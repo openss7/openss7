@@ -1,18 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi.h,v 0.9.2.4 2005/07/18 12:40:29 brian Exp $
+ @(#) $Id: dlpi.h,v 0.9.2.5 2006/03/03 11:27:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,33 +44,39 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:40:29 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:27:48 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: dlpi.h,v $
+ Revision 0.9.2.5  2006/03/03 11:27:48  brian
+ - 32/64-bit compatibility
 
  *****************************************************************************/
 
 #ifndef _SYS_DLPI_H
 #define _SYS_DLPI_H
 
-#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:40:29 $"
+#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifdef __LP64__
 typedef int32_t dl_long;
 typedef u_int32_t dl_ulong;
 typedef u_int16_t dl_ushort;
-#else
+#else				/* __LP64__ */
 typedef long dl_long;
 typedef ulong dl_ulong;
 typedef ushort dl_ushort;
-#endif
+#endif				/* __LP64__ */
 
-/*
-   DLPI revision definition history 
+/* 
+   DLPI revision definition history
  */
-#define	DL_CURRENT_VERSION		0x02	/* current version of DLPI */
-#define	DL_VERSION_2			0x02	/* DLPI March 12, 1991 */
+#define DL_CURRENT_VERSION		0x02	/* current version of DLPI */
+#define DL_VERSION_2			0x02	/* DLPI March 12, 1991 */
 
-/*
-   Primitives for Local Managemet Services 
+/* 
+   Primitives for Local Management Services
  */
 #define DL_INFO_REQ			0x00	/* Information Req */
 #define DL_INFO_ACK			0x03	/* Information Ack */
@@ -91,19 +95,16 @@ typedef ushort dl_ushort;
 #define DL_PROMISCON_REQ		0x1f	/* Turn on promiscuous mode */
 #define DL_PROMISCOFF_REQ		0x20	/* Turn off promiscuous mode */
 
-#define DL_OK_ACK			0x06
-#define DL_ERROR_ACK			0x05
-
-/*
-   Primitives used for Connectionless Service 
+/* 
+   Primitives used for Connectionless Service
  */
 #define DL_UNITDATA_REQ			0x07	/* datagram send request */
 #define DL_UNITDATA_IND			0x08	/* datagram receive indication */
 #define DL_UDERROR_IND			0x09	/* datagram error indication */
 #define DL_UDQOS_REQ			0x0a	/* set QOS for subsequent datagrams */
 
-/*
-   Primitives used for Connection-Oriented Service 
+/* 
+   Primitives used for Connection-Oriented Service
  */
 #define DL_CONNECT_REQ			0x0d	/* Connect request */
 #define DL_CONNECT_IND			0x0e	/* Incoming connect indication */
@@ -118,8 +119,8 @@ typedef ushort dl_ushort;
 #define DL_RESET_RES			0x19	/* Complete reset processing */
 #define DL_RESET_CON			0x1a	/* Reset processing complete */
 
-/*
-   Primitives used for Acknowledged Connectionless Service 
+/* 
+   Primitives used for Acknowledged Connectionless Service
  */
 #define DL_DATA_ACK_REQ			0x21	/* data unit transmission request */
 #define DL_DATA_ACK_IND			0x22	/* Arrival of a command PDU */
@@ -130,8 +131,8 @@ typedef ushort dl_ushort;
 #define DL_REPLY_UPDATE_REQ		0x27	/* Hold a DLSDU for transmission */
 #define DL_REPLY_UPDATE_STATUS_IND	0x28	/* Status of REPLY_UPDATE req */
 
-/*
-   Primitives used for XID and TEST operations 
+/* 
+   Primitives used for XID and TEST operations
  */
 #define DL_XID_REQ			0x29	/* Request to send an XID PDU */
 #define DL_XID_IND			0x2a	/* Arrival of an XID PDU */
@@ -142,21 +143,21 @@ typedef ushort dl_ushort;
 #define DL_TEST_RES			0x2f	/* TEST response */
 #define DL_TEST_CON			0x30	/* TEST Confirmation */
 
-/*
-   Primitives to get and set the physical address 
+/* 
+   Primitives to get and set the physical address
  */
 #define DL_PHYS_ADDR_REQ		0x31	/* Request to get physical addr */
 #define DL_PHYS_ADDR_ACK		0x32	/* Return physical addr */
 #define DL_SET_PHYS_ADDR_REQ		0x33	/* set physical addr */
 
-/*
-   Primitives to get statistics 
+/* 
+   Primitives to get statistics
  */
 #define DL_GET_STATISTICS_REQ		0x34	/* Request to get statistics */
 #define DL_GET_STATISTICS_ACK		0x35	/* Return statistics */
 
-/*
-   DLPI interface states 
+/* 
+   DLPI interface states
  */
 #define DL_UNATTACHED			0x04	/* PPA not attached */
 #define DL_ATTACH_PENDING		0x05	/* Waiting ack of DL_ATTACH_REQ */
@@ -181,8 +182,8 @@ typedef ushort dl_ushort;
 #define DL_SUBS_BIND_PND		0x14	/* Waiting ack of DL_SUBS_BIND_REQ */
 #define DL_SUBS_UNBIND_PND		0x15	/* Waiting ack of DL_SUBS_UNBIND_REQ */
 
-/*
-   DL_ERROR_ACK error return values 
+/* 
+   DL_ERROR_ACK error return values
  */
 #define DL_ACCESS			0x02	/* Improper permissions for request */
 #define DL_BADADDR			0x01	/* DLSAP addr in improper format or invalid */
@@ -214,13 +215,13 @@ typedef ushort dl_ushort;
 #define DL_TESTAUTO			0x1a	/* Automatic handling of TEST response */
 #define DL_PENDING			0x1b	/* pending outstanding connect indications */
 
-/*
+/* 
    NOTE: The range of error codes from 0x80 - 0xff is reserved for implementation specific error
-   codes.  This reserved range of error codes will be defined by the DLS Provider. 
+   codes.  This reserved range of error codes will be defined by the DLS Provider.
  */
 
-/*
-   DLPI media types supported 
+/* 
+   DLPI media types supported
  */
 #define DL_CSMACD			0x00	/* IEEE 802.3 CSMA/CD network */
 #define DL_TPB				0x01	/* IEEE 802.4 Token Passing Bus */
@@ -248,32 +249,32 @@ typedef ushort dl_ushort;
 #define DL_IPX25			0x0d	/* X.25 Classical IP interface */
 #define DL_LOOP				0x0e	/* software loopback */
 
-/*
+/* 
    DLPI provider service supported.
 
-   These must be allowed to be bitwise-OR for dl_service_mode in DL_INFO_ACK. 
+   These must be allowed to be bitwise-OR for dl_service_mode in DL_INFO_ACK.
  */
 #define DL_CODLS			0x01	/* connection-oriented service */
 #define DL_CLDLS			0x02	/* connectionless data link service */
 #define DL_ACLDLS			0x04	/* acknowledged connectionless service */
 
-/*
+/* 
    DLPI provider style.
 
    The DLPI provider style which determines whether a provider requires a DL_ATTACH_REQ to inform
-   the provider which PPA user messages should be sent/received on. 
+   the provider which PPA user messages should be sent/received on.
  */
 #define DL_STYLE1			0x0500	/* PPA is implicitly bound by open(2) */
 #define DL_STYLE2			0x0501	/* PPA must be expl. bound via DL_ATTACH_REQ */
 
-/*
-   DLPI Originator for Disconnect and Resets 
+/* 
+   DLPI Originator for Disconnect and Resets
  */
 #define DL_PROVIDER			0x0700
 #define DL_USER				0x0701
 
-/*
-   DLPI Disconnect Reasons 
+/* 
+   DLPI Disconnect Reasons
  */
 #define DL_CONREJ_DEST_UNKNOWN			0x0800
 #define DL_CONREJ_DEST_UNREACH_PERMANENT	0x0801
@@ -288,15 +289,15 @@ typedef ushort dl_ushort;
 #define DL_DISC_TRANSIENT_CONDITION		0x080a
 #define DL_DISC_UNSPECIFIED			0x080b
 
-/*
-   DLPI Reset Reasons 
+/* 
+   DLPI Reset Reasons
  */
 #define DL_RESET_FLOW_CONTROL		0x0900
 #define DL_RESET_LINK_ERROR		0x0901
 #define DL_RESET_RESYNCH		0x0902
 
-/*
-   DLPI status values for acknowledged connectionless data transfer 
+/* 
+   DLPI status values for acknowledged connectionless data transfer
  */
 #define DL_CMD_MASK			0x0f	/* mask for command portion of status */
 #define DL_CMD_OK			0x00	/* Command Accepted */
@@ -317,80 +318,80 @@ typedef ushort dl_ushort;
 #define DL_RSP_UN			0x90	/* Resources temporarily unavailable */
 #define DL_RSP_IT			0xf0	/* Temporary implementation dependent error */
 
-/*
-   Service Class values for acknowledged connectionless data transfer 
+/* 
+   Service Class values for acknowledged connectionless data transfer
  */
 #define DL_RQST_RSP			0x01	/* Use acknowledge capability in MAC sublayer */
 #define DL_RQST_NORSP			0x02	/* No acknowledgement service requested */
 
-/*
-   DLPI address type definition 
+/* 
+   DLPI address type definition
  */
 #define DL_FACT_PHYS_ADDR		0x01	/* factory physical address */
 #define DL_CURR_PHYS_ADDR		0x02	/* current physical address */
 
-/*
-   DLPI flag definitions 
+/* 
+   DLPI flag definitions
  */
-#define	DL_POLL_FINAL			0x01	/* poll/final bit for TEST/XID */
+#define DL_POLL_FINAL			0x01	/* poll/final bit for TEST/XID */
 
-/*
-   XID and TEST responses supported by the provider 
+/* 
+   XID and TEST responses supported by the provider
  */
 #define DL_AUTO_XID			0x01	/* provider will respond to XID */
 #define DL_AUTO_TEST			0x02	/* provider will respond to TEST */
 
-/*
-   Subsequent bind types 
+/* 
+   Subsequent bind types
  */
-#define	DL_PEER_BIND			0x01	/* subsequent bind on a peer addr */
-#define	DL_HIERARCHICAL_BIND		0x02	/* subs-bind on a hierarchical addr */
+#define DL_PEER_BIND			0x01	/* subsequent bind on a peer addr */
+#define DL_HIERARCHICAL_BIND		0x02	/* subs-bind on a hierarchical addr */
 
-/*
-   DLPI promiscuous mode definitions 
+/* 
+   DLPI promiscuous mode definitions
  */
 #define DL_PROMISC_PHYS			0x01	/* promiscuous mode at phys level */
 #define DL_PROMISC_SAP			0x02	/* promiscous mode at sap level */
 #define DL_PROMISC_MULTI		0x03	/* promiscuous mode for multicast */
 
-/*
+/* 
    DLPI Quality Of Service definition for use in QOS structure definitions. The QOS structures are
-   used in connection establishment, DL_INFO_ACK, and setting connectionless QOS values. 
+   used in connection establishment, DL_INFO_ACK, and setting connectionless QOS values.
  */
 
-/*
+/* 
    Throughput
 
-   This parameter is specified for both directions. 
+   This parameter is specified for both directions.
  */
 typedef struct {
 	dl_long dl_target_value;	/* bits/second desired */
 	dl_long dl_accept_value;	/* min. ok bits/second */
 } dl_through_t;
 
-/*
+/* 
    transit delay specification
 
-   This parameter is specified for both directions. expressed in milliseconds assuming a DLSDU size 
-   of 128 octets. The scaling of the value to the current DLSDU size is provider dependent. 
+   This parameter is specified for both directions. expressed in milliseconds assuming a DLSDU size
+   of 128 octets. The scaling of the value to the current DLSDU size is provider dependent.
  */
 typedef struct {
 	dl_long dl_target_value;	/* desired value of service */
 	dl_long dl_accept_value;	/* min. ok value of service */
 } dl_transdelay_t;
 
-/*
+/* 
    priority specification
 
-   priority range is 0-100, with 0 being highest value. 
+   priority range is 0-100, with 0 being highest value.
  */
 typedef struct {
 	dl_long dl_min;
 	dl_long dl_max;
 } dl_priority_t;
 
-/*
-   protection specification 
+/* 
+   protection specification
  */
 #define DL_NONE				0x0B01	/* no protection supplied */
 #define DL_MONITOR			0x0B02	/* prot. from passive monit. */
@@ -402,17 +403,17 @@ typedef struct {
 	dl_long dl_max;
 } dl_protect_t;
 
-/*
+/* 
    Resilience specification
 
-   probabilities are scaled by a factor of 10,000 with a time interval of 10,000 seconds. 
+   probabilities are scaled by a factor of 10,000 with a time interval of 10,000 seconds.
  */
 typedef struct {
 	dl_long dl_disc_prob;		/* prob. of provider init DISC */
 	dl_long dl_reset_prob;		/* prob. of provider init RESET */
 } dl_resilience_t;
 
-/*
+/* 
    QOS type definition to be used for negotiation with the remote end of a connection, or a
    connectionless unitdata request. There are two type definitions to handle the negotiation
    process at connection establishment. The typedef dl_qos_range_t is used to present a range for
@@ -428,17 +429,17 @@ typedef struct {
    this value doesn't care what the QOS parameter is set to. This value becomes the least possible
    value in the range of QOS parameters. The order of the QOS parameter range is then:
 
-   DL_QOS_DONT_CARE < 0 < MAXIMUM QOS VALUE 
+   DL_QOS_DONT_CARE < 0 < MAXIMUM QOS VALUE
  */
-#define DL_UNKNOWN              -1
-#define DL_QOS_DONT_CARE        -2
+#define DL_UNKNOWN		-1
+#define DL_QOS_DONT_CARE	-2
 
-/*
+/* 
    Every QOS structure has the first 4 bytes containing a type field, denoting the definition of
    the rest of the structure. This is used in the same manner has the dl_primitive variable is in
    messages.
 
-   The following list is the defined QOS structure type values and structures. 
+   The following list is the defined QOS structure type values and structures.
  */
 #define DL_QOS_CO_RANGE1		0x0101	/* CO QOS range struct. */
 #define DL_QOS_CO_SEL1			0x0102	/* CO QOS selection structure */
@@ -485,34 +486,34 @@ typedef struct {
 	dl_long dl_residual_error;
 } dl_qos_cl_sel1_t;
 
-/*
+/* 
    DLPI interface primitive definitions.
 
-   Each primitive is sent as a stream message.  It is possible that the messages may be viewed as a 
+   Each primitive is sent as a stream message.  It is possible that the messages may be viewed as a
    sequence of bytes that have the following form without any padding. The structure definition of
    the following messages may have to change depending on the underlying hardware architecture and
    crossing of a hardware boundary with a different hardware architecture.
 
-   Fields in the primitives having a name of the form dl_reserved cannot be used and have the value 
+   Fields in the primitives having a name of the form dl_reserved cannot be used and have the value
    of binary zero, no bits turned on.
 
    Each message has the name defined followed by the stream message type (M_PROTO, M_PCPROTO,
-   M_DATA) 
+   M_DATA)
  */
 
-/*
-   LOCAL MANAGEMENT SERVICE PRIMITIVES 
+/* 
+   LOCAL MANAGEMENT SERVICE PRIMITIVES
  */
 
-/*
-   DL_INFO_REQ, M_PCPROTO type 
+/* 
+   DL_INFO_REQ, M_PCPROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* set to DL_INFO_REQ */
 } dl_info_req_t;
 
-/*
-   DL_INFO_ACK, M_PCPROTO type 
+/* 
+   DL_INFO_ACK, M_PCPROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* set to DL_INFO_ACK */
@@ -536,23 +537,23 @@ typedef struct {
 	dl_ulong dl_growth;		/* set to zero */
 } dl_info_ack_t;
 
-/*
-   DL_ATTACH_REQ, M_PROTO type 
+/* 
+   DL_ATTACH_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* set to DL_ATTACH_REQ */
 	dl_ulong dl_ppa;		/* id of the PPA */
 } dl_attach_req_t;
 
-/*
-   DL_DETACH_REQ, M_PROTO type 
+/* 
+   DL_DETACH_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* set to DL_DETACH_REQ */
 } dl_detach_req_t;
 
-/*
-   DL_BIND_REQ, M_PROTO type 
+/* 
+   DL_BIND_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* set to DL_BIND_REQ */
@@ -563,8 +564,8 @@ typedef struct {
 	dl_ulong dl_xidtest_flg;	/* auto init. of test and xid */
 } dl_bind_req_t;
 
-/*
-   DL_BIND_ACK, M_PCPROTO type 
+/* 
+   DL_BIND_ACK, M_PCPROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_BIND_ACK */
@@ -575,8 +576,8 @@ typedef struct {
 	dl_ulong dl_xidtest_flg;	/* responses supported by provider */
 } dl_bind_ack_t;
 
-/*
-   DL_SUBS_BIND_REQ, M_PROTO type 
+/* 
+   DL_SUBS_BIND_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_SUBS_BIND_REQ */
@@ -585,10 +586,10 @@ typedef struct {
 	dl_ulong dl_subs_bind_class;	/* peer or hierarchical */
 } dl_subs_bind_req_t;
 
-#define	dl_subs_sap_len	dl_subs_sap_length	/* SCO compatibility */
+#define dl_subs_sap_len dl_subs_sap_length	/* SCO compatibility */
 
-/*
-   DL_SUBS_BIND_ACK, M_PCPROTO type 
+/* 
+   DL_SUBS_BIND_ACK, M_PCPROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_SUBS_BIND_ACK */
@@ -596,15 +597,15 @@ typedef struct {
 	dl_ulong dl_subs_sap_length;	/* length of subs_sap */
 } dl_subs_bind_ack_t;
 
-/*
-   DL_UNBIND_REQ, M_PROTO type 
+/* 
+   DL_UNBIND_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_UNBIND_REQ */
 } dl_unbind_req_t;
 
-/*
-   DL_SUBS_UNBIND_REQ, M_PROTO type 
+/* 
+   DL_SUBS_UNBIND_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_SUBS_UNBIND_REQ */
@@ -612,16 +613,16 @@ typedef struct {
 	dl_ulong dl_subs_sap_length;	/* length of subs_sap */
 } dl_subs_unbind_req_t;
 
-/*
-   DL_OK_ACK, M_PCPROTO type 
+/* 
+   DL_OK_ACK, M_PCPROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_OK_ACK */
 	dl_ulong dl_correct_primitive;	/* primitive acknowledged */
 } dl_ok_ack_t;
 
-/*
-   DL_ERROR_ACK, M_PCPROTO type 
+/* 
+   DL_ERROR_ACK, M_PCPROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_ERROR_ACK */
@@ -630,8 +631,8 @@ typedef struct {
 	dl_ulong dl_unix_errno;		/* UNIX system error code */
 } dl_error_ack_t;
 
-/*
-   DL_ENABMULTI_REQ, M_PROTO type 
+/* 
+   DL_ENABMULTI_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_ENABMULTI_REQ */
@@ -639,8 +640,8 @@ typedef struct {
 	dl_ulong dl_addr_offset;	/* offset from start of M_PROTO block */
 } dl_enabmulti_req_t;
 
-/*
-   DL_DISABMULTI_REQ, M_PROTO type 
+/* 
+   DL_DISABMULTI_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_DISABMULTI_REQ */
@@ -648,36 +649,36 @@ typedef struct {
 	dl_ulong dl_addr_offset;	/* offset from start of M_PROTO block */
 } dl_disabmulti_req_t;
 
-/*
-   DL_PROMISCON_REQ, M_PROTO type 
+/* 
+   DL_PROMISCON_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_PROMISCON_REQ */
 	dl_ulong dl_level;		/* physical,SAP, or ALL multicast */
 } dl_promiscon_req_t;
 
-/*
-   DL_PROMISCOFF_REQ, M_PROTO type 
+/* 
+   DL_PROMISCOFF_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_PROMISCOFF_REQ */
 	dl_ulong dl_level;		/* Physical,SAP, or ALL multicast */
 } dl_promiscoff_req_t;
 
-/*
-   Primitives to get and set the Physical address 
+/* 
+   Primitives to get and set the Physical address
  */
 
-/*
-   DL_PHYS_ADDR_REQ, M_PROTO type 
+/* 
+   DL_PHYS_ADDR_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_PHYS_ADDR_REQ */
 	dl_ulong dl_addr_type;		/* factory or current physical addr */
 } dl_phys_addr_req_t;
 
-/*
-   DL_PHYS_ADDR_ACK, M_PCPROTO type 
+/* 
+   DL_PHYS_ADDR_ACK, M_PCPROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_PHYS_ADDR_ACK */
@@ -685,8 +686,8 @@ typedef struct {
 	dl_ulong dl_addr_offset;	/* offset from start of block */
 } dl_phys_addr_ack_t;
 
-/*
-   DL_SET_PHYS_ADDR_REQ, M_PROTO type 
+/* 
+   DL_SET_PHYS_ADDR_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_SET_PHYS_ADDR_REQ */
@@ -694,19 +695,19 @@ typedef struct {
 	dl_ulong dl_addr_offset;	/* offset from start of block */
 } dl_set_phys_addr_req_t;
 
-/*
-   Primitives to get statistics 
+/* 
+   Primitives to get statistics
  */
 
-/*
-   DL_GET_STATISTICS_REQ, M_PROTO type 
+/* 
+   DL_GET_STATISTICS_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_GET_STATISTICS_REQ */
 } dl_get_statistics_req_t;
 
-/*
-   DL_GET_STATISTICS_ACK, M_PCPROTO type 
+/* 
+   DL_GET_STATISTICS_ACK, M_PCPROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_GET_STATISTICS_ACK */
@@ -714,12 +715,12 @@ typedef struct {
 	dl_ulong dl_stat_offset;	/* offset from start of block */
 } dl_get_statistics_ack_t;
 
-/*
-   CONNECTION-ORIENTED SERVICE PRIMITIVES 
+/* 
+   CONNECTION-ORIENTED SERVICE PRIMITIVES
  */
 
-/*
-   DL_CONNECT_REQ, M_PROTO type 
+/* 
+   DL_CONNECT_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_CONNECT_REQ */
@@ -730,8 +731,8 @@ typedef struct {
 	dl_ulong dl_growth;		/* set to zero */
 } dl_connect_req_t;
 
-/*
-   DL_CONNECT_IND, M_PROTO type 
+/* 
+   DL_CONNECT_IND, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_CONNECT_IND */
@@ -745,8 +746,8 @@ typedef struct {
 	dl_ulong dl_growth;		/* set to zero */
 } dl_connect_ind_t;
 
-/*
-   DL_CONNECT_RES, M_PROTO type 
+/* 
+   DL_CONNECT_RES, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_CONNECT_RES */
@@ -757,8 +758,8 @@ typedef struct {
 	dl_ulong dl_growth;		/* set to zero */
 } dl_connect_res_t;
 
-/*
-   DL_CONNECT_CON, M_PROTO type 
+/* 
+   DL_CONNECT_CON, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_CONNECT_CON */
@@ -769,23 +770,23 @@ typedef struct {
 	dl_ulong dl_growth;		/* set to zero */
 } dl_connect_con_t;
 
-/*
-   DL_TOKEN_REQ, M_PCPROTO type 
+/* 
+   DL_TOKEN_REQ, M_PCPROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_TOKEN_REQ */
 } dl_token_req_t;
 
-/*
-   DL_TOKEN_ACK, M_PCPROTO type 
+/* 
+   DL_TOKEN_ACK, M_PCPROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_TOKEN_ACK */
 	dl_ulong dl_token;		/* Connection response token */
 } dl_token_ack_t;
 
-/*
-   DL_DISCONNECT_REQ, M_PROTO type 
+/* 
+   DL_DISCONNECT_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_DISCONNECT_REQ */
@@ -793,8 +794,8 @@ typedef struct {
 	dl_ulong dl_correlation;	/* association with connect_ind */
 } dl_disconnect_req_t;
 
-/*
-   DL_DISCONNECT_IND, M_PROTO type 
+/* 
+   DL_DISCONNECT_IND, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_DISCONNECT_IND */
@@ -803,15 +804,15 @@ typedef struct {
 	dl_ulong dl_correlation;	/* association with connect_ind */
 } dl_disconnect_ind_t;
 
-/*
-   DL_RESET_REQ, M_PROTO type 
+/* 
+   DL_RESET_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_RESET_REQ */
 } dl_reset_req_t;
 
-/*
-   DL_RESET_IND, M_PROTO type 
+/* 
+   DL_RESET_IND, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_RESET_IND */
@@ -819,26 +820,26 @@ typedef struct {
 	dl_ulong dl_reason;		/* flow control, link error, resync */
 } dl_reset_ind_t;
 
-/*
-   DL_RESET_RES, M_PROTO type 
+/* 
+   DL_RESET_RES, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_RESET_RES */
 } dl_reset_res_t;
 
-/*
-   DL_RESET_CON, M_PROTO type 
+/* 
+   DL_RESET_CON, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_RESET_CON */
 } dl_reset_con_t;
 
-/*
-   CONNECTIONLESS SERVICE PRIMITIVES 
+/* 
+   CONNECTIONLESS SERVICE PRIMITIVES
  */
 
-/*
-   DL_UNITDATA_REQ, M_PROTO type, with M_DATA block(s) 
+/* 
+   DL_UNITDATA_REQ, M_PROTO type, with M_DATA block(s)
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_UNITDATA_REQ */
@@ -847,8 +848,8 @@ typedef struct {
 	dl_priority_t dl_priority;	/* priority value */
 } dl_unitdata_req_t;
 
-/*
-   DL_UNITDATA_IND, M_PROTO type, with M_DATA block(s) 
+/* 
+   DL_UNITDATA_IND, M_PROTO type, with M_DATA block(s)
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_UNITDATA_IND */
@@ -859,8 +860,8 @@ typedef struct {
 	dl_ulong dl_group_address;	/* one if multicast/broadcast */
 } dl_unitdata_ind_t;
 
-/*
-   DL_UDERROR_IND, M_PROTO type (or M_PCPROTO type if LLI-based provider) 
+/* 
+   DL_UDERROR_IND, M_PROTO type (or M_PCPROTO type if LLI-based provider)
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_UDERROR_IND */
@@ -870,8 +871,8 @@ typedef struct {
 	dl_ulong dl_errno;		/* DLPI error code */
 } dl_uderror_ind_t;
 
-/*
-   DL_UDQOS_REQ, M_PROTO type 
+/* 
+   DL_UDQOS_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_UDQOS_REQ */
@@ -879,12 +880,12 @@ typedef struct {
 	dl_ulong dl_qos_offset;		/* offset from start of block */
 } dl_udqos_req_t;
 
-/*
-   Primitives to handle XID and TEST operations 
+/* 
+   Primitives to handle XID and TEST operations
  */
 
-/*
-   DL_TEST_REQ, M_PROTO type 
+/* 
+   DL_TEST_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_TEST_REQ */
@@ -893,8 +894,8 @@ typedef struct {
 	dl_ulong dl_dest_addr_offset;	/* offset from start of block */
 } dl_test_req_t;
 
-/*
-   DL_TEST_IND, M_PROTO type 
+/* 
+   DL_TEST_IND, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_TEST_IND */
@@ -905,8 +906,8 @@ typedef struct {
 	dl_ulong dl_src_addr_offset;	/* offset from start of block */
 } dl_test_ind_t;
 
-/*
-   DL_TEST_RES, M_PROTO type 
+/* 
+   DL_TEST_RES, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_TEST_RES */
@@ -915,8 +916,8 @@ typedef struct {
 	dl_ulong dl_dest_addr_offset;	/* offset from start of block */
 } dl_test_res_t;
 
-/*
-   DL_TEST_CON, M_PROTO type 
+/* 
+   DL_TEST_CON, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_TEST_CON */
@@ -927,8 +928,8 @@ typedef struct {
 	dl_ulong dl_src_addr_offset;	/* offset from start of block */
 } dl_test_con_t;
 
-/*
-   DL_XID_REQ, M_PROTO type 
+/* 
+   DL_XID_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_XID_REQ */
@@ -937,8 +938,8 @@ typedef struct {
 	dl_ulong dl_dest_addr_offset;	/* offset from start of block */
 } dl_xid_req_t;
 
-/*
-   DL_XID_IND, M_PROTO type 
+/* 
+   DL_XID_IND, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_XID_IND */
@@ -949,8 +950,8 @@ typedef struct {
 	dl_ulong dl_src_addr_offset;	/* offset from start of block */
 } dl_xid_ind_t;
 
-/*
-   DL_XID_RES, M_PROTO type 
+/* 
+   DL_XID_RES, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_XID_RES */
@@ -959,8 +960,8 @@ typedef struct {
 	dl_ulong dl_dest_addr_offset;	/* offset from start of block */
 } dl_xid_res_t;
 
-/*
-   DL_XID_CON, M_PROTO type 
+/* 
+   DL_XID_CON, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_XID_CON */
@@ -971,12 +972,12 @@ typedef struct {
 	dl_ulong dl_src_addr_offset;	/* offset from start of block */
 } dl_xid_con_t;
 
-/*
-   ACKNOWLEDGED CONNECTIONLESS SERVICE PRIMITIVES 
+/* 
+   ACKNOWLEDGED CONNECTIONLESS SERVICE PRIMITIVES
  */
 
-/*
-   DL_DATA_ACK_REQ, M_PROTO type 
+/* 
+   DL_DATA_ACK_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_DATA_ACK_REQ */
@@ -989,8 +990,8 @@ typedef struct {
 	dl_ulong dl_service_class;	/* DL_RQST_RSP|DL_RQST_NORSP */
 } dl_data_ack_req_t;
 
-/*
-   DL_DATA_ACK_IND, M_PROTO type 
+/* 
+   DL_DATA_ACK_IND, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_DATA_ACK_IND */
@@ -1002,8 +1003,8 @@ typedef struct {
 	dl_ulong dl_service_class;	/* DL_RQST_RSP|DL_RQST_NORSP */
 } dl_data_ack_ind_t;
 
-/*
-   DL_DATA_ACK_STATUS_IND, M_PROTO type 
+/* 
+   DL_DATA_ACK_STATUS_IND, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_DATA_ACK_STATUS_IND */
@@ -1011,8 +1012,8 @@ typedef struct {
 	dl_ulong dl_status;		/* success or failure of previous req */
 } dl_data_ack_status_ind_t;
 
-/*
-   DL_REPLY_REQ, M_PROTO type 
+/* 
+   DL_REPLY_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_REPLY_REQ */
@@ -1025,8 +1026,8 @@ typedef struct {
 	dl_ulong dl_service_class;
 } dl_reply_req_t;
 
-/*
-   DL_REPLY_IND, M_PROTO type 
+/* 
+   DL_REPLY_IND, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_REPLY_IND */
@@ -1038,8 +1039,8 @@ typedef struct {
 	dl_ulong dl_service_class;	/* DL_RQST_RSP|DL_RQST_NORSP */
 } dl_reply_ind_t;
 
-/*
-   DL_REPLY_STATUS_IND, M_PROTO type 
+/* 
+   DL_REPLY_STATUS_IND, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_REPLY_STATUS_IND */
@@ -1047,8 +1048,8 @@ typedef struct {
 	dl_ulong dl_status;		/* success or failure of previous req */
 } dl_reply_status_ind_t;
 
-/*
-   DL_REPLY_UPDATE_REQ, M_PROTO type 
+/* 
+   DL_REPLY_UPDATE_REQ, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_REPLY_UPDATE_REQ */
@@ -1057,8 +1058,8 @@ typedef struct {
 	dl_ulong dl_src_addr_offset;	/* offset from start of block */
 } dl_reply_update_req_t;
 
-/*
-   DL_REPLY_UPDATE_STATUS_IND, M_PROTO type 
+/* 
+   DL_REPLY_UPDATE_STATUS_IND, M_PROTO type
  */
 typedef struct {
 	dl_ulong dl_primitive;		/* DL_REPLY_UPDATE_STATUS_IND */
@@ -1123,58 +1124,58 @@ union DL_primitives {
 	dl_reply_update_status_ind_t reply_update_status_ind;
 };
 
-#define DL_INFO_REQ_SIZE		sizeof (dl_info_req_t)
-#define DL_INFO_ACK_SIZE		sizeof (dl_info_ack_t)
-#define DL_ATTACH_REQ_SIZE		sizeof (dl_attach_req_t)
-#define DL_DETACH_REQ_SIZE		sizeof (dl_detach_req_t)
-#define DL_BIND_REQ_SIZE		sizeof (dl_bind_req_t)
-#define DL_BIND_ACK_SIZE		sizeof (dl_bind_ack_t)
-#define DL_UNBIND_REQ_SIZE		sizeof (dl_unbind_req_t)
-#define DL_SUBS_BIND_REQ_SIZE		sizeof (dl_subs_bind_req_t)
-#define DL_SUBS_BIND_ACK_SIZE		sizeof (dl_subs_bind_ack_t)
-#define DL_SUBS_UNBIND_REQ_SIZE		sizeof (dl_subs_unbind_req_t)
-#define DL_OK_ACK_SIZE			sizeof (dl_ok_ack_t)
-#define DL_ERROR_ACK_SIZE		sizeof (dl_error_ack_t)
-#define DL_CONNECT_REQ_SIZE		sizeof (dl_connect_req_t)
-#define DL_CONNECT_IND_SIZE		sizeof (dl_connect_ind_t)
-#define DL_CONNECT_RES_SIZE		sizeof (dl_connect_res_t)
-#define DL_CONNECT_CON_SIZE		sizeof (dl_connect_con_t)
-#define DL_TOKEN_REQ_SIZE		sizeof (dl_token_req_t)
-#define DL_TOKEN_ACK_SIZE		sizeof (dl_token_ack_t)
-#define DL_DISCONNECT_REQ_SIZE		sizeof (dl_disconnect_req_t)
-#define DL_DISCONNECT_IND_SIZE		sizeof (dl_disconnect_ind_t)
-#define DL_RESET_REQ_SIZE		sizeof (dl_reset_req_t)
-#define DL_RESET_IND_SIZE		sizeof (dl_reset_ind_t)
-#define DL_RESET_RES_SIZE		sizeof (dl_reset_res_t)
-#define DL_RESET_CON_SIZE		sizeof (dl_reset_con_t)
-#define DL_UNITDATA_REQ_SIZE		sizeof (dl_unitdata_req_t)
-#define DL_UNITDATA_IND_SIZE		sizeof (dl_unitdata_ind_t)
-#define DL_UDERROR_IND_SIZE		sizeof (dl_uderror_ind_t)
-#define DL_UDQOS_REQ_SIZE		sizeof (dl_udqos_req_t)
-#define DL_ENABMULTI_REQ_SIZE		sizeof (dl_enabmulti_req_t)
-#define DL_DISABMULTI_REQ_SIZE		sizeof (dl_disabmulti_req_t)
-#define DL_PROMISCON_REQ_SIZE		sizeof (dl_promiscon_req_t)
-#define DL_PROMISCOFF_REQ_SIZE		sizeof (dl_promiscoff_req_t)
-#define DL_PHYS_ADDR_REQ_SIZE		sizeof (dl_phys_addr_req_t)
-#define DL_PHYS_ADDR_ACK_SIZE		sizeof (dl_phys_addr_ack_t)
-#define DL_SET_PHYS_ADDR_REQ_SIZE	sizeof (dl_set_phys_addr_req_t)
-#define DL_GET_STATISTICS_REQ_SIZE	sizeof (dl_get_statistics_req_t)
-#define DL_GET_STATISTICS_ACK_SIZE	sizeof (dl_get_statistics_ack_t)
-#define DL_XID_REQ_SIZE			sizeof (dl_xid_req_t)
-#define DL_XID_IND_SIZE			sizeof (dl_xid_ind_t)
-#define DL_XID_RES_SIZE			sizeof (dl_xid_res_t)
-#define DL_XID_CON_SIZE			sizeof (dl_xid_con_t)
-#define DL_TEST_REQ_SIZE		sizeof (dl_test_req_t)
-#define DL_TEST_IND_SIZE		sizeof (dl_test_ind_t)
-#define DL_TEST_RES_SIZE		sizeof (dl_test_res_t)
-#define DL_TEST_CON_SIZE		sizeof (dl_test_con_t)
-#define DL_DATA_ACK_REQ_SIZE		sizeof (dl_data_ack_req_t)
-#define DL_DATA_ACK_IND_SIZE		sizeof (dl_data_ack_ind_t)
-#define DL_DATA_ACK_STATUS_IND_SIZE	sizeof (dl_data_ack_status_ind_t)
-#define DL_REPLY_REQ_SIZE		sizeof (dl_reply_req_t)
-#define DL_REPLY_IND_SIZE		sizeof (dl_reply_ind_t)
-#define DL_REPLY_STATUS_IND_SIZE	sizeof (dl_reply_status_ind_t)
-#define DL_REPLY_UPDATE_REQ_SIZE	sizeof (dl_reply_update_req_t)
-#define DL_REPLY_UPDATE_STATUS_IND_SIZE	sizeof (dl_reply_update_status_ind_t)
+#define DL_INFO_REQ_SIZE		sizeof(dl_info_req_t)
+#define DL_INFO_ACK_SIZE		sizeof(dl_info_ack_t)
+#define DL_ATTACH_REQ_SIZE		sizeof(dl_attach_req_t)
+#define DL_DETACH_REQ_SIZE		sizeof(dl_detach_req_t)
+#define DL_BIND_REQ_SIZE		sizeof(dl_bind_req_t)
+#define DL_BIND_ACK_SIZE		sizeof(dl_bind_ack_t)
+#define DL_UNBIND_REQ_SIZE		sizeof(dl_unbind_req_t)
+#define DL_SUBS_BIND_REQ_SIZE		sizeof(dl_subs_bind_req_t)
+#define DL_SUBS_BIND_ACK_SIZE		sizeof(dl_subs_bind_ack_t)
+#define DL_SUBS_UNBIND_REQ_SIZE		sizeof(dl_subs_unbind_req_t)
+#define DL_OK_ACK_SIZE			sizeof(dl_ok_ack_t)
+#define DL_ERROR_ACK_SIZE		sizeof(dl_error_ack_t)
+#define DL_CONNECT_REQ_SIZE		sizeof(dl_connect_req_t)
+#define DL_CONNECT_IND_SIZE		sizeof(dl_connect_ind_t)
+#define DL_CONNECT_RES_SIZE		sizeof(dl_connect_res_t)
+#define DL_CONNECT_CON_SIZE		sizeof(dl_connect_con_t)
+#define DL_TOKEN_REQ_SIZE		sizeof(dl_token_req_t)
+#define DL_TOKEN_ACK_SIZE		sizeof(dl_token_ack_t)
+#define DL_DISCONNECT_REQ_SIZE		sizeof(dl_disconnect_req_t)
+#define DL_DISCONNECT_IND_SIZE		sizeof(dl_disconnect_ind_t)
+#define DL_RESET_REQ_SIZE		sizeof(dl_reset_req_t)
+#define DL_RESET_IND_SIZE		sizeof(dl_reset_ind_t)
+#define DL_RESET_RES_SIZE		sizeof(dl_reset_res_t)
+#define DL_RESET_CON_SIZE		sizeof(dl_reset_con_t)
+#define DL_UNITDATA_REQ_SIZE		sizeof(dl_unitdata_req_t)
+#define DL_UNITDATA_IND_SIZE		sizeof(dl_unitdata_ind_t)
+#define DL_UDERROR_IND_SIZE		sizeof(dl_uderror_ind_t)
+#define DL_UDQOS_REQ_SIZE		sizeof(dl_udqos_req_t)
+#define DL_ENABMULTI_REQ_SIZE		sizeof(dl_enabmulti_req_t)
+#define DL_DISABMULTI_REQ_SIZE		sizeof(dl_disabmulti_req_t)
+#define DL_PROMISCON_REQ_SIZE		sizeof(dl_promiscon_req_t)
+#define DL_PROMISCOFF_REQ_SIZE		sizeof(dl_promiscoff_req_t)
+#define DL_PHYS_ADDR_REQ_SIZE		sizeof(dl_phys_addr_req_t)
+#define DL_PHYS_ADDR_ACK_SIZE		sizeof(dl_phys_addr_ack_t)
+#define DL_SET_PHYS_ADDR_REQ_SIZE	sizeof(dl_set_phys_addr_req_t)
+#define DL_GET_STATISTICS_REQ_SIZE	sizeof(dl_get_statistics_req_t)
+#define DL_GET_STATISTICS_ACK_SIZE	sizeof(dl_get_statistics_ack_t)
+#define DL_XID_REQ_SIZE			sizeof(dl_xid_req_t)
+#define DL_XID_IND_SIZE			sizeof(dl_xid_ind_t)
+#define DL_XID_RES_SIZE			sizeof(dl_xid_res_t)
+#define DL_XID_CON_SIZE			sizeof(dl_xid_con_t)
+#define DL_TEST_REQ_SIZE		sizeof(dl_test_req_t)
+#define DL_TEST_IND_SIZE		sizeof(dl_test_ind_t)
+#define DL_TEST_RES_SIZE		sizeof(dl_test_res_t)
+#define DL_TEST_CON_SIZE		sizeof(dl_test_con_t)
+#define DL_DATA_ACK_REQ_SIZE		sizeof(dl_data_ack_req_t)
+#define DL_DATA_ACK_IND_SIZE		sizeof(dl_data_ack_ind_t)
+#define DL_DATA_ACK_STATUS_IND_SIZE	sizeof(dl_data_ack_status_ind_t)
+#define DL_REPLY_REQ_SIZE		sizeof(dl_reply_req_t)
+#define DL_REPLY_IND_SIZE		sizeof(dl_reply_ind_t)
+#define DL_REPLY_STATUS_IND_SIZE	sizeof(dl_reply_status_ind_t)
+#define DL_REPLY_UPDATE_REQ_SIZE	sizeof(dl_reply_update_req_t)
+#define DL_REPLY_UPDATE_STATUS_IND_SIZE	sizeof(dl_reply_update_status_ind_t)
 
 #endif				/* _SYS_DLPI_H */

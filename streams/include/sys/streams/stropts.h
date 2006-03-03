@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.23 2006/02/20 10:59:20 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.24 2006/03/03 10:57:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts.h,v $
+ Revision 0.9.2.24  2006/03/03 10:57:11  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.23  2006/02/20 10:59:20  brian
  - updated copyright headers on changed files
 
@@ -57,7 +60,7 @@
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.23 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.24 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STROPTS_H__
 //#warning "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
@@ -256,9 +259,9 @@ struct strioctl {
 };
 
 struct strrecvfd {
-	int fd;
-	uid_t uid;
-	gid_t gid;
+	int fd;				/* file descriptor */
+	uid_t uid;			/* user id */
+	gid_t gid;			/* group id */
 	char fill[8];			/* UnixWare/Solaris compatibility */
 };
 
@@ -276,8 +279,7 @@ struct strsigset {
 	long ss_events;
 };
 
-/* for ioctl emulation of getmsg() getpmsg() putmsg() putpmsg() */
-/* matches Mac OT */
+/* for ioctl emulation of getmsg() getpmsg() putmsg() putpmsg() matches Mac OT */
 struct strpmsg {
 	struct strbuf ctlbuf;
 	struct strbuf databuf;
@@ -302,8 +304,13 @@ struct strputpmsg {
 };
 #endif
 
-/* 2.6.8 thinks this stupid number is legitimate, but doesn't have unlocked_ioctl */
-/* upgrade your kernel please! */
-#define LFS_GETMSG_PUTMSG_ULEN	(-0x12345678UL)
+/* 2.6.8 thinks this stupid number is legitimate, but doesn't have unlocked_ioctl upgrade your
+   kernel please! */
+#ifdef __LP64__
+#define LFS_GETMSG_PUTMSG_ULEN	(0xedbca987edbca988UL)
+#else
+//#define LFS_GETMSG_PUTMSG_ULEN	(-0x12345678UL)
+#define LFS_GETMSG_PUTMSG_ULEN	(0xedbca988UL)
+#endif
 
 #endif				/* __SYS_STREAMS_STROPTS_H__ */

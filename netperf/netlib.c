@@ -1265,7 +1265,7 @@ allocate_buffer_ring(int width, int buffer_size, int alignment, int offset)
     /* get the ring element */
     temp_link = (struct ring_elt *)malloc(sizeof(struct ring_elt));
     if (temp_link == NULL) {
-      printf("malloc(%d) failed!\n", sizeof(struct ring_elt));
+      printf("malloc(%lu) failed!\n", (ulong) sizeof(struct ring_elt));
       exit(1);
 	}
     /* remember the first one so we can close the ring at the end */
@@ -1375,7 +1375,7 @@ alloc_sendfile_buf_ring(int width,
     temp_link = (struct sendfile_ring_elt *)
       malloc(sizeof(struct sendfile_ring_elt));
     if (temp_link == NULL) {
-      printf("malloc(%d) failed!\n", sizeof(struct sendfile_ring_elt));
+      printf("malloc(%lu) failed!\n", (ulong) sizeof(struct sendfile_ring_elt));
       exit(1);
 	}
 
@@ -1712,8 +1712,8 @@ send_request(void)
     dump_request();
 
     fprintf(where,
-            "\nsend_request: about to send %d bytes from %p\n",
-            sizeof(netperf_request),
+            "\nsend_request: about to send %lu bytes from %p\n",
+            (ulong) sizeof(netperf_request),
             &netperf_request);
     fflush(where);
   }
@@ -1751,8 +1751,8 @@ send_response(void)
 
   if (debug > 1) {
     fprintf(where,
-            "send_response: contents of %u ints before htonl\n",
-            sizeof(netperf_response)/4);
+            "send_response: contents of %lu ints before htonl\n",
+            (ulong) sizeof(netperf_response)/4);
     dump_response();
   }
 
@@ -1771,8 +1771,8 @@ send_response(void)
             "send_response: contents after htonl\n");
     dump_response();
     fprintf(where,
-            "about to send %u bytes from %p\n",
-            sizeof(netperf_response),
+            "about to send %lu bytes from %p\n",
+            (ulong) sizeof(netperf_response),
             &netperf_response);
     fflush(where);
   }
@@ -4504,14 +4504,14 @@ put_control(int fd, int len, int pri, int ack)
   }
   if (err_ack->dl_primitive != ack) {
     fprintf(where,"put_control: acknowledgement error wanted %u got %lu \n",
-            ack,err_ack->dl_primitive);
+            ack, (ulong) err_ack->dl_primitive);
     if (err_ack->dl_primitive == DL_ERROR_ACK) {
       fprintf(where,"             dl_error_primitive: %lu\n",
-              err_ack->dl_error_primitive);
+              (ulong) err_ack->dl_error_primitive);
       fprintf(where,"             dl_errno:           %lu\n",
-              err_ack->dl_errno);
+              (ulong) err_ack->dl_errno);
       fprintf(where,"             dl_unix_errno       %lu\n",
-              err_ack->dl_unix_errno);
+              (ulong) err_ack->dl_unix_errno);
     }
     fflush(where);
     return(-1);

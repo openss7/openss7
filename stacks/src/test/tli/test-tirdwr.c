@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:33 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 12:06:14 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:58:33 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 12:06:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.8  2006/03/03 12:06:14  brian
+ - 32/64-bit compatibility
+
  Revision 0.9.2.7  2005/12/28 09:58:33  brian
  - remove warnings on FC4 compile
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:33 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 12:06:14 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:33 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 12:06:14 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -307,6 +310,11 @@ static timer_range_t timer[tmax] = {
 long test_start = 0;
 
 static int state;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 #if 0
 /*

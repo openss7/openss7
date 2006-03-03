@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCTL.9.man,v 0.9.2.11 2005/12/06 09:39:07 brian Exp $
+.\" @(#) $Id: M_IOCTL.9.man,v 0.9.2.12 2006/03/03 10:57:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/06 09:39:07 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/03 10:57:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: M_IOCTL.9.man,v $
+.\" Revision 0.9.2.12  2006/03/03 10:57:10  brian
+.\" - 32-bit compatibility support, updates for release
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -294,10 +300,12 @@ struct iocblk {
     int ioc_cmd;        /* ioctl command type */
     cred_t *ioc_cr;     /* full credentials */
     uint ioc_id;        /* ioctl identifier */
-    uint ioc_count;     /* byte count for ioctl data */
+    ulong ioc_count;    /* byte count for ioctl data */
     int ioc_error;      /* error code for M_IOCACK/NAK */
     int ioc_rval;       /* return value for M_IOCACK */
-    long ioc_filler[4]; /* reserved for future use */
+    long ioc_filler[1]; /* reserved for future use */
+    long ioc_flag;      /* data model, IOC_NATIVE or IOC_ILP32 */
+    long _pad[2];       /* reserved for future use */
 };
 \s+1\fP
 .fi
@@ -336,6 +344,13 @@ Stream head,
 to match each
 .B M_IOCTL
 message sent downstream with response messages sent upstream.
+.TP
+.I ioc_flag
+is a flag populated by the Stream head that contains
+.B IOC_ILP32
+if the IO control command was issued by a 32-bit data model caller to a 64-bit driver, or
+.B IOC_NONE
+if the IO control command was issued on the same model as the driver.
 .PP
 If data is provided to be sent downstream (i.e., the
 value of
@@ -440,6 +455,11 @@ message; and,
 is populated as for
 .BR I_STR -based
 messages.
+.TP
+.I ioc_flag
+is populated as for
+.BR I_STR -based
+messages.
 .PP
 A single
 .BR M_DATA (9)
@@ -453,9 +473,95 @@ block to form the completed
 .B M_IOCTL
 message.
 .PP
+Care should be taken when the
+.I ioc_flag
+member is set to
+.B IOC_ILP32
+by the Stream head because any address contained in the 64-bit argument in the attached
+message block will be a 32-bit address least-significant-bit aligned.  The module or driver must
+convert any such pointer to a native data model pointer before using it.
+.PP
 The completed
 .B M_IOCTL
 message is then passed downstream and the calling process blocks awaiting an acknowledgement.
+.\"
+.\"
+.SS 32-bit Compatibility Input-Output Controls
+.PP
+To support 31/32-bit C language model input-output controls executed by a 32-bit process on a 64-bit
+kernel,
+.B @PACKAGE_TITLE@
+provides capabilities similar to the
+.IR Solaris \(rg
+.[
+soldoc
+.]
+operating system
+.I STREAMS
+implementation.
+Under
+.IR Solaris \(rg,
+when a 32-bit process opens a file on a 64-bit kernel, the
+.B FILP32
+file flag is set, indicating to the Stream head that the file was opened by a 32-bit process.
+.RB ( @PACKAGE_TITLE@
+also sets the
+.B FILP32
+file flag, however, only after the first
+.BR read (2s),
+.BR readv (2s),
+.BR write (2s),
+.BR writev (2s),
+.BR getmsg (2s),
+.BR getpmsg (2s),
+.BR putmsg (2s),
+.BR putpmsg (2s),
+or
+.BR ioctl (2s)
+operation has been performed.)
+.PP
+Whenever an
+.BR ioctl (2s)
+operation is performed on a Stream, the Stream head places the
+.B IOC_ILP32
+flag in the
+.I ioc_flag
+member of the
+.BR iocblk (9)
+structure in the
+.B M_IOCTL
+message passed downstream to indicate to the other modules and drivers in the Stream that the
+.BR ioctl (2s)
+operation originated from a 32-bit process.  Any data structures or pointers passed in the
+.B b_cont
+message block are 32-bit model structures and pointers.
+.PP
+For
+.B TRANSPARENT
+input-output controls, care should be taken that the
+.B unsigned long
+argument passed in the
+.B b_cont
+message block, (when
+.I arg
+is a pointer), contains a 32-bit pointer least significant bit aligned with the 64-bit
+.B unsigned long
+argument value.  Such a pointer needs to be converted to a 64-bit model before use as the
+.I cq_addr
+field of a subsequent
+.BR M_COPYIN (9)
+or
+.BR M_COPYOUT (9)
+message, or, before the pointer is used internaly by the module or driver.
+.PP
+In addition, on Linux kernels prior to kernel 2.6.11, it may be necessary to register the 32-bit
+input-output control command with for the Stream head using the
+.BR register_ioctl32 (9)
+utility when the module or driver loads, and de-register the command using the
+.BR unregister_ioctl32 (9)
+utility when the module or driver unloads.  See
+.BR register_ioctl32 (9)
+for more information.
 .\"
 .\"
 .SS Processing and Acknowledgement
@@ -1109,8 +1215,41 @@ above.  It shows general positive and negative acknowledgement handling.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR datab (9),
-.BR msgb (9).
+.BR M_DATA (9),
+.BR msgb (9),
+.BR iocblk (9),
+.BR I_STR (7),
+.BR I_LINK (7),
+.BR I_UNLINK (7),
+.BR I_PLINK (7),
+.BR I_PUNLINK (7),
+.BR streamio (7),
+.BR termios (7),
+.BR ioctl (2s),
+.BR linkblk (9),
+.BR strioctl (5),
+.BR read (2s),
+.BR readv (2s),
+.BR write (2s),
+.BR writev (2s),
+.BR getmsg (2s),
+.BR getpmsg (2s),
+.BR putmsg (2s),
+.BR putpmsg (2s),
+.BR M_COPYIN (9),
+.BR M_COPYOUT (9),
+.BR register_ioctl32 (9),
+.BR unregister_ioctl32 (9),
+.BR M_IOCACK (9),
+.BR M_IOCNAK (9),
+.BR M_IOCDATA (9),
+.BR M_HANGUP (9),
+.BR M_ERROR (9),
+.BR qreply (9),
+.BR pipe (4),
+.BR fifo (4),
+.BR putnext (9),
+.BR qreply (9).
 .\"
 .\"
 .SH COMPATIBILITY

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/28 10:01:51 $
+ @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 11:27:48 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:51 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:27:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldltest.c,v $
+ Revision 0.9.2.9  2006/03/03 11:27:48  brian
+ - 32/64-bit compatibility
+
  Revision 0.9.2.8  2005/12/28 10:01:51  brian
  - remove warnings on FC4 compile
 
@@ -83,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/28 10:01:51 $"
+#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 11:27:48 $"
 
 static char const ident[] =
-    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/28 10:01:51 $";
+    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 11:27:48 $";
 
 /*
  *  ldltest: Test program for dlpi driver
@@ -722,8 +724,8 @@ do_info(int fd)
 		if (verbose) {
 			printf("do_info: error ack:\n");
 			printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-			       err_ack->dl_error_primitive, err_ack->dl_errno,
-			       err_ack->dl_unix_errno);
+			       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno,
+			       (ulong) err_ack->dl_unix_errno);
 		}
 		return -1;
 
@@ -737,25 +739,25 @@ do_info(int fd)
 		}
 		if (verbose > 1) {
 			printf("do_info: info ack:\n");
-			printf("\tprimitive=%lu\n", reply.ack.dl_primitive);
-			printf("\tmin_sdu=%lu\n", reply.ack.dl_min_sdu);
-			printf("\tmax_sdu=%lu\n", reply.ack.dl_max_sdu);
-			printf("\taddr_length=%lu\n", reply.ack.dl_addr_length);
-			printf("\tmac_type=%lu\n", reply.ack.dl_mac_type);
-			printf("\treserved=%lu\n", reply.ack.dl_reserved);
-			printf("\tcurrent_state=%lu\n", reply.ack.dl_current_state);
-			printf("\tsap_length=%ld\n", reply.ack.dl_sap_length);
-			printf("\tservice_mode=%lu\n", reply.ack.dl_service_mode);
-			printf("\tqos_length=%lu\n", reply.ack.dl_qos_length);
-			printf("\tqos_offset=%lu\n", reply.ack.dl_qos_offset);
-			printf("\tqos_range_length=%lu\n", reply.ack.dl_qos_range_length);
-			printf("\tqos_range_offset=%lu\n", reply.ack.dl_qos_range_offset);
-			printf("\tprovider_style=%ld\n", reply.ack.dl_provider_style);
-			printf("\taddr_offset=%lu\n", reply.ack.dl_addr_offset);
-			printf("\tversion=%lu\n", reply.ack.dl_version);
-			printf("\tbrdcst_addr_length=%lu\n", reply.ack.dl_brdcst_addr_length);
-			printf("\tbrdcst_addr_offset=%lu\n", reply.ack.dl_brdcst_addr_offset);
-			printf("\tgrowth=%lu\n", reply.ack.dl_growth);
+			printf("\tprimitive=%lu\n", (ulong) reply.ack.dl_primitive);
+			printf("\tmin_sdu=%lu\n", (ulong) reply.ack.dl_min_sdu);
+			printf("\tmax_sdu=%lu\n", (ulong) reply.ack.dl_max_sdu);
+			printf("\taddr_length=%lu\n", (ulong) reply.ack.dl_addr_length);
+			printf("\tmac_type=%lu\n", (ulong) reply.ack.dl_mac_type);
+			printf("\treserved=%lu\n", (ulong) reply.ack.dl_reserved);
+			printf("\tcurrent_state=%lu\n", (ulong) reply.ack.dl_current_state);
+			printf("\tsap_length=%ld\n", (ulong) reply.ack.dl_sap_length);
+			printf("\tservice_mode=%lu\n", (ulong) reply.ack.dl_service_mode);
+			printf("\tqos_length=%lu\n", (ulong) reply.ack.dl_qos_length);
+			printf("\tqos_offset=%lu\n", (ulong) reply.ack.dl_qos_offset);
+			printf("\tqos_range_length=%lu\n", (ulong) reply.ack.dl_qos_range_length);
+			printf("\tqos_range_offset=%lu\n", (ulong) reply.ack.dl_qos_range_offset);
+			printf("\tprovider_style=%ld\n", (ulong) reply.ack.dl_provider_style);
+			printf("\taddr_offset=%lu\n", (ulong) reply.ack.dl_addr_offset);
+			printf("\tversion=%lu\n", (ulong) reply.ack.dl_version);
+			printf("\tbrdcst_addr_length=%lu\n", (ulong) reply.ack.dl_brdcst_addr_length);
+			printf("\tbrdcst_addr_offset=%lu\n", (ulong) reply.ack.dl_brdcst_addr_offset);
+			printf("\tgrowth=%lu\n", (ulong) reply.ack.dl_growth);
 			if (reply.ack.dl_addr_length && reply.ack.dl_addr_offset &&
 			    reply.ack.dl_addr_offset + reply.ack.dl_addr_length <= ctlbuf.len)
 				dumpaddr("\tAddress", &ctlbuf.buf[reply.ack.dl_addr_offset],
@@ -775,12 +777,12 @@ do_info(int fd)
 				printf("\tQOS selection:\n");
 				if (sel->dl_qos_type != DL_QOS_CL_SEL1)
 					printf("\t\tUnknown type %lu, expected %lu\n",
-					       sel->dl_qos_type, (dl_ulong) DL_QOS_CL_SEL1);
+					       (ulong) sel->dl_qos_type, (ulong) DL_QOS_CL_SEL1);
 				else {
-					printf("\t\ttrans_delay=%ld\n", sel->dl_trans_delay);
-					printf("\t\tpriority=%ld\n", sel->dl_priority);
-					printf("\t\tprotection=%ld\n", sel->dl_protection);
-					printf("\t\tresidual_error=%ld\n", sel->dl_residual_error);
+					printf("\t\ttrans_delay=%ld\n", (long) sel->dl_trans_delay);
+					printf("\t\tpriority=%ld\n", (long) sel->dl_priority);
+					printf("\t\tprotection=%ld\n", (long) sel->dl_protection);
+					printf("\t\tresidual_error=%ld\n", (long) sel->dl_residual_error);
 				}
 			}
 			if (reply.ack.dl_qos_range_length >= sizeof(unsigned long)
@@ -792,19 +794,19 @@ do_info(int fd)
 				printf("\tQOS range:\n");
 				if (range->dl_qos_type != DL_QOS_CL_RANGE1)
 					printf("\t\tUnknown type %lu, expected %lu\n",
-					       range->dl_qos_type, (dl_ulong) DL_QOS_CL_RANGE1);
+					       (ulong) range->dl_qos_type, (ulong) DL_QOS_CL_RANGE1);
 				else {
 					printf("\t\ttrans_delay(target, accept)=(%ld, %ld)\n",
-					       range->dl_trans_delay.dl_target_value,
-					       range->dl_trans_delay.dl_accept_value);
+					       (long) range->dl_trans_delay.dl_target_value,
+					       (long) range->dl_trans_delay.dl_accept_value);
 					printf("\t\tpriority(min, max)=(%ld, %ld)\n",
-					       range->dl_priority.dl_min,
-					       range->dl_priority.dl_max);
+					       (long) range->dl_priority.dl_min,
+					       (long) range->dl_priority.dl_max);
 					printf("\t\tprotection(min, max)=(%ld, %ld)\n",
-					       range->dl_protection.dl_min,
-					       range->dl_protection.dl_max);
+					       (long) range->dl_protection.dl_min,
+					       (long) range->dl_protection.dl_max);
 					printf("\t\tresidual_error=%ld\n",
-					       range->dl_residual_error);
+					       (long) range->dl_residual_error);
 				}
 			}
 		}
@@ -840,7 +842,7 @@ do_info(int fd)
 	default:
 		if (verbose)
 			fprintf(stderr, "do_info: Unknown reply primitive=%lu\n",
-				reply.ack.dl_primitive);
+				(ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -904,8 +906,8 @@ do_curr_phys_addr(int fd)
 		if (verbose) {
 			printf("do_curr_phys_addr: error ack:\n");
 			printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-			       err_ack->dl_error_primitive, err_ack->dl_errno,
-			       err_ack->dl_unix_errno);
+			       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno,
+			       (ulong) err_ack->dl_unix_errno);
 		}
 		return -1;
 
@@ -921,9 +923,9 @@ do_curr_phys_addr(int fd)
 		}
 		if (verbose > 1) {
 			printf("do_curr_phys_addr: phys_addr ack:\n");
-			printf("\tprimitive=%lu\n", reply.ack.dl_primitive);
-			printf("\taddr_length=%lu\n", reply.ack.dl_addr_length);
-			printf("\taddr_offset=%lu\n", reply.ack.dl_addr_offset);
+			printf("\tprimitive=%lu\n", (ulong) reply.ack.dl_primitive);
+			printf("\taddr_length=%lu\n", (ulong) reply.ack.dl_addr_length);
+			printf("\taddr_offset=%lu\n", (ulong) reply.ack.dl_addr_offset);
 			if (reply.ack.dl_addr_length && reply.ack.dl_addr_offset &&
 			    reply.ack.dl_addr_offset + reply.ack.dl_addr_length <= ctlbuf.len)
 				dumpaddr("\tAddress", &ctlbuf.buf[reply.ack.dl_addr_offset],
@@ -935,7 +937,7 @@ do_curr_phys_addr(int fd)
 	default:
 		if (verbose)
 			fprintf(stderr, "do_curr_phys_addr: Unknown reply primitive=%lu\n",
-				reply.ack.dl_primitive);
+				(ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -1003,8 +1005,8 @@ do_attach(int fd, dl_ulong ppa)
 		if (verbose) {
 			printf("do_attach: error ack:\n");
 			printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-			       err_ack->dl_error_primitive, err_ack->dl_errno,
-			       err_ack->dl_unix_errno);
+			       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno,
+			       (ulong) err_ack->dl_unix_errno);
 		}
 		return -1;
 
@@ -1018,15 +1020,15 @@ do_attach(int fd, dl_ulong ppa)
 		}
 		if (verbose > 1) {
 			printf("do_attach: ok ack:\n");
-			printf("\tprimitive=%lu\n", reply.ack.dl_primitive);
-			printf("\tcorrect_primitive=%lu\n", reply.ack.dl_correct_primitive);
+			printf("\tprimitive=%lu\n", (ulong) reply.ack.dl_primitive);
+			printf("\tcorrect_primitive=%lu\n", (ulong) reply.ack.dl_correct_primitive);
 		}
 		break;
 
 	default:
 		if (verbose)
 			fprintf(stderr, "do_attach: Unknown reply primitive=%lu\n",
-				reply.ack.dl_primitive);
+				(ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -1090,8 +1092,8 @@ do_promiscon(int fd, unsigned long level)
 		if (verbose) {
 			printf("do_promiscon: error ack:\n");
 			printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-			       err_ack->dl_error_primitive, err_ack->dl_errno,
-			       err_ack->dl_unix_errno);
+			       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno,
+			       (ulong) err_ack->dl_unix_errno);
 		}
 		return -1;
 
@@ -1106,8 +1108,8 @@ do_promiscon(int fd, unsigned long level)
 		}
 		if (verbose > 1) {
 			printf("do_promiscon: ok ack:\n");
-			printf("\tprimitive=%lu\n", reply.ack.dl_primitive);
-			printf("\tcorrect_primitive=%lu\n", reply.ack.dl_correct_primitive);
+			printf("\tprimitive=%lu\n", (ulong) reply.ack.dl_primitive);
+			printf("\tcorrect_primitive=%lu\n", (ulong) reply.ack.dl_correct_primitive);
 		}
 		if (reply.ack.dl_correct_primitive != request.dl_primitive) {
 			if (verbose)
@@ -1120,7 +1122,7 @@ do_promiscon(int fd, unsigned long level)
 	default:
 		if (verbose)
 			fprintf(stderr, "do_promiscon: Unknown reply primitive=%lu\n",
-				reply.ack.dl_primitive);
+				(ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -1139,7 +1141,7 @@ do_bind(int fd, dl_ulong sap)
 	dl_error_ack_t *err_ack;
 
 	if (verbose > 2)
-		printf("do_bind(sap=0x%lx): Sending DL_BIND_REQ\n", sap);
+		printf("do_bind(sap=0x%lx): Sending DL_BIND_REQ\n", (long) sap);
 
 	request.dl_primitive = DL_BIND_REQ;
 	request.dl_sap = sap;
@@ -1188,8 +1190,8 @@ do_bind(int fd, dl_ulong sap)
 		if (verbose) {
 			printf("do_bind: error ack:\n");
 			printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-			       err_ack->dl_error_primitive, err_ack->dl_errno,
-			       err_ack->dl_unix_errno);
+			       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno,
+			       (ulong) err_ack->dl_unix_errno);
 		}
 		return -1;
 
@@ -1203,12 +1205,12 @@ do_bind(int fd, dl_ulong sap)
 		}
 		if (verbose > 1) {
 			printf("do_bind: bind ack:\n");
-			printf("\tprimitive=%lu\n", reply.ack.dl_primitive);
-			printf("\tsap=%lu\n", reply.ack.dl_sap);
-			printf("\taddr_length=%lu\n", reply.ack.dl_addr_length);
-			printf("\taddr_offset=%lu\n", reply.ack.dl_addr_offset);
-			printf("\tmax_conind=%lu\n", reply.ack.dl_max_conind);
-			printf("\txidtest_flg=%lu\n", reply.ack.dl_xidtest_flg);
+			printf("\tprimitive=%lu\n", (ulong) reply.ack.dl_primitive);
+			printf("\tsap=%lu\n", (ulong) reply.ack.dl_sap);
+			printf("\taddr_length=%lu\n", (ulong) reply.ack.dl_addr_length);
+			printf("\taddr_offset=%lu\n", (ulong) reply.ack.dl_addr_offset);
+			printf("\tmax_conind=%lu\n", (ulong) reply.ack.dl_max_conind);
+			printf("\txidtest_flg=%lu\n", (ulong) reply.ack.dl_xidtest_flg);
 			dumpbytes("\tSAP", (char *) &reply.ack + reply.ack.dl_addr_offset,
 				  reply.ack.dl_addr_length);
 		}
@@ -1217,7 +1219,7 @@ do_bind(int fd, dl_ulong sap)
 	default:
 		if (verbose)
 			fprintf(stderr, "do_bind: Unknown reply primitive=%lu\n",
-				reply.ack.dl_primitive);
+				(ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -1296,8 +1298,8 @@ do_bind_peer(int fd, char *sap, int saplen)
 		if (verbose) {
 			printf("do_bind_peer: error ack:\n");
 			printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-			       err_ack->dl_error_primitive, err_ack->dl_errno,
-			       err_ack->dl_unix_errno);
+			       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno,
+			       (ulong) err_ack->dl_unix_errno);
 		}
 		return -1;
 
@@ -1312,9 +1314,9 @@ do_bind_peer(int fd, char *sap, int saplen)
 		}
 		if (verbose > 1) {
 			printf("do_bind_peer: subs_bind ack:\n");
-			printf("\tprimitive=%lu\n", reply.ack.dl_primitive);
-			printf("\tsap_length=%lu\n", reply.ack.dl_subs_sap_length);
-			printf("\tsap_offset=%lu\n", reply.ack.dl_subs_sap_offset);
+			printf("\tprimitive=%lu\n", (ulong) reply.ack.dl_primitive);
+			printf("\tsap_length=%lu\n", (ulong) reply.ack.dl_subs_sap_length);
+			printf("\tsap_offset=%lu\n", (ulong) reply.ack.dl_subs_sap_offset);
 			dumpbytes("\tSAP", (char *) &reply.ack + reply.ack.dl_subs_sap_offset,
 				  reply.ack.dl_subs_sap_length);
 		}
@@ -1323,7 +1325,7 @@ do_bind_peer(int fd, char *sap, int saplen)
 	default:
 		if (verbose)
 			fprintf(stderr, "do_bind_peer: Unknown reply primitive=%lu\n",
-				reply.ack.dl_primitive);
+				(ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -1839,9 +1841,9 @@ _do_rcv_unitdata(int fd, unsigned char *data, int *datalen, unsigned char *src_d
 				if (verbose)
 					fprintf(stderr, "_do_rcv_unitdata(): "
 						"Bad ctlbuf.len=%d returned, "
-						"should be at least %d\n",
+						"should be at least %lu\n",
 						ctlbuf.len,
-						sizeof(dl_unitdata_ind_t) + 2 * (addr_len +
+						(ulong) sizeof(dl_unitdata_ind_t) + 2 * (addr_len +
 										 sap_len));
 			}
 			return -1;
@@ -2469,7 +2471,7 @@ copying(int argc, char *argv[])
 \n\
 %1$s %2$s:\n\
 \n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
 \n\
@@ -2477,8 +2479,7 @@ All Rights Reserved.\n\
 \n\
 This program is free software;  you can  redistribute  it and/or modify it under\n\
 the terms of the GNU General  Public License as  published by the  Free Software\n\
-Foundation; either  version 2 of  the  License, or  (at  your option) any  later\n\
-version.\n\
+Foundation; version 2 of  the  License.\n\
 \n\
 This program is distributed in the hope that it will be  useful, but WITHOUT ANY\n\
 WARRANTY;  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -2513,7 +2514,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2003-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\

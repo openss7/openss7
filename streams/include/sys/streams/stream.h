@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.81 2006/02/25 01:30:43 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.82 2006/03/03 10:57:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/25 01:30:43 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.82  2006/03/03 10:57:11  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.81  2006/02/25 01:30:43  brian
  - more roughing in of 32bit compatibilty support
  - updated perftest program to be able to use FIFOs as well as pipes
@@ -62,7 +65,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.81 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.82 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -121,6 +124,9 @@ typedef unsigned long __streams_dev_t;
 #include <sys/dki.h>		/* for cred_t */
 /* caller should have already included this, but make sure */
 #include <sys/stropts.h>	/* for some defines */
+#ifdef __LP64__
+#include <sys/stropts32.h>
+#endif
 
 #ifndef dev_t
 #define dev_t __streams_dev_t
@@ -818,7 +824,9 @@ struct iocblk {
 #define IOC_MASK	0xff000000	/* mask of model bits */
 #define IOC_NONE	0x00000000	/* no indication */
 #define IOC_NATIVE	0x01000000	/* native ioctl request */
-#define IOC_IPL32	0x02000000	/* 32bit ioctl request */
+#define IOC_ILP32	0x02000000	/* 32bit ioctl request */
+
+#define IOC_CONVERT_FROM(__iocp) ((_iocp)->ioc_flag & IOC_ILP32)
 
 struct copyreq {
 	int cq_cmd;			/* command being performed */

@@ -1,0 +1,312 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: unregister_ioctl32.9.man,v 0.9.2.1 2006/03/03 10:57:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/03/03 10:57:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: unregister_ioctl32.9.man,v $
+.\" Revision 0.9.2.1  2006/03/03 10:57:10  brian
+.\" - 32-bit compatibility support, updates for release
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH UNREGISTER_IOCTL32 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B unregister_ioctl32
+\- unregister a 32-bit IO control command
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "void unregister_ioctl32(void *" handle );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I handle
+an opaque pointer returned by the corresponding
+.BR register_ioctl32 ()
+call, used to unregister the 32-bti IO control command
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR unregsiter_ioctl32 ()
+unregsiters a 32-bit IO control command previously registered with
+.BR register_ioctl32 (9).
+.PP
+On
+.B Linux
+kernels prior to 2.6.11 it is necessary for the driver or module to register its 32-bit IO control
+commands, otherwise, the kernel will not pass these IO control commands to the driver, or in the
+case of conflict with another
+.RI (non- STREAMS )
+device, might pass inappropriate arguments.
+.BR unregister_ioctl32 ()
+and
+.BR register_ioctl32 (9)
+are provided by
+.B @PACKAGE_TITLE@
+to allow the
+.I STREAMS
+module or driver to register its 32-bit IO control commands with the Linux kernel.
+.PP
+Once registered, 32-bit IO control commands will be passed to
+.BR strioctl (9)
+with the
+.B FILP32
+flag set in
+.BR file->f_flags ,
+and with the
+.B IOC_ILP32
+value set in the
+.I ioc_flag
+or
+.I cp_flag
+members of the
+.BR iocblk (9)
+or
+.BR copyresp (9)
+structure contained in an
+.BR M_IOCTL (9)
+or
+.BR M_IOCDATA (9)
+message.
+.PP
+Because the registration mechanism only affects
+.I STREAMS
+devices, it does not interfere with other devices in the
+.B Linux
+system, regardless of IO control command conflicts.
+.PP
+.BR unregister_ioctl32 ()
+is only necessary for
+.B Linux
+kernels prior to kernel 2.6.11.  For kernels 2.6.11 or greater, 32-bit IO control commands are
+automatically passed to the Stream head for processing.  On these later kernels, the functions
+.BR unregister_ioct32 ()
+and
+.BR register_ioctl32 (9)
+are unnecessary and have no effect if called.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR register_ioct32 (9)
+is called multiple time for the same device driver with different selections of the
+.I cmd
+IO control command argument, and returns an opaque pointer that used as a handle for the IO control
+command for use with a call to
+.BR unregister_ioctl32 ().
+.BR unregister_ioctl32 ()
+is called on each opaque pointer returned by
+.BR register_ioctl32 (9).
+.\"
+.\"
+.SH RETURN
+.PP
+.BR unregister_ioct32 ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR unregister_ioctl32 ()
+always succeeds.  Calling
+.BR unregister_ioctl32 ()
+with and invalid
+.I handle
+argument could cause a kernel panic.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR unregister_ioctl32 ()
+can be called from any blocking context.
+.BR unregister_ioctl32 ()
+is intended to be called from the
+.BR module_init ()
+procedure of a kernel module associated with the
+.I STREAMS
+module or driver.
+.BR unregister_ioctl32 ()
+may be called from the
+.IR qi_qopen (9)
+routine of the
+.I STREAMS
+device.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR unregister_ioctl32 ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
+.PP
+Loadable kernel modules that call
+.BR register_ioctl32 (9)
+when loading must call
+.BR unregister_ioctl32 ()
+before unloading.
+.BR unregister_ioctl32 ()
+must be called with the
+.RB non- NULL
+opaque
+.B void *
+void pointer that was returned from the call to
+.BR register_ioctl32 (9).
+.\"
+.\"
+.SH EXAMPLES
+.PP
+For examples, see
+.BR register_ioctl32 (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ioctl (2s),
+.BR strioctl (9),
+.BR iocblk (9),
+.BR copyresp (9),
+.BR M_IOCTL (9),
+.BR sad (4),
+.BR register_ioctl32 (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR unregister_ioctl32 ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR unregister_ioctl32 ()
+is a
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific function.
+Registration of
+.I STREAMS
+driver and module 32-bit IO control commands is inherently implementation specific and non-portable.
+Different implementations provide different mechanisms.
+See
+.BR STREAMS (9)
+for mechanisms compatible with other implemenations
+and additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and de-registration of \fISTREAMS\fR 32-bit IO control commands is implementation
+specific and not subject to standardization.
+.BR unregister_ioctl32 ()
+is a
+.BR @PACKAGE_TITLE@
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR unregister_ioctl32 ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.[
+@PACKAGE_TITLE@
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_mtp.h,v 0.9.2.2 2005/05/14 08:30:49 brian Exp $
+ @(#) $Id: xti_mtp.h,v 0.9.2.3 2006/03/03 12:06:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,18 +41,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:49 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 12:06:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_MTP_H
 #define _SYS_XTI_MTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #ifndef t_uscalar_t
-#define t_uscalar_t	ulong
-#define t_scalar_t	long
+#define t_uscalar_t	u_int32_t
+#define t_scalar_t	int32_t
 #endif
 
 typedef struct sockaddr_mtp {

@@ -1,19 +1,62 @@
-# $Log: ChangeLog,v $
-# Revision 0.9.2.2  2005/09/14 23:41:17  brian
-# - bumped release numbers and change logs
-#
+2006-03-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* THANKS: updated for release
+	* doc/man/strss7.macros: updated for release
+	* doc/man/strss7.refs: updated references
+	* README-nexusware: updated for release
+	* AUTHORS: updated for release
+	* src/include/sys/xti_mtp.h: 32/64-bit compatibility
+	* src/lib/libxnet/xnet.c: correction affecting 32/64-bit compatibility
+	* src/modules/ss7ip/sdt_tpi.c: 32/64-bit compatibility
+	* src/modules/ss7ip/sl_tpi.c: 32/64-bit compatibility
+	* src/test/inet/test-inet_raw.c: lockf doesn't work well on SMP
+	* src/test/inet/test-inet_tcp.c: lockf doesn't work well on SMP
+	* src/test/inet/test-inet_udp.c: lockf doesn't work well on SMP
+	* src/test/inet/test-sctp_n.c: lockf doesn't work well on SMP
+	* src/test/m2pa/test-m2pa.c: lockf doesn't work well on SMP, 64-bit
+	  compatibility
+	* src/test/sctp/test-sctp_n.c: lockf doesn't work well on SMP
+	* src/test/sctp/test-sctp_t.c: lockf doesn't work well on SMP
+	* src/test/tli/test-timod.c: lockf doesn't work well on SMP
+	* src/test/tli/test-tirdwr.c: lockf doesn't work well on SMP
+	* src/test/xnet/test-xnet.c: lockf doesn't work well on SMP
+
+2006-03-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* README: updated for release
+	* README-alpha: updated for release
+	* doc/manual/releases.texi (Bugs): updated alpha statement
+	* doc/manual/releases.texi (Bugs, Known Bugs, Maturity): updated release notes
+	* doc/manual/strss7.texi (detailed node listing): added missing Troubleshooting
+	* README-cvs: updated for release
+
+2006-03-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: corrected format of change log
+	* TODO: updated to do items
+	* README: update for release
+
+2006-02-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: modified -- updated for new release
+	* Makefile.am: modified -- added TODO file to distribution
+	* TODO: added -- added TODO file to distribution
+
+2006-02-13  Brian Bidulock  <bidulock@openss7.org>
+
+	- Changes from OpenSS7 0.9a.4 release:
+	* m4/kernel.m4: changes for Gentoo and 2.6.15 kernels
 
 -----
 
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
-version.
+Foundation; version 2 of the License.
 
 This program is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: netperf.texi,v 1.1.2.4 2005/07/08 13:15:37 brian Exp $
+% @(#) $Id: netperf.texi,v 1.1.2.5 2006/03/03 11:56:43 brian Exp $
 %
 % =========================================================================
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/07/08 13:15:37 $ by $Author: brian $
+% Last Modified $Date: 2006/03/03 11:56:43 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -307,7 +307,8 @@ Releases
 * Prerequisites::		Prerequisite packages
 * Compatibility::		Compatibility Issues
 * Release Notes::		Release Notes
-* Bugs::			Known Bugs
+* Maturity::			Package Maturity
+* Bugs::			Package Defects
 * Schedule::			Development and Bug Fix Schedule
 * History::			Project History
 
@@ -319,6 +320,12 @@ Installation
 * Installing::			Installing the package
 * Removal::			Removal of the package
 * Loading::			Loading the package
+
+Troubleshooting
+
+* Test Suites::			Test Suites for the package
+* Problem Reports::		Problem Reports for the package
+* Known Bugs::			Known Bugs in the package
 
 Indices
 

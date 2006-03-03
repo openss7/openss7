@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_compat.h,v 0.9.2.6 2005/12/28 10:01:03 brian Exp $
+ @(#) $Id: sctp_compat.h,v 0.9.2.7 2006/03/03 11:47:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:03 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:47:02 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctp_compat.h,v $
+ Revision 0.9.2.7  2006/03/03 11:47:02  brian
+ - 32/64-bit compatibility
 
  *****************************************************************************/
 
 #ifndef __LOCAL_SCTP_COMPAT_H__
 #define __LOCAL_SCTP_COMPAT_H__
 
-#ident "@(#) $RCSfile: sctp_compat.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_compat.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/os7/compat.h>
 
@@ -76,7 +81,7 @@
 #include <sys/xti_inet.h>
 #include <sys/xti_sctp.h>
 
-#define T_ALLLEVELS -1UL
+#define T_ALLLEVELS -1
 
 #ifdef LINUX
 #include <linux/interrupt.h>	/* for local_irq functions */

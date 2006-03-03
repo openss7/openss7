@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 12:40:30 $
+ @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 11:27:48 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:40:30 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:27:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldlconfig.c,v $
+ Revision 0.9.2.8  2006/03/03 11:27:48  brian
+ - 32/64-bit compatibility
+
  Revision 0.9.2.7  2005/07/18 12:40:30  brian
  - standard indentation
 
@@ -80,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 12:40:30 $"
+#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 11:27:48 $"
 
 static char const ident[] =
-    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 12:40:30 $";
+    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 11:27:48 $";
 
 /*
  *  ldlconfig: A configuration helper for ldl clients
@@ -402,7 +404,7 @@ do_info(int fd)
 		err_ack = (dl_error_ack_t *) & reply;
 		printf("do_info: error ack:\n");
 		printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-		       err_ack->dl_error_primitive, err_ack->dl_errno, err_ack->dl_unix_errno);
+		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno, (ulong) err_ack->dl_unix_errno);
 		return -1;
 
 	case DL_INFO_ACK:
@@ -414,25 +416,25 @@ do_info(int fd)
 		}
 		if (output > 1) {
 			printf("do_info: info ack:\n");
-			printf("\tprimitive=%lu\n", reply.ack.dl_primitive);
-			printf("\tmin_sdu=%lu\n", reply.ack.dl_min_sdu);
-			printf("\tmax_sdu=%lu\n", reply.ack.dl_max_sdu);
-			printf("\taddr_length=%lu\n", reply.ack.dl_addr_length);
-			printf("\tmac_type=%lu\n", reply.ack.dl_mac_type);
-			printf("\treserved=%lu\n", reply.ack.dl_reserved);
-			printf("\tcurrent_state=%lu\n", reply.ack.dl_current_state);
-			printf("\tsap_length=%ld\n", reply.ack.dl_sap_length);
-			printf("\tservice_mode=%lu\n", reply.ack.dl_service_mode);
-			printf("\tqos_length=%lu\n", reply.ack.dl_qos_length);
-			printf("\tqos_offset=%lu\n", reply.ack.dl_qos_offset);
-			printf("\tqos_range_length=%lu\n", reply.ack.dl_qos_range_length);
-			printf("\tqos_range_offset=%lu\n", reply.ack.dl_qos_range_offset);
-			printf("\tprovider_style=%ld\n", reply.ack.dl_provider_style);
-			printf("\taddr_offset=%lu\n", reply.ack.dl_addr_offset);
-			printf("\tversion=%lu\n", reply.ack.dl_version);
-			printf("\tbrdcst_addr_length=%lu\n", reply.ack.dl_brdcst_addr_length);
-			printf("\tbrdcst_addr_offset=%lu\n", reply.ack.dl_brdcst_addr_offset);
-			printf("\tgrowth=%lu\n", reply.ack.dl_growth);
+			printf("\tprimitive=%lu\n", (ulong) reply.ack.dl_primitive);
+			printf("\tmin_sdu=%lu\n", (ulong) reply.ack.dl_min_sdu);
+			printf("\tmax_sdu=%lu\n", (ulong) reply.ack.dl_max_sdu);
+			printf("\taddr_length=%lu\n", (ulong) reply.ack.dl_addr_length);
+			printf("\tmac_type=%lu\n", (ulong) reply.ack.dl_mac_type);
+			printf("\treserved=%lu\n", (ulong) reply.ack.dl_reserved);
+			printf("\tcurrent_state=%lu\n", (ulong) reply.ack.dl_current_state);
+			printf("\tsap_length=%ld\n", (ulong) reply.ack.dl_sap_length);
+			printf("\tservice_mode=%lu\n", (ulong) reply.ack.dl_service_mode);
+			printf("\tqos_length=%lu\n", (ulong) reply.ack.dl_qos_length);
+			printf("\tqos_offset=%lu\n", (ulong) reply.ack.dl_qos_offset);
+			printf("\tqos_range_length=%lu\n", (ulong) reply.ack.dl_qos_range_length);
+			printf("\tqos_range_offset=%lu\n", (ulong) reply.ack.dl_qos_range_offset);
+			printf("\tprovider_style=%ld\n", (ulong) reply.ack.dl_provider_style);
+			printf("\taddr_offset=%lu\n", (ulong) reply.ack.dl_addr_offset);
+			printf("\tversion=%lu\n", (ulong) reply.ack.dl_version);
+			printf("\tbrdcst_addr_length=%lu\n", (ulong) reply.ack.dl_brdcst_addr_length);
+			printf("\tbrdcst_addr_offset=%lu\n", (ulong) reply.ack.dl_brdcst_addr_offset);
+			printf("\tgrowth=%lu\n", (ulong) reply.ack.dl_growth);
 			if (reply.ack.dl_addr_length && reply.ack.dl_addr_offset &&
 			    reply.ack.dl_addr_offset + reply.ack.dl_addr_length <= ctlbuf.len)
 				dumpaddr("\tAddress", &ctlbuf.buf[reply.ack.dl_addr_offset],
@@ -453,12 +455,12 @@ do_info(int fd)
 				printf("\tQOS selection:\n");
 				if (sel->dl_qos_type != DL_QOS_CL_SEL1)
 					printf("\t\tUnknown type %lu, expected %lu\n",
-					       sel->dl_qos_type, (dl_ulong) DL_QOS_CL_SEL1);
+					       (ulong) sel->dl_qos_type, (ulong) DL_QOS_CL_SEL1);
 				else {
-					printf("\t\ttrans_delay=%ld\n", sel->dl_trans_delay);
-					printf("\t\tpriority=%ld\n", sel->dl_priority);
-					printf("\t\tprotection=%ld\n", sel->dl_protection);
-					printf("\t\tresidual_error=%ld\n", sel->dl_residual_error);
+					printf("\t\ttrans_delay=%ld\n", (long) sel->dl_trans_delay);
+					printf("\t\tpriority=%ld\n", (long) sel->dl_priority);
+					printf("\t\tprotection=%ld\n", (long) sel->dl_protection);
+					printf("\t\tresidual_error=%ld\n", (long) sel->dl_residual_error);
 				}
 			}
 			if (reply.ack.dl_qos_range_length >= sizeof(unsigned long) &&
@@ -470,19 +472,19 @@ do_info(int fd)
 				printf("\tQOS range:\n");
 				if (range->dl_qos_type != DL_QOS_CL_RANGE1)
 					printf("\t\tUnknown type %lu, expected %lu\n",
-					       range->dl_qos_type, (dl_ulong) DL_QOS_CL_RANGE1);
+					       (ulong) range->dl_qos_type, (ulong) DL_QOS_CL_RANGE1);
 				else {
 					printf("\t\ttrans_delay(target, accept)=(%ld, %ld)\n",
-					       range->dl_trans_delay.dl_target_value,
-					       range->dl_trans_delay.dl_accept_value);
+					       (long) range->dl_trans_delay.dl_target_value,
+					       (long) range->dl_trans_delay.dl_accept_value);
 					printf("\t\tpriority(min, max)=(%ld, %ld)\n",
-					       range->dl_priority.dl_min,
-					       range->dl_priority.dl_max);
+					       (long) range->dl_priority.dl_min,
+					       (long) range->dl_priority.dl_max);
 					printf("\t\tprotection(min, max)=(%ld, %ld)\n",
-					       range->dl_protection.dl_min,
-					       range->dl_protection.dl_max);
+					       (long) range->dl_protection.dl_min,
+					       (long) range->dl_protection.dl_max);
 					printf("\t\tresidual_error=%ld\n",
-					       range->dl_residual_error);
+					       (long) range->dl_residual_error);
 				}
 			}
 		}
@@ -516,7 +518,7 @@ do_info(int fd)
 		break;
 
 	default:
-		fprintf(stderr, "do_info: Unknown reply primitive=%lu\n", reply.ack.dl_primitive);
+		fprintf(stderr, "do_info: Unknown reply primitive=%lu\n", (ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -575,7 +577,7 @@ do_attach(int fd, dl_ulong ppa)
 		err_ack = (dl_error_ack_t *) & reply;
 		printf("do_attach: error ack:\n");
 		printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-		       err_ack->dl_error_primitive, err_ack->dl_errno, err_ack->dl_unix_errno);
+		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno, (ulong) err_ack->dl_unix_errno);
 		return -1;
 
 	case DL_OK_ACK:
@@ -587,13 +589,13 @@ do_attach(int fd, dl_ulong ppa)
 		}
 		if (output > 1) {
 			printf("do_attach: ok ack:\n");
-			printf("\tprimitive=%lu\n", reply.ack.dl_primitive);
-			printf("\tcorrect_primitive=%lu\n", reply.ack.dl_correct_primitive);
+			printf("\tprimitive=%lu\n", (ulong) reply.ack.dl_primitive);
+			printf("\tcorrect_primitive=%lu\n", (ulong) reply.ack.dl_correct_primitive);
 		}
 		break;
 
 	default:
-		fprintf(stderr, "do_attach: Unknown reply primitive=%lu\n", reply.ack.dl_primitive);
+		fprintf(stderr, "do_attach: Unknown reply primitive=%lu\n", (ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -652,7 +654,7 @@ do_promiscon(int fd, unsigned long level)
 		err_ack = (dl_error_ack_t *) & reply;
 		printf("do_promiscon: error ack:\n");
 		printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-		       err_ack->dl_error_primitive, err_ack->dl_errno, err_ack->dl_unix_errno);
+		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno, (ulong) err_ack->dl_unix_errno);
 		return -1;
 
 	case DL_OK_ACK:
@@ -664,8 +666,8 @@ do_promiscon(int fd, unsigned long level)
 		}
 		if (output > 1) {
 			printf("do_promiscon: ok ack:\n");
-			printf("\tprimitive=%lu\n", reply.ack.dl_primitive);
-			printf("\tcorrect_primitive=%lu\n", reply.ack.dl_correct_primitive);
+			printf("\tprimitive=%lu\n", (ulong) reply.ack.dl_primitive);
+			printf("\tcorrect_primitive=%lu\n", (ulong) reply.ack.dl_correct_primitive);
 		}
 		if (reply.ack.dl_correct_primitive != request.dl_primitive) {
 			fprintf(stderr, "do_promiscon: " "DL_OK_ACK acks wrong primitive\n");
@@ -675,7 +677,7 @@ do_promiscon(int fd, unsigned long level)
 
 	default:
 		fprintf(stderr, "do_promiscon: Unknown reply primitive=%lu\n",
-			reply.ack.dl_primitive);
+			(ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -694,7 +696,7 @@ do_bind(int fd, dl_ulong sap)
 	dl_error_ack_t *err_ack;
 
 	if (output > 2)
-		printf("do_bind(sap=0x%lx): Sending DL_BIND_REQ\n", sap);
+		printf("do_bind(sap=0x%lx): Sending DL_BIND_REQ\n", (long) sap);
 
 	request.dl_primitive = DL_BIND_REQ;
 	request.dl_sap = sap;
@@ -738,7 +740,7 @@ do_bind(int fd, dl_ulong sap)
 		err_ack = (dl_error_ack_t *) & reply;
 		printf("do_bind: error ack:\n");
 		printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-		       err_ack->dl_error_primitive, err_ack->dl_errno, err_ack->dl_unix_errno);
+		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno, (ulong) err_ack->dl_unix_errno);
 		return -1;
 
 	case DL_BIND_ACK:
@@ -750,12 +752,12 @@ do_bind(int fd, dl_ulong sap)
 		}
 		if (output > 1) {
 			printf("do_bind: bind ack:\n");
-			printf("\tprimitive=%lu\n", reply.ack.dl_primitive);
-			printf("\tsap=%lu\n", reply.ack.dl_sap);
-			printf("\taddr_length=%lu\n", reply.ack.dl_addr_length);
-			printf("\taddr_offset=%lu\n", reply.ack.dl_addr_offset);
-			printf("\tmax_conind=%lu\n", reply.ack.dl_max_conind);
-			printf("\txidtest_flg=%lu\n", reply.ack.dl_xidtest_flg);
+			printf("\tprimitive=%lu\n", (ulong) reply.ack.dl_primitive);
+			printf("\tsap=%lu\n", (ulong) reply.ack.dl_sap);
+			printf("\taddr_length=%lu\n", (ulong) reply.ack.dl_addr_length);
+			printf("\taddr_offset=%lu\n", (ulong) reply.ack.dl_addr_offset);
+			printf("\tmax_conind=%lu\n", (ulong) reply.ack.dl_max_conind);
+			printf("\txidtest_flg=%lu\n", (ulong) reply.ack.dl_xidtest_flg);
 			dumpbytes("\tSAP",
 				  (char *) &reply.ack + reply.ack.dl_addr_offset,
 				  reply.ack.dl_addr_length);
@@ -763,7 +765,7 @@ do_bind(int fd, dl_ulong sap)
 		break;
 
 	default:
-		fprintf(stderr, "do_bind: Unknown reply primitive=%lu\n", reply.ack.dl_primitive);
+		fprintf(stderr, "do_bind: Unknown reply primitive=%lu\n", (ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -778,7 +780,7 @@ copying(int argc, char *argv[])
 \n\
 %1$s %2$s:\n\
 \n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 Copyright (c) 1999       David Grothe (dave@gcom.com)\n\
 Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
@@ -787,8 +789,7 @@ All Rights Reserved.\n\
 \n\
 This program is free software;  you can  redistribute  it and/or modify it under\n\
 the terms of the GNU General  Public License as  published by the  Free Software\n\
-Foundation; either  version 2 of  the  License, or  (at  your option) any  later\n\
-version.\n\
+Foundation; version 2 of  the  License.\n\
 \n\
 This program is distributed in the hope that it will be  useful, but WITHOUT ANY\n\
 WARRANTY;  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -823,7 +824,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2003-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 1999       David Grothe (dave@gcom.com)\n\
     Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
 \n\

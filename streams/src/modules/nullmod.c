@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/20 15:12:14 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 10:57:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/20 15:12:14 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.9  2006/03/03 10:57:11  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.8  2005/12/20 15:12:14  brian
  - result of SMP kernel testing for LiS
 
@@ -79,10 +81,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/20 15:12:14 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 10:57:11 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/20 15:12:14 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 10:57:11 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -113,8 +115,8 @@ static char const ident[] =
 #endif
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/20 15:12:14 $"
+#define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 10:57:11 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -449,6 +451,51 @@ STATIC struct fmodsw nullmod_fmod = {
 };
 #endif
 
+#ifdef LFS
+struct nullmod_ioctl {
+	unsigned int cmd;
+	void *opaque;
+};
+
+static struct nullmod_ioctl nullmod_map[] = {
+	{.cmd = (('V' << 8) | 1),}
+	, {.cmd = (('V' << 8) | 2),}
+	, {.cmd = (('V' << 8) | 3),}
+	, {.cmd = (('V' << 8) | 4),}
+	, {.cmd = (('V' << 8) | 5),}
+	, {.cmd = (('V' << 8) | 6),}
+	, {.cmd = (('V' << 8) | 7),}
+	, {.cmd = (('V' << 8) | 8),}
+	, {.cmd = (('V' << 8) | 9),}
+	, {.cmd = (('V' << 8) | 10),}
+	, {.cmd = 0,}
+};
+
+static void
+nullmod_unregister_ioctl32(void)
+{
+	struct nullmod_ioctl *i;
+
+	for (i = nullmod_map; i->cmd != 0; i++)
+		if (i->opaque != NULL)
+			unregister_ioctl32(i->opaque);
+}
+
+static int
+nullmod_register_ioctl32(void)
+{
+	struct nullmod_ioctl *i;
+
+	for (i = nullmod_map; i->cmd != 0; i++) {
+		if ((i->opaque = register_ioctl32(i->cmd)) == NULL) {
+			nullmod_unregister_ioctl32();
+			return (-ENOMEM);
+		}
+	}
+	return (0);
+}
+#endif				/* LFS */
+
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
 STATIC
 #endif
@@ -464,8 +511,12 @@ nullmod_init(void)
 #endif
 	nullmod_minfo.mi_idnum = modid;
 #ifdef LFS
-	if ((err = register_strmod(&nullmod_fmod)) < 0)
+	if ((err = nullmod_register_ioctl32()) < 0)
 		return (err);
+	if ((err = register_strmod(&nullmod_fmod)) < 0) {
+		nullmod_unregister_ioctl32();
+		return (err);
+	}
 #endif
 #ifdef LIS
 	if ((err = lis_register_strmod(&nullmod_info, CONFIG_STREAMS_NULLMOD_NAME)) < 0)
@@ -482,17 +533,13 @@ STATIC
 void __exit
 nullmod_exit(void)
 {
-	int err;
-
 #ifdef LFS
-	if ((err = unregister_strmod(&nullmod_fmod)) < 0)
-		return (void) (err);
+	unregister_strmod(&nullmod_fmod);
+	nullmod_unregister_ioctl32();
 #endif
 #ifdef LIS
-	if ((err = lis_unregister_strmod(&nullmod_info)) < 0)
-		return (void) (err);
+	lis_unregister_strmod(&nullmod_info);
 #endif
-	return (void) (0);
 }
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE

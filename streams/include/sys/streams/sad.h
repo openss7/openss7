@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.13 2006/02/20 10:59:20 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.14 2006/03/03 10:57:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.h,v $
+ Revision 0.9.2.14  2006/03/03 10:57:11  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.13  2006/02/20 10:59:20  brian
  - updated copyright headers on changed files
 
@@ -57,7 +60,7 @@
 #ifndef __SYS_STREAMS_SAD_H__
 #define __SYS_STREAMS_SAD_H__
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_SAD_H__
 #warning "Do no include sys/streams/sad.h directly, include sys/sad.h instead."
@@ -79,7 +82,7 @@
 #define MAXAPUSH MAX_APUSH
 
 #ifdef __LP64__
-struct strapush {
+struct strapush32 {
 	int32_t sap_cmd;
 	int32_t sap_major;
 	int32_t sap_minor;
@@ -91,7 +94,7 @@ struct strapush {
 	/* This one is Linux Fast-STREAMS specific */
 	char sap_module[FMNAMESZ + 1];	/* This is mine. */
 };
-#else				/* __LP64__ */
+#endif				/* __LP64__ */
 struct strapush {
 	int sap_cmd;
 	long sap_major;
@@ -104,7 +107,6 @@ struct strapush {
 	/* This one is Linux Fast-STREAMS specific */
 	char sap_module[FMNAMESZ + 1];	/* This is mine. */
 };
-#endif				/* __LP64__ */
 
 #define SAP_CLEAR	0x00	/* clear entry */
 #define SAP_ONE		0x01	/* add entry for one minor */

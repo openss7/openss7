@@ -1,20 +1,26 @@
-OpenSS7 STREAMS XTI/TLI Library -- things to do.  2006-02-23
+OpenSS7 STREAMS XTI/TLI Library -- things to do.  2006-03-01
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
-See the end cor copying conditions.
+See the end for copying conditions (for this file).
 
 Things to do:
 
-- The XTI/TLI library is now largely in maintenance mode.  Not much
+* The XTI/TLI library is now largely in maintenance mode.  Not much
   special development is planned.
 
-- Addition send with options commands for SCTP.
+- Full ATM Support.  This is an item where the XTI implementation is
+  lacking.  When we provide full TPI ATM support under the strss7
+  package, then this item will be investigated.
 
-  TODO
+- Addition of a (unfortunately non-standard) send with options commands
+  for SCTP.
 
-- Full ATM Support.
+  *done*
 
-  TODO
+    Actually this was already done a long time ago.  See manual pages
+    t_sndopt(3), t_sndvopt(3), t_rcvopt(3) and t_rcvvopt(3).  Perhaps
+    what needs to be done is to test them?
+
 
 =========================================================================
 
@@ -66,3 +72,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: tw=72 nocindent

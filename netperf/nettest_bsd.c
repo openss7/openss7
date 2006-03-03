@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2005/12/29 21:36:01 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/03/03 11:56:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:36:01 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:56:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2005/12/29 21:36:01 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/03/03 11:56:41 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2005/12/29 21:36:01 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/03/03 11:56:41 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -11445,7 +11445,7 @@ Send   Recv    Send   Recv\n\
   
   myaddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
   if (myaddr == NULL) {
-    printf("malloc(%d) failed!\n", sizeof(struct sockaddr_in));
+    printf("malloc(%lu) failed!\n", (ulong) sizeof(struct sockaddr_in));
     exit(1);
   }
 
@@ -13961,7 +13961,7 @@ Send   Recv    Send   Recv\n\
   
   myaddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
   if (myaddr == NULL) {
-    printf("malloc(%d) failed!\n", sizeof(struct sockaddr_in));
+    printf("malloc(%lu) failed!\n", (ulong) sizeof(struct sockaddr_in));
     exit(1);
   }
 
@@ -18141,7 +18141,7 @@ Send   Recv    Send   Recv\n\
   
   myaddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
   if (myaddr == NULL) {
-    printf("malloc(%d) failed!\n", sizeof(struct sockaddr_in));
+    printf("malloc(%lu) failed!\n", (ulong) sizeof(struct sockaddr_in));
     exit(1);
   }
 

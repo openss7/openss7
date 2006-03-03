@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/02/22 19:57:33 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/03 10:57:14 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/22 19:57:33 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 0.9.2.27  2006/03/03 10:57:14  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.26  2006/02/22 19:57:33  brian
  - strap out lockf() that was blocking some test case
    processes on SMP and even on UP
@@ -156,9 +159,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/02/22 19:57:33 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/03 10:57:14 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/02/22 19:57:33 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/03 10:57:14 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -240,6 +243,7 @@ pid_t test_pid[3] = { 0, 0, 0 };
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define INFINITE_WAIT	-1
 #define TEST_DURATION	20000
+#define INVALID_ADDRESS ((void *)(long)(-1))
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];

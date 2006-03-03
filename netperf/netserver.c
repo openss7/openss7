@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $
+ @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2006/03/03 11:56:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:55:59 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:56:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netserver.c,v $
+ Revision 1.1.1.13  2006/03/03 11:56:41  brian
+ - 64-bit compatibility
+
  Revision 1.1.1.12  2005/12/28 09:55:59  brian
  - remove warnings on FC4 compile
 
@@ -62,9 +65,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $"
+#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2006/03/03 11:56:41 $"
 
-static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $";
+static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2006/03/03 11:56:41 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -1276,7 +1279,7 @@ struct sockaddr name;
 	// Save away the program name
 	program = (char *)malloc(strlen(argv[0]) + 1);
 	if (program == NULL) {
-		printf("malloc(%d) failed!\n", strlen(argv[0]) + 1);
+		printf("malloc(%lu) failed!\n", (ulong) strlen(argv[0]) + 1);
 		return 1 ;
 	}
 	strcpy(program, argv[0]);

@@ -1,58 +1,86 @@
-# $Log: ChangeLog,v $
-# Revision 0.9.2.4  2006/02/23 11:19:53  brian
-# - updated for new release
-#
-# Revision 0.9.2.3  2006/02/23 11:07:44  brian
-# - updated for new release
-#
+2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 
-2006-02-23 brian <bidulock@openss7.org>
-	* (src/test/test-inet_raw.c): modified
-	* (src/test/test-inet_sctp.c): modified
-	* (src/test/test-inet_tcp.c): modified
-	* (src/test/test-inet_udp.c): modified
+	* THANKS: updated for release
+	* doc/man/strinet.macros: updated for release
+	* doc/man/strinet.refs: updated references
+	* README-nexusware: updated for release
+
+2006-03-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* README: updated for release
+	* doc/manual/releases.texi (Bugs, Known Bugs, Maturity): updated release notes
+	* doc/manual/strinet.texi (detailed node listing): added missing Troubleshooting
+	* README-cvs: updated for release
+
+2006-03-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: corrected format
+	* Makefile.am: updated headers
+	* README: updated headers
+	* TODO: updated to do items
+	* README: updated for release
+
+2006-02-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: modified -- updated for new release
+	* Makefile.am: modified -- added TODO file to distribution
+	* TODO: added -- added TODO file to distribution
+
+2006-02-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-inet_raw.c: modified
+	* src/test/test-inet_sctp.c: modified
+	* src/test/test-inet_tcp.c: modified
+	* src/test/test-inet_udp.c: modified
 	- 64bit changes
 	- suppress lockf for SMP operation
-	* (tests/testsuite-inet_raw.at): modified
-	* (tests/testsuite-inet_sctp.at): modified
-	* (tests/testsuite-inet_tcp.at): modified
-	* (tests/testsuite-inet_udp.at): modified
+	* tests/testsuite-inet_raw.at: modified
+	* tests/testsuite-inet_sctp.at: modified
+	* tests/testsuite-inet_tcp.at: modified
+	* tests/testsuite-inet_udp.at: modified
 	- corrected verbosity
-	* (src/drivers/inet.c): modified
+	* src/drivers/inet.c: modified
 	- a couple of bug corrections reported by sponsors
 	- 64bit changes
-	* (TODO): added
-	* (Makefile.am): modified - added TODO file to distribution
+	* TODO: added
+	* Makefile.am: modified - added TODO file to distribution
 
-2006-02-20 brian <bidulock@openss7.org>
-	* (.indent.pro): modified - added new types
-	* (strinet.spec.in): modified - updated for 64bit distribution
-	* (m4/dist.m4): modified - updated for 64bit distribution
-	* (src/.indent.pro): modified - added new types
+2006-02-20  Brian Bidulock  <bidulock@openss7.org>
 
-2006-02-19 brian <bidulock@openss7.org>
-	* (README): modified - updated for new release
+	* .indent.pro: modified - added new types
+	* strinet.spec.in: modified - updated for 64bit distribution
+	* m4/dist.m4: modified - updated for 64bit distribution
+	* src/.indent.pro: modified - added new types
 
-2006-02-13 brian <bidulock@openss7.org>
-	* (.pkgrelease): modified - bumped release number to 3
-	* (ChangeLog): modified - updated for new release
-	* (NEWS): modified - updated for new release
-	* (m4/kernel.m4): changes for Gentoo and 2.6.15 kernels
+2006-02-19  Brian Bidulock  <bidulock@openss7.org>
 
-2006-01-17 brian <bidulock@openss7.org>
-	* (src/util/init/strinet.sh): modified
+	* README: modified - updated for new release
+
+2006-02-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: modified - bumped release number to 3
+	* ChangeLog: modified - updated for new release
+	* NEWS: modified - updated for new release
+	* m4/kernel.m4: changes for Gentoo and 2.6.15 kernels
+
+2006-01-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/strinet.sh: modified
 	- corrected type in debian init script
 
-2005-09-14 Brian Bidulock <bidulock@openss7.org>
+2005-09-14  Brian Bidulock  <bidulock@openss7.org>
+
 	- Revision 0.9.2.2  2005/09/14 23:41:35  brian
 	- bumped release numbers and change logs
 
-2004-07-27 Brian Bidulock <bidulock@openss7.org>
+2004-07-27  Brian Bidulock  <bidulock@openss7.org>
+
 	- Revision 0.9.2.1  2004/06/27 08:15:37  brian
 	- Building strinet release.
 
-2004-06-27 brian <bidulock@openss7.org>
-	* (strinet):
+2004-06-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* strinet
 	- built up initial release of this package
 
 -----

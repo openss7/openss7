@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:33 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/03 12:06:13 $
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:33 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 12:06:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.6  2006/03/03 12:06:13  brian
+ - 32/64-bit compatibility
+
  Revision 0.9.2.5  2005/05/14 08:31:33  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:33 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/03 12:06:13 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:33 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/03 12:06:13 $";
 
 /* 
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -298,6 +301,11 @@ static timer_range_t timer[tmax] = {
 long test_start = 0;
 
 static int state;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 /* 
  *  Return the current time in milliseconds.

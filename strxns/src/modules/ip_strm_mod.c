@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 10:01:51 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 11:27:48 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:51 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:27:48 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: ip_strm_mod.c,v $
+ Revision 0.9.2.18  2006/03/03 11:27:48  brian
+ - 32/64-bit compatibility
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 10:01:51 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 11:27:48 $"
 
-static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 10:01:51 $";
+static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 11:27:48 $";
 
 #include <sys/os7/compat.h>
 
@@ -73,10 +77,15 @@ static char const ident[] =
 
 #include <sys/dlpi.h>
 
+#undef WITH_32BIT_COMPATIBILITY
+#if defined LFS && defined __LP64__
+#define WITH_32BIT_COMPATIBILITY 1
+#endif
+
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2005/12/28 10:01:51 $"
+#define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2006/03/03 11:27:48 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -411,6 +420,7 @@ ip_to_streams_ioctl(queue_t *q, mblk_t *mp)
 		 * simple "set if-name" ioctl will make the interface appear
 		 * under IP again.
 		 */
+		/* FIXME: this function does not check for TRANSPARENT ioctl! */
 		if (xmp != NULL && *xmp->b_rptr != 0) {	/* name specified */
 			strncpy(minor_ptr->myname, xmp->b_rptr, sizeof(minor_ptr->myname));
 #if defined(KERNEL_2_3)
@@ -1536,13 +1546,43 @@ STATIC struct fmodsw ip_to_streams_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
+#ifdef WITH_32BIT_COMPATIBILITY
+static void *ip_to_streams_ioctl32;
+#endif				/* WITH_32BIT_COMPATIBILITY */
+
+static void
+ip_to_streams_unregister_ioctl32(void)
+{
+#ifdef WITH_32BIT_COMPATIBILITY
+	if (ip_to_streams_ioctl32 != NULL)
+		unregister_ioctl32(ip_to_streams_ioctl32);
+	ip_to_streams_ioctl32 = NULL;
+#endif				/* WITH_32BIT_COMPATIBILITY */
+}
+
+static int
+ip_to_streams_register_ioctl32(void)
+{
+#ifdef WITH_32BIT_COMPATIBILITY
+	if (ip_to_streams_ioctl32 == NULL)
+		if ((ip_to_streams_ioctl32 = register_ioctl32(SIOCSIFNAME)) == NULL)
+			return (-ENOMEM);
+#endif				/* WITH_32BIT_COMPATIBILITY */
+	return (0);
+}
+
 STATIC int
 ip_to_streams_register_module(void)
 {
 	int err;
 
-	if ((err = register_strmod(&ip_to_streams_fmod)) < 0)
+	if ((err = ip_to_streams_register_ioctl32()) < 0)
 		return (err);
+
+	if ((err = register_strmod(&ip_to_streams_fmod)) < 0) {
+		ip_to_streams_unregister_ioctl32();
+		return (err);
+	}
 	if (modid == 0 && err > 0)
 		modid = err;
 	return (0);
@@ -1550,7 +1590,8 @@ ip_to_streams_register_module(void)
 STATIC void
 ip_to_streams_unregister_module(void)
 {
-	return (void) unregister_strmod(&ip_to_streams_fmod);
+	unregister_strmod(&ip_to_streams_fmod);
+	ip_to_streams_unregister_ioctl32();
 }
 #else
 #ifdef LIS

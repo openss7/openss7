@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/28 09:58:25 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/03 12:06:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:58:25 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 12:06:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/28 09:58:25 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/03 12:06:09 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/28 09:58:25 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/03 12:06:09 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -2366,7 +2366,7 @@ __xnet_t_getinfo(int fd, struct t_info *info)
 			struct T_info_ack ack;
 		} buf;
 		buf.req.PRIM_type = T_INFO_REQ;
-		if (__xnet_t_strioctl(fd, TI_GETINFO, &buf, sizeof(&buf)) != 0)
+		if (__xnet_t_strioctl(fd, TI_GETINFO, &buf, sizeof(buf)) != 0)
 			goto error;
 		user->info.addr = buf.ack.ADDR_size;
 		user->info.options = buf.ack.OPT_size;
@@ -5892,10 +5892,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.5 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.6 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.5 $)
- * @date \$Date: 2005/12/28 09:58:25 $
+ * @version \$Name:  $(\$Revision: 0.9.2.6 $)
+ * @date \$Date: 2006/03/03 12:06:09 $
  *
  * @}
  */

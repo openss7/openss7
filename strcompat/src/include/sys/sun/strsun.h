@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.5 2005/07/18 12:25:41 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.6 2006/03/03 11:11:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:11:14 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/18 12:25:41 $"
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/03 11:11:14 $"
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."
@@ -260,7 +260,7 @@ mcopyin(mblk_t *mp, void *priv, size_t size, void *uaddr)
 	union ioctypes *iocp = (typeof(iocp)) mp->b_rptr;
 
 	if (mp->b_datap->db_type == M_IOCTL && iocp->iocblk.ioc_count == TRANSPARENT)
-		iocp->copyreq.cq_addr = (caddr_t) *(uintptr_t *) mp->b_cont->b_rptr;
+		iocp->copyreq.cq_addr = (caddr_t) (long) *(intptr_t *)mp->b_cont->b_rptr;
 	else
 		iocp->copyreq.cq_addr = (caddr_t) uaddr;
 	if (mp->b_cont)
@@ -277,7 +277,7 @@ mcopyout(mblk_t *mp, void *priv, size_t size, void *uaddr, mblk_t *dp)
 	union ioctypes *iocp = (typeof(iocp)) mp->b_rptr;
 
 	if (mp->b_datap->db_type == M_IOCTL && iocp->iocblk.ioc_count == TRANSPARENT) {
-		iocp->copyreq.cq_addr = (caddr_t) *(uintptr_t *) mp->b_cont->b_rptr;
+		iocp->copyreq.cq_addr = (caddr_t) (long) *(intptr_t *)mp->b_cont->b_rptr;
 		freemsg(xchg(&mp->b_cont, dp));
 	} else {
 		iocp->copyreq.cq_addr = (caddr_t) uaddr;

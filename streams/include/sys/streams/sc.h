@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sc.h,v 0.9.2.12 2006/02/20 10:59:20 brian Exp $
+ @(#) $Id: sc.h,v 0.9.2.13 2006/03/03 10:57:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.h,v $
+ Revision 0.9.2.13  2006/03/03 10:57:11  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.12  2006/02/20 10:59:20  brian
  - updated copyright headers on changed files
 
@@ -57,7 +60,7 @@
 #ifndef __SYS_STREAMS_SC_H__
 #define __SYS_STREAMS_SC_H__
 
-#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_SC_H__
 #warning "Do no include sys/streams/sc.h directly, include sys/sc.h instead."
@@ -77,25 +80,16 @@ struct bar {
 	int bar;
 };
 
-/*
- *  This was a really bad idea for 32-bit compatibility exposing this internal kernel structure.
- *  What we really need to do is to define a new sc_module_info and sc_module_stat that is the same
- *  across 32-bit and 64-bit architectures.
- */
-
-#if 0
-#undef  module_info
-#define module_info smodule_info
-struct module_info {
+struct sc_module_info {
 	ushort mi_idnum;		/* module id number */
-	char *mi_idname;		/* module name */
-	ssize_t mi_minpsz;		/* min packet size accepted *//* OSF/Mac OT: long */
-	ssize_t mi_maxpsz;		/* max packet size accepted *//* OSF/Mac OT: long */
-	size_t mi_hiwat;		/* hi water mark *//* OSF/Mac OT: ulong */
-	size_t mi_lowat;		/* lo water mark *//* OSF/Mac OT: ulong */
+	char mi_idname[FMNAMESZ + 1];	/* module name */
+	ssize_t mi_minpsz;		/* min packet size accepted */
+	ssize_t mi_maxpsz;		/* max packet size accepted */
+	size_t mi_hiwat;		/* hi water mark */
+	size_t mi_lowat;		/* lo water mark */
 };
 
-typedef struct module_stat {
+typedef struct sc_module_stat {
 	long ms_pcnt;			/* calls to qi_putp() */
 	long ms_scnt;			/* calls to qi_srvp() */
 	long ms_ocnt;			/* calls to qi_qopen() */
@@ -104,30 +98,10 @@ typedef struct module_stat {
 	void *ms_xptr;			/* module private stats */
 	short ms_xsize;			/* len of private stats */
 	uint ms_flags;			/* bool stats -- for future use */
-} module_stat_t;
-#endif
-
-struct sc_module_info {
-	int16_t mi_idnum;		/* module id number */
-	char mi_idname[FMNAMESZ+1];	/* module name */
-	int32_t mi_minpsz;		/* min packet size accepted */
-	int32_t mi_maxpsz;		/* max packet size accepted */
-	u_int32_t mi_hiwat;		/* hi water mark */
-	u_int32_t mi_lowat;		/* lo water mark */
-};
-
-typedef struct sc_module_stat {
-	int32_t ms_pcnt;		/* calls to qi_putp() */
-	int32_t ms_scnt;		/* calls to qi_srvp() */
-	int32_t ms_ocnt;		/* calls to qi_qopen() */
-	int32_t ms_ccnt;		/* calls to qi_qclose() */
-	int32_t ms_acnt;		/* calls to qi_qadmin() */
-	u_int32_t ms_flags;		/* bool stats -- for future use */
-	int16_t ms_xsize;		/* len of private stats */
 } sc_module_stat_t;
 
 struct sc_mlist {
-	int major;
+	long major;
 	char name[FMNAMESZ + 1];
 	struct sc_module_info mi;
 	struct sc_module_stat ms;
@@ -137,5 +111,39 @@ struct sc_list {
 	int sc_nmods;
 	struct sc_mlist *sc_mlist;
 };
+
+#ifdef __LP64__
+struct sc_module_info32 {
+	u_int16_t mi_idnum;		/* module id number */
+	char mi_idname[FMNAMESZ + 1];	/* module name */
+	int32_t mi_minpsz;		/* min packet size accepted */
+	int32_t mi_maxpsz;		/* max packet size accepted */
+	u_int32_t mi_hiwat;		/* hi water mark */
+	u_int32_t mi_lowat;		/* lo water mark */
+};
+
+struct sc_module_stat32 {
+	int32_t ms_pcnt;		/* calls to qi_putp() */
+	int32_t ms_scnt;		/* calls to qi_srvp() */
+	int32_t ms_ocnt;		/* calls to qi_qopen() */
+	int32_t ms_ccnt;		/* calls to qi_qclose() */
+	int32_t ms_acnt;		/* calls to qi_qadmin() */
+	u_int32_t ms_xptr;		/* module private stats */
+	int16_t ms_xsize;		/* len of private stats */
+	u_int32_t ms_flags;		/* bool stats -- for future use */
+};
+
+struct sc_mlist32 {
+	int32_t major;
+	char name[FMNAMESZ + 1];
+	struct sc_module_info32 mi;
+	struct sc_module_stat32 ms;
+};
+
+struct sc_list32 {
+	int32_t sc_nmods;
+	u_int32_t sc_mlist;
+};
+#endif				/* __LP64__ */
 
 #endif				/* __SYS_STREAMS_SC_H__ */

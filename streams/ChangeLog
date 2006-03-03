@@ -1,12 +1,83 @@
-# $Log: ChangeLog,v $
-# Revision 0.9.2.14  2006/02/25 01:30:37  brian
-# - more roughing in of 32bit compatibilty support
-# - updated perftest program to be able to use FIFOs as well as pipes
-# - added README-LiS file to capture LiS binary compatibility issues
-#
+2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 
-2006-02-24 Brian Bidulock <bidulock@openss7.org>
+	* THANKS: updated for release
+	* NEWS: updated for release
+	* doc/manual/releases.texi (Release Notes): updated for release
+	* doc/man/sreams.macros: updated for release
+	* doc/man/sreams.refs: updated references
+	* README-nexusware: updated for release
+
+2006-03-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* README: updated for release
+	* README-alpha: updated for release
+	* doc/manual/releases.texi (Bugs): updated alpha statement
+	* doc/manual/releases.texi (Bugs, Known Bugs, Maturity): updated release notes
+	* README-cvs: updated for release
+
+2006-03-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* TODO: updated to do items
+	* README: updated for release
+
+2006-02-28  Brian Bidulock  <bidulock@openss7.org>
+
 	* ChangeLog: modified -- updated for new release
+	* TODO: updated
+	* acinclude.m4: Added checks for linux/ioctl32.h, asm/ioctl32.h,
+	  linux/syscalls and linux/rwsem.h header file.  Added checks for
+	  compat_ptr functions, ioctl32_hash_table, ioctl32_sem, and compat_ptr
+	  symbols.
+	* doc/man/Makefile.am: added register_ioct32.9.man and
+	  unregister_ioctl32.9.man.
+	* doc/man/streams.macros: updated copyright dates
+	* doc/man/man9/M_CTL.9.man: corrections to iocblk structure
+	* doc/man/man9/M_IOCACK.9.man: corrections to iocblk structure
+	* doc/man/man9/M_IOCNAK.9.man: corrections to iocblk structure
+	* doc/man/man9/M_IOCTL.9.man: corrections to iocblk structure
+	* doc/man/man9/iocblk.8.man: corrections to iocblk structure
+	* doc/man/man9/register_ioctl32.9.man: new manual page
+	* doc/man/man9/register_strdev.9.man: typo correction
+	* doc/man/man9/unregister_ioctl32.9.man: new manual page
+	* include/sys/streams/sad.h (struct strapush): added strapush32
+	  structure under __LP64__ for 32-bit ioctl compatibility.
+	* include/sys/streams/sc.h: added 32-bit compatibility structures
+	  under __LP64__.
+	* include/sys/streams/strconf.h (register_ioctl32, unregister_ioct32):
+	  added declarations for register_ioctl32 and unregister_ioctl32.
+	* include/sys/streams/stream.h: added IOC_CONVERT_FROM macro for Solaris
+	  compatibility.
+	* include/sys/streams/stropts.h (LFS_GETMSG_PUTMSG_ULEN): made magic
+	  value longer under __LP64__ for detecting 32-bit read/write call.
+	* src/drivers/sad.c: added 32-bit ioctl handling.
+	* src/modules/nullmod.c: added 32-bit ioctl handling.
+	* src/modules/sc.c: added 32-bit ioctl handling.
+	* src/modules/sth.c: sweeping changes to Stream head code for 32bit
+	  compatibility.
+	* src/modules/testmod.c: added 32-bit ioctl handling.
+	* src/test/test-clone.c: Added INVALID_ADDRESS for use in test cases.
+	* src/test/test-connld.c: Added INVALID_ADDRESS for use in test cases.
+	* src/test/test-echo.c: Added INVALID_ADDRESS for use in test cases.
+	* src/test/test-fifo.c: Added INVALID_ADDRESS for use in test cases.
+	* src/test/test-log.c: Added INVALID_ADDRESS for use in test cases.
+	* src/test/test-nsdev.c: Added INVALID_ADDRESS for use in test cases.
+	* src/test/test-nuls.c: Added INVALID_ADDRESS for use in test cases.
+	* src/test/test-piepmod.c: Added INVALID_ADDRESS for use in test cases.
+	* src/test/test-pipe.c: Added INVALID_ADDRESS for use in test cases.
+	* src/test/test-sad.c: Opening 3 SAD drivers is not possible.  Added
+	  INVALID_ADDRESS macro for use in test cases.
+	* src/test/test-sc.c: Opening 3 SAD drivers is not possible.  Added
+	  INVALID_ADDRESS macro for use in test cases.
+	* src/test/test-streams.c: Added preamble in to some read/getmsg/getpmsg
+	  EFAULT test cases.  Added INVALID_ADDRESS maco for use in test cases.
+	* src/util/scls.c: changes to align with sc module.
+
+2006-02-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: modified -- updated for new release
+	- more roughing in of 32bit compatibilty support
+	- updated perftest program to be able to use FIFOs as well as pipes
+	- added README-LiS file to capture LiS binary compatibility issues
 	* include/sys/streams/stream.h (struct iocblk): modified --
 	- added ioc_flag member for ioctl32 compatibility ala Solaris
 	  and rationalized to SVR4, OSF, and provided capability for LiS
@@ -23,13 +94,13 @@
 	* src/test/perftest.c: modified -- added support for using FIFOs
 	  for performance tests instead of pipes.
 
-2006-02-23 Brian Bidulock <bidulock@openss7.org>
+2006-02-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* ChangeLog: modified -- updated for new release
 	* Makefile.am (EXTRA_DIST: modified -- added TODO file to distribution
 	* TODO: added -- added TODO file to distribution
 
-2006-02-22 Brian Bidulock <bidulock@openss7.org>
+2006-02-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* ChangeLog: modified - updated
 	* NEWS: modified - updated
@@ -81,7 +152,7 @@
 	- strap out lockf() that was blocking some test case
 	  processes on SMP and even on UP
 
-2006-02-20 Brian Bidulock <bidulock@openss7.org>
+2006-02-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* ChangeLog: modified - updated
 	* NEWS: modified - updated for new release
@@ -163,39 +234,39 @@
 	* src/util/strerr.c: modified
 	- 64bit corrections
 
-2006-02-13 Brian Bidulock <bidulock@openss7.org>
+2006-02-13  Brian Bidulock  <bidulock@openss7.org>
 
 	Changes from streams 0.9a.4 release:
 
 	* m4/kernel.m4: changes for Gentoo and 2.6.15 kernels
 
-2005-11-06 Brian Bidulock <bidulock@openss7.org>
+2005-11-06  Brian Bidulock  <bidulock@openss7.org>
 
 	- Revision 0.9.2.10  2005/11/06 11:00:16  brian
 	- updates
 
-2005-09-14 Brian Bidulock <bidulock@openss7.org>
+2005-09-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- Revision 0.9.2.9  2005/09/14 23:41:29  brian
 	- bumped release numbers and change logs
 
-2005-08-22 Brian Bidulock <bidulock@openss7.org>
+2005-08-22  Brian Bidulock  <bidulock@openss7.org>
 
 	- Revision 0.9.2.8  2004/08/22 06:17:38  brian
 	- Checkin on new working branch.
 
-2005-08-22 Brian Bidulock <bidulock@openss7.org>
+2005-08-22  Brian Bidulock  <bidulock@openss7.org>
 
 	- Revision 0.9.2.1  2004/08/22 06:17:38  brian
 	- Checkin on new working branch.
 
-2004-07-27 Brian Bidulock <bidulock@openss7.org>
+2004-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	- Revision 1.7  2004/06/27 03:06:29  brian
 	- Removed XTI/TLI and Linux Networking.
 
 
-2004-06-26 Brian Bidulock <bidulock@openss7.org>
+2004-06-26  Brian Bidulock  <bidulock@openss7.org>
 	* .rpmepoch: modified - changed epoch to 0
 	* .rpmrelease: modified - bumped release to 2
 	* ChangeLog: modified - updated
@@ -647,17 +718,17 @@
 	* tests/Makefile.am: modified - strapped out tests for distcheck target
 
 
-2004-05-27 Brian Bidulock <bidulock@openss7.org>
+2004-05-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams: Revision 1.6  2004/05/27 08:55:11  brian
 	- Stabilizing release.
 
-2004-05-14 Brian Bidulock <bidulock@openss7.org>
+2004-05-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams: Revision 1.5  2004/05/14 07:59:47  brian
 	- Updated xns, tli, inet, xnet and documentation.
 
-2004-05-14 Brian Bidulock <bidulock@openss7.org>
+2004-05-14  Brian Bidulock  <bidulock@openss7.org>
 	* ChangeLog: modified
 	* Makefile.am: modified
 	* acinclude.m4: modified
@@ -1073,12 +1144,12 @@
 	* src/test/test-inet_tcp.c: modified
 	* src/test/test-inet_udp.c: modified
 
-2004-04-24 Brian Bidulock <bidulock@openss7.org>
+2004-04-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams: Revision 1.4  2004/04/24 06:28:26  brian
 	- Updating change logs, new and readmes.
 
-2004-03-04 Brian Bidulock <bidulock@openss7.org>
+2004-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams: Revision 1.3  2004/03/04 23:15:46  brian
 	- working up release directory
@@ -1089,7 +1160,7 @@
 	- added inet and libxnet test programs
 	- added utility programs and user commands
 
-2004-03-04 Brian Bidulock <bidulock@openss7.org>
+2004-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: modified
 	* ChangeLog: modified
@@ -1168,8 +1239,7 @@ All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
-version.
+Foundation; version 2 of the License.
 
 This program is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS

@@ -2,19 +2,18 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2006/02/22 11:36:21 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2006/03/03 10:57:09 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +47,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/02/22 11:36:21 $ by $Author: brian $
+# Last Modified $Date: 2006/03/03 10:57:09 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: acinclude.m4,v $
+# Revision 0.9.2.114  2006/03/03 10:57:09  brian
+# - 32-bit compatibility support, updates for release
 #
 # =============================================================================
 
@@ -947,7 +952,8 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
-			  asm/uaccess.h linux/kthread.h linux/compat.h], [:], [:], [
+			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
+			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -978,7 +984,8 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
 			num_online_cpus generic_delete_inode set_user_nice \
 			set_cpus_allowed yield \
-			prepare_to_wait prepare_to_wait_exclusive finish_wait], [:], [
+			prepare_to_wait prepare_to_wait_exclusive finish_wait \
+			compat_ptr], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
@@ -1031,6 +1038,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/pci.h>		/* for pci checks */
 #if HAVE_KINC_ASM_UACCESS_H
 #include <asm/uaccess.h>
+#endif
+#if HAVE_KINC_LINUX_COMPAT_H
+#include <linux/compat.h>
 #endif
 ])
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
@@ -1150,6 +1160,7 @@ dnl
     at_ioctl_getmsg="$linux_cv_member_struct_file_operations_unlocked_ioctl"
     AC_SUBST([at_ioctl_getmsg])dnl
     AM_CONDITIONAL(USING_IOCTL_GETPMSG_PUTPMSG, test :$at_ioctl_getmsg = :yes)dnl
+	_LINUX_KERNEL_SYMBOLS([ioctl32_hash_table, ioctl32_sem, compat_ptr])
 	_LINUX_KERNEL_SYMBOLS([is_ignored, is_orphaned_pgrp, kill_sl, kill_proc_info, send_group_sig_info, session_of_pgrp])
 	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
 	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
@@ -1396,7 +1407,7 @@ AC_DEFUN([_LFS_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

@@ -1,18 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/12/22 07:27:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2006/03/03 10:57:09 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/22 07:27:42 $ by $Author: brian $
+# Last Modified $Date: 2006/03/03 10:57:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1237,6 +1236,7 @@ man_MANS = \
 	man9/queue_t.9 \
 	man9/register_clone.9 \
 	man9/register_cmajor.9 \
+	man9/register_ioctl32.9 \
 	man9/register_strdev.9 \
 	man9/register_strdrv.9 \
 	man9/register_strmod.9 \
@@ -1290,6 +1290,7 @@ man_MANS = \
 	man9/unlinkmsg.9 \
 	man9/unregister_clone.9 \
 	man9/unregister_cmajor.9 \
+	man9/unregister_ioctl32.9 \
 	man9/unregister_strdev.9 \
 	man9/unregister_strdrv.9 \
 	man9/unregister_strmod.9 \
@@ -2341,6 +2342,7 @@ dist_noinst_MANS = \
 	man9/queue_t.9.man \
 	man9/register_clone.9.man \
 	man9/register_cmajor.9.man \
+	man9/register_ioctl32.9.man \
 	man9/register_strdev.9.man \
 	man9/register_strdrv.9.man \
 	man9/register_strmod.9.man \
@@ -2394,6 +2396,7 @@ dist_noinst_MANS = \
 	man9/unlinkmsg.9.man \
 	man9/unregister_clone.9.man \
 	man9/unregister_cmajor.9.man \
+	man9/unregister_ioctl32.9.man \
 	man9/unregister_strdev.9.man \
 	man9/unregister_strdrv.9.man \
 	man9/unregister_strmod.9.man \

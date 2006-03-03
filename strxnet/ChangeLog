@@ -1,103 +1,137 @@
-# $Log: ChangeLog,v $
-# Revision 0.9.2.7  2006/02/23 12:17:38  brian
-# - updated for new release
-#
+2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 
-2006-02-23 brian <bidulock@openss7.org>
-	* (src/test/test-inet_raw.c): modified
-	* (src/test/test-inet_tcp.c): modified
-	* (src/test/test-inet_udp.c): modified
-	* (src/test/test-timod.c): modified
-	* (src/test/test-tirdwr.c): modified
-	* (src/test/test-xnet.c): modified
+	* THANKS: updated for release
+	* doc/man/strxnet.macros: updated for release
+	* doc/man/strxnet.refs: updated references
+	* README-nexusware: updated for release
+
+2006-03-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* README: updated for release
+	* doc/manual/releases.texi (Bugs, Known Bugs, Maturity): updated release notes
+	* doc/manual/strxnet.texi (detailed node listing): added missing Troubleshooting
+	* README-cvs: updated for release
+
+2006-03-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: modified -- corrected format of change log
+	* Makefile.am: modified -- updated headers
+	* src/modules/timod.c: modified
+	Changes for ioctl32 registration.
+	* TODO: updated to do items
+	* README: updated for release
+
+
+2006-02-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: modified -- updated for new release
+	* Makefile.am: modified -- added TODO file to distribution
+	* TODO: added -- added TODO file to distribution
+
+2006-02-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-inet_raw.c: modified
+	* src/test/test-inet_tcp.c: modified
+	* src/test/test-inet_udp.c: modified
+	* src/test/test-timod.c: modified
+	* src/test/test-tirdwr.c: modified
+	* src/test/test-xnet.c: modified
 	- updates for 64bit
 	- disabled lockf (doesn't work well on SMP)
 	- updated headers
 
-	* (tests/testsuite-timod.at): modified
-	* (tests/testsuite-tirdwr.at): modified
-	* (tests/testsuite-xnet.at): modified
-	* (tests/testsuite-xnet_thr.at): modified
+	* tests/testsuite-timod.at: modified
+	* tests/testsuite-tirdwr.at: modified
+	* tests/testsuite-xnet.at: modified
+	* tests/testsuite-xnet_thr.at: modified
 	- changed verbosity level for bug reports
 	- updated headers
 
-	* (src/include/sys/timod.h): modified
-	* (src/include/sys/tpi.h): modified
-	* (src/include/sys/xti.h): modified
+	* src/include/sys/timod.h: modified
+	* src/include/sys/tpi.h: modified
+	* src/include/sys/xti.h: modified
 	- corrections for 64bit and 32/64bit compatibility
 	- updated headers
 
-	* (TODO): added - added TODO file for this package
-	* (Makefile.am): modified -- added TODO file to distribution
+	* TODO: added - added TODO file for this package
+	* Makefile.am: modified -- added TODO file to distribution
 
-	* (ChangeLog): modified -- updated for new release
-	* (NEWS): modified -- updated for new release
-	* (README): modified -- updated for new release
+	* ChangeLog: modified -- updated for new release
+	* NEWS: modified -- updated for new release
+	* README: modified -- updated for new release
 
-2006-02-20 brian <bidulock@openss7.org>
-	* (.indent.pro): modified -- added types
-	* (strxnet.spec.in): modified -- corrected for 64bit distribution
-	* (m4/dist.m4): modified -- corrected for 64bit distribution
-	* (src/.indent.pro): modified -- added types
+2006-02-20  Brian Bidulock  <bidulock@openss7.org>
 
-2006-02-13 brian <bidulock@openss7.org>
-	* (.pkgrelease): modified -- updated for new release
-	* (m4/kernel.m4): changes for Gentoo and 2.6.15 kernels
+	* .indent.pro: modified -- added types
+	* strxnet.spec.in: modified -- corrected for 64bit distribution
+	* m4/dist.m4: modified -- corrected for 64bit distribution
+	* src/.indent.pro: modified -- added types
 
-2005-09-14 Brian Bidulock <bidulock@openss7.org>
+2006-02-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: modified -- updated for new release
+	* m4/kernel.m4: changes for Gentoo and 2.6.15 kernels
+
+2005-09-14  Brian Bidulock  <bidulock@openss7.org>
+
 	- Revision 0.9.2.6  2005/09/14 23:41:55  brian
 	- bumped release numbers and change logs
 
-2004-07-27 Brian Bidulock <bidulock@openss7.org>
+2004-07-27  Brian Bidulock  <bidulock@openss7.org>
+
 	- Revision 0.9.2.5  2004/06/27 04:24:23  brian
 	- Updated.
 
-2004-06-22 brian <bidulock@openss7.org>
-	* (.rpmrelease):
-	- bumped rpm release to 5
-	* (doc/man/Makefile.am):
-	- made sctp manpages conditional on OpenSS7 SCTP kernel
-	* (ChangeLog): updated
-	* (NEWS): updated
+2004-06-22  Brian Bidulock  <bidulock@openss7.org>
 
-2004-06-21 brian <bidulock@openss7.org>
-	* (.rpmrelease):
+	* .rpmrelease:
+	- bumped rpm release to 5
+	* doc/man/Makefile.am:
+	- made sctp manpages conditional on OpenSS7 SCTP kernel
+	* ChangeLog: updated
+	* NEWS: updated
+
+2004-06-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* .rpmrelease:
 	- bumped rpm release to 4
-	* (strxnet.spec.in):
+	* strxnet.spec.in:
 	- added explicit epoch for internal package dependencies for
 	  compatibility with rpm release 4.2.1 and 4.2.2.
-	* (am/kernel.am):
+	* am/kernel.am:
 	- corrected symbolic linking and system map location on autoconf
 	  install
-	* (m4/kernel.m4):
+	* m4/kernel.m4:
 	- added detection for EL3 hugemem kernels
-	* (src/lib/xnet.c):
+	* src/lib/xnet.c:
 	- corrected behavior on zero maxlen for t_rcvconnect()
 
-2004-06-10 brian <bidulock@openss7.org>
-	* (.rpmrelease):
+2004-06-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* .rpmrelease:
 	- bumped rpm release to 3
-	* (Makefile.am):
+	* Makefile.am:
 	- corrected autoconf device installation from separate build directory
-	* (m4/genksyms.m4):
+	* m4/genksyms.m4:
 	- added check an prefix for CONFIG_REGPARM for SuSE
-	* (m4/kernel.m4):
+	* m4/kernel.m4:
 	- added check and CFLAGS for CONFIG_REGPARM for SuSE
 	- corrected exported symbol caching
 	- added ability to supress exported symbol versioning
 
-2004-06-05 brian <bidulock@openss7.org>
-	* (am/rpm.am):
+2004-06-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/rpm.am:
 	- build tools last so that debug rpm built properly on RH9
-	* (m4/rpm.m4):
+	* m4/rpm.m4:
 	- quoting error
-	* (m4/strconf.m4):
+	* m4/strconf.m4:
 	- build quoting problems
-	* (src/drivers/inet.c):
+	* src/drivers/inet.c:
 	- changed MODULE_PARM to non-static
-	* (src/modules/timod.c):
+	* src/modules/timod.c:
 	- changed MODULE_PARM to non-static
-	* (src/modules/tirdwr.c):
+	* src/modules/tirdwr.c:
 	- changed MODULE_PARM to non-static
 
 -----

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 12:43:51 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 12:06:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:43:51 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 12:06:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 12:43:51 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 12:06:11 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 12:43:51 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 12:06:11 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -1525,8 +1525,8 @@ t_conn_res(queue_t *q, long seq)
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_CONN_RES;
-		p->ACCEPTOR_id = (t_uscalar_t) RD(sl->wq->q_next);	/* accept on indicating
-									   queue */
+		/* accept on indicating queue */
+		p->ACCEPTOR_id = (t_uscalar_t) (long) RD(sl->wq->q_next);
 		p->OPT_length = opt_len;
 		p->OPT_offset = opt_len ? sizeof(*p) : 0;
 		p->SEQ_number = seq;

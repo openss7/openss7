@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: iocblk.9.man,v 0.9.2.11 2006/02/25 01:30:42 brian Exp $
+.\" @(#) $Id: iocblk.9.man,v 0.9.2.12 2006/03/03 10:57:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/02/25 01:30:42 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/03 10:57:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: iocblk.9.man,v $
+.\" Revision 0.9.2.12  2006/03/03 10:57:10  brian
+.\" - 32-bit compatibility support, updates for release
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,12 +95,15 @@ struct iocblk {
     int ioc_cmd;        /* command to perform */
     cred_t *ioc_cr;     /* credentials */
     uint ioc_id;        /* id of this ioctl */
-    caddr_t __pad1;     /* padding for alignment with copyreq and copyresp */
-    size_t ioc_count;   /* size of the data field */
+#if defined __LP64__ && defined CONFIG_STREAMS_LIS_BCM
+    uint ioc_count;     /* size of the data field */
+#else
+    ulong ioc_count;    /* size of the data field */
+#endif
     int ioc_error;      /* ioctl error code (for errno) */
     int ioc_rval;       /* system call return value */
-    uint ioc_flag;
-    mblk_t *__pad2;
+    long ioc_filler[4]; /* reserved for future use */
+#define ioc_flag ioc_filler[1]; /* data model, IOC_NONE or IOC_ILP32 */
 };
 
 #define ioc_uid         ioc_cr->cr_uid
@@ -123,9 +132,6 @@ pointer to the invoking user credentials;
 current input-output control identification number;
 .\" ----------------------
 .TP
-.I __pad1
-.\" ----------------------
-.TP
 .I ioc_count
 amount of data (in bytes) in an attached
 .BR M_DATA (9)
@@ -144,14 +150,14 @@ return value to\
 call;
 .\" ----------------------
 .TP
+.I ioc_filler
+padding for SVR 4 compatibility.
+.\" ----------------------
+.TP
 .I ioc_flag
 modifier flags (see
 .IR \(lq\)COMPATIBILITY\(rq\) ,
 below);
-.\" ----------------------
-.TP
-.I __pad2
-padding for alignment;
 .PD
 .\"
 .\"
@@ -269,6 +275,32 @@ messages, containing the
 and
 .BR copyresp (9)
 data structures.
+.PP
+The
+.I ioc_flag
+field is significant in the
+.B M_IOCTL (9)
+message.  It is set by the Stream head an indicates to the module or driver the C language model
+from which the
+.BR ioctl (2s)
+operation originated.  For an
+.B ILP32
+kernel, this field will always be set to zero
+.RB ( 0 ", " IOC_NONE ).
+For an
+.B LP64
+kernel, this field will either be set to
+.B IOC_NATIVE
+to indicate that the
+.BR ioctl (2s)
+originated from the same C language model as the kernel
+.RB ( LP64 ),
+or
+.B IOC_ILP32
+to indicate that the
+.BR ioctl (2s)
+originated from a different C language model than the kernel
+.RB ( ILP32 ).
 .\".\"
 .\".SS M_COPYIN
 .\".PP
@@ -377,6 +409,14 @@ or
 .BR streamio (2)
 call on
 .BR M_IOCACK (9).
+.PP
+The
+.I ioc_flag
+field in the
+.BR M_IOCACK (9)
+and
+.BR M_IOCNAK (9)
+messages is ignored by the Stream head.
 .\"
 .SS M_CTL
 .PP
@@ -494,9 +534,9 @@ uses the
 .I ioc_flag
 member to indicate whether the input output control that invoked the operation was native to the
 kernel
-.RB ( FNATIVE )
+.RB ( IOC_NATIVE ") or (" IOC_NONE )
 or was a 32-bit operation invoked on a kernel with 64-bit longs and pointers
-.RB ( DATAMODEL_ILP32 ).
+.RB ( IOC_ILP32 ).
 .B @PACKAGE_TITLE@
 supports this flag for compatibility with modules or drivers written for
 .IR Solaris \(rg.

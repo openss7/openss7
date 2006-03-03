@@ -1,9 +1,13 @@
-OpenSS7 Linux Fast STREAMS -- things to do.  2006-02-20
+OpenSS7 Linux Fast STREAMS -- things to do.  2006-03-01
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
-See the end cor copying conditions.
+See the end for copying conditions (for this file).
 
 Things to do:
+
+- Have the STREAMS subsystem register a panic notifier on 2.6 kernels to
+  be able to recover from panics caused by misbehaving STREAMS modules
+  or drivers.
 
 - More performance testing and profiling on SMP.  On the same kernel
   running non-SMP we get pipe performance of about 80-90% of a Linux
@@ -25,7 +29,8 @@ Things to do:
   CONFIG_COMPAT define that we might want to check in the configure
   script.
 
-  TODO: Some code roughed in.
+  DONE: Tested on x86_64 with i686.
+  TODO: Documentation of new registration functions.
 
 - Per cpu data:- I am still using the older approach of using cacheline
   aligned arrays for per-cpu data.  This, of course, does not fully
@@ -213,3 +218,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: tw=72 nocindent

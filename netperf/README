@@ -1,47 +1,226 @@
+OpenSS7 Netperf -- readme first file.  2006-03-02
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+OpenSS7 Modified Netperf
+========================
 
-BE SURE TO READ THE MANUAL.
+This package is an OpenSS7 modified version of the sources found at
+ftp://ftp.cup.hp.com/dist/networking/benchmarks/netperf/
 
-This is a brief readme file for the netperf TCP/UDP/sockets/etc
-performance benchmark. This is here mostly as a boot-strap. The real
-information is in the manual, which can be found in netperf.ps and
-online from http://www.netperf.org/netperf/NetperfPage.html. The
-sources, and a limited number of binaries, can be found from
-ftp://ftp.cup.hp.com/dist/networking/benchmarks/netperf/ .
+This is the netperf-2.3.3 package.  It, and the current version, can
+be obtained from the download area of The OpenSS7 Project website at
+http://www.openss7.org/download.html as netperf-2.3.3.tar.bz2 using a
+command such as
 
-BE SURE TO READ THE MANUAL.
+	wget http://www.openss7.org/tarballs/netperf-2.3.3.tar.bz2
 
-There is a COPYRIGHT file included. It is based on what the HP Legal
-Eagles gave me. I am not sure if the legalese is clear, but the intent
-is to say "Here is a benchmark. Use it in good health. Pass it along,
-port it, enhance it. You didn't pay for this tool, so don't expect it 
-to be perfect ;-)" The rest of it is there to keep the layers happy...
+Please see the NEWS file for release notes and history of user visible
+changes for the current version, and the ChangeLog file for a more
+detailed history of implementation changes.  The TODO file lists
+features not yet implemented or other outstandinng items.
 
-Feel free to report results in public forums, but please be
-excruciatingly complete in your description of the test envorinment.
-Better still, report results to the netperf database at
-http://www.netperf.org/netperf/NetperfPage.html.
+Please see the INSTALL, INSTALL-netperf and README-make files (or the
+installation and reference manual) for installation instructions.  When
+working from CVS, please see the README-cvs file.  An abbreviated
+installation procedure that works for most applications appears below.
 
-There is an Internet mailing list devoted to netperf. It is called
-netperf-talk and it is hosted on netperf.org. Subscription requests
-should go to netperf-talk-request@netperf.org.
+This release of the package is published strictly under Version 2 of the
+GNU Public License which can be found in the file COPYING.  Package
+specific licensing terms (if any) can be found in the file LICENSING.
+Please respect these licensing arrangements.  If you are interested in
+different licensing terms, please contact the copyright holder, OpenSS7
+Corporation, http://www.openss7.com/ or mailto:bidulock@openss7.org.
 
-Please DO NOT SEND subscription requests to netperf-talk!
+Prerequisites
+-------------
 
-If you run into severe difficulties, or are just feeling chatty,
-please feel free to drop some email to me - Rick Jones
-<raj@cup.hp.com>. Be sure to include a meaningful subject lines.
+The following are prerequisites for building the package:
 
-happy benchmarking, 
-rick jones
+ 1. Linux distribution with a 2.4 or 2.6 kernel with the appropriate
+    tool chain.  For supported and tested distributions, see the manual.
 
-BE SURE TO READ THE MANUAL.
+    (Note that although the original HP release of Netperf builds and
+    installs on a number of operating systems, this OpenSS7 modified
+    version only builds and install on Linux.)
+
+ 2. OpenSS7 Linux Fast-STREAMS or OpenSS7 Modified Linux STREAMS
+    installed, such as
+    http://www.openss7.org/tarballs/streams-0.7a.5.tar.bz2 or
+    http://www.openss7.org/tarballs/LiS-2.18.3.tar.bz2
+
+    (Note that the `LiS' package is deprecated.  We recommend using the
+    `streams' package instead.)
+
+ 3. OpenSS7 STREAMS Compatibility Modules installed, such as
+    http://www.openss7.org/tarballs/strcompat-0.9.2.3.tar.bz2
+
+ 4. OpenSS7 STREAMS XNS installed, such as
+    http://www.openss7.org/tarballs/strxns-0.9.2.3.tar.bz2
+
+ 5. OpenSS7 STREAMS XTI/TLI Library installed, such as
+    http://www.openss7.org/tarballs/strxnet-0.9.2.8.tar.bz2
+
+ 6. OpenSS7 STREAMS INET Driver installed, such as
+    http://www.openss7.org/tarballs/strinet-0.9.2.3.tar.bz2
+
+ 7. OpenSS7 STREAMS SCTP Driver installed, such as
+    http://www.openss7.org/tarballs/strsctp-0.9.2.5.tar.bz2
+
+When configuring and building multiple OpenSS7 Project release packages,
+place all of the source packages (unpackaged tarballs) at the same
+directory level and all build directories at the same directory level.
+
+Installation
+------------
+
+The following commands will download, configure, build, check, install,
+validate, uninstall and remove the package:
+
+	wget http://www.openss7.org/tarballs/netperf-2.3.3.tar.bz2
+	tar -xjvf netperf-2.3.3.tar.bz2
+	mkdir build
+	cd build
+	../netperf-2.3.3.configure
+	make
+	make check
+	sudo make install
+	sudo make installcheck
+	sudo make uninstall
+	cd ..
+	sudo rm -rf build
+	rm -rf netperf-2.3.3.
+	rm -f netperf-2.3.3.tar.bz2
+
+Manual
+------
+
+More detailed installation instructions can be found in the Installation
+and Reference Manual, contained in the distribution in `text', `info',
+`html', and `pdf' formats:
+
+	cd ../netperf-2.3.3
+	less manual/netperf.txt
+	lynx manual/netperf.html
+	info -f manual/netperf.info
+	xpdf manual/netperf.pdf
+
+The current manual is also always available online from The OpenSS7
+Project website at:
+
+	lynx http://www.openss7.org/netperf_manual.html
+
+Description
+-----------
+
+Netperf is a general purpose tool for benchmarking bandwidth and
+performance of the Internet Protocol suite.  The OpenSS7 Modified
+Netperf package is an OpenSS7 modified release of the HP netperf package
+configured to run with OpenSS7 STREAMS SCTP (Stream Control Transmission
+Protocol) and the OpenSS7 STREAMS XNS, XTI/TLI and INET packages.
+
+This is a version of the Netperf package release by HP modified by the
+OpenSS7 Project for use with OpenSS7 STREAMS XNS, XTI/TLI, INET and SCTP
+packages.  This OpenSS7 release of the package is based on the
+Netperf-2.3 release from HP.
+
+Modifications to the package are derived from the OpenSS7 STREAMS XNS,
+XTI/TLI, INET and SCTP implementations and are release under the GNU
+General Public License (GPL) Version 2.  The Netperf tool itself is
+licensed under specific terms by Hewlett-Packard.  Please see LICENSE
+for the Hewlett-Packard Netperf copyright notices and licensing
+restrictions.  The Netperf tool is
+
+     Copyright (c) 1993, 1994, 1995 Hewlett-Packard Company
+     All Rights Reserved
+
+See the HP License in the LICENSE file for complete details.
+
+Please note that this modified version of the Netperf package is not
+endorsed by Hewlett-Packard in any way and that neither the original
+copyright holders nor OpenSS7 Corporation will take any responsibility
+in it.
+
+Brief Installation Instructions
+-------------------------------
+
+The OpenSS7 Modified Netperf package is available from the downloads
+area of The OpenSS7 Project website:
+<http://www.openss7.org/download.html> using a command such as:
+
+	wget http://www.openss7.org/tarballs/netperf-2.3.3.tar.bz2
+
+Unpack the tarball using a command such as:
+
+	tar -xjvf netperf-2.3.3.tar.bz2
+
+The tarball will unpack into the relative subdirectory named after the
+package name: netperf-2.3.3  The package builds using the GNU autoconf
+utilities and the `configure' script.  To build the package, we
+recommend using a separate build directory as follows:
+
+	mkdir build
+	cd build
+	../netperf-2.3.3/configure
+
+In general, the package configures and builds without adding any special
+options to the configure script.  For general options to the configure
+script, see the GNU `INSTALL' file in the distribution:
+
+	less ../netperf-2.3.3/INSTALL
+
+For specific options to the configure script, see the INSTALL-netperf
+file in the distribution, or simply execute the configure script with
+the --help option like so:
+
+	../netperf-2.3.3/configure --help
+
+After configuring the package, the package can be compiled simply by
+issuing the `make' command:
+
+	make
+
+Some specialized makefile targets exist, see the README-make file in the
+distribution or simply invoke the `help' target like so:
+
+	make help
+
+After successfully building the package, the package can be checked by
+invoking the `check' make target like so:
+
+	make check
+
+After successfully checking the package, the package can be installed by
+invoking the `install' make target (as root) like so:
+
+	sudo make install
+
+The testsuites that ship with the package can be invoked after the
+package has been installed by invoking the `installcheck' target.  This
+target can either be invoked as root, or as a normal user, like so:
+
+	make installcheck
+
+The package can be cleanly removed by invoking the `uninstall' target
+(as root):
+
+	sudo make uninstall
+
+Then the build directory and tarball can be simply removed:
+
+	cd ..
+	rm -rf build
+	rm -rf netperf-2.3.3
+	rm -f netperf-2.3.3.tar.bz2
+
 
 =========================================================================
 
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -86,3 +265,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

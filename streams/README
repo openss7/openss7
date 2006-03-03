@@ -1,10 +1,93 @@
-OpenSS7 Linux Fast-STREAMS -- readme first file.  2006-02-20
+OpenSS7 Linux Fast-STREAMS -- readme first file.  2006-03-02
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
-See the end for copying conditions.
+See the end for copying conditions (for this file).
 
-Linux Fast-STREAMS
-------------------
+OpenSS7 Linux Fast-STREAMS
+==========================
+
+This is the streams-0.7a.5 package.  It, and the current version, can
+be obtained from the download area of The OpenSS7 Project website at
+http://www.openss7.org/download.html as streams-0.7a.5.tar.bz2 using a
+command such as
+
+	wget http://www.openss7.org/tarballs/streams-0.7a.5.tar.bz2
+
+Please see the NEWS file for release notes and history of user visible
+changes for the current version, and the ChangeLog file for a more
+detailed history of implementation changes.  The TODO file lists
+features not yet implemented or other outstandinng items.
+
+Please see the INSTALL, INSTALL-streams and README-make files (or the
+installation and reference manual) for installation instructions.  When
+working from CVS, please see the README-cvs file.  An abbreviated
+installation procedure that works for most applications appears below.
+
+This release of the package is published strictly under Version 2 of the
+GNU Public License which can be found in the file COPYING.  Package
+specific licensing terms (if any) can be found in the file LICENSING.
+Please respect these licensing arrangements.  If you are interested in
+different licensing terms, please contact the copyright holder, OpenSS7
+Corporation, http://www.openss7.com/ or mailto:bidulock@openss7.org.
+
+See README-alpha for alpha release information.
+
+Prerequisites
+-------------
+
+The following are prerequisites for building the package:
+
+ 1. Linux distribution with a 2.4 or 2.6 kernel with the appropriate
+    tool chain.  For supported and tested distributions, see the manual.
+
+When configuring and building multiple OpenSS7 Project release packages,
+place all of the source packages (unpackaged tarballs) at the same
+directory level and all build directories at the same directory level.
+
+Installation
+------------
+
+The following commands will download, configure, build, check, install,
+validate, uninstall and remove the package:
+
+	wget http://www.openss7.org/tarballs/streams-0.7a.5.tar.bz2
+	tar -xjvf streams-0.7a.5.tar.bz2
+	mkdir build
+	cd build
+	../streams-0.7a.5.configure
+	make
+	make check
+	sudo make install
+	sudo make installcheck
+	sudo make uninstall
+	cd ..
+	sudo rm -rf build
+	rm -rf streams-0.7a.5.
+	rm -f streams-0.7a.5.tar.bz2
+
+Manual
+------
+
+More detailed installation instructions can be found in the Installation
+and Reference Manual, contained in the distribution in `text', `info',
+`html', and `pdf' formats:
+
+	cd ../streams-0.7a.5
+	less doc/manual/STREAMS.txt
+	lynx doc/manual/STREAMS.html
+	info -f doc/manual/STREAMS.info
+	xpdf doc/manual/STREAMS.pdf
+
+The current manual is also always available online from The OpenSS7
+Project website at:
+
+	lynx http://www.openss7.org/STREAMS_manual.html
+
+Description
+-----------
+
+The OpenSS7 Linux Fast-STREAMS package is a STREAMS framework for Linux
+that is compatible with SVR 4.2 MP STREAMS.
 
 Linux Fast-STREAMS is intendeed as a high-performance, production replacement
 for Linux STREAMS (LiS).  In contrast, Linux Fast-STREAMS has the following
@@ -62,13 +145,86 @@ and other utilities.                    Linux-derived utlities.
 Provides full named-streams device and  Provides only character-based node    
 device filesystem support.              support.                              
 --------------------------------------  --------------------------------------
+
+Brief Installation Instructions
+-------------------------------
+
+The OpenSS7 Linux Fast-STREAMS package is available from the downloads
+area of The OpenSS7 Project website:
+<http://www.openss7.org/download.html> using a command such as:
+
+	wget http://www.openss7.org/tarballs/streams-0.7a.5.tar.bz2
+
+Unpack the tarball using a command such as:
+
+	tar -xjvf streams-0.7a.5.tar.bz2
+
+The tarball will unpack into the relative subdirectory named after the
+package name: streams-0.7a.5  The package builds using the GNU autoconf
+utilities and the `configure' script.  To build the package, we
+recommend using a separate build directory as follows:
+
+	mkdir build
+	cd build
+	../streams-0.7a.5/configure
+
+In general, the package configures and builds without adding any special
+options to the configure script.  For general options to the configure
+script, see the GNU `INSTALL' file in the distribution:
+
+	less ../streams-0.7a.5/INSTALL
+
+For specific options to the configure script, see the INSTALL-streams
+file in the distribution, or simply execute the configure script with
+the --help option like so:
+
+	../streams-0.7a.5/configure --help
+
+After configuring the package, the package can be compiled simply by
+issuing the `make' command:
+
+	make
+
+Some specialized makefile targets exist, see the README-make file in the
+distribution or simply invoke the `help' target like so:
+
+	make help
+
+After successfully building the package, the package can be checked by
+invoking the `check' make target like so:
+
+	make check
+
+After successfully checking the package, the package can be installed by
+invoking the `install' make target (as root) like so:
+
+	sudo make install
+
+The testsuites that ship with the package can be invoked after the
+package has been installed by invoking the `installcheck' target.  This
+target can either be invoked as root, or as a normal user, like so:
+
+	make installcheck
+
+The package can be cleanly removed by invoking the `uninstall' target
+(as root):
+
+	sudo make uninstall
+
+Then the build directory and tarball can be simply removed:
+
+	cd ..
+	rm -rf build
+	rm -rf streams-0.7a.5
+	rm -f streams-0.7a.5.tar.bz2
+
 
 =========================================================================
 
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -113,3 +269,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/22 19:57:35 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/03 10:57:16 $
 
  -----------------------------------------------------------------------------
 
@@ -33,8 +33,7 @@
 
  As an exception to the above, this software may be distributed under the GNU
  General Public License (GPL) Version 2, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and
- libraries.
+ with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/22 19:57:35 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.61  2006/03/03 10:57:16  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.60  2006/02/22 19:57:35  brian
  - strap out lockf() that was blocking some test case
    processes on SMP and even on UP
@@ -255,9 +257,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/22 19:57:35 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/03 10:57:16 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/22 19:57:35 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/03 10:57:16 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -345,6 +347,7 @@ pid_t test_pid[3] = { 0, 0, 0 };
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define INFINITE_WAIT	-1
 #define TEST_DURATION	20000
+#define INVALID_ADDRESS ((void *)(long)(-1))
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -2864,7 +2867,7 @@ space."
 int
 test_case_2_1_2(int child)
 {
-	if (test_ioctl(child, I_NREAD, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_NREAD, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -3041,7 +3044,7 @@ UnixWare."
 int
 test_case_2_2_3(int child)
 {
-	if (test_ioctl(child, I_PUSH, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_PUSH, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4552,7 +4555,7 @@ space."
 int
 test_case_2_7_11(int child)
 {
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4715,7 +4718,7 @@ space."
 int
 test_case_2_8_1(int child)
 {
-	if (test_ioctl(child, I_STR, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_STR, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5783,7 +5786,7 @@ space."
 int
 test_case_2_10_2(int child)
 {
-	if (test_ioctl(child, I_GETSIG, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GETSIG, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -7655,7 +7658,7 @@ test_case_2_16_13(int child)
 	fdi.flags = RS_HIPRI;
 	fdi.fildes = test_fd[child];
 	fdi.offset = 0;
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -7685,7 +7688,7 @@ test_case_2_16_14(int child)
 	fdi.ctlbuf.buf = buf;
 	fdi.databuf.maxlen = 0;
 	fdi.databuf.len = sizeof(t_uscalar_t);
-	fdi.databuf.buf = (char *) -1;
+	fdi.databuf.buf = (char *) INVALID_ADDRESS;
 	fdi.flags = RS_HIPRI;
 	fdi.fildes = test_fd[child];
 	fdi.offset = 0;
@@ -8600,7 +8603,7 @@ space."
 int
 test_case_2_20_10(int child)
 {
-	if (test_ioctl(child, I_GWROPT, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9284,7 +9287,7 @@ space."
 int
 test_case_2_24_3(int child)
 {
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10368,7 +10371,7 @@ space."
 int
 test_case_2_28_2(int child)
 {
-	if (test_ioctl(child, I_SETCLTIME, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10776,7 +10779,7 @@ space."
 int
 test_case_2_29_2(int child)
 {
-	if (test_ioctl(child, I_GETCLTIME, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GETCLTIME, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -11759,7 +11762,7 @@ space."
 int
 test_case_2_32_6(int child)
 {
-	if (test_ioctl(child, I_GERROPT, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GERROPT, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -12263,7 +12266,7 @@ space."
 int
 test_case_2_40_9(int child)
 {
-	if (test_ioctl(child, I_GETPMSG, (intptr_t) 1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GETPMSG, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -12284,27 +12287,44 @@ EFAULT is returned when a buffer extends outside the callers valid\n\
 address space."
 
 int
+preamble_test_case_2_40_10(int child)
+{
+	char buf[] = "Test message.";
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int
 test_case_2_40_10(int child)
 {
 	struct strpmsg sg;
 
 	sg.ctlbuf.maxlen = 5;
 	sg.ctlbuf.len = -1;
-	sg.ctlbuf.buf = (char *) -1;
+	sg.ctlbuf.buf = (char *) INVALID_ADDRESS;
 
 	sg.databuf.maxlen = 5;
 	sg.databuf.len = -1;
-	sg.databuf.buf = (char *) -1;
+	sg.databuf.buf = (char *) INVALID_ADDRESS;
 
 	sg.band = 0;
 	sg.flags = MSG_ANY;
 
-	if (test_ioctl(child, I_GETPMSG, (intptr_t) &sg) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GETPMSG, (intptr_t) &sg) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_40_10 = { &preamble_0, &test_case_2_40_10, &postamble_0 };
+struct test_stream test_2_40_10 = { &preamble_test_case_2_40_10, &test_case_2_40_10, &postamble_0 };
 
 #define test_case_2_40_10_stream_0 (&test_2_40_10)
 #define test_case_2_40_10_stream_1 (NULL)
@@ -12679,7 +12699,7 @@ operation."
 int
 test_case_2_48_4(int child)
 {
-	if (test_ioctl(child, TM_IOC_COPYIN, (intptr_t) -1) == __RESULT_SUCCESS)
+	if (test_ioctl(child, TM_IOC_COPYIN, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != EFAULT)
@@ -12705,7 +12725,7 @@ operation."
 int
 test_case_2_48_5(int child)
 {
-	if (test_ioctl(child, TM_IOC_COPYOUT, (intptr_t) -1) == __RESULT_SUCCESS)
+	if (test_ioctl(child, TM_IOC_COPYOUT, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != EFAULT)
@@ -12731,7 +12751,7 @@ and copyout operation."
 int
 test_case_2_48_6(int child)
 {
-	if (test_ioctl(child, TM_IOC_COPYIO, (intptr_t) -1) == __RESULT_SUCCESS)
+	if (test_ioctl(child, TM_IOC_COPYIO, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != EFAULT)
@@ -12962,16 +12982,30 @@ Check that read() can be performed on a Stream.  Checks that EFAULT is\n\
 returned when the buffer extends outside the callers valid address space."
 
 int
-test_case_3_1_9(int child)
+preamble_test_case_3_1_9(int child)
 {
 	char buf[16];
 
-	if (test_read(child, (char *)-1, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_3_1_9 = { &preamble_0, &test_case_3_1_9, &postamble_0 };
+
+int
+test_case_3_1_9(int child)
+{
+	char buf[16];
+
+	if (test_read(child, (char *)INVALID_ADDRESS, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_9 = { &preamble_test_case_3_1_9, &test_case_3_1_9, &postamble_0 };
 
 #define test_case_3_1_9_stream_0 (&test_3_1_9)
 #define test_case_3_1_9_stream_1 (NULL)
@@ -14087,7 +14121,7 @@ test_case_3_2_9(int child)
 	iov[0].iov_base = buf;
 	iov[0].iov_len = sizeof(buf);
 
-	if (test_readv(child, (struct iovec *)-1, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_readv(child, (struct iovec *)INVALID_ADDRESS, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14108,12 +14142,26 @@ returned when the iov array describes a buffer that extends outside the\n\
 caller's valid address space."
 
 int
+preamble_test_case_3_2_10(int child)
+{
+	char buf[16];
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int
 test_case_3_2_10(int child)
 {
 	char buf[16];
 	struct iovec iov[1];
 
-	iov[0].iov_base = (char *)-1;
+	iov[0].iov_base = (char *)INVALID_ADDRESS;
 	iov[0].iov_len = sizeof(buf);
 
 	if (test_readv(child, iov, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
@@ -14121,7 +14169,7 @@ test_case_3_2_10(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_3_2_10 = { &preamble_0, &test_case_3_2_10, &postamble_0 };
+struct test_stream test_3_2_10 = { &preamble_test_case_3_2_10, &test_case_3_2_10, &postamble_0 };
 
 #define test_case_3_2_10_stream_0 (&test_3_2_10)
 #define test_case_3_2_10_stream_1 (NULL)
@@ -14387,7 +14435,7 @@ test_case_3_3_9(int child)
 {
 	char buf[16] = { 0, };
 
-	if (test_write(child, (char *)-1, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_write(child, (char *)INVALID_ADDRESS, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14959,7 +15007,7 @@ test_case_3_4_9(int child)
 	iov[0].iov_base = buf;
 	iov[0].iov_len = sizeof(buf);;
 
-	if (test_writev(child, (struct iovec *)-1, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_writev(child, (struct iovec *)INVALID_ADDRESS, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14985,7 +15033,7 @@ test_case_3_4_10(int child)
 	char buf[16] = { 0, };
 	struct iovec iov[1];
 
-	iov[0].iov_base = (char *)-1;
+	iov[0].iov_base = (char *)INVALID_ADDRESS;
 	iov[0].iov_len = sizeof(buf);;
 
 	if (test_writev(child, iov, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
@@ -15404,28 +15452,42 @@ Check that getmsg() can be performed on a Stream.  Checks that EFAULT is\n\
 returned when a buffer points outside the callers valid address space."
 
 int
+preamble_test_case_3_5_10(int child)
+{
+	char buf[16];
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int
 test_case_3_5_10(int child)
 {
 	struct strbuf ctl;
 	struct strbuf dat;
 	int flags;
 
-	ctl.maxlen = 1;
+	ctl.maxlen = 5;
 	ctl.len = -1;
-	ctl.buf = (char *)-1;
+	ctl.buf = (char *)INVALID_ADDRESS;
 
-	dat.maxlen = 1;
+	dat.maxlen = 5;
 	dat.len = -1;
-	dat.buf = (char *)-1;
+	dat.buf = (char *)INVALID_ADDRESS;
 
-	flags = RS_HIPRI;
+	flags = 0;
 
 	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_3_5_10 = { &preamble_0, &test_case_3_5_10, &postamble_0 };
+struct test_stream test_3_5_10 = { &preamble_test_case_3_5_10, &test_case_3_5_10, &postamble_0 };
 
 #define test_case_3_5_10_stream_0 (&test_3_5_10)
 #define test_case_3_5_10_stream_1 (NULL)
@@ -16787,6 +16849,20 @@ Check that getpmsg() can be performed on a Stream.  Checks that EFAULT\n\
 is returned when a buffer points outside the callers valid address space."
 
 int
+preamble_test_case_3_6_14(int child)
+{
+	char buf[16];
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int
 test_case_3_6_14(int child)
 {
 	struct strbuf ctl;
@@ -16795,13 +16871,13 @@ test_case_3_6_14(int child)
 	int flags;
 
 
-	ctl.maxlen = 1;
+	ctl.maxlen = 5;
 	ctl.len = -1;
-	ctl.buf = (char *)-1;
+	ctl.buf = (char *)INVALID_ADDRESS;
 
-	dat.maxlen = 1;
+	dat.maxlen = 5;
 	dat.len = -1;
-	dat.buf = (char *)-1;
+	dat.buf = (char *)INVALID_ADDRESS;
 
 	band = 0;
 	flags = MSG_ANY;
@@ -16811,7 +16887,7 @@ test_case_3_6_14(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_3_6_14 = { &preamble_0, &test_case_3_6_14, &postamble_0 };
+struct test_stream test_3_6_14 = { &preamble_test_case_3_6_14, &test_case_3_6_14, &postamble_0 };
 
 #define test_case_3_6_14_stream_0 (&test_3_6_14)
 #define test_case_3_6_14_stream_1 (NULL)
@@ -18046,11 +18122,11 @@ test_case_3_7_8(int child)
 
 	ctl.maxlen = -1;
 	ctl.len = sizeof(cbuf);
-	ctl.buf = (char *)-1;
+	ctl.buf = (char *)INVALID_ADDRESS;
 
 	dat.maxlen = -1;
 	dat.len = sizeof(dbuf);
-	dat.buf = (char *)-1;
+	dat.buf = (char *)INVALID_ADDRESS;
 
 	flags = 0;
 
@@ -18838,11 +18914,11 @@ test_case_3_8_8(int child)
 
 	ctl.maxlen = -1;
 	ctl.len = sizeof(cbuf);
-	ctl.buf = (char *)-1;
+	ctl.buf = (char *)INVALID_ADDRESS;
 
 	dat.maxlen = -1;
 	dat.len = sizeof(dbuf);
-	dat.buf = (char *)-1;
+	dat.buf = (char *)INVALID_ADDRESS;
 
 	band = 0;
 	flags = MSG_BAND;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:31:27 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/03 12:06:12 $
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:27 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 12:06:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.4  2006/03/03 12:06:12  brian
+ - 32/64-bit compatibility
+
  Revision 0.9.2.3  2005/05/14 08:31:27  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:31:27 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/03 12:06:12 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:31:27 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/03 12:06:12 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -3972,6 +3975,11 @@ struct test_case {
 	"10(b)", desc_case_10b, &preamble_5, &test_case_10b, &postamble_2, 0, 0}, {
 	NULL,}
 };
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 int
 do_tests(void)

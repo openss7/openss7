@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 10:01:24 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 12:17:39 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:24 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 12:17:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.20  2006/03/03 12:17:39  brian
+ - 64-bit and SMP compatibility
+
  Revision 0.9.2.19  2005/12/28 10:01:24  brian
  - remove warnings on FC4 compile
 
@@ -126,9 +129,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 10:01:24 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 12:17:39 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 10:01:24 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 12:17:39 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -275,6 +278,11 @@ enum {
 long test_start = 0;
 
 static int state;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 /*
  *  Return the current time in milliseconds.

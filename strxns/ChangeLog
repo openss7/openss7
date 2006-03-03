@@ -1,40 +1,101 @@
-# $Log: ChangeLog,v $
-# Revision 0.9.2.5  2005/09/14 23:42:08  brian
-# - bumped release numbers and change logs
-#
+2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 
-* Mon Jul  4 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.4  2005/07/04 20:19:01  brian
-- updated dates
+	* THANKS: updated for release
+	* doc/man/strxns.macros: updated for release
+	* doc/man/strxns.refs: updated references
+	* README-nexusware: updated for release
+	* AUTHORS: updated for release
+	* src/include/sys/ldl.h: 32/64-bit compatibility, remove dependency on
+	  atomic_t from kernel
+	* src/include/sys/npi.h: 32/64-bit compatibility, some reformatting
+	* src/modules/ip_strm_mod.c: 32/64-bit ioctl compatibility
+	* src/test/ldltest.c: 64-bit compatibility
+	* src/util/ldlconfig.c: 64-bit compatibility
 
-* Sat May 14 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.3  2005/05/14 08:26:03  brian
-- copyright header correction
+2006-03-02  Brian Bidulock  <bidulock@openss7.org>
 
-* Sat Aug 14 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.2  2004/08/14 12:35:51  brian
-- Serious work on updating documentation.
+	* README: updated for release
+	* doc/manual/releases.texi (Bugs, Known Bugs, Maturity): updated release notes
+	* src/drivers/ldl.c: corrections to typos introduced
+	* doc/manual/strxns.texi (detailed node listing): added missing Troubleshooting
+	* README-alpha: added alpha readme file for release
+	* README-cvs: updated for release
+
+2006-03-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: modified -- corrected format and upated
+	* Makefile.am: modified -- added README-LiS to distribution
+	* NEWS: modified -- updated for release
+	* README: modified -- updated for release
+	* README-LiS: added -- README file to capture LiS binary
+	  compatibility issues (if any).
+	* src/drivers/ip_to_dlpi.c: modified -- 64-bit compatibility for
+	  printk statements.
+	* src/drivers/ldl.c: modified -- added 64-bit compatibility,
+	  32-bit ioctl compatibility, TRANPARENT ioctl capability,
+	  removed issues with atomic_t being placed in a user header.
+	* src/include/sys/cdi.h: modified -- Applied t_uscalar_t
+	  approach to 64-bit and 32-bit compatibility in this header
+	  file (cd_long and cd_ulong are 32-bit on both 64-bit and
+	  32-bit models).
+	* src/include/sys/dlpi.h: modified -- Applied t_uscalar_t
+	  approach to 64-bit and 32-bit compatibility in this header
+	  file (cd_long and cd_ulong are 32-bit on both 64-bit and
+	  32-bit models).
+	* TODO: updated to do items
+	* README: updated for release
+
+2006-02-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: modified -- updated for new release
+	* Makefile.am: modified -- added TODO file to distribution
+	* TODO: added -- added TODO file to distribution
+
+2006-02-13  Brian Bidulock  <bidulock@openss7.org>
+
+	- Changes from strsctp 0.9.2.2 release:
+	* m4/kernel.m4: changes for Gentoo and 2.6.15 kernels
+
+2005-09-14  Brian Bidulock  <bidulock@openss7.org>
+
+	- Revision 0.9.2.5  2005/09/14 23:42:08  brian
+	- bumped release numbers and change logs
+
+2005-07-04  Brian Bidulock  <bidulock@openss7.org>
+
+	- Revision 0.9.2.4  2005/07/04 20:19:01  brian
+	- updated dates
+
+2005-05-15  Brian Bidulock  <bidulock@openss7.org>
+
+	- Revision 0.9.2.3  2005/05/14 08:26:03  brian
+	- copyright header correction
+
+2004-08-14  Brian Bidulock  <bidulock@openss7.org>
+
+	- Revision 0.9.2.2  2004/08/14 12:35:51  brian
+	- Serious work on updating documentation.
 
 
-2004-07-03 brian <bidulock@openss7.org>
-	* (strxns): Revision 0.9.2.1  2004/07/04 00:54:07  brian
+2004-07-03  Brian Bidulock  <bidulock@openss7.org>
+
+	- Revision 0.9.2.1  2004/07/04 00:54:07  brian
 	- Initial import of strxns package.
 
-2004-07-03 brian <bidulock@openss7.org>
-	* (strxns/):
+2004-07-03  Brian Bidulock  <bidulock@openss7.org>
+
 	- started separate xns packaging
 
 -----
 
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
-version.
+Foundation; version 2 of the License.
 
 This program is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS

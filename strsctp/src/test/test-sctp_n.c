@@ -1,11 +1,11 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/28 10:01:04 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/03 11:47:02 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -14,46 +14,64 @@
  This software and related documentation is protected by copyright and
  distributed under licenses restricting its use, copying, distribution and
  decompilation.  No part of this software or related documentation may be
- reproduced in any form by any means without the prior written
- authorization of the copyright holder, and licensors, if any.
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- The recipient of this document, by its retention and use, warrants that
- the recipient will protect this information and keep it confidential, and
- will not disclose the information contained in this document without the
- written permission of its owner.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
 
- The author reserves the right to revise this software and documentation
- for any reason, including but not limited to, conformity with standards
- promulgated by various agencies, utilization of advances in the state of
- the technical arts, or the reflection of changes in the design of any
- techniques, or procedures embodied, described, or referred to herein.
- The author is under no obligation to provide any feature listed herein.
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
  behalf of the U.S. Government ("Government"), the following provisions apply
- to you.  If the Software is supplied by the Department of Defense ("DoD"),
- it is classified as "Commercial Computer Software" under paragraph
- 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations
- ("DFARS") (or any successor regulations) and the Government is acquiring
- only the license rights granted herein (the license rights customarily
- provided to non-Government users).  If the Software is supplied to any unit
- or agency of the Government other than DoD, it is classified as "Restricted
- Computer Software" and the Government's rights in the Software are defined
- in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
- any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86
- of the NASA Supplement to the FAR (or any successor regulations).
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:04 $ by <bidulock@openss7.org>
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/03/03 11:47:02 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: test-sctp_n.c,v $
+ Revision 0.9.2.13  2006/03/03 11:47:02  brian
+ - 32/64-bit compatibility
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/28 10:01:04 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/03 11:47:02 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/28 10:01:04 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/03 11:47:02 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -221,6 +239,11 @@ long test_start = 0;
 
 static int state;
 
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
+
 static int
 time_event(int event)
 {
@@ -350,10 +373,10 @@ N_qos_sel_info_sctp_t qos_info = {
 	0,				/* sid */
 	12,				/* max_inits */
 	12,				/* max_retrans */
-	-1UL,				/* ck_life */
-	-1UL,				/* ck_inc */
-	-1UL,				/* hmac */
-	-1UL,				/* throttle */
+	-1,				/* ck_life */
+	-1,				/* ck_inc */
+	-1,				/* hmac */
+	-1,				/* throttle */
 	0,				/* max_sack */
 	0,				/* rto_ini */
 	0,				/* rto_min */
@@ -847,7 +870,7 @@ print_addr(char *add_ptr, size_t add_len)
 		int i;
 
 		if (add_len != anum * sizeof(*a))
-			fprintf(stdout, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
 		fprintf(stdout, "[%d]", ntohs(a[0].sin_port));
 		for (i = 0; i < anum; i++) {
 			uint32_t addr = a[i].sin_addr.s_addr;
@@ -873,7 +896,7 @@ addr_string(char *add_ptr, size_t add_len)
 		int i;
 
 		if (add_len != anum * sizeof(*a))
-			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
 		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a[0].sin_port));
 		for (i = 0; i < anum; i++) {
 			uint32_t addr = a[i].sin_addr.s_addr;
@@ -897,7 +920,7 @@ print_proto(char *pro_ptr, size_t pro_len)
 		int i;
 
 		if (!pnum)
-			printf("(PROTOID_length = %d)", pro_len);
+			printf("(PROTOID_length = %lu)", (ulong) pro_len);
 		for (i = 0; i < pnum; i++) {
 			printf("%s%d", i ? "," : "", p[i]);
 		}
@@ -980,10 +1003,10 @@ void
 print_size(ulong size)
 {
 	switch (size) {
-	case -1UL:
+	case -1:
 		printf("UNLIMITED\n");
 		break;
-	case -2UL:
+	case -2:
 		printf("UNDEFINED\n");
 		break;
 	default:
@@ -1092,7 +1115,7 @@ print_event_conn(int fd, int event)
 		fprintf(stdout, "N_RESET_CON   <-----|<- - - - - - - /               |  |                    [%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "????%4d????  ?----?|?- - - - - - -?                |  |                    [%d]\n", cmd.npi.type, state);
+		fprintf(stdout, "????%4ld????  ?----?|?- - - - - - -?                |  |                    [%d]\n", (long) cmd.npi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -1200,7 +1223,7 @@ print_event_list(int fd, int event)
 		fprintf(stdout, "                    |               \\ - - - - - - ->|--+---> N_RESET_CON    [%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "                    |                               |?-+---? ????%4d????   [%d]\n", cmd.npi.type, state);
+		fprintf(stdout, "                    |                               |?-+---? ????%4ld????   [%d]\n", (long) cmd.npi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -1288,7 +1311,7 @@ print_event_resp(int fd, int event)
 		fprintf(stdout, "                    |               \\ - - - - - - - +->|---> N_DISCON_IND   [%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "                    |                               |  |?--? ????%4d????   [%d]\n", cmd.npi.type, state);
+		fprintf(stdout, "                    |                               |  |?--? ????%4ld????   [%d]\n", (long) cmd.npi.type, state);
 		break;
 	case __EVENT_DATACK_REQ:
 		fprintf(stdout, "                    |               /<- - - - - - - + -|<--- N_DATACK_REQ   [%d]\n", state);
@@ -3655,7 +3678,7 @@ test_case_7_1_resp(int fd)
       failure:
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "i = %d, j = %d, k = %d\n", 4, 4, 4);
-	fprintf(stdout, "Received %u bytes, expecting %u\n", len, 4 * 100000 + 4 * 8 + 4 * 7);
+	fprintf(stdout, "Received %lu bytes, expecting %u\n", (ulong) len, 4 * 100000 + 4 * 8 + 4 * 7);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
@@ -3707,7 +3730,7 @@ test_case_7_2_conn(int fd)
 	return (__RESULT_SUCCESS);
       failure:
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, "Sent %3d messages making %6u bytes.\n", s, snd_bytes);
+	fprintf(stdout, "Sent %3d messages making %6lu bytes.\n", s, (ulong) snd_bytes);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	print_more();
@@ -3758,7 +3781,7 @@ test_case_7_2_resp(int fd)
 	return (__RESULT_SUCCESS);
       failure:
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, "Rcvd %3d messages making %6u bytes.\n", r, rcv_bytes);
+	fprintf(stdout, "Rcvd %3d messages making %6lu bytes.\n", r, (ulong) rcv_bytes);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	print_more();
@@ -5359,7 +5382,7 @@ splash(int argc, char *argv[])
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -5385,9 +5408,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -5413,7 +5435,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

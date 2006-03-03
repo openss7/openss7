@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.12 2005/12/06 09:39:07 brian Exp $
+.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.13 2006/03/03 10:57:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/06 09:39:07 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/03 10:57:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -125,17 +125,24 @@ structure, defined in
 .nf
 \fC\s-1\
 struct copyresp {
-    int cp_cmd;         /* ioctl command (from ioc_cmd) */
-    cred_t *cp_cr;      /* full credentials */
-    uint cp_id;         /* ioctl id (from ioc_id) */
-    caddr_t cp_rval;    /* status of request: 0-success,
-                           !0-failure */
+    int cp_cmd;         /* command being performed */
+    cred_t *cp_cr;      /* credentials */
+    uint cp_id;         /* id of this ioctl */
+    caddr_t cp_rval;    /* result 0 - success, 1 - failure */
     uint cp_pad1;       /* reserved */
     int cp_pad2;        /* reserved */
-    mblk_t *cp_private; /* private state info (from
-                           cq_private) */
-    long cp_filler[4];  /* reserved for future use */
+    mblk_t *cp_private; /* private state information */
+    long cp_filler[4];  /* SVR4 compatibility */
+#define cp_flag cp_filler[0] /* IOC_NATIVE or IOC_ILP32 */
 };
+
+#define cp_uid cp_cr->cr_uid
+#define cp_gid cp_cr->cr_gid
+
+#define IOC_MASK   0xff000000 /* mask of model bits */
+#define IOC_NONE   0x00000000 /* no indication */
+#define IOC_NATIVE 0x01000000 /* native ioctl request */
+#define IOC_ILP32  0x02000000 /* 32bit ioctl request */
 \s+1\fP
 .fi
 .PP
@@ -185,6 +192,42 @@ message.  It is included in the
 message so the message can be self-describing.  This is intended to simplify
 .BR ioctl (2s)
 processing by drivers and modules.
+.PP
+The
+.I cp_flag
+field is set by the Stream head and has the same value as the
+.I ioc_flag
+field in the original corresponding
+.BR M_IOCTL (9)
+message.  The
+.I cp_flag
+field can have the values as follows:
+.TP \w'IOC_NATIVE\(em'u
+.B IOC_NONE
+indicates that the
+.BR copyin (9)
+or
+.BR copyout (9)
+operation was performed for a process with the same data model as the driver.
+No conversions are required on data copied in.
+.TP
+.B IOC_NATIVE
+indicates that the 
+.BR copyin (9)
+or
+.BR copyout (9)
+operation was performed for a process with the same data model as the driver (i.e.
+.BR LP64 ).
+No conversion are required on data copied in.
+.TP
+.B IOC_ILP32
+indicates that the 
+.BR copyin (9)
+or
+.BR copyout (9)
+operation was performed for a process with a different data model (31- or 32-bit) from the kernel
+(i.e. ILP32 instead of LP64).
+Conversion is required on data copied in.
 .PP
 If the message is in response to an
 .BR M_COPYIN (9)
@@ -378,6 +421,41 @@ structure, and will only examine and modify members in accordance with the
 .[
 svr4spg
 .]
+.IP \(em
+The
+.I cp_flag
+field is documented only by
+.IR Solaris \(rg
+.[
+soldoc
+.]
+with the same sematics as provided by
+.B @PACKAGE_TITLE@
+as described above, for compatibility with
+.IR Solaris \(rg.
+.[
+soldoc
+.]
+Nevertheless, the interpretation of the
+.I cp_flag
+is non-portable, and, as the
+.I cp_flag
+occupies one of the
+.I cp_filler
+elements in the SVR 4.2 structure, examining it on implementations other than
+.IR Solaris \(rg
+.[
+soldoc
+.]
+or
+.B @PACKAGE_TITLE@
+could have undefined results.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not examine the
+.I cp_flag
+field.
 .IP \(em
 When a driver or module receives an
 .B M_IOCDATA

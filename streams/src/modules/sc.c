@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/02/20 10:59:24 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/03 10:57:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:24 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.44  2006/03/03 10:57:11  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.43  2006/02/20 10:59:24  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/02/20 10:59:24 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/03 10:57:11 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/02/20 10:59:24 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/03 10:57:11 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -85,7 +88,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/02/20 10:59:24 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/03 10:57:11 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -139,6 +142,66 @@ static struct module_info sc_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+#ifdef __LP64__
+#  undef WITH_32BIT_CONVERSION
+#  define WITH_32BIT_CONVERSION 1
+#endif
+
+static size_t
+sc_mlist_copy(long major, struct qinit *qinit, caddr_t _mlist, const uint flag)
+{
+#ifdef WITH_32BIT_CONVERSION
+	if (flag == IOC_ILP32) {
+		struct sc_mlist32 *mlist = (typeof(mlist)) _mlist;
+
+		if ((mlist->major = major) != -1) {
+			strncpy(mlist->name, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+			// mlist->mi = *qinit->qi_minfo;
+			mlist->mi.mi_idnum = qinit->qi_minfo->mi_idnum;
+			strncpy(mlist->mi.mi_idname, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+			mlist->mi.mi_minpsz = qinit->qi_minfo->mi_minpsz;
+			mlist->mi.mi_maxpsz = qinit->qi_minfo->mi_maxpsz;
+			mlist->mi.mi_hiwat = qinit->qi_minfo->mi_hiwat;
+			mlist->mi.mi_lowat = qinit->qi_minfo->mi_lowat;
+			if (qinit->qi_mstat) {
+				mlist->ms.ms_pcnt = qinit->qi_mstat->ms_pcnt;
+				mlist->ms.ms_scnt = qinit->qi_mstat->ms_scnt;
+				mlist->ms.ms_ocnt = qinit->qi_mstat->ms_ocnt;
+				mlist->ms.ms_ccnt = qinit->qi_mstat->ms_ccnt;
+				mlist->ms.ms_acnt = qinit->qi_mstat->ms_acnt;
+				mlist->ms.ms_flags = qinit->qi_mstat->ms_flags;
+				mlist->ms.ms_xsize = qinit->qi_mstat->ms_xsize;
+			}
+		}
+		return sizeof(struct sc_mlist32);
+	} else
+#endif				/* WITH_32BIT_CONVERSION */
+	{
+		struct sc_mlist *mlist = (typeof(mlist)) _mlist;
+
+		if ((mlist->major = major) != -1) {
+			strncpy(mlist->name, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+			// mlist->mi = *qinit->qi_minfo;
+			mlist->mi.mi_idnum = qinit->qi_minfo->mi_idnum;
+			strncpy(mlist->mi.mi_idname, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+			mlist->mi.mi_minpsz = qinit->qi_minfo->mi_minpsz;
+			mlist->mi.mi_maxpsz = qinit->qi_minfo->mi_maxpsz;
+			mlist->mi.mi_hiwat = qinit->qi_minfo->mi_hiwat;
+			mlist->mi.mi_lowat = qinit->qi_minfo->mi_lowat;
+			if (qinit->qi_mstat) {
+				mlist->ms.ms_pcnt = qinit->qi_mstat->ms_pcnt;
+				mlist->ms.ms_scnt = qinit->qi_mstat->ms_scnt;
+				mlist->ms.ms_ocnt = qinit->qi_mstat->ms_ocnt;
+				mlist->ms.ms_ccnt = qinit->qi_mstat->ms_ccnt;
+				mlist->ms.ms_acnt = qinit->qi_mstat->ms_acnt;
+				mlist->ms.ms_flags = qinit->qi_mstat->ms_flags;
+				mlist->ms.ms_xsize = qinit->qi_mstat->ms_xsize;
+			}
+		}
+		return sizeof(struct sc_mlist);
+	}
+}
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -175,8 +238,23 @@ sc_wput(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case M_IOCTL:
+	{
+		caddr_t uaddr;
+		size_t usize;
+
 		trace();
 		ioc = (typeof(ioc)) mp->b_rptr;
+
+#ifdef WITH_32BIT_CONVERSION
+		if (ioc->iocblk.ioc_flag == IOC_ILP32) {
+			uaddr = (caddr_t) (unsigned long) (uint32_t) *(unsigned long *) dp->b_rptr;
+			usize = sizeof(struct sc_list32);
+		} else
+#endif
+		{
+			uaddr = (caddr_t) *(unsigned long *) dp->b_rptr;
+			usize = sizeof(struct sc_list);
+		}
 		switch (ioc->iocblk.ioc_cmd) {
 		case SC_IOC_LIST:
 			/* there is really no reason why a regular user cannot list modules and
@@ -191,8 +269,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 #endif
 			trace();
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
-				caddr_t uaddr = *(caddr_t *) dp->b_rptr;
-
 				trace();
 				if (uaddr == NULL) {
 					rval = cdev_count + fmod_count;
@@ -200,7 +276,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 				}
 				mp->b_datap->db_type = M_COPYIN;
 				ioc->copyreq.cq_addr = uaddr;
-				ioc->copyreq.cq_size = sizeof(struct sc_list);
+				ioc->copyreq.cq_size = usize;
 				ioc->copyreq.cq_flag = 0;
 				ioc->copyreq.cq_private = (mblk_t *) 0;
 				qreply(q, mp);
@@ -211,15 +287,12 @@ sc_wput(queue_t *q, mblk_t *mp)
 			goto nak;
 		}
 		break;
+	}
 	case M_IOCDATA:
 		ioc = (typeof(ioc)) mp->b_rptr;
+
 		switch (ioc->copyresp.cp_cmd) {
 		case SC_IOC_LIST:
-		{
-			int n, count;
-			ssize_t size;
-			caddr_t uaddr;
-
 			trace();
 			if (ioc->copyresp.cp_rval != 0) {
 				ptrace(("Aborting ioctl!\n"));
@@ -227,52 +300,71 @@ sc_wput(queue_t *q, mblk_t *mp)
 			}
 			trace();
 			if (ioc->copyresp.cp_private == (mblk_t *) 0) {
+				int n, count;
+				caddr_t uaddr;
+				size_t usize;
+
 				n = 0;
 				if (!dp || dp->b_wptr == dp->b_rptr) {
 					rval = cdev_count + fmod_count;
 					goto ack;
 				}
-				{
-					struct sc_list *list;
-
-					if (dp->b_wptr < dp->b_rptr + sizeof(*list)) {
+#ifdef WITH_32BIT_CONVERSION
+				if (ioc->copyresp.cp_flag == IOC_ILP32) {
+					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_list32)) {
 						ptrace(("Error path taken!\n"));
 						err = -EFAULT;
 						goto nak;
-					}
-					list = (typeof(list)) dp->b_rptr;
-					count = list->sc_nmods;
-					uaddr = (caddr_t) list->sc_mlist;
-					if (count < 0) {
-						ptrace(("Error path taken!\n"));
-						err = -EINVAL;
-						goto nak;
-					}
-					if (count > 100) {
-						ptrace(("Error path taken!\n"));
-						err = -ERANGE;
-						goto nak;
-					}
-					if (count == 0) {
-						rval = cdev_count + fmod_count;
-						goto ack;
-					}
-					size = count * sizeof(struct sc_mlist);
-					if (!(dp = allocb(size, BPRI_MED))) {
-						ptrace(("Error path taken!\n"));
-						err = -ENOSR;
-						goto nak;
-					}
-					dp->b_wptr = dp->b_rptr + size;
-					bzero(dp->b_rptr, size);
-					freemsg(mp->b_cont);
-					mp->b_cont = dp;
-				}
-				{
-					struct sc_mlist *mlist;
-					struct list_head *pos;
+					} else {
+						struct sc_list32 *sclp = (typeof(sclp)) dp->b_rptr;
 
-					mlist = (typeof(mlist)) dp->b_rptr;
+						count = sclp->sc_nmods;
+						uaddr = (caddr_t) (unsigned long) sclp->sc_mlist;
+						usize = count * sizeof(struct sc_mlist32);
+					}
+				} else
+#endif
+				{
+					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_list)) {
+						ptrace(("Error path taken!\n"));
+						err = -EFAULT;
+						goto nak;
+					} else {
+						struct sc_list *sclp = (typeof(sclp)) dp->b_rptr;
+
+						count = sclp->sc_nmods;
+						uaddr = (caddr_t) sclp->sc_mlist;
+						usize = count * sizeof(struct sc_mlist);
+					}
+				}
+				if (count < 0) {
+					ptrace(("Error path taken!\n"));
+					err = -EINVAL;
+					goto nak;
+				}
+				if (count > 100) {
+					ptrace(("Error path taken!\n"));
+					err = -ERANGE;
+					goto nak;
+				}
+				if (count == 0) {
+					rval = cdev_count + fmod_count;
+					goto ack;
+				}
+				if (!(dp = allocb(usize, BPRI_MED))) {
+					ptrace(("Error path taken!\n"));
+					err = -ENOSR;
+					goto nak;
+				}
+				dp->b_wptr = dp->b_rptr + usize;
+				bzero(dp->b_rptr, usize);
+				freemsg(mp->b_cont);
+				mp->b_cont = dp;
+				{
+					struct list_head *pos;
+					uint flag = ioc->copyresp.cp_flag;
+					caddr_t mlist = (typeof(mlist)) dp->b_rptr;
+
 					trace();
 					if (n < count) {
 						trace();
@@ -286,43 +378,11 @@ sc_wput(queue_t *q, mblk_t *mp)
 								break;
 							cdev =
 							    list_entry(pos, struct cdevsw, d_list);
-
 							qinit = cdev->d_str->st_wrinit;
-							mlist->major = cdev->d_major;
-							strncpy(mlist->name,
-									qinit->qi_minfo->mi_idname,
-									FMNAMESZ + 1);
-							// mlist->mi = *qinit->qi_minfo;
-							mlist->mi.mi_idnum = qinit->qi_minfo->mi_idnum;
-							strncpy(mlist->mi.mi_idname,
-									qinit->qi_minfo->mi_idname,
-									FMNAMESZ + 1);
-							mlist->mi.mi_minpsz =
-								qinit->qi_minfo->mi_minpsz;
-							mlist->mi.mi_maxpsz =
-								qinit->qi_minfo->mi_maxpsz;
-							mlist->mi.mi_hiwat =
-								qinit->qi_minfo->mi_hiwat;
-							mlist->mi.mi_lowat =
-								qinit->qi_minfo->mi_lowat;
-							if (qinit->qi_mstat) {
-								mlist->ms.ms_pcnt =
-									qinit->qi_mstat->ms_pcnt;
-								mlist->ms.ms_scnt =
-									qinit->qi_mstat->ms_scnt;
-								mlist->ms.ms_ocnt =
-									qinit->qi_mstat->ms_ocnt;
-								mlist->ms.ms_ccnt =
-									qinit->qi_mstat->ms_ccnt;
-								mlist->ms.ms_acnt =
-									qinit->qi_mstat->ms_acnt;
-								mlist->ms.ms_flags =
-									qinit->qi_mstat->ms_flags;
-								mlist->ms.ms_xsize =
-									qinit->qi_mstat->ms_xsize;
-							}
+							mlist +=
+							    sc_mlist_copy(cdev->d_major, qinit,
+									  mlist, flag);
 							n++;
-							mlist++;
 						}
 						read_unlock(&cdevsw_lock);
 					}
@@ -339,56 +399,23 @@ sc_wput(queue_t *q, mblk_t *mp)
 								break;
 							fmod =
 							    list_entry(pos, struct fmodsw, f_list);
-
 							qinit = fmod->f_str->st_wrinit;
-							mlist->major = 0;
-							strncpy(mlist->name,
-									qinit->qi_minfo->mi_idname,
-									FMNAMESZ + 1);
-							mlist->mi.mi_idnum =
-								qinit->qi_minfo->mi_idnum;
-							strncpy(mlist->mi.mi_idname,
-									qinit->qi_minfo->mi_idname,
-									FMNAMESZ + 1);
-							mlist->mi.mi_minpsz =
-								qinit->qi_minfo->mi_minpsz;
-							mlist->mi.mi_maxpsz =
-								qinit->qi_minfo->mi_maxpsz;
-							mlist->mi.mi_hiwat =
-								qinit->qi_minfo->mi_hiwat;
-							mlist->mi.mi_lowat =
-								qinit->qi_minfo->mi_lowat;
-							if (qinit->qi_mstat) {
-								mlist->ms.ms_pcnt =
-									qinit->qi_mstat->ms_pcnt;
-								mlist->ms.ms_scnt =
-									qinit->qi_mstat->ms_scnt;
-								mlist->ms.ms_ocnt =
-									qinit->qi_mstat->ms_ocnt;
-								mlist->ms.ms_ccnt =
-									qinit->qi_mstat->ms_ccnt;
-								mlist->ms.ms_acnt =
-									qinit->qi_mstat->ms_acnt;
-								mlist->ms.ms_flags =
-									qinit->qi_mstat->ms_flags;
-								mlist->ms.ms_xsize =
-									qinit->qi_mstat->ms_xsize;
-							}
+							mlist +=
+							    sc_mlist_copy(0, qinit, mlist, flag);
 							n++;
-							mlist++;
 						}
 						read_unlock(&fmodsw_lock);
 					}
 					trace();
 					/* zero all excess elements */
-					for (; n < count; n++, mlist++) {
-						mlist->major = -1;
+					for (; n < count; n++) {
+						mlist += sc_mlist_copy(-1, NULL, mlist, flag);
 					}
 				}
 				trace();
 				mp->b_datap->db_type = M_COPYOUT;
 				ioc->copyreq.cq_addr = uaddr;
-				ioc->copyreq.cq_size = size;
+				ioc->copyreq.cq_size = usize;
 				ioc->copyreq.cq_flag = 0;
 				ioc->copyreq.cq_private = (mblk_t *) (long) count;
 				qreply(q, mp);
@@ -399,7 +426,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 				rval = (int) (long) ioc->copyresp.cp_private;
 				goto ack;
 			}
-		}
 		}
 	      nak:
 		mp->b_datap->db_type = M_IOCNAK;
@@ -493,6 +519,23 @@ static struct fmodsw sc_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
+static void *sc_opaque;
+
+static void
+sc_unregister_ioctl32(void)
+{
+	if (sc_opaque != NULL)
+		unregister_ioctl32(sc_opaque);
+}
+
+static int
+sc_register_ioctl32(void)
+{
+	if ((sc_opaque = register_ioctl32(SC_IOC_LIST)) == NULL)
+		return (-ENOMEM);
+	return (0);
+}
+
 #ifdef CONFIG_STREAMS_SC_MODULE
 static
 #endif
@@ -507,8 +550,12 @@ sc_init(void)
 	printk(KERN_INFO SC_SPLASH);
 #endif
 	sc_minfo.mi_idnum = modid;
-	if ((err = register_strmod(&sc_fmod)) < 0)
+	if ((err = sc_register_ioctl32()) < 0)
 		return (err);
+	if ((err = register_strmod(&sc_fmod)) < 0) {
+		sc_unregister_ioctl32();
+		return (err);
+	}
 	if (modid == 0 && err > 0)
 		modid = err;
 	return (0);
@@ -520,11 +567,8 @@ static
 void __exit
 sc_exit(void)
 {
-	int err;
-
-	if ((err = unregister_strmod(&sc_fmod)))
-		return (void) (err);
-	return (void) (0);
+	unregister_strmod(&sc_fmod);
+	sc_unregister_ioctl32();
 };
 
 #ifdef CONFIG_STREAMS_SC_MODULE

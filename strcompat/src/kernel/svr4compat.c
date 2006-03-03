@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/03 11:11:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:50 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:11:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/03 11:11:14 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/03 11:11:14 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/03 11:11:14 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -461,11 +461,11 @@ RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
 
-#if defined CONFIG_SMP && defined HAVE_READ_TRYLOCK
+#if defined CONFIG_SMP && (defined HAVE_KFUNC_READ_TRYLOCK || defined HAVE_KMACRO_READ_TRYLOCK)
 	if (read_trylock(lockp))
 		return (old_pl);
 #else
-#if defined CONFIG_SMP && defined HAVE_WRITE_TRYLOCK
+#if defined CONFIG_SMP && (defined HAVE_KFUNC_WRITE_TRYLOCK || defined HAVE_KMACRO_WRITE_TRYLOCK)
 	if (write_trylock(lockp))
 		return (old_pl);
 #else
@@ -490,7 +490,7 @@ RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
 
-#if defined CONFIG_SMP && defined HAVE_WRITE_TRYLOCK
+#if defined CONFIG_SMP && (defined HAVE_KFUNC_WRITE_TRYLOCK || defined HAVE_KMACRO_WRITE_TRYLOCK)
 	if (write_trylock(lockp))
 		return (old_pl);
 #else

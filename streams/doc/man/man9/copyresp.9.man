@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyresp.9.man,v 0.9.2.7 2005/12/06 09:39:11 brian Exp $
+.\" @(#) $Id: copyresp.9.man,v 0.9.2.8 2006/03/03 10:57:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/06 09:39:11 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/03 10:57:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -86,19 +86,24 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 
 struct copyresp {
-    int cp_cmd;        /* command being performed */
-    cred_t *cp_cr;     /* credentials */
-    uint cp_id;        /* id of this ioctl */
-    caddr_t cp_rval;   /* data address */
-    size_t __pad1;     /* alignment with copyreq */
-    int __pad2;
-    int __pad3;
-    uint cp_flag;      /* response flags */
+    int cp_cmd;         /* command being performed */
+    cred_t *cp_cr;      /* credentials */
+    uint cp_id;         /* id of this ioctl */
+    caddr_t cp_rval;    /* result 0 - success, 1 - failure */
+    uint cp_pad1;       /* reserved */
+    int cp_pad2;        /* reserved */
     mblk_t *cp_private; /* private state information */
+    long cp_filler[4];  /* SVR4 compatibility */
+#define cp_flag cp_filler[0] /* IOC_NATIVE or IOC_ILP32 */
 };
 
-#define cp_uid          cp_cr->cr_uid
-#define cp_gid          cp_cr->cr_gid
+#define cp_uid cp_cr->cr_uid
+#define cp_gid cp_cr->cr_gid
+
+#define IOC_MASK   0xff000000 /* mask of model bits */
+#define IOC_NONE   0x00000000 /* no indication */
+#define IOC_NATIVE 0x01000000 /* native ioctl request */
+#define IOC_ILP32  0x02000000 /* 32bit ioctl request */
 \s+1\fP
 .fi
 .\"
@@ -135,27 +140,23 @@ if successful;
 is unsuccessful;
 .\" ----------------------
 .TP
-.I __pad1
+.I cp_pad1
 padding for alignment;
 .\" ----------------------
 .TP
-.I __pad2
+.I cp_pad2
 padding for alignment;
 .\" ----------------------
 .TP
-.I __pad3
-padding for alignment;
+.I cp_private
+pointer to a private state
+.BR mblk_t (9).
 .\" ----------------------
 .TP
 .I cp_flag
 modifier flags (see
 .IR \(lq\)COMPATIBILITY\(rq\) ,
 below);
-.\" ----------------------
-.TP
-.I cp_private
-pointer to a private state
-.BR mblk_t (9).
 .PD
 .\"
 .\"
@@ -274,7 +275,7 @@ with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IR Solaris \(rg
 documents the
-.I cp_flags
+.I cp_flag
 member.
 .[
 soldoc
@@ -285,7 +286,7 @@ soldoc
 and
 .IR UXP/V \(rg
 do not document the
-.I cp_flags
+.I cp_flag
 member.
 .[
 suxspg
@@ -300,7 +301,7 @@ uxpspg
 Portable
 .I STREAMS
 drivers and modules will not access the
-.I cp_flags
+.I cp_flag
 member.
 .IP \(em
 .IR UnixWare \(rg

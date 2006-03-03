@@ -1,0 +1,419 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: register_ioctl32.9.man,v 0.9.2.1 2006/03/03 10:57:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/03/03 10:57:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: register_ioctl32.9.man,v $
+.\" Revision 0.9.2.1  2006/03/03 10:57:10  brian
+.\" - 32-bit compatibility support, updates for release
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH REGISTER_IOCTL32 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B register_ioctl32
+\- register a 32-bit IO control command
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "void *register_clone(unsigned int " cmd );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I cmd
+the 32-bit IO control command to register
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR register_ioctl32 ()
+registers a 32-bit IO control command to be processed by the Stream head on
+.B LP64
+architectures supporting 32-bit IO controls on a 64-bit kernel.
+.PP
+On
+.B Linux
+kernels prior to 2.6.11 it is necessary for the driver or module to register its 32-bit IO control
+commands, otherwise, the kernel will not pass these IO control commands to the driver, or in the
+case of conflict with another
+.RI (non- STREAMS )
+device, might pass inappropriate arguments.
+.BR register_ioctl32 ()
+and
+.BR unregister_ioctl32 (9)
+are provided by
+.B @PACKAGE_TITLE@
+to allow the
+.I STREAMS
+module or driver to register its 32-bit IO control commands with the Linux kernel.
+.PP
+Once registered, 32-bit IO control commands will be passed to
+.BR strioctl (9)
+with the
+.B FILP32
+flag set in
+.BR file->f_flags ,
+and with the
+.B IOC_ILP32
+value set in the
+.I ioc_flag
+or
+.I cp_flag
+members of the
+.BR iocblk (9)
+or
+.BR copyresp (9)
+structure contained in an
+.BR M_IOCTL (9)
+or
+.BR M_IOCDATA (9)
+message.
+.PP
+Because the registration mechanism only affects
+.I STREAMS
+devices, it does not interfere with other devices in the
+.B Linux
+system, regardless of IO control command conflicts.
+.PP
+.BR register_ioctl32 ()
+is only necessary for
+.B Linux
+kernels prior to kernel 2.6.11.  For kernels 2.6.11 or greater, 32-bit IO control commands are
+automatically passed to the Stream head for processing.  On these later kernels, the functions
+.BR register_ioctl32 ()
+and
+.BR unregister_ioct32 (9)
+are unnecessary and have no effect if called.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR register_ioct32 ()
+is called multiple time for the same device driver with different selections of the
+.I cmd
+IO control command argument, and returns an opaque pointer that used as a handle for the IO control
+command for use with a call to
+.BR unregister_ioctl32 (9).
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR register_ioctl32 ()
+registers the 32-bit IO control command described by
+.I cmd
+and returns
+.RB non- NULL
+opaque pointer providing a registration handle.
+Upon failure,
+.BR register_ioctl32 ()
+does not effect registration and returns a
+.B NULL
+pointer.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR register_ioctl32 ()
+fails to register the specified
+.I STREAMS
+32-bit IO control command, it returns a
+.B NULL
+pointer.
+.BR register_ioctl32 ()
+only fails and returns a
+.B NULL
+pointer when it is unable to allocated memory necessary to provide the 32-bit IO control.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR register_ioctl32 ()
+can be called from any blocking context.
+.BR register_ioctl32 ()
+is intended to be called from the
+.BR module_init ()
+procedure of a kernel module associated with the
+.I STREAMS
+module or driver.
+.BR register_ioctl32 ()
+may be called from the
+.IR qi_qopen (9)
+routine of the
+.I STREAMS
+device.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR register_ioctl32 ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
+.PP
+Loadable kernel modules that call
+.BR register_ioctl32 ()
+when loading must call
+.BR unregister_ioctl32 (9)
+before unloading.
+.BR unregister_ioctl32 (9)
+must be called with the
+.RB non- NULL
+opaque
+.B void *
+void pointer that was returned from the call to
+.BR register_ioctl32 ().
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of registration and unregistration from the
+.IR "STREAMS Administrative Driver" ,
+described in
+.BR sad (4),
+taken from the
+.I src/drivers/sad.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution directory:
+.PP
+.nf
+\fC\s-2
+ 1  struct sad_ioctl {
+ 2          unsigned int cmd;
+ 3          void *opaque;
+ 4  };
+ 5  
+ 6  static struct sad_ioctl sad_map[] = {
+ 7          {.cmd = SAD_SAP,}
+ 8          , {.cmd = SAD_GAP,}
+ 9          , {.cmd = SAD_VML,}
+10          , {.cmd = SAD_SAP_SOL,}
+11          , {.cmd = SAD_GAP_SOL,}
+12          , {.cmd = 0,}
+13  };
+14  
+15  void
+16  sad_unregister_ioctl32(void)
+17  {
+18          struct sad_ioctl *i;
+19  
+20          for (i = sad_map; i->cmd != 0; i++)
+21                  if (i->opaque != NULL)
+22                          unregister_ioctl32(i->opaque);
+23  }
+24  
+25  int
+26  sad_register_ioctl32(void)
+27  {
+28          struct sad_ioctl *i;
+29  
+30          for (i = sad_map; i->cmd != 0; i++) {
+31                  if ((i->opaque =
+32                       register_ioctl32(i->cmd)) ==
+33                      NULL) {
+34                          sad_unregister_ioctl32();
+35                          return (-ENOMEM);
+36                  }
+37          }
+38          return (0);
+39  }
+40  
+41  #ifdef CONFIG_STREAMS_SAD_MODULE
+42  static
+43  #endif
+44  int __init
+45  sad_init(void)
+46  {
+47          int err;
+48  
+49  #ifdef CONFIG_STREAMS_SAD_MODULE
+50          printk(KERN_INFO SAD_BANNER);
+51  #else
+52          printk(KERN_INFO SAD_SPLASH);
+53  #endif
+54          if ((err = sad_register_ioctl32()) < 0)
+55                  return (err);
+56          sad_minfo.mi_idnum = modid;
+57          if ((err =
+58               register_strdev(&sad_cdev, major)) < 0) {
+59                  sad_unregister_ioctl32();
+60                  return (err);
+61          }
+62          if (major == 0 && err > 0)
+63                  major = err;
+64          bzero(&sads, sizeof(sads));
+65          register_strnod(&sad_cdev, &sad_node_admin, 0);
+66          register_strnod(&sad_cdev, &sad_node_user, 1);
+67          return (0);
+68  };
+69  
+70  #ifdef CONFIG_STREAMS_SAD_MODULE
+71  static
+72  #endif
+73  void __exit
+74  sad_exit(void)
+75  {
+76          unregister_strnod(&sad_cdev, 1);
+77          unregister_strnod(&sad_cdev, 0);
+78          unregister_strdev(&sad_cdev, major);
+79          sad_unregister_ioctl32();
+80  };
+81  
+82  #ifdef CONFIG_STREAMS_SAD_MODULE
+83  module_init(sad_init);
+84  module_exit(sad_exit);
+85  #endif
+\s+2\fP
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ioctl (2s),
+.BR strioctl (9),
+.BR iocblk (9),
+.BR copyresp (9),
+.BR M_IOCTL (9),
+.BR sad (4),
+.BR unregister_ioctl32 (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR register_ioctl32 ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR register_ioctl32 ()
+is a
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific function.
+Registration of
+.I STREAMS
+driver and module 32-bit IO control commands is inherently implementation specific and non-portable.
+Different implementations provide different mechanisms.
+See
+.BR STREAMS (9)
+for mechanisms compatible with other implemenations
+and additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and de-registration of \fISTREAMS\fR 32-bit IO control commands is implementation
+specific and not subject to standardization.
+.BR register_ioctl32 ()
+is a
+.BR @PACKAGE_TITLE@
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR register_ioctl32 ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.[
+@PACKAGE_TITLE@
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

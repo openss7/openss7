@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/22 19:57:34 $
+ @(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 10:57:15 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/22 19:57:34 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-nsdev.c,v $
+ Revision 0.9.2.21  2006/03/03 10:57:15  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.20  2006/02/22 19:57:34  brian
  - strap out lockf() that was blocking some test case
    processes on SMP and even on UP
@@ -135,9 +138,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/22 19:57:34 $"
+#ident "@(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 10:57:15 $"
 
-static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/22 19:57:34 $";
+static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 10:57:15 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -218,6 +221,7 @@ pid_t test_pid[3] = { 0, 0, 0 };
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define INFINITE_WAIT	-1UL
 #define TEST_DURATION	20000
+#define INVALID_ADDRESS ((void *)(long)(-1))
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -2744,7 +2748,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -2770,9 +2774,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -2800,7 +2803,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

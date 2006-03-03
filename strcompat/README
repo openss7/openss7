@@ -1,59 +1,109 @@
-# *****************************************************************************
-# 
-# $Id: README,v 0.9.2.1 2005/07/04 19:47:23 brian Exp $
-# 
-# *****************************************************************************
-# 
-# Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-# 
-# All Rights Reserved.
-# 
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-# 
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-# 
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
-# 
-# *****************************************************************************
-# 
-# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
-# 
-# *****************************************************************************
-# 
-# Commercial licensing and support of this software is available from OpenSS7
-# Corporation at a fee.  See http://www.openss7.com/
-# 
-# *****************************************************************************
-# 
-# Last Modified $Date: 2005/07/04 19:47:23 $ by $Author: brian $
-# 
-# *****************************************************************************
+OpenSS7 STREAMS Compatibility Modules -- readme first file.  2006-03-02
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+OpenSS7 STREAMS Compatibility Modules
+=====================================
 
-OpenSS7 STREAMS Compatibility
------------------------------
+This is the strcompat-0.9.2.3 package.  It, and the current version, can
+be obtained from the download area of The OpenSS7 Project website at
+http://www.openss7.org/download.html as strcompat-0.9.2.3.tar.bz2 using a
+command such as
 
-The OpenSS7 STREAMS Compatibility package provides compatibility with the
-following STREAMS implementations:
+	wget http://www.openss7.org/tarballs/strcompat-0.9.2.3.tar.bz2
+
+Please see the NEWS file for release notes and history of user visible
+changes for the current version, and the ChangeLog file for a more
+detailed history of implementation changes.  The TODO file lists
+features not yet implemented or other outstandinng items.
+
+Please see the INSTALL, INSTALL-strcompat and README-make files (or the
+installation and reference manual) for installation instructions.  When
+working from CVS, please see the README-cvs file.  An abbreviated
+installation procedure that works for most applications appears below.
+
+This release of the package is published strictly under Version 2 of the
+GNU Public License which can be found in the file COPYING.  Package
+specific licensing terms (if any) can be found in the file LICENSING.
+Please respect these licensing arrangements.  If you are interested in
+different licensing terms, please contact the copyright holder, OpenSS7
+Corporation, http://www.openss7.com/ or mailto:bidulock@openss7.org.
+
+Prerequisites
+-------------
+
+The following are prerequisites for building the package:
+
+ 1. Linux distribution with a 2.4 or 2.6 kernel with the appropriate
+    tool chain.  For supported and tested distributions, see the manual.
+
+ 2. OpenSS7 Linux Fast-STREAMS or OpenSS7 Modified Linux STREAMS
+    installed, such as
+    http://www.openss7.org/tarballs/streams-0.7a.5.tar.bz2 or
+    http://www.openss7.org/tarballs/LiS-2.18.3.tar.bz2
+
+    (Note that the `LiS' package is deprecated.  We recommend using the
+    `streams' package instead.)
+
+When configuring and building multiple OpenSS7 Project release packages,
+place all of the source packages (unpackaged tarballs) at the same
+directory level and all build directories at the same directory level.
+
+Installation
+------------
+
+The following commands will download, configure, build, check, install,
+validate, uninstall and remove the package:
+
+	wget http://www.openss7.org/tarballs/strcompat-0.9.2.3.tar.bz2
+	tar -xjvf strcompat-0.9.2.3.tar.bz2
+	mkdir build
+	cd build
+	../strcompat-0.9.2.3.configure
+	make
+	make check
+	sudo make install
+	sudo make installcheck
+	sudo make uninstall
+	cd ..
+	sudo rm -rf build
+	rm -rf strcompat-0.9.2.3.
+	rm -f strcompat-0.9.2.3.tar.bz2
+
+Manual
+------
+
+More detailed installation instructions can be found in the Installation
+and Reference Manual, contained in the distribution in `text', `info',
+`html', and `pdf' formats:
+
+	cd ../strcompat-0.9.2.3
+	less doc/manual/strcompat.txt
+	lynx doc/manual/strcompat.html
+	info -f doc/manual/strcompat.info
+	xpdf doc/manual/strcompat.pdf
+
+The current manual is also always available online from The OpenSS7
+Project website at:
+
+	lynx http://www.openss7.org/strcompat_manual.html
+
+Description
+-----------
+
+The OpenSS7 STREAMS Compatibility Modules package includes kernel
+modules, SVR 4.2 STREAMS drivers, modules, libraries, utilities, test
+programs, daemons, and development environment for the development and
+execution of STREAMS modules and drivers ported from other operating
+system environments to Linux Fast-STREAMS.
+
+This distribution is only currently applicable to Linux 2.4 and 2.6
+kernels and was targetted at ix86, x86_64, ppc and ppc64 architectures,
+but should build and install for other architectures as well.
+
+The OpenSS7 STREAMS Compatibility Modules package provides compatibility
+with the following STREAMS implementations:
 
 * UNIX(R) System V Release 3.2
 * UNIX(R) System V Release 4.2
@@ -72,13 +122,85 @@ into the kernel when used by a specific STREAMS module or driver.  The
 compatibility modules ease porting of STREAMS modules and drivers from other
 Operating Systems to Linux.
 
+Brief Installation Instructions
+-------------------------------
+
+The OpenSS7 STREAMS Compatibility Modules package is available from the
+downloads area of The OpenSS7 Project website:
+<http://www.openss7.org/download.html> using a command such as:
+
+	wget http://www.openss7.org/tarballs/strcompat-0.9.2.3.tar.bz2
+
+Unpack the tarball using a command such as:
+
+	tar -xjvf strcompat-0.9.2.3.tar.bz2
+
+The tarball will unpack into the relative subdirectory named after the
+package name: strcompat-0.9.2.3  The package builds using the GNU autoconf
+utilities and the `configure' script.  To build the package, we
+recommend using a separate build directory as follows:
+
+	mkdir build
+	cd build
+	../strcompat-0.9.2.3/configure
+
+In general, the package configures and builds without adding any special
+options to the configure script.  For general options to the configure
+script, see the GNU `INSTALL' file in the distribution:
+
+	less ../strcompat-0.9.2.3/INSTALL
+
+For specific options to the configure script, see the INSTALL-strcompat
+file in the distribution, or simply execute the configure script with
+the --help option like so:
+
+	../strcompat-0.9.2.3/configure --help
+
+After configuring the package, the package can be compiled simply by
+issuing the `make' command:
+
+	make
+
+Some specialized makefile targets exist, see the README-make file in the
+distribution or simply invoke the `help' target like so:
+
+	make help
+
+After successfully building the package, the package can be checked by
+invoking the `check' make target like so:
+
+	make check
+
+After successfully checking the package, the package can be installed by
+invoking the `install' make target (as root) like so:
+
+	sudo make install
+
+The testsuites that ship with the package can be invoked after the
+package has been installed by invoking the `installcheck' target.  This
+target can either be invoked as root, or as a normal user, like so:
+
+	make installcheck
+
+The package can be cleanly removed by invoking the `uninstall' target
+(as root):
+
+	sudo make uninstall
+
+Then the build directory and tarball can be simply removed:
+
+	cd ..
+	rm -rf build
+	rm -rf strcompat-0.9.2.3
+	rm -f strcompat-0.9.2.3.tar.bz2
+
 
 =========================================================================
 
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -123,3 +245,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

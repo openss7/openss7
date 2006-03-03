@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/29 21:36:49 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/03 11:27:47 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:36:49 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:27:47 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: ldl.c,v $
+ Revision 0.9.2.30  2006/03/03 11:27:47  brian
+ - 32/64-bit compatibility
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/29 21:36:49 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/03 11:27:47 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/29 21:36:49 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/03 11:27:47 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -81,10 +86,15 @@ static char const ident[] =
 
 #include <sys/ldl.h>
 
+#undef WITH_32BIT_CONVERSION
+#if defined LFS && defined __LP64__
+#define WITH_32BIT_CONVERSION 1
+#endif
+
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.29 $) $Date: 2005/12/29 21:36:49 $"
+#define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.30 $) $Date: 2006/03/03 11:27:47 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -445,7 +455,36 @@ struct dl {
 #define DEV_WR_MIN 0x08000	/* Low water: 32 Kb */
 #define DEV_WR_MAX 0x10000	/* High water: 64 Kb */
 
-ldl_gstats_ioctl_t ldl_gstats;
+typedef struct ldl_gstats {		/* global statistics *//* for entire driver */
+	atomic_t attach_req_cnt;
+	atomic_t detach_req_cnt;
+	atomic_t bind_req_cnt;
+	atomic_t unbind_req_cnt;
+	atomic_t subs_bind_req_cnt;
+	atomic_t subs_unbind_req_cnt;
+	atomic_t udqos_req_cnt;
+	atomic_t ok_ack_cnt;
+	atomic_t error_ack_cnt;
+	atomic_t unitdata_req_cnt;	/* including M_DATA */
+	atomic_t unitdata_req_q_cnt;	/* including M_DATA */
+	atomic_t unitdata_ind_cnt;	/* including M_DATA */
+	atomic_t unitdata_q_cnt;	/* including M_DATA */
+	atomic_t unitdata_drp_cnt;	/* including M_DATA */
+	atomic_t uderror_ind_cnt;
+	atomic_t ioctl_cnt;
+	atomic_t net_rx_cnt;		/* # pkts from below */
+	atomic_t net_rx_drp_cnt;	/* usually mem-alloc fail */
+	atomic_t net_tx_cnt;		/* # pkts xmitted */
+	atomic_t net_tx_fail_cnt;
+
+} ldl_gstats_t;
+
+typedef struct ldl_lstats {		/* local statistics *//* per stream */
+	int to_be_done;
+} ldl_lstats_t;
+
+ldl_gstats_t ldl_gstats;
+ldl_lstats_t ldl_lstats;
 
 #define	ginc(field)	atomic_inc(&ldl_gstats.field)
 STATIC unsigned long ldl_debug_mask;
@@ -473,7 +512,8 @@ STATIC int ndev_n_alloc = 0;
 STATIC char *ldl_pkt_type(unsigned saptype);
 
 #ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_FUNC_4_ARGS
-STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt, struct ldldev *dev2);
+STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt,
+		    struct ldldev *dev2);
 #else
 STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt);
 #endif
@@ -2600,7 +2640,7 @@ rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 		skb_get(skb);
 	} else {		/* We still need the frame type for correct drop stats */
 		fr_ptr = &fr_buf[0];
-		fr_len = min(skb->end - skb->mac.raw, LDL_MAX_HDR_LEN);
+		fr_len = min(skb->end - skb->mac.raw, (ptrdiff_t) LDL_MAX_HDR_LEN);
 		ASSERT(fr_len > 0);
 		memcpy(fr_buf, skb->mac.raw, fr_len);
 	}
@@ -3209,7 +3249,7 @@ ws_phys_addr(struct dl *dl, mblk_t *mp)
 	}
 }
 
-#if 0 /* never used */
+#if 0				/* never used */
 STATIC INLINE int
 ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 {
@@ -3481,7 +3521,7 @@ ws_attach(struct dl *dl, mblk_t *mp)
 	SPLX(psw);
 
 	if (ldl_debug_mask & LDL_DEBUG_ATTACH)
-		printk("ldl: ws_attach: " "ppa=%lx dev=\"%s\" framing=%s\n", ppa, dev->name,
+		printk("ldl: ws_attach: " "ppa=%lx dev=\"%s\" framing=%s\n", (long) ppa, dev->name,
 		       ldl_framing_type(framing));
 
 	putnext(dl->rq, mp);
@@ -3628,7 +3668,7 @@ ws_bind(struct dl *dl, mblk_t *mp)
 	SPLX(psw);
 
 	if (ldl_debug_mask & LDL_DEBUG_BIND)
-		printk("ldl: ws_bind: " "dl_sap=%lx framing=%s pkt-type=%s\n", reqp->dl_sap,
+		printk("ldl: ws_bind: " "dl_sap=%lx framing=%s pkt-type=%s\n", (long) reqp->dl_sap,
 		       ldl_framing_type(dl->framing), ldl_pkt_type(saptype));
 
 	putnext(dl->rq, mp);
@@ -4095,29 +4135,68 @@ ioc_nak(struct dl *dl, mblk_t *mp)
 STATIC INLINE int
 ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
-	struct ldl_flags_ioctl *flg;
-	mblk_t *dp;
+	caddr_t uaddr = NULL;
+	size_t usize;
 	pl_t psw;
 
 	ASSERT(iocp->ioc_cmd == LDL_SETFLAGS);
 
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
 		return ioc_nak(dl, mp);	/* No M_DATA block for flags */
-	if (iocp->ioc_count != sizeof(struct ldl_flags_ioctl))
-		return ioc_nak(dl, mp);	/* Bad data size */
-	dp = mp->b_cont;
-	ASSERT(dp->b_wptr - dp->b_rptr >= sizeof(struct ldl_flags_ioctl));
-	flg = (struct ldl_flags_ioctl *) dp->b_rptr;
-	flg->mask &= ~LDLFLAG_PRIVATE;	/* Cannot set private flags */
-	SPLSTR(psw);
-	dl->flags = (dl->flags & ~flg->mask) | (flg->flags & flg->mask);
-	SPLX(psw);
-	flg->flags = dl->flags;
 
-	mp->b_datap->db_type = M_IOCACK;
-	iocp->ioc_error = 0;
-	iocp->ioc_rval = 0;
+#ifdef WITH_32BIT_CONVERSION
+	if (iocp->ioc_flag == IOC_ILP32) {
+		struct ldl_flags_ioctl32 *flg;
 
+		usize = sizeof(*flg);
+		if (iocp->ioc_count == TRANSPARENT) {
+			uaddr = (caddr_t) (unsigned long) (uint32_t)
+			    *(unsigned long *) mp->b_cont->b_rptr;
+		} else {
+			if (iocp->ioc_count != usize)
+				return ioc_nak(dl, mp);
+			flg = (typeof(flg)) mp->b_cont->b_rptr;
+			flg->mask &= ~LDLFLAG_PRIVATE;	/* Cannot set private flags */
+			SPLSTR(psw);
+			dl->flags = (dl->flags & ~flg->mask) | (flg->flags & flg->mask);
+			SPLX(psw);
+			flg->flags = dl->flags;
+		}
+	} else
+#endif				/* WITH_32BIT_CONVERSION */
+	{
+		struct ldl_flags_ioctl *flg;
+
+		usize = sizeof(*flg);
+		if (iocp->ioc_count == TRANSPARENT) {
+			uaddr = (caddr_t)
+			    *(unsigned long *) mp->b_cont->b_rptr;
+		} else {
+			if (iocp->ioc_count != usize)
+				return ioc_nak(dl, mp);
+			flg = (typeof(flg)) mp->b_cont->b_rptr;
+			flg->mask &= ~LDLFLAG_PRIVATE;	/* Cannot set private flags */
+			SPLSTR(psw);
+			dl->flags = (dl->flags & ~flg->mask) | (flg->flags & flg->mask);
+			SPLX(psw);
+			flg->flags = dl->flags;
+		}
+	}
+
+	if (iocp->ioc_count == TRANSPARENT) {
+		struct copyreq *cq = (typeof(cq)) iocp;
+
+		/* explicit copyin */
+		mp->b_datap->db_type = M_COPYOUT;
+		cq->cq_addr = uaddr;
+		cq->cq_size = usize;
+	} else {
+		/* implicit copyin */
+		mp->b_datap->db_type = M_IOCACK;
+		iocp->ioc_count = 0;
+		iocp->ioc_error = 0;
+		iocp->ioc_rval = 0;
+	}
 	qreply(WR(dl->rq), mp);
 	return DONE;
 }
@@ -4133,6 +4212,13 @@ ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
 		return ioc_nak(dl, mp);	/* No M_DATA block for name */
+
+	/* Sorry no way to handle variable length strings with transparent IOCTL (other than
+	   possibly the antiquated SVR 3.2 STRCANON and REPLY facilities).  Because TRANSPARENT
+	   ioctls are not supported and the copyin has already been performed for the I_STR
+	   operation, there is no 32-bit compatibility issues here. */
+	if (iocp->ioc_count == TRANSPARENT)
+		return ioc_nak(dl, mp);
 
 	if (iocp->ioc_count <= 0)
 		return ioc_nak(dl, mp);	/* Empty name */
@@ -4162,7 +4248,8 @@ STATIC INLINE int
 ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	mblk_t *dp;
-	int len;
+	caddr_t uaddr = NULL;
+	size_t usize;
 
 	ASSERT(iocp->ioc_cmd == LDL_GETNAME);
 
@@ -4172,19 +4259,45 @@ ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	ASSERT(dl->ndev != NULL);
 	ASSERT(dl->ndev->dev != NULL);
 
-	len = strlen(dl->ndev->dev->name) + 1;
-	if ((dp = allocb(len, BPRI_HI)) == NULL)
+	usize = strlen(dl->ndev->dev->name) + 1;
+	if ((dp = allocb(usize, BPRI_HI)) == NULL)
 		return RETRY;
-	memcpy(dp->b_rptr, dl->ndev->dev->name, len);
-	dp->b_wptr += len;
+	memcpy(dp->b_rptr, dl->ndev->dev->name, usize);
+	dp->b_wptr += usize;
+
+#ifdef WITH_32BIT_CONVERSION
+	if (iocp->ioc_flag == IOC_ILP32) {
+		if (iocp->ioc_count == TRANSPARENT) {
+			uaddr = (caddr_t) (unsigned long) (uint32_t)
+			    *(unsigned long *) mp->b_cont->b_rptr;
+		}
+	} else
+#endif				/* WITH_32BIT_CONVERSION */
+	{
+		if (iocp->ioc_count == TRANSPARENT) {
+			uaddr = (caddr_t)
+			    *(unsigned long *) mp->b_cont->b_rptr;
+		}
+	}
+
 	if (mp->b_cont != NULL)
 		freemsg(unlinkb(mp));
 	linkb(mp, dp);
 
-	mp->b_datap->db_type = M_IOCACK;
-	iocp->ioc_count = len;
-	iocp->ioc_error = 0;
-	iocp->ioc_rval = 0;
+	if (iocp->ioc_count == TRANSPARENT) {
+		struct copyreq *cq = (typeof(cq)) iocp;
+
+		/* explicit copyout */
+		mp->b_datap->db_type = M_COPYOUT;
+		cq->cq_addr = uaddr;
+		cq->cq_size = usize;
+	} else {
+		/* implicit copyout */
+		mp->b_datap->db_type = M_IOCACK;
+		iocp->ioc_count = usize;
+		iocp->ioc_error = 0;
+		iocp->ioc_rval = 0;
+	}
 
 	qreply(WR(dl->rq), mp);
 	return DONE;
@@ -4194,25 +4307,104 @@ STATIC INLINE int
 ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	mblk_t *dp;
+	caddr_t uaddr = NULL;
+	size_t usize;
 
 	ASSERT(iocp->ioc_cmd == LDL_GETGSTATS);
-	if (iocp->ioc_count != sizeof(ldl_gstats))
-		return ioc_nak(dl, mp);	/* wrong size struct */
 
-	if ((dp = allocb(sizeof(ldl_gstats), BPRI_HI)) == NULL)
-		return RETRY;
+#ifdef WITH_32BIT_CONVERSION
+	if (iocp->ioc_flag == IOC_ILP32) {
+		struct ldl_gstats_ioctl32 *out;
 
-	memcpy(dp->b_rptr, &ldl_gstats, sizeof(ldl_gstats));
-	dp->b_wptr += sizeof(ldl_gstats);
+		if ((dp = allocb(sizeof(struct ldl_gstats_ioctl32), BPRI_HI)) == NULL)
+			return RETRY;
+
+		out = (typeof(out)) dp->b_rptr;
+		usize = sizeof(*out);
+		dp->b_wptr += usize;
+
+		out->attach_req_cnt = (int32_t) atomic_read(&ldl_gstats.attach_req_cnt);
+		out->detach_req_cnt = (int32_t) atomic_read(&ldl_gstats.detach_req_cnt);
+		out->bind_req_cnt = (int32_t) atomic_read(&ldl_gstats.bind_req_cnt);
+		out->unbind_req_cnt = (int32_t) atomic_read(&ldl_gstats.unbind_req_cnt);
+		out->subs_bind_req_cnt = (int32_t) atomic_read(&ldl_gstats.subs_bind_req_cnt);
+		out->subs_unbind_req_cnt = (int32_t) atomic_read(&ldl_gstats.subs_unbind_req_cnt);
+		out->udqos_req_cnt = (int32_t) atomic_read(&ldl_gstats.udqos_req_cnt);
+		out->ok_ack_cnt = (int32_t) atomic_read(&ldl_gstats.ok_ack_cnt);
+		out->error_ack_cnt = (int32_t) atomic_read(&ldl_gstats.error_ack_cnt);
+		out->unitdata_req_cnt = (int32_t) atomic_read(&ldl_gstats.unitdata_req_cnt);
+		out->unitdata_req_q_cnt = (int32_t) atomic_read(&ldl_gstats.unitdata_req_q_cnt);
+		out->unitdata_ind_cnt = (int32_t) atomic_read(&ldl_gstats.unitdata_ind_cnt);
+		out->unitdata_q_cnt = (int32_t) atomic_read(&ldl_gstats.unitdata_q_cnt);
+		out->unitdata_drp_cnt = (int32_t) atomic_read(&ldl_gstats.unitdata_drp_cnt);
+		out->uderror_ind_cnt = (int32_t) atomic_read(&ldl_gstats.uderror_ind_cnt);
+		out->ioctl_cnt = (int32_t) atomic_read(&ldl_gstats.ioctl_cnt);
+		out->net_rx_cnt = (int32_t) atomic_read(&ldl_gstats.net_rx_cnt);
+		out->net_rx_drp_cnt = (int32_t) atomic_read(&ldl_gstats.net_rx_drp_cnt);
+		out->net_tx_cnt = (int32_t) atomic_read(&ldl_gstats.net_tx_cnt);
+		out->net_tx_fail_cnt = (int32_t) atomic_read(&ldl_gstats.net_tx_fail_cnt);
+
+		if (iocp->ioc_count == TRANSPARENT) {
+			uaddr = (caddr_t) (unsigned long) (uint32_t)
+			    *(unsigned long *) mp->b_cont->b_rptr;
+		}
+	} else
+#endif				/* WITH_32BIT_CONVERSION */
+	{
+		struct ldl_gstats_ioctl *out;
+
+		if ((dp = allocb(sizeof(struct ldl_gstats_ioctl), BPRI_HI)) == NULL)
+			return RETRY;
+
+		out = (typeof(out)) dp->b_rptr;
+		usize = sizeof(*out);
+		dp->b_wptr += usize;
+
+		out->attach_req_cnt = (long) atomic_read(&ldl_gstats.attach_req_cnt);
+		out->detach_req_cnt = (long) atomic_read(&ldl_gstats.detach_req_cnt);
+		out->bind_req_cnt = (long) atomic_read(&ldl_gstats.bind_req_cnt);
+		out->unbind_req_cnt = (long) atomic_read(&ldl_gstats.unbind_req_cnt);
+		out->subs_bind_req_cnt = (long) atomic_read(&ldl_gstats.subs_bind_req_cnt);
+		out->subs_unbind_req_cnt = (long) atomic_read(&ldl_gstats.subs_unbind_req_cnt);
+		out->udqos_req_cnt = (long) atomic_read(&ldl_gstats.udqos_req_cnt);
+		out->ok_ack_cnt = (long) atomic_read(&ldl_gstats.ok_ack_cnt);
+		out->error_ack_cnt = (long) atomic_read(&ldl_gstats.error_ack_cnt);
+		out->unitdata_req_cnt = (long) atomic_read(&ldl_gstats.unitdata_req_cnt);
+		out->unitdata_req_q_cnt = (long) atomic_read(&ldl_gstats.unitdata_req_q_cnt);
+		out->unitdata_ind_cnt = (long) atomic_read(&ldl_gstats.unitdata_ind_cnt);
+		out->unitdata_q_cnt = (long) atomic_read(&ldl_gstats.unitdata_q_cnt);
+		out->unitdata_drp_cnt = (long) atomic_read(&ldl_gstats.unitdata_drp_cnt);
+		out->uderror_ind_cnt = (long) atomic_read(&ldl_gstats.uderror_ind_cnt);
+		out->ioctl_cnt = (long) atomic_read(&ldl_gstats.ioctl_cnt);
+		out->net_rx_cnt = (long) atomic_read(&ldl_gstats.net_rx_cnt);
+		out->net_rx_drp_cnt = (long) atomic_read(&ldl_gstats.net_rx_drp_cnt);
+		out->net_tx_cnt = (long) atomic_read(&ldl_gstats.net_tx_cnt);
+		out->net_tx_fail_cnt = (long) atomic_read(&ldl_gstats.net_tx_fail_cnt);
+
+		if (iocp->ioc_count == TRANSPARENT) {
+			uaddr = (caddr_t)
+			    *(unsigned long *) mp->b_cont->b_rptr;
+		}
+	}
+
 	if (mp->b_cont != NULL)
 		freemsg(unlinkb(mp));
 	linkb(mp, dp);
 
-	mp->b_datap->db_type = M_IOCACK;
-	iocp->ioc_count = sizeof(ldl_gstats);
-	iocp->ioc_error = 0;
-	iocp->ioc_rval = 0;
+	if (iocp->ioc_count != TRANSPARENT) {
+		/* use implicit copyout capability of I_STR ioctl */
+		mp->b_datap->db_type = M_IOCACK;
+		iocp->ioc_count = usize;
+		iocp->ioc_error = 0;
+		iocp->ioc_rval = 0;
+	} else {
+		struct copyreq *cq = (typeof(cq)) iocp;
 
+		/* use explicit copyout operation */
+		mp->b_datap->db_type = M_COPYOUT;
+		cq->cq_addr = uaddr;
+		cq->cq_size = usize;
+	}
 	qreply(WR(dl->rq), mp);
 	return DONE;
 }
@@ -4220,21 +4412,33 @@ ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 STATIC INLINE int
 ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
-	mblk_t *dp;
-	unsigned long *lp;
-
 	ASSERT(iocp->ioc_cmd == LDL_SETDEBUG);
 
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
 		return ioc_nak(dl, mp);	/* No M_DATA block for flags */
-	if (iocp->ioc_count != sizeof(ldl_debug_mask))
-		return ioc_nak(dl, mp);	/* Bad data size */
-	dp = mp->b_cont;
-	ASSERT(dp->b_wptr - dp->b_rptr >= sizeof(ldl_debug_mask));
-	lp = (unsigned long *) dp->b_rptr;
-	ldl_debug_mask = *lp;
+#ifdef WITH_32BIT_CONVERSION
+	if (iocp->ioc_flag == IOC_ILP32) {
+		if (iocp->ioc_count == TRANSPARENT) {
+			ldl_debug_mask = *(unsigned long *) mp->b_cont->b_rptr;
+		} else {
+			if (iocp->ioc_count != sizeof(uint32_t))
+				return ioc_nak(dl, mp);
+			ldl_debug_mask = *(uint32_t *) mp->b_cont->b_rptr;
+		}
+	} else
+#endif				/* WITH_32BIT_CONVERSION */
+	{
+		if (iocp->ioc_count == TRANSPARENT) {
+			ldl_debug_mask = *(unsigned long *) mp->b_cont->b_rptr;
+		} else {
+			if (iocp->ioc_count != sizeof(unsigned long))
+				return ioc_nak(dl, mp);
+			ldl_debug_mask = *(unsigned long *) mp->b_cont->b_rptr;
+		}
+	}
 
 	mp->b_datap->db_type = M_IOCACK;
+	iocp->ioc_count = 0;	/* no implicit copyout */
 	iocp->ioc_error = 0;
 	iocp->ioc_rval = 0;
 
@@ -4479,6 +4683,62 @@ do_ioctl(struct dl *dl, mblk_t *mp)
 	}
 }
 
+STATIC int
+do_iocdata(struct dl *dl, mblk_t *mp)
+{
+	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
+	struct copyresp *cp = (struct copyresp *) mp->b_rptr;
+
+	if (cp->cp_rval != (caddr_t) 0) {
+		freemsg(mp);	/* abort */
+		return DONE;
+	}
+	switch (iocp->ioc_cmd) {
+	case LDL_SETFLAGS:
+#ifdef WITH_32BIT_CONVERSION
+		if (cp->cp_flag == IOC_ILP32) {
+			struct ldl_flags_ioctl32 *flg;
+
+			flg = (typeof(flg)) mp->b_cont->b_rptr;
+			flg->mask &= ~LDLFLAG_PRIVATE;	/* Cannot set private flags */
+			SPLSTR(psw);
+			dl->flags = (dl->flags & ~flg->mask) | (flg->flags & flg->mask);
+			SPLX(psw);
+			flg->flags = dl->flags;
+		} else
+#endif				/* WITH_32BIT_CONVERSION */
+		{
+			struct ldl_flags_ioctl *flg;
+			psw_t psw;
+
+			flg = (typeof(flg)) mp->b_cont->b_rptr;
+			flg->mask &= ~LDLFLAG_PRIVATE;	/* Cannot set private flags */
+			SPLSTR(psw);
+			dl->flags = (dl->flags & ~flg->mask) | (flg->flags & flg->mask);
+			SPLX(psw);
+			flg->flags = dl->flags;
+		}
+		break;
+	case LDL_FINDPPA:
+		return ioc_nak(dl, mp);
+	case LDL_GETNAME:
+		break;
+	case LDL_GETGSTATS:
+		break;
+	case LDL_SETDEBUG:
+		return ioc_nak(dl, mp);
+	default:
+		return ioc_nak(dl, mp);
+	}
+
+	mp->b_datap->db_type = M_IOCACK;
+	iocp->ioc_count = 0;
+	iocp->ioc_error = 0;
+	iocp->ioc_rval = 0;
+	qreply(WR(dl->rq), mp);
+	return DONE;
+}
+
 /*
  *  Write queue put routine
  */
@@ -4527,6 +4787,10 @@ ldl_wput(queue_t *q, mblk_t *mp)
 			return (0);
 		case M_IOCTL:
 			if (do_ioctl((struct dl *) q->q_ptr, mp) == DONE)
+				return (0);
+			break;
+		case M_IOCDATA:
+			if (do_iocdata((struct dl *) q->q_ptr, mp) == DONE)
 				return (0);
 			break;
 		default:
@@ -4622,14 +4886,58 @@ STATIC struct cdevsw ldl_cdev = {
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
 };
+
+struct ldl_ioctl {
+	unsigned int cmd;
+	void *handle;
+};
+
+static struct ldl_ioctl ldl_map[] = {
+	{.cmd = LDL_GETLSTATS,}
+	, {.cmd = LDL_GETGSTATS,}
+	, {.cmd = LDL_SETDEBUG,}
+	, {.cmd = LDL_SETFLAGS,}
+	, {.cmd = LDL_FINDPPA,}
+	, {.cmd = LDL_GETNAME,}
+	, {.cmd = 0,}
+};
+
+static void
+ldl_unregister_ioctl32(void)
+{
+	struct ldl_ioctl *i;
+
+	for (i = ldl_map; i->cmd != 0; i++)
+		if (i->handle != NULL)
+			unregister_ioctl32(i->handle);
+}
+
+static int
+ldl_register_ioctl32(void)
+{
+	struct ldl_ioctl *i;
+
+	for (i = ldl_map; i->cmd != 0; i++) {
+		if ((i->handle = register_ioctl32(i->cmd)) == NULL) {
+			ldl_unregister_ioctl32();
+			return (-ENOMEM);
+		}
+	}
+	return (0);
+}
+
 int __init
 ldl_init(void)
 {
 	int err;
 
 	cmn_err(CE_NOTE, DRV_BANNER);
-	if ((err = register_strdev(&ldl_cdev, major)) < 0)
+	if ((err = ldl_register_ioctl32()) < 0)
 		return (err);
+	if ((err = register_strdev(&ldl_cdev, major)) < 0) {
+		ldl_unregister_ioctl32();
+		return (err);
+	}
 	if (err > 0)
 		major = err;
 	return (0);
@@ -4638,7 +4946,8 @@ ldl_init(void)
 void __exit
 ldl_exit(void)
 {
-	return (void) unregister_strdev(&ldl_cdev, major);
+	unregister_strdev(&ldl_cdev, major);
+	ldl_unregister_ioctl32();
 }
 
 #ifdef CONFIG_STREAMS_LDL_MODULE

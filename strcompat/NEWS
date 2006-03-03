@@ -1,8 +1,37 @@
-OpenSS7 STREAMS XNS -- history of user-visible changes.  2005-12-29
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
-See the end for copying conditions.
+OpenSS7 STREAMS XNS -- history of user-visible changes.  2006-03-03
+$Id: NEWS,v 0.9.2.4 2006/03/03 11:11:13 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+See the end for copying conditions (for this file).
 
+* Major changes in strcompat-0.9.2.3
+
+  This release is primarily to support additional compilers (gcc 4.0.2),
+  architectures (x86_64, SMP, 32-bit compatibility), recent Linux
+  distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
+
+  - Corrections for and testing of 64-bit clean compile and test runs on
+    x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
+    compiler warnings.
+
+  - Changes to satisfy gcc 4.0.2 compiler.
+
+  - Corrected build flags for Gentoo and 2.6.15 kernels as reported on
+    mailing list.
+
+  - Corrections for and testing of 64-bit clean compile and test runs on
+    x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
+    compiler warnings.
+
+  - Initial corrections for and testing of SMP operation on Intel 630
+    Hyper-Threaded SMP on x86_64.  This package should now run well on
+    N-way Xeons even with Hyper-Threading enabled.
+
+  - Corrections and validation of 32-bit compatibilty over 64-bit on
+    x86_64.  Should apply well to other 64-bit architectures as well.
+
+  This is a public beta test release of the package.
+
 * Major changes in strcompat-0.9.2.2
 
   This is primarily a bug fixes release and corrections resulting from
@@ -22,13 +51,15 @@ See the end for copying conditions.
   they have been removed into a separate package.  Once `Linux
   Fast-STREAMS' is production grade, these compatibility modules will be
   rolled back into the streams package as `LiS' becomes deprecated.
+
+-----
 
 =========================================================================
 
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -47,8 +78,8 @@ All Rights Reserved.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -57,8 +88,8 @@ All Rights Reserved.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -73,3 +104,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

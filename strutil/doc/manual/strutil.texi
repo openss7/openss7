@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strutil.texi,v 0.9.2.1 2005/07/09 21:59:46 brian Exp $
+% @(#) $Id: strutil.texi,v 0.9.2.2 2006/03/03 12:17:36 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/07/09 21:59:46 $ by $Author: brian $
+% Last Modified $Date: 2006/03/03 12:17:36 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -247,7 +247,8 @@ Releases
 * Prerequisites::		Prerequisite packages
 * Compatibility::		Compatibility Issues
 * Release Notes::		Release Notes
-* Bugs::			Known Bugs
+* Maturity::			Package Maturity
+* Bugs::			Package Defects
 * Schedule::			Development and Bug Fix Schedule
 * History::			Project History
 
@@ -259,6 +260,12 @@ Installation
 * Installing::			Installing the package
 * Removal::			Removal of the package
 * Loading::			Loading the package
+
+Troubleshooting
+
+* Test Suites::			Test Suites for the package
+* Problem Reports::		Problem Reports for the package
+* Known Bugs::			Known Bugs in the package
 
 Indices
 

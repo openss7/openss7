@@ -1,10 +1,10 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: strcompat.macros,v 0.9.2.7 2005/05/14 08:34:12 brian Exp $
+.\" @(#) $Id: strcompat.macros,v 0.9.2.8 2006/03/03 11:11:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:12 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/03 11:11:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -81,8 +81,16 @@ Trademarks mentioned are the property of their owners.
 .rm [R
 .\}
 \fI\\*([T\fR\c
+.if !'\\*([J'' \{\
+,\ \fB\\*([J\fR\c
+.rm [J
+.\}
+.if !'\\*([V'' \{\
+,\ Vol.\ \fB\\*([V\fR\c
+.rm [V
+.\}
 .if !'\\*([N'' \{\
-,\ \\*([N\c
+,\ No.\ \fB\\*([N\fR\c
 .rm [N
 .\}
 .if !'\\*([D'' \{\
@@ -150,7 +158,7 @@ Trademarks mentioned are the property of their owners.
 .de CO
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation.
+\f(HRCopyright \(co 1997-2006 OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -212,7 +220,7 @@ PERFORMANCE OF THIS DOCUMENTATION.
 .PP
 .\}
 .el .br
-\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation.
+\f(HRCopyright \(co 1997-2006 OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -252,6 +260,39 @@ source, must acknowledge the copyright and authors of this work.
 .br
 .I (See roff source for permission notice.)
 ..
+.de C5
+.SH "COPYRIGHT"
+.PP
+\f(HRCopyright \(co 1999, 2000, 2001, 2002, 2003, 2004  The Board of Trustees of the University of Illinois
+.PP
+.ce 1
+\s-2\f(HRPERMISSION NOTICE\fR
+.PP
+\s-2\f(HRPermission is hereby granted, free of charge, to any person obtaining a copy of this
+software (Iperf) and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the right to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+.RS
+.IP * 2
+\s-2\f(HRRedistributions of source code must retain the above copyright notice, this list of
+conditions and the following disclaimers.
+.IP * 2
+\s-2\f(HRRedistributions in binary form must reproduce the above copyright notice, this list of
+conditions and the following disclaimers in the documentation and/or other material provided with
+the distribution.
+.IP * 2
+\s-2\f(HRNeither the names of the University of Illinois, NCSA, nor the names of its contributors
+may be used to endorse or promote products derived from this Software without specific prior written
+permission.
+.RE
+.PP
+\s-2\f(HBTHE SOFTWARE IS PROVIDED \(lqAS IS\(rq, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT.  IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+..
 .de BG
 .SH "BUGS"
 .PP
@@ -268,9 +309,8 @@ The OpenSS7 Project http://www.openss7.org/
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.7 $); $Date: 2005/05/14 08:34:12 $.
 .PP
-\f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
+\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -282,11 +322,10 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.7 $); $Date: 2005/05/14 08:34:12 $.
 .PP
 \f(HRCopyright \(co 1992 UNIX International, Inc.
 .br
-\f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
+\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -298,11 +337,10 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.7 $); $Date: 2005/05/14 08:34:12 $.
 .PP
 \f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
 .br
-\f(HRCopyright \(co 2001-2005 OpenSS7 Corp.
+\f(HRCopyright \(co 2001-2006 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -314,9 +352,24 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.7 $); $Date: 2005/05/14 08:34:12 $.
 .PP
-\f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
+\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
+.if (\n[.l]u < 80n) \{\
+.br
+.\}
+All Rights Reserved.
+.br
+.I (See roff source for permission notice.)
+..
+.de I5
+.SH IDENTIFICATION
+.HP
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 0.9.2.8 $); $Date: 2006/03/03 11:11:13 $.
+.PP
+\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
+.br
+\f(HRCopyright \(co 1999-2004 The Board of Trustees of the University of Illinois
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -328,7 +381,6 @@ All Rights Reserved.
 .SH "VERSIONS"
 .PP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.7 $); $Date: 2005/05/14 08:34:12 $.
 ..
 .de AU
 .SH "AUTHOR"
@@ -376,6 +428,13 @@ Other trademarks are the property of their respective owners.
 .\".C4
 .\".TH
 .I4
+..
+.de T5
+.I5
+.\".VR
+.\".AU
+.\".C5
+.\".TM
 ..
 .de TI
 .ID

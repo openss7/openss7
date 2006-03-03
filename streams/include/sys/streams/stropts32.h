@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts32.h,v 0.9.2.2 2006/02/20 10:59:20 brian Exp $
+ @(#) $Id: stropts32.h,v 0.9.2.3 2006/03/03 10:57:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts32.h,v $
+ Revision 0.9.2.3  2006/03/03 10:57:11  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.2  2006/02/20 10:59:20  brian
  - updated copyright headers on changed files
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_STREAMS_STROPTS32_H__
 #define __SYS_STREAMS_STROPTS32_H__
 
-#ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 struct bandinfo32 {
 	unsigned char bi_pri;
@@ -68,8 +71,8 @@ struct bandinfo32 {
 };
 
 struct strbuf32 {
-	int maxlen;
-	int len;
+	int32_t maxlen;
+	int32_t len;
 	uint32_t buf;
 };
 
@@ -80,23 +83,24 @@ struct strpeek32 {
 };
 
 struct strfdinsert32 {
-	struct strbuf32 ctlbuf;
-	struct strbuf32 databuf;
-	uint32_t flags;
-	int32_t fildes;
+	struct strbuf32 ctlbuf;		/* ctrl part for putmsg(2) */
+	struct strbuf32 databuf;	/* data part for putmsg(2) */
+	int32_t flags;			/* flags for putmsg(2) */
+	int32_t fildes;			/* file descriptor to insert */
+	int32_t offset;			/* offset within control part for insertion */
 };
 
 struct strioctl32 {
-	int32_t ic_cmd;
-	int32_t ic_timout;
-	int32_t ic_len;
-	uint32_t ic_dp;
+	int32_t ic_cmd;			/* command to perform */
+	int32_t ic_timout;		/* ioctl timeout period */
+	int32_t ic_len;			/* size of data buffer */
+	uint32_t ic_dp;			/* addr of data buffer */
 };
 
 struct strrecvfd32 {
-	int32_t fd;
-	uid_t uid;
-	gid_t gid;
+	int32_t fd;			/* file descriptor */
+	uid_t uid;			/* user id */
+	gid_t gid;			/* group id */
 	char fill[8];			/* UnixWare/Solaris compatibility */
 };
 
@@ -114,11 +118,12 @@ struct strsigset32 {
 	int32_t ss_events;
 };
 
+/* for ioctl emulation of getmsg() getpmsg() putmsg() putpmsg() matches Mac OT */
 struct strpmsg32 {
 	struct strbuf32 ctlbuf;
 	struct strbuf32 databuf;
 	int32_t band;
-	int32_t flags;
+	int32_t flags;			/* actually long for Mac OT */
 };
 
 #endif				/* __SYS_STREAMS_STROPTS32_H__ */

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyreq.9.man,v 0.9.2.7 2005/12/06 09:39:11 brian Exp $
+.\" @(#) $Id: copyreq.9.man,v 0.9.2.8 2006/03/03 10:57:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/06 09:39:11 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/03 10:57:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -242,8 +242,9 @@ ioc_id:cq_id:cp_id
 ioc_count:cq_size:\fR\-
 ioc_error:\fR\-:\fR\-
 ioc_rval:\fR\-:\fR\-
-ioc_flag:cq_flag:cp_flag
+\fR\-:cq_flag:\fR\-
 \fR\-:cq_private:cp_private
+ioc_flag:\fR\-:cp_flag
 .TE
 .sp
 .RE
@@ -353,9 +354,9 @@ Stream end
 can determine if requests, response or acknoweldgements belong to the same transaction.
 .\" -----------
 .TP
-.I cq_flags
+.I cq_flag
 The
-.I cq_flags
+.I cq_flag
 field contains implementation specific flags.
 .B @PACKAGE_TITLE@
 neither defines nor recognizes any flags.  It also does not alter the flags field in any structure.
@@ -606,21 +607,18 @@ svr42
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IR Solaris \(rg
-documents the
-.I cq_flags
-member.
-.[
-soldoc
-.]
+.IR Solaris \(rg,
 .IR IRIX \(rg,
 .IR SUPER-UX \(rg,
 .IR UnixWare \(rg
 and
 .IR UXP/V \(rg
-do not document the
-.I cq_flags
+document the
+.I cq_flag
 member.
+.[
+soldoc
+.]
 .[
 suxspg
 .]
@@ -630,12 +628,29 @@ uw7spg
 .[
 uxpspg
 .]
+As far as I can tell the
+.I cq_flag
+member and the
+.B STRCANON
+and
+.B RECOPY
+flags were used in implementations of SVR 3.2
+.[
+svr32
+.]
+.IR STREAMS ;
+however,
+I cannot find documentation of how it ever worked.
+Therefore,
+.B @PACKAGE_TITLE@
+does not implement the cannonical format specifier feature.
 .IP ""
 Portable
 .I STREAMS
-drivers and modules will not access the
-.I cq_flags
-member.
+drivers and modules will set the
+.I cq_flag
+member to zero
+.RB ( 0 ).
 .IP \(em
 .IR UnixWare \(rg
 documents the

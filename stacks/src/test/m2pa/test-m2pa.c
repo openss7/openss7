@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/29 21:36:09 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/03 12:06:12 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:36:09 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 12:06:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.15  2006/03/03 12:06:12  brian
+ - 32/64-bit compatibility
+
  Revision 0.9.2.14  2005/12/29 21:36:09  brian
  - a few idiosynchrasies for PPC, old 2.95 compiler, and 2.6.14 builds
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/29 21:36:09 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/03 12:06:12 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/29 21:36:09 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/03 12:06:12 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -1923,9 +1926,9 @@ pt_decode_data(void)
 #endif
 			if (show_msus || verbose > 1) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
-				printf("                         <-----------------  DATA [%5u bytes]     \n", iut_bsn, iut_fsn, ntohl(((uint32_t *) pt_buf)[1]) - 2 * sizeof(uint32_t));
+				printf("                         <-----------------  DATA [%5lu bytes]     \n", iut_bsn, iut_fsn, (ulong) ntohl(((uint32_t *) pt_buf)[1]) - 2 * sizeof(uint32_t));
 #else
-				printf("                         <-%06X, %06X--  DATA [%5u bytes]     \n", iut_bsn & 0xffffff, iut_fsn & 0xffffff, ntohl(((uint32_t *) pt_buf)[1]) - 4 * sizeof(uint32_t));
+				printf("                         <-%06X, %06X--  DATA [%5lu bytes]     \n", iut_bsn & 0xffffff, iut_fsn & 0xffffff, (ulong) ntohl(((uint32_t *) pt_buf)[1]) - 4 * sizeof(uint32_t));
 #endif
 				FFLUSH(stdout);
 				return ret;
@@ -12015,6 +12018,11 @@ end_tests(void)
 {
 	return (SUCCESS);
 }
+#endif
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
 #endif
 
 int

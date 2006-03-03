@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/29 21:36:14 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/03 11:11:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:36:14 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:11:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.23  2006/03/03 11:11:14  brian
+ - 64-bit compatibility, fixes, updates for release
+
  Revision 0.9.2.22  2005/12/29 21:36:14  brian
  - a few idiosynchrasies for PPC, old 2.95 compiler, and 2.6.14 builds
 
@@ -120,10 +123,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/29 21:36:14 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/03 11:11:14 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/29 21:36:14 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/03 11:11:14 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -151,7 +154,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/29 21:36:14 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/03 11:11:14 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -451,7 +454,7 @@ EXPORT_SYMBOL_NOVERS(mi_attach);	/* mps/ddi.h, mac/ddi.h */
  *  MI_OPEN_COMM
  *  -------------------------------------------------------------------------
  */
-__MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, uint size, queue_t *q, dev_t *devp, int flag,
+__MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag,
 				     int sflag, cred_t *credp);
 EXPORT_SYMBOL_NOVERS(mi_open_comm);	/* mps/ddi.h, aix/ddi.h */
 
@@ -835,7 +838,7 @@ mi_copyout(queue_t *q, mblk_t *mp)
 		return mi_copy_done(q, mp, EPROTO);
 	/* This is for LiS that puts an error code in the cp_rval and expects an M_IOCNAK. */
 	if (ioc->copyresp.cp_rval || !(db = bp->b_cont))
-		return mi_copy_done(q, mp, (int) (intptr_t) ioc->copyresp.cp_rval);
+		return mi_copy_done(q, mp, (int) (long) ioc->copyresp.cp_rval);
 	bp->b_cont = xchg(&db->b_cont, NULL);
 	mip = (typeof(mip)) bp->b_rptr;
 	mp->b_datap->db_type = M_COPYOUT;
@@ -869,7 +872,7 @@ mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 	    || !(bp = ioc->copyresp.cp_private))
 		goto error;
 	/* This is for LiS that puts an error code in the cp_rval and expects an M_IOCNAK. */
-	if ((err = (int) (intptr_t) ioc->copyresp.cp_rval))
+	if ((err = (int) (long) ioc->copyresp.cp_rval))
 		goto error;
 	switch (mp->b_datap->db_type) {
 	case M_IOCDATA:

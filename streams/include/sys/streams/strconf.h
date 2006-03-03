@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.22 2005/12/19 12:44:53 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.23 2006/03/03 10:57:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strconf.h,v $
+ Revision 0.9.2.23  2006/03/03 10:57:11  brian
+ - 32-bit compatibility support, updates for release
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRCONF_H__
 #define __SYS_STREAMS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/19 12:44:53 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.23 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do no include sys/streams/strconf.h directly, include sys/strconf.h instead."
@@ -112,5 +117,8 @@ __STREAMS_EXTERN struct strapush *autopush_search(const char *name, minor_t mino
 __STREAMS_EXTERN int apush_get(struct strapush *sap);
 __STREAMS_EXTERN int apush_set(struct strapush *sap);
 __STREAMS_EXTERN int apush_vml(struct str_list *slp);
+
+__STREAMS_EXTERN void *register_ioctl32(unsigned int cmd);
+__STREAMS_EXTERN void unregister_ioctl32(void *opaque);
 
 #endif				/* __SYS_STREAMS_STRCONF_H__ */

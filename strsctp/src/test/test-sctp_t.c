@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 10:01:04 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/03 11:47:02 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:04 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:47:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.14  2006/03/03 11:47:02  brian
+ - 32/64-bit compatibility
+
  Revision 0.9.2.13  2005/12/28 10:01:04  brian
  - remove warnings on FC4 compile
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 10:01:04 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/03 11:47:02 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 10:01:04 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/03 11:47:02 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -338,6 +341,11 @@ enum {
 long test_start = 0;
 
 static int state;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 #if 0
 /*
@@ -1545,7 +1553,7 @@ print_addr(char *add_ptr, size_t add_len)
 		int i;
 
 		if (add_len != anum * sizeof(*a))
-			fprintf(stdout, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
 		fprintf(stdout, "[%d]", ntohs(a[0].sin_port));
 		for (i = 0; i < anum; i++) {
 			uint32_t addr = a[i].sin_addr.s_addr;
@@ -1571,7 +1579,7 @@ addr_string(char *add_ptr, size_t add_len)
 		int i;
 
 		if (add_len != anum * sizeof(*a))
-			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
 		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a[0].sin_port));
 		for (i = 0; i < anum; i++) {
 			uint32_t addr = a[i].sin_addr.s_addr;
@@ -1627,7 +1635,7 @@ status_string(struct t_opthdr *oh)
 }
 
 #ifndef T_ALLLEVELS
-#define T_ALLLEVELS -1UL
+#define T_ALLLEVELS -1
 #endif
 
 char *
@@ -2892,9 +2900,9 @@ print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
 
 	if (verbose < 4)
 		return;
-	snprintf(buf, sizeof(buf), "opt len = %d", opt_len);
+	snprintf(buf, sizeof(buf), "opt len = %lu", (ulong) opt_len);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "opt ofs = %d", opt_ofs);
+	snprintf(buf, sizeof(buf), "opt ofs = %lu", (ulong) opt_ofs);
 	print_string(child, buf);
 	oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0);
 	if (oh) {
@@ -4409,9 +4417,9 @@ do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 }
 
 #if 0
-#define IUT 0x00000001UL
-#define PT  0x00000002UL
-#define ANY 0x00000003UL
+#define IUT 0x00000001
+#define PT  0x00000002
+#define ANY 0x00000003
 
 int
 any_wait_event(int source, int wait)
@@ -28656,7 +28664,7 @@ test_case_7_1_resp(int child)
       failure:
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "i = %d, j = %d, k = %d\n", 4, 4, 4);
-	fprintf(stdout, "Received %u bytes, expecting %u\n", len, 4 * 100000 + 4 * 8 + 4 * 7);
+	fprintf(stdout, "Received %lu bytes, expecting %u\n", (ulong) len, 4 * 100000 + 4 * 8 + 4 * 7);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
@@ -28727,7 +28735,7 @@ test_case_7_2_conn(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, "Sent %3d messages making %6u bytes.\n", s, snd_bytes);
+	fprintf(stdout, "Sent %3d messages making %6lu bytes.\n", s, (ulong) snd_bytes);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	print_more();
@@ -28768,7 +28776,7 @@ test_case_7_2_resp(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, "Rcvd %3d messages making %6u bytes.\n", r, rcv_bytes);
+	fprintf(stdout, "Rcvd %3d messages making %6lu bytes.\n", r, (ulong) rcv_bytes);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	print_more();
@@ -30103,7 +30111,7 @@ test_case_11_1(int child, int prim)
 			goto expect_error;
 		case T_UNITDATA_REQ:
 			goto expect_error;
-		case -1UL:
+		case -1:
 			goto expect_nosupport_ack;
 		default:
 			goto expect_error;
@@ -30136,7 +30144,7 @@ test_case_11_1(int child, int prim)
 			goto expect_error;
 		case T_UNITDATA_REQ:
 			goto expect_error;
-		case -1UL:
+		case -1:
 			goto expect_nosupport_ack;
 		default:
 			goto expect_error;
@@ -30169,7 +30177,7 @@ test_case_11_1(int child, int prim)
 			goto expect_error;
 		case T_UNITDATA_REQ:
 			goto expect_error;
-		case -1UL:
+		case -1:
 			goto expect_nosupport_ack;
 		default:
 			goto expect_error;
@@ -31095,7 +31103,7 @@ for a UNKNOWN primitive sent in the wrong direction."
 int
 test_case_11_2_17(int child)
 {
-	return test_case_11_1(child, -1UL);
+	return test_case_11_1(child, -1);
 }
 
 #define preamble_11_2_17_conn	preamble_0
@@ -31194,7 +31202,7 @@ test_case_11_3(int child, long prim)
 			break;
 		case T_UNITDATA_REQ:
 			break;
-		case -1UL:
+		case -1:
 		default:
 			last_prim = prim;
 			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
@@ -31241,7 +31249,7 @@ test_case_11_3(int child, long prim)
 				goto failure;
 			state++;
 			goto expect_error;
-		case -1UL:
+		case -1:
 		default:
 			last_prim = prim;
 			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
@@ -31284,7 +31292,7 @@ test_case_11_3(int child, long prim)
 				goto failure;
 			state++;
 			goto expect_error;
-		case -1UL:
+		case -1:
 		default:
 			last_prim = prim;
 			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
@@ -31630,7 +31638,7 @@ verifies that behavior."
 int
 test_case_11_3_14(int child)
 {
-	return test_case_11_3(child, -1UL);
+	return test_case_11_3(child, -1);
 }
 
 struct test_stream test_11_3_14_conn = { &preamble_0, &test_case_11_3_14, &postamble_0 };
@@ -41305,7 +41313,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -41331,9 +41339,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -41361,7 +41368,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

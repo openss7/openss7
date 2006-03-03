@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/19 03:26:09 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 11:35:17 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:26:09 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 11:35:17 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: timod.c,v $
+ Revision 0.9.2.21  2006/03/03 11:35:17  brian
+ - 32/64-bit compatibility
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/19 03:26:09 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 11:35:17 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/19 03:26:09 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 11:35:17 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -82,8 +87,8 @@ static char const ident[] =
 #endif
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TIMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/19 03:26:09 $"
+#define TIMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 11:35:17 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -149,18 +154,18 @@ static streamscall int timod_wput(queue_t *, mblk_t *);
 static struct qinit timod_rinit = {
 	.qi_putp = timod_rput,		/* Read put (message from below) */
 	.qi_qopen = timod_open,		/* Each open */
-	.qi_qclose = timod_close,		/* Last close */
-	.qi_minfo = &timod_minfo,		/* Information */
+	.qi_qclose = timod_close,	/* Last close */
+	.qi_minfo = &timod_minfo,	/* Information */
 };
 
 static struct qinit timod_winit = {
 	.qi_putp = timod_wput,		/* Write put (message from above) */
-	.qi_minfo = &timod_minfo,		/* Information */
+	.qi_minfo = &timod_minfo,	/* Information */
 };
 
 MODULE_STATIC struct streamtab timodinfo = {
-	.st_rdinit = &timod_rinit,		/* Upper read queue */
-	.st_wrinit = &timod_winit,		/* Upper write queue */
+	.st_rdinit = &timod_rinit,	/* Upper read queue */
+	.st_wrinit = &timod_winit,	/* Upper write queue */
 };
 
 /*
@@ -1061,6 +1066,70 @@ timod_unregister_strmod(void)
 	return (0);
 }
 
+#if defined WITH_32BIT_CONVERSION
+struct timod_trans {
+	unsigned int cmd;
+	void *opaque;
+};
+
+STATIC timod_trans timod_trans_map[] = {
+	{.cmd = _O_TI_GETINFO,}
+	, {.cmd = _O_TI_OPTMGMT,}
+	, {.cmd = _O_TI_BIND,}
+	, {.cmd = _O_TI_UNBIND,}
+	, {.cmd = _O_TI_GETMYNAME,}
+	, {.cmd = _O_TI_GETPEERNAME,}
+	, {.cmd = _O_TI_XTI_HELLO,}
+	, {.cmd = _O_TI_XTI_GET_STATE,}
+	, {.cmd = _O_TI_XTI_CLEAR_EVENT,}
+	, {.cmd = _O_TI_XTI_MODE,}
+	, {.cmd = _O_TI_TLI_MODE,}
+	, {.cmd = O_TI_GETINFO,}
+	, {.cmd = O_TI_OPTMGMT,}
+	, {.cmd = O_TI_BIND,}
+	, {.cmd = O_TI_UNBIND,}
+	, {.cmd = TI_GETINFO,}
+	, {.cmd = TI_OPTMGMT,}
+	, {.cmd = TI_BIND,}
+	, {.cmd = TI_UNBIND,}
+	, {.cmd = TI_GETMYNAME,}
+	, {.cmd = TI_GETPEERNAME,}
+	, {.cmd = TI_SETMYNAME,}
+	, {.cmd = TI_SETPEERNAME,}
+	, {.cmd = TI_SYNC,}
+	, {.cmd = TI_GETADDRS,}
+	, {.cmd = TI_CAPABILITY,}
+	, {.cmd = 0,}
+};
+
+STATIC void
+timod_ioctl32_unregister(void)
+{
+	struct timod_trans *t;
+
+	for (t = timod_trans_map; t->cmd != 0; t++) {
+		streams_unregister_ioctl32(t->opaque);
+		t->opaque = NULL;
+	}
+	return;
+}
+
+STATIC int
+timod_ioctl32_register(void)
+{
+	struct timod_trans *t;
+
+	for (t = timod_trans_map; t->cmd != 0; t++) {
+		if ((t->opaque = streams_register_ioctl32(t->cmd)) == NULL) {
+			timod_ioctl32_unregister();
+			return (-ENOMEM);
+		}
+	}
+	return (0);
+}
+
+#endif				/* defined WITH_32BIT_CONVERSION */
+
 #endif				/* LFS */
 
 /*
@@ -1101,8 +1170,18 @@ timodinit(void)
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
 		return (err);
 	}
+#if defined WITH_32BIT_CONVERSION
+	if ((err = timod_ioctl32_register())) {
+		cmn_err(CE_WARN, "%s: could not register 32bit ioctls, err = %d", MOD_NAME, err);
+		timod_term_caches();
+		return (err);
+	}
+#endif				/* defined WITH_32BIT_CONVERSION */
 	if ((err = timod_register_strmod())) {
 		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+#if defined WITH_32BIT_CONVERSION
+		timod_ioctl32_unregister();
+#endif				/* defined WITH_32BIT_CONVERSION */
 		timod_term_caches();
 		return (err);
 	}
@@ -1118,6 +1197,9 @@ timodterminate(void)
 
 	if ((err = timod_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+#if defined WITH_32BIT_CONVERSION
+	timod_ioctl32_unregister();
+#endif				/* defined WITH_32BIT_CONVERSION */
 	if ((err = timod_term_caches()))
 		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;

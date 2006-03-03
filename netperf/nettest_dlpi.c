@@ -2322,7 +2322,7 @@ void
       fprintf(where,
 	      "dlpi_recv_cl_stream: getmsg failure: errno %d primitive 0x%lx\n",
 	      errno,
-	      data_ind->dl_primitive);
+	      (ulong) data_ind->dl_primitive);
       fflush(where);
       netperf_response.content.serv_errno = 996;
       send_response();
@@ -2790,7 +2790,7 @@ frames frames bytes   bytes  secs.   per sec  %%      %%      us/Tr   us/Tr\n\n"
       fprintf(where,
 	      "send_dlpi_cl_rr: recv error: errno %d primitive 0x%lx\n",
 	      errno,
-	      data_ind->dl_primitive);
+	      (ulong) data_ind->dl_primitive);
       fflush(where);
       exit(1);
     }
@@ -3257,7 +3257,7 @@ else {
       fprintf(where,
 	      "dlpi_recv_cl_rr: getmsg failure: errno %d primitive 0x%lx\n",
 	      errno,
-	      data_ind->dl_primitive);
+	      (ulong) data_ind->dl_primitive);
       fprintf(where,
 	      "                 recevied %u transactions\n",
 	      trans_received);

@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.15 2005/12/30 12:21:46 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.16 2006/03/03 12:06:09 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
 @c Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/12/30 12:21:46 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/03 12:06:09 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -76,7 +76,8 @@ drivers, as well as Linux kernel compatibility.
 * Prerequisites::		Prerequisite packages
 * Compatibility::		Compatibility Issues
 * Release Notes::		Release Notes
-* Bugs::			Known Bugs
+* Maturity::			Package Maturity
+* Bugs::			Package Defects
 * Schedule::			Development and Bug Fix Schedule
 * History::			Project History
 @end menu
@@ -114,6 +115,7 @@ This section discusses compatibility with major prerequisites.
 @menu
 * GNU/Linux Distributions::	Compatibility to GNU/Linux Distributions
 * Linux Kernel::		Compatibility to Linux Kernels
+* Linux Architectures::		Compatibility to Linux Architectures
 * Linux STREAMS::		Compatibility to LiS
 * Linux Fast-STREAMS::		Compatibility to LfS
 @end menu
@@ -124,36 +126,42 @@ This section discusses compatibility with major prerequisites.
 @subsection GNU/Linux Distributions
 @cindex GNU/Linux Distributions
 
-@dfn{@value{PACKAGE_TITLE}} is compatible with the following @dfn{Linux} distributions:
+@dfn{@value{PACKAGE_TITLE}} is compatible with the following @dfn{Linux}
+distributions:@footnote{Items marked as @samp{TBD} are scheduled to have support deprecated.  That
+is, in a future release, the distributions marked @samp{TBD} will not longer be validated before
+release.}
 
 @itemize @bullet
 @item RedHat Linux 7.2 (RH7)
 @item RedHat Linux 7.3 (RH7)
-@item Performance Technlogies @dfn{NexusWare24}
-@item RedHat Linux 8.0 (RH8)
-@item RedHat Linux 9 (RH9)
-@item SuSE 8.0 Professional
-@item Fedora Core 1 (FC1)
+@item Performance Technlogies @dfn{NexusWare24} -- TBD
+@item RedHat Linux 8.0 (RH8) -- TBD
+@item RedHat Linux 9 (RH9) -- TBD
+@item SuSE 8.0 Professional -- TBD
+@item Fedora Core 1 (FC1) -- TBD
 @item Debian 3.0r2 Woody
-@item Mandrakelinux 9.2 (MDK92)
+@item Mandrakelinux 9.2 (MDK92) -- TBD
 @item RedHat Enterprise Linux 3.0 (EL3)
 @item WhiteBox Enterprise Linux 3.0 (WBEL3)
 @item CentOS Enterprise Linux 3.4 (centos34)
-@item Fedora Core 2 (FC2)
-@item SuSE 9.1 Personal
-@item Mandrakelinux 10.0 (MDK100)
-@item SuSE 9.2 Professional (SuSE9.2)
-@item Mandrakelinux 10.1 (MDK101)
-@item Fedora Core 3 (FC3)
+@item Fedora Core 2 (FC2) -- TBD
+@item SuSE 9.1 Personal -- TBD
+@item Mandrakelinux 10.0 (MDK100) -- TBD
+@item SuSE 9.2 Professional (SuSE9.2) -- TBD
+@item Mandrakelinux 10.1 (MDK101) -- TBD
+@item Fedora Core 3 (FC3) -- TBD
 @item RedHat Enterprise Linux 4 (EL4)
 @item CentOS Enterprise Linux 4.0 (centos4)
 @item WhiteBox Enterprise Linux 4 (WBEL4)
 @item Fedora Core 4 (FC4)
-@item Lineox 4.026 (LEL4)
-@item Mandriva Linux LE2005 (MDK102)
+@item Lineox 4.026 (LEL4) -- TBD
+@item Lineox 4.053 (LEL4)
+@item Mandriva Linux LE2005 (MDK102) -- TBD
 @item Performance Technologies NexusWare 8.0
 @item Debian 3.1r0a Sarge (untested)
-@item OpenSuSE 10.0 (untested)
+@item SuSE 10.0 (untested)
+@item OpenSuSE (untested)
+@item Mandriva Linux LE2006 (MDK103) (untested)
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
@@ -175,8 +183,32 @@ production kernels from the distributions listed above.  Rather than relying on 
 to distribution production kernels that have had patches applied over the official
 @url{http://www.kernel.org/, kernel.org} sources.
 
-The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10.  It has
-been tested up to and including 2.6.11.
+The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10 and has
+been tested up to and including 2.4.27.  It has been tested from 2.6.3 up to and including 2.6.15.
+
+UP validation testing for kernels is performed on all supported architectures.  SMP validation
+testing is performed on UP machines, as well as on an Intel 3.0GHz Pentium IV 630 with
+HyperThreading enabled.  Because HyperThreading is not as independent as multiple CPUs, SMP
+validation testing is limited.
+
+@node Linux Architectures
+@subsection Architectures
+@cindex Architectures
+
+The @cite{@value{PACKAGE_TITLE}} package compiles and installs on a wide range of architectures.
+Although it is believed that the package will work on all architectures supported by the Linux
+kernel being used, validation testing has only been performed with the following architectures:
+
+@itemize
+@item ix86
+@item x86_64
+@item ppc (MPC 860)
+@item ppc64
+@end itemize
+
+32-bit compatibility validation testing is performed on all 64-bit architectures supporting 32-bit
+compatibility.  If you would like to validate an OpenSS7 package on a specific machine architecture,
+you are welcome to sponsor the project with a test machine.
 
 @node Linux STREAMS
 @subsection Linux STREAMS
@@ -213,6 +245,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-0.9a-3::			Release 3
 * Release @value{PACKAGE}-0.9a-2::			Release 2
 * Release @value{PACKAGE}-0.9a-1::			Release 1
 @end menu
@@ -224,6 +257,33 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @node Release @value{PACKAGE}-@value{VERSION}
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This release is primarily to support additional compilers (gcc 4.0.2), architectures (x86_64, SMP,
+32-bit compatibility), recent Linux distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels
+(2.6.15).
+
+@itemize
+@item Changes necessary for __LP64__ compatible builds.  Changes to support 32-bit ioctl
+compatibility for __LP64__ architectures.  Binary compatibilty should not have been disrupted.  At
+the same time as the ioctl32 changes, TRANSPARENT ioctl support for most of the IO controls for the
+ldl(4) driver has been added.
+@item Changes to satisfy gcc 4.0.2 compiler.
+@item Corrections for and testing of 64-bit clean compile and test runs on x86_64 architecture.
+Some bug corrections resulting from gcc 4.0.2 compiler warnings.
+@item Corrected build flags for Gentoo and 2.6.15 kernels as reported on mailing list.
+@item Initial corrections for and testing of SMP operation on Intel 630 Hyper-Threaded SMP on
+x86_64.  This package should now run well on N-way Xeons even with Hyper-Threading enabled.
+@item Corrections and validation of 32-bit compatibilty over 64-bit on x86_64.  Should apply well to
+other 64-bit architectures as well.
+@end itemize
+
+This is a public alpha release of the package.
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.9a-3
+@subsection Release @value{PACKAGE}-0.9a-3
+@cindex release @value{PACKAGE}-0.9a-3
 
 This is primarily a bug fixes release and corrections resulting from testing.  This is a major bug
 fix release.  The previous release was largely untested.  This release has been verified
@@ -264,21 +324,210 @@ Not publicly released.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
+@node Maturity
+@section Maturity
+@cindex maturity
+
+The @cite{OpenSS7 Project} adheres to the following release philosophy:
+
+@menu
+* Pre-Alpha Releases::		Pre-Alpha release description
+* Alpha Releases::		Alpha release description
+* Beta Releases::		Beta release description
+* Gamma Releases::		Gamma release description
+* Production Releases::		Production release description
+@end menu
+
+@itemize
+@item pre-alpha release
+@item alpha release
+@item beta release
+@item gamma release
+@item production release
+@end itemize
+
+@node Pre-Alpha Releases
+@subsection Pre-Alpha Releases
+
+@dfn{Pre-alpha} releases are releases that have received no testing whatsoever.  Code in the release
+is not even known to configure or compile.  The purpose of a pre-alpha release is to make code and
+documenation available for insepection only, and to solicit comments on the design approach or other
+characteristics of the software package.
+
+@dfn{Pre-alpha} release packages ship containing warnings recommending that the user not even
+execute the contained code.
+
+@node Alpha Releases
+@subsection Alpha Releases
+
+@dfn{Alpha} release are releases that have received little to no testing, or that have been tested
+and contains known bugs or defects that make the package unsuitable even for testing.  The purpose
+for an @dfn{alpha} release are the same as for the pre-alpha release, with the additional purpose
+that it is an earily release of partially functional code that has problems that an external
+developer might be willing to fix themselves and contribute back to the project.
+
+@dfn{Alpha} release packages ship containing warnings that executing the code can crash machines and
+might possibly do damage to systems upon which it is executed.
+
+@node Beta Releases
+@subsection Beta Releases
+
+@dfn{Beta} releases are releases that have received some testing, but the testing to date is not
+exhaustive.  @dfn{Beta} release packages do not ship with known defects.  All known defects are
+respolved before distribution; however, as exhaustive testing has not been performed, unknown
+defects may exist.  The purpose for a @dfn{beta} release is to provide a baseline for other
+organizations to participate in the rigorous testing of the package.
+
+@dfn{Beta} release packages ship containing warnings that the package has not been exhaustively
+tested and that the package may cause systems to crash.  Suitability of software in this category
+for production use is not advised by the project; however, as always, is at the discretion of the
+user of the software.
+
+@node Gamma Releases
+@subsection Gamma Releases
+
+@dfn{Gamma} release are releases that have received exhaustive testing within the project, but
+external testing has been minimal.  @dfn{Gamma} release packages do not ship with known defects.  As
+exhaustive internal testing has been performed, unknown defects should be few.  Please remember that
+there is NO WARRANTY on public release packages.
+
+@dfn{Gamma} release packages typically resolve problems in previous @dfn{beta} releases, and might
+not have had full regression testing performed.  Suitability of software in this category for
+production use is at the discretion of the user of the software.   @dfn{The OpenSS7 Project}
+recommends that the complete validation test suites provided with the package be performed and pass
+on target systems before considering production use.
+
+@node Production Releases
+@subsection Production Releases
+
+@dfn{Production} releases are releases that have received exhaustive testing within the project and
+validated on specific distributions and architectures.  @dfn{Production} release packages do not
+ship with known defects.  Please remember that there is NO WARRANTY on public release packages.
+
+@dfn{Production} packages ship containig a list of validated distributions and architecutres.
+Full regression testing of any maintenance changes is performed.  Suitability of software in this
+category for production use on the specified target distributions and architectures is at the
+discretion of the user.  It should not be necessary to preform validation tests on the set of
+supported target systems before considering production use.
+
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
 @node Bugs
 @section Bugs
 @cindex bugs
 
-@dfn{@value{PACKAGE_TITLE}} has many known bugs.  These are alpha releases.  Use at your own risk.
-Remember that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANY} under @ref{GNU General
-Public License}.}
+@menu
+* Defect Notices::		Notices of the possibility of defects
+* Known Defects::		Known bugs in the package
+@end menu
 
-@b{This software is @i{alpha} software.  As such, it will likely crash your kernel.  Installation
-of the software may irreparably mangle your header files or Linux distribution in such a way as to
-make it unusable.  Crashes will likely lock your system and rebooting the system might not repair the
-problem.  You can loose all the data on your system.  Because this software can crash your kernel,
-the resulting unstable system could destroy computer hardware or peripherals making them unusable.
-You will likely void the warranty on any system on which you run this software. YOU HAVE BEEN
+@node Defect Notices
+@subsection Defect Notices
+
+@c This is the defect notice for pre-alpha release software
+@ignore
+@dfn{@value{PACKAGE_TITLE}} has known and unknown defects.  This is a @dfn{pre-alpha} release.  Some
+defects might be harmful.  No validation testing whatsoever has been performed by the @cite{OpenSS7
+Project} on this software.  The software might not even configure or compile.  The @cite{OpenSS7
+Project} recommends that you @b{do not use this software}. Use at your own risk.  Remember that
+there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public
+License}.}
+
+@b{This software is @i{pre-alpha} software.  As such, it will crash your kernel.  Installation of
+the software will irreparably mangle your header files or Linux distribution in such a way as to
+make it unusable.  Crashes will lock your system and rebooting the system will not repair the
+problem.  You will loose all the data on your system.  Because this software will crash your kernel,
+the resulting unstable system can destroy computer hardware or peripherals making them ususable.
+You will likely void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
+@end ignore
+
+@c This is the defect notice for alpha release software
+@dfn{@value{PACKAGE_TITLE}} has unknown defects.  This is a @dfn{alpha} release.  Some defects could
+be harmful.  No validation testing whatsoever has been performed by the @cite{OpenSS7 Project} on
+this software.  The software might fail to configure or compile on some systems.  The @cite{OpenSS7
+Project} recommends that you @b{do not use this software for purposes other than develoment or
+evaluation, and then only with great care}. Use at your own risk.  Remember that there is @b{NO
+WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public License}.}
+
+@b{This software is @i{alpha} software.  As such, it can likely crash your kernel.  Installation of
+the software can irreparably mangle your header files or Linux distribution in such a way as to make
+it unusable.  Crashes could lock your system and rebooting the system might not repair the problem.
+You can possibly loose all the data on your system.  Because this software can crash your kernel,
+the resulting unstable system could destroy computer hardware or peripherals making them ususable.
+You could void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
+
+@c This is the defect notice for beta release software
+@ignore
+@dfn{@value{PACKAGE_TITLE}} could contain unknown defects.  This is a @dfn{beta} release.  Some
+defects could be harmful.  Validation testing has been performed by the @cite{OpenSS7 Project} on
+this software for only a restricted set of systems.  The software might fail to configure or compile
+on other systems.  The @cite{OpenSS7 Project} recommends that you @b{do not use this software for
+purposes other than validation testing and evaluation, and then only with care}. Use at your own
+risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU
+General Public License}.}
+
+@b{This software is @i{beta} software.  As such, it might crash your kernel.  Installation of the
+software might mangle your header files or Linux distribution in such a way as to make it unusable.
+Crashes could lock your system and rebooting the system might not repair the problem.  You can
+possibly loose all the data on your system.  Because this software might crash your kernel, the
+resulting unstable system could possibly destroy computer hardware or peripherals making them
+ususable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
+WARNED.}
+@end ignore
+
+@c This is the defect notice for gammar release software
+@ignore
+@dfn{@value{PACKAGE_TITLE}} could possibly contain unknown defects.  This is a @dfn{gamma} release.
+Some remaining unknown defects could possibly be harmful.  Validation testing has been performed by
+the @cite{OpenSS7 Project} on this software for a set of systems and external validation testing has
+been performed on other systems.  Nevertheless, the software might still fail to configure or
+compile on other systems.  The @cite{OpenSS7 Project} recommends that you @b{validate this software
+for your target system with care before using this software}.  Use at your own risk.  Remember that
+there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public
+License}.}
+
+@b{This software is @i{gamma} software.  As such, it is quite stable but might still crash your
+kernel under some conditions.  Installation of the software on a non-validated distribution might
+mangle your header files or Linux distribution in such a way as to make it unusable.  Crashes could
+possibly lock your system and rebooting the system might not repair the problem.  You can possibly
+loose all the data on your system.  Because this software stands a chance of crashing your kernel,
+the resulting unstable system could possibly destroy computer hardware or peripherals making them
+ususable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
+WARNED.}
+@end ignore
+
+@c This is the defect notice for production release software
+@ignore
+@dfn{@value{PACKAGE_TITLE}} could possibly contain unknown defects.  This is a @dfn{production}
+release.  Nevertheless, some remaining unknown defects could possibly be harmful.  Validation
+testing has been performed by the @cite{OpenSS7 Project} and external entities on this software for
+the set of systems listed in the release notes.  Nevertheless, the software might still fail to
+configure or compile on other systems.  The @cite{OpenSS7 Project} recommends that you @b{validate
+this software for your target system before using this software}.  Use at your own risk.  Remember
+that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public
+License}.}
+
+@b{This software is @i{production} software.  As such, it is stable on validated systems but might
+still crash your kernel in unique circumstances.  Installation of the software on a non-validated
+distribution might mangle your header files or Linux distribution in such a way as to make it
+unusable.  Crashes could possibly lock your system and rebooting the system might not repair the
+problem.  You can possibly loose all the data on your system.  Because this software stands a chance
+of crashing your kernel, the resulting unstable system could possibly destroy computer hardware or
+peripherals making them ususable.  You might void the warranty on any system on which you run this
+software.  YOU HAVE BEEN WARNED.}
+@end ignore
+
+@node Known Defects
+@subsection Known Defects
+@cindex known bugs
+@cindex bugs, known
+
+With the exception of packages not originaly created by the @cite{OpenSS7 Project}, the
+@cite{OpenSS7 Project} software does not ship with known bugs in any release stage except
+@dfn{pre-alpha}.  @dfn{@value{PACKAGE_TITLE}} had no known bugs at the time of release.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

@@ -1,17 +1,9 @@
-OpenSS7 STREAMS INET Driver -- things to do.  2006-02-23
+OpenSS7 STREAMS INET Driver -- things to do.  2006-03-01
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
-See the end cor copying conditions.
+See the end for copying conditions (for this file).
 
 Things to do:
-
-- SMP Testing.
-
-  DONE: for HT at least.
-
-- 32bit compatibiltiy testing.
-
-  TODO
 
 - Pure STREAMS RAW and UDP implementation.  A higher performance RAW and
   UDP implementation supporting both TPI and NPI would be nice to have.
@@ -19,7 +11,15 @@ Things to do:
   primarily for use with RTP.  Also, it will be interesting to test the
   performance differences between STREAMS UDP and Sockets UDP.
 
-  TODO
+- 32bit compatibiltiy testing.
+
+- SMP Testing.
+
+  *done*
+  
+    What I did was to perform SMP testing for Intel Pentium IV 630 HT at
+    least.
+
 
 =========================================================================
 
@@ -71,3 +71,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: tw=72 nocindent

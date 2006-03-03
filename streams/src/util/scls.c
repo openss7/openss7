@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/02/20 10:59:30 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 10:57:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:30 $ by $Author: brian $
+ Last Modified $Date: 2006/03/03 10:57:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: scls.c,v $
+ Revision 0.9.2.20  2006/03/03 10:57:17  brian
+ - 32-bit compatibility support, updates for release
+
  Revision 0.9.2.19  2006/02/20 10:59:30  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/02/20 10:59:30 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 10:57:17 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/02/20 10:59:30 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 10:57:17 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -206,21 +209,21 @@ printit(struct sc_mlist *l, int cmd)
 	case CMN_LONG:
 		if (l->major != 0) {
 			fprintf(stdout, "\tdevice");
-			fprintf(stdout, "\t%u", l->major);
+			fprintf(stdout, "\t%ld", (long) l->major);
 		} else {
 			fprintf(stdout, "\tmodule");
 			fprintf(stdout, "\t-");
 		}
 		fprintf(stdout, "\t%u", l->mi.mi_idnum);
-		fprintf(stdout, "\t%d", l->mi.mi_minpsz);
-		fprintf(stdout, "\t%d", l->mi.mi_maxpsz);
-		fprintf(stdout, "\t%d", l->mi.mi_hiwat);
-		fprintf(stdout, "\t%d", l->mi.mi_lowat);
+		fprintf(stdout, "\t%ld", (long) l->mi.mi_minpsz);
+		fprintf(stdout, "\t%ld", (long) l->mi.mi_maxpsz);
+		fprintf(stdout, "\t%ld", (long) l->mi.mi_hiwat);
+		fprintf(stdout, "\t%ld", (long) l->mi.mi_lowat);
 	case CMN_COUNT:
-		fprintf(stdout, "\t%u", l->ms.ms_pcnt);
-		fprintf(stdout, "\t%u", l->ms.ms_scnt);
-		fprintf(stdout, "\t%u", l->ms.ms_ocnt);
-		fprintf(stdout, "\t%u", l->ms.ms_acnt);
+		fprintf(stdout, "\t%ld", (long) l->ms.ms_pcnt);
+		fprintf(stdout, "\t%ld", (long) l->ms.ms_scnt);
+		fprintf(stdout, "\t%ld", (long) l->ms.ms_ocnt);
+		fprintf(stdout, "\t%ld", (long) l->ms.ms_acnt);
 		fprintf(stdout, "\t%x", l->ms.ms_flags);
 	}
 	fprintf(stdout, "\n");
