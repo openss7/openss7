@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ldl.h,v 0.9.2.4 2006/03/03 11:27:48 brian Exp $
+ @(#) $Id: ldl.h,v 0.9.2.5 2006/03/04 04:34:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:27:48 $ by $Author: brian $
+ Last Modified $Date: 2006/03/04 04:34:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.h,v $
+ Revision 0.9.2.5  2006/03/04 04:34:29  brian
+ - corrections for FC4 x86_64 build
+
  Revision 0.9.2.4  2006/03/03 11:27:48  brian
  - 32/64-bit compatibility
 
@@ -57,7 +60,7 @@
 #ifndef SYS_LDL_H
 #define SYS_LDL_H
 
-#ident "@(#) $RCSfile: ldl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ldl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  Driver device numbering
@@ -271,8 +274,8 @@ typedef struct ldl_lstats_ioctl {	/* local statistics *//* per stream */
 
 #ifdef __LP64__
 struct ldl_flags_ioctl32 {
-	uint32_t flags;
-	uint32_t mask;
+	u_int32_t flags;
+	u_int32_t mask;
 };
 
 typedef struct ldl_gstats_ioctl32 {	/* global statistics *//* for entire driver */

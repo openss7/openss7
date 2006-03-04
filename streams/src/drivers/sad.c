@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/03 10:57:11 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/03/04 04:37:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
+ Last Modified $Date: 2006/03/04 04:37:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.c,v $
+ Revision 0.9.2.46  2006/03/04 04:37:34  brian
+ - corrections for FC4 x86_64 gcc 4.0.4 build
+
  Revision 0.9.2.45  2006/03/03 10:57:11  brian
  - 32-bit compatibility support, updates for release
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/03 10:57:11 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/03/04 04:37:34 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/03 10:57:11 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/03/04 04:37:34 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -95,7 +98,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/03 10:57:11 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/03/04 04:37:34 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -219,6 +222,8 @@ sad_put(queue_t *q, mblk_t *mp)
 	union ioctypes *ioc;
 	int err = 0, rval = 0, count = 0;
 	mblk_t *dp = mp->b_cont;
+	caddr_t sa_addr, sl_addr;
+	size_t sa_size, sl_size;
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
@@ -241,10 +246,6 @@ sad_put(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case M_IOCTL:
-	{
-		caddr_t sa_addr, sl_addr;
-		size_t sa_size, sl_size;
-
 		ioc = (typeof(ioc)) mp->b_rptr;
 #ifdef WITH_32BIT_CONVERSION
 		if (ioc->iocblk.ioc_flag == IOC_ILP32) {
@@ -314,12 +315,7 @@ sad_put(queue_t *q, mblk_t *mp)
 		}
 		err = -EINVAL;
 		goto nak;
-	}
 	case M_IOCDATA:
-	{
-		size_t sa_size = sizeof(struct strapush);
-		size_t sl_size = sizeof(struct str_list);
-
 		ioc = (typeof(ioc)) mp->b_rptr;
 		if (ioc->copyresp.cp_rval != (caddr_t) 0) {
 			sad->transparent = 0;
@@ -330,8 +326,12 @@ sad_put(queue_t *q, mblk_t *mp)
 		if (ioc->copyresp.cp_flag == IOC_ILP32) {
 			sa_size = sizeof(struct strapush32);
 			sl_size = sizeof(struct str_list32);
-		}
+		} else
 #endif
+		{
+			sa_size = sizeof(struct strapush);
+			sl_size = sizeof(struct str_list);
+		}
 		switch (ioc->copyresp.cp_cmd) {
 		case SAD_SAP:
 			switch (sad->iocstate) {
@@ -466,7 +466,6 @@ sad_put(queue_t *q, mblk_t *mp)
 			err = -EIO;
 			goto nak;
 		}
-	}
 	}
       abort:
 	freemsg(mp);

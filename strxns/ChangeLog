@@ -1,3 +1,8 @@
+2006-03-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ldl.c: corrections for FC4 x86_64 build
+	* src/include/sys/ldl.h: corrections for FC4 x86_64 build
+
 2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* THANKS: updated for release

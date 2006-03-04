@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/03/03 10:57:12 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/03/04 04:37:35 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 10:57:12 $ by $Author: brian $
+ Last Modified $Date: 2006/03/04 04:37:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.141  2006/03/04 04:37:35  brian
+ - corrections for FC4 x86_64 gcc 4.0.4 build
+
  Revision 0.9.2.140  2006/03/03 10:57:12  brian
  - 32-bit compatibility support, updates for release
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/03/03 10:57:12 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/03/04 04:37:35 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/03/03 10:57:12 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/03/04 04:37:35 $";
 
 //#define __NO_VERSION__
 
@@ -166,7 +169,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/03/03 10:57:12 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/03/04 04:37:35 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -5712,7 +5715,7 @@ sock_siocatmark(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC streams_fastcall __unlikely int
 sock_siocatmark32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	sock_siocatmark(file, sd, (unsigned long) compat_ptr(arg));
+	return sock_siocatmark(file, sd, (unsigned long) compat_ptr(arg));
 }
 #endif				/* WITH_32BIT_CONVERSION */
 
@@ -5803,7 +5806,7 @@ STATIC streams_fastcall __unlikely int
 file_fiogetown32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	/* XXX is (pid_t *) compatible? */
-	file_fiogetown(file, sd, (unsigned long) compat_ptr(arg));
+	return file_fiogetown(file, sd, (unsigned long) compat_ptr(arg));
 }
 #endif				/* WITH_32BIT_CONVERSION */
 
@@ -8720,7 +8723,6 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(FIOGETOWN):	/* pid_t * */
 			printd(("%s: got FIOGETOWN\n", __FUNCTION__));
 			return file_fiogetown32(file, sd, arg);	/* not compatible */
-			break;
 		case _IOC_NR(FIOSETOWN):	/* const pid_t * */
 			printd(("%s: got FIOSETOWN\n", __FUNCTION__));
 			return file_fiosetown32(file, sd, arg);	/* not compatible */
@@ -9313,7 +9315,7 @@ _strioctl_locked(struct inode *inode, struct file *file, unsigned int cmd, unsig
 #if defined HAVE_COMPAT_IOCTL
 
 /* Just about every 64-bit architecture has a 32-bit compatibility mode */
-STATIC __hot int
+STATIC __hot long
 _strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	file->f_flags |= FILP32;
@@ -10531,7 +10533,7 @@ sth_init(void)
 		goto no_strmod;
 	if (sth_modid == 0 && result >= 0)
 		sth_modid = result;
-#ifdef WITH_32BIT_CONVERSION
+#if defined WITH_32BIT_CONVERSION && !defined HAVE_COMPAT_IOCTL
 	streams_register_ioctl32_conversions();
 #endif
 	return (0);
@@ -10545,7 +10547,7 @@ STATIC
 void __exit
 sth_exit(void)
 {
-#ifdef WITH_32BIT_CONVERSION
+#if defined WITH_32BIT_CONVERSION && !defined HAVE_COMPAT_IOCTL
 	streams_unregister_ioctl32_conversions();
 #endif
 	unregister_strmod(&sth_fmod);
