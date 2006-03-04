@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/13 12:01:25 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:02 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:25 $ by $Author: brian $
+ Last Modified $Date: 2006/03/04 13:00:02 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: cd.c,v $
+ Revision 0.9.2.9  2006/03/04 13:00:02  brian
+ - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/13 12:01:25 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:02 $"
 
 static char const ident[] =
-    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/13 12:01:25 $";
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:02 $";
 
 #define EXPORT_SYMTAB
 
@@ -71,8 +76,8 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/13 12:01:25 $"
-#define HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
+#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:02 $"
+#define HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HDLC_LICENSE	"GPL"
@@ -148,7 +153,7 @@ struct cd {
 #define CD_DISCONNECTED		0x00000001	/* autonomous disconnect */
 
 #ifndef CD_UNINIT
-#define CD_UNINIT	(-1UL)
+#define CD_UNINIT	(-1)
 #endif
 
 /*
@@ -1055,20 +1060,20 @@ ch_detach_req(queue_t *q, struct cd *cd)
 #define HDLC_RX_TABLE_LENGTH	(2* HDLC_RX_STATES * 256)
 
 typedef struct tx_entry {
-	uint bit_string:10;		/* the output string */
-	uint bit_length:4;		/* length in excess of 8 bits of output string */
-	uint state:3;			/* new state */
-} tx_entry_t __attribute__ ((packed));
+	uint bit_string:10 __attribute__ ((packed));	/* the output string */
+	uint bit_length:4 __attribute__ ((packed));	/* length in excess of 8 bits of output string */
+	uint state:3 __attribute__ ((packed));	/* new state */
+} tx_entry_t;
 
 typedef struct rx_entry {
-	uint bit_string:16;
-	uint bit_length:4;
-	uint state:4;
-	uint sync:1;
-	uint hunt:1;
-	uint flag:1;
-	uint idle:1;
-} rx_entry_t __attribute__ ((packed));
+	uint bit_string:16 __attribute__ ((packed));
+	uint bit_length:4 __attribute__ ((packed));
+	uint state:4 __attribute__ ((packed));
+	uint sync:1 __attribute__ ((packed));
+	uint hunt:1 __attribute__ ((packed));
+	uint flag:1 __attribute__ ((packed));
+	uint idle:1 __attribute__ ((packed));
+} rx_entry_t;
 
 typedef uint16_t bc_entry_t;
 

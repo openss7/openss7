@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/03 12:06:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/03/04 12:38:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/03 12:06:07 $ by $Author: brian $
+# Last Modified $Date: 2006/03/04 12:38:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -300,7 +300,7 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 #				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h
-libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) -I$(srcdir)/src/modules
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
@@ -564,7 +564,7 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 #				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h
-libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) -I$(srcdir)/src/modules
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
@@ -999,10 +999,18 @@ UNINSTALL_HOOK += uninstall-inet-devices
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 ##
 EXPORT_SRCFILES			=
+if PUBLIC_RELEASE
+else
+EXPORT_SRCFILES			+= src/modules/cd/cd.c
+endif
 
 EXPORT_VERFILES			=
+if PUBLIC_RELEASE
+else
+EXPORT_VERFILES			+= $(PKGINCL)/versions/cd.ver
+endif
 
-GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) -I$(srcdir)/src/modules
 
 ##
 ## Rules for generating versioned kernel symbols

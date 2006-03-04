@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:34 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:15 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:34 $ by $Author: brian $
+ Last Modified $Date: 2006/03/04 13:00:15 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: mtp_npi.c,v $
+ Revision 0.9.2.13  2006/03/04 13:00:15  brian
+ - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:34 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:15 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:34 $";
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:15 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message
@@ -72,8 +77,8 @@ static char const ident[] =
 #include <sys/npi_mtp.h>
 
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:34 $"
-#define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:15 $"
+#define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_NPI_LICENSE		"GPL"
@@ -354,7 +359,7 @@ n_conn_ind(queue_t *q, struct mtp *mtp, ulong seq, ulong flags, struct mtp_addr 
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_CONN_IND;
 	p->SRC_length = src_len;
 	p->SRC_offset = src_len ? sizeof(*p) : 0;
@@ -404,7 +409,7 @@ n_conn_con(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_addr *res,
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_CONN_CON;
 	p->RES_length = res_len;
 	p->RES_offset = res_len ? sizeof(*p) : 0;
@@ -449,7 +454,7 @@ n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq,
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_DISCON_IND;
 	p->DISCON_orig = orig;
 	p->DISCON_reason = reason;
@@ -486,7 +491,7 @@ n_data_ind(queue_t *q, struct mtp *mtp, ulong flags, mblk_t *dp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_DATA_IND;
 	p->DATA_xfer_flags = flags;
 	mp->b_cont = dp;
@@ -515,7 +520,7 @@ n_exdata_ind(queue_t *q, struct mtp *mtp, mblk_t *dp)
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 1;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_EXDATA_IND;
 	mp->b_cont = dp;
 	printd(("%s: %p: <- N_EXDATA_IND\n", MOD_NAME, mtp));
@@ -563,7 +568,7 @@ n_info_ack(queue_t *q, struct mtp *mtp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	*p = mtp->prot;
 	p->ADDR_size = sizeof(struct mtp_addr);
 	p->ADDR_length = src_len + dst_len;
@@ -583,13 +588,13 @@ n_info_ack(queue_t *q, struct mtp *mtp)
 		mp->b_wptr += sizeof(mtp->dst);
 	}
 	if (qos_len) {
-		qos = ((typeof(qos)) mp->b_wptr)++;
+		qos = (typeof(qos)) mp->b_wptr++;
 		qos->n_qos_type = N_QOS_SEL_INFO_MTP;
 		qos->pvar = mtp->options.pvar;
 		qos->popt = mtp->options.popt;
 	}
 	if (qor_len) {
-		qor = ((typeof(qor)) mp->b_wptr)++;
+		qor = (typeof(qor)) mp->b_wptr++;
 		qor->n_qos_type = N_QOS_RANGE_INFO_MTP;
 		qor->sls_range = mtp->options.sls_mask;
 		qor->mp_range = (mtp->options.popt & SS7_POPT_MPLEV) ? 3 : 0;
@@ -619,7 +624,7 @@ n_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 	if (!(mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_BIND_ACK;
 	p->ADDR_length = add_len;
 	p->ADDR_offset = add_len ? sizeof(*p) : 0;
@@ -675,7 +680,7 @@ n_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long etype)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_ERROR_ACK;
 	p->ERROR_prim = prim;
 	p->NPI_error = etype < 0 ? NSYSERR : etype;
@@ -710,7 +715,7 @@ n_ok_ack(queue_t *q, struct mtp *mtp, ulong prim)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_OK_ACK;
 	p->CORRECT_prim = prim;
 	switch (mtp_get_state(mtp)) {
@@ -771,7 +776,7 @@ n_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_add
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_UNITDATA_IND;
 	p->SRC_length = src_len;
 	p->SRC_offset = src_len ? sizeof(*p) : 0;
@@ -812,7 +817,7 @@ n_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, mblk_t *dp, ulo
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_UDERROR_IND;
 	p->DEST_length = dst_len;
 	p->DEST_offset = dst_len ? sizeof(*p) : 0;
@@ -847,7 +852,7 @@ n_datack_ind(queue_t *q, struct mtp *mtp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_DATACK_IND;
 	printd(("%s: %p: <- N_DATACK_IND\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
@@ -874,7 +879,7 @@ n_reset_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_RESET_IND;
 	p->RESET_orig = orig;
 	p->RESET_reason = reason;
@@ -903,7 +908,7 @@ n_reset_con(queue_t *q, struct mtp *mtp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_RESET_CON;
 	printd(("%s: %p: <- N_RESET_CON\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
@@ -1942,8 +1947,8 @@ mtp_info_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		break;
 	case M_CLMS:
 		mtp->prot.SERV_type = N_CLNS;
-		mtp->prot.CDATA_size = -2UL;
-		mtp->prot.DDATA_size = -2UL;
+		mtp->prot.CDATA_size = -2;
+		mtp->prot.DDATA_size = -2;
 		break;
 	default:
 		swerr();
@@ -2629,13 +2634,13 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp)
 		*mtpp = mtp_get(mtp);
 		printd(("%s: linked module private structure\n", MOD_NAME));
 		mtp->prot.PRIM_type = N_INFO_ACK;
-		mtp->prot.NSDU_size = -1UL;
-		mtp->prot.ENSDU_size = -2UL;
-		mtp->prot.CDATA_size = -2UL;
-		mtp->prot.DDATA_size = -2UL;
+		mtp->prot.NSDU_size = -1;
+		mtp->prot.ENSDU_size = -2;
+		mtp->prot.CDATA_size = -2;
+		mtp->prot.DDATA_size = -2;
 		mtp->prot.ADDR_size = sizeof(struct mtp_addr);
 		mtp->prot.OPTIONS_flags = 0;
-		mtp->prot.NIDU_size = -1UL;
+		mtp->prot.NIDU_size = -1;
 		mtp->prot.SERV_type = N_CLNS;
 		mtp->prot.CURRENT_state = NS_UNBND;
 		mtp->prot.PROVIDER_type = N_SNICFP;

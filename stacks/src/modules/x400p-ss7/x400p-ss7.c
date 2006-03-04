@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/01/04 08:04:52 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/04 13:00:31 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -41,14 +40,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/01/04 08:04:52 $ by $Author: brian $
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/03/04 13:00:31 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: x400p-ss7.c,v $
+ Revision 0.9.2.19  2006/03/04 13:00:31  brian
+ - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/01/04 08:04:52 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/04 13:00:31 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/01/04 08:04:52 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/04 13:00:31 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -88,7 +98,7 @@ static char const ident[] =
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2006/01/04 08:04:52 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2006/03/04 13:00:31 $"
 #define X400P_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -422,11 +432,10 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 STATIC int __devinit xp_probe(struct pci_dev *, const struct pci_device_id *);
 STATIC void __devexit xp_remove(struct pci_dev *);
 #ifdef CONFIG_PM
-#ifdef HAVE_KTYPE_PM_MESSAGE_T
-STATIC int xp_suspend(struct pci_dev *pdev, pm_message_t state);
-#else
-STATIC int xp_suspend(struct pci_dev *pdev, u32 state);
+#ifndef HAVE_KTYPE_PM_MESSAGE_T
+typedef u32 pm_message_t;
 #endif
+STATIC int xp_suspend(struct pci_dev *pdev, pm_message_t state);
 STATIC int xp_resume(struct pci_dev *pdev);
 #endif
 
@@ -3202,8 +3211,9 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		}
 		cd->frame += 8;
 		cd->xlb[CTLREG] = (INTENA | E1DIV);
+		return (irqreturn_t)(IRQ_HANDLED);
 	}
-	return (irqreturn_t)(IRQ_HANDLED);
+	return (irqreturn_t)(IRQ_NONE);
 }
 
 /*
@@ -3342,8 +3352,9 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		}
 		cd->frame += 8;
 		cd->xlb[CTLREG] = (INTENA);
+		return (irqreturn_t)(IRQ_HANDLED);
 	}
-	return (irqreturn_t)(IRQ_HANDLED);
+	return (irqreturn_t)(IRQ_NONE);
 }
 
 /*
@@ -4577,21 +4588,12 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
  *  X400P-SS7 Suspend
  *  -----------------------------------
  */
-#ifdef HAVE_KTYPE_PM_MESSAGE_T
 STATIC int
 xp_suspend(struct pci_dev *pdev, pm_message_t state)
 {
 	fixme(("Write a suspend routine.\n"));
 	return 0;
 }
-#else
-STATIC int
-xp_suspend(struct pci_dev *pdev, u32 state)
-{
-	fixme(("Write a suspend routine.\n"));
-	return 0;
-}
-#endif
 
 /*
  *  X400P-SS7 Resume

@@ -1,11 +1,11 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:29 $
+ @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/04 13:00:36 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -14,47 +14,65 @@
  This software and related documentation is protected by copyright and
  distributed under licenses restricting its use, copying, distribution and
  decompilation.  No part of this software or related documentation may be
- reproduced in any form by any means without the prior written
- authorization of the copyright holder, and licensors, if any.
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- The recipient of this document, by its retention and use, warrants that
- the recipient will protect this information and keep it confidential, and
- will not disclose the information contained in this document without the
- written permission of its owner.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
 
- The author reserves the right to revise this software and documentation
- for any reason, including but not limited to, conformity with standards
- promulgated by various agencies, utilization of advances in the state of
- the technical arts, or the reflection of changes in the design of any
- techniques, or procedures embodied, described, or referred to herein.
- The author is under no obligation to provide any feature listed herein.
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
  behalf of the U.S. Government ("Government"), the following provisions apply
- to you.  If the Software is supplied by the Department of Defense ("DoD"),
- it is classified as "Commercial Computer Software" under paragraph
- 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations
- ("DFARS") (or any successor regulations) and the Government is acquiring
- only the license rights granted herein (the license rights customarily
- provided to non-Government users).  If the Software is supplied to any unit
- or agency of the Government other than DoD, it is classified as "Restricted
- Computer Software" and the Government's rights in the Software are defined
- in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
- any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86
- of the NASA Supplement to the FAR (or any successor regulations).
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:29 $ by <bidulock@openss7.org>
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/03/04 13:00:36 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: test-q784.c,v $
+ Revision 0.9.2.6  2006/03/04 13:00:36  brian
+ - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:29 $"
+#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/04 13:00:36 $"
 
 static char const ident[] =
-    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:29 $";
+    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/04 13:00:36 $";
 
 /* 
  *  This is a ferry-clip Q.784 conformance test program for testing the
@@ -979,7 +997,7 @@ send(int msg)
 	int i;
 	char cbuf[BUFSIZE];
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
-	struct strbuf data = { sizeof(*pt_dat), 0, pt_dat };
+	struct strbuf data = { sizeof(*pt_dat), 0, (char *)pt_dat };
 	union MTP_primitives *m = (typeof(m)) cbuf;
 	unsigned char *d = pt_dat;
 	unsigned char *p = pt_dat;
@@ -1719,7 +1737,7 @@ send(int msg)
 	ctrl.maxlen = BUFSIZE;
 	ctrl.buf = cbuf;
 	data.maxlen = BUFSIZE;
-	data.buf = pt_dat;
+	data.buf = (char *)pt_dat;
 	if (putmsg(pt_fd, ctrl.len ? &ctrl : NULL, data.len ? &data : NULL, 0) < 0) {
 		if (errno == EAGAIN || errno == EINTR)
 			return FAILURE;
@@ -3223,7 +3241,7 @@ pt_decode_data(struct strbuf data)
 	int ret;
 	ulong mt;
 	ulong x, y;
-	unsigned char *d = data.buf, *p = data.buf, *e = data.buf + data.len;
+	unsigned char *d = (unsigned char *)data.buf, *p = (unsigned char *)data.buf, *e = (unsigned char *)data.buf + data.len;
 	x = *d++;
 	y = *d++;
 	imsg.cic = x | (y << 8);
@@ -6018,8 +6036,8 @@ wait_event(int wait, int source)
 			// FFLUSH(stdout);
 			if (pfd[4].revents) {
 				int flags = 0;
-				struct strbuf ctrl = { BUFSIZE, 0, iut_ctl };
-				struct strbuf data = { BUFSIZE, 0, iut_dat };
+				struct strbuf ctrl = { BUFSIZE, 0, (char *)iut_ctl };
+				struct strbuf data = { BUFSIZE, 0, (char *)iut_dat };
 				// printf("getmsg from iut_mgm:\n");
 				// FFLUSH(stdout);
 				if (getmsg(iut_mnt_fd, &ctrl, &data, &flags) == 0) {
@@ -6040,8 +6058,8 @@ wait_event(int wait, int source)
 			// FFLUSH(stdout);
 			if (pfd[3].revents) {
 				int flags = 0;
-				struct strbuf ctrl = { BUFSIZE, 0, iut_ctl };
-				struct strbuf data = { BUFSIZE, 0, iut_dat };
+				struct strbuf ctrl = { BUFSIZE, 0, (char *)iut_ctl };
+				struct strbuf data = { BUFSIZE, 0, (char *)iut_dat };
 				// printf("getmsg from iut_mgm:\n");
 				// FFLUSH(stdout);
 				if (getmsg(iut_mgm_fd, &ctrl, &data, &flags) == 0) {
@@ -6062,8 +6080,8 @@ wait_event(int wait, int source)
 			// FFLUSH(stdout);
 			if (pfd[2].revents) {
 				int flags = 0;
-				struct strbuf ctrl = { BUFSIZE, 0, iut_ctl };
-				struct strbuf data = { BUFSIZE, 0, iut_dat };
+				struct strbuf ctrl = { BUFSIZE, 0, (char *)iut_ctl };
+				struct strbuf data = { BUFSIZE, 0, (char *)iut_dat };
 				// printf("getmsg from iut_mgm:\n");
 				// FFLUSH(stdout);
 				if (getmsg(iut_tst_fd, &ctrl, &data, &flags) == 0) {
@@ -6082,8 +6100,8 @@ wait_event(int wait, int source)
 			}
 			if (pfd[1].revents) {
 				int flags = 0;
-				struct strbuf ctrl = { BUFSIZE, 0, iut_ctl };
-				struct strbuf data = { BUFSIZE, 0, iut_dat };
+				struct strbuf ctrl = { BUFSIZE, 0, (char *)iut_ctl };
+				struct strbuf data = { BUFSIZE, 0, (char *)iut_dat };
 				// printf("getmsg from iut:\n");
 				// FFLUSH(stdout);
 				if (getmsg(iut_cpc_fd, &ctrl, &data, &flags) == 0) {
@@ -6102,8 +6120,8 @@ wait_event(int wait, int source)
 			}
 			if (pfd[0].revents) {
 				int flags = 0;
-				struct strbuf ctrl = { BUFSIZE, 0, pt_ctl };
-				struct strbuf data = { BUFSIZE, 0, pt_dat };
+				struct strbuf ctrl = { BUFSIZE, 0, (char *)pt_ctl };
+				struct strbuf data = { BUFSIZE, 0, (char *)pt_dat };
 				// printf("getmsg from pt:\n");
 				// FFLUSH(stdout);
 				if (getmsg(pt_fd, &ctrl, &data, &flags) == 0) {
@@ -15951,15 +15969,12 @@ copying(int argc, char *argvp[])
 	fprintf(stdout, "\
 Q.784 ISUP Basic Call Test Specification - Conformance Test Program\n\
 \n\
-Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
-Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>\n\
-\n\
 All Rights Reserved.\n\
 \n\
 Unauthorized distribution or duplication is prohibited.\n\
 \n\
 This software and related documentation is protected by copyright and distribut-\n\
-ed under licenses restricting its use,  copying, distribution and decompliation.\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
 No part of this software or related documentation may  be reproduced in any form\n\
 by any means without the prior  written  authorization of the  copyright holder,\n\
 and licensors, if any.\n\
@@ -15971,10 +15986,14 @@ sion of its owner.\n\
 \n\
 The author reserves the right to revise  this software and documentation for any\n\
 reason,  including but not limited to, conformity with standards  promulgated by\n\
-various agencies, utilization of advances in the state of  the technical ars, or\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
 the reflection of changes  in the design of any techniques, or procedures embod-\n\
 ied, described, or  referred to herein.   The author  is under no  obligation to\n\
 provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -15985,10 +16004,11 @@ regulations) and the  Government  is acquiring  only the license rights  granted
 herein (the license  rights customarily  provided to non-Government  users).  If\n\
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
-rights in the Software are defined in paragraph 52.227-19 of the Federal Acquis-\n\
-ition Regulations (\"FAR\") (or any successor regulations) or, in the cases of NASA,\n\
-in paragraph  18.52.227-86 of the NASA  Supplement  to the FAR (or any successor\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
+\n\
 ");
 	FFLUSH(stdout);
 }
@@ -16001,7 +16021,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

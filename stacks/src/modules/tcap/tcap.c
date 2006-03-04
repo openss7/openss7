@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:43 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:19 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:43 $ by $Author: brian $
+ Last Modified $Date: 2006/03/04 13:00:19 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tcap.c,v $
+ Revision 0.9.2.14  2006/03/04 13:00:19  brian
+ - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:43 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:19 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:43 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:19 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -64,6 +69,7 @@ static char const ident[] =
  */
 
 #include <sys/os7/compat.h>
+#include <linux/socket.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -94,8 +100,8 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:43 $"
-#define TCAP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:19 $"
+#define TCAP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCAP_LICENSE	"GPL"

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:25 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:03 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:25 $ by $Author: brian $
+ Last Modified $Date: 2006/03/04 13:00:03 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: dl_lapd.c,v $
+ Revision 0.9.2.14  2006/03/04 13:00:03  brian
+ - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:25 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:03 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:25 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:03 $";
 
 #include <sys/os7/compat.h>
 
@@ -68,8 +73,8 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:25 $"
-#define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved."
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:03 $"
+#define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LAPD_LICENSE		"GPL"
@@ -1301,7 +1306,7 @@ dl_connect_ind(queue_t *q, struct dl *dl, mblk_t *cp, size_t cda_len, caddr_t cd
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_CONNECT_IND;
-		p->dl_correlation = (typeof(p->dl_correlation)) cp;
+		p->dl_correlation = (typeof(p->dl_correlation)) (long) cp;
 		p->dl_called_addr_length = cda_len;
 		p->dl_called_addr_offset = cda_len ? sizeof(*p) : 0;
 		p->dl_calling_addr_length = cga_len;
@@ -4464,7 +4469,7 @@ dl_connect_res(queue_t *q, mblk_t *mp)
 	}
 	if (!p->dl_correlation)
 		goto badcorr;
-	for (cp = dl->conq.q_head; cp && (p->dl_correlation != (typeof(p->dl_correlation)) cp);
+	for (cp = dl->conq.q_head; cp && ((uint32_t) p->dl_correlation != (uint32_t) (typeof(p->dl_correlation)) (long) cp);
 	     cp = cp->b_next) ;
 	if (!cp)
 		goto badcorr;
@@ -4520,7 +4525,7 @@ dl_disconnect_req(queue_t *q, mblk_t *mp)
 		if (!p->dl_correlation)
 			goto badcorr;
 		for (cp = dl->conq.q_head;
-		     cp && (p->dl_correlation != (typeof(p->dl_correlation)) cp); cp = cp->b_next) ;
+		     cp && ((uint32_t) p->dl_correlation != (uint32_t) (typeof(p->dl_correlation)) (long) cp); cp = cp->b_next) ;
 		if (!cp)
 			goto badcorr;
 		dl_set_state(dl, DL_DISCON9_PENDING);

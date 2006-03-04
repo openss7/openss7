@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:28 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:28 $ by $Author: brian $
+ Last Modified $Date: 2006/03/04 13:00:05 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: isdn.c,v $
+ Revision 0.9.2.15  2006/03/04 13:00:05  brian
+ - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:28 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:05 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:28 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:05 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -73,8 +78,8 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:28 $"
-#define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:05 $"
+#define ISDN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISDN_LICENSE	"GPL"
@@ -1960,7 +1965,7 @@ cc_info_ack(queue_t *q, struct cc *cc)
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->cc_primitive = CC_INFO_ACK;
 		fixme(("Fill out more of the message\n"));
 		printd(("%s: %p: <- CC_INFO_ACK\n", DRV_NAME, cc));
@@ -1985,7 +1990,7 @@ cc_bind_ack(queue_t *q, struct cc *cc, unsigned char *add_ptr, size_t add_len, u
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->cc_primitive = CC_BIND_ACK;
 		p->cc_addr_length = add_len;
 		p->cc_addr_offset = add_len ? sizeof(*p) : 0;
@@ -2017,7 +2022,7 @@ cc_optmgmt_ack(queue_t *q, struct cc *cc, unsigned char *opt_ptr, size_t opt_len
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->cc_call_ref = cref;
 		p->cc_opt_length = opt_len;
 		p->cc_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -2048,7 +2053,7 @@ cc_addr_ack(queue_t *q, struct cc *cc, unsigned char *bind_ptr, size_t bind_len,
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p) + bind_len + conn_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->cc_primitive = CC_ADDR_ACK;
 		p->cc_bind_length = bind_len;
 		p->cc_bind_offset = bind_len ? sizeof(*p) : 0;
@@ -2084,7 +2089,7 @@ cc_ok_ack(queue_t *q, struct cc *cc, long prim)
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->cc_primitive = CC_OK_ACK;
 		p->cc_correct_prim = prim;
 		p->cc_state = cc->state;
@@ -2109,7 +2114,7 @@ cc_error_ack(queue_t *q, struct cc *cc, ulong prim, long error)
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->cc_primitive = CC_ERROR_ACK;
 		p->cc_error_primitive = prim;
 		p->cc_error_type = error < 0 ? CCSYSERR : error;
@@ -2145,7 +2150,7 @@ cc_setup_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t add_len = 0;	/* FIXME: get from message later */
 		if ((mp = ss7_allocb(q, sizeof(*p) + num_len + opt_len + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_SETUP_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_call_type = type;
@@ -2196,13 +2201,13 @@ cc_setup_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t add_len = sizeof(*a);
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_SETUP_CON;
 			p->cc_user_ref = cr->uref;
 			p->cc_call_ref = cr->cref;
 			p->cc_addr_length = add_len;
 			p->cc_addr_offset = add_len ? sizeof(*p) : 0;
-			a = ((typeof(a)) mp->b_wptr)++;
+			a = (typeof(a)) mp->b_wptr++;
 			a->scope = ISDN_SCOPE_CH;
 			a->id = cr->ch.list->id;
 			a->ci = cr->ch.list->ci;
@@ -2236,7 +2241,7 @@ cc_more_info_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		struct CC_more_info_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_MORE_INFO_IND;
 			p->cc_user_ref = cr->uref;
 			p->cc_opt_length = opt_len;
@@ -2286,7 +2291,7 @@ cc_information_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + sub_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_INFORMATION_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_subn_length = sub_len;
@@ -2328,7 +2333,7 @@ cc_info_timeout_ind(queue_t *q, struct cr *cr)
 		struct CC_info_timeout_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_INFO_TIMEOUT_IND;
 			p->cc_call_ref = cr->cref;
 			printd(("%s: %p: <- CC_INFO_TIMEOUT_IND\n", DRV_NAME, cc));
@@ -2358,7 +2363,7 @@ cc_error_ind(queue_t *q, struct cr *cr)
 		struct CC_error_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_ERROR_IND;
 			p->cc_call_ref = cr->cref;
 			printd(("%s: %p: <- CC_ERROR_IND\n", DRV_NAME, cc));
@@ -2391,7 +2396,7 @@ cc_proceeding_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_PROCEEDING_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_flags = flags;
@@ -2431,7 +2436,7 @@ cc_alerting_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_ALERTING_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_flags = flags;
@@ -2472,7 +2477,7 @@ cc_progress_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_PROGRESS_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_event = event;
@@ -2513,7 +2518,7 @@ cc_disconnect_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_DISCONNECT_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_cause = cause;
@@ -2553,7 +2558,7 @@ cc_connect_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_CONNECT_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_flags = flags;
@@ -2591,7 +2596,7 @@ cc_setup_complete_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_SETUP_COMPLETE_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_opt_length = opt_len;
@@ -2627,7 +2632,7 @@ cc_notify_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		struct CC_notify_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_NOTIFY_IND;
 			printd(("%s: %p: <- CC_NOTIFY_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
@@ -2658,7 +2663,7 @@ cc_suspend_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_SUSPEND_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_flags = flags;
@@ -2697,7 +2702,7 @@ cc_suspend_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_SUSPEND_CON;
 			p->cc_call_ref = cr->cref;
 			p->cc_opt_length = opt_len;
@@ -2735,7 +2740,7 @@ cc_suspend_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_SUSPEND_REJECT_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_cause = cause;
@@ -2775,7 +2780,7 @@ cc_resume_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_RESUME_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_flags = flags;
@@ -2814,7 +2819,7 @@ cc_resume_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_RESUME_CON;
 			p->cc_call_ref = cr->cref;
 			p->cc_opt_length = opt_len;
@@ -2852,7 +2857,7 @@ cc_resume_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_RESUME_REJECT_IND;
 			p->cc_call_ref = cr->cref;
 			p->cc_cause = cause;
@@ -2892,7 +2897,7 @@ cc_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_REJECT_IND;
 			p->cc_user_ref = cr->uref;
 			p->cc_cause = cause;
@@ -2933,7 +2938,7 @@ cc_release_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_RELEASE_IND;
 			p->cc_user_ref = cr->uref;
 			p->cc_call_ref = cr->cref;
@@ -2973,7 +2978,7 @@ cc_release_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		size_t opt_len = m ? m->opt.len : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_RELEASE_CON;
 			p->cc_user_ref = cr->uref;
 			p->cc_call_ref = cr->cref;
@@ -3009,7 +3014,7 @@ cc_restart_con(queue_t *q, struct cr *cr)
 		struct CC_restart_con *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_RESTART_CON;
 			printd(("%s: %p: <- CC_RESTART_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
@@ -3038,7 +3043,7 @@ cc_status_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		struct CC_status_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_STATUS_IND;
 			printd(("%s: %p: <- CC_STATUS_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
@@ -3066,7 +3071,7 @@ cc_datalink_failure_ind(queue_t *q, struct cr *cr)
 		struct CC_datalink_failure_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->cc_primitive = CC_DATALINK_FAILURE_IND;
 			p->cc_user_ref = cr->uref;
 			p->cc_call_ref = cr->cref;
@@ -3120,7 +3125,7 @@ dl_info_req(queue_t *q, struct dl *dl)
 	ensure(dl->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->dl_primitive = DL_INFO_REQ;
 		printd(("%s: %p: DL_INFO_REQ ->\n", DRV_NAME, dl));
 		ss7_oput(dl->oq, mp);
@@ -3144,7 +3149,7 @@ dl_attach_req(queue_t *q, struct dl *dl, ulong ppa)
 		dl_attach_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_ATTACH_REQ;
 			p->dl_ppa = ppa;
 			printd(("%s: %p: DL_ATTACH_REQ ->\n", DRV_NAME, dl));
@@ -3173,7 +3178,7 @@ dl_detach_req(queue_t *q, struct dl *dl)
 		dl_detach_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_DETACH_REQ;
 			printd(("%s: %p: DL_DETACH_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_DETACH_PENDING);
@@ -3201,7 +3206,7 @@ dl_bind_req(queue_t *q, struct dl *dl, ulong sap)
 		dl_bind_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_BIND_REQ;
 			p->dl_sap = sap;
 			p->dl_max_conind = 0;
@@ -3234,7 +3239,7 @@ dl_unbind_req(queue_t *q, struct dl *dl)
 		dl_unbind_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_UNBIND_REQ;
 			printd(("%s: %p: DL_UNBIND_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_UNBIND_PENDING);
@@ -3262,7 +3267,7 @@ dl_subs_bind_req(queue_t *q, struct dl *dl, caddr_t sap_ptr, size_t sap_len)
 		dl_subs_bind_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + sap_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_SUBS_BIND_REQ;
 			p->dl_subs_sap_offset = sap_len ? sizeof(*p) : 0;
 			p->dl_subs_sap_length = sap_len;
@@ -3297,7 +3302,7 @@ dl_subs_unbind_req(queue_t *q, struct dl *dl, caddr_t sap_ptr, size_t sap_len)
 		dl_subs_unbind_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + sap_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_SUBS_UNBIND_REQ;
 			p->dl_subs_sap_offset = sap_len ? sizeof(*p) : 0;
 			p->dl_subs_sap_length = sap_len;
@@ -3331,7 +3336,7 @@ dl_enabmulti_req(queue_t *q, struct dl *dl, caddr_t add_ptr, size_t add_len)
 		dl_enabmulti_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_ENABMULTI_REQ;
 			p->dl_addr_length = add_len;
 			p->dl_addr_offset = add_len ? sizeof(*p) : 0;
@@ -3364,7 +3369,7 @@ dl_disabmulti_req(queue_t *q, struct dl *dl, caddr_t add_ptr, size_t add_len)
 		dl_disabmulti_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_DISABMULTI_REQ;
 			p->dl_addr_length = add_len;
 			p->dl_addr_offset = add_len ? sizeof(*p) : 0;
@@ -3397,7 +3402,7 @@ dl_promiscon_req(queue_t *q, struct dl *dl, ulong level)
 		dl_promiscon_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_PROMISCON_REQ;
 			p->dl_level = level;
 			printd(("%s: %p: DL_PROMISCON_REQ ->\n", DRV_NAME, dl));
@@ -3425,7 +3430,7 @@ dl_promiscoff_req(queue_t *q, struct dl *dl, ulong level)
 		dl_promiscoff_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_PROMISCOFF_REQ;
 			p->dl_level = level;
 			printd(("%s: %p: DL_PROMISCOFF_REQ ->\n", DRV_NAME, dl));
@@ -3457,7 +3462,7 @@ dl_connect_req(queue_t *q, struct dl *dl)
 		size_t qos_len = 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + qos_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_CONNECT_REQ;
 			p->dl_dest_addr_length = dst_len;
 			p->dl_dest_addr_offset = dst_len ? sizeof(*p) : 0;
@@ -3498,7 +3503,7 @@ dl_connect_res(queue_t *q, struct dl *dl, ulong cor, ulong tok, caddr_t qos_ptr,
 		dl_connect_res_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_CONNECT_RES;
 			p->dl_correlation = cor;
 			p->dl_resp_token = tok;
@@ -3534,7 +3539,7 @@ dl_token_req(queue_t *q, struct dl *dl)
 	ensure(dl->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->dl_primitive = DL_TOKEN_REQ;
 		printd(("%s: %p: DL_TOKEN_REQ ->\n", DRV_NAME, dl));
 		ss7_oput(dl->oq, mp);
@@ -3558,7 +3563,7 @@ dl_disconnect_req(queue_t *q, struct dl *dl, ulong reason, ulong cor)
 		dl_disconnect_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_DISCONNECT_REQ;
 			p->dl_reason = reason;
 			p->dl_correlation = cor;
@@ -3604,7 +3609,7 @@ dl_reset_req(queue_t *q, struct dl *dl)
 		dl_reset_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_RESET_REQ;
 			printd(("%s: %p: DL_RESET_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_USER_RESET_PENDING);
@@ -3632,7 +3637,7 @@ dl_reset_res(queue_t *q, struct dl *dl)
 		dl_reset_res_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_RESET_RES;
 			printd(("%s: %p: DL_RESET_RES ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_RESET_RES_PENDING);
@@ -3661,7 +3666,7 @@ dl_unitdata_req(queue_t *q, struct dl *dl, caddr_t dst_ptr, size_t dst_len, ulon
 		dl_unitdata_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_UNITDATA_REQ;
 			p->dl_dest_addr_length = dst_len;
 			p->dl_dest_addr_offset = dst_len ? sizeof(*p) : 0;
@@ -3697,7 +3702,7 @@ dl_udqos_req(queue_t *q, struct dl *dl, caddr_t qos_ptr, size_t qos_len)
 		dl_udqos_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_UDQOS_REQ;
 			p->dl_qos_length = qos_len;
 			p->dl_qos_offset = qos_len ? sizeof(*p) : 0;
@@ -3731,7 +3736,7 @@ dl_test_req(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_l
 		dl_test_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_TEST_REQ;
 			p->dl_flag = flag;
 			p->dl_dest_addr_length = dst_len;
@@ -3766,7 +3771,7 @@ dl_test_res(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_l
 		dl_test_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_TEST_RES;
 			p->dl_flag = flag;
 			p->dl_dest_addr_length = dst_len;
@@ -3801,7 +3806,7 @@ dl_xid_req(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_le
 		dl_xid_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_XID_REQ;
 			p->dl_flag = flag;
 			p->dl_dest_addr_length = dst_len;
@@ -3836,7 +3841,7 @@ dl_xid_res(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_le
 		dl_xid_res_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_XID_RES;
 			p->dl_flag = flag;
 			p->dl_dest_addr_length = dst_len;
@@ -3872,7 +3877,7 @@ dl_data_ack_req(queue_t *q, struct dl *dl, ulong cor, caddr_t dst_ptr, size_t ds
 		dl_data_ack_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_DATA_ACK_REQ;
 			p->dl_correlation = cor;
 			p->dl_dest_addr_length = dst_len;
@@ -3916,7 +3921,7 @@ dl_reply_req(queue_t *q, struct dl *dl, ulong cor, caddr_t dst_ptr, size_t dst_l
 		dl_reply_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_REPLY_REQ;
 			p->dl_correlation = cor;
 			p->dl_dest_addr_length = dst_len;
@@ -3960,7 +3965,7 @@ dl_reply_update_req(queue_t *q, struct dl *dl, ulong cor, caddr_t src_ptr, size_
 		dl_reply_update_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + src_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_REPLY_UPDATE_REQ;
 			p->dl_correlation = cor;
 			p->dl_src_addr_length = src_len;
@@ -3995,7 +4000,7 @@ dl_phys_addr_req(queue_t *q, struct dl *dl, ulong type)
 		dl_phys_addr_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_PHYS_ADDR_REQ;
 			p->dl_addr_type = type;
 			printd(("%s: %p: DL_PHYS_ADDR_REQ ->\n", DRV_NAME, dl));
@@ -4023,7 +4028,7 @@ dl_set_phys_addr_req(queue_t *q, struct dl *dl, caddr_t add_ptr, size_t add_len)
 		dl_set_phys_addr_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_SET_PHYS_ADDR_REQ;
 			p->dl_addr_length = add_len;
 			p->dl_addr_offset = add_len ? sizeof(*p) : 0;
@@ -4052,7 +4057,7 @@ dl_get_statistics_req(queue_t *q, struct dl *dl)
 		dl_get_statistics_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->dl_primitive = DL_GET_STATISTICS_REQ;
 			printd(("%s: %p: DL_GET_STATISTICS_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);

@@ -1,19 +1,20 @@
-# OpenSS7 Iperf -- CVS procedures.  2006-01-03
-# $Id: README-cvs,v 0.9.2.3 2006/01/03 16:21:33 brian Exp $
-# Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
-# See the end for copying conditions.
+OpenSS7 Iperf -- CVS procedures.  2006-03-02
+$Id: README-cvs,v 0.9.2.4 2006/03/04 13:06:03 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
 
 The following is an extract from the manual to assist CVS developers:
 
+(There is no manual yet.)
 
 
 =========================================================================
 
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -58,3 +59,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

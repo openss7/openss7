@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:44 $
+ @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/04 13:00:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,16 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:44 $ by $Author: brian $
+ Last Modified $Date: 2006/03/04 13:00:20 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tua.c,v $
+ Revision 0.9.2.11  2006/03/04 13:00:20  brian
+ - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:44 $"
+#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/04 13:00:20 $"
 
 static char const ident[] =
-    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:44 $";
+    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/04 13:00:20 $";
 
 #include <sys/os7/compat.h>
+#include <linux/socket.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -88,7 +94,7 @@ static char const ident[] =
 
 #define TUA_DESCRIP	"TUA STREAMS MULTIPLEXING DRIVER."
 #define TUA_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:44 $"
+#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2006/03/04 13:00:20 $"
 #define TUA_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_DEVICE	"Supports OpenSS7 TCAP TCI/TRI Interface Pseudo-Device Drivers."
 #define TUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

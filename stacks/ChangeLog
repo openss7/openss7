@@ -1,3 +1,99 @@
+2006-03-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/cd/cd.c (CD_UINIT):
+	  - gcc 4.0.4 doesn't like -1UL
+	  - misuse of packed attribute
+	* src/modules/dl/dl_lapd.c (dl_correlation):
+	  - 32/64-bit issues with dl_correlation
+	* src/modules/hdlc/hdlc.c (CD_UINIT):
+	  - gcc 4.0.4 doesn't like -1UL
+	  - misuse of packed attribute
+	* src/modules/isdn/isdn.c:
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	* src/modules/isup/isup.c:
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	* src/modules/m2ua/m2ua.c:
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	  - gcc 4.0.4 doesn't like *((X *)y)++ = z,
+	    change to *(X *)y++ = z instead
+	* src/modules/mg/mg.c:
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	* src/modules/mtp/mtp.c:
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	* src/modules/mtp/mtp_npi.c:
+	  - gcc 4.0.4 doesn't like -1UL
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	  - got rid of non-prototype function declarations
+	* src/modules/mtp/mtp_tpi.c:
+	  - gcc 4.0.4 doesn't like -1UL
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	* src/modules/mx/mx_sdl.c:
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	  - 32/64-bit issues 
+	* src/modules/sccp/sccp.c:
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	* src/modules/x400p-ss7/sl_x400p.c:
+	  - corrected headers
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	  - misuse of packed attribute
+	* src/modules/x400p-ss7/sl_x100p.c:
+	  - corrected headers
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	  - misuse of packed attribute
+	* src/modules/x400p-ss7/sdt_x400p.c:
+	  - corrected headers
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	  - misuse of packed attribute
+	* src/modules/x400p-ss7/sdl_x400p.c:
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	  - 32/64-bit issues 
+	* src/modules/x400p-ss7/mx_x400p.c:
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	  - 32/64-bit issues 
+	* src/modules/x400p-ss7/x400p_mx.c:
+	  - corrected headers
+	  - gcc 4.0.4 doesn't like p = ((typeof(p))y)++,
+	    change to p = (typeof(p))y++
+	  - misuse of packed attribute
+	* src/test/x400p-ss7/test-x400p-sl.c:
+	  - signedness of chars
+	* src/modules/x400p-ss7/sl_x400p.c (xp_e1_interrupt): - handle irqreturn_t
+	  (xp_t1_interrupt): - handle irqreturn_t
+	  (xp_suspend): - handle pm_message_t
+	* src/modules/x400p-ss7/sl_x100p.c (xp_e1_interrupt): - handle irqreturn_t
+	  (xp_t1_interrupt): - handle irqreturn_t
+	  (xp_suspend): - handle pm_message_t
+	* src/modules/x400p-ss7/sdt_x400p.c (xp_e1_interrupt): - handle irqreturn_t
+	  (xp_t1_interrupt): - handle irqreturn_t
+	  (xp_suspend): - handle pm_message_t
+	* src/modules/x400p-ss7/sdl_x400p.c (xp_e1_interrupt): - handle irqreturn_t
+	  (xp_t1_interrupt): - handle irqreturn_t
+	  (xp_suspend): - handle pm_message_t
+	* Makefile.am (EXPORT_SRCFILES): added cd.c
+	  (EXPORT_VERFILES): added cd.c
+	  (GENKSYMS_CPPFLAGS): added src/modules include directory
+	  (libSS7mods_a_CPPFLAGS): added src/modules include directory
+	* src/modules/sccp/sccp.c: include <linux/socket.h> for sa_family_t
+	* src/modules/tcap/tcap.c: include <linux/socket.h> for sa_family_t
+	* src/modules/mtp/mtp_min.c: include <linux/socket.h> for sa_family_t
+	* src/modules/mtp/mtp_tpi.c: include <linux/socket.h> for sa_family_t
+	* src/modules/mtp/mtp.c: include <linux/socket.h> for sa_family_t
+	* src/modules/tua/tua.c: include <linux/socket.h> for sa_family_t
+
 2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* THANKS: updated for release

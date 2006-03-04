@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:33 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:14 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:33 $ by $Author: brian $
+ Last Modified $Date: 2006/03/04 13:00:14 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: mtp_min.c,v $
+ Revision 0.9.2.12  2006/03/04 13:00:14  brian
+ - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:33 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:14 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:33 $";
+    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:14 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -62,6 +67,7 @@ static char const ident[] =
  *  implementation which is suitable for GSM-A or F-Links only between SEPs.
  */
 #include <sys/os7/compat.h>
+#include <linux/socket.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -76,8 +82,8 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:33 $"
-#define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:14 $"
+#define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_MIN_LICENSE		"GPL"

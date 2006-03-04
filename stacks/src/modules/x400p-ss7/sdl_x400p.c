@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:29 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:22 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -41,14 +40,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:58:29 $ by $Author: brian $
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/03/04 13:00:22 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sdl_x400p.c,v $
+ Revision 0.9.2.14  2006/03/04 13:00:22  brian
+ - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:29 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:22 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:29 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:22 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -80,8 +90,8 @@ static char const ident[] =
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:29 $"
-#define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:22 $"
+#define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_X400P_LICENSE	"GPL"
@@ -340,8 +350,13 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 
 STATIC int __devinit xp_probe(struct pci_dev *, const struct pci_device_id *);
 STATIC void __devexit xp_remove(struct pci_dev *);
-STATIC int xp_suspend(struct pci_dev *pdev, u32 state);
+#ifdef CONFIG_PM
+#ifndef HAVE_KTYPE_PM_MESSAGE_T
+typedef u32 pm_message_t;
+#endif
+STATIC int xp_suspend(struct pci_dev *pdev, pm_message_t state);
 STATIC int xp_resume(struct pci_dev *pdev);
+#endif
 
 STATIC struct pci_driver xp_driver = {
 	name:		"x400p-ss7",
@@ -377,8 +392,8 @@ m_error(queue_t *q, struct xp *xp, int err)
 	mblk_t *mp;
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_ERROR;
-		*(mp->b_wptr)++ = err < 0 ? -err : err;
-		*(mp->b_wptr)++ = err < 0 ? -err : err;
+		*mp->b_wptr++ = err < 0 ? -err : err;
+		*mp->b_wptr++ = err < 0 ? -err : err;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -399,7 +414,7 @@ sdl_received_bits_ind(queue_t *q, struct xp *xp, mblk_t *dp)
 		sdl_received_bits_ind_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->sdl_primitive = SDL_RECEIVED_BITS_IND;
 			mp->b_cont = dp;
 			ss7_oput(xp->oq, mp);
@@ -423,7 +438,7 @@ sdl_disconnect_ind(queue_t *q, struct xp *xp)
 	sdl_disconnect_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->sdl_primitive = SDL_DISCONNECT_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -443,7 +458,7 @@ lmi_info_ack(queue_t *q, struct xp *xp, caddr_t ppa_ptr, size_t ppa_len)
 	lmi_info_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->lmi_primitive = LMI_INFO_ACK;
 		p->lmi_version = 1;
 		p->lmi_state = LMI_UNATTACHED;
@@ -471,7 +486,7 @@ lmi_ok_ack(queue_t *q, struct xp *xp, ulong state, long prim)
 	lmi_ok_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->lmi_primitive = LMI_OK_ACK;
 		p->lmi_correct_primitive = prim;
 		p->lmi_state = xp->i_state = state;
@@ -493,7 +508,7 @@ lmi_error_ack(queue_t *q, struct xp *xp, ulong state, long prim, ulong errno, ul
 	lmi_error_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->lmi_primitive = LMI_ERROR_ACK;
 		p->lmi_errno = errno;
 		p->lmi_reason = reason;
@@ -517,7 +532,7 @@ lmi_enable_con(queue_t *q, struct xp *xp)
 	lmi_enable_con_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->lmi_primitive = LMI_ENABLE_CON;
 		p->lmi_state = xp->i_state = LMI_ENABLED;
 		ss7_oput(xp->oq, mp);
@@ -539,7 +554,7 @@ lmi_disable_con(queue_t *q, struct xp *xp)
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		struct xp *xp = XP_PRIV(q);
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->lmi_primitive = LMI_DISABLE_CON;
 		p->lmi_state = xp->i_state = LMI_DISABLED;
 		ss7_oput(xp->oq, mp);
@@ -560,7 +575,7 @@ lmi_optmgmt_ack(queue_t *q, struct xp *xp, ulong flags, caddr_t opt_ptr, size_t 
 	lmi_optmgmt_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->lmi_primitive = LMI_OPTMGMT_ACK;
 		p->lmi_opt_length = opt_len;
 		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -583,7 +598,7 @@ lmi_error_ind(queue_t *q, struct xp *xp, ulong errno, ulong reason)
 	lmi_error_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr++;
 		p->lmi_primitive = LMI_ERROR_IND;
 		p->lmi_errno = errno;
 		p->lmi_reason = reason;
@@ -607,7 +622,7 @@ lmi_stats_ind(queue_t *q, struct xp *xp, ulong interval)
 		lmi_stats_ind_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->lmi_primitive = LMI_STATS_IND;
 			p->lmi_interval = interval;
 			p->lmi_timestamp = jiffies;
@@ -633,7 +648,7 @@ lmi_event_ind(queue_t *q, struct xp *xp, ulong oid, ulong level)
 		lmi_event_ind_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr++;
 			p->lmi_primitive = LMI_EVENT_IND;
 			p->lmi_objectid = oid;
 			p->lmi_timestamp = jiffies;
@@ -1814,7 +1829,7 @@ xp_rx_chan_block(struct xp *xp)
 		if (canput(xp->oq) && (mp = allocb(8, BPRI_MED))) {
 			uchar *offset;
 			for (offset = xp->rx_base; offset < 1024 + xp->rx_base; offset += 128) {
-				*(mp->b_wptr)++ = *offset;
+				*mp->b_wptr++ = *offset;
 			}
 			ss7_oput(xp->oq, mp);
 		} else {
@@ -1833,7 +1848,7 @@ xp_tx_chan_block(struct xp *xp)
 		if ((mp = (mblk_t *) xchg(&xp->tx_msg, NULL))) {
 			for (offset = xp->tx_base; offset < 1024 + xp->tx_base; offset += 128) {
 				if (mp->b_rptr < mp->b_wptr)
-					*offset = *(mp->b_rptr)++;
+					*offset = *mp->b_rptr++;
 				else {
 					*offset = 0xff;
 					xp->stats.tx_underruns++;
@@ -1859,7 +1874,7 @@ xp_rx_t1_span_block(struct xp *xp)
 			uchar *offset;
 			for (offset = xp->rx_base; offset < 1024 + xp->rx_base; offset += 128) {
 				for (chan = 0; chan < 24; chan++) {
-					*(mp->b_wptr)++ = *(offset + xp_t1_chan_map[chan]);
+					*mp->b_wptr++ = *(offset + xp_t1_chan_map[chan]);
 				}
 			}
 			ss7_oput(xp->oq, mp);
@@ -1881,7 +1896,7 @@ xp_tx_t1_span_block(struct xp *xp)
 			for (offset = xp->tx_base; offset < 1024 + xp->tx_base; offset += 128) {
 				for (chan = 0; chan < 24; chan++) {
 					if (mp->b_rptr < mp->b_wptr)
-						*(offset + xp_t1_chan_map[chan]) = *(mp->b_rptr)++;
+						*(offset + xp_t1_chan_map[chan]) = *mp->b_rptr++;
 					else {
 						*(offset + xp_t1_chan_map[chan]) = 0xff;
 						xp->stats.tx_underruns++;
@@ -1909,7 +1924,7 @@ xp_rx_e1_span_block(struct xp *xp)
 			uchar *offset;
 			for (offset = xp->rx_base; offset < 1024 + xp->rx_base; offset += 128) {
 				for (chan = 0; chan < 31; chan++) {
-					*(mp->b_wptr)++ = *(offset + xp_e1_chan_map[chan]);
+					*mp->b_wptr++ = *(offset + xp_e1_chan_map[chan]);
 				}
 			}
 			ss7_oput(xp->oq, mp);
@@ -1931,7 +1946,7 @@ xp_tx_e1_span_block(struct xp *xp)
 			for (offset = xp->tx_base; offset < 1024 + xp->tx_base; offset += 128) {
 				for (chan = 0; chan < 31; chan++) {
 					if (mp->b_rptr < mp->b_wptr)
-						*(offset + xp_e1_chan_map[chan]) = *(mp->b_rptr)++;
+						*(offset + xp_e1_chan_map[chan]) = *mp->b_rptr++;
 					else {
 						*(offset + xp_e1_chan_map[chan]) = 0xff;
 						xp->stats.tx_underruns++;
@@ -2172,7 +2187,7 @@ xp_t1_card_tasklet(unsigned long data)
 		cd->eval_syncsrc = 0;
 	}
 }
-STATIC void
+STATIC irqreturn_t
 xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 {
 	struct cd *cd = (struct cd *) dev_id;
@@ -2189,10 +2204,11 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		cd->frame += 8;
 		cd->xlb[CTLREG] = (INTENA | E1DIV);
 		tasklet_hi_schedule(&cd->tasklet);
+		return (irqreturn_t)(IRQ_HANDLED);
 	}
-	return;
+	return (irqreturn_t)(IRQ_NONE);
 }
-STATIC void
+STATIC irqreturn_t
 xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 {
 	struct cd *cd = (struct cd *) dev_id;
@@ -2209,8 +2225,9 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		cd->frame += 8;
 		cd->xlb[CTLREG] = (INTENA);
 		tasklet_hi_schedule(&cd->tasklet);
+		return (irqreturn_t)(IRQ_HANDLED);
 	}
-	return;
+	return (irqreturn_t)(IRQ_NONE);
 }
 
 /*
@@ -3179,12 +3196,13 @@ xp_remove(struct pci_dev *dev)
 	xp_free_cd(cd);
 }
 
+#ifdef CONFIG_PM
 /*
  *  X400P-SS7 Suspend
  *  -----------------------------------
  */
 STATIC int
-xp_suspend(struct pci_dev *pdev, u32 state)
+xp_suspend(struct pci_dev *pdev, pm_message_t state)
 {
 	fixme(("Write a suspend routine.\n"));
 	return 0;
@@ -3200,6 +3218,7 @@ xp_resume(struct pci_dev *pdev)
 	fixme(("Write a resume routine.\n"));
 	return 0;
 }
+#endif
 
 /* 
  *  X400P-SS7 PCI Init
