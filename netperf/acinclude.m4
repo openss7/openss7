@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.21 $) $Date: 2006/01/04 11:57:01 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.22 $) $Date: 2006/03/04 05:33:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/01/04 11:57:01 $ by $Author: brian $
+# Last Modified $Date: 2006/03/04 05:33:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -145,7 +145,7 @@ AC_DEFUN([AC_NETPERF], [dnl
 	    ])
 	fi
     fi
-    CPPFLAGS="-I- -include ./config.h${SCTP_CPPFLAGS:+ }${SCTP_CPPFLAGS}${INET_CPPFLAGS:+ }${INET_CPPFLAGS}${STRCOMP_CPPFLAGS:+ }${STRCOMP_CPPFLAGS}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    CPPFLAGS="-include ./config.h${SCTP_CPPFLAGS:+ }${SCTP_CPPFLAGS}${INET_CPPFLAGS:+ }${INET_CPPFLAGS}${STRCOMP_CPPFLAGS:+ }${STRCOMP_CPPFLAGS}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     NETPERF_LDADD="$STREAMS_LDADD $XTI_LDADD"
     AC_SUBST([NETPERF_LDADD])
     _NETPERF_OUTPUT

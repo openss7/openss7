@@ -1,3 +1,8 @@
+2006-03-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: got rid of -I- construct
+	* configure.ac: don't add libbind to libraries
+
 2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* THANKS: updated for release

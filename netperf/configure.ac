@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2005/07/10 02:42:14 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.16 $) $Date: 2006/03/04 05:33:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/10 02:42:14 $ by $Author: brian $
+# Last Modified $Date: 2006/03/04 05:33:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -105,7 +105,7 @@ dnl AM_GNU_GETTEXT_VERSION(0.14.1)
 dnl
 dnl Checks for libraries.
 dnl
-AC_CHECK_LIB([c], [open])
+dnl AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([m], [main])
 dnl AC_CHECK_LIB([pthread], [pthread_create])
 dnl AC_CHECK_LIB([LiS], [putpmsg])
@@ -121,7 +121,7 @@ AC_CHECK_LIB([unix], [main])
 AC_CHECK_LIB([kstat], [kstat])
 AC_CHECK_LIB([sendfile], [sendfile])
 AC_CHECK_LIB([resolv], [main])
-AC_CHECK_LIB([bind], [main])
+dnl AC_CHECK_LIB([bind], [main])
 
 dnl
 dnl Checks for header files.
