@@ -1,40 +1,22 @@
-Iperf -- authors and acknowledgements.  2006-03-03
-$Id: AUTHORS,v 1.1.2.4 2006/03/05 05:52:08 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+OpenSS7 Master Package -- things to do.  2006-03-01
+$Id: TODO,v 0.9.2.1 2006/03/05 06:31:31 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-Iperf was originally written by:
+Things to do:
 
-  Mark Gates
-  Ajay Tirumala
-  Jim Ferguson
-  Jon Dugan
-  Feng Qin
-  Kevin Gibbs
+- Get master build package working better.  Currently the master build
+  package does not build a master tarball or RPM distribution, which
+  would be nice, only individual RPMs for subpackages.
 
-Autoconf/RPM packaging was performed as part of the OpenSS7 Project
-(http://www.openss7.org/) by:
-
-  Brian Bidulock		bidulock@openss7.org
-
-Packaging would not be what it is today without the invaluable help of
-these people:
-
-Additional people not named here that I missed putting on the list.  We
-thank them too!
-
-
-See the file entitled "THANKS" for acknowledgements.
-
------
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
- All Rights Reserved.
+All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -53,8 +35,8 @@ See the file entitled "THANKS" for acknowledgements.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by the
- source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by
+ the source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -63,8 +45,8 @@ See the file entitled "THANKS" for acknowledgements.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and
- the Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and the
+ Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -79,4 +61,4 @@ See the file entitled "THANKS" for acknowledgements.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
+vim: tw=72 nocindent

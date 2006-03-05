@@ -1,8 +1,14 @@
-OpenSS7 Iperf -- history of user-visible changes.  2005-12-29
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 Iperf -- history of user-visible changes.  2006-03-01
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes in iperf-2.0.4
+
+  Corrections for and testing of 64-bit clean compile and test runs on
+  x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
+  compiler warnings.
+
 * Major changes in iperf-2.0.3
 
   Minor changes and bug fixes.  Still remaining to do is merge in the
@@ -33,7 +39,7 @@ See the end for copying conditions.
 
 =========================================================================
 
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.

@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: iperf.macros,v 1.1.2.7 2006/03/05 05:52:19 brian Exp $
+.\" @(#) $Id: openss7.macros,v 0.9.2.1 2006/03/05 06:31:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/03/05 05:52:19 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/05 06:31:31 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -365,7 +365,7 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.7 $); $Date: 2006/03/05 05:52:19 $.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 0.9.2.1 $); $Date: 2006/03/05 06:31:31 $.
 .PP
 \f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
 .br

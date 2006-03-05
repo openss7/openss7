@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyreq.9.man,v 0.9.2.8 2006/03/03 10:57:10 brian Exp $
+.\" @(#) $Id: copyreq.9.man,v 0.9.2.9 2006/03/05 06:27:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/03/03 10:57:10 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/05 06:27:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -636,7 +636,7 @@ and
 .B RECOPY
 flags were used in implementations of SVR 3.2
 .[
-svr32
+svr3
 .]
 .IR STREAMS ;
 however,

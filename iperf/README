@@ -1,29 +1,204 @@
-This is Iperf v2.0.0, a tool for measuring Internet bandwidth performance.
-See the doc directory for more documentation.
-Briefly:
+OpenSS7 Iperf -- readme first file.  2006-03-02
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+OpenSS7 Modified Iperf
+======================
 
-  ./configure      -- configure for your machine
-  make             -- compile Iperf
-  make install     -- install Iperf, if desired
+This is the iperf-2.0.3 package.  It, and the current version, can
+be obtained from the download area of The OpenSS7 Project website at
+http://www.openss7.org/download.html as iperf-2.0.3.tar.bz2 using a
+command such as
 
-  iperf -s               (on machine "foo.bar.edu")
-  iperf -c foo.bar.edu   (on some other machine)
-  iperf -h               (for help screen)
-  iperf -v               (for version information)
+	wget http://www.openss7.org/tarballs/iperf-2.0.3.tar.bz2
 
-Copyright 1999, 2000, 2001, 2002, 2003, 2004
-The Board of Trustees of the University of Illinois
-All rights reserved
-See UI License (doc/ui_license.html) for complete details.
+Please see the NEWS file for release notes and history of user visible
+changes for the current version, and the ChangeLog file for a more
+detailed history of implementation changes.  The TODO file lists
+features not yet implemented or other outstandinng items.
 
-$Id: README,v 1.1.1.1 2004/05/18 01:50:44 kgibbs Exp $
+Please see the INSTALL, INSTALL-iperf and README-make files (or the
+installation and reference manual) for installation instructions.  When
+working from CVS, please see the README-cvs file.  An abbreviated
+installation procedure that works for most applications appears below.
+
+This release of the package is published strictly under Version 2 of the
+GNU Public License which can be found in the file COPYING.  Package
+specific licensing terms (if any) can be found in the file LICENSING.
+Please respect these licensing arrangements.  If you are interested in
+different licensing terms, please contact the copyright holder, OpenSS7
+Corporation, http://www.openss7.com/ or mailto:bidulock@openss7.org.
+
+Prerequisites
+-------------
+
+The following are prerequisites for building the package:
+
+ 1. Linux distribution with a 2.4 kernel with the appropriate tool
+    chain.  For supported and tested distributions, see the manual.
+
+    (Note that although the original DAST Iperf builds and installs on a
+    number of operating systems, the OpenSS7 modified version only
+    currently builds and installs on Linux.)
+
+ 2. The OpenSS7 Linux Native SCTP package installed, such as
+    http://www.openss7.org/sctp-0.2.23.tar.bz2
+
+When configuring and building multiple OpenSS7 Project release packages,
+place all of the source packages (unpackaged tarballs) at the same
+directory level and all build directories at the same directory level.
+
+Installation
+------------
+
+The following commands will download, configure, build, check, install,
+validate, uninstall and remove the package:
+
+	wget http://www.openss7.org/tarballs/iperf-2.0.3.tar.bz2
+	tar -xjvf iperf-2.0.3.tar.bz2
+	mkdir build
+	cd build
+	../iperf-2.0.3.configure
+	make
+	make check
+	sudo make install
+	sudo make installcheck
+	sudo make uninstall
+	cd ..
+	sudo rm -rf build
+	rm -rf iperf-2.0.3.
+	rm -f iperf-2.0.3.tar.bz2
+
+Manual
+------
+
+More detailed installation instructions can be found in the Installation
+and Reference Manual, contained in the distribution in `text', `info',
+`html', and `pdf' formats:
+
+	cd ../iperf-2.0.3
+	less doc/manual/iperf.txt
+	lynx doc/manual/iperf.html
+	info -f doc/manual/iperf.info
+	xpdf doc/manual/iperf.pdf
+
+The current manual is also always available online from The OpenSS7
+Project website at:
+
+	lynx http://www.openss7.org/iperf_manual.html
+
+Description
+-----------
+
+Iperf is a general purpose tool for measuring bandwidth and performance
+of the Internet Protocol suite.  The OpenSS7 Modified Iperf package is
+an OpenSS7 release of the DAST iperf package configured to run with
+OpenSS7 Linux Native Stream Control Transmission Protocol (SCTP).
+
+This is a version of the Iperf package released by the University of
+Illinois modified by the OpenSS7 Project for use with OpenSS7 SCTP
+(Stream Control Transmission Protocol).  This OpenSS7 release of the
+package is based on the Iperf-2.0.0 release from the University of
+Illinois.
+
+Modifications to the package are derived from the OpenSS7 SCTP
+implementation and are released under the GNU General Public License
+(GPL) Version 2.  The Iperf tool itself is licesnse under specific terms
+by the University of Illinois.  Please see LICENSE for the University of
+Illinois Iperf copyright notices and licensing restrictions.  The Iperf
+tool is
+
+    Copyright 1999, 2000, 2001, 2002, 2003, 2004
+    The Board of Trustees of the University of Illinois
+    All rights reserved
+
+See UI License in the LICENSE file for complete details.
+
+Please note that this modified version of the Iperf package is not
+endorsed by the University of Illinois or DAST in any way and that
+neither the original copyright holders nor OpenSS7 Corporation will take
+any responsibility in it.
+
+Brief Installation Instructions
+-------------------------------
+
+The OpenSS7 Modified Iperf package is available from the downloads area
+of The OpenSS7 Project website: <http://www.openss7.org/download.html>
+using a command such as:
+
+	wget http://www.openss7.org/tarballs/iperf-2.0.3.tar.bz2
+
+Unpack the tarball using a command such as:
+
+	tar -xjvf iperf-2.0.3.tar.bz2
+
+The tarball will unpack into the relative subdirectory named after the
+package name: iperf-2.0.3  The package builds using the GNU autoconf
+utilities and the `configure' script.  To build the package, we
+recommend using a separate build directory as follows:
+
+	mkdir build
+	cd build
+	../iperf-2.0.3/configure
+
+In general, the package configures and builds without adding any special
+options to the configure script.  For general options to the configure
+script, see the GNU `INSTALL' file in the distribution:
+
+	less ../iperf-2.0.3/INSTALL
+
+For specific options to the configure script, see the INSTALL-iperf
+file in the distribution, or simply execute the configure script with
+the --help option like so:
+
+	../iperf-2.0.3/configure --help
+
+After configuring the package, the package can be compiled simply by
+issuing the `make' command:
+
+	make
+
+Some specialized makefile targets exist, see the README-make file in the
+distribution or simply invoke the `help' target like so:
+
+	make help
+
+After successfully building the package, the package can be checked by
+invoking the `check' make target like so:
+
+	make check
+
+After successfully checking the package, the package can be installed by
+invoking the `install' make target (as root) like so:
+
+	sudo make install
+
+The testsuites that ship with the package can be invoked after the
+package has been installed by invoking the `installcheck' target.  This
+target can either be invoked as root, or as a normal user, like so:
+
+	make installcheck
+
+The package can be cleanly removed by invoking the `uninstall' target
+(as root):
+
+	sudo make uninstall
+
+Then the build directory and tarball can be simply removed:
+
+	cd ..
+	rm -rf build
+	rm -rf iperf-2.0.3
+	rm -f iperf-2.0.3.tar.bz2
+
 
 =========================================================================
 
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -68,3 +243,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
