@@ -1,7 +1,11 @@
 2006-03-04  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: aligned to LiS
 	* src/drivers/sad.c: corrections for FC4 x86_64 gcc 4.0.4 build
 	* src/modules/sth.c: corrections for FC4 x86_64 gcc 4.0.4 build
+	* tests/local.at: updated headers
+	* doc/man/man9/copyreq.9.man: corrected bad reference
+	* doc/man/man9/STREAMS.9.man: corrected Dave's last name
 
 2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 

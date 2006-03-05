@@ -93,6 +93,7 @@
 	* src/modules/mtp/mtp_tpi.c: include <linux/socket.h> for sa_family_t
 	* src/modules/mtp/mtp.c: include <linux/socket.h> for sa_family_t
 	* src/modules/tua/tua.c: include <linux/socket.h> for sa_family_t
+	* tests/local.at: updated headers
 
 2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 

@@ -1,0 +1,160 @@
+OpenSS7 Linux STREAMS (LiS) -- alpha release introduction.  2006-03-02
+$Id: README-alpha,v 1.1.2.1 2006/03/05 04:02:56 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+Linux STREAMS (LiS)
+===================
+
+This is an incremental release of OpenSS7 Linux STREAMS.  The purpose of
+this release is to provide the technical community with a detailed
+comparison point for the OpenSS7 Linux Fast-STREAMS releases, which are
+superior and that deprecates this package.
+
+THIS CODE HAS TESTED UNSTABLE.  LOADING OR EXECUTING CODE IN THIS
+RELEASE WILL CRASH YOUR MACHINE AND COULD INADVETENTLY CAUSE DAMAGE.
+THERE IS NO WARRANTY.
+
+The following is an extract from the Installation and Reference Manual:
+
+5.4.2 Alpha Releases
+--------------------
+
+"Alpha" release are releases that have received little to no testing, or
+that have been tested and contains known bugs or defects that make the
+package unsuitable even for testing.  The purpose for an "alpha" release
+are the same as for the pre-alpha release, with the additional purpose
+that it is an earily release of partially functional code that has
+problems that an external developer might be willing to fix themselves
+and contribute back to the project.
+
+"Alpha" release packages ship containing warnings that executing the
+code can crash machines and might possibly do damage to systems upon
+which it is executed.
+
+4.4 Bugs
+========
+
+Linux STREAMS (LiS), both releases from OpenSS7 and GCOM, contain many
+known bugs.  These are unstable releases.  Although there are no bugs
+known to be harmful, the OpenSS7 Project has tested the release and
+found defects that cause the kernel to lock or crash.  Use at your own
+risk.  Remember that there is NO WARRANTY(1) and that the package is no
+longer actively maintained.
+
+This software has tested unstable.  As such, it can crash your kernel.
+Installation of the software could irreparably mangle your header files
+or Linux distribution in such a way as to make it unstable or unusable.
+Crashes can lock your system and rebooting the system might not repair
+the problem.  You can loose all the data on your system.  Because this
+software locks or crashes under a large number of test cases in the test
+suite, simply running the test cases can cause locks or crashes.  The
+resulting unstable system could destroy computer hardware or peripherals
+making them unusable.  You could void the warranty on any system on
+which you run this software.  YOU HAVE BEEN WARNED.
+
+4.4.1 Known Bugs
+----------------
+
+Linux STREAMS (LiS) has many known bugs.  Under some architectures, the
+test cases in the conformance test suite cause the kernel to lock or
+crash.  Linux STREAMS (LiS) contains many races and defects and is
+unsuitable for production environments.  This section provides a summary
+of some (but not all) known defects.
+
+ 1. A substantial group of test cases in the POSIX conformance test
+    suite fail.  This is largely due to non-fatal defects in LiS.
+
+ 2. A number of test cases fail under any architecture and result in a
+    kernel lock.  In particular if a significant number of modules are
+    pushed onto a Stream using I_PUSH, the kernel will lock when the
+    Stream is closed.  The number of modules pushed to cause a crash
+    depends on the speed of the machine upon which the test case is run.
+    The test case in the test suite pushes 64 modules and has always
+    resulted in a kernel lock regardless of the machine speed upon which
+    it was tested.  Pushing 20 modules results in a kernel lock on some
+    of the OpenSS7 project 2.57GHz test machines.
+
+    As a result, any test case that pushes a number of modules, and the
+    performance tests (that push modules for measurement) will cause the
+    kernel to lock.
+
+ 3. A large number of test cases fail when running under an SMP kernel,
+    regardless of the number of processors on the test system.  These
+    test cases cause the kernel to lock.  The kernel locks are
+    apparentlhy due to locking defects in the implementation.  None of
+    these implementation defects have been repaired.
+
+ 4. The original LiS-2.18.0 release from GCOM has a large number of
+    defects that were repaired in the OpenSS7 LiS-2.18.1 release.
+
+ 5. The original LiS-2.18.0 release has defects in the description of
+    data types and handling under 64-bit architectures.  32-bit
+    compatibility for 64-bit architectures is all but non-existent in
+    the LiS-2.18.0 release.  Because of binary compatibility issues,
+    many of these defects persist in the OpenSS7 LiS-2.18.1 and
+    LiS-2.18.2 releases.  LiS is largely unusable in a 64-bit and almost
+    completely unusable in a mixed architecture.
+
+The work-around for these defects is to not use LiS at all: use the
+OpenSS7 Linux Fast-STREAMS release instead.  The OpenSS7 Linux
+Fast-STREAMS, being a completely independent implemenation, does not
+suffer from this extensive set of LiS defects.
+
+---------- Footnotes ----------
+
+(1) See section NO WARRANY under *Note GNU General Public License::.
+
+
+=========================================================================
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by
+ the source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and the
+ Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+# vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2006/02/20 11:05:59 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/05 04:03:14 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 11:05:59 $ by $Author: brian $
+ Last Modified $Date: 2006/03/05 04:03:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 1.1.2.6  2006/03/05 04:03:14  brian
+ - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
+ - updates for new release
+
  Revision 1.1.2.5  2006/02/20 11:05:59  brian
  - gcc 4.0.2 does not like (-1UL) on 64 bit
 
@@ -251,9 +255,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2006/02/20 11:05:59 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/05 04:03:14 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2006/02/20 11:05:59 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/05 04:03:14 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -412,6 +416,11 @@ enum {
 long test_start = 0;
 
 static int state;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 #if 0
 /*

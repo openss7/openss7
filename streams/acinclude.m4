@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2006/03/03 10:57:09 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2006/03/05 03:51:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/03 10:57:09 $ by $Author: brian $
+# Last Modified $Date: 2006/03/05 03:51:19 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.115  2006/03/05 03:51:19  brian
+# - aligned to LiS
+#
 # Revision 0.9.2.114  2006/03/03 10:57:09  brian
 # - 32-bit compatibility support, updates for release
 #
@@ -978,14 +981,15 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
 			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
+			pci_dac_page_to_dma pci_dac_dma_to_page pci_dac_dma_to_offset \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			cpumask_scnprintf __symbol_get __symbol_put \
 			read_trylock write_trylock atomic_add_return path_lookup \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
-			num_online_cpus generic_delete_inode set_user_nice \
+			num_online_cpus generic_delete_inode access_ok set_user_nice \
 			set_cpus_allowed yield \
 			prepare_to_wait prepare_to_wait_exclusive finish_wait \
-			compat_ptr], [:], [
+			compat_ptr register_ioctl32_conversion unregister_ioctl32_conversion], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"

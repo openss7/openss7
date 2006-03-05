@@ -2,6 +2,7 @@
 
 	* src/drivers/ldl.c: corrections for FC4 x86_64 build
 	* src/include/sys/ldl.h: corrections for FC4 x86_64 build
+	* tests/local.at: updated headers
 
 2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 

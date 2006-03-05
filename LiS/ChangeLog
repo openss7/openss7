@@ -1,47 +1,109 @@
-2006-02-20 brian <bidulock@openss7.org>
-	* Changes from OpenSS7 2.18.2 release:
-	* (util/test-fifo.c): modified
-	* (util/test-pipe.c): modified
-	* (util/test-streams.c): modified
+2006-03-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite-fifo.at: upgraded for x86_64 SMP
+	* tests/testsuite-pipe.at: upgraded for x86_64 SMP
+	* tests/testsuite-sad.at: upgraded for x86_64 SMP
+	* tests/testsuite-streams.at: upgraded for x86_64 SMP
+	* tests/testsuite-strtst.at: upgraded for x86_64 SMP
+	* tests/testsuite-test2.at: upgraded for x86_64 SMP
+	* tests/testsuite-thrtst.at: upgraded for x86_64 SMP
+	* tests/testsuite.at: updated headers
+	* tests/local.at: updated headers
+	* AUTHORS: updated headers
+	* Makefile.am (EXTRA_DIST): removed BUGS (now README-alpha)
+	* NEWS: updated for release
+	* README: updated for release
+	* README-alpha: updated for release
+	* README-nexusware: updated for release
+	* THANKS: updated for release
+	* TODO: updated for release
+	* acinclude.m4: include checks from Linux Fast-STREAMS
+	* head/linux-mdep.c: changes for compile on x86_64 2.6.15
+	* include/sys/LiS/genconf.h.in: more things have regparms than i386
+	* man/lis.macros: updated headers
+	* man/lis.refs: updated references
+	* manual/releases.texi: updated release notes
+	* util/test-fifo.c: lockf doesn't work well on SMP
+	* util/test-pipe.c: lockf doesn't work well on SMP
+	* util/test-sad.c: lockf doesn't work well on SMP
+	* util/test-streams.c: lockf doesn't work well on SMP
+
+2006-03-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* THANKS: updated for release
+	* man/lis.macros: updated for release
+	* man/lis.refs: updated references
+	* README-nexusware: updated for release
+	* README-alpha: moved BUGS file to README-alpha
+
+2006-03-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* README: updated for release
+	* manual/releases.texi: updated release notes
+	* BUGS: added bugs file
+	* Makefile.am (EXTRA_DIST): added BUGS file to distribution
+	* README-cvs: updated for release
+
+2006-03-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: corrected format of change log
+	* TODO: updated to do items
+	* README: updated for release
+	* manual/releases.texi (Bugs, Known Bugs, Maturity): updated release notes
+
+2006-02-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: modified -- updated for new release
+	* Makefile.am: modified -- added TODO file to distribution
+	* TODO: added -- added TODO file to distribution
+
+2006-02-20  Brian Bidulock  <bidulock@openss7.org>
+
+	- Changes from OpenSS7 2.18.2 release:
+	* util/test-fifo.c: modified
+	* util/test-pipe.c: modified
+	* util/test-streams.c: modified
 	- gcc 4.0.2 does not like (-1UL) on 64 bit
-	* (util/strtst.c): modified
+	* util/strtst.c: modified
 	- printf changes for 64 bit
-	* (util/streams.c): modified
+	* util/streams.c: modified
 	- stats corrections for 64 bit
-	* (libc/getpmsg.c): modified
-	* (libc/putpmsg.c): modified
+	* libc/getpmsg.c: modified
+	* libc/putpmsg.c: modified
 	- Paul's patches for s390x
-	* (include/sys/osif.h): modified
+	* include/sys/osif.h: modified
 	- Paul's 64 bit patches
-	* (drivers/str/loop.c): modified
-	* (drivers/str/sad.c): modified
-	* (drivers/str/linux/mtdrv.c): modified
+	* drivers/str/loop.c: modified
+	* drivers/str/sad.c: modified
+	* drivers/str/linux/mtdrv.c: modified
 	- 64bit corrections, mostly printf
-	* (head/head.c): modified
-	* (head/linux-mdep.c): modified
-	* (head/msgutl.c): modified
-	* (head/osif.c): modified
-	* (head/linux/exports.c): modified
+	* head/head.c: modified
+	* head/linux-mdep.c: modified
+	* head/msgutl.c: modified
+	* head/osif.c: modified
+	* head/linux/exports.c: modified
 	- corrections for some 64bit architectures, from patches
-	* (acinclude.m4): modified
+	* acinclude.m4: modified
 	- added checks for 64bit architectures
-	* (NEWS): modified
-	* (ChangeLog): modified
+	* NEWS: modified
+	* ChangeLog: modified
 	- updated for next release
 
-2006-02-13 brian <bidulock@openss7.org>
-	* Changes from OpenSS7 2.18.2 release:
-	* (m4/kernel.m4): changes for Gentoo and 2.6.15 kernels
+2006-02-13  Brian Bidulock  <bidulock@openss7.org>
 
-2005-11-13  brian  <bidulock@openss7.org>
-	* Changes from OpenSS7 2.18.1 release:
-	* (.indent.pro): added a few types
-	* (.pkgrelease): bumped release number
-	* (ChangeLog):
+	- Changes from OpenSS7 2.18.2 release:
+	* m4/kernel.m4: changes for Gentoo and 2.6.15 kernels
+
+2005-11-13  Brian Bidulock  <bidulock@openss7.org>
+
+	- Changes from OpenSS7 2.18.1 release:
+	* .indent.pro: added a few types
+	* .pkgrelease: bumped release number
+	* ChangeLog:
 	- updated this change long
 	- added copyright notice at bottom
-	* (LiS.spec.in): updated changelog
-	* (Makefile.am):
+	* LiS.spec.in: updated changelog
+	* Makefile.am:
 	- added the following test programs backported to LiS:
 	- added test-streams to build
 	- added test-fifo to build
@@ -55,9 +117,9 @@
 	- added nuls module
 	- added echo module
 	- added mux driver
-	* (NEWS): updated
-	* (am/help.am): corrected spelling
-	* (drivers/str/Config.in):
+	* NEWS: updated
+	* am/help.am: corrected spelling
+	* drivers/str/Config.in:
 	- added the following test modules and drivers backported to LiS
 	- added bufmod module
 	- added nullmod module
@@ -65,134 +127,135 @@
 	- added nuls driver
 	- added echo driver
 	- added mux driver
-	* (drivers/str/bufmod.c): new file for bufmod module
-	* (drivers/str/echo.c): new file for echo driver
-	* (drivers/str/minimux.c):
+	* drivers/str/bufmod.c: new file for bufmod module
+	* drivers/str/echo.c: new file for echo driver
+	* drivers/str/minimux.c:
 	- resolved namespace clash between minimux and mux drivers
-	* (drivers/str/mux.c): new file for mux driver
-	* (drivers/str/nullmod.c): new file for nullmod driver
-	* (drivers/str/nuls.c): new file for nuls driver
-	* (drivers/str/testmod.c): new file for testmod module
-	* (include/Makefile.am):
+	* drivers/str/mux.c: new file for mux driver
+	* drivers/str/nullmod.c: new file for nullmod driver
+	* drivers/str/nuls.c: new file for nuls driver
+	* drivers/str/testmod.c: new file for testmod module
+	* include/Makefile.am:
 	- added sys/testmod.h and sys/LiS/testmod.h headers to build
-	* (include/sys/sad.h):
+	* include/sys/sad.h:
 	- correct problem with missing major_t and minor_t definitions
-	* (incldue/sys/testmod.h): new file for testmod ioctls
-	* (incldue/sys/LiS/testmod.h): new file for testmod ioctls
-	* (m4/kernel.m4):
+	* incldue/sys/testmod.h: new file for testmod ioctls
+	* incldue/sys/LiS/testmod.h: new file for testmod ioctls
+	* m4/kernel.m4:
 	- fixed FC4 boot kernel name extraction
 	- removed -Winline when maintainer mode (because they then become errors)
-	* (man/Makefile.am):
+	* man/Makefile.am:
 	- added manual pages for
 	- bufmod, nullmod, testmod, echo, nuls, mux
 	- perftest, test-streams, test-fifo, test-pipe, test-sad
-	* (man/man4/bufmod.4.man): new file
-	* (man/man4/echo.4.man): new file
-	* (man/man4/mux.4.man): new file
-	* (man/man4/nullmod.4.man): new file
-	* (man/man4/nuls.4.man): new file
-	* (man/man4/testmod.4.man): new file
-	* (man/man4/stremio.7.man): new file
-	* (man/man8/perftest.8.man): new file
-	* (man/man8/test-fifo.8.man): new file
-	* (man/man8/test-pipe.8.man): new file
-	* (man/man8/test-sad.8.man): new file
-	* (man/man8/test-streams.8.man): new file
-	* (manual/LiS.texi): include proper testsuite.texi file
-	* (manual/Makefile.am): add testsuite.texi file dependency
-	* (manual/releases.texi): updated release notes
-	* (manual/texi/testsuite.texi):
+	* man/man4/bufmod.4.man: new file
+	* man/man4/echo.4.man: new file
+	* man/man4/mux.4.man: new file
+	* man/man4/nullmod.4.man: new file
+	* man/man4/nuls.4.man: new file
+	* man/man4/testmod.4.man: new file
+	* man/man4/stremio.7.man: new file
+	* man/man8/perftest.8.man: new file
+	* man/man8/test-fifo.8.man: new file
+	* man/man8/test-pipe.8.man: new file
+	* man/man8/test-sad.8.man: new file
+	* man/man8/test-streams.8.man: new file
+	* manual/LiS.texi: include proper testsuite.texi file
+	* manual/Makefile.am: add testsuite.texi file dependency
+	* manual/releases.texi: updated release notes
+	* manual/texi/testsuite.texi:
 	- added descriptions of pre- and post-installation tests
-	* (tests/Makefile.am):
+	* tests/Makefile.am:
 	- added testsuite-streams, testsuite-fifo, testsuite-pipe and testsuite-sad
 	  test suites
-	* (tests/aclocal.in):
+	* tests/aclocal.in:
 	- added at_STRCONF_PACKAGE so that testsuites can know which package they
 	  are running against (LiS or LfS).
-	* (tests/testsuite-fifo.at): backport of Linux Fast-STREAMS testsuite
-	* (tests/testsuite-pipe.at): backport of Linux Fast-STREAMS testsuite
-	* (tests/testsuite-sad.at): backport of Linux Fast-STREAMS testsuite
-	* (tests/testsuite-streams.at): backport of Linux Fast-STREAMS testsuite
-	* (tests/testsuite-strtst.at): factoring
-	* (tests/testsuite.at): added new test suites
-	* (util/perftest.c): added backported performance test program
-	* (util/test-fifo.): added backported conformance test program
-	* (util/test-pipe.): added backported conformance test program
-	* (util/test-sad.): added backported conformance test program
-	* (util/test-streams.): added backported conformance test program
+	* tests/testsuite-fifo.at: backport of Linux Fast-STREAMS testsuite
+	* tests/testsuite-pipe.at: backport of Linux Fast-STREAMS testsuite
+	* tests/testsuite-sad.at: backport of Linux Fast-STREAMS testsuite
+	* tests/testsuite-streams.at: backport of Linux Fast-STREAMS testsuite
+	* tests/testsuite-strtst.at: factoring
+	* tests/testsuite.at: added new test suites
+	* util/perftest.c: added backported performance test program
+	* util/test-fifo.: added backported conformance test program
+	* util/test-pipe.: added backported conformance test program
+	* util/test-sad.: added backported conformance test program
+	* util/test-streams.: added backported conformance test program
 
 
-2005-03-12  brian  <bidulock@openss7.org>
-	* Changes from GCOM 2.18.0 release:
-	* (drivers/str/clone.c):
+2005-03-12  Brian Bidulock  <bidulock@openss7.org>
+
+	- Changes from GCOM 2.18.0 release:
+	* drivers/str/clone.c:
 	- changed #ident string to CVS revision
-	* (drivers/str/dlpidriver.c):
+	* drivers/str/dlpidriver.c:
 	- changed #ident string to CVS revision
-	* (drivers/str/fifo.c):
+	* drivers/str/fifo.c:
 	- changed #ident string to CVS revision
 	- corrected FIFO_ to FIFO__DRV
 	- removed vermagic module info (done by modpost)
 	- added <linux/errno.h> include
 	- changed checks on MODULE to checks on __NO_VERSION__
-	* (drivers/str/log.c):
+	* drivers/str/log.c:
 	- changed #ident string to CVS revision
-	* (drivers/str/loop.c):
+	* drivers/str/loop.c:
 	- changed #ident string to CVS revision
 	- changed checks on MODULE to checks on __NO_VERSION__
 	- changed to GPL license
-	* (drivers/str/minimux.c):
+	* drivers/str/minimux.c:
 	- changed #ident string to CVS revision
-	* (drivers/str/module-skeleton.c):
+	* drivers/str/module-skeleton.c:
 	- changed #ident string to CVS revision
-	* (drivers/str/nullstrm.c):
+	* drivers/str/nullstrm.c:
 	- changed #ident string to CVS revision
-	* (drivers/str/pipemod.c):
+	* drivers/str/pipemod.c:
 	- changed #ident string to CVS revision
 	- corrected PIPEMOD_ to PIPEMOD__MOD
 	- removed vermagic module info (done by modpost)
 	- added <linux/errno.h> include
 	- changed to GPL license
-	* (drivers/str/printk.c):
+	* drivers/str/printk.c:
 	- changed #ident string to CVS revision
-	* (drivers/str/putst.c):
+	* drivers/str/putst.c:
 	- changed #ident string to CVS revision
-	* (drivers/str/relay.c):
+	* drivers/str/relay.c:
 	- changed #ident string to CVS revision
 	- changed checks on MODULE to checks on __NO_VERSION__
 	- changed to GPL license
-	* (drivers/str/sad.c):
+	* drivers/str/sad.c:
 	- corrected SAD_ to SAD__DRV
 	- changed checks on MODULE to checks on __NO_VERSION__
 	- changed to GPL license
-	* (drivers/str/timod.c):
+	* drivers/str/timod.c:
 	- old broken version, removed from release
-	* (drivers/str/tirdwr.c):
+	* drivers/str/tirdwr.c:
 	- old broken version, removed from release
 	- corrected CONNLD_ to CONNLD__MOD
 	- corrected printf error
 	- changed checks on MODULE to checks on __NO_VERSION__
 	- changed to GPL license
-	* (drivers/str/linux/ip_strm_mod.c):
+	* drivers/str/linux/ip_strm_mod.c:
 	- removed deprecated define "SAFE"
-	* (drivers/str/linux/ip_to_dlpi.c):
+	* drivers/str/linux/ip_to_dlpi.c:
 	- changed to GPL license
-	* (drivers/str/linux/liskmod.c):
+	* drivers/str/linux/liskmod.c:
 	- added <linux/config.h> include
 	- removed define of KERNEL_VERSION, no longer applicable
 	- included <linux/module.h> and <linux/init.h>
 	- removed modversions.h and module.h conditional includes
 	- removed vermagic module info (done by modpost)
-	* (drivers/str/linux/mtdrv.c):
+	* drivers/str/linux/mtdrv.c:
 	- changed to GPL license
-	* (head/cmn_err.c):
+	* head/cmn_err.c:
 	- printf patch
-	* (head/head.c):
+	* head/head.c:
 	- removed deprecard poll stuff.
 	- corrected typo include <errnos.h>
 	- corrected error returned (ENXIO) when stream hung up
 	- stats patches
 	- flush patches
-	* (head/linux-mdep.c):
+	* head/linux-mdep.c:
 	- panic patch
 	- smp patch
 	- parisc syscall patches
@@ -205,731 +268,732 @@
 	- changed to GPL license
 	- removed vermagic module info (done by modpost)
 	- corrected CONFIG_DEV checks to USE_KMEM_TIMER checks
-	* (head/mod.c):
+	* head/mod.c:
 	- corrections to uninitialized modules
 	- corrected printf warnings
-	* (head/osif.c):
+	* head/osif.c:
 	- hppa patches
 	- add check_mem request_mem functions
 	- printf patch
 	- HZ calculation correction patches
-	* (head/queue.c):
+	* head/queue.c:
 	- corrected printf warnings
 	- changed appq to return success or failure like insq
-	* (head/stream.c):
+	* head/stream.c:
 	- corrected printf warnings
 	- panic patch
-	* (head/strmdbg.c):
+	* head/strmdbg.c:
 	- DMA patch
 	- printf patch
-	* (head/version.c):
+	* head/version.c:
 	- added proper set of initial linux includes
-	* (head/linux/exports.c):
+	* head/linux/exports.c:
 	- removed improper modversion.h and module.h includes
 	- ensure EXPORT_SYMTAB is defined
 	- remove deprecated linux poll defines
 	- changed all symbol exports to versioned GPL exports
-	* (head/linux/lismem.c):
+	* head/linux/lismem.c:
 	- DMA patch
-	* (head/user/port.c):
+	* head/user/port.c:
 	- printf patch
-	* *include/stropts.h):
+	* *include/stropts.h:
 	- replaced with OpenSS7 Linux Fast-STREAMS include file
-	* (include/sys/cmn_err.h):
+	* include/sys/cmn_err.h:
 	- printf patch
 	- removed deprecated lis_print_trace
-	* (include/sys/osif.h):
+	* include/sys/osif.h:
 	- hppa patch
 	- printf patch
 	- added check_mem_region, request_mem_region and release_mem_region
-	* (include/sys/strconfig.h):
+	* include/sys/strconfig.h:
 	- removed deprecated debugging defines
-	* (include/sys/stream.h):
+	* include/sys/stream.h:
 	- removed deprecated debugging defines
-	* (include/sys/stropts.h):
+	* include/sys/stropts.h:
 	- corrected erroneous prototypes for getmsg and putmsg
-	* (include/sys/LiS/linux-mdep.h):
+	* include/sys/LiS/linux-mdep.h:
 	- added proper linux includes
 	- defined _RP to nothing when undefined
 	- added sys/types include
 	- removed erroneous modversions.h and module.h includes
 	- added KERNEL_2_6 define
-	* (include/sys/LiS/mod.h):
+	* include/sys/LiS/mod.h:
 	- stats patch
-	* (include/sys/LiS/port-mdep.h):
+	* include/sys/LiS/port-mdep.h:
 	- printf patch
-	* (include/sys/LiS/queue.h):
+	* include/sys/LiS/queue.h:
 	- corrected appq prototype
-	* (include/sys/LiS/strlog.h):
+	* include/sys/LiS/strlog.h:
 	- printf patch
-	* (include/sys/LiS/strmdbg.h):
+	* include/sys/LiS/strmdbg.h:
 	- printf patch
-	* (libc/fattach.c):
+	* libc/fattach.c:
 	- replaced with Linux Fast-STREAMS thread-safe function
-	* (libc/fdetach.c):
+	* libc/fdetach.c:
 	- replaced with Linux Fast-STREAMS thread-safe function
-	* (libc/getmsg.c):
+	* libc/getmsg.c:
 	- replaced with Linux Fast-STREAMS thread-safe function
-	* (libc/getpmsg.c):
+	* libc/getpmsg.c:
 	- replaced with Linux Fast-STREAMS thread-safe function
-	* (libc/isastream.c):
+	* libc/isastream.c:
 	- replaced with Linux Fast-STREAMS thread-safe function
-	* (libc/pipe.c):
+	* libc/pipe.c:
 	- replaced with Linux Fast-STREAMS thread-safe function
-	* (libc/putmsg.c):
+	* libc/putmsg.c:
 	- replaced with Linux Fast-STREAMS thread-safe function
-	* (libc/putpmsg.c):
+	* libc/putpmsg.c:
 	- replaced with Linux Fast-STREAMS thread-safe function
-	* (scripts/lis-down):
+	* scripts/lis-down:
 	- replaced with full script
-	* (scripts/lis-status):
+	* scripts/lis-status:
 	- replaced with full script
-	* (scripts/lis-up):
+	* scripts/lis-up:
 	- replaced with full script
-	* (util/strconf.c):
+	* util/strconf.c:
 	- printf patch
 	- removed from release (scripts/strconf.sh does job)
-	* (util/streams.c):
+	* util/streams.c:
 	- full argument handling
-	* (util/strtst.c):
+	* util/strtst.c:
 	- full argument handling
 	- multiple threaded tests patch
-	* (util/timetst.c):
+	* util/timetst.c:
 	- full argument handling
-	* (util/fattach.c):
+	* util/fattach.c:
 	- full argument handling
-	* (util/fdetach.c):
+	* util/fdetach.c:
 	- full argument handling
-	* (util/mkfifo.c):
+	* util/mkfifo.c:
 	- full argument handling
-	* (util/linux/oc.c):
+	* util/linux/oc.c:
 	- full argument handling
-	* (util/linux/pafd.c):
+	* util/linux/pafd.c:
 	- full argument handling
-	* (util/linux/psfd.c):
+	* util/linux/psfd.c:
 	- full argument handling
-	* (util/linux/rwf.c):
+	* util/linux/rwf.c:
 	- full argument handling
-	* (util/linux/test.c):
+	* util/linux/test.c:
 	- full argument handling
-	* (util/linux/test2.c):
+	* util/linux/test2.c:
 	- full argument handling
-	* (util/linux/thrtst.c):
+	* util/linux/thrtst.c:
 	- full argument handling
 	- multithreaded test patch
-	* (.debepoch): added: autoconf control files
-	* (.debrelease): added: autoconf control files
-	* (.gnupguser): added: autoconf control files
-	* (.pkgepoch): added: autoconf control files
-	* (.pkgrelease): added: autoconf control files
-	* (.rpmepoch): added: autoconf control files
-	* (.rpmrelease): added: autoconf control files
-	* (AUTHORS): added for gnits compliance
-	* (ChangeLog): added for gnits compliance
-	* (NEWS): added for gnits compliance
-	* (THANKS): added for gnits compliance
-	* (COPYING): replaced with GPL
-	* (LiS.lsm.in): lsm input file
-	* (LiS.gif): added rpm spec input files
-	* (LiS.spec.in): added rpm spec input files
-	* (LiS.tif): added rpm spec input files
-	* (LiS.xcf): added rpm spec input files
-	* (LiS.xpm): added rpm spec input files
-	* (config.in.in): added autoconf input files for old GCOM config files
-	* (include/sys/LiS/genconf.h.in): added autoconf input files for old GCOM config files
-	* (Makefile.am): added autoconf/automake primary files
-	* (acinclude.m4): added autoconf/automake primary files
-	* (configure.ac): added autoconf/automake primary files
-	* (configure.nexusware): added autoconf/automake primary files
-	* (include/Makefile.am): added autoconf/automake primary files
-	* (man/Makefile.am): added autoconf/automake primary files
-	* (gettext.h): added GNU gettext include
-	* (strms_down): readded old scripts
-	* (strms_status): readded old scripts
-	* (strms_up): readded old scripts
-	* (util/linux/ldlconfig.c): removed to strxns package
-	* (util/linux/ldltest.c): removed to strxns package
-	* (m4/Makefile.am): added autoconf local includes
-	* (m4/autotest.m4): added autoconf local includes
-	* (m4/deb.m4): added autoconf local includes
-	* (m4/dist.m4): added autoconf local includes
-	* (m4/genksyms.m4): added autoconf local includes
-	* (m4/inet.m4): added autoconf local includes
-	* (m4/init.m4): added autoconf local includes
-	* (m4/kernel.m4): added autoconf local includes
-	* (m4/libraries.m4): added autoconf local includes
-	* (m4/man.m4): added autoconf local includes
-	* (m4/openss7.m4): added autoconf local includes
-	* (m4/public.m4): added autoconf local includes
-	* (m4/rpm.m4): added autoconf local includes
-	* (m4/sctp.m4): added autoconf local includes
-	* (m4/strconf.m4): added autoconf local includes
-	* (m4/streams.m4): added autoconf local includes
-	* (m4/xns.m4): added autoconf local includes
-	* (m4/xopen.m4): added autoconf local includes
-	* (m4/xti.m4): added autoconf local includes
-	* (am/archive.am): added automake fragments
-	* (am/deb.am): added automake fragments
-	* (am/genksyms.am): added automake fragments
-	* (am/info.am): added automake fragments
-	* (am/init.am): added automake fragments
-	* (am/kernel.am): added automake fragments
-	* (am/libraries.am): added automake fragments
-	* (am/lsm.am): added automake fragments
-	* (am/man.am): added automake fragments
-	* (am/openss7.am): added automake fragments
-	* (am/rpm.am): added automake fragments
-	* (am/sctp.am): added automake fragments
-	* (am/strconf.am): added automake fragments
-	* (scripts/cflagcheck): added autoconf/automake helper scripts
-	* (scripts/check_commands): added autoconf/automake helper scripts
-	* (scripts/check_libs): added autoconf/automake helper scripts
-	* (scripts/check_mans): added autoconf/automake helper scripts
-	* (scripts/check_modules): added autoconf/automake helper scripts
-	* (scripts/chkconfig): added autoconf/automake helper scripts
-	* (scripts/inet_mkdev): added autoconf/automake helper scripts
-	* (scripts/inet_rmdev): added autoconf/automake helper scripts
-	* (scripts/install_initd): added autoconf/automake helper scripts
-	* (scripts/modpost.sh): added autoconf/automake helper scripts
-	* (scripts/modsyms.sh): added autoconf/automake helper scripts
-	* (scripts/remove_initd): added autoconf/automake helper scripts
-	* (scripts/strconf-sh): added autoconf/automake helper scripts
-	* (scripts/texinfo.cnf): added autoconf/automake helper scripts
-	* (scripts/texi/args.texi.in): added autoconf/automake helper scripts
-	* (scripts/texi/fdl.texi): added autoconf/automake helper scripts
-	* (scripts/texi/gpl.texi): added autoconf/automake helper scripts
-	* (scripts/texi/install.texi): added autoconf/automake helper scripts
-	* (scripts/texi/lesser.texi): added autoconf/automake helper scripts
-	* (tests/Makefile.am): added autotest stub
-	* (tests/atlocal.in): added autotest stub
-	* (tests/dummy1.m4): added autotest stub
-	* (tests/dummy2.m4): added autotest stub
-	* (tests/dummy3.m4): added autotest stub
-	* (tests/dummy4.m4): added autotest stub
-	* (tests/kernel.at): added autotest stub
-	* (tests/testsuite.at): added autotest stub
-	* (testsuite/Makefile.am): added DEJAGNU stub
-	* (testsuite/README): added DEJAGNU stub
-	* (testsuite/config/default.exp): added DEJAGNU stub
-	* (testsuite/netperf/netperf.diff): added DEJAGNU stub
-	* (testsuite/netperf/netperf.exp): added DEJAGNU stub
-	* (testsuite/strtst/strtst.exp): added DEJAGNU stub
-	* (testsuite/wrapper/.cvsignore): added DEJAGNU stub
-	* (testsuite/wrapper/Makefile.am): added DEJAGNU stub
-	* (testsuite/wrapper/wrapper.c): added DEJAGNU stub
-	* (debian/changelog): added debian build files
-	* (debian/control.in): added debian build files
-	* (debian/copyright): added debian build files
-	* (debian/rules.in): added debian build files
-	* (drivers/str/Config, drivers/str/Config.in):
+	* .debepoch: added: autoconf control files
+	* .debrelease: added: autoconf control files
+	* .gnupguser: added: autoconf control files
+	* .pkgepoch: added: autoconf control files
+	* .pkgrelease: added: autoconf control files
+	* .rpmepoch: added: autoconf control files
+	* .rpmrelease: added: autoconf control files
+	* AUTHORS: added for gnits compliance
+	* ChangeLog: added for gnits compliance
+	* NEWS: added for gnits compliance
+	* THANKS: added for gnits compliance
+	* COPYING: replaced with GPL
+	* LiS.lsm.in: lsm input file
+	* LiS.gif: added rpm spec input files
+	* LiS.spec.in: added rpm spec input files
+	* LiS.tif: added rpm spec input files
+	* LiS.xcf: added rpm spec input files
+	* LiS.xpm: added rpm spec input files
+	* config.in.in: added autoconf input files for old GCOM config files
+	* include/sys/LiS/genconf.h.in: added autoconf input files for old GCOM config files
+	* Makefile.am: added autoconf/automake primary files
+	* acinclude.m4: added autoconf/automake primary files
+	* configure.ac: added autoconf/automake primary files
+	* configure.nexusware: added autoconf/automake primary files
+	* include/Makefile.am: added autoconf/automake primary files
+	* man/Makefile.am: added autoconf/automake primary files
+	* gettext.h: added GNU gettext include
+	* strms_down: readded old scripts
+	* strms_status: readded old scripts
+	* strms_up: readded old scripts
+	* util/linux/ldlconfig.c: removed to strxns package
+	* util/linux/ldltest.c: removed to strxns package
+	* m4/Makefile.am: added autoconf local includes
+	* m4/autotest.m4: added autoconf local includes
+	* m4/deb.m4: added autoconf local includes
+	* m4/dist.m4: added autoconf local includes
+	* m4/genksyms.m4: added autoconf local includes
+	* m4/inet.m4: added autoconf local includes
+	* m4/init.m4: added autoconf local includes
+	* m4/kernel.m4: added autoconf local includes
+	* m4/libraries.m4: added autoconf local includes
+	* m4/man.m4: added autoconf local includes
+	* m4/openss7.m4: added autoconf local includes
+	* m4/public.m4: added autoconf local includes
+	* m4/rpm.m4: added autoconf local includes
+	* m4/sctp.m4: added autoconf local includes
+	* m4/strconf.m4: added autoconf local includes
+	* m4/streams.m4: added autoconf local includes
+	* m4/xns.m4: added autoconf local includes
+	* m4/xopen.m4: added autoconf local includes
+	* m4/xti.m4: added autoconf local includes
+	* am/archive.am: added automake fragments
+	* am/deb.am: added automake fragments
+	* am/genksyms.am: added automake fragments
+	* am/info.am: added automake fragments
+	* am/init.am: added automake fragments
+	* am/kernel.am: added automake fragments
+	* am/libraries.am: added automake fragments
+	* am/lsm.am: added automake fragments
+	* am/man.am: added automake fragments
+	* am/openss7.am: added automake fragments
+	* am/rpm.am: added automake fragments
+	* am/sctp.am: added automake fragments
+	* am/strconf.am: added automake fragments
+	* scripts/cflagcheck: added autoconf/automake helper scripts
+	* scripts/check_commands: added autoconf/automake helper scripts
+	* scripts/check_libs: added autoconf/automake helper scripts
+	* scripts/check_mans: added autoconf/automake helper scripts
+	* scripts/check_modules: added autoconf/automake helper scripts
+	* scripts/chkconfig: added autoconf/automake helper scripts
+	* scripts/inet_mkdev: added autoconf/automake helper scripts
+	* scripts/inet_rmdev: added autoconf/automake helper scripts
+	* scripts/install_initd: added autoconf/automake helper scripts
+	* scripts/modpost.sh: added autoconf/automake helper scripts
+	* scripts/modsyms.sh: added autoconf/automake helper scripts
+	* scripts/remove_initd: added autoconf/automake helper scripts
+	* scripts/strconf-sh: added autoconf/automake helper scripts
+	* scripts/texinfo.cnf: added autoconf/automake helper scripts
+	* scripts/texi/args.texi.in: added autoconf/automake helper scripts
+	* scripts/texi/fdl.texi: added autoconf/automake helper scripts
+	* scripts/texi/gpl.texi: added autoconf/automake helper scripts
+	* scripts/texi/install.texi: added autoconf/automake helper scripts
+	* scripts/texi/lesser.texi: added autoconf/automake helper scripts
+	* tests/Makefile.am: added autotest stub
+	* tests/atlocal.in: added autotest stub
+	* tests/dummy1.m4: added autotest stub
+	* tests/dummy2.m4: added autotest stub
+	* tests/dummy3.m4: added autotest stub
+	* tests/dummy4.m4: added autotest stub
+	* tests/kernel.at: added autotest stub
+	* tests/testsuite.at: added autotest stub
+	* testsuite/Makefile.am: added DEJAGNU stub
+	* testsuite/README: added DEJAGNU stub
+	* testsuite/config/default.exp: added DEJAGNU stub
+	* testsuite/netperf/netperf.diff: added DEJAGNU stub
+	* testsuite/netperf/netperf.exp: added DEJAGNU stub
+	* testsuite/strtst/strtst.exp: added DEJAGNU stub
+	* testsuite/wrapper/.cvsignore: added DEJAGNU stub
+	* testsuite/wrapper/Makefile.am: added DEJAGNU stub
+	* testsuite/wrapper/wrapper.c: added DEJAGNU stub
+	* debian/changelog: added debian build files
+	* debian/control.in: added debian build files
+	* debian/copyright: added debian build files
+	* debian/rules.in: added debian build files
+	* drivers/str/Config, drivers/str/Config.in:
 	- Config replaced with Config.in input file
-	* (include/sys/dlpi.h): removed
-	* (include/sys/ldl.h): removed
-	* (include/sys/npi.h): removed
-	* (include/sys/sockio.h): removed
-	* (include/sys/LiS/dlpidriver.h): removed
-	* (include/sys/LiS/tpicommon.h): removed
-	* (man/man3/fattach.3, man/man3/fattach.3.man): replaced
-	* (man/man3/fdetach.3, man/man3/fdetach.3.man): replaced
-	* (man/man3/isastream.3, man/man3/isastream.3.man): replaced
-	* (man/man3/pipe.3, man/man3/pipe.3.man): replaced
-	* (man/man8/fattach.8, man/man8/fattach.8.man): replaced
-	* (man/man8/fdetach.8, man/man8/fdetach.8.man): replaced
-	* (man/man9/connld.9, man/man9/connld.9.man): replaced
-	* (man/man9/fifo.9, man/man9/fifo.9.man): replaced
-	* (man/man9/pipemod.9, man/man9/pipemod.9.man): replaced
-	* (man/lis.macros): added manual pages
-	* (man/lis.refs): added manual pages
-	* (man/man1/oc.1.man): added manual pages
-	* (man/man1/pafd.1.man): added manual pages
-	* (man/man1/psfd.1.man): added manual pages
-	* (man/man1/rwf.1.man): added manual pages
-	* (man/man2/getmsg.2.man): added manual pages
-	* (man/man2/getpmsg.2s.man): added manual pages
-	* (man/man2/pipe.2s.man): added manual pages
-	* (man/man2/poll.2s.man): added manual pages
-	* (man/man2/putmsg.2.man): added manual pages
-	* (man/man2/putpmsg.2s.man): added manual pages
-	* (man/man2/streamio.2.man): added manual pages
-	* (man/man4/clone.4.man): added manual pages
-	* (man/man4/connld.4.man): added manual pages
-	* (man/man4/fifo.4s.man): added manual pages
-	* (man/man4/pipemod.4.man): added manual pages
-	* (man/man4/sad.4.man): added manual pages
-	* (man/man4/soon.4.man): added manual pages
-	* (man/man5/soon.5.man): added manual pages
-	* (man/man5/strconf_config.5.man): added manual pages
-	* (man/man7/streamio.7.man): added manual pages
-	* (man/man8/mkfifo.8s.man): added manual pages
-	* (man/man8/streams.8.man): added manual pages
-	* (man/man8/strmakenodes.8.man): added manual pages
-	* (man/man8/strms_down.8.man): added manual pages
-	* (man/man8/strms_status.8.man): added manual pages
-	* (man/man8/strms_up.8.man): added manual pages
-	* (man/man9/Intro.9.man): added manual pages
-	* (man/man9/LiS.9.man): added manual pages
-	* (man/man9/OTHER.9.man): added manual pages
-	* (man/man9/OTHERQ.9.man): added manual pages
-	* (man/man9/RD.9.man): added manual pages
-	* (man/man9/SAMESTR.9.man): added manual pages
-	* (man/man9/WR.9.man): added manual pages
-	* (man/man9/adjmsg.9.man): added manual pages
-	* (man/man9/allocb.9.man): added manual pages
-	* (man/man9/allocb_physreq.9.man): added manual pages
-	* (man/man9/allocq.9.man): added manual pages
-	* (man/man9/appq.9.man): added manual pages
-	* (man/man9/backq.9.man): added manual pages
-	* (man/man9/bcanput.9.man): added manual pages
-	* (man/man9/bcanputnext.9.man): added manual pages
-	* (man/man9/bcopy.9.man): added manual pages
-	* (man/man9/bufcall.9.man): added manual pages
-	* (man/man9/bzero.9.man): added manual pages
-	* (man/man9/canenable.9.man): added manual pages
-	* (man/man9/canput.9.man): added manual pages
-	* (man/man9/canputnext.9.man): added manual pages
-	* (man/man9/cmn_err.9.man): added manual pages
-	* (man/man9/copyb.9.man): added manual pages
-	* (man/man9/copymsg.9.man): added manual pages
-	* (man/man9/datamsg.9.man): added manual pages
-	* (man/man9/dupb.9.man): added manual pages
-	* (man/man9/dupmsg.9.man): added manual pages
-	* (man/man9/enableok.9.man): added manual pages
-	* (man/man9/esballoc.9.man): added manual pages
-	* (man/man9/esbbcall.9.man): added manual pages
-	* (man/man9/flushband.9.man): added manual pages
-	* (man/man9/flushq.9.man): added manual pages
-	* (man/man9/freeb.9.man): added manual pages
-	* (man/man9/freemsg.9.man): added manual pages
-	* (man/man9/freeq.9.man): added manual pages
-	* (man/man9/getmajor.9.man): added manual pages
-	* (man/man9/getminor.9.man): added manual pages
-	* (man/man9/getq.9.man): added manual pages
-	* (man/man9/insq.9.man): added manual pages
-	* (man/man9/isdatablk.9.man): added manual pages
-	* (man/man9/isdatamsg.9.man): added manual pages
-	* (man/man9/kmem_alloc.9.man): added manual pages
-	* (man/man9/kmem_free.9.man): added manual pages
-	* (man/man9/kmem_zalloc.9.man): added manual pages
-	* (man/man9/linkb.9.man): added manual pages
-	* (man/man9/lis_OTHER.9.man): added manual pages
-	* (man/man9/lis_OTHERQ.9.man): added manual pages
-	* (man/man9/lis_RD.9.man): added manual pages
-	* (man/man9/lis_SAMESTR.9.man): added manual pages
-	* (man/man9/lis_WR.9.man): added manual pages
-	* (man/man9/lis__kfree.9.man): added manual pages
-	* (man/man9/lis__kmalloc.9.man): added manual pages
-	* (man/man9/lis_add_timer.9.man): added manual pages
-	* (man/man9/lis_adjmsg.9.man): added manual pages
-	* (man/man9/lis_alloc_atomic_fcn.9.man): added manual pages
-	* (man/man9/lis_alloc_dma_fcn.9.man): added manual pages
-	* (man/man9/lis_alloc_kernel_fcn.9.man): added manual pages
-	* (man/man9/lis_allocb.9.man): added manual pages
-	* (man/man9/lis_allocb_physreq.9.man): added manual pages
-	* (man/man9/lis_allocq.9.man): added manual pages
-	* (man/man9/lis_appq.9.man): added manual pages
-	* (man/man9/lis_apush_get.9.man): added manual pages
-	* (man/man9/lis_apush_set.9.man): added manual pages
-	* (man/man9/lis_apushm.9.man): added manual pages
-	* (man/man9/lis_assert_fail.9.man): added manual pages
-	* (man/man9/lis_atomic_add.9.man): added manual pages
-	* (man/man9/lis_atomic_dec.9.man): added manual pages
-	* (man/man9/lis_atomic_dec_and_test.9.man): added manual pages
-	* (man/man9/lis_atomic_inc.9.man): added manual pages
-	* (man/man9/lis_atomic_read.9.man): added manual pages
-	* (man/man9/lis_atomic_set.9.man): added manual pages
-	* (man/man9/lis_atomic_sub.9.man): added manual pages
-	* (man/man9/lis_backq.9.man): added manual pages
-	* (man/man9/lis_backq_fcn.9.man): added manual pages
-	* (man/man9/lis_basename.9.man): added manual pages
-	* (man/man9/lis_bcanput.9.man): added manual pages
-	* (man/man9/lis_bcanputnext.9.man): added manual pages
-	* (man/man9/lis_bcanputnext_anyband.9.man): added manual pages
-	* (man/man9/lis_bcopy.9.man): added manual pages
-	* (man/man9/lis_bprintf.9.man): added manual pages
-	* (man/man9/lis_bufcall.9.man): added manual pages
-	* (man/man9/lis_bzero.9.man): added manual pages
-	* (man/man9/lis_can_unload.9.man): added manual pages
-	* (man/man9/lis_canenable.9.man): added manual pages
-	* (man/man9/lis_canput.9.man): added manual pages
-	* (man/man9/lis_canputnext.9.man): added manual pages
-	* (man/man9/lis_check_guard.9.man): added manual pages
-	* (man/man9/lis_check_mem.9.man): added manual pages
-	* (man/man9/lis_check_mem_region.9.man): added manual pages
-	* (man/man9/lis_check_q_magic.9.man): added manual pages
-	* (man/man9/lis_check_region.9.man): added manual pages
-	* (man/man9/lis_check_umem.9.man): added manual pages
-	* (man/man9/lis_clone_major.9.man): added manual pages
-	* (man/man9/lis_cmn_err.9.man): added manual pages
-	* (man/man9/lis_copyb.9.man): added manual pages
-	* (man/man9/lis_copyin.9.man): added manual pages
-	* (man/man9/lis_copymsg.9.man): added manual pages
-	* (man/man9/lis_copyout.9.man): added manual pages
-	* (man/man9/lis_datamsg.9.man): added manual pages
-	* (man/man9/lis_date.9.man): added manual pages
-	* (man/man9/lis_debug_mask.9.man): added manual pages
-	* (man/man9/lis_debug_mask2.9.man): added manual pages
-	* (man/man9/lis_dec_mod_cnt_fcn.9.man): added manual pages
-	* (man/man9/lis_del_timer.9.man): added manual pages
-	* (man/man9/lis_disable_irq.9.man): added manual pages
-	* (man/man9/lis_dobufcall.9.man): added manual pages
-	* (man/man9/lis_doclose.9.man): added manual pages
-	* (man/man9/lis_down_fcn.9.man): added manual pages
-	* (man/man9/lis_dsecs.9.man): added manual pages
-	* (man/man9/lis_dupb.9.man): added manual pages
-	* (man/man9/lis_dupmsg.9.man): added manual pages
-	* (man/man9/lis_enable_intr.9.man): added manual pages
-	* (man/man9/lis_enable_irq.9.man): added manual pages
-	* (man/man9/lis_enableok.9.man): added manual pages
-	* (man/man9/lis_esballoc.9.man): added manual pages
-	* (man/man9/lis_esbbcall.9.man): added manual pages
-	* (man/man9/lis_fattach.9.man): added manual pages
-	* (man/man9/lis_fdetach.9.man): added manual pages
-	* (man/man9/lis_fdetach_all.9.man): added manual pages
-	* (man/man9/lis_fdetach_stream.9.man): added manual pages
-	* (man/man9/lis_fifo_close_sync.9.man): added manual pages
-	* (man/man9/lis_fifo_open_sync.9.man): added manual pages
-	* (man/man9/lis_fifo_write_sync.9.man): added manual pages
-	* (man/man9/lis_file_inode.9.man): added manual pages
-	* (man/man9/lis_file_str.9.man): added manual pages
-	* (man/man9/lis_find_strdev.9.man): added manual pages
-	* (man/man9/lis_flush_print_buffer.9.man): added manual pages
-	* (man/man9/lis_flushband.9.man): added manual pages
-	* (man/man9/lis_flushq.9.man): added manual pages
-	* (man/man9/lis_fmod_sw.9.man): added manual pages
-	* (man/man9/lis_free.9.man): added manual pages
-	* (man/man9/lis_free_dma.9.man): added manual pages
-	* (man/man9/lis_free_irq.9.man): added manual pages
-	* (man/man9/lis_free_mem_fcn.9.man): added manual pages
-	* (man/man9/lis_free_pages_fcn.9.man): added manual pages
-	* (man/man9/lis_free_passfp.9.man): added manual pages
-	* (man/man9/lis_freeb.9.man): added manual pages
-	* (man/man9/lis_freedb.9.man): added manual pages
-	* (man/man9/lis_freemsg.9.man): added manual pages
-	* (man/man9/lis_freeq.9.man): added manual pages
-	* (man/man9/lis_fstr_sw.9.man): added manual pages
-	* (man/man9/lis_get_fifo.9.man): added manual pages
-	* (man/man9/lis_get_free_pages_atomic_fcn.9.man): added manual pages
-	* (man/man9/lis_get_free_pages_fcn.9.man): added manual pages
-	* (man/man9/lis_get_free_pages_kernel_fcn.9.man): added manual pages
-	* (man/man9/lis_get_passfp.9.man): added manual pages
-	* (man/man9/lis_get_pipe.9.man): added manual pages
-	* (man/man9/lis_getint.9.man): added manual pages
-	* (man/man9/lis_getq.9.man): added manual pages
-	* (man/man9/lis_gettimeofday.9.man): added manual pages
-	* (man/man9/lis_hitime.9.man): added manual pages
-	* (man/man9/lis_in_syscall.9.man): added manual pages
-	* (man/man9/lis_inc_mod_cnt_fcn.9.man): added manual pages
-	* (man/man9/lis_init_bufcall.9.man): added manual pages
-	* (man/man9/lis_insq.9.man): added manual pages
-	* (man/man9/lis_interruptible_sleep_on.9.man): added manual pages
-	* (man/man9/lis_ioc_fattach.9.man): added manual pages
-	* (man/man9/lis_ioc_fdetach.9.man): added manual pages
-	* (man/man9/lis_ioc_pipe.9.man): added manual pages
-	* (man/man9/lis_ioremap.9.man): added manual pages
-	* (man/man9/lis_ioremap_nocache.9.man): added manual pages
-	* (man/man9/lis_iounmap.9.man): added manual pages
-	* (man/man9/lis_isdatablk.9.man): added manual pages
-	* (man/man9/lis_isdatamsg.9.man): added manual pages
-	* (man/man9/lis_jiffies.9.man): added manual pages
-	* (man/man9/lis_kernel_down.9.man): added manual pages
-	* (man/man9/lis_kernel_up.9.man): added manual pages
-	* (man/man9/lis_kernel_version.9.man): added manual pages
-	* (man/man9/lis_kfree.9.man): added manual pages
-	* (man/man9/lis_kill_pg.9.man): added manual pages
-	* (man/man9/lis_kill_proc.9.man): added manual pages
-	* (man/man9/lis_kmalloc.9.man): added manual pages
-	* (man/man9/lis_linkb.9.man): added manual pages
-	* (man/man9/lis_loadable_load.9.man): added manual pages
-	* (man/man9/lis_maj_min_name.9.man): added manual pages
-	* (man/man9/lis_major.9.man): added manual pages
-	* (man/man9/lis_malloc.9.man): added manual pages
-	* (man/man9/lis_max_mem.9.man): added manual pages
-	* (man/man9/lis_membar.9.man): added manual pages
-	* (man/man9/lis_milli_to_ticks.9.man): added manual pages
-	* (man/man9/lis_mknod.9.man): added manual pages
-	* (man/man9/lis_mount.9.man): added manual pages
-	* (man/man9/lis_msecs.9.man): added manual pages
-	* (man/man9/lis_msg_type_name.9.man): added manual pages
-	* (man/man9/lis_msgdsize.9.man): added manual pages
-	* (man/man9/lis_msgpullup.9.man): added manual pages
-	* (man/man9/lis_msgsize.9.man): added manual pages
-	* (man/man9/lis_msgutil.9.man): added manual pages
-	* (man/man9/lis_noenable.9.man): added manual pages
-	* (man/man9/lis_num_cpus.9.man): added manual pages
-	* (man/man9/lis_old_inode.9.man): added manual pages
-	* (man/man9/lis_open_cnt.9.man): added manual pages
-	* (man/man9/lis_osif_cli.9.man): added manual pages
-	* (man/man9/lis_osif_do_gettimeofday.9.man): added manual pages
-	* (man/man9/lis_osif_do_settimeofday.9.man): added manual pages
-	* (man/man9/lis_osif_pci_alloc_consistent.9.man): added manual pages
-	* (man/man9/lis_osif_pci_dac_dma_supported.9.man): added manual pages
-	* (man/man9/lis_osif_pci_dac_dma_sync_single.9.man): added manual pages
-	* (man/man9/lis_osif_pci_dac_dma_to_offset.9.man): added manual pages
-	* (man/man9/lis_osif_pci_dac_dma_to_page.9.man): added manual pages
-	* (man/man9/lis_osif_pci_dac_page_to_dma.9.man): added manual pages
-	* (man/man9/lis_osif_pci_dac_set_dma_mask.9.man): added manual pages
-	* (man/man9/lis_osif_pci_disable_device.9.man): added manual pages
-	* (man/man9/lis_osif_pci_dma_supported.9.man): added manual pages
-	* (man/man9/lis_osif_pci_dma_sync_sg.9.man): added manual pages
-	* (man/man9/lis_osif_pci_dma_sync_single.9.man): added manual pages
-	* (man/man9/lis_osif_pci_enable_device.9.man): added manual pages
-	* (man/man9/lis_osif_pci_find_class.9.man): added manual pages
-	* (man/man9/lis_osif_pci_find_device.9.man): added manual pages
-	* (man/man9/lis_osif_pci_find_slot.9.man): added manual pages
-	* (man/man9/lis_osif_pci_free_consistent.9.man): added manual pages
-	* (man/man9/lis_osif_pci_map_page.9.man): added manual pages
-	* (man/man9/lis_osif_pci_map_sg.9.man): added manual pages
-	* (man/man9/lis_osif_pci_map_single.9.man): added manual pages
-	* (man/man9/lis_osif_pci_module_init.9.man): added manual pages
-	* (man/man9/lis_osif_pci_read_config_byte.9.man): added manual pages
-	* (man/man9/lis_osif_pci_read_config_dword.9.man): added manual pages
-	* (man/man9/lis_osif_pci_read_config_word.9.man): added manual pages
-	* (man/man9/lis_osif_pci_set_dma_mask.9.man): added manual pages
-	* (man/man9/lis_osif_pci_set_master.9.man): added manual pages
-	* (man/man9/lis_osif_pci_unmap_page.9.man): added manual pages
-	* (man/man9/lis_osif_pci_unmap_sg.9.man): added manual pages
-	* (man/man9/lis_osif_pci_unmap_single.9.man): added manual pages
-	* (man/man9/lis_osif_pci_unregister_driver.9.man): added manual pages
-	* (man/man9/lis_osif_pci_write_config_byte.9.man): added manual pages
-	* (man/man9/lis_osif_pci_write_config_dword.9.man): added manual pages
-	* (man/man9/lis_osif_pci_write_config_word.9.man): added manual pages
-	* (man/man9/lis_osif_sg_dma_address.9.man): added manual pages
-	* (man/man9/lis_osif_sg_dma_len.9.man): added manual pages
-	* (man/man9/lis_osif_sti.9.man): added manual pages
-	* (man/man9/lis_own_spl.9.man): added manual pages
-	* (man/man9/lis_pci_alloc_consistent.9.man): added manual pages
-	* (man/man9/lis_pci_cleanup.9.man): added manual pages
-	* (man/man9/lis_pci_disable_device.9.man): added manual pages
-	* (man/man9/lis_pci_dma_handle_to_32.9.man): added manual pages
-	* (man/man9/lis_pci_dma_handle_to_64.9.man): added manual pages
-	* (man/man9/lis_pci_dma_supported.9.man): added manual pages
-	* (man/man9/lis_pci_dma_sync_single.9.man): added manual pages
-	* (man/man9/lis_pci_enable_device.9.man): added manual pages
-	* (man/man9/lis_pci_find_class.9.man): added manual pages
-	* (man/man9/lis_pci_find_device.9.man): added manual pages
-	* (man/man9/lis_pci_find_slot.9.man): added manual pages
-	* (man/man9/lis_pci_free_consistent.9.man): added manual pages
-	* (man/man9/lis_pci_map_single.9.man): added manual pages
-	* (man/man9/lis_pci_read_config_byte.9.man): added manual pages
-	* (man/man9/lis_pci_read_config_dword.9.man): added manual pages
-	* (man/man9/lis_pci_read_config_word.9.man): added manual pages
-	* (man/man9/lis_pci_set_dma_mask.9.man): added manual pages
-	* (man/man9/lis_pci_set_master.9.man): added manual pages
-	* (man/man9/lis_pci_unmap_single.9.man): added manual pages
-	* (man/man9/lis_pci_write_config_byte.9.man): added manual pages
-	* (man/man9/lis_pci_write_config_dword.9.man): added manual pages
-	* (man/man9/lis_pci_write_config_word.9.man): added manual pages
-	* (man/man9/lis_pcibios_find_class.9.man): added manual pages
-	* (man/man9/lis_pcibios_find_device.9.man): added manual pages
-	* (man/man9/lis_pcibios_init.9.man): added manual pages
-	* (man/man9/lis_pcibios_present.9.man): added manual pages
-	* (man/man9/lis_pcibios_read_config_byte.9.man): added manual pages
-	* (man/man9/lis_pcibios_read_config_dword.9.man): added manual pages
-	* (man/man9/lis_pcibios_read_config_word.9.man): added manual pages
-	* (man/man9/lis_pcibios_strerror.9.man): added manual pages
-	* (man/man9/lis_pcibios_write_config_byte.9.man): added manual pages
-	* (man/man9/lis_pcibios_write_config_dword.9.man): added manual pages
-	* (man/man9/lis_pcibios_write_config_word.9.man): added manual pages
-	* (man/man9/lis_phys_to_virt.9.man): added manual pages
-	* (man/man9/lis_pipe.9.man): added manual pages
-	* (man/man9/lis_poll_2_1.9.man): added manual pages
-	* (man/man9/lis_poll_bits.9.man): added manual pages
-	* (man/man9/lis_poll_events.9.man): added manual pages
-	* (man/man9/lis_poll_file.9.man): added manual pages
-	* (man/man9/lis_print_block.9.man): added manual pages
-	* (man/man9/lis_print_data.9.man): added manual pages
-	* (man/man9/lis_print_mem.9.man): added manual pages
-	* (man/man9/lis_print_msg.9.man): added manual pages
-	* (man/man9/lis_print_queue.9.man): added manual pages
-	* (man/man9/lis_print_queues.9.man): added manual pages
-	* (man/man9/lis_print_spl_track.9.man): added manual pages
-	* (man/man9/lis_print_stream.9.man): added manual pages
-	* (man/man9/lis_printk.9.man): added manual pages
-	* (man/man9/lis_pullupmsg.9.man): added manual pages
-	* (man/man9/lis_putbq.9.man): added manual pages
-	* (man/man9/lis_putbyte.9.man): added manual pages
-	* (man/man9/lis_putctl.9.man): added manual pages
-	* (man/man9/lis_putctl1.9.man): added manual pages
-	* (man/man9/lis_putnext.9.man): added manual pages
-	* (man/man9/lis_putnextctl.9.man): added manual pages
-	* (man/man9/lis_putnextctl1.9.man): added manual pages
-	* (man/man9/lis_putq.9.man): added manual pages
-	* (man/man9/lis_qattach.9.man): added manual pages
-	* (man/man9/lis_qclose.9.man): added manual pages
-	* (man/man9/lis_qcountstrm.9.man): added manual pages
-	* (man/man9/lis_qdetach.9.man): added manual pages
-	* (man/man9/lis_qenable.9.man): added manual pages
-	* (man/man9/lis_qopen.9.man): added manual pages
-	* (man/man9/lis_qprocsoff.9.man): added manual pages
-	* (man/man9/lis_qprocson.9.man): added manual pages
-	* (man/man9/lis_qreply.9.man): added manual pages
-	* (man/man9/lis_qsize.9.man): added manual pages
-	* (man/man9/lis_queue_name.9.man): added manual pages
-	* (man/man9/lis_queuerun_cnts.9.man): added manual pages
-	* (man/man9/lis_queues_running.9.man): added manual pages
-	* (man/man9/lis_recvfd.9.man): added manual pages
-	* (man/man9/lis_register_strdev.9.man): added manual pages
-	* (man/man9/lis_register_strmod.9.man): added manual pages
-	* (man/man9/lis_release_mem_region.9.man): added manual pages
-	* (man/man9/lis_release_region.9.man): added manual pages
-	* (man/man9/lis_request_dma.9.man): added manual pages
-	* (man/man9/lis_request_irq.9.man): added manual pages
-	* (man/man9/lis_request_mem_region.9.man): added manual pages
-	* (man/man9/lis_request_region.9.man): added manual pages
-	* (man/man9/lis_rmvb.9.man): added manual pages
-	* (man/man9/lis_rmvq.9.man): added manual pages
-	* (man/man9/lis_runq_cnts.9.man): added manual pages
-	* (man/man9/lis_runq_req_cnt.9.man): added manual pages
-	* (man/man9/lis_rw_lock_alloc_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_lock_free_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_lock_init_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_read_lock_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_read_lock_irq_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_read_lock_irqsave_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_read_unlock_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_read_unlock_irq_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_read_unlock_irqrestore_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_write_lock_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_write_lock_irq_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_write_lock_irqsave_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_write_unlock_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_write_unlock_irq_fcn.9.man): added manual pages
-	* (man/man9/lis_rw_write_unlock_irqrestore_fcn.9.man): added manual pages
-	* (man/man9/lis_safe_OTHERQ.9.man): added manual pages
-	* (man/man9/lis_safe_RD.9.man): added manual pages
-	* (man/man9/lis_safe_SAMESTR.9.man): added manual pages
-	* (man/man9/lis_safe_WR.9.man): added manual pages
-	* (man/man9/lis_safe_canenable.9.man): added manual pages
-	* (man/man9/lis_safe_enableok.9.man): added manual pages
-	* (man/man9/lis_safe_noenable.9.man): added manual pages
-	* (man/man9/lis_safe_putmsg.9.man): added manual pages
-	* (man/man9/lis_safe_putnext.9.man): added manual pages
-	* (man/man9/lis_safe_qreply.9.man): added manual pages
-	* (man/man9/lis_secs.9.man): added manual pages
-	* (man/man9/lis_sem_alloc.9.man): added manual pages
-	* (man/man9/lis_sem_destroy.9.man): added manual pages
-	* (man/man9/lis_sem_init.9.man): added manual pages
-	* (man/man9/lis_sendfd.9.man): added manual pages
-	* (man/man9/lis_seq_cntr.9.man): added manual pages
-	* (man/man9/lis_set_file_str.9.man): added manual pages
-	* (man/man9/lis_setq.9.man): added manual pages
-	* (man/man9/lis_setqsched.9.man): added manual pages
-	* (man/man9/lis_setqsched_cnts.9.man): added manual pages
-	* (man/man9/lis_setqsched_isr_cnts.9.man): added manual pages
-	* (man/man9/lis_sleep_on.9.man): added manual pages
-	* (man/man9/lis_spin_is_locked_fcn.9.man): added manual pages
-	* (man/man9/lis_spin_lock_alloc_fcn.9.man): added manual pages
-	* (man/man9/lis_spin_lock_fcn.9.man): added manual pages
-	* (man/man9/lis_spin_lock_free_fcn.9.man): added manual pages
-	* (man/man9/lis_spin_lock_init_fcn.9.man): added manual pages
-	* (man/man9/lis_spin_lock_irq_fcn.9.man): added manual pages
-	* (man/man9/lis_spin_lock_irqsave_fcn.9.man): added manual pages
-	* (man/man9/lis_spin_trylock_fcn.9.man): added manual pages
-	* (man/man9/lis_spin_unlock_fcn.9.man): added manual pages
-	* (man/man9/lis_spin_unlock_irq_fcn.9.man): added manual pages
-	* (man/man9/lis_spin_unlock_irqrestore_fcn.9.man): added manual pages
-	* (man/man9/lis_spl0_fcn.9.man): added manual pages
-	* (man/man9/lis_splstr_fcn.9.man): added manual pages
-	* (man/man9/lis_splx_fcn.9.man): added manual pages
-	* (man/man9/lis_sprintf.9.man): added manual pages
-	* (man/man9/lis_stdata_cnt.9.man): added manual pages
-	* (man/man9/lis_strclose.9.man): added manual pages
-	* (man/man9/lis_strcount.9.man): added manual pages
-	* (man/man9/lis_stream_utils.9.man): added manual pages
-	* (man/man9/lis_strgetpmsg.9.man): added manual pages
-	* (man/man9/lis_strioctl.9.man): added manual pages
-	* (man/man9/lis_strm_name.9.man): added manual pages
-	* (man/man9/lis_strm_name_from_queue.9.man): added manual pages
-	* (man/man9/lis_stropen.9.man): added manual pages
-	* (man/man9/lis_stropts_file.9.man): added manual pages
-	* (man/man9/lis_strputpmsg.9.man): added manual pages
-	* (man/man9/lis_strqget.9.man): added manual pages
-	* (man/man9/lis_strqset.9.man): added manual pages
-	* (man/man9/lis_strread.9.man): added manual pages
-	* (man/man9/lis_strstats.9.man): added manual pages
-	* (man/man9/lis_strwrite.9.man): added manual pages
-	* (man/man9/lis_testb.9.man): added manual pages
-	* (man/man9/lis_thread_start.9.man): added manual pages
-	* (man/man9/lis_thread_stop.9.man): added manual pages
-	* (man/man9/lis_timeout.9.man): added manual pages
-	* (man/man9/lis_timeout_fcn.9.man): added manual pages
-	* (man/man9/lis_udelay.9.man): added manual pages
-	* (man/man9/lis_umount.9.man): added manual pages
-	* (man/man9/lis_umount2.9.man): added manual pages
-	* (man/man9/lis_unbufcall.9.man): added manual pages
-	* (man/man9/lis_undoc.9.man): added manual pages
-	* (man/man9/lis_unlink.9.man): added manual pages
-	* (man/man9/lis_unlinkb.9.man): added manual pages
-	* (man/man9/lis_unregister_strdev.9.man): added manual pages
-	* (man/man9/lis_unregister_strmod.9.man): added manual pages
-	* (man/man9/lis_untimeout.9.man): added manual pages
-	* (man/man9/lis_up_fcn.9.man): added manual pages
-	* (man/man9/lis_usecs.9.man): added manual pages
-	* (man/man9/lis_usectohz.9.man): added manual pages
-	* (man/man9/lis_valid_mod_list.9.man): added manual pages
-	* (man/man9/lis_version.9.man): added manual pages
-	* (man/man9/lis_vfree.9.man): added manual pages
-	* (man/man9/lis_virt_to_phys.9.man): added manual pages
-	* (man/man9/lis_vmalloc.9.man): added manual pages
-	* (man/man9/lis_vremap.9.man): added manual pages
-	* (man/man9/lis_vsprintf.9.man): added manual pages
-	* (man/man9/lis_wake_up.9.man): added manual pages
-	* (man/man9/lis_wake_up_interruptible.9.man): added manual pages
-	* (man/man9/lis_xmsgsize.9.man): added manual pages
-	* (man/man9/lis_zmalloc.9.man): added manual pages
-	* (man/man9/makedevice.9.man): added manual pages
-	* (man/man9/mknod.9.man): added manual pages
-	* (man/man9/mount.9.man): added manual pages
-	* (man/man9/msgdsize.9.man): added manual pages
-	* (man/man9/msgpullup.9.man): added manual pages
-	* (man/man9/msgsize.9.man): added manual pages
-	* (man/man9/msgutil.9.man): added manual pages
-	* (man/man9/noenable.9.man): added manual pages
-	* (man/man9/pullupmsg.9.man): added manual pages
-	* (man/man9/putbq.9.man): added manual pages
-	* (man/man9/putctl.9.man): added manual pages
-	* (man/man9/putctl1.9.man): added manual pages
-	* (man/man9/putnext.9.man): added manual pages
-	* (man/man9/putnextctl.9.man): added manual pages
-	* (man/man9/putnextctl1.9.man): added manual pages
-	* (man/man9/putq.9.man): added manual pages
-	* (man/man9/qattach.9.man): added manual pages
-	* (man/man9/qbufcall.9.man): added manual pages
-	* (man/man9/qclose.9.man): added manual pages
-	* (man/man9/qdetach.9.man): added manual pages
-	* (man/man9/qenable.9.man): added manual pages
-	* (man/man9/qopen.9.man): added manual pages
-	* (man/man9/qprocsoff.9.man): added manual pages
-	* (man/man9/qprocson.9.man): added manual pages
-	* (man/man9/qreply.9.man): added manual pages
-	* (man/man9/qsize.9.man): added manual pages
-	* (man/man9/rmvb.9.man): added manual pages
-	* (man/man9/rmvq.9.man): added manual pages
-	* (man/man9/stream_utils.9.man): added manual pages
-	* (man/man9/strlog.9.man): added manual pages
-	* (man/man9/strqget.9.man): added manual pages
-	* (man/man9/strqset.9.man): added manual pages
-	* (man/man9/testb.9.man): added manual pages
-	* (man/man9/timeout.9.man): added manual pages
-	* (man/man9/umount.9.man): added manual pages
-	* (man/man9/umount2.9.man): added manual pages
-	* (man/man9/unbufcall.9.man): added manual pages
-	* (man/man9/unlink.9.man): added manual pages
-	* (man/man9/unlinkb.9.man): added manual pages
-	* (man/man9/untimeout.9.man): added manual pages
-	* (man/man9/xmsgsize.9.man): added manual pages
-	* (manual/LiS.texi): added LiS texi manual
-	* (manual/Makefile.am): added LiS texi manual
-	* (manual/configure.texi): added LiS texi manual
-	* (manual/releases.texi): added LiS texi manual
-	* (manual/rpm.texi): added LiS texi manual
-	* (manual/texi/args.texi.in): added LiS texi manual
-	* (manual/texi/fdl.texi): added LiS texi manual
-	* (manual/texi/gpl.texi): added LiS texi manual
-	* (manual/texi/install.texi): added LiS texi manual
-	* (manual/texi/lesser.texi): added LiS texi manual
+	* include/sys/dlpi.h: removed
+	* include/sys/ldl.h: removed
+	* include/sys/npi.h: removed
+	* include/sys/sockio.h: removed
+	* include/sys/LiS/dlpidriver.h: removed
+	* include/sys/LiS/tpicommon.h: removed
+	* man/man3/fattach.3, man/man3/fattach.3.man: replaced
+	* man/man3/fdetach.3, man/man3/fdetach.3.man: replaced
+	* man/man3/isastream.3, man/man3/isastream.3.man: replaced
+	* man/man3/pipe.3, man/man3/pipe.3.man: replaced
+	* man/man8/fattach.8, man/man8/fattach.8.man: replaced
+	* man/man8/fdetach.8, man/man8/fdetach.8.man: replaced
+	* man/man9/connld.9, man/man9/connld.9.man: replaced
+	* man/man9/fifo.9, man/man9/fifo.9.man: replaced
+	* man/man9/pipemod.9, man/man9/pipemod.9.man: replaced
+	* man/lis.macros: added manual pages
+	* man/lis.refs: added manual pages
+	* man/man1/oc.1.man: added manual pages
+	* man/man1/pafd.1.man: added manual pages
+	* man/man1/psfd.1.man: added manual pages
+	* man/man1/rwf.1.man: added manual pages
+	* man/man2/getmsg.2.man: added manual pages
+	* man/man2/getpmsg.2s.man: added manual pages
+	* man/man2/pipe.2s.man: added manual pages
+	* man/man2/poll.2s.man: added manual pages
+	* man/man2/putmsg.2.man: added manual pages
+	* man/man2/putpmsg.2s.man: added manual pages
+	* man/man2/streamio.2.man: added manual pages
+	* man/man4/clone.4.man: added manual pages
+	* man/man4/connld.4.man: added manual pages
+	* man/man4/fifo.4s.man: added manual pages
+	* man/man4/pipemod.4.man: added manual pages
+	* man/man4/sad.4.man: added manual pages
+	* man/man4/soon.4.man: added manual pages
+	* man/man5/soon.5.man: added manual pages
+	* man/man5/strconf_config.5.man: added manual pages
+	* man/man7/streamio.7.man: added manual pages
+	* man/man8/mkfifo.8s.man: added manual pages
+	* man/man8/streams.8.man: added manual pages
+	* man/man8/strmakenodes.8.man: added manual pages
+	* man/man8/strms_down.8.man: added manual pages
+	* man/man8/strms_status.8.man: added manual pages
+	* man/man8/strms_up.8.man: added manual pages
+	* man/man9/Intro.9.man: added manual pages
+	* man/man9/LiS.9.man: added manual pages
+	* man/man9/OTHER.9.man: added manual pages
+	* man/man9/OTHERQ.9.man: added manual pages
+	* man/man9/RD.9.man: added manual pages
+	* man/man9/SAMESTR.9.man: added manual pages
+	* man/man9/WR.9.man: added manual pages
+	* man/man9/adjmsg.9.man: added manual pages
+	* man/man9/allocb.9.man: added manual pages
+	* man/man9/allocb_physreq.9.man: added manual pages
+	* man/man9/allocq.9.man: added manual pages
+	* man/man9/appq.9.man: added manual pages
+	* man/man9/backq.9.man: added manual pages
+	* man/man9/bcanput.9.man: added manual pages
+	* man/man9/bcanputnext.9.man: added manual pages
+	* man/man9/bcopy.9.man: added manual pages
+	* man/man9/bufcall.9.man: added manual pages
+	* man/man9/bzero.9.man: added manual pages
+	* man/man9/canenable.9.man: added manual pages
+	* man/man9/canput.9.man: added manual pages
+	* man/man9/canputnext.9.man: added manual pages
+	* man/man9/cmn_err.9.man: added manual pages
+	* man/man9/copyb.9.man: added manual pages
+	* man/man9/copymsg.9.man: added manual pages
+	* man/man9/datamsg.9.man: added manual pages
+	* man/man9/dupb.9.man: added manual pages
+	* man/man9/dupmsg.9.man: added manual pages
+	* man/man9/enableok.9.man: added manual pages
+	* man/man9/esballoc.9.man: added manual pages
+	* man/man9/esbbcall.9.man: added manual pages
+	* man/man9/flushband.9.man: added manual pages
+	* man/man9/flushq.9.man: added manual pages
+	* man/man9/freeb.9.man: added manual pages
+	* man/man9/freemsg.9.man: added manual pages
+	* man/man9/freeq.9.man: added manual pages
+	* man/man9/getmajor.9.man: added manual pages
+	* man/man9/getminor.9.man: added manual pages
+	* man/man9/getq.9.man: added manual pages
+	* man/man9/insq.9.man: added manual pages
+	* man/man9/isdatablk.9.man: added manual pages
+	* man/man9/isdatamsg.9.man: added manual pages
+	* man/man9/kmem_alloc.9.man: added manual pages
+	* man/man9/kmem_free.9.man: added manual pages
+	* man/man9/kmem_zalloc.9.man: added manual pages
+	* man/man9/linkb.9.man: added manual pages
+	* man/man9/lis_OTHER.9.man: added manual pages
+	* man/man9/lis_OTHERQ.9.man: added manual pages
+	* man/man9/lis_RD.9.man: added manual pages
+	* man/man9/lis_SAMESTR.9.man: added manual pages
+	* man/man9/lis_WR.9.man: added manual pages
+	* man/man9/lis__kfree.9.man: added manual pages
+	* man/man9/lis__kmalloc.9.man: added manual pages
+	* man/man9/lis_add_timer.9.man: added manual pages
+	* man/man9/lis_adjmsg.9.man: added manual pages
+	* man/man9/lis_alloc_atomic_fcn.9.man: added manual pages
+	* man/man9/lis_alloc_dma_fcn.9.man: added manual pages
+	* man/man9/lis_alloc_kernel_fcn.9.man: added manual pages
+	* man/man9/lis_allocb.9.man: added manual pages
+	* man/man9/lis_allocb_physreq.9.man: added manual pages
+	* man/man9/lis_allocq.9.man: added manual pages
+	* man/man9/lis_appq.9.man: added manual pages
+	* man/man9/lis_apush_get.9.man: added manual pages
+	* man/man9/lis_apush_set.9.man: added manual pages
+	* man/man9/lis_apushm.9.man: added manual pages
+	* man/man9/lis_assert_fail.9.man: added manual pages
+	* man/man9/lis_atomic_add.9.man: added manual pages
+	* man/man9/lis_atomic_dec.9.man: added manual pages
+	* man/man9/lis_atomic_dec_and_test.9.man: added manual pages
+	* man/man9/lis_atomic_inc.9.man: added manual pages
+	* man/man9/lis_atomic_read.9.man: added manual pages
+	* man/man9/lis_atomic_set.9.man: added manual pages
+	* man/man9/lis_atomic_sub.9.man: added manual pages
+	* man/man9/lis_backq.9.man: added manual pages
+	* man/man9/lis_backq_fcn.9.man: added manual pages
+	* man/man9/lis_basename.9.man: added manual pages
+	* man/man9/lis_bcanput.9.man: added manual pages
+	* man/man9/lis_bcanputnext.9.man: added manual pages
+	* man/man9/lis_bcanputnext_anyband.9.man: added manual pages
+	* man/man9/lis_bcopy.9.man: added manual pages
+	* man/man9/lis_bprintf.9.man: added manual pages
+	* man/man9/lis_bufcall.9.man: added manual pages
+	* man/man9/lis_bzero.9.man: added manual pages
+	* man/man9/lis_can_unload.9.man: added manual pages
+	* man/man9/lis_canenable.9.man: added manual pages
+	* man/man9/lis_canput.9.man: added manual pages
+	* man/man9/lis_canputnext.9.man: added manual pages
+	* man/man9/lis_check_guard.9.man: added manual pages
+	* man/man9/lis_check_mem.9.man: added manual pages
+	* man/man9/lis_check_mem_region.9.man: added manual pages
+	* man/man9/lis_check_q_magic.9.man: added manual pages
+	* man/man9/lis_check_region.9.man: added manual pages
+	* man/man9/lis_check_umem.9.man: added manual pages
+	* man/man9/lis_clone_major.9.man: added manual pages
+	* man/man9/lis_cmn_err.9.man: added manual pages
+	* man/man9/lis_copyb.9.man: added manual pages
+	* man/man9/lis_copyin.9.man: added manual pages
+	* man/man9/lis_copymsg.9.man: added manual pages
+	* man/man9/lis_copyout.9.man: added manual pages
+	* man/man9/lis_datamsg.9.man: added manual pages
+	* man/man9/lis_date.9.man: added manual pages
+	* man/man9/lis_debug_mask.9.man: added manual pages
+	* man/man9/lis_debug_mask2.9.man: added manual pages
+	* man/man9/lis_dec_mod_cnt_fcn.9.man: added manual pages
+	* man/man9/lis_del_timer.9.man: added manual pages
+	* man/man9/lis_disable_irq.9.man: added manual pages
+	* man/man9/lis_dobufcall.9.man: added manual pages
+	* man/man9/lis_doclose.9.man: added manual pages
+	* man/man9/lis_down_fcn.9.man: added manual pages
+	* man/man9/lis_dsecs.9.man: added manual pages
+	* man/man9/lis_dupb.9.man: added manual pages
+	* man/man9/lis_dupmsg.9.man: added manual pages
+	* man/man9/lis_enable_intr.9.man: added manual pages
+	* man/man9/lis_enable_irq.9.man: added manual pages
+	* man/man9/lis_enableok.9.man: added manual pages
+	* man/man9/lis_esballoc.9.man: added manual pages
+	* man/man9/lis_esbbcall.9.man: added manual pages
+	* man/man9/lis_fattach.9.man: added manual pages
+	* man/man9/lis_fdetach.9.man: added manual pages
+	* man/man9/lis_fdetach_all.9.man: added manual pages
+	* man/man9/lis_fdetach_stream.9.man: added manual pages
+	* man/man9/lis_fifo_close_sync.9.man: added manual pages
+	* man/man9/lis_fifo_open_sync.9.man: added manual pages
+	* man/man9/lis_fifo_write_sync.9.man: added manual pages
+	* man/man9/lis_file_inode.9.man: added manual pages
+	* man/man9/lis_file_str.9.man: added manual pages
+	* man/man9/lis_find_strdev.9.man: added manual pages
+	* man/man9/lis_flush_print_buffer.9.man: added manual pages
+	* man/man9/lis_flushband.9.man: added manual pages
+	* man/man9/lis_flushq.9.man: added manual pages
+	* man/man9/lis_fmod_sw.9.man: added manual pages
+	* man/man9/lis_free.9.man: added manual pages
+	* man/man9/lis_free_dma.9.man: added manual pages
+	* man/man9/lis_free_irq.9.man: added manual pages
+	* man/man9/lis_free_mem_fcn.9.man: added manual pages
+	* man/man9/lis_free_pages_fcn.9.man: added manual pages
+	* man/man9/lis_free_passfp.9.man: added manual pages
+	* man/man9/lis_freeb.9.man: added manual pages
+	* man/man9/lis_freedb.9.man: added manual pages
+	* man/man9/lis_freemsg.9.man: added manual pages
+	* man/man9/lis_freeq.9.man: added manual pages
+	* man/man9/lis_fstr_sw.9.man: added manual pages
+	* man/man9/lis_get_fifo.9.man: added manual pages
+	* man/man9/lis_get_free_pages_atomic_fcn.9.man: added manual pages
+	* man/man9/lis_get_free_pages_fcn.9.man: added manual pages
+	* man/man9/lis_get_free_pages_kernel_fcn.9.man: added manual pages
+	* man/man9/lis_get_passfp.9.man: added manual pages
+	* man/man9/lis_get_pipe.9.man: added manual pages
+	* man/man9/lis_getint.9.man: added manual pages
+	* man/man9/lis_getq.9.man: added manual pages
+	* man/man9/lis_gettimeofday.9.man: added manual pages
+	* man/man9/lis_hitime.9.man: added manual pages
+	* man/man9/lis_in_syscall.9.man: added manual pages
+	* man/man9/lis_inc_mod_cnt_fcn.9.man: added manual pages
+	* man/man9/lis_init_bufcall.9.man: added manual pages
+	* man/man9/lis_insq.9.man: added manual pages
+	* man/man9/lis_interruptible_sleep_on.9.man: added manual pages
+	* man/man9/lis_ioc_fattach.9.man: added manual pages
+	* man/man9/lis_ioc_fdetach.9.man: added manual pages
+	* man/man9/lis_ioc_pipe.9.man: added manual pages
+	* man/man9/lis_ioremap.9.man: added manual pages
+	* man/man9/lis_ioremap_nocache.9.man: added manual pages
+	* man/man9/lis_iounmap.9.man: added manual pages
+	* man/man9/lis_isdatablk.9.man: added manual pages
+	* man/man9/lis_isdatamsg.9.man: added manual pages
+	* man/man9/lis_jiffies.9.man: added manual pages
+	* man/man9/lis_kernel_down.9.man: added manual pages
+	* man/man9/lis_kernel_up.9.man: added manual pages
+	* man/man9/lis_kernel_version.9.man: added manual pages
+	* man/man9/lis_kfree.9.man: added manual pages
+	* man/man9/lis_kill_pg.9.man: added manual pages
+	* man/man9/lis_kill_proc.9.man: added manual pages
+	* man/man9/lis_kmalloc.9.man: added manual pages
+	* man/man9/lis_linkb.9.man: added manual pages
+	* man/man9/lis_loadable_load.9.man: added manual pages
+	* man/man9/lis_maj_min_name.9.man: added manual pages
+	* man/man9/lis_major.9.man: added manual pages
+	* man/man9/lis_malloc.9.man: added manual pages
+	* man/man9/lis_max_mem.9.man: added manual pages
+	* man/man9/lis_membar.9.man: added manual pages
+	* man/man9/lis_milli_to_ticks.9.man: added manual pages
+	* man/man9/lis_mknod.9.man: added manual pages
+	* man/man9/lis_mount.9.man: added manual pages
+	* man/man9/lis_msecs.9.man: added manual pages
+	* man/man9/lis_msg_type_name.9.man: added manual pages
+	* man/man9/lis_msgdsize.9.man: added manual pages
+	* man/man9/lis_msgpullup.9.man: added manual pages
+	* man/man9/lis_msgsize.9.man: added manual pages
+	* man/man9/lis_msgutil.9.man: added manual pages
+	* man/man9/lis_noenable.9.man: added manual pages
+	* man/man9/lis_num_cpus.9.man: added manual pages
+	* man/man9/lis_old_inode.9.man: added manual pages
+	* man/man9/lis_open_cnt.9.man: added manual pages
+	* man/man9/lis_osif_cli.9.man: added manual pages
+	* man/man9/lis_osif_do_gettimeofday.9.man: added manual pages
+	* man/man9/lis_osif_do_settimeofday.9.man: added manual pages
+	* man/man9/lis_osif_pci_alloc_consistent.9.man: added manual pages
+	* man/man9/lis_osif_pci_dac_dma_supported.9.man: added manual pages
+	* man/man9/lis_osif_pci_dac_dma_sync_single.9.man: added manual pages
+	* man/man9/lis_osif_pci_dac_dma_to_offset.9.man: added manual pages
+	* man/man9/lis_osif_pci_dac_dma_to_page.9.man: added manual pages
+	* man/man9/lis_osif_pci_dac_page_to_dma.9.man: added manual pages
+	* man/man9/lis_osif_pci_dac_set_dma_mask.9.man: added manual pages
+	* man/man9/lis_osif_pci_disable_device.9.man: added manual pages
+	* man/man9/lis_osif_pci_dma_supported.9.man: added manual pages
+	* man/man9/lis_osif_pci_dma_sync_sg.9.man: added manual pages
+	* man/man9/lis_osif_pci_dma_sync_single.9.man: added manual pages
+	* man/man9/lis_osif_pci_enable_device.9.man: added manual pages
+	* man/man9/lis_osif_pci_find_class.9.man: added manual pages
+	* man/man9/lis_osif_pci_find_device.9.man: added manual pages
+	* man/man9/lis_osif_pci_find_slot.9.man: added manual pages
+	* man/man9/lis_osif_pci_free_consistent.9.man: added manual pages
+	* man/man9/lis_osif_pci_map_page.9.man: added manual pages
+	* man/man9/lis_osif_pci_map_sg.9.man: added manual pages
+	* man/man9/lis_osif_pci_map_single.9.man: added manual pages
+	* man/man9/lis_osif_pci_module_init.9.man: added manual pages
+	* man/man9/lis_osif_pci_read_config_byte.9.man: added manual pages
+	* man/man9/lis_osif_pci_read_config_dword.9.man: added manual pages
+	* man/man9/lis_osif_pci_read_config_word.9.man: added manual pages
+	* man/man9/lis_osif_pci_set_dma_mask.9.man: added manual pages
+	* man/man9/lis_osif_pci_set_master.9.man: added manual pages
+	* man/man9/lis_osif_pci_unmap_page.9.man: added manual pages
+	* man/man9/lis_osif_pci_unmap_sg.9.man: added manual pages
+	* man/man9/lis_osif_pci_unmap_single.9.man: added manual pages
+	* man/man9/lis_osif_pci_unregister_driver.9.man: added manual pages
+	* man/man9/lis_osif_pci_write_config_byte.9.man: added manual pages
+	* man/man9/lis_osif_pci_write_config_dword.9.man: added manual pages
+	* man/man9/lis_osif_pci_write_config_word.9.man: added manual pages
+	* man/man9/lis_osif_sg_dma_address.9.man: added manual pages
+	* man/man9/lis_osif_sg_dma_len.9.man: added manual pages
+	* man/man9/lis_osif_sti.9.man: added manual pages
+	* man/man9/lis_own_spl.9.man: added manual pages
+	* man/man9/lis_pci_alloc_consistent.9.man: added manual pages
+	* man/man9/lis_pci_cleanup.9.man: added manual pages
+	* man/man9/lis_pci_disable_device.9.man: added manual pages
+	* man/man9/lis_pci_dma_handle_to_32.9.man: added manual pages
+	* man/man9/lis_pci_dma_handle_to_64.9.man: added manual pages
+	* man/man9/lis_pci_dma_supported.9.man: added manual pages
+	* man/man9/lis_pci_dma_sync_single.9.man: added manual pages
+	* man/man9/lis_pci_enable_device.9.man: added manual pages
+	* man/man9/lis_pci_find_class.9.man: added manual pages
+	* man/man9/lis_pci_find_device.9.man: added manual pages
+	* man/man9/lis_pci_find_slot.9.man: added manual pages
+	* man/man9/lis_pci_free_consistent.9.man: added manual pages
+	* man/man9/lis_pci_map_single.9.man: added manual pages
+	* man/man9/lis_pci_read_config_byte.9.man: added manual pages
+	* man/man9/lis_pci_read_config_dword.9.man: added manual pages
+	* man/man9/lis_pci_read_config_word.9.man: added manual pages
+	* man/man9/lis_pci_set_dma_mask.9.man: added manual pages
+	* man/man9/lis_pci_set_master.9.man: added manual pages
+	* man/man9/lis_pci_unmap_single.9.man: added manual pages
+	* man/man9/lis_pci_write_config_byte.9.man: added manual pages
+	* man/man9/lis_pci_write_config_dword.9.man: added manual pages
+	* man/man9/lis_pci_write_config_word.9.man: added manual pages
+	* man/man9/lis_pcibios_find_class.9.man: added manual pages
+	* man/man9/lis_pcibios_find_device.9.man: added manual pages
+	* man/man9/lis_pcibios_init.9.man: added manual pages
+	* man/man9/lis_pcibios_present.9.man: added manual pages
+	* man/man9/lis_pcibios_read_config_byte.9.man: added manual pages
+	* man/man9/lis_pcibios_read_config_dword.9.man: added manual pages
+	* man/man9/lis_pcibios_read_config_word.9.man: added manual pages
+	* man/man9/lis_pcibios_strerror.9.man: added manual pages
+	* man/man9/lis_pcibios_write_config_byte.9.man: added manual pages
+	* man/man9/lis_pcibios_write_config_dword.9.man: added manual pages
+	* man/man9/lis_pcibios_write_config_word.9.man: added manual pages
+	* man/man9/lis_phys_to_virt.9.man: added manual pages
+	* man/man9/lis_pipe.9.man: added manual pages
+	* man/man9/lis_poll_2_1.9.man: added manual pages
+	* man/man9/lis_poll_bits.9.man: added manual pages
+	* man/man9/lis_poll_events.9.man: added manual pages
+	* man/man9/lis_poll_file.9.man: added manual pages
+	* man/man9/lis_print_block.9.man: added manual pages
+	* man/man9/lis_print_data.9.man: added manual pages
+	* man/man9/lis_print_mem.9.man: added manual pages
+	* man/man9/lis_print_msg.9.man: added manual pages
+	* man/man9/lis_print_queue.9.man: added manual pages
+	* man/man9/lis_print_queues.9.man: added manual pages
+	* man/man9/lis_print_spl_track.9.man: added manual pages
+	* man/man9/lis_print_stream.9.man: added manual pages
+	* man/man9/lis_printk.9.man: added manual pages
+	* man/man9/lis_pullupmsg.9.man: added manual pages
+	* man/man9/lis_putbq.9.man: added manual pages
+	* man/man9/lis_putbyte.9.man: added manual pages
+	* man/man9/lis_putctl.9.man: added manual pages
+	* man/man9/lis_putctl1.9.man: added manual pages
+	* man/man9/lis_putnext.9.man: added manual pages
+	* man/man9/lis_putnextctl.9.man: added manual pages
+	* man/man9/lis_putnextctl1.9.man: added manual pages
+	* man/man9/lis_putq.9.man: added manual pages
+	* man/man9/lis_qattach.9.man: added manual pages
+	* man/man9/lis_qclose.9.man: added manual pages
+	* man/man9/lis_qcountstrm.9.man: added manual pages
+	* man/man9/lis_qdetach.9.man: added manual pages
+	* man/man9/lis_qenable.9.man: added manual pages
+	* man/man9/lis_qopen.9.man: added manual pages
+	* man/man9/lis_qprocsoff.9.man: added manual pages
+	* man/man9/lis_qprocson.9.man: added manual pages
+	* man/man9/lis_qreply.9.man: added manual pages
+	* man/man9/lis_qsize.9.man: added manual pages
+	* man/man9/lis_queue_name.9.man: added manual pages
+	* man/man9/lis_queuerun_cnts.9.man: added manual pages
+	* man/man9/lis_queues_running.9.man: added manual pages
+	* man/man9/lis_recvfd.9.man: added manual pages
+	* man/man9/lis_register_strdev.9.man: added manual pages
+	* man/man9/lis_register_strmod.9.man: added manual pages
+	* man/man9/lis_release_mem_region.9.man: added manual pages
+	* man/man9/lis_release_region.9.man: added manual pages
+	* man/man9/lis_request_dma.9.man: added manual pages
+	* man/man9/lis_request_irq.9.man: added manual pages
+	* man/man9/lis_request_mem_region.9.man: added manual pages
+	* man/man9/lis_request_region.9.man: added manual pages
+	* man/man9/lis_rmvb.9.man: added manual pages
+	* man/man9/lis_rmvq.9.man: added manual pages
+	* man/man9/lis_runq_cnts.9.man: added manual pages
+	* man/man9/lis_runq_req_cnt.9.man: added manual pages
+	* man/man9/lis_rw_lock_alloc_fcn.9.man: added manual pages
+	* man/man9/lis_rw_lock_free_fcn.9.man: added manual pages
+	* man/man9/lis_rw_lock_init_fcn.9.man: added manual pages
+	* man/man9/lis_rw_read_lock_fcn.9.man: added manual pages
+	* man/man9/lis_rw_read_lock_irq_fcn.9.man: added manual pages
+	* man/man9/lis_rw_read_lock_irqsave_fcn.9.man: added manual pages
+	* man/man9/lis_rw_read_unlock_fcn.9.man: added manual pages
+	* man/man9/lis_rw_read_unlock_irq_fcn.9.man: added manual pages
+	* man/man9/lis_rw_read_unlock_irqrestore_fcn.9.man: added manual pages
+	* man/man9/lis_rw_write_lock_fcn.9.man: added manual pages
+	* man/man9/lis_rw_write_lock_irq_fcn.9.man: added manual pages
+	* man/man9/lis_rw_write_lock_irqsave_fcn.9.man: added manual pages
+	* man/man9/lis_rw_write_unlock_fcn.9.man: added manual pages
+	* man/man9/lis_rw_write_unlock_irq_fcn.9.man: added manual pages
+	* man/man9/lis_rw_write_unlock_irqrestore_fcn.9.man: added manual pages
+	* man/man9/lis_safe_OTHERQ.9.man: added manual pages
+	* man/man9/lis_safe_RD.9.man: added manual pages
+	* man/man9/lis_safe_SAMESTR.9.man: added manual pages
+	* man/man9/lis_safe_WR.9.man: added manual pages
+	* man/man9/lis_safe_canenable.9.man: added manual pages
+	* man/man9/lis_safe_enableok.9.man: added manual pages
+	* man/man9/lis_safe_noenable.9.man: added manual pages
+	* man/man9/lis_safe_putmsg.9.man: added manual pages
+	* man/man9/lis_safe_putnext.9.man: added manual pages
+	* man/man9/lis_safe_qreply.9.man: added manual pages
+	* man/man9/lis_secs.9.man: added manual pages
+	* man/man9/lis_sem_alloc.9.man: added manual pages
+	* man/man9/lis_sem_destroy.9.man: added manual pages
+	* man/man9/lis_sem_init.9.man: added manual pages
+	* man/man9/lis_sendfd.9.man: added manual pages
+	* man/man9/lis_seq_cntr.9.man: added manual pages
+	* man/man9/lis_set_file_str.9.man: added manual pages
+	* man/man9/lis_setq.9.man: added manual pages
+	* man/man9/lis_setqsched.9.man: added manual pages
+	* man/man9/lis_setqsched_cnts.9.man: added manual pages
+	* man/man9/lis_setqsched_isr_cnts.9.man: added manual pages
+	* man/man9/lis_sleep_on.9.man: added manual pages
+	* man/man9/lis_spin_is_locked_fcn.9.man: added manual pages
+	* man/man9/lis_spin_lock_alloc_fcn.9.man: added manual pages
+	* man/man9/lis_spin_lock_fcn.9.man: added manual pages
+	* man/man9/lis_spin_lock_free_fcn.9.man: added manual pages
+	* man/man9/lis_spin_lock_init_fcn.9.man: added manual pages
+	* man/man9/lis_spin_lock_irq_fcn.9.man: added manual pages
+	* man/man9/lis_spin_lock_irqsave_fcn.9.man: added manual pages
+	* man/man9/lis_spin_trylock_fcn.9.man: added manual pages
+	* man/man9/lis_spin_unlock_fcn.9.man: added manual pages
+	* man/man9/lis_spin_unlock_irq_fcn.9.man: added manual pages
+	* man/man9/lis_spin_unlock_irqrestore_fcn.9.man: added manual pages
+	* man/man9/lis_spl0_fcn.9.man: added manual pages
+	* man/man9/lis_splstr_fcn.9.man: added manual pages
+	* man/man9/lis_splx_fcn.9.man: added manual pages
+	* man/man9/lis_sprintf.9.man: added manual pages
+	* man/man9/lis_stdata_cnt.9.man: added manual pages
+	* man/man9/lis_strclose.9.man: added manual pages
+	* man/man9/lis_strcount.9.man: added manual pages
+	* man/man9/lis_stream_utils.9.man: added manual pages
+	* man/man9/lis_strgetpmsg.9.man: added manual pages
+	* man/man9/lis_strioctl.9.man: added manual pages
+	* man/man9/lis_strm_name.9.man: added manual pages
+	* man/man9/lis_strm_name_from_queue.9.man: added manual pages
+	* man/man9/lis_stropen.9.man: added manual pages
+	* man/man9/lis_stropts_file.9.man: added manual pages
+	* man/man9/lis_strputpmsg.9.man: added manual pages
+	* man/man9/lis_strqget.9.man: added manual pages
+	* man/man9/lis_strqset.9.man: added manual pages
+	* man/man9/lis_strread.9.man: added manual pages
+	* man/man9/lis_strstats.9.man: added manual pages
+	* man/man9/lis_strwrite.9.man: added manual pages
+	* man/man9/lis_testb.9.man: added manual pages
+	* man/man9/lis_thread_start.9.man: added manual pages
+	* man/man9/lis_thread_stop.9.man: added manual pages
+	* man/man9/lis_timeout.9.man: added manual pages
+	* man/man9/lis_timeout_fcn.9.man: added manual pages
+	* man/man9/lis_udelay.9.man: added manual pages
+	* man/man9/lis_umount.9.man: added manual pages
+	* man/man9/lis_umount2.9.man: added manual pages
+	* man/man9/lis_unbufcall.9.man: added manual pages
+	* man/man9/lis_undoc.9.man: added manual pages
+	* man/man9/lis_unlink.9.man: added manual pages
+	* man/man9/lis_unlinkb.9.man: added manual pages
+	* man/man9/lis_unregister_strdev.9.man: added manual pages
+	* man/man9/lis_unregister_strmod.9.man: added manual pages
+	* man/man9/lis_untimeout.9.man: added manual pages
+	* man/man9/lis_up_fcn.9.man: added manual pages
+	* man/man9/lis_usecs.9.man: added manual pages
+	* man/man9/lis_usectohz.9.man: added manual pages
+	* man/man9/lis_valid_mod_list.9.man: added manual pages
+	* man/man9/lis_version.9.man: added manual pages
+	* man/man9/lis_vfree.9.man: added manual pages
+	* man/man9/lis_virt_to_phys.9.man: added manual pages
+	* man/man9/lis_vmalloc.9.man: added manual pages
+	* man/man9/lis_vremap.9.man: added manual pages
+	* man/man9/lis_vsprintf.9.man: added manual pages
+	* man/man9/lis_wake_up.9.man: added manual pages
+	* man/man9/lis_wake_up_interruptible.9.man: added manual pages
+	* man/man9/lis_xmsgsize.9.man: added manual pages
+	* man/man9/lis_zmalloc.9.man: added manual pages
+	* man/man9/makedevice.9.man: added manual pages
+	* man/man9/mknod.9.man: added manual pages
+	* man/man9/mount.9.man: added manual pages
+	* man/man9/msgdsize.9.man: added manual pages
+	* man/man9/msgpullup.9.man: added manual pages
+	* man/man9/msgsize.9.man: added manual pages
+	* man/man9/msgutil.9.man: added manual pages
+	* man/man9/noenable.9.man: added manual pages
+	* man/man9/pullupmsg.9.man: added manual pages
+	* man/man9/putbq.9.man: added manual pages
+	* man/man9/putctl.9.man: added manual pages
+	* man/man9/putctl1.9.man: added manual pages
+	* man/man9/putnext.9.man: added manual pages
+	* man/man9/putnextctl.9.man: added manual pages
+	* man/man9/putnextctl1.9.man: added manual pages
+	* man/man9/putq.9.man: added manual pages
+	* man/man9/qattach.9.man: added manual pages
+	* man/man9/qbufcall.9.man: added manual pages
+	* man/man9/qclose.9.man: added manual pages
+	* man/man9/qdetach.9.man: added manual pages
+	* man/man9/qenable.9.man: added manual pages
+	* man/man9/qopen.9.man: added manual pages
+	* man/man9/qprocsoff.9.man: added manual pages
+	* man/man9/qprocson.9.man: added manual pages
+	* man/man9/qreply.9.man: added manual pages
+	* man/man9/qsize.9.man: added manual pages
+	* man/man9/rmvb.9.man: added manual pages
+	* man/man9/rmvq.9.man: added manual pages
+	* man/man9/stream_utils.9.man: added manual pages
+	* man/man9/strlog.9.man: added manual pages
+	* man/man9/strqget.9.man: added manual pages
+	* man/man9/strqset.9.man: added manual pages
+	* man/man9/testb.9.man: added manual pages
+	* man/man9/timeout.9.man: added manual pages
+	* man/man9/umount.9.man: added manual pages
+	* man/man9/umount2.9.man: added manual pages
+	* man/man9/unbufcall.9.man: added manual pages
+	* man/man9/unlink.9.man: added manual pages
+	* man/man9/unlinkb.9.man: added manual pages
+	* man/man9/untimeout.9.man: added manual pages
+	* man/man9/xmsgsize.9.man: added manual pages
+	* manual/LiS.texi: added LiS texi manual
+	* manual/Makefile.am: added LiS texi manual
+	* manual/configure.texi: added LiS texi manual
+	* manual/releases.texi: added LiS texi manual
+	* manual/rpm.texi: added LiS texi manual
+	* manual/texi/args.texi.in: added LiS texi manual
+	* manual/texi/fdl.texi: added LiS texi manual
+	* manual/texi/gpl.texi: added LiS texi manual
+	* manual/texi/install.texi: added LiS texi manual
+	* manual/texi/lesser.texi: added LiS texi manual
 
-2004-11-09  brian  <bidulock@openss7.org>
+2004-11-09  Brian Bidulock  <bidulock@openss7.org>
+
 	* .rpmrelease:
 	- Build system updates.
 	* LiS.lsm.in:
@@ -1289,866 +1353,887 @@
 	* util/linux/thrtst.c:
 	- Updated copying and GNU long options.
 
-2004-08-13  brian  <bidulock@openss7.org>
-	* am/genksyms.am (CONFIG_REGPARM):
+2004-08-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/genksyms.am (CONFIG_REGPARM:
 	- added CONFIG_REPARM to CONFIG_SMP
 
-2004-08-04 brian <bidulock@openss7.org>
-	* (LiS): Revision 1.1.4.30  2004/08/04 05:48:56  brian
+2004-08-04  Brian Bidulock  <bidulock@openss7.org>
+
+	- Revision 1.1.4.30  2004/08/04 05:48:56  brian
 	- added missing configure.nexusware script to distribution.
 	- changed defaults to kmem cache options, now default to 'no'
 
-2004-06-27 brian <bidulock@openss7.org>
-	* (LiS): Revision 1.1.4.29  2004/06/27 03:05:23  brian
+2004-06-27  Brian Bidulock  <bidulock@openss7.org>
+
+	- Revision 1.1.4.29  2004/06/27 03:05:23  brian
 	- Removed XTI/TLI and Linux Networking.
 
-2004-06-26 brian <bidulock@openss7.org>
-	* (.rpmepoch): bumped to 2
-	* (.rpmrelease): bumped to 21
-	* (ChangeLog): updated
-	* (LiS.spec.in):
+2004-06-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* .rpmepoch: bumped to 2
+	* .rpmrelease: bumped to 21
+	* ChangeLog: updated
+	* LiS.spec.in:
 	- removed references to XTI/TLI
 	- removed tli, inet, xnet options
 	- removed libxnet manual
 	- skip locale files (was only for libxnet)
 	- updated changelog
-	* (Makefile.am):
+	* Makefile.am:
 	- removed tli, inet, xnet and sock files
 	- removed libxnet
 	- removed ldl and other ip dlpi drivers and modules
 	- removed inet device scripts
-	* (NEWS): updated
-	* (acinclude.m4): removed xopen.m4
-	* (configure.ac): removed gettext
-	* (drivers/str/Config.in): removed configuration for Linux networking drivers and modules
-	* (include/Makefile.am): removed xns, tli, inet, xnet and dlpi headers
-	* (man/Makefile.am): removed xns, tli, inet, xnet, dlpi and sock manpages
-	* (manual/Makefile.am): removed libxnet manual
-	* (manual/libxnet.texi): removed libxnet manual
-	* (drivers/str/dlpidriver.c): deleted
-	* (drivers/str/timod.c): deleted
-	* (drivers/str/tirdwr.c): deleted
-	* (drivers/str/linux/bufq.h): deleted
-	* (drivers/str/linux/debug.h): deleted
-	* (drivers/str/linux/inet.c): deleted
-	* (drivers/str/linux/ip.c): deleted
-	* (drivers/str/linux/ip_strm_mod.c): deleted
-	* (drivers/str/linux/ip_strm_mod.h): deleted
-	* (drivers/str/linux/ip_to_dlpi.c): deleted
-	* (drivers/str/linux/ldl.c): deleted
-	* (drivers/str/linux/raw.c): deleted
-	* (drivers/str/linux/udp.c): deleted
-	* (drivers/str/linux/unix.c): deleted
-	* (include/ticlts.h): deleted
-	* (include/ticots.h): deleted
-	* (include/ticotsord.h): deleted
-	* (include/tihdr.h): deleted
-	* (include/timod.h): deleted
-	* (include/tirdwr.h): deleted
-	* (include/tiuser.h): deleted
-	* (include/xti.h): deleted
-	* (include/xti_inet.h): deleted
-	* (include/sys/dlpi.h): deleted
-	* (include/sys/ldl.h): deleted
-	* (include/sys/npi.h): deleted
-	* (include/sys/sockio.h): deleted
-	* (include/sys/ticlts.h): deleted
-	* (include/sys/ticots.h): deleted
-	* (include/sys/ticotsord.h): deleted
-	* (include/sys/tihdr.h): deleted
-	* (include/sys/timod.h): deleted
-	* (include/sys/tirdwr.h): deleted
-	* (include/sys/tiuser.h): deleted
-	* (include/sys/tli.h): deleted
-	* (include/sys/tpi.h): deleted
-	* (include/sys/xti.h): deleted
-	* (include/sys/xti_atm.h): deleted
-	* (include/sys/xti_inet.h): deleted
-	* (include/sys/xti_ip.h): deleted
-	* (include/sys/xti_local.h): deleted
-	* (include/sys/xti_mosi.h): deleted
-	* (include/sys/xti_osi.h): deleted
-	* (include/sys/xti_sctp.h): deleted
-	* (include/sys/xti_tcp.h): deleted
-	* (include/sys/xti_udp.h): deleted
-	* (include/sys/xti_xti.h): deleted
-	* (include/sys/LiS/dlpidriver.h): deleted
-	* (m4/ChangeLog): deleted
-	* (m4/Makefile.am): deleted
-	* (m4/xopen.m4): deleted
-	* (man/man3/t_accept.3.man): deleted
-	* (man/man3/t_addleaf.3.man): deleted
-	* (man/man3/t_alloc.3.man): deleted
-	* (man/man3/t_bind.3.man): deleted
-	* (man/man3/t_close.3.man): deleted
-	* (man/man3/t_connect.3.man): deleted
-	* (man/man3/t_errno.3.man): deleted
-	* (man/man3/t_error.3.man): deleted
-	* (man/man3/t_free.3.man): deleted
-	* (man/man3/t_getinfo.3.man): deleted
-	* (man/man3/t_getprotaddr.3.man): deleted
-	* (man/man3/t_getstate.3.man): deleted
-	* (man/man3/t_listen.3.man): deleted
-	* (man/man3/t_look.3.man): deleted
-	* (man/man3/t_open.3.man): deleted
-	* (man/man3/t_optmgmt.3.man): deleted
-	* (man/man3/t_rcv.3.man): deleted
-	* (man/man3/t_rcvconnect.3.man): deleted
-	* (man/man3/t_rcvdis.3.man): deleted
-	* (man/man3/t_rcvleafchange.3.man): deleted
-	* (man/man3/t_rcvrel.3.man): deleted
-	* (man/man3/t_rcvreldata.3.man): deleted
-	* (man/man3/t_rcvudata.3.man): deleted
-	* (man/man3/t_rcvuderr.3.man): deleted
-	* (man/man3/t_rcvv.3.man): deleted
-	* (man/man3/t_rcvvudata.3.man): deleted
-	* (man/man3/t_removeleaf.3.man): deleted
-	* (man/man3/t_snd.3.man): deleted
-	* (man/man3/t_snddis.3.man): deleted
-	* (man/man3/t_sndopt.3.man): deleted
-	* (man/man3/t_sndrel.3.man): deleted
-	* (man/man3/t_sndreldata.3.man): deleted
-	* (man/man3/t_sndudata.3.man): deleted
-	* (man/man3/t_sndv.3.man): deleted
-	* (man/man3/t_sndvopt.3.man): deleted
-	* (man/man3/t_sndvudata.3.man): deleted
-	* (man/man3/t_strerror.3.man): deleted
-	* (man/man3/t_sync.3.man): deleted
-	* (man/man3/t_sysconf.3.man): deleted
-	* (man/man3/t_unbind.3.man): deleted
-	* (man/man3/xti.3.man): deleted
-	* (man/man3/xti_ip.3.man): deleted
-	* (man/man3/xti_sctp.3.man): deleted
-	* (man/man3/xti_tcp.3.man): deleted
-	* (man/man3/xti_udp.3.man): deleted
-	* (man/man4/INET.4.man): deleted
-	* (man/man4/inet.4.man): deleted
-	* (man/man4/ip.4.man): deleted
-	* (man/man4/sockmod.4.man): deleted
-	* (man/man4/socksys.4.man): deleted
-	* (man/man4/tcp.4.man): deleted
-	* (man/man4/tcp_ioctl.4.man): deleted
-	* (man/man4/ticlts.4.man): deleted
-	* (man/man4/ticots.4.man): deleted
-	* (man/man4/ticotsord.4.man): deleted
-	* (man/man4/timod.4.man): deleted
-	* (man/man4/tirdwr.4.man): deleted
-	* (man/man4/udp.4.man): deleted
-	* (man/man4/udp_ioctl.4.man): deleted
-	* (man/man4/xtios.4.man): deleted
-	* (man/man5/protosw.5.man): deleted
-	* (man/man7/CD_ABORT_OUTPUT_REQ.7.man): deleted
-	* (man/man7/CD_ALLOW_INPUT_REQ.7.man): deleted
-	* (man/man7/CD_ATTACH_REQ.7.man): deleted
-	* (man/man7/CD_BAD_FRAME_IND.7.man): deleted
-	* (man/man7/CD_DETACH_REQ.7.man): deleted
-	* (man/man7/CD_DISABLE_CON.7.man): deleted
-	* (man/man7/CD_DISABLE_REQ.7.man): deleted
-	* (man/man7/CD_ENABLE_CON.7.man): deleted
-	* (man/man7/CD_ENABLE_REQ.7.man): deleted
-	* (man/man7/CD_ERROR_ACK.7.man): deleted
-	* (man/man7/CD_ERROR_IND.7.man): deleted
-	* (man/man7/CD_HALT_INPUT_REQ.7.man): deleted
-	* (man/man7/CD_INFO_ACK.7.man): deleted
-	* (man/man7/CD_INFO_REQ.7.man): deleted
-	* (man/man7/CD_MODEM_SIG_IND.7.man): deleted
-	* (man/man7/CD_MODEM_SIG_POLL.7.man): deleted
-	* (man/man7/CD_MODEM_SIG_REQ.7.man): deleted
-	* (man/man7/CD_MUX_NAME_REQ.7.man): deleted
-	* (man/man7/CD_OK_ACK.7.man): deleted
-	* (man/man7/CD_READ_REQ.7.man): deleted
-	* (man/man7/CD_UNITDATA_ACK.7.man): deleted
-	* (man/man7/CD_UNITDATA_IND.7.man): deleted
-	* (man/man7/CD_UNITDATA_REQ.7.man): deleted
-	* (man/man7/CD_WRITE_READ_REQ.7.man): deleted
-	* (man/man7/DL_ATTACH_REQ.7.man): deleted
-	* (man/man7/DL_BIND_ACK.7.man): deleted
-	* (man/man7/DL_BIND_REQ.7.man): deleted
-	* (man/man7/DL_CONNECT_CON.7.man): deleted
-	* (man/man7/DL_CONNECT_IND.7.man): deleted
-	* (man/man7/DL_CONNECT_REQ.7.man): deleted
-	* (man/man7/DL_CONNECT_RES.7.man): deleted
-	* (man/man7/DL_DATA_ACK_IND.7.man): deleted
-	* (man/man7/DL_DATA_ACK_REQ.7.man): deleted
-	* (man/man7/DL_DATA_ACK_STATUS_IND.7.man): deleted
-	* (man/man7/DL_DATA_IND.7.man): deleted
-	* (man/man7/DL_DATA_REQ.7.man): deleted
-	* (man/man7/DL_DETACH_REQ.7.man): deleted
-	* (man/man7/DL_DISABMULTI_REQ.7.man): deleted
-	* (man/man7/DL_DISCONNECT_IND.7.man): deleted
-	* (man/man7/DL_DISCONNECT_REQ.7.man): deleted
-	* (man/man7/DL_ENABMULTI_REQ.7.man): deleted
-	* (man/man7/DL_ERROR_ACK.7.man): deleted
-	* (man/man7/DL_GET_STATISTICS_ACK.7.man): deleted
-	* (man/man7/DL_GET_STATISTICS_REQ.7.man): deleted
-	* (man/man7/DL_INFO_ACK.7.man): deleted
-	* (man/man7/DL_INFO_REQ.7.man): deleted
-	* (man/man7/DL_OK_ACK.7.man): deleted
-	* (man/man7/DL_PHYS_ADDR_ACK.7.man): deleted
-	* (man/man7/DL_PHYS_ADDR_REQ.7.man): deleted
-	* (man/man7/DL_PROMISCOFF_REQ.7.man): deleted
-	* (man/man7/DL_PROMISCON_REQ.7.man): deleted
-	* (man/man7/DL_REPLY_IND.7.man): deleted
-	* (man/man7/DL_REPLY_REQ.7.man): deleted
-	* (man/man7/DL_REPLY_STATUS_IND.7.man): deleted
-	* (man/man7/DL_REPLY_UPDATE_REQ.7.man): deleted
-	* (man/man7/DL_REPLY_UPDATE_STATUS_IND.7.man): deleted
-	* (man/man7/DL_RESET_CON.7.man): deleted
-	* (man/man7/DL_RESET_IND.7.man): deleted
-	* (man/man7/DL_RESET_REQ.7.man): deleted
-	* (man/man7/DL_RESET_RES.7.man): deleted
-	* (man/man7/DL_SET_PHYS_ADDR_REQ.7.man): deleted
-	* (man/man7/DL_SUBS_BIND_ACK.7.man): deleted
-	* (man/man7/DL_SUBS_BIND_REQ.7.man): deleted
-	* (man/man7/DL_SUBS_UNBIND_REQ.7.man): deleted
-	* (man/man7/DL_TEST_CON.7.man): deleted
-	* (man/man7/DL_TEST_IND.7.man): deleted
-	* (man/man7/DL_TEST_REQ.7.man): deleted
-	* (man/man7/DL_TEST_RES.7.man): deleted
-	* (man/man7/DL_TOKEN_ACK.7.man): deleted
-	* (man/man7/DL_TOKEN_REQ.7.man): deleted
-	* (man/man7/DL_UDERROR_IND.7.man): deleted
-	* (man/man7/DL_UDQOS_REQ.7.man): deleted
-	* (man/man7/DL_UNBIND_REQ.7.man): deleted
-	* (man/man7/DL_UNITDATA_IND.7.man): deleted
-	* (man/man7/DL_UNITDATA_REQ.7.man): deleted
-	* (man/man7/DL_XID_CON.7.man): deleted
-	* (man/man7/DL_XID_IND.7.man): deleted
-	* (man/man7/DL_XID_REQ.7.man): deleted
-	* (man/man7/DL_XID_RES.7.man): deleted
-	* (man/man7/N_BIND_ACK.7.man): deleted
-	* (man/man7/N_BIND_REQ.7.man): deleted
-	* (man/man7/N_CONN_CON.7.man): deleted
-	* (man/man7/N_CONN_IND.7.man): deleted
-	* (man/man7/N_CONN_REQ.7.man): deleted
-	* (man/man7/N_CONN_RES.7.man): deleted
-	* (man/man7/N_DATACK_IND.7.man): deleted
-	* (man/man7/N_DATACK_REQ.7.man): deleted
-	* (man/man7/N_DATA_IND.7.man): deleted
-	* (man/man7/N_DATA_REQ.7.man): deleted
-	* (man/man7/N_DISCON_IND.7.man): deleted
-	* (man/man7/N_DISCON_REQ.7.man): deleted
-	* (man/man7/N_ERROR_ACK.7.man): deleted
-	* (man/man7/N_EXDATA_IND.7.man): deleted
-	* (man/man7/N_EXDATA_REQ.7.man): deleted
-	* (man/man7/N_INFO_ACK.7.man): deleted
-	* (man/man7/N_INFO_REQ.7.man): deleted
-	* (man/man7/N_OK_ACK.7.man): deleted
-	* (man/man7/N_OPTMGMT_REQ.7.man): deleted
-	* (man/man7/N_RESET_CON.7.man): deleted
-	* (man/man7/N_RESET_IND.7.man): deleted
-	* (man/man7/N_RESET_REQ.7.man): deleted
-	* (man/man7/N_RESET_RES.7.man): deleted
-	* (man/man7/N_TOKEN_ACK.7.man): deleted
-	* (man/man7/N_TOKEN_REQ.7.man): deleted
-	* (man/man7/N_UDERROR_IND.7.man): deleted
-	* (man/man7/N_UNBIND_REQ.7.man): deleted
-	* (man/man7/N_UNITDATA_IND.7.man): deleted
-	* (man/man7/N_UNITDATA_REQ.7.man): deleted
-	* (man/man7/N_bind_ack_t.7.man): deleted
-	* (man/man7/N_bind_req_t.7.man): deleted
-	* (man/man7/N_conn_con_t.7.man): deleted
-	* (man/man7/N_conn_ind_t.7.man): deleted
-	* (man/man7/N_conn_req_t.7.man): deleted
-	* (man/man7/N_conn_res_t.7.man): deleted
-	* (man/man7/N_data_ind_t.7.man): deleted
-	* (man/man7/N_data_req_t.7.man): deleted
-	* (man/man7/N_datack_ind_t.7.man): deleted
-	* (man/man7/N_datack_req_t.7.man): deleted
-	* (man/man7/N_discon_ind_t.7.man): deleted
-	* (man/man7/N_discon_req_t.7.man): deleted
-	* (man/man7/N_error_ack_t.7.man): deleted
-	* (man/man7/N_exdata_ind_t.7.man): deleted
-	* (man/man7/N_exdata_req_t.7.man): deleted
-	* (man/man7/N_info_ack_t.7.man): deleted
-	* (man/man7/N_info_req_t.7.man): deleted
-	* (man/man7/N_ok_ack_t.7.man): deleted
-	* (man/man7/N_optmgmt_req_t.7.man): deleted
-	* (man/man7/N_reset_con_t.7.man): deleted
-	* (man/man7/N_reset_ind_t.7.man): deleted
-	* (man/man7/N_reset_req_t.7.man): deleted
-	* (man/man7/N_reset_res_t.7.man): deleted
-	* (man/man7/N_token_ack_t.7.man): deleted
-	* (man/man7/N_token_req_t.7.man): deleted
-	* (man/man7/N_uderror_ind_t.7.man): deleted
-	* (man/man7/N_unbind_req_t.7.man): deleted
-	* (man/man7/N_unitdata_ind_t.7.man): deleted
-	* (man/man7/N_unitdata_req_t.7.man): deleted
-	* (man/man7/T_ADDR_ACK.7.man): deleted
-	* (man/man7/T_ADDR_REQ.7.man): deleted
-	* (man/man7/T_BIND_ACK.7.man): deleted
-	* (man/man7/T_BIND_REQ.7.man): deleted
-	* (man/man7/T_CAPABILITY_ACK.7.man): deleted
-	* (man/man7/T_CAPABILITY_REQ.7.man): deleted
-	* (man/man7/T_CONN_CON.7.man): deleted
-	* (man/man7/T_CONN_IND.7.man): deleted
-	* (man/man7/T_CONN_REQ.7.man): deleted
-	* (man/man7/T_CONN_RES.7.man): deleted
-	* (man/man7/T_DATA_IND.7.man): deleted
-	* (man/man7/T_DATA_REQ.7.man): deleted
-	* (man/man7/T_DISCON_IND.7.man): deleted
-	* (man/man7/T_DISCON_REQ.7.man): deleted
-	* (man/man7/T_ERROR_ACK.7.man): deleted
-	* (man/man7/T_EXDATA_IND.7.man): deleted
-	* (man/man7/T_EXDATA_REQ.7.man): deleted
-	* (man/man7/T_INFO_ACK.7.man): deleted
-	* (man/man7/T_INFO_REQ.7.man): deleted
-	* (man/man7/T_OK_ACK.7.man): deleted
-	* (man/man7/T_OPTDATA_IND.7.man): deleted
-	* (man/man7/T_OPTDATA_REQ.7.man): deleted
-	* (man/man7/T_OPTMGMT_ACK.7.man): deleted
-	* (man/man7/T_OPTMGMT_REQ.7.man): deleted
-	* (man/man7/T_ORDREL_IND.7.man): deleted
-	* (man/man7/T_ORDREL_REQ.7.man): deleted
-	* (man/man7/T_UDERROR_IND.7.man): deleted
-	* (man/man7/T_UNBIND_REQ.7.man): deleted
-	* (man/man7/T_UNITDATA_IND.7.man): deleted
-	* (man/man7/T_UNITDATA_REQ.7.man): deleted
-	* (man/man7/T_addr_ack.7.man): deleted
-	* (man/man7/T_addr_req.7.man): deleted
-	* (man/man7/T_bind_ack.7.man): deleted
-	* (man/man7/T_bind_req.7.man): deleted
-	* (man/man7/T_capability_ack.7.man): deleted
-	* (man/man7/T_capability_req.7.man): deleted
-	* (man/man7/T_conn_con.7.man): deleted
-	* (man/man7/T_conn_ind.7.man): deleted
-	* (man/man7/T_conn_req.7.man): deleted
-	* (man/man7/T_conn_res.7.man): deleted
-	* (man/man7/T_data_ind.7.man): deleted
-	* (man/man7/T_data_req.7.man): deleted
-	* (man/man7/T_discon_ind.7.man): deleted
-	* (man/man7/T_discon_req.7.man): deleted
-	* (man/man7/T_error_ack.7.man): deleted
-	* (man/man7/T_exdata_ind.7.man): deleted
-	* (man/man7/T_exdata_req.7.man): deleted
-	* (man/man7/T_info_ack.7.man): deleted
-	* (man/man7/T_info_req.7.man): deleted
-	* (man/man7/T_ok_ack.7.man): deleted
-	* (man/man7/T_optdata_ind.7.man): deleted
-	* (man/man7/T_optdata_req.7.man): deleted
-	* (man/man7/T_optmgmt_ack.7.man): deleted
-	* (man/man7/T_optmgmt_req.7.man): deleted
-	* (man/man7/T_ordrel_ind.7.man): deleted
-	* (man/man7/T_ordrel_req.7.man): deleted
-	* (man/man7/T_uderror_ind.7.man): deleted
-	* (man/man7/T_unbind_req.7.man): deleted
-	* (man/man7/T_unitdata_ind.7.man): deleted
-	* (man/man7/T_unitdata_req.7.man): deleted
-	* (man/man7/cd_abort_output_req_t.7.man): deleted
-	* (man/man7/cd_allow_input_req_t.7.man): deleted
-	* (man/man7/cd_attach_req_t.7.man): deleted
-	* (man/man7/cd_bad_frame_ind_t.7.man): deleted
-	* (man/man7/cd_detach_req_t.7.man): deleted
-	* (man/man7/cd_disable_con_t.7.man): deleted
-	* (man/man7/cd_disable_req_t.7.man): deleted
-	* (man/man7/cd_enable_con_t.7.man): deleted
-	* (man/man7/cd_enable_req_t.7.man): deleted
-	* (man/man7/cd_error_ack_t.7.man): deleted
-	* (man/man7/cd_error_ind_t.7.man): deleted
-	* (man/man7/cd_halt_input_req_t.7.man): deleted
-	* (man/man7/cd_info_ack_t.7.man): deleted
-	* (man/man7/cd_modem_sig_ind_t.7.man): deleted
-	* (man/man7/cd_modem_sig_poll_t.7.man): deleted
-	* (man/man7/cd_modem_sig_req_t.7.man): deleted
-	* (man/man7/cd_mux_name_req_t.7.man): deleted
-	* (man/man7/cd_ok_ack_t.7.man): deleted
-	* (man/man7/cd_read_req_t.7.man): deleted
-	* (man/man7/cd_unitdata_ack_t.7.man): deleted
-	* (man/man7/cd_unitdata_ind_t.7.man): deleted
-	* (man/man7/cd_unitdata_req_t.7.man): deleted
-	* (man/man7/cd_write_read_req_t.7.man): deleted
-	* (man/man7/cdi.7.man): deleted
-	* (man/man7/dl_attach_req_t.7.man): deleted
-	* (man/man7/dl_bind_ack_t.7.man): deleted
-	* (man/man7/dl_bind_req_t.7.man): deleted
-	* (man/man7/dl_connect_con_t.7.man): deleted
-	* (man/man7/dl_connect_ind_t.7.man): deleted
-	* (man/man7/dl_connect_req_t.7.man): deleted
-	* (man/man7/dl_connect_res_t.7.man): deleted
-	* (man/man7/dl_data_ack_ind_t.7.man): deleted
-	* (man/man7/dl_data_ack_req_t.7.man): deleted
-	* (man/man7/dl_data_ack_status_ind_t.7.man): deleted
-	* (man/man7/dl_detach_req_t.7.man): deleted
-	* (man/man7/dl_disabmulti_req_t.7.man): deleted
-	* (man/man7/dl_disconnect_ind_t.7.man): deleted
-	* (man/man7/dl_disconnect_req_t.7.man): deleted
-	* (man/man7/dl_enabmulti_req_t.7.man): deleted
-	* (man/man7/dl_error_ack_t.7.man): deleted
-	* (man/man7/dl_get_statistics_ack_t.7.man): deleted
-	* (man/man7/dl_get_statistics_req_t.7.man): deleted
-	* (man/man7/dl_info_ack_t.7.man): deleted
-	* (man/man7/dl_info_req_t.7.man): deleted
-	* (man/man7/dl_ok_ack_t.7.man): deleted
-	* (man/man7/dl_phys_addr_ack_t.7.man): deleted
-	* (man/man7/dl_phys_addr_req_t.7.man): deleted
-	* (man/man7/dl_promiscoff_req_t.7.man): deleted
-	* (man/man7/dl_promiscon_req_t.7.man): deleted
-	* (man/man7/dl_reply_ind_t.7.man): deleted
-	* (man/man7/dl_reply_req_t.7.man): deleted
-	* (man/man7/dl_reply_status_ind_t.7.man): deleted
-	* (man/man7/dl_reply_update_req_t.7.man): deleted
-	* (man/man7/dl_reply_update_status_ind_t.7.man): deleted
-	* (man/man7/dl_reset_con_t.7.man): deleted
-	* (man/man7/dl_reset_ind_t.7.man): deleted
-	* (man/man7/dl_reset_req_t.7.man): deleted
-	* (man/man7/dl_reset_res_t.7.man): deleted
-	* (man/man7/dl_set_phys_addr_req_t.7.man): deleted
-	* (man/man7/dl_subs_bind_ack_t.7.man): deleted
-	* (man/man7/dl_subs_bind_req_t.7.man): deleted
-	* (man/man7/dl_subs_unbind_req_t.7.man): deleted
-	* (man/man7/dl_test_con_t.7.man): deleted
-	* (man/man7/dl_test_ind_t.7.man): deleted
-	* (man/man7/dl_test_req_t.7.man): deleted
-	* (man/man7/dl_test_res_t.7.man): deleted
-	* (man/man7/dl_token_ack_t.7.man): deleted
-	* (man/man7/dl_token_req_t.7.man): deleted
-	* (man/man7/dl_uderror_ind_t.7.man): deleted
-	* (man/man7/dl_udqos_req_t.7.man): deleted
-	* (man/man7/dl_unbind_req_t.7.man): deleted
-	* (man/man7/dl_unitdata_ind_t.7.man): deleted
-	* (man/man7/dl_unitdata_req_t.7.man): deleted
-	* (man/man7/dl_xid_con_t.7.man): deleted
-	* (man/man7/dl_xid_ind_t.7.man): deleted
-	* (man/man7/dl_xid_req_t.7.man): deleted
-	* (man/man7/dl_xid_res_t.7.man): deleted
-	* (man/man7/dlpi.7.man): deleted
-	* (man/man7/npi.7.man): deleted
-	* (man/man7/tpi.7.man): deleted
-	* (man/man7/tpi_ip.7.man): deleted
-	* (man/man7/tpi_tcp.7.man): deleted
-	* (man/man7/tpi_udp.7.man): deleted
-	* (po/.cvsignore): deleted
-	* (po/ChangeLog): deleted
-	* (po/LINGUAS): deleted
-	* (po/Makevars): deleted
-	* (po/POTFILES.in): deleted
-	* (po/de.po): deleted
-	* (scripts/inet_mkdev): deleted
-	* (scripts/inet_rmdev): deleted
+	* NEWS: updated
+	* acinclude.m4: removed xopen.m4
+	* configure.ac: removed gettext
+	* drivers/str/Config.in: removed configuration for Linux networking drivers and modules
+	* include/Makefile.am: removed xns, tli, inet, xnet and dlpi headers
+	* man/Makefile.am: removed xns, tli, inet, xnet, dlpi and sock manpages
+	* manual/Makefile.am: removed libxnet manual
+	* manual/libxnet.texi: removed libxnet manual
+	* drivers/str/dlpidriver.c: deleted
+	* drivers/str/timod.c: deleted
+	* drivers/str/tirdwr.c: deleted
+	* drivers/str/linux/bufq.h: deleted
+	* drivers/str/linux/debug.h: deleted
+	* drivers/str/linux/inet.c: deleted
+	* drivers/str/linux/ip.c: deleted
+	* drivers/str/linux/ip_strm_mod.c: deleted
+	* drivers/str/linux/ip_strm_mod.h: deleted
+	* drivers/str/linux/ip_to_dlpi.c: deleted
+	* drivers/str/linux/ldl.c: deleted
+	* drivers/str/linux/raw.c: deleted
+	* drivers/str/linux/udp.c: deleted
+	* drivers/str/linux/unix.c: deleted
+	* include/ticlts.h: deleted
+	* include/ticots.h: deleted
+	* include/ticotsord.h: deleted
+	* include/tihdr.h: deleted
+	* include/timod.h: deleted
+	* include/tirdwr.h: deleted
+	* include/tiuser.h: deleted
+	* include/xti.h: deleted
+	* include/xti_inet.h: deleted
+	* include/sys/dlpi.h: deleted
+	* include/sys/ldl.h: deleted
+	* include/sys/npi.h: deleted
+	* include/sys/sockio.h: deleted
+	* include/sys/ticlts.h: deleted
+	* include/sys/ticots.h: deleted
+	* include/sys/ticotsord.h: deleted
+	* include/sys/tihdr.h: deleted
+	* include/sys/timod.h: deleted
+	* include/sys/tirdwr.h: deleted
+	* include/sys/tiuser.h: deleted
+	* include/sys/tli.h: deleted
+	* include/sys/tpi.h: deleted
+	* include/sys/xti.h: deleted
+	* include/sys/xti_atm.h: deleted
+	* include/sys/xti_inet.h: deleted
+	* include/sys/xti_ip.h: deleted
+	* include/sys/xti_local.h: deleted
+	* include/sys/xti_mosi.h: deleted
+	* include/sys/xti_osi.h: deleted
+	* include/sys/xti_sctp.h: deleted
+	* include/sys/xti_tcp.h: deleted
+	* include/sys/xti_udp.h: deleted
+	* include/sys/xti_xti.h: deleted
+	* include/sys/LiS/dlpidriver.h: deleted
+	* m4/ChangeLog: deleted
+	* m4/Makefile.am: deleted
+	* m4/xopen.m4: deleted
+	* man/man3/t_accept.3.man: deleted
+	* man/man3/t_addleaf.3.man: deleted
+	* man/man3/t_alloc.3.man: deleted
+	* man/man3/t_bind.3.man: deleted
+	* man/man3/t_close.3.man: deleted
+	* man/man3/t_connect.3.man: deleted
+	* man/man3/t_errno.3.man: deleted
+	* man/man3/t_error.3.man: deleted
+	* man/man3/t_free.3.man: deleted
+	* man/man3/t_getinfo.3.man: deleted
+	* man/man3/t_getprotaddr.3.man: deleted
+	* man/man3/t_getstate.3.man: deleted
+	* man/man3/t_listen.3.man: deleted
+	* man/man3/t_look.3.man: deleted
+	* man/man3/t_open.3.man: deleted
+	* man/man3/t_optmgmt.3.man: deleted
+	* man/man3/t_rcv.3.man: deleted
+	* man/man3/t_rcvconnect.3.man: deleted
+	* man/man3/t_rcvdis.3.man: deleted
+	* man/man3/t_rcvleafchange.3.man: deleted
+	* man/man3/t_rcvrel.3.man: deleted
+	* man/man3/t_rcvreldata.3.man: deleted
+	* man/man3/t_rcvudata.3.man: deleted
+	* man/man3/t_rcvuderr.3.man: deleted
+	* man/man3/t_rcvv.3.man: deleted
+	* man/man3/t_rcvvudata.3.man: deleted
+	* man/man3/t_removeleaf.3.man: deleted
+	* man/man3/t_snd.3.man: deleted
+	* man/man3/t_snddis.3.man: deleted
+	* man/man3/t_sndopt.3.man: deleted
+	* man/man3/t_sndrel.3.man: deleted
+	* man/man3/t_sndreldata.3.man: deleted
+	* man/man3/t_sndudata.3.man: deleted
+	* man/man3/t_sndv.3.man: deleted
+	* man/man3/t_sndvopt.3.man: deleted
+	* man/man3/t_sndvudata.3.man: deleted
+	* man/man3/t_strerror.3.man: deleted
+	* man/man3/t_sync.3.man: deleted
+	* man/man3/t_sysconf.3.man: deleted
+	* man/man3/t_unbind.3.man: deleted
+	* man/man3/xti.3.man: deleted
+	* man/man3/xti_ip.3.man: deleted
+	* man/man3/xti_sctp.3.man: deleted
+	* man/man3/xti_tcp.3.man: deleted
+	* man/man3/xti_udp.3.man: deleted
+	* man/man4/INET.4.man: deleted
+	* man/man4/inet.4.man: deleted
+	* man/man4/ip.4.man: deleted
+	* man/man4/sockmod.4.man: deleted
+	* man/man4/socksys.4.man: deleted
+	* man/man4/tcp.4.man: deleted
+	* man/man4/tcp_ioctl.4.man: deleted
+	* man/man4/ticlts.4.man: deleted
+	* man/man4/ticots.4.man: deleted
+	* man/man4/ticotsord.4.man: deleted
+	* man/man4/timod.4.man: deleted
+	* man/man4/tirdwr.4.man: deleted
+	* man/man4/udp.4.man: deleted
+	* man/man4/udp_ioctl.4.man: deleted
+	* man/man4/xtios.4.man: deleted
+	* man/man5/protosw.5.man: deleted
+	* man/man7/CD_ABORT_OUTPUT_REQ.7.man: deleted
+	* man/man7/CD_ALLOW_INPUT_REQ.7.man: deleted
+	* man/man7/CD_ATTACH_REQ.7.man: deleted
+	* man/man7/CD_BAD_FRAME_IND.7.man: deleted
+	* man/man7/CD_DETACH_REQ.7.man: deleted
+	* man/man7/CD_DISABLE_CON.7.man: deleted
+	* man/man7/CD_DISABLE_REQ.7.man: deleted
+	* man/man7/CD_ENABLE_CON.7.man: deleted
+	* man/man7/CD_ENABLE_REQ.7.man: deleted
+	* man/man7/CD_ERROR_ACK.7.man: deleted
+	* man/man7/CD_ERROR_IND.7.man: deleted
+	* man/man7/CD_HALT_INPUT_REQ.7.man: deleted
+	* man/man7/CD_INFO_ACK.7.man: deleted
+	* man/man7/CD_INFO_REQ.7.man: deleted
+	* man/man7/CD_MODEM_SIG_IND.7.man: deleted
+	* man/man7/CD_MODEM_SIG_POLL.7.man: deleted
+	* man/man7/CD_MODEM_SIG_REQ.7.man: deleted
+	* man/man7/CD_MUX_NAME_REQ.7.man: deleted
+	* man/man7/CD_OK_ACK.7.man: deleted
+	* man/man7/CD_READ_REQ.7.man: deleted
+	* man/man7/CD_UNITDATA_ACK.7.man: deleted
+	* man/man7/CD_UNITDATA_IND.7.man: deleted
+	* man/man7/CD_UNITDATA_REQ.7.man: deleted
+	* man/man7/CD_WRITE_READ_REQ.7.man: deleted
+	* man/man7/DL_ATTACH_REQ.7.man: deleted
+	* man/man7/DL_BIND_ACK.7.man: deleted
+	* man/man7/DL_BIND_REQ.7.man: deleted
+	* man/man7/DL_CONNECT_CON.7.man: deleted
+	* man/man7/DL_CONNECT_IND.7.man: deleted
+	* man/man7/DL_CONNECT_REQ.7.man: deleted
+	* man/man7/DL_CONNECT_RES.7.man: deleted
+	* man/man7/DL_DATA_ACK_IND.7.man: deleted
+	* man/man7/DL_DATA_ACK_REQ.7.man: deleted
+	* man/man7/DL_DATA_ACK_STATUS_IND.7.man: deleted
+	* man/man7/DL_DATA_IND.7.man: deleted
+	* man/man7/DL_DATA_REQ.7.man: deleted
+	* man/man7/DL_DETACH_REQ.7.man: deleted
+	* man/man7/DL_DISABMULTI_REQ.7.man: deleted
+	* man/man7/DL_DISCONNECT_IND.7.man: deleted
+	* man/man7/DL_DISCONNECT_REQ.7.man: deleted
+	* man/man7/DL_ENABMULTI_REQ.7.man: deleted
+	* man/man7/DL_ERROR_ACK.7.man: deleted
+	* man/man7/DL_GET_STATISTICS_ACK.7.man: deleted
+	* man/man7/DL_GET_STATISTICS_REQ.7.man: deleted
+	* man/man7/DL_INFO_ACK.7.man: deleted
+	* man/man7/DL_INFO_REQ.7.man: deleted
+	* man/man7/DL_OK_ACK.7.man: deleted
+	* man/man7/DL_PHYS_ADDR_ACK.7.man: deleted
+	* man/man7/DL_PHYS_ADDR_REQ.7.man: deleted
+	* man/man7/DL_PROMISCOFF_REQ.7.man: deleted
+	* man/man7/DL_PROMISCON_REQ.7.man: deleted
+	* man/man7/DL_REPLY_IND.7.man: deleted
+	* man/man7/DL_REPLY_REQ.7.man: deleted
+	* man/man7/DL_REPLY_STATUS_IND.7.man: deleted
+	* man/man7/DL_REPLY_UPDATE_REQ.7.man: deleted
+	* man/man7/DL_REPLY_UPDATE_STATUS_IND.7.man: deleted
+	* man/man7/DL_RESET_CON.7.man: deleted
+	* man/man7/DL_RESET_IND.7.man: deleted
+	* man/man7/DL_RESET_REQ.7.man: deleted
+	* man/man7/DL_RESET_RES.7.man: deleted
+	* man/man7/DL_SET_PHYS_ADDR_REQ.7.man: deleted
+	* man/man7/DL_SUBS_BIND_ACK.7.man: deleted
+	* man/man7/DL_SUBS_BIND_REQ.7.man: deleted
+	* man/man7/DL_SUBS_UNBIND_REQ.7.man: deleted
+	* man/man7/DL_TEST_CON.7.man: deleted
+	* man/man7/DL_TEST_IND.7.man: deleted
+	* man/man7/DL_TEST_REQ.7.man: deleted
+	* man/man7/DL_TEST_RES.7.man: deleted
+	* man/man7/DL_TOKEN_ACK.7.man: deleted
+	* man/man7/DL_TOKEN_REQ.7.man: deleted
+	* man/man7/DL_UDERROR_IND.7.man: deleted
+	* man/man7/DL_UDQOS_REQ.7.man: deleted
+	* man/man7/DL_UNBIND_REQ.7.man: deleted
+	* man/man7/DL_UNITDATA_IND.7.man: deleted
+	* man/man7/DL_UNITDATA_REQ.7.man: deleted
+	* man/man7/DL_XID_CON.7.man: deleted
+	* man/man7/DL_XID_IND.7.man: deleted
+	* man/man7/DL_XID_REQ.7.man: deleted
+	* man/man7/DL_XID_RES.7.man: deleted
+	* man/man7/N_BIND_ACK.7.man: deleted
+	* man/man7/N_BIND_REQ.7.man: deleted
+	* man/man7/N_CONN_CON.7.man: deleted
+	* man/man7/N_CONN_IND.7.man: deleted
+	* man/man7/N_CONN_REQ.7.man: deleted
+	* man/man7/N_CONN_RES.7.man: deleted
+	* man/man7/N_DATACK_IND.7.man: deleted
+	* man/man7/N_DATACK_REQ.7.man: deleted
+	* man/man7/N_DATA_IND.7.man: deleted
+	* man/man7/N_DATA_REQ.7.man: deleted
+	* man/man7/N_DISCON_IND.7.man: deleted
+	* man/man7/N_DISCON_REQ.7.man: deleted
+	* man/man7/N_ERROR_ACK.7.man: deleted
+	* man/man7/N_EXDATA_IND.7.man: deleted
+	* man/man7/N_EXDATA_REQ.7.man: deleted
+	* man/man7/N_INFO_ACK.7.man: deleted
+	* man/man7/N_INFO_REQ.7.man: deleted
+	* man/man7/N_OK_ACK.7.man: deleted
+	* man/man7/N_OPTMGMT_REQ.7.man: deleted
+	* man/man7/N_RESET_CON.7.man: deleted
+	* man/man7/N_RESET_IND.7.man: deleted
+	* man/man7/N_RESET_REQ.7.man: deleted
+	* man/man7/N_RESET_RES.7.man: deleted
+	* man/man7/N_TOKEN_ACK.7.man: deleted
+	* man/man7/N_TOKEN_REQ.7.man: deleted
+	* man/man7/N_UDERROR_IND.7.man: deleted
+	* man/man7/N_UNBIND_REQ.7.man: deleted
+	* man/man7/N_UNITDATA_IND.7.man: deleted
+	* man/man7/N_UNITDATA_REQ.7.man: deleted
+	* man/man7/N_bind_ack_t.7.man: deleted
+	* man/man7/N_bind_req_t.7.man: deleted
+	* man/man7/N_conn_con_t.7.man: deleted
+	* man/man7/N_conn_ind_t.7.man: deleted
+	* man/man7/N_conn_req_t.7.man: deleted
+	* man/man7/N_conn_res_t.7.man: deleted
+	* man/man7/N_data_ind_t.7.man: deleted
+	* man/man7/N_data_req_t.7.man: deleted
+	* man/man7/N_datack_ind_t.7.man: deleted
+	* man/man7/N_datack_req_t.7.man: deleted
+	* man/man7/N_discon_ind_t.7.man: deleted
+	* man/man7/N_discon_req_t.7.man: deleted
+	* man/man7/N_error_ack_t.7.man: deleted
+	* man/man7/N_exdata_ind_t.7.man: deleted
+	* man/man7/N_exdata_req_t.7.man: deleted
+	* man/man7/N_info_ack_t.7.man: deleted
+	* man/man7/N_info_req_t.7.man: deleted
+	* man/man7/N_ok_ack_t.7.man: deleted
+	* man/man7/N_optmgmt_req_t.7.man: deleted
+	* man/man7/N_reset_con_t.7.man: deleted
+	* man/man7/N_reset_ind_t.7.man: deleted
+	* man/man7/N_reset_req_t.7.man: deleted
+	* man/man7/N_reset_res_t.7.man: deleted
+	* man/man7/N_token_ack_t.7.man: deleted
+	* man/man7/N_token_req_t.7.man: deleted
+	* man/man7/N_uderror_ind_t.7.man: deleted
+	* man/man7/N_unbind_req_t.7.man: deleted
+	* man/man7/N_unitdata_ind_t.7.man: deleted
+	* man/man7/N_unitdata_req_t.7.man: deleted
+	* man/man7/T_ADDR_ACK.7.man: deleted
+	* man/man7/T_ADDR_REQ.7.man: deleted
+	* man/man7/T_BIND_ACK.7.man: deleted
+	* man/man7/T_BIND_REQ.7.man: deleted
+	* man/man7/T_CAPABILITY_ACK.7.man: deleted
+	* man/man7/T_CAPABILITY_REQ.7.man: deleted
+	* man/man7/T_CONN_CON.7.man: deleted
+	* man/man7/T_CONN_IND.7.man: deleted
+	* man/man7/T_CONN_REQ.7.man: deleted
+	* man/man7/T_CONN_RES.7.man: deleted
+	* man/man7/T_DATA_IND.7.man: deleted
+	* man/man7/T_DATA_REQ.7.man: deleted
+	* man/man7/T_DISCON_IND.7.man: deleted
+	* man/man7/T_DISCON_REQ.7.man: deleted
+	* man/man7/T_ERROR_ACK.7.man: deleted
+	* man/man7/T_EXDATA_IND.7.man: deleted
+	* man/man7/T_EXDATA_REQ.7.man: deleted
+	* man/man7/T_INFO_ACK.7.man: deleted
+	* man/man7/T_INFO_REQ.7.man: deleted
+	* man/man7/T_OK_ACK.7.man: deleted
+	* man/man7/T_OPTDATA_IND.7.man: deleted
+	* man/man7/T_OPTDATA_REQ.7.man: deleted
+	* man/man7/T_OPTMGMT_ACK.7.man: deleted
+	* man/man7/T_OPTMGMT_REQ.7.man: deleted
+	* man/man7/T_ORDREL_IND.7.man: deleted
+	* man/man7/T_ORDREL_REQ.7.man: deleted
+	* man/man7/T_UDERROR_IND.7.man: deleted
+	* man/man7/T_UNBIND_REQ.7.man: deleted
+	* man/man7/T_UNITDATA_IND.7.man: deleted
+	* man/man7/T_UNITDATA_REQ.7.man: deleted
+	* man/man7/T_addr_ack.7.man: deleted
+	* man/man7/T_addr_req.7.man: deleted
+	* man/man7/T_bind_ack.7.man: deleted
+	* man/man7/T_bind_req.7.man: deleted
+	* man/man7/T_capability_ack.7.man: deleted
+	* man/man7/T_capability_req.7.man: deleted
+	* man/man7/T_conn_con.7.man: deleted
+	* man/man7/T_conn_ind.7.man: deleted
+	* man/man7/T_conn_req.7.man: deleted
+	* man/man7/T_conn_res.7.man: deleted
+	* man/man7/T_data_ind.7.man: deleted
+	* man/man7/T_data_req.7.man: deleted
+	* man/man7/T_discon_ind.7.man: deleted
+	* man/man7/T_discon_req.7.man: deleted
+	* man/man7/T_error_ack.7.man: deleted
+	* man/man7/T_exdata_ind.7.man: deleted
+	* man/man7/T_exdata_req.7.man: deleted
+	* man/man7/T_info_ack.7.man: deleted
+	* man/man7/T_info_req.7.man: deleted
+	* man/man7/T_ok_ack.7.man: deleted
+	* man/man7/T_optdata_ind.7.man: deleted
+	* man/man7/T_optdata_req.7.man: deleted
+	* man/man7/T_optmgmt_ack.7.man: deleted
+	* man/man7/T_optmgmt_req.7.man: deleted
+	* man/man7/T_ordrel_ind.7.man: deleted
+	* man/man7/T_ordrel_req.7.man: deleted
+	* man/man7/T_uderror_ind.7.man: deleted
+	* man/man7/T_unbind_req.7.man: deleted
+	* man/man7/T_unitdata_ind.7.man: deleted
+	* man/man7/T_unitdata_req.7.man: deleted
+	* man/man7/cd_abort_output_req_t.7.man: deleted
+	* man/man7/cd_allow_input_req_t.7.man: deleted
+	* man/man7/cd_attach_req_t.7.man: deleted
+	* man/man7/cd_bad_frame_ind_t.7.man: deleted
+	* man/man7/cd_detach_req_t.7.man: deleted
+	* man/man7/cd_disable_con_t.7.man: deleted
+	* man/man7/cd_disable_req_t.7.man: deleted
+	* man/man7/cd_enable_con_t.7.man: deleted
+	* man/man7/cd_enable_req_t.7.man: deleted
+	* man/man7/cd_error_ack_t.7.man: deleted
+	* man/man7/cd_error_ind_t.7.man: deleted
+	* man/man7/cd_halt_input_req_t.7.man: deleted
+	* man/man7/cd_info_ack_t.7.man: deleted
+	* man/man7/cd_modem_sig_ind_t.7.man: deleted
+	* man/man7/cd_modem_sig_poll_t.7.man: deleted
+	* man/man7/cd_modem_sig_req_t.7.man: deleted
+	* man/man7/cd_mux_name_req_t.7.man: deleted
+	* man/man7/cd_ok_ack_t.7.man: deleted
+	* man/man7/cd_read_req_t.7.man: deleted
+	* man/man7/cd_unitdata_ack_t.7.man: deleted
+	* man/man7/cd_unitdata_ind_t.7.man: deleted
+	* man/man7/cd_unitdata_req_t.7.man: deleted
+	* man/man7/cd_write_read_req_t.7.man: deleted
+	* man/man7/cdi.7.man: deleted
+	* man/man7/dl_attach_req_t.7.man: deleted
+	* man/man7/dl_bind_ack_t.7.man: deleted
+	* man/man7/dl_bind_req_t.7.man: deleted
+	* man/man7/dl_connect_con_t.7.man: deleted
+	* man/man7/dl_connect_ind_t.7.man: deleted
+	* man/man7/dl_connect_req_t.7.man: deleted
+	* man/man7/dl_connect_res_t.7.man: deleted
+	* man/man7/dl_data_ack_ind_t.7.man: deleted
+	* man/man7/dl_data_ack_req_t.7.man: deleted
+	* man/man7/dl_data_ack_status_ind_t.7.man: deleted
+	* man/man7/dl_detach_req_t.7.man: deleted
+	* man/man7/dl_disabmulti_req_t.7.man: deleted
+	* man/man7/dl_disconnect_ind_t.7.man: deleted
+	* man/man7/dl_disconnect_req_t.7.man: deleted
+	* man/man7/dl_enabmulti_req_t.7.man: deleted
+	* man/man7/dl_error_ack_t.7.man: deleted
+	* man/man7/dl_get_statistics_ack_t.7.man: deleted
+	* man/man7/dl_get_statistics_req_t.7.man: deleted
+	* man/man7/dl_info_ack_t.7.man: deleted
+	* man/man7/dl_info_req_t.7.man: deleted
+	* man/man7/dl_ok_ack_t.7.man: deleted
+	* man/man7/dl_phys_addr_ack_t.7.man: deleted
+	* man/man7/dl_phys_addr_req_t.7.man: deleted
+	* man/man7/dl_promiscoff_req_t.7.man: deleted
+	* man/man7/dl_promiscon_req_t.7.man: deleted
+	* man/man7/dl_reply_ind_t.7.man: deleted
+	* man/man7/dl_reply_req_t.7.man: deleted
+	* man/man7/dl_reply_status_ind_t.7.man: deleted
+	* man/man7/dl_reply_update_req_t.7.man: deleted
+	* man/man7/dl_reply_update_status_ind_t.7.man: deleted
+	* man/man7/dl_reset_con_t.7.man: deleted
+	* man/man7/dl_reset_ind_t.7.man: deleted
+	* man/man7/dl_reset_req_t.7.man: deleted
+	* man/man7/dl_reset_res_t.7.man: deleted
+	* man/man7/dl_set_phys_addr_req_t.7.man: deleted
+	* man/man7/dl_subs_bind_ack_t.7.man: deleted
+	* man/man7/dl_subs_bind_req_t.7.man: deleted
+	* man/man7/dl_subs_unbind_req_t.7.man: deleted
+	* man/man7/dl_test_con_t.7.man: deleted
+	* man/man7/dl_test_ind_t.7.man: deleted
+	* man/man7/dl_test_req_t.7.man: deleted
+	* man/man7/dl_test_res_t.7.man: deleted
+	* man/man7/dl_token_ack_t.7.man: deleted
+	* man/man7/dl_token_req_t.7.man: deleted
+	* man/man7/dl_uderror_ind_t.7.man: deleted
+	* man/man7/dl_udqos_req_t.7.man: deleted
+	* man/man7/dl_unbind_req_t.7.man: deleted
+	* man/man7/dl_unitdata_ind_t.7.man: deleted
+	* man/man7/dl_unitdata_req_t.7.man: deleted
+	* man/man7/dl_xid_con_t.7.man: deleted
+	* man/man7/dl_xid_ind_t.7.man: deleted
+	* man/man7/dl_xid_req_t.7.man: deleted
+	* man/man7/dl_xid_res_t.7.man: deleted
+	* man/man7/dlpi.7.man: deleted
+	* man/man7/npi.7.man: deleted
+	* man/man7/tpi.7.man: deleted
+	* man/man7/tpi_ip.7.man: deleted
+	* man/man7/tpi_tcp.7.man: deleted
+	* man/man7/tpi_udp.7.man: deleted
+	* po/.cvsignore: deleted
+	* po/ChangeLog: deleted
+	* po/LINGUAS: deleted
+	* po/Makevars: deleted
+	* po/POTFILES.in: deleted
+	* po/de.po: deleted
+	* scripts/inet_mkdev: deleted
+	* scripts/inet_rmdev: deleted
 
-2004-06-22 brian <bidulock@openss7.org>
-	* (.rpmrelease):
+2004-06-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* .rpmrelease:
 	- bumped rpm release to 20
-	* (man/Makefile.am):
+	* man/Makefile.am:
 	- made conflicting xti_sctp.3 manpage conditional on openss7 sctp
 	  kernel
-	* (ChangeLog): updated
-	* (NEWS): updated
+	* ChangeLog: updated
+	* NEWS: updated
 
-2004-06-21 brian <bidulock@openss7.org>
-	* (.rpmrelease):
+2004-06-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* .rpmrelease:
 	- bumped rpm release to 19
-	* (LiS.spec.in):
+	* LiS.spec.in:
 	- added explicit epoch for internal package dependencies for
 	  compatibility with rpm release 4.2.1 and 4.2.2.
-	* (am/kernel.am):
+	* am/kernel.am:
 	- corrected symbolic linking and system map location on autoconf
 	  install
-	* (libxnet/xnet.c):
+	* libxnet/xnet.c:
 	- corrected behavior on zero maxlen for t_rcvconnect()
-	* (m4/kernel.m4):
+	* m4/kernel.m4:
 	- added detection for EL3 hugemem kernels
-	* (man/Makefile.am):
+	* man/Makefile.am:
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
-	* (man/man2/pipe.2s.man):
+	* man/man2/pipe.2s.man:
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
-	* (man/man3/pipe.3.man):
+	* man/man3/pipe.3.man:
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
-	* (man/man4/connld.4.man):
+	* man/man4/connld.4.man:
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
-	* (man/man4/timod.4.man):
+	* man/man4/timod.4.man:
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
-	* (man/man4/tirdwr.4.man):
+	* man/man4/tirdwr.4.man:
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
-	* (man/man9/LiS.9.man):
+	* man/man9/LiS.9.man:
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
-	* (man/man2/getpmsg.2.man): deleted
+	* man/man2/getpmsg.2.man: deleted
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
-	* (man/man2/putpmsg.2.man): deleted
+	* man/man2/putpmsg.2.man: deleted
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
-	* (man/man2/getpmsg.2s.man): added
+	* man/man2/getpmsg.2s.man: added
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
-	* (man/man2/putpmsg.2s.man): added
+	* man/man2/putpmsg.2s.man: added
 	- moved getpmsg and putpmsg to 2s to avoid install conflict with FC1
 	  manpages
 
-2004-06-10 brian <bidulock@openss7.org>
-	* (.rpmrelease):
+2004-06-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* .rpmrelease:
 	- bumped rpm release to 18
-	* (Makefile.am):
+	* Makefile.am:
 	- corrected autoconf device installation from separate build directory
-	* (m4/genksyms.m4):
+	* m4/genksyms.m4:
 	- added check an prefix for CONFIG_REGPARM for SuSE
-	* (m4/kernel.m4):
+	* m4/kernel.m4:
 	- added check and CFLAGS for CONFIG_REGPARM for SuSE
 	- corrected exported symbol caching
 
-2004-06-05 brian <bidulock@openss7.org>
-	* (.rpmrelease):
+2004-06-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* .rpmrelease:
 	- bumped rpm release to 17
-	* (ChangeLog):
+	* ChangeLog:
 	- updated change log
-	* (LiS.spec.in):
+	* LiS.spec.in:
 	- don't copy sources when source package not built
 	- added atomic stats option
-	* (Makefile):
+	* Makefile:
 	- HP patches to gcom makefile
-	* (Makefile.am):
+	* Makefile.am:
 	- added testsuite subdirectory
-	* (acinclude.m4):
+	* acinclude.m4:
 	- added atomic stats option for HP patches
 	- relative includes to build testsuite components
-	* (configure.ac):
+	* configure.ac:
 	- added testsuite auto makefiles
-	* (ia64+stats+fixes.patch):
+	* ia64+stats+fixes.patch:
 	- included HP patch in CVS
-	* (ldl-fixes.patch):
+	* ldl-fixes.patch:
 	- included HP patch in CVS
-	* (ldl-fixes2.patch):
+	* ldl-fixes2.patch:
 	- included HP patch in CVS
-	* (monothread+queueprotect.patch):
+	* monothread+queueprotect.patch:
 	- included HP patch in CVS
-	* (strtst-ng.patch):
+	* strtst-ng.patch:
 	- included HP patch in CVS
-	* (testsuite.patch):
+	* testsuite.patch:
 	- included HP patch in CVS
-	* (am/rpm.am):
+	* am/rpm.am:
 	- build tools last so debug package built correctly
-	* (drivers/str/dlpidriver.c):
+	* drivers/str/dlpidriver.c:
 	- putq() putbq() modifications
-	* (drivers/str/loop.c):
+	* drivers/str/loop.c:
 	- putq() putbq() modifications
-	* (drivers/str/minimux.c):
+	* drivers/str/minimux.c:
 	- putq() putbq() modifications
-	* (drivers/str/timod.c):
+	* drivers/str/timod.c:
 	- make MODULE_PARM non-static to keep it from being stripped
-	* (drivers/str/tirdwr.c):
+	* drivers/str/tirdwr.c:
 	- make MODULE_PARM non-static to keep it from being stripped
-	* (drivers/str/linux/inet.c):
+	* drivers/str/linux/inet.c:
 	- make MODULE_PARM non-static to keep it from being stripped
 	- putq() putbq() modifications
-	* (drivers/str/linux/ip.c):
+	* drivers/str/linux/ip.c:
 	- make MODULE_PARM non-static to keep it from being stripped
-	* (drivers/str/linux/ip_strm_mod.c):
+	* drivers/str/linux/ip_strm_mod.c:
 	- putq() putbq() modifications
-	* (drivers/str/linux/ip_to_dlpi.c):
+	* drivers/str/linux/ip_to_dlpi.c:
 	- putq() putbq() modifications
-	* (drivers/str/linux/ldl.c):
+	* drivers/str/linux/ldl.c:
 	- HP ldl patches
 	- putq() putbq() modifications
-	* (drivers/str/linux/udp.c):
+	* drivers/str/linux/udp.c:
 	- make MODULE_PARM non-static to keep it from being stripped
 	- putq() putbq() modifications
-	* (head/head.c):
+	* head/head.c:
 	- HP atomic stats, ioctl, ia64 patches
 	- Questionable HP patch addition of stats increment
-	* (head/linux-mdep.c):
+	* head/linux-mdep.c:
 	- HP BUG, ia64, time calculations and other patches
 	- printk patches
-	* (head/mod.c):
+	* head/mod.c:
 	- printk patches
-	* (head/msgutl.c):
+	* head/msgutl.c:
 	- Questionable HP patch changing lis_msgsize to lis_msgdsize
-	* (head/osif.c):
+	* head/osif.c:
 	- Added mem versions of io region functions
-	* (head/queue.c):
+	* head/queue.c:
 	- putq() putbq() modifications
 	- printk corrections
-	* (head/safe.c):
+	* head/safe.c:
 	- Questionable HP patch addition of stats increment
-	* (head/stream.c):
+	* head/stream.c:
 	- Questionable HP patch addition of stats increment
-	* (head/strmdbg.c):
+	* head/strmdbg.c:
 	- HP patch ia64 correction
-	* (head/user-mdep.c):
+	* head/user-mdep.c:
 	- putq() putbq() modifications
-	* (head/linux/exports.c):
+	* head/linux/exports.c:
 	- added lis_check_mem_region(), lis_release_mem_region(),
 	  lis_request_mem_region()
-	* (include/sys/ldl.h):
+	* include/sys/ldl.h:
 	- HP patch bumping number of minors to 256.
-	* (include/sys/osif.h):
+	* include/sys/osif.h:
 	- added lis_check_mem_region(), lis_release_mem_region(),
 	  lis_request_mem_region()
-	* (include/sys/LiS/genconf.h.in):
+	* include/sys/LiS/genconf.h.in:
 	- added define for atomic stats
-	* (include/sys/LiS/linux-mdep.h):
+	* include/sys/LiS/linux-mdep.h:
 	- HP patch debug macro
-	* (include/sys/LiS/mod.h):
+	* include/sys/LiS/mod.h:
 	- HP patch atomic stats option
-	* (include/sys/LiS/queue.h):
+	* include/sys/LiS/queue.h:
 	- changed appq() to return int
-	* (m4/rpm.m4):
+	* m4/rpm.m4:
 	- quoting mistake blocked passing of configure options to rpm
-	* (m4/strconf.m4):
+	* m4/strconf.m4:
 	- fixed quoting problems reported by Gurol
-	* (man/man9/appq.9.man):
+	* man/man9/appq.9.man:
 	- updated man page for appq to match modifications
-	* (man/man9/insq.9.man):
+	* man/man9/insq.9.man:
 	- updated man page for insq to match modifications
-	* (man/man9/putbq.9.man):
+	* man/man9/putbq.9.man:
 	- updated man page for putbq to match modifications
-	* (man/man9/putq.9.man):
+	* man/man9/putq.9.man:
 	- updated man page for putq to match modifications
-	* (po/de.po):
+	* po/de.po:
 	- I hate gnu gettext for this
-	* (testsuite/.cvsignore):
+	* testsuite/.cvsignore:
 	- added ignore file this directory
-	* (testsuite/Makefile):
+	* testsuite/Makefile:
 	- HP dejagnu patch
-	* (testsuite/Makefile.am):
+	* testsuite/Makefile.am:
 	- added automake makefile for autoconf build
-	* (testsuite/README):
+	* testsuite/README:
 	- HP dejagnu patch
-	* (testsuite/config/default.exp):
+	* testsuite/config/default.exp:
 	- HP dejagnu patch
-	* (testsuite/netperf/netperf.diff):
+	* testsuite/netperf/netperf.diff:
 	- HP dejagnu patch
-	* (testsuite/netperf/netperf.exp):
+	* testsuite/netperf/netperf.exp:
 	- HP dejagnu patch
-	* (testsuite/strtst/strtst.exp):
+	* testsuite/strtst/strtst.exp:
 	- HP dejagnu patch
-	* (testsuite/wrapper/.cvsignore):
+	* testsuite/wrapper/.cvsignore:
 	- added ignore file this directory
-	* (testsuite/wrapper/Makefile):
+	* testsuite/wrapper/Makefile:
 	- HP dejagnu patch
-	* (testsuite/wrapper/Makefile.am):
+	* testsuite/wrapper/Makefile.am:
 	- added automake makefile for autoconf build
-	* (testsuite/wrapper/wrapper.c):
+	* testsuite/wrapper/wrapper.c:
 	- HP dejagnu patch
-	* (util/strtst.c):
+	* util/strtst.c:
 	- HP strtst patch
 
-2004-05-19 brian <bidulock@openss7.org>
-	* (LiS.spec.in):
+2004-05-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.spec.in:
 	- Added option for modules and tools builds.
 	- simplified info installation
-	* (Makefile.am):
+	* Makefile.am:
 	- Added options to build inet driver and tli modules.
 	- Corrected library linking (don't always link LiS and pthread).
-	* (acinclude.m4):
+	* acinclude.m4:
 	- Updates to build process.
-	* (am/man.am): (removed)
-	* (am/strconf.am): dependencies update
-	* (configure.ac): don't mangle LIBS
-	* (drivers/str/Config): (removed)
-	* (drivers/str/Config.in): (added)
-	* (drivers/str/timod.c): sync with Linux Fast-STREAMS
-	* (drivers/str/tirdwr.c): sync with Linux Fast-STREAMS
-	* (drivers/str/linux/inet.c):
+	* am/man.am: (removed)
+	* am/strconf.am: dependencies update
+	* configure.ac: don't mangle LIBS
+	* drivers/str/Config: (removed)
+	* drivers/str/Config.in: (added)
+	* drivers/str/timod.c: sync with Linux Fast-STREAMS
+	* drivers/str/tirdwr.c: sync with Linux Fast-STREAMS
+	* drivers/str/linux/inet.c:
 	- sync with Linux Fast-STREAMS
 	- changed _irq locks to _bh locks
 	- removed deadlock from ss_unbufcall
-	* (include/Makefile.am):
+	* include/Makefile.am:
 	- installation of header files now depends on options
-	* (m4/kernel.m4):
+	* m4/kernel.m4:
 	- added linkage option for embedded targets
 	- added optimization options
 	- added symbol ripping macro
 	- changed option defaults for optimized build
-	* (m4/libraries.m4): moved options and variables
-	* (m4/man.m4): moved options and variables
-	* (m4/public.m4): moved options and variables
-	* (m4/rpm.m4): moved options and variables
-	* (m4/strconf.m4): moved options and variables
+	* m4/libraries.m4: moved options and variables
+	* m4/man.m4: moved options and variables
+	* m4/public.m4: moved options and variables
+	* m4/rpm.m4: moved options and variables
+	* m4/strconf.m4: moved options and variables
 	- files generated from strconf generated at configure time
 	  instead of make time
-	* (man/Makefile.am):
+	* man/Makefile.am:
 	- installation of manpages now dependent on options
 	- compression of manpages is smarter (compresses if compressed
 	  manpages exist in the installation target directory).
-	* (manual/LiS.texi): corrected typo that hung html target
-	* (manual/Makefile.am): infos and pdfs now distributed.
-	* (po/de.po): I hate gnu gettext for this.
+	* manual/LiS.texi: corrected typo that hung html target
+	* manual/Makefile.am: infos and pdfs now distributed.
+	* po/de.po: I hate gnu gettext for this.
 
-2004-04-26 brian <bidulock@openss7.org>
-	* (ChangeLog): Revision 1.1.4.23  2004/04/26 09:53:07  brian
+2004-04-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: Revision 1.1.4.23  2004/04/26 09:53:07  brian
 	- More build enhancements and corrections.
 
-2004-04-26 brian <bidulock@openss7.org>
-	* (ChangeLog): Revision 1.1.4.22  2004/04/26 06:53:32  brian
+2004-04-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: Revision 1.1.4.22  2004/04/26 06:53:32  brian
 	- Corrections to build.
-	* (acinclude.m4): corrected with/enable defaults
+	* acinclude.m4: corrected with/enable defaults
 	- use linux kernel environment technique
 	- placed additional AC_MSG_CHECKING statements
-	* (am/openss7.am): added new .PHONY targets
-	* (am/rpm.am): added signatures
-	* (m4/genksyms.m4): user kernel environment technique
-	* (m4/kernel.m4): provide _LINUX_KERNEL_ENV macro
+	* am/openss7.am: added new .PHONY targets
+	* am/rpm.am: added signatures
+	* m4/genksyms.m4: user kernel environment technique
+	* m4/kernel.m4: provide _LINUX_KERNEL_ENV macro
 	- corrected typo
-	* (m4/libraries.m4): adjusted defaults
-	* (m4/man.m4): adjusted defaults
-	* (m4/public.m4): adjusted defaults
-	* (m4/rpm.m4): adjusted defaults
+	* m4/libraries.m4: adjusted defaults
+	* m4/man.m4: adjusted defaults
+	* m4/public.m4: adjusted defaults
+	* m4/rpm.m4: adjusted defaults
 	- added additional tool checks
-	* (po/de.po): I hate gnu gettext
+	* po/de.po: I hate gnu gettext
 
-2004-04-26 brian <bidulock@openss7.org>
-	* (ChangeLog, NEWS): updated changelog and news
-	* (acinclude.m4): updated streams configuration
-	* (am/rpm.am): rpm rules only in place if rpmbuild exists
-	* (head/linux-mkdep.c): corrected static declaration of cache pointers
-	* (head/version.c): corrected missing modversions include
-	* (m4/genksyms.m4): no more AC_ name clash
-	* (m4/kernel.m4): no more AC_ name clash
+2004-04-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog, NEWS: updated changelog and news
+	* acinclude.m4: updated streams configuration
+	* am/rpm.am: rpm rules only in place if rpmbuild exists
+	* head/linux-mkdep.c: corrected static declaration of cache pointers
+	* head/version.c: corrected missing modversions include
+	* m4/genksyms.m4: no more AC_ name clash
+	* m4/kernel.m4: no more AC_ name clash
 	- looks for additional tools
 	- correcte linux_cv_debug test error
-	* (m4/libraries.m4): no more AC_ name clash
-	* (m4/man.m4): no more AC_ name clash
+	* m4/libraries.m4: no more AC_ name clash
+	* m4/man.m4: no more AC_ name clash
 	- only check for programs when cooking requested
-	* (m4/public.m4): no more AC_ name clash
+	* m4/public.m4: no more AC_ name clash
 	- reversed default (defaults to public release)
-	* (m4/rpm.m4): no more AC_ name clash
+	* m4/rpm.m4: no more AC_ name clash
 	- added checking statements
 	- look for additional tools
-	* (m4/strconf.m4): no more AC_ name clash
+	* m4/strconf.m4: no more AC_ name clash
 	- more general for use by other packages
-	* (po/de.po): I hate gnu gettext
+	* po/de.po: I hate gnu gettext
 
-2004-04-25 brian <bidulock@openss7.org>
-	* (ChangeLog, NEWS): Revision 1.1.4.21  2004/04/25 10:45:11  brian
+2004-04-25  Brian Bidulock  <bidulock@openss7.org>
+
+	- Revision 1.1.4.21  2004/04/25 10:45:11  brian
+	* ChangeLog, NEWS:
 	- Updated change log and news.
 
-2004-04-25 brian <bidulock@openss7.org>
-	* (ChangeLog):
+2004-04-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog:
 	- Updated NEWS and ChangeLog.
-	* (LiS.spec.in): revision 1.1.4.12
+	* LiS.spec.in: revision 1.1.4.12
 	- Updated change log.
-	* (LiS.spec.in): revision 1.1.4.11
+	* LiS.spec.in: revision 1.1.4.11
 	- Added streams to conflicts list.
 	- Check for existence of devices list before copying.
 	- Change devs subpackage to dev, libs subpackage to lib, utils subpackage to util.
 	- Install prebuild PDF versions of the manuals in the doc directory.
 	- Updated change log.
-	* (Makefile.am): revision 1.1.4.23
+	* Makefile.am: revision 1.1.4.23
 	- Manpage handling moved to man/Makefile.am
-	* (acinclude.m4): revision 1.1.4.15
+	* acinclude.m4: revision 1.1.4.15
 	- Updated AC_HELP_STRING to AS_HELP_STRING.
-	* (configure.ac): revision 1.1.4.4
+	* configure.ac: revision 1.1.4.4
 	- Updated to result of latest autoscan 2.59.
-	* (m4/genksyms.m4): revision 1.1.2.2
+	* m4/genksyms.m4: revision 1.1.2.2
 	- Updated AC_HELP_STRING to AS_HELP_STRING.
-	* (m4/kernel.m4): revision 1.1.2.6
+	* m4/kernel.m4: revision 1.1.2.6
 	- Updated AC_HELP_STRING to AS_HELP_STRING.
-	* (m4/man.m4): revision 1.1.2.3
+	* m4/man.m4: revision 1.1.2.3
 	- Updated AC_HELP_STRING to AS_HELP_STRING.
-	* (m4/public.m4): revision 1.1.2.2
+	* m4/public.m4: revision 1.1.2.2
 	- Updated AC_HELP_STRING to AS_HELP_STRING.
-	* (m4/rpm.m4): revision 1.1.2.13
+	* m4/rpm.m4: revision 1.1.2.13
 	- Updated AC_HELP_STRING to AS_HELP_STRING.
-	* (m4/strconf.m4): revision 1.1.2.3
+	* m4/strconf.m4: revision 1.1.2.3
 	- Updated AC_HELP_STRING to AS_HELP_STRING.
-	* (manual/Makefile.am): revision 1.1.4.2
+	* manual/Makefile.am: revision 1.1.4.2
 	- Prebuilt pdfs distributed.
 
-2004-04-25 brian <bidulock@openss7.org>
-	* (ChangeLog, NEWS): Revision 1.1.4.20  2004/04/24 11:22:58  brian
+2004-04-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog, NEWS: Revision 1.1.4.20  2004/04/24 11:22:58  brian
 	- Updated NEWS and ChangeLog.
 
-2004-04-23 brian <bidulock@openss7.org>
-	* (ChangeLog): Revision 1.1.4.19  2004/04/23 08:48:32  brian
+2004-04-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: Revision 1.1.4.19  2004/04/23 08:48:32  brian
 	- Updated NEWS and ChangeLog
 
-2004-04-23 brian <bidulock@openss7.org>
-	* (LiS.spec.in): revision 1.1.4.10
+2004-04-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.spec.in: revision 1.1.4.10
 	- added propagation of debugging flags
 	- make dependencies, devices list and pdfs separately (just in case)
 	- parameterized devices list
 	- copy devices list instead of regenerating it
 	- updated change logs
-	* (Makefile.am): revision 1.1.4.20
+	* Makefile.am: revision 1.1.4.20
 	- fully parameterized
 	- moved streams configuraiton to am/strconf.am
 	- added kernel symbol generation in am/genksyms.am
 	- moved header file installation to am/headers.am
-	* (acinclude.m4): revision 1.1.4.13
+	* acinclude.m4: revision 1.1.4.13
 	- added kernel symbol versioning support m4/genksyms.m4
 	- added public release support m4/public.m4
 	- added library support m4/libraries.m4
 	- moved streams configuration to m4/strconf.m4
-	* (acinclude.m4): revision 1.1.4.14
+	* acinclude.m4: revision 1.1.4.14
 	- removed redundant m4/strconf.m4 macros
-	* (am/kernel.am): revision 1.1.2.3
+	* am/kernel.am: revision 1.1.2.3
 	- converted to use discovered depmod tool
-	* (am/libraries.am): revision 1.1.2.2
+	* am/libraries.am: revision 1.1.2.2
 	- converted to use discovered ldconfig tool
-	* (am/man.am): revision 1.1.2.4
+	* am/man.am: revision 1.1.2.4
 	- converted to use discovered refer, soelim, tbl and pic
-	* (am/openss7.am): revision 1.1.2.2
+	* am/openss7.am: revision 1.1.2.2
 	- added phony targets and enhanced tags flags
-	* (am/rpm.am): revision 1.1.2.2
+	* am/rpm.am: revision 1.1.2.2
 	- converted to use discovered rpmbuild program
-	* (drivers/str/fifo.c): revision 1.1.1.1.8.2
-	* (drivers/str/linux/inet.c): revision 1.1.4.27
+	* drivers/str/fifo.c: revision 1.1.1.1.8.2
+	* drivers/str/linux/inet.c: revision 1.1.4.27
 	- Patch for 2.4.26 kernel build.
-	* (drivers/str/fifo.c): revision 1.1.1.1.8.2
-	* (drivers/str/loop.c): revision 1.1.1.2.8.2
-	* (drivers/str/pipemod.c): revision 1.1.1.3.4.2
-	* (drivers/str/sad.c): revision 1.1.1.2.8.2
-	* (drivers/str/timod.c): revision 1.1.1.2.4.3
-	* (drivers/str/tirdwr.c): revision 1.1.1.2.8.3
-	* (drivers/str/linux/connld.c): revision 1.1.1.3.4.2
-	* (drivers/str/linux/inet.c): revision 1.1.4.28
-	* (drivers/str/linux/ip.c): revision 1.1.2.2
-	* (drivers/str/linux/ip_strm_mod.c): revision 1.1.1.2.4.3
-	* (drivers/str/linux/ip_to_dlpi.c): revision 1.1.1.3.8.3
-	* (drivers/str/linux/ldl.c): revision 1.1.1.4.8.2
-	* (drivers/str/linux/liskmod.c): revision 1.1.1.2.4.2
-	* (drivers/str/linux/mtdrv.c): revision 1.1.1.2.4.2
-	* (drivers/str/linux/udp.c): revision 1.1.2.2
-	* (head/head.c): revision 1.1.1.11.4.2
-	* (head/linux/exports.c): revision 1.1.1.6.4.4
-	* (include/sys/LiS/linux-mdep.h): revision 1.1.1.6.4.2
+	* drivers/str/fifo.c: revision 1.1.1.1.8.2
+	* drivers/str/loop.c: revision 1.1.1.2.8.2
+	* drivers/str/pipemod.c: revision 1.1.1.3.4.2
+	* drivers/str/sad.c: revision 1.1.1.2.8.2
+	* drivers/str/timod.c: revision 1.1.1.2.4.3
+	* drivers/str/tirdwr.c: revision 1.1.1.2.8.3
+	* drivers/str/linux/connld.c: revision 1.1.1.3.4.2
+	* drivers/str/linux/inet.c: revision 1.1.4.28
+	* drivers/str/linux/ip.c: revision 1.1.2.2
+	* drivers/str/linux/ip_strm_mod.c: revision 1.1.1.2.4.3
+	* drivers/str/linux/ip_to_dlpi.c: revision 1.1.1.3.8.3
+	* drivers/str/linux/ldl.c: revision 1.1.1.4.8.2
+	* drivers/str/linux/liskmod.c: revision 1.1.1.2.4.2
+	* drivers/str/linux/mtdrv.c: revision 1.1.1.2.4.2
+	* drivers/str/linux/udp.c: revision 1.1.2.2
+	* head/head.c: revision 1.1.1.11.4.2
+	* head/linux/exports.c: revision 1.1.1.6.4.4
+	* include/sys/LiS/linux-mdep.h: revision 1.1.1.6.4.2
 	- touched up module headers
-	* (m4/kernel.m4): revision 1.1.2.5
+	* m4/kernel.m4: revision 1.1.2.5
 	- added kernel debug setup
 	- added search for depmod utility
 	- setup openss7 kernel debugging in kernel.m4
 	- added AM_CONDITIONAL for KERNEL_VERSIONS (used by genksyms.am)
-	* (m4/man.m4): revision 1.1.2.2
+	* m4/man.m4: revision 1.1.2.2
 	- added search for soelim, refer, tbl and pic programs for cooking manpages
-	* (m4/rpm.m4): revision 1.1.2.12
+	* m4/rpm.m4: revision 1.1.2.12
 	- added search for rpmbuild program.
-	* (man/lis.macros): revision 1.1.4.3
+	* man/lis.macros: revision 1.1.4.3
 	- Corrected typo.
 
-2004-04-15 brian <bidulock@openss7.org>
-	* (ChangeLog): Revision 1.1.4.18  2004/04/15 07:11:28  brian
+2004-04-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: Revision 1.1.4.18  2004/04/15 07:11:28  brian
 	- Updated changelogs.
 
-2004-04-15 brian <bidulock@openss7.org>
-	* (acinclude.m4, inet.c): ripped three missing kernel symbols
+2004-04-15  Brian Bidulock  <bidulock@openss7.org>
 
-2004-04-13 brian <bidulock@openss7.org>
-	* (ChangeLog): Revision 1.1.4.17  2004/04/13 21:47:33  brian
-	* (LiS.spec.in): Updated build system.
-	* (Makefile.am):
+	* acinclude.m4, inet.c: ripped three missing kernel symbols
+
+2004-04-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: Revision 1.1.4.17  2004/04/13 21:47:33  brian
+	* LiS.spec.in: Updated build system.
+	* Makefile.am:
 	- Removed redundant xti directory.
 	- Corrected header file install.
 	- Rearranged header files.
 	- Update man pages.
 	- Updated build system.
 	- Cooked manpages and other general rearrangements.
-	* (acinclude.m4):
+	* acinclude.m4:
 	- Added configure script support for uc_ttl.
 	- Cooked manpages and other general rearrangements.
 	- Added _SAFE and _DEBUG flags.
-	* (config.h.bot, config.h.top): - Get rid of template warnings.
-	* (kernel.am, openss7.am, rpm.am, libraries.am, man.am):
+	* config.h.bot, config.h.top: - Get rid of template warnings.
+	* kernel.am, openss7.am, rpm.am, libraries.am, man.am:
 	- Updating build system.
 	- Cooked manpages and other general rearrangements.
-	* (debug.h): - Changes for latest inet driver.
-	* (inet.c):
+	* debug.h: - Changes for latest inet driver.
+	* inet.c:
 	- Strapped out several noxious warnings.
 	- Rearranged header files.
 	- Raw sockets cannot have null addresses bound.
@@ -2157,48 +2242,48 @@
 	- Corrected all level and TBADOPT behavior on negotiation.
 	- Debugging option handling.
 	- More t_alloc adjustments.
-	* (ip.c): added - Attempt at NPI IP driver. (strapped out)
-	* (ip_to_dlpi.c): - Strapped out hanging debug statements.
-	* (raw.c): - Initial attempt towards direct UDP, RAW and UNIX devices.
-	* (udp.c): - Initial attempt towards direct UDP, RAW and UNIX devices.
-	* (unix.c): - Initial attempt towards direct UDP, RAW and UNIX devices.
-	* (stropts.h): - Rearranged header files.
-	* (ticlts.h): file ticlts.h was initially added on branch LIS-2-16-18-autoconf.
-	* (ticots.h): file ticots.h was initially added on branch LIS-2-16-18-autoconf.
-	* (ticotsord.h): file ticotsord.h was initially added on branch LIS-2-16-18-autoconf.
-	* (tihdr.h): - Rearranged header files.
-	* (timod.h): - Rearranged header files.
-	* (tirdwr.h): file tirdwr.h was initially added on branch LIS-2-16-18-autoconf.
-	* (tiuser.h): file tiuser.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/xti.h): - Rearranged header files.
-	* (sys/xti_inet.h): - Rearranged header files.
-	* (sys/dlpi.h): - Rearranged header files.
-	* (sys/npi.h): - Rearranged header files.
-	* (sys/ticlts.h): file ticlts.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/ticots.h): file ticots.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/ticotsord.h): file ticotsord.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/tihdr.h): - Rearranged header files.
-	* (sys/timod.h): - Rearranged header files.
-	* (sys/tirdwr.h): file tirdwr.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/tiuser.h): file tiuser.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/tli.h): file tli.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/tpi.h): file tpi.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/xti.h): file xti.h was initially added on branch LIS-2-16-18-autoconf.
+	* ip.c: added - Attempt at NPI IP driver. (strapped out)
+	* ip_to_dlpi.c: - Strapped out hanging debug statements.
+	* raw.c: - Initial attempt towards direct UDP, RAW and UNIX devices.
+	* udp.c: - Initial attempt towards direct UDP, RAW and UNIX devices.
+	* unix.c: - Initial attempt towards direct UDP, RAW and UNIX devices.
+	* stropts.h: - Rearranged header files.
+	* ticlts.h: file ticlts.h was initially added on branch LIS-2-16-18-autoconf.
+	* ticots.h: file ticots.h was initially added on branch LIS-2-16-18-autoconf.
+	* ticotsord.h: file ticotsord.h was initially added on branch LIS-2-16-18-autoconf.
+	* tihdr.h: - Rearranged header files.
+	* timod.h: - Rearranged header files.
+	* tirdwr.h: file tirdwr.h was initially added on branch LIS-2-16-18-autoconf.
+	* tiuser.h: file tiuser.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti.h: - Rearranged header files.
+	* sys/xti_inet.h: - Rearranged header files.
+	* sys/dlpi.h: - Rearranged header files.
+	* sys/npi.h: - Rearranged header files.
+	* sys/ticlts.h: file ticlts.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/ticots.h: file ticots.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/ticotsord.h: file ticotsord.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/tihdr.h: - Rearranged header files.
+	* sys/timod.h: - Rearranged header files.
+	* sys/tirdwr.h: file tirdwr.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/tiuser.h: file tiuser.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/tli.h: file tli.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/tpi.h: file tpi.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti.h: file xti.h was initially added on branch LIS-2-16-18-autoconf.
 	- Minor adjustments to ATM exposed definitions.
-	* (sys/xti_atm.h): file xti_atm.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti_atm.h: file xti_atm.h was initially added on branch LIS-2-16-18-autoconf.
 	- Minor adjustments to ATM exposed definitions.
-	* (sys/xti_inet.h): file xti_inet.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/xti_ip.h): file xti_ip.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/xti_local.h): file xti_local.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/xti_mosi.h): file xti_mosi.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/xti_osi.h): file xti_osi.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/xti_sctp.h): file xti_sctp.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/xti_tcp.h): file xti_tcp.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/xti_udp.h): file xti_udp.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/xti_xti.h): file xti_xti.h was initially added on branch LIS-2-16-18-autoconf.
-	* (sys/LiS/tpicommon.h): removed - Rearranged header files.
-	* (xti/*.h): - Removed redundant xti directory.
-	* (xnet.c):
+	* sys/xti_inet.h: file xti_inet.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti_ip.h: file xti_ip.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti_local.h: file xti_local.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti_mosi.h: file xti_mosi.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti_osi.h: file xti_osi.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti_sctp.h: file xti_sctp.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti_tcp.h: file xti_tcp.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti_udp.h: file xti_udp.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/xti_xti.h: file xti_xti.h was initially added on branch LIS-2-16-18-autoconf.
+	* sys/LiS/tpicommon.h: removed - Rearranged header files.
+	* xti/*.h: - Removed redundant xti directory.
+	* xnet.c:
 	- Rearranged header files.
 	- Upgraded method for calculating allocated sizes and maximum sizes.
 	- Corrections inside DEBUG conditionals.
@@ -2209,137 +2294,140 @@
 	- Corrections to t_getinfo
 	- More t_alloc fixin.
 	- Fixed bug in t_alloc
-	* (m4/man.m4): file man.m4 was initially added on branch LIS-2-16-18-autoconf.
-	* (m4/rpm.m4): - Bumped release number.
-	* (libxnet.macros, libxnet,refs): - Removed some redunant macro and reference files.
-	* (lis.macros, lis.refs): - Update man pages.
-	* (openss7.macros, openss7,refs): - Removed some redunant macro and reference files.
-	* (*.[2-9]): all manpages moved to .man prefix for cooked manpages option
-	* (po/de.po): I hate how GNU gettext does this
-	* (test-inet_raw.c, test-inet_tcp.c, test-inet_udp.c):
+	* m4/man.m4: file man.m4 was initially added on branch LIS-2-16-18-autoconf.
+	* m4/rpm.m4: - Bumped release number.
+	* libxnet.macros, libxnet,refs: - Removed some redunant macro and reference files.
+	* lis.macros, lis.refs: - Update man pages.
+	* openss7.macros, openss7,refs: - Removed some redunant macro and reference files.
+	* *.[2-9]: all manpages moved to .man prefix for cooked manpages option
+	* po/de.po: I hate how GNU gettext does this
+	* test-inet_raw.c, test-inet_tcp.c, test-inet_udp.c:
 	- Updated test programs to run concurrent forked child proceses
 	- Added ability to list test cases.
 	- Test cases pass.
 	- Working up new inet driver and documentation.
-	* (test-timod.c, test-tirdwr.c): minor changes
+	* test-timod.c, test-tirdwr.c: minor changes
 
-2004-04-05 brian <bidulock@openss7.org>
-	* (LiS): Revision 1.1.4.16  2004/04/05 02:10:56  brian
+2004-04-05  Brian Bidulock  <bidulock@openss7.org>
+
+	- Revision 1.1.4.16  2004/04/05 02:10:56  brian
 	- Cooked manpages and other general rearrangements.
 
-2004-03-15 brian <bidulock@openss7.org>
-	* (LiS): Revision 1.1.4.15  2004/03/15 22:18:32  brian
-	* (ChangeLog): Updated changelog.
+2004-03-15  Brian Bidulock  <bidulock@openss7.org>
 
-2004-03-15 brian <bidulock@openss7.org>
-	* (LiS): Revision 1.1.4.14  2004/03/15 22:14:54  brian
-	* (man/man9/timeout.9): corrected typo in SYNOPSIS
-	* (head/msgutl.c): lis_copyb(), copy b_band and b_flag fields as well.
+	- Revision 1.1.4.15  2004/03/15 22:18:32  brian
+	* ChangeLog: Updated changelog.
+
+2004-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	- Revision 1.1.4.14  2004/03/15 22:14:54  brian
+	* man/man9/timeout.9: corrected typo in SYNOPSIS
+	* head/msgutl.c: lis_copyb(), copy b_band and b_flag fields as well.
 	- apparently AIX and Solaris copy b_band, and Solaris copies b_flag
 	  but AIX doesn't
 	- thanks to Gurol Akman for both changes
 
-2004-03-04 brian <bidulock@openss7.org>
+2004-03-04  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.4.13  2004/03/04 10:45:21  brian
-	* (LiS): corrections mostly for HPPA (PARISC) architecture
-	* (acinclude.m4): added _HPPA_LIS_ define
-	* (acinclude.m4): added symbol ripping for mknod, unlink, mount, umount syscalls
-	* (acinclude.m4): quoted defined symbols
-	* (drivers/str/linux/inet.c): defines working around that stupid sctp in recent kernels
-	* (head/linux-mdep.c): added new syscall technique and _HPPA_LIS_ tests
-	* (head/osif.c): added _HPPA_LIS_ tests
-	* (libxnet/test-xnet.c): removed sa_restorer for recent kernels
-	* (m4/kernel.m4): corrected sp on __BOOT_KERNEL_H_ for RH kernels
-	* (m4/kernel.m4): quoted defined symbols
-	* (m4/rpm.m4): bumped release number (there has to be a better way)
-	* (util/linux/test-timod.c): remove sa_restorer for recent kernels
-	* (util/linux/test-tirdwr.c): remove sa_restorer for recent kernels
-	* (LiS.spec.in): corrected info (un)install for older rpm versions
-	* (Makefile.am): corrected sp of LIS_SC_MODCONF in dependencies
-	* (NEWS): updated
-	* (THANKS): updated
+	- Revision 1.1.4.13  2004/03/04 10:45:21  brian
+	- corrections mostly for HPPA (PARISC) architecture
+	* acinclude.m4: added _HPPA_LIS_ define
+	* acinclude.m4: added symbol ripping for mknod, unlink, mount, umount syscalls
+	* acinclude.m4: quoted defined symbols
+	* drivers/str/linux/inet.c: defines working around that stupid sctp in recent kernels
+	* head/linux-mdep.c: added new syscall technique and _HPPA_LIS_ tests
+	* head/osif.c: added _HPPA_LIS_ tests
+	* libxnet/test-xnet.c: removed sa_restorer for recent kernels
+	* m4/kernel.m4: corrected sp on __BOOT_KERNEL_H_ for RH kernels
+	* m4/kernel.m4: quoted defined symbols
+	* m4/rpm.m4: bumped release number (there has to be a better way)
+	* util/linux/test-timod.c: remove sa_restorer for recent kernels
+	* util/linux/test-tirdwr.c: remove sa_restorer for recent kernels
+	* LiS.spec.in: corrected info (un)install for older rpm versions
+	* Makefile.am: corrected sp of LIS_SC_MODCONF in dependencies
+	* NEWS: updated
+	* THANKS: updated
 
-2004-02-29 brian <bidulock@openss7.org>
+2004-02-29  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.4.12  2004/02/29 01:44:31  brian
+	- Revision 1.1.4.12  2004/02/29 01:44:31  brian
 	- fixed padding problem with small cache slots
 	- bumped revision number
 	- fixed moved tcp_openreq_cachep declaration (moved to tcp.h)
 
-2004-02-28 brian <bidulock@openss7.org>
+2004-02-28  Brian Bidulock  <bidulock@openss7.org>
 
-	* (head/strmdbg.c): fixed padding problem with small cache slots
-	* (head/linux/lismem.c): fixed padding problem with small cache slots
-	* (m4/rpm.m4): bumped revision number
-	* (drivers/str/linux/inet.c): fixed moved tcp_openreq_cachep declaration
+	* head/strmdbg.c: fixed padding problem with small cache slots
+	* head/linux/lismem.c: fixed padding problem with small cache slots
+	* m4/rpm.m4: bumped revision number
+	* drivers/str/linux/inet.c: fixed moved tcp_openreq_cachep declaration
 
-2004-02-16 brian <bidulock@openss7.org>
+2004-02-16  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.4.11  2004/02/16 06:27:59  brian
+	- Revision 1.1.4.11  2004/02/16 06:27:59  brian
 	- Fixed module loading bugs.
 	- Bumped revision number.
 	- Updated change log.
 
-2004-02-15 brian <bidulock@openss7.org>
+2004-02-15  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.4.10  2004/02/15 18:29:18  brian
+	- Revision 1.1.4.10  2004/02/15 18:29:18  brian
 	- Updated changelog.
 
-2004-02-11 brian <bidulock@openss7.org>
+2004-02-11  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.4.9  2004/02/11 05:16:07  brian
+	- Revision 1.1.4.9  2004/02/11 05:16:07  brian
 	- Changes for release 5.
 
-2004-02-10 brian <bidulock@openss7.org>
+2004-02-10  Brian Bidulock  <bidulock@openss7.org>
 
-	* (libxnet/xnet.c):
+	* libxnet/xnet.c:
 	- hob corrections to t_open and t_bind.
 
-	* (Makefile.am):
+	* Makefile.am:
 	- changed man_MANS to dist_man_MANS
 
-	* (drivers/str/Config):
+	* drivers/str/Config:
 	- added ticots_ord, ticots and ticlts device nodes
 
-	* (drivers/str/linux/inet.c):
+	* drivers/str/linux/inet.c:
 	- added support for above devices over UNIX domain sockets
 	- (untested)
 
-	* (head/strmdbg.c, head/linux/lismem.c):
+	* head/strmdbg.c, head/linux/lismem.c:
 	- stratus padding patch
 
-	* (m4/rpm.m4):
+	* m4/rpm.m4:
 	- bumped patch number to 5
 
-2004-01-29 brian <bidulock@openss7.org>
+2004-01-29  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.4.8  2004/01/29 21:33:15  brian
+	- Revision 1.1.4.8  2004/01/29 21:33:15  brian
 
-	* (strms_up/down/status):
+	* strms_up/down/status:
 	- Added these scripts back into the distribution.
 
-	* (libxnet/xnet.c): Revision 1.1.4.7  2004/01/29 18:29:47  brian
+	* libxnet/xnet.c: Revision 1.1.4.7  2004/01/29 18:29:47  brian
 	- Fixed search for existing transport user.
 
-	* (drivers/str/linux/inet): Revision 1.1.4.6  2004/01/29 18:00:09  brian
+	* drivers/str/linux/inet: Revision 1.1.4.6  2004/01/29 18:00:09  brian
 	- Fixed capability bit error.
 
-	* (LiS): Revision 1.1.4.5  2004/01/29 12:19:52  brian
+	- Revision 1.1.4.5  2004/01/29 12:19:52  brian
 	- Made make un/install smart enough to do %post and %postun
 
-2004-01-23 brian <bidulock@openss7.org>
+2004-01-23  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.4.4  2004/01/23 12:15:27  brian
+	- Revision 1.1.4.4  2004/01/23 12:15:27  brian
 	- Split off kernel modules install automake file and provided post targets.
 
-2004-01-17 brian <bidulock@openss7.org>
+2004-01-17  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.4.3  2004/01/20 00:03:01  brian
+	- Revision 1.1.4.3  2004/01/20 00:03:01  brian
 	- Fixed conflict with openss7 release headers and man pages.
 	- Added CVS ignore files.
 
-2004-01-17 brian <bidulock@openss7.org>
+2004-01-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am (nobase_include_HEADERS): removed files from list.
 	* Makefile.am (man_MANS): removed files from list.
@@ -2374,24 +2462,24 @@
 	* ChangeLog: update changelog
 	* LiS.spec.in: updated changelog
 
-2004-01-17 Brian Bidulock <bidulock@openss7.org>
+2004-01-17  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.16  2004/01/17 10:11:37  brian
+	- Revision 1.1.2.16  2004/01/17 10:11:37  brian
 	- Removed man pages and headers that conflict with openss7 release.
 
-2004-01-13 Brian Bidulock <bidulock@openss7.org>
+2004-01-13  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.4.2  2004/01/13 16:11:31  brian
+	- Revision 1.1.4.2  2004/01/13 16:11:31  brian
 	- Improvements to buid process.  Common m4 files for kernel and rpm.
 
-2004-01-12 Brian Bidulock <bidulock@openss7.org>
+2004-01-12  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.4.1  2004/01/12 23:32:35  brian
+	- Revision 1.1.4.1  2004/01/12 23:32:35  brian
 	- Updated LiS-2.16.18 gcom release to autoconf.
 
-2004-01-07 Brian Bidulock <bidulock@openss7.org>
+2004-01-07  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.15  2004/01/07 10:25:34  brian
+	- Revision 1.1.2.15  2004/01/07 10:25:34  brian
 	- More internationalization.
 
 2004-01-07  gettextize  <bug-gnu-gettext@gnu.org>
@@ -2416,73 +2504,73 @@
 	(EXTRA_DIST): Add scripts/config.rpath.
 	* configure.ac (AC_CONFIG_FILES): Add po/Makefile.in,
 
-2004-01-07 Brian Bidulock <bidulock@openss7.org>
+2004-01-07  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.14  2004/01/07 06:58:55  brian
+	- Revision 1.1.2.14  2004/01/07 06:58:55  brian
 	- Added gettext internationalization.
 
-2003-12-23 Brian Bidulock <bidulock@openss7.org>
+2003-12-23  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.13  2003/12/23 11:26:10  brian
+	- Revision 1.1.2.13  2003/12/23 11:26:10  brian
 	- Finalizing addition of INET streams and libxnet.
 
-2003-12-17 Brian Bidulock <bidulock@openss7.org>
+2003-12-17  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.12  2003/12/17 00:23:16  brian
+	- Revision 1.1.2.12  2003/12/17 00:23:16  brian
 	- Added XTI/TLI package into release.
 
-2003-12-16 Brian Bidulock <bidulock@openss7.org>
+2003-12-16  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.11  2003/12/16 16:20:52  brian
+	- Revision 1.1.2.11  2003/12/16 16:20:52  brian
 	- Added icons to binary packages.
 	- Modified modprobe removal to get entire stack.
 
-2003-12-16 Brian Bidulock <bidulock@openss7.org>
+2003-12-16  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.10  2003/12/16 13:54:33  brian
+	- Revision 1.1.2.10  2003/12/16 13:54:33  brian
 	- More corrections to module loading and versioning.
 
-2003-12-16 Brian Bidulock <bidulock@openss7.org>
+2003-12-16  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.9  2003/12/16 12:28:33  brian
+	- Revision 1.1.2.9  2003/12/16 12:28:33  brian
 	- Better handling of prefix for distcheck and cross compile.
 	- Moved conflicting programs and man pages for rpm install
 	- Corrected module.conf handling on rpm install/erase
 	- Changes to make texinfo documentation pass distcheck
 
-2003-12-15 Brian Bidulock <bidulock@openss7.org>
+2003-12-15  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.8  2003/12/15 23:45:36  brian
+	- Revision 1.1.2.8  2003/12/15 23:45:36  brian
 	- Added texinfo docs and logos.
 
-2003-12-13 Brian Bidulock <bidulock@openss7.org>
+2003-12-13  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.7  2003/12/13 20:51:53  brian
+	- Revision 1.1.2.7  2003/12/13 20:51:53  brian
 	- Corrections to icon bundling.
 
-2003-12-13 Brian Bidulock <bidulock@openss7.org>
+2003-12-13  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.6  2003/12/13 19:16:55  brian
+	- Revision 1.1.2.6  2003/12/13 19:16:55  brian
 	- removed a lot of redundant files and added devices to spec file
 
-2003-12-12 Brian Bidulock <bidulock@openss7.org>
+2003-12-12  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.5  2003/12/12 13:19:02  brian
+	- Revision 1.1.2.5  2003/12/12 13:19:02  brian
 	- added makedevices or LIS_MKNOD script for adding and removing devices
 
-2003-12-11 Brian Bidulock <bidulock@openss7.org>
+2003-12-11  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.4  2003/12/11 21:02:40  brian
+	- Revision 1.1.2.4  2003/12/11 21:02:40  brian
 	- updated spec for post and pre, started on strmknods script
 
-2003-12-11 Brian Bidulock <bidulock@openss7.org>
+2003-12-11  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.3  2003/12/11 11:36:58  brian
+	- Revision 1.1.2.3  2003/12/11 11:36:58  brian
 	- Added manual pages and [M]akefile.am's
 
-2003-12-10 Brian Bidulock <bidulock@openss7.org>
+2003-12-10  Brian Bidulock  <bidulock@openss7.org>
 
-	* (LiS): Revision 1.1.2.2  2003/12/10 13:55:18  brian
+	- Revision 1.1.2.2  2003/12/10 13:55:18  brian
 	- Minor changes to targets.
 
 -----

@@ -1,11 +1,11 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-thrtst.at,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/06/24 16:58:46 $
+dnl @(#) $RCSfile: testsuite-thrtst.at,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2006/03/05 04:03:10 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -33,9 +33,9 @@ dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl As an exception to the above, this software may be distributed under the
-dnl GNU General Public License (GPL) Version 2 or later, so long as the
-dnl software is distributed with, and only used for the testing of, OpenSS7
-dnl modules, drivers, and libraries.
+dnl GNU General Public License (GPL) Version 2, so long as the software is
+dnl distributed with, and only used for the testing of, OpenSS7 modules,
+dnl drivers, and libraries.
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,15 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/24 16:58:46 $ by $Author: brian $
+dnl Last Modified $Date: 2006/03/05 04:03:10 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-thrtst.at,v $
+dnl Revision 1.1.2.5  2006/03/05 04:03:10  brian
+dnl - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
+dnl - updates for new release
+dnl
 dnl Revision 1.1.2.4  2005/06/24 16:58:46  brian
 dnl - testsuite as always verbose internally
 dnl
@@ -87,7 +91,7 @@ AT_SETUP([thrtst])
 AT_KEYWORDS([Thread test])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    exit 77
+    exit 2
     thrtst
     ], [], [ignore], [], [], [])
 AT_CLEANUP

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.22 $) $Date: 2006/02/20 11:38:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,21 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/02/20 11:38:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: linux-mdep.c,v $
+ Revision 1.1.1.11.4.22  2006/02/20 11:38:49  brian
+ - corrections for some 64bit architectures, from patches
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.21 $) $Date: 2005/12/29 21:35:56 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.22 $) $Date: 2006/02/20 11:38:49 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.21 2005/12/29 21:35:56 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.22 2006/02/20 11:38:49 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -334,10 +337,14 @@ void lis_print_dentry(struct dentry *d, char *comment);
 
 #if defined(_S390X_LIS_) || defined (_PPC64_LIS_) || defined(_X86_64_LIS_)
 extern long sys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg);
+#ifdef HAVE_KFUNC_REGISTER_IOCTL32_CONVERSION
 extern int register_ioctl32_conversion(unsigned int fd,
 				       int (*handler) (unsigned int fd, unsigned int cmd,
 						       unsigned long arg));
+#endif
+#ifdef HAVE_KFUNC_REGISTER_IOCTL32_CONVERSION
 extern int unregister_ioctl32_conversion(unsigned int cmd);
+#endif
 typedef struct strioctl32 {
 	int ic_cmd;			/* command */
 	int ic_timout;			/* timeout value */
@@ -3981,6 +3988,7 @@ lis_init_module(void)
 
 	lis_start_qsched();	/* ensure q running process going */
 
+#if defined HAVE_KFUNC_REGISTER_IOCTL32_CONVERSION
 #if defined(_S390X_LIS_) || defined(_PPC64_LIS_) || defined(_X86_64_LIS_)
 	register_ioctl32_conversion(I_SETSIG, lis_ioctl32);
 	register_ioctl32_conversion(I_SRDOPT, lis_ioctl32);
@@ -3990,13 +3998,14 @@ lis_init_module(void)
 
 	register_ioctl32_conversion(I_STR, lis_ioctl32);
 #endif
+#endif
 #ifdef LIS_ATOMIC_STATS
 	lis_proc_file = create_proc_read_entry("LiS", 0444, NULL, lis_proc_read, NULL);
 
 #endif
 
 	printk("Linux STREAMS Subsystem ready.\n"
-	       "Copyright (c) 2004-2005 OpenSS7 Corporation.  All Rights Reserved.\n"
+	       "Copyright (c) 2004-2006 OpenSS7 Corporation.  All Rights Reserved.\n"
 	       "Copyright (c) 1997-2004 David Grothe, et al, http://www.gcom.com\n"
 	       "Major device number %d.\n" "Version %s %s. Compiled for kernel version %s.\n"
 	       "Using %s %s\n"
@@ -4103,6 +4112,7 @@ cleanup_module(void)
 	lis_terminate_final();	/* LiS internal memory */
 	lis_mem_terminate();	/* LiS use of slab allocator */
 
+#if defined HAVE_KFUNC_UNREGISTER_IOCTL32_CONVERSION
 #if defined(_S390X_LIS_) || defined(_PPC64_LIS_) || defined(_X86_64_LIS_)
 	unregister_ioctl32_conversion(I_SETSIG);
 	unregister_ioctl32_conversion(I_SRDOPT);
@@ -4111,6 +4121,7 @@ cleanup_module(void)
 	unregister_ioctl32_conversion(I_UNLINK);
 
 	unregister_ioctl32_conversion(I_STR);
+#endif
 #endif
 
 	printk("Linux STREAMS Subsystem removed\n");

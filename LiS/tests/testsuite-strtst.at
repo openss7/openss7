@@ -1,11 +1,11 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/10/23 05:01:27 $
+dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2006/03/05 04:03:09 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -32,6 +32,13 @@ dnl The author is under no obligation to provide any feature listed herein.
 dnl
 dnl --------------------------------------------------------------------------
 dnl
+dnl As an exception to the above, this software may be distributed under the
+dnl GNU General Public License (GPL) Version 2, so long as the software is
+dnl distributed with, and only used for the testing of, OpenSS7 modules,
+dnl drivers, and libraries.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
 dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
 dnl behalf of the U.S. Government ("Government"), the following provisions
 dnl apply to you.  If the Software is supplied by the Department of Defense
@@ -54,11 +61,15 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/10/23 05:01:27 $ by $Author: brian $
+dnl Last Modified $Date: 2006/03/05 04:03:09 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-strtst.at,v $
+dnl Revision 1.1.2.8  2006/03/05 04:03:09  brian
+dnl - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
+dnl - updates for new release
+dnl
 dnl Revision 1.1.2.7  2005/10/23 05:01:27  brian
 dnl - test programs and modules for POSIX testing
 dnl
@@ -165,7 +176,7 @@ AT_CLEANUP
 
 AT_SETUP([strtst band])
 AT_KEYWORDS([strtst band])
-AT_CHECK([test_strtst band || exit 77], [], [ignore], [], [], [])
+AT_CHECK([test_strtst band], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst flush])

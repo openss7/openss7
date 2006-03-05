@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/28 09:53:35 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2006/03/05 04:03:13 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:53:35 $ by $Author: brian $
+ Last Modified $Date: 2006/03/05 04:03:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
+ Revision 1.1.2.3  2006/03/05 04:03:13  brian
+ - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
+ - updates for new release
+
  Revision 1.1.2.2  2005/12/28 09:53:35  brian
  - remove warnings on FC4 compile
 
@@ -140,9 +144,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/28 09:53:35 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2006/03/05 04:03:13 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/28 09:53:35 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2006/03/05 04:03:13 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -317,6 +321,11 @@ enum {
 long test_start = 0;
 
 static int state;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 #if 0
 /*

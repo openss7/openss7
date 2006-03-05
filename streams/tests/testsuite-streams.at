@@ -1,11 +1,11 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/02/22 11:33:20 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/03/05 03:51:42 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -33,9 +33,9 @@ dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl As an exception to the above, this software may be distributed under the
-dnl GNU General Public License (GPL) Version 2 or later, so long as the
-dnl software is distributed with, and only used for the testing of, OpenSS7
-dnl modules, drivers, and libraries.
+dnl GNU General Public License (GPL) Version 2, so long as the software is
+dnl distributed with, and only used for the testing of, OpenSS7 modules,
+dnl drivers, and libraries.
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/02/22 11:33:20 $ by $Author: brian $
+dnl Last Modified $Date: 2006/03/05 03:51:42 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 0.9.2.43  2006/03/05 03:51:42  brian
+dnl - updated common test suites
+dnl
 dnl Revision 0.9.2.42  2006/02/22 11:33:20  brian
 dnl - recognize --quite flag to test suites
 dnl
@@ -211,10 +214,98 @@ dnl - getting autotest up and running
 dnl
 dnl ==========================================================================
 
-dnl if test `id -u` -ne 0 ; then exit 77 ; fi
-
 m4_divert_push([DEFAULTS])
+at_SMP=
+at_MP=
 function test_streams() {
+    case "$2" in
+    (LIS)
+	# LiS crashes on many tests regardless of SMP
+	if test :${at_STRCONF_PACKAGE:-LfS} = :LiS
+	then
+	    cat <<ACEOF >&2
+***** WARNING *****
+This test causes LiS to hang or crash the kernel on all machine
+types and all kernel types.  The testsuite has detected an LiS
+system and, therefore, the test is skipped but assumed failed.
+
+LIS IS FULL OF BUGS AND IS DEPRECATED!  PLEASE USE THE OPENSS7
+LINUX FAST-STREAMS INSTEAD!  WHATEVER YOU DO, DO NOT REPORT THIS
+TEST CASE FAILURE AS A BUG!
+***** WARNING *****
+ACEOF
+	    return 2
+	fi
+	;;
+    (SMP)
+	# LiS crashes on many tests under SMP
+	if test :${at_STRCONF_PACKAGE:-LfS} = :LiS
+	then
+	    if test :${at_SMP:-notset} = :notset
+	    then
+		# crashes on SMP machine
+		if (grep -q '^processor[[[:space:]]]*:[[[:space:]]]*[[1-9]]' /proc/cpuinfo >/dev/null 2>&1)
+		then
+		    at_SMP=yes
+		else
+		    # crahses on SMP kernel UP machine
+		    if (grep -q 'SMP' /proc/sys/kernel/version >/dev/null 2>&1)
+		    then
+			at_SMP=yes
+		    else
+			at_SMP=no
+		    fi
+		fi
+	    fi
+	    if test :$at_SMP = :yes
+	    then
+		cat <<ACEOF >&2
+***** WARNING *****
+This test causes LiS to hang or crash the kernel on all machine
+types on SMP kernels.  The testsuite has detected an LiS SMP
+system and, therefore, the test is skipped but assumed failed.
+
+LIS IS FULL OF BUGS AND IS DEPRECATED!  PLEASE USE THE OPENSS7
+LINUX FAST-STREAMS INSTEAD!  WHATEVER YOU DO, DO NOT REPORT THIS
+TEST CASE FAILURE AS A BUG!
+***** WARNING *****
+ACEOF
+		return 2
+	    fi
+	fi
+	;;
+    (MP)
+	# LiS crashes on more tests on a MP machine
+	if test :${at_STRCONF_PACKAGE:=LiS} = :LiS
+	then
+	    if test :${at_MP:-notset} = :notset
+	    then
+		# crashes on SMP machine
+		if (grep -q '^processor[[[:space:]]]*:[[[:space:]]]*[[1-9]]' /proc/cpuinfo >/dev/null 2>&1)
+		then
+		    at_MP=yes
+		else
+		    at_MP=no
+		fi
+	    fi
+	    if test :$at_MP = :yes
+	    then
+		cat <<ACEOF >&2
+***** WARNING *****
+This test causes LiS to hang or crash the kernel on MP machine
+types on SMP kernels.  The testsuite has detected an LiS MP
+system and, therefore, the test is skipped but assumed failed.
+
+LIS IS FULL OF BUGS AND IS DEPRECATED!  PLEASE USE THE OPENSS7
+LINUX FAST-STREAMS INSTEAD!  WHATEVER YOU DO, DO NOT REPORT THIS
+TEST CASE FAILURE AS A BUG!
+***** WARNING *****
+ACEOF
+		return 2
+	    fi
+	fi
+	;;
+    esac
     if test $at_verbose = echo
     then
 	options='-vvvvv'
@@ -282,7 +373,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.1.5])
 AT_KEYWORDS([streams ioctl I_NREAD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -308,24 +398,12 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.2.5])
 AT_KEYWORDS([streams ioctl I_PUSH EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.2.6])
 AT_KEYWORDS([streams ioctl I_PUSH EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
-AT_CHECK([
-    if test :${at_STRCONF_PACKAGE:-LfS} = :LiS
-    then
-	#
-	# LiS hangs the machine on this test
-	#
-	exit 77
-    else
-	test_streams 2.2.6
-    fi
-], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.2.6 LIS], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.2.7])
@@ -340,19 +418,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.2.9])
 AT_KEYWORDS([streams ioctl I_PUSH EIO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.2.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.2.10])
 AT_KEYWORDS([streams ioctl I_PUSH EIO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.2.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.2.11])
 AT_KEYWORDS([streams ioctl I_PUSH EIO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.2.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -383,19 +458,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.3.5])
 AT_KEYWORDS([streams ioctl I_POP EIO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.3.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.3.6])
 AT_KEYWORDS([streams ioctl I_POP EIO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.3.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.3.7])
 AT_KEYWORDS([streams ioctl I_POP EIO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.3.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -406,7 +478,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.4.1])
 AT_KEYWORDS([streams ioctl I_LOOK])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -452,7 +523,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.5.2])
 AT_KEYWORDS([streams ioctl I_FLUSH EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -478,19 +548,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.5.7])
 AT_KEYWORDS([streams ioctl I_FLUSH EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.5.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.5.8])
 AT_KEYWORDS([streams ioctl I_FLUSH EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.5.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.5.9])
 AT_KEYWORDS([streams ioctl I_FLUSH EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.5.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -556,7 +623,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.6.12])
 AT_KEYWORDS([streams ioctl I_SRDOPT EPROTO])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.6.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -567,7 +633,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.6.14])
 AT_KEYWORDS([streams ioctl I_SRDOPT EPROTO])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.6.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -663,13 +728,11 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.8.2])
 AT_KEYWORDS([streams ioctl I_STR EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.8.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.8.3])
 AT_KEYWORDS([streams ioctl I_STR EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.8.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -690,19 +753,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.8.7])
 AT_KEYWORDS([streams ioctl I_STR EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.8.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.8.8])
 AT_KEYWORDS([streams ioctl I_STR EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.8.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.8.9])
 AT_KEYWORDS([streams ioctl I_STR EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.8.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -778,7 +838,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.9.12.2])
 AT_KEYWORDS([streams ioctl I_SETSIG S_OUTPUT false])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.9.12.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -789,7 +848,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.9.13.2])
 AT_KEYWORDS([streams ioctl I_SETSIG S_WRNORM false])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.9.13.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -880,7 +938,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.11.2])
 AT_KEYWORDS([streams ioctl I_FIND true])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.11.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -891,7 +948,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.11.4])
 AT_KEYWORDS([streams ioctl I_FIND EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.11.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -937,7 +993,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.12.3])
 AT_KEYWORDS([streams ioctl I_LINK EBADF])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.12.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -948,19 +1003,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.12.5])
 AT_KEYWORDS([streams ioctl I_LINK])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.12.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.12.6])
 AT_KEYWORDS([streams ioctl I_LINK])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.12.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.12.7])
 AT_KEYWORDS([streams ioctl I_LINK])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.12.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -976,13 +1028,11 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.12.10])
 AT_KEYWORDS([streams ioctl I_LINK EINVAL PLEX])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.12.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.13.1])
 AT_KEYWORDS([streams ioctl I_UNLINK EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.13.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -998,19 +1048,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.13.4])
 AT_KEYWORDS([streams ioctl I_UNLINK EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.13.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.13.5])
 AT_KEYWORDS([streams ioctl I_UNLINK EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.13.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.13.6])
 AT_KEYWORDS([streams ioctl I_UNLINK EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.13.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1021,24 +1068,12 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.14.2])
 AT_KEYWORDS([streams ioctl I_RECVFD ENXIO])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.14.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.14.3])
 AT_KEYWORDS([streams ioctl I_RECVFD EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
-AT_CHECK([
-    if test :${at_STRCONF_PACKAGE:-LfS} = :LiS
-    then
-	#
-	# LiS hangs the machine on this test (on SMP kernel)
-	#
-	exit 77
-    else
-	test_streams 2.14.3
-    fi
-], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.14.3 SMP], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.14.4])
@@ -1048,7 +1083,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.14.5])
 AT_KEYWORDS([streams ioctl I_RECVFD EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.14.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1059,7 +1093,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.14.7])
 AT_KEYWORDS([streams ioctl I_RECVFD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.14.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1110,7 +1143,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.15.9])
 AT_KEYWORDS([streams ioctl I_PEEK false])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.15.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1131,57 +1163,31 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.16.3.1])
 AT_KEYWORDS([streams ioctl I_FDINSERT RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
-AT_CHECK([
-    if test :${at_STRCONF_PACKAGE:-LfS} = :LiS
-    then
-	#
-	# LiS hangs the machine on this test (on SMP kernel)
-	#
-	exit 77
-    else
-	test_streams 2.16.3.1
-    fi
-], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.16.3.1 SMP], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.16.3.2])
 AT_KEYWORDS([streams ioctl I_FDINSERT EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
-AT_CHECK([
-    if test :${at_STRCONF_PACKAGE:-LfS} = :LiS
-    then
-	#
-	# LiS hangs the machine on this test (on SMP kernel)
-	#
-	exit 77
-    else
-	test_streams 2.16.3.2
-    fi
-], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.16.3.2 SMP], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.16.4.1])
 AT_KEYWORDS([streams ioctl I_FDINSERT EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.16.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.16.4.2])
 AT_KEYWORDS([streams ioctl I_FDINSERT EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.16.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.16.5.1])
 AT_KEYWORDS([streams ioctl I_FDINSERT EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.16.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.16.5.2])
 AT_KEYWORDS([streams ioctl I_FDINSERT EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.16.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1192,7 +1198,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.16.6.2])
 AT_KEYWORDS([streams ioctl I_FDINSERT PLEX])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.16.6.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1223,7 +1228,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.16.12])
 AT_KEYWORDS([streams ioctl I_FDINSERT EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.16.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1244,7 +1248,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.16.16])
 AT_KEYWORDS([streams ioctl I_FDINSERT EBADF])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.16.16], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1255,41 +1258,26 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.17.1])
 AT_KEYWORDS([streams ioctl I_SENDFD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.17.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.17.2])
 AT_KEYWORDS([streams ioctl I_SENDFD ENXIO])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.17.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.17.3])
 AT_KEYWORDS([streams ioctl I_SENDFD RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
-AT_CHECK([
-    if test :${at_STRCONF_PACKAGE:-LfS} = :LiS
-    then
-	#
-	# LiS hangs the machine on this test (on SMP kernel)
-	#
-	exit 77
-    else
-	test_streams 2.17.3
-    fi
-], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.17.3 SMP], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.17.4])
 AT_KEYWORDS([streams ioctl I_SENDFD EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.17.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.17.5])
 AT_KEYWORDS([streams ioctl I_SENDFD EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.17.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1320,7 +1308,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.19.4])
 AT_KEYWORDS([streams ioctl I_SWROPT SNDHOLD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.19.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1331,31 +1318,26 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.19.6])
 AT_KEYWORDS([streams ioctl I_SWROPT SNDZERO SNDHOLD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.19.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.19.7])
 AT_KEYWORDS([streams ioctl I_SWROPT SNDPIPE SNDHOLD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.19.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.19.8])
 AT_KEYWORDS([streams ioctl I_SWROPT SNDZERO SNDPIPE SNDHOLD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.19.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.19.9])
 AT_KEYWORDS([streams ioctl I_SWROPT EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.19.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.19.10])
 AT_KEYWORDS([streams ioctl I_SWROPT SNDPIPE HUP])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.19.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1366,13 +1348,11 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.19.12])
 AT_KEYWORDS([streams ioctl I_SWROPT EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.19.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.19.13])
 AT_KEYWORDS([streams ioctl I_SWROPT EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.19.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1383,7 +1363,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.20.1])
 AT_KEYWORDS([streams ioctl I_GWROPT default])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.20.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1404,7 +1383,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.20.5])
 AT_KEYWORDS([streams ioctl I_GWROPT SNDHOLD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.20.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1415,19 +1393,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.20.7])
 AT_KEYWORDS([streams ioctl I_GWROPT SNDZERO SNDHOLD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.20.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.20.8])
 AT_KEYWORDS([streams ioctl I_GWROPT SNDPIPE SNDHOLD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.20.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.20.9])
 AT_KEYWORDS([streams ioctl I_GWROPT SNDZERO SNDPIPE SNDHOLD])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.20.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1438,25 +1413,21 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.20.11])
 AT_KEYWORDS([streams ioctl I_GWROPT default HUP])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.20.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.20.12])
 AT_KEYWORDS([streams ioctl I_GWROPT default RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.20.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.20.13])
 AT_KEYWORDS([streams ioctl I_GWROPT default WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.20.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.20.14])
 AT_KEYWORDS([streams ioctl I_GWROPT default RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.20.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1507,7 +1478,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.22.3])
 AT_KEYWORDS([streams ioctl I_PLINK EBADF])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.22.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1518,19 +1488,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.22.5])
 AT_KEYWORDS([streams ioctl I_PLINK EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.22.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.22.6])
 AT_KEYWORDS([streams ioctl I_PLINK EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.22.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.22.7])
 AT_KEYWORDS([streams ioctl I_PLINK EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.22.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1546,7 +1513,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.23.1])
 AT_KEYWORDS([streams ioctl I_PUNLINK EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.23.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1562,19 +1528,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.23.4])
 AT_KEYWORDS([streams ioctl I_PUNLINK EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.23.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.23.5])
 AT_KEYWORDS([streams ioctl I_PUNLINK EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.23.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.23.6])
 AT_KEYWORDS([streams ioctl I_PUNLINK EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.23.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1585,7 +1548,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.24.2])
 AT_KEYWORDS([streams ioctl I_FLUSHBAND EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.24.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1631,19 +1593,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.24.11])
 AT_KEYWORDS([streams ioctl I_FLUSHBAND EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.24.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.24.12])
 AT_KEYWORDS([streams ioctl I_FLUSHBAND EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.24.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.24.13])
 AT_KEYWORDS([streams ioctl I_FLUSHBAND EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.24.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1669,7 +1628,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.25.3])
 AT_KEYWORDS([streams ioctl I_CKBAND EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.25.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1680,7 +1638,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.25.5])
 AT_KEYWORDS([streams ioctl I_CKBAND EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.25.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1711,7 +1668,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.26.3])
 AT_KEYWORDS([streams ioctl I_GETBAND EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.26.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1722,7 +1678,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.26.5])
 AT_KEYWORDS([streams ioctl I_GETBAND EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.26.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1758,7 +1713,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.27.3])
 AT_KEYWORDS([streams ioctl I_ATMARK EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.27.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1769,7 +1723,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.27.5])
 AT_KEYWORDS([streams ioctl I_ATMARK EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.27.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1780,37 +1733,31 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.28.1])
 AT_KEYWORDS([streams ioctl I_SETCLTIME zero])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.28.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.28.2])
 AT_KEYWORDS([streams ioctl I_SETCLTIME EFAULT])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.28.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.28.3])
 AT_KEYWORDS([streams ioctl I_SETCLTIME zero HUP])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.28.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.28.4])
 AT_KEYWORDS([streams ioctl I_SETCLTIME zero RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.28.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.28.5])
 AT_KEYWORDS([streams ioctl I_SETCLTIME zero WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.28.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.28.6])
 AT_KEYWORDS([streams ioctl I_SETCLTIME zero RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.28.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1821,7 +1768,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.28.8])
 AT_KEYWORDS([streams ioctl I_SETCLTIME])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.28.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1837,7 +1783,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.28.11])
 AT_KEYWORDS([streams ioctl I_SETCLTIME])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.28.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1893,13 +1838,11 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.30.4])
 AT_KEYWORDS([streams ioctl I_CANPUT ANYBAND false])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.30.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.30.5])
 AT_KEYWORDS([streams ioctl I_CANPUT normal EPROTO HUP])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.30.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1910,13 +1853,11 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.30.7])
 AT_KEYWORDS([streams ioctl I_CANPUT normal EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.30.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.30.8])
 AT_KEYWORDS([streams ioctl I_CANPUT normal EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.30.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1937,37 +1878,31 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.30.12])
 AT_KEYWORDS([streams ioctl I_CANPUT ANYBAND false])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.30.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.30.13])
 AT_KEYWORDS([streams ioctl I_CANPUT ANYBAND true])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.30.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.31.1])
 AT_KEYWORDS([streams ioctl I_SERROPT default])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.31.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.31.2])
 AT_KEYWORDS([streams ioctl I_SERROPT RERRNONPERSIST])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.31.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.31.3])
 AT_KEYWORDS([streams ioctl I_SERROPT WERRNONPERSIST])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.31.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.31.4])
 AT_KEYWORDS([streams ioctl I_SERROPT RERRNONPERSIST WERRNONPERSIST])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.31.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1978,67 +1913,56 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.31.6])
 AT_KEYWORDS([streams ioctl I_SERROPT EINVAL PLEX])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.31.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.31.7])
 AT_KEYWORDS([streams ioctl I_SERROPT RERRNORM])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.31.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.31.8])
 AT_KEYWORDS([streams ioctl I_SERROPT WERRNORM])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.31.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.31.9])
 AT_KEYWORDS([streams ioctl I_SERROPT RERRNONPERSIST])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.31.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.31.10])
 AT_KEYWORDS([streams ioctl I_SERROPT WERRNONPERSIST])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.31.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.32.1])
 AT_KEYWORDS([streams ioctl I_GERROPT default])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.32.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.32.2])
 AT_KEYWORDS([streams ioctl I_GERROPT RERRNORM WERRNORM])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.32.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.32.3])
 AT_KEYWORDS([streams ioctl I_GERROPT RERRNONPERSIST WERRNORM])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.32.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.32.4])
 AT_KEYWORDS([streams ioctl I_GERROPT RERRNORM WERRNONPERSIST])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.32.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.32.5])
 AT_KEYWORDS([streams ioctl I_GERROPT RERRNONPERSIST WERRNONPERSIST])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.32.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.32.6])
 AT_KEYWORDS([streams ioctl I_GERROPT EFAULT])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.32.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2049,7 +1973,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.33])
 AT_KEYWORDS([streams ioctl I_ANCHOR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.33], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2125,13 +2048,11 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.40.9])
 AT_KEYWORDS([streams ioctl I_GETPMSG EFAULT])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.40.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 2.40.10])
 AT_KEYWORDS([streams ioctl I_GETPMSG EFAULT])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.40.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2147,7 +2068,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 2.41.3])
 AT_KEYWORDS([streams ioctl I_PUTPMSG EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 2.41.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2278,7 +2198,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.1.11.3])
 AT_KEYWORDS([streams read RNORM])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.1.11.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2399,7 +2318,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.3.3])
 AT_KEYWORDS([streams write EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2445,13 +2363,11 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.3.12])
 AT_KEYWORDS([streams write])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.3.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.3.13])
 AT_KEYWORDS([streams write])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.3.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2482,7 +2398,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.4.3])
 AT_KEYWORDS([streams writev EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2563,19 +2478,16 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.5.8])
 AT_KEYWORDS([streams getmsg EBADF])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.5.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.5.9])
 AT_KEYWORDS([streams getmsg EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.5.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.5.10])
 AT_KEYWORDS([streams getmsg EFAULT])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.5.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2626,7 +2538,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.5.16])
 AT_KEYWORDS([streams getmsg EBADMSG])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.5.16], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2638,7 +2549,6 @@ AT_CLEANUP
 AT_SETUP([posix streams test 3.5.18])
 AT_KEYWORDS([streams getmsg ENOSTR])
 AT_CHECK([test_streams 3.5.18], [], [ignore], [], [], [])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.5.19])
@@ -2649,13 +2559,11 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.5.20])
 AT_KEYWORDS([streams getmsg])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.5.20], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.5.21])
 AT_KEYWORDS([streams getmsg])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.5.21], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2696,43 +2604,36 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.8])
 AT_KEYWORDS([streams getpmsg EBADF])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.6.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.9])
 AT_KEYWORDS([streams getpmsg EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.6.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.10])
 AT_KEYWORDS([streams getpmsg EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.6.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.11])
 AT_KEYWORDS([streams getpmsg EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.6.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.12])
 AT_KEYWORDS([streams getpmsg EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.6.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.13])
 AT_KEYWORDS([streams getpmsg EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.6.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.14])
 AT_KEYWORDS([streams getpmsg EFAULT])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.6.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2803,7 +2704,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.20])
 AT_KEYWORDS([streams getpmsg EBADMSG])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.6.20], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2820,7 +2720,6 @@ AT_CLEANUP
 AT_SETUP([posix streams test 3.6.23])
 AT_KEYWORDS([streams getpmsg ENOSTR])
 AT_CHECK([test_streams 3.6.23], [], [ignore], [], [], [])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.24])
@@ -2831,13 +2730,11 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.25])
 AT_KEYWORDS([streams getpmsg])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.6.25], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.26])
 AT_KEYWORDS([streams getpmsg])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.6.26], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2853,7 +2750,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.7.3])
 AT_KEYWORDS([streams putmsg EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.7.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2874,7 +2770,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.7.7])
 AT_KEYWORDS([streams putmsg EBADF])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.7.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2900,7 +2795,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.7.12])
 AT_KEYWORDS([streams putmsg])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.7.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2937,7 +2831,6 @@ AT_CLEANUP
 AT_SETUP([posix streams test 3.7.19])
 AT_KEYWORDS([streams putmsg ENOSTR])
 AT_CHECK([test_streams 3.7.19], [], [ignore], [], [], [])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.8.1])
@@ -2952,7 +2845,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.8.3])
 AT_KEYWORDS([streams putpmsg EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.8.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2973,7 +2865,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.8.7])
 AT_KEYWORDS([streams putpmsg EBADF])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.8.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2989,7 +2880,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.8.10])
 AT_KEYWORDS([streams putpmsg EINVAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.8.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -3000,7 +2890,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.8.12])
 AT_KEYWORDS([streams putpmsg])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.8.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -3037,7 +2926,6 @@ AT_CLEANUP
 AT_SETUP([posix streams test 3.8.19])
 AT_KEYWORDS([streams putpmsg ENOSTR])
 AT_CHECK([test_streams 3.8.19], [], [ignore], [], [], [])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.9.1])
@@ -3052,7 +2940,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.9.3])
 AT_KEYWORDS([streams isastream EBADF])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.9.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -3119,7 +3006,6 @@ AT_CLEANUP
 
 AT_SETUP([posix streams test 3.10.12.2])
 AT_KEYWORDS([streams poll POLLERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LfS} = :LiS])
 AT_CHECK([test_streams 3.10.12.2], [], [ignore], [], [], [])
 AT_CLEANUP
 

@@ -1,11 +1,11 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-pipe.at,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:46 $
+dnl @(#) $RCSfile: testsuite-pipe.at,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/05 04:03:08 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -33,9 +33,9 @@ dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl As an exception to the above, this software may be distributed under the
-dnl GNU General Public License (GPL) Version 2 or later, so long as the
-dnl software is distributed with, and only used for the testing of, OpenSS7
-dnl modules, drivers, and libraries.
+dnl GNU General Public License (GPL) Version 2, so long as the software is
+dnl distributed with, and only used for the testing of, OpenSS7 modules,
+dnl drivers, and libraries.
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,15 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/12/20 15:11:46 $ by $Author: brian $
+dnl Last Modified $Date: 2006/03/05 04:03:08 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-pipe.at,v $
+dnl Revision 1.1.2.6  2006/03/05 04:03:08  brian
+dnl - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
+dnl - updates for new release
+dnl
 dnl Revision 1.1.2.5  2005/12/20 15:11:46  brian
 dnl - result of SMP kernel testing for LiS
 dnl
@@ -126,12 +130,107 @@ dnl
 dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
+at_SMP=
+at_MP=
 function test_pipe() {
+    case "$2" in
+    (LIS)
+	# LiS crashes on many tests regardless of SMP
+	if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+	then
+	    cat <<ACEOF >&2
+***** WARNING *****
+This test causes LiS to hang or crash the kernel on all machine
+types and all kernel types.  The testsuite has detected an LiS
+system and, therefore, the test is skipped but assumed failed.
+
+LIS IS FULL OF BUGS AND IS DEPRECATED!  PLEASE USE THE OPENSS7
+LINUX FAST-STREAMS INSTEAD!  WHATEVER YOU DO, DO NOT REPORT THIS
+TEST CASE FAILURE AS A BUG!
+***** WARNING *****
+ACEOF
+	    return 2
+	fi
+	;;
+    (SMP)
+	# LiS crashes on many tests under SMP
+	if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+	then
+	    if test :${at_SMP:-notset} = :notset
+	    then
+		# crashes on SMP machine
+		if (grep -q '^processor[[[:space:]]]*:[[[:space:]]]*[[1-9]]' /proc/cpuinfo >/dev/null 2>&1)
+		then
+		    at_SMP=yes
+		else
+		    # crahses on SMP kernel UP machine
+		    if (grep -q 'SMP' /proc/sys/kernel/version >/dev/null 2>&1)
+		    then
+			at_SMP=yes
+		    else
+			at_SMP=no
+		    fi
+		fi
+	    fi
+	    if test :$at_SMP = :yes
+	    then
+		cat <<ACEOF >&2
+***** WARNING *****
+This test causes LiS to hang or crash the kernel on all machine
+types on SMP kernels.  The testsuite has detected an LiS SMP
+system and, therefore, the test is skipped but assumed failed.
+
+LIS IS FULL OF BUGS AND IS DEPRECATED!  PLEASE USE THE OPENSS7
+LINUX FAST-STREAMS INSTEAD!  WHATEVER YOU DO, DO NOT REPORT THIS
+TEST CASE FAILURE AS A BUG!
+***** WARNING *****
+ACEOF
+		return 2
+	    fi
+	fi
+	;;
+    (MP)
+	# LiS crashes on more tests on a MP machine
+	if test :${at_STRCONF_PACKAGE:=LiS} = :LiS
+	then
+	    if test :${at_MP:-notset} = :notset
+	    then
+		# crashes on SMP machine
+		if (grep -q '^processor[[[:space:]]]*:[[[:space:]]]*[[1-9]]' /proc/cpuinfo >/dev/null 2>&1)
+		then
+		    at_MP=yes
+		else
+		    at_MP=no
+		fi
+	    fi
+	    if test :$at_MP = :yes
+	    then
+		cat <<ACEOF >&2
+***** WARNING *****
+This test causes LiS to hang or crash the kernel on MP machine
+types on SMP kernels.  The testsuite has detected an LiS MP
+system and, therefore, the test is skipped but assumed failed.
+
+LIS IS FULL OF BUGS AND IS DEPRECATED!  PLEASE USE THE OPENSS7
+LINUX FAST-STREAMS INSTEAD!  WHATEVER YOU DO, DO NOT REPORT THIS
+TEST CASE FAILURE AS A BUG!
+***** WARNING *****
+ACEOF
+		return 2
+	    fi
+	fi
+	;;
+    esac
     if test $at_verbose = echo
     then
 	options='-vvvvv'
     else
-	options='-vvv'
+	if test $at_arg_given_quiet != false
+	then
+	    options='-q'
+	else
+	    options='-vvv'
+	fi
     fi
     if test-pipe $options -e -o $1
     then
@@ -169,13 +268,11 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.2.1])
 AT_KEYWORDS([pipe ioctl I_RECVFD ENXIO HUP])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.2.2])
 AT_KEYWORDS([pipe ioctl I_RECVFD EPROTO RDERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -186,7 +283,6 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.2.4])
 AT_KEYWORDS([pipe ioctl I_RECVFD EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -207,30 +303,27 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.3.1])
 AT_KEYWORDS([pipe ioctl I_SENDFD ENXIO HUP])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_pipe 2.3.1], [], [ignore], [], [], [])
+AT_CHECK([test_pipe 2.3.1 MP], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.3.2])
 AT_KEYWORDS([pipe ioctl I_SENDFD RDERR])
-AT_CHECK([test_pipe 2.3.2], [], [ignore], [], [], [])
+AT_CHECK([test_pipe 2.3.2 MP], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.3.3])
 AT_KEYWORDS([pipe ioctl I_SENDFD EPROTO WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_pipe 2.3.3], [], [ignore], [], [], [])
+AT_CHECK([test_pipe 2.3.3 MP], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.3.4])
 AT_KEYWORDS([pipe ioctl I_SENDFD EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_pipe 2.3.4], [], [ignore], [], [], [])
+AT_CHECK([test_pipe 2.3.4 MP], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.4.1])
 AT_KEYWORDS([pipe ioctl I_PUSH ENXIO HUP])
-AT_CHECK([test_pipe 2.4.1], [], [ignore], [], [], [])
+AT_CHECK([test_pipe 2.4.1 MP], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.4.2])
@@ -255,7 +348,6 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.4.6])
 AT_KEYWORDS([pipe ioctl I_SWROPT ENXIO HUP])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.4.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -266,7 +358,6 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.4.8])
 AT_KEYWORDS([pipe ioctl I_CANPUT ENXIO HUP])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.4.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -282,13 +373,11 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.3])
 AT_KEYWORDS([pipe write ~O_NONBLOCK SIGNAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.4])
 AT_KEYWORDS([pipe write O_NONBLOCK])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -304,7 +393,6 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.7])
 AT_KEYWORDS([pipe write zero-length])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -315,19 +403,16 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.9])
 AT_KEYWORDS([pipe write EPROTO SIGPIPE WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.10])
 AT_KEYWORDS([pipe write EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.11])
 AT_KEYWORDS([pipe write EPIPE SIGPIPE])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -343,13 +428,11 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.3])
 AT_KEYWORDS([pipe putmsg ~O_NONBLOCK SIGNAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.4])
 AT_KEYWORDS([pipe putmsg O_NONBLOCK])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -365,7 +448,6 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.7])
 AT_KEYWORDS([pipe putmsg zero-length])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -376,19 +458,16 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.9])
 AT_KEYWORDS([pipe putmsg EPROTO SIGPIPE WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.10])
 AT_KEYWORDS([pipe putmsg EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.11])
 AT_KEYWORDS([pipe putmsg EPIPE SIGPIPE])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -404,13 +483,11 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.3])
 AT_KEYWORDS([pipe putpmsg ~O_NONBLOCK SIGNAL])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.4])
 AT_KEYWORDS([pipe putpmsg O_NONBLOCK])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -426,7 +503,6 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.7])
 AT_KEYWORDS([pipe putpmsg zero-length])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -437,19 +513,16 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.9])
 AT_KEYWORDS([pipe putpmsg EPROTO SIGPIPE WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.10])
 AT_KEYWORDS([pipe putpmsg EPROTO RDERR WRERR])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.11])
 AT_KEYWORDS([pipe putpmsg EPIPE SIGPIPE])
-AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.11], [], [ignore], [], [], [])
 AT_CLEANUP
 

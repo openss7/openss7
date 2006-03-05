@@ -1,11 +1,11 @@
 dnl vim: ft=config
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: local.at,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/06/05 05:13:50 $
+dnl @(#) $RCSfile: local.at,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/05 03:47:02 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -33,9 +33,9 @@ dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl As an exception to the above, this software may be distributed under the
-dnl GNU General Public License (GPL) Version 2 or later, so long as the
-dnl software is distributed with, and only used for the testing of, OpenSS7
-dnl modules, drivers, and libraries.
+dnl GNU General Public License (GPL) Version 2, so long as the software is
+dnl distributed with, and only used for the testing of, OpenSS7 modules,
+dnl drivers, and libraries.
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/05 05:13:50 $ by $Author: brian $
+dnl Last Modified $Date: 2006/03/05 03:47:02 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: local.at,v $
+dnl Revision 0.9.2.4  2006/03/05 03:47:02  brian
+dnl - updated test suite headers
+dnl
 dnl Revision 0.9.2.3  2005/06/05 05:13:50  brian
 dnl - added banner
 dnl
@@ -91,7 +94,7 @@ AT_ARG_OPTION([quiet], AS_HELP_STRING([--quiet],
 	[suppress normal output]))
 
 AT_BANNER(
-[Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+[Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.
@@ -117,9 +120,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.
 
 As an exception to the above,  this software may be  distributed  under the  GNU
-General Public License  (GPL)  Version 2  or later,  so long as  the software is
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,
-and libraries.
+General Public License (GPL) Version 2,  so long as the  software is distributed
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.
 
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
 of the  U.S. Government  ("Government"),  the following provisions apply to you.
@@ -133,6 +135,9 @@ it is classified as  "Restricted Computer Software" and the  Government's rights
 in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition
 Regulations  ("FAR") (or any successor regulations) or, in the cases of NASA, in
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor
-regulations).]
+regulations).
+
+Commercial licensing  and  support of  this  software is available from  OpenSS7
+Corporation  at a fee.  See http://www.openss7.com/]
 )
 

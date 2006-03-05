@@ -1,81 +1,184 @@
-		    Linux STREAMS Package
+OpenSS7 Linux STREAMS (LiS) -- readme first file.  2006-03-02
+$Id$
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+OpenSS7 Modified Linux STREAMS (LiS)
+====================================
 
-		          L i S
+This is an OpenSS7 modified version of the sources available from
+ftp://ftp.gcom.com/pub/linux/src/LiS-2.18.0.tgz
 
-NOTE
+This is the LiS-2.18.3 package.  It, and the current version, can
+be obtained from the download area of The OpenSS7 Project website at
+http://www.openss7.org/download.html as LiS-2.18.3.tar.bz2 using a
+command such as
 
-This is a very abbreviated version of the Lis documenation.  The complete
-documentation is now in html format.  It comes with the LiS distribution
-in the directory htdocs.  It is available over the Internet at
-http://www.gcom.com/LiS.
+	wget http://www.openss7.org/tarballs/LiS-2.18.3.tar.bz2
 
-INSTALLATION
+Please see the NEWS file for release notes and history of user visible
+changes for the current version, and the ChangeLog file for a more
+detailed history of implementation changes.  The TODO file lists
+features not yet implemented or other outstandinng items.
 
-We recommend unpacking the tar archive in the directory /usr/src.
-While logged in as root, use the following command:
+Please see the INSTALL, INSTALL-LiS and README-make files (or the
+installation and reference manual) for installation instructions.  When
+working from CVS, please see the README-cvs file.  An abbreviated
+installation procedure that works for most applications appears below.
 
-    tar xzf LiS-2.x.tgz  ('x' is the specific LiS version extension)
+This release of the package is published strictly under Version 2 of the
+GNU Public License which can be found in the file COPYING.  Package
+specific licensing terms (if any) can be found in the file LICENSING.
+Please respect these licensing arrangements.  If you are interested in
+different licensing terms, please contact the copyright holder, OpenSS7
+Corporation, http://www.openss7.com/ or mailto:bidulock@openss7.org.
 
-It will make a subdirectory named LiS-2.7
+Prerequisites
+-------------
 
-Change directories to LiS-2.x and type in "make".  The LiS package
-will install itself.  After the make completes, type in "make install"
-and LiS will install all the modules and utility programs in the
-proper places on your system.
+The following are prerequisites for building the package:
 
+ 1. Linux distribution with a 2.4 or 2.6 kernel with the appropriate
+    tool chain.  For supported and tested distributions, see the manual.
 
-KERNEL COMPATIBILITY
+    (Note that the `LiS' package is deprecated.  We recommend using the
+    `streams' package instead.)
 
-This version of LiS will install in any kernel version from 2.2.x
-onward (through 2.4.x).  LiS no longer supports 2.0.x kernels.
-It is best when used with 2.4.x kernels.
+When configuring and building multiple OpenSS7 Project release packages,
+place all of the source packages (unpackaged tarballs) at the same
+directory level and all build directories at the same directory level.
 
-The LiS software resides outside the kernel source tree.  It runs
-as a loadable module.
+Installation
+------------
 
-SPARC PORT OF LIS (Could be obsolete)
+The following commands will download, configure, build, check, install,
+validate, uninstall and remove the package:
 
-This is compliments of Jürgen Magin <juergen.magin@octogon.de>
+	wget http://www.openss7.org/tarballs/LiS-2.18.3.tar.bz2
+	tar -xjvf LiS-2.18.3.tar.bz2
+	mkdir build
+	cd build
+	../LiS-2.18.3.configure
+	make
+	make check
+	sudo make install
+	sudo make installcheck
+	sudo make uninstall
+	cd ..
+	sudo rm -rf build
+	rm -rf LiS-2.18.3.
+	rm -f LiS-2.18.3.tar.bz2
 
-RedHat Linux 5.2 (UltraPenguin 1.1.9, kernel 2.2.2) on SparcStation5
+Manual
+------
 
-  In this kernel version there is a problem with some symbols,
-  which are included in the kernel but not exported.
-  First look in /proc/ksyms after < mmu_p2v >. If it´s
-  not included, there is a patch in the Kernel recommended. 
-  In the file
+More detailed installation instructions can be found in the Installation
+and Reference Manual, contained in the distribution in `text', `info',
+`html', and `pdf' formats:
 
-	/usr/src/linux/arch/sparc/kernel/sparc_ksyms.c 
+	cd ../LiS-2.18.3
+	less manual/LiS.txt
+	lynx manual/LiS.html
+	info -f manual/LiS.info
+	xpdf manual/LiS.pdf
 
-  you have to add the line: ( line 176 )
+The current manual is also always available online from The OpenSS7
+Project website at:
 
-	EXPORT_SYMBOL_NOVERS(BTFIXUP_CALL(mmu_p2v)); 
+	lynx http://www.openss7.org/LiS_manual.html
 
-  (In newer kernel version it may be exported) and in the file 
+Description
+-----------
 
-	/usr/include/asm/unistd.h
+The OpenSS7 Modified Linux STREAMS (LiS) package is a STREAMS framework
+that is compatible with SVR4 STREAMS.  It has lots of debugging features
+not found in other STREAMS packages.  Good to do networking and other
+things.  It allows for installation of binary drivers.
 
-  add the lines:
+NOTE: The original LiS package from GCOM is no longer actively
+maintained by either GCOM or the OpenSS7 Project: use the OpenSS7 Linux
+Fast-STREAMS package <http://www.openss7.org/STREAMS.html> instead.
 
-	#define __NR_getpmsg            151    /* LiS specific */
-	#define __NR_putpmsg            152    /* LiS specific */
-	#define __NR_poll               153    /* LiS specific */
-	#define __NR_streams            154    /* LiS specific */
+Brief Installation Instructions
+-------------------------------
 
-  and then compile a new kernel. For the sparc there is a 
-  collision in head/syscalls.c. The number 188 and 189 are used by
-  the kernel for < __NR_sysconf > and < __NR_uname >. 
+The OpenSS7 Modified Linux STREAMS (LiS) package is available from the
+downloads area of The OpenSS7 Project website:
+<http://www.openss7.org/download.html> using a command such as:
 
+	wget http://www.openss7.org/tarballs/LiS-2.18.3.tar.bz2
 
-David Grothe
-<dave@gcom.com>
+Unpack the tarball using a command such as:
+
+	tar -xjvf LiS-2.18.3.tar.bz2
+
+The tarball will unpack into the relative subdirectory named after the
+package name: LiS-2.18.3  The package builds using the GNU autoconf
+utilities and the `configure' script.  To build the package, we
+recommend using a separate build directory as follows:
+
+	mkdir build
+	cd build
+	../LiS-2.18.3/configure
+
+In general, the package configures and builds without adding any special
+options to the configure script.  For general options to the configure
+script, see the GNU `INSTALL' file in the distribution:
+
+	less ../LiS-2.18.3/INSTALL
+
+For specific options to the configure script, see the INSTALL-LiS
+file in the distribution, or simply execute the configure script with
+the --help option like so:
+
+	../LiS-2.18.3/configure --help
+
+After configuring the package, the package can be compiled simply by
+issuing the `make' command:
+
+	make
+
+Some specialized makefile targets exist, see the README-make file in the
+distribution or simply invoke the `help' target like so:
+
+	make help
+
+After successfully building the package, the package can be checked by
+invoking the `check' make target like so:
+
+	make check
+
+After successfully checking the package, the package can be installed by
+invoking the `install' make target (as root) like so:
+
+	sudo make install
+
+The testsuites that ship with the package can be invoked after the
+package has been installed by invoking the `installcheck' target.  This
+target can either be invoked as root, or as a normal user, like so:
+
+	make installcheck
+
+The package can be cleanly removed by invoking the `uninstall' target
+(as root):
+
+	sudo make uninstall
+
+Then the build directory and tarball can be simply removed:
+
+	cd ..
+	rm -rf build
+	rm -rf LiS-2.18.3
+	rm -f LiS-2.18.3.tar.bz2
+
 
 =========================================================================
 
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -120,3 +223,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

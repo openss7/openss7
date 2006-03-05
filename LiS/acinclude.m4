@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.40 $) $Date: 2006/02/20 11:41:09 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.41 $) $Date: 2006/03/05 04:02:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/02/20 11:41:09 $ by $Author: brian $
+# Last Modified $Date: 2006/03/05 04:02:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.41  2006/03/05 04:02:56  brian
+# - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
+# - updates for new release
+#
 # Revision 1.1.6.40  2006/02/20 11:41:09  brian
 # - added checks for 64 bit architectures
 #
@@ -435,7 +439,8 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
-			  asm/uaccess.h linux/compat.h], [:], [:], [
+			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
+			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -463,9 +468,12 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			pci_dac_page_to_dma pci_dac_dma_to_page pci_dac_dma_to_offset \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			cpumask_scnprintf __symbol_get __symbol_put \
-			read_trylock write_trylock path_lookup \
+			read_trylock write_trylock atomic_add_return path_lookup \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
-			num_online_cpus generic_delete_inode access_ok], [:], [
+			num_online_cpus generic_delete_inode access_ok set_user_nice \
+			set_cpus_allowed_yield \
+			prepare_to_wait prepare_to_wait_exclusive finish_wait \
+			compat_ptr register_ioctl32_conversion unregister_ioctl32_conversion], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
@@ -511,10 +519,16 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #if HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
 #endif
+#if HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
 #if HAVE_KINC_ASM_UACCESS_H
 #include <asm/uaccess.h>
+#endif
+#if HAVE_KINC_LINUX_COMPAT_H
+#include <linux/compat.h>
 #endif
 ])
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
@@ -581,6 +595,9 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #if HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
 #endif
+#if HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
 #include <linux/time.h>		/* for struct timespec */
 ])
 dnl 
@@ -622,6 +639,7 @@ dnl
 #include <linux/namespace.h>
 #endif
 ])
+	_LINUX_KERNEL_SYMBOLS([ioctl32_hash_table, ioctl32_sem, compat_ptr])
 	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
 	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])
@@ -695,6 +713,9 @@ dnl
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
 #if HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#if HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
 #endif
 #include <linux/time.h>		/* for struct timespec */]],
 			[[struct timespec ts;
@@ -1186,7 +1207,7 @@ AC_DEFUN([_LIS_REGPARMS], [dnl
 	an attribute with the number of parameters passed to exported LiS
 	functions when there is a regparms kernel.  This is for binary
 	compatibility. */], [   ], [/* ])[
-#ifdef __i386__
+#if defined __i386__ || defined __x86_64__ || defined __k8__
 #undef _RP
 #else
 #define _RP

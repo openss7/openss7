@@ -1,67 +1,34 @@
-LiS, Linux STREAMS -- acknowledgements.  2006-03-02
-$Id: THANKS,v 1.1.6.3 2006/03/05 04:02:56 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+OpenSS7 Linux STREAMS -- things to do.  2006-03-01
+Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-Acknowledgements
-****************
+Things to do:
 
-Sponsors
-========
+The OpenSS7 release of Linux STREAMS was in maintenance mode for over a
+year and the latest 2.18 releases are quite stable.  However, LiS is
+fraught with bugs and suffers from a aging design approach making it
+unsuitable for production use.  It fails many of the conformance test
+cases in the test suite and even locks the kernel on a number of cases
+on SMP kernels regardless of their being run on a UP machine.
 
-Funding for maintenance of the Linux STREAMS (LiS) package was provided
-in part by:
+The OpenSS7 Project wrote a new STREAMS package for Linux called Linux
+Fast-STREAMS.  Linux Fast-STREAMS is now far more stable than LiS, and
+The OpenSS7 Project will no longer perform develoment on the LiS
+package, unless at the bequest of a project sponsor.  As such, LiS is
+deprecated.  Use the latest streams package from the OpenSS7 download
+site at <http://www.openss7.org/download.html> instead.
 
-   * OpenSS7 Corporation
-
-Contributors
-============
-
-The current maintainer of the Linux STREAMS (LiS) package is Brian F. G.
-Bidulock <bidulock@openss7.org>.
-
-LiS was originally written by:
-
-Christian Herkt			macbett@cs.tu-berlin.de
-David Grothe			dave@gcom.com
-Denis Froschauer		100741.1151@compuserve.com
-Dennis Henriksen		duke@diku.dk
-Ed Pendzik			edp@eznet.net
-Francisco J. Ballesteros	nemo@gsyc.escet.urjc.es
-Gautham Ghantasala		unknown@jove.acs.unt.edu
-Graham Wheeler			gram@aztec.co.za
-ISOLA Jean-Marc			root@devnet.fr
-John A. Boyd Jr.		jaboydjr@netwalk.com
-Lars Dahl-Hansen		ldh@imada.ou.dk
-Ole Husgaard			sparre@login.dknet.dk
-Rodney Thayer			rodney@sabletech.com
-Roland Dunkerley		rolandd@swn.com
-Shyan Katru			shyam@jove.acs.unt.edu
-Tim G. Boerresen		tgrube@diku.dk
-
-Packaging was performed by:
-
-Brian Bidulock			bidulock@openss7.org
-
-Packaging would not be what it is today without the invaluable help of these
-people:
-
-Christian Hildner		christian.hildner@hob.de
-Gurol Akman			gurol.akman@ss8.com
-John A. Boyd Jr.		jaboydjr@netwalk.com
-William Waites			openss7@lists.styx.org
-
-Additional people not named here that I missed putting on the list.  We thank
-them too!
+- Last remaining to do item is to release the LiS-2.18.3 release that
+  might very well be the last release.
 
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
- All Rights Reserved.
+All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -80,8 +47,8 @@ them too!
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by the
- source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by
+ the source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -90,8 +57,8 @@ them too!
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and
- the Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and the
+ Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -106,4 +73,4 @@ them too!
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
+vim: tw=72 nocindent
