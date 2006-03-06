@@ -1,18 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:29:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/06 11:38:59 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,10 +45,18 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:29:14 $ by $Author: brian $
+# Last Modified $Date: 2006/03/06 11:38:59 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.4  2006/03/06 11:38:59  brian
+# - updated headers
 #
 # =============================================================================
 
 include ../am/openss7.am
 
 SUBDIRS = include
+
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
