@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.39 $) $Date: 2006/03/06 11:37:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.40 $) $Date: 2006/03/07 12:34:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:37:56 $ by $Author: brian $
+# Last Modified $Date: 2006/03/07 12:34:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.40  2006/03/07 12:34:18  brian
+# - tools must be built static for distcheck
+#
 # Revision 1.1.2.39  2006/03/06 11:37:56  brian
 # - updated headers
 #
@@ -133,13 +136,13 @@ $(libnetperf_la_OBJECTS):	./config.h
 
 netperf_SOURCES			= netperf.c
 netperf_LDADD			= libnetperf.la $(NETPERF_LDADD)
-netperf_LDFLAGS			= 
+netperf_LDFLAGS			= -static
 netperf_DEPENDENCIES		= libnetperf.la ./config.h
 
 
 netserver_SOURCES		= netserver.c
 netserver_LDADD			= libnetperf.la $(NETPERF_LDADD)
-netserver_LDFLAGS		= 
+netserver_LDFLAGS		= -static
 netserver_DEPENDENCIES		= libnetperf.la ./config.h
 
 ## RPM_BUILD_USER

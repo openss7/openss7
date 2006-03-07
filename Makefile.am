@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/06 11:39:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/07 12:32:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:39:25 $ by $Author: brian $
+# Last Modified $Date: 2006/03/07 12:32:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.18  2006/03/07 12:32:55  brian
+# - must clean module files
+#
 # Revision 0.9.2.17  2006/03/06 11:39:25  brian
 # - updated headers
 #
@@ -96,5 +99,12 @@ include am/deb.am
 EXTRA_DIST			+= \
 				  debian/README.Debian \
 				  debian/TODO.Debian
+
+DISTCLEANFILES			+= \
+				  Modules.map \
+				  System.symvers \
+				  Module.symvers \
+				  modpost.cache
+
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

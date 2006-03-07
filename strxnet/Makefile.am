@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/03/06 11:39:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/03/07 12:34:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:39:16 $ by $Author: brian $
+# Last Modified $Date: 2006/03/07 12:34:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.56  2006/03/07 12:34:25  brian
+# - tools must be built static for distcheck
+#
 # Revision 0.9.2.55  2006/03/06 11:39:16  brian
 # - updated headers
 #
@@ -111,11 +114,13 @@ if WITH_TLI
 ## WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_LDADD		= $(STREAMS_LDADD)
+test_tirdwr_LDFLAGS		= -static
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
 test_timod_LDADD		= $(STREAMS_LDADD)
+test_timod_LDFLAGS		= -static
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
 ## WITH_TLI
@@ -125,11 +130,13 @@ if WITH_XNET
 ## WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
+test_xnet_LDFLAGS		= -static
 test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
 test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD) -lpthread
+test_xnet_thr_LDFLAGS		= -static
 test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
@@ -215,11 +222,13 @@ if WITH_TLI
 ## WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_LDADD		= $(STREAMS_LDADD)
+test_tirdwr_LDFLAGS		= -static
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
 test_timod_LDADD		= $(STREAMS_LDADD)
+test_timod_LDFLAGS		= -static
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
 ## WITH_TLI
@@ -229,11 +238,12 @@ if WITH_XNET
 ## WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
+test_xnet_LDFLAGS		= -static
 test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
-test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD) -lpthread
+test_xnet_thr_LDFLAGS		= -static
 test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 

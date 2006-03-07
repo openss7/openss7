@@ -1,3 +1,7 @@
+2006-03-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: compile tools static for distcheck
+
 2006-03-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: updated headers

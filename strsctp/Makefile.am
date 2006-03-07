@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/06 11:39:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/03/07 12:34:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:39:01 $ by $Author: brian $
+# Last Modified $Date: 2006/03/07 12:34:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.42  2006/03/07 12:34:22  brian
+# - tools must be built static for distcheck
+#
 # Revision 0.9.2.41  2006/03/06 11:39:01  brian
 # - updated headers
 #
@@ -100,27 +103,32 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_SOURCES		= src/test/test-sctp.c
-test_sctp_LDFLAGS		= $(STREAMS_LDADD)
+test_sctp_LDADD			= $(STREAMS_LDADD)
+test_sctp_LDFLAGS		= -static
 test_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_n_SOURCES		= src/test/test-sctp_n.c
-test_sctp_n_LDFLAGS		= $(STREAMS_LDADD)
+test_sctp_n_LDADD		= $(STREAMS_LDADD)
+test_sctp_n_LDFLAGS		= -static
 test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
-test_sctp_nc_LDFLAGS		= $(STREAMS_LDADD)
+test_sctp_nc_LDADD		= $(STREAMS_LDADD)
+test_sctp_nc_LDFLAGS		= -static
 test_sctp_nc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_nc_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_ns_SOURCES		= src/test/test-sctp_ns.c
-test_sctp_ns_LDFLAGS		= $(STREAMS_LDADD)
+test_sctp_ns_LDADD		= $(STREAMS_LDADD)
+test_sctp_ns_LDFLAGS		= -static
 test_sctp_ns_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_ns_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_t_SOURCES		= src/test/test-sctp_t.c
-test_sctp_t_LDFLAGS		= $(STREAMS_LDADD)
+test_sctp_t_LDADD		= $(STREAMS_LDADD)
+test_sctp_t_LDFLAGS		= -static
 test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 
@@ -268,27 +276,32 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_SOURCES		= src/test/test-sctp.c
-test_sctp_LDFLAGS		= $(STREAMS_LDADD)
+test_sctp_LDADD			= $(STREAMS_LDADD)
+test_sctp_LDFLAGS		= -static
 test_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_n_SOURCES		= src/test/test-sctp_n.c
-test_sctp_n_LDFLAGS		= $(STREAMS_LDADD)
+test_sctp_n_LDADD		= $(STREAMS_LDADD)
+test_sctp_n_LDFLAGS		= -static
 test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
-test_sctp_nc_LDFLAGS		= $(STREAMS_LDADD)
+test_sctp_nc_LDADD		= $(STREAMS_LDADD)
+test_sctp_nc_LDFLAGS		= -static
 test_sctp_nc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_nc_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_ns_SOURCES		= src/test/test-sctp_ns.c
-test_sctp_ns_LDFLAGS		= $(STREAMS_LDADD)
+test_sctp_ns_LDADD		= $(STREAMS_LDADD)
+test_sctp_ns_LDFLAGS		= -static
 test_sctp_ns_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_ns_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_t_SOURCES		= src/test/test-sctp_t.c
-test_sctp_t_LDFLAGS		= $(STREAMS_LDADD)
+test_sctp_t_LDADD		= $(STREAMS_LDADD)
+test_sctp_t_LDFLAGS		= -static
 test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 

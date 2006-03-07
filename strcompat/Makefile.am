@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/06 11:38:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 12:34:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:34 $ by $Author: brian $
+# Last Modified $Date: 2006/03/07 12:34:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2006/03/07 12:34:20  brian
+# - tools must be built static for distcheck
+#
 # Revision 0.9.2.12  2006/03/06 11:38:34  brian
 # - updated headers
 #
@@ -89,6 +92,7 @@ sbin_PROGRAMS			= \
 
 ## xxx_SOURCES			=
 ## xxx_LDADD			= $(STREAMS_LDADD)
+## xxx_LDFLAGS			= -static
 ## xxx_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ## xxx_CFLAGS			= $(USER_CFLAGS)
 

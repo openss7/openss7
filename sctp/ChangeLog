@@ -1,3 +1,7 @@
+2006-03-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* sctp.spec.in: updated %description's
+
 2006-03-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: updated headers

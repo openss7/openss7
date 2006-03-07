@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/06 11:39:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 12:34:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:39:08 $ by $Author: brian $
+# Last Modified $Date: 2006/03/07 12:34:23 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2006/03/07 12:34:23  brian
+# - tools must be built static for distcheck
+#
 # Revision 0.9.2.12  2006/03/06 11:39:08  brian
 # - updated headers
 #
@@ -128,66 +131,77 @@ dist_sbin_SCRIPTS		= \
 strchg_SOURCES			= src/util/strchg.c
 strchg_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strchg_LDADD			= $(STREAMS_LDADD)
+strchg_LDFLAGS			= -static
 strchg_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strchg_CFLAGS			= $(USER_CFLAGS)
 
 strconf_SOURCES			= src/util/strconf.c
 strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strconf_LDADD			= $(STREAMS_LDADD)
+strconf_LDFLAGS			= -static
 strconf_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strconf_CFLAGS			= $(USER_CFLAGS)
 
 strlog_SOURCES			= src/util/strlog.c
 strlog_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strlog_LDADD			= $(STREAMS_LDADD) -lrt
+strlog_LDFLAGS			= -static
 strlog_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strlog_CFLAGS			= $(USER_CFLAGS)
 
 strreset_SOURCES		= src/util/strreset.c
 strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strreset_LDADD			= $(STREAMS_LDADD)
+strreset_LDFLAGS		= -static
 strreset_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strreset_CFLAGS			= $(USER_CFLAGS)
 
 autopush_SOURCES		= src/util/autopush.c
 autopush_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 autopush_LDADD			= $(STREAMS_LDADD)
+autopush_LDFLAGS		= -static
 autopush_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 autopush_CFLAGS			= $(USER_CFLAGS)
 
 fattach_SOURCES			= src/util/fattach.c
 fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 fattach_LDADD			= $(STREAMS_LDADD)
+fattach_LDFLAGS			= -static
 fattach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fattach_CFLAGS			= $(USER_CFLAGS)
 
 fdetach_SOURCES			= src/util/fdetach.c 
 fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 fdetach_LDADD			= $(STREAMS_LDADD)
+fdetach_LDFLAGS			= -static
 fdetach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fdetach_CFLAGS			= $(USER_CFLAGS)
 
 insf_SOURCES			= src/util/insf.c
 insf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 insf_LDADD			= $(STREAMS_LDADD)
+insf_LDFLAGS			= -static
 insf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 insf_CFLAGS			= $(USER_CFLAGS)
 
 scls_SOURCES			= src/util/scls.c
 scls_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 scls_LDADD			= $(STREAMS_LDADD)
+scls_LDFLAGS			= -static
 scls_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 scls_CFLAGS			= $(USER_CFLAGS)
 
 strace_SOURCES			= src/util/strace.c
 strace_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strace_LDADD			= $(STREAMS_LDADD)
+strace_LDFLAGS			= -static
 strace_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strace_CFLAGS			= $(USER_CFLAGS)
 
 #strclean_SOURCES		= src/util/strclean.c
 #strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #strclean_LDADD			= $(STREAMS_LDADD)
+#strclean_LDFLAGS		= -static
 #strclean_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #strclean_CFLAGS		= $(USER_CFLAGS)
 
@@ -200,18 +214,21 @@ strace_CFLAGS			= $(USER_CFLAGS)
 strerr_SOURCES			= src/util/strerr.c
 strerr_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strerr_LDADD			= $(STREAMS_LDADD)
+strerr_LDFLAGS			= -static
 strerr_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strerr_CFLAGS			= $(USER_CFLAGS)
 
 strinfo_SOURCES			= src/util/strinfo.c
 strinfo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strinfo_LDADD			= $(STREAMS_LDADD)
+strinfo_LDFLAGS			= -static
 strinfo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strinfo_CFLAGS			= $(USER_CFLAGS)
 
 #strload_SOURCES		= src/util/strload.c
 #strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #strload_LDADD			= $(STREAMS_LDADD)
+#strload_LDFLAGS		= -static
 #strload_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #strload_CFLAGS			= $(USER_CFLAGS)
 
@@ -224,12 +241,14 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 strlogd_SOURCES			= src/util/strlogd.c
 strlogd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strlogd_LDADD			= $(STREAMS_LDADD)
+strlogd_LDFLAGS			= -static
 strlogd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strlogd_CFLAGS			= $(USER_CFLAGS)
 
 #strsetup_SOURCES		= src/util/strsetup.c
 #strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #strsetup_LDADD			= $(STREAMS_LDADD)
+#strsetup_LDFLAGS		= -static
 #strsetup_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #strsetup_CFLAGS		= $(USER_CFLAGS)
 
@@ -242,66 +261,79 @@ strlogd_CFLAGS			= $(USER_CFLAGS)
 strvf_SOURCES			= src/util/strvf.c
 strvf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strvf_LDADD			= $(STREAMS_LDADD)
+strvf_LDFLAGS			= -static
 strvf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strvf_CFLAGS			= $(USER_CFLAGS)
 
 test_clone_SOURCES		= src/test/test-clone.c
 test_clone_LDADD		= $(STREAMS_LDADD)
+test_clone_LDFLAGS		= -static
 test_clone_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_clone_CFLAGS		= $(LFS_CFLAGS)
 
 test_connld_SOURCES		= src/test/test-connld.c
 test_connld_LDADD		= $(STREAMS_LDADD)
+test_connld_LDFLAGS		= -static
 test_connld_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_connld_CFLAGS		= $(LFS_CFLAGS)
 
 test_echo_SOURCES		= src/test/test-echo.c
 test_echo_LDADD			= $(STREAMS_LDADD)
+test_echo_LDFLAGS		= -static
 test_echo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_echo_CFLAGS		= $(LFS_CFLAGS)
 
 test_fifo_SOURCES		= src/test/test-fifo.c
 test_fifo_LDADD			= $(STREAMS_LDADD)
+test_fifo_LDFLAGS		= -static
 test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_fifo_CFLAGS		= $(LFS_CFLAGS)
 
 test_log_SOURCES		= src/test/test-log.c
 test_log_LDADD			= $(STREAMS_LDADD)
+test_log_LDFLAGS		= -static
 test_log_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_log_CFLAGS			= $(LFS_CFLAGS)
 
 test_nsdev_SOURCES		= src/test/test-nsdev.c
 test_nsdev_LDADD		= $(STREAMS_LDADD)
+test_nsdev_LDFLAGS		= -static
 test_nsdev_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nsdev_CFLAGS		= $(LFS_CFLAGS)
 
 test_nuls_SOURCES		= src/test/test-nuls.c
 test_nuls_LDADD			= $(STREAMS_LDADD)
+test_nuls_LDFLAGS		= -static
 test_nuls_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nuls_CFLAGS		= $(LFS_CFLAGS)
 
 test_pipe_SOURCES		= src/test/test-pipe.c
 test_pipe_LDADD			= $(STREAMS_LDADD)
+test_pipe_LDFLAGS		= -static
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(LFS_CFLAGS)
 
 test_sad_SOURCES		= src/test/test-sad.c
 test_sad_LDADD			= $(STREAMS_LDADD)
+test_sad_LDFLAGS		= -static
 test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(LFS_CFLAGS)
 
 test_pipemod_SOURCES		= src/test/test-pipemod.c
 test_pipemod_LDADD		= $(STREAMS_LDADD)
+test_pipemod_LDFLAGS		= -static
 test_pipemod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipemod_CFLAGS		= $(LFS_CFLAGS)
 
 test_sc_SOURCES			= src/test/test-sc.c
 test_sc_LDADD			= $(STREAMS_LDADD)
+test_sc_LDFLAGS			= -static
 test_sc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sc_CFLAGS			= $(LFS_CFLAGS)
 
 test_streams_SOURCES		= src/test/test-streams.c
 test_streams_LDADD		= $(STREAMS_LDADD)
+test_streams_LDFLAGS		= -static
 test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(LFS_CFLAGS)
 

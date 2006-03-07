@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/11/13 07:53:19 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/07 12:33:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/13 07:53:19 $ by $Author: brian $
+# Last Modified $Date: 2006/03/07 12:33:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -130,100 +130,64 @@ dnl _AUTOTEST
 AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([SCTP],
 		AS_HELP_STRING([--without-SCTP],
-			       [do not include SCTP in master pack @<:@included@:>@]),
+			       [do not include SCTP in master pack @<:@detected@:>@]),
 		[with_SCTP="$withval"],
-		[with_SCTP='yes'])
-    if test :${with_SCTP:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([sctp])
-    fi
+		[with_SCTP=''])
     AC_ARG_WITH([IPERF],
 		AS_HELP_STRING([--without-IPERF],
-			       [do not include IPERF in master pack @<:@included@:>@]),
+			       [do not include IPERF in master pack @<:@detected@:>@]),
 		[with_IPERF="$withval"],
-		[with_IPERF='yes'])
-    if test :${with_IPERF:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([iperf])
-    fi
+		[with_IPERF=''])
     AC_ARG_WITH([LIS],
-		AS_HELP_STRING([--without-LIS],
-			       [do not include LIS in master pack @<:@included@:>@]),
+		AS_HELP_STRING([--with-LIS],
+			       [include LIS in master pack @<:@detected@:>@]),
 		[with_LIS="$withval"],
-		[with_LIS='yes'])
-    if test :${with_LIS:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([LiS])
-    fi
+		[with_LIS=''])
     AC_ARG_WITH([STREAMS],
 		AS_HELP_STRING([--without-STREAMS],
 			       [do not include STREAMS in master pack @<:@included@:>@]),
 		[with_STREAMS="$withval"],
 		[with_STREAMS='yes'])
-    if test :${with_STREAMS:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([streams])
-    fi
     AC_ARG_WITH([STRCOMPAT],
 		AS_HELP_STRING([--without-STRCOMPAT],
 			       [do not include STRCOMPAT in master pack @<:@included@:>@]),
 		[with_STRCOMPAT="$withval"],
 		[with_STRCOMPAT='yes'])
-    if test :${with_STRCOMPAT:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([strcompat])
-    fi
     AC_ARG_WITH([STRUTIL],
-		AS_HELP_STRING([--without-STRUTIL],
-			       [do not include STRUTIL in master pack @<:@included@:>@]),
+		AS_HELP_STRING([--with-STRUTIL],
+			       [include STRUTIL in master pack @<:@detected@:>@]),
 		[with_STRUTIL="$withval"],
-		[with_STRUTIL='no'])
-    if test :${with_STRUTIL:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([strutil])
-    fi
+		[with_STRUTIL=''])
     AC_ARG_WITH([STRXNS],
 		AS_HELP_STRING([--without-STRXNS],
 			       [do not include STRXNS in master pack @<:@included@:>@]),
 		[with_STRXNS="$withval"],
 		[with_STRXNS='yes'])
-    if test :${with_STRXNS:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([strxns])
-    fi
     AC_ARG_WITH([STRXNET],
 		AS_HELP_STRING([--without-STRXNET],
 			       [do not include STRXNET in master pack @<:@included@:>@]),
 		[with_STRXNET="$withval"],
 		[with_STRXNET='yes'])
-    if test :${with_STRXNET:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([strxnet])
-    fi
     AC_ARG_WITH([STRINET],
 		AS_HELP_STRING([--without-STRINET],
 			       [do not include STRINET in master pack @<:@included@:>@]),
 		[with_STRINET="$withval"],
 		[with_STRINET='yes'])
-    if test :${with_STRINET:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([strinet])
-    fi
     AC_ARG_WITH([STRSCTP],
 		AS_HELP_STRING([--without-STRSCTP],
 			       [do not include STRSCTP in master pack @<:@included@:>@]),
 		[with_STRSCTP="$withval"],
 		[with_STRSCTP='yes'])
-    if test :${with_STRSCTP:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([strsctp])
-    fi
     AC_ARG_WITH([NETPERF],
 		AS_HELP_STRING([--without-NETPERF],
 			       [do not include NETPERF in master pack @<:@included@:>@]),
 		[with_NETPERF="$withval"],
 		[with_NETPERF='yes'])
-    if test :${with_NETPERF:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([netperf])
-    fi
     AC_ARG_WITH([STACKS],
 		AS_HELP_STRING([--without-STACKS],
 			       [do not include STACKS in master pack @<:@included@:>@]),
 		[with_STACKS="$withval"],
 		[with_STACKS='yes'])
-    if test :${with_STACKS:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([stacks])
-    fi
 ])# _OS7_OPTIONS
 # =============================================================================
 
@@ -247,6 +211,78 @@ dnl _SCTP
 # _OS7_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OS7_OUTPUT], [dnl
+    if test :${with_SCTP:-auto} = :auto ; then
+	if test :$USE_MAINTAINER_MODE = :yes ; then
+	    with_SCTP='yes'
+	else
+	    if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
+		with_SCTP='no'
+	    else
+		with_SCTP='yes'
+	    fi
+	fi
+    fi
+    if test :${with_IPERF:-auto} = :auto ; then
+	if test :$USE_MAINTAINER_MODE = :yes ; then
+	    with_IPERF='yes'
+	else
+	    if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
+		with_IPERF='no'
+	    else
+		with_IPERF='yes'
+	    fi
+	fi
+    fi
+    if test :${with_LIS:-auto} = :auto ; then
+	if test :$USE_MAINTAINER_MODE = :yes ; then
+	    with_LIS='yes'
+	else
+	    with_LIS='no'
+	fi
+    fi
+    if test :${with_STRUTIL:-auto} = :auto ; then
+	if test :$USE_MAINTAINER_MODE = :yes ; then
+	    with_STRUTIL='yes'
+	else
+	    with_STRUTIL='no'
+	fi
+    fi
+    if test :${with_SCTP:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([sctp])
+    fi
+    if test :${with_IPERF:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([iperf])
+    fi
+    if test :${with_LIS:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([LiS])
+    fi
+    if test :${with_STREAMS:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([streams])
+    fi
+    if test :${with_STRCOMPAT:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strcompat])
+    fi
+    if test :${with_STRUTIL:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strutil])
+    fi
+    if test :${with_STRXNS:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strxns])
+    fi
+    if test :${with_STRXNET:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strxnet])
+    fi
+    if test :${with_STRINET:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strinet])
+    fi
+    if test :${with_STRSCTP:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strsctp])
+    fi
+    if test :${with_NETPERF:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([netperf])
+    fi
+    if test :${with_STACKS:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([stacks])
+    fi
 ])# _OS7_OUTPUT
 # =============================================================================
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/03/06 11:39:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/07 12:34:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:39:24 $ by $Author: brian $
+# Last Modified $Date: 2006/03/07 12:34:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.41  2006/03/07 12:34:26  brian
+# - tools must be built static for distcheck
+#
 # Revision 0.9.2.40  2006/03/06 11:39:24  brian
 # - updated headers
 #
@@ -97,11 +100,13 @@ sbin_PROGRAMS			= \
 
 ldlconfig_SOURCES		= src/util/ldlconfig.c
 ldlconfig_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+ldlconfig_LDFLAGS		= -static
 ldlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldlconfig_CFLAGS		= $(USER_CFLAGS)
 
 ldltest_SOURCES			= src/test/ldltest.c
 ldltest_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+ldltest_LDFLAGS			= -static
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
 
@@ -175,11 +180,13 @@ sbin_PROGRAMS			= \
 
 ldlconfig_SOURCES		= src/util/ldlconfig.c
 ldlconfig_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+ldlconfig_LDFLAGS		= -static
 ldlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldlconfig_CFLAGS		= $(USER_CFLAGS)
 
 ldltest_SOURCES			= src/test/ldltest.c
 ldltest_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+ldltest_LDFLAGS			= -static
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
 

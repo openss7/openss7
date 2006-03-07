@@ -1,3 +1,7 @@
+2006-03-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.spec.in: updated %description's
+
 2006-03-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/Makefile.am: updated headers
