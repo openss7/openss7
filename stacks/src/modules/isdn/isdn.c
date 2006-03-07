@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:05 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:09:32 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:05 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:09:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isdn.c,v $
+ Revision 0.9.2.16  2006/03/07 01:09:32  brian
+ - binary compatible callouts
+
  Revision 0.9.2.15  2006/03/04 13:00:05  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:05 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:09:32 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:05 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:09:32 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -78,9 +81,9 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:05 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:09:32 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISDN_LICENSE	"GPL"
 #define ISDN_BANNER	ISDN_DESCRIP	"\n" \
@@ -166,8 +169,8 @@ STATIC struct module_info dl_rinfo = {
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 
-STATIC int isdn_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int isdn_close(queue_t *, int, cred_t *);
+STATIC streamscall int isdn_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int isdn_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit isdn_rinit = {
 	qi_putp:ss7_oput,		/* Read put (msg from below) */
@@ -5016,7 +5019,7 @@ enum { tall = 0, t301, t302, t303, t304, t305, t306, t307, t308, t309, t310, t31
 
 #define ISDN_DECLARE_TIMER(__o,__t) \
 STATIC int __o ## _ ## __t ## _timeout(struct __o *); \
-STATIC void __o ## _ ## __t ## _expiry(caddr_t data) \
+STATIC streamscall void __o ## _ ## __t ## _expiry(caddr_t data) \
 { \
 	__o ## _do_timeout(data, # __t, &((struct __o *)data)->timers. __t, &__o ## _ ## __t ## _timeout, & __o ## _ ## __t ## _expiry); \
 } \
@@ -5038,7 +5041,7 @@ STATIC void __o ## _start_timer_ ## __t (struct __o * __o) \
  */
 STATIC INLINE void
 cr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struct cr *),
-	      void (*exp_fnc) (caddr_t))
+	      streamscall void (*exp_fnc) (caddr_t))
 {
 	struct cr *cr = (struct cr *) data;
 	if (xchg(timeo, 0)) {
@@ -5077,7 +5080,7 @@ cr_stop_timer(struct cr *cr, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-cr_start_timer(struct cr *cr, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
+cr_start_timer(struct cr *cr, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, cr, timer, val * 1000 / HZ,
 		jiffies));
@@ -14428,7 +14431,7 @@ STATIC major_t isdn_majors[ISDN_CMAJORS] = { ISDN_CMAJOR_0, };
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 isdn_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -14490,7 +14493,7 @@ isdn_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 isdn_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct cc *cc = CC_PRIV(q);

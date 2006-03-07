@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/04 13:00:36 $
+ @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/07 01:16:08 $
 
  -----------------------------------------------------------------------------
 
@@ -59,20 +59,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:36 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:16:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-q784.c,v $
+ Revision 0.9.2.7  2006/03/07 01:16:08  brian
+ - 64bit issues
+
  Revision 0.9.2.6  2006/03/04 13:00:36  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/04 13:00:36 $"
+#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/07 01:16:08 $"
 
 static char const ident[] =
-    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/04 13:00:36 $";
+    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/07 01:16:08 $";
 
 /* 
  *  This is a ferry-clip Q.784 conformance test program for testing the
@@ -3489,7 +3492,7 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		}
 		if (imsg.rs.len > 33) {
-			printf("**** ERROR: length too large len = %d\n", imsg.rs.len);
+			printf("**** ERROR: length too large len = %ld\n", (long) imsg.rs.len);
 			FFLUSH(stdout);
 			goto decode_error;
 		}

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:25 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:25 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:07:05 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: cd_daed.c,v $
+ Revision 0.9.2.11  2006/03/07 01:07:05  brian
+ - binary compatible callouts
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:25 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:05 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:25 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:05 $";
 
 #include <sys/os7/compat.h>
 
@@ -68,8 +73,8 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
-#define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:25 $"
+#define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:05 $"
 #define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL"
@@ -127,8 +132,8 @@ STATIC struct module_info daed_rinfo = {
 	mi_lowat:(0),			/* Lo water mark */
 };
 
-STATIC int daed_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int daed_close(queue_t *, int, cred_t *);
+STATIC streamscall int daed_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int daed_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit daed_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
@@ -173,7 +178,7 @@ daed_term_caches(void)
  *  -------------------------------------------------------------------------
  */
 STATIC struct str *daed_list = NULL;
-STATIC int
+STATIC streamscall int
 daed_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
@@ -207,7 +212,7 @@ daed_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 daed_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

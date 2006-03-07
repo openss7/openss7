@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:40 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:13:08 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:40 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:13:08 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sscop2.c,v $
+ Revision 0.9.2.11  2006/03/07 01:13:08  brian
+ - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:40 $"
+#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:13:08 $"
 
 static char const ident[] =
-    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:40 $";
+    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:13:08 $";
 
 #include <sys/os7/compat.h>
 
@@ -61,8 +66,8 @@ static char const ident[] =
 #include <sys/npi_ip.h>
 
 #define SSCOP_DESCRIP	"SSCOP STREAMS MODULE."
-#define SSCOP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SSCOP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define SSCOP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SSCOP_LICENSE	"GPL"
 #define SSCOP_BANNER	SSCOP_DESCRIP	"\n" \

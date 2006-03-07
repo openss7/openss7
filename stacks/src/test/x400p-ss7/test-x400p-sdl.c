@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p-sdl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:39 $
+ @(#) $RCSfile: test-x400p-sdl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/07 01:18:01 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:39 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:18:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p-sdl.c,v $
+ Revision 0.9.2.5  2006/03/07 01:18:01  brian
+ - 64bit issues
+
  Revision 0.9.2.4  2005/05/14 08:31:39  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p-sdl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:39 $"
+#ident "@(#) $RCSfile: test-x400p-sdl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/07 01:18:01 $"
 
-static char const ident[] = "$RCSfile: test-x400p-sdl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:39 $";
+static char const ident[] = "$RCSfile: test-x400p-sdl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/07 01:18:01 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -509,7 +512,7 @@ sdl_write(int fd)
 			printf("Write succeeded, wrote %d bytes!\n", ret);
 		if (ret > 0) {
 			int i;
-			printf("Message[%d]: ", len);
+			printf("Message[%ld]: ", (long) len);
 			for (i = 0; i < len; i++) {
 				printf("%02X ", buf[i]);
 			}
@@ -739,7 +742,7 @@ copying(int argc, char *argv[])
 	fprintf(stdout, "\
 ITU-T RECOMMENDATAION Q.781 - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -765,9 +768,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -793,7 +795,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:17 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:11:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:17 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:11:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.16  2006/03/07 01:11:12  brian
+ - binary compatible callouts
+
  Revision 0.9.2.15  2006/03/04 13:00:17  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:17 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:11:12 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:17 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:11:12 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -90,9 +93,9 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/04 13:00:17 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:11:12 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_LICENSE	"GPL"
 #define SCCP_BANNER	SCCP_DESCRIP	"\n" \
@@ -186,8 +189,8 @@ STATIC struct module_info mtp_rinfo = {
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 
-STATIC int sccp_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sccp_close(queue_t *, int, cred_t *);
+STATIC streamscall int sccp_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int sccp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit sccp_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
@@ -19945,7 +19948,7 @@ mtp_w_prim(queue_t *q, mblk_t *mp)
 STATIC int sccp_majors[SCCP_CMAJORS] = {
 	SCCP_CMAJOR_0,
 };
-STATIC int
+STATIC streamscall int
 sccp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -20014,7 +20017,7 @@ sccp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 sccp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct sc *sc = SCCP_PRIV(q);

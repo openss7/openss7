@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:36 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:11:27 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,13 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:36 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:11:27 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctp.c,v $
+ Revision 0.9.2.8  2006/03/07 01:11:27  brian
+ - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:36 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:11:27 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:36 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:11:27 $";
 
 #include <sys/os7/compat.h>
 
@@ -66,9 +71,9 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $
 #include "sctp_input.h"
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
-			"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:36 $"
-#define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp. All Rights Reserved."
+			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:11:27 $"
+#define SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"

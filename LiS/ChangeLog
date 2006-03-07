@@ -1,3 +1,13 @@
+2006-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/Makefile.am: updated headers
+	* man/Makefile.am: updated headers
+	* manual/Makefile.am: updated headers
+	* tests/Makefile.am: updated headers
+	* testsuite/wrapper/Makefile.am: updated headers
+	* testsuite/Makefile.am: updated headers
+	* Makefile.am: updated headers
+
 2006-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/testsuite-fifo.at: upgraded for x86_64 SMP

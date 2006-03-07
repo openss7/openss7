@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/06 11:38:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/03/07 00:55:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:12 $ by $Author: brian $
+# Last Modified $Date: 2006/03/07 00:55:52 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.28  2006/03/07 00:55:52  brian
+# - package passes full documentation check
+#
 # Revision 0.9.2.27  2006/03/06 11:38:12  brian
 # - updated headers
 #
@@ -174,8 +177,6 @@ ss7_man_MANS = \
 	man4/sccp-npi.4 \
 	man4/sccp-sccpi.4 \
 	man4/sccp-tpi.4 \
-	man4/sctp_n.4 \
-	man4/sctp_t.4 \
 	man4/sdl.4 \
 	man4/sdl-acb56.4 \
 	man4/sdl_eth.4 \
@@ -243,7 +244,6 @@ ss7_man_MANS = \
 	man4/tcap-tci.4 \
 	man4/tcap-tpi.4 \
 	man4/tcap-tri.4 \
-	man4/ticots_ord.4 \
 	man4/tua.4 \
 	man4/tua_ioctl.4 \
 	man4/ua_ioctl.4 \
@@ -1161,6 +1161,7 @@ inet_man_MANS = \
 	man4/ticlts.4 \
 	man4/ticots.4 \
 	man4/ticotsord.4 \
+	man4/ticots_ord.4 \
 	man4/tlclts.4 \
 	man4/tlcots.4 \
 	man4/tlcotsod.4 \
@@ -1171,6 +1172,8 @@ inet_man_MANS = \
 sctp_man_MANS = \
 	man3/xti_sctp.3 \
 	man4/sctp.4 \
+	man4/sctp_n.4 \
+	man4/sctp_t.4 \
 	man4/sctp_ioctl.4 \
 	man7/npi_sctp.7 \
 	man7/tpi_sctp.7 \
@@ -1602,8 +1605,6 @@ ss7_dist_noinst_MANS = \
 	man4/sccp-npi.4.man \
 	man4/sccp-sccpi.4.man \
 	man4/sccp-tpi.4.man \
-	man4/sctp_n.4.man \
-	man4/sctp_t.4.man \
 	man4/sdl.4.man \
 	man4/sdl-acb56.4.man \
 	man4/sdl_eth.4.man \
@@ -1671,7 +1672,6 @@ ss7_dist_noinst_MANS = \
 	man4/tcap-tci.4.man \
 	man4/tcap-tpi.4.man \
 	man4/tcap-tri.4.man \
-	man4/ticots_ord.4.man \
 	man4/tua.4.man \
 	man4/tua_ioctl.4.man \
 	man4/ua_ioctl.4.man \
@@ -2590,6 +2590,7 @@ inet_dist_noinst_MANS = \
 	man4/ticlts.4.man \
 	man4/ticots.4.man \
 	man4/ticotsord.4.man \
+	man4/ticots_ord.4.man \
 	man4/tlclts.4.man \
 	man4/tlcots.4.man \
 	man4/tlcotsod.4.man \
@@ -2600,6 +2601,8 @@ inet_dist_noinst_MANS = \
 sctp_dist_noinst_MANS = \
 	man3/xti_sctp.3.man \
 	man4/sctp.4.man \
+	man4/sctp_n.4.man \
+	man4/sctp_t.4.man \
 	man4/sctp_ioctl.4.man \
 	man7/npi_sctp.7.man \
 	man7/tpi_sctp.7.man \
@@ -2909,7 +2912,123 @@ dist_noinst_MANS = \
 ## These are not used by any function, device or driver but needs to be included in the
 ## distribution.
 ##
-MANS_UNUSED =
+MANS_UNUSED = \
+	man3/cframe.3 \
+	man4/acb56.4 \
+	man4/bicc.4 \
+	man4/bicc_ioctl.4 \
+	man4/bssap.4 \
+	man4/bssap_ioctl.4 \
+	man4/bua.4 \
+	man4/bua_ioctl.4 \
+	man4/capi.4 \
+	man4/capi_ioctl.4 \
+	man4/ch.4 \
+	man4/ch_ioctl.4 \
+	man4/cpc388.4 \
+	man4/dass.4 \
+	man4/dlb.4 \
+	man4/dl_ioctl.4 \
+	man4/dpnss.4 \
+	man4/dua.4 \
+	man4/dua_ioctl.4 \
+	man4/fr.4 \
+	man4/gr303.4 \
+	man4/gr303_ioctl.4 \
+	man4/gr303ua.4 \
+	man4/gr303ua_ioctl.4 \
+	man4/gsma.4 \
+	man4/h225_ioctl.4 \
+	man4/h245.4 \
+	man4/h248.4 \
+	man4/h248_ioctl.4 \
+	man4/hdlc_ioctl.4 \
+	man4/idlc.4 \
+	man4/isdn_ioctl.4 \
+	man4/isua.4 \
+	man4/isua_ioctl.4 \
+	man4/isup_ioctl.4 \
+	man4/iua.4 \
+	man4/iua_ioctl.4 \
+	man4/lapb.4 \
+	man4/lapf.4 \
+	man4/m2ua_ioctl.4 \
+	man4/m3pa.4 \
+	man4/m3tp.4 \
+	man4/m3ua_ioctl.4 \
+	man4/mgc.4 \
+	man4/mgcp.4 \
+	man4/mgcp_ioctl.4 \
+	man4/mg_ioctl.4 \
+	man4/mtp_ioctl.4 \
+	man4/mx_ioctl.4 \
+	man4/OpenSS7.4 \
+	man4/pca200e.4 \
+	man4/q921.4 \
+	man4/q922.4 \
+	man4/q931.4 \
+	man4/rtp.4 \
+	man4/sccp_ioctl.4 \
+	man4/sdl_eth.4 \
+	man4/sdl_ioctl.4 \
+	man4/sdl_ip.4 \
+	man4/sdl_rtp.4 \
+	man4/sdl_tcp.4 \
+	man4/sdl_udp.4 \
+	man4/sdt_ioctl.4 \
+	man4/SIGTRAN.4 \
+	man4/sipt.4 \
+	man4/sipt_ioctl.4 \
+	man4/sl_ioctl.4 \
+	man4/SS7.4 \
+	man4/sscop_ioctl.4 \
+	man4/sscop_mce.4 \
+	man4/sua_ioctl.4 \
+	man4/tali_ioctl.4 \
+	man4/tcap_ioctl.4 \
+	man4/tua_ioctl.4 \
+	man4/ua_ioctl.4 \
+	man4/v52.4 \
+	man4/v5_ioctl.4 \
+	man4/v5ua.4 \
+	man4/v5ua_ioctl.4 \
+	man4/VOIP.4 \
+	man4/x100p-ch.4 \
+	man4/x100p-ss7.4 \
+	man4/x400p-ch.4 \
+	man4/x400p-ss7.4 \
+	man8/bicc.8 \
+	man8/bua.8 \
+	man8/cpc388.8 \
+	man8/h225.8 \
+	man8/h323confd.8 \
+	man8/isdn.8 \
+	man8/isdnconfd.8 \
+	man8/isua.8 \
+	man8/isup.8 \
+	man8/iua.8 \
+	man8/m2pa.8 \
+	man8/m2tp.8 \
+	man8/m2ua.8 \
+	man8/m3tp.8 \
+	man8/m3ua.8 \
+	man8/mgconfd.8 \
+	man8/mtp.8 \
+	man8/sccp.8 \
+	man8/sdl.8 \
+	man8/sdt.8 \
+	man8/sigtran.8 \
+	man8/sl.8 \
+	man8/sls.8 \
+	man8/soip.8 \
+	man8/ss7.8 \
+	man8/ss7confd.8 \
+	man8/ss7d.8 \
+	man8/sua.8 \
+	man8/tcap.8 \
+	man8/tua.8 \
+	man8/uaconfd.8 \
+	man8/voipconfd.8
 
 ## PKG_BUILD_INDEP
 endif

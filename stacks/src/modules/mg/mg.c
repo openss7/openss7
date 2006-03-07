@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:11 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:11 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:10:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 0.9.2.13  2006/03/07 01:10:27  brian
+ - binary compatible callouts
+
  Revision 0.9.2.12  2006/03/04 13:00:11  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:11 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:27 $"
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:11 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:27 $";
 
 #include <sys/os7/compat.h>
 
@@ -70,9 +73,9 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:11 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:27 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define MG_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MG_LICENSE	"GPL"
 #define MG_BANNER	MG_DESCRIP	"\n" \
@@ -158,8 +161,8 @@ STATIC struct module_info mux_rinfo = {
 	mi_lowat:0,			/* Lo water mark */
 };
 
-STATIC int mg_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int mg_close(queue_t *, int, cred_t *);
+STATIC streamscall int mg_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int mg_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit mg_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
@@ -6089,7 +6092,7 @@ STATIC major_t mg_majors[MG_CMAJORS] = { MG_CMAJOR_0, };
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -6150,7 +6153,7 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 mg_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct mg *mg = MG_PRIV(q);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:03 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:07:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:03 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:07:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_lapd.c,v $
+ Revision 0.9.2.15  2006/03/07 01:07:41  brian
+ - binary compatible callouts, gcc 4.0
+
  Revision 0.9.2.14  2006/03/04 13:00:03  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:03 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:07:41 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:03 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:07:41 $";
 
 #include <sys/os7/compat.h>
 
@@ -73,7 +76,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:03 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:07:41 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -161,8 +164,8 @@ STATIC struct module_info cd_rinfo = {
 	mi_lowat:(1 << 10),		/* Lo water mark */
 };
 
-STATIC int dl_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int dl_close(queue_t *, int, cred_t *);
+STATIC streamscall int dl_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int dl_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit dl_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
@@ -296,10 +299,10 @@ struct dl {
 #define LAPD_ESTABLISHED		8
 #define LAPD_TIME_RECOVERY		9
 
-STATIC INLINE struct dl *dl_lookup(ulong);
-STATIC INLINE struct dl *dl_get(struct dl *);
-STATIC INLINE void dl_put(struct dl *);
-STATIC INLINE ulong dl_get_id(ulong);
+STATIC struct dl *dl_lookup(ulong);
+STATIC struct dl *dl_get(struct dl *);
+STATIC void dl_put(struct dl *);
+STATIC ulong dl_get_id(ulong);
 
 STATIC struct dl *dl_alloc_priv(queue_t *, struct dl **, dev_t *, cred_t *, int);
 STATIC void dl_free_priv(struct dl *);
@@ -365,10 +368,10 @@ struct cd {
 };
 #define CD_PRIV(__q) ((struct cd *)(__q)->q_ptr)
 
-STATIC INLINE struct cd *cd_lookup(ulong);
-STATIC INLINE struct cd *cd_get(struct cd *);
-STATIC INLINE void cd_put(struct cd *);
-STATIC INLINE ulong cd_get_id(ulong);
+STATIC struct cd *cd_lookup(ulong);
+STATIC struct cd *cd_get(struct cd *);
+STATIC void cd_put(struct cd *);
+STATIC ulong cd_get_id(ulong);
 
 STATIC struct cd *dl_alloc_link(queue_t *, struct cd **, ulong, cred_t *);
 STATIC void dl_free_link(struct cd *);
@@ -1113,9 +1116,9 @@ dl_subs_bind_ack(queue_t *q, struct dl *dl, uchar tei)
  *  DL_OK_ACK                   0x06
  *  -----------------------------------
  */
-STATIC INLINE int send_UA_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf);
-STATIC INLINE int send_DM_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf);
-STATIC INLINE int send_DISC_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf);
+STATIC int send_UA_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf);
+STATIC int send_DM_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf);
+STATIC int send_DISC_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf);
 STATIC INLINE int
 dl_ok_ack(queue_t *q, struct dl *dl, ulong prim, struct cd *cd, struct dl *ap, mblk_t *cp)
 {
@@ -2507,7 +2510,7 @@ send_UI_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, mblk_t *dp)
  *  SEND DM (Disconnected Mode) response
  *  -----------------------------------
  */
-STATIC INLINE int
+STATIC int
 send_DM_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	if (canputnext(cd->oq)) {
@@ -2527,7 +2530,7 @@ send_DM_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
  *  SEND DISC (Disconnect) command
  *  -----------------------------------
  */
-STATIC INLINE int
+STATIC int
 send_DISC_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	/* 
@@ -2550,7 +2553,7 @@ send_DISC_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
  *  SEND UA (Unnumbered Acknowledgeemnt) response
  *  -----------------------------------
  */
-STATIC INLINE int
+STATIC int
 send_UA_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	if (canputnext(cd->oq)) {
@@ -3485,7 +3488,7 @@ __dl_lookup(ulong id)
 	for (dl = master.dl.list; dl && dl->id != id; dl = dl->next) ;
 	return (dl);
 }
-STATIC INLINE struct dl *
+STATIC struct dl *
 dl_lookup(ulong id)
 {
 	struct dl *dl;
@@ -3495,7 +3498,7 @@ dl_lookup(ulong id)
 	spin_unlock_irqrestore(&master.lock, flags);
 	return (dl);
 }
-STATIC INLINE struct dl *
+STATIC struct dl *
 dl_get(struct dl *dl)
 {
 	assure(dl);
@@ -3503,7 +3506,7 @@ dl_get(struct dl *dl)
 		atomic_inc(&dl->refcnt);
 	return (dl);
 }
-STATIC INLINE void
+STATIC void
 dl_put(struct dl *dl)
 {
 	assure(dl);
@@ -3512,7 +3515,7 @@ dl_put(struct dl *dl)
 		printd(("%s: %p: deallocated dl priv structure\n", DRV_NAME, dl));
 	}
 }
-STATIC INLINE ulong
+STATIC ulong
 dl_get_id(ulong id)
 {
 	if (!id) {
@@ -3646,7 +3649,7 @@ __cd_lookup(ulong id)
 	for (cd = master.cd.list; cd && cd->id != id; cd = cd->next) ;
 	return (cd);
 }
-STATIC INLINE struct cd *
+STATIC struct cd *
 cd_lookup(ulong id)
 {
 	struct cd *cd = NULL;
@@ -3658,7 +3661,7 @@ cd_lookup(ulong id)
 	}
 	return (cd);
 }
-STATIC INLINE struct cd *
+STATIC struct cd *
 cd_get(struct cd *cd)
 {
 	assure(cd);
@@ -3666,7 +3669,7 @@ cd_get(struct cd *cd)
 		atomic_inc(&cd->refcnt);
 	return (cd);
 }
-STATIC INLINE void
+STATIC void
 cd_put(struct cd *cd)
 {
 	assure(cd);
@@ -3675,7 +3678,7 @@ cd_put(struct cd *cd)
 		printd(("%s: %p: deallocated dl link structure\n", DRV_NAME, cd));
 	}
 }
-STATIC INLINE ulong
+STATIC ulong
 cd_get_id(ulong id)
 {
 	if (!id) {
@@ -6483,7 +6486,7 @@ STATIC int dl_register_strdev(major_t major);
  *  module is unloaded.  This ensures that the driver only uses one major
  *  device number when less that about 250 devices are not needed.
  */
-STATIC int
+STATIC streamscall int
 dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -6553,7 +6556,7 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  Close
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 dl_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct dl *dl = DL_PRIV(q);

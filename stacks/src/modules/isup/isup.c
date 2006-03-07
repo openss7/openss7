@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:07 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:09:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:07 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:09:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.13  2006/03/07 01:09:42  brian
+ - binary compatible callouts
+
  Revision 0.9.2.12  2006/03/04 13:00:07  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:07 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:09:42 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:07 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:09:42 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -85,9 +88,9 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:07 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:09:42 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ISUP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISUP_LICENSE	"GPL"
 #define ISUP_BANNER	ISUP_DESCRIP	"\n" \
@@ -168,8 +171,8 @@ STATIC struct module_info mtp_rinfo = {
 	mi_lowat:1 << 12,		/* Lo water mark */
 };
 
-STATIC int isup_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int isup_close(queue_t *, int, cred_t *);
+STATIC streamscall int isup_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int isup_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit isup_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from above) */
@@ -9451,7 +9454,7 @@ STATIC isup_opt_conf_sr_t ansi_sr_config_defaults = {
  */
 STATIC INLINE void
 ct_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struct ct *),
-	      void (*exp_fnc) (caddr_t))
+	      streamscall void (*exp_fnc) (caddr_t))
 {
 	struct ct *ct = (struct ct *) data;
 	if (xchg(timeo, 0)) {
@@ -9480,63 +9483,63 @@ ct_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 }
 
 STATIC int ct_t1_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t1_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t1", &((struct ct *) data)->timers.t1, &ct_t1_timeout, &ct_t1_expiry);
 };
 
 STATIC int ct_t2_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t2_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t2", &((struct ct *) data)->timers.t2, &ct_t2_timeout, &ct_t2_expiry);
 };
 
 STATIC int ct_t3_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t3_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t3", &((struct ct *) data)->timers.t3, &ct_t3_timeout, &ct_t3_expiry);
 };
 
 STATIC int ct_t5_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t5_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t5", &((struct ct *) data)->timers.t5, &ct_t5_timeout, &ct_t5_expiry);
 };
 
 STATIC int ct_t6_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t6_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t6", &((struct ct *) data)->timers.t6, &ct_t6_timeout, &ct_t6_expiry);
 };
 
 STATIC int ct_t7_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t7_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t7", &((struct ct *) data)->timers.t7, &ct_t7_timeout, &ct_t7_expiry);
 };
 
 STATIC int ct_t8_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t8_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t8", &((struct ct *) data)->timers.t8, &ct_t8_timeout, &ct_t8_expiry);
 };
 
 STATIC int ct_t9_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t9_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t9", &((struct ct *) data)->timers.t9, &ct_t9_timeout, &ct_t9_expiry);
 };
 
 STATIC int ct_t10_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t10_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t10", &((struct ct *) data)->timers.t10, &ct_t10_timeout,
@@ -9544,7 +9547,7 @@ ct_t10_expiry(caddr_t data)
 };
 
 STATIC int ct_t11_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t11_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t11", &((struct ct *) data)->timers.t11, &ct_t11_timeout,
@@ -9552,7 +9555,7 @@ ct_t11_expiry(caddr_t data)
 };
 
 STATIC int ct_t12_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t12_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t12", &((struct ct *) data)->timers.t12, &ct_t12_timeout,
@@ -9560,7 +9563,7 @@ ct_t12_expiry(caddr_t data)
 };
 
 STATIC int ct_t13_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t13_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t13", &((struct ct *) data)->timers.t13, &ct_t13_timeout,
@@ -9568,7 +9571,7 @@ ct_t13_expiry(caddr_t data)
 };
 
 STATIC int ct_t14_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t14_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t14", &((struct ct *) data)->timers.t14, &ct_t14_timeout,
@@ -9576,7 +9579,7 @@ ct_t14_expiry(caddr_t data)
 };
 
 STATIC int ct_t15_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t15_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t15", &((struct ct *) data)->timers.t15, &ct_t15_timeout,
@@ -9584,7 +9587,7 @@ ct_t15_expiry(caddr_t data)
 };
 
 STATIC int ct_t16_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t16_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t16", &((struct ct *) data)->timers.t16, &ct_t16_timeout,
@@ -9592,7 +9595,7 @@ ct_t16_expiry(caddr_t data)
 };
 
 STATIC int ct_t17_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t17_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t17", &((struct ct *) data)->timers.t17, &ct_t17_timeout,
@@ -9600,7 +9603,7 @@ ct_t17_expiry(caddr_t data)
 };
 
 STATIC int ct_t24_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t24_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t24", &((struct ct *) data)->timers.t24, &ct_t24_timeout,
@@ -9608,7 +9611,7 @@ ct_t24_expiry(caddr_t data)
 };
 
 STATIC int ct_t25_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t25_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t25", &((struct ct *) data)->timers.t25, &ct_t25_timeout,
@@ -9616,7 +9619,7 @@ ct_t25_expiry(caddr_t data)
 };
 
 STATIC int ct_t26_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t26_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t26", &((struct ct *) data)->timers.t26, &ct_t26_timeout,
@@ -9624,7 +9627,7 @@ ct_t26_expiry(caddr_t data)
 };
 
 STATIC int ct_t27_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t27_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t27", &((struct ct *) data)->timers.t27, &ct_t27_timeout,
@@ -9632,7 +9635,7 @@ ct_t27_expiry(caddr_t data)
 };
 
 STATIC int ct_t31_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t31_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t31", &((struct ct *) data)->timers.t31, &ct_t31_timeout,
@@ -9640,7 +9643,7 @@ ct_t31_expiry(caddr_t data)
 };
 
 STATIC int ct_t32_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t32_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t32", &((struct ct *) data)->timers.t32, &ct_t32_timeout,
@@ -9648,7 +9651,7 @@ ct_t32_expiry(caddr_t data)
 };
 
 STATIC int ct_t33_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t33_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t33", &((struct ct *) data)->timers.t33, &ct_t33_timeout,
@@ -9656,7 +9659,7 @@ ct_t33_expiry(caddr_t data)
 };
 
 STATIC int ct_t34_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t34_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t34", &((struct ct *) data)->timers.t34, &ct_t34_timeout,
@@ -9664,7 +9667,7 @@ ct_t34_expiry(caddr_t data)
 };
 
 STATIC int ct_t35_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t35_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t35", &((struct ct *) data)->timers.t35, &ct_t35_timeout,
@@ -9672,7 +9675,7 @@ ct_t35_expiry(caddr_t data)
 };
 
 STATIC int ct_t36_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t36_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t36", &((struct ct *) data)->timers.t36, &ct_t36_timeout,
@@ -9680,7 +9683,7 @@ ct_t36_expiry(caddr_t data)
 };
 
 STATIC int ct_t37_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t37_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t37", &((struct ct *) data)->timers.t37, &ct_t37_timeout,
@@ -9688,7 +9691,7 @@ ct_t37_expiry(caddr_t data)
 };
 
 STATIC int ct_t38_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_t38_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "t38", &((struct ct *) data)->timers.t38, &ct_t38_timeout,
@@ -9696,7 +9699,7 @@ ct_t38_expiry(caddr_t data)
 };
 
 STATIC int ct_tacc_r_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_tacc_r_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "tacc_r", &((struct ct *) data)->timers.tacc_r, &ct_tacc_r_timeout,
@@ -9704,7 +9707,7 @@ ct_tacc_r_expiry(caddr_t data)
 };
 
 STATIC int ct_tccr_r_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_tccr_r_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "tccr_r", &((struct ct *) data)->timers.tccr_r, &ct_tccr_r_timeout,
@@ -9712,7 +9715,7 @@ ct_tccr_r_expiry(caddr_t data)
 };
 
 STATIC int ct_tccr_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_tccr_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "tccr", &((struct ct *) data)->timers.tccr, &ct_tccr_timeout,
@@ -9720,7 +9723,7 @@ ct_tccr_expiry(caddr_t data)
 };
 
 STATIC int ct_tcra_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_tcra_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "tcra", &((struct ct *) data)->timers.tcra, &ct_tcra_timeout,
@@ -9728,7 +9731,7 @@ ct_tcra_expiry(caddr_t data)
 };
 
 STATIC int ct_tcrm_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_tcrm_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "tcrm", &((struct ct *) data)->timers.tcrm, &ct_tcrm_timeout,
@@ -9736,7 +9739,7 @@ ct_tcrm_expiry(caddr_t data)
 };
 
 STATIC int ct_tcvt_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_tcvt_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "tcvt", &((struct ct *) data)->timers.tcvt, &ct_tcvt_timeout,
@@ -9744,7 +9747,7 @@ ct_tcvt_expiry(caddr_t data)
 };
 
 STATIC int ct_texm_d_timeout(struct ct *);
-STATIC void
+STATIC streamscall void
 ct_texm_d_expiry(caddr_t data)
 {
 	ct_do_timeout(data, "texm_d", &((struct ct *) data)->timers.texm_d, &ct_texm_d_timeout,
@@ -10354,7 +10357,7 @@ ct_timer_start(struct ct *ct, const uint t)
  */
 STATIC INLINE void
 cg_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struct cg *),
-	      void (*exp_fnc) (caddr_t))
+	      streamscall void (*exp_fnc) (caddr_t))
 {
 	struct cg *cg = (struct cg *) data;
 	if (xchg(timeo, 0)) {
@@ -10383,7 +10386,7 @@ cg_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 }
 
 STATIC int cg_t18_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_t18_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "t18", &((struct cg *) data)->timers.t18, &cg_t18_timeout,
@@ -10391,7 +10394,7 @@ cg_t18_expiry(caddr_t data)
 };
 
 STATIC int cg_t19_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_t19_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "t19", &((struct cg *) data)->timers.t19, &cg_t19_timeout,
@@ -10399,7 +10402,7 @@ cg_t19_expiry(caddr_t data)
 };
 
 STATIC int cg_t20_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_t20_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "t20", &((struct cg *) data)->timers.t20, &cg_t20_timeout,
@@ -10407,7 +10410,7 @@ cg_t20_expiry(caddr_t data)
 };
 
 STATIC int cg_t21_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_t21_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "t21", &((struct cg *) data)->timers.t21, &cg_t21_timeout,
@@ -10415,7 +10418,7 @@ cg_t21_expiry(caddr_t data)
 };
 
 STATIC int cg_t22_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_t22_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "t22", &((struct cg *) data)->timers.t22, &cg_t22_timeout,
@@ -10423,7 +10426,7 @@ cg_t22_expiry(caddr_t data)
 };
 
 STATIC int cg_t23_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_t23_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "t23", &((struct cg *) data)->timers.t23, &cg_t23_timeout,
@@ -10431,7 +10434,7 @@ cg_t23_expiry(caddr_t data)
 };
 
 STATIC int cg_t28_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_t28_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "t28", &((struct cg *) data)->timers.t28, &cg_t28_timeout,
@@ -10439,7 +10442,7 @@ cg_t28_expiry(caddr_t data)
 };
 
 STATIC int cg_tcgb_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_tcgb_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "tcgb", &((struct cg *) data)->timers.tcgb, &cg_tcgb_timeout,
@@ -10447,7 +10450,7 @@ cg_tcgb_expiry(caddr_t data)
 };
 
 STATIC int cg_tgrs_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_tgrs_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "tgrs", &((struct cg *) data)->timers.tgrs, &cg_tgrs_timeout,
@@ -10455,7 +10458,7 @@ cg_tgrs_expiry(caddr_t data)
 };
 
 STATIC int cg_thga_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_thga_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "thga", &((struct cg *) data)->timers.thga, &cg_thga_timeout,
@@ -10463,7 +10466,7 @@ cg_thga_expiry(caddr_t data)
 };
 
 STATIC int cg_tscga_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_tscga_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "tscga", &((struct cg *) data)->timers.tscga, &cg_tscga_timeout,
@@ -10471,7 +10474,7 @@ cg_tscga_expiry(caddr_t data)
 };
 
 STATIC int cg_tscga_d_timeout(struct cg *);
-STATIC void
+STATIC streamscall void
 cg_tscga_d_expiry(caddr_t data)
 {
 	cg_do_timeout(data, "tscga_d", &((struct cg *) data)->timers.tscga_d, &cg_tscga_d_timeout,
@@ -10720,7 +10723,7 @@ cg_timer_start(struct cg *cg, const uint t)
  */
 STATIC INLINE void
 sr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struct sr *),
-	      void (*exp_fnc) (caddr_t))
+	      streamscall void (*exp_fnc) (caddr_t))
 {
 	struct sr *sr = (struct sr *) data;
 	if (xchg(timeo, 0)) {
@@ -10749,14 +10752,14 @@ sr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 }
 
 STATIC int sr_t4_timeout(struct sr *);
-STATIC void
+STATIC streamscall void
 sr_t4_expiry(caddr_t data)
 {
 	sr_do_timeout(data, "t4", &((struct sr *) data)->timers.t4, &sr_t4_timeout, &sr_t4_expiry);
 };
 
 STATIC int sr_t29_timeout(struct sr *);
-STATIC void
+STATIC streamscall void
 sr_t29_expiry(caddr_t data)
 {
 	sr_do_timeout(data, "t29", &((struct sr *) data)->timers.t29, &sr_t29_timeout,
@@ -10764,7 +10767,7 @@ sr_t29_expiry(caddr_t data)
 };
 
 STATIC int sr_t30_timeout(struct sr *);
-STATIC void
+STATIC streamscall void
 sr_t30_expiry(caddr_t data)
 {
 	sr_do_timeout(data, "t30", &((struct sr *) data)->timers.t30, &sr_t30_timeout,
@@ -25138,7 +25141,7 @@ STATIC major_t isup_majors[ISUP_CMAJORS] = { ISUP_CMAJOR_0, };
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -25207,7 +25210,7 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 isup_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct cc *cc = CC_PRIV(q);

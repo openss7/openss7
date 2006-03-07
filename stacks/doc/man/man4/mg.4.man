@@ -1,11 +1,11 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mg.4.man,v 0.9.2.5 2005/05/14 08:32:27 brian Exp $
+.\" @(#) $Id: mg.4.man,v 0.9.2.6 2006/03/07 00:55:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:32:27 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/07 00:55:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mg.4.man,v $
+.\" Revision 0.9.2.6  2006/03/07 00:55:54  brian
+.\" - package passes full documentation check
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -73,7 +79,7 @@ sort-adjacent-labels
 .\"
 .TH MG 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .SH NAME
-.B mg
+.B mg, MG
 \- Media Gateway (MG)
 .SH SYNOPSIS
 .PP
@@ -101,7 +107,7 @@ multiplexing driver.
 .BR mx (4)
 or
 .BR ch (4)
-streams are linked under the
+Streams are linked under the
 .B MG
 multiplexing driver using the
 .IR I_LINK " or " I_PLINK
@@ -109,14 +115,14 @@ commands of
 .BR streamio (7),
 to provide multiplex or channel services to
 .BR MG .
-Once linked, the streams must be configured using
+Once linked, the Streams must be configured using
 .BR mgi_ioctl (4).
 .PP
 .B MG
-provides the following stream types that are directly compatible with the
-stream types provided by other
+provides the following Stream types that are directly compatible with the
+Stream types provided by other
 .BR MG (4)
-drivers.  To select one fo these streams types, the
+drivers.  To select one of these Stream types, the
 .I device
 argument to the
 .BR open (2)
@@ -165,14 +171,17 @@ file descriptor.  These management controls are documented in
 .SH DEVICES
 .PP
 .IR /dev/mg .
+.SH BUGS
+.PP
+The
+.B MG
+drivers have no known bugs.
 .SH "SEE ALSO"
 .PP
 .BR MG (4),
 .BR mgconfd (8),
 .BR mgi (7),
 .BR cframe (3).
-.SH FILES
-.PP
 .SH VERSIONS
 .PP
 The
@@ -181,7 +190,7 @@ interface is specific to the
 .BR OpenSS7
 MG stack.  This is Version 1 of the interface.
 .PP
-NGI interfaces are consistent with MGI Revision 0.8.2.
+MGI interfaces are consistent with MGI Revision 0.8.2.
 .PP
 The
 .B MG

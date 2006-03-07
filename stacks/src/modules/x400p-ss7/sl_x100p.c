@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:24 $
+ @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:15:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:24 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:15:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x100p.c,v $
+ Revision 0.9.2.14  2006/03/07 01:15:12  brian
+ - binary compatible callouts
+
  Revision 0.9.2.13  2006/03/04 13:00:24  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:24 $"
+#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:15:12 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:24 $";
+    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:15:12 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -93,7 +96,7 @@ static char const ident[] =
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:24 $"
+#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:15:12 $"
 #define SL_X100P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -157,8 +160,8 @@ STATIC struct module_info xp_minfo = {
 
 STATIC struct module_stat xp_mstat = { 0, };
 
-STATIC int xp_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int xp_close(queue_t *, int, cred_t *);
+STATIC streamscall int xp_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int xp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit xp_rinit = {
 	.qi_putp = ss7_oput,		/* Read put (message from below) */
@@ -1530,7 +1533,7 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 enum { tall, t1, t2, t3, t4, t5, t6, t7, t8, t9 };
 
 STATIC int xp_t1_timeout(struct xp *);
-STATIC void
+STATIC streamscall void
 xp_t1_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t1", DRV_NAME, &((struct xp *) data)->sl.timers.t1,
@@ -1549,7 +1552,7 @@ xp_start_timer_t1(struct xp *xp)
 };
 
 STATIC int xp_t2_timeout(struct xp *);
-STATIC void
+STATIC streamscall void
 xp_t2_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t2", DRV_NAME, &((struct xp *) data)->sl.timers.t2,
@@ -1568,7 +1571,7 @@ xp_start_timer_t2(struct xp *xp)
 };
 
 STATIC int xp_t3_timeout(struct xp *);
-STATIC void
+STATIC streamscall void
 xp_t3_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t3", DRV_NAME, &((struct xp *) data)->sl.timers.t3,
@@ -1587,7 +1590,7 @@ xp_start_timer_t3(struct xp *xp)
 };
 
 STATIC int xp_t4_timeout(struct xp *);
-STATIC void
+STATIC streamscall void
 xp_t4_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t4", "xp", &((struct xp *) data)->sl.timers.t4,
@@ -1606,7 +1609,7 @@ xp_start_timer_t4(struct xp *xp)
 };
 
 STATIC int xp_t5_timeout(struct xp *);
-STATIC void
+STATIC streamscall void
 xp_t5_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t5", DRV_NAME, &((struct xp *) data)->sl.timers.t5,
@@ -1625,7 +1628,7 @@ xp_start_timer_t5(struct xp *xp)
 };
 
 STATIC int xp_t6_timeout(struct xp *);
-STATIC void
+STATIC streamscall void
 xp_t6_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t6", DRV_NAME, &((struct xp *) data)->sl.timers.t6,
@@ -1644,7 +1647,7 @@ xp_start_timer_t6(struct xp *xp)
 };
 
 STATIC int xp_t7_timeout(struct xp *);
-STATIC void
+STATIC streamscall void
 xp_t7_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t7", DRV_NAME, &((struct xp *) data)->sl.timers.t7,
@@ -1663,7 +1666,7 @@ xp_start_timer_t7(struct xp *xp)
 };
 
 STATIC int xp_t8_timeout(struct xp *);
-STATIC void
+STATIC streamscall void
 xp_t8_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t8", DRV_NAME, &((struct xp *) data)->sdt.timers.t8,
@@ -1683,7 +1686,7 @@ xp_start_timer_t8(struct xp *xp)
 
 #if 0
 STATIC int xp_t9_timeout(struct xp *);
-STATIC void
+STATIC streamscall void
 xp_t9_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t9", "xp", &((struct xp *) data)->sdl.timers.t9,
@@ -9132,7 +9135,7 @@ STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct xp *xp_list = NULL;
 STATIC major_t xp_majors[CMAJORS] = { CMAJOR_0, };
 
-STATIC int
+STATIC streamscall int
 xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -9195,7 +9198,7 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_unlock_irqrestore(&xp_lock, flags);
 	return (0);
 }
-STATIC int
+STATIC streamscall int
 xp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct xp *xp = XP_PRIV(q);

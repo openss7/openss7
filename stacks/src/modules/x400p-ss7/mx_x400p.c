@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:21 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:14:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:21 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:14:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_x400p.c,v $
+ Revision 0.9.2.15  2006/03/07 01:14:33  brian
+ - binary compatible callouts
+
  Revision 0.9.2.14  2006/03/04 13:00:21  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:21 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:14:33 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:21 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:14:33 $";
 
 #include <sys/os7/compat.h>
 
@@ -71,7 +74,7 @@ static char const ident[] =
 
 #define MX_SDL_DESCRIP		"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
 #define MX_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:21 $"
+#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:14:33 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define MX_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -140,8 +143,8 @@ STATIC struct module_info mx_minfo = {
 	mi_lowat:0,			/* Lo water mark */
 };
 
-STATIC int mx_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int mx_close(queue_t *, int, cred_t *);
+STATIC streamscall int mx_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int mx_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit mx_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
@@ -2486,7 +2489,7 @@ mx_r_prim(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 mx_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err;
@@ -2525,7 +2528,7 @@ mx_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 mx_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

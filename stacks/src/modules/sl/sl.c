@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:45 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:11:46 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:43:45 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:11:46 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sl.c,v $
+ Revision 0.9.2.14  2006/03/07 01:11:46  brian
+ - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:45 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:11:46 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:45 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:11:46 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -71,9 +76,9 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:45 $"
-#define SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:11:46 $"
+#define SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_LICENSE	"GPL"
 #define SL_BANNER	SL_DESCRIP	"\n" \

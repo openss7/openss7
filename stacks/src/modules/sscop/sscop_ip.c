@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sscop_ip.c,v 0.9.2.7 2005/07/13 12:01:40 brian Exp $
+ @(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:13:21 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -24,11 +24,40 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:40 $ by $Author: brian $
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/03/07 01:13:21 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sscop_ip.c,v $
+ Revision 0.9.2.8  2006/03/07 01:13:21  brian
+ - updated headers
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:40 $";
+#ident "@(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:13:21 $"
+
+static char const ident[] = "$RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:13:21 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE/IP as specified in
@@ -38,14 +67,18 @@ static char const ident[] = "$Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 1
 #include <sys/os7/compat.h>
 
 #define SSCOP_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
-#define SSCOP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SSCOP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop_ip.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:13:21 $"
+#define SSCOP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SSCOP_LICENSE	"GPL"
 #define SSCOP_BANNER	SSCOP_DESCRIP	"\n"	\
+			SSCOP_REVISION	"\n"	\
 			SSCOP_COPYRIGHT	"\n"	\
 			SSCOP_DEVICE	"\n"	\
 			SSCOP_CONTACT	"\n"	\
+#define SSCOP_SPLASH	SSCOP_DEVICE	" - "	\
+			SSCOP_REVISION	"\n"
 
 #ifdef LINUX
 MODULE_AUTHOR(SSCOP_CONTACT);

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:32 $
+ @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:10:17 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:32 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:10:17 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: m3ua.c,v $
+ Revision 0.9.2.11  2006/03/07 01:10:17  brian
+ - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:32 $"
+#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:10:17 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:32 $";
+    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:10:17 $";
 
 #include <sys/os7/compat.h>
 
@@ -75,9 +80,9 @@ static char const ident[] =
  */
 
 #define M3UA_DESCRIP	"M3UA STREAMS MULTIPLEXING DRIVER."
-#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:32 $"
-#define M3UA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
-#define M3UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:10:17 $"
+#define M3UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corp.  All Rights Reserved."
+#define M3UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M3UA_LICENSE	"GPL"
 #define M3UA_BANNER	M3UA_DESCRIP	"\n" \

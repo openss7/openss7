@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:25:59 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:12:24 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:25:59 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:12:24 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sdt_sctp.c,v $
+ Revision 0.9.2.14  2006/03/07 01:12:24  brian
+ - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:25:59 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:12:24 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:25:59 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:12:24 $";
 
 #include <sys/os7/compat.h>
 
@@ -70,9 +75,9 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:25:59 $"
-#define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:12:24 $"
+#define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_SCTP_LICENSE	"GPL"
 #define SDT_SCTP_BANNER		SDT_SCTP_DESCRIP	"\n" \

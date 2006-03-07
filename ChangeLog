@@ -1,3 +1,27 @@
+2006-03-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: corrected package number bump
+	* NEWS: updated for release
+
+2006-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: updated headers
+	* am/archive.am: updated headers
+	* am/autotest.am: updated headers
+	* am/deb.am: updated headers
+	* am/genksyms.am: updated headers
+	* am/help.am: updated headers
+	* am/info.am: updated headers
+	* am/init.am: updated headers
+	* am/kernel.am: updated headers
+	* am/libraries.am: updated headers
+	* am/lsm.am: updated headers
+	* am/man.am: updated headers
+	* am/openss7.am: updated headers
+	* am/rpm.am: updated headers
+	* am/sctp.am: updated headers
+	* am/strconf.am: updated headers
+
 2006-03-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* THANKS: updated for release

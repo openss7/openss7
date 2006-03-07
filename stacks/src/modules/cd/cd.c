@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:02 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/07 01:05:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,22 +45,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:02 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:05:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.10  2006/03/07 01:05:52  brian
+ - changes for gcc 4.0
+
  Revision 0.9.2.9  2006/03/04 13:00:02  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:02 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/07 01:05:52 $"
 
 static char const ident[] =
-    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:02 $";
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/07 01:05:52 $";
 
-#define EXPORT_SYMTAB
+//#define EXPORT_SYMTAB
 
 #include <sys/os7/compat.h>
 
@@ -76,7 +79,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:02 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/07 01:05:52 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -252,8 +255,9 @@ cd_free_priv(queue_t *q)
 	return;
 }
 
-EXPORT_SYMBOL(cd_free_priv);
-STATIC INLINE int ch_info_req(queue_t *q, struct cd *cd);
+//EXPORT_SYMBOL(cd_free_priv);
+/* gcc 4.0 can't handle forward declarations of inline functions */
+STATIC int ch_info_req_slow(queue_t *q, struct cd *cd);
 extern struct str *
 cd_alloc_priv(queue_t *q, struct str **stp, dev_t *devp, cred_t *crp, ulong type)
 {
@@ -337,13 +341,13 @@ cd_alloc_priv(queue_t *q, struct str **stp, dev_t *devp, cred_t *crp, ulong type
 		/*
 		   generate immediate info request 
 		 */
-		ch_info_req(q, cd);
+		ch_info_req_slow(q, cd);
 	} else
 		ptrace(("%s: ERROR: Could not allocate module private structure\n", CD_MOD_NAME));
 	return ((struct str *) cd);
 }
 
-EXPORT_SYMBOL(cd_alloc_priv);
+//EXPORT_SYMBOL(cd_alloc_priv);
 
 /*
  *  ========================================================================
@@ -845,6 +849,12 @@ ch_info_req(queue_t *q, struct cd *cd)
 	}
 	rare();
 	return (-ENOBUFS);
+}
+
+STATIC int
+ch_info_req_slow(queue_t *q, struct cd *cd)
+{
+	return ch_info_req(q, cd);
 }
 
 /*

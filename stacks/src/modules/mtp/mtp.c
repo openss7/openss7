@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:12 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:12 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:10:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.13  2006/03/07 01:10:36  brian
+ - binary compatible callouts
+
  Revision 0.9.2.12  2006/03/04 13:00:12  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:12 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:36 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:12 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:36 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -85,9 +88,9 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:12 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:36 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_LICENSE	"GPL"
 #define MTP_BANNER	MTP_DESCRIP	"\n" \
@@ -181,8 +184,8 @@ STATIC struct module_info sl_rinfo = {
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 
-STATIC int mtp_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int mtp_close(queue_t *, int, cred_t *);
+STATIC streamscall int mtp_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int mtp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit mtp_rinit = {
 	qi_putp:ss7_oput,		/* Write put (message from below) */
@@ -17431,7 +17434,7 @@ sl_w_prim(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 STATIC int mtp_majors[MTP_CMAJORS] = { MTP_CMAJOR_0, };
-STATIC int
+STATIC streamscall int
 mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -17501,7 +17504,7 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 mtp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct mtp *mtp = MTP_PRIV(q);

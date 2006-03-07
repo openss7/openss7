@@ -1,3 +1,17 @@
+2006-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: updated headers
+	* doc/manual/Makefile.am: updated headers
+	* doc/specs/dlpi/Makefile.am: updated headers
+	* doc/specs/npi/Makefile.am: updated headers
+	* doc/specs/tpi/Makefile.am: updated headers
+	* doc/specs/Makefile.am: updated headers
+	* doc/Makefile.am: updated headers
+	* src/include/Makefile.am: updated headers
+	* src/Makefile.am: updated headers
+	* tests/Makefile.am: updated headers
+	* Makefile.am: updated headers
+
 2006-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/ldl.c: corrections for FC4 x86_64 build

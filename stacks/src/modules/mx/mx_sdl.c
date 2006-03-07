@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/04 13:00:16 $
+ @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:11:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:16 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:11:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_sdl.c,v $
+ Revision 0.9.2.11  2006/03/07 01:11:03  brian
+ - binary compatible callouts
+
  Revision 0.9.2.10  2006/03/04 13:00:16  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/04 13:00:16 $"
+#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:11:03 $"
 
 static char const ident[] =
-    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/04 13:00:16 $";
+    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:11:03 $";
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -82,9 +85,9 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/04 13:00:16 $"
+#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:11:03 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_SDL_LICENSE	"GPL"
 #define MX_SDL_BANNER	MX_SDL_DESCRIP	"\n" \
@@ -137,8 +140,8 @@ STATIC struct module_info mx_minfo = {
 	mi_lowat:0,			/* Lo water mark */
 };
 
-STATIC int mx_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int mx_close(queue_t *, int, cred_t *);
+STATIC streamscall int mx_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int mx_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit mx_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
@@ -2535,7 +2538,7 @@ mx_r_prim(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 mx_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err;
@@ -2575,7 +2578,7 @@ mx_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 mx_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

@@ -1,3 +1,19 @@
+2006-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: updated headers
+	* doc/manual/Makefile.am: updated headers
+	* doc/specs/tpi/Makefile.am: updated headers
+	* doc/specs/Makefile.am: updated headers
+	* doc/Makefile.am: updated headers
+	* src/include/Makefile.am: updated headers
+	* src/Makefile.am: updated headers
+	* tests/Makefile.am: updated headers
+	* Makefile.am: updated headers
+
+2006-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/tiuser.h: rationalized to stacks package
+
 2006-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: updated headers

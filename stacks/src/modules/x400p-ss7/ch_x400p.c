@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:20 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:14:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:20 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:14:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_x400p.c,v $
+ Revision 0.9.2.13  2006/03/07 01:14:29  brian
+ - binary compatible callouts
+
  Revision 0.9.2.12  2006/03/04 13:00:20  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:20 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:14:29 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:20 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:14:29 $";
 
 #include <sys/os7/compat.h>
 
@@ -71,7 +74,7 @@ static char const ident[] =
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
 #define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:20 $"
+#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:14:29 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -126,8 +129,8 @@ STATIC struct module_info ch_minfo = {
 	mi_lowat:0,			/* Lo water mark */
 };
 
-STATIC int ch_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int ch_close(queue_t *, int, cred_t *);
+STATIC streamscall int ch_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int ch_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit ch_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
@@ -2458,7 +2461,7 @@ ch_r_prim(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 ch_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
@@ -2492,7 +2495,7 @@ ch_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 ch_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

@@ -1,3 +1,200 @@
+2006-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/tcap-tpi.4.man: added missing manpage
+	* doc/man/man4/sua-mgmt.4.man: added missing manpage
+	* src/modules/inet/lis.conf: removed, needs configure input
+	* src/modules/inet/lis.conf.in: added, replacement for lis.conf
+	* configure.ac: added src/modules/inet/lis.conf.in to config files
+	* doc/man/man4/slm.4.man: added missing manpage
+	* doc/man/man4/sdlm-lm.4.man: added missing manpage
+	* doc/man/Makefile.am: added missing manpages
+	* src/modules/h225/h225.c: updated splash and headers
+	* src/modules/isdn/isdn.c: updated splash and headers
+	* src/modules/isup/isup.c: updated splash and headers
+	* src/modules/m2tp/m2tp.c: updated splash and headers
+	* src/modules/m2ua/m2ua.c: updated splash and headers
+	* src/modules/m3ua/m3ua.c: updated splash and headers
+	* src/modules/mg/mg.c: updated splash and headers
+	* src/modules/mtp/mtp.c: updated splash and headers
+	* src/modules/mtp/mtp_npi.c: updated splash and headers
+	* src/modules/mtp/mtp_tpi.c: updated splash and headers
+	* src/modules/mx/mx_sdl.c: updated splash and headers
+	* src/modules/sccp/sccp.c: updated splash and headers
+	* src/modules/sctp/sctp.c: updated splash and headers
+	* src/modules/sdl/cdi_mod.c: updated splash and headers
+	* src/modules/sl/sl.c: updated splash and headers
+	* src/modules/sl/sl_mux.c: updated splash and headers
+	* src/modules/sl/sm_mod.c: updated splash and headers
+	* src/modules/ss7sctp/sdl_sctp.c: updated splash and headers
+	* src/modules/ss7sctp/sdt_sctp.c: updated splash and headers
+	* src/modules/sscop/sscop_ip.c: updated splash and headers
+	* src/modules/sscop/sscop.c: updated splash and headers
+	* src/modules/sscop/sscop2.c: updated splash and headers
+	* src/modules/sscop/sscop_n.c: updated splash and headers
+	* src/modules/sscop/sscop_n2.c: updated splash and headers
+	* src/modules/sscop/sscop_t.c: updated splash and headers
+	* src/modules/sua/sua.c: updated splash and headers
+	* src/modules/tcap/tc.c: updated splash and headers
+	* src/test/perftest.c:
+	  aligned with perftest from Linux Fast-STREAMS package
+	* src/modules/cd/cd.c: don't export symbols for now
+	* doc/man/Makefile.am: updated headers
+	* doc/manual/Makefile.am: updated headers
+	* doc/projects/Makefile.am: updated headers
+	* doc/specs/cci/Makefile.am: updated headers
+	* doc/specs/dlpi/Makefile.am: updated headers
+	* doc/specs/mapi/Makefile.am: updated headers
+	* doc/specs/npi/Makefile.am: updated headers
+	* doc/specs/tci/Makefile.am: updated headers
+	* doc/specs/tpi/Makefile.am: updated headers
+	* doc/specs/tri/Makefile.am: updated headers
+	* doc/specs/Makefile.am: updated headers
+	* doc/Makefile.am: updated headers
+	* src/include/Makefile.am: updated headers
+	* src/Makefile.am: updated headers
+	* tests/Makefile.am: updated headers
+	* Makefile.am: updated headers
+	* doc/man/man8/bicc.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/bua.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/cpc388.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/h225.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/h323confd.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/isdn.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/isdnconfd.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/isua.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/isup.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/iua.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/m2pa.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/m2tp.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/m2ua.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/m3tp.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/m3ua.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/mgconfd.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/mtp.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/sccp.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/sctp.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/sdl.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/sdt.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/sigtran.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/sl.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/sls.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/soip.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/ss7.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/ss7confd.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/ss7d.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/sua.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/tcap.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/tua.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/uaconfd.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/voipconfd.8.man: moved undoc.8 to ss7_undoc.8
+	* doc/man/man8/perftest.8.man: added missing manpage
+	* doc/man/man8/ss7_undoc.8.man: moved undoc.8 out of the way
+	* doc/man/Makefile.am: added perftest.8
+	* doc/man/man9/ss7_undoc.9.man: moved ss7undoc.9.man to ss7_undoc.9.man
+	* src/modules/sctp/lis.conf: removed
+	* src/modules/sctp/lis.conf.in: added
+	* configure.ac: added src/modules/sctp/lis.conf to config files
+	* doc/man/man9/mtp_n_uderror_ind.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/mtp_n_unitdata_ind.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/mtp_n_unitdata_req.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/sccp_n_uderror_ind.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/sccp_n_unitdata_ind.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/sccp_n_unitdata_req.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/sctp_data_ind.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/sctp_data_req.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/sctp_datack_ind.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/sctp_datack_req.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/sctp_exdata_ind.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* doc/man/man9/sctp_exdata_req.9.man: changed ss7undoc.9 to ss7_undoc.9
+	* Makefile.am: removed perftest
+	* doc/man/Makefile.am: removed perftest
+
+2006-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/SS7.4.man: updated
+	* doc/man/man4/hdlc.4.man: updated
+	* doc/man/man4/mg.4.man: updated
+	* doc/man/man4/mtp.4.man: updated
+	* doc/man/man4/mx.4.man: updated
+	* doc/man/man4/cd.4.man: added missing manpage
+	* doc/man/man4/cd_daed.4.man: added missing manpage
+	* doc/man/man4/cd_hdlc.4.man: added missing manpage
+	* doc/man/man4/ch_x400p.4.man: added missing manpage
+	* doc/man/man4/dl_lapd.4.man: added missing manpage
+	* doc/man/man4/lm.4.man: added missing manpage
+	* doc/man/man4/m2pa_sl.4.man: added missing manpage
+	* doc/man/man4/mx_sdl.4.man: added missing manpage
+	* doc/man/man4/mx_x400p.4.man: added missing manpage
+	* doc/man/man4/sdl_x400p.4.man: added missing manpage
+	* doc/man/man4/sdlm.4.man: added missing manpage
+	* doc/man/man4/sdt_sctp.4.man: added missing manpage
+	* doc/man/man4/sdt_tpi.4.man: added missing manpage
+	* doc/man/man4/sdt_x400p.4.man: added missing manpage
+	* doc/man/man4/sl_mux.4.man: added missing manpage
+	* doc/man/man4/sl_tpi.4.man: added missing manpage
+	* doc/man/man4/sl_x100p.4.man: added missing manpage
+	* doc/man/man4/sl_x400p.4.man: added missing manpage
+	* doc/man/man4/sm_mod.4.man: added missing manpage
+	* doc/man/man4/spm.4.man: added missing manpage
+	* doc/man/man4/x100p_ss7.4.man: added missing manpage
+	* doc/man/man4/x400p_mx.4.man: added missing manpage
+	* doc/man/man4/x400p_ss7.4.man: added missing manpage
+	* doc/man/Makefile.am: added missing manpages
+	* doc/man/man4/ch-sdl.4.man: added missing manpage
+	* doc/man/man4/mg-lm.4.man: added missing manpage
+	* doc/man/man4/mtp-mgmt.4.man: added missing manpage
+	* doc/man/man4/mtp-min.4.man: added missing manpage
+	* doc/man/man4/mtp-mtpi.4.man: added missing manpage
+	* doc/man/man4/mtp-npi.4.man: added missing manpage
+	* doc/man/man4/mtp-tpi.4.man: added missing manpage
+	* doc/man/man4/sccp-gtt.4.man: added missing manpage
+	* doc/man/man4/sccp-mgmt.4.man: added missing manpage
+	* doc/man/man4/sccp-npi.4.man: added missing manpage
+	* doc/man/man4/sccp-sccpi.4.man: added missing manpage
+	* doc/man/man4/sccp-tpi.4.man: added missing manpage
+	* doc/man/man4/sctp_n.4.man: added missing manpage
+	* doc/man/man4/sctp_t.4.man: added missing manpage
+	* doc/man/man4/sdl-acb56.4.man: added missing manpage
+	* doc/man/man4/sdl-mux.4.man: added missing manpage
+	* doc/man/man4/sdt-acb56.4.man: added missing manpage
+	* doc/man/man4/sl-acb56.4.man: added missing manpage
+	* doc/man/man4/sl-sctp.4.man: added missing manpage
+	* doc/man/man4/ss7-sdl-acb0.4.man: added missing manpage
+	* doc/man/man4/ss7-sdl-acb1.4.man: added missing manpage
+	* doc/man/man4/ss7-sdl-acb2.4.man: added missing manpage
+	* doc/man/man4/ss7-sdl-acb3.4.man: added missing manpage
+	* doc/man/man4/ss7-sdt-acb0.4.man: added missing manpage
+	* doc/man/man4/ss7-sdt-acb1.4.man: added missing manpage
+	* doc/man/man4/ss7-sdt-acb2.4.man: added missing manpage
+	* doc/man/man4/ss7-sdt-acb3.4.man: added missing manpage
+	* doc/man/man4/ss7-sl-acb0.4.man: added missing manpage
+	* doc/man/man4/ss7-sl-acb1.4.man: added missing manpage
+	* doc/man/man4/ss7-sl-acb2.4.man: added missing manpage
+	* doc/man/man4/ss7-sl-acb3.4.man: added missing manpage
+	* doc/man/man4/sua-gtt.4.man: added missing manpage
+	* doc/man/man4/sua-npi.4.man: added missing manpage
+	* doc/man/man4/sua-sccpi.4.man: added missing manpage
+	* doc/man/man4/sua-tpi.4.man: added missing manpage
+	* doc/man/man4/tali-isup.4.man: added missing manpage
+	* doc/man/man4/tali-mtp.4.man: added missing manpage
+	* doc/man/man4/tali-sccp.4.man: added missing manpage
+	* doc/man/man4/tcap-mgmt.4.man: added missing manpage
+	* doc/man/man4/tcap-tci.4.man: added missing manpage
+	* doc/man/man4/tcap-tri.4.man: added missing manpage
+	* doc/man/man4/ticots_ord.4.man: added missing manpage
+	* doc/man/man4/x100p-mx.4.man: added missing manpage
+	* doc/man/man4/x100p-sdl.4.man: added missing manpage
+	* doc/man/man4/x100p-sdt.4.man: added missing manpage
+	* doc/man/man4/x100p-sl.4.man: added missing manpage
+	* doc/man/man4/x100p-ss7-lm.4.man: added missing manpage
+	* doc/man/man4/x100p-ss7-sdl.4.man: added missing manpage
+	* doc/man/man4/x400p-sdl.4.man: added missing manpage
+	* doc/man/man4/x400p-sdt.4.man: added missing manpage
+	* doc/man/man4/x400p-sl.4.man: added missing manpage
+	* doc/man/man4/x400p-ss7-lm.4.man: added missing manpage
+	* doc/man/man4/x400p-ss7-sdl.4.man: added missing manpage
+	* doc/man/Makefile.am: added missing manpages
+
 2006-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/cd/cd.c (CD_UINIT):

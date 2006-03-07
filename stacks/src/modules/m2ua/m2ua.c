@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:10 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:10:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:10 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:10:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.14  2006/03/07 01:10:04  brian
+ - binary compatible callouts
+
  Revision 0.9.2.13  2006/03/04 13:00:10  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:10 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:10:04 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:10 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:10:04 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -73,9 +76,9 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:10 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:10:04 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define M2UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M2UA_LICENSE	"GPL"
 #define M2UA_BANNER	M2UA_DESCRIP	"\n" \
@@ -156,8 +159,8 @@ STATIC struct module_info mux_rinfo = {
 	mi_lowat:1 << 12,		/* Lo water mark */
 };
 
-STATIC int m2ua_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int m2ua_close(queue_t *, int, cred_t *);
+STATIC streamscall int m2ua_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int m2ua_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit m2ua_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
@@ -3987,7 +3990,7 @@ enum { tall, tack, tbeat, tidle, tpend
 
 #define M2UA_DECLARE_TIMER(__o, __t) \
 STATIC INLINE int __o ## _ ## __t ## _timeout(__o ## _t *); \
-STATIC void __o ## _ ## __t ## _expiry(caddr_t data) \
+STATIC streamscall void __o ## _ ## __t ## _expiry(caddr_t data) \
 { \
 	__o ## _do_timeout(data, # __t, &((__o ## _t *)data)->timers. __t, &__o ## _ ## __t ## _timeout, & __o ## _ ## __t ## _expiry); \
 } \
@@ -4009,7 +4012,7 @@ STATIC INLINE void __o ## _start_timer_ ## __t (__o ## _t *__o, ulong val) \
  */
 STATIC INLINE void
 spp_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (spp_t *),
-	       void (*exp_fnc) (caddr_t))
+	       streamscall void (*exp_fnc) (caddr_t))
 {
 	spp_t *spp = (spp_t *) data;
 	if (xchg(timeo, 0)) {
@@ -4048,7 +4051,7 @@ spp_stop_timer(spp_t * spp, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-spp_start_timer(spp_t * spp, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
+spp_start_timer(spp_t * spp, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, spp, timer, val * 1000 / HZ,
 		jiffies));
@@ -4136,7 +4139,7 @@ spp_timer_start(spp_t * spp, const uint t)
  */
 STATIC INLINE void
 as_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (as_t *),
-	      void (*exp_fnc) (caddr_t))
+	      streamscall void (*exp_fnc) (caddr_t))
 {
 	as_t *as = (as_t *) data;
 	if (xchg(timeo, 0)) {
@@ -4175,7 +4178,7 @@ as_stop_timer(as_t * as, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-as_start_timer(as_t * as, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
+as_start_timer(as_t * as, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, as, timer, val * 1000 / HZ,
 		jiffies));
@@ -4243,7 +4246,7 @@ as_timer_start(as_t * as, const uint t)
  */
 STATIC INLINE void
 sp_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (sp_t *),
-	      void (*exp_fnc) (caddr_t))
+	      streamscall void (*exp_fnc) (caddr_t))
 {
 	sp_t *sp = (sp_t *) data;
 	if (xchg(timeo, 0)) {
@@ -4282,7 +4285,7 @@ sp_stop_timer(sp_t * sp, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-sp_start_timer(sp_t * sp, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
+sp_start_timer(sp_t * sp, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, sp, timer, val * 1000 / HZ,
 		jiffies));
@@ -4349,7 +4352,7 @@ sp_timer_start(sp_t * sp, const uint t)
  */
 STATIC INLINE void
 sl_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (sl_t *),
-	      void (*exp_fnc) (caddr_t))
+	      streamscall void (*exp_fnc) (caddr_t))
 {
 	sl_t *sl = (sl_t *) data;
 	if (xchg(timeo, 0)) {
@@ -4388,7 +4391,7 @@ sl_stop_timer(sl_t * sl, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-sl_start_timer(sl_t * sl, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
+sl_start_timer(sl_t * sl, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, sl, timer, val * 1000 / HZ,
 		jiffies));
@@ -4455,7 +4458,7 @@ sl_timer_start(sl_t * sl, const uint t)
  */
 STATIC INLINE void
 xp_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (xp_t *),
-	      void (*exp_fnc) (caddr_t))
+	      streamscall void (*exp_fnc) (caddr_t))
 {
 	xp_t *xp = (xp_t *) data;
 	if (xchg(timeo, 0)) {
@@ -4494,7 +4497,7 @@ xp_stop_timer(xp_t * xp, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-xp_start_timer(xp_t * xp, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
+xp_start_timer(xp_t * xp, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, xp, timer, val * 1000 / HZ,
 		jiffies));
@@ -15101,7 +15104,7 @@ STATIC major_t m2ua_majors[M2UA_CMAJORS] = { M2UA_CMAJOR_0, };
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -15180,7 +15183,7 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 m2ua_close(queue_t *q, int flag, cred_t *crp)
 {
 	str_t *s = STR_PRIV(q);

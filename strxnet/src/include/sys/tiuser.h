@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9.2.7 2005/07/18 12:45:03 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.8 2006/03/07 00:46:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:45:03 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 00:46:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIUSER_H
 #define _SYS_TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #include <sys/tpi.h>		/* common definitions */
 
@@ -181,7 +181,11 @@ struct t_uderr {
 #define T_ADDR		0x01	/* address */
 #define T_OPT		0x02	/* options */
 #define T_UDATA		0x04	/* user data */
+#if 0
+#define T_ALL		0x07	/* all the above fields */
+#else
 #define T_ALL		0xffff	/* all the above fields */
+#endif
 
 /* 
  * The following are the states for the user.
@@ -194,6 +198,9 @@ struct t_uderr {
 #define T_DATAXFER	5	/* data transfer */
 #define T_OUTREL	6	/* outgoing release pending */
 #define T_INREL		7	/* incoming release pending */
+#if 0
+#define T_BADSTATE	8	/* illegal state */
+#endif
 #define T_FAKE		8	/* illegal state */
 #define T_NOSTATES	9
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:22 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:14:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:22 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:14:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_x400p.c,v $
+ Revision 0.9.2.15  2006/03/07 01:14:40  brian
+ - binary compatible callouts
+
  Revision 0.9.2.14  2006/03/04 13:00:22  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:22 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:14:40 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:22 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:14:40 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -90,7 +93,7 @@ static char const ident[] =
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2006/03/04 13:00:22 $"
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:14:40 $"
 #define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -154,8 +157,8 @@ STATIC struct module_info xp_minfo = {
 
 STATIC struct module_stat xp_mstat = { 0, };
 
-STATIC int xp_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int xp_close(queue_t *, int, cred_t *);
+STATIC streamscall int xp_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int xp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit xp_rinit = {
 	.qi_putp = ss7_oput,		/* Read put (message from below) */
@@ -2475,7 +2478,7 @@ STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct xp *xp_list = NULL;
 STATIC major_t xp_majors[CMAJORS] = { CMAJOR_0, };
 
-STATIC int
+STATIC streamscall int
 xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -2538,7 +2541,7 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_unlock_irqrestore(&xp_lock, flags);
 	return (0);
 }
-STATIC int
+STATIC streamscall int
 xp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct xp *xp = XP_PRIV(q);

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:25 $
+ @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:14 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:25 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:07:14 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: cd_hdlc.c,v $
+ Revision 0.9.2.11  2006/03/07 01:07:14  brian
+ - binary compatible callouts
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:25 $"
+#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:14 $"
 
 static char const ident[] =
-    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:25 $";
+    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:14 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -81,8 +86,8 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define CD_HDLC_DESCRIP		"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:25 $"
-#define CD_HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
+#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:14 $"
+#define CD_HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CD_HDLC_DEVICES		"Supports OpenSS7 Channel Drivers."
 #define CD_HDLC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_HDLC_LICENSE		"GPL"
@@ -140,8 +145,8 @@ STATIC struct module_info hdlc_rinfo = {
 	mi_lowat:(0),			/* Lo water mark */
 };
 
-STATIC int hdlc_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int hdlc_close(queue_t *, int, cred_t *);
+STATIC streamscall int hdlc_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int hdlc_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit hdlc_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
@@ -186,7 +191,7 @@ hdlc_term_caches(void)
  *  -------------------------------------------------------------------------
  */
 STATIC struct str *hdlc_list = NULL;
-STATIC int
+STATIC streamscall int
 hdlc_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
@@ -219,7 +224,7 @@ hdlc_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 hdlc_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

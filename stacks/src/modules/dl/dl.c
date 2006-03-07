@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:25 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:07:25 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:25 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:07:25 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: dl.c,v $
+ Revision 0.9.2.13  2006/03/07 01:07:25  brian
+ - binary compatible callouts
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:25 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:07:25 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:25 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:07:25 $";
 
 #include <sys/os7/compat.h>
 #include <linux/kmod.h>
@@ -63,9 +68,9 @@ static char const ident[] =
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.12 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:25 $"
-#define DL_COPYRIGHT	"Copyright (c) 1997-2003  OpenSS7 Corporation.  All Rights Reserved."
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.13 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:07:25 $"
+#define DL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -125,8 +130,8 @@ STATIC struct module_info dl_xinfo = {
 	mi_lowat:(0),			/* Lo water mark */
 };
 
-STATIC int dl_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int dl_close(queue_t *, int, cred_t *);
+STATIC streamscall int dl_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int dl_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit dl_xinit = {
 	qi_qopen:dl_open,		/* Each open */
@@ -202,7 +207,7 @@ dl_find_strdev(const char *devname)
  *  that we do an lis_setq and call the actual driver's open function, so we
  *  should never return here.
  */
-STATIC int
+STATIC streamscall int
 dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	uchar cmajor;
@@ -276,7 +281,7 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  Close
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 dl_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) q;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.13 2005/12/28 09:51:47 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.14 2006/03/07 00:41:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 00:41:20 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_STRCONF_H__
 #define __SYS_LIS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:51:47 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 00:41:20 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -114,11 +114,11 @@ struct lis_strapush {
 	char sap_list[LIS_MAXAPUSH][LIS_FMNAMESZ + 1];
 };
 
-extern int _RP lis_register_strdev(major_t major, struct streamtab *strtab, int nminor,
+extern int streamscall lis_register_strdev(major_t major, struct streamtab *strtab, int nminor,
 				   const char *name);
-extern int _RP lis_unregister_strdev(major_t major);
-extern modID_t _RP lis_register_strmod(struct streamtab *strtab, const char *name);
-extern int _RP lis_unregister_strmod(struct streamtab *strtab);
+extern int streamscall lis_unregister_strdev(major_t major);
+extern modID_t streamscall lis_register_strmod(struct streamtab *strtab, const char *name);
+extern int streamscall lis_unregister_strmod(struct streamtab *strtab);
 
 extern int _RP lis_apush_get(struct lis_strapush *ap);
 extern int _RP lis_apush_set(struct lis_strapush *ap);

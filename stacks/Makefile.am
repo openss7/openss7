@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/03/06 11:38:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/03/07 01:04:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:27 $ by $Author: brian $
+# Last Modified $Date: 2006/03/07 01:04:06 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.64  2006/03/07 01:04:06  brian
+# - removed conflicting perftest
+#
 # Revision 0.9.2.63  2006/03/06 11:38:27  brian
 # - updated headers
 #
@@ -85,7 +88,6 @@ pkglibexec_PROGRAMS		= \
 				  test-x400p
 
 EXTRA_PROGRAMS			+= \
-				  perftest \
 				  test-inet_raw \
 				  test-inet_tcp \
 				  test-inet_udp \
@@ -323,7 +325,6 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 pkglibexec_PROGRAMS		= \
-				  perftest \
 				  test-m2pa \
 				  test-q781 \
 				  test-q781-pipe \
@@ -344,7 +345,6 @@ pkglibexec_PROGRAMS		= \
 				  test-x400p-sl
 
 EXTRA_PROGRAMS			+= \
-				  perftest \
 				  test-inet_raw \
 				  test-inet_tcp \
 				  test-inet_udp \
@@ -410,10 +410,10 @@ test_m2pa_LDFLAGS		= $(STREAMS_LDADD)
 test_m2pa_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_m2pa_CFLAGS		= $(USER_CFLAGS)
 
-perftest_SOURCES		= src/test/perftest.c
-perftest_LDFLAGS		= $(STREAMS_LDADD)
-perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-perftest_CFLAGS			= $(USER_CFLAGS)
+#perftest_SOURCES		= src/test/perftest.c
+#perftest_LDFLAGS		= $(STREAMS_LDADD)
+#perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+#perftest_CFLAGS			= $(USER_CFLAGS)
 
 test_q781_SOURCES		= src/test/sl/test-q781.c
 test_q781_LDFLAGS		= $(STREAMS_LDADD)

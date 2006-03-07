@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/04 13:00:23 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:14:48 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:23 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:14:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_x400p.c,v $
+ Revision 0.9.2.17  2006/03/07 01:14:48  brian
+ - binary compatible callouts
+
  Revision 0.9.2.16  2006/03/04 13:00:23  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/04 13:00:23 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:14:48 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/04 13:00:23 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:14:48 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -95,7 +98,7 @@ static char const ident[] =
 
 #define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2006/03/04 13:00:23 $"
+#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:14:48 $"
 #define SDT_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -159,11 +162,11 @@ STATIC struct module_info xp_minfo = {
 
 STATIC struct module_stat xp_mstat = { 0, };
 
-STATIC int xp_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int xp_close(queue_t *, int, cred_t *);
+STATIC streamscall int xp_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int xp_close(queue_t *, int, cred_t *);
 
-STATIC int xp_rput(queue_t *, mblk_t *);
-STATIC int xp_rsrv(queue_t *);
+STATIC streamscall int xp_rput(queue_t *, mblk_t *);
+STATIC streamscall int xp_rsrv(queue_t *);
 
 STATIC struct qinit xp_rinit = {
 	.qi_putp = xp_rput,		/* Read put (message from below) */
@@ -174,8 +177,8 @@ STATIC struct qinit xp_rinit = {
 	.qi_mstat = &xp_mstat,		/* Statistics */
 };
 
-STATIC int xp_wput(queue_t *, mblk_t *);
-STATIC int xp_wsrv(queue_t *);
+STATIC streamscall int xp_wput(queue_t *, mblk_t *);
+STATIC streamscall int xp_wsrv(queue_t *);
 
 STATIC struct qinit xp_winit = {
 	.qi_putp = xp_wput,		/* Write put (message from above) */
@@ -841,7 +844,7 @@ xp_free_card(xp_card_t * cp)
  *  BUFSRV
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC streamscall void
 xp_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
@@ -5972,22 +5975,22 @@ xp_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 	return (rtn);
 }
 
-STATIC int
+STATIC streamscall int
 xp_rput(queue_t *q, mblk_t *mp)
 {
 	return xp_putq(q, mp, &xp_r_prim);
 }
-STATIC int
+STATIC streamscall int
 xp_rsrv(queue_t *q)
 {
 	return xp_srvq(q, &xp_r_prim);
 }
-STATIC int
+STATIC streamscall int
 xp_wput(queue_t *q, mblk_t *mp)
 {
 	return xp_putq(q, mp, &xp_w_prim);
 }
-STATIC int
+STATIC streamscall int
 xp_wsrv(queue_t *q)
 {
 	return xp_srvq(q, &xp_w_prim);
@@ -6006,7 +6009,7 @@ STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct xp *xp_list = NULL;
 STATIC major_t xp_majors[CMAJORS] = { CMAJOR_0, };
 
-STATIC int
+STATIC streamscall int
 xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -6069,7 +6072,7 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_unlock_irqrestore(&xp_lock, flags);
 	return (0);
 }
-STATIC int
+STATIC streamscall int
 xp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct xp *xp = PRIV(q);

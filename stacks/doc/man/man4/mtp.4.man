@@ -1,11 +1,11 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mtp.4.man,v 0.9.2.5 2005/05/14 08:32:27 brian Exp $
+.\" @(#) $Id: mtp.4.man,v 0.9.2.6 2006/03/07 00:55:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:32:27 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/07 00:55:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mtp.4.man,v $
+.\" Revision 0.9.2.6  2006/03/07 00:55:54  brian
+.\" - package passes full documentation check
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -93,7 +99,16 @@ is an implementation of the Signalling System No. 7
 .RB ( SS7 (4))
 Message Transfer Part
 .RB ( MTP )
-defined in ITU-T Recommendation Q.704 and ANSI T1.111.4.
+defined in
+.I ITU-T Recommendation Q.704
+.[
+q704
+.]
+and
+.IR "ANSI T1.111.4" ".
+.[
+t1.111
+.]
 .B MTP
 provides reliable sequenced or unsequenced delivery of packets over a
 connectionless transport between two
@@ -141,8 +156,11 @@ Interface described in
 .IR /dev/mtp-npi-cl ", " /dev/mtp-npi-co
 This device provides the
 .B MTP
-protocol service interface using the N-primitives of the Network Provider
-Interface
+protocol service interface using the N-primitives of the
+.I Network Provider Interface
+.[
+NPI
+.]
 .BR npi (7)
 used for the Message Transfer Part as described in
 .BR npi_mtp (7).
@@ -164,8 +182,11 @@ network service provider.
 .IR /dev/mtp-tpi-cl ", " /dev/mtp-tpi-co
 This device provides the
 .B MTP
-protocol service interface using the T-primitives of the Transport Provider
-Interface
+protocol service interface using the T-primitives of the
+.I Transport Provider Interface
+.[
+TPI Revision 2.0.0
+.]
 .BR tpi (7)
 used for the Message Transfer Part as described in
 .BR tpi_mtp (7).

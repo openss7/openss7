@@ -1,11 +1,11 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: hdlc.4.man,v 0.9.2.5 2005/05/14 08:32:26 brian Exp $
+.\" @(#) $Id: hdlc.4.man,v 0.9.2.6 2006/03/07 00:55:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:32:26 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/07 00:55:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: hdlc.4.man,v $
+.\" Revision 0.9.2.6  2006/03/07 00:55:54  brian
+.\" - package passes full documentation check
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -99,7 +105,15 @@ sort-adjacent-labels
 .B HDLC
 is an implementation of the High-Level Data Link Control (HDLC) Procedures as
 specified in
-.BR "IS0 3309" " and " "ISO 4333" .
+.B IS0 3309
+.[
+ISO 3309
+.]
+and
+.BR "ISO 4333" .
+.[
+ISO 4335
+.]
 .B HDLC
 is intended to be used with the
 .BR lapb (4),
@@ -119,24 +133,24 @@ as described in
 .BR chi (7).
 The
 .B HDLC
-mdoule provides HDLC access to the bit stream from the channel provided by the
+module provides HDLC access to the bit stream from the channel provided by the
 .BR chi (7)
-stream below it, by performing HDLC functions on the raw bit stream.
-The upper interface proivded by the
+Stream below it, by performing HDLC functions on the raw bit stream.
+The upper interface provided by the
 .B HDLC
 module is the Communications Device Interface (CDI) as described in
 .BR cdi (7).
 .PP
 .B HDLC
 streams can be linked under
-.BD dl (4),
+.BR dl (4)
 drivers
 .BR lapd (4),
 .BR lapb (4),
 .BR lapf (4),
 .BR gr303 (4),
 .BR v52 (4),
-drivers using the
+using the
 .IR I_LINK " or " I_PLINK
 commands of
 .BR streamio (7),
@@ -170,7 +184,11 @@ and push the
 .BR hdlc (4)
 and
 .BR dl (4)
-modules to provide a complete and compliant Q.921 Data Link.
+modules to provide a complete and compliant Q.921
+.[
+q921
+.]
+Data Link.
 .\"
 .\"
 .PP
@@ -205,7 +223,7 @@ module responds to Local Management Interface (LMI),
 IO controls as interpreted for
 .B HDLC
 operation as described in
-.RB hdlc_ioctl (4).
+.BR hdlc_ioctl (4).
 .\"
 .\"
 .SH FILES
@@ -233,11 +251,14 @@ operation as described in
 .PP
 The
 .B HDLC
-module conforms to the CDI Specification, Revision 1.0
+module conforms to the CDI Specification, Revision 1.0.
+.[
+cdi
+.]
 .PP
 The
 .B HDLC
-mdoule does not appear until
+module does not appear until
 .B strss7
 release 0.8.4.
 .\"

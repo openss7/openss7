@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:15 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:10:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:15 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:10:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_npi.c,v $
+ Revision 0.9.2.14  2006/03/07 01:10:46  brian
+ - binary compatible callouts
+
  Revision 0.9.2.13  2006/03/04 13:00:15  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:15 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:10:46 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:15 $";
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:10:46 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message
@@ -77,9 +80,9 @@ static char const ident[] =
 #include <sys/npi_mtp.h>
 
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/04 13:00:15 $"
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:10:46 $"
 #define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
+#define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_NPI_LICENSE		"GPL"
 #define MTP_NPI_BANNER		MTP_NPI_DESCRIP		"\n" \
@@ -132,8 +135,8 @@ STATIC struct module_info mtp_minfo = {
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 
-STATIC int mtp_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int mtp_close(queue_t *, int, cred_t *);
+STATIC streamscall int mtp_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int mtp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit mtp_rinit = {
 	qi_putp:ss7_oput,		/* Read put (msg from below) */
@@ -339,7 +342,7 @@ m_error(queue_t *q, struct mtp *mtp, int etype)
       error:
 	return (err);
 }
-STATIC INLINE int n_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long error);
+STATIC int n_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long error);
 
 /*
  *  N_CONN_IND          11 - Incoming connection indication
@@ -657,7 +660,7 @@ n_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
  *  N_ERROR_ACK         18 - Error Acknowledgement
  *  -----------------------------------------------------------
  */
-STATIC INLINE int
+STATIC int
 n_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long etype)
 {
 	int err = etype;
@@ -2521,7 +2524,7 @@ mtp_r_prim(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
@@ -2564,7 +2567,7 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 mtp_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

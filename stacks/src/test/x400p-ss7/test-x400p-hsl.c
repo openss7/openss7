@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/04 13:00:42 $
+ @(#) $RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/07 01:17:39 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:42 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:17:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p-hsl.c,v $
+ Revision 0.9.2.6  2006/03/07 01:17:39  brian
+ - 64bit issues
+
  Revision 0.9.2.5  2006/03/04 13:00:42  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/04 13:00:42 $"
+#ident "@(#) $RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/07 01:17:39 $"
 
-static char const ident[] = "$RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/04 13:00:42 $";
+static char const ident[] = "$RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/07 01:17:39 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -591,7 +594,7 @@ sdt_write(int fd)
 	} else {
 		int i;
 		printf("Write succeeded, wrote %d bytes!\n", ret);
-		printf("Message[%d]: ", len);
+		printf("Message[%ld]: ", (long) len);
 		for (i = 0; i < len; i++) {
 			printf("%02X ", buf[i]);
 		}

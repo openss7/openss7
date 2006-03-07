@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/13 12:01:43 $
+ @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/07 01:14:07 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:43 $ by $Author: brian $
+ Last Modified $Date: 2006/03/07 01:14:07 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tc.c,v $
+ Revision 0.9.2.9  2006/03/07 01:14:07  brian
+ - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/13 12:01:43 $"
+#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/07 01:14:07 $"
 
 static char const ident[] =
-    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/13 12:01:43 $";
+    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/07 01:14:07 $";
 
 /*
  *  This is a TC (Transaction Capabilities) mulitplexing driver for SS7 TCAP.
@@ -69,8 +74,8 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define TC_DESCRIP	"TC STREAMS MULTIPLEXING DRIVER."
-#define TC_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define TC_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define TC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define TC_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TC_LICENSE	"GPL"
 #define TC_BANNER	TC_DESCRIP	"\n" \
