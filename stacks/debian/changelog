@@ -1,3 +1,10 @@
+
+strss7 (0.9a.4-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:22:14 -0700
+
 strss7 (0.9a.3-0) experimental; urgency=low
 
   * Changed version numbering.

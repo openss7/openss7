@@ -17,12 +17,12 @@ Replaces: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
 Depends: kernel-image-@kversion@ (= @krelease@), lis-core-@kversion@-@krelease@ (>= 2.18.1-0),
  @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Pre-Depends: kernel-image-@kversion@ (= @krelease@), lis-core-@kversion@-@krelease@ (>= 2.18.1-0)
-Description: Core LiS kernel modules for @PACKAGE_TITLE@
- Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for LiS.
- Includes assorted LiS drivers and modules for @PACKAGE_TITLE@.
- These binaries are heavily tied to the kernel for which they were compiled:
- applies to kernel version @kversion@ and requires an LiS package
- compiled for the same kernel.
+Description: Core Linux Fast-STREAMS kernel modules for @PACKAGE_TITLE@
+ Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for Linux
+ Fast-STREAMS.  Includes assorted Linux Fast-STREAMS drivers and modules for
+ @PACKAGE_TITLE@.  These binaries are heavily tied to the
+ kernel for which they were compiled: applies to kernel version @kversion@
+ and requires an Linux Fast-STREAMS package compiled for the same kernel.
 
 Package: @PACKAGE_LCNAME@-streams-core-@kversion@-@krelease@
 Architecture: any
@@ -50,9 +50,9 @@ Conflicts: @PACKAGE_LCNAME@-util
 Replaces: @PACKAGE_LCNAME@-util
 Depends: lis-lib (>= 2.18.1-0), ${shlibs:Depends}
 Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
-Description: Utitlity and test programs for @PACKAGE_TITLE@ and LiS
- Adminstration and configuration test utilities and commands for
- @PACKAGE_TITLE@ for LiS.
+Description: Utitlity and test programs for @PACKAGE_TITLE@ and
+ Linux Fast-STREAMS Adminstration and configuration test utilities and commands
+ for @PACKAGE_TITLE@ for Linux Fast-STREAMS.
 
 Package: @PACKAGE_LCNAME@-streams-util
 Architecture: any
@@ -85,7 +85,7 @@ Priority: optional
 Depends: @PACKAGE_LCNAME@-util(= @VERSION@-@PACKAGE_DEBRELEASE@), ${misc:Depends}
 Description: Init scripts and config files for @PACKAGE_TITLE@
  SysV init scripts and configuration files for @PACKAGE_TITLE@
- for LiS or STREAMS.
+ for Linux Fast-STREAMS.
 
 Package: @PACKAGE_LCNAME@-dev
 Architecture: all

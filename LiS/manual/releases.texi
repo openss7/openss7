@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.16 2006/03/05 04:03:07 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.17 2006/03/08 11:59:59 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/05 04:03:07 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/08 11:59:59 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -89,7 +89,7 @@ Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
 @itemize @bullet
 @item A fairly LSB compliant GNU/Linux distribution.
 @footnote{@xref{GNU/Linux Distributions}, for more information.}
-@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.10)
+@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.15)
 @item glibc2 or better.
 @item GNU info (for info files).
 @item GNU groff (for man pages).
@@ -97,6 +97,9 @@ Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
 (@samp{groff_ext}), as it contains the @command{refer} or @command{grefer} commands necessary for
 including references in the manual pages.}
 @end itemize
+
+If you need to rebuild the package from sources with modifications, you will need a larger GNU
+toolchain as described in @xref{Downloading from CVS}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -281,8 +284,9 @@ is required.
 @subsection Linux STREAMS
 @cindex Linux STREAMS
 
-@dfn{@value{PACKAGE_TITLE}} provides a suitable replacement for the (now deprecated) @dfn{Linux
-STREAMS (LiS) 2.18.0} package formerly maintained by Dave Goethe of @uref{http://www.gcom.com/,GCOM}.
+@dfn{Linux Fast-STREAMS} provides a suitable replacement for the (now deprecated)
+@dfn{@value{PACKAGE_TITLE} 2.18.0} package formerly maintained by Dave Goethe of
+@uref{http://www.gcom.com/,GCOM}.
 
 @menu
 * LiS-2.18 Kernel and Driver Compatibility::
@@ -450,8 +454,10 @@ Interface documentation, (@pxref{Development}).
 @subsection Linux Fast-STREAMS
 @cindex Linux Fast-STREAMS
 
-The @cite{@value{PACKAGE_TITLE}} package is no longer receiving active development or support.
-@cite{Linux Fast-STREAMS} is the preferred replacement for @cite{@value{PACKAGE_TITLE}}.
+The @cite{@value{PACKAGE_TITLE}} package is no longer receiving active development or support.  The
+@cite{@value{PACKAGE_TITLE}} package is so fraught with bugs that it is unusable as far as The
+OpenSS7 Project is concerned.  @cite{Linux Fast-STREAMS} is the preferred replacement for
+@cite{@value{PACKAGE_TITLE}}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -467,6 +473,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release LiS-2.18.2::          Release 2
 * Release LiS-2.18.1::          Release 1
 * Release LiS-2.16.19::		Release 19
 * Release LiS-2.16.18-22::	Release 22
@@ -502,6 +509,22 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
+Corrections for and testing of 64-bit clean compile and test runs on x86_64 architecture.  Some bug
+corrections resulting from gcc 4.0.2 compiler warnings.
+
+Corrected build flags for Gentoo and 2.6.15 kernels as reported on mailing list.  Builds on FC4
+2.6.15 kernel and with gcc 4.0.2.
+
+Added in many of Paul's 64-bit corrections.
+
+The @cite{@value{PACKAGE_TITLE} 2.18.3} is still largely unusable on 64-bit or SMP kernels.
+@b{@value{PACKAGE_TITLE} package is deprecated.  Do not use it.  The package contains many
+unresovled bugs. Use @cite{Linux Fast-STREAMS} instead.}
+
+@node Release LiS-2.18.2
+@subsection Release LiS-2.18.2
+@cindex release LiS-2.18.2
+
 Cross-build support for newer @cite{Nex@-us@-Ware} releases.  Build support for (recent FC4) 2.6.14
 kernel.  Corrected installation support (init scripts) for SuSE 9.2.
 
@@ -522,10 +545,10 @@ register_strlog() and unregister_strlog().
 
 Some bug corrections and fixes for glaring SMP errors reported by Kutluck.
 
-This might be the last OpenSS7 release of Linux STREAMS.  You should seriously consider using the
-Linux Fast-STREAMS package (streams-0.7a.4 or later) instead.  If you need comptibility to LiS (or
-other STREAMS implementation), investigate the strcompat package, which provides some binary
-compatibility to LiS under Linux Fast STREAMS.
+This might be the last OpenSS7 release of @dfn{@value{PACKAGE_TITLE}}.  You should seriously
+consider using the Linux Fast-STREAMS package (streams-0.7a.4 or later) instead.  If you need
+comptibility to LiS (or other STREAMS implementation), investigate the strcompat package, which
+provides some binary compatibility to LiS under Linux Fast STREAMS.
 
 @node Release LiS-2.18.1
 @subsection Release LiS-2.18.1
@@ -574,8 +597,8 @@ documentation pieces.
 Removed all XTI/TLI and Linux networking code, headers and documentation from LiS distribution and
 bumped epoch to 2.  Linux networking code has been migrated to the @strong{strxns},
 @strong{strxnet}, @strong{strinet} and @strong{strsctp} packages.  The purpose for doing this was to
-allow the Linux networking to build against Linux Fast-STREAMS as well as Linux STREAMS and is a
-preparation for phasing out LiS and phasing in LfS.
+allow the Linux networking to build against Linux Fast-STREAMS as well as
+@dfn{@value{PACKAGE_TITLE}} and is a preparation for phasing out LiS and phasing in LfS.
 
 Added missing @file{configure.nexusware} to distribution.  LiS cache options now default to 'no'
 because of instabilities with timers.

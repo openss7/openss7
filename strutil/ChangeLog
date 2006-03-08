@@ -1,7 +1,20 @@
+2006-03-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/releases.texi (Prerequisites): updated for release
+	* NEWS: corrections to package name
+	* README-nexusware: corrections to package name
+
 2006-03-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: compile tools static for distcheck
 	* README-nexusware: added missing README file
+	* am/help.am: documented remove target
+	* am/openss7.am: added remove target and reverse recursive targets
+	* NEWS: updated for release
+	* README-nexusware: updated for release
+	* debian/changelog: updated release numbering
+	* debian/copyright: updated headers
+	* debian/control.in: updated deprecated references to LiS
 
 2006-03-06  Brian Bidulock  <bidulock@openss7.org>
 

@@ -1,3 +1,16 @@
+
+sctp (0.2.23-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:21:35 -0700
+
+sctp (0.2.22-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:21:35 -0700
+
 sctp (0.2.21-0) experimental; urgency=low
 
   * Changed version numbering.

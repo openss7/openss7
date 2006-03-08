@@ -1,3 +1,10 @@
+
+iperf (2.0.3-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:16:16 -0700
+
 iperf (2.0.2-0) experimental; urgency=low
 
   * Changed version numbering.

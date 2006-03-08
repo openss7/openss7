@@ -1,0 +1,137 @@
+/*****************************************************************************
+
+ @(#) $Id: config.h.in,v 0.9.2.1 2006/03/08 11:18:02 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/03/08 11:18:02 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: config.h.in,v $
+ Revision 0.9.2.1  2006/03/08 11:18:02  brian
+ - completing package
+
+ *****************************************************************************/
+
+#ifndef __SYS_STRBCM_CONFIG_H__
+#define __SYS_STRBCM_CONFIG_H__
+
+#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+
+#undef CONFIG_STREAMS
+
+#undef CONFIG_STREAMS_MODULE
+
+#undef CONFIG_STREAMS_DEBUG
+
+#undef CONFIG_STREAMS_NONE
+
+#undef CONFIG_STREAMS_SAFE
+
+#undef CONFIG_STREAMS_TEST
+
+#undef _DEBUG
+
+#undef _NONE
+
+#undef _SAFE
+
+#undef _TEST
+
+#undef CONFIG_STREAMS_OVERRIDE_FIFOS
+
+#undef HAVE_KFUNC_PROCESS_GROUP
+
+#undef HAVE_KFUNC_TO_KDEV_T
+
+#undef HAVE_KINC_LINUX_HARDIRQ_H
+
+#undef HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
+
+#undef HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
+
+#undef HAVE_KTYPE_IRQRETURN_T
+
+#undef HAVE_LINUX_FAST_STREAMS
+
+#undef HAVE_KFUNC_READ_TRYLOCK
+#undef HAVE_KMACRO_READ_TRYLOCK
+#if HAVE_KFUNC_READ_TRYLOCK || HAVE_KMACRO_READ_TRYLOCK
+#define HAVE_READ_TRYLOCK 1
+#endif
+
+#undef HAVE_TIMESPEC_DO_SETTIMEOFDAY
+
+#undef HAVE___WAKE_UP_SYNC_ADDR
+
+#undef HAVE___WAKE_UP_SYNC_EXPORT
+
+#undef HAVE_KFUNC_WRITE_TRYLOCK
+#undef HAVE_KMACRO_WRITE_TRYLOCK
+#if HAVE_KFUNC_WRITE_TRYLOCK || HAVE_KMACRO_WRITE_TRYLOCK
+#define HAVE_WRITE_TRYLOCK 1
+#endif
+
+#undef HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
+#undef HAVE_KFUNC_SLEEP_ON
+#undef HAVE_KFUNC_SLEEP_ON_TIMEOUT
+
+#undef HAVE_KFUNC_PCIBIOS_FIND_CLASS
+#undef HAVE_KFUNC_PCIBIOS_FIND_DEVICE
+#undef HAVE_KFUNC_PCIBIOS_INIT
+#undef HAVE_KFUNC_PCIBIOS_PRESENT
+#undef HAVE_KFUNC_PCIBIOS_READ_CONFIG_BYTE
+#undef HAVE_KFUNC_PCIBIOS_READ_CONFIG_DWORD
+#undef HAVE_KFUNC_PCIBIOS_READ_CONFIG_WORD
+#undef HAVE_KFUNC_PCIBIOS_WRITE_CONFIG_BYTE
+#undef HAVE_KFUNC_PCIBIOS_WRITE_CONFIG_DWORD
+#undef HAVE_KFUNC_PCIBIOS_WRITE_CONFIG_WORD
+#undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
+#undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
+#undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
+#undef HAVE_KFUNC_PCI_DMA_SYNC_SG
+#undef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#undef HAVE_KFUNC_PCI_FIND_CLASS
+
+#endif				/* __SYS_STRBCM_CONFIG_H__ */

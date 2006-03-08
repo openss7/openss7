@@ -6,6 +6,13 @@
 	* Makefile.am: must clean out module symbols and caches for distcheck
 	* acinclude.m4: be smarter about which packages to build
 	* configure.ac (pkg_save_LIBS): correct error
+	* am/help.am: documented remove target
+	* am/openss7.am: added remove target and reverse recursive targets
+	* acinclude.m4: a little smarter still
+	* debian/changelog: updated release numbering
+	* debian/copyright: updated headers
+	* debian/control.in: updated deprecated references to LiS
+	* acinclude.m4: added strbcm package
 
 2006-03-06  Brian Bidulock  <bidulock@openss7.org>
 

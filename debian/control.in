@@ -10,12 +10,12 @@ Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-lis-core, @PACKAGE_LCNAME@-lis-core-@kversion@
 Conflicts: streams-core, @PACKAGE_LCNAME@-streams-core
-Description: Core LiS kernel modules for @PACKAGE_TITLE@
- Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for LiS.
- Includes assorted LiS drivers and modules for @PACKAGE_TITLE@.
- These binaries are heavily tied to the kernel for which they were compiled:
- applies to kernel version @kversion@ and requires an LiS package
- compiled for the same kernel.
+Description: Core Linux Fast-STREAMS kernel modules for @PACKAGE_TITLE@
+ Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for Linux
+ Fast-STREAMS.  Includes assorted Linux Fast-STREAMS drivers and modules for
+ @PACKAGE_TITLE@.  These binaries are heavily tied to the kernel
+ for which they were compiled: applies to kernel version @kversion@ and requires
+ a Linux Fast-STREAMS package compiled for the same kernel.
 
 Package: @PACKAGE_LCNAME@-streams-core-@kversion@-@krelease@
 Architecture: any
@@ -35,9 +35,10 @@ Architecture: any
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-lib, @PACKAGE_LCNAME@-lis-lib
-Description: Shared libraries for @PACKAGE_TITLE@ for LiS
- Run-time shared libraries necessary to run applications programs and utilities
- developed for @PACKAGE_SHORTTITLE@ for LiS.
+Description: Shared libraries for @PACKAGE_TITLE@ for
+ Linux Fast-STREAMS Run-time shared libraries necessary to run applications
+ programs and utilities developed for @PACKAGE_SHORTTITLE@ for Linux
+ Fast-STREAMS.
 
 Package: @PACKAGE_LCNAME@-streams-lib
 Architecture: any
@@ -54,9 +55,10 @@ Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-util, @PACKAGE_LCNAME@-lis-util
 Conflicts: @PACKAGE_LCNAME@-streams-util
-Description: Utitlity and test programs for @PACKAGE_TITLE@ and LiS
- Adminstration and configuration test utilities and commands for
- @PACKAGE_TITLE@ for LiS; also init scripts and configuration files.
+Description: Utitlity and test programs for @PACKAGE_TITLE@
+ and Linux Fast-STREAMS Adminstration and configuration test utilities and
+ commands for @PACKAGE_TITLE@ for Linux Fast-STREAMS;
+ also init scripts and configuration files.
 
 Package: @PACKAGE_LCNAME@-streams-util
 Architecture: any
@@ -64,9 +66,10 @@ Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-util, @PACKAGE_LCNAME@-streams-util
 Conflicts: @PACKAGE_LCNAME@-lis-util
-Description: Utitlity and test programs for @PACKAGE_TITLE@ and STREAMS
- Adminstration and configuration test utilities and commands for
- @PACKAGE_TITLE@ for STREAMS; also init scripts and configuration files.
+Description: Utitlity and test programs for @PACKAGE_TITLE@
+ and STREAMS Adminstration and configuration test utilities and commands for
+ @PACKAGE_TITLE@ for STREAMS; also init scripts
+ and configuration files.
 
 Package: @PACKAGE_LCNAME@-devel
 Architecture: any
@@ -74,10 +77,11 @@ Section: devel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-devel
 Description: C headers and static libraries for @PACKAGE_TITLE@
- Static libraries and kernel headers to develop @PACKAGE_TITLE@ modules and
- drivers; user-space headers and static libraries required to compile
- @PACKAGE_TITLE@ applications programs;  all @PACKAGE_TITLE@ manual pages and
- info files for both kernel and user-space functions.
+ Static libraries and kernel headers to develop @PACKAGE_TITLE@
+ modules and drivers; user-space headers and static libraries required to
+ compile @PACKAGE_TITLE@ applications programs;
+ all @PACKAGE_TITLE@ manual pages and info files for both
+ kernel and user-space functions.
 
 Package: @PACKAGE_LCNAME@-dev
 Architecture: all
@@ -103,7 +107,7 @@ Section: devel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-source
 Description: Source code for @PACKAGE_TITLE@
- Source code for building the @PACKAGE_TITLE@ release: autoconf configuration
- utilities necessary to create and distribute this dpkg -- required for
- recompiling against recompiled kernel.
+ Source code for building the @PACKAGE_TITLE@ release:
+ autoconf configuration utilities necessary to create and distribute this dpkg
+ -- required for recompiling against recompiled kernel.
 

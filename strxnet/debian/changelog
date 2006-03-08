@@ -1,3 +1,16 @@
+
+strxnet (0.9.2.8-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:26:05 -0700
+
+strxnet (0.9.2.7-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:26:05 -0700
+
 strxnet (0.9.2.6-0) experimental; urgency=low
 
   * Changed version numbering.

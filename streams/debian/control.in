@@ -19,9 +19,10 @@ Depends: kernel-image-@kversion@ (= @krelease@),
 Pre-Depends: kernel-image-@kversion@ (= @krelease@)
 Description: Core kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel SVR 4.2 MP STREAMS facility.
- Includes assorted LiS drivers and modules for @PACKAGE_TITLE@.
- These binaries are heavily tied to the kernel for which they were compiled:
- applies to kernel version @kversion@.
+ Includes assorted Linux Fast-STREAMS drivers and modules for
+ @PACKAGE_TITLE@.  These binaries are heavily tied to the
+ kernel for which they were compiled: applies to kernel version
+ @kversion@.
 
 Package: @PACKAGE_LCNAME@-info-@kversion@-@krelease@
 Architecture: any
@@ -84,7 +85,7 @@ Replaces: STREAMS-init
 Depends: @PACKAGE_LCNAME@-util(= @VERSION@-@PACKAGE_DEBRELEASE@), ${misc:Depends}
 Description: Init scripts and config files for @PACKAGE_TITLE@
  SysV init scripts and configuration files for @PACKAGE_TITLE@
- for LiS or STREAMS.
+ for Linux Fast-STREAMS.
 
 Package: @PACKAGE_LCNAME@-dev
 Architecture: all

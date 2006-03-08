@@ -1,3 +1,16 @@
+
+netperf (2.3.3-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:20:38 -0700
+
+netperf (2.3.2-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:20:38 -0700
+
 netperf (2.3.1-0) experimental; urgency=low
 
   * Changed version numbering.

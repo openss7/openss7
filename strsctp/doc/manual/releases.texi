@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.15 2006/03/03 11:46:59 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.16 2006/03/08 12:00:17 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,19 +54,23 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/03 11:46:59 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/08 12:00:17 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @c ----------------------------------------------------------------------------
 
 This is the OpenSS7 Release of the @value{PACKAGE_TITLE} tools, drivers and modules
-used with the @cite{Linux Fast-STREAMS} or @cite{Linux STREAMS} SVR 4.2 STREAMS utility for Linux.
+used with the @cite{Linux Fast-STREAMS} or
+@cite{Linux STREAMS}@footnote{@cite{Linux STREAMS} is buggy, unsupported and deprecated.  Do not use it.}
+SVR 4.2 STREAMS releases.
 
 The purpose of providing a separate release of this package was to separate the
-@value{PACKAGE_TITLE} tools, headers, drivers and modules from the @cite{Linux STREAMS} package for
-use with both @cite{Linux STREAMS} and @cite{Linux Fast-STREAMS} in preparation for replacement of
-the former by the later.
+@value{PACKAGE_TITLE} tools, headers, drivers and modules from the
+@cite{Linux STREAMS}@footnote{@cite{Linux STREAMS} is buggy, unsupported and deprecated.  Do not use it.}
+package for use with both
+@cite{Linux STREAMS}@footnote{@cite{Linux STREAMS} is buggy, unsupported and deprecated.  Do not use it.}
+and @cite{Linux Fast-STREAMS} in preparation for replacement of the former by the later.
 
 The following sections provide information on @value{PACKAGE_TITLE} releases as well as
 compatibility information of OpenSS7 release to mainstream UNIX releases of the core, modules and
@@ -94,14 +98,27 @@ Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
 @itemize @bullet
 @item A fairly LSB compliant GNU/Linux distribution.
 @footnote{@xref{GNU/Linux Distributions}, for more information.}
-@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.10)
+@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.15)
 @item glibc2 or better.
 @item GNU info (for info files).
 @item GNU groff (for man pages).
 @footnote{If you are using a Debian release, please make sure to install the groff extension package
 (@samp{groff_ext}), as it contains the @command{refer} or @command{grefer} commands necessary for
 including references in the manual pages.}
+@item OpenSS7 Linux Fast-STREAMS
+(@url{http://www.openss7.org/tarballs/streams-0.7a.5.tar.bz2, streams-0.7a.5} or better)
+@footnote{Although this an other OpenSS7 STREAMS packages will build and install with Linux STREAMS
+(LiS), @b{Linux STREAMS (LiS) is deprecated and cannot be supported because it is full of bugs!}}
+@item OpenSS7 STREAMS Compatibility Modules
+(@url{http://www.openss7.org/tarballs/strcompat-0.9.2.3.tar.bz2, strcompat-0.9.2.3} or better)
+@item OpenSS7 STREAMS XNS
+(@url{http://www.openss7.org/tarballs/strxns-0.9.2.3.tar.bz2, strxns-0.9.2.3} or better)
+@item OpenSS7 STREAMS XTI/TLI Library
+(@url{http://www.openss7.org/tarballs/strxnet-0.9.2.8.tar.bz2, strxnet-0.9.2.8} or better)
 @end itemize
+
+If you need to rebuild the package from sources with modifications, you will need a larger GNU
+toolchain as described in @xref{Downloading from CVS}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -214,12 +231,15 @@ you are welcome to sponsor the project with a test machine.
 @subsection Linux STREAMS
 @cindex Linux STREAMS
 
-The @cite{@value{PACKAGE_TITLE}} package is currently compatible with @cite{Linux STREAMS (LiS)},
+The @cite{@value{PACKAGE_TITLE}} package is currently compatible with
+@cite{Linux STREAMS},@footnote{@cite{Linux STREAMS} is buggy, unsupported and deprecated.  Do not use it.}
 however, to use the @cite{@value{PACKAGE_TITLE}} package with @cite{LiS} requires use of the OpenSS7
 release packages of @cite{LiS}.
-The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{LiS-2.18.2} release that
+The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{LiS-2.18.3} release that
 is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
 Page}.
+But, do not use @cite{LiS}: it is buggy, unsupported and deprecated.  Use @cite{Linux Fast-STREAMS}
+instead.
 
 @node Linux Fast-STREAMS
 @subsection Linux Fast-STREAMS

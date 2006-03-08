@@ -1,3 +1,16 @@
+
+openss7 (0.9.C-0) experimental; urgency=low
+
+  * Bumped version numbering for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:14:42 -0700
+
+openss7 (0.9.B-0) experimental; urgency=low
+
+  * Bumped version numbering for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:14:42 -0700
+
 openss7 (0.9.A-0) experimental; urgency=low
 
   * Changed version numbering.

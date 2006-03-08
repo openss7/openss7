@@ -1,3 +1,16 @@
+
+streams (0.7a.5-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:23:44 -0700
+
+streams (0.7a.4-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:23:44 -0700
+
 streams (0.7a.3-0) experimental; urgency=low
 
   * Changed version numbering.

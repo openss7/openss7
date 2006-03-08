@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/07 12:33:16 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/03/08 12:05:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/07 12:33:16 $ by $Author: brian $
+# Last Modified $Date: 2006/03/08 12:05:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -128,21 +128,26 @@ dnl _AUTOTEST
 # _OS7_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OS7_OPTIONS], [dnl
+    AC_ARG_WITH([ALL],
+		AS_HELP_STRING([--with-ALL],
+			       [include all packages in master pack @<:@disabled@:>@]),
+		[with_ALL="$withval"],
+		[with_ALL=''])
     AC_ARG_WITH([SCTP],
 		AS_HELP_STRING([--without-SCTP],
 			       [do not include SCTP in master pack @<:@detected@:>@]),
 		[with_SCTP="$withval"],
-		[with_SCTP=''])
+		[with_SCTP="$with_ALL"])
     AC_ARG_WITH([IPERF],
 		AS_HELP_STRING([--without-IPERF],
 			       [do not include IPERF in master pack @<:@detected@:>@]),
 		[with_IPERF="$withval"],
-		[with_IPERF=''])
+		[with_IPERF="$with_ALL"])
     AC_ARG_WITH([LIS],
 		AS_HELP_STRING([--with-LIS],
 			       [include LIS in master pack @<:@detected@:>@]),
 		[with_LIS="$withval"],
-		[with_LIS=''])
+		[with_LIS="$with_ALL"])
     AC_ARG_WITH([STREAMS],
 		AS_HELP_STRING([--without-STREAMS],
 			       [do not include STREAMS in master pack @<:@included@:>@]),
@@ -153,11 +158,16 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 			       [do not include STRCOMPAT in master pack @<:@included@:>@]),
 		[with_STRCOMPAT="$withval"],
 		[with_STRCOMPAT='yes'])
+    AC_ARG_WITH([STRBCM],
+		AS_HELP_STRING([--with-STRBCM],
+			       [include STRBCM in master pack @<:@detected@:>@]),
+		[with_STRBCM="$withval"],
+		[with_STRBCM='yes'])
     AC_ARG_WITH([STRUTIL],
 		AS_HELP_STRING([--with-STRUTIL],
 			       [include STRUTIL in master pack @<:@detected@:>@]),
 		[with_STRUTIL="$withval"],
-		[with_STRUTIL=''])
+		[with_STRUTIL='no'])
     AC_ARG_WITH([STRXNS],
 		AS_HELP_STRING([--without-STRXNS],
 			       [do not include STRXNS in master pack @<:@included@:>@]),
@@ -212,40 +222,27 @@ dnl _SCTP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_SCTP:-auto} = :auto ; then
-	if test :$USE_MAINTAINER_MODE = :yes ; then
-	    with_SCTP='yes'
+	if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
+	    with_SCTP='no'
 	else
-	    if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
-		with_SCTP='no'
-	    else
-		with_SCTP='yes'
-	    fi
+	    with_SCTP='yes'
 	fi
     fi
     if test :${with_IPERF:-auto} = :auto ; then
-	if test :$USE_MAINTAINER_MODE = :yes ; then
-	    with_IPERF='yes'
+	if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
+	    with_IPERF='no'
 	else
-	    if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
-		with_IPERF='no'
-	    else
-		with_IPERF='yes'
-	    fi
+	    with_IPERF='yes'
 	fi
     fi
     if test :${with_LIS:-auto} = :auto ; then
-	if test :$USE_MAINTAINER_MODE = :yes ; then
-	    with_LIS='yes'
-	else
-	    with_LIS='no'
-	fi
+	with_LIS='no'
     fi
     if test :${with_STRUTIL:-auto} = :auto ; then
-	if test :$USE_MAINTAINER_MODE = :yes ; then
-	    with_STRUTIL='yes'
-	else
-	    with_STRUTIL='no'
-	fi
+	with_STRUTIL='no'
+    fi
+    if test :${with_STRBCM:-auto} = :auto ; then
+	with_STRBCM='no'
     fi
     if test :${with_SCTP:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([sctp])
@@ -261,6 +258,9 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     fi
     if test :${with_STRCOMPAT:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strcompat])
+    fi
+    if test :${with_STRBCM:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strbcm])
     fi
     if test :${with_STRUTIL:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strutil])

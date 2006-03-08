@@ -1,5 +1,5 @@
-OpenSS7 Linux STREAMS (LiS) -- history of user-visible changes.  2006-03-01
-$Id: NEWS,v 1.1.6.12 2006/03/05 04:02:55 brian Exp $
+OpenSS7 Linux STREAMS (LiS) -- history of user-visible changes.  2006-03-07
+$Id: NEWS,v 1.1.6.13 2006/03/08 12:03:56 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
@@ -14,6 +14,10 @@ See the end for copying conditions.
   mailing list.  Builds on FC4 2.6.15 kernel and with gcc 4.0.2.
 
   Added in many of Paul's 64-bit corrections.
+
+  The package is still largely unusable on 64-bit or SMP kernels.  Linux
+  STREAMS IS DEPRECATED.  DO NOT USE IT.  THE PACKAGE CONTAINS MANY
+  URESOLVED BUGS.  USE Linux Fast-STREAMS INSTEAD.
 
 * Major changes in LiS-2.18.2
 

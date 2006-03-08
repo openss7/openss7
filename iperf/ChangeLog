@@ -1,6 +1,11 @@
 2006-03-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* iperf.spec.in: updated %description's
+	* am/help.am: documented remove target
+	* am/openss7.am: added remove target and reverse recursive targets
+	* debian/changelog: updated release numbering
+	* debian/copyright: updated headers
+	* debian/control.in: updated deprecated references to LiS
 
 2006-03-06  Brian Bidulock  <bidulock@openss7.org>
 

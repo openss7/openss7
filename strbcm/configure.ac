@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 01:08:25 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/08 11:48:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/08 01:08:25 $ by $Author: brian $
+# Last Modified $Date: 2006/03/08 11:48:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.4  2006/03/08 11:48:31  brian
+# - correction
+#
+# Revision 0.9.2.3  2006/03/08 11:46:48  brian
+# - corrections
+#
+# Revision 0.9.2.2  2006/03/08 11:42:09  brian
+# - setting up package
+#
 # Revision 0.9.2.1  2006/03/08 01:08:25  brian
 # - starting off package
 #
@@ -61,14 +70,14 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.1 2006/03/08 01:08:25 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.4 2006/03/08 11:48:31 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strbcm],[0.9.2],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
-AC_CONFIG_SRCDIR([src/pkg/README])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_SRCDIR([src/drivers/testdrv.c])
+AC_CONFIG_HEADERS([config.h src/include/sys/strbcm/config.h])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
@@ -145,14 +154,18 @@ AC_FUNC_MEMCMP
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS([alarm gettimeofday inet_ntoa memset strtol strtoul])
 
-AC_UTIL
+AC_BCM
 
 AC_CONFIG_FILES([Makefile
 		 scripts/texi/args.texi
+		 src/include/Makefile
+		 src/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
 		 doc/manual/texi/args.texi
-		 doc/manual/Makefile])
+		 doc/manual/Makefile
+		 src/modules/Config
+		 src/drivers/Config])
 
 AC_OUTPUT
 
