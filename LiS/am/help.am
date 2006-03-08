@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: help.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/06 11:35:14 $
+# @(#) $RCSfile: help.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/08 00:04:59 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/06 11:35:14 $ by $Author: brian $
+## Last Modified $Date: 2006/03/08 00:04:59 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: help.am,v $
+## Revision 0.9.2.11  2006/03/08 00:04:59  brian
+## - added help for remove target
+##
 ## Revision 0.9.2.10  2006/03/06 11:35:14  brian
 ## - updated headers
 ##
@@ -154,6 +157,10 @@
 #!     any of the files in that build directory.
 #!
 #!     This target requires root privilege.
+#!
+#! remove:
+#!     This target is like `uninstall' with the exception that it uninstalls in
+#!     the reverse order that installation was performed.
 #!
 #! Configure Options:
 #! ------------------

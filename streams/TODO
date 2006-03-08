@@ -1,4 +1,4 @@
-OpenSS7 Linux Fast STREAMS -- things to do.  2006-03-01
+OpenSS7 Linux Fast STREAMS -- things to do.  2006-03-07
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -9,6 +9,8 @@ Things to do:
   be able to recover from panics caused by misbehaving STREAMS modules
   or drivers.
 
+  TODO: Register panic notifier.
+
 - More performance testing and profiling on SMP.  On the same kernel
   running non-SMP we get pipe performance of about 80-90% of a Linux
   native pipe.  Just running an SMP kernel drops this to 60%
@@ -18,19 +20,6 @@ Things to do:
   profiling information is out of date and needs to be updated.
 
   TODO: Profile and performance test on SMP.
-
-- 32bit compatibility:- Not done yet, but a plan in place.  Override
-  stupid CDROM ioctl conversions on kernels before 2.6.11, use
-  compat_ioctl after that.  For the older read/write interface it will
-  be necessary to have two "magic" lengths: one the same as the old one
-  for 32-bit and a new 64-bit "magic" length.  This is so that the
-  internal function can convert.  Perhaps it can really be the same
-  number in the lower 32-bits.  Note that on later kernels there is a
-  CONFIG_COMPAT define that we might want to check in the configure
-  script.
-
-  DONE: Tested on x86_64 with i686.
-  TODO: Documentation of new registration functions.
 
 - Per cpu data:- I am still using the older approach of using cacheline
   aligned arrays for per-cpu data.  This, of course, does not fully
@@ -44,6 +33,10 @@ Things to do:
   TODO: Convert cacheline aligned arrays to NUMA per-cpu data on 2.6
         kernels.  Complete NUMA supporting STREAMS facilities.
 
+- Timers and Buffer callbacks:- Still haven't tested these.
+
+  TODO: Test.
+
 - I am interested to convert the perftest program to use a FIFO instead
   of a pipe.  This is because a FIFO is more closely related to a Linux
   Native pipe (i.e it has a read side and a write side, is really only
@@ -53,9 +46,18 @@ Things to do:
   DONE: Tested.  Results were unimpressive.  STREAMS FIFOs perform about
         1% better than STREAMS-based pipes.
 
-- Timers and Buffer callbacks:- Still haven't tested these.
+- 32bit compatibility:- Not done yet, but a plan in place.  Override
+  stupid CDROM ioctl conversions on kernels before 2.6.11, use
+  compat_ioctl after that.  For the older read/write interface it will
+  be necessary to have two "magic" lengths: one the same as the old one
+  for 32-bit and a new 64-bit "magic" length.  This is so that the
+  internal function can convert.  Perhaps it can really be the same
+  number in the lower 32-bits.  Note that on later kernels there is a
+  CONFIG_COMPAT define that we might want to check in the configure
+  script.
 
-  TODO: Test.
+  DONE: Tested on x86_64 with i686.
+  DONE: Documentation of new registration functions.
 
 - SMP:- Finally got at least a Hyper-Threaded Intel 630 for testing.
   There are some issues discovered when running the test suites.

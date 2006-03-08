@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2006/03/06 11:35:14 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2006/03/08 00:05:12 $
 #
 #! -----------------------------------------------------------------------------
 #!
@@ -46,11 +46,14 @@
 #!
 #! -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/06 11:35:14 $ by $Author: brian $
+## Last Modified $Date: 2006/03/08 00:05:12 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.88  2006/03/08 00:05:12  brian
+## - added remove and reverse recursive targets
+##
 ## Revision 0.9.2.87  2006/03/06 11:35:14  brian
 ## - updated headers
 ##
@@ -162,6 +165,9 @@ else
 MAINTAINER_MODE = no
 endif
 
+##
+## Like automake recursive targets, but mine.
+##
 MY_RECURSIVE_TARGETS =
 
 $(MY_RECURSIVE_TARGETS):
@@ -169,72 +175,96 @@ $(MY_RECURSIVE_TARGETS):
 	@set fnord $$MAKEFLAGS ; amf=$$2 ; dot_seen=no ; \
 	target=`$(ECHO) $@ | sed s/-recursive//` ; \
 	list='$(SUBDIRS)' ; for subdir in $$list ; do \
+	     if test "$$subdir" = "." ; then dot_seen=yes ; fi ; \
+	done ; \
+	if test "$$dot_seen" = "no" ; then list="$$list ." ; fi ; \
+	for subdir in $$list ; do \
 		case " m4 intl po " in *" $$subdir "*) continue ;; esac ; \
 		$(ECHO) "Making $$target in $$subdir" ; \
-		if test "$$subdir" = "." ; then \
-			dot_seen=yes ; \
-			local_target="$$target-am" ; \
-		else \
-			local_target="$$target" ; \
-		fi ; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local_target)" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local_target) \
+		if test "$$subdir" = "." ; then target="$$target-am" ; fi ; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
 	done ; \
-	if test "$$dot_seen" = "no" ; then \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) \"$$target-am\"" ; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) "$$target-am" || exit 1 ; \
-	fi ; test -z "$$fail"
+	test -z "$$fail"
 
 MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
 
-ALL_EXPORT_OPTS =
+##
+## Like automake recursive targets, except that they execute subdirectories in the reverse order.
+## We also try to override uninstall-recursive.  Automake will probably complain violently.
+##
+MY_REVERSIVE_TARGETS = release-clean-recursive
 
-ALL_RECURSIVE_TARGETS = all-check all-distcheck all-installcheck
+$(MY_REVERSIVE_TARGETS):
+	@$(ECHO) "Making $@ in `pwd`"
+	@set fnord $$MAKEFLAGS ; amf=$$2 ; dot_seen=no ; \
+	target=`$(ECHO) $@ | sed s/-recursive//` ; \
+	list='' ; rev='$(subdirs)' ; for subdir in $$rev ; do \
+	     	if test "$$subdir" = "." ; then dot_seen=yes ; fi ; \
+		list="$$subdir $$list" ; \
+	done ; \
+	if test "$$dot_seen" = "no" ; then list=". $$list" ; fi ; \
+	for subdir in $$list ; do \
+		echo "Making $$target in $$subdir" ; \
+		if test "$$subdir" = "." ; then target="$$target-am" ; fi ; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
+	done ; \
+	test -z "$$fail"
+
+MY_PHONY	+= $(MY_REVERSIVE_TARGETS)
+
+##
+## Like automake recursive targets, except that they do not execute in the current directory, only
+## subdirectories.
+##
+ALL_RECURSIVE_TARGETS = all-check all-distcheck all-installcheck all-install
+
+ALL_EXPORT_OPTS =
 
 $(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 $(ALL_RECURSIVE_TARGETS):
 	@$(ECHO) "Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS ; amf=$$2 ; \
 	target=`$(ECHO) $@ | sed -e 's|^all-||'` ; \
-	list='$(subdirs)' ; for subdir in $$list ; do \
+	list='$(subdirs)' ; \
+	for subdir in $$list ; do \
+		if test "$$subdir" = "." ; then continue ; fi ; \
 		$(ECHO) "Making $$target in $$subdir" ; \
 		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
-	done ; test -z "$$fail"
+	done ; \
+	test -z "$$fail"
 
-ALL_RECURSIVE_CLEAN_TARGETS =
+MY_PHONY	+= $(ALL_RECURSIVE_TARGETS)
 
-release-clean-recursive:
+##
+## Like automake recursive targets, except that they do not execute in the current directory, and
+## operate on subdirectories in reverse order.
+##
+ALL_REVERSIVE_TARGETS = all-uninstall
+
+$(ALL_REVERSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+$(ALL_REVERSIVE_TARGETS):
 	@$(ECHO) "Making $@ in `pwd`"
-	@failcom='exit 1' ; \
-	for f in x $$MAKEFLAGS ; do \
-		case $$f in \
-			*=* | --[!k]*) ;; \
-			*k*) failcom='fail=yes' ;; \
-		esac ; \
+	@set fnord $$MAKEFLAGS ; amf=$$2 ; \
+	target=`$(ECHO) $@ | sed -e 's|^all-||'` ; \
+	list='' ; rev='$(subdirs)' ; for subdir in $$rev ; do \
+		list="$$subdir $$list" ; \
 	done ; \
-	dot_seen=no ; \
-	rev='' ; list='$(subdirs)' ; for subdir in $$list ; do \
-	    	if test "$$subdir" = "." ; then :; else \
-			rev="$$subdir $$rev" ; \
-		fi ; \
+	for subdir in $$list ; do \
+		if test "$$subdir" = "." ; then continue ; fi ; \
+		$(ECHO) "Making $$target in $$subdir" ; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
 	done ; \
-	target=`echo $@ | sed s/-recursive//` ; \
-	for subdir in $$rev ; do \
-		echo "Making $$target in $$subdir" ; \
-		if test "$$subdir" = "." ; then \
-			local_target="$$target-am" ; \
-		else \
-			local_target="$$target" ; \
-		fi ; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local_target)" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local_target) \
-		|| eval $$failcom ; \
-	done && test -z "$$fail"
+	test -z "$$fail"
 
-MY_PHONY	+= $(ALL_RECURSIVE_TARGETS) release-clean-recursive
+MY_PHONY	+= $(ALL_REVERSIVE_TARGETS)
 
 ##
 # directory for test suites and other test programs
@@ -399,7 +429,7 @@ pre-uninstall: pre-uninstall-recursive
 
 pre-uninstall-am: $(PRE_UNINSTALL_AM)
 
-MY_RECURSIVE_TARGETS	+= pre-uninstall-recursive
+MY_REVERSIVE_TARGETS	+= pre-uninstall-recursive
 MY_PHONY		+= pre-uninstall pre-uninstall-am
 
 uninstall-local: pre-uninstall-am $(UNINSTALL_LOCAL)
@@ -410,7 +440,7 @@ post-uninstall: post-uninstall-am
 
 post-uninstall-am: $(POST_UNINSTALL_AM)
 
-MY_RECURSIVE_TARGETS	+= post-uninstall-recursive
+MY_REVERSIVE_TARGETS	+= post-uninstall-recursive
 MY_PHONY		+= post-uninstall post-uninstall-am
 
 mostlyclean-local: $(MOSTLYCLEAN_LOCAL)
@@ -435,6 +465,13 @@ retest-am: $(RETEST_AM)
 
 MY_RECURSIVE_TARGETS	+= retest-recursive
 MY_PHONY		+= retest retest-am
+
+remove: remove-recursive
+
+remove-am: uninstall-am
+
+MY_REVERSIVE_TARGETS	+= remove-recursive
+MY_PHONY		+= remove remove-am
 
 #!
 #! Release Targets:
@@ -480,7 +517,7 @@ release-clean: release-clean-recursive release-clean-am
 ##
 LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log distcheck.log \
 		  rpms.log sign.log rebuild.log resign.log uninstall.log release.log \
-		  release-sign.log srpm.log
+		  release-sign.log srpm.log remove.log
 
 #!
 #! Logging targets:
@@ -498,7 +535,8 @@ LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log di
 #!
 #! First the common ones:
 #!
-#! 	compile.log, check.log, install.log, installcheck.log, uninstall.log
+#! 	compile.log, check.log, install.log, installcheck.log, uninstall.log,
+#! 	remove.log
 #!
 #! and the maintainer mode ones:
 #!

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/03/04 04:37:35 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/03/08 00:03:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 04:37:35 $ by $Author: brian $
+ Last Modified $Date: 2006/03/08 00:03:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.142  2006/03/08 00:03:56  brian
+ - ioctl32 functions are streams calls
+
  Revision 0.9.2.141  2006/03/04 04:37:35  brian
  - corrections for FC4 x86_64 gcc 4.0.4 build
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/03/04 04:37:35 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/03/08 00:03:56 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/03/04 04:37:35 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/03/08 00:03:56 $";
 
 //#define __NO_VERSION__
 
@@ -169,7 +172,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/03/04 04:37:35 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/03/08 00:03:56 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -9322,7 +9325,7 @@ _strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 	return _strioctl(file, cmd, arg);
 }
 
-__unlikely void *
+__unlikely streams_fastcall void *
 register_ioctl32(unsigned int cmd)
 {
 	/* when the kernel has compat_ioctl all ioctl values will be delivered to the driver and
@@ -9331,7 +9334,7 @@ register_ioctl32(unsigned int cmd)
 }
 EXPORT_SYMBOL(register_ioctl32);
 
-__unlikely void
+__unlikely streams_fastcall void
 unregister_ioctl32(void *opaque)
 {
 	/* when the kernel has compat_ioctl all ioctl values will be delivered to the driver and
@@ -9624,7 +9627,7 @@ streams_unregister_ioctl32_conversions(void)
  *  Stream head).  Otherwise, each 32 bit ioctl issued with the corresponding command will just
  *  return EINVAL.
  */
-__unlikely void *
+__unlikely streams_fastcall void *
 register_ioctl32(unsigned int cmd)
 {
 	struct ioctl_trans *t;
@@ -9643,7 +9646,7 @@ EXPORT_SYMBOL(register_ioctl32);
  *  unregister_ioctl32: - register ioctl for 32bit compatibility
  *  @opaque: the opaque pointer returned by register_ioctl32()
  */
-__unlikely void
+__unlikely streams_fastcall void
 unregister_ioctl32(void *opaque)
 {
 	struct ioctl_trans *t;
@@ -9657,7 +9660,7 @@ EXPORT_SYMBOL(unregister_ioctl32);
 #endif				/* defined HAVE_COMPAT_IOCTL */
 #else				/* defined WITH_32BIT_CONVERSION */
 
-__unlikely void *
+__unlikely streams_fastcall void *
 register_ioctl32(unsigned int cmd)
 {
 	/* when the kernel has compat_ioctl all ioctl values will be delivered to the driver and
@@ -9666,7 +9669,7 @@ register_ioctl32(unsigned int cmd)
 }
 EXPORT_SYMBOL(register_ioctl32);
 
-__unlikely void
+__unlikely streams_fastcall void
 unregister_ioctl32(void *opaque)
 {
 	/* when the kernel has compat_ioctl all ioctl values will be delivered to the driver and
