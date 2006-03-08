@@ -1,3 +1,75 @@
+2006-03-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/mscript_header.in: added
+	* debian/mscript_postinst.in: added
+	* debian/mscript_postrm.in: added
+	* debian/mscript_preinst.in: added
+	* debian/mscript_prerm.in: added
+	* debian/strbcm-core.postinst.in: added
+	* debian/strbcm-core.postrm.in: added
+	* debian/strbcm-core.preinst.in: added
+	* debian/strbcm-core.prerm.in: added
+	* debian/strbcm-devel.preinst.in: added
+	* debian/strbcm-dev.postinst.in: added
+	* debian/strbcm-dev.preinst.in: added
+	* debian/strbcm-dev.prerm.in: added
+	* debian/strbcm-doc.postinst.in: added
+	* debian/strbcm-doc.preinst.in: added
+	* debian/strbcm-doc.prerm.in: added
+	* debian/strbcm-init.postinst.in: added
+	* debian/strbcm-init.postrm.in: added
+	* debian/strbcm-init.preinst.in: added
+	* debian/strbcm-init.prerm.in: added
+	* debian/strbcm-lib.preinst.in: added
+	* debian/strbcm-source.preinst.in: added
+	* debian/strbcm-util.preinst.in: added
+	* doc/.cvsignore: added
+	* doc/Makefile.am: added
+	* doc/man/.cvsignore: added
+	* doc/man/Makefile.am: added
+	* doc/man/strbcm.macros: added
+	* doc/man/strbcm.refs: added
+	* doc/manual/.cvsignore: added
+	* doc/manual/Makefile.am: added
+	* doc/manual/strbcm.texi: added
+	* doc/manual/configure.texi: added
+	* doc/manual/releases.texi: added
+	* doc/manual/rpm.texi: added
+	* doc/manual/tree.texi: added
+	* Makefile.am: added
+	* src/.cvsignore: added
+	* src/drivers/Config.in: added
+	* src/drivers/testdrv.c: added
+	* src/drivers/testdrv.h: added
+	* src/include/.cvsignore: added
+	* src/include/Makefile.am: added
+	* src/include/sys/strbcm/config.h.in: added
+	* src/include/sys/strbcm/version.h.in: added
+	* src/.indent.pro: added
+	* src/Makefile.am: added
+	* src/modules/Config.in: added
+	* src/modules/testmod.c: added
+	* src/modules/testmod.h: added
+	* src/util/init/README: added
+	* src/util/init/strbcm: added
+	* src/util/init/strbcm.sh: added
+	* src/util/modutils/strbcm.in: added
+	* src/util/sysconfig/README: added
+	* src/util/sysconfig/strbcm: added
+	* src/util/sysconfig/strbcm.conf: added
+	* src/test/test-bcm.c: added
+	* tests/.cvsignore: added
+	* tests/Makefile.am: added
+	* tests/atlocal.in: added
+	* tests/dummy1.m4: added
+	* tests/dummy2.m4: added
+	* tests/dummy3.m4: added
+	* tests/dummy4.m4: added
+	* tests/kernel.at: added
+	* tests/local.at: added
+	* tests/testsuite.at: added
+	* acinclude.m4: added
+
 2006-03-07  Brian Bidulock  <bidulock@openss7.org>
 
 	- started off this new binary compatibility modules package
@@ -27,6 +99,12 @@
 	* strbcm.tif: added
 	* strbcm.xcf: added
 	* strbcm.xpm: added
+	* debian/README.Debian: added
+	* debian/TODO.Debian: added
+	* debian/changelog: added
+	* debian/copyright: updated headers
+	* debian/control.in: added
+	* debian/rules.in: added
 
 -----
 

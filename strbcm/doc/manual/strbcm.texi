@@ -1,0 +1,594 @@
+% -*- texinfo -*- vim: ft=texinfo
+% =========================================================================
+%
+% @(#) $Id: strbcm.texi,v 0.9.2.1 2006/03/08 08:20:14 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2006/03/08 08:20:14 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename strutil.info
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+@settitle @value{MANUAL_TITLE}
+
+@dircategory Kernel
+@direntry
+* OpenSS7 UTIL: (@value{PACKAGE_TARNAME}).	An Open STREAMS Utilities Package.
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{VERSION}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
+All Rights Reserved. @*
+
+@noindent
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
+documentation, and is consistent with @value{PACKAGE_TARNAME} @value{PACKAGE_VERSION}.
+This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
+Project} and was funded in part by
+@uref{http://www.openss7.com/, OpenSS7 Corporation}.
+
+@noindent
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@noindent
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+@noindent
+Permission is granted to copy and distribute translations of this manual into
+another language, under the same conditions as for modified versions.
+
+@vskip 0pt
+@end titlepage
+@page
+
+@c Define an index of authors.
+@defindex au
+
+@c Define an index of configure output variables.
+@c @defcodeindex ov
+
+@c Define an index of configure variables.
+@c @defcodeindex cv
+
+@c Define an index of options.
+@defcodeindex op
+
+@c Define an index of targets.
+@c @defcodeindex tr
+
+@c Define an index of commands.
+@c @defcodeindex cm
+
+@c Put the macros and variables into their own index.
+@c @syncodeindex fn cp
+@c @syncodeindex ov vr
+@c @syncodeindex cv vr
+@c @syncodeindex fn vr
+
+@c Put everything else into one index (arbitrarily chosen to be the concept index).
+@c @syncodeindex op cp
+@c @syncodeindex tr cp
+@c @syncodeindex cm cp
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of @cite{The
+@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Acknowledgments::		Sponsors and Contributors
+
+* Introduction::		Introduction to the package
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
+
+* GPL::				GNU General Public License
+* LGPL::			GNU Lesser General Public License
+* FDL::				GNU Free Documentation License
+
+* Indices::			Index of Indices
+
+ ----- detailed node listing -----
+
+Acknowledgments
+
+* Sponsors::			Sponsors of the package
+* Contributors::		People who contributed to the development of
+				the package.
+Introduction
+
+* Notice::			Notice
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
+
+Reference
+
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Utilities::			Utilities
+* Development::			Development against the package
+
+Conformance
+
+Releases
+
+* Prerequisites::		Prerequisite packages
+* Compatibility::		Compatibility Issues
+* Release Notes::		Release Notes
+* Maturity::			Package Maturity
+* Bugs::			Package Defects
+* Schedule::			Development and Bug Fix Schedule
+* History::			Project History
+
+Installation
+
+* Downloading::			Downloading the package
+* Configuration::		Configuration of the package
+* Building::			Building the package
+* Installing::			Installing the package
+* Removal::			Removal of the package
+* Loading::			Loading the package
+
+Troubleshooting
+
+* Test Suites::			Test Suites for the package
+* Problem Reports::		Problem Reports for the package
+* Known Bugs::			Known Bugs in the package
+
+Indices
+
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@node Acknowledgments
+@unnumbered Acknowledgments
+@cindex credits
+
+@include texi/funding.texi
+
+@ignore
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @cite{Free Software Foundation} and the @cite{Linux Kernel
+Community}.
+
+@menu
+* Sponsors::			Sponsors
+* Contributors::		Contributors
+@end menu
+
+@node Sponsors
+@unnumberedsec Sponsors
+@cindex sponsors
+
+Funding for completion of the @value{PACKAGE_TITLE} package was provided in part by:
+
+@itemize
+@item OpenSS7 Corporation
+@end itemize
+
+@noindent
+Additional funding for The OpenSS7 Project was provided by:
+
+@itemize
+@item OpenSS7 Corporation
+@item Lockheed Martin
+@item Performance Technologies
+@item Motorola
+@item HOB International
+@item Comverse
+@item Sonus Networks
+@item France Telecom
+@item SS8 Networks
+@end itemize
+
+@node Contributors
+@unnumberedsec Contributors
+@cindex contributors
+
+The primary contributor to the OpenSS7 @value{PACKAGE_TITLE} package is
+@email{bidulock@@openss7.org, Brian F. G. Bidulock}.  The following is a list
+of significant contributors to the project:
+
+@itemize
+@item Per Berquist
+@item John Boyd
+@item Chuck Winters
+@item Peter Courtney
+@item Tom Chandler
+@item Gurol Akman
+@item Kutluk Testicioglu
+@item Others
+@end itemize
+
+@end ignore
+
+@node Introduction
+@chapter Introduction
+@cindex introduction
+
+This manual documents the design, implementation, installation, operation and
+future development schedule of the @value{PACKAGE_TITLE} package.
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Notice::			Notice
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
+@end menu
+
+@node Notice
+@section Notice
+@cindex notice
+
+This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
+@uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and modules previously
+part of @cite{Linux STREAMS}@footnote{@xref{Top, Top, About This Manual, LiS, Linux STREAMS (LiS)
+Installation and Reference Manual}.}.  In stark contrast to many other software packages released by
+@uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
+other parties.
+@cindex licensing
+
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
+General Public License}).
+Please note, however, that there are different licensing terms for the manual pages and some of the
+documentation (derived from X/Open publications and other sources).  Consult the permission notices
+contained in the documentation for more information.  This document is released under the @cite{GNU
+Free Documentation License} (@pxref{FDL}) with all sections invariant.
+
+@node Overview
+@section Overview
+@cindex overview
+
+This manual documents the design, implementation, installation, operation and future development of
+the @value{PACKAGE_TITLE} package.
+
+@node Organization
+@section Organization of this Document
+@cindex organization
+
+This document is organized (loosely) into several sections as follows:
+
+@ifnottex
+@menu
+  Introduction::		This introduction
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
+@end menu
+@end ifnottex
+@iftex
+@multitable @columnfractions .50 .50
+@item @ref{Introduction}.
+@tab This introduction
+@item @ref{Reference}.
+@tab Contents of the package
+@item @ref{Conformance}.
+@tab Conformance of the package
+@item @ref{Releases}.
+@tab Releases of the package
+@item @ref{Installation}.
+@tab Installation of the package
+@item @ref{Troubleshooting}.
+@tab Troubleshooting of the package
+@end multitable
+@end iftex
+
+@node Conventions
+@section Conventions and Definitions
+@cindex conventions
+@cindex definitions
+
+This manual uses @cite{texinfo} typographic conventions.
+
+@c ----------------------------------------------------------------------------
+
+@node Reference
+@chapter Reference
+@cindex reference
+
+@menu
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Utilities::			Utilities
+* Development::			Development against the package
+@end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Files
+@section Files
+@cindex headers
+
+@include tree.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Drivers
+@section Drivers
+@cindex drivers
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Modules
+@section Modules
+@cindex modules
+
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Utilities
+@section Utilities
+@cindex utilities
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Development
+@section Development
+@cindex developing
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Conformance
+@chapter Conformance
+@cindex conformance
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Releases
+@chapter Releases
+@cindex releases
+
+@include releases.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Installation
+@chapter Installation
+@cindex installation
+
+@include texi/install.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Troubleshooting
+@chapter Troubleshooting
+@cindex troubleshooting
+
+@include texi/testsuite.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node GPL
+@appendix GPL
+@cindex license GPL
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+@include texi/gpl.texi
+
+@node LGPL
+@appendix LGPL
+@cindex license LGPL
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+@include texi/lesser.texi
+
+@node FDL
+@appendix FDL
+@cindex license FDL
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+@include texi/fdl.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Indices
+@appendix Indices
+@cindex indices
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+* Author Index::		Index of Authors
+@end menu
+
+@node Concept Index
+@appendixsec Index of Concepts
+@printindex cp
+
+@node Type Index
+@appendixsec Index of Data Types
+@printindex tp
+
+@node Function Index
+@appendixsec Index of Functions and Macros
+@printindex fn
+
+@node Variable Index
+@appendixsec Index of Variables and Constants
+@printindex vr
+
+@node File Index
+@appendixsec Index of Files and Programs
+@printindex pg
+
+@node Option Index
+@appendixsec Index of Configuration Options
+@printindex op
+
+@node Author Index
+@appendixsec Index of Authors
+@printindex au
+
+@c ----------------------------------------------------------------------------
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+
+@c ============================================================================
