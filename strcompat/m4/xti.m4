@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/08 12:03:21 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/09 04:48:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:03:21 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 04:48:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,7 +77,7 @@ AC_DEFUN([_XTI], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XTI_OPTIONS], [dnl
     AC_ARG_WITH([xti],
-		AC_HELP_STRING([--with-xti=HEADERS],
+		AS_HELP_STRING([--with-xti=HEADERS],
 			       [specify the XTI header file directory.
 				@<:@default=$INCLUDEDIR/xti@:>@]),
 		[with_xti="$withval"],

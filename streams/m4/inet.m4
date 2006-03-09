@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/08 12:03:21 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/09 04:48:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:03:21 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 04:48:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,7 +77,7 @@ dnl AC_SUBST([INET_LDADD])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_OPTIONS], [dnl
     AC_ARG_WITH([inet],
-		AC_HELP_STRING([--with-inet=HEADERS],
+		AS_HELP_STRING([--with-inet=HEADERS],
 			       [specify the INET header file directory.
 				@<:@default=$INCLUDEDIR/strinet@:>@]),
 		[with_inet="$withval"],

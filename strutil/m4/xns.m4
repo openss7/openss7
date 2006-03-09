@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/08 12:03:21 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/09 04:48:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:03:21 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 04:48:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,7 +77,7 @@ dnl AC_SUBST([XNS_LDADD])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_OPTIONS], [dnl
     AC_ARG_WITH([xns],
-		AC_HELP_STRING([--with-xns=HEADERS],
+		AS_HELP_STRING([--with-xns=HEADERS],
 			       [specify the XNS header file directory.
 				@<:@default=$INCLUDEDIR/strxns@:>@]),
 		[with_xns="$withval"],

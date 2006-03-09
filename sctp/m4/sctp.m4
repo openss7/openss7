@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/08 12:03:21 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/09 04:48:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:03:21 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 04:48:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,7 +78,7 @@ dnl AC_SUSBT([SCTP_LDADD])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP_OPTIONS], [dnl
     AC_ARG_WITH([sctp],
-		AC_HELP_STRING([--with-sctp=HEADERS],
+		AS_HELP_STRING([--with-sctp=HEADERS],
 			       [specify the SCTP header file directory.
 				@<:@default=$INCLUDEDIR/strsctp@:>@]),
 		[with_sctp="$withval"],

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/12/23 04:54:36 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/03/09 04:48:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/23 04:54:36 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 04:48:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -187,7 +187,7 @@ AC_DEFUN([_OPENSS7_OPTIONS], [dnl
 AC_DEFUN([_OPENSS7_OPTIONS_CHECK], [dnl
     AC_MSG_CHECKING([for preinstall tests on check])
     AC_ARG_ENABLE([checks],
-	AC_HELP_STRING([--enable-checks],
+	AS_HELP_STRING([--enable-checks],
 	    [enable preinstall checks. @<:@default=auto@:>@]),
 	[enable_checks="$enableval"], [dnl
 	     if test :"${USE_MAINTAINER_MODE:-no}" != :no

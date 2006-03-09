@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/04 19:57:39 $
+# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/09 04:48:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:39 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 04:48:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,7 +69,7 @@ AC_DEFUN([_AUTOTEST], [dnl
 AC_DEFUN([_AUTOTEST_OPTIONS], [dnl
     AC_MSG_CHECKING([for autotest on installcheck])
     AC_ARG_ENABLE([autotest],
-	AC_HELP_STRING([--enable-autotest],
+	AS_HELP_STRING([--enable-autotest],
 	    [enable pre- and post-install testing.  @<:@default=auto@:>@]),
 	[enable_autotest="$enableval"], [dnl
 	    if test :"${USE_MAINTAINER_MODE:-no}" != :no

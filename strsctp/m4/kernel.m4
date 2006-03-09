@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2006/02/13 22:48:59 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2006/03/09 04:40:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/02/13 22:48:59 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 04:40:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1249,9 +1249,9 @@ dnl
 	    AC_MSG_ERROR([
 *** 
 *** The kernel compiler was:
-***   \`$linux_cv_k_compiler',
+***   "$linux_cv_k_compiler",
 *** and the current compiler is:
-***   \`$linux_cv_compiler'.
+***   "$linux_cv_compiler".
 *** 
 *** These compilers do not match, not even in version.
 *** This will cause real problems later.  Cannot proceed.
@@ -1261,9 +1261,9 @@ dnl
 	    AC_MSG_WARN([
 *** 
 *** The kernel compiler was:
-***   \`$linux_cv_k_compiler',
+***   "$linux_cv_k_compiler",
 *** and the current compiler is:
-***   \`$linux_cv_compiler'.
+***   "$linux_cv_compiler".
 *** 
 *** These compilers do not match.
 *** This will cause problems later.
@@ -1275,9 +1275,9 @@ dnl
 	    AC_MSG_WARN([
 *** 
 *** The kernel compiler was:
-***   \`$linux_cv_k_compiler',
+***   "$linux_cv_k_compiler",
 *** and the current compiler is:
-***   \`$linux_cv_compiler'.
+***   "$linux_cv_compiler".
 *** 
 *** Configure cannot determine whether the compilers match or do not match.
 *** This will cause problems later.
