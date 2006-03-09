@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-bcm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:21:33 $
+ @(#) $RCSfile: test-bcm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/08 23:20:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/08 11:21:33 $ by $Author: brian $
+ Last Modified $Date: 2006/03/08 23:20:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-bcm.c,v $
+ Revision 0.9.2.2  2006/03/08 23:20:43  brian
+ - changes for successful build
+
  Revision 0.9.2.1  2006/03/08 11:21:33  brian
  - added test program
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-bcm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:21:33 $"
+#ident "@(#) $RCSfile: test-bcm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/08 23:20:43 $"
 
-static char const ident[] = "$RCSfile: test-bcm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:21:33 $";
+static char const ident[] = "$RCSfile: test-bcm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/08 23:20:43 $";
 
+int main(int argc, char *argv[]) {
+	return (0);
+}

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 08:20:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/08 23:20:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/08 08:20:05 $ by $Author: brian $
+# Last Modified $Date: 2006/03/08 23:20:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/03/08 23:20:40  brian
+# - changes for successful build
+#
 # Revision 0.9.2.1  2006/03/08 08:20:05  brian
 # - starting off strbcm package
 #
@@ -126,7 +129,7 @@ EXTRA_LIBRARIES			+=
 EXTRA_libBCMlink_a_SOURCES	= 
 libBCMlink_a_SOURCES		= 
 libBCMlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libBCMlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=strutil $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libBCMlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=strbcm $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libBCMlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libBCMlink_a_OBJECTS):	$(libBCMlink_a_SOURCES) $(libBCMlink_a_DEPENDENCIES)
@@ -243,22 +246,20 @@ if INSTALL_INITSCRIPTS
 if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		= 
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@.sh
 
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		= 
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		= \
-				  strbcm.conf
+dist_sysconf_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@.conf
 
-dist_config_DATA		= \
-				  src/util/sysconfig/strbcm
+dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
 
 ## INSTALL_INITSCRIPTS
 endif

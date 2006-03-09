@@ -69,6 +69,17 @@
 	* tests/local.at: added
 	* tests/testsuite.at: added
 	* acinclude.m4: added
+	* Makefile.am: corrected for build (proper path to init and configuration files)
+	* debian/rules.in (tools): corrected for build (strbcm_mknod instead of strutil_mknod)
+	* doc/manual/strbcm.texi: corrected for build (strbcm.info instead of strutil.info)
+	* src/test/test-bcm.c: corrected for build (needs main)
+	* strbcm/src/.cvsignore: added
+	* strbcm/src/include/.cvsignore: added
+	* strbcm/tests/.cvsignore: added
+	* m4/strconf.m4: split package configs and normal configs into two
+	  files, Config.master (as usual) for normal configs and
+	  Config.package for package configuration
+	* am/strconf.am: split package configs and normal configs
 
 2006-03-07  Brian Bidulock  <bidulock@openss7.org>
 

@@ -1,3 +1,23 @@
+2006-03-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: got rid of autoconf nits
+
+2006-03-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/strconf-sh: updated headers
+	* scripts/strconf-sh: added pkgobject to defaults
+	* am/strconf.am (STRCONF_PKGDIR): added binary package directory detection
+	* m4/strconf.m4 (STRCONF_PKGDIR): added binary package directory detection
+	* scripts/strconf-sh: added pkgobject and packagedir
+	* m4/strconf.m4: corrected typo
+	* m4/kernel.m4: correct autoconf warnings
+	* m4/openss7.m4: change AC_HELP_STRING to AS_HELP_STRING
+	* m4/autotest.m4: change AC_HELP_STRING to AS_HELP_STRING
+	* m4/sctp.m4: change AC_HELP_STRING to AS_HELP_STRING
+	* m4/xns.m4: change AC_HELP_STRING to AS_HELP_STRING
+	* m4/xti.m4: change AC_HELP_STRING to AS_HELP_STRING
+	* m4/inet.m4: change AC_HELP_STRING to AS_HELP_STRING
+
 2006-03-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: corrected package number bump
