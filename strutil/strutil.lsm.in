@@ -2,29 +2,31 @@ Begin4
 Title:			@PACKAGE@
 Version:		@VERSION@
 Entered-date:		@PACKAGE_DATE@
-Entered-by:		bidulock@openss7.org (Brian Bidulock)
-Description:		The @PACKAGE@ package includes kernel modules, SVR 4.2
+Description:		@PACKAGE_TITLE@.
+			OpenSS7 STREAMS Utilities for Linux Fast-STREAMS.
+			The @PACKAGE@ package includes kernel modules, SVR 4.2
 			STREAMS drivers, modules, libraries, utilities, test
 			programs, daemons, and development environment for the
 			development and execution of STREAMS modules and
 			drivers.  This package contains primarily user-space
 			utilities and test programs.
-			This distribution is only currently applicable to Linux
-			2.4 and 2.6 kernels and was targetted at ix86 and ppc
+			This distribution is applicable to Linux 2.4 and 2.6
+			kernels and was targetted at ix86, x86_64, ppc and ppc64
 			architectures, but should build and install for other
 			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
 Keywords:		STREAMS, SVR 4.2 MP, LiS, LfS
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
-Original-site:		http://www.openss7.org/
-			2.4MB @PACKAGE@-@VERSION@.tar.bz2
-			2.6MB @PACKAGE@-@VERSION@.tar.gz
-Primary-site:		http://www.openss7.org/
-			2.4MB @PACKAGE@-@VERSION@.tar.bz2
-			2.6MB @PACKAGE@-@VERSION@.tar.gz
+Primary-site:		http://www.openss7.org/ tarballs/
+			2.6M @PACKAGE@-@VERSION@.tar.gz
+			2.4M @PACKAGE@-@VERSION@.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2.4M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+Original-site:		
 Platforms:		Linux
-Requires:		Linux kernel 2.4 or 2.6,
-			LiS-2.18.1 or streams-0.7a.3 SVR 4.2 STREAMS
+			Requires: Linux kernel 2.4 or 2.6,
+			LiS-2.18.3 or streams-0.7a.5 SVR 4.2 STREAMS
 Copying-policy:		GPL
-Comment:		Report bugs to @PACKAGE_BUGREPORT@
 End

@@ -1,6 +1,7 @@
 2006-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: got rid of autoconf nits
+	* sctp.lsm.in: make suitable for Linux Software Map submission
 
 2006-03-08  Brian Bidulock  <bidulock@openss7.org>
 

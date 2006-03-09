@@ -2,29 +2,36 @@ Begin4
 Title:			@PACKAGE@
 Version:		@VERSION@
 Entered-date:		@PACKAGE_DATE@
-Entered-by:		bidulock@openss7.org (Brian Bidulock)
-Description:		The @PACKAGE@ package includes kernel modules,
-	SVR 4.2 STREAMS drivers, modules, libraries, utilities, test programs,
-	daemons, and development environment for the development and execution
-	of Signalling System Number 7 (SS7) protocol stack components
-	and applications for the %{_STREAMS} STREAMS environment.  This
-	distribution is only currently applicable to 2.4 kernels and was
-	targetted at ix86 and ppc architectures, but should build and install
-	for other architectures as well.
+Description:		@PACKAGE_TITLE@.
+			The @PACKAGE@ package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of Signalling System Number 7
+			(SS7) protocol stack components and applications for the
+			Linux Fast-STREAMS environment.
+			This distribution is currently applicable to 2.4 and 2.6
+			kernels and was targetted at ix86, x86_64, ppc and ppc64
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
 Keywords:		SS7 SIGTRAN ISDN H323 VoIP
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
-Original-site:		http://www.openss7.org/
-			16MB @PACKAGE@-@VERSION@.tar.bz2
-			18MB @PACKAGE@-@VERSION@.tar.gz
-Primary-site:		http://www.openss7.org/
-			16MB @PACKAGE@-@VERSION@.tar.bz2
-			18MB @PACKAGE@-@VERSION@.tar.gz
+Primary-site:		http://www.openss7.org/ tarballs/
+			15M @PACKAGE@-@VERSION@.tar.gz
+			13M @PACKAGE@-@VERSION@.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			13M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+Original-site:		
 Platforms:		Linux
-Requires:		Linux kernel 2.4 or 2.6,
-			LiS-2.18.1 or streams-0.7a.3 SVR 4.2 STREAMS
-			strxns-0.9.2-1, strxnet-0.9.2-1, strsctp-0.9.2-1
+			Requires: Linux kernel 2.4 or 2.6,
+			LiS-2.18.3 or streams-0.7a.5 SVR 4.2 STREAMS,
+			strcompat-0.9.2.3,
+			strxns-0.9.2.3,
+			strxnet-0.9.2.8,
+			strinet-0.9.2.3,
+			strsctp-0.9.2.5
 Copying-policy:		GPL
-Comment:		Report bugs to @PACKAGE_BUGREPORT@
 End
 

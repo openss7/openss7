@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.51 $) $Date: 2006/02/20 10:06:59 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.52 $) $Date: 2006/03/09 14:02:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/02/20 10:06:59 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 14:02:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -340,12 +340,19 @@ Autoreq:        true
 
 # ---------------------------------------------------------------------------
 %description
-The %{name} package includes kernel modules, libraries, utilities and
-development environment for the development and execution of System V
-Release 4 %{virtual} modules and drivers developed for Linux.
-This distribution is currently applicable to 2.4 and 2.6 kernels and was
-targetted at ix86 and ppc architectures, but should build and install
-for other architectures as well.
+The %{name} package is an implementation of SVR 4 %{virtual} for Linux.
+
+The package includes kernel modules, libraries, utilities and development
+environment for the development and execution of System V Release 4 %{virtual}
+modules and drivers developed for Linux.
+
+This distribution is currently applicable to 2.4 and 2.6 kernels and is
+validated for ix86, x86_64, ppc and ppc64 architectures, but should build and
+install for other architectures as well.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND DISTRIBUTIONS AND
+IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE
+USING THE %{_conflict} PACKAGE INSTEAD.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -549,11 +556,15 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{core_name}
-The %{name}-%{core_name} package contains the kernel modules that provide the
-Linux kernel SVR 4 %{virtual} facility.  This also includes assorted basic
-%{virtual} drivers and modules such as pipes, fifos, echo, etc.  This package is
-heavily tied to the kernel for which it was compiled.  This package applies to
-kernel version %{kernel_version}.
+The %{name}-%{core_name} sub-package contains the kernel modules that provide
+the Linux kernel SVR 4 %{virtual} facility.  This also includes assorted basic
+%{virtual} drivers and modules such as pipes, fifos, echo, etc.  This
+sub-package is heavily tied to the kernel for which it was compiled.  This
+sub-package applies to kernel version %{kernel_version}.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND DISTRIBUTIONS AND
+IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE
+USING THE %{_conflict} PACKAGE INSTEAD.
 
 %pre %{core_name}
 # ---------------------------------------------------------------------------
@@ -810,11 +821,16 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{info_name}
-The %{name}-%{info_name} package contains the kernel modules symbol
+The %{name}-%{info_name} sub-package contains the kernel modules symbol
 information for development of kernel modules against the core kernel modules
-included in the %{name}-core package.  This package is tied to the core kernel
-modules and kernel for which they were compiled.  This package applies to core
-kernel modules %{name}-%{core_name} for kernel version %{_kversion}.
+included in the %{name}-core sub-package.  This sub-package is tied to the core
+kernel modules and kernel for which they were compiled.  This sub-package
+applies to core kernel modules %{name}-%{core_name} for kernel version
+%{_kversion}.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND DISTRIBUTIONS AND
+IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE
+USING THE %{_conflict} PACKAGE INSTEAD.
 
 %if %{FILES_modules}
 %files %{info_name}
@@ -843,9 +859,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description lib
-The %{name}-lib package contains the run-time shared libraries
-necessary to run applications programs and utilities developed for
-%{title}.
+The %{name}-lib sub-package contains the run-time shared libraries necessary to
+run applications programs and utilities developed for %{title}.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND DISTRIBUTIONS AND
+IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE
+USING THE %{_conflict} PACKAGE INSTEAD.
 
 %if %{have_libraries}
 %pre lib
@@ -902,11 +921,15 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description devel
-The %{name}-devel package contains library archives for static compilation,
-and headers files to develop %{title} modules and drivers.  This
-also includes the header files and static libraries required to compile
-%{title} applications programs.  In addition it contains all of the
-manual pages necessary for developing %{title} application programs.
+The %{name}-devel sub-package contains library archives for static compilation,
+and headers files to develop %{title} modules and drivers.  This also includes
+the header files and static libraries required to compile %{title} applications
+programs.  In addition it contains all of the manual pages necessary for
+developing %{title} application programs.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND DISTRIBUTIONS AND
+IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE
+USING THE %{_conflict} PACKAGE INSTEAD.
 
 %if %{FILES_libs}
 %files devel
@@ -948,8 +971,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description util
-The %{name}-util package provides administrative and configuration test
+The %{name}-util sub-package provides administrative and configuration test
 utilities and commands associated with the %{title} package.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND DISTRIBUTIONS AND
+IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE
+USING THE %{_conflict} PACKAGE INSTEAD.
 
 %pre util
 # ---------------------------------------------------------------------------
@@ -1014,9 +1041,13 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description dev
-The %{name}-dev package contains the device definitions necessary to run
-applications programs and utilities developed for %{title}.
-The package is not required for devfs based systems.
+The %{name}-dev sub-package contains the device definitions necessary to run
+applications programs and utilities developed for %{title}.  The sub-package is
+not required for devfs based systems.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND DISTRIBUTIONS AND
+IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE
+USING THE %{_conflict} PACKAGE INSTEAD.
 
 %if %{MAKE_devs}
 %post dev
@@ -1066,8 +1097,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description test
-The %{name}-test package provides testsuites used for troubleshooting
-the %{title} package.
+The %{name}-test sub-package provides autotest testsuites used for validating
+and troubleshooting the %{title} package.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND
+DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS
+DEPRECATED.  YOU SHOULD BE USING THE %{_conflict} PACKAGE INSTEAD.
 
 %if %{FILES_test}
 %files test
@@ -1098,8 +1133,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description doc
-The %{name}-doc package contains html documentation for the development of
-%{title} applications, modules and drivers.
+The %{name}-doc sub-package contains text, info, html and pdf documentation for
+the development of %{title} applications, modules and drivers.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND DISTRIBUTIONS AND
+IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE
+USING THE %{_conflict} PACKAGE INSTEAD.
 
 %post doc
 # ---------------------------------------------------------------------------
@@ -1192,9 +1231,13 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description source
-The %{name}-source package contains the source code necessary for building the
-%{name} release.  It includes the autoconf configuration utilities necessary
+The %{name}-source sub-package contains the source code necessary for building
+the %{name} release.  It includes the autoconf configuration utilities necessary
 to create and distribute this rpm.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND DISTRIBUTIONS AND
+IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE
+USING THE %{_conflict} PACKAGE INSTEAD.
 
 %if %{FILES_source}
 %files source
@@ -1228,8 +1271,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description init
-The %{name}-init package provides init scripts and configuration files
+The %{name}-init sub-package provides init scripts and configuration files
 associated with the %{title} package.
+
+THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES AND DISTRIBUTIONS AND
+IS ESSENTIALLY UNUSABLE ON SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE
+USING THE %{_conflict} PACKAGE INSTEAD.
 
 %pre init
 # ---------------------------------------------------------------------------
@@ -1602,6 +1649,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
+# Revision 1.1.6.52  2006/03/09 14:02:52  brian
+# - updating descriptions
+#
 # Revision 1.1.6.51  2006/02/20 10:06:59  brian
 # - changes for 64 bit distributions
 #

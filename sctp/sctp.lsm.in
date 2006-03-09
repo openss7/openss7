@@ -2,20 +2,24 @@ Begin4
 Title:			@PACKAGE@
 Version:		@VERSION@
 Entered-date:		@PACKAGE_DATE@
-Entered-by:		bidulock@openss7.org (Brian Bidulock)
-Description:		@PACKAGE@ is the OpenSS7 Linux Native (Sockets) Kernel
-			implementation of Stream Control Transmission Protocol (SCTP)
+Description:		@PACKAGE_TITLE@.
+			OpenSS7 Linux Native SCTP (Stream Control Transmission
+			Protocol).
+			@PACKAGE@ is the OpenSS7 Linux Native (Sockets) Kernel
+			implementation of Stream Control Transmission Protocol
+			(SCTP).
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
 Keywords:		SCTP, SIGTRAN, OpenSS7, Sockets, Telecommunications
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
-Original-site:		http://www.openss7.org/
-			1.5MB @PACKAGE@-@VERSION@.tar.bz2
-			1.8MB @PACKAGE@-@VERSION@.tar.gz
-Primary-site:		http://www.openss7.org/
-			1.5MB @PACKAGE@-@VERSION@.tar.bz2
-			1.8MB @PACKAGE@-@VERSION@.tar.gz
+Primary-site:		http://www.openss7.org/ tarballs/
+			1.8M @PACKAGE@-@VERSION@.tar.gz
+			1.5M @PACKAGE@-@VERSION@.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			1.5M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+Original-site:		
 Platforms:		Linux
-Requires:		Linux kernel 2.4
+			Requires: Linux kernel 2.4
 Copying-policy:		GPL
-Comment:		Report bugs to @PACKAGE_BUGREPORT@
 End

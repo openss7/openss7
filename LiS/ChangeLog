@@ -1,6 +1,7 @@
 2006-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: got rid of AC_HELP_STRING
+	* LiS.lsm.in: make suitable for Linux Software Map submission
 
 2006-03-08  Brian Bidulock  <bidulock@openss7.org>
 

@@ -1,25 +1,30 @@
 Begin4
-Title:			@PACKAGE@ - "Linux STREAMS"
-Version:		@VERSION@
-Entered-date:		@PACKAGE_DATE@
-Entered-by:		bidulock@openss7.org (Brian Bidulock)
-Description:		@PACKAGE@ is a STREAMS framework that is
-			compatible with SVR4 STREAMS.  It has lots of
-			debugging features not found in other STREAMS
-			packages.  Good to do networking and other things.
-			It allows for installation of binary drivers.
-Keywords:		STREAMS, SVR4, LiS
-Author:			<dave@gcom.com> (David Grothe) et al
-Maintained-by:		bidulock@openss7.org (Brian Bidulock)
-Original-site:		http://www.gcom.com/
-			@PACKAGE@-@PACKAGE_VERSION@.tar.gz
-Primary-site:		http://www.openss7.org/
-			1.7MB @PACKAGE@-@VERSION@.tar.bz2
-			2.0MB @PACKAGE@-@VERSION@.tar.gz
-Platforms:		Linux
-Requires:		Linux kernel 2.4 or 2.6
-Copying-policy:		GPL
-Comment:		Report bugs to @PACKAGE_BUGREPORT@
-			linux-streams@gsyc.escet.urjc.es  majordomo mailing list
-			<http://www.gcom.com/LiS> LiS web home page
+Title:          @PACKAGE@ - Linux STREAMS
+Version:	@VERSION@
+Entered-date:	@PACKAGE_DATE@
+Description:	@PACKAGE_TITLE@.
+		OpenSS7 Linux STREAMS (LiS), SVR 4 STREAMS for Linux.
+		@PACKAGE@ is a STREAMS framework that is compatible with SVR4
+		STREAMS.  It has lots of debugging features not found in other
+		STREAMS packages.  Good to do networking and other things.  It
+		allows for installation of binary drivers.
+		This distribution is currently applicable to 2.4 and 2.6 kernels
+		and was targetted at ix86, x86_64, ppc and ppc64 architectures,
+		but should build and install for other architectures as well.
+		Mailing-List: linux-streams@gsyc.escet.urjc.es
+		Supports a wide range of new and old Linux distributions.
+		Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
+Keywords:	STREAMS, SVR4, LiS
+Author:		dave@gcom.com (David Grothe)
+Maintained-by:	bidulock@openss7.org (Brian Bidulock)
+Primary-site:	http://www.openss7.org/ tarballs/
+		2.4M @PACKAGE@-@VERSION@.tar.gz
+		1.9M @PACKAGE@-@VERSION@.tar.bz2
+Alternate-site:	http://www.openss7.org/ rpms/SRPMS/
+		2.0M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+Original-site:	ftp.gcom.com /pub/linux/src/LiS
+		748K @PACKAGE@-2.18.0.tgz
+Platforms:	Linux
+		Requires: Linux kernel 2.4 or 2.6
+Copying-policy:	GPL
 End

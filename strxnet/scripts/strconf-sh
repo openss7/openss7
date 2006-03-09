@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf-sh,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/09 01:16:33 $
+# @(#) $RCSfile: strconf-sh,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/09 14:01:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 01:16:33 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 14:01:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -150,7 +150,6 @@ default_strmknods='makedev.lst'
 default_strsetup='strsetup.conf'
 default_strload='strload.conf'
 default_minorbits='8'
-default_packagedir='pkg'
 
 hconfig=
 modconf=
@@ -160,7 +159,7 @@ confmodules=
 strmknods=
 strsetup=
 strload=
-packagedir=
+packagedirs=
 
 # Parse our command line options once, thoroughly.
 while test "$#" -gt 0 -o ":$more" != ":"
@@ -183,7 +182,7 @@ do
         --functionname=* | --funcname=* | --funcnam=* | --function=* | --func=* | --fncname=* | --fncnam=* | --fnc=* | --f=* | --r=* | \
         --package=* | --packag=* | --packa=* | --pack=* | --pac=* | --pa=* | --k=* | \
         --pkgobject=* | --pkgobjec=* | --pkgobje=* | --pkgobj=* | --pkgob=* | --pkgo=* | --pkg=* | --pk=* | --g=* | \
-        --packagedir=* | --packagedi=* | --packaged=* | --d=* \
+        --packagedirs=* | --packagedir=* | --packagedi=* | --packaged=* | --d=* \
         )
             optarg=`$echo "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
         --*=*)
@@ -306,10 +305,10 @@ do
             prevopt="$arg" ; prev=pkgobject ;;
         --pkgobject=* | --pkgobjec=* | --pkgobje=* | --pkgobj=* | --pkgob=* | --pkgo=* | --pkg=* | --pk=* | --g=* | -g*)
             pkgobject="$optarg" ; reexec="$reexec --pkgobject=\"$optarg\"" ;;
-        --packagedir | --packagedi | --packaged | --d | -d)
-            prevopt="$arg" ; prev=packagedir ;;
-        --packagedir=* | --packagedi=* | --packaged=* | --d=* | -d*)
-            packagedir="$optarg" ; reexec="$reexec --packagedir=\"$optarg\"" ;;
+        --packagedirs | --packagedir | --packagedi | --packaged | --d | -d)
+            prevopt="$arg" ; prev=packagedirs ;;
+        --packagedirs=* | --packagedir=* | --packagedi=* | --packaged=* | --d=* | -d*)
+            packagedirs="$optarg" ; reexec="$reexec --packagedirs=\"$optarg\"" ;;
         --) # end of options
             more_options=no
             ;;
@@ -341,7 +340,7 @@ if test -n "$prev" ; then
 fi
 
 if test X"$show_version" = Xyes ; then
-    $echo "$progname:"' Version $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/09 01:16:33 $'
+    $echo "$progname:"' Version $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/09 14:01:16 $'
 fi
 
 if test X"$show_help" = Xyes ; then
@@ -394,8 +393,8 @@ Options:
     -g, --pkgobject=[PKGOBJECT]
         full path and filename of object file to package
         [default: $default_pkgobject]
-    -d, --packagedir=[PACKAGEDIR]
-        full path to binary package directory
+    -d, --packagedirs=[PACKAGEDIR[,PACKAGEDIR]]
+        full path to source and binary package directory
         [default: $default_packagedir]
 EOF
     exit 0
@@ -605,11 +604,11 @@ do
             ;;
         :autopush)
             token=`$echo -n ${tokens[1]} | $strconf_tokenize`
-            eval "otherno=\"\$strconf_autopush_lineno_$token\""
-            if test -n "$otherno" ; then
-                $echo "$progname: error: ${infile:-(stdin)} +$lineno : autopush \`${tokens[1]}' already defined at line $otherno" >&2
-                continue
-            fi
+#            eval "otherno=\"\$strconf_autopush_lineno_$token\""
+#            if test -n "$otherno" ; then
+#                $echo "$progname: error: ${infile:-(stdin)} +$lineno : autopush \`${tokens[1]}' already defined at line $otherno" >&2
+#                continue
+#            fi
             eval "strconf_autopush_lineno_$token=\"\$lineno\""
             eval "strconf_autopush_$token='${tokens[*]}'"
             eval "strconf_minor_$token='${tokens[2]}'"
@@ -2081,7 +2080,7 @@ if test :"$modtype" = :driver ; then
     count=0
     while test $count -lt $nmajors
     do
-        $echo "MODULE_ALIAS(\"char-major-$((major+count++))\")" >>$pkgwrapper
+        $echo "MODULE_ALIAS(\"char-major-$((major+count++))\");" >>$pkgwrapper
     done
 fi
 cat >>$pkgwrapper <<EOF
@@ -2183,7 +2182,7 @@ static void __exit
 _xx_exit(void)
 {
 EOF
-if test :"$init" = :yes ; then
+if test :"$term" = :yes ; then
         $echo "	${prefix}term(); /* only if we have a terminate function */" >>$pkgwrapper
 fi
 cat >>$pkgwrapper <<EOF
@@ -2211,6 +2210,298 @@ module_init(_xx_init);
 module_exit(_xx_exit);
 EOF
 fi
+
+#
+#   Generate package object wrappers and make rules as required
+#
+if test -n "$packagedirs"
+then
+    pkgdirs=(`$echo $packagedirs | sed -e 's|,| |g'`)
+    for dir in ${pkgdirs[*]} ; do
+        if test ! -d $dir ; then
+            $echo "$progname: error: directory \"$dir\" does not exit" >&2
+            exit 1
+        fi
+    done
+    for object in $strconf_drv_objnames ; do
+        found='no'
+        for dir in ${pkgdirs[*]} ; do
+            if test -f "$dir/$object.o" ; then
+                bcm_drv_objects="${bcm_drv_objects:+$bcm_drv_objects }$object" ; found='yes'
+            elif test -f "$dir/$object.c" ; then
+                bcm_drv_sources="${bcm_drv_sources:+$bcm_drv_sources }$object" ; found='yes'
+            fi
+        done
+        if test ":$found" = :no ; then
+            $echo "$progname: error: no source or object in ${pkgdirs[*]} for driver $object" >&2
+            continue
+        fi
+    done
+    for object in $strconf_mod_objnames ; do
+        found='no'
+        for dir in ${pkgdirs[*]} ; do
+            if test -f "$dir/$object.o" ; then
+                bcm_mod_objects="${bcm_mod_objects:+$bcm_mod_objects }$object" ; found='yes'
+            elif test -f "$dir/$object.c" ; then
+                bcm_mod_sources="${bcm_mod_sources:+$bcm_drv_sources }$object" ; found='yes'
+            fi
+        done
+        if test ":$found" = :no ; then
+            $echo "$progname: error: no source or object in ${pkgdirs[*]} for module $object" >&2
+            continue
+        fi
+    done
+    # anything not marked loadable needs a wrapper
+    # the wrapper *really* needs to go in the build directory unless we were
+    # passed an absolute directory
+    for object in $bcm_drv_objects $bcm_drv_sources $bcm_mod_objects $bcm_mod_sources
+    do
+        case " $bcm_drv_objects $bcm_drv_sources " in
+            (*" $object "*)
+            modtype='driver'
+            moddef=0
+            drvdef=1
+            ;;
+        esac
+        case " $bcm_mod_objects $bcm_mod_sources " in
+            (*" $object "*)
+            modtype='module'
+            moddef=1
+            drvdef=0
+            ;;
+        esac
+        pkgwrapper="${pkgdirs[0]}/${object}_wrapper.c"
+        objname=`$echo -n $object | $strconf_tokenize`
+        eval "loadable=\"\$strconf_loadable_$objname\""
+        if test :"$loadable" = :yes ; then linkdef=0 ; else linkdef=1 ; fi
+        eval "name=\"\$strconf_name_$objname\""
+        eval "realname=\"\$strconf_realname_$name\""
+        eval "prefix=\"\$strconf_prefix_$name\""
+        Prefix=`$echo $prefix | $strconf_uppercase`
+        eval "major=\"\$strconf_major_$name\""
+        eval "nmajors=\"\$strconf_nmajors_$name\""
+        eval "nminors=\"\$strconf_nminors_$name\""
+        eval "init=\"\$strconf_initialize_$name\""
+        if test :"$init" = :yes ; then initdef=1 ; else initdef=0 ; fi
+        eval "term=\"\$strconf_terminate_$name\""
+        if test :"$term" = :yes ; then termdef=1 ; else termdef=0 ; fi
+        eval "qlock=\"\$strconf_qlock_$name\""
+        cat /dev/null >$pkgwrapper
+        cat>>$pkgwrapper<<EOF
+/*****************************************************************************
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ *****************************************************************************/
+
+/*
+ * GENERATED BY $progname (`date`) FROM ${infile:-(stdin)}
+ * EDITS TO THIS FILE WILL BE LOST: EDIT $progname INSTEAD.
+ */
+
+#ident "@(#) \$RCSfile\$ \$Name\$(\$Revision\$) \$Date\$"
+
+static char const ident[] = "\$RCSfile\$ \$Name\$(\$Revision\$) \$Date\$";
+
+#if ${linkdef}
+#include <sys/os7/compat.h>
+
+#define _XX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define _XX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define _XX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define _XX_REVISION	"OpenSS7 \$RCSfile\$ \$Name\$(\$Revision\$) \$Date\$"
+#define _XX_DEVICE	"Linux Fast-STREAMS Binary Compatibility Wrapper for ${object}"
+#define _XX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define _XX_LICENSE	"Proprietary"
+#define _XX_BANNER	_XX_DESCRIP	"\n" \\
+			_XX_EXTRA	"\n" \\
+			_XX_REVISION	"\n" \\
+			_XX_COPYRIGHT	"\n" \\
+			_XX_DEVICE	"\n" \\
+			_XX_CONTACT
+#ifdef LINUX
+MODULE_AUTHOR(_XX_CONTACT);
+MODULE_DESCRIPTION(_XX_DESCRIP);
+MODULE_SUPPORTED_DEVICE(_XX_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(_XX_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-${object}");
+#if ${drvdef}
+EOF
+        count=0
+        while test $count -lt $nmajors
+        do
+            numb=$((major+count++))
+            cat>>$pkgwrapper<<EOF
+MODULE_ALIAS("char-major-${numb}");
+EOF
+        done
+        cat>>$pkgwrapper<<EOF
+#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* LINUX */
+
+extern struct module_info ${prefix}info;
+
+#if ${initdef}
+extern void streamscall ${prefix}init(void);
+#endif
+
+#if ${termdef}
+extern void streamscall ${prefix}term(void);
+#endif
+
+#if ${drvdef}
+static int _xx_majors[${nmajors}] = {
+EOF
+        count=0
+        while test $count -lt $nmajors
+        do
+            numb=$((major+count++))
+            cat>>$pkgwrapper<<EOF
+	${numb},
+EOF
+        done
+        cat>>$pkgwrapper<<EOF
+};
+
+static void
+__xx_del(void)
+{
+	int err, mindex;
+
+	for (mindex = ${nmajors} - 1; mindex >= 0; mindex--) {
+		if (_xx_majors[mindex]) {
+			if ((err = lis_unregister_strdev(_xx_majors[mindex])))
+				cmn_err(CE_PANIC, "${realname}: cannot unregister major %d", _xx_majors[mindex]);
+			_xx_majors[mindex] = 0;
+		}
+	}
+}
+
+static int
+_xx_add(void)
+{
+	int err, mindex = 0, major;
+
+	cmn_err(CE_NOTE, _XX_BANNER);	/* console splash */
+	for (mindex = 0; mindex < ${nmajors}; mindex++) {
+		if ((err = lis_register_strdev(_xx_majors[mindex], &${prefix}info, ${nminors}, "${realname}")) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "${realname}: could not register major %d", _xx_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "${realname}: could not register driver, err = %d", err);
+				return (err);
+			}
+		}
+		if (_xx_majors[mindex] == 0)
+			_xx_majors[mindex] = err;
+		if ((err = lis_register_qlock_option(_xx_majors[mindex], ${qlock:--1})) < 0)
+			cmn_err(CE_WARN, "${realname}: could not register qlock option, err = %d", err);
+	}
+	return (0);
+}
+#endif
+
+#if ${moddef}
+static void
+_xx_del(void)
+{
+	int err;
+
+	if ((err = lis_unregister_strmod(&${prefix}info)) < 0) {
+		cmn_err(CE_PANIC, "${realname}: cannot unregister module, err = %d", err);
+		return (err);
+	}
+	return (0);
+}
+
+static int
+__xx_add(void)
+{
+	int err, modid;
+
+	cmn_err(CE_NOTE, _XX_BANNER);	/* console splash */
+	if ((modid = lis_register_strmod(&${prefix}info, "${realname}")) == LIS_NULL_MID) {
+		cmn_err(CE_WARN, "${realname}: could not register module");
+		return (-ENXIO);
+	}
+	if ((err = lis_register_qlock_option(modid, ${qlock:--1})) < 0)
+		cmn_err(CE_WARN, "${realname}: could not register qlock option, err = %d", err);
+	return (0);
+}
+#endif
+
+static void __exit
+_xx_exit(void)
+{
+#if ${termdef}
+	${prefix}term();	/* only if we have a terminate function */
+#endif
+	_xx_del();
+}
+
+static int __init
+_xx_init(void)
+{
+	int err;
+
+	if ((err = _xx_add())) {
+		_xx_del();
+		return (err);
+	}
+#if ${initdef}
+	${prefix}init();	/* only if we have an initialize function */
+#endif
+	return (0);
+}
+
+module_init(_xx_init);
+module_exit(_xx_exit);
+#endif
+EOF
+    done
+fi
 )
 
-# vim: ft=sh sw=4 et
+# vim: ft=sh sw=4 et nocin nosi

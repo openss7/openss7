@@ -1,21 +1,28 @@
 Begin4
-Title:			@PACKAGE@ - "OpenSS7 Master Package"
+Title:			@PACKAGE@
 Version:		@VERSION@
 Entered-date:		@PACKAGE_DATE@
-Entered-by:		bidulock@openss7.org (Brian Bidulock)
-Description:		@PACKAGE@ is a collection of SCTP and STREAMS
-			protocol stacks for IP and SS7.
+Description:		@PACKAGE_TITLE@.
+			OpenSS7 SS7/ISDN/VoIP/SIGTRAN Protocol Stacks for Linux
+			Fast-STREAMS.
+			@PACKAGE@ is a collection of SCTP and STREAMS protocol
+			stacks for IP and SS7.
+			This distribution is currently applicable to Linux 2.4
+			and 2.6 kernels and was targetted at ix86, x86_64, ppc
+			and ppc64 architectures, but should build and install
+			for other architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
 Keywords:		STREAMS, SCTP, SVR 4.2 MP, SS7, SIGTRAN, VoIP, ISDN
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
-Original-Site:		http://www.openss7.org/
-			34MB @PACKAGE@-@VERSION@.tar.bz2
-			39MB @PACKAGE@-@VERSION@.tar.gz
-Primary-Site:		http://www.openss7.org/
-			34MB @PACKAGE@-@VERSION@.tar.bz2
-			39MB @PACKAGE@-@VERSION@.tar.gz
+Primary-site:		http://www.openss7.org/ tarballs/
+			35M @PACKAGE@-@VERSION@.tar.gz
+			30M @PACKAGE@-@VERSION@.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			38M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+Original-site:		
 Platforms:		Linux
-Requires:		Linux kernel 2.4 or 2.6
+			Requires: Linux kernel 2.4 or 2.6
 Copying-policy:		GPL
-Comment:		Report bugs to @PACKAGE_BUGREPORT@
 End

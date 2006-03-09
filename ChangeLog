@@ -1,6 +1,8 @@
 2006-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: got rid of autoconf nits
+	* am/strconf.am: suppress rebuilds on package file or directory for now
+	* openss7.lsm.in: make suitable for Linux Software Map submission
 
 2006-03-08  Brian Bidulock  <bidulock@openss7.org>
 

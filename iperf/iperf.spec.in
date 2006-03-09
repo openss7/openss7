@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.56 $) $Date: 2006/02/20 10:06:58 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.57 $) $Date: 2006/03/09 14:02:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/02/20 10:06:58 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 14:02:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -223,9 +223,9 @@ Autoreq:        true
 The %{name} package includes iperf test programs optioned and compiled for use
 with the OpenSS7 Linux Native SCTP sockets interface.  The purpose of this
 package is to be able to perform comparison tests against TCP, UDP and SCTP.
-This distribution is currently only applicable to Linux releases and was
-targetted at ix86 and ppc architecutres, but should build and install for
-other architectures as well.
+This distribution is currently only applicable to Linux releases and is
+validated for ix86, x86_64, ppc and ppc64 architecutres, but should build and
+install for other architectures as well.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -371,12 +371,13 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description openss7
-The %{name} package includes iperf test programs optioned and compiled for use
-with OpenSS7 Linux Native SCTP sockets interface as well as OpenSS7 STREAMS
-socket library and socket drivers.  The purpose of this package is to be able to
-perform comparison tests against TCP and SCTP.  This distribution is currently
-only applicable to Linux release and was targetted at ix86 and ppc
-architectures, but should build and install for other architectures as well.
+The %{name}-openss7 sub-package includes iperf test programs optioned and
+compiled for use with OpenSS7 Linux Native SCTP sockets interface as well as
+OpenSS7 STREAMS socket library and socket drivers.  The purpose of this
+sub-package is to be able to perform comparison tests against TCP and SCTP.
+This distribution is currently only applicable to Linux release and targetted at
+ix86, x86_64, ppc and ppc64 architectures, but should build and install for
+other architectures as well.
 
 %files openss7
 # ---------------------------------------------------------------------------
@@ -399,7 +400,7 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description lib
-The %{name}-lib package contains the run-time shared libraries necessary to
+The %{name}-lib sub-package contains the run-time shared libraries necessary to
 run applications programs developed for %{title}.
 
 %if %{have_libraries}
@@ -456,11 +457,11 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description devel
-The %{name}-devel package contains library archives for static compilation,
-and headers files to develop %{title} applications.  This
-also includes the header files and static libraries required to compile
-%{title} applications programs.  In addition it contains all of the
-manual pages necessary for developing %{title} application programs.
+The %{name}-devel sub-package contains library archives for static compilation,
+and headers files to develop %{title} applications.  This also includes the
+header files and static libraries required to compile %{title} applications
+programs.  In addition it contains all of the manual pages necessary for
+developing %{title} application programs.
 
 %if %{FILES_libs}
 %files devel
@@ -498,7 +499,7 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description util
-The %{name}-util package provides administrative and configuration test
+The %{name}-util sub-package provides administrative and configuration test
 utilities and commands associated with the %{title} package.
 
 %pre util
@@ -543,8 +544,8 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description test
-The %{name}-test package provides testsuites used for troubleshooting
-the %{title} package.
+The %{name}-test sub-package provides testsuites used for troubleshooting the
+%{title} package.
 
 %if %{FILES_test}
 %files test
@@ -685,6 +686,9 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.57  2006/03/09 14:02:44  brian
+# - updating descriptions
+#
 # Revision 1.1.2.56  2006/02/20 10:06:58  brian
 # - changes for 64 bit distributions
 #

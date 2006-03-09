@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.49 $) $Date: 2006/02/20 10:07:00 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.50 $) $Date: 2006/03/09 14:02:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/02/20 10:07:00 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 14:02:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -273,9 +273,10 @@ The %{name} package include netperf test programs optioned and compiled for
 use with OpenSS7 Linux Native SCTP sockets interface as well as OpenSS7
 %{_STREAMS} STREAMS DLPI, XTI INET driver, and XTI SCTP driver.  The purpose
 of this package is to be able to perform comparison tests agains TCP and SCTP.
+
 This distribution is currently only applicable to Linux release and was
-targetted at ix86 and ppc architectures, but should build and install for
-other architectures as well.
+targetted at ix86, x86_64, ppc and ppc64 architectures, but should build and
+install for other architectures as well.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -486,13 +487,13 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}
-The %{name}-%{_streams} package includes netperf test programs optioned and
-compiled for use with OpenSS7 Linux Native SCTP sockets interface as well as
-OpenSS7 %{_STREAMS} STREAMS DLPI, XTI INET driver, and XTI SCTP driver.  The
-purpose of this package is to be able to perform comparison tests against TCP
-and SCTP.  This distribution is currently only applicable to Linux release and
-was targetted at ix86 and ppc architectures, but should build and install for
-other architectures as well.
+The %{name}-%{_streams} sub-package includes netperf test programs optioned
+and compiled for use with OpenSS7 Linux Native SCTP sockets interface as well
+as OpenSS7 %{_STREAMS} STREAMS DLPI, XTI INET driver, and XTI SCTP driver.
+The purpose of this sub-package is to be able to perform comparison tests
+against TCP and SCTP.  This distribution is currently only applicable to Linux
+release and was targetted at ix86, x86_64, ppc and ppc64 architectures, but
+should build and install for other architectures as well.
 
 %pre %{_streams}
 # ---------------------------------------------------------------------------
@@ -534,8 +535,8 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description test
-The %{name}-test package provides testsuites used for troubleshooting
-the %{title} package.
+The %{name}-test sub-package provides testsuites used for troubleshooting the
+%{title} package.
 
 %if %{FILES_test}
 %files test
@@ -563,7 +564,7 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description doc
-The %{name}-doc package contains html documentation for the development of
+The %{name}-doc sub-package contains html documentation for the development of
 %{title} applications, modules and drivers.
 
 %post doc
@@ -658,9 +659,9 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description source
-The %{name}-source package contains the source code necessary for building the
-%{name} release.  It includes the autoconf configuration utilities necessary
-to create and distribute this rpm.
+The %{name}-source sub-package contains the source code necessary for building
+the %{name} release.  It includes the autoconf configuration utilities
+necessary to create and distribute this rpm.
 
 %if %{FILES_source}
 %files source
@@ -676,6 +677,9 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.50  2006/03/09 14:02:53  brian
+# - updating descriptions
+#
 # Revision 1.1.2.49  2006/02/20 10:07:00  brian
 # - changes for 64 bit distributions
 #

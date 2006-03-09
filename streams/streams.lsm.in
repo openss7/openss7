@@ -1,21 +1,28 @@
 Begin4
-Title:			@PACKAGE@ - "Linux Fast-STREAMS"
+Title:			@PACKAGE@ - Linux Fast-STREAMS
 Version:		@VERSION@
 Entered-date:		@PACKAGE_DATE@
-Entered-by:		bidulock@openss7.org (Brian Bidulock)
-Description:		@PACKAGE@ is a STREAMS framework that is
-			compatible with SVR 4.2 MP STREAMS.
+Description:		@PACKAGE_TITLE@.
+			UNIX System V Release 4.2 STREAMS for Linux.
+			@PACKAGE@ is a STREAMS framework that is compatible with
+			SVR 4.2 MP STREAMS.  @PACKAGE@ is a production
+			replacement for the deprecated LiS package.
+			This distribution is applicable to 2.4 and 2.6 kernels
+			and was targetted at ix86, x86_64, ppc64 and ppc
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
 Keywords:		STREAMS, SVR 4.2 MP, LfS
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
-Original-site:		http://www.openss7.org/
-			3.3MB @PACKAGE@-@VERSION@.tar.bz2
-			4.1MB @PACKAGE@-@VERSION@.tar.gz
-Primary-site:		http://www.openss7.org/
-			3.3MB @PACKAGE@-@VERSION@.tar.bz2
-			4.1MB @PACKAGE@-@VERSION@.tar.gz
+Primary-site:		http://www.openss7.org/ tarballs/
+			4.6M @PACKAGE@-@VERSION@.tar.gz
+			3.8M @PACKAGE@-@VERSION@.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			3.8M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+Original-site:		
 Platforms:		Linux
-Requires:		Linux kernel 2.4 or 2.6
+			Requires: Linux kernel 2.4 or 2.6
 Copying-policy:		GPL
-Comment:		Report bugs to @PACKAGE_BUGREPORT@
 End
