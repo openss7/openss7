@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.41 $) $Date: 2006/03/05 04:02:56 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.42 $) $Date: 2006/03/09 05:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/05 04:02:56 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 05:51:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.42  2006/03/09 05:51:33  brian
+# - autoconf nits and autoupdate changes
+#
 # Revision 1.1.6.41  2006/03/05 04:02:56  brian
 # - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
 # - updates for new release
@@ -1422,7 +1425,7 @@ AC_DEFUN([_LIS_SHLIB], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_ATOMIC_STATS], [dnl
     AC_ARG_ENABLE([atomic-stats],
-	AC_HELP_STRING([--enable-atomic-stats],
+	AS_HELP_STRING([--enable-atomic-stats],
 	    [use atomic_t for module_stat structure elements.
 	    @<:@default=no@:>@]),
     [enable_atomic_stats="$enableval"],

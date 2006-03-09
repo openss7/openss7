@@ -82,23 +82,23 @@ fi
 
 AC_GNU_SOURCE
 
-AC_ARG_ENABLE(ipv6, AC_HELP_STRING([--disable-ipv6],
+AC_ARG_ENABLE(ipv6, AS_HELP_STRING([--disable-ipv6],
 	    [disable ipv6 support (default is autodetect)]), 
 	ac_cv_have_ipv6=$enable_ipv6,)
 
-AC_ARG_ENABLE(multicast, AC_HELP_STRING([--disable-multicast],
+AC_ARG_ENABLE(multicast, AS_HELP_STRING([--disable-multicast],
 	    [disable multicast support (default is autodetect)]),
 	ac_cv_multicast=$enable_multicast,)
 
-AC_ARG_ENABLE(threads, AC_HELP_STRING([--disable-threads],
+AC_ARG_ENABLE(threads, AS_HELP_STRING([--disable-threads],
 	    [disable thread support (default is autodetect)]))
 
-AC_ARG_ENABLE(debuginfo, AC_HELP_STRING([--enable-debuginfo],
+AC_ARG_ENABLE(debuginfo, AS_HELP_STRING([--enable-debuginfo],
 	    [enable debugging info for sockets (default is no)]),
 	enable_debuginfo=$enableval,
 	enable_debuginfo=no)
 
-AC_ARG_ENABLE(web100, AC_HELP_STRING([--disable-web100],
+AC_ARG_ENABLE(web100, AS_HELP_STRING([--disable-web100],
 	    [disable web100 support (default is autodetect)]))
 
 
@@ -220,36 +220,36 @@ AH_TEMPLATE(HAVE_PRINTF_QD)
 
 AC_MSG_CHECKING(*printf() support for %lld)
 can_printf_longlong=no
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 	#include <stdio.h>
 	int main() {
 		char buf[100];
 		sprintf(buf, "%lld", 21726587590LL);
 		return (strcmp(buf, "21726587590"));
 	}
-	], [
+	]])],[
 	AC_MSG_RESULT(yes)
 	can_printf_longlong=yes
-	], [
+	],[
 	AC_MSG_RESULT(no)
-	], [ : ])
+	],[ : ])
 
 if test $can_printf_longlong != yes; then
 	AC_MSG_CHECKING(*printf() support for %qd)
-	AC_TRY_RUN([
+	AC_RUN_IFELSE([AC_LANG_SOURCE([[
 		#include <stdio.h>
 		int main() {
 			char buf[100];
 			sprintf(buf, "%qd", 21726587590LL);
 			return (strcmp(buf, "21726587590"));
 		}
-		], [
+		]])],[
 		AC_MSG_RESULT(yes)
 		can_printf_longlong=yes
 		AC_DEFINE(HAVE_PRINTF_QD, 1)
-		], [
+		],[
 		AC_MSG_RESULT(no)
-		], [ : ])
+		],[ : ])
 fi
 
 if test $can_printf_longlong = yes; then

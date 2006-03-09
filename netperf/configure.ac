@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.16 $) $Date: 2006/03/04 05:33:33 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.17 $) $Date: 2006/03/09 05:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/04 05:33:33 $ by $Author: brian $
+# Last Modified $Date: 2006/03/09 05:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 
 AC_PREREQ(2.59)
-AC_INIT([netperf], [2.3], [bugs@openss7.org])
+AC_INIT([netperf],[2.3],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
