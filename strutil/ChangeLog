@@ -1,3 +1,89 @@
+2006-03-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/clone.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/drivers/clone.h: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/drivers/echo.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/drivers/fifo.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/drivers/log.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/drivers/nsdev.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/drivers/nuls.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/drivers/pipe.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/drivers/sad.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/drivers/sfx.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/drivers/spx.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/include/sys/strutil/log.h: rationalized back to Linux Fast-STREAMS
+	  resident version, updated headers
+	* src/include/sys/strutil/sad.h: rationalized back to Linux Fast-STREAMS
+	  resident version, updated headers
+	* src/include/sys/strutil/sc.h: rationalized back to Linux Fast-STREAMS
+	  resident version, updated headers
+	* src/include/sys/strutil/strlog.h: rationalized back to Linux
+	  Fast-STREAMS resident version, updated headers
+	* src/modules/connld.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/modules/pipemod.c: rationalized back to Linux Fast-STREAMS
+	  resident version, updated headers
+	* src/modules/sc.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/test/test-clone.c: rationalized back to Linux Fast-STREAMS
+	  resident version, updated headers
+	* src/test/test-connld.c: rationalized back to Linux Fast-STREAMS
+	  resident version, updated headers
+	* src/test/test-echo.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/test/test-fifo.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/test/test-log.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/test/test-nsdev.c: rationalized back to Linux Fast-STREAMS
+	  resident version, updated headers
+	* src/test/test-nuls.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/test/test-pipe.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/test/test-pipemod.c: rationalized back to Linux Fast-STREAMS
+	  resident version, updated headers
+	* src/test/test-sad.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/test/test-sc.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/test/test-streams.c: rationalized back to Linux Fast-STREAMS
+	  resident version, updated headers
+	* src/util/autopush.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/util/fattach.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/util/fdetach.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/util/scls.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/util/strace.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/util/strchg.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/util/strconf.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/util/strerr.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/util/strinfo.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/util/strreset.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* src/util/strvf.c: rationalized back to Linux Fast-STREAMS resident
+	  version, updated headers
+	* strutil.spec.in: updated description fields and headers
+
 2006-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* strutil.lsm.in: make suitable for Linux Software Map submission
@@ -57,8 +143,10 @@
 2006-03-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updated for release
-	* doc/manual/releases.texi (Bugs, Known Bugs, Maturity): updated release notes
-	* doc/manual/strutil.texi (detailed node listing): added missing Troubleshooting
+	* doc/manual/releases.texi (Bugs, Known Bugs, Maturity): updated release
+	  notes
+	* doc/manual/strutil.texi (detailed node listing): added missing
+	  Troubleshooting
 	* README-cvs: updated for release
 
 2006-03-01  Brian Bidulock  <bidulock@openss7.org>
@@ -127,3 +215,4 @@ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 Commercial licensing and support of this software is available from OpenSS7
 Corporation at a fee.  See http://www.openss7.com/
 
+vim: ft=changelog tw=80 com=fb\:*,fb\:- fo+=tcqlorn

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 10:01:21 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/10 07:24:12 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 10:01:21 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/10 07:24:12 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 10:01:21 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/10 07:24:12 $";
 
 #define _LFS_SOURCE
 
@@ -71,8 +70,8 @@ extern struct file_operations strm_f_ops;
 #endif
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PIPE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 10:01:21 $"
+#define PIPE_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/10 07:24:12 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -141,115 +140,47 @@ MODULE_ALIAS("/dev/streams/pipe/*");
 #endif
 
 static struct module_info pipe_minfo = {
-	mi_idnum:CONFIG_STREAMS_PIPE_MODID,
-	mi_idname:CONFIG_STREAMS_PIPE_NAME,
-	mi_minpsz:STRMINPSZ,
-	mi_maxpsz:STRMAXPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_PIPE_MODID,
+	.mi_idname = CONFIG_STREAMS_PIPE_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
-static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
-static int pipe_close(queue_t *q, int oflag, cred_t *crp);
-
 static struct qinit pipe_rinit = {
-	qi_putp:strrput,
-	qi_qopen:pipe_open,
-	qi_qclose:pipe_close,
-	qi_minfo:&pipe_minfo,
+	.qi_putp = strrput,
+	.qi_qopen = str_open,
+	.qi_qclose = str_close,
+	.qi_minfo = &pipe_minfo,
 };
 
 static struct qinit pipe_winit = {
-	qi_srvp:strwsrv,
-	qi_minfo:&pipe_minfo,
+	.qi_putp = strwput,
+	.qi_srvp = strwsrv,
+	.qi_minfo = &pipe_minfo,
 };
 
 static struct streamtab pipe_info = {
-	st_rdinit:&pipe_rinit,
-	st_wrinit:&pipe_winit,
+	.st_rdinit = &pipe_rinit,
+	.st_wrinit = &pipe_winit,
 };
 
 /* 
  *  -------------------------------------------------------------------------
  *
- *  OPEN and CLOSE
+ *  INITIALIZATION
  *
  *  -------------------------------------------------------------------------
  */
-/**
- *  pipe_open:	- STREAMS qopen procedure for pipe stream heads
- *  @q:		read queue of stream to open
- *  @devp:	pointer to a dev_t from which to read and into which to return the device number
- *  @oflag:	open flags
- *  @sflag:	STREAMS flags (%DRVOPEN or %MODOPEN or %CLONEOPEN)
- *  @crp:	pointer to user's credentials structure
- */
-static int
-pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
-{
-#ifdef LIS
-	return (ENXIO);
-#else
-	int err;
-
-	if (q->q_ptr != NULL) {
-		/* we walk down the queue chain calling open on each of the modules and the driver */
-		queue_t *wq = WR(q), *wq_next;
-
-		wq_next = SAMESTR(wq) ? wq->q_next : NULL;
-		while ((wq = wq_next)) {
-			int new_sflag;
-
-			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
-			new_sflag = wq_next ? MODOPEN : sflag;
-			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp)))
-				return (err > 0 ? -err : err);
-		}
-		return (0);
-	}
-	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
-		dev_t dev = *devp;
-		struct stdata *sd;
-
-		if ((sd = ((struct queinfo *) q)->qu_str)) {
-			/* 1st step: attach the driver and call its open routine */
-			/* we are the driver and this *is* the open routine */
-			/* FIXME: create another stream head and attach it to the first */
-			/* FIXME: place a M_PASSFP message on the first stream head */
-			/* start off life as a fifo */
-			WR(q)->q_next = q;
-			/* 2nd step: check for redirected return */
-			/* we are the driver and this *is* the open routine and there is no
-			   redirection. */
-			/* 3rd step: autopush modules and call their open routines */
-			if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp)))
-				return (err > 0 ? -err : err);
-			/* lastly, attach our privates and return */
-			q->q_ptr = WR(q)->q_ptr = sd;
-			return (0);
-		}
-	}
-	return (-EIO);		/* can't be opened as module or clone */
-#endif
-}
-static int
-pipe_close(queue_t *q, int oflag, cred_t *crp)
-{
-#ifdef LFS
-	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
-		return (ENXIO);
-#endif
-	q->q_ptr = WR(q)->q_ptr = NULL;
-	return (0);
-}
 
 static struct cdevsw pipe_cdev = {
-	d_name:CONFIG_STREAMS_PIPE_NAME,
-	d_str:&pipe_info,
-	d_flag:D_CLONE,
-	d_fop:&strm_f_ops,
-	d_mode:S_IFIFO | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_PIPE_NAME,
+	.d_str = &pipe_info,
+	.d_flag = D_CLONE | D_MP,
+	.d_fop = &strm_f_ops,
+	.d_mode = S_IFIFO | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_PIPE_MODULE

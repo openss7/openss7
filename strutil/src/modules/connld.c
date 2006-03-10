@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:22 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:22 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:22 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:22 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -70,8 +69,8 @@ static char const ident[] =
 #endif
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CONNLD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:22 $"
+#define CONNLD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -119,12 +118,12 @@ MODULE_ALIAS("streams-module-connld");
 #endif
 
 static struct module_info connld_minfo = {
-	mi_idnum:CONFIG_STREAMS_CONNLD_MODID,
-	mi_idname:CONFIG_STREAMS_CONNLD_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_CONNLD_MODID,
+	.mi_idname = CONFIG_STREAMS_CONNLD_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 /* 
@@ -134,17 +133,17 @@ static struct module_info connld_minfo = {
  *
  *  -------------------------------------------------------------------------
  */
-static int
+static streamscall int
 connld_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp)
 {
 	return (ENXIO);
 }
-static int
+static streamscall int
 connld_close(queue_t *q, int oflag, cred_t *credp)
 {
 	return (ENXIO);
 }
-static int
+static streamscall int
 connld_putp(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);
@@ -159,25 +158,25 @@ connld_putp(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 static struct qinit connld_qinit = {
-	qi_putp:connld_putp,
-	qi_qopen:connld_open,
-	qi_qclose:connld_close,
-	qi_minfo:&connld_minfo,
+	.qi_putp = connld_putp,
+	.qi_qopen = connld_open,
+	.qi_qclose = connld_close,
+	.qi_minfo = &connld_minfo,
 };
 
 static struct streamtab connld_info = {
-	st_rdinit:&connld_qinit,
-	st_wrinit:&connld_qinit,
+	.st_rdinit = &connld_qinit,
+	.st_wrinit = &connld_qinit,
 };
 
 #ifdef LIS
 #define fmodsw _fmodsw
 #endif
 static struct fmodsw connld_fmod = {
-	f_name:CONFIG_STREAMS_CONNLD_NAME,
-	f_str:&connld_info,
-	f_flag:0,
-	f_kmod:THIS_MODULE,
+	.f_name = CONFIG_STREAMS_CONNLD_NAME,
+	.f_str = &connld_info,
+	.f_flag = D_MP,
+	.f_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_CONNLD_MODULE

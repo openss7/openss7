@@ -1,3 +1,7 @@
+2006-03-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* iperf.spec.in: updated description fields and headers
+
 2006-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: got rid of AC_HELP_STRING
@@ -89,3 +93,4 @@ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 Commercial licensing and support of this software is available from OpenSS7
 Corporation at a fee.  See http://www.openss7.com/
 
+vim: ft=changelog tw=80 com=fb\:*,fb\:- fo+=tcqlorn

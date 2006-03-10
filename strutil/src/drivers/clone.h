@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: clone.h,v 0.9.2.2 2005/05/14 08:34:40 brian Exp $
+ @(#) $Id: clone.h,v 0.9.2.3 2006/03/10 07:24:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:40 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:12 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_CLONE_H__
 #define __LOCAL_CLONE_H__
 
-extern int register_clone(struct cdevsw *cdev);
-extern int unregister_clone(struct cdevsw *cdev);
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
+
+__STREAMS_EXTERN int register_clone(struct cdevsw *cdev);
+__STREAMS_EXTERN int unregister_clone(struct cdevsw *cdev);
 
 #endif				/* __LOCAL_CLONE_H__ */

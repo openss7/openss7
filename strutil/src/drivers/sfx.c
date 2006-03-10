@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 10:01:21 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/03/10 07:24:12 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 10:01:21 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/03/10 07:24:12 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 10:01:21 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/03/10 07:24:12 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -69,8 +68,8 @@ extern struct file_operations strm_f_ops;
 #endif
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SFX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 10:01:21 $"
+#define SFX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/03/10 07:24:12 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -139,105 +138,39 @@ MODULE_ALIAS("/dev/streams/sfx/*");
 #endif
 
 static struct module_info sfx_minfo = {
-	mi_idnum:CONFIG_STREAMS_SFX_MODID,
-	mi_idname:CONFIG_STREAMS_SFX_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_SFX_MODID,
+	.mi_idname = CONFIG_STREAMS_SFX_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
-static int sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
-static int sfx_close(queue_t *q, int oflag, cred_t *crp);
-
-static struct qinit sfx_rinit = {
-	qi_putp:strrput,
-	qi_qopen:sfx_open,
-	qi_qclose:sfx_close,
-	qi_minfo:&sfx_minfo,
+static struct qinit sfx_rqinit = {
+	.qi_putp = strrput,
+	.qi_qopen = str_open,
+	.qi_qclose = str_close,
+	.qi_minfo = &sfx_minfo,
 };
 
-static struct qinit sfx_winit = {
-	qi_srvp:strwsrv,
-	qi_minfo:&sfx_minfo,
+static struct qinit sfx_wqinit = {
+	.qi_putp = strwput,
+	.qi_srvp = strwsrv,
+	.qi_minfo = &sfx_minfo,
 };
 
 static struct streamtab sfx_info = {
-	st_rdinit:&sfx_rinit,
-	st_wrinit:&sfx_winit,
+	.st_rdinit = &sfx_rqinit,
+	.st_wrinit = &sfx_wqinit,
 };
 
-#define stri_lookup(__f) ((struct stdata *)(__f)->private_data)
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  OPEN and CLOSE
- *
- *  -------------------------------------------------------------------------
- */
-static int
-sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
-{
-#ifdef LIS
-	return (ENXIO);
-#else
-	int err;
-
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
-	if (q->q_ptr != NULL) {
-		/* we walk down the queue chain calling open on each of the modules and the driver */
-		queue_t *wq = WR(q), *wq_next;
-
-		wq_next = SAMESTR(wq) ? wq->q_next : NULL;
-		while ((wq = wq_next)) {
-			/* all opens are module opens on fifos, there is no driver */
-			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
-			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp)))
-				goto error;
-		}
-		MOD_DEC_USE_COUNT;	/* already open */
-		return (0);
-	}
-	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
-		dev_t dev = *devp;
-		struct stdata *sd;
-
-		if ((sd = ((struct queinfo *) q)->qu_str)) {
-			struct cdevsw *sdev = sd->sd_cdevsw;
-
-			/* 1st step: attach the driver and call its open routine */
-			/* we are the driver and this *is* the open routine */
-			/* 2nd step: check for redirected return */
-			/* we are the driver and this *is* the open routine and there is no
-			   redirection. */
-			/* 3rd step: autopush modules and call their open routines */
-			if ((err = autopush(sd, sdev, &dev, oflag, MODOPEN, crp)))
-				goto error;
-			/* lastly, attach our privates and return */
-			q->q_ptr = WR(q)->q_ptr = sd;
-			return (0);
-		}
-	}
-	err = -EIO;		/* can't be opened as module or clone */
-      error:
-	MOD_DEC_USE_COUNT;
-	return (err <= 0 ? err : -err);
-#endif
-}
-static int
-sfx_close(queue_t *q, int oflag, cred_t *crp)
-{
-	return (0);
-}
-
 static struct cdevsw sfx_cdev = {
-	d_name:CONFIG_STREAMS_SFX_NAME,
-	d_str:&sfx_info,
-	d_flag:0,
-	d_fop:&strm_f_ops,
-	d_mode:S_IFIFO | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_SFX_NAME,
+	.d_str = &sfx_info,
+	.d_flag = D_MP,
+	.d_fop = &strm_f_ops,
+	.d_mode = S_IFIFO | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_SFX_MODULE

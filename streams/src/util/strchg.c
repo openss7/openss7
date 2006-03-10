@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/10/16 05:31:43 $
+ @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:23:59 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/16 05:31:43 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:23:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/10/16 05:31:43 $"
+#ident "@(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:23:59 $"
 
 static char const ident[] =
-    "$RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/10/16 05:31:43 $";
+    "$RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:23:59 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -90,7 +89,7 @@ version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -165,15 +164,14 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
-version.\n\
+Foundation; version 2 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -325,7 +323,7 @@ main(int argc, char *argv[])
 			output = val;
 			break;
 		case 'H':	/* -H, --help */
-				/* -H, --? */
+			/* -H, --? */
 			if (debug)
 				fprintf(stderr, "%s: printing help message\n", argv[0]);
 			help(argc, argv);

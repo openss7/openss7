@@ -3,6 +3,7 @@
 	* scripts/strconf-sh: handle package wrappers better
 	* am/strconf.am: handle package wrappers better
 	* m4/strconf.m4: handle package wrappers better
+	* strbcm.spec.in: updated description fields and headers
 
 2006-03-09  Brian Bidulock  <bidulock@openss7.org>
 

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/28 10:01:21 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/03/10 07:24:12 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/28 10:01:21 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/03/10 07:24:12 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/28 10:01:21 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/03/10 07:24:12 $";
 
 #define _LFS_SOURCE
 
@@ -66,8 +65,8 @@ static char const ident[] =
 #endif
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/28 10:01:21 $"
+#define ECHO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/03/10 07:24:12 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -78,6 +77,10 @@ static char const ident[] =
 			ECHO_CONTACT	"\n"
 #define ECHO_SPLASH	ECHO_DEVICE	" - " \
 			ECHO_REVISION	"\n"
+
+#if defined LIS && defined MODULE
+#define CONFIG_STREAMS_ECHO_MODULE MODULE
+#endif
 
 #ifdef CONFIG_STREAMS_ECHO_MODULE
 MODULE_AUTHOR(ECHO_CONTACT);
@@ -90,13 +93,28 @@ MODULE_ALIAS("streams-echo");
 #endif
 
 #ifndef CONFIG_STREAMS_ECHO_NAME
+#ifdef LIS
+#define CONFIG_STREAMS_ECHO_NAME ECHO__DRV_NAME
+#endif
+#ifdef LFS
 #define CONFIG_STREAMS_ECHO_NAME "echo"
 #endif
+#endif
 #ifndef CONFIG_STREAMS_ECHO_MODID
+#ifdef LIS
+#define CONFIG_STREAMS_ECHO_MODID ECHO__ID
+#endif
+#ifdef LFS
 #error CONFIG_STREAMS_ECHO_MODID must be defined.
 #endif
+#endif
 #ifndef CONFIG_STREAMS_ECHO_MAJOR
+#ifdef LIS
+#define CONFIG_STREAMS_ECHO_MAJOR ECHO__CMAJOR_0
+#endif
+#ifdef LFS
 #error CONFIG_STREAMS_ECHO_MAJOR must be defined.
+#endif
 #endif
 
 modID_t modid = CONFIG_STREAMS_ECHO_MODID;
@@ -132,24 +150,67 @@ MODULE_ALIAS("/dev/streams/echo/*");
 #endif
 #endif
 
+#ifdef LIS
+#define STRMINPSZ   0
+#define STRMAXPSZ   4096
+#define STRHIGH	    5120
+#define STRLOW	    1024
+#endif
+
 static struct module_info echo_minfo = {
-	mi_idnum:CONFIG_STREAMS_ECHO_MODID,
-	mi_idname:CONFIG_STREAMS_ECHO_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_ECHO_MODID,
+	.mi_idname = CONFIG_STREAMS_ECHO_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
-static int
-echo_put(queue_t *q, mblk_t *mp)
+#ifdef LIS
+#define trace() while (0) { }
+#define ptrace(__x) while (0) { }
+#define printd(__x) while (0) { }
+#define pswerr(__x) while (0) { }
+#define ctrace(__x) __x
+
+#define QSVCBUSY QRUNNING
+
+union ioctypes {
+	struct iocblk iocblk;
+	struct copyreq copyreq;
+	struct copyresp copyresp;
+};
+#endif
+
+#ifdef LiS
+#define streamscall _RP
+#endif
+
+static streamscall int
+echo_rput(queue_t *q, mblk_t *mp)
+{
+	putnext(q, mp);
+	return (0);
+}
+
+static streamscall int
+echo_rsrv(queue_t *q)
+{
+	qenable(OTHERQ(q));
+	return (0);
+}
+
+static streamscall int
+echo_wput(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
 	trace();
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
+		trace();
 		if (mp->b_rptr[0] & FLUSHW) {
+			trace();
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, mp->b_rptr[1], FLUSHALL);
 			else
@@ -157,22 +218,40 @@ echo_put(queue_t *q, mblk_t *mp)
 			mp->b_rptr[0] &= ~FLUSHW;
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
-			queue_t *rq = RD(q);
-
+			trace();
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(rq, mp->b_rptr[1], FLUSHALL);
+				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
 			else
-				flushq(rq, FLUSHALL);
-			qreply(q, mp);
+				flushq(RD(q), FLUSHALL);
+			ctrace(qreply(q, mp));
+			/* never makes it here */
+			trace();
 			return (0);
 		}
+		trace();
 		break;
 	case M_IOCTL:
-		err = -EOPNOTSUPP;
-		goto nak;
 	case M_IOCDATA:
+	{
+		union ioctypes *ioc;
+
+		ptrace(("received M_IOCTL or M_IOCDATA, naking it\n"));
 		err = -EINVAL;
-		goto nak;
+
+		mp->b_datap->db_type = M_IOCNAK;
+		ioc = (typeof(ioc)) mp->b_rptr;
+		ioc->iocblk.ioc_count = 0;
+		ioc->iocblk.ioc_rval = -1;
+		ioc->iocblk.ioc_error = -err;
+		qreply(q, mp);
+		return (0);
+	}
+	case M_READ:
+		mp->b_wptr = mp->b_rptr;
+		mp->b_datap->db_type = M_DATA;
+		mp->b_flag |= MSGDELIM;
+		qreply(q, mp);
+		return (0);
 	case M_DATA:
 	case M_PROTO:
 	case M_PCPROTO:
@@ -180,23 +259,34 @@ echo_put(queue_t *q, mblk_t *mp)
 	case M_PCCTL:
 	case M_RSE:
 	case M_PCRSE:
-		qreply(q, mp);
-		return (0);
-	default:
-		freemsg(mp);
+		/* Check QSVCBUSY flag in MP drivers to avoid missequencing of messages when
+		   service procedure is running concurrent with put procedure. */
+		if (mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)
+						     || !bcanputnext(OTHERQ(q), mp->b_band)))
+			putq(q, mp);
+		else
+			qreply(q, mp);
 		return (0);
 	}
-      nak:
-	{
-		union ioctypes *ioc;
+	freemsg(mp);
+	return (0);
+}
 
-		mp->b_datap->db_type = M_IOCNAK;
-		ioc = (typeof(ioc)) mp->b_rptr;
-		ioc->iocblk.ioc_rval = -1;
-		ioc->iocblk.ioc_error = -err;
-		qreply(q, mp);
-		return (0);
+static streamscall int
+echo_wsrv(queue_t *q)
+{
+	mblk_t *mp;
+	queue_t *rq = RD(q);
+
+	while ((mp = getq(q))) {
+		if (bcanputnext(rq, mp->b_band)) {
+			putnext(rq, mp);
+			continue;
+		}
+		putbq(q, mp);
+		break;
 	}
+	return (0);
 }
 
 typedef struct echo {
@@ -208,7 +298,14 @@ typedef struct echo {
 static spinlock_t echo_lock = SPIN_LOCK_UNLOCKED;
 static struct echo *echo_list = NULL;
 
-static int
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  OPEN and CLOSE
+ *
+ *  -------------------------------------------------------------------------
+ */
+static streamscall int
 echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct echo *p, **pp = &echo_list;
@@ -247,19 +344,23 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		spin_lock(&echo_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
-		     getminor(makedevice(0, cminor)) != 0; pp = &(*pp)->next, cminor++) {
+		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
 			minor_t dminor = getminor((*pp)->dev);
 
 			if (cminor < dminor)
 				break;
-			if (cminor == dminor && sflag != CLONEOPEN) {
-				spin_unlock(&echo_lock);
-				kmem_free(p, sizeof(*p));
-				pswerr(("%s: stream already open!\n", __FUNCTION__));
-				return (EIO);	/* bad error */
+			if (cminor == dminor) {
+				if (sflag == CLONEOPEN)
+					cminor++;
+				else {
+					spin_unlock(&echo_lock);
+					kmem_free(p, sizeof(*p));
+					pswerr(("%s: stream already open!\n", __FUNCTION__));
+					return (EIO);	/* bad error */
+				}
 			}
 		}
-		if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
+		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
 			spin_unlock(&echo_lock);
 			kmem_free(p, sizeof(*p));
 			printd(("%s: no minor devices left\n", __FUNCTION__));
@@ -272,6 +373,7 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock(&echo_lock);
+		qprocson(q);
 		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
@@ -279,7 +381,8 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	pswerr(("%s: bad sflag %d\n", __FUNCTION__, sflag));
 	return (ENXIO);
 }
-static int
+
+static streamscall int
 echo_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct echo *p;
@@ -289,6 +392,7 @@ echo_close(queue_t *q, int oflag, cred_t *crp)
 		pswerr(("%s: already closed\n", __FUNCTION__));
 		return (0);	/* already closed */
 	}
+	qprocsoff(q);
 	spin_lock(&echo_lock);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
@@ -301,28 +405,31 @@ echo_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit echo_rqinit = {
-	qi_qopen:echo_open,
-	qi_qclose:echo_close,
-	qi_minfo:&echo_minfo,
+	.qi_putp = echo_rput,
+	.qi_srvp = echo_rsrv,
+	.qi_qopen = echo_open,
+	.qi_qclose = echo_close,
+	.qi_minfo = &echo_minfo,
 };
 
 static struct qinit echo_wqinit = {
-	qi_putp:echo_put,
-	qi_minfo:&echo_minfo,
+	.qi_putp = echo_wput,
+	.qi_srvp = echo_wsrv,
+	.qi_minfo = &echo_minfo,
 };
 
 static struct streamtab echo_info = {
-	st_rdinit:&echo_rqinit,
-	st_wrinit:&echo_wqinit,
+	.st_rdinit = &echo_rqinit,
+	.st_wrinit = &echo_wqinit,
 };
 
 static struct cdevsw echo_cdev = {
-	d_name:CONFIG_STREAMS_ECHO_NAME,
-	d_str:&echo_info,
-	d_flag:0,
-	d_fop:NULL,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_ECHO_NAME,
+	.d_str = &echo_info,
+	.d_flag = D_MP,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_ECHO_MODULE

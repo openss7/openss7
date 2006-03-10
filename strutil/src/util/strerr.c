@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/20 13:02:41 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:24:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/20 13:02:41 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/20 13:02:41 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:24:20 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/20 13:02:41 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:24:20 $";
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -578,14 +577,14 @@ version(int argc, char **argv)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
 static void
-usage(int argc, char **argv)
+usage(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -599,7 +598,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char **argv)
+help(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -632,12 +631,12 @@ Options:\n\
         increase or set debugging verbosity\n\
     -v, --verbose [LEVEL]\n\
         increase or set output verbosity\n\
-    -h, --help\n\
-        prints this usage information and exits\n\
+    -h, --help, -?\n\
+        print this usage information and exit\n\
     -V, --version\n\
-        prints the version and exits\n\
+        print the version and exit\n\
     -C, --copying\n\
-        prints copying permissions and exits\n\
+        print copying permissions and exit\n\
 ", argv[0], program, loggername);
 }
 
@@ -650,15 +649,14 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
-version.\n\
+Foundation; version  2  of  the  License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -1055,15 +1053,17 @@ main(int argc, char *argv[])
 
 		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options,
 				     &option_index);
-#else
+#else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?");
-#endif
+#endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
 				fprintf(stderr, "%s: done options processing\n", argv[0]);
 			break;
 		}
 		switch (c) {
+		case 0:
+			goto bad_usage;
 		case 'n':	/* -n, --nodaemon */
 			if (debug)
 				fprintf(stderr, "%s: suppressing deamon mode\n", argv[0]);
@@ -1099,10 +1099,10 @@ main(int argc, char *argv[])
 		case 'q':	/* -q, --quiet */
 			if (debug)
 				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
-			output = 0;
 			debug = 0;
+			output = 0;
 			break;
-		case 'D':	/* -D, --debug [LEVEL] */
+		case 'D':	/* -D, --debug [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -1115,7 +1115,7 @@ main(int argc, char *argv[])
 			if (debug)
 				nomead = 0;
 			break;
-		case 'v':	/* -v, --verbose [LEVEL] */
+		case 'v':	/* -v, --verbose [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -1147,7 +1147,7 @@ main(int argc, char *argv[])
 		      bad_option:
 			optind--;
 		      bad_nonopt:
-			if (output > 0 || debug > 0) {
+			if (output || debug) {
 				if (optind < argc) {
 					fprintf(stderr, "%s: syntax error near '", argv[0]);
 					while (optind < argc)
@@ -1158,6 +1158,7 @@ main(int argc, char *argv[])
 					fprintf(stderr, "\n");
 				}
 				fflush(stderr);
+			      bad_usage:
 				usage(argc, argv);
 			}
 			exit(2);
@@ -1223,9 +1224,11 @@ main(int argc, char *argv[])
 				if (dat.len <= 0)
 					continue;
 				if (nomead && outfile[0] != '\0') {
+					time_t ltime = lc->ltime;
+
 					snprintf_text(sbuf, sizeof(sbuf), dbuf, dat.len);
 					fprintf(stdout, "%d", lc->seq_no);
-					fprintf(stdout, " %s", ctime(&lc->ltime));
+					fprintf(stdout, " %s", ctime(&ltime));
 					fprintf(stdout, "%lu", (unsigned long) lc->ttime);
 					fprintf(stdout, "%3d", lc->level);
 					if (lc->flags & SL_TRACE)

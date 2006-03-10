@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:38:51 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/10 07:24:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:51 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:38:51 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/10 07:24:20 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:38:51 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/10 07:24:20 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -78,24 +77,24 @@ static char const ident[] =
 #include <stropts.h>
 #include <sys/sc.h>
 
-static int debug = 0;
-static int output = 1;
+static int debug = 0;			/* default no debug */
+static int output = 1;			/* default normal output */
 
 static void
-version(int argc, char **argv)
+version(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
 static void
-usage(int argc, char **argv)
+usage(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -109,7 +108,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char **argv)
+help(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -124,6 +123,10 @@ Arguments:\n\
 	specific drivers and modules to list instead of all drivers and\n\
 	modules\n\
 Options:\n\
+    -c, --count\n\
+        print module_stats only\n\
+    -l, --long\n\
+        print module_info and module_stats\n\
     -q, --quiet\n\
         suppress output\n\
     -d, --debug [LEVEL]\n\
@@ -148,15 +151,14 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
-version.\n\
+Foundation; version  2  of  the  License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -193,40 +195,38 @@ printit(struct sc_mlist *l, int cmd)
 {
 	if (output <= 0 || l->major == -1)
 		return;
-	fprintf(stdout, "%s", l->mi.mi_idname);
+	fprintf(stdout, "%s", l->name);
 	switch (cmd) {
 	case CMN_LONG:
 		if (l->major != 0) {
 			fprintf(stdout, "\tdevice");
-			fprintf(stdout, "\t%u", l->major);
+			fprintf(stdout, "\t%ld", (long) l->major);
 		} else {
 			fprintf(stdout, "\tmodule");
 			fprintf(stdout, "\t-");
 		}
 		fprintf(stdout, "\t%u", l->mi.mi_idnum);
-		fprintf(stdout, "\t%s", l->mi.mi_idname);
-		fprintf(stdout, "\t%d", l->mi.mi_minpsz);
-		fprintf(stdout, "\t%d", l->mi.mi_maxpsz);
-		fprintf(stdout, "\t%d", l->mi.mi_hiwat);
-		fprintf(stdout, "\t%d", l->mi.mi_lowat);
+		fprintf(stdout, "\t%ld", (long) l->mi.mi_minpsz);
+		fprintf(stdout, "\t%ld", (long) l->mi.mi_maxpsz);
+		fprintf(stdout, "\t%ld", (long) l->mi.mi_hiwat);
+		fprintf(stdout, "\t%ld", (long) l->mi.mi_lowat);
 	case CMN_COUNT:
-		fprintf(stdout, "\t%lu", l->ms.ms_pcnt);
-		fprintf(stdout, "\t%lu", l->ms.ms_scnt);
-		fprintf(stdout, "\t%lu", l->ms.ms_ocnt);
-		fprintf(stdout, "\t%lu", l->ms.ms_acnt);
+		fprintf(stdout, "\t%ld", (long) l->ms.ms_pcnt);
+		fprintf(stdout, "\t%ld", (long) l->ms.ms_scnt);
+		fprintf(stdout, "\t%ld", (long) l->ms.ms_ocnt);
+		fprintf(stdout, "\t%ld", (long) l->ms.ms_acnt);
 		fprintf(stdout, "\t%x", l->ms.ms_flags);
 	}
 	fprintf(stdout, "\n");
 };
 
 int
-main(int argc, char **argv)
+main(int argc, char *argv[])
 {
 	int i, fd, count;
 	struct sc_list *list;
-	struct strioctl ic;
 
-	while (1) {
+	for (;;) {
 		int c, val;
 
 #if defined _GNU_SOURCE
@@ -235,8 +235,8 @@ main(int argc, char **argv)
 		static struct option long_options[] = {
 			{"long",	no_argument,		NULL, 'l'},
 			{"count",	no_argument,		NULL, 'c'},
-			{"debug",	optional_argument,	NULL, 'd'},
 			{"quiet",	no_argument,		NULL, 'q'},
+			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
@@ -246,9 +246,9 @@ main(int argc, char **argv)
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "lcdqvhVC?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "lcqD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "lcdqvhVC?");
+		c = getopt(argc, argv, "lcqDvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -256,6 +256,8 @@ main(int argc, char **argv)
 			break;
 		}
 		switch (c) {
+		case 0:
+			goto bad_usage;
 		case 'l':
 			if (command != CMN_NONE)
 				goto bad_option;
@@ -270,24 +272,24 @@ main(int argc, char **argv)
 				fprintf(stderr, "%s: setting count command\n", argv[0]);
 			command = CMN_COUNT;
 			break;
-		case 'd':	/* -d, --debug */
+		case 'D':	/* -D, --debug */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
 				debug++;
-				break;
+			} else {
+				if ((val = strtol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				debug = val;
 			}
-			if ((val = strtol(optarg, NULL, 0)) < 0)
-				goto bad_option;
-			debug = val;
 			break;
 		case 'q':	/* -q, --quiet */
 			if (debug)
 				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
-			output = 0;
 			debug = 0;
+			output = 0;
 			break;
-		case 'v':	/* -v, --verbose */
+		case 'v':	/* -v, --verbose [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -318,7 +320,9 @@ main(int argc, char **argv)
 		default:
 		      bad_option:
 			optind--;
-			if (output > 0 || debug > 0) {
+			goto bad_nonopt;
+		      bad_nonopt:
+			if (output || debug) {
 				if (optind < argc) {
 					fprintf(stderr, "%s: syntax error near '", argv[0]);
 					while (optind < argc)
@@ -329,42 +333,52 @@ main(int argc, char **argv)
 					fprintf(stderr, "\n");
 				}
 				fflush(stderr);
+			      bad_usage:
 				usage(argc, argv);
 			}
 			exit(2);
 		}
 	}
+	if (debug)
+		fprintf(stderr, "%s: opening /dev/nuls\n", argv[0]);
 	if ((fd = open("/dev/nuls", O_RDWR)) < 0) {
+		if (debug)
+			fprintf(stderr, "%s: could not open /dev/nuls\n", argv[0]);
 		perror(argv[0]);
 		exit(1);
 	}
+	if (debug)
+		fprintf(stderr, "%s: pushing sc module\n", argv[0]);
 	if (ioctl(fd, I_PUSH, "sc") < 0) {
+		if (debug)
+			fprintf(stderr, "%s: could not push sc module\n", argv[0]);
 		perror(argv[0]);
 		exit(1);
 	}
+	if (debug)
+		fprintf(stderr, "%s: getting size of list\n", argv[0]);
 	/* go out and get all the names anyway */
-	ic.ic_cmd = SC_IOC_LIST;
-	ic.ic_timout = -1;
-	ic.ic_len = 0;
-	ic.ic_dp = NULL;
-	if ((count = ioctl(fd, I_STR, ic) < 0)) {
+	if ((count = ioctl(fd, SC_IOC_LIST, NULL)) < 0) {
+		if (debug)
+			fprintf(stderr, "%s: could not perform SC_IOC_LIST command\n", argv[0]);
 		perror(argv[0]);
 		exit(1);
 	}
+	if (debug)
+		fprintf(stderr, "%s: size of list = %d\n", argv[0], count);
 	/* get entire list */
-	ic.ic_cmd = SC_IOC_LIST;
-	ic.ic_timout = -1;
-	ic.ic_len = sizeof(struct sc_list) + count * sizeof(struct sc_mlist);
-	ic.ic_dp = malloc(ic.ic_len);
-	if (ic.ic_dp == NULL) {
+	if ((list = malloc(sizeof(struct sc_list) + count * sizeof(struct sc_mlist))) == NULL) {
+		if (debug)
+			fprintf(stderr, "%s: could not allocate memory\n", argv[0]);
 		fprintf(stderr, "%s: %s\n", argv[0], strerror(ENOMEM));
 		fflush(stderr);
 		exit(1);
 	}
-	list = (struct sc_list *) ic.ic_dp;
 	list->sc_nmods = count;
 	list->sc_mlist = (struct sc_mlist *) (list + 1);
-	if (ioctl(fd, I_STR, ic) < 0) {
+	if (ioctl(fd, SC_IOC_LIST, list) < 0) {
+		if (debug)
+			fprintf(stderr, "%s: could not perform second SC_IOC_LIST command\n", argv[0]);
 		perror(argv[0]);
 		exit(1);
 	}
@@ -374,7 +388,7 @@ main(int argc, char **argv)
 		/* have module name arguments - iterate through them */
 		for (; optind < argc; optind++) {
 			for (i = 0; i < count; i++)
-				if (strncmp(argv[optind], list->sc_mlist[i].mi.mi_idname, FMNAMESZ)
+				if (strncmp(argv[optind], list->sc_mlist[i].name, FMNAMESZ)
 				    == 0)
 					break;
 			if (i < count)

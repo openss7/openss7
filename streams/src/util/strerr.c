@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/20 10:59:30 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:23:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:30 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:23:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strerr.c,v $
+ Revision 0.9.2.21  2006/03/10 07:23:59  brian
+ - rationalized streams and strutil package sources
+
  Revision 0.9.2.20  2006/02/20 10:59:30  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/20 10:59:30 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:23:59 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/20 10:59:30 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:23:59 $";
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -1057,7 +1060,8 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options,
+				     &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?");
 #endif				/* defined _GNU_SOURCE */
@@ -1230,6 +1234,7 @@ main(int argc, char *argv[])
 					continue;
 				if (nomead && outfile[0] != '\0') {
 					time_t ltime = lc->ltime;
+
 					snprintf_text(sbuf, sizeof(sbuf), dbuf, dat.len);
 					fprintf(stdout, "%d", lc->seq_no);
 					fprintf(stdout, " %s", ctime(&ltime));

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/02/20 10:59:30 $
+ @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/10 07:23:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:30 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:23:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: autopush.c,v $
+ Revision 0.9.2.18  2006/03/10 07:23:59  brian
+ - rationalized streams and strutil package sources
+
  Revision 0.9.2.17  2006/02/20 10:59:30  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/02/20 10:59:30 $"
+#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/10 07:23:59 $"
 
-static char const ident[] = "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/02/20 10:59:30 $";
+static char const ident[] =
+    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/10 07:23:59 $";
 
 /* 
  *  autopush(8)
@@ -280,7 +284,8 @@ sc_list(char *argv[], int fd)
 		fprintf(stderr, "%s: getting number of drivers and modules\n", __FUNCTION__);
 	if ((count = ioctl(fd, SC_IOC_LIST, NULL)) < 0) {
 		if (debug)
-			fprintf(stderr, "%s: could not perform SC_IOC_LIST command\n", __FUNCTION__);
+			fprintf(stderr, "%s: could not perform SC_IOC_LIST command\n",
+				__FUNCTION__);
 		if (output || debug)
 			perror(argv[0]);
 		return (list);
@@ -299,7 +304,8 @@ sc_list(char *argv[], int fd)
 	list->sc_mlist = (struct sc_mlist *) (list + 1);
 	if (ioctl(fd, SC_IOC_LIST, list) < 0) {
 		if (debug)
-			fprintf(stderr, "%s: could not perform second SC_IOC_LIST command\n", __FUNCTION__);
+			fprintf(stderr, "%s: could not perform second SC_IOC_LIST command\n",
+				__FUNCTION__);
 		perror(argv[0]);
 		free(list);
 		list = NULL;
@@ -310,13 +316,16 @@ sc_list(char *argv[], int fd)
 }
 
 static int
-autopush_set(char *argv[], char *devname, int major, int minor, int lastminor, int nmods, char **modlist)
+autopush_set(char *argv[], char *devname, int major, int minor, int lastminor, int nmods,
+	     char **modlist)
 {
 	struct strapush sap;
 	int i, fd, cmd;
 
 	if (debug) {
-		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d, lastminor=%d, nmods=%d, modlist=", __FUNCTION__, devname, major, minor, lastminor, nmods);
+		fprintf(stderr,
+			"%s: devname=%s, major=%d, minor=%d, lastminor=%d, nmods=%d, modlist=",
+			__FUNCTION__, devname, major, minor, lastminor, nmods);
 		for (i = 0; i < nmods; i++)
 			fprintf(stderr, "\"%s\" ", modlist[i]);
 		fprintf(stderr, "\n");
@@ -352,7 +361,8 @@ autopush_set(char *argv[], char *devname, int major, int minor, int lastminor, i
 			fprintf(stderr, "%s: copying module name %s\n", __FUNCTION__, modlist[i]);
 		strncpy(sap.sap_list[i], modlist[i], FMNAMESZ);
 		if (debug)
-			fprintf(stderr, "%s: copied module name %s\n", __FUNCTION__, sap.sap_list[i]);
+			fprintf(stderr, "%s: copied module name %s\n", __FUNCTION__,
+				sap.sap_list[i]);
 	}
 	strncpy(sap.sap_module, devname, FMNAMESZ);
 	if (debug)
@@ -370,7 +380,8 @@ static int
 autopush_cln(char *argv[], char *devname, int major, int minor)
 {
 	if (debug)
-		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname, major, minor);
+		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname,
+			major, minor);
 	return (1);
 }
 
@@ -416,7 +427,8 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 	int fd;
 
 	if (debug)
-		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname, major, minor);
+		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname,
+			major, minor);
 	if (debug)
 		fprintf(stderr, "%s: opening %s\n", __FUNCTION__, SAD_USER_FILENAME);
 	if ((fd = open(SAD_USER_FILENAME, O_RDWR | O_NONBLOCK)) < 0) {
@@ -445,7 +457,8 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 			int j;
 
 			printf("DeviceName Major Minor Lastminor Modules\n");
-			printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major, (long) sap.sap_minor);
+			printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
+			       (long) sap.sap_minor);
 			if (sap.sap_minor == sap.sap_lastminor)
 				printf("%5s ", "-");
 			else
@@ -478,7 +491,10 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 			sap.sap_npush = MAXAPUSH;
 			strncpy(sap.sap_module, mlist->name, FMNAMESZ);
 			if (debug)
-				fprintf(stderr, "%s: performing SAD_GAP major = %d, minor = %d, name = %s\n", __FUNCTION__, (int) sap.sap_major, (int) sap.sap_minor, sap.sap_module);
+				fprintf(stderr,
+					"%s: performing SAD_GAP major = %d, minor = %d, name = %s\n",
+					__FUNCTION__, (int) sap.sap_major, (int) sap.sap_minor,
+					sap.sap_module);
 			errno = 0;
 			if (ioctl(fd, SAD_GAP, &sap) < 0) {
 				if (debug)
@@ -511,7 +527,8 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 			if (output || debug) {
 				int j;
 
-				printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major, (long) sap.sap_minor);
+				printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
+				       (long) sap.sap_minor);
 				if (sap.sap_minor == sap.sap_lastminor)
 					printf("%5s ", "-");
 				else
@@ -534,7 +551,8 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 	int fd;
 
 	if (debug)
-		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname, major, minor);
+		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname,
+			major, minor);
 	if (debug)
 		fprintf(stderr, "%s: opening %s\n", __FUNCTION__, SAD_ADMIN_FILENAME);
 	if ((fd = open(SAD_ADMIN_FILENAME, O_RDWR | O_NONBLOCK)) < 0) {
@@ -563,7 +581,8 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 			int j;
 
 			printf("DeviceName Major Minor Lastminor Modules\n");
-			printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major, (long) sap.sap_minor);
+			printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
+			       (long) sap.sap_minor);
 			if (sap.sap_minor == sap.sap_lastminor)
 				printf("%5s ", "-");
 			else
@@ -596,7 +615,8 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 			sap.sap_npush = MAXAPUSH;
 			strncpy(sap.sap_module, mlist->name, FMNAMESZ);
 			if (debug)
-				fprintf(stderr, "%s: performing SAD_SAP major = %d, name = %s\n", __FUNCTION__, (int) major, sap.sap_module);
+				fprintf(stderr, "%s: performing SAD_SAP major = %d, name = %s\n",
+					__FUNCTION__, (int) major, sap.sap_module);
 			if (ioctl(fd, SAD_SAP, &sap) < 0) {
 				switch (errno) {
 				case ENOSTR:	/* skip that device */
@@ -621,7 +641,8 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 			if (output || debug) {
 				int j;
 
-				printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major, (long) sap.sap_minor);
+				printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
+				       (long) sap.sap_minor);
 				if (sap.sap_minor == sap.sap_lastminor)
 					printf("%5s ", "-");
 				else
@@ -657,7 +678,10 @@ autopush_fil(char *argv[], char *filename)
 		int major = -1, minor = -1, lastminor = -1;
 		char devname[FMNAMESZ + 1] = "";
 
-		for (str = line, tokenind = 0, sap.sap_npush = 0; tokenind < MAXAPUSH + 3 && (token = strtok_r(str, " \t\f\n\r\v", &tmp)) != NULL; str = NULL, tokenind++) {
+		for (str = line, tokenind = 0, sap.sap_npush = 0;
+		     tokenind < MAXAPUSH + 3
+		     && (token = strtok_r(str, " \t\f\n\r\v", &tmp)) != NULL;
+		     str = NULL, tokenind++) {
 			switch (tokenind) {
 				char *end;
 
@@ -689,7 +713,9 @@ autopush_fil(char *argv[], char *filename)
 				lastminor = strtol(token, &end, 0);
 				if (end[0] != '\0')
 					break;
-				if (lastminor != -1 && (lastminor < 0 || lastminor > MAX_MINOR_DEVICE || lastminor < minor))
+				if (lastminor != -1
+				    && (lastminor < 0 || lastminor > MAX_MINOR_DEVICE
+					|| lastminor < minor))
 					break;
 				continue;
 			default:	/* module name (tokenind - 3) */
@@ -794,7 +820,8 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "f:sgrcM:m:N:l:vqD::x::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "f:sgrcM:m:N:l:vqD::x::hVC?W:", long_options,
+				     &option_index);
 #else				/* _GNU_SOURCE */
 		c = getopt(argc, argv, "f:sgrcM:m:N:l:vqDxhVC?");
 #endif				/* _GNU_SOURCE */
@@ -828,7 +855,8 @@ main(int argc, char *argv[])
 			option = OPTION_RESET;
 			break;
 		case 'M':	/* -M, --major [ major | name ] */
-			if (option == OPTION_NONE || option == OPTION_FILE || option == OPTION_VERIFY || *devname != 0)
+			if (option == OPTION_NONE || option == OPTION_FILE
+			    || option == OPTION_VERIFY || *devname != 0)
 				goto bad_option;
 			if ('0' <= *optarg && *optarg <= '9') {
 				/* -M, --major major */
@@ -841,14 +869,16 @@ main(int argc, char *argv[])
 			}
 			break;
 		case 'm':	/* -m, --minor minor */
-			if (option == OPTION_NONE || option == OPTION_FILE || option == OPTION_VERIFY || minor != -1)
+			if (option == OPTION_NONE || option == OPTION_FILE
+			    || option == OPTION_VERIFY || minor != -1)
 				goto bad_option;
 			minor = atoi(optarg);
 			if (minor < 0 || minor > MAX_MINOR_DEVICE)
 				goto bad_option;
 			break;
 		case 'N':	/* -N, --name name */
-			if (option == OPTION_NONE || option == OPTION_FILE || option == OPTION_VERIFY || major != -1)
+			if (option == OPTION_NONE || option == OPTION_FILE
+			    || option == OPTION_VERIFY || major != -1)
 				goto bad_option;
 			strncpy(devname, optarg, FMNAMESZ);
 			break;
@@ -942,7 +972,8 @@ main(int argc, char *argv[])
 	case OPTION_FILE:
 		if (optind < argc) {
 			if (debug)
-				fprintf(stderr, "%s: OPTION_FILE: too many non-option arguments\n", argv[0]);
+				fprintf(stderr, "%s: OPTION_FILE: too many non-option arguments\n",
+					argv[0]);
 			goto bad_nonopt;
 		}
 		exit(autopush_fil(argv, filename));
@@ -951,15 +982,19 @@ main(int argc, char *argv[])
 			goto option_reset;
 		if (argc - optind > MAXAPUSH) {
 			if (debug)
-				fprintf(stderr, "%s: OPTION_SET: too many ( %d > %d ) module names\n", argv[0], argc - optind, MAXAPUSH);
+				fprintf(stderr,
+					"%s: OPTION_SET: too many ( %d > %d ) module names\n",
+					argv[0], argc - optind, MAXAPUSH);
 			optind += MAXAPUSH;
 			goto bad_nonopt;
 		}
-		exit(autopush_set(argv, devname, major, minor, lastminor, argc - optind, &argv[optind]));
+		exit(autopush_set
+		     (argv, devname, major, minor, lastminor, argc - optind, &argv[optind]));
 	case OPTION_GET:
 		if (optind < argc) {
 			if (debug)
-				fprintf(stderr, "%s: OPTION_GET: too many non-option arguments\n", argv[0]);
+				fprintf(stderr, "%s: OPTION_GET: too many non-option arguments\n",
+					argv[0]);
 			goto bad_nonopt;
 		}
 		exit(autopush_get(argv, devname, major, minor));
@@ -967,13 +1002,16 @@ main(int argc, char *argv[])
 	      option_reset:
 		if (optind < argc) {
 			if (debug)
-				fprintf(stderr, "%s: OPTION_RESET: too many non-option arguments\n", argv[0]);
+				fprintf(stderr, "%s: OPTION_RESET: too many non-option arguments\n",
+					argv[0]);
 			goto bad_nonopt;
 		}
 #if 0
 		if ((*devname == 0 && major == -1) || minor == -1) {
 			if (debug)
-				fprintf(stderr, "%s: OPTION_RESET: one of -N or -M and -m must be set\n", argv[0]);
+				fprintf(stderr,
+					"%s: OPTION_RESET: one of -N or -M and -m must be set\n",
+					argv[0]);
 			goto bad_nonopt;
 		}
 #endif
@@ -983,7 +1021,9 @@ main(int argc, char *argv[])
 			exit(0);	/* no modules to verify */
 		if (argc - optind > MAXAPUSH) {
 			if (debug)
-				fprintf(stderr, "%s: OPTION_VERIFY: too many ( %d > %d ) module names\n", argv[0], argc - optind, MAXAPUSH);
+				fprintf(stderr,
+					"%s: OPTION_VERIFY: too many ( %d > %d ) module names\n",
+					argv[0], argc - optind, MAXAPUSH);
 			optind += MAXAPUSH;
 			goto bad_nonopt;
 		}
@@ -991,12 +1031,15 @@ main(int argc, char *argv[])
 	case OPTION_CLONE:
 		if (optind < argc) {
 			if (debug)
-				fprintf(stderr, "%s: OPTION_CLONE: too many non-option arguments\n", argv[0]);
+				fprintf(stderr, "%s: OPTION_CLONE: too many non-option arguments\n",
+					argv[0]);
 			goto bad_nonopt;
 		}
 		if ((*devname == 0 && major == -1) || minor == -1) {
 			if (debug)
-				fprintf(stderr, "%s: OPTION_CLONE: one of -N or -M and -m must be set\n", argv[0]);
+				fprintf(stderr,
+					"%s: OPTION_CLONE: one of -N or -M and -m must be set\n",
+					argv[0]);
 			goto bad_nonopt;
 		}
 		exit(autopush_cln(argv, devname, major, minor));

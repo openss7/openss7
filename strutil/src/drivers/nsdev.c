@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 10:01:21 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/10 07:24:12 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 10:01:21 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/10 07:24:12 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 10:01:21 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/10 07:24:12 $";
 
 #define _LFS_SOURCE
 
@@ -70,8 +69,8 @@ static char const ident[] =
 #endif
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 10:01:21 $"
+#define NSDEV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/10 07:24:12 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -140,12 +139,12 @@ MODULE_ALIAS("/dev/streams/nsdev/*");
 #endif
 
 LFSSTATIC struct module_info nsdev_minfo = {
-	mi_idnum:CONFIG_STREAMS_NSDEV_MODID,
-	mi_idname:CONFIG_STREAMS_NSDEV_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_NSDEV_MODID,
+	.mi_idname = CONFIG_STREAMS_NSDEV_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 LFSSTATIC struct qinit nsdev_rinit = {
@@ -196,7 +195,7 @@ nsdevopen(struct inode *inode, struct file *file)
 		printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
 		err = spec_open(file, cdev, dev, sflag);
 		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-		sdev_put(cdev);
+		ctrace(sdev_put(cdev));
 	} else
 		err = -ENOENT;
 	return (err);
@@ -262,7 +261,7 @@ nsdev_open(struct inode *inode, struct file *file)
 	modID_t modid, instance;
 	dev_t dev;
 
-#ifdef HAVE_KFUNC_TO_KDEV_T
+#if defined HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 #else
@@ -284,7 +283,7 @@ nsdev_open(struct inode *inode, struct file *file)
 	err = spec_open(file, cdev, dev, CLONEOPEN);
       cdev_put_exit:
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	sdev_put(cdev);
+	ctrace(sdev_put(cdev));
       exit:
 	return (err);
 #endif

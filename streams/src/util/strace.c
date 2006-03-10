@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/02/20 10:59:30 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/10 07:23:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:30 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:23:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strace.c,v $
+ Revision 0.9.2.16  2006/03/10 07:23:59  brian
+ - rationalized streams and strutil package sources
+
  Revision 0.9.2.15  2006/02/20 10:59:30  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/02/20 10:59:30 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/10 07:23:59 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/02/20 10:59:30 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/10 07:23:59 $";
 
 /*
  *  SVR 4.2 Utility: strace - Prints STREAMS trace messages.
@@ -669,7 +672,7 @@ All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; version  2  of  the  License.\n\
+Foundation; version 2 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -1064,7 +1067,8 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options,
+				     &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?");
 #endif				/* defined _GNU_SOURCE */
@@ -1273,6 +1277,7 @@ main(int argc, char *argv[])
 					continue;
 				if (nomead && outfile[0] != '\0') {
 					time_t ltime = lc->ltime;
+
 					snprintf_text(sbuf, sizeof(sbuf), dbuf, dat.len);
 					fprintf(stdout, "%d", lc->seq_no);
 					fprintf(stdout, " %s", ctime(&ltime));

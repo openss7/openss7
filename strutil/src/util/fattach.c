@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:38:51 $
+ @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/10 07:24:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,43 +45,47 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:51 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:38:51 $"
+#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/10 07:24:20 $"
 
 static char const ident[] =
-    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:38:51 $";
+    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/10 07:24:20 $";
 
-#include <stdlib.h>
+#define _XOPEN_SOURCE 600
+
 #include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <memory.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <limits.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
 
 #include <stropts.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/sysmacros.h>
 #include <sys/ioctl.h>
 
-static int output = 1;
-static int debug = 0;
+static int debug = 0;			/* default no debug */
+static int output = 1;			/* default normal output */
 
 static void
-version(int argc, char **argv)
+version(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -135,15 +138,15 @@ Options:\n\
     -M, --mode MODE\n\
         apply mode MODE after attaching to PATH\n\
     -q, --quiet\n\
-        suppress output\n\
-    -d, --debug [LEVEL]\n\
-        increase or set debugging verbosity\n\
+        suppress normal output\n\
+    -D, --debug [LEVEL]\n\
+        increment or set debug LEVEL (default: 0)\n\
     -v, --verbose [LEVEL]\n\
-        increase or set output verbosity\n\
-    -h, --help, -?, --?\n\
+        increment or set output verbosity LEVEL (default: 1)\n\
+    -h, --help, -?\n\
         print this usage information and exit\n\
     -V, --version\n\
-        print version and exit\n\
+        print the version and exit\n\
     -C, --copying\n\
         print copying permission and exit\n\
 ", argv[0]);
@@ -158,15 +161,14 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
-version.\n\
+Foundation; version 2 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -214,31 +216,35 @@ main(int argc, char *argv[])
 	for (;;) {
 		int c, val;
 
-#ifdef _GNU_SOURCE
+#if defined _GNU_SOURCE
 		int option_index = 0;
+		/* *INDENT-OFF* */
 		static struct option long_options[] = {
-			/* *INDENT-OFF* */
-			{ "umask",	no_argument,		NULL, 'u' },
-			{ "mode",	optional_argument,	NULL, 'M' },
-			{ "pipe",	no_argument,		NULL, 'p' },
-			{ "connld",	no_argument,		NULL, 'c' },
-			{ "quiet",	no_argument,		NULL, 'q' },
-			{ "debug",	optional_argument,	NULL, 'd' },
-			{ "verbose",	optional_argument,	NULL, 'v' },
-			{ "version",	no_argument,		NULL, 'V' },
-			{ "copying",	no_argument,		NULL, 'C' },
-			{ "help",	no_argument,		NULL, 'h' },
-			{ "?",		no_argument,		NULL, 'h' },
+			{"umask",	no_argument,		NULL, 'u'},
+			{"mode",	optional_argument,	NULL, 'M'},
+			{"pipe",	no_argument,		NULL, 'p'},
+			{"connld",	no_argument,		NULL, 'c'},
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"debug",	optional_argument,	NULL, 'D'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
+			{"?",		no_argument,		NULL, 'H'},
 			{ 0, }
-			/* *INDENT-ON* */
 		};
+		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "muM:pcqd::v::VCh?", long_options, &option_index);
-#else				/* _GNU_SOURCE */
-		c = getopt(argc, argv, "muM:pcqd::v::VCh?");
-#endif				/* _GNU_SOURCE */
-		if (c == -1)
+		c = getopt_long_only(argc, argv, "muM:pcqD::v::hVC?W:", long_options,
+				     &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, "muM:pcqDvhVC?");
+#endif				/* defined _GNU_SOURCE */
+		if (c == -1) {
+			if (debug)
+				fprintf(stderr, "%s: done options processing\n", argv[0]);
 			break;
+		}
 		switch (c) {
 		case 0:
 			goto bad_usage;
@@ -265,24 +271,24 @@ main(int argc, char *argv[])
 			push_connld = use_pipe = use_new_mode = 1;
 			new_mode[0] = new_mode[1] = (0666 & ~um);
 			break;
-		case 'q':	/* -q, --quiet */
-			if (debug)
-				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
-			output = 0;
-			debug = 0;
-			break;
-		case 'd':	/* -d, --debug [LEVEL] */
+		case 'D':	/* -D, --debug [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
 				debug++;
-				break;
+			} else {
+				if ((val = strtol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				debug = val;
 			}
-			if ((val = strtol(optarg, NULL, 0)) < 0)
-				goto bad_option;
-			debug = val;
 			break;
-		case 'v':	/* -v, --verbose [LEVEL] */
+		case 'q':	/* -q, --quiet */
+			if (debug)
+				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
+			debug = 0;
+			output = 0;
+			break;
+		case 'v':	/* -v, --verbose [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -293,7 +299,8 @@ main(int argc, char *argv[])
 				goto bad_option;
 			output = val;
 			break;
-		case 'h':	/* -h, --help, -?, --? */
+		case 'h':	/* -h, --help */
+		case 'H':	/* -H, --? */
 			if (debug)
 				fprintf(stderr, "%s: printing help message\n", argv[0]);
 			help(argc, argv);
@@ -313,7 +320,7 @@ main(int argc, char *argv[])
 		      bad_option:
 			optind--;
 		      bad_nonopt:
-			if (output > 0 || debug > 0) {
+			if (output || debug) {
 				if (optind < argc) {
 					fprintf(stderr, "%s: syntax error near '", argv[0]);
 					while (optind < argc)
@@ -330,6 +337,9 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 	}
+	/* 
+	 * dont' ignore non-option arguments
+	 */
 	if (argc - optind < 1) {
 		if (output || debug)
 			fprintf(stderr, "%s: missing path", argv[0]);

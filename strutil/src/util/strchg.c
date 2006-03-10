@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:38:51 $
+ @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/10 07:24:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:51 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:38:51 $"
+#ident "@(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/10 07:24:20 $"
 
 static char const ident[] =
-    "$RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:38:51 $";
+    "$RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/10 07:24:20 $";
+
+#define _XOPEN_SOURCE 600
 
 /* 
  * SVR 4.2 utility: strchg - Changes stream configuration.
@@ -78,25 +79,26 @@ static char const ident[] =
 #include <sys/sysmacros.h>
 #include <sys/ioctl.h>
 
-int verbose = 1;
+static int debug = 0;
+static int output = 1;
 
-void
+static void
 version(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-void
+static void
 usage(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (!output && !debug)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
@@ -109,10 +111,10 @@ Usage:\n\
 ", argv[0]);
 }
 
-void
+static void
 help(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
 Usage:\n\
@@ -138,37 +140,38 @@ Options:\n\
     -f, --file FILE\n\
         specifies that the module stack is to conform to the module stack\n\
         specification contained in the specified file\n\
-    -v, --verbose\n\
-        verbose output\n\
+    -v, --verbose [LEVEL]\n\
+        increment or set output verbosity LEVEL (default: 1)\n\
+    -D, --debug [LEVEL]\n\
+        increment or set debug LEVEL (default: 0)\n\
     -q, --quiet\n\
         suppress normal output\n\
     -H, --help, -?\n\
-        print this usage message and exits\n\
+        print this usage information and exit\n\
     -V, --version\n\
-        print the version and exits\n\
+        print the version and exit\n\
     -C, --copying\n\
-        print the copyright and exits\n\
+        print copying permissions and exit\n\
 ", argv[0]);
 }
 
-void
+static void
 copying(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
-version.\n\
+Foundation; version 2 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -228,6 +231,7 @@ main(int argc, char *argv[])
 			{"all",		no_argument,		NULL, 'a'},
 			{"file",	required_argument,	NULL, 'f'},
 			{"quiet",	no_argument,		NULL, 'q'},
+			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'H'},
 			{"version",	no_argument,		NULL, 'V'},
@@ -237,13 +241,18 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "h:pu:af:qvHVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "h:pu:af:qD::v::HVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "h:pu:af:qvHVC?");
+		c = getopt(argc, argv, "h:pu:af:qDvHVC?");
 #endif				/* defined _GNU_SOURCE */
-		if (c == -1)
+		if (c == -1) {
+			if (debug)
+				fprintf(stderr, "%s: done options processing\n", argv[0]);
 			break;
+		}
 		switch (c) {
+		case 0:
+			goto bad_usage;
 		case 'h':	/* -h, --push modulelist */
 			if (command != CMN_NONE && command != CMN_FILE)
 				goto bad_option;
@@ -251,6 +260,8 @@ main(int argc, char *argv[])
 			mlen = strnlen(optarg, OPTS_MAX);
 			memset(mbuf, 0, OPTS_MAX);
 			strncpy(mbuf, optarg, OPTS_MAX);
+			if (debug)
+				fprintf(stderr, "%s: module list: %s\n", __FUNCTION__, mbuf);
 			/* count number of modules in list */
 			for (i = 0, mnum = 1; i < mlen; i++) {
 				if (mbuf[i] == ',') {
@@ -283,25 +294,48 @@ main(int argc, char *argv[])
 			flen = strnlen(optarg, PATH_MAX);
 			strncpy(fbuf, optarg, PATH_MAX);
 			break;
+		case 'D':	/* -D, --debug [level] */
+			if (debug)
+				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
+			if (optarg == NULL) {
+				debug++;
+			} else {
+				if ((val = strtol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				debug = val;
+			}
+			break;
 		case 'q':	/* -q, --quiet */
-			verbose = -1;
+			if (debug)
+				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
+			debug = 0;
+			output = 0;
 			break;
 		case 'v':	/* -v, --verbose [level] */
+			if (debug)
+				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {
-				verbose++;
+				output++;
 				break;
 			}
 			if ((val = strtol(optarg, NULL, 0)) < 0)
 				goto bad_option;
-			verbose = val;
+			output = val;
 			break;
 		case 'H':	/* -H, --help */
+			/* -H, --? */
+			if (debug)
+				fprintf(stderr, "%s: printing help message\n", argv[0]);
 			help(argc, argv);
 			exit(0);
 		case 'V':	/* -V, --version */
+			if (debug)
+				fprintf(stderr, "%s: printing version message\n", argv[0]);
 			version(argc, argv);
 			exit(0);
 		case 'C':	/* -C, --copying */
+			if (debug)
+				fprintf(stderr, "%s: printing copying message\n", argv[0]);
 			copying(argc, argv);
 			exit(0);
 		case '?':
@@ -309,14 +343,20 @@ main(int argc, char *argv[])
 		      bad_option:
 			optind--;
 		      bad_nonopt:
-			if (optind < argc && verbose) {
-				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
-				while (optind < argc)
-					fprintf(stderr, "%s ", argv[optind++]);
-				fprintf(stderr, "\n");
+			if (output || debug) {
+				if (optind < argc) {
+					fprintf(stderr, "%s: syntax error near '", argv[0]);
+					while (optind < argc)
+						fprintf(stderr, "%s ", argv[optind++]);
+					fprintf(stderr, "'\n");
+				} else {
+					fprintf(stderr, "%s: missing option or argument", argv[0]);
+					fprintf(stderr, "\n");
+				}
 				fflush(stderr);
+			      bad_usage:
+				usage(argc, argv);
 			}
-			usage(argc, argv);
 			exit(2);
 		}
 	}

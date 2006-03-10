@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:38:51 $
+ @(#) $RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/10 07:24:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,48 +45,53 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:51 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:38:51 $"
+#ident "@(#) $RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/10 07:24:20 $"
 
 static char const ident[] =
-    "$RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:38:51 $";
+    "$RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/10 07:24:20 $";
 
 #define _XOPEN_SOURCE 600
 
-#include <stdlib.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <memory.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <limits.h>
+
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
-#include <stropts.h>
 
-static int output = 1;
-static int debug = 0;
+#include <stropts.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+
+static int debug = 0;			/* default no debug */
+static int output = 1;			/* default normal output */
 
 static void
-version(int argc, char **argv)
+version(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
 static void
-usage(int argc, char **argv)
+usage(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -101,7 +105,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char **argv)
+help(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -113,17 +117,17 @@ Usage:\n\
     %1$s {-C|--copying}\n\
 Options:\n\
     -q, --quiet\n\
-        suppress output\n\
+        suppress normal output\n\
     -d, --debug [LEVEL]\n\
-        increase or set debugging verbosity\n\
+        increment or set debug LEVEL (default: 0)\n\
     -v, --verbose [LEVEL]\n\
-        increase or set output verbosity\n\
-    -h, --help\n\
-        prints this usage information and exits\n\
+        increment or set output verbosity LEVEL (default: 1)\n\
+    -h, --help, -?\n\
+        print this usage information and exit\n\
     -V, --version\n\
-        prints the version and exits\n\
+        print the version and exit\n\
     -C, --copying\n\
-        prints copying permissions and exits\n\
+        print copying permissions and exit\n\
 ", argv[0]);
 }
 
@@ -136,15 +140,14 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
-version.\n\
+Foundation; either version 2 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -200,34 +203,36 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "qdvhVC?", long_options, &option_index);
-#else
+		c = getopt_long_only(argc, argv, "qD::v::hVC?W:", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "qdvhVC?");
-#endif
+#endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
 				fprintf(stderr, "%s: done options processing\n", argv[0]);
 			break;
 		}
 		switch (c) {
-		case 'q':	/* -q, --quiet */
-			if (debug)
-				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
-			output = 0;
-			debug = 0;
-			break;
-		case 'D':	/* -D, --debug [LEVEL] */
+		case 0:
+			goto bad_usage;
+		case 'D':	/* -D, --debug [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
 				debug++;
-				break;
+			} else {
+				if ((val = strtol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				debug = val;
 			}
-			if ((val = strtol(optarg, NULL, 0)) < 0)
-				goto bad_option;
-			debug = val;
 			break;
-		case 'v':	/* -v, --verbose [LEVEL] */
+		case 'q':	/* -q, --quiet */
+			if (debug)
+				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
+			debug = 0;
+			output = 0;
+			break;
+		case 'v':	/* -v, --verbose [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -259,7 +264,7 @@ main(int argc, char *argv[])
 		      bad_option:
 			optind--;
 		      bad_nonopt:
-			if (output > 0 || debug > 0) {
+			if (output || debug) {
 				if (optind < argc) {
 					fprintf(stderr, "%s: syntax error near '", argv[0]);
 					while (optind < argc)
@@ -270,12 +275,15 @@ main(int argc, char *argv[])
 					fprintf(stderr, "\n");
 				}
 				fflush(stderr);
+			      bad_usage:
 				usage(argc, argv);
 			}
 			exit(2);
 		}
 	}
-	/* don't ignore non-option arguments */
+	/* 
+	 * dont' ignore non-option arguments
+	 */
 	if (optind < argc)
 		goto bad_nonopt;
 	strinfo(argc, argv);

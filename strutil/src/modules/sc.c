@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/28 10:01:22 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 07:24:14 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:22 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:14 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sc.c,v $
+ Revision 0.9.2.31  2006/03/10 07:24:14  brian
+ - rationalized streams and strutil package sources
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/28 10:01:22 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 07:24:14 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/28 10:01:22 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 07:24:14 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -73,8 +78,8 @@ static char const ident[] =
 #endif
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/28 10:01:22 $"
+#define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 07:24:14 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -120,26 +125,90 @@ MODULE_ALIAS("streams-module-sc");
 #endif
 
 static struct module_info sc_minfo = {
-	mi_idnum:CONFIG_STREAMS_SC_MODID,
-	mi_idname:CONFIG_STREAMS_SC_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_SC_MODID,
+	.mi_idname = CONFIG_STREAMS_SC_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
-/* 
- *  -------------------------------------------------------------------------
- *
- *  SC Private Structure
- *  
- *  -------------------------------------------------------------------------
- */
-struct sc {
-	int iocstate;
-	int transparent;
-	int count;
-};
+#if defined __LP64__ && defined LFS
+#  undef WITH_32BIT_CONVERSION
+#  define WITH_32BIT_CONVERSION 1
+#endif
+
+static size_t
+sc_mlist_copy(long major, struct qinit *qinit, caddr_t _mlist, const uint flag)
+{
+#ifdef WITH_32BIT_CONVERSION
+	if (flag == IOC_ILP32) {
+		struct sc_mlist32 *mlist = (typeof(mlist)) _mlist;
+
+		if ((mlist->major = major) != -1) {
+			strncpy(mlist->name, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+			// mlist->mi = *qinit->qi_minfo;
+			mlist->mi.mi_idnum = qinit->qi_minfo->mi_idnum;
+			strncpy(mlist->mi.mi_idname, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+			mlist->mi.mi_minpsz = qinit->qi_minfo->mi_minpsz;
+			mlist->mi.mi_maxpsz = qinit->qi_minfo->mi_maxpsz;
+			mlist->mi.mi_hiwat = qinit->qi_minfo->mi_hiwat;
+			mlist->mi.mi_lowat = qinit->qi_minfo->mi_lowat;
+			if (qinit->qi_mstat) {
+				mlist->ms.ms_pcnt = qinit->qi_mstat->ms_pcnt;
+				mlist->ms.ms_scnt = qinit->qi_mstat->ms_scnt;
+				mlist->ms.ms_ocnt = qinit->qi_mstat->ms_ocnt;
+				mlist->ms.ms_ccnt = qinit->qi_mstat->ms_ccnt;
+				mlist->ms.ms_acnt = qinit->qi_mstat->ms_acnt;
+				mlist->ms.ms_flags = qinit->qi_mstat->ms_flags;
+				mlist->ms.ms_xsize = qinit->qi_mstat->ms_xsize;
+			}
+		}
+		return sizeof(struct sc_mlist32);
+	} else
+#endif				/* WITH_32BIT_CONVERSION */
+	{
+		struct sc_mlist *mlist = (typeof(mlist)) _mlist;
+
+		if ((mlist->major = major) != -1) {
+			strncpy(mlist->name, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+			// mlist->mi = *qinit->qi_minfo;
+			mlist->mi.mi_idnum = qinit->qi_minfo->mi_idnum;
+			strncpy(mlist->mi.mi_idname, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+			mlist->mi.mi_minpsz = qinit->qi_minfo->mi_minpsz;
+			mlist->mi.mi_maxpsz = qinit->qi_minfo->mi_maxpsz;
+			mlist->mi.mi_hiwat = qinit->qi_minfo->mi_hiwat;
+			mlist->mi.mi_lowat = qinit->qi_minfo->mi_lowat;
+			if (qinit->qi_mstat) {
+				mlist->ms.ms_pcnt = qinit->qi_mstat->ms_pcnt;
+				mlist->ms.ms_scnt = qinit->qi_mstat->ms_scnt;
+				mlist->ms.ms_ocnt = qinit->qi_mstat->ms_ocnt;
+				mlist->ms.ms_ccnt = qinit->qi_mstat->ms_ccnt;
+				mlist->ms.ms_acnt = qinit->qi_mstat->ms_acnt;
+				mlist->ms.ms_flags = qinit->qi_mstat->ms_flags;
+				mlist->ms.ms_xsize = qinit->qi_mstat->ms_xsize;
+			}
+		}
+		return sizeof(struct sc_mlist);
+	}
+}
+
+static size_t
+str_mlist_count(void)
+{
+#ifdef LIS
+	int i, cdev_count = 0, fmod_count = 0;
+
+	for (i = 0; i < MAX_STRDEV; i++)
+		if (lis_fstr_sw[i].f_str && lis_fstr_sw[i].f_count)
+			cdev_count++;
+	for (i = 1; i < MAX_STRMOD; i++)
+		if ((lis_fmod_sw[i].f_state & LIS_MODSTATE_INITED)
+		    && lis_fmod_sw[i].f_count)
+			fmod_count++;
+#endif
+	return (cdev_count + fmod_count);
+}
 
 /* 
  *  -------------------------------------------------------------------------
@@ -148,10 +217,9 @@ struct sc {
  *  
  *  -------------------------------------------------------------------------
  */
-static int
+static streamscall int
 sc_wput(queue_t *q, mblk_t *mp)
 {
-	struct sc *sc = q->q_ptr;
 	union ioctypes *ioc;
 	int err = 0, rval = 0;
 	mblk_t *dp = mp->b_cont;
@@ -178,191 +246,275 @@ sc_wput(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case M_IOCTL:
+	{
+		caddr_t uaddr;
+		size_t usize;
+
+		trace();
 		ioc = (typeof(ioc)) mp->b_rptr;
+
+#ifdef WITH_32BIT_CONVERSION
+		if (ioc->iocblk.ioc_flag == IOC_ILP32) {
+			uaddr = (caddr_t) (unsigned long) (uint32_t) *(unsigned long *) dp->b_rptr;
+			usize = sizeof(struct sc_list32);
+		} else
+#endif
+		{
+			uaddr = (caddr_t) *(unsigned long *) dp->b_rptr;
+			usize = sizeof(struct sc_list);
+		}
 		switch (ioc->iocblk.ioc_cmd) {
 		case SC_IOC_LIST:
+			/* there is really no reason why a regular user cannot list modules and
+			   related information. */
+#if 0
+			trace();
 			err = -EPERM;
-			if (ioc->iocblk.ioc_uid != 0)
+			if (ioc->iocblk.ioc_uid != 0) {
+				ptrace(("Error path taken!\n"));
 				goto nak;
+			}
+#endif
+			trace();
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
-				void *addr = *(void **) dp->b_rptr;
-
-				if (addr == NULL) {
-					rval = /* how name drivers and modules? */ 0;
+				trace();
+				if (uaddr == NULL) {
+					rval = str_mlist_count();
 					goto ack;
 				}
 				mp->b_datap->db_type = M_COPYIN;
-				ioc->copyreq.cq_addr = addr;
-				ioc->copyreq.cq_size = sizeof(struct sc_list);
+				ioc->copyreq.cq_addr = uaddr;
+				ioc->copyreq.cq_size = usize;
 				ioc->copyreq.cq_flag = 0;
-				sc->iocstate = 1;
-				sc->transparent = 1;
+				ioc->copyreq.cq_private = (mblk_t *) 0;
 				qreply(q, mp);
 				return (0);
 			}
-			sc->iocstate = 1;
-			sc->transparent = 0;
-			goto sc_list_state_1;
-		}
-		break;
-	case M_IOCDATA:
-		ioc = (typeof(ioc)) mp->b_rptr;
-		switch (ioc->copyresp.cp_cmd) {
-		case SC_IOC_LIST:
-			err = -(long) ioc->copyresp.cp_rval;
-			if (err == 0) {
-#ifdef LIS
-				int i;
-				struct fmodsw *fmod;
-				struct fmodsw *cdev;
-#endif
-#ifdef LFS
-				struct fmodsw *fmod;
-				struct cdevsw *cdev;
-				struct list_head *pos;
-#endif
-				int n, count;
-				struct sc_list *list;
-				struct sc_mlist *mlist;
-				struct qinit *qinit;
-
-				switch (sc->iocstate) {
-				case 1:
-				      sc_list_state_1:
-					n = 0;
-					err = -EFAULT;
-					if (!dp)
-						goto nak;
-					if (dp->b_wptr == dp->b_rptr) {
-#ifdef LIS
-						int i, cdev_count = 0, fmod_count = 0;
-
-						for (i = 0; i < MAX_STRDEV; i++)
-							if (lis_fstr_sw[i].f_str
-							    && lis_fstr_sw[i].f_count)
-								cdev_count++;
-						for (i = 1; i < MAX_STRMOD; i++)
-							if ((lis_fmod_sw[i].
-							     f_state & LIS_MODSTATE_INITED)
-							    && lis_fmod_sw[i].f_count)
-								fmod_count++;
-#endif
-						err = 0;
-						rval = cdev_count + fmod_count;
-						goto ack;
-					}
-					err = -EFAULT;
-					if (dp->b_wptr < dp->b_rptr + sizeof(*list))
-						goto nak;
-					list = (typeof(list)) dp->b_rptr;
-					err = -EINVAL;
-					if (list->sc_nmods < 0)
-						goto nak;
-					count = sc->count;
-					list->sc_nmods = count;
-					mlist = (typeof(mlist)) dp->b_rptr;
-#ifdef LFS
-					/* list all devices */
-					read_lock(&cdevsw_lock);
-					list_for_each(pos, &cdevsw_list) {
-						if (n >= count)
-							break;
-						cdev = list_entry(pos, struct cdevsw, d_list);
-						qinit = cdev->d_str->st_rdinit;
-						mlist->major = cdev->d_major;
-						mlist->mi = *qinit->qi_minfo;
-						if (qinit->qi_mstat)
-							mlist->ms = *qinit->qi_mstat;
-						n++;
-						mlist++;
-					}
-					read_unlock(&cdevsw_lock);
-					/* list all modules */
-					read_lock(&fmodsw_lock);
-					list_for_each(pos, &fmodsw_list) {
-						if (n >= count)
-							break;
-						fmod = list_entry(pos, struct fmodsw, f_list);
-						qinit = fmod->f_str->st_rdinit;
-						mlist->major = 0;
-						mlist->mi = *qinit->qi_minfo;
-						if (qinit->qi_mstat)
-							mlist->ms = *qinit->qi_mstat;
-						n++;
-						mlist++;
-					}
-					read_unlock(&fmodsw_lock);
-#endif
-#ifdef LIS
-					/* list all devices */
-					for (i = 0; i < MAX_STRDEV; i++) {
-						cdev = &lis_fstr_sw[i];
-						if (!cdev->f_str || !cdev->f_count)
-							continue;
-						if (n >= count)
-							break;
-						qinit = cdev->f_str->st_rdinit;
-						mlist->major = i;
-						mlist->mi = *qinit->qi_minfo;
-						if (qinit->qi_mstat)
-							mlist->ms = *qinit->qi_mstat;
-						n++;
-						mlist++;
-					}
-					/* list all modules */
-					for (i = 1; i < MAX_STRMOD; i++) {
-						fmod = &lis_fmod_sw[i];
-						if (!fmod->f_str || !fmod->f_count)
-							continue;
-						if (n >= count)
-							break;
-						qinit = fmod->f_str->st_rdinit;
-						mlist->major = i;
-						mlist->mi = *qinit->qi_minfo;
-						if (qinit->qi_mstat)
-							mlist->ms = *qinit->qi_mstat;
-						n++;
-						mlist++;
-					}
-#endif
-					/* zero all excess elements */
-					for (; n < count; n++, mlist++) {
-						mlist->major = -1;
-					}
-					mp->b_datap->db_type = M_COPYOUT;
-					ioc->copyreq.cq_addr = (void *) list->sc_mlist;
-					ioc->copyreq.cq_size = sc->count * sizeof(struct sc_mlist);
-					ioc->copyreq.cq_flag = 0;
-					sc->iocstate = 2;
-					qreply(q, mp);
-					return (0);
-				case 2:
-					/* done */
-					sc->iocstate = 0;
-					goto ack;
-				}
-			}
+			trace();
+			/* doesn't support I_STR yet, just TRANSPARENT */
+			err = -EINVAL;
 			goto nak;
 		}
+		break;
+	}
+	case M_IOCDATA:
+		ioc = (typeof(ioc)) mp->b_rptr;
+
+		switch (ioc->copyresp.cp_cmd) {
+		case SC_IOC_LIST:
+			trace();
+			if (ioc->copyresp.cp_rval != 0) {
+#ifdef LFS
+				ptrace(("Aborting ioctl!\n"));
+				goto abort;
+#endif
+#ifdef LIS
+				/* LiS has a bug here... */
+				ptrace(("Nacking failed ioctl!\n"));
+				err = -(long) ioc->copyresp.cp_rval;
+				goto nak;
+#endif
+			}
+			trace();
+			if (ioc->copyresp.cp_private == (mblk_t *) 0) {
+				int n, count;
+				caddr_t uaddr;
+				size_t usize;
+
+				n = 0;
+				if (!dp || dp->b_wptr == dp->b_rptr) {
+					rval = str_mlist_count();
+					goto ack;
+				}
+#ifdef WITH_32BIT_CONVERSION
+				if (ioc->copyresp.cp_flag == IOC_ILP32) {
+					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_list32)) {
+						ptrace(("Error path taken!\n"));
+						err = -EFAULT;
+						goto nak;
+					} else {
+						struct sc_list32 *sclp = (typeof(sclp)) dp->b_rptr;
+
+						count = sclp->sc_nmods;
+						uaddr = (caddr_t) (unsigned long) sclp->sc_mlist;
+						usize = count * sizeof(struct sc_mlist32);
+					}
+				} else
+#endif
+				{
+					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_list)) {
+						ptrace(("Error path taken!\n"));
+						err = -EFAULT;
+						goto nak;
+					} else {
+						struct sc_list *sclp = (typeof(sclp)) dp->b_rptr;
+
+						count = sclp->sc_nmods;
+						uaddr = (caddr_t) sclp->sc_mlist;
+						usize = count * sizeof(struct sc_mlist);
+					}
+				}
+				if (count < 0) {
+					ptrace(("Error path taken!\n"));
+					err = -EINVAL;
+					goto nak;
+				}
+				if (count > 100) {
+					ptrace(("Error path taken!\n"));
+					err = -ERANGE;
+					goto nak;
+				}
+				if (count == 0) {
+					rval = str_mlist_count();
+					goto ack;
+				}
+				if (!(dp = allocb(usize, BPRI_MED))) {
+					ptrace(("Error path taken!\n"));
+					err = -ENOSR;
+					goto nak;
+				}
+				dp->b_wptr = dp->b_rptr + usize;
+				bzero(dp->b_rptr, usize);
+				freemsg(mp->b_cont);
+				mp->b_cont = dp;
+#ifdef LIS
+				{
+					int i;
+					uint flag = 0;
+					caddr_t mlist = (typeof(mlist)) dp->b_rptr;
+
+					trace();
+					if (n < count) {
+						trace();
+						/* list all devices */
+						for (i = 0; i < MAX_STRDEV; i++) {
+							struct cdevsw *cdev;
+							struct qinit *qinit;
+
+							cdev = &lis_fstr_sw[i];
+							if (!cdev->f_str || !cdev->f_count)
+								continue;
+							if (n >= count)
+								break;
+							qinit = cdev->f_str->st_wrinit;
+							mlist +=
+							    sc_mlist_copy(i, qinit, mlist, flag);
+							n++;
+						}
+					}
+					trace();
+					if (n < count) {
+						/* list all modules */
+						for (i = 1; i < MAX_STRMOD; i++) {
+							struct fmodsw *fmod;
+							struct qinit *qinit;
+
+							fmod = &lis_fmod_sw[i];
+							if (!fmod->f_str || !fmod->f_count)
+								continue;
+							if (n >= count)
+								break;
+							qinit = fmod->f_str->st_wrinit;
+							mlist +=
+							    sc_mlist_copy(0, qinit, mlist, flag);
+							n++;
+						}
+					}
+				}
+#endif
+#ifdef LFS
+				{
+					struct list_head *pos;
+					uint flag = ioc->copyresp.cp_flag;
+					caddr_t mlist = (typeof(mlist)) dp->b_rptr;
+
+					trace();
+					if (n < count) {
+						trace();
+						/* output all devices */
+						read_lock(&cdevsw_lock);
+						list_for_each(pos, &cdevsw_list) {
+							struct cdevsw *cdev;
+							struct qinit *qinit;
+
+							if (n >= count)
+								break;
+							cdev =
+							    list_entry(pos, struct cdevsw, d_list);
+							qinit = cdev->d_str->st_wrinit;
+							mlist +=
+							    sc_mlist_copy(cdev->d_major, qinit,
+									  mlist, flag);
+							n++;
+						}
+						read_unlock(&cdevsw_lock);
+					}
+					trace();
+					if (n < count) {
+						trace();
+						/* output all modules */
+						read_lock(&fmodsw_lock);
+						list_for_each(pos, &fmodsw_list) {
+							struct fmodsw *fmod;
+							struct qinit *qinit;
+
+							if (n >= count)
+								break;
+							fmod =
+							    list_entry(pos, struct fmodsw, f_list);
+							qinit = fmod->f_str->st_wrinit;
+							mlist +=
+							    sc_mlist_copy(0, qinit, mlist, flag);
+							n++;
+						}
+						read_unlock(&fmodsw_lock);
+					}
+#endif
+					trace();
+					/* zero all excess elements */
+					for (; n < count; n++) {
+						mlist += sc_mlist_copy(-1, NULL, mlist, flag);
+					}
+				}
+				trace();
+				mp->b_datap->db_type = M_COPYOUT;
+				ioc->copyreq.cq_addr = uaddr;
+				ioc->copyreq.cq_size = usize;
+				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = (mblk_t *) (long) count;
+				qreply(q, mp);
+				return (0);
+			} else {
+				trace();
+				/* done */
+				rval = (int) (long) ioc->copyresp.cp_private;
+				goto ack;
+			}
+		}
 	      nak:
-		sc->iocstate = 0;
 		mp->b_datap->db_type = M_IOCNAK;
+		ioc->iocblk.ioc_count = 0;
 		ioc->iocblk.ioc_rval = -1;
 		ioc->iocblk.ioc_error = -err;
 		qreply(q, mp);
 		return (0);
 	      ack:
-		sc->iocstate = 0;
-		mp->b_datap->db_type = M_IOCNAK;
+		mp->b_datap->db_type = M_IOCACK;
+		ioc->iocblk.ioc_count = 0;
 		ioc->iocblk.ioc_rval = rval;
 		ioc->iocblk.ioc_error = 0;
 		qreply(q, mp);
 		return (0);
+#ifdef LFS
+	      abort:
+		ctrace(freemsg(mp));
+		return (0);
+#endif
 	}
 	putnext(q, mp);
 	return (0);
 }
-static int
+static streamscall int
 sc_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);
@@ -376,38 +528,28 @@ sc_rput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+static streamscall int
 sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	if (q->q_ptr)
 		return (0);	/* already open */
 	if (sflag == MODOPEN && WR(q)->q_next != NULL) {
-		struct sc *sc;
-
+		/* don't need to be privileged to push the module, just to use it */
+#if 0
 		if (crp->cr_uid != 0 && crp->cr_ruid != 0)
 			return (-EACCES);
-		if (!(sc = kmem_alloc(sizeof(*sc), KM_NOSLEEP)))
-			return (-ENOMEM);
-		sc->iocstate = 0;
-		sc->transparent = 0;
-		q->q_ptr = WR(q)->q_ptr = sc;
+#endif
+		q->q_ptr = WR(q)->q_ptr = (void *) 1;
+		qprocson(q);
 		return (0);
 	}
 	return (-EIO);		/* can't be opened as driver */
 }
-static int
+static streamscall int
 sc_close(queue_t *q, int oflag, cred_t *crp)
 {
-	struct sc *sc = q->q_ptr;
-
-	(void) oflag;
-	(void) crp;
-	if (!sc)
-		return (ENXIO);
-	sc->iocstate = 0;
-	sc->transparent = 0;
+	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = NULL;
-	kmem_free(q->q_ptr, sizeof(struct sc));
 	return (0);
 }
 
@@ -420,31 +562,48 @@ sc_close(queue_t *q, int oflag, cred_t *crp)
  */
 
 static struct qinit sc_rqinit = {
-	qi_putp:sc_rput,
-	qi_qopen:sc_open,
-	qi_qclose:sc_close,
-	qi_minfo:&sc_minfo,
+	.qi_putp = sc_rput,
+	.qi_qopen = sc_open,
+	.qi_qclose = sc_close,
+	.qi_minfo = &sc_minfo,
 };
 
 static struct qinit sc_wqinit = {
-	qi_putp:sc_wput,
-	qi_minfo:&sc_minfo,
+	.qi_putp = sc_wput,
+	.qi_minfo = &sc_minfo,
 };
 
 static struct streamtab sc_info = {
-	st_rdinit:&sc_rqinit,
-	st_wrinit:&sc_wqinit,
+	.st_rdinit = &sc_rqinit,
+	.st_wrinit = &sc_wqinit,
 };
 
 #ifdef LIS
 #define fmodsw _fmodsw
 #endif
 static struct fmodsw sc_fmod = {
-	f_name:CONFIG_STREAMS_SC_NAME,
-	f_str:&sc_info,
-	f_flag:0,
-	f_kmod:THIS_MODULE,
+	.f_name = CONFIG_STREAMS_SC_NAME,
+	.f_str = &sc_info,
+	.f_flag = D_MP,
+	.f_kmod = THIS_MODULE,
 };
+
+static void *sc_opaque;
+
+static void
+sc_unregister_ioctl32(void)
+{
+	if (sc_opaque != NULL)
+		unregister_ioctl32(sc_opaque);
+}
+
+static int
+sc_register_ioctl32(void)
+{
+	if ((sc_opaque = register_ioctl32(SC_IOC_LIST)) == NULL)
+		return (-ENOMEM);
+	return (0);
+}
 
 #ifdef CONFIG_STREAMS_SC_MODULE
 static
@@ -460,8 +619,12 @@ sc_init(void)
 	printk(KERN_INFO SC_SPLASH);
 #endif
 	sc_minfo.mi_idnum = modid;
-	if ((err = register_strmod(&sc_fmod)) < 0)
+	if ((err = sc_register_ioctl32()) < 0)
 		return (err);
+	if ((err = register_strmod(&sc_fmod)) < 0) {
+		sc_unregister_ioctl32();
+		return (err);
+	}
 	if (modid == 0 && err > 0)
 		modid = err;
 	return (0);
@@ -473,11 +636,8 @@ static
 void __exit
 sc_exit(void)
 {
-	int err;
-
-	if ((err = unregister_strmod(&sc_fmod)))
-		return (void) (err);
-	return (void) (0);
+	unregister_strmod(&sc_fmod);
+	sc_unregister_ioctl32();
 };
 
 #ifdef CONFIG_STREAMS_SC_MODULE

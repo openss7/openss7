@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:22 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:22 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:22 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:22 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -73,8 +72,8 @@ static char const ident[] =
 #endif
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:22 $"
+#define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -122,12 +121,12 @@ MODULE_ALIAS("streams-module-pipemod");
 #endif
 
 static struct module_info pipemod_minfo = {
-	mi_idnum:CONFIG_STREAMS_PIPEMOD_MODID,
-	mi_idname:CONFIG_STREAMS_PIPEMOD_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_PIPEMOD_MODID,
+	.mi_idname = CONFIG_STREAMS_PIPEMOD_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 /* 
@@ -137,7 +136,8 @@ static struct module_info pipemod_minfo = {
  *
  *  -------------------------------------------------------------------------
  */
-static int
+
+static streamscall int
 pipemod_put(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_datap->db_type == M_FLUSH) {
@@ -163,7 +163,7 @@ pipemod_put(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+static streamscall int
 pipemod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
@@ -177,17 +177,19 @@ pipemod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		wq->q_minpsz = wq->q_next->q_minpsz;
 		wq->q_maxpsz = wq->q_next->q_maxpsz;
 		q->q_ptr = wq->q_ptr = q;	/* just set it to something */
+		qprocson(q);
 		return (0);
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-static int
+static streamscall int
 pipemod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
 	(void) crp;
 	if (!q->q_ptr)
 		return (ENXIO);
+	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);
 }
@@ -200,25 +202,25 @@ pipemod_close(queue_t *q, int oflag, cred_t *crp)
  *  -------------------------------------------------------------------------
  */
 static struct qinit pipemod_qinit = {
-	qi_putp:pipemod_put,
-	qi_qopen:pipemod_open,
-	qi_qclose:pipemod_close,
-	qi_minfo:&pipemod_minfo,
+	.qi_putp = pipemod_put,
+	.qi_qopen = pipemod_open,
+	.qi_qclose = pipemod_close,
+	.qi_minfo = &pipemod_minfo,
 };
 
 static struct streamtab pipemod_info = {
-	st_rdinit:&pipemod_qinit,
-	st_wrinit:&pipemod_qinit,
+	.st_rdinit = &pipemod_qinit,
+	.st_wrinit = &pipemod_qinit,
 };
 
 #ifdef LIS
 #define fmodsw _fmodsw
 #endif
 static struct fmodsw pipemod_fmod = {
-	f_name:CONFIG_STREAMS_PIPEMOD_NAME,
-	f_str:&pipemod_info,
-	f_flag:0,
-	f_kmod:THIS_MODULE,
+	.f_name = CONFIG_STREAMS_PIPEMOD_NAME,
+	.f_str = &pipemod_info,
+	.f_flag = D_MP,
+	.f_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_PIPEMOD_MODULE

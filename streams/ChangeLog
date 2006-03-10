@@ -1,3 +1,25 @@
+2006-03-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/clone.h: updated headers
+	* src/drivers/fifo.c: corrected typos in comments
+	* src/drivers/log.c: updated headers
+	* src/drivers/sfx.c: updated headers
+	* src/modules/sc.c: slight reorganization to be closer to the strutil
+	  version
+	* src/util/autopush.c: updated headers, lindent
+	* src/util/fattach.c: updated headers, lindent
+	* src/util/fdetach.c: updated headers
+	* src/util/strace.c: updated headers, lindent
+	* src/util/strchg.c: updated headers
+	* src/util/strconf.c: updated headers, lindent
+	* src/util/strerr.c: updated headers, lindent
+	* src/util/strinfo.c: updated headers
+	* src/util/strreset.c: updated headers
+	* src/util/strvf.c: updated headers, lindent
+	* streams.spec.in: updated description fields and headers
+	* tests/Makefile.am (TESTSUITE_DEPS): corrected kishore's problem of
+	  missing testsuite-admin.at from distribution
+
 2006-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams.lsm.in: make suitable for Linux Software Map submission
@@ -77,8 +99,8 @@
 	* doc/man/man9/unregister_ioctl32.9.man: new manual page
 	* include/sys/streams/sad.h (struct strapush): added strapush32
 	  structure under __LP64__ for 32-bit ioctl compatibility.
-	* include/sys/streams/sc.h: added 32-bit compatibility structures
-	  under __LP64__.
+	* include/sys/streams/sc.h: added 32-bit compatibility structures under
+	  __LP64__.
 	* include/sys/streams/strconf.h (register_ioctl32, unregister_ioct32):
 	  added declarations for register_ioctl32 and unregister_ioctl32.
 	* include/sys/streams/stream.h: added IOC_CONVERT_FROM macro for Solaris
@@ -115,20 +137,20 @@
 	- updated perftest program to be able to use FIFOs as well as pipes
 	- added README-LiS file to capture LiS binary compatibility issues
 	* include/sys/streams/stream.h (struct iocblk): modified --
-	- added ioc_flag member for ioctl32 compatibility ala Solaris
-	  and rationalized to SVR4, OSF, and provided capability for LiS
+	- added ioc_flag member for ioctl32 compatibility ala Solaris and
+	  rationalized to SVR4, OSF, and provided capability for LiS
 	  2.18.0 buggy structure compatibility.
 	(struct copyreq): modified --
 	- rationalized to SVR4, OSF, LiS and 32bit Solaris.
 	(struct copyresp): modified --
-	- rationalized to SVR4, OSF, LiS and 32bit Solaris, added
-	  cp_flag member for ioctl32 compatibiltiy ala Solaris.
-	* README-LiS: added -- added to capture some LiS binary
-	  compatibility issues.
-	* src/modules/sth.c: modified -- wide ranging changes for
-	  support of 32bit binaries over a 64bit kernel.
-	* src/test/perftest.c: modified -- added support for using FIFOs
-	  for performance tests instead of pipes.
+	- rationalized to SVR4, OSF, LiS and 32bit Solaris, added cp_flag member
+	  for ioctl32 compatibiltiy ala Solaris.
+	* README-LiS: added -- added to capture some LiS binary compatibility
+	  issues.
+	* src/modules/sth.c: modified -- wide ranging changes for support of
+	  32bit binaries over a 64bit kernel.
+	* src/test/perftest.c: modified -- added support for using FIFOs for
+	  performance tests instead of pipes.
 
 2006-02-23  Brian Bidulock  <bidulock@openss7.org>
 
@@ -185,8 +207,8 @@
 	* src/test/test-sad.c: modified
 	* src/test/test-sc.c: modified
 	* src/test/test-streams.c: modified
-	- strap out lockf() that was blocking some test case
-	  processes on SMP and even on UP
+	- strap out lockf() that was blocking some test case processes on SMP
+	  and even on UP
 
 2006-02-20  Brian Bidulock  <bidulock@openss7.org>
 
@@ -195,30 +217,28 @@
 	* README: modified - updated for new release
 	* acinclude.m4: modified
 	- added check for linux/compat.h
-	- precursor to 32-bit compatibility support for 64-bit
-	  architectures
+	- precursor to 32-bit compatibility support for 64-bit architectures
 	* streams.spec.in: modified
 	- changes for x86_64
 	- libraries need to go in /usr/lib64 not /usr/lib
 	- kernel modules still go in /lib/modules (not /lib64/modules)
-	- strangely libexec and test binaries just overwrite in /usr/bin
-	  and /usr/libexec.  Maybe we should move these to pkglibdir:
-	  that is, /usr/lib64/streams/.
+	- strangely libexec and test binaries just overwrite in /usr/bin and
+	  /usr/libexec.  Maybe we should move these to pkglibdir: that is,
+	  /usr/lib64/streams/.
 	* include/Makefile.am: modified
 	- added files sys/stropts32.h and sys/stream/stropts32.h
 	- perhaps these should not be installed
 	* include/sys/streams/ddi.h: modified - corrected sysctl size
 	* include/sys/streams/kmem.h: modified
 	- suppress NUMA warning
-	- note that it is possible on 2.6 kernels to actually support
-	  these functions
+	- note that it is possible on 2.6 kernels to actually support these
+	  functions
 	* include/sys/streams/sad.h: modified
 	- 32/64 bit compatibility
 	- see file
 	* include/sys/streams/sc.h: modified
-	- completely removed dependency on kernel module_info and
-	  module_stat structures, defining new sc_module_info and
-	  sc_module_stat structures.
+	- completely removed dependency on kernel module_info and module_stat
+	  structures, defining new sc_module_info and sc_module_stat structures.
 	* include/sys/streams/stream.h: modified
 	- compilers don't like (-1UL) now
 	* include/sys/streams/strlog.h: modified
@@ -248,13 +268,11 @@
 	* src/kernel/strutil.c: modified
 	- corrected size of sysctls for 64 bit
 	* src/modules/sc.c: modified
-	- remove dependency on kernel module_info and module_stat
-	  structures
-	- copy members of these now to new sc_module_info and
-	  sc_module_stat
+	- remove dependency on kernel module_info and module_stat structures
+	- copy members of these now to new sc_module_info and sc_module_stat
 	* src/modules/sth.c: modified
-	- couple of bugs, 64 bit issues, and roughed in a bunch of the
-	  stuff necessary for 32 over 64 bit compatibility later
+	- couple of bugs, 64 bit issues, and roughed in a bunch of the stuff
+	  necessary for 32 over 64 bit compatibility later
 	* src/test/test-fifo.c: modified
 	- gcc 4.0.2 doesn't like (-1UL) on 64 bit
 	* src/test/test-pipe.c: modified
@@ -310,7 +328,8 @@
 	* acinclude.m4: modified - removed xopen.m4
 	* configure.ac: modified - removed gettext
 	* streams.spec.in: modified - removed xns, tli, inet, xnet and sock
-	* doc/man/Makefile.am: modified - removed xns, tli, inet, xnet and sock manual pages
+	* doc/man/Makefile.am: modified - removed xns, tli, inet, xnet and sock
+	  manual pages
 	* doc/man/man3/accept.3.man: deleted
 	* doc/man/man3/bind.3.man: deleted
 	* doc/man/man3/connect.3.man: deleted
@@ -685,7 +704,8 @@
 	* doc/man/man7/tpi_udp.7.man: deleted
 	* doc/manual/Makefile.am: modified - removed libxnet manual
 	* doc/manual/libxnet.texi: deleted
-	* include/Makefile.am: modified - removed xns, tli, inet, xnet and sock headers
+	* include/Makefile.am: modified - removed xns, tli, inet, xnet and sock
+	  headers
 	* include/ticlts.h: deleted
 	* include/ticots.h: deleted
 	* include/ticotsord.h: deleted
@@ -733,7 +753,8 @@
 	* po/streams.pot: deleted
 	* scripts/inet_mkdev: deleted
 	* scripts/inet_rmdev: deleted
-	* src/drivers/Config.in: modified - removed xns, tli, inet, xnet and sock modules and device nodes
+	* src/drivers/Config.in: modified - removed xns, tli, inet, xnet and
+	  sock modules and device nodes
 	* src/drivers/inet.c: deleted
 	* src/drivers/sock.c: deleted
 	* src/drivers/sock.h: deleted
@@ -741,7 +762,8 @@
 	* src/drivers/strunix.c: deleted
 	* src/drivers/unix.c: deleted
 	* src/drivers/xnet.c: deleted
-	* src/modules/Config.in: modified - removed xns, tli, inet, xnet and sock modules and device nodes
+	* src/modules/Config.in: modified - removed xns, tli, inet, xnet and
+	  sock modules and device nodes
 	* src/modules/sockmod.c: deleted
 	* src/modules/timod.c: deleted
 	* src/modules/tirdwr.c: deleted
@@ -1305,3 +1327,4 @@ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 Commercial licensing and support of this software is available from OpenSS7
 Corporation at a fee.  See http://www.openss7.com/
 
+vim: ft=changelog tw=80 com=fb\:*,fb\:- fo+=tcqlorn

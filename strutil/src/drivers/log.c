@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/03/10 07:24:12 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:24:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/03/10 07:24:12 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/03/10 07:24:12 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -71,6 +70,7 @@ static char const ident[] =
  *  is present in the system would information be passed upstream.  This is far preferrable to
  *  cmn_err(9) which generates each and every message to the kernel log.
  */
+#include <stdarg.h>
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -86,8 +86,8 @@ static char const ident[] =
 #endif
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $"
+#define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/03/10 07:24:12 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -158,12 +158,12 @@ MODULE_ALIAS("/dev/streams/conslog");
 #endif
 
 static struct module_info log_minfo = {
-	mi_idnum:CONFIG_STREAMS_LOG_MODID,
-	mi_idname:CONFIG_STREAMS_LOG_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_LOG_MODID,
+	.mi_idname = CONFIG_STREAMS_LOG_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 queue_t *log_conq = NULL;
@@ -176,19 +176,23 @@ atomic_t trclog_sequence = ATOMIC_INIT(0);
 
 #if !defined HAVE_KFUNC_ATOMIC_ADD_RETURN
 static spinlock_t my_atomic_lock = SPIN_LOCK_UNLOCKED;
-int my_atomic_add_return(int val, atomic_t *atomic) {
+int
+my_atomic_add_return(int val, atomic_t *atomic)
+{
 	int ret;
 	unsigned long flags;
+
+	/* XXX: do these locks have to be so severe? */
 	spin_lock_irqsave(&my_atomic_lock, flags);
 	atomic_add(val, atomic);
 	ret = atomic_read(atomic);
 	spin_unlock_irqrestore(&my_atomic_lock, flags);
 	return (ret);
 }
+
 #undef atomic_add_return
 #define atomic_add_return my_atomic_add_return
 #endif
-
 
 /* private structures */
 struct log {
@@ -207,7 +211,7 @@ struct log {
  *  Determine whether the message is filtered or not.  Return 1 if the message
  *  is to be delivered to the trace logger and 0 if it is not.
  */
-static int inline
+static int
 log_trace_filter(queue_t *q, short mid, short sid, char level)
 {
 	int rval = 0;
@@ -230,10 +234,42 @@ log_trace_filter(queue_t *q, short mid, short sid, char level)
 	return (rval);
 }
 
+static streamscall int
+log_rput(queue_t *q, mblk_t *mp)
+{
+	/* pass message along with flow control */
+	if (mp->b_datap->db_type >= QPCTL
+	    || (!q->q_first && !(q->q_flag & QSVCBUSY) && bcanputnext(q, mp->b_band))) {
+		putnext(q, mp);
+		return (1);
+	}
+	if (putq(q, mp))
+		return (1);
+	freemsg(mp);
+	return (0);
+}
+
+static streamscall int
+log_rsrv(queue_t *q)
+{
+	mblk_t *mp;
+
+	/* simply drain the queue */
+	while ((mp = getq(q))) {
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+			putnext(q, mp);
+			continue;
+		}
+		putbq(q, mp);
+		break;
+	}
+	return (0);
+}
+
 /*
  *  Allocate a control block portion for a log message and fill it out.
  */
-static inline mblk_t *
+static mblk_t *
 log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags, int seq_no,
 	      int source)
 {
@@ -254,7 +290,7 @@ log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags
 	if ((mp = allocb(sizeof(*lp), BPRI_MED))) {
 		struct timeval tv;
 
-		mp->b_datap->db_type = M_PROTO;
+		mp->b_datap->db_type = (flags & SL_NOPUTBUF) ? M_PCPROTO : M_PROTO;
 		lp = (typeof(lp)) mp->b_rptr;
 		mp->b_wptr = mp->b_rptr + sizeof(*lp);
 		mp->b_band = (7 - pri);
@@ -275,25 +311,21 @@ log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags
  *  Try to allocate a control block, duplicate the data block, and deliver the
  *  message.  Return 1 on success, 0 on failure.
  */
-static inline int
+static int
 log_deliver_msg(queue_t *q, short mid, short sid, char level, int flags, int seq, mblk_t *dp,
 		int source)
 {
-	int rval = 0;
 	mblk_t *bp, *mp;
 
 	if (q && (bp = dupmsg(dp)) && (mp = log_alloc_ctl(q, mid, sid, level, flags, seq, source))) {
 		mp->b_cont = bp;
-		if (bcanput(q, mp->b_band) && putq(q, mp))
-			rval = 1;
-		else
-			freemsg(mp);
+		return log_rput(q, mp);
 	}
-	return (rval);
+	return (0);
 }
 
-static int
-log_put(queue_t *q, mblk_t *mp)
+static streamscall int
+log_wput(queue_t *q, mblk_t *mp)
 {
 	struct log *log = q->q_ptr;
 	union ioctypes *ioc;
@@ -326,7 +358,7 @@ log_put(queue_t *q, mblk_t *mp)
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
-			err = -EOPNOTSUPP;
+			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
 			err = -EFAULT;
@@ -341,7 +373,7 @@ log_put(queue_t *q, mblk_t *mp)
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
-			err = -EOPNOTSUPP;
+			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
 			err = -EFAULT;
@@ -356,7 +388,7 @@ log_put(queue_t *q, mblk_t *mp)
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
-			err = -EOPNOTSUPP;
+			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
 			err = -EFAULT;
@@ -376,7 +408,7 @@ log_put(queue_t *q, mblk_t *mp)
 			log_trcq = RD(q);
 			goto ack;
 		}
-		err = -EOPNOTSUPP;
+		err = -EINVAL;
 		goto nak;
 	case M_IOCDATA:
 		ioc = (typeof(ioc)) mp->b_rptr;
@@ -424,12 +456,14 @@ log_put(queue_t *q, mblk_t *mp)
 	return (0);
       nak:
 	mp->b_datap->db_type = M_IOCNAK;
+	ioc->iocblk.ioc_count = 0;
 	ioc->iocblk.ioc_rval = -1;
 	ioc->iocblk.ioc_error = -err;
 	qreply(q, mp);
 	return (0);
       ack:
 	mp->b_datap->db_type = M_IOCACK;
+	ioc->iocblk.ioc_count = 0;
 	ioc->iocblk.ioc_rval = rval;
 	ioc->iocblk.ioc_error = 0;
 	qreply(q, mp);
@@ -439,7 +473,7 @@ log_put(queue_t *q, mblk_t *mp)
 static spinlock_t log_lock = SPIN_LOCK_UNLOCKED;
 static struct log *log_list = NULL;
 
-static int
+static streamscall int
 log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct log *p, **pp = &log_list;
@@ -467,14 +501,18 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		spin_lock_bh(&log_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
-		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next, cminor++) {
+		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
 			dminor = getminor((*pp)->dev);
 			if (cminor < dminor)
 				break;
-			if (cminor == dminor && sflag != CLONEOPEN) {
-				spin_unlock_bh(&log_lock);
-				kmem_free(p, sizeof(*p));
-				return (EIO);	/* bad error */
+			if (cminor == dminor) {
+				if (sflag == CLONEOPEN)
+					cminor++;
+				else {
+					spin_unlock_bh(&log_lock);
+					kmem_free(p, sizeof(*p));
+					return (EIO);	/* bad error */
+				}
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
@@ -489,19 +527,21 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock_bh(&log_lock);
+		qprocson(q);
 		return (0);
 	}
 	}
 	return (ENXIO);
 }
 
-static int
+static streamscall int
 log_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct log *p;
 
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
+	qprocsoff(q);
 	spin_lock_bh(&log_lock);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
@@ -513,28 +553,30 @@ log_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit log_rqinit = {
-	qi_qopen:log_open,
-	qi_qclose:log_close,
-	qi_minfo:&log_minfo,
+	.qi_putp = log_rput,
+	.qi_srvp = log_rsrv,
+	.qi_qopen = log_open,
+	.qi_qclose = log_close,
+	.qi_minfo = &log_minfo,
 };
 
 static struct qinit log_wqinit = {
-	qi_putp:log_put,
-	qi_minfo:&log_minfo,
+	.qi_putp = log_wput,
+	.qi_minfo = &log_minfo,
 };
 
 static struct streamtab log_info = {
-	st_rdinit:&log_rqinit,
-	st_wrinit:&log_wqinit,
+	.st_rdinit = &log_rqinit,
+	.st_wrinit = &log_wqinit,
 };
 
 static struct cdevsw log_cdev = {
-	d_name:CONFIG_STREAMS_LOG_NAME,
-	d_str:&log_info,
-	d_flag:0,
-	d_fop:NULL,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_LOG_NAME,
+	.d_str = &log_info,
+	.d_flag = D_MP,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 /*
@@ -543,13 +585,16 @@ static struct cdevsw log_cdev = {
 
 static vstrlog_t oldlog = NULL;
 
+#ifndef va_copy
+#define va_copy(__x,__y) __va_copy((__x),(__y))
+#endif
 /*
  *  Allocate a data block and fill it in with the format string and an argument
- *  list beignning with the integer aligned following the format string.  We
+ *  list beginning with the integer aligned following the format string.  We
  *  need to parse the format string (twice: once for sizing and once to assemble
  *  the list) to do this, so the number of arguments passed should be small
- *  (NLOGARGS is 3).  We process as many arguments as passed but you shouold not
- *  send mor than NLOGARGS.
+ *  (NLOGARGS is 3).  We process as many arguments as passed but you should not
+ *  send more than NLOGARGS.
  */
 static mblk_t *
 log_alloc_data(char *fmt, va_list args)
@@ -969,7 +1014,11 @@ log_init(void)
 	if (major == 0 && err > 0)
 		major = err;
 	/* hook into vstrlog */
+#if 0
 	oldlog = xchg(&vstrlog, &log_vstrlog);
+#else
+	oldlog = register_strlog(&log_vstrlog);
+#endif
 	return (0);
 }
 
@@ -980,7 +1029,11 @@ void __exit
 log_exit(void)
 {
 	/* unhook from vstrlog */
+#if 0
 	vstrlog = oldlog;
+#else
+	register_strlog(oldlog);
+#endif
 	unregister_strdev(&log_cdev, major);
 }
 

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:01 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/03/10 07:23:57 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:01 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:23:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:01 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/03/10 07:23:57 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:01 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/03/10 07:23:57 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,8 +77,8 @@ static char const ident[] =
 #include "fifo.h"		/* extern verification */
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:01 $"
+#define FIFO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/03/10 07:23:57 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -206,9 +205,9 @@ static struct cdevsw fifo_cdev = {
  *
  *  fifo_open() is only used to open a fifo device (named pipe) from a character device node in an
  *  external filesystem.  This is never called for direct opens of a specfs device node (for direct
- *  opens, fee spec_dev_open() in strspecfs.c).  The character device inode is opened directly and
+ *  opens, see spec_dev_open() in strspecfs.c).  The character device inode is opened directly and
  *  no inode in the shadow filesystem is addressed.
-f*/
+ */
 STATIC int
 fifo_open(struct inode *inode, struct file *file)
 {

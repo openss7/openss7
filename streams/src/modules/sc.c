@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/03 10:57:11 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/10 07:23:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 07:23:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.45  2006/03/10 07:23:58  brian
+ - rationalized streams and strutil package sources
+
  Revision 0.9.2.44  2006/03/03 10:57:11  brian
  - 32-bit compatibility support, updates for release
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/03 10:57:11 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/10 07:23:58 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/03 10:57:11 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/10 07:23:58 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -88,7 +91,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/03 10:57:11 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/10 07:23:58 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -142,7 +145,7 @@ static struct module_info sc_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-#ifdef __LP64__
+#if defined __LP64__ && defined LFS
 #  undef WITH_32BIT_CONVERSION
 #  define WITH_32BIT_CONVERSION 1
 #endif
@@ -200,6 +203,12 @@ sc_mlist_copy(long major, struct qinit *qinit, caddr_t _mlist, const uint flag)
 		}
 		return sizeof(struct sc_mlist);
 	}
+}
+
+static size_t
+str_mlist_count(void)
+{
+	return (cdev_count + fmod_count);
 }
 
 /* 
@@ -271,7 +280,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
 				trace();
 				if (uaddr == NULL) {
-					rval = cdev_count + fmod_count;
+					rval = str_mlist_count();
 					goto ack;
 				}
 				mp->b_datap->db_type = M_COPYIN;
@@ -283,6 +292,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 				return (0);
 			}
 			trace();
+			/* doesn't support I_STR yet, just TRANSPARENT */
 			err = -EINVAL;
 			goto nak;
 		}
@@ -306,7 +316,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 
 				n = 0;
 				if (!dp || dp->b_wptr == dp->b_rptr) {
-					rval = cdev_count + fmod_count;
+					rval = str_mlist_count();
 					goto ack;
 				}
 #ifdef WITH_32BIT_CONVERSION
@@ -348,7 +358,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 					goto nak;
 				}
 				if (count == 0) {
-					rval = cdev_count + fmod_count;
+					rval = str_mlist_count();
 					goto ack;
 				}
 				if (!(dp = allocb(usize, BPRI_MED))) {
