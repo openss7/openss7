@@ -1,19 +1,18 @@
-# vim: ft=spec sw=4 et tw=78
+# vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.57 $) $Date: 2006/03/09 14:02:44 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.58 $) $Date: 2006/03/10 12:03:13 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -47,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 14:02:44 $ by $Author: brian $
+# Last Modified $Date: 2006/03/10 12:03:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -154,6 +153,8 @@
 %define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
 %define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
+%global descripline %{title} is an OpenSS7 Modified version of the DAST Iperf package.
+
 # doesn't work well with this spec file
 %define _unpackaged_files_terminate_build 0
 
@@ -170,7 +171,7 @@ Group:          System Environment/Base
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
-Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
+Source:         http://www.openss7.org/tarballs/%{name}-%{version}.tar.bz2
 Obsoletes:      %{base}
 Obsoletes:      %{name}
 Obsoletes:      iperf
@@ -214,18 +215,28 @@ BuildRequires:  /usr/bin/gzip
 #BuildRequires: tetex >= 1.0
 #BuildRequires: ghostscript >= 6.51
 # to install documentation
-##BuildRequires: texinfo >= 4.0
+#BuildRequires: texinfo >= 4.0
 # find the rest automagically
 Autoreq:        true
 
 # ---------------------------------------------------------------------------
 %description
-The %{name} package includes iperf test programs optioned and compiled for use
-with the OpenSS7 Linux Native SCTP sockets interface.  The purpose of this
-package is to be able to perform comparison tests against TCP, UDP and SCTP.
-This distribution is currently only applicable to Linux releases and is
-validated for ix86, x86_64, ppc and ppc64 architecutres, but should build and
-install for other architectures as well.
+%{descripline}
+The %{name} package includes iperf test programs optioned and
+compiled for use with the OpenSS7 Linux Native SCTP sockets
+interface.  The purpose of this package is to be able to perform
+comparison tests against TCP, UDP and SCTP.  This distribution
+is currently applicable to 2.4 and 2.6 kernels and is validated
+for ix86, x86_64, ppc and ppc64 architectures, but should build
+and install well for other architectures.  This SRPM builds the
+following binary packages:
+- %{name}-openss7 -- %{title} for OpenSS7 SCTP
+- %{name}-lib -- run-time libraries.
+- %{name}-util -- admin utilities.
+- %{name}-devel -- headers, libs and docs.
+- %{name}-test -- test utilities.
+- %{name}-doc -- manpages, manuals and docs.
+- %{name}-source -- source package.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -371,13 +382,15 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description openss7
-The %{name}-openss7 sub-package includes iperf test programs optioned and
-compiled for use with OpenSS7 Linux Native SCTP sockets interface as well as
-OpenSS7 STREAMS socket library and socket drivers.  The purpose of this
-sub-package is to be able to perform comparison tests against TCP and SCTP.
-This distribution is currently only applicable to Linux release and targetted at
-ix86, x86_64, ppc and ppc64 architectures, but should build and install for
-other architectures as well.
+%{descripline}
+The %{name}-openss7 binary package includes iperf test programs
+optioned and compiled for use with OpenSS7 Linux Native SCTP
+sockets interface as well as OpenSS7 STREAMS socket library and
+socket drivers.  The purpose of this binary package is to be
+able to perform comparison tests against TCP and SCTP.  This
+distribution is currently only applicable to Linux release and
+targetted at ix86, x86_64, ppc and ppc64 architectures, but
+should build and install for other architectures as well.
 
 %files openss7
 # ---------------------------------------------------------------------------
@@ -400,8 +413,11 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description lib
-The %{name}-lib sub-package contains the run-time shared libraries necessary to
-run applications programs developed for %{title}.
+%{descripline}
+The %{name}-lib binary package contains the run-time (shared
+object) libraries necessary to run applications programs and
+utilities developed for %{title}.  Also included are the libtool
+.la files describing the shared object libraries.
 
 %if %{have_libraries}
 %pre lib
@@ -457,11 +473,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description devel
-The %{name}-devel sub-package contains library archives for static compilation,
-and headers files to develop %{title} applications.  This also includes the
-header files and static libraries required to compile %{title} applications
-programs.  In addition it contains all of the manual pages necessary for
-developing %{title} application programs.
+%{descripline}
+The %{name}-devel binary package contains library archives for
+static compilation, and headers files to develop %{title}
+modules and drivers.  This also includes the header files and
+static libraries required to compile %{title} applications
+programs.
 
 %if %{FILES_libs}
 %files devel
@@ -499,8 +516,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description util
-The %{name}-util sub-package provides administrative and configuration test
-utilities and commands associated with the %{title} package.
+%{descripline}
+The %{name}-util binary package provides administrative and
+configuration test utilities and commands associated with the
+%{title} package.  Note that these utilities are needed for
+running the validation test suites contained in the %{name}-test
+binary package.
 
 %pre util
 # ---------------------------------------------------------------------------
@@ -544,8 +565,10 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description test
-The %{name}-test sub-package provides testsuites used for troubleshooting the
-%{title} package.
+%{descripline}
+The %{name}-test binary package provides the autotest validation
+testsuites used for validating and troubleshooting the %{title}
+package.
 
 %if %{FILES_test}
 %files test
@@ -573,8 +596,14 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description doc
-The %{name}-doc package contains html documentation for the development of
-%{title} applications, modules and drivers.
+%{descripline}
+The %{name}-doc binary package contains text, html, info and pdf
+(texinfo) documentation and manuals for the development of
+%{title} applications, modules and drivers, as well as the
+installation and reference manual.  Also included are extensive
+manual pages for the entire package, including manual pages for
+commands, administrative utilities, user interfaces, and kernel
+functions.
 
 %post doc
 # ---------------------------------------------------------------------------
@@ -668,9 +697,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description source
-The %{name}-source package contains the source code necessary for building the
-%{name} release.  It includes the autoconf configuration utilities necessary
-to create and distribute this rpm.
+%{descripline}
+The %{name}-source binary package contains the source code
+necessary for building the %{name} release.  It also includes
+the autoconf configuration utilities necessary to create and
+distribute this rpm.  To develop on the package, it would be
+better to use the tarball or source rpm release.
 
 %if %{FILES_source}
 %files source
@@ -686,12 +718,17 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.57  2006/03/09 14:02:44  brian
-# - updating descriptions
+# Revision 1.1.2.58  2006/03/10 12:03:13  brian
+# - updated descriptions and headers
 #
-# Revision 1.1.2.56  2006/02/20 10:06:58  brian
-# - changes for 64 bit distributions
-#
+
+* Thu Mar  9 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.57  2006/03/09 14:02:44  brian
+- updating descriptions
+
+* Mon Feb 20 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.56  2006/02/20 10:06:58  brian
+- changes for 64 bit distributions
 
 * Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.55  2005/12/23 05:23:28  brian
@@ -916,4 +953,4 @@ Tue Dec 28 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.1  2004/12/28 03:48:26  brian
 - First stab at rpm release.
 
-# vim: ft=spec sw=4 et
+# vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi

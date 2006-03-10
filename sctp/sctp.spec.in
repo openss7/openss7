@@ -1,19 +1,18 @@
-# vim: ft=spec sw=4 et tw=78
+# vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2006/03/09 14:02:54 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2006/03/10 12:03:18 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -47,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 14:02:54 $ by $Author: brian $
+# Last Modified $Date: 2006/03/10 12:03:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -265,6 +264,8 @@
 %define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
 %define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
+%global descripline %{title} is a Linux Native Sockets implementation of SCTP.
+
 Summary:        %{title} for Linux
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
@@ -278,7 +279,7 @@ Group:          System Environment/Kernel
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
-Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
+Source:         http://www.openss7.org/tarballs/%{name}-%{version}.tar.bz2
 Obsoletes:      %{base}
 Obsoletes:      %{name}
 Obsoletes:      sctp
@@ -344,17 +345,27 @@ Autoreq:        true
 
 # ---------------------------------------------------------------------------
 %description
-The %{name} package is a Linux Native Sockets implementations of SCTP (Stream
-Control Transmission Protocol) as specified in RFC 2960.
-
-The %{name} package includes kernel modules, Linux/BSD NET4 protocol modules,
-libraries, utilities, test programs, daemons, and development environment for
-the development and execution of the Stream Control Transmission Protocol
-(SCTP) stack components and applications for the Linux/BSD NET4 environment.
-
-This distribution is currently applicable only to 2.4 kernels and is validated
-for ix86, x86_64, ppc and ppc64 architectures, but should build and install
-for other architectures as well.
+%{descripline}
+The %{name} package is a Linux Native Sockets implementation of
+SCTP (Stream Control Transmission Protocol) as specified in RFC
+2960.  The %{name} package includes kernel modules, Linux/BSD
+NET4 protocol modules, libraries, utilities, test programs,
+daemons, and development environment for the development and
+execution of the Stream Control Transmission Protocol (SCTP)
+stack components and applications for the Linux/BSD NET4
+environment.  This distribution is currently applicable to only
+to 2.4 kernels and is validated for ix86, x86_64, ppc and ppc64
+architectures, but should build and install well for other
+architectures.  This SRPM builds the following binary packages:
+- %{name}-%{core_name} -- core kernel modules.
+- %{name}-%{info_name} -- core kernel module symbol versions.
+- %{name}-lib -- run-time libraries.
+- %{name}-devel -- headers, libs and docs.
+- %{name}-util -- admin utilities.
+- %{name}-test -- test utilities.
+- %{name}-doc -- manpages, manuals and docs.
+- %{name}-source -- source package.
+- %{name}-init -- init scripts and config files.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -570,13 +581,15 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{core_name}
-The %{name} package is a Linux Native Sockets implementations of SCTP (Stream
-Control Transmission Protocol) as specified in RFC 2960.
-
-The %{name}-%{core_name} sub-package contains the kernel modules that provide
-the Linux kernel %{stitle} Linux/BSD NET4 protocol modules.  This package is
-heavily tied to the kernel for which it was compiled.  This package applies to
-kernel version %{kernel_version}.
+%{descripline}
+The %{name}-%{core_name} binary package contains the kernel
+modules that provide the Linux kernel Linux/BSD NET4 %{stitle}
+facility.  This binary package also includes modprobe
+configuration files for the associated kernel modules.  This
+package is heavily tied to the kernel for which it was compiled.
+This package applies to kernel version %{kernel_version}.  If
+you cannot find a binary package that matches your kernel,
+rebuild from the source rpm.
 
 %pre %{core_name}
 # ---------------------------------------------------------------------------
@@ -844,14 +857,14 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{info_name}
-The %{name} package is a Linux Native Sockets implementations of SCTP (Stream
-Control Transmission Protocol) as specified in RFC 2960.
-
-The %{name}-%{info_name} sub-package contains the kernel modules symbol
-information for development of kernel modules against the core kernel modules
-included in the %{name}-core package.  This sub-package is tied to the core
-kernel modules and kernel for which they were compiled.  This package applies
-to core kernel modules %{name}-%{core_name} for kernel version %{_kversion}.
+%{descripline}
+The %{name}-%{info_name} binary package contains the kernel
+modules symbol information for development of additional
+%{virtual} kernel modules against the core kernel modules
+included in the %{name}-core binary package.  This package is
+heavily tied to the core kernel modules and kernel for which it
+was compiled.  This package applies to core kernel modules
+%{name}-%{core_name} for kernel version %{_kversion}.
 
 %if %{FILES_modules}
 %files %{info_name}
@@ -880,11 +893,11 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description lib
-The %{name} package is a Linux Native Sockets implementations of SCTP (Stream
-Control Transmission Protocol) as specified in RFC 2960.
-
-The %{name}-lib sub-package contains the run-time shared libraries necessary
-to run applications programs and utilities developed for %{title}.
+%{descripline}
+The %{name}-lib binary package contains the run-time (shared
+object) libraries necessary to run applications programs and
+utilities developed for %{title}.  Also included are the libtool
+.la files describing the shared object libraries.
 
 %if %{have_libraries}
 %pre lib
@@ -940,14 +953,11 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description devel
-The %{name} package is a Linux Native Sockets implementations of SCTP (Stream
-Control Transmission Protocol) as specified in RFC 2960.
-
-The %{name}-devel sub-package contains library archives for static
-compilation, and headers files to develop %{title} applications.  This also
-includes the header files and static libraries required to compile
-%{title} applications programs.  In addition it contains all of the manual
-pages necessary for developing %{title} application programs.
+%{descripline}
+The %{name}-devel binary package contains library archives for
+static compilation, and headers files to develop %{title}
+applications.  This also includes the header files and static
+libraries required to compile %{title} applications programs.
 
 %if %{FILES_libs}
 %files devel
@@ -981,11 +991,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description util
-The %{name} package is a Linux Native Sockets implementations of SCTP (Stream
-Control Transmission Protocol) as specified in RFC 2960.
-
-The %{name}-util sub-package provides administrative and configuration test
-utilities and commands associated with the %{title} package.
+%{descripline}
+The %{name}-util binary package provides administrative and
+configuration test utilities and commands associated with the
+%{title} package.  Note that these utilities are needed for
+running the validation test suites contained in the %{name}-test
+binary package.
 
 %pre util
 # ---------------------------------------------------------------------------
@@ -1029,11 +1040,10 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description test
-The %{name} package is a Linux Native Sockets implementations of SCTP (Stream
-Control Transmission Protocol) as specified in RFC 2960.
-
-The %{name}-test sub-package provides testsuites used for troubleshooting the
-%{title} package.
+%{descripline}
+The %{name}-test binary package provides the autotest validation
+testsuites used for validating and troubleshooting the %{title}
+package.
 
 %if %{FILES_test}
 %files test
@@ -1061,11 +1071,14 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description doc
-The %{name} package is a Linux Native Sockets implementations of SCTP (Stream
-Control Transmission Protocol) as specified in RFC 2960.
-
-The %{name}-doc sub-package contains text, info, html and pdf documentation
-for the development of %{title} applications, modules and drivers.
+%{descripline}
+The %{name}-doc binary package contains text, html, info and pdf
+(texinfo) documentation and manuals for the development of
+%{title} applications, modules and drivers, as well as the
+installation and reference manual.  Also included are extensive
+manual pages for the entire package, including manual pages for
+commands, administrative utilities, user interfaces, and kernel
+functions.
 
 %post doc
 # ---------------------------------------------------------------------------
@@ -1157,12 +1170,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description source
-The %{name} package is a Linux Native Sockets implementations of SCTP (Stream
-Control Transmission Protocol) as specified in RFC 2960.
-
-The %{name}-source sub-package contains the source code necessary for building
-the %{name} release.  It includes the autoconf configuration utilities
-necessary to create and distribute this rpm.
+%{descripline}
+The %{name}-source binary package contains the source code
+necessary for building the %{name} release.  It also includes
+the autoconf configuration utilities necessary to create and
+distribute this rpm.  To develop on the package, it would be
+better to use the tarball or source rpm release.
 
 %if %{FILES_source}
 %files source
@@ -1191,11 +1204,11 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description init
-The %{name} package is a Linux Native Sockets implementations of SCTP (Stream
-Control Transmission Protocol) as specified in RFC 2960.
-
-The %{name}-init sub-package provides init scripts and configuration files
-associated with the %{title} package.
+%{descripline}
+The %{name}-init binary package provides the Sys V init scripts
+and configuration files associated with the %{title} package.
+These init scripts load kernel modules, create devices, and
+apply system configuration customizations at boot.
 
 %pre init
 # ---------------------------------------------------------------------------
@@ -1462,12 +1475,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.82  2006/03/09 14:02:54  brian
-# - updating descriptions
+# Revision 0.9.2.83  2006/03/10 12:03:18  brian
+# - updated descriptions and headers
 #
-# Revision 0.9.2.81  2006/02/20 10:07:01  brian
-# - changes for 64 bit distributions
-#
+
+* Thu Mar  9 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.82  2006/03/09 14:02:54  brian
+- updating descriptions
+
+* Mon Feb 20 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.81  2006/02/20 10:07:01  brian
+- changes for 64 bit distributions
 
 * Wed Jan  4 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.80  2006/01/04 08:03:01  brian
@@ -1804,4 +1822,4 @@ fi
 - Begain this RPM build for Linux Native SCTP.
 - Borrowed heavily from the OpenSS7 STREAMS builds.
 
-# vim: ft=spec sw=4 et tw=78
+# vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi

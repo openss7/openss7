@@ -1,19 +1,18 @@
-# vim: ft=spec sw=4 et tw=78
+# vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.50 $) $Date: 2006/03/09 14:02:53 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.51 $) $Date: 2006/03/10 12:03:16 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -47,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 14:02:53 $ by $Author: brian $
+# Last Modified $Date: 2006/03/10 12:03:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -199,6 +198,8 @@
 %define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
 %define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
+%global descripline %{title} is an OpenSS7 Modified version of HP Netperf.
+
 Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
@@ -212,7 +213,7 @@ Group:          System Environment/Kernel
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
-Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
+Source:         http://www.openss7.org/tarballs/%{name}-%{version}.tar.bz2
 %{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
 
 %define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
@@ -269,14 +270,20 @@ Autoreq:        true
 
 # ---------------------------------------------------------------------------
 %description
-The %{name} package include netperf test programs optioned and compiled for
-use with OpenSS7 Linux Native SCTP sockets interface as well as OpenSS7
-%{_STREAMS} STREAMS DLPI, XTI INET driver, and XTI SCTP driver.  The purpose
-of this package is to be able to perform comparison tests agains TCP and SCTP.
-
-This distribution is currently only applicable to Linux release and was
-targetted at ix86, x86_64, ppc and ppc64 architectures, but should build and
-install for other architectures as well.
+%{descripline}
+The %{name} package includes netperf test programs optioned and
+compiled for use with OpenSS7 Linux Native SCTP sockets
+interface as well as OpenSS7 %{_STREAMS} STREAMS DLPI, XTI INET
+driver, and XTI SCTP driver.  The purpose of this package is to
+be able to perform comparison tests agains TCP and SCTP.  This
+distribution is currently applicable to 2.4 and 2.6 kernels and
+is validated for ix86, x86_64, ppc and ppc64 architectures, but
+should build and install well for other architectures.  This
+SRPM builds the following binary packages:
+- %{name}-%{_streams} -- for %{_STREAMS} STREAMS and SCTP
+- %{name}-test -- test utilities.
+- %{name}-doc -- manpages, manuals and docs.
+- %{name}-source -- source package.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -487,13 +494,13 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}
-The %{name}-%{_streams} sub-package includes netperf test programs optioned
-and compiled for use with OpenSS7 Linux Native SCTP sockets interface as well
-as OpenSS7 %{_STREAMS} STREAMS DLPI, XTI INET driver, and XTI SCTP driver.
-The purpose of this sub-package is to be able to perform comparison tests
-against TCP and SCTP.  This distribution is currently only applicable to Linux
-release and was targetted at ix86, x86_64, ppc and ppc64 architectures, but
-should build and install for other architectures as well.
+%{descripline}
+The %{name}-%{_streams} binary package includes netperf test
+programs optioned and compiled for use with OpenSS7 Linux Native
+SCTP sockets interface as well as OpenSS7 %{_STREAMS} STREAMS
+DLPI, XTI INET driver, and XTI SCTP driver.  The purpose of this
+binary package is to be able to perform comparison tests against
+TCP and SCTP.
 
 %pre %{_streams}
 # ---------------------------------------------------------------------------
@@ -535,8 +542,10 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description test
-The %{name}-test sub-package provides testsuites used for troubleshooting the
-%{title} package.
+%{descripline}
+The %{name}-test binary package provides the autotest validation
+testsuites used for validating and troubleshooting the %{title}
+package.
 
 %if %{FILES_test}
 %files test
@@ -564,8 +573,14 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description doc
-The %{name}-doc sub-package contains html documentation for the development of
-%{title} applications, modules and drivers.
+%{descripline}
+The %{name}-doc binary package contains text, html, info and pdf
+(texinfo) documentation and manuals for the development of
+%{title} applications, modules and drivers, as well as the
+installation and reference manual.  Also included are extensive
+manual pages for the entire package, including manual pages for
+commands, administrative utilities, user interfaces, and kernel
+functions.
 
 %post doc
 # ---------------------------------------------------------------------------
@@ -659,9 +674,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description source
-The %{name}-source sub-package contains the source code necessary for building
-the %{name} release.  It includes the autoconf configuration utilities
-necessary to create and distribute this rpm.
+%{descripline}
+The %{name}-source binary package contains the source code
+necessary for building the %{name} release.  It also includes
+the autoconf configuration utilities necessary to create and
+distribute this rpm.  To develop on the package, it would be
+better to use the tarball or source rpm release.
 
 %if %{FILES_source}
 %files source
@@ -677,12 +695,17 @@ necessary to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.50  2006/03/09 14:02:53  brian
-# - updating descriptions
+# Revision 1.1.2.51  2006/03/10 12:03:16  brian
+# - updated descriptions and headers
 #
-# Revision 1.1.2.49  2006/02/20 10:07:00  brian
-# - changes for 64 bit distributions
-#
+
+* Thu Mar  9 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.50  2006/03/09 14:02:53  brian
+- updating descriptions
+
+* Mon Feb 20 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.49  2006/02/20 10:07:00  brian
+- changes for 64 bit distributions
 
 * Fri Dec 30 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.48  2005/12/30 12:21:28  brian
@@ -980,4 +1003,4 @@ necessary to create and distribute this rpm.
 - Revision 1.1.2.2  2004/08/06 03:47:22  brian
 - First stab at SCTP being included.
 
-# vim: ft=spec sw=4 et
+# vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi

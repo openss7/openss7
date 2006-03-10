@@ -1,19 +1,18 @@
-# vim: ft=spec sw=4 et tw=78
+# vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strutil.spec.in,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/20 10:07:06 $
+# @(#) $RCSfile: strutil.spec.in,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 12:03:29 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -47,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/02/20 10:07:06 $ by $Author: brian $
+# Last Modified $Date: 2006/03/10 12:03:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -298,6 +297,8 @@
 %define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
 %define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
+%global descripline %{title} provides as set of {_STREAMS} STREAMS Administrative Utilities.
+
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} for Linux
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
@@ -311,7 +312,7 @@ Group:          System Environment/Kernel
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
-Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
+Source:         http://www.openss7.org/tarballs/%{name}-%{version}.tar.bz2
 %{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
 # TODO: FC4 wants kernel-devel not kernel-source
 # older rpm can't handle nested ifs
@@ -378,14 +379,27 @@ Autoreq:        true
 
 # ---------------------------------------------------------------------------
 %description
+%{descripline}
 The %{name} package includes kernel modules, %{_STREAMS} STREAMS
-drivers, modules, libraries, utilities, test programs, daemons, and
-development environment for the development and execution of X/Open
-Network Services (XNS) protocol stack components and applications for
-the %{_STREAMS} STREAMS environment.
-This distribution is currently applicable to 2.4 and 2.6 kernels and was
-targetted at ix86 and ppc architectures, but should build and install
-for other architectures as well.
+drivers, modules, libraries, utilities, test programs, daemons,
+and development environment for the development and execution of
+administrative utilities and applications for the %{_STREAMS}
+STREAMS environment.  This distribution is currently applicable
+to 2.4 and 2.6 kernels and is validated for ix86, x86_64, ppc
+and ppc64 architectures, but should build and install well for
+other architectures.  This SRPM builds the following binary
+packages:
+- %{name}-%{_streams}-%{core_name} -- core kernel modules.
+- %{name}-%{_streams}-%{info_name} -- core kernel module symbol
+  versions.
+- %{name}-%{_streams}-lib -- run-time libraries.
+- %{name}-%{_streams}-util -- admin utilities.
+- %{name}-devel -- headers, libs and docs.
+- %{name}-dev -- devices.
+- %{name}-test -- test utilities.
+- %{name}-doc -- manpages, manuals and docs.
+- %{name}-source -- source package.
+- %{name}-init -- init scripts and config files.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -573,13 +587,17 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-%{core_name}
-The %{name}-%{_streams}-%{core_name} package contains the kernel modules
-that provide the Linux kernel %{stitle} %{_STREAMS} STREAMS drivers and modules.
-This also includes assorted drivers and modules for additional protocol stacks
-such as XNS.  This package is heavily tied to the kernel for which it and the
-%{_STREAMS} STREAMS facility was compiled.  This package applies to kernel
-version %{kernel_version} and requires a %{_STREAMS} STREAMS package compiled
-for the same kernel.
+%{descripline}
+The %{name}-%{_streams}-%{core_name} binary package contains the
+kernel modules that provide the Linux kernel %{stitle}
+%{_STREAMS} STREAMS drivers and modules.  This includes assorted
+drivers and modules for additional protocol stacks such as XNS.
+This package is heavily tied to the kernel for which it and the
+%{_STREAMS} STREAMS facility were compiled.  This package
+applies to kernel version %{kernel_version} and requires a
+%{_STREAMS} STREAMS package compiled for the same kernel.  If
+you cannot find a binary package that matches your kernel,
+rebuild from the source rpm.
 
 %pre %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
@@ -834,11 +852,15 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-%{info_name}
-The %{name}-%{_streams}-%{info_name} package contains the kernel modules symbol
-information for development of kernel modules against the core kernel modules
-included in the %{name}-core package.  This package is tied to the core kernel
-modules and kernel for which they were compiled.  This package applies to core
-kernel modules %{name}-%{_streams}-%{core_name} for kernel version %{_kversion}.
+%{descripline}
+The %{name}-%{_streams}-%{info_name} package contains the kernel
+modules symbol information for development of additional kernel
+modules against the core kernel modules included in the
+%{name}-core binary package.  This package is heavily tied to
+the core kernel modules and kernel for which it was compiled.
+This package applies to core kernel modules
+%{name}-%{_streams}-%{core_name} for kernel version
+%{_kversion}.
 
 %if %{FILES_modules}
 %files %{_streams}-%{info_name}
@@ -870,9 +892,11 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-lib
-The %{name}-%{_streams}-lib package contains the run-time shared libraries
-necessary to run applications programs and utilities developed for OpenSS7
-%{_STREAMS} STREAMS %{stitle}.
+%{descripline}
+The %{name}-%{_streams}-lib package contains the run-time
+(shared object) libraries necessary to run applications programs
+and utilities developed for %{title}.  Also included are the
+libtool .la files describing the shared object libraries.
 
 %if %{have_libraries}
 %pre %{_streams}-lib
@@ -928,12 +952,15 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description devel
-The %{name}-devel package contains library archives for static compilation,
-and headers files to develop OpenSS7 %{_STREAMS} STREAMS %{stitle} applications.
-This also includes the header files and static libraries required to compile
-OpenSS7 %{_STREAMS} STREAMS %{stitle} applications programs.  In addition it
-contains all of the manual pages necessary for developing OpenSS7 %{_STREAMS}
-STREAMS %{stitle} application programs.
+%{descripline}
+The %{name}-devel package contains library archives for static
+compilation, and headers files to develop OpenSS7 %{_STREAMS}
+STREAMS %{stitle} applications.  This also includes the header
+files and static libraries required to compile OpenSS7
+%{_STREAMS} STREAMS %{stitle} applications programs.  In
+addition it contains all of the manual pages necessary for
+developing OpenSS7 %{_STREAMS} STREAMS %{stitle} application
+programs.
 
 %if %{FILES_libs}
 %files devel
@@ -981,9 +1008,13 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-util
-The %{name}-%{_streams}-util package provides administrative and configuration
-test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
-%{stitle} package.
+%{descripline}
+The %{name}-%{_streams}-util binary package provides
+administrative and configuration test utilities and commands
+associated with the OpenSS7 %{_STREAMS} STREAMS %{stitle}
+package.  Note that these utilities are needed for running the
+validation test suites contained in the %{name}-test binary
+package.
 
 %pre %{_streams}-util
 # ---------------------------------------------------------------------------
@@ -1029,9 +1060,14 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description dev
-The %{name}-dev package contains the device definitions necessary to run
-applications programs and utilities developed for OpenSS7 %{_STREAMS} STREAMS
-%{stitle}.  The package is not required for devfs based systems.
+%{descripline}
+The %{name}-dev binary package contains the device definitions
+necessary to run applications programs and utilities developed
+for %{title}.  On older systems, this binary creates the devices
+themselvs.  On newer systems, this binary package includes the
+executable for creating devices from init scripts.
+
+The package is not required for devfs based systems.
 
 %if %{MAKE_devs}
 %post dev
@@ -1078,8 +1114,10 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description test
-The %{name}-test package provides testsuites used for troubleshooting
-the %{title} package.
+%{descripline}
+The %{name}-test binary package provides the autotest validation
+testsuites used for validating and troubleshooting the %{title}
+package.
 
 %if %{FILES_test}
 %files test
@@ -1107,8 +1145,14 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description doc
-The %{name}-doc package contains html documentation for the development of
-OpenSS7 %{_STREAMS} STREAMS %{stitle} applications, modules and drivers.
+%{descripline}
+The %{name}-doc binary package contains text, html, info and pdf
+(texinfo) documentation and manuals for the development of
+%{title} applications, modules and drivers, as well as the
+installation and reference manual.  Also included are extensive
+manual pages for the entire package, including manual pages for
+commands, administrative utilities, user interfaces, and kernel
+functions.
 
 %post doc
 # ---------------------------------------------------------------------------
@@ -1202,9 +1246,12 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description source
-The %{name}-source package contains the source code necessary for building the
-%{name} release.  It includes the autoconf configuration utilities necessary
-to create and distribute this rpm.
+%{descripline}
+The %{name}-source binary package contains the source code
+necessary for building the %{name} release.  It also includes
+the autoconf configuration utilities necessary to create and
+distribute this rpm.  To develop on the package, it would be
+better to use the tarball or source rpm release.
 
 %if %{FILES_source}
 %files source
@@ -1237,8 +1284,11 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description init
-The %{name}-init package provides init scripts and configuration files
-associated with the %{title} package.
+%{descripline}
+The %{name}-init binary package provides the Sys V init scripts
+and configuration files associated with the %{title} package.
+These init scripts load kernel modules, create devices, and
+apply system configuration customizations at boot.
 
 %pre init
 # ---------------------------------------------------------------------------
@@ -1611,9 +1661,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strutil.spec.in,v $
-# Revision 0.9.2.20  2006/02/20 10:07:06  brian
-# - changes for 64 bit distributions
+# Revision 0.9.2.21  2006/03/10 12:03:29  brian
+# - updated descriptions and headers
 #
+
+* Mon Feb 20 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.20  2006/02/20 10:07:06  brian
+- changes for 64 bit distributions
 
 * Wed Jan  4 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.19  2006/01/04 08:03:14  brian
@@ -1694,4 +1748,4 @@ fi
 * Sun Jul  3 2005 Brian Bidulock <bidulock@openss7.org>
 - borrowed this file from the strxns package
 
-# vim: ft=spec sw=4 et
+# vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
