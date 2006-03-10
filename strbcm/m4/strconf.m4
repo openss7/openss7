@@ -1,8 +1,9 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:*** fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/09 14:01:15 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 02:57:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,10 +48,9 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 14:01:15 $ by $Author: brian $
+# Last Modified $Date: 2006/03/10 02:57:37 $ by $Author: brian $
 #
 # =============================================================================
-
 
 # =============================================================================
 # _STRCONF
@@ -113,22 +113,6 @@ dnl
     ])
     STRCONF_INPUT="${strconf_cv_input:-Config.master}"
 dnl
-dnl There is really no need to allow the name of the package master file to be
-dnl changed by configure
-dnl
-    AC_ARG_WITH([strconf-pkg-master],
-	AS_HELP_STRING([--with-strconf-pkg-master=FILENAME],
-	    [specify the file name to which the configuration master file for
-	     binary packages is written @<:@default=Config.package@:>@]),
-	[with_strconf_pkg_master="$withval"],
-	[with_strconf_pkg_master=''])
-    AC_CACHE_CHECK([for strconf package master file], [strconf_cv_pkgin], [dnl
-	if test :"${with_strconf_pkg_master:-no}" != :no ; then
-	    strconf_cv_pkgin="$with_strconf_pkg_master"
-	fi
-    ])
-    STRCONF_PKGIN="${strconf_cv_pkgin:-Config.package}"
-dnl
     AC_ARG_WITH([base-major],
 	AS_HELP_STRING([--with-base-major=MAJOR],
 	    [specify the base major device number from which to start
@@ -177,41 +161,64 @@ dnl Allow the user to specify a package directory that is completely outside
 dnl of the source or build tree: that way, one can configure with a simple
 dnl option and do not need to copy files from anywhere.
 dnl
-    AC_ARG_WITH([strconf-pkgdirs],
-	AS_HELP_STRING([--with-strconf-pkgdirs=DIRECTORY@<:@ DIRECTORY@:>@],
+    AC_ARG_WITH([strconf-pkgdir],
+	AS_HELP_STRING([--with-strconf-pkgdir=DIRECTORY],
 	    [specify the relative or absolute path to the binary package
 	     configuration directory in which to look for binary packages
 	     @<:@default=pkg@:>@]),
-	[with_strconf_pkgdirs="$withval"],
-	[with_strconf_pkgdirs=''])
+	[with_strconf_pkgdir="$withval"],
+	[with_strconf_pkgdir=''])
     AC_MSG_CHECKING([for strconf binary package direcotries])
-    strconf_cv_packagedirs="$with_strconf_pkgdirs"
-    if test -n "$strconf_cv_packagedirs" ; then
-	strconf_found='no'
-	for strconf_dir in $strconf_cv_packagedirs ; do
-	    if test -d $strconf_dir ; then
-		strconf_found='yes'
-		break
-	    fi
-	done
-	if test ":$strconf_found" = :no ; then
-	    AC_MSG_ERROR([
+    strconf_cv_packagedir=
+    strconf_dir="$with_strconf_pkgdir"
+    # clean it up
+    strconf_dir=`echo $strconf_dir | sed -e 's|///*|/|g;s|/\./|/|g;s|/\.$||;s|/$||;s|^\./||'`
+    if test -n "$strconf_dir" ; then
+	case $strconf_dir in
+	    (.*|/*) # if it begin a . or a / then it is not vpath relative
+	    # if it is not vpath relative, then it must exist
+	    if test ! -d "$strconf_dir" ; then
+		AC_MSG_ERROR([
 ***
-*** You have specified package directories of "$with_strconf_pkgdirs" using
-*** --with-strconf-pkgdirs, however, no directory exists.  This cannot be
-*** correct.  Please specify the correct directory with the configure option
-*** --with-strconf-pkgdirs, or create the directory before calling configure,
-*** and try again.
-*** ])
-	fi
+*** You have specified a specific package directory of
+***	"$with_strconf_pkgdir"
+*** using --with-strconf-pkgdir, however, that directory does not exist.  This
+*** cannot be correct.  Please specify the correct directory with the
+*** configure option --with-strconf-pkgdir, or create the
+***	"$strconf_dir"
+*** directory before calling configure again.
+***])
+	    fi
+	    strconf_cv_packagedir="$strconf_dir"
+	    ;;
+	    (*)
+	    # if it is vpath relative, then at the source directory must exist
+	    if test ! -d "$srcdir/$strconf_dir" ; then
+		AC_MSG_ERROR([
+***
+*** You have specified a relative package directory of
+***	"$with_strconf_pkgdir"
+*** using --with-strconf-pkgdir, however, the corresponding source directory,
+***	"$srcdir/$strconf_dir"
+*** does not exist.  This cannot be correct.  Please specify the correct
+*** directory with the configure option --with-strconf-pkgdir, or create the
+*** corresponding source directory before calling configure again.
+***])
+	    fi
+	    # might need to create the build directory
+	    test -d "./$strconf_dir" || (umask 077 && mkdir -p $strconf_dir)
+	    strconf_cv_packagedir="$strconf_dir"
+	    ;;
+	esac
     else
-	if test -d "$srcdir/pkg" ; then
-	    test -d pkg || (umask 077 && mkdir pkg)
-	    strconf_cv_packagedirs="pkg $srcdir/pkg"
+	strconf_dir='pkg'
+	if test -d "$srcdir/$strconf_dir" ; then
+	    test -d "./$strconf_dir" || (umask 077 && mkdir -p $strconf_dir)
+	    strconf_cv_packagedir="$strconf_dir"
 	fi
     fi
-    AC_MSG_RESULT([$strconf_cv_packagedirs])
-    STRCONF_PKGDIRS="`$echo $strconf_cv_packagedirs | sed -e s'|  *|,|g'`"
+    AC_MSG_RESULT([$strconf_cv_packagedir])
+    STRCONF_BPKGDIR="$strconf_cv_packagedir"
 ])# _STRCONF_SETUP
 # =============================================================================
 
@@ -224,51 +231,77 @@ dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
     AC_MSG_NOTICE([searching for $STRCONF_INPUT input files in  $ac_srcdir and $ac_builddir])
-    strconf_configs=
-    # config.status idea of absolute is not absolute, might be an autoconf bug
-    ac_abs_srcdir=`( cd $ac_srcdir ; /bin/pwd )`
-    ac_abs_builddir=`( cd $ac_builddir ; /bin/pwd )`
-    ac_abs_pkgdirs=
-    if test ":${STRCONF_PKGDIRS:+set}" = :set ; then
-	strconf_dirs="`echo $STRCONF_PKGDIRS | sed -e 's|,| |g'`"
-	for strconf_dir in $strconf_dirs ; do
-	    ac_abs_pkgdirs="${ac_abs_pkgdirs:+$ac_abs_pkgdirs }`( cd $strconf_dir ; /bin/pwd )`"
-	done
-    fi
-    strconf_list="`find $ac_abs_srcdir/ $ac_abs_builddir/ -type f -name \"$STRCONF_STEM\" | sort | uniq`"
-    for strconf_tmp in $strconf_list ; do
-	# skip lower level build directories in list
-	case $strconf_tmp in
-	    ("$ac_abs_builddir"*/"$PACKAGE"/*) continue ;;
-	    ("$ac_abs_builddir"*/"$PACKAGE-$VERSION"/*) continue ;;
-	    ("$ac_abs_builddir"*/"$PACKAGE-bin-$VERSION"/*) continue ;;
+    ac_pkgdir=
+    if test ":${STRCONF_BPKGDIR:+set}" = :set ; then
+	case $STRCONF_BPKGDIR in
+	    (.*|/*) # non vpath directory specification, use specified
+	    ac_pkgdir="$STRCONF_BPKGDIR"
+	    ac_pkg_srcdir=
+	    ac_pkg_builddir=
+	    ;;
+	    (*) # vpath directory specification, relative to src and build
+	    ac_pkgdir=
+	    ac_pkg_srcdir="$ac_srcdir/$ac_pkgdir"
+	    ac_pkg_builddir="$ac_builddir/$ac_pkgdir"
+	    ;;
 	esac
-	# skip package directories in list
-	strconf_skip='no'
-	for strconf_dir in $ac_abs_pkgdirs ; do
+    fi
+    # need absolute directory names so that we can get rid of duplicates
+    ac_abs_srcdir=`(cd $ac_srcdir ; /bin/pwd)`
+    ac_abs_builddir=`(cd $ac_builddir ; /bin/pwd)`
+    if test -z "$ac_pkgdir" ; then
+	ac_abs_pkgdir=
+    else
+	ac_abs_pkgdir=`(cd $ac_pkgdir ; /bin/pwd)`
+    fi
+    strconf_list="`find ${ac_abs_srcdir:+$ac_abs_srcdir/} ${ac_abs_builddir:+$ac_abs_builddir/} ${ac_abs_pkgdir:+$ac_abs_pkgdir/} -type f -name \"$STRCONF_STEM\" | sort | uniq`"
+    strconf_configs=
+    ac_abs_srcdir_mask="^`echo $ac_abs_srcdir | sed -e 's|.|.|g'`"
+    ac_abs_builddir_mask="^`echo $ac_abs_builddir | sed -e 's|.|.|g'`"
+    ac_abs_pkgdir_mask="^`echo $ac_abs_pkgdir | sed -e 's|.|.|g'`"
+    for strconf_tmp in $strconf_list ; do
+	# skip lower level build directories in list (to avoid duplicates)
+	case $strconf_tmp in
+	    ("$ac_abs_builddir/$PACKAGE"/* | "$ac_abs_builddir/"*/"$PACKAGE"/*) continue ;;
+	    ("$ac_abs_builddir/$PACKAGE-$VERSION"/* | "$ac_abs_builddir/"*/"$PACKAGE-$VERSION"/*) continue ;;
+	    ("$ac_abs_builddir/$PACKAGE-bin-$VERSION"/* | "$ac_abs_builddir/"*/"$PACKAGE-bin-$VERSION"/*) continue ;;
+	esac
+	# convert back to relative
+	if test -n "$ac_abs_builddir" ; then
 	    case $strconf_tmp in
-		("$strconf_dir"*) strconf_skip='yes' ;;
+		("$ac_abs_builddir"/*)
+		strconf_tmp=`echo $strconf_tmp | sed -e 's|'$ac_abs_builddir_mask'|'$ac_builddir'|'`
+		;;
 	    esac
-	done
-	if test ":$strconf_skip" = :yes ; then
-	    continue
+	fi
+	if test -n "$ac_abs_srcdir" ; then
+	    case $strconf_tmp in
+		("$ac_abs_srcdir"/*)
+		strconf_tmp=`echo $strconf_tmp | sed -e 's|'$ac_abs_srcdir_mask'|'$ac_srcdir'|'`
+		;;
+	    esac
+	fi
+	if test -n "$ac_abs_pkgdir" ; then
+	    case $strconf_tmp in
+		("$ac_abs_pkgdir"/*)
+		strconf_tmp=`echo $strconf_tmp | sed -e 's|'$ac_abs_pkgdir_mask'|'$ac_pkgdir'|'`
+		;;
+	    esac
 	fi
 	if test -r "$strconf_tmp" ; then
 	    strconf_configs="$strconf_tmp${strconf_configs:+ }${strconf_configs}"
 	fi
     done
-    strconf_dirs="$ac_abs_pkgdirs"
-    AC_MSG_NOTICE([searching for $STRCONF_PKGIN input files in $strconf_dirs])
-    strconf_packages=
-    if test -n "${strconf_dirs}" ; then
-	strconf_packages="`find $strconf_dirs -type f -name \"$STRCONF_STEM\" | sort | uniq`"
-    fi
     if test -n "${strconf_configs}" -a -n "${STRCONF_INPUT}"; then
 	AC_MSG_NOTICE([creating $STRCONF_INPUT])
 	cat /dev/null > $STRCONF_INPUT
 	for file in $strconf_configs ; do
 	    AC_MSG_NOTICE([appending $file to  $STRCONF_INPUT])
-	    ( echo "#" ; echo "# included from $file `date`" ; echo "#" ; cat $file ) | sed -e '/^##/d' | cat -s >> $STRCONF_INPUT
+	    basename=`echo $file | sed -e 's|^.*/||'`
+	    dirname=`echo $file | sed -e 's|/[[^/]]*$||'`
+	    absdir=`( cd $dirname/ ; /bin/pwd )`
+	    abspath="$absdir/$basename"
+	    ( echo "#" ; echo "# included from $abspath `date`" ; echo "#" ; echo "file $file" ; cat $file ) | sed -e '/^##/d' | cat -s >> $STRCONF_INPUT
 	done
 	if test :"${STRCONF_CONFIG:+set}" = :set; then
 	    AC_MSG_NOTICE([creating $STRCONF_CONFIG from $STRCONF_INPUT])
@@ -334,17 +367,9 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 		echo "$as_me: $line" >&2
 	    done
 	fi
-    fi
-    if test -n "${strconf_packages}" -a -n "${STRCONF_PKGIN}" ; then
-	AC_MSG_NOTICE([creating $STRCONF_PKGIN])
-	cat /dev/null > $STRCONF_PKGIN
-	for file in $strconf_packages ; do
-	    AC_MSG_NOTICE([appending $file to $STRCONF_PKGIN])
-	    ( echo "#" ; echo "# included from $file `date`" ; echo "#" ; cat $file ) | sed -e '/^##/d' | cat -s >> $STRCONF_PKGIN
-	done
-	if test ":${STRCONF_PKGDIRS:+set}" = :set ; then
-	    AC_MSG_NOTICE([creating $STRCONF_PKGDIRS from $STRCONF_PKGIN])
-	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --packagedirs=$STRCONF_PKGDIRS $STRCONF_PKGIN" 2>&1 | \
+	if test ":${STRCONF_BPKGDIR:+set}" = :set ; then
+	    AC_MSG_NOTICE([creating $STRCONF_BPKGDIR from $STRCONF_INPUT])
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --packagedir=$STRCONF_BPKGDIR $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
 		echo "$as_me: $line" >&2
@@ -370,7 +395,6 @@ STRCONF="$STRCONF"
 STRCONF_STEM="$STRCONF_STEM"
 STRCONF_SCRIPT="$STRCONF_SCRIPT"
 STRCONF_INPUT="$STRCONF_INPUT"
-STRCONF_PKGIN="$STRCONF_PKGIN"
 STRCONF_MAJBASE="$STRCONF_MAJBASE"
 STRCONF_CONFIG="$STRCONF_CONFIG"
 STRCONF_MODCONF="$STRCONF_MODCONF"
@@ -380,7 +404,7 @@ STRCONF_CONFMOD="$STRCONF_CONFMOD"
 STRCONF_MAKEDEV="$STRCONF_MAKEDEV"
 STRCONF_STSETUP="$STRCONF_STSETUP"
 STRCONF_STRLOAD="$STRCONF_STRLOAD"
-STRCONF_PKGDIRS="$STRCONF_PKGDIRS"
+STRCONF_BPKGDIR="$STRCONF_BPKGDIR"
 STRCONF_PACKAGE="$STRCONF_PACKAGE"
 STRCONF_MINORSZ="$STRCONF_MINORSZ"
     ])
@@ -395,7 +419,6 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 	AC_SUBST([STRCONF_STEM])dnl
 	AC_SUBST([STRCONF_SCRIPT])dnl
 	AC_SUBST([STRCONF_INPUT])dnl
-	AC_SUBST([STRCONF_PKGIN])dnl
 	AC_SUBST([STRCONF_CONFIGS])dnl
 	AC_SUBST([STRCONF_MAJBASE])dnl
 	AC_SUBST([STRCONF_CONFIG])dnl
@@ -406,7 +429,7 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 	AC_SUBST([STRCONF_MAKEDEV])dnl
 	AC_SUBST([STRCONF_STSETUP])dnl
 	AC_SUBST([STRCONF_STRLOAD])dnl
-	AC_SUBST([STRCONF_PKGDIRS])dnl
+	AC_SUBST([STRCONF_BPKGDIR])dnl
 	AC_SUBST([STRCONF_PACKAGE])dnl
 	AC_SUBST([STRMAKENODES])dnl
 	_STRCONF_OUTPUT_CONFIG
@@ -419,5 +442,6 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:*** fo+=tcqlorn
