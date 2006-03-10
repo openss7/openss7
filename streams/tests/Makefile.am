@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/06 11:38:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 14:05:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:39 $ by $Author: brian $
+# Last Modified $Date: 2006/03/10 14:05:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.31  2006/03/10 14:05:22  brian
+# - corrected kishore's problem with missing testsuite-admin.at
+#
 # Revision 0.9.2.30  2006/03/06 11:38:39  brian
 # - updated headers
 #
@@ -118,6 +121,7 @@ TESTSUITE_DEPS		+= \
 			local.at \
 			kernel.at \
 			$(TESTSUITE)-streams.at \
+			$(TESTSUITE)-admin.at \
 			$(TESTSUITE).at
 
 if CONFIG_STREAMS_CLONE
