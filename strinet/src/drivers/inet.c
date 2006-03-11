@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/23 11:08:51 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/10 19:47:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/23 11:08:51 $ by $Author: brian $
+ Last Modified $Date: 2006/03/10 19:47:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.61  2006/03/10 19:47:43  brian
+ - reformatting
+
  Revision 0.9.2.60  2006/02/23 11:08:51  brian
  - a couple of bug corrections reported by sponsors
  - 64bit changes
@@ -57,10 +60,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/23 11:08:51 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/10 19:47:43 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/23 11:08:51 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/10 19:47:43 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -514,7 +517,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/23 11:08:51 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/10 19:47:43 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -1143,7 +1146,7 @@ ss_socket_put(struct socket *sock)
 	sock_release(sock);
 }
 STATIC void
-ss_socket_get(struct socket *sock, ss_t * ss)
+ss_socket_get(struct socket *sock, ss_t *ss)
 {
 	struct sock *sk;
 
@@ -1451,7 +1454,7 @@ STATIC ss_options_t ss_defaults = {
  *  indications, all request options flags must be cleared to zero.
  */
 STATIC int
-ss_size_conn_opts(ss_t * ss)
+ss_size_conn_opts(ss_t *ss)
 {
 	int size = 0;
 
@@ -1612,7 +1615,7 @@ ss_size_conn_opts(ss_t * ss)
  *  negotiation is always set to T_SUCCESS.
  */
 STATIC int
-t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
+t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 {
 	struct t_opthdr *oh;
 	struct sock *sk;
@@ -2542,7 +2545,7 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
  *  the appropriate option values set.
  */
 STATIC int
-t_set_options(ss_t * ss)
+t_set_options(ss_t *ss)
 {
 	struct sock *sk;
 
@@ -3112,7 +3115,7 @@ t_set_options(ss_t * ss)
  *  negotiated values.  There is no roll-back mechanmism.
  */
 STATIC int
-t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
+t_parse_conn_opts(ss_t *ss, const unsigned char *ip, size_t ilen, int request)
 {
 	const struct t_opthdr *ih;
 	struct sock *sk;
@@ -4339,7 +4342,7 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
  *  options provided to T_OPTDATA_REQ or T_UNITDATA_REQ.
  */
 STATIC int
-ss_cmsg_size(const ss_t * ss, const unsigned char *ip, size_t ilen)
+ss_cmsg_size(const ss_t *ss, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	const struct t_opthdr *ih;
@@ -4422,7 +4425,7 @@ ss_cmsg_size(const ss_t * ss, const unsigned char *ip, size_t ilen)
  *  T_UNITDATA_REQ.
  */
 STATIC int
-ss_cmsg_build(const ss_t * ss, const unsigned char *ip, size_t ilen, struct msghdr *msg)
+ss_cmsg_build(const ss_t *ss, const unsigned char *ip, size_t ilen, struct msghdr *msg)
 {
 	struct cmsghdr *ch = CMSG_FIRSTHDR(msg);
 	const struct t_opthdr *ih;
@@ -4601,12 +4604,12 @@ ss_cmsg_build(const ss_t * ss, const unsigned char *ip, size_t ilen, struct msgh
 }
 
 STATIC int
-ss_errs_size(ss_t * ss, struct msghdr *msg)
+ss_errs_size(ss_t *ss, struct msghdr *msg)
 {
 	return (0);
 }
 STATIC int
-ss_errs_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen, int *etype)
+ss_errs_build(ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen, int *etype)
 {
 	return (-EFAULT);
 }
@@ -4618,7 +4621,7 @@ ss_errs_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen, int
  *  cmsg.  Only options with end to end significance are important.
  */
 STATIC int
-ss_opts_size(const ss_t * ss, struct msghdr *msg)
+ss_opts_size(const ss_t *ss, struct msghdr *msg)
 {
 	int size = 0;
 	struct cmsghdr *cmsg;
@@ -4683,7 +4686,7 @@ ss_opts_size(const ss_t * ss, struct msghdr *msg)
  *  Data indications only indicate options with end-to-end significance.
  */
 STATIC int
-ss_opts_build(const ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
+ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen)
 {
 	struct cmsghdr *cmsg;
 	struct t_opthdr *oh;
@@ -4829,7 +4832,7 @@ ss_opts_build(const ss_t * ss, struct msghdr *msg, unsigned char *op, size_t ole
  *  field.
  */
 STATIC int
-t_size_default_options(const ss_t * t, const unsigned char *ip, size_t ilen)
+t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	const struct t_opthdr *ih;
@@ -5210,7 +5213,7 @@ t_size_default_options(const ss_t * t, const unsigned char *ip, size_t ilen)
 }
 
 STATIC int
-t_size_current_options(const ss_t * t, const unsigned char *ip, size_t ilen)
+t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	const struct t_opthdr *ih;
@@ -5587,7 +5590,7 @@ t_size_current_options(const ss_t * t, const unsigned char *ip, size_t ilen)
 }
 
 STATIC int
-t_size_check_options(const ss_t * t, const unsigned char *ip, size_t ilen)
+t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	const struct t_opthdr *ih;
@@ -6100,7 +6103,7 @@ t_size_check_options(const ss_t * t, const unsigned char *ip, size_t ilen)
 }
 
 STATIC int
-t_size_negotiate_options(const ss_t * t, const unsigned char *ip, size_t ilen)
+t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	const struct t_opthdr *ih;
@@ -6709,7 +6712,7 @@ t_overall_result(uint * overall, uint result)
  *  Perform the actions required of T_DEFAULT placing the output in the provided buffer.
  */
 STATIC t_scalar_t
-t_build_default_options(const ss_t * ss, const unsigned char *ip, size_t ilen, unsigned char *op,
+t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsigned char *op,
 			size_t *olen)
 {
 	t_scalar_t overall = T_SUCCESS;
@@ -7544,7 +7547,7 @@ t_build_default_options(const ss_t * ss, const unsigned char *ip, size_t ilen, u
  *  provided buffer.
  */
 STATIC t_scalar_t
-t_build_current_options(const ss_t * t, const unsigned char *ip, size_t ilen, unsigned char *op,
+t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 			size_t *olen)
 {
 	t_scalar_t overall = T_SUCCESS;
@@ -8447,7 +8450,7 @@ t_build_current_options(const ss_t * t, const unsigned char *ip, size_t ilen, un
  *  buffer.
  */
 STATIC t_scalar_t
-t_build_check_options(const ss_t * ss, const unsigned char *ip, size_t ilen, unsigned char *op,
+t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsigned char *op,
 		      size_t *olen)
 {
 	t_scalar_t overall = T_SUCCESS;
@@ -10098,7 +10101,7 @@ t_build_check_options(const ss_t * ss, const unsigned char *ip, size_t ilen, uns
  *  T_NEGOTIARE, placing the output in the provided buffer.
  */
 STATIC t_scalar_t
-t_build_negotiate_options(ss_t * t, const unsigned char *ip, size_t ilen, unsigned char *op,
+t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 			  size_t *olen)
 {
 	t_scalar_t overall = T_SUCCESS;
@@ -12033,7 +12036,7 @@ t_build_negotiate_options(ss_t * t, const unsigned char *ip, size_t ilen, unsign
  *  T_NEGOTIARE, placing the output in the provided buffer.
  */
 STATIC t_scalar_t
-t_build_options(ss_t * t, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen,
+t_build_options(ss_t *t, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen,
 		t_scalar_t flag)
 {
 	switch (flag) {
@@ -12057,7 +12060,7 @@ t_build_options(ss_t * t, unsigned char *ip, size_t ilen, unsigned char *op, siz
  *  =========================================================================
  */
 STATIC int
-ss_addr_size(ss_t * ss, struct sockaddr *add)
+ss_addr_size(ss_t *ss, struct sockaddr *add)
 {
 	if (add) {
 		switch (add->sa_family) {
@@ -12128,7 +12131,7 @@ state_name(t_scalar_t state)
 }
 #endif
 STATIC void
-ss_set_state(ss_t * ss, t_scalar_t state)
+ss_set_state(ss_t *ss, t_scalar_t state)
 {
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, ss, state_name(state),
 		state_name(ss->p.info.CURRENT_state)));
@@ -12136,7 +12139,7 @@ ss_set_state(ss_t * ss, t_scalar_t state)
 }
 
 STATIC t_scalar_t
-ss_get_state(ss_t * ss)
+ss_get_state(ss_t *ss)
 {
 	return (ss->p.info.CURRENT_state);
 }
@@ -12189,7 +12192,7 @@ tcp_state_name(int state)
  *  ------------------------------------------------------------------------
  */
 STATIC int
-ss_socket(ss_t * ss)
+ss_socket(ss_t *ss)
 {
 	int err;
 	int family, type, protocol;
@@ -12221,7 +12224,7 @@ ss_socket(ss_t * ss)
  *  until they have been bound to a protocol.  Those are deferred until bind.
  */
 STATIC int
-ss_sock_init(ss_t * ss)
+ss_sock_init(ss_t *ss)
 {
 	if (ss->p.prot.protocol == IPPROTO_RAW)
 		return (0);
@@ -12236,7 +12239,7 @@ ss_sock_init(ss_t * ss)
  *  them here now if an earlier reinitialization failed.
  */
 STATIC int
-ss_bind(ss_t * ss, struct sockaddr *add, size_t add_len)
+ss_bind(ss_t *ss, struct sockaddr *add, size_t add_len)
 {
 	int err;
 
@@ -12289,7 +12292,7 @@ ss_bind(ss_t * ss, struct sockaddr *add, size_t add_len)
  *  ------------------------------------------------------------------------
  */
 STATIC int
-ss_listen(ss_t * ss, uint cons)
+ss_listen(ss_t *ss, uint cons)
 {
 	int err;
 	int type;
@@ -12337,7 +12340,7 @@ ss_listen(ss_t * ss, uint cons)
  *  behavior.
  */
 STATIC int
-ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
+ss_accept(ss_t *ss, struct socket **newsock, mblk_t *cp)
 {
 	struct socket *sock;
 
@@ -12403,7 +12406,7 @@ ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
  *  socket.  This is X/Open POSIX behavior.
  */
 STATIC int
-ss_unbind(ss_t * ss)
+ss_unbind(ss_t *ss)
 {
 	ensure(ss, return (-EFAULT));
 	if (ss->sock) {
@@ -12424,7 +12427,7 @@ ss_unbind(ss_t * ss)
  *  ------------------------------------------------------------------------
  */
 STATIC int
-ss_connect(ss_t * ss, struct sockaddr *dst)
+ss_connect(ss_t *ss, struct sockaddr *dst)
 {
 	int err;
 
@@ -12446,7 +12449,7 @@ ss_connect(ss_t * ss, struct sockaddr *dst)
  *  ------------------------------------------------------------------------
  */
 STATIC int
-ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
+ss_sendmsg(ss_t *ss, struct msghdr *msg, int len)
 {
 	int res;
 
@@ -12474,7 +12477,7 @@ ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
  *  ------------------------------------------------------------------------
  */
 STATIC int
-ss_recvmsg(ss_t * ss, struct msghdr *msg, int size)
+ss_recvmsg(ss_t *ss, struct msghdr *msg, int size)
 {
 	int res;
 	int sflags = MSG_DONTWAIT | MSG_NOSIGNAL;
@@ -12507,7 +12510,7 @@ ss_recvmsg(ss_t * ss, struct msghdr *msg, int size)
  *  protocol disconnect and see if that works better.
  */
 STATIC int
-ss_disconnect(ss_t * ss)
+ss_disconnect(ss_t *ss)
 {
 	int err;
 
@@ -12533,7 +12536,7 @@ ss_disconnect(ss_t * ss)
  *  Get the names from a socket.
  */
 STATIC int
-ss_getsockname(ss_t * ss)
+ss_getsockname(ss_t *ss)
 {
 	int err, len = sizeof(ss->src);
 
@@ -12546,7 +12549,7 @@ ss_getsockname(ss_t * ss)
 	return (len);
 }
 STATIC int
-ss_getpeername(ss_t * ss)
+ss_getpeername(ss_t *ss)
 {
 	int err, len = sizeof(ss->dst);
 
@@ -12559,7 +12562,7 @@ ss_getpeername(ss_t * ss)
 	return (len);
 }
 STATIC int
-ss_getnames(ss_t * ss)
+ss_getnames(ss_t *ss)
 {
 	int err_src, err_dst;
 
@@ -12752,7 +12755,7 @@ t_conn_con(queue_t *q, struct sockaddr *res, mblk_t *dp)
  *  ---------------------------------------------------------------
  */
 STATIC mblk_t *
-t_seq_find(ss_t * ss, mblk_t *rp)
+t_seq_find(ss_t *ss, mblk_t *rp)
 {
 	mblk_t *mp;
 
@@ -12770,7 +12773,7 @@ t_seq_find(ss_t * ss, mblk_t *rp)
 }
 
 STATIC t_uscalar_t
-t_seq_delete(ss_t * ss, mblk_t *rp)
+t_seq_delete(ss_t *ss, mblk_t *rp)
 {
 	mblk_t *mp;
 
@@ -13031,7 +13034,7 @@ t_error_ack(queue_t *q, t_scalar_t prim, t_scalar_t error)
  */
 STATIC int ss_sock_recvmsg(queue_t *q);
 STATIC int
-t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *cp, ss_t * as)
+t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *cp, ss_t *as)
 {
 	int err = -EFAULT;
 	ss_t *ss = PRIV(q);
@@ -13507,7 +13510,7 @@ ss_conn_ind(queue_t *q, mblk_t *cp)
  *  The socket will handle moving data from the mblks.
  */
 STATIC int
-ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
+ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 {
 	int err = 0;
 	int len, sdu, n;
@@ -13721,7 +13724,7 @@ ss_sock_recvmsg(queue_t *q)
  *  -------------------------------------------------------------------------
  */
 STATIC void
-ss_putctl(ss_t * ss, queue_t *q, int type, void streamscall (*func) (long), struct sock *sk)
+ss_putctl(ss_t *ss, queue_t *q, int type, void streamscall (*func) (long), struct sock *sk)
 {
 	mblk_t *mp;
 	ss_event_t *p;
@@ -13985,7 +13988,7 @@ t_conn_req(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------
  */
 STATIC mblk_t *
-t_seq_check(ss_t * ss, t_uscalar_t seq)
+t_seq_check(ss_t *ss, t_uscalar_t seq)
 {
 	mblk_t *mp;
 
@@ -15681,7 +15684,7 @@ ss_term_caches(void)
 	return (0);
 }
 STATIC ss_t *
-ss_alloc_priv(queue_t *q, ss_t ** slp, major_t cmajor, minor_t cminor, cred_t *crp,
+ss_alloc_priv(queue_t *q, ss_t **slp, major_t cmajor, minor_t cminor, cred_t *crp,
 	      const ss_profile_t * prof)
 {
 	ss_t *ss;

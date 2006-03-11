@@ -1,6 +1,8 @@
 2006-03-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* strinet.spec.in: updated description fields and headers
+	* .indent.pro: added -Tss_t for proper spacing of ss_t *
+	* src/drivers/inet.c: reindent with above to reduce diff to last version
 
 2006-03-09  Brian Bidulock  <bidulock@openss7.org>
 
