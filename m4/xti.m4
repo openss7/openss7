@@ -1,20 +1,20 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/09 04:48:28 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/11 13:14:03 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 04:48:28 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,10 +63,12 @@ AC_DEFUN([_XTI], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _XTI_OPTIONS
     _XTI_SETUP
-    AC_SUBST([XTI_CPPFLAGS])
-    AC_SUBST([XTI_LDADD])
-    AC_SUBST([XTI_MANPATH])
-    AC_SUBST([XTI_VERSION])
+    AC_SUBST([XTI_CPPFLAGS])dnl
+    AC_SUBST([XTI_LDADD])dnl
+    AC_SUBST([XTI_MODMAP])dnl
+    AC_SUBST([XTI_SYMVER])dnl
+    AC_SUBST([XTI_MANPATH])dnl
+    AC_SUBST([XTI_VERSION])dnl
 ])# _XTI
 # =============================================================================
 
@@ -111,21 +113,30 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    xti_here=`pwd`
+	    AC_MSG_RESULT([(searching from $xti_here)])
 	    for xti_dir in \
 		$srcdir/strxnet*/src/include \
 		$srcdir/../strxnet*/src/include \
 		../_build/$srcdir/../../strxnet*/src/include \
 		../_build/$srcdir/../../../strxnet*/src/include
 	    do
-		if test -d $xti_dir -a -r $xti_dir/$xti_what ; then
-		    xti_bld=`echo $xti_dir | sed -e "s|^$srcdir/|$xti_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		if test -d "$xti_dir" ; then
+		    xti_bld=`echo $xti_dir | sed -e "s|^$srcdir/|$xti_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    xti_dir=`(cd $xti_dir; pwd)`
-		    xti_cv_includes="$xti_dir $xti_bld"
-		    xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    xti_cv_manpath=`echo "$xti_bld/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    break
+		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
+		    if test -r "$xti_dir/$xti_what" ; then
+			xti_cv_includes="$xti_dir $xti_bld"
+			xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_modmap=
+			xti_cv_symver=
+			xti_cv_manpath=`echo "$xti_bld/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for xti include directory])
 	fi
 	if test ":${xti_cv_includes:-no}" = :no ; then
 	    case "$streams_cv_package" in
@@ -178,38 +189,67 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    ;;
 	    esac
 	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
 	    for xti_dir in $xti_search_path ; do
-		if test -d "$xti_dir" -a -r "$xti_dir/$xti_what" ; then
-		    xti_cv_includes="$xti_dir"
-		    xti_cv_ldadd="-lxnet"
-		    xti_cv_manpath=
-		    break
+		if test -d "$xti_dir" ; then
+		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
+		    if test -r "$xti_dir/$xti_what" ; then
+			xti_cv_includes="$xti_dir"
+			xti_cv_ldadd="-lxnet"
+			xti_cv_modmap=
+			xti_cv_symver=
+			xti_cv_manpath=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for xti include directory])
 	fi
     ])
-dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
-dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
-dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
-dnl properly, so we use defines.
+    AC_MSG_CHECKING([for xti ldadd])
+    AC_MSG_RESULT([${xti_cv_ldadd:-(none)}])
+    AC_MSG_CHECKING([for xti modmap])
+    AC_MSG_RESULT([${xti_cv_modmap:-(none)}])
+    AC_MSG_CHECKING([for xti symver])
+    AC_MSG_RESULT([${xti_cv_symver:-(none)}])
+    AC_MSG_CHECKING([for xti manpath])
+    AC_MSG_RESULT([${xti_cv_manpath:-(none)}])
     if test :"${xti_cv_includes:-no}" = :no ; then
 	if test :"$with_xti" = :no ; then
 	    AC_MSG_ERROR([
 *** 
-*** Could not find XTI include directories.  This package requires the
-*** presence of XTI include directories to compile.  Specify the location of
-*** XTI include directories with option --with-xti to configure and try again.
+*** Configure could not find the STREAMS XNET include directories.  If
+*** you wish to use the STREAMS XNET package you will need to specify
+*** the location of the STREAMS XNET (strxnet) include directories with
+*** the --with-xti=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
+*** ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS XNS package?  The
+*** STREAMS strxns package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strxnet-0.9.2.8.tar.gz".
 *** ])
 	fi
-	if test -z "$with_xti" ; then
+    fi
+    AC_MSG_CHECKING([for xti added configure arguments])
+dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
+dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
+dnl so we use defines.
+    if test -z "$with_xti" ; then
+	if test :"${xti_cv_includes:-no}" = :no ; then
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_xti --with-xti\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-xti'"
-	fi
-    else
-	if test -z "$with_xti" ; then
+	    AC_MSG_RESULT([--with-xti])
+	else
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_xti --without-xti\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-xti'"
+	    AC_MSG_RESULT([--without-xti])
 	fi
+    else
+	AC_MSG_RESULT([--with-xti="$with_xti"])
     fi
     AC_CACHE_CHECK([for xti version], [xti_cv_version], [dnl
 	xti_what="sys/strxnet/version.h"
@@ -246,6 +286,8 @@ AC_DEFUN([_XTI_DEFINES], [dnl
 	XTI_CPPFLAGS="${XTI_CPPFLAGS}${XTI_CPPFLAGS:+ }-I${xti_include}"
     done
     XTI_LDADD="$xti_cv_ldadd"
+    XTI_MODMAP="$xti_cv_modmap"
+    XTI_SYMVER="$xti_cv_symver"
     XTI_MANPATH="$xti_cv_manpath"
     XTI_VERSION="$xti_cv_version"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
@@ -264,9 +306,10 @@ AC_DEFUN([_XTI_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

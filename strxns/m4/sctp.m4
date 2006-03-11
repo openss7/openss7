@@ -1,20 +1,20 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/09 04:48:28 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/11 13:14:03 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 04:48:28 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,10 +64,12 @@ AC_DEFUN([_SCTP], [dnl
     _SCTP_OPTIONS
     _SCTP_SETUP
     _SCTP_OPENSS7
-    AC_SUBST([SCTP_CPPFLAGS])
-dnl AC_SUSBT([SCTP_LDADD])
-    AC_SUBST([SCTP_MANPATH])
-    AC_SUBST([SCTP_VERSION])
+    AC_SUBST([SCTP_CPPFLAGS])dnl
+    AC_SUBST([SCTP_LDADD])dnl
+    AC_SUBST([SCTP_MODMAP])dnl
+    AC_SUBST([SCTP_SYMVER])dnl
+    AC_SUBST([SCTP_MANPATH])dnl
+    AC_SUBST([SCTP_VERSION])dnl
 ])# _SCTP
 # =============================================================================
 
@@ -112,21 +114,30 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    sctp_here=`pwd`
+	    AC_MSG_RESULT([(searching from $sctp_here)])
 	    for sctp_dir in \
 		$srcdir/strsctp*/src/include \
 		$srcdir/../strsctp*/src/include \
 		../_build/$srcdir/../../strsctp*/src/include \
 		../_build/$srcdir/../../../strsctp*/src/include
 	    do
-		if test -d $sctp_dir -a -r $sctp_dir/$sctp_what ; then
-		    sctp_bld=`echo $sctp_dir | sed -e "s|^$srcdir/|$sctp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		if test -d "$sctp_dir" ; then
+		    sctp_bld=`echo $sctp_dir | sed -e "s|^$srcdir/|$sctp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    sctp_dir=`(cd $sctp_dir; pwd)`
-		    sctp_cv_includes="$sctp_dir $sctp_bld"
-dnl		    sctp_cv_manpath=`echo "$sctp_bld/../../libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    sctp_cv_manpath=`echo "$sctp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    break
+		    AC_MSG_CHECKING([for sctp include directory... $sctp_dir])
+		    if test -r "$sctp_dir/$sctp_what" ; then
+			sctp_cv_includes="$sctp_dir $sctp_bld"
+			sctp_cv_ldadd=
+			sctp_cv_modmap=
+			sctp_cv_symver=
+			sctp_cv_manpath=`echo "$sctp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for sctp include directory])
 	fi
 	if test ":${sctp_cv_includes:-no}" = :no ; then
 	    eval "sctp_search_path=\"
@@ -177,37 +188,67 @@ dnl		    sctp_cv_manpath=`echo "$sctp_bld/../../libsctp.la" |sed -e 's|/[[^/]][[
 		${DESTDIR}/usr/src/LiS/include\""
 	    sctp_search_path=`echo "$sctp_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	    sctp_cv_includes=
+	    AC_MSG_RESULT([(searching)])
 	    for sctp_dir in $sctp_search_path ; do
-		if test -d "$sctp_dir" -a -r "$sctp_dir/$sctp_what" ; then
-		    sctp_cv_includes="$sctp_dir"
-		    sctp_cv_manpath=
-		    break
+		if test -d "$sctp_dir" ; then
+		    AC_MSG_CHECKING([for sctp include directory... $sctp_dir])
+		    if test -r "$sctp_dir/$sctp_what" ; then
+			sctp_cv_includes="$sctp_dir"
+			sctp_cv_ldadd=
+			sctp_cv_modmap=
+			sctp_cv_symver=
+			sctp_cv_manpath=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for sctp include directory])
 	fi
     ])
-dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
-dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
-dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
-dnl properly, so we use defines.
+    AC_MSG_CHECKING([for sctp ldadd])
+    AC_MSG_RESULT([${sctp_cv_ldadd:-(none)}])
+    AC_MSG_CHECKING([for sctp modmap])
+    AC_MSG_RESULT([${sctp_cv_modmap:-(none)}])
+    AC_MSG_CHECKING([for sctp symver])
+    AC_MSG_RESULT([${sctp_cv_symver:-(none)}])
+    AC_MSG_CHECKING([for sctp manpath])
+    AC_MSG_RESULT([${sctp_cv_manpath:-(none)}])
     if test :"${sctp_cv_includes:-no}" = :no ; then :
 	if test :"$with_sctp" = :no ; then
 	    AC_MSG_ERROR([
 ***
-*** Could not find SCTP include directories.  This package requires the
-*** presence of SCTP include directories to compile.  Specify the location of
-*** SCTP include directories with option --with-sctp to configure and try again.
+*** Configure could not find the SCTP include directories.  If you wish
+*** to use the Linux Native SCTP package, you will need to specify the
+*** location of the Linux Native SCTP (sctp) include directories with
+*** the --with-sctp=@<:@DIRECTORY@:>@ option to ./configure and try
+*** again.
+***
+*** Perhaps you just forgot to load the Linux SCTP package?  The strsctp
+*** package is available from The OpenSS7 Project download page at
+*** http://www.openss7.org/ and comes in a tarball named something like
+*** "sctp-0.2.23.tar.gz".
 *** ])
 	fi
-	if test -z "$with_sctp" ; then
+    fi
+dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
+dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
+dnl so we use defines.
+    AC_MSG_CHECKING([for sctp added configure arguments])
+    if test -z "$with_sctp" ; then
+	if test :"${sctp_cv_includes:-no}" = :no ; then :
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_sctp --with-sctp\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-sctp'"
-	fi
-    else
-	if test -z "$with_sctp" ; then
+	    AC_MSG_RESULT([--with-sctp])
+	else
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_sctp --without-sctp\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-sctp'"
+	    AC_MSG_RESULT([--without-sctp])
 	fi
+    else
+	AC_MSG_RESULT([--with-sctp="$with_sctp"])
     fi
     AC_CACHE_CHECK([for sctp version], [sctp_cv_version], [dnl
 	sctp_what="sys/strsctp/version.h"
@@ -243,7 +284,9 @@ AC_DEFUN([_SCTP_DEFINES], [dnl
     for sctp_include in $sctp_cv_includes ; do
 	SCTP_CPPFLAGS="${SCTP_CPPFLAGS}${SCTP_CPPFLAGS:+ }-I${sctp_include}"
     done
-dnl SCTP_LDADD="$sctp_cv_ldadd"
+    SCTP_LDADD="$sctp_cv_ldadd"
+    SCTP_MODMAP="$sctp_cv_modmap"
+    SCTP_SYMVER="$sctp_cv_symver"
     SCTP_MANPATH="$sctp_cv_manpath"
     SCTP_VERSION="$sctp_cv_version"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
@@ -279,9 +322,10 @@ AC_DEFUN([_SCTP_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

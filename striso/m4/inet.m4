@@ -1,20 +1,20 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/09 04:48:28 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/03/11 13:14:03 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 04:48:28 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,10 +63,12 @@ AC_DEFUN([_INET], [dnl
     AC_REQUIRE([_XTI])dnl
     _INET_OPTIONS
     _INET_SETUP
-    AC_SUBST([INET_CPPFLAGS])
-dnl AC_SUBST([INET_LDADD])
-    AC_SUBST([INET_MANPATH])
-    AC_SUBST([INET_VERSION])
+    AC_SUBST([INET_CPPFLAGS])dnl
+    AC_SUBST([INET_LDADD])dnl
+    AC_SUBST([INET_MODMAP])dnl
+    AC_SUBST([INET_SYMVER])dnl
+    AC_SUBST([INET_MANPATH])dnl
+    AC_SUBST([INET_VERSION])dnl
 ])# _INET
 # =============================================================================
 
@@ -111,21 +113,30 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    inet_here=`pwd`
+	    AC_MSG_RESULT([(searching from $inet_here)])
 	    for inet_dir in \
 		$srcdir/strinet*/src/include \
 		$srcdir/../strinet*/src/include \
 		../_build/$srcdir/../../strinet*/src/include \
 		../_build/$srcdir/../../../strinet*/src/include
 	    do
-		if test -d $inet_dir -a -r $inet_dir/$inet_what ; then
-		    inet_bld=`echo $inet_dir | sed -e "s|^$srcdir/|$inet_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		if test -d "$inet_dir" ; then
+		    inet_bld=`echo $inet_dir | sed -e "s|^$srcdir/|$inet_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    inet_dir=`(cd $inet_dir; pwd)`
-		    inet_cv_includes="$inet_dir $inet_bld"
-dnl		    inet_cv_ldadd=`echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    break
+		    AC_MSG_CHECKING([for inet include directory... $inet_dir])
+		    if test -r "$inet_dir/$inet_what" ; then
+			inet_cv_includes="$inet_dir $inet_bld"
+			inet_cv_ldadd=
+			inet_cv_modmap=
+			inet_cv_symver=
+			inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for inet include directory])
 	fi
 	if test ":${inet_cv_includes:-no}" = :no ; then
 	    eval "inet_search_path=\"
@@ -167,37 +178,64 @@ dnl		    inet_cv_ldadd=`echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/
 		${DESTDIR}/usr/src/LiS/include\""
 	    inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	    inet_cv_includes=
+	    AC_MSG_RESULT([(searching)])
 	    for inet_dir in $inet_search_path ; do
-		if test -d "$inet_dir" -a -r "$inet_dir/$inet_what" ; then
-		    inet_cv_includes="$inet_dir"
-		    inet_cv_manpath=
-		    break
+		if test -d "$inet_dir" ; then
+		    AC_MSG_CHECKING([for inet include directory... $inet_dir])
+		    if test -r "$inet_dir/$inet_what" ; then
+			inet_cv_includes="$inet_dir"
+			inet_cv_manpath=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for inet include directory])
 	fi
     ])
-dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
-dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
-dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
-dnl properly, so we use defines.
+    AC_MSG_CHECKING([for inet ldadd])
+    AC_MSG_RESULT([${inet_cv_ldadd:-(none)}])
+    AC_MSG_CHECKING([for inet modmap])
+    AC_MSG_RESULT([${inet_cv_modmap:-(none)}])
+    AC_MSG_CHECKING([for inet symver])
+    AC_MSG_RESULT([${inet_cv_symver:-(none)}])
+    AC_MSG_CHECKING([for inet manpath])
+    AC_MSG_RESULT([${inet_cv_manpath:-(none)}])
     if test :"${inet_cv_includes:-no}" = :no ; then :
 	if test :"$with_inet" = :no ; then
 	    AC_MSG_ERROR([
 ***
-*** Could not find INET include directories.  This package requires the
-*** presence of INET include directories to compile.  Specify the location of
-*** INET include directories with option --with-inet to configure and try again.
+*** Configure could not find the STREAMS INET include directories.  If
+*** you wish to use the STREAMS INET package, you will need to specify
+*** the location of the STREAMS INET (strinet) include directories with
+*** the --with-inet=@<:@DIRECTORY@:>@ option to ./configure and try
+*** again.
+***
+*** Perhaps you just forgot to load the STREAMS INET package?  The
+*** STREAMS strinet package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strinet-0.9.2.3.tar.gz".
 *** ])
 	fi
-	if test -z "$with_inet" ; then
+    fi
+    AC_MSG_CHECKING([for inet added configure arguments])
+dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
+dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
+dnl so we use defines.
+    if test -z "$with_inet" ; then
+	if test :"${inet_cv_includes:-no}" = :no ; then :
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_inet --with-inet\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-inet'"
-	fi
-    else
-	if test -z "$with_inet" ; then
+	    AC_MSG_RESULT([--with-inet])
+	else
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_inet --without-inet\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-inet'"
+	    AC_MSG_RESULT([--without-inet])
 	fi
+    else
+	AC_MSG_RESULT([--with-inet="$with_inet"])
     fi
     AC_CACHE_CHECK([for inet version], [inet_cv_version], [dnl
 	inet_what="sys/strinet/version.h"
@@ -233,7 +271,9 @@ AC_DEFUN([_INET_DEFINES], [dnl
     for inet_include in $inet_cv_includes ; do
 	INET_CPPFLAGS="${INET_CPPFLAGS}${INET_CPPFLAGS:+ }-I${inet_include}"
     done
-dnl INET_LDADD="$inet_cv_ldadd"
+    INET_LDADD="$inet_cv_ldadd"
+    INET_MODMAP="$inet_cv_modmap"
+    INET_SYMVER="$inet_cv_symver"
     INET_MANPATH="$inet_cv_manpath"
     INET_VERSION="$inet_cv_version"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
@@ -252,9 +292,10 @@ AC_DEFUN([_INET_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

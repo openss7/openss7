@@ -1,20 +1,20 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2006/03/09 04:40:25 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2006/03/11 09:49:50 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 04:40:25 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 09:49:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -229,12 +229,13 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
     then
 	AC_MSG_ERROR([
 *** 
-*** You have not specified --with-k-releease indicating that the build is for
-*** the running kernel, however, you are cross-compiling.  When cross-compiling,
-*** you must specify the kernel release that you are targetting using the
-*** --with-k-release option.  This option should specify the entire UTS_RELEASE
-*** of the kernel, including the EXTRAVERSION such as that associated with
-*** RedHat or Mandrake kernel releases.
+*** You have not specified --with-k-releease indicating that the build
+*** is for the running kernel, however, you are cross-compiling.  When
+*** cross-compiling, you must specify the kernel release that you are
+*** targetting using the --with-k-release option.  This option should
+*** specify the entire UTS_RELEASE of the kernel, including the
+*** EXTRAVERSION such as that associated with RedHat or Mandrake kernel
+*** releases.
 *** ])
     fi
 dnl pull out versions from release number
@@ -244,12 +245,13 @@ dnl pull out versions from release number
     then
 	AC_MSG_ERROR([
 *** 
-*** Kernel major release number is "$linux_cv_k_major".  That cannot be correct, unless
-*** this is really old software now and Linux has already made it to release
-*** 3.  In which case, give up.  More likely, "$linux_cv_k_release" is not the
-*** UTS_RELEASE of the target.  Check the UTS_RELEASE of the target and
-*** specify with with the configure option --with-k-release or look at the
-*** result of uname -r ("`uname -r`") to determine the problem.
+*** Kernel major release number is "$linux_cv_k_major".  That cannot be
+*** correct, unless this is really old software now and Linux has
+*** already made it to release 3.  In which case, give up.  More likely,
+*** "$linux_cv_k_release" is not the UTS_RELEASE of the target.  Check
+*** the UTS_RELEASE of the target and specify with with the configure
+*** option --with-k-release or look at the result of uname -r ("`uname
+*** -r`") to determine the problem.
 *** ])
     fi
     AC_CACHE_CHECK([for kernel minor release number], [linux_cv_k_minor], [dnl
@@ -258,11 +260,12 @@ dnl pull out versions from release number
     then
 	AC_MSG_ERROR([
 *** 
-*** Kernel minor release number "$linux_cv_k_minor" is either too old or too new, or
-*** the UTS_RELEASE name "$linux_cv_k_release" is mangled.  Try specifiying a
-*** 2.4 or 2.6 kernel with the --with-k-release option to configure.  If you are
-*** trying to compile for a 2.2, 2.3, 2.5 or 2.7 kernel, give up.  Only 2.4 and 2.6
-*** kernels are supported at the current time.
+*** Kernel minor release number "$linux_cv_k_minor" is either too old or
+*** too new, or the UTS_RELEASE name "$linux_cv_k_release" is mangled.
+*** Try specifiying a 2.4 or 2.6 kernel with the --with-k-release option
+*** to configure.  If you are trying to compile for a 2.2, 2.3, 2.5 or
+*** 2.7 kernel, give up.  Only 2.4 and 2.6 kernels are supported at the
+*** current time.
 *** ])
     fi
     AC_CACHE_CHECK([for kernel patch release number], [linux_cv_k_patch], [dnl
@@ -415,11 +418,11 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 	(no)		COMPRESS_KERNEL_MODULES= ; kzip= ;;
 	(unknown|*)	COMPRESS_KERNEL_MODULES= ; kzip=
 		AC_MSG_WARN([
-**** 
-**** Strange, the modules directory is $linux_cv_k_modules_eval
-**** but the file $linux_cv_k_modules_eval/modules.dep does
-**** not exist.  This could cause some problems later.
-**** ])
+*** 
+*** Strange, the modules directory is $linux_cv_k_modules_eval
+*** but the file $linux_cv_k_modules_eval/modules.dep
+*** does not exist.  This could cause some problems later.
+*** ])
 	    ;;
     esac
     AC_SUBST([COMPRESS_KERNEL_MODULES])dnl
@@ -926,9 +929,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 ***	    "$with_k_modver"
 ***	    "$k_modver_search_path"
 *** 
-*** This can cause problems later.  Please specify the absolute location of
-*** your kernel's module versions file with option --with-k-modver before
-*** repeating.
+*** This can cause problems later.  Please specify the absolute location
+*** of your kernel's module versions file with option --with-k-modver
+*** before repeating.
 *** ])
 		fi
 	    fi
@@ -949,8 +952,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 *** 
 ***	"$linux_cv_k_modver"
 *** 
-*** This may cause problems later if you have mismatches between the target
-*** kernel and the kernel symbols contained in that file.
+*** This may cause problems later if you have mismatches between the
+*** target kernel and the kernel symbols contained in that file.
 *** ])
 				;;
 			esac
@@ -1029,8 +1032,8 @@ dnl
 ***	    "$with_k_sysmap"
 ***	    "$k_sysmap_search_path"
 *** 
-*** Please specify the absolute location of your kernel's system map file with
-*** option --with-k-sysmap before repeating.
+*** Please specify the absolute location of your kernel's system map
+*** file with option --with-k-sysmap before repeating.
 *** ])
 	else
 	    if test :$linux_cv_k_running != :yes
@@ -1066,8 +1069,8 @@ dnl
 *** 
 ***	"$linux_cv_k_sysmap"
 *** 
-*** This may cause problems later if you have mismatches between the target
-*** kernel and the kernel symbols contained in that file.
+*** This may cause problems later if you have mismatches between the
+*** target kernel and the kernel symbols contained in that file.
 *** ])
 				;;
 			esac
@@ -1152,9 +1155,10 @@ dnl
     then
 	AC_MSG_WARN([
 *** 
-*** Configure could not determine the number of minor bits in a minor device
-*** number for your kernel.  Configure is assuming that the kernel only has
-*** 8-bits per minor device number.  This could cause problems later.
+*** Configure could not determine the number of minor bits in a minor
+*** device number for your kernel.  Configure is assuming that the
+*** kernel only has 8-bits per minor device number.  This could cause
+*** problems later.
 *** ])
     fi
 ])# _LINUX_CHECK_KERNEL_MINORBITS
@@ -1310,8 +1314,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [dnl
 ***
 *** Kernel architecture directory:
 ***     "$linux_cv_k_archdir"
-*** does not exist.  Specify the correct kernel architecture directory using
-*** the --with-k-archdir option to configure before attempting again.
+*** does not exist.  Specify the correct kernel architecture directory
+*** using the --with-k-archdir option to configure before attempting
+*** again.
 *** ])
 	fi])dnl
 ])# _LINUX_CHECK_KERNEL_ARCHDIR
@@ -1369,9 +1374,9 @@ dnl
 ***
 *** Kernel machine directory:
 ***     "$linux_cv_k_machdir"
-*** does not exist, or there is no Makefile in the directory.  Specify the
-*** correct kernel machine directory using the --with-k-machdir option to
-*** configure before attempting again.
+*** does not exist, or there is no Makefile in the directory.  Specify
+*** the correct kernel machine directory using the --with-k-machdir
+*** option to configure before attempting again.
 *** ])
 	fi ])
     kmachdir="$linux_cv_k_machdir"
@@ -1464,13 +1469,13 @@ dnl
 	then
 	    AC_MSG_ERROR([
 *** 
-*** Configure cannot find the kernel configuration file.  The directories
-*** searched were:
+*** Configure cannot find the kernel configuration file.  The
+*** directories searched were:
 ***	"$with_k_config"
 ***	"$k_config_search_path"
 *** 
-*** Specify the absolute location of the kernel configuration files with the
-*** --with-k-config option to configure before attempting again.
+*** Specify the absolute location of the kernel configuration files with
+*** the --with-k-config option to configure before attempting again.
 *** ])
 	else
 	    case "$linux_cv_k_config" in
@@ -1483,8 +1488,9 @@ dnl
 *** 
 ***	"$linux_cv_k_config"
 *** 
-*** This may cause problems later if you have mismatches between the target
-*** kernel and the configuration information contained in that file.
+*** This may cause problems later if you have mismatches between the
+*** target kernel and the configuration information contained in that
+*** file.
 *** ])
 		    ;;
 	    esac
@@ -2419,9 +2425,10 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

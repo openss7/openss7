@@ -1,20 +1,20 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/14 03:57:42 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/11 13:14:03 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 03:57:42 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,13 +74,13 @@ dnl as we do for netperf.
 dnl
     m4_ifdef([_LINUX_KERNEL], [_STRCOMP_KERNEL])
     _STRCOMP_OUTPUT
-    AC_SUBST([STRCOMP_CPPFLAGS])
-    AC_SUBST([STRCOMP_MODFLAGS])
-    AC_SUBST([STRCOMP_LDADD])
-    AC_SUBST([STRCOMP_MODMAP])
-    AC_SUBST([STRCOMP_SYMVER])
-    AC_SUBST([STRCOMP_MANPATH])
-    AC_SUBST([STRCOMP_VERSION])
+    AC_SUBST([STRCOMP_CPPFLAGS])dnl
+    AC_SUBST([STRCOMP_MODFLAGS])dnl
+    AC_SUBST([STRCOMP_LDADD])dnl
+    AC_SUBST([STRCOMP_MODMAP])dnl
+    AC_SUBST([STRCOMP_SYMVER])dnl
+    AC_SUBST([STRCOMP_MANPATH])dnl
+    AC_SUBST([STRCOMP_VERSION])dnl
 ])# _STRCOMP
 # =============================================================================
 
@@ -129,23 +129,30 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    strcomp_here=`pwd`
+	    AC_MSG_RESULT([(searching from $strcomp_here)])
 	    for strcomp_dir in \
-		$srcdir/strcompat*/include \
+		$srcdir/strcompat*/src/include \
 		$srcdir/../strcompat*/src/include \
 		../_build/$srcdir/../../strcompat*/src/include \
 		../_build/$srcdir/../../../strcompat*/src/include
 	    do
-		if test -d $strcomp_dir -a -r $strcomp_dir/$strcomp_what ; then
-		    strcomp_bld=`echo $strcomp_dir | sed -e "s|^$srcdir/|$strcomp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		if test -d "$strcomp_dir" ; then
+		    strcomp_bld=`echo $strcomp_dir | sed -e "s|^$srcdir/|$strcomp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    strcomp_dir=`(cd $strcomp_dir; pwd)`
-		    strcomp_cv_includes="$strcomp_dir $strcomp_bld"
-		    strcomp_cv_ldadd=
-		    strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    strcomp_cv_symver=`echo "$strcomp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    strcomp_cv_manpath=`echo "$strcomp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    break
+		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir])
+		    if test -r "$strcomp_dir/$strcomp_what" ; then
+			strcomp_cv_includes="$strcomp_dir $strcomp_bld"
+			strcomp_cv_ldadd=
+			strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_symver=`echo "$strcomp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_manpath=`echo "$strcomp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for compat include directory])
 	fi
 	if test ":${strcomp_cv_includes:-no}" = :no ; then
 	    # Compat header files are normally found in the strcompat package now.
@@ -198,29 +205,47 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/src/streams/include\""
 		    ;;
 	    esac
-	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>||g:s|//|/|g'`
+	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
 	    for strcomp_dir in $strcomp_search_path ; do
-		if test -d "$strcomp_dir" -a -r "$strcomp_dir/$strcomp_what" ; then
-		    strcomp_cv_includes="$strcomp_dir"
-		    strcomp_cv_ldadd=
-		    strcomp_cv_modmap=
-		    strcomp_cv_symver=
-		    strcomp_cv_manpath=
-		    break
+		if test -d "$strcomp_dir" ; then
+		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir])
+		    if test -r "$strcomp_dir/$strcomp_what" ; then
+			strcomp_cv_includes="$strcomp_dir"
+			strcomp_cv_ldadd=
+			strcomp_cv_modmap=
+			strcomp_cv_symver=
+			strcomp_cv_manpath=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for compat include directory])
 	fi
     ])
+    AC_MSG_CHECKING([for compat ldadd])
+    AC_MSG_RESULT([${strcomp_cv_ldadd:-(none)}])
+    AC_MSG_CHECKING([for compat modmap])
+    AC_MSG_RESULT([${strcomp_cv_modmap:-(none)}])
+    AC_MSG_CHECKING([for compat symver])
+    AC_MSG_RESULT([${strcomp_cv_symver:-(none)}])
+    AC_MSG_CHECKING([for compat manpath])
+    AC_MSG_RESULT([${strcomp_cv_manpath:-(none)}])
     if test :"${strcomp_cv_includes:-no}" = :no ; then
 	AC_MSG_ERROR([
 *** 
-*** Configure could not find the STREAMS compat include directories.  If you
-*** wish to use the STREAMS compat package you will need to specify the location
-*** fo the STREAMS compat (strcompat) include directories with the --with-compat
-*** option to configure and try again.  Perhaps you just forgot to load the
-*** STREAMS compat package?  The STREAMS strcompat package is available from the
-*** download page at http://www.openss7.org/ and comes in a tarball named
-*** something like "strcompat-0.9.2.1.tar.gz".
+*** Configure could not find the STREAMS compat include directories.  If
+*** you wish to use the STREAMS compat package you will need to specify
+*** the location fo the STREAMS compat (strcompat) include directories
+*** with the --with-compat=@<:@DIRECTORY@:>@ option to ./configure and
+*** try again.
+***
+*** Perhaps you just forgot to load the STREAMS compat package?  The
+*** STREAMS strcompat package is available from the download page at
+*** http://www.openss7.org/ and comes in a tarball named something like
+*** "strcompat-0.9.2.3.tar.gz".
 *** ])
     fi
     strcomp_what="sys/config.h"
@@ -293,28 +318,40 @@ dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will jus
 	    fi
 	fi
     ])
-dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
-dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
-dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
-dnl properly, so we use defines.
     if test :"${strcomp_cv_includes:-no}" = :no ; then :
 	if test :"$with_compat" = :no ; then
 	    AC_MSG_ERROR([
 ***
-*** Could not find strcompat include directories.  This package requires the
-*** presence of strcompat include directories to compile.  Specify the location of
-*** strcompat include directories with option --with-compat to configure and try again.
+*** Configure could not find the STREAMS compat include directories.  If
+*** you wish to use the STREAMS compat package you will need to specify
+*** the location fo the STREAMS compat (strcompat) include directories
+*** with the --with-compat=@<:@DIRECTORY@:>@ option to ./configure and
+*** try again.
+***
+*** Perhaps you just forgot to load the STREAMS compat package?  The
+*** STREAMS strcompat package is available from the download page at
+*** http://www.openss7.org/ and comes in a tarball named something like
+*** "strcompat-0.9.2.1.tar.gz".
 *** ])
 	fi
-	if test -z "$with_compat" ; then
+    fi
+    AC_MSG_CHECKING([for compat added configure arguments])
+dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
+dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
+dnl so we use defines.
+    if test -z "$with_compat" ; then
+	if test :"${strcomp_cv_includes:-no}" = :no ; then :
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_compat --with-compat\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-compat'"
-	fi
-    else
-	if test -z "$with_compat" ; then
+	    AC_MSG_RESULT([--with-compat])
+	else
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_compat --without-compat\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-compat'"
+	    AC_MSG_RESULT([--without-compat])
 	fi
+    else
+	AC_MSG_RESULT([--with-compat="$with_compat"])
     fi
 ])# _STRCOMP_CHECK_HEADERS
 # =============================================================================
@@ -372,9 +409,10 @@ AC_DEFUN([_STRCOMP_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

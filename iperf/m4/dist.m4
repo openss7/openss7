@@ -1,20 +1,20 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/02/20 09:43:33 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/11 09:49:50 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/02/20 09:43:33 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 09:49:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,29 +72,29 @@ AC_DEFUN([_DISTRO_CHECK_OS], [dnl
     case "$build_os" in
 	(linux|linux-gnu) ;;
 	(*) AC_MSG_WARN([
-**** 
-**** The build system is $build_os  It is not wise to
-**** build for Linux on a system other than Linux.  If you have
-**** problems later, please build on a Linux system.
-**** ]) ;;
+*** 
+*** The build system is $build_os  It is not wise to build for Linux on
+*** a system other than Linux.  If you have problems later, please build
+*** on a Linux system.
+*** ]) ;;
     esac
     case "$host_os" in
 	(linux|linux-gnu) ;;
 	(*) AC_MSG_ERROR([
-**** 
-**** Sorry, this package only builds for Linux.  The host system is
-**** $host_os  Please specify a linux host with the --host
-**** option to configure.
-**** ]) ;;
+*** 
+*** Sorry, this package only builds for Linux.  The host system is
+*** $host_os  Please specify a linux host with the --host option to
+*** configure.
+*** ]) ;;
     esac
     case "$target_os" in
 	(linux|linux-gnu) ;;
 	(*) AC_MSG_ERROR([
-**** 
-**** Sorry, this package only builds for Linux.  The target system is
-**** $target_os  Please specify a linux host with the --host or
-**** or --target to configure.
-**** ]) ;;
+*** 
+*** Sorry, this package only builds for Linux.  The target system is
+*** $target_os  Please specify a linux host with the --host or or
+*** --target to configure.
+*** ]) ;;
     esac
 ])# _DISTRO_CHECK_OS
 # =============================================================================
@@ -571,29 +571,26 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
     if test :"`echo $build_os | sed -e s'|-gnu$||'`" != :"`echo $host_os | sed -e s'|-gnu$||'`" -o \
 	:"`echo $build_os | sed -e s'|-gnu$||'`" != :"`echo $target_os | sed -e s'|-gnu$||'`" ; then
 	AC_MSG_WARN([
-**** 
-**** The build operating system ($build_os) is not the same
-**** as the host or target operating system ($host_os or
-**** $target_os).  In general this is not a good idea because
-**** the tool chain of one operating system might not be
-**** compatible with the other.  If you encounter problems
-**** later, build on the same operating system as the host and
-**** target.
-**** ])
+*** 
+*** The build operating system ($build_os) is not the same as the host
+*** or target operating system ($host_os or $target_os).  In general
+*** this is not a good idea because the tool chain of one operating
+*** system might not be compatible with the other.  If you encounter
+*** problems later, build on the same operating system as the host and
+*** target.
+*** ])
     fi
     if test ":$build_vendor" != ":$host_vendor" -o ":$build_vendor" != ":$target_vendor" ; then
 	if test :"${cross_compiling:-no}" = :no
 	then
 	    AC_MSG_WARN([
-**** 
-**** The build distribution ($build_vendor) is not the same
-**** as the host or target distribution ($host_vendor or
-**** $target_vendor).  In general this is not a good idea because
-**** the tool chain of one distribution might not be
-**** compatible with the other.  If you encounter problems
-**** later, build on the same distribution as the host and
-**** target.
-**** ])
+*** 
+*** The build distribution ($build_vendor) is not the same as the host
+*** or target distribution ($host_vendor or $target_vendor).  In general
+*** this is not a good idea because the tool chain of one distribution
+*** might not be compatible with the other.  If you encounter problems
+*** later, build on the same distribution as the host and target.
+*** ])
 	fi
     fi
 ])# _DISTRO_CHECK_VENDOR
@@ -623,9 +620,10 @@ AC_DEFUN([_DISTRO_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

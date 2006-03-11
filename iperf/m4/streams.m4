@@ -1,20 +1,20 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/07/08 12:56:39 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/11 13:14:03 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:56:39 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,13 +80,13 @@ dnl as we do for netperf.
 dnl
     m4_ifdef([_LINUX_KERNEL], [_LINUX_STREAMS_KERNEL])
     _LINUX_STREAMS_OUTPUT
-    AC_SUBST([STREAMS_CPPFLAGS])
-    AC_SUBST([STREAMS_MODFLAGS])
-    AC_SUBST([STREAMS_LDADD])
-    AC_SUBST([STREAMS_MODMAP])
-    AC_SUBST([STREAMS_SYMVER])
-    AC_SUBST([STREAMS_MANPATH])
-    AC_SUBST([STREAMS_VERSION])
+    AC_SUBST([STREAMS_CPPFLAGS])dnl
+    AC_SUBST([STREAMS_MODFLAGS])dnl
+    AC_SUBST([STREAMS_LDADD])dnl
+    AC_SUBST([STREAMS_MODMAP])dnl
+    AC_SUBST([STREAMS_SYMVER])dnl
+    AC_SUBST([STREAMS_MANPATH])dnl
+    AC_SUBST([STREAMS_VERSION])dnl
 ])# _LINUX_STREAMS
 # =============================================================================
 
@@ -181,8 +181,8 @@ AC_DEFUN([_LINUX_STREAMS_SETUP], [dnl
     AC_MSG_CHECKING([for streams added configure arguments])
 dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
 dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
-dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
-dnl properly, so we use defines.
+dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
+dnl so we use defines.
     case "$streams_cv_package" in
 	LiS)
 	    if test -z "$with_lis" 
@@ -207,29 +207,37 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
 		AC_MSG_ERROR([
 *** 
 *** Linux GCOM STREAMS was specified with the --with-lis flag, however,
-*** configure could not find the LiS include directories.  This package requires
-*** the presense of LiS include directories when the --with-lis flag is
-*** specified.  Specify the correct location of LiS include directories with the
-*** argument to option --with-lis to configure and try again.
+*** configure could not find the LiS include directories.  This package
+*** requires the presense of LiS include directories when the --with-lis
+*** flag is specified.  Specify the correct location of LiS include
+*** directories with the argument to option --with-lis to configure and
+*** try again.
 *** ])
 	    fi
 	    if test :"${with_lfs:-no}" != :no ; then
 		AC_MSG_ERROR([
 *** 
 *** Linux Fast STREAMS was specified with the --with-lfs flag, however,
-*** configure could not find the LfS include directories.  This package requires
-*** the presense of LfS include directories when the --with-lfs flag is
-*** specified.  Specify the correct location of LfS include directories with the
-*** argument to option --with-lfs to configure and try again.
+*** configure could not find the LfS include directories.  This package
+*** requires the presense of LfS include directories when the --with-lfs
+*** flag is specified.  Specify the correct location of LfS include
+*** directories with the argument to option --with-lfs to configure and
+*** try again.
 *** ])
 	    fi
 	    AC_MSG_ERROR([
 *** 
-*** Configure could not find the STREAMS include directories.  This package
-*** requires the presence of STREAMS include directories.  Specify the correct
-*** location of Linux GCOM STREAMS (LiS) include directories with the --with-lis
-*** option to configure, or the correct location of Linux Fast STREAMS (LfS)
-*** include directories with the --with-lfs option to configure, and try again.
+*** Configure could not find the STREAMS include directories.  This
+*** package requires the presence of STREAMS include directories.
+*** Specify the correct location of Linux GCOM STREAMS (LiS) include
+*** directories with the --with-lis option to configure, or the correct
+*** location of Linux Fast STREAMS (LfS) include directories with the
+*** --with-lfs option to configure, and try again.
+***
+*** Perhaps you just forgot to load the LfS STREAMS package?  The LfS
+*** STREAMS package is available from The OpenSS7 Project download page
+*** at http://www.openss7.org/ and comes in a tarball named something
+*** like "streams-0.7a-5.tar.gz".
 *** ])
 	    ;;
     esac
@@ -262,23 +270,30 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    streams_here=`pwd`
+	    AC_MSG_RESULT([(searching from $streams_here)])
 	    for streams_dir in \
 		$srcdir/LiS*/include $srcdir/lis*/include \
 		$srcdir/../LiS*/include $srcdir/../lis*/include \
 		../_build/$srcdir/../../LiS*/include ../_build/$srcdir/../../lis*/include \
 		../_build/$srcdir/../../../LiS*/include ../_build/$srcdir/../../../lis*/include
 	    do
-		if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
-		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		if test -d "$streams_dir" ; then
+		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    streams_dir=`(cd $streams_dir; pwd)`
-		    streams_cv_lis_includes="$streams_dir $streams_bld"
-		    streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lis_symver=`echo "$streams_bld/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lis_manpath=`echo "$streams_bld/../man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    break
+		    AC_MSG_CHECKING([for streams lis include directory... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lis_includes="$streams_dir $streams_bld"
+			streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lis_symver=`echo "$streams_bld/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lis_manpath=`echo "$streams_bld/../man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for streams lis include directory])
 	fi
 	if test ":${streams_cv_lis_includes:-no}" = :no ; then
 	    # note if linux kernel macros have not run this reduces
@@ -294,28 +309,45 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		${DESTDIR}/usr/local/include/LiS
 		${DESTDIR}/usr/src/LiS/include\""
 	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
 	    for streams_dir in $streams_search_path ; do
-		if test -d "$streams_dir" -a -r "$streams_dir/$streams_what" ; then
-		    streams_cv_lis_includes="$streams_dir"
-		    streams_cv_lis_ldadd="-lLiS"
-		    streams_cv_lis_modmap=
-		    streams_cv_lis_symver=
-		    streams_cv_lis_manpath=
-		    break
+		if test -d "$streams_dir" ; then
+		    AC_MSG_CHECKING([for streams lis include directory... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lis_includes="$streams_dir"
+			streams_cv_lis_ldadd="-lLiS"
+			streams_cv_lis_modmap=
+			streams_cv_lis_symver=
+			streams_cv_lis_manpath=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for streams lis include directory])
 	fi
     ])
+    AC_MSG_CHECKING([for streams lis ldadd])
+    AC_MSG_RESULT([${streams_cv_lis_ldadd:-(none)}])
+    AC_MSG_CHECKING([for streams lis modmap])
+    AC_MSG_RESULT([${streams_cv_lis_modmap:-(none)}])
+    AC_MSG_CHECKING([for streams lis symver])
+    AC_MSG_RESULT([${streams_cv_lis_symver:-(none)}])
+    AC_MSG_CHECKING([for streams lis manpath])
+    AC_MSG_RESULT([${streams_cv_lis_manpath:-(none)}])
     if test :"${streams_cv_lis_includes:-no}" = :no ; then
 	AC_MSG_WARN([
 *** 
-*** Configure could not find the LiS STREAMS include directories.  If you
-*** wish to use the LiS STREAMS package you will need to specify the location
-*** of the Linux STREAMS (LiS) include directories with the --with-lis
-*** option to configure and try again.  Perhaps you just forgot to load the
-*** LiS STREAMS package?  The LiS STREAMS package is available from the
-*** download page at http://www.openss7.org/ and comes in a tarball named
-*** something like "LiS-2.16.18-22.tar.gz".
+*** Configure could not find the LiS STREAMS include directories.  If
+*** you wish to use the LiS STREAMS package you will need to specify the
+*** location of the Linux STREAMS (LiS) include directories with the
+*** --with-lis=@<:@DIRECTORY@:>@ option to configure and try again.
+***
+*** Perhaps you just forgot to load the LiS STREAMS package?  The LiS
+*** STREAMS package is available from The OpenSS7 Project download page
+*** at http://www.openss7.org/ and comes in a tarball named something
+*** like "LiS-2.18.3.tar.gz".
 *** ])
     fi
     streams_what="sys/LiS/config.h"
@@ -420,18 +452,30 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    streams_here=`pwd`
-	    for streams_dir in $srcdir/streams*/include $srcdir/../streams*/include ; do
-		if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
-		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+	    AC_MSG_RESULT([(searching from $streams_here)])
+	    for streams_dir in \
+		$srcdir/streams*/include \
+		$srcdir/../streams*/include \
+		../_build/$srcdir/../../streams*/include \
+		../_build/$srcdir/../../../streams*/include
+	    do
+		if test -d "$streams_dir" ; then
+		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    streams_dir=`(cd $streams_dir; pwd)`
-		    streams_cv_lfs_includes="$streams_dir $streams_bld"
-		    streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lfs_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lfs_manpath=`echo "$streams_bld/../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    break
+		    AC_MSG_CHECKING([for streams lfs include directory... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lfs_includes="$streams_dir $streams_bld"
+			streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lfs_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lfs_manpath=`echo "$streams_bld/../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for streams lfs include directory])
 	fi
 	if test ":${streams_cv_lfs_includes:-no}" = :no ; then
 	    # note if linux kernel macros have not run this reduces
@@ -447,28 +491,45 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		${DESTDIR}/usr/local/include/streams
 		${DESTDIR}/usr/src/streams/include\""
 	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
 	    for streams_dir in $streams_search_path ; do
-		if test -d "$streams_dir" -a -r "$streams_dir/$streams_what" ; then
-		    streams_cv_lfs_includes="$streams_dir"
-		    streams_cv_lfs_ldadd="-lstreams"
-		    streams_cv_lfs_modmap=
-		    streams_cv_lfs_symver=
-		    streams_cv_lfs_manpath=
-		    break
+		if test -d "$streams_dir" ; then
+		    AC_MSG_CHECKING([for stream lfs include directory... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lfs_includes="$streams_dir"
+			streams_cv_lfs_ldadd="-lstreams"
+			streams_cv_lfs_modmap=
+			streams_cv_lfs_symver=
+			streams_cv_lfs_manpath=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for streams lfs include directory])
 	fi
     ])
+    AC_MSG_CHECKING([for streams lfs ldadd])
+    AC_MSG_RESULT([${streams_cv_lfs_ldadd:-(none)}])
+    AC_MSG_CHECKING([for streams lfs modmap])
+    AC_MSG_RESULT([${streams_cv_lfs_modmap:-(none)}])
+    AC_MSG_CHECKING([for streams lfs symver])
+    AC_MSG_RESULT([${streams_cv_lfs_symver:-(none)}])
+    AC_MSG_CHECKING([for streams lfs manpath])
+    AC_MSG_RESULT([${streams_cv_lfs_manpath:-(none)}])
     if test :"${streams_cv_lfs_includes:-no}" = :no ; then
 	AC_MSG_WARN([
 *** 
-*** Configure could not find the LfS STREAMS include directories.  If you
-*** wish to use the LfS STREAMS package you will need to specify the location
-*** of the Linux Fast STREAMS (LfS) include directories with the --with-lfs
-*** option to configure and try again.  Perhaps you just forgot to load the
-*** LfS STREAMS package?  The LfS STREAMS package is available from the
-*** download page at http://www.openss7.org/ and comes in a tarball named
-*** something like "streams-0.7a-1.tar.gz".
+*** Configure could not find the LfS STREAMS include directories.  If
+*** you wish to use the LfS STREAMS package you will need to specify the
+*** location of the Linux Fast STREAMS (LfS) include directories with
+*** the --with-lfs option to configure and try again.
+***
+*** Perhaps you just forgot to load the LfS STREAMS package?  The LfS
+*** STREAMS package is available from The OpenSS7 Project download page
+*** at http://www.openss7.org/ and comes in a tarball named something
+*** like "streams-0.7a-5.tar.gz".
 *** ])
     fi
     streams_what="sys/config.h"
@@ -699,9 +760,10 @@ AC_DEFUN([_LINUX_STREAMS_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

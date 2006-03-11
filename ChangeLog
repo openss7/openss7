@@ -1,3 +1,35 @@
+2006-03-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* autotest.m4: updated headers, vim tags
+	* deb.m4: updated headers, vim tags
+	* devfs.m4: updated headers, vim tags
+	* dist.m4: updated headers, vim tags
+	* genksyms.m4: updated headers, vim tags
+	* inet.m4: updated headers, vim tags, include directory search
+	* init.m4: updated headers, vim tags
+	* kernel.m4: updated headers, vim tags
+	* libraries.m4: updated headers, vim tags
+	* man.m4: updated headers, vim tags
+	* openss7.m4: updated headers, vim tags
+	* public.m4: updated headers, vim tags
+	* rpm.m4: updated headers, vim tags
+	* sctp.m4: updated headers, vim tags, include directory search
+	* strcomp.m4: updated headers, vim tags, include directory search
+	* strconf.m4: updated headers, vim tags
+	* streams.m4: updated headers, vim tags, include directory search
+	* xns.m4: updated headers, vim tags, include directory search
+	* xopen.m4: updated headers, vim tags
+	* xti.m4: updated headers, vim tags, include directory search
+	* configure.ac: allow --disable-dependency-tracking in maintainer mode
+	* am/info.am: try to avoid rebuilding docs when unnecessary
+	* m4/inet.m4: uppercase LDADD is too loud
+	* m4/sctp.m4: uppercase LDADD is too loud
+	* m4/strcomp.m4: uppercase LDADD is too loud
+	* m4/xns.m4: uppercase LDADD is too loud
+	* m4/streams.m4: uppercase LDADD is too loud
+	* m4/xti.m4: uppercase LDADD is too loud
+	* acinclude.m4: wider range of initial checks
+
 2006-03-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.spec.in: updated description fields and headers

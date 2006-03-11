@@ -1,20 +1,20 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/09 04:48:28 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/03/11 13:14:03 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 04:48:28 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,10 +63,12 @@ AC_DEFUN([_XNS], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _XNS_OPTIONS
     _XNS_SETUP
-    AC_SUBST([XNS_CPPFLAGS])
-dnl AC_SUBST([XNS_LDADD])
-    AC_SUBST([XNS_MANPATH])
-    AC_SUBST([XNS_VERSION])
+    AC_SUBST([XNS_CPPFLAGS])dnl
+    AC_SUBST([XNS_LDADD])dnl
+    AC_SUBST([XNS_MODMAP])dnl
+    AC_SUBST([XNS_SYMVER])dnl
+    AC_SUBST([XNS_MANPATH])dnl
+    AC_SUBST([XNS_VERSION])dnl
 ])# _XNS
 # =============================================================================
 
@@ -111,21 +113,30 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    xns_here=`pwd`
+	    AC_MSG_RESULT([(searching from $xns_here)])
 	    for xns_dir in \
 		$srcdir/strxns*/src/include \
 		$srcdir/../strxns*/src/include \
 		../_build/$srcdir/../../strxns*/src/include \
 		../_build/$srcdir/../../../strxns*/src/include
 	    do
-		if test -d $xns_dir -a -r $xns_dir/$xns_what ; then
-		    xns_bld=`echo $xns_dir | sed -e "s|^$srcdir/|$xns_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		if test -d "$xns_dir" ; then
+		    xns_bld=`echo $xns_dir | sed -e "s|^$srcdir/|$xns_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    xns_dir=`(cd $xns_dir; pwd)`
-		    xns_cv_includes="$xns_dir $xns_bld"
-dnl		    xns_cv_ldadd=`echo "$xns_bld/../../libxns.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    break
+		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
+		    if test -r "$xns_dir/$xns_what" ; then
+			xns_cv_includes="$xns_dir $xns_bld"
+			xns_cv_ldadd=
+			xns_cv_modmap=
+			xns_cv_symver=
+			xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for xns include directory])
 	fi
 	if test ":${xns_cv_includes:-no}" = :no ; then
 	    case "$streams_cv_package" in
@@ -214,38 +225,66 @@ dnl		    xns_cv_ldadd=`echo "$xns_bld/../../libxns.la" | sed -e 's|/[[^/]][[^/]]
 		    ;;
 	    esac
 	    xns_search_path=`echo "$xns_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
 	    for xns_dir in $xns_search_path ; do
-		if test -d "$xns_dir" -a -r "$xns_dir/$xns_what" ; then
-		    xns_cv_includes="$xns_dir"
-dnl		    xns_cv_ldadd="-lxns"
-		    xns_cv_manpath=
-		    break
+		if test -d "$xns_dir" ; then
+		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
+		    if test -r "$xns_dir/$xns_what" ; then
+			xns_cv_includes="$xns_dir"
+			xns_cv_ldadd=
+			xns_cv_modmap=
+			xns_cv_symver=
+			xns_cv_manpath=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for xns include directory])
 	fi
     ])
-dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
-dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
-dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
-dnl properly, so we use defines.
+    AC_MSG_CHECKING([for xns ldadd])
+    AC_MSG_RESULT([${xns_cv_ldadd:-(none)}])
+    AC_MSG_CHECKING([for xns modmap])
+    AC_MSG_RESULT([${xns_cv_modmap:-(none)}])
+    AC_MSG_CHECKING([for xns symver])
+    AC_MSG_RESULT([${xns_cv_symver:-(none)}])
+    AC_MSG_CHECKING([for xns manpath])
+    AC_MSG_RESULT([${xns_cv_manpath:-(none)}])
     if test :"${xns_cv_includes:-no}" = :no ; then :
 	if test :"$with_xns" = :no ; then
 	    AC_MSG_ERROR([
 *** 
-*** Could not find XNS include directories.  This package requires the
-*** presence of XNS include directories to compile.  Specify the location of
-*** XNS include directories with option --with-xns to configure and try again.
+*** Configure could not find the STREAMS XNS include directories.  If
+*** you wish to use the STREAMS XNS package you will need to specify the
+*** location of the STREAMS XNS (strxns) include directories with the
+*** --with-xns=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS XNS package?  The
+*** STREAMS strxns package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strxns-0.9.2.3.tar.gz".
 *** ])
 	fi
-	if test -z "$with_xns" ; then
+    fi
+    AC_MSG_CHECKING([for xns added configure arguments])
+dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
+dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
+dnl so we use defines.
+    if test -z "$with_xns" ; then
+	if test :"${xns_cv_includes:-no}" = :no ; then :
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_xns --with-xns\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-xns'"
-	fi
-    else
-	if test -z "$with_xns" ; then
+	    AC_MSG_RESULT([--with-xns])
+	else
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_xns --without-xns\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-xns'"
+	    AC_MSG_RESULT([--without-xns])
 	fi
+    else
+	AC_MSG_RESULT([--with-xns="$with_xns"])
     fi
     AC_CACHE_CHECK([for xns version], [xns_cv_version], [dnl
 	xns_what="sys/strxns/version.h"
@@ -281,7 +320,9 @@ AC_DEFUN([_XNS_DEFINES], [dnl
     for xns_include in $xns_cv_includes ; do
 	XNS_CPPFLAGS="${XNS_CPPFLAGS}${XNS_CPPFLAGS:+ }-I${xns_include}"
     done
-dnl XNS_LDADD="$xns_cv_ldadd"
+    XNS_LDADD="$xns_cv_ldadd"
+    XNS_MODMAP="$xns_cv_modmap"
+    XNS_SYMVER="$xns_cv_symver"
     XNS_MANPATH="$xns_cv_manpath"
     XNS_VERSION="$xns_cv_version"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
@@ -300,9 +341,10 @@ AC_DEFUN([_XNS_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

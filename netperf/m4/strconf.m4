@@ -1,13 +1,13 @@
-# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:*** fo+=tcqlorn
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 02:57:37 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/03/11 09:49:51 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/10 02:57:37 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 09:49:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -182,9 +182,9 @@ dnl
 ***
 *** You have specified a specific package directory of
 ***	"$with_strconf_pkgdir"
-*** using --with-strconf-pkgdir, however, that directory does not exist.  This
-*** cannot be correct.  Please specify the correct directory with the
-*** configure option --with-strconf-pkgdir, or create the
+*** using --with-strconf-pkgdir, however, that directory does not exist.
+*** This cannot be correct.  Please specify the correct directory with
+*** the configure option --with-strconf-pkgdir, or create the
 ***	"$strconf_dir"
 *** directory before calling configure again.
 ***])
@@ -198,11 +198,12 @@ dnl
 ***
 *** You have specified a relative package directory of
 ***	"$with_strconf_pkgdir"
-*** using --with-strconf-pkgdir, however, the corresponding source directory,
+*** using --with-strconf-pkgdir, however, the corresponding source
+*** directory,
 ***	"$srcdir/$strconf_dir"
 *** does not exist.  This cannot be correct.  Please specify the correct
-*** directory with the configure option --with-strconf-pkgdir, or create the
-*** corresponding source directory before calling configure again.
+*** directory with the configure option --with-strconf-pkgdir, or create
+*** the corresponding source directory before calling configure again.
 ***])
 	    fi
 	    # might need to create the build directory
@@ -438,10 +439,10 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
-# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:*** fo+=tcqlorn
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
