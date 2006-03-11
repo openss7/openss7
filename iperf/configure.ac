@@ -77,7 +77,7 @@ dnl
 dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
 dnl
 if test :"${USE_MAINTAINER_MODE:-yes}" = :yes ; then
-	enable_dependency_tracking='yes'
+	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
 fi
 
 AC_GNU_SOURCE

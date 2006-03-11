@@ -1,3 +1,8 @@
+2006-03-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* TODO: updated udev and devfs items
+	* configure.ac: allow --disable-dependency-tracking in maintainer mode
+
 2006-03-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/clone.h: updated headers

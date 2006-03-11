@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/09 05:51:33 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/11 12:57:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,14 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 05:51:33 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 12:57:59 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.16 2006/03/09 05:51:33 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.17 2006/03/11 12:57:59 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([SCTP],[0.2],[bugs@openss7.org],[sctp])
 
@@ -77,7 +77,7 @@ dnl
 dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
 dnl
 if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
-	enable_dependency_tracking='yes'
+	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
 fi
 
 AC_GNU_SOURCE

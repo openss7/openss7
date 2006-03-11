@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.17 $) $Date: 2006/03/09 05:51:33 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.18 $) $Date: 2006/03/11 12:57:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 05:51:33 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 12:57:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,7 +77,7 @@ dnl
 dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
 dnl
 if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
-	enable_dependency_tracking='yes'
+	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
 fi
 
 AC_GNU_SOURCE

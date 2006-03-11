@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/08 11:48:31 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/11 12:58:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/08 11:48:31 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 12:58:01 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.5  2006/03/11 12:58:01  brian
+# - allow disable dependencies in maintainer mode
+#
 # Revision 0.9.2.4  2006/03/08 11:48:31  brian
 # - correction
 #
@@ -70,7 +73,7 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.4 2006/03/08 11:48:31 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.5 2006/03/11 12:58:01 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strbcm],[0.9.2],[bugs@openss7.org])
 
@@ -92,7 +95,7 @@ dnl
 dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
 dnl
 if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
-	enable_dependency_tracking='yes'
+	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
 fi
 
 AC_GNU_SOURCE
