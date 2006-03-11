@@ -2,19 +2,18 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/03/08 12:05:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/11 14:06:18 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/08 12:05:20 $ by $Author: brian $
+# Last Modified $Date: 2006/03/11 14:06:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,8 +67,9 @@ m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
 m4_include([m4/xopen.m4])
-m4_include([m4/xti.m4])
 m4_include([m4/xns.m4])
+m4_include([m4/xti.m4])
+m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
 
 # =============================================================================
@@ -83,14 +83,37 @@ AC_DEFUN([AC_OS7], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
+dnl AC_CONFIG_FILES([debian/openss7-core.postinst
+dnl		     debian/openss7-core.postrm
+dnl		     debian/openss7-core.preinst
+dnl		     debian/openss7-core.prerm
+dnl		     debian/openss7-devel.preinst
+dnl		     debian/openss7-dev.postinst
+dnl		     debian/openss7-dev.preinst
+dnl		     debian/openss7-dev.prerm
+dnl		     debian/openss7-doc.postinst
+dnl		     debian/openss7-doc.preinst
+dnl		     debian/openss7-doc.prerm
+dnl		     debian/openss7-init.postinst
+dnl		     debian/openss7-init.postrm
+dnl		     debian/openss7-init.preinst
+dnl		     debian/openss7-init.prerm
+dnl		     debian/openss7-lib.preinst
+dnl		     debian/openss7-source.preinst
+dnl		     debian/openss7-util.preinst
+dnl		     src/util/modutils/openss7
+dnl		     src/include/sys/openss7/version.h])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
     USER_LDFLAGS="$LDFLAGS"
     _OS7_SETUP
-    PKG_INCLUDES="-imacros ./config.h"
-    PKG_INCLUDES='-imacros $(top_builddir)/config.h'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/src/include -I$(top_srcdir)/src/include'
     if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
 	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
@@ -115,6 +138,10 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     AC_SUBST([PKG_INCLUDES])dnl
     AC_SUBST([PKG_MODFLAGS])dnl
     PKG_MANPATH='$(mandir)'"${PKG_MANPATH:+:}${PKG_MANPATH}"
+    PKG_MANPATH="${STREAMS_MANPATH:+${STREAMS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${STRCOMP_MANPATH:+${STRCOMP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${XNS_MANPATH:+${XNS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
@@ -208,13 +235,32 @@ AC_DEFUN([_OS7_SETUP], [dnl
     _LINUX_KERNEL
     _LINUX_DEVFS
     _GENKSYMS
-dnl _LINUX_STREAMS
-dnl _STRCOMP
-dnl _XNS
-dnl _XTI
-dnl _INET
-dnl _SCTP
+    _OS7_CONFIG_KERNEL
+    _LINUX_STREAMS
+    if test ":${with_STRCOMPAT:-no}" != ":no" ; then
+    _STRCOMP
+    fi
+    _XOPEN
+    if test ":${with_XNS:-no}" != ":no" ; then
+    _XNS
+    fi
+    if test ":${with_XNET:-no}" != ":no" ; then
+    _XTI
+    fi
+    if test ":${with_INET:-no}" != ":no" ; then
+    _INET
+    fi
+    if test ":${with_SCTP:-no}" != ":no" ; then
+    _SCTP
+    fi
 ])# _OS7_SETUP
+# =============================================================================
+
+# =============================================================================
+# _OS7_CONFIG_KERNEL
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OS7_CONFIG_KERNEL], [dnl
+])# _OS7_CONFIG_KERNEL
 # =============================================================================
 
 # =============================================================================
@@ -295,7 +341,7 @@ AC_DEFUN([_OS7_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

@@ -1,9 +1,30 @@
-OpenSS7 Linux Fast STREAMS -- things to do.  2006-03-07
+OpenSS7 Linux Fast STREAMS -- things to do.  2006-03-11
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 Things to do:
+
+- Had another look at specfs, devfs and udev.  It looks like we can
+  create minor device nodes within /dev (not just /dev/streams) using
+  devfs or udev.  Again, this doesn't do everything that specfs does.
+  specfs will demand load when an attempt is made to open a non-existent
+  character device.  Nevertheless, we can describe a "streams" class for
+  udev and when a module registers a minor device node, we can have udev
+  create that device node and provide permissions by adding our files to
+  the /etc/udev/rules.d and /etc/udev/permissions.d directories.
+
+  Therefore, on a udev system, we should make strconf-sh create the
+  necessary rules.d and permissions.d file entries.  register_strnod
+  will be modified to create a udev instance within the stream class
+  matching the rules.d and permissions.d entry when creating a minor
+  device node within the specfs.
+
+  On a devfs system, register_strdev and register_strnod should perform
+  devfs calls instead of calling register_chrdev.  That way minor device
+  nodes will automagically appear at least once the module is loaded.
+
+  TODO: rationalize specfs to devfs and udev
 
 - Have the STREAMS subsystem register a panic notifier on 2.6 kernels to
   be able to recover from panics caused by misbehaving STREAMS modules
