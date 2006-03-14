@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/03/11 13:14:03 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/03/13 23:21:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
+# Last Modified $Date: 2006/03/13 23:21:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -104,11 +104,57 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
     # normally requires either Linux STREAMS or Linux Fast-STREAMS INET header
     # files (or both) to compile.
     AC_CACHE_CHECK([for inet include directory], [inet_cv_includes], [dnl
+	inet_what="sys/xti_inet.h"
 	if test ":${with_inet:-no}" != :no -a :"${with_inet:-no}" != :yes ;  then
 	    # First thing to do is to take user specified director(ies)
-	    inet_cv_includes="$with_inet"
+	    AC_MSG_RESULT([(searching $with_inet)])
+	    for inet_dir in $with_inet ; do
+		if test -d "$inet_dir" ; then
+		    AC_MSG_CHECKING([for inet include directory... $inet_dir])
+		    if test -r "$inet_dir/$inet_what" ; then
+			inet_cv_includes="$with_inet"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    if test ":${inet_cv_includes:-no}" = :no ; then
+		AC_MSG_WARN([
+*** 
+*** You have specified include directories using:
+***
+***	    --with-inet="$with_inet"
+***  
+*** however, $inet_what does not exist in any of the specified
+*** directories.  Configure will continue to search other known
+*** directories.
+*** ])
+	    fi
+	    AC_MSG_CHECKING([for inet include directory])
 	fi
-	inet_what="sys/xti_inet.h"
+	if test ":${inet_cv_includes:-no}" = :no ; then
+	    # The next place to look is under the master source and build directory, if any.
+	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
+	    inet_search_path="
+		${master_srcdir:+$master_srcdir/strinet/src/include}
+		${master_builddir:+$master_builddir/strinet/src/include}"
+	    for inet_dir in $inet_search_path ; do
+		if test -d "$inet_dir" ; then
+		    AC_MSG_CHECKING([for inet include directory... $inet_dir])
+		    if test -r "$inet_dir/$inet_what" ; then
+			inet_cv_includes="$inet_search_path"
+			inet_cv_ldadd= # "$master_builddir/strinet/libinet.la"
+			inet_cv_modmap= # "$master_builddir/strinet/Modules.map"
+			inet_cv_symver= # "$master_builddir/strinet/Module.symvers"
+			inet_cv_manpath="$master_builddir/strinet/doc/man"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		fi
+	    done
+	    AC_MSG_CHECKING([for inet include directory])
+	fi
 	if test ":${inet_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
@@ -194,14 +240,42 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for inet include directory])
 	fi
     ])
-    AC_MSG_CHECKING([for inet ldadd])
-    AC_MSG_RESULT([${inet_cv_ldadd:-(none)}])
-    AC_MSG_CHECKING([for inet modmap])
-    AC_MSG_RESULT([${inet_cv_modmap:-(none)}])
-    AC_MSG_CHECKING([for inet symver])
-    AC_MSG_RESULT([${inet_cv_symver:-(none)}])
-    AC_MSG_CHECKING([for inet manpath])
-    AC_MSG_RESULT([${inet_cv_manpath:-(none)}])
+    AC_CACHE_CHECK([for inet ldadd],[inet_cv_ldadd],[dnl
+	for inet_dir in $inet_cv_includes ; do
+	    if test -f "$inet_dir/../../libinet.la" ; then
+		inet_cv_ldadd=`echo "$inet_dir/../../libinet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$inet_cv_ldadd" ; then
+	    inet_cv_ldadd='-linet'
+	    inet_cv_ldadd=
+	fi
+    ])
+    AC_CACHE_CHECK([for inet modmap],[inet_cv_modmap],[dnl
+	for inet_dir in $inet_cv_includes ; do
+	    if test -f "$inet_dir/../../Modules.map" ; then
+		inet_cv_modmap=`echo "$inet_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_CACHE_CHECK([for inet symver],[inet_cv_symver],[dnl
+	for inet_dir in $inet_cv_includes ; do
+	    if test -f "$inet_dir/../../Module.symvers" ; then
+		inet_cv_symver=`echo "$inet_dir/../../Modules.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_CACHE_CHECK([for inet manpath],[inet_cv_manpath],[dnl
+	for inet_dir in $inet_cv_includes ; do
+	    if test -d "$inet_dir/../../doc/man" ; then
+		inet_cv_manpath=`echo "$inet_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
     if test :"${inet_cv_includes:-no}" = :no ; then :
 	if test :"$with_inet" = :no ; then
 	    AC_MSG_ERROR([

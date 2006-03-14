@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/11 13:14:03 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/03/13 23:21:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
+# Last Modified $Date: 2006/03/13 23:21:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -104,11 +104,56 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
     # normally requires either Linux STREAMS or Linux Fast-STREAMS XTI header
     # files (or both) to compile.
     AC_CACHE_CHECK([for xti include directory], [xti_cv_includes], [dnl
+	xti_what="xti.h"
 	if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
-	    xti_cv_includes="$with_xti"
+	    AC_MSG_RESULT([(searching $with_xti)])
+	    for xti_dir in $with_xti ; do
+		if test -d "$xti_dir" ; then
+		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
+		    if test -r "$xns_dir/$xns_what" ; then
+			xti_cv_includes="$with_xti"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    if test ":${xti_cv_includes:-no}" = :no ; then
+		AC_MSG_WARN([
+***
+*** You have specified include directories using:
+***
+***	    --with-xti="$with_xti"
+***
+*** however, $xti_what does not exist in any of the specified
+*** directories.  Configure will continue to search other known
+*** directories.
+***])
+	    fi
 	fi
-	xti_what="xti.h"
+	if test ":${xti_cv_includes:-no}" = :no ; then
+	    # The next place to look is under the master source and build directory, if any.
+	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
+	    xti_search_path="
+		${master_srcdir:+$master_srcdir/strxnet/src/include}
+		${master_builddir:+$master_builddir/strxnet/src/include}"
+	    for xti_dir in $xti_search_path ; do
+		if test -d "$xti_dir" ; then
+		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
+		    if test -r "$xti_dir/$xti_what" ; then
+			xti_cv_includes="$xti_search_path"
+			xti_cv_ldadd="$master_builddir/strxnet/libxnet.la"
+			xti_cv_modmap= # "$master_builddir/strxnet/Modules.map"
+			xti_cv_symver= # "$master_builddir/strxnet/Module.symvers"
+			xti_cv_manpath="$master_builddir/strxnet/doc/man"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		fi
+	    done
+	    AC_MSG_CHECKING([for xti include directory])
+	fi
 	if test ":${xti_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
@@ -208,14 +253,41 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for xti include directory])
 	fi
     ])
-    AC_MSG_CHECKING([for xti ldadd])
-    AC_MSG_RESULT([${xti_cv_ldadd:-(none)}])
-    AC_MSG_CHECKING([for xti modmap])
-    AC_MSG_RESULT([${xti_cv_modmap:-(none)}])
-    AC_MSG_CHECKING([for xti symver])
-    AC_MSG_RESULT([${xti_cv_symver:-(none)}])
-    AC_MSG_CHECKING([for xti manpath])
-    AC_MSG_RESULT([${xti_cv_manpath:-(none)}])
+    AC_CACHE_CHECK([for xti ldadd],[xti_cv_ldadd],[dnl
+	for xti_dir in $xti_cv_includes ; do
+	    if test -f "$xti_dir/../../libxnet.la" ; then
+		xti_cv_ldadd=`echo "$xti_dir/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$xti_cv_ldadd" ; then
+	    xti_cv_ldadd='-lxnet'
+	fi
+    ])
+    AC_CACHE_CHECK([for xti modmap],[xti_cv_modmap],[dnl
+	for xti_dir in $xti_cv_includes ; do
+	    if test -f "$xti_dir/../../Modules.map" ; then
+		xti_cv_modmap=`echo "$xti_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_CACHE_CHECK([for xti symver],[xti_cv_symver],[dnl
+	for xti_dir in $xti_cv_includes ; do
+	    if test -f "$xti_dir/../../Module.symvers" ; then
+		xti_cv_symver=`echo "$xti_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_CACHE_CHECK([for xti manpath],[xti_cv_manpath],[dnl
+	for xti_dir in $xti_cv_includes ; do
+	    if test -d "$xti_dir/../../doc/man" ; then
+		xti_cv_manpath=`echo "$xti_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
     if test :"${xti_cv_includes:-no}" = :no ; then
 	if test :"$with_xti" = :no ; then
 	    AC_MSG_ERROR([

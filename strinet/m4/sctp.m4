@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/11 13:14:03 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/03/13 23:21:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
+# Last Modified $Date: 2006/03/13 23:21:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -105,11 +105,57 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
     # normally requires either Linux STREAMS or Linux Fast-STREAMS SCTP header
     # files (or both) to compile.
     AC_CACHE_CHECK([for sctp include directory], [sctp_cv_includes], [dnl
+	sctp_what="sys/xti_sctp.h"
 	if test ":${with_sctp:-no}" != :no -a :"${with_sctp:-no}" != :yes ;  then
 	    # First thing to do is to take user specified director(ies)
-	    sctp_cv_includes="$with_sctp"
+	    AC_MSG_RESULT([(searching $with_sctp)])
+	    for sctp_dir in $with_sctp ; do
+		if test -d "$sctp_dir" ; then
+		    AC_MSG_CHECKING([for sctp include directory... $sctp_dir])
+		    if test -r "$sctp_dir/$sctp_what" ; then
+			sctp_cv_includes="$with_sctp"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    if test ":${sctp_cv_includes:-no}" = :no ; then
+		AC_MSG_WARN([
+*** 
+*** You have specified include directories using:
+***
+***	    --with-sctp="$with_sctp"
+***  
+*** however, $sctp_what does not exist in any of the specified
+*** directories.  Configure will continue to search other known
+*** directories.
+*** ])
+	    fi
+	    AC_MSG_CHECKING([for sctp include directory])
 	fi
-	sctp_what="sys/xti_sctp.h"
+	if test ":${sctp_cv_includes:-no}" = :no ; then
+	    # The next place to look is under the master source and build directory, if any.
+	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
+	    sctp_search_path="
+		${master_srcdir:+$master_srcdir/strsctp/src/include}
+		${master_builddir:+$master_builddir/strsctp/src/include}"
+	    for sctp_dir in $sctp_search_path ; do
+		if test -d "$sctp_dir" ; then
+		    AC_MSG_CHECKING([for sctp include directory... $sctp_dir])
+		    if test -r "$sctp_dir/$sctp_what" ; then
+			sctp_cv_includes="$sctp_search_path"
+			sctp_cv_ldadd= # "$master_builddir/strsctp/libsctp.la"
+			sctp_cv_modmap= # "$master_builddir/strsctp/Modules.map"
+			sctp_cv_symver= # "$master_builddir/strsctp/Module.symvers"
+			sctp_cv_manpath="$master_builddir/strsctp/doc/man"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		fi
+	    done
+	    AC_MSG_CHECKING([for sctp include directory])
+	fi
 	if test ":${sctp_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
@@ -207,14 +253,42 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for sctp include directory])
 	fi
     ])
-    AC_MSG_CHECKING([for sctp ldadd])
-    AC_MSG_RESULT([${sctp_cv_ldadd:-(none)}])
-    AC_MSG_CHECKING([for sctp modmap])
-    AC_MSG_RESULT([${sctp_cv_modmap:-(none)}])
-    AC_MSG_CHECKING([for sctp symver])
-    AC_MSG_RESULT([${sctp_cv_symver:-(none)}])
-    AC_MSG_CHECKING([for sctp manpath])
-    AC_MSG_RESULT([${sctp_cv_manpath:-(none)}])
+    AC_CACHE_CHECK([for sctp ldadd],[sctp_cv_ldadd],[dnl
+	for sctp_dir in $sctp_cv_includes ; do
+	    if test -f "$sctp_dir/../../libsctp.la" ; then
+		sctp_cv_ldadd=`echo "$sctp_dir/../../libsctp.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$sctp_cv_ldadd" ; then
+	    sctp_cv_ldadd='-lsctp'
+	    sctp_cv_ldadd=
+	fi
+    ])
+    AC_CACHE_CHECK([for sctp modmap],[sctp_cv_modmap],[dnl
+	for sctp_dir in $sctp_cv_includes ; do
+	    if test -f "$sctp_dir/../../Modules.map" ; then
+		sctp_cv_modmap=`echo "$sctp_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_CACHE_CHECK([for sctp symver],[sctp_cv_symver],[dnl
+	for sctp_dir in $sctp_cv_includes ; do
+	    if test -f "$sctp_dir/../../Module.symvers" ; then
+		sctp_cv_symver=`echo "$sctp_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_CACHE_CHECK([for sctp manpath],[sctp_cv_manpath],[dnl
+	for sctp_dir in $sctp_cv_includes ; do
+	    if test -d "$sctp_dir/../../doc/man" ; then
+		sctp_cv_manpath=`echo "$sctp_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
     if test :"${sctp_cv_includes:-no}" = :no ; then :
 	if test :"$with_sctp" = :no ; then
 	    AC_MSG_ERROR([

@@ -1,3 +1,14 @@
+2006-03-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/inet.m4: even smarter about finding directories
+	* m4/sctp.m4: even smarter about finding directories
+	* m4/strcomp.m4: even smarter about finding directories
+	* m4/streams.m4: even smarter about finding directories
+	* m4/xns.m4: even smarter about finding directories
+	* m4/xti.m4: even smarter about finding directories
+	* Makefile.am: pass down master_srcdir and master_builddir
+	* acinclude.m4: susbstitute master_srcdir and master_builddir
+
 2006-03-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* autotest.m4: updated headers, vim tags

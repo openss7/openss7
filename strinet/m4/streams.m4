@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/11 13:14:03 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/03/13 23:55:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
+# Last Modified $Date: 2006/03/13 23:55:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -262,10 +262,55 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS header files.  The package normally requires either
     # Linux STREAMS or Linux Fast-STREAMS header files (or both) to compile.
     AC_CACHE_CHECK([for streams lis include directory], [streams_cv_lis_includes], [dnl
-	if test :"${with_lis:-no}" != :no -a :"${with_lis:-no}" != :yes ; then
-	    streams_cv_lis_includes="$with_lis"
-	fi
 	streams_what="sys/stream.h"
+	if test :"${with_lis:-no}" != :no -a :"${with_lis:-no}" != :yes ; then
+	    AC_MSG_RESULT([(searching $with_lis)])
+	    for streams_dir in $with_lis ; do
+		if test -d "$streams_dir" ; then
+		    AC_MSG_CHECKING([for streams lis include directory... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lis_includes="$with_lis"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    if test ":${streams_cv_lis_includes:-no}" = :no ; then
+		AC_MSG_WARN([
+***
+*** You have specified include directories using:
+***
+***	    --with-lis="$with_lis"
+***
+*** however, $streams_what does not exist in any of the specified
+*** directories.  Configure will continue to search other known
+*** directories.
+*** ])
+	    fi
+	fi
+	if test ":${streams_cv_lis_includes:-no}" = :no ; then
+	    # The next place to look is under the master source and build directory, if any.
+	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
+	    streams_search_path="
+		${master_srcdir:+$master_srcdir/LiS/include}
+		${master_builddir:+$master_builddir/LiS/include}"
+	    for streams_dir in $streams_search_path ; do
+		if test -d "$streams_dir" ; then
+		    AC_MSG_CHECKING([for streams lis include directory... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lis_includes="$streams_search_path"
+			streams_cv_lis_ldadd="$master_builddir/LiS/libLiS.la"
+			streams_cv_lis_modmap="$master_builddir/LiS/Modules.map"
+			streams_cv_lis_symver="$master_builddir/LiS/Module.symvers"
+			streams_cv_lis_manpath="$master_builddir/LiS/man"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		fi
+	    done
+	    AC_MSG_CHECKING([for streams lis include directory])
+	fi
 	if test ":${streams_cv_lis_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
@@ -328,14 +373,41 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for streams lis include directory])
 	fi
     ])
-    AC_MSG_CHECKING([for streams lis ldadd])
-    AC_MSG_RESULT([${streams_cv_lis_ldadd:-(none)}])
-    AC_MSG_CHECKING([for streams lis modmap])
-    AC_MSG_RESULT([${streams_cv_lis_modmap:-(none)}])
-    AC_MSG_CHECKING([for streams lis symver])
-    AC_MSG_RESULT([${streams_cv_lis_symver:-(none)}])
-    AC_MSG_CHECKING([for streams lis manpath])
-    AC_MSG_RESULT([${streams_cv_lis_manpath:-(none)}])
+    AC_CACHE_CHECK([for streams lis ldadd],[streams_cv_lis_ldadd],[dnl
+	for streams_dir in $streams_cv_lis_includes ; do
+	    if test -f $streams_dir/../libLiS.la ; then
+		streams_cv_lis_ldadd=`echo "$streams_dir/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$streams_cv_lis_ldadd" ; then
+	    streams_cv_lis_ldadd='-lLiS'
+	fi
+    ])
+    AC_CACHE_CHECK([for streams lis modmap],[streams_cv_lis_modmap],[dnl
+	for streams_dir in $streams_cv_lis_includes ; do
+	    if test -f $streams_dir/../Modules.map ; then
+		streams_cv_lis_modmap=`echo "$streams_dir/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_MSG_CHECKING([for streams lis symver],[streams_cv_lis_symver],[dnl
+	for streams_dir in $streams_cv_lis_includes ; do
+	    if test -f $streams_dir/../Module.symvers ; then
+		streams_cv_lis_symver=`echo "$streams_dir/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_MSG_CHECKING([for streams lis manpath],[streams_cv_lis_manpath],[dnl
+	for streams_dir in $streams_cv_lis_includes ; do
+	    if test -d $streams_dir/../man ; then
+		streams_cv_lis_manpath=`echo "$streams_dir/../man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
     if test :"${streams_cv_lis_includes:-no}" = :no ; then
 	AC_MSG_WARN([
 *** 
@@ -443,11 +515,56 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
     # Test for the existence of Linux Fast-STREAMS header files.  The package normally requires
     # either Linux STREAMS or Linux Fast-STREAMS header files (or both) to compile.
     AC_CACHE_CHECK([for streams lfs include directory], [streams_cv_lfs_includes], [dnl
+	streams_what="sys/stream.h"
 	if test :"${with_lfs:-no}" != :no -a :"${with_lfs:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
-	    streams_cv_lfs_includes="$with_lfs"
+	    AC_MSG_RESULT([(searching $with_lfs)])
+	    for streams_dir in $with_lfs ; do
+		if test -d "$streams_dir" ; then
+		    AC_MSG_CHECKING([for streams lfs include directory... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lfs_includes="$with_lfs"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    if test ":${streams_cv_lfs_includes:-no}" = :no ; then
+		AC_MSG_WARN([
+***
+*** You have specified include directories using:
+***
+***	    --with-lfs="$with_lfs"
+***
+*** however, $streams_what does not exist in any of the specified
+*** directories.  Configure will continue to search other known
+*** directories.
+*** ])
+	    fi
 	fi
-	streams_what="sys/stream.h"
+	if test ":${streams_cv_lfs_includes:-no}" = :no ; then
+	    # The next place to look is under the master source and build directory, if any.
+	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
+	    streams_search_path="
+		${master_srcdir:+$master_srcdir/streams/include}
+		${master_builddir:+$master_builddir/streams/include}"
+	    for streams_dir in $streams_search_path ; do
+		if test -d "$streams_dir" ; then
+		    AC_MSG_CHECKING([for streams lfs include directory... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lfs_includes="$streams_search_path"
+			streams_cv_lfs_ldadd="$master_builddir/streams/libstreams.la"
+			streams_cv_lfs_modmap="$master_builddir/streams/Modules.map"
+			streams_cv_lfs_symver="$master_builddir/streams/Module.symvers"
+			streams_cv_lfs_manpath="$master_builddir/streams/doc/man"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		fi
+	    done
+	    AC_MSG_CHECKING([for streams lfs include directory])
+	fi
 	if test ":${streams_cv_lfs_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
@@ -510,14 +627,41 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for streams lfs include directory])
 	fi
     ])
-    AC_MSG_CHECKING([for streams lfs ldadd])
-    AC_MSG_RESULT([${streams_cv_lfs_ldadd:-(none)}])
-    AC_MSG_CHECKING([for streams lfs modmap])
-    AC_MSG_RESULT([${streams_cv_lfs_modmap:-(none)}])
-    AC_MSG_CHECKING([for streams lfs symver])
-    AC_MSG_RESULT([${streams_cv_lfs_symver:-(none)}])
-    AC_MSG_CHECKING([for streams lfs manpath])
-    AC_MSG_RESULT([${streams_cv_lfs_manpath:-(none)}])
+    AC_CACHE_CHECK([for streams lfs ldadd],[streams_cv_lfs_ldadd],[dnl
+	for streams_dir in $streams_cv_lfs_includes ; do
+	    if test -f $streams_dir/../libLiS.la ; then
+		streams_cv_lfs_ldadd=`echo "$streams_dir/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$streams_cv_lfs_ldadd" ; then
+	    streams_cv_lfs_ldadd='-lLiS'
+	fi
+    ])
+    AC_CACHE_CHECK([for streams lfs modmap],[streams_cv_lfs_modmap],[dnl
+	for streams_dir in $streams_cv_lfs_includes ; do
+	    if test -f $streams_dir/../Modules.map ; then
+		streams_cv_lfs_modmap=`echo "$streams_dir/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_MSG_CHECKING([for streams lfs symver],[streams_cv_lfs_symver],[dnl
+	for streams_dir in $streams_cv_lfs_includes ; do
+	    if test -f $streams_dir/../Module.symvers ; then
+		streams_cv_lfs_symver=`echo "$streams_dir/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_MSG_CHECKING([for streams lfs manpath],[streams_cv_lfs_manpath],[dnl
+	for streams_dir in $streams_cv_lfs_includes ; do
+	    if test -d $streams_dir/../doc/man ; then
+		streams_cv_lfs_manpath=`echo "$streams_dir/../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
     if test :"${streams_cv_lfs_includes:-no}" = :no ; then
 	AC_MSG_WARN([
 *** 

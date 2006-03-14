@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/03/11 13:14:03 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/03/13 23:21:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
+# Last Modified $Date: 2006/03/13 23:21:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -104,11 +104,56 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
     # normally requires either Linux STREAMS or Linux Fast-STREAMS XNS header
     # files (or both) to compile.
     AC_CACHE_CHECK([for xns include directory], [xns_cv_includes], [dnl
+	xns_what="sys/npi.h"
 	if test ":${with_xns:-no}" != :no -a :"${with_xns:-no}" != :yes ;  then
 	    # First thing to do is to take user specified director(ies)
-	    xns_cv_includes="$with_xns"
+	    AC_MSG_RESULT([(searching $with_xns)])
+	    for xns_dir in $with_xns ; do
+		if test -d "$xns_dir" ; then
+		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
+		    if test -r "$xns_dir/$xns_what" ; then
+			xns_cv_includes="$with_xns"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    if test ":${xns_cv_includes:-no}" = :no ; then
+		AC_MSG_WARN([
+*** 
+*** You have specified include directories using:
+***
+***	    --with-xns="$with_xns"
+***
+*** however, $xns_what does not exist in any of the specified
+*** directories.  Configure will continue to search other known
+*** directories.
+*** ])
+	    fi
 	fi
-	xns_what="sys/npi.h"
+	if test ":${xns_cv_includes:-no}" = :no ; then
+	    # The next place to look is under the master source and build directory, if any.
+	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
+	    xns_search_path="
+		${master_srcdir:+$master_srcdir/strxns/src/include}
+		${master_builddir:+$master_builddir/strxns/src/include}"
+	    for xns_dir in $xns_search_path ; do
+		if test -d "$xns_dir" ; then
+		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
+		    if test -r "$xns_dir/$xns_what" ; then
+			xns_cv_includes="$xns_search_path"
+			xns_cv_ldadd= # "$master_builddir/strxns/libxns.la"
+			xns_cv_modmap= # "$master_builddir/strxns/Modules.map"
+			xns_cv_symver= # "$master_builddir/strxns/Module.symvers"
+			xns_cv_manpath="$master_builddir/strxns/doc/man"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		fi
+	    done
+	    AC_MSG_CHECKING([for xns include directory])
+	fi
 	if test ":${xns_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
@@ -244,14 +289,42 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for xns include directory])
 	fi
     ])
-    AC_MSG_CHECKING([for xns ldadd])
-    AC_MSG_RESULT([${xns_cv_ldadd:-(none)}])
-    AC_MSG_CHECKING([for xns modmap])
-    AC_MSG_RESULT([${xns_cv_modmap:-(none)}])
-    AC_MSG_CHECKING([for xns symver])
-    AC_MSG_RESULT([${xns_cv_symver:-(none)}])
-    AC_MSG_CHECKING([for xns manpath])
-    AC_MSG_RESULT([${xns_cv_manpath:-(none)}])
+    AC_CACHE_CHECK([for xns ldadd],[xns_cv_ldadd],[dnl
+	for xns_dir in $xns_cv_includes ; do
+	    if test -f "$xns_dir/../../libxns.la" ; then
+		xns_cv_ldadd=`echo "$xns_dir/../../libxns.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$xns_cv_ldadd" ; then
+	    xns_cv_ldadd='-lxns'
+	    xns_cv_ldadd=
+	fi
+    ])
+    AC_CACHE_CHECK([for xns modmap],[xns_cv_modmap],[dnl
+	for xns_dir in $xns_cv_includes ; do
+	    if test -f "$xns_dir/../../Modules.map" ; then
+		xns_cv_modmap=`echo "$xns_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_CACHE_CHECK([for xns symver],[xns_cv_symver],[dnl
+	for xns_dir in $xns_cv_includes ; do
+	    if test -f "$xns_dir/../../Module.symvers" ; then
+		xns_cv_symver=`echo "$xns_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
+    AC_CACHE_CHECK([for xns manpath],[xns_cv_manpath],[dnl
+	for xns_dir in $xns_cv_includes ; do
+	    if test -d "$xns_dir/../../doc/man" ; then
+		xns_cv_manpath=`echo "$xns_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+    ])
     if test :"${xns_cv_includes:-no}" = :no ; then :
 	if test :"$with_xns" = :no ; then
 	    AC_MSG_ERROR([

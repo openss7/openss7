@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/11 13:14:03 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/13 23:21:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 13:14:03 $ by $Author: brian $
+# Last Modified $Date: 2006/03/13 23:21:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -120,11 +120,57 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS Compatibility header files.  The
     # package normally requires compatibility header files to compile.
     AC_CACHE_CHECK([for compat include directory], [strcomp_cv_includes], [dnl
+	strcomp_what="sys/os7/compat.h"
 	if test :"${with_compat:-no}" != :no -a :"${with_compat:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
-	    strcomp_cv_includes="$with_compat"
+	    AC_MSG_RESULT([(searching $with_compat)])
+	    for strcomp_dir in $with_compat ; do
+		if test -d "$strcomp_dir" ; then
+		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir])
+		    if test -r "$strcomp_dir/$strcomp_what" ; then
+			strcomp_cv_cinludes="$with_compat"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    if test ":${strcomp_cv_includes:-no}" = :no ; then
+		AC_MSG_WARN([
+*** 
+*** You have specified include directories using:
+***
+***	    --with-compat="$with_compat"
+***
+*** however, $strcomp_what does not exist in any of the specified
+*** directories.  Configure will continue to search other known
+*** directories.
+*** ])
+	    fi
+	    AC_MSG_CHECKING([for compat include directory])
 	fi
-	strcomp_what="sys/os7/compat.h"
+	if test ":${strcomp_cv_includes:-no}" = :no ; then
+	    # The next place to look is under the master source and build directory, if any.
+	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
+	    strcomp_search_path="
+		${master_srcdir:+$master_srcdir/strcompat/src/include}
+		${master_builddir:+$master_builddir/strcompat/src/include}"
+	    for strcomp_dir in $strcomp_search_path ; do
+		if test -d "$strcomp_dir" ; then
+		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir])
+		    if test -r "$strcomp_dir/$strcomp_what" ; then
+			strcomp_cv_includes="$strcomp_search_path"
+			strcomp_cv_ldadd= # "$master_builddir/strcompat/libcompat.la"
+			strcomp_cv_modmap="$master_builddir/strcompat/Modules.map"
+			strcomp_cv_symver="$master_builddir/strcompat/Module.symvers"
+			strcomp_cv_manpath="$master_builddir/strcompat/doc/man"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		fi
+	    done
+	    AC_MSG_CHECKING([for compat include directory])
+	fi
 	if test ":${strcomp_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
@@ -225,14 +271,38 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for compat include directory])
 	fi
     ])
-    AC_MSG_CHECKING([for compat ldadd])
-    AC_MSG_RESULT([${strcomp_cv_ldadd:-(none)}])
-    AC_MSG_CHECKING([for compat modmap])
-    AC_MSG_RESULT([${strcomp_cv_modmap:-(none)}])
-    AC_MSG_CHECKING([for compat symver])
-    AC_MSG_RESULT([${strcomp_cv_symver:-(none)}])
-    AC_MSG_CHECKING([for compat manpath])
-    AC_MSG_RESULT([${strcomp_cv_manpath:-(none)}])
+    AC_CACHE_CHECK([for compat ldadd],[strcomp_cv_ldadd],[dnl
+	for strcomp_dir in $strcomp_cv_includes ; do
+	    if test -f "$strcomp_dir/../../libcompat.la" ; then
+		strcomp_cv_ldadd=`echo "$strcomp_dir/../../libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    fi
+	done
+	if test -z "$strcomp_cv_ldadd" ; then
+	    strcomp_cv_ldadd='-lcompat'
+	    strcomp_cv_ldadd=
+	fi
+    ])
+    AC_CACHE_CHECK([for compat modmap],[strcomp_cv_modmap],[dnl
+	for strcomp_dir in $strcomp_cv_includes ; do
+	    if test -f $strcomp_dir/../../Modules.map ; then
+		strcomp_cv_modmap=`echo "$strcomp_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    fi
+	done
+    ])
+    AC_CACHE_CHECK([for compat symver],[strcomp_cv_symver],[dnl
+	for strcomp_dir in $strcomp_cv_includes ; do
+	    if test -f $strcomp_dir/../../Module.symvers ; then
+		strcomp_cv_symver=`echo "$strcomp_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    fi
+	done
+    ])
+    AC_CACHE_CHECK([for compat manpath],[strcomp_cv_manpath],[dnl
+	for strcomp_dir in $strcomp_cv_includes ; do
+	    if test -d $strcomp_dir/../../doc/man; then
+		strcomp_cv_manpath=`echo "$strcomp_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    fi
+	done
+    ])
     if test :"${strcomp_cv_includes:-no}" = :no ; then
 	AC_MSG_ERROR([
 *** 
