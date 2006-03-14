@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2006/03/06 11:35:14 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2006/03/14 12:23:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/06 11:35:14 $ by $Author: brian $
+## Last Modified $Date: 2006/03/14 12:23:51 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.92  2006/03/14 12:23:51  brian
+## - added second rpmextra string
+##
 ## Revision 0.9.2.91  2006/03/06 11:35:14  brian
 ## - updated headers
 ##
@@ -133,6 +136,7 @@ RPMSOPTS		= $(RPMOPTS) \
 ##
 RPMBOPTS		= $(RPMOPTS) \
 			  --define "extrarelease $(PACKAGE_RPMEXTRA)" \
+			  --define "extrarelease2 $(PACKAGE_RPMEXTRA2)" \
 			  --define "distribution $(PACKAGE_RPMDIST) (contrib)" \
 			  --define "_gif $(PACKAGE)-$(VERSION).gif" \
 			  --define "_xpm $(PACKAGE)-$(VERSION).xpm"
