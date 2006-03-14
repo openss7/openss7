@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/07 12:32:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/13 23:59:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/07 12:32:55 $ by $Author: brian $
+# Last Modified $Date: 2006/03/13 23:59:52 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.19  2006/03/13 23:59:52  brian
+# - pass down master source and build directories
+#
 # Revision 0.9.2.18  2006/03/07 12:32:55  brian
 # - must clean module files
 #
@@ -67,6 +70,10 @@ include am/help.am
 
 export RPMXOPTS="--nodeps"
 export DEBXOPTS="-d"
+
+all-distcheck: ALL_EXPORT_OPTS=\
+	master_srcdir="$(master_srcdir)" \
+	master_builddir="$(master_builddir)"
 
 SUBDIRS	= @subdirs@
 

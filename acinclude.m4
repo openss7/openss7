@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/11 14:06:18 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/03/13 23:59:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 14:06:18 $ by $Author: brian $
+# Last Modified $Date: 2006/03/13 23:59:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -329,6 +329,16 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_STACKS:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([stacks])
     fi
+    AC_CACHE_CHECK([for master srcdir],[os7_cv_master_srcdir],[dnl
+	os7_cv_master_srcdir=`(cd $srcdir; pwd)`
+    ])
+    AC_CACHE_CHECK([for master builddir],[os7_cv_master_builddir],[dnl
+	os7_cv_master_builddir=`pwd`
+    ])
+    master_srcdir="$os7_cv_master_srcdir"
+    master_builddir="$os7_cv_master_builddir"
+    AC_SUBST([master_srcdir])
+    AC_SUBST([master_builddir])
 ])# _OS7_OUTPUT
 # =============================================================================
 
