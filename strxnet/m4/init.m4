@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/11 09:49:50 $
+# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/14 09:04:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 09:49:50 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 09:04:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -99,7 +99,7 @@ dnl next check for the initial init script from inittab
 dnl 
     AC_CACHE_CHECK([for init SysV script], [init_cv_script], [dnl
 	init_cv_script='no'
-	if test ":$init_cv_inittab" != :no ; then
+	if test :"$init_cv_inittab" != :no ; then
 	    init_tmp="$(< $init_cv_inittab | grep -c1 '^si::sysinit:' | sed -e 's|^si::sysinit:||;s|[[[:space:]]].*||')"
 	    init_tmp=`echo "${DESTDIR}${rootdir}$init_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	    if test -f "$init_tmp" ; then
@@ -109,7 +109,7 @@ dnl
 dnl
 dnl     fallback is to go looking for it in the usual places
 dnl
-	if test ":${init_cv_script:-no}" = :no ; then
+	if test :"${init_cv_script:-no}" = :no ; then
 	    AC_MSG_RESULT([searching...])
 	    eval "init_search_path=\"
 		${DESTDIR}${sysconfdir}/init.d/rcS
@@ -271,7 +271,7 @@ dnl
     ])
     AC_CACHE_CHECK([for init SysV installation], [init_cv_install], [dnl
 	init_cv_install='yes'
-	test ":${enable_initscripts:-yes}" = :no && init_cv_install='no'
+	test :"${enable_initscripts:-yes}" = :no && init_cv_install='no'
     ])
 ])# _INIT_SCRIPTS_SETUP
 # =============================================================================

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/03/13 23:21:41 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/03/14 09:20:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,22 +48,48 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/13 23:21:41 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 09:20:47 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: xti.m4,v $
+# Revision 0.9.2.34  2006/03/14 09:20:47  brian
+# - typo
+#
+# Revision 0.9.2.33  2006/03/14 09:04:11  brian
+# - syntax consistency, advanced search
 #
 # =============================================================================
+
+# -----------------------------------------------------------------------------
+# This file provides some common macros for finding a STREAMS XNET
+# release and necessary include directories and other configuration for
+# compiling kernel modules to run with the STREAMS XNET package.
+# -----------------------------------------------------------------------------
+# Interesting enough, there is no need to have strxnet loaded on the build
+# machine to compile modules.  Only the proper header files are required.
+# -----------------------------------------------------------------------------
 
 # =============================================================================
 # _XTI
 # -----------------------------------------------------------------------------
-# Check for the existence of XTI header files, particularly sys/tpi.h.  TPI
-# headers files are required for building the TPI interface for SCTP.  Without
-# TPI header files, the TPI interface to SCTP will not be built.
+# Check for the existence of XTI header files, particularly sys/tpi.h.
+# XTI header files are required for building the TPI interface for XTI.
+# Without XTI header files, the TPI interface to XTI will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XTI], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _XTI_OPTIONS
     _XTI_SETUP
+dnl
+dnl Skip kernel checks if not configuring for the kernel (i.e. no _LINUX_KERNEL)
+dnl as we do for netperf.
+dnl
+    m4_ifdef([_LINUX_KERNEL], [_XTI_KERNEL])
+    _XTI_USER
+    _XTI_OUTPUT
     AC_SUBST([XTI_CPPFLAGS])dnl
+    AC_SUBST([XTI_MODFLAGS])dnl
     AC_SUBST([XTI_LDADD])dnl
     AC_SUBST([XTI_MODMAP])dnl
     AC_SUBST([XTI_SYMVER])dnl
@@ -92,7 +118,15 @@ AC_DEFUN([_XTI_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XTI_SETUP], [dnl
     _XTI_CHECK_HEADERS
-    _XTI_DEFINES
+    for xti_include in $xti_cv_includes ; do
+	XTI_CPPFLAGS="${XTI_CPPFLAGS}${XTI_CPPFLAGS:+ }-I${xti_include}"
+    done
+    if test :"${xti_cv_config:-no}" != :no ; then
+	XTI_CPPFLAGS="${XTI_CPPFLAGS}${XTI_CPPFLAGS:+ }-include ${xti_cv_config}"
+    fi
+    if test :"${xti_cv_modversions:-no}" != :no ; then
+	XTI_MODFLAGS="${XTI_MODFLAGS}${XTI_MODFLAGS:+ }-include ${xti_cv_modversions}"
+    fi
 ])# _XTI_SETUP
 # =============================================================================
 
@@ -100,9 +134,8 @@ AC_DEFUN([_XTI_SETUP], [dnl
 # _XTI_CHECK_HEADERS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
-    # Test for the existence of Linux STREAMS XTI header files.  The package
-    # normally requires either Linux STREAMS or Linux Fast-STREAMS XTI header
-    # files (or both) to compile.
+    # Test for the existence of Linux Fast-STREAMS XTI header files.  The
+    # package normally requires XTI header files to compile.
     AC_CACHE_CHECK([for xti include directory], [xti_cv_includes], [dnl
 	xti_what="xti.h"
 	if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes ; then
@@ -119,9 +152,9 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    AC_MSG_RESULT([no])
 		fi
 	    done
-	    if test ":${xti_cv_includes:-no}" = :no ; then
+	    if test :"${xti_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-***
+*** 
 *** You have specified include directories using:
 ***
 ***	    --with-xti="$with_xti"
@@ -129,11 +162,13 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 *** however, $xti_what does not exist in any of the specified
 *** directories.  Configure will continue to search other known
 *** directories.
-***])
+*** ])
 	    fi
+	    AC_MSG_CHECKING([for xit include directory])
 	fi
-	if test ":${xti_cv_includes:-no}" = :no ; then
-	    # The next place to look is under the master source and build directory, if any.
+	if test :"${xti_cv_includes:-no}" = :no ; then
+	    # The next place to look is under the master source and build
+	    # directory, if any.
 	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
 	    xti_search_path="
 		${master_srcdir:+$master_srcdir/strxnet/src/include}
@@ -150,11 +185,12 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
 	    AC_MSG_CHECKING([for xti include directory])
 	fi
-	if test ":${xti_cv_includes:-no}" = :no ; then
+	if test :"${xti_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    xti_here=`pwd`
@@ -171,10 +207,10 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
 		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_dir $xti_bld"
-			xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_modmap=
-			xti_cv_symver=
-			xti_cv_manpath=`echo "$xti_bld/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_modmap= # `echo "$xti_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_symver= # `echo "$xti_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_manpath=`echo "$xti_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -183,15 +219,12 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    done
 	    AC_MSG_CHECKING([for xti include directory])
 	fi
-	if test ":${xti_cv_includes:-no}" = :no ; then
+	if test :"${xti_cv_includes:-no}" = :no ; then
+	    # XTI header files are normally found in the strxnet package now.
+	    # They used to be part of the XNET add-on package and even older
+	    # versions are part of the LiS release packages.
 	    case "$streams_cv_package" in
-		LiS)
-		    # Some of our oldest RPM releases of LiS put the xti header files into their own
-		    # subdirectory (/usr/include/xti/).  The old version places them in with the LiS
-		    # header files.  The current version has them separate as part of the strxnet
-		    # package.  This tests whether we need an additional -I/usr/include/xti in the
-		    # streams includes line.  This check can be dropped when the older RPM releases
-		    # of LiS fall out of favor.
+		(LiS)
 		    eval "xti_search_path=\"
 			${DESTDIR}${includedir}/strxnet
 			${DESTDIR}${rootdir}${oldincludedir}/strxnet
@@ -220,20 +253,29 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/local/include/xti\""
 		    ;;
 		LfS)
-		    # LfS has always been separate.
 		    eval "xti_search_path=\"
 			${DESTDIR}${includedir}/strxnet
 			${DESTDIR}${rootdir}${oldincludedir}/strxnet
 			${DESTDIR}${rootdir}/usr/include/strxnet
 			${DESTDIR}${rootdir}/usr/local/include/strxnet
 			${DESTDIR}${rootdir}/usr/src/strxnet/src/include
+			${DESTDIR}${includedir}/streams
+			${DESTDIR}${rootdir}${oldincludedir}/streams
+			${DESTDIR}${rootdir}/usr/include/streams
+			${DESTDIR}${rootdir}/usr/local/include/streams
+			${DESTDIR}${rootdir}/usr/src/streams/include
 			${DESTDIR}${oldincludedir}/strxnet
 			${DESTDIR}/usr/include/strxnet
 			${DESTDIR}/usr/local/include/strxnet
-			${DESTDIR}/usr/src/strxnet/src/include\""
+			${DESTDIR}/usr/src/strxnet/src/include
+			${DESTDIR}${oldincludedir}/streams
+			${DESTDIR}/usr/include/streams
+			${DESTDIR}/usr/local/include/streams
+			${DESTDIR}/usr/src/streams/include\""
 		    ;;
 	    esac
 	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    xti_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for xti_dir in $xti_search_path ; do
 		if test -d "$xti_dir" ; then
@@ -289,8 +331,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	done
     ])
     if test :"${xti_cv_includes:-no}" = :no ; then
-	if test :"$with_xti" = :no ; then
-	    AC_MSG_ERROR([
+	AC_MSG_ERROR([
 *** 
 *** Configure could not find the STREAMS XNET include directories.  If
 *** you wish to use the STREAMS XNET package you will need to specify
@@ -303,13 +344,86 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 *** download page at http://www.openss7.org/ and comes in a tarball
 *** named something like "strxnet-0.9.2.8.tar.gz".
 *** ])
-	fi
     fi
+    AC_CACHE_CHECK([for xti version], [xti_cv_version], [dnl
+	xti_what="sys/strxnet/version.h"
+	xti_file=
+	if test -n "$xti_cv_includes" ; then
+	    for xti_dir in $xti_cv_includes ; do
+		# old place for version
+		if test -f "$xti_dir/$xti_what" ; then
+		    xti_file="$xti_dir/$xti_what"
+		    break
+		fi
+		# new place for version
+		if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+		    if test -f "$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what" ; then
+			xti_file="$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what"
+			break
+		    fi
+		fi
+	    done
+	fi
+	if test :${xti_file:-no} != :no ; then
+	    xti_cv_version=`grep '#define.*\<STRXNET_VERSION\>' $xti_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	fi
+    ])
+    xti_what="sys/config.h"
+    AC_CACHE_CHECK([for xti $xti_what], [xti_cv_config], [dnl
+	xti_cv_config=
+	if test -n "$xti_cv_includes" ; then
+	    for xti_dir in $xti_cv_includes ; do
+		# old place for config
+		if test -f "$xti_dir/$xti_what" ; then
+		    xti_cv_config="$xti_dir/$xti-what"
+		    break
+		fi
+		# new place for config
+		if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+		    if test -f "$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what" ; then
+			xti_cv_config="$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what"
+			break
+		    fi
+		fi
+	    done
+	fi
+    ])
+    xti_what="sys/strxnet/modversions.h"
+    AC_CACHE_CHECK([for xti $xti_what], [xti_cv_modversions], [dnl
+	xti_cv_modversions=
+dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
+dnl	assume normal objects
+	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
+	    if test -n "$xti_cv_includes" ; then
+		for xti_dir in $xti_cv_includes ; do
+		    # old place for modversions
+		    if test -f "$xti_dir/$xti_what" ; then
+			xti_cv_modversions="$xti_dir/$xti_what"
+			break
+		    fi
+		    # new place for modversions
+		    if test -n "$linux_cv_k_release" ; then
+dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
+dnl			then this will just not be set
+			if test "$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what" ; then
+			    xti_cv_includes="$xti_dir/$linux_cv_k_release/$target_cpu $xti_cv_includes"
+			    xti_cv_modversions="$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	fi
+    ])
     AC_MSG_CHECKING([for xti added configure arguments])
-dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
-dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
-dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
-dnl so we use defines.
+dnl Older rpms (particularly those used by SuSE) are too stupid to handle --with
+dnl and --without rpmopt syntax, so convert to the equivalent --define syntax.
+dnl Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly, so we
+dnl use defines.
     if test -z "$with_xti" ; then
 	if test :"${xti_cv_includes:-no}" = :no ; then
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_xti --with-xti\""
@@ -323,50 +437,52 @@ dnl so we use defines.
     else
 	AC_MSG_RESULT([--with-xti="$with_xti"])
     fi
-    AC_CACHE_CHECK([for xti version], [xti_cv_version], [dnl
-	xti_what="sys/strxnet/version.h"
-	xti_file=
-	if test -n "$xti_cv_includes" ; then
-	    for xti_dir in $xti_cv_includes ; do
-		# old place for version
-		if test -f "$xti_dir/$xti_what" ; then
-		    xti_file="$xti_dir/$xti_what"
-		    break
-		fi
-		# new place for version
-		if test -n $linux_cv_k_release ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-		    if test -f "$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what" ; then
-			xti_file="$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what"
-			break
-		    fi
-		fi
-	    done
-	fi
-	if test :${xti_file:-no} != :no ; then
-	    xti_cv_version=`grep '#define.*\<STRXNET_VERSION\>' $xti_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
-	fi
-    ])
 ])# _XTI_CHECK_HEADERS
+# =============================================================================
+
+# =============================================================================
+# _XTI_KERNEL
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XTI_KERNEL], [dnl
+])# _XTI_KERNEL
+# =============================================================================
+
+# =============================================================================
+# _XTI_OUTPUT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XTI_OUTPUT], [dnl
+    _XTI_DEFINES
+])# _XTI_OUTPUT
 # =============================================================================
 
 # =============================================================================
 # _XTI_DEFINES
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XTI_DEFINES], [dnl
-    for xti_include in $xti_cv_includes ; do
-	XTI_CPPFLAGS="${XTI_CPPFLAGS}${XTI_CPPFLAGS:+ }-I${xti_include}"
-    done
+    if test :"${xti_cv_modversions:-no}" != :no ; then
+	AC_DEFINE_UNQUOTED([HAVE_SYS_XNET_MODVERSIONS_H], [1], [Define when
+	    the STREAMS XNET release supports module versions such as
+	    the OpenSS7 autoconf releases.])
+    fi
+    XTI_CPPFLAGS="${XTI_CPPFLAGS:+ ${XTI_CPPFLAGS}}"
     XTI_LDADD="$xti_cv_ldadd"
     XTI_MODMAP="$xti_cv_modmap"
     XTI_SYMVER="$xti_cv_symver"
     XTI_MANPATH="$xti_cv_manpath"
     XTI_VERSION="$xti_cv_version"
+    MODPOST_INPUT="${MODPOST_INPUTS}${XTI_SYMVER:+${MODPOST_INPUTS:+ }${XTI_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strxnet for
 	that matter.
     ])
 ])# _XTI_DEFINES
+# =============================================================================
+
+# =============================================================================
+# _XTI_USER
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XTI_USER], [dnl
+])# _XTI_USER
 # =============================================================================
 
 # =============================================================================

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/03/13 23:55:42 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/03/14 09:20:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/13 23:55:42 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 09:20:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -276,7 +276,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    AC_MSG_RESULT([no])
 		fi
 	    done
-	    if test ":${streams_cv_lis_includes:-no}" = :no ; then
+	    if test :"${streams_cv_lis_includes:-no}" = :no ; then
 		AC_MSG_WARN([
 ***
 *** You have specified include directories using:
@@ -289,7 +289,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 *** ])
 	    fi
 	fi
-	if test ":${streams_cv_lis_includes:-no}" = :no ; then
+	if test :"${streams_cv_lis_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build directory, if any.
 	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
 	    streams_search_path="
@@ -311,7 +311,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    done
 	    AC_MSG_CHECKING([for streams lis include directory])
 	fi
-	if test ":${streams_cv_lis_includes:-no}" = :no ; then
+	if test :"${streams_cv_lis_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    streams_here=`pwd`
@@ -340,7 +340,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    done
 	    AC_MSG_CHECKING([for streams lis include directory])
 	fi
-	if test ":${streams_cv_lis_includes:-no}" = :no ; then
+	if test :"${streams_cv_lis_includes:-no}" = :no ; then
 	    # note if linux kernel macros have not run this reduces
 	    streams_cv_lis_includes=
 	    eval "streams_search_path=\"
@@ -433,7 +433,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    break
 		fi
 		# new place for config
-		if test -n $linux_cv_k_release ; then
+		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
 		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
 			streams_cv_lis_config="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
@@ -454,7 +454,7 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 		    break
 		fi
 		# new place for version
-		if test -n $linux_cv_k_release ; then
+		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
 		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
 			streams_file="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
@@ -482,7 +482,7 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we assume no
 			break
 		    fi
 		    # new place for modversions
-		    if test -n $linux_cv_k_release ; then
+		    if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
 			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
 			    streams_cv_lis_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
@@ -530,7 +530,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    AC_MSG_RESULT([no])
 		fi
 	    done
-	    if test ":${streams_cv_lfs_includes:-no}" = :no ; then
+	    if test :"${streams_cv_lfs_includes:-no}" = :no ; then
 		AC_MSG_WARN([
 ***
 *** You have specified include directories using:
@@ -543,7 +543,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 *** ])
 	    fi
 	fi
-	if test ":${streams_cv_lfs_includes:-no}" = :no ; then
+	if test :"${streams_cv_lfs_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build directory, if any.
 	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
 	    streams_search_path="
@@ -565,7 +565,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    done
 	    AC_MSG_CHECKING([for streams lfs include directory])
 	fi
-	if test ":${streams_cv_lfs_includes:-no}" = :no ; then
+	if test :"${streams_cv_lfs_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    streams_here=`pwd`
@@ -594,7 +594,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    done
 	    AC_MSG_CHECKING([for streams lfs include directory])
 	fi
-	if test ":${streams_cv_lfs_includes:-no}" = :no ; then
+	if test :"${streams_cv_lfs_includes:-no}" = :no ; then
 	    # note if linux kernel macros have not run this reduces
 	    streams_cv_lfs_includes=
 	    eval "streams_search_path=\"
@@ -687,7 +687,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    break
 		fi
 		# new place for config
-		if test -n $linux_cv_k_release ; then
+		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
 		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
 			streams_cv_lfs_config="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
@@ -708,7 +708,7 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 		    break
 		fi
 		# new place for version
-		if test -n $linux_cv_k_release ; then
+		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
 		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
 			streams_file="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
@@ -736,7 +736,7 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we assume no
 			break
 		    fi
 		    # new place for modversions
-		    if test -n $linux_cv_k_release ; then
+		    if test -n "$linux_cv_k_release" ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
 			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
 			    streams_cv_lfs_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lfs_includes"
@@ -806,61 +806,115 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
 	m68*)			: ;;
 	mips64*)		: ;;
 	mips*)			: ;;
-	hppa*)			: ;;
+	hppa*)
+dnl
+dnl	    Define when compiling for HPPA.  This define is only used for linux
+dnl	    kernel target.  This is really the wrong way to go about doing this:
+dnl	    the function should be checked for by autoconf instead of placing
+dnl	    the architectural dependencies in the LiS source.  The define is
+dnl	    used in "head/linux-mdep.c" to determine whether lis_pci_cleanup
+dnl	    exists; "head/linux/exports.c" to determine whether a bunch of
+dnl	    functions are available; "head/osif.c" to determine whether a bunch
+dnl	    of PCI DMA mapping functions are available.
+dnl
+	    STREAMS_CPPFLAGS="-D_HPPA_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+	    ;;
+	ppc64* | powerpc64* )
+dnl
+dnl	    Define when compiling for PPC64.  This define is only used for linux
+dnl	    kernel target.  This is really the wrong way to go about doing this:
+dnl	    the function should be checked for by autoconf instead of placing
+dnl	    the architectural dependencies in the LiS source.  The define is
+dnl	    used in "head/linux-mdep.c" to determine whether lis_pci_cleanup
+dnl	    exists; "head/linux/exports.c" to determine whether a bunch of
+dnl	    functions are available; "head/osif.c" to determine whether a bunch
+dnl	    of PCI DMA mapping functions are available; "include/sys/osif.h" to
+dnl	    determine whether a bunch of PCI DMA mapping functions are
+dnl	    available.
+dnl
+	    STREAMS_CPPFLAGS="-D_PPC64_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+	    STREAMS_CPPFLAGS="-D_PPC_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+	    ;;
 	ppc* | powerpc*)	
-	    # Define when compiling for PPC.  This define is only used for linux
-	    # kernel target.  This is really the wrong way to go about doing
-	    # this: the function should be checked for by autoconf instead of
-	    # placing the architectural dependencies in the LiS source.  The
-	    # define is used in <LiS/include/sys/osif.h> and "head/osif.c" to
-	    # determine whether PCI BIOS is present; in (head/linux-mdep.c) to
-	    # determine whether cpu binding is possible; to determine whether
-	    # spin_is_locked() is available in "head/linux/lislocks.c"; in
-	    # "head/mod.c" to determine whether to define struct pt_regs; and in
-	    # <LiS/include/sys/lislocks.h> to determine the size of semaphore
-	    # memory.
-	    STREAMS_CPPFLAGS="-D_PPC_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+dnl
+dnl	    Define when compiling for PPC.  This define is only used for linux
+dnl	    kernel target.  This is really the wrong way to go about doing this:
+dnl	    the function should be checked for by autoconf instead of placing
+dnl	    the architectural dependencies in the LiS source.  The define is
+dnl	    used in <LiS/include/sys/osif.h> and "head/osif.c" to determine
+dnl	    whether PCI BIOS is present; in (head/linux-mdep.c) to determine
+dnl	    whether cpu binding is possible; to determine whether
+dnl	    spin_is_locked() is available in "head/linux/lislocks.c"; in
+dnl	    "head/mod.c" to determine whether to define struct pt_regs; and in
+dnl	    <LiS/include/sys/lislocks.h> to determine the size of semaphore
+dnl	    memory.
+dnl
+	    STREAMS_CPPFLAGS="-D_PPC_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	s390x*)			
-	    # Define when compiling for S390X.  This define is only used for the
-	    # linux kernel target.  This is really the wrong way to go about
-	    # doing this: the function should be checked for by autoconf instead
-	    # of placing the architectural depdendencies in the LiS source.  The
-	    # define is used in "head/linux-mdep.c" to determine whether
-	    # lis_pci_cleanup exists; "head/linux/exports.c" to determine
-	    # whether a bunch of functions are available; "head/osif.c" to
-	    # determine whether a bunch of PCI DMA mapping functions are
-	    # available; "include/sys/osif.h" to determine whether a bunch of
-	    # PCI DMA mapping functions are available.
-	    STREAMS_CPPFLAGS="-D_S390X_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+dnl
+dnl	    Define when compiling for S390X.  This define is only used for the
+dnl	    linux kernel target.  This is really the wrong way to go about doing
+dnl	    this: the function should be checked for by autoconf instead of
+dnl	    placing the architectural depdendencies in the LiS source.  The
+dnl	    define is used in "head/linux-mdep.c" to determine whether
+dnl	    lis_pci_cleanup exists; "head/linux/exports.c" to determine whether
+dnl	    a bunch of functions are available; "head/osif.c" to determine
+dnl	    whether a bunch of PCI DMA mapping functions are available;
+dnl	    "include/sys/osif.h" to determine whether a bunch of PCI DMA mapping
+dnl	    functions are available.
+dnl
+	    STREAMS_CPPFLAGS="-D_S390X_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+	    STREAMS_CPPFLAGS="-D_S390_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	s390*)			
-	    # Define when compiling for S390.  Strangely enough, _S390_LIS_ is
-	    # never checked without _S390X_LIS_.  Rendering it as an alias for
-	    # the above.
-	    STREAMS_CPPFLAGS="-D_S390_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+dnl
+dnl	    Define when compiling for S390.  Strangely enough, _S390_LIS_ is
+dnl	    never checked without _S390X_LIS_.  Rendering it as an alias for the
+dnl	    above.
+dnl
+	    STREAMS_CPPFLAGS="-D_S390_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	sh*)			: ;;
 	sparc64*)		
-	    # Define when compiling for Sparc64.  This define is only used for
-	    # the linux kernel target.  This is really the wrong way to go about
-	    # doing this: the function should be checked for by autoconf instead
-	    # of placing the architectural dependencies in the LiS source.  The
-	    # define is used to determine when ioremap functions are not
-	    # available <LiS/include/osif.h>.  Strangely enough, none of the
-	    # other checks are performed as for _SPARC_LIS_ below.
-	    STREAMS_CPPFLAGS="-D_SPARC64_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+dnl
+dnl	    Define when compiling for Sparc64.  This define is only used for the
+dnl	    linux kernel target.  This is really the wrong way to go about doing
+dnl	    this: the function should be checked for by autoconf instead of
+dnl	    placing the architectural dependencies in the LiS source.  The
+dnl	    define is used to determine when ioremap functions are not available
+dnl	    <LiS/include/osif.h>.  Strangely enough, none of the other checks
+dnl	    are performed as for _SPARC_LIS_ below.
+dnl
+	    STREAMS_CPPFLAGS="-D_SPARC64_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+	    STREAMS_CPPFLAGS="-D_SPARC_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	sparc*)			
-	    # Define when compiling for Sparc.  This define is used for the
-	    # linux kernel target.  This is really the wrong way to go about
-	    # doing this: the function should be checked for by autoconf instead
-	    # of placing architectural depedencies in the LiS source.  The
-	    # define is used to determine when ioremap functions are not
-	    # available <LiS/include/osif.h>, when PCI BIOS is not present
-	    # (head/osif.c), and when <linux/poll.h> is missing POLLMSG
-	    # <LiS/include/sys/poll.h>
-	    STREAMS_CPPFLAGS="-D_SPARC_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+dnl
+dnl	    Define when compiling for Sparc.  This define is used for the linux
+dnl	    kernel target.  This is really the wrong way to go about doing this:
+dnl	    the function should be checked for by autoconf instead of placing
+dnl	    architectural depedencies in the LiS source.  The define is used to
+dnl	    determine when ioremap functions are not available
+dnl	    <LiS/include/osif.h>, when PCI BIOS is not present (head/osif.c),
+dnl	    and when <linux/poll.h> is missing POLLMSG <LiS/include/sys/poll.h>
+dnl
+	    STREAMS_CPPFLAGS="-D_SPARC_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+	    ;;
+	x86_64*)
+dnl
+dnl	    Define when compiling for X86_64.  This define is only used for
+dnl	    linux kernel target.  This is really the wrong way to go about doing
+dnl	    this: the function should be checked for by autoconf instead of
+dnl	    placing the architectural dependencies in the LiS source.  The
+dnl	    define is used in "head/linux-mdep.c" to determine whether
+dnl	    lis_pci_cleanup exists; "head/linux/exports.c" to determine whether
+dnl	    a bunch of functions are available; "head/osif.c" to determine
+dnl	    whether a bunch of PCI DMA mapping functions are available;
+dnl	    "include/sys/osif.h" to determine whether a bunch of PCI DMA mapping
+dnl	    functions are available.
+dnl
+	    STREAMS_CPPFLAGS="-D_X86_64_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	*)			: ;;
     esac

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/11 09:49:50 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/14 09:04:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 09:49:50 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 09:04:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -256,7 +256,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_REQUIRE([_DISTRO_FUNCTIONS])
     AC_CACHE_CHECK([for dist build flavor], [dist_cv_build_flavor], [dnl
-	if test ":${dist_cv_build_rel_file:-no}" != :no ; then
+	if test :"${dist_cv_build_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` = 'debian_version' ; then
 		dist_cv_build_flavor='debian'
 	    else
@@ -288,7 +288,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	if test -z "$dist_cv_build_vendor" ; then dist_cv_build_vendor=$build_vendor ; fi
     ])
     AC_CACHE_CHECK([for dist build release], [dist_cv_build_release], [dnl
-	if test ":${dist_cv_build_rel_file:-no}" != :no ; then
+	if test :"${dist_cv_build_rel_file:-no}" != :no ; then
 	    dist_cv_build_release=$(dist_get_release "$(cat $dist_cv_build_rel_file)")
 	fi
 	if test -z "$dist_cv_build_release" -a ":${dist_cv_build_lsb_file:-no}" != :no ; then
@@ -312,7 +312,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	dist_cv_build_distrib=$(dist_get_distrib "$dist_cv_build_flavor")
     ])
     AC_CACHE_CHECK([for dist build codename], [dist_cv_build_codename], [dnl
-	if test ":${dist_cv_build_rel_file:-no}" != :no ; then
+	if test :"${dist_cv_build_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
 		dist_cv_build_codename=$(dist_get_codename "$(cat $dist_cv_build_rel_file)")
 	    else
@@ -336,7 +336,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	# cannot get the codename from the compiler
     ])
     AC_CACHE_CHECK([for dist build cpu], [dist_cv_build_cpu], [dnl
-	if test ":${dist_cv_build_rel_file:-no}" != :no ; then
+	if test :"${dist_cv_build_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
 		dist_cv_build_cpu=$(dist_get_cpu "$(cat $dist_cv_build_rel_file)")
 	    else
@@ -414,7 +414,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_REQUIRE([_DISTRO_FUNCTIONS])
     AC_CACHE_CHECK([for dist host flavor], [dist_cv_host_flavor], [dnl
-	if test ":${dist_cv_host_rel_file:-no}" != :no ; then
+	if test :"${dist_cv_host_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` = 'debian_version' ; then
 		dist_cv_host_flavor='debian'
 	    else
@@ -443,7 +443,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	dist_cv_host_vendor=$(dist_get_vendor "${dist_cv_host_flavor:-unknown}")
     ])
     AC_CACHE_CHECK([for dist host release], [dist_cv_host_release], [dnl
-	if test ":${dist_cv_host_rel_file:-no}" != :no ; then
+	if test :"${dist_cv_host_rel_file:-no}" != :no ; then
 	    dist_cv_host_release=$(dist_get_release "$(cat $dist_cv_host_rel_file)")
 	fi
 	if test -z "$dist_cv_host_release" -a ":${dist_cv_host_lsb_file:-no}" != :no ; then
@@ -466,7 +466,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	dist_cv_host_distrib=$(dist_get_distrib "$dist_cv_host_flavor")
     ])
     AC_CACHE_CHECK([for dist host codename], [dist_cv_host_codename], [dnl
-	if test ":${dist_cv_host_rel_file:-no}" != :no ; then
+	if test :"${dist_cv_host_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
 		dist_cv_host_codename=$(dist_get_codename "$(cat $dist_cv_host_rel_file)")
 	    else
@@ -490,7 +490,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	# cannot get the codename from the compiler
     ])
     AC_CACHE_CHECK([for dist host cpu], [dist_cv_host_cpu], [dnl
-	if test ":${dist_cv_host_rel_file:-no}" != :no ; then
+	if test :"${dist_cv_host_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
 		dist_cv_host_cpu=$(dist_get_cpu "$(cat $dist_cv_host_rel_file)")
 	    else
@@ -580,7 +580,7 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
 *** target.
 *** ])
     fi
-    if test ":$build_vendor" != ":$host_vendor" -o ":$build_vendor" != ":$target_vendor" ; then
+    if test :"$build_vendor" != ":$host_vendor" -o ":$build_vendor" != ":$target_vendor" ; then
 	if test :"${cross_compiling:-no}" = :no
 	then
 	    AC_MSG_WARN([
@@ -601,7 +601,7 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
 # -----------------------------------------------------------------------------
 # adjust default lib directory for 64 bit
 AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
-    if test ":$libdir" = ':${exec_prefix}/lib' ; then 
+    if test :"$libdir" = ':${exec_prefix}/lib' ; then 
 	case $host_cpu in
 	    (*64)
 		libdir='${exec_prefix}/lib64'

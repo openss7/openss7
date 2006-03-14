@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/03/11 09:49:51 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/14 09:04:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 09:49:51 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 09:04:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -233,7 +233,7 @@ dnl
 AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
     AC_MSG_NOTICE([searching for $STRCONF_INPUT input files in  $ac_srcdir and $ac_builddir])
     ac_pkgdir=
-    if test ":${STRCONF_BPKGDIR:+set}" = :set ; then
+    if test :"${STRCONF_BPKGDIR:+set}" = :set ; then
 	case $STRCONF_BPKGDIR in
 	    (.*|/*) # non vpath directory specification, use specified
 	    ac_pkgdir="$STRCONF_BPKGDIR"
@@ -368,7 +368,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 		echo "$as_me: $line" >&2
 	    done
 	fi
-	if test ":${STRCONF_BPKGDIR:+set}" = :set ; then
+	if test :"${STRCONF_BPKGDIR:+set}" = :set ; then
 	    AC_MSG_NOTICE([creating $STRCONF_BPKGDIR from $STRCONF_INPUT])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --packagedir=$STRCONF_BPKGDIR $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/03/13 23:21:41 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/03/14 09:20:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,22 +48,48 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/13 23:21:41 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 09:20:46 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: inet.m4,v $
+# Revision 0.9.2.26  2006/03/14 09:20:46  brian
+# - typo
+#
+# Revision 0.9.2.25  2006/03/14 09:04:10  brian
+# - syntax consistency, advanced search
 #
 # =============================================================================
+
+# -----------------------------------------------------------------------------
+# This file provides some common macros for finding a STREAMS INET
+# release and necessary include directories and other configuration for
+# compiling kernel modules to run with the STREAMS INET package.
+# -----------------------------------------------------------------------------
+# Interesting enough, there is no need to have strinet loaded on the build
+# machine to compile modules.  Only the proper header files are required.
+# -----------------------------------------------------------------------------
 
 # =============================================================================
 # _INET
 # -----------------------------------------------------------------------------
 # Check for the existence of INET header files, particularly sys/xti_inet.h.
-# INET headers files are required for building the XTI interface for SCTP.
-# Without INET header files, the INET interface to SCTP will not be built.
+# INET header files are required for building the XTI interface for INET.
+# Without INET header files, the XTI interface to INET will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET], [dnl
     AC_REQUIRE([_XTI])dnl
     _INET_OPTIONS
     _INET_SETUP
+dnl
+dnl Skip kernel checks if not configuring for the kernel (i.e. no _LINUX_KERNEL)
+dnl as we do for netperf.
+dnl
+    m4_ifdef([_LINUX_KERNEL], [_INET_KERNEL])
+    _INET_USER
+    _INET_OUTPUT
     AC_SUBST([INET_CPPFLAGS])dnl
+    AC_SUBST([INET_MODFLAGS])dnl
     AC_SUBST([INET_LDADD])dnl
     AC_SUBST([INET_MODMAP])dnl
     AC_SUBST([INET_SYMVER])dnl
@@ -92,7 +118,15 @@ AC_DEFUN([_INET_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_SETUP], [dnl
     _INET_CHECK_HEADERS
-    _INET_DEFINES
+    for inet_include in $inet_cv_includes ; do
+	INET_CPPFLAGS="${INET_CPPFLAGS}${INET_CPPFLAGS:+ }-I${inet_include}"
+    done
+    if test :"${inet_cv_config:-no}" != :no ; then
+	INET_CPPFLAGS="${INET_CPPFLAGS}${INET_CPPFLAGS:+ }-include ${inet_cv_config}"
+    fi
+    if test :"${inet_cv_modversions:-no}" != :no ; then
+	INET_MODFLAGS="${INET_MODFLAGS}${INET_MODFLAGS:+ }-include ${inet_cv_modversions}"
+    fi
 ])# _INET_SETUP
 # =============================================================================
 
@@ -100,12 +134,11 @@ AC_DEFUN([_INET_SETUP], [dnl
 # _INET_CHECK_HEADERS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_CHECK_HEADERS], [dnl
-    # Test for the existence of Linux STREAMS INET header files.  The package
-    # normally requires either Linux STREAMS or Linux Fast-STREAMS INET header
-    # files (or both) to compile.
+    # Test for the existence of Linux Fast-STREAMS INET header files.  The
+    # package normally requires INET header files to compile.
     AC_CACHE_CHECK([for inet include directory], [inet_cv_includes], [dnl
 	inet_what="sys/xti_inet.h"
-	if test ":${with_inet:-no}" != :no -a :"${with_inet:-no}" != :yes ;  then
+	if test :"${with_inet:-no}" != :no -a :"${with_inet:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
 	    AC_MSG_RESULT([(searching $with_inet)])
 	    for inet_dir in $with_inet ; do
@@ -119,13 +152,13 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 		    AC_MSG_RESULT([no])
 		fi
 	    done
-	    if test ":${inet_cv_includes:-no}" = :no ; then
+	    if test :"${inet_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
 *** 
 *** You have specified include directories using:
 ***
 ***	    --with-inet="$with_inet"
-***  
+***
 *** however, $inet_what does not exist in any of the specified
 *** directories.  Configure will continue to search other known
 *** directories.
@@ -133,8 +166,9 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    fi
 	    AC_MSG_CHECKING([for inet include directory])
 	fi
-	if test ":${inet_cv_includes:-no}" = :no ; then
-	    # The next place to look is under the master source and build directory, if any.
+	if test :"${inet_cv_includes:-no}" = :no ; then
+	    # The next place to look is under the master source and build
+	    # directory, if any.
 	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
 	    inet_search_path="
 		${master_srcdir:+$master_srcdir/strinet/src/include}
@@ -151,11 +185,12 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
 	    AC_MSG_CHECKING([for inet include directory])
 	fi
-	if test ":${inet_cv_includes:-no}" = :no ; then
+	if test :"${inet_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    inet_here=`pwd`
@@ -172,9 +207,9 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for inet include directory... $inet_dir])
 		    if test -r "$inet_dir/$inet_what" ; then
 			inet_cv_includes="$inet_dir $inet_bld"
-			inet_cv_ldadd=
-			inet_cv_modmap=
-			inet_cv_symver=
+			inet_cv_ldadd= # `echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			inet_cv_modmap= # `echo "$inet_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			inet_cv_symver= # `echo "$inet_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
@@ -184,44 +219,72 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    done
 	    AC_MSG_CHECKING([for inet include directory])
 	fi
-	if test ":${inet_cv_includes:-no}" = :no ; then
-	    eval "inet_search_path=\"
-		${DESTDIR}${includedir}/strinet
-		${DESTDIR}${rootdir}${oldincludedir}/strinet
-		${DESTDIR}${rootdir}/usr/include/strinet
-		${DESTDIR}${rootdir}/usr/local/include/strinet
-		${DESTDIR}${rootdir}/usr/src/strinet/src/include
-		${DESTDIR}${includedir}/strxnet
-		${DESTDIR}${rootdir}${oldincludedir}/strxnet
-		${DESTDIR}${rootdir}/usr/include/strxnet
-		${DESTDIR}${rootdir}/usr/local/include/strxnet
-		${DESTDIR}${rootdir}/usr/src/strxnet/src/include
-		${DESTDIR}${includedir}/streams
-		${DESTDIR}${rootdir}${oldincludedir}/streams
-		${DESTDIR}${rootdir}/usr/include/streams
-		${DESTDIR}${rootdir}/usr/local/include/streams
-		${DESTDIR}${rootdir}/usr/src/streams/src/include
-		${DESTDIR}${includedir}/LiS
-		${DESTDIR}${rootdir}${oldincludedir}/LiS
-		${DESTDIR}${rootdir}/usr/include/LiS
-		${DESTDIR}${rootdir}/usr/local/include/LiS
-		${DESTDIR}${rootdir}/usr/src/LiS/include
-		${DESTDIR}${oldincludedir}/strinet
-		${DESTDIR}/usr/include/strinet
-		${DESTDIR}/usr/local/include/strinet
-		${DESTDIR}/usr/src/strinet/src/include
-		${DESTDIR}${oldincludedir}/strxnet
-		${DESTDIR}/usr/include/strxnet
-		${DESTDIR}/usr/local/include/strxnet
-		${DESTDIR}/usr/src/strxnet/src/include
-		${DESTDIR}${oldincludedir}/streams
-		${DESTDIR}/usr/include/streams
-		${DESTDIR}/usr/local/include/streams
-		${DESTDIR}/usr/src/streams/include
-		${DESTDIR}${oldincludedir}/LiS
-		${DESTDIR}/usr/include/LiS
-		${DESTDIR}/usr/local/include/LiS
-		${DESTDIR}/usr/src/LiS/include\""
+	if test :"${inet_cv_includes:-no}" = :no ; then
+	    # INET header files are normally found in the strinet package now.
+	    # They used to be part of the INET add-on package and even older
+	    # versions are part of the LiS release packages.
+	    case "$streams_cv_package" in
+		(LiS)
+		    eval "inet_search_path=\"
+			${DESTDIR}${includedir}/strinet
+			${DESTDIR}${rootdir}${oldincludedir}/strinet
+			${DESTDIR}${rootdir}/usr/include/strinet
+			${DESTDIR}${rootdir}/usr/local/include/strinet
+			${DESTDIR}${rootdir}/usr/src/strinet/src/include
+			${DESTDIR}${includedir}/strxnet
+			${DESTDIR}${rootdir}${oldincludedir}/strxnet
+			${DESTDIR}${rootdir}/usr/include/strxnet
+			${DESTDIR}${rootdir}/usr/local/include/strxnet
+			${DESTDIR}${rootdir}/usr/src/strxnet/src/include
+			${DESTDIR}${includedir}/LiS
+			${DESTDIR}${rootdir}${oldincludedir}/LiS
+			${DESTDIR}${rootdir}/usr/include/LiS
+			${DESTDIR}${rootdir}/usr/local/include/LiS
+			${DESTDIR}${rootdir}/usr/src/LiS/include
+			${DESTDIR}${oldincludedir}/strinet
+			${DESTDIR}/usr/include/strinet
+			${DESTDIR}/usr/local/include/strinet
+			${DESTDIR}/usr/src/strinet/src/include
+			${DESTDIR}${oldincludedir}/strxnet
+			${DESTDIR}/usr/include/strxnet
+			${DESTDIR}/usr/local/include/strxnet
+			${DESTDIR}/usr/src/strxnet/src/include
+			${DESTDIR}${oldincludedir}/LiS
+			${DESTDIR}/usr/include/LiS
+			${DESTDIR}/usr/local/include/LiS
+			${DESTDIR}/usr/src/LiS/include\""
+		    ;;
+		(LfS)
+		    eval "inet_search_path=\"
+			${DESTDIR}${includedir}/strinet
+			${DESTDIR}${rootdir}${oldincludedir}/strinet
+			${DESTDIR}${rootdir}/usr/include/strinet
+			${DESTDIR}${rootdir}/usr/local/include/strinet
+			${DESTDIR}${rootdir}/usr/src/strinet/src/include
+			${DESTDIR}${includedir}/strxnet
+			${DESTDIR}${rootdir}${oldincludedir}/strxnet
+			${DESTDIR}${rootdir}/usr/include/strxnet
+			${DESTDIR}${rootdir}/usr/local/include/strxnet
+			${DESTDIR}${rootdir}/usr/src/strxnet/src/include
+			${DESTDIR}${includedir}/streams
+			${DESTDIR}${rootdir}${oldincludedir}/streams
+			${DESTDIR}${rootdir}/usr/include/streams
+			${DESTDIR}${rootdir}/usr/local/include/streams
+			${DESTDIR}${rootdir}/usr/src/streams/include
+			${DESTDIR}${oldincludedir}/strinet
+			${DESTDIR}/usr/include/strinet
+			${DESTDIR}/usr/local/include/strinet
+			${DESTDIR}/usr/src/strinet/src/include
+			${DESTDIR}${oldincludedir}/strxnet
+			${DESTDIR}/usr/include/strxnet
+			${DESTDIR}/usr/local/include/strxnet
+			${DESTDIR}/usr/src/strxnet/src/include
+			${DESTDIR}${oldincludedir}/streams
+			${DESTDIR}/usr/include/streams
+			${DESTDIR}/usr/local/include/streams
+			${DESTDIR}/usr/src/streams/include\""
+		    ;;
+	    esac
 	    inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	    inet_cv_includes=
 	    AC_MSG_RESULT([(searching)])
@@ -230,6 +293,9 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for inet include directory... $inet_dir])
 		    if test -r "$inet_dir/$inet_what" ; then
 			inet_cv_includes="$inet_dir"
+			inet_cv_ldadd= # '-linet'
+			inet_cv_modmap=
+			inet_cv_symver=
 			inet_cv_manpath=
 			AC_MSG_RESULT([yes])
 			break
@@ -248,8 +314,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$inet_cv_ldadd" ; then
-	    inet_cv_ldadd='-linet'
-	    inet_cv_ldadd=
+	    inet_cv_ldadd= # '-linet'
 	fi
     ])
     AC_CACHE_CHECK([for inet modmap],[inet_cv_modmap],[dnl
@@ -276,40 +341,20 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${inet_cv_includes:-no}" = :no ; then :
-	if test :"$with_inet" = :no ; then
-	    AC_MSG_ERROR([
-***
+    if test :"${inet_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
 *** Configure could not find the STREAMS INET include directories.  If
 *** you wish to use the STREAMS INET package, you will need to specify
 *** the location of the STREAMS INET (strinet) include directories with
-*** the --with-inet=@<:@DIRECTORY@:>@ option to ./configure and try
-*** again.
+*** the --with-inet=@<:@DIRECTORY@<:@ DIRECOTYR@:>@@:>@ option to
+*** ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS INET package?  The
 *** STREAMS strinet package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
 *** named something like "strinet-0.9.2.3.tar.gz".
 *** ])
-	fi
-    fi
-    AC_MSG_CHECKING([for inet added configure arguments])
-dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
-dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
-dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
-dnl so we use defines.
-    if test -z "$with_inet" ; then
-	if test :"${inet_cv_includes:-no}" = :no ; then :
-	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_inet --with-inet\""
-	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-inet'"
-	    AC_MSG_RESULT([--with-inet])
-	else
-	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_inet --without-inet\""
-	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-inet'"
-	    AC_MSG_RESULT([--without-inet])
-	fi
-    else
-	AC_MSG_RESULT([--with-inet="$with_inet"])
     fi
     AC_CACHE_CHECK([for inet version], [inet_cv_version], [dnl
 	inet_what="sys/strinet/version.h"
@@ -322,8 +367,9 @@ dnl so we use defines.
 		    break
 		fi
 		# new place for version
-		if test -n $linux_cv_k_release ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+		if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
 		    if test -f "$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what" ; then
 			inet_file="$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what"
 			break
@@ -335,26 +381,119 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    inet_cv_version=`grep '#define.*\<STRINET_VERSION\>' $inet_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
+    inet_what="sys/config.h"
+    AC_CACHE_CHECK([for inet $inet_what], [inet_cv_config], [dnl
+	inet_cv_config=
+	if test -n "$inet_cv_includes" ; then
+	    for inet_dir in $inet_cv_includes ; do
+		# old place for config
+		if test -f "$inet_dir/$inet_what" ; then
+		    inet_cv_config="$inet_dir/$inet-what"
+		    break
+		fi
+		# new place for config
+		if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+		    if test -f "$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what" ; then
+			inet_cv_config="$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what"
+			break
+		    fi
+		fi
+	    done
+	fi
+    ])
+    inet_what="sys/strinet/modversions.h"
+    AC_CACHE_CHECK([for inet $inet_what], [inet_cv_modversions], [dnl
+	inet_cv_modversions=
+dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
+dnl	assume normal objects
+	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
+	    if test -n "$inet_cv_includes" ; then
+		for inet_dir in $inet_cv_includes ; do
+		    # old place for modversions
+		    if test -f "$inet_dir/$inet_what" ; then
+			inet_cv_modversions="$inet_dir/$inet_what"
+			break
+		    fi
+		    # new place for modversions
+		    if test -n "$linux_cv_k_release" ; then
+dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
+dnl			then this will just not be set
+			if test "$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what" ; then
+			    inet_cv_includes="$inet_dir/$linux_cv_k_release/$target_cpu $inet_cv_includes"
+			    inet_cv_modversions="$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	fi
+    ])
+    AC_MSG_CHECKING([for inet added configure arguments])
+dnl Older rpms (particularly those used by SuSE) are too stupid to handle --with
+dnl and --without rpmopt syntax, so convert to the equivalent --define syntax.
+dnl Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly, so we
+dnl use defines.
+    if test -z "$with_inet" ; then
+	if test :"${inet_cv_includes:-no}" = :no ; then
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_inet --with-inet\""
+	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-inet'"
+	    AC_MSG_RESULT([--with-inet])
+	else
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_inet --without-inet\""
+	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-inet'"
+	    AC_MSG_RESULT([--without-inet])
+	fi
+    else
+	AC_MSG_RESULT([--with-inet="$with_inet"])
+    fi
 ])# _INET_CHECK_HEADERS
+# =============================================================================
+
+# =============================================================================
+# _INET_KERNEL
+# -----------------------------------------------------------------------------
+AC_DEFUN([_INET_KERNEL], [dnl
+])# _INET_KERNEL
+# =============================================================================
+
+# =============================================================================
+# _INET_OUTPUT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_INET_OUTPUT], [dnl
+    _INET_DEFINES
+])# _INET_OUTPUT
 # =============================================================================
 
 # =============================================================================
 # _INET_DEFINES
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_DEFINES], [dnl
-    for inet_include in $inet_cv_includes ; do
-	INET_CPPFLAGS="${INET_CPPFLAGS}${INET_CPPFLAGS:+ }-I${inet_include}"
-    done
+    if test :"${inet_cv_modversions:-no}" != :no ; then
+	AC_DEFINE_UNQUOTED([HAVE_SYS_INET_MODVERSIONS_H], [1], [Define when
+	    the STREAMS INET release supports module versions such as
+	    the OpenSS7 autoconf releases.])
+    fi
+    INET_CPPFLAGS="${INET_CPPFLAGS:+ ${INET_CPPFLAGS}}"
     INET_LDADD="$inet_cv_ldadd"
     INET_MODMAP="$inet_cv_modmap"
     INET_SYMVER="$inet_cv_symver"
     INET_MANPATH="$inet_cv_manpath"
     INET_VERSION="$inet_cv_version"
+    MODPOST_INPUT="${MODPOST_INPUTS}${INET_SYMVER:+${MODPOST_INPUTS:+ }${INET_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strinet for
 	that matter.
     ])
 ])# _INET_DEFINES
+# =============================================================================
+
+# =============================================================================
+# _INET_USER
+# -----------------------------------------------------------------------------
+AC_DEFUN([_INET_USER], [dnl
+])# _INET_USER
 # =============================================================================
 
 # =============================================================================

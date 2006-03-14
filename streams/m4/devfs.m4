@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/11 09:49:50 $
+# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/14 09:04:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 09:49:50 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 09:04:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,7 +78,7 @@ AC_DEFUN([_LINUX_DEVFS], [dnl
     ])
     AC_CACHE_CHECK([for devfs modprobe entries], [devfs_cv_modprobe], [dnl
 	devfs_cv_modprobe=no
-	if test ":$linux_cv_k_ko_modules" = :yes
+	if test :"$linux_cv_k_ko_modules" = :yes
 	then
 	    eval "devfs_where=\"${DESTDIR}${sysconfdir}/modprobe.devfs\""
 	else
@@ -107,19 +107,19 @@ AC_DEFUN([_LINUX_DEVFS], [dnl
     ])
     AC_CACHE_CHECK([for devfs build], [devfs_cv_build], [dnl
 	devfs_cv_build=yes
-	if test ":$devfs_cv_kernel_support" = :no
+	if test :"$devfs_cv_kernel_support" = :no
 	then
 	    devfs_cv_build=no
 	fi
-	if test ":$devfs_cv_modprobe" = :no
+	if test :"$devfs_cv_modprobe" = :no
 	then
 	    devfs_cv_build=no
 	fi
-	if test ":$devfs_cv_daemon_config" = :no
+	if test :"$devfs_cv_daemon_config" = :no
 	then
 	    devfs_cv_build=no
 	fi
-	if test ":$devfs_cv_daemon" = :no
+	if test :"$devfs_cv_daemon" = :no
 	then
 	    devfs_cv_build=no
 	fi

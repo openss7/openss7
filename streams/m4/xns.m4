@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/03/13 23:21:41 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/14 09:20:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,22 +48,48 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/13 23:21:41 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 09:20:47 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: xns.m4,v $
+# Revision 0.9.2.30  2006/03/14 09:20:47  brian
+# - typo
+#
+# Revision 0.9.2.29  2006/03/14 09:04:11  brian
+# - syntax consistency, advanced search
 #
 # =============================================================================
+
+# -----------------------------------------------------------------------------
+# This file provides some common macros for finding a STREAMS XNS
+# release and necessary include directories and other configuration for
+# compiling kernel modules to run with the STREAMS XNS package.
+# -----------------------------------------------------------------------------
+# Interesting enough, there is no need to have strxns loaded on the build
+# machine to compile modules.  Only the proper header files are required.
+# -----------------------------------------------------------------------------
 
 # =============================================================================
 # _XNS
 # -----------------------------------------------------------------------------
-# Check for the existence of XNS header files, particularly sys/npi.h.  NPI
-# headers files are required for building the NPI interface for SCTP.  Without
-# NPI header files, the NPI interface to SCTP will not be built.
+# Check for the existence of XNS header files, particularly sys/npi.h.
+# XNS headers files are required for building the NPI interface for XNS.
+# Without XNS header files, the NPI interface to XNS will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _XNS_OPTIONS
     _XNS_SETUP
+dnl
+dnl Skip kernel checks if not configuring for the kernel (i.e. no _LINUX_KERNEL)
+dnl as we do for netperf.
+dnl
+    m4_ifdef([_LINUX_KERNEL], [_XNS_KERNEL])
+    _XNS_USER
+    _XNS_OUTPUT
     AC_SUBST([XNS_CPPFLAGS])dnl
+    AC_SUBST([XNS_MODFLAGS])dnl
     AC_SUBST([XNS_LDADD])dnl
     AC_SUBST([XNS_MODMAP])dnl
     AC_SUBST([XNS_SYMVER])dnl
@@ -92,7 +118,15 @@ AC_DEFUN([_XNS_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_SETUP], [dnl
     _XNS_CHECK_HEADERS
-    _XNS_DEFINES
+    for xns_include in $xns_cv_includes ; do
+	XNS_CPPFLAGS="${XNS_CPPFLAGS}${XNS_CPPFLAGS:+ }-I${xns_include}"
+    done
+    if test :"${xns_cv_config:-no}" != :no ; then
+	XNS_CPPFLAGS="${XNS_CPPFLAGS}${XNS_CPPFLAGS:+ }-include ${xns_cv_config}"
+    fi
+    if test :"${xns_cv_modversions:=no}" != :no ; then
+	XNS_MODFLAGS="${XNS_MODFLAGS}${XNS_MODFLAGS:+ }-include ${xns_cv_modversions}"
+    fi
 ])# _XNS_SETUP
 # =============================================================================
 
@@ -100,12 +134,11 @@ AC_DEFUN([_XNS_SETUP], [dnl
 # _XNS_CHECK_HEADERS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
-    # Test for the existence of Linux STREAMS XNS header files.  The package
-    # normally requires either Linux STREAMS or Linux Fast-STREAMS XNS header
-    # files (or both) to compile.
+    # Test for the existence of Linux Fast-STREAMS XNS header files.  The
+    # package normally requires XNS header files to compile.
     AC_CACHE_CHECK([for xns include directory], [xns_cv_includes], [dnl
 	xns_what="sys/npi.h"
-	if test ":${with_xns:-no}" != :no -a :"${with_xns:-no}" != :yes ;  then
+	if test :"${with_xns:-no}" != :no -a :"${with_xns:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
 	    AC_MSG_RESULT([(searching $with_xns)])
 	    for xns_dir in $with_xns ; do
@@ -119,7 +152,7 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		    AC_MSG_RESULT([no])
 		fi
 	    done
-	    if test ":${xns_cv_includes:-no}" = :no ; then
+	    if test :"${xns_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
 *** 
 *** You have specified include directories using:
@@ -131,9 +164,11 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 *** directories.
 *** ])
 	    fi
+	    AC_MSG_CHECKING([for xns include directory])
 	fi
-	if test ":${xns_cv_includes:-no}" = :no ; then
-	    # The next place to look is under the master source and build directory, if any.
+	if test :"${xns_cv_includes:-no}" = :no ; then
+	    # The next place to look is under the master source and build
+	    # directory, if any.
 	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
 	    xns_search_path="
 		${master_srcdir:+$master_srcdir/strxns/src/include}
@@ -150,11 +185,12 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
 	    AC_MSG_CHECKING([for xns include directory])
 	fi
-	if test ":${xns_cv_includes:-no}" = :no ; then
+	if test :"${xns_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    xns_here=`pwd`
@@ -171,9 +207,9 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
 		    if test -r "$xns_dir/$xns_what" ; then
 			xns_cv_includes="$xns_dir $xns_bld"
-			xns_cv_ldadd=
-			xns_cv_modmap=
-			xns_cv_symver=
+			xns_cv_ldadd= # `echo "$xns_bld/../../libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xns_cv_modmap= # `echo "$xns_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xns_cv_symver= # `echo "$xns_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
@@ -183,21 +219,23 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    done
 	    AC_MSG_CHECKING([for xns include directory])
 	fi
-	if test ":${xns_cv_includes:-no}" = :no ; then
+	if test :"${xns_cv_includes:-no}" = :no ; then
+	    # XNS header files are normaly found in the strxns package now.
+	    # They used to be part of the INET add-on package and even older
+	    # versions are part of the LiS release packages.
 	    case "$streams_cv_package" in
-		LiS)
-		    # Some of our oldest RPM releases of LiS put the xns header files into their own
-		    # subdirectory (/usr/include/xti).  The old version places them in with the LiS
-		    # header files.  The current version has them separate as part of the strxns
-		    # package.  This tests whether we need additional -I/usr/include/xti in the
-		    # streams include line.  This check can be dropped when the older RPM releases
-		    # of LiS fall out of favor.
+		(LiS)
 		    eval "xns_search_path=\"
 			${DESTDIR}${includedir}/strxns
 			${DESTDIR}${rootdir}${oldincludedir}/strxns
 			${DESTDIR}${rootdir}/usr/include/strxns
 			${DESTDIR}${rootdir}/usr/local/include/strxns
 			${DESTDIR}${rootdir}/usr/src/strxns/src/include
+			${DESTDIR}${includedir}/strinet
+			${DESTDIR}${rootdir}${oldincludedir}/strinet
+			${DESTDIR}${rootdir}/usr/include/strinet
+			${DESTDIR}${rootdir}/usr/local/include/strinet
+			${DESTDIR}${rootdir}/usr/src/strinet/src/include
 			${DESTDIR}${includedir}/strxnet
 			${DESTDIR}${rootdir}${oldincludedir}/strxnet
 			${DESTDIR}${rootdir}/usr/include/strxnet
@@ -221,6 +259,10 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/include/strxns
 			${DESTDIR}/usr/local/include/strxns
 			${DESTDIR}/usr/src/strxns/src/include
+			${DESTDIR}${oldincludedir}/strinet
+			${DESTDIR}/usr/include/strinet
+			${DESTDIR}/usr/local/include/strinet
+			${DESTDIR}/usr/src/strinet/src/include
 			${DESTDIR}${oldincludedir}/strxnet
 			${DESTDIR}/usr/include/strxnet
 			${DESTDIR}/usr/local/include/strxnet
@@ -237,14 +279,18 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/local/include/LiS
 			${DESTDIR}/usr/src/LiS/include\""
 		    ;;
-		LfS)
-		    # XNS header files used to be part of the LfS package.
+		(LfS)
 		    eval "xns_search_path=\"
 			${DESTDIR}${includedir}/strxns
 			${DESTDIR}${rootdir}${oldincludedir}/strxns
 			${DESTDIR}${rootdir}/usr/include/strxns
 			${DESTDIR}${rootdir}/usr/local/include/strxns
 			${DESTDIR}${rootdir}/usr/src/strxns/src/include
+			${DESTDIR}${includedir}/strinet
+			${DESTDIR}${rootdir}${oldincludedir}/strinet
+			${DESTDIR}${rootdir}/usr/include/strinet
+			${DESTDIR}${rootdir}/usr/local/include/strinet
+			${DESTDIR}${rootdir}/usr/src/strinet/src/include
 			${DESTDIR}${includedir}/strxnet
 			${DESTDIR}${rootdir}${oldincludedir}/strxnet
 			${DESTDIR}${rootdir}/usr/include/strxnet
@@ -259,6 +305,10 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/include/strxns
 			${DESTDIR}/usr/local/include/strxns
 			${DESTDIR}/usr/src/strxns/src/include
+			${DESTDIR}${oldincludedir}/strinet
+			${DESTDIR}/usr/include/strinet
+			${DESTDIR}/usr/local/include/strinet
+			${DESTDIR}/usr/src/strinet/src/include
 			${DESTDIR}${oldincludedir}/strxnet
 			${DESTDIR}/usr/include/strxnet
 			${DESTDIR}/usr/local/include/strxnet
@@ -270,13 +320,14 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		    ;;
 	    esac
 	    xns_search_path=`echo "$xns_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    xns_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for xns_dir in $xns_search_path ; do
 		if test -d "$xns_dir" ; then
 		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
 		    if test -r "$xns_dir/$xns_what" ; then
 			xns_cv_includes="$xns_dir"
-			xns_cv_ldadd=
+			xns_cv_ldadd= # '-lxns'
 			xns_cv_modmap=
 			xns_cv_symver=
 			xns_cv_manpath=
@@ -297,8 +348,7 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$xns_cv_ldadd" ; then
-	    xns_cv_ldadd='-lxns'
-	    xns_cv_ldadd=
+	    xns_cv_ldadd= # '-lxns'
 	fi
     ])
     AC_CACHE_CHECK([for xns modmap],[xns_cv_modmap],[dnl
@@ -326,38 +376,19 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	done
     ])
     if test :"${xns_cv_includes:-no}" = :no ; then :
-	if test :"$with_xns" = :no ; then
-	    AC_MSG_ERROR([
+	AC_MSG_ERROR([
 *** 
 *** Configure could not find the STREAMS XNS include directories.  If
-*** you wish to use the STREAMS XNS package you will need to specify the
-*** location of the STREAMS XNS (strxns) include directories with the
-*** --with-xns=@<:@DIRECTORY@:>@ option to ./configure and try again.
+*** you wish to use the STREAMS XNS package you will need to specify
+*** the location of the STREAMS XNS (strxns) include directories with
+*** the --with-xns=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
+*** ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS XNS package?  The
 *** STREAMS strxns package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
 *** named something like "strxns-0.9.2.3.tar.gz".
 *** ])
-	fi
-    fi
-    AC_MSG_CHECKING([for xns added configure arguments])
-dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
-dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
-dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
-dnl so we use defines.
-    if test -z "$with_xns" ; then
-	if test :"${xns_cv_includes:-no}" = :no ; then :
-	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_xns --with-xns\""
-	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-xns'"
-	    AC_MSG_RESULT([--with-xns])
-	else
-	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_xns --without-xns\""
-	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-xns'"
-	    AC_MSG_RESULT([--without-xns])
-	fi
-    else
-	AC_MSG_RESULT([--with-xns="$with_xns"])
     fi
     AC_CACHE_CHECK([for xns version], [xns_cv_version], [dnl
 	xns_what="sys/strxns/version.h"
@@ -370,8 +401,9 @@ dnl so we use defines.
 		    break
 		fi
 		# new place for version
-		if test -n $linux_cv_k_release ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+		if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
 		    if test -f "$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what" ; then
 			xns_file="$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what"
 			break
@@ -383,26 +415,119 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    xns_cv_version=`grep '#define.*\<STRXNS_VERSION\>' $xns_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
+    xns_what="sys/config.h"
+    AC_CACHE_CHECK([for xns $xns_what], [xns_cv_config], [dnl
+	xns_cv_config=
+	if test -n "$xns_cv_includes" ; then
+	    for xns_dir in $xns_cv_includes ; do
+		# old place for config
+		if test -f "$xns_dir/$xns_what" ; then
+		    xns_cv_config="$xns_dir/$xns-what"
+		    break
+		fi
+		# new place for config
+		if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+		    if test -f "$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what" ; then
+			xns_cv_config="$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what"
+			break
+		    fi
+		fi
+	    done
+	fi
+    ])
+    xns_what="sys/strxns/modversions.h"
+    AC_CACHE_CHECK([for xns $xns_what], [xns_cv_config], [dnl
+	xns_cv_modversions=
+dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
+dnl	assume normal objects
+	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
+	    if test -n "$xns_cv_includes" ; then
+		for xns_dir in $xns_cv_includes ; do
+		    # old place for modversions
+		    if test -f "$xns_dir/$xns_what" ; then
+			xns_cv_modversions="$xns_dir/$xns_what"
+			break
+		    fi
+		    # new place for modversions
+		    if test -n "$linux_cv_k_release" ; then
+dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
+dnl			then this will just not be set
+			if test "$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what" ; then
+			    xns_cv_includes="$xns_dir/$linux_cv_k_release/$target_cpu $xns_cv_includes"
+			    xns_cv_modversions="$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	fi
+    ])
+    AC_MSG_CHECKING([for xns added configure arguments])
+dnl Older rpms (particularly those used by SuSE) are too stupid to handle --with
+dnl and --without rpmopt syntax, so convert to the equivalent --define syntax.
+dnl Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly, so we
+dnl use defines.
+    if test -z "$with_xns" ; then
+	if test :"${xns_cv_includes:-no}" = :no ; then
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_xns --with-xns\""
+	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-xns'"
+	    AC_MSG_RESULT([--with-xns])
+	else
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_xns --without-xns\""
+	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-xns'"
+	    AC_MSG_RESULT([--without-xns])
+	fi
+    else
+	AC_MSG_RESULT([--with-xns="$with_xns"])
+    fi
 ])# _XNS_CHECK_HEADERS
+# =============================================================================
+
+# =============================================================================
+# _XNS_KERNEL
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNS_KERNEL], [dnl
+])# _XNS_KERNEL
+# =============================================================================
+
+# =============================================================================
+# _XNS_OUTPUT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNS_OUTPUT], [dnl
+    _XNS_DEFINES
+])# _XNS_OUTPUT
 # =============================================================================
 
 # =============================================================================
 # _XNS_DEFINES
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_DEFINES], [dnl
-    for xns_include in $xns_cv_includes ; do
-	XNS_CPPFLAGS="${XNS_CPPFLAGS}${XNS_CPPFLAGS:+ }-I${xns_include}"
-    done
+    if test :"${xns_cv_modversions:-no}" != :no ; then
+	AC_DEFINE_UNQUOTED([HAVE_SYS_XNS_MODVERSIONS_H], [1], [Define when
+	    the STREAMS XNS release supports module versions such as
+	    the OpenSS7 autoconf releases.])
+    fi
+    XNS_CPPFLAGS="${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}"
     XNS_LDADD="$xns_cv_ldadd"
     XNS_MODMAP="$xns_cv_modmap"
     XNS_SYMVER="$xns_cv_symver"
     XNS_MANPATH="$xns_cv_manpath"
     XNS_VERSION="$xns_cv_version"
+    MODPOST_INPUT="${MODPOST_INPUTS}${XNS_SYMVER:+${MODPOST_INPUTS:+ }${XNS_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strxns for
 	that matter.
     ])
 ])# _XNS_DEFINES
+# =============================================================================
+
+# =============================================================================
+# _XNS_USER
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNS_USER], [dnl
+])# _XNS_USER
 # =============================================================================
 
 # =============================================================================

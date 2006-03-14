@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/11 09:49:50 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/14 09:04:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 09:49:50 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 09:04:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -153,7 +153,7 @@ AC_DEFUN([_KSYMS_OUTPUT_MODSYMS_CONFIG], [dnl
     AC_CACHE_CHECK([for modsyms command], [MODSYMS], [MODSYMS="${CONFIG_SHELL:-$SHELL} $MODSYMS_SCRIPT"])
     AC_CACHE_CHECK([for modsyms file], [MODSYMS_SYMVER], [MODSYMS_SYMVER="Module.symvers"])
     AC_CACHE_CHECK([for modsyms system map], [MODSYMS_SYSMAP], [dnl
-	if test ":${kmodver:-no}" != :no
+	if test :"${kmodver:-no}" != :no
 	then
 	    MODSYMS_SYSMAP="$kmodver"
 	else

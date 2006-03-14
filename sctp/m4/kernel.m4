@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2006/03/11 09:49:50 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2006/03/14 12:23:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 09:49:50 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 12:23:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -521,7 +521,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		linux_cv_k_base="$kversion"
 	esac
 	kbase="$linux_cv_k_base"
-dnl 	if test ":$linux_cv_k_boot" != :no
+dnl 	if test :"$linux_cv_k_boot" != :no
 dnl 	then
 dnl 	    kboot="${linux_cv_k_boot:-UP}"
 dnl 	else
@@ -916,11 +916,11 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 		AC_MSG_RESULT([no])
 	    done
 	fi
-	if test ":${linux_cv_k_modver:-no}" = :no
+	if test :"${linux_cv_k_modver:-no}" = :no
 	then
-	    if test ":${linux_cv_k_ko_modules:-no}" != :no
+	    if test :"${linux_cv_k_ko_modules:-no}" != :no
 	    then
-		if test ":${linux_cv_k_versions}" != :no -a ":${linux_cv_k_modversions}" != :no
+		if test :"${linux_cv_k_versions}" != :no -a ":${linux_cv_k_modversions}" != :no
 		then
 		    AC_MSG_WARN([
 *** 
@@ -936,7 +936,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 		fi
 	    fi
 	else
-	    if test ":$linux_cv_k_running" != :yes
+	    if test :"$linux_cv_k_running" != :yes
 	    then
 		case "$linux_cv_k_modver" in
 		    (*/usr/src/kernels/*)
@@ -1211,7 +1211,7 @@ dnl
 				fi
 			    fi
 			done
-			if test ":${linux_cv_k_compiler:+set}" = :set
+			if test :"${linux_cv_k_compiler:+set}" = :set
 			then
 			    break
 			fi
@@ -1402,7 +1402,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 	then
 	    linux_cv_k_config="$with_k_config"
 	else
-	    if test ":$linux_cv_k_running" = :yes
+	    if test :"$linux_cv_k_running" = :yes
 	    then
 		eval "k_config_search_path=\"
 		    ${ksrcdir}/configs/kernel-${knumber}-${karch}${kboot:+-}${kboot}.config
@@ -1528,7 +1528,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 		;;
 	esac
     ])
-    if test ":${linux_cv_k_version:-unknown}" != :unknown
+    if test :"${linux_cv_k_version:-unknown}" != :unknown
     then
 	krelease="$linux_cv_k_version"
     else
@@ -1752,7 +1752,7 @@ dnl
 dnl	Non-kbuild (2.4 kernel) always needs include directories to be in the
 dnl	build directory.
 dnl
-	if test ":$linux_cv_k_ko_modules" != :yes ; then
+	if test :"$linux_cv_k_ko_modules" != :yes ; then
 	    eval "linux_src=\"$ksrcdir\""
 	    eval "linux_bld=\"$kbuilddir\""
 	    if test "$linux_src" != "$linux_bld" ; then
@@ -1772,7 +1772,7 @@ dnl	the flags from the kernel-source package but the modversions.h file is
 dnl	in the kernel-headers package.  So, we need to change source directory
 dnl	to build directory unless they are the same.
 dnl
-	if test ":$linux_cv_k_ko_modules" != :yes ; then
+	if test :"$linux_cv_k_ko_modules" != :yes ; then
 	    eval "linux_src=\"$ksrcdir\""
 	    eval "linux_bld=\"$kbuilddir\""
 	    if test "$linux_src" != "$linux_bld" ; then
