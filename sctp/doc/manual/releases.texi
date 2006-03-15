@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.16 2006/03/08 12:00:08 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.17 2006/03/15 12:21:43 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/08 12:00:08 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/15 12:21:43 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -221,6 +221,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::			Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-0.2.22::		Release 22
 * Release @value{PACKAGE}-0.2.21::		Release 21
 * Release @value{PACKAGE}-0.2.20-1::		Release 20
 @end menu
@@ -233,8 +234,21 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is primarily a bug fixes release and corrections resulting from testing.  This is a major bug
-fix release.  The previous release was largely untested.
+Corrections for and testing of 64-bit clean compile and test runs on x86_64
+architecture.  Some bug corrections resulting from gcc 4.0.2 compiler
+warnings.
+
+Corrected build flags for Gentoo and 2.6.15 kernels as reported on mailing
+list.
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.2.22
+@subsection Release @value{PACKAGE}-0.2.22
+@cindex release @value{PACKAGE}-0.2.22
+
+This is primarily a bug fixes release and corrections resulting from testing.
+This is a major bug fix release.  The previous release was largely untested.
 
 @c ----------------------------------------------------------------------------
 
@@ -242,12 +256,14 @@ fix release.  The previous release was largely untested.
 @subsection Release @value{PACKAGE}-0.2.21
 @cindex release @value{PACKAGE}-0.2.21
 
-With this release version numbers were changed to reflect an upstream version only to be consistent
-with other OpenSS7 package releases.  All @cite{RPM} release numbers will be
-@samp{-1$(PACKAGE_RPMEXTRA)} and all @cite{Debian} release numbers will be @samp{_0}.  If you wish
-to apply patches and relelease the package, please bump up the release number and apply a suitable
-release suffix for your organization.  We leave @cite{Debian} release number @samp{_1} reserved for
-your use, so you can still bundle the source in the @file{.dsc} file.
+With this release version numbers were changed to reflect an upstream version
+only to be consistent with other OpenSS7 package releases.  All @cite{RPM}
+release numbers will be @samp{-1$(PACKAGE_RPMEXTRA)} and all @cite{Debian}
+release numbers will be @samp{_0}.  If you wish to apply patches and relelease
+the package, please bump up the release number and apply a suitable release
+suffix for your organization.  We leave @cite{Debian} release number @samp{_1}
+reserved for your use, so you can still bundle the source in the @file{.dsc}
+file.
 
 Improved build process.
 
@@ -261,9 +277,10 @@ Not publicly released.
 
 Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
 
-The @cite{OpenSS7 Linux Native SCTP} existed before as a kernel patch for the Linux kernel.  This is
-an @command{autoconf/rpm} packaging release of @cite{Linux Native SCTP} that builds and installs
-separate from the Linux kernel tree.
+The @cite{OpenSS7 Linux Native SCTP} existed before as a kernel patch for the
+Linux kernel.  This is an @command{autoconf/rpm} packaging release of
+@cite{Linux Native SCTP} that builds and installs separate from the Linux
+kernel tree.
 
 Not publicly released.
 
