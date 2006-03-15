@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.18 $) $Date: 2006/03/11 12:57:58 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.19 $) $Date: 2006/03/15 07:18:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 12:57:58 $ by $Author: brian $
+# Last Modified $Date: 2006/03/15 07:18:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,7 +61,7 @@ AC_INIT([netperf],[2.3],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
-AC_CONFIG_SRCDIR([hist.h])
+AC_CONFIG_SRCDIR([netperf.lsm.in])
 AC_CONFIG_HEADER([config.h])
 
 AC_CONFIG_AUX_DIR([scripts])

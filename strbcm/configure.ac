@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/11 12:58:01 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/15 07:18:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 12:58:01 $ by $Author: brian $
+# Last Modified $Date: 2006/03/15 07:18:13 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.6  2006/03/15 07:18:13  brian
+# - change unique source file to .lsm.in file
+#
 # Revision 0.9.2.5  2006/03/11 12:58:01  brian
 # - allow disable dependencies in maintainer mode
 #
@@ -73,13 +76,13 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.5 2006/03/11 12:58:01 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.6 2006/03/15 07:18:13 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strbcm],[0.9.2],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
-AC_CONFIG_SRCDIR([src/drivers/testdrv.c])
+AC_CONFIG_SRCDIR([strbcm.lsm.in])
 AC_CONFIG_HEADERS([config.h src/include/sys/strbcm/config.h])
 
 AC_CONFIG_AUX_DIR([scripts])

@@ -1,3 +1,10 @@
+2006-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac (AC_CONFIG_SRCDIR): changed unique file to openss7.lsm.in
+	* acinclude.m4: check for presense of source subdirectories
+	* am/info.am: build and distribute text info documentation
+	* am/info.am: can't distribute pdf and txt images
+
 2006-03-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/devfs.m4: minor syntax consistency

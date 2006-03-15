@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/11 12:58:03 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/15 07:18:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,20 +48,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 12:58:03 $ by $Author: brian $
+# Last Modified $Date: 2006/03/15 07:18:15 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.44 2006/03/11 12:58:03 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.45 2006/03/15 07:18:15 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([streams],[0.7a],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
-AC_CONFIG_SRCDIR([src/modules/sth.c])
+AC_CONFIG_SRCDIR([streams.lsm.in])
 AC_CONFIG_HEADERS([config.h include/sys/streams/config.h])
 
 AC_CONFIG_AUX_DIR([scripts])

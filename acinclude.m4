@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/03/14 21:09:46 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/03/15 07:22:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/14 21:09:46 $ by $Author: brian $
+# Last Modified $Date: 2006/03/15 07:22:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,7 +56,7 @@ m4_include([m4/dist.m4])
 m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
 m4_include([m4/devfs.m4])
-m4_include([m4/genksyms.m4])
+dnl m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
@@ -165,66 +165,105 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 			       [do not include SCTP in master pack @<:@detected@:>@]),
 		[with_SCTP="$withval"],
 		[with_SCTP="$with_ALL"])
+    if test ! -d "$srcdir/sctp" ; then
+	with_SCTP='no'
+    fi
     AC_ARG_WITH([IPERF],
 		AS_HELP_STRING([--without-IPERF],
 			       [do not include IPERF in master pack @<:@detected@:>@]),
 		[with_IPERF="$withval"],
 		[with_IPERF="$with_ALL"])
+    if test ! -d "$srcdir/iperf" ; then
+	with_IPERF='no'
+    fi
     AC_ARG_WITH([LIS],
 		AS_HELP_STRING([--with-LIS],
 			       [include LIS in master pack @<:@detected@:>@]),
 		[with_LIS="$withval"],
 		[with_LIS="$with_ALL"])
+    if test ! -d "$srcdir/LiS" ; then
+	with_LIS='no'
+    fi
     AC_ARG_WITH([STREAMS],
 		AS_HELP_STRING([--without-STREAMS],
 			       [do not include STREAMS in master pack @<:@included@:>@]),
 		[with_STREAMS="$withval"],
 		[with_STREAMS='yes'])
+    if test ! -d "$srcdir/streams" ; then
+	with_STREAMS='no'
+    fi
     AC_ARG_WITH([STRCOMPAT],
 		AS_HELP_STRING([--without-STRCOMPAT],
 			       [do not include STRCOMPAT in master pack @<:@included@:>@]),
 		[with_STRCOMPAT="$withval"],
 		[with_STRCOMPAT='yes'])
+    if test ! -d "$srcdir/strcompat" ; then
+	with_STRCOMPAT='no'
+    fi
     AC_ARG_WITH([STRUTIL],
 		AS_HELP_STRING([--with-STRUTIL],
 			       [include STRUTIL in master pack @<:@detected@:>@]),
 		[with_STRUTIL="$withval"],
 		[with_STRUTIL='no'])
+    if test ! -d "$srcdir/strutil" ; then
+	with_STRUTIL='no'
+    fi
     AC_ARG_WITH([STRXNS],
 		AS_HELP_STRING([--without-STRXNS],
 			       [do not include STRXNS in master pack @<:@included@:>@]),
 		[with_STRXNS="$withval"],
 		[with_STRXNS='yes'])
+    if test ! -d "$srcdir/strxns" ; then
+	with_STRXNS='no'
+    fi
     AC_ARG_WITH([STRXNET],
 		AS_HELP_STRING([--without-STRXNET],
 			       [do not include STRXNET in master pack @<:@included@:>@]),
 		[with_STRXNET="$withval"],
 		[with_STRXNET='yes'])
+    if test ! -d "$srcdir/strxnet" ; then
+	with_STRXNET='no'
+    fi
     AC_ARG_WITH([STRINET],
 		AS_HELP_STRING([--without-STRINET],
 			       [do not include STRINET in master pack @<:@included@:>@]),
 		[with_STRINET="$withval"],
 		[with_STRINET='yes'])
+    if test ! -d "$srcdir/strinet" ; then
+	with_STRINET='no'
+    fi
     AC_ARG_WITH([STRSCTP],
 		AS_HELP_STRING([--without-STRSCTP],
 			       [do not include STRSCTP in master pack @<:@included@:>@]),
 		[with_STRSCTP="$withval"],
 		[with_STRSCTP='yes'])
+    if test ! -d "$srcdir/strsctp" ; then
+	with_STRSCTP='no'
+    fi
     AC_ARG_WITH([NETPERF],
 		AS_HELP_STRING([--without-NETPERF],
 			       [do not include NETPERF in master pack @<:@included@:>@]),
 		[with_NETPERF="$withval"],
 		[with_NETPERF='yes'])
+    if test ! -d "$srcdir/netperf" ; then
+	with_NETPERF='no'
+    fi
     AC_ARG_WITH([STACKS],
 		AS_HELP_STRING([--without-STACKS],
 			       [do not include STACKS in master pack @<:@included@:>@]),
 		[with_STACKS="$withval"],
 		[with_STACKS='yes'])
+    if test ! -d "$srcdir/stacks" ; then
+	with_STACKS='no'
+    fi
     AC_ARG_WITH([STRBCM],
 		AS_HELP_STRING([--with-STRBCM],
 			       [include STRBCM in master pack @<:@detected@:>@]),
 		[with_STRBCM="$withval"],
 		[with_STRBCM="$with_ALL"])
+    if test ! -d "$srcdir/strbcm" ; then
+	with_STRBCM='no'
+    fi
 ])# _OS7_OPTIONS
 # =============================================================================
 
@@ -234,25 +273,39 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 AC_DEFUN([_OS7_SETUP], [dnl
     _LINUX_KERNEL
     _LINUX_DEVFS
-    _GENKSYMS
+dnl _GENKSYMS
     _OS7_CONFIG_KERNEL
-    _LINUX_STREAMS
-    if test ":${with_STRCOMPAT:-no}" != ":no" ; then
+    if test :"${with_LIS:-no}" = :no ; then
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lis --without-lis\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lis'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-lis"
+	with_lis='no'
+    fi
+    if test :"${with_STREAMS:-yes}" = :no ; then
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lfs --without-lfs\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lfs'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-lfs"
+	with_lfs='no'
+    fi
+    if test :"${with_LIS:-no}" != :no -o :"${with_STREAMS:-yes}" != :no ; then
+	_LINUX_STREAMS
+    fi
+    if test :"${with_STRCOMPAT:-yes}" != :no ; then
 	_STRCOMP
     fi
-    if test ":${with_STRXNS:-no}" != ":no" ; then
+    if test :"${with_STRXNS:-yes}" != :no ; then
 	_XNS
     fi
-    if test ":${with_STRXNET:-no}" != ":no" ; then
+    if test :"${with_STRXNET:-yes}" != :no ; then
 	_XTI
     fi
-    if test ":${with_STRINET:-no}" != ":no" ; then
+    if test :"${with_STRINET:-yes}" != :no ; then
 	_INET
     fi
-    if test ":${with_STRSCTP:-no}" != ":no" ; then
+    if test :"${with_STRSCTP:-yes}" != :no ; then
 	_SCTP
     fi
-    if test ":${with_STACKS:-no}" != ":no" ; then
+    if test :"${with_STACKS:-yes}" != :no ; then
 	_SS7
     fi
 ])# _OS7_SETUP

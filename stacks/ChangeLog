@@ -1,3 +1,10 @@
+2006-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac (AC_CONFIG_SRCDIR): change unique file to .lsm.in file
+	* doc/man/Makefile.am (MANS_UNUSED): added unused manpages for public
+	  release
+	* tests/local.at: set better defaults for stand-alone test suites
+
 2006-03-14  Brian Bidulock  <bidulock@openss7.org>
 	
 	* strss7.spec.in: added second rpmextra string

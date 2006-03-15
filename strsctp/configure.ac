@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/11 12:58:06 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/15 07:18:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,20 +48,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 12:58:06 $ by $Author: brian $
+# Last Modified $Date: 2006/03/15 07:18:17 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.16 2006/03/11 12:58:06 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.17 2006/03/15 07:18:17 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strsctp],[0.9.2],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
-AC_CONFIG_SRCDIR([src/drivers/sctp.c])
+AC_CONFIG_SRCDIR([strsctp.lsm.in])
 AC_CONFIG_HEADERS([config.h src/drivers/sctp_hooks.h])
 
 AC_CONFIG_AUX_DIR([scripts])

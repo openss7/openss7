@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/11 12:58:02 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/15 07:18:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,20 +48,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 12:58:02 $ by $Author: brian $
+# Last Modified $Date: 2006/03/15 07:18:14 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.4 2006/03/11 12:58:02 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.5 2006/03/15 07:18:14 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strcompat],[0.9.2],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
-AC_CONFIG_SRCDIR([src/kernel/aixcompat.c])
+AC_CONFIG_SRCDIR([strcompat.lsm.in])
 AC_CONFIG_HEADERS([config.h src/include/sys/strcompat/config.h])
 
 AC_CONFIG_AUX_DIR([scripts])

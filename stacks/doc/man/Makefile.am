@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/03/07 00:55:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/15 07:21:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/07 00:55:52 $ by $Author: brian $
+# Last Modified $Date: 2006/03/15 07:21:30 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.29  2006/03/15 07:21:30  brian
+# - add unused man pages for public release
+#
 # Revision 0.9.2.28  2006/03/07 00:55:52  brian
 # - package passes full documentation check
 #
@@ -3029,6 +3032,28 @@ MANS_UNUSED = \
 	man8/tua.8 \
 	man8/uaconfd.8 \
 	man8/voipconfd.8
+
+if PUBLIC_RELEASE
+## PUBLIC_RELEASE
+MANS_UNUSED += \
+	man4/ch_x400p.4 \
+	man4/mx_x400p.4 \
+	man4/sdl_x400p.4 \
+	man4/sdt_x400p.4 \
+	man4/sl_x100p.4 \
+	man4/sl_x400p.4 \
+	man8/test-q781-pipe.8 \
+	man8/test-q784.8 \
+	man8/test-x400p-cap2.8 \
+	man8/test-x400p-cap.8 \
+	man8/test-x400p-hsl.8 \
+	man8/test-x400p-perf.8 \
+	man8/test-x400p-sdl.8 \
+	man8/test-x400p-sdt2.8 \
+	man8/test-x400p-sdt.8 \
+	man8/test-x400p-sl.8
+## PUBLIC_RELEASE
+endif
 
 ## PKG_BUILD_INDEP
 endif

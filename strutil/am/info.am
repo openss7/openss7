@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/03/11 14:32:41 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/15 11:33:37 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,17 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/11 14:32:41 $ by $Author: brian $
+## Last Modified $Date: 2006/03/15 11:33:37 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: info.am,v $
+## Revision 0.9.2.44  2006/03/15 11:33:37  brian
+## - can't distribute pdf and txt images
+##
+## Revision 0.9.2.43  2006/03/15 07:17:22  brian
+## - build and distribute text texinfo documentation
+##
 ## Revision 0.9.2.42  2006/03/11 14:32:41  brian
 ## - trying to pass distcheck on texinfo files
 ##
@@ -218,6 +224,9 @@ else
 # to be rebuilt  we really only want to rebuild documentation in maintainer
 # mode
 ##
+.SECONDARY: $(IMG_JPGS) $(IMG_EPSS) $(IMG_PDFS) $(IMG_PNGS) $(IMG_TXTS)
+
+$(SGMLS)     : %.sgml : %.texi $(IMG_JPGS)
 $(DVIS)      : %.dvi  : %.texi $(IMG_EPSS)
 $(PSS)       : %.ps   : %.dvi  $(IMG_EPSS)
 $(PDFS)      : %.pdf  : %.texi $(IMG_PDFS)
@@ -228,11 +237,12 @@ $(SGMLS)     : %.sgml : %.texi $(IMG_JPGS)
 endif
 
 ##
-# Don't distribute .ps manuals, they are way too big
+# Don't distribute .ps manuals, they are way too big, no dvis or sgmls either
 ##
 EXTRA_DIST	+= $(EXTRA_info_TEXINFOS) $(FIG_FIGS) $(FIG_TXTS) $(TBL_TBLS) $(PNG_PNGS) $(PS_PSS)
 EXTRA_DIST	+= $(PDFS)
 EXTRA_DIST	+= $(HTMLS) $(IMG_PNGS)
+EXTRA_DIST	+= $(TXTS)
 
 ##
 # distcheck is not run in maintainer mode, and we need this, otherwise distcheck
@@ -367,9 +377,9 @@ if PKG_BUILD_INDEP
 if MAINTAINER_MODE
 ## MAINTAINER_MODE
 ##
-# Only build docs in maintainer mode
+# Only build docs in maintainer mode, don't build what we don't distribute
 ##
-ALL_LOCAL		+= info html pdf # ps txt sgml
+ALL_LOCAL		+= info html pdf txt # ps sgml
 ## MAINTAINER_MODE
 endif
 
