@@ -1,3 +1,24 @@
+2006-03-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/devfs.m4: minor syntax consistency
+	* m4/dist.m4: minor syntax consistency
+	* m4/genksyms.m4: minor syntax consistency
+	* m4/init.m4: minor syntax consistency
+	* m4/kernel.m4: minor syntax consistency
+	* m4/strconf.m4: minor syntax consistency
+	* m4/inet.m4: advanced search capabilities
+	* m4/sctp.m4: advanced search capabilities
+	* m4/ss7.m4: added new search file for ss7 directories
+	* m4/strcomp.m4: advanced search capabilities
+	* m4/streams.m4: advanced search capabilities
+	* m4/xns.m4: advanced search capabilities
+	* m4/xti.m4: advanced search capabilities
+	* m4/kernel.m4: sed quotation correction
+	* m4/rpm.m4: added second rpmextra string
+	* am/rpm.am: added second rpmextra string
+	* openss7.spec.in: added second rpmextra string
+	* acinclude.m4: moved BCM to end, corrected directory searches
+
 2006-03-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/inet.m4: even smarter about finding directories

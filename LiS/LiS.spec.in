@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.53 $) $Date: 2006/03/10 12:03:15 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.54 $) $Date: 2006/03/14 21:09:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/10 12:03:15 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 21:09:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -258,6 +258,8 @@
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
 %{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
 %{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@}}
+%{?extrarelease2:  %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@%%{extrarelease2}}}
+%{!?extrarelease2: %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@}}
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
@@ -545,10 +547,10 @@ Group:          System Environment/Kernel
 Prefix:         %{_kmoduledir}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 %if %{NEED_init}
-Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 %endif
 %if %{NEED_devs}
-Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Conflicts:      %{_conflict}-%{core_name}
 #Prereq:         /sbin/depmod
@@ -562,7 +564,12 @@ Autoreq:        true
 %{?_gif:Icon: %_gif}
 Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -828,9 +835,14 @@ Prefix:         %{_includedir}/%{name}/%{kernel_version}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
-Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-info = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-info = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-core < %{epoch}:%{version}-%{fullrelease}
 Release:        %{fullrelease}
 
@@ -872,6 +884,9 @@ Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -936,6 +951,9 @@ Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -978,7 +996,7 @@ Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_libexecdir}
 #Prefix:         %{_sysconfdir}
-Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-utils
 Conflicts:      %{_conflict}-util
 Conflicts:      %{_conflict}-utils
@@ -986,6 +1004,9 @@ Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1052,13 +1073,16 @@ Conflicts:      %{_conflict}-dev
 Conflicts:      %{_conflict}-devs
 Requires:       dev >= 3.3
 %if %{MAKE_devs}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Obsoletes:      %{name}-devs
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1110,7 +1134,7 @@ fi
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
 Prefix:         %{_libexecdir}/%{name}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
 Conflicts:      %{_conflict}-test
 Conflicts:      %{_conflict}-tests
@@ -1118,6 +1142,9 @@ Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1155,6 +1182,9 @@ Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{virtual}-doc = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-doc = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1258,6 +1288,9 @@ Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{virtual}-source = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-source = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1293,13 +1326,16 @@ Prefix:         %{_sysconfdir}
 %if %{without_ko_modules}
 Prefix:         %{_modutildir}
 %endif
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-inits
 Conflicts:      %{_conflict}-init
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{virtual}-init = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-init = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1684,9 +1720,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.53  2006/03/10 12:03:15  brian
-# - updated descriptions and headers
+# Revision 1.1.6.54  2006/03/14 21:09:49  brian
+# - two levels of distro specific rpm extra tags
 #
+
+* Fri Mar 10 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.53  2006/03/10 12:03:15  brian
+- updated descriptions and headers
 
 * Thu Mar  9 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.52  2006/03/09 14:02:52  brian

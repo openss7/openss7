@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.42 $) $Date: 2006/03/09 05:51:33 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.43 $) $Date: 2006/03/14 21:09:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/09 05:51:33 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 21:09:48 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.43  2006/03/14 21:09:48  brian
+# - two levels of distro specific rpm extra tags
+#
 # Revision 1.1.6.42  2006/03/09 05:51:33  brian
 # - autoconf nits and autoupdate changes
 #
@@ -740,15 +743,16 @@ retval = do_settimeofday(&ts);]]) ],
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_ARCH_DEFINES], [dnl
     AC_REQUIRE([AC_CANONICAL_HOST])dnl
-    AH_TEMPLATE([_X86_64_LIS_], [Define when compiling for X86_64.  This define is
-	only used for linux kernel target.  This is really the wrong way to go
-	about doing this: the function should be checked for by autoconf instead
-	of placing the architectural dependencies in the LiS source.  The define
-	is used in "head/linux-mdep.c" to determine whether lis_pci_cleanup
-	exists; "head/linux/exports.c" to determine whether a bunch of functions
-	are available; "head/osif.c" to determine whether a bunch of PCI DMA
-	mapping functions are available; "include/sys/osif.h" to determine
-	whether a bunch of PCI MDA mapping functions are available.])
+    AH_TEMPLATE([_X86_64_LIS_], [Define when compiling for X86_64.  This define
+	is only used for linux kernel target.  This is really the wrong way to
+	go about doing this: the function should be checked for by autoconf
+	instead of placing the architectural dependencies in the LiS source.
+	The define is used in "head/linux-mdep.c" to determine whether
+	lis_pci_cleanup exists; "head/linux/exports.c" to determine whether a
+	bunch of functions are available; "head/osif.c" to determine whether a
+	bunch of PCI DMA mapping functions are available; "include/sys/osif.h"
+	to determine whether a bunch of PCI DMA mapping functions are
+	available.])
     AH_TEMPLATE([_PPC64_LIS_], [Define when compiling for PPC64.  This define is
 	only used for linux kernel target.  This is really the wrong way to go
 	about doing this: the function should be checked for by autoconf instead
@@ -757,7 +761,7 @@ AC_DEFUN([_LIS_ARCH_DEFINES], [dnl
 	exists; "head/linux/exports.c" to determine whether a bunch of functions
 	are available; "head/osif.c" to determine whether a bunch of PCI DMA
 	mapping functions are available; "include/sys/osif.h" to determine
-	whether a bunch of PCI MDA mapping functions are available.])
+	whether a bunch of PCI DMA mapping functions are available.])
     AH_TEMPLATE([_HPPA_LIS_], [Define when compiling for HPPA.  This define is
 	only used for linux kernel target.  This is really the wrong way to go
 	about doing this: the function should be checked for by autoconf instead

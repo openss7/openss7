@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2006/03/10 12:03:27 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2006/03/14 21:09:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/10 12:03:27 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 21:09:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -175,7 +175,7 @@
 %global _ksubdir streams
 %global _kmodext streams
 %global _conflict LiS
-%global _strvers @LFS_VERSION@%{?extrarelease}
+%global _strvers @LFS_VERSION@%{?extrarelease2}
 %{expand: %%global _with_lfs --with-lfs}
 %endif
 %if %{BUILD_lis}
@@ -184,7 +184,7 @@
 %global _ksubdir lis
 %global _kmodext lis
 %global _conflict streams
-%global _strvers @LIS_VERSION@%{?extrarelease}
+%global _strvers @LIS_VERSION@%{?extrarelease2}
 %{expand: %%global _with_lis --with-lis}
 %endif
 
@@ -291,6 +291,8 @@
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
 %{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
 %{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@}}
+%{?extrarelease2:  %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@%%{extrarelease2}}}
+%{!?extrarelease2: %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@}}
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
@@ -346,14 +348,14 @@ BuildRequires:  gcc >= 2.96
 %else
 BuildRequires:  gcc = 2.95.3
 %endif
-BuildRequires: strcompat-devel = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease}
+BuildRequires: strcompat-devel = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
 %if %{without_ko_modules}
-BuildRequires: strcompat-%{info_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease}
+BuildRequires: strcompat-%{info_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
 %else
-BuildRequires: strcompat-%{core_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease}
+BuildRequires: strcompat-%{core_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
 %endif
-BuildRequires:    strxns-devel >=     @XNS_VERSION@%{?extrarelease}
-BuildRequires:   strxnet-devel >=     @XTI_VERSION@%{?extrarelease}
+BuildRequires:    strxns-devel >=     @XNS_VERSION@%{?extrarelease2}
+BuildRequires:   strxnet-devel >=     @XTI_VERSION@%{?extrarelease2}
 
 # these are some needs of the configure script
 # to manipulate manual pages:
@@ -566,12 +568,12 @@ Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
 Group:          System Environment/Kernel
 Prefix:         %{_kmoduledir}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
-Requires:       strcompat-%{core_name} = %version_of_or strcompat-%{core_name} @STRCOMP_VERSION@%{?extrarelease}
+Requires:       strcompat-%{core_name} = %version_of_or strcompat-%{core_name} @STRCOMP_VERSION@%{?extrarelease2}
 %if %{NEED_init}
-Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 %endif
 %if %{NEED_devs}
-Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 %endif
 %{?_conflict:Conflicts:      %{name}-%{_conflict}-%{core_name}}
 #Prereq:         /sbin/depmod
@@ -583,9 +585,14 @@ Prereq:         lsof
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-STREAMS-core = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-STREAMS-core = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -849,8 +856,12 @@ Prefix:         %{_includedir}/%{name}/%{kernel_version}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
-Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -889,8 +900,12 @@ Prereq:         /sbin/ldconfig
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
-Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-STREAMS-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-STREAMS-lib = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -951,6 +966,8 @@ Prefix:         %{_includedir}/%{name}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -991,7 +1008,7 @@ Prefix:         %{_sbindir}
 Prefix:         %{_libexecdir}
 Prefix:         %{_sysconfdir}
 %if %{have_libraries}
-Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease2}
 %endif
 %{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
@@ -1002,8 +1019,12 @@ Obsoletes:      %{name}-utils
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
-Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-STREAMS-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-STREAMS-util = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1060,12 +1081,14 @@ Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} devices.
 Group:          System Environment/Base
 Requires:       dev >= 3.3
 %if %{MAKE_devs}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Obsoletes:      %{name}-devs
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1114,11 +1137,13 @@ fi
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
 Prefix:         %{_libexecdir}/%{name}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1150,6 +1175,8 @@ Obsoletes:      %{name}-docs
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1251,6 +1278,8 @@ Prefix:         %{_usrsrc}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1283,12 +1312,14 @@ Prefix:         %{_sysconfdir}
 %if %{without_ko_modules}
 Prefix:         %{_modutildir}
 %endif
-Requires:       strcompat-init = %version_of_or strcompat-init @STRCOMP_VERSION@%{?extrarelease}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       strcompat-init = %version_of_or strcompat-init @STRCOMP_VERSION@%{?extrarelease2}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-inits
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1670,9 +1701,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
-# Revision 0.9.2.108  2006/03/10 12:03:27  brian
-# - updated descriptions and headers
+# Revision 0.9.2.109  2006/03/14 21:09:58  brian
+# - two levels of distro specific rpm extra tags
 #
+
+* Fri Mar 10 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.108  2006/03/10 12:03:27  brian
+- updated descriptions and headers
 
 * Mon Feb 20 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.107  2006/02/20 10:07:04  brian

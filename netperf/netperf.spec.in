@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.51 $) $Date: 2006/03/10 12:03:16 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.52 $) $Date: 2006/03/14 21:09:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/10 12:03:16 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 21:09:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -135,14 +135,14 @@
 %global _streams streams
 #global _ksubdir streams
 #global _kmodext streams
-%global _strvers @LFS_VERSION@%{?extrarelease}
+%global _strvers @LFS_VERSION@%{?extrarelease2}
 %endif
 %if %{BUILD_lis}
 %global _STREAMS LiS
 %global _streams LiS
 #global _ksubdir lis
 #global _kmodext lis
-%global _strvers @LIS_VERSION@%{?extrarelease}
+%global _strvers @LIS_VERSION@%{?extrarelease2}
 %endif
 
 %if %{BUILD_tools}
@@ -192,6 +192,8 @@
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
 %{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
 %{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@}}
+%{?extrarelease2:  %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@%%{extrarelease2}}}
+%{!?extrarelease2: %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@}}
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
@@ -236,18 +238,18 @@ BuildRequires:  gcc >= 2.96
 %else
 BuildRequires:  gcc = 2.95.3
 %endif
-BuildRequires: strcompat-devel >= @STRCOMP_VERSION@%{?extrarelease}
+BuildRequires: strcompat-devel >= @STRCOMP_VERSION@%{?extrarelease2}
 %if %{_strxns}
-BuildRequires:    strxns-devel >=    @XNS_VERSION@%{?extrarelease}
+BuildRequires:    strxns-devel >=    @XNS_VERSION@%{?extrarelease2}
 %endif
 %if %{_strxnet}
-BuildRequires:   strxnet-devel >=    @XTI_VERSION@%{?extrarelease}
+BuildRequires:   strxnet-devel >=    @XTI_VERSION@%{?extrarelease2}
 %endif
 %if %{_strinet}
-BuildRequires:   strinet-devel >=   @INET_VERSION@%{?extrarelease}
+BuildRequires:   strinet-devel >=   @INET_VERSION@%{?extrarelease2}
 %endif
 %if %{_strsctp}
-BuildRequires:   strsctp-devel >= @STRSCTP_VERSION@%{?extrarelease}
+BuildRequires:   strsctp-devel >= @STRSCTP_VERSION@%{?extrarelease2}
 %endif
 # these are some needs of the configure script
 # to manipulate manual pages:
@@ -489,6 +491,8 @@ Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{name}
+Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}
 Release:        %{fullrelease}
 
@@ -533,11 +537,13 @@ fi
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
 Prefix:         %{_libexecdir}/%{name}
-Requires:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -569,6 +575,8 @@ Obsoletes:      %{name}-docs
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -670,6 +678,8 @@ Prefix:         %{_usrsrc}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -695,9 +705,13 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.51  2006/03/10 12:03:16  brian
-# - updated descriptions and headers
+# Revision 1.1.2.52  2006/03/14 21:09:51  brian
+# - two levels of distro specific rpm extra tags
 #
+
+* Fri Mar 10 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.51  2006/03/10 12:03:16  brian
+- updated descriptions and headers
 
 * Thu Mar  9 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.50  2006/03/09 14:02:53  brian

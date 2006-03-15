@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/03/13 23:59:52 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/03/14 21:09:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/13 23:59:52 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 21:09:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,11 +66,11 @@ m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
-m4_include([m4/xopen.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
+m4_include([m4/ss7.m4])
 
 # =============================================================================
 # AC_OS7
@@ -185,11 +185,6 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 			       [do not include STRCOMPAT in master pack @<:@included@:>@]),
 		[with_STRCOMPAT="$withval"],
 		[with_STRCOMPAT='yes'])
-    AC_ARG_WITH([STRBCM],
-		AS_HELP_STRING([--with-STRBCM],
-			       [include STRBCM in master pack @<:@detected@:>@]),
-		[with_STRBCM="$withval"],
-		[with_STRBCM='yes'])
     AC_ARG_WITH([STRUTIL],
 		AS_HELP_STRING([--with-STRUTIL],
 			       [include STRUTIL in master pack @<:@detected@:>@]),
@@ -225,6 +220,11 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 			       [do not include STACKS in master pack @<:@included@:>@]),
 		[with_STACKS="$withval"],
 		[with_STACKS='yes'])
+    AC_ARG_WITH([STRBCM],
+		AS_HELP_STRING([--with-STRBCM],
+			       [include STRBCM in master pack @<:@detected@:>@]),
+		[with_STRBCM="$withval"],
+		[with_STRBCM="$with_ALL"])
 ])# _OS7_OPTIONS
 # =============================================================================
 
@@ -238,20 +238,22 @@ AC_DEFUN([_OS7_SETUP], [dnl
     _OS7_CONFIG_KERNEL
     _LINUX_STREAMS
     if test ":${with_STRCOMPAT:-no}" != ":no" ; then
-    _STRCOMP
+	_STRCOMP
     fi
-    _XOPEN
-    if test ":${with_XNS:-no}" != ":no" ; then
-    _XNS
+    if test ":${with_STRXNS:-no}" != ":no" ; then
+	_XNS
     fi
-    if test ":${with_XNET:-no}" != ":no" ; then
-    _XTI
+    if test ":${with_STRXNET:-no}" != ":no" ; then
+	_XTI
     fi
-    if test ":${with_INET:-no}" != ":no" ; then
-    _INET
+    if test ":${with_STRINET:-no}" != ":no" ; then
+	_INET
     fi
-    if test ":${with_SCTP:-no}" != ":no" ; then
-    _SCTP
+    if test ":${with_STRSCTP:-no}" != ":no" ; then
+	_SCTP
+    fi
+    if test ":${with_STACKS:-no}" != ":no" ; then
+	_SS7
     fi
 ])# _OS7_SETUP
 # =============================================================================
@@ -305,9 +307,6 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_STRCOMPAT:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strcompat])
     fi
-    if test :${with_STRBCM:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([strbcm])
-    fi
     if test :${with_STRUTIL:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strutil])
     fi
@@ -328,6 +327,9 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     fi
     if test :${with_STACKS:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([stacks])
+    fi
+    if test :${with_STRBCM:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strbcm])
     fi
     AC_CACHE_CHECK([for master srcdir],[os7_cv_master_srcdir],[dnl
 	os7_cv_master_srcdir=`(cd $srcdir; pwd)`

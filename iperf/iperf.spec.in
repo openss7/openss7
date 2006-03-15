@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.58 $) $Date: 2006/03/10 12:03:13 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.59 $) $Date: 2006/03/14 21:09:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/10 12:03:13 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 21:09:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -147,6 +147,8 @@
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
 %{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
 %{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@}}
+%{?extrarelease2:  %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@%%{extrarelease2}}}
+%{!?extrarelease2: %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@}}
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
@@ -378,6 +380,8 @@ Summary:        %{title} for OpenSS7 SCTP
 Group:          System Environment/Base
 Prefix:         %{_bindir}
 Autoreq:        true
+Provides:       %{name}-openss7 = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-openss7 = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -409,6 +413,8 @@ Prereq:         /sbin/ldconfig
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -469,6 +475,8 @@ Prefix:         %{_libdir}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -507,11 +515,13 @@ Group:          Development/System
 #Prefix:         %{_bindir}
 #Prefix:         %{_sbindir}
 Prefix:         %{_libexecdir}
-#Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+#Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-utils
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -556,11 +566,13 @@ fi
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
 Prefix:         %{_libexecdir}/%{name}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -592,6 +604,8 @@ Obsoletes:      %{name}-docs
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -693,6 +707,8 @@ Prefix:         %{_usrsrc}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -718,9 +734,13 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.58  2006/03/10 12:03:13  brian
-# - updated descriptions and headers
+# Revision 1.1.2.59  2006/03/14 21:09:48  brian
+# - two levels of distro specific rpm extra tags
 #
+
+* Fri Mar 10 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.58  2006/03/10 12:03:13  brian
+- updated descriptions and headers
 
 * Thu Mar  9 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.57  2006/03/09 14:02:44  brian

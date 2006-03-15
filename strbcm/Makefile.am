@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/08 23:20:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/14 21:09:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/08 23:20:40 $ by $Author: brian $
+# Last Modified $Date: 2006/03/14 21:09:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/03/14 21:09:54  brian
+# - two levels of distro specific rpm extra tags
+#
 # Revision 0.9.2.2  2006/03/08 23:20:40  brian
 # - changes for successful build
 #
@@ -218,6 +221,7 @@ EXPORT_SRCFILES			=
 EXPORT_VERFILES			=
 
 GENKSYMS_CPPFLAGS		= \
+				  -I./pkg -I$(srcdir)/pkg \
 				  -I./src/drivers -I$(srcdir)/src/drivers \
 				  -I./src/modules -I$(srcdir)/src/modules \
 				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)

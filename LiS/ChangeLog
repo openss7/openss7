@@ -1,3 +1,8 @@
+2006-03-14  Brian Bidulock  <bidulock@openss7.org>
+	
+	* LiS.spec.in: added second rpmextra string
+	* acinclude.m4: corrected spelling
+
 2006-03-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: allow --disable-dependency-tracking in maintainer mode
