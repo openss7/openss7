@@ -108,7 +108,7 @@ with the following STREAMS implementations:
 * UNIX(R) System V Release 3.2
 * UNIX(R) System V Release 4.2
 * MPS(R) Mentat Portable Streams
-* Linux(R) STREAMS 2.18.1
+* Linux STREAMS 2.18.0
 * AIX(R) 5L Version 5.1 Portable STREAMS Environment
 * HP-UX(R) 11.0i v2 STREAMS/UX
 * IRIX(R) 6.5.17
