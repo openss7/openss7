@@ -1,0 +1,128 @@
+From bidulock@openss7.org Wed Mar 15 13:45:30 2006
+Date: Wed, 15 Mar 2006 13:22:35 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@gsyc.escet.urjc.es>
+Subject: LiS 2.18.3 Released - SVR 4 STREAMS for Linux
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+LiS 2.18.3 was released under GPLv2 on March 15, 2006.
+
+LiS (Linux STREAMS) is a STREAMS framework that is compatible with UNIX
+SVR 4 STREAMS as described in the "UNIX System V Release 4 Programmer's
+Guide - STREAMS".
+
+The LiS 2.18.3 release is the OpenSS7 Project's <http://www.openss7.org/>
+most recent release of the Linux 2.4 and 2.6 kernel compatible package.
+It includes libraries, documentation and all the things needed to run
+STREAMS for OpenSS7 SS7 packages and other LiS based products.
+
+This release provides:
+
+ - Corrections for and testing of 64-bit clean compile and test runs on
+   x86_64 architecture.
+    
+ - Some bug corrections resulting from gcc 4.0.2 compiler warnings.
+
+ - Corrected build flags for Gentoo and 2.6.15 kernels as reported on
+   mailing list.  Builds on FC4 2.6.15 kernel and with gcc 4.0.2.
+
+ - Added in many of Paul's 64-bit corrections.
+
+ This is an unstable public alpha release of the package.
+
+This release, as the release before it, suppresses versioning of
+LiS exported symbols and restores to a large degree binary compatibility
+of interface functions with LiS 2.18.0.  It again contains the pipe
+performance programs an POSIX conformance test suite used with Linux
+Fast-STREAMS for comparison testing between LiS and Linux Fast-STREAMS.
+These programs were used to generate the comparison performance test
+results <http://www.openss7.org/streams_perf.html> and conformance test
+results <http://www.openss7.org/streams_pics.html>.
+
+A large number of additional tests cases were found to fail on x86_64
+and SMP architectures making the LiS packages largely unusable.  Please
+read <http://www.openss7.org/codefiles/LiS-2.18.3/README-alpha> in the
+release.
+
+The package is still largely unusable on 64-bit or SMP kernels.  Linux
+STREAMS IS DEPRECATED.  DO NOT USE IT.  THE PACKAGE CONTAINS MANY
+UNRESOLVED BUGS.  USE Linux Fast-STREAMS INSTEAD.
+
+This is the OpenSS7 Project's third, and likely last, LiS-2.18.0-based
+release of LiS.  The release includes all of the improvements from
+previous releases as well as a few additional 64-bit patches.  The
+OpenSS7 Project will be replacing LiS with Linux Fast-STREAMS in all
+further production releases.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
+distributions, and can be used on production kernels without patching or
+recompiling the kernel.
+
+This package is released under the 'GNU Public License Version 2'.  The
+release is available as an autoconf/RPM tarball, SRPM and set of binary
+RPMs.  See the download page <http://www.openss7.org/download.html> for
+the autoconf tarballs and SRPMs.  See the LiS package page at
+<http://www.openss7.org/streams_pkg.html> for tarballs, SRPMs and binary
+RPMs.
+
+See <http://www.openss7.org/codefiles/LiS-2.18.3/ChangeLog> and
+<http://www.openss7.org/codefiles/LiS-2.18.3/NEWS> in the release for
+more information.  Also, see the manual/LiS.pdf manual in the release
+(also at <http://www.openss7.org/LiS_manual.html>).
+
+For the news release, see <http://www.openss7.org/rel20060315_3.html>
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
+From bidulock@openss7.org Wed Mar 15 13:45:30 2006
+Date: Wed, 15 Mar 2006 13:22:35 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@execpc.com>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:          LiS - Linux STREAMS
+Version:	2.18.3
+Entered-date:	2006-03-15
+Description:	Linux STREAMS (LiS).
+		OpenSS7 Linux STREAMS (LiS), SVR 4 STREAMS for Linux.
+		LiS is a STREAMS framework that is compatible with SVR4
+		STREAMS.  It has lots of debugging features not found in other
+		STREAMS packages.  Good to do networking and other things.  It
+		allows for installation of binary drivers.
+		This distribution is currently applicable to 2.4 and 2.6 kernels
+		and was targeted at ix86, x86_64, ppc and ppc64 architectures,
+		but should build and install for other architectures as well.
+		Mailing-List: linux-streams@gsyc.escet.urjc.es
+		Supports a wide range of new and old Linux distributions.
+		Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:	STREAMS, SVR4, LiS
+Author:		dave@gcom.com (David Grothe)
+Maintained-by:	bidulock@openss7.org (Brian Bidulock)
+Primary-site:	http://www.openss7.org/ tarballs/
+		2.4M LiS-2.18.3.tar.gz
+		1.9M LiS-2.18.3.tar.bz2
+Alternate-site:	http://www.openss7.org/ rpms/SRPMS/
+		2.0M LiS-2.18.3-1.src.rpm
+Original-site:	ftp.gcom.com /pub/linux/src/LiS
+		748K LiS-2.18.0.tgz
+Platforms:	Linux
+		Requires: Linux kernel 2.4 or 2.6
+Copying-policy:	GPL
+End
+
+

@@ -1,8 +1,10 @@
-OpenSS7 Iperf -- history of user-visible changes.  2006-03-01
+OpenSS7 Iperf -- history of user-visible changes.  2006-03-16
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes in iperf-2.0.5
+
 * Major changes in iperf-2.0.4
 
   Corrections for and testing of 64-bit clean compile and test runs on
@@ -87,3 +89,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

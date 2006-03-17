@@ -1,3 +1,9 @@
+2006-03-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* ANNOUNCE: added announcement file for release
+	* .pkgrelease: bumped release number after release
+	* NEWS: prepare for next release
+
 2006-03-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac (AC_CONFIG_SRCDIR): change unique file to .lsm.in file

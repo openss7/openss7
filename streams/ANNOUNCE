@@ -1,0 +1,131 @@
+From bidulock@openss7.org Wed Mar 15 13:45:30 2006
+Date: Wed, 15 Mar 2006 13:22:35 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@gsyc.escet.urjc.es>
+Subject: streams 0.7a.5 Released - High Performance SVR 4.2 MP STREAMS for Linux
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+streams-0.7a.5 was released under GPLv2 on March 15, 2006.
+
+Linux Fast-STREAMS is a complete reimplementation of SVR 4.2 MP STREAMS
+for Linux, intended as a high-performance production replacement for the
+failing and deprecated LiS.
+
+This is the second fully functioning OpenSS7 Project public release of
+Linux Fast-STREAMS, the high-performance reimplementation of SVR 4.2 MP
+STREAMS for Linux.  This release is a beta release and has been
+extensively tested and is mostly stable.  The purpose of the release is
+to provide the community with the ability to try the code and
+documentation.  Later releases will include any fixes or missing
+functionality.
+
+This release has been performance tested (see the results at
+<http://www.openss7.org/streams_perf.html>) and conformance tested (see
+the results at <http://www.openss7.org/streams_pics.html>) and tested in
+comparison with LiS.   Linux Fast-STREAMS far exceeds LiS in every
+dimension.  Linux Fast-STREAMS is upt to seven (7) times faster, one
+eighth (1/8) the size, and conforms far better to POSIX/SUSv3 standards.
+Linux Fast-STREAMS is already more stable that LiS on 64-bit, SMP
+kernels, and SMP platforms, and does not lock up on UP kernel where LiS
+does.
+
+This release is primarily to support additional compilers (gcc 4.0.2),
+architectures (x86_64, SMP, 32-bit compatibility), recent Linux
+distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).  It
+includes:
+
+ - Changes to wait queues.  Split single wait queue into four
+   independent wait queues.  Reworked wait queues for both old style
+   (2.4) and new style (2.6) semantics.
+
+ - Changes to satisfy gcc 4.0.2 compiler.
+
+ - Corrected build flags for Gentoo and 2.6.15 kernels as reported on
+   mailing list.  Build and run tested on FC4 i686 and x86_64 kernels
+   based on 2.6.15.
+
+ - Corrections for and testing of 64-bit clean compile and test runs on
+   x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
+   compiler warnings.
+
+ - Initial corrections for and testing of SMP operation on Intel 630
+   Hyper-Threaded SMP on x86_64.  This package should now run well on
+   N-way Xeons even with Hyper-Threading enabled.
+
+ - Corrections and validation of 32-bit compatibility over 64-bit on
+   x86_64.  Should apply well to other 64-bit architectures as well.
+
+ This is a public beta test release of the package: it deprecates
+ previous releases.  Please upgrade before reporting bugs on previous
+ releases.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
+distributions, and can be used on production kernels without patching or
+recompiling the kernel.
+
+This package is released under the 'GNU Public License Version 2'.  The
+release is available as an autoconf/RPM tarball, SRPM and set of binary
+RPMs.  See the download page <http://www.openss7.org/download.html> for
+the autoconf tarballs and SRPMs.  See the streams package page at
+<http://www.openss7.org/streams_pkg.html> for tarballs, SRPMs and binary
+RPMs.
+
+See <http://www.openss7.org/codefiles/streams-0.7a.5/ChangeLog> and
+<http://www.openss7.org/codefiles/streams-0.7a.5/NEWS> in the release
+for more information.  Also, see the STREAMS.pdf manual in the release
+(also in html <http://www.openss7.org/STREAMS_manual.html>).
+
+For the news release, see <http://www.openss7.org/rel20060315_4.html>
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
+From bidulock@openss7.org Wed Mar 15 13:45:30 2006
+Date: Wed, 15 Mar 2006 13:22:35 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@execpc.com>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			streams - Linux Fast-STREAMS
+Version:		0.7a.5
+Entered-date:		2006-03-15
+Description:		Linux Fast-STREAMS.
+			UNIX System V Release 4.2 STREAMS for Linux.
+			streams is a STREAMS framework that is compatible with
+			SVR 4.2 MP STREAMS.  streams is a production
+			replacement for the deprecated LiS package.
+			This distribution is applicable to 2.4 and 2.6 kernels
+			and was targeted at ix86, x86_64, ppc64 and ppc
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		STREAMS, SVR 4.2 MP, LfS
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			4.6M streams-0.7a.5.tar.gz
+			3.8M streams-0.7a.5.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			3.8M streams-0.7a.5-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6
+Copying-policy:		GPL
+End
+
+

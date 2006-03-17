@@ -1,0 +1,130 @@
+From bidulock@openss7.org Wed Mar 15 13:45:30 2006
+Date: Wed, 15 Mar 2006 13:22:35 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@gsyc.escet.urjc.es>
+Subject: strxns 0.9.2.3 Released - STREAMS XNS 5.2 Networking for Linux
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+strxns-0.9.2.3 was released under GPLv2 on March 15, 2006.
+
+STREAMS XNS is an implementation of X/Open Network Services (XNS 5.2)
+for Linux Fast-STREAMS and provides OSI conforming CDI, DLPI and NPI
+header files as well as several DLPI modules and drivers that convert
+between the Linux Native IP interface and the STREAMS DLPI interface.
+One allows DLPI drivers to be added to Linux as IP interfaces, the other
+provides DLPI access to native Linux IP interfaces.
+
+This is the OpenSS7 Project's third separate release from the OpenSS7
+Project of the OpenSS7 STREAMS XNS modules, formerly part of the (now
+deprecated) Linux STREAMS LiS-2.18.0 package.  These networking modules
+provide DLPI and Linux IP interface drivers, as well as providing CDI,
+DLPI and NPI header files.  The package contains all the necessary
+manual pages and other documentation for XNS components in a separate
+autoconf tarball.
+
+This release is primarily to support additional compilers (gcc 4.0.2),
+architectures (x86_64, SMP, 32-bit compatibility), recent Linux
+distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).  It
+includes:
+
+ - Changes necessary for __LP64__ compatible builds.  Changes to support
+   32-bit ioctl compatibility for __LP64__ architectures.  Binary
+   compatibility should not have been disrupted.  At the same time as
+   the ioctl32 changes, TRANSPARENT ioctl support for most of the IO
+   controls for the ldl(4) driver has been added.
+
+ - Changes to satisfy gcc 4.0.2 compiler.
+
+ - Corrections for and testing of 64-bit clean compile and test runs on
+   x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
+   compiler warnings.
+
+ - Corrected build flags for Gentoo and 2.6.15 kernels as reported on
+   mailing list.
+
+ - Initial corrections for and testing of SMP operation on Intel 630
+   Hyper-Threaded SMP on x86_64.  This package should now run well on
+    N-way Xeons even with Hyper-Threading enabled.
+
+ - Corrections and validation of 32-bit compatibility over 64-bit on
+   x86_64.  Should apply well to other 64-bit architectures as well.
+
+ This is public beta release of the package: it deprecates previous
+ releases.  Please upgrade before reporting problems with previous
+ releases.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
+distributions, and can be used on production kernels without patching or
+recompiling the kernel.
+
+This package is released under the 'GNU Public License Version 2'.  The
+release is available as an autoconf/RPM tarball, SRPM and set of binary
+RPMs.  See the download page <http://www.openss7.org/download.html> for
+the autoconf tarballs and SRPMs.  See the strxns package page at
+<http://www.openss7.org/strxns_pkg.html> for tarballs, SRPMs and binary
+RPMs.
+
+See <http://www.openss7.org/codefiles/strxns-0.9.2.3/ChangeLog> and
+<http://www.openss7.org/codefiles/strxns-0.9.2.3/NEWS> in the release
+for more information.  Also, see the strxns.pdf manual in the release
+(also in html <http://www.openss7.org/strxns_manual.html>).
+
+For the news release, see <http://www.openss7.org/rel20060315_6.html>
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
+From bidulock@openss7.org Wed Mar 15 13:45:30 2006
+Date: Wed, 15 Mar 2006 13:22:35 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@execpc.com>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			strxns
+Version:		0.9.2.3
+Entered-date:		2006-03-15
+Description:		OpenSS7 XNS Networking.
+			X/Open Network Services (XNS) for Linux Fast-STREAMS.
+			The strxns package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of X/Open Network Services
+			(XNS) protocol stack components and applications for the
+			SVR 4.2 STREAMS environment.
+			This distribution is currently applicable to Linux 2.4
+			and 2.6 kernels and was targeted at ix86, x86_64, ppc
+			and ppc64 architectures, but should build and install
+			for other architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		XNS, CDI, DLPI, NPI, DL
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			3.7M strxns-0.9.2.3.tar.gz
+			3.3M strxns-0.9.2.3.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			3.3M strxns-0.9.2.3-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			LiS-2.18.3 or streams-0.7a.5 SVR 4.2 STREAMS,
+			strcompat-0.9.2.3
+Copying-policy:		GPL
+End
+
+
