@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/07 12:34:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/03/18 09:42:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/07 12:34:26 $ by $Author: brian $
+# Last Modified $Date: 2006/03/18 09:42:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.42  2006/03/18 09:42:10  brian
+# - added in ip driver and manual pages
+#
 # Revision 0.9.2.41  2006/03/07 12:34:26  brian
 # - tools must be built static for distcheck
 #
@@ -137,13 +140,15 @@ libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/drivers/ip_to_dlpi.c \
-				  src/drivers/ldl.c
+				  src/drivers/ldl.c \
+				  src/drivers/ip.c \
+				  src/drivers/ip_hooks.h
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
 nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
-libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/ip_hooks.h
 libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 libXNSdrvs_a_OBJECTS:		$(libXNSdrvs_a_DEPENDENCIES)
@@ -217,15 +222,18 @@ libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/drivers/ip_to_dlpi.c \
-				  src/drivers/ldl.c
+				  src/drivers/ldl.c \
+				  src/drivers/ip.c \
+				  src/drivers/ip_hooks.h
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
 nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
-libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/ip_hooks.h
 libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+libXNSdrvs_a_OBJECTS:		$(libXNSdrvs_a_DEPENDENCIES)
 
 EXTRA_KERNEL_MODULES		+= 
 

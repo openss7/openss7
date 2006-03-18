@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/06 11:39:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/18 09:39:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:39:21 $ by $Author: brian $
+# Last Modified $Date: 2006/03/18 09:39:03 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.12  2006/03/18 09:39:03  brian
+# - added ip driver headers
+#
 # Revision 0.9.2.11  2006/03/06 11:39:21  brian
 # - updated headers
 #
@@ -64,7 +67,8 @@ nobase_pkginclude_HEADERS = \
 	sys/cdi.h \
 	sys/dlpi.h \
 	sys/ldl.h \
-	sys/npi.h
+	sys/npi.h \
+	sys/npi_ip.h
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/strxns/version.h

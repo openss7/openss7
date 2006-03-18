@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/01/04 08:04:54 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/18 09:40:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/01/04 08:04:54 $ by $Author: brian $
+# Last Modified $Date: 2006/03/18 09:40:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -614,7 +614,7 @@ dnl fi
 		])
 	    AC_CHECK_MEMBER([struct dst_entry.path],
 		[sctp_cv_dst_entry_path='yes'],
-		[sctp_cv_dst_netry_path='no'], [
+		[sctp_cv_dst_entry_path='no'], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>

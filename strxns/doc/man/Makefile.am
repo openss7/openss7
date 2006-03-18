@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/06 11:39:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/18 09:42:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:39:17 $ by $Author: brian $
+# Last Modified $Date: 2006/03/18 09:42:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.15  2006/03/18 09:42:10  brian
+# - added in ip driver and manual pages
+#
 # Revision 0.9.2.14  2006/03/06 11:39:17  brian
 # - updated headers
 #
@@ -67,6 +70,7 @@ MANS_UNUSED = \
 
 man_MANS = \
 	man4/XNS.4 \
+	man4/ip.4 \
 	man4/ip2xinet.4 \
 	man4/ip_strms.4 \
 	man4/ip_strm_mod.4 \
@@ -270,6 +274,7 @@ man_MANS = \
 	man7/N_OPTMGMT_REQ.7 \
 	man7/N_optmgmt_req_t.7 \
 	man7/npi.7 \
+	man7/npi_ip.7 \
 	man7/N_RESET_CON.7 \
 	man7/N_reset_con_t.7 \
 	man7/N_RESET_IND.7 \
@@ -293,6 +298,7 @@ man_MANS = \
 
 dist_noinst_MANS = \
 	man4/XNS.4.man \
+	man4/ip.4.man \
 	man4/ip2xinet.4.man \
 	man4/ip_strms.4.man \
 	man4/ip_strm_mod.4.man \
@@ -496,6 +502,7 @@ dist_noinst_MANS = \
 	man7/N_OPTMGMT_REQ.7.man \
 	man7/N_optmgmt_req_t.7.man \
 	man7/npi.7.man \
+	man7/npi_ip.7.man \
 	man7/N_RESET_CON.7.man \
 	man7/N_reset_con_t.7.man \
 	man7/N_RESET_IND.7.man \

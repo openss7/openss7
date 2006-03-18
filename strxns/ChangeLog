@@ -3,6 +3,18 @@
 	* src/drivers/ip.c: working up NPI-IP driver
 	* doc/man/man4/ip.4.man: documentation for ip driver
 	* doc/man/man7/npi_ip.7.man: documentation for ip driver
+	* Makefile.am: added ip(4) driver to build
+	* doc/man/Makefile.am: added ip(4) driver manpages
+	* src/drviers/lis.conf: added ip(4) driver
+	* acinclude.m4: check members for inet_protocol, net_protocol
+	- get symbol address for inet_proto_lock
+	- check existence of inet_protocol or net_protocol
+	- added lots of checks from strsctp/acinclude.m4
+	* src/drivers/ip_hooks.h.in: added config file
+	* configure.ac: added src/drivers/ip_hooks.h to config files
+	* Makefile.am: added ip_hooks.h file
+	* src/include/sys/npi_ip.h: added ip specific npi file
+	* src/include/Makefile.am: added npi_ip.h file
 
 2006-03-16  Brian Bidulock  <bidulock@openss7.org>
 

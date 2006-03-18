@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/18 00:15:21 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/18 09:42:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/18 00:15:21 $ by $Author: brian $
+ Last Modified $Date: 2006/03/18 09:42:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.8  2006/03/18 09:42:11  brian
+ - added in ip driver and manual pages
+
  Revision 0.9.2.7  2006/03/18 00:15:21  brian
  - syncing notebook
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/18 00:15:21 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/18 09:42:11 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/18 00:15:21 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/18 09:42:11 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -91,24 +94,34 @@ static char const ident[] =
    uses the NPI (Network Provider Interface) API.
 */
 
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
-#include <linux/bitops.h>
-
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-
+#ifdef LINUX
 #undef ASSERT
 
-#include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
+#include <linux/bitops.h>
+#include <linux/interrupt.h>
+
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <net/snmp.h>
+
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#endif				/* LINUX */
+
+#include "ip_hooks.h"
+
+#include <sys/npi.h>
+#include <sys/npi_ip.h>
 
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/18 00:15:21 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/18 09:42:11 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -246,7 +259,8 @@ struct ip {
 	queue_t *rwait;			/* RD queue waiting on lock */
 	queue_t *wwait;			/* WR queue waiting on lock */
 	int users;			/* lock holders */
-	int bcid;			/* bufcall id */
+	int rbid;			/* RD bufcall id */
+	int wbid;			/* WR bufcall id */
 	np_ulong i_flags;		/* interface flags */
 	np_ulong i_state;		/* interface state */
 	np_ulong state;			/* IP state */
@@ -259,10 +273,16 @@ struct ip {
 	size_t anum;			/* number of sockaddr_in addresses in addr */
 	uint8_t protoids[16];		/* bound protocol ids */
 	size_t pnum;			/* number of protocol ids in protoids */
+	uint pmtu;			/* path MTU for association */
+	ulong userlocks;
+	unsigned short sport;
 };
 
 #define PRIV(__q) (((__q)->q_ptr))
 #define IP_PRIV(__q) ((struct ip *)((__q)->q_ptr))
+
+STATIC struct ip *ip_opens = NULL;
+STATIC spinlock_t ip_lock = SPIN_LOCK_UNLOCKED;
 
 typedef int (*ip_rcv_fnc_t) (struct sk_buff *);
 
@@ -275,7 +295,7 @@ struct ip_bind_bucket {
 	unsigned char proto;		/* IP protocol identifier */
 	unsigned short port;		/* port number (host order) */
 	struct ip *owners;		/* list of owners of this protocol/port combination */
-	struct ip *default;		/* default destinations for this protocol */
+	struct ip *dflt;		/* default destinations for this protocol */
 };
 struct ip_hash_bucket {
 	rwlock_t lock;
@@ -295,12 +315,38 @@ struct ip_prot_bucket {
 	struct net_protocol *next;	/* Linkage for protocol override */
 #endif					/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 };
-STATIC rwlock_t ip_prot_lock = RWLOCK_UNLOCKED;
+STATIC rwlock_t ip_prot_lock = RW_LOCK_UNLOCKED;
 STATIC struct ip_prot_bucket *ip_prots[256];
 
 STATIC kmem_cache_t *ip_bind_cachep;
 STATIC kmem_cache_t *ip_prot_cachep;
 STATIC kmem_cache_t *ip_priv_cachep;
+
+STATIC INLINE struct ip *
+ip_get(void)
+{
+	struct ip *ip;
+
+	if ((ip = kmem_cache_alloc(ip_priv_cachep, SLAB_ATOMIC))) {
+		bzero(ip, sizeof(*ip));
+		atomic_set(&ip->refcnt, 1);
+	}
+	return (ip);
+}
+STATIC INLINE void
+ip_hold(struct ip *ip)
+{
+	if (ip)
+		atomic_inc(&ip->refcnt);
+}
+STATIC INLINE void
+ip_put(struct ip *ip)
+{
+	if (ip)
+		if (atomic_dec_and_test(&ip->refcnt)) {
+			kmem_cache_free(ip_priv_cachep, ip);
+		}
+}
 
 /*
  *  State changes.
@@ -371,6 +417,9 @@ ip_get_state(struct ip *ip)
  *  =========================================================================
  */
 
+STATIC int ip_v4_rcv(struct sk_buff *skb);
+STATIC void ip_v4_err(struct sk_buff *skb, u32 info);
+
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
 STATIC void
 inet_override_protocol(struct ip_prot_bucket *pb, int proto)
@@ -405,6 +454,8 @@ inet_restore_protocol(struct ip_prot_bucket *pb)
 #ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 
+STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
+
 STATIC void
 inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 {
@@ -414,14 +465,14 @@ inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 	pb->prot.handler = &ip_v4_rcv;
 	pb->prot.err_handler = &ip_v4_err;
 	pb->prot.no_policy = 1;
-	if (inet_add_protocol(pb, proto) == -1) {
+	if (inet_add_protocol(&pb->prot, proto) == -1) {
 		/* need to override */
-		int hash = protocol & (MAX_INET_PROTOS - 1);
+		int hash = proto & (MAX_INET_PROTOS - 1);
 
 		spin_lock_bh(inet_proto_lockp);
 		/* FIXME: need to find the module that owns inet_protos[hash] and take a reference */
-		pb->next = inet_protos[hash];
-		inet_protos[hash] = pb;
+		pb->next = inet_protosp[hash];
+		inet_protosp[hash] = &pb->prot;
 		spin_unlock_bh(inet_proto_lockp);
 	}
 }
@@ -454,7 +505,7 @@ ip_bind_prot(unsigned char proto)
 {
 	struct ip_prot_bucket *pb;
 
-	rwlock_bh(&ip_prot_lock);
+	write_lock_bh(&ip_prot_lock);
 	{
 		pb = ip_prots[proto];
 		if (pb != NULL)
@@ -468,7 +519,7 @@ ip_bind_prot(unsigned char proto)
 			}
 		}
 	}
-	rwunlock_bh(&ip_prot_lock);
+	write_unlock_bh(&ip_prot_lock);
 	return (pb);
 }
 
@@ -481,7 +532,7 @@ ip_unbind_prot(unsigned char proto)
 {
 	struct ip_prot_bucket *pb;
 
-	rwlock_bh(&ip_prot_lock);
+	write_lock_bh(&ip_prot_lock);
 	{
 		pb = ip_prots[proto];
 		if (pb != NULL) {
@@ -493,7 +544,7 @@ ip_unbind_prot(unsigned char proto)
 			}
 		}
 	}
-	rwunlock_bh(&ip_prot_lock);
+	write_unlock_bh(&ip_prot_lock);
 }
 
 /**
@@ -564,7 +615,7 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
 				else
 					add->sin_port = port;
 
-				if ((err = ip_bind_addr(q, proto, add)))
+				if ((err = ip_bind_addr(q, add, proto, 0))) /* FIXME: what flag? */
 					break;
 			}
 			if (err == 0)
@@ -572,7 +623,7 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
 			for (; j >= 0; j--) {
 				struct sockaddr_in *add = &add_in[j];
 
-				ip_unbind_addr(q, proto, add);
+				ip_unbind_addr(q, add, proto, 0); /* FIXME: what flag? */
 			}
 			break;
 		} else {
@@ -580,10 +631,10 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
 			struct sockaddr_in add = {
 				.sin_family = AF_INET,
 				.sin_port = 0,
-				.sin_addr = {.in_addr = 0,},
+				.sin_addr = {.s_addr = 0,},
 			};
 
-			err = ip_bind_addr(q, proto, &add);
+			err = ip_bind_addr(q, &add, proto, 0); /* FIXME: what flag? */
 			if (err == 0)
 				continue;
 			break;
@@ -599,19 +650,20 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
 			for (j = 0; j < anum; j++) {
 				struct sockaddr_in *add = &add_in[j];
 
-				ip_unbind_addr(q, proto, add);
+				ip_unbind_addr(q, add, proto, 0); /* FIXME: what flag? */
 			}
 		} else {
 			/* no addresses means wildcard bind */
 			struct sockaddr_in add = {
 				.sin_family = AF_INET,
 				.sin_port = 0,
-				.sin_addr = {.in_addr = 0,},
+				.sin_addr = {.s_addr = 0,},
 			};
 
-			ip_unbind_addr(q, proto, &add);
+			ip_unbind_addr(q, &add, proto, 0); /* FIXME: what flag? */
 		}
 	}
+	return (err);
 }
 
 /*
@@ -623,7 +675,7 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
  */
 #ifdef HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
-ip_queue_xmit(struct sk_buff *skb)
+npi_ip_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
@@ -641,8 +693,8 @@ ip_queue_xmit(struct sk_buff *skb)
 #endif
 }
 #else
-STATIC INLINE in
-ip_queue_xmit(struct sk_buff *skb)
+STATIC INLINE int
+npi_ip_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
@@ -651,7 +703,7 @@ ip_queue_xmit(struct sk_buff *skb)
 		rare();
 		return ip_fragment(skb, skb->dst->output);
 	} else {
-		iph->frag_off != __constant_htons(IP_DF);
+		iph->frag_off |= __constant_htons(IP_DF);
 		ip_send_check(iph);
 		return skb->dst->output(skb);
 	}
@@ -678,16 +730,15 @@ ip_xmit_msg(uint32_t daddr, uint32_t saddr, uint8_t protoid, mblk_t *mp, struct 
 		   the buffer.  For STREAMS, no socket buffer is passed in, just a message block,
 		   so a new socket buffer is allocated with the necessary headroom and the message
 		   blocks are copied into the socket buffer. */
-		if (skb = allocb_skb(hlen + tlen, GFP_ATOMIC)) {
-			mblk_t *mp;
+		if ((skb = alloc_skb(hlen + tlen, GFP_ATOMIC))) {
+			mblk_t *bp;
 			struct iphdr *iph;
 			unsigned char *data;
 
 			skb_reserve(skb, hlen);
 			/* find headers */
 			iph = (typeof(iph)) __skb_put(skb, tlen);
-			sh = (typeof(sh)) (iph + 1);
-			data = (unsigned char *) (sh);
+			data = (unsigned char *) (iph + 1);
 			skb->dst = &rt->u.dst;
 			skb->priority = 0;
 			iph->version = 4;
@@ -697,16 +748,17 @@ ip_xmit_msg(uint32_t daddr, uint32_t saddr, uint8_t protoid, mblk_t *mp, struct 
 			iph->daddr = rt->rt_dst;
 			iph->saddr = saddr;
 			iph->protocol = protoid;
-			iph->tot_len = htons(len);
+			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
 #else
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
-			__ip_select_ident(iph, &rt->u.dat, 0);
+			__ip_select_ident(iph, &rt->u.dst, 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
 #endif
 #endif
 			/* For sockets the passed in sk_buff represents a single packet.  For
@@ -716,15 +768,15 @@ ip_xmit_msg(uint32_t daddr, uint32_t saddr, uint8_t protoid, mblk_t *mp, struct 
 				int blen = bp->b_wptr - bp->b_rptr;
 
 				if (blen > 0) {
-					bcopy(bp->b_rptr, data blen);
+					bcopy(bp->b_rptr, data, blen);
 					data += blen;
 				} else
 					rare();
 			}
 #ifdef HAVE_KFUNC_DST_OUTPUT
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, ip_queue_xmit);
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, npi_ip_queue_xmit);
 #else
-			ip_queue_xmit(skb);
+			npi_ip_queue_xmit(skb);
 #endif
 		} else
 			rare();
@@ -738,7 +790,7 @@ STATIC int
 ip_unitdata_req(queue_t *q, struct sockaddr_in *dest, mblk_t *mp)
 {
 	struct ip *ip = IP_PRIV(q);
-	struct sockaddr_in *srce = &ip->addr;
+	struct sockaddr_in *srce = (struct sockaddr_in *)&ip->addr;
 	uint32_t saddr = srce->sin_addr.s_addr;
 	uint32_t daddr = dest->sin_addr.s_addr;
 	uint8_t protoid = ntohs(dest->sin_port);
@@ -1001,17 +1053,23 @@ ip_dupb(queue_t *q, mblk_t *bp)
  *
  *  ===================================================================
  */
+STATIC int ip_unbind_req(struct ip *ip) {
+	swerr();
+	fixme(("write this function"));
+	return (0);
+}
+
 /*
  *  M_ERROR		    - error out the stream
  *  ---------------------------------------------------------------
  */
 STATIC int
-n_error_reply(queue_t *q, long uerrno)
+n_error_reply(queue_t *q, long err)
 {
 	struct ip *ip = IP_PRIV(q);
 	mblk_t *mp;
 
-	switch (uerrno) {
+	switch (err) {
 	case -EBUSY:
 	case -EAGAIN:
 	case -ENOMEM:
@@ -1022,16 +1080,12 @@ n_error_reply(queue_t *q, long uerrno)
 	case 2:
 		return (err);
 	}
-	if ((mp = ip_allocb(sp, 2, BPRI_HI))) {
+	if ((mp = ip_allocb(q, 2, BPRI_HI))) {
 		mp->b_datap->db_type = M_ERROR;
 		*(mp->b_wptr)++ = (err < 0) ? -err : err;
 		*(mp->b_wptr)++ = (err < 0) ? -err : err;
-		putnext(sp->rq, mp);
-		local_bh_disable();
-		bh_lock_ip(sp);
-		ip_unbind(sp);
-		bh_unlock_ip(sp);
-		local_bh_enable();
+		putnext(ip->rq, mp);
+		ip_unbind_req(ip);
 		return (QR_DONE);
 	}
 	return (-ENOBUFS);
@@ -1045,8 +1099,9 @@ STATIC int
 n_info_ack(queue_t *q)
 {
 	struct ip *ip = IP_PRIV(q);
+	int err;
 	mblk_t *mp;
-	N_info_ack *p;
+	N_info_ack_t *p;
 	N_qos_sel_info_ip_t *qos;
 	N_qos_range_info_ip_t *qor;
 	size_t add_len = ip->anum * sizeof(struct sockaddr_in);
@@ -1088,12 +1143,12 @@ n_info_ack(queue_t *q)
 	qos->n_qos_type = N_QOS_SEL_INFO_IP;
 	qos->ttl = ip->ttl;
 	qos->tos = ip->tos;
-	mp->b_ptr += qos_len;
+	mp->b_wptr += qos_len;
 	qor = (typeof(qor)) mp->b_wptr;
 	qor->n_qos_type = N_QOS_RANGE_INFO_IP;
 	mp->b_wptr += qor_len;
 	if (pro_len) {
-		bcopy(&ip->prot, mp->b_wptr, pro_len);
+		bcopy(&ip->protoids, mp->b_wptr, pro_len);
 		mp->b_wptr += pro_len;
 	}
 	putnext(ip->rq, mp);
@@ -1111,14 +1166,14 @@ n_info_ack(queue_t *q)
  *  ---------------------------------------------------------------
  */
 STATIC int
-n_bind_ack(queue_t *q)
+n_bind_ack(queue_t *q, ulong coninds)
 {
 	struct ip *ip = IP_PRIV(q);
 	int err;
 	mblk_t *mp;
 	N_bind_ack_t *p;
-	size_t add_len = sp->anum * sizeof(struct sockaddr_in);
-	size_t pro_len = sp->pnum * sizeof(uint8_t);
+	size_t add_len = ip->anum * sizeof(struct sockaddr_in);
+	size_t pro_len = ip->pnum * sizeof(uint8_t);
 
 	if (ip_get_state(ip) != NS_WACK_BREQ)
 		goto outstate;
@@ -1139,7 +1194,7 @@ n_bind_ack(queue_t *q)
 		mp->b_wptr += add_len;
 	}
 	if (pro_len) {
-		bcopy(&ip->prot, mp->b_wptr, pro_len);
+		bcopy(&ip->protoids, mp->b_wptr, pro_len);
 		mp->b_wptr += pro_len;
 	}
 	ip_set_state(ip, NS_IDLE);
@@ -1189,7 +1244,7 @@ n_error_ack(queue_t *q, int prim, int err)
 		err = NNOTSUPPORT;
 		break;
 	}
-	if (!(mp = ip_allocb(ip, sizeof(*p), BPRI_MED)))
+	if (!(mp = ip_allocb(q, sizeof(*p), BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (N_error_ack_t *) mp->b_wptr;
@@ -1246,10 +1301,11 @@ STATIC int
 n_ok_ack(queue_t *q, np_ulong prim, np_ulong seq, np_ulong tok)
 {
 	struct ip *ip = IP_PRIV(q);
+	int err;
 	mblk_t *mp;
 	N_ok_ack_t *p;
 
-	if (!(mp = ip_alloc(q, sizeof(*p), BRPI_MED)))
+	if (!(mp = ip_allocb(q, sizeof(*p), BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -1298,12 +1354,13 @@ n_unitdata_ind(queue_t *q, unsigned char *src_ptr, size_t src_len, unsigned char
 	       size_t dst_len, mblk_t *db)
 {
 	struct ip *ip = IP_PRIV(q);
+	int err;
 	mblk_t *mp;
 	N_unitdata_ind_t *p;
 
 	if (!(canputnext(ip->rq)))
 		goto ebusy;
-	if (!(mp = ip_alloc(q, sizeof(*p) + src_len + dst_len, BPRI_MED)))
+	if (!(mp = ip_allocb(q, sizeof(*p) + src_len + dst_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -1337,7 +1394,9 @@ STATIC int
 n_uderror_ind(queue_t *q, unsigned char *dest_ptr, size_t dest_len, np_ulong error, mblk_t *db)
 {
 	struct ip *ip = IP_PRIV(q);
+	int err;
 	N_uderror_ind_t *p;
+	mblk_t *mp;
 
 	if (!canputnext(ip->rq))
 		goto ebusy;
@@ -1377,14 +1436,14 @@ n_uderror_reply(queue_t *q, void *dest_ptr, size_t dest_len, long error, mblk_t 
 
 	switch (error) {
 	case -EINVAL:
-		return n_error_reply(q, err);
+		return n_error_reply(q, error);
 	case NBADADDR:
 	case NBADDATA:
 		break;
 	case NOUTSTATE:
 		return n_error_reply(q, -EPROTO);
 	}
-	if ((err = n_uderror_ind(q, dest_ptr, dest_len, err, db)) == QR_DONE)
+	if ((err = n_uderror_ind(q, dest_ptr, dest_len, error, db)) == QR_DONE)
 		return (QR_STRIP);
 	return (err);
 }
@@ -1485,7 +1544,7 @@ n_bind_req(queue_t *q, mblk_t *mp)
 			}
 		if ((err = n_bind_ack(q, p->CONIND_number)) == 0)
 			return (QR_DONE);
-		ip_unbind_req(q);
+		ip_unbind_req(ip);
 		return (err);
 	}
       provspec:
@@ -1503,7 +1562,9 @@ n_bind_req(queue_t *q, mblk_t *mp)
 	err = NBOUND;
 	ptrace(("%s; %p: default address is already bound\n", DRV_NAME, ip));
 	goto error;
+      badprotoid:
       noprotoid:
+      badprotoid2:
 	err = NNOPROTOID;
 	ptrace(("%s: %p: could not allocate protocol id\n", DRV_NAME, ip));
 	goto error;
@@ -1511,7 +1572,7 @@ n_bind_req(queue_t *q, mblk_t *mp)
 	err = NBADFLAG;
 	ptrace(("%s: %p: invalid flags\n", DRV_NAME, ip));
 	goto error;
-      baddaddr:
+      badaddr:
 	err = NBADADDR;
 	ptrace(("%s: %p: address is invalid\n", DRV_NAME, ip));
 	goto error;
@@ -1543,15 +1604,19 @@ n_unbind_req(queue_t *q, mblk_t *mp)
 	if (ip_get_state(ip) != NS_IDLE)
 		goto outstate;
 	ip_set_state(ip, NS_WACK_UREQ);
-	if ((err = ip_unbind_req(q)))
+	if ((err = ip_unbind_req(ip)))
 		goto error;
-	return n_ok_ack(ip, N_UNBIND_REQ, err);
+	return n_ok_ack(q, N_UNBIND_REQ, 0, 0);
       outstate:
 	err = NOUTSTATE;
 	ptrace(("%s: %p: would place interface out of state\n", DRV_NAME, ip));
 	goto error;
+      einval:
+	err = -EINVAL;
+	ptrace(("%s: %p: invalid primitive format\n", DRV_NAME, ip));
+	goto error;
       error:
-	return n_error_ack(ip, N_UNBIND_REQ, err);
+	return n_error_ack(q, N_UNBIND_REQ, err);
 }
 
 /*
@@ -1564,7 +1629,7 @@ n_optmgmt_req(queue_t *q, mblk_t *mp)
 	struct ip *ip = IP_PRIV(q);
 	int err;
 	N_optmgmt_req_t *p = (typeof(p)) mp->b_rptr;
-	N_qos_sel_info_ip_t *q = (typeof(q)) (mp->b_rptr + p->QOS_offset);
+	N_qos_sel_info_ip_t *qos = (typeof(qos)) (mp->b_rptr + p->QOS_offset);
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
@@ -1573,21 +1638,21 @@ n_optmgmt_req(queue_t *q, mblk_t *mp)
 	if (p->QOS_length) {
 		if (mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length)
 			goto badopt;
-		if (q->n_qos_type != N_QOS_SEL_INFO_IP)
+		if (qos->n_qos_type != N_QOS_SEL_INFO_IP)
 			goto badqostype;
-		if (p->QOS_length != sizeof(*q))
+		if (p->QOS_length != sizeof(*qos))
 			goto badopt2;
 	}
 	if (p->QOS_length) {
-		if (q->tos != -1UL)
-			ip->tos = q->tos;
-		if (q->ttl != -1UL)
-			ip->ttl = q->ttl;
+		if (qos->tos != -1UL)
+			ip->tos = qos->tos;
+		if (qos->ttl != -1UL)
+			ip->ttl = qos->ttl;
 	}
 	if (p->OPTMGMT_flags & DEFAULT_RC_SEL)
-		ip->flags |= IP_FLAG_DEFAULT_RC_SEL;
+		ip->i_flags |= IP_FLAG_DEFAULT_RC_SEL;
 	else
-		ip->flags &= ~IP_FLAG_DEFAULT_RC_SEL;
+		ip->i_flags &= ~IP_FLAG_DEFAULT_RC_SEL;
 	return n_ok_ack(q, N_OPTMGMT_REQ, 0, 0);
       badopt2:
 	err = NBADOPT;
@@ -1649,11 +1714,11 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 			goto badaddr2;
 		/* avoid alignemnt problems */
 		bcopy(mp->b_rptr + p->DEST_offset, &dest, dlen);
-		if (dest->sin_family != AF_INET)
+		if (dest.sin_family != AF_INET)
 			goto badaddr;
-		if (dest->sin_port == 0)
+		if (dest.sin_port == 0)
 			goto badaddr;
-		if (dest->sin_addr.s_addr == INADDR_ANY)
+		if (dest.sin_addr.s_addr == INADDR_ANY)
 			goto badaddr;
 		if ((err = ip_unitdata_req(q, &dest, mp->b_cont)) < 0)
 			switch (err) {
@@ -1668,6 +1733,13 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 			}
 		return (QR_DONE);
 	}
+      provspec:
+	err = err;
+	ptrace(("%s: %p: provider specific UNIX error %d\n", DRV_NAME, ip, -err));
+      access:
+	err = NACCESS;
+	ptrace(("%s: %p: no permission for requested address\n", DRV_NAME, ip));
+	goto error;
       baddata2:
 	err = NBADDATA;
 	ptrace(("%s: %p: invalid amount of user data %u\n", DRV_NAME, ip, mlen));
@@ -1700,23 +1772,6 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 	return n_uderror_reply(q, &dest, dlen, err, mp->b_cont);
 }
 
-STATIC INLINE int
-ip_trylockq(queue_t *q)
-{
-	int res;
-	struct ip *ip = IP_PRIV(q);
-
-	ip_lock_bh(ip);
-	if (!(res = !ip->users++)) {
-		if (q == ip->rq)
-			ip->rwait = q;
-		if (q == ip->wq)
-			ip->wwait = q;
-	}
-	ip_unlock_bh(ip);
-	return (res);
-}
-
 /*
  *  =========================================================================
  *
@@ -1732,7 +1787,7 @@ STATIC int
 ip_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn = -EPROTO;
-	t_uscalar_t prim;
+	t_uscalar_t prim = 0;
 	struct ip *ip = IP_PRIV(q);
 	t_uscalar_t oldstate = ip_get_state(ip);
 	if (mp->b_wptr >= mp->b_rptr + sizeof(ulong))
@@ -1795,7 +1850,7 @@ ip_w_proto(queue_t *q, mblk_t *mp)
 		case -ENOMEM:
 		case -ENOBUFS:
 		case -EOPNOTSUPP:
-			return n_error_ack(q, rtn);
+			return n_error_ack(q, prim, rtn);
 		case -EPROTO:
 			return n_error_reply(q, -EPROTO);
 		default:
@@ -1806,6 +1861,11 @@ ip_w_proto(queue_t *q, mblk_t *mp)
 	return (rtn);
 }
 
+STATIC int n_write(struct ip *ip, mblk_t *mp) {
+	swerr();
+	fixme(("write this function"));
+	return (0);
+}
 /*
  *  -------------------------------------------------------------------------
  *
@@ -1862,6 +1922,11 @@ ip_r_other(queue_t *q, mblk_t *mp)
 #endif
 }
 
+STATIC int ip_recv_msg(struct ip *ip, mblk_t *mp) {
+	swerr();
+	fixme(("write this function"));
+	return (0);
+}
 /*
  *  -------------------------------------------------------------------------
  *
@@ -1877,6 +1942,11 @@ ip_r_data(queue_t *q, mblk_t *mp)
 	return ip_recv_msg(ip, mp);
 }
 
+STATIC int ip_recv_err(struct ip *ip, mblk_t *mp) {
+	swerr();
+	fixme(("write this function"));
+	return (0);
+}
 /*
  *  -------------------------------------------------------------------------
  *
@@ -2173,6 +2243,17 @@ ip_wsrv(queue_t *q)
  *
  *  =========================================================================
  */
+STATIC struct ip_hash_bucket ip_bind_hash[1] = { };
+STATIC int ip_bind_hashfn(short snum) {
+	swerr();
+	fixme(("write this function"));
+	return (0);
+}
+STATIC struct sockaddr_in *ip_find_saddr(struct ip *ip, uint32_t daddr) {
+	swerr();
+	fixme(("write this function"));
+	return (NULL);
+}
 /**
  *  ip_lookup -	lookup Stream by protocol, address and port.
  *  @proto:	IP protocol number
@@ -2182,7 +2263,7 @@ ip_wsrv(queue_t *q)
 STATIC struct ip *
 ip_lookup(uint8_t proto, uint32_t daddr, uint16_t dport)
 {
-	strict ip *result = NULL;
+	struct ip *result = NULL;
 	int snum = ntohs(dport);
 	struct ip_bind_bucket *ib;
 	struct ip_hash_bucket *hp = &ip_bind_hash[ip_bind_hashfn(snum)];
@@ -2256,12 +2337,12 @@ ip_v4_rcv(struct sk_buff *skb)
 		goto no_ip_prot;
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
 		goto linear_fail;
-	if (!(ip = ip_lookup(pb->proto, iph->daddr, dport)))
+	if (!(ip = ip_lookup(pb->proto, iph->daddr, *(unsigned short *)(iph+1)))) /* FIXME */
 		goto no_ip_stream;
 	if (!ip->rq || !canput(ip->rq))
 		goto flow_controlled;
 	/* include a hidden IP header */
-	if (!(mp = esballoc(skb->nh.raw, skb->len + (skb->data - skb->nh.raw))))
+	if (!(mp = esballoc(skb->nh.raw, skb->len + (skb->data - skb->nh.raw), BPRI_MED, &fr)))
 		goto no_buffers;
 	mp->b_datap->db_type = M_DATA;
 	mp->b_wptr = mp->b_rptr + skb->len + (skb->data - skb->nh.raw);
@@ -2290,7 +2371,7 @@ ip_v4_rcv(struct sk_buff *skb)
 	ptrace(("%s: %p: ERROR: no stream\n", DRV_NAME, ip));
 #ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 	if (pb->next != NULL)
-		return (*pb->next) (skb);
+		return (*pb->next->handler) (skb);
 #endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 	goto discard_it;
       linear_fail:
@@ -2308,7 +2389,7 @@ ip_v4_rcv(struct sk_buff *skb)
 	freemsg(mp);
 	return (0);
 }
-STATIC int
+STATIC void
 ip_v4_err(struct sk_buff *skb, u32 info)
 {
 }
@@ -2381,31 +2462,6 @@ ip_init_caches(void)
 	}
 	return (0);
 }
-STATIC INLINE struct ip *
-ip_get(void)
-{
-	struct ip *ip;
-
-	if ((ip = kmem_cache_alloc(ip_priv_cachep, SLAB_ATOMIC))) {
-		bzero(ip, sizeof(*ip));
-		atomic_set(&ip->refcnt, 1);
-	}
-	return (ip);
-}
-STATIC INLINE void
-ip_hold(struct ip *ip)
-{
-	if (ip)
-		atomic_inc(&ip->refcnt);
-}
-STATIC INLINE void
-ip_put(sturct ip * ip)
-{
-	if (ip)
-		if (atomic_dec_and_test(&ip->refcnt)) {
-			kmem_cache_free(ip_priv_cachep, ip);
-		}
-}
 STATIC ip_t *
 ip_alloc_priv(queue_t *q, ip_t ** slp, major_t cmajor, minor_t cminor, cred_t *crp)
 {
@@ -2426,7 +2482,6 @@ ip_alloc_priv(queue_t *q, ip_t ** slp, major_t cmajor, minor_t cminor, cred_t *c
 		ip->wwait = NULL;
 		ip->users = 0;
 		ip_set_state(ip, NS_UNBND);
-		spin_lock_init(&ip->lock);
 		ip_hold(ip);
 		if ((ip->next = *slp))
 			ip->next->prev = &ip->next;
@@ -2447,29 +2502,25 @@ ip_free_priv(queue_t *q)
 	ensure(ip, return);
 	qprocsoff(q);
 	printd(("%s: unlinking private structure, reference count = %d\n", DRV_NAME,
+	atomic_read(&ip->refcnt)));
+	ip_unbufcall(q);
+	printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME,
 		atomic_read(&ip->refcnt)));
-	spin_lock_bh(&ip->lock);
-	{
-		ip_unbufcall(q);
-		printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME,
-			atomic_read(&ip->refcnt)));
-		spin_lock(&ip_lock);
-		if ((*ip->prev = ip->next))
-			ip->next->prev = ip->prev;
-		ip->next = NULL;
-		ip->prev = NULL;
-		spin_unlock(&ip_lock);
-		ip_put(ip);
-		printd(("%s: unlinked, reference count = %d\n", DRV_NAME,
-			atomic_read(&ip->refcnt)));
-		ip->rq->q_ptr = NULL;
-		ip->rq = NULL;
-		ip_put(ip);
-		ip->wq->q_ptr = NULL;
-		ip->wq = NULL;
-		ip_put(ip);
-	}
-	spin_unlock_bh(&ip->lock);
+	spin_lock_bh(&ip_lock);
+	if ((*ip->prev = ip->next))
+		ip->next->prev = ip->prev;
+	ip->next = NULL;
+	ip->prev = NULL;
+	spin_unlock_bh(&ip_lock);
+	ip_put(ip);
+	printd(("%s: unlinked, reference count = %d\n", DRV_NAME,
+		atomic_read(&ip->refcnt)));
+	ip->rq->q_ptr = NULL;
+	ip->rq = NULL;
+	ip_put(ip);
+	ip->wq->q_ptr = NULL;
+	ip->wq = NULL;
+	ip_put(ip);
 	assure(atomic_read(&ip->refcnt) == 1);
 	ip_put(ip);		/* should normally be final put */
 	return;
@@ -2485,11 +2536,14 @@ ip_free_priv(queue_t *q)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
+#define FIRST_CMINOR	1
+#define  FREE_CMINOR	1
+#define  LAST_CMINOR	255
 STATIC int ip_majors[IP_CMAJORS] = { IP_CMAJOR_0, };
 STATIC int
 ip_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	int mindex = 0, err;
+	int mindex = 0;
 	int cmajor = getmajor(*devp);
 	int cminor = getminor(*devp);
 	ip_t *ip, **ipp = &ip_opens;
@@ -2719,7 +2773,7 @@ ipinit(void)
 			} else {
 				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
 					DRV_NAME, err);
-				ip_terminate();
+				ipterminate();
 				return (err);
 			}
 		}
@@ -2731,6 +2785,11 @@ ipinit(void)
 		if (major == 0)
 			major = ip_majors[0];
 	}
+	(void)ip_unbind_prot;
+	(void)ip_esballoc;
+	(void)ip_dupmsg;
+	(void)ip_dupb;
+	(void)n_unitdata_ind;
 	return (0);
 }
 

@@ -1,3 +1,10 @@
+2006-03-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: README-alpha missing from last release
+	- this file is normally included by autoconf but the base version number
+	  for LiS is 2.18 which is not an alpha release number according to
+	  autoconf
+
 2006-03-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* ANNOUNCE: added announcement file for release

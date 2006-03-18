@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: npi_ip.7.man,v 0.9.2.1 2006/03/18 00:15:20 brian Exp $
+.\" @(#) $Id: npi_ip.7.man,v 0.9.2.2 2006/03/18 09:42:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/03/18 00:15:20 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/18 09:42:11 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: npi_ip.7.man,v $
+.\" Revision 0.9.2.2  2006/03/18 09:42:11  brian
+.\" - added in ip driver and manual pages
+.\"
 .\" Revision 0.9.2.1  2006/03/18 00:15:20  brian
 .\" - syncing notebook
 .\"
@@ -86,7 +89,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH SYNOPSIS
-.HP 12
+.PP
 .B #include <sys/npi.h>
 .br
 .B #include <sys/npi_ip.h>
@@ -117,7 +120,7 @@ and
 .BR sockets (3)
 library.
 .\"
-.SS "ADDRESS FORMATS"
+.SS "Address Formats"
 .PP
 For consistency with other protocol modules, the address format used by
 .B NPI-IP
@@ -155,13 +158,16 @@ permits multiple addresses to be specified to bind.  When multiple addresses
 are required, they are specified as a packed list of
 .BR sockaddr_in  " or " sockaddr_in6
 structures.  The list forms the address specified using the
-.IR ADDR_length "and " ADDR_offset
+.IR ADDR_length " and " ADDR_offset
 fields in the
+.BR N_INFO_ACK (7),
 .BR N_BIND_REQ (7)
-primitive.
+and
+.BR N_BIND_ACK (7)
+primitives.
 .\"
 .\"
-.SS "QOS PARAMETERS"
+.SS "QOS Parameters"
 .PP
 .B NPI-IP
 provides Quality of Service parameters using
@@ -169,12 +175,31 @@ provides Quality of Service parameters using
 and
 .B OSI 
 conforming structures as described in the sections that follow.
+.HP
+.I DESIGN\ NOTES:\-\ \c
+This is really problematic trying to map OSI conforming connectionless QOS parameters onto IP QOS
+parameters.  What is really needed here is
+.BR N_QOS_IP_CL_SEL1
+and
+.BR N_QOQ_IP_CL_RANGE1
+structures.
+
 .\"
 .TP
 .B N_QOS_CL_SEL1
+Used with the
+.BR N_INFO_ACK (7)
+and
+.BR N_OPTMGMT_REQ (7)
+primitives, it provides a selection of quality of service parameters for connectionless providers.
 .RS
 .TP
 .I n_qos_type
+Always
+.B N_QOS_CL_SEL1
+indicating the
+.B n_qos_cl_sel1
+structure.
 .TP
 .I transit_delay_max
 TTL field.
@@ -183,18 +208,52 @@ TTL field.
 TOS type of service.
 .TP
 .I protection_sel
+Provides the protection selection.  Values can be one of:
+.BR N_NO_PROT ,
+no protection;
+.BR N_PASSIVE_PROT ,
+protection against passive monitoring;
+.BR N_ACTIVE_PROT ,
+protection against active monitoring; and,
+.BR N_ACTIVE_PASSIVE_PROT ,
+protection against active and passive monitoring.
+The
+.B NPI-IP
+provider only need support
+.BR N_NO_PROT .
 .TP
 .I priority_sel
-TOS precedence.
+Provideds selection of the priority of a given packet or packets within an association.  Under
+.B NPI-IP
+this is the
+.I TOS Precedence
+and can have values:
+.BR N_ROUTINE ,
+.BR N_PRIORITY ,
+.BR N_IMMEDIATE ,
+.BR N_FLASH ,
+.BR N_OVERRIDEFLASH ,
+.BR N_CRITIC_ECP ,
+.BR N_INETCONTROL ,
+and
+.BR N_NETCONTROL .
 .TP
 .I max_accept_cost
 .RE
 .\"
 .TP
 .B N_QOS_CL_RANGE1
+Used with the
+.BR N_INFO_ACK (7)
+primitive, it provides a range of quality of service parameters for connectionless providers.
 .RS
 .TP
 .I n_qos_type
+Always
+.B N_QOS_CL_RANGE1
+indicating the
+.B n_qos_cl_range1
+structure.
 .TP
 .I transit_delay_max
 .RS
@@ -673,41 +732,116 @@ and payload.
 .RE
 .\"
 .\"
-.\"
-.\"
-.\"
-.\"
-.\"
 .SH IOCTLS
 .PP
+The
+.B NPI
+specification
+.[
+NPI Revision 2.0.0
+.]
+does not standardize on any input-output controls.
+
 .\"
 .\"
-.SH "ERROR HANDLING"
-.PP
+.\".SH "ERROR HANDLING"
+.\".PP
 .\"
 .\"
-.SH ERRORS
-.PP
+.\".SH ERRORS
+.\".PP
 .\"
 .\"
 .SH NOTICES
 .PP
+There are a number of purposes for this NPI-IP driver:
+.IP 1. \w'0.\(em'u
+The
+.I OpenSS7 Project
+has a need for a solution for providing a pseudo-device driver for RTP (Real-Time Transport
+Protocol).
+.[
+rfc1889
+.]
+Because RTP runs over UDP (User Datagram Protocol), it is necessary to intercept packets
+ahead of Linux' native UDP at the IP level to avoid the inefficiencies of opening Sockets from
+inside the kernel.  This NPI-IP driver accomplishes that feat.  It also permits a single Stream to
+be opened but which communicates on many RTP channels.
+.IP 2.
+The
+.I OpenSS7 Project
+has a need for a direct interface and interception (drop and insert) capabilities at the IP level
+for the purposes of testing both RTP (Real-Time Transport Protocol)
+.[
+rfc1889
+.]
+and SCTP (Stream Control Transmission Protocol).
+.[
+rfc2960
+.]
+This need is less critical because of the availability of Ferry-Clip
+testing, using STREAMS-based pipes, that can be rigged to RTP and SCTP to acheive the same effect.
+.IP 3.
+Although historically the STREAMS SCTP driver hooks directly to the Linux native IP subsystem at the
+driver-kernel level, it might be of some advantage to make SCTP a pushable module that simply pushes
+over one of these NPI-IP Streams, or a multiplexing driver under which one of these NPI-IP Streams
+is permanently linked at system initialization.  The ability to bind multiple addresses is of use to
+SCTP.
+.IP 4.
+Although there is no prevailing standardized way of interfacing to the IP layer of various
+.IR UNIX \(rg
+operating systems, such as
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+it might be possible to make the
+.I OpenSS7 Project
+RTP and SCTP drivers immediately portable to other operating systems with STREAMS such as
+.IR Solaris \(rg,
+.IR pSOS \(rg,
+.IR vxWorks \(rg,
+.IR LynxOS \(rg,
+etc. by simply porting the NPI-IP driver instead of each protocol driver.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR npi (7),
+.BR getpmsg (2s),
+.BR putpmsg (2s),
+.BR getpmsg (3p),
+.BR putpmsg (3p),
+.BR ioctl (2),
+.BR ioctl (3p).
 .\"
 .\"
 .SH VERSIONS
 .PP
+This is version @VERSION@ of the NPI-IP Corrigendum.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+There is, in fact, no standard for using the Network Provider Interface (NPI)
+.[
+NPI Revision 2.0.0
+.]
+with the Internet Protocol (IP) suite.  Although historically some approaches may have been taken in
+various releases of the
+.IR UNIX \(rg
+operating system, none have been well documented nor can be considered the basis for a standard.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+This Corrigendum conforms where possible to the
+.I Network Provider Interface Revision 2.0.0
+.[
+NPI Revision 2.0.0
+.]
+but its application to the Internet Protocol is implementation specific and not subject to
+standardization.
 .\"
 .\"
 .[
