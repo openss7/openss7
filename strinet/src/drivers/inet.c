@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/10 19:47:43 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/03/18 00:15:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 19:47:43 $ by $Author: brian $
+ Last Modified $Date: 2006/03/18 00:15:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.62  2006/03/18 00:15:13  brian
+ - syncing notebook
+
  Revision 0.9.2.61  2006/03/10 19:47:43  brian
  - reformatting
 
@@ -60,10 +63,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/10 19:47:43 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/03/18 00:15:13 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/10 19:47:43 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/03/18 00:15:13 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -517,7 +520,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2006/03/10 19:47:43 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/03/18 00:15:13 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -913,7 +916,6 @@ typedef struct inet {
 	int users;			/* lock holders */
 	uint rbid;			/* RD buffer call id */
 	uint wbid;			/* WR buffer call id */
-	int ioc_state;			/* transparent ioctl state */
 	ushort port;			/* port/protocol number */
 	int tcp_state;			/* tcp state history */
 	ss_profile_t p;			/* protocol profile */
@@ -15448,6 +15450,17 @@ ss_r_prim(queue_t *q, mblk_t *mp)
 }
 
 /*
+ *  READ SIDE wakeup procedure (called on each service procedure exit)
+ *  -------------------------------------------------------------------------
+ */
+STATIC void
+ss_r_wakeup(queue_t *q)
+{
+	if (((ss_t *) PRIV(q))->sock != NULL)
+		ss_sock_recvmsg(q);
+}
+
+/*
  *  =========================================================================
  *
  *  QUEUE PUT and SERVICE routines
@@ -15534,7 +15547,7 @@ ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
  *  -----------------------------------
  */
 STATIC int
-ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
+ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_t *))
 {
 	int rtn = 0;
 
@@ -15619,6 +15632,8 @@ ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 			}
 			break;
 		}
+		if (procwake != NULL)
+			procwake(q);
 		ss_unlockq(q);
 	}
 	return (rtn);
@@ -15633,9 +15648,7 @@ ss_rput(queue_t *q, mblk_t *mp)
 STATIC streamscall int
 ss_rsrv(queue_t *q)
 {
-	if (((ss_t *) PRIV(q))->sock != NULL)
-		ss_sock_recvmsg(q);
-	return ss_srvq(q, &ss_r_prim);
+	return ss_srvq(q, &ss_r_prim, &ss_r_wakeup);
 }
 
 STATIC streamscall int
@@ -15647,7 +15660,7 @@ ss_wput(queue_t *q, mblk_t *mp)
 STATIC streamscall int
 ss_wsrv(queue_t *q)
 {
-	return ss_srvq(q, &ss_w_prim);
+	return ss_srvq(q, &ss_w_prim, NULL);
 }
 
 /*

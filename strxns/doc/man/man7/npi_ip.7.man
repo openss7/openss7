@@ -1,0 +1,716 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: npi_ip.7.man,v 0.9.2.1 2006/03/18 00:15:20 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/03/18 00:15:20 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: npi_ip.7.man,v $
+.\" Revision 0.9.2.1  2006/03/18 00:15:20  brian
+.\" - syncing notebook
+.\"
+.\" =========================================================================
+.so strxns.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH NPI-IP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Provider Interface (NPI)"
+.\"
+.\"
+.SH NAME
+.B npi_ip
+\- Network Provider Interface (NPI) - Internet Protocol (IP) Corrigendum
+.\"
+.\"
+.SH SYNOPSIS
+.HP 12
+.B #include <sys/npi.h>
+.br
+.B #include <sys/npi_ip.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B NPI-IP
+provides a Stream supporting the Network Provider Interface,
+.[
+NPI Revision 2.0.0
+.]
+.BR npi (7),
+to the Internet Protocol,
+.BR ip (7).
+This
+.IR STREAMS (4)
+interface provides the
+.BR ip (7)
+protocol service interface using the N-primitives of the
+.BR npi (7).
+This interface is intended solely for use by user programs or protocol modules
+requiring the common
+.BR npi (7)
+interface, such as the
+.BR xti (3)
+and
+.BR sockets (3)
+library.
+.\"
+.SS "ADDRESS FORMATS"
+.PP
+For consistency with other protocol modules, the address format used by
+.B NPI-IP
+is a Internet Protocol socket address
+.RB ( sockaddr_in
+structure)
+in address family
+.B AF_INET
+or
+.RB ( sockaddr_in6
+structure)
+in address family
+.BR AF_INET6 .
+The
+.B sockaddr_in
+structure is described in
+.BR ip (7).
+The
+.B sockaddr_in6
+structure is described in
+.BR ipv6 (7).
+.PP
+.B NPI-IP
+supports the notion of multihoming in support of the Stream Control
+Transmission Protocol (SCTP)
+.[
+rfc2960
+.]
+described in
+.BR sctp (7).
+SCTP requires that an association be bound to multiple IP or IPv6 addresses.
+In support of multihoming,
+.B NPI-IP
+permits multiple addresses to be specified to bind.  When multiple addresses
+are required, they are specified as a packed list of
+.BR sockaddr_in  " or " sockaddr_in6
+structures.  The list forms the address specified using the
+.IR ADDR_length "and " ADDR_offset
+fields in the
+.BR N_BIND_REQ (7)
+primitive.
+.\"
+.\"
+.SS "QOS PARAMETERS"
+.PP
+.B NPI-IP
+provides Quality of Service parameters using
+.BR IP -specific
+and
+.B OSI 
+conforming structures as described in the sections that follow.
+.\"
+.TP
+.B N_QOS_CL_SEL1
+.RS
+.TP
+.I n_qos_type
+.TP
+.I transit_delay_max
+TTL field.
+.TP
+.I residual_error_rate
+TOS type of service.
+.TP
+.I protection_sel
+.TP
+.I priority_sel
+TOS precedence.
+.TP
+.I max_accept_cost
+.RE
+.\"
+.TP
+.B N_QOS_CL_RANGE1
+.RS
+.TP
+.I n_qos_type
+.TP
+.I transit_delay_max
+.RS
+.TP
+.I td_targ_value
+.TP
+.I td_max_value
+.RE
+.TP
+.I residual_error_rate
+.TP
+.I protection_range
+.RS
+.TP
+.I protect_targ_value
+.TP
+.I protect_min_value
+.RE
+.TP
+.I priority_range
+.RS
+.TP
+.I priority_targ_value
+.TP
+.I priority_min_value
+.RE
+.TP
+.I max_accept_cost
+.RE
+.\"
+.\"
+.SS "Local Management Interface"
+.PP
+For the most part, the local management interface of the NPI operates for the
+NPI-IP provider in accordance with the Network Provider Interface Revision
+2.0.0 specifications.
+.[
+NPI Revision 2.0.0
+.]
+Some enhancements are provided to addressing in support of the Stream Control
+Transmission Protocol (SCTP)
+.[
+rfc2960
+.]
+and multihomed associations.
+.PP
+The local management primitives are interpreted and issued as
+follows:
+.TP
+.BR N_INFO_REQ (7)
+This primitive is interpreted by the NPI-IP provider in accordance with the
+NPI specifications.
+.[
+NPI Revision 2.0.0
+.]
+.TP
+.BR N_INFO_ACK (7)
+This primitive is issued by the NPI-IP provider in accordances with the NPI
+specifications
+.[
+NPI Revision 2.0.0
+.]
+with the following considerations:
+.RS
+.TP
+.I NSDU_size
+This field reflects the current Maximum Transfer Unit (MTU) (minus the size of
+the IP header), times the number of IP packets that can be generated
+considering IP fragmentation, for the Stream given the protocol addresses to
+which the Stream is bound.
+.TP
+.I ENSDU_size
+The NPI-IP provider, being a CLNS provider, has no concept of expedited data
+and this field is always set to zero
+.RB ( 0 ).
+.TP
+.I CDATA_size
+The NPI-IP provider, being a CLNS proivder, has no concept of connection data
+and this field is always set to zero
+.RB ( 0 ).
+.TP
+.I DDATA_size
+The NPI-IP provider, being a CLNS proivder, has no concept of connection data
+and this field is always set to zero
+.RB ( 0 ).
+.TP
+.I ADDR_size
+Specifies the maximum address size.  For a device that supports IPv4, this is
+the size of the
+.B sockaddr_in
+structure.  For an NPI-IP provider supporting multihoming, this value will
+be an integer multiple of the size of the
+.B sockaddr_in
+structure.  For a device that supports IPv6, the size of the
+.B sockaddr_in6
+structure, or, supprorting multihoming, an integer multiple.
+.TP
+.IR ADDR_length " and " ADDR_offset
+The length and offset of the bound protocol addresses.  For an NPI-IP provider
+supporting multihoming, the length and offset specify a list of address
+structures as described above under
+.RB \*(lq "Address Formats" \*(rq.
+.TP
+.IR QOS_length " and " QOS_offset
+The length and offset of the current selected QOS parameters.  This will be an
+.B N_QOS_CL_SEL1
+structure completed as described above under
+.RB \*(lq "QOS Parameters" .\*(rq
+It may be necessary to bind a Stream before a value will be returned in the
+information acknowledgement.
+.TP
+.IR QOS_range_length " and " QOS_range_offset
+The length and offset of the current range of QOS parameters.  This will be an
+.B N_QOS_CL_RANGE1
+structure completed as described above under
+.RB \*(lq "QOS Parameters" .\*(rq
+It may be necessary to bind a Stream before a value will be returned in the
+information acknowledgement.
+.TP
+.I OPTIONS_flags
+The NPI-IP provider sets no options flags and this field is always set to zero
+.RB ( 0 ).
+.TP
+.I NIDU_size
+The NPI-IP provider, being a CLNS proivder, has no concept of interface data
+unit size
+and this field is always set to zero
+.RB ( 0 ).
+.TP
+.I SERV_type
+The NPI-IP provider always sets this field to
+.B N_CLNS
+for connectionless network service.
+.TP
+.I CURRENT_state
+Indicates the current state of the NPI provider in accordance with the NPI
+specifications.
+.TP
+.I PROVIDER_type
+The NPI-IP proivder always sets this field to
+.B N_SNICFP
+for Subnetwork Independent Convergence Function/Protocol.
+.TP
+.I NODU_size
+This field reflects the current Maximum Transfer Unit (MTU) (minus the size of
+the IP header) for the Stream given the protocol address to which the Stream
+is bound.  Sending a packet using the
+.BR N_UNITDATA_REQ
+primitive with a data payload of less than or equal to this size will not
+normally result in IP fragmentation.
+.TP
+.IR PROTOID_length " and " PROTOID_offset
+The length and offset of the bound protocol identifiers.
+.TP
+.I NPI_version
+The NPI-IP always sets this field to
+.B N_VERSION_2
+to indicat Network Provider Interface Revision 2.0.0.
+.[
+NPI Revision 2.0.0
+.]
+.RE
+.TP
+.BR N_OPTMGMT_REQ (7)
+.RS
+.TP
+.IR QOS_length " and " QOS_offset
+The NPI-IP provider will only recognize the
+.B N_QOS_CL_SEL1
+structure type and will return
+.BR NBADQOSTYPE
+for all other structures.
+.TP
+.I OPTMGMT_flags
+The NPI-IP provider does not support receipt acknowledgement and will ignore
+the
+.B DEFAULT_RC_SEL
+flag because it is a CLNS provider as specified in the NPI.
+.[
+NPI Revision 2.0.0
+.]
+.RE
+.TP
+.BR N_BIND_REQ (7)
+.RS
+.TP
+.I PRIM_type
+.TP
+.IR ADDR_length ", " ADDR_offset
+Specifies the length in bytes of the network addresses to be bound to the
+Stream and the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the network addresses begin.
+Typically in NPI the network address consists of a single address.  In support
+of the Stream Control Transmission Protocol (SCTP), the
+.B NPI-IP
+driver supports the specification of multiple addresses in the form of a
+list of addresses.  See
+.RB \*(lq "ADDRESS FORMAT" ,\*(rq
+above.
+.TP
+.I CONIND_number
+This number is ignored in CLNS in accordance with the NPI specification.
+.TP
+.I BIND_flags
+.RS
+.TP
+.B DEFAULT_LISTENER
+This flag is ignored in CLNS in accordance with the NPI specification.
+.TP
+.B TOKEN_REQUEST
+This flag is ignored in CLNS in accordance with the NPI specification.
+.TP
+.B DEFAULT_DEST
+This flag is honored by NPI-IP.  When set, this flag indicates that this
+Stream is the \*(lqdefault destination Stream.\*(rq  This Stream will receive
+all packets destined for the NSAP specified in the bind request.  If no NSAP
+is specified in the bind request, then this Stream should receive all packets
+destined to an NSAP which is bound to no other Stream.  Only one default
+destination Stream per NSAP is allowed per occurrence of NPI.  An attempt to
+bind a default destination Stream to an NSAP when one is already bound should
+result in an error of type
+.BR NBOUND .
+.RE
+.TP
+.IR PROTOID_length ", " PROTOID_offset
+Specifies the length in bytes of the protocol ids and the offset from the
+beginning of the
+.BR M_PROTO (9)
+message block where the protocol ids begin.  Protocol ids for NPI-IP consist
+of IP protocol numbers.  Typically only one IP protocol number is bound in a
+given bind request.
+.RE
+.TP
+.BR N_BIND_ACK (7)
+The bind acknowledgement primitive is issued in accordance with the NPI
+specifications.  When a multihomed address was specified to the bind, the
+.IR ADDR_length " and " ADDR_offset
+fields may specify a bound address that consists of a list of addresses as
+indicated under
+.RB \*(lq "ADDRESS FORMATS" ,\*(rq
+above.
+.RS
+.PP
+If no address was specified to the bind, the NPI-IP provider will assume that
+all local addresses are to be bound.  The NPI-IP provider also respects the
+.B INADDR_ANY
+value in the address, as well as the special port number zero (0).
+.RE
+.TP
+.BR N_UNBIND_REQ (7)
+The unbind request primitive is interpreted by the NPI-IP provider in
+accordance with the NPI specifications.  If the user specified multiple
+addresses to the bind request, the unbind request is interpreted as unbinding
+all bound addresses.
+.TP
+.BR N_OK_ACK (7)
+The NPI-IP provider issues this primitive in accordance with the NPI
+specifications.
+.[
+NPI Revision 2.0.0
+.]
+.TP
+.BR N_ERROR_ACK (7)
+The NPI-IP provider issues this primitive in accordance with the NPI
+specifications.
+.[
+NPI Revision 2.0.0
+.]
+.\"
+.\"
+.SS "Connectionless Data Transfer"
+.PP
+The NPI-IP provider is a CLNS (Connectionless Network Service) provider that
+uses the connectionless data transfer N-primitives to transfer data.  For the
+most part, these primitives are used in strict accordance with the NPI
+specifications.
+.[
+NPI Revision 2.0.0
+.]
+Some enhancements are provided to addressing in support of the Stream Control
+Transmission Protocol (SCTP)
+.[
+rfc2960
+.]
+and multihomed associations.
+.PP
+The connectionless data transfer primitives are interpreted and issued as
+follows:
+.TP
+.BR N_UNITDATA_REQ (7)
+This primitive is interpreted by the NPI-IP provider as specified in the NPI specification.
+.[
+NPI Revision 2.0.0
+.]
+.RS
+.TP
+.IR DEST_length " and " DEST_offset
+These fields are interpreted as the destination address for the IP packet.
+The specified address must be a single address and cannot contain a list.
+.TP
+.IR RESERVED_Field "[0] and " RESERVED_field [1]
+These fields are reserved for DLPI
+.[
+DLPI
+.]
+compatibility and are normally set to zero.  For multihomed hosts in support
+of the Stream Control Transmission Protocol (SCTP),
+.[
+rfc2960
+.]
+and when the Stream is bound to multiple addresses, these fields can be
+treated as
+.IR SRC_length " and " SRC_offset
+fields and used to specify the source address for the outgoing packet.
+The source address specified must normally be one of the addresses to which the
+Stream is bound.  If not, the NPI-IP provider may return the
+.B NBADADDR
+error in a
+.BR N_UDERROR_IND (7)
+primitive.
+If a source address is not specified (i.e.
+.I SRC_length
+is zero), then the NPI-IP provider will select a source address from those to
+which the Stream was bound.
+If only one address was bound, these fields are ignored and the NPI-IP provider
+will use the bound address as the source address for the packet.
+.PP
+In addition to the normal use of the
+.BR N_UNITDATA_REQ (7)
+primitive, the primitive can be used to return a message delivered to the
+NPI-IP NS User with the
+.BR N_UNITDATA_IND (7)
+primitive.  This is accomplished by simply changing the
+.I PRIM_type
+from
+.B N_UNITDATA_IND
+to
+.B N_UNITDATA_REQ
+and passing the message back downstream.  The NPI-IP NS Provider will detect
+that the destination address is one of the addresses bound to the Stream and
+will pass the message to any other Linux IP user registered against the
+protocol ID, if there is no other Linux IP user registered against the
+protocol ID, these messages are simply discarded.
+.RE
+.TP
+.BR N_UNITDATA_IND (7)
+This primitive is issued by the NPI-IP provider in accordance with the NPI
+specification.
+.[
+NPI Revision 2.0.0
+.]
+.RS
+.TP
+.IR DEST_length " and " DEST_offset
+It is normally only necessary for the NPI provider to specify the destination
+address if it is not implicit to the receiving Stream: that is, if the
+receiving Stream is a default destination Stream.  For NPI-IP, it is also
+necessary that the destination address be specified by the NPI-IP provider
+when the receiving Stream is bound to more than one address.  These fields
+specify a single address.
+.TP
+.IR SRC_length " and " SRC_offset
+Populated by the NPI provider in accordance with the NPI specifications.
+These fields specify a single address.
+.TP
+.IR ERROR_type
+Populated by the NPI provider in accordance with the NPI specifications.  The
+NPI-IP provider may indicate the
+.B N_UD_CONGESTION
+value in this field when the IP packet is marked for Explicit Congestion
+Notification or other congestion indication.
+.PP
+Note that addresses, IP options and other IP particulars are available in the
+message block.  The message body (attached
+.BR M_DATA (9)
+message blocks) contains the entire IP packet including IP network and
+transport headers and payload.
+.RE
+.TP
+.BR N_UDERROR_IND (7)
+This primitive is issued by the NPI-IP provider in accordance with the NPI
+specification.
+.[
+NPI Revision 2.0.0
+.]
+.RS
+.TP
+.IR DEST_length " and " DEST_offset
+Populated by the NPI-IP provider in accordance with the NPI specifications.
+.[
+NPI Revision 2.0.0
+.]
+.TP
+.I RESERVED_field
+This field is set to zero (0) in accordance with NPI specifications.
+.[
+NPI Revision 2.0.0
+.]
+.\".TP
+.\".IR RESERVED_field "[0] and " RESERVED_field [1]
+.\"As with the
+.\".BR N_UNITDATA_REQ (7)
+.\"primitive, these fields are reserved fro DLPI
+.\".[
+.\"DLPI
+.\".]
+.\"compatibility and are normally set to zero.  For multihomed hosts in support
+.\"of the Stream Control Transmission Protocol (SCTP),
+.\".[
+.\"rfc2960
+.\".]
+.\"and when the Stream is bound to multiple addresses, these fields can be
+.\"treated as
+.\".IR SRC_length " and " SRC_offset
+.\"fields and used to specify the source address for the outgoing packet that was
+.\"in error.  The source address indicated will be one of the addresses to which
+.\"the Stream is bound.
+.\"If only one address was bound, these fields are set to zero by the NPI-IP
+.\"proivder.
+.TP
+.I ERROR_type
+This field is populated by the NPI-IP provider in accordance with the NPI
+specifications.  Some of the
+.BR N_UDERROR_IND (7)
+reason codes have additional meaning when issued by the NPI-IP provider as
+follows:
+.RS
+.TP
+.B N_UD_UNDEFINED
+No reason was specified.
+.TP
+.B N_UD_TD_EXCEEDED
+Transit delay exceeded.
+This can be generated by the NPI-IP provider in response to an ICMP message
+.RB ( ICMP_TIME_EXCEEDED/ICMP_EXC_FRAGTIME ).
+.TP
+.B N_UD_CONGESTION
+NS Provider congestion encountered.
+This can be generated by the NPI-IP provider in response to an ICMP message
+.RB ( ICMP_SOURCE_QUENCH ).
+.TP
+.B N_UD_QOS_UNAVAIL
+Requested QOS/service characteristic unavailable.
+.TP
+.B N_UD_LIFE_EXCEEDED
+NSDU lifetime exceeded.  This is an indication that the specified lifeimte
+(TTL) was exceeded as detected to the NPI-IP provider in a returned ICMP
+message.
+This can be generated by the NPI-IP provider in response to an ICMP message
+.RB ( ICMP_TIME_EXCEEDED/ICMP_EXC_TTL ).
+.TP
+.B N_UD_ROUTE_UNAVAIL
+Suitable route unavailable.  This is used by the NPI-IP provider to specify
+many separate error conditions as indicated by the received ICMP messages.
+This can be generated by the NPI-IP provider in response to an ICMP message
+.RB ( ICMP_DEST_UNREACH/ICMP_PROT_UNREACH ", " /ICMP_PORT_UNREACH ", "
+.BR /ICMP_NET_UNKNOWN ", " /ICMP_HOST_UNKNOWN ", " /ICMP_HOST_ISOLATED ", "
+.BR /ICMP_NET_ANO ", " /ICMP_HOST_ANO ", " /ICMP_PKG_FILTERED ", "
+.BR /ICMP_PREC_VIOLATION ", " /ICMP_PREC_CUTOFF ).
+.TP
+.B N_UD_SEG_REQUIRED
+Segmentation was required where none permitted.  This error is used in
+conjunction the Path MTU Discovery and is used ot indicate that a packet that
+was marked don't fragment encounter a path with an MTU less than the packet
+size.
+This can be generated by the NPI-IP provider in response to an ICMP message
+.RB ( ICMP_DEST_UNREACH/ICMP_FRAG_NEEDED ).
+.RE
+.PP
+Note that the source address, IP options and ICMP particulars are available in
+the message body.  The message body (attached
+.BR M_DATA (9)
+message blocks) contains the entire IP packet including IP and ICMP headers
+and payload.
+.RE
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH "ERROR HANDLING"
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH VERSIONS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

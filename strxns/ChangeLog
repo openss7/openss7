@@ -1,3 +1,9 @@
+2006-03-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ip.c: working up NPI-IP driver
+	* doc/man/man4/ip.4.man: documentation for ip driver
+	* doc/man/man7/npi_ip.7.man: documentation for ip driver
+
 2006-03-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* ANNOUNCE: added announcement file for release

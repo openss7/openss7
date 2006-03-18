@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/01/02 12:00:44 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/18 00:15:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/01/02 12:00:44 $ by $Author: brian $
+ Last Modified $Date: 2006/03/18 00:15:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.7  2006/03/18 00:15:21  brian
+ - syncing notebook
+
  Revision 0.9.2.6  2006/01/02 12:00:44  brian
  - working up IP driver
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/01/02 12:00:44 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/18 00:15:21 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/01/02 12:00:44 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/18 00:15:21 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -105,7 +108,7 @@ static char const ident[] =
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/01/02 12:00:44 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/18 00:15:21 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -185,11 +188,11 @@ STATIC struct module_info ip_minfo = {
 	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
-STATIC int ip_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int ip_close(queue_t *, int, cred_t *);
+STATIC streamscall int ip_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int ip_close(queue_t *, int, cred_t *);
 
-STATIC int ip_rput(queue_t *, mblk_t *);
-STATIC int ip_rsrv(queue_t *);
+STATIC streamscall int ip_rput(queue_t *, mblk_t *);
+STATIC streamscall int ip_rsrv(queue_t *);
 
 STATIC struct qinit ip_rinit = {
 	.qi_putp = ip_rput,		/* Read put (msg from below) */
@@ -199,8 +202,8 @@ STATIC struct qinit ip_rinit = {
 	.qi_minfo = &ip_minfo,		/* Information */
 };
 
-STATIC int ip_wput(queue_t *, mblk_t *);
-STATIC int ip_wsrv(queue_t *);
+STATIC streamscall int ip_wput(queue_t *, mblk_t *);
+STATIC streamscall int ip_wsrv(queue_t *);
 
 STATIC struct qinit ip_winit = {
 	.qi_putp = ip_wput,		/* Write put (msg from above) */
@@ -238,7 +241,7 @@ struct ip {
 	queue_t *rq;			/* read queue */
 	queue_t *wq;			/* write queue */
 	cred_t cred;			/* credentials of opener */
-	atomic_t refcnt;		/* reference count */
+	atomic_t refcnt;		/* structure refe(rence count */
 	spinlock_t qlock;		/* queue lock */
 	queue_t *rwait;			/* RD queue waiting on lock */
 	queue_t *wwait;			/* WR queue waiting on lock */
@@ -257,6 +260,9 @@ struct ip {
 	uint8_t protoids[16];		/* bound protocol ids */
 	size_t pnum;			/* number of protocol ids in protoids */
 };
+
+#define PRIV(__q) (((__q)->q_ptr))
+#define IP_PRIV(__q) ((struct ip *)((__q)->q_ptr))
 
 typedef int (*ip_rcv_fnc_t) (struct sk_buff *);
 
@@ -617,7 +623,7 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
  */
 #ifdef HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
-ip_queue_xmit(struct sk_buff * skb)
+ip_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
@@ -636,7 +642,7 @@ ip_queue_xmit(struct sk_buff * skb)
 }
 #else
 STATIC INLINE in
-ip_queue_xmit(struct sk_buff * skb)
+ip_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
@@ -739,6 +745,253 @@ ip_unitdata_req(queue_t *q, struct sockaddr_in *dest, mblk_t *mp)
 
 	ip_xmit_msg(daddr, saddr, protoid, mp, ip);
 	return (0);
+}
+
+/*
+ *  =========================================================================
+ *
+ *  Locking
+ *
+ *  =========================================================================
+ */
+STATIC int
+ip_trylockq(queue_t *q)
+{
+	int res;
+	struct ip *ip = PRIV(q);
+
+	spin_lock_bh(&ip->qlock);
+	if (!(res = !ip->users++)) {
+		if (q == ip->rq)
+			ip->rwait = q;
+		if (q == ip->wq)
+			ip->wwait = q;
+	}
+	spin_unlock_bh(&ip->qlock);
+	return (res);
+}
+STATIC void
+ip_unlockq(queue_t *q)
+{
+	struct ip *ip = PRIV(q);
+
+	spin_lock_bh(&ip->qlock);
+	if (ip->rwait)
+		qenable(xchg(&ip->rwait, NULL));
+	if (ip->wwait)
+		qenable(xchg(&ip->wwait, NULL));
+	ip->users = 0;
+	spin_unlock_bh(&ip->qlock);
+}
+
+/*
+ *  =========================================================================
+ *
+ *  Buffer Allocation
+ *
+ *  =========================================================================
+ */
+/**
+ *  
+ *  ip_bufsrv: - safe bufcalls
+ *  @data: opaque client data
+ *
+ *  Whereas sockets allocate most buffers in user mode, where it is possible
+ *  to simply return an error to a system call, the STREAMS driver runs as a
+ *  coroutine and there is no (valid) user present.  This is done with
+ *  bufcalls.  However, for LiS and a number of other STREAMS implementations,
+ *  bufcalls are unsafe.  Here we do reference counting against the STREAMS
+ *  private structure when buffer calls are issued and when they complete.
+ *  STREAMS private structures will not be deallocated until the buffer calls
+ *  are complete.  There are some mi_bufcall() compatibility functions that
+ *  accomplish the same ends.  All of this can go away when this driver only
+ *  needs to be used with Linux Fast-STREAMS that has safe buffer callbacks.
+ */
+STATIC void streamscall
+ip_bufsrv(long data)
+{
+	struct ip *ip;
+	queue_t *q;
+
+	q = (queue_t *) data;
+	ensure(q, return);
+	ip = PRIV(q);
+	ensure(ip, return);
+
+	if (q == ip->rq && xchg(&ip->rbid, 0) != 0)
+		ip_put(ip);
+	if (q == ip->wq && xchg(&ip->wbid, 0) != 0)
+		ip_put(ip);
+	qenable(q);
+	return;
+}
+
+/**
+ *  ip_unbufcall: - reliably cancel a buffer callback
+ *  @q: the queue whose callback to cancel
+ *
+ *  Cancel a qenable() buffer callback associated with one queue in the queue pair.  ip_unbufcall()
+ *  effectively undoes the actions performed by ip_bufcall().
+ *
+ *  NOTICES: Cancellation of buffer callbacks on LiS using unbufcall() is unreliable.  The callback
+ *  function could execute some time shortly after the call to unbufcall() has returned.   LiS
+ *  abbrogates the SVR 4 STREAMS principles for unbufcall().  This is why you will find atomic
+ *  exchanges here and in the callback function and why reference counting is performed on the
+ *  structure and queue pointers are checked for NULL.
+ */
+STATIC void
+ip_unbufcall(queue_t *q)
+{
+	struct ip *ip;
+	bufcall_id_t bid;
+
+	ensure(q, return);
+	ip = PRIV(q);
+	ensure(ip, return);
+
+	if (q == ip->rq && (bid = xchg(&ip->rbid, 0))) {
+		unbufcall(bid);
+		ip_put(ip);
+	}
+	if (q == ip->wq && (bid = xchg(&ip->wbid, 0))) {
+		unbufcall(bid);
+		ip_put(ip);
+	}
+	return;
+}
+
+/**
+ *  ip_bufcall: - generate a buffer callback to enable a queue
+ *  @q: the queue to enable on callback
+ *  @size: size of the allocation
+ *  @prior: priority of the allocation
+ *
+ *  Maintain one buffer call for each queue in the queue pair.  The callback function will simply
+ *  perform a qenable(9).
+ *
+ *  NOTICES: One of the reasons for going to such extents is that LiS has completely unsafe buffer
+ *  callbacks.  The buffer callback function can be invoked (shortly) after unbufcall() returns
+ *  under LiS in abrogation of SVR 4 STREAMS principles.  This is why you will find atomic exchanges
+ *  here and in the callback function and why reference counting is performed on the structure and
+ *  queue pointers are checked for NULL.
+ */
+STATIC void
+ip_bufcall(queue_t *q, size_t size, int prior)
+{
+	struct ip *ip = IP_PRIV(q);
+	bufcall_id_t bid;
+
+	ensure(q, return);
+	ip = IP_PRIV(q);
+	ensure(ip, return);
+	ip_hold(ip);
+	if (q == ip->wq) {
+		if ((bid = xchg(&ip->wbid, bufcall(size, prior, &ip_bufsrv, (long) ip)))) {
+			unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
+			ip_put(ip);
+		}
+		return;
+	}
+	if (q == ip->rq) {
+		if ((bid = xchg(&ip->rbid, bufcall(size, prior, &ip_bufsrv, (long) ip)))) {
+			unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
+			ip_put(ip);
+		}
+		return;
+	}
+	swerr();
+	return;
+}
+
+/**
+ *  ip_allocb: - reliable allocb()
+ *  @q: the queue to enable when allocation can succeed
+ *  @size: the size to allocate
+ *  @prior: the priority of the allocation
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that allocate a
+ *  buffer in response to an incoming message.  If the allocation fails, this routine will return
+ *  NULL and issue a buffer callback to reenable the queue @q when the allocation could succeed.
+ *  When NULL is returned, the caller should simply place the incoming message on the queue (i.e.
+ *  with putq() from a put procedure or putbq() from a service procedure) and return.  The queue
+ *  will be rescheduled with qenable() when the allocation could succeed.
+ */
+STATIC mblk_t *
+ip_allocb(queue_t *q, size_t size, int prior)
+{
+	mblk_t *mp;
+
+	if (!(mp = allocb(size, prior)))
+		ip_bufcall(q, size, prior);
+	return (mp);
+}
+
+/**
+ *  ip_allocb: - reliable allocb()
+ *  @q: the queue to enable when allocation can succeed
+ *  @base: the base of the external data buffer
+ *  @size: the size of the external data buffer
+ *  @prior: the priority of the allocation
+ *  @frtn: a pointer to a free routine structure (containing callback and client data)
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that allocate a
+ *  message block with an external buffer in response to an incoming message.  If the allocation
+ *  fails, this routine will return NULL and issue a buffer callback to reenable the queue @q when
+ *  the allocation could succeed.  When NULL is returned, the caller should simply place the
+ *  incoming message on the queue (i.e.  with putq() from a put procedure or putbq() from a service
+ *  procedure) and return.  The queue will be rescheduled with qenable() when the allocation could
+ *  succeed.
+ */
+STATIC mblk_t *
+ip_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
+{
+	mblk_t *mp;
+
+	if (!(mp = esballoc(base, size, prior, frtn)))
+		ip_bufcall(q, FASTBUF, prior);
+	return (mp);
+}
+
+/**
+ *  ip_dupmsg: - reliable dupmsg()
+ *  @q: queue to enable when duplication can succeed
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that duplicate a an
+ *  incoming message.  If the allocation fails, this routine will return NULL and issue a buffer
+ *  callback to reenable the queue @q when the duplication could succeed.  When NULL is returned,
+ *  the caller should simply place the incoming message on the queue (i.e.  with putq() from a put
+ *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
+ *  qenable() when the duplication could succeed.
+ */
+STATIC mblk_t *
+ip_dupmsg(queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+
+	if (!(mp = dupmsg(bp)) && (q != NULL))
+		ip_bufcall(q, FASTBUF, BPRI_MED);
+	return (mp);
+}
+
+/**
+ *  ip_dupb: - reliable dupb()
+ *  @q: queue to enable when duplication can succeed
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that duplicate a an
+ *  incoming message block.  If the allocation fails, this routine will return NULL and issue a
+ *  buffer callback to reenable the queue @q when the duplication could succeed.  When NULL is
+ *  returned, the caller should simply place the incoming message on the queue (i.e.  with putq()
+ *  from a put procedure or putbq() from a service procedure) and return.  The queue will be
+ *  rescheduled with qenable() when the duplication could succeed.
+ */
+STATIC mblk_t *
+ip_dupb(queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+
+	if (!(mp = dupb(bp)) && (q != NULL))
+		ip_bufcall(q, FASTBUF, BPRI_MED);
+	return (mp);
 }
 
 /*
@@ -1720,8 +1973,9 @@ ip_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 	int rtn = 0, locked;
 
 	ensure(mp, return (-EFAULT));
-	ensure(q, freemsg(mp); return (-EFAULT));
-	if (mp->b_datap->db_type < QPCTL && q->q_count) {
+	ensure(q, freemsg(mp);
+	       return (-EFAULT));
+	if (mp->b_datap->db_type < QPCTL && (q->q_first || q->q_flag & QSVCBUSY)) {
 		if (!putq(q, mp))
 			freemsg(mp);
 		return (0);
@@ -1795,7 +2049,7 @@ ip_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
  *  -----------------------------------
  */
 STATIC INLINE int
-ip_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
+ip_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_t *))
 {
 	int rtn = 0;
 
@@ -1833,11 +2087,11 @@ ip_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 				}
 				rtn = -EOPNOTSUPP;
 			default:
-				pswerr(("ERROR: (q dropping) %d\n", rtn));
+				pswerr(("%s: ERROR: (q dropping) %d\n", DRV_NAME, rtn));
 				freemsg(mp);
 				continue;
 			case QR_DISABLE:
-				pswerr(("ERROR: (q disabling) %d\n", rtn));
+				pswerr(("%s: ERROR: (q disabling)\n", DRV_NAME));
 				noenable(q);
 				if (!putbq(q, mp))
 					freemsg(mp);
@@ -1853,7 +2107,7 @@ ip_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 			case -ENOMEM:	/* proc must schedule re-enable */
 			case -EAGAIN:	/* proc must schedule re-enable */
 				if (mp->b_datap->db_type < QPCTL) {
-					_printd(("ERROR: (q stalled) %d\n", rtn));
+					ptrace(("%s: ERROR: (q stalled) %d\n", DRV_NAME, rtn));
 					if (!putbq(q, mp))
 						freemsg(mp);
 					break;
@@ -1863,8 +2117,14 @@ ip_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 				case M_PCPROTO:
 					mp->b_datap->db_type = M_PROTO;
 					break;
+				case M_PCRSE:
+					mp->b_datap->db_type = M_RSE;
+					break;
+				case M_READ:
+					mp->b_datap->db_type = M_CTL;
+					break;
 				default:
-					_printd(("ERROR: (q dropping) %d\n", rtn));
+					ptrace(("%s: ERROR: (q dropping) %d\n", DRV_NAME, rtn));
 					freemsg(mp);
 					continue;
 				}
@@ -1875,6 +2135,8 @@ ip_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 			}
 			break;
 		}
+		if (procwake != NULL)
+			procwake(q);
 		ip_unlockq(q);
 	}
 	return (rtn);
@@ -1885,20 +2147,23 @@ ip_rput(queue_t *q, mblk_t *mp)
 {
 	return (int) ip_putq(q, mp, &ip_r_prim);
 }
+
 STATIC int
 ip_rsrv(queue_t *q)
 {
-	return (int) ip_srvq(q, &ip_r_prim);
+	return (int) ip_srvq(q, &ip_r_prim, NULL);
 }
+
 STATIC int
 ip_wput(queue_t *q, mblk_t *mp)
 {
 	return (int) ip_putq(q, mp, &ip_w_prim);
 }
+
 STATIC int
 ip_wsrv(queue_t *q)
 {
-	return (int) ip_srvq(q, &ip_w_prim);
+	return (int) ip_srvq(q, &ip_w_prim, NULL);
 }
 
 /*
@@ -2185,7 +2450,7 @@ ip_free_priv(queue_t *q)
 		atomic_read(&ip->refcnt)));
 	spin_lock_bh(&ip->lock);
 	{
-		__ss_unbufcall(q);
+		ip_unbufcall(q);
 		printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME,
 			atomic_read(&ip->refcnt)));
 		spin_lock(&ip_lock);
@@ -2236,10 +2501,22 @@ ip_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		ptrace(("%s: ERROR: can't push as module\n", DRV_NAME));
 		return (EIO);
 	}
-	if (cmajor != IP_CMAJOR_0 || cminor < FIRST_CMINOR || cminor > LAST_CMINOR) {
+#if defined LIS
+	if (cmajor != IP_CMAJOR_0)
+		return (ENXIO);
+#endif
+#if defined LFS
+	/* Linux Fast-STREAMS always passes internal major device numbers (modules ids) */
+	if (cmajor != IP_DRV_ID)
+		return (ENXIO);
+#endif
+	if (cminor < FIRST_CMINOR || cminor > LAST_CMINOR) {
 		return (ENXIO);
 	}
-	cminor = FREE_CMINOR;
+#if 0
+	if (sflag == CLONEOPEN)
+#endif
+		cminor = FREE_CMINOR;
 	spin_lock_bh(&ip_lock);
 	for (; *ipp; ipp = &(*ipp)->next) {
 		if (cmajor != (*ipp)->cmajor)
@@ -2268,16 +2545,6 @@ ip_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		spin_unlock_bh(&ip_lock);
 		return (ENOMEM);
-	}
-	/* Create all but raw sockets at open time.  For raw sockets, we do not know the protocol
-	   to create until the socket is bound to a protocol.  For all others, the protocol is
-	   known and the socket is created so that we can accept options management on unbound
-	   sockets. */
-	spin_unlock_bh(&ip_lock);
-	if ((err = ip_sock_init(ip)) < 0) {
-		ptrace(("%s: ERROR: from ip_sock_init %d\n", DRV_NAME, -err));
-		ip_free_priv(q);
-		return (-err);
 	}
 	qprocson(q);
 	return (0);
@@ -2472,6 +2739,6 @@ ipinit(void)
  *  -------------------------------------------------------------------------
  */
 module_init(ipinit);
-module_exit(ipeterminate);
+module_exit(ipterminate);
 
 #endif				/* LINUX */
