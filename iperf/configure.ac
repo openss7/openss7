@@ -6,15 +6,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -52,13 +51,14 @@
 #
 # =============================================================================
 
-dnl ===================================================================
-dnl configure.ac
-dnl Process this file with autogen.sh to produce configure files
-dnl ===================================================================
-
+dnl                                               -*- Autoconf -*-
+dnl Process this file with autoconf to produce a configure script.
+dnl
+AC_REVISION([$Id])
 AC_PREREQ(2.59)
 AC_INIT([Iperf],[2.0],[bugs@openss7.org],[iperf])
+
+_OPENSS7_DIRCHANGE
 
 AC_CONFIG_SRCDIR([iperf.lsm.in])
 AC_CONFIG_HEADER([config.h])
@@ -72,11 +72,10 @@ _DISTRO
 
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
-
 dnl
 dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
 dnl
-if test :"${USE_MAINTAINER_MODE:-yes}" = :yes ; then
+if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
 	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
 fi
 
@@ -102,10 +101,9 @@ AC_ARG_ENABLE(web100, AS_HELP_STRING([--disable-web100],
 	    [disable web100 support (default is autodetect)]))
 
 
-dnl ===================================================================
-dnl Checks for programs
-dnl ===================================================================
-
+dnl
+dnl Checks for programs.
+dnl
 AC_PROG_CXX
 dnl CXXFLAGS=`echo " $CXXFLAGS " | sed -e "s/ -g / /"` # do not want it implicitly
 AC_PROG_CC
@@ -117,10 +115,9 @@ AC_PROG_RANLIB
 AC_LANG(C)
 dnl AC_CANONICAL_HOST
 
-dnl ===================================================================
+dnl
 dnl Checks for libraries.
-dnl ===================================================================
-
+dnl
 dnl check for -lpthread
  
 if test "$enable_threads" != no; then
@@ -135,14 +132,15 @@ dnl check for -lnsl, -lsocket
 AC_CHECK_FUNC(gethostbyname,,AC_CHECK_LIB(nsl, gethostbyname))
 AC_CHECK_FUNC(socket,,AC_CHECK_LIB(socket, socket))
 
+dnl
 dnl Checks for header files.
+dnl
 AC_HEADER_STDC
 AC_CHECK_HEADERS([arpa/inet.h libintl.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h unistd.h])
 
-dnl ===================================================================
-dnl Checks for typedefs, structures
-dnl ===================================================================
-
+dnl
+dnl Checks for typedefs, structures, and compiler characteristics.
+dnl
 AC_C_CONST
 AC_TYPE_SIZE_T
 AC_CHECK_TYPES(ssize_t,,AC_DEFINE_UNQUOTED(ssize_t, int, [Define ssize_t type.]))
@@ -199,7 +197,9 @@ fi
 
 AC_DEFINE_UNQUOTED([Socklen_t], $ac_cv_accept_arg, [Define 3rd arg of accept])
 
+dnl
 dnl Checks for library functions.
+dnl
 if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_FORK fi
 if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MALLOC fi
 if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MEMCMP fi
@@ -373,9 +373,10 @@ AC_OUTPUT
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocindent nosmartindent

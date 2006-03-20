@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/06 11:38:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/20 13:50:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:21 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 13:50:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.12  2006/03/20 13:50:31  brian
+# - get automake to run clean
+#
+# Revision 0.9.2.11  2006/03/20 13:36:30  brian
+# - added checks for Development
+#
 # Revision 0.9.2.10  2006/03/06 11:38:21  brian
 # - updated headers
 #
@@ -57,7 +63,12 @@
 
 include ../../../am/openss7.am
 
-info_TEXINFOS		= tri.texi
+info_TEXINFOS		=
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+info_TEXINFOS		+= tri.texi
 
 EXTRA_info_TEXINFOS	= \
 			texi/args.texi \
@@ -99,6 +110,9 @@ TBL_TBLS		= \
 			tri_tab8.tbl
 
 ## PKG_BUILD_INDEP
+endif
+
+## DEVELOPMENT
 endif
 
 include ../../../am/info.am

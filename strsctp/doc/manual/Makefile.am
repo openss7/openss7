@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/06 11:38:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/20 13:50:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:56 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 13:50:34 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.16  2006/03/20 13:50:34  brian
+# - get automake to run clean
+#
+# Revision 0.9.2.15  2006/03/20 13:36:33  brian
+# - added checks for Development
+#
 # Revision 0.9.2.14  2006/03/06 11:38:56  brian
 # - updated headers
 #
@@ -57,7 +63,12 @@
 
 include ../../am/openss7.am
 
-info_TEXINFOS		= strsctp.texi
+info_TEXINFOS		=
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+info_TEXINFOS		+= strsctp.texi
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
@@ -71,6 +82,9 @@ EXTRA_info_TEXINFOS	= \
 			  texi/testsuite.texi \
 			  texi/lesser.texi \
 			  $(top_builddir)/scripts/texi/funding.texi
+
+## DEVELOPMENT
+endif
 
 include ../../am/info.am
 

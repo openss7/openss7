@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/15 07:18:13 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/20 13:30:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/15 07:18:13 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 13:30:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.7  2006/03/20 13:30:08  brian
+# - updated and rationalized configure.ac
+#
 # Revision 0.9.2.6  2006/03/15 07:18:13  brian
 # - change unique source file to .lsm.in file
 #
@@ -76,7 +79,7 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.6 2006/03/15 07:18:13 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.7 2006/03/20 13:30:08 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strbcm],[0.9.2],[bugs@openss7.org])
 
@@ -125,14 +128,14 @@ dnl AM_GNU_GETTEXT_VERSION(0.14.1)
 dnl
 dnl Checks for libraries.
 dnl
-bcm_save_LIBS="$LIBS"
+pkg_save_LIBS="$LIBS"
 AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([pthread], [pthread_create])
 AC_CHECK_LIB([LiS], [fattach])
 AC_CHECK_LIB([streams], [fattach])
 AC_CHECK_LIB([xnet], [t_open])
 AC_CHECK_LIB([socket], [socket])
-LIBS="$bcm_save_LIBS"
+LIBS="$pkg_save_LIBS"
 
 dnl
 dnl Checks for header files.

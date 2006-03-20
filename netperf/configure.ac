@@ -2,19 +2,18 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.19 $) $Date: 2006/03/15 07:18:10 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2006/03/20 13:30:04 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/15 07:18:10 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 13:30:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -108,8 +107,8 @@ dnl
 dnl AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([m], [main])
 dnl AC_CHECK_LIB([pthread], [pthread_create])
-dnl AC_CHECK_LIB([LiS], [putpmsg])
-dnl AC_CHECK_LIB([streams], [putpmsg])
+dnl AC_CHECK_LIB([LiS], [fattach])
+dnl AC_CHECK_LIB([streams], [fattach])
 dnl AC_CHECK_LIB([xnet], [t_open])
 AC_CHECK_LIB([socket], [socket])
 AC_CHECK_LIB([nsl], [main])
@@ -167,9 +166,10 @@ AC_OUTPUT
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocindent nosmartindent

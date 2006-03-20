@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/07 00:44:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/20 13:50:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/07 00:44:53 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 13:50:39 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2006/03/20 13:50:39  brian
+# - get automake to run clean
+#
+# Revision 0.9.2.6  2006/03/20 13:36:37  brian
+# - added checks for Development
+#
 # Revision 0.9.2.5  2006/03/07 00:44:53  brian
 # - removed double log lists
 #
@@ -63,7 +69,12 @@
 
 include ../../../am/openss7.am
 
-info_TEXINFOS		= dlpi.texi
+info_TEXINFOS		=
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+info_TEXINFOS		+= dlpi.texi
 
 EXTRA_info_TEXINFOS	= \
 			texi/args.texi \
@@ -132,6 +143,9 @@ TBL_TBLS		= \
 			dlpi_ta19.tbl
 
 ## PKG_BUILD_INDEP
+endif
+
+## DEVELOPMENT
 endif
 
 include ../../../am/info.am
