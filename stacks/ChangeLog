@@ -1,3 +1,22 @@
+2006-03-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added checks for DEVELOPMENT
+	* src/Makefile.am: added checks for DEVELOPMENT
+	* stacks.spec.in: tied in --disable-devel flag
+	* src/include/ss7/zapata.h: added -- first cut of zaptel driver
+	* src/modules/zaptel/zaptel.c: added -- first cut of zaptel driver
+	* src/modules/mx/mx_mux.c: added -- first cut of zaptel driver
+	* configure.ac: updated and rationalized
+	* doc/manual/Makefile.am: added checks for DEVELOPMENT
+	* doc/projects/Makefile.am: added checks for DEVELOPMENT
+	* doc/specs/cci/Makefile.am: added checks for DEVELOPMENT
+	* doc/specs/dlpi/Makefile.am: added checks for DEVELOPMENT
+	* doc/specs/mapi/Makefile.am: added checks for DEVELOPMENT
+	* doc/specs/npi/Makefile.am: added checks for DEVELOPMENT
+	* doc/specs/tci/Makefile.am: added checks for DEVELOPMENT
+	* doc/specs/tpi/Makefile.am: added checks for DEVELOPMENT
+	* doc/specs/tri/Makefile.am: added checks for DEVELOPMENT
+
 2006-03-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* ANNOUNCE: added announcement file for release

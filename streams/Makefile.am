@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/03/06 11:38:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/03/20 11:54:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:40 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 11:54:02 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.130  2006/03/20 11:54:02  brian
+# - added checks for DEVELOPMENT
+#
 # Revision 0.9.2.129  2006/03/06 11:38:40  brian
 # - updated headers
 #
@@ -817,7 +820,17 @@ include am/strconf.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = include . tests doc
+SUBDIRS =
+
+if DEVELOPMENT
+SUBDIRS += include
+endif
+
+SUBDIRS += . tests
+
+if DEVELOPMENT
+SUBDIRS += doc
+endif
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

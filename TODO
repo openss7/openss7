@@ -1,5 +1,5 @@
 OpenSS7 Master Package -- things to do.  2006-03-01
-$Id: TODO,v 0.9.2.2 2006/03/18 00:15:11 brian Exp $
+$Id: TODO,v 0.9.2.3 2006/03/20 11:55:37 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -91,6 +91,13 @@ Things to do:
 
 - I want to someday write an ldterm for Linux Fast-STREAMS and provide
   truly STREAMS-based pseudo terminals.
+
+- Provide an option for not installing documentation and development
+  headers, etc.  Just the runtime.  This is mostly for embedded targets.
+  Make it a --without-devel configure flag that defaults to including
+  documentation and development environment.
+
+  *done*
 
 
 =========================================================================

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/03/07 13:16:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/03/20 11:53:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/07 13:16:56 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 11:53:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.66  2006/03/20 11:53:58  brian
+# - added checks for DEVELOPMENT
+#
 # Revision 0.9.2.65  2006/03/07 13:16:56  brian
 # - tools must be compiled static for distcheck
 #
@@ -1079,24 +1082,18 @@ include am/strconf.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
+SUBDIRS = src
+
 if WITH_XNET
-## WITH_XNET
-
-if PKG_BUILD_INDEP
-SUBDIRS = src . tests doc
-endif
-
 if PKG_BUILD_ARCH
-SUBDIRS = src intl m4 po . tests doc
+SUBDIRS += intl m4 po
+endif
 endif
 
-## WITH_XNET
-else
-## !WITH_XNET
+SUBDIRS += . tests
 
-SUBDIRS = src . tests doc
-
-## !WITH_XNET
+if DEVELOPMENT
+SUBDIRS += doc
 endif
 
 if PKG_BUILD_INDEP

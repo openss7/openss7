@@ -1,3 +1,15 @@
+2006-03-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* TODO: updated todo items for common packaging
+	* m4/openss7.m4: added check for --disable-devel
+	* am/info.am: add DEVELOPMENT check
+	* am/man.am: add DEVELOPMENT check
+	* openss7.spec.in: tied in --disable-devel flag
+	* texi/install.texi: documented --disable-devel flag
+	* scripts/texi/install.texi: documented --disable-devel flag
+	* m4/openss7.m4: don't build libtool static libraries no devel
+	* configure.ac: updated and rationalized
+
 2006-03-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* TODO: updated todo items for common packaging

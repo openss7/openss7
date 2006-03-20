@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.40 $) $Date: 2006/03/07 12:34:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.41 $) $Date: 2006/03/20 11:53:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/07 12:34:18 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 11:53:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.41  2006/03/20 11:53:56  brian
+# - added checks for DEVELOPMENT
+#
 # Revision 1.1.2.40  2006/03/07 12:34:18  brian
 # - tools must be built static for distcheck
 #
@@ -159,6 +162,9 @@ MANMACRO_PFX			= netperf
 
 SUBDIRS =
 
+if DEVELOPMENT
+## DEVELOPMENT
+
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
@@ -219,6 +225,9 @@ dist_noinst_MANS		= \
 				  man8/netserver.man
 
 ## PKG_BUILD_INDEP
+endif
+
+## DEVELOPMENT
 endif
 
 include am/man.am

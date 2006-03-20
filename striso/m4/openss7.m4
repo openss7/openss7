@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/11 09:49:51 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/20 12:12:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 09:49:51 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 12:12:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.31  2006/03/20 12:12:18  brian
+# - don't build libtool static libraries no devel
+#
+# Revision 0.9.2.30  2006/03/20 11:51:09  brian
+# - added check for --disable-devel
+#
 # Revision 0.9.2.29  2006/03/11 09:49:51  brian
 # - a bit better checking
 #
@@ -125,6 +131,31 @@ dnl
 	if test :"$mandir" = :'${prefix}/man' ; then mandir='${prefix}/share/man' ; fi
     fi
     AC_SUBST([rootdir])
+dnl
+dnl Need to check this before libtool gets done
+dnl
+    AC_MSG_CHECKING([for development environment])
+    AC_ARG_ENABLE([devel],
+	AS_HELP_STRING([--disable-devel],
+	    [disable development environment.  @<:@default=enabled@:>@]),
+	[dnl
+	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	    then
+		enable_devel='yes'
+	    else
+		enable_devel="$enableval"
+	    fi
+	], [enable_devel='yes'])
+    AC_MSG_RESULT([$enable_devel])
+    AM_CONDITIONAL([DEVELOPMENT], [test :"${enable_devel:-yes}" = :yes])dnl
+dnl
+dnl Don't build libtool static libraries if development environment not
+dnl specified
+dnl
+    if test :"${enable_devel:-yes}" = :yes
+    then
+	enable_static='no'
+    fi
 ])# _OPENSS7_DIRCHANGE
 # =============================================================================
 

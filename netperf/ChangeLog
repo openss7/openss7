@@ -1,3 +1,10 @@
+2006-03-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added checks for DEVELOPMENT
+	* netperf.spec.in: tied in --disable-devel flag
+	* configure.ac: updated and rationalized
+	* manual/Makefile.am: added checks for DEVELOPMENT
+
 2006-03-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* ANNOUNCE: added announcement file for release

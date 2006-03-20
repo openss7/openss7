@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/03/18 09:42:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/03/20 11:54:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/18 09:42:10 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 11:54:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.43  2006/03/20 11:54:08  brian
+# - added checks for DEVELOPMENT
+#
 # Revision 0.9.2.42  2006/03/18 09:42:10  brian
 # - added in ip driver and manual pages
 #
@@ -320,7 +323,11 @@ include am/strconf.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = src . tests doc
+SUBDIRS = src . tests
+
+if DEVELOPMENT
+SUBDIRS += doc
+endif
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

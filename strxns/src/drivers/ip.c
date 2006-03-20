@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/18 09:42:11 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/20 12:16:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/18 09:42:11 $ by $Author: brian $
+ Last Modified $Date: 2006/03/20 12:16:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.9  2006/03/20 12:16:45  brian
+ - working up IP driver
+
  Revision 0.9.2.8  2006/03/18 09:42:11  brian
  - added in ip driver and manual pages
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/18 09:42:11 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/20 12:16:45 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/18 09:42:11 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/20 12:16:45 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -121,7 +124,7 @@ static char const ident[] =
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/18 09:42:11 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/20 12:16:45 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -306,17 +309,18 @@ struct ip_prot_bucket {
 	unsigned char proto;		/* protocol number */
 	char name[15];			/* protocol name */
 	int refs;			/* reference count */
-#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
+#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
 	struct inet_protocol prot;	/* Linux registration structure */
 	struct inet_protocol *next;	/* Linkage for protocol override */
-#endif					/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 	struct net_protocol prot;	/* Linux registration structure */
 	struct net_protocol *next;	/* Linkage for protocol override */
-#endif					/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+#else
+#error HAVE_KTYPE_STRUCT_INET_PROTOCOL or HAVE_KTYPE_STRUCT_NET_PROTOCOL must be defined.
+#endif
 };
 STATIC rwlock_t ip_prot_lock = RW_LOCK_UNLOCKED;
-STATIC struct ip_prot_bucket *ip_prots[256];
+STATIC struct ip_prot_bucket *ip_prots[MAX_INET_PROTOS];
 
 STATIC kmem_cache_t *ip_bind_cachep;
 STATIC kmem_cache_t *ip_prot_cachep;
@@ -420,42 +424,102 @@ ip_get_state(struct ip *ip)
 STATIC int ip_v4_rcv(struct sk_buff *skb);
 STATIC void ip_v4_err(struct sk_buff *skb, u32 info);
 
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
+/*
+ *  Some notes are in order here: These two functions, inet_override_protocol()  and
+ *  inet_restore_protocol() are intended to provide a drop and insert packet tap on received IP
+ *  packets.
+ *
+ *  There are two approaches: an older approach for 2.4 kernels and a newer approach for
+ *  2.6 kernels (and some patched back 2.4 kernels like RHEL3).
+ *
+ *  Under the older approach, when multiple protocol users are registered with inet_add_protocol()
+ *  the kernel will duplicate the sk_buffs and pass a copy to each registered protocol user.
+ *
+ *  Under the newer approach, inet_add_protocol() will refuse to register multiple protocol users
+ *  and will simply return -1 if it is attempted.
+ *
+ *  What we want is a mechanism whereby a single sk_buff is passed.  Our protocol user is registered
+ *  ahead of existing protocol users.  When our protocol user receives an sk_buff that is not for
+ *  it, it has the option of passing the sk_buff on to the next registered protocol user and is
+ *  given notice if the sk_buff was indeed passed.  This permits us to overlay a protocol stack over
+ *  an existing protocol stack.  This is useful for rawip, UDP (for use by RTP) and SCTP.  For rawip
+ *  it permits us to intercept specific packets.
+ *
+ *  In fact this is very similar to a netfilter hook on local ip delivery.  The problem is that icmp
+ *  errors are delivered to net protocols but are not delivered to netfilter hooks: a (rather
+ *  extensive) netfilter hook for icmp messages would also be necessary.
+ *
+ *  Note also that Linux only delivers ICMP messages to one net protocol: the first on the list.  We
+ *  want to be able to also send ICMP messages onwards that we are not interested in.
+ */
+
+#if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
+/**
+ *  inet_override_protocol: - register or override a net protocol
+ *  @pb: freshly allocated protocol bucket
+ *  @proto: the protocol to register or override
+ *
+ */
 STATIC void
 inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 {
 	bzero(pb, sizeof(*pb));
 	pb->refs = 1;
+	pb->override = true;
 	pb->proto = proto;
 	pb->prot.handler = &ip_v4_rcv;
 	pb->prot.err_hander = &ip_v4_err;
 	pb->prot.protocol = proto;
 	pb->prot.name = &pb->name;
-	inet_add_protocol(&pb->prot);
-	/* FIXME: take a lock for SMP */
-	local_bh_disable();
-	/* FIXME: need to find the module that owns pb->prot.next and take a reference */
-	pb->next = pb->prot.next;
 	pb->prot.next = NULL;
 	pb->prot.copy = 0;
-	/* FIXME: released the lock for SMP */
-	local_bh_enable();
+	{
+		unsigned char hash = proto & (MAX_INET_PROTOS - 1);
+		struct inet_protocol **p = &inet_protos[hash];
+
+		br_write_lock_bh(BR_NETPROTO_LOCK);
+		/* FIXME: need to find the module that owns pb->prot.next and take a reference */
+		pb->next = (*p);
+		(*p) = &pb->prot;
+		br_write_unlock_bh(BR_NETPROTO_LOCK);
+	}
 }
+
+/**
+ *  inet_restore_protocol: - restore or deregister a new protocol
+ *  @pb: existing registered protocol bucket
+ *
+ */
 STATIC void
 inet_restore_protocol(struct ip_prot_bucket *pb)
 {
-	pb->prot.copy = (pb->next != NULL);
-	pb->prot.next = pb->next;
-	pb->next = NULL;
-	inet_del_protocol(&pb->prot);
-}
-#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
+	unsigned char hash = proto & (MAX_INET_PROTOS - 1);
+	struct inet_protocol **p = &inet_protos[hash];
 
-#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
+	if (pb == NULL)
+		return;
+
+	br_write_lock_bh(BR_NETPROTO_LOCK);
+	while ((*p) != NULL && (*p) != pb)
+		p = &(*p)->next;
+	if ((*p) == pb)
+		(*p) = pb->next;
+	/* FIXME: restore copy pointers on the list */
+	br_write_unlock_bh(BR_NETPROTO_LOCK);
+}
+#elif defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 
 STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
 
+/**
+ *  inet_override_protocol: - register or override a net protocol
+ *  @pb: freshly allocated protocol bucket
+ *  @proto: the protocol to register or override
+ *
+ *  This is the newer 2.6 (and patched back 2.4) version of the function.  We always register
+ *  ourselves and detach the list.
+ */
 STATIC void
 inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 {
@@ -465,8 +529,7 @@ inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 	pb->prot.handler = &ip_v4_rcv;
 	pb->prot.err_handler = &ip_v4_err;
 	pb->prot.no_policy = 1;
-	if (inet_add_protocol(&pb->prot, proto) == -1) {
-		/* need to override */
+	{
 		int hash = proto & (MAX_INET_PROTOS - 1);
 
 		spin_lock_bh(inet_proto_lockp);
@@ -476,11 +539,27 @@ inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 		spin_unlock_bh(inet_proto_lockp);
 	}
 }
+
+/**
+ *  inet_restore_protocol: - restore or deregister a new protocol
+ *  @pb: existing registered protocol bucket
+ *
+ *  This is the newer 2.6 (and patched back 2.4) version of the function.  We always deregister
+ *  ourselves and reattach the list.
+ */
 STATIC void
 inet_restore_protocol(struct ip_prot_bucket *pb)
 {
+	int hash = proto & (MAX_INET_PROTOS - 1);
+
+	spin_lock_bh(inet_proto_lockp);
+	inet_protos[hash] = pb->next;
+	spin_unlock_bh(inet_proto_lockp);
+	synchronize_net();
 }
-#endif				/* HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY */
+#else
+#error HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY or HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY must be defined.
+#endif
 
 /**
  *  ip_bind_prot -  bind a protocol
@@ -494,33 +573,30 @@ inet_restore_protocol(struct ip_prot_bucket *pb)
  *
  *  Issues with the 2.4 approach to registration is that the ip_input function passes a cloned skb
  *  to each protocol registered.  We don't want to do that.  If the message is for us, we want to
- *  process it without passing it to others, except perhaps raw sockets.
+ *  process it without passing it to others.
  *
  *  Issues with the 2.6 approach to registration is that the ip_input function passes the skb to
  *  only one function.  We don't want that either.  If the message is not for us, we want to pass it
  *  to the next protocol module.
  */
-STATIC struct ip_prot_bucket *
+STATIC int
 ip_bind_prot(unsigned char proto)
 {
 	struct ip_prot_bucket *pb;
 
 	write_lock_bh(&ip_prot_lock);
 	{
-		pb = ip_prots[proto];
-		if (pb != NULL)
+		if ((pb = ip_prots[proto]) != NULL)
 			++pb->refs;
-		else {
-			pb = kmem_cache_alloc(ip_prot_cachep, SLAB_ATOMIC);
-			if (pb != NULL) {
+		else
+			if ((pb = kmem_cache_alloc(ip_prot_cachep, SLAB_ATOMIC)) != NULL) {
 				/* register protocol */
 				inet_override_protocol(pb, proto);
 				ip_prots[proto] = pb;
 			}
-		}
 	}
 	write_unlock_bh(&ip_prot_lock);
-	return (pb);
+	return ((pb != NULL) ? 0 : -ENOMEM);
 }
 
 /**
@@ -534,17 +610,15 @@ ip_unbind_prot(unsigned char proto)
 
 	write_lock_bh(&ip_prot_lock);
 	{
-		pb = ip_prots[proto];
-		if (pb != NULL) {
-			if (--pb->refs <= 0) {
-				ip_prots[proto] = NULL;
-				/* unregister protocol */
-				inet_restore_protocol(pb);
-				kmem_cache_free(ip_prot_cachep, pb);
-			}
+		if ((pb = ip_prots[proto]) != NULL && --pb->refs <= 0) {
+			ip_prots[proto] = NULL;
+			/* unregister protocol */
+			inet_restore_protocol(pb);
+			kmem_cache_free(ip_prot_cachep, pb);
 		}
 	}
 	write_unlock_bh(&ip_prot_lock);
+	return;
 }
 
 /**
@@ -557,10 +631,12 @@ ip_unbind_prot(unsigned char proto)
 STATIC int
 ip_bind_addr(queue_t *q, struct sockaddr_in *addr, unsigned char proto, int flag)
 {
-	if (ip_bind_prot(proto) == NULL)
-		goto noprot;
-      noprot:
-	return (-ENOMEM);
+	int err;
+
+	if ((err = ip_bind_prot(proto)) != 0)
+		goto error;
+      error:
+	return (err);
 }
 
 /**
@@ -615,7 +691,8 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
 				else
 					add->sin_port = port;
 
-				if ((err = ip_bind_addr(q, add, proto, 0))) /* FIXME: what flag? */
+				if ((err = ip_bind_addr(q, add, proto, 0)))	/* FIXME: what
+										   flag? */
 					break;
 			}
 			if (err == 0)
@@ -623,7 +700,7 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
 			for (; j >= 0; j--) {
 				struct sockaddr_in *add = &add_in[j];
 
-				ip_unbind_addr(q, add, proto, 0); /* FIXME: what flag? */
+				ip_unbind_addr(q, add, proto, 0);	/* FIXME: what flag? */
 			}
 			break;
 		} else {
@@ -634,7 +711,7 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
 				.sin_addr = {.s_addr = 0,},
 			};
 
-			err = ip_bind_addr(q, &add, proto, 0); /* FIXME: what flag? */
+			err = ip_bind_addr(q, &add, proto, 0);	/* FIXME: what flag? */
 			if (err == 0)
 				continue;
 			break;
@@ -650,7 +727,7 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
 			for (j = 0; j < anum; j++) {
 				struct sockaddr_in *add = &add_in[j];
 
-				ip_unbind_addr(q, add, proto, 0); /* FIXME: what flag? */
+				ip_unbind_addr(q, add, proto, 0);	/* FIXME: what flag? */
 			}
 		} else {
 			/* no addresses means wildcard bind */
@@ -660,7 +737,7 @@ ip_bind_req(queue_t *q, struct sockaddr_in *add_in, size_t anum, unsigned char *
 				.sin_addr = {.s_addr = 0,},
 			};
 
-			ip_unbind_addr(q, &add, proto, 0); /* FIXME: what flag? */
+			ip_unbind_addr(q, &add, proto, 0);	/* FIXME: what flag? */
 		}
 	}
 	return (err);
@@ -790,7 +867,7 @@ STATIC int
 ip_unitdata_req(queue_t *q, struct sockaddr_in *dest, mblk_t *mp)
 {
 	struct ip *ip = IP_PRIV(q);
-	struct sockaddr_in *srce = (struct sockaddr_in *)&ip->addr;
+	struct sockaddr_in *srce = (struct sockaddr_in *) &ip->addr;
 	uint32_t saddr = srce->sin_addr.s_addr;
 	uint32_t daddr = dest->sin_addr.s_addr;
 	uint8_t protoid = ntohs(dest->sin_port);
@@ -1053,7 +1130,9 @@ ip_dupb(queue_t *q, mblk_t *bp)
  *
  *  ===================================================================
  */
-STATIC int ip_unbind_req(struct ip *ip) {
+STATIC int
+ip_unbind_req(struct ip *ip)
+{
 	swerr();
 	fixme(("write this function"));
 	return (0);
@@ -1861,11 +1940,14 @@ ip_w_proto(queue_t *q, mblk_t *mp)
 	return (rtn);
 }
 
-STATIC int n_write(struct ip *ip, mblk_t *mp) {
+STATIC int
+n_write(struct ip *ip, mblk_t *mp)
+{
 	swerr();
 	fixme(("write this function"));
 	return (0);
 }
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -1922,11 +2004,14 @@ ip_r_other(queue_t *q, mblk_t *mp)
 #endif
 }
 
-STATIC int ip_recv_msg(struct ip *ip, mblk_t *mp) {
+STATIC int
+ip_recv_msg(struct ip *ip, mblk_t *mp)
+{
 	swerr();
 	fixme(("write this function"));
 	return (0);
 }
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -1942,11 +2027,14 @@ ip_r_data(queue_t *q, mblk_t *mp)
 	return ip_recv_msg(ip, mp);
 }
 
-STATIC int ip_recv_err(struct ip *ip, mblk_t *mp) {
+STATIC int
+ip_recv_err(struct ip *ip, mblk_t *mp)
+{
 	swerr();
 	fixme(("write this function"));
 	return (0);
 }
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -2244,16 +2332,21 @@ ip_wsrv(queue_t *q)
  *  =========================================================================
  */
 STATIC struct ip_hash_bucket ip_bind_hash[1] = { };
-STATIC int ip_bind_hashfn(short snum) {
+STATIC int
+ip_bind_hashfn(short snum)
+{
 	swerr();
 	fixme(("write this function"));
 	return (0);
 }
-STATIC struct sockaddr_in *ip_find_saddr(struct ip *ip, uint32_t daddr) {
+STATIC struct sockaddr_in *
+ip_find_saddr(struct ip *ip, uint32_t daddr)
+{
 	swerr();
 	fixme(("write this function"));
 	return (NULL);
 }
+
 /**
  *  ip_lookup -	lookup Stream by protocol, address and port.
  *  @proto:	IP protocol number
@@ -2337,7 +2430,7 @@ ip_v4_rcv(struct sk_buff *skb)
 		goto no_ip_prot;
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
 		goto linear_fail;
-	if (!(ip = ip_lookup(pb->proto, iph->daddr, *(unsigned short *)(iph+1)))) /* FIXME */
+	if (!(ip = ip_lookup(pb->proto, iph->daddr, *(unsigned short *) (iph + 1))))	/* FIXME */
 		goto no_ip_stream;
 	if (!ip->rq || !canput(ip->rq))
 		goto flow_controlled;
@@ -2502,7 +2595,7 @@ ip_free_priv(queue_t *q)
 	ensure(ip, return);
 	qprocsoff(q);
 	printd(("%s: unlinking private structure, reference count = %d\n", DRV_NAME,
-	atomic_read(&ip->refcnt)));
+		atomic_read(&ip->refcnt)));
 	ip_unbufcall(q);
 	printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME,
 		atomic_read(&ip->refcnt)));
@@ -2513,8 +2606,7 @@ ip_free_priv(queue_t *q)
 	ip->prev = NULL;
 	spin_unlock_bh(&ip_lock);
 	ip_put(ip);
-	printd(("%s: unlinked, reference count = %d\n", DRV_NAME,
-		atomic_read(&ip->refcnt)));
+	printd(("%s: unlinked, reference count = %d\n", DRV_NAME, atomic_read(&ip->refcnt)));
 	ip->rq->q_ptr = NULL;
 	ip->rq = NULL;
 	ip_put(ip);
@@ -2600,6 +2692,7 @@ ip_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		spin_unlock_bh(&ip_lock);
 		return (ENOMEM);
 	}
+	spin_unlock_bh(&udp_lock);
 	qprocson(q);
 	return (0);
 }
@@ -2678,7 +2771,7 @@ MODULE_PARM_DESC(major, "Device number for the IP driver. (0 for allocation.)");
 STATIC struct cdevsw ip_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &ip_info,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
@@ -2785,11 +2878,11 @@ ipinit(void)
 		if (major == 0)
 			major = ip_majors[0];
 	}
-	(void)ip_unbind_prot;
-	(void)ip_esballoc;
-	(void)ip_dupmsg;
-	(void)ip_dupb;
-	(void)n_unitdata_ind;
+	(void) ip_unbind_prot;
+	(void) ip_esballoc;
+	(void) ip_dupmsg;
+	(void) ip_dupb;
+	(void) n_unitdata_ind;
 	return (0);
 }
 

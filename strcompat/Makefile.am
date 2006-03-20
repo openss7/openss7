@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 12:34:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/20 11:54:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/07 12:34:20 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 11:54:01 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.14  2006/03/20 11:54:01  brian
+# - added checks for DEVELOPMENT
+#
 # Revision 0.9.2.13  2006/03/07 12:34:20  brian
 # - tools must be built static for distcheck
 #
@@ -520,7 +523,11 @@ include am/strconf.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = src . tests doc
+SUBDIRS = src . tests
+
+if DEVELOPMENT
+SUBDIRS += doc
+endif
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

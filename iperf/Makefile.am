@@ -52,7 +52,19 @@
 # $Log$
 # =============================================================================
 
-SUBDIRS = compat include src doc
+SUBDIRS =
+
+SUBDIRS += compat
+
+if DEVELOPMENT
+SUBDIRS += include
+endif
+
+SUBDIRS += src
+
+if DEVELOPMENT
+SUBDIRS += doc
+endif
 
 ##
 ## General rules

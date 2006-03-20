@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/03/07 12:34:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/03/20 14:01:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/07 12:34:25 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 14:01:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.58  2006/03/20 14:01:57  brian
+# - fixed error on SUBDIRS
+#
+# Revision 0.9.2.57  2006/03/20 11:54:07  brian
+# - added checks for DEVELOPMENT
+#
 # Revision 0.9.2.56  2006/03/07 12:34:25  brian
 # - tools must be built static for distcheck
 #
@@ -366,12 +372,16 @@ include am/strconf.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-if PKG_BUILD_INDEP
-SUBDIRS = src . tests doc
-endif
+SUBDIRS = src
 
 if PKG_BUILD_ARCH
-SUBDIRS = src intl m4 po . tests doc
+SUBDIRS += intl m4 po
+endif
+
+SUBDIRS += . tests
+
+if DEVELOPMENT
+SUBDIRS += doc
 endif
 
 if PKG_BUILD_INDEP

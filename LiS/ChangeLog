@@ -1,3 +1,10 @@
+2006-03-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: add checks for DEVELOPMENT
+	* LiS.spec.in: tied in --disable-devel flag
+	* configure.ac: updated and rationalized
+	* manual/Makefile.am: added checks for DEVELOPMENT
+
 2006-03-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: README-alpha missing from last release

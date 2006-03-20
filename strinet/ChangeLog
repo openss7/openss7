@@ -1,3 +1,12 @@
+2006-03-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added checks for DEVELOPMENT
+	* src/Makefile.am: added checks for DEVELOPMENT
+	* strinet.spec.in: tied in --disable-devel flag
+	* src/drivers/udp.c: added new approach to UDP
+	* configure.ac: updated and rationalized
+	* doc/manual/Makefile.am: added checks for DEVELOPMENT
+
 2006-03-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: moved ss_sock_recvmsg inside locks

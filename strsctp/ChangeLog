@@ -1,3 +1,11 @@
+2006-03-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added checks for DEVELOPMENT
+	* src/Makefile.am: added checks for DEVELOPMENT
+	* strsctp.spec.in: tied in --disable-devel flag
+	* configure.ac: updated and rationalized
+	* doc/manual/Makefile.am: added checks for DEVELOPMENT
+
 2006-03-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: corrected typo

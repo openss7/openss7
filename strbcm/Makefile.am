@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/14 21:09:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/20 11:54:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/14 21:09:54 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 11:54:00 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2006/03/20 11:54:00  brian
+# - added checks for DEVELOPMENT
+#
 # Revision 0.9.2.3  2006/03/14 21:09:54  brian
 # - two levels of distro specific rpm extra tags
 #
@@ -239,7 +242,11 @@ include am/strconf.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = src . tests doc
+SUBDIRS = src . tests
+
+if DEVELOPMENT
+SUBDIRS += doc
+endif
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

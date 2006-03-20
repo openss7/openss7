@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.32 $) $Date: 2006/03/06 11:37:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.34 $) $Date: 2006/03/20 12:51:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:37:48 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 12:51:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.34  2006/03/20 12:51:45  brian
+# - added missing README-alpha file
+#
+# Revision 1.1.6.33  2006/03/20 11:53:55  brian
+# - added checks for DEVELOPMENT
+#
 # Revision 1.1.6.32  2006/03/06 11:37:48  brian
 # - updated headers
 #
@@ -474,8 +480,10 @@ if RPM_BUILD_USER
 
 SUBDIRS =
 
+if DEVELOPMENT
 if PKG_BUILD_ARCH
 SUBDIRS += include
+endif
 endif
 
 SUBDIRS += tests
@@ -484,8 +492,10 @@ if PKG_BUILD_ARCH
 SUBDIRS += . testsuite
 endif
 
+if DEVELOPMENT
 if PKG_BUILD_INDEP
 SUBDIRS += man manual
+endif
 endif
 
 if PKG_BUILD_INDEP
@@ -556,6 +566,7 @@ include am/deb.am
 EXTRA_DIST			+= \
 				  TODO \
 				  README-cvs \
+				  README-alpha \
 				  README-nexusware \
 				  debian/README.Debian \
 				  debian/TODO.Debian

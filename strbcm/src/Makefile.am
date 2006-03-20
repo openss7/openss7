@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:17:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/20 11:54:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/08 11:17:58 $ by $Author: brian $
+# Last Modified $Date: 2006/03/20 11:54:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/03/20 11:54:10  brian
+# - added checks for DEVELOPMENT
+#
 # Revision 0.9.2.1  2006/03/08 11:17:58  brian
 # - completing package
 #
@@ -57,6 +60,12 @@
 
 include ../am/openss7.am
 
+if DEVELOPMENT
+## DEVELOPMENT
+
 SUBDIRS = include
+
+## DEVELOPMENT
+endif
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
