@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2006/03/05 03:51:19 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2006/03/21 13:24:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/05 03:51:19 $ by $Author: brian $
+# Last Modified $Date: 2006/03/21 13:24:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.116  2006/03/21 13:24:15  brian
+# - added problem report checks
+#
 # Revision 0.9.2.115  2006/03/05 03:51:19  brian
 # - aligned to LiS
 #
@@ -62,6 +65,7 @@
 
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/pr.m4])
 m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
 m4_include([m4/devfs.m4])
@@ -80,6 +84,7 @@ m4_include([m4/strconf.m4])
 AC_DEFUN([AC_LFS], [dnl
     _OPENSS7_PACKAGE([STREAMS], [Linux Fast-STREAMS])
     _LFS_OPTIONS
+    _AUTOPR
     _MAN_CONVERSION
     _PUBLIC_RELEASE
     _INIT_SCRIPTS

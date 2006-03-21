@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/03/20 11:53:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/03/21 13:24:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 11:53:58 $ by $Author: brian $
+# Last Modified $Date: 2006/03/21 13:24:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.67  2006/03/21 13:24:37  brian
+# - included pr.am
+#
 # Revision 0.9.2.66  2006/03/20 11:53:58  brian
 # - added checks for DEVELOPMENT
 #
@@ -73,6 +76,11 @@ include am/openss7.am
 ## Help
 ##
 include am/help.am
+
+##
+## Problem Reports
+##
+include am/pr.am
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH

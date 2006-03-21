@@ -76,6 +76,11 @@ include am/openss7.am
 ##
 include am/help.am
 
+##
+## Problem Reports
+##
+include am/pr.am
+
 AM_CPPFLAGS = @STRIP_BEGIN@ \
 	      -I$(top_srcdir)/include \
 	      @STRIP_END@

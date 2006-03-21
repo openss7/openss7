@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/13 23:59:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/21 13:24:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/13 23:59:52 $ by $Author: brian $
+# Last Modified $Date: 2006/03/21 13:24:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.20  2006/03/21 13:24:32  brian
+# - included pr.am
+#
 # Revision 0.9.2.19  2006/03/13 23:59:52  brian
 # - pass down master source and build directories
 #
@@ -67,6 +70,11 @@ include am/openss7.am
 ## Help
 ##
 include am/help.am
+
+##
+## Problem Reports
+##
+include am/pr.am
 
 export RPMXOPTS="--nodeps"
 export DEBXOPTS="-d"

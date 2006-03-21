@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/07/04 20:08:38 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/21 13:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:08:38 $ by $Author: brian $
+# Last Modified $Date: 2006/03/21 13:24:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,6 +56,7 @@ m4_include([m4/acx_pthread.m4])
 m4_include([m4/dast.m4])
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/pr.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
 m4_include([m4/man.m4])

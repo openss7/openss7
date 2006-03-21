@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.34 $) $Date: 2006/03/20 12:51:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.35 $) $Date: 2006/03/21 13:24:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 12:51:45 $ by $Author: brian $
+# Last Modified $Date: 2006/03/21 13:24:34 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.35  2006/03/21 13:24:34  brian
+# - included pr.am
+#
 # Revision 1.1.6.34  2006/03/20 12:51:45  brian
 # - added missing README-alpha file
 #
@@ -70,6 +73,11 @@ include am/openss7.am
 ## Help
 ##
 include am/help.am
+
+##
+## Problem Reports
+##
+include am/pr.am
 
 if LIS_USER_TARGET
 

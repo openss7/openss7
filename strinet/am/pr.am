@@ -1,0 +1,132 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: pr.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/21 13:23:46 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; version 2 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2006/03/21 13:23:46 $ by $Author: brian $
+##
+## -----------------------------------------------------------------------------
+##
+## $Log: pr.am,v $
+## Revision 0.9.2.1  2006/03/21 13:23:46  brian
+## - added problem reports
+##
+## =============================================================================
+
+#!
+#! Problem Report targets:
+#! -----------------------
+#!
+#! To ease problem report generation, all logging targets will automatically
+#! generate a problem report suitable for mailing in the file 'target'.pr for
+#! target 'target.log'.  This problem report file is in the form of an email
+#! and can be sent directly.
+#!
+#! There are two additional problem report targets:
+#!
+#! make-pr:
+#!     The make-pr target is for independently generating a problem report
+#!     outside of the build or installation process.  The target will
+#!     automatically generate a problem report skeleton suitable for editting
+#!     and mailing in the file 'problem.pr'.  This problem report file is in
+#!     the form of an email and can be sent directly.
+#!
+make-pr: $(AP_CONFIG)
+	$(AP_AUTOPR) --config=$(AP_CONFIG)
+
+#! mail-pr:
+#!	The mail-pr target is for finalizing and mailing a problem report
+#!	generated either inside or outside the build and isntallation process.
+#!	The target will automatically finalize and mail any *.pr problem
+#!	report that has changed since the last time that mail-pr was run.
+#!
+mail-pr: $(AP_CONFIG)
+	@for pr in *.pr ; do \
+		if test -f $$pr -a -w $$pr ; then \
+			if (grep -q '^Status: Sent' $$pr >/dev/null 2>&1) ; then  \
+				continue ; \
+			fi ; \
+			mv -f -- $$pr $$pr.tmp.$$$$ ; \
+			$(ECHO) "sendmail -ti $$pr" ; \
+			sendmail -ti $$pr.tmp.$$$$ ; \
+			sent= ; cat $$pr.tmp.$$$$ | while read line ; do \
+				if test -z "$$sent" -a -z "$$line" ; then \
+					 $(ECHO) "Status: Sent" ; \
+					 sent='yes' ; \
+				fi ; \
+				$(ECHO) "$$line" ; \
+			done > $$pr ; \
+		fi ; \
+	done
+
+
+clean-autopr:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-autopr:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(LOGGING_TARGETS)' ; for t in $$list ; do \
+		p=`echo $$t | sed -e 's|\.log$|.pr|'` ; \
+		$(ECHO) "rm -f -- $$p" ; \
+		rm -f -- $$p ; \
+	done ; \
+	$(ECHO) "rm -f -- problem.pr" ; \
+	rm -f -- problem.pr
+
+maintainer-clean-autopr:
+	@$(ECHO) "Making $@ in `pwd`"
+
+CLEAN_LOCAL		+= clean-autopr
+DISTCLEAN_LOCAL		+= distclean-autopr
+MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-autopr
+
+pkglibexec_SCRIPTS	= $(AP_SCRIPT)
+pkglibexec_DATA		= $(AP_CONFIG)
+
+EXTRA_SCRIPTS		+= scripts/auto-pr
+EXTRA_DIST		+= $(AP_CONFIG)
+
+MY_PHONY		+= make-pr mail-pr

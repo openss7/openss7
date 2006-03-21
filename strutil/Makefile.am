@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/20 11:54:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/21 13:24:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 11:54:06 $ by $Author: brian $
+# Last Modified $Date: 2006/03/21 13:24:43 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.15  2006/03/21 13:24:43  brian
+# - included pr.am
+#
 # Revision 0.9.2.14  2006/03/20 11:54:06  brian
 # - added checks for DEVELOPMENT
 #
@@ -70,6 +73,11 @@ include am/openss7.am
 ## Help
 ##
 include am/help.am
+
+##
+## Problem Reports
+##
+include am/pr.am
 
 lib_LTLIBRARIES			=
 

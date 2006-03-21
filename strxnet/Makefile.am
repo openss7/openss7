@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/03/20 14:01:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2006/03/21 13:24:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 14:01:57 $ by $Author: brian $
+# Last Modified $Date: 2006/03/21 13:24:44 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.59  2006/03/21 13:24:44  brian
+# - included pr.am
+#
 # Revision 0.9.2.58  2006/03/20 14:01:57  brian
 # - fixed error on SUBDIRS
 #
@@ -73,6 +76,11 @@ include am/openss7.am
 ## Help
 ##
 include am/help.am
+
+##
+## Problem Reports
+##
+include am/pr.am
 
 lib_LTLIBRARIES			= 
 

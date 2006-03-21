@@ -1,3 +1,10 @@
+2006-03-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* .cvsignore: added *.pr files
+	* Makefile.am: added pr.am for problem reports
+	* acinclude.m4: added pr.m4 to includes
+	* configure.ac: call _AUTOPR for problem reports
+
 2006-03-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added checks for DEVELOPMENT

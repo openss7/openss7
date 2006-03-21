@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.43 $) $Date: 2006/03/14 21:09:48 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.44 $) $Date: 2006/03/21 13:24:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/14 21:09:48 $ by $Author: brian $
+# Last Modified $Date: 2006/03/21 13:24:09 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.44  2006/03/21 13:24:09  brian
+# - added problem report checks
+#
 # Revision 1.1.6.43  2006/03/14 21:09:48  brian
 # - two levels of distro specific rpm extra tags
 #
@@ -69,6 +72,7 @@
 
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/pr.m4])
 m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
 m4_include([m4/devfs.m4])
@@ -87,6 +91,7 @@ m4_include([m4/strconf.m4])
 AC_DEFUN([AC_LIS], [dnl
     _OPENSS7_PACKAGE([LiS], [Linux STREAMS (LiS)])
     _LIS_OPTIONS
+    _AUTOPR
     _MAN_CONVERSION
     _PUBLIC_RELEASE
     _INIT_SCRIPTS

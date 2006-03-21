@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/18 09:40:07 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/21 13:24:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/18 09:40:07 $ by $Author: brian $
+# Last Modified $Date: 2006/03/21 13:24:17 $ by $Author: brian $
 #
 # =============================================================================
 
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/pr.m4])
 m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
 m4_include([m4/devfs.m4])
@@ -76,6 +77,7 @@ m4_include([m4/xti.m4])
 AC_DEFUN([AC_SCTP], [dnl
     _OPENSS7_PACKAGE([SCTP], [OpenSS7 STREAMS SCTP])
     _SCTP_OPTIONS
+    _AUTOPR
     _MAN_CONVERSION
     _PUBLIC_RELEASE
     _INIT_SCRIPTS

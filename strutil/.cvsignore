@@ -21,3 +21,4 @@ stamp-h1
 config.site
 config.cache
 INSTALL.*
+*.pr

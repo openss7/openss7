@@ -1,3 +1,15 @@
+2006-03-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/pr.m4: configuration for auto-pr problem reports
+	* scripts/auto-pr: automagically generate problem reports
+	* am/man.am: handle .PHONY correctly
+	* .cvsignore: added *.pr files
+	* am/openss7.am: added auto-pr on failure to logging targets
+	* am/pr.am: new automake fragement for problem reports
+	* Makefile.am: added pr.am for problem reports
+	* acinclude.m4: added pr.m4 and call _AUTOPR for problem reports
+	* scripts/auto-pr.config.in: configuration file for auto-pr
+
 2006-03-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* TODO: updated todo items for common packaging
