@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/20 12:16:45 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/20 23:10:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/20 12:16:45 $ by $Author: brian $
+ Last Modified $Date: 2006/03/20 23:10:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.10  2006/03/20 23:10:31  brian
+ - corrected errors
+
  Revision 0.9.2.9  2006/03/20 12:16:45  brian
  - working up IP driver
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/20 12:16:45 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/20 23:10:31 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/20 12:16:45 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/20 23:10:31 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -124,7 +127,7 @@ static char const ident[] =
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/20 12:16:45 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/20 23:10:31 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -550,6 +553,7 @@ inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 STATIC void
 inet_restore_protocol(struct ip_prot_bucket *pb)
 {
+	unsigned char proto = pb->proto;
 	int hash = proto & (MAX_INET_PROTOS - 1);
 
 	spin_lock_bh(inet_proto_lockp);
@@ -2692,7 +2696,7 @@ ip_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		spin_unlock_bh(&ip_lock);
 		return (ENOMEM);
 	}
-	spin_unlock_bh(&udp_lock);
+	spin_unlock_bh(&ip_lock);
 	qprocson(q);
 	return (0);
 }

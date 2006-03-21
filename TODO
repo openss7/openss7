@@ -1,5 +1,5 @@
 OpenSS7 Master Package -- things to do.  2006-03-01
-$Id: TODO,v 0.9.2.3 2006/03/20 11:55:37 brian Exp $
+$Id: TODO,v 0.9.2.4 2006/03/20 23:10:45 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -26,6 +26,10 @@ Things to do:
   information and generate a problem report template as a mail text file
   that can then be editted by the user and mailed to the bugs address.
   I like that.  That will work better.
+
+  Better still, it might be a good idea to modify the logging targets to
+  automatically generate a problem report when they fail.  That would be
+  better.
 
 - Cross-testing framework.  We have nice autotest test suites that are
   fine for native builds, but for cross-compile builds, it would also be
