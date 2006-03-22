@@ -1,3 +1,10 @@
+2006-03-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/pr.am: changed some target names
+	- made mail-pr call auto-pr with --mail argument
+	* scripts/auto-pr: working up auto-pr
+	- added --mail argument
+
 2006-03-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/pr.m4: configuration for auto-pr problem reports

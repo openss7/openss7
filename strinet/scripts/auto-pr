@@ -2,7 +2,7 @@
 # vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
 # 
-# @(#) $RCSfile: auto-pr,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/21 13:23:44 $
+# @(#) $RCSfile: auto-pr,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/22 01:08:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:23:44 $ by $Author: brian $
+# Last Modified $Date: 2006/03/22 01:08:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: auto-pr,v $
+# Revision 0.9.2.2  2006/03/22 01:08:26  brian
+# - working up auto-pr
+#
 # Revision 0.9.2.1  2006/03/21 13:23:44  brian
 # - added problem reports
 #
@@ -88,13 +91,14 @@ dir=`dirname $0`
 path=`(cd $dir ; pwd)`
 errors=0
 warnings=0
+revision='$Revision: 0.9.2.2 $'
 
 exec 5>${top_builddir}${top_builddir+/}$me.log
 
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: auto-pr,v $ $Nam$($Revision: 0.9.2.1 $) $Date: 2006/03/21 13:23:44 $'
+ident='$RCSfile: auto-pr,v $ $Nam$($Revision: 0.9.2.2 $) $Date: 2006/03/22 01:08:26 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -127,13 +131,16 @@ fi
 # Make sure IFS has a sensible default
 : ${IFS=" 	"}
 
-genpr_letters='abcdefghijklmnopqrstuvwxyz'
-genpr_LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-genpr_Letters=$genpr_letters$genpr_LETTERS
-genpr_numbers='0123456789'
-genpr_alphano=$genpr_Letters$genpr_numbers
-genpr_uppercase="$SED y%*$genpr_letters%P$genpr_LETTERS%;s%[^_$genpr_alphano]%_%g"
-genpr_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
+autopr_letters='abcdefghijklmnopqrstuvwxyz'
+autopr_LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+autopr_Letters=$autopr_letters$autopr_LETTERS
+autopr_numbers='0123456789'
+autopr_alphano=$autopr_Letters$autopr_numbers
+autopr_uppercase="$SED y%*$autopr_letters%P$autopr_LETTERS%;s%[^_$autopr_alphano]%_%g"
+autopr_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
+
+ucme=`echo "$me" | $autopr_uppercase`
+leader="$ucme:"
 
 targets=( \
     "compile.log" \
@@ -155,8 +162,10 @@ targets=( \
 
 # Default
 
-default_target=
-default_config="$path/$me.conf"
+default_target='all'
+default_config="$path/$me.config"
+default_mail='problem.pr'
+default_sendmail='/usr/sbin/sendmail -oi -t'
 
 commands=
 target=
@@ -229,12 +238,16 @@ Arguments:
         whitespace separated list of targets for which to generate problem reports
         the default is to generate a general purpose problem report
 Options:
-    -t, --target=TARGET[ TARGET]*
+    -t, --target=[TARGET[ TARGET]*]
         failed target for which to generate a problem report [default: '$default_target']
     -s, --srcdir=SRCDIR
         autoconf source directory
     -c, --config=CONFIG
         $me configuration file [default: '$default_config']
+    -M, --mail=[REPORT[ REPORT]*]
+	instead, mail an existing problem report [default: '$default_mail']
+    -m, --sendmail=COMMAND
+        mail command to use when sending mail [default: '$default_sendmail']
     -q, --quiet
         suppress normal output
     -D, --debug [LEVEL]
@@ -347,6 +360,18 @@ function echo_fle()
     $ECHO "$me: E: $2" >&5
     ((errors++))
 }
+function echo_i()
+{
+    echo -e "$1" >&6
+    echo_d "$1"
+}
+function echo_c()
+{
+    if test "$target" != none ; then
+	return
+    fi
+    echo_i "$1"
+}
 
 
 function syntax_error()
@@ -395,7 +420,9 @@ do
 	--verbose=* | --verbos=* | --verbo=* | --verb=* | \
 	--target=* | --targe=* | --targ=* | --tar=* | --ta=* | --t=* | \
 	--srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=* | --s=* | \
-	--config=* | --confi=* | --conf=* | --con=* | --co=* | --c=*)
+	--config=* | --confi=* | --conf=* | --con=* | --co=* | --c=* | \
+	--mail=* | --mai=* | --ma=* | --m=* | \
+	--sendmail=* | --sendmai=* | --sendma=* | --sendm=* | --send=* | --sen=* | --se=* | --s=*)
 	    optarg=`$ECHO "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
 	--*=*)
 	    option_noarg $arg ;;
@@ -405,33 +432,35 @@ do
 	    more=`$ECHO "X$arg" | $Xsed -e 's|-[qDvhVC]||'`
 	    eval "arg=\`$ECHO \"X$arg\" | $Xsed -e 's|$more||'\`"
 	    ;;
-	-[tsc])
+	-[tscmM])
 	    optarg= ;;
-	-[tsc]*)
-	    optarg=`$ECHO "X$arg" | $Xsed -e 's|-[tsc]||'` ;;
+	-[tscmM]*)
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's|-[tscmM]||'` ;;
 	*)
 	    optarg= ;;
     esac
     # check for optional or required option argument
     if test -n "$prev" ; then
 	case $arg in
-	    -*) # optional arguments not forthcoming
+	    (-*) # optional arguments not forthcoming
 		case $prev in
-		    debug | verbose)
+		    (debug | verbose)
 			eval "(($prev++))" ;;
+		    # these have optional arguments
+		    (target | mail) ;;
 		    # the rest have required arguments
-		    target)
+		    (srcdir | config | sendmail)
 			option_needarg $prevopt ;;
 		esac
 		prev= ; prevopt=
 		;;
-	    *) # if the previous option needs an argument, assign it.
+	    (*) # if the previous option needs an argument, assign it.
 		case $prev in
 		    # these are array arguments
-		    target)
+		    (target | mail)
 			eval "$prev=(\${#prev[*]} $arg)" ;;
 		    # the rest are simple arguments
-		    *)
+		    (*)
 			eval "$prev=\"\$arg\"" ;;
 		esac
 		prev= ; prevopt=
@@ -500,6 +529,20 @@ do
 	--config=* | --confi=* | --conf=* | --con=* | --co=* | --c=* | -c*)
 	    config="$optarg"
 	    ;;
+	--mail | --mai | --ma | -M)
+	    prevopt="$arg"
+	    prev=mail
+	    ;;
+	--mail=* | --mai=* | --ma=* | -M*)
+	    mail=(${mail[*]} $optarg)
+	    ;;
+	--sendmail | --sendmai | --sendma | --sendm | --send | --sen | --se | --s | -m)
+	    prevopt="$arg"
+	    prev=sendmail
+	    ;;
+	--sendmail=* | --sendmai=* | --sendma=* | --sendm=* | --send=* | --sen=* | --se=* | --s=* | -m*)
+	    sendmail="$optarg"
+	    ;;
 	--)
 	    # end of options
 	    break
@@ -528,15 +571,22 @@ if test "x$nonopt" != "x" ; then
 fi
 
 if test -n "$target" ; then
-    commands=${commands}${commands:+ }'genpr'
+    commands=${commands}${commands:+ }'autopr'
 fi
 
-if test -z "$config" ; then
-    config="$default_config"
-fi
+# assign defaults
+for parm in config mail sendmail ; do
+    eval "val=\"\$$parm\""
+    if test -z "$val" ; then
+	eval "$parm=\"\$default_$parm\""
+    fi
+done
 
 if test -r $config ; then
+    echo_d "Reading config file $config."
     . $config
+else
+    echo_w "Cannot read config file $config."
 fi
 
 severities=( \
@@ -770,11 +820,21 @@ kerneltypes=( \
     )
 
 function gnats_comment() {
+    if test "$target" != none ; then
+	return
+    fi
     fields=
     for field in $* ; do
 	fields=${fields:+$fields | }$field
     done
     echo "<[ $fields ] (one line)>"
+}
+
+function gnats_info() {
+    if test "$target" != none ; then
+	return
+    fi
+    echo -n "$1"
 }
 
 function pr_procs()
@@ -797,7 +857,7 @@ function pr_procs()
     test -n "$cpu" || \
 	cpu='unknown'
     proc=`uname -m`
-    proc="${proc:+$proc }${cpu:+[$cpu]}"
+    proc="${proc:+$proc }${cpu:+<$cpu>}"
 }
 
 function pr_streams()
@@ -838,16 +898,27 @@ function proutput()
     email="$email${mail:+<$mail>}"
     echo_d "Email is $email"
     cat>&6<<-EOF
-	AUTO-PR: vim: ft=mail
-	AUTO-PR: Lines starting with 'AUTO-PR' will be removed automatically, as
-	AUTO-PR: will all comments (text enclosed in '<' and '>').
-	AUTO-PR:
-	AUTO-PR: Please consult the auto-pr man page 'auto-pr(1)' or the Texinfo
-	AUTO-PR: manual if you are not sure how to fill out a problem report.
-	AUTO-PR: Note that the Synopsis field is mandatory.  The Subject (for
-	AUTO-PR: the mail) will be made the same as Synopsis unless explicity
-	AUTO-PR: changed.
-	AUTO-PR:
+	$leader vim: ft=mail comments=b\:$ucme\:,b\:# fo+=tcqlorn
+	$leader
+	$leader Lines starting with '$ucme' will be removed automatically, as
+	$leader will all comments (text enclosed in '<' and '>').
+	$leader
+	$leader Please consult the auto-pr man page 'auto-pr(1)' or the Texinfo
+	$leader manual if you are not sure how to fill out a problem report.
+	$leader Note that the Synopsis field is mandatory.  The Subject (for the
+	$leader mail) will be made the same as Synopsis unless explicity
+	$leader changed.
+	$leader
+	$leader Please do not send confidential information in the mail.
+	$leader Setting 'Confidential' to yes simply makes the information less
+	$leader accessible to other users, but does not ensure confidentiality
+	$leader of information.  In particular, please inspect the included
+	$leader Environment Variables and remove any sensitive values.  Note
+	$leader also that log files included may contain IP addresses,
+	$leader hostnames, email addresses, and other information of a
+	$leader confidential or sensitive nature.  Please delete all such
+	$leader information before sending.
+	$leader
 EOF
     cat>&6<<-EOF
 	From $mail `date`
@@ -856,92 +927,94 @@ EOF
 	Subject: Failure during $stage for target $target
 	Date: `date -R`
 	Reply-To: $email
-	X-send-pr-version: 4.1.0
+	X-$me-version: $revision
 
 
-	>Submitter-Id:    <SUBMITTER>
-	>Originator:      $name <DEFAULT_ORIGINATOR>
-	>Organization:    
 EOF
-    echo -e "\t<ORGANIZATION>" >&6
+    echo_i ">Submitter-Id:    ${SUBMITTER:-<SUBMITTER>}"
+    echo_i ">Originator:      ${DEFAULT_ORIGINATOR:-${name:-<DEFAULT_ORIGINATOR>}}"
+    echo_i ">Organization:    "
+    echo_i "\t${ORGANIZATION:-<ORGANIZATION>}"
     if test -n "$org" ; then
 	echo "$org" | while read line ; do
-	    echo -e "\t$line" >&6
+	    echo_i "\t$line"
 	done
     fi
     cat>&6<<-EOF
-	>Synopsis:        Failure during $stage for target $target <One-line summary of the Problem. (one line)>
+	>Synopsis:        Failure during $stage for target $target `gnats_info '<One-line summary of the Problem. (one line)>'`
 	>Confidential:    no `gnats_comment yes no`
 	>Severity:        $severity `gnats_comment ${severities[*]}`
 	>Priority:        $priority `gnats_comment ${priorities[*]}`
 	>Category:        ${ap_PACKAGE:-openss7} `gnats_comment ${categories[*]}`
 	>Class:           $class `gnats_comment ${classes[*]}`
 	>Quarter:         $me
-	>Package:         ${ap_PACKAGE:unknown} `gnats_comment ${packages[*]}`
-	>Release:         ${ap_VERSION:unknown}
+	>Package:         ${ap_PACKAGE:-unknown} `gnats_comment ${packages[*]}`
+	>Release:         ${ap_VERSION:-unknown}
 	>URL:             $url
 	>Browser:         $browser
-	>OS-Distribution: ${ap_DISTRIBUTION:-unknown}${ap_PACKAGE_RPMDIST:+ [$ap_PACKAGE_RPMDIST]} `gnats_comment ${distributions[*]}`
+	>OS-Distribution: ${ap_DISTRIBUTION:-unknown}${ap_PACKAGE_RPMDIST:+ <$ap_PACKAGE_RPMDIST>} `gnats_comment ${distributions[*]}`
 	>STREAMS-Release: $streams
 	>Kernel-Version:  ${ap_PACKAGE_KVERSION:-`uname -r`}
 	>Kernel-Type:     $ktype `gnats_comment ${kerneltypes[*]}`
-	>Processor-Type:  $proc <Processor machine architecture type. (one line)>
-	>Processors:      $procs <Number of processors on the target system. (one line)>
+	>Processor-Type:  $proc `gnats_info '<Processor machine architecture type. (one line)>'`
+	>Processors:      $procs `gnats_info '<Number of processors on the target system. (one line)>'`
 	>Environment:     
 EOF
-    echo -e "\t`uname -a`" >&6
+    echo_i "\t`uname -a`"
     if test -r /proc/version ; then
 	cat /proc/version | while read line ; do
-	    echo -e "\t$line" >&6
+	    echo_i "\t$line"
 	done
     fi
-    echo -e "\t" >&6
+    echo_i "\t"
 #   env | uuencode -m env.log | while read line ; do
-    echo -e "\tEnvironment Variables:" >&6
+    echo_i "\tEnvironment Variables:"
     declare -x | while read line ; do
-	echo -e "\t[env] $line" >&6
+	echo_i "\t| $line"
     done
-    echo -e "\t" >&6
-    if test -r /proc/cpuinfo ; then
-	echo -e "\tContents of /proc/cpuinfo:" >&6
-	cat /proc/cpuinfo | while read line ; do
-	    echo -e "\t[cpuinfo] $line" >&6
-	done
-    fi
-    echo -e "\t" >&6
+    for f in $envfiles ; do
+	if test -r $f ; then
+	    echo_i "\t"
+	    echo_i "\tContents of $f:"
+	    cat $f | while read line ; do
+		echo_i "\t| $line"
+	    done
+	fi
+    done
+    echo_i "\t"
     cat>&6<<-EOF
-	>Cases:           $cases <Test cases that failed. (one line)>
+	>Cases:           $cases `gnats_info '<Test cases that failed. (one line)>'`
 	>Description:     
 EOF
-    echo -e "\t<Precise description of the problem. (multiple lines)>" >&6
-    echo -e "\t" >&6
+    echo_c "\t<Precise description of the problem. (multiple lines)>"
+    echo_i "\t"
     cat>&6<<EOF
 	This problem report was automatically generated by $me
 	on `date -u -I` because target '$target' failed
 	in the '$stage' stage.  The pertinent log files have
 	been included below.
 EOF
-    echo -e "\t" >&6
+    echo_i "\t"
     for f in $files ; do
 	if test -r $f ; then
-	    echo -e "\t$f" >&6
+	    echo_i "\t$f"
 	fi
     done
-    echo -e "\t" >&6
+    echo_i "\t"
     for f in $files ; do
 	if test -r $f ; then
-	    echo -e "\tContents of file '$f':" >&6
+	    echo_i "\tContents of file '$f':"
 #	    uuencode -m $f `basename $f` | while read line ; do
 	    cat $f | while read line ; do
-		echo -e "\t[$f] $line" >&6
+		echo_i "\t| $line"
 	    done
-	    echo "" >&6
+	    echo_i ""
 	fi
     done
     cat>&6<<-EOF
 	>How-To-Repeat:   
 EOF
-    echo -e "\t<Code/input/activities to reproduce the problem. (multiple lines)>" >&6
+    echo_c "\t<Code/input/activities to reproduce the problem. (multiple lines)>"
     cat>&6<<EOF
 	wget http://www.openss7.org/tarballs/${ap_PACKAGE}-${ap_VERSION}.tar.bz2
 	tar -xjvf ${ap_PACKAGE}-${ap_VERSION}.tar.bz2
@@ -1011,60 +1084,87 @@ EOF
 	make srpm.log
 EOF
 	;;
+    (external)
+	cat>&6<<EOF
+	<Provide specific build or test instructions.>
+EOF
+	;;
     esac
     cat>&6<<-EOF
 	>Fix:              
 EOF
-    echo -e "\t<How to correct or work around the problem, if known. (multiple lines)>" >&6
+    echo_c "\t<How to correct or work around the problem, if known. (multiple lines)>"
     if test -n "$fix" ; then
 	echo "$fix" | while read line ; do
-	    echo -e "\t$line" >&6
+	    echo_i "\t$line"
 	done
     fi
 }
 
 function targetpr()
 {
+    target=$1
     case $1 in
     (compile.log)
+	filename=compile.pr
 	stage=compile
 	class=software
 	severity=serious
 	files="compile.log configure.log config.log"
+	envfiles="/proc/cpuinfo"
 	;;
     (check.log)
+	filename=check.pr
 	stage=check
 	class=install
 	severity=annoyance
 	files="check.log compile.log configure.log config.log"
+	envfiles="/proc/cpuinfo"
 	;;
     (install.log)
+	filename=install.pr
 	stage=install
 	class=install
 	severity=serious
 	files="install.log check.log compile.log configure.log config.log"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
 	;;
     (installcheck.log)
+	filename=installcheck.pr
 	stage=installcheck
 	class=software
 	severity=critical
-	files="tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
+	files="testsuite.log tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
 	;;
     (uninstall.log)
+	filename=uninstall.pr
 	stage=uninstall
 	class=install
 	severity=annoyance
-	files="uninstall.log tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
+	files="uninstall.log testsuite.log tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
 	;;
     (remove.log)
+	filename=remove.pr
 	stage=remove
 	class=install
 	severity=annoyance
-	files="remove.log tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
+	files="remove.log testsuite.log tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
 	;;
     (dist.log|distcheck.log|rpms.log|sign.log|rebuild.log|resign.log|release.log|release-sign.log|srpm.log)
 	stage=maintenance
-	files="$1"
+	files="$1 remove.log uninstall.log testsuite.log tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
+	;;
+    (none|*)
+	filename=problem.pr
+	stage=external
+	class=software
+	severity=serious
+	files="tests/testsuite.log ${targets[*]}"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
 	;;
     esac
     echo_d "stage  : $stage"
@@ -1075,8 +1175,8 @@ function targetpr()
     else
 	echo_w "Problem reports not generated for maintenance stage targets."
     fi
-    echo_d "Opening $stage.pr"
-    exec 6>$stage.pr
+    echo_d "Opening $filename"
+    exec 6>$filename
     url="http://www.openss7.org/support.html"
     browser=`mozilla --version 2>/dev/null | sed -e 's|,.*||'`
     test -n "$browser" || browser=`netscape --version 2>/dev/null | sed -e 's|,.*||'`
@@ -1085,45 +1185,73 @@ function targetpr()
     pr_streams
     proutput
     exec 6>&-
-    cat<<-EOF
-	***
-	*** AUTO-PR:  Make target $target failed in the $stage stage.
-	*** An automated problem report has been created in the file
-	*** named '$stage.pr' in the current directory.  This problem
-	*** report can be sent to ${ap_PACKAGE_BUGREPORT} by calling
-	*** 'make mail-pr'.  It is possible to edit some of the fields
-	*** before sending on the problem report.  Please remember that
-	*** there is NO WARRANTY.  See the file 'COPYING' in the top
-	*** level directory.
-	***
+    if test "$stage" != external ; then
+	cat<<-EOF
+		$leader
+		$leader $me:  Make target $target failed in the $stage stage.  An
+		$leader automated problem report has been created in the file named
+		$leader '$filename' in the current directory.  This problem report can
+		$leader be sent to ${ap_PACKAGE_BUGREPORT} by calling 'make mail-pr'.
+		$leader
+		$leader It is possible to edit some of the fields before sending on the
+		$leader problem report.  Please remember that there is NO WARRANTY.  See
+		$leader the file 'COPYING' in the top level directory.
+		$leader
+		$leader Please do not send confidential information to the bug report
+		$leader address.  Inspect the file '$filename' for confidential
+		$leader information before mailing.
+		$leader
 EOF
+    else
+	cat<<-EOF
+		$leader
+		$leader $me:  $me was invoked to generate an external report.  An
+		$leader automated problem report has been created in the file named
+		$leader '$filename' in the current directory.  This problem report can
+		$leader be sent to ${ap_PACKAGE_BUGREPORT} by calling this script as
+		$leader '$path/$me --mail'.
+		$leader
+		$leader It is possible to edit some of the fields before sending on the
+		$leader problem report.  Please remember that there is NO WARRANTY.  See
+		$leader the file 'COPYING' in the top level directory.
+		$leader
+		$leader Please do not send confidential information to the bug report
+		$leader address.  Inspect the file '$filename' for confidential
+		$leader information before mailing.
+		$leader
+EOF
+    fi
 }
 
-function genpr()
+function autopr()
 {
-    for t in ${target[*]} ; do
-	found=
-	for x in ${targets[*]} ; do
-	    if test $t = $x ; then
-		found=yes
-		break
+    if test -n "${target[*]}" ; then
+	for t in ${target[*]} ; do
+	    found=
+	    for x in ${targets[*]} ; do
+		if test $t = $x ; then
+		    found=yes
+		    break
+		fi
+	    done
+	    if test ${found:-no} = no ; then
+		echo "Unknown target $t." >&2
+		usage
+		known
+		exit 1
 	    fi
 	done
-	if test ${found:-no} = no ; then
-	    echo "Unknown target $t." >&2
-	    usage
-	    known
-	    exit 1
-	fi
-    done
-    for t in ${target[*]} ; do
-	targetpr $t
-    done
+	for t in ${target[*]} ; do
+	    targetpr $t
+	done
+    else
+	targetpr none
+    fi
 }
 
-for command in ${commands:-none} ; do
+for command in ${commands:-autopr} ; do
     case ${command:-'help'} in
-	(version|help|copying|usage|genpr) $command ;;
+	(version|help|copying|usage|autopr) $command ;;
 	(*) ( usage ) >&2 ; exit 1 ;;
     esac
 done
