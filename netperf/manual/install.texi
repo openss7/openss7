@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.3 2005/12/30 12:21:30 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.4 2006/03/22 08:21:53 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/12/30 12:21:30 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/22 08:21:53 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,6 +64,7 @@
 * Building::			Building the package
 * Installing::			Installing the package
 * Removing::			Removing the package
+* Maintenance::			Maintaining the package
 @end menu
 @ignore
 * Loading::			Loading the package
@@ -1114,6 +1115,15 @@ CONFIG_DEVFS_FS is defined in the target kernel.  The @command{reuild} target
 uses this option to signal to the RPM spec file that the @samp{dev} subpackage
 need not be built.  This option does not appear when the package has no devices.
 
+@item --with devel
+@itemx --without devel
+@opindex devel
+Specifies whether to build development environment packages such as those that
+include header files, static libraries, manual pages and texinfo
+documentation.  The default is to build development environment packages.
+This option can be useful when building for an embedded target where only the
+runtime components are desired.
+
 @item --with tools
 @itemx --without tools
 @opindex tools
@@ -1236,6 +1246,14 @@ No private components exist in @file{@value{PACKAGE_NAME}} releases.
 Disables the installation of init scripts.
 The default is to configure and install init scripts and their associated
 configuration files.
+
+@item --disable-devel
+@opindex devel
+Disables the installation of development environment components such as
+header files, static libraries, manual pages and texinfo documentation.  The
+default is to install development environment components.  This option can be
+useful when configuring for an embedded target where only the runtime
+components are desired.
 
 @item --enable-tools
 @opindex tools
@@ -2456,3 +2474,593 @@ at boot time.@footnote{At some time I expect to create an
 the @file{.spec} and @file{rc.4} files automatically.}
 @end ignore
 
+@node Maintenance
+@section Maintenance
+
+@menu
+* Makefile Targets::
+@end menu
+
+@node Makefile Targets
+@subsection Makefile Targets
+
+Automake has many targets, not all of which are obvious to the casual user.  In addition,
+@cite{OpenSS7} automake files have additional rules added to make maintaining and releasing a
+package somewhat easier.  This list of targets provides some help with what targets can be invoked,
+what they do, and what they hope to acheive.  The available targets are as follows:
+
+@menu
+* User Targets::
+* Maintainer Targets::
+* Clean Targets::
+* Release Targets::
+* Logging Targets::
+* Problem Report Targets::
+* Release Archive Targets::
+* RPM Build Targets::
+* Debian Build Targets::
+@end menu
+
+@node User Targets
+@subsubsection User Targets
+
+The following are normal targets intended to be invoked by installers of the package.  They are
+concerned with compiling, checking the compile, installing, checking the installation, and
+uninstalling the package.
+
+@table @samp
+@item [all]
+@mkindex all
+This is also the default target.  It compiles the package.  This is performed after configuring the
+source with @samp{configure}.  A makefile stub is provided so that if the package has not had
+autoreconf run (such as when checked out from CVS, the package will attempt to run @samp{autoreconf
+-fiv}.
+
+All @cite{OpenSS7 Project} packages are configured without maintainer mode and without dependency
+tracking by default.  This speed compilation of the package for one-time builds.  This also means
+that if you are developing using the source package (edit-compile-test-cycle), changes made to
+source files will not cause the automatic rebuilding due to dependencies.  There are two ways to
+enable dependency tracking: specify @samp{--enable-maintainer-mode} to @command{configure}; or,
+specify @samp{--enable-dependency-tracking} to @command{configure}.  I use the former during my
+edit-compile-test cycle.
+
+This is a standard @cite{GNU} @command{automake} makefile target.
+This target does not require root privilege.
+
+@item check
+@mkindex check
+All @cite{OpenSS7 Project} packages provide check scripts for the check target.  This step is
+performed after compiling the package and will run all of the check programs against the compiled
+binaries.  Which checks are performed depends on whether @samp{--enable-maintainer-mode} was
+specified to configure.  If in maintainer mode, checks that assist with the release of the package
+will be run (such as checking that all manual pages load properly and that they have required
+sections.)  We recommend running the check stage before installing, because it catches problems that
+might keep the installed package from functioning properly.
+
+Another way to enable the greater set of checks, without invoking maintainer mode, is to specify
+@samp{--enable-checks} to @command{configure}.
+
+This is a standard @cite{GNU} @command{automake} makefile target, although the functions performed
+are customized for the @cite{OpenSS7 Project}.
+This target does not require root privilege.
+
+@item install
+@itemx install-strip
+@mkindex install
+@mkindex install-strip
+The @samp{install} target installs the package.  This target also performs some actions similar to
+the pre- and post-install scripts used by packaging tools such as @command{rpm} or @command{dpkg}.
+The @samp{install-strip} target strips unnecessary symbols from executables and kernel modules
+before installing.
+
+This is a standard @cite{GNU} @command{automake} makefile target.
+This target requires root privilege.
+
+@item installcheck
+@mkindex installcheck
+All @cite{OpenSS7 Project} packages provide test scripts for the @samp{installcheck} target.  Test
+scripts are created and run using autotest (part of the autoconf package).  Which test suites are
+run and how extensive they are depends on whether @samp{--enable-maintainer-mode} was specified to
+@command{configure}.  When in maintainer mode, all test suites will be run.  When not in maintainer
+mode, only a few post-install checks will be performed, but the test suites themselves will be
+installed in
+@file{@value{_libexecdir}/@value{PACKAGE}}@footnote{@file{@value{_libexecdir}/@value{PACKAGE}} is
+just an example, the actual location is @file{$@{libexecdir@}/$@{PACKAGE@}}, which varies from
+distribution to distribution (as some distributions such as Mandriva do not have a libexec
+directory).} for later use.
+
+This is a standard @cite{GNU} @command{automake} makefile target.
+This target might require root privilege.  Tests requiring root privilege will be skipped when run
+as a regular user.  Tests requiring regular account privileges will be skipped when run as root.
+
+@item retest
+@mkindex retest
+To complement the @samp{installcheck} target above, all @cite{OpenSS7 Project} packages provide the
+@samp{retest} target as a means to rerun failed conformance testsuite test cases.  The retest target
+is provided because some test cases in the testsuites have delicate timing considerations that allow
+them to fail sporadically.  Invoking this target will retest the failed cases until no cases that
+are not expected failures remain.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+As with @samp{installcheck}, this target might require root privilege.  Tests requiring root
+privilege will be skpped when run as a regular user.  Tests requiring regular account privileges
+will be skipped when run as root.
+
+@item uninstall
+@mkindex uninstall
+This target will reverse the steps taken to install the package.  This target also performs pre- and
+post- erase scripts used by packaging tools such as @cite{rpm} or @cite{dpkg}.  You need to have a
+configured build directory from which to execute this target, however, you do not need to have
+compiled any of the files in that build directory.@footnote{Therefore, it is possible to download
+the package, configure it, and then uninstall it.  This is handy if you do not have the sources used
+to build and install the package immediately available.}
+
+This is a standard @cite{GNU} @command{automake} makefile target.
+This target requires root privilege.
+
+@item remove
+@mkindex remove
+This target is like @samp{uninstall} with the exception that it uninstalls in the reverse order that
+installation was performed.@footnote{This is useful from the @cite{OpenSS7 Master Package}.}
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+@end table
+
+@node Maintainer Targets
+@subsubsection Maintainer Targets
+
+The following targets are targets intended for use by maintainers of the package, or those
+responsible for rerelease and packaging of a derivative work of the package.  Some of these targets
+are only effective when maintainer mode has been invoked (@samp{--enable-maintainer-mode} specified
+to @command{configure}.)
+
+@table @samp
+@item dist
+@mkindex dist
+Creates a distribution package (tarball) in the top level build directory.  @cite{OpenSS7 Project}
+packages distribute two archives: a @samp{gzip tar} archive and a @samp{bzip tar} archive.  These
+archives will have the name @file{@value{PACKAGE}-@value{VERSION}.tar.gz} and
+@file{@value{PACKAGE}-@value{VERSION}.tar.bz2}.
+
+This is a standard @cite{GNU} @command{automake} makefile target.
+This target does not require root privilege.
+
+@item distcheck
+@mkindex distcheck
+This target is intended for use when releasing the package.  It creates the @command{tar} archives
+above and then unpacks the tarball in a source directory, configures in a separate build directory,
+compiles the package, installs the package in a separate install directory, tests the install
+package to ensure that some components work, and, finally, uses the unpacked source tree to build
+another tarball.  If you have added or removed files from the package, this is a good way to ensure
+that everything is still stable for release.
+
+This is a standard @cite{GNU} @command{automake} makefile target.
+This target does not require root privilege.
+@end table
+
+@node Clean Targets
+@subsubsection Clean Targets
+
+@table @samp
+@item mostlyclean
+@mkindex mostlyclean
+Cleans out most of the files from the compile stage.  This target is helpful if you have not enabled
+dependency tracking and need to recompile with changes.
+
+This is a standard @cite{GNU} @command{automake} makefile target.
+This target does not require root privilege.
+
+@item clean
+@mkindex clean
+Cleans all the files from the build directory generated during the @samp{make [all]} phase.  It does
+not, however, remove files from the directory left there from the @command{configure} run.  Use the
+@samp{distclean} target to remove those too.
+
+This is a standard @cite{GNU} @command{automake} makefile target.
+This target might require root privilege if the @samp{installcheck} target or the
+@command{testsuite} was invoked with root privilege (leaving files belonging to root).
+
+@item distclean
+@mkindex distclean
+This target cleans out the directories left behind by @samp{distcheck} and removes all the
+@command{configure} and generated files from the build directory.  This will effectively remove all
+the files in the build directory, with the except of files that belong to you or some other process.
+
+This is a standard @cite{GNU} @command{automake} makefile target.
+This target might require root privilege if the @samp{installcheck} target or the
+@command{testsuite} was invoked with root privilege (leaving files belonging to root).
+
+@item maintainer-clean
+@mkindex maintainer-clean
+This target not only removes files from the build directory, it removes generated files from the
+source directory as well.  Care should be taken when invoking this target, because it removes files
+generated by the maintainer and distributed with the archive that might require special tools to
+regenerate.  These special tools might only be available to the maintainer (but they aren't).  It
+also means that you probably need a full blown Linux system to rebuild the package.
+
+This is a standard @cite{GNU} @command{automake} makefile target.
+This target might require root privilege if the @samp{installcheck} target or the
+@command{testsuite} was invoked with root privilege (leaving files belonging to root).
+
+@item check-clean
+@mkindex check-clean
+This target removes log files left behind by the @samp{check} target.  By default, the check scripts
+append to log files in the top level build directory.  This target can be used to clean out those
+log files before the next run.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+@end table
+
+@node Release Targets
+@subsubsection Release Targets
+
+The following are targets used to generate complete releases into the package distribution
+directory.  These are good for unattended and NFS builds, which is what I use them for.  Also, when
+building from atop multiple packages, these targets also recurse down through each package.
+
+@table @samp
+@item release
+@mkindex release
+Build all of the things necessary to generate a release.  On an @command{rpm} system this is the
+distribution archives, the source rpm, and the architecture dependent and architecture independent
+binary rpms.  All items are placed in the package distribution directory that can be specified with
+the @samp{--with-pkg-distdir=DIR} option to @command{configure}.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item forced-release
+@mkindex forced-release
+The @samp{release} target will not regenerate any files that already exist in the package
+distribution directory.  This forced target will.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item release-sign
+@mkindex release-sign
+You will be prompted for a password, unless to specify it to make with the @var{GNUPGPASS} variable.
+For unattended or non-interactive builds with signing, you can do that as: @samp{make
+GNUPGPASS=mypasswd release-sign}
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item forced-release-sign
+@mkindex forced-release-sign
+The @samp{release-sign} target will not regenerate any files that already exist in the package
+distribution directory.  This forced target will.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item release-clean
+@mkindex release-clean
+This target will remove all distribution files for the current package from the package distribution
+directory.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+@end table
+
+@node Logging Targets
+@subsubsection Logging Targets
+
+For convenience, to log the output of a number of targets to a file, log targets are defined.  The
+log file itself is used as the target to make, but make invokes the target minus a @file{.log}
+suffix.  So, for example, to log the results of target @samp{foo}, invoke the target @samp{foo.log}.
+The only target that this does not apply to is @samp{compile.log}.  When you invoke the target
+@samp{compile.log} a simple @command{make} is invoked and logged to the file @file{compile.log}.
+The @samp{foo.log} rule applies to all other targets.  This does not work for all targets, just a
+selected few.@footnote{Note that because logging targets invoke a pipe, @command{make} does not
+return the correct return status (always returns success if the @command{tee} operation is
+successful).  Therefore, these targets should not be invoked by scripts that need to use the return
+value from @command{make}.} Following are the logging targets:
+
+@subsubheading Common Logging Targets
+
+Common logging targets correspond to normal user @command{automake} makefile targets as follows:
+
+@table @samp
+@item compile.log
+@mkindex compile.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+but it invokes the standard @cite{GNU} @command{automake} makefile target
+@samp{[all]}.
+
+@item check.log
+@mkindex check.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+but it invokes the standard @cite{GNU} @command{automake} makefile target
+@samp{check}.
+
+@item install.log
+@mkindex install.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+but it invokes the standard @cite{GNU} @command{automake} makefile target
+@samp{install}.
+
+@item installcheck.log
+@mkindex installcheck.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+but it invokes the standard @cite{GNU} @command{automake} makefile target
+@samp{installcheck}.
+
+@item uninstall.log
+@mkindex uninstall.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+but it invokes the standard @cite{GNU} @command{automake} makefile target
+@samp{uninstall}.
+
+@item remove.log
+@mkindex remove.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+that invokes the @cite{OpenSS7 Project}
+@samp{remove}
+target.
+@end table
+
+@subsubheading Maintainer Logging Targets
+
+Maintainer logging targets correspond to maintainer mode @command{automake} makefile targets as
+follows:
+
+@table @samp
+@item dist.log
+@mkindex dist.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+but it invokes the standard @cite{GNU} @command{automake} makefile target
+@samp{dist}.
+
+@item distcheck.log
+@mkindex distcheck.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+but it invokes the standard @cite{GNU} @command{automake} makefile target
+@samp{distcheck}.
+
+@item srpm.log
+@mkindex srpm.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+that invokes the @cite{OpenSS7 Project}
+@samp{remove}
+target.
+
+@item rebuild.log
+@mkindex rebuild.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+that invokes the @cite{OpenSS7 Project}
+@samp{remove}
+target.
+
+@item resign.log
+@mkindex resign.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+that invokes the @cite{OpenSS7 Project}
+@samp{remove}
+target.
+
+@item release.log
+@mkindex release.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+that invokes the @cite{OpenSS7 Project}
+@samp{remove}
+target.
+
+@item release-sign.log
+@mkindex release-sign.log
+This is an @cite{OpenSS7 Project} specific makefile target,
+that invokes the @cite{OpenSS7 Project}
+@samp{remove}
+target.
+@end table
+
+If you want to add one, simply add it to @var{LOGGING_TARGETS} in @file{Makefile.am}.
+
+@node Problem Report Targets
+@subsubsection Problem Report Targets
+
+To ease problem report generation, all logging targets will automatically generate a problem report
+suitable for mailing in the file @file{@i{target}.pr} for target @samp{@i{target}.log}.  This
+problem report file is in the form of an email and can be sent using the included @command{auto-pr}
+script or by invoking the @samp{mail-pr} makefile target.
+
+There are two additional problem report targets:
+
+@table @samp
+@item pr
+@mkindex pr
+The @samp{pr} target is for independently generating a problem report outside of the build or
+installation process.  The target will automatically generate a problem report skeleton suitable for
+editting and mailing in the file @file{problem.pr}.  This problem report file is in the form of an
+email and can be editted and sent directly, or sent using the included @command{auto-pr} script or
+by invoking the @samp{mail-pr} target.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item mail-pr
+@mkindex mail-pr
+The @samp{mail-pr} target is for finalizing and mailing a problem report generated either inside or
+outside the build and installation process.  The target will automatically finalize and mail the
+@file{problem.pr} problem report if it has changed since the last time that @samp{mail-pr} was
+invoked.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege (unless the problem report file was generated as root).
+@end table
+
+@node Release Archive Targets
+@subsubsection Release Archive Targets
+
+The following targets are used to generate and clean distribution archive and signature files.
+Whereas the @samp{dist} target affects archives in the top build directory, the
+@samp{release-archive} targets affects archives in the package distribution directory (either the
+top build directory or that specified with @samp{--with-pkg-distdir=DIR} to @command{configure}).
+
+You can change the directory to which packages are distributed by using the
+@samp{--with-pkg-distdir=DIR} option to @command{configure}.  The default directory is the top build
+directory.
+
+@table @samp
+@item release-archives
+@mkindex release-archives
+This target creates the distribution archive files if they have not already been created.  This not
+only runs the @samp{dist} target, but also copies the files to the distribution directory, which, by
+default is the top build directory.
+
+The files generated are named:
+
+@file{@value{PACKAGE}-@value{VERSION}.tar.gz}
+and
+@file{@value{PACKAGE}-@value{VERSION}.tar.bz2}
+
+You can change this distribution directory with the @samp{--with-pkg-distdir} option to
+@command{configure}.  See @samp{./configure --help} for more details on options.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item release-sign-archives
+@mkindex release-sign-archives
+This target is like @samp{release-archives}, except that it also signs the archives using a
+@cite{GPG} detached signature.  You will be prompted for a password unless you pass the
+@var{GNUPGPASS} variable to make.  For automated or unattended builds, pass the @var{GNUPGPASS}
+variable like so:
+
+@samp{make GNUPGPASS=mypasswd release-sign-archives}
+
+Signature files will be named:
+
+@file{@value{PACKAGE}-@value{VERSION}.tar.gz.asc}
+and
+@file{@value{PACKAGE}-@value{VERSION}.tar.bz2.asc}
+
+These files will be moved to the package distribution directory with the plaintext archives.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item release-clean-archives
+@mkindex release-clean-archives
+This target will clean the release archives and signature files from the package distribution
+directory.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+@end table
+
+@node RPM Build Targets
+@subsubsection RPM Build Targets
+
+On @command{rpm} systems, or systems sporting rpm packaging tools, the following targets are used to
+generate @command{rpm} release packages.  The epoch and release number can be controlled by the
+contents of the @file{.rpmepoch} and @file{.rpmrelease} files, or with the
+@samp{--with-rpm-epoch=EPOCH} and @samp{--with-rpm-release=RELEASE} options to @command{configure}.
+See @samp{configure --help} for more information on options.  We always use release number @samp{1}.
+You can use release numbers above @samp{1}.
+
+@table @samp
+@item srpm
+@mkindex srpm
+This target generates the source rpm for the package (without signing the source rpm).  The source
+rpm will be named: @file{@value{PACKAGE}-@value{VERSION}-1.srpm}.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item rpms
+@mkindex rpms
+This target is responsible for generating all of the package binary rpms for the architecture.  The
+binary rpms will be named:
+
+@file{@value{PACKAGE}-*-@value{VERSION}-1.*.rpm}
+
+where the stars indicate the subpackage and the architecture.  Both the architecture specific
+subpackages (binary objects) and the architecture independent (@file{.noarch}) subpackages will be
+built unless the the former was disabled with the option @samp{--disable-arch}, or the later with
+the option @samp{--disable-indep}, passed to @command{configure}.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item sign
+@itemx srpm-sign
+@mkindex sign
+@mkindex srpm-sign
+These two targets are the same.  When invoked, they will add a signature to the source rpm file,
+provided that the file does not already have a signature.  You will be prompted for a password if a
+signature is required.  Automated or unattended builds can be acheived by using the @command{emake}
+expect script, included in
+@file{$@{srcdir@}/scripts/emake}.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item rebuild
+@mkindex rebuild
+This target accepts searches out a list of kernel names from the @file{$@{DESTDIR@}/lib/modules}
+directory and builds rpms for those kernels and for each of a set of architectures given in the
+@var{AM_RPMTARGETS} variable to make.  This is convenience target for building a group of rpms on a
+given build machine.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item resign
+@mkindex resign
+This target will search out and sign, with a @cite{GPG} signature, the source rpm, and all of the
+binary rpms for this package that can be found in the package distribution directory.  This target
+will prompt for a @cite{GPG} password.  Automated or unattended builds can be acheived with the
+@command{emake} expect script loccated here:
+@file{$@{srcdir@}/scripts/emake}.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+@end table
+
+@node Debian Build Targets
+@subsubsection Debian Build Targets
+
+On debian systems, or systems sporting debian packaging tools, the following targets are used to
+generate debian release packages.  The release number can be controlled by the contents of the
+@file{.debrelease} file, or with the @samp{--with-debrelease=RELEASENUMBER} option to
+@command{configure}.  See @samp{configure --help} for more information on options.
+
+@table @samp
+@item dsc
+@mkindex dsc
+This target will build the debian source change package (@file{.dsc} file).  We use release number
+@samp{0} so that the entire tarball is included in the @file{dsc} file.  You can use release number
+@samp{1} for the same purposes.  Release numbers above @samp{1} will not include the entire tarball.
+The @file{.dsc} file will be named: @file{@value{PACKAGE}_@value{VERSION}-0.dsc}.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item sigs
+@mkindex sigs
+This target signs the @file{.deb} files.  You will be prompted for a password, unless to specify it
+to make with the @var{GNUPGPASS} variable.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item debs
+@mkindex debs
+This target will build the debian binary package (@file{.deb} file) from the @file{.dsc} created
+above.  (This target will also create the @file{.dsc} if it has not been created already.)  The
+subpackage @file{.deb} files will be named: @file{@value{PACKAGE}-*_@value{VERSION}-0_*.deb}, where
+the stars indicate the subpackage and the architecture.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+
+@item csig
+@mkindex csig
+This target signs the @file{.dsc} file.  You will be prompted for a password, unless to specify it
+to make with the @var{GNUPGPASS} variable.
+
+This is an @cite{OpenSS7 Project} specific makefile target.
+This target does not require root privilege.
+@end table
