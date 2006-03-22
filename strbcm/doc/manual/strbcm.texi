@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strbcm.texi,v 0.9.2.2 2006/03/08 23:20:42 brian Exp $
+% @(#) $Id: strbcm.texi,v 0.9.2.3 2006/03/22 10:02:01 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/03/08 23:20:42 $ by $Author: brian $
+% Last Modified $Date: 2006/03/22 10:02:01 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -167,6 +167,9 @@ another language, under the same conditions as for modified versions.
 @c Define an index of authors.
 @defindex au
 
+@c Define an index of makefile targets
+@defcodeindex mk
+
 @c Define an index of configure output variables.
 @c @defcodeindex ov
 
@@ -275,6 +278,7 @@ Indices
 * Variable Index::		Index of Variables and Constants
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
+* Makefile Target Index::	Index of Makefile Targets
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -578,6 +582,11 @@ This manual uses @cite{texinfo} typographic conventions.
 @node Option Index
 @appendixsec Index of Configuration Options
 @printindex op
+
+@page
+@node Makefile Target Index
+@unnumberedsec Index of Makefile Targets
+@printindex mk
 
 @node Author Index
 @appendixsec Index of Authors

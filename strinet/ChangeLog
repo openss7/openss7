@@ -1,3 +1,9 @@
+2006-03-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/strinet.texi: added makefile target index
+	* doc/manual/releases.texi: bumped release number
+	* strinet.lsm.in: boutelli can't handle decimal point in lsm
+
 2006-03-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* .cvsignore: added *.pr files

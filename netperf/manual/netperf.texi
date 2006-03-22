@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: netperf.texi,v 1.1.2.5 2006/03/03 11:56:43 brian Exp $
+% @(#) $Id: netperf.texi,v 1.1.2.6 2006/03/22 10:01:58 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 % Copyright (C) 1993-1995  Hewlett-Packard Company
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/03/03 11:56:43 $ by $Author: brian $
+% Last Modified $Date: 2006/03/22 10:01:58 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -83,7 +83,7 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 Copyright @copyright{} 1993-1995  @uref{http://www.hp.com/, Hewlett-Packard Company}
 
@@ -130,7 +130,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2005  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -214,6 +214,9 @@ OR DOCUMENTATION.}
 
 @c Define an index of authors.
 @defindex au
+
+@c Define an index of makefile targets
+@defcodeindex mk
 
 @c Define an index of configure output variables.
 @c @defcodeindex ov
@@ -336,6 +339,7 @@ Indices
 * Test Index::			Index of Tests
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
+* Makefile Target Index::	Index of Makefile Targets
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -1850,6 +1854,11 @@ receive.
 @node Option Index
 @appendixsec Index of Configuration Options
 @printindex op
+
+@page
+@node Makefile Target Index
+@unnumberedsec Index of Makefile Targets
+@printindex mk
 
 @node Author Index
 @appendixsec Index of Authors

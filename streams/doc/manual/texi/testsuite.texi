@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: testsuite.texi,v 0.9.2.3 2005/09/15 12:59:38 brian Exp $
+@c @(#) $Id: testsuite.texi,v 0.9.2.4 2006/03/22 09:53:46 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
@@ -54,14 +54,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/09/15 12:59:38 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/22 09:53:46 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @menu
 * Test Suites::			Test Suites for the package
 * Problem Reports::		Problem Reports for the package
-* Known Bugs::			Known Bugs in the package
+* Known Problems::		Known Problems with the package
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -308,7 +308,7 @@ require root privileges, or that require plain user privileges, to complete succ
 @c ----------------------------------------------------------------------------
 
 @node Running Test Suites
-@subsubsection Running Test Suites
+@section Running Test Suites
 @cindex test suites, running
 
 There are several ways of invoking the conformance test suites:
@@ -354,7 +354,23 @@ This ensures that all of the information known to @command{configure} and pertin
 configuration of the system for which a test case failed, will be collected in the resulting
 @file{testsuite.log} file depositied upon test suite failure in the @file{tests} directory.  This
 @file{testsuite.log} file can then be attached as part of the problem report and provides rich
-details to maintainers of the package.
+details to maintainers of the package.  See also @xref{Problem Reports}, below.
+
+Typical steps for invoking and installed @command{testsuite} standalone are shown in
+@ref{testsuite:ex4}.
+
+@cartouche
+@float Example,testsuite:ex4
+@caption{@emph{Invoking @command{testsuite} Directly}}
+@example
+% [sudo] @value{_libexecdir}/@value{PACKAGE}/testsuite
+@end example
+@end float
+@end cartouche
+
+When invoked directly, @command{testsuite} will generate a @file{testsuite.log} file in the current
+directory, and a @file{testsuite.dir} directory of failed tests cases and debugging scripts.  For
+generating a problem report for failed test cases, see @ref{Stand Alone Problem Reports}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -364,6 +380,16 @@ details to maintainers of the package.
 @cindex problem reports
 @cindex bugs, reporting
 @cindex reporting bugs
+
+@menu
+* Problem Report Guidelines::
+* Generating Problem Reports::
+* Automatic Problem Reports::
+* Stand Alone Problem Reports::
+@end menu
+
+@node Problem Report Guidelines
+@subsection Problem Report Guidelines
 
 Problem reports in the following categories should include a log file as indicated in the table
 below:
@@ -390,10 +416,23 @@ A problem occurs with @samp{sudo make install} that causes it to fail.  Perform 
 uninstall} and @samp{sudo make install.log} and attach the @file{config.log}, @file{compile.log},
 @file{check.log}, and @file{install.log} files to the problem report.
 
-@item [sudo] make installcheck
+@item [sudo] make installcheck.log
 A problem occurs with the @samp{make installcheck} target that causes the test suite to fail.
-Attach the resulting @file{tests/testsuite.log} file to the problem report.  There is no need to
-attach the other files as they are included in @file{tests/testsuite.log}.
+Attach the resulting @file{tests/testsuite.log} and @file{installcheck.log} file to the problem
+report.  There is no need to attach the other files as they are included in
+@file{tests/testsuite.log}.
+
+@item [sudo] make uninstall.log
+A problem occurs with the @samp{make uninstall} target that causes the test suite to fail.  Perform
+@samp{sudo make uninstall.log} and attach the @file{config.log}, @file{compile.log},
+@file{check.log}, @file{install.log}, @file{installcheck.log}, @file{tests/testsuite.log} and
+@file{uninstall.log} file to the problem report.
+
+@item [sudo] make remove.log
+A problem occurs with the @samp{make remove} target that causes the test suite to fail.  Perform
+@samp{sudo make remove.log} and attach the @file{config.log}, @file{compile.log}, @file{check.log},
+@file{install.log}, @file{installcheck.log}, @file{tests/testsuite.log} and @file{remove.log} file
+to the problem report.
 
 @end table
 
@@ -403,14 +442,174 @@ provide a test program patch with the problem report.  Also include whatever log
 by the kernel (@code{cmn_err(9)}) or by the @command{strerr(8)} or @command{strace(1)} facilities
 (@code{strlog(9)}).
 
+@c ----------------------------------------------------------------------------
+
+@node Generating Problem Reports
+@subsection Generating Problem Reports
+@cindex generating problem reports
+@cindex bug reports, generating
+@cindex generating bug reports
+
+@cite{The OpenSS7 Project} uses the @cite{GNU GNATS} system for problem reporting.  Although the
+@samp{send-pr} tool from the @cite{GNU GNATS} package can be used for bug reporting to the project's
+@cite{GNATS} database using electronic mail, it is not always convenient to download and install the
+@cite{GNATS} system to gain access to the @samp{send-pr} tool.
+
+Therefore, the @cite{@value{PACKAGE_TITLE}} package provides the @samp{auto-pr} shell script that
+can be used for problem reporting.  The @samp{auto-pr} shell script can invoked directly and is a
+workalike for the @cite{GNU} @samp{send-pr} tool.
+
+The @samp{auto-pr} tool takes the same flags and can be used in the same fashion, however, whereas
+@samp{send-pr} is an interactive tool@footnote{@samp{send-pr} launches the user's @var{EDITOR} to
+edit the problem report before submitting it.}, @samp{auto-pr} is also able to perform batch
+processing.  Whereas @samp{send-pr} takes its field information from local databases or from using
+the @samp{query-pr} C-language program to query a remote database, the @samp{auto-pr} tool has the
+field database internal to the tool.
+
+Problem reports can be generate using @command{make}, @xref{Problem Report Targets}.  An example of
+how simple it is to generate a problem report is illustrated in @ref{autopr:ex0}.
+@mkindex pr
+
+@cartouche
+@float Example,autopr:ex0
+@caption{@emph{Invoking Problem Report Generation}}
+@example
+% make pr
+AUTO_PR:
+AUTO_PR: auto-pr:  auto-pr was invoked to generate an external report.  An
+AUTO_PR: automated problem report has been created in the file named
+AUTO_PR: 'problem.pr' in the current directory.  This problem report can
+AUTO_PR: be sent to bugs@@openss7.org by calling this script as
+AUTO_PR: '/home/brian/os7/scripts/auto-pr --mail'.
+AUTO_PR:
+AUTO_PR: It is possible to edit some of the fields before sending on the
+AUTO_PR: problem report.  Please remember that there is NO WARRANTY.  See
+AUTO_PR: the file 'COPYING' in the top level directory.
+AUTO_PR:
+AUTO_PR: Please do not send confidential information to the bug report
+AUTO_PR: address.  Inspect the file 'problem.pr' for confidential
+AUTO_PR: information before mailing.
+AUTO_PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% make mail-pr
+@end example
+@end float
+@end cartouche
+
+Using the @samp{make pr} target to generate a problem report has the advantages that it will
+assemble any available @file{*.log} files in the build directory and attach them to the problem
+report.
+
+@c ----------------------------------------------------------------------------
+
+@node Automatic Problem Reports
+@subsection Automatic Problem Reports
+@cindex generating problem reports automatically
+@cindex bug reports, automatic generation
+@cindex generating bug reports automatically
+
+The @cite{@value{PACKAGE_TITLE}} package also provides a feature for automatic problem report
+generation that meets the problem report submission guidelines detailed in the preceding sections.
+
+Whenever a logging makefile target (@pxref{Logging Targets}) is invoked, if the primary target
+fails, the @command{auto-pr} shell script is invoked to automatically generate a problem report
+file suitable for the corresponding target (as described above under @pxref{Problem Report
+Guidelines}).  An example is shown in @ref{autopr:ex2}.
+
+@cartouche
+@float Example,autopr:ex2
+@caption{@emph{Problem Report from Failed Logging Target}}
+@example
+% make compile.log
+...
+...
+make[5]: *** [libXNSdrvs_a-ip.o] Error 1
+make[5]: Leaving directory `/u6/buildel4/strxns'
+make[4]: *** [all-recursive] Error 1
+make[4]: Leaving directory `/u6/buildel4/strxns'
+make[3]: *** [all] Error 2
+make[3]: Leaving directory `/u6/buildel4/strxns'
+make[2]: *** [all-recursive] Error 1
+make[2]: Leaving directory `/u6/buildel4'
+make[1]: *** [all] Error 2
+make[1]: Leaving directory `/u6/buildel4'
+AUTO_PR:
+AUTO_PR: auto-pr:  Make target compile.log failed in the compile stage.  An
+AUTO_PR: automated problem report has been created in the file named
+AUTO_PR: 'compile.pr' in the current directory.  This problem report can
+AUTO_PR: be sent to bugs@@openss7.org by calling 'make mail-pr'.
+AUTO_PR:
+AUTO_PR: It is possible to edit some of the fields before sending on the
+AUTO_PR: problem report.  Please remember that there is NO WARRANTY.  See
+AUTO_PR: the file 'COPYING' in the top level directory.
+AUTO_PR:
+AUTO_PR: Please do not send confidential information to the bug report
+AUTO_PR: address.  Inspect the file 'compile.pr' for confidential
+AUTO_PR: information before mailing.
+AUTO_PR:
+% vim compile.pr  # <--- follow instructions at head of file
+% make mail-pr
+@end example
+@end float
+@end cartouche
+
+@c ----------------------------------------------------------------------------
+
+@node Stand Alone Problem Reports
+@subsection Stand Alone Problem Reports
+@cindex generating problem reports stand alone
+@cindex bug reports, stand along generation
+@cindex generating bug reports
+
+The @cite{@value{PACKAGE_TITLE}} package installs the @command{auto-pr} script and its configuration
+file @file{auto-pr.config} in @file{$@{libexecdir@}/@value{PACKAGE}} along with the validation
+@command{testsuite}, see @xref{Test Suites}.  As with the @command{testsuite}, this allows the
+@command{auto-pr} script to be used for problem report generation on an installed system that does
+not have a build directory.
+
+An example of invoking the package @command{testsuite} and then generating a problem report for
+failed cases is shown in @ref{autopr:ex2}.
+
+@cartouche
+@float Example,autopr:ex2
+@caption{@emph{Invoking @command{auto-pr} Directly}}
+@example
+% [sudo] @value{_libexecdir}/@value{PACKAGE}/testsuite
+% # test cases failed...
+% @value{_libexecdir}/@value{PACKAGE}/auto-pr
+AUTO_PR:
+AUTO_PR: auto-pr:  auto-pr was invoked to generate an external report.  An
+AUTO_PR: automated problem report has been created in the file named
+AUTO_PR: 'problem.pr' in the current directory.  This problem report can
+AUTO_PR: be sent to bugs@@openss7.org by calling this script as
+AUTO_PR: '@value{_libexecdir}/@value{PACKAGE}/auto-pr --mail'.
+AUTO_PR:
+AUTO_PR: It is possible to edit some of the fields before sending on the
+AUTO_PR: problem report.  Please remember that there is NO WARRANTY.  See
+AUTO_PR: the file 'COPYING' in the top level directory.
+AUTO_PR:
+AUTO_PR: Please do not send confidential information to the bug report
+AUTO_PR: address.  Inspect the file 'problem.pr' for confidential
+AUTO_PR: information before mailing.
+AUTO_PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% @value{_libexecdir}/@value{PACKAGE}/auto-pr --mail problem.pr
+@end example
+@end float
+@end cartouche
+
+The advantage of the approach shown in the example is that the @command{auto-pr} script is capable
+of collecting the @file{testsuite.log} file and the failed test cases and debugging scripts from the
+@file{testsuite.dir} directory and including them in the problem report, as well as all package
+pertinent information from the installed @file{auto-pr.config}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Known Bugs
-@section Known Bugs
-@cindex known bugs
-@cindex bugs, known
+@node Known Problems
+@section Known Problems
+@cindex known problems
+@cindex problems, known
 
 @cite{The OpenSS7 Project} does not ship software with known bugs.  All bugs are unknown.
 
@@ -420,3 +619,5 @@ shipped with the @cite{@value{PACKAGE_TITLE}} package.
 Unverified behaviour may contain unknown bugs.
 
 Please remember that there is @strong{NO WARRANTY}.
+
+See also @ref{Bugs}.

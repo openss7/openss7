@@ -4,6 +4,11 @@
 	- made mail-pr call auto-pr with --mail argument
 	* scripts/auto-pr: working up auto-pr
 	- added --mail argument
+	* texi/install.texi: added makefile target documentation
+	* scripts/texi/install.texi: added makefile target documentation
+	* texi/testsuite.texi: added problem reports with auto-pr
+	* scripts/texi/testsuite.texi: added problem reports with auto-pr
+	* am/help.am: spelling
 
 2006-03-21  Brian Bidulock  <bidulock@openss7.org>
 

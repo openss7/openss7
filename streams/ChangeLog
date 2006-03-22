@@ -1,3 +1,10 @@
+2006-03-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/install.texi: added makefile target documentation
+	* doc/manual/STREAMS.texi: added makefile target index
+	* doc/manual/releases.texi: bumped release number
+	* streams.lsm.in: boutelli can't handle decimal point in lsm
+
 2006-03-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* .cvsignore: added *.pr files
