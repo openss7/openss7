@@ -21,10 +21,10 @@ Keywords:		XNS, TPI, XTI, TLI, libxnet, libxti
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			2.9M @PACKAGE@-@VERSION@.tar.gz
-			2.5M @PACKAGE@-@VERSION@.tar.bz2
+			3M @PACKAGE@-@VERSION@.tar.gz
+			3M @PACKAGE@-@VERSION@.tar.bz2
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			2.6M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+			3M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,

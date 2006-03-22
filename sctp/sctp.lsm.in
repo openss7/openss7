@@ -14,10 +14,10 @@ Keywords:		SCTP, SIGTRAN, OpenSS7, Sockets, Telecommunications
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			1.8M @PACKAGE@-@VERSION@.tar.gz
-			1.5M @PACKAGE@-@VERSION@.tar.bz2
+			2M @PACKAGE@-@VERSION@.tar.gz
+			2M @PACKAGE@-@VERSION@.tar.bz2
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			1.5M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+			2M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4

@@ -21,10 +21,10 @@ Keywords:		XNS, INET, TPI
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			2.1M @PACKAGE@-@VERSION@.tar.gz
-			1.7M @PACKAGE@-@VERSION@.tar.bz2
+			2M @PACKAGE@-@VERSION@.tar.gz
+			2M @PACKAGE@-@VERSION@.tar.bz2
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			1.7M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+			2M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,

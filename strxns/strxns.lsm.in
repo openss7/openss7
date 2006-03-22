@@ -20,10 +20,10 @@ Keywords:		XNS, CDI, DLPI, NPI, DL
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			3.7M @PACKAGE@-@VERSION@.tar.gz
-			3.3M @PACKAGE@-@VERSION@.tar.bz2
+			4M @PACKAGE@-@VERSION@.tar.gz
+			3M @PACKAGE@-@VERSION@.tar.bz2
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			3.3M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+			3M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,

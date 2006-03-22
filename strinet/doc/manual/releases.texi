@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.16 2006/03/08 12:00:15 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.17 2006/03/22 10:42:28 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/08 12:00:15 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/22 10:42:28 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -265,6 +265,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-0.9.2.3::		Release 3
 * Release @value{PACKAGE}-0.9.2.2::		Release 2
 * Release @value{PACKAGE}-0.9.2.1::		Release 1
 * Release @value{PACKAGE}-0.9.2-1::		Release 1
@@ -277,6 +278,12 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @node Release @value{PACKAGE}-@value{VERSION}
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+@c ----------------------------------------------------------------------------
+
+@node Release strinet-0.9.2.3
+@subsection Release strinet-0.9.2.3
+@cindex release strinet-0.9.2.3
 
 This release is primarily to support additional compilers (gcc 4.0.2), architectures (x86_64, SMP,
 32-bit compatibility), recent Linux distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels

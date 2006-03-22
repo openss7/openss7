@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.2.7 2006/03/08 12:00:05 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.2.8 2006/03/22 10:42:24 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/08 12:00:05 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/22 10:42:24 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -299,6 +299,7 @@ Hewlett-Packard Company releases.
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release netperf-2.3.3::		Release 3
 * Release netperf-2.3.2::		Release 2
 * Release netperf-2.3.1::		Release 1
 @end menu
@@ -310,6 +311,10 @@ Hewlett-Packard Company releases.
 @node Release @value{PACKAGE}-@value{VERSION}
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+@node Release netperf-2.3.3
+@subsection Release netperf-2.3.3
+@cindex release netperf-2.3.3
 
 This release is primarily to support additional compilers (gcc 4.0.2), architectures (x86_64, SMP,
 32-bit compatibility), recent Linux distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels

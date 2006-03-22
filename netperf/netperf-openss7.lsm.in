@@ -13,10 +13,10 @@ Keywords:		INET, SCTP, XNET, XTI, Netperf
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			2.3M @PACKAGE@-@VERSION@.tar.gz
-			1.8M @PACKAGE@-@VERSION@.tar.bz2
+			2M @PACKAGE@-@VERSION@.tar.gz
+			2M @PACKAGE@-@VERSION@.tar.bz2
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			1.7M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+			2M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		http://www.hp.com/ /
 			950K netperf-2.3.tar.gz
 Platforms:		Linux

@@ -18,10 +18,10 @@ Keywords:	STREAMS, SVR4, LiS
 Author:		dave@gcom.com (David Grothe)
 Maintained-by:	bidulock@openss7.org (Brian Bidulock)
 Primary-site:	http://www.openss7.org/ tarballs/
-		2.4M @PACKAGE@-@VERSION@.tar.gz
-		1.9M @PACKAGE@-@VERSION@.tar.bz2
+		2M @PACKAGE@-@VERSION@.tar.gz
+		2M @PACKAGE@-@VERSION@.tar.bz2
 Alternate-site:	http://www.openss7.org/ rpms/SRPMS/
-		2.0M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+		2M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:	ftp.gcom.com /pub/linux/src/LiS
 		748K @PACKAGE@-2.18.0.tgz
 Platforms:	Linux

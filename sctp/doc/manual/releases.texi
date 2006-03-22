@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.17 2006/03/15 12:21:43 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.18 2006/03/22 10:42:24 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/15 12:21:43 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/22 10:42:24 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -221,6 +221,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::			Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-0.2.23::		Release 23
 * Release @value{PACKAGE}-0.2.22::		Release 22
 * Release @value{PACKAGE}-0.2.21::		Release 21
 * Release @value{PACKAGE}-0.2.20-1::		Release 20
@@ -233,6 +234,12 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @node Release @value{PACKAGE}-@value{VERSION}
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.2.23
+@subsection Release @value{PACKAGE}-0.2.23
+@cindex release @value{PACKAGE}-0.2.23
 
 Corrections for and testing of 64-bit clean compile and test runs on x86_64
 architecture.  Some bug corrections resulting from gcc 4.0.2 compiler
