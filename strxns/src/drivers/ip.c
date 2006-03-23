@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/20 23:10:31 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/23 12:16:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/20 23:10:31 $ by $Author: brian $
+ Last Modified $Date: 2006/03/23 12:16:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.11  2006/03/23 12:16:16  brian
+ - changes for old 2.4 kernel (RH7) build
+
  Revision 0.9.2.10  2006/03/20 23:10:31  brian
  - corrected errors
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/20 23:10:31 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/23 12:16:16 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/20 23:10:31 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/23 12:16:16 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -108,11 +111,19 @@ static char const ident[] =
 #include <linux/bitops.h>
 #include <linux/interrupt.h>
 
+#ifdef HAVE_KINC_LINUX_BRLOCK_H
+#include <linux/brlock.h>
+#endif
+
 #include <net/ip.h>
 #include <net/icmp.h>
 #include <net/route.h>
 #include <net/inet_ecn.h>
 #include <net/snmp.h>
+
+#ifdef HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
 
 #include <linux/skbuff.h>
 #include <linux/netfilter.h>
@@ -127,7 +138,7 @@ static char const ident[] =
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/20 23:10:31 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/23 12:16:16 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -313,6 +324,7 @@ struct ip_prot_bucket {
 	char name[15];			/* protocol name */
 	int refs;			/* reference count */
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
+	int override;			/* was entry overriden */
 	struct inet_protocol prot;	/* Linux registration structure */
 	struct inet_protocol *next;	/* Linkage for protocol override */
 #elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
@@ -468,12 +480,12 @@ inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 {
 	bzero(pb, sizeof(*pb));
 	pb->refs = 1;
-	pb->override = true;
+	pb->override = 1;
 	pb->proto = proto;
 	pb->prot.handler = &ip_v4_rcv;
-	pb->prot.err_hander = &ip_v4_err;
+	pb->prot.err_handler = &ip_v4_err;
 	pb->prot.protocol = proto;
-	pb->prot.name = &pb->name;
+	pb->prot.name = pb->name;
 	pb->prot.next = NULL;
 	pb->prot.copy = 0;
 	{
@@ -496,6 +508,7 @@ inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 STATIC void
 inet_restore_protocol(struct ip_prot_bucket *pb)
 {
+	unsigned char proto = pb->proto;
 	unsigned char hash = proto & (MAX_INET_PROTOS - 1);
 	struct inet_protocol **p = &inet_protos[hash];
 
@@ -503,9 +516,9 @@ inet_restore_protocol(struct ip_prot_bucket *pb)
 		return;
 
 	br_write_lock_bh(BR_NETPROTO_LOCK);
-	while ((*p) != NULL && (*p) != pb)
+	while ((*p) != NULL && (*p) != &pb->prot)
 		p = &(*p)->next;
-	if ((*p) == pb)
+	if ((*p) == &pb->prot)
 		(*p) = pb->next;
 	/* FIXME: restore copy pointers on the list */
 	br_write_unlock_bh(BR_NETPROTO_LOCK);
@@ -774,6 +787,18 @@ npi_ip_queue_xmit(struct sk_buff *skb)
 #endif
 }
 #else
+#ifdef HAVE_KFUNC_DST_MTU
+/* Why do stupid people rename things like this? */
+#undef dst_pmtu
+#define dst_pmtu dst_mtu
+#endif
+#ifndef HAVE_STRUCT_DST_ENTRY_PATH
+static inline u32
+dst_pmtu(struct dst_entry *dst)
+{
+	return (dst->pmtu);
+}
+#endif
 STATIC INLINE int
 npi_ip_queue_xmit(struct sk_buff *skb)
 {

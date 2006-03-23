@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/03/21 13:24:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/03/23 12:16:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:24:20 $ by $Author: brian $
+# Last Modified $Date: 2006/03/23 12:16:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -177,8 +177,27 @@ AC_DEFUN([_XNS_SETUP], [dnl
 # and 2.6 kernels.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel ip_route_output], [linux_cv_have_ip_route_output], [dnl
+	    CFLAGS="$CFLAGS -Werror-implicit-function-declaration"
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>]],
+		[[ip_route_output(NULL, 0, 0, 0, 0);]]) ],
+		    [linux_cv_have_ip_route_output='yes'],
+		    [linux_cv_have_ip_route_output='no'])
+	    ])
+	if test :$linux_cv_have_ip_route_output = :yes ; then
+	    AC_DEFINE([HAVE_IP_ROUTE_OUTPUT_EXPLICIT], [1], [Define if you have the explicit
+		version of ip_route_output.])
+	fi
+    ])
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
-			  linux/locks.h asm/softirq.h \
+			  linux/locks.h asm/softirq.h linux/brlock.h \
 			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -210,7 +229,8 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #include <linux/ip.h>
 #include <net/sock.h>
     ])
-    _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
+    _LINUX_CHECK_FUNCS([dst_output dst_mtu ip_dst_output ip_route_output_key \
+			try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
 			pcibios_read_config_byte pcibios_read_config_dword \
@@ -226,6 +246,16 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#if HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
 #include <linux/sched.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
@@ -253,6 +283,9 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
 #include <linux/sched.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
@@ -265,7 +298,6 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
 #include <linux/time.h>		/* for struct timespec */
-#include <net/protocol.h>
 ])
     _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
 			  struct inet_protocol.copy,
