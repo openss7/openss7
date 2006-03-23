@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.4.11 2006/03/22 08:21:52 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.4.12 2006/03/23 05:55:22 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/22 08:21:52 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/23 05:55:22 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -2787,8 +2787,8 @@ If you want to add one, simply add it to @var{LOGGING_TARGETS} in @file{Makefile
 
 To ease problem report generation, all logging targets will automatically generate a problem report
 suitable for mailing in the file @file{@i{target}.pr} for target @samp{@i{target}.log}.  This
-problem report file is in the form of an email and can be sent using the included @command{auto-pr}
-script or by invoking the @samp{mail-pr} makefile target.
+problem report file is in the form of an email and can be sent using the included @command{send-pr}
+script or by invoking the @samp{send-pr} makefile target.
 
 There are two additional problem report targets:
 
@@ -2798,17 +2798,17 @@ There are two additional problem report targets:
 The @samp{pr} target is for independently generating a problem report outside of the build or
 installation process.  The target will automatically generate a problem report skeleton suitable for
 editting and mailing in the file @file{problem.pr}.  This problem report file is in the form of an
-email and can be editted and sent directly, or sent using the included @command{auto-pr} script or
-by invoking the @samp{mail-pr} target.
+email and can be editted and sent directly, or sent using the included @command{send-pr} script or
+by invoking the @samp{send-pr} target.
 
 This is an @cite{OpenSS7 Project} specific makefile target.
 This target does not require root privilege.
 
-@item mail-pr
-@mkindex mail-pr
-The @samp{mail-pr} target is for finalizing and mailing a problem report generated either inside or
+@item send-pr
+@mkindex send-pr
+The @samp{send-pr} target is for finalizing and mailing a problem report generated either inside or
 outside the build and installation process.  The target will automatically finalize and mail the
-@file{problem.pr} problem report if it has changed since the last time that @samp{mail-pr} was
+@file{problem.pr} problem report if it has changed since the last time that @samp{send-pr} was
 invoked.
 
 This is an @cite{OpenSS7 Project} specific makefile target.

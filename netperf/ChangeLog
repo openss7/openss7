@@ -1,3 +1,7 @@
+2006-03-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* manual/install.texi: changed auto-pr and mail-pr to send-pr
+
 2006-03-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/install.texi: added makefile target documentation

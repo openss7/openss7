@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/21 13:23:45 $
+# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/23 05:41:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:23:45 $ by $Author: brian $
+# Last Modified $Date: 2006/03/23 05:41:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: pr.m4,v $
+# Revision 0.9.2.2  2006/03/23 05:41:18  brian
+# - renamed auto-pr to send-pr
+#
 # Revision 0.9.2.1  2006/03/21 13:23:45  brian
 # - added problem reports
 #
@@ -72,7 +75,7 @@ AC_DEFUN([_AUTOPR], [dnl
 # _AUTOPR_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_AUTOPR_SETUP], [dnl
-    AC_CACHE_CHECK([for auto-pr distribution], [ap_cv_distribution], [dnl
+    AC_CACHE_CHECK([for send-pr distribution], [ap_cv_distribution], [dnl
 	case "$dist_cv_host_flavor" in
 	    (centos)	ap_cv_distribtuion="COS$dist_cv_host_release"	;;
 	    (lineox)	ap_cv_distribution="LEL$dist_cv_host_release"	;;
@@ -99,19 +102,19 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 	])
     AP_DISTRIBUTION="$ap_cv_distribution"
     AC_SUBST([AP_DISTRIBUTION])
-    AC_MSG_CHECKING([for auto-pr script])
-    AP_SCRIPT="$ac_aux_dir/auto-pr"
+    AC_MSG_CHECKING([for send-pr script])
+    AP_SCRIPT="$ac_aux_dir/send-pr"
     AC_MSG_RESULT([${AP_SCRIPT}])
     AC_SUBST([AP_SCRIPT])
-    AC_MSG_CHECKING([for auto-pr command])
+    AC_MSG_CHECKING([for send-pr command])
     AP_AUTOPR="$SHELL $AP_SCRIPT"
     AC_MSG_RESULT([${AP_AUTOPR}])
     AC_SUBST([AP_AUTOPR])
-    AC_MSG_CHECKING([for auto-pr config])
-    AP_CONFIG="scripts/auto-pr.config"
+    AC_MSG_CHECKING([for send-pr config])
+    AP_CONFIG="scripts/send-pr.config"
     AC_MSG_RESULT([${AP_CONFIG}])
     AC_SUBST([AP_CONFIG])
-    AC_CONFIG_FILES([scripts/auto-pr.config])
+    AC_CONFIG_FILES([scripts/send-pr.config])
 ])# _AUTOPR_SETUP
 # =============================================================================
 

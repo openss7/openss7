@@ -1,3 +1,17 @@
+2006-03-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/send-pr: added (renamed from auto-pr)
+	* scripts/auto-pr: deleted (renamed to send-pr)
+	* scripts/send-pr.config.in: added (renamed from auto-pr.config.in)
+	* scripts/auto-pr.config.in: deleted (renamed to send-pr.config.in)
+	* am/openss7.am: renamed auto-pr to send-pr
+	* am/pr.am: renamed auto-pr to send-pr
+	* m4/pr.m4: renamed auto-pr to send-pr
+	* texi/install.texi: changed auto-pr and mail-pr to send-pr
+	* texi/testsuite.texi: changed auto-pr and mail-pr to send-pr
+	* scripts/texi/install.texi: changed auto-pr and mail-pr to send-pr
+	* scripts/texi/testsuite.texi: changed auto-pr and mail-pr to send-pr
+
 2006-03-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/pr.am: changed some target names
