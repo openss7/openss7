@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: udp.4.man,v 0.9.2.3 2005/05/14 08:28:50 brian Exp $
+.\" @(#) $Id: udp.4.man,v 0.9.2.4 2006/03/24 08:37:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:28:50 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/24 08:37:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strinet.macros
@@ -75,8 +75,8 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B udp
-\- User Datagram Protocol
+.B udp, udp2
+\- User Datagram Protocol Stream
 .\"
 .\"
 .SH SYNOPSIS
@@ -89,11 +89,13 @@ sort-adjacent-labels
 .br
 .B #include <sys/xti_udp.h>
 .HP
-.BI "int " udp_stream " = open(" \fR/dev/udp\fI ", " flags );
+.BI "int " udp_stream " = open(" udp_device ", " flags );
+.PD 0
 .HP
-.BI "int " udp_xtistr " = t_open(" \fR/dev/udp\fI ", " flags );
+.BI "int " udp_xtistr " = t_open(" udp_device ", " flags );
 .HP
 .BI "int " udp_socket " = socket(" \fRPF_INET\fI ", " \fRSOCK_DGRAM\fI ", " \fRIPPROTO_UDP\fI );
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -105,7 +107,7 @@ defined in RFC 768.
 .[
 RFC 768
 .]
-It implements a connectoinless, unreliable datagram packet service.  Packets
+It implements a connectionless, unreliable datagram packet service.  Packets
 may be reordered or duplicated before they arrive.
 .B UDP
 generates and checks checksums to catch transmission errors.
@@ -113,24 +115,24 @@ generates and checks checksums to catch transmission errors.
 .B UDP
 is implemented as a
 .IR STREAMS (4)
-pseudo-driver using the
+pseudo-device driver using the
 .BR INET (4)
-.B strinet
-packet for
-.B LiS\c
+.B @PACKAGE@
+package for
+.B Linux Fast-STREAMS\c
 .
 .[
-LiS
+LfS
 .]
 The
-.B strinet
-package translate Linux native
+.B @PACKAGE@
+package translates Linux native
 .BR udp (7)
 sockets into TPI
 .[
 TPI Revision 2.0.0
 .]
-transport provider streams suitable for use with XTI,
+transport provider Streams suitable for use with XTI,
 .[
 XTI
 .]
@@ -140,12 +142,21 @@ XNS
 (see
 .BR xti (3)).
 .PP
+.B UDP2
+(the second generation UDP driver) differs from
 .B UDP
-provides one connectionless TPI stream type.  To select the stream,
+largely in internal implementation.
+.B UDP2
+accesses the IP layer of
+.B Linux
+directly, rather than opening a socket internal to the kernel.
+.PP
+.B UDP
+provides one connectionless TPI Stream type.  To select the Stream,
 .I udp_device
 can be one of the following:
 .TP
-.IR /dev/udp " or " /dev/inet/udp .
+.IR /dev/udp ", " /dev/inet/udp ", " /dev/streams/inet/udp .
 This device provides the
 .B UDP
 protocol services using the T-primitives of the Transport Provider Interface,
@@ -157,7 +168,7 @@ used for User Datagram Protocol, as described in
 .BR tpi_udp (7).
 The
 .BR tpi (7)
-interface provided on a stream opening this device is suitable for use with
+interface provided on a Stream opening this device is suitable for use with
 the
 .BR xnet (3)
 or
@@ -173,9 +184,16 @@ XNS
 .]
 as described in
 .BR xti_udp (3).
+.TP
+.IR /dev/udp2 ", " /dev/streams/udp .
+The same as above, but accesses the second generation
+.B UDP2
+driver instead of the
+.B UDP
+driver.
 .PP
 .B UDP
-proivdes one socket type for use by the
+provides one socket type for use by the
 .BR sockets (3)
 library
 .BR socket (7)
@@ -192,7 +210,7 @@ can be one of the following:
 .B SOCK_DGRAM
 A standard
 .I SOCK_DGRAM
-socket that preserves message boudnaries, does not Nagle, and provides only
+socket that preserves message boundaries, does not Nagle, and provides only
 unordered and unreliable delivery in a connectionless association.  This
 socket uses the underlying Linux socket implementation,
 .BR udp (7),
@@ -202,7 +220,6 @@ for more information.
 .\"
 .\"
 .SH USAGE
-.PP
 .PP
 The following entries in
 .B /etc/protosw
@@ -237,9 +254,13 @@ See also
 for sockets.
 .\"
 .\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
 .SH NOTICES
 .PP
-.B TCP
+.B UDP
 has several implementations.  This manpage is for the
 .BR INET (4)
 implementation that provides
@@ -248,6 +269,90 @@ access to the Linux NET4 version of
 .BR UDP .
 For more information on the Linux NET4 version, see
 .BR udp (7).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+There are now two
+.I STREAMS
+implementations for
+.BR udp :
+.B UDP
+and
+.BR UDP2 .
+These implementations differ as follows:
+.TP
+.B UDP
+This implementation is part of the
+.B streams-inet
+driver in the
+.B @PACKAGE_TITLE@
+package.
+The
+.B streams-inet
+driver implements
+.I udp
+by opening a
+.B Linux
+.I udp
+socket internal to kernel and providing a TPI
+.[
+TPI Revision 2.0.0
+.]
+interface to that socket.  This approach has been termed
+.B xtios
+(XTI over Sockets).
+The approach is rather inefficient in that two layers of interface code are
+executed.  Also, sockets does not have the same capabilities that
+.I STREAMS
+does in many regards, particularly internal to the kernel.  The approach is
+not only inefficient, but is less usable by other
+.I STREAMS
+modules and multiplexing drivers.
+.TP
+.B UDP2
+This implementation if part of the
+.B streams-udp
+driver in the
+.B @PACKAGE_TITLE@
+package.  This implementation uses the direct approach of hooking into the
+.B Linux
+kernel at the
+.BR ip (7)
+level, using direct function calls, and does not open a socket.  This approach
+is more efficient in that only
+.I STREAMS
+interface code is invoked in the data path.
+.PP
+The
+.B UDP
+implementation is the traditional one for the
+.B @PACKAGE_TITLE@
+package.
+.B UDP2
+was an afterthought.
+One of the reasons for implementing a separate
+.B UDP2
+driver was to be able to do performance comparisons between the two
+approaches.  Also, using the
+.B UDP2
+driver, it is possible to make fair performance (throughput, latency, CPU
+occupancy) comparisons between the NET4 Linux sockets implementation of
+.I udp
+and the
+.I STREAMS
+implementation.
+It was intended that the
+.BR netperf (1)
+package be used to provide performance histogram comparisons between the two
+implementations.
+.PP
+It may seem like a lot of trouble to go to, however, lkml (Linux Kernel
+Mailing List) has made some very strong (and unsupported in the author's
+opinion) statements regarding the performance of
+.I STREAMS
+and that of sockets for Internet protocols.  Performance tests of this nature
+could dis-spell those rumours.
 .\"
 .\"
 .SH FILES
@@ -267,7 +372,10 @@ For more information on the Linux NET4 version, see
 .PP
 .PP
 .IR /dev/udp ,
-.IR /dev/inet/udp .
+.IR /dev/inet/udp ,
+.IR /dev/streams/inet/udp ,
+.IR /dev/udp2 ,
+.IR /dev/streams/udp .
 .\"
 .\"
 .SH "SEE ALSO"
@@ -276,7 +384,7 @@ For more information on the Linux NET4 version, see
 .BR INET (4),
 .BR ioctl (2),
 .BR ip (7),
-.BR LiS (9),
+.BR STREAMS (9),
 .BR protosw (5),
 .BR socket (7),
 .BR sockets (3),
@@ -293,6 +401,53 @@ For more information on the Linux NET4 version, see
 .BR xti (3),
 .BR xti_ip (3),
 .BR xti_udp (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR UDP " and " UDP2
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B @PACKAGE_TITLE@
+implementation of
+.B UDP
+for
+.I STREAMS
+is largely compatible with
+.IR STREAMS -based
+implementations such as Lachman or Mentat TCP/IP stacks and
+.IR Solaris \(rg
+documentation.
+.[
+soldoc
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XNS 5.2.
+.[
+XNS
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B strinet 0.8.2
+was released in 2002 and was since part of the Linux STREAMS (LiS)
+.[
+LiS
+.]
+package, and is now part of
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+The second generation driver was completed in 2006.
 .\"
 .\"
 .\"

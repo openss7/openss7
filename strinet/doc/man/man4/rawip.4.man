@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: rawip.4.man,v 0.9.2.3 2005/05/14 08:28:49 brian Exp $
+.\" @(#) $Id: rawip.4.man,v 0.9.2.4 2006/03/24 08:37:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:28:49 $ by $Author: brian $
+.\" Last Modified $Date: 2006/03/24 08:37:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strinet.macros
@@ -71,60 +71,376 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXXX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.TH RAWIP 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .\"
 .\"
 .SH NAME
-.B xxx
-\- incomplete man page
+.B rawip, rawip2
+\- Raw Internet Protocol Stream
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-none
+.B #include <sys/socket.h>
+.br
+.B #include <netinet/ip.h>
+.br
+.B #include <sys/tpi_ip.h>
+.br
+.B #include <sys/xti_ip.h>
+.HP
+.BI "int " raw_stream " = open(" raw_device ", " flags );
+.PD 0
+.HP
+.BI "int " raw_xtistr " = t_open(" raw_device ", " flags );
+.HP
+.BI "int " raw_socket " = socket(" \fRPF_INET\fI ", " \fRSOCK_RAW\fRI ", " \fRIPPROTO_IP\fI );
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-This manpage is under construction.
+.B RAWIP
+is an implementation of the Internet Protocol
+.RB ( IP )
+defined in RFC 768.
+.[
+RFC 768
+.]
+It implements a connectionless, unreliable datagram packet service.  Packets may be reordered or
+duplicated before they arrive.
+.B RAWIP
+generates and checks checksums to catch transmission errors.
+.PP
+.B RAWIP
+is implemented as a
+.IR STREAMS (4)
+pseudo-device driver using the
+.BR INET (4)
+.B @PACKAGE@
+package for
+.B Linux Fast-STREAMS\c
+.
+.[
+LfS
+.]
+The
+.B @PACKAGE@
+package translates Linux native
+.BR raw (7)
+sockets into TPI
+.[
+TPI Revision 2.0.0
+.]
+transport provider Streams suitable for use with XTI,
+.[
+XTI
+.]
+.[
+XNS
+.]
+(see
+.BR xti (3)).
+.PP
+.B RAWIP2
+(the second generation IP driver) differs from
+.B RAWIP
+largely in internal implementation.
+.B RAWIP2
+accesses the IP layer of
+.B Linux
+directly, rather than opening a socket internal to the kernel.
+.PP
+.B RAWIP
+provides one connectionless TPI Stream type.  To select the Stream,
+.I raw_device
+can be one of the following:
+.TP
+.IR /dev/rawip ", " /dev/inet/rawip ", " /dev/streams/inet/rawip .
+This device provides the
+.B RAWIP
+protocol services using the T-primitives of the Transport Provider Interface.
+.[
+TPI Revision 2.0.0
+.]
+.BR tpi (7),
+used for Internet Protocol, as described in
+.BR tpi_ip (7).
+The
+.BR tpi (7)
+interface provided on a Stream opening this device is suitable for use with the
+.BR xnet (3)
+or
+.BR xti (3)
+library and provides
+.BR RAWIP
+interface using XTI
+.[
+XTI
+.]
+.[
+XNS
+.]
+as described in
+.BR xti_ip (3).
+.TP
+.IR /dev/rawip2 ", " /dev/streams/rawip .
+The same as above, but accesses the second generation
+.B RAWIP2
+driver instead of the
+.B UDP
+driver.
+.PP
+.B RAWIP
+provides one socket type for use by the
+.BR sockets (3)
+library
+.BR socket (7)
+calls.
+.B RAWIP
+provides sockets in the protocol families
+.BR PF_INET " and " PF_INET6
+using the protocol number
+.BR IPPROTO_IP .
+The
+.I socket_type
+can be one of the following:
+.TP
+.B SOCK_RAW
+A standard
+.I SOCK_RAW
+socket that preserves message boundaries, does not Nagle, and provides only
+unordered and unreliable delivery in a connectionless association.  This
+socket uses the underlying Linux socket implementation,
+.BR raw (7)
+directly.  See
+.BR raw (7)
+for more information.
 .\"
 .\"
 .SH USAGE
 .PP
+The following entries in
+.B /etc/protosw
+provides the information for
+.BR socksys (4)
+to use the devices:
+.sp
+.TS
+tab(:);
+lllllll.
+PF_INET:SOCK_RAW:IPPROTO_IP:/dev/rawip:tpi:clts
+PF_INET6:SOCK_RAW:IPPROTO_IP:/dev/rawip:tpi:clts
+.TE
+.PP
+For additional information, see
+.BR socksys "(4) and " protosw (5).
 .\"
 .\"
 .SH IOCTLS
 .PP
+All interfaces support a set of management IO controls using
+.BR ioctl (2)
+and
+.BR streamio (7)
+.I I_STR
+system calls on the
+.IR raw_stream ", " raw_xtistr " or " raw_socket .
+These management controls are described in
+.BR timod "(4), " sockmod "(4) and " socksys (4).
+See also
+.BR raw (7)
+for sockets.
 .\"
 .\"
-.SH EXAMPLES
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH NOTICES
 .PP
+.B RAWIP
+has several implementations.  This manpage is for the
+.BR INET (4)
+implementation that provides
+.BR tpi (7)
+access to the Linux NET4 version of
+.BR RAWIP .
+For more information on the Linux NET4 version, see
+.BR raw (7).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+There are now two
+.I STREAMS
+implementations for
+.BR rawip :
+.B RAWIP
+and
+.BR RAWIP2 .
+These implementations differ as follows:
+.TP
+.B RAWIP
+This implementation is part of the
+.B streams-inet
+driver in the
+.B @PACKAGE_TITLE@
+package.
+The
+.B streams-inet
+driver implements
+.I rawip
+by opening a
+.B Linux
+.I rawip
+socket internal to kernel and providing a TPI
+.[
+TPI Revision 2.0.0
+.]
+interface to that socket.  This approach has been termed
+.B xtios
+(XTI over Sockets).
+The approach is rather inefficient in that two layers of interface code are
+executed.  Also, sockets does not have the same capabilities that
+.I STREAMS
+does in many regards, particularly internal to the kernel.  The approach is
+not only inefficient, but is less usable by other
+.I STREAMS
+modules and multiplexing drivers.
+.TP
+.B RAWIP2
+This implementation if part of the
+.B streams-rawip
+driver in the
+.B @PACKAGE_TITLE@
+package.  This implementation uses the direct approach of hooking into the
+.B Linux
+kernel at the
+.BR ip (7)
+level, using direct function calls, and does not open a socket.  This approach
+is more efficient in that only
+.I STREAMS
+interface code is invoked in the data path.
+.PP
+The
+.B RAWIP
+implementation is the traditional one for the
+.B @PACKAGE_TITLE@
+package.
+.B RAWIP2
+was an afterthought.
+One of the reasons for implementing a separate
+.B RAWIP2
+driver was to be able to do performance comparisons between the two
+approaches.  Also, using the
+.B RAWIP2
+driver, it is possible to make fair performance (throughput, latency, CPU
+occupancy) comparisons between the NET4 Linux sockets implementation of
+.I rawip
+and the
+.I STREAMS
+implementation.
+It was intended that the
+.BR netperf (1)
+package be used to provide performance histogram comparisons between the two
+implementations.
+.PP
+It may seem like a lot of trouble to go to, however, lkml (Linux Kernel
+Mailing List) has made some very strong (and unsupported in the author's
+opinion) statements regarding the performance of
+.I STREAMS
+and that of sockets for Internet protocols.  Performance tests of this nature
+could dis-spell those rumours.
+.\"
+.\"
+.SH FILES
+.PP
+.PP
+.BR <sys/socket.h> ,
+.BR <netinet/ip> ,
+.BR <sys/tpi.h> ,
+.BR <sys/tpi_ip.h> ,
+.BR <sys/xti.h> ,
+.BR <sys/xti_ip.h> .
 .\"
 .\"
 .SH DEVICES
 .PP
-.BR /dev/rawip ,
-.BR /dev/inet/rawip .
+.IR /dev/rawip ,
+.IR /dev/inet/rawip ,
+.IR /dev/streams/inet/rawip ,
+.IR /dev/rawip2 ,
+.IR /dev/streams/rawip .
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR INET (4),
+.BR ioctl (2),
+.BR ip (7),
+.BR STREAMS (9),
+.BR protosw (5),
+.BR socket (7),
+.BR sockets (3),
+.BR sockmod (4),
+.BR socksys (4),
+.BR STREAMS (4),
+.BR raw (7),
+.BR rawip_ioctl (4),
+.BR timod (4),
+.BR tpi (7),
+.BR tpi_ip (7),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ip (3).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR RAWIP " and " RAWIP2
+have no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.B @PACKAGE_TITLE@
+implementation of
+.B UDP
+for
+.I STREAMS
+is largely compatible with
+.IR STREAMS -based
+implementations such as Lachman or Mentat TCP/IP stacks and
+.IR Solaris \(rg
+documentation.
+.[
+soldoc
+.]
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+XNS 5.2.
+.[
+XNS
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.B strinet 0.8.2
+was released in 2002 and was since part of the Linux STREAMS (LiS)
+.[
+LiS
+.]
+package, and is now part of
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+The second generation driver was completed in 2006.
 .\"
 .\"
 .[

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/06 11:38:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/24 08:37:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:41 $ by $Author: brian $
+# Last Modified $Date: 2006/03/24 08:37:34 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2006/03/24 08:37:34  brian
+# - added manpages for new udp and rawip drivers
+#
 # Revision 0.9.2.12  2006/03/06 11:38:41  brian
 # - updated headers
 #
@@ -82,6 +85,7 @@ man_MANS = \
 	man4/ipip.4 \
 	man4/pup.4 \
 	man4/rawip.4 \
+	man4/rawip2.4 \
 	man4/rip.4 \
 	man4/tcp.4 \
 	man4/ticlts.4 \
@@ -89,6 +93,7 @@ man_MANS = \
 	man4/ticots_ord.4 \
 	man4/ticotsord.4 \
 	man4/udp.4 \
+	man4/udp2.4 \
 	man7/tpi_ip.7 \
 	man7/tpi_udp.7 \
 	man7/tpi_tcp.7 \
@@ -141,6 +146,7 @@ dist_noinst_MANS = \
 	man4/ipip.4.man \
 	man4/pup.4.man \
 	man4/rawip.4.man \
+	man4/rawip2.4.man \
 	man4/rip.4.man \
 	man4/sctp.4.man \
 	man4/tcp.4.man \
@@ -149,6 +155,7 @@ dist_noinst_MANS = \
 	man4/ticots_ord.4.man \
 	man4/ticotsord.4.man \
 	man4/udp.4.man \
+	man4/udp2.4.man \
 	man7/tpi_ip.7.man \
 	man7/tpi_udp.7.man \
 	man7/tpi_tcp.7.man \
