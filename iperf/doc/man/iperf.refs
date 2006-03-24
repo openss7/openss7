@@ -2669,7 +2669,7 @@ Part 1: Protocol Specification
 %R LIS 2.18
 %A OpenSS7
 %Q OpenSS7
-%T Linux STREAMS (LiS) 2.18.3 Source Code
+%T Linux STREAMS (LiS) 2.18.4 Source Code
 %E Brian Bidulock
 %I OpenSS7 Corporation
 %U http://www.openss7.org/
@@ -2679,7 +2679,7 @@ Part 1: Protocol Specification
 %R streams-0.7a.5
 %A OpenSS7
 %Q OpenSS7
-%T Linux Fast-STREAMS (LfS) 0.7a.5 Source Code
+%T Linux Fast-STREAMS (LfS) 0.7a.6 Source Code
 %E Brian Bidulock
 %I OpenSS7 Corporation
 %U http://www.openss7.org/

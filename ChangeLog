@@ -1,3 +1,11 @@
+2006-03-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* openss7.refs: updated LiS and STREAMS release numbers
+	* am/pr.am: scrpits/send-pr missing from distribution
+	* openss7.spec.in (%package test): described send-pr
+	* am/autotest.am: stylistic changes
+	* am/pr.am: only install noarch
+
 2006-03-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/send-pr: added (renamed from auto-pr)

@@ -1,3 +1,8 @@
+2006-03-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strss7.refs: updated LiS and STREAMS release numbers
+	* strss7.spec.in (%package test): described send-pr
+
 2006-03-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* strss7.spec.in: added send-pr files

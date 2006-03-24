@@ -1,3 +1,8 @@
+2006-03-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strsctp.refs: updated LiS and STREAMS release numbers
+	* strsctp.spec.in (%package test): described send-pr
+
 2006-03-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: rationalized to strxns
