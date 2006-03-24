@@ -1,10 +1,13 @@
-OpenSS7 Master Package -- history of user-visible changes.  2006-03-16
-$Id: NEWS,v 0.9.2.11 2006/03/16 23:36:25 brian Exp $
+OpenSS7 Master Package -- history of user-visible changes.  2006-03-23
+$Id: NEWS,v 0.9.2.12 2006/03/24 00:04:20 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
 * Major changes in openss7-0.9.2.D
+
+  Added --enable-devel configure option for embedded targets.
+  Added send-pr script for automatic problem report generation.
 
 * Major changes in openss7-0.9.2.C
 

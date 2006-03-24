@@ -1,3 +1,8 @@
+2006-03-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* iperf.spec.in: added send-pr files
+	* NEWS: updated release notes
+
 2006-03-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* .cvsignore: added *.pr files

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/20 12:16:23 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/24 04:58:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/20 12:16:23 $ by $Author: brian $
+ Last Modified $Date: 2006/03/24 04:58:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.3  2006/03/24 04:58:00  brian
+ - first compile pass
+
+ Revision 0.9.2.2  2006/03/24 00:08:29  brian
+ - added second generation udp driver
+
  Revision 0.9.2.1  2006/03/20 12:16:23  brian
  - new approach to UDP
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/20 12:16:23 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/24 04:58:00 $"
 
-static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/20 12:16:23 $";
+static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/24 04:58:00 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -70,6 +76,14 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.1 $)
  *  Sockets approach of the inet.c driver is that UDP is easy enough to
  *  implement, and this driver will provide a reasonable comparison between
  *  the efficiency and performance of the Streams and the Socket frameworks.
+ *
+ *  There are three ways that this module cn operate: 1) The module can be
+ *  opened as a pseudo-device driver (DRVOPEN|CLONEOPEN) of its own right.  2)
+ *  The module can be pushed over another Stream.  That Stream needs to be a
+ *  freshly opened (unbound) NPI IP driver Stream.  An NPI IP Stream can be
+ *  linked underneath the driver as a multiplexing driver.  The reason for all
+ *  these approaches is to determine the relative merits (performance and
+ *  otherwise) of each approach.
  */
 
 #include <sys/os7/compat.h>
@@ -78,7 +92,16 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 #undef ASSERT
 
 #include <linux/bitops.h>
+
+#define udp_tst_bit(nr,addr)	    test_bit(nr,addr)
+#define udp_set_bit(nr,addr)	    __set_bit(nr,addr)
+#define udp_clr_bit(nr,addr)	    __clear_bit(nr,addr)
+
 #include <linux/interrupt.h>
+
+#ifdef HAVE_KINC_LINUX_BRLOCK_H
+#include <linux/brlock.h>
+#endif
 
 #include <net/ip.h>
 #include <net/icmp.h>
@@ -87,6 +110,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 #include <net/snmp.h>
 
 #include <net/udp.h>
+#include <net/tcp.h> /* for checksumming */
 
 #include <linux/skbuff.h>
 #include <linux/netfilter.h>
@@ -94,6 +118,8 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 #endif				/* LINUX */
 
 #include "udp_hooks.h"
+
+#include <sys/npi.h>
 
 #if defined HAVE_TIHDR_H
 #   include <tihdr.h>
@@ -109,7 +135,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/20 12:16:23 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/24 04:58:00 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -168,7 +194,7 @@ MODULE_ALIAS("/dev/inet/udp");
  *  ==========================================================================
  */
 
-#define DRV_ID		UDP_DRIV_ID
+#define DRV_ID		UDP_DRV_ID
 #define DRV_NAME	UDP_DRV_NAME
 #define CMAJORS		UDP_CMAJORS
 #define CMAJOR_0	UDP_CMAJOR_0
@@ -211,9 +237,29 @@ STATIC struct qinit udp_winit = {
 	.qi_minfo = &udp_minfo,		/* Information */
 };
 
+STATIC streamscall int mux_rput(queue_t *, mblk_t *);
+STATIC streamscall int mux_rsrv(queue_t *);
+
+STATIC struct qinit mux_rinit = {
+	.qi_putp = mux_rput,		/* Read put (msg from below) */
+	.qi_srvp = mux_rsrv,		/* Read queue service */
+	.qi_minfo = &udp_minfo,		/* Information */
+};
+
+STATIC streamscall int mux_wput(queue_t *, mblk_t *);
+STATIC streamscall int mux_wsrv(queue_t *);
+
+STATIC struct qinit mux_winit = {
+	.qi_putp = mux_wput,		/* Write put (msg from above) */
+	.qi_srvp = mux_wsrv,		/* Write queue service */
+	.qi_minfo = &udp_minfo,		/* Information */
+};
+
 MODULE_STATIC struct streamtab udp_info = {
 	.st_rdinit = &udp_rinit,	/* Upper read queue */
 	.st_wrinit = &udp_winit,	/* Upper write queue */
+	.st_muxrinit = &mux_rinit,	/* Lower read queue */
+	.st_muxwinit = &mux_winit,	/* Lower write queue */
 };
 
 /*
@@ -380,6 +426,7 @@ typedef struct udp {
 	struct udp *bnext;		/* linkage for bind hash */
 	struct udp **bprev;		/* linkage for bind hash */
 	struct udp_bind_bucket *bindb;	/* linkage for bind hash */
+	short port;			/* bound port number - host order */
 	struct sockaddr_storage src;	/* bound address */
 	struct sockaddr_storage dst;	/* connected address */
 	struct udp_options options;	/* protocol options */
@@ -391,6 +438,8 @@ typedef struct udp {
 
 STATIC struct udp *udp_opens = NULL;
 STATIC spinlock_t udp_lock = SPIN_LOCK_UNLOCKED;
+
+STATIC queue_t *npi_bottom = NULL;
 
 typedef int (*udp_rcv_fnc_t) (struct sk_buff *);
 
@@ -442,7 +491,7 @@ struct udp_bind_bucket {
 	struct udp *owners;		/* list of owners of this port */
 	struct udp *dflt;		/* default destinations for this protocol */
 };
-struct udp_hash_bucket {
+struct udp_bhash_bucket {
 	rwlock_t lock;
 	struct udp_bind_bucket *list;
 };
@@ -462,7 +511,7 @@ udp_get(void)
 	return (udp);
 }
 STATIC INLINE void
-udp_hold(struct upd *udp)
+udp_hold(struct udp *udp)
 {
 	if (udp)
 		atomic_inc(&udp->refcnt);
@@ -473,6 +522,368 @@ udp_put(struct udp *udp)
 	if (udp && atomic_dec_and_test(&udp->refcnt))
 		kmem_cache_free(udp_priv_cachep, udp);
 }
+
+/*
+ *  LOCKING
+ */
+STATIC int
+udp_trylockq(queue_t *q)
+{
+	int res;
+	struct udp *udp = PRIV(q);
+
+	spin_lock_bh(&udp->qlock);
+	if (!(res = !udp->users++)) {
+		if (q == udp->rq)
+			udp->rwait = q;
+		if (q == udp->wq)
+			udp->wwait = q;
+	}
+	spin_unlock_bh(&udp->qlock);
+	return (res);
+}
+STATIC void
+udp_unlockq(queue_t *q)
+{
+	struct udp *udp = PRIV(q);
+
+	spin_lock_bh(&udp->qlock);
+	if (udp->rwait)
+		qenable(xchg(&udp->rwait, NULL));
+	if (udp->wwait)
+		qenable(xchg(&udp->wwait, NULL));
+	udp->users = 0;
+	spin_unlock_bh(&udp->qlock);
+}
+
+/*
+ *  State changes.
+ */
+#ifdef _DEBUG
+STATIC const char *
+tpi_state_name(t_scalar_t state)
+{
+	switch (state) {
+	case TS_UNBND:
+		return ("TS_UNBND");
+	case TS_WACK_BREQ:
+		return ("TS_WACK_BREQ");
+	case TS_WACK_UREQ:
+		return ("TS_WACK_UREQ");
+	case TS_IDLE:
+		return ("TS_IDLE");
+	case TS_WACK_OPTREQ:
+		return ("TS_WACK_OPTREQ");
+	case TS_WACK_CREQ:
+		return ("TS_WACK_CREQ");
+	case TS_WCON_CREQ:
+		return ("TS_WCON_CREQ");
+	case TS_WRES_CIND:
+		return ("TS_WRES_CIND");
+	case TS_WACK_CRES:
+		return ("TS_WACK_CRES");
+	case TS_DATA_XFER:
+		return ("TS_DATA_XFER");
+	case TS_WIND_ORDREL:
+		return ("TS_WIND_ORDREL");
+	case TS_WREQ_ORDREL:
+		return ("TS_WREQ_ORDREL");
+	case TS_WACK_DREQ6:
+		return ("TS_WACK_DREQ6");
+	case TS_WACK_DREQ7:
+		return ("TS_WACK_DREQ7");
+	case TS_WACK_DREQ9:
+		return ("TS_WACK_DREQ9");
+	case TS_WACK_DREQ10:
+		return ("TS_WACK_DREQ10");
+	case TS_WACK_DREQ11:
+		return ("TS_WACK_DREQ11");
+	case TS_NOSTATES:
+		return ("TS_NOSTATES");
+	default:
+		return ("(unknown)");
+	}
+}
+#endif				/* _DEBUG */
+STATIC void
+tpi_set_state(struct udp *udp, long state)
+{
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, udp, tpi_state_name(state),
+		tpi_state_name(udp->i_state)));
+	udp->i_state = state;
+}
+STATIC long
+tpi_get_state(struct udp *udp)
+{
+	return (udp->i_state);
+}
+
+#ifdef _DEBUG
+STATIC const char *
+npi_state_name(np_long state)
+{
+	switch (state) {
+	case NS_UNBND:
+		return ("NS_UNBND");
+	case NS_WACK_BREQ:
+		return ("NS_WACK_BREQ");
+	case NS_WACK_UREQ:
+		return ("NS_WACK_UREQ");
+	case NS_IDLE:
+		return ("NS_IDLE");
+	case NS_WACK_OPTREQ:
+		return ("NS_WACK_OPTREQ");
+	case NS_WACK_RRES:
+		return ("NS_WACK_RRES");
+	case NS_WCON_CREQ:
+		return ("NS_WCON_CREQ");
+	case NS_WRES_CIND:
+		return ("NS_WRES_CIND");
+	case NS_WACK_CRES:
+		return ("NS_WACK_CRES");
+	case NS_DATA_XFER:
+		return ("NS_DATA_XFER");
+	case NS_WCON_RREQ:
+		return ("NS_WCON_RREQ");
+	case NS_WRES_RIND:
+		return ("NS_WRES_RIND");
+	case NS_WACK_DREQ6:
+		return ("NS_WACK_DREQ6");
+	case NS_WACK_DREQ7:
+		return ("NS_WACK_DREQ7");
+	case NS_WACK_DREQ9:
+		return ("NS_WACK_DREQ9");
+	case NS_WACK_DREQ10:
+		return ("NS_WACK_DREQ10");
+	case NS_WACK_DREQ11:
+		return ("NS_WACK_DREQ11");
+	case NS_NOSTATES:
+		return ("NS_NOSTATES");
+	default:
+		return ("(unknown)");
+	}
+}
+#endif				/* _DEBUG */
+
+STATIC void
+npi_set_state(struct udp *udp, long state)
+{
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, udp, npi_state_name(state),
+		npi_state_name(udp->n_state)));
+	udp->n_state = state;
+}
+STATIC long
+npi_get_state(struct udp *udp)
+{
+	return (udp->n_state);
+}
+
+/*
+ *  BUFFER ALLOCATION
+ */
+
+/**
+ *  udp_bufsrv: - safe bufcalls
+ *  @data: opaque client data
+ *
+ *  Whereas sockets allocate most buffers in user mode, where it is possible
+ *  to simply return an error to a system call, the STREAMS driver runs as a
+ *  coroutine and there is no (valid) user present.  This is done with
+ *  bufcalls.  However, for LiS and a number of other STREAMS implementations,
+ *  bufcalls are unsafe.  Here we do reference counting against the STREAMS
+ *  private structure when buffer calls are issued and when they complete.
+ *  STREAMS private structures will not be deallocated until the buffer calls
+ *  are complete.  There are some mi_bufcall() compatibility functions that
+ *  accomplish the same ends.  All of this can go away when this driver only
+ *  needs to be used with Linux Fast-STREAMS that has safe buffer callbacks.
+ */
+STATIC void streamscall
+udp_bufsrv(long data)
+{
+	struct udp *udp;
+	queue_t *q;
+
+	q = (queue_t *) data;
+	ensure(q, return);
+	udp = PRIV(q);
+	ensure(udp, return);
+
+	if (q == udp->rq && xchg(&udp->rbid, 0) != 0)
+		udp_put(udp);
+	if (q == udp->wq && xchg(&udp->wbid, 0) != 0)
+		udp_put(udp);
+	qenable(q);
+	return;
+}
+
+/**
+ *  udp_unbufcall: - reliably cancel a buffer callback
+ *  @q: the queue whose callback to cancel
+ *
+ *  Cancel a qenable() buffer callback associated with one queue in the queue pair.  udp_unbufcall()
+ *  effectively undoes the actions performed by udp_bufcall().
+ *
+ *  NOTICES: Cancellation of buffer callbacks on LiS using unbufcall() is unreliable.  The callback
+ *  function could execute some time shortly after the call to unbufcall() has returned.   LiS
+ *  abbrogates the SVR 4 STREAMS principles for unbufcall().  This is why you will find atomic
+ *  exchanges here and in the callback function and why reference counting is performed on the
+ *  structure and queue pointers are checked for NULL.
+ */
+STATIC void
+udp_unbufcall(queue_t *q)
+{
+	struct udp *udp;
+	bufcall_id_t bid;
+
+	ensure(q, return);
+	udp = PRIV(q);
+	ensure(udp, return);
+
+	if (q == udp->rq && (bid = xchg(&udp->rbid, 0))) {
+		unbufcall(bid);
+		udp_put(udp);
+	}
+	if (q == udp->wq && (bid = xchg(&udp->wbid, 0))) {
+		unbufcall(bid);
+		udp_put(udp);
+	}
+	return;
+}
+
+/**
+ *  udp_bufcall: - generate a buffer callback to enable a queue
+ *  @q: the queue to enable on callback
+ *  @size: size of the allocation
+ *  @prior: priority of the allocation
+ *
+ *  Maintain one buffer call for each queue in the queue pair.  The callback function will simply
+ *  perform a qenable(9).
+ *
+ *  NOTICES: One of the reasons for going to such extents is that LiS has completely unsafe buffer
+ *  callbacks.  The buffer callback function can be invoked (shortly) after unbufcall() returns
+ *  under LiS in abrogation of SVR 4 STREAMS principles.  This is why you will find atomic exchanges
+ *  here and in the callback function and why reference counting is performed on the structure and
+ *  queue pointers are checked for NULL.
+ */
+STATIC void
+udp_bufcall(queue_t *q, size_t size, int prior)
+{
+	struct udp *udp;
+	bufcall_id_t bid;
+
+	ensure(q, return);
+	udp = UDP_PRIV(q);
+	ensure(udp, return);
+	udp_hold(udp);
+	if (q == udp->wq) {
+		if ((bid = xchg(&udp->wbid, bufcall(size, prior, &udp_bufsrv, (long) udp)))) {
+			unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
+			udp_put(udp);
+		}
+		return;
+	}
+	if (q == udp->rq) {
+		if ((bid = xchg(&udp->rbid, bufcall(size, prior, &udp_bufsrv, (long) udp)))) {
+			unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
+			udp_put(udp);
+		}
+		return;
+	}
+	swerr();
+	return;
+}
+
+/**
+ *  udp_allocb: - reliable allocb()
+ *  @q: the queue to enable when allocation can succeed
+ *  @size: the size to allocate
+ *  @prior: the priority of the allocation
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that allocate a
+ *  buffer in response to an incoming message.  If the allocation fails, this routine will return
+ *  NULL and issue a buffer callback to reenable the queue @q when the allocation could succeed.
+ *  When NULL is returned, the caller should simply place the incoming message on the queue (i.e.
+ *  with putq() from a put procedure or putbq() from a service procedure) and return.  The queue
+ *  will be rescheduled with qenable() when the allocation could succeed.
+ */
+STATIC mblk_t *
+udp_allocb(queue_t *q, size_t size, int prior)
+{
+	mblk_t *mp;
+
+	if (!(mp = allocb(size, prior)))
+		udp_bufcall(q, size, prior);
+	return (mp);
+}
+
+/**
+ *  udp_allocb: - reliable allocb()
+ *  @q: the queue to enable when allocation can succeed
+ *  @base: the base of the external data buffer
+ *  @size: the size of the external data buffer
+ *  @prior: the priority of the allocation
+ *  @frtn: a pointer to a free routine structure (containing callback and client data)
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that allocate a
+ *  message block with an external buffer in response to an incoming message.  If the allocation
+ *  fails, this routine will return NULL and issue a buffer callback to reenable the queue @q when
+ *  the allocation could succeed.  When NULL is returned, the caller should simply place the
+ *  incoming message on the queue (i.e.  with putq() from a put procedure or putbq() from a service
+ *  procedure) and return.  The queue will be rescheduled with qenable() when the allocation could
+ *  succeed.
+ */
+STATIC mblk_t *
+udp_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
+{
+	mblk_t *mp;
+
+	if (!(mp = esballoc(base, size, prior, frtn)))
+		udp_bufcall(q, FASTBUF, prior);
+	return (mp);
+}
+
+/**
+ *  udp_dupmsg: - reliable dupmsg()
+ *  @q: queue to enable when duplication can succeed
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that duplicate a an
+ *  incoming message.  If the allocation fails, this routine will return NULL and issue a buffer
+ *  callback to reenable the queue @q when the duplication could succeed.  When NULL is returned,
+ *  the caller should simply place the incoming message on the queue (i.e.  with putq() from a put
+ *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
+ *  qenable() when the duplication could succeed.
+ */
+STATIC mblk_t *
+udp_dupmsg(queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+
+	if (!(mp = dupmsg(bp)) && (q != NULL))
+		udp_bufcall(q, FASTBUF, BPRI_MED);
+	return (mp);
+}
+
+/**
+ *  udp_dupb: - reliable dupb()
+ *  @q: queue to enable when duplication can succeed
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that duplicate a an
+ *  incoming message block.  If the allocation fails, this routine will return NULL and issue a
+ *  buffer callback to reenable the queue @q when the duplication could succeed.  When NULL is
+ *  returned, the caller should simply place the incoming message on the queue (i.e.  with putq()
+ *  from a put procedure or putbq() from a service procedure) and return.  The queue will be
+ *  rescheduled with qenable() when the duplication could succeed.
+ */
+STATIC mblk_t *
+udp_dupb(queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+
+	if (!(mp = dupb(bp)) && (q != NULL))
+		udp_bufcall(q, FASTBUF, BPRI_MED);
+	return (mp);
+}
+
 
 /*
  *  Option Handling
@@ -534,7 +945,7 @@ t_opts_size(const struct udp *t, mblk_t *mp)
 	if (optlen > 0)
 		size += T_SPACE(optlen);	/* T_IP_OPTIONS */
 	size += _T_SPACE_SIZEOF(t_defaults.ip.ttl);	/* T_IP_TTL */
-	size += _T_SPACE_SIZEOF(t_defautls.ip.tos);	/* T_IP_TOS */
+	size += _T_SPACE_SIZEOF(t_defaults.ip.tos);	/* T_IP_TOS */
 	size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
 	size += _T_SPACE_SIZEOF(t_defaults.udp.checksum);	/* T_UDP_CHECKSUM */
 	return (size);
@@ -603,7 +1014,8 @@ t_opts_build(const struct udp *t, mblk_t *mp, unsigned char *op, size_t olen)
 		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
-	uh = (struct udphdr *) (mp->b_datap->db_base + (iph->ihl << 2)) {
+	uh = (struct udphdr *) (mp->b_datap->db_base + (iph->ihl << 2));
+	{
 		if (oh == NULL)
 			goto efault;
 		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
@@ -640,7 +1052,7 @@ t_errs_size(const struct udp *t, mblk_t *mp)
  * @olen: output length
  */
 STATIC int
-t_errs_build(const struct udp *t, mblk_t *mp, unsigned char *op, size_t olen)
+t_errs_build(const struct udp *t, mblk_t *mp, unsigned char *op, size_t olen, int *etypep)
 {
 	fixme(("Write this function."));
 	return (-EFAULT);
@@ -664,7 +1076,7 @@ t_size_default_options(struct udp *t, const unsigned char *ip, size_t ilen)
 
 	if (ip == NULL || ilen == 0) {
 		/* For zero-length options fake an option header for all names with all levels */
-		all.levels = T_ALLLEVELS;
+		all.level = T_ALLLEVELS;
 		all.name = T_ALLOPT;
 		all.len = sizeof(all);
 		all.status = 0;
@@ -2650,7 +3062,7 @@ t_build_options(struct udp * t, unsigned char *ip, size_t ilen, unsigned char *o
  * @flags: bind flags
  */
 STATIC int
-n_bind_req(queue_t *q, struct sockaddr *add, socklen_t add_len, np_ulong condind, np_ulong flags)
+n_bind_req(queue_t *q, struct sockaddr *add, socklen_t add_len, np_ulong conind, np_ulong flags)
 {
 	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
@@ -2695,14 +3107,14 @@ n_unbind_req(queue_t *q)
 	mblk_t *mp;
 	N_unbind_req_t *p;
 
-	if ((mp = udp_allocb(q, sizeof(*p) + add_len + 1, BPRI_MED))) {
+	if ((mp = udp_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = N_UNBIND_REQ;
 		mp->b_wptr += sizeof(*p);
 		npi_set_state(udp, NS_WACK_UREQ);
 		printd(("%s: %p: N_UNBIND_REQ ->\n", DRV_NAME, udp));
-		if (upd->wq->q_next)
+		if (udp->wq->q_next)
 			putnext(udp->wq, mp);
 		else
 			put(npi_bottom, mp);
@@ -2739,7 +3151,7 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 				p->DEST_length = dst_len;
 				p->DEST_offset = dst_len ? sizeof(*p) : 0;
 				p->RESERVED_field[0] = src_len;
-				p->RESERVED_filed[1] = src_len ? sizeof(*p) + dst_len : 0;
+				p->RESERVED_field[1] = src_len ? sizeof(*p) + dst_len : 0;
 				mp->b_wptr += sizeof(*p);
 				if (dst_len) {
 					bcopy(dst, mp->b_wptr, dst_len);
@@ -2768,128 +3180,6 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 }
 
 /*
- *  State changes.
- */
-#ifdef _DEBUG
-STATIC const char *
-tpi_state_name(t_scalar_t state)
-{
-	switch (state) {
-	case TS_UNBND:
-		return ("TS_UNBND");
-	case TS_WACK_BREQ:
-		return ("TS_WACK_BREQ");
-	case TS_WACK_UREQ:
-		return ("TS_WACK_UREQ");
-	case TS_IDLE:
-		return ("TS_IDLE");
-	case TS_WACK_OPTREQ:
-		return ("TS_WACK_OPTREQ");
-	case TS_WACK_CREQ:
-		return ("TS_WACK_CREQ");
-	case TS_WCON_CREQ:
-		return ("TS_WCON_CREQ");
-	case TS_WRES_CIND:
-		return ("TS_WRES_CIND");
-	case TS_WACK_CRES:
-		return ("TS_WACK_CRES");
-	case TS_DATA_XFER:
-		return ("TS_DATA_XFER");
-	case TS_WIND_ORDREL:
-		return ("TS_WIND_ORDREL");
-	case TS_WREQ_ORDREL:
-		return ("TS_WREQ_ORDREL");
-	case TS_WACK_DREQ6:
-		return ("TS_WACK_DREQ6");
-	case TS_WACK_DREQ7:
-		return ("TS_WACK_DREQ7");
-	case TS_WACK_DREQ9:
-		return ("TS_WACK_DREQ9");
-	case TS_WACK_DREQ10:
-		return ("TS_WACK_DREQ10");
-	case TS_WACK_DREQ11:
-		return ("TS_WACK_DREQ11");
-	case TS_NOSTATES:
-		return ("TS_NOSTATES");
-	default:
-		return ("(unknown)");
-	}
-}
-#endif				/* _DEBUG */
-STATIC void
-tpi_set_state(struct udp *udp, long state)
-{
-	printd(("%s: %p: %s <- %s\n", DRV_NAME, udp, tpi_state_name(state),
-		tpi_state_name(udp->i_state)));
-	udp->i_state = state;
-}
-STATIC long
-tpi_get_state(struct udp *udp)
-{
-	return (udp->i_state);
-}
-
-#ifdef _DEBUG
-STATIC const char *
-npi_state_name(np_long state)
-{
-	switch (state) {
-	case NS_UNBND:
-		return ("NS_UNBND");
-	case NS_WACK_BREQ:
-		return ("NS_WACK_BREQ");
-	case NS_WACK_UREQ:
-		return ("NS_WACK_UREQ");
-	case NS_IDLE:
-		return ("NS_IDLE");
-	case NS_WACK_OPTREQ:
-		return ("NS_WACK_OPTREQ");
-	case NS_WACK_RRES:
-		return ("NS_WACK_RRES");
-	case NS_WCON_CREQ:
-		return ("NS_WCON_CREQ");
-	case NS_WRES_CIND:
-		return ("NS_WRES_CIND");
-	case NS_WACK_CRES:
-		return ("NS_WACK_CRES");
-	case NS_DATA_XFER:
-		return ("NS_DATA_XFER");
-	case NS_WCON_RREQ:
-		return ("NS_WCON_RREQ");
-	case NS_WRES_RIND:
-		return ("NS_WRES_RIND");
-	case NS_WACK_DREQ6:
-		return ("NS_WACK_DREQ6");
-	case NS_WACK_DREQ7:
-		return ("NS_WACK_DREQ7");
-	case NS_WACK_DREQ9:
-		return ("NS_WACK_DREQ9");
-	case NS_WACK_DREQ10:
-		return ("NS_WACK_DREQ10");
-	case NS_WACK_DREQ11:
-		return ("NS_WACK_DREQ11");
-	case NS_NOSTATES:
-		return ("NS_NOSTATES");
-	default:
-		return ("(unknown)");
-	}
-}
-#endif				/* _DEBUG */
-
-STATIC void
-npi_set_state(struct udp *udp, long state)
-{
-	printd(("%s: %p: %s <- %s\n", DRV_NAME, udp, npi_state_name(state),
-		npi_state_name(udp->n_state)));
-	udp->n_state = state;
-}
-STATIC long
-npi_get_state(struct udp *udp)
-{
-	return (udp->n_state);
-}
-
-/*
  * UDP actions
  */
 
@@ -2907,6 +3197,8 @@ npi_get_state(struct udp *udp)
 STATIC int
 udp_bind(queue_t *q, struct sockaddr *add, socklen_t add_len)
 {
+	struct udp *udp = UDP_PRIV(q);
+
 	if (q->q_next != NULL) {
 		return n_bind_req(q, add, add_len, 0, 0);
 	} else {
@@ -2929,6 +3221,8 @@ udp_bind(queue_t *q, struct sockaddr *add, socklen_t add_len)
 STATIC int
 udp_unbind(queue_t *q)
 {
+	struct udp *udp = UDP_PRIV(q);
+
 	if (q->q_next != NULL) {
 		return n_unbind_req(q);
 	} else {
@@ -2939,7 +3233,7 @@ udp_unbind(queue_t *q)
 }
 
 /**
- * udp_sendmsg: - send a message from a Stream
+ * udp_xmitmsg: - send a message from a Stream
  * @q: active queue in queue pair (write queue)
  * @mp: T_UNITDATA_REQ message
  * @opts: UDP options for send
@@ -2950,7 +3244,7 @@ udp_unbind(queue_t *q)
  * the IP layer directly.
  */
 STATIC int
-udp_sendmsg(queue_t *q, mblk_t *mp, struct udp_options *opts)
+udp_xmitmsg(queue_t *q, mblk_t *mp, struct udp_options *opts)
 {
 	struct udp *udp = UDP_PRIV(q);
 
@@ -2961,10 +3255,10 @@ udp_sendmsg(queue_t *q, mblk_t *mp, struct udp_options *opts)
 		socklen_t src_len = 0, dst_len;
 		struct sockaddr_in sin;
 
-		if (opts != NULL && t_tst_bit(_T_BIT_IP_ADDR, opts.flags)) {
+		if (opts != NULL && t_tst_bit(_T_BIT_IP_ADDR, opts->flags)) {
 			sin.sin_family = AF_INET;
 			sin.sin_port = htons(udp->port);
-			sin.sin_addr.s_addr = opts.ip.addr;
+			sin.sin_addr.s_addr = opts->ip.addr;
 			src = (struct sockaddr *) &sin;
 			src_len = sizeof(sin);
 		}
@@ -2977,6 +3271,7 @@ udp_sendmsg(queue_t *q, mblk_t *mp, struct udp_options *opts)
 
 	} else {
 		/* FIXME: need to send message directly */
+		return (-EFAULT);
 	}
 }
 
@@ -2993,7 +3288,7 @@ udp_sendmsg(queue_t *q, mblk_t *mp, struct udp_options *opts)
 STATIC int
 m_flush(queue_t *q, int how, int band)
 {
-	struct upd *udp = PRIV(q);
+	struct udp *udp = PRIV(q);
 	mblk_t *mp;
 
 	if ((mp = udp_allocb(q, 2, BPRI_HI))) {
@@ -3064,7 +3359,6 @@ t_info_ack(queue_t *q)
 	if ((mp = udp_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
-		*p = udp->p.info;
 		p->PRIM_type = T_INFO_ACK;
 		p->TSDU_size = (unsigned short) 0xffff;
 		p->ETSDU_size = T_INVALID;
@@ -3198,7 +3492,6 @@ t_ok_ack(queue_t *q, t_scalar_t prim)
 	struct udp *udp = PRIV(q);
 	mblk_t *mp;
 	struct T_ok_ack *p;
-	struct socket *sock = NULL;
 
 	if ((mp = udp_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -3251,19 +3544,26 @@ t_unitdata_ind(queue_t *q, mblk_t *dp)
 	mblk_t *mp;
 	struct T_unitdata_ind *p;
 	size_t opt_len = t_opts_size(udp, dp);
+	const size_t src_len = sizeof(struct sockaddr_in);
 
-	if ((mp = udp_allocb(q, sizeof(*p) + msg->msg_namelen + opt_len, BPRI_MED))) {
+	if ((mp = udp_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_UNITDATA_IND;
-		p->SRC_length = msg->msg_namelen;
-		p->SRC_offset = msg->msg_namelen ? sizeof(*p) : 0;
+		p->SRC_length = src_len;
+		p->SRC_offset = src_len ? sizeof(*p) : 0;
 		p->OPT_length = opt_len;
-		p->OPT_offset = opt_len ? sizeof(*p) + msg->msg_namelen : 0;
+		p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
 		mp->b_wptr += sizeof(*p);
-		if (msg->msg_namelen) {
-			bcopy(msg->msg_name, mp->b_wptr, msg->msg_namelen);
-			mp->b_wptr += msg->msg_namelen;
+		if (src_len) {
+			struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
+			struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
+			struct udphdr *uh = (typeof(uh)) (mp->b_datap->db_base + (iph->ihl << 2));
+
+			sin->sin_family = AF_INET;
+			sin->sin_port = uh->source;
+			sin->sin_addr.s_addr = iph->saddr;
+			mp->b_wptr += src_len;
 		}
 		if (opt_len) {
 			t_opts_build(udp, dp, mp->b_wptr, opt_len);
@@ -3295,21 +3595,28 @@ t_uderror_ind(queue_t *q, mblk_t *dp)
 	struct T_uderror_ind *p;
 	size_t opt_len = t_errs_size(udp, dp);
 	int etype = 0;
+	const size_t src_len = sizeof(struct sockaddr_in);
 
 	if (canputnext(udp->rq)) {
-		if ((mp = udp_allocb(q, sizeof(*p) + msg->msg_namelen + opt_len, BPRI_MED))) {
+		if ((mp = udp_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			mp->b_band = 2;	/* XXX move ahead of data indications */
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = T_UDERROR_IND;
-			p->DEST_length = msg->msg_namelen;
-			p->DEST_offset = msg->msg_namelen ? sizeof(*p) : 0;
+			p->DEST_length = src_len;
+			p->DEST_offset = src_len ? sizeof(*p) : 0;
 			p->OPT_length = opt_len;
-			p->OPT_offset = opt_len ? sizeof(*p) + msg->msg_namelen : 0;
+			p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
 			mp->b_wptr += sizeof(*p);
-			if (msg->msg_namelen) {
-				bcopy(msg->msg_name, mp->b_wptr, msg->msg_namelen);
-				mp->b_wptr += msg->msg_namelen;
+			if (src_len) {
+				struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
+				struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
+				struct udphdr *uh = (typeof(uh)) (mp->b_datap->db_base + (iph->ihl << 2));
+
+				sin->sin_family = AF_INET;
+				sin->sin_port = uh->source;
+				sin->sin_addr.s_addr = iph->saddr;
+				mp->b_wptr += src_len;
 			}
 			if (opt_len) {
 				t_errs_build(udp, dp, mp->b_wptr, opt_len, &etype);
@@ -3486,7 +3793,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	struct udp *udp = PRIV(q);
 	int err, add_len, type;
 	const struct T_bind_req *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr *add = &udp->src;
+	struct sockaddr *add = (struct sockaddr *)&udp->src;
 	struct sockaddr_in *add_in;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -3523,7 +3830,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	}
 	add_in = (typeof(add_in)) add;
 	type = inet_addr_type(add_in->sin_addr.s_addr);
-	if (sysctl_ip_nonlocal_bind == 0 && add->sin_addr.s_addr != INADDR_ANY && type != RTN_LOCAL
+	if (sysctl_ip_nonlocal_bind == 0 && add_in->sin_addr.s_addr != INADDR_ANY && type != RTN_LOCAL
 	    && type != RTN_MULTICAST && type != RTN_BROADCAST)
 		goto noaddr;
 	udp->port = ntohs(add_in->sin_port);
@@ -3532,7 +3839,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 		goto acces;
 	if ((err = udp_bind(q, add, add_len)))
 		goto error;
-	return t_bind_ack(q, &udp->src, p->CONIND_number);
+	return t_bind_ack(q, (struct sockaddr *)&udp->src, sizeof(struct sockaddr_in), p->CONIND_number);
       acces:
 	err = TACCES;
 	ptrace(("%s: ERROR: no permission for address\n", DRV_NAME));
@@ -3584,7 +3891,6 @@ t_unbind_req(queue_t *q, mblk_t *mp)
 STATIC int
 t_unitdata_req(queue_t *q, mblk_t *mp)
 {
-	long mmax;
 	struct udp *udp = PRIV(q);
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
 	const struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
@@ -3601,7 +3907,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 	    || (p->DEST_length < sizeof(struct sockaddr_in)))
 		goto badadd;
 	if (p->OPT_length == 0)
-		return udp_sendmsg(q, mp, NULL);
+		return udp_xmitmsg(q, mp, NULL);
 	{
 		struct udp_options opts;
 		unsigned char *ip;
@@ -3666,7 +3972,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 				}
 			}
 		}
-		return udp_sendmsg(q, mp, &opts);
+		return udp_xmitmsg(q, mp, &opts);
 	}
 	/* FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
       badopt:
@@ -3807,16 +4113,19 @@ t_addr_req(queue_t *q, mblk_t *mp)
 	(void) mp;
 	switch (tpi_get_state(udp)) {
 	case TS_UNBND:
-		return t_addr_ack(q, NULL, NULL);
+		return t_addr_ack(q, NULL, 0, NULL, 0);
 	case TS_IDLE:
-		return t_addr_ack(q, &udp->src, NULL);
+		return t_addr_ack(q, (struct sockaddr *) &udp->src, sizeof(struct sockaddr_in),
+				  NULL, 0);
 	case TS_WCON_CREQ:
 	case TS_DATA_XFER:
 	case TS_WIND_ORDREL:
 	case TS_WREQ_ORDREL:
-		return t_addr_ack(q, &udp->src, &udp->dst);
+		return t_addr_ack(q, (struct sockaddr *) &udp->src, sizeof(struct sockaddr_in),
+				  (struct sockaddr *) &udp->dst, sizeof(struct sockaddr_in));
 	case TS_WRES_CIND:
-		return t_addr_ack(q, NULL, &udp->dst);
+		return t_addr_ack(q, NULL, 0, (struct sockaddr *) &udp->dst,
+				  sizeof(struct sockaddr_in));
 	}
 	return t_error_ack(q, T_ADDR_REQ, TOUTSTATE);
 }
@@ -3890,12 +4199,14 @@ n_bind_ack(queue_t *q, mblk_t *mp)
 		}
 		rtn = t_bind_ack(q, add, add_len, p->CONIND_number);
 		if (rtn >= 0)
-			npi_set_state(NS_IDLE);
+			npi_set_state(udp, NS_IDLE);
 		break;
 	default:
 		break;
 	}
 	return (rtn);
+      efault:
+	return (-EFAULT);
 }
 
 /**
@@ -3911,9 +4222,9 @@ n_ok_ack(queue_t *q, mblk_t *mp)
 
 	switch (npi_get_state(udp)) {
 	case NS_WACK_UREQ:
-		rtn = t_ok_ack(q, mp);
+		rtn = t_ok_ack(q, T_UNBIND_REQ);
 		if (rtn >= 0)
-			npi_set_state(NS_UNBND);
+			npi_set_state(udp, NS_UNBND);
 		break;
 	case NS_WACK_OPTREQ:
 		if (rtn >= 0)
@@ -3925,6 +4236,7 @@ n_ok_ack(queue_t *q, mblk_t *mp)
 		   than the NS_IDLE state. */
 		break;
 	}
+	return (rtn);
 }
 
 /**
@@ -3935,7 +4247,6 @@ STATIC t_scalar_t
 n_tpi_error(N_error_ack_t * p)
 {
 	switch (p->NPI_error) {
-	default:
 	case NBADADDR:
 		return (TBADADDR);
 	case NBADOPT:
@@ -4302,7 +4613,6 @@ udp_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	np_long prim;
-	struct udp *udp = UDP_PRIV(q);
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(prim))
 		goto eproto;
@@ -4327,6 +4637,8 @@ udp_r_proto(queue_t *q, mblk_t *mp)
 		break;
 	}
 	return (rtn);
+      eproto:
+	return (-EPROTO);
 }
 
 /**
@@ -4349,6 +4661,20 @@ udp_w_prim(queue_t *q, mblk_t *mp)
 		return udp_w_proto(q, mp);
 	}
 	return (-EOPNOTSUPP);
+}
+
+STATIC int
+mux_w_proto(queue_t *q, mblk_t *mp)
+{
+	fixme(("Write this function."));
+	return (-EFAULT);
+}
+
+STATIC int
+mux_r_proto(queue_t *q, mblk_t *mp)
+{
+	fixme(("Write this function."));
+	return (-EFAULT);
 }
 
 /**
@@ -4644,6 +4970,48 @@ udp_wsrv(queue_t *q)
 	return udp_srvq(q, &udp_w_prim, NULL);
 }
 
+/**
+ * mux_rput: - read side put procedure
+ * @q: queue to put message to
+ * @mp: message to put
+ */
+STATIC streamscall int
+mux_rput(queue_t *q, mblk_t *mp)
+{
+	return udp_putq(q, mp, &mux_r_prim);
+}
+
+/**
+ * mux_rsrv: - read side service procedure
+ * @q: queue to service
+ */
+STATIC streamscall int
+mux_rsrv(queue_t *q)
+{
+	return udp_srvq(q, &mux_r_prim, NULL);
+}
+
+/**
+ * mux_wput: - write side put procedure
+ * @q: queue to put message to
+ * @mp: message to put
+ */
+STATIC streamscall int
+mux_wput(queue_t *q, mblk_t *mp)
+{
+	return udp_putq(q, mp, &mux_w_prim);
+}
+
+/**
+ * mux_wsrv: - write side service procedure
+ * @q: queue to service
+ */
+STATIC streamscall int
+mux_wsrv(queue_t *q)
+{
+	return udp_srvq(q, &mux_w_prim, NULL);
+}
+
 /*
  *  =========================================================================
  *
@@ -4668,7 +5036,7 @@ STATIC struct net_protocol *udp_next_proto = NULL;
  * passed, and the caller is still responsible for the buffer.
  */
 STATIC int
-udp_next_pkt_handler(struct sk_buff *skbp)
+udp_next_pkt_handler(struct sk_buff **skbp)
 {
 	if (udp_next_proto != NULL) {
 		struct sk_buff *skb;
@@ -4688,17 +5056,30 @@ udp_next_pkt_handler(struct sk_buff *skbp)
  * the caller is no longer responsible for the buffer; false, when the socket buffer has not been
  * passed, and the caller is still responsible for the buffer.
  */
-STATIC int
-udp_next_err_handler(struct sk_buff *skbp, u32 info)
+STATIC void
+udp_next_err_handler(struct sk_buff **skbp, u32 info)
 {
 	if (udp_next_proto != NULL) {
 		struct sk_buff *skb = *skbp;
 
 		skb = *skbp;
 		*skbp = NULL;
-		return (*udp_next_proto->err_handler) (skb, info);
+		(*udp_next_proto->err_handler) (skb, info);
 	}
-	return (0);
+}
+
+STATIC struct udp *
+udp_lookup(struct udphdr * uh, uint32_t daddr, uint32_t saddr, int dif)
+{
+	fixme(("Write this function."));
+	return (NULL);
+}
+
+STATIC struct udp *
+udp_lookup_icmp(uint16_t source, uint16_t dest, uint32_t saddr, uint32_t daddr)
+{
+	fixme(("Write this function."));
+	return (NULL);
 }
 
 /**
@@ -4720,13 +5101,14 @@ udp_free(char *data)
 STATIC int
 udp_v4_rcv(struct sk_buff *skb)
 {
-	mblk_t *mp;
+	mblk_t *mp = NULL;
 	ushort ulen;
 	struct udp *udp;
 	struct iphdr *iph;
 	struct rtable *rt;
 	struct udphdr *uh, *uh2;
 	frtn_t fr = { &udp_free, (char *) skb };
+	int rtn;
 
 	IP_INC_STATS_BH(IpInDelivers);	/* should wait... */
 
@@ -4739,19 +5121,19 @@ udp_v4_rcv(struct sk_buff *skb)
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
 		/* need to do something about broadcast and multicast */ ;
 
-	UDP_INC_STATS_BH(UdpInUdpPacks);
+	UDP_INC_STATS_BH(UdpInDatagrams);
 	/* pull up the udp header */
 	uh = skb->h.uh;
 	ulen = ntohs(uh->len);
 	/* sanity check UDP length */
-	if (ulen > len || ulen < sizeof(struct udphdr))
+	if (ulen > skb->len || ulen < sizeof(struct udphdr))
 		goto too_small;
 	if (pskb_trim(skb, ulen))
 		goto too_small;
 	/* we do the lookup before the checksum */
 	iph = skb->nh.iph;
 	if (!(udp = udp_lookup(uh, iph->daddr, iph->saddr, skb->dev->ifindex)))
-		goto no_udp_stream;
+		goto no_stream;
 	/* checksum initialization */
 	if (uh->check == 0)
 		skb->ip_summed = CHECKSUM_UNNECESSARY;
@@ -4781,15 +5163,20 @@ udp_v4_rcv(struct sk_buff *skb)
 	UDP_INC_STATS_BH(UdpInDatagrams);
 	udp_put(udp);
 	return (0);
-      no_udp_stream:
+      no_stream:
 	ptrace(("ERROR: No stream\n"));
 	/* Note, if there is nobody to pass it too, we have to complete the checksum check before
 	   dropping it to handle stats correctly. */
-	if (skb->ip_summed != CHECKSUM_UNNECESARY
+	if (skb->ip_summed != CHECKSUM_UNNECESSARY
 	    && (unsigned short) csum_fold(skb_checksum(skb, 0, skb->len, skb->csum)))
 		goto bad_checksum;
 	UDP_INC_STATS_BH(UdpNoPorts);	/* should wait... */
 	goto pass_it;
+      pass_it:
+	rtn = udp_next_pkt_handler(&skb);
+	if (skb == NULL)
+		return (rtn);
+	goto discard_it;
       bad_checksum:
 	UDP_INC_STATS_BH(UdpInErrors);
 	IP_INC_STATS_BH(IpInDiscards);
@@ -4842,7 +5229,7 @@ udp_v4_err(struct sk_buff *skb, u32 info)
 	if (skb->len < (ihl = iph->ihl << 2) + ICMP_MIN_LENGTH)
 		goto drop;
 	uh = (struct udphdr *) (skb->data + ihl);
-	udp = udp_lookup_icmp(udp->source, udp->dest, iph->saddr, iph->daddr);
+	udp = udp_lookup_icmp(uh->source, uh->dest, iph->saddr, iph->daddr);
 	if (udp == NULL)
 		goto no_stream;
 	spin_lock(&udp->qlock);
@@ -4857,7 +5244,7 @@ udp_v4_err(struct sk_buff *skb, u32 info)
 		   message and pass it along. */
 		if (!udp->rq || !canput(udp->rq))
 			goto flow_controlled;
-		if (!(mp = allocb(mlen, BRPI_MED)))
+		if (!(mp = allocb(mlen, BPRI_MED)))
 			goto no_buffers;
 		mp->b_datap->db_type = M_ERROR;
 		*(uint32_t *) mp->b_wptr++ = iph->daddr;
@@ -4882,6 +5269,9 @@ udp_v4_err(struct sk_buff *skb, u32 info)
 	goto discard_and_put;
       no_stream:
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
+	udp_next_err_handler(&skb, info);
+	if (skb == NULL)
+		return;
 	goto drop;
       drop:
 #ifdef HAVE_KINC_LINUX_SNMP_H
@@ -4895,242 +5285,19 @@ udp_v4_err(struct sk_buff *skb, u32 info)
 #endif				/* LINUX */
 
 /*
- *  LOCKING
+ *  Private structure allocation and deallocation.
  */
-STATIC int
-udp_trylockq(queue_t *q)
+STATIC struct udp *
+udp_alloc_priv(queue_t *q, struct udp **udpp, major_t major, minor_t minor, cred_t *crp)
 {
-	int res;
-	struct udp *udp = PRIV(q);
-
-	spin_lock_bh(&udp->qlock);
-	if (!(res = !udp->users++)) {
-		if (q == udp->rq)
-			udp->rwait = q;
-		if (q == udp->wq)
-			udp->wwait = q;
-	}
-	spin_unlock_bh(&udp->qlock);
-	return (res);
+	fixme(("Write this function."));
+	return (NULL);
 }
 STATIC void
-udp_unlockq(queue_t *q)
+udp_free_priv(queue_t *q)
 {
-	struct udp *udp = PRIV(q);
-
-	spin_lock_bh(&udp->qlock);
-	if (udp->rwait)
-		qenable(xchg(&udp->rwait, NULL));
-	if (udp->wwait)
-		qenable(xchg(&udp->wwait, NULL));
-	udp->users = 0;
-	spin_unlock_bh(&udp->qlock);
-}
-
-/*
- *  BUFFER ALLOCATION
- */
-
-/**
- *  udp_bufsrv: - safe bufcalls
- *  @data: opaque client data
- *
- *  Whereas sockets allocate most buffers in user mode, where it is possible
- *  to simply return an error to a system call, the STREAMS driver runs as a
- *  coroutine and there is no (valid) user present.  This is done with
- *  bufcalls.  However, for LiS and a number of other STREAMS implementations,
- *  bufcalls are unsafe.  Here we do reference counting against the STREAMS
- *  private structure when buffer calls are issued and when they complete.
- *  STREAMS private structures will not be deallocated until the buffer calls
- *  are complete.  There are some mi_bufcall() compatibility functions that
- *  accomplish the same ends.  All of this can go away when this driver only
- *  needs to be used with Linux Fast-STREAMS that has safe buffer callbacks.
- */
-STATIC void streamscall
-udp_bufsrv(long data)
-{
-	struct udp *udp;
-	queue_t *q;
-
-	q = (queue_t *) data;
-	ensure(q, return);
-	udp = PRIV(q);
-	ensure(udp, return);
-
-	if (q == udp->rq && xchg(&udp->rbid, 0) != 0)
-		udp_put(udp);
-	if (q == udp->wq && xchg(&udp->wbid, 0) != 0)
-		udp_put(udp);
-	qenable(q);
+	fixme(("Write this function."));
 	return;
-}
-
-/**
- *  udp_unbufcall: - reliably cancel a buffer callback
- *  @q: the queue whose callback to cancel
- *
- *  Cancel a qenable() buffer callback associated with one queue in the queue pair.  udp_unbufcall()
- *  effectively undoes the actions performed by udp_bufcall().
- *
- *  NOTICES: Cancellation of buffer callbacks on LiS using unbufcall() is unreliable.  The callback
- *  function could execute some time shortly after the call to unbufcall() has returned.   LiS
- *  abbrogates the SVR 4 STREAMS principles for unbufcall().  This is why you will find atomic
- *  exchanges here and in the callback function and why reference counting is performed on the
- *  structure and queue pointers are checked for NULL.
- */
-STATIC void
-udp_unbufcall(queue_t *q)
-{
-	struct udp *udp;
-	bufcall_id_t bid;
-
-	ensure(q, return);
-	udp = PRIV(q);
-	ensure(udp, return);
-
-	if (q == udp->rq && (bid = xchg(&udp->rbid, 0))) {
-		unbufcall(bid);
-		udp_put(udp);
-	}
-	if (q == udp->wq && (bid = xchg(&udp->wbid, 0))) {
-		unbufcall(bid);
-		udp_put(udp);
-	}
-	return;
-}
-
-/**
- *  udp_bufcall: - generate a buffer callback to enable a queue
- *  @q: the queue to enable on callback
- *  @size: size of the allocation
- *  @prior: priority of the allocation
- *
- *  Maintain one buffer call for each queue in the queue pair.  The callback function will simply
- *  perform a qenable(9).
- *
- *  NOTICES: One of the reasons for going to such extents is that LiS has completely unsafe buffer
- *  callbacks.  The buffer callback function can be invoked (shortly) after unbufcall() returns
- *  under LiS in abrogation of SVR 4 STREAMS principles.  This is why you will find atomic exchanges
- *  here and in the callback function and why reference counting is performed on the structure and
- *  queue pointers are checked for NULL.
- */
-STATIC void
-udp_bufcall(queue_t *q, size_t size, int prior)
-{
-	struct udp *udp = IP_PRIV(q);
-	bufcall_id_t bid;
-
-	ensure(q, return);
-	udp = IP_PRIV(q);
-	ensure(udp, return);
-	udp_hold(udp);
-	if (q == udp->wq) {
-		if ((bid = xchg(&udp->wbid, bufcall(size, prior, &udp_bufsrv, (long) udp)))) {
-			unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
-			udp_put(udp);
-		}
-		return;
-	}
-	if (q == udp->rq) {
-		if ((bid = xchg(&udp->rbid, bufcall(size, prior, &udp_bufsrv, (long) udp)))) {
-			unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
-			udp_put(udp);
-		}
-		return;
-	}
-	swerr();
-	return;
-}
-
-/**
- *  udp_allocb: - reliable allocb()
- *  @q: the queue to enable when allocation can succeed
- *  @size: the size to allocate
- *  @prior: the priority of the allocation
- *
- *  This helper function can be used by most STREAMS message handling procedures that allocate a
- *  buffer in response to an incoming message.  If the allocation fails, this routine will return
- *  NULL and issue a buffer callback to reenable the queue @q when the allocation could succeed.
- *  When NULL is returned, the caller should simply place the incoming message on the queue (i.e.
- *  with putq() from a put procedure or putbq() from a service procedure) and return.  The queue
- *  will be rescheduled with qenable() when the allocation could succeed.
- */
-STATIC mblk_t *
-udp_allocb(queue_t *q, size_t size, int prior)
-{
-	mblk_t *mp;
-
-	if (!(mp = allocb(size, prior)))
-		udp_bufcall(q, size, prior);
-	return (mp);
-}
-
-/**
- *  udp_allocb: - reliable allocb()
- *  @q: the queue to enable when allocation can succeed
- *  @base: the base of the external data buffer
- *  @size: the size of the external data buffer
- *  @prior: the priority of the allocation
- *  @frtn: a pointer to a free routine structure (containing callback and client data)
- *
- *  This helper function can be used by most STREAMS message handling procedures that allocate a
- *  message block with an external buffer in response to an incoming message.  If the allocation
- *  fails, this routine will return NULL and issue a buffer callback to reenable the queue @q when
- *  the allocation could succeed.  When NULL is returned, the caller should simply place the
- *  incoming message on the queue (i.e.  with putq() from a put procedure or putbq() from a service
- *  procedure) and return.  The queue will be rescheduled with qenable() when the allocation could
- *  succeed.
- */
-STATIC mblk_t *
-udp_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
-{
-	mblk_t *mp;
-
-	if (!(mp = esballoc(base, size, prior, frtn)))
-		udp_bufcall(q, FASTBUF, prior);
-	return (mp);
-}
-
-/**
- *  udp_dupmsg: - reliable dupmsg()
- *  @q: queue to enable when duplication can succeed
- *
- *  This helper function can be used by most STREAMS message handling procedures that duplicate a an
- *  incoming message.  If the allocation fails, this routine will return NULL and issue a buffer
- *  callback to reenable the queue @q when the duplication could succeed.  When NULL is returned,
- *  the caller should simply place the incoming message on the queue (i.e.  with putq() from a put
- *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
- *  qenable() when the duplication could succeed.
- */
-STATIC mblk_t *
-udp_dupmsg(queue_t *q, mblk_t *bp)
-{
-	mblk_t *mp;
-
-	if (!(mp = dupmsg(bp)) && (q != NULL))
-		udp_bufcall(q, FASTBUF, BPRI_MED);
-	return (mp);
-}
-
-/**
- *  udp_dupb: - reliable dupb()
- *  @q: queue to enable when duplication can succeed
- *
- *  This helper function can be used by most STREAMS message handling procedures that duplicate a an
- *  incoming message block.  If the allocation fails, this routine will return NULL and issue a
- *  buffer callback to reenable the queue @q when the duplication could succeed.  When NULL is
- *  returned, the caller should simply place the incoming message on the queue (i.e.  with putq()
- *  from a put procedure or putbq() from a service procedure) and return.  The queue will be
- *  rescheduled with qenable() when the duplication could succeed.
- */
-STATIC mblk_t *
-udp_dupb(queue_t *q, mblk_t *bp)
-{
-	mblk_t *mp;
-
-	if (!(mp = dupb(bp)) && (q != NULL))
-		udp_bufcall(q, FASTBUF, BPRI_MED);
-	return (mp);
 }
 
 /*
@@ -5181,14 +5348,14 @@ udp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 #endif
 		cminor = 1;
 	spin_lock_bh(&udp_lock);
-	for (; *udpp, udpp = &(*udpp)->next) {
+	for (; *udpp; udpp = &(*udpp)->next) {
 		if (cmajor != (*udpp)->cmajor)
 			break;
 		if (cmajor == (*udpp)->cmajor) {
 			if (cminor < (*udpp)->cminor)
 				break;
 			if (cminor == (*udpp)->cminor) {
-				if (++cminor >= NMINOR) {
+				if (++cminor >= UDP_UNITS) {
 					if (+mindex >= UDP_CMAJORS
 					    || !(cmajor = udp_majors[mindex]))
 						break;
@@ -5224,10 +5391,8 @@ udp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 STATIC int
 udp_close(queue_t *q, int flag, cred_t *crp)
 {
-	struct udp *udp = UDP_PRIV(q);
-
-	printd(("%s: closing character device %d:%d\n", DRV_NAME, (int) udp->cmajor,
-		(int) udp->cminor));
+	printd(("%s: closing character device %d:%d\n", DRV_NAME, (int) UDP_PRIV(q)->cmajor,
+		(int) UDP_PRIV(q)->cminor));
 #ifdef LIS
 	/* protect against LiS bugs */
 	if (q->q_ptr == NULL) {
@@ -5277,7 +5442,7 @@ udp_init_caches(void)
 	return;
 }
 
-STATIC struct udp_hash_bucket *udp_bhash;
+STATIC struct udp_bhash_bucket *udp_bhash;
 STATIC size_t udp_bhash_size = 0;
 STATIC size_t udp_bhash_order = 0;
 STATIC void
@@ -5336,7 +5501,7 @@ STATIC void
 udp_term_nproto(void)
 {
 	unsigned char hash = IPPROTO_UDP & (MAX_INET_PROTOS - 1);
-	struct inet_protocol **p = &inet_protosp[hash];
+	struct inet_protocol **p = (struct inet_protocol **)&inet_protosp[hash];
 
 	br_write_lock_bh(BR_NETPROTO_LOCK);
 	while ((*p) != NULL && (*p) != &udp_net_protocol)
@@ -5355,7 +5520,7 @@ STATIC void
 udp_init_nproto(void)
 {
 	unsigned char hash = IPPROTO_UDP & (MAX_INET_PROTOS - 1);
-	struct inet_protocol **p = &inet_protosp[hash];
+	struct inet_protocol **p = (struct inet_protocol **)&inet_protosp[hash];
 
 	br_write_lock_bh(BR_NETPROTO_LOCK);
 	udp_next_proto = (*p);
@@ -5513,6 +5678,11 @@ udpinit(void)
 {
 	int err, mindex = 0;
 
+	(void)udp_unbufcall;
+	(void)udp_esballoc;
+	(void)udp_dupmsg;
+	(void)udp_dupb;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	udp_init_hashes();
 	udp_init_caches();
@@ -5540,5 +5710,12 @@ udpinit(void)
 	}
 	return (0);
 }
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(udpinit);
+module_exit(udpterminate);
 
 #endif				/* LINUX */

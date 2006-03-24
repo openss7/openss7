@@ -2,6 +2,11 @@
 
 	* acinclude.m4: added missing IP_ROUTE_OUTPUT_EXPLICIT
 	* src/drivers/ip.c: corrections for old 2.4 kernel (RH7) build
+	* strxns.spec.in: added send-pr files
+	* NEWS: updated release notes
+	* doc/manual/releases.texi: updated release notes
+	* acinclude.m4: rationalized to strinet
+	* src/drivers/ip.c: 64 bit corrections
 
 2006-03-22  Brian Bidulock  <bidulock@openss7.org>
 

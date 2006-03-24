@@ -1,9 +1,12 @@
-OpenSS7 Linux Native SCTP -- history of user-visible changes.  2006-03-16
+OpenSS7 Linux Native SCTP -- history of user-visible changes.  2006-03-23
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
 * Major changes in sctp-0.2.24
+
+  Added --enable-devel configure option for embedded targets.
+  Added send-pr script for automatic problem report generation.
 
 * Major changes in sctp-0.2.23
 

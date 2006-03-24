@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.17 2006/03/08 11:59:59 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.18 2006/03/24 00:04:22 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/08 11:59:59 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/24 00:04:22 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -473,6 +473,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release LiS-2.18.3::          Release 3
 * Release LiS-2.18.2::          Release 2
 * Release LiS-2.18.1::          Release 1
 * Release LiS-2.16.19::		Release 19
@@ -508,6 +509,13 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @node Release @value{PACKAGE}-@value{VERSION}
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+Added @samp{--enable-devel} @command{configure} option for embedded targets.
+Added @command{send-pr} script for automatic problem report generation.
+
+@node Release LiS-2.18.2
+@subsection Release LiS-2.18.2
+@cindex release LiS-2.18.2
 
 Corrections for and testing of 64-bit clean compile and test runs on x86_64 architecture.  Some bug
 corrections resulting from gcc 4.0.2 compiler warnings.

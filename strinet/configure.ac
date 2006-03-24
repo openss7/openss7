@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/20 13:30:11 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/03/24 00:08:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,21 +47,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 13:30:11 $ by $Author: brian $
+# Last Modified $Date: 2006/03/24 00:08:29 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.21 2006/03/20 13:30:11 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.22 2006/03/24 00:08:29 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strinet],[0.9.2],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
 AC_CONFIG_SRCDIR([strinet.lsm.in])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([config.h src/drivers/udp_hooks.h])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])

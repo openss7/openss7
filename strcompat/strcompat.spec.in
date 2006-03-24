@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.spec.in,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/03/20 11:54:45 $
+# @(#) $RCSfile: strcompat.spec.in,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/24 00:03:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 11:54:45 $ by $Author: brian $
+# Last Modified $Date: 2006/03/24 00:03:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1204,6 +1204,8 @@ package.
 %defattr(-,root,root)
 %{_libexecdir}/%{name}/atlocal
 %{_libexecdir}/%{name}/testsuite*
+%{_libexecdir}/%{name}/send-pr
+%{_libexecdir}/%{name}/send-pr.config
 %endif
 
 # ===========================================================================
@@ -1747,9 +1749,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strcompat.spec.in,v $
-# Revision 0.9.2.28  2006/03/20 11:54:45  brian
-# - tied in --disable-devel flag
+# Revision 0.9.2.29  2006/03/24 00:03:28  brian
+# - added send-pr files to distribution
 #
+
+* Mon Mar 20 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.28  2006/03/20 11:54:45  brian
+- tied in --disable-devel flag
 
 * Tue Mar 14 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.27  2006/03/14 21:09:55  brian

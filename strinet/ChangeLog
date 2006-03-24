@@ -1,3 +1,20 @@
+2006-03-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/rawip.c: added new rawip driver
+	* src/drivers/lis.conf.in: added new rawip driver
+	* Maekfile.am: added new rawip driver
+
+2006-03-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* strinet.spec.in: added send-pr files
+	* NEWS: updated release notes
+	* doc/manual/releases.texi: updated release notes
+	* src/drivers/lis.conf.in: added new udp driver
+	* Makefile.am: added new udp driver
+	* configure.ac: added src/drivers/udp_hooks.h config header
+	* acinclude.m4: rationalized to strxns (added missing checks)
+	* src/drivers/udp.c: first compile pass
+
 2006-03-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/strinet.texi: added makefile target index

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2006/03/20 11:54:47 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2006/03/24 00:03:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 11:54:47 $ by $Author: brian $
+# Last Modified $Date: 2006/03/24 00:03:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1182,6 +1182,8 @@ package.
 %defattr(-,root,root)
 %{_libexecdir}/%{name}/atlocal
 %{_libexecdir}/%{name}/testsuite*
+%{_libexecdir}/%{name}/send-pr
+%{_libexecdir}/%{name}/send-pr.config
 %endif
 
 # ===========================================================================
@@ -1724,9 +1726,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
-# Revision 0.9.2.110  2006/03/20 11:54:47  brian
-# - tied in --disable-devel flag
+# Revision 0.9.2.111  2006/03/24 00:03:28  brian
+# - added send-pr files to distribution
 #
+
+* Mon Mar 20 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.110  2006/03/20 11:54:47  brian
+- tied in --disable-devel flag
 
 * Tue Mar 14 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.109  2006/03/14 21:09:58  brian

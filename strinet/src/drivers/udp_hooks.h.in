@@ -1,0 +1,251 @@
+/*****************************************************************************
+
+ @(#) $Id: udp_hooks.h.in,v 0.9.2.1 2006/03/24 00:08:29 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/03/24 00:08:29 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: udp_hooks.h.in,v $
+ Revision 0.9.2.1  2006/03/24 00:08:29  brian
+ - added second generation udp driver
+
+ Revision 0.9.2.1  2006/03/18 09:39:20  brian
+ - added ip driver headers
+
+ *****************************************************************************/
+
+#ifndef __LOCAL_UDP_HOOKS_H__
+#define __LOCAL_UDP_HOOKS_H__
+
+#ident "@(#) $RCSfile: udp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+
+#undef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
+#ifndef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
+#define _SS_MAXSIZE 128
+#define _SS_ALIGNSIZE (__alignof__ (struct sockaddr *))
+struct sockaddr_storage {
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+} __attribute__ ((aligned(_SS_ALIGNSIZE)));
+#endif
+
+#undef HAVE_ICMP_ERR_CONVERT_ADDR
+extern struct icmp_err icmp_err_convert[];
+#ifdef HAVE_ICMP_ERR_CONVERT_ADDR
+struct icmp_err *icmp_err_convert___ = (void *) HAVE_ICMP_ERR_CONVERT_ADDR;
+#define icmp_err_convert icmp_err_convert___
+#endif
+
+#undef HAVE_ICMP_STATISTICS_ADDR
+extern struct icmp_mib icmp_statistic[];
+#ifdef HAVE_ICMP_STATISTICS_ADDR
+struct icmp_mib *icmp_statistic___ = (void *) HAVE_ICMP_STATISTICS_ADDR;
+#define icmp_statistics icmp_statistic___
+#endif
+
+#undef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
+/* this was already declared and referenced by an inline (ip_route_connect) so
+   it must be a function and not a macro */
+int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags)
+{
+	int (*func) (struct rtable ** rp, struct flowi * flp, struct sock * sk, int flags)
+	= (typeof(func)) HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR;
+	return (*func) (rp, flp, sk, flags);
+}
+#endif
+
+#undef HAVE_IP_RT_MIN_PMTU_ADDR
+extern int ip_rt_min_pmtu;
+#ifdef HAVE_IP_RT_MIN_PMTU_ADDR
+#define ip_rt_min_pmtu (*((typeof(ip_rt_min_pmtu) *)HAVE_IP_RT_MIN_PMTU_ADDR))
+#endif
+
+#undef HAVE_IP_RT_MTU_EXPIRES_ADDR
+extern int ip_rt_mtu_expires;
+#ifdef HAVE_IP_RT_MTU_EXPIRES_ADDR
+#define ip_rt_mtu_expires (*((typeof(ip_rt_mtu_expires) *)HAVE_IP_RT_MTU_EXPIRES_ADDR))
+#endif
+
+#undef HAVE_IP_RT_UPDATE_PMTU_ADDR
+#ifdef HAVE_IP_RT_UPDATE_PMTU_ADDR
+void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
+#define ip_rt_update_pmtu (*((typeof(ip_rt_update_pmtu) *) HAVE_IP_RT_UPDATE_PMTU_ADDR))
+#endif
+
+#undef HAVE_SYSCTL_IP_DYNADDR_ADDR
+extern int sysctl_ip_dynaddr;
+#ifdef HAVE_SYSCTL_IP_DYNADDR_ADDR
+#define sysctl_ip_dynaddr (*((typeof(sysctl_ip_dynaddr) *)HAVE_SYSCTL_IP_DYNADDR_ADDR))
+#endif
+
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
+extern int sysctl_ip_nonlocal_bind;
+#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
+#define sysctl_ip_nonlocal_bind (*((typeof(sysctl_ip_nonlocal_bind) *)HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR))
+#endif
+
+#undef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
+#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
+/* this was already declared and referenced by an inline (ip_route_connect) so
+   it must be a function and not a macro */
+int __ip_route_output_key(struct rtable **rp, const struct flowi *flp)
+{
+	int (*func) (struct rtable ** rp, const struct flowi * flp)
+	= (typeof(func)) HAVE___IP_ROUTE_OUTPUT_KEY_ADDR;
+	return (*func) (rp, flp);
+}
+#endif
+
+#if 0
+#undef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
+#ifdef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
+/* dst_pmtu should be already defined */
+static void dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
+{
+	if (dst->ops->update_pmtu)
+		dst->ops->update_pmtu(dst, mtu);
+}
+#else
+#ifndef dst_pmtu
+static __inline__ u32 dst_pmtu(struct dst_entry *dst)
+{
+	return (dst->pmtu);
+}
+#endif
+static void dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
+{
+	dst->pmtu = mtu;
+}
+#endif
+#endif
+
+#undef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
+#ifndef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
+static __inline__ int ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
+{
+	struct flowi fl = {.oif = oif,
+		.nl_u = {.ip4_u = {.daddr = daddr,
+				   .saddr = saddr,
+				   .tos = tos}},
+		.proto = IPPROTO_SCTP,
+		.uli_u = {.ports = {.sport = 0,.dport = 0}}
+	};
+	return ip_route_output_key(rp, &fl);
+}
+#endif
+
+#undef HAVE___XFRM_POLICY_CHECK_ADDR
+#ifdef HAVE___XFRM_POLICY_CHECK_ADDR
+int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned short family);
+#define __xfrm_policy_check (*((typeof(__xfrm_policy_check) *) HAVE___XFRM_POLICY_CHECK_ADDR))
+#endif
+
+#undef HAVE_XFRM_POLICY_DELETE_ADDR
+#ifdef HAVE_XFRM_POLICY_DELETE_ADDR
+void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+#define xfrm_policy_delete (*((typeof(xfrm_policy_delete) *) HAVE_XFRM_POLICY_DELETE_ADDR))
+#endif
+
+#undef HAVE_SNMP_GET_INFO_ADDR
+#ifdef HAVE_SNMP_GET_INFO_ADDR
+int snmp_get_info(char *buffer, char **start, off_t offset, int length);
+#define snmp_get_info (*((typeof(snmp_get_info) *) HAVE_SNMP_GET_INFO_ADDR))
+#endif
+
+#undef HAVE_RAW_PROT_ADDR
+extern struct proto raw_prot;
+#ifdef HAVE_RAW_PROT_ADDR
+#define raw_prot (*((typeof(raw_prot) *)HAVE_RAW_PROT_ADDR))
+#endif
+
+#undef HAVE_IP_FRAG_NQUEUES_ADDR
+extern int ip_frag_nqueues;
+#ifdef HAVE_IP_FRAG_NQUEUES_ADDR
+#define ip_frag_nqueues (*((typeof(ip_frag_nqueues) *)HAVE_IP_FRAG_NQUEUES_ADDR))
+#endif
+
+#undef HAVE_IP_FRAG_MEM_ADDR
+extern atomic_t ip_frag_mem;
+#ifdef HAVE_IP_FRAG_MEM_ADDR
+#define ip_frag_mem (*((typeof(ip_frag_mem) *)HAVE_IP_FRAG_MEM_ADDR))
+#endif
+
+#ifndef SK_WMEM_MAX
+#define SK_WMEM_MAX 65535
+#endif
+#ifndef SK_RMEM_MAX
+#define SK_RMEM_MAX 65535
+#endif
+
+#undef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
+#ifndef sysctl_rmem_default
+#ifdef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
+static __u32 *const _sysctl_rmem_default_location =
+	(typeof(_sysctl_rmem_default_location)) (HAVE_SYSCTL_RMEM_DEFAULT_ADDR);
+#define sysctl_rmem_default (*_sysctl_rmem_default_location)
+#else
+#define sysctl_rmem_default SK_RMEM_MAX
+#endif
+#endif
+
+#undef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
+#ifndef sysctl_wmem_default
+#ifdef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
+static __u32 *const _sysctl_wmem_default_location =
+	(typeof(_sysctl_wmem_default_location)) (HAVE_SYSCTL_WMEM_DEFAULT_ADDR);
+#define sysctl_wmem_default (*_sysctl_wmem_default_location)
+#else
+#define sysctl_wmem_default SK_WMEM_MAX
+#endif
+#endif
+
+#ifndef socklen_t
+typedef int socklen_t;
+#define socklen_t socklen_t
+#endif
+
+#endif				/* __LOCAL_UDP_HOOKS_H__ */

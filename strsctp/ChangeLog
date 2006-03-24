@@ -1,6 +1,9 @@
 2006-03-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: rationalized to strxns
+	* strsctp.spec.in: added send-pr files
+	* NEWS: updated release notes
+	* doc/manual/releases.texi: updated release notes
 
 2006-03-22  Brian Bidulock  <bidulock@openss7.org>
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/03/21 13:24:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/03/24 06:16:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:24:41 $ by $Author: brian $
+# Last Modified $Date: 2006/03/24 06:16:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.56  2006/03/24 06:16:37  brian
+# - added next generation rawip driver
+#
+# Revision 0.9.2.55  2006/03/24 00:08:29  brian
+# - added second generation udp driver
+#
 # Revision 0.9.2.54  2006/03/21 13:24:41  brian
 # - included pr.am
 #
@@ -149,13 +155,16 @@ noinst_LIBRARIES		= libINETmods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libINETmods_a_SOURCES = \
-				  src/drivers/inet.c
+				  src/drivers/inet.c \
+				  src/drivers/rawip.c \
+				  src/drivers/udp.c \
+				  src/drivers/udp_hooks.h
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 
 nodist_libINETmods_a_SOURCES	= $(mods_source_FILES)
 
-libINETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libINETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/udp_hooks.h
 libINETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -234,13 +243,16 @@ noinst_LIBRARIES		= libINETmods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libINETmods_a_SOURCES	= \
-				  src/drivers/inet.c
+				  src/drivers/inet.c \
+				  src/drivers/rawip.c \
+				  src/drivers/udp.c \
+				  src/drivers/udp_hooks.h
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 
 nodist_libINETmods_a_SOURCES	= $(mods_source_FILES)
 
-libINETmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libINETmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H) src/drivers/udp_hooks.h
 libINETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
