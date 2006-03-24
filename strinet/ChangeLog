@@ -1,5 +1,16 @@
 2006-03-24  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/strinet.refs: updated LiS and STREAMS release numbers
+	* doc/man/Makefile.am: added manpages for new udp and rawip drivers
+	* doc/man/man4/rawip.4.man: added manpages for new udp and rawip drivers
+	* doc/man/man4/rawip2.4.man: added manpages for new udp and rawip drivers
+	* doc/man/man4/tcp.4.man: added manpages for new udp and rawip drivers
+	* doc/man/man4/udp.4.man: added manpages for new udp and rawip drivers
+	* doc/man/man4/udp2.4.man: added manpages for new udp and rawip drivers
+	* strinet.spec.in (%package test): described send-pr
+
+2006-03-24  Brian Bidulock  <bidulock@openss7.org>
+
 	* src/drivers/rawip.c: added new rawip driver
 	* src/drivers/lis.conf.in: added new rawip driver
 	* Maekfile.am: added new rawip driver

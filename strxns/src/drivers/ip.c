@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/23 12:16:16 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/24 05:10:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/23 12:16:16 $ by $Author: brian $
+ Last Modified $Date: 2006/03/24 05:10:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.12  2006/03/24 05:10:08  brian
+ - 64-bit corrections
+
  Revision 0.9.2.11  2006/03/23 12:16:16  brian
  - changes for old 2.4 kernel (RH7) build
 
@@ -86,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/23 12:16:16 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/24 05:10:08 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/23 12:16:16 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/24 05:10:08 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -138,7 +141,7 @@ static char const ident[] =
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/23 12:16:16 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/24 05:10:08 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -1752,9 +1755,9 @@ n_optmgmt_req(queue_t *q, mblk_t *mp)
 			goto badopt2;
 	}
 	if (p->QOS_length) {
-		if (qos->tos != -1UL)
+		if (qos->tos != -1)
 			ip->tos = qos->tos;
-		if (qos->ttl != -1UL)
+		if (qos->ttl != -1)
 			ip->ttl = qos->ttl;
 	}
 	if (p->OPTMGMT_flags & DEFAULT_RC_SEL)
