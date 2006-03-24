@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/24 04:58:00 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/24 16:03:26 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/24 04:58:00 $ by $Author: brian $
+ Last Modified $Date: 2006/03/24 16:03:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.4  2006/03/24 16:03:26  brian
+ - changes for x86_64 2.6.15 compile, working up udp
+
  Revision 0.9.2.3  2006/03/24 04:58:00  brian
  - first compile pass
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/24 04:58:00 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/24 16:03:26 $"
 
-static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/24 04:58:00 $";
+static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/24 16:03:26 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -135,7 +138,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.3 $)
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/24 04:58:00 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/24 16:03:26 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -437,7 +440,7 @@ typedef struct udp {
 #define UDP_PRIV(__q) ((struct udp *)((__q)->q_ptr))
 
 STATIC struct udp *udp_opens = NULL;
-STATIC spinlock_t udp_lock = SPIN_LOCK_UNLOCKED;
+STATIC rwlock_t udp_lock = RW_LOCK_UNLOCKED;
 
 STATIC queue_t *npi_bottom = NULL;
 
@@ -2152,6 +2155,11 @@ t_build_current_options(const struct udp * t, const unsigned char *ip, size_t il
 	return (-EFAULT);
 }
 
+#ifdef __LP64__
+#undef MAX_SCHEDULE_TIMEOUT
+#define MAX_SCHEDULE_TIMEOUT INT_MAX
+#endif
+
 /**
  * t_build_check_options: - built output options for T_CHECK
  * @t: private structure
@@ -3067,6 +3075,7 @@ n_bind_req(queue_t *q, struct sockaddr *add, socklen_t add_len, np_ulong conind,
 	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	N_bind_req_t *p;
+	queue_t *wq = udp->wq->q_next ? udp->wq : npi_bottom;
 
 	if ((mp = udp_allocb(q, sizeof(*p) + add_len + 1, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
@@ -3086,10 +3095,7 @@ n_bind_req(queue_t *q, struct sockaddr *add, socklen_t add_len, np_ulong conind,
 		*(unsigned char *) mp->b_wptr++ = IPPROTO_UDP;
 		npi_set_state(udp, NS_WACK_BREQ);
 		printd(("%s: %p: N_BIND_REQ ->\n", DRV_NAME, udp));
-		if (udp->wq->q_next)
-			putnext(udp->wq, mp);
-		else
-			put(npi_bottom, mp);
+		putnext(wq, mp);
 		return (0);
 	}
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
@@ -3106,6 +3112,7 @@ n_unbind_req(queue_t *q)
 	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	N_unbind_req_t *p;
+	queue_t *wq = udp->wq->q_next ? udp->wq : npi_bottom;
 
 	if ((mp = udp_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
@@ -3114,10 +3121,7 @@ n_unbind_req(queue_t *q)
 		mp->b_wptr += sizeof(*p);
 		npi_set_state(udp, NS_WACK_UREQ);
 		printd(("%s: %p: N_UNBIND_REQ ->\n", DRV_NAME, udp));
-		if (udp->wq->q_next)
-			putnext(udp->wq, mp);
-		else
-			put(npi_bottom, mp);
+		putnext(wq, mp);
 		return (0);
 	}
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
@@ -3140,10 +3144,10 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	N_unitdata_req_t *p;
+	queue_t *wq = udp->wq->q_next ? udp->wq : npi_bottom;
 
-	if (udp->wq->q_next != NULL || npi_bottom != NULL) {
-		if ((udp->wq->q_next != NULL && canputnext(udp->wq)) ||
-		    (npi_bottom != NULL && canput(npi_bottom))) {
+	if (wq != NULL) {
+		if (bcanputnext(wq, mp->b_band)) {
 			if ((mp = udp_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 				mp->b_datap->db_type = M_PROTO;
 				p = (typeof(p)) mp->b_wptr;
@@ -3163,10 +3167,7 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 				}
 				mp->b_cont = dp;
 				printd(("%s: %p: N_UNITDATA_REQ ->\n", DRV_NAME, udp));
-				if (udp->wq->q_next)
-					putnext(udp->wq, mp);
-				else
-					put(npi_bottom, mp);
+				putnext(wq, mp);
 				return (0);
 			}
 			ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
@@ -3247,8 +3248,9 @@ STATIC int
 udp_xmitmsg(queue_t *q, mblk_t *mp, struct udp_options *opts)
 {
 	struct udp *udp = UDP_PRIV(q);
+	queue_t *wq = udp->wq->q_next ? udp->wq : npi_bottom;
 
-	if (q->q_next != NULL || npi_bottom != NULL) {
+	if (wq != NULL) {
 		int rtn;
 		struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
 		struct sockaddr *src = NULL, *dst;
@@ -3558,7 +3560,7 @@ t_unitdata_ind(queue_t *q, mblk_t *dp)
 		if (src_len) {
 			struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
 			struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
-			struct udphdr *uh = (typeof(uh)) (mp->b_datap->db_base + (iph->ihl << 2));
+			struct udphdr *uh = (typeof(uh)) (dp->b_datap->db_base + (iph->ihl << 2));
 
 			sin->sin_family = AF_INET;
 			sin->sin_port = uh->source;
@@ -4329,7 +4331,7 @@ n_unitdata_ind(queue_t *q, mblk_t *mp)
 	rtn = t_unitdata_ind(q, mp->b_cont);
 	if (rtn == QR_DONE) {
 		freeb(mp);
-		return (QR_DONE);
+		return (QR_ABSORBED);
 	}
 	return (rtn);
 }
@@ -4347,7 +4349,7 @@ n_uderror_ind(queue_t *q, mblk_t *mp)
 	rtn = t_uderror_ind(q, mp->b_cont);
 	if (rtn == QR_DONE) {
 		freeb(mp);
-		return (QR_DONE);
+		return (QR_ABSORBED);
 	}
 	return (rtn);
 }
@@ -4363,6 +4365,110 @@ n_other_ind(queue_t *q, mblk_t *mp)
 	return (-EOPNOTSUPP);
 }
 
+/*
+ *  NPI IP Provider -> UDP Provider messages.
+ */
+
+/**
+ * l_unidata_ind: - process N_UNITDATA_IND from linked NPI IP provider
+ * @q: active queue in queue pair (read queue)
+ * @mp: the N_UNITDATA_IND message
+ *
+ * N_UNITDATA_IND messages are passed from a linked NPI IP provider.  They are processed similar to
+ * IP messages incoming in udp_v4_rcv().  The data block contains the IP header, UDP header and UDP
+ * payload starting at mp->b_cont->b_datap->db_base.  The UDP message payload starts at
+ * mp->b_cont->b_rptr.  This function extracts IP header information and uses it to create options.
+ *
+ * LOCKING: Holding udp_lock protects against the upper stream closing.  udp->qlock protects the
+ * state of the private structure.  udp->refs protects the structure from being deallocated.
+ */
+STATIC int
+l_unitdata_ind(queue_t *q, mblk_t *mp)
+{
+	struct udp *udp;
+	mblk_t *dp = mp->b_cont;
+	struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
+	struct udphdr *uh = (typeof(uh)) (dp->b_datap->db_base + (iph->ihl << 2));
+
+	read_lock_bh(&udp_lock);
+	udp = udp_lookup(uh->dest, uh->source, iph->daddr, iph->saddr);
+	if (udp == NULL)
+		goto no_stream;
+	spin_lock_bh(&udp->qlock);
+	if (tpi_get_state(udp) != TS_IDLE)
+		goto outstate;
+	if (canput(udp->rq, mp)) {
+		put(udp->rq, mp);
+		return (QR_ABSORBED);
+	}
+	/* Note: when flow control subsides, the upper read queue must backenable the lower read
+	   queue for this to work.  Another possibility is to simply discard the message. */
+	return (-EBUSY);
+      no_stream:
+	read_unlock_bh(&udp_lock);
+	/* When there is no Stream associated with the message, we want the NPI IP driver to still
+	   be able to pass the message along to another protocol, so we return it as an M_CTL
+	   message.  Note that we do not check for flow control. */
+	mp->b_datap->db_type = M_CTL;
+	qreply(q, mp);
+	return (QR_ABSORBED);
+      outstate:
+	spin_unlock_bh(&udp->qlock);
+	udp_put(udp);
+	read_unlock_bh(&udp_lock);
+	/* discard */
+	return (QR_DONE);
+}
+
+/**
+ * l_uderror_ind: - process N_UDERROR_IND from linked NPI IP provider
+ * @q: active queue in queue pair (read queue)
+ * @mp: the N_UDERROR_IND message
+ *
+ * N_UDERROR_IND messages are passed from a linked NPI IP provider.  They are processed similar to
+ * ICMP messages incoming in udp_v4_err().
+ */
+STATIC int
+l_uderror_ind(queue_t *q, mblk_t *mp)
+{
+	struct udp *udp;
+	mblk_t *dp = mp->b_cont;
+	struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
+	struct udphdr *uh = (typeof(uh)) (dp->b_datap->db_base + (iph->ihl << 2));
+
+	udp = udp_lookup_icmp(uh->source, uh->dest, iph->saddr, iph->daddr);
+	if (udp == NULL)
+		goto no_stream;
+	if (canput(udp->rq, mp)) {
+		put(udp->rq, mp);
+		return (QR_ABSORBED);
+	}
+	/* Note: when flow control subsides, the upper read queue must backenable the lower read
+	   queue for this to work.  Another possibility is to simply discard the message. */
+	return (-EBUSY);
+      no_stream:
+	/* When there is no Stream associated with the message, we want the NPI IP driver to still
+	   be able to pass the message along to another protocol, so we return it as an M_CTL
+	   message.  Note that we do not check for flow control. */
+	mp->b_datap->db_type = M_CTL;
+	qreply(q, mp);
+	return (QR_ABSORBED);
+}
+
+/**
+ * l_other_ind: - process unsupported indication from linked NPI IP provider
+ * @q: active queue in queue pair (read queue)
+ * @mp: the message
+ *
+ * Unexpected message.
+ */
+STATIC int
+l_other_ind(queue_t *q, mblk_t *mp)
+{
+	swerr();
+	/* discard it */
+	return (QR_DONE);
+}
 /*
  *  STREAMS MESSAGE HANDLING
  */
@@ -4663,18 +4769,40 @@ udp_w_prim(queue_t *q, mblk_t *mp)
 	return (-EOPNOTSUPP);
 }
 
-STATIC int
-mux_w_proto(queue_t *q, mblk_t *mp)
-{
-	fixme(("Write this function."));
-	return (-EFAULT);
-}
-
+/**
+ * mux_r_proto: - process an M_PROTO message on the lower read queue
+ * @q: active queue in queue pair (read queue)
+ * @mp: the M_PROTO, M_PCPROTO message
+ *
+ * M_PROTO, M_PCPROTO messages are placed on the lower read queue by an NPI IP Stream linked beneath
+ * the UDP multiplexing driver.  These are NPI message that have not yet been associated with a
+ * Stream.  This function performs a similar function to that of the udp_v4_rcv() function.
+ */
 STATIC int
 mux_r_proto(queue_t *q, mblk_t *mp)
 {
-	fixme(("Write this function."));
-	return (-EFAULT);
+	int rtn;
+	np_ulong prim;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(prim))
+		goto eproto;
+	switch ((prim = *((np_ulong *) mp->b_rptr))) {
+	case N_UNITDATA_IND:
+		rtn = l_unitdata_ind(q, mp);
+		break;
+	case N_UDERROR_IND:
+		rtn = l_uderror_ind(q, mp);
+		break;
+	case N_BIND_ACK:
+	case N_OK_ACK:
+	case N_ERROR_ACK:
+	default:
+		rtn = l_other_ind(q, mp);
+		break;
+	}
+	return (rtn);
+      eproto:
+	return (-EPROTO);
 }
 
 /**
@@ -4718,11 +4846,8 @@ mux_w_prim(queue_t *q, mblk_t *mp)
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		return udp_w_flush(q, mp);
-	case M_PROTO:
-	case M_PCPROTO:
-		return mux_w_proto(q, mp);
 	}
-	return (-EOPNOTSUPP);
+	return (QR_PASSFLOW);
 }
 
 /**
@@ -4929,6 +5054,47 @@ udp_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_
 }
 
 /**
+ * udp_rwake: - an upper read queue has awoken
+ * @q: active queue in the queue pair (read queue)
+ *
+ * The upper read queue service procudure is invoked only by back enabling (because we do not ever
+ * place any message on the upper read queue but always put them to the next read queue).  When
+ * invoked, we need to manually enable any lower multiplex (NPI IP) read queue.  This permits flow
+ * control to work across the multiplexing driver.
+ */
+STATIC void
+udp_rwake(queue_t *q)
+{
+	read_lock_bh(&udp_lock);
+	if (npi_bottom != NULL)
+		/* There is an NPI IP Stream linked under the driver. */
+		qenable(RD(npi_bottom));
+	read_unlock_bh(&udp_lock);
+}
+
+/**
+ * mux_wwake: - the lower write queue has awoken
+ * @q: active queue in queue pair (write queue)
+ *
+ * The lower write service procedure is used merely for backenabling across the multiplexing driver.
+ * We never put messages to the lower write queue, but put them to the next queue below the lower
+ * write queue.  When a bcanput() fails on the next queue to thelower write queue, a back enable
+ * will invoke the lower write queue service procedure which can then be used to explicitly enable
+ * the upper write queue(s) feeding the lower write queue.  This permits flow control to work across
+ * the multiplexing driver.
+ */
+STATIC void
+mux_wwake(queue_t *q)
+{
+	struct udp *top;
+
+	read_lock_bh(&udp_lock);
+	for (top = udp_opens; top; top = top->next)
+		qenable(top->wq);
+	read_unlock_bh(&udp_lock);
+}
+
+/**
  * udp_rput: - read side put procedure
  * @q: queue to put message to
  * @mp: message to put
@@ -4946,7 +5112,7 @@ udp_rput(queue_t *q, mblk_t *mp)
 STATIC streamscall int
 udp_rsrv(queue_t *q)
 {
-	return udp_srvq(q, &udp_r_prim, NULL);
+	return udp_srvq(q, &udp_r_prim, udp_rwake);
 }
 
 /**
@@ -4984,6 +5150,10 @@ mux_rput(queue_t *q, mblk_t *mp)
 /**
  * mux_rsrv: - read side service procedure
  * @q: queue to service
+ *
+ * If the lower read put procedure encounters flow control on the queue beyond the accepting upper
+ * read queue, it places the message back on its qeue and waits for the upper read queue service
+ * procedure to enable it when congestion is cleared, or when a connection is formed.
  */
 STATIC streamscall int
 mux_rsrv(queue_t *q)
@@ -5069,14 +5239,14 @@ udp_next_err_handler(struct sk_buff **skbp, u32 info)
 }
 
 STATIC struct udp *
-udp_lookup(struct udphdr * uh, uint32_t daddr, uint32_t saddr, int dif)
+udp_lookup(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
 {
 	fixme(("Write this function."));
 	return (NULL);
 }
 
 STATIC struct udp *
-udp_lookup_icmp(uint16_t source, uint16_t dest, uint32_t saddr, uint32_t daddr)
+udp_lookup_icmp(uint16_t sport, uint16_t dport, uint32_t saddr, uint32_t daddr)
 {
 	fixme(("Write this function."));
 	return (NULL);
@@ -5110,7 +5280,7 @@ udp_v4_rcv(struct sk_buff *skb)
 	frtn_t fr = { &udp_free, (char *) skb };
 	int rtn;
 
-	IP_INC_STATS_BH(IpInDelivers);	/* should wait... */
+//	IP_INC_STATS_BH(IpInDelivers);	/* should wait... */
 
 	if (!pskb_may_pull(skb, sizeof(struct udphdr)))
 		goto too_small;
@@ -5121,7 +5291,7 @@ udp_v4_rcv(struct sk_buff *skb)
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
 		/* need to do something about broadcast and multicast */ ;
 
-	UDP_INC_STATS_BH(UdpInDatagrams);
+//	UDP_INC_STATS_BH(UdpInDatagrams);
 	/* pull up the udp header */
 	uh = skb->h.uh;
 	ulen = ntohs(uh->len);
@@ -5132,7 +5302,8 @@ udp_v4_rcv(struct sk_buff *skb)
 		goto too_small;
 	/* we do the lookup before the checksum */
 	iph = skb->nh.iph;
-	if (!(udp = udp_lookup(uh, iph->daddr, iph->saddr, skb->dev->ifindex)))
+	read_lock(&udp_lock);
+	if (!(udp = udp_lookup(uh->dest, uh->source, iph->daddr, iph->saddr)))
 		goto no_stream;
 	/* checksum initialization */
 	if (uh->check == 0)
@@ -5160,17 +5331,19 @@ udp_v4_rcv(struct sk_buff *skb)
 	skb->dev = NULL;
 	if (!udp->rq || !canput(udp->rq) || !putq(udp->rq, mp))
 		goto flow_controlled;
-	UDP_INC_STATS_BH(UdpInDatagrams);
+//	UDP_INC_STATS_BH(UdpInDatagrams);
 	udp_put(udp);
+	read_unlock(&udp_lock);
 	return (0);
       no_stream:
+	read_unlock(&udp_lock);
 	ptrace(("ERROR: No stream\n"));
 	/* Note, if there is nobody to pass it too, we have to complete the checksum check before
 	   dropping it to handle stats correctly. */
 	if (skb->ip_summed != CHECKSUM_UNNECESSARY
 	    && (unsigned short) csum_fold(skb_checksum(skb, 0, skb->len, skb->csum)))
 		goto bad_checksum;
-	UDP_INC_STATS_BH(UdpNoPorts);	/* should wait... */
+//	UDP_INC_STATS_BH(UdpNoPorts);	/* should wait... */
 	goto pass_it;
       pass_it:
 	rtn = udp_next_pkt_handler(&skb);
@@ -5178,8 +5351,8 @@ udp_v4_rcv(struct sk_buff *skb)
 		return (rtn);
 	goto discard_it;
       bad_checksum:
-	UDP_INC_STATS_BH(UdpInErrors);
-	IP_INC_STATS_BH(IpInDiscards);
+//	UDP_INC_STATS_BH(UdpInErrors);
+//	IP_INC_STATS_BH(IpInDiscards);
 	/* decrement IpInDelivers ??? */
 	udp_put(udp);
 	goto free_it;
@@ -5190,6 +5363,7 @@ udp_v4_rcv(struct sk_buff *skb)
 	goto discard_it;
       linear_fail:
 	udp_put(udp);
+	read_unlock(&udp_lock);
 	goto discard_it;
       bad_pkt_type:
 	goto discard_it;
@@ -5198,13 +5372,16 @@ udp_v4_rcv(struct sk_buff *skb)
 	return (0);
       flow_controlled:
 	udp_put(udp);
+	read_unlock(&udp_lock);
 	goto free_it;
       sanity:
 	udp_put(udp);
+	read_unlock(&udp_lock);
 	goto free_it;
       no_buffers:
 	ptrace(("ERROR: Could not allocate mblk\n"));
 	udp_put(udp);
+	read_unlock(&udp_lock);
 	goto discard_it;
 }
 
@@ -5216,6 +5393,10 @@ udp_v4_rcv(struct sk_buff *skb)
  * This function is a network protocol callback that is invoked when transport specific ICMP errors
  * are received.  The function looks up the Stream and, if found, wraps the packet in an M_ERROR
  * message and passes it to the read queue of the Stream.
+ *
+ * LOCKING: udp_lock protects the master list and protects from open, close, link and unlink.
+ * udp->qlock protects the state of private structure.  udp->refs protects the private structure
+ * from being deallocated before locking.
  */
 STATIC void
 udp_v4_err(struct sk_buff *skb, u32 info)
@@ -5229,6 +5410,7 @@ udp_v4_err(struct sk_buff *skb, u32 info)
 	if (skb->len < (ihl = iph->ihl << 2) + ICMP_MIN_LENGTH)
 		goto drop;
 	uh = (struct udphdr *) (skb->data + ihl);
+	read_lock(&udp_lock);
 	udp = udp_lookup_icmp(uh->source, uh->dest, iph->saddr, iph->daddr);
 	if (udp == NULL)
 		goto no_stream;
@@ -5249,26 +5431,29 @@ udp_v4_err(struct sk_buff *skb, u32 info)
 		mp->b_datap->db_type = M_ERROR;
 		*(uint32_t *) mp->b_wptr++ = iph->daddr;
 		*(struct icmphdr *) mp->b_wptr++ = *skb->h.icmph;
-		if (!putq(udp->rq, mp))
-			freemsg(mp);
-		goto discard_and_put;
-	      no_buffers:
-		ptrace(("ERROR: could not allocate buffer\n"));
-		goto discard_and_put;
-	      flow_controlled:
-		ptrace(("ERROR: stream is flow controlled\n"));
-		goto discard_and_put;
+		putq(udp->rq, mp);
+		goto unlock_discard_put;
 	}
 	goto discard_and_put;
-      discard_and_put:
+      unlock_discard_put:
 	spin_unlock(&udp->qlock);
+	goto discard_and_put;
+      discard_and_put:
 	udp_put(udp);
+	read_unlock(&udp_lock);
 	return;
+      no_buffers:
+	ptrace(("ERROR: could not allocate buffer\n"));
+	goto unlock_discard_put;
+      flow_controlled:
+	ptrace(("ERROR: stream is flow controlled\n"));
+	goto unlock_discard_put;
       closed:
 	ptrace(("ERROR: ICMP for closed stream\n"));
-	goto discard_and_put;
+	goto unlock_discard_put;
       no_stream:
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
+	read_unlock(&udp_lock);
 	udp_next_err_handler(&skb, info);
 	if (skb == NULL)
 		return;
@@ -5347,7 +5532,7 @@ udp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = 1;
-	spin_lock_bh(&udp_lock);
+	write_lock_bh(&udp_lock);
 	for (; *udpp; udpp = &(*udpp)->next) {
 		if (cmajor != (*udpp)->cmajor)
 			break;
@@ -5367,17 +5552,17 @@ udp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	if (mindex >= UDP_CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
-		spin_unlock_bh(&udp_lock);
+		write_unlock_bh(&udp_lock);
 		return (ENXIO);
 	}
 	printd(("%s: opened character device %d:%d\n", DRV_NAME, camjor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(udp = udp_alloc_priv(q, udpp, cmajor, cminor, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
-		spin_unlock_bh(&udp_lock);
+		write_unlock_bh(&udp_lock);
 		return (ENOMEM);
 	}
-	spin_unlock_bh(&udp_lock);
+	write_unlock_bh(&udp_lock);
 	qprocson(q);
 	return (0);
 }
@@ -5529,7 +5714,10 @@ udp_init_nproto(void)
 }
 #elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 struct net_protocol udp_net_protocol = {
+#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
+	/* 2.6.15 is different */
 	.proto = IPPROTO_UDP,
+#endif
 	.handler = &udp_v4_rcv,
 	.err_handler = &udp_v4_err,
 	.no_policy = 1,

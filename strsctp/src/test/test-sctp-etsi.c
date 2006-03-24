@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/24 16:03:48 $
+ @(#) $RCSfile: test-sctp-etsi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/24 16:02:43 $
 
  -----------------------------------------------------------------------------
 
@@ -59,143 +59,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/24 16:03:48 $ by $Author: brian $
+ Last Modified $Date: 2006/03/24 16:02:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: test-inet_sctp.c,v $
- Revision 0.9.2.21  2006/03/24 16:03:48  brian
- - rationalized to strsctp package
-
- Revision 0.9.2.20  2006/02/23 11:10:11  brian
- - 64bit changes for x86_64
- - suppress lockf because it doesn't work too well on SMP
-
- Revision 0.9.2.19  2005/12/28 10:00:37  brian
- - remove warnings on FC4 compile
-
- Revision 0.9.2.18  2005/07/18 12:47:53  brian
- - standard indentation
-
- Revision 0.9.2.17  2005/06/28 03:18:49  brian
- - upgrading test suites
-
- Revision 0.9.2.16  2005/06/23 22:06:04  brian
- - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
-
- Revision 0.9.2.15  2005/06/16 04:33:33  brian
- - modifications for test-inet_sctp
-
- Revision 0.9.2.14  2005/06/15 23:00:19  brian
- - final allowed state test cases
-
- Revision 0.9.2.13  2005/06/15 12:36:36  brian
- - added negative test cases
-
- Revision 0.9.2.12  2005/06/15 00:38:38  brian
- - fixed introduced typo
-
- Revision 0.9.2.11  2005/06/14 23:16:14  brian
- - corrected standards reference
-
- Revision 0.9.2.10  2005/06/14 23:02:26  brian
- - additional test cases for flushing and capabilities request
-
- Revision 0.9.2.9  2005/06/14 06:30:02  brian
- - a few more test cases
-
- Revision 0.9.2.8  2005/06/13 11:20:52  brian
- - added bug test case, a few timing corrections
-
- Revision 0.9.2.7  2005/06/13 09:51:07  brian
- - added more tests for connect request/response options
-
- Revision 0.9.2.6  2005/06/12 12:52:55  brian
- - added more tests, bad primitive corrections
-
- Revision 0.9.2.5  2005/06/11 02:21:20  brian
- - added more test cases
-
- Revision 0.9.2.4  2005/06/10 04:03:12  brian
- - more options corrections
-
- Revision 0.9.2.3  2005/06/08 09:01:19  brian
- - corrected options processing
-
- Revision 0.9.2.2  2005/06/08 06:08:25  brian
- - more options testing
-
- Revision 0.9.2.1  2005/06/07 00:52:06  brian
- - upgrading test suites
-
- Revision 0.9.2.10  2005/06/04 13:38:47  brian
- - final workup of test suites
-
- Revision 0.9.2.9  2005/06/04 09:13:55  brian
- - test suite corrections
-
- Revision 0.9.2.8  2005/06/04 05:01:42  brian
- - working up test suite upgrade
-
- Revision 0.9.2.7  2005/06/04 03:02:18  brian
- - upgraded test suites
-
- Revision 0.9.2.6  2005/05/14 08:28:53  brian
- - copyright header correction
-
- Revision 0.9.2.5  2005/04/04 16:43:17  brian
- - removed references to HZ
-
- Revision 0.9.2.4  2005/01/25 16:09:59  brian
- - Add check for <sys/wait.h>.
-
- Revision 0.9.2.3  2005/01/22 16:38:22  brian
- - Fixed compiler warnings.
-
- Revision 0.9.2.2  2004/09/02 10:07:37  brian
- - Updates for LFS compile.
-
- Revision 0.9.2.1  2004/06/27 10:08:37  brian
- - Built up separate inet release.
-
- Revision 0.9.2.1  2004/05/16 04:12:36  brian
- - Updating strxnet release.
-
- Revision 1.1.4.6  2004/04/13 12:12:55  brian
- - Rearranged header files.
-
- Revision 1.1.4.5  2004/04/13 06:04:04  brian
- - INET driver works pretty good now.
-
- Revision 1.1.4.4  2004/04/12 20:18:00  brian
- - Test cases pass.
-
- Revision 1.1.4.3  2004/03/31 09:00:50  brian
- - Working up new inet driver and documentation.
-
- Revision 1.1.4.2  2004/03/28 17:30:20  brian
- - First clean compile of inet updates.
-
- Revision 1.1.4.1  2004/01/12 23:33:18  brian
- - Updated LiS-2.16.18 gcom release to autoconf.
-
- Revision 1.1.2.3  2004/01/07 11:34:53  brian
- - Updated copyright dates.
-
- Revision 1.1.2.2  2004/01/04 11:31:23  brian
- - Corrected xti include.
-
- Revision 1.1.2.1  2003/12/23 11:12:23  brian
- - Added INET streams test programs.
+ $Log: test-sctp-etsi.c,v $
+ Revision 0.9.2.1  2006/03/24 16:02:43  brian
+ - new testsuites and programs
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/24 16:03:48 $"
+#ident "@(#) $RCSfile: test-sctp-etsi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/24 16:02:43 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/24 16:03:48 $";
+static char const ident[] = "$RCSfile: test-sctp-etsi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/24 16:02:43 $";
 
 /*
- *  Simple test program for INET streams.
+ *  This file is for testing the sctp_t driver.  It is provided for the
+ *  purpose of testing the OpenSS7 sctp_t driver only.
  */
 
 #include <sys/types.h>
@@ -264,13 +144,13 @@ typedef struct sctp_addr {
  *  -------------------------------------------------------------------------
  */
 
-static const char *lpkgname = "OpenSS7 INET Driver - SCTP";
+static const char *lpkgname = "OpenSS7 SCTP Driver";
 
-/* static const char *spkgname = "INET"; */
+/* static const char *spkgname = "SCTP"; */
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
-static const char *shortname = "INET/SCTP";
-static char devname[256] = "/dev/sctp";
+static const char *shortname = "SCTP";
+static char devname[256] = "/dev/sctp_t";
 
 static const int test_level = T_INET_SCTP;
 

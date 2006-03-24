@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/24 06:16:38 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/24 16:03:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/24 06:16:38 $ by $Author: brian $
+ Last Modified $Date: 2006/03/24 16:03:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.2  2006/03/24 16:03:25  brian
+ - changes for x86_64 2.6.15 compile, working up udp
+
  Revision 0.9.2.1  2006/03/24 06:16:38  brian
  - added next generation rawip driver
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/24 06:16:38 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/24 16:03:25 $"
 
-static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/24 06:16:38 $";
+static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/24 16:03:25 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -126,7 +129,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.1 
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/24 06:16:38 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/24 16:03:25 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -2020,6 +2023,11 @@ t_build_current_options(const struct raw * t, const unsigned char *ip, size_t il
 	swerr();
 	return (-EFAULT);
 }
+
+#ifdef __LP64__
+#undef MAX_SCHEDULE_TIMEOUT
+#define MAX_SCHEDULE_TIMEOUT INT_MAX
+#endif
 
 /**
  * t_build_check_options: - built output options for T_CHECK
@@ -4899,7 +4907,7 @@ raw_v4_rcv(struct sk_buff *skb)
 	frtn_t fr = { &raw_free, (char *) skb };
 	int rtn;
 
-	IP_INC_STATS_BH(IpInDelivers);	/* should wait... */
+//	IP_INC_STATS_BH(IpInDelivers);	/* should wait... */
 
 	rt = (struct rtable *) skb->dst;
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
@@ -5265,8 +5273,12 @@ raw_init_nproto(void)
 	br_write_unlock_bh(BR_NETPROTO_LOCK);
 }
 #elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+/* FIXME: need to allocate these on demand */
 struct net_protocol raw_net_protocol = {
-	.proto = IPPROTO_RAW,
+#ifdef HAVE_KMEM_STRUCT_NET_PROTOCOL_PROTO
+	/* 2.6.15 is different */
+	.proto = 0,
+#endif
 	.handler = &raw_v4_rcv,
 	.err_handler = &raw_v4_err,
 	.no_policy = 1,

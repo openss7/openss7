@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/03/23 12:16:16 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/03/24 16:02:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/23 12:16:16 $ by $Author: brian $
+# Last Modified $Date: 2006/03/24 16:02:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -303,6 +303,7 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 			  struct inet_protocol.copy,
 			  struct inet_protocol.no_policy,
 			  struct net_protocol.no_policy,
+			  struct net_protocol.proto,
 			  struct dst_entry.path], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
