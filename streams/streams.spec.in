@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/03/24 00:03:28 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/03/24 10:02:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/24 00:03:28 $ by $Author: brian $
+# Last Modified $Date: 2006/03/24 10:02:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1185,7 +1185,8 @@ Release:        %{fullrelease}
 %{descripline}
 The %{name}-test binary package provides the autotest validation
 testsuites used for validating and troubleshooting the %{title}
-package.
+package.  It also includes the send-pr script for generating and
+submitting problem reports to @PACKAGE_BUGREPORT@.
 
 %if %{FILES_test}
 %files test
@@ -1747,9 +1748,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.140  2006/03/24 00:03:28  brian
-# - added send-pr files to distribution
+# Revision 0.9.2.141  2006/03/24 10:02:43  brian
+# - added send-pr to %package test description
 #
+
+* Fri Mar 24 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.140  2006/03/24 00:03:28  brian
+- added send-pr files to distribution
 
 * Mon Mar 20 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.139  2006/03/20 11:54:46  brian

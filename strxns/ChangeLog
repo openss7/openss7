@@ -2,6 +2,7 @@
 
 	* doc/man/strxns.refs: updated LiS and STREAMS release numbers
 	* strxns.spec.in (%package test): described send-pr
+	* acinclude.m4: 2.6.15 has no proto member in net_protocol
 
 2006-03-23  Brian Bidulock  <bidulock@openss7.org>
 

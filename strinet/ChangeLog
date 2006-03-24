@@ -8,6 +8,12 @@
 	* doc/man/man4/udp.4.man: added manpages for new udp and rawip drivers
 	* doc/man/man4/udp2.4.man: added manpages for new udp and rawip drivers
 	* strinet.spec.in (%package test): described send-pr
+	* acinclude.m4: 2.6.15 has no proto member in net_protocol
+	* src/drivers/lis.conf.in: correction
+	* src/drivers/rawip.c: changes to compile on x86_64 2.6.15
+	* src/drivers/udp.c: changes to compile on x86_64 2.6.15
+	* src/drivers/udp.c: working up UDP driver
+	* src/test/test-inet_sctp.c: rationalized to strsctp package
 
 2006-03-24  Brian Bidulock  <bidulock@openss7.org>
 

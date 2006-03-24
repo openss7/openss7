@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.61 $) $Date: 2006/03/24 00:03:26 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.62 $) $Date: 2006/03/24 10:02:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/24 00:03:26 $ by $Author: brian $
+# Last Modified $Date: 2006/03/24 10:02:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -603,7 +603,8 @@ Release:        %{fullrelease}
 %{descripline}
 The %{name}-test binary package provides the autotest validation
 testsuites used for validating and troubleshooting the %{title}
-package.
+package.  It also includes the send-pr script for generating and
+submitting problem reports to @PACKAGE_BUGREPORT@.
 
 %if %{FILES_test}
 %files test
@@ -759,9 +760,13 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.61  2006/03/24 00:03:26  brian
-# - added send-pr files to distribution
+# Revision 1.1.2.62  2006/03/24 10:02:37  brian
+# - added send-pr to %package test description
 #
+
+* Fri Mar 24 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.61  2006/03/24 00:03:26  brian
+- added send-pr files to distribution
 
 * Mon Mar 20 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.60  2006/03/20 11:54:38  brian

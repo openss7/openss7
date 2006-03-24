@@ -2,6 +2,8 @@
 
 	* doc/man/strsctp.refs: updated LiS and STREAMS release numbers
 	* strsctp.spec.in (%package test): described send-pr
+	* src/test/test-sctp-etsi.c: added ETSI test program
+	* tests/testsuite-sctp.at: added ETSI testsuite
 
 2006-03-23  Brian Bidulock  <bidulock@openss7.org>
 
