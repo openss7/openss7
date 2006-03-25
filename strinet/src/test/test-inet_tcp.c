@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/02/23 11:10:28 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/03/25 10:20:29 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/23 11:10:28 $ by $Author: brian $
+ Last Modified $Date: 2006/03/25 10:20:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.40  2006/03/25 10:20:29  brian
+ - working up ETSI test cases for SCTP
+
  Revision 0.9.2.39  2006/02/23 11:10:28  brian
  - 64bit changes for x86_64
  - suppress lockf because it doesn't work too well on SMP
@@ -200,9 +217,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/02/23 11:10:28 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/03/25 10:20:29 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/02/23 11:10:28 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/03/25 10:20:29 $";
 
 /*
  *  Simple test program for INET streams.
@@ -1677,9 +1694,9 @@ addr_string(char *add_ptr, size_t add_len)
 	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
-
+void print_string(int child, const char *string);
 void
-print_addrs(int fd, char *add_ptr, size_t add_len)
+print_addrs(int child, char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *sin;
 
@@ -1689,15 +1706,7 @@ print_addrs(int fd, char *add_ptr, size_t add_len)
 		char buf[128];
 
 		snprintf(buf, sizeof(buf), "%d.%d.%d.%d:%d", (sin->sin_addr.s_addr >> 0) & 0xff, (sin->sin_addr.s_addr >> 8) & 0xff, (sin->sin_addr.s_addr >> 16) & 0xff, (sin->sin_addr.s_addr >> 24) & 0xff, ntohs(sin->sin_port));
-		if (fd == test_fd[0]) {
-			fprintf(stdout, "%-20s|                               |  |                    \n", buf);
-		}
-		if (fd == test_fd[1]) {
-			fprintf(stdout, "                    |                               |  |     %-15s\n", buf);
-		}
-		if (fd == test_fd[2]) {
-			fprintf(stdout, "                    |                               |  |     %-15s\n", buf);
-		}
+		print_string(child, buf);
 	}
 }
 #endif

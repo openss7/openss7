@@ -1,3 +1,8 @@
+2006-03-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-inet_tcp.c: rationalized to test-inet_sctp.c
+	* src/drivers/udp.c: corrected some compile problems
+
 2006-03-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strinet.refs: updated LiS and STREAMS release numbers

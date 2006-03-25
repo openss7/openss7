@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/24 16:03:26 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/25 10:20:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/24 16:03:26 $ by $Author: brian $
+ Last Modified $Date: 2006/03/25 10:20:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.5  2006/03/25 10:20:09  brian
+ - corrected some compile problems
+
  Revision 0.9.2.4  2006/03/24 16:03:26  brian
  - changes for x86_64 2.6.15 compile, working up udp
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/24 16:03:26 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/25 10:20:09 $"
 
-static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/24 16:03:26 $";
+static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/25 10:20:09 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -138,7 +141,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.4 $)
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/24 16:03:26 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/25 10:20:09 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -3147,7 +3150,7 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 	queue_t *wq = udp->wq->q_next ? udp->wq : npi_bottom;
 
 	if (wq != NULL) {
-		if (bcanputnext(wq, mp->b_band)) {
+		if (bcanputnext(wq, dp->b_band)) {
 			if ((mp = udp_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 				mp->b_datap->db_type = M_PROTO;
 				p = (typeof(p)) mp->b_wptr;
@@ -3166,6 +3169,7 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 					mp->b_wptr += src_len;
 				}
 				mp->b_cont = dp;
+				mp->b_band = dp->b_band;
 				printd(("%s: %p: N_UNITDATA_REQ ->\n", DRV_NAME, udp));
 				putnext(wq, mp);
 				return (0);
@@ -3183,6 +3187,21 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 /*
  * UDP actions
  */
+
+STATIC struct udp *
+udp_lookup(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
+{
+	fixme(("Write this function."));
+	return (NULL);
+}
+
+STATIC struct udp *
+udp_lookup_icmp(uint16_t sport, uint16_t dport, uint32_t saddr, uint32_t daddr)
+{
+	fixme(("Write this function."));
+	return (NULL);
+}
+
 
 /**
  * udp_bind: - bind a Stream to an NSAP
@@ -4397,7 +4416,7 @@ l_unitdata_ind(queue_t *q, mblk_t *mp)
 	spin_lock_bh(&udp->qlock);
 	if (tpi_get_state(udp) != TS_IDLE)
 		goto outstate;
-	if (canput(udp->rq, mp)) {
+	if (bcanput(udp->rq, mp->b_band)) {
 		put(udp->rq, mp);
 		return (QR_ABSORBED);
 	}
@@ -4439,7 +4458,7 @@ l_uderror_ind(queue_t *q, mblk_t *mp)
 	udp = udp_lookup_icmp(uh->source, uh->dest, iph->saddr, iph->daddr);
 	if (udp == NULL)
 		goto no_stream;
-	if (canput(udp->rq, mp)) {
+	if (bcanput(udp->rq, mp->b_band)) {
 		put(udp->rq, mp);
 		return (QR_ABSORBED);
 	}
@@ -5112,7 +5131,7 @@ udp_rput(queue_t *q, mblk_t *mp)
 STATIC streamscall int
 udp_rsrv(queue_t *q)
 {
-	return udp_srvq(q, &udp_r_prim, udp_rwake);
+	return udp_srvq(q, &udp_r_prim, &udp_rwake);
 }
 
 /**
@@ -5179,7 +5198,7 @@ mux_wput(queue_t *q, mblk_t *mp)
 STATIC streamscall int
 mux_wsrv(queue_t *q)
 {
-	return udp_srvq(q, &mux_w_prim, NULL);
+	return udp_srvq(q, &mux_w_prim, &mux_wwake);
 }
 
 /*
@@ -5236,20 +5255,6 @@ udp_next_err_handler(struct sk_buff **skbp, u32 info)
 		*skbp = NULL;
 		(*udp_next_proto->err_handler) (skb, info);
 	}
-}
-
-STATIC struct udp *
-udp_lookup(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
-{
-	fixme(("Write this function."));
-	return (NULL);
-}
-
-STATIC struct udp *
-udp_lookup_icmp(uint16_t sport, uint16_t dport, uint32_t saddr, uint32_t daddr)
-{
-	fixme(("Write this function."));
-	return (NULL);
 }
 
 /**

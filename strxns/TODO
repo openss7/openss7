@@ -1,9 +1,20 @@
-OpenSS7 STREAMS XNS -- things to do.  2006-03-01
+OpenSS7 STREAMS XNS -- things to do.  2006-03-25
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 Things to do:
+
+- I want to write a NetFilter pseudo-device driver that will install and
+  control netfilter hooks for performance testing.  It will do things
+  like packet drops, checksum errors, packet duplication, packet delay,
+  and combinations, for a specified range of addresses and/or protocols.
+  Also a set of user-space utilities (C language programs) to permit the
+  control of the filters.  The purpose is to be able to do a wide range
+  of performance testing on simulated networks that are simply loopback
+  devices.  This would permit performance test programs (such as
+  netperf) to be used for testing special network conditions on SCTP
+  (for example), and will also allow for comparison tests.
 
 * The strxns package contains several GPL'd modules and drivers
   originally included in the LiS releases that were removed to this
