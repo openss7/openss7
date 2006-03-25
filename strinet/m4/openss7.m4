@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/20 12:12:18 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/03/25 12:55:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 12:12:18 $ by $Author: brian $
+# Last Modified $Date: 2006/03/25 12:55:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.32  2006/03/25 12:55:08  brian
+# - got enable_static backwards
+#
 # Revision 0.9.2.31  2006/03/20 12:12:18  brian
 # - don't build libtool static libraries no devel
 #
@@ -152,7 +155,7 @@ dnl
 dnl Don't build libtool static libraries if development environment not
 dnl specified
 dnl
-    if test :"${enable_devel:-yes}" = :yes
+    if test :"${enable_devel:-yes}" != :yes
     then
 	enable_static='no'
     fi
