@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/24 16:03:25 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/27 01:25:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/24 16:03:25 $ by $Author: brian $
+ Last Modified $Date: 2006/03/27 01:25:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.3  2006/03/27 01:25:36  brian
+ - working up IP driver and SCTP testing
+
  Revision 0.9.2.2  2006/03/24 16:03:25  brian
  - changes for x86_64 2.6.15 compile, working up udp
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/24 16:03:25 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/27 01:25:36 $"
 
-static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/24 16:03:25 $";
+static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/27 01:25:36 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -114,6 +117,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 
 #include "udp_hooks.h"
 
 #include <sys/npi.h>
+#include <sys/npi_ip.h>
 
 #if defined HAVE_TIHDR_H
 #   include <tihdr.h>
@@ -129,7 +133,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/24 16:03:25 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/27 01:25:36 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -2877,6 +2881,7 @@ n_bind_req(queue_t *q, struct sockaddr *add, socklen_t add_len, np_ulong conind,
 	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 	N_bind_req_t *p;
+	queue_t *wq = raw->wq->q_next ? raw->wq : npi_bottom;
 
 	if ((mp = raw_allocb(q, sizeof(*p) + add_len + 1, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
@@ -2896,10 +2901,7 @@ n_bind_req(queue_t *q, struct sockaddr *add, socklen_t add_len, np_ulong conind,
 		*(unsigned char *) mp->b_wptr++ = raw->proto;
 		npi_set_state(raw, NS_WACK_BREQ);
 		printd(("%s: %p: N_BIND_REQ ->\n", DRV_NAME, raw));
-		if (raw->wq->q_next)
-			putnext(raw->wq, mp);
-		else
-			put(npi_bottom, mp);
+		putnext(wq, mp);
 		return (0);
 	}
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
@@ -2916,6 +2918,7 @@ n_unbind_req(queue_t *q)
 	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 	N_unbind_req_t *p;
+	queue_t *wq = raw->wq->q_next ? raw->wq : npi_bottom;
 
 	if ((mp = raw_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
@@ -2924,10 +2927,7 @@ n_unbind_req(queue_t *q)
 		mp->b_wptr += sizeof(*p);
 		npi_set_state(raw, NS_WACK_UREQ);
 		printd(("%s: %p: N_UNBIND_REQ ->\n", DRV_NAME, raw));
-		if (raw->wq->q_next)
-			putnext(raw->wq, mp);
-		else
-			put(npi_bottom, mp);
+		putnext(wq, mp);
 		return (0);
 	}
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
@@ -2950,10 +2950,10 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 	N_unitdata_req_t *p;
+	queue_t *wq = raw->wq=>q_next ? raw->wq : npi_bottom;
 
-	if (raw->wq->q_next != NULL || npi_bottom != NULL) {
-		if ((raw->wq->q_next != NULL && canputnext(raw->wq)) ||
-		    (npi_bottom != NULL && canput(npi_bottom))) {
+	if (wq != NULL) {
+		if (bcanputnext(wq, dp->b_band)) {
 			if ((mp = raw_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 				mp->b_datap->db_type = M_PROTO;
 				p = (typeof(p)) mp->b_wptr;
@@ -2972,11 +2972,9 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 					mp->b_wptr += src_len;
 				}
 				mp->b_cont = dp;
+				mp->b_band = dp->b_band;
 				printd(("%s: %p: N_UNITDATA_REQ ->\n", DRV_NAME, raw));
-				if (raw->wq->q_next)
-					putnext(raw->wq, mp);
-				else
-					put(npi_bottom, mp);
+				putnext(wq, mp);
 				return (0);
 			}
 			ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
@@ -2992,6 +2990,20 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 /*
  * RAW actions
  */
+
+STATIC struct raw *
+raw_lookup(uint16_t protocol, uint32_t daddr, uint32_t saddr)
+{
+	fixme(("Write this function."));
+	return (NULL);
+}
+
+STATIC struct raw *
+raw_lookup_icmp(uint16_t protocol, uint32_t saddr, uint32_t daddr)
+{
+	fixme(("Write this function."));
+	return (NULL);
+}
 
 /**
  * raw_bind: - bind a Stream to an NSAP
@@ -3057,8 +3069,9 @@ STATIC int
 raw_xmitmsg(queue_t *q, mblk_t *mp, struct raw_options *opts)
 {
 	struct raw *raw = RAW_PRIV(q);
+	queue_t *wq = raw->wq->q_next ? raw->wq : npi_bottom;
 
-	if (q->q_next != NULL || npi_bottom != NULL) {
+	if (wq != NULL) {
 		int rtn;
 		struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
 		struct sockaddr *src = NULL, *dst;
@@ -4163,6 +4176,108 @@ n_other_ind(queue_t *q, mblk_t *mp)
 }
 
 /*
+ *  NPI IP Provider -> UDP Provider messages.
+ */
+
+/**
+ * l_unidata_ind: - process N_UNITDATA_IND from linked NPI IP provider
+ * @q: active queue in queue pair (read queue)
+ * @mp: the N_UNITDATA_IND message
+ *
+ * N_UNITDATA_IND messages are passed from a linked NPI IP provider.  They are processed similar to
+ * IP messages incoming in raw_v4_rcv().  The data block contains the IP header, UDP header and UDP
+ * payload starting at mp->b_cont->b_datap->db_base.  The UDP message payload starts at
+ * mp->b_cont->b_rptr.  This function extracts IP header information and uses it to create options.
+ *
+ * LOCKING: Holding raw_lock protects against the upper stream closing.  raw->qlock protects the
+ * state of the private structure.  raw->refs protects the structure from being deallocated.
+ */
+STATIC int
+l_unitdata_ind(queue_t *q, mblk_t *mp)
+{
+	struct raw *raw;
+	mblk_t *dp = mp->b_cont;
+	struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
+
+	read_lock_bh(&raw_lock);
+	raw = raw_lookup(iph->protocol, iph->daddr, iph->saddr);
+	if (raw == NULL)
+		goto no_stream;
+	spin_lock_bh(&raw->qlock);
+	if (tpi_get_state(raw) != TS_IDLE)
+		goto outstate;
+	if (bcanput(raw->rq, mp->b_band)) {
+		put(raw->rq, mp);
+		return (QR_ABSORBED);
+	}
+	/* Note: when flow control subsides, the upper read queue must backenable the lower read
+	   queue for this to work.  Another possibility is to simply discard the message. */
+	return (-EBUSY);
+      no_stream:
+	read_unlock_bh(&raw_lock);
+	/* When there is no Stream associated with the message, we want the NPI IP driver to still
+	   be able to pass the message along to another protocol, so we return it as an M_CTL
+	   message.  Note that we do not check for flow control. */
+	mp->b_datap->db_type = M_CTL;
+	qreply(q, mp);
+	return (QR_ABSORBED);
+      outstate:
+	spin_unlock_bh(&raw->qlock);
+	raw_put(raw);
+	read_unlock_bh(&raw_lock);
+	/* discard */
+	return (QR_DONE);
+}
+
+/**
+ * l_uderror_ind: - process N_UDERROR_IND from linked NPI IP provider
+ * @q: active queue in queue pair (read queue)
+ * @mp: the N_UDERROR_IND message
+ *
+ * N_UDERROR_IND messages are passed from a linked NPI IP provider.  They are processed similar to
+ * ICMP messages incoming in raw_v4_err().
+ */
+STATIC int
+l_uderror_ind(queue_t *q, mblk_t *mp)
+{
+	struct raw *raw;
+	mblk_t *dp = mp->b_cont;
+	struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
+
+	raw = raw_lookup_icmp(iph->protocol, iph->saddr, iph->daddr);
+	if (raw == NULL)
+		goto no_stream;
+	if (bcanput(raw->rq, mp->b_band)) {
+		put(raw->rq, mp);
+		return (QR_ABSORBED);
+	}
+	/* Note: when flow control subsides, the upper read queue must backenable the lower read
+	   queue for this to work.  Another possibility is to simply discard the message. */
+	return (-EBUSY);
+      no_stream:
+	/* When there is no Stream associated with the message, we want the NPI IP driver to still
+	   be able to pass the message along to another protocol, so we return it as an M_CTL
+	   message.  Note that we do not check for flow control. */
+	mp->b_datap->db_type = M_CTL;
+	qreply(q, mp);
+	return (QR_ABSORBED);
+}
+
+/**
+ * l_other_ind: - process unsupported indication from linked NPI IP provider
+ * @q: active queue in queue pair (read queue)
+ * @mp: the message
+ *
+ * Unexpected message.
+ */
+STATIC int
+l_other_ind(queue_t *q, mblk_t *mp)
+{
+	swerr();
+	/* discard it */
+	return (QR_DONE);
+}
+/*
  *  STREAMS MESSAGE HANDLING
  */
 
@@ -4867,20 +4982,6 @@ raw_next_err_handler(struct sk_buff **skbp, u32 info)
 	}
 }
 
-STATIC struct raw *
-raw_lookup(uint16_t protocol, uint32_t daddr, uint32_t saddr, int dif)
-{
-	fixme(("Write this function."));
-	return (NULL);
-}
-
-STATIC struct raw *
-raw_lookup_icmp(uint16_t protocol, uint32_t saddr, uint32_t daddr)
-{
-	fixme(("Write this function."));
-	return (NULL);
-}
-
 /**
  * raw_free: - message block free function for mblks esballoc'ed from sk_buffs
  * @data: client data (sk_buff pointer in this case)
@@ -4915,7 +5016,7 @@ raw_v4_rcv(struct sk_buff *skb)
 
 	/* we do the lookup before the checksum */
 	iph = skb->nh.iph;
-	if (!(raw = raw_lookup(iph->protocol, iph->daddr, iph->saddr, skb->dev->ifindex)))
+	if (!(raw = raw_lookup(iph->protocol, iph->daddr, iph->saddr)))
 		goto no_stream;
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
 		goto linear_fail;
@@ -4963,17 +5064,24 @@ raw_v4_rcv(struct sk_buff *skb)
  * This function is a network protocol callback that is invoked when transport specific ICMP errors
  * are received.  The function looks up the Stream and, if found, wraps the packet in an M_ERROR
  * message and passes it to the read queue of the Stream.
+ *
+ * LOCKING: raw_lock protects the master list and protects from open, close, link and unlink
+ * raw->qlock protects the state of private structure.  raw->refs protects the private structure
+ * from being deallocated before locking.
  */
 STATIC void
 raw_v4_err(struct sk_buff *skb, u32 info)
 {
 	struct raw *raw;
+
 	struct iphdr *iph = (struct iphdr *) skb->data;
 	size_t ihl;
 
 #define ICMP_MIN_LENGTH 8
 	if (skb->len < (ihl = iph->ihl << 2) + ICMP_MIN_LENGTH)
 		goto drop;
+
+	read_lock(&raw_lock);
 	raw = raw_lookup_icmp(iph->protocol, iph->saddr, iph->daddr);
 	if (raw == NULL)
 		goto no_stream;
@@ -4997,23 +5105,27 @@ raw_v4_err(struct sk_buff *skb, u32 info)
 		if (!putq(raw->rq, mp))
 			freemsg(mp);
 		goto discard_and_put;
-	      no_buffers:
-		ptrace(("ERROR: could not allocate buffer\n"));
-		goto discard_and_put;
-	      flow_controlled:
-		ptrace(("ERROR: stream is flow controlled\n"));
-		goto discard_and_put;
 	}
 	goto discard_and_put;
-      discard_and_put:
+      unlock_discard_put:
 	spin_unlock(&raw->qlock);
+	goto discard_and_put;
+      discard_and_put:
 	raw_put(raw);
+	read_unlock(&raw_lock);
 	return;
+      no_buffers:
+	ptrace(("ERROR: could not allocate buffer\n"));
+	goto unlock_discard_put;
+      flow_controlled:
+	ptrace(("ERROR: stream is flow controlled\n"));
+	goto unlock_discard_put;
       closed:
 	ptrace(("ERROR: ICMP for closed stream\n"));
-	goto discard_and_put;
+	goto unlock_discard_put;
       no_stream:
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
+	read_unlock(&raw_lock);
 	raw_next_err_handler(&skb, info);
 	if (skb == NULL)
 		return;
@@ -5275,7 +5387,7 @@ raw_init_nproto(void)
 #elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 /* FIXME: need to allocate these on demand */
 struct net_protocol raw_net_protocol = {
-#ifdef HAVE_KMEM_STRUCT_NET_PROTOCOL_PROTO
+#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
 	/* 2.6.15 is different */
 	.proto = 0,
 #endif

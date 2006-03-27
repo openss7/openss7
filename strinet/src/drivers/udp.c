@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/25 10:20:09 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/27 01:25:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/25 10:20:09 $ by $Author: brian $
+ Last Modified $Date: 2006/03/27 01:25:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.6  2006/03/27 01:25:36  brian
+ - working up IP driver and SCTP testing
+
  Revision 0.9.2.5  2006/03/25 10:20:09  brian
  - corrected some compile problems
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/25 10:20:09 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/27 01:25:36 $"
 
-static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/25 10:20:09 $";
+static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/27 01:25:36 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -118,6 +121,10 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $)
 #include <net/udp.h>
 #include <net/tcp.h> /* for checksumming */
 
+#ifdef HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+
 #include <linux/skbuff.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
@@ -126,6 +133,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $)
 #include "udp_hooks.h"
 
 #include <sys/npi.h>
+#include <sys/npi_ip.h>
 
 #if defined HAVE_TIHDR_H
 #   include <tihdr.h>
@@ -141,7 +149,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $)
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/25 10:20:09 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/27 01:25:36 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -3202,7 +3210,6 @@ udp_lookup_icmp(uint16_t sport, uint16_t dport, uint32_t saddr, uint32_t daddr)
 	return (NULL);
 }
 
-
 /**
  * udp_bind: - bind a Stream to an NSAP
  * @q: active queue in queue pair (write queue)
@@ -5436,7 +5443,8 @@ udp_v4_err(struct sk_buff *skb, u32 info)
 		mp->b_datap->db_type = M_ERROR;
 		*(uint32_t *) mp->b_wptr++ = iph->daddr;
 		*(struct icmphdr *) mp->b_wptr++ = *skb->h.icmph;
-		putq(udp->rq, mp);
+		if (!putq(udp->rq, mp))
+			freemsg(mp);
 		goto unlock_discard_put;
 	}
 	goto discard_and_put;
@@ -5718,6 +5726,7 @@ udp_init_nproto(void)
 	br_write_unlock_bh(BR_NETPROTO_LOCK);
 }
 #elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+
 struct net_protocol udp_net_protocol = {
 #ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
 	/* 2.6.15 is different */

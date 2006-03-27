@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/25 12:46:43 $
+ @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/27 01:25:51 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/25 12:46:43 $ by $Author: brian $
+ Last Modified $Date: 2006/03/27 01:25:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_t.c,v $
+ Revision 0.9.2.2  2006/03/27 01:25:51  brian
+ - working up IP driver and SCTP testing
+
  Revision 0.9.2.1  2006/03/25 12:46:43  brian
  - working up ETSI tests
 
@@ -75,16 +78,64 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/25 12:46:43 $"
+#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/27 01:25:51 $"
 
-static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/25 12:46:43 $";
+static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/27 01:25:51 $";
 
 /*
- *  This file is for testing the sctp_t driver.  It is provided for the
- *  purpose of testing the OpenSS7 sctp_t driver only.
+ *  This file is for testing the sctp_t module.  It is provided for the
+ *  purpose of testing the OpenSS7 sctp_t module only.
  *
  *  This file contains test cases for the ETSI TS 102 369 test purposes.  It
  *  skips the ATS and goes directly to implemented test cases.
+ *
+ *  This test suite uses Ferry Clip testing, it opens a pipe and pushes SCTP
+ *  as the Implementation Under Test as a module over one end of the pipe and
+ *  uses the other end of the pipe as a Protocol Tester.  Another approach is
+ *  to send IP packets to the IUT as a driver, but that is another program.
+ *
+ *  This test program exchenages NPI primitives with one side of the open pipe
+ *  and excehage TPI primities on the other side of the pipe.  The side of the
+ *  pipe with the "sctp_t" STREAMS module pushed represents the Upper Layer
+ *  Program user of the SCTP module.  The other side of the pipe is the test
+ *  harness, as shown below:
+ *
+ *                               USER SPACE
+ *                              TEST PROGRAM
+ *  _________________________________________________________________________
+ *               \   /  |                            \   /  |
+ *                \ /   |                             \ /   |
+ *                 |   / \                             |    |
+ *     ____________|__/___\__________                  |    |
+ *    |                              |                 |    |
+ *    |                              |                 |    |
+ *    |             SCTP             |                 |    |
+ *    |                              |                 |    |
+ *    |        STREAMS MODULE        |                 |    |
+ *    |                              |                 |    |
+ *    |                              |                 |    |
+ *    |______________________________|                 |    |
+ *               \   /  |                              |    |
+ *                \ /   |                              |    |
+ *                 |    |                              |    |
+ *                 |   / \                             |    |
+ *     ____________|__/___\____________________________|____|_____________
+ *    |                                                                   |
+ *    |                                                                   |
+ *    |                               PIPE                                |
+ *    |                                                                   |
+ *    |___________________________________________________________________|
+ *
+ *
+ *  This test arrangement results in a ferry-clip around the SCTP module, where
+ *  NPI primitives are injected and removed beneath the module as well as TPI
+ *  primitives being performed above the module.
+ *
+ *  To preserve the environment and ensure that the tests are repeatable in any
+ *  order, the entire test harness (pipe) is assembled and disassembled for each
+ *  test.  A test preamble is used to place the module in the correct state for
+ *  a test case to begin and then a postamble is used to ensure that the module
+ *  can be removed correctly.
  */
 
 #include <sys/types.h>
@@ -160,6 +211,7 @@ static const char *lstdname = "RFC 2960, SCTP-IG, ETSI TS 102 144";
 static const char *sstdname = "RFC2960/TS102144";
 static const char *shortname = "SCTP";
 static char devname[256] = "/dev/sctp_t";
+static char modname[256] = "sctp_t";
 
 static const int test_level = T_INET_SCTP;
 
@@ -188,7 +240,9 @@ static int last_prio = 0;
 static int MORE_flag = 0;
 static int DATA_flag = T_ODF_EX | T_ODF_MORE;
 
-int test_fd[3] = { 0, 0, 0 };
+#define NUM_STREAMS 3
+
+int test_fd[NUM_STREAMS] = { 0, };
 
 #define BUFSIZE 5*4096
 
@@ -259,7 +313,7 @@ struct timeval when;
  *  -------------------------------------------------------------------------
  */
 enum {
-	__EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
+	__EVENT_EOF = -7, __EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
 	__RESULT_DECODE_ERROR = -3, __RESULT_SCRIPT_ERROR = -2,
 	__RESULT_INCONCLUSIVE = -1, __RESULT_SUCCESS = 0, __RESULT_FAILURE = 1,
 	__RESULT_NOTAPPL = 3, __RESULT_SKIPPED = 77,
@@ -287,6 +341,7 @@ enum {
 	__TEST_DATA,
 	__TEST_DATACK_REQ, __TEST_DATACK_IND, __TEST_RESET_REQ,
 	__TEST_RESET_IND, __TEST_RESET_RES, __TEST_RESET_CON,
+	__TEST_PRIM_TOO_SHORT, __TEST_PRIM_WAY_TOO_SHORT,
 	__TEST_O_TI_GETINFO, __TEST_O_TI_OPTMGMT, __TEST_O_TI_BIND,
 	__TEST_O_TI_UNBIND,
 	__TEST__O_TI_GETINFO, __TEST__O_TI_OPTMGMT, __TEST__O_TI_BIND,
@@ -301,8 +356,17 @@ enum {
 	__TEST_TI_SETMYNAME_DATA, __TEST_TI_SETPEERNAME_DATA,
 	__TEST_TI_SETMYNAME_DISC, __TEST_TI_SETPEERNAME_DISC,
 	__TEST_TI_SETMYNAME_DISC_DATA, __TEST_TI_SETPEERNAME_DISC_DATA,
-	__TEST_PRIM_TOO_SHORT, __TEST_PRIM_WAY_TOO_SHORT,
+	__TEST_O_NONBLOCK, __TEST_O_BLOCK,
+	__TEST_T_ACCEPT, __TEST_T_BIND, __TEST_T_CLOSE, __TEST_T_CONNECT,
+	__TEST_T_GETINFO, __TEST_T_GETPROTADDR, __TEST_T_GETSTATE,
+	__TEST_T_LISTEN, __TEST_T_LOOK, __TEST_T_OPTMGMT, __TEST_T_RCV,
+	__TEST_T_RCVCONNECT, __TEST_T_RCVDIS, __TEST_T_RCVREL,
+	__TEST_T_RCVRELDATA, __TEST_T_RCVUDATA, __TEST_T_RCVUDERR,
+	__TEST_T_RCVV, __TEST_T_RCVVUDATA, __TEST_T_SND, __TEST_T_SNDDIS,
+	__TEST_T_SNDREL, __TEST_T_SNDRELDATA, __TEST_T_SNDUDATA,
+	__TEST_T_SNDV, __TEST_T_SNDVUDATA, __TEST_T_SYNC, __TEST_T_UNBIND,
 	__TEST_BUNDLE,
+	__TEST_ABORT,
 	__TEST_INIT,
 	__TEST_INIT_ACK,
 	__TEST_COOKIE_ECHO,
@@ -1189,6 +1253,8 @@ const char *
 event_string(int event)
 {
 	switch (event) {
+	case __EVENT_EOF:
+		return ("END OF FILE");
 	case __EVENT_NO_MSG:
 		return ("NO MESSAGE");
 	case __EVENT_TIMEOUT:
@@ -1267,6 +1333,28 @@ event_string(int event)
 		return ("T_CAPABILITY_REQ");
 	case __TEST_CAPABILITY_ACK:
 		return ("T_CAPABILITY_ACK");
+	case __TEST_ABORT:
+		return ("ABORT");
+	case __TEST_INIT:
+		return ("INIT");
+	case __TEST_INIT_ACK:
+		return ("INIT-ACK");
+	case __TEST_COOKIE_ECHO:
+		return ("COOKIE-ECHO");
+	case __TEST_COOKIE_ACK:
+		return ("COOKIE-ACK");
+	case __TEST_DATA:
+		return ("DATA");
+	case __TEST_SACK:
+		return ("SACK");
+	case __TEST_ERROR:
+		return ("ERROR");
+	case __TEST_SHUTDOWN:
+		return ("SHUTDOWN");
+	case __TEST_SHUTDOWN_ACK:
+		return ("SHUTDOWN-ACK");
+	case __TEST_SHUTDOWN_COMPLETE:
+		return ("SHUTDOWN-COMPLETE");
 	default:
 		return ("(unexpected");
 	}
@@ -2324,10 +2412,10 @@ void
 print_open(int child)
 {
 	static const char *msgs[] = {
-		"  open()      ----->v                                   .                   \n",
-		"                    |                                   v<-----     open()  \n",
-		"                    |                                v<-+------     open()  \n",
-		"                    .                                .  .                   \n",
+		"  open()      ----->v  .                                .                   \n",
+		"                    |  v                                v<-----     open()  \n",
+		"                    |  v<-------------------------------.------     open()  \n",
+		"                    .  .                                .                   \n",
 	};
 
 	if (verbose > 3)
@@ -2338,10 +2426,10 @@ void
 print_close(int child)
 {
 	static const char *msgs[] = {
-		"  close()     ----->X                                   |                   \n",
-		"                    .                                   X<-----    close()  \n",
-		"                    .                                X<-+------    close()  \n",
-		"                    .                                .  .                   \n",
+		"  close()     ----->X  |                                |                   \n",
+		"                    .  X                                X<-----    close()  \n",
+		"                    .  X<-------------------------------.------    close()  \n",
+		"                    .  .                                .                   \n",
 	};
 
 	if (verbose > 3)
@@ -2352,10 +2440,10 @@ void
 print_preamble(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+-------------Preamble-----------+--+                   \n",
-		"                    +-------------Preamble-----------+  +-------------------\n",
-		"                    +-------------Preamble-----------+--+-------------------\n",
-		"--------------------+-------------Preamble-----------+--+-------------------\n",
+		"--------------------+  +----------Preamble--------------+                   \n",
+		"                    +  +----------Preamble--------------+-------------------\n",
+		"                    +--+----------Preamble--------------+                   \n",
+		"--------------------+--+----------Preamble--------------+-------------------\n",
 	};
 
 	if (verbose > 0)
@@ -2366,10 +2454,10 @@ void
 print_notapplicable(int child)
 {
 	static const char *msgs[] = {
-		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|                    [%d:%03d]\n",
-		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|  |X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
-		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
-		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"X-X-X-X-X-X-X-X-X-X-|  |-X-X-X NOT APPLICABLE -X-X-X-X-X|                    [%d:%03d]\n",
+		"                    |  |-X-X-X NOT APPLICABLE -X-X-X-X-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"                    |X-|-X-X-X NOT APPLICABLE -X-X-X-X-X|                    [%d:%03d]\n",
+		"X-X-X-X-X-X-X-X-X-X-|X-|-X-X-X NOT APPLICABLE -X-X-X-X-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2380,10 +2468,10 @@ void
 print_skipped(int child)
 {
 	static const char *msgs[] = {
-		"::::::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|                    [%d:%03d]\n",
-		"                    |:::::::::::: SKIPPED :::::::::::|  |::::::::::::::::::: [%d:%03d]\n",
-		"                    |:::::::::::: SKIPPED :::::::::::|::|::::::::::::::::::: [%d:%03d]\n",
-		"::::::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|::::::::::::::::::: [%d:%03d]\n",
+		"::::::::::::::::::::|  |::::::::: SKIPPED ::::::::::::::|                    [%d:%03d]\n",
+		"                    |  |::::::::: SKIPPED ::::::::::::::|::::::::::::::::::: [%d:%03d]\n",
+		"                    |::|::::::::: SKIPPED ::::::::::::::|                    [%d:%03d]\n",
+		"::::::::::::::::::::|::|::::::::: SKIPPED ::::::::::::::|::::::::::::::::::: [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2394,10 +2482,10 @@ void
 print_inconclusive(int child)
 {
 	static const char *msgs[] = {
-		"????????????????????|?????????? INCONCLUSIVE ????????|??|                    [%d:%03d]\n",
-		"                    |?????????? INCONCLUSIVE ????????|  |??????????????????? [%d:%03d]\n",
-		"                    |?????????? INCONCLUSIVE ????????|??|??????????????????? [%d:%03d]\n",
-		"????????????????????|?????????? INCONCLUSIVE ????????|??|??????????????????? [%d:%03d]\n",
+		"????????????????????|  |??????? INCONCLUSIVE ???????????|                    [%d:%03d]\n",
+		"                    |  |??????? INCONCLUSIVE ???????????|??????????????????? [%d:%03d]\n",
+		"                    |??|??????? INCONCLUSIVE ???????????|                    [%d:%03d]\n",
+		"????????????????????|??|??????? INCONCLUSIVE ???????????|??????????????????? [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2408,10 +2496,10 @@ void
 print_test(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+---------------Test-------------+--+                   \n",
-		"                    +---------------Test-------------+  +-------------------\n",
-		"                    +---------------Test-------------+--+-------------------\n",
-		"--------------------+---------------Test-------------+--+-------------------\n",
+		"--------------------+  +------------Test----------------+                   \n",
+		"                    +  +------------Test----------------+-------------------\n",
+		"                    +--+------------Test----------------+                   \n",
+		"--------------------+--+------------Test----------------+-------------------\n",
 	};
 
 	if (verbose > 0)
@@ -2422,10 +2510,10 @@ void
 print_failed(int child)
 {
 	static const char *msgs[] = {
-		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d:%03d]\n",
-		"                    |XXXXXXXXXXXXX FAILED XXXXXXXXXXX|  |XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
-		"                    |XXXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
-		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                    [%d:%03d]\n",
+		"                    |  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+		"                    |XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                    [%d:%03d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2436,10 +2524,10 @@ void
 print_script_error(int child)
 {
 	static const char *msgs[] = {
-		"####################|########### SCRIPT ERROR #######|##|                    [%d:%03d]\n",
-		"                    |########### SCRIPT ERROR #######|  |################### [%d:%03d]\n",
-		"                    |########### SCRIPT ERROR #######|##|################### [%d:%03d]\n",
-		"####################|########### SCRIPT ERROR #######|##|################### [%d:%03d]\n",
+		"####################|  |######## SCRIPT ERROR ##########|                    [%d:%03d]\n",
+		"                    |  |######## SCRIPT ERROR ##########|################### [%d:%03d]\n",
+		"                    |##|######## SCRIPT ERROR ##########|                    [%d:%03d]\n",
+		"####################|##|######## SCRIPT ERROR ##########|################### [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2450,10 +2538,10 @@ void
 print_passed(int child)
 {
 	static const char *msgs[] = {
-		"********************|************* PASSED ***********|**|                    [%d:%03d]\n",
-		"                    |************* PASSED ***********|  |******************* [%d:%03d]\n",
-		"                    |************* PASSED ***********|**|******************* [%d:%03d]\n",
-		"********************|************* PASSED ***********|**|******************* [%d:%03d]\n",
+		"********************|  |********** PASSED **************|                    [%d:%03d]\n",
+		"                    |  |********** PASSED **************|******************* [%d:%03d]\n",
+		"                    |**|********** PASSED **************|                    [%d:%03d]\n",
+		"********************|**|********** PASSED **************|******************* [%d:%03d]\n",
 	};
 
 	if (verbose > 2)
@@ -2464,10 +2552,10 @@ void
 print_postamble(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+-------------Postamble----------+--+                   \n",
-		"                    +-------------Postamble----------+  +-------------------\n",
-		"                    +-------------Postamble----------+--+-------------------\n",
-		"--------------------+-------------Postamble----------+--+-------------------\n",
+		"--------------------+  +----------Postamble-------------+                   \n",
+		"                    +  +----------Postamble-------------+-------------------\n",
+		"                    +--+----------Postamble-------------+                   \n",
+		"--------------------+--+----------Postamble-------------+-------------------\n",
 	};
 
 	if (verbose > 0)
@@ -2478,10 +2566,10 @@ void
 print_test_end(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+--------------------------------+--+                   \n",
-		"                    +--------------------------------+  +-------------------\n",
-		"                    +--------------------------------+--+-------------------\n",
-		"--------------------+--------------------------------+--+-------------------\n",
+		"--------------------+  +--------------------------------+                   \n",
+		"                    +  +--------------------------------+-------------------\n",
+		"                    +--+--------------------------------+                   \n",
+		"--------------------+--+--------------------------------+-------------------\n",
 	};
 
 	if (verbose > 0)
@@ -2492,10 +2580,10 @@ void
 print_terminated(int child, int signal)
 {
 	static const char *msgs[] = {
-		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|                    {%d:%03d}\n",
-		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
-		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
-		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|                    {%d:%03d}\n",
+		"                    |  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
+		"                    |@@|@@@@@@@@ TERMINATED @@@@@@@@@@@@|                    {%d:%03d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@|@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
 	};
 
 	if (verbose > 0)
@@ -2506,10 +2594,10 @@ void
 print_stopped(int child, int signal)
 {
 	static const char *msgs[] = {
-		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|                    {%d:%03d}\n",
-		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
-		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
-		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                    {%d:%03d}\n",
+		"                    |  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
+		"                    |&&|&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                    {%d:%03d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&|&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
 	};
 
 	if (verbose > 0)
@@ -2520,10 +2608,10 @@ void
 print_timeout(int child)
 {
 	static const char *msgs[] = {
-		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|                    [%d:%03d]\n",
-		"                    |++++++++++++ TIMEOUT! ++++++++++|  |+++++++++++++++++++ [%d:%03d]\n",
-		"                    |++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
-		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
+		"++++++++++++++++++++|  |+++++++++ TIMEOUT! +++++++++++++|                    [%d:%03d]\n",
+		"                    |  |+++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
+		"                    |++|+++++++++ TIMEOUT! +++++++++++++|                    [%d:%03d]\n",
+		"++++++++++++++++++++|++|+++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 
 	if (show_timeout || verbose > 0) {
@@ -2536,10 +2624,10 @@ void
 print_nothing(int child)
 {
 	static const char *msgs[] = {
-		"- - - - - - - - - - |- - - - - - -nothing! - - - - - |  |                    [%d:%03d]\n",
-		"                    |- - - - - - -nothing! - - - - - |  |- - - - - - - - - - [%d:%03d]\n",
-		"                    |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
-		"- - - - - - - - - - |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
+		"- - - - - - - - - - |  |- - - - - nothing! - - - - - - -|                    [%d:%03d]\n",
+		"                    |  |- - - - - nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
+		"                    |- |- - - - - nothing! - - - - - - -|                    [%d:%03d]\n",
+		"- - - - - - - - - - |- |- - - - - nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
 	};
 
 	if (verbose > 1)
@@ -2559,10 +2647,10 @@ void
 print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"%-14s----->|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |<---%-14s  [%d:%03d]\n",
-		"                    |                                |<-+----%-14s  [%d:%03d]\n",
-		"                    |          %-14s        |  |                    [%d:%03d]\n",
+		"  %-14s--->|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |<---%14s  [%d:%03d]\n",
+		"                    |  |                                |<---%14s  [%d:%03d]\n",
+		"                    |  |                                |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2573,10 +2661,10 @@ void
 print_tx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"--%16s->|- - - - - - - - - - - - - - - ->|->|                    [%d:%03d]\n",
-		"                    |<- - - - - - - - - - - - - - - -|- |<-%16s- [%d:%03d]\n",
-		"                    |<- - - - - - - - - - - - - - - -|<----%16s- [%d:%03d]\n",
-		"                    |                                |  |                    [%d:%03d]\n",
+		"--%16s->|  |                                |                    [%d:%03d]\n",
+		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s- [%d:%03d]\n",
+		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s- [%d:%03d]\n",
+		"                    |  |                                |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2587,10 +2675,10 @@ void
 print_rx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"<-%16s--|<- - - - - - - - - - - - - - - -| -|                    [%d:%03d]\n",
-		"                    |- - - - - - - - - - - - - - - ->|  |-%16s-> [%d:%03d]\n",
-		"                    |- - - - - - - - - - - - - - - ->|--+-%16s-> [%d:%03d]\n",
-		"                    |         <%16s>     |  |                    [%d:%03d]\n",
+		"<-%16s--|  |                                |                    [%d:%03d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|-%16s-> [%d:%03d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|-%16s-> [%d:%03d]\n",
+		"                    |  |      <%16s>        |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2601,10 +2689,10 @@ void
 print_ack_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"<-%16s-/|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |\\%16s-> [%d:%03d]\n",
-		"                    |                                |\\-+-%16s-> [%d:%03d]\n",
-		"                    |         <%16s>     |  |                    [%d:%03d]\n",
+		"<-%16s-/|  |                                |                    [%d:%03d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|\\%16s-> [%d:%03d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|\\%16s-> [%d:%03d]\n",
+		"                    |  |      <%16s>        |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2624,10 +2712,10 @@ void
 print_no_prim(int child, long prim)
 {
 	static const char *msgs[] = {
-		"????%4ld????  ?----?|?- - - - - - -?                |  |                     [%d:%03d]\n",
-		"                    |                               |  |?--? ????%4ld????    [%d:%03d]\n",
-		"                    |                               |?-+---? ????%4ld????    [%d:%03d]\n",
-		"                    | ? - - - - - - %4ld  - - - - ? |  |                     [%d:%03d]\n",
+		"????%4ld????  ?----?|  | ?- - - - - - - - - - - - - -? |                     [%d:%03d]\n",
+		"                    |  | ?- - - - - - - - - - - - - -? |?--? ????%4ld????    [%d:%03d]\n",
+		"                    |  | ?- - - - - - - - - - - - - -? |?--? ????%4ld????    [%d:%03d]\n",
+		"                    |  | ?- - - - - %4ld  - - - - - -? |                     [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2647,10 +2735,10 @@ void
 print_rx_data(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"<-%1$16s--|<- -%2$4d bytes- - - - - - - - - |- |                    [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes- - - - - - - - ->|  |--%1$16s> [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes- - - - - - - - - |->|--%1$16s> [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
+		"<-%1$16s--|  |  %2$4d bytes                    |                    [%3$d:%4$03d]\n",
+		"                    |  |- %2$4d bytes - - - - - - - - - >|--%1$16s> [%3$d:%4$03d]\n",
+		"                    |  |- %2$4d bytes - - - - - - - - - >|--%1$16s> [%3$d:%4$03d]\n",
+		"                    |  |  %2$4d bytes  %1$16s  |                    [%3$d:%4$03d]\n",
 	};
 
 	if ((verbose && show_data) || verbose > 1)
@@ -2661,10 +2749,10 @@ void
 print_errno(int child, long error)
 {
 	static const char *msgs[] = {
-		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |\\-->%14s  [%d:%03d]\n",
-		"                    |                                |\\-+--->%14s  [%d:%03d]\n",
-		"                    |          [%14s]      |  |                    [%d:%03d]\n",
+		"  %-14s<--/|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
+		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
+		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 3)
@@ -2675,10 +2763,10 @@ void
 print_success(int child)
 {
 	static const char *msgs[] = {
-		"  ok          <----/|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |\\---->         ok   [%d:%03d]\n",
-		"                    |                                |\\-+----->         ok   [%d:%03d]\n",
-		"                    |                 ok             |  |                    [%d:%03d]\n",
+		"  ok          <----/|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |\\---->         ok   [%d:%03d]\n",
+		"                    |  |                                |\\---->         ok   [%d:%03d]\n",
+		"                    |  |              ok                |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 4)
@@ -2689,10 +2777,10 @@ void
 print_success_value(int child, int value)
 {
 	static const char *msgs[] = {
-		"  %10d  <----/|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |\\---->  %10d  [%d:%03d]\n",
-		"                    |                                |\\-+----->  %10d  [%d:%03d]\n",
-		"                    |            [%10d]        |  |                    [%d:%03d]\n",
+		"  %10d  <----/|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |\\---->  %10d  [%d:%03d]\n",
+		"                    |  |                                |\\---->  %10d  [%d:%03d]\n",
+		"                    |  |         [%10d]           |                    [%d:%03d]\n",
 	};
 
 	if (verbose)
@@ -2703,10 +2791,10 @@ void
 print_ti_ioctl(int child, int cmd, intptr_t arg)
 {
 	static const char *msgs[] = {
-		"--ioctl(2)--------->|       %16s         |  |                    [%d:%03d]\n",
-		"                    |       %16s         |  |<---ioctl(2)------  [%d:%03d]\n",
-		"                    |       %16s         |<-+----ioctl(2)------  [%d:%03d]\n",
-		"                    |       %16s ioctl(2)|  |                    [%d:%03d]\n",
+		"--ioctl(2)--------->|  |    %16s            |                    [%d:%03d]\n",
+		"                    |  |    %16s            |<---ioctl(2)------  [%d:%03d]\n",
+		"                    |  |    %16s            |<---ioctl(2)------  [%d:%03d]\n",
+		"                    |  |    %16s ioctl(2)   |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2724,10 +2812,10 @@ void
 print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"  %1$16s->|- - %2$4d bytes- - - - - - - - ->|->|                    [%3$d:%4$03d]\n",
-		"                    |< - %2$4d bytes- - - - - - - - - |- |<-%1$16s  [%3$d:%4$03d]\n",
-		"                    |< - %2$4d bytes- - - - - - - - - |<-+--%1$16s  [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
+		"  %1$16s->|- | %2$4d bytes- - - - - - - - - - >|                    [%3$d:%4$03d]\n",
+		"                    |< + %2$4d bytes- - - - - - - - - - -|<-%1$16s  [%3$d:%4$03d]\n",
+		"                    |< + %2$4d bytes- - - - - - - - - - -|<-%1$16s  [%3$d:%4$03d]\n",
+		"                    |< + %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
 
 	if ((verbose && show_data) || verbose > 1)
@@ -2738,10 +2826,10 @@ void
 print_libcall(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"  %-16s->|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |<-%16s  [%d:%03d]\n",
-		"                    |                                |<-+--%16s  [%d:%03d]\n",
-		"                    |        [%16s]      |  |                    [%d:%03d]\n",
+		"  %-16s->|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |<-%16s  [%d:%03d]\n",
+		"                    |  |                                |<-%16s  [%d:%03d]\n",
+		"                    |  |     [%16s]         |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2752,10 +2840,10 @@ void
 print_terror(int child, long error, long terror)
 {
 	static const char *msgs[] = {
-		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |\\-->%14s  [%d:%03d]\n",
-		"                    |                                |\\-+--->%14s  [%d:%03d]\n",
-		"                    |          [%14s]      |  |                    [%d:%03d]\n",
+		"  %-14s<--/|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
+		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
+		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2766,10 +2854,10 @@ void
 print_expect(int child, int want)
 {
 	static const char *msgs[] = {
-		" (%-16s) |- - - - - -[Expected]- - - - - -|  |                    [%d:%03d]\n",
-		"                    |- - - - - -[Expected]- - - - - -|  | (%-16s) [%d:%03d]\n",
-		"                    |- - - - - -[Expected]- - - - - -|- | (%-16s) [%d:%03d]\n",
-		"                    |- [Expected %-16s ] -|- |                    [%d:%03d]\n",
+		" (%-16s) |  | - - - -[Expected]- - - - - - - |                     [%d:%03d]\n",
+		"                    |  | - - - -[Expected]- - - - - - - | (%-16s)  [%d:%03d]\n",
+		"                    |  | - - - -[Expected]- - - - - - - | (%-16s)  [%d:%03d]\n",
+		"                    |- |- [Expected %-16s ] -|                     [%d:%03d]\n",
 	};
 
 	if (verbose > 1 && show)
@@ -2780,10 +2868,10 @@ void
 print_string(int child, const char *string)
 {
 	static const char *msgs[] = {
-		"%-20s|                                |  |                    \n",
-		"                    |                                |  |%-20s\n",
-		"                    |                                |   %-20s\n",
-		"                    |       %-20s     |  |                    \n",
+		"%-20s|  |                                |                    \n",
+		"                    |  |                                |%-20s\n",
+		"                    |  |                                |%-20s\n",
+		"                    |  |    %-20s        |                    \n",
 	};
 
 	if (verbose > 1 && show)
@@ -2803,10 +2891,10 @@ void
 print_waiting(int child, ulong time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|  |                    [%d:%03d]\n",
-		"                    | / / / Waiting %03lu seconds / / /|  | / / / / / / / / /  [%d:%03d]\n",
-		"                    | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / /  [%d:%03d]\n",
-		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / /  [%d:%03d]\n",
+		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / |                    [%d:%03d]\n",
+		"                    |  |/ / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
+		"                    | /|/ / Waiting %03lu seconds / / / / |                    [%d:%03d]\n",
+		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
 	};
 
 	if (verbose > 0 && show)
@@ -2826,10 +2914,10 @@ void
 print_mwaiting(int child, struct timespec *time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |  |                    [%d:%03d]\n",
-		"                    | / / Waiting %8.4f seconds / |  | / / / / / / / / /  [%d:%03d]\n",
-		"                    | / / Waiting %8.4f seconds / |/ | / / / / / / / / /  [%d:%03d]\n",
-		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |/ | / / / / / / / / /  [%d:%03d]\n",
+		"/ / / / / / / / / / |  |/ Waiting %8.4f seconds / / /|                    [%d:%03d]\n",
+		"                    |  |/ Waiting %8.4f seconds / / /| / / / / / / / / /  [%d:%03d]\n",
+		"                    | /|/ Waiting %8.4f seconds / / /|                    [%d:%03d]\n",
+		"/ / / / / / / / / / | /|/ Waiting %8.4f seconds / / /| / / / / / / / / /  [%d:%03d]\n",
 	};
 
 	if (verbose > 0 && show) {
@@ -3010,7 +3098,7 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -3353,8 +3441,28 @@ stream_start(int child, int index)
 	}
 	switch (child) {
 	case 1:
+#if 1
+		/* set up the test harness */
+		if (test_pipe(0) != __RESULT_SUCCESS)
+			goto failure;
+		if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+			goto failure;
+		if (test_ioctl(1, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+			goto failure;
+		if (test_ioctl(0, I_SWROPT, (intptr_t) SNDZERO) != __RESULT_SUCCESS)
+			goto failure;
+		if (test_ioctl(1, I_SWROPT, (intptr_t) SNDZERO) != __RESULT_SUCCESS)
+			goto failure;
+		if (test_ioctl(1, I_PUSH, (intptr_t) "pipemod") != __RESULT_SUCCESS)
+			goto failure;
+		return __RESULT_SUCCESS;
+#endif
 	case 2:
+#if 1
+		return __RESULT_SUCCESS;
+#endif
 	case 0:
+#if 0
 		for (i = 0; i < 3; i++) {
 #ifndef SCTP_VERSION_2
 			addrs[child].port = htons(ports[child] + offset);
@@ -3366,11 +3474,13 @@ stream_start(int child, int index)
 #endif				/* SCTP_VERSION_2 */
 		}
 		if (test_open(child, devname) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 		if (test_ioctl(child, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
+#endif
 		return __RESULT_SUCCESS;
 	default:
+	      failure:
 		return __RESULT_FAILURE;
 	}
 }
@@ -3380,10 +3490,24 @@ stream_stop(int child)
 {
 	switch (child) {
 	case 1:
+#if 1
+		if (test_ioctl(1, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_close(0) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_close(1) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		return __RESULT_SUCCESS;
+#endif
 	case 2:
+#if 1
+		return __RESULT_SUCCESS;
+#endif
 	case 0:
+#if 0
 		if (test_close(child) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
+#endif
 		return __RESULT_SUCCESS;
 	default:
 		return __RESULT_FAILURE;
@@ -3482,7 +3606,7 @@ do_signal(int child, int action)
 	}
 	switch (action) {
 	case __TEST_PUSH:
-		return test_ti_ioctl(child, I_PUSH, (intptr_t) "tirdwr");
+		return test_ti_ioctl(child, I_PUSH, (intptr_t) modname);
 	case __TEST_POP:
 		return test_ti_ioctl(child, I_POP, (intptr_t) NULL);
 	case __TEST_PUTMSG_DATA:
@@ -3532,7 +3656,10 @@ do_signal(int child, int action)
 		p->conn_ind.OPT_length = 0;
 		p->conn_ind.OPT_offset = 0;
 		p->conn_ind.SEQ_number = last_sequence;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Connection indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3567,7 +3694,10 @@ do_signal(int child, int action)
 		p->conn_con.RES_offset = 0;
 		p->conn_con.OPT_length = 0;
 		p->conn_con.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Connection confirmation test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3590,7 +3720,10 @@ do_signal(int child, int action)
 		p->discon_ind.PRIM_type = T_DISCON_IND;
 		p->discon_ind.DISCON_reason = 0;
 		p->discon_ind.SEQ_number = last_sequence;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Disconnection indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3611,7 +3744,10 @@ do_signal(int child, int action)
 		ctrl->len = sizeof(p->data_ind);
 		p->data_ind.PRIM_type = T_DATA_IND;
 		p->data_ind.MORE_flag = MORE_flag;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Normal test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3632,7 +3768,10 @@ do_signal(int child, int action)
 		ctrl->len = sizeof(p->exdata_ind);
 		p->data_ind.PRIM_type = T_EXDATA_IND;
 		p->data_ind.MORE_flag = MORE_flag;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Expedited test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		print_tx_prim(child, prim_string(p->type));
@@ -3761,7 +3900,10 @@ do_signal(int child, int action)
 		p->unitdata_ind.SRC_offset = 0;
 		p->unitdata_ind.OPT_length = 0;
 		p->unitdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Unit test data indication.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3825,7 +3967,10 @@ do_signal(int child, int action)
 	case __TEST_ORDREL_IND:
 		ctrl->len = sizeof(p->ordrel_ind);
 		p->ordrel_ind.PRIM_type = T_ORDREL_IND;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Orderly release indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3864,7 +4009,10 @@ do_signal(int child, int action)
 		p->optdata_ind.DATA_flag = 0;
 		p->optdata_ind.OPT_length = 0;
 		p->optdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Option data indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
@@ -3879,7 +4027,10 @@ do_signal(int child, int action)
 		p->optdata_ind.DATA_flag = T_ODF_EX;
 		p->optdata_ind.OPT_length = 0;
 		p->optdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Option data indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
@@ -3964,7 +4115,7 @@ do_signal(int child, int action)
 		ic.ic_cmd = O_TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_OPTMGMT:
 		ic.ic_cmd = O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -3975,7 +4126,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_BIND:
 		ic.ic_cmd = O_TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -3983,17 +4134,17 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_UNBIND:
 		ic.ic_cmd = O_TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETINFO:
 		ic.ic_cmd = _O_TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_OPTMGMT:
 		ic.ic_cmd = _O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4004,7 +4155,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_BIND:
 		ic.ic_cmd = _O_TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4012,47 +4163,47 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_UNBIND:
 		ic.ic_cmd = _O_TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETMYNAME:
 		ic.ic_cmd = _O_TI_GETMYNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETPEERNAME:
 		ic.ic_cmd = _O_TI_GETPEERNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_HELLO:
 		ic.ic_cmd = _O_TI_XTI_HELLO;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_GET_STATE:
 		ic.ic_cmd = _O_TI_XTI_GET_STATE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_CLEAR_EVENT:
 		ic.ic_cmd = _O_TI_XTI_CLEAR_EVENT;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_MODE:
 		ic.ic_cmd = _O_TI_XTI_MODE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_TLI_MODE:
 		ic.ic_cmd = _O_TI_TLI_MODE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETINFO:
 		ic.ic_cmd = TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_OPTMGMT:
 		ic.ic_cmd = TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4063,7 +4214,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_BIND:
 		ic.ic_cmd = TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4071,22 +4222,22 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_UNBIND:
 		ic.ic_cmd = TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETMYNAME:
 		ic.ic_cmd = TI_GETMYNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETPEERNAME:
 		ic.ic_cmd = TI_GETPEERNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->conn_res);
@@ -4095,7 +4246,7 @@ do_signal(int child, int action)
 		p->conn_res.OPT_length = 0;
 		p->conn_res.OPT_offset = 0;
 		p->conn_res.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->conn_req);
@@ -4104,19 +4255,19 @@ do_signal(int child, int action)
 		p->conn_req.DEST_offset = 0;
 		p->conn_req.OPT_length = 0;
 		p->conn_req.OPT_offset = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DISC:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->discon_req);
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DISC:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->discon_req);
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DATA:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->conn_res) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
@@ -4125,7 +4276,7 @@ do_signal(int child, int action)
 		p->conn_res.OPT_length = 0;
 		p->conn_res.OPT_offset = 0;
 		p->conn_res.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DATA:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->conn_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
@@ -4134,19 +4285,19 @@ do_signal(int child, int action)
 		p->conn_req.DEST_offset = 0;
 		p->conn_req.OPT_length = 0;
 		p->conn_req.OPT_offset = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DISC_DATA:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DISC_DATA:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SYNC:
 	{
 		union {
@@ -4157,19 +4308,19 @@ do_signal(int child, int action)
 		ic.ic_cmd = TI_SYNC;
 		ic.ic_len = sizeof(*s);
 		s->req.tsr_flags = TSRF_INFO_REQ | TSRF_IS_EXP_IN_RCVBUF | TSRF_QLEN_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	}
 	case __TEST_TI_GETADDRS:
 		ic.ic_cmd = TI_GETADDRS;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_CAPABILITY:
 		ic.ic_cmd = TI_CAPABILITY;
 		ic.ic_len = sizeof(p->capability_ack);
 		p->capability_req.PRIM_type = T_CAPABILITY_REQ;
 		p->capability_req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	default:
 		return __RESULT_SCRIPT_ERROR;
 	}
@@ -4413,12 +4564,14 @@ do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	if (ctrl->len > 0) {
 		if ((last_event = do_decode_ctrl(child, ctrl, data)) != __EVENT_UNKNOWN)
-			return time_event(child, last_event);
+			return (time_event(child, last_event));
 	} else if (data->len > 0) {
 		if ((last_event = do_decode_data(child, data)) != __EVENT_UNKNOWN)
-			return time_event(child, last_event);
+			return (time_event(child, last_event));
+	} else if (data->len == 0) {
+		return (time_event(child, (last_event = __EVENT_EOF)));
 	}
-	return ((last_event = __EVENT_NO_MSG));
+	return (time_event(child, (last_event = __EVENT_NO_MSG)));
 }
 
 #if 0
@@ -4890,7 +5043,7 @@ preamble_pt_initialized_iut(int child)
 	/* Short wait for PT to launch INIT and receive INIT-ACK */
 	state++;
 	return (__RESULT_SUCCESS);
-failure:
+      failure:
 	return (__RESULT_FAILURE);
 }
 static int
@@ -5193,7 +5346,7 @@ static int
 postamble_iut_bound_iut(int child)
 {
 	int failed = -1;
-	
+
 	/* Unbind IUT */
 	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
@@ -5208,7 +5361,7 @@ postamble_iut_bound_iut(int child)
 	if (failed != -1)
 		goto failure;
 	return (__RESULT_SUCCESS);
-failure:
+      failure:
 	state = failed;
 	return (__RESULT_FAILURE);
 }
@@ -5247,7 +5400,7 @@ postamble_iut_cookie_wait_iut(int child)
 	if (failed != -1)
 		goto failure;
 	return (__RESULT_SUCCESS);
-failure:
+      failure:
 	state = failed;
 	return (__RESULT_FAILURE);
 }
@@ -5261,7 +5414,7 @@ postamble_iut_cookie_wait_pt(int child)
 	/* clear out any duplicate INITs */
 	state++;
 	return postamble_iut_bound_pt(child);
-failure:
+      failure:
 	state = failed;
 	return (__RESULT_FAILURE);
 }
@@ -5281,7 +5434,7 @@ postamble_iut_cookie_echoed_pt(int child)
 	/* clear out any duplicate COOKIE-ECHOs */
 	state++;
 	return postamble_iut_bound_pt(child);
-failure:
+      failure:
 	state = failed;
 	return (__RESULT_FAILURE);
 }
@@ -5454,36 +5607,29 @@ struct test_stream test_0_1_list = { &preamble_0_1, &test_case_0_1, &postamble_0
 #define desc_case_1_1_1 "\
 Checks that the IUT makes a complete association procedure."
 
-#define preamble_1_1_1_conn	preamble_1_iut
-#define preamble_1_1_1_resp	preamble_1_pt
-#define preamble_1_1_1_list	preamble_1_pt
+#define preamble_1_1_1_top	preamble_1_iut
+#define preamble_1_1_1_bot	preamble_1_pt
 
 /* Association is not established between tester and SUT.  Configure the
  * IUT to send an INIT to the tester. */
 
 int
-test_case_1_1_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_1_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_1_1_list(int child)
+test_case_1_1_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_1_1_conn	postamble_1_iut
-#define postamble_1_1_1_resp	postamble_1_pt
-#define postamble_1_1_1_list	postamble_1_pt
+int
+test_case_1_1_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_1_1_conn = { &premable_1_1_1_conn, &test_case_1_1_1_conn, &postamble_1_1_1_conn };
-struct test_stream test_1_1_1_resp = { &premable_1_1_1_resp, &test_case_1_1_1_resp, &postamble_1_1_1_resp };
-struct test_stream test_1_1_1_list = { &premable_1_1_1_list, &test_case_1_1_1_list, &postamble_1_1_1_list };
+#define postamble_1_1_1_top	postamble_1_iut
+#define postamble_1_1_1_bot	postamble_1_pt
+
+struct test_stream test_1_1_1_top = { &premable_1_1_1_top, &test_case_1_1_1_top, &postamble_1_1_1_top };
+struct test_stream test_1_1_1_bot = { &premable_1_1_1_bot, &test_case_1_1_1_bot, &postamble_1_1_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5496,36 +5642,29 @@ struct test_stream test_1_1_1_list = { &premable_1_1_1_list, &test_case_1_1_1_li
 Checsk that the IUT can establish a complete association after receiving\n\
 an INIT from the PT."
 
-#define preamble_1_1_2_conn	preamble_1_iut
-#define preamble_1_1_2_resp	preamble_1_pt
-#define preamble_1_1_2_list	preamble_1_pt
+#define preamble_1_1_2_top	preamble_1_iut
+#define preamble_1_1_2_bot	preamble_1_pt
 
 /* Association is not established between tester and SUT.  Arrange the
  * data at the tester such that INIT is sent to IUT. */
 
 int
-test_case_1_1_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_1_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_1_2_list(int child)
+test_case_1_1_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_1_2_conn	postamble_1_iut
-#define postamble_1_1_2_resp	postamble_1_pt
-#define postamble_1_1_2_list	postamble_1_pt
+int
+test_case_1_1_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_1_2_conn = { &premable_1_1_2_conn, &test_case_1_1_2_conn, &postamble_1_1_2_conn };
-struct test_stream test_1_1_2_resp = { &premable_1_1_2_resp, &test_case_1_1_2_resp, &postamble_1_1_2_resp };
-struct test_stream test_1_1_2_list = { &premable_1_1_2_list, &test_case_1_1_2_list, &postamble_1_1_2_list };
+#define postamble_1_1_2_top	postamble_1_iut
+#define postamble_1_1_2_bot	postamble_1_pt
+
+struct test_stream test_1_1_2_top = { &premable_1_1_2_top, &test_case_1_1_2_top, &postamble_1_1_2_top };
+struct test_stream test_1_1_2_bot = { &premable_1_1_2_bot, &test_case_1_1_2_bot, &postamble_1_1_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5538,37 +5677,30 @@ struct test_stream test_1_1_2_list = { &premable_1_1_2_list, &test_case_1_1_2_li
 Checks that the IUT, if T1-Init timer expires, transmits the INIT messsage\n\
 again."
 
-#define preamble_1_2_1_conn	preamble_1_iut
-#define preamble_1_2_1_resp	preamble_1_pt
-#define preamble_1_2_1_list	preamble_1_pt
+#define preamble_1_2_1_top	preamble_1_iut
+#define preamble_1_2_1_bot	preamble_1_pt
 
 /* Association is not esablished between the PT and SUT.  Configure the
  * SUT to send an INIT to the PT.  Arrange the data at the PT such that
  * INIT-ACK is not sent in response to INIT message. */
 
 int
-test_case_1_2_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_2_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_2_1_list(int child)
+test_case_1_2_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_2_1_conn	postamble_1_iut
-#define postamble_1_2_1_resp	postamble_1_pt
-#define postamble_1_2_1_list	postamble_1_pt
+int
+test_case_1_2_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_2_1_conn = { &premable_1_2_1_conn, &test_case_1_2_1_conn, &postamble_1_2_1_conn };
-struct test_stream test_1_2_1_resp = { &premable_1_2_1_resp, &test_case_1_2_1_resp, &postamble_1_2_1_resp };
-struct test_stream test_1_2_1_list = { &premable_1_2_1_list, &test_case_1_2_1_list, &postamble_1_2_1_list };
+#define postamble_1_2_1_top	postamble_1_iut
+#define postamble_1_2_1_bot	postamble_1_pt
+
+struct test_stream test_1_2_1_top = { &premable_1_2_1_top, &test_case_1_2_1_top, &postamble_1_2_1_top };
+struct test_stream test_1_2_1_bot = { &premable_1_2_1_bot, &test_case_1_2_1_bot, &postamble_1_2_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5581,37 +5713,30 @@ struct test_stream test_1_2_1_list = { &premable_1_2_1_list, &test_case_1_2_1_li
 Checks that the IUT, if T1-Cookie timer expires, transmits the COOKIE-ECHO\n\
 message again."
 
-#define preamble_1_2_2_conn	preamble_1_iut
-#define preamble_1_2_2_resp	preamble_1_pt
-#define preamble_1_2_2_list	preamble_1_pt
+#define preamble_1_2_2_top	preamble_1_iut
+#define preamble_1_2_2_bot	preamble_1_pt
 
 /* Association is not esablished betwen the PT and SUT.  Configure the
  * SUT to send an INIT to the PT.  Arrange the data at the tester such
  * that COOKIE-ACK is not sent in response to COOKIE-ECHO message. */
 
 int
-test_case_1_2_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_2_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_2_2_list(int child)
+test_case_1_2_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_2_2_conn	postamble_1_iut
-#define postamble_1_2_2_resp	postamble_1_pt
-#define postamble_1_2_2_list	postamble_1_pt
+int
+test_case_1_2_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_2_2_conn = { &premable_1_2_2_conn, &test_case_1_2_2_conn, &postamble_1_2_2_conn };
-struct test_stream test_1_2_2_resp = { &premable_1_2_2_resp, &test_case_1_2_2_resp, &postamble_1_2_2_resp };
-struct test_stream test_1_2_2_list = { &premable_1_2_2_list, &test_case_1_2_2_list, &postamble_1_2_2_list };
+#define postamble_1_2_2_top	postamble_1_iut
+#define postamble_1_2_2_bot	postamble_1_pt
+
+struct test_stream test_1_2_2_top = { &premable_1_2_2_top, &test_case_1_2_2_top, &postamble_1_2_2_top };
+struct test_stream test_1_2_2_bot = { &premable_1_2_2_bot, &test_case_1_2_2_bot, &postamble_1_2_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5624,37 +5749,30 @@ struct test_stream test_1_2_2_list = { &premable_1_2_2_list, &test_case_1_2_2_li
 Checks that the IUT, if INIT is retransmitted for MAX.INIT.RETRIES times,\n\
 stops the initialization process."
 
-#define preamble_1_3_1_conn	preamble_1_iut
-#define preamble_1_3_1_resp	preamble_1_pt
-#define preamble_1_3_1_list	preamble_1_pt
+#define preamble_1_3_1_top	preamble_1_iut
+#define preamble_1_3_1_bot	preamble_1_pt
 
 /* Association is not established between PT and SUT.  Configure the SUT
  * to send an INIT to the PT.  Arrange the data at the PT such that
  * INIT-ACK is never sent in response to INIT message. */
 
 int
-test_case_1_3_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_3_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_3_1_list(int child)
+test_case_1_3_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_3_1_conn	postamble_1_iut
-#define postamble_1_3_1_resp	postamble_1_pt
-#define postamble_1_3_1_list	postamble_1_pt
+int
+test_case_1_3_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_3_1_conn = { &premable_1_3_1_conn, &test_case_1_3_1_conn, &postamble_1_3_1_conn };
-struct test_stream test_1_3_1_resp = { &premable_1_3_1_resp, &test_case_1_3_1_resp, &postamble_1_3_1_resp };
-struct test_stream test_1_3_1_list = { &premable_1_3_1_list, &test_case_1_3_1_list, &postamble_1_3_1_list };
+#define postamble_1_3_1_top	postamble_1_iut
+#define postamble_1_3_1_bot	postamble_1_pt
+
+struct test_stream test_1_3_1_top = { &premable_1_3_1_top, &test_case_1_3_1_top, &postamble_1_3_1_top };
+struct test_stream test_1_3_1_bot = { &premable_1_3_1_bot, &test_case_1_3_1_bot, &postamble_1_3_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5667,37 +5785,30 @@ struct test_stream test_1_3_1_list = { &premable_1_3_1_list, &test_case_1_3_1_li
 Checks that the IUT, if COOKIE-ECHO message is retransmitted for\n\
 MAX.INIT.RETRANS times, stops the initialization process."
 
-#define preamble_1_3_2_conn	preamble_1_iut
-#define preamble_1_3_2_resp	preamble_1_pt
-#define preamble_1_3_2_list	preamble_1_pt
+#define preamble_1_3_2_top	preamble_1_iut
+#define preamble_1_3_2_bot	preamble_1_pt
 
 /* Association is not established between PT and SUT.  Configure the
  * SUTto send an INIT to the PT.  Arrange the data at the PT such that
  * COOKIE-ACK is never sent in response to COOKIE-ECHO message. */
 
 int
-test_case_1_3_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_3_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_3_2_list(int child)
+test_case_1_3_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_3_2_conn	postamble_1_iut
-#define postamble_1_3_2_resp	postamble_1_pt
-#define postamble_1_3_2_list	postamble_1_pt
+int
+test_case_1_3_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_3_2_conn = { &premable_1_3_2_conn, &test_case_1_3_2_conn, &postamble_1_3_2_conn };
-struct test_stream test_1_3_2_resp = { &premable_1_3_2_resp, &test_case_1_3_2_resp, &postamble_1_3_2_resp };
-struct test_stream test_1_3_2_list = { &premable_1_3_2_list, &test_case_1_3_2_list, &postamble_1_3_2_list };
+#define postamble_1_3_2_top	postamble_1_iut
+#define postamble_1_3_2_bot	postamble_1_pt
+
+struct test_stream test_1_3_2_top = { &premable_1_3_2_top, &test_case_1_3_2_top, &postamble_1_3_2_top };
+struct test_stream test_1_3_2_bot = { &premable_1_3_2_bot, &test_case_1_3_2_bot, &postamble_1_3_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5710,9 +5821,8 @@ struct test_stream test_1_3_2_list = { &premable_1_3_2_list, &test_case_1_3_2_li
 Checks that the IUT remains in closed state if COOKIE-ECHO message\n\
 is not received."
 
-#define preamble_1_4_conn	preamble_1_iut
-#define preamble_1_4_resp	preamble_1_pt
-#define preamble_1_4_list	preamble_1_pt
+#define preamble_1_4_top	preamble_1_iut
+#define preamble_1_4_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange the data at
  * the PT such that COOKIE-ECHO is not sent in response to INIT-ACK
@@ -5721,28 +5831,22 @@ is not received."
  * the nth association. */
 
 int
-test_case_1_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_4_list(int child)
+test_case_1_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_4_conn	postamble_1_iut
-#define postamble_1_4_resp	postamble_1_pt
-#define postamble_1_4_list	postamble_1_pt
+int
+test_case_1_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_4_conn = { &premable_1_4_conn, &test_case_1_4_conn, &postamble_1_4_conn };
-struct test_stream test_1_4_resp = { &premable_1_4_resp, &test_case_1_4_resp, &postamble_1_4_resp };
-struct test_stream test_1_4_list = { &premable_1_4_list, &test_case_1_4_list, &postamble_1_4_list };
+#define postamble_1_4_top	postamble_1_iut
+#define postamble_1_4_bot	postamble_1_pt
+
+struct test_stream test_1_4_top = { &premable_1_4_top, &test_case_1_4_top, &postamble_1_4_top };
+struct test_stream test_1_4_bot = { &premable_1_4_bot, &test_case_1_4_bot, &postamble_1_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5755,37 +5859,30 @@ struct test_stream test_1_4_list = { &premable_1_4_list, &test_case_1_4_list, &p
 Checks that the IUT on re-establishing an association to a peer, uses\n\
 a random Initiate-Tag value in the INIT message."
 
-#define preamble_1_5_1_conn	preamble_1_iut
-#define preamble_1_5_1_resp	preamble_1_pt
-#define preamble_1_5_1_list	preamble_1_pt
+#define preamble_1_5_1_top	preamble_1_iut
+#define preamble_1_5_1_bot	preamble_1_pt
 
 /* Association is not established between PT and SUT.  Arrange the data
  * at the PT such that normal association can be established and
  * terminated between PT and SUT. */
 
 int
-test_case_1_5_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_5_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_5_1_list(int child)
+test_case_1_5_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_5_1_conn	postamble_1_iut
-#define postamble_1_5_1_resp	postamble_1_pt
-#define postamble_1_5_1_list	postamble_1_pt
+int
+test_case_1_5_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_5_1_conn = { &premable_1_5_1_conn, &test_case_1_5_1_conn, &postamble_1_5_1_conn };
-struct test_stream test_1_5_1_resp = { &premable_1_5_1_resp, &test_case_1_5_1_resp, &postamble_1_5_1_resp };
-struct test_stream test_1_5_1_list = { &premable_1_5_1_list, &test_case_1_5_1_list, &postamble_1_5_1_list };
+#define postamble_1_5_1_top	postamble_1_iut
+#define postamble_1_5_1_bot	postamble_1_pt
+
+struct test_stream test_1_5_1_top = { &premable_1_5_1_top, &test_case_1_5_1_top, &postamble_1_5_1_top };
+struct test_stream test_1_5_1_bot = { &premable_1_5_1_bot, &test_case_1_5_1_bot, &postamble_1_5_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5798,37 +5895,30 @@ struct test_stream test_1_5_1_list = { &premable_1_5_1_list, &test_case_1_5_1_li
 Checks that the IUT on re-establishing an association to a peer, uses\n\
 a random Initiate-Tag value in the INIT-ACK message.
 
-#define preamble_1_5_2_conn	preamble_1_iut
-#define preamble_1_5_2_resp	preamble_1_pt
-#define preamble_1_5_2_list	preamble_1_pt
+#define preamble_1_5_2_top	preamble_1_iut
+#define preamble_1_5_2_bot	preamble_1_pt
 
 /* Association is not established between PT and SUT.  Arrange the data
  * at the PT such that normal association can be established and
  * terminated between PT and SUT. */
 
 int
-test_case_1_5_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_5_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_5_2_list(int child)
+test_case_1_5_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_5_2_conn	postamble_1_iut
-#define postamble_1_5_2_resp	postamble_1_pt
-#define postamble_1_5_2_list	postamble_1_pt
+int
+test_case_1_5_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_5_2_conn = { &premable_1_5_2_conn, &test_case_1_5_2_conn, &postamble_1_5_2_conn };
-struct test_stream test_1_5_2_resp = { &premable_1_5_2_resp, &test_case_1_5_2_resp, &postamble_1_5_2_resp };
-struct test_stream test_1_5_2_list = { &premable_1_5_2_list, &test_case_1_5_2_list, &postamble_1_5_2_list };
+#define postamble_1_5_2_top	postamble_1_iut
+#define postamble_1_5_2_bot	postamble_1_pt
+
+struct test_stream test_1_5_2_top = { &premable_1_5_2_top, &test_case_1_5_2_top, &postamble_1_5_2_top };
+struct test_stream test_1_5_2_bot = { &premable_1_5_2_bot, &test_case_1_5_2_bot, &postamble_1_5_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5843,9 +5933,8 @@ Checks that the IUT on receipt of an INIT message with parameters\n\
 Supported Address Type Parameter) accepts this message and responds\n\
 to it."
 
-#define preamble_1_6_1_conn	preamble_1_iut
-#define preamble_1_6_1_resp	preamble_1_pt
-#define preamble_1_6_1_list	preamble_1_pt
+#define preamble_1_6_1_top	preamble_1_iut
+#define preamble_1_6_1_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange the data at
  * the PT such that the listed parameters (Ipv4 Adddress Parameter, IPv6
@@ -5853,28 +5942,22 @@ to it."
  * Parameter) are sent in INIT message. */
 
 int
-test_case_1_6_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_6_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_6_1_list(int child)
+test_case_1_6_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_6_1_conn	postamble_1_iut
-#define postamble_1_6_1_resp	postamble_1_pt
-#define postamble_1_6_1_list	postamble_1_pt
+int
+test_case_1_6_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_6_1_conn = { &premable_1_6_1_conn, &test_case_1_6_1_conn, &postamble_1_6_1_conn };
-struct test_stream test_1_6_1_resp = { &premable_1_6_1_resp, &test_case_1_6_1_resp, &postamble_1_6_1_resp };
-struct test_stream test_1_6_1_list = { &premable_1_6_1_list, &test_case_1_6_1_list, &postamble_1_6_1_list };
+#define postamble_1_6_1_top	postamble_1_iut
+#define postamble_1_6_1_bot	postamble_1_pt
+
+struct test_stream test_1_6_1_top = { &premable_1_6_1_top, &test_case_1_6_1_top, &postamble_1_6_1_top };
+struct test_stream test_1_6_1_bot = { &premable_1_6_1_bot, &test_case_1_6_1_bot, &postamble_1_6_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5888,9 +5971,8 @@ Checks that the IUT on receipt of an INIT-ACK message with parameters\n\
 (IPv4 Address Parameter, IPv6 Address Parameter, Cookie Preservative)\n\
 accepts this message and responds to it."
 
-#define preamble_1_6_2_conn	preamble_1_iut
-#define preamble_1_6_2_resp	preamble_1_pt
-#define preamble_1_6_2_list	preamble_1_pt
+#define preamble_1_6_2_top	preamble_1_iut
+#define preamble_1_6_2_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange the data at
  * the PT such that the listed parameters (IPv4 Address Parameter, IPv6
@@ -5898,28 +5980,22 @@ accepts this message and responds to it."
  */
 
 int
-test_case_1_6_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_6_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_6_2_list(int child)
+test_case_1_6_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_6_2_conn	postamble_1_iut
-#define postamble_1_6_2_resp	postamble_1_pt
-#define postamble_1_6_2_list	postamble_1_pt
+int
+test_case_1_6_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_6_2_conn = { &premable_1_6_2_conn, &test_case_1_6_2_conn, &postamble_1_6_2_conn };
-struct test_stream test_1_6_2_resp = { &premable_1_6_2_resp, &test_case_1_6_2_resp, &postamble_1_6_2_resp };
-struct test_stream test_1_6_2_list = { &premable_1_6_2_list, &test_case_1_6_2_list, &postamble_1_6_2_list };
+#define postamble_1_6_2_top	postamble_1_iut
+#define postamble_1_6_2_bot	postamble_1_pt
+
+struct test_stream test_1_6_2_top = { &premable_1_6_2_top, &test_case_1_6_2_top, &postamble_1_6_2_top };
+struct test_stream test_1_6_2_bot = { &premable_1_6_2_bot, &test_case_1_6_2_bot, &postamble_1_6_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5933,37 +6009,30 @@ Checks that the IUT, if there is a mismatch in the Outbound Stream and\n\
 Inbound Stream parameters in INIT and INIT-ACK message, either aborts\n\
 the association or settles with the lesser of the two values."
 
-#define preamble_1_7_1_conn	preamble_1_iut
-#define preamble_1_7_1_resp	preamble_1_pt
-#define preamble_1_7_1_list	preamble_1_pt
+#define preamble_1_7_1_top	preamble_1_iut
+#define preamble_1_7_1_bot	preamble_1_pt
 
 /* Association is not established between PT and SUT.  Also, let the
  * Outbound Streams of the SUT be Z.  Arrange data at the PT such that
  * INIT message is sent from PT with Maximum Inbound Streams Y < Z. */
 
 int
-test_case_1_7_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_7_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_7_1_list(int child)
+test_case_1_7_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_7_1_conn	postamble_1_iut
-#define postamble_1_7_1_resp	postamble_1_pt
-#define postamble_1_7_1_list	postamble_1_pt
+int
+test_case_1_7_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_7_1_conn = { &premable_1_7_1_conn, &test_case_1_7_1_conn, &postamble_1_7_1_conn };
-struct test_stream test_1_7_1_resp = { &premable_1_7_1_resp, &test_case_1_7_1_resp, &postamble_1_7_1_resp };
-struct test_stream test_1_7_1_list = { &premable_1_7_1_list, &test_case_1_7_1_list, &postamble_1_7_1_list };
+#define postamble_1_7_1_top	postamble_1_iut
+#define postamble_1_7_1_bot	postamble_1_pt
+
+struct test_stream test_1_7_1_top = { &premable_1_7_1_top, &test_case_1_7_1_top, &postamble_1_7_1_top };
+struct test_stream test_1_7_1_bot = { &premable_1_7_1_bot, &test_case_1_7_1_bot, &postamble_1_7_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -5977,37 +6046,30 @@ Checks that the IUT, if OutboundStreams are found zero in the received\n\
 INIT message, sends an ABORT message for that INIT, or silently discards\n\
 the received message."
 
-#define preamble_1_7_2_conn	preamble_1_iut
-#define preamble_1_7_2_resp	preamble_1_pt
-#define preamble_1_7_2_list	preamble_1_pt
+#define preamble_1_7_2_top	preamble_1_iut
+#define preamble_1_7_2_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT such that INIT message with Outbound Streams equal to 0 is sent
  * from the PT. */
 
 int
-test_case_1_7_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_7_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_7_2_list(int child)
+test_case_1_7_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_7_2_conn	postamble_1_iut
-#define postamble_1_7_2_resp	postamble_1_pt
-#define postamble_1_7_2_list	postamble_1_pt
+int
+test_case_1_7_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_7_2_conn = { &premable_1_7_2_conn, &test_case_1_7_2_conn, &postamble_1_7_2_conn };
-struct test_stream test_1_7_2_resp = { &premable_1_7_2_resp, &test_case_1_7_2_resp, &postamble_1_7_2_resp };
-struct test_stream test_1_7_2_list = { &premable_1_7_2_list, &test_case_1_7_2_list, &postamble_1_7_2_list };
+#define postamble_1_7_2_top	postamble_1_iut
+#define postamble_1_7_2_bot	postamble_1_pt
+
+struct test_stream test_1_7_2_top = { &premable_1_7_2_top, &test_case_1_7_2_top, &postamble_1_7_2_top };
+struct test_stream test_1_7_2_bot = { &premable_1_7_2_bot, &test_case_1_7_2_bot, &postamble_1_7_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6021,9 +6083,8 @@ Checks that the IUT, if there is a mismatch in the Outbound Streams and\n\
 Inbound Streams parameters in INIT and INIT-ACK messages, either aborts\n\
 the association or settles with the lesser of the two parameters."
 
-#define preamble_1_7_3_conn	preamble_1_iut
-#define preamble_1_7_3_resp	preamble_1_pt
-#define preamble_1_7_3_list	preamble_1_pt
+#define preamble_1_7_3_top	preamble_1_iut
+#define preamble_1_7_3_bot	preamble_1_pt
 
 /* Association is not established between PT and SUT.  Also let the
  * Outbound Streams of the SUT be Z.  Arrange data at the PT such that
@@ -6031,28 +6092,22 @@ the association or settles with the lesser of the two parameters."
  */
 
 int
-test_case_1_7_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_7_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_7_3_list(int child)
+test_case_1_7_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_7_3_conn	postamble_1_iut
-#define postamble_1_7_3_resp	postamble_1_pt
-#define postamble_1_7_3_list	postamble_1_pt
+int
+test_case_1_7_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_7_3_conn = { &premable_1_7_3_conn, &test_case_1_7_3_conn, &postamble_1_7_3_conn };
-struct test_stream test_1_7_3_resp = { &premable_1_7_3_resp, &test_case_1_7_3_resp, &postamble_1_7_3_resp };
-struct test_stream test_1_7_3_list = { &premable_1_7_3_list, &test_case_1_7_3_list, &postamble_1_7_3_list };
+#define postamble_1_7_3_top	postamble_1_iut
+#define postamble_1_7_3_bot	postamble_1_pt
+
+struct test_stream test_1_7_3_top = { &premable_1_7_3_top, &test_case_1_7_3_top, &postamble_1_7_3_top };
+struct test_stream test_1_7_3_bot = { &premable_1_7_3_bot, &test_case_1_7_3_bot, &postamble_1_7_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6067,37 +6122,30 @@ INIT-ACK message, destroys the TCB and may send an ABORT message for\n\
 that INIT-ACK.  (Further message exchanges between the tester and IUT\n\
 need to take place to verify the TCB removal from outside the SUT.)"
 
-#define preamble_1_7_4_conn	preamble_1_iut
-#define preamble_1_7_4_resp	preamble_1_pt
-#define preamble_1_7_4_list	preamble_1_pt
+#define preamble_1_7_4_top	preamble_1_iut
+#define preamble_1_7_4_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Also let the
  * Outbound Streams of the SUT be Z.  Arrange data at the PT such that
  * INIT-ACK message with Outbound Streams equal to 0 is send from PT. */
 
 int
-test_case_1_7_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_7_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_7_4_list(int child)
+test_case_1_7_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_7_4_conn	postamble_1_iut
-#define postamble_1_7_4_resp	postamble_1_pt
-#define postamble_1_7_4_list	postamble_1_pt
+int
+test_case_1_7_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_7_4_conn = { &premable_1_7_4_conn, &test_case_1_7_4_conn, &postamble_1_7_4_conn };
-struct test_stream test_1_7_4_resp = { &premable_1_7_4_resp, &test_case_1_7_4_resp, &postamble_1_7_4_resp };
-struct test_stream test_1_7_4_list = { &premable_1_7_4_list, &test_case_1_7_4_list, &postamble_1_7_4_list };
+#define postamble_1_7_4_top	postamble_1_iut
+#define postamble_1_7_4_bot	postamble_1_pt
+
+struct test_stream test_1_7_4_top = { &premable_1_7_4_top, &test_case_1_7_4_top, &postamble_1_7_4_top };
+struct test_stream test_1_7_4_bot = { &premable_1_7_4_bot, &test_case_1_7_4_bot, &postamble_1_7_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6110,37 +6158,30 @@ struct test_stream test_1_7_4_list = { &premable_1_7_4_list, &test_case_1_7_4_li
 Checks that the IUT supports at least 2 incoming streams and 2 outgoing\n\
 streams."
 
-#define preamble_1_7_5_conn	preamble_1_iut
-#define preamble_1_7_5_resp	preamble_1_pt
-#define preamble_1_7_5_list	preamble_1_pt
+#define preamble_1_7_5_top	preamble_1_iut
+#define preamble_1_7_5_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT such that INIT message is sent from tester with Outbound Streams
  * and Maximum Inbound Streams set to 2. */
 
 int
-test_case_1_7_5_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_7_5_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_7_5_list(int child)
+test_case_1_7_5_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_7_5_conn	postamble_1_iut
-#define postamble_1_7_5_resp	postamble_1_pt
-#define postamble_1_7_5_list	postamble_1_pt
+int
+test_case_1_7_5_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_7_5_conn = { &premable_1_7_5_conn, &test_case_1_7_5_conn, &postamble_1_7_5_conn };
-struct test_stream test_1_7_5_resp = { &premable_1_7_5_resp, &test_case_1_7_5_resp, &postamble_1_7_5_resp };
-struct test_stream test_1_7_5_list = { &premable_1_7_5_list, &test_case_1_7_5_list, &postamble_1_7_5_list };
+#define postamble_1_7_5_top	postamble_1_iut
+#define postamble_1_7_5_bot	postamble_1_pt
+
+struct test_stream test_1_7_5_top = { &premable_1_7_5_top, &test_case_1_7_5_top, &postamble_1_7_5_top };
+struct test_stream test_1_7_5_bot = { &premable_1_7_5_bot, &test_case_1_7_5_bot, &postamble_1_7_5_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6155,37 +6196,30 @@ two bits in the parameter type set to 11) in a received INIT message,\n\
 fills them in the Unrecognized Parameters of the INIT-ACK and continues\n\
 processing of further parameters."
 
-#define preamble_1_8_1_conn	preamble_1_iut
-#define preamble_1_8_1_resp	preamble_1_pt
-#define preamble_1_8_1_list	preamble_1_pt
+#define preamble_1_8_1_top	preamble_1_iut
+#define preamble_1_8_1_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT such that a datagram with undefined paramter type and MSB two bits
  * in the parameter type equal to 11 is sent to tester. */
 
 int
-test_case_1_8_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_8_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_8_1_list(int child)
+test_case_1_8_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_8_1_conn	postamble_1_iut
-#define postamble_1_8_1_resp	postamble_1_pt
-#define postamble_1_8_1_list	postamble_1_pt
+int
+test_case_1_8_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_8_1_conn = { &premable_1_8_1_conn, &test_case_1_8_1_conn, &postamble_1_8_1_conn };
-struct test_stream test_1_8_1_resp = { &premable_1_8_1_resp, &test_case_1_8_1_resp, &postamble_1_8_1_resp };
-struct test_stream test_1_8_1_list = { &premable_1_8_1_list, &test_case_1_8_1_list, &postamble_1_8_1_list };
+#define postamble_1_8_1_top	postamble_1_iut
+#define postamble_1_8_1_bot	postamble_1_pt
+
+struct test_stream test_1_8_1_top = { &premable_1_8_1_top, &test_case_1_8_1_top, &postamble_1_8_1_top };
+struct test_stream test_1_8_1_bot = { &premable_1_8_1_bot, &test_case_1_8_1_bot, &postamble_1_8_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6200,37 +6234,30 @@ MSB two bits in the parameter type set to 00) in a received INIT\n\
 message, does not process any further parameters and does not report\n\
 it."
 
-#define preamble_1_8_2_conn	preamble_1_iut
-#define preamble_1_8_2_resp	preamble_1_pt
-#define preamble_1_8_2_list	preamble_1_pt
+#define preamble_1_8_2_top	preamble_1_iut
+#define preamble_1_8_2_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT such that a datagram with underfined parameter type and MSB two
  * bits in the parameter type equal to 00 is sent to the IUT. */
 
 int
-test_case_1_8_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_8_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_8_2_list(int child)
+test_case_1_8_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_8_2_conn	postamble_1_iut
-#define postamble_1_8_2_resp	postamble_1_pt
-#define postamble_1_8_2_list	postamble_1_pt
+int
+test_case_1_8_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_8_2_conn = { &premable_1_8_2_conn, &test_case_1_8_2_conn, &postamble_1_8_2_conn };
-struct test_stream test_1_8_2_resp = { &premable_1_8_2_resp, &test_case_1_8_2_resp, &postamble_1_8_2_resp };
-struct test_stream test_1_8_2_list = { &premable_1_8_2_list, &test_case_1_8_2_list, &postamble_1_8_2_list };
+#define postamble_1_8_2_top	postamble_1_iut
+#define postamble_1_8_2_bot	postamble_1_pt
+
+struct test_stream test_1_8_2_top = { &premable_1_8_2_top, &test_case_1_8_2_top, &postamble_1_8_2_top };
+struct test_stream test_1_8_2_bot = { &premable_1_8_2_bot, &test_case_1_8_2_bot, &postamble_1_8_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6246,37 +6273,30 @@ message, does not process any further parameters and reports it using an\n\
 Unrecognized Parameters parameter field in the INIT-ACK response\n\
 message."
 
-#define preamble_1_8_3_conn	preamble_1_iut
-#define preamble_1_8_3_resp	preamble_1_pt
-#define preamble_1_8_3_list	preamble_1_pt
+#define preamble_1_8_3_top	preamble_1_iut
+#define preamble_1_8_3_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT such that a datagram with underfined parameter and MSB two bits in
  * the parameter type equal to 01 is send to the IUT. */
 
 int
-test_case_1_8_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_8_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_8_3_list(int child)
+test_case_1_8_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_8_3_conn	postamble_1_iut
-#define postamble_1_8_3_resp	postamble_1_pt
-#define postamble_1_8_3_list	postamble_1_pt
+int
+test_case_1_8_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_8_3_conn = { &premable_1_8_3_conn, &test_case_1_8_3_conn, &postamble_1_8_3_conn };
-struct test_stream test_1_8_3_resp = { &premable_1_8_3_resp, &test_case_1_8_3_resp, &postamble_1_8_3_resp };
-struct test_stream test_1_8_3_list = { &premable_1_8_3_list, &test_case_1_8_3_list, &postamble_1_8_3_list };
+#define postamble_1_8_3_top	postamble_1_iut
+#define postamble_1_8_3_bot	postamble_1_pt
+
+struct test_stream test_1_8_3_top = { &premable_1_8_3_top, &test_case_1_8_3_top, &postamble_1_8_3_top };
+struct test_stream test_1_8_3_bot = { &premable_1_8_3_bot, &test_case_1_8_3_bot, &postamble_1_8_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6290,37 +6310,30 @@ Checs that the IUT, on receipt of an unrecognized TLV parameter (with\n\
 MSB two bits in the parameter type set to 10) in the received INIT\n\
 message, skips this parameter and processes further parameters."
 
-#define preamble_1_8_4_conn	preamble_1_iut
-#define preamble_1_8_4_resp	preamble_1_pt
-#define preamble_1_8_4_list	preamble_1_pt
+#define preamble_1_8_4_top	preamble_1_iut
+#define preamble_1_8_4_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT such that a datagram with undefined parameter and MSB two bits in
  * the parameter type equal to 10 is sent to the IUT. */
 
 int
-test_case_1_8_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_8_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_8_4_list(int child)
+test_case_1_8_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_8_4_conn	postamble_1_iut
-#define postamble_1_8_4_resp	postamble_1_pt
-#define postamble_1_8_4_list	postamble_1_pt
+int
+test_case_1_8_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_8_4_conn = { &premable_1_8_4_conn, &test_case_1_8_4_conn, &postamble_1_8_4_conn };
-struct test_stream test_1_8_4_resp = { &premable_1_8_4_resp, &test_case_1_8_4_resp, &postamble_1_8_4_resp };
-struct test_stream test_1_8_4_list = { &premable_1_8_4_list, &test_case_1_8_4_list, &postamble_1_8_4_list };
+#define postamble_1_8_4_top	postamble_1_iut
+#define postamble_1_8_4_bot	postamble_1_pt
+
+struct test_stream test_1_8_4_top = { &premable_1_8_4_top, &test_case_1_8_4_top, &postamble_1_8_4_top };
+struct test_stream test_1_8_4_bot = { &premable_1_8_4_bot, &test_case_1_8_4_bot, &postamble_1_8_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6334,37 +6347,30 @@ Checks that the IUT on receipt of an INIT message for starting\n\
 asscociation with transport addresses that are already in association,\n\
 responds with an INIT-ACK message.
 
-#define preamble_1_9_1_conn	preamble_1_iut
-#define preamble_1_9_1_resp	preamble_1_pt
-#define preamble_1_9_1_list	preamble_1_pt
+#define preamble_1_9_1_top	preamble_1_iut
+#define preamble_1_9_1_bot	preamble_1_pt
 
 /* Association is established between PT and SUT.  Arrange the data at
  * the PT such that INIT message is sent for making an association with
  * SUT using same IP address. */
 
 int
-test_case_1_9_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_9_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_9_1_list(int child)
+test_case_1_9_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_9_1_conn	postamble_1_iut
-#define postamble_1_9_1_resp	postamble_1_pt
-#define postamble_1_9_1_list	postamble_1_pt
+int
+test_case_1_9_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_9_1_conn = { &premable_1_9_1_conn, &test_case_1_9_1_conn, &postamble_1_9_1_conn };
-struct test_stream test_1_9_1_resp = { &premable_1_9_1_resp, &test_case_1_9_1_resp, &postamble_1_9_1_resp };
-struct test_stream test_1_9_1_list = { &premable_1_9_1_list, &test_case_1_9_1_list, &postamble_1_9_1_list };
+#define postamble_1_9_1_top	postamble_1_iut
+#define postamble_1_9_1_bot	postamble_1_pt
+
+struct test_stream test_1_9_1_top = { &premable_1_9_1_top, &test_case_1_9_1_top, &postamble_1_9_1_top };
+struct test_stream test_1_9_1_bot = { &premable_1_9_1_bot, &test_case_1_9_1_bot, &postamble_1_9_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6379,9 +6385,8 @@ association with transport addresses that are not the same as the\n\
 already established association, responds with an ABORT message with\n\
 error \"Restart of an association with new addresses\""
 
-#define preamble_1_9_2_conn	preamble_1_iut
-#define preamble_1_9_2_resp	preamble_1_pt
-#define preamble_1_9_2_list	preamble_1_pt
+#define preamble_1_9_2_top	preamble_1_iut
+#define preamble_1_9_2_bot	preamble_1_pt
 
 /* Association is established between PT and SUT.  Arrange the data at
  * the PT such that INIT message is sent for establishing an association
@@ -6389,28 +6394,22 @@ error \"Restart of an association with new addresses\""
  * not yet used, IP address. */
 
 int
-test_case_1_9_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_9_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_9_2_list(int child)
+test_case_1_9_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_9_2_conn	postamble_1_iut
-#define postamble_1_9_2_resp	postamble_1_pt
-#define postamble_1_9_2_list	postamble_1_pt
+int
+test_case_1_9_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_9_2_conn = { &premable_1_9_2_conn, &test_case_1_9_2_conn, &postamble_1_9_2_conn };
-struct test_stream test_1_9_2_resp = { &premable_1_9_2_resp, &test_case_1_9_2_resp, &postamble_1_9_2_resp };
-struct test_stream test_1_9_2_list = { &premable_1_9_2_list, &test_case_1_9_2_list, &postamble_1_9_2_list };
+#define postamble_1_9_2_top	postamble_1_iut
+#define postamble_1_9_2_bot	postamble_1_pt
+
+struct test_stream test_1_9_2_top = { &premable_1_9_2_top, &test_case_1_9_2_top, &postamble_1_9_2_top };
+struct test_stream test_1_9_2_bot = { &premable_1_9_2_bot, &test_case_1_9_2_bot, &postamble_1_9_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6424,36 +6423,29 @@ Checks that the IUT, on receipt of an INIT message with no IP addresses\n\
 sends an INIT-ACK message to the source IP address from where the INIT\n\
 message was received."
 
-#define preamble_1_10_1_conn	preamble_1_iut
-#define preamble_1_10_1_resp	preamble_1_pt
-#define preamble_1_10_1_list	preamble_1_pt
+#define preamble_1_10_1_top	preamble_1_iut
+#define preamble_1_10_1_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT such that no IP addresses are sent in INIT. */
 
 int
-test_case_1_10_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_10_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_10_1_list(int child)
+test_case_1_10_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_10_1_conn	postamble_1_iut
-#define postamble_1_10_1_resp	postamble_1_pt
-#define postamble_1_10_1_list	postamble_1_pt
+int
+test_case_1_10_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_10_1_conn = { &premable_1_10_1_conn, &test_case_1_10_1_conn, &postamble_1_10_1_conn };
-struct test_stream test_1_10_1_resp = { &premable_1_10_1_resp, &test_case_1_10_1_resp, &postamble_1_10_1_resp };
-struct test_stream test_1_10_1_list = { &premable_1_10_1_list, &test_case_1_10_1_list, &postamble_1_10_1_list };
+#define postamble_1_10_1_top	postamble_1_iut
+#define postamble_1_10_1_bot	postamble_1_pt
+
+struct test_stream test_1_10_1_top = { &premable_1_10_1_top, &test_case_1_10_1_top, &postamble_1_10_1_top };
+struct test_stream test_1_10_1_bot = { &premable_1_10_1_bot, &test_case_1_10_1_bot, &postamble_1_10_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6467,37 +6459,30 @@ Checks that the IUT, on receipt of an INIT-ACK message with no optional\n\
 IP addresses sends a COOKIE-ECHO message to the source IP address from\n\
 which the INIT-ACK message was received."
 
-#define preamble_1_10_2_conn	preamble_1_iut
-#define preamble_1_10_2_resp	preamble_1_pt
-#define preamble_1_10_2_list	preamble_1_pt
+#define preamble_1_10_2_top	preamble_1_iut
+#define preamble_1_10_2_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT such that no IP addresses are sent in INIT-ACK optional IP address
  * field. */
 
 int
-test_case_1_10_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_10_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_10_2_list(int child)
+test_case_1_10_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_10_2_conn	postamble_1_iut
-#define postamble_1_10_2_resp	postamble_1_pt
-#define postamble_1_10_2_list	postamble_1_pt
+int
+test_case_1_10_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_10_2_conn = { &premable_1_10_2_conn, &test_case_1_10_2_conn, &postamble_1_10_2_conn };
-struct test_stream test_1_10_2_resp = { &premable_1_10_2_resp, &test_case_1_10_2_resp, &postamble_1_10_2_resp };
-struct test_stream test_1_10_2_list = { &premable_1_10_2_list, &test_case_1_10_2_list, &postamble_1_10_2_list };
+#define postamble_1_10_2_top	postamble_1_iut
+#define postamble_1_10_2_bot	postamble_1_pt
+
+struct test_stream test_1_10_2_top = { &premable_1_10_2_top, &test_case_1_10_2_top, &postamble_1_10_2_top };
+struct test_stream test_1_10_2_bot = { &premable_1_10_2_bot, &test_case_1_10_2_bot, &postamble_1_10_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6513,37 +6498,30 @@ the INIT message was received and uses all of the IP addresses plus the\n\
 IP address from where the INIT message was received combined with the\n\
 SCTP source port number as the destination transport address.
 
-#define preamble_1_11_1_conn	preamble_1_iut
-#define preamble_1_11_1_resp	preamble_1_pt
-#define preamble_1_11_1_list	preamble_1_pt
+#define preamble_1_11_1_top	preamble_1_iut
+#define preamble_1_11_1_bot	preamble_1_pt
 
 /* Association not established between tester and SUT.  Arrange the data
  * at the tester such that one or more IP adddresses are sent in
  * INIT message. */
 
 int
-test_case_1_11_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_11_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_11_1_list(int child)
+test_case_1_11_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_11_1_conn	postamble_1_iut
-#define postamble_1_11_1_resp	postamble_1_pt
-#define postamble_1_11_1_list	postamble_1_pt
+int
+test_case_1_11_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_11_1_conn = { &premable_1_11_1_conn, &test_case_1_11_1_conn, &postamble_1_11_1_conn };
-struct test_stream test_1_11_1_resp = { &premable_1_11_1_resp, &test_case_1_11_1_resp, &postamble_1_11_1_resp };
-struct test_stream test_1_11_1_list = { &premable_1_11_1_list, &test_case_1_11_1_list, &postamble_1_11_1_list };
+#define postamble_1_11_1_top	postamble_1_iut
+#define postamble_1_11_1_bot	postamble_1_pt
+
+struct test_stream test_1_11_1_top = { &premable_1_11_1_top, &test_case_1_11_1_top, &postamble_1_11_1_top };
+struct test_stream test_1_11_1_bot = { &premable_1_11_1_bot, &test_case_1_11_1_bot, &postamble_1_11_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6559,36 +6537,29 @@ where the INIT-ACK comes combined with the SCTP source port number as\n\
 the destinaiton transport address and sends a COOKIE-ECHO message to one\n\
 of the transport addresses.
 
-#define preamble_1_11_2_conn	preamble_1_iut
-#define preamble_1_11_2_resp	preamble_1_pt
-#define preamble_1_11_2_list	preamble_1_pt
+#define preamble_1_11_2_top	preamble_1_iut
+#define preamble_1_11_2_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT to send one or more IP addresses in INIT-ACK message. */
 
 int
-test_case_1_11_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_11_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_11_2_list(int child)
+test_case_1_11_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_11_2_conn	postamble_1_iut
-#define postamble_1_11_2_resp	postamble_1_pt
-#define postamble_1_11_2_list	postamble_1_pt
+int
+test_case_1_11_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_11_2_conn = { &premable_1_11_2_conn, &test_case_1_11_2_conn, &postamble_1_11_2_conn };
-struct test_stream test_1_11_2_resp = { &premable_1_11_2_resp, &test_case_1_11_2_resp, &postamble_1_11_2_resp };
-struct test_stream test_1_11_2_list = { &premable_1_11_2_list, &test_case_1_11_2_list, &postamble_1_11_2_list };
+#define postamble_1_11_2_top	postamble_1_iut
+#define postamble_1_11_2_bot	postamble_1_pt
+
+struct test_stream test_1_11_2_top = { &premable_1_11_2_top, &test_case_1_11_2_top, &postamble_1_11_2_top };
+struct test_stream test_1_11_2_bot = { &premable_1_11_2_bot, &test_case_1_11_2_bot, &postamble_1_11_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6602,37 +6573,30 @@ Checks that the IUT on receipt of an INIT message with Host Name address\n\
 and no other IP address sends an ABORT message with error \"Unresolvable\n\
 Address\"."
 
-#define preamble_1_12_1_conn	preamble_1_iut
-#define preamble_1_12_1_resp	preamble_1_pt
-#define preamble_1_12_1_list	preamble_1_pt
+#define preamble_1_12_1_top	preamble_1_iut
+#define preamble_1_12_1_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT to send Host Name address to SUT with no other IP address in INIT
  * message. */
 
 int
-test_case_1_12_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_12_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_12_1_list(int child)
+test_case_1_12_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_12_1_conn	postamble_1_iut
-#define postamble_1_12_1_resp	postamble_1_pt
-#define postamble_1_12_1_list	postamble_1_pt
+int
+test_case_1_12_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_12_1_conn = { &premable_1_12_1_conn, &test_case_1_12_1_conn, &postamble_1_12_1_conn };
-struct test_stream test_1_12_1_resp = { &premable_1_12_1_resp, &test_case_1_12_1_resp, &postamble_1_12_1_resp };
-struct test_stream test_1_12_1_list = { &premable_1_12_1_list, &test_case_1_12_1_list, &postamble_1_12_1_list };
+#define postamble_1_12_1_top	postamble_1_iut
+#define postamble_1_12_1_bot	postamble_1_pt
+
+struct test_stream test_1_12_1_top = { &premable_1_12_1_top, &test_case_1_12_1_top, &postamble_1_12_1_top };
+struct test_stream test_1_12_1_bot = { &premable_1_12_1_bot, &test_case_1_12_1_bot, &postamble_1_12_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6646,37 +6610,30 @@ Checks that the IUT, on receipt of an INIT-ACK message with Host Name\n\
 address and no other IP address sends an ABORT message with error\n\
 \"Unresolvable Address\"."
 
-#define preamble_1_12_2_conn	preamble_1_iut
-#define preamble_1_12_2_resp	preamble_1_pt
-#define preamble_1_12_2_list	preamble_1_pt
+#define preamble_1_12_2_top	preamble_1_iut
+#define preamble_1_12_2_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT to send Host Name address with no other IP addresses in INIT-ACK
  * message. */
 
 int
-test_case_1_12_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_12_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_12_2_list(int child)
+test_case_1_12_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_12_2_conn	postamble_1_iut
-#define postamble_1_12_2_resp	postamble_1_pt
-#define postamble_1_12_2_list	postamble_1_pt
+int
+test_case_1_12_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_12_2_conn = { &premable_1_12_2_conn, &test_case_1_12_2_conn, &postamble_1_12_2_conn };
-struct test_stream test_1_12_2_resp = { &premable_1_12_2_resp, &test_case_1_12_2_resp, &postamble_1_12_2_resp };
-struct test_stream test_1_12_2_list = { &premable_1_12_2_list, &test_case_1_12_2_list, &postamble_1_12_2_list };
+#define postamble_1_12_2_top	postamble_1_iut
+#define postamble_1_12_2_bot	postamble_1_pt
+
+struct test_stream test_1_12_2_top = { &premable_1_12_2_top, &test_case_1_12_2_top, &postamble_1_12_2_top };
+struct test_stream test_1_12_2_bot = { &premable_1_12_2_bot, &test_case_1_12_2_bot, &postamble_1_12_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6690,37 +6647,30 @@ Checks that the IUT, on receipt of an INIT message with Supported\n\
 address field sends an INIT-ACK message with the address of the type\n\
 contained in the Supported address field in the received INIT."
 
-#define preamble_1_13_1_conn	preamble_1_iut
-#define preamble_1_13_1_resp	preamble_1_pt
-#define preamble_1_13_1_list	preamble_1_pt
+#define preamble_1_13_1_top	preamble_1_iut
+#define preamble_1_13_1_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at the
  * PT to send Supported Address field in INIT.  Also, the SUT is capable
  * of using the address type mentioned in the Supported Address field. */
 
 int
-test_case_1_13_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_13_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_13_1_list(int child)
+test_case_1_13_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_13_1_conn	postamble_1_iut
-#define postamble_1_13_1_resp	postamble_1_pt
-#define postamble_1_13_1_list	postamble_1_pt
+int
+test_case_1_13_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_13_1_conn = { &premable_1_13_1_conn, &test_case_1_13_1_conn, &postamble_1_13_1_conn };
-struct test_stream test_1_13_1_resp = { &premable_1_13_1_resp, &test_case_1_13_1_resp, &postamble_1_13_1_resp };
-struct test_stream test_1_13_1_list = { &premable_1_13_1_list, &test_case_1_13_1_list, &postamble_1_13_1_list };
+#define postamble_1_13_1_top	postamble_1_iut
+#define postamble_1_13_1_bot	postamble_1_pt
+
+struct test_stream test_1_13_1_top = { &premable_1_13_1_top, &test_case_1_13_1_top, &postamble_1_13_1_top };
+struct test_stream test_1_13_1_bot = { &premable_1_13_1_bot, &test_case_1_13_1_bot, &postamble_1_13_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6734,9 +6684,8 @@ Checks that the IUT, on receipt of an INIT message with Supported\n\
 address type which the receiver is incapable of using sends an ABORT\n\
 message with cause \"Unresolvable Address\"."
 
-#define preamble_1_13_2_conn	preamble_1_iut
-#define preamble_1_13_2_resp	preamble_1_pt
-#define preamble_1_13_2_list	preamble_1_pt
+#define preamble_1_13_2_top	preamble_1_iut
+#define preamble_1_13_2_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at PT
  * to send Supported address type field IPv6 to SUT in INIT message
@@ -6744,28 +6693,22 @@ message with cause \"Unresolvable Address\"."
  * not capable of using supported addresss type, i.e. only IPv4. */
 
 int
-test_case_1_13_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_13_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_13_2_list(int child)
+test_case_1_13_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_13_2_conn	postamble_1_iut
-#define postamble_1_13_2_resp	postamble_1_pt
-#define postamble_1_13_2_list	postamble_1_pt
+int
+test_case_1_13_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_13_2_conn = { &premable_1_13_2_conn, &test_case_1_13_2_conn, &postamble_1_13_2_conn };
-struct test_stream test_1_13_2_resp = { &premable_1_13_2_resp, &test_case_1_13_2_resp, &postamble_1_13_2_resp };
-struct test_stream test_1_13_2_list = { &premable_1_13_2_list, &test_case_1_13_2_list, &postamble_1_13_2_list };
+#define postamble_1_13_2_top	postamble_1_iut
+#define postamble_1_13_2_bot	postamble_1_pt
+
+struct test_stream test_1_13_2_top = { &premable_1_13_2_top, &test_case_1_13_2_top, &postamble_1_13_2_top };
+struct test_stream test_1_13_2_bot = { &premable_1_13_2_bot, &test_case_1_13_2_bot, &postamble_1_13_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6778,36 +6721,29 @@ struct test_stream test_1_13_2_list = { &premable_1_13_2_list, &test_case_1_13_2
 Checks that the IUT, on receipt of an INIT message with an Init-Tag of\n\
 zero (0) detroys the TCB and may send an ABORT."
 
-#define preamble_1_14_1_conn	preamble_1_iut
-#define preamble_1_14_1_resp	preamble_1_pt
-#define preamble_1_14_1_list	preamble_1_pt
+#define preamble_1_14_1_top	preamble_1_iut
+#define preamble_1_14_1_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at PT
  * to send Initiate-tag field equal to zero to SUT in INIT message. */
 
 int
-test_case_1_14_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_14_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_14_1_list(int child)
+test_case_1_14_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_14_1_conn	postamble_1_iut
-#define postamble_1_14_1_resp	postamble_1_pt
-#define postamble_1_14_1_list	postamble_1_pt
+int
+test_case_1_14_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_14_1_conn = { &premable_1_14_1_conn, &test_case_1_14_1_conn, &postamble_1_14_1_conn };
-struct test_stream test_1_14_1_resp = { &premable_1_14_1_resp, &test_case_1_14_1_resp, &postamble_1_14_1_resp };
-struct test_stream test_1_14_1_list = { &premable_1_14_1_list, &test_case_1_14_1_list, &postamble_1_14_1_list };
+#define postamble_1_14_1_top	postamble_1_iut
+#define postamble_1_14_1_bot	postamble_1_pt
+
+struct test_stream test_1_14_1_top = { &premable_1_14_1_top, &test_case_1_14_1_top, &postamble_1_14_1_top };
+struct test_stream test_1_14_1_bot = { &premable_1_14_1_bot, &test_case_1_14_1_bot, &postamble_1_14_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6820,36 +6756,29 @@ struct test_stream test_1_14_1_list = { &premable_1_14_1_list, &test_case_1_14_1
 Checks that the IUT, on receipt of an INIT-ACK message with Init-Tag\n\
 equal to zero destroys the TCB and may send an ABORT."
 
-#define preamble_1_14_2_conn	preamble_1_iut
-#define preamble_1_14_2_resp	preamble_1_pt
-#define preamble_1_14_2_list	preamble_1_pt
+#define preamble_1_14_2_top	preamble_1_iut
+#define preamble_1_14_2_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  Arrange data at PT
  * to send Initiate-tag equal to zero to SUT in INIT-ACK message. */
 
 int
-test_case_1_14_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_14_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_14_2_list(int child)
+test_case_1_14_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_14_2_conn	postamble_1_iut
-#define postamble_1_14_2_resp	postamble_1_pt
-#define postamble_1_14_2_list	postamble_1_pt
+int
+test_case_1_14_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_14_2_conn = { &premable_1_14_2_conn, &test_case_1_14_2_conn, &postamble_1_14_2_conn };
-struct test_stream test_1_14_2_resp = { &premable_1_14_2_resp, &test_case_1_14_2_resp, &postamble_1_14_2_resp };
-struct test_stream test_1_14_2_list = { &premable_1_14_2_list, &test_case_1_14_2_list, &postamble_1_14_2_list };
+#define postamble_1_14_2_top	postamble_1_iut
+#define postamble_1_14_2_bot	postamble_1_pt
+
+struct test_stream test_1_14_2_top = { &premable_1_14_2_top, &test_case_1_14_2_top, &postamble_1_14_2_top };
+struct test_stream test_1_14_2_bot = { &premable_1_14_2_bot, &test_case_1_14_2_bot, &postamble_1_14_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6862,37 +6791,30 @@ struct test_stream test_1_14_2_list = { &premable_1_14_2_list, &test_case_1_14_2
 Checks that the IUT uses all configured addresses for retransmitted INIT\n\
 messages for association establishment."
 
-#define preamble_1_15_conn	preamble_1_iut
-#define preamble_1_15_resp	preamble_1_pt
-#define preamble_1_15_list	preamble_1_pt
+#define preamble_1_15_top	preamble_1_iut
+#define preamble_1_15_bot	preamble_1_pt
 
 /* Association not established between PT and SUT.  PT is preconfigured
  * to be multi-homed with two addresses X and Y.  Arrange data at PT so
  * no INIT-ACK message is sent to SUT in response to INIT. */
 
 int
-test_case_1_15_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_15_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_1_15_list(int child)
+test_case_1_15_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_1_15_conn	postamble_1_iut
-#define postamble_1_15_resp	postamble_1_pt
-#define postamble_1_15_list	postamble_1_pt
+int
+test_case_1_15_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_1_15_conn = { &premable_1_15_conn, &test_case_1_15_conn, &postamble_1_15_conn };
-struct test_stream test_1_15_resp = { &premable_1_15_resp, &test_case_1_15_resp, &postamble_1_15_resp };
-struct test_stream test_1_15_list = { &premable_1_15_list, &test_case_1_15_list, &postamble_1_15_list };
+#define postamble_1_15_top	postamble_1_iut
+#define postamble_1_15_bot	postamble_1_pt
+
+struct test_stream test_1_15_top = { &premable_1_15_top, &test_case_1_15_top, &postamble_1_15_top };
+struct test_stream test_1_15_bot = { &premable_1_15_bot, &test_case_1_15_bot, &postamble_1_15_bot };
 
 /* ========================================================================= */
 
@@ -6910,36 +6832,29 @@ Checks that the IUT, on receipt of an ABORT removes the association.\n\
 Further message exchanges between the tester and IUT need to take place\n\
 to verify the removal of the association from outside the SUT."
 
-#define preamble_2_2_conn	preamble_2_iut
-#define preamble_2_2_resp	preamble_2_pt
-#define preamble_2_2_list	preamble_2_pt
+#define preamble_2_2_top	preamble_2_iut
+#define preamble_2_2_bot	preamble_2_pt
 
 /* Association established between PT and SUT.  Arrange data at the PT
  * to send an ABORT message to the SUT. */
 
 int
-test_case_2_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_2_list(int child)
+test_case_2_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_2_conn	postamble_2_iut
-#define postamble_2_2_resp	postamble_2_pt
-#define postamble_2_2_list	postamble_2_pt
+int
+test_case_2_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_2_conn = { &premable_2_2_conn, &test_case_2_2_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_resp = { &premable_2_2_resp, &test_case_2_2_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_list = { &premable_2_2_list, &test_case_2_2_list, &postamble_2_2_list };
+#define postamble_2_2_top	postamble_2_iut
+#define postamble_2_2_bot	postamble_2_pt
+
+struct test_stream test_2_2_top = { &premable_2_2_top, &test_case_2_2_top, &postamble_2_2_top };
+struct test_stream test_2_2_bot = { &premable_2_2_bot, &test_case_2_2_bot, &postamble_2_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6953,37 +6868,30 @@ Checks that the IUT, on receipt of a Terminate primitive will send a\n\
 SHUTDOWN message to its peer only when all outstanding DATA hass been\n\
 acknowledged by the PT."
 
-#define preamble_2_3_conn	preamble_2_iut
-#define preamble_2_3_resp	preamble_2_pt
-#define preamble_2_3_list	preamble_2_pt
+#define preamble_2_3_top	preamble_2_iut
+#define preamble_2_3_bot	preamble_2_pt
 
 /* Association established between PT and SUT and DATA is sent from SUT
  * to PT.  Arrange the data at SUT to issue Terminate primitive to IUT.
  */
 
 int
-test_case_2_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_3_list(int child)
+test_case_2_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_3_conn	postamble_2_iut
-#define postamble_2_3_resp	postamble_2_pt
-#define postamble_2_3_list	postamble_2_pt
+int
+test_case_2_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_3_conn = { &premable_2_3_conn, &test_case_2_3_conn, &postamble_2_3_conn };
-struct test_stream test_2_3_resp = { &premable_2_3_resp, &test_case_2_3_resp, &postamble_2_3_resp };
-struct test_stream test_2_3_list = { &premable_2_3_list, &test_case_2_3_list, &postamble_2_3_list };
+#define postamble_2_3_top	postamble_2_iut
+#define postamble_2_3_bot	postamble_2_pt
+
+struct test_stream test_2_3_top = { &premable_2_3_top, &test_case_2_3_top, &postamble_2_3_top };
+struct test_stream test_2_3_bot = { &premable_2_3_bot, &test_case_2_3_bot, &postamble_2_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -6996,36 +6904,29 @@ struct test_stream test_2_3_list = { &premable_2_3_list, &test_case_2_3_list, &p
 Checks that the IUT starts the T2-Shutdown timer and after its expiry a\n\
 SHUTDOWN message is sent again."
 
-#define preamble_2_4_conn	preamble_2_iut
-#define preamble_2_4_resp	preamble_2_pt
-#define preamble_2_4_list	preamble_2_pt
+#define preamble_2_4_top	preamble_2_iut
+#define preamble_2_4_bot	preamble_2_pt
 
 /* Association establishe between PT and SUT.  Arrange PT so no
  * SHUTDOWN-ACK or DATA is sent in response to SHUTDOWN. */
 
 int
-test_case_2_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_4_list(int child)
+test_case_2_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_4_conn	postamble_2_iut
-#define postamble_2_4_resp	postamble_2_pt
-#define postamble_2_4_list	postamble_2_pt
+int
+test_case_2_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_4_conn = { &premable_2_4_conn, &test_case_2_4_conn, &postamble_2_4_conn };
-struct test_stream test_2_4_resp = { &premable_2_4_resp, &test_case_2_4_resp, &postamble_2_4_resp };
-struct test_stream test_2_4_list = { &premable_2_4_list, &test_case_2_4_list, &postamble_2_4_list };
+#define postamble_2_4_top	postamble_2_iut
+#define postamble_2_4_bot	postamble_2_pt
+
+struct test_stream test_2_4_top = { &premable_2_4_top, &test_case_2_4_top, &postamble_2_4_top };
+struct test_stream test_2_4_bot = { &premable_2_4_bot, &test_case_2_4_bot, &postamble_2_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7041,37 +6942,30 @@ removes the association and optionally sends ABORT.  Further message\n\
 exchanges between PT and IUT need to take place to verify the removal of\n\
 the association from outside the SUT."
 
-#define preamble_2_5_conn	preamble_2_iut
-#define preamble_2_5_resp	preamble_2_pt
-#define preamble_2_5_list	preamble_2_pt
+#define preamble_2_5_top	preamble_2_iut
+#define preamble_2_5_bot	preamble_2_pt
 
 /* Association estalished between PT and IUT.  Arrange the data at the
  * PT such that in response to SHUTDOWN no SHUTDOWN-ACK or DATA message
  * is sent. */
 
 int
-test_case_2_5_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_5_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_5_list(int child)
+test_case_2_5_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_5_conn	postamble_2_iut
-#define postamble_2_5_resp	postamble_2_pt
-#define postamble_2_5_list	postamble_2_pt
+int
+test_case_2_5_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_5_conn = { &premable_2_5_conn, &test_case_2_5_conn, &postamble_2_5_conn };
-struct test_stream test_2_5_resp = { &premable_2_5_resp, &test_case_2_5_resp, &postamble_2_5_resp };
-struct test_stream test_2_5_list = { &premable_2_5_list, &test_case_2_5_list, &postamble_2_5_list };
+#define postamble_2_5_top	postamble_2_iut
+#define postamble_2_5_bot	postamble_2_pt
+
+struct test_stream test_2_5_top = { &premable_2_5_top, &test_case_2_5_top, &postamble_2_5_top };
+struct test_stream test_2_5_bot = { &premable_2_5_bot, &test_case_2_5_bot, &postamble_2_5_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7084,36 +6978,29 @@ struct test_stream test_2_5_list = { &premable_2_5_list, &test_case_2_5_list, &p
 Checks that the IUT, on receive of SHUTDOWN-ACK message in Shutdown Sent\n\
 state send a SHUTDOWN COMPLETE message and terminates the association."
 
-#define preamble_2_6_conn	preamble_2_iut
-#define preamble_2_6_resp	preamble_2_pt
-#define preamble_2_6_list	preamble_2_pt
+#define preamble_2_6_top	preamble_2_iut
+#define preamble_2_6_bot	preamble_2_pt
 
 /* Association is established between PT and SUT.  Arrange the PT to
  * send SHUTDOWN-ACK in response to SHUTDOWN message. */
 
 int
-test_case_2_6_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_6_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_6_list(int child)
+test_case_2_6_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_6_conn	postamble_2_iut
-#define postamble_2_6_resp	postamble_2_pt
-#define postamble_2_6_list	postamble_2_pt
+int
+test_case_2_6_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_6_conn = { &premable_2_6_conn, &test_case_2_6_conn, &postamble_2_6_conn };
-struct test_stream test_2_6_resp = { &premable_2_6_resp, &test_case_2_6_resp, &postamble_2_6_resp };
-struct test_stream test_2_6_list = { &premable_2_6_list, &test_case_2_6_list, &postamble_2_6_list };
+#define postamble_2_6_top	postamble_2_iut
+#define postamble_2_6_bot	postamble_2_pt
+
+struct test_stream test_2_6_top = { &premable_2_6_top, &test_case_2_6_top, &postamble_2_6_top };
+struct test_stream test_2_6_bot = { &premable_2_6_bot, &test_case_2_6_bot, &postamble_2_6_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7126,36 +7013,29 @@ struct test_stream test_2_6_list = { &premable_2_6_list, &test_case_2_6_list, &p
 Checks that the IUT, if it is in Shutdown sent state and receives data\n\
 for transmission from upper layer, does not send this new data."
 
-#define preamble_2_7_1_conn	preamble_2_iut
-#define preamble_2_7_1_resp	preamble_2_pt
-#define preamble_2_7_1_list	preamble_2_pt
+#define preamble_2_7_1_top	preamble_2_iut
+#define preamble_2_7_1_bot	preamble_2_pt
 
 /* Association established between PT and SUT.  Arrange data in SUT so
  * upper layers send data when in Shutdown sent state. */
 
 int
-test_case_2_7_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_7_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_7_1_list(int child)
+test_case_2_7_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_7_1_conn	postamble_2_iut
-#define postamble_2_7_1_resp	postamble_2_pt
-#define postamble_2_7_1_list	postamble_2_pt
+int
+test_case_2_7_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_7_1_conn = { &premable_2_7_1_conn, &test_case_2_7_1_conn, &postamble_2_7_1_conn };
-struct test_stream test_2_7_1_resp = { &premable_2_7_1_resp, &test_case_2_7_1_resp, &postamble_2_7_1_resp };
-struct test_stream test_2_7_1_list = { &premable_2_7_1_list, &test_case_2_7_1_list, &postamble_2_7_1_list };
+#define postamble_2_7_1_top	postamble_2_iut
+#define postamble_2_7_1_bot	postamble_2_pt
+
+struct test_stream test_2_7_1_top = { &premable_2_7_1_top, &test_case_2_7_1_top, &postamble_2_7_1_top };
+struct test_stream test_2_7_1_bot = { &premable_2_7_1_bot, &test_case_2_7_1_bot, &postamble_2_7_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7168,37 +7048,30 @@ struct test_stream test_2_7_1_list = { &premable_2_7_1_list, &test_case_2_7_1_li
 Checks that the IUT, if it is in Shutdown received state and receives\n\
 data for transmission from upper layer, does not send this new data."
 
-#define preamble_2_7_2_conn	preamble_2_iut
-#define preamble_2_7_2_resp	preamble_2_pt
-#define preamble_2_7_2_list	preamble_2_pt
+#define preamble_2_7_2_top	preamble_2_iut
+#define preamble_2_7_2_bot	preamble_2_pt
 
 /* Association established between PT and SUT.  Arrange the data in SUT
  * such that upper layer sends data to transmit when it is in Shutdown
  * received state. */
 
 int
-test_case_2_7_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_7_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_7_2_list(int child)
+test_case_2_7_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_7_2_conn	postamble_2_iut
-#define postamble_2_7_2_resp	postamble_2_pt
-#define postamble_2_7_2_list	postamble_2_pt
+int
+test_case_2_7_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_7_2_conn = { &premable_2_7_2_conn, &test_case_2_7_2_conn, &postamble_2_7_2_conn };
-struct test_stream test_2_7_2_resp = { &premable_2_7_2_resp, &test_case_2_7_2_resp, &postamble_2_7_2_resp };
-struct test_stream test_2_7_2_list = { &premable_2_7_2_list, &test_case_2_7_2_list, &postamble_2_7_2_list };
+#define postamble_2_7_2_top	postamble_2_iut
+#define postamble_2_7_2_bot	postamble_2_pt
+
+struct test_stream test_2_7_2_top = { &premable_2_7_2_top, &test_case_2_7_2_top, &postamble_2_7_2_top };
+struct test_stream test_2_7_2_bot = { &premable_2_7_2_bot, &test_case_2_7_2_bot, &postamble_2_7_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7211,36 +7084,29 @@ struct test_stream test_2_7_2_list = { &premable_2_7_2_list, &test_case_2_7_2_li
 Checks that the IUT, if it is in Shutdown Pending state and receives\n\
 data for transmission from upper layer, does not send this new data."
 
-#define preamble_2_7_3_conn	preamble_2_iut
-#define preamble_2_7_3_resp	preamble_2_pt
-#define preamble_2_7_3_list	preamble_2_pt
+#define preamble_2_7_3_top	preamble_2_iut
+#define preamble_2_7_3_bot	preamble_2_pt
 
 /* Association established between PT and SUT.  Arrange SUT upper layers
  * to send data to transmit when in Shutdown pending state. */
 
 int
-test_case_2_7_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_7_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_7_3_list(int child)
+test_case_2_7_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_7_3_conn	postamble_2_iut
-#define postamble_2_7_3_resp	postamble_2_pt
-#define postamble_2_7_3_list	postamble_2_pt
+int
+test_case_2_7_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_7_3_conn = { &premable_2_7_3_conn, &test_case_2_7_3_conn, &postamble_2_7_3_conn };
-struct test_stream test_2_7_3_resp = { &premable_2_7_3_resp, &test_case_2_7_3_resp, &postamble_2_7_3_resp };
-struct test_stream test_2_7_3_list = { &premable_2_7_3_list, &test_case_2_7_3_list, &postamble_2_7_3_list };
+#define postamble_2_7_3_top	postamble_2_iut
+#define postamble_2_7_3_bot	postamble_2_pt
+
+struct test_stream test_2_7_3_top = { &premable_2_7_3_top, &test_case_2_7_3_top, &postamble_2_7_3_top };
+struct test_stream test_2_7_3_bot = { &premable_2_7_3_bot, &test_case_2_7_3_bot, &postamble_2_7_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7253,36 +7119,29 @@ struct test_stream test_2_7_3_list = { &premable_2_7_3_list, &test_case_2_7_3_li
 Checks that the IUT, if it is in Shutdown Ack Sent state and receives\n\
 data for transmission from upper layer, does not send this new data."
 
-#define preamble_2_7_4_conn	preamble_2_iut
-#define preamble_2_7_4_resp	preamble_2_pt
-#define preamble_2_7_4_list	preamble_2_pt
+#define preamble_2_7_4_top	preamble_2_iut
+#define preamble_2_7_4_bot	preamble_2_pt
 
 /* Assocation established between PT and SUT.  Arrange the SUT uuper
  * layer to send data to transmit when in Shutdown Ack Sent state. */
 
 int
-test_case_2_7_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_7_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_7_4_list(int child)
+test_case_2_7_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_7_4_conn	postamble_2_iut
-#define postamble_2_7_4_resp	postamble_2_pt
-#define postamble_2_7_4_list	postamble_2_pt
+int
+test_case_2_7_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_7_4_conn = { &premable_2_7_4_conn, &test_case_2_7_4_conn, &postamble_2_7_4_conn };
-struct test_stream test_2_7_4_resp = { &premable_2_7_4_resp, &test_case_2_7_4_resp, &postamble_2_7_4_resp };
-struct test_stream test_2_7_4_list = { &premable_2_7_4_list, &test_case_2_7_4_list, &postamble_2_7_4_list };
+#define postamble_2_7_4_top	postamble_2_iut
+#define postamble_2_7_4_bot	postamble_2_pt
+
+struct test_stream test_2_7_4_top = { &premable_2_7_4_top, &test_case_2_7_4_top, &postamble_2_7_4_top };
+struct test_stream test_2_7_4_bot = { &premable_2_7_4_bot, &test_case_2_7_4_bot, &postamble_2_7_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7295,36 +7154,29 @@ struct test_stream test_2_7_4_list = { &premable_2_7_4_list, &test_case_2_7_4_li
 Checks that the IUT, if it is in Shutdown Sent state and receives data,\n\
 acknowledges the message and restarts the T2-Shutdown timer."
 
-#define preamble_2_8_conn	preamble_2_iut
-#define preamble_2_8_resp	preamble_2_pt
-#define preamble_2_8_list	preamble_2_pt
+#define preamble_2_8_top	preamble_2_iut
+#define preamble_2_8_bot	preamble_2_pt
 
 /* Assocation established between PT and SUT.  Arrange the PT so after
  * receiving SHUTDOWN message, DATA message is sent to SUT. */
 
 int
-test_case_2_8_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_8_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_8_list(int child)
+test_case_2_8_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_8_conn	postamble_2_iut
-#define postamble_2_8_resp	postamble_2_pt
-#define postamble_2_8_list	postamble_2_pt
+int
+test_case_2_8_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_8_conn = { &premable_2_8_conn, &test_case_2_8_conn, &postamble_2_8_conn };
-struct test_stream test_2_8_resp = { &premable_2_8_resp, &test_case_2_8_resp, &postamble_2_8_resp };
-struct test_stream test_2_8_list = { &premable_2_8_list, &test_case_2_8_list, &postamble_2_8_list };
+#define postamble_2_8_top	postamble_2_iut
+#define postamble_2_8_bot	postamble_2_pt
+
+struct test_stream test_2_8_top = { &premable_2_8_top, &test_case_2_8_top, &postamble_2_8_top };
+struct test_stream test_2_8_bot = { &premable_2_8_bot, &test_case_2_8_bot, &postamble_2_8_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7337,37 +7189,30 @@ struct test_stream test_2_8_list = { &premable_2_8_list, &test_case_2_8_list, &p
 Checks that the IUT, if it is in Shutdown Received state and receives\n\
 data, discards the data."
 
-#define preamble_2_9_conn	preamble_2_iut
-#define preamble_2_9_resp	preamble_2_pt
-#define preamble_2_9_list	preamble_2_pt
+#define preamble_2_9_top	preamble_2_iut
+#define preamble_2_9_bot	preamble_2_pt
 
 /* Association established between PT and SUT.  Arrange PT to send DATA
  * to SUT after sending SHUTDOWN message.  Also, in SUT there is no
  * outstanding DATA for which SACK has not come from PT. */
 
 int
-test_case_2_9_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_9_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_9_list(int child)
+test_case_2_9_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_9_conn	postamble_2_iut
-#define postamble_2_9_resp	postamble_2_pt
-#define postamble_2_9_list	postamble_2_pt
+int
+test_case_2_9_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_9_conn = { &premable_2_9_conn, &test_case_2_9_conn, &postamble_2_9_conn };
-struct test_stream test_2_9_resp = { &premable_2_9_resp, &test_case_2_9_resp, &postamble_2_9_resp };
-struct test_stream test_2_9_list = { &premable_2_9_list, &test_case_2_9_list, &postamble_2_9_list };
+#define postamble_2_9_top	postamble_2_iut
+#define postamble_2_9_bot	postamble_2_pt
+
+struct test_stream test_2_9_top = { &premable_2_9_top, &test_case_2_9_top, &postamble_2_9_top };
+struct test_stream test_2_9_bot = { &premable_2_9_bot, &test_case_2_9_bot, &postamble_2_9_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7380,9 +7225,8 @@ struct test_stream test_2_9_list = { &premable_2_9_list, &test_case_2_9_list, &p
 Checks that the IUT, if there is still outstanding DATA, does not send a\n\
 SHUTDOWN-ACK on reception of a SHUTDOWN (even recevied multiple times)."
 
-#define preamble_2_10_conn	preamble_2_iut
-#define preamble_2_10_resp	preamble_2_pt
-#define preamble_2_10_list	preamble_2_pt
+#define preamble_2_10_top	preamble_2_iut
+#define preamble_2_10_bot	preamble_2_pt
 
 /* Association established between PT and SUT.  Arrange PT to send
  * SHUTDOWN message to IUT.  The SHUTDOWN should not acknowledge the
@@ -7392,28 +7236,22 @@ SHUTDOWN-ACK on reception of a SHUTDOWN (even recevied multiple times)."
  * IUT. */
 
 int
-test_case_2_10_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_10_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_10_list(int child)
+test_case_2_10_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_10_conn	postamble_2_iut
-#define postamble_2_10_resp	postamble_2_pt
-#define postamble_2_10_list	postamble_2_pt
+int
+test_case_2_10_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_10_conn = { &premable_2_10_conn, &test_case_2_10_conn, &postamble_2_10_conn };
-struct test_stream test_2_10_resp = { &premable_2_10_resp, &test_case_2_10_resp, &postamble_2_10_resp };
-struct test_stream test_2_10_list = { &premable_2_10_list, &test_case_2_10_list, &postamble_2_10_list };
+#define postamble_2_10_top	postamble_2_iut
+#define postamble_2_10_bot	postamble_2_pt
+
+struct test_stream test_2_10_top = { &premable_2_10_top, &test_case_2_10_top, &postamble_2_10_top };
+struct test_stream test_2_10_bot = { &premable_2_10_bot, &test_case_2_10_bot, &postamble_2_10_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7426,36 +7264,29 @@ struct test_stream test_2_10_list = { &premable_2_10_list, &test_case_2_10_list,
 Checks that the IUT, after expiry of T2-Shutdown timer, sends a\n\
 SHUTDOWN-ACK message again."
 
-#define preamble_2_11_conn	preamble_2_iut
-#define preamble_2_11_resp	preamble_2_pt
-#define preamble_2_11_list	preamble_2_pt
+#define preamble_2_11_top	preamble_2_iut
+#define preamble_2_11_bot	preamble_2_pt
 
 /* Association established between PT and SUT.  Arrange the PT to not
  * send SHUTDOWN-COMPLETE in response to SHUTDOWN-ACK. */
 
 int
-test_case_2_11_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_11_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_11_list(int child)
+test_case_2_11_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_11_conn	postamble_2_iut
-#define postamble_2_11_resp	postamble_2_pt
-#define postamble_2_11_list	postamble_2_pt
+int
+test_case_2_11_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_11_conn = { &premable_2_11_conn, &test_case_2_11_conn, &postamble_2_11_conn };
-struct test_stream test_2_11_resp = { &premable_2_11_resp, &test_case_2_11_resp, &postamble_2_11_resp };
-struct test_stream test_2_11_list = { &premable_2_11_list, &test_case_2_11_list, &postamble_2_11_list };
+#define postamble_2_11_top	postamble_2_iut
+#define postamble_2_11_bot	postamble_2_pt
+
+struct test_stream test_2_11_top = { &premable_2_11_top, &test_case_2_11_top, &postamble_2_11_top };
+struct test_stream test_2_11_bot = { &premable_2_11_bot, &test_case_2_11_bot, &postamble_2_11_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7469,36 +7300,29 @@ Checks that the IUT, after retransmitting SHUTDOWN-ACK message for\n\
 ASSOCIATION.MAX.RETRANS times, removes the association and optionally\n\
 sends an ABORT."
 
-#define preamble_2_12_conn	preamble_2_iut
-#define preamble_2_12_resp	preamble_2_pt
-#define preamble_2_12_list	preamble_2_pt
+#define preamble_2_12_top	preamble_2_iut
+#define preamble_2_12_bot	preamble_2_pt
 
 /* Association established between PT and SUT.  Arrange PT to not send
  * SHUTDOWN-COMPLETE in response to SHUTDOWN-ACK. */
 
 int
-test_case_2_12_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_12_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_12_list(int child)
+test_case_2_12_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_12_conn	postamble_2_iut
-#define postamble_2_12_resp	postamble_2_pt
-#define postamble_2_12_list	postamble_2_pt
+int
+test_case_2_12_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_12_conn = { &premable_2_12_conn, &test_case_2_12_conn, &postamble_2_12_conn };
-struct test_stream test_2_12_resp = { &premable_2_12_resp, &test_case_2_12_resp, &postamble_2_12_resp };
-struct test_stream test_2_12_list = { &premable_2_12_list, &test_case_2_12_list, &postamble_2_12_list };
+#define postamble_2_12_top	postamble_2_iut
+#define postamble_2_12_bot	postamble_2_pt
+
+struct test_stream test_2_12_top = { &premable_2_12_top, &test_case_2_12_top, &postamble_2_12_top };
+struct test_stream test_2_12_bot = { &premable_2_12_bot, &test_case_2_12_bot, &postamble_2_12_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7511,36 +7335,29 @@ struct test_stream test_2_12_list = { &premable_2_12_list, &test_case_2_12_list,
 Checks that the IUT, if it is in Shutdown Ack Sent state, accepts a\n\
 SHUTDOWN-COMPLETE message and removes the association."
 
-#define preamble_2_13_conn	preamble_2_iut
-#define preamble_2_13_resp	preamble_2_pt
-#define preamble_2_13_list	preamble_2_pt
+#define preamble_2_13_top	preamble_2_iut
+#define preamble_2_13_bot	preamble_2_pt
 
 /* Association established between PT and SUT.  Arrange PT to send
  * SHUTDOWN-COMPLETE in response to SHUTDOWN-ACK. */
 
 int
-test_case_2_13_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_13_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_13_list(int child)
+test_case_2_13_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_13_conn	postamble_2_iut
-#define postamble_2_13_resp	postamble_2_pt
-#define postamble_2_13_list	postamble_2_pt
+int
+test_case_2_13_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_13_conn = { &premable_2_13_conn, &test_case_2_13_conn, &postamble_2_13_conn };
-struct test_stream test_2_13_resp = { &premable_2_13_resp, &test_case_2_13_resp, &postamble_2_13_resp };
-struct test_stream test_2_13_list = { &premable_2_13_list, &test_case_2_13_list, &postamble_2_13_list };
+#define postamble_2_13_top	postamble_2_iut
+#define postamble_2_13_bot	postamble_2_pt
+
+struct test_stream test_2_13_top = { &premable_2_13_top, &test_case_2_13_top, &postamble_2_13_top };
+struct test_stream test_2_13_bot = { &premable_2_13_bot, &test_case_2_13_bot, &postamble_2_13_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7553,37 +7370,30 @@ struct test_stream test_2_13_list = { &premable_2_13_list, &test_case_2_13_list,
 Checks that the IUT, if there is still outstanding DATA, receives a\n\
 SHUTDOWN that acknowledges outstanding DATA, sends a SHUTDOWN-ACK."
 
-#define preamble_2_14_conn	preamble_2_iut
-#define preamble_2_14_resp	preamble_2_pt
-#define preamble_2_14_list	preamble_2_pt
+#define preamble_2_14_top	preamble_2_iut
+#define preamble_2_14_bot	preamble_2_pt
 
 /* Association established between PT and SUT.  Arrange PT for
  * outstanding DATA in IUT that has not been acknowledged by SACK and to
  * send SHUTDOWN message to IUT that acknowledges this DATA. */
 
 int
-test_case_2_14_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_14_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_2_14_list(int child)
+test_case_2_14_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_2_14_conn	postamble_2_iut
-#define postamble_2_14_resp	postamble_2_pt
-#define postamble_2_14_list	postamble_2_pt
+int
+test_case_2_14_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_2_14_conn = { &premable_2_14_conn, &test_case_2_14_conn, &postamble_2_14_conn };
-struct test_stream test_2_14_resp = { &premable_2_14_resp, &test_case_2_14_resp, &postamble_2_14_resp };
-struct test_stream test_2_14_list = { &premable_2_14_list, &test_case_2_14_list, &postamble_2_14_list };
+#define postamble_2_14_top	postamble_2_iut
+#define postamble_2_14_bot	postamble_2_pt
+
+struct test_stream test_2_14_top = { &premable_2_14_top, &test_case_2_14_top, &postamble_2_14_top };
+struct test_stream test_2_14_bot = { &premable_2_14_bot, &test_case_2_14_bot, &postamble_2_14_bot };
 
 /* ========================================================================= */
 
@@ -7601,37 +7411,30 @@ Checks that the IUT, on receipt of an invalid INIT message with message\n\
 length less than the length of all mandatory parameters, discards the\n\
 message or may send an ABORT message."
 
-#define preamble_3_1_conn	preamble_3_iut
-#define preamble_3_1_resp	preamble_3_pt
-#define preamble_3_1_list	preamble_3_pt
+#define preamble_3_1_top	preamble_3_iut
+#define preamble_3_1_bot	preamble_3_pt
 
 /* Association not established between PT and SUT.  Arrange PT to send
  * INIT message to SUT with message length less that the length of all
  * mandatory parameters. */
 
 int
-test_case_3_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_1_list(int child)
+test_case_3_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_3_1_conn	postamble_3_iut
-#define postamble_3_1_resp	postamble_3_pt
-#define postamble_3_1_list	postamble_3_pt
+int
+test_case_3_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_3_1_conn = { &premable_3_1_conn, &test_case_3_1_conn, &postamble_3_1_conn };
-struct test_stream test_3_1_resp = { &premable_3_1_resp, &test_case_3_1_resp, &postamble_3_1_resp };
-struct test_stream test_3_1_list = { &premable_3_1_list, &test_case_3_1_list, &postamble_3_1_list };
+#define postamble_3_1_top	postamble_3_iut
+#define postamble_3_1_bot	postamble_3_pt
+
+struct test_stream test_3_1_top = { &premable_3_1_top, &test_case_3_1_top, &postamble_3_1_top };
+struct test_stream test_3_1_bot = { &premable_3_1_bot, &test_case_3_1_bot, &postamble_3_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7645,37 +7448,30 @@ Checks that the IUT, on receipt of an INIT-ACK message with message\n\
 length less than the length of all mandatory parameters, discards the\n\
 message or may send an ABORT message."
 
-#define preamble_3_2_conn	preamble_3_iut
-#define preamble_3_2_resp	preamble_3_pt
-#define preamble_3_2_list	preamble_3_pt
+#define preamble_3_2_top	preamble_3_iut
+#define preamble_3_2_bot	preamble_3_pt
 
 /* Association not established between PT and SUT.  Arrange PT to send
  * INIT-ACK message to SUT with message length less than the length of
  * all mandatory parameters. */
 
 int
-test_case_3_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_2_list(int child)
+test_case_3_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_3_2_conn	postamble_3_iut
-#define postamble_3_2_resp	postamble_3_pt
-#define postamble_3_2_list	postamble_3_pt
+int
+test_case_3_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_3_2_conn = { &premable_3_2_conn, &test_case_3_2_conn, &postamble_3_2_conn };
-struct test_stream test_3_2_resp = { &premable_3_2_resp, &test_case_3_2_resp, &postamble_3_2_resp };
-struct test_stream test_3_2_list = { &premable_3_2_list, &test_case_3_2_list, &postamble_3_2_list };
+#define postamble_3_2_top	postamble_3_iut
+#define postamble_3_2_bot	postamble_3_pt
+
+struct test_stream test_3_2_top = { &premable_3_2_top, &test_case_3_2_top, &postamble_3_2_top };
+struct test_stream test_3_2_bot = { &premable_3_2_bot, &test_case_3_2_bot, &postamble_3_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7688,37 +7484,30 @@ struct test_stream test_3_2_list = { &premable_3_2_list, &test_case_3_2_list, &p
 Checks that the IUT, on receipt of a COOKIE-ECHO message with an invalid\n\
 verification tag, discards the COOKIE-ECHO message."
 
-#define preamble_3_3_conn	preamble_3_iut
-#define preamble_3_3_resp	preamble_3_pt
-#define preamble_3_3_list	preamble_3_pt
+#define preamble_3_3_top	preamble_3_iut
+#define preamble_3_3_bot	preamble_3_pt
 
 /* Association not established between PT and SUT.  Arrange PT so a
  * COOKIE-ECHO message with a different verification tag (different from
  * that received in INIT-ACK) is sent in repsonse to INIT-ACK. */
 
 int
-test_case_3_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_3_list(int child)
+test_case_3_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_3_3_conn	postamble_3_iut
-#define postamble_3_3_resp	postamble_3_pt
-#define postamble_3_3_list	postamble_3_pt
+int
+test_case_3_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_3_3_conn = { &premable_3_3_conn, &test_case_3_3_conn, &postamble_3_3_conn };
-struct test_stream test_3_3_resp = { &premable_3_3_resp, &test_case_3_3_resp, &postamble_3_3_resp };
-struct test_stream test_3_3_list = { &premable_3_3_list, &test_case_3_3_list, &postamble_3_3_list };
+#define postamble_3_3_top	postamble_3_iut
+#define postamble_3_3_bot	postamble_3_pt
+
+struct test_stream test_3_3_top = { &premable_3_3_top, &test_case_3_3_top, &postamble_3_3_top };
+struct test_stream test_3_3_bot = { &premable_3_3_bot, &test_case_3_3_bot, &postamble_3_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7731,36 +7520,29 @@ struct test_stream test_3_3_list = { &premable_3_3_list, &test_case_3_3_list, &p
 Checks that the IUT, upon receipt of an INIT message with wrong CRC-32c\n\
 checksum, discards the INIT message."
 
-#define preamble_3_4_conn	preamble_3_iut
-#define preamble_3_4_resp	preamble_3_pt
-#define preamble_3_4_list	preamble_3_pt
+#define preamble_3_4_top	preamble_3_iut
+#define preamble_3_4_bot	preamble_3_pt
 
 /* Association not established between PT and SUT.  Arrange PT to send
  * INIT message to SUT with wrong CRC-32c checksum. */
 
 int
-test_case_3_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_4_list(int child)
+test_case_3_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_3_4_conn	postamble_3_iut
-#define postamble_3_4_resp	postamble_3_pt
-#define postamble_3_4_list	postamble_3_pt
+int
+test_case_3_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_3_4_conn = { &premable_3_4_conn, &test_case_3_4_conn, &postamble_3_4_conn };
-struct test_stream test_3_4_resp = { &premable_3_4_resp, &test_case_3_4_resp, &postamble_3_4_resp };
-struct test_stream test_3_4_list = { &premable_3_4_list, &test_case_3_4_list, &postamble_3_4_list };
+#define postamble_3_4_top	postamble_3_iut
+#define postamble_3_4_bot	postamble_3_pt
+
+struct test_stream test_3_4_top = { &premable_3_4_top, &test_case_3_4_top, &postamble_3_4_top };
+struct test_stream test_3_4_bot = { &premable_3_4_bot, &test_case_3_4_bot, &postamble_3_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7773,37 +7555,30 @@ struct test_stream test_3_4_list = { &premable_3_4_list, &test_case_3_4_list, &p
 Checks that the IUT, upon receipt of a COOKIE-ECHO message with other\n\
 cookie than sent in INIT-ACK, discards the message."
 
-#define preamble_3_5_conn	preamble_3_iut
-#define preamble_3_5_resp	preamble_3_pt
-#define preamble_3_5_list	preamble_3_pt
+#define preamble_3_5_top	preamble_3_iut
+#define preamble_3_5_bot	preamble_3_pt
 
 /* Association not established between PT and SUT.  Arrange PT to send
  * COOKIE-ECHO message with cookie different from received cookie in
  * INIT-ACK. */
 
 int
-test_case_3_5_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_5_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_5_list(int child)
+test_case_3_5_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_3_5_conn	postamble_3_iut
-#define postamble_3_5_resp	postamble_3_pt
-#define postamble_3_5_list	postamble_3_pt
+int
+test_case_3_5_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_3_5_conn = { &premable_3_5_conn, &test_case_3_5_conn, &postamble_3_5_conn };
-struct test_stream test_3_5_resp = { &premable_3_5_resp, &test_case_3_5_resp, &postamble_3_5_resp };
-struct test_stream test_3_5_list = { &premable_3_5_list, &test_case_3_5_list, &postamble_3_5_list };
+#define postamble_3_5_top	postamble_3_iut
+#define postamble_3_5_bot	postamble_3_pt
+
+struct test_stream test_3_5_top = { &premable_3_5_top, &test_case_3_5_top, &postamble_3_5_top };
+struct test_stream test_3_5_bot = { &premable_3_5_bot, &test_case_3_5_bot, &postamble_3_5_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7817,37 +7592,30 @@ Checks that the IUT, on receipt of a COOKIE-ECHO message after lifetime\n\
 received in INIT-ACK messae has expired, should send an ERROR with cause\n\
 \"Stale Cookie Error\"."
 
-#define preamble_3_6_conn	preamble_3_iut
-#define preamble_3_6_resp	preamble_3_pt
-#define preamble_3_6_list	preamble_3_pt
+#define preamble_3_6_top	preamble_3_iut
+#define preamble_3_6_bot	preamble_3_pt
 
 /* Association not established between PT and SUT.  Arrange PT to send
  * COOKIE-ECHO mesage after life time of the received cookie in INIT-ACK
  * message has expired. */
 
 int
-test_case_3_6_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_6_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_6_list(int child)
+test_case_3_6_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_3_6_conn	postamble_3_iut
-#define postamble_3_6_resp	postamble_3_pt
-#define postamble_3_6_list	postamble_3_pt
+int
+test_case_3_6_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_3_6_conn = { &premable_3_6_conn, &test_case_3_6_conn, &postamble_3_6_conn };
-struct test_stream test_3_6_resp = { &premable_3_6_resp, &test_case_3_6_resp, &postamble_3_6_resp };
-struct test_stream test_3_6_list = { &premable_3_6_list, &test_case_3_6_list, &postamble_3_6_list };
+#define postamble_3_6_top	postamble_3_iut
+#define postamble_3_6_bot	postamble_3_pt
+
+struct test_stream test_3_6_top = { &premable_3_6_top, &test_case_3_6_top, &postamble_3_6_top };
+struct test_stream test_3_6_bot = { &premable_3_6_bot, &test_case_3_6_bot, &postamble_3_6_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7860,36 +7628,29 @@ struct test_stream test_3_6_list = { &premable_3_6_list, &test_case_3_6_list, &p
 Checks that the IUT, upon receipt of an ABORT message with incorrect\n\
 verification tag, discards the message."
 
-#define preamble_3_7_conn	preamble_3_iut
-#define preamble_3_7_resp	preamble_3_pt
-#define preamble_3_7_list	preamble_3_pt
+#define preamble_3_7_top	preamble_3_iut
+#define preamble_3_7_bot	preamble_3_pt
 
 /* Association established between PT and SUT.  Arrange PT to send ABORT
  * to SUT with incorrect verification tag. */
 
 int
-test_case_3_7_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_7_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_7_list(int child)
+test_case_3_7_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_3_7_conn	postamble_3_iut
-#define postamble_3_7_resp	postamble_3_pt
-#define postamble_3_7_list	postamble_3_pt
+int
+test_case_3_7_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_3_7_conn = { &premable_3_7_conn, &test_case_3_7_conn, &postamble_3_7_conn };
-struct test_stream test_3_7_resp = { &premable_3_7_resp, &test_case_3_7_resp, &postamble_3_7_resp };
-struct test_stream test_3_7_list = { &premable_3_7_list, &test_case_3_7_list, &postamble_3_7_list };
+#define postamble_3_7_top	postamble_3_iut
+#define postamble_3_7_bot	postamble_3_pt
+
+struct test_stream test_3_7_top = { &premable_3_7_top, &test_case_3_7_top, &postamble_3_7_top };
+struct test_stream test_3_7_bot = { &premable_3_7_bot, &test_case_3_7_bot, &postamble_3_7_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7903,36 +7664,29 @@ Checks that the IUT, on receipt of an INIT message with a packet length\n\
 smaller than the Chunk length defined, sends an ABORT message or\n\
 discards the message."
 
-#define preamble_3_8_conn	preamble_3_iut
-#define preamble_3_8_resp	preamble_3_pt
-#define preamble_3_8_list	preamble_3_pt
+#define preamble_3_8_top	preamble_3_iut
+#define preamble_3_8_bot	preamble_3_pt
 
 /* Association not established between PT and SUT.  Arrange PT to send
  * INIT with chunk length greater than the length of the message. */
 
 int
-test_case_3_8_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_8_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_8_list(int child)
+test_case_3_8_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_3_8_conn	postamble_3_iut
-#define postamble_3_8_resp	postamble_3_pt
-#define postamble_3_8_list	postamble_3_pt
+int
+test_case_3_8_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_3_8_conn = { &premable_3_8_conn, &test_case_3_8_conn, &postamble_3_8_conn };
-struct test_stream test_3_8_resp = { &premable_3_8_resp, &test_case_3_8_resp, &postamble_3_8_resp };
-struct test_stream test_3_8_list = { &premable_3_8_list, &test_case_3_8_list, &postamble_3_8_list };
+#define postamble_3_8_top	postamble_3_iut
+#define postamble_3_8_bot	postamble_3_pt
+
+struct test_stream test_3_8_top = { &premable_3_8_top, &test_case_3_8_top, &postamble_3_8_top };
+struct test_stream test_3_8_bot = { &premable_3_8_bot, &test_case_3_8_bot, &postamble_3_8_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7945,37 +7699,30 @@ struct test_stream test_3_8_list = { &premable_3_8_list, &test_case_3_8_list, &p
 Checks that the IUT, on receipt of a SHUTDOWN-ACK message with invalid\n\
 verification tag, discards the message."
 
-#define preamble_3_9_conn	preamble_3_iut
-#define preamble_3_9_resp	preamble_3_pt
-#define preamble_3_9_list	preamble_3_pt
+#define preamble_3_9_top	preamble_3_iut
+#define preamble_3_9_bot	preamble_3_pt
 
 /* Association established between PT and SUT.  Arrange PT to send
  * SHUTDOWN-ACK message with invalid verification tag to SUT in Shutdown
  * Sent state. */
 
 int
-test_case_3_9_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_9_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_9_list(int child)
+test_case_3_9_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_3_9_conn	postamble_3_iut
-#define postamble_3_9_resp	postamble_3_pt
-#define postamble_3_9_list	postamble_3_pt
+int
+test_case_3_9_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_3_9_conn = { &premable_3_9_conn, &test_case_3_9_conn, &postamble_3_9_conn };
-struct test_stream test_3_9_resp = { &premable_3_9_resp, &test_case_3_9_resp, &postamble_3_9_resp };
-struct test_stream test_3_9_list = { &premable_3_9_list, &test_case_3_9_list, &postamble_3_9_list };
+#define postamble_3_9_top	postamble_3_iut
+#define postamble_3_9_bot	postamble_3_pt
+
+struct test_stream test_3_9_top = { &premable_3_9_top, &test_case_3_9_top, &postamble_3_9_top };
+struct test_stream test_3_9_bot = { &premable_3_9_bot, &test_case_3_9_bot, &postamble_3_9_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -7988,37 +7735,30 @@ struct test_stream test_3_9_list = { &premable_3_9_list, &test_case_3_9_list, &p
 Checks that the IUT, on receipt of a SHUTDOWN-COMPLETE message with\n\
 invalid verification tag, discards the message."
 
-#define preamble_3_10_conn	preamble_3_iut
-#define preamble_3_10_resp	preamble_3_pt
-#define preamble_3_10_list	preamble_3_pt
+#define preamble_3_10_top	preamble_3_iut
+#define preamble_3_10_bot	preamble_3_pt
 
 /* Association established between PT and SUT.  Arrange PT to send
  * SHUTDOWN-COMPLETE with invalid verification tag to SUT in Shutdown
  * Ack Sent state. */
 
 int
-test_case_3_10_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_10_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_3_10_list(int child)
+test_case_3_10_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_3_10_conn	postamble_3_iut
-#define postamble_3_10_resp	postamble_3_pt
-#define postamble_3_10_list	postamble_3_pt
+int
+test_case_3_10_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_3_10_conn = { &premable_3_10_conn, &test_case_3_10_conn, &postamble_3_10_conn };
-struct test_stream test_3_10_resp = { &premable_3_10_resp, &test_case_3_10_resp, &postamble_3_10_resp };
-struct test_stream test_3_10_list = { &premable_3_10_list, &test_case_3_10_list, &postamble_3_10_list };
+#define postamble_3_10_top	postamble_3_iut
+#define postamble_3_10_bot	postamble_3_pt
+
+struct test_stream test_3_10_top = { &premable_3_10_top, &test_case_3_10_top, &postamble_3_10_top };
+struct test_stream test_3_10_bot = { &premable_3_10_bot, &test_case_3_10_bot, &postamble_3_10_bot };
 
 /* ========================================================================= */
 
@@ -8035,36 +7775,29 @@ struct test_stream test_3_10_list = { &premable_3_10_list, &test_case_3_10_list,
 Checks that the IUT, on receipt of an INIT message after sending an INIT\n\
 message on its own, sends an INIT-ACK message."
 
-#define preamble_4_1_conn	preamble_4_iut
-#define preamble_4_1_resp	preamble_4_pt
-#define preamble_4_1_list	preamble_4_pt
+#define preamble_4_1_top	preamble_4_iut
+#define preamble_4_1_bot	preamble_4_pt
 
 /* Association not established between PT and SUT.  Arrange PT to send
  * INIT to SUT upon reception of an INIT from the SUT. */
 
 int
-test_case_4_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_1_list(int child)
+test_case_4_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_1_conn	postamble_4_iut
-#define postamble_4_1_resp	postamble_4_pt
-#define postamble_4_1_list	postamble_4_pt
+int
+test_case_4_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_1_conn = { &premable_4_1_conn, &test_case_4_1_conn, &postamble_4_1_conn };
-struct test_stream test_4_1_resp = { &premable_4_1_resp, &test_case_4_1_resp, &postamble_4_1_resp };
-struct test_stream test_4_1_list = { &premable_4_1_list, &test_case_4_1_list, &postamble_4_1_list };
+#define postamble_4_1_top	postamble_4_iut
+#define postamble_4_1_bot	postamble_4_pt
+
+struct test_stream test_4_1_top = { &premable_4_1_top, &test_case_4_1_top, &postamble_4_1_top };
+struct test_stream test_4_1_bot = { &premable_4_1_bot, &test_case_4_1_bot, &postamble_4_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8078,37 +7811,30 @@ Checks that the IUT, on reciept of an INIT message when association is\n\
 already established, sends an INIT-ACK message and existing association\n\
 is not disturbed."
 
-#define preamble_4_2_1_conn	preamble_4_iut
-#define preamble_4_2_1_resp	preamble_4_pt
-#define preamble_4_2_1_list	preamble_4_pt
+#define preamble_4_2_1_top	preamble_4_iut
+#define preamble_4_2_1_bot	preamble_4_pt
 
 /* Association established between PT and IUT.  Arrange PT to send INIT
  * message to SUT with source IP address, destination IP addres and port
  * numbers the same as in the established association. */
 
 int
-test_case_4_2_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_2_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_2_1_list(int child)
+test_case_4_2_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_2_1_conn	postamble_4_iut
-#define postamble_4_2_1_resp	postamble_4_pt
-#define postamble_4_2_1_list	postamble_4_pt
+int
+test_case_4_2_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_2_1_conn = { &premable_4_2_1_conn, &test_case_4_2_1_conn, &postamble_4_2_1_conn };
-struct test_stream test_4_2_1_resp = { &premable_4_2_1_resp, &test_case_4_2_1_resp, &postamble_4_2_1_resp };
-struct test_stream test_4_2_1_list = { &premable_4_2_1_list, &test_case_4_2_1_list, &postamble_4_2_1_list };
+#define postamble_4_2_1_top	postamble_4_iut
+#define postamble_4_2_1_bot	postamble_4_pt
+
+struct test_stream test_4_2_1_top = { &premable_4_2_1_top, &test_case_4_2_1_top, &postamble_4_2_1_top };
+struct test_stream test_4_2_1_bot = { &premable_4_2_1_bot, &test_case_4_2_1_bot, &postamble_4_2_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8122,36 +7848,29 @@ Checks that the IUT, on receipt of INIT message, after sending a\n\
 SHUTDOWN-ACK message, discards the INIT message and retransmits the\n\
 SHUTDOWN-ACK message."
 
-#define preamble_4_2_2_conn	preamble_4_iut
-#define preamble_4_2_2_resp	preamble_4_pt
-#define preamble_4_2_2_list	preamble_4_pt
+#define preamble_4_2_2_top	preamble_4_iut
+#define preamble_4_2_2_bot	preamble_4_pt
 
 /* Association established between PT and SUT>  Arrange PT to send INIT
  * message to SUT after receiving SHUTDOWN-ACK message. */
 
 int
-test_case_4_2_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_2_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_2_2_list(int child)
+test_case_4_2_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_2_2_conn	postamble_4_iut
-#define postamble_4_2_2_resp	postamble_4_pt
-#define postamble_4_2_2_list	postamble_4_pt
+int
+test_case_4_2_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_2_2_conn = { &premable_4_2_2_conn, &test_case_4_2_2_conn, &postamble_4_2_2_conn };
-struct test_stream test_4_2_2_resp = { &premable_4_2_2_resp, &test_case_4_2_2_resp, &postamble_4_2_2_resp };
-struct test_stream test_4_2_2_list = { &premable_4_2_2_list, &test_case_4_2_2_list, &postamble_4_2_2_list };
+#define postamble_4_2_2_top	postamble_4_iut
+#define postamble_4_2_2_bot	postamble_4_pt
+
+struct test_stream test_4_2_2_top = { &premable_4_2_2_top, &test_case_4_2_2_top, &postamble_4_2_2_top };
+struct test_stream test_4_2_2_bot = { &premable_4_2_2_bot, &test_case_4_2_2_bot, &postamble_4_2_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8164,36 +7883,29 @@ struct test_stream test_4_2_2_list = { &premable_4_2_2_list, &test_case_4_2_2_li
 Checks that the IUT, on receipt of a duplicate INIT-ACK message, after\n\
 sending a COOKIE-ECHO message, discards the INIT-ACK message."
 
-#define preamble_4_3_conn	preamble_4_iut
-#define preamble_4_3_resp	preamble_4_pt
-#define preamble_4_3_list	preamble_4_pt
+#define preamble_4_3_top	preamble_4_iut
+#define preamble_4_3_bot	preamble_4_pt
 
 /* Association not established between PT and SUT.  Arrange PT to resent
  * the INIT-ACK to the SUT after receiving COOKIE-ECHO message. */
 
 int
-test_case_4_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_3_list(int child)
+test_case_4_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_3_conn	postamble_4_iut
-#define postamble_4_3_resp	postamble_4_pt
-#define postamble_4_3_list	postamble_4_pt
+int
+test_case_4_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_3_conn = { &premable_4_3_conn, &test_case_4_3_conn, &postamble_4_3_conn };
-struct test_stream test_4_3_resp = { &premable_4_3_resp, &test_case_4_3_resp, &postamble_4_3_resp };
-struct test_stream test_4_3_list = { &premable_4_3_list, &test_case_4_3_list, &postamble_4_3_list };
+#define postamble_4_3_top	postamble_4_iut
+#define postamble_4_3_bot	postamble_4_pt
+
+struct test_stream test_4_3_top = { &premable_4_3_top, &test_case_4_3_top, &postamble_4_3_top };
+struct test_stream test_4_3_bot = { &premable_4_3_bot, &test_case_4_3_bot, &postamble_4_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8206,37 +7918,30 @@ struct test_stream test_4_3_list = { &premable_4_3_list, &test_case_4_3_list, &p
 Checks that the IUT, on receipt of a duplicate COOKIE-ACK message, after\n\
 the association is established, discards the COOKIE-ACK message."
 
-#define preamble_4_4_conn	preamble_4_iut
-#define preamble_4_4_resp	preamble_4_pt
-#define preamble_4_4_list	preamble_4_pt
+#define preamble_4_4_top	preamble_4_iut
+#define preamble_4_4_bot	preamble_4_pt
 
 /* Association not established between PT and SUT.  Arrange PT to
  * retransmit COOKIE-ACK message to SUT after association is established
  * between PT and SUT. */
 
 int
-test_case_4_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_4_list(int child)
+test_case_4_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_4_conn	postamble_4_iut
-#define postamble_4_4_resp	postamble_4_pt
-#define postamble_4_4_list	postamble_4_pt
+int
+test_case_4_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_4_conn = { &premable_4_4_conn, &test_case_4_4_conn, &postamble_4_4_conn };
-struct test_stream test_4_4_resp = { &premable_4_4_resp, &test_case_4_4_resp, &postamble_4_4_resp };
-struct test_stream test_4_4_list = { &premable_4_4_list, &test_case_4_4_list, &postamble_4_4_list };
+#define postamble_4_4_top	postamble_4_iut
+#define postamble_4_4_bot	postamble_4_pt
+
+struct test_stream test_4_4_top = { &premable_4_4_top, &test_case_4_4_top, &postamble_4_4_top };
+struct test_stream test_4_4_bot = { &premable_4_4_bot, &test_case_4_4_bot, &postamble_4_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8249,37 +7954,30 @@ struct test_stream test_4_4_list = { &premable_4_4_list, &test_case_4_4_list, &p
 Checks that the IUT, on receipt of a SHUTDONW message, after sending a\n\
 SHUTDOWN message on its own, sends a SHUTDOWN-ACK message."
 
-#define preamble_4_5_conn	preamble_4_iut
-#define preamble_4_5_resp	preamble_4_pt
-#define preamble_4_5_list	preamble_4_pt
+#define preamble_4_5_top	preamble_4_iut
+#define preamble_4_5_bot	preamble_4_pt
 
 /* Association established between PT and SUT.  Arrange PT to send
  * SHUTDOWN message after receiving SHUTDOWN message from the other end.
  */
 
 int
-test_case_4_5_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_5_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_5_list(int child)
+test_case_4_5_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_5_conn	postamble_4_iut
-#define postamble_4_5_resp	postamble_4_pt
-#define postamble_4_5_list	postamble_4_pt
+int
+test_case_4_5_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_5_conn = { &premable_4_5_conn, &test_case_4_5_conn, &postamble_4_5_conn };
-struct test_stream test_4_5_resp = { &premable_4_5_resp, &test_case_4_5_resp, &postamble_4_5_resp };
-struct test_stream test_4_5_list = { &premable_4_5_list, &test_case_4_5_list, &postamble_4_5_list };
+#define postamble_4_5_top	postamble_4_iut
+#define postamble_4_5_bot	postamble_4_pt
+
+struct test_stream test_4_5_top = { &premable_4_5_top, &test_case_4_5_top, &postamble_4_5_top };
+struct test_stream test_4_5_bot = { &premable_4_5_bot, &test_case_4_5_bot, &postamble_4_5_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8292,36 +7990,29 @@ struct test_stream test_4_5_list = { &premable_4_5_list, &test_case_4_5_list, &p
 Checks that the IUT, on receipt of SHUTDOWN message, after sending INIT\n\
 message on its own, discards the SHUTDOWN message."
 
-#define preamble_4_6_1_conn	preamble_4_iut
-#define preamble_4_6_1_resp	preamble_4_pt
-#define preamble_4_6_1_list	preamble_4_pt
+#define preamble_4_6_1_top	preamble_4_iut
+#define preamble_4_6_1_bot	preamble_4_pt
 
 /* No association between PT an SUT.  Arrange PT to send SHUTDOWN
  * message to SUT after receiving INIT message from it. */
 
 int
-test_case_4_6_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_6_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_6_1_list(int child)
+test_case_4_6_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_6_1_conn	postamble_4_iut
-#define postamble_4_6_1_resp	postamble_4_pt
-#define postamble_4_6_1_list	postamble_4_pt
+int
+test_case_4_6_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_6_1_conn = { &premable_4_6_1_conn, &test_case_4_6_1_conn, &postamble_4_6_1_conn };
-struct test_stream test_4_6_1_resp = { &premable_4_6_1_resp, &test_case_4_6_1_resp, &postamble_4_6_1_resp };
-struct test_stream test_4_6_1_list = { &premable_4_6_1_list, &test_case_4_6_1_list, &postamble_4_6_1_list };
+#define postamble_4_6_1_top	postamble_4_iut
+#define postamble_4_6_1_bot	postamble_4_pt
+
+struct test_stream test_4_6_1_top = { &premable_4_6_1_top, &test_case_4_6_1_top, &postamble_4_6_1_top };
+struct test_stream test_4_6_1_bot = { &premable_4_6_1_bot, &test_case_4_6_1_bot, &postamble_4_6_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8334,36 +8025,29 @@ struct test_stream test_4_6_1_list = { &premable_4_6_1_list, &test_case_4_6_1_li
 Checks that the IUT, on receipt of a SHUTDOWN mesage in the closed\n\
 state, sends an ABORT message"
 
-#define preamble_4_6_2_conn	preamble_4_iut
-#define preamble_4_6_2_resp	preamble_4_pt
-#define preamble_4_6_2_list	preamble_4_pt
+#define preamble_4_6_2_top	preamble_4_iut
+#define preamble_4_6_2_bot	preamble_4_pt
 
 /* Arrange PT to send SHUTDOWN message to SUT for association in the
  * closed state. */
 
 int
-test_case_4_6_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_6_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_6_2_list(int child)
+test_case_4_6_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_6_2_conn	postamble_4_iut
-#define postamble_4_6_2_resp	postamble_4_pt
-#define postamble_4_6_2_list	postamble_4_pt
+int
+test_case_4_6_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_6_2_conn = { &premable_4_6_2_conn, &test_case_4_6_2_conn, &postamble_4_6_2_conn };
-struct test_stream test_4_6_2_resp = { &premable_4_6_2_resp, &test_case_4_6_2_resp, &postamble_4_6_2_resp };
-struct test_stream test_4_6_2_list = { &premable_4_6_2_list, &test_case_4_6_2_list, &postamble_4_6_2_list };
+#define postamble_4_6_2_top	postamble_4_iut
+#define postamble_4_6_2_bot	postamble_4_pt
+
+struct test_stream test_4_6_2_top = { &premable_4_6_2_top, &test_case_4_6_2_top, &postamble_4_6_2_top };
+struct test_stream test_4_6_2_bot = { &premable_4_6_2_bot, &test_case_4_6_2_bot, &postamble_4_6_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8376,37 +8060,30 @@ struct test_stream test_4_6_2_list = { &premable_4_6_2_list, &test_case_4_6_2_li
 Checks that the IUT, on receipt of a SHUTDOWN message in Shutdown Sent\n\
 state, sends a SHUTDOWN-ACK message and restarts T2-Shutdown timer."
 
-#define preamble_4_6_3_conn	preamble_4_iut
-#define preamble_4_6_3_resp	preamble_4_pt
-#define preamble_4_6_3_list	preamble_4_pt
+#define preamble_4_6_3_top	preamble_4_iut
+#define preamble_4_6_3_bot	preamble_4_pt
 
 /* Association between PT and SUT.  Arrange SUT to send Terminate
  * primitive to IUT to terminate the association.  Arrange PT to send
  * SHUTDOWN to SUT. */
 
 int
-test_case_4_6_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_6_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_6_3_list(int child)
+test_case_4_6_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_6_3_conn	postamble_4_iut
-#define postamble_4_6_3_resp	postamble_4_pt
-#define postamble_4_6_3_list	postamble_4_pt
+int
+test_case_4_6_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_6_3_conn = { &premable_4_6_3_conn, &test_case_4_6_3_conn, &postamble_4_6_3_conn };
-struct test_stream test_4_6_3_resp = { &premable_4_6_3_resp, &test_case_4_6_3_resp, &postamble_4_6_3_resp };
-struct test_stream test_4_6_3_list = { &premable_4_6_3_list, &test_case_4_6_3_list, &postamble_4_6_3_list };
+#define postamble_4_6_3_top	postamble_4_iut
+#define postamble_4_6_3_bot	postamble_4_pt
+
+struct test_stream test_4_6_3_top = { &premable_4_6_3_top, &test_case_4_6_3_top, &postamble_4_6_3_top };
+struct test_stream test_4_6_3_bot = { &premable_4_6_3_bot, &test_case_4_6_3_bot, &postamble_4_6_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8420,36 +8097,29 @@ Checks that the IUT, on receipt of a SHUTDOWN-ACK message in Cookie Wait\n\
 state, sends a SHUTDOWN-COMPLETE message and current state is not\n\
 disturbed."
 
-#define preamble_4_7_1_conn	preamble_4_iut
-#define preamble_4_7_1_resp	preamble_4_pt
-#define preamble_4_7_1_list	preamble_4_pt
+#define preamble_4_7_1_top	preamble_4_iut
+#define preamble_4_7_1_bot	preamble_4_pt
 
 /* No association between PT and SUT.  Arrange PT to send SHUTDOWN-ACK
  * message to SUT after receiving INIT message. */
 
 int
-test_case_4_7_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_7_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_7_1_list(int child)
+test_case_4_7_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_7_1_conn	postamble_4_iut
-#define postamble_4_7_1_resp	postamble_4_pt
-#define postamble_4_7_1_list	postamble_4_pt
+int
+test_case_4_7_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_7_1_conn = { &premable_4_7_1_conn, &test_case_4_7_1_conn, &postamble_4_7_1_conn };
-struct test_stream test_4_7_1_resp = { &premable_4_7_1_resp, &test_case_4_7_1_resp, &postamble_4_7_1_resp };
-struct test_stream test_4_7_1_list = { &premable_4_7_1_list, &test_case_4_7_1_list, &postamble_4_7_1_list };
+#define postamble_4_7_1_top	postamble_4_iut
+#define postamble_4_7_1_bot	postamble_4_pt
+
+struct test_stream test_4_7_1_top = { &premable_4_7_1_top, &test_case_4_7_1_top, &postamble_4_7_1_top };
+struct test_stream test_4_7_1_bot = { &premable_4_7_1_bot, &test_case_4_7_1_bot, &postamble_4_7_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8462,36 +8132,29 @@ struct test_stream test_4_7_1_list = { &premable_4_7_1_list, &test_case_4_7_1_li
 Checks that the IUT, on receipt of a SHUTDOWN-ACK message in Established\n\
 state, discards the message or sends an ABORT."
 
-#define preamble_4_7_2_conn	preamble_4_iut
-#define preamble_4_7_2_resp	preamble_4_pt
-#define preamble_4_7_2_list	preamble_4_pt
+#define preamble_4_7_2_top	preamble_4_iut
+#define preamble_4_7_2_bot	preamble_4_pt
 
 /* Association between PT and SUT.  Arrange PT to send SHUTDOWN-ACK
  * message to SUT with correct verification tag. */
 
 int
-test_case_4_7_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_7_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_7_2_list(int child)
+test_case_4_7_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_7_2_conn	postamble_4_iut
-#define postamble_4_7_2_resp	postamble_4_pt
-#define postamble_4_7_2_list	postamble_4_pt
+int
+test_case_4_7_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_7_2_conn = { &premable_4_7_2_conn, &test_case_4_7_2_conn, &postamble_4_7_2_conn };
-struct test_stream test_4_7_2_resp = { &premable_4_7_2_resp, &test_case_4_7_2_resp, &postamble_4_7_2_resp };
-struct test_stream test_4_7_2_list = { &premable_4_7_2_list, &test_case_4_7_2_list, &postamble_4_7_2_list };
+#define postamble_4_7_2_top	postamble_4_iut
+#define postamble_4_7_2_bot	postamble_4_pt
+
+struct test_stream test_4_7_2_top = { &premable_4_7_2_top, &test_case_4_7_2_top, &postamble_4_7_2_top };
+struct test_stream test_4_7_2_bot = { &premable_4_7_2_bot, &test_case_4_7_2_bot, &postamble_4_7_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8505,37 +8168,30 @@ Checks that the IUT, on receipt of a SHUTDOWN-ACK message in Shutdown\n\
 Ack Sent state, sends a SHUTDOWN-COMPLETE message and closes the\n\
 association."
 
-#define preamble_4_7_3_conn	preamble_4_iut
-#define preamble_4_7_3_resp	preamble_4_pt
-#define preamble_4_7_3_list	preamble_4_pt
+#define preamble_4_7_3_top	preamble_4_iut
+#define preamble_4_7_3_bot	preamble_4_pt
 
 /* Association established between PT and SUT.  Arrange PT to send
  * SHUTDOWN message to SUT.  Also, SHUTDOWN-ACK messag is sent to SUT
  * after receiving SHUTDOWN-ACK message. */
 
 int
-test_case_4_7_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_7_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_7_3_list(int child)
+test_case_4_7_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_7_3_conn	postamble_4_iut
-#define postamble_4_7_3_resp	postamble_4_pt
-#define postamble_4_7_3_list	postamble_4_pt
+int
+test_case_4_7_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_7_3_conn = { &premable_4_7_3_conn, &test_case_4_7_3_conn, &postamble_4_7_3_conn };
-struct test_stream test_4_7_3_resp = { &premable_4_7_3_resp, &test_case_4_7_3_resp, &postamble_4_7_3_resp };
-struct test_stream test_4_7_3_list = { &premable_4_7_3_list, &test_case_4_7_3_list, &postamble_4_7_3_list };
+#define postamble_4_7_3_top	postamble_4_iut
+#define postamble_4_7_3_bot	postamble_4_pt
+
+struct test_stream test_4_7_3_top = { &premable_4_7_3_top, &test_case_4_7_3_top, &postamble_4_7_3_top };
+struct test_stream test_4_7_3_bot = { &premable_4_7_3_bot, &test_case_4_7_3_bot, &postamble_4_7_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8548,36 +8204,29 @@ struct test_stream test_4_7_3_list = { &premable_4_7_3_list, &test_case_4_7_3_li
 Checks that the IUT, on receipt of a COOKIE-ECHO message in Established\n\
 state, discards the message and current state is not disturbed."
 
-#define preamble_4_8_conn	preamble_4_iut
-#define preamble_4_8_resp	preamble_4_pt
-#define preamble_4_8_list	preamble_4_pt
+#define preamble_4_8_top	preamble_4_iut
+#define preamble_4_8_bot	preamble_4_pt
 
 /* Association between PT and SUT.  Arrange PT to send COOKIE-ECHO
  * message with invalid Message Authentication Code (MAC) to SUT. */
 
 int
-test_case_4_8_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_8_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_8_list(int child)
+test_case_4_8_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_8_conn	postamble_4_iut
-#define postamble_4_8_resp	postamble_4_pt
-#define postamble_4_8_list	postamble_4_pt
+int
+test_case_4_8_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_8_conn = { &premable_4_8_conn, &test_case_4_8_conn, &postamble_4_8_conn };
-struct test_stream test_4_8_resp = { &premable_4_8_resp, &test_case_4_8_resp, &postamble_4_8_resp };
-struct test_stream test_4_8_list = { &premable_4_8_list, &test_case_4_8_list, &postamble_4_8_list };
+#define postamble_4_8_top	postamble_4_iut
+#define postamble_4_8_bot	postamble_4_pt
+
+struct test_stream test_4_8_top = { &premable_4_8_top, &test_case_4_8_top, &postamble_4_8_top };
+struct test_stream test_4_8_bot = { &premable_4_8_bot, &test_case_4_8_bot, &postamble_4_8_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8590,36 +8239,29 @@ struct test_stream test_4_8_list = { &premable_4_8_list, &test_case_4_8_list, &p
 Checks that the IUT, on receipt of a SHUTDOWN-COMPLETE message in Cookie\n\
 Wait state, discards the message."
 
-#define preamble_4_9_conn	preamble_4_iut
-#define preamble_4_9_resp	preamble_4_pt
-#define preamble_4_9_list	preamble_4_pt
+#define preamble_4_9_top	preamble_4_iut
+#define preamble_4_9_bot	preamble_4_pt
 
 /* No association between PT and SUT.  Arrange PT to send
  * SHUTDOWN-COMPLETE to SUT after receiving INIT from the SUT. */
 
 int
-test_case_4_9_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_9_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_9_list(int child)
+test_case_4_9_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_9_conn	postamble_4_iut
-#define postamble_4_9_resp	postamble_4_pt
-#define postamble_4_9_list	postamble_4_pt
+int
+test_case_4_9_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_9_conn = { &premable_4_9_conn, &test_case_4_9_conn, &postamble_4_9_conn };
-struct test_stream test_4_9_resp = { &premable_4_9_resp, &test_case_4_9_resp, &postamble_4_9_resp };
-struct test_stream test_4_9_list = { &premable_4_9_list, &test_case_4_9_list, &postamble_4_9_list };
+#define postamble_4_9_top	postamble_4_iut
+#define postamble_4_9_bot	postamble_4_pt
+
+struct test_stream test_4_9_top = { &premable_4_9_top, &test_case_4_9_top, &postamble_4_9_top };
+struct test_stream test_4_9_bot = { &premable_4_9_bot, &test_case_4_9_bot, &postamble_4_9_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8632,36 +8274,29 @@ struct test_stream test_4_9_list = { &premable_4_9_list, &test_case_4_9_list, &p
 Checks that the IUT, on receipt of DATA mesage in Shutdown Ack Sent\n\
 state, discards the message and may send an ABORT."
 
-#define preamble_4_10_conn	preamble_4_iut
-#define preamble_4_10_resp	preamble_4_pt
-#define preamble_4_10_list	preamble_4_pt
+#define preamble_4_10_top	preamble_4_iut
+#define preamble_4_10_bot	preamble_4_pt
 
 /* Association between PT and SUT.  Arrange PT to send SHUTDOWN to SUT.
  * Also DATA message is sent from PT to SUT. */
 
 int
-test_case_4_10_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_10_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_4_10_list(int child)
+test_case_4_10_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_4_10_conn	postamble_4_iut
-#define postamble_4_10_resp	postamble_4_pt
-#define postamble_4_10_list	postamble_4_pt
+int
+test_case_4_10_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_4_10_conn = { &premable_4_10_conn, &test_case_4_10_conn, &postamble_4_10_conn };
-struct test_stream test_4_10_resp = { &premable_4_10_resp, &test_case_4_10_resp, &postamble_4_10_resp };
-struct test_stream test_4_10_list = { &premable_4_10_list, &test_case_4_10_list, &postamble_4_10_list };
+#define postamble_4_10_top	postamble_4_iut
+#define postamble_4_10_bot	postamble_4_pt
+
+struct test_stream test_4_10_top = { &premable_4_10_top, &test_case_4_10_top, &postamble_4_10_top };
+struct test_stream test_4_10_bot = { &premable_4_10_bot, &test_case_4_10_bot, &postamble_4_10_bot };
 
 /* ========================================================================= */
 
@@ -8679,36 +8314,29 @@ Checks that the IUT, when total number of consecutive retransmissions to\n\
 a peer exceeds the ASSOCIATION.MAX.RETRANS, closes the association and\n\
 may send an ABORT."
 
-#define preamble_5_1_1_conn	preamble_5_iut
-#define preamble_5_1_1_resp	preamble_5_pt
-#define preamble_5_1_1_list	preamble_5_pt
+#define preamble_5_1_1_top	preamble_5_iut
+#define preamble_5_1_1_bot	preamble_5_pt
 
 /* Association between PT and SUT.  The PT is multi-homed.  Arrange the
  * PT so no SACK is sent in response to DATA received from SUT. */
 
 int
-test_case_5_1_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_1_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_1_1_list(int child)
+test_case_5_1_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_5_1_1_conn	postamble_5_iut
-#define postamble_5_1_1_resp	postamble_5_pt
-#define postamble_5_1_1_list	postamble_5_pt
+int
+test_case_5_1_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_5_1_1_conn = { &premable_5_1_1_conn, &test_case_5_1_1_conn, &postamble_5_1_1_conn };
-struct test_stream test_5_1_1_resp = { &premable_5_1_1_resp, &test_case_5_1_1_resp, &postamble_5_1_1_resp };
-struct test_stream test_5_1_1_list = { &premable_5_1_1_list, &test_case_5_1_1_list, &postamble_5_1_1_list };
+#define postamble_5_1_1_top	postamble_5_iut
+#define postamble_5_1_1_bot	postamble_5_pt
+
+struct test_stream test_5_1_1_top = { &premable_5_1_1_top, &test_case_5_1_1_top, &postamble_5_1_1_top };
+struct test_stream test_5_1_1_bot = { &premable_5_1_1_bot, &test_case_5_1_1_bot, &postamble_5_1_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8722,37 +8350,30 @@ Checks that the IUT, on receipt of a SACK from the PT, for a DATA that\n\
 has been retransmitted, resets the counter which counts the total\n\
 retransmission to an endpoint."
 
-#define preamble_5_1_2_conn	preamble_5_iut
-#define preamble_5_1_2_resp	preamble_5_pt
-#define preamble_5_1_2_list	preamble_5_pt
+#define preamble_5_1_2_top	preamble_5_iut
+#define preamble_5_1_2_bot	preamble_5_pt
 
 /* Association between PT and SUT.  Arrange PT so SACK is sent in
  * response to DATA received from SUT only when the DATA has been
  * retransmitted for two or three times. */
 
 int
-test_case_5_1_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_1_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_1_2_list(int child)
+test_case_5_1_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_5_1_2_conn	postamble_5_iut
-#define postamble_5_1_2_resp	postamble_5_pt
-#define postamble_5_1_2_list	postamble_5_pt
+int
+test_case_5_1_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_5_1_2_conn = { &premable_5_1_2_conn, &test_case_5_1_2_conn, &postamble_5_1_2_conn };
-struct test_stream test_5_1_2_resp = { &premable_5_1_2_resp, &test_case_5_1_2_resp, &postamble_5_1_2_resp };
-struct test_stream test_5_1_2_list = { &premable_5_1_2_list, &test_case_5_1_2_list, &postamble_5_1_2_list };
+#define postamble_5_1_2_top	postamble_5_iut
+#define postamble_5_1_2_bot	postamble_5_pt
+
+struct test_stream test_5_1_2_top = { &premable_5_1_2_top, &test_case_5_1_2_top, &postamble_5_1_2_top };
+struct test_stream test_5_1_2_bot = { &premable_5_1_2_bot, &test_case_5_1_2_bot, &postamble_5_1_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8766,36 +8387,29 @@ Checks that the IUT, on receipt of HEARTBEAT message, send a\n\
 HEARTBEAT-ACK message with the information carried in the HEARTBEAT\n\
 message."
 
-#define preamble_5_2_conn	preamble_5_iut
-#define preamble_5_2_resp	preamble_5_pt
-#define preamble_5_2_list	preamble_5_pt
+#define preamble_5_2_top	preamble_5_iut
+#define preamble_5_2_bot	preamble_5_pt
 
 /* Assocation between PT and SUT.  Arrange PT so HEARTBEAT message is
  * sent to the SUT. */
 
 int
-test_case_5_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_2_list(int child)
+test_case_5_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_5_2_conn	postamble_5_iut
-#define postamble_5_2_resp	postamble_5_pt
-#define postamble_5_2_list	postamble_5_pt
+int
+test_case_5_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_5_2_conn = { &premable_5_2_conn, &test_case_5_2_conn, &postamble_5_2_conn };
-struct test_stream test_5_2_resp = { &premable_5_2_resp, &test_case_5_2_resp, &postamble_5_2_resp };
-struct test_stream test_5_2_list = { &premable_5_2_list, &test_case_5_2_list, &postamble_5_2_list };
+#define postamble_5_2_top	postamble_5_iut
+#define postamble_5_2_bot	postamble_5_pt
+
+struct test_stream test_5_2_top = { &premable_5_2_top, &test_case_5_2_top, &postamble_5_2_top };
+struct test_stream test_5_2_bot = { &premable_5_2_bot, &test_case_5_2_bot, &postamble_5_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8809,36 +8423,29 @@ Checks that the IUT, on receipt of DATA message from a transport address\n\
 corresponding to which there is no association, sends and ABORT\n\
 message."
 
-#define preamble_5_3_1_conn	preamble_5_iut
-#define preamble_5_3_1_resp	preamble_5_pt
-#define preamble_5_3_1_list	preamble_5_pt
+#define preamble_5_3_1_top	preamble_5_iut
+#define preamble_5_3_1_bot	preamble_5_pt
 
 /* No association between PT and SUT.  Arrange PT so DATA is sent to
  * SUT. */
 
 int
-test_case_5_3_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_3_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_3_1_list(int child)
+test_case_5_3_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_5_3_1_conn	postamble_5_iut
-#define postamble_5_3_1_resp	postamble_5_pt
-#define postamble_5_3_1_list	postamble_5_pt
+int
+test_case_5_3_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_5_3_1_conn = { &premable_5_3_1_conn, &test_case_5_3_1_conn, &postamble_5_3_1_conn };
-struct test_stream test_5_3_1_resp = { &premable_5_3_1_resp, &test_case_5_3_1_resp, &postamble_5_3_1_resp };
-struct test_stream test_5_3_1_list = { &premable_5_3_1_list, &test_case_5_3_1_list, &postamble_5_3_1_list };
+#define postamble_5_3_1_top	postamble_5_iut
+#define postamble_5_3_1_bot	postamble_5_pt
+
+struct test_stream test_5_3_1_top = { &premable_5_3_1_top, &test_case_5_3_1_top, &postamble_5_3_1_top };
+struct test_stream test_5_3_1_bot = { &premable_5_3_1_bot, &test_case_5_3_1_bot, &postamble_5_3_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8852,36 +8459,29 @@ Checks that the IUT, on receipt of ABORT message from a transport\n\
 address corresponding to which there is no association, discards the\n\
 message."
 
-#define preamble_5_3_2_conn	preamble_5_iut
-#define preamble_5_3_2_resp	preamble_5_pt
-#define preamble_5_3_2_list	preamble_5_pt
+#define preamble_5_3_2_top	preamble_5_iut
+#define preamble_5_3_2_bot	preamble_5_pt
 
 /* No association between PT and SUT.  Arrange PT to send ABORT to SUT.
  */
 
 int
-test_case_5_3_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_3_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_3_2_list(int child)
+test_case_5_3_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_5_3_2_conn	postamble_5_iut
-#define postamble_5_3_2_resp	postamble_5_pt
-#define postamble_5_3_2_list	postamble_5_pt
+int
+test_case_5_3_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_5_3_2_conn = { &premable_5_3_2_conn, &test_case_5_3_2_conn, &postamble_5_3_2_conn };
-struct test_stream test_5_3_2_resp = { &premable_5_3_2_resp, &test_case_5_3_2_resp, &postamble_5_3_2_resp };
-struct test_stream test_5_3_2_list = { &premable_5_3_2_list, &test_case_5_3_2_list, &postamble_5_3_2_list };
+#define postamble_5_3_2_top	postamble_5_iut
+#define postamble_5_3_2_bot	postamble_5_pt
+
+struct test_stream test_5_3_2_top = { &premable_5_3_2_top, &test_case_5_3_2_top, &postamble_5_3_2_top };
+struct test_stream test_5_3_2_bot = { &premable_5_3_2_bot, &test_case_5_3_2_bot, &postamble_5_3_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8895,36 +8495,29 @@ Checks that the IUT, on receipt of a SHUTDOWN-ACK message from a\n\
 transport address corresponding to which there is no association, sends\n\
 a SHUTDOWN-COMPLETE message with T-Bit set."
 
-#define preamble_5_3_3_conn	preamble_5_iut
-#define preamble_5_3_3_resp	preamble_5_pt
-#define preamble_5_3_3_list	preamble_5_pt
+#define preamble_5_3_3_top	preamble_5_iut
+#define preamble_5_3_3_bot	preamble_5_pt
 
 /* No association between PT and SUT.  Arrange PT so SHUTDOWN-ACK is
  * sent to SUT. */
 
 int
-test_case_5_3_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_3_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_3_3_list(int child)
+test_case_5_3_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_5_3_3_conn	postamble_5_iut
-#define postamble_5_3_3_resp	postamble_5_pt
-#define postamble_5_3_3_list	postamble_5_pt
+int
+test_case_5_3_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_5_3_3_conn = { &premable_5_3_3_conn, &test_case_5_3_3_conn, &postamble_5_3_3_conn };
-struct test_stream test_5_3_3_resp = { &premable_5_3_3_resp, &test_case_5_3_3_resp, &postamble_5_3_3_resp };
-struct test_stream test_5_3_3_list = { &premable_5_3_3_list, &test_case_5_3_3_list, &postamble_5_3_3_list };
+#define postamble_5_3_3_top	postamble_5_iut
+#define postamble_5_3_3_bot	postamble_5_pt
+
+struct test_stream test_5_3_3_top = { &premable_5_3_3_top, &test_case_5_3_3_top, &postamble_5_3_3_top };
+struct test_stream test_5_3_3_bot = { &premable_5_3_3_bot, &test_case_5_3_3_bot, &postamble_5_3_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8938,36 +8531,29 @@ Checks that the IUT, on receipt of a SHUTDOWN-COMPLETE message from a\n\
 transport address corresponding to which there is no association,\n\
 discards the message."
 
-#define preamble_5_3_4_conn	preamble_5_iut
-#define preamble_5_3_4_resp	preamble_5_pt
-#define preamble_5_3_4_list	preamble_5_pt
+#define preamble_5_3_4_top	preamble_5_iut
+#define preamble_5_3_4_bot	preamble_5_pt
 
 /* No association between PT and SUT.  Arrange PT to send a
  * SHUTDOWN-COMPLETE to the SUT. */
 
 int
-test_case_5_3_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_3_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_3_4_list(int child)
+test_case_5_3_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_5_3_4_conn	postamble_5_iut
-#define postamble_5_3_4_resp	postamble_5_pt
-#define postamble_5_3_4_list	postamble_5_pt
+int
+test_case_5_3_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_5_3_4_conn = { &premable_5_3_4_conn, &test_case_5_3_4_conn, &postamble_5_3_4_conn };
-struct test_stream test_5_3_4_resp = { &premable_5_3_4_resp, &test_case_5_3_4_resp, &postamble_5_3_4_resp };
-struct test_stream test_5_3_4_list = { &premable_5_3_4_list, &test_case_5_3_4_list, &postamble_5_3_4_list };
+#define postamble_5_3_4_top	postamble_5_iut
+#define postamble_5_3_4_bot	postamble_5_pt
+
+struct test_stream test_5_3_4_top = { &premable_5_3_4_top, &test_case_5_3_4_top, &postamble_5_3_4_top };
+struct test_stream test_5_3_4_bot = { &premable_5_3_4_bot, &test_case_5_3_4_bot, &postamble_5_3_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -8981,36 +8567,29 @@ Checks that the IUT, on receipt of a COOKIE-ECHO from a non-unicast\n\
 address where there is no association between them, discards the\n\
 message."
 
-#define preamble_5_3_5_conn	preamble_5_iut
-#define preamble_5_3_5_resp	preamble_5_pt
-#define preamble_5_3_5_list	preamble_5_pt
+#define preamble_5_3_5_top	preamble_5_iut
+#define preamble_5_3_5_bot	preamble_5_pt
 
 /* No association between PT and SUT.  Arrange PT so COOKIE-ECHO is sent
  * to the SUT with non-unicast source address. */
 
 int
-test_case_5_3_5_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_3_5_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_5_3_5_list(int child)
+test_case_5_3_5_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_5_3_5_conn	postamble_5_iut
-#define postamble_5_3_5_resp	postamble_5_pt
-#define postamble_5_3_5_list	postamble_5_pt
+int
+test_case_5_3_5_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_5_3_5_conn = { &premable_5_3_5_conn, &test_case_5_3_5_conn, &postamble_5_3_5_conn };
-struct test_stream test_5_3_5_resp = { &premable_5_3_5_resp, &test_case_5_3_5_resp, &postamble_5_3_5_resp };
-struct test_stream test_5_3_5_list = { &premable_5_3_5_list, &test_case_5_3_5_list, &postamble_5_3_5_list };
+#define postamble_5_3_5_top	postamble_5_iut
+#define postamble_5_3_5_bot	postamble_5_pt
+
+struct test_stream test_5_3_5_top = { &premable_5_3_5_top, &test_case_5_3_5_top, &postamble_5_3_5_top };
+struct test_stream test_5_3_5_bot = { &premable_5_3_5_bot, &test_case_5_3_5_bot, &postamble_5_3_5_bot };
 
 /* ========================================================================= */
 
@@ -9036,36 +8615,29 @@ depending on the implementation:\n\
 3. Sends a new INIT message to the PT adding a cookie preservative\n\
    parameter requesting the extension of lifetime of cookie."
 
-#define preamble_6_1_conn	preamble_6_iut
-#define preamble_6_1_resp	preamble_6_pt
-#define preamble_6_1_list	preamble_6_pt
+#define preamble_6_1_top	preamble_6_iut
+#define preamble_6_1_bot	preamble_6_pt
 
 /* No association between PT and SUT.  Arrange PT to send ERROR with
  * cause "Stale Cookie" in response to COOKIE-ECHO message. */
 
 int
-test_case_6_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_1_list(int child)
+test_case_6_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_6_1_conn	postamble_6_iut
-#define postamble_6_1_resp	postamble_6_pt
-#define postamble_6_1_list	postamble_6_pt
+int
+test_case_6_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_6_1_conn = { &premable_6_1_conn, &test_case_6_1_conn, &postamble_6_1_conn };
-struct test_stream test_6_1_resp = { &premable_6_1_resp, &test_case_6_1_resp, &postamble_6_1_resp };
-struct test_stream test_6_1_list = { &premable_6_1_list, &test_case_6_1_list, &postamble_6_1_list };
+#define postamble_6_1_top	postamble_6_iut
+#define postamble_6_1_bot	postamble_6_pt
+
+struct test_stream test_6_1_top = { &premable_6_1_top, &test_case_6_1_top, &postamble_6_1_top };
+struct test_stream test_6_1_bot = { &premable_6_1_bot, &test_case_6_1_bot, &postamble_6_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9079,36 +8651,29 @@ Checks that the IUT, on receipt of ERROR message with cause \"Stale\n\
 Cookie\" in state other than Cookie Echoed state, discards the message\n\
 and association is not disturbed."
 
-#define preamble_6_2_conn	preamble_6_iut
-#define preamble_6_2_resp	preamble_6_pt
-#define preamble_6_2_list	preamble_6_pt
+#define preamble_6_2_top	preamble_6_iut
+#define preamble_6_2_bot	preamble_6_pt
 
 /* Assocation between PT and SUT.  Arrange PT so ERROR message with
  * cause "Stale Cookie" is sent. */
 
 int
-test_case_6_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_2_list(int child)
+test_case_6_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_6_2_conn	postamble_6_iut
-#define postamble_6_2_resp	postamble_6_pt
-#define postamble_6_2_list	postamble_6_pt
+int
+test_case_6_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_6_2_conn = { &premable_6_2_conn, &test_case_6_2_conn, &postamble_6_2_conn };
-struct test_stream test_6_2_resp = { &premable_6_2_resp, &test_case_6_2_resp, &postamble_6_2_resp };
-struct test_stream test_6_2_list = { &premable_6_2_list, &test_case_6_2_list, &postamble_6_2_list };
+#define postamble_6_2_top	postamble_6_iut
+#define postamble_6_2_bot	postamble_6_pt
+
+struct test_stream test_6_2_top = { &premable_6_2_top, &test_case_6_2_top, &postamble_6_2_top };
+struct test_stream test_6_2_bot = { &premable_6_2_bot, &test_case_6_2_bot, &postamble_6_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9122,36 +8687,29 @@ Checks that the IUT, on receipt of DATA message to a non-existing\n\
 stream, sends an ERROR message with cause \"Invalid Stream Identifier\"\n\
 or aborts the association."
 
-#define preamble_6_3_conn	preamble_6_iut
-#define preamble_6_3_resp	preamble_6_pt
-#define preamble_6_3_list	preamble_6_pt
+#define preamble_6_3_top	preamble_6_iut
+#define preamble_6_3_bot	preamble_6_pt
 
 /* Association between PT and SUT.  Arrange PT so DATA is sent to SUT on
  * a stream that does not exist for the association. */
 
 int
-test_case_6_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_3_list(int child)
+test_case_6_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_6_3_conn	postamble_6_iut
-#define postamble_6_3_resp	postamble_6_pt
-#define postamble_6_3_list	postamble_6_pt
+int
+test_case_6_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_6_3_conn = { &premable_6_3_conn, &test_case_6_3_conn, &postamble_6_3_conn };
-struct test_stream test_6_3_resp = { &premable_6_3_resp, &test_case_6_3_resp, &postamble_6_3_resp };
-struct test_stream test_6_3_list = { &premable_6_3_list, &test_case_6_3_list, &postamble_6_3_list };
+#define postamble_6_3_top	postamble_6_iut
+#define postamble_6_3_bot	postamble_6_pt
+
+struct test_stream test_6_3_top = { &premable_6_3_top, &test_case_6_3_top, &postamble_6_3_top };
+struct test_stream test_6_3_bot = { &premable_6_3_bot, &test_case_6_3_bot, &postamble_6_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9165,36 +8723,29 @@ Checks that the IUT, on receipt of an INIT-ACK message without a Cookie\n\
 parameter, sends and ERROR message with cause \"Missing Mandatory\n\
 Parameter\" or may send an ABORT or no message at all."
 
-#define preamble_6_4_conn	preamble_6_iut
-#define preamble_6_4_resp	preamble_6_pt
-#define preamble_6_4_list	preamble_6_pt
+#define preamble_6_4_top	preamble_6_iut
+#define preamble_6_4_bot	preamble_6_pt
 
 /* No association between PT and SUT.  Arrange PT so INIT-ACK is sent to
  * SUT without Cookie parameter. */
 
 int
-test_case_6_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_4_list(int child)
+test_case_6_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_6_4_conn	postamble_6_iut
-#define postamble_6_4_resp	postamble_6_pt
-#define postamble_6_4_list	postamble_6_pt
+int
+test_case_6_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_6_4_conn = { &premable_6_4_conn, &test_case_6_4_conn, &postamble_6_4_conn };
-struct test_stream test_6_4_resp = { &premable_6_4_resp, &test_case_6_4_resp, &postamble_6_4_resp };
-struct test_stream test_6_4_list = { &premable_6_4_list, &test_case_6_4_list, &postamble_6_4_list };
+#define postamble_6_4_top	postamble_6_iut
+#define postamble_6_4_bot	postamble_6_pt
+
+struct test_stream test_6_4_top = { &premable_6_4_top, &test_case_6_4_top, &postamble_6_4_top };
+struct test_stream test_6_4_bot = { &premable_6_4_bot, &test_case_6_4_bot, &postamble_6_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9208,36 +8759,29 @@ Checks that the IUT, on receipt of an INIT-ACK mesage with an unknown\n\
 TLV parameter, sends an ERROR message with cause \"Unrecognized\n\
 Parameters\"."
 
-#define preamble_6_5_conn	preamble_6_iut
-#define preamble_6_5_resp	preamble_6_pt
-#define preamble_6_5_list	preamble_6_pt
+#define preamble_6_5_top	preamble_6_iut
+#define preamble_6_5_bot	preamble_6_pt
 
 /* No association between PT and IUT.  Arrange PT so INIT-ACK is sent to
  * SUT with an unknown TLV parameter. */
 
 int
-test_case_6_5_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_5_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_5_list(int child)
+test_case_6_5_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_6_5_conn	postamble_6_iut
-#define postamble_6_5_resp	postamble_6_pt
-#define postamble_6_5_list	postamble_6_pt
+int
+test_case_6_5_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_6_5_conn = { &premable_6_5_conn, &test_case_6_5_conn, &postamble_6_5_conn };
-struct test_stream test_6_5_resp = { &premable_6_5_resp, &test_case_6_5_resp, &postamble_6_5_resp };
-struct test_stream test_6_5_list = { &premable_6_5_list, &test_case_6_5_list, &postamble_6_5_list };
+#define postamble_6_5_top	postamble_6_iut
+#define postamble_6_5_bot	postamble_6_pt
+
+struct test_stream test_6_5_top = { &premable_6_5_top, &test_case_6_5_top, &postamble_6_5_top };
+struct test_stream test_6_5_bot = { &premable_6_5_bot, &test_case_6_5_bot, &postamble_6_5_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9251,36 +8795,29 @@ Checks that the IUT, on receipt of a COOKIE-ECHO mesage bundled with\n\
 error (cause \"Unrecognized Parameters\"), continues to establish the\n\
 association."
 
-#define preamble_6_6_conn	preamble_6_iut
-#define preamble_6_6_resp	preamble_6_pt
-#define preamble_6_6_list	preamble_6_pt
+#define preamble_6_6_top	preamble_6_iut
+#define preamble_6_6_bot	preamble_6_pt
 
 /* No association between PT and SUT.  Arrange PT so COOKIE-ECHO bundled
  * with ERROR (cause "Unrecongnized Parameters") is send to SUT. */
 
 int
-test_case_6_6_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_6_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_6_6_list(int child)
+test_case_6_6_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_6_6_conn	postamble_6_iut
-#define postamble_6_6_resp	postamble_6_pt
-#define postamble_6_6_list	postamble_6_pt
+int
+test_case_6_6_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_6_6_conn = { &premable_6_6_conn, &test_case_6_6_conn, &postamble_6_6_conn };
-struct test_stream test_6_6_resp = { &premable_6_6_resp, &test_case_6_6_resp, &postamble_6_6_resp };
-struct test_stream test_6_6_list = { &premable_6_6_list, &test_case_6_6_list, &postamble_6_6_list };
+#define postamble_6_6_top	postamble_6_iut
+#define postamble_6_6_bot	postamble_6_pt
+
+struct test_stream test_6_6_top = { &premable_6_6_top, &test_case_6_6_top, &postamble_6_6_top };
+struct test_stream test_6_6_bot = { &premable_6_6_bot, &test_case_6_6_bot, &postamble_6_6_bot };
 
 /* ========================================================================= */
 
@@ -9297,36 +8834,29 @@ struct test_stream test_6_6_list = { &premable_6_6_list, &test_case_6_6_list, &p
 Checks that the IUT, on receipt of any DATA chunks bundled with INIT\n\
 chunk discards this packet."
 
-#define preamble_7_1_conn	preamble_7_iut
-#define preamble_7_1_resp	preamble_7_pt
-#define preamble_7_1_list	preamble_7_pt
+#define preamble_7_1_top	preamble_7_iut
+#define preamble_7_1_bot	preamble_7_pt
 
 /* No association between PT and SUT.  Arrange PT so DATA chunks are
  * bundled with INIT message.  */
 
 int
-test_case_7_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_1_list(int child)
+test_case_7_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_7_1_conn	postamble_7_iut
-#define postamble_7_1_resp	postamble_7_pt
-#define postamble_7_1_list	postamble_7_pt
+int
+test_case_7_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_7_1_conn = { &premable_7_1_conn, &test_case_7_1_conn, &postamble_7_1_conn };
-struct test_stream test_7_1_resp = { &premable_7_1_resp, &test_case_7_1_resp, &postamble_7_1_resp };
-struct test_stream test_7_1_list = { &premable_7_1_list, &test_case_7_1_list, &postamble_7_1_list };
+#define postamble_7_1_top	postamble_7_iut
+#define postamble_7_1_bot	postamble_7_pt
+
+struct test_stream test_7_1_top = { &premable_7_1_top, &test_case_7_1_top, &postamble_7_1_top };
+struct test_stream test_7_1_bot = { &premable_7_1_bot, &test_case_7_1_bot, &postamble_7_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9340,36 +8870,29 @@ Checks that the IUT, on reciept of any DATA chunks bundled with INIT-ACK\n\
 chunk discards this packet or sends an ABORT or accepts the INIT-ACK but\n\
 ignores the DATA chunks."
 
-#define preamble_7_2_conn	preamble_7_iut
-#define preamble_7_2_resp	preamble_7_pt
-#define preamble_7_2_list	preamble_7_pt
+#define preamble_7_2_top	preamble_7_iut
+#define preamble_7_2_bot	preamble_7_pt
 
 /* No association between PT and SUT.  Arrange PT so DATA chunks are
  * bundled wtih INIT-ACK message.  */
 
 int
-test_case_7_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_2_list(int child)
+test_case_7_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_7_2_conn	postamble_7_iut
-#define postamble_7_2_resp	postamble_7_pt
-#define postamble_7_2_list	postamble_7_pt
+int
+test_case_7_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_7_2_conn = { &premable_7_2_conn, &test_case_7_2_conn, &postamble_7_2_conn };
-struct test_stream test_7_2_resp = { &premable_7_2_resp, &test_case_7_2_resp, &postamble_7_2_resp };
-struct test_stream test_7_2_list = { &premable_7_2_list, &test_case_7_2_list, &postamble_7_2_list };
+#define postamble_7_2_top	postamble_7_iut
+#define postamble_7_2_bot	postamble_7_pt
+
+struct test_stream test_7_2_top = { &premable_7_2_top, &test_case_7_2_top, &postamble_7_2_top };
+struct test_stream test_7_2_bot = { &premable_7_2_bot, &test_case_7_2_bot, &postamble_7_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9384,37 +8907,30 @@ SHUTDOWN-COMPLETE chunk discards this packet and remains in Shutdown Ack\n\
 Sent state or sends an ABORT or accepts the SHUTDOWN-COMPLETE but\n\
 ignores the DATA chunks."
 
-#define preamble_7_3_conn	preamble_7_iut
-#define preamble_7_3_resp	preamble_7_pt
-#define preamble_7_3_list	preamble_7_pt
+#define preamble_7_3_top	preamble_7_iut
+#define preamble_7_3_bot	preamble_7_pt
 
 /* Association between PT and SUT.  Arrange SUT in Shutdown Ack Sent
  * state.  Arrange PT so DATA chunks are bundled with SHUTDOWN-COMPLETE
  * chunk with SHUTDOWN-COMPLETE as first chunk.  */
 
 int
-test_case_7_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_3_list(int child)
+test_case_7_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_7_3_conn	postamble_7_iut
-#define postamble_7_3_resp	postamble_7_pt
-#define postamble_7_3_list	postamble_7_pt
+int
+test_case_7_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_7_3_conn = { &premable_7_3_conn, &test_case_7_3_conn, &postamble_7_3_conn };
-struct test_stream test_7_3_resp = { &premable_7_3_resp, &test_case_7_3_resp, &postamble_7_3_resp };
-struct test_stream test_7_3_list = { &premable_7_3_list, &test_case_7_3_list, &postamble_7_3_list };
+#define postamble_7_3_top	postamble_7_iut
+#define postamble_7_3_bot	postamble_7_pt
+
+struct test_stream test_7_3_top = { &premable_7_3_top, &test_case_7_3_top, &postamble_7_3_top };
+struct test_stream test_7_3_bot = { &premable_7_3_bot, &test_case_7_3_bot, &postamble_7_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9428,36 +8944,29 @@ Checks that the IUT, on receipt of a COOKIE-ECHO chunk bundled with DATA\n\
 chunks, accepts the packet and responsds with a COOKIE-ACK bundled with\n\
 a SACK or a single COOKIE-ACK and then a SACK."
 
-#define preamble_7_4_conn	preamble_7_iut
-#define preamble_7_4_resp	preamble_7_pt
-#define preamble_7_4_list	preamble_7_pt
+#define preamble_7_4_top	preamble_7_iut
+#define preamble_7_4_bot	preamble_7_pt
 
 /* No association between PT and SUT.  Arrange PT so DATA chunks are
  * bundled with COOKIE-ECHO chunk with COOKIE-ECHO as the first chunk.  */
 
 int
-test_case_7_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_4_list(int child)
+test_case_7_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_7_4_conn	postamble_7_iut
-#define postamble_7_4_resp	postamble_7_pt
-#define postamble_7_4_list	postamble_7_pt
+int
+test_case_7_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_7_4_conn = { &premable_7_4_conn, &test_case_7_4_conn, &postamble_7_4_conn };
-struct test_stream test_7_4_resp = { &premable_7_4_resp, &test_case_7_4_resp, &postamble_7_4_resp };
-struct test_stream test_7_4_list = { &premable_7_4_list, &test_case_7_4_list, &postamble_7_4_list };
+#define postamble_7_4_top	postamble_7_iut
+#define postamble_7_4_bot	postamble_7_pt
+
+struct test_stream test_7_4_top = { &premable_7_4_top, &test_case_7_4_top, &postamble_7_4_top };
+struct test_stream test_7_4_bot = { &premable_7_4_bot, &test_case_7_4_bot, &postamble_7_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9470,36 +8979,29 @@ struct test_stream test_7_4_list = { &premable_7_4_list, &test_case_7_4_list, &p
 Checks that the IUT, on receipt of a COOKIE-ACK chunk bundled with DATA\n\
 chunks, accepts the COOKIE-ACK and responds with a SACK."
 
-#define preamble_7_5_conn	preamble_7_iut
-#define preamble_7_5_resp	preamble_7_pt
-#define preamble_7_5_list	preamble_7_pt
+#define preamble_7_5_top	preamble_7_iut
+#define preamble_7_5_bot	preamble_7_pt
 
 /* No association between PT and SUT.  Arrange PT so DATA chunks are
  * bundled with COOKIE-ACK chunk with COOKIE-ACK as the first chunk.  */
 
 int
-test_case_7_5_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_5_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_5_list(int child)
+test_case_7_5_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_7_5_conn	postamble_7_iut
-#define postamble_7_5_resp	postamble_7_pt
-#define postamble_7_5_list	postamble_7_pt
+int
+test_case_7_5_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_7_5_conn = { &premable_7_5_conn, &test_case_7_5_conn, &postamble_7_5_conn };
-struct test_stream test_7_5_resp = { &premable_7_5_resp, &test_case_7_5_resp, &postamble_7_5_resp };
-struct test_stream test_7_5_list = { &premable_7_5_list, &test_case_7_5_list, &postamble_7_5_list };
+#define postamble_7_5_top	postamble_7_iut
+#define postamble_7_5_bot	postamble_7_pt
+
+struct test_stream test_7_5_top = { &premable_7_5_top, &test_case_7_5_top, &postamble_7_5_top };
+struct test_stream test_7_5_bot = { &premable_7_5_bot, &test_case_7_5_bot, &postamble_7_5_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9512,36 +9014,29 @@ struct test_stream test_7_5_list = { &premable_7_5_list, &test_case_7_5_list, &p
 Checks that the IUT, on receipt of SHUTDOWN chunk bundled with a SACK,\n\
 accepts the packet and responds with a SHUTDOWN-ACK."
 
-#define preamble_7_6_conn	preamble_7_iut
-#define preamble_7_6_resp	preamble_7_pt
-#define preamble_7_6_list	preamble_7_pt
+#define preamble_7_6_top	preamble_7_iut
+#define preamble_7_6_bot	preamble_7_pt
 
 /* Association between PT and SUT.  Arrange PT so SACK is bundled with
  * SHUTDOWN message and that there is no outstanding data. */
 
 int
-test_case_7_6_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_6_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_6_list(int child)
+test_case_7_6_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_7_6_conn	postamble_7_iut
-#define postamble_7_6_resp	postamble_7_pt
-#define postamble_7_6_list	postamble_7_pt
+int
+test_case_7_6_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_7_6_conn = { &premable_7_6_conn, &test_case_7_6_conn, &postamble_7_6_conn };
-struct test_stream test_7_6_resp = { &premable_7_6_resp, &test_case_7_6_resp, &postamble_7_6_resp };
-struct test_stream test_7_6_list = { &premable_7_6_list, &test_case_7_6_list, &postamble_7_6_list };
+#define postamble_7_6_top	postamble_7_iut
+#define postamble_7_6_bot	postamble_7_pt
+
+struct test_stream test_7_6_top = { &premable_7_6_top, &test_case_7_6_top, &postamble_7_6_top };
+struct test_stream test_7_6_bot = { &premable_7_6_bot, &test_case_7_6_bot, &postamble_7_6_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9555,36 +9050,29 @@ Checks that the IUT, on receipt of a SACK bundled with DATA chunks\n\
 accepts that packet and responds with a SACK for the received DATA\n\
 chunks."
 
-#define preamble_7_7_conn	preamble_7_iut
-#define preamble_7_7_resp	preamble_7_pt
-#define preamble_7_7_list	preamble_7_pt
+#define preamble_7_7_top	preamble_7_iut
+#define preamble_7_7_bot	preamble_7_pt
 
 /* Association between PT and SUT.  Arrange PT so SACK bundled with
  * DATA is sent to SUT.  */
 
 int
-test_case_7_7_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_7_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_7_list(int child)
+test_case_7_7_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_7_7_conn	postamble_7_iut
-#define postamble_7_7_resp	postamble_7_pt
-#define postamble_7_7_list	postamble_7_pt
+int
+test_case_7_7_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_7_7_conn = { &premable_7_7_conn, &test_case_7_7_conn, &postamble_7_7_conn };
-struct test_stream test_7_7_resp = { &premable_7_7_resp, &test_case_7_7_resp, &postamble_7_7_resp };
-struct test_stream test_7_7_list = { &premable_7_7_list, &test_case_7_7_list, &postamble_7_7_list };
+#define postamble_7_7_top	postamble_7_iut
+#define postamble_7_7_bot	postamble_7_pt
+
+struct test_stream test_7_7_top = { &premable_7_7_top, &test_case_7_7_top, &postamble_7_7_top };
+struct test_stream test_7_7_bot = { &premable_7_7_bot, &test_case_7_7_bot, &postamble_7_7_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9599,36 +9087,29 @@ chunks discards the packet and remains in Shutdown Sent state, or sends\n\
 an ABORT, or accepts the SHUTDOWN-ACK but ignores the DATA chunks, which\n\
 would mean that the IUT has to send a SHUTDOWN-COMPLETE."
 
-#define preamble_7_8_conn	preamble_7_iut
-#define preamble_7_8_resp	preamble_7_pt
-#define preamble_7_8_list	preamble_7_pt
+#define preamble_7_8_top	preamble_7_iut
+#define preamble_7_8_bot	preamble_7_pt
 
 /* Association between PT and SUT and SUT is in Shutdown Sent state.
  * Arrange PT so DATA is bundled with SHUTDOWN-ACK message.  */
 
 int
-test_case_7_8_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_8_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_7_8_list(int child)
+test_case_7_8_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_7_8_conn	postamble_7_iut
-#define postamble_7_8_resp	postamble_7_pt
-#define postamble_7_8_list	postamble_7_pt
+int
+test_case_7_8_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_7_8_conn = { &premable_7_8_conn, &test_case_7_8_conn, &postamble_7_8_conn };
-struct test_stream test_7_8_resp = { &premable_7_8_resp, &test_case_7_8_resp, &postamble_7_8_resp };
-struct test_stream test_7_8_list = { &premable_7_8_list, &test_case_7_8_list, &postamble_7_8_list };
+#define postamble_7_8_top	postamble_7_iut
+#define postamble_7_8_bot	postamble_7_pt
+
+struct test_stream test_7_8_top = { &premable_7_8_top, &test_case_7_8_top, &postamble_7_8_top };
+struct test_stream test_7_8_bot = { &premable_7_8_bot, &test_case_7_8_bot, &postamble_7_8_bot };
 
 /* ========================================================================= */
 
@@ -9645,37 +9126,30 @@ struct test_stream test_7_8_list = { &premable_7_8_list, &test_case_7_8_list, &p
 Checks that the IUT is able to send unsegmented user message, if\n\
 resolving sCTP packet is less than or equal to MTU size."
 
-#define preamble_8_1_conn	preamble_8_iut
-#define preamble_8_1_resp	preamble_8_pt
-#define preamble_8_1_list	preamble_8_pt
+#define preamble_8_1_top	preamble_8_iut
+#define preamble_8_1_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange SUT so data for
  * transmission fits into an MTU and is smaller than the maximum size of
  * user data. */
 
 int
-test_case_8_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_1_list(int child)
+test_case_8_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_1_conn	postamble_8_iut
-#define postamble_8_1_resp	postamble_8_pt
-#define postamble_8_1_list	postamble_8_pt
+int
+test_case_8_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_1_conn = { &premable_8_1_conn, &test_case_8_1_conn, &postamble_8_1_conn };
-struct test_stream test_8_1_resp = { &premable_8_1_resp, &test_case_8_1_resp, &postamble_8_1_resp };
-struct test_stream test_8_1_list = { &premable_8_1_list, &test_case_8_1_list, &postamble_8_1_list };
+#define postamble_8_1_top	postamble_8_iut
+#define postamble_8_1_bot	postamble_8_pt
+
+struct test_stream test_8_1_top = { &premable_8_1_top, &test_case_8_1_top, &postamble_8_1_top };
+struct test_stream test_8_1_bot = { &premable_8_1_bot, &test_case_8_1_bot, &postamble_8_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9687,36 +9161,29 @@ struct test_stream test_8_1_list = { &premable_8_1_list, &test_case_8_1_list, &p
 #define desc_case_8_2 "\
 Checks that the IUT, is able to perfom data segmentation and transmission."
 
-#define preamble_8_2_conn	preamble_8_iut
-#define preamble_8_2_resp	preamble_8_pt
-#define preamble_8_2_list	preamble_8_pt
+#define preamble_8_2_top	preamble_8_iut
+#define preamble_8_2_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange SUT so data for
  * transmission will not fit into an MTU.  */
 
 int
-test_case_8_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_2_list(int child)
+test_case_8_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_2_conn	postamble_8_iut
-#define postamble_8_2_resp	postamble_8_pt
-#define postamble_8_2_list	postamble_8_pt
+int
+test_case_8_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_2_conn = { &premable_8_2_conn, &test_case_8_2_conn, &postamble_8_2_conn };
-struct test_stream test_8_2_resp = { &premable_8_2_resp, &test_case_8_2_resp, &postamble_8_2_resp };
-struct test_stream test_8_2_list = { &premable_8_2_list, &test_case_8_2_list, &postamble_8_2_list };
+#define postamble_8_2_top	postamble_8_iut
+#define postamble_8_2_bot	postamble_8_pt
+
+struct test_stream test_8_2_top = { &premable_8_2_top, &test_case_8_2_top, &postamble_8_2_top };
+struct test_stream test_8_2_bot = { &premable_8_2_bot, &test_case_8_2_bot, &postamble_8_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9728,36 +9195,29 @@ struct test_stream test_8_2_list = { &premable_8_2_list, &test_case_8_2_list, &p
 #define desc_case_8_3 "\
 Checks that the IUT is able to receive segmented data."
 
-#define preamble_8_3_conn	preamble_8_iut
-#define preamble_8_3_resp	preamble_8_pt
-#define preamble_8_3_list	preamble_8_pt
+#define preamble_8_3_top	preamble_8_iut
+#define preamble_8_3_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT to send first, middle
  * and end piece of a segmented data.  */
 
 int
-test_case_8_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_3_list(int child)
+test_case_8_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_3_conn	postamble_8_iut
-#define postamble_8_3_resp	postamble_8_pt
-#define postamble_8_3_list	postamble_8_pt
+int
+test_case_8_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_3_conn = { &premable_8_3_conn, &test_case_8_3_conn, &postamble_8_3_conn };
-struct test_stream test_8_3_resp = { &premable_8_3_resp, &test_case_8_3_resp, &postamble_8_3_resp };
-struct test_stream test_8_3_list = { &premable_8_3_list, &test_case_8_3_list, &postamble_8_3_list };
+#define postamble_8_3_top	postamble_8_iut
+#define postamble_8_3_bot	postamble_8_pt
+
+struct test_stream test_8_3_top = { &premable_8_3_top, &test_case_8_3_top, &postamble_8_3_top };
+struct test_stream test_8_3_bot = { &premable_8_3_bot, &test_case_8_3_bot, &postamble_8_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9769,36 +9229,29 @@ struct test_stream test_8_3_list = { &premable_8_3_list, &test_case_8_3_list, &p
 #define desc_case_8_4 "\
 Checks that the IUT on receipt of SACK cancels the timer T3-rtx and does not increase it."
 
-#define preamble_8_4_conn	preamble_8_iut
-#define preamble_8_4_resp	preamble_8_pt
-#define preamble_8_4_list	preamble_8_pt
+#define preamble_8_4_top	preamble_8_iut
+#define preamble_8_4_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT so SACK is sent in
  * reponse to DATA.  */
 
 int
-test_case_8_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_4_list(int child)
+test_case_8_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_4_conn	postamble_8_iut
-#define postamble_8_4_resp	postamble_8_pt
-#define postamble_8_4_list	postamble_8_pt
+int
+test_case_8_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_4_conn = { &premable_8_4_conn, &test_case_8_4_conn, &postamble_8_4_conn };
-struct test_stream test_8_4_resp = { &premable_8_4_resp, &test_case_8_4_resp, &postamble_8_4_resp };
-struct test_stream test_8_4_list = { &premable_8_4_list, &test_case_8_4_list, &postamble_8_4_list };
+#define postamble_8_4_top	postamble_8_iut
+#define postamble_8_4_bot	postamble_8_pt
+
+struct test_stream test_8_4_top = { &premable_8_4_top, &test_case_8_4_top, &postamble_8_4_top };
+struct test_stream test_8_4_bot = { &premable_8_4_bot, &test_case_8_4_bot, &postamble_8_4_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9810,36 +9263,29 @@ struct test_stream test_8_4_list = { &premable_8_4_list, &test_case_8_4_list, &p
 #define desc_case_8_5 "\
 Checks that the IUT, after expiry of the timer T3-rtx, sends the DATA message again."
 
-#define preamble_8_5_conn	preamble_8_iut
-#define preamble_8_5_resp	preamble_8_pt
-#define preamble_8_5_list	preamble_8_pt
+#define preamble_8_5_top	preamble_8_iut
+#define preamble_8_5_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT so no SACK is sent in
  * response to a DATA message.  */
 
 int
-test_case_8_5_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_5_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_5_list(int child)
+test_case_8_5_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_5_conn	postamble_8_iut
-#define postamble_8_5_resp	postamble_8_pt
-#define postamble_8_5_list	postamble_8_pt
+int
+test_case_8_5_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_5_conn = { &premable_8_5_conn, &test_case_8_5_conn, &postamble_8_5_conn };
-struct test_stream test_8_5_resp = { &premable_8_5_resp, &test_case_8_5_resp, &postamble_8_5_resp };
-struct test_stream test_8_5_list = { &premable_8_5_list, &test_case_8_5_list, &postamble_8_5_list };
+#define postamble_8_5_top	postamble_8_iut
+#define postamble_8_5_bot	postamble_8_pt
+
+struct test_stream test_8_5_top = { &premable_8_5_top, &test_case_8_5_top, &postamble_8_5_top };
+struct test_stream test_8_5_bot = { &premable_8_5_bot, &test_case_8_5_bot, &postamble_8_5_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9853,36 +9299,29 @@ Checks that the IUT, on receipt of duplicate DATA chunks should report\n\
 this in a SACK and number of duplicate TSN count should be reset once\n\
 reported in SACK."
 
-#define preamble_8_6_conn	preamble_8_iut
-#define preamble_8_6_resp	preamble_8_pt
-#define preamble_8_6_list	preamble_8_pt
+#define preamble_8_6_top	preamble_8_iut
+#define preamble_8_6_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT to send duplicate DATA
  * to SUT.  */
 
 int
-test_case_8_6_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_6_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_6_list(int child)
+test_case_8_6_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_6_conn	postamble_8_iut
-#define postamble_8_6_resp	postamble_8_pt
-#define postamble_8_6_list	postamble_8_pt
+int
+test_case_8_6_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_6_conn = { &premable_8_6_conn, &test_case_8_6_conn, &postamble_8_6_conn };
-struct test_stream test_8_6_resp = { &premable_8_6_resp, &test_case_8_6_resp, &postamble_8_6_resp };
-struct test_stream test_8_6_list = { &premable_8_6_list, &test_case_8_6_list, &postamble_8_6_list };
+#define postamble_8_6_top	postamble_8_iut
+#define postamble_8_6_bot	postamble_8_pt
+
+struct test_stream test_8_6_top = { &premable_8_6_top, &test_case_8_6_top, &postamble_8_6_top };
+struct test_stream test_8_6_bot = { &premable_8_6_bot, &test_case_8_6_bot, &postamble_8_6_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9895,36 +9334,29 @@ struct test_stream test_8_6_list = { &premable_8_6_list, &test_case_8_6_list, &p
 Checks that the IUT, if its peer's rwnd indicates that the peer has no\n\
 buffer space, does not transmit more than one DATA."
 
-#define preamble_8_7_conn	preamble_8_iut
-#define preamble_8_7_resp	preamble_8_pt
-#define preamble_8_7_list	preamble_8_pt
+#define preamble_8_7_top	preamble_8_iut
+#define preamble_8_7_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT so rwnd=0 is sent in
  * SACK in response to DATA message.  */
 
 int
-test_case_8_7_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_7_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_7_list(int child)
+test_case_8_7_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_7_conn	postamble_8_iut
-#define postamble_8_7_resp	postamble_8_pt
-#define postamble_8_7_list	postamble_8_pt
+int
+test_case_8_7_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_7_conn = { &premable_8_7_conn, &test_case_8_7_conn, &postamble_8_7_conn };
-struct test_stream test_8_7_resp = { &premable_8_7_resp, &test_case_8_7_resp, &postamble_8_7_resp };
-struct test_stream test_8_7_list = { &premable_8_7_list, &test_case_8_7_list, &postamble_8_7_list };
+#define postamble_8_7_top	postamble_8_iut
+#define postamble_8_7_bot	postamble_8_pt
+
+struct test_stream test_8_7_top = { &premable_8_7_top, &test_case_8_7_top, &postamble_8_7_top };
+struct test_stream test_8_7_bot = { &premable_8_7_bot, &test_case_8_7_bot, &postamble_8_7_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9938,37 +9370,30 @@ Checks that the IUT, if its peer's rwnd indicates that the peer has no\n\
 buffer space, does not transmit DATA, until it receives a SACK, where\n\
 the rnwd indicates that the peer has buffer space again."
 
-#define preamble_8_8_conn	preamble_8_iut
-#define preamble_8_8_resp	preamble_8_pt
-#define preamble_8_8_list	preamble_8_pt
+#define preamble_8_8_top	preamble_8_iut
+#define preamble_8_8_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT so rwnd=0 is sent in
  * SACK in response to DATA message.  Data should be in large size so it
  * will be transmitted segmented.  */
 
 int
-test_case_8_8_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_8_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_8_list(int child)
+test_case_8_8_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_8_conn	postamble_8_iut
-#define postamble_8_8_resp	postamble_8_pt
-#define postamble_8_8_list	postamble_8_pt
+int
+test_case_8_8_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_8_conn = { &premable_8_8_conn, &test_case_8_8_conn, &postamble_8_8_conn };
-struct test_stream test_8_8_resp = { &premable_8_8_resp, &test_case_8_8_resp, &postamble_8_8_resp };
-struct test_stream test_8_8_list = { &premable_8_8_list, &test_case_8_8_list, &postamble_8_8_list };
+#define postamble_8_8_top	postamble_8_iut
+#define postamble_8_8_bot	postamble_8_pt
+
+struct test_stream test_8_8_top = { &premable_8_8_top, &test_case_8_8_top, &postamble_8_8_top };
+struct test_stream test_8_8_bot = { &premable_8_8_bot, &test_case_8_8_bot, &postamble_8_8_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -9981,36 +9406,29 @@ struct test_stream test_8_8_list = { &premable_8_8_list, &test_case_8_8_list, &p
 Checks that the IUT, before it sends new DATA chunks, first transmits\n\
 any outstanding DATA chunks, which are marked for retransmission."
 
-#define preamble_8_9_conn	preamble_8_iut
-#define preamble_8_9_resp	preamble_8_pt
-#define preamble_8_9_list	preamble_8_pt
+#define preamble_8_9_top	preamble_8_iut
+#define preamble_8_9_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT to ignore a TSN and
  * sends SACK with gap in DATA.  */
 
 int
-test_case_8_9_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_9_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_9_list(int child)
+test_case_8_9_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_9_conn	postamble_8_iut
-#define postamble_8_9_resp	postamble_8_pt
-#define postamble_8_9_list	postamble_8_pt
+int
+test_case_8_9_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_9_conn = { &premable_8_9_conn, &test_case_8_9_conn, &postamble_8_9_conn };
-struct test_stream test_8_9_resp = { &premable_8_9_resp, &test_case_8_9_resp, &postamble_8_9_resp };
-struct test_stream test_8_9_list = { &premable_8_9_list, &test_case_8_9_list, &postamble_8_9_list };
+#define postamble_8_9_top	postamble_8_iut
+#define postamble_8_9_bot	postamble_8_pt
+
+struct test_stream test_8_9_top = { &premable_8_9_top, &test_case_8_9_top, &postamble_8_9_top };
+struct test_stream test_8_9_bot = { &premable_8_9_bot, &test_case_8_9_bot, &postamble_8_9_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10024,9 +9442,8 @@ Checks that the IUT, if it sends DATA to a multihomed endpoint on one\n\
 address and receive a SACK from the alternate address in that host,\n\
 accepts the SACK."
 
-#define preamble_8_10_conn	preamble_8_iut
-#define preamble_8_10_resp	preamble_8_pt
-#define preamble_8_10_list	preamble_8_pt
+#define preamble_8_10_top	preamble_8_iut
+#define preamble_8_10_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT so on reception of a
  * packet containing a DATA chunk, the packet containing the
@@ -10035,28 +9452,22 @@ accepts the SACK."
  * chunk. */
 
 int
-test_case_8_10_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_10_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_10_list(int child)
+test_case_8_10_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_10_conn	postamble_8_iut
-#define postamble_8_10_resp	postamble_8_pt
-#define postamble_8_10_list	postamble_8_pt
+int
+test_case_8_10_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_10_conn = { &premable_8_10_conn, &test_case_8_10_conn, &postamble_8_10_conn };
-struct test_stream test_8_10_resp = { &premable_8_10_resp, &test_case_8_10_resp, &postamble_8_10_resp };
-struct test_stream test_8_10_list = { &premable_8_10_list, &test_case_8_10_list, &postamble_8_10_list };
+#define postamble_8_10_top	postamble_8_iut
+#define postamble_8_10_bot	postamble_8_pt
+
+struct test_stream test_8_10_top = { &premable_8_10_top, &test_case_8_10_top, &postamble_8_10_top };
+struct test_stream test_8_10_bot = { &premable_8_10_bot, &test_case_8_10_bot, &postamble_8_10_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10069,36 +9480,29 @@ struct test_stream test_8_10_list = { &premable_8_10_list, &test_case_8_10_list,
 Checks that the IUT, on receipt of a DATA chunk with no user data, sends\n\
 an ABORT with cause \"No User Data\"."
 
-#define preamble_8_11_conn	preamble_8_iut
-#define preamble_8_11_resp	preamble_8_pt
-#define preamble_8_11_list	preamble_8_pt
+#define preamble_8_11_top	preamble_8_iut
+#define preamble_8_11_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT so DATA chunk with no
  * user data is sent to SUT.  */
 
 int
-test_case_8_11_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_11_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_11_list(int child)
+test_case_8_11_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_11_conn	postamble_8_iut
-#define postamble_8_11_resp	postamble_8_pt
-#define postamble_8_11_list	postamble_8_pt
+int
+test_case_8_11_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_11_conn = { &premable_8_11_conn, &test_case_8_11_conn, &postamble_8_11_conn };
-struct test_stream test_8_11_resp = { &premable_8_11_resp, &test_case_8_11_resp, &postamble_8_11_resp };
-struct test_stream test_8_11_list = { &premable_8_11_list, &test_case_8_11_list, &postamble_8_11_list };
+#define postamble_8_11_top	postamble_8_iut
+#define postamble_8_11_bot	postamble_8_pt
+
+struct test_stream test_8_11_top = { &premable_8_11_top, &test_case_8_11_top, &postamble_8_11_top };
+struct test_stream test_8_11_bot = { &premable_8_11_bot, &test_case_8_11_bot, &postamble_8_11_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10112,37 +9516,30 @@ Checks that the IUT, on receipt of a SACK that contains Cummulative TSN\n\
 field less than the current Cummulative TSN Ack point, discards the\n\
 SACK."
 
-#define preamble_8_12_conn	preamble_8_iut
-#define preamble_8_12_resp	preamble_8_pt
-#define preamble_8_12_list	preamble_8_pt
+#define preamble_8_12_top	preamble_8_iut
+#define preamble_8_12_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT so a SACK chunk with
  * cummulative TSN less than the cumulative TSN ack point of SUT is sent
  * to SUT.  */
 
 int
-test_case_8_12_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_12_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_12_list(int child)
+test_case_8_12_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_12_conn	postamble_8_iut
-#define postamble_8_12_resp	postamble_8_pt
-#define postamble_8_12_list	postamble_8_pt
+int
+test_case_8_12_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_12_conn = { &premable_8_12_conn, &test_case_8_12_conn, &postamble_8_12_conn };
-struct test_stream test_8_12_resp = { &premable_8_12_resp, &test_case_8_12_resp, &postamble_8_12_resp };
-struct test_stream test_8_12_list = { &premable_8_12_list, &test_case_8_12_list, &postamble_8_12_list };
+#define postamble_8_12_top	postamble_8_iut
+#define postamble_8_12_bot	postamble_8_pt
+
+struct test_stream test_8_12_top = { &premable_8_12_top, &test_case_8_12_top, &postamble_8_12_top };
+struct test_stream test_8_12_bot = { &premable_8_12_bot, &test_case_8_12_bot, &postamble_8_12_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10155,37 +9552,30 @@ struct test_stream test_8_12_list = { &premable_8_12_list, &test_case_8_12_list,
 Checks that the IUT, can receive DATA equal to the maximum User Data\n\
 size defined by the upper layer."
 
-#define preamble_8_13_conn	preamble_8_iut
-#define preamble_8_13_resp	preamble_8_pt
-#define preamble_8_13_list	preamble_8_pt
+#define preamble_8_13_top	preamble_8_iut
+#define preamble_8_13_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT so DATA chunk with size
  * of data equal to the maximum user data size of the SUT is sent to the
  * SUT.  */
 
 int
-test_case_8_13_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_13_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_13_list(int child)
+test_case_8_13_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_13_conn	postamble_8_iut
-#define postamble_8_13_resp	postamble_8_pt
-#define postamble_8_13_list	postamble_8_pt
+int
+test_case_8_13_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_13_conn = { &premable_8_13_conn, &test_case_8_13_conn, &postamble_8_13_conn };
-struct test_stream test_8_13_resp = { &premable_8_13_resp, &test_case_8_13_resp, &postamble_8_13_resp };
-struct test_stream test_8_13_list = { &premable_8_13_list, &test_case_8_13_list, &postamble_8_13_list };
+#define postamble_8_13_top	postamble_8_iut
+#define postamble_8_13_bot	postamble_8_pt
+
+struct test_stream test_8_13_top = { &premable_8_13_top, &test_case_8_13_top, &postamble_8_13_top };
+struct test_stream test_8_13_bot = { &premable_8_13_bot, &test_case_8_13_bot, &postamble_8_13_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10198,37 +9588,30 @@ struct test_stream test_8_13_list = { &premable_8_13_list, &test_case_8_13_list,
 Checks that the IUT can send DATA equal to the maximum User Data size\n\
 defined by the upper layer."
 
-#define preamble_8_14_conn	preamble_8_iut
-#define preamble_8_14_resp	preamble_8_pt
-#define preamble_8_14_list	preamble_8_pt
+#define preamble_8_14_top	preamble_8_iut
+#define preamble_8_14_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange SUT so data for transmission
  * has a size equal to the maximum User Data size defined by the upper
  * layer.  */
 
 int
-test_case_8_14_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_14_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_14_list(int child)
+test_case_8_14_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_14_conn	postamble_8_iut
-#define postamble_8_14_resp	postamble_8_pt
-#define postamble_8_14_list	postamble_8_pt
+int
+test_case_8_14_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_14_conn = { &premable_8_14_conn, &test_case_8_14_conn, &postamble_8_14_conn };
-struct test_stream test_8_14_resp = { &premable_8_14_resp, &test_case_8_14_resp, &postamble_8_14_resp };
-struct test_stream test_8_14_list = { &premable_8_14_list, &test_case_8_14_list, &postamble_8_14_list };
+#define postamble_8_14_top	postamble_8_iut
+#define postamble_8_14_bot	postamble_8_pt
+
+struct test_stream test_8_14_top = { &premable_8_14_top, &test_case_8_14_top, &postamble_8_14_top };
+struct test_stream test_8_14_bot = { &premable_8_14_bot, &test_case_8_14_bot, &postamble_8_14_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10241,36 +9624,29 @@ struct test_stream test_8_14_list = { &premable_8_14_list, &test_case_8_14_list,
 Checks that the IUT, on receipt of DATA larger than own User Data size,\n\
 sends an ABORT with cause \"Out of Resource\"."
 
-#define preamble_8_15_conn	preamble_8_iut
-#define preamble_8_15_resp	preamble_8_pt
-#define preamble_8_15_list	preamble_8_pt
+#define preamble_8_15_top	preamble_8_iut
+#define preamble_8_15_bot	preamble_8_pt
 
 /* Association between PT and SUT.  Arrange PT so DATA chunk with size
  * of data larger than user data size of the SUT is sent to SUT.  */
 
 int
-test_case_8_15_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_15_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_8_15_list(int child)
+test_case_8_15_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_8_15_conn	postamble_8_iut
-#define postamble_8_15_resp	postamble_8_pt
-#define postamble_8_15_list	postamble_8_pt
+int
+test_case_8_15_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_8_15_conn = { &premable_8_15_conn, &test_case_8_15_conn, &postamble_8_15_conn };
-struct test_stream test_8_15_resp = { &premable_8_15_resp, &test_case_8_15_resp, &postamble_8_15_resp };
-struct test_stream test_8_15_list = { &premable_8_15_list, &test_case_8_15_list, &postamble_8_15_list };
+#define postamble_8_15_top	postamble_8_iut
+#define postamble_8_15_bot	postamble_8_pt
+
+struct test_stream test_8_15_top = { &premable_8_15_top, &test_case_8_15_top, &postamble_8_15_top };
+struct test_stream test_8_15_bot = { &premable_8_15_bot, &test_case_8_15_bot, &postamble_8_15_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10287,36 +9663,29 @@ struct test_stream test_8_15_list = { &premable_8_15_list, &test_case_8_15_list,
 Checks that the IUT sends a SACK for the first DATA chunk it receives\n\
 immediately."
 
-#define preamble_9_1_conn	preamble_9_iut
-#define preamble_9_1_resp	preamble_9_pt
-#define preamble_9_1_list	preamble_9_pt
+#define preamble_9_1_top	preamble_9_iut
+#define preamble_9_1_bot	preamble_9_pt
 
 /* Association between PT and SUT.  Arrange PT so it sends the first
  * DATA and waits for SACK.  */
 
 int
-test_case_9_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_9_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_9_1_list(int child)
+test_case_9_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_9_1_conn	postamble_9_iut
-#define postamble_9_1_resp	postamble_9_pt
-#define postamble_9_1_list	postamble_9_pt
+int
+test_case_9_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_9_1_conn = { &premable_9_1_conn, &test_case_9_1_conn, &postamble_9_1_conn };
-struct test_stream test_9_1_resp = { &premable_9_1_resp, &test_case_9_1_resp, &postamble_9_1_resp };
-struct test_stream test_9_1_list = { &premable_9_1_list, &test_case_9_1_list, &postamble_9_1_list };
+#define postamble_9_1_top	postamble_9_iut
+#define postamble_9_1_bot	postamble_9_pt
+
+struct test_stream test_9_1_top = { &premable_9_1_top, &test_case_9_1_top, &postamble_9_1_top };
+struct test_stream test_9_1_bot = { &premable_9_1_bot, &test_case_9_1_bot, &postamble_9_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10328,36 +9697,29 @@ struct test_stream test_9_1_list = { &premable_9_1_list, &test_case_9_1_list, &p
 #define desc_case_9_2 "\
 Checks that the IUT can acknowledge the reception of multiple DATA chunks."
 
-#define preamble_9_2_conn	preamble_9_iut
-#define preamble_9_2_resp	preamble_9_pt
-#define preamble_9_2_list	preamble_9_pt
+#define preamble_9_2_top	preamble_9_iut
+#define preamble_9_2_bot	preamble_9_pt
 
 /* Association between PT and SUT.  Arrange PT so it sends multiple DATA
  * chunks bunded in one SCTP packet. */
 
 int
-test_case_9_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_9_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_9_2_list(int child)
+test_case_9_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_9_2_conn	postamble_9_iut
-#define postamble_9_2_resp	postamble_9_pt
-#define postamble_9_2_list	postamble_9_pt
+int
+test_case_9_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_9_2_conn = { &premable_9_2_conn, &test_case_9_2_conn, &postamble_9_2_conn };
-struct test_stream test_9_2_resp = { &premable_9_2_resp, &test_case_9_2_resp, &postamble_9_2_resp };
-struct test_stream test_9_2_list = { &premable_9_2_list, &test_case_9_2_list, &postamble_9_2_list };
+#define postamble_9_2_top	postamble_9_iut
+#define postamble_9_2_bot	postamble_9_pt
+
+struct test_stream test_9_2_top = { &premable_9_2_top, &test_case_9_2_top, &postamble_9_2_top };
+struct test_stream test_9_2_bot = { &premable_9_2_bot, &test_case_9_2_bot, &postamble_9_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10371,36 +9733,29 @@ Checks that the IUT, if it detects a gap in the received data chunk\n\
 sequence, sends a SACK immediately where it reports the missing TSN in\n\
 the GAP ACK block."
 
-#define preamble_9_3_conn	preamble_9_iut
-#define preamble_9_3_resp	preamble_9_pt
-#define preamble_9_3_list	preamble_9_pt
+#define preamble_9_3_top	preamble_9_iut
+#define preamble_9_3_bot	preamble_9_pt
 
 /* Association between PT and SUT.  Arrange PT so it sends a gap in the
  * data.  */
 
 int
-test_case_9_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_9_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_9_3_list(int child)
+test_case_9_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_9_3_conn	postamble_9_iut
-#define postamble_9_3_resp	postamble_9_pt
-#define postamble_9_3_list	postamble_9_pt
+int
+test_case_9_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_9_3_conn = { &premable_9_3_conn, &test_case_9_3_conn, &postamble_9_3_conn };
-struct test_stream test_9_3_resp = { &premable_9_3_resp, &test_case_9_3_resp, &postamble_9_3_resp };
-struct test_stream test_9_3_list = { &premable_9_3_list, &test_case_9_3_list, &postamble_9_3_list };
+#define postamble_9_3_top	postamble_9_iut
+#define postamble_9_3_bot	postamble_9_pt
+
+struct test_stream test_9_3_top = { &premable_9_3_top, &test_case_9_3_top, &postamble_9_3_top };
+struct test_stream test_9_3_bot = { &premable_9_3_bot, &test_case_9_3_bot, &postamble_9_3_bot };
 
 /* ========================================================================= */
 
@@ -10418,37 +9773,30 @@ Checks that the IUT, on receipt of an unrecognized chunk type with\n\
 highest order 2 bits set to 11, sends an ERROR with cause \"Unrecognized\n\
 Chunk Type\" and a SACK for the DATA chunk."
 
-#define preamble_10_1_conn	preamble_10_iut
-#define preamble_10_1_resp	preamble_10_pt
-#define preamble_10_1_list	preamble_10_pt
+#define preamble_10_1_top	preamble_10_iut
+#define preamble_10_1_bot	preamble_10_pt
 
 /* Association between PT and SUT.  Arrange PT so a datagram with
  * reserved chunk type is sent to IUT bundled with DATA chunk and higher
  * two bits are set to 11.  */
 
 int
-test_case_10_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_10_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_10_1_list(int child)
+test_case_10_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_10_1_conn	postamble_10_iut
-#define postamble_10_1_resp	postamble_10_pt
-#define postamble_10_1_list	postamble_10_pt
+int
+test_case_10_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_10_1_conn = { &premable_10_1_conn, &test_case_10_1_conn, &postamble_10_1_conn };
-struct test_stream test_10_1_resp = { &premable_10_1_resp, &test_case_10_1_resp, &postamble_10_1_resp };
-struct test_stream test_10_1_list = { &premable_10_1_list, &test_case_10_1_list, &postamble_10_1_list };
+#define postamble_10_1_top	postamble_10_iut
+#define postamble_10_1_bot	postamble_10_pt
+
+struct test_stream test_10_1_top = { &premable_10_1_top, &test_case_10_1_top, &postamble_10_1_top };
+struct test_stream test_10_1_bot = { &premable_10_1_bot, &test_case_10_1_bot, &postamble_10_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10462,37 +9810,30 @@ Checks that the IUT, on receipt of an unrecognized chunk type with\n\
 highest order 2 bits set to 00, discards the SCTP packet and does not\n\
 process the DATA chunk."
 
-#define preamble_10_2_conn	preamble_10_iut
-#define preamble_10_2_resp	preamble_10_pt
-#define preamble_10_2_list	preamble_10_pt
+#define preamble_10_2_top	preamble_10_iut
+#define preamble_10_2_bot	preamble_10_pt
 
 /* Association between PT and SUT.  Arrange PT so a datagram with a
  * reserved chunk type is sent to ITU bundled with DATA chunk and higher
  * to bits are set to 00.  */
 
 int
-test_case_10_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_10_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_10_2_list(int child)
+test_case_10_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_10_2_conn	postamble_10_iut
-#define postamble_10_2_resp	postamble_10_pt
-#define postamble_10_2_list	postamble_10_pt
+int
+test_case_10_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_10_2_conn = { &premable_10_2_conn, &test_case_10_2_conn, &postamble_10_2_conn };
-struct test_stream test_10_2_resp = { &premable_10_2_resp, &test_case_10_2_resp, &postamble_10_2_resp };
-struct test_stream test_10_2_list = { &premable_10_2_list, &test_case_10_2_list, &postamble_10_2_list };
+#define postamble_10_2_top	postamble_10_iut
+#define postamble_10_2_bot	postamble_10_pt
+
+struct test_stream test_10_2_top = { &premable_10_2_top, &test_case_10_2_top, &postamble_10_2_top };
+struct test_stream test_10_2_bot = { &premable_10_2_bot, &test_case_10_2_bot, &postamble_10_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10507,37 +9848,30 @@ highest order 2 bits set to 01, discards this SCTP packet and does not\n\
 process the DATA chunk.  Additionally it has to send an ERROR with cause\n\
 \"Unrecognized Chunk Type\"."
 
-#define preamble_10_3_conn	preamble_10_iut
-#define preamble_10_3_resp	preamble_10_pt
-#define preamble_10_3_list	preamble_10_pt
+#define preamble_10_3_top	preamble_10_iut
+#define preamble_10_3_bot	preamble_10_pt
 
 /* Association between PT and SUT.  Arrange PT so a datagram with
  * reserved chunk type is sent to IUT bundled with DATA chunk and higher
  * to bits are set to 01.  */
 
 int
-test_case_10_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_10_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_10_3_list(int child)
+test_case_10_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_10_3_conn	postamble_10_iut
-#define postamble_10_3_resp	postamble_10_pt
-#define postamble_10_3_list	postamble_10_pt
+int
+test_case_10_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_10_3_conn = { &premable_10_3_conn, &test_case_10_3_conn, &postamble_10_3_conn };
-struct test_stream test_10_3_resp = { &premable_10_3_resp, &test_case_10_3_resp, &postamble_10_3_resp };
-struct test_stream test_10_3_list = { &premable_10_3_list, &test_case_10_3_list, &postamble_10_3_list };
+#define postamble_10_3_top	postamble_10_iut
+#define postamble_10_3_bot	postamble_10_pt
+
+struct test_stream test_10_3_top = { &premable_10_3_top, &test_case_10_3_top, &postamble_10_3_top };
+struct test_stream test_10_3_bot = { &premable_10_3_bot, &test_case_10_3_bot, &postamble_10_3_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10551,37 +9885,30 @@ Checks that the IUT, on receipt of an unrecognized chunk type with\n\
 highest order 2 bits set to 10, discards this chunk and sends a SACK for\n\
 the DATA chunk."
 
-#define preamble_10_4_conn	preamble_10_iut
-#define preamble_10_4_resp	preamble_10_pt
-#define preamble_10_4_list	preamble_10_pt
+#define preamble_10_4_top	preamble_10_iut
+#define preamble_10_4_bot	preamble_10_pt
 
 /* Association between PT and SUT.  Arrange PT so a datagrm with
  * reserved chunk type is sent to IUT bundled with DATA chunk and higher
  * two bits are set to 10.  */
 
 int
-test_case_10_4_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_10_4_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_10_4_list(int child)
+test_case_10_4_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_10_4_conn	postamble_10_iut
-#define postamble_10_4_resp	postamble_10_pt
-#define postamble_10_4_list	postamble_10_pt
+int
+test_case_10_4_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_10_4_conn = { &premable_10_4_conn, &test_case_10_4_conn, &postamble_10_4_conn };
-struct test_stream test_10_4_resp = { &premable_10_4_resp, &test_case_10_4_resp, &postamble_10_4_resp };
-struct test_stream test_10_4_list = { &premable_10_4_list, &test_case_10_4_list, &postamble_10_4_list };
+#define postamble_10_4_top	postamble_10_iut
+#define postamble_10_4_bot	postamble_10_pt
+
+struct test_stream test_10_4_top = { &premable_10_4_top, &test_case_10_4_top, &postamble_10_4_top };
+struct test_stream test_10_4_bot = { &premable_10_4_bot, &test_case_10_4_bot, &postamble_10_4_bot };
 
 /* ========================================================================= */
 
@@ -10599,36 +9926,29 @@ Checks that the IUT, if timer T3-rtx expires on a destination address,\n\
 increases value of RTO for that address, i.e. increases the T3-rtx\n\
 timer."
 
-#define preamble_11_1_conn	preamble_11_iut
-#define preamble_11_1_resp	preamble_11_pt
-#define preamble_11_1_list	preamble_11_pt
+#define preamble_11_1_top	preamble_11_iut
+#define preamble_11_1_bot	preamble_11_pt
 
 /* Association between PT and SUT.  Arrange PT so SACK is not sent for
  * the data received from the SUT.  */
 
 int
-test_case_11_1_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_11_1_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_11_1_list(int child)
+test_case_11_1_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_11_1_conn	postamble_11_iut
-#define postamble_11_1_resp	postamble_11_pt
-#define postamble_11_1_list	postamble_11_pt
+int
+test_case_11_1_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_11_1_conn = { &premable_11_1_conn, &test_case_11_1_conn, &postamble_11_1_conn };
-struct test_stream test_11_1_resp = { &premable_11_1_resp, &test_case_11_1_resp, &postamble_11_1_resp };
-struct test_stream test_11_1_list = { &premable_11_1_list, &test_case_11_1_list, &postamble_11_1_list };
+#define postamble_11_1_top	postamble_11_iut
+#define postamble_11_1_bot	postamble_11_pt
+
+struct test_stream test_11_1_top = { &premable_11_1_top, &test_case_11_1_top, &postamble_11_1_top };
+struct test_stream test_11_1_bot = { &premable_11_1_bot, &test_case_11_1_bot, &postamble_11_1_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10641,36 +9961,29 @@ struct test_stream test_11_1_list = { &premable_11_1_list, &test_case_11_1_list,
 Checks that the IUT, if timer T3-rtx expires on a destination adddress,\n\
 increases the value of RTO for that address."
 
-#define preamble_11_2_conn	preamble_11_iut
-#define preamble_11_2_resp	preamble_11_pt
-#define preamble_11_2_list	preamble_11_pt
+#define preamble_11_2_top	preamble_11_iut
+#define preamble_11_2_bot	preamble_11_pt
 
 /* Association between PT and SUT.  Arrange PT so SACK is not sent for
  * the data received.  */
 
 int
-test_case_11_2_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_11_2_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_11_2_list(int child)
+test_case_11_2_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_11_2_conn	postamble_11_iut
-#define postamble_11_2_resp	postamble_11_pt
-#define postamble_11_2_list	postamble_11_pt
+int
+test_case_11_2_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_11_2_conn = { &premable_11_2_conn, &test_case_11_2_conn, &postamble_11_2_conn };
-struct test_stream test_11_2_resp = { &premable_11_2_resp, &test_case_11_2_resp, &postamble_11_2_resp };
-struct test_stream test_11_2_list = { &premable_11_2_list, &test_case_11_2_list, &postamble_11_2_list };
+#define postamble_11_2_top	postamble_11_iut
+#define postamble_11_2_bot	postamble_11_pt
+
+struct test_stream test_11_2_top = { &premable_11_2_top, &test_case_11_2_top, &postamble_11_2_top };
+struct test_stream test_11_2_bot = { &premable_11_2_bot, &test_case_11_2_bot, &postamble_11_2_bot };
 
 /* ------------------------------------------------------------------------- */
 
@@ -10684,37 +9997,30 @@ Checks that the IUT, if it retransmits DATA to an alternate address,\n\
 uses the RTO value of that address and not that of the previous\n\
 address."
 
-#define preamble_11_3_conn	preamble_11_iut
-#define preamble_11_3_resp	preamble_11_pt
-#define preamble_11_3_list	preamble_11_pt
+#define preamble_11_3_top	preamble_11_iut
+#define preamble_11_3_bot	preamble_11_pt
 
 /* Association between PT and SUT.  Arrange PT so SACK is not sent for
  * the data received.  Before sending the DATA note the T3-rtx value
  * corresponding to both IP addresses.  */
 
 int
-test_case_11_3_conn(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_11_3_resp(int child)
-{
-	return (__RESULT_SKIPPED);
-}
-int
-test_case_11_3_list(int child)
+test_case_11_3_top(int child)
 {
 	return (__RESULT_SKIPPED);
 }
 
-#define postamble_11_3_conn	postamble_11_iut
-#define postamble_11_3_resp	postamble_11_pt
-#define postamble_11_3_list	postamble_11_pt
+int
+test_case_11_3_bot(int child)
+{
+	return (__RESULT_SKIPPED);
+}
 
-struct test_stream test_11_3_conn = { &premable_11_3_conn, &test_case_11_3_conn, &postamble_11_3_conn };
-struct test_stream test_11_3_resp = { &premable_11_3_resp, &test_case_11_3_resp, &postamble_11_3_resp };
-struct test_stream test_11_3_list = { &premable_11_3_list, &test_case_11_3_list, &postamble_11_3_list };
+#define postamble_11_3_top	postamble_11_iut
+#define postamble_11_3_bot	postamble_11_pt
+
+struct test_stream test_11_3_top = { &premable_11_3_top, &test_case_11_3_top, &postamble_11_3_top };
+struct test_stream test_11_3_bot = { &premable_11_3_bot, &test_case_11_3_bot, &postamble_11_3_bot };
 
 /*
  *  -------------------------------------------------------------------------
@@ -10803,182 +10109,104 @@ run_stream(int child, struct test_stream *stream)
 
 /*
  *  Fork multiple children to do the actual testing.
- *  The conn child (child[0]) is the connecting process, the resp child
- *  (child[1]) is the responding process.
+ *  The top child (child[0]) is the process running above the tested module, the
+ *  bot child (child[1]) is the process running below (at other end of pipe) the
+ *  tested module.
  */
 
 int
 test_run(struct test_stream *stream[])
 {
-	int children = 0;
-	pid_t this_child, child[3] = { 0, };
-	int this_status, status[3] = { 0, };
+	int children = 0, c, i;
+	pid_t this_child, child[NUM_STREAMS] = { 0, };
+	int this_status, status[NUM_STREAMS] = { 0, };
 
 	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto inconclusive;
-	if (stream[2]) {
-		switch ((child[2] = fork())) {
-		case 00:	/* we are the child */
-			exit(run_stream(2, stream[2]));	/* execute stream[2] state machine */
-		case -1:	/* error */
-			if (child[0])
-				kill(child[0], SIGKILL);	/* toast stream[0] child */
-			if (child[1])
-				kill(child[1], SIGKILL);	/* toast stream[1] child */
-			return __RESULT_FAILURE;
-		default:	/* we are the parent */
-			children++;
-			break;
-		}
-	} else
-		status[2] = __RESULT_SUCCESS;
-	if (stream[1]) {
-		switch ((child[1] = fork())) {
-		case 00:	/* we are the child */
-			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
-		case -1:	/* error */
-			if (child[0])
-				kill(child[0], SIGKILL);	/* toast stream[0] child */
-			return __RESULT_FAILURE;
-		default:	/* we are the parent */
-			children++;
-			break;
-		}
-	} else
-		status[1] = __RESULT_SUCCESS;
-	if (stream[0]) {
-		switch ((child[0] = fork())) {
-		case 00:	/* we are the child */
-			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
-		case -1:	/* error */
-			return __RESULT_FAILURE;
-		default:	/* we are the parent */
-			children++;
-			break;
-		}
-	} else
-		status[0] = __RESULT_SUCCESS;
+	for (i = NUM_STREAMS - 1; i >= 0; i--) {
+		if (stream[i]) {
+			switch ((child[i] = fork())) {
+			case 00:	/* we are the child */
+				exit(run_stream(i, stream[i]));	/* execute stream[i] state machine */
+			case -1:
+				child[i] = 0;
+				for (c = 0; c < NUM_STREAMS; c++)
+					if (child[c])
+						kill(child[c], SIGKILL);
+				return __RESULT_FAILURE;
+			default:	/* we are the parent */
+				children++;
+				break;
+			}
+		} else
+			status[i] = __RESULT_SUCCESS;
+	}
 	for (; children > 0; children--) {
 	      waitagain:
 		if ((this_child = wait(&this_status)) > 0) {
-			if (WIFEXITED(this_status)) {
-				if (this_child == child[0]) {
-					child[0] = 0;
-					if ((status[0] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (child[1])
-							kill(child[1], SIGKILL);
-						if (child[2])
-							kill(child[2], SIGKILL);
-					}
-				}
-				if (this_child == child[1]) {
-					child[1] = 0;
-					if ((status[1] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (child[0])
-							kill(child[0], SIGKILL);
-						if (child[2])
-							kill(child[2], SIGKILL);
-					}
-				}
-				if (this_child == child[2]) {
-					child[2] = 0;
-					if ((status[2] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (child[0])
-							kill(child[0], SIGKILL);
-						if (child[1])
-							kill(child[1], SIGKILL);
-					}
-				}
-			} else if (WIFSIGNALED(this_status)) {
-				int signal = WTERMSIG(this_status);
+			for (i = 0; i < NUM_STREAMS; i++)
+				if (this_child == child[i])
+					break;
+			if (i < NUM_STREAMS) {
 
-				if (this_child == child[0]) {
-					print_terminated(0, signal);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
-					status[0] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					child[0] = 0;
-				}
-				if (this_child == child[1]) {
-					print_terminated(1, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
-					status[1] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					child[1] = 0;
-				}
-				if (this_child == child[2]) {
-					print_terminated(2, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					status[2] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					child[2] = 0;
-				}
-			} else if (WIFSTOPPED(this_status)) {
-				int signal = WSTOPSIG(this_status);
+				if (WIFEXITED(this_status)) {
+					child[i] = 0;
+					if ((status[i] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS)
+						for (c = 0; c < NUM_STREAMS; c++)
+							if (c != i && child[c])
+								kill(child[c], SIGKILL);
+				} else if (WIFSIGNALED(this_status)) {
+					int signal = WTERMSIG(this_status);
 
-				if (this_child == child[0]) {
-					print_stopped(0, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
-					status[0] = __RESULT_FAILURE;
-					child[0] = 0;
-				}
-				if (this_child == child[1]) {
-					print_stopped(1, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
-					status[1] = __RESULT_FAILURE;
-					child[1] = 0;
-				}
-				if (this_child == child[2]) {
-					print_stopped(2, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
-					status[2] = __RESULT_FAILURE;
-					child[2] = 0;
+					print_terminated(i, signal);
+					child[i] = 0;
+					status[i] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
+					for (c = 0; c < NUM_STREAMS; c++)
+						if (c != i && child[c])
+							kill(child[c], SIGKILL);
+				} else if (WIFSTOPPED(this_status)) {
+					int signal = WSTOPSIG(this_status);
+
+					print_stopped(i, signal);
+					child[i] = 0;
+					status[i] = __RESULT_FAILURE;
+					for (c = 0; c < NUM_STREAMS; c++)
+						if (c != i && child[c])
+							kill(child[c], SIGKILL);
 				}
 			}
 		} else {
 			if (timer_timeout) {
 				timer_timeout = 0;
-				print_timeout(3);
+				print_timeout(NUM_STREAMS);
 			}
-			if (child[0])
-				kill(child[0], SIGKILL);
-			if (child[1])
-				kill(child[1], SIGKILL);
-			if (child[2])
-				kill(child[2], SIGKILL);
+			for (c = 0; c < NUM_STREAMS; c++)
+				if (child[c])
+					kill(child[c], SIGKILL);
 			goto waitagain;
 		}
 	}
 	if (stop_tt() != __RESULT_SUCCESS)
 		goto inconclusive;
-	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
+	for (i = 0; i < NUM_STREAMS; i++)
+		if (status[i] != __RESULT_NOTAPPL)
+			break;
+	if (i == NUM_STREAMS)
 		return (__RESULT_NOTAPPL);
-	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
+	for (i = 0; i < NUM_STREAMS; i++)
+		if (status[i] != __RESULT_SKIPPED)
+			break;
+	if (i == NUM_STREAMS)
 		return (__RESULT_SKIPPED);
-	if (status[0] == __RESULT_FAILURE || status[1] == __RESULT_FAILURE || status[2] == __RESULT_FAILURE)
+	for (i = 0; i < NUM_STREAMS; i++)
+		if (status[i] != __RESULT_FAILURE)
+			break;
+	if (i == NUM_STREAMS)
 		return (__RESULT_FAILURE);
-	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
+	for (i = 0; i < NUM_STREAMS; i++)
+		if (status[i] != __RESULT_SUCCESS)
+			break;
+	if (i == NUM_STREAMS)
 		return (__RESULT_SUCCESS);
       inconclusive:
 	return (__RESULT_INCONCLUSIVE);
@@ -10998,7 +10226,7 @@ struct test_case {
 	const char *name;		/* test case name */
 	const char *desc;		/* test case description */
 	const char *sref;		/* test case standards section reference */
-	struct test_stream *stream[3];	/* test streams */
+	struct test_stream *stream[NUM_STREAMS];	/* test streams */
 	int (*start) (int);		/* start function */
 	int (*stop) (int);		/* stop function */
 	int run;			/* whether to run this test */
@@ -11008,247 +10236,247 @@ struct test_case {
 		numb_case_0_1, tgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, {
 	&test_0_1_conn, &test_0_1_resp, &test_0_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_1_1, tgrp_case_1_1_1, name_case_1_1_1, desc_case_1_1_1, sref_case_1_1_1, {
-	&test_1_1_1_conn, &test_1_1_1_resp, &test_1_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_1_1_top, &test_1_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_1_2, tgrp_case_1_1_2, name_case_1_1_2, desc_case_1_1_2, sref_case_1_1_2, {
-	&test_1_1_2_conn, &test_1_1_2_resp, &test_1_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_1_2_top, &test_1_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_2_1, tgrp_case_1_2_1, name_case_1_2_1, desc_case_1_2_1, sref_case_1_2_1, {
-	&test_1_2_1_conn, &test_1_2_1_resp, &test_1_2_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_2_1_top, &test_1_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_2_2, tgrp_case_1_2_2, name_case_1_2_2, desc_case_1_2_2, sref_case_1_2_2, {
-	&test_1_2_2_conn, &test_1_2_2_resp, &test_1_2_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_2_2_top, &test_1_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_3_1, tgrp_case_1_3_1, name_case_1_3_1, desc_case_1_3_1, sref_case_1_3_1, {
-	&test_1_3_1_conn, &test_1_3_1_resp, &test_1_3_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_3_1_top, &test_1_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_3_2, tgrp_case_1_3_2, name_case_1_3_2, desc_case_1_3_2, sref_case_1_3_2, {
-	&test_1_3_2_conn, &test_1_3_2_resp, &test_1_3_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_3_2_top, &test_1_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_4, tgrp_case_1_4, name_case_1_4, desc_case_1_4, sref_case_1_4, {
-	&test_1_4_conn, &test_1_4_resp, &test_1_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_4_top, &test_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_5_1, tgrp_case_1_5_1, name_case_1_5_1, desc_case_1_5_1, sref_case_1_5_1, {
-	&test_1_5_1_conn, &test_1_5_1_resp, &test_1_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_5_1_top, &test_1_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_5_2, tgrp_case_1_5_2, name_case_1_5_2, desc_case_1_5_2, sref_case_1_5_2, {
-	&test_1_5_2_conn, &test_1_5_2_resp, &test_1_5_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_5_2_top, &test_1_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_6_1, tgrp_case_1_6_1, name_case_1_6_1, desc_case_1_6_1, sref_case_1_6_1, {
-	&test_1_6_1_conn, &test_1_6_1_resp, &test_1_6_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_6_1_top, &test_1_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_6_2, tgrp_case_1_6_2, name_case_1_6_2, desc_case_1_6_2, sref_case_1_6_2, {
-	&test_1_6_2_conn, &test_1_6_2_resp, &test_1_6_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_6_2_top, &test_1_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_7_1, tgrp_case_1_7_1, name_case_1_7_1, desc_case_1_7_1, sref_case_1_7_1, {
-	&test_1_7_1_conn, &test_1_7_1_resp, &test_1_7_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_7_1_top, &test_1_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_7_2, tgrp_case_1_7_2, name_case_1_7_2, desc_case_1_7_2, sref_case_1_7_2, {
-	&test_1_7_2_conn, &test_1_7_2_resp, &test_1_7_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_7_2_top, &test_1_7_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_7_3, tgrp_case_1_7_3, name_case_1_7_3, desc_case_1_7_3, sref_case_1_7_3, {
-	&test_1_7_3_conn, &test_1_7_3_resp, &test_1_7_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_7_3_top, &test_1_7_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_7_4, tgrp_case_1_7_4, name_case_1_7_4, desc_case_1_7_4, sref_case_1_7_4, {
-	&test_1_7_4_conn, &test_1_7_4_resp, &test_1_7_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_7_4_top, &test_1_7_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_7_5, tgrp_case_1_7_5, name_case_1_7_5, desc_case_1_7_5, sref_case_1_7_5, {
-	&test_1_7_5_conn, &test_1_7_5_resp, &test_1_7_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_7_5_top, &test_1_7_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_8_1, tgrp_case_1_8_1, name_case_1_8_1, desc_case_1_8_1, sref_case_1_8_1, {
-	&test_1_8_1_conn, &test_1_8_1_resp, &test_1_8_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_8_1_top, &test_1_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_8_2, tgrp_case_1_8_2, name_case_1_8_2, desc_case_1_8_2, sref_case_1_8_2, {
-	&test_1_8_2_conn, &test_1_8_2_resp, &test_1_8_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_8_2_top, &test_1_8_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_8_3, tgrp_case_1_8_3, name_case_1_8_3, desc_case_1_8_3, sref_case_1_8_3, {
-	&test_1_8_3_conn, &test_1_8_3_resp, &test_1_8_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_8_3_top, &test_1_8_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_8_4, tgrp_case_1_8_4, name_case_1_8_4, desc_case_1_8_4, sref_case_1_8_4, {
-	&test_1_8_4_conn, &test_1_8_4_resp, &test_1_8_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_8_4_top, &test_1_8_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_9_1, tgrp_case_1_9_1, name_case_1_9_1, desc_case_1_9_1, sref_case_1_9_1, {
-	&test_1_9_1_conn, &test_1_9_1_resp, &test_1_9_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_9_1_top, &test_1_9_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_9_2, tgrp_case_1_9_2, name_case_1_9_2, desc_case_1_9_2, sref_case_1_9_2, {
-	&test_1_9_2_conn, &test_1_9_2_resp, &test_1_9_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_9_2_top, &test_1_9_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_10_1, tgrp_case_1_10_1, name_case_1_10_1, desc_case_1_10_1, sref_case_1_10_1, {
-	&test_1_10_1_conn, &test_1_10_1_resp, &test_1_10_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_10_1_top, &test_1_10_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_10_2, tgrp_case_1_10_2, name_case_1_10_2, desc_case_1_10_2, sref_case_1_10_2, {
-	&test_1_10_2_conn, &test_1_10_2_resp, &test_1_10_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_10_2_top, &test_1_10_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_11_1, tgrp_case_1_11_1, name_case_1_11_1, desc_case_1_11_1, sref_case_1_11_1, {
-	&test_1_11_1_conn, &test_1_11_1_resp, &test_1_11_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_11_1_top, &test_1_11_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_11_2, tgrp_case_1_11_2, name_case_1_11_2, desc_case_1_11_2, sref_case_1_11_2, {
-	&test_1_11_2_conn, &test_1_11_2_resp, &test_1_11_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_11_2_top, &test_1_11_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_12_1, tgrp_case_1_12_1, name_case_1_12_1, desc_case_1_12_1, sref_case_1_12_1, {
-	&test_1_12_1_conn, &test_1_12_1_resp, &test_1_12_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_12_1_top, &test_1_12_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_12_2, tgrp_case_1_12_2, name_case_1_12_2, desc_case_1_12_2, sref_case_1_12_2, {
-	&test_1_12_2_conn, &test_1_12_2_resp, &test_1_12_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_12_2_top, &test_1_12_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_13_1, tgrp_case_1_13_1, name_case_1_13_1, desc_case_1_13_1, sref_case_1_13_1, {
-	&test_1_13_1_conn, &test_1_13_1_resp, &test_1_13_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_13_1_top, &test_1_13_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_13_2, tgrp_case_1_13_2, name_case_1_13_2, desc_case_1_13_2, sref_case_1_13_2, {
-	&test_1_13_2_conn, &test_1_13_2_resp, &test_1_13_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_13_2_top, &test_1_13_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_14_1, tgrp_case_1_14_1, name_case_1_14_1, desc_case_1_14_1, sref_case_1_14_1, {
-	&test_1_14_1_conn, &test_1_14_1_resp, &test_1_14_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_14_1_top, &test_1_14_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_14_2, tgrp_case_1_14_2, name_case_1_14_2, desc_case_1_14_2, sref_case_1_14_2, {
-	&test_1_14_2_conn, &test_1_14_2_resp, &test_1_14_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_14_2_top, &test_1_14_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_15, tgrp_case_1_15, name_case_1_15, desc_case_1_15, sref_case_1_15, {
-	&test_1_15_conn, &test_1_15_resp, &test_1_15_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_1_15_top, &test_1_15_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, {
-	&test_2_2_conn, &test_2_2_resp, &test_2_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_top, &test_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_3, tgrp_case_2_3, name_case_2_3, desc_case_2_3, sref_case_2_3, {
-	&test_2_3_conn, &test_2_3_resp, &test_2_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_3_top, &test_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_4, tgrp_case_2_4, name_case_2_4, desc_case_2_4, sref_case_2_4, {
-	&test_2_4_conn, &test_2_4_resp, &test_2_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_4_top, &test_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_5, tgrp_case_2_5, name_case_2_5, desc_case_2_5, sref_case_2_5, {
-	&test_2_5_conn, &test_2_5_resp, &test_2_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_5_top, &test_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_6, tgrp_case_2_6, name_case_2_6, desc_case_2_6, sref_case_2_6, {
-	&test_2_6_conn, &test_2_6_resp, &test_2_6_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_6_top, &test_2_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_7_1, tgrp_case_2_7_1, name_case_2_7_1, desc_case_2_7_1, sref_case_2_7_1, {
-	&test_2_7_1_conn, &test_2_7_1_resp, &test_2_7_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_7_1_top, &test_2_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_7_2, tgrp_case_2_7_2, name_case_2_7_2, desc_case_2_7_2, sref_case_2_7_2, {
-	&test_2_7_2_conn, &test_2_7_2_resp, &test_2_7_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_7_2_top, &test_2_7_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_7_3, tgrp_case_2_7_3, name_case_2_7_3, desc_case_2_7_3, sref_case_2_7_3, {
-	&test_2_7_3_conn, &test_2_7_3_resp, &test_2_7_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_7_3_top, &test_2_7_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_7_4, tgrp_case_2_7_4, name_case_2_7_4, desc_case_2_7_4, sref_case_2_7_4, {
-	&test_2_7_4_conn, &test_2_7_4_resp, &test_2_7_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_7_4_top, &test_2_7_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_8, tgrp_case_2_8, name_case_2_8, desc_case_2_8, sref_case_2_8, {
-	&test_2_8_conn, &test_2_8_resp, &test_2_8_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_8_top, &test_2_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_9, tgrp_case_2_9, name_case_2_9, desc_case_2_9, sref_case_2_9, {
-	&test_2_9_conn, &test_2_9_resp, &test_2_9_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_9_top, &test_2_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_10, tgrp_case_2_10, name_case_2_10, desc_case_2_10, sref_case_2_10, {
-	&test_2_10_conn, &test_2_10_resp, &test_2_10_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_10_top, &test_2_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_11, tgrp_case_2_11, name_case_2_11, desc_case_2_11, sref_case_2_11, {
-	&test_2_11_conn, &test_2_11_resp, &test_2_11_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_11_top, &test_2_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_12, tgrp_case_2_12, name_case_2_12, desc_case_2_12, sref_case_2_12, {
-	&test_2_12_conn, &test_2_12_resp, &test_2_12_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_12_top, &test_2_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_13, tgrp_case_2_13, name_case_2_13, desc_case_2_13, sref_case_2_13, {
-	&test_2_13_conn, &test_2_13_resp, &test_2_13_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_13_top, &test_2_13_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_14, tgrp_case_2_14, name_case_2_14, desc_case_2_14, sref_case_2_14, {
-	&test_2_14_conn, &test_2_14_resp, &test_2_14_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_14_top, &test_2_14_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_1, tgrp_case_3_1, name_case_3_1, desc_case_3_1, sref_case_3_1, {
-	&test_3_1_conn, &test_3_1_resp, &test_3_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_3_1_top, &test_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_2, tgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, {
-	&test_3_2_conn, &test_3_2_resp, &test_3_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_3_2_top, &test_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_3, tgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, {
-	&test_3_3_conn, &test_3_3_resp, &test_3_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_3_3_top, &test_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_4, tgrp_case_3_4, name_case_3_4, desc_case_3_4, sref_case_3_4, {
-	&test_3_4_conn, &test_3_4_resp, &test_3_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_3_4_top, &test_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_5, tgrp_case_3_5, name_case_3_5, desc_case_3_5, sref_case_3_5, {
-	&test_3_5_conn, &test_3_5_resp, &test_3_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_3_5_top, &test_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_6, tgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, {
-	&test_3_6_conn, &test_3_6_resp, &test_3_6_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_3_6_top, &test_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_7, tgrp_case_3_7, name_case_3_7, desc_case_3_7, sref_case_3_7, {
-	&test_3_7_conn, &test_3_7_resp, &test_3_7_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_3_7_top, &test_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_8, tgrp_case_3_8, name_case_3_8, desc_case_3_8, sref_case_3_8, {
-	&test_3_8_conn, &test_3_8_resp, &test_3_8_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_3_8_top, &test_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_9, tgrp_case_3_9, name_case_3_9, desc_case_3_9, sref_case_3_9, {
-	&test_3_9_conn, &test_3_9_resp, &test_3_9_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_3_9_top, &test_3_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_10, tgrp_case_3_10, name_case_3_10, desc_case_3_10, sref_case_3_10, {
-	&test_3_10_conn, &test_3_10_resp, &test_3_10_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_3_10_top, &test_3_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1, tgrp_case_4_1, name_case_4_1, desc_case_4_1, sref_case_4_1, {
-	&test_4_1_conn, &test_4_1_resp, &test_4_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_1_top, &test_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_2_1, tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, sref_case_4_2_1, {
-	&test_4_2_1_conn, &test_4_2_1_resp, &test_4_2_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_2_1_top, &test_4_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_2_2, tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, sref_case_4_2_2, {
-	&test_4_2_2_conn, &test_4_2_2_resp, &test_4_2_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_2_2_top, &test_4_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3, tgrp_case_4_3, name_case_4_3, desc_case_4_3, sref_case_4_3, {
-	&test_4_3_conn, &test_4_3_resp, &test_4_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_3_top, &test_4_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_4, tgrp_case_4_4, name_case_4_4, desc_case_4_4, sref_case_4_4, {
-	&test_4_4_conn, &test_4_4_resp, &test_4_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_4_top, &test_4_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_5, tgrp_case_4_5, name_case_4_5, desc_case_4_5, sref_case_4_5, {
-	&test_4_5_conn, &test_4_5_resp, &test_4_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_5_top, &test_4_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_6_1, tgrp_case_4_6_1, name_case_4_6_1, desc_case_4_6_1, sref_case_4_6_1, {
-	&test_4_6_1_conn, &test_4_6_1_resp, &test_4_6_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_6_1_top, &test_4_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_6_2, tgrp_case_4_6_2, name_case_4_6_2, desc_case_4_6_2, sref_case_4_6_2, {
-	&test_4_6_2_conn, &test_4_6_2_resp, &test_4_6_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_6_2_top, &test_4_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_6_3, tgrp_case_4_6_3, name_case_4_6_3, desc_case_4_6_3, sref_case_4_6_3, {
-	&test_4_6_3_conn, &test_4_6_3_resp, &test_4_6_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_6_3_top, &test_4_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_7_1, tgrp_case_4_7_1, name_case_4_7_1, desc_case_4_7_1, sref_case_4_7_1, {
-	&test_4_7_1_conn, &test_4_7_1_resp, &test_4_7_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_7_1_top, &test_4_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_7_2, tgrp_case_4_7_2, name_case_4_7_2, desc_case_4_7_2, sref_case_4_7_2, {
-	&test_4_7_2_conn, &test_4_7_2_resp, &test_4_7_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_7_2_top, &test_4_7_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_7_3, tgrp_case_4_7_3, name_case_4_7_3, desc_case_4_7_3, sref_case_4_7_3, {
-	&test_4_7_3_conn, &test_4_7_3_resp, &test_4_7_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_7_3_top, &test_4_7_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_8, tgrp_case_4_8, name_case_4_8, desc_case_4_8, sref_case_4_8, {
-	&test_4_8_conn, &test_4_8_resp, &test_4_8_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_8_top, &test_4_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_9, tgrp_case_4_9, name_case_4_9, desc_case_4_9, sref_case_4_9, {
-	&test_4_9_conn, &test_4_9_resp, &test_4_9_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_9_top, &test_4_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_10, tgrp_case_4_10, name_case_4_10, desc_case_4_10, sref_case_4_10, {
-	&test_4_10_conn, &test_4_10_resp, &test_4_10_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_4_10_top, &test_4_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_1_1, tgrp_case_5_1_1, name_case_5_1_1, desc_case_5_1_1, sref_case_5_1_1, {
-	&test_5_1_1_conn, &test_5_1_1_resp, &test_5_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_5_1_1_top, &test_5_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_1_2, tgrp_case_5_1_2, name_case_5_1_2, desc_case_5_1_2, sref_case_5_1_2, {
-	&test_5_1_2_conn, &test_5_1_2_resp, &test_5_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_5_1_2_top, &test_5_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_2, tgrp_case_5_2, name_case_5_2, desc_case_5_2, sref_case_5_2, {
-	&test_5_2_conn, &test_5_2_resp, &test_5_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_5_2_top, &test_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_3_1, tgrp_case_5_3_1, name_case_5_3_1, desc_case_5_3_1, sref_case_5_3_1, {
-	&test_5_3_1_conn, &test_5_3_1_resp, &test_5_3_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_5_3_1_top, &test_5_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_3_2, tgrp_case_5_3_2, name_case_5_3_2, desc_case_5_3_2, sref_case_5_3_2, {
-	&test_5_3_2_conn, &test_5_3_2_resp, &test_5_3_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_5_3_2_top, &test_5_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_3_3, tgrp_case_5_3_3, name_case_5_3_3, desc_case_5_3_3, sref_case_5_3_3, {
-	&test_5_3_3_conn, &test_5_3_3_resp, &test_5_3_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_5_3_3_top, &test_5_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_3_4, tgrp_case_5_3_4, name_case_5_3_4, desc_case_5_3_4, sref_case_5_3_4, {
-	&test_5_3_4_conn, &test_5_3_4_resp, &test_5_3_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_5_3_4_top, &test_5_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_3_5, tgrp_case_5_3_5, name_case_5_3_5, desc_case_5_3_5, sref_case_5_3_5, {
-	&test_5_3_5_conn, &test_5_3_5_resp, &test_5_3_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_5_3_5_top, &test_5_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_6_1, tgrp_case_6_1, name_case_6_1, desc_case_6_1, sref_case_6_1, {
-	&test_6_1_conn, &test_6_1_resp, &test_6_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_6_1_top, &test_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_6_2, tgrp_case_6_2, name_case_6_2, desc_case_6_2, sref_case_6_2, {
-	&test_6_2_conn, &test_6_2_resp, &test_6_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_6_2_top, &test_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_6_3, tgrp_case_6_3, name_case_6_3, desc_case_6_3, sref_case_6_3, {
-	&test_6_3_conn, &test_6_3_resp, &test_6_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_6_3_top, &test_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_6_4, tgrp_case_6_4, name_case_6_4, desc_case_6_4, sref_case_6_4, {
-	&test_6_4_conn, &test_6_4_resp, &test_6_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_6_4_top, &test_6_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_6_5, tgrp_case_6_5, name_case_6_5, desc_case_6_5, sref_case_6_5, {
-	&test_6_5_conn, &test_6_5_resp, &test_6_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_6_5_top, &test_6_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_6_6, tgrp_case_6_6, name_case_6_6, desc_case_6_6, sref_case_6_6, {
-	&test_6_6_conn, &test_6_6_resp, &test_6_6_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_6_6_top, &test_6_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_7_1, tgrp_case_7_1, name_case_7_1, desc_case_7_1, sref_case_7_1, {
-	&test_7_1_conn, &test_7_1_resp, &test_7_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_7_1_top, &test_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_7_2, tgrp_case_7_2, name_case_7_2, desc_case_7_2, sref_case_7_2, {
-	&test_7_2_conn, &test_7_2_resp, &test_7_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_7_2_top, &test_7_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_7_3, tgrp_case_7_3, name_case_7_3, desc_case_7_3, sref_case_7_3, {
-	&test_7_3_conn, &test_7_3_resp, &test_7_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_7_3_top, &test_7_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_7_4, tgrp_case_7_4, name_case_7_4, desc_case_7_4, sref_case_7_4, {
-	&test_7_4_conn, &test_7_4_resp, &test_7_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_7_4_top, &test_7_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_7_5, tgrp_case_7_5, name_case_7_5, desc_case_7_5, sref_case_7_5, {
-	&test_7_5_conn, &test_7_5_resp, &test_7_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_7_5_top, &test_7_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_7_6, tgrp_case_7_6, name_case_7_6, desc_case_7_6, sref_case_7_6, {
-	&test_7_6_conn, &test_7_6_resp, &test_7_6_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_7_6_top, &test_7_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_7_7, tgrp_case_7_7, name_case_7_7, desc_case_7_7, sref_case_7_7, {
-	&test_7_7_conn, &test_7_7_resp, &test_7_7_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_7_7_top, &test_7_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_7_8, tgrp_case_7_8, name_case_7_8, desc_case_7_8, sref_case_7_8, {
-	&test_7_8_conn, &test_7_8_resp, &test_7_8_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_7_8_top, &test_7_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_1, tgrp_case_8_1, name_case_8_1, desc_case_8_1, sref_case_8_1, {
-	&test_8_1_conn, &test_8_1_resp, &test_8_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_1_top, &test_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_2, tgrp_case_8_2, name_case_8_2, desc_case_8_2, sref_case_8_2, {
-	&test_8_2_conn, &test_8_2_resp, &test_8_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_2_top, &test_8_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_3, tgrp_case_8_3, name_case_8_3, desc_case_8_3, sref_case_8_3, {
-	&test_8_3_conn, &test_8_3_resp, &test_8_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_3_top, &test_8_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_4, tgrp_case_8_4, name_case_8_4, desc_case_8_4, sref_case_8_4, {
-	&test_8_4_conn, &test_8_4_resp, &test_8_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_4_top, &test_8_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_5, tgrp_case_8_5, name_case_8_5, desc_case_8_5, sref_case_8_5, {
-	&test_8_5_conn, &test_8_5_resp, &test_8_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_5_top, &test_8_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_6, tgrp_case_8_6, name_case_8_6, desc_case_8_6, sref_case_8_6, {
-	&test_8_6_conn, &test_8_6_resp, &test_8_6_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_6_top, &test_8_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_7, tgrp_case_8_7, name_case_8_7, desc_case_8_7, sref_case_8_7, {
-	&test_8_7_conn, &test_8_7_resp, &test_8_7_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_7_top, &test_8_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_8, tgrp_case_8_8, name_case_8_8, desc_case_8_8, sref_case_8_8, {
-	&test_8_8_conn, &test_8_8_resp, &test_8_8_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_8_top, &test_8_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_9, tgrp_case_8_9, name_case_8_9, desc_case_8_9, sref_case_8_9, {
-	&test_8_9_conn, &test_8_9_resp, &test_8_9_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_9_top, &test_8_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_10, tgrp_case_8_10, name_case_8_10, desc_case_8_10, sref_case_8_10, {
-	&test_8_10_conn, &test_8_10_resp, &test_8_10_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_10_top, &test_8_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_11, tgrp_case_8_11, name_case_8_11, desc_case_8_11, sref_case_8_11, {
-	&test_8_11_conn, &test_8_11_resp, &test_8_11_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_11_top, &test_8_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_12, tgrp_case_8_12, name_case_8_12, desc_case_8_12, sref_case_8_12, {
-	&test_8_12_conn, &test_8_12_resp, &test_8_12_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_12_top, &test_8_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_13, tgrp_case_8_13, name_case_8_13, desc_case_8_13, sref_case_8_13, {
-	&test_8_13_conn, &test_8_13_resp, &test_8_13_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_13_top, &test_8_13_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_14, tgrp_case_8_14, name_case_8_14, desc_case_8_14, sref_case_8_14, {
-	&test_8_14_conn, &test_8_14_resp, &test_8_14_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_14_top, &test_8_14_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_15, tgrp_case_8_15, name_case_8_15, desc_case_8_15, sref_case_8_15, {
-	&test_8_15_conn, &test_8_15_resp, &test_8_15_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_8_15_top, &test_8_15_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_9_1, tgrp_case_9_1, name_case_9_1, desc_case_9_1, sref_case_9_1, {
-	&test_9_1_conn, &test_9_1_resp, &test_9_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_9_1_top, &test_9_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_9_2, tgrp_case_9_2, name_case_9_2, desc_case_9_2, sref_case_9_2, {
-	&test_9_2_conn, &test_9_2_resp, &test_9_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_9_2_top, &test_9_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_9_3, tgrp_case_9_3, name_case_9_3, desc_case_9_3, sref_case_9_3, {
-	&test_9_3_conn, &test_9_3_resp, &test_9_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_9_3_top, &test_9_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_10_1, tgrp_case_10_1, name_case_10_1, desc_case_10_1, sref_case_10_1, {
-	&test_10_1_conn, &test_10_1_resp, &test_10_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_10_1_top, &test_10_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_10_2, tgrp_case_10_2, name_case_10_2, desc_case_10_2, sref_case_10_2, {
-	&test_10_2_conn, &test_10_2_resp, &test_10_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_10_2_top, &test_10_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_10_3, tgrp_case_10_3, name_case_10_3, desc_case_10_3, sref_case_10_3, {
-	&test_10_3_conn, &test_10_3_resp, &test_10_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_10_3_top, &test_10_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_10_4, tgrp_case_10_4, name_case_10_4, desc_case_10_4, sref_case_10_4, {
-	&test_10_4_conn, &test_10_4_resp, &test_10_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_10_4_top, &test_10_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_11_1, tgrp_case_11_1, name_case_11_1, desc_case_11_1, sref_case_11_1, {
-	&test_11_1_conn, &test_11_1_resp, &test_11_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_11_1_top, &test_11_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_11_2, tgrp_case_11_2, name_case_11_2, desc_case_11_2, sref_case_11_2, {
-	&test_11_2_conn, &test_11_2_resp, &test_11_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_11_2_top, &test_11_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_11_3, tgrp_case_11_3, name_case_11_3, desc_case_11_3, sref_case_11_3, {
-	&test_11_3_conn, &test_11_3_resp, &test_11_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_11_3_top, &test_11_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 
@@ -11322,20 +10550,20 @@ do_tests(int num_tests)
 			} else {
 				switch (result) {
 				case __RESULT_SUCCESS:
-					print_passed(3);
+					print_passed(NUM_STREAMS);
 					break;
 				case __RESULT_FAILURE:
-					print_failed(3);
+					print_failed(NUM_STREAMS);
 					break;
 				case __RESULT_NOTAPPL:
-					print_notapplicable(3);
+					print_notapplicable(NUM_STREAMS);
 					break;
 				case __RESULT_SKIPPED:
-					print_skipped(3);
+					print_skipped(NUM_STREAMS);
 					break;
 				default:
 				case __RESULT_INCONCLUSIVE:
-					print_inconclusive(3);
+					print_inconclusive(NUM_STREAMS);
 					break;
 				}
 			}
@@ -11617,6 +10845,8 @@ Arguments:\n\
 Options:\n\
     -d, --device DEVICE\n\
         device name to open [default: %2$s].\n\
+    -M, --module MODULE\n\
+        module name to push [default: %3$s].\n\
     -e, --exit\n\
         exit on the first failed or inconclusive test case.\n\
     -l, --list [RANGE]\n\
@@ -11643,7 +10873,7 @@ Options:\n\
     -C, --copying\n\
         print copying permission and exit\n\
 \n\
-", argv[0], devname);
+", argv[0], devname, modname);
 }
 
 int
@@ -11668,6 +10898,7 @@ main(int argc, char *argv[])
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
 			{"device",	required_argument,	NULL, 'd'},
+			{"module",	required_argument,	NULL, 'M'},
 			{"exit",	no_argument,		NULL, 'e'},
 			{"list",	optional_argument,	NULL, 'l'},
 			{"fast",	optional_argument,	NULL, 'f'},
@@ -11685,9 +10916,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "d:el::f::so:t:mqvhVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "d:M:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "d:el::f::so:t:mqvhVC?");
+		c = getopt(argc, argv, "d:M:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -11695,6 +10926,12 @@ main(int argc, char *argv[])
 		case 'd':
 			if (optarg) {
 				snprintf(devname, sizeof(devname), "%s", optarg);
+				break;
+			}
+			goto bad_option;
+		case 'M':
+			if (optarg) {
+				snprintf(modname, sizeof(modname), "%s", optarg);
 				break;
 			}
 			goto bad_option;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/02/23 11:51:06 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/03/27 01:25:52 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/23 11:51:06 $ by $Author: brian $
+ Last Modified $Date: 2006/03/27 01:25:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.25  2006/03/27 01:25:52  brian
+ - working up IP driver and SCTP testing
+
  Revision 0.9.2.24  2006/02/23 11:51:06  brian
  - updated headers
 
@@ -123,9 +126,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/02/23 11:51:06 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/03/27 01:25:52 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/02/23 11:51:06 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/03/27 01:25:52 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -169,15 +172,15 @@ static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9
  *    |___________________________________________________________________|
  *
  *
- *  This test arrangement results in a a ferry-clip around the TIMOD module,
- *  where TPI primitives are injected and removed beneath the module as well
- *  as both TPI primitives and ioctls being performed above the module.
+ *  This test arrangement results in a ferry-clip around the TIMOD module, where
+ *  TPI primitives are injected and removed beneath the module as well as both
+ *  TPI primitives and ioctls being performed above the module.
  *
- *  To preserve the environment and ensure that the tests are repeatable in
- *  any order, the entire test harness (pipe) is assembled and disassembled
- *  for each test.  A test preamble is used to place the module in the correct
- *  state for a test case to begin and then a postamble is used to ensure that
- *  the module can be removed correctly.
+ *  To preserve the environment and ensure that the tests are repeatable in any
+ *  order, the entire test harness (pipe) is assembled and disassembled for each
+ *  test.  A test preamble is used to place the module in the correct state for
+ *  a test case to begin and then a postamble is used to ensure that the module
+ *  can be removed correctly.
  */
 
 #include <sys/types.h>
@@ -275,8 +278,8 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
-#define INFINITE_WAIT	-1
 #define TEST_DURATION	20000
+#define INFINITE_WAIT	-1
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -334,7 +337,7 @@ enum {
 int show = 1;
 
 enum {
-	__TEST_CONN_REQ = 2, __TEST_CONN_RES, __TEST_DISCON_REQ,
+	__TEST_CONN_REQ = 100, __TEST_CONN_RES, __TEST_DISCON_REQ,
 	__TEST_DATA_REQ, __TEST_EXDATA_REQ, __TEST_INFO_REQ, __TEST_BIND_REQ,
 	__TEST_UNBIND_REQ, __TEST_UNITDATA_REQ, __TEST_OPTMGMT_REQ,
 	__TEST_ORDREL_REQ, __TEST_OPTDATA_REQ, __TEST_ADDR_REQ,
@@ -349,6 +352,7 @@ enum {
 	__TEST_DATA,
 	__TEST_DATACK_REQ, __TEST_DATACK_IND, __TEST_RESET_REQ,
 	__TEST_RESET_IND, __TEST_RESET_RES, __TEST_RESET_CON,
+	__TEST_PRIM_TOO_SHORT, __TEST_PRIM_WAY_TOO_SHORT,
 	__TEST_O_TI_GETINFO, __TEST_O_TI_OPTMGMT, __TEST_O_TI_BIND,
 	__TEST_O_TI_UNBIND,
 	__TEST__O_TI_GETINFO, __TEST__O_TI_OPTMGMT, __TEST__O_TI_BIND,
@@ -667,7 +671,7 @@ find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt
  */
 
 char *
-errno_string(long err)
+errno_string(t_scalar_t err)
 {
 	switch (err) {
 	case 0:
@@ -920,14 +924,14 @@ errno_string(long err)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%ld]", err);
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
 		return buf;
 	}
 	}
 }
 
 char *
-terrno_string(ulong terr, long uerr)
+terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 {
 	switch (terr) {
 	case TBADADDR:
@@ -992,7 +996,7 @@ terrno_string(ulong terr, long uerr)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%lu]", terr);
+		snprintf(buf, sizeof(buf), "[%lu]", (ulong) terr);
 		return buf;
 	}
 	}
@@ -1253,7 +1257,7 @@ ioctl_string(int cmd, intptr_t arg)
 }
 
 const char *
-service_type(ulong type)
+service_type(t_uscalar_t type)
 {
 	switch (type) {
 	case T_CLTS:
@@ -1268,7 +1272,7 @@ service_type(ulong type)
 }
 
 const char *
-state_string(ulong state)
+state_string(t_uscalar_t state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -1884,7 +1888,7 @@ mgmtflag_string(t_uscalar_t flag)
 }
 
 char *
-size_string(ulong size)
+size_string(t_uscalar_t size)
 {
 	static char buf[128];
 
@@ -1896,12 +1900,12 @@ size_string(ulong size)
 	case T_UNSPEC:
 		return ("T_UNSPEC");
 	}
-	snprintf(buf, sizeof(buf), "%lu", size);
+	snprintf(buf, sizeof(buf), "%lu", (ulong) size);
 	return buf;
 }
 
 const char *
-prim_string(ulong prim)
+prim_string(t_uscalar_t prim)
 {
 	switch (prim) {
 	case T_CONN_REQ:
@@ -1970,7 +1974,7 @@ prim_string(ulong prim)
 }
 
 char *
-t_errno_string(long err, long syserr)
+t_errno_string(t_scalar_t err, t_scalar_t syserr)
 {
 	switch (err) {
 	case 0:
@@ -2037,7 +2041,7 @@ t_errno_string(long err, long syserr)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%ld]", err);
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
 		return buf;
 	}
 	}
@@ -3204,30 +3208,36 @@ stream_start(int child, int index)
 {
 	switch (child) {
 	case 1:
+#if 1
+		/* set up the test harness */
 		if (test_pipe(0) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 		if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 		if (test_ioctl(1, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 		if (test_ioctl(0, I_SWROPT, (intptr_t) SNDZERO) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 		if (test_ioctl(1, I_SWROPT, (intptr_t) SNDZERO) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 		if (test_ioctl(1, I_PUSH, (intptr_t) "pipemod") != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 		return __RESULT_SUCCESS;
+#endif
 	case 2:
+#if 1
 		return __RESULT_SUCCESS;
+#endif
 	case 0:
 #if 0
 		if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 		if (test_ioctl(0, I_PUSH, (intptr_t) "timod") != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 #endif
 		return __RESULT_SUCCESS;
 	default:
+	      failure:
 		return __RESULT_FAILURE;
 	}
 }
@@ -3237,6 +3247,7 @@ stream_stop(int child)
 {
 	switch (child) {
 	case 1:
+#if 1
 		if (test_ioctl(1, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		if (test_close(0) != __RESULT_SUCCESS)
@@ -3244,8 +3255,11 @@ stream_stop(int child)
 		if (test_close(1) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		return __RESULT_SUCCESS;
+#endif
 	case 2:
+#if 1
 		return __RESULT_SUCCESS;
+#endif
 	case 0:
 #if 0
 		if (test_ioctl(0, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
@@ -3810,6 +3824,22 @@ do_signal(int child, int action)
 		p->capability_ack.ACCEPTOR_id = 0;
 		data = NULL;
 		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_PRIM_TOO_SHORT:
+		ctrl->len = sizeof(p->type);
+		p->type = last_prim;
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_PRIM_WAY_TOO_SHORT:
+		ctrl->len = sizeof(p->type) >> 1;
+		p->type = last_prim;
+		data = NULL;
+		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);

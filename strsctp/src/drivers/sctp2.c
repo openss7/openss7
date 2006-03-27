@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/03/03 11:46:59 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/27 01:25:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:46:59 $ by $Author: brian $
+ Last Modified $Date: 2006/03/27 01:25:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.41  2006/03/27 01:25:38  brian
+ - working up IP driver and SCTP testing
+
  Revision 0.9.2.40  2006/03/03 11:46:59  brian
  - 32/64-bit compatibility
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/03/03 11:46:59 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/27 01:25:38 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/03/03 11:46:59 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/27 01:25:38 $";
 
 #include "sctp_compat.h"
 
@@ -71,7 +74,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/03/03 11:46:59 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/27 01:25:38 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -13795,6 +13798,58 @@ sctp_rsrv(queue_t *q)
 /*
  *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
  *
+ *  Multiplex Definitions
+ *
+ *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ */
+
+/*
+ *  =========================================================================
+ *
+ *  STREAMS Definitions
+ *
+ *  =========================================================================
+ */
+
+#if defined WITH_NPI_IP_MUX
+
+STATIC struct module_info sctp_m_info = {
+	.mi_idnum = 0,			/* Module ID number (nothing for mux) */
+	.mi_idname = "sctp_m",		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10,		/* Lo water mark */
+};
+
+STATIC streamscall int sctp_m_open(queue_t *q, dev_t *, int, int, cred_t *);
+STATIC streamscall int sctp_m_close(queue_t *q, int, cred_t *);
+
+STATIC streamscall int sctp_m_rput(queue_t *q, mblk_t *);
+STATIC streamscall int sctp_m_rsrv(queue_t *q);
+
+static struct qinit sctp_m_rinit = {
+	.qi_putp = sctp_m_rput,		/* Read put (msg from below) */
+	.qi_srvp = sctp_m_rsrv,		/* Read queue service */
+	.qi_qopen = sctp_m_open,	/* Each open */
+	.qi_qclose = sctp_m_close,	/* Last close */
+	.qi_minfo = &sctp_m_minfo,	/* Information */
+};
+
+STATIC streamscall int sctp_m_wput(queue_t *q, mblk_t *);
+STATIC streamscall int sctp_m_wsrv(queue_t *q);
+
+static struct qinit sctp_m_winit = {
+	.qi_putp = sctp_m_wput,		/* Write put (msg from above) */
+	.qi_srvp = sctp_m_wsrv,		/* Write queue service */
+	.qi_minfo = &sctp_m_minfo,	/* Information */
+};
+
+#endif				/* defined WITH_NPI_IP_MUX */
+
+/*
+ *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ *
  *  Network Provider Interface (NPI) Interface Definitions
  *
  *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -13840,8 +13895,10 @@ STATIC struct module_info sctp_n_minfo = {
 
 STATIC streamscall int sctp_n_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int sctp_n_close(queue_t *, int, cred_t *);
+
 STATIC streamscall int sctp_rput(queue_t *, mblk_t *);
 STATIC streamscall int sctp_rsrv(queue_t *);
+
 STATIC struct qinit sctp_n_rinit = {
 	.qi_putp = sctp_rput,		/* Read put (msg from below) */
 	.qi_srvp = sctp_rsrv,		/* Read queue service */
@@ -13862,6 +13919,10 @@ STATIC struct qinit sctp_n_winit = {
 STATIC struct streamtab sctp_n_info = {
 	.st_rdinit = &sctp_n_rinit,	/* Upper read queue */
 	.st_wrinit = &sctp_n_winit,	/* Upper write queue */
+#if defined WITH_NPI_IP_MUX
+	.st_muxrinit = &sctp_m_rinit,	/* Lower read queue */
+	.st_muxwinit = &sctp_m_winit,	/* Lower write queue */
+#endif					/* defined WITH_NPI_IP_MUX */
 };
 
 /*
@@ -15682,11 +15743,19 @@ MODULE_ALIAS("/dev/sctp_n");
 STATIC struct cdevsw sctp_n_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &sctp_n_info,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
 };
+#ifdef WITH_NPI_IP_DRV
+STATIC struct fmodsw sctp_n_fmod = {
+	.f_name = DRV_NAME,
+	.f_str = &sctp_n_info,
+	.f_flag = D_MP,
+	.f_kmod = THIS_MODULE,
+};
+#endif				/* WITH_NPI_IP_DRV */
 STATIC int
 sctp_n_init(void)
 {
@@ -15695,11 +15764,21 @@ sctp_n_init(void)
 	if ((err = register_strdev(&sctp_n_cdev, n_major)) < 0)
 		return (err);
 	n_major = err;
+#ifdef WITH_NPI_IP_DRV
+	if ((err = register_strmod(&sctp_n_fmod)) < 0) {
+		unregister_strdev(&sctp_n_cdev, n_major);
+		return (err);
+	}
+	n_modid = err;
+#endif				/* WITH_NPI_IP_DRV */
 	return (0);
 };
 STATIC void
 sctp_n_term(void)
 {
+#ifdef WITH_NPI_IP_DRV
+	unregister_strmod(&sctp_n_fmod);
+#endif				/* WITH_NPI_IP_DRV */
 	unregister_strdev(&sctp_n_cdev, n_major);
 }
 #endif				/* LFS */
@@ -15808,6 +15887,10 @@ STATIC struct qinit sctp_t_winit = {
 STATIC struct streamtab sctp_t_info = {
 	.st_rdinit = &sctp_t_rinit,	/* Upper read queue */
 	.st_wrinit = &sctp_t_winit,	/* Upper write queue */
+#if defined WITH_NPI_IP_MUX
+	.st_muxrinit = &sctp_m_rinit,	/* Lower read queue */
+	.st_muxwinit = &sctp_m_winit,	/* Lower write queue */
+#endif					/* defined WITH_NPI_IP_MUX */
 };
 
 /*
@@ -26545,7 +26628,7 @@ MODULE_ALIAS("/dev/sctp_t");
 STATIC struct cdevsw sctp_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &sctp_t_info,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
