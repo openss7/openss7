@@ -1,3 +1,42 @@
+2006-03-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am (KERNEL_PRELOADS): removed sctp.o from preloads
+	* doc/manual/sctp.texi: replaced references to XNS stuff
+	* doc/manual/tree.texi: replaced references to XNS stuff
+	* include/linux/hooks.h.in: Removed redundant ifdefs.  Fixed unresovled
+	  symbols occuring on some systems. (Reported by Sumit.)
+	  (ip_route_output_flow): replacement function instead of macro
+	  (__ip_route_output_key): replacement function instead of macro
+	  (__xfrm_sk_clone_policy): replacement function instead of macro
+	  (xfrm_policy_delete): replacement function instead of macro
+	* src/sctp.c (init_module): Fixed glaring error in sctp_init preventing
+	  kernel module from loading. (Reported by Sumit.)
+	* sctp.spec.in (%files init): added init scripts to release
+	* am/kernel.am: don't build modules boot directory if nothing for it
+	* util/init/README: added readme file for init scripts
+	* util/init/sctp: added redhat/LSB style init script
+	* util/init/sctp.sh: added debian style init script
+	* util/sysconfig/README: added reame file for configuration files
+	* util/sysconfig/sctp: added configuration source for init script
+	* util/sysconfig/sctp.conf: added sysctl init source
+	* scripts/send-pr: wouldn't pass --help --version check when searching
+	  for config files
+	* am/pr.am (distclean-send-pr): character escape in sed expression
+	* NEWS: updated for re-release
+	* ANNOUNCE: updated for re-release
+	* doc/man/man7/sctp.7.man: corrections
+	* man/man7/sctp.7.man: corrections (same file as doc/man/man7/sctp.7.man)
+	* doc/manual/Makefile.am: added sctp.7.texi
+	* doc/manual/releases.texi: updated release notes
+	* doc/manual/sctp.7.texi: added texinfo version of man page
+	* doc/manual/texi/install.texi: corrected @fnindex
+	* scripts/texi/install.texi: corrected @fnindex
+
+	* doc/manual/releases.texi: corrected release node
+	* doc/manual/sctp.7.texi: added nodes for better info navigation
+	* doc/manual/texi/testsuite.texi (Running Test Suites): fixed section level
+	* scripts/texi/testsuite.texi (Running Test Suites): fixed section level
+
 2006-03-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/sctp.refs: updated LiS and STREAMS release numbers

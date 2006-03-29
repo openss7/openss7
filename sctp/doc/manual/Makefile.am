@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/20 13:50:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/29 11:27:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 13:50:25 $ by $Author: brian $
+# Last Modified $Date: 2006/03/29 11:27:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.11  2006/03/29 11:27:45  brian
+# - corrections for rerelease, see ChangeLog
+#
 # Revision 0.9.2.10  2006/03/20 13:50:25  brian
 # - get automake to run clean
 #
@@ -75,6 +78,7 @@ EXTRA_info_TEXINFOS	= \
 			  releases.texi \
 			  rpm.texi \
 			  tree.texi \
+			  sctp.7.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \

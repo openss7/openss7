@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/03/06 11:35:14 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/03/29 11:32:18 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,17 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/06 11:35:14 $ by $Author: brian $
+## Last Modified $Date: 2006/03/29 11:32:18 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: kernel.am,v $
+## Revision 0.9.2.65  2006/03/29 11:32:18  brian
+## - spelling in comment
+##
+## Revision 0.9.2.64  2006/03/29 11:27:42  brian
+## - corrections for rerelease, see ChangeLog
+##
 ## Revision 0.9.2.63  2006/03/06 11:35:14  brian
 ## - updated headers
 ##
@@ -220,7 +226,7 @@ STRIP_KERNEL_MODULES	= $(STRIP) --strip-debug
 # This is performed both for the install as well as the install-strip targets.  This simply installs
 # and strips if required.  We use libtool to install even though these are not .la libraries but
 # just objects.  We set kernel module stripping as above.  Note that we do not strip kernel modules
-# if rpm is going to perfrom stripping; however, an execute flag must be set on the modules to get
+# if rpm is going to perform stripping; however, an execute flag must be set on the modules to get
 # RH rpms to strip them.
 ##
 install-modules: $(KERNEL_MODULES)
@@ -245,10 +251,12 @@ install-modules: $(KERNEL_MODULES)
 
 ##
 # This target creates symbolic links from the boot subdirectory to the appropriate kernel module.
-# This is for the older-style modprobe with classes.  Therefore it is 2.4 specific.
+# This is for the older-style modprobe with classes.  Therefore it is 2.4 specific.  It seems
+# that some insmods really hate this, it might be necessary to defeat it altogether.
 ##
 install-preloads:
 	@$(ECHO) "Making $@ in `pwd`"
+	@test -n "$(KERNEL_PRELOADS)" || exit 0 ; \
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/boot
 	@list=` $(ECHO) " $(KERNEL_PRELOADS) " | sed -r -e 's| [^[:space:]]*/| $(kpre)|g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
 		test -f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p || continue ; \

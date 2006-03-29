@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: testsuite.texi,v 0.9.2.6 2006/03/23 11:19:18 brian Exp $
+@c @(#) $Id: testsuite.texi,v 0.9.2.7 2006/03/29 11:59:28 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/23 11:19:18 $ by $Author: brian $
+@c Last Modified $Date: 2006/03/29 11:59:28 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -308,7 +308,7 @@ require root privileges, or that require plain user privileges, to complete succ
 @c ----------------------------------------------------------------------------
 
 @node Running Test Suites
-@section Running Test Suites
+@subsubsection Running Test Suites
 @cindex test suites, running
 
 There are several ways of invoking the conformance test suites:

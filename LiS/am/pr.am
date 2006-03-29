@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: pr.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/24 10:07:43 $
+# @(#) $RCSfile: pr.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/29 11:27:42 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/24 10:07:43 $ by $Author: brian $
+## Last Modified $Date: 2006/03/29 11:27:42 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: pr.am,v $
+## Revision 0.9.2.7  2006/03/29 11:27:42  brian
+## - corrections for rerelease, see ChangeLog
+##
 ## Revision 0.9.2.6  2006/03/24 10:07:43  brian
 ## - send-pr is architecture independent
 ##
@@ -115,7 +118,7 @@ clean-send-pr:
 distclean-send-pr:
 	@$(ECHO) "Making $@ in `pwd`"
 	@list='$(LOGGING_TARGETS)' ; for t in $$list ; do \
-		p=`echo $$t | sed -e 's|\.log$|.pr|'` ; \
+		p=`echo $$t | sed -e 's|\.log$$|.pr|'` ; \
 		$(ECHO) "rm -f -- $$p" ; \
 		rm -f -- $$p ; \
 	done ; \

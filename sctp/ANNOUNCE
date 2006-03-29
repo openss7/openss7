@@ -1,16 +1,16 @@
-From bidulock@openss7.org Wed Mar 15 13:45:30 2006
-Date: Wed, 15 Mar 2006 13:22:35 -0700
+From bidulock@openss7.org Tue Mar 28 21:37:29 MST 2006
+Date: Tue, 28 Mar 2006 21:37:14 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Announce" <cola@stump.algebra.com>
 Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
     "OpenSS7 List" <openss7@openss7.org>
-Subject: sctp 0.2.23 Released - Linux Native SCTP
+Subject: sctp 0.2.24 Released - Linux Native SCTP
 Reply-To: bidulock@openss7.org
 Organization: The OpenSS7 Project <http://www.openss7.org/>
 Dsn-Notification-To: <bidulock@openss7.org>
 Return-Receipt-To: <bidulock@openss7.org>
 
-sctp 0.2.23 was released under GPLv2 on March 15, 2006.
+sctp 0.2.24 was released under GPLv2 on March 28, 2006.
 
 This is a release of the OpenSS7 Linux Native (Sockets) implementation
 of SCTP (Stream Control Transmission Protocol), previously only
@@ -18,15 +18,26 @@ available as a Kernel patch.  This package contains the necessary
 manual pages, header files, and configures and installs against almost
 any 2.4 kernel, even production kernels, without patching.
 
-This release provides corrections for and testing of 64-bit clean
-compile and test runs on x86_64 architecture.  It also provides some bug
-corrections resulting from gcc 4.0.2 compiler warnings, and corrects
-build flags for Gentoo and 2.6.15 kernels as reported on mailing list.
+This is primarily a maintenance release correcting reported bugs, but
+also includes the latest packaging improvements:
+
+- Added --enable-devel configure option for embedded targets.
+
+- Added send-pr script for automatic problem report generation.
+
+- Fixed problems with unresolved symbols on some systems.
+
+- Fixed glaring error in sctp_init preventing kernel module from
+  loading.
+
+- Added init scripts and system control configuration data.
+
+- Removed old preload approach to kernel module loading.
 
  This is a public alpha release of the package.
 
  Please see README-alpha in the release, or
- <http://www.openss7.org/codefiles/sctp-0.2.23/README-alpha>.
+ <http://www.openss7.org/codefiles/sctp-0.2.24/README-alpha>.
  
  This release deprecates previous releases as well as the older
  linux-sctp kernel patches.
@@ -43,20 +54,20 @@ the autoconf tarballs and SRPMs.  See the sctp package page at
 <http://www.openss7.org/sctp_pkg.html> for tarballs, SRPMs and binary
 RPMs.
 
-See <http://www.openss7.org/codefiles/sctp-0.2.23/ChangeLog> and
-<http://www.openss7.org/codefiles/sctp-0.2.23/NEWS> in the release for
+See <http://www.openss7.org/codefiles/sctp-0.2.24/ChangeLog> and
+<http://www.openss7.org/codefiles/sctp-0.2.24/NEWS> in the release for
 more information.  Also, see the sctp.pdf manual in the release (also
 in html <http://www.openss7.org/sctp_manual.html>).
 
-For the news release, see <http://www.openss7.org/rel20060315_2.html>
+For the news release, see <http://www.openss7.org/rel20060328_1.html>
 
 --
 Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
-From bidulock@openss7.org Wed Mar 15 13:45:30 2006
-Date: Wed, 15 Mar 2006 13:22:35 -0700
+From bidulock@openss7.org Tue Mar 28 21:37:29 MST 2006
+Date: Tue, 28 Mar 2006 21:37:14 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Software Map" <LSM@execpc.com>
 Subject: add
@@ -67,8 +78,8 @@ Return-Receipt-To: <bidulock@openss7.org>
 
 Begin4
 Title:			sctp
-Version:		0.2.23
-Entered-date:		2006-03-15
+Version:		0.2.24
+Entered-date:		2006-03-28
 Description:		OpenSS7 Linux Native SCTP.
 			OpenSS7 Linux Native SCTP (Stream Control Transmission
 			Protocol).
@@ -81,10 +92,10 @@ Keywords:		SCTP, SIGTRAN, OpenSS7, Sockets, Telecommunications
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			1.8M sctp-0.2.23.tar.gz
-			1.5M sctp-0.2.23.tar.bz2
+			2M sctp-0.2.24.tar.gz
+			2M sctp-0.2.24.tar.bz2
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			1.5M sctp-0.2.23-1.src.rpm
+			2M sctp-0.2.24-1.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4

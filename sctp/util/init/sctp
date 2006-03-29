@@ -1,0 +1,317 @@
+#!/bin/bash
+#
+# @(#) $RCSfile: sctp,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/29 11:27:59 $
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# All Rights Reserved.
+#
+# Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
+# permissions.
+#
+# Redhat chkconfig init script conventions
+#
+# sctp:		start and stop SCTP subsystem
+# chkconfig:	345 03 96
+# lockfile:	/var/lock/subsys/sctp
+# config:	/etc/sysconfig/sctp
+# probe:	true
+# hide:		false
+# license:	GPL
+# description:	This SCTP init script is part of OpenSS7 Linux SCTP.  \
+#		It is responsible for ensuring that the SCTP subsystem \
+#		is configured and loaded.
+#
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: sctp
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
+# X-UnitedLinux-Default-Enabled: yes
+# Short-Description: start and stop SCTP subsystem
+# License: GPL
+# Description:	This SCTP init script is part of OpenSS7 Linux SCTP.
+#	It is reponsible for ensuring that the SCTP subsystem is
+#	configured and loaded.
+### END INIT INFO
+
+# Source init script functions library.
+init_mode="standalone"
+  if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
+elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
+elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
+fi
+
+case "$init_mode" in
+    (chkconfig)
+	;;
+    (insserv)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	;;
+    (lsb)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $?
+	}
+	;;
+    (standalone|*)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
+	    return $?
+	}
+	;;
+esac
+
+name='sctp'
+lockfile="/var/lock/subsys/$name"
+config="/etc/sysconfig/$name"
+
+if [ ! -e /proc/modules ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
+
+for SCTP_MKNOD in \
+    ./${name}_mknod /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
+    if [ -x $SCTP_MKNOD ] ; then
+	break
+    else
+	SCTP_MKNOD=
+    fi
+done
+
+# Specify defaults
+
+SCTP_MODULES="sctp"
+SCTP_MAKEDEVICES="yes"
+SCTP_REMOVEDEVICES="yes"
+
+# Source redhat and/or debian config file
+for file in $config ; do
+    [ -f $file ] && . $file
+done
+
+[ -z "$SCTP_MKNOD" ] && SCTP_MAKEDEVICES='no'
+[ -z "$SCTP_MKNOD" ] && SCTP_REMOVEDEVICES='no'
+
+RETVAL=0
+
+umask 077
+
+start() {
+    for module in $SCTP_MODULES ; do
+	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	    action $"Loading kernel module $module: " \
+		modprobe -k -q -- $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
+    if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
+	action $"Reconfiguring kernel parameters: " \
+	    sysctl -e -p /etc/sysctl.conf || :
+    fi
+    if [ -f /etc/${name}.conf ] ; then
+	action $"Configuring SCTP parameters: " \
+	    sysctl -e -p /etc/${name}.conf || :
+    fi
+    if [ -n "$SCTP_MKNOD" ] ; then
+	if [ ":$SCTP_MAKEDEVICES" = ":yes" ] ; then
+	    if [ -n "$SCTP_MKNOD" ] ; then
+		action $"Making SCTP devices: " \
+		    $SCTP_MKNOD
+		RETVAL=$?
+	    fi
+	fi
+    fi
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+remove_modules() {
+    modules=
+    while read -a module ; do
+	modules="${modules}${modules:+ }${module[0]}"
+    done
+    if [ -n "$modules" ] ; then
+	action $"Removing SCTP modules: " \
+		rmmod $modules
+	RETVAL=$?
+    fi
+    RETVAL=0
+    return $RETVAL
+}
+
+stop() {
+    if [ -n "$SCTP_MKNOD" -a ":$SCTP_REMOVEDEVICES" = ":yes" ] ; then
+	action $"Removing SCTP devices: " \
+	    $SCTP_MKNOD --remove
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && egrep '^sctp' /proc/modules 2>/dev/null | remove_modules
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+    return $?
+}
+
+reload() {
+    stop
+    start
+    return $?
+}
+
+case "$1" in
+    (start|stop|reload|restart)
+	$1 || RETVAL=$?
+	;;
+    (status)
+	LOADED='yes'
+	for module in $SCTP_MODULES ; do
+	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+		LOADED='no'
+		break
+	    fi
+	done
+	if [ ":$LOADED" = ":yes" ] ; then
+	    if true ; then
+		echo $"$name is running..."
+		RETVAL=0
+	    fi
+	else
+	    if [ -f $lockfile ] ; then
+		echo $"$name is stopped but sybsys locked"
+		RETVAL=2
+	    else
+		echo $"$name is stopped"
+		RETVAL=3
+	    fi
+	fi
+	;;
+    (force-reload|try-restart|condrestart)
+	[ -f $lockfile ] && restart || RETVAL=$?
+	;;
+    (probe)
+	LOADED='yes'
+	for module in $SCTP_MODULES ; do
+	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+		LOADED='no'
+		break
+	    fi
+	done
+	if [ ":$LOADED" = ":yes" ] ; then
+	    # loaded
+	    if true ; then
+		if [ ! -f $lockfile ] ; then
+		    # loaded, but subsystem unlocked, need to reload
+		    echo 'reload'
+		else
+		    # loaded and subsystem locked
+		    for file in $config /etc/$name.conf ; do
+			if [ -f $file -a $file -nt $lockfile ] ; then
+			    # configuration file updeated, need to reload
+			    echo 'reload'
+			    break
+			fi
+		    done
+		fi
+	    else
+		# loaded, but with wrong options, need to restart
+		echo 'restart'
+	    fi
+	else
+	    # unloaded
+	    if [ ! -f $lockfile ] ; then
+		# subsystem unlocked, need to start
+		echo 'start'
+	    else
+		if true ; then
+		    # unloaded but subsystem locked, need to restart
+		    echo 'restart'
+		fi
+	    fi
+	fi
+	# do not need to do anything
+	RETVAL=$?
+	;;
+    (*)
+	echo "Usage: $0 (start|stop|status|restart|try-restart|condrestart|force-reload|reload|probe)"
+	;;
+esac
+
+[ "${0##*/}" = "$name" ] && exit $RETVAL
+
+# =============================================================================
+# 
+# @(#) $RCSfile: sctp,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/29 11:27:59 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/03/29 11:27:59 $ by $Author: brian $
+#
+# =============================================================================
+
+# vim: ft=sh sw=4 tw=80

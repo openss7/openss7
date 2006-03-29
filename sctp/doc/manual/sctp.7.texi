@@ -1,0 +1,1807 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: sctp.7.texi,v 0.9.2.2 2006/03/29 11:59:26 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/03/29 11:59:26 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@menu
+* sctp(7) NAME::
+* sctp(7) SYNOPSIS::
+* sctp(7) DESCRIPTION::
+* sctp(7) SYSCTLS::
+* sctp(7) SOCKET OPTIONS::
+* sctp(7) IOCTLS::
+* sctp(7) ERROR HANDLING::
+* sctp(7) NOTES::
+* sctp(7) ERRORS::
+* sctp(7) NETWORK STATISTICS::
+* sctp(7) CAVEATS::
+* sctp(7) AUTHOR::
+@end menu
+
+@node sctp(7) NAME
+@unnumberedsec NAME
+sctp - Stream Control Transmission Protocol (SCTP).
+
+@node sctp(7) SYNOPSIS
+@unnumberedsec SYNOPSIS
+@noindent
+@example
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/sctp.h>
+
+sctp_socket = socket(PF_INET, @emph{SOCK_SEQPACKET}, 0);
+sctp_socket = socket(PF_INET, @emph{SOCK_SEQPACKET}, IPPROTO_SCTP);
+sctp_socket = socket(PF_INET, @emph{SOCK_STREAM}, IPPROTO_SCTP);
+sctp_socket = socket(PF_INET, @emph{SOCK_RDM}, 0IPPROTO_SCTP
+@end example
+
+@node sctp(7) DESCRIPTION
+@unnumberedsec DESCRIPTION
+
+@menu
+* sctp(7) Connection Establishment::
+* sctp(7) Sending Data::
+* sctp(7) Receiving Data::
+* sctp(7) ADDRESS FORMATS::
+* sctp(7) SOCKET CALLS::
+* sctp(7) FEATURES::
+@end menu
+
+@emph{SCTP} is an implementation of the SCTP (Stream Control Transmission Protocol) defined in
+@cite{RFC 2960}.  @emph{SCTP} provides reliable delivery of ordered or unordered packets over a full
+duplex connection between two @samp{SOCK_SEQPACKET} sockets on top of @manref{ip(7)}.  @emph{SCTP}
+can guarantee that the data arrives in order on a stream, if requested, and retransmits lost
+packets.  It generates and checks a per packet checksum to catch transmission errors.
+
+@emph{SCTP} provides the following socket types:
+
+@table @samp
+@item SOCK_SEQPACKET
+A standard @samp{SOCK_SEQPACKET} socket that preserves message boundaries, Nagles at the association
+level, and provides ordered and unordered reliable and partial reliable, acknowledged and
+unacknowledged delivery on multiple streams.
+@item SOCK_STREAM
+A @manref{tcp(7)} compatible @samp{SOCK_STREAM} socket that does not preserve message boundaries,
+Nagles at the stream level, and provides ordered and out-of-band unacknowledged delivery on a single
+stream.  This is an optional capability of @emph{SCTP} which provides for maximum compatibility with
+applications written for @manref{tcp(7)}.  This socket type is available when @emph{SCTP} is
+compiled with the kernel configuration parameter @samp{CONFIG_SCTP_TCP_COMPATIBLE} set.
+@item SOCK_RDM
+An @manref{udp(7)} compatible @samp{SOCK_RDM} socket that preserves message boundaries, does not
+Nagle, and provides only unordered but reliable or partially reliable delivery on multiple streams.
+This is an optional capability of @emph{SCTP} which provides for maximum compatibility with
+applications written for @manref{udp(7)}.  This socket type is available when @emph{SCTP} is
+compiled with the kernel configuration parameter @samp{CONFIG_SCTP_UDP_COMPATIBLE} set.
+@end table
+
+@node sctp(7) Connection Establishment
+@unnumberedsubsec Connection Establishment
+
+A fresh @emph{SCTP} socket has no remote or local address and is not fully specified.  To create an
+outgoing @emph{SCTP} association use @manref{connect(2)} to establish an association with another
+@emph{SCTP} endpoint.  To receive incoming associations @manref{bind(2)} the socket first to a
+number of local addresses and a port and then call @manref{listen(2)} to put the socket into
+listening state.  Then a new socket for each incoming association can be accepted using
+@manref{accept(2)}.  A socket that has had @manref{accept(2)} or @manref{connect(2)} successfully
+called on it is fully specified and may transmit data.  Data cannot be transmitted on listening or
+not yet connected sockets.
+
+@emph{SCTP} supports large windows to support links with high latency or bandwidth.  Large
+@emph{SCTP} windows can be used by increasing the send and receive buffer sizes.  They can be set
+globally with the @samp{net.core.wmem_default} and @samp{net.core.rmem_default} system controls, or
+on individual sockets by using the @samp{SO_SNDBUF} and @samp{SO_RCVBUF} socket options.  The
+maximum sizes for socket buffers are limited by the @samp{net.core.wmem_max} and
+@samp{net.core.rmem_max} system controls.  See @manref{socket(7)} for more information.
+
+@node sctp(7) Sending Data
+@unnumberedsubsec Sending Data
+
+When sending data, the specific destination address within the association to which to send the data
+can be specified by providing a valid destination address as an argument to @manref{sendto(2)} or
+@manref{sendmsg(2)}.  Data sent with @manref{send(2)} or @manref{write(2)} will use @emph{SCTP}'s
+destination transport address selection policies for transmission and retransmission to single- and
+multi-homed hosts.  The stream upon which to send the data can also be set with the @samp{SCTP_SID}
+socket option on a socket basis with @manref{setsockopt(2)} or on a per-message basis with
+@samp{SCTP_SID} control message to @manref{sendmsg(2)}.  In addition, the @manref{ip(7)}
+@samp{IP_PKTINFO} option can be used with @manref{sendmsg(2)} to specify the interface, first-hop
+destination address and source address to be used in the outbound packet on @samp{SOCK_SEQPACKET}
+and @samp{SOCK_RDM} sockets.  IP options can also be specified for the outbound packet with the
+@manref{ip(7)} @samp{IP_OPTIONS} or @samp{IP_RETOPTS} control messages to @manref{sendmsg(2)}.
+
+For @samp{SOCK_SEQPACKET} socket, send operations may also use the @samp{MSG_MORE} flag when sending
+with @manref{send(2)}, @manref{sendto(2)} or @manref{sendmsg(2)} to indicate that the next write
+operation will provide additional data belonging to the same packet.  @samp{SOCK_STREAM} sockets do
+not support send options and do not return the @samp{MSG_TRUNC} flag on send operations.
+
+If a @samp{SOCK_SEQPACKET} or @samp{SOCK_STREAM} socket does not have sufficient room to buffer the
+sent data, it buffers what it can and returns the amount of user data buffered.  @samp{SOCK_RDM}
+sockets wait for sufficient room to buffer the entire sent packet before returning.
+@samp{SOCK_SEQPACKET} and @samp{SOCK_STREAM} sockets will segment large data writes in to smaller
+segments for delivery to the peer.
+
+@emph{SCTP} provides a mechanism for receiving positive and negative acknowledgments of sent data on
+@samp{SOCK_SEQPACKET} and @samp{SOCK_RDM} sockets.  When the socket option @samp{SCTP_DISPOSITION}
+is set to @samp{SCTP_DISPOSITION_ACKED}, or when data is sent using the @samp{MSG_CONFIRM} flag to
+@manref{send(2)}, @manref{sendto(2)} or @manref{sendmsg(2)}, message confirmation or delivery
+failures can be received by passing the @samp{MSG_CONFIRM} flag to @manref{recv(2)},
+@manref{recvfrom(2)} or @manref{recvmsg(2)}.  This mechanism also provides for retrieval and
+disposition of undelivered messages after the association has aborted or shut down, but before a
+call to @manref{close(2)}.
+
+@node sctp(7) Receiving Data
+@unnumberedsubsec Receiving Data
+
+For @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM} sockets, all receive operations return only one
+packet, or a portion of one packet.  When the packet is smaller than the passed buffer only that
+much data is returned, when it is larger the packet is truncated and the @samp{MSG_TRUNC} flag is
+set for @samp{SOCK_RDM} sockets.  Subsequent @b{recv} or @manref{read(2)}, or a subsequent
+@manref{recvfrom(2)} or @manref{recvmsg(2)} for the same stream will return the remainder of the
+packet for @samp{SOCK_SEQPACKET} sockets.  @samp{SOCK_SEQPACKET} sockets also return the
+@samp{MSG_EOR} flag when the end of the packet has been received successfully.  For
+@samp{SOCK_STREAM} sockets, all receive operations return only the amount of data available on the
+current stream.  @samp{MSG_TRUNC} and @samp{MSG_EOR} are never set for @samp{SOCK_STREAM} sockets.
+
+IP options may be sent or received using the socket options described in @manref{ip(7)}.  They are
+only processed by the kernel when the appropriate system control is enabled (but still passed to the
+user even when it is turned off).  See @manref{ip(7)}.
+
+When the @samp{MSG_DONTROUTE} flag is set on sending, the destination address must refer to a local
+interface address and the packet is only sent to that interface.
+
+@emph{SCTP} fragments a packet when its total length exceeds the association MTU (Maximum
+Transmission Unit).  A more network friendly alternative is to use path MTU discovery as described
+in the @samp{IP_PMTU_DISCOVER} section of @manref{ip(7)}.
+
+@emph{SCTP} supports urgent data similar to @manref{tcp(7)}.  Urgent data is used to signal the
+receiver that some important message is part of the data stream and that it should be processed as
+soon as possible.  Urgent data is always sent out of order.  To send urgent (or out of order) data
+specify the @samp{MSG_OOB} option to @manref{send(2)}, @manref{sendto(2)}, or @manref{sendmsg(2)}.
+When urgent data is received, the kernel sends a @samp{SIGURG} signal to the reading process or the
+process or process group that has been set for the socket using the @samp{FIOCSPGRP} or
+@samp{FIOCSETOWN} I/O controls.  When the @samp{SO_OOBINLINE} socket option is enabled, urgent data
+is put into the normal data stream (and can be tested for by the @samp{SIOCATMARK} I/O control),
+otherwise it can only be received when the @samp{MSG_OOB} flag is set for @manref{recvmsg(2)}.
+
+@node sctp(7) ADDRESS FORMATS
+@unnumberedsubsec ADDRESS FORMATS
+
+@emph{SCTP} is built on top of @b{IP} (see @manref{ip(7)}).  The address formats defined by
+@manref{ip(7)} apply to @emph{SCTP}.  @emph{SCTP} uses the IPv4 @b{sockaddr_in} address format
+described in @manref{ip(7)}.
+
+@emph{SCTP} supports multiple-stream point-to-point communication within multi-homed associations;
+broadcasting and multi-casting are not supported.
+
+In addition to normal IP addressing, @emph{SCTP} provides extensions on the @manref{bind(2)},
+@manref{accept(2)}, @manref{connect(2)}, @manref{getsockname(2)}, and @manref{getpeername(2)} system
+calls.  These functions normally take or return a single @b{sockaddr_in} as an address argument.
+When used in conjunction with an @emph{SCTP} socket on or to a multi-homed host, these calls will
+accept or return an array of @b{sockaddr_in} structures.  The number of addresses in the structure
+is indicated by the length of the structure and the protocol family of the socket.  @emph{SCTP} will
+only support one port number being specified in the address list, and each @b{sockaddr_in} structure
+in the list must contain the same @i{sin_port}.  (Note: Linux uses @samp{MAX_SOCK_ADDR} as a maximum
+size of the socket address length.  This is currently only 128 bytes or eight (8) @b{sockaddr_in}
+structures. Eight (8) addresses should be sufficient for most applications.)
+
+Multiple addresses provided to the @manref{bind(2)} system call will be interpreted as multiple
+local addresses to provide to the peer at connection time as well as the local address/port
+combinations upon which a listening socket will accept incoming associations.  A call to
+@manref{accept(2)} requesting the source address of the peer will return multiple transport
+addresses if the connecting peer is multi-homed.  Multiple addresses provided to the
+@manref{connect(2)} system call will be interpreted as multiple destination address/port
+combinations to which to attempt to form an association. The @manref{getpeername(2)} system call
+returns the list of destination address/port combinations to which the socket is connected.  The
+@manref{getsockname(2)} system call returns the list of local address/port combinations to which the
+socket is bound.
+
+@table @asis
+@item @manref{getsockname(2)}
+A call to @manref{getsockname(2)} can provide multiple bound transport addresses for a multi-homed
+host when the socket is bound to multiple addresses or @samp{INADDR_ANY} using @manref{bind(2)}.
+The first address in the list is the primary address to which the socket is bound.  This is the
+first address that will be attempted to be used as a source address when sending an INIT chunk to
+the @emph{SCTP} peer as a result of a call to @manref{connect(2)}.  Otherwise, the order of the
+addresses has no significance.  When the socket is not bound to any address, the call to
+@manref{getsockname(2)} returns a socket address with address family @samp{AF_UNSPEC}.
+
+As a result of binding to @samp{INADDR_ANY} or the @b{ADD-IP} extension, subsequent calls to
+@manref{getsockname(2)} may return different addresses depending on the state of the connection or
+resulting from the exchange of ASCONF control chunks.  This list of transport addresses returned by
+@manref{getsockname(2)} represents the current list of local transport addresses bound to the
+endpoint.  When the connection is multi-homed or supports @b{ADD-IP}, this behavior is different
+from @manref{tcp(7)} and other connection-oriented protocols, whose bound address does not change
+during the lifespan of a connection.
+
+@item @manref{getpeername(2)}
+A call to @manref{getpeername(2)} can provide multiple peer transport addresses for a multi-homed
+peer when the socket is connecting or connected to multiple addresses using @manref{connect(2)}.
+The first address is always the current primary destination transport address.  The current primary
+destination transport address is the address to which all messages will be sent in the absence of
+congestion or failure.
+
+As a result of connecting to multiple transport addresses using @manref{connect(2)} or the
+@b{ADD-IP} extension, the membership of the list of transport addresses returned by
+@manref{getpeername(2)} may change due to the state of the socket or resulting from the exchange of
+ASCONF control chunks.  When the @emph{SCTP} connection is multi-homed or supports @b{ADD-IP}, this
+behavior is different from @manref{tcp(7)} and other connection-oriented protocol, whose peer
+address does not change during the lifespan of a connection.
+@end table
+
+@node sctp(7) SOCKET CALLS
+@unnumberedsubsec SOCKET CALLS
+
+Socket calls for @samp{SOCK_STREAM}, @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM} sockets are different
+in some respects (addressing and options) than their @manref{tcp(7)} or @manref{udp(7)}
+counterparts.  These differences are described here.  For common behavior, please see the indicated
+manual page in Section 2.
+
+@table @asis
+@item @manref{bind(2)}
+A call to @manref{bind(2)} can provide multiple address if the host is multi-homed.  Binds to
+@samp{INADDR_ANY} will result in a binding to all of the local transport addresses belonging to the
+host that do not cause a conflict at the time that a connection is formed.  As with other sockets,
+the local port number is assigned at the time that @manref{bind(2)} is called.
+
+As with other sockets, binding to a socket address with address family @samp{AF_UNSPEC} will cause
+the socket to be unbound from all transport addresses.
+
+Consistent with @manref{tcp(7)}, @emph{SCTP} supports binding of multiple sockets to the same
+transport address providing that the socket option @samp{SO_REUSEADDR} (see @manref{socket(7)}) is
+set on the sockets and that no sockets have executed @manref{listen(2)} bound to the same transport
+address.
+
+@item @manref{accept(2)}
+A call to @manref{accept(2)} requesting the peer address of the connection will return multiple
+transport addresses if the connecting peer is multi-homed.  The first transport address in the list
+is the primary transport address of the connecting peer.  The primary transport address is the
+address upon which the INIT message was received.  Otherwise, the @manref{accept(2)} operation is
+unchanged.
+
+@item @manref{connect(2)}
+A call to @manref{connect(2)} can provide multiple destination transport addresses if the peer host
+is multi-homed.  If an INIT chunk sent to the first destination transport address is not
+acknowledged, the next INIT chunk will be sent to the next address in the list.  This will occur
+until an acknowledgment is received from one of the addresses or the connection attempt times out.
+Each address will be retried @b{sctp_max_init_retries} times before the connection process is
+considered to have timed out.  Broadcast and multicast addresses are permitted for the call to
+@manref{connect(2)} but will not form an endpoint address in the association.  This feature permits
+fast and reliable initialization of associations.
+
+As with other connection-oriented sockets, connecting to a socket address with address family
+@samp{AF_UNSPEC} will cause a socket engaged in active connections to be disconnected.
+
+@item @manref{read(2)}
+@itemx @manref{recv(2)}
+@itemx @manref{recvfrom(2)}
+@itemx @manref{recvmsg(2)}
+@emph{SCTP} preserves message boundaries on read for @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM}
+sockets.  Message boundaries are never preserved for @samp{SOCK_STREAM} sockets.
+
+The following message flags to, or returned from, @manref{recv(2)}, @manref{recvfrom(2)} and
+@manref{recvmsg(2)} have special interpretations for @emph{SCTP}:
+
+@table @samp
+@item MSG_OOB
+@emph{SCTP} supports the return of the @samp{MSG_OOB} flag from @manref{recv(2)},
+@manref{recvfrom(2)} and @manref{recvmsg(2)}.  Data read with the @samp{MSG_OOB} flag set indicates
+that the data was received on the specified @emph{SCTP} stream with the Unordered bit set.
+Operation is similar to @manref{tcp(7)}.
+
+@item MSG_EOR
+For @samp{SOCK_SEQPACKET} sockets, the @samp{MSG_EOR} flag returned from @manref{recv(2)},
+@manref{recvfrom(2)} or @manref{recvmsg(2)} indicates that the data read has been read to the end of
+a record.  The @samp{MSG_EOR} flag is not used for @samp{SOCK_STREAM} or @samp{SOCK_RDM} sockets.
+
+@item MSG_TRUNC
+@emph{SCTP} supports the use of the @samp{MSG_TRUNC} flag to @manref{recv(2)}, @manref{recvfrom(2)}
+and @manref{recvmsg(2)}.  Data read with the @samp{MSG_TRUNC} flag set will return the number of
+bytes available in the packet rather than the number of bytes read.
+
+When the @samp{MSG_TRUNC} flag is returned from @manref{recv(2)}, @manref{recvfrom(2)} and
+@manref{recvmsg(2)}, it indicates that the record was truncated.  @samp{MSG_TRUNC} will only be
+returned on @samp{SOCK_RDM} sockets.  @samp{MSG_TRUNC} is never set on return for @samp{SOCK_STREAM}
+and @samp{SOCK_SEQPACKET} sockets.
+
+@item MSG_CONFIRM
+@emph{SCTP} supports the use of the @samp{MSG_CONFIRM} flag to @manref{recv(2)},
+@manref{recvfrom(2)} and @manref{recvmsg(2)}.  Data read with the @samp{MSG_CONFIRM} flag set will
+return messages receipt acknowledgments as well as messages which have exceeded their life-times,
+messages which have been dropped by @b{PR-SCTP}, and messages held for retrieval after abort or
+shutdown.
+
+When the @samp{MSG_CONFIRM} flag is returned from @manref{recv(2)}, @manref{recvfrom(2)} and
+@manref{recvmsg(2)}, it indicates that the read data represents data that was confirmed as
+acknowledged by the peer.  See also @samp{SCTP_DISPOSITION} under @b{SOCKET OPTIONS}.
+@end table
+
+
+Other message flags have the same interpretation as described in @manref{recv(2)},
+@manref{recvfrom(2)} and @manref{recvmsg(2)}.
+
+@item @manref{write(2)}
+@itemx @manref{send(2)}
+@itemx @manref{sendto(2)}
+@itemx @manref{sendmsg(2)}
+@emph{SCTP} preserves message boundaries on write for @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM}
+sockets.  Message boundaries are never preserved for @samp{SOCK_STREAM} sockets.
+
+The following message flags to @manref{send(2)}, @manref{sendto(2)} and @manref{sendmsg(2)} have
+special interpretations for @emph{SCTP}:
+
+@table @samp
+@item MSG_OOB
+@emph{SCTP} supports the use of the @samp{MSG_OOB} flag to @manref{send(2)}, @manref{sendto(2)} and
+@manref{sendmsg(2)}.  Data written with the @samp{MSG_OOB} flag set indicates that the data is to be
+sent on the specified @emph{SCTP} stream with the Unordered bit set.
+
+@item MSG_MORE
+@emph{SCTP} supports the use of the @samp{MSG_MORE} flag to @manref{send(2)}, @manref{sendto(2)} and
+@manref{sendmsg(2)}.  Data written with the @samp{MSG_MORE} flag set indicates that the data of a
+subsequent send operation on the same stream contains additional data belonging to the same record.
+Use of the @samp{MSG_MORE} flag is only supported for @samp{SOCK_SEQPACKET} sockets.  Data written
+with @manref{write(2)} is assumed to contain an entire record.
+
+@item MSG_PROBE
+@emph{SCTP} supports the use of the @samp{MSG_PROBE} flag to @manref{send(2)}, @manref{sendto(2)}
+and @manref{sendmsg(2)}.  Data written with the @samp{MSG_PROBE} flag set indicates that the data is
+to be used to fill out the heartbeat data in a HEARTBEAT chunk and request that @emph{SCTP} send a
+HEARTBEAT to the peer.  Use of the @samp{MSG_PROBE} flag is supported on all socket types.
+
+@item MSG_EOF
+@emph{SCTP} supports the use of the @samp{MSG_EOF} flag to @manref{send(2)}, @manref{sendto(2)} and
+@manref{sendmsg(2)}.  Data written with the @samp{MSG_EOF} flag will be the last data sent on the
+association and then a shutdown initiated.
+
+@item MSG_CONFIRM
+@emph{SCTP} supports the use of the @samp{MSG_CONFIRM} flag to @manref{send(2)} @manref{sendto(2)}
+and @manref{sendmsg(2)} for @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM} sockets.  Records or packets
+written with the @samp{MSG_CONFIRM} flag set are marked for acknowledgment.  Acknowledgments can be
+received with the @samp{MSG_CONFIRM} flag to @manref{recv(2)}, @manref{recvfrom(2)} and
+@manref{recvmsg(2)} as described above.  See also @samp{SCTP_DISPOSITION} under @b{SOCKET OPTIONS}.
+@end table
+
+Other message flags have the same interpretation as described in @manref{send(2)},
+@manref{sendto(2)} and @manref{sendmsg(2)}.
+
+@item @manref{shutdown(2)}
+@itemx @manref{close(2)}
+@emph{SCTP} supports orderly release using @manref{shutdown(2)} and both orderly and abortive
+release using @manref{close(2)} similar to @manref{tcp(7)}.
+
+When the @samp{SHUT_RD} flag is given to @manref{shutdown(2)}, receive will be disabled locally and
+further receive operations on the socket will fail.  When the @samp{SHUT_WR} or @samp{SHUT_RDWR}
+flag is given to @manref{shutdown(2)}, orderly release will be initiated and further send operations
+on the socket will fail.
+
+Distinctions between orderly and abortive release when @manref{close(2)} or @manref{exit(2)} are
+called are similar to that of @manref{tcp(7)}.
+@end table
+
+@node sctp(7) FEATURES
+@unnumberedsubsec FEATURES
+
+@emph{SCTP} provides the following basic features:
+
+@itemize @bullet
+@item Compiled into kernel or as a loadable module.
+@item Standards support for socket type @samp{SOCK_SEQPACKET}.
+@item Supports a partial packet delivery interface on all packets.  @samp{MSG_TRUNC} set when
+receiving a packet does not discard the remainder of the packet but permits subsequent reads to read
+the remainder of the packet.
+@item Silly Window Syndrome (SWS) avoidance per @uref{http://www.ietf.org/rfcs/rfc1122.txt,RFC
+1122}.  Section 4.2.3.2 and 4.2.3.3 as recommended in the SCTP Implementor's Guide.
+@item Nagle algorithm per @uref{http://www.ietf.org/rfcs/rfc0896.txt,RFC 896} and
+@uref{http://www.ietf.org/rfcs/rfc1122.txt,RFC 1122}.  Section 4.2.3 with delayed ACK modifications
+presented by Minshall in
+@uref{http://www.ietf.org/internet-drafts/draft-minshall-tsvwg-nagle-01.txt,
+<draft-minshall-tsvwg-nagle-01.txt>}.
+@item Message disposition and retrieval on connection shutdown or abort, lifetime expiry, and
+receipt confirmation acknowledgment.
+@item Support for hardware assisted checksum for drivers which support @samp{NETIF_F_HW_CSUM}.
+@item Support for hardware assisted scatter/gather and fragmentation for devices which support
+@samp{NETIF_F_SG} and @samp{NETIF_F_FRAGLIST}.
+@item For security of HMACs, @emph{SCTP} includes a re-keying algorithm for secret keys that rotates
+secret keys after the key's first cookie lifetime to provide for maximum security for HMACs.
+@item High performance routing algorithm alters multi-homed routes on a per-packet basis.
+@item Wide range of settings for timers and protocol parameters permitting fast (average 5ms with
+100Hz tick clock; 0.5ms with 1000Hz tick clock) failover between failed destination addresses on
+high-speed networks.
+@item Deferral of checksum calculation until after socket lookup for protection from software
+checksum DoS attacks.
+@item Support for the changes and modifications in the SCTP Implementers Guide
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
+<draft-ietf-tsvwg-sctpimpguide-10.txt>}.  (See @b{CAVEATS}.).
+@end itemize
+
+@emph{SCTP} provides the following added features:
+
+@itemize @bullet
+@item A @manref{tcp(7)}-compatible mode for sockets of type @samp{SOCK_STREAM} when @emph{SCTP} is
+compiled with kernel configuration parameter @samp{CONFIG_SCTP_TCP_COMPATIBLE} set.
+@item A @manref{udp(7)}-compatible mode for sockets of type @samp{SOCK_RDM} when @emph{SCTP} is
+compiled with kernel configuration parameter @samp{CONFIG_SCTP_UDP_COMPATIBLE} set.
+@item Support for both Adler32 and CRC-32c checksums with automatic detection of checksum on receive
+when @emph{SCTP} is compiled with kernel configuration parameters @samp{CONFIG_SCTP_ADLER_32} or
+@samp{CONFIG_SCTP_CRC_32C} set.
+@item Support for multiple HMAC types when compiled with kernel configuration parameters
+@samp{CONFIG_SCTP_HMAC_SHA_1} or @samp{CONFIG_SCTP_HMAC_MD5}.
+@item Support for @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} Appendix A and
+@uref{http://www.ietf.org/rfcs/rfc3168.txt,RFC 3168} compatible Explicit Congestion Notification
+when compiled with kernel configuration parameter @samp{CONFIG_SCTP_ECN} set.
+@item Support for @uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-addip-sctp-08.txt,
+<draft-ietf-tsvwg-addip-sctp-08.txt>} Adaptation Layer Indication when compiled with kernel
+configuration parameter @samp{CONFIG_SCTP_ADAPTATION_LAYER_INFO} set.
+@item Support for @b{ADD-IP} extensions from
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-addip-sctp-08.txt,
+<draft-ietf-tsvwg-addip-sctp-08.txt>} when compiled with kernel configuration parameter
+@samp{CONFIG_SCTP_ADD_IP} set.
+@item Support for @b{PR-SCTP} extensions as described in @uref{http://www.ietf.org/rfcs/rfc3758.txt,
+RFC 3758} when compiled with kernel configuration parameter @samp{CONFIG_SCTP_PARTIAL_RELIABILITY}
+set.
+@end itemize
+
+@node sctp(7) SYSCTLS
+@unnumberedsec SYSCTLS
+
+@emph{SCTP} provides and supports a number of system controls that can be accessed using the
+@file{/proc/sys/net/ipv4/*} files, with the @manref{sysctl(2)} interface or using
+@manref{sysctl(8)}.
+
+@emph{SCTP} supports all @manref{socket(7)} system controls @b{rmem_default}, @b{rmem_max},
+@b{wmem_default}, @b{wmem_max}, @b{msg_cost}, @b{msg_burst}, @b{netdev_max_backlog} and
+@b{optmem_max} in the normal fashion.  For more information, see @manref{socket(7)}.
+
+@emph{SCTP} supports @manref{ip(7)} system controls @b{ip_default_ttl}, @b{ip_dynaddr},
+@b{ip_autoconfig}, @b{ip_local_port_range} and @b{ip_no_pmtu_disc} in the normal fashion.
+@manref{ip(7)} system controls @b{ip_forward}, @b{ipfrag_high_thresh}, @b{ipfrag_low_thresh} and
+@b{ip_always_defrag} are not applicable to @emph{SCTP}.  For more information, see @manref{ip(7)}.
+
+The following @emph{SCTP} specific system controls are provided by @emph{SCTP}:
+
+@table @code
+@item sctp_csum_type
+Defines the default checksum algorithm that will be used when checksumming packets associated with a
+socket.  Valid values are as follows:
+
+@table @code
+@item SCTP_CSUM_ADLER_32
+for the @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} Appendix B algorithm.  To set this
+value, @emph{SCTP} must have been compiled with @samp{CONFIG_SCTP_ADLER_32} or without
+@samp{CONFIG_SCTP_CRC_32C}.  When computed in software, Adler 32 checksum algorithm is more amenable
+to Van Jacobson partial checksum and copy from user approaches and exhibits higher performance than
+CRC-32c.
+
+@item SCTP_CSUM_CRC_32C
+for the @uref{http://www.ietf.org/rfcs/rfc3309.txt,RFC 3309} CRC-32c checksum algorithm.  To set
+this value, @emph{SCTP} must have been compiled with @samp{CONFIG_SCTP_CRC_32C}.  When computed in
+software, CRC-32c checksum is more processor intensive than Adler-32.
+@end table
+
+As @uref{http://www.ietf.org/rfcs/rfc3309.txt,RFC 3309} has been approved and replaces
+@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} checksum algorithm, the default value for this
+system control is now @samp{SCTP_CSUM_CRC_32C}.  This value may also be set for a given socket using
+the @samp{SCTP_CKSUM_TYPE} socket option as described in @b{SOCKET OPTIONS}.  This system control
+will soon be deprecated, should always be set to @samp{SCTP_CSUM_CRC_32C} and should not be used by
+portable programs.
+
+@item sctp_mac_type
+Defines the default MAC (Message Authentication Code) type that will be used when signing cookies in
+INIT-ACK messages.  Valid values are:
+
+@table @code
+@item SCTP_HMAC_SHA_1
+for the @cite{FIPS 180-1 Secure Hash Algorithm} SHA-1 HMAC.  SHA-1 performs well on big-endian
+machines.  This option setting is only supported if @emph{SCTP} was compiled with the kernel
+configuration parameter @samp{CONFIG_SCTP_HMAC_SHA1} set.
+
+@item SCTP_HMAC_MD5
+for the @uref{http://www.ietf.org/rfcs/rfc1321.txt,RFC 1321} @cite{Message Digest 5} HMAC.  MD5
+performs well on little-endian machines.  This option setting is only supported if @emph{SCTP} was
+compiled with the kernel configuration parameter @samp{CONFIG_SCTP_HMAC_MD5} set.
+
+@item SCTP_HMAC_NONE
+for no secure signature.  Not signing the cookie performs well on all machines; however, this option
+should only be used if some other mechanism provides security (such as IPSec) or the system is
+closed and trusted.  This option setting is always supported.
+@end table
+
+There is no required or recommended value in @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960}.
+The default value is (in priority of availability) @samp{SCTP_HMAC_MD5}, @samp{SCTP_HMAC_SHA_1},
+then @samp{SCTP_HMAC_NONE}.  This system control defines the default for new sockets.  The MAC for a
+given socket can be changed before the call to @manref{listen(2)}, or before receiving a passive
+connection attempt, with the socket option @samp{SCTP_MAC_TYPE} as described under @b{SOCKET
+OPTIONS}.
+
+@item sctp_valid_cookie_life
+Defines the default time interval (in milliseconds) in conjunction with @b{sctp_cookie_inc} beyond
+which a COOKIE-ECHO received with a cookie sent in a INIT-ACK will not longer be accepted.  For
+@emph{SCTP}, this also limits the default maximum time interval for which the HMAC secret key for
+the cookie will be valid.  Valid values are zero (0) or greater (@code{INT_MAX}).  Values of zero
+(0) will be converted to a Linux system clock tick (1000/HZ milliseconds).  The default value is the
+value recommended in @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (60,000 milliseconds).
+This system control defines the default for new sockets.  The value for a given socket can be
+changed with the socket option @samp{SCTP_COOKIE_LIFE} before a call to @manref{listen(2)}, or
+before receiving passive connection attempt, as described under @b{SOCKET OPTIONS}.
+
+Reducing this value will increase the chances that passive connection attempts will fail due to
+expired cookies.  Increasing the value will reduce the overall security of the system by permitting
+attackers and increased interval to crack HMACs and guess verification tags.  This value may be
+adjusted in conjunction with @b{sctp_cookie_inc} to meet most objectives for successful passive
+connection attempts with the best security afforded by smaller values of @b{sctp_valid_cookie_life}.
+
+Unfortunately the @samp{SCTP_COOKIE_LIFE} and @samp{SCTP_COOKIE_INC} must be adjusted to accommodate
+the slowest peer on the slowest connection.  The default setting is adequate for Internet
+applications.
+
+@item sctp_cookie_inc
+Defines the default time increment (in milliseconds) that will be added to the lifespan of the
+cookie in an INIT ACK if the received INIT requests cookie preservative to lengthen the lifespan of
+the cookie.  Valid values are zero (0) or greater (@code{INT_MAX}).  The default value is the value
+recommended in @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} 5.2.6 (1,000 milliseconds).
+This system control defines the default for new sockets.  The cookie lifetime increment for a given
+socket can be changed before a call to @manref{listen(2)}, or before receiving a passive connection
+attempt, with the socket option @samp{SCTP_COOKIE_INC} as described under @b{SOCKET OPTIONS}.
+
+This value can be adjusted in conjunction with @b{sctp_valid_cookie_life}, above, to meet objectives
+of successful passive connection attempts and security.  The default setting is adequate for
+Internet applications.
+
+@item sctp_throttle_itvl
+Defines the default time interval (in milliseconds) within which the receiver will not accept more
+than one INIT or COOKIE ECHO.  Zero (don't throttle) is a valid value.  The default value is 50
+milliseconds.  This system control defines the default for new sockets.  The throttle interval for a
+given socket can be changed before the call to @manref{listen(2)}, or before a passive connection
+attempt, with the socket option @samp{SCTP_THROTTLE_ITVL} as described under @b{SOCKET OPTIONS}.
+
+When the HMAC type is SHA-1 or MD5, and when CRC-32c software checksum is used, the implementation
+is particularly vulnerable to DoS flood attacks using bogus INIT or COOKIE ECHO messages.  When
+@emph{SCTP} is compiled with @samp{CONFIG_SCTP_THROTTLE_PASSIVEOPENS}, this permits the throttling
+of INIT and COOKIE ECHO messages.  Only one INIT and one COOKIE ECHO message will be accepted in the
+interval set by this control.
+
+@item sctp_max_istreams
+Defines the default maximum number of inbound streams that will be requested when forming or
+receiving connections on a socket.  Valid values are in the range from 1 to 65,535 streams.  This
+system control defines the default for new sockets.  The actual value used by a socket for both
+outgoing and incoming connections can be changed with the socket option @samp{SCTP_ISTREAMS} before
+a call to @manref{connect(2)} or @manref{accept(2)} as described under @b{SOCKET OPTIONS}.
+
+Usable default values for @b{sctp_max_istreams} are highly dependent upon the intended applications.
+@b{SIGTRAN} UAs, for example, seldom need more than 257 inbound or outbound streams.  The default
+valid is set to thirty-three (33) streams for @samp{SOCK_SEQPACKET} sockets.  This system control
+only affects @samp{SOCK_SEQPACKET} sockets: @samp{SOCK_STREAM} sockets always have both inbound and
+outbound streams set to one (1).
+
+@item sctp_req_ostreams
+Defines the default requested number of outbound streams that will be requested when forming or
+receiving connections on a socket.  Valid values are in the range from 1 to 65,535 streams.  This
+system control defines the default for new sockets.  The actual value used by a socket for both
+outgoing and incoming connections can be changed with socket option @samp{SCTP_OSTREAMS} before a
+call to @manref{connect(2)} or @manref{accept(2)} as described under @b{SOCKET OPTIONS}.
+
+Usable default values for @b{sctp_max_istreams} are highly dependent upon the intended applications.
+@b{SIGTRAN} UAs, for example, seldom need more than 257 inbound or outbound streams.  The default
+valid is set to one (1) streams for @samp{SOCK_SEQPACKET} sockets.  This system control only affects
+@samp{SOCK_SEQPACKET} sockets: @samp{SOCK_STREAM} sockets always have both inbound and outbound
+streams set to one (1).
+
+@item sctp_ecn
+Defines a default flag that allows disabling of Explicit Congestion Notification (ECN) operation for
+@emph{SCTP} when cleared.  This system control defines the default for new sockets.  ECN can be
+overridden on a per-socket basis with the socket option @samp{SCTP_ECN}, as described under
+@b{SOCKET OPTIONS}.  For this system control to have any effect, the kernel must have been compiled
+with both kernel configuration parameters @samp{CONFIG_INET_ECN} and @samp{CONFIG_SCTP_ECN} set.
+
+@item sctp_adaptation_layer_info
+Defines the default adaptation layer information flags that will be sent in an INIT or INIT-ACK
+message.  Valid values include any 32-bit unsigned integer.  The default value for backward
+compatibility is zero (0) which indicates to not send the Adaptation Layer Information parameter in
+INIT and INIT-ACK.  This system control defines the default for new sockets.  The actual value for
+both outgoing and incoming connections can be changed with socket option @samp{SCTP_ALI} before a
+call to @manref{connect(2)} or @manref{listen(2)}, or before a passive connection indication on a
+listening socket, as described under @b{SOCKET OPTIONS}.  For this system control to have any
+effect, the kernel must have been compiled with kernel configuration parameter
+@samp{CONFIG_SCTP_ADAPTATION_LEVEL_INFO} set.
+
+@item sctp_partial_reliability
+Defines the default partial reliability preference that will be used for the socket.  Valid values
+include zero (0) \- no partial reliability reported, one (1) partial reliability support preferred
+but not required, and two (2), partial reliability support required.  The default value for backward
+compatibility is zero (0).  This system control defines the default for new sockets.  The actual
+value for both outgoing and incoming connections can be changed with socket option @samp{SCTP_PR}
+before a call to @manref{connect(2)} or @manref{listen(2)}, or before a passive connection
+indication on a listening socket, as described under @b{SOCKET OPTIONS}.  For this system control to
+have any effect, the kernel must have been compiled with kernel configuration parameter
+@samp{CONFIG_SCTP_PARTIAL_RELIABILITY} set.
+
+@item sctp_wmem
+Defines three values (lower, default, upper) for the socket write buffer.  The value associated with
+a given socket can also be changed with the @samp{SO_SNDBUF} option, see @manref{socket(7)}.
+
+@item sctp_rmem
+Defines three values (lower, default, upper) for the socket read buffer.  The value associated with
+a given socket can also be changed with the @samp{SO_RCVBUF} option, see @manref{socket(7)}.
+
+@item sctp_max_init_retries
+Defines the default number of times that an INIT or COOKIE-ECHO will be resent to a given
+destination before abandoning an active open attempt.  Valid values are zero (0) or greater
+(@code{INT_MAX}).  The default value is the value recommended in
+@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (8 retries).  This system control defines the
+default for new sockets.  The value for a given socket can be changed with the socket option
+@samp{SCTP_MAX_INIT_RETRIES} as described under @b{SOCKET OPTIONS}.
+
+@item sctp_max_burst
+Defines the default maximum number of MTUs of new data chunks that will be sent in a burst in
+accordance with @uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
+<draft-ietf-tsvwg-sctpimpguide-10.txt>}.  Valid values are one (1) or greater (@code{INT_MAX}).  The
+default value is the value recommended in
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
+<draft-ietf-tsvwg-sctpimpguide-10.txt>} (4 MTUs).  This system control defines the default for new
+sockets.  The value for a given socket can be changed with the socket option @samp{SCTP_MAX_BURST}
+as described under @b{SOCKET OPTIONS}.
+
+@item sctp_assoc_max_retrans
+Defines the number of times that the sending endpoint will attempt retransmitting a packet on any
+active destination transport address before it aborts the association.  Valid values are zero (0) or
+greater (@code{INT_MAX}).  The default value is the value recommended in
+@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (10 retries).  This system control defines the
+default for new sockets.  The value for a given socket can be changed with the socket option
+@samp{SCTP_ASSOC_MAX_RETRANS} as described under @b{SOCKET OPTIONS}.
+
+This value should be larger than the sum of the @b{sctp_path_max_retrans} values of each of the
+destinations.  Setting this value to less that sum of the @b{sctp_path_max_retrans} values for all
+of the destinations has the interesting effect of permitting a connection to persist even when all
+destinations have been deemed inactive.
+
+@item sctp_max_sack_delay
+Defines the default interval of time (in milliseconds) that the sending endpoint is permitted to
+delay an acknowledgment of received data.  Valid values are in the range from zero (0) to 500
+milliseconds.  (@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} forbids setting this value
+larger than 500 milliseconds.) The default value is the value recommended in
+@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (200 milliseconds).  This system control
+defines the default for new sockets.  The value for a given socket can be changed with the socket
+option @samp{SCTP_SACK_DELAY} as described under @b{SOCKET OPTIONS}.
+
+@item sctp_rto_min
+Defines the default time interval (in milliseconds) that will be used as a RTO (Retransmission Time
+Out) value when sending packets to a destination transport address.  Valid values are zero (0) or
+greater (@code{INT_MAX}) and must be less than or equal to both @b{sctp_rto_initial} and
+@b{sctp_rto_max}.  The default value is the value recommended in
+@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (1,000 milliseconds).  The actual value used
+can be changed with the socket option @samp{SCTP_RTO_MIN} before a call to @manref{connect(2)} or
+@manref{accept(2)} or before a new destination transport address is added by the peer.  After a
+socket is connected or a destination transport address has been added, the destination-specific
+value can be changed using the socket option @samp{SCTP_RTO} as described under @b{SOCKET OPTIONS}.
+
+In general, @b{sctp_rto_min} should not be less than the peer's @b{sctp_max_sack_delay}.  Otherwise,
+excessive retransmissions might occur while the peer is delaying acknowledgments.
+
+@item sctp_rto_initial
+Defines the default time interval (in milliseconds) that will be used as an initial RTO
+(Retransmission Time Out) value when sending packets to a destination for the first time, or after
+the destination has been idle for some time.  Valid values are zero (0) or greater (@code{INT_MAX})
+and must be in the range from @b{sctp_rto_min} to @b{sctp_rto_max}.  The default value is the value
+recommended in @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (3,000 milliseconds).  This
+system control defines the default for new sockets.  The actual value used can be changed with the
+socket option @samp{SCTP_RTO_INITIAL} before a call to @manref{connect(2)} or @manref{accept(2)} or
+before a new destination transport address is added by the peer.  After a socket is connected or a
+destination transport address has been added, the destination-specific value can be changed using
+the socket option @samp{SCTP_RTO} as described under @b{SOCKET OPTIONS}.
+
+In general, @b{sctp_rto_initial} should not be less than the peer's @b{sctp_max_sack_delay}.
+Otherwise, excessive retransmissions might occur while the peer is delaying acknowledgments.
+
+@item sctp_rto_max
+Defines the default time interval (in milliseconds) that will be used as a maximum RTO
+(Retransmission Time Out) value when sending packets to a destination.  Valid values are zero (0) or
+greater (@code{INT_MAX}) and must be greater than or equal to both @b{sctp_rto_min} and
+@b{sctp_rto_initial}.  The default value is the value recommended in
+@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (60,000 milliseconds).  This system control
+defines the default maximum for new sockets.  The actual value used can be changed with the socket
+option @samp{SCTP_RTO_MAX} before a call to @manref{connect(2)} or @manref{accept(2)} or before a
+new destination transport address is added by the peer.  After an socket is connected or a
+destination transport address has been added, the destination-specific value can be changed using
+the socket option @samp{SCTP_RTO} as described under @b{SOCKET OPTIONS}.
+
+In general, @b{sctp_rto_initial} should not be less than the peer's @b{sctp_max_sack_delay}.
+Otherwise, excessive retransmissions might occur while the peer is delaying acknowledgments.
+
+@item sctp_path_max_retrans
+Defines the default number of times that @emph{SCTP} will attempt retransmitting a packet on to a
+given destination transport address before it considers that destination transport address inactive.
+Valid values are zero (0) or greater (@code{INT_MAX}).  The default value is the value recommended
+in @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (5 retries).  This system control defines
+the default maximum for new sockets.  The actual value used can be changed with the socket option
+@samp{SCTP_PATH_MAX_RETRANS} before a call to @manref{connect(2)} or @manref{accept(2)} or before a
+new destination transport address is added by the peer.  After a socket is connected or a
+destination transport address has ben added, the destination-specific value can be changed using the
+socket option @samp{SCTP_RTO} as described under @b{SOCKET OPTIONS}.
+
+Adjusting this value has an effect on the period of time taken to fail-over between destinations for
+multi-homed connections.  Lower values (including zero) will yield faster fail-over response times.
+Lower values, however, may cause thrashing between destinations contributing to congestion in the
+network.  Default values are applicable to Internet applications.
+
+@item sctp_heartbeat_itvl
+Defines the default interval (in seconds) between successive HEARTBEAT messages used to probe
+destination transport address for RTT calculation and activity.  Valid values are 1 second or
+greater.  The default value is the value recommended in
+@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (30 seconds).  This system control defines the
+default for new sockets.  The actual value used can be changed with the socket option
+@samp{SCTP_HEARTBEAT_ITVL} before a call to @manref{connect(2)} or @manref{accept(2)} or before a
+new destination transport address is added by the peer.  After a socket is connected or a
+destination transport address has been added, the destination-specific value can be changed using
+the socket option @samp{SCTP_HB} as described under @b{SOCKET OPTIONS}.
+
+If the kernel configuration parameter @samp{CONFIG_SCTP_THROTTLE_HEARTBEATS} is set, then half this
+value is also used for throttling heartbeats.  Then only two heartbeats per interval are permitted,
+any additional heartbeats are discarded.
+@end table
+
+@node sctp(7) SOCKET OPTIONS
+@unnumberedsec SOCKET OPTIONS
+To set or get a socket option, call @manref{getsockopt(2)} to read or @manref{setsockopt(2)} to
+write the option with the socket @i{level} argument set to @samp{SOL_SCTP}.  In addition, most
+@samp{SOL_SOCKET} and @samp{SOL_IP} socket options are valid on @emph{SCTP} sockets.  For more
+information see @manref{socket(7)} and @manref{ip(7)}.
+
+The following @samp{SOL_SOCKET} @manref{socket(7)} socket options are supported by @emph{SCTP}:
+
+@table @code
+@item  SO_KEEPALIVE
+Set or get a flag that controls heartbeats for the entire association.  See @manref{socket(7)} for
+additional information.
+
+Normally @emph{SCTP} is required to send HEARTBEAT chunks on a per-destination basis.  Clearing this
+flag (setting @samp{SO_KEEPALIVE} to zero) disables exchanging heartbeats on an association level.
+Exchanging heartbeats is an essential part of the Stream Control Transmission Protocol (SCTP).  It
+is required for clearing retransmission counts against destinations that otherwise will not be
+cleared if no data is sent and acknowledged to that destination.  Disabling heartbeats is provided
+for in the SCTP specifications (@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960}); however,
+disabling heartbeats is not recommended.  This is in contrast to @manref{tcp(7)} that only rarely
+heartbeats and for which heartbeats are neither an essential nor necessary part of the protocol.
+
+Heartbeats can also be enabled or disabled on a destination basis using the @samp{SCTP_HB} socket
+option.  It is also possible to generate a HEARTBEAT under user control by sending heartbeat data
+with the @samp{MSG_PROBE} flag set using @manref{send(2)}, @manref{sendto(2)} or
+@manref{sendmsg(2)}.
+
+@item SO_OOBINLINE
+If this option is enabled, out of order data that has been received on a stream will be placed
+between the ordered data for that stream.  Otherwise, out of order data is only returned on a read
+call when the @samp{MSG_OOB} flag is set when receiving.  This option is ignored for @samp{SOCK_RDM}
+sockets and only applies to @samp{SOCK_STREAM} and @samp{SOCK_SEQPACKET} sockets.  See
+@manref{socket(7)} for additional information.
+
+@item SO_BINDTODEVICE
+Binds the socket to a particular device.  This is not yet supported for @emph{SCTP}; however,
+support for it is planned for the future.  See @manref{socket(7)} for additional information.
+
+@item SO_REUSEADDR
+Supported by @emph{SCTP} without modification; however, consideration is made for binding of
+multiple transport addresses.  See @manref{socket(7)} for additional information.
+
+@item SO_RCVLOWAT
+@itemx SO_SNDLOWAT
+@itemx SO_RCVTIMEO
+@itemx SO_SNDTIMEO
+@itemx SO_DEBUG
+@itemx SO_TYPE
+@itemx SO_DONTROUTE
+@itemx SO_SNDBUF
+@itemx SO_RCVBUF
+@itemx SO_LINGER
+@itemx SO_PRIORITY
+@itemx SO_ERROR
+These socket options are supported by @emph{SCTP} without modification.  See @manref{socket(7)} for
+additional information.
+@end table
+
+The following @samp{SOL_IP} @manref{ip(7)} socket options are supported by @emph{SCTP}:
+
+@table @code
+@item IP_OPTIONS
+Set or get the IP options to be sent with every packet from this socket.  See @manref{ip(7)} for
+additional information.
+
+@item IP_PKTINFO
+Pass an @samp{IP_PKINFO} ancillary message that contains the @b{pktinfo} structure that supplies
+some information about the incoming or outgoing packet.  This only works for @samp{SOCK_SEQPACKET}
+and @samp{SOCK_RDM} sockets.  It is ignored for @samp{SOCK_STREAM} sockets.  For
+@manref{setsockopt(2)} and @manref{getsockopt(2)}, the argument is a flag that tells the socket
+whether the @samp{IP_PKTINFO} message should be passed or not.  The message itself can only be sent
+or retrieved as a control message with a packet using @manref{recvmsg(2)} or @manref{sendmsg(2)}.
+
+@example
+struct in_pktinfo @{
+    unsigned int    ipi_ifindex;    /* Interface index      */
+    struct in_addr  ipi_spec_dst;   /* Local address        */
+    struct in_addr  ipi_addr;       /* Header Dest Address  */
+@};
+@end example
+
+@table @samp
+@item ipi_ifindex
+is the unique index of the interface the packet was received on, or the index of the interface upon
+which the packet is to be sent;
+
+@item ipi_spec_dst
+is the local address of the received packet or sent packet, and
+
+@item ipi_addr
+is the destination address in the packet header.
+@end table
+
+If @samp{IP_PKTINFO} is passed to @manref{sendmsg(2)} then the outgoing packet will be sent over the
+interface specified in @i{ipi_ifindex} with the destination address set to @i{ipi_spec_dst}.
+
+This option is used to control the source (local) address of packets sent with @manref{sendmsg(2)}
+and to retrieve the destination (local) address of packets received with @manref{recvmsg(2)}.  See
+@manref{ip(7)} for additional information.
+
+Support for @samp{IP_PKTINFO} is similar to support for this socket option under @manref{udp(7)}.
+Under @manref{udp(7)}, @samp{IP_PKTINFO} is used for multi-homed UDP hosts to specify the local
+address to @manref{sendmsg(2)} and return remote address from @manref{recvmsg(2)}.  @emph{SCTP} uses
+this in a similar fashion where the choice of addresses consists of the address space of the
+association.
+
+@item IP_RECVTOS
+Set or get the flag indicating whether the @manref{recvmsg(2)} call will return the type of service
+field for the received packet in an ancillary message as a @samp{IP_TOS} control message for sockets
+of type @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM}.  This option is ignored for @samp{SOCK_STREAM}
+sockets.  See @manref{ip(7)} for additional information.
+
+@item IP_RECVTTL
+Set or get the flag indicating whether the @manref{recvmsg(2)} call will return the time to live
+field for the received packet in an ancillary message as a @samp{IP_TTL} control message for sockets
+of type @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM}.  This option is ignored for @samp{SOCK_STREAM}
+sockets.  See @manref{ip(7)} for additional information.
+
+@item IP_RECVOPTS
+Set or get the flag indicating whether the @manref{recvmsg(2)} call will return the IP options for
+the received packet in an ancillary message as an @samp{IP_OPTIONS} control message for sockets of
+type @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM}.  This option is ignored for @samp{SOCK_STREAM}
+sockets.  See @manref{ip(7)} for additional information.
+
+@item IP_RETOPTS
+Set or get the flag indicating whether the @manref{recvmsg(2)} call will return the IP options for
+the received packet in an ancillary message as an @samp{IP_RETOPTS} control message for sockets of
+type @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM}.  This option is ignored for @samp{SOCK_STREAM}
+sockets.  See @manref{ip(7)} for additional information.
+
+In contrast to @samp{IP_OPTIONS}, the @samp{IP_RETOPTS} ancillary message contains raw, unprocessed
+options, with the time stamp and route record options not filled in for this hop.  It is also
+possible to pass an @samp{IP_RETOPTS} ancillary message to @manref{sendmsg(2)}.
+
+@item IP_TOS
+Set or get the default type of service to be used in IP packets associated with the connection.  For
+@samp{SOCK_SEQPACKET} and @samp{SOCK_RDM} sockets, this option can also be passed to
+@manref{sendmsg(2)} in the ancillary data and will be used as the type of service field in the IP
+packet containing the data chunk associated with the user data provided in the call to
+@manref{sendmsg(2)}.  For @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM} sockets, this option returns the
+type of service parameter associated with a packet in the ancillary data returned from a call to
+@manref{recvmsg(2)} when the @samp{IP_RECVTOS} option has been set on the socket.  This option is
+ignored for @samp{SOCK_STREAM} sockets.  See @manref{ip(7)} for additional information.
+
+@item IP_TTL
+Set or get the default time to live to be used in IP packets associated with the connection.  This
+option can also be passed to @manref{sendmsg(2)} in the ancillary data and will be used as the time
+to live field in the IP packet containing the data chunk associated with the user data provided in
+the call to @manref{sendmsg(2)}.  See @manref{ip(7)} for additional information.
+
+@item IP_MTU
+For @emph{SCTP} sockets, this returns only the Path MTU for the association.  This value is the
+minimum MTU of all the peer destinations.  See @emph{SCTP} socket options for a mechanism for
+obtaining MTU on a per-destination basis.  When the peer is not multi-homed, this option returns the
+same value as would be obtained on a per-destination basis.  See @manref{ip(7)} for additional
+information.
+
+@item IP_RECVERR
+For @emph{SCTP} sockets, this enables extended reliable error messages with the use of
+@samp{SO_ERROR} as for @manref{tcp(7)}.  Error queues are not supported for @emph{SCTP} (they are
+not supported for @manref{tcp(7)} either).  As for @manref{tcp(7)}, @emph{SCTP} does not permit
+calling @manref{recvmsg(2)} with the @samp{MSG_ERRQUEUE} flag for @samp{SOCK_SEQPACKET} and
+@samp{SOCK_STREAM} sockets.
+
+@item IP_PMTU_DISCOVER
+Supported for @emph{SCTP} sockets without modification.  See @manref{ip(7)} for additional
+information.
+@end table
+
+
+The following @samp{SOL_SCTP} socket options are supported: (A number of the following socket
+options may also be passed as an ancillary message with level @samp{SOL_SCTP} when calling
+@manref{sendmsg(2)} or returned as a control message from a call to @manref{recvmsg(2)}.)
+
+@table @code
+
+@item SCTP_NODELAY
+Turn the Nagle algorithm off.  This means that packets are always sent as soon as possible and no
+unnecessary delays are introduced, at the cost of more packets in the network.  Expects an integer
+boolean flag.
+
+This parallels the @samp{TCP_NODELAY} socket option for compatibility with @manref{tcp(7)}.
+@samp{SCTP_NODELAY} and @samp{TCP_NODELAY} can be used interchangeably.  For @samp{SOCK_STREAM}
+sockets, this setting applies to the default stream as set by the @samp{SCTP_SID} socket option.
+For regular @samp{SOCK_SEQPACKET} sockets, this setting applies to the entire association.  For
+@samp{SOCK_STREAM} sockets, this setting has the same effect as @manref{tcp(7)}.  This option has no
+effect on @samp{SOCK_RDM} sockets.  See @manref{tcp(7)} for additional information.
+
+When Nagle is enabled, @emph{SCTP} uses the Nagle algorithm
+(@uref{http://www.ietf.org/rfcs/rfc0896.txt,RFC 896}) for bundling DATA chunks into a packet.  This
+results in far fewer short packets in the network.  The algorithm is that described in
+@uref{http://www.ietf.org/rfcs/rfc0896.txt,RFC 896} and
+@uref{http://www.ietf.org/rfcs/rfc1122.txt,RFC 1122} with the Minshall modifications to accommodate
+delayed SACK as described in
+@uref{http://www.ietf.org/internet-drafts/draft-minshall-tsvwg-nagle-01.txt,
+<draft-minshall-tsvwg-nagle-01.txt>}.  (Note: later versions of @manref{tcp(7)} also in include the
+Minshall modification).
+
+@item SCTP_MAXSEG
+Set or get the maximum segment size for outgoing packets.  Values greater than the association MTU
+are ignored and have no effect.
+
+This parallels the @samp{TCP_MAXSEG} socket option for compatibility with @manref{tcp(7)}.
+@samp{SCTP_MAXSEG} and @samp{TCP_MAXSEG} can be used interchangeably.  This option is applicable to
+both @samp{SOCK_SEQPACKET} and @samp{SOCK_STREAM} sockets.
+
+This value determines the maximum size (in bytes) above which @emph{SCTP} will fragment larger DATA
+chunks into smaller DATA chunks, and beneath which @emph{SCTP} will bundle DATA chunks into a single
+packet or combine smaller DATA chunks into larger DATA chunks.  Normally this value is the
+association MTU value minus the size of the current IP and SCTP headers, minus the size of one DATA
+chunk header.  If the user sets this to a lower value, the lower value will be used.
+
+@item SCTP_CORK
+If enabled don't send out partial frames.  All queued partial frames are sent when the option is
+cleared again.  This is useful for prefixing headers before calling @manref{sendfile(2)}, or for
+throughput optimization.  This option cannot be combined with @samp{SCTP_NODELAY}.
+
+This parallels the @samp{TCP_CORK} socket option for compatibility with @manref{tcp(7)}.
+@samp{SCTP_CORK} and @samp{TCP_CORK} can be used interchangeably.  For @samp{SOCK_STREAM} sockets,
+this setting applies to the default stream as set by the @samp{SCTP_SIB} socket option.  For regular
+@samp{SOCK_SEQPACKET} sockets, this setting applies to the entire association.  This option has no
+effect on @samp{SOCK_RDM} sockets.
+
+@item SCTP_SID
+Set or get the default stream identifier for all outgoing packets associated with the connection.
+If @samp{SCTP_SID} is passed to @manref{sendmsg(2)} then the outgoing packet will be sent over the
+stream specified by the integer stream identifier contained in the ancillary message.   If
+@samp{SCTP_SID} is received from a call to @manref{recvmsg(2)} then the incoming packet was received
+over the stream specified by the integer stream identifier contained in the ancillary message.  See
+also @samp{SCTP_RECVSID}.
+
+@item SCTP_PPI
+Set or get the default payload protocol identifier for all outgoing packets.  If @samp{SCTP_PPI} is
+passed to @manref{sendmsg(2)} then the outgoing packet will be sent with the payload protocol
+identifier specified by the integer payload protocol identifier contains in the ancillary message.
+If @samp{SCTP_PPI} is received from a call to @manref{recvmsg(2)} then the incoming packet was
+received with the payload protocol identifier specified the integer payload protocol identifier
+contained in the ancillary message.  See also @samp{SCTP_RECVPPI}.
+
+@item SCTP_RECVSID
+When this flag is set, pass a @samp{SCTP_SID} control message with the stream identifier for
+received packets as an integer in an ancillary message that may be received with
+@manref{recvmsg(2)}.  Otherwise, no @samp{SCTP_SID} control message will be passed with normal data.
+@samp{SCTP_SID} is always passed for retrieved or negatively acknowledged data.
+
+@item SCTP_RECVPPI
+When this flag is set, pass a @samp{SCTP_PPI} control message with the payload protocol identifier
+for received packets as an integer in an ancillary message that may be received with
+@manref{recvmsg(2)}.  Otherwise, no @samp{SCTP_PPI} control message will be passed with normal data.
+@samp{SCTP_PPI} is always passed for retrieved or negatively acknowledged data.
+
+@item SCTP_HEARTBEAT_ITVL
+Set or get the time interval (in seconds) between successive HEARTBEAT messages used to probe
+destination transport addresses for RTT calculation and activity.  Valid values are zero (0) \- do
+not heartbeat, or a value of 1 second or greater.  The default value is set by the system control
+@b{sctp_heartbeat_itvl}.  This is the default value that will be assigned to new destinations.
+Active destinations can be controlled with the socket option @samp{SCTP_HB}.  This socket option
+must be set before the call to @manref{connect(2)} or @manref{listen(2)}, or before a passive
+connection indication is received on a listening socket.
+
+@item SCTP_HB
+Set or get the heartbeat activation and interval associated with the specified destination address.
+The expected value is a @b{sctp_hbitvl} structure.  This option will return an error if it is
+attempted on a socket in the unconnected state.
+
+@example
+struct sctp_hbitvl @{
+    struct sockaddr_in
+          dest;   /* destination address      */
+    uint  active; /* activation flag          */
+    uint  itvl;   /* interval in milliseconds */
+@};
+@end example
+
+The @b{sctp_hbitvl} structure has the following fields:
+
+@table @samp
+
+@item dest
+is a @b{sockaddr_in} structure that contains the destination address to which the heartbeat setting
+applies.
+
+@item active
+is an integer boolean activation flag indicating whether heartbeat is active on the destination.
+
+@item itvl
+is the integer heartbeat interval in milliseconds.
+
+@end table
+
+For use with @manref{setsockopt(2)}, @i{dest} must be one of the valid destination addresses
+associated with the connection: that is, it must be one of the addresses returned from a call to
+@manref{getpeername(2)}.  Note that heartbeat activity and interval can also be set on an
+association basis with @samp{SO_KEEPALIVE} and @samp{SCTP_HEARTBEAT_ITVL}.
+
+@item SCTP_RTO_INITIAL
+Set or get the time interval (in milliseconds) that will be used as an initial RTO (Retransmission
+Time Out) value when sending packets to a destination for the first time.  Valid values are zero or
+greater and must be within the range from @samp{SCTP_RTO_MIN} to @samp{SCTP_RTO_MAX}.  The default
+value is the value set by @b{sctp_rto_initial}.  This socket option must be set before the call to
+@manref{connect(2)} or @manref{listen(2)}, or before a passive connection attempt, but the value may
+be controlled on active destination with the @samp{SCTP_RTO} socket option.
+
+@item SCTP_RTO_MIN
+Set or get the time interval (in milliseconds) that will be used as a minimum RTO (Retransmission
+Time Out) value when sending packets.  Valid values are zero or greater and must be less than or
+equal to the value of @samp{SCTP_RTO_MAX}.  The default value is set by the system control
+@b{sctp_rto_min}.  This socket option must be set before the call to @manref{connect(2)} or
+@manref{listen(2)}, or before a passive connection attempt, but the value associated with active
+destinations can be controlled using the @samp{SCTP_RTO} socket option.
+
+@item SCTP_RTO_MAX
+Set or get the time interval (in milliseconds) that will be used as a maximum RTO (Retransmission
+Time Out) value when sending packets.  Valid values are zero or greater and must be greater than or
+equal to the value of @samp{SCTP_RTO_MIN}.  The default value is set by the system control
+@b{sctp_rto_max}.  This socket option must be set before the call to @manref{connect(2)} or
+@manref{listen(2)}, or before a passive connection attempt, but the value associated with active
+destinations can be controlled using the @samp{SCTP_RTO} socket option.
+
+@item SCTP_PATH_MAX_RETRANS
+Set or get the number of times that the sending endpoint will attempt retransmitting a packet to a
+given destination transport address before it considers that destination transport address inactive.
+Valid values include zero.  The default values is set by the system control
+@b{sctp_path_max_retrans}.  This is the default value assigned to destinations before the call to
+@manref{connect(2)} or @manref{listen(2)}, or before a passive connection attempt.  Active
+destinations can be controlled with the @samp{SCTP_RTO} socket option.
+
+@item SCTP_RTO
+Set or get the retransmission timeout parameters associated with the specified destination address.
+The expected value is a @b{sctp_rtoval} structure.  This option will return an error if it is
+attempted on a socket in the unconnected state.
+
+@example
+struct sctp_rtoval @{
+    struct sockaddr_in
+          dest;        /* destination address        */
+    uint  rto_initial; /* RTO.Initial (milliseconds) */
+    uint  rto_min;     /* RTO.Min     (milliseconds) */
+    uint  rto_max;     /* RTO.Max     (milliseconds) */
+    uint  max_retrans; /* Path.Max.Retrans (retries) */
+@};
+@end example
+
+The @b{sctp_rtoval} structure has the following fields:
+
+@table @samp
+@item dest
+is a @b{sockaddr_in} structure that contains the destination address to which the rto parameter
+setting applies.
+
+@item rto_initial
+is the integer initial retransmission timeout value in milliseconds.  For expected values see
+@samp{SCTP_RTO_INITIAL}.
+
+@item rto_min
+is the integer minimum retransmission timeout value in milliseconds.  For expected values see
+@samp{SCTP_RTO_MIN}.
+
+@item rto_max
+is the integer maximum retransmission timeout value in milliseconds.  For expected values see
+@samp{SCTP_RTO_MAX}.
+
+@item max_retrans
+is the integer maximum number of retransmissions.  For expected values see
+@samp{SCTP_PATH_MAX_RETRANS}.
+@end table
+
+For use with @manref{setsockopt(2)}, @i{dest} must be one of the valid destination addresses
+associated with the connection: that is, it must be one of the addresses returned from a call to
+@manref{getpeername(2)}.
+
+@item SCTP_CKSUM_TYPE
+Set or get the checksum algorithm associated with socket.  Valid values are
+@samp{SCTP_CSUM_ADLER_32} and @samp{SCTP_CSUM_CRC_32C}.  The default value is set by the system
+control @b{sctp_csum_type}.  This socket option must be set before the call to @manref{connect(2)}
+or @manref{listen(2)}, or before a passive connection attempt on a listening socket.
+
+@item SCTP_MAC_TYPE
+Set or get the MAC (Message Authentication Code) type that will be used when signing cookies in INIT
+ACK messages.  Valid values are @samp{SCTP_HMAC_SHA_1}, @samp{SCTP_HMAC_MD5}, and
+@samp{SCTP_HMAC_NONE}.  The default value is set by the system control @b{sctp_mac_type}.  This
+socket option must be set before the call to @manref{listen(2)}, or before a passive connection
+attempt on a listening socket.
+
+@item SCTP_COOKIE_LIFE
+Set or get the cookie lifetime associated with a socket.  This is the amount of time that cookies
+sent to a peer endpoint in an INIT-ACK message will be valid.  For @emph{SCTP} this also limits the
+maximum for which the HMAC secret key for the cookie will be valid.  The value is a integer time
+interval in milliseconds.  Valid values are zero (0) or greater (@code{INT_MAX}).  The default value
+is set by the system control @b{sctp_cookie_life}.  This socket option must be set before the call
+to @manref{listen(2)}, or before receiving a passive connection attempt.  When changing this value,
+the new value will apply to all passive connection attempts (INIT messages) received on a listening
+socket after the change is made.
+
+Reducing this value will increase the chances that passive connection attempts will fail due to
+expired cookies.  Increasing the value will reduce the overall security of the system by permitting
+attackers and increased interval to crack HMACs and guess verification tags.  This value may be
+adjusted in conjunction with @samp{SCTP_COOKIE_INC} to meet most objectives for successful passive
+connection attempts with the best security afforded by smaller values of @samp{SCTP_COOKIE_LIFE}.
+
+Unfortunately the @samp{SCTP_COOKIE_LIFE} and @samp{SCTP_COOKIE_INC} must be adjusted to accommodate
+the slowest peer on the slowest connection.  The default setting is adequate for Internet
+applications.
+
+@item SCTP_COOKIE_INC
+Set or get the time increment (in milliseconds) that will be added to the lifespan of the cookie in
+an INIT ACK if the sender of the INIT requested cookie preservation to lengthen the lifespan of the
+cookie.  Valid values include zero.  The default value is set by the system control
+@b{sctp_cookie_inc}.  This socket option must be set before the call to @manref{listen(2)}, or
+before a passive connection attempt on the listening socket, but can be read at any time.
+
+@item SCTP_THROTTLE_ITVL
+Set or get the interval (in milliseconds) within which the receiver will not accept more than one
+INIT or COOKIE ECHO.  Zero (don't throttle) is a valid value.  The default is set by the system
+control @b{sctp_throttle_itvl}.  This socket option must be set before the call to
+@manref{listen(2)}, or before a passive connection attempt on the listening socket.
+
+@item SCTP_ISTREAMS
+Set the maximum number of inbound streams or get the actual number of inbound streams associated
+with a connection.  Valid values are from 1 to 16,736.  The default value is set by the system
+control @b{sctp_max_istreams}.  This socket option must be set before the call to
+@manref{connect(2)} or @manref{listen(2)}, or before a passive connection attempt, but can be read
+at any time.  For @manref{tcp(7)}-compatible @samp{SOCK_STREAM} sockets, the number of inbound
+streams is fixed at one (1) and this socket option has no effect.
+
+@item SCTP_OSTREAMS
+Set the number of requested outbound streams or get the actual number of outbound streams associated
+with a connection.  Valid values are from 1 to 16,736.  The default value is set by the system
+control @b{sctp_req_ostreams}.  This socket option must be set before the call to
+@manref{connect(2)} or @manref{listen(2)}, or before a passive connection attempt on a listening
+socket, but can be read at any time.  For @manref{tcp(7)}-compatible @samp{SOCK_STREAM} sockets, the
+number of outbound streams is fixed at one (1) and this socket option has no effect.
+
+@item SCTP_ECN
+When set to zero (0), disables the local transport Explicit Congestion Notification (ECN)
+capability, or get the transport ECN capability of the peer on a connected socket.
+
+This socket option supports the ECN capability of @uref{http://www.ietf.org/rfcs/rfc3168.txt,RFC
+3168} and Appendix A of @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} and is only available
+if @emph{SCTP} was compiled with the kernel configuration parameters @samp{CONFIG_INET_ECN} and
+@samp{CONFIG_SCTP_ECN} set.
+
+@item SCTP_ALI
+Set the adaptation layer information to be used in the INIT or INIT-ACK on all passive or active
+connection attempts on the socket, or get the adaptation layer information provided by the peer on a
+connected socket.
+
+When set to zero (0), no adaptation layer information will be included in the INIT or INIT-ACK; when
+non-zero, it contains the flag bits that will be sent in the adaptation layer information in the
+INIT or INIT-ACK when set before the call to @manref{connect(2)} or @manref{listen(2)}, or before a
+passive connection information is received on a listening socket.
+
+If the socket is in a disconnected state (and has never been connected), getting this option returns
+zero (0).  If the socket has been in a connected state, getting this option returns zero (0) if no
+adaptation layer information was present during connection, or returns the adaptation layer
+information bits if provided by the peer.
+
+This socket option supports the adaptation layer information feature described in
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-addip-sctp-08.txt,
+<draft-ietf-tsvwg-addip-sctp-08.txt>} and is only supported if @emph{SCTP} was compiled with kernel
+configuration parameter @samp{CONFIG_SCTP_ADAPTATION_LAYER_INFO} set.
+
+@item SCTP_PR
+Set whether Partial Reliability (@uref{http://www.ietf.org/rfcs/rfc3758.txt, RFC 3758}) will be
+supported or required on connection establishment, or get the indication of support for @b{PR-SCTP}
+provided by the peer on a connected socket.  Valid values are as follows:
+
+@table @code
+@item SCTP_PR_NONE
+Do not place or respond with Forward TSN parameter in an INIT or INIT-ACK indicating that this
+socket does not support @b{PR-SCTP}.
+
+@item SCTP_PR_PREFERRED
+Place and respond with a Forward TSN parameter in an INIT or INIT-ACK indicating to the peer that we
+support @b{PR-SCTP} for this connection, but do not require the peer to support @b{PR-SCTP}.
+
+@item SCTP_PR_REQUIRED
+Place and respond with a Forward TSN parameter in an INIT or INIT-ACK indicating to the peer that we
+support @b{PR-SCTP} and require the peer to do the same.
+@end table
+
+The default setting is provided by the @b{sctp_pr} system control.
+
+For a connected socket, when this flag is true, it indicates that the peer supports @b{PR-SCTP}.
+When this flag is false, it indicates that the peer does not support @b{PR-SCTP}.
+
+This socket options supports the partial reliability feature
+(@uref{http://www.ietf.org/rfcs/rfc3758.txt, RFC 3758}) and is only available if @emph{SCTP} was
+compiled with the kernel configuration parameter @samp{CONFIG_SCTP_PARTIAL_RELIABILITY} set.
+
+@item SCTP_MAX_INIT_RETRIES
+Set or get the number of times that an INIT or COOKIE ECHO will be resent before abandoning the
+association initialization.  Valid values include zero.  The default value is set by the system
+control @b{sctp_max_init_retries}.  This socket option must be set before the call to
+@manref{connect(2)} or @manref{listen(2)}, or before a passive connection attempt on a listening
+socket.
+
+@item SCTP_MAX_BURST
+Set or get the number of MTUs of data that will be sent in a single burst as defined by
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
+<draft-ietf-tsvwg-sctpimpguide-10.txt>}.  Valid values are one (1) or greater.  The default value is
+set by the system control @b{sctp_max_burst}.  This socket option may be changed at any time during
+the life of the socket.
+
+@item SCTP_ASSOC_MAX_RETRANS
+Set or get the number of times that the sending endpoint will attempt retransmitting a packet on a
+given association before it aborts the association.  Valid values include zero.  The default value
+is set by the system control @b{sctp_assoc_max_retrans}.  This value should be larger than the sum
+of all the @samp{SCTP_PATH_MAX_RETRANS} values of each of the destinations.  This socket option may
+be changed at any time during the life of the socket.
+
+@item SCTP_SACK_DELAY
+Set or get the maximum SACK delay as the interval of time (in milliseconds) that the sending
+endpoint will delay an acknowledgment of a received data chunk.  Valid values are in the range from
+0 to @code{INT_MAX}, however, the value of the maximum SACK delay should not exceed 500 milliseconds
+(setting this value to greater than 500 milliseconds is forbidden by
+@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960}) for Internet Applications.  The default value
+is set by the system control @b{sctp_sack_delay}.  This socket option may be changed at any time
+during the life of the socket.
+
+@item SCTP_DISPOSITION
+Gets or sets a flag that determines whether @emph{SCTP} will retain and deliver messages that were
+not successfully acknowledged by the peer for retrieval, or will deliver confirmation of
+acknowledgment for messages successfully acknowledged by the peer.  If @samp{SCTP_DISPOSITION} is
+return in a control message from a call to @manref{recvmsg(2)} with the @samp{MSG_CONFIRM} flag set,
+then the read packet represents a packet that was held for retrieval, exceeded its life-time, was
+dropped by @b{PR-SCTP} or had message confirmation set and was successfully acknowledged.  In
+addition, if the message was successfully acknowledged, the @samp{MSG_CONFIRM} flag will be returned
+in a call to @manref{recv(2)}, @manref{recvfrom(2)} or @manref{recvmsg(2)}.  Valid values are:
+
+@table @code
+@item SCTP_DISPOSITION_NONE
+When this option is set to @samp{SCTP_DISPOSITION_NONE}, messages will not be retained for retrieval
+and acknowledgments will not be provided for messages unless overridden with the @samp{MSG_CONFIRM}
+flag to @manref{send(2)}, @manref{sendto(2)} or @manref{sendmsg(2)}.
+
+@item SCTP_DISPOSITION_UNSENT
+When set to @samp{SCTP_DISPOSITION_UNSENT}, @emph{SCTP} will retain and provide for retrieval only
+messages that were unsent.  When set to @samp{SCTP_DISPOSITION_UNSENT} in an ancillary message
+returned by @manref{recvmsg(2)} called with the @samp{MSG_CONFIRM} flag set, the read data
+represents a packet that was unsent at the time that the connection shut down or aborted.  When
+@samp{SCTP_PR} is enabled on the connection, unsent data that was dropped by @b{PR-SCTP} will be
+delivered before shut down or abort.
+
+@item SCTP_DISPOSITION_SENT
+When set to @samp{SCTP_DISPOSITION_SENT}, @emph{SCTP} will retain and provide for retrieval all
+messages that were sent and unacknowledged, or that were unsent at the time that the connection shut
+down or aborted.  When set to @samp{SCTP_DISPOSITION_SENT} in an ancillary message returned by
+@manref{recvmsg(2)} called with the @samp{MSG_CONFIRM} flag set, then the read data was a packet
+that was sent but not acknowledged (with a cumulative ack) before the connection was shut down or
+aborted.  When @samp{SCTP_PR} is enabled on the connection, sent data that was dropped by
+@b{PR-SCTP} will be delivered before shut down or abort.
+
+@item SCTP_DISPOSITION_GAP_ACKED
+When set to @samp{SCTP_DISPOSITION_GAP_ACKED}, @emph{SCTP} will retain and provide for retrieval all
+messages that were sent and gap acknowledged, sent and unacknowledged, or unsent at the time that
+the connection shut down or aborted.  When set to @samp{SCTP_DISPOSITION_GAP_ACKED} in an ancillary
+message returned by @manref{recvmsg(2)} called with the @samp{MSG_CONFIRM} flag set, then the read
+data was a packet that was sent but not acknowledged (with a cumulative ack) before the connection
+was shut down or aborted.  When @samp{SCTP_PR} is enabled on the connection, gap acknowledged data
+that was dropped by @b{PR-SCTP} will be delivered before shut down or abort.
+
+@item SCTP_DISPOSITION_ACKED
+When set to @samp{SCTP_DISPOSITION_ACKED}, @emph{SCTP} will retain and provide for retrieval
+acknowledgments for all messages that were confirmed delivered (by cumulative ack).  When set to
+@samp{SCTP_DISPOSITION_ACKED} in the ancillary message return by @manref{recvmsg(2)} called with the
+@samp{MSG_CONFIRM} flag set, then the read data was a packet that was sent and acknowledged (with a
+cumulative ack) before the connection was shut down gracefully or at any time before shut down or
+abort.
+@end table
+
+This option permits messages that are unsent, sent but not acknowledged or sent and gap
+acknowledged, to be retrieved from the socket before close.  This is accomplished by setting the
+@samp{SCTP_DISPOSITION} socket option prior to shut down or abort, and then calling
+@manref{recvmsg(2)} after @samp{POLLHUP}, @samp{SIGPIPE} or @samp{EPIPE} indicating shutdown or
+abort of the connection.  Messages then read with the @samp{MSG_CONFIRM} flag set on call to
+@manref{recv(2)}, @manref{recvfrom(2)} or @manref{recvmsg(2)} will have the @samp{SCTP_DISPOSITION}
+ancillary message attached and will indicate whether they were @samp{SCTP_DISPOSITION_UNSENT},
+@samp{SCTP_DISPOSITION_SENT} or @samp{SCTP_DISPOSITION_GAP_ACKED}.
+
+If the socket option @samp{SCTP_PR} is set on the socket and the peer supports @b{PR-SCTP}, messages
+which have failed partial reliable delivery (were dropped) will also be retrieved by
+@manref{recvmsg(2)} called with the @samp{MSG_CONFIRM} flag set, with the @samp{SCTP_DISPOSITION}
+ancillary data message before shutdown.  @emph{SCTP} must have been compiled with
+@samp{CONFIG_SCTP_PARTIAL_RELIABILITY} for this feature to be available.
+
+Alternatively, if the socket option @samp{SCTP_DISPOSITION} is set to @samp{SCTP_DISPOSITION_ACKED}
+or messages were sent with the @samp{MSG_CONFIRM} flag set to @manref{send(2)}, @manref{sendto(2)}
+or @manref{sendmsg(2)}, then a call to @manref{recv(2)}, @manref{recvfrom(2)} or @manref{recvmsg(2)}
+with the @samp{MSG_CONFIRM} flag set will return acknowledgments with a @samp{SCTP_DISPOSITION}
+control message set to @samp{SCTP_DISPOSITION_ACKED} for all acknowledged messages a the time of the
+call.  Care should be taken when using this receipt confirmation service as the message will be held
+in the transmit buffers until confirmation has been received by the user. Receipt confirmation also
+has an impact on the performance of @emph{SCTP}.
+
+@item SCTP_LIFETIME
+Get or set the SCTP lifetime or @b{PR-SCTP} timed reliability lifetime associated with messages
+which are sent on this socket.  When this option is included as an control message to
+@manref{sendmsg(2)}, the specified lifetime is associated with the written message.
+
+Ordered messages waiting for acknowledgment beyond this lifetime will cause subsequent writes to the
+same stream to fail until all failed messages have been retrieved with @manref{recvmsg(2)} with the
+@samp{MSG_CONFIRM} flag set.  Subsequent unordered writes to the stream will succeed, although
+unordered data can also be collected by setting both @samp{MSG_OOB} and @samp{MSG_CONFIRM} in a call
+to @manref{recvmsg(2)}.
+
+@item SCTP_ADD
+Sets a flag that indicates whether @emph{SCTP} will support the ADD-IP extensions (ADD IP and DEL
+IP) on this socket, or gets a flags that indicates whether the peer supports the ADD-IP extensions
+on a connected socket.  When the flag is set, requests that @emph{SCTP} respond to ASCONF chunks
+with ADD IP or DEL IP requests.  When the flag is unset, @emph{SCTP} will refuse these requests.
+The default setting for this flag is unset for new sockets.  This option is only available when the
+kernel is compiled with kernel configuration parameter @samp{CONFIG_SCTP_ADD_IP} set.
+
+@item SCTP_ADD_IP
+When set, requests that the provided IP address (@i{addr}), provided in a @b{sockaddr_in} structure
+be added to the local IP addresses associated with the connection.  If the socket is in a connected
+or connecting state, this invokes the ASCONF procedure to add the IP address to the association.  If
+the socket is in a disconnected state, setting this option will fail.  This option is only available
+when the kernel is compiled with kernel configuration parameter @samp{CONFIG_SCTP_ADD_IP} set.
+
+If a connected socket was initially bound to @samp{INADDR_ANY}, additional IP addresses may be
+automatically added to the socket if new network interfaces are added to the system, or if existing
+network interfaces are configured with @manref{ifconfig(8)} or equivalent commands.
+
+@item SCTP_DEL_IP
+When set, requests that the provided IP address (@i{addr}), provided in a @b{sockaddr_in} structure
+be deleted from the local IP addresses associated with the connection.  If the socket is in a
+connected or connecting state, this invokes the ASCONF procedure to remove the IP address from the
+association.  If the socket is in a disconnected state, setting this option will fail.  This option
+is only available when the kernel is compiled with kernel configuration parameter
+@samp{CONFIG_SCTP_ADD_IP} set.
+
+If the socket was initially bound to @samp{INADDR_ANY}, IP addresses may be automatically unbound
+from the socket if network interfaces are removed from the system, or if network interfaces are
+reconfigured with @manref{ifconfig(8)} or equivalent commands.
+
+@item SCTP_SET
+Sets a flag that indicates whether @emph{SCTP} will support the ADD-IP extensions (SET PRIMARY) on
+this socket, or gets a flags that indicates whether the peer supports the ADD-IP extensions on a
+connected socket.  When the flag is set, requests that @emph{SCTP} respond to ASCONF chunks with SET
+PRIMARY requests.  When the flag is unset, @emph{SCTP} will refuse these requests.  The default
+setting for this flag is unset for new sockets.  This option is only available when the kernel is
+compiled with kernel configuration parameter @samp{CONFIG_SCTP_ADD_IP} set.
+
+@item SCTP_STATUS
+Gets the association status and the status associated with each of the destination transport
+addresses forming the association.  The returned value is a @b{sctp_astat} structure following by
+@i{assoc_nrep} @b{sctp_dstat} structures (one for each destination transport address as returned by
+@manref{getpeername(2)}).
+
+@example
+struct sctp_astat @{
+    uint assoc_rwnd;  /* receive window           */
+    uint assoc_rbuf;  /* receive buffer           */
+    uint assoc_nrep;  /* destinations reported    */
+@};
+
+struct sctp_dstat @{
+    struct sockaddr_in
+          dest;       /* destination address      */
+    uint dst_cwnd;    /* congestion window        */
+    uint dst_unack;   /* unacknowledged chunks    */
+    uint dst_srtt;    /* smoothed round trip time */
+    uint dst_rvar;    /* rtt variance             */
+    uint dst_rto;     /* current rto              */
+    uint dst_sst;     /* slow start threshold     */
+@};
+@end example
+
+The @b{sctp_astat} structure has the following fields:
+
+@table @samp
+@item assoc_rwnd
+is the current advertised receive window in bytes.
+
+@item assoc_rbuf
+is the current receive buffer size in bytes.
+
+@item assoc_nrep
+is the number of @b{sctp_dstat} structures that follow this structure.
+@end table
+
+The @b{sctp_dstat} structure has the following fields:
+
+@table @samp
+@item dest
+is the address associated with this @b{sctp_dstat} structure.
+
+@item dst_cwnd
+is the congestion window for the given destination transport address in bytes.
+
+@item dst_unack
+is the number of unacknowledged DATA chunks outstanding to the given destination transport address
+in chunks.
+
+@item dst_srtt
+is the current smoothed round trip time for the destination transport address in milliseconds.
+
+@item dst_rvar
+is the RTT variance for the destination transport address in milliseconds.
+
+@item dst_rto
+is the current value of the RTO for the destination transport address in milliseconds.
+
+@item dst_sst
+is the current value of the slow start threshold in bytes.
+@end table
+
+@item SCTP_DEBUG_OPTIONS
+Not Documented.  (This socket option provides for special debugging functions intended for
+developers of @emph{SCTP}.)
+
+@end table
+
+@node sctp(7) IOCTLS
+@unnumberedsec IOCTLS
+
+These I/O controls can be accessed using @manref{ioctl(2)}.  The correct syntax is:
+
+@example
+int @var{value};
+@var{error} = ioctl(@var{sctp_socket}, @var{ioctl_type}, &@var{value});
+@end example
+
+All @manref{socket(7)} I/O controls are supported by @emph{SCTP} without modification:
+@samp{SIOCGSTAMP}, @samp{SIOCSPGRP}, @samp{FIOASYNC} and @samp{SIOCGPGRP}.  All
+@manref{socket(7)} fcntls are supported by @emph{SCTP}: @samp{FIOCGETOWN} and @samp{FIOCSETOWN}.
+
+The following @manref{tcp(7)} I/O controls are supported by @emph{SCTP}:
+
+@table @code
+@item SIOCINQ
+Returns the amount of queued unread data in the receive buffer.  Argument is a pointer to an
+integer.
+
+@item SIOCATMARK
+Returns true when all urgent data has already been received by the user program.  This is used
+together with @samp{SO_OOBINLINE}.  Argument is a pointer to an integer for the test result.
+
+@item SIOCOUTQ
+Returns the amount of unsent data in the socket send queue in the passed integer value pointer.
+@end table
+
+@node sctp(7) ERROR HANDLING
+@unnumberedsec ERROR HANDLING
+When a network error occurs, @emph{SCTP} tries to resend the packet.  If it doesn't succeed after
+some time, either @samp{ETIMEDOUT} or the last received error on this connection is reported.
+
+Some applications require a quicker error notification.  This can be enabled with the @samp{SOL_IP}
+level @samp{IP_RECVERR} socket option.  When this option is enabled, all incoming errors are
+immediately passed to the user program.  Use this option with care: it makes @emph{SCTP} less
+tolerant to routing changes and other normal network conditions.
+
+@node sctp(7) NOTES
+@unnumberedsec NOTES
+When an error occurs doing a connection setup occurring in a socket write @samp{SIGPIPE} is only
+raised when the @samp{SO_KEEPOPEN} socket option is set.
+
+@emph{SCTP} has no real out-of-band or urgent data; it has out-of-order data.  In Linux this means
+if the other end sends newer out-of-band data the older urgent data may arrive later.
+
+If the socket option @samp{SO_KEEPALIVE} is not set (see @manref{socket(7)}), @emph{SCTP} will not
+generate heartbeats to any destination.  For regular @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM}
+sockets, @samp{SO_KEEPALIVE} defaults to set.  For @manref{tcp(7)}-compatible @samp{SOCK_STREAM}
+sockets, @samp{SO_KEEPALIVE} defaults to unset.
+
+@node sctp(7) ERRORS
+@unnumberedsec ERRORS
+@table @code
+@item EPIPE
+The other end closed the socket unexpectedly or a read is executed on a shut down socket.
+
+@item ETIMEDOUT
+The other end didn't acknowledge retransmitted data after some time.
+
+@item EAFNOTSUPPORT
+Passed socket address type in @i{sin_family} was not @samp{AF_INET} or @samp{AF_UNSPEC}.
+@end table
+
+Any errors defined for @manref{ip(7)} or the generic @manref{socket(7)} layer may also be
+returned for @emph{SCTP}.
+
+@node sctp(7) NETWORK STATISTICS
+@unnumberedsec NETWORK STATISTICS
+
+@menu
+* sctp(7) Protocol Information::
+* sctp(7) Connection Information::
+* sctp(7) Socket Usage Information::
+@end menu
+
+@node sctp(7) Protocol Information
+@unnumberedsubsec Protocol Information
+
+@emph{SCTP} keeps a number of statistics provided for in the the IP MIB.  IP protocol statistics are
+available in @samp{/proc/net/snmp} as well as with the @i{-s} or @i{--statistics} flag to
+@manref{netstat(8)}.  For additional information see @manref{proc(5)} and @manref{netstat(8)}.  ICMP
+Protocol statistics that are applicable to @emph{SCTP} are as follows:
+
+@table @code
+@item InErrors
+The number of ICMP messages received in error.  This represents the value for all protocols
+including @emph{SCTP}.
+
+@emph{SCTP} provides the following information in the Linux MIB.  Linux MIB statistics are available
+in @samp{/proc/net/netstat}.  For additional information see @manref{proc(5)}.  Linux protocol
+statistics that are applicable also to @emph{SCTP} are as follows:
+
+@item LockDroppedIcmps
+The number of ICMP errors that were dropped because the socket was locked.
+
+@item ListenOverflows
+The number of COOKIE-ECHO chunks dropped due to listen queue overflows.
+@end table
+
+@emph{SCTP} provides for SNMP Protocol Information following the SCTP MIB
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sctp-mib-10.txt,
+<draft-ietf-sigtran-sctp-mib-10.txt>}.  Protocol information is available in @samp{/proc/net/snmp}
+as well as with the @i{-s} flag to the @manref{netstat(8)} command.  SCTP Protocol Statistics that
+are applicable to @emph{SCTP} are as follows:
+
+@table @code
+@item RtoAlgorithm
+The algorithm used to determine the timeout value (T3-rtx) used for retransmitting unacknowledged
+chunks.
+
+@item RtoMin
+The minimum value for the transmission timeout value.  This value can be obtained by reading the
+system control @b{sctp_rto_min}.  A retransmission time value of zero means immediate
+retransmission.  The value of this object has to be less than or equal to RtoMax's value.
+
+@item RtoMax
+The maximum value for the retransmission timeout value.  This value can be obtained by reading the
+system control @b{sctp_rto_max}.  A retransmission timeout value of zero means immediate
+retransmission.  The value of this object has to be greater than or equal to RtoMin's value.
+
+@item RtoInitial
+The initial value for the retransmission timer.  This value can be obtained by reading the system
+control @b{sctp_rto_initial}.  A retransmission time value of zero means immediate retransmission.
+
+@item MaxAssoc
+The maximum number of associations.  For @emph{SCTP} there is no controllable upper limit on the
+maximum number of associations.  The maximum number of associations is constrained by the system
+maximum number of file descriptors, the process maximum number of file descriptors, and the amount
+of memory in the system.  Therefore, this value will always be -1.
+
+@item ValCookieLife
+The valid cookie life for COOKIEs in the initialization procedure.  This value can be obtained by
+reading the system control @b{sctp_valid_cookie_life}.
+
+@item MaxInitRetr
+The maximum number of times that an INIT or COOKIE-ECHO chunk will be retransmitted during the
+startup of an association.  This value can be obtained by reading the system control
+@b{sctp_max_init_retries}.
+
+@item CurrEstab
+The number of @emph{SCTP} sockets in the established state.
+
+@item ActiveEstabs
+The number of times that a @manref{connect(2)} call succeeded on an @emph{SCTP} socket.
+
+@item PassiveEstabs
+The number of times that a @manref{accept(2)} call succeeded on an @emph{SCTP} socket.
+
+@item Aborteds
+The number of times that an established @emph{SCTP} socket completed an abortive release.
+
+@item Shutdowns
+The number of times that an established @emph{SCTP} socket completed an orderly release.
+
+@item OutOfBlues
+The number of out of the blue packets received.  Out of the blue packets are packets for which
+no corresponding @emph{SCTP} socket could be found.
+
+@item ChecksumErrors
+The number of received packets that discovered a checksum error and were discarded.
+
+@item OutCtrlChunks
+The number of SCTP Control Chunks that were sent, excluding retransmissions.
+
+@item OutOrderChunks
+The number of SCTP Data Chunks that were sent with the Unordered Bit clear, excluding
+retransmissions.
+
+@item OutUnorderChunks
+The number of SCTP Data Chunks that were sent with the Unordered Bit set, excluding retransmissions.
+
+@item InCtrlChunks
+The number of SCTP Control Chunks that were received and processed, excluding duplicates.
+
+@item InOrderChunks
+The number of SCTP Data Chunks that were received with the Unordered Bit clear, excluding
+duplicates.
+
+@item InUnorderChunks
+The number of SCTP Data Chunks that were received with the Unordered Bit set, excluding duplicates.
+
+@item FragUsrMsgs
+The number of times that @emph{SCTP} further fragmented a user message.
+
+@item ReasmUserMsgs
+The number of times that @emph{SCTP} reassembled fragmented chunks into a user messages.
+
+@item OutSCTPPacks
+The number of packets delivered for transmission to the IP layer.
+
+@item InSCTPPacks
+The number of packets received for processing from the IP layer.
+
+@item DiscontinuityTime
+The last time at which SCTP statistics suffered a discontinuity.
+@end table
+
+@node sctp(7) Connection Information
+@unnumberedsubsec Connection Information
+
+@emph{SCTP} provides for SNMP Connection Information following the SCTP MIB
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sctp-mib-10.txt,
+<draft-ietf-sigtran-sctp-mib-10.txt>}.  Connection information is available in @samp{/proc/net/sctp}
+but is not yet available with a @i{-sctp} flag to the @manref{netstat(8)} command.  (Extensions to
+the @manref{netstat(8)} command are required to access this information.)
+
+@node sctp(7) Socket Usage Information
+@unnumberedsubsec Socket Usage Information
+
+@emph{SCTP} provides for socket usage information available in @samp{/proc/net/sockstat}.
+
+@node sctp(7) CAVEATS
+@unnumberedsec CAVEATS
+
+@emph{SCTP} does not subscribe to the @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960}
+restriction to assign sequential TSNs (Transmit Sequence Numbers) to each fragmented DATA chunk of a
+large record for @samp{SOCK_SEQPACKET} sockets.  Multiple calls to @manref{write(2)},
+@manref{send(2)}, @manref{sendto(2)} or @manref{sendmsg(2)} for portions of different records may
+result in fragments from multiple records being assigned interleaving TSNs.  Portable programs
+should refrain from writing record fragments to more than one stream at a time.
+
+@emph{SCTP} ignores the source address list in INIT and INIT-ACK chunks when searching for
+Transmission Control Blocks in opposition to
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
+<draft-ietf-tsvwg-sctpimpguide-10.txt>} section 2.18.  This is because the procedure described there
+introduces severe vulnerability to DoS and Spoofing attacks.  @emph{SCTP} does not have this
+vulnerability.
+
+@emph{SCTP} ignores the source address list in INIT chunks when searching for Transmission Control
+Block matches in opposition to
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
+<draft-ietf-tsvwg-sctpimpguide-10.txt>} section 2.6.  This is because the procedure described there
+introduces severe vulnerability to DoS attacks by revealing detailed information about existing
+associations.  @emph{SCTP} does not have this vulnerability.
+
+@emph{SCTP} does not implement the UDP-like interface of
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpsocket-07.txt,<draft-ietf-tsvwg-sctpsocket-07.txt>}.
+This is because the socket interface presented in that draft provides unorthodox interface to a
+@samp{SOCK_SEQPACKET} socket which is against both the traditional and standard usage of
+@samp{SOCK_SEQPACKET} sockets in BSD, XNS 5.2, and POSIX.  In BSD, XNS 5.2 and POSIX,
+@samp{SOCK_SEQPACKET} sockets are strictly connection-oriented, whereas in this draft they are
+connectionless.  A connectionless use of @samp{SOCK_SEQPACKET} would conflict with common standard
+socket code used by X.25, AX.25, DECNET, and other users of @samp{SOCK_SEQPACKET} sockets.
+
+Although similar, @emph{SCTP} does not implement the TCP-like interface of
+@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpsocket-07.txt,<draft-ietf-tsvwg-sctpsocket-07.txt>}.
+This is because the @samp{SOCK_STREAM} socket interface presented in that draft only provides
+limited compatibility with @manref{tcp(7)}.  The @manref{tcp(7)} compatible socket interface
+provided by @emph{SCTP} more closely follows the @manref{tcp(7)} interface making it suitable to use
+@emph{SCTP} as a drop-in replacement for @manref{tcp(7)} with minimal (@samp{IPPROTO_SCTP})
+adjustment to applications programs written to @manref{tcp(7)}.
+
+@emph{SCTP} has way too many options.  This is mostly because @emph{SCTP} is an new protocol and
+experimentation with the protocol is high.  These options provide close control of the interesting
+features of the protocol.  Unfortunately, when all options are compiled, the performance of
+@emph{SCTP} is necessarily impacted.  Many of these options will become deprecated in future
+releases.  Portable programs should minimize their use of @emph{SCTP}-specific socket options.
+
+Although @emph{SCTP} permits the user maximum control over the various SCTP protocol parameters, it
+is also possible to set protocol parameters in violation of the requirements of
+@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} and subsequent SCTP drafts and RFCs.  Internet
+applications should take extreme care with protocol parameter settings, by either using the default
+values for all protocol parameters (as recommended in @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC
+2960} and others) or by taking care not to adjust protocol parameters outside the ranges recommended
+in @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} and subsequent RFCs.
+
+@emph{SCTP} does not currently support IPv6.
+
+@emph{SCTP} host name addresses are not supported.
+
+@emph{SCTP} does not implement @b{MOBILE-SCTP} extensions due to Intellectual Property Rights claims
+made against the technologies in @b{MOBILE-SCTP}.
+
+@emph{SCTP} does not currently support @manref{tcp(7)} undocumented Linux @manref{sendpage(2)}
+socket call.
+
+Transparent proxy options and other enhanced IP capabilities available with the kernel configuration
+parameter @samp{CONFIG_SCTP_EXTENDED_IP_SUPPORT} are not described, or not implemented.
+
+Providing destination addresses to @manref{send(2)}, @manref{sendto(2)} and @manref{sendmsg(2)} does
+not work as described (it is largely ignored).
+
+@samp{SOCK_RDM} sockets are not fully supported as described.
+
+The use of @samp{SO_BINDTODEVICE}, @samp{IP_OPTIONS}, @samp{IP_PKTINFO}, @samp{IP_RECVOPTS},
+@samp{IP_RETOPTS} and @samp{SCTP_STATUS} socket options are not fully implemented and will probably
+not work as described.
+
+@node sctp(7) AUTHOR
+@unnumberedsec AUTHOR
+
+@uref{mailto:bidulock@@openss7.org,Brian F. G. Bidulock}. @*
+@uref{http://www.openss7.org/,The OpenSS7 Project}.
+

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/03/21 13:24:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/03/29 11:27:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:24:36 $ by $Author: brian $
+# Last Modified $Date: 2006/03/29 11:27:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.47  2006/03/29 11:27:41  brian
+# - corrections for rerelease, see ChangeLog
+#
 # Revision 0.9.2.46  2006/03/21 13:24:36  brian
 # - included pr.am
 #
@@ -269,7 +272,7 @@ EXTRA_SCRIPTS			+= configure.nexusware
 ##
 KERNEL_OBJECTS			= $(ADDON_OBJS)
 KERNEL_MODULES			= $(ADDON_MODS)
-KERNEL_PRELOADS			= sctp.o
+KERNEL_PRELOADS			= 
 KERNEL_MODCONF			=
 KERNEL_SUBDIR			= kernel/net/ipv4
 KMODCONF_EXT			= $(PACKAGE_LCNAME)
@@ -328,20 +331,24 @@ if INSTALL_INITSCRIPTS
 if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= \
+				util/init/sctp.sh
 
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= \
+				util/init/sctp
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		=
+dist_sysconf_DATA		= \
+				util/sysconfig/sctp.conf
 
-dist_config_DATA		=
+dist_config_DATA		= \
+				util/sysconfig/sctp
 
 ## INSTALL_INITSCRIPTS
 endif
