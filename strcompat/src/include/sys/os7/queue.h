@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 0.9.2.8 2005/12/19 03:26:01 brian Exp $
+ @(#) $Id: queue.h,v 0.9.2.9 2006/03/30 10:45:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:26:01 $ by $Author: brian $
+ Last Modified $Date: 2006/03/30 10:45:47 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -64,8 +64,7 @@
 
 extern int ss7_w_flush(queue_t *q, mblk_t *mp);
 extern int ss7_r_flush(queue_t *q, mblk_t *mp);
-extern int ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *),
-		    void (*wakeup) (queue_t *));
+extern int ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *));
 extern int ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t *));
 extern int streamscall ss7_oput(queue_t *q, mblk_t *mp);
 extern int streamscall ss7_osrv(queue_t *q);

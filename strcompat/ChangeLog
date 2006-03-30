@@ -1,3 +1,20 @@
+2006-03-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/os7/queue.h: new prototype for ss7_putq without the
+	  call to wakeup function
+
+2006-03-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/os7/allocb.h: rationalized to working versions in
+	  strinet
+	* src/include/sys/os7/priv.h: rationalized to working versions in
+	  strinet
+	* src/kernel/os7compat.c: rationalized to working versions in strinet
+
+	- this is in preparation for converting external modules that use
+	  similar versions of these functions to use the compatibility module
+	  versions instead
+
 2006-03-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strcompat.refs: updated LiS and STREAMS release numbers

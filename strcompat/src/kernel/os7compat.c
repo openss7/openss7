@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/22 10:28:54 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/30 10:45:48 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:54 $ by $Author: brian $
+ Last Modified $Date: 2006/03/30 10:45:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.8  2006/03/30 10:45:48  brian
+ - rationalized to working drivers
+
  Revision 0.9.2.7  2005/12/22 10:28:54  brian
  - no symbol mangling for 2.4 kernels
 
@@ -74,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/22 10:28:54 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/30 10:45:48 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/22 10:28:54 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/30 10:45:48 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -97,8 +99,8 @@ static char const ident[] =
 #include "sys/os7/compat.h"
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/22 10:28:54 $"
+#define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/30 10:45:48 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -276,41 +278,79 @@ __OS7_EXTERN_INLINE mblk_t *bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, i
 
 EXPORT_SYMBOL_NOVERS(bufq_resupply);
 
+/**
+ * ss7_trylockq: - try to lock a queue pair for exclusive operation
+ * @q: queue in queue pair
+ *
+ * Most of the purpose for these locking arrangements was that LiS had no STREAMS syncrhonization
+ * mechanisms, and this approximates queue-pair synchronization.  If this succeeds, the procedure
+ * has access exclusive to the private structure.  Note that this approach cannot ever attempt to
+ * take the qlock twice in the same thread (leading to single party deadlock).  This, protects even
+ * against an implicit recursive put procedure (one that calls a put procedure that calls another
+ * that calls the original put procedure).  Locking is strict and safe against interrupts.
+ */
 int
 ss7_trylockq(queue_t *q)
 {
 	int res;
 	str_t *s = STR_PRIV(q);
+	unsigned long flags;
 
-	if (!(res = spin_trylock(&s->qlock))) {
+	spin_lock_irqsave(&s->qlock, flags);
+	if (!(res = !s->users++)) {
 		if (q == s->iq)
 			s->iwait = q;
 		if (q == s->oq)
 			s->owait = q;
+		--s->users;
 	}
+	spin_unlock_irqrestore(&s->qlock, flags);
 	return (res);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_trylockq);
 
+/**
+ * ss7_unlockq: - unlock a queue pair, enabling waiting queues
+ * @q: queue whose put or service procedure is running
+ *
+ * Most of the purpose for these locking arrangement was that LiS had no STREAMS synchronization
+ * mechanisms, and this approximates queue-pair synchronization.  This is the reverse of a
+ * successful ss7_trylock(), above.  Note that the approach cannot ever attempt to take the qlock
+ * twice in the same thread (leading to single party deadlock).  Note also, that if a waiting queue
+ * does not have a service procedure, one will still be called directly to drain deferred messages
+ * from the queue.
+ */
 void
 ss7_unlockq(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
+	queue_t *wait;
+	unsigned long flags;
 
-	spin_unlock(&s->qlock);
-	if (s->iwait) {
-		if (s->iwait->q_qinfo && s->iwait->q_qinfo->qi_srvp)
-			qenable(xchg(&s->iwait, NULL));
+	int streamscall (*isrv) (queue_t *) = NULL;
+	int streamscall (*osrv) (queue_t *) = NULL;
+
+	spin_lock_irqsave(&s->qlock, flags);
+	if ((wait = XCHG(&s->iwait, NULL)) && !enableq(wait)) {
+		if (wait->q_qinfo && wait->q_qinfo->qi_srvp)
+			qenable(wait);
 		else
-			ss7_isrv(xchg(&s->iwait, NULL));
+			isrv = &ss7_isrv;
 	}
-	if (s->owait) {
-		if (s->owait->q_qinfo && s->owait->q_qinfo->qi_srvp)
-			qenable(xchg(&s->owait, NULL));
+	if ((wait = XCHG(&s->owait, NULL)) && !enableq(wait)) {
+		if (wait->q_qinfo && wait->q_qinfo->qi_srvp)
+			qenable(wait);
 		else
-			ss7_osrv(xchg(&s->iwait, NULL));
+			osrv = &ss7_osrv;
 	}
+	s->users = 0;
+	spin_unlock_irqrestore(&s->qlock, flags);
+
+	if (isrv)
+		isrv(s->iq);
+	if (osrv)
+		osrv(s->iq);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_unlockq);
@@ -322,54 +362,73 @@ EXPORT_SYMBOL_NOVERS(ss7_unlockq);
  *
  *  -------------------------------------------------------------------------
  */
-int
-ss7_w_flush(queue_t *q, mblk_t *mp)
+
+/**
+ * ss7_flushq: - cannonical flushing of a queue in the queue pair
+ * @q: queue to flush
+ * @mp: the M_FLUSH message
+ * @flag: FLUSHR for read queue, FLUSHW for write queue
+ *
+ * Performs canonical flushing of one queue in the queue pair.  If the corresponding flag is set in
+ * the M_FLUSH message, this queue is flushed.  The message is passed along if there is a subsequent
+ * queue in the flow and QR_ABSORBED returned, otherwise, the directional flag is cleared and
+ * QR_DONE returned.
+ */
+STATIC INLINE fastcall int
+ss7_flushq(queue_t *q, mblk_t *mp, const unsigned char flag)
 {
-	if (*mp->b_rptr & FLUSHW) {
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+	if (mp->b_rptr[0] & flag) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHALL);
 		else
-			flushq(WR(q), FLUSHALL);
-		if (q->q_next)
-			return (QR_PASSALONG);
-		*mp->b_rptr &= ~FLUSHW;
+			flushq(q, FLUSHALL);
 	}
-	if (*mp->b_rptr & FLUSHR) {
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(RD(q), FLUSHALL);
-		if (!q->q_next)
-			return (QR_LOOP);
-		*mp->b_rptr &= ~FLUSHR;
+	if ((mp->b_rptr[0] & (FLUSHR | FLUSHW))) {
+		if (q->q_next) {
+			putnext(q, mp);
+			return (QR_ABSORBED);
+		}
+		mp->b_rptr[0] &= ~flag;
 	}
 	return (QR_DONE);
 }
 
+/**
+ * ss7_w_flush: - canoncial flushing of the WR queue
+ * @q: write queue
+ * @mp: M_FLUSH message
+ *
+ * Performs canonical flushing from a write queue.  The mesage is passed along or looped if
+ * required and QR_ABSORBED returned, or QR_DONE returned if the message is to be discarded.
+ */
+int
+ss7_w_flush(queue_t *q, mblk_t *mp)
+{
+	int rtn;
+
+	if ((rtn = ss7_flushq(q, mp, FLUSHW)) == QR_DONE)
+		rtn = ss7_flushq(RD(q), mp, FLUSHR);
+	return (rtn);
+}
+
 EXPORT_SYMBOL_NOVERS(ss7_w_flush);
 
+/**
+ * ss7_w_flush: - canoncial flushing of the RD queue
+ * @q: read queue
+ * @mp: M_FLUSH message
+ *
+ * Performs canonical flushing from a read queue.  The mesage is passed along or looped if
+ * required and QR_ABSORBED returned, or QR_DONE returned if the message is to be discarded.
+ */
 int
 ss7_r_flush(queue_t *q, mblk_t *mp)
 {
-	if (*mp->b_rptr & FLUSHR) {
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(RD(q), FLUSHALL);
-		if (q->q_next)
-			return (QR_PASSALONG);
-		*mp->b_rptr &= ~FLUSHR;
-	}
-	if (*mp->b_rptr & FLUSHW) {
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(WR(q), mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(WR(q), FLUSHALL);
-		if (!q->q_next)
-			return (QR_LOOP);
-		*mp->b_rptr &= ~FLUSHW;
-	}
-	return (QR_DONE);
+	int rtn;
+
+	if ((rtn = ss7_flushq(q, mp, FLUSHR)) == QR_DONE)
+		rtn = ss7_flushq(WR(q), mp, FLUSHW);
+	return (rtn);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_r_flush);
@@ -382,22 +441,40 @@ EXPORT_SYMBOL_NOVERS(ss7_r_flush);
  *  =========================================================================
  */
 
-/*
- *  PUTQ Put Routine
- *  -------------------------------------------------------------------------
+/**
+ * ss7_putq: - canonical put (qi_putp_t) procedure
+ * @q: queue to put
+ * @mp: message to put
+ * @proc: procedure to process the message
+ *
+ * Notes: M_FLUSH messages are processed without locking and are not queued.  All other normal
+ * priority messages are queued if there exists messages on the queue, or if the service procedure
+ * is running.  This maintains ordering of normal priority messages, but not high priority messages.
+ * Most service interface specifications (NPI, TPI, etc.) require that if the user issues a priority
+ * message that it wait for an acknowledgement before issuing any other (priority) messages.  Note
+ * also that the Stream head only allows one oustanding high priority message and will discard
+ * others arriving at the Stream head.  Priority messages are, therefore, a real one-shot thing.
+ *
+ * Priority messages other than M_FLUSH will be queued if requested by the message handling
+ * procedure, or if locks are in contention on the queue pair.
+ *
+ * The message processing procedure proc() is invoked with the queue pair locked and the procedure
+ * has exclusive access to the queue pair private structure.
  */
 int
-ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t *))
+ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0, locked = 0;
 
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
-	if (q->q_count && mp->b_datap->db_type < QPCTL) {
-		putq(q, mp);
+
+	if (mp->b_datap->db_type < QPCTL && (q->q_first || q->q_flag & QSVCBUSY)) {
+		if (!putq(q, mp))
+			freemsg(mp);
 		return (0);
 	}
-	if ((locked = ss7_trylockq(q)) || mp->b_datap->db_type == M_FLUSH) {
+	if (mp->b_datap->db_type == M_FLUSH || (locked = ss7_trylockq(q))) {
 		do {
 			/* Fast Path */
 			if ((rtn = proc(q, mp)) == QR_DONE) {
@@ -411,7 +488,8 @@ ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), void (*wakeu
 				break;
 			case QR_STRIP:
 				if (mp->b_cont)
-					putq(q, mp->b_cont);
+					if (!putq(q, mp->b_cont))
+						freemsg(mp->b_cont);
 			case QR_TRIMMED:
 				freeb(mp);
 				break;
@@ -432,11 +510,12 @@ ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), void (*wakeu
 				freemsg(mp);
 				break;
 			case QR_DISABLE:
-				putq(q, mp);
+				if (!putq(q, mp))
+					freemsg(mp);
 				rtn = 0;
 				break;
 			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
+				if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
 					putnext(q, mp);
 					break;
 				}
@@ -444,32 +523,36 @@ ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), void (*wakeu
 			case -EBUSY:
 			case -ENOMEM:
 			case -EAGAIN:
-				putq(q, mp);
-				break;
 			case QR_RETRY:
-				putq(q, mp);
+				if (!putq(q, mp))
+					freemsg(mp);
 				break;
 			}
 		} while (0);
-		if (wakeup)
-			wakeup(q);
 		if (locked)
 			ss7_unlockq(q);
 	} else {
-		rare();
-		putq(q, mp);
+		seldom();
+		if (!putq(q, mp))
+			freemsg(mp);
 	}
 	return (rtn);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_putq);
 
-/*
- *  SRVQ Service Routine
- *  -------------------------------------------------------------------------
+/**
+ * ss7_srvq: - canonical service procedure
+ * @q: queue to service
+ * @proc: procedure to process messages
+ * @procwake: procedure to call after queue is processed
+ *
+ * Again, much of the locking and flakiness here was to handle LiS poor locking, synchronization,
+ * lacking qprocson()/qprocsoff() and other poor behaviour.  Only the synchronization is necessary
+ * for running D_MP under Linux Fast-STREAMS.
  */
 int
-ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t *))
+ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_t *))
 {
 	int rtn = 0;
 
@@ -490,7 +573,8 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 				continue;
 			case QR_STRIP:
 				if (mp->b_cont)
-					putbq(q, mp->b_cont);
+					if (!putbq(q, mp->b_cont))
+						freemsg(mp->b_cont);
 			case QR_TRIMMED:
 				freeb(mp);
 				continue;
@@ -514,11 +598,12 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 				printd(("%s: %p: ERROR: (q disabling) %d\n",
 					q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
 				noenable(q);
-				putbq(q, mp);
+				if (!putbq(q, mp))
+					freemsg(mp);
 				rtn = 0;
 				break;
 			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
+				if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
 					putnext(q, mp);
 					continue;
 				}
@@ -529,32 +614,43 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 				if (mp->b_datap->db_type < QPCTL) {
 					printd(("%s: %p: ERROR: (q stalled) %d\n",
 						q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
-					putbq(q, mp);
+					if (!putbq(q, mp))
+						freemsg(mp);
 					break;
 				}
 				/* 
-				 *  Be careful not to put a priority
-				 *  message back on the queue.
+				 *  Be careful not to put a priority message back on the queue.
 				 */
-				if (mp->b_datap->db_type == M_PCPROTO) {
+				switch (mp->b_datap->db_type) {
+				case M_PCPROTO:
 					mp->b_datap->db_type = M_PROTO;
-					mp->b_band = 255;
-					putq(q, mp);
 					break;
+				case M_PCRSE:
+					mp->b_datap->db_type = M_RSE;
+					break;
+				case M_PCCTL:
+					mp->b_datap->db_type = M_CTL;
+					break;
+				default:
+					printd(("%s: %p: ERROR: (q dropping) %d\n",
+						q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
+					freemsg(mp);
+					continue;
 				}
-				printd(("%s: %p: ERROR: (q dropping) %d\n",
-					q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
-				freemsg(mp);
-				continue;
+				mp->b_band = 255;
+				if (!putq(q, mp))
+					freemsg(mp);
+				break;
 			case QR_RETRY:
-				putbq(q, mp);
+				if (!putbq(q, mp))
+					freemsg(mp);
 				continue;
 			}
 			break;
 		}
 		/* perform wakeups */
-		if (wakeup)
-			wakeup(q);
+		if (procwake)
+			procwake(q);
 		ss7_unlockq(q);
 	} else {
 		rare();
@@ -564,23 +660,44 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 
 EXPORT_SYMBOL_NOVERS(ss7_srvq);
 
+/**
+ * ss7_oput: - canonical put procedure for the output side
+ * @q: queue to put
+ * @mp: message to put
+ *
+ * The output queue is a read queue on the upper multiplex or a write queue on the lower multiplex.
+ * The checks for the existence of a queue and the existence of a processing routine are to handle
+ * the older LiS lack of a proper qprocson()/qprocsoff() mechanism.
+ */
 int streamscall
 ss7_oput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
 
 	if (s->oq) {
-		if (s->o_prim)
-			ss7_putq(s->oq, mp, s->o_prim, s->o_wakeup);
-		else
-			putq(s->oq, mp);
-	} else
-		putq(q, mp);
-	return (0);
+		if (s->o_prim) {
+			ss7_putq(s->oq, mp, s->o_prim);
+			return (0);
+		}
+		swerr();
+		if (s->oq->q_qinfo->qi_srvp && putq(s->oq, mp))
+			return (0); /* recovered */
+	}
+	swerr();
+	freemsg(mp);
+	return (-EFAULT);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_oput);
 
+/**
+ * ss7_osrv: - canoncial service procedure for the output side
+ * @q: queue to service
+ *
+ * Note that this function can be called directly even if there is no service procedure.  This is
+ * done by the deferral mechanism for bufcalls.  The message is deferred to the queue and this
+ * procedure invoked on callback when there is no service procedure to enable.
+ */
 int streamscall
 ss7_osrv(queue_t *q)
 {
@@ -602,23 +719,44 @@ ss7_osrv(queue_t *q)
 
 EXPORT_SYMBOL_NOVERS(ss7_osrv);
 
+/**
+ * ss7_iput: - canonical put procedure for the input side
+ * @q: queue to put
+ * @mp: message to put
+ *
+ * The input queue is a write queue on the upper multiplex or a read queue on the lower multiplex.
+ * The checks for the existence of a queue and the existence of a processing routine are to handle
+ * the older LiS lack of a proper qprocson()/qprocsoff() mechanism.
+ */
 int streamscall
 ss7_iput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
 
 	if (s->iq) {
-		if (s->i_prim)
-			ss7_putq(s->iq, mp, s->i_prim, s->i_wakeup);
-		else
-			putq(s->iq, mp);
-	} else
-		putq(q, mp);
-	return (0);
+		if (s->i_prim) {
+			ss7_putq(s->iq, mp, s->i_prim);
+			return (0);
+		}
+		swerr();
+		if (s->iq->q_qinfo->qi_srvp && putq(s->iq, mp))
+			return (0); /* recovered */
+	}
+	swerr();
+	freemsg(mp);
+	return (-EFAULT);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_iput);
 
+/**
+ * ss7_isrv: - canoncial service procedure for the input side
+ * @q: queue to service
+ *
+ * Note that this function can be called directly even if there is no service procedure.  This is
+ * done by the deferral mechanism for bufcalls.  The message is deferred to the queue and this
+ * procedure invoked on callback when there is no service procedure to enable.
+ */
 int streamscall
 ss7_isrv(queue_t *q)
 {
@@ -648,7 +786,8 @@ __OS7_EXTERN_INLINE void ss7_stop_timer(struct head *h, const char *timer, const
 					ulong *timeo);
 EXPORT_SYMBOL_NOVERS(ss7_stop_timer);
 __OS7_EXTERN_INLINE void ss7_start_timer(struct head *h, const char *timer, const char *mod,
-					 ulong *timeo, void streamscall (*exp_func) (caddr_t), ulong val);
+					 ulong *timeo, void streamscall (*exp_func) (caddr_t),
+					 ulong val);
 EXPORT_SYMBOL_NOVERS(ss7_start_timer);
 
 #ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE

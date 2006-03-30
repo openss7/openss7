@@ -1,3 +1,9 @@
+2006-03-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ip.c: working up NPI IP test and mux driver
+	* src/include/sys/npi_ip.h: working up NPI IP test and mux driver
+	* src/drivers/ip.c: corrections for x86_64 compile
+
 2006-03-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* TODO: added netfilter driver to TODO list

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/27 01:25:36 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/30 12:51:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/27 01:25:36 $ by $Author: brian $
+ Last Modified $Date: 2006/03/30 12:51:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.5  2006/03/30 12:51:54  brian
+ - corrections for x64_64 compile
+
+ Revision 0.9.2.4  2006/03/30 10:46:22  brian
+ - working up second gen rawip driver
+
  Revision 0.9.2.3  2006/03/27 01:25:36  brian
  - working up IP driver and SCTP testing
 
@@ -61,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/27 01:25:36 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/30 12:51:54 $"
 
-static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/27 01:25:36 $";
+static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/30 12:51:54 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -133,7 +139,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.3 
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/27 01:25:36 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/30 12:51:54 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -432,7 +438,7 @@ typedef struct raw {
 #define RAW_PRIV(__q) ((struct raw *)((__q)->q_ptr))
 
 STATIC struct raw *raw_opens = NULL;
-STATIC spinlock_t raw_lock = SPIN_LOCK_UNLOCKED;
+STATIC rwlock_t raw_lock = RW_LOCK_UNLOCKED;
 
 STATIC queue_t *npi_bottom = NULL;
 
@@ -2950,7 +2956,7 @@ n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct socka
 	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 	N_unitdata_req_t *p;
-	queue_t *wq = raw->wq=>q_next ? raw->wq : npi_bottom;
+	queue_t *wq = raw->wq->q_next ? raw->wq : npi_bottom;
 
 	if (wq != NULL) {
 		if (bcanputnext(wq, dp->b_band)) {
@@ -4192,7 +4198,7 @@ n_other_ind(queue_t *q, mblk_t *mp)
  * LOCKING: Holding raw_lock protects against the upper stream closing.  raw->qlock protects the
  * state of the private structure.  raw->refs protects the structure from being deallocated.
  */
-STATIC int
+STATIC INLINE fastcall int
 l_unitdata_ind(queue_t *q, mblk_t *mp)
 {
 	struct raw *raw;
@@ -4237,7 +4243,7 @@ l_unitdata_ind(queue_t *q, mblk_t *mp)
  * N_UDERROR_IND messages are passed from a linked NPI IP provider.  They are processed similar to
  * ICMP messages incoming in raw_v4_err().
  */
-STATIC int
+STATIC INLINE fastcall int
 l_uderror_ind(queue_t *q, mblk_t *mp)
 {
 	struct raw *raw;
@@ -4270,7 +4276,7 @@ l_uderror_ind(queue_t *q, mblk_t *mp)
  *
  * Unexpected message.
  */
-STATIC int
+STATIC INLINE fastcall int
 l_other_ind(queue_t *q, mblk_t *mp)
 {
 	swerr();
@@ -5204,7 +5210,7 @@ raw_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = 1;
-	spin_lock_bh(&raw_lock);
+	write_lock_bh(&raw_lock);
 	for (; *rawp; rawp = &(*rawp)->next) {
 		if (cmajor != (*rawp)->cmajor)
 			break;
@@ -5224,17 +5230,17 @@ raw_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	if (mindex >= RAW_CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
-		spin_unlock_bh(&raw_lock);
+		write_unlock_bh(&raw_lock);
 		return (ENXIO);
 	}
 	printd(("%s: opened character device %d:%d\n", DRV_NAME, camjor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(raw = raw_alloc_priv(q, rawp, cmajor, cminor, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
-		spin_unlock_bh(&raw_lock);
+		write_unlock_bh(&raw_lock);
 		return (ENOMEM);
 	}
-	spin_unlock_bh(&raw_lock);
+	write_unlock_bh(&raw_lock);
 	qprocson(q);
 	return (0);
 }

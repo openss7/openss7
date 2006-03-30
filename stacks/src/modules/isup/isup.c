@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:09:42 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/30 10:43:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:09:42 $ by $Author: brian $
+ Last Modified $Date: 2006/03/30 10:43:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.14  2006/03/30 10:43:49  brian
+ - zero cache pointers on deallocation
+
  Revision 0.9.2.13  2006/03/07 01:09:42  brian
  - binary compatible callouts
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:09:42 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/30 10:43:49 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:09:42 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/30 10:43:49 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -88,7 +91,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:09:42 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/30 10:43:49 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -25310,16 +25313,22 @@ isup_init_caches(void)
 	return (0);
       no_mtp:
 	kmem_cache_destroy(isup_sp_cachep);
+	isup_sp_cachep = NULL;
       no_sp:
 	kmem_cache_destroy(isup_sr_cachep);
+	isup_sr_cachep = NULL;
       no_sr:
 	kmem_cache_destroy(isup_ct_cachep);
+	isup_ct_cachep = NULL;
       no_ct:
 	kmem_cache_destroy(isup_cg_cachep);
+	isup_cg_cachep = NULL;
       no_cg:
 	kmem_cache_destroy(isup_tg_cachep);
+	isup_tg_cachep = NULL;
       no_tg:
 	kmem_cache_destroy(isup_cc_cachep);
+	isup_cc_cachep = NULL;
       no_cc:
 	return (-ENOMEM);
 }
@@ -25533,7 +25542,7 @@ cc_put(struct cc *cc)
 {
 	if (cc && atomic_dec_and_test(&cc->refcnt)) {
 		kmem_cache_free(isup_cc_cachep, cc);
-		printd(("%s: %s: %p: deallocated cc structure", DRV_NAME, __FUNCTION__, cc));
+		printd(("%s: %s: %p: deallocated cc structure\n", DRV_NAME, __FUNCTION__, cc));
 	}
 }
 
@@ -26766,7 +26775,7 @@ MODULE_PARM_DESC(major, "Device number for the ISUP driver. (0 for allocation.)"
 STATIC struct cdevsw isup_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &isupinfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

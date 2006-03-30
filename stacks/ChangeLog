@@ -1,3 +1,9 @@
+2006-03-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/isup/isup.c: zero cache pointers on deallocation
+	* src/modules/rtp/rtp.c: start of RTP driver
+	* src/modules/sdl/spm.c: corrections for new ss7_putp prototype
+
 2006-03-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strss7.refs: updated LiS and STREAMS release numbers

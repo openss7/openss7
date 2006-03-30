@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_ip.h,v 0.9.2.2 2006/03/27 01:25:56 brian Exp $
+ @(#) $Id: npi_ip.h,v 0.9.2.3 2006/03/30 10:47:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/27 01:25:56 $ by $Author: brian $
+ Last Modified $Date: 2006/03/30 10:47:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_ip.h,v $
+ Revision 0.9.2.3  2006/03/30 10:47:34  brian
+ - working up NPI IP test and mux driver
+
  Revision 0.9.2.2  2006/03/27 01:25:56  brian
  - working up IP driver and SCTP testing
 
@@ -60,7 +63,7 @@
 #ifndef SYS_NPI_IP_H
 #define SYS_NPI_IP_H
 
-#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/npi.h>
 
@@ -70,6 +73,8 @@
 #define N_QOS_SEL_INFO_IP	0x0201
 #define N_QOS_RANGE_INFO_IP	0x0202
 #define N_QOS_SEL_CONN_IP	0x0203
+#define N_QOS_SEL_RESET_IP	0x0204
+#define N_QOS_SEL_UD_IP		0x0205
 
 typedef struct N_qos_sel_info_ip {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_INFO_IP */
@@ -90,8 +95,19 @@ typedef struct N_qos_sel_conn_ip {
 
 typedef struct N_qos_sel_reset_ip {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_RESET_IP */
+	np_ulong ttl;
+	np_ulong tos;
 	np_ulong mtu;
 } N_qos_sel_reset_ip_t;
+
+typedef struct N_qos_sel_ud_ip {
+	np_ulong n_qos_type;		/* always N_QOS_SEL_UD_IP */
+	np_ulong protocol;		/* protocol for outgoing packet */
+	np_ulong priority;		/* priority for outgoing packet */
+	np_ulong ttl;			/* time to live for outgoing packet */
+	np_ulong tos;			/* type of service for outgoing packet */
+	np_ulong ipaddr;		/* source IP address for outgoing packet */
+} N_qos_sel_ud_ip_t;
 
 /* 
    NC reset request

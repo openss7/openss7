@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: allocb.h,v 0.9.2.7 2005/12/19 12:44:31 brian Exp $
+ @(#) $Id: allocb.h,v 0.9.2.8 2006/03/30 10:45:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,7 +44,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:31 $ by $Author: brian $
+ Last Modified $Date: 2006/03/30 10:45:47 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -59,119 +58,169 @@
  *
  *  =========================================================================
  */
-/*
- *  BUFSRV call service routine
- *  -------------------------------------------------------------------------
+/**
+ * ss7_bufsrv: - buffer callback service procedure
+ * @data: queue to enable
+ *
+ * This bufcall callback routine simply enables the queue for which the callback was generated.
+ * Note that messages might be deferred on the queue even if the queue does not have a service
+ * procedure.  If there is no defined service procedure, we reinvoke message processing here.
+ *
+ * The expensive atomic exchanges here are for Linux STREAMS (LiS) that has horribly unsafe bufcall,
+ * unbufcall and callback mechanisms.
  */
 __OS7_EXTERN_INLINE void streamscall
 ss7_bufsrv(long data)
 {
-	queue_t *q = (queue_t *) data;
+	str_t *s;
+	queue_t *q;
 
-	if (q) {
-		str_t *s = STR_PRIV(q);
+	q = (queue_t *) data;
+	ensure(q, return);
+	s = STR_PRIV(q);
+	ensure(s, return);
 
-		if (q == s->iq) {
-			if (s->ibid) {
-				s->ibid = 0;
-				atomic_dec(&s->refcnt);
-			}
-			if (q->q_qinfo && q->q_qinfo->qi_srvp)
-				qenable(q);
-			else
-				ss7_isrv(q);
-		}
-		if (q == s->oq) {
-			if (s->obid) {
-				s->obid = 0;
-				atomic_dec(&s->refcnt);
-			}
-			if (q->q_qinfo && q->q_qinfo->qi_srvp)
-				qenable(q);
-			else
-				ss7_osrv(q);
-		}
+	if (q == s->iq) {
+		if (xchg(&s->ibid, 0) != 0)
+			atomic_dec(&s->refcnt);
+		if (q->q_qinfo && q->q_qinfo->qi_srvp)
+			qenable(q);
+		else
+			ss7_isrv(q);
+		return;
 	}
+	if (q == s->oq) {
+		if (xchg(&s->obid, 0) != 0)
+			atomic_dec(&s->refcnt);
+		if (q->q_qinfo && q->q_qinfo->qi_srvp)
+			qenable(q);
+		else
+			ss7_osrv(q);
+		return;
+	}
+	return;
 }
 
-/*
- *  UNBUFCALL
- *  -------------------------------------------------------------------------
+/**
+ * ss7_unbufcall: - reliably cancel a buffer callbacks
+ * @s: private structure of queue pair
+ *
+ * Cancel the qenable() buffer callback associated with each queue in the queue pair.
+ * ss7_unbufcall() effectively undoes the actions performed by ss7_bufcall().  It is intended to be
+ * called from the module close procedure to cancel these pending buffer callbacks.
+ *
+ * NOTICES: Cancellation of buffer callbacks on LiS using unbufcall() is unreliable.  The callback
+ * function could execute some time shortly after the call to unbufcall() has returned.   LiS
+ * abbrogates the SVR 4 STREAMS principles for unbufcall().  This is why you will find atomic
+ * exchanges here and in the callback function and why reference counting is performed on the
+ * structure.
  */
 __OS7_EXTERN_INLINE void
 ss7_unbufcall(str_t * s)
 {
-	if (s->ibid) {
-		unbufcall(xchg(&s->ibid, 0));
+	bufcall_id_t bid;
+
+	if ((bid = xchg(&s->ibid, 0))) {
+		unbufcall(bid);
 		atomic_dec(&s->refcnt);
 	}
-	if (s->obid) {
-		unbufcall(xchg(&s->obid, 0));
+	if ((bid = xchg(&s->obid, 0))) {
+		unbufcall(bid);
 		atomic_dec(&s->refcnt);
 	}
 }
 
-/*
- *  BUFCALL
- *  -------------------------------------------------------------------------
+/**
+ *  ss7_bufcall: - generate a buffer callback to enable a queue
+ *  @q: the queue to enable on callback
+ *  @size: size of the allocation
+ *  @prior: priority of the allocation
+ *
+ *  Maintain one buffer call for each queue in the queue pair.  The callback function will simply
+ *  perform a qenable(9).
+ *
+ *  NOTICES: One of the reasons for going to such extents is that LiS has completely unsafe buffer
+ *  callbacks.  The buffer callback function can be invoked (shortly) after unbufcall() returns
+ *  under LiS in abrogation of SVR 4 STREAMS principles.  This is why you will find atomic exchanges
+ *  here and in the callback function and why reference counting is performed on the structure and
+ *  queue pointers are checked for NULL.
  */
 __OS7_EXTERN_INLINE void
 ss7_bufcall(queue_t *q, size_t size, int prior)
 {
 	if (q) {
 		str_t *s = STR_PRIV(q);
+		bufcall_id_t bid, *bidp = NULL;
 
-		if (q == s->iq) {
-			if (!s->ibid) {
-				s->ibid = bufcall(size, prior, &ss7_bufsrv, (long) q);
-				atomic_inc(&s->refcnt);
+		if (q == s->iq)
+			bidp = &s->ibid;
+		if (q == s->oq)
+			bidp = &s->obid;
+
+		if (bidp) {
+			atomic_inc(&s->refcnt);
+			if ((bid = xchg(bidp, bufcall(size, prior, &ss7_bufsrv, (long) q)))) {
+				unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
+				atomic_dec(&s->refcnt);
 			}
 			return;
 		}
-		if (q == s->oq) {
-			if (!s->obid) {
-				s->obid = bufcall(size, prior, &ss7_bufsrv, (long) q);
-				atomic_inc(&s->refcnt);
-			}
-			return;
-		}
-		swerr();
-		return;
 	}
+	swerr();
+	return;
 }
 
-/*
- *  ESBBCALL
- *  -------------------------------------------------------------------------
+/**
+ *  ss7_esbcall: - generate a buffer callback to enable a queue
+ *  @q: the queue to enable on callback
+ *  @prior: priority of the allocation
+ *
+ *  Maintain one buffer call for each queue in the queue pair.  The callback function will simply
+ *  perform a qenable(9).
+ *
+ *  NOTICES: One of the reasons for going to such extents is that LiS has completely unsafe buffer
+ *  callbacks.  The buffer callback function can be invoked (shortly) after unbufcall() returns
+ *  under LiS in abrogation of SVR 4 STREAMS principles.  This is why you will find atomic exchanges
+ *  here and in the callback function and why reference counting is performed on the structure and
+ *  queue pointers are checked for NULL.
  */
 __OS7_EXTERN_INLINE void
 ss7_esbbcall(queue_t *q, int prior)
 {
 	if (q) {
 		str_t *s = STR_PRIV(q);
+		bufcall_id_t bid, *bidp = NULL;
 
-		if (q == s->iq) {
-			if (!s->ibid) {
-				s->ibid = esbbcall(prior, &ss7_bufsrv, (long) q);
-				atomic_inc(&s->refcnt);
+		if (q == s->iq)
+			bidp = &s->ibid;
+		if (q == s->oq)
+			bidp = &s->obid;
+
+		if (bidp) {
+			atomic_inc(&s->refcnt);
+			if ((bid = xchg(bidp, esbbcall(prior, &ss7_bufsrv, (long) q)))) {
+				unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
+				atomic_dec(&s->refcnt);
 			}
 			return;
 		}
-		if (q == s->oq) {
-			if (!s->obid) {
-				s->obid = esbbcall(prior, &ss7_bufsrv, (long) q);
-				atomic_inc(&s->refcnt);
-			}
-			return;
-		}
-		swerr();
-		return;
 	}
+	swerr();
+	return;
 }
 
-/*
- *  ALLOCB
- *  -------------------------------------------------------------------------
+/**
+ *  ss7_allocb: - reliable allocb()
+ *  @q: the queue to enable when allocation can succeed
+ *  @size: the size to allocate
+ *  @prior: the priority of the allocation
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that allocate a
+ *  buffer in response to an incoming message.  If the allocation fails, this routine will return
+ *  NULL and issue a buffer callback to reenable the queue @q when the allocation could succeed.
+ *  When NULL is returned, the caller should simply place the incoming message on the queue (i.e.
+ *  with putq() from a put procedure or putbq() from a service procedure) and return.  The queue
+ *  will be rescheduled with qenable() when the allocation could succeed.
  */
 __OS7_EXTERN_INLINE mblk_t *
 ss7_allocb(queue_t *q, size_t size, int prior)
@@ -185,9 +234,21 @@ ss7_allocb(queue_t *q, size_t size, int prior)
 	return (mp);
 }
 
-/*
- *  ESBALLOC
- *  -------------------------------------------------------------------------
+/**
+ *  ss7_esballoc: - reliable esballoc()
+ *  @q: the queue to enable when allocation can succeed
+ *  @base: the base of the external data buffer
+ *  @size: the size of the external data buffer
+ *  @prior: the priority of the allocation
+ *  @frtn: a pointer to a free routine structure (containing callback and client data)
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that allocate a
+ *  message block with an external buffer in response to an incoming message.  If the allocation
+ *  fails, this routine will return NULL and issue a buffer callback to reenable the queue @q when
+ *  the allocation could succeed.  When NULL is returned, the caller should simply place the
+ *  incoming message on the queue (i.e.  with putq() from a put procedure or putbq() from a service
+ *  procedure) and return.  The queue will be rescheduled with qenable() when the allocation could
+ *  succeed.
  */
 __OS7_EXTERN_INLINE mblk_t *
 ss7_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
@@ -201,64 +262,111 @@ ss7_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *fr
 	return (mp);
 }
 
-/*
- *  PULLUPMSG
- *  -------------------------------------------------------------------------
+/**
+ *  ss7_pullupmsg: - reliable pullupmsg()
+ *  @q: queue to enable when pullup can succeed
+ *  @mp: message to pullup
+ *  @size: number of bytes to pull
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that pullup an
+ *  incoming message.  If the allocation fails, this routine will return -ENOBUFS and issue a buffer
+ *  callback to reenable the queue @q when the pullup could succeed.  When -ENOBUFS is returned, the
+ *  caller should simply place the incoming message on the queue (i.e.  with putq() from a put
+ *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
+ *  qenable() when the duplication could succeed.
  */
 __OS7_EXTERN_INLINE int
 ss7_pullupmsg(queue_t *q, mblk_t *mp, int size)
 {
 	if (pullupmsg(mp, size) != 0)
 		return (QR_DONE);
-	ss7_bufcall(q, size, BPRI_MED);
+	ss7_bufcall(q, size > 0 ? size : -size, BPRI_MED);
 	return (-ENOBUFS);
 }
 
-/*
- *  DUPB
- *  -------------------------------------------------------------------------
+/**
+ *  ss7_dupb: - reliable dupb()
+ *  @q: queue to enable when duplication can succeed
+ *  @bp: message block to duplicate
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that duplicate an
+ *  incoming message block.  If the allocation fails, this routine will return NULL and issue a
+ *  buffer callback to reenable the queue @q when the duplication could succeed.  When NULL is
+ *  returned, the caller should simply place the incoming message on the queue (i.e.  with putq()
+ *  from a put procedure or putbq() from a service procedure) and return.  The queue will be
+ *  rescheduled with qenable() when the duplication could succeed.
  */
 __OS7_EXTERN_INLINE mblk_t *
 ss7_dupb(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
 
-	if (!(mp = dupb(bp)))
-		ss7_bufcall(q, bp->b_wptr - bp->b_rptr, BPRI_MED);
+	if ((mp = dupb(bp)))
+		return (mp);
+	rare();
+	ss7_bufcall(q, bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0, BPRI_MED);
 	return (mp);
 }
 
-/*
- *  DUPMSG
- *  -------------------------------------------------------------------------
+/**
+ *  ss7_dupmsg: - reliable dupmsg()
+ *  @q: queue to enable when duplication can succeed
+ *  @bp: message to duplicate
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that duplicate an
+ *  incoming message.  If the allocation fails, this routine will return NULL and issue a buffer
+ *  callback to reenable the queue @q when the duplication could succeed.  When NULL is returned,
+ *  the caller should simply place the incoming message on the queue (i.e.  with putq() from a put
+ *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
+ *  qenable() when the duplication could succeed.
  */
 __OS7_EXTERN_INLINE mblk_t *
 ss7_dupmsg(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
 
-	if (!(mp = dupmsg(bp)))
-		ss7_bufcall(q, msgsize(bp), BPRI_MED);
+	if ((mp = dupmsg(bp)))
+		return (mp);
+	rare();
+	ss7_bufcall(q, msgsize(bp), BPRI_MED);
 	return (mp);
 }
 
-/*
- *  COPYB
- *  -------------------------------------------------------------------------
+/**
+ *  ss7_copyb: - reliable copyb()
+ *  @q: queue to enable when copy can succeed
+ *  @bp: message block to copy
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that copy an
+ *  incoming message block.  If the allocation fails, this routine will return NULL and issue a
+ *  buffer callback to reenable the queue @q when the copy could succeed.  When NULL is returned,
+ *  the caller should simply place the incoming message on the queue (i.e.  with putq() from a put
+ *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
+ *  qenable() when the duplication could succeed.
  */
 __OS7_EXTERN_INLINE mblk_t *
 ss7_copyb(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
 
-	if (!(mp = copyb(bp)))
-		ss7_bufcall(q, bp->b_wptr - bp->b_rptr, BPRI_MED);
+	if ((mp = copyb(bp)))
+		return (mp);
+	rare();
+	ss7_bufcall(q, bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0, BPRI_MED);
 	return (mp);
 }
 
-/*
- *  COPYMSG
- *  -------------------------------------------------------------------------
+/**
+ *  ss7_copymsg: - reliable copymsg()
+ *  @q: queue to enable when copy can succeed
+ *  @bp: message to copy
+ *
+ *  This helper function can be used by most STREAMS message handling procedures that copy an
+ *  incoming message.  If the allocation fails, this routine will return NULL and issue a buffer
+ *  callback to reenable the queue @q when the copy could succeed.  When NULL is returned, the
+ *  caller should simply place the incoming message on the queue (i.e.  with putq() from a put
+ *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
+ *  qenable() when the duplication could succeed.
  */
 __OS7_EXTERN_INLINE mblk_t *
 ss7_copymsg(queue_t *q, mblk_t *bp)
@@ -266,7 +374,8 @@ ss7_copymsg(queue_t *q, mblk_t *bp)
 	mblk_t *mp;
 
 	if (!(mp = copymsg(bp)))
-		ss7_bufcall(q, msgsize(bp), BPRI_MED);
+		return (mp);
+	ss7_bufcall(q, msgsize(bp), BPRI_MED);
 	return (mp);
 }
 

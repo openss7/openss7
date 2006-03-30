@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: priv.h,v 0.9.2.5 2005/07/18 12:25:40 brian Exp $
+ @(#) $Id: priv.h,v 0.9.2.6 2006/03/30 10:45:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
+ Last Modified $Date: 2006/03/30 10:45:47 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -101,11 +101,13 @@ typedef struct head {
 	void (*i_wakeup)(queue_t *);		/* isrv wakeup function */ \
 	void (*o_wakeup)(queue_t *);		/* osrv wakeup function */ \
 	spinlock_t qlock;			/* queue lock */ \
+	uint users;				/* queue users */ \
 	uint ibid;				/* iput bufcall id */ \
 	uint obid;				/* oput bufcall id */ \
 	queue_t *iwait;				/* iput queue waiting */ \
 	queue_t *owait;				/* oput queue waiting */ \
 	ulong i_state;				/* interface state */ \
+	ulong i_flags;				/* interface flags */ \
 	ulong i_style;				/* interface style */ \
 	ulong i_version;			/* interface version */ \
 	ulong i_oldstate;			/* previous state */ \
