@@ -2,6 +2,9 @@
 
 	* src/drivers/rawip.c: working up second gen rawip driver
 	* src/drivers/rawip.c: corrections for x86_64 compile
+	* src/drivers/inet.c (ss_sock_recvmsg): fixed buffer leak reported by
+	  John Wenker
+	* scripts/texi/funding.texi: added John Wenker to contributors list
 
 2006-03-25  Brian Bidulock  <bidulock@openss7.org>
 

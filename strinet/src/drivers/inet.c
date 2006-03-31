@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/03/18 00:15:13 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/03/31 00:36:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/18 00:15:13 $ by $Author: brian $
+ Last Modified $Date: 2006/03/31 00:36:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.63  2006/03/31 00:36:43  brian
+ - fixed buffer leak reported by John Wenker
+
  Revision 0.9.2.62  2006/03/18 00:15:13  brian
  - syncing notebook
 
@@ -63,10 +66,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/03/18 00:15:13 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/03/31 00:36:43 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/03/18 00:15:13 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/03/31 00:36:43 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -520,7 +523,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/03/18 00:15:13 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/03/31 00:36:43 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -13607,7 +13610,7 @@ ss_sock_recvmsg(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
-	int err, res, size = 0;
+	int err, size = 0;
 	struct msghdr msg = { NULL, };
 	u_int32_t cbuf[32] = { 0xdeadbeef, };
 	struct sockaddr add = { AF_INET, };
@@ -13650,16 +13653,10 @@ ss_sock_recvmsg(queue_t *q)
 			msg.msg_control = cbuf;
 			msg.msg_controllen = sizeof(cbuf);
 			msg.msg_flags = MSG_DONTWAIT;
-			if ((res = ss_recvmsg(ss, &msg, size)) < 0) {
-				freemsg(mp);
-				return (res);
-			}
-			if (res == 0) {
-				freemsg(mp);
-				return (QR_DONE);
-			}
-			mp->b_wptr = mp->b_rptr + res;
-			ptrace(("%s: %p: recvmsg with len = %d\n", DRV_NAME, ss, res));
+			if ((err = ss_recvmsg(ss, &msg, size)) <= 0)
+				goto error;
+			mp->b_wptr = mp->b_rptr + err;
+			ptrace(("%s: %p: recvmsg with len = %d\n", DRV_NAME, ss, err));
 		}
 		if (msg.msg_flags & MSG_CTRUNC) {
 			printd(("%s: %p: control message truncated\n", DRV_NAME, ss));
@@ -13684,31 +13681,30 @@ ss_sock_recvmsg(queue_t *q)
 			msg.msg_controllen = 0;
 		}
 #if 0
-		if (msg.msg_flags & MSG_TRUNC) {
-			freemsg(mp);
-			return (-EMSGSIZE);
-		}
+		if (msg.msg_flags & MSG_TRUNC)
+			goto emsgsize;
 #endif
 		if (ss->p.info.SERV_type == T_CLTS) {
-			if (msg.msg_flags & MSG_ERRQUEUE) {
-				if ((err = t_uderror_ind(q, &msg, mp)) != QR_ABSORBED)
-					return (err);
-			} else if ((err = t_unitdata_ind(q, &msg, mp)) != QR_ABSORBED)
-				return (err);
+			err = (msg.msg_flags & MSG_ERRQUEUE) ?
+			    t_uderror_ind(q, &msg, mp) : t_unitdata_ind(q, &msg, mp);
 		} else if (!msg.msg_controllen) {
-			if (msg.msg_flags & MSG_OOB) {
-				if ((err = t_exdata_ind(q, &msg, mp)) != QR_ABSORBED)
-					return (err);
-			} else {
-				if ((err = t_data_ind(q, &msg, mp)) != QR_ABSORBED)
-					return (err);
-			}
+			err = (msg.msg_flags & MSG_OOB) ?
+			    t_exdata_ind(q, &msg, mp) : t_data_ind(q, &msg, mp);
 		} else {
-			if ((err = t_optdata_ind(q, &msg, mp)) != QR_ABSORBED)
-				return (err);
+			err = t_optdata_ind(q, &msg, mp);
 		}
+		if (err != QR_ABSORBED)
+			goto error;
 	}
 	return (-EBUSY);
+#if 0
+      emsgsize:
+	err = -EMSGSIZE;
+	goto error;
+#endif
+      error:
+	freemsg(mp);
+	return (err);
 }
 
 /*
