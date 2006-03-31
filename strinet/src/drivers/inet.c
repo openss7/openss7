@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/03/31 00:36:43 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/03/31 12:43:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/31 00:36:43 $ by $Author: brian $
+ Last Modified $Date: 2006/03/31 12:43:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.64  2006/03/31 12:43:31  brian
+ - stab at ss_sock_sendmsg corrections
+
  Revision 0.9.2.63  2006/03/31 00:36:43  brian
  - fixed buffer leak reported by John Wenker
 
@@ -66,10 +69,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/03/31 00:36:43 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/03/31 12:43:31 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/03/31 00:36:43 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/03/31 12:43:31 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -523,7 +526,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/03/31 00:36:43 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/03/31 12:43:31 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -4346,7 +4349,7 @@ t_parse_conn_opts(ss_t *ss, const unsigned char *ip, size_t ilen, int request)
  *  Calculate how large a cmsg buffer needs to be to contain all of the
  *  options provided to T_OPTDATA_REQ or T_UNITDATA_REQ.
  */
-STATIC int
+STATIC fastcall __hot_out int
 ss_cmsg_size(const ss_t *ss, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -4429,7 +4432,7 @@ ss_cmsg_size(const ss_t *ss, const unsigned char *ip, size_t ilen)
  *  Build a cmsg buffer from options provided to T_OPTDATA_REQ or
  *  T_UNITDATA_REQ.
  */
-STATIC int
+STATIC fastcall __hot_out int
 ss_cmsg_build(const ss_t *ss, const unsigned char *ip, size_t ilen, struct msghdr *msg)
 {
 	struct cmsghdr *ch = CMSG_FIRSTHDR(msg);
@@ -4608,12 +4611,12 @@ ss_cmsg_build(const ss_t *ss, const unsigned char *ip, size_t ilen, struct msghd
 	return (-EPROTO);
 }
 
-STATIC int
+STATIC INLINE fastcall __hot_get int
 ss_errs_size(ss_t *ss, struct msghdr *msg)
 {
 	return (0);
 }
-STATIC int
+STATIC INLINE fastcall __hot_get int
 ss_errs_build(ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen, int *etype)
 {
 	return (-EFAULT);
@@ -4625,7 +4628,7 @@ ss_errs_build(ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen, int 
  *  Calculate the size of the options buffer necessary to hold elements in a
  *  cmsg.  Only options with end to end significance are important.
  */
-STATIC int
+STATIC fastcall __hot_in int
 ss_opts_size(const ss_t *ss, struct msghdr *msg)
 {
 	int size = 0;
@@ -4690,7 +4693,7 @@ ss_opts_size(const ss_t *ss, struct msghdr *msg)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  *  Data indications only indicate options with end-to-end significance.
  */
-STATIC int
+STATIC fastcall __hot_in int
 ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen)
 {
 	struct cmsghdr *cmsg;
@@ -12064,7 +12067,7 @@ t_build_options(ss_t *t, unsigned char *ip, size_t ilen, unsigned char *op, size
  *
  *  =========================================================================
  */
-STATIC int
+STATIC INLINE fastcall __hot int
 ss_addr_size(ss_t *ss, struct sockaddr *add)
 {
 	if (add) {
@@ -12135,7 +12138,7 @@ state_name(t_scalar_t state)
 	}
 }
 #endif
-STATIC void
+STATIC INLINE fastcall __hot void
 ss_set_state(ss_t *ss, t_scalar_t state)
 {
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, ss, state_name(state),
@@ -12143,7 +12146,7 @@ ss_set_state(ss_t *ss, t_scalar_t state)
 	ss->p.info.CURRENT_state = state;
 }
 
-STATIC t_scalar_t
+STATIC INLINE fastcall __hot t_scalar_t
 ss_get_state(ss_t *ss)
 {
 	return (ss->p.info.CURRENT_state);
@@ -12453,7 +12456,7 @@ ss_connect(ss_t *ss, struct sockaddr *dst)
  *  SOCKET SENDMSG
  *  ------------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_out int
 ss_sendmsg(ss_t *ss, struct msghdr *msg, int len)
 {
 	int res;
@@ -12481,7 +12484,7 @@ ss_sendmsg(ss_t *ss, struct msghdr *msg, int len)
  *  SOCKET RECVMSG
  *  ------------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_in int
 ss_recvmsg(ss_t *ss, struct msghdr *msg, int size)
 {
 	int res;
@@ -12652,7 +12655,7 @@ m_error(queue_t *q, int error)
  *  T_CONN_IND          11 - Connection Indication
  *  ---------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_conn_ind(queue_t *q, struct sockaddr *src, mblk_t *cp)
 {
 	ss_t *ss = PRIV(q);
@@ -12708,7 +12711,7 @@ t_conn_ind(queue_t *q, struct sockaddr *src, mblk_t *cp)
  *  T_CONN_CON          12 - Connection Confirmation
  *  ---------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_conn_con(queue_t *q, struct sockaddr *res, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
@@ -12844,7 +12847,7 @@ t_discon_ind(queue_t *q, struct sockaddr *res, uint orig, uint reason, mblk_t *c
  *  T_DATA_IND          14 - Data Indication
  *  ---------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_in int
 t_data_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
@@ -12857,6 +12860,8 @@ t_data_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 		p->PRIM_type = T_DATA_IND;
 		p->MORE_flag = (msg->msg_flags & MSG_EOR) ? 1 : 0;
 		mp->b_wptr += sizeof(*p);
+		dp->b_band = 0;	/* sometimes non-zero */
+		dp->b_flag &= ~MSGMARK;	/* sometimes marked */
 		mp->b_cont = dp;
 		printd(("%s: %p: <- T_DATA_IND\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
@@ -12870,7 +12875,7 @@ t_data_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  T_EXDATA_IND        15 - Expedited Data Indication
  *  ---------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_in int
 t_exdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
@@ -12884,6 +12889,8 @@ t_exdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 		p->PRIM_type = T_EXDATA_IND;
 		p->MORE_flag = (msg->msg_flags & MSG_EOR) ? 1 : 0;
 		mp->b_wptr += sizeof(*p);
+		dp->b_band = 0;	/* sometimes non-zero */
+		dp->b_flag &= ~MSGMARK;	/* sometimes marked */
 		mp->b_cont = dp;
 		printd(("%s: %p: <- T_EXDATA_IND\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
@@ -12897,7 +12904,7 @@ t_exdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  T_INFO_ACK          16 - Information acknowledgement
  *  ---------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_info_ack(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
@@ -12921,7 +12928,7 @@ t_info_ack(queue_t *q)
  *  T_BIND_ACK          17 - Bind Acknowledgement
  *  ---------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_bind_ack(queue_t *q, struct sockaddr *add, t_uscalar_t conind)
 {
 	ss_t *ss = PRIV(q);
@@ -13033,11 +13040,12 @@ t_error_ack(queue_t *q, t_scalar_t prim, t_scalar_t error)
 	return (-ENOBUFS);
 }
 
+STATIC fastcall __hot_in int ss_sock_recvmsg(queue_t *q);
+
 /*
  *  T_OK_ACK            19 - Success Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int ss_sock_recvmsg(queue_t *q);
 STATIC int
 t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *cp, ss_t *as)
 {
@@ -13147,7 +13155,7 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *cp, ss_t *as)
  *  T_UNIDATA_IND       20 - Unitdata indication
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_in int
 t_unitdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
@@ -13176,6 +13184,8 @@ t_unitdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 			ss_opts_build(ss, msg, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
+		dp->b_band = 0;	/* sometimes non-zero */
+		dp->b_flag &= ~MSGMARK;	/* sometimes marked */
 		mp->b_cont = dp;
 		printd(("%s: %p: <- T_UNITDATA_IND\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
@@ -13194,7 +13204,7 @@ t_unitdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  This is not called, but should be when T_UNITDATA_REQ fails due to options
  *  errors or permission.
  */
-STATIC INLINE int
+STATIC INLINE fastcall __hot_get int
 t_uderror_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
@@ -13223,6 +13233,8 @@ t_uderror_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 				mp->b_wptr += opt_len;
 			}
 			p->ERROR_type = etype;
+			dp->b_band = 0;	/* sometimes non-zero */
+			dp->b_flag &= ~MSGMARK;	/* sometimes marked */
 			mp->b_cont = dp;
 			printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, ss));
 			putnext(ss->rq, mp);
@@ -13241,7 +13253,7 @@ t_uderror_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  Note: opt_len is conservative but might not be actual size of the output
  *  options.  This will be adjusted when the option buffer is built.
  */
-STATIC int
+STATIC fastcall int
 t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, size_t opt_len)
 {
 	ss_t *ss = PRIV(q);
@@ -13315,7 +13327,7 @@ t_ordrel_ind(queue_t *q)
  *  T_OPTDATA_IND       26 - Data with Options Indication
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_in int
 t_optdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
@@ -13343,6 +13355,8 @@ t_optdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 			ss_opts_build(ss, msg, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
+		dp->b_band = 0;	/* sometimes non-zero */
+		dp->b_flag &= ~MSGMARK;	/* sometimes marked */
 		mp->b_cont = dp;
 		printd(("%s: %p: <- T_OPTDATA_IND\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
@@ -13357,7 +13371,7 @@ t_optdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  T_ADDR_ACK          27 - Address Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_addr_ack(queue_t *q, struct sockaddr *loc, struct sockaddr *rem)
 {
 	ss_t *ss = PRIV(q);
@@ -13401,7 +13415,7 @@ t_addr_ack(queue_t *q, struct sockaddr *loc, struct sockaddr *rem)
  *  that if the T_CAPABILITY_REQ was sent as a M_PROTO, then the
  *  T_CAPABILITY_ACK must also be sent as a M_PROTO.
  */
-STATIC int
+STATIC fastcall int
 t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
 {
 	ss_t *ss = PRIV(q);
@@ -13445,7 +13459,7 @@ t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
  *  address.  This means that connection must be accepted and then released,
  *  rather than refused.
  */
-STATIC int
+STATIC fastcall int
 ss_conn_ind(queue_t *q, mblk_t *cp)
 {
 	ss_t *ss = PRIV(q);
@@ -13514,7 +13528,7 @@ ss_conn_ind(queue_t *q, mblk_t *cp)
  *  message and then call sendmsg on the socket with the kernel data segment.
  *  The socket will handle moving data from the mblks.
  */
-STATIC int
+STATIC fastcall __hot_out int
 ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 {
 	int err = 0;
@@ -13601,28 +13615,33 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 	}
 }
 
+STATIC fastcall int __hot_in ss_r_data(queue_t *q, mblk_t *mp);
+
 /*
  *  RECVMSG
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall __hot_in int
 ss_sock_recvmsg(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
-	int err, size = 0;
-	struct msghdr msg = { NULL, };
-	u_int32_t cbuf[32] = { 0xdeadbeef, };
-	struct sockaddr add = { AF_INET, };
-	struct sk_buff *skb;
+	struct msghdr *msg;
+	struct sockaddr *add;
+	u_int32_t *cbuf;
+	const size_t clen = (sizeof(u_int32_t) << 5);
+	struct iovec *iov;
+	int size;
 
-	while (canputnext(ss->rq)) {
+	while (canput(q)) {
 		switch (ss->p.prot.type) {
 		case SOCK_DGRAM:
 		case SOCK_RAW:
 		case SOCK_RDM:
 		case SOCK_STREAM:
 		{
+			struct sk_buff *skb;
+
 			ensure(ss->sock, return (QR_DONE));	/* spurious, ignore it */
 			size = (skb = skb_peek(&ss->sock->sk->sk_receive_queue)) ? skb->len : 0;
 			break;
@@ -13631,80 +13650,123 @@ ss_sock_recvmsg(queue_t *q)
 			ensure(ss->sock, return (QR_DONE));	/* spurious, ignore it */
 			size = atomic_read(&ss->sock->sk->sk_rmem_alloc);
 			break;
+		default:
+			swerr();
+			size = 0;
+			break;
 		}
 		if (!size)
 			return (QR_DONE);
-		if (!(mp = ss_allocb(ss->rq, size, BPRI_MED)))
-			return (-ENOBUFS);
-		{
-			struct iovec iov[1];
 
-			iov[0].iov_base = mp->b_rptr;
-			iov[0].iov_len = size;
-			if (ss->p.prot.type != SOCK_STREAM) {
-				msg.msg_name = &add;
-				msg.msg_namelen = ss_addr_size(ss, &add);
-			} else {
-				msg.msg_name = NULL;
-				msg.msg_namelen = 0;
+		if (!(mp = ss_allocb(ss->rq,
+				     size + sizeof(*msg) + sizeof(*add) +
+				     clen + sizeof(*iov), BPRI_MED)))
+			return (-ENOBUFS);
+		/* message header */
+		msg = (struct msghdr *) mp->b_wptr;
+		mp->b_wptr += sizeof(*msg);
+		/* address */
+		add = (struct sockaddr *) mp->b_wptr;
+		add->sa_family = AF_INET;
+		mp->b_wptr += sizeof(*add);
+		/* control buffer */
+		cbuf = (u_int32_t *) mp->b_wptr;
+		cbuf[0] = 0xdeadbeef;
+		mp->b_wptr += clen;
+		/* io vector */
+		iov = (struct iovec *) mp->b_wptr;
+		mp->b_wptr += sizeof(*iov);
+		mp->b_rptr = mp->b_wptr;	/* hide msg headers */
+		iov->iov_base = mp->b_rptr;
+		iov->iov_len = size;
+		msg->msg_iov = iov;
+		msg->msg_iovlen = 1;
+		if (ss->p.prot.type != SOCK_STREAM) {
+			msg->msg_name = add;
+			msg->msg_namelen = ss_addr_size(ss, add);
+		} else {
+			msg->msg_name = NULL;
+			msg->msg_namelen = 0;
+		}
+		msg->msg_control = cbuf;
+		msg->msg_controllen = clen;
+		msg->msg_flags = MSG_DONTWAIT;
+		{
+			int err;
+
+			if ((err = ss_recvmsg(ss, msg, size)) <= 0) {
+				freemsg(mp);
+				return (err);
 			}
-			msg.msg_iov = iov;
-			msg.msg_iovlen = sizeof(iov) / sizeof(struct iovec);
-			msg.msg_control = cbuf;
-			msg.msg_controllen = sizeof(cbuf);
-			msg.msg_flags = MSG_DONTWAIT;
-			if ((err = ss_recvmsg(ss, &msg, size)) <= 0)
-				goto error;
 			mp->b_wptr = mp->b_rptr + err;
 			ptrace(("%s: %p: recvmsg with len = %d\n", DRV_NAME, ss, err));
 		}
-		if (msg.msg_flags & MSG_CTRUNC) {
+		if (msg->msg_flags & MSG_CTRUNC) {
 			printd(("%s: %p: control message truncated\n", DRV_NAME, ss));
-			msg.msg_control = NULL;
-			msg.msg_controllen = 0;
+			msg->msg_control = NULL;
+			msg->msg_controllen = 0;
 		}
-		if (msg.msg_control != (void *) cbuf) {
+		if (msg->msg_control != (void *) cbuf) {
 			printd(("%s: %p: control message pointer moved!\n", DRV_NAME, ss));
 			printd(("%s: %p: initial control buffer %p\n", DRV_NAME, ss,
-				msg.msg_control));
+				msg->msg_control));
 			printd(("%s: %p: initial control length %d\n", DRV_NAME, ss,
-				msg.msg_controllen));
-			msg.msg_control = cbuf;
-			msg.msg_controllen = sizeof(cbuf) - msg.msg_controllen;
+				msg->msg_controllen));
+			msg->msg_control = cbuf;
+			msg->msg_controllen = clen - msg->msg_controllen;
 			printd(("%s: %p: final control buffer %p\n", DRV_NAME, ss,
-				msg.msg_control));
+				msg->msg_control));
 			printd(("%s: %p: final control length %d\n", DRV_NAME, ss,
-				msg.msg_controllen));
-		} else if (msg.msg_controllen == sizeof(cbuf) && cbuf[0] == 0xdeadbeef) {
+				msg->msg_controllen));
+		} else if (msg->msg_controllen == clen && cbuf[0] == 0xdeadbeef) {
 			printd(("%s: %p: control message unchanged!\n", DRV_NAME, ss));
-			msg.msg_control = NULL;
-			msg.msg_controllen = 0;
+			msg->msg_control = NULL;
+			msg->msg_controllen = 0;
 		}
-#if 0
-		if (msg.msg_flags & MSG_TRUNC)
-			goto emsgsize;
-#endif
-		if (ss->p.info.SERV_type == T_CLTS) {
-			err = (msg.msg_flags & MSG_ERRQUEUE) ?
-			    t_uderror_ind(q, &msg, mp) : t_unitdata_ind(q, &msg, mp);
-		} else if (!msg.msg_controllen) {
-			err = (msg.msg_flags & MSG_OOB) ?
-			    t_exdata_ind(q, &msg, mp) : t_data_ind(q, &msg, mp);
-		} else {
-			err = t_optdata_ind(q, &msg, mp);
+		if (msg->msg_flags & MSG_TRUNC) {
+			swerr();
+			/* This indicates a problem with datagram size logic. A buffer large enough 
+			   to hold the available data was not calculated correctly, resulting in a
+			   truncated buffer.  This only happens for connectionless: Discard the
+			   message rather than delivering a partial message. */
+			freemsg(mp);
+			continue;
 		}
-		if (err != QR_ABSORBED)
-			goto error;
+		{
+			int err;
+
+			/* Attempt to deliver directly as was done before. */
+			if ((err = ss_r_data(q, mp)) != QR_ABSORBED) {
+				/* If unsuccessful, place the M_DATA message on the queue for later
+				   processing.  Note that if an M_READ message is placed back on the 
+				   queue as a result of flow control (-EBUSY) of lack of bufers
+				   (-ENOBUFS) it will be transformed into an M_CTL message of band 0 
+				   and will, therefore, queue behind the M_DATA mesages. */
+				if (msg->msg_flags & (MSG_OOB | MSG_ERRQUEUE)) {
+					mp->b_band = 2;	/* expedite */
+					mp->b_flag |= MSGMARK;
+				} else {
+					mp->b_band = 1;
+				}
+				/* Note that this could enable the queue.  When the service
+				   procedure runs (possibly again), ss_r_data() will do a putbq()
+				   on a subsequent failure and suspend the service procedure from
+				   there. */
+				if (!putq(q, mp)) {
+					swerr();
+					/* Will only happen if there is not enough memory to
+					   allocate a band 1 or 2 qband structure, which is quite
+					   possible if we got here as a result of a buffer
+					   allocation failure.  Therefore, strqset() is used to
+					   allocate one of each when the Stream is opened so (see
+					   ss_open()) so that this call cannot fail. */
+					freemsg(mp);
+				}
+				return (err);
+			}
+		}
 	}
 	return (-EBUSY);
-#if 0
-      emsgsize:
-	err = -EMSGSIZE;
-	goto error;
-#endif
-      error:
-	freemsg(mp);
-	return (err);
 }
 
 /*
@@ -13721,7 +13783,7 @@ ss_sock_recvmsg(queue_t *q)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC fastcall __hot void
 ss_putctl(ss_t *ss, queue_t *q, int type, void streamscall (*func) (long), struct sock *sk)
 {
 	mblk_t *mp;
@@ -13759,7 +13821,7 @@ ss_putctl(ss_t *ss, queue_t *q, int type, void streamscall (*func) (long), struc
  *  We get state changes on sockets that we hold.  We also get state changes
  *  on accepting sockets.
  */
-STATIC void streamscall
+STATIC streamscall __hot void
 _ss_sock_state_change(long data)
 {
 	struct sock *sk;
@@ -13778,7 +13840,7 @@ _ss_sock_state_change(long data)
 	} else
 		assure(sk);
 }
-STATIC void
+STATIC __hot void
 ss_state_change(struct sock *sk)
 {
 	_ss_sock_state_change((long) sk);
@@ -13788,7 +13850,7 @@ ss_state_change(struct sock *sk)
  *  WRITE Available
  *  -------------------------------------------------------------------------
  */
-STATIC void streamscall
+STATIC streamscall __hot_out void
 _ss_sock_write_space(long data)
 {
 	struct sock *sk;
@@ -13807,7 +13869,7 @@ _ss_sock_write_space(long data)
 	} else
 		assure(sk);
 }
-STATIC void
+STATIC __hot_out void
 ss_write_space(struct sock *sk)
 {
 	_ss_sock_write_space((long) sk);
@@ -13817,7 +13879,7 @@ ss_write_space(struct sock *sk)
  *  ERROR Available
  *  -------------------------------------------------------------------------
  */
-STATIC void streamscall
+STATIC streamscall __hot_get void
 _ss_sock_error_report(long data)
 {
 	struct sock *sk;
@@ -13839,7 +13901,7 @@ _ss_sock_error_report(long data)
 	} else
 		assure(sk);
 }
-STATIC void
+STATIC __hot_get void
 ss_error_report(struct sock *sk)
 {
 	_ss_sock_error_report((long) sk);
@@ -13849,7 +13911,7 @@ ss_error_report(struct sock *sk)
  *  READ Available
  *  -------------------------------------------------------------------------
  */
-STATIC void streamscall
+STATIC streamscall __hot_in void
 _ss_sock_data_ready(long data)
 {
 	struct sock *sk;
@@ -13868,7 +13930,7 @@ _ss_sock_data_ready(long data)
 	} else
 		assure(sk);
 }
-STATIC void
+STATIC __hot_in void
 ss_data_ready(struct sock *sk, int len)
 {
 	(void) len;
@@ -13885,7 +13947,7 @@ ss_data_ready(struct sock *sk, int len)
  *  T_CONN_REQ           0 - TC Request
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_conn_req(queue_t *q, mblk_t *mp)
 {
 	int err = -EFAULT;
@@ -13998,7 +14060,7 @@ t_seq_check(ss_t *ss, t_uscalar_t seq)
 	usual(mp);
 	return (mp);
 }
-STATIC ss_t *
+STATIC fastcall ss_t *
 t_tok_check(t_uscalar_t tok)
 {
 	ss_t *as;
@@ -14007,7 +14069,7 @@ t_tok_check(t_uscalar_t tok)
 	usual(as);
 	return (as);
 }
-STATIC int
+STATIC fastcall int
 t_conn_res(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -14113,7 +14175,7 @@ t_conn_res(queue_t *q, mblk_t *mp)
  *  T_DISCON_REQ         2 - TC disconnection request
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_discon_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -14185,7 +14247,7 @@ t_discon_req(queue_t *q, mblk_t *mp)
  *  M_DATA
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_write int
 ss_w_data(queue_t *q, mblk_t *mp)
 {
 	long mlen, mmax;
@@ -14228,7 +14290,7 @@ ss_w_data(queue_t *q, mblk_t *mp)
  *  T_DATA_REQ           3 - Connection-Mode data transfer request
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_out int
 t_data_req(queue_t *q, mblk_t *mp)
 {
 	long mlen, mmax;
@@ -14277,7 +14339,7 @@ t_data_req(queue_t *q, mblk_t *mp)
  *  T_EXDATA_REQ         4 - Expedited data request
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_put int
 t_exdata_req(queue_t *q, mblk_t *mp)
 {
 	long mlen, mmax;
@@ -14327,7 +14389,7 @@ t_exdata_req(queue_t *q, mblk_t *mp)
  *  T_INFO_REQ           5 - Information Request
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_info_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -14341,7 +14403,7 @@ t_info_req(queue_t *q, mblk_t *mp)
  *  T_BIND_REQ           6 - Bind a TS user to a transport address
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_bind_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -14444,9 +14506,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	    && (ss->p.prot.type == SOCK_STREAM || ss->p.prot.type == SOCK_SEQPACKET))
 		if ((err = ss_listen(ss, p->CONIND_number)))
 			goto error_close;
-	if (ss_getsockname(ss) <= 0)
-		return t_bind_ack(q, NULL, p->CONIND_number);
-	return t_bind_ack(q, &ss->src, p->CONIND_number);
+	return t_bind_ack(q, (ss_getsockname(ss) <= 0) ? NULL : &ss->src, p->CONIND_number);
       acces:
 	err = TACCES;
 	ptrace(("%s: ERROR: no permission for address\n", DRV_NAME));
@@ -14483,7 +14543,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
  *  T_UNBIND_REQ         7 - Unbind TS user from transport address
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_unbind_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -14501,7 +14561,7 @@ t_unbind_req(queue_t *q, mblk_t *mp)
  *  T_UNITDATA_REQ       8 -Unitdata Request 
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_out int
 t_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	long mmax;
@@ -14608,7 +14668,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
  *
  *  TSYSERR:    a system error has occured and the UNIX system error is indicated in the primitive.
  */
-STATIC int
+STATIC INLINE fastcall __hot_put int
 t_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -14649,9 +14709,8 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 			goto provspec;
 		}
 	}
-	if ((err =
-	     t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length,
-			   opt_len)) < 0) {
+	if ((err = t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset,
+				 p->OPT_length, opt_len)) < 0) {
 		switch (-err) {
 		case EINVAL:
 			goto badopt;
@@ -14693,7 +14752,7 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
  *  T_ORDREL_REQ        10 - TS user is finished sending
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_ordrel_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -14739,7 +14798,7 @@ t_ordrel_req(queue_t *q, mblk_t *mp)
  *  T_OPTDATA_REQ       24 - Data with options request
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_out int
 t_optdata_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -14811,28 +14870,38 @@ t_optdata_req(queue_t *q, mblk_t *mp)
  *  T_ADDR_REQ          25 - Address Request
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_addr_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
+	struct sockaddr *loc = NULL;
+	struct sockaddr *rem = NULL;
 
 	(void) mp;
 	switch (ss_get_state(ss)) {
 	case TS_UNBND:
-		return t_addr_ack(q, NULL, NULL);
+		break;
 	case TS_IDLE:
 		ss_getsockname(ss);
-		return t_addr_ack(q, &ss->src, NULL);
+		loc = &ss->src;
+		break;
 	case TS_WCON_CREQ:
 	case TS_DATA_XFER:
 	case TS_WIND_ORDREL:
 	case TS_WREQ_ORDREL:
 		ss_getnames(ss);
-		return t_addr_ack(q, &ss->src, &ss->dst);
+		loc = &ss->src;
+		rem = &ss->dst;
+		break;
 	case TS_WRES_CIND:
 		ss_getpeername(ss);
-		return t_addr_ack(q, NULL, &ss->dst);
+		rem = &ss->dst;
+		break;
+	default:
+		goto outstate;
 	}
+	return t_addr_ack(q, loc, rem);
+      outstate:
 	return t_error_ack(q, T_ADDR_REQ, TOUTSTATE);
 }
 #endif
@@ -14841,7 +14910,7 @@ t_addr_req(queue_t *q, mblk_t *mp)
  *  T_CAPABILITY_REQ    ?? - Capability Request
  *  -------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall int
 t_capability_req(queue_t *q, mblk_t *mp)
 {
 	int err = -EFAULT;
@@ -14887,7 +14956,7 @@ t_other_req(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall __hot_out int
 ss_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -15012,7 +15081,7 @@ ss_w_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC INLINE fastcall int
 ss_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (*mp->b_rptr & FLUSHW) {
@@ -15052,7 +15121,7 @@ ss_w_flush(queue_t *q, mblk_t *mp)
  *  ss->sock->sk, sk may be a child (connection indication) of the primary
  *  socket.
  */
-STATIC int
+STATIC INLINE fastcall __hot int
 ss_r_pcrse(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -15179,6 +15248,45 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
 /*
  *  -------------------------------------------------------------------------
  *
+ *  M_DATA Handling
+ *
+ *  -------------------------------------------------------------------------
+ */
+/**
+ * ss_r_data - process an M_DATA message on the read queue
+ * @q: active queue in pair (read queue)
+ * @mp: the M_DATA message
+ *
+ * On the read queue, an M_DATA is used to save queued data against the queue.  This is data that
+ * ss_sock_recvmsg() has retrieved from the underlying socket, but which has not yet been formatted
+ * into T_DATA_IND, T_EXDATA_IND, T_UINITDATA_IND or T_UDERROR_IND messages.  These M_DATA blocks
+ * are specially formatted: they contain a complete returned cmsg header ahead of the data.  The
+ * cmsg header starts at mp->b_databp->db_base and ends at mp->b_rptr-1.  The message data itself
+ * starts at mp->b_rptr and ends at mp->b_wptr-1.
+ *
+ */
+STATIC fastcall int __hot_in
+ss_r_data(queue_t *q, mblk_t *mp)
+{
+	ss_t *ss = PRIV(q);
+	struct msghdr *msg = (struct msghdr *) mp->b_datap->db_base;
+	int err;
+
+	if (ss->p.info.SERV_type == T_CLTS) {
+		err = (msg->msg_flags & MSG_ERRQUEUE) ?
+		    t_uderror_ind(q, msg, mp) : t_unitdata_ind(q, msg, mp);
+	} else if (!msg->msg_controllen) {
+		err = (msg->msg_flags & MSG_OOB) ?
+		    t_exdata_ind(q, msg, mp) : t_data_ind(q, msg, mp);
+	} else {
+		err = t_optdata_ind(q, msg, mp);
+	}
+	return (err);
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
  *  M_READ Handling
  *
  *  -------------------------------------------------------------------------
@@ -15200,7 +15308,7 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
  *  ss->sock->sk, sk may be a child (connection indication) of the primary
  *  socket.
  */
-STATIC int
+STATIC INLINE fastcall __hot_in int
 ss_r_read(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -15266,7 +15374,7 @@ ss_r_read(queue_t *q, mblk_t *mp)
  *  socket.
  *
  */
-STATIC int
+STATIC INLINE fastcall __hot_out int
 ss_w_read(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
@@ -15326,7 +15434,7 @@ ss_w_read(queue_t *q, mblk_t *mp)
  *  ss->sock->sk, sk may be a child (connection indication) of the primary
  *  socket.
  */
-STATIC int
+STATIC INLINE fastcall __hot_get int
 ss_r_error(queue_t *q, mblk_t *mp)
 {
 	int err;
@@ -15399,7 +15507,7 @@ ss_r_error(queue_t *q, mblk_t *mp)
  *  WRITE PUT ad SERVICE (Message from above IP-User --> IP-Provider
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall __hot_out int
 ss_w_prim(queue_t *q, mblk_t *mp)
 {
 	assert(q);
@@ -15425,7 +15533,7 @@ ss_w_prim(queue_t *q, mblk_t *mp)
  *  READ PUT ad SERVICE (Message from below IP-Provider --> IP-User
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC fastcall __hot_in int
 ss_r_prim(queue_t *q, mblk_t *mp)
 {
 	assert(q);
@@ -15441,6 +15549,9 @@ ss_r_prim(queue_t *q, mblk_t *mp)
 		return ss_r_read(q, mp);
 	case M_ERROR:
 		return ss_r_error(q, mp);
+	case M_DATA:
+		/* actually, rather unlikely */
+		return ss_r_data(q, mp);
 	}
 	return (QR_PASSFLOW);
 }
@@ -15449,7 +15560,7 @@ ss_r_prim(queue_t *q, mblk_t *mp)
  *  READ SIDE wakeup procedure (called on each service procedure exit)
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC fastcall __hot_in void
 ss_r_wakeup(queue_t *q)
 {
 	if (((ss_t *) PRIV(q))->sock != NULL)
@@ -15466,8 +15577,8 @@ ss_r_wakeup(queue_t *q)
  *  PUTQ Put Routine
  *  -----------------------------------
  */
-STATIC int
-ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
+STATIC INLINE fastcall __hot int
+ss_putq(queue_t *q, mblk_t *mp, fastcall int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0, locked;
 
@@ -15542,8 +15653,9 @@ ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
  *  SRVQ Service Routine
  *  -----------------------------------
  */
-STATIC int
-ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_t *))
+STATIC INLINE fastcall __hot int
+ss_srvq(queue_t *q, fastcall int (*proc) (queue_t *, mblk_t *),
+	fastcall void (*procwake) (queue_t *))
 {
 	int rtn = 0;
 
@@ -15635,25 +15747,25 @@ ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_t
 	return (rtn);
 }
 
-STATIC streamscall int
+STATIC streamscall __hot_in int
 ss_rput(queue_t *q, mblk_t *mp)
 {
 	return ss_putq(q, mp, &ss_r_prim);
 }
 
-STATIC streamscall int
+STATIC streamscall __hot_in int
 ss_rsrv(queue_t *q)
 {
 	return ss_srvq(q, &ss_r_prim, &ss_r_wakeup);
 }
 
-STATIC streamscall int
+STATIC streamscall __hot_out int
 ss_wput(queue_t *q, mblk_t *mp)
 {
 	return ss_putq(q, mp, &ss_w_prim);
 }
 
-STATIC streamscall int
+STATIC streamscall __hot_out int
 ss_wsrv(queue_t *q)
 {
 	return ss_srvq(q, &ss_w_prim, NULL);
@@ -15907,6 +16019,19 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_bh(&ss_lock);
 		return (ENXIO);
+	}
+	/* Pre-allocate queue band structures on the read side. */
+	if ((err = strqset(q, QHIWAT, 1, STRHIGH))) {
+		ptrace(("%s: ERROR: could not allocate queue band 1 structure, err = %d\n",
+			DRV_NAME, err));
+		spin_unlock_bh(&ss_lock);
+		return (err);
+	}
+	if ((err = strqset(q, QHIWAT, 2, STRHIGH))) {
+		ptrace(("%s: ERROR: could not allocate queue band 2 structure, err = %d\n",
+			DRV_NAME, err));
+		spin_unlock_bh(&ss_lock);
+		return (err);
 	}
 	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);

@@ -1,3 +1,7 @@
+2006-03-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ip.c: working up NPI IP test and mux driver
+
 2006-03-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/ip.c: working up NPI IP test and mux driver

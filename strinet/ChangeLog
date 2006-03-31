@@ -1,3 +1,12 @@
+2006-03-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/inet.c: significant changes to the INET driver
+	  - largely rewrote ss_sock_sendmsg
+	  - ss_sock_sendmsg has been causing some problems over the last number
+	    of releases.  This version queues messages retrieved from the socket
+	    on the read queue when there are buffer allocation failures.
+	  - optimizations
+
 2006-03-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/rawip.c: working up second gen rawip driver

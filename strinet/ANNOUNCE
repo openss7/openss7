@@ -39,6 +39,10 @@ enhancements and fixes:
 
   - Fixed buffer leak in ss_sock_sendmsg reported by John Wenker.
 
+  - Significant rewrite of the ss_sock_sendmsg function.
+
+  - Loader optimizations for streams-inet driver.
+
  This is a public gamma release of the package: it deprecates previous
  packages.  Please upgrade before reporting problems with previous
  packages.

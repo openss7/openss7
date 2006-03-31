@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/30 12:51:56 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/31 12:36:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/30 12:51:56 $ by $Author: brian $
+ Last Modified $Date: 2006/03/31 12:36:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.16  2006/03/31 12:36:46  brian
+ - working up ip driver
+
  Revision 0.9.2.15  2006/03/30 12:51:56  brian
  - corrections for x64_64 compile
 
@@ -98,10 +101,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/30 12:51:56 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/31 12:36:46 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/30 12:51:56 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/31 12:36:46 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -156,7 +159,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/30 12:51:56 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/31 12:36:46 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -285,19 +288,22 @@ typedef struct ip {
 	unsigned char priority;		/* message priority */
 	unsigned char protocol;		/* primary protocol */
 	np_ulong provider;		/* provider type */
-	struct ip *bnext;		/* linkage for bind hash */
-	struct ip **bprev;		/* linkage for bind hash */
-	struct ip_bind_bucket *bindb;	/* linkage for bind hash */
+	struct ip *bnext;		/* linkage for bind/list hash */
+	struct ip **bprev;		/* linkage for bind/list hash */
+	struct ip_bind_bucket *bindb;	/* linkage for bind/list hash */
 	struct ip *cnext;		/* linkage for conn hash */
 	struct ip **cprev;		/* linkage for conn hash */
 	struct ip_conn_bucket *connb;	/* linkage for conn hash */
 	unsigned char ttl;		/* default ttl */
 	unsigned char tos;		/* default tos */
 	unsigned short pmtu;		/* path MTU */
-	mblk_t *conq;			/* connection indication queue */
+	unsigned int maxinds;		/* maximum number of oustanding connection indications */
 	unsigned int coninds;		/* number of outstanding connection indications */
+	mblk_t *conq;			/* connection indication queue */
+	unsigned int datinds;		/* number of outstanding data indications */
 	mblk_t *resq;			/* reset indication queue */
 	unsigned int resinds;		/* number of outstanding reset indications */
+	mblk_t *datq;			/* data indication queue */
 	unsigned short pnum;		/* number of bound protocol ids */
 	uint8_t protoids[16];		/* bound protocol ids */
 	unsigned short bnum;		/* number of bound addresses */
@@ -332,15 +338,7 @@ struct ip_bind_bucket {
 	unsigned char proto;		/* IP protocol identifier */
 	unsigned short port;		/* port number (host order) */
 	struct ip *owners;		/* list of owners of this protocol/port combination */
-	struct ip *dflt;		/* default destinations for this protocol */
-};
-struct ip_list_bucket {
-	struct ip_list_bucket *next;	/* linkage of list buckets for hash slot */
-	struct ip_list_bucket **prev;	/* linkage of list buckets for hash slot */
-	unsigned char proto;		/* IP protocol identifier */
-	unsigned short port;		/* port number (host order) */
-	struct ip *owners;		/* list of owners of this protocol/port combination */
-	struct ip *dflt;		/* default liseteners for this protocol */
+	struct ip *dflt;		/* default listeners/destinations for this protocol */
 };
 struct ip_conn_bucket {
 	struct ip_conn_bucket *next;	/* linkage of conn buckets for hash slot */
@@ -350,23 +348,15 @@ struct ip_conn_bucket {
 	unsigned short dport;		/* destination port number (network order) */
 	struct ip *owners;		/* list of owners of this protocol/sport/dport combination */
 };
-struct ip_bhash_slot {
-	rwlock_t lock;
-	struct ip_bind_bucket *list;
-};
-struct ip_lhash_slot {
-	rwlock_t lock;
-	struct ip_list_bucket *list;
-};
-struct ip_chash_slot {
-	rwlock_t lock;
-	struct ip_conn_bucket *list;
-};
+
+rwlock_t ip_hash_lock = RW_LOCK_UNLOCKED;
 
 struct ip_prot_bucket {
 	unsigned char proto;		/* protocol number */
 	char name[15];			/* protocol name */
 	int refs;			/* reference count */
+	int corefs;			/* reference count N_CONS */
+	int clrefs;			/* reference count N_CLNS */
 	int override;			/* was entry overriden */
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
 	struct inet_protocol prot;	/* Linux registration structure */
@@ -592,7 +582,9 @@ STATIC void
 inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 {
 	bzero(pb, sizeof(*pb));
-	pb->refs = 1;
+	pb->refs = 0;
+	pb->corefs = 0;
+	pb->clrefs = 0;
 	pb->override = 1;
 	pb->proto = proto;
 	pb->prot.handler = &ip_v4_rcv;
@@ -728,7 +720,9 @@ STATIC void
 inet_override_protocol(struct ip_prot_bucket *pb, int proto)
 {
 	bzero(pb, sizeof(*pb));
-	pb->refs = 1;
+	pb->refs = 0;
+	pb->clrefs = 0;
+	pb->corefs = 0;
 	pb->proto = proto;
 	{
 		int hash = proto & (MAX_INET_PROTOS - 1);
@@ -867,17 +861,26 @@ inet_pass_next_err_handler(struct sk_buff *skb, __u32 info)
  *  to the next protocol module.
  */
 STATIC int
-ip_bind_prot(unsigned char proto)
+ip_bind_prot(unsigned char proto, unsigned int type)
 {
 	struct ip_prot_bucket *pb;
 
 	write_lock_bh(&ip_prot_lock);
 	{
-		if ((pb = ip_prots[proto]) != NULL)
+		if ((pb = ip_prots[proto]) != NULL) {
 			++pb->refs;
-		else if ((pb = kmem_cache_alloc(ip_prot_cachep, SLAB_ATOMIC)) != NULL) {
+			if (type & N_CONS)
+				++pb->corefs;
+			if (type & N_CLNS)
+				++pb->clrefs;
+		} else if ((pb = kmem_cache_alloc(ip_prot_cachep, SLAB_ATOMIC)) != NULL) {
 			/* register protocol */
 			inet_override_protocol(pb, proto);
+			pb->refs = 1;
+			if (type & N_CONS)
+				pb->corefs = 1;
+			if (type & N_CLNS)
+				pb->clrefs = 1;
 			ip_prots[proto] = pb;
 		}
 	}
@@ -890,17 +893,23 @@ ip_bind_prot(unsigned char proto)
  *  @proto:	    protocol number to unbind
  */
 STATIC void
-ip_unbind_prot(unsigned char proto)
+ip_unbind_prot(unsigned char proto, unsigned int type)
 {
 	struct ip_prot_bucket *pb;
 
 	write_lock_bh(&ip_prot_lock);
 	{
-		if ((pb = ip_prots[proto]) != NULL && --pb->refs <= 0) {
-			ip_prots[proto] = NULL;
-			/* unregister protocol */
-			inet_restore_protocol(pb);
-			kmem_cache_free(ip_prot_cachep, pb);
+		if ((pb = ip_prots[proto]) != NULL) {
+			if (type & N_CONS)
+				--pb->corefs;
+			if (type & N_CLNS)
+				--pb->clrefs;
+			if (--pb->refs <= 0) {
+				ip_prots[proto] = NULL;
+				/* unregister protocol */
+				inet_restore_protocol(pb);
+				kmem_cache_free(ip_prot_cachep, pb);
+			}
 		}
 	}
 	write_unlock_bh(&ip_prot_lock);
@@ -912,14 +921,15 @@ ip_unbind_prot(unsigned char proto)
  *  @ip:	    Stream to which to bind
  *  @add:	    sockaddr_in structure with address to bind
  *  @proto:	    protocol id to bind
+ *  @type:	    type of bind (N_CLNS|N_CONS)
  *  @flag:	    default bind
  */
 STATIC int
-ip_bind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, int flag)
+ip_bind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, unsigned int type, int flag)
 {
 	int err;
 
-	if ((err = ip_bind_prot(proto)) != 0)
+	if ((err = ip_bind_prot(proto, type)) != 0)
 		goto error;
 	/* FIXME: now bind to address... */
       error:
@@ -931,22 +941,53 @@ ip_bind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, int f
  *  @ip:		    Stream to which to unbind
  *  @add:	    sockaddr_in structure with address to unbind
  *  @proto:	    protocl id to unbind
+ *  @type:	    type of bind (N_CLNS|N_CONS)
  *  @flag:	    default unbind
  */
 STATIC void
-ip_unbind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, int flag)
+ip_unbind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, unsigned int type, int flag)
 {
+	/* FIXME: unbind from address... */
+	ip_unbind_prot(proto, type);
 }
 
 /**
- *  ip_bind - bind to addresses and protocol ids
- *  @q:		    Stream to which to bind
- *  @add_in:	    array of sockaddr_in structures to bind
- *  @anum:	    number of elements in sockaddr_in array
- *  @protoids:	    array of protocol ids to which to bind
- *  @pnum:	    number of elements in protocol id array
- *  @flags:	    bind flags
+ * ip_bind - bind to addresses and protocol ids
+ * @q:		    Stream to which to bind
+ * @add_in:	    array of sockaddr_in structures to bind
+ * @anum:	    number of elements in sockaddr_in array
+ * @protoids:	    array of protocol ids to which to bind
+ * @pnum:	    number of elements in protocol id array
+ * @flags:	    bind flags
  *
+ * If the number of connection indications is zero, the bind is performed on the bind hashes.  If
+ * non-zero, the bind is performed on the listen hashes and the Stream is marked for N_CONS.  If the
+ * port number in the bound address(es) is non-zero, whether the Stream is listening or not, the
+ * Stream is marked for N_CONS.
+ *
+ * When the port number in the bound address(es) is zero and the number of connection indications
+ * are zero, the Stream can still be considered connectionless or connection-oriented.  If
+ * TOKEN_REQUEST is specified, the Stream is always considered connection-oriented.  If
+ * TOKEN_REQUEST is not specified in this situation (zero port number) the Stream is always
+ * considered connectionless.
+ *
+ * If DEFAULT_LISTENER is specified, the Stream is always considered connection-oriented.  Each
+ * protocol id an port number combination (whether the port number is zero or not) is permitted
+ * multiple DEFAULT_LISTENER Streams (one for each IP address, and one for the wildcard IP address).
+ * DEFAULT_LISTENER Streams are only considered when there is no match for any other listening
+ * Stream.
+ *
+ * If DEFAULT_DEST is specified, the Stream is always considered connectionless.  Each protocol id
+ * is permitted multiple DEFAULT_DEST Streams (one for each IP address, and one for the wildcard IP
+ * address).  DEFAULT_DEST Streams are only considered when there is no match for any other
+ * connectionless bound Stream that matches the destination address.
+ *
+ * Binding supports wildcard addresses, both in port number and IP address.
+ * 
+ *
+ * The bind hash contains bind buckets that list Streams that are bound to the
+ * same protocol id and port number.
+ *  
  *  Binding is performed as a two-level hash.  The first hash level is on protocol id.  The second
  *  level hash is on socket address.
  *
@@ -961,7 +1002,7 @@ ip_unbind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, int
  */
 STATIC int
 ip_bind(struct ip *ip, struct sockaddr_in *add_in, size_t anum, unsigned char *protoids,
-	size_t pnum, ulong flags)
+	size_t pnum, ulong coninds, ulong flags)
 {
 	int i, j, err = 0;
 
@@ -978,8 +1019,8 @@ ip_bind(struct ip *ip, struct sockaddr_in *add_in, size_t anum, unsigned char *p
 				else
 					add->sin_port = port;
 
-				if ((err = ip_bind_addr(ip, add, proto, 0)))	/* FIXME: what
-										   flag? */
+				/* FIXME: what flag?  what type? */
+				if ((err = ip_bind_addr(ip, add, proto, N_CONS, 0)))
 					break;
 			}
 			if (err == 0)
@@ -987,7 +1028,8 @@ ip_bind(struct ip *ip, struct sockaddr_in *add_in, size_t anum, unsigned char *p
 			for (; j >= 0; j--) {
 				struct sockaddr_in *add = &add_in[j];
 
-				ip_unbind_addr(ip, add, proto, 0);	/* FIXME: what flag? */
+				/* FIXME: what flag?  what type? */
+				ip_unbind_addr(ip, add, proto, N_CONS, 0);
 			}
 			break;
 		} else {
@@ -998,8 +1040,8 @@ ip_bind(struct ip *ip, struct sockaddr_in *add_in, size_t anum, unsigned char *p
 				.sin_addr = {.s_addr = 0,},
 			};
 
-			err = ip_bind_addr(ip, &add, proto, 0);	/* FIXME: what flag? */
-			if (err == 0)
+			/* FIXME: what flag? what type? */
+			if ((err = ip_bind_addr(ip, &add, proto, N_CONS, 0)))
 				continue;
 			break;
 		}
@@ -1014,7 +1056,8 @@ ip_bind(struct ip *ip, struct sockaddr_in *add_in, size_t anum, unsigned char *p
 			for (j = 0; j < anum; j++) {
 				struct sockaddr_in *add = &add_in[j];
 
-				ip_unbind_addr(ip, add, proto, 0);	/* FIXME: what flag? */
+				/* FIXME: what flag? what type? */
+				ip_unbind_addr(ip, add, proto, N_CONS, 0);
 			}
 		} else {
 			/* no addresses means wildcard bind */
@@ -1024,7 +1067,8 @@ ip_bind(struct ip *ip, struct sockaddr_in *add_in, size_t anum, unsigned char *p
 				.sin_addr = {.s_addr = 0,},
 			};
 
-			ip_unbind_addr(ip, &add, proto, 0);	/* FIXME: what flag? */
+			/* FIXME: what flag? what type? */
+			ip_unbind_addr(ip, &add, proto, N_CONS, 0);
 		}
 	}
 	return (err);
@@ -1060,7 +1104,7 @@ ip_unbind(struct ip *ip)
 
 STATIC int
 ip_passive(struct ip *ip, struct sockaddr_in *dst, socklen_t anum, void *qos, mblk_t *seq,
-	   struct ip *tok)
+	   struct ip *tok, np_ulong flags)
 {
 	fixme(("Write this function.\n"));
 	return (-EFAULT);
@@ -1305,60 +1349,75 @@ ne_info_ack(queue_t *q)
 	size_t qor_len = sizeof(*qor);
 	size_t pro_len = ip->pnum * sizeof(uint8_t);
 
-	if (!(mp = ss7_allocb(q, sizeof(*p) + add_len + qos_len + qor_len + pro_len, BPRI_MED)))
-		goto enobufs;
-	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr;
-	p->PRIM_type = N_INFO_ACK;
-	p->NSDU_size = 65535;
-	p->ENSDU_size = 0;
-	p->CDATA_size = 0;
-	p->DDATA_size = 0;
-	p->ADDR_size = sizeof(struct sockaddr_storage);
-	p->ADDR_length = add_len;
-	p->ADDR_offset = add_len ? sizeof(*p) : 0;
-	p->QOS_length = qos_len;
-	p->QOS_offset = qos_len ? sizeof(*p) + add_len : 0;
-	p->QOS_range_length = qor_len;
-	p->QOS_range_offset = qor_len ? sizeof(*p) + add_len + qos_len : 0;
-	p->OPTIONS_flags = 0;
-	p->NIDU_size = 65535;
-	p->SERV_type = ip->provider ? ip->provider : (N_CONS | N_CLNS);
-	p->CURRENT_state = npi_get_state(ip);
-	p->PROVIDER_type = N_SNICFP;
-	p->NODU_size = ip->pmtu ? : 536;
-	p->PROTOID_length = pro_len;
-	p->PROTOID_offset = pro_len ? sizeof(*p) + add_len + qos_len + qor_len : 0;
-	p->NPI_version = N_VERSION_2;
-	mp->b_wptr += sizeof(*p);
-	if (add_len) {
-		for (i = 0; i < ip->snum; i++) {
-			sin = (struct sockaddr_in *) mp->b_wptr;
-			sin->sin_family = AF_INET;
-			sin->sin_port = ip->sport;
-			sin->sin_addr.s_addr = ip->saddrs[i].addr;
-			mp->b_wptr += sizeof(*sin);
+	if ((mp = ss7_allocb(q, sizeof(*p) + add_len + qos_len + qor_len + pro_len, BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_INFO_ACK;
+		p->NSDU_size = 65535;
+		p->ENSDU_size = 0;
+		p->CDATA_size = 65535;
+		p->DDATA_size = 65535;
+		p->ADDR_size = sizeof(struct sockaddr_storage);
+		p->ADDR_length = add_len;
+		p->ADDR_offset = add_len ? sizeof(*p) : 0;
+		/* QOS_length: In the connection-mode environment, when this primitive is invoked
+		   before the NC is established on the stream, the values returned specify the
+		   default values supported by the NS provider.  When this primitive is invoked
+		   after a NC has been established on the stream, the values returned indicated
+		   negotiated values for the QOS parameters.  In the connection-less environment,
+		   these values represent the default or the selected QOS parameter values.  In
+		   case a QOS parameter is not supported by the NS Provider, a value of QOS_UNKNOWN 
+		   will be returned.  In the case where no QOS parameters are supported by the NS
+		   provider, this field will be zero. */
+		p->QOS_length = qos_len;
+		p->QOS_offset = qos_len ? sizeof(*p) + add_len : 0;
+		/* QOS_range_length: These ranges are used by the NS user to select QOS parameter
+		   values that are valid with the NS provider.  QOS parameter values are selected,
+		   or the default values altered via the N_OPTMGMT_REQ primitive.  In the
+		   connection-mode environment, the values for end-to-end QOS parameter may be
+		   specified with the N_CONN primitives for negotiation. If the NS provider does
+		   not support a certain QOS parameter, its value will be set to QOS_UNKNOWN.  In
+		   the case where no QOS parameters are supported by the NS provider, the length of 
+		   this field will be zero. */
+		p->QOS_range_length = qor_len;
+		p->QOS_range_offset = qor_len ? sizeof(*p) + add_len + qos_len : 0;
+		p->OPTIONS_flags = 0;
+		p->NIDU_size = 65535;
+		p->SERV_type = ip->provider ? ip->provider : (N_CONS | N_CLNS);
+		p->CURRENT_state = npi_get_state(ip);
+		p->PROVIDER_type = N_SNICFP;
+		p->NODU_size = ip->pmtu ? : 536;
+		p->PROTOID_length = pro_len;
+		p->PROTOID_offset = pro_len ? sizeof(*p) + add_len + qos_len + qor_len : 0;
+		p->NPI_version = N_VERSION_2;
+		mp->b_wptr += sizeof(*p);
+		if (add_len) {
+			for (i = 0; i < ip->snum; i++) {
+				sin = (struct sockaddr_in *) mp->b_wptr;
+				sin->sin_family = AF_INET;
+				sin->sin_port = ip->sport;
+				sin->sin_addr.s_addr = ip->saddrs[i].addr;
+				mp->b_wptr += sizeof(*sin);
+			}
 		}
+		qos = (typeof(qos)) mp->b_wptr;
+		qos->n_qos_type = N_QOS_SEL_INFO_IP;
+		qos->ttl = ip->ttl;
+		qos->tos = ip->tos;
+		mp->b_wptr += qos_len;
+		qor = (typeof(qor)) mp->b_wptr;
+		qor->n_qos_type = N_QOS_RANGE_INFO_IP;
+		mp->b_wptr += qor_len;
+		if (pro_len) {
+			bcopy(&ip->protoids, mp->b_wptr, pro_len);
+			mp->b_wptr += pro_len;
+		}
+		putnext(ip->oq, mp);
+		return (QR_DONE);
+	} else {
+		err = -ENOBUFS;
+		ptrace(("%s: %p: no buffers\n", DRV_NAME, ip));
 	}
-	qos = (typeof(qos)) mp->b_wptr;
-	qos->n_qos_type = N_QOS_SEL_INFO_IP;
-	qos->ttl = ip->ttl;
-	qos->tos = ip->tos;
-	mp->b_wptr += qos_len;
-	qor = (typeof(qor)) mp->b_wptr;
-	qor->n_qos_type = N_QOS_RANGE_INFO_IP;
-	mp->b_wptr += qor_len;
-	if (pro_len) {
-		bcopy(&ip->protoids, mp->b_wptr, pro_len);
-		mp->b_wptr += pro_len;
-	}
-	putnext(ip->oq, mp);
-	return (QR_DONE);
-      enobufs:
-	err = -ENOBUFS;
-	ptrace(("%s: %p: no buffers\n", DRV_NAME, ip));
-	goto error;
-      error:
 	return (err);
 }
 
@@ -1380,45 +1439,42 @@ ne_bind_ack(queue_t *q, ulong coninds)
 	size_t add_len = ip->snum * sizeof(struct sockaddr_in);
 	size_t pro_len = ip->pnum * sizeof(uint8_t);
 
-	if (npi_not_state(ip, NSF_WACK_BREQ))
-		goto outstate;
-	if (!(mp = ss7_allocb(q, sizeof(*p) + add_len + pro_len, BPRI_MED)))
-		goto enobufs;
-	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr;
-	p->PRIM_type = N_BIND_ACK;
-	p->ADDR_length = add_len;
-	p->ADDR_offset = add_len ? sizeof(*p) : 0;
-	p->CONIND_number = 0;
-	p->TOKEN_value = 0;
-	p->PROTOID_length = pro_len;
-	p->PROTOID_offset = pro_len ? sizeof(*p) + add_len : 0;
-	mp->b_wptr += sizeof(*p);
-	if (add_len) {
-		sin = (struct sockaddr_in *) mp->b_wptr;
-		for (i = 0; i < ip->snum; i++) {
-			sin->sin_family = AF_INET;
-			sin->sin_port = ip->sport;
-			sin->sin_addr.s_addr = ip->saddrs[i].addr;
-			mp->b_wptr = (unsigned char *) (++sin);
+	if (npi_get_state(ip) == NS_WACK_BREQ) {
+		if ((mp = ss7_allocb(q, sizeof(*p) + add_len + pro_len, BPRI_MED))) {
+			mp->b_datap->db_type = M_PCPROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_BIND_ACK;
+			p->ADDR_length = add_len;
+			p->ADDR_offset = add_len ? sizeof(*p) : 0;
+			p->CONIND_number = 0;
+			p->TOKEN_value = 0;
+			p->PROTOID_length = pro_len;
+			p->PROTOID_offset = pro_len ? sizeof(*p) + add_len : 0;
+			mp->b_wptr += sizeof(*p);
+			if (add_len) {
+				sin = (struct sockaddr_in *) mp->b_wptr;
+				for (i = 0; i < ip->snum; i++) {
+					sin->sin_family = AF_INET;
+					sin->sin_port = ip->sport;
+					sin->sin_addr.s_addr = ip->saddrs[i].addr;
+					mp->b_wptr = (unsigned char *) (++sin);
+				}
+			}
+			if (pro_len) {
+				bcopy(&ip->protoids, mp->b_wptr, pro_len);
+				mp->b_wptr += pro_len;
+			}
+			npi_set_state(ip, NS_IDLE);
+			putnext(ip->oq, mp);
+			return (QR_DONE);
+		} else {
+			err = -ENOBUFS;
+			ptrace(("%s: %p: no buffers\n", DRV_NAME, ip));
 		}
+	} else {
+		err = -EFAULT;
+		ptrace(("%s: %p: would place interface out of state\n", DRV_NAME, ip));
 	}
-	if (pro_len) {
-		bcopy(&ip->protoids, mp->b_wptr, pro_len);
-		mp->b_wptr += pro_len;
-	}
-	npi_set_state(ip, NS_IDLE);
-	putnext(ip->oq, mp);
-	return (QR_DONE);
-      enobufs:
-	err = -ENOBUFS;
-	ptrace(("%s: %p: no buffers\n", DRV_NAME, ip));
-	goto error;
-      outstate:
-	err = -EFAULT;
-	ptrace(("%s: %p: would place interface out of state\n", DRV_NAME, ip));
-	goto error;
-      error:
 	return (err);
 }
 
@@ -1479,45 +1535,37 @@ ne_error_ack(queue_t *q, int prim, int err)
 		mp->b_wptr += sizeof(*p);
 		switch (npi_get_state(ip)) {
 		case NS_WACK_OPTREQ:
-			npi_set_state(ip, NS_IDLE);
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			break;
 		case NS_WACK_UREQ:
-			npi_set_state(ip, NS_IDLE);
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			break;
 		case NS_WCON_CREQ:
-			assure(ip->provider == N_CONS);
-			npi_set_state(ip, NS_IDLE);
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			break;
 		case NS_WCON_RREQ:
-			assure(ip->provider == N_CONS);
-			npi_set_state(ip, NS_DATA_XFER);
+			npi_set_state(ip, ip->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 			break;
 		case NS_WACK_BREQ:
 			npi_set_state(ip, NS_UNBND);
 			break;
 		case NS_WACK_CRES:
-			assure(ip->provider == N_CONS);
-			npi_set_state(ip, NS_WRES_CIND);
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			break;
 		case NS_WACK_DREQ6:
-			assure(ip->provider == N_CONS);
 			npi_set_state(ip, NS_WCON_CREQ);
 			break;
 		case NS_WACK_DREQ7:
-			assure(ip->provider == N_CONS);
-			npi_set_state(ip, NS_WRES_CIND);
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			break;
 		case NS_WACK_DREQ9:
-			assure(ip->provider == N_CONS);
-			npi_set_state(ip, NS_DATA_XFER);
+			npi_set_state(ip, ip->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 			break;
 		case NS_WACK_DREQ10:
-			assure(ip->provider == N_CONS);
 			npi_set_state(ip, NS_WCON_RREQ);
 			break;
 		case NS_WACK_DREQ11:
-			assure(ip->provider == N_CONS);
-			npi_set_state(ip, NS_WRES_RIND);
+			npi_set_state(ip, ip->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 			break;
 		default:
 			/* Note: if we are not in a WACK state we simply do not change state.  This 
@@ -1561,7 +1609,7 @@ ne_ok_ack(queue_t *q, np_ulong prim, struct sockaddr_in *add, socklen_t anum, vo
 		case NS_WACK_OPTREQ:
 			if ((err = ip_optmgmt(ip, qos, flags)) < 0)
 				goto free_out;
-			npi_set_state(ip, NS_IDLE);
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			break;
 		case NS_WACK_UREQ:
 			if ((err = ip_unbind(ip)) < 0)
@@ -1569,39 +1617,44 @@ ne_ok_ack(queue_t *q, np_ulong prim, struct sockaddr_in *add, socklen_t anum, vo
 			npi_set_state(ip, NS_UNBND);
 			break;
 		case NS_WACK_CRES:
-			if ((err = ip_passive(ip, add, anum, qos, seq, tok)) < 0)
+			if ((err = ip_passive(ip, add, anum, qos, seq, tok, flags)) < 0)
 				goto free_out;
-			npi_set_state(ip, NS_IDLE);
+			if (ip != tok) {
+				npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
+				npi_set_state(tok, ip->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
+			} else {
+				npi_set_state(ip, ip->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
+			}
 			break;
 		case NS_WACK_RRES:
 			if ((err = ip_reset(ip, add, N_USER, N_REASON_UNDEFINED)) < 0)
 				goto free_out;
-			npi_set_state(ip, NS_DATA_XFER);
-			break;
-		case NS_WACK_DREQ7:
-			if ((err = ip_disconnect(ip, add, seq, flags)) < 0)
-				goto free_out;
-			npi_set_state(ip, NS_IDLE);
+			npi_set_state(ip, ip->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 			break;
 		case NS_WACK_DREQ6:
 			if ((err = ip_disconnect(ip, add, seq, flags)) < 0)
 				goto free_out;
-			npi_set_state(ip, NS_IDLE);
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
+			break;
+		case NS_WACK_DREQ7:
+			if ((err = ip_disconnect(ip, add, seq, flags)) < 0)
+				goto free_out;
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			break;
 		case NS_WACK_DREQ9:
 			if ((err = ip_disconnect(ip, add, seq, flags)) < 0)
 				goto free_out;
-			npi_set_state(ip, NS_IDLE);
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			break;
 		case NS_WACK_DREQ10:
 			if ((err = ip_disconnect(ip, add, seq, flags)) < 0)
 				goto free_out;
-			npi_set_state(ip, NS_IDLE);
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			break;
 		case NS_WACK_DREQ11:
 			if ((err = ip_disconnect(ip, add, seq, flags)) < 0)
 				goto free_out;
-			npi_set_state(ip, NS_IDLE);
+			npi_set_state(ip, ip->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			break;
 		default:
 			/* Note: if we are not in a WACK state we simply do not change state.  This 
@@ -1611,10 +1664,11 @@ ne_ok_ack(queue_t *q, np_ulong prim, struct sockaddr_in *add, socklen_t anum, vo
 		}
 		putnext(ip->oq, mp);
 		return (QR_DONE);
+	} else {
+		err = -ENOBUFS;
+		ptrace(("%s: %p: no buffers\n", DRV_NAME, ip));
+		return (err);
 	}
-	err = -ENOBUFS;
-	ptrace(("%s: %p: no buffers\n", DRV_NAME, ip));
-	return (err);
       free_out:
 	freemsg(mp);
 	return (err);
@@ -1722,10 +1776,11 @@ ne_reset_con(queue_t *q, struct sockaddr_in *dst, np_ulong RESET_orig, np_ulong 
 					mp->b_wptr += sizeof(*qos);
 				}
 			}
-			npi_set_state(ip, NS_DATA_XFER);
+			npi_set_state(ip, ip->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 			qreply(q, mp);
 			return (QR_DONE);
 		}
+		freemsg(mp);
 		return (err);
 	}
 	return (-ENOBUFS);
@@ -1821,133 +1876,182 @@ ne_conn_ind(queue_t *q, mblk_t *dp)
  * addresses have errors, otherwise, we just perform a reset for the affected destination.
  */
 STATIC INLINE fastcall int
-ne_discon_ind(queue_t *q, mblk_t *dp)
+ne_discon_ind(queue_t *q, struct sockaddr_in *res, np_ulong mtu, np_ulong orig, np_ulong reason,
+	      mblk_t *conp, mblk_t *dp)
 {
-	struct ip *ip = IP_PRIV(q);
-	mblk_t *mp, *bp, *resp, *conp;
+	mblk_t *mp;
 	N_discon_ind_t *p;
 	struct sockaddr_in *sin;
-	const size_t size = sizeof(*p) + sizeof(*sin);
-	struct iphdr *iph = (struct iphdr *) dp->b_rptr;
-	struct icmphdr *icmp = (struct icmphdr *) (dp->b_rptr + (iph->ihl << 2));
 
-	assure(dp->b_wptr >= dp->b_rptr + sizeof(*iph));
-	assure(dp->b_wptr >= dp->b_rptr + (iph->ihl << 2));
-	assure(dp->b_wptr >= dp->b_rptr + (iph->ihl << 2) + sizeof(*icmp));
-
-	/* See if there are any outstanding reset indications for responding address. */
-	for (resp = NULL, bp = ip->resq; bp; bp = bp->b_next) {
-		struct iphdr *iph2 = (struct iphdr *) bp->b_rptr;
-
-		if (iph->protocol == iph2->protocol && iph->saddr == iph2->saddr
-		    && iph->daddr == iph2->daddr) {
-			resp = bp;
-			break;
-		}
-	}
-	/* See if there are any outstanding connect indications for responding address. */
-	for (conp = NULL, bp = ip->conq; bp; bp = bp->b_next) {
-		struct iphdr *iph2 = (struct iphdr *) bp->b_rptr;
-
-		if (iph->protocol == iph2->protocol && iph->saddr == iph2->saddr
-		    && iph->daddr == iph2->daddr) {
-			conp = bp;
-			break;
-		}
-	}
-
-	if ((mp = ss7_allocb(q, size, BPRI_MED))) {
-		if (ip->coninds > 0)
-			npi_set_state(ip, NS_WRES_CIND);
-		else
-			npi_set_state(ip, NS_IDLE);
+	if ((mp = ss7_allocb(q, sizeof(*p) + sizeof(*sin), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		mp->b_band = 0;
-		p = (N_discon_ind_t *) mp->b_wptr;
+		mp->b_band = 2;	/* expedite */
+		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = N_DISCON_IND;
-		switch (icmp->type) {
-		case ICMP_DEST_UNREACH:
-			switch (icmp->code) {
-			case ICMP_NET_UNREACH:
-			case ICMP_HOST_UNREACH:
-				p->DISCON_orig = N_PROVIDER;
-				p->DISCON_reason = N_REJ_NSAP_UNREACH_P;
-				break;
-			case ICMP_PROT_UNREACH:
-			case ICMP_PORT_UNREACH:
-				p->DISCON_orig = N_PROVIDER;
-				p->DISCON_reason = N_REJ_NSAP_UNKNOWN;
-				break;
-			case ICMP_FRAG_NEEDED:
-				/* frag needed ICMPs only cause disconnect on connection attempts,
-				   that is, in state NS_WCON_CREQ */
-				p->DISCON_orig = N_PROVIDER;
-				p->DISCON_reason = N_REJ_QOS_UNAVAIL_P;
-				break;
-			case ICMP_NET_UNKNOWN:
-			case ICMP_HOST_UNKNOWN:
-			case ICMP_HOST_ISOLATED:
-			case ICMP_NET_ANO:
-			case ICMP_HOST_ANO:
-			case ICMP_PKT_FILTERED:
-			case ICMP_PREC_VIOLATION:
-			case ICMP_PREC_CUTOFF:
-				p->DISCON_orig = N_PROVIDER;
-				p->DISCON_reason = N_REJ_NSAP_UNREACH_P;
-				break;
-			default:
-				p->DISCON_orig = N_UNDEFINED;
-				p->DISCON_reason = N_REASON_UNDEFINED;
-				break;
-			}
-			break;
-		case ICMP_SOURCE_QUENCH:
-			/* source quench ICMPs only cause disconnect on connection attempts, that
-			   is, in state NS_WCON_CREQ */
-			p->DISCON_orig = N_PROVIDER;
-			p->DISCON_reason = N_CONGESTION;
-			break;
-		case ICMP_TIME_EXCEEDED:
-			/* time exceeded ICMPs only cause disconnect on connection attempts, that
-			   is, in state NS_WCON_CREQ. */
-			switch (icmp->code) {
-			case ICMP_EXC_TTL:
-				p->DISCON_orig = N_PROVIDER;
-				p->DISCON_reason = N_REJ_QOS_UNAVAIL_P;
-				break;
-			case ICMP_EXC_FRAGTIME:
-				p->DISCON_orig = N_PROVIDER;
-				p->DISCON_reason = N_REJ_QOS_UNAVAIL_P;
-				break;
-			default:
-				p->DISCON_orig = N_UNDEFINED;
-				p->DISCON_reason = N_REASON_UNDEFINED;
-				break;
-			}
-			break;
-		case ICMP_PARAMETERPROB:
-			p->DISCON_orig = N_UNDEFINED;
-			p->DISCON_reason = N_REASON_UNDEFINED;
-			break;
-		default:
-			p->DISCON_orig = N_UNDEFINED;
-			p->DISCON_reason = N_REASON_UNDEFINED;
-			break;
-		}
+		p->DISCON_orig = orig;
+		p->DISCON_reason = reason;
 		p->RES_length = sizeof(*sin);
 		p->RES_offset = sizeof(*p);
 		p->SEQ_number = (np_ulong) (long) conp;
 		mp->b_wptr += sizeof(*p);
 		sin = (struct sockaddr_in *) mp->b_wptr;
-		sin->sin_family = AF_INET;
-		sin->sin_port = iph->protocol;
-		sin->sin_addr.s_addr = iph->saddr;
+		*sin = *res;
 		mp->b_wptr += sizeof(*sin);
 		mp->b_cont = dp;
 		putnext(q, mp);
-		return (QR_DONE);
+		return (QR_ABSORBED);
 	}
 	return (-ENOBUFS);
+}
+
+/**
+ * ne_discon_ind_icmp: - NE_DISCON_IND event resulting from ICMP message
+ * @q: active queue in queue pair
+ * @mp: the ICMP message
+ */
+STATIC INLINE fastcall int
+ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
+{
+	struct ip *ip = IP_PRIV(q);
+	struct iphdr *iph;
+	struct icmphdr *icmp;
+	struct udphdr *uh;
+	struct sockaddr_in resp;
+	np_ulong mtu, orig, error;
+	mblk_t **respp, **conpp;
+	ptrdiff_t hidden;
+	int err;
+
+	iph = (struct iphdr *) mp->b_rptr;	/* this is the ICMP message IP header */
+	icmp = (struct icmphdr *) (mp->b_rptr + (iph->ihl << 2));
+	iph = (struct iphdr *) (icmp + 1);	/* this is the encapsulated IP header */
+	uh = (struct udphdr *) ((unsigned char *) iph + (iph->ihl << 2));
+	if (mp->b_wptr < (unsigned char *) (uh + 1))
+		uh = NULL;	/* don't have a full transport header */
+
+	resp.sin_family = AF_INET;
+	resp.sin_port = uh ? uh->source : 0;
+	resp.sin_addr.s_addr = iph->saddr;
+
+	switch (icmp->type) {
+	case ICMP_DEST_UNREACH:
+		switch (icmp->code) {
+		case ICMP_NET_UNREACH:
+		case ICMP_HOST_UNREACH:
+		case ICMP_PROT_UNREACH:
+		case ICMP_PORT_UNREACH:
+			orig = N_PROVIDER;
+			error = N_REJ_NSAP_UNREACH_P;	// N_UD_ROUTE_UNAVAIL;
+			mtu = 0;
+			break;
+		case ICMP_FRAG_NEEDED:
+			orig = N_PROVIDER;
+			error = N_REJ_QOS_UNAVAIL_P;	// N_UD_SEG_REQUIRED;
+			mtu = icmp->un.frag.mtu;
+			break;
+		case ICMP_NET_UNKNOWN:
+		case ICMP_HOST_UNKNOWN:
+		case ICMP_HOST_ISOLATED:
+		case ICMP_NET_ANO:
+		case ICMP_HOST_ANO:
+		case ICMP_PKT_FILTERED:
+		case ICMP_PREC_VIOLATION:
+		case ICMP_PREC_CUTOFF:
+			orig = N_PROVIDER;
+			error = N_REJ_NSAP_UNKNOWN;	// N_UD_ROUTE_UNAVAIL;
+			mtu = 0;
+			break;
+		case ICMP_SR_FAILED:
+		case ICMP_NET_UNR_TOS:
+		case ICMP_HOST_UNR_TOS:
+			orig = N_PROVIDER;
+			error = N_REJ_QOS_UNAVAIL_P;	// N_UD_QOS_UNAVAIL;
+			mtu = 0;
+			break;
+		default:
+			orig = N_UNDEFINED;
+			error = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
+			mtu = 0;
+			break;
+		}
+		break;
+	case ICMP_SOURCE_QUENCH:
+		/* Should not cause disconnect. */
+		orig = N_PROVIDER;
+		error = N_CONGESTION;	// N_UD_CONGESTION;
+		mtu = 0;
+		break;
+	case ICMP_TIME_EXCEEDED:
+		switch (icmp->code) {
+		case ICMP_EXC_TTL:
+			orig = N_PROVIDER;
+			error = N_REJ_QOS_UNAVAIL_P;	// N_UD_LIFE_EXCEEDED;
+			mtu = 0;
+			break;
+		case ICMP_EXC_FRAGTIME:
+			error = N_REJ_QOS_UNAVAIL_P;	// N_UD_TD_EXCEEDED;
+			mtu = 0;
+			break;
+		default:
+			orig = N_UNDEFINED;
+			error = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
+			mtu = 0;
+			break;
+		}
+		break;
+	case ICMP_PARAMETERPROB:
+		orig = N_UNDEFINED;
+		error = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
+		mtu = 0;
+		break;
+	default:
+		orig = N_UNDEFINED;
+		error = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
+		mtu = 0;
+		break;
+	}
+
+	/* check for outstanding reset indications for responding address */
+	for (respp = &ip->resq; (*respp); respp = &(*respp)->b_next) {
+		struct iphdr *iph2 = (struct iphdr *) (*respp)->b_rptr;
+
+		if (iph->protocol == iph2->protocol && iph->saddr == iph2->saddr
+		    && iph->daddr == iph2->daddr)
+			break;
+	}
+
+	/* check for outstanding connection indications for responding address */
+	for (conpp = &ip->conq; (*conpp); conpp = &(*conpp)->b_next) {
+		struct iphdr *iph2 = (struct iphdr *) (*conpp)->b_rptr;
+
+		if (iph->protocol == iph2->protocol && iph->saddr == iph2->saddr
+		    && iph->daddr == iph2->daddr)
+			break;
+	}
+
+	/* hide ICMP header */
+	hidden = (unsigned char *) iph - mp->b_rptr;
+	mp->b_rptr = (unsigned char *) iph;
+	if ((err = ne_discon_ind(q, &resp, mtu, orig, error, (*conpp), mp)) < 0)
+		mp->b_rptr -= hidden;
+	else if ((*conpp) != NULL) {
+		mblk_t *b, *b_prev;
+
+		/* Remove connection indication from queue */
+		b = (*conpp);
+		(*conpp) = b->b_next;
+		b->b_next = NULL;
+
+		/* Free any attached pending data */
+		b_prev = b;
+		while ((b = b_prev)) {
+			b_prev = b->b_prev;
+			b->b_prev = NULL;
+			b->b_next = NULL;
+			freemsg(b);
+		}
+	}
+	return (err);
 }
 
 /**
@@ -2072,7 +2176,6 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
 STATIC INLINE fastcall int
 ne_uderror_ind(queue_t *q, struct sockaddr_in *dst, np_ulong mtu, np_ulong error, mblk_t *dp)
 {
-	struct ip *ip = IP_PRIV(q);
 	mblk_t *mp;
 	N_uderror_ind_t *p;
 	struct sockaddr_in *sin;
@@ -2093,7 +2196,7 @@ ne_uderror_ind(queue_t *q, struct sockaddr_in *dst, np_ulong mtu, np_ulong error
 			mp->b_wptr += sizeof(*sin);
 			mp->b_cont = dp;
 			dp->b_datap->db_type = M_DATA;	/* was M_ERROR in some cases */
-			putnext(ip->oq, mp);
+			putnext(q, mp);
 			return (QR_ABSORBED);
 		}
 		return (-ENOBUFS);
@@ -2399,9 +2502,6 @@ ne_datack_ind(queue_t *q)
 STATIC int
 ne_info_req(queue_t *q, mblk_t *mp)
 {
-	struct ip *ip = IP_PRIV(q);
-
-	(void) ip;
 	return ne_info_ack(q);
 }
 
@@ -2450,7 +2550,6 @@ ne_bind_req(queue_t *q, mblk_t *mp)
 		size_t anum;
 		unsigned char *protoids = (typeof(protoids)) (mp->b_rptr + p->PROTOID_offset);
 		size_t pnum = p->PROTOID_length;
-		ulong flags = p->BIND_flags;
 
 		if (add_len) {
 			if (add_len < sizeof(struct sockaddr_in))
@@ -2470,7 +2569,8 @@ ne_bind_req(queue_t *q, mblk_t *mp)
 			add_in->sin_port = 0;
 			add_in->sin_addr.s_addr = INADDR_ANY;
 		}
-		if ((err = ip_bind(ip, add_in, anum, protoids, pnum, flags)) < 0)
+		if ((err = ip_bind(ip, add_in, anum, protoids, pnum, p->CONIND_number,
+				   p->BIND_flags)) < 0)
 			switch (err) {
 			case -EADDRNOTAVAIL:
 				goto bound;
@@ -2580,10 +2680,14 @@ ne_optmgmt_req(queue_t *q, mblk_t *mp)
 	if (p->QOS_length) {
 		if (mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length)
 			goto badopt;
+		if (p->QOS_length < sizeof(qos->n_qos_type))
+			goto badopt;
+		if (mp->b_wptr < mp->b_rptr + sizeof(qos->n_qos_type))
+			goto badopt;
 		if (qos->n_qos_type != N_QOS_SEL_INFO_IP)
 			goto badqostype;
 		if (p->QOS_length != sizeof(*qos))
-			goto badopt2;
+			goto badopt;
 	}
 	if (p->QOS_length) {
 		if (qos->tos != -1)
@@ -2596,10 +2700,6 @@ ne_optmgmt_req(queue_t *q, mblk_t *mp)
 	else
 		ip->i_flags &= ~IP_FLAG_DEFAULT_RC_SEL;
 	return ne_ok_ack(q, N_OPTMGMT_REQ, NULL, 0, qos, NULL, NULL, p->OPTMGMT_flags);
-      badopt2:
-	err = NBADOPT;
-	ptrace(("%s: %p: QOS options were invalid\n", DRV_NAME, ip));
-	goto error;
       badqostype:
 	err = NBADQOSTYPE;
 	ptrace(("%s: %p: QOS structure type not supported\n", DRV_NAME, ip));
@@ -2681,13 +2781,17 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 	/* Note: the reserved field can be used to send QOS data for the datagram. */
 	if (p->QOS_length) {
 		if (mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length)
-			goto badqos;
+			goto badopt;
+		if (p->QOS_length < sizeof(qos->n_qos_type))
+			goto badopt;
+		if (mp->b_wptr < mp->b_rptr + sizeof(qos->n_qos_type))
+			goto badopt;
 		if (p->QOS_length < sizeof(N_qos_sel_ud_ip_t))
-			goto badqos2;
+			goto badqostype;
 		/* avoid alignment problems */
 		bcopy(mp->b_rptr + p->QOS_offset, &nqos, sizeof(nqos));
 		if (nqos.n_qos_type != N_QOS_SEL_UD_IP)
-			goto badqos3;
+			goto badqostype;
 		qos = &nqos;
 	}
 #undef QOS_length
@@ -2714,14 +2818,11 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 	err = NACCESS;
 	ptrace(("%s: %p: no permission for requested address\n", DRV_NAME, ip));
 	goto error;
-      badqos3:
+      badqostype:
 	err = NBADQOSTYPE;
 	goto error;
-      badqos2:
-	err = NBADQOSTYPE;
-	goto error;
-      badqos:
-	err = NBADQOSTYPE;
+      badopt:
+	err = NBADOPT;
 	goto error;
       baddata2:
 	err = NBADDATA;
@@ -2795,7 +2896,10 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if (ip->provider != N_CONS)
 		goto outstate;
-	if (npi_not_state(ip, NSM_LISTEN))
+	/* connection requests are not allowed on listening Streams */
+	if (ip->maxinds > 0)
+		goto access;
+	if (npi_get_state(ip) != NS_IDLE)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
@@ -2812,12 +2916,16 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	}
 	if (p->QOS_length != 0) {
 		if (mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length)
-			goto einval;
-		if (p->QOS_length != sizeof(*qos))
-			goto badqos;
+			goto badopt;
+		if (p->QOS_length < sizeof(qos->n_qos_type))
+			goto badopt;
+		if (mp->b_wptr < mp->b_rptr + sizeof(qos->n_qos_type))
+			goto badopt;
 		qos = (N_qos_sel_conn_ip_t *) (mp->b_rptr + p->QOS_offset);
 		if (qos->n_qos_type != N_QOS_SEL_CONN_IP)
-			goto badqos;
+			goto badqostype;
+		if (p->QOS_length != sizeof(*qos))
+			goto badopt;
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	if ((err = ne_conn_con(q, dst, dnum, qos)) < 0)
@@ -2844,8 +2952,11 @@ ne_conn_req(queue_t *q, mblk_t *mp)
       bound:
 	err = NBOUND;
 	goto error;
-      badqos:
+      badqostype:
 	err = NBADQOSTYPE;
+	goto error;
+      badopt:
+	err = NBADOPT;
 	goto error;
       badaddr:
 	err = NBADADDR;
@@ -2880,12 +2991,12 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 STATIC INLINE fastcall int
 ne_conn_res(queue_t *q, mblk_t *mp)
 {
-	struct ip *ip = IP_PRIV(q);
+	struct ip *ip = IP_PRIV(q), *tok = ip;
 	N_conn_res_t *p;
 	N_qos_sel_conn_ip_t *qos = NULL;
 	struct sockaddr_in *res = NULL;
 	size_t rnum = 0;
-	mblk_t *dp;
+	mblk_t *dp, *seq;
 	np_long err = -EFAULT;
 
 	if (ip->provider == N_CLNS)
@@ -2907,23 +3018,56 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 	}
 	if (p->QOS_length != 0) {
 		if (mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length)
-			goto einval;
-		if (p->QOS_length != sizeof(*qos))
-			goto badqos;
+			goto badopt;
+		if (p->QOS_length < sizeof(qos->n_qos_type))
+			goto badopt;
+		if (mp->b_wptr < mp->b_rptr + sizeof(qos->n_qos_type))
+			goto badopt;
 		qos = (N_qos_sel_conn_ip_t *) (mp->b_rptr + p->QOS_offset);
 		if (qos->n_qos_type != N_QOS_SEL_CONN_IP)
-			goto badqos;
+			goto badqostype;
+		if (p->QOS_length != sizeof(*qos))
+			goto badopt;
 	}
 	if ((dp = mp->b_cont) != NULL && dp->b_wptr - dp->b_rptr <= 0)
 		goto baddata;
+	if (p->SEQ_number == 0)
+		goto badseq;
+	if (npi_not_state(ip, NSF_WRES_CIND) || ip->coninds < 1)
+		goto outstate;
+	for (seq = ip->conq; seq && (np_ulong) (long) seq != p->SEQ_number; seq = seq->b_next) ;
+	if (seq == NULL)
+		goto badseq;
+	if (p->TOKEN_value != 0) {
+		for (tok = master.ip.list; tok && (np_ulong) (long) tok != p->TOKEN_value;
+		     tok = tok->next) ;
+		if (tok == NULL)
+			goto badtoken;
+		if (npi_get_state(tok) == NS_UNBND)
+			goto badtoken;	/* we could bind it */
+		if (tok->maxinds > 0)
+			goto badtoken;
+		/* Note that the Stream to which we do a passive connection could be already
+		   connected: we just are just adding another address to a multihomed connection.
+		   But this is not as useful as adding or removing an address with N_OPTMGMT_REQ. */
+	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	npi_set_state(ip, NS_WACK_CRES);
-	return ne_ok_ack(q, N_CONN_RES, res, rnum, qos, NULL, NULL, 0);
+	return ne_ok_ack(q, N_CONN_RES, res, rnum, qos, seq, tok, p->CONN_flags);
+      badtoken:
+	err = NBADTOKEN;
+	goto error;
+      badseq:
+	err = NBADSEQ;
+	goto error;
       baddata:
 	err = NBADDATA;
 	goto error;
-      badqos:
+      badqostype:
 	err = NBADQOSTYPE;
+	goto error;
+      badopt:
+	err = NBADOPT;
 	goto error;
       badaddr:
 	err = NBADADDR;
@@ -2960,7 +3104,7 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if (ip->provider != N_CONS)
 		goto outstate;
-	if (npi_not_state(ip, NSM_LISTEN))
+	if (npi_not_state(ip, NSM_CONNECTED))
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
@@ -2974,12 +3118,15 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 		rnum = p->RES_length / sizeof(*res);
 	}
 	if (p->SEQ_number) {
-		if (npi_not_state(ip, NSF_WRES_CIND) || ip->coninds < 1)
-			goto outstate;
-		for (seq = ip->conq; seq && (np_ulong) (long) seq != p->SEQ_number; seq = seq->b_prev) ;
+		if (npi_get_state(ip) != NS_WRES_CIND)
+			goto badseq;
+		for (seq = ip->conq; seq && (np_ulong) (long) seq != p->SEQ_number; seq = seq->b_next) ;
 		if (seq == NULL)
 			goto badseq;
 
+	} else {
+		if (npi_get_state(ip) == NS_WRES_CIND)
+			goto badseq;
 	}
 	/* Ok, all checking done.  Now we need to disconnect the address. */
 	return ne_ok_ack(q, N_DISCON_REQ, res, rnum, NULL, seq, NULL, p->DISCON_reason);
@@ -3006,6 +3153,12 @@ ne_discon_req(queue_t *q, mblk_t *mp)
  * ne_data_req:- process N_DATA_REQ message
  * @q: active queue in queue pair (write queue)
  * @mp: the N_DATA_REQ message
+ *
+ * Unfortunately, there is no standard way of specifying destination and source addreses for
+ * multihomed hosts.  We could use N_OPTMGMT_REQ to change the primary destination address, source
+ * address and QOS parameters.  We could defined a non-standard DATA_xfer_flags to indicate that the
+ * IP header is included in the attached M_DATA blocks.  Or, we could accept N_UNITDATA_REQ
+ * primitives even though we are in N_CONS mode.
  */
 STATIC INLINE fastcall int
 ne_data_req(queue_t *q, mblk_t *mp)
@@ -3019,6 +3172,14 @@ ne_data_req(queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if (ip->provider != N_CONS)
 		goto outstate;
+	/* Note: If the interface is in the NS_IDLE or NS_WRES_RIND states when the provider
+	   receives the N_DATA_REQ primitive, then the NS provider should discard the request
+	   without generating a fatal error. */
+	if (npi_chk_state(ip, (NSF_IDLE | NSF_WRES_RIND)))
+		goto ignore;
+	/* For multihomed operation, we should not actually discard the N_DATA_REQ if the
+	   destination of the request is an address that does not have an outstanding reset
+	   indication. */
 	if (npi_not_state(ip, NSM_OUTDATA))
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -3039,6 +3200,8 @@ ne_data_req(queue_t *q, mblk_t *mp)
       einval:
 	err = EPROTO;
 	goto error;
+      ignore:
+	return (QR_DONE);	/* discard */
       outstate:
 	err = EPROTO;
 	goto error;
@@ -3066,6 +3229,11 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if (ip->provider != N_CONS)
 		goto outstate;
+	/* Note: If the interface is in the NS_IDLE or NS_WRES_RIND states when the provider
+	   receives the N_EXDATA_REQ primitive, then the NS provider should discard the request
+	   without generating a fatal error. */
+	if (npi_chk_state(ip, (NSF_IDLE | NSF_WRES_RIND)))
+		goto ignore;
 	if (npi_not_state(ip, NSM_OUTDATA))
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -3081,6 +3249,8 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
       einval:
 	err = EPROTO;
 	goto error;
+      ignore:
+	return (QR_DONE);	/* discard */
       outstate:
 	err = EPROTO;
 	goto error;
@@ -3106,8 +3276,18 @@ ne_datack_req(queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if (ip->provider != N_CONS)
 		goto outstate;
+	/* Note: If the interface is in the NS_IDLE state when the provider receives the
+	   N_DATACK_REQ primitive, then the NS provider should discard the request without
+	   generating a fatal error. */
+	if (npi_get_state(ip) == NS_IDLE)
+		goto ignore;
 	if (npi_not_state(ip, NSM_CONNECTED))
 		goto outstate;
+	/* Note: If the NS provider had no knowledge of a previous N_DATA_IND with the receipt
+	   confirmation flag set, then the NS provider should just ignore the request without
+	   generating a fatal error. */
+	if (ip->datinds <= 0)
+		goto ignore;
 	if (mp->b_wptr < mp->b_rptr + sizeof(N_datack_req_t))
 		goto einval;
 	/* do not currently support this primitive, even when properly formatted */
@@ -3115,6 +3295,8 @@ ne_datack_req(queue_t *q, mblk_t *mp)
       einval:
 	err = EPROTO;
 	goto error;
+      ignore:
+	return (QR_DONE);	/* discard */
       outstate:
 	err = EPROTO;
 	goto error;
@@ -3142,7 +3324,12 @@ ne_reset_req(queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if (ip->provider != N_CONS)
 		goto outstate;
-	if (npi_not_state(ip, NSM_OUTDATA))
+	/* Note: If the interface is in the NS_IDLE state when the provider receives the
+	   N_RESET_REQ primitive, then the NS provider should discard the message without
+	   generating an error. */
+	if (npi_get_state(ip) == NS_IDLE)
+		goto ignore;
+	if (npi_get_state(ip) != NS_DATA_XFER)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
@@ -3165,6 +3352,8 @@ ne_reset_req(queue_t *q, mblk_t *mp)
       einval:
 	err = -EINVAL;
 	goto error;
+      ignore:
+	return (QR_DONE);	/* discard */
       outstate:
 	err = NOUTSTATE;
 	goto error;
@@ -3227,7 +3416,7 @@ ne_reset_res(queue_t *q, mblk_t *mp)
 	if (!dpp)
 		goto badaddr;
 	/* find pointer to corresponding destination routing information */
-	for (i = 0, da = ip->daddrs; i < ip->dnum; i++, da++ )
+	for (i = 0, da = ip->daddrs; i < ip->dnum; i++, da++)
 		if (da->addr == dest.sin_addr.s_addr)
 			break;
 	if (i >= ip->dnum)
@@ -3615,18 +3804,10 @@ ip_w_prim(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC struct ip_bhash_slot ip_bind_hash[1] = { };
-STATIC struct ip_lhash_slot ip_list_hash[1] = { };
-STATIC struct ip_chash_slot ip_conn_hash[1] = { };
+STATIC struct ip_bind_bucket *ip_bind_hash[1] = { };
+STATIC struct ip_conn_bucket *ip_conn_hash[1] = { };
 STATIC int
 ip_bind_hashfn(unsigned char protocol, unsigned short snum)
-{
-	swerr();
-	fixme(("write this function"));
-	return (0);
-}
-STATIC int
-ip_list_hashfn(unsigned char protocol, unsigned short snum)
 {
 	swerr();
 	fixme(("write this function"));
@@ -3639,17 +3820,108 @@ ip_conn_hashfn(unsigned char protocol, unsigned short snum, unsigned short dnum)
 	fixme(("write this function"));
 	return (0);
 }
-STATIC struct sockaddr_in *
-ip_find_saddr(struct ip *ip, uint32_t daddr)
+
+/**
+ * ip_match_bind_next: - match the next Stream in the bind or listen hashes
+ * @ip_prev:	previous lookup value (NULL for new)
+ * @list:	list to traverse
+ * @dport:	destination port number (network order)
+ * @daddr:	destination address (network order)
+ * @type:	N_CONS or N_CLNS, or both
+ */
+STATIC fastcall struct ip *
+ip_match_bind_next(struct ip *ip_prev, struct ip *list, unsigned short dport, uint32_t daddr, unsigned int type)
 {
-	swerr();
-	fixme(("write this function"));
-	return (NULL);
+	struct ip *ip2, *ip_seen = NULL, *result = NULL;
+	int hiscore = 0;
+
+	for (ip2 = list; ip2; ip2 = ip2->bnext) {
+		int score = 0;
+
+		if (ip_seen != ip_prev)
+			continue;
+		if (ip2 == ip_prev) {
+			ip_seen = ip_prev;
+			continue;
+		}
+		if (ip2->provider != 0) {
+			if ((ip2->provider & type) == 0)
+				continue;
+			if (ip2->provider == type)
+				score++;
+		}
+		if (type == N_CONS) {
+			if (ip2->maxinds == 0)
+				continue;
+		}
+		if (ip2->bport) {
+			if (ip2->bport != dport)
+				continue;
+			score++;
+		}
+		if (ip2->bnum) {
+			int i;
+			for (i = 0; i < ip2->bnum; i++) {
+				if (ip2->baddrs[i].addr == INADDR_ANY)
+					break;
+				if (ip2->baddrs[i].addr == daddr) {
+					score++;
+					break;
+				}
+			}
+			if (i >= ip2->bnum)
+				continue;
+		}
+		if (score >= 3) {
+			result = ip2;
+			break;
+		}
+		if (score > hiscore) {
+			hiscore = score;
+			result = ip2;
+		}
+	}
+	return (result);
+}
+
+STATIC fastcall struct ip *
+ip_match_conn_next(struct ip *ip_prev, struct ip *list, uint32_t daddr, uint32_t saddr)
+{
+	struct ip *ip2, *ip_seen = NULL;
+
+	for (ip2 = list; ip2; ip2 = ip2->cnext) {
+		if (ip_seen != ip_prev)
+			continue;
+		if (ip2 == ip_prev) {
+			ip_seen = ip_prev;
+			continue;
+		}
+		if (ip2->provider != N_CONS) {
+			swerr();
+			continue;
+		}
+		if (npi_not_state(ip2, NSM_CONNECTED)) {
+			swerr();
+			continue;
+		}
+		{
+			int i;
+
+			for (i = 0; i < ip2->dnum && ip2->daddrs[i].addr != daddr; i++) ;
+			if (i >= ip2->dnum)
+				continue;
+			for (i = 0; i < ip2->snum && ip2->saddrs[i].addr != saddr; i++) ;
+			if (i >= ip2->snum)
+				continue;
+		}
+		break;
+	}
+	return (ip2);
 }
 
 /**
  * ip_lookup_conn_next: - lookup next Stream in the connection hashes
- * @ip:		previous lookup value (NULL for new)
+ * @ip_prev:	previous lookup value (NULL for new)
  * @iph:	IP header
  * @uh:		UDP header
  *
@@ -3660,190 +3932,113 @@ ip_find_saddr(struct ip *ip, uint32_t daddr)
  * connection bucket must be traversed and checked for address matches.
  */
 STATIC INLINE fastcall struct ip *
-ip_lookup_conn_next(struct ip *ip, struct iphdr *iph, struct udphdr *uh)
-{
-	struct ip *result = NULL;
-	struct ip_conn_bucket *ic;
-	struct ip_chash_slot *hp =
-	    &ip_conn_hash[ip_conn_hashfn(iph->protocol, uh->source, uh->dest)];
-
-	read_lock_bh(&hp->lock);
-	for (ic = hp->list; ic; ic = ic->next) {
-		if (ic->proto != iph->protocol)
-			continue;
-		if (ic->dport != uh->source)
-			continue;
-		if (ic->sport != uh->dest)
-			continue;
-		{
-			struct ip *ip2;
-
-			for (ip2 = ic->owners; ip2; ip2 = ip2->cnext) {
-				int i;
-
-				if (ip2 == ip)
-					continue;
-				if (ip2->provider != N_CONS)
-					continue;
-				if (npi_not_state(ip2, NSM_CONNECTED))
-					continue;
-				for (i = 0; i < ip2->dnum; i++) {
-					if (ip2->daddrs[i].addr != iph->daddr)
-						continue;
-					goto found_daddr;
-				}
-				break;
-			      found_daddr:
-				for (i = 0; i < ip2->snum; i++) {
-					if (ip2->saddrs[i].addr != iph->saddr)
-						continue;
-					goto found_saddr;
-				}
-			}
-			continue;
-		      found_saddr:
-			result = ip2;
-			break;
-		}
-	}
-	read_unlock_bh(&hp->lock);
-	return (result);
-}
-
-/**
- * ip_lookup_list_next: - lookup next Stream in the listening hashes
- * @ip:		previous lookup value (NULL for new)
- * @iph:	IP header
- * @uh:		UDP header
- */
-STATIC INLINE fastcall struct ip *
-ip_lookup_list_next(struct ip *ip, struct iphdr *iph, struct udphdr *uh)
-{
-	struct ip *result = NULL;
-	struct ip_list_bucket *il;
-	struct ip_lhash_slot *hp = &ip_list_hash[ip_list_hashfn(iph->protocol, uh->dest)];
-
-	read_lock_bh(&hp->lock);
-	for (il = hp->list; il; il = il->next) {
-		if (il->proto != 0 && il->proto != iph->protocol)
-			continue;
-		if (il->port != 0 && il->port != uh->dest)
-			continue;
-		{
-			struct ip *ip2;
-
-			for (ip2 = il->owners; ip2; ip2 = ip2->next) {
-				int i;
-
-				if (ip2 == ip)
-					continue;
-				if (ip2->provider != N_CONS)
-					continue;
-				if (npi_not_state(ip2, NSM_LISTEN))
-					continue;
-				for (i = 0; i < ip2->snum; i++) {
-					if (ip2->baddrs[i].addr != INADDR_ANY
-					    && ip2->baddrs[i].addr != iph->daddr)
-						continue;
-					break;
-				}
-				if (i >= ip2->snum)
-					continue;
-				break;
-			}
-			if (ip2 == NULL)
-				continue;
-			result = ip2;
-			break;
-		}
-	}
-	read_unlock_bh(&hp->lock);
-	return (result);
-}
-
-/**
- * ip_lookup_bind_next: - lookup Stream in the bind hashes
- * @ip:		previous result
- * @iph:	IP header
- * @uh:		UDP header
- */
-STATIC INLINE fastcall struct ip *
-ip_lookup_bind_next(struct ip *ip, struct iphdr *iph, struct udphdr *uh)
+ip_lookup_conn_next(struct ip *ip_prev, struct iphdr *iph, struct udphdr *uh)
 {
 	unsigned char protocol = iph->protocol;
-	unsigned short dport = uh ? uh->dest : 0;
+	unsigned short sport = uh->source;
+	unsigned short dport = uh->dest;
 	struct ip *result = NULL;
-	struct ip_bind_bucket *ib;
-	struct ip_bhash_slot *hp = &ip_bind_hash[ip_bind_hashfn(protocol, dport)];
+	struct ip_conn_bucket *ic, **hp;
 
-	read_lock(&hp->lock);
-	for (ib = hp->list; ib && (ib->proto != protocol || ib->port != dport); ib = ib->next) ;
-	if (ib) {
-		struct ip *ip2;
-		int hiscore = 0;
+	hp = &ip_conn_hash[ip_conn_hashfn(protocol, sport, dport)];
 
-		for (ip2 = ib->owners; ip2; ip2 = ip2->bnext) {
-			int score = 0;
-
-			if (ip2 == ip)
-				continue;
-			if (npi_not_state(ip2, NSF_IDLE))
-				continue;
-			if (ip2->bport) {
-				if (ip2->bport != dport)
-					continue;
-				score++;
-				if (ip2->bnum) {
-					struct sockaddr_in *sa;
-
-					if (!(sa = ip_find_saddr(ip2, iph->daddr)))
-						continue;
-					score++;
-				}
-			}
-			if (score > 0) {
-				result = ip2;
-				break;
-			}
-			if (score > hiscore) {
-				hiscore = score;
-				result = ip2;
-			}
-		}
+	read_lock_bh(&ip_hash_lock);
+	for (ic = (*hp); ic && (ic->proto != protocol || ic->dport != sport || ic->sport != dport);
+	     ic = ic->next) ;
+	if (ic) {
+		result = ip_match_conn_next(ip_prev, ic->owners, iph->daddr, iph->saddr);
 	}
-	read_unlock(&hp->lock);
-	usual(result);
-	if (result) {
+	if (result)
 		ip_get(result);
-		return (result);
-	}
-	return NULL;
+	read_unlock_bh(&ip_hash_lock);
+	return (result);
 }
 
 /**
- * ip_lookup -	lookup Stream by protocol, address and port.
+ * ip_lookup_bind_next: - lookup Stream in the bind/listening hashes
+ * @ip_prev:	previous result (NULL for new)
+ * @iph:	IP header
+ * @uh:		UDP header (NULL N_CLNS, non-NULL N_CONS)
+ *
+ * Note that an N_CLNS Stream cannot bind to a port number and must bind to port number zero.  An
+ * N_CONS Stream can only bind listening to a non-zero port number, but can bind normal to a zero
+ * port number.
+ *
+ * N_CLNS Streams are always entered into the bind hashes against port 0, even if they have an
+ * assigned port.  N_CONS Streams are entered against their bound port number (which can be zero
+ * only if they are not listening).  N_CONS Streams that are not listening will not be matched.
+ * Only the DEFAULT_LISTENER can be bound listening against a zero port (and it requires a wildcard
+ * address).
+ */
+STATIC INLINE fastcall struct ip *
+ip_lookup_bind_next(struct ip *ip_prev, struct iphdr *iph, struct udphdr *uh, unsigned int type)
+{
+	unsigned char protocol = iph->protocol;
+	unsigned short dport = uh->dest, lport = (type == N_CONS) ? dport : 0;
+	struct ip *result = NULL;
+	struct ip_bind_bucket *ib, **hp;
+	
+	hp = &ip_bind_hash[ip_bind_hashfn(protocol, lport)];
+
+	read_lock_bh(&ip_hash_lock);
+	for (ib = (*hp); ib && (ib->proto != protocol || ib->port != lport); ib = ib->next) ;
+	if (ib) {
+		if (result == NULL)
+			result = ip_match_bind_next(ip_prev, ib->owners, dport, iph->daddr, type);
+		if (result == NULL)
+			result = ip_match_bind_next(ip_prev, ib->dflt, dport, iph->daddr, type);
+	}
+	if (result)
+		ip_get(result);
+	read_unlock_bh(&ip_hash_lock);
+	usual(result);
+	return (result);
+}
+
+/**
+ * ip_lookup_next - lookup next Stream by protocol, address and port.
+ * @ip_prev:	result of previous lookup, NULL for new
  * @iph:	IP header
  * @uh:		UDP header
  *
  * The UDP header here is just to get port numbers in the right place.  All connection-oriented IP
  * protocols use port numbers in the same layout as UDP.  This header is ignored for connectionless
- * lookups.
+ * lookups if the Stream is not bound to a non-zero port number.
  *
- * There are three places to look: connection hash, listening hash, connectionless bind hash, in
- * that order.  These are all organized at the first level by protocol number.
+ * There are two places to look: connection hash and bind hash.  Connection hashes and bind hashes
+ * are only searched for connection-oriented Streams if there is a connection oriented Stream bound
+ * to the protocol id.  Bind hashes are only searched for connectionless Streams if there is a
+ * connectionless Stream bound to the protocol id.
  */
+STATIC INLINE fastcall struct ip *
+ip_lookup_next(struct ip *ip_prev, struct iphdr *iph, struct udphdr *uh)
+{
+	struct ip *result = NULL;
+	struct ip_prot_bucket *pp, **ipp;
+
+	ipp = &ip_prots[iph->protocol];
+
+	read_lock_bh(&ip_prot_lock);
+	if ((pp = *ipp)) {
+		if (pp->corefs > 0) {
+			if (result == NULL)
+				result = ip_lookup_conn_next(ip_prev, iph, uh);
+			if (result == NULL)
+				result = ip_lookup_bind_next(ip_prev, iph, uh, N_CONS);
+		}
+		if (pp->clrefs > 0) {
+			if (result == NULL)
+				result = ip_lookup_bind_next(ip_prev, iph, uh, N_CLNS);
+		}
+	}
+	read_unlock_bh(&ip_prot_lock);
+	return (result);
+}
+
 STATIC INLINE fastcall struct ip *
 ip_lookup(struct iphdr *iph, struct udphdr *uh)
 {
-	struct ip *result = NULL;
-
-	if (result == NULL)
-		result = ip_lookup_conn_next(result, iph, uh);
-	if (result == NULL)
-		result = ip_lookup_list_next(result, iph, uh);
-	if (result == NULL)
-		result = ip_lookup_bind_next(result, iph, uh);
-	return (result);
+	return ip_lookup_next(NULL, iph, uh);
 }
 
 /**
@@ -4061,10 +4256,10 @@ ip_alloc_priv(queue_t *q, ip_t ** slp, int type, dev_t *devp, cred_t *crp)
 		// ip->obid = 0;
 		// ip->iwait = NULL;
 		// ip->owait = NULL;
-		ip->i_state = (-1); // LMI_UNUSABLE;
-		ip->i_style = (1); // LMI_STYLE1;
+		ip->i_state = (-1);	// LMI_UNUSABLE;
+		ip->i_style = (1);	// LMI_STYLE1;
 		ip->i_version = 1;
-		ip->i_oldstate = (1); // LMI_UNUSABLE;
+		ip->i_oldstate = (1);	// LMI_UNUSABLE;
 		/* ip specific members */
 		ip->provider = type;
 		/* link into master list */
@@ -4419,7 +4614,6 @@ ipinit(void)
 		if (major == 0)
 			major = ip_majors[0];
 	}
-	(void) ip_unbind_prot;
 	return (0);
 }
 
