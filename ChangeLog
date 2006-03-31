@@ -1,3 +1,7 @@
+2006-03-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/hot.lds: miss-ordering of hot.put and hot.get
+
 2006-03-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/openss7.m4: got enable_static backwards
