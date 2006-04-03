@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/03/24 16:02:19 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/04/03 10:58:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/24 16:02:19 $ by $Author: brian $
+# Last Modified $Date: 2006/04/03 10:58:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -216,7 +216,8 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
     ])
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/brlock.h \
-			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h], [:], [:], [
+			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h \
+			  net/request_sock.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -346,6 +347,36 @@ dnl 		    ])
 dnl 	])
     fi
     _LINUX_KERNEL_ENV([dnl
+	if test :$linux_cv_xfrm_policy_delete_symbol = :yes ; then
+	    AC_CACHE_CHECK([for kernel xfrm_policy_delete_symbol returns int],
+			   [linux_cv_xfrm_policy_delete_returns_int], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif]],
+		    [[int retval = xfrm_policy_delete(NULL, 0);]]) ],
+		    [linux_cv_xfrm_policy_delete_returns_int='yes'],
+		    [linux_cv_xfrm_policy_delete_returns_int='no'])
+	    ])
+	    if test :$linux_cv_xfrm_policy_delete_returns_int = :yes ; then
+		AC_DEFINE([HAVE_XFRM_POLICY_DELETE_RETURNS_INT], [1], [Define if function
+			   xfrm_policy_delete returns int.])
+	    fi
+	fi
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments], [linux_cv_have___ip_select_ident_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[

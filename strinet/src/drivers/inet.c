@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/03/31 12:43:31 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/04/03 10:58:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/31 12:43:31 $ by $Author: brian $
+ Last Modified $Date: 2006/04/03 10:58:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.65  2006/04/03 10:58:09  brian
+ - 2.6.13 kernel has request_sock but no inet_connection_sock
+
  Revision 0.9.2.64  2006/03/31 12:43:31  brian
  - stab at ss_sock_sendmsg corrections
 
@@ -69,10 +72,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/03/31 12:43:31 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/04/03 10:58:09 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/03/31 12:43:31 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/04/03 10:58:09 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -330,11 +333,21 @@ static char const ident[] =
 
 #ifndef HAVE_KFUNC_INET_CSK
 #define sock_syn_retries(_sk)		(tcp_sk(_sk)->syn_retries)
+#ifndef HAVE_KINC_NET_REQUEST_SOCK_H
 #define sock_defer_accept(_sk)		(tcp_sk(_sk)->defer_accept)
 #define sock_accept_queue_head(_sk)	(tcp_sk(_sk)->accept_queue)
 #define sock_accept_queue_tail(_sk)	(tcp_sk(_sk)->accept_queue_tail)
 #define sock_accept_queue_lock(_sk)
 #define sock_accept_queue_unlock(_sk)
+#else
+#define sock_defer_accept(_sk)		(tcp_sk(_sk)->defer_accept)
+#define sock_accept_queue_head(_sk)	(tcp_sk(_sk)->accept_queue.rskq_accept_head)
+#define sock_accept_queue_tail(_sk)	(tcp_sk(_sk)->accept_queue.rskq_accept_tail)
+#define sock_accept_queue_lock(_sk)	write_lock_bh(&tcp_sk(_sk)->accept_queue.syn_wait_lock)
+#define sock_accept_queue_unlock(_sk)	write_unlock_bh(&tcp_sk(_sk)->accept_queue.syn_wait_lock)
+#define open_request request_sock
+#define tcp_openreq_fastfree(__req)	__reqsk_free(__req)
+#endif
 #else
 #define sock_syn_retries(_sk)		(inet_csk(_sk)->icsk_syn_retries)
 #define sock_defer_accept(_sk)		(inet_csk(_sk)->icsk_accept_queue.rskq_defer_accept)
@@ -526,7 +539,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/03/31 12:43:31 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/04/03 10:58:09 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"

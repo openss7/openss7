@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: udp_hooks.h.in,v 0.9.2.1 2006/03/24 00:08:29 brian Exp $
+ @(#) $Id: udp_hooks.h.in,v 0.9.2.2 2006/04/03 10:56:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/24 00:08:29 $ by $Author: brian $
+ Last Modified $Date: 2006/04/03 10:56:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp_hooks.h.in,v $
+ Revision 0.9.2.2  2006/04/03 10:56:19  brian
+ - xfrm_policy_delete now returns int instead of void
+
  Revision 0.9.2.1  2006/03/24 00:08:29  brian
  - added second generation udp driver
 
@@ -60,7 +63,7 @@
 #ifndef __LOCAL_UDP_HOOKS_H__
 #define __LOCAL_UDP_HOOKS_H__
 
-#ident "@(#) $RCSfile: udp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: udp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #undef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
 #ifndef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
@@ -186,8 +189,18 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned 
 
 #undef HAVE_XFRM_POLICY_DELETE_ADDR
 #ifdef HAVE_XFRM_POLICY_DELETE_ADDR
-void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
-#define xfrm_policy_delete (*((typeof(xfrm_policy_delete) *) HAVE_XFRM_POLICY_DELETE_ADDR))
+/* this needs to be function, not macro */
+#ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
+int xfrm_policy_delete(struct xfrm_policy *pol, int dir) {
+	int (*func)(struct xfrm_policy *, int) = (typeof(func)) HAVE_XFRM_POLICY_DELETE_ADDR;
+	return (*func)(pol, dir);
+}
+#else
+void xfrm_policy_delete(struct xfrm_policy *pol, int dir) {
+	void (*func)(struct xfrm_policy *, int) = (typeof(func)) HAVE_XFRM_POLICY_DELETE_ADDR;
+	return (*func)(pol, dir);
+}
+#endif
 #endif
 
 #undef HAVE_SNMP_GET_INFO_ADDR

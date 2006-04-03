@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.3 $) $Date: 2005/12/18 05:41:23 $
+ @(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.4 $) $Date: 2005/12/19 03:22:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.3 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.4 $) $Date: 2005/12/19 03:22:20 $"
 
 /************************************************************************
 *                         LiS Locks                                     *
@@ -874,11 +874,8 @@ lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL)
 	(void) file;
 	(void) line;
 	(void) l;		/* compiler happiness in 2.2 */
-#if defined(_PPC_LIS_)
-	return (0);		/* PPC does not define this, odd */
-#else
+
 	return (spin_is_locked(l));
-#endif
 }
 
 void _RP

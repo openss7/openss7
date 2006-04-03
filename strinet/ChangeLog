@@ -1,3 +1,16 @@
+2006-04-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: add check for <net/request_sock.h> for 2.6.13 kernels.
+	  I finally stumbled across a 2.6.13 kernel (in SuSE 10) that has a
+	  request_sock structure but no inet_csk().  This handles that case.
+	  Also, xfrm_policy_delete returns int on 2.6.13+.
+	* src/drivers/inet.c: handles request_sock with no inet_connection_sock
+	* src/drivers/udp.c (udp_open, udp_close): gcc 4 does not like different
+	  attributes between declaration and definition.
+	* src/drivers/rawip.c (rawip_open, rawip_close): gcc 4 does not like
+	  different attributes between declaration and definition.
+	* src/drivers/udp_hooks.h.in: xfrm_policy_delete returns int on 2.6.13+.
+
 2006-03-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: significant changes to the INET driver
@@ -260,4 +273,4 @@ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 Commercial licensing and support of this software is available from OpenSS7
 Corporation at a fee.  See http://www.openss7.com/
 
-vim: ft=changelog tw=80 com=fb\:*,fb\:- fo+=tcqlorn
+vim: ft=changelog tw=80 com=fb\:*,fb\:- fo+=tcqlorn nocin nosi

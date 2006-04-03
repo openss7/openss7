@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/31 12:36:46 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/03 10:57:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/31 12:36:46 $ by $Author: brian $
+ Last Modified $Date: 2006/04/03 10:57:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.17  2006/04/03 10:57:25  brian
+ - need attributes on definition as well as declaration
+
  Revision 0.9.2.16  2006/03/31 12:36:46  brian
  - working up ip driver
 
@@ -101,10 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/31 12:36:46 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/03 10:57:25 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/31 12:36:46 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/03 10:57:25 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -159,7 +162,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/31 12:36:46 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/03 10:57:25 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -4056,7 +4059,7 @@ ip_lookup_icmp(struct iphdr *iph, unsigned int len)
 	return (NULL);
 }
 
-STATIC void
+STATIC streamscall void
 ip_free(char *data)
 {
 	struct sk_buff *skb = (typeof(skb)) data;
@@ -4339,7 +4342,7 @@ STATIC int ip_majors[IP_CMAJORS] = { IP_CMAJOR_0, };
  * @sflag: STREAMS flag: DRVOPEN, MODOPEN or CLONEOPEN
  * @crp: pointer to opener's credentials
  */
-STATIC int
+STATIC streamscall int
 ip_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int mindex = 0;
@@ -4412,7 +4415,7 @@ ip_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
  * @oflag: flags to open call
  * @crp: pointer to closer's credentials
  */
-STATIC int
+STATIC streamscall int
 ip_close(queue_t *q, int oflag, cred_t *crp)
 {
 	ip_t *ip = PRIV(q);

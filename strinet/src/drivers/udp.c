@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/27 01:25:36 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/03 10:57:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/27 01:25:36 $ by $Author: brian $
+ Last Modified $Date: 2006/04/03 10:57:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.7  2006/04/03 10:57:25  brian
+ - need attributes on definition as well as declaration
+
  Revision 0.9.2.6  2006/03/27 01:25:36  brian
  - working up IP driver and SCTP testing
 
@@ -70,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/27 01:25:36 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/03 10:57:25 $"
 
-static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/27 01:25:36 $";
+static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/03 10:57:25 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -149,7 +152,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $)
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/27 01:25:36 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/03 10:57:25 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -5511,7 +5514,7 @@ STATIC int udp_majors[UDP_CMAJORS] = { UDP_CMAJOR_0, };
  * @sflag: STREAMS flags (DRVOPEN, MODOPEN, CLONEOPEN)
  * @crp: credentials pointer
  */
-STATIC int
+STATIC streamscall int
 udp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int mindex = 0;
@@ -5586,7 +5589,7 @@ udp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  * @flag: open flags
  * @crp: credentials pointer
  */
-STATIC int
+STATIC streamscall int
 udp_close(queue_t *q, int flag, cred_t *crp)
 {
 	printd(("%s: closing character device %d:%d\n", DRV_NAME, (int) UDP_PRIV(q)->cmajor,

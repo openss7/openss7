@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/30 12:51:54 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/04/03 10:57:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/30 12:51:54 $ by $Author: brian $
+ Last Modified $Date: 2006/04/03 10:57:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.6  2006/04/03 10:57:25  brian
+ - need attributes on definition as well as declaration
+
  Revision 0.9.2.5  2006/03/30 12:51:54  brian
  - corrections for x64_64 compile
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/30 12:51:54 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/04/03 10:57:25 $"
 
-static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/30 12:51:54 $";
+static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/04/03 10:57:25 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -139,7 +142,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.5 
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/30 12:51:54 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/04/03 10:57:25 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -5176,7 +5179,7 @@ STATIC int raw_majors[RAW_CMAJORS] = { RAW_CMAJOR_0, };
  * @sflag: STREAMS flags (DRVOPEN, MODOPEN, CLONEOPEN)
  * @crp: credentials pointer
  */
-STATIC int
+STATIC streamscall int
 raw_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int mindex = 0;
@@ -5251,7 +5254,7 @@ raw_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  * @flag: open flags
  * @crp: credentials pointer
  */
-STATIC int
+STATIC streamscall int
 raw_close(queue_t *q, int flag, cred_t *crp)
 {
 	printd(("%s: closing character device %d:%d\n", DRV_NAME, (int) RAW_PRIV(q)->cmajor,
