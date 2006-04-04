@@ -1,3 +1,12 @@
+2006-04-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/dist.m4: better detection of SuSE 10 distribution
+	  - SuSE 10 uses all caps in SuSE-release for some stupid reason.
+	  - Check for OSS as a SuSE codename (SuSE never had codenames).
+	  - Expect Mandrake to use Mandriva in random places.
+	* m4/rpm.m4 (PACKAGE_RPMDIST): add codename
+	* scripts/send-pr: do not remove leading space from included lines
+
 2006-03-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/hot.lds: miss-ordering of hot.put and hot.get

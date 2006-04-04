@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/03/14 12:09:00 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/04/03 21:08:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/14 12:09:00 $ by $Author: brian $
+# Last Modified $Date: 2006/04/03 21:08:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -283,7 +283,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	    (*)		rpm_cv_dist_topdir="$ac_abs_top_buiddir" ;;
 	esac
     ])
-    PACKAGE_RPMDIST="${dist_cv_host_distrib:-Unknown Linux} ${dist_cv_host_release:-Unknown}"
+    PACKAGE_RPMDIST="${dist_cv_host_distrib:-Unknown Linux} ${dist_cv_host_release:-Unknown}${dist_cv_host_codename:+ ($dist_cv_host_codename)}"
     AC_SUBST([PACKAGE_RPMDIST])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RPMDIST], ["$PACKAGE_RPMDIST"], [The RPM Distribution.  This
 	defaults to automatic detection.])

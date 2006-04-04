@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/14 09:04:10 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/04/03 21:08:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/14 09:04:10 $ by $Author: brian $
+# Last Modified $Date: 2006/04/03 21:08:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -124,18 +124,22 @@ AC_DEFUN([_DISTRO_OPTIONS], [dnl
 # =============================================================================
 # _DISTRO_FUNCTIONS
 # -----------------------------------------------------------------------------
+# Note: check for capitalized versions now too: SuSE 10 uses SUSE LINUX (all caps
+# for some stupid reaason).  Also, expect Mandrake to change to Mandriva any day
+# soon.
+# -----------------------------------------------------------------------------
 AC_DEFUN_ONCE([_DISTRO_FUNCTIONS], [dnl
 dist_get_flavor() {
 dnl AC_MSG_WARN([checking for flavor in $[1]])
     case "$[1]" in
-	(*CentOS*)	echo 'centos'   ;;
-	(*Lineox*)	echo 'lineox'	;;
-	(*White?Box*)	echo 'whitebox' ;;
-	(*Fedora?Core*)	echo 'fedora'   ;;
-	(*Mandrake*)	echo 'mandrake' ;;
-	(*Red?Hat*)	echo 'redhat'   ;;
-	(*SuSE*)	echo 'suse'     ;;
-	(*Debian*)	echo 'debian'   ;;
+	(*CentOS*|*CENTOS*)				echo 'centos'	;;
+	(*Lineox*|*LINEOX*)				echo 'lineox'	;;
+	(*White?Box*|*WHITE?BOX*)			echo 'whitebox'	;;
+	(*Fedora?Core*|*FEDORA?CORE*)			echo 'fedora'	;;
+	(*Mandrake*|*Mandriva*|*MANDRAKE*|*MANDRIVA*)	echo 'mandrake'	;;
+	(*Red?Hat*|*RED?HAT*)				echo 'redhat'	;;
+	(*SuSE*|*SUSE*|*Novell*|*NOVELL*)		echo 'suse'	;;
+	(*Debian*|*DEBIAN*)				echo 'debian'	;;
     esac
 }
 dist_get_vendor() {
@@ -143,14 +147,14 @@ dnl AC_MSG_WARN([checking for vendor in $[1]])
     case "$[1]" in
 	(centos)	echo 'centos'	;;
 	(lineox)	echo 'lineox'	;;
-	(whitebox)	echo 'whitebox' ;;
-	(fedora)	echo 'redhat'   ;;
-	(mandrake)	echo 'mandrake' ;;
-	(redhat)	echo 'redhat'   ;;
-	(suse)		echo 'suse'     ;;
-	(debian)	echo 'debian'   ;;
-	(unknown)	echo 'pc'       ;;
-	(*)		echo "$[1]"       ;;
+	(whitebox)	echo 'whitebox'	;;
+	(fedora)	echo 'redhat'	;;
+	(mandrake)	echo 'mandrake'	;;
+	(redhat)	echo 'redhat'	;;
+	(suse)		echo 'suse'	;;
+	(debian)	echo 'debian'	;;
+	(unknown)	echo 'pc'	;;
+	(*)		echo "$[1]"	;;
     esac
 }
 dist_get_release() {
@@ -221,6 +225,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    /etc/whitebox-release
 	    /etc/fedora-release
 	    /etc/mandrake-release
+	    /etc/mandriva-release
 	    /etc/redhat-release
 	    /etc/SuSE-release
 	    /etc/debian_version\""
@@ -313,12 +318,19 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_CACHE_CHECK([for dist build codename], [dist_cv_build_codename], [dnl
 	if test :"${dist_cv_build_rel_file:-no}" != :no ; then
-	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
-		dist_cv_build_codename=$(dist_get_codename "$(cat $dist_cv_build_rel_file)")
-	    else
-		# for now ...
-		dist_cv_build_codename='Woody'
-	    fi
+	    case :`echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` in
+		(:debian_version)
+		    # for now ...  FIXME for Sarge
+		    dist_cv_build_codename='Woody'
+		    ;;
+		(:SuSE-release)
+		    # SuSE never really had a codename, but now they put OSS on OpenSuSE
+		    dist_cv_build_codename="`head -1 $dist_cv_build_rel_file | sed -e 's|^.*\<OSS\>.*|OSS|'`"
+		    ;;
+		(:*)
+		    dist_cv_build_codename=$(dist_get_codename "$(cat $dist_cv_build_rel_file)")
+		    ;;
+	    esac
 	fi
 	if test -z "$dist_cv_build_codename" -a ":${dist_cv_build_lsb_file:-no}" != :no ; then
 	    . "$dist_cv_build_lsb_file"
@@ -379,6 +391,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    ${DESTDIR}${sysconfdir}/whitebox-release
 	    ${DESTDIR}${sysconfdir}/fedora-release
 	    ${DESTDIR}${sysconfdir}/mandrake-release
+	    ${DESTDIR}${sysconfdir}/mandriva-release
 	    ${DESTDIR}${sysconfdir}/redhat-release
 	    ${DESTDIR}${sysconfdir}/SuSE-release
 	    ${DESTDIR}${sysconfdir}/debian_version\""
@@ -467,12 +480,19 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_CACHE_CHECK([for dist host codename], [dist_cv_host_codename], [dnl
 	if test :"${dist_cv_host_rel_file:-no}" != :no ; then
-	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
-		dist_cv_host_codename=$(dist_get_codename "$(cat $dist_cv_host_rel_file)")
-	    else
-		# for now ...
-		dist_cv_host_codename='Woody'
-	    fi
+	    case :`echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` in
+		(:debian_version)
+		    # for now ...  FIXME for Sarge
+		    dist_cv_host_codename='Woody'
+		    ;;
+		(:SuSE-release)
+		    # SuSE never really had a codename, but now they put OSS on OpenSuSE
+		    dist_cv_host_codename="`head -1 $dist_cv_host_rel_file | sed -e 's|^.*\<OSS\>.*|OSS|'`"
+		    ;;
+		(:*)
+		    dist_cv_host_codename=$(dist_get_codename "$(cat $dist_cv_host_rel_file)")
+		    ;;
+	    esac
 	fi
 	if test -z "$dist_cv_host_codename" -a ":${dist_cv_host_lsb_file:-no}" != :no ; then
 	    . "$dist_cv_host_lsb_file"
