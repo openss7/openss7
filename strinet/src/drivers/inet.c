@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/04/03 10:58:09 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/04/04 04:16:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/03 10:58:09 $ by $Author: brian $
+ Last Modified $Date: 2006/04/04 04:16:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.67  2006/04/04 04:16:17  brian
+ - handling of __tcp_push_pending_frames on 2.6.13+ kernels
+
+ Revision 0.9.2.66  2006/04/03 22:32:59  brian
+ - must freeze before strqset
+
  Revision 0.9.2.65  2006/04/03 10:58:09  brian
  - 2.6.13 kernel has request_sock but no inet_connection_sock
 
@@ -72,10 +78,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/04/03 10:58:09 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/04/04 04:16:17 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/04/03 10:58:09 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/04/04 04:16:17 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -539,7 +545,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/04/03 10:58:09 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/04/04 04:16:17 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -10115,6 +10121,28 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 	return (-EFAULT);
 }
 
+#ifndef HAVE___TCP_PUSH_PENDING_FRAMES_EXPORT
+#ifdef  HAVE___TCP_PUSH_PENDING_FRAMES_ADDR
+#ifdef HAVE_OLD_SOCK_STRUCTURE
+void
+__tcp_push_pending_frames(struct sock *sk, struct tcp_opt *tp, unsigned int cur_mss, int nonagle)
+{
+	void (*func) (struct sock * sk, struct tcp_opt * tp, unsigned int cur_mss, int nonagle) =
+	    (typeof(func)) HAVE___TCP_PUSH_PENDING_FRAMES_ADDR;
+	return (*func) (sk, tp, cur_mss, nonagle);
+}
+#else
+void
+__tcp_push_pending_frames(struct sock *sk, struct tcp_sock *tp, unsigned int cur_mss, int nonagle)
+{
+	void (*func) (struct sock * sk, struct tcp_opt * tp, unsigned int cur_mss, int nonagle) =
+	    (typeof(func)) HAVE___TCP_PUSH_PENDING_FRAMES_ADDR;
+	return (*func) (sk, tp, cur_mss, nonagle);
+}
+#endif
+#endif
+#endif
+
 /*
  *  Process Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -16033,18 +16061,24 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		spin_unlock_bh(&ss_lock);
 		return (ENXIO);
 	}
-	/* Pre-allocate queue band structures on the read side. */
-	if ((err = strqset(q, QHIWAT, 1, STRHIGH))) {
-		ptrace(("%s: ERROR: could not allocate queue band 1 structure, err = %d\n",
-			DRV_NAME, err));
-		spin_unlock_bh(&ss_lock);
-		return (err);
-	}
-	if ((err = strqset(q, QHIWAT, 2, STRHIGH))) {
-		ptrace(("%s: ERROR: could not allocate queue band 2 structure, err = %d\n",
-			DRV_NAME, err));
-		spin_unlock_bh(&ss_lock);
-		return (err);
+	{
+		unsigned long flags = freezestr(q);
+		/* Pre-allocate queue band structures on the read side. */
+		if ((err = strqset(q, QHIWAT, 1, STRHIGH))) {
+			ptrace(("%s: ERROR: could not allocate queue band 1 structure, err = %d\n",
+				DRV_NAME, err));
+			unfreezestr(q, flags);
+			spin_unlock_bh(&ss_lock);
+			return (err);
+		}
+		if ((err = strqset(q, QHIWAT, 2, STRHIGH))) {
+			ptrace(("%s: ERROR: could not allocate queue band 2 structure, err = %d\n",
+				DRV_NAME, err));
+			unfreezestr(q, flags);
+			spin_unlock_bh(&ss_lock);
+			return (err);
+		}
+		unfreezestr(q, flags);
 	}
 	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);

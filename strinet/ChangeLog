@@ -1,3 +1,9 @@
+2006-04-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: handling of __tcp_push_pending_frames on 2.6.13+ kernel
+	* src/drivers/inet.c: handling of __tcp_push_pending_frames on 2.6.13+
+	  kernel
+
 2006-04-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: add check for <net/request_sock.h> for 2.6.13 kernels.
@@ -10,6 +16,7 @@
 	* src/drivers/rawip.c (rawip_open, rawip_close): gcc 4 does not like
 	  different attributes between declaration and definition.
 	* src/drivers/udp_hooks.h.in: xfrm_policy_delete returns int on 2.6.13+.
+	* src/drivers/inet.c: have to put freezestr/unfreezestr around strqset
 
 2006-03-31  Brian Bidulock  <bidulock@openss7.org>
 
