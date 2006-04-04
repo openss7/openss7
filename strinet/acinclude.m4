@@ -1,8 +1,8 @@
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/04/03 10:58:09 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/04/04 04:16:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/03 10:58:09 $ by $Author: brian $
+# Last Modified $Date: 2006/04/04 04:16:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -316,6 +316,7 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 			   raw_prot,
 			   ip_frag_nqueues,
 			   ip_frag_mem,
+			   __tcp_push_pending_frames,
 			   __xfrm_policy_check,
 			   xfrm_policy_delete,
 			   __xfrm_sk_clone_policy])
@@ -664,5 +665,5 @@ AC_DEFUN([_INET_], [dnl
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
