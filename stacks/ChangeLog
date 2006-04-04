@@ -1,3 +1,60 @@
+2006-04-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/cci//cci01.fig: changed from landscape to portrait
+	* doc/specs/cci//cci01a.fig: changed from landscape to portrait
+	* doc/specs/cci//cci01b.fig: changed from landscape to portrait
+	* doc/specs/cci//cci02.fig: changed from landscape to portrait
+	* doc/specs/cci//cci03.fig: changed from landscape to portrait
+	* doc/specs/cci//cci04.fig: changed from landscape to portrait
+	* doc/specs/cci//cci05.fig: changed from landscape to portrait
+	* doc/specs/cci//cci06.fig: changed from landscape to portrait
+	* doc/specs/cci//cci07.fig: changed from landscape to portrait
+	* doc/specs/cci//cci08.fig: changed from landscape to portrait
+	* doc/specs/cci//cci09.fig: changed from landscape to portrait
+	* doc/specs/cci//cci10.fig: changed from landscape to portrait
+	* doc/specs/cci//cci10b.fig: changed from landscape to portrait
+	* doc/specs/cci//cci10c.fig: changed from landscape to portrait
+	* doc/specs/cci//cci10d.fig: changed from landscape to portrait
+	* doc/specs/cci//cci11.fig: changed from landscape to portrait
+	* doc/specs/cci//cci11b.fig: changed from landscape to portrait
+	* doc/specs/cci//cci12.fig: changed from landscape to portrait
+	* doc/specs/cci//cci13.fig: changed from landscape to portrait
+	* doc/specs/cci//cci14.fig: changed from landscape to portrait
+	* doc/specs/cci//cci15.fig: changed from landscape to portrait
+	* doc/specs/cci//cci16.fig: changed from landscape to portrait
+	* doc/specs/cci//cci17.fig: changed from landscape to portrait
+	* doc/specs/cci//cci18.fig: changed from landscape to portrait
+	* doc/specs/cci//cci19.fig: changed from landscape to portrait
+	* doc/specs/cci//cci20.fig: changed from landscape to portrait
+	* doc/specs/cci//cci21.fig: changed from landscape to portrait
+	* doc/specs/cci//cci22.fig: changed from landscape to portrait
+	* doc/specs/cci//cci23.fig: changed from landscape to portrait
+	* doc/specs/cci//cci24.fig: changed from landscape to portrait
+	* doc/specs/cci//cci25.fig: changed from landscape to portrait
+	* doc/specs/cci//cci26.fig: changed from landscape to portrait
+	* doc/specs/cci//cci27.fig: changed from landscape to portrait
+	* doc/specs/cci//cci28.fig: changed from landscape to portrait
+	* doc/specs/cci//cci30.fig: changed from landscape to portrait
+	* doc/specs/cci//cci31.fig: changed from landscape to portrait
+	* doc/specs/cci//cci32.fig: changed from landscape to portrait
+	* doc/specs/cci//cci33.fig: changed from landscape to portrait
+	* doc/specs/cci//cci34.fig: changed from landscape to portrait
+	* doc/specs/cci//cci35.fig: changed from landscape to portrait
+	* doc/specs/cci//cci36.fig: changed from landscape to portrait
+	* doc/specs/cci//cci37.fig: changed from landscape to portrait
+	* doc/specs/cci//cci38.fig: changed from landscape to portrait
+	* doc/specs/cci//cci39.fig: changed from landscape to portrait
+	* doc/specs/cci//cci40.fig: changed from landscape to portrait
+	* doc/specs/cci//cci41.fig: changed from landscape to portrait
+	* doc/specs/cci//cci42.fig: changed from landscape to portrait
+	* doc/specs/cci//cci43.fig: changed from landscape to portrait
+	* doc/specs/cci//cci44.fig: changed from landscape to portrait
+	* doc/specs/cci//cci45.fig: changed from landscape to portrait
+	* doc/specs/cci//cci46.fig: changed from landscape to portrait
+	* doc/specs/cci//cci47.fig: changed from landscape to portrait
+	* doc/specs/cci//cci48.fig: changed from landscape to portrait
+	* doc/specs/cci//cci49.fig: changed from landscape to portrait
+
 2006-03-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/isup/isup.c: zero cache pointers on deallocation

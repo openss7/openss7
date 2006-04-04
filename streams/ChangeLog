@@ -1,3 +1,8 @@
+2006-04-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/SPG_fig16.fig: changed from landscape to portrait
+	* doc/manual/SPG_fig21.fig: changed from landscape to portrait
+
 2006-03-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/streams.refs: updated LiS and STREAMS release numbers
