@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: T_DISCON_IND.7.man,v 0.9.2.5 2005/05/14 08:28:26 brian Exp $
+.\" @(#) $Id: T_DISCON_IND.7.man,v 0.9.2.6 2006/04/05 09:44:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -24,7 +24,7 @@
 .\" the use of the information contained herein.  The author(s) may not
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
-.\" professionally.
+.\" professionally.  The author(s) will take no responsibility in it.
 .\" 
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
@@ -53,10 +53,15 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:28:26 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/05 09:44:49 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: T_DISCON_IND.7.man,v $
+.\" Revision 0.9.2.6  2006/04/05 09:44:49  brian
+.\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
-.so strxnet.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
@@ -69,6 +74,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
+.so strxnet.macros
 .\"
 .\"
 .TH T_DISCON_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transport Provider Interface (TPI)"

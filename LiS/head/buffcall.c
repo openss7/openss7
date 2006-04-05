@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/12/18 05:41:23 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 /*                               -*- Mode: C -*- 
  * buffcall.c --- buffcall management
@@ -58,7 +60,7 @@
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
  * Last Modified On: Fri Dec 27 09:48:15 CST 1996
- * RCS Id          : $Id: buffcall.c,v 1.1.1.3.4.3 2005/12/18 05:41:23 brian Exp $
+ * RCS Id          : $Id: buffcall.c,v 1.1.1.3.4.4 2005/12/19 03:22:18 brian Exp $
  * ----------------______________________________________________
  *
  *    Copyright (C) 1995  Graham Wheeler, Francisco J. Ballesteros,
@@ -179,6 +181,10 @@ bc_link(int size, void _RP(*function) (long), long arg)
 	 */
 	list = (bclist_t *) & lis_bchash[id & BCHASH_MSK];
 	bcinfo->prev = list->last;	/* current to old last element */
+	/* fix from JW */
+	if (list->last != NULL)
+		list->last->next = bcinfo; /* Link previous tail to new */
+	/* fix from JW */
 	list->last = bcinfo;	/* list to new entry */
 	if (list->first == NULL)	/* maybe only entry */
 		list->first = bcinfo;

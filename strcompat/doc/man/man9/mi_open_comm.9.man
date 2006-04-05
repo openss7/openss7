@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_open_comm.9.man,v 0.9.2.9 2005/07/04 19:28:47 brian Exp $
+.\" @(#) $Id: mi_open_comm.9.man,v 0.9.2.10 2006/04/05 09:43:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -24,7 +24,7 @@
 .\" the use of the information contained herein.  The author(s) may not
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
-.\" professionally.
+.\" professionally.  The author(s) will take no responsibility in it.
 .\" 
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
@@ -53,10 +53,15 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/04 19:28:47 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/05 09:43:33 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mi_open_comm.9.man,v $
+.\" Revision 0.9.2.10  2006/04/05 09:43:33  brian
+.\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
-.so strcompat.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
@@ -69,6 +74,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
+.so strcompat.macros
 .\"
 .\"
 .TH MI_OPEN_COMM 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"

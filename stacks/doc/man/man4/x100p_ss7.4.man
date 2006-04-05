@@ -1,8 +1,8 @@
 .so man4/x100p.4.man
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: x100p_ss7.4.man,v 0.9.2.1 2006/03/07 00:55:55 brian Exp $
+.\" @(#) $Id: x100p_ss7.4.man,v 0.9.2.2 2006/04/05 09:43:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -25,7 +25,7 @@
 .\" the use of the information contained herein.  The author(s) may not
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
-.\" professionally.
+.\" professionally.  The author(s) will take no responsibility in it.
 .\" 
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
@@ -54,12 +54,12 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/03/07 00:55:55 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/05 09:43:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: x100p_ss7.4.man,v $
-.\" Revision 0.9.2.1  2006/03/07 00:55:55  brian
-.\" - package passes full documentation check
+.\" Revision 0.9.2.2  2006/04/05 09:43:06  brian
+.\" - moved .so line and updated headers
 .\"
 .\" =========================================================================

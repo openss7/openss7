@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: npi_ip.7.man,v 0.9.2.2 2006/03/18 09:42:11 brian Exp $
+.\" @(#) $Id: npi_ip.7.man,v 0.9.2.3 2006/04/05 09:44:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -24,7 +24,7 @@
 .\" the use of the information contained herein.  The author(s) may not
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
-.\" professionally.
+.\" professionally.  The author(s) will take no responsibility in it.
 .\" 
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
@@ -53,19 +53,15 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/03/18 09:42:11 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/05 09:44:55 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: npi_ip.7.man,v $
-.\" Revision 0.9.2.2  2006/03/18 09:42:11  brian
-.\" - added in ip driver and manual pages
-.\"
-.\" Revision 0.9.2.1  2006/03/18 00:15:20  brian
-.\" - syncing notebook
+.\" Revision 0.9.2.3  2006/04/05 09:44:55  brian
+.\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
-.so strxns.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
@@ -78,6 +74,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
+.so strxns.macros
 .\"
 .\"
 .TH NPI-IP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Provider Interface (NPI)"

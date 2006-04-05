@@ -1,3 +1,17 @@
+2006-04-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* man/man*/*.man: Moved all .so xxx.macros lines down beneath .R2 with a
+	  script.  SuSE 10's broken man(1) program thinks that .so lines after a
+	  comment line is a redirect, but it is not.  No other man(1) is that
+	  stupid.  OTOH SuSE 10's man(1) uses zsoelim, so it doesn't matter if
+	  our .macros file gets compressed (just our .refs file).  Also updated
+	  all copyright headers.
+
+2006-04-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* head/buffcall.c (bc_link): fixed buffer call list linkage:
+	  fix provided by John Wenker
+
 2006-04-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* head/linux/lislocks.c: PPC has spin_is_locked()

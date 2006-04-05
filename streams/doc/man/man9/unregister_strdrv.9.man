@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: unregister_strdrv.9.man,v 0.9.2.10 2005/12/06 09:39:22 brian Exp $
+.\" @(#) $Id: unregister_strdrv.9.man,v 0.9.2.11 2006/04/05 09:44:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -24,7 +24,7 @@
 .\" the use of the information contained herein.  The author(s) may not
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
-.\" professionally.
+.\" professionally.  The author(s) will take no responsibility in it.
 .\" 
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
@@ -53,34 +53,15 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/06 09:39:22 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/05 09:44:19 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: unregister_strdrv.9.man,v $
-.\" Revision 0.9.2.10  2005/12/06 09:39:22  brian
-.\" - finalizing more manual pages
-.\"
-.\" Revision 0.9.2.9  2005/12/02 15:15:51  brian
-.\" - more updates
-.\"
-.\" Revision 0.9.2.8  2005/11/29 10:46:36  brian
-.\" - updating manual pages for release
-.\"
-.\" Revision 0.9.2.7  2005/11/26 11:17:13  brian
-.\" - updating man pages
-.\"
-.\" Revision 0.9.2.6  2005/11/25 23:42:07  brian
-.\" - manual page updates
-.\"
-.\" Revision 0.9.2.5  2005/11/22 11:57:25  brian
-.\" - updating documentation for release
-.\"
-.\" Revision 0.9.2.4  2005/08/29 10:06:50  brian
-.\" - documentation updates during rework
+.\" Revision 0.9.2.11  2006/04/05 09:44:19  brian
+.\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
-.so streams.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
@@ -93,6 +74,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
+.so streams.macros
 .\"
 .\"
 .TH UNREGISTER_STRDRV 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"

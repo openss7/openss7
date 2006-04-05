@@ -1,3 +1,12 @@
+2006-04-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man*/*.man: Moved all .so xxx.macros lines down beneath .R2 with a
+	  script.  SuSE 10's broken man(1) program thinks that .so lines after a
+	  comment line is a redirect, but it is not.  No other man(1) is that
+	  stupid.  OTOH SuSE 10's man(1) uses zsoelim, so it doesn't matter if
+	  our .macros file gets compressed (just our .refs file).  Also updated
+	  all copyright headers.
+
 2006-03-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strbcm.refs: updated LiS and STREAMS release numbers

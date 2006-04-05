@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: iperf.1.man,v 1.1.2.8 2005/07/16 06:54:00 brian Exp $
+.\" @(#) $Id: iperf.1.man,v 1.1.2.9 2006/04/05 09:42:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -24,7 +24,7 @@
 .\" the use of the information contained herein.  The author(s) may not
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
-.\" professionally.
+.\" professionally.  The author(s) will take no responsibility in it.
 .\" 
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
@@ -53,8 +53,28 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/16 06:54:00 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/05 09:42:48 $ by $Author: brian $
 .\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: iperf.1.man,v $
+.\" Revision 1.1.2.9  2006/04/05 09:42:48  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database iperf.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so iperf.macros
 .\" =========================================================================
 .\"
 .\"  Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004  The Board of Trustees
@@ -88,19 +108,6 @@
 .\"  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 .\"
 .\" =========================================================================
-.so iperf.macros
-.R1
-bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
-no-default-database
-database iperf.refs
-accumulate
-move-punctuation
-abbreviate A
-join-authors ", " ", " " and "
-et-al " et al" 2 3
-abbreviate-label-ranges ".."
-sort-adjacent-labels
-.R2
 .\"
 .\"
 .TH IPERF 1 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Linux User Commands"
@@ -1278,4 +1285,7 @@ version 1.6.5.  This is a modification of
 version 2.0.1.  Modifications are consistent with those made to version 1.6.5.
 .\" =========================================================================
 .\" =========================================================================
+.[
+$LIST$
+.]
 .T5

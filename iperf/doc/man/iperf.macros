@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: iperf.macros,v 1.1.2.7 2006/03/05 05:52:19 brian Exp $
+.\" @(#) $Id: iperf.macros,v 1.1.2.8 2006/04/05 09:42:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/03/05 05:52:19 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/05 09:42:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -158,7 +158,7 @@ Trademarks mentioned are the property of their owners.
 .de CO
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corporation.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -194,7 +194,7 @@ source, must acknowledge the copyright and authors of this work.
 .de C2
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 1992 UNIX International, Inc.
+\f(HRCopyright\ \(co\ 1992\ UNIX International, Inc.
 .ie '\\*(.T'ps' \{\
 .PP
 .ce 1
@@ -220,7 +220,7 @@ PERFORMANCE OF THIS DOCUMENTATION.
 .PP
 .\}
 .el .br
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corporation.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -256,14 +256,14 @@ source, must acknowledge the copyright and authors of this work.
 .de C3
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
+\f(HRCopyright\ \(co\ 2000\ John A. Boyd Jr.  protologos, LLC
 .br
 .I (See roff source for permission notice.)
 ..
 .de C5
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 1999, 2000, 2001, 2002, 2003, 2004  The Board of Trustees of the University of Illinois
+\f(HRCopyright\ \(co\ 1999,\ 2000,\ 2001,\ 2002,\ 2003,\ 2004\ The Board of Trustees of the University of Illinois
 .PP
 .ce 1
 \s-2\f(HRPERMISSION NOTICE\fR
@@ -310,7 +310,7 @@ The OpenSS7 Project http://www.openss7.org/
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -323,9 +323,9 @@ All Rights Reserved.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright \(co 1992 UNIX International, Inc.
+\f(HRCopyright\ \(co\ 1992\ UNIX International, Inc.
 .br
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -338,9 +338,9 @@ All Rights Reserved.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
+\f(HRCopyright\ \(co\ 2000\ John A. Boyd Jr.  protologos, LLC
 .br
-\f(HRCopyright \(co 2001-2006 OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 2001-2006\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -353,7 +353,7 @@ All Rights Reserved.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -365,14 +365,12 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.7 $); $Date: 2006/03/05 05:52:19 $.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.8 $); $Date: 2006/04/05 09:42:48 $.
 .PP
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
 .br
-\f(HRCopyright \(co 1999-2004 The Board of Trustees of the University of Illinois
-.if (\n[.l]u < 80n) \{\
+\f(HRCopyright\ \(co\ 1999-2004\ The Board of Trustees of the University of Illinois
 .br
-.\}
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
