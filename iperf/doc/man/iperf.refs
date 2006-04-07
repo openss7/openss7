@@ -86,7 +86,7 @@
 %A Geoffrey Gerrien
 %T CDI \(em Application Program Interface Guide
 %I Gcom, Inc.
-%D March, 1999
+%D March 1999
 
 %K xxx
 %A X Programmer's Group
@@ -381,7 +381,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T SS7 MTP2-User Adaptation Layer (M2UA)
 %R draft-ietf-sigtran-m2ua-09.txt
-%D July, 2001
+%D July 2001
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-09.txt
@@ -397,7 +397,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T SS7 MTP2-User Adaptation Layer (M2UA)
 %R draft-ietf-sigtran-m2ua-11.txt
-%D November, 2001
+%D November 2001
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-11.txt
@@ -413,7 +413,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T SS7 MTP2-User Adaptation Layer (M2UA)
 %R draft-ietf-sigtran-m2ua-12.txt
-%D December, 2001
+%D December 2001
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-12.txt
@@ -429,7 +429,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T SS7 MTP2-User Adaptation Layer (M2UA)
 %R draft-ietf-sigtran-m2ua-15.txt
-%D February, 2002
+%D February 2002
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-15.txt
@@ -442,7 +442,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T M3UA Implementor's Guide
 %R draft-ietf-sigtran-m3ua-implementors-guide-04.txt
-%D March, 2002
+%D March 2002
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-04.txt
 
@@ -454,7 +454,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T M3UA Implementor's Guide
 %R draft-ietf-sigtran-m3ua-implementors-guide-03.txt
-%D March, 2002
+%D March 2002
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-03.txt
 
@@ -466,7 +466,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T M3UA Implementor's Guide
 %R draft-ietf-sigtran-m3ua-implementors-guide-02.txt
-%D March, 2002
+%D March 2002
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-02.txt
 
@@ -478,7 +478,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T M3UA Implementor's Guide
 %R draft-ietf-sigtran-m3ua-implementors-guide-01.txt
-%D March, 2002
+%D March 2002
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-01.txt
 
@@ -490,7 +490,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T M3UA Implementor's Guide
 %R draft-ietf-sigtran-m3ua-implementors-guide-00.txt
-%D March, 2002
+%D March 2002
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-00.txt
 
@@ -508,7 +508,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T SS7 MTP3-User Adaptation Layer (M3UA)
 %R draft-ietf-sigtran-m3ua-07.txt
-%D July, 2001
+%D July 2001
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m3ua-07.txt
@@ -530,7 +530,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T SS7 MTP3-User Adaptation Layer (M3UA)
 %R draft-ietf-sigtran-m3ua-10.txt
-%D November, 2001
+%D November 2001
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m3ua-10.txt
@@ -552,7 +552,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T SS7 MTP3-User Adaptation Layer (M3UA)
 %R draft-ietf-sigtran-m3ua-11.txt
-%D January, 2002
+%D January 2002
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m3ua-11.txt
@@ -574,7 +574,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T SS7 MTP3-User Adaptation Layer (M3UA)
 %R draft-ietf-sigtran-m3ua-12.txt
-%D February, 2002
+%D February 2002
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m3ua-12.txt
@@ -1823,7 +1823,7 @@ Part 1: Protocol Specification
 %A ITU
 %R ITU-T Recommendation X.213 [ISO/IEC 8072]
 %T OSI \(em Network Service Definition
-%D November, 1995
+%D November 1995
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %O (Previously "CCITT Recommendation")
@@ -1833,7 +1833,7 @@ Part 1: Protocol Specification
 %A ITU
 %R ITU-T Recommendation X.214 [ISO/IEC 8072 : 1996]
 %T Information Technology \(em Open Systems Interconnection \(em Transport service definition
-%D November, 1995
+%D November 1995
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %O (Previously "CCITT Recommendation")
@@ -1923,7 +1923,7 @@ Part 1: Protocol Specification
 %A ITU
 %R ITU-T Recommendation X.229 (ISO/IEC 9072-2)
 %T Information processing systems \(em Text Communication, Remote Operations: Protocol Specification
-%D March, 1988
+%D March 1988
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %O (Previously "CCITT Recommendation")
@@ -2502,7 +2502,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Transport Area Working Group
 %T Stream Control Transmission Protocol Management Information Base
 %R draft-ietf-sigtran-sctp-mib-10.txt
-%D June, 2003
+%D June 2003
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sctp-mib-10.txt
@@ -2675,8 +2675,8 @@ Part 1: Protocol Specification
 %U http://www.openss7.org/
 
 %K lfs
-%L streams-0.7a.5
-%R streams-0.7a.5
+%L streams-0.7a
+%R streams-0.7a
 %A OpenSS7
 %Q OpenSS7
 %T Linux Fast-STREAMS (LfS) 0.7a.6 Source Code
@@ -2799,9 +2799,31 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Network Working Group
 %T Window and Acknowledgment Strategy in TCP
 %R RFC 813
-%D July, 1982
+%D July 1982
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc0813.txt
+
+%K rfc892
+%L RFC 892
+%A International Organization for Standardization
+%Q Internet Engineering Task Force \(em Network Working Group
+%T ISO Transport Protocol Specification
+%R RFC 892
+%D December 1983
+%I The Internet Society
+%O Obsoleted by RFC 905.
+%U http://www.ietf.org/rfc/rfc0892.txt
+
+%K rfc905
+%L RFC 905
+%A International Organization for Standardization
+%Q Internet Engineering Task Force \(em Network Working Group
+%T ISO Transport Protocol Specification ISO DP 8073
+%R RFC 905
+%D April 1, 1984
+%I The Internet Society
+%O Obsoletes RFC 892.
+%U http://www.ietf.org/rfc/rfc0905.txt
 
 %K rfc896
 %L RFC 896
@@ -2813,6 +2835,323 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc0896.txt
 
+%K rfc958
+%L RFC 958
+%A D. L. Mills
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Network Time Protocol (NTP)
+%R RFC 958
+%D September 1985
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc958.txt
+
+%K rfc982
+%L RFC 892
+%A H. W. Braun
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Guidelines for the Specification of the Structure of the Domain Specific Part (DSP) of the ISO Standard NSAP Address
+%R RFC 982
+%D April 1, 1986
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0982.txt
+
+%K rfc983
+%L RFC 983
+%A Dwight E. Cass
+%A Marshal T. Rose
+%T ISO Transport Arrives on Top of the TCP
+%D April 1, 1986
+%R RFC 983
+%O Obsoleted by RFC 1006.
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0983.txt
+
+%K rfc986
+%L RFC 986
+%A R.W. Callon
+%A H.W. Braun
+%T Guidelines for the use of Internet-IP addesses in the ISO Connectionless-Mode Network Protocol
+%D June 1986
+%R RFC 986
+%O Obsoleted by RFC 1069.
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0986.txt
+
+%K rfc995
+%L RFC 995
+%A International Organization for Standardization
+%T End System to Intermediate System Routing Exchange Protocol for Standardization with ISO 8473
+%D April 1, 1986
+%R RFC 995
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0995.txt
+
+%K rfc1006
+%L RFC 1006
+%E Marshall T. Rose
+%A Dwight D. Cass
+%T ISO Transport Service on top of the TCP \(em Version 3
+%D May 1987
+%R STD 35/RFC 1006
+%O Obsoletes RFC 983. Updated by RFC 2126.  Also STD 35.
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1006.txt
+
+%K rfc1007
+%L RFC 1007
+%A W. McCoy
+%T Military Supplement to the ISO Transport Protocol
+%D June 1987
+%R RFC 1007
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1007.txt
+
+%K rfc1008
+%L RFC 1008
+%A W. McCoy
+%T Implementation Guide for the ISO Transport Protocol
+%D June 1987
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1008.txt
+
+%K rfc1069
+%L RFC 1069
+%R RFC 1069
+%A R.W. Callon
+%A H.W. Braun
+%T Guidelines for the Use of Internet-IP Addresses in the ISO Connectionless-Mode Network Protocol
+%D February 1989
+%O Obsoletes RFC 986.
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1069.txt
+
+%K rfc1356
+%L RFC 1356
+%R RFC 1356
+%E A. Malis
+%A A. Malis
+%A D. Robinson
+%A R. Ullmann
+%T Multiprotocol Interconnection on X.25 and ISDN in the Packet Mode.
+%D August 1992
+%O Draft Standard
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1356.txt
+
+%K rfc1381
+%L RFC 1381
+%R RFC 1381
+%E D. Throop
+%A D. Throop
+%A F. Baker
+%T SNMP MIB Extension for X.25 LAPB
+%D November 1992
+%O Proposed Standard
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1381.txt
+
+%K rfc1382
+%L RFC 1382
+%R RFC 1382
+%E D. Throop
+%A D. Throop
+%T SNMP MIB Extension for the X.25 Packet Layer
+%D November 1992
+%O Proposed Standard
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1382.txt
+
+%K rfc1461
+%L RFC 1461
+%R RFC 1461
+%E D. Throop
+%A D. Throop
+%T SNMP MIB Extension for Multiprotocol Interconnect over X.25
+%D May 1993
+%O Historic
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1461.txt
+
+%K rfc1598
+%L RFC 1598
+%R RFC 1598
+%E W. Simpson
+%A W. Simpson
+%T PPP in X.25
+%D March 1994
+%O Proposed Standard
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1598.txt
+
+%K rfc1613
+%L RFC 1613
+%R RFC 1613
+%E J. Forster
+%A J. Forster
+%A G. Satz
+%A G. Glick
+%A R. Day
+%T cisco Systems X.25 over TCP (XOT)
+%D May 1994
+%O Informational
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1613.txt
+
+%K rfc1277
+%L RFC 1277
+%A Steve E. Hardcastle-Kille
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Encoding Network Addresses to Support Operation over Non-OSI Lower Layers
+%R RFC 1277
+%D November 1991
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1277.txt
+
+%K rfc1278
+%L RFC 1278
+%A Steve E. Hardcastle-Kille
+%Q Internet Engineering Task Force \(em Network Working Group
+%T A String Encoding of Presentation Address
+%R RFC 1278
+%D November 1991
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1278.txt
+
+%K rfc1859
+%L RFC 1859
+%A Yanick Pouffary
+%T ISO Transport Class 2 Non-use of Explicit Flow Control over TCP RFC 1006 Extension
+%R RFC 1859
+%D October 1995
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1859.txt
+
+%K rfc1085
+%L RFC 1085
+%R RFC 1085
+%A Marshall T. Rose
+%T ISO Presentation Services on top of TCP/IP-based Internets
+%D December 1988
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1085.txt
+
+%K rfc1086
+%L RFC 1086
+%R RFC 1086
+%A J.P. Onions
+%A Marshall T. Rose
+%T ISO-TP0 Bridge Between TCP and X.25.
+%D December 1988
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1086.txt
+
+%K rfc1139
+%L RFC 1139
+%R RFC 1139
+%A R.A. Hagens
+%T Echo Function for ISO 8473
+%D January 1990
+%O Obsoleted by RFC 1574, RFC 1575.
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1139.txt
+
+%K rfc1138
+%L RFC 1138
+%R RFC 1138
+%A Steve. E. Hardcastle-Kille
+%T Mapping between X.400(1988) / ISO 10021 and RFC 822
+%D December 1989
+%O Updates RFC 1026, RFC 987, RFC 822.
+%O Updated by RFC 1148.
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1138.txt
+
+%K rfc1148
+%L RFC 1148
+%R RFC 1148
+%A Steve. E. Hardcastle-Kille
+%T Mapping between X.400(1988) / ISO 10021 and RFC 822
+%D March 1990
+%O Updates RFC 1026, RFC 987, RFC 1138, RFC 822.
+%O Obsoleted by RFC 2156, RFC 1327.
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1148.txt
+
+%K rfc1162
+%L RFC 1162
+%R RFC 1162
+%A G. Satz
+%T Connectionless Network Protocol (ISO 8473) and End System to Intermediate System (ISO 9542) Management Information Base
+%D June 1990
+%O Obsoleted by RFC 1238.
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1162.txt
+
+%K rfc1238
+%L RFC 1238
+%R RFC 1238
+%A G. Satz
+%T CLNS MIB for use with Connectionless Network Protocol (ISO 8473) and End System to Intermediate System (ISO 9542)
+%D June 1991
+%O Obsoletes RFC 1162.
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1238.txt
+
+%K rfc1561
+%L RFC 1561
+%R RFC 1561
+%A D. Piscitello
+%T Use of ISO CLNP in TUBA Environments
+%D December 1993
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1561.txt
+
+%K rfc1575
+%L RFC 1575
+%R RFC 1575
+%A S. Hares
+%A C. Wittbrodt
+%T An Echo Function for CLNP (ISO 8473)
+%D February 1994
+%O Obsoletes RFC 1139.
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1575.txt
+
+%K rfc1095
+%L rfc 1095
+%A Unnikrishnan S. Warrier
+%A Larry Besaw
+%Q Internet Engineering Task Force \(em Network Working Group
+%T The Common Management Information Services and Protocol over TCP/IP (CMOT)
+%R RFC 1095
+%D April 1988
+%I The Internet Society
+%O Obsoleted by RFC 1189.
+%U http://www.ietf.org/rfc/rfc1095.txt
+
 %K rfc1122
 %L RFC 1122
 %E Robert Braden
@@ -2822,6 +3161,76 @@ Part 1: Protocol Specification
 %D October 1989
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1122.txt
+
+%K rfc1155
+%L RFC 1155
+%E Marshall T. Rose
+%A K. McCloghrie
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Structure and Identification of Management Information for TCP/IP-based Internets
+%R RFC 1155
+%D May 1990
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1155.txt
+
+%K rfc1157
+%L RFC 1157
+%E J. Case
+%A M. Fedor
+%A M. Schoffstall
+%A J. Davin
+%Q Internet Engineering Task Force \(em Network Working Group
+%T A Simple Network Management Protocol (SNMP)
+%R RFC 1157
+%D May 1990
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1157.txt
+
+%K rfc1189
+%L RFC 1189
+%A Unnikrishnan S. Warrier
+%A Larry Besaw
+%A Lee LaBarre
+%A Biran D. Handspicker
+%Q Internet Engineering Task Force \(em Network Working Group
+%T The Common Management Information Services and Protocols for the Internet (CMOT and CMIP)
+%R RFC 1189
+%D October 1990
+%I The Internet Society
+%O Obsoletes RFC 1095.
+%U http://www.ietf.org/rfc/rfc1189.txt
+
+%K rfc1212
+%L RFC 1212
+%E Marshall T. Rose
+%A K. McCloghrie
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Concise MIB Definitions
+%R RFC 1212
+%D March 1991
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1212.txt
+
+%K rfc1224
+%L RFC 1224
+%A Lou Steinberg
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Techniques for Managing Asyncrhonously Generated Alerts
+%R RFC 1224
+%D May 1991
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1224.txt
+
+%K rfc1213
+%L RFC 1213
+%E K. McCloghrie
+%A Marshall T. Rose
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Management Information Base for Network Management of TCP/IP-based Internets: MIB-II
+%R RFC 1213
+%D March 1991
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1213.txt
 
 %K rfc1321
 %L RFC 1321
@@ -2883,13 +3292,13 @@ Part 1: Protocol Specification
 
 %K rfc2126
 %L RFC 2126
+%R RFC 2126
 %A Y. Pouffray
 %A A. Young
 %E Y. Pouffray
-%Q Internet Engineering Task Force
 %T ISO Transport Service on top of TCP (ITOT)
-%R RFC 2126
 %D March 1997
+%Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2126.txt
 
@@ -2979,7 +3388,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %T Guidelines for Writing an IANA Considerations Section in RFCs
 %R RFC 2434
-%D October, 1998
+%D October 1998
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2434.txt
 
@@ -3013,7 +3422,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %T Framework Architecture for Signaling Transport
 %R RFC 2719
-%D October, 1999
+%D October 1999
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2719.txt
 
@@ -3169,7 +3578,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %T ISDN Q.921-User Adaptation Layer
 %R RFC 3057
-%D November, 2000
+%D November 2000
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3057.txt
 
@@ -3483,7 +3892,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %T Signaling System 7 (SS7) Message Transfer Part 2 (MTP2) \(em User Adaptation Layer
 %R RFC 3331
-%D September, 2002
+%D September 2002
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3331.txt
 
@@ -3495,7 +3904,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %T Signaling System 7 (SS7) Message Transfer Part 3 (MTP3) \(em User Adaptation Layer (M3UA)
 %R RFC 3332
-%D September, 2002
+%D September 2002
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3332.txt
 
@@ -3683,7 +4092,7 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %T Signalling Connection Control Part User Adaptation Layer (SUA)
 %R RFC 3868
-%D  October, 2004
+%D  October 2004
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3868.txt
 

@@ -1,3 +1,7 @@
+2006-04-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strcompat.refs: added some RFC references
+
 2006-04-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man*/*.man: Moved all .so xxx.macros lines down beneath .R2 with a

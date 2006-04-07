@@ -1,3 +1,7 @@
+2006-04-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* openss7.refs: added some RFC references
+
 2006-04-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* */man*/*.man, */man/man*/*.man, */doc/man/man*/*.man:
