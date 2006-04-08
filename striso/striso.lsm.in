@@ -1,0 +1,33 @@
+Begin4
+Title:			@PACKAGE@
+Version:		@VERSION@
+Entered-date:		@PACKAGE_DATE@
+Description:		@PACKAGE_TITLE@.
+			OpenSS7 ISO Networking (ISO) for Linux Fast-STREAMS.
+			The @PACKAGE@ package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of OpenSS7 ISO Networking
+			(ISO) protocol stack components and applications for the
+			SVR 4.2 STREAMS environment.
+			This distribution is currently applicable to Linux 2.4
+			and 2.6 kernels and was targetted at ix86, x86_64, ppc
+			and ppc64 architectures, but should build and install
+			for other architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
+Keywords:		ISO, XNS, CDI, DLPI, NPI, DL
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			4M @PACKAGE@-@VERSION@.tar.gz
+			3M @PACKAGE@-@VERSION@.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			3M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			LiS-2.18.3 or streams-0.7a.5 SVR 4.2 STREAMS,
+			strcompat-0.9.2.3, strxns-0.9.2.3, strxnet-0.9.2.3.
+Copying-policy:		GPL
+End

@@ -1,0 +1,280 @@
+OpenSS7 STREAMS ISO -- readme first file.  2006-04-07
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+OpenSS7 STREAMS ISO (ISO/OSI Networking Services)
+=================================================
+
+This is the striso-0.9.2.1 package.  It, and the current version, can
+be obtained from the download area of The OpenSS7 Project website at
+http://www.openss7.org/download.html as striso-0.9.2.1.tar.bz2 using a
+command such as
+
+	wget http://www.openss7.org/tarballs/striso-0.9.2.1.tar.bz2
+
+Please see the NEWS file for release notes and history of user visible
+changes for the current version, and the ChangeLog file for a more
+detailed history of implementation changes.  The TODO file lists
+features not yet implemented or other outstandinng items.
+
+Please see the INSTALL, INSTALL-striso and README-make files (or the
+installation and reference manual) for installation instructions.  When
+working from CVS, please see the README-cvs file.  An abbreviated
+installation procedure that works for most applications appears below.
+
+This release of the package is published strictly under Version 2 of the
+GNU Public License which can be found in the file COPYING.  Package
+specific licensing terms (if any) can be found in the file LICENSING.
+Please respect these licensing arrangements.  If you are interested in
+different licensing terms, please contact the copyright holder, OpenSS7
+Corporation, http://www.openss7.com/ or mailto:bidulock@openss7.org.
+
+Prerequisites
+-------------
+
+The following are prerequisites for building the package:
+
+ 1. Linux distribution with a 2.4 or 2.6 kernel with the appropriate
+    tool chain.  For supported and tested distributions, see the manual.
+
+ 2. OpenSS7 Linux Fast-STREAMS or OpenSS7 Modified Linux STREAMS
+    installed, such as
+    http://www.openss7.org/tarballs/streams-0.7a.5.tar.bz2 or
+    http://www.openss7.org/tarballs/LiS-2.18.3.tar.bz2
+
+    (Note that the `LiS' package is deprecated.  We recommend using the
+    `streams' package instead.)
+
+ 3. OpenSS7 STREAMS Compatibility Modules installed, such as
+    http://www.openss7.org/tarballs/strcompat-0.9.2.3.tar.bz2
+
+When configuring and building multiple OpenSS7 Project release packages,
+place all of the source packages (unpackaged tarballs) at the same
+directory level and all build directories at the same directory level.
+
+Installation
+------------
+
+The following commands will download, configure, build, check, install,
+validate, uninstall and remove the package:
+
+	wget http://www.openss7.org/tarballs/striso-0.9.2.1.tar.bz2
+	tar -xjvf striso-0.9.2.1.tar.bz2
+	mkdir build
+	cd build
+	../striso-0.9.2.1.configure
+	make
+	make check
+	sudo make install
+	sudo make installcheck
+	sudo make uninstall
+	cd ..
+	sudo rm -rf build
+	rm -rf striso-0.9.2.1.
+	rm -f striso-0.9.2.1.tar.bz2
+
+Manual
+------
+
+More detailed installation instructions can be found in the Installation
+and Reference Manual, contained in the distribution in `text', `info',
+`html', and `pdf' formats:
+
+	cd ../striso-0.9.2.1
+	less doc/manual/striso.txt
+	lynx doc/manual/striso.html
+	info -f doc/manual/striso.info
+	xpdf doc/manual/striso.pdf
+
+The current manual is also always available online from The OpenSS7
+Project website at:
+
+	lynx http://www.openss7.org/striso_manual.html
+
+Description
+-----------
+
+The OpenSS7 STREAMS ISO packagse contains header files and a number of
+modules and drivers and the associated documentation not contained in
+the OpenSS7 Linux STREAMS (LiS) releases.
+
+The package uses the following standard OSI conforming header files from
+the strxns package:
+
+	- <sys/cdi.h> Communications Device Interface
+	- <sys/dlpi.h> Data Link Provider Interface Version 2.0.0
+	- <sys/npi.h> Network Provider Interface Version 2.0.0
+
+The package uses the following standard OSI conforming header files from
+the strxnet package:
+
+	- <sys/tihdr.h> Transport Provider Interface Version 2.0.0
+
+The package currently includes the following STREAMS kernel modules and
+drivers:
+
+	- streams_x223.ko	    /dev/cons
+	- streams_x233.ko	    /dev/clns
+	- streams_x224.ko	    /dev/tp0 /dev/tp4
+	- streams_X234.ko	    /dev/clts
+	- streams_isot.ko	    module /dev/isot
+	- streams_lpp.ko	    module /dev/lpp
+	- streams_cmot.ko	    module /dev/cmot
+	- streams_itot.ko	    module
+	- streams_itos.ko	    module
+
+The x223(4) driver provides CONS and CLNS services in accordance with
+the ISO/OSI Network Protocol X.223.
+
+The x224(4) driver provides OSI Transport Protocol services in
+accordance with the ISO/OSI Transport Protocol X.224.
+
+The isot(4) driver and module provides ISO Transport over TCP/IP as
+specified in RFC 1006/STD 35
+
+The lpp(4) driver and module provides ISO Transport over TCP/IP as
+specified in RFC 1085.
+
+The cmot(4) driver and modules provides ISO Common Management
+Information Protocol (CMIP) over TCP/IP as specified in RFC 1095.
+
+The itot(4) module provides ISO Transport over TCP as specified in
+RFC 2126.
+
+The itos(4) module provides ISO Transport over SCTP.
+
+The OpenSS7 STREAMS ISO package includes kernel modules, SVR 4.2 STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and
+development environment for the development and execution of X/Open
+Network Services (ISO) protocol stack components and applications for
+the SVR 4.2 STREAMS environment.
+
+This distribution is only currently applicable to Linux 2.4 and 2.6
+kernels and was targetted at ix86, x86_64, ppc and ppc64 architectures,
+but should build and install for other architectures as well.
+
+Brief Installation Instructions
+-------------------------------
+
+The OpenSS7 STREAMS ISO package is available from the downloads area of
+The OpenSS7 Project website: <http://www.openss7.org/download.html>
+using a command such as:
+
+	wget http://www.openss7.org/tarballs/striso-0.9.2.1.tar.bz2
+
+Unpack the tarball using a command such as:
+
+	tar -xjvf striso-0.9.2.1.tar.bz2
+
+The tarball will unpack into the relative subdirectory named after the
+package name: striso-0.9.2.1  The package builds using the GNU autoconf
+utilities and the `configure' script.  To build the package, we
+recommend using a separate build directory as follows:
+
+	mkdir build
+	cd build
+	../striso-0.9.2.1/configure
+
+In general, the package configures and builds without adding any special
+options to the configure script.  For general options to the configure
+script, see the GNU `INSTALL' file in the distribution:
+
+	less ../striso-0.9.2.1/INSTALL
+
+For specific options to the configure script, see the INSTALL-striso
+file in the distribution, or simply execute the configure script with
+the --help option like so:
+
+	../striso-0.9.2.1/configure --help
+
+After configuring the package, the package can be compiled simply by
+issuing the `make' command:
+
+	make
+
+Some specialized makefile targets exist, see the README-make file in the
+distribution or simply invoke the `help' target like so:
+
+	make help
+
+After successfully building the package, the package can be checked by
+invoking the `check' make target like so:
+
+	make check
+
+After successfully checking the package, the package can be installed by
+invoking the `install' make target (as root) like so:
+
+	sudo make install
+
+The testsuites that ship with the package can be invoked after the
+package has been installed by invoking the `installcheck' target.  This
+target can either be invoked as root, or as a normal user, like so:
+
+	make installcheck
+
+The package can be cleanly removed by invoking the `uninstall' target
+(as root):
+
+	sudo make uninstall
+
+Then the build directory and tarball can be simply removed:
+
+	cd ..
+	rm -rf build
+	rm -rf striso-0.9.2.1
+	rm -f striso-0.9.2.1.tar.bz2
+
+
+=========================================================================
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by
+ the source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and the
+ Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn
