@@ -1,3 +1,7 @@
+2006-04-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/sctp.refs: corrected spelling error reported by spammer
+
 2006-04-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/sctp.refs: added some RFC references

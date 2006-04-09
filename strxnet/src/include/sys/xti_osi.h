@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_osi.h,v 0.9.2.2 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: xti_osi.h,v 0.9.2.3 2006/04/08 23:53:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2006/04/08 23:53:30 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_OSI_H
 #define _SYS_XTI_OSI_H
 
-#ident "@(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /*
    SPECIFIC ISO OPTION AND MANAGEMENT PARAMETERS 
@@ -123,35 +123,35 @@ struct transdel {
 /*
  *  Options for Quality of Service and Expedited Data (ISO 8072:1994)
  */
-#define T_TCO_THROUGHPUT	0x0001
-#define T_TCO_TRANSDEL		0x0002
-#define T_TCO_RESERRORRATE	0x0003
-#define T_TCO_TRANSFFAILPROB	0x0004
-#define T_TCO_ESTFAILPROB	0x0005
-#define T_TCO_RELFAILPROB	0x0006
-#define T_TCO_ESTDELAY		0x0007
-#define T_TCO_RELDELAY		0x0008
-#define T_TCO_CONNRESIL		0x0009
-#define T_TCO_PROTECTION	0x000a
-#define T_TCO_PRIORITY		0x000b
-#define T_TCO_EXPD		0x000c
+#define T_TCO_THROUGHPUT	0x0001 /* struct thrpt, octets per second */
+#define T_TCO_TRANSDEL		0x0002 /* struct transdel, milliseconds */
+#define T_TCO_RESERRORRATE	0x0003 /* struct rate, -log10(ratio) */
+#define T_TCO_TRANSFFAILPROB	0x0004 /* struct rate, -log10(ratio) */
+#define T_TCO_ESTFAILPROB	0x0005 /* struct rate, -log10(ratio) */
+#define T_TCO_RELFAILPROB	0x0006 /* struct rate, -log10(ratio) */
+#define T_TCO_ESTDELAY		0x0007 /* struct rate, milliseconds */
+#define T_TCO_RELDELAY		0x0008 /* struct rate, milliseconds */
+#define T_TCO_CONNRESIL		0x0009 /* struct rate, -log10(ratio) */
+#define T_TCO_PROTECTION	0x000a /* t_uscalar_t, values above */
+#define T_TCO_PRIORITY		0x000b /* t_uscalar_t, values above */
+#define T_TCO_EXPD		0x000c /* t_uscalar_t T_YES/T_NO */
 
 /*
  *  Management Options
  */
-#define T_TCO_LTPDU		0x0100
-#define T_TCO_ACKTIME		0x0200
-#define T_TCO_REASTIME		0x0300
-#define T_TCO_EXTFORM		0x0400
-#define T_TCO_FLOWCTRL		0x0500
-#define T_TCO_CHECKSUM		0x0600
-#define T_TCO_NETEXP		0x0700
-#define T_TCO_NETRECPTCF	0x0800
-#define T_TCO_PREFCLASS		0x0900
-#define T_TCO_ALTCLASS1		0x0a00
-#define T_TCO_ALTCLASS2		0x0b00
-#define T_TCO_ALTCLASS3		0x0c00
-#define T_TCO_ALTCLASS4		0x0d00
+#define T_TCO_LTPDU		0x0100 /* t_uscalar_t, octets */
+#define T_TCO_ACKTIME		0x0200 /* t_uscalar_t, milliseconds */
+#define T_TCO_REASTIME		0x0300 /* t_uscalar_t, seconds */
+#define T_TCO_PREFCLASS		0x0900 /* t_uscalar_t, see above */
+#define T_TCO_ALTCLASS1		0x0a00 /* t_uscalar_t, see above */
+#define T_TCO_ALTCLASS2		0x0b00 /* t_uscalar_t, see above */
+#define T_TCO_ALTCLASS3		0x0c00 /* t_uscalar_t, see above */
+#define T_TCO_ALTCLASS4		0x0d00 /* t_uscalar_t, see above */
+#define T_TCO_EXTFORM		0x0400 /* t_uscalar_t, T_YES/T_NO/T_UNSPEC */
+#define T_TCO_FLOWCTRL		0x0500 /* t_uscalar_t, T_YES/T_NO/T_UNSPEC */
+#define T_TCO_CHECKSUM		0x0600 /* t_uscalar_t, T_YES/T_NO/T_UNSPEC */
+#define T_TCO_NETEXP		0x0700 /* t_uscalar_t, T_YES/T_NO/T_UNSPEC */
+#define T_TCO_NETRECPTCF	0x0800 /* t_uscalar_t, T_YES/T_NO/T_UNSPEC */
 
 #define T_TCL_TRANSDEL		0x000d
 #define T_TCL_RESERRORRATE	T_TCO_RESERRORRATE

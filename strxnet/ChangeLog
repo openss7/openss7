@@ -1,3 +1,8 @@
+2006-04-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strxnet.refs: corrected spelling error reported by spammer
+	* src/include/sys/xti_osi.h: added some comments
+
 2006-04-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strxnet.refs: added some RFC references
