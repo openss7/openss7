@@ -1,3 +1,12 @@
+2006-04-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/cmot.c: added module for cmot
+	* src/modules/isot.c: added module for isot
+	* src/modules/itot.c: added module for itot
+	* src/modules/lpp.c: added module for lpp
+	* src/modules/tcpns.c: added module for tcpns
+	* src/modules/xot.c: added module for xot
+
 2006-04-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strinet.refs: corrected spelling error reported by spammer

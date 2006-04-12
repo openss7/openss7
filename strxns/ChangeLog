@@ -1,3 +1,7 @@
+2006-04-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/dl.c: added new DL driver
+
 2006-04-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strxns.refs: corrected spelling error reported by spammer

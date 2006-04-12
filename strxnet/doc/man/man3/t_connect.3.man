@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: t_connect.3.man,v 0.9.2.8 2006/04/05 09:44:44 brian Exp $
+.\" @(#) $Id: t_connect.3.man,v 0.9.2.9 2006/04/11 18:30:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:44 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/11 18:30:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: t_connect.3.man,v $
+.\" Revision 0.9.2.9  2006/04/11 18:30:30  brian
+.\" - documentation corrections
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:44:44  brian
 .\" - moved .so line and updated headers
 .\"
@@ -227,7 +230,7 @@ or the connection establishment to fail at a later stage, depending on when
 the implementation detects the illegal option.
 If multiple options are passed in
 .I sndcall->opt
-and on of them is illegal, the call fails.  It is possible, however, that some
+and one of them is illegal, the call fails.  It is possible, however, that some
 or all of the submitted legal options were successfully negotiated.  Use the
 .B T_CURRENT
 management flag to
