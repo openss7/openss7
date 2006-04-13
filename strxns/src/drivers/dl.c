@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/11 22:08:51 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/04/12 20:36:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/11 22:08:51 $ by $Author: brian $
+ Last Modified $Date: 2006/04/12 20:36:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.3  2006/04/12 20:36:03  brian
+ - added some experimental drivers
+
  Revision 0.9.2.2  2006/04/11 22:08:51  brian
  - working up DL driver
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/11 22:08:51 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/04/12 20:36:03 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/11 22:08:51 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/04/12 20:36:03 $";
 
 #include <sys/os7/compat.h>
 
@@ -81,7 +84,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2006/04/11 22:08:51 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2006/04/12 20:36:03 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI OSI Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -147,12 +150,12 @@ MODULE_ALIAS("/dev/dl");
 #endif				/* MODULE */
 
 STATIC struct module_info dl_minfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
-	.mi_idname = DRV_NAME,	/* Module name */
-	.mi_minpsz = 0,		/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,	/* Max packet size acceptd */
-	.mi_hiwat = 1 << 15,	/* Hi water mark */
-	.mi_hiwat = 1 << 10,	/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size acceptd */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_hiwat = 1 << 10,		/* Lo water mark */
 };
 
 STATIC struct module_stat dl_mstat = {
@@ -162,62 +165,333 @@ STATIC struct module_stat dl_mstat = {
 
 STATIC streamscall int dl_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int dl_qclose(queue_t *, int, cred_t *);
-STATIC streamscall int dl_rput(queue_t *, mblk_t *);
-STATIC streamscall int dl_rsrv(queue_t *);
-STATIC streamscall int dl_wput(queue_t *, mblk_t *);
-STATIC streamscall int dl_wsrv(queue_t *);
 
 STATIC struct qinit dl_rinit = {
-	.qi_putp = &dl_rput,	/* Read put procedure (message from below) */
-	.qi_srvp = &dl_rsrv,	/* Read service procedure */
-	.qi_qopen = &dl_qopen,	/* Each open */
+	.qi_putp = &ss7_oput,		/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_osrv,		/* Read service procedure */
+	.qi_qopen = &dl_qopen,		/* Each open */
 	.qi_qclose = &dl_qclose,	/* Last close */
-	.qi_minfo = &dl_minfo,	/* Module information */
-	.qi_mstat = &dl_mstat,	/* Module statistics */
+	.qi_minfo = &dl_minfo,		/* Module information */
+	.qi_mstat = &dl_mstat,		/* Module statistics */
 };
 
 STATIC struct qinit dl_winit = {
-	.qi_putp = &dl_wput,	/* Read put procedure (message from below) */
-	.qi_srvp = &dl_wsrv,	/* Read service procedure */
-	.qi_minfo = &dl_minfo,	/* Module information */
-	.qi_mstat = &dl_mstat,	/* Module statistics */
+	.qi_putp = &ss7_iput,		/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_isrv,		/* Read service procedure */
+	.qi_minfo = &dl_minfo,		/* Module information */
+	.qi_mstat = &dl_mstat,		/* Module statistics */
 };
 
 /* Lower multiplex is a CD user following the CDI. */
 
-STATIC streamscall int cd_qlink(queue_t *, dev_t *, int, int, cred_t *);
-STATIC streamscall int cd_qunlink(queue_t *, int, cred_t *);
-STATIC streamscall int cd_rput(queue_t *, mblk_t *);
-STATIC streamscall int cd_rsrv(queue_t *);
-STATIC streamscall int cd_wput(queue_t *, mblk_t *);
-STATIC streamscall int cd_wsrv(queue_t *);
-
 STATIC struct qinit cd_rinit = {
-	.qi_putp = &cd_rput,	/* Read put procedure (message from below) */
-	.qi_srvp = &cd_rsrv,	/* Read service procedure */
-	.qi_qopen = &cd_qlink,	/* Each open */
-	.qi_qclose = &cd_qunlink,	/* Last close */
-	.qi_minfo = &cd_minfo,	/* Module information */
-	.qi_mstat = &cd_mstat,	/* Module statistics */
+	.qi_putp = &ss7_iput,		/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_isrv,		/* Read service procedure */
+	.qi_minfo = &cd_minfo,		/* Module information */
+	.qi_mstat = &cd_mstat,		/* Module statistics */
 };
 
 STATIC struct qinit cd_winit = {
-	.qi_putp = &cd_wput,	/* Read put procedure (message from below) */
-	.qi_srvp = &cd_wsrv,	/* Read service procedure */
-	.qi_minfo = &cd_minfo,	/* Module information */
-	.qi_mstat = &cd_mstat,	/* Module statistics */
+	.qi_putp = &ss7_oput,		/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_osrv,		/* Read service procedure */
+	.qi_minfo = &cd_minfo,		/* Module information */
+	.qi_mstat = &cd_mstat,		/* Module statistics */
 };
 
 STATIC struct streamtab dl_info = {
-	.st_rdinit = &dl_rinit,	/* Upper read queue */
-	.st_wrinit = &dl_winit,	/* Upper write queue */
+	.st_rdinit = &dl_rinit,		/* Upper read queue */
+	.st_wrinit = &dl_winit,		/* Upper write queue */
 	.st_muxrinit = &cd_rinit,	/* Lower read queue */
 	.st_muxwinit = &cd_winit,	/* Lower write queue */
 };
 
 /*
- *  Service Primitives passed upwards
- *  ---------------------------------
+ *  Service Primitives passed downwards -- lower multiplex or module
+ *  ----------------------------------------------------------------
+ */
+
+STATIC int
+cd_info_req(queue_t *q, queue_t *oq)
+{
+	struct cd *cd = CD_PRIV(oq);
+	cd_info_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (cd_info_req_t *) mp->b_rptr;
+		p->cd_primitive = CD_INFO_REQ;
+		mp->b_wptr += sizeof(*p);
+		cdi_set_state(cd, cdi_get_state(cd));
+		putnext(oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+STATIC int
+cd_attach_req(queue_t *q, queue_t *oq, dl_ulong cd_ppa)
+{
+	cd_attach_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (cd_attach_req_t *) mp->b_rptr;
+		p->cd_primitive = CD_ATTACH_REQ;
+		p->cd_ppa = cd_ppa;
+		mp->b_wptr += sizeof(*p);
+		putnext(oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+STATIC int
+cd_detach_req(queue_t *q, queue_t *oq)
+{
+	cd_detach_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap_db_type = M_PROTO;
+		p = (cd_detach_req_t *) mp->b_rptr;
+		p->cd_primitive = CD_DETACH_REQ;
+		mp->b_wptr += sizeof(*p);
+		putnext(oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+STATIC int
+cd_enable_req(queue_t *q, queue_t *oq, cd_ulong cd_dial_type, struct netbuf *dial)
+{
+	cd_enable_req_t *p;
+
+	if ((mp = ss7_allocb(q, sizeof(*p) + dial->len, BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (cd_enable_req_t *) mp->b_wptr;
+		p->cd_primitive = CD_ENABLE_REQ;
+		p->cd_dial_type = cd_dial_type;
+		p->cd_dial_length = dial->len;
+		p->cd_dial_offset = dial->len ? sizeof(*p) : 0;
+		mp->b_wptr += sizeof(*p);
+		if (dial->len) {
+			bcopy(dial->buf, mp->b_wptr, dial->len);
+			mp->b_wptr += dial->len;
+		}
+		cdi_set_state(CD_PRIM(oq), CD_ENABLE_PENDING);
+		putnext(oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+STATIC int
+cd_disable_req(queue_t *q, queue_t *oq, cd_ulong cd_disposal)
+{
+	cd_disable_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (cd_disable_req_t *) mp->b_wptr;
+		p->cd_primitive = CD_DISABLE_REQ;
+		p->cd_disposal = cd_disposal;
+		mp->b_wptr += sizeof(*p);
+		cdi_set_state(CD_PRIM(oq), CD_DISABLE_PENDING);
+		putnext(oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+STATIC int
+cd_allow_input_req(queue_t *q, queue_t *oq)
+{
+	cd_allow_input_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (cd_allow_input_req_t *) mp->b_wptr;
+		p->cd_primitive = CD_ALLOW_INPUT_REQ;
+		mp->b_wptr += sizeof(*p);
+		putnext(oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+STATIC int
+cd_read_req(queue_t *q, queue_t *oq, cd_ulong cd_msec)
+{
+	cd_read_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;	/* could also be M_PCPROTO */
+		p = (cd_read_req_t *) mp->b_wptr;
+		p->cd_primitive = CD_READ_REQ;
+		p->cd_msec = cd_msec;
+		mp->b_wptr += sizeof(*p);
+		putnext(oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+STATIC int
+cd_unitdata_req(queue_t *q, queue_t *oq, cd_ushort cd_addr_type, cd_ushort cd_priority,
+		struct netbuf *dest, mblk_t *data)
+{
+	cd_unitdata_req_t *p;
+	mblk_t *mp;
+
+	if (bcanputnext(q, cd_priority)) {
+		if ((mp = ss7_allocb(q, sizeof(*p) + dest->len, BPRI_MED))) {
+			mp->b_datap->db_type = M_PROTO;
+			p = (cd_unitdata_req_t *) mp->b_wptr;
+			p->cd_primitive = CD_UNITDATA_REQ;
+			p->cd_addr_type = cd_addr_type;
+			p->cd_priority = cd_priority;
+			p->cd_dest_addr_length = 0;
+			p->cd_dest_addr_offset = 0;
+			mp->b_wptr += sizeof(*p);
+			if (cd_addr_type == CD_SPECIFIC) {
+				p->cd_dest_addr_length = dest->len;
+				p->cd_dest_addr_offset = dest->len ? sizeof(*p) : 0;
+				if (dest->len) {
+					bcopy(dest->buf, mp->b_wptr, dest->len);
+					mp->b_wptr += sizeof(dest->len);
+				}
+			}
+			mp->b_cont = data;
+			putnext(oq, mp);
+			return (QR_ABSORBED);
+		}
+		return (-ENOBUFS);
+	}
+	return (-EBUSY);
+}
+STATIC int
+cd_write_read_req(queue_t *q, queue_t *oq, cd_ushort cd_addr_type, cd_ushort cd_priority,
+		  struct netbuf *dest, mblk_t *data, cd_ulong cd_msec)
+{
+	cd_write_read_req_t *p;
+	mblk_t *mp;
+
+	if (bcanputnext(q, cd_priority)) {
+		if ((mp = ss7_allocb(q, sizeof(*p) = dest->len, BRPI_MED))) {
+			mp->b_datap->db_type = M_PROTO;
+			p = (cd_write_read_req_t *) mp->b_wptr;
+			p->cd_primitive = CD_WRITE_READ_REQ;
+			p->cd_unitdata_req.cd_primitive = CD_UNITDATA_REQ;
+			p->cd_unitdata_req.cd_addr_type = cd_addr_type;
+			p->cd_unitdata_req.cd_priority = cd_priority;
+			p->cd_unitdata_req.cd_addr_length = 0;
+			p->cd_unitdata_req.cd_addr_offset = 0;
+			p->cd_read_req.cd_primitive = CD_READ_REQ;
+			p->cd_read_req.cd_msec = cd_msec;
+			mp->b_wptr += sizeof(*p);
+			if (cd_addr_type == CD_SPECIFIC) {
+				p->cd_unitdata_req.cd_addr_length = dest->len;
+				p->cd_unitdata_req.cd_addr_offset = dest->len ? sizeof(*p) : 0;
+				if (dest->len) {
+					bcopy(dest->buf, mp->b_wptr, dest->len);
+					mp->b_wptr += dest->len;
+				}
+			}
+			mp->b_cont = data;
+			putnext(oq, mp);
+			return (QR_ABSORBED);
+		}
+		return (-ENOBUFS);
+	}
+	return (-EBUSY);
+}
+STATIC int
+cd_halt_input_req(queue_t *q, queue_t *oq, cd_ulong cd_disposal)
+{
+	cd_halt_input_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (cd_halt_input_req_t *) mp->b_wptr;
+		p->cd_primitive = CD_HALT_INPUT_REQ;
+		p->cd_disposal = cd_disposal;
+		mp->b_wptr += sizeof(*p);
+		putnext(oq, mp);
+		return (QR_DONE);
+	}
+	return (-ENOBUFS);
+}
+STATIC int
+cd_abort_output_req(queue_t *q, queue_t *oq)
+{
+	cd_abort_output_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (cd_abort_output_req_t *) mp->b_wptr;
+		p->cd_primitive = CD_HALT_INPUT_REQ;
+		p->cd_disposal = cd_disposal;
+		mp->b_wptr += sizeof(*p);
+		putnext(oq, mp);
+		return (QR_DONE);
+	}
+	return (-ENOBUFS);
+}
+STATIC int
+cd_mux_name_req(queue_t *q, queue_t *oq)
+{
+	cd_ulong *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (cd_ulong *) mp->b_wptr;
+		*p = CD_MUX_NAME_REQ;
+		mp->b_wptr += sizeof(*p);
+		putnext(oq, mp);
+		return (QR_DONE);
+	}
+	return (-ENOBUFS);
+}
+STATIC int
+cd_modem_sig_req(queue_t *q, queue_t *oq, cd_ulong cd_sigs)
+{
+	cd_modem_sig_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (cd_modem_sig_req_t *) mp->b_wptr;
+		p->cd_primitive = CD_MODEM_SIG_REQ;
+		p->cd_sigs = cd_sigs;
+		mp->b_wptr += sizeof(*p);
+		putnext(oq, mp);
+		return (QR_DONE);
+	}
+	return (-ENOBUFS);
+}
+STATIC int
+cd_modem_sig_poll(queue_t *q)
+{
+	cd_modem_sig_poll_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (cd_modem_sig_poll_t *) mp->b_wptr;
+		p->cd_primitive = CD_MODEM_SIG_POLL;
+		mp->b_wptr += sizeof(*p);
+		putnext(oq, mp);
+		return (QR_DONE);
+	}
+	return (-ENOBUFS);
+}
+
+/*
+ *  Service Primitives passed upwards -- upper multiplex or module
+ *  --------------------------------------------------------------
  */
 STATIC mblk_t *
 dl_info_ack(queue_t *q)
@@ -294,9 +568,18 @@ dl_bind_ack(queue_t *q, struct netbuf *add, dl_ulong dl_sap, dl_ulong dl_max_con
 	}
 	return (mp);
 }
-STATIC mblk_t *
-dl_ok_ack(queue_t *q, dl_long prim)
+
+/**
+ * dl_ok_ack - send a DL_OK_ACK and commit a pending action
+ * @q: DL write queue
+ * @prim: corret primitive
+ * @aq: accepting queue if DL_CONNECT_RES
+ * @cp: connection indication pointer if DL_CONNECT_RES or DL_DISCONNECT_REQ
+ */
+STATIC int
+dl_ok_ack(queue_t *q, dl_long prim, queue_t *aq, mblk_t *cp)
 {
+	struct dl *dl = DL_PRIV(q);
 	dl_ok_ack_t *p;
 	mblk_t *mp;
 
@@ -306,12 +589,98 @@ dl_ok_ack(queue_t *q, dl_long prim)
 		p->dl_primitive = DL_OK_ACK;
 		p->dl_correct_primitive = prim;
 		mp->b_wptr += sizeof(*p);
+		switch (dlpi_get_state(dl)) {
+		case DL_ATTACH_PENDING:	/* Waiting ack of DL_ATTACH_REQ */
+			dlpi_set_state(dl, DL_UNBOUND);
+			break;
+		case DL_DETACH_PENDING:	/* Waiting ack of DL_DETACH_REQ */
+			dlpi_set_state(dl, DL_UNATTACHED);
+			break;
+		case DL_BIND_PENDING:	/* Waiting ack of DL_BIND_REQ */
+			swerr();	/* should be DL_BIND_ACK */
+			break;
+		case DL_UNBIND_PENDING:	/* Waiting ack of DL_UNBIND_REQ */
+			dlpi_set_state(dl, DL_UNBOUND);
+			break;
+		case DL_UDQOS_PENDING:	/* Waiting ack of DL_UDQOS_REQ */
+			dlpi_set_state(dl, DL_IDLE);
+			break;
+		case DL_OUTCON_PENDING:	/* awaiting DL_CONN_CON */
+		case DL_INCON_PENDING:	/* awaiting DL_CONN_RES */
+			swerr();
+			break;
+		case DL_CONN_RES_PENDING:	/* Waiting ack of DL_CONNECT_RES */
+			if (--dl->dl_outstanding_coninds > 0)
+				dlpi_set_state(dl, DL_INCON_PENDING);
+			else
+				dlpi_set_state(dl, DL_IDLE);
+			break;
+		case DL_USER_RESET_PENDING:	/* awaiting DL_RESET_CON */
+		case DL_PROV_RESET_PENDING:	/* awaiting DL_RESET_RES */
+			swerr();
+			break;
+		case DL_RESET_RES_PENDING:	/* Waiting ack of DL_RESET_RES */
+			dlpi_set_state(dl, DL_DATAXFER);
+			break;
+		case DL_DISCON8_PENDING:	/* Waiting ack of DL_DISC_REQ from
+						   DL_OUTCON_PENDING */
+			dlpi_set_state(dl, DL_IDLE);
+			break;
+		case DL_DISCON9_PENDING:	/* Waiting ack of DL_DISC_REQ from DL_INCON_PENDING 
+						 */
+			if (--dl->dl_outstanding_coninds > 0)
+				dlpi_set_state(dl, DL_INCON_PENDING);
+			else
+				dlpi_set_state(dl, DL_IDLE);
+			break;
+		case DL_DISCON11_PENDING:	/* Waiting ack of DL_DISC_REQ from DL_ DATAXFER */
+			dlpi_set_state(dl, DL_IDLE);
+			break;
+		case DL_DISCON12_PENDING:	/* Waiting ack of DL_DISC_REQ from
+						   DL_USER_RESET_PENDING */
+			dlpi_set_state(dl, DL_IDLE);
+			break;
+		case DL_DISCON13_PENDING:	/* Waiting ack of DL_DISC_REQ from
+						   DL_PROV_RESET_PENDING */
+			dlpi_set_state(dl, DL_IDLE);
+			break;
+		case DL_SUBS_BIND_PND:	/* Waiting ack of DL_SUBS_BIND_REQ */
+			swerr();	/* should be DL_SUBS_BIND_ACK */
+			break;
+		case DL_SUBS_UNBIND_PND:	/* Waiting ack of DL_SUBS_UNBIND_REQ */
+			dlpi_set_state(dl, DL_IDLE);
+			break;
+
+		case DL_UNATTACHED:	/* PPA not attached */
+		case DL_UNBOUND:	/* PPA attached */
+		case DL_IDLE:	/* dlsap bound, awaiting use */
+		case DL_DATAXFER:	/* connection-oriented data transfer */
+			/* If not in a pending state, then this is probably an acknowledged
+			   primitive that does not have a pending state (can be issued from any
+			   state), such as DL_PROMISCON_REQ.  Just stay in the same state and
+			   acknowledge the primitive. */
+			break;
+		}
+		qreply(q, mp);
+		return (QR_DONE);
 	}
+	return (-ENOBUFS);
 	return (mp);
 }
-STATIC mblk_t *
+
+/**
+ * dl_error_ack - generate a DL_ERROR_ACK upstream
+ * @q: DL write queue
+ * @prim: primitive in error
+ * @error: zero (0) no error, positive (>0) dlpi error, negative(<0) linux error
+ *
+ * Generates a DL_ERROR_ACK message upstream with state recovery and error recovery.  The return
+ * value from this function may be used as a return value from the procedure.
+ */
+STATIC int
 dl_error_ack(queue_t *q, dl_long prim, dl_long error)
 {
+	struct dl *dl = DL_PRIV(q);
 	dl_error_ack_t *p;
 	mblk_t *mp;
 
@@ -323,8 +692,87 @@ dl_error_ack(queue_t *q, dl_long prim, dl_long error)
 		p->dl_errno = (error < 0 ? DL_SYSERR : error);
 		p->dl_unix_errno = (error < 0 ? -error : 0);
 		mp->b_wptr += sizeof(*p);
+		switch (dlpi_get_state(dl)) {
+		case DL_UNATTACHED:
+			/* PPA not attached */
+		case DL_ATTACH_PENDING:
+			/* Waiting ack of DL_ATTACH_REQ */
+
+			dlpi_set_state(dl, DL_UNATTACHED);
+			break;
+
+		case DL_DETACH_PENDING:
+			/* Waiting ack of DL_DETACH_REQ */
+		case DL_UNBOUND:
+			/* PPA attached */
+		case DL_BIND_PENDING:
+			/* Waiting ack of DL_BIND_REQ */
+
+			dlpi_set_state(dl, DL_UNBOUND);
+			break;
+
+		case DL_UNBIND_PENDING:
+			/* Waiting ack of DL_UNBIND_REQ */
+		case DL_SUBS_BIND_PND:
+			/* Waiting ack of DL_SUBS_BIND_REQ */
+		case DL_SUBS_UNBIND_PND:
+			/* Waiting ack of DL_SUBS_UNBIND_REQ */
+		case DL_IDLE:
+			/* dlsap bound, awaiting use */
+		case DL_UDQOS_PENDING:
+			/* Waiting ack of DL_UDQOS_REQ */
+		case DL_OUTCON_PENDING:
+			/* awaiting DL_CONN_CON */
+
+			dlpi_set_state(dl, DL_IDLE);
+			break;
+
+		case DL_INCON_PENDING:
+			/* awaiting DL_CONN_RES */
+		case DL_CONN_RES_PENDING:
+			/* Waiting ack of DL_CONNECT_RES */
+		case DL_DISCON9_PENDING:
+			/* Waiting ack of DL_DISC_REQ from DL_INCON_PENDING */
+
+			dlpi_set_state(dl, DL_INCON_PENDING);
+			break;
+
+		case DL_DISCON8_PENDING:
+			/* Waiting ack of DL_DISC_REQ from DL_OUTCON_PENDING */
+
+			dlpi_set_state(dl, DL_OUTCON_PENDING);
+			break;
+
+		case DL_DATAXFER:
+			/* connection-oriented data transfer */
+		case DL_USER_RESET_PENDING:
+			/* awaiting DL_RESET_CON */
+		case DL_DISCON11_PENDING:
+			/* Waiting ack of DL_DISC_REQ from DL_DATAXFER */
+
+			dlpi_set_state(dl, DL_DATAXFER);
+			break;
+
+		case DL_DISCON12_PENDING:
+			/* Waiting ack of DL_DISC_REQ from DL_USER_RESET_PENDING */
+
+			dlpi_set_state(dl, DL_USER_RESET_PENDING);
+			break;
+
+		case DL_PROV_RESET_PENDING:
+			/* awaiting DL_RESET_RES */
+		case DL_RESET_RES_PENDING:
+			/* Waiting ack of DL_RESET_RES */
+		case DL_DISCON13_PENDING:
+			/* Waiting ack of DL_DISC_REQ from DL_PROV_RESET_PENDING */
+
+			dlpi_set_state(dl, DL_PROV_RESET_PENDING);
+			break;
+		}
+		qreply(q, mp);
+		return (QR_DONE);
 	}
-	return (mp);
+	return (-ENOBUFS);
 }
 STATIC mblk_t *
 dl_subs_bind_ack(queue_t *q)
@@ -796,19 +1244,7 @@ dl_get_statistics_ack(queue_t *q, struct netbuf *sta)
  */
 
 STATIC int
-cd_w_proto(queue_t *q, mblk_t *mp)
-{
-}
-STATIC int
-cd_w_data(queue_t *q, mblk_t *mp)
-{
-}
-STATIC int
-cd_w_ctl(queue_t *q, mblk_t *mp)
-{
-}
-STATIC int
-cd_w_ioctl(queue_t *q, mblk_t *mp)
+cd_w_rse(queue_t *q, mblk_t *mp)
 {
 }
 
@@ -859,11 +1295,7 @@ dl_attach_req(queue_t *q, mblk_t *mp)
 	dl_errno = -EPROTO;
 	goto error;
       error:
-	if ((bp = dl_error_ack(q, DL_ATTACH_REQ, dl_errno))) {
-		qreply(q, bp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
+	return dl_error_ack(q, DL_ATTACH_REQ, dl_errno);
 }
 STATIC int
 dl_detach_req(queue_t *q, mblk_t *mp)
@@ -874,10 +1306,10 @@ dl_detach_req(queue_t *q, mblk_t *mp)
 
 	if (dlpi_get_state(dl) != DL_UNBOUND)
 		goto outstate;
-	/* FIXME: more stuff to detach ppa */
 	dlpi_set_state(dl, DL_DETACH_PENDING);
+	/* FIXME: more stuff to detach ppa */
+	dl->dl_ppa = 0;
 	if ((bp = dl_ok_ack(q, DL_DETACH_REQ))) {
-		dl->dl_ppa = 0;
 		qreply(q, bp);
 		return (QR_DONE);
 	}
@@ -886,12 +1318,7 @@ dl_detach_req(queue_t *q, mblk_t *mp)
 	dl_errno = DL_OUTSTATE;
 	goto error;
       error:
-	if ((bp = dl_error_ack(q, DL_DETACH_REQ, dl_errno))) {
-		dlpi_set_state(dl, DL_UNATTACHED);
-		qreply(q, bp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
+	return dl_error_ack(q, DL_DETACH_REQ, dl_errno);
 }
 STATIC int
 dl_bind_req(queue_t *q, mblk_t *mp)
@@ -948,11 +1375,7 @@ dl_bind_req(queue_t *q, mblk_t *mp)
 	dl_errno = -EPROTO;
 	goto error;
       error:
-	if ((bp = dl_error_ack(q, DL_DETACH_REQ, dl_errno))) {
-		qreply(q, bp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
+	return dl_error_ack(q, DL_BIND_REQ, dl_errno);
 }
 STATIC int
 dl_unbind_req(queue_t *q, mblk_t *mp)
@@ -977,12 +1400,7 @@ dl_unbind_req(queue_t *q, mblk_t *mp)
 	dl_errno = DL_OUTSTATE;
 	goto error;
       error:
-	if ((bp = dl_error_ack(q, DL_DETACH_REQ, dl_errno))) {
-		dlpi_set_state(dl, DL_UNATTACHED);
-		qreply(q, bp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
+	return dl_error_ack(q, DL_UNBIND_REQ, dl_errno);
 }
 
 /**
@@ -1014,12 +1432,7 @@ dl_subs_bind_req(queue_t *q, mblk_t *mp)
 	dl_errno = -EPROTO;
 	goto error;
       error:
-	if ((bp = dl_error_ack(q, DL_SUBS_BIND_REQ, dl_errno))) {
-		dlpi_set_state(dl, DL_IDLE);
-		qreply(q, bp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
+	return dl_error_ack(q, DL_SUBS_BIND_REQ, dl_errno);
 }
 STATIC int
 dl_subs_unbind_req(queue_t *q, mblk_t *mp)
@@ -1062,50 +1475,63 @@ dl_subs_unbind_req(queue_t *q, mblk_t *mp)
 	dl_errno = -EPROTO;
 	goto error;
       error:
-	if ((bp = dl_error_ack(q, DL_DETACH_REQ, dl_errno))) {
-		dlpi_set_state(dl, DL_UNATTACHED);
-		qreply(q, bp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
+	return dl_error_ack(q, DL_SUBS_UNBIND_REQ, dl_errno);
 }
 STATIC int
 dl_enabmulti_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_ENABMULTI_REQ, dl_errno);
 }
 STATIC int
 dl_disabmulti_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_DISABMULTI_REQ, dl_errno);
 }
 STATIC int
 dl_promiscon_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_PROMISCON_REQ, dl_errno);
 }
 STATIC int
 dl_promiscoff_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_PROMISCOFF_REQ, dl_errno);
 }
 STATIC int
 dl_unitdata_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_UNITDATA_REQ, dl_errno);
 }
 STATIC INLINE fastcall __hot_put int
 dl_udqos_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_UDQOS_REQ, dl_errno);
 }
 STATIC int
 dl_connect_req(queue_t *q, mblk_t *mp)
 {
 	dlpi_set_state(dl, DL_OUTCON_PENDING);
+      error:
+	return dl_error_ack(q, DL_CONNECT_REQ, dl_errno);
 }
 STATIC int
 dl_connect_res(queue_t *q, mblk_t *mp)
 {
 	dlpi_set_state(dl, DL_CONN_RES_PENDING);
+      error:
+	return dl_error_ack(q, DL_CONNECT_RES, dl_errno);
 }
 STATIC int
 dl_token_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_TOKEN_REQ, dl_errno);
 }
 STATIC int
 dl_disconnect_req(queue_t *q, mblk_t *mp)
@@ -1115,56 +1541,82 @@ dl_disconnect_req(queue_t *q, mblk_t *mp)
 	dlpi_set_state(dl, DL_DISCON11_PENDING);
 	dlpi_set_state(dl, DL_DISCON12_PENDING);
 	dlpi_set_state(dl, DL_DISCON13_PENDING);
+      error:
+	return dl_error_ack(q, DL_DISCONNECT_REQ, dl_errno);
 }
 STATIC INLINE fastcall __hot_put int
 dl_reset_req(queue_t *q, mblk_t *mp)
 {
 	dlpi_set_state(dl, DL_USER_RESET_PENDING);
+      error:
+	return dl_error_ack(q, DL_RESET_REQ, dl_errno);
 }
 STATIC INLINE fastcall __hot_put int
 dl_reset_res(queue_t *q, mblk_t *mp)
 {
 	dlpi_set_state(dl, DL_RESET_RES_PENDING);
+      error:
+	return dl_error_ack(q, DL_RESET_RES, dl_errno);
 }
 STATIC INLINE fastcall __hot_put int
 dl_data_ack_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_DATA_ACK_REQ, dl_errno);
 }
 STATIC INLINE fastcall __hot_put int
 dl_reply_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_REPLY_REQ, dl_errno);
 }
 STATIC INLINE fastcall __hot_put int
 dl_reply_update_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_REPLY_UPDATE_REQ, dl_errno);
 }
 STATIC int
 dl_xid_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_XID_REQ, dl_errno);
 }
 STATIC int
 dl_xid_res(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_XID_RES, dl_errno);
 }
 STATIC int
 dl_test_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_TEST_REQ, dl_errno);
 }
 STATIC int
 dl_test_res(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_TEST_RES, dl_errno);
 }
 STATIC int
 dl_phys_addr_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_PHYS_ADDR_REQ, dl_errno);
 }
 STATIC int
 dl_set_phys_addr_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_SET_PHYS_ADDR_REQ, dl_errno);
 }
 STATIC int
 dl_get_statistics_req(queue_t *q, mblk_t *mp)
 {
+      error:
+	return dl_error_ack(q, DL_GET_STATISTICS_REQ, dl_errno);
 }
 
 STATIC INLINE fastcall __hot_put int
@@ -1335,30 +1787,13 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 /*
  *  Service Primitives from below -- upper multiplex
  *  ------------------------------------------------
+ *  Messages arriving at the upper multiplex read queue are either passed directly by a CD stream
+ *  upon which DL is pushed as a module, or are passed across the multiplex from a lower CD stream.
+ *  These are CDI primitives and other lower stream related messages.
  */
 
 STATIC int
-dl_r_proto(queue_t *q, mblk_t *mp)
-{
-}
-STATIC int
-dl_r_data(queue_t *q, mblk_t *mp)
-{
-}
-STATIC int
-dl_r_ctl(queue_t *q, mblk_t *mp)
-{
-}
-STATIC int
-dl_r_ioctl(queue_t *q, mblk_t *mp)
-{
-}
-STATIC int
-dl_r_hangup(queue_t *q, mblk_t *mp)
-{
-}
-STATIC int
-dl_r_error(queue_t *q, mblk_t *mp)
+dl_r_rse(queue_t *q, mblk_t *mp)
 {
 }
 
@@ -1398,10 +1833,128 @@ STATIC int
 cd_error_ind(queue_t *q, mblk_t *mp)
 {
 }
+
+/**
+ * cd_unitdata_ack - process a CD_UNITDATA_ACK message
+ * @q: lower multiplex or module read queue
+ * @mp: the CD_UNITDATA_ACK message
+ *
+ * This provider originated primitive acknowledges that that previou CD_UNITDATA_REQ primitive as
+ * acknowledged as sent.  (Note: sent -- not received.)  CD_UNITDATA_ACK primitives are indicated or
+ * not depending on the output style as indicated in the cd_output_style field of the CD_INFO_ACK
+ * primitives as follows: CD_UNACKEDOUTPUT -- no C_UNITDATA_ACK primitives will be issued;
+ * CD_ACKEDOUTPUT -- CD_UNITDATA_ACK primitives will be issued for every outstanding
+ * CD_UNITDATA_REQ; CD_PACEDOUTPUT -- CD_UNITDATA_ACK primitives will only be issued as a timing
+ * clude for output.
+ */
+STATIC INLINE fastcall __hot_read int
+cd_unitdata_ack(queue_t *q, mblk_t *mp)
+{
+	struct cd *cd = CD_PRIV(q);
+	cd_unitdata_ack_t *p;
+	int err = -EPROTO;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto efault;
+
+	p = (cd_unitdata_ack_t *) mp->b_rptr;
+
+	if (!((1 << cdi_get_state(cd)) & ((1 << CD_OUTPUT_ACTIVE) | (1 << CD_INPUT_ALLOWED))))
+		goto outstate;
+
+	switch (cd->info.cd_output_style) {
+	case CD_UNACKEDOUTPUT:
+		goto eproto;
+	case CD_ACKEDOUTPUT:
+		/* ackwnowledge to higher level */
+		/* If a DL_DATA_ACK_REQ is outstanding from the upper layer (i.e., dl_service_mode
+		   in DL_INFO_ACK is set to DL_ACLDS, acknowledged connectionless data service),
+		   send a DL_DATA_ACK_STATUS_IND with dl_status of DL_CMD_OK and dl_correlation set 
+		   to that of the outstanding DL_DATA_ACK_REQ. */
+		break;
+	case CD_PACEDOUTPUT:
+		/* enable the output section */
+		qenable(OTHERQ(q));
+		break;
+	default:
+		goto efault;
+	}
+	assure((1 << p->cd_state)
+	       & ((1 << CD_OUTPUT_ACTIVE) | (1 << CD_READ_ACTIVE) | (1 << CD_INPUT_ALLOWED)));
+	cdi_set_state(cd, p->cd_state);
+	return (QR_DONE);
+      outstate:
+	/* FIXME: error the stream */
+	/* discard for now */
+	return (-EPROTO);
+      efault:
+	/* FIXME: error the stream */
+	/* discard for now */
+	return (-EFAULT);
+}
+
+/**
+ * cd_unitdata_ind - process a CD_UNITDATA_IND message
+ * @q: lower multiplex or module read queue
+ * @mp: the CD_UNITDATA_IND message
+ *
+ * This is were most of the real work is done.  This data is the same for both connection-oriented
+ * (or should I say call- or circuit-oriented) and connectionless interfaces (e.g. CDMA/MAC).
+ *
+ * Data can be delivered as just M_DATA blocks too.  That is probably all that is necessary for a
+ * permanent HDLC data link connection (e.g. point-to-point Citynet 56kpbs service).
+ */
 STATIC INLINE fastcall __hot_read int
 cd_unitdata_ind(queue_t *q, mblk_t *mp)
 {
+	struct cd *cd = CD_PRIV(q);
+	cd_unitdata_ind_t *p;
+	int err = -EPROTO;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto efault;
+
+	p = (cd_unitdata_ind_t *) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + p->cd_src_addr_offset + p->cd_src_addr_length)
+		goto efault;
+
+	if (!((1 << cdi_get_state(cd)) & ((1 << CD_READ_ACTIVE) | (1 << CD_INPUT_ALLOWED))))
+		goto outstate;
+
+	switch (cd->cd_addr_type) {
+	case CD_SPECIFIC:
+		/* Indicates that an address is contained in the primitive.  When cd_addr_type is
+		   set to CD_SPECIFIC, a destination address is indicated in the
+		   cd_dest_addr_length and cd_dest_addr_offset fields. */
+		if (p->cd_dest_addr_length == 0)
+			goto efault;
+		if (mp->b_wptr < mp->b_rptr + p->cd_dest_addr_offset + p->cd_dest_addr_length)
+			goto efault;
+		break;
+	case CD_BROADCAST:
+		/* Inidcates that the data was sent to the implicit broadcast address and no
+		   specific address follows.  When cd_addr_type is set to CD_BROADCAST, the fields
+		   cd_dest_addr_length and cd_dest_addr_offset are coded zero (9) and should be
+		   ignored by the CD user. */
+		break;
+	case CD_IMPLICIT:
+		/* Indicates that an implicit addres was used, or that the addressis embedded in
+		   the data.  When cd_addr_type is set to CD_IMPLICIT, the fields
+		   cd_dest_addr_length cd_dest_addr_offset are coded zero (0) and should be ignored 
+		   by the CD user. */
+		break;
+	case default:
+		goto efault;
+	}
+
+	/* Set the new state of the input section.  Most of the stuff that we do is full-duplex
+	   with a permanently enabled input section so this should normally by CD_INPUT_ALLOWED. */
+	assure(p->cd_state == CD_INPUT_ALLOWED);
+	cdi_set_state(cd, p->cd_state);
+
 }
+
 STATIC int
 cd_bad_frame_ind(queue_t *q, mblk_t *mp)
 {
@@ -1439,6 +1992,9 @@ cd_r_proto(queue_t *q, mblk_t *mp)
 		case CD_ERROR_IND:	/* Error indication */
 			rtn = cd_error_ind(q, mp);
 			break;
+		case CD_UNITDATA_ACK:	/* Data send acknowledgement */
+			rtn = cd_unitdata_ack(q, mp);
+			break;
 		case CD_UNITDATA_IND:	/* Data receive indication */
 			rtn = cd_unitdata_ind(q, mp);
 			break;
@@ -1457,7 +2013,6 @@ cd_r_proto(queue_t *q, mblk_t *mp)
 		case CD_READ_REQ:	/* Wait-for-input request */
 		case CD_UNITDATA_REQ:	/* Data send request */
 		case CD_WRITE_READ_REQ:	/* Write/read request */
-		case CD_UNITDATA_ACK:	/* Data send acknowledgement */
 		case CD_HALT_INPUT_REQ:	/* Halt input */
 		case CD_ABORT_OUTPUT_REQ:	/* Abort output */
 		case CD_MUX_NAME_REQ:	/* get mux name (Gcom) */
@@ -1525,6 +2080,11 @@ cd_r_error(queue_t *q, mblk_t *mp)
  *  Put and Service procedures
  *  ==========================
  */
+/**
+ * dl_w_prim - process messages on the upper multiplex write queue
+ * @q: upper multiplex write queue
+ * @mp: message to process
+ */
 STATIC int
 dl_w_prim(queue_t *q, mblk_t *mp)
 {
@@ -1547,54 +2107,81 @@ dl_w_prim(queue_t *q, mblk_t *mp)
 	swerr();
 	return (QR_PASSFLOW);
 }
+
+/**
+ * dl_r_prim - process messages on the upper multiplex read queue
+ * @q: upper multiplex read queue
+ * @mp: message to process
+ *
+ * Message only arrive at the upper multiplex when passed from the other queue in the pair or when
+ * passed across the multiplexing driver from the lower multiplex.  Normally, message that are
+ * destined upstream are passed to the queue above the upper multiplex.  There is only one situation
+ * in which messages are placed on the upper read queue: lock contention on the upper multiplex
+ * private structure (from the lower).  Therefore, all messages can do a simple passflow except any
+ * special messages that we want to interpret internally across the multiplex.  These are always
+ * M_RSE or M_PCRSE messages.
+ *
+ * Note that if we are pushed as a module, cd_r_prim() is used for the read queue instead of this
+ * function.  This function is only used for the read queue of an upper multiplex.
+ *
+ */
 STATIC int
 dl_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
-	case M_PROTO:
-	case M_PCPROTO:
-		return dl_r_proto(q, mp);
-	case M_DATA:
-		return dl_r_data(q, mp);
-	case M_CTL:
-	case M_PCCTL:
-		/* intermodule IOCTLs */
-		return dl_r_ctl(q, mp);
-	case M_IOCACK:
-	case M_IOCNAK:
-	case M_COPYIN:
-	case M_COPYOUT:
-		return dl_r_ioctl(q, mp);
-	case M_HANGUP:
-		return dl_r_hangup(q, mp);
-	case M_ERROR:
-		return dl_r_error(q, mp);
+	case M_RSE:
+	case M_PCRSE:
+		/* intra multiplexer messages */
+		return dl_r_rse(q, mp);
 	case M_FLUSH:
 		return ss7_r_flush(q, mp);
 	}
 	return (QR_PASSFLOW);
 }
+
+/**
+ * cd_w_prim - process messages for the lower multiplex write queue
+ * @q: lower multiplex write queue
+ * @mp: message to process
+ *
+ * Messages only arrive at the lower multiplex when passed from the other queue in the pair or when
+ * passed across the multiplexing driver from the upper multiplex.  Normally, messages that are
+ * destined downstream are passed the queue beneath the lower multiplex.  There is only one
+ * situation in which messages are placed on the lower write queue: lock contention on the lower
+ * multiplex private structure (from the upper).  Therefore, all messages can do a simple passflow
+ * except any special messages that we want to interpret internally across the multiplex.  These are
+ * always M_RSE or M_PCRSE messages.
+ *
+ * Note that if we are pushed as a module, dl_w_prim() is used for the write queue instead of this
+ * function.  This function is only used for the write queue of a lower multiplex.
+ *
+ */
 STATIC int
 cd_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
-	case M_PROTO:
-	case M_PCPROTO:
-		return cd_w_proto(q, mp);
-	case M_DATA:
-		return cd_w_data(q, mp);
-	case M_CTL:
-	case M_PCCTL:
-		/* intermodule IOCTLs */
-		return cd_w_ctl(q, mp);
-	case M_IOCTL:
-	case M_IOCDATA:
-		return cd_w_ioctl(q, mp);
+	case M_RSE:
+	case M_PCRSE:
+		/* intra multiplexer messages */
+		return cd_w_rse(q, mp);
 	case M_FLUSH:
 		return ss7_w_flush(q, mp);
 	}
 	return (QR_PASSFLOW);
 }
+
+/**
+ * cd_r_prim - process messages on the lower multiplex read queue or the module read queue
+ * @q: upper multiplex or module read queue
+ * @mp: message to process
+ *
+ * In general the procedures can detect whether this is a lower multiplex read queue or a module
+ * read queue by checking q->q_next.  If it is NULL, this is a lower multiplex read queue; if
+ * non-NULL, a module.  Typically, the procedures can check this when considering which upper
+ * multiplex stream to which to deliver the message.  When a module, the result is trivial
+ * (q->q_next); when a multiplexing driver, some algorithm that considers all upper multiplex
+ * streams.
+ */
 STATIC int
 cd_r_prim(queue_t *q, mblk_t *mp)
 {
@@ -1660,7 +2247,7 @@ dl_init_caches(void)
 }
 
 STATIC struct dl *
-dl_alloc_priv(queue_t *q, struct dl **dlp, int type, dev_t *devp, cred_t *crp)
+dl_alloc_priv(queue_t *q, struct dl **dlp, int sflag, dev_t *devp, cred_t *crp)
 {
 	struct dl *dl;
 
@@ -1671,10 +2258,17 @@ dl_alloc_priv(queue_t *q, struct dl **dlp, int type, dev_t *devp, cred_t *crp)
 		dl->cred = *crp;
 		(dl->oq = q)->q_ptr = dl_get(dl);
 		(dl->iq = WR(q))->q_ptr = dl_get(dl);
-		dl->i_prim = &dl_w_prim;
-		dl->o_prim = &dl_r_prim;
-		dl->i_wakeup = NULL;
-		dl->o_wakeup = NULL;
+		if (sflag != MODOPEN) {
+			dl->i_prim = &dl_w_prim;
+			dl->o_prim = &dl_r_prim;
+			dl->i_wakeup = NULL;
+			dl->o_wakeup = &dl_r_wakeup;
+		} else {
+			dl->i_prim = &dl_w_prim;
+			dl->o_prim = &cd_r_prim;
+			dl->i_wakeup = NULL;
+			dl->o_wakeup = NULL;
+		}
 		spin_lock_init(&dl->qlock);
 		dl->i_state = DL_UNATTACHED;
 		dl->i_style = DL_STYLE2;
@@ -1730,7 +2324,6 @@ STATIC streamscall int
 dl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
 	int mindex = 0;
-	int type = 0;
 	major_t cmajor = getmajor(*devp);
 	major_t cminor = getminor(*devp);
 	struct dl *dl, **dlp;
@@ -1756,7 +2349,6 @@ dl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		return (ENXIO);
 	}
 #endif				/* LFS */
-	type = cminor;
 	if (sflag == CLONEOPEN || cminor < 1) {
 		strlog(DRV_ID, cminor, LOG_DEBUG, SL_TRACE, "clone open in effect");
 		sflag = CLONEOPEN;
@@ -1784,7 +2376,7 @@ dl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	}
 	cmn_err(CE_NOTE, "%s: opened character device %d:%d", DRV_NAME, cmajor, cminor);
 	*devp = makedevice(cmajor, cminor);
-	if (!(dl = dl_alloc_priv(q, dlp, type, devp, crp))) {
+	if (!(dl = dl_alloc_priv(q, dlp, sflag, devp, crp))) {
 		write_unlock_bh(&master.lock);
 		return (ENOMEM);
 	}
