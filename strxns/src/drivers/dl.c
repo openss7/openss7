@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/04/12 20:36:03 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/13 18:32:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/12 20:36:03 $ by $Author: brian $
+ Last Modified $Date: 2006/04/13 18:32:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.4  2006/04/13 18:32:49  brian
+ - working up DL and NP drivers.
+
  Revision 0.9.2.3  2006/04/12 20:36:03  brian
  - added some experimental drivers
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/04/12 20:36:03 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/13 18:32:49 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/04/12 20:36:03 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/13 18:32:49 $";
 
 #include <sys/os7/compat.h>
 
@@ -84,7 +87,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2006/04/12 20:36:03 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2006/04/13 18:32:49 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI OSI Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -203,6 +206,74 @@ STATIC struct streamtab dl_info = {
 	.st_wrinit = &dl_winit,		/* Upper write queue */
 	.st_muxrinit = &cd_rinit,	/* Lower read queue */
 	.st_muxwinit = &cd_winit,	/* Lower write queue */
+};
+
+/*
+ *  A portion of the minor device number is used to determine the mac type of the opened Stream and
+ *  the remainder of the minor device number determines the interface id resulting in a Style 1
+ *  provider.  Interface Id 0 can act as a control stream for linking additional CDI or DLPI
+ *  drivers.  The low order 5 bits of the device number provide the mac type and the high order 3
+ *  bits (old 2.4 kernels without device number extensions) or 15 bits (2.6 kernels and LiS) or 11
+ *  bits (LfS) provide the unit number.  Unit number 0 is special and does not represent a physical
+ *  device and is a Style 2 driver.  These devices need to have a ppa attached, where the ppa is the
+ *  device index.  mac type 0 is special (and corresponds to DL_OTHER).  These devices are Style 2
+ *  devices and need a mac type to be specified (as part of the ppa) when they are attached.
+ *
+ *  minor device number
+ *  ----------------+-+-+-+-+-+-+-+-+
+ *      interface id      |   mac   |
+ *  ----------------+-+-+-+-+-+-+-+-+
+ *
+ *  physical point of attachment
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |    EtherType or MPOxx Code    :         Interface Id          |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+enum {
+	DL_MINOR_OTHER = 0,		/* Other */
+	DL_MINOR_CSMACD,		/* IEEE 802.3 (ISO 8802/3) CSMA/CD Network */
+	DL_MINOR_TPB,			/* IEEE 802.4 (ISO 8802/4) Token Bus */
+	DL_MINOR_TPR,			/* IEEE 802.5 (ISO 8802/5 Token Ring */
+	DL_MINOR_METRO,			/* IEEE 802.6 (ISO 8802/6) DBDQ */
+	DL_MINOR_ETHER,			/* Ethernet Bus */
+	DL_MINOR_HDLC,			/* ISO HDLC bit-synchronous communications line */
+	DL_MINOR_CHAR,			/* Character synchronous communications line (e.g. BISYNC) */
+	DL_MINOR_CTCA,			/* IBM Channel-to-Channel Adapter */
+	DL_MINOR_FDDI,			/* FDDI Fibre Distribute Data Interface */
+	DL_MINOR_FC,			/* Fiber Channel */
+	DL_MINOR_ATM,			/* ATM Asyncrhonous Transfer Mode */
+	DL_MINOR_IPATM,			/* ATM Classical IP (CLIP) interace (RFC 1577) */
+	DL_MINOR_X25,			/* X.25 LAPB (X.25) */
+	DL_MINOR_ISDN,			/* ISDN LAPD (Q.921) */
+	DL_MINOR_HIPPI,			/* HIPPI High Performance Parallel Interface */
+	DL_MINOR_100VG,			/* 100 Base VG Ethernet */
+	DL_MINOR_100VGTPR,		/* 100 Base VG Token Ring */
+	DL_MINOR_ETH_CSMA,		/* IEEE 802.3 | ISO 8802/3 and Ethernet */
+	DL_MINOR_100BT,			/* 100 Base T */
+	DL_MINOR_FRAME,			/* Frame Relay LAPF (Q.922) */
+	DL_MINOR_MPFRAME,		/* Multi-protocol over Frame Relay (MPOFR) */
+	DL_MINOR_ASYNC,			/* Character asyncrhonous communications line */
+	DL_MINOR_IPX25,			/* X.25 Classical IP (X.25 over IP MPOX RFC 1490) */
+	DL_MINOR_LOOP,			/* Software loopback */
+	DL_MINOR_FREE
+};
+
+struct dl_actions {
+	int streamscall (*dl_attach) (queue_t *q, struct dl * dl, dl_ulong ppa);
+	int streamscall (*dl_deattach) (queue_t *q, struct dl * dl);
+	int streamscall (*dl_bind) (queue_t *q, struct dl * dl, dl_ulong sap, dl_ushort dl_flags);
+	int streamscall (*dl_subs_bind) (queue_t *q, struct dl * dl, struct netbuf * sap,
+					 dl_ulong dl_subs_bind_class);
+	int streamscall (*dl_subs_unbind) (queue_t *q, struct dl * dl, struct netbuf * sap);
+	int streamscall (*dl_unbind) (queue_t *q, struct dl * dl);
+	int streamscall (*dl_unitdata) (queue_t *q, struct dl * dl, struct netbuf * dst);
+	int streamscall (*dl_udqos) (queue_t *q, struct dl * dl, struct netbuf * opt);
+	int streamscall (*dl_option) (queue_t *q, struct dl * dl, dl_ulong dl_primitive);
+	int streamscall (*dl_connect) (queue_t *q, struct dl * dl, struct netbuf * dst);
+	int streamscall (*dl_reset) (queue_t *q, struct dl * dl, dl_ulong dl_origin,
+				     dl_ulong dl_reason);
+	int streamscall (*dl_xid) (queue_t *q, struct dl * dl, dl_ulong dl_flag);
+	int streamscall (*dl_test) (queue_t *q, struct dl * dl, dl_ulong dl_flag);
 };
 
 /*
@@ -1239,6 +1310,2346 @@ dl_get_statistics_ack(queue_t *q, struct netbuf *sta)
 }
 
 /*
+ *  STATE MACHINES for Individual Provider Types
+ *  ============================================
+ */
+
+/*
+ * DL_OTHER
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_other_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_OTHER,
+	.dl_current_state = DL_UNATTACHED,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE2,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_other_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_other_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_other_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_other_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_other_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_other_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_other_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_other_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_other_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_other_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_other_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_other_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_other_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_other_actions = {
+	.dl_attach = &dl_other_attach,
+	.dl_deattach = &dl_other_deattach,
+	.dl_bind = &dl_other_bind,
+	.dl_subs_bind = &dl_other_subs_bind,
+	.dl_subs_unbind = &dl_other_subs_unbind,
+	.dl_unbind = &dl_other_unbind,
+	.dl_unitdata = &dl_other_unitdata,
+	.dl_udqos = &dl_other_udqos,
+	.dl_option = &dl_other_option,
+	.dl_connect = &dl_other_connect,
+	.dl_reset = &dl_other_reset,
+	.dl_xid = &dl_other_xid,
+	.dl_test = &dl_other_test,
+};
+
+/*
+ * DL_CSMACD
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_csmacd_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_CSMACD,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_csmacd_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_csmacd_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_csmacd_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_csmacd_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_csmacd_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_csmacd_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_csmacd_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_csmacd_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_csmacd_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_csmacd_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_csmacd_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_csmacd_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_csmacd_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_csmacd_actions = {
+	.dl_attach = &dl_csmacd_attach,
+	.dl_deattach = &dl_csmacd_deattach,
+	.dl_bind = &dl_csmacd_bind,
+	.dl_subs_bind = &dl_csmacd_subs_bind,
+	.dl_subs_unbind = &dl_csmacd_subs_unbind,
+	.dl_unbind = &dl_csmacd_unbind,
+	.dl_unitdata = &dl_csmacd_unitdata,
+	.dl_udqos = &dl_csmacd_udqos,
+	.dl_option = &dl_csmacd_option,
+	.dl_connect = &dl_csmacd_connect,
+	.dl_reset = &dl_csmacd_reset,
+	.dl_xid = &dl_csmacd_xid,
+	.dl_test = &dl_csmacd_test,
+};
+
+/*
+ * DL_TPB
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_tpb_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_TPB,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_tpb_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_tpb_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_tpb_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_tpb_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_tpb_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_tpb_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_tpb_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_tpb_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_tpb_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_tpb_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_tpb_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_tpb_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_tpb_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_tpb_actions = {
+	.dl_attach = &dl_tpb_attach,
+	.dl_deattach = &dl_tpb_deattach,
+	.dl_bind = &dl_tpb_bind,
+	.dl_subs_bind = &dl_tpb_subs_bind,
+	.dl_subs_unbind = &dl_tpb_subs_unbind,
+	.dl_unbind = &dl_tpb_unbind,
+	.dl_unitdata = &dl_tpb_unitdata,
+	.dl_udqos = &dl_tpb_udqos,
+	.dl_option = &dl_tpb_option,
+	.dl_connect = &dl_tpb_connect,
+	.dl_reset = &dl_tpb_reset,
+	.dl_xid = &dl_tpb_xid,
+	.dl_test = &dl_tpb_test,
+};
+
+/*
+ * DL_TPR
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_tpr_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_TPR,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_tpr_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_tpr_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_tpr_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_tpr_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_tpr_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_tpr_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_tpr_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_tpr_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_tpr_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_tpr_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_tpr_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_tpr_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_tpr_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_tpr_actions = {
+	.dl_attach = &dl_tpr_attach,
+	.dl_deattach = &dl_tpr_deattach,
+	.dl_bind = &dl_tpr_bind,
+	.dl_subs_bind = &dl_tpr_subs_bind,
+	.dl_subs_unbind = &dl_tpr_subs_unbind,
+	.dl_unbind = &dl_tpr_unbind,
+	.dl_unitdata = &dl_tpr_unitdata,
+	.dl_udqos = &dl_tpr_udqos,
+	.dl_option = &dl_tpr_option,
+	.dl_connect = &dl_tpr_connect,
+	.dl_reset = &dl_tpr_reset,
+	.dl_xid = &dl_tpr_xid,
+	.dl_test = &dl_tpr_test,
+};
+
+/*
+ * DL_METRO
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_metro_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_METRO,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_metro_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_metro_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_metro_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_metro_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_metro_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_metro_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_metro_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_metro_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_metro_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_metro_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_metro_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_metro_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_metro_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_metro_actions = {
+	.dl_attach = &dl_metro_attach,
+	.dl_deattach = &dl_metro_deattach,
+	.dl_bind = &dl_metro_bind,
+	.dl_subs_bind = &dl_metro_subs_bind,
+	.dl_subs_unbind = &dl_metro_subs_unbind,
+	.dl_unbind = &dl_metro_unbind,
+	.dl_unitdata = &dl_metro_unitdata,
+	.dl_udqos = &dl_metro_udqos,
+	.dl_option = &dl_metro_option,
+	.dl_connect = &dl_metro_connect,
+	.dl_reset = &dl_metro_reset,
+	.dl_xid = &dl_metro_xid,
+	.dl_test = &dl_metro_test,
+};
+
+/*
+ * DL_ether
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_ether_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_ETHER,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_ether_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_ether_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_ether_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_ether_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_ether_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_ether_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_ether_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_ether_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_ether_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_ether_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_ether_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_ether_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_ether_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_ether_actions = {
+	.dl_attach = &dl_ether_attach,
+	.dl_deattach = &dl_ether_deattach,
+	.dl_bind = &dl_ether_bind,
+	.dl_subs_bind = &dl_ether_subs_bind,
+	.dl_subs_unbind = &dl_ether_subs_unbind,
+	.dl_unbind = &dl_ether_unbind,
+	.dl_unitdata = &dl_ether_unitdata,
+	.dl_udqos = &dl_ether_udqos,
+	.dl_option = &dl_ether_option,
+	.dl_connect = &dl_ether_connect,
+	.dl_reset = &dl_ether_reset,
+	.dl_xid = &dl_ether_xid,
+	.dl_test = &dl_ether_test,
+};
+
+/*
+ * DL_hdlc
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_hdlc_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_HDLC,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_hdlc_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_hdlc_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_hdlc_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_hdlc_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_hdlc_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_hdlc_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_hdlc_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_hdlc_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_hdlc_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_hdlc_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_hdlc_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_hdlc_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_hdlc_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_hdlc_actions = {
+	.dl_attach = &dl_hdlc_attach,
+	.dl_deattach = &dl_hdlc_deattach,
+	.dl_bind = &dl_hdlc_bind,
+	.dl_subs_bind = &dl_hdlc_subs_bind,
+	.dl_subs_unbind = &dl_hdlc_subs_unbind,
+	.dl_unbind = &dl_hdlc_unbind,
+	.dl_unitdata = &dl_hdlc_unitdata,
+	.dl_udqos = &dl_hdlc_udqos,
+	.dl_option = &dl_hdlc_option,
+	.dl_connect = &dl_hdlc_connect,
+	.dl_reset = &dl_hdlc_reset,
+	.dl_xid = &dl_hdlc_xid,
+	.dl_test = &dl_hdlc_test,
+};
+
+/*
+ * DL_char
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_char_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_CHAR,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_char_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_char_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_char_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_char_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_char_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_char_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_char_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_char_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_char_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_char_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_char_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_char_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_char_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_char_actions = {
+	.dl_attach = &dl_char_attach,
+	.dl_deattach = &dl_char_deattach,
+	.dl_bind = &dl_char_bind,
+	.dl_subs_bind = &dl_char_subs_bind,
+	.dl_subs_unbind = &dl_char_subs_unbind,
+	.dl_unbind = &dl_char_unbind,
+	.dl_unitdata = &dl_char_unitdata,
+	.dl_udqos = &dl_char_udqos,
+	.dl_option = &dl_char_option,
+	.dl_connect = &dl_char_connect,
+	.dl_reset = &dl_char_reset,
+	.dl_xid = &dl_char_xid,
+	.dl_test = &dl_char_test,
+};
+
+/*
+ * DL_ctca
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_ctca_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_CTCA,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_ctca_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_ctca_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_ctca_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_ctca_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_ctca_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_ctca_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_ctca_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_ctca_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_ctca_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_ctca_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_ctca_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_ctca_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_ctca_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_ctca_actions = {
+	.dl_attach = &dl_ctca_attach,
+	.dl_deattach = &dl_ctca_deattach,
+	.dl_bind = &dl_ctca_bind,
+	.dl_subs_bind = &dl_ctca_subs_bind,
+	.dl_subs_unbind = &dl_ctca_subs_unbind,
+	.dl_unbind = &dl_ctca_unbind,
+	.dl_unitdata = &dl_ctca_unitdata,
+	.dl_udqos = &dl_ctca_udqos,
+	.dl_option = &dl_ctca_option,
+	.dl_connect = &dl_ctca_connect,
+	.dl_reset = &dl_ctca_reset,
+	.dl_xid = &dl_ctca_xid,
+	.dl_test = &dl_ctca_test,
+};
+
+/*
+ * DL_FDDI
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_fddi_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_FDDI,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_fddi_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_fddi_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_fddi_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_fddi_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_fddi_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_fddi_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_fddi_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_fddi_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_fddi_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_fddi_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_fddi_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_fddi_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_fddi_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_fddi_actions = {
+	.dl_attach = &dl_fddi_attach,
+	.dl_deattach = &dl_fddi_deattach,
+	.dl_bind = &dl_fddi_bind,
+	.dl_subs_bind = &dl_fddi_subs_bind,
+	.dl_subs_unbind = &dl_fddi_subs_unbind,
+	.dl_unbind = &dl_fddi_unbind,
+	.dl_unitdata = &dl_fddi_unitdata,
+	.dl_udqos = &dl_fddi_udqos,
+	.dl_option = &dl_fddi_option,
+	.dl_connect = &dl_fddi_connect,
+	.dl_reset = &dl_fddi_reset,
+	.dl_xid = &dl_fddi_xid,
+	.dl_test = &dl_fddi_test,
+};
+
+/*
+ * DL_FC
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_fc_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_FC,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_fc_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_fc_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_fc_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_fc_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_fc_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_fc_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_fc_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_fc_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_fc_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_fc_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_fc_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_fc_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_fc_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_fc_actions = {
+	.dl_attach = &dl_fc_attach,
+	.dl_deattach = &dl_fc_deattach,
+	.dl_bind = &dl_fc_bind,
+	.dl_subs_bind = &dl_fc_subs_bind,
+	.dl_subs_unbind = &dl_fc_subs_unbind,
+	.dl_unbind = &dl_fc_unbind,
+	.dl_unitdata = &dl_fc_unitdata,
+	.dl_udqos = &dl_fc_udqos,
+	.dl_option = &dl_fc_option,
+	.dl_connect = &dl_fc_connect,
+	.dl_reset = &dl_fc_reset,
+	.dl_xid = &dl_fc_xid,
+	.dl_test = &dl_fc_test,
+};
+
+/*
+ * DL_ATM
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_atm_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_ATM,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_atm_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_atm_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_atm_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_atm_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_atm_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_atm_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_atm_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_atm_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_atm_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_atm_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_atm_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_atm_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_atm_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_atm_actions = {
+	.dl_attach = &dl_atm_attach,
+	.dl_deattach = &dl_atm_deattach,
+	.dl_bind = &dl_atm_bind,
+	.dl_subs_bind = &dl_atm_subs_bind,
+	.dl_subs_unbind = &dl_atm_subs_unbind,
+	.dl_unbind = &dl_atm_unbind,
+	.dl_unitdata = &dl_atm_unitdata,
+	.dl_udqos = &dl_atm_udqos,
+	.dl_option = &dl_atm_option,
+	.dl_connect = &dl_atm_connect,
+	.dl_reset = &dl_atm_reset,
+	.dl_xid = &dl_atm_xid,
+	.dl_test = &dl_atm_test,
+};
+
+/*
+ * DL_IPATM
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_ipatm_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_IPATM,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_ipatm_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_ipatm_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_ipatm_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_ipatm_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_ipatm_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_ipatm_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_ipatm_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_ipatm_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_ipatm_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_ipatm_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_ipatm_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_ipatm_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_ipatm_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_ipatm_actions = {
+	.dl_attach = &dl_ipatm_attach,
+	.dl_deattach = &dl_ipatm_deattach,
+	.dl_bind = &dl_ipatm_bind,
+	.dl_subs_bind = &dl_ipatm_subs_bind,
+	.dl_subs_unbind = &dl_ipatm_subs_unbind,
+	.dl_unbind = &dl_ipatm_unbind,
+	.dl_unitdata = &dl_ipatm_unitdata,
+	.dl_udqos = &dl_ipatm_udqos,
+	.dl_option = &dl_ipatm_option,
+	.dl_connect = &dl_ipatm_connect,
+	.dl_reset = &dl_ipatm_reset,
+	.dl_xid = &dl_ipatm_xid,
+	.dl_test = &dl_ipatm_test,
+};
+
+/*
+ * DL_X25
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_x25_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_X25,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_x25_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_x25_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_x25_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_x25_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_x25_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_x25_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_x25_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_x25_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_x25_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_x25_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_x25_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_x25_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_x25_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_x25_actions = {
+	.dl_attach = &dl_x25_attach,
+	.dl_deattach = &dl_x25_deattach,
+	.dl_bind = &dl_x25_bind,
+	.dl_subs_bind = &dl_x25_subs_bind,
+	.dl_subs_unbind = &dl_x25_subs_unbind,
+	.dl_unbind = &dl_x25_unbind,
+	.dl_unitdata = &dl_x25_unitdata,
+	.dl_udqos = &dl_x25_udqos,
+	.dl_option = &dl_x25_option,
+	.dl_connect = &dl_x25_connect,
+	.dl_reset = &dl_x25_reset,
+	.dl_xid = &dl_x25_xid,
+	.dl_test = &dl_x25_test,
+};
+
+/*
+ * DL_IDSN
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_isdn_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_ISDN,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_isdn_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_isdn_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_isdn_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_isdn_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_isdn_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_isdn_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_isdn_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_isdn_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_isdn_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_isdn_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_isdn_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_isdn_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_isdn_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_isdn_actions = {
+	.dl_attach = &dl_isdn_attach,
+	.dl_deattach = &dl_isdn_deattach,
+	.dl_bind = &dl_isdn_bind,
+	.dl_subs_bind = &dl_isdn_subs_bind,
+	.dl_subs_unbind = &dl_isdn_subs_unbind,
+	.dl_unbind = &dl_isdn_unbind,
+	.dl_unitdata = &dl_isdn_unitdata,
+	.dl_udqos = &dl_isdn_udqos,
+	.dl_option = &dl_isdn_option,
+	.dl_connect = &dl_isdn_connect,
+	.dl_reset = &dl_isdn_reset,
+	.dl_xid = &dl_isdn_xid,
+	.dl_test = &dl_isdn_test,
+};
+
+/*
+ * DL_HIPPI
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_hippi_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_HIPPI,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_hippi_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_hippi_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_hippi_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_hippi_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_hippi_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_hippi_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_hippi_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_hippi_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_hippi_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_hippi_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_hippi_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_hippi_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_hippi_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_hippi_actions = {
+	.dl_attach = &dl_hippi_attach,
+	.dl_deattach = &dl_hippi_deattach,
+	.dl_bind = &dl_hippi_bind,
+	.dl_subs_bind = &dl_hippi_subs_bind,
+	.dl_subs_unbind = &dl_hippi_subs_unbind,
+	.dl_unbind = &dl_hippi_unbind,
+	.dl_unitdata = &dl_hippi_unitdata,
+	.dl_udqos = &dl_hippi_udqos,
+	.dl_option = &dl_hippi_option,
+	.dl_connect = &dl_hippi_connect,
+	.dl_reset = &dl_hippi_reset,
+	.dl_xid = &dl_hippi_xid,
+	.dl_test = &dl_hippi_test,
+};
+
+/*
+ * DL_100VG
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_100vg_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_100VG,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_100vg_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_100vg_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_100vg_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_100vg_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_100vg_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_100vg_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_100vg_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_100vg_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_100vg_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_100vg_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_100vg_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_100vg_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_100vg_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_100vg_actions = {
+	.dl_attach = &dl_100vg_attach,
+	.dl_deattach = &dl_100vg_deattach,
+	.dl_bind = &dl_100vg_bind,
+	.dl_subs_bind = &dl_100vg_subs_bind,
+	.dl_subs_unbind = &dl_100vg_subs_unbind,
+	.dl_unbind = &dl_100vg_unbind,
+	.dl_unitdata = &dl_100vg_unitdata,
+	.dl_udqos = &dl_100vg_udqos,
+	.dl_option = &dl_100vg_option,
+	.dl_connect = &dl_100vg_connect,
+	.dl_reset = &dl_100vg_reset,
+	.dl_xid = &dl_100vg_xid,
+	.dl_test = &dl_100vg_test,
+};
+
+/*
+ * DL_100VGTPR
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_100vgtpr_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_100VGTPR,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_100vgtpr_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_100vgtpr_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_100vgtpr_actions = {
+	.dl_attach = &dl_100vgtpr_attach,
+	.dl_deattach = &dl_100vgtpr_deattach,
+	.dl_bind = &dl_100vgtpr_bind,
+	.dl_subs_bind = &dl_100vgtpr_subs_bind,
+	.dl_subs_unbind = &dl_100vgtpr_subs_unbind,
+	.dl_unbind = &dl_100vgtpr_unbind,
+	.dl_unitdata = &dl_100vgtpr_unitdata,
+	.dl_udqos = &dl_100vgtpr_udqos,
+	.dl_option = &dl_100vgtpr_option,
+	.dl_connect = &dl_100vgtpr_connect,
+	.dl_reset = &dl_100vgtpr_reset,
+	.dl_xid = &dl_100vgtpr_xid,
+	.dl_test = &dl_100vgtpr_test,
+};
+
+/*
+ * DL_ETH_CSMA
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_eth_csma_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_ETH_CSMA,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_eth_csma_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_eth_csma_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_eth_csma_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_eth_csma_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_eth_csma_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_eth_csma_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_eth_csma_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_eth_csma_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_eth_csma_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_eth_csma_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_eth_csma_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_eth_csma_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_eth_csma_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_eth_csma_actions = {
+	.dl_attach = &dl_eth_csma_attach,
+	.dl_deattach = &dl_eth_csma_deattach,
+	.dl_bind = &dl_eth_csma_bind,
+	.dl_subs_bind = &dl_eth_csma_subs_bind,
+	.dl_subs_unbind = &dl_eth_csma_subs_unbind,
+	.dl_unbind = &dl_eth_csma_unbind,
+	.dl_unitdata = &dl_eth_csma_unitdata,
+	.dl_udqos = &dl_eth_csma_udqos,
+	.dl_option = &dl_eth_csma_option,
+	.dl_connect = &dl_eth_csma_connect,
+	.dl_reset = &dl_eth_csma_reset,
+	.dl_xid = &dl_eth_csma_xid,
+	.dl_test = &dl_eth_csma_test,
+};
+
+/*
+ * DL_100BT
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_100bt_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_100BT,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_100bt_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_100bt_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_100bt_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_100bt_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_100bt_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_100bt_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_100bt_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_100bt_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_100bt_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_100bt_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_100bt_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_100bt_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_100bt_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_100bt_actions = {
+	.dl_attach = &dl_100bt_attach,
+	.dl_deattach = &dl_100bt_deattach,
+	.dl_bind = &dl_100bt_bind,
+	.dl_subs_bind = &dl_100bt_subs_bind,
+	.dl_subs_unbind = &dl_100bt_subs_unbind,
+	.dl_unbind = &dl_100bt_unbind,
+	.dl_unitdata = &dl_100bt_unitdata,
+	.dl_udqos = &dl_100bt_udqos,
+	.dl_option = &dl_100bt_option,
+	.dl_connect = &dl_100bt_connect,
+	.dl_reset = &dl_100bt_reset,
+	.dl_xid = &dl_100bt_xid,
+	.dl_test = &dl_100bt_test,
+};
+
+/*
+ * DL_FRAME
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_frame_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_FRAME,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_frame_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_frame_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_frame_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_frame_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_frame_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_frame_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_frame_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_frame_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_frame_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_frame_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_frame_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_frame_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_frame_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_frame_actions = {
+	.dl_attach = &dl_frame_attach,
+	.dl_deattach = &dl_frame_deattach,
+	.dl_bind = &dl_frame_bind,
+	.dl_subs_bind = &dl_frame_subs_bind,
+	.dl_subs_unbind = &dl_frame_subs_unbind,
+	.dl_unbind = &dl_frame_unbind,
+	.dl_unitdata = &dl_frame_unitdata,
+	.dl_udqos = &dl_frame_udqos,
+	.dl_option = &dl_frame_option,
+	.dl_connect = &dl_frame_connect,
+	.dl_reset = &dl_frame_reset,
+	.dl_xid = &dl_frame_xid,
+	.dl_test = &dl_frame_test,
+};
+
+/*
+ * DL_MPFRAME
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_mpframe_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_MPFRAME,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_mpframe_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_mpframe_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_mpframe_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_mpframe_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_mpframe_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_mpframe_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_mpframe_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_mpframe_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_mpframe_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_mpframe_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_mpframe_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_mpframe_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_mpframe_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_mpframe_actions = {
+	.dl_attach = &dl_mpframe_attach,
+	.dl_deattach = &dl_mpframe_deattach,
+	.dl_bind = &dl_mpframe_bind,
+	.dl_subs_bind = &dl_mpframe_subs_bind,
+	.dl_subs_unbind = &dl_mpframe_subs_unbind,
+	.dl_unbind = &dl_mpframe_unbind,
+	.dl_unitdata = &dl_mpframe_unitdata,
+	.dl_udqos = &dl_mpframe_udqos,
+	.dl_option = &dl_mpframe_option,
+	.dl_connect = &dl_mpframe_connect,
+	.dl_reset = &dl_mpframe_reset,
+	.dl_xid = &dl_mpframe_xid,
+	.dl_test = &dl_mpframe_test,
+};
+
+/*
+ * DL_ASYNC
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_async_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_ASYNC,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_async_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_async_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_async_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_async_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_async_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_async_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_async_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_async_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_async_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_async_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_async_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_async_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_async_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_async_actions = {
+	.dl_attach = &dl_async_attach,
+	.dl_deattach = &dl_async_deattach,
+	.dl_bind = &dl_async_bind,
+	.dl_subs_bind = &dl_async_subs_bind,
+	.dl_subs_unbind = &dl_async_subs_unbind,
+	.dl_unbind = &dl_async_unbind,
+	.dl_unitdata = &dl_async_unitdata,
+	.dl_udqos = &dl_async_udqos,
+	.dl_option = &dl_async_option,
+	.dl_connect = &dl_async_connect,
+	.dl_reset = &dl_async_reset,
+	.dl_xid = &dl_async_xid,
+	.dl_test = &dl_async_test,
+};
+
+/*
+ * DL_IPX25
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_ipx25_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_IPX25,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_ipx25_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_ipx25_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_ipx25_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_ipx25_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_ipx25_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_ipx25_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_ipx25_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_ipx25_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_ipx25_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_ipx25_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_ipx25_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_ipx25_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_ipx25_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_ipx25_actions = {
+	.dl_attach = &dl_ipx25_attach,
+	.dl_deattach = &dl_ipx25_deattach,
+	.dl_bind = &dl_ipx25_bind,
+	.dl_subs_bind = &dl_ipx25_subs_bind,
+	.dl_subs_unbind = &dl_ipx25_subs_unbind,
+	.dl_unbind = &dl_ipx25_unbind,
+	.dl_unitdata = &dl_ipx25_unitdata,
+	.dl_udqos = &dl_ipx25_udqos,
+	.dl_option = &dl_ipx25_option,
+	.dl_connect = &dl_ipx25_connect,
+	.dl_reset = &dl_ipx25_reset,
+	.dl_xid = &dl_ipx25_xid,
+	.dl_test = &dl_ipx25_test,
+};
+
+/*
+ * DL_LOOP
+ * =========
+ */
+
+/* Information */
+
+STATIC dl_info_ack_t dl_loop_info = {
+	.dl_primitive = DL_INFO_ACK,
+	.dl_max_sdu = 0x0000ffff,
+	.dl_min_sdu = 0,
+	.dl_addr_length = QOS_UNKNOWN,
+	.dl_mac_type = DL_LOOP,
+	.dl_current_state = DL_UNBOUND,
+	.dl_sap_length = QOS_UNKNOWN,
+	.dl_service_mode = (DL_CODLS | DL_CLDLS | DL_ACLDLS),
+	.dl_provider_style = DL_STYLE1,
+	.dl_version = DL_CURRENT_VERSION,
+};
+
+/* Actions */
+
+STATIC int streamscall
+dl_loop_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+{
+}
+STATIC int streamscall
+dl_loop_deattach(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_loop_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
+{
+}
+STATIC int streamscall
+dl_loop_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
+{
+}
+STATIC int streamscall
+dl_loop_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
+{
+}
+STATIC int streamscall
+dl_loop_unbind(queue_t *q, struct dl *dl)
+{
+}
+STATIC int streamscall
+dl_loop_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_loop_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
+{
+}
+STATIC int streamscall
+dl_loop_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
+{
+}
+STATIC int streamscall
+dl_loop_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
+{
+}
+STATIC int streamscall
+dl_loop_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
+{
+}
+STATIC int streamscall
+dl_loop_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+STATIC int streamscall
+dl_loop_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
+{
+}
+
+STATIC struct dl_actions dl_loop_actions = {
+	.dl_attach = &dl_loop_attach,
+	.dl_deattach = &dl_loop_deattach,
+	.dl_bind = &dl_loop_bind,
+	.dl_subs_bind = &dl_loop_subs_bind,
+	.dl_subs_unbind = &dl_loop_subs_unbind,
+	.dl_unbind = &dl_loop_unbind,
+	.dl_unitdata = &dl_loop_unitdata,
+	.dl_udqos = &dl_loop_udqos,
+	.dl_option = &dl_loop_option,
+	.dl_connect = &dl_loop_connect,
+	.dl_reset = &dl_loop_reset,
+	.dl_xid = &dl_loop_xid,
+	.dl_test = &dl_loop_test,
+};
+
+/* Information */
+
+STATIC dl_info_ack_t *dl_info[DL_MINOR_FREE] = {
+	[DL_MINOR_OTHER] = &dl_other_info,
+	[DL_MINOR_CSMACD] = &dl_csmacd_info,
+	[DL_MINOR_TPB] = &dl_tpb_info,
+	[DL_MINOR_TPR] = &dl_tpr_info,
+	[DL_MINOR_METRO] = &dl_metro_info,
+	[DL_MINOR_ETHER] = &dl_ether_info,
+	[DL_MINOR_HDLC] = &dl_hdlc_info,
+	[DL_MINOR_CHAR] = &dl_char_info,
+	[DL_MINOR_CTCA] = &dl_ctca_info,
+	[DL_MINOR_FDDI] = &dl_fddi_info,
+	[DL_MINOR_FC] = &dl_fc_info,
+	[DL_MINOR_ATM] = &dl_atm_info,
+	[DL_MINOR_IPATM] = &dl_ipatm_info,
+	[DL_MINOR_X25] = &dl_x25_info,
+	[DL_MINOR_ISDN] = &dl_isdn_info,
+	[DL_MINOR_HIPPI] = &dl_hippi_info,
+	[DL_MINOR_100VG] = &dl_100vg_info,
+	[DL_MINOR_100VGTPR] = &dl_100vgtpr_info,
+	[DL_MINOR_ETH_CSMA] = &dl_eth_csma_info,
+	[DL_MINOR_100BT] = &dl_100bt_info,
+	[DL_MINOR_FRAME] = &dl_frame_info,
+	[DL_MINOR_MPFRAME] = &dl_mpframe_info,
+	[DL_MINOR_ASYNC] = &dl_async_info,
+	[DL_MINOR_IPX25] = &dl_ipx25_info,
+	[DL_MINOR_LOOP] = &dl_loop_info,
+};
+
+/* Actions */
+
+STATIC struct dl_actions *dl_actions[DL_MINOR_FREE] = {
+	[DL_MINOR_OTHER] = &dl_other_actions,
+	[DL_MINOR_CSMACD] = &dl_csmacd_actions,
+	[DL_MINOR_TPB] = &dl_tpb_actions,
+	[DL_MINOR_TPR] = &dl_tpr_actions,
+	[DL_MINOR_METRO] = &dl_metro_actions,
+	[DL_MINOR_ETHER] = &dl_ether_actions,
+	[DL_MINOR_HDLC] = &dl_hdlc_actions,
+	[DL_MINOR_CHAR] = &dl_char_actions,
+	[DL_MINOR_CTCA] = &dl_ctca_actions,
+	[DL_MINOR_FDDI] = &dl_fddi_actions,
+	[DL_MINOR_FC] = &dl_fc_actions,
+	[DL_MINOR_ATM] = &dl_atm_actions,
+	[DL_MINOR_IPATM] = &dl_ipatm_actions,
+	[DL_MINOR_X25] = &dl_x25_actions,
+	[DL_MINOR_ISDN] = &dl_isdn_actions,
+	[DL_MINOR_HIPPI] = &dl_hippi_actions,
+	[DL_MINOR_100VG] = &dl_100vg_actions,
+	[DL_MINOR_100VGTPR] = &dl_100vgtpr_actions,
+	[DL_MINOR_ETH_CSMA] = &dl_eth_csma_actions,
+	[DL_MINOR_100BT] = &dl_100bt_actions,
+	[DL_MINOR_FRAME] = &dl_frame_actions,
+	[DL_MINOR_MPFRAME] = &dl_mpframe_actions,
+	[DL_MINOR_ASYNC] = &dl_async_actions,
+	[DL_MINOR_IPX25] = &dl_ipx25_actions,
+	[DL_MINOR_LOOP] = &dl_loop_actions,
+};
+
+/*
  *  Service Primitives from above -- lower multiplex
  *  ------------------------------------------------
  */
@@ -2247,14 +4658,20 @@ dl_init_caches(void)
 }
 
 STATIC struct dl *
-dl_alloc_priv(queue_t *q, struct dl **dlp, int sflag, dev_t *devp, cred_t *crp)
+dl_alloc_priv(queue_t *q, struct dl **dlp, minor_t bminor, int sflag, dev_t *devp, cred_t *crp)
 {
 	struct dl *dl;
 
 	if ((dl = dl_alloc())) {
+		major_t cmajor = getmajor(*devp);
+		minor_t cminor = getminor(*devp);
+		int index = (cminor & 0x1f);
+		int unit = (cminor >> 5);
+		bool style2 = (cmajor != CMAJOR_0 || index == 0 && unit == 0);
+
 		/* dl generic members */
-		dl->u.dev.cmajor = getmajor(*devp);
-		dl->u.dev.cminor = getminor(*devp);
+		dl->u.dev.cmajor = cmajor;
+		dl->u.dev.cminor = cminor;
 		dl->cred = *crp;
 		(dl->oq = q)->q_ptr = dl_get(dl);
 		(dl->iq = WR(q))->q_ptr = dl_get(dl);
@@ -2270,10 +4687,19 @@ dl_alloc_priv(queue_t *q, struct dl **dlp, int sflag, dev_t *devp, cred_t *crp)
 			dl->o_wakeup = NULL;
 		}
 		spin_lock_init(&dl->qlock);
-		dl->i_state = DL_UNATTACHED;
-		dl->i_style = DL_STYLE2;
 		dl->i_version = DL_CURRENT_VERSION;
-		dl->i_oldstate = DL_UNATTACHED;
+		/* information to report */
+		dl->info = *dl_info[index];
+		/* actions to take */
+		dl->actions = *dl_actions[index];
+		/* style and state */
+		if (style2) {
+			dl->i_state = dl->i_oldstate = dl->info.dl_state = DL_UNATTACHED;
+			dl->i_style = dl->info.dl_provider_style = DL_STYLE2;
+		} else {
+			dl->i_state = dl->i_oldstate = dl->info.dl_state = DL_UNBOUND;
+			dl->i_style = dl->info.dl_provider_style = DL_STYLE1;
+		}
 		/* link into master list */
 		if ((dl->next = *dlp))
 			dl->next->prev = &dl->next;
@@ -2325,7 +4751,7 @@ dl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
 	int mindex = 0;
 	major_t cmajor = getmajor(*devp);
-	major_t cminor = getminor(*devp);
+	minor_t cminor = getminor(*devp), bminor = cminor;
 	struct dl *dl, **dlp;
 
 	if (q->q_ptr != NULL)
@@ -2335,48 +4761,65 @@ dl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		return (ENXIO);
 	}
 #ifdef LIS
-	if (cmajor != CMAJOR_0) {
+	if (cmajor != CMAJOR_0 || (cminor & 0x1f >= DL_MINOR_FREE)) {
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "major device number mismatch %d != %d", cmajor, CMAJOR_0);
+		       "attempt to open device %d:%d directly", cmajor, cminor);
 		return (ENXIO);
 	}
 #endif				/* LIS */
 #ifdef LFS
 	/* Linux Fast-STREAMS always passes internal major dvice numbers (module ids) */
-	if (cmajor != DRV_ID) {
+	if (cmajor != DRV_ID || (cminor & 0x1f >= DL_MINOR_FREE)) {
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "major device number mismatch %d != %d", cmajor, DRV_ID);
+		       "attempt to open device %d:%d directly", cmajor, cminor);
 		return (ENXIO);
 	}
 #endif				/* LFS */
-	if (sflag == CLONEOPEN || cminor < 1) {
+	if (sflag == CLONEOPEN || (cminor & 0x1f) == 0 || (cminor & ~0x1f) == 0) {
 		strlog(DRV_ID, cminor, LOG_DEBUG, SL_TRACE, "clone open in effect");
 		sflag = CLONEOPEN;
-		cminor = 1;
+		/* allocate dynamic device numbers from the second major */
+		mindex = 1;
+		cmajor = dl_majors[mindex];
+		cminor = 0;
 	}
+	dlp = &master.drv.list;
 	write_lock_bh(&master.lock);
-	for (dlp = &master.drv.list; *dlp; dlp = &(*dlp)->next) {
+	/* find position of majors in list */
+	if (mindex)
+		/* scan to second major block */
+		for (; *dlp && (*dlp)->u.dev.cmajor != dl_majors[0]; dlp = &(*dlp)->next) ;
+	for (; *dlp; dlp = &(*dlp)->next) {
 		if (cmajor != (*dlp)->u.dev.cmajor)
 			break;
-		if (cmajor == (*dlp)->u.dev.cmajor) {
-			if (cminor < (*dlp)->u.dev.cminor) {
-				if (++cminor >= NMINORS) {
-					if (++mindex >= CMAJORS || !(cmajor = dl_majors[mindex]))
-						break;
-					cminor = 0;	/* start next major */
-				}
-				continue;
+		if (cminor < (*dlp)->u.dev.cminor)
+			break;
+		if (cminor == (*dlp)->u.dev.cminor) {
+			if (sflag != CLONEOPEN) {
+				write_unlock_bh(&master.lock);
+				/* should not happen with DRVOPEN: STREAMS should know that the
+				   device is already open */
+				strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
+				       "opened device %d:%d in use!", cmajor, cminor);
+				return (EAGAIN);
+			}
+			if (getmajor(makedevice(cmajor, ++cminor)) != cmajor) {
+				if (++mindex >= CMAJORS)
+					break;
+				if (!(cmajor = dl_majors[mindex]))
+					break;
+				cminor = 0;	/* start next major */
 			}
 		}
 	}
 	if (mindex >= CMAJORS || !cmajor) {
-		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE, "no device numbers available");
 		write_unlock_bh(&master.lock);
+		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE, "no device numbers available");
 		return (ENXIO);
 	}
 	cmn_err(CE_NOTE, "%s: opened character device %d:%d", DRV_NAME, cmajor, cminor);
 	*devp = makedevice(cmajor, cminor);
-	if (!(dl = dl_alloc_priv(q, dlp, sflag, devp, crp))) {
+	if (!(dl = dl_alloc_priv(q, dlp, bminor, sflag, devp, crp))) {
 		write_unlock_bh(&master.lock);
 		return (ENOMEM);
 	}

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_REPLY_REQ.7.man,v 0.9.2.6 2006/04/05 09:44:54 brian Exp $
+.\" @(#) $Id: DL_REPLY_REQ.7.man,v 0.9.2.7 2006/04/13 18:32:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:54 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/13 18:32:49 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_REPLY_REQ.7.man,v $
+.\" Revision 0.9.2.7  2006/04/13 18:32:49  brian
+.\" - working up DL and NP drivers.
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:54  brian
 .\" - moved .so line and updated headers
 .\"
@@ -80,13 +83,17 @@ sort-adjacent-labels
 .TH DL_REPLY_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
 .SH NAME
 .B DL_REPLY_REQ (dl_reply_req_t)
-\- this request primitive is passed to the  DLS  Provider  by  the  DLS  User
-to  request that a DLSDU be returned  from  a  peer  DLS  Provider  or that
-DLSDUs be exchanged between  stations  using acknowledged connectionless mode
+\- this request primitive is passed to the DLS Provider by the DLS User
+to request that a DLSDU be returned from a peer DLS Provider or that
+DLSDUs be exchanged between stations using acknowledged connectionless mode
 data unit exchange procedures.
 .SH SYNOPSIS
-Consists  of  one  M_PROTO  message  block containing the structure shown
-below, followed by one or more M_DATA blocks with one or more bytes of data.
+.PP
+Consists of one
+.BR M_PROTO (9)
+message block containing the structure shown below, followed by one or more
+.BR M_DATA (9)
+blocks with one or more bytes of data.
 .sp
 .nf
 \fC\s-1\
@@ -103,61 +110,90 @@ typedef struct {
 \fR\s+1
 .fi
 .SH DESCRIPTION
+.PP
 .B DL_REPLY_REQ
-is passed to the  DLS  Provider  by  the  DLS  User
-to  request that a DLSDU be returned  from  a  peer  DLS  Provider  or that
-DLSDUs be exchanged between  stations  using acknowledged connectionless mode
-data unit exchange procedures.
+is passed to the DLS Provider by the DLS User to request that a DLSDU
+be returned from a peer DLS Provider or that DLSDUs be exchanged between
+stations using acknowledged connectionless mode data unit exchange
+procedures.
 .SH PARAMETERS
+.PP
 .TP
 .I dl_primitive
-conveys DL_REPLY_REQ
+conveys
+.B DL_REPLY_REQ
 .TP
 .I dl_correlation
-conveys  a  unique  identifier  which  will  be returned in the
-DL_REPLY_STATUS_IND   primitive   to  allow  the  DLS  User  to correlate the
-status to the appropriate DL_REPLY_REQ primitive.
+conveys a unique identifier which will be returned in the
+.BR DL_REPLY_STATUS_IND (7)
+primitive to allow the DLS User to correlate the status to the
+appropriate
+.B DL_REPLY_REQ
+primitive.
 .TP
 .I dl_dest_addr_length
-conveys  the length of the DLSAP address of the destination DLS User.  If  the
-destination user is implemented using DLPI, this address is the full DLSAP
-address returned on the DL_BIND_ACK.
+conveys the length of the
+.I DLSAP
+address of the destination DLS User. If the
+destination user is implemented using DLPI, this address is the full
+.I DLSAP
+address returned on the
+.BR DL_BIND_ACK (7).
 .TP
 .I dl_dest_addr_offset
-conveys  the  offset  from the beginning of the M_PROTO message block where
-the destination DLSAP address begins.
+conveys the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the destination
+.I DLSAP
+address begins.
 .TP
 .I dl_src_addr_length
-conveys the length of the DLSAP address of the source DLS User.
+conveys the length of the
+.I DLSAP
+address of the source DLS User.
 .TP
 .I dl_src_addr_offset
-conveys  the  offset  from the beginning of the M_PROTO message block where
-the source DLSAP address begins.
+conveys the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the source
+.I DLSAP
+address begins.
 .TP
 .I dl_priority
 priority provided for the data unit transmission.
 .TP
 .I dl_service_class
-specifies  whether  or  not  an  acknowledge  capability in the medium  access
+specifies whether or not an acknowledge capability in the medium access
 control sublayer is to be used for the data unit transmission.
 .SH STATE
-This primitive is valid in state DL_IDLE.
+.PP
+This primitive is valid in state
+.BR DL_IDLE .
 .SH "NEW STATE"
+.PP
 The resulting state is unchanged.
 .SH RESPONSE
-If  the request is erroneous, message DL_ERROR_ACK is returned, and the
-resulting  state  is  unchanged.  If  the  message is valid, a
-DL_REPLY_STATUS_IND  is returned.  This will indicate the success or failure of
-the previous associated acknowledged connectionless-mode data unit exchange.
+.PP
+If the request is erroneous, message
+.BR DL_ERROR_ACK (7)
+is returned, and the resulting state is unchanged. If the message is valid, a
+.BR DL_REPLY_STATUS_IND (7)
+is returned. This will indicate the success or failure of the previous
+associated acknowledged connectionless-mode data unit exchange.
 .SH ERRORS
+.PP
 .TP
 .B DL_BADADDR
-The  destination  DLSAP  address  was in an incorrect format or contained
-invalid information.
+The destination
+.I DLSAP
+address was in an incorrect format or contained invalid information.
 .TP
 .B DL_BADDATA
-The  amount  of  data  in  the  current  DLSDU exceeded the DLS provider's
-DLSDU limit.
+The amount of data in the current
+.I DLSDU
+exceeded the DLS provider's
+.I DLSDU
+limit.
 .TP
 .B DL_NOTSUPPORTED
 Primitive is valid, but not supported.
@@ -166,8 +202,9 @@ Primitive is valid, but not supported.
 The primitive was issued from an invalid state.
 .TP
 .B DL_UNSUPPORTED
-Requested  service  not  supported  by  Provider  (Request with response at
-the Medium Access Control sublayer).
+Requested service not supported by Provider (Request with response at the
+.I Medium Access Control
+sublayer).
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
