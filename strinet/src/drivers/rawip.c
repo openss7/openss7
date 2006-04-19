@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/04/03 10:57:25 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/18 17:55:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/03 10:57:25 $ by $Author: brian $
+ Last Modified $Date: 2006/04/18 17:55:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.7  2006/04/18 17:55:41  brian
+ - raiontalizing rawip and udp drivers
+
  Revision 0.9.2.6  2006/04/03 10:57:25  brian
  - need attributes on definition as well as declaration
 
@@ -70,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/04/03 10:57:25 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/18 17:55:41 $"
 
-static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/04/03 10:57:25 $";
+static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/18 17:55:41 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -118,6 +121,10 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.6 
 #include <net/inet_ecn.h>
 #include <net/snmp.h>
 
+#ifdef HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+
 #include <linux/skbuff.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
@@ -142,7 +149,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.6 
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/04/03 10:57:25 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/18 17:55:41 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -4150,7 +4157,7 @@ n_unitdata_ind(queue_t *q, mblk_t *mp)
 	rtn = t_unitdata_ind(q, mp->b_cont);
 	if (rtn == QR_DONE) {
 		freeb(mp);
-		return (QR_DONE);
+		return (QR_ABSORBED);
 	}
 	return (rtn);
 }
@@ -4168,7 +4175,7 @@ n_uderror_ind(queue_t *q, mblk_t *mp)
 	rtn = t_uderror_ind(q, mp->b_cont);
 	if (rtn == QR_DONE) {
 		freeb(mp);
-		return (QR_DONE);
+		return (QR_ABSORBED);
 	}
 	return (rtn);
 }
@@ -4593,11 +4600,40 @@ mux_w_proto(queue_t *q, mblk_t *mp)
 	return (-EFAULT);
 }
 
+/**
+ * mux_r_proto: - process an M_PROTO message on the lower read queue
+ * @q: active queue in queue pair (read queue)
+ * @mp: the M_PROTO, M_PCPROTO message
+ *
+ * M_PROTO, M_PCPROTO messages are placed on the lower read queue by an NPI IP Stream linked beneath
+ * the UDP multiplexing driver.  These are NPI message that have not yet been associated with a
+ * Stream.  This function performs a similar function to that of the raw_v4_rcv() function.
+ */
 STATIC int
 mux_r_proto(queue_t *q, mblk_t *mp)
 {
-	fixme(("Write this function."));
-	return (-EFAULT);
+	int rtn;
+	np_ulong prim;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(prim))
+		goto eproto;
+	switch ((prim = *((np_ulong *) mp->b_rptr))) {
+	case N_UNITDATA_IND:
+		rtn = l_unitdata_ind(q, mp);
+		break;
+	case N_UDERROR_IND:
+		rtn = l_uderror_ind(q, mp);
+		break;
+	case N_BIND_ACK:
+	case N_OK_ACK:
+	case N_ERROR_ACK:
+	default:
+		rtn = l_other_ind(q, mp);
+		break;
+	}
+	return (rtn);
+      eproto:
+	return (-EPROTO);
 }
 
 /**
@@ -4852,6 +4888,47 @@ raw_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_
 }
 
 /**
+ * raw_rwake: - an upper read queue has awoken
+ * @q: active queue in the queue pair (read queue)
+ *
+ * The upper read queue service procudure is invoked only by back enabling (because we do not ever
+ * place any message on the upper read queue but always put them to the next read queue).  When
+ * invoked, we need to manually enable any lower multiplex (NPI IP) read queue.  This permits flow
+ * control to work across the multiplexing driver.
+ */
+STATIC void
+raw_rwake(queue_t *q)
+{
+	read_lock_bh(&raw_lock);
+	if (npi_bottom != NULL)
+		/* There is an NPI IP Stream linked under the driver. */
+		qenable(RD(npi_bottom));
+	read_unlock_bh(&raw_lock);
+}
+
+/**
+ * mux_wwake: - the lower write queue has awoken
+ * @q: active queue in queue pair (write queue)
+ *
+ * The lower write service procedure is used merely for backenabling across the multiplexing driver.
+ * We never put messages to the lower write queue, but put them to the next queue below the lower
+ * write queue.  When a bcanput() fails on the next queue to thelower write queue, a back enable
+ * will invoke the lower write queue service procedure which can then be used to explicitly enable
+ * the upper write queue(s) feeding the lower write queue.  This permits flow control to work across
+ * the multiplexing driver.
+ */
+STATIC void
+mux_wwake(queue_t *q)
+{
+	struct raw *top;
+
+	read_lock_bh(&raw_lock);
+	for (top = raw_opens; top; top = top->next)
+		qenable(top->wq);
+	read_unlock_bh(&raw_lock);
+}
+
+/**
  * raw_rput: - read side put procedure
  * @q: queue to put message to
  * @mp: message to put
@@ -4907,6 +4984,10 @@ mux_rput(queue_t *q, mblk_t *mp)
 /**
  * mux_rsrv: - read side service procedure
  * @q: queue to service
+ *
+ * If the lower read put procedure encounters flow control on the queue beyond the accepting upper
+ * read queue, it places the message back on its qeue and waits for the upper read queue service
+ * procedure to enable it when congestion is cleared, or when a connection is formed.
  */
 STATIC streamscall int
 mux_rsrv(queue_t *q)
@@ -5019,12 +5100,15 @@ raw_v4_rcv(struct sk_buff *skb)
 
 //	IP_INC_STATS_BH(IpInDelivers);	/* should wait... */
 
+	if (skb->pkt_type != PACKET_HOST)
+		goto bad_pkt_type;
 	rt = (struct rtable *) skb->dst;
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
 		/* need to do something about broadcast and multicast */ ;
 
 	/* we do the lookup before the checksum */
 	iph = skb->nh.iph;
+	read_lock(&raw_lock);
 	if (!(raw = raw_lookup(iph->protocol, iph->daddr, iph->saddr)))
 		goto no_stream;
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
@@ -5039,10 +5123,15 @@ raw_v4_rcv(struct sk_buff *skb)
 	skb->dev = NULL;
 	if (!raw->rq || !canput(raw->rq) || !putq(raw->rq, mp))
 		goto flow_controlled;
+//
 	raw_put(raw);
+	read_unlock(&raw_lock);
 	return (0);
       no_stream:
+	read_unlock(&raw_lock);
 	ptrace(("ERROR: No stream\n"));
+	goto pass_it;
+      pass_it:
 	rtn = raw_next_pkt_handler(&skb);
 	if (skb == NULL)
 		return (rtn);
@@ -5052,16 +5141,21 @@ raw_v4_rcv(struct sk_buff *skb)
 	return (0);
       linear_fail:
 	raw_put(raw);
+	read_unlock(&raw_lock);
+	goto discard_it;
+      bad_pkt_type:
 	goto discard_it;
       discard_it:
 	kfree_skb(skb);
 	return (0);
       flow_controlled:
 	raw_put(raw);
+	read_unlock(&raw_lock);
 	goto free_it;
       no_buffers:
 	ptrace(("ERROR: Could not allocate mblk\n"));
 	raw_put(raw);
+	read_unlock(&raw_lock);
 	goto discard_it;
 }
 

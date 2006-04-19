@@ -1,0 +1,112 @@
+OpenSS7 STREAMS INET Driver -- design notes.  2006-04-18
+Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+Design Notes:
+-------------
+
+Design notes for INET and related drivers:
+
+Initially, the strinet driver (streams-inet) opened sockets internal to
+the kernel and used those for TCP, UDP and RAWIP, and even openss7
+sockets based SCTP.  This is certainly not too efficient.  As there is
+the OpenSS7 STREAMS SCTP, there is no need for that approach for SCTP.
+Writing a fully STREAMS-based TCP might be too ambitious at this point,
+however, there is no reason that UDP and RAWIP should not be
+STREAMS-based instead of opening sockets internal to the kernel.
+
+The approach to RAWIP on 2.4 kernels is to use inet_add_protocol() to
+add us as a protocol in front of others, just like a raw socket.  On 2.6
+kernels, inet_add_protocol() will not do this for already registered
+protocols, so some hacks are in order: lock the protocol table, and if
+there is an existing entry, see if it belongs to a module using
+module_text_address() (kernel/module.c) on the rcv and err_handler
+functions.  If they belong to a module, try to increment the module
+count for each.  If the module counts can be incremented, replace
+the entry with ours (including a pointer to the stolen entry) and
+unlock.  When a packet is received, clone it an pass it up, and send the
+original to the stolen functions.  This will operate exactly like a raw
+socket would.  An alternative is to override the protocol, but that is
+performed by the NPI IP driver.  The intention of the RAWIP driver is
+not to override existing protocols, but to provide a mechanism for
+implementing non-existent protocols or supplementing existing protocols.
+
+This functions a little differently than rawip streams on, say, Solaris,
+in that icmp messages are delivered as T_UDERR_IND messages and it is
+not necessary to bind another raw stream to ICMP.
+
+The approach to UDP on 2.4 kernels is to use inet_add_protocol() to add
+us as a protocol in front of UDP.  When we receive a packet, if the
+packet is for us, keep our cloned copy by munge iph->protocol to
+something unused (e.g. 254) and it will not get delivered to any body
+else.  This is because the iph->protocol is checked on each loop.  and
+raw sockets use iph->protocol to demultiplex.  (Note that it is
+sufficient to alter the (MAX_INET_PROTOS-1) part of the protocol number
+because this is what the protocol is hashed on.  So iph->protocol++
+would be sufficient.  Otherwise, if the packet is not for us, just free
+the sk_buff and return.
+
+The approach to UDP on 2.6 kernels is just like for RAWIP (steal the
+existing rcv and err_handler functions. but for UDP we do not have to
+increment module counts because it is kernel resident.  In the receive
+function, if the packet is for us, clone it and pass the clone up and
+free the original.  If it is not for us, simply pass it to the replaced
+functions.
+
+One purpose of implementing UDP and RAWIP in this fashion is to check
+performance testing comparisions between the STREAMS-based UDP and the
+socket-based UDP to answer the perennial question (which is faster?).
+
+
+=========================================================================
+
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by
+ the source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and the
+ Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: tw=72 nocindent

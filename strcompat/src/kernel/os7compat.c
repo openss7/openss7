@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/30 10:45:48 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/18 17:54:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/30 10:45:48 $ by $Author: brian $
+ Last Modified $Date: 2006/04/18 17:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.9  2006/04/18 17:54:43  brian
+ - added some strategic prefetches
+
  Revision 0.9.2.8  2006/03/30 10:45:48  brian
  - rationalized to working drivers
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/30 10:45:48 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/18 17:54:43 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/30 10:45:48 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/18 17:54:43 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -100,7 +103,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/30 10:45:48 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/18 17:54:43 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -561,6 +564,11 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_
 		mblk_t *mp;
 
 		while ((mp = getq(q))) {
+
+			prefetch(mp->b_datap);
+			prefetch(mp->b_rptr);
+			prefetch(mp->b_cont);
+
 			/* Fast Path */
 			if ((rtn = proc(q, mp)) == QR_DONE) {
 				freemsg(mp);
@@ -674,6 +682,10 @@ ss7_oput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
 
+	prefetch(mp->b_datap);
+	prefetch(mp->b_rptr);
+	prefetch(mp->b_cont);
+
 	if (s->oq) {
 		if (s->o_prim) {
 			ss7_putq(s->oq, mp, s->o_prim);
@@ -732,6 +744,10 @@ int streamscall
 ss7_iput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
+
+	prefetch(mp->b_datap);
+	prefetch(mp->b_rptr);
+	prefetch(mp->b_cont);
 
 	if (s->iq) {
 		if (s->i_prim) {

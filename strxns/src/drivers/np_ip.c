@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/13 18:32:50 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/18 18:00:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/13 18:32:50 $ by $Author: brian $
+ Last Modified $Date: 2006/04/18 18:00:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.2  2006/04/18 18:00:45  brian
+ - working up DL and NP drivers
+
  Revision 0.9.2.1  2006/04/13 18:32:50  brian
  - working up DL and NP drivers.
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/13 18:32:50 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/18 18:00:45 $"
 
-static char const ident[] = "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/13 18:32:50 $";
+static char const ident[] =
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/18 18:00:45 $";
 
 /*
  *  This is a NPI connectionless driver for the IP subsystem.  The purpose of this driver is to
@@ -73,9 +77,9 @@ static char const ident[] = "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.1 
 
 #include <linux/bitops.h>
 
-#define d_tst_bit(nr,addr)	test_bit(nr,addr)
-#define d_set_bit(nr,addr)	__set_bit(nr,addr)
-#define d_clr_bit(nr,addr)	__clear_bit(nr,addr)
+#define n_tst_bit(nr,addr)	test_bit(nr,addr)
+#define n_set_bit(nr,addr)	__set_bit(nr,addr)
+#define n_clr_bit(nr,addr)	__clear_bit(nr,addr)
 
 #include <linux/interrupt.h>
 
@@ -84,7 +88,7 @@ static char const ident[] = "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.1 
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.1 $) $Date: 2006/04/13 18:32:50 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2006/04/18 18:00:45 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -577,6 +581,11 @@ n_conn_req(queue_t *q, mblk_t *mp)
 		goto badopt;
 	if (p->DEST_offset == 0)
 		goto noaddr;
+	if (mp->b_cont != NULL && msgsize(mp->b_cont) > np->info.CDATA_size)
+		goto baddata;
+      baddata:
+	err = NBADDATA;
+	goto error;
       noaddr:
 	err = NNOADDR;
 	goto error;
@@ -592,12 +601,28 @@ n_conn_req(queue_t *q, mblk_t *mp)
       error:
 	return n_error_ack(q, *(np_long *) mp->b_rptr, err);
 }
+
+
+/**
+ * n_conn_res - accept a specified NS connection indication on the requested stream
+ * @q: write queue
+ * @mp: N_CONN_RES message
+ *
+ * There is a slight variation on normal NPI Revision 2.0.0 semantics here: the Responding Address
+ * is, here, the remote address(es) to which the connection is to be formed, rather than the
+ * local address(es) with which the connection is established.  This is only necessary, however, for
+ * multihomed operation, where the NS user is the only one aware of the other remote addresses from
+ * the message.
+ */
 STATIC INLINE int
 n_conn_res(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 	N_conn_res_t *p;
 	int err;
+	struct np *ap;
+	mblk_t *cp;
+	N_qos_sel_conn_ip_t qos = { N_QOS_SEL_CONN_IP, 64, 0, 576, };
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
@@ -606,6 +631,37 @@ n_conn_res(queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if (mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length)
 		goto badopt;
+	if (mp->b_cont != NULL && msgsize(mp->b_cont) > np->info.CDATA_size)
+		goto baddata;
+	if (p->TOKEN_value != 0 && (ap = np_find_token(p->TOKEN_value)) == NULL)
+		goto badtoken;
+	if ((cp = cp_find_sequence(p->SEQ_number)) == NULL)
+		goto badseq;
+	if (p->RES_length != 0) {
+	}
+	if (p->QOS_length != 0) {
+		if (p->QOS_length != sizeof(N_qos_sel_conn_ip_t))
+			goto badqostype;
+		bcopy(mp->b_rptr + p->QOS_offset, &qos, p->QOS_length);
+		if (qos.n_qos_type != N_QOS_SEL_CONN_IP)
+			goto badqostype;
+		if (qos.ttl > 255)
+			goto badqosparam;
+	}
+      badqosparam:
+	err = NBADQOSPARAM;
+	goto error;
+      badqostype:
+	err = NBADQOSTYPE;
+	goto error;
+      badseq:
+	err = NBADSEQ;
+	goto error;
+      badtoken:
+	err = NBADTOKEN;
+      baddata:
+	err = NBADDATA;
+	goto error;
       badopt:
 	err = NBADOPT;
 	goto error;
@@ -808,6 +864,16 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
       error:
 	return n_error_ack(q, *(np_long *) mp->b_rptr, err);
 }
+
+/**
+ * n_optmgmt_req - options management request
+ * @q: write queue
+ * @mp: the N_OPTMGMT_REQ message
+ *
+ * It might be an idea to define some provider-specific flags.  Some things could be performing or
+ * not performing SAR, cooked and uncooked headers, and the like.  Another would be promiscuous mode
+ * (processing packets with packet type == PACKET_OTHERHOST).
+ */
 STATIC INLINE int
 n_optmgmt_req(queue_t *q, mblk_t *mp)
 {
@@ -818,6 +884,11 @@ n_optmgmt_req(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	p = (typeof(p)) mp->b_rptr;
+	if (mp->b_wtpr < mp->b_rptr + p->QOS_offset + p->QOS_length)
+		goto badqos;
+      badqos:
+	err = NBADOPT;
+	goto error;
       emsgsize:
 	err = -EMSGSIZE;
 	goto error;
@@ -873,6 +944,11 @@ n_reset_res(queue_t *q, mblk_t *mp)
 	return n_error_ack(q, *(np_long *) mp->b_rptr, err);
 }
 
+/**
+ * np_w_proto - process M_PROTO/M_PCPROTO messages on the write queue
+ * @q: write queue
+ * @mp: the M_PROTO/M_PCPROTO message
+ */
 STATIC INLINE fastcall __hot_put int
 np_w_proto(queue_t *q, mblk_t *mp)
 {

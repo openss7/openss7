@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/02/22 11:37:19 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/04/18 17:55:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/22 11:37:19 $ by $Author: brian $
+ Last Modified $Date: 2006/04/18 17:55:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.126  2006/04/18 17:55:04  brian
+ - added some strategic prefetches
+
  Revision 0.9.2.125  2006/02/22 11:37:19  brian
  - split giant wait queue into 4 independent queues
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/02/22 11:37:19 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/04/18 17:55:04 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/02/22 11:37:19 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/04/18 17:55:04 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -2004,6 +2007,14 @@ putp_fast(queue_t *q, mblk_t *mp)
 	{
 		qi_putp_t qi_putp;
 
+		/* prefetch private structure */
+		prefetch(q->q_ptr);
+
+		/* prefetch most used message components */
+		prefetch(mp->b_datap);
+		prefetch(mp->b_rptr);
+		prefetch(mp->b_cont);
+
 		dassert(q->q_qinfo != NULL);
 		dassert(q->q_qinfo->qi_putp != NULL);
 		/* some weirdness in older compilers */
@@ -2079,6 +2090,9 @@ srvp_fast(queue_t *q)
 #endif
 		{
 			qi_srvp_t qi_srvp;
+
+			/* prefetch private structure */
+			prefetch(q->q_ptr);
 
 			set_bit(QSVCBUSY_BIT, &q->q_flag);
 			dassert(q->q_qinfo);
@@ -2808,6 +2822,8 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	qi_qopen_t q_open;
 
+	prefetch(q->q_ptr);
+
 	dassert(q);
 	dassert(q->q_qinfo);
 
@@ -2843,6 +2859,8 @@ __unlikely streams_fastcall int
 qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	qi_qclose_t q_close;
+
+	prefetch(q->q_ptr);
 
 	dassert(q);
 	dassert(q->q_qinfo);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/13 18:32:49 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/04/18 18:00:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/13 18:32:49 $ by $Author: brian $
+ Last Modified $Date: 2006/04/18 18:00:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.5  2006/04/18 18:00:44  brian
+ - working up DL and NP drivers
+
  Revision 0.9.2.4  2006/04/13 18:32:49  brian
  - working up DL and NP drivers.
 
@@ -64,10 +67,24 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/13 18:32:49 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/04/18 18:00:44 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/13 18:32:49 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/04/18 18:00:44 $";
+
+/*
+ *  This multiplexing driver is a master device driver for Data Link Provider streams prsenting a
+ *  Data Link Provider Interface (DLPI Revision 2.0.0) Service Interface at the upper boundary.  It
+ *  collects a wide range of DLPI drivers into a single device heirarchy using the Linux device
+ *  independent packet layer.
+ *
+ *  CD streams presenting the Communications Device Interface (CDI) Service Interface can be linked
+ *  under the multiplexing driver at the lower multiplex.  Rather than directly providing
+ *  connections to the link layer, most of these drivers will marshall packets to and from the Linux
+ *  device independent packet layer.  As such, it is not necessary to link any CDI streams for the
+ *  data link provider to be of use.  Data Link provider streams can access any Linux packet system
+ *  network device.
+ */
 
 #include <sys/os7/compat.h>
 
@@ -87,7 +104,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2006/04/13 18:32:49 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2006/04/18 18:00:44 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI OSI Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -258,23 +275,719 @@ enum {
 	DL_MINOR_FREE
 };
 
-struct dl_actions {
-	int streamscall (*dl_attach) (queue_t *q, struct dl * dl, dl_ulong ppa);
-	int streamscall (*dl_deattach) (queue_t *q, struct dl * dl);
-	int streamscall (*dl_bind) (queue_t *q, struct dl * dl, dl_ulong sap, dl_ushort dl_flags);
-	int streamscall (*dl_subs_bind) (queue_t *q, struct dl * dl, struct netbuf * sap,
-					 dl_ulong dl_subs_bind_class);
-	int streamscall (*dl_subs_unbind) (queue_t *q, struct dl * dl, struct netbuf * sap);
-	int streamscall (*dl_unbind) (queue_t *q, struct dl * dl);
-	int streamscall (*dl_unitdata) (queue_t *q, struct dl * dl, struct netbuf * dst);
-	int streamscall (*dl_udqos) (queue_t *q, struct dl * dl, struct netbuf * opt);
-	int streamscall (*dl_option) (queue_t *q, struct dl * dl, dl_ulong dl_primitive);
-	int streamscall (*dl_connect) (queue_t *q, struct dl * dl, struct netbuf * dst);
-	int streamscall (*dl_reset) (queue_t *q, struct dl * dl, dl_ulong dl_origin,
-				     dl_ulong dl_reason);
-	int streamscall (*dl_xid) (queue_t *q, struct dl * dl, dl_ulong dl_flag);
-	int streamscall (*dl_test) (queue_t *q, struct dl * dl, dl_ulong dl_flag);
+typedef streamscall int (*dl_event_t) (queue_t *, struct dl *, union dl_event *);
+typedef streamscall int (*cd_event_t) (queue_t *, struct cd *, union cd_event *);
+
+STATIC kmem_cache_t *dl_priv_cachep;
+STATIC kmem_cache_t *dl_link_cachep;
+
+struct dl {
+	STR_DECLARATION (struct dl);	/* Stream declaration */
+	struct dl_info_ack dl_info;	/* information structure */
+	dl_event_t dl_event;		/* event interface */
+	bufq_t dl_conq;			/* connection indication queue */
+	uint dl_coninds;		/* outstanding connection indications */
+	bufq_t dl_datq;			/* data indications */
+	uint dl_datinds;		/* outstanding data indications */
+	dl_ulong dl_ppa;		/* attached PPA */
+	dl_ulong dl_sap;		/* partial DLSAP */
+	dl_ulong dl_level;		/* promiscuity level */
+	dl_ulong dl_xidtest_flg;	/* auto XID/TEST flags */
+	char dl_addr_buffer[64];	/* address buffer */
+	uint dl_addr_length;		/* address length */
+	char dl_qos_buffer[64];		/* quality of service buffer */
+	uint dl_qos_length;		/* quality of service length */
+	char dl_qos_range_buffer[64];	/* quality of service range buffer */
+	uint dl_qos_range_length;	/* quality of service range length */
+	char dl_brdcst_addr_buffer[64];	/* broadcast address buffer */
+	char dl_brdcst_addr_length;	/* broadcast address length */
 };
+
+struct cd {
+	STR_DECLARATION (struct cd);	/* Stream declaration */
+	struct cd_info_ack cd_info;	/* information structure */
+	cd_event_t cd_event;		/* event interface */
+	bufq_t cd_conq;			/* connection indication queue */
+	uint cd_coninds;		/* outstanding connection indications */
+	bufq_t cd_datq;			/* data indication queue */
+	uint cd_datinds;		/* outstanding data indications */
+};
+
+STATIC INLINE fastcall struct dl *
+dl_get(struct dl *dl)
+{
+	if (dl)
+		atomic_inc(&dl->refcnt);
+	return (dl);
+}
+STATIC INLINE fastcall void
+dl_put(struct dl *dl)
+{
+	if (dl && atomic_dec_and_test(&dl->refcnt))
+		kmem_cache_free(dl_priv_cachep);
+}
+STATIC INLINE fastcall void
+dl_release(struct dl **dlp)
+{
+	dl_put(xchg(dlp, NULL));
+}
+STATIC void
+dl_alloc(void)
+{
+	struct dl *dl;
+
+	if ((dl = kmem_cache_alloc(dl_priv_cachep, SLAB_ATOMIC))) {
+		bzero(dl, sizeof(*dl));
+		atomic_set(&dl->refcnt, 1);
+		spin_lock_init(&dl->lock);	/* "dl-lock" */
+		dl->priv_put = &dl_put;
+		dl->priv_get = &dl_get;
+	}
+	return (dl);
+}
+
+STATIC INLINE fastcall struct cd *
+cd_get(struct cd *cd)
+{
+	if (cd)
+		atomic_inc(&cd->refcnt);
+	return (cd);
+}
+STATIC INLINE fastcall void
+cd_put(struct cd *cd)
+{
+	if (cd && atomic_dec_and_test(&cd->refcnt))
+		kmem_cache_free(dl_link_cachep);
+}
+STATIC INLINE fastcall void
+cd_release(struct cd **cdp)
+{
+	cd_put(xchg(cdp, NULL));
+}
+STATIC void
+cd_alloc(void)
+{
+	struct cd *cd;
+
+	if ((cd = kmem_cache_alloc(dl_link_cachep, SLAB_ATOMIC))) {
+		bzero(cd, sizeof(*cd));
+		atomic_set(&cd->refcnt, 1);
+		spin_lock_init(&cd->lock);	/* "cd-lock" */
+		cd->priv_put = &cd_put;
+		cd->priv_get = &cd_get;
+	}
+	return (cd);
+}
+
+/*
+ *  STATE CHANGES
+ */
+STATIC INLINE fastcall dl_ulong
+dl_get_state(struct dl * dl)
+{
+	return (dl->dl_info.dl_current_state);
+}
+STATIC INLINE fastcall dl_ulong
+dl_get_statef(struct dl * dl)
+{
+	return (1 << dl_get_state(dl));
+}
+STATIC INLINE fastcall void
+dl_set_state(struct dl *dl, dl_ulong state)
+{
+	dl->dl_info.dl_current_state = state;
+}
+
+STATIC INLINE fastcall cd_ulong
+cd_get_state(struct cd *cd)
+{
+	return (cd->cd_info.cd_current_state);
+}
+STATIC INLINE fastcall cd_ulong
+cd_get_statef(struct cd * cd)
+{
+	return (1 << cd_get_state(cd));
+}
+STATIC INLINE fastcall void
+cd_set_state(struct cd *cd, cd_ulong state)
+{
+	cd->cd_info.cd_current_state = state;
+}
+
+/*
+ *  DL PROVIDER PRIMITIVES SENT UPSTREAM
+ *  ====================================
+ */
+
+STATIC fastcall int
+dl_reply_ack(queue_t *q, struct dl *dl, dl_ulong dl_primitive, dl_long error, mblk_t *mp)
+{
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+
+	if (likely(error == 0)) {
+		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_band = 0;
+		p->ok_ack.dl_primitive = DL_OK_ACK;
+		p->ok_ack.dl_correct_primitive = dl_primitive;
+		mp->b_wptr = mp->b_rptr + sizeof(p->ok_ack);
+		mp->b_cont = NULL;
+		qreply(q, mp);
+		return (QR_ABSORBED);
+	}
+	/* Note: don't ever call this with a positive queue return code other than QR_DONE (which
+	   is really zero), because those codes overlap with provider specific error codes.  The
+	   ones to really watch out for are QR_ABSORBED and QR_STRIP. */
+	switch (error) {
+	case -ENOBUFS:
+	case -ENOMEM:
+	case -EAGAIN:
+	case -EBUSY:
+		/* These do not generate an error ack, but get returned directly */
+		return (error);
+	case -EPROTO:
+	case -EMSGSIZE:
+	case -EINVAL:
+	case -EFAULT:
+	case -EOPNOTSUPP:
+		break;
+	}
+	mp->b_datap->db_type = M_PCPROTO;
+	mp->b_band = 0;
+	p->error_ack.dl_primitive = DL_ERROR_ACK;
+	p->error_ack.dl_error_primitive = dl_primitive;
+	p->error_ack.dl_errno = error > 0 ? error : DL_SYSERR;
+	p->error_ack.dl_unix_errno = error < 0 ? -errno : 0;
+	if (mp->b_cont)
+		freemsg(XCHG(&mp->b_cont, NULL));
+	dl_set_state(dl, dl->i_oldstate);
+	qreply(q, mp);
+	return (QR_ABSORBED);
+}
+STATIC fastcall int
+dl_reply_err(queue_t *q, struct dl *dl, dl_ulong dl_primitive, dl_long error, mblk_t *mp)
+{
+	if (likely(error == 0))
+		return (QR_DONE);
+	switch (error) {
+	case -ENOBUFS:
+	case -ENOMEM:
+	case -EAGAIN:
+	case -EBUSY:
+		/* These do not generate an error, but get returned directly */
+		return (error);
+	case -EPROTO:
+	case -EMSGSIZE:
+	case -EINVAL:
+	case -EFAULT:
+	case -EOPNOTSUPP:
+		break;
+	}
+	mp->b_datap->db_type = M_ERROR;
+	mp->b_band = 0;
+	mp->b_wptr = mp->b_rptr;
+	*mp->b_wptr++ = EPROTO;
+	*mp->b_wptr++ = EPROTO;
+	if (mp->b_cont)
+		freemsg(XCHG(&mp->b_cont, NULL));
+	qreply(q, mp);
+	return (QR_ABSORBED);
+}
+
+STATIC INLINE fastcall __hot_get int
+dl_unitdata_ind(queue_t *q, struct dl *dl, struct dle_unitdata_ind *dle)
+{
+	dl_unitdata_ind_t *p;
+	mblk_t *mp;
+	dl_ulong dl_dest_addr_length = dle->dl_dest_addr_length;
+	dl_ulong dl_src_addr_length = dle->dl_src_addr_length;
+	size_t size = sizeof(*p) + dl_dest_addr_length + dl_src_addr_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_unitdata_ind_t *) mp->b_wptr++;
+	p->dl_primitive = DL_UNITDATA_IND;
+	p->dl_dest_addr_length = dl_dest_addr_length;
+	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	p->dl_src_addr_length = dl_src_addr_length;
+	p->dl_src_addr_offset = dl_src_addr_length ? sizeof(*p) + dl_dest_addr_length : 0;
+	p->dl_group_address = dle->dl_group_address;
+	mp->b_wptr += sizeof(*p);
+	if (dl_dest_addr_length) {
+		bcopy(dle->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
+		mp->b_wptr += dl_dest_addr_length;
+	}
+	if (dl_src_addr_length) {
+		bcopy(dle->dl_src_addr_buffer, mp->b_wptr, dl_src_addr_length);
+		mp->b_wptr += dl_src_addr_length;
+	}
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      ebusy:
+	return (-EBUSY);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC INLINE fastcall __hot_get int
+dl_uderror_ind(queue_t *q, struct dl *dl, struct dle_uderror_ind *dle)
+{
+	dl_uderror_ind_t *p;
+	mblk_t *mp;
+	dl_ulong dl_dest_addr_length = dle->dl_dest_addr_length;
+	size_t size = sizeof(*p) + dl_dest_addr_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_uderror_ind_t *) mp->b_rptr;
+	p->dl_primitive = DL_UDERROR_IND;
+	p->dl_dest_addr_length = dl_dest_addr_length;
+	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	p->dl_unix_errno = dle->dl_unix_errno;
+	p->dl_errno = dle->dl_errno;
+	mp->b_wptr += sizeof(*p);
+	if (dl_dest_addr_length) {
+		bcopy(dle->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
+		mp->b_wptr += dl_dest_addr_length;
+	}
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      ebusy:
+	return (-EBUSY);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC int
+dl_connect_ind(queue_t *q, struct dl *dl, struct dle_connect_ind *dle)
+{
+	dl_connect_ind_t *p;
+	mblk_t *mp;
+	dl_ulong dl_called_addr_length = dle->dl_called_addr_length;
+	dl_ulong dl_calling_addr_length = dle->dl_calling_addr_length;
+	dl_ulong dl_qos_length = dle->dl_qos_length;
+	size_t size = sizeof(*p) + dl_called_addr_length + dl_calling_addr_length + dl_qos_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
+	/* FIXME: queue the connection indication */
+	if (unlikely(dl->dl_max_conind < dl->dl_coninds)) {
+		/* can't indicate, but can queue it */
+		return (0);
+	}
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_connect_ind_t *) mp->b_wptr;
+	p->dl_primitive = DL_CONNECT_IND;
+	p->dl_correlation = token;
+	p->dl_called_addr_length = dl_called_addr_length;
+	p->dl_called_addr_offset = dl_called_addr_length ? sizeof(*p) : 0;
+	p->dl_calling_addr_length = dl_calling_addr_length;
+	p->dl_calling_addr_offset = dl_calling_addr_length ? sizeof(*p) + dl_called_addr_length : 0;
+	p->dl_qos_length = dl_qos_length;
+	p->dl_qos_offset =
+	    dl_qos_length ? sizeof(*p) + dl_called_addr_length + dl_calling_addr_length : 0;
+	p->dl_growth = 0;
+	mp->b_wptr += sizeof(*p);
+	if (dl_called_addr_length) {
+		bcopy(dle->dl_called_addr_buffer, mp->b_wptr, dl_called_addr_length);
+		mp->b_wptr += dl_called_addr_length;
+	}
+	if (dl_calling_addr_length) {
+		bcopy(dle->dl_calling_addr_buffer, mp->b_wptr, dl_calling_addr_length);
+		mp->b_wptr += dl_calling_addr_length;
+	}
+	if (dl_qos_length) {
+		bcopy(dle->dl_qos_buffer, mp->b_wptr, dl_qos_length);
+		mp->b_wptr += dl_qos_length;
+	}
+	dl_set_state(dl, DL_INCON_PENDING);
+	putnext(q, mp);
+	return (0);
+      ebusy:
+	return (-EBUSY);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC int
+dl_connect_con(queue_t *q, struct dl *dl, struct dle_connect_con *dle)
+{
+	dl_connect_con_t *p;
+	mblk_t *mp;
+	dl_ulong dl_resp_addr_length = dle->dl_resp_addr_length;
+	dl_ulong dl_qos_length = dle->dl_qos_length;
+	size_t size = sizeof(*p) + dl_resp_addr_length + dl_qos_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_connect_con_t *) mp->b_wptr;
+	p->dl_primitive = DL_CONNECT_CON;
+	p->dl_resp_addr_length = dl_resp_addr_length;
+	p->dl_resp_addr_offset = dl_resp_addr_length ? sizeof(*p) : 0;
+	p->dl_qos_length = dl_qos_length;
+	p->dl_qos_offset = dl_qos_length ? sizeof(*p) + dl_resp_addr_length : 0;
+	p->dl_growth = 0;
+	mp->b_wptr += sizeof(*p);
+	if (dl_resp_addr_length) {
+		bcopy(dle->dl_resp_addr_buffer, mp->b_wptr, dl_resp_addr_length);
+		mp->b_wptr += dl_resp_addr_length;
+	}
+	if (dl_qos_length) {
+		bcopy(dle->dl_qos_buffer, mp->b_wptr, dl_qos_length);
+		mp->b_wptr += dl_qos_length;
+	}
+	dl_set_state(dl, DL_DATAXFER);
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC int
+dl_disconnect_ind(queue_t *q, struct dl *dl, struct dle_disconnect_ind *dle)
+{
+	dl_disconnect_ind_t *p;
+	mblk_t *mp;
+	const size_t size = sizeof(*p);
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_disconect_ind_t *) mp->b_wptr;
+	p->dl_primitive = DL_DISCONNECT_IND;
+	p->dl_originator = dle->dl_originator;
+	p->dl_reason = dle->dl_reason;
+	p->dl_correlation = (dl_ulong) (long) dle->dl_correlation;
+	mp->b_wptr += sizeof(*p);
+	if (dle->dl_correlation != NULL) {
+		bufq_dequeue(&dl->dl_conq, dle->dl_correlation);
+		freemsg(dle->dl_correlation);
+		if (bufq_length(&dl->dl_conq) < 1)
+			dl_set_state(dl, DL_IDLE);
+		else
+			dl_set_state(dl, DL_INCON_PENDING);
+	} else
+		dl_set_state(dl, DL_IDLE);
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC INLINE fastcall __hot_get int
+dl_reset_ind(queue_t *q, struct dl *dl, struct dle_reset_ind *dle)
+{
+	dl_reset_ind_t *p;
+	mblk_t *mp;
+	const size_t size = sizeof(*p);
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_reset_ind_t *) mp->b_wptr;
+	p->dl_primitive = DL_RESET_IND;
+	p->dl_originator = dle->dl_originator;
+	p->dl_reason = dle->dl_reason;
+	mp->b_wptr += sizeof(*p);
+	dl_set_state(dl, DL_PROV_RESET_PENDING);
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC INLINE fastcall __hot_get int
+dl_reset_con(queue_t *q)
+{
+	dl_reset_con_t *p;
+	mblk_t *mp;
+	const size_t size = sizeof(*p);
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_reset_con_t *) mp->b_wptr;
+	p->dl_primitive = DL_RESET_CON;
+	mp->b_wptr += sizeof(*p);
+	dl_set_state(dl, DL_DATAXFER);
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC INLINE fastcall __hot_get int
+dl_data_ack_ind(queue_t *q, struct dl *dl, struct dle_data_ack_ind *dle)
+{
+	dl_data_ack_ind_t *p;
+	mblk_t *mp;
+	dl_ulong dl_dest_addr_length = dle->dl_dest_addr_length;
+	dl_ulong dl_src_addr_length = dle->dl_src_addr_length;
+	size_t size = sizeof(*p) + dl_dest_addr_length + dl_src_addr_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_data_ack_ind_t *) mp->b_wptr;
+	p->dl_primitive = DL_DATA_ACK_IND;
+	p->dl_dest_addr_length = dl_dest_addr_length;
+	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	p->dl_src_addr_length = dl_src_addr_length;
+	p->dl_src_addr_offset = dl_src_addr_length ? sizeof(*p) + dl_dest_addr_length : 0;
+	p->dl_priority = dle->dl_priority;
+	p->dl_service_class = dle->dl_service_class;
+	mp->b_wptr += sizeof(*p);
+	if (dl_dest_addr_length) {
+		bcopy(dle->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
+		mp->b_wptr += dl_dest_addr_length;
+	}
+	if (dl_src_addr_length) {
+		bcopy(dle->dl_src_addr_buffer, mp->b_wptr, dl_src_addr_length);
+		mp->b_wptr += dl_src_addr_length;
+	}
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC INLINE fastcall __hot_get int
+dl_data_ack_status_ind(queue_t *q, struct dl *dl, struct dle_data_ack_status_ind *dle)
+{
+	dl_data_ack_status_ind_t *p;
+	mblk_t *mp;
+	const size_t size = sizeof(*p);
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_data_ack_status_ind_t *) mp->b_wptr;
+	p->dl_primitive = DL_DATA_ACK_STATUS_IND;
+	p->dl_correlation = dle->dl_correlation;
+	p->dl_status = dle->dl_status;
+	mp->b_wptr += sizeof(*p);
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC INLINE fastcall __hot_get int
+dl_reply_ind(queue_t *q, struct dl *dl, struct dle_reply_ind *dle)
+{
+	dl_reply_ind_t *p;
+	mblk_t *mp;
+	dl_ulong dl_dest_addr_length = dle->dl_dest_addr_length;
+	dl_ulong dl_src_addr_length = dle->dl_src_addr_length;
+	size_t size = sizeof(*p) + dl_dest_addr_length + dl_src_addr_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_reply_ind_t *) mp->b_wptr;
+	p->dl_primitive = DL_REPLY_IND;
+	p->dl_dest_addr_length = dl_dest_addr_length;
+	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	p->dl_src_addr_length = dl_src_addr_length;
+	p->dl_src_addr_offset = dl_src_addr_length ? sizeof(*p) + dl_dest_addr_length : 0;
+	p->dl_priority = dl_priority;
+	p->dl_service_class = dl_service_class;
+	mp->b_wptr += sizeof(*p);
+	if (dl_dest_addr_length) {
+		bcopy(dle->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
+		mp->b_wptr += dl_dest_addr_length;
+	}
+	if (dl_src_addr_length) {
+		bcopy(dle->dl_src_addr_buffer, mp->b_wptr, dl_src_addr_length);
+		mp->b_wptr += dl_src_addr_length;
+	}
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC INLINE fastcall __hot_get int
+dl_reply_status_ind(queue_t *q, dl_ulong dl_correlation, dl_ulong dl_status)
+{
+	dl_reply_status_ind_t *p;
+	mblk_t *mp;
+	size_t size = sizeof(*p);
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_reply_status_ind_t *) mp->b_wptr;
+	p->dl_primitive = DL_REPLY_STATUS_IND;
+	p->dl_correlation = dle->dl_correlation;
+	p->dl_status = dle->dl_status;
+	mp->b_wptr += sizeof(*p);
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC INLINE fastcall __hot_get int
+dl_reply_update_status_ind(queue_t *q, dl_ulong dl_correlation, dl_ulong dl_status)
+{
+	dl_reply_update_status_ind_t *p;
+	mblk_t *mp;
+	size_t size = sizeof(*p);
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_reply_update_status_ind_t *) mp->b_wptr;
+	p->dl_primitive = DL_REPLY_UPDATE_STATUS_IND;
+	p->dl_correlation = dle->dl_correlation;
+	p->dl_status = dle->dl_status;
+	mp->b_wptr += sizeof(*p);
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC int
+dl_xid_ind(queue_t *q, struct dl *dl, struct dle_xid_ind *dle)
+{
+	dl_xid_ind_t *p;
+	mblk_t *mp;
+	dl_ulong dl_dest_addr_length = dle->dl_dest_addr_length;
+	dl_ulong dl_src_addr_length = dle->dl_src_addr_length;
+	size_t size = sizeof(*p) + dl_dest_addr_length + dl_src_addr_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_xid_ind_t *) mp->b_wptr;
+	p->dl_primitive = DL_XID_IND;
+	p->dl_flag = dle->dl_flag;
+	p->dl_dest_addr_length = dl_dest_addr_length;
+	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	p->dl_src_addr_length = dl_src_addr_length;
+	p->dl_src_addr_offset = dl_src_addr_length ? sizeof(*p) + dl_dest_addr_length : 0;
+	mp->b_wptr += sizeof(*p);
+	if (dl_dest_addr_length) {
+		bcopy(dle->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
+		mp->b_wptr += dl_dest_addr_length;
+	}
+	if (dl_src_addr_length) {
+		bcopy(dle->dl_src_addr_buffer, mp->b_wptr, dl_src_addr_length);
+		mp->b_wptr += dl_src_addr_length;
+	}
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC int
+dl_xid_con(queue_t *q, struct dl *dl, struct dle_xid_con *dle)
+{
+	dl_xid_con_t *p;
+	mblk_t *mp;
+	dl_ulong dl_dest_addr_length = dle->dl_dest_addr_length;
+	dl_ulong dl_src_addr_length = dle->dl_src_addr_length;
+	size_t size = sizeof(*p) + dl_dest_addr_length + dl_src_addr_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_xid_con_t *) mp->b_wptr;
+	p->dl_primitive = DL_XID_CON;
+	p->dl_flag = dle->dl_flag;
+	p->dl_dest_addr_length = dl_dest_addr_length;
+	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	p->dl_src_addr_length = dl_src_addr_length;
+	p->dl_src_addr_offset = dl_src_addr_length ? sizeof(*p) + dl_dest_addr_length : 0;
+	mp->b_wptr += sizeof(*p);
+	if (dl_dest_addr_length) {
+		bcopy(dle->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
+		mp->b_wptr += dl_dest_addr_length;
+	}
+	if (dl_src_addr_length) {
+		bcopy(dle->dl_src_addr_buffer, mp->b_wptr, dl_src_addr_length);
+		mp->b_wptr += dl_src_addr_length;
+	}
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC int
+dl_test_ind(queue_t *q, struct netbuf *dst, struct netbuf *src, dl_ulong dl_flag)
+{
+	dl_test_ind_t *p;
+	mblk_t *mp;
+	dl_ulong dl_dest_addr_length = dle->dl_dest_addr_length;
+	dl_ulong dl_src_addr_length = dle->dl_src_addr_length;
+	size_t size = sizeof(*p) + dl_dest_addr_length + dl_src_addr_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_test_ind_t *) mp->b_wptr;
+	p->dl_primitive = DL_TEST_IND;
+	p->dl_flag = dle->dl_flag;
+	p->dl_dest_addr_length = dl_dest_addr_length;
+	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	p->dl_src_addr_length = dl_src_addr_length;
+	p->dl_src_addr_offset = dl_src_addr_length ? sizeof(*p) + dl_dest_addr_length : 0;
+	mp->b_wptr += sizeof(*p);
+	if (dl_dest_addr_length) {
+		bcopy(dle->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
+		mp->b_wptr += dl_dest_addr_length;
+	}
+	if (dl_src_addr_length) {
+		bcopy(dle->dl_src_addr_buffer, mp->b_wptr, dl_src_addr_length);
+		mp->b_wptr += dl_src_addr_length;
+	}
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
+STATIC int
+dl_test_con(queue_t *q, struct netbuf *dst, struct netbuf *src, dl_ulong dl_flag)
+{
+	dl_test_con_t *p;
+	mblk_t *mp;
+	dl_ulong dl_dest_addr_length = dle->dl_dest_addr_length;
+	dl_ulong dl_src_addr_length = dle->dl_src_addr_length;
+	size_t size = sizeof(*p) + dl_dest_addr_length + dl_src_addr_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (dl_test_con_t *) mp->b_wptr;
+	p->dl_primitive = DL_TEST_CON;
+	p->dl_flag = dle->dl_flag;
+	p->dl_dest_addr_length = dl_dest_addr_length;
+	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	p->dl_src_addr_length = dl_src_addr_length;
+	p->dl_src_addr_offset = dl_src_addr_length ? sizeof(*p) + dl_dest_addr_length : 0;
+	mp->b_wptr += sizeof(*p);
+	if (dl_dest_addr_length) {
+		bcopy(dle->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
+		mp->b_wptr += dl_dest_addr_length;
+	}
+	if (dl_src_addr_length) {
+		bcopy(dle->dl_src_addr_buffer, mp->b_wptr, dl_src_addr_length);
+		mp->b_wptr += dl_src_addr_length;
+	}
+	mp->b_cont = dle->dl_data_blocks;
+	putnext(q, mp);
+	return (0);
+      enobufs:
+	return (-ENOBUFS);
+}
 
 /*
  *  Service Primitives passed downwards -- lower multiplex or module
@@ -561,755 +1274,6 @@ cd_modem_sig_poll(queue_t *q)
 }
 
 /*
- *  Service Primitives passed upwards -- upper multiplex or module
- *  --------------------------------------------------------------
- */
-STATIC mblk_t *
-dl_info_ack(queue_t *q)
-{
-	struct dl *dl = DL_PRIV(q);
-	dl_info_ack_t *p;
-	mblk_t *mp;
-	size_t len = dl->add.len + dl->qos.len + dl->qor.len + dl->brd.len;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_info_ack_t *) mp->b_rptr;
-		p->dl_primitive = DL_INFO_ACK;
-		p->dl_max_sdu = dl->info.dl_max_sdu;
-		p->dl_min_sdu = dl->info.dl_min_sdu;
-		p->dl_addr_length = dl->add.len;
-		p->dl_mac_type = dl->info.dl_mac_type;
-		p->dl_reserved = 0;
-		p->dl_current_state = dlpi_get_state(dl);
-		p->dl_sap_length = dl->info.dl_sap_length;
-		p->dl_serivce_mode = dl->info.dl_service_mode;
-		p->dl_qos_length = dl->qos.len;
-		p->dl_qos_offset = (dl->qos.len ? sizeof(*p) : 0);
-		p->dl_qos_range_length = dl->qor.len;
-		p->dl_qos_range_offset = (dl->qor.len ? sizeof(*p) + dl->qos.len : 0);
-		p->dl_provider_style = dl->info.dl_provider_style;
-		p->dl_addr_offset = (dl->add.len ? sizeof(*p) + dl->qos.len + dl->qor.len : 0);
-		p->dl_version = dl->info.dl_version;
-		p->dl_brdcst_addr_length = dl->brd.len;
-		p->dl_brdcst_addr_offset =
-		    (dl->brd.len ? sizeof(*p) + dl->qos.len + dl->qor.len + dl->add.len : 0);
-		p->dl_growth = 0;
-		mp->b_wptr += sizeof(*p);
-		if (dl->qos.len) {
-			bcopy(dl->qos.buf, mp->b_wptr, dl->qos.len);
-			mp->b_wptr += dl->qos.len;
-		}
-		if (dl->qor.len) {
-			bcopy(dl->qor.buf, mp->b_wptr, dl->qor.len);
-			mp->b_wptr += dl->qor.len;
-		}
-		if (dl->add.len) {
-			bcopy(dl->add.buf, mp->b_wptr, dl->add.len);
-			mp->b_wptr += dl->add.len;
-		}
-		if (dl->brd.len) {
-			bcopy(dl->brd.buf, mp->b_wptr, dl->brd.len);
-			mp->b_wptr += dl->brd.len;
-		}
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_bind_ack(queue_t *q, struct netbuf *add, dl_ulong dl_sap, dl_ulong dl_max_conind,
-	    dl_ulong dl_xidtest_flg)
-{
-	dl_bind_ack_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + add->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_bind_ack_t *) mp->b_wptr;
-		p->dl_primitive = DL_BIND_ACK;
-		p->dl_sap = dl_sap;
-		p->dl_addr_length = add->len;
-		p->dl_addr_offset = (add->len ? sizeof(*p) : 0);
-		p->dl_max_conind = dl_max_conind;
-		p->dl_xidtest_flg = dl_xidtest_flg;
-		mp->b_wptr += sizeof(*p);
-		if (add->len) {
-			bcopy(add->buf, mp->b_wptr, add->len);
-			mp->b_wptr += add->len;
-		}
-	}
-	return (mp);
-}
-
-/**
- * dl_ok_ack - send a DL_OK_ACK and commit a pending action
- * @q: DL write queue
- * @prim: corret primitive
- * @aq: accepting queue if DL_CONNECT_RES
- * @cp: connection indication pointer if DL_CONNECT_RES or DL_DISCONNECT_REQ
- */
-STATIC int
-dl_ok_ack(queue_t *q, dl_long prim, queue_t *aq, mblk_t *cp)
-{
-	struct dl *dl = DL_PRIV(q);
-	dl_ok_ack_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_ok_ack_t *) mp->b_wptr;
-		p->dl_primitive = DL_OK_ACK;
-		p->dl_correct_primitive = prim;
-		mp->b_wptr += sizeof(*p);
-		switch (dlpi_get_state(dl)) {
-		case DL_ATTACH_PENDING:	/* Waiting ack of DL_ATTACH_REQ */
-			dlpi_set_state(dl, DL_UNBOUND);
-			break;
-		case DL_DETACH_PENDING:	/* Waiting ack of DL_DETACH_REQ */
-			dlpi_set_state(dl, DL_UNATTACHED);
-			break;
-		case DL_BIND_PENDING:	/* Waiting ack of DL_BIND_REQ */
-			swerr();	/* should be DL_BIND_ACK */
-			break;
-		case DL_UNBIND_PENDING:	/* Waiting ack of DL_UNBIND_REQ */
-			dlpi_set_state(dl, DL_UNBOUND);
-			break;
-		case DL_UDQOS_PENDING:	/* Waiting ack of DL_UDQOS_REQ */
-			dlpi_set_state(dl, DL_IDLE);
-			break;
-		case DL_OUTCON_PENDING:	/* awaiting DL_CONN_CON */
-		case DL_INCON_PENDING:	/* awaiting DL_CONN_RES */
-			swerr();
-			break;
-		case DL_CONN_RES_PENDING:	/* Waiting ack of DL_CONNECT_RES */
-			if (--dl->dl_outstanding_coninds > 0)
-				dlpi_set_state(dl, DL_INCON_PENDING);
-			else
-				dlpi_set_state(dl, DL_IDLE);
-			break;
-		case DL_USER_RESET_PENDING:	/* awaiting DL_RESET_CON */
-		case DL_PROV_RESET_PENDING:	/* awaiting DL_RESET_RES */
-			swerr();
-			break;
-		case DL_RESET_RES_PENDING:	/* Waiting ack of DL_RESET_RES */
-			dlpi_set_state(dl, DL_DATAXFER);
-			break;
-		case DL_DISCON8_PENDING:	/* Waiting ack of DL_DISC_REQ from
-						   DL_OUTCON_PENDING */
-			dlpi_set_state(dl, DL_IDLE);
-			break;
-		case DL_DISCON9_PENDING:	/* Waiting ack of DL_DISC_REQ from DL_INCON_PENDING 
-						 */
-			if (--dl->dl_outstanding_coninds > 0)
-				dlpi_set_state(dl, DL_INCON_PENDING);
-			else
-				dlpi_set_state(dl, DL_IDLE);
-			break;
-		case DL_DISCON11_PENDING:	/* Waiting ack of DL_DISC_REQ from DL_ DATAXFER */
-			dlpi_set_state(dl, DL_IDLE);
-			break;
-		case DL_DISCON12_PENDING:	/* Waiting ack of DL_DISC_REQ from
-						   DL_USER_RESET_PENDING */
-			dlpi_set_state(dl, DL_IDLE);
-			break;
-		case DL_DISCON13_PENDING:	/* Waiting ack of DL_DISC_REQ from
-						   DL_PROV_RESET_PENDING */
-			dlpi_set_state(dl, DL_IDLE);
-			break;
-		case DL_SUBS_BIND_PND:	/* Waiting ack of DL_SUBS_BIND_REQ */
-			swerr();	/* should be DL_SUBS_BIND_ACK */
-			break;
-		case DL_SUBS_UNBIND_PND:	/* Waiting ack of DL_SUBS_UNBIND_REQ */
-			dlpi_set_state(dl, DL_IDLE);
-			break;
-
-		case DL_UNATTACHED:	/* PPA not attached */
-		case DL_UNBOUND:	/* PPA attached */
-		case DL_IDLE:	/* dlsap bound, awaiting use */
-		case DL_DATAXFER:	/* connection-oriented data transfer */
-			/* If not in a pending state, then this is probably an acknowledged
-			   primitive that does not have a pending state (can be issued from any
-			   state), such as DL_PROMISCON_REQ.  Just stay in the same state and
-			   acknowledge the primitive. */
-			break;
-		}
-		qreply(q, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-	return (mp);
-}
-
-/**
- * dl_error_ack - generate a DL_ERROR_ACK upstream
- * @q: DL write queue
- * @prim: primitive in error
- * @error: zero (0) no error, positive (>0) dlpi error, negative(<0) linux error
- *
- * Generates a DL_ERROR_ACK message upstream with state recovery and error recovery.  The return
- * value from this function may be used as a return value from the procedure.
- */
-STATIC int
-dl_error_ack(queue_t *q, dl_long prim, dl_long error)
-{
-	struct dl *dl = DL_PRIV(q);
-	dl_error_ack_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_error_ack_t *) mp->b_wptr;
-		p->dl_primitive = DL_ERROR_ACK;
-		p->dl_error_primitive = prim;
-		p->dl_errno = (error < 0 ? DL_SYSERR : error);
-		p->dl_unix_errno = (error < 0 ? -error : 0);
-		mp->b_wptr += sizeof(*p);
-		switch (dlpi_get_state(dl)) {
-		case DL_UNATTACHED:
-			/* PPA not attached */
-		case DL_ATTACH_PENDING:
-			/* Waiting ack of DL_ATTACH_REQ */
-
-			dlpi_set_state(dl, DL_UNATTACHED);
-			break;
-
-		case DL_DETACH_PENDING:
-			/* Waiting ack of DL_DETACH_REQ */
-		case DL_UNBOUND:
-			/* PPA attached */
-		case DL_BIND_PENDING:
-			/* Waiting ack of DL_BIND_REQ */
-
-			dlpi_set_state(dl, DL_UNBOUND);
-			break;
-
-		case DL_UNBIND_PENDING:
-			/* Waiting ack of DL_UNBIND_REQ */
-		case DL_SUBS_BIND_PND:
-			/* Waiting ack of DL_SUBS_BIND_REQ */
-		case DL_SUBS_UNBIND_PND:
-			/* Waiting ack of DL_SUBS_UNBIND_REQ */
-		case DL_IDLE:
-			/* dlsap bound, awaiting use */
-		case DL_UDQOS_PENDING:
-			/* Waiting ack of DL_UDQOS_REQ */
-		case DL_OUTCON_PENDING:
-			/* awaiting DL_CONN_CON */
-
-			dlpi_set_state(dl, DL_IDLE);
-			break;
-
-		case DL_INCON_PENDING:
-			/* awaiting DL_CONN_RES */
-		case DL_CONN_RES_PENDING:
-			/* Waiting ack of DL_CONNECT_RES */
-		case DL_DISCON9_PENDING:
-			/* Waiting ack of DL_DISC_REQ from DL_INCON_PENDING */
-
-			dlpi_set_state(dl, DL_INCON_PENDING);
-			break;
-
-		case DL_DISCON8_PENDING:
-			/* Waiting ack of DL_DISC_REQ from DL_OUTCON_PENDING */
-
-			dlpi_set_state(dl, DL_OUTCON_PENDING);
-			break;
-
-		case DL_DATAXFER:
-			/* connection-oriented data transfer */
-		case DL_USER_RESET_PENDING:
-			/* awaiting DL_RESET_CON */
-		case DL_DISCON11_PENDING:
-			/* Waiting ack of DL_DISC_REQ from DL_DATAXFER */
-
-			dlpi_set_state(dl, DL_DATAXFER);
-			break;
-
-		case DL_DISCON12_PENDING:
-			/* Waiting ack of DL_DISC_REQ from DL_USER_RESET_PENDING */
-
-			dlpi_set_state(dl, DL_USER_RESET_PENDING);
-			break;
-
-		case DL_PROV_RESET_PENDING:
-			/* awaiting DL_RESET_RES */
-		case DL_RESET_RES_PENDING:
-			/* Waiting ack of DL_RESET_RES */
-		case DL_DISCON13_PENDING:
-			/* Waiting ack of DL_DISC_REQ from DL_PROV_RESET_PENDING */
-
-			dlpi_set_state(dl, DL_PROV_RESET_PENDING);
-			break;
-		}
-		qreply(q, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-STATIC mblk_t *
-dl_subs_bind_ack(queue_t *q)
-{
-	struct dl *dl = DL_PRIV(q);
-	dl_subs_bind_ack_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dl->sub.len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_subs_bind_ack_t *) mp->b_wptr;
-		p->dl_primitive = DL_SUBS_BIND_ACK;
-		p->dl_subs_sap_offset = (dl->sub.len ? sizeof(*p) : 0);
-		p->dl_subs_sap_length = dl->sub.len;
-		mp->b_wptr += sizeof(*p);
-		if (dl->sub.len) {
-			bcopy(dl->sub.buf, mp->b_wptr, dl->sub.len);
-			mp->b_wptr += dl->sub.len;
-		}
-	}
-	return (mp);
-}
-STATIC INLINE fastcall __hot_get mblk_t *
-dl_unitdata_ind(queue_t *q, struct netbuf *dst, struct netbuf *src, int group)
-{
-	dl_unitdata_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dst->len + src->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_unitdata_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_UNITDATA_IND;
-		p->dl_dest_addr_length = dst->len;
-		p->dl_dest_addr_offset = dst->len ? sizeof(*p) : 0;
-		p->dl_src_addr_length = src->len;
-		p->dl_src_addr_offset = src->len ? sizeof(*p) + dst->len : 0;
-		p->dl_group_address = group ? 1 : 0;
-		mp->b_wptr += sizeof(*p);
-		if (dst->len) {
-			bcopy(dst->buf, mp->b_wptr, dst->len);
-			mp->b_wptr += dst->len;
-		}
-		if (src->len) {
-			bcopy(src->buf, mp->b_wptr, src->len);
-			mp->b_wptr += src->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC INLINE fastcall __hot_get mblk_t *
-dl_uderror_ind(queue_t *q, struct netbuf *dst, dl_long error)
-{
-	dl_uderror_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dst->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_uderror_ind_t *) mp->b_rptr;
-		p->dl_primitive = DL_UDERROR_IND;
-		p->dl_dest_addr_length = dst->len;
-		p->dl_dest_addr_offset = dst->len ? sizeof(*p) : 0;
-		p->dl_unix_errno = error < 0 ? -error : 0;
-		p->dl_errno = error < 0 ? DL_SYSERR : error;
-		mp->b_wptr += sizeof(*p);
-		if (dst->len) {
-			bcopy(dst->buf, mp->b_wptr, dst->len);
-			mp->b_wptr += dst->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_connect_ind(queue_t *q, struct netbuf *cld, struct netbuf *clg, struct netbuf *qos,
-	       dl_ulong token)
-{
-	dl_connect_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + cld->len + clg->len + qos->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_connect_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_CONNECT_IND;
-		p->dl_correlation = token;
-		p->dl_called_addr_length = cld->len;
-		p->dl_called_addr_offset = cld->len ? sizeof(*p) : 0;
-		p->dl_calling_addr_length = clg->len;
-		p->dl_calling_addr_offset = clg->len ? sizeof(*p) + cld->len : 0;
-		p->dl_qos_length = qos->len;
-		p->dl_qos_offset = qos->len ? sizeof(*p) + cld->len + clg->len : 0;
-		p->dl_growth = 0;
-		mp->b_wptr += sizeof(*p);
-		if (cld->len) {
-			bcopy(cld->buf, mp->b_wptr, cld->len);
-			mp->b_wptr += cld->len;
-		}
-		if (clg->len) {
-			bcopy(clg->buf, mp->b_wptr, clg->len);
-			mp->b_wptr += clg->len;
-		}
-		if (qos->len) {
-			bcopy(qos->buf, mp->b_wptr, qos->len);
-			mp->b_wptr += qos->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_connect_con(queue_t *q, struct netbuf *res, struct netbuf *qos)
-{
-	dl_connect_con_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + res->len + qos->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_connect_con_t *) mp->b_wptr;
-		p->dl_primitive = DL_CONNECT_CON;
-		p->dl_resp_addr_length = res->len;
-		p->dl_resp_addr_offset = resl->len ? sizeof(*p) : 0;
-		p->dl_qos_length = qos->len;
-		p->dl_qos_offset = qos->len ? sizeof(*p) + res->len : 0;
-		p->dl_growth = 0;
-		mp->b_wptr += sizeof(*p);
-		if (res->len) {
-			bcopy(res->buf, mp->b_wptr, res->len);
-			mp->b_wptr += res->len;
-		}
-		if (qos->len) {
-			bcopy(qos->buf, mp->b_wptr, qos->len);
-			mp->b_wptr += qos->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_token_ack(queue_t *q, dl_ulong token)
-{
-	dl_token_ack_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_token_ack_t *) mp->b_wptr;
-		p->dl_primitive = DL_TOKEN_ACK;
-		p->dl_token = token;
-		mp->b_wptr += sizeof(*p);
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_disconnect_ind(queue_t *q, dl_ulong dl_originator, dl_ulong dl_reason, dl_ulong dl_correlation)
-{
-	dl_disconnect_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_disconect_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_DISCONNECT_IND;
-		p->dl_originator = dl_originator;
-		p->dl_reason = dl_reason;
-		p->dl_correlation = dl_correlation;
-		mp->b_wptr += sizeof(*p);
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC INLINE fastcall __hot_get mblk_t *
-dl_reset_ind(queue_t *q, dl_ulong dl_originator, dl_ulong dl_reason)
-{
-	dl_reset_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_reset_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_RESET_IND;
-		p->dl_originator = dl_originator;
-		p->dl_reason = dl_reason;
-		mp->b_wptr += sizeof(*p);
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC INLINE fastcall __hot_get mblk_t *
-dl_reset_con(queue_t *q)
-{
-	dl_reset_con_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_reset_con_t *) mp->b_wptr;
-		p->dl_primitive = DL_RESET_CON;
-		mp->b_wptr += sizeof(*p);
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC INLINE fastcall __hot_get mblk_t *
-dl_data_ack_ind(queue_t *q, struct netbuf *dst, struct netbuf *src, dl_ulong dl_priority,
-		dl_ulong dl_service_class)
-{
-	dl_data_ack_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dst->len + src->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_data_ack_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_DATA_ACK_IND;
-		p->dl_dest_addr_length = dst->len;
-		p->dl_dest_addr_offset = dst->len ? sizeof(*p) : 0;
-		p->dl_src_addr_length = src->len;
-		p->dl_src_addr_offset = src->len ? sizeof(*p) + dst->len : 0;
-		p->dl_priority = dl_priority;
-		p->dl_service_class = dl_service_class;
-		mp->b_wptr += sizeof(*p);
-		if (dst->len) {
-			bcopy(dst->buf, mp->b_wptr, dst->len);
-			mp->b_wptr += dst->len;
-		}
-		if (src->len) {
-			bcopy(src->buf, mp->b_wptr, src->len);
-			mp->b_wptr += src->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC INLINE fastcall __hot_get mblk_t *
-dl_data_ack_status_ind(queue_t *q, dl_ulong dl_correlation, dl_ulong dl_status)
-{
-	dl_data_ack_status_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_data_ack_status_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_DATA_ACK_STATUS_IND;
-		p->dl_correlation = dl_correlation;
-		p->dl_status = dl_status;
-		mp->b_wptr += sizeof(*p);
-	}
-	return (mp);
-}
-STATIC INLINE fastcall __hot_get mblk_t *
-dl_reply_ind(queue_t *q, struct netbuf *dst, struct netbuf *src, dl_ulong dl_priority,
-	     dl_ulong dl_service_class)
-{
-	dl_reply_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dst->len + src->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_reply_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_REPLY_IND;
-		p->dl_dest_addr_length = dst->len;
-		p->dl_dest_addr_offset = dst->len ? sizeof(*p) : 0;
-		p->dl_src_addr_length = src->len;
-		p->dl_src_addr_offset = src->len ? sizeof(*p) + dst->len : 0;
-		p->dl_priority = dl_priority;
-		p->dl_service_class = dl_service_class;
-		mp->b_wptr += sizeof(*p);
-		if (dst->len) {
-			bcopy(dst->buf, mp->b_wptr, dst->len);
-			mp->b_wptr += dst->len;
-		}
-		if (src->len) {
-			bcopy(src->buf, mp->b_wptr, src->len);
-			mp->b_wptr += src->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC INLINE fastcall __hot_get mblk_t *
-dl_reply_status_ind(queue_t *q, dl_ulong dl_correlation, dl_ulong dl_status)
-{
-	dl_reply_status_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_reply_status_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_REPLY_STATUS_IND;
-		p->dl_correlation = dl_correlation;
-		p->dl_status = dl_status;
-		mp->b_wptr += sizeof(*p);
-	}
-	return (mp);
-}
-STATIC INLINE fastcall __hot_get mblk_t *
-dl_reply_update_status_ind(queue_t *q, dl_ulong dl_correlation, dl_ulong dl_status)
-{
-	dl_reply_update_status_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_reply_update_status_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_REPLY_UPDATE_STATUS_IND;
-		p->dl_correlation = dl_correlation;
-		p->dl_status = dl_status;
-		mp->b_wptr += sizeof(*p);
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_xid_ind(queue_t *q, struct netbuf *dst, struct netbuf *src, dl_ulong dl_flag)
-{
-	dl_xid_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dst->len + src->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_xid_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_XID_IND;
-		p->dl_flag = dl_flag;
-		p->dl_dest_addr_length = dst->len;
-		p->dl_dest_addr_offset = dst->len ? sizeof(*p) : 0;
-		p->dl_src_addr_length = src->len;
-		p->dl_src_addr_offset = src->len ? sizeof(*p) + dst->len : 0;
-		mp->b_wptr += sizeof(*p);
-		if (dst->len) {
-			bcopy(dst->buf, mp->b_wptr, dst->len);
-			mp->b_wptr += dst->len;
-		}
-		if (src->len) {
-			bcopy(src->buf, mp->b_wptr, src->len);
-			mp->b_wptr += src->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_xid_con(queue_t *q, struct netbuf *dst, struct netbuf *src, dl_ulong dl_flag)
-{
-	dl_xid_con_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dst->len + src->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_xid_con_t *) mp->b_wptr;
-		p->dl_primitive = DL_XID_CON;
-		p->dl_flag = dl_flag;
-		p->dl_dest_addr_length = dst->len;
-		p->dl_dest_addr_offset = dst->len ? sizeof(*p) : 0;
-		p->dl_src_addr_length = src->len;
-		p->dl_src_addr_offset = src->len ? sizeof(*p) + dst->len : 0;
-		mp->b_wptr += sizeof(*p);
-		if (dst->len) {
-			bcopy(dst->buf, mp->b_wptr, dst->len);
-			mp->b_wptr += dst->len;
-		}
-		if (src->len) {
-			bcopy(src->buf, mp->b_wptr, src->len);
-			mp->b_wptr += src->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_test_ind(queue_t *q, struct netbuf *dst, struct netbuf *src, dl_ulong dl_flag)
-{
-	dl_test_ind_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dst->len + src->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_test_ind_t *) mp->b_wptr;
-		p->dl_primitive = DL_TEST_IND;
-		p->dl_flag = dl_flag;
-		p->dl_dest_addr_length = dst->len;
-		p->dl_dest_addr_offset = dst->len ? sizeof(*p) : 0;
-		p->dl_src_addr_length = src->len;
-		p->dl_src_addr_offset = src->len ? sizeof(*p) + dst->len : 0;
-		mp->b_wptr += sizeof(*p);
-		if (dst->len) {
-			bcopy(dst->buf, mp->b_wptr, dst->len);
-			mp->b_wptr += dst->len;
-		}
-		if (src->len) {
-			bcopy(src->buf, mp->b_wptr, src->len);
-			mp->b_wptr += src->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_test_con(queue_t *q, struct netbuf *dst, struct netbuf *src, dl_ulong dl_flag)
-{
-	dl_test_con_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dst->len + src->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_test_con_t *) mp->b_wptr;
-		p->dl_primitive = DL_TEST_CON;
-		p->dl_flag = dl_flag;
-		p->dl_dest_addr_length = dst->len;
-		p->dl_dest_addr_offset = dst->len ? sizeof(*p) : 0;
-		p->dl_src_addr_length = src->len;
-		p->dl_src_addr_offset = src->len ? sizeof(*p) + dst->len : 0;
-		mp->b_wptr += sizeof(*p);
-		if (dst->len) {
-			bcopy(dst->buf, mp->b_wptr, dst->len);
-			mp->b_wptr += dst->len;
-		}
-		if (src->len) {
-			bcopy(src->buf, mp->b_wptr, src->len);
-			mp->b_wptr += src->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_phys_addr_ack(queue_t *q, struct netbuf *add)
-{
-	dl_phys_addr_ack_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + add->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_phys_addr_ack_t *) mp->b_wptr;
-		p->dl_primitive = DL_PHYS_ADDR_ACK;
-		p->dl_addr_length = add->len;
-		p->dl_addr_offset = add->len ? sizeof(*p) : 0;
-		mp->b_wptr += sizeof(*p);
-		if (add->len) {
-			bcopy(add->buf, mp->b_wptr, add->len);
-			mp->b_wptr += add->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-STATIC mblk_t *
-dl_get_statistics_ack(queue_t *q, struct netbuf *sta)
-{
-	dl_get_statistics_ack_t *p;
-	mblk_t *mp;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + sta->len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (dl_get_statistics_ack_t *) mp->b_wptr;
-		p->dl_primitive = DL_PHYS_ADDR_ACK;
-		p->dl_stat_length = sta->len;
-		p->dl_stat_offset = sta->len ? sizeof(*p) : 0;
-		mp->b_wptr += sizeof(*p);
-		if (sta->len) {
-			bcopy(sta->buf, mp->b_wptr, sta->len);
-			mp->b_wptr += sta->len;
-		}
-		/* Note: caller must attach their own data */
-	}
-	return (mp);
-}
-
-/*
  *  STATE MACHINES for Individual Provider Types
  *  ============================================
  */
@@ -1337,73 +1301,10 @@ STATIC dl_info_ack_t dl_other_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_other_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_other_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_other_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_other_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_other_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_other_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_other_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_other_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_other_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_other_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_other_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_other_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_other_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_other_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_other_actions = {
-	.dl_attach = &dl_other_attach,
-	.dl_deattach = &dl_other_deattach,
-	.dl_bind = &dl_other_bind,
-	.dl_subs_bind = &dl_other_subs_bind,
-	.dl_subs_unbind = &dl_other_subs_unbind,
-	.dl_unbind = &dl_other_unbind,
-	.dl_unitdata = &dl_other_unitdata,
-	.dl_udqos = &dl_other_udqos,
-	.dl_option = &dl_other_option,
-	.dl_connect = &dl_other_connect,
-	.dl_reset = &dl_other_reset,
-	.dl_xid = &dl_other_xid,
-	.dl_test = &dl_other_test,
-};
 
 /*
  * DL_CSMACD
@@ -1428,73 +1329,10 @@ STATIC dl_info_ack_t dl_csmacd_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_csmacd_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_csmacd_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_csmacd_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_csmacd_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_csmacd_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_csmacd_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_csmacd_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_csmacd_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_csmacd_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_csmacd_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_csmacd_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_csmacd_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_csmacd_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_csmacd_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_csmacd_actions = {
-	.dl_attach = &dl_csmacd_attach,
-	.dl_deattach = &dl_csmacd_deattach,
-	.dl_bind = &dl_csmacd_bind,
-	.dl_subs_bind = &dl_csmacd_subs_bind,
-	.dl_subs_unbind = &dl_csmacd_subs_unbind,
-	.dl_unbind = &dl_csmacd_unbind,
-	.dl_unitdata = &dl_csmacd_unitdata,
-	.dl_udqos = &dl_csmacd_udqos,
-	.dl_option = &dl_csmacd_option,
-	.dl_connect = &dl_csmacd_connect,
-	.dl_reset = &dl_csmacd_reset,
-	.dl_xid = &dl_csmacd_xid,
-	.dl_test = &dl_csmacd_test,
-};
 
 /*
  * DL_TPB
@@ -1519,73 +1357,10 @@ STATIC dl_info_ack_t dl_tpb_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_tpb_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_tpb_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_tpb_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_tpb_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_tpb_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_tpb_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_tpb_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_tpb_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_tpb_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_tpb_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_tpb_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_tpb_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_tpb_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_tpb_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_tpb_actions = {
-	.dl_attach = &dl_tpb_attach,
-	.dl_deattach = &dl_tpb_deattach,
-	.dl_bind = &dl_tpb_bind,
-	.dl_subs_bind = &dl_tpb_subs_bind,
-	.dl_subs_unbind = &dl_tpb_subs_unbind,
-	.dl_unbind = &dl_tpb_unbind,
-	.dl_unitdata = &dl_tpb_unitdata,
-	.dl_udqos = &dl_tpb_udqos,
-	.dl_option = &dl_tpb_option,
-	.dl_connect = &dl_tpb_connect,
-	.dl_reset = &dl_tpb_reset,
-	.dl_xid = &dl_tpb_xid,
-	.dl_test = &dl_tpb_test,
-};
 
 /*
  * DL_TPR
@@ -1610,73 +1385,10 @@ STATIC dl_info_ack_t dl_tpr_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_tpr_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_tpr_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_tpr_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_tpr_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_tpr_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_tpr_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_tpr_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_tpr_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_tpr_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_tpr_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_tpr_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_tpr_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_tpr_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_tpr_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_tpr_actions = {
-	.dl_attach = &dl_tpr_attach,
-	.dl_deattach = &dl_tpr_deattach,
-	.dl_bind = &dl_tpr_bind,
-	.dl_subs_bind = &dl_tpr_subs_bind,
-	.dl_subs_unbind = &dl_tpr_subs_unbind,
-	.dl_unbind = &dl_tpr_unbind,
-	.dl_unitdata = &dl_tpr_unitdata,
-	.dl_udqos = &dl_tpr_udqos,
-	.dl_option = &dl_tpr_option,
-	.dl_connect = &dl_tpr_connect,
-	.dl_reset = &dl_tpr_reset,
-	.dl_xid = &dl_tpr_xid,
-	.dl_test = &dl_tpr_test,
-};
 
 /*
  * DL_METRO
@@ -1701,73 +1413,10 @@ STATIC dl_info_ack_t dl_metro_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_metro_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_metro_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_metro_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_metro_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_metro_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_metro_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_metro_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_metro_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_metro_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_metro_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_metro_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_metro_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_metro_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_metro_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_metro_actions = {
-	.dl_attach = &dl_metro_attach,
-	.dl_deattach = &dl_metro_deattach,
-	.dl_bind = &dl_metro_bind,
-	.dl_subs_bind = &dl_metro_subs_bind,
-	.dl_subs_unbind = &dl_metro_subs_unbind,
-	.dl_unbind = &dl_metro_unbind,
-	.dl_unitdata = &dl_metro_unitdata,
-	.dl_udqos = &dl_metro_udqos,
-	.dl_option = &dl_metro_option,
-	.dl_connect = &dl_metro_connect,
-	.dl_reset = &dl_metro_reset,
-	.dl_xid = &dl_metro_xid,
-	.dl_test = &dl_metro_test,
-};
 
 /*
  * DL_ether
@@ -1792,73 +1441,10 @@ STATIC dl_info_ack_t dl_ether_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_ether_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_ether_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_ether_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_ether_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_ether_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_ether_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_ether_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_ether_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_ether_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_ether_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_ether_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_ether_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_ether_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_ether_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_ether_actions = {
-	.dl_attach = &dl_ether_attach,
-	.dl_deattach = &dl_ether_deattach,
-	.dl_bind = &dl_ether_bind,
-	.dl_subs_bind = &dl_ether_subs_bind,
-	.dl_subs_unbind = &dl_ether_subs_unbind,
-	.dl_unbind = &dl_ether_unbind,
-	.dl_unitdata = &dl_ether_unitdata,
-	.dl_udqos = &dl_ether_udqos,
-	.dl_option = &dl_ether_option,
-	.dl_connect = &dl_ether_connect,
-	.dl_reset = &dl_ether_reset,
-	.dl_xid = &dl_ether_xid,
-	.dl_test = &dl_ether_test,
-};
 
 /*
  * DL_hdlc
@@ -1883,73 +1469,10 @@ STATIC dl_info_ack_t dl_hdlc_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_hdlc_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_hdlc_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_hdlc_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_hdlc_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_hdlc_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_hdlc_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_hdlc_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_hdlc_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_hdlc_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_hdlc_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_hdlc_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_hdlc_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_hdlc_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_hdlc_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_hdlc_actions = {
-	.dl_attach = &dl_hdlc_attach,
-	.dl_deattach = &dl_hdlc_deattach,
-	.dl_bind = &dl_hdlc_bind,
-	.dl_subs_bind = &dl_hdlc_subs_bind,
-	.dl_subs_unbind = &dl_hdlc_subs_unbind,
-	.dl_unbind = &dl_hdlc_unbind,
-	.dl_unitdata = &dl_hdlc_unitdata,
-	.dl_udqos = &dl_hdlc_udqos,
-	.dl_option = &dl_hdlc_option,
-	.dl_connect = &dl_hdlc_connect,
-	.dl_reset = &dl_hdlc_reset,
-	.dl_xid = &dl_hdlc_xid,
-	.dl_test = &dl_hdlc_test,
-};
 
 /*
  * DL_char
@@ -1974,73 +1497,10 @@ STATIC dl_info_ack_t dl_char_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_char_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_char_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_char_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_char_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_char_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_char_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_char_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_char_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_char_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_char_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_char_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_char_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_char_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_char_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_char_actions = {
-	.dl_attach = &dl_char_attach,
-	.dl_deattach = &dl_char_deattach,
-	.dl_bind = &dl_char_bind,
-	.dl_subs_bind = &dl_char_subs_bind,
-	.dl_subs_unbind = &dl_char_subs_unbind,
-	.dl_unbind = &dl_char_unbind,
-	.dl_unitdata = &dl_char_unitdata,
-	.dl_udqos = &dl_char_udqos,
-	.dl_option = &dl_char_option,
-	.dl_connect = &dl_char_connect,
-	.dl_reset = &dl_char_reset,
-	.dl_xid = &dl_char_xid,
-	.dl_test = &dl_char_test,
-};
 
 /*
  * DL_ctca
@@ -2065,73 +1525,10 @@ STATIC dl_info_ack_t dl_ctca_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_ctca_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_ctca_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_ctca_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_ctca_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_ctca_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_ctca_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_ctca_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_ctca_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_ctca_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_ctca_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_ctca_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_ctca_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_ctca_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_ctca_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_ctca_actions = {
-	.dl_attach = &dl_ctca_attach,
-	.dl_deattach = &dl_ctca_deattach,
-	.dl_bind = &dl_ctca_bind,
-	.dl_subs_bind = &dl_ctca_subs_bind,
-	.dl_subs_unbind = &dl_ctca_subs_unbind,
-	.dl_unbind = &dl_ctca_unbind,
-	.dl_unitdata = &dl_ctca_unitdata,
-	.dl_udqos = &dl_ctca_udqos,
-	.dl_option = &dl_ctca_option,
-	.dl_connect = &dl_ctca_connect,
-	.dl_reset = &dl_ctca_reset,
-	.dl_xid = &dl_ctca_xid,
-	.dl_test = &dl_ctca_test,
-};
 
 /*
  * DL_FDDI
@@ -2156,73 +1553,10 @@ STATIC dl_info_ack_t dl_fddi_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_fddi_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_fddi_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_fddi_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_fddi_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_fddi_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_fddi_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_fddi_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_fddi_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_fddi_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_fddi_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_fddi_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_fddi_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_fddi_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_fddi_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_fddi_actions = {
-	.dl_attach = &dl_fddi_attach,
-	.dl_deattach = &dl_fddi_deattach,
-	.dl_bind = &dl_fddi_bind,
-	.dl_subs_bind = &dl_fddi_subs_bind,
-	.dl_subs_unbind = &dl_fddi_subs_unbind,
-	.dl_unbind = &dl_fddi_unbind,
-	.dl_unitdata = &dl_fddi_unitdata,
-	.dl_udqos = &dl_fddi_udqos,
-	.dl_option = &dl_fddi_option,
-	.dl_connect = &dl_fddi_connect,
-	.dl_reset = &dl_fddi_reset,
-	.dl_xid = &dl_fddi_xid,
-	.dl_test = &dl_fddi_test,
-};
 
 /*
  * DL_FC
@@ -2247,73 +1581,10 @@ STATIC dl_info_ack_t dl_fc_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_fc_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_fc_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_fc_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_fc_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_fc_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_fc_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_fc_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_fc_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_fc_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_fc_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_fc_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_fc_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_fc_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_fc_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_fc_actions = {
-	.dl_attach = &dl_fc_attach,
-	.dl_deattach = &dl_fc_deattach,
-	.dl_bind = &dl_fc_bind,
-	.dl_subs_bind = &dl_fc_subs_bind,
-	.dl_subs_unbind = &dl_fc_subs_unbind,
-	.dl_unbind = &dl_fc_unbind,
-	.dl_unitdata = &dl_fc_unitdata,
-	.dl_udqos = &dl_fc_udqos,
-	.dl_option = &dl_fc_option,
-	.dl_connect = &dl_fc_connect,
-	.dl_reset = &dl_fc_reset,
-	.dl_xid = &dl_fc_xid,
-	.dl_test = &dl_fc_test,
-};
 
 /*
  * DL_ATM
@@ -2338,73 +1609,10 @@ STATIC dl_info_ack_t dl_atm_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_atm_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_atm_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_atm_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_atm_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_atm_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_atm_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_atm_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_atm_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_atm_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_atm_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_atm_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_atm_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_atm_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_atm_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_atm_actions = {
-	.dl_attach = &dl_atm_attach,
-	.dl_deattach = &dl_atm_deattach,
-	.dl_bind = &dl_atm_bind,
-	.dl_subs_bind = &dl_atm_subs_bind,
-	.dl_subs_unbind = &dl_atm_subs_unbind,
-	.dl_unbind = &dl_atm_unbind,
-	.dl_unitdata = &dl_atm_unitdata,
-	.dl_udqos = &dl_atm_udqos,
-	.dl_option = &dl_atm_option,
-	.dl_connect = &dl_atm_connect,
-	.dl_reset = &dl_atm_reset,
-	.dl_xid = &dl_atm_xid,
-	.dl_test = &dl_atm_test,
-};
 
 /*
  * DL_IPATM
@@ -2429,73 +1637,10 @@ STATIC dl_info_ack_t dl_ipatm_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_ipatm_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_ipatm_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_ipatm_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_ipatm_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_ipatm_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_ipatm_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_ipatm_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_ipatm_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_ipatm_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_ipatm_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_ipatm_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_ipatm_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_ipatm_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_ipatm_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_ipatm_actions = {
-	.dl_attach = &dl_ipatm_attach,
-	.dl_deattach = &dl_ipatm_deattach,
-	.dl_bind = &dl_ipatm_bind,
-	.dl_subs_bind = &dl_ipatm_subs_bind,
-	.dl_subs_unbind = &dl_ipatm_subs_unbind,
-	.dl_unbind = &dl_ipatm_unbind,
-	.dl_unitdata = &dl_ipatm_unitdata,
-	.dl_udqos = &dl_ipatm_udqos,
-	.dl_option = &dl_ipatm_option,
-	.dl_connect = &dl_ipatm_connect,
-	.dl_reset = &dl_ipatm_reset,
-	.dl_xid = &dl_ipatm_xid,
-	.dl_test = &dl_ipatm_test,
-};
 
 /*
  * DL_X25
@@ -2520,73 +1665,10 @@ STATIC dl_info_ack_t dl_x25_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_x25_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_x25_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_x25_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_x25_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_x25_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_x25_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_x25_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_x25_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_x25_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_x25_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_x25_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_x25_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_x25_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_x25_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_x25_actions = {
-	.dl_attach = &dl_x25_attach,
-	.dl_deattach = &dl_x25_deattach,
-	.dl_bind = &dl_x25_bind,
-	.dl_subs_bind = &dl_x25_subs_bind,
-	.dl_subs_unbind = &dl_x25_subs_unbind,
-	.dl_unbind = &dl_x25_unbind,
-	.dl_unitdata = &dl_x25_unitdata,
-	.dl_udqos = &dl_x25_udqos,
-	.dl_option = &dl_x25_option,
-	.dl_connect = &dl_x25_connect,
-	.dl_reset = &dl_x25_reset,
-	.dl_xid = &dl_x25_xid,
-	.dl_test = &dl_x25_test,
-};
 
 /*
  * DL_IDSN
@@ -2611,73 +1693,10 @@ STATIC dl_info_ack_t dl_isdn_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_isdn_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_isdn_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_isdn_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_isdn_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_isdn_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_isdn_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_isdn_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_isdn_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_isdn_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_isdn_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_isdn_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_isdn_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_isdn_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_isdn_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_isdn_actions = {
-	.dl_attach = &dl_isdn_attach,
-	.dl_deattach = &dl_isdn_deattach,
-	.dl_bind = &dl_isdn_bind,
-	.dl_subs_bind = &dl_isdn_subs_bind,
-	.dl_subs_unbind = &dl_isdn_subs_unbind,
-	.dl_unbind = &dl_isdn_unbind,
-	.dl_unitdata = &dl_isdn_unitdata,
-	.dl_udqos = &dl_isdn_udqos,
-	.dl_option = &dl_isdn_option,
-	.dl_connect = &dl_isdn_connect,
-	.dl_reset = &dl_isdn_reset,
-	.dl_xid = &dl_isdn_xid,
-	.dl_test = &dl_isdn_test,
-};
 
 /*
  * DL_HIPPI
@@ -2702,73 +1721,10 @@ STATIC dl_info_ack_t dl_hippi_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_hippi_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_hippi_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_hippi_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_hippi_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_hippi_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_hippi_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_hippi_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_hippi_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_hippi_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_hippi_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_hippi_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_hippi_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_hippi_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_hippi_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_hippi_actions = {
-	.dl_attach = &dl_hippi_attach,
-	.dl_deattach = &dl_hippi_deattach,
-	.dl_bind = &dl_hippi_bind,
-	.dl_subs_bind = &dl_hippi_subs_bind,
-	.dl_subs_unbind = &dl_hippi_subs_unbind,
-	.dl_unbind = &dl_hippi_unbind,
-	.dl_unitdata = &dl_hippi_unitdata,
-	.dl_udqos = &dl_hippi_udqos,
-	.dl_option = &dl_hippi_option,
-	.dl_connect = &dl_hippi_connect,
-	.dl_reset = &dl_hippi_reset,
-	.dl_xid = &dl_hippi_xid,
-	.dl_test = &dl_hippi_test,
-};
 
 /*
  * DL_100VG
@@ -2793,73 +1749,10 @@ STATIC dl_info_ack_t dl_100vg_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_100vg_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_100vg_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_100vg_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_100vg_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_100vg_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_100vg_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_100vg_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_100vg_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_100vg_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_100vg_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_100vg_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_100vg_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_100vg_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_100vg_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_100vg_actions = {
-	.dl_attach = &dl_100vg_attach,
-	.dl_deattach = &dl_100vg_deattach,
-	.dl_bind = &dl_100vg_bind,
-	.dl_subs_bind = &dl_100vg_subs_bind,
-	.dl_subs_unbind = &dl_100vg_subs_unbind,
-	.dl_unbind = &dl_100vg_unbind,
-	.dl_unitdata = &dl_100vg_unitdata,
-	.dl_udqos = &dl_100vg_udqos,
-	.dl_option = &dl_100vg_option,
-	.dl_connect = &dl_100vg_connect,
-	.dl_reset = &dl_100vg_reset,
-	.dl_xid = &dl_100vg_xid,
-	.dl_test = &dl_100vg_test,
-};
 
 /*
  * DL_100VGTPR
@@ -2884,73 +1777,10 @@ STATIC dl_info_ack_t dl_100vgtpr_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_100vgtpr_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_100vgtpr_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_100vgtpr_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_100vgtpr_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_100vgtpr_actions = {
-	.dl_attach = &dl_100vgtpr_attach,
-	.dl_deattach = &dl_100vgtpr_deattach,
-	.dl_bind = &dl_100vgtpr_bind,
-	.dl_subs_bind = &dl_100vgtpr_subs_bind,
-	.dl_subs_unbind = &dl_100vgtpr_subs_unbind,
-	.dl_unbind = &dl_100vgtpr_unbind,
-	.dl_unitdata = &dl_100vgtpr_unitdata,
-	.dl_udqos = &dl_100vgtpr_udqos,
-	.dl_option = &dl_100vgtpr_option,
-	.dl_connect = &dl_100vgtpr_connect,
-	.dl_reset = &dl_100vgtpr_reset,
-	.dl_xid = &dl_100vgtpr_xid,
-	.dl_test = &dl_100vgtpr_test,
-};
 
 /*
  * DL_ETH_CSMA
@@ -2975,73 +1805,10 @@ STATIC dl_info_ack_t dl_eth_csma_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_eth_csma_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_eth_csma_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_eth_csma_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_eth_csma_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_eth_csma_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_eth_csma_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_eth_csma_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_eth_csma_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_eth_csma_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_eth_csma_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_eth_csma_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_eth_csma_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_eth_csma_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_eth_csma_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_eth_csma_actions = {
-	.dl_attach = &dl_eth_csma_attach,
-	.dl_deattach = &dl_eth_csma_deattach,
-	.dl_bind = &dl_eth_csma_bind,
-	.dl_subs_bind = &dl_eth_csma_subs_bind,
-	.dl_subs_unbind = &dl_eth_csma_subs_unbind,
-	.dl_unbind = &dl_eth_csma_unbind,
-	.dl_unitdata = &dl_eth_csma_unitdata,
-	.dl_udqos = &dl_eth_csma_udqos,
-	.dl_option = &dl_eth_csma_option,
-	.dl_connect = &dl_eth_csma_connect,
-	.dl_reset = &dl_eth_csma_reset,
-	.dl_xid = &dl_eth_csma_xid,
-	.dl_test = &dl_eth_csma_test,
-};
 
 /*
  * DL_100BT
@@ -3066,73 +1833,10 @@ STATIC dl_info_ack_t dl_100bt_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_100bt_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_100bt_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_100bt_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_100bt_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_100bt_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_100bt_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_100bt_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_100bt_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_100bt_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_100bt_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_100bt_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_100bt_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_100bt_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_100bt_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_100bt_actions = {
-	.dl_attach = &dl_100bt_attach,
-	.dl_deattach = &dl_100bt_deattach,
-	.dl_bind = &dl_100bt_bind,
-	.dl_subs_bind = &dl_100bt_subs_bind,
-	.dl_subs_unbind = &dl_100bt_subs_unbind,
-	.dl_unbind = &dl_100bt_unbind,
-	.dl_unitdata = &dl_100bt_unitdata,
-	.dl_udqos = &dl_100bt_udqos,
-	.dl_option = &dl_100bt_option,
-	.dl_connect = &dl_100bt_connect,
-	.dl_reset = &dl_100bt_reset,
-	.dl_xid = &dl_100bt_xid,
-	.dl_test = &dl_100bt_test,
-};
 
 /*
  * DL_FRAME
@@ -3157,73 +1861,10 @@ STATIC dl_info_ack_t dl_frame_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_frame_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_frame_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_frame_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_frame_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_frame_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_frame_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_frame_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_frame_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_frame_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_frame_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_frame_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_frame_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_frame_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_frame_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_frame_actions = {
-	.dl_attach = &dl_frame_attach,
-	.dl_deattach = &dl_frame_deattach,
-	.dl_bind = &dl_frame_bind,
-	.dl_subs_bind = &dl_frame_subs_bind,
-	.dl_subs_unbind = &dl_frame_subs_unbind,
-	.dl_unbind = &dl_frame_unbind,
-	.dl_unitdata = &dl_frame_unitdata,
-	.dl_udqos = &dl_frame_udqos,
-	.dl_option = &dl_frame_option,
-	.dl_connect = &dl_frame_connect,
-	.dl_reset = &dl_frame_reset,
-	.dl_xid = &dl_frame_xid,
-	.dl_test = &dl_frame_test,
-};
 
 /*
  * DL_MPFRAME
@@ -3248,73 +1889,10 @@ STATIC dl_info_ack_t dl_mpframe_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_mpframe_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_mpframe_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_mpframe_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_mpframe_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_mpframe_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_mpframe_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_mpframe_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_mpframe_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_mpframe_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_mpframe_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_mpframe_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_mpframe_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_mpframe_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_mpframe_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_mpframe_actions = {
-	.dl_attach = &dl_mpframe_attach,
-	.dl_deattach = &dl_mpframe_deattach,
-	.dl_bind = &dl_mpframe_bind,
-	.dl_subs_bind = &dl_mpframe_subs_bind,
-	.dl_subs_unbind = &dl_mpframe_subs_unbind,
-	.dl_unbind = &dl_mpframe_unbind,
-	.dl_unitdata = &dl_mpframe_unitdata,
-	.dl_udqos = &dl_mpframe_udqos,
-	.dl_option = &dl_mpframe_option,
-	.dl_connect = &dl_mpframe_connect,
-	.dl_reset = &dl_mpframe_reset,
-	.dl_xid = &dl_mpframe_xid,
-	.dl_test = &dl_mpframe_test,
-};
 
 /*
  * DL_ASYNC
@@ -3339,73 +1917,10 @@ STATIC dl_info_ack_t dl_async_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_async_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_async_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_async_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_async_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_async_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_async_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_async_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_async_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_async_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_async_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_async_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_async_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_async_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_async_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_async_actions = {
-	.dl_attach = &dl_async_attach,
-	.dl_deattach = &dl_async_deattach,
-	.dl_bind = &dl_async_bind,
-	.dl_subs_bind = &dl_async_subs_bind,
-	.dl_subs_unbind = &dl_async_subs_unbind,
-	.dl_unbind = &dl_async_unbind,
-	.dl_unitdata = &dl_async_unitdata,
-	.dl_udqos = &dl_async_udqos,
-	.dl_option = &dl_async_option,
-	.dl_connect = &dl_async_connect,
-	.dl_reset = &dl_async_reset,
-	.dl_xid = &dl_async_xid,
-	.dl_test = &dl_async_test,
-};
 
 /*
  * DL_IPX25
@@ -3430,73 +1945,10 @@ STATIC dl_info_ack_t dl_ipx25_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_ipx25_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_ipx25_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_ipx25_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_ipx25_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_ipx25_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_ipx25_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_ipx25_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_ipx25_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_ipx25_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_ipx25_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_ipx25_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_ipx25_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_ipx25_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_ipx25_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_ipx25_actions = {
-	.dl_attach = &dl_ipx25_attach,
-	.dl_deattach = &dl_ipx25_deattach,
-	.dl_bind = &dl_ipx25_bind,
-	.dl_subs_bind = &dl_ipx25_subs_bind,
-	.dl_subs_unbind = &dl_ipx25_subs_unbind,
-	.dl_unbind = &dl_ipx25_unbind,
-	.dl_unitdata = &dl_ipx25_unitdata,
-	.dl_udqos = &dl_ipx25_udqos,
-	.dl_option = &dl_ipx25_option,
-	.dl_connect = &dl_ipx25_connect,
-	.dl_reset = &dl_ipx25_reset,
-	.dl_xid = &dl_ipx25_xid,
-	.dl_test = &dl_ipx25_test,
-};
 
 /*
  * DL_LOOP
@@ -3521,73 +1973,10 @@ STATIC dl_info_ack_t dl_loop_info = {
 /* Actions */
 
 STATIC int streamscall
-dl_loop_attach(queue_t *q, struct dl *dl, dl_ulong ppa)
+dl_loop_event(queue_t *q, struct dl *dl, union dl_event *ep)
 {
+	return (DL_NOTSUPPORTED);
 }
-STATIC int streamscall
-dl_loop_deattach(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_loop_bind(queue_t *q, struct dl *dl, dl_ulong sap, dl_ushort dl_flags)
-{
-}
-STATIC int streamscall
-dl_loop_subs_bind(queue_t *q, struct dl *dl, struct netbuf *sap, dl_ulong dl_subs_bind_class)
-{
-}
-STATIC int streamscall
-dl_loop_subs_unbind(queue_t *q, struct dl *dl, struct netbuf *sap)
-{
-}
-STATIC int streamscall
-dl_loop_unbind(queue_t *q, struct dl *dl)
-{
-}
-STATIC int streamscall
-dl_loop_unitdata(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_loop_udqos(queue_t *q, struct dl *dl, struct netbuf *opt)
-{
-}
-STATIC int streamscall
-dl_loop_option(queue_t *q, struct dl *dl, dl_ulong dl_primitive)
-{
-}
-STATIC int streamscall
-dl_loop_connect(queue_t *q, struct dl *dl, struct netbuf *dst)
-{
-}
-STATIC int streamscall
-dl_loop_reset(queue_t *q, struct dl *dl, dl_ulong dl_origin, dl_ulong dl_reason)
-{
-}
-STATIC int streamscall
-dl_loop_xid(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-STATIC int streamscall
-dl_loop_test(queue_t *q, struct dl *dl, dl_ulong dl_flag)
-{
-}
-
-STATIC struct dl_actions dl_loop_actions = {
-	.dl_attach = &dl_loop_attach,
-	.dl_deattach = &dl_loop_deattach,
-	.dl_bind = &dl_loop_bind,
-	.dl_subs_bind = &dl_loop_subs_bind,
-	.dl_subs_unbind = &dl_loop_subs_unbind,
-	.dl_unbind = &dl_loop_unbind,
-	.dl_unitdata = &dl_loop_unitdata,
-	.dl_udqos = &dl_loop_udqos,
-	.dl_option = &dl_loop_option,
-	.dl_connect = &dl_loop_connect,
-	.dl_reset = &dl_loop_reset,
-	.dl_xid = &dl_loop_xid,
-	.dl_test = &dl_loop_test,
-};
 
 /* Information */
 
@@ -3621,32 +2010,32 @@ STATIC dl_info_ack_t *dl_info[DL_MINOR_FREE] = {
 
 /* Actions */
 
-STATIC struct dl_actions *dl_actions[DL_MINOR_FREE] = {
-	[DL_MINOR_OTHER] = &dl_other_actions,
-	[DL_MINOR_CSMACD] = &dl_csmacd_actions,
-	[DL_MINOR_TPB] = &dl_tpb_actions,
-	[DL_MINOR_TPR] = &dl_tpr_actions,
-	[DL_MINOR_METRO] = &dl_metro_actions,
-	[DL_MINOR_ETHER] = &dl_ether_actions,
-	[DL_MINOR_HDLC] = &dl_hdlc_actions,
-	[DL_MINOR_CHAR] = &dl_char_actions,
-	[DL_MINOR_CTCA] = &dl_ctca_actions,
-	[DL_MINOR_FDDI] = &dl_fddi_actions,
-	[DL_MINOR_FC] = &dl_fc_actions,
-	[DL_MINOR_ATM] = &dl_atm_actions,
-	[DL_MINOR_IPATM] = &dl_ipatm_actions,
-	[DL_MINOR_X25] = &dl_x25_actions,
-	[DL_MINOR_ISDN] = &dl_isdn_actions,
-	[DL_MINOR_HIPPI] = &dl_hippi_actions,
-	[DL_MINOR_100VG] = &dl_100vg_actions,
-	[DL_MINOR_100VGTPR] = &dl_100vgtpr_actions,
-	[DL_MINOR_ETH_CSMA] = &dl_eth_csma_actions,
-	[DL_MINOR_100BT] = &dl_100bt_actions,
-	[DL_MINOR_FRAME] = &dl_frame_actions,
-	[DL_MINOR_MPFRAME] = &dl_mpframe_actions,
-	[DL_MINOR_ASYNC] = &dl_async_actions,
-	[DL_MINOR_IPX25] = &dl_ipx25_actions,
-	[DL_MINOR_LOOP] = &dl_loop_actions,
+STATIC dl_event_t dl_event[DL_MINOR_FREE] = {
+	[DL_MINOR_OTHER] = &dl_other_event,
+	[DL_MINOR_CSMACD] = &dl_csmacd_event,
+	[DL_MINOR_TPB] = &dl_tpb_event,
+	[DL_MINOR_TPR] = &dl_tpr_event,
+	[DL_MINOR_METRO] = &dl_metro_event,
+	[DL_MINOR_ETHER] = &dl_ether_event,
+	[DL_MINOR_HDLC] = &dl_hdlc_event,
+	[DL_MINOR_CHAR] = &dl_char_event,
+	[DL_MINOR_CTCA] = &dl_ctca_event,
+	[DL_MINOR_FDDI] = &dl_fddi_event,
+	[DL_MINOR_FC] = &dl_fc_event,
+	[DL_MINOR_ATM] = &dl_atm_event,
+	[DL_MINOR_IPATM] = &dl_ipatm_event,
+	[DL_MINOR_X25] = &dl_x25_event,
+	[DL_MINOR_ISDN] = &dl_isdn_event,
+	[DL_MINOR_HIPPI] = &dl_hippi_event,
+	[DL_MINOR_100VG] = &dl_100vg_event,
+	[DL_MINOR_100VGTPR] = &dl_100vgtpr_event,
+	[DL_MINOR_ETH_CSMA] = &dl_eth_csma_event,
+	[DL_MINOR_100BT] = &dl_100bt_event,
+	[DL_MINOR_FRAME] = &dl_frame_event,
+	[DL_MINOR_MPFRAME] = &dl_mpframe_event,
+	[DL_MINOR_ASYNC] = &dl_async_event,
+	[DL_MINOR_IPX25] = &dl_ipx25_event,
+	[DL_MINOR_LOOP] = &dl_loop_event,
 };
 
 /*
@@ -3660,158 +2049,214 @@ cd_w_rse(queue_t *q, mblk_t *mp)
 }
 
 /*
- *  Service Primitives from above -- upper multiplex
- *  ------------------------------------------------
+ *  DL USER PRIMITIVES SENT DOWNSTREAM
+ *  ==================================
  */
 
 STATIC int
 dl_info_req(queue_t *q, mblk_t *mp)
 {
-	mblk_t *bp;
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	dl_long dl_errno;
+	size_t size = sizeof(p->info_ack) + dl->dl_addr_length + dl->dl_qos_length
+	    + dl->dl_qos_range_length + dl->dl_brdcst_addr_length;
+	mblk_t *pp = mp;
 
-	if ((bp = dl_info_ack(q))) {
-		qreply(q, mp);
-		return (QR_DONE);
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->info_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_INFO_REQ))
+		goto error;
+	dl_errno = -ENOBUFS;
+	if (unlikely(mp->b_datap->db_lim < mp->b_datap->db_base + size))
+		if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+			goto error;
+	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (typeof(p)) mp->b_rptr;
+	mp->b_wptr += sizeof(p->info_ack);
+	p->info_ack = dl->dl_info;
+	p->info_ack.dl_primitive = DL_INFO_ACK;
+	if (dl->dl_addr_length) {
+		bcopy(dl->dl_addr_buffer, mp->b_wptr, dl->dl_addr_length);
+		p->info_ack.dl_addr_length = dl->dl_addr_length;
+		p->info_ack.dl_addr_offset = mp->b_wptr - mp->b_rptr;
+		mp->b_wptr += dl->dl_addr_length;
 	}
-	return (-ENOBUFS);
+	if (dl->dl_qos_length) {
+		bcopy(dl->dl_qos_buffer, mp->b_wptr, dl->dl_qos_length);
+		p->info_ack.dl_qos_length = dl->dl_qos_length;
+		p->info_ack.dl_qos_offset = mp->b_wptr - mp->b_rptr;
+		mp->b_wptr += dl->dl_qos_length;
+	}
+	if (dl->dl_qos_range_length) {
+		bcopy(dl->dl_qos_range_buffer, mp->b_wptr, dl->dl_qos_range_length);
+		p->info_ack.dl_qos_range_length = dl->dl_qos_range_length;
+		p->info_ack.dl_qos_range_offset = mp->b_wptr - mp->b_rptr;
+		mp->b_wptr += dl->dl_qos_range_length;
+	}
+	if (dl->dl_brdcst_addr_length) {
+		bcopy(dl->dl_brdcst_addr_buffer, mp->b_wptr, dl->dl_brdcst_addr_length);
+		p->info_ack.dl_brdcst_addr_length = dl->dl_brdcst_addr_length;
+		p->info_ack.dl_brdcst_addr_offset = mp->b_wptr - mp->b_rptr;
+		mp->b_wptr += dl->dl_brdcst_addr_length;
+	}
+	qreply(q, mp);
+	return (mp == pp ? QR_ABSORBED : QR_DONE);
+      error:
+	return dl_reply_ack(q, dl, DL_INFO_REQ, dl_errno, pp);
 }
+
 STATIC int
 dl_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
-	dl_attach_req_t *p;
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_attach_req dle = { DLE_ATTACH_REQ, };
 	dl_long dl_errno;
-	mblk_t *bp;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	if (dlpi_get_state(dl) != DL_UNATTACHED)
-		goto outstate;
-	if (dl->info.dl_provider_style != DL_STYLE2)
-		goto outstate;
-	p = (dl_attach_req_t *) mp->b_rptr;
-	/* FIXME: more stuff to attach ppa */
-	dlpi_set_state(dl, DL_ATTACH_PENDING);
-	if ((bp = dl_ok_ack(q, DL_ATTACH_REQ))) {
-		dl->dl_ppa = p->dl_ppa;
-		dlpi_set_state(dl, DL_UNBOUND);
-		qreply(q, bp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-      outstate:
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->attach_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_ATTACH_REQ))
+		goto error;
 	dl_errno = DL_OUTSTATE;
-	goto error;
-      einval:
-	dl_errno = -EPROTO;
-	goto error;
+	if (unlikely(dl_get_state(dl) != DL_UNATTACHED))
+		goto error;
+	dl_errno = DL_UNSUPPORTED;
+	if (unlikely(dl->dl_info.dl_provider_style != DL_STYLE2))
+		goto error;
+	dl_set_state(dl, DL_ATTACH_PENDING);
+	/* provider specific attach */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		dl_set_state(dl, DL_UNBOUND);
       error:
-	return dl_error_ack(q, DL_ATTACH_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_ATTACH_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_detach_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_detach_req *dle = { DLE_DETACH_REQ, };
 	dl_long dl_errno;
-	mblk_t *bp;
 
-	if (dlpi_get_state(dl) != DL_UNBOUND)
-		goto outstate;
-	dlpi_set_state(dl, DL_DETACH_PENDING);
-	/* FIXME: more stuff to detach ppa */
-	dl->dl_ppa = 0;
-	if ((bp = dl_ok_ack(q, DL_DETACH_REQ))) {
-		qreply(q, bp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-      outstate:
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->detach_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_DETACH_REQ))
+		goto error;
 	dl_errno = DL_OUTSTATE;
-	goto error;
+	if (unlikely(dl_get_state(dl) != DL_UNBOUND))
+		goto error;
+	dl_errno = DL_UNSUPPORTED;
+	if (unlikely(dl->dl_info.dl_provider_style != DL_STYLE2))
+		goto error;
+	dl_set_state(dl, DL_DETACH_PENDING);
+	/* provider specific detach */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		dl_set_state(dl, DL_UNATTACHED);
       error:
-	return dl_error_ack(q, DL_DETACH_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_DETACH_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_bind_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
-	dl_bind_req_t *p;
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_bind_req *dle = { DLE_BIND_REQ, };
+	dl_ulong state;
 	dl_long dl_errno;
-	mblk_t *bp;
-	struct netbuf add;
+	const size_t size = sizeof(p->bind_ack) + sizeof(dl->dl_addr_buffer);
+	mblk_t *pp = mp;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	p = (dl_bind_req_t *) mp->b_rptr;
-	if (dlpi_get_state(dl) == DL_UNATTACHED)
-		/* well, perhaps we could wildcard attach */
-		goto oustate;
-	if (dlpi_get_state(dl) != DL_UNBOUND)
-		goto outstate;
-	if (p->dl_addr_length == 0)
-		goto noaddr;
-	if (mp->b_wptr < mp->b_rptr + p->dl_addr_length + p->dl_addr_offset)
-		goto badaddr;
-	if (p->dl_addr_length > dl->add.maxlen)
-		goto baddaddr;
-	add.len = p->dl_addr_length;
-	add.buf = mp->b_rptr + p->dl_addr_offset;
-	/* FIXME do some more binding */
-
-	dlpi_set_state(dl, DL_BIND_PENDING);
-	if ((bp = dl_bind_ack(q, &add, p->dl_sap, p->dl_max_conind, p->dl_xidtest_flg))) {
-		/* commit the bind */
-		bcopy(add->buf, dl->add.buf, add->len);
-		dl->add.len = add->len;
-		dl->dl_sap = p->dl_sap;
-		dl->dl_max_conind = p->dl_max_conind;
-		dl->dl_xidtest_flg = p->dl_xidtest_flg;
-		dl->info.dl_service_mode = p->dl_service_mode;
-		dlpi_set_state(dl, DL_BOUND);
-		qreply(q, bp);
-		return (QR_DONE);
+	state = dl_get_state(dl);
+	if (unlikely(state == DL_UNATTACHED)) {
+		/* auto attach to wildcard PPA */
+		dl->dl_ppa = 0;
+		dl_set_state(DL_UNBOUND);
 	}
-	return (-ENOBUFS);
-      badaddr:
-	dl_errno = DL_BADADDR;
-	goto error;
-
-      noaddr:
-	dl_errno = DL_NOADDR;
-	goto error;
-      outstate:
 	dl_errno = DL_OUTSTATE;
-	goto error;
-      einval:
-	dl_errno = -EPROTO;
-	goto error;
+	if (unlikely(state != DL_UNBOUND))
+		goto error;
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->bind_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_BIND_REQ))
+		goto error;
+	dl_errno = -EINVAL;
+	if ((dle.dl_service_mode = p->bind_req.dl_service_mode) != DL_CODLS
+	    && dle.dl_service_mode != DL_CLDLS && dle.dl_service_mode != DL_ACLDLS)
+		goto error;
+	dle.dl_sap = p->bind_req.dl_sap;	/* provider specific */
+	dle.dl_max_conind = (dle.dl_service_mode == DL_CODLS) ? p->bind_req.dl_max_conind : 0;
+	dle.dl_conn_mgmt = (dle.dl_service_mode == DL_CODLS) ? p->bind_req.dl_conn_mgmt : 0;
+	dl_errno = -EINVAL;
+	if (unlikely((dle.dl_xidtest_flg
+		      = p->bind_req.dl_xidtest_flg) & ~(DL_AUTO_XID | DL_AUTO_TEST)))
+		goto error;
+	dl_errno = -ENOBUFS;
+	if (unlikely(mp->b_datap->db_lim < mp->b_datap->db_base + size))
+		if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+			goto error;
+	dl_set_state(dl, DL_BIND_PENDING);
+	/* provider specific bind */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0)) {
+		freemsg(mp);
+		goto error;
+	}
+	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	mp->b_datap->db_type = M_PCPROTO;
+	mp->b_band = 0;
+	p = (typeof(p)) mp->b_rptr;
+	p->bind_ack.dl_primitive = DL_BIND_ACK;
+	p->bind_ack.dl_sap = dle.dl_sap;
+	p->bind_ack.dl_addr_length = dle.dl_addr_length;
+	p->bind_ack.dl_addr_offset = dle.dl_addr_length ? sizeof(p->bind_ack) : 0;
+	p->bind_ack.dl_max_conind = dle.dl_max_conind;
+	p->bind_ack.dl_xidtest_flg = dle.dl_xidtest_flg;
+	mp->b_wptr += sizeof(p->bind_ack);
+	if (dle.dl_addr_length) {
+		bcopy(dle.dl_addr_buffer, mp->b_wptr, dle.dl_addr_length);
+		mp->b_wptr += dle.dl_addr_length;
+	}
+	dl_set_state(dl, DL_IDLE);
+	qreply(q, mp);
+	return (mp == pp ? QR_ABSORBED : QR_DONE);
       error:
-	return dl_error_ack(q, DL_BIND_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_BIND_REQ, dl_errno, pp);
 }
+
 STATIC int
 dl_unbind_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_unbind_req *dle = { DLE_UNBIND_REQ, };
 	dl_long dl_errno;
-	mblk_t *bp;
 
-	if (dlpi_get_state(dl) != DL_BOUND)
-		goto outstate;
-	/* FIXME: more stuff to unbind */
-	dlpi_set_state(dl, DL_UNBIND_PENDING);
-	if ((bp = dl_ok_ack(q, DL_UNBIND_REQ))) {
-		dl->add.len = 0;
-		dl->dl_sap = 0;
-		dlpi_set_state(dl, DL_UNBOUND);
-		qreply(q, bp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-      outstate:
 	dl_errno = DL_OUTSTATE;
-	goto error;
+	if (unlikely(dl_get_state(dl) != DL_IDLE))
+		goto error;
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->unbind_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_UNBIND_REQ))
+		goto error;
+	dl_set_state(dl, DL_UNBIND_PENDING);
+	/* provider specific unbind */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		dl_set_state(dl, DL_UNBOUND);
       error:
-	return dl_error_ack(q, DL_UNBIND_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_UNBIND_REQ, dl_errno, mp);
 }
 
 /**
@@ -3823,211 +2268,1029 @@ dl_unbind_req(queue_t *q, mblk_t *mp)
 STATIC int
 dl_subs_bind_req(queue_t *q, mblk_t *mp)
 {
-	dlpi_set_state(dl, DL_SUBS_BIND_PND);
-      toomany:
-	dl_errno = DL_TOOMANY;
-	goto error;
-      access:
-	dl_errno = DL_ACCESS;
-	goto error;
-      badaddr:
-	dl_errno = DL_BADADDR;
-	goto error;
-      outstate:
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_subs_bind_req *dle = { DLE_SUBS_BIND_REQ, };
+	dl_long dl_errno;
+	const size_t size = sizeof(p->subs_bind_ack) + sizeof(dl->dl_addr_buffer);
+	mblk_t *pp = mp;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->subs_bind_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_SUBS_BIND_REQ))
+		goto error;
 	dl_errno = DL_OUTSTATE;
-	goto error;
-      unsupported:
+	if (unlikely(dl_get_state(dl) != DL_IDLE))
+		goto error;
+	dl_errno = DL_NOADDR;
+	if (unlikely((dle.dl_subs_sap_length = p->subs_bind_req.dl_subs_sap_length) == 0))
+		goto error;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr < (dle.dl_subs_sap_buffer
+				   = mp->b_rptr + p->subs_bind_req.dl_subs_sap_offset)))
+		goto error;
 	dl_errno = DL_UNSUPPORTED;
-	goto error;
-      eproto:
-	dl_errno = -EPROTO;
-	goto error;
+	if (unlikely((dle.dl_subs_bind_class = p->subs_bind_req.dl_subs_bind_class) != DL_PEER_BIND
+		     && dle.dl_subs_bind_class != DL_HIERARCHICAL_BIND))
+		goto error;
+	dl_errno = -ENOBUFS;
+	if (unlikely(mp->b_datap->db_lim < mp->b_datap->db_base + size))
+		if (unlikely((mp = ss7_allocb(q, size, BPR_MED) == NULL)))
+			goto error;
+	dl_set_state(dl, DL_SUBS_BIND_PND);
+	/* provider specific subsequent bind */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0)) {
+		freemsg(mp);
+		goto error;
+	}
+	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	mp->b_datap->db_type = M_PCPROTO;
+	bp->b_band = 0;
+	p = (typeof(p)) mp->b_rptr;
+	p->subs_bind_ack.dl_primitive = DL_SUBS_BIND_ACK;
+	p->subs_bind_ack.dl_subs_sap_offset = dle.dl_subs_sap_length ? sizeof(p->subs_bind_ack) : 0;
+	p->subs_bind_ack.dl_subs_sap_length = dle.dl_subs_sap_length;
+	mp->b_wptr += sizeof(p->subs_bind_ack);
+	dl_set_state(dl, DL_IDLE);
+	qreply(q, mp);
+	return (QR_DONE);
       error:
-	return dl_error_ack(q, DL_SUBS_BIND_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_SUBS_BIND_REQ, dl_errno, pp);
 }
+
 STATIC int
 dl_subs_unbind_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
-	dl_subs_unbind_req_t *p;
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_subs_unbind_req dle = { DLE_SUBS_UNBIND_REQ, };
 	dl_long dl_errno;
-	mblk_t *bp;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	if (dlpi_get_state(dl) != DL_BOUND)
-		goto outstate;
-	p = (dl_subs_unbind_req_t *) mp->b_rptr;
-	if (p->dl_subs_sap_length == 0)
-		goto noaddr;
-	if (p->dl_subs_sap_length != dl->sub.len)
-		goto badaddr;
-	if (strncmp(mp->b_wptr + p->dl_subs_sap_offset, dl->sub.buf, dl->sub.len))
-		goto badaddr;
-	dlpi_set_state(dl, DL_SUBS_UNBIND_PND);
-	/* FIXME: more stuff to unbind */
-	if ((bp = dl_ok_ack(q, DL_UNBIND_REQ))) {
-		dl->sub.len = 0;
-		dlpi_set_state(dl, DL_BOUND);
-		qreply(q, bp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-      badaddr:
-	dl_errno = DL_BADADDR;
-	goto error;
-      noaddr:
-	dl_errno = DL_NOADDR;
-	goto error;
-      outstate:
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->subs_unbind_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_SUBS_UNBIND_REQ))
+		goto error;
 	dl_errno = DL_OUTSTATE;
-	goto error;
-      einval:
-	dl_errno = -EPROTO;
-	goto error;
+	if (unlikely(dl_get_state(dl) != DL_IDLE))
+		goto error;
+	dl_errno = DL_NOADDR;
+	if (unlikely((dle.dl_subs_sap_length = p->subs_unbind_req.dl_subs_sap_length) == 0))
+		goto error;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr < (dle.dl_subs_sap_buffer
+				   = mp->b_rptr + p->subs_unbind_req.dl_subs_sap_offset)))
+		goto error;
+	dl_set_state(dl, DL_SUBS_UNBIND_PND);
+	/* provider specific subsequent unbind */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	dl_set_state(dl, DL_IDLE);
       error:
-	return dl_error_ack(q, DL_SUBS_UNBIND_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_SUBS_UNBIND_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_enabmulti_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_enabmulti_req dle = { DLE_ENABMULTI_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->enabmulti_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_ENABMULTI_REQ))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) == DL_UNATTACHED))
+		goto error;
+	dl_errno = DL_NOADDR;
+	if (unlikely((dle.dl_addr_length = p->enabmulti_req.dl_addr_length) == 0))
+		goto error;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr < (dle.dl_addr_buffer
+				   = mp->b_rptr + p->enabmulti_req.dl_addr_offset)))
+		goto error;
+	/* provider specific enable multicast */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
       error:
-	return dl_error_ack(q, DL_ENABMULTI_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_ENABMULTI_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_disabmulti_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_disabmulti_req dle = { DLE_DISABMULTI_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->disabmulti_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_DISABMULTI_REQ))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) == DL_UNATTACHED))
+		goto error;
+	dl_errno = DL_NOADDR;
+	if (unlikely((dle.dl_addr_length = p->disabmulti_req.dl_addr_length) == 0))
+		goto error;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr < (dle.dl_addr_buffer
+				   = mp->b_rptr + p->disabmulti_req.dl_addr_offset)))
+		goto error;
+	/* provider specific disable multicast */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
       error:
-	return dl_error_ack(q, DL_DISABMULTI_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_DISABMULTI_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_promiscon_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_promiscon_req dle = { DLE_PROMISCON_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->promsicon_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_PROMISCON_REQ))
+		goto error;
+	dl_errno = DL_UNSUPPORTED;
+	if (unlikely((dle.dl_level = p->promiscon_req.dl_level) != DL_PROMISC_PHYS
+		     && dle.dl_level != DL_PROMISC_SAP && dle.dl_level != DL_PROMISC_MULTI))
+		goto error;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	dl->dl_level = dle.dl_level;
       error:
-	return dl_error_ack(q, DL_PROMISCON_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_PROMISCON_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_promiscoff_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_promiscoff_req dle = { DLE_PROMISCOFF_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->promsicoff_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_PROMISCOFF_REQ))
+		goto error;
+	dl_errno = DL_UNSUPPORTED;
+	if (unlikely((dle.dl_level = p->promiscoff_req.dl_level) != DL_PROMISC_PHYS
+		     && dle.dl_level != DL_PROMISC_SAP && dle.dl_level != DL_PROMISC_MULTI))
+		goto error;
+	dl_errno = DL_NOTENAB;
+	if (unlikely(dle.dl_level != dl->dl_level))
+		goto error;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle))))
+		goto error;
+	dl->dl_level = 0;
       error:
-	return dl_error_ack(q, DL_PROMISCOFF_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_PROMISCOFF_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_unitdata_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_unitdata_req dle = { DLE_UNITDATA_REQ, };
+	dl_long dl_errno;
+	size_t size;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->unitdata_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_UNITDATA_REQ))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) != DL_IDLE))
+		goto error;
+	dl_errno = DL_NOADDR;
+	if (unlikely((dle.dl_addr_length = p->unitdata_req.dl_addr_length) == 0))
+		goto error;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr <
+		     (dle.dl_addr_buffer = mp->b_rptr = p->unitdata_req.dl_addr_offset)))
+		goto error;
+	dl_errno = DL_BADDATA;
+	if (unlikely((dle.dl_data_blocks = mp->b_cont) == NULL))
+		goto error;
+	dl_errno = DL_BADDATA;
+	if (unlikely((dle.dl_data_length = msgsize(mp->b_cont)) < dl->dl_info.dl_min_sdu
+		     || dle.dl_data_length > dl->dl_info.dl_max_sdu))
+		goto error;
+	dle.dl_priority = p->unitdata_req.dl_priority;
+	/* provider specific unit data transmission */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	return (QR_TRIMMED);
       error:
-	return dl_error_ack(q, DL_UNITDATA_REQ, dl_errno);
+	size = sizeof(p->uderror_ind) + dle.dl_addr_length;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
+
+	mp->b_datap->db_type = M_PCPROTO;
+	mp->b_band = 0;
+	p = (typeof(p)) mp->b_rptr;
+	p->uderror_ind.dl_primitive = DL_UDERROR_IND;
+	p->uderror_ind.dl_addr_length = 0;
+	p->uderror_ind.dl_addr_offset = 0;
+	p->uderror_ind.dl_unix_errno = dl_errno < 0 ? -dl_errno : 0;
+	p->uderror_ind.dl_errno = dl_errno > 0 ? dl_errno : DL_SYSERR;
+	mp->b_wptr += sizeof(p->uderror_ind);
+	if (dle.dl_addr_length) {
+		p->uderror_ind.dl_addr_length = dle.dl_addr_length;
+		p->uderror_ind.dl_addr_offset = mp->b_wptr - mp->b_rptr;
+		bcopy(dle.dl_addr_buffer, mp->b_wptr, dle.dl_addr_length);
+		mp->b_wptr += dle.dl_addr_length;
+	}
+	mp->b_cont = dle.dl_data_blocks;
+	qreply(q, mp);
+	return (QR_TRIMMED);
+      enobufs:
+	return (-ENOBUFS);
 }
+
 STATIC INLINE fastcall __hot_put int
 dl_udqos_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_udqos_req dle = { DLE_UDQOS_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->udqos_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_UDQOS_REQ))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) != DL_IDLE))
+		goto error;
+	dl_errno = DL_BADQOSTYPE;
+	if (unlikely((dle.dl_qos_length = p->udqos_req.dl_qos_length) < sizeof(dl_ulong)))
+		goto error;
+	dl_errno = DL_BADQOSTYPE;
+	if (unlikely(mp->b_wptr < (dle.dl_qos_buffer = mp->b_rptr + p->udqos_req.dl_qos_offset)))
+		goto error;
+	/* provider specific data qos */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
       error:
-	return dl_error_ack(q, DL_UDQOS_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_UDQOS_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_connect_req(queue_t *q, mblk_t *mp)
 {
-	dlpi_set_state(dl, DL_OUTCON_PENDING);
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_connect_req dle = { DLE_CONNECT_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->connect_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_CONNECT_REQ))
+		goto error;
+	dl_errno = DL_NOTSUPPORTED;
+	if (unlikely(dl->dl_service_mode != DL_CODLS))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) != DL_IDLE))
+		goto error;
+	dl_errno = DL_NOADDR;
+	if (unlikely((dle.dl_dest_addr_length = p->connect_req.dl_dest_addr_length) == 0))
+		goto error;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr <
+		     (dle.dl_dest_addr_buffer = mp->b_rptr + p->connect_req.dl_dest_addr_offset)))
+		goto error;
+	dl_errno = DL_BADQOSTYPE;
+	if (unlikely((dle.dl_qos_length = p->connect_req.dl_qos_length) < sizeof(dl_ulong)))
+		goto error;
+	dl_errno = DL_BADQOSTYPE;
+	if (unlikely(mp->b_wptr < (dle.dl_qos_buffer = mp->b_rptr + p->connect_req.dl_qos_offset)))
+		goto error;
+	dl_set_state(dl, DL_OUTCON_PENDING);
+	/* provider specific connection establishment */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	return (QR_DONE);
       error:
-	return dl_error_ack(q, DL_CONNECT_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_CONNECT_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_connect_res(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_connect_res dle = { DLE_CONNECT_RES, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->connect_res)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_CONNECT_RES))
+		goto error;
+	dl_errno = DL_NOTSUPPORTED;
+	if (unlikely(dl->dl_service_mode != DL_CODLS))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) != DL_INCON_PENDING))
+		goto error;
+	dle.dl_correlation = dl_find_sequence(p->connect_res.dl_correlation);
+	dl_errno = DL_BADCORR;
+	if (unlikely(dle.dl_correlation == NULL))
+		goto error;
+	if (p->connect_res.dl_resp_token) {
+		dle.dl_resp_token = dl_find_token(p->connect_res.dl_resp_token);
+		dl_errno = DL_BADTOKEN;
+		if (unlikely(dle.dl_resp_token == NULL))
+			goto error;
+	}
+	if (dle.dl_resp_token == NULL)
+		dle.dl_resp_token = dl;
+	dl_errno = DL_PENDING;
+	if (unlikely(dle.dl_resp_token == dl && dl->dl_coninds > 1))
+		goto error;
+	dle.dl_qos_length = p->connect_res.dl_qos_length;
+	dl_errno = DL_BADQOSTYPE;
+	if (unlikely(dle.dl_qos_length < sizeof(dl_ulong)))
+		goto error;
+	dle.dl_qos_buffer = mp->b_rptr + p->connect_res.dl_qos_offset;
+	dl_errno = DL_BADQOSTYPE;
+	if (unlikely(mp->b_wptr < dle.dl_qos_buffer))
+		goto error;
 	dlpi_set_state(dl, DL_CONN_RES_PENDING);
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	bufq_dequeue(&dl->dl_conq, dle.dl_correlation);
+	dl->dl_coninds--;
+	freemsg(dle.dl_correlation);
+	dl_set_state(dle.dl_resp_token, DL_DATAXFER);
+	if (dl != dle.dl_resp_token) {
+		if (bufq_length(&dl->dl_conq) > 0)
+			dl_set_state(dl, DL_INCON_PENDING);
+		else
+			dl_set_state(dl, DL_IDLE);
+	}
       error:
-	return dl_error_ack(q, DL_CONNECT_RES, dl_errno);
+	return dl_reply_ack(q, dl, DL_CONNECT_RES, dl_errno, mp);
 }
+
 STATIC int
 dl_token_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->token_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_TOKEN_REQ))
+		goto error;
+	mp->b_datap->db_type = M_PCPROTO;
+	mp->b_band = 0;
+	p->dl_primitive = DL_TOKEN_ACK;
+	p->dl_token = (dl_ulong) (long) dl;
+	mp->b_wptr = mp->b_rptr + sizeof(p->token_ack);
+	qreply(q, mp);
+	return (QR_ABSORBED);
       error:
-	return dl_error_ack(q, DL_TOKEN_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_TOKEN_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_disconnect_req(queue_t *q, mblk_t *mp)
 {
-	dlpi_set_state(dl, DL_DISCON8_PENDING);
-	dlpi_set_state(dl, DL_DISCON9_PENDING);
-	dlpi_set_state(dl, DL_DISCON11_PENDING);
-	dlpi_set_state(dl, DL_DISCON12_PENDING);
-	dlpi_set_state(dl, DL_DISCON13_PENDING);
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_disconnect_req dle = { DLE_DISCONNECT_REQ, };
+	dl_long dl_errno;
+	dl_ulong state, nextstate;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->disconnect_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_DISCONNECT_REQ))
+		goto error;
+	dl_errno = DL_NOTSUPPORTED;
+	if (unlikely(dl->dl_service_mode != DL_CODLS))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	switch ((state = dl_get_state(dl))) {
+	case DL_DATAXFER:
+		nextstate = DL_DISCON8_PENDING;
+		break;
+	case DL_INCON_PENDING:
+		dle.dl_correlation = dl_find_sequence(p->disconnect_req.dl_correlation);
+		dl_errno = DL_BADCORR;
+		if (unlikely(dle.dl_correlation == NULL))
+			goto error;
+		nextstate = DL_DISCON9_PENDING;
+		break;
+	case DL_OUTCON_PENDING:
+		nextstate = DL_DISCON11_PENDING;
+		break;
+	case DL_PROV_RESET_PENDING:
+		nextstate = DL_DISCON12_PENDING;
+		break;
+	case DL_USER_RESET_PENDING:
+		nextstate = DL_DISCON13_PENDING;
+		break;
+	default:
+		goto error;
+	}
+	dl_errno = DL_UNSUPPORTED;
+	switch ((dle.dl_reason = p->disconnect_req.dl_reason)) {
+	case DL_DISC_NORMAL_CONDITION:
+	case DL_DISC_ABNORMAL_CONDITION:
+		if (state == DL_INCON_PENDING)
+			goto error;
+		break;
+	case DL_CONREJ_PERMANENT_COND:
+	case DL_CONREJ_TRANSIENT_COND:
+		if (state != DL_INCON_PENDING)
+			goto error;
+		break;
+	case DL_DISC_UNSPECIFIED:
+		break;
+	default:
+		goto error;
+	}
+	dl_set_state(dl, nextstate);
+	/* provider specific disconnect or connection rejection */
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	if (dle.dl_correlation != NULL) {
+		bufq_dequeue(&dl->dl_conq, dle.dl_correlation);
+		freemsg(dle.dl_correlation);
+		dl->dl_coninds--;
+		if (bufq_length(&dl->dl_conq) > 0)
+			dl_set_state(dl, DL_INCON_PENDING);
+		else
+			dl_set_state(dl, DL_IDLE);
+	} else
+		dl_set_state(dl, DL_IDLE);
       error:
-	return dl_error_ack(q, DL_DISCONNECT_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_DISCONNECT_REQ, dl_errno, mp);
 }
+
 STATIC INLINE fastcall __hot_put int
 dl_reset_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_reset_req dle = { DLE_RESET_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->reset_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_RESET_REQ))
+		goto error;
+	dl_errno = DL_NOTSUPPORTED;
+	if (unlikely(dl->dl_service_mode != DL_CODLS))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) != DL_DATAXFER))
+		goto error;
 	dlpi_set_state(dl, DL_USER_RESET_PENDING);
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	return (QR_DONE);
       error:
-	return dl_error_ack(q, DL_RESET_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_RESET_REQ, dl_errno, mp);
 }
+
 STATIC INLINE fastcall __hot_put int
 dl_reset_res(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_reset_res dle = { DLE_RESET_RES, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->reset_res)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_RESET_RES))
+		goto error;
+	dl_errno = DL_NOTSUPPORTED;
+	if (unlikely(dl->dl_service_mode != DL_CODLS))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) != DL_PROV_RESET_PENDING))
+		goto error;
 	dlpi_set_state(dl, DL_RESET_RES_PENDING);
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	dl_set_state(dl, DL_DATAXFER);
       error:
-	return dl_error_ack(q, DL_RESET_RES, dl_errno);
+	return dl_reply_ack(q, dl, DL_RESET_RES, dl_errno, mp);
 }
+
 STATIC INLINE fastcall __hot_put int
 dl_data_ack_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_data_ack_req dle = { DLE_DATA_ACK_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->data_ack_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_DATA_ACK_REQ))
+		goto error;
+	dl_errno = DL_NOTSUPPORTED;
+	if (unlikely(dl->dl_service_mode != DL_ACLDLS))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) != DL_IDLE))
+		goto error;
+	dle.dl_dest_addr_length = p->data_ack_req.dl_dest_addr_length;
+	dl_errno = DL_NOADDR;
+	if (unlikely(dle.dl_dest_addr_length == 0))
+		goto error;
+	dle.dl_dest_addr_buffer = mp->b_rptr + p->data_ack_req.dl_dest_addr_offset;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr < dle.dl_dest_addr_buffer + dle.dl_dest_addr_length))
+		goto error;
+	dle.dl_src_addr_length = p->data_ack_req.dl_src_addr_length;
+	dl_errno = DL_NOADDR;
+	if (unlikely(dle.dl_src_addr_length == 0))
+		goto error;
+	dle.dl_src_addr_buffer = mp->b_rptr + p->data_ack_req.dl_src_addr_offset;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr < dle.dl_src_addr_buffer + dle.dl_src_addr_length))
+		goto error;
+	dl_errno = DL_BADDATA;
+	if (unlikely((dle.dl_data_blocks = mp->b_cont) == NULL))
+		goto error;
+	dle.dl_data_length = msgsize(dle.dl_data_blocks);
+	dl_errno = DL_BADDATA;
+	if (unlikely(dle.dl_data_length < dl->dl_info.dl_min_sdu
+		     || dle.dle_data_length > dl->dl_info.dl_max_sdu))
+		goto error;
+	dle.dl_correlation = p->data_ack_req.dl_correlation;
+	dle.dl_priority = p->data_ack_req.dl_priority;
+	dle.dl_service_class = p->data_ack_req.dl_service_class;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	return (QR_TRIMMED);
       error:
-	return dl_error_ack(q, DL_DATA_ACK_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_DATA_ACK_REQ, dl_errno, mp);
 }
+
 STATIC INLINE fastcall __hot_put int
 dl_reply_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_reply_req dle = { DLE_REPLY_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->reply_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_REPLY_REQ))
+		goto error;
+	dl_errno = DL_NOTSUPPORTED;
+	if (unlikely(dl->dl_service_mode != DL_ACLDLS))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) != DL_IDLE))
+		goto error;
+	dle.dl_dest_addr_length = p->reply_req.dl_dest_addr_length;
+	dl_errno = DL_NOADDR;
+	if (unlikely(dle.dl_dest_addr_length == 0))
+		goto error;
+	dle.dl_dest_addr_buffer = mp->b_rptr + p->reply_req.dl_dest_addr_offset;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr < dle.dl_dest_addr_buffer + dle.dl_dest_addr_length))
+		goto error;
+	dle.dl_src_addr_length = p->reply_req.dl_src_addr_length;
+	dl_errno = DL_NOADDR;
+	if (unlikely(dle.dl_src_addr_length == 0))
+		goto error;
+	dle.dl_src_addr_buffer = mp->b_rptr + p->reply_req.dl_src_addr_offset;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr < dle.dl_src_addr_buffer + dle.dl_src_addr_length))
+		goto error;
+	dl_errno = DL_BADDATA;
+	if (unlikely((dle.dl_data_blocks = mp->b_cont) == NULL))
+		goto error;
+	dle.dl_data_length = msgsize(dle.dl_data_blocks);
+	dl_errno = DL_BADDATA;
+	if (unlikely(dle.dl_data_length < dl->dl_info.dl_min_sdu
+		     || dle.dle_data_length > dl->dl_info.dl_max_sdu))
+		goto error;
+	dle.dl_correlation = p->reply_req.dl_correlation;
+	dle.dl_priority = p->reply_req.dl_priority;
+	dle.dl_service_class = p->reply_req.dl_service_class;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	return (QR_TRIMMED);
       error:
-	return dl_error_ack(q, DL_REPLY_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_REPLY_REQ, dl_errno, mp);
 }
+
 STATIC INLINE fastcall __hot_put int
 dl_reply_update_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_reply_update_req dle = { DLE_REPLY_UPDATE_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->reply_update_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_REPLY_UPDATE_REQ))
+		goto error;
+	dl_errno = DL_NOTSUPPORTED;
+	if (unlikely(dl->dl_service_mode != DL_ACLDLS))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) != DL_IDLE))
+		goto error;
+	dle.dl_src_addr_length = p->reply_update_req.dl_src_addr_length;
+	dl_errno = DL_NOADDR;
+	if (unlikely(dle.dl_src_addr_length == 0))
+		goto error;
+	dle.dl_src_addr_buffer = mp->b_rptr + p->reply_update_req.dl_src_addr_offset;
+	dl_errno = DL_BADADDR;
+	if (unlikely(mp->b_wptr < dle.dl_src_addr_buffer + dle.dl_src_addr_length))
+		goto error;
+	dl_errno = DL_BADDATA;
+	if (unlikely((dle.dl_data_blocks = mp->b_cont) == NULL))
+		goto error;
+	dle.dl_data_length = msgsize(dle.dl_data_blocks);
+	dl_errno = DL_BADDATA;
+	if (unlikely(dle.dl_data_length < dl->dl_info.dl_min_sdu
+		     || dle.dle_data_length > dl->dl_info.dl_max_sdu))
+		goto error;
+	dle.dl_correlation = p->reply_update_req.dl_correlation;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	return (QR_TRIMMED);
       error:
-	return dl_error_ack(q, DL_REPLY_UPDATE_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_REPLY_UPDATE_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_xid_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_xid_req dle = { DLE_XID_REQ, };
+	dl_long dl_errno;
+	dl_ulong state;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->xid_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_XID_REQ))
+		goto error;
+	state = dl_get_state(dl);
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(state != DL_IDLE && state != DL_DATAXFER))
+		goto error;
+	dle.dl_dest_addr_length = p->xid_req.dl_dest_addr_length;
+	dl_errno = DL_NOADDR;
+	if (dle.dl_dest_addr_length == 0) {
+		if (unlikely(state != DL_DATAXFER))
+			goto error;
+	} else {
+		dle.dl_dest_addr_buffer = mp->b_rptr + p->xid_req.dl_dest_addr_offset;
+		dl_errno = DL_BADADDR;
+		if (unlikely(mp->b_wptr < dle.dl_dest_addr_buffer + dle.dl_dest_addr_length))
+			goto error;
+	}
+	dl_errno = DL_BADDATA;
+	if (unlikely((dle.dl_data_blocks = mp->b_cont) == NULL))
+		goto error;
+	dle.dl_data_length = msgsize(dle.dl_data_blocks);
+	dl_errno = DL_BADDATA;
+	if (unlikely(dle.dl_data_length < dl->dl_info.dl_min_sdu
+		     || dle.dle_data_length > dl->dl_info.dl_max_sdu))
+		goto error;
+	dle.dl_flag = p->xid_req.dl_flag;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	return (QR_TRIMMED);
       error:
-	return dl_error_ack(q, DL_XID_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_XID_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_xid_res(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_xid_res dle = { DLE_XID_RES, };
+	dl_long dl_errno;
+	dl_ulong state;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->xid_res)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_XID_RES))
+		goto error;
+	state = dl_get_state(dl);
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(state != DL_IDLE && state != DL_DATAXFER))
+		goto error;
+	dle.dl_dest_addr_length = p->xid_res.dl_dest_addr_length;
+	dl_errno = DL_XIDAUTO;
+	if (dl->dl_xidtest_flg & DL_AUTO_XID)
+		goto error;
+	dl_errno = DL_NOADDR;
+	if (dle.dl_dest_addr_length == 0) {
+		if (unlikely(state != DL_DATAXFER))
+			goto error;
+	} else {
+		dle.dl_dest_addr_buffer = mp->b_rptr + p->xid_res.dl_dest_addr_offset;
+		dl_errno = DL_BADADDR;
+		if (unlikely(mp->b_wptr < dle.dl_dest_addr_buffer + dle.dl_dest_addr_length))
+			goto error;
+	}
+	dl_errno = DL_BADDATA;
+	if (unlikely((dle.dl_data_blocks = mp->b_cont) == NULL))
+		goto error;
+	dle.dl_data_length = msgsize(dle.dl_data_blocks);
+	dl_errno = DL_BADDATA;
+	if (unlikely(dle.dl_data_length < dl->dl_info.dl_min_sdu
+		     || dle.dle_data_length > dl->dl_info.dl_max_sdu))
+		goto error;
+	dle.dl_flag = p->xid_res.dl_flag;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	return (QR_TRIMMED);
       error:
-	return dl_error_ack(q, DL_XID_RES, dl_errno);
+	return dl_reply_ack(q, dl, DL_XID_RES, dl_errno, mp);
 }
+
 STATIC int
 dl_test_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_test_req dle = { DLE_TEST_REQ, };
+	dl_long dl_errno;
+	dl_ulong state;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->test_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_TEST_REQ))
+		goto error;
+	state = dl_get_state(dl);
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(state != DL_IDLE && state != DL_DATAXFER))
+		goto error;
+	dle.dl_dest_addr_length = p->test_req.dl_dest_addr_length;
+	dl_errno = DL_NOADDR;
+	if (dle.dl_dest_addr_length == 0) {
+		if (unlikely(state != DL_DATAXFER))
+			goto error;
+	} else {
+		dle.dl_dest_addr_buffer = mp->b_rptr + p->test_req.dl_dest_addr_offset;
+		dl_errno = DL_BADADDR;
+		if (unlikely(mp->b_wptr < dle.dl_dest_addr_buffer + dle.dl_dest_addr_length))
+			goto error;
+	}
+	dl_errno = DL_BADDATA;
+	if (unlikely((dle.dl_data_blocks = mp->b_cont) == NULL))
+		goto error;
+	dle.dl_data_length = msgsize(dle.dl_data_blocks);
+	dl_errno = DL_BADDATA;
+	if (unlikely(dle.dl_data_length < dl->dl_info.dl_min_sdu
+		     || dle.dle_data_length > dl->dl_info.dl_max_sdu))
+		goto error;
+	dle.dl_flag = p->test_req.dl_flag;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	return (QR_TRIMMED);
       error:
-	return dl_error_ack(q, DL_TEST_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_TEST_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_test_res(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_test_res dle = { DLE_TEST_RES, };
+	dl_long dl_errno;
+	dl_ulong state;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->test_res)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_TEST_RES))
+		goto error;
+	state = dl_get_state(dl);
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(state != DL_IDLE && state != DL_DATAXFER))
+		goto error;
+	dle.dl_dest_addr_length = p->test_res.dl_dest_addr_length;
+	dl_errno = DL_TESTAUTO;
+	if (dl->dl_xidtest_flg & DL_AUTO_TEST)
+		goto error;
+	dl_errno = DL_NOADDR;
+	if (dle.dl_dest_addr_length == 0) {
+		if (unlikely(state != DL_DATAXFER))
+			goto error;
+	} else {
+		dle.dl_dest_addr_buffer = mp->b_rptr + p->test_res.dl_dest_addr_offset;
+		dl_errno = DL_BADADDR;
+		if (unlikely(mp->b_wptr < dle.dl_dest_addr_buffer + dle.dl_dest_addr_length))
+			goto error;
+	}
+	dl_errno = DL_BADDATA;
+	if (unlikely((dle.dl_data_blocks = mp->b_cont) == NULL))
+		goto error;
+	dle.dl_data_length = msgsize(dle.dl_data_blocks);
+	dl_errno = DL_BADDATA;
+	if (unlikely(dle.dl_data_length < dl->dl_info.dl_min_sdu
+		     || dle.dle_data_length > dl->dl_info.dl_max_sdu))
+		goto error;
+	dle.dl_flag = p->test_res.dl_flag;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	return (QR_TRIMMED);
       error:
-	return dl_error_ack(q, DL_TEST_RES, dl_errno);
+	return dl_reply_ack(q, dl, DL_TEST_RES, dl_errno, mp);
 }
+
 STATIC int
 dl_phys_addr_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_phys_addr_req del = { DLE_PHYS_ADDR_REQ, };
+	dl_long dl_errno;
+	mblk_t *pp = mp;
+	size_t size;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->phys_addr_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_PHYS_ADDR_REQ))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) == DL_UNATTACHED))
+		goto error;
+	dl_errno = DL_UNSUPPORTED;
+	if (unlikely(dl->dl_ppa == 0))
+		goto error;
+	dle.dl_addr_type = p->phys_addr_req.dl_addr_type;
+	dl_errno = DL_UNSUPPORTED;
+	if (unlikely(dle.dl_addr_type != DL_FACT_PHYS_ADDR
+		     && dle.dl_addr_type != DL_CURR_PHYS_ADDR))
+		goto error;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	size = sizeof(p->phys_addr_ack) + dle.dl_addr_length;
+	dl_errno = -ENOBUFS;
+	if (unlikely(mp->b_datap->db_lim < mp->b_datap->db_base + size))
+		if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+			goto error;
+	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	mp->b_datap->db_type = M_PCPROTO;
+	mp->b_band = 0;
+	p = (typeof(p)) mp->b_rptr;
+	p->phys_addr_ack.dl_primitive = DL_PHYS_ADDR_ACK;
+	p->phys_addr_ack.dl_addr_length = 0;
+	p->phys_addr_ack.dl_addr_offset = 0;
+	mp->b_wptr += sizeof(p->phys_addr_ack);
+	if (dle.dl_addr_length) {
+		p->phys_addr_ack.dl_addr_length = dle.dl_addr_length;
+		p->phys_addr_ack.dl_addr_offset = mp->b_wptr - mp->b_rptr;
+		bcopy(dle.dl_addr_buffer, mp->b_wptr, dle.dl_addr_length);
+		mp->b_wptr += dle.dl_addr_length;
+	}
+	qreply(q, mp);
+	return (pp == mp ? QR_ABSORBED : QR_DONE);
       error:
-	return dl_error_ack(q, DL_PHYS_ADDR_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_PHYS_ADDR_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_set_phys_addr_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_set_phys_addr_req del = { DLE_SET_PHYS_ADDR_REQ, };
+	dl_long dl_errno;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->set_phys_addr_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_SET_PHYS_ADDR_REQ))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) == DL_UNATTACHED))
+		goto error;
+	dl_errno = DL_UNSUPPORTED;
+	if (unlikely(dl->dl_ppa == 0))
+		goto error;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
       error:
-	return dl_error_ack(q, DL_SET_PHYS_ADDR_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_SET_PHYS_ADDR_REQ, dl_errno, mp);
 }
+
 STATIC int
 dl_get_statistics_req(queue_t *q, mblk_t *mp)
 {
+	struct dl *dl = DL_PRIV(q);
+	union DL_primitives *p = (typeof(p)) mp->b_rptr;
+	struct dle_get_statistics_req del = { DLE_GET_STATISTICS_REQ, };
+	dl_long dl_errno;
+	mblk_t *pp = mp;
+	size_t size;
+
+	dl_errno = -EMSGSIZE;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->get_statistics_req)))
+		goto error;
+	dl_errno = -EFAULT;
+	if (unlikely(p->dl_primitive != DL_GET_STATISTICS_REQ))
+		goto error;
+	dl_errno = DL_OUTSTATE;
+	if (unlikely(dl_get_state(dl) == DL_UNATTACHED))
+		goto error;
+	dl_errno = DL_UNSUPPORTED;
+	if (unlikely(dl->dl_ppa == 0))
+		goto error;
+	if (unlikely((dl_errno = dl->dl_event(q, dl, &dle)) != 0))
+		goto error;
+	size = sizeof(p->get_statistics_ack) + dle.dl_stat_length;
+	dl_errno = -ENOBUFS;
+	if (unlikely(mp->b_datap->db_lim < mp->b_datap->db_base + size))
+		if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+			goto error;
+	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	mp->b_datap->db_type = M_PCPROTO;
+	mp->b_band = 0;
+	p = (typeof(p)) mp->b_rptr;
+	p->get_statistics_ack.dl_primitive = DL_GET_STATISTICS_ACK;
+	p->get_statistics_ack.dl_stat_length = 0;
+	p->get_statistics_ack.dl_stat_offset = 0;
+	mp->b_wptr += sizeof(p->get_statistics_ack);
+	if (dle.dl_stat_length) {
+		p->get_statistics_ack.dl_stat_length = dle.dl_stat_length;
+		p->get_statistics_ack.dl_stat_offset = mp->b_wptr - mp->b_rptr;
+		bcopy(dle.dl_stat_buffer, mp->b_wptr, dle.dl_stat_length);
+		mp->b_wptr += dle.dl_stat_length;
+	}
+	qreply(q, mp);
+	return (pp == mp ? QR_ABSORBED : QR_DONE);
       error:
-	return dl_error_ack(q, DL_GET_STATISTICS_REQ, dl_errno);
+	return dl_reply_ack(q, dl, DL_GET_STATISTICS_REQ, dl_errno, mp);
 }
 
 STATIC INLINE fastcall __hot_put int
@@ -4036,7 +3299,7 @@ dl_w_proto(queue_t *q, mblk_t *mp)
 	int rtn = -EPROTO;
 	dl_long prim = 0;
 	struct dl *dl = DL_PRIV(q);
-	dl_long oldstate = dlpi_get_state(dl);
+	dl_long oldstate = dl->i_oldstate = dlpi_get_state(dl);
 
 	if (mp->b_wptr >= mp->b_rptr + sizeof(prim)) {
 		switch ((prim = *(dl_long *) mp->b_rptr)) {
@@ -4170,8 +3433,9 @@ dl_w_proto(queue_t *q, mblk_t *mp)
 		case -EAGAIN:	/* try again */
 		case -ENOMEM:	/* could not allocate memory */
 		case -ENOBUFS:	/* could not allocate an mblk */
+			return (rtn);
 		case -EOPNOTSUPP:	/* primitive not supported */
-			return dl_error_ack(q, prim, rtn);
+			return dl_reply_ack(q, dl, prim, rtn, mp);
 		case -EPROTO:
 			return dl_error_reply(q, rtn);
 		default:
@@ -4258,7 +3522,7 @@ cd_error_ind(queue_t *q, mblk_t *mp)
  * CD_UNITDATA_REQ; CD_PACEDOUTPUT -- CD_UNITDATA_ACK primitives will only be issued as a timing
  * clude for output.
  */
-STATIC INLINE fastcall __hot_read int
+STATIC INLINE fastcall __hot_in int
 cd_unitdata_ack(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
@@ -4315,7 +3579,7 @@ cd_unitdata_ack(queue_t *q, mblk_t *mp)
  * Data can be delivered as just M_DATA blocks too.  That is probably all that is necessary for a
  * permanent HDLC data link connection (e.g. point-to-point Citynet 56kpbs service).
  */
-STATIC INLINE fastcall __hot_read int
+STATIC INLINE fastcall __hot_in int
 cd_unitdata_ind(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
@@ -4375,13 +3639,13 @@ cd_modem_sig_ind(queue_t *q, mblk_t *mp)
 {
 }
 
-STATIC INLINE fastcall __hot_read int
+STATIC INLINE fastcall __hot_in int
 cd_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn = -EPROTO;
 	cd_long prim = 0;
 	struct cd *cd = CD_PRIV(q);
-	cd_long oldstate = cdi_get_state(cd);
+	cd_long oldstate = cd->i_oldstate = cdi_get_state(cd);
 
 	if (mp->b_wptr >= mp->b_rptr + sizeof(prim)) {
 		switch ((prim = *(cd_long *) mp->b_rptr)) {
@@ -4466,7 +3730,7 @@ cd_r_proto(queue_t *q, mblk_t *mp)
 	return (rtn);
 }
 
-STATIC INLINE fastcall __hot_read int
+STATIC INLINE fastcall __hot_in int
 cd_r_data(queue_t *q, mblk_t *mp)
 {
 }
@@ -4496,7 +3760,7 @@ cd_r_error(queue_t *q, mblk_t *mp)
  * @q: upper multiplex write queue
  * @mp: message to process
  */
-STATIC int
+STATIC streamscall __hot_put int
 dl_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -4536,7 +3800,7 @@ dl_w_prim(queue_t *q, mblk_t *mp)
  * function.  This function is only used for the read queue of an upper multiplex.
  *
  */
-STATIC int
+STATIC streamscall __hot_get int
 dl_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -4567,7 +3831,7 @@ dl_r_prim(queue_t *q, mblk_t *mp)
  * function.  This function is only used for the write queue of a lower multiplex.
  *
  */
-STATIC int
+STATIC streamscall __hot_out int
 cd_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -4593,7 +3857,7 @@ cd_w_prim(queue_t *q, mblk_t *mp)
  * (q->q_next); when a multiplexing driver, some algorithm that considers all upper multiplex
  * streams.
  */
-STATIC int
+STATIC streamscall __hot_in int
 cd_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {

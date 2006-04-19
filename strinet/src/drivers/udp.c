@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/03 10:57:25 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/18 17:55:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/03 10:57:25 $ by $Author: brian $
+ Last Modified $Date: 2006/04/18 17:55:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.8  2006/04/18 17:55:42  brian
+ - raiontalizing rawip and udp drivers
+
  Revision 0.9.2.7  2006/04/03 10:57:25  brian
  - need attributes on definition as well as declaration
 
@@ -73,9 +76,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/03 10:57:25 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/18 17:55:42 $"
 
-static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/03 10:57:25 $";
+static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/18 17:55:42 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -152,7 +155,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $)
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/03 10:57:25 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/18 17:55:42 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -4457,7 +4460,7 @@ l_unitdata_ind(queue_t *q, mblk_t *mp)
  * N_UDERROR_IND messages are passed from a linked NPI IP provider.  They are processed similar to
  * ICMP messages incoming in udp_v4_err().
  */
-STATIC int
+STATIC INLINE fastcall int
 l_uderror_ind(queue_t *q, mblk_t *mp)
 {
 	struct udp *udp;
@@ -4491,7 +4494,7 @@ l_uderror_ind(queue_t *q, mblk_t *mp)
  *
  * Unexpected message.
  */
-STATIC int
+STATIC INLINE fastcall int
 l_other_ind(queue_t *q, mblk_t *mp)
 {
 	swerr();
@@ -4798,6 +4801,13 @@ udp_w_prim(queue_t *q, mblk_t *mp)
 	return (-EOPNOTSUPP);
 }
 
+STATIC int
+mux_w_proto(queue_t *q, mblk_t *mp)
+{
+	fixme(("Write this function."));
+	return (-EFAULT);
+}
+
 /**
  * mux_r_proto: - process an M_PROTO message on the lower read queue
  * @q: active queue in queue pair (read queue)
@@ -4875,6 +4885,9 @@ mux_w_prim(queue_t *q, mblk_t *mp)
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		return udp_w_flush(q, mp);
+	case M_PROTO:
+	case M_PCPROTO:
+		return mux_w_proto(q, mp);
 	}
 	return (QR_PASSFLOW);
 }
