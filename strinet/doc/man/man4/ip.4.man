@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ip.4.man,v 0.9.2.4 2006/04/05 09:44:26 brian Exp $
+.\" @(#) $Id: ip.4.man,v 0.9.2.5 2006/04/22 04:59:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:26 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/22 04:59:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ip.4.man,v $
+.\" Revision 0.9.2.5  2006/04/22 04:59:27  brian
+.\" - updated manual pages for 2G drivers
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:44:26  brian
 .\" - moved .so line and updated headers
 .\"
@@ -81,7 +84,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B ip
+.B ip, ip2
 \- Internet Protocol
 .\"
 .\"
@@ -95,11 +98,13 @@ sort-adjacent-labels
 .br
 .B #include <sys/xti_ip.h>
 .HP 8
-.BI "int " ip_stream " = open(" \fR\*(lq/dev/ip\*(rq\fP ", " oflags );
+.BI "int " ip_stream " = open(" ip_device ", " oflags );
+.PD 0
 .HP 8
-.BI "int " ip_xtistr " = t_open(" \fR\*(lq/dev/ip\*(rq\fP ", " oflags );
+.BI "int " ip_xtistr " = t_open(" ip_device ", " oflags );
 .HP 8
 .BI "int " ip_socket " = socket(" \fRPF_INET\fP ", " \fRSOCK_RAW\fP ", " \fRIPPROTO_IP\fP );
+.PD
 .\"
 .\"
 .SH DESCRIPTION

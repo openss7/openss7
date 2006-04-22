@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_udp.7.man,v 0.9.2.6 2006/04/22 04:59:34 brian Exp $
+.\" @(#) $Id: tpi_udp.7.man,v 0.9.2.7 2006/04/22 08:39:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/22 04:59:34 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/22 08:39:09 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_udp.7.man,v $
+.\" Revision 0.9.2.7  2006/04/22 08:39:09  brian
+.\" - updated manual pages
+.\"
 .\" Revision 0.9.2.6  2006/04/22 04:59:34  brian
 .\" - updated manual pages for 2G drivers
 .\"
@@ -1548,15 +1551,54 @@ Fragmentation time exceeded.
 .PD
 .\"
 .\"
-.SH "CAVEATS"
+.SH NOTICES
 .PP
+.B UDP
+has several implementations.  This manpage is for the
+.BR INET (4)
+implementation that provides
+.BR tpi (7)
+access to the Linux NET4 version of
+.BR UDP.
+For more information on the Linux NET4 version, see
+.BR udp (7).
 .\"
 .\"
 .SH "SEE ALSO"
+.PP
 .BR udp (7),
+.BR udp (4),
+.BR udp2 (4),
 .BR tpi (7),
 .BR xti (3),
 .BR sockets (3).
+.\"
+.\"
+.SH COMPATIBILTY
+.PP
+The
+.B @PACKAGE_TITLE@
+implementation of
+.BR UDP
+for
+.I STREAMS
+is largely compatible with
+.IR STREAMS -based
+implementations such as Lachman or Mentat TCP/IP stacks and
+.IR Solaris \(rg
+documentation.
+.[
+soldoc
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to TPI Version 2, Draft 2,
+.[
+TPI Revision 2.0.0
+.]
+except where indicated.
 .\"
 .\"
 .SH HISTORY
@@ -1567,12 +1609,6 @@ svr4
 .]
 .\"
 .\"
-.SH CONFORMANCE
-.PP
-This interface conforms to TPI Version 2, Draft 2.
-.[
-TPI Revision 2.0.0
-.]
 .XX
 .[
 magic
