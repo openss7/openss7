@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/18 17:54:43 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 01:05:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/18 17:54:43 $ by $Author: brian $
+ Last Modified $Date: 2006/04/22 01:05:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.10  2006/04/22 01:05:36  brian
+ - updated headers and optimitization
+
  Revision 0.9.2.9  2006/04/18 17:54:43  brian
  - added some strategic prefetches
 
@@ -79,10 +82,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/18 17:54:43 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 01:05:36 $"
 
-static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/18 17:54:43 $";
+static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 01:05:36 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -103,7 +105,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/18 17:54:43 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 01:05:36 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -128,62 +130,65 @@ MODULE_ALIAS("streams-os7compat");
 __OS7_EXTERN_INLINE void streamscall ss7_bufsrv(long data);
 
 EXPORT_SYMBOL_NOVERS(ss7_bufsrv);
-__OS7_EXTERN_INLINE void ss7_unbufcall(str_t * s);
+__OS7_EXTERN_INLINE streamscall void ss7_unbufcall(str_t * s);
 
 EXPORT_SYMBOL_NOVERS(ss7_unbufcall);
-__OS7_EXTERN_INLINE void ss7_bufcall(queue_t *q, size_t size, int prior);
+__OS7_EXTERN_INLINE streamscall void ss7_bufcall(queue_t *q, size_t size, int prior);
 
 EXPORT_SYMBOL_NOVERS(ss7_bufcall);
-__OS7_EXTERN_INLINE void ss7_esbbcall(queue_t *q, int prior);
+__OS7_EXTERN_INLINE streamscall void ss7_esbbcall(queue_t *q, int prior);
 
 EXPORT_SYMBOL_NOVERS(ss7_esbbcall);
-__OS7_EXTERN_INLINE mblk_t *ss7_allocb(queue_t *q, size_t size, int prior);
+__OS7_EXTERN_INLINE streamscall mblk_t *ss7_allocb(queue_t *q, size_t size, int prior);
 
 EXPORT_SYMBOL_NOVERS(ss7_allocb);
-__OS7_EXTERN_INLINE mblk_t *ss7_esballoc(queue_t *q, unsigned char *base, size_t size, int prior,
-					 frtn_t *frtn);
+__OS7_EXTERN_INLINE streamscall mblk_t *ss7_esballoc(queue_t *q, unsigned char *base, size_t size,
+						     int prior, frtn_t *frtn);
 EXPORT_SYMBOL_NOVERS(ss7_esballoc);
-__OS7_EXTERN_INLINE int ss7_pullupmsg(queue_t *q, mblk_t *mp, int size);
+__OS7_EXTERN_INLINE streamscall int ss7_pullupmsg(queue_t *q, mblk_t *mp, int size);
 
 EXPORT_SYMBOL_NOVERS(ss7_pullupmsg);
-__OS7_EXTERN_INLINE mblk_t *ss7_dupb(queue_t *q, mblk_t *bp);
+__OS7_EXTERN_INLINE streamscall mblk_t *ss7_dupb(queue_t *q, mblk_t *bp);
 
 EXPORT_SYMBOL_NOVERS(ss7_dupb);
-__OS7_EXTERN_INLINE mblk_t *ss7_dupmsg(queue_t *q, mblk_t *bp);
+__OS7_EXTERN_INLINE streamscall mblk_t *ss7_dupmsg(queue_t *q, mblk_t *bp);
 
 EXPORT_SYMBOL_NOVERS(ss7_dupmsg);
-__OS7_EXTERN_INLINE mblk_t *ss7_copyb(queue_t *q, mblk_t *bp);
+__OS7_EXTERN_INLINE streamscall mblk_t *ss7_copyb(queue_t *q, mblk_t *bp);
 
 EXPORT_SYMBOL_NOVERS(ss7_copyb);
-__OS7_EXTERN_INLINE mblk_t *ss7_copymsg(queue_t *q, mblk_t *bp);
+__OS7_EXTERN_INLINE streamscall mblk_t *ss7_copymsg(queue_t *q, mblk_t *bp);
 
 EXPORT_SYMBOL_NOVERS(ss7_copymsg);
 
-__OS7_EXTERN_INLINE mblk_t *__ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior);
+__OS7_EXTERN_INLINE streamscall mblk_t *__ss7_fast_allocb(struct ss7_bufpool *pool, size_t size,
+							  int prior);
 
 EXPORT_SYMBOL_NOVERS(__ss7_fast_allocb);
-__OS7_EXTERN_INLINE mblk_t *ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior);
+__OS7_EXTERN_INLINE streamscall mblk_t *ss7_fast_allocb(struct ss7_bufpool *pool, size_t size,
+							int prior);
 
 EXPORT_SYMBOL_NOVERS(ss7_fast_allocb);
-__OS7_EXTERN_INLINE mblk_t *ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size, int prior);
+__OS7_EXTERN_INLINE streamscall mblk_t *ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size,
+							   int prior);
 
 EXPORT_SYMBOL_NOVERS(ss7_fast_allocb_bh);
-__OS7_EXTERN_INLINE void __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
+__OS7_EXTERN_INLINE streamscall void __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(__ss7_fast_freeb);
-__OS7_EXTERN_INLINE void ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
+__OS7_EXTERN_INLINE streamscall void ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(ss7_fast_freeb);
-__OS7_EXTERN_INLINE void ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp);
+__OS7_EXTERN_INLINE streamscall void ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(ss7_fast_freeb_bh);
-__OS7_EXTERN_INLINE void __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
+__OS7_EXTERN_INLINE streamscall void __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(__ss7_fast_freemsg);
-__OS7_EXTERN_INLINE void ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
+__OS7_EXTERN_INLINE streamscall void ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(ss7_fast_freemsg);
-__OS7_EXTERN_INLINE void ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp);
+__OS7_EXTERN_INLINE streamscall void ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(ss7_fast_freemsg_bh);
 __OS7_EXTERN_INLINE void ss7_bufpool_init(struct ss7_bufpool *pool);
@@ -202,22 +207,22 @@ EXPORT_SYMBOL_NOVERS(ss7_bufpool_term);
 __OS7_EXTERN_INLINE void bufq_init(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_init);
-__OS7_EXTERN_INLINE void bufq_lock(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall void bufq_lock(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_lock);
-__OS7_EXTERN_INLINE void bufq_unlock(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall void bufq_unlock(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_unlock);
-__OS7_EXTERN_INLINE size_t bufq_length(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall size_t bufq_length(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_length);
-__OS7_EXTERN_INLINE size_t bufq_size(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall size_t bufq_size(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_size);
-__OS7_EXTERN_INLINE mblk_t *bufq_head(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall mblk_t *bufq_head(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_head);
-__OS7_EXTERN_INLINE mblk_t *bufq_tail(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall mblk_t *bufq_tail(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_tail);
 __OS7_EXTERN_INLINE void __bufq_add(bufq_t * q, mblk_t *mp);
@@ -229,16 +234,16 @@ EXPORT_SYMBOL_NOVERS(__bufq_sub);
 __OS7_EXTERN_INLINE void __bufq_queue(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(__bufq_queue);
-__OS7_EXTERN_INLINE void bufq_queue(bufq_t * q, mblk_t *mp);
+__OS7_EXTERN_INLINE streamscall void bufq_queue(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(bufq_queue);
-__OS7_EXTERN_INLINE void bufq_queue_head(bufq_t * q, mblk_t *mp);
+__OS7_EXTERN_INLINE streamscall void bufq_queue_head(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(bufq_queue_head);
-__OS7_EXTERN_INLINE void bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np);
+__OS7_EXTERN_INLINE streamscall void bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np);
 
 EXPORT_SYMBOL_NOVERS(bufq_insert);
-__OS7_EXTERN_INLINE void bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np);
+__OS7_EXTERN_INLINE streamscall void bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np);
 
 EXPORT_SYMBOL_NOVERS(bufq_append);
 __OS7_EXTERN_INLINE mblk_t *__bufq_dequeue(bufq_t * q);
@@ -250,34 +255,35 @@ EXPORT_SYMBOL_NOVERS(bufq_dequeue);
 __OS7_EXTERN_INLINE mblk_t *__bufq_dequeue_tail(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(__bufq_dequeue_tail);
-__OS7_EXTERN_INLINE mblk_t *bufq_dequeue_tail(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall mblk_t *bufq_dequeue_tail(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_dequeue_tail);
 __OS7_EXTERN_INLINE mblk_t *__bufq_unlink(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(__bufq_unlink);
-__OS7_EXTERN_INLINE mblk_t *bufq_unlink(bufq_t * q, mblk_t *mp);
+__OS7_EXTERN_INLINE streamscall mblk_t *bufq_unlink(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(bufq_unlink);
-__OS7_EXTERN_INLINE void bufq_splice_head(bufq_t * q1, bufq_t * q2);
+__OS7_EXTERN_INLINE streamscall void bufq_splice_head(bufq_t * q1, bufq_t * q2);
 
 EXPORT_SYMBOL_NOVERS(bufq_splice_head);
-__OS7_EXTERN_INLINE void bufq_splice_tail(bufq_t * q1, bufq_t * q2);
+__OS7_EXTERN_INLINE streamscall void bufq_splice_tail(bufq_t * q1, bufq_t * q2);
 
 EXPORT_SYMBOL_NOVERS(bufq_splice_tail);
-__OS7_EXTERN_INLINE void bufq_freehead(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall void bufq_freehead(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_freehead);
-__OS7_EXTERN_INLINE void bufq_purge(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall void bufq_purge(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_purge);
 __OS7_EXTERN_INLINE void __bufq_supply(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(__bufq_supply);
-__OS7_EXTERN_INLINE void bufq_supply(bufq_t * q, mblk_t *mp);
+__OS7_EXTERN_INLINE streamscall void bufq_supply(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(bufq_supply);
-__OS7_EXTERN_INLINE mblk_t *bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount);
+__OS7_EXTERN_INLINE streamscall mblk_t *bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize,
+						      int maxcount);
 
 EXPORT_SYMBOL_NOVERS(bufq_resupply);
 
@@ -292,7 +298,7 @@ EXPORT_SYMBOL_NOVERS(bufq_resupply);
  * against an implicit recursive put procedure (one that calls a put procedure that calls another
  * that calls the original put procedure).  Locking is strict and safe against interrupts.
  */
-int
+streamscall __hot int
 ss7_trylockq(queue_t *q)
 {
 	int res;
@@ -324,7 +330,7 @@ EXPORT_SYMBOL_NOVERS(ss7_trylockq);
  * does not have a service procedure, one will still be called directly to drain deferred messages
  * from the queue.
  */
-void
+streamscall __hot void
 ss7_unlockq(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
@@ -404,7 +410,7 @@ ss7_flushq(queue_t *q, mblk_t *mp, const unsigned char flag)
  * Performs canonical flushing from a write queue.  The mesage is passed along or looped if
  * required and QR_ABSORBED returned, or QR_DONE returned if the message is to be discarded.
  */
-int
+streamscall int
 ss7_w_flush(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -417,14 +423,14 @@ ss7_w_flush(queue_t *q, mblk_t *mp)
 EXPORT_SYMBOL_NOVERS(ss7_w_flush);
 
 /**
- * ss7_w_flush: - canoncial flushing of the RD queue
+ * ss7_r_flush: - canoncial flushing of the RD queue
  * @q: read queue
  * @mp: M_FLUSH message
  *
  * Performs canonical flushing from a read queue.  The mesage is passed along or looped if
  * required and QR_ABSORBED returned, or QR_DONE returned if the message is to be discarded.
  */
-int
+int streamscall
 ss7_r_flush(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -464,7 +470,7 @@ EXPORT_SYMBOL_NOVERS(ss7_r_flush);
  * The message processing procedure proc() is invoked with the queue pair locked and the procedure
  * has exclusive access to the queue pair private structure.
  */
-int
+streamscall __hot int
 ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0, locked = 0;
@@ -554,7 +560,7 @@ EXPORT_SYMBOL_NOVERS(ss7_putq);
  * lacking qprocson()/qprocsoff() and other poor behaviour.  Only the synchronization is necessary
  * for running D_MP under Linux Fast-STREAMS.
  */
-int
+streascall __hot int
 ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_t *))
 {
 	int rtn = 0;
@@ -677,7 +683,7 @@ EXPORT_SYMBOL_NOVERS(ss7_srvq);
  * The checks for the existence of a queue and the existence of a processing routine are to handle
  * the older LiS lack of a proper qprocson()/qprocsoff() mechanism.
  */
-int streamscall
+streamscall __hot_out int
 ss7_oput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
@@ -693,7 +699,7 @@ ss7_oput(queue_t *q, mblk_t *mp)
 		}
 		swerr();
 		if (s->oq->q_qinfo->qi_srvp && putq(s->oq, mp))
-			return (0); /* recovered */
+			return (0);	/* recovered */
 	}
 	swerr();
 	freemsg(mp);
@@ -710,7 +716,7 @@ EXPORT_SYMBOL_NOVERS(ss7_oput);
  * done by the deferral mechanism for bufcalls.  The message is deferred to the queue and this
  * procedure invoked on callback when there is no service procedure to enable.
  */
-int streamscall
+streamscall __hot_out int
 ss7_osrv(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
@@ -740,7 +746,7 @@ EXPORT_SYMBOL_NOVERS(ss7_osrv);
  * The checks for the existence of a queue and the existence of a processing routine are to handle
  * the older LiS lack of a proper qprocson()/qprocsoff() mechanism.
  */
-int streamscall
+streamscall __hot_in int
 ss7_iput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
@@ -756,7 +762,7 @@ ss7_iput(queue_t *q, mblk_t *mp)
 		}
 		swerr();
 		if (s->iq->q_qinfo->qi_srvp && putq(s->iq, mp))
-			return (0); /* recovered */
+			return (0);	/* recovered */
 	}
 	swerr();
 	freemsg(mp);
@@ -773,7 +779,7 @@ EXPORT_SYMBOL_NOVERS(ss7_iput);
  * done by the deferral mechanism for bufcalls.  The message is deferred to the queue and this
  * procedure invoked on callback when there is no service procedure to enable.
  */
-int streamscall
+streamscall __hot_in int
 ss7_isrv(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
@@ -794,16 +800,18 @@ ss7_isrv(queue_t *q)
 
 EXPORT_SYMBOL_NOVERS(ss7_isrv);
 
-__OS7_EXTERN_INLINE void ss7_do_timeout(caddr_t data, const char *timer, const char *mod,
-					ulong *timeo, int (*to_fnc) (struct head *),
-					void streamscall (*exp_func) (caddr_t));
+__OS7_EXTERN_INLINE streamscall void ss7_do_timeout(caddr_t data, const char *timer,
+						    const char *mod, ulong *timeo,
+						    int (*to_fnc) (struct head *),
+						    void streamscall (*exp_func) (caddr_t));
 EXPORT_SYMBOL_NOVERS(ss7_do_timeout);
-__OS7_EXTERN_INLINE void ss7_stop_timer(struct head *h, const char *timer, const char *mod,
-					ulong *timeo);
+__OS7_EXTERN_INLINE streamscall void ss7_stop_timer(struct head *h, const char *timer,
+						    const char *mod, ulong *timeo);
 EXPORT_SYMBOL_NOVERS(ss7_stop_timer);
-__OS7_EXTERN_INLINE void ss7_start_timer(struct head *h, const char *timer, const char *mod,
-					 ulong *timeo, void streamscall (*exp_func) (caddr_t),
-					 ulong val);
+__OS7_EXTERN_INLINE streamscall void ss7_start_timer(struct head *h, const char *timer,
+						     const char *mod, ulong *timeo,
+						     void streamscall (*exp_func) (caddr_t),
+						     ulong val);
 EXPORT_SYMBOL_NOVERS(ss7_start_timer);
 
 #ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE

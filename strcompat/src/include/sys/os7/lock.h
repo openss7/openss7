@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: lock.h,v 0.9.2.4 2005/07/12 13:54:43 brian Exp $
+ @(#) $Id: lock.h,v 0.9.2.5 2006/04/22 01:05:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+ Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_LOCK_H__
 #define __OS7_LOCK_H__
 
-extern int ss7_trylockq(queue_t *q);
-extern void ss7_unlockq(queue_t *q);
+#ident "@(#) $RCSfile: lock.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+
+extern int streamscall ss7_trylockq(queue_t *q);
+extern void streamscall ss7_unlockq(queue_t *q);
 
 #endif				/* __OS7_LOCK_H__ */

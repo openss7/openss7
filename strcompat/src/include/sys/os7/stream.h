@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.4 2005/12/28 09:51:48 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.5 2006/04/22 01:05:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,29 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: stream.h,v $
- Revision 0.9.2.4  2005/12/28 09:51:48  brian
- - remove warnings on FC4 compile
-
- Revision 0.9.2.3  2005/07/18 12:25:40  brian
- - standard indentation
-
- Revision 0.9.2.2  2005/07/15 23:09:21  brian
- - checking in for sync
-
- Revision 0.9.2.1  2005/07/12 13:54:43  brian
- - changes for os7 compatibility and check pass
+ Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OS7_STREAM_H__
 #define __SYS_OS7_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/irix/stream.h directly, include sys/stream.h instead."

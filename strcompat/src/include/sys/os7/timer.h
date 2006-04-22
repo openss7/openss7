@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: timer.h,v 0.9.2.7 2005/12/19 12:44:31 brian Exp $
+ @(#) $Id: timer.h,v 0.9.2.8 2006/04/22 01:05:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,12 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:31 $ by $Author: brian $
+ Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_TIMER_H__
 #define __OS7_TIMER_H__
+
+#ident "@(#) $RCSfile: timer.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define SS7_DECLARE_TIMER(__n,__o,__t,__c) \
 STATIC int __o ## _ ## __t ## _timeout(struct __o *); \
@@ -69,9 +70,9 @@ STATIC void __o ## _start_timer_ ## __t (struct __o * __o) \
 	ss7_start_timer((struct head *)__o, # __t, __n, &__o->timers.__t, &__o ## _ ## __t ## _expiry, __o->__c.__t); \
 } \
 
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 ss7_do_timeout(caddr_t data, const char *timer, const char *mod, ulong *timeo,
-	       int  (*to_fnc) (struct head *), void streamscall (*exp_func) (caddr_t))
+	       int (*to_fnc) (struct head *), void streamscall (*exp_func) (caddr_t))
 {
 	struct head *h = (struct head *) data;
 
@@ -100,7 +101,7 @@ ss7_do_timeout(caddr_t data, const char *timer, const char *mod, ulong *timeo,
 		*timeo = timeout(exp_func, data, 2);
 	}
 }
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 ss7_stop_timer(struct head *h, const char *timer, const char *mod, ulong *timeo)
 {
 	ulong to;
@@ -115,7 +116,7 @@ ss7_stop_timer(struct head *h, const char *timer, const char *mod, ulong *timeo)
 	}
 	return;
 }
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 ss7_start_timer(struct head *h, const char *timer, const char *mod, ulong *timeo,
 		void streamscall (*exp_func) (caddr_t), ulong val)
 {

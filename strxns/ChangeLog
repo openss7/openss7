@@ -1,3 +1,11 @@
+2006-04-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strxns.refs: added a few more references
+	* doc/man/man4/ip.4.man: updating manual pages
+	* doc/man/man4/np.4.man: updating manual pages
+	* doc/man/man7/npi_ip.7.man: updating manual pages
+	* src/drivers/np.c: working up NP driver
+
 2006-04-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/dl.c: added new DL driver

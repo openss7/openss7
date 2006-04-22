@@ -1768,6 +1768,107 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %O (Previously "CCITT Recommendation")
 
+%K 802.1X
+%L 802.1X
+%A IEEE
+%R IEEE Std. 802.1X-2004
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Port-Based Network Access Control
+%D December 13, 2004
+%C New York
+%G ISBN 0-7381-4529-7 SS95298
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+%O (Revision of IEEE Std. 802.1X-2001)
+
+%K 802.1AB
+%L 802.1AB
+%A IEEE
+%R IEEE Std. 802.1AB-2005
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Station and Media Access Control Connectivity Discovery
+%D May 6, 2005
+%C New York
+%G ISBN 0-7381-4688-9 SS95332
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802.1D
+%L 802.1D
+%A IEEE
+%R IEEE Std. 802.1D-2004
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Media Access Control (MAC) Bridges
+%D June 9, 2004
+%C New York
+%G ISBN 0-7381-3982-3 SS95213
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+%O (Revision of IEEE Std. 802.1D-1998)
+
+%K 802.1Q
+%L 802.1Q
+%A IEEE
+%R IEEE Std. 802.1Q-2003
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Virtual Bridged Local Area Networks
+%D May 7, 2003
+%C New York
+%G ISBN 0-7381-3663-8 SS95124
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802.1F
+%L 802.1F
+%A IEEE
+%R IEEE Std. 802.1F-1993(R2004)
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Common Definitions and Procedures for IEEE 802 Management Information
+%D March 25, 2004
+%C New York
+%G ISBN 1-55937-340-7
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802
+%L 802
+%A IEEE
+%R IEEE Std. 802-2001
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Overview and Architecture
+%D March 8, 2002
+%C New York
+%G ISBN 0-7381-2941-0 SS94947
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802.1G
+%L 802.1G
+%A ANSI/IEEE
+%R ANSI/IEEE Std. 802.1G-1998 [ISO/IEC 15802-5 : 1998(E)]
+%T IEEE Standard for Information Technology \(em Telecommunications and Information Exchange Between Systems \(em Local and Metropolitan Area Networks \(em Common Specifications \(em Part 5: Remove media Access Control (MAC) Bridging
+%D March 13, 1998
+%C New York
+%G ISBN 1-55937-899-6
+%Q American National Standards Institute, Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802.1H
+%L 802.1H
+%A IEEE
+%R IEEE Std. 802.1H-1997 [ISO/IEC 11802-5 : 1997(E)]
+%T IEEE Standard for Information Technology \(em Telecommunications and Information Exchange Between Systems \(em Local and Metropolitan Area Networks \(em Common Specifications \(em Part 5: Remove media Access Control (MAC) Bridging of Ethernet V2.0 in Local Area Networks
+%D May 2, 2002
+%C New York
+%G ISBN 1-55937-931-6
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802.2
+%L 802.2
+%A ANSI/IEEE
+%R ANSI/IEEE Std. 802.2-1998 [ISO/IEC 8802-2 : 1998]
+%T IEEE Standard for Information Technology \(em Telecommunications and Information Exchange Between Systems \(em Local and Metropolitan Area Networks \(em Specific Requirements \(em Part 2: Logical Link Control
+%D May 7, 1998
+%C New York
+%G ISBN 1-55937-959-6
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
 %K x25
 %L X.25
 %A ITU
@@ -1778,14 +1879,74 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %O (Previously "CCITT Recommendation")
 
+%K x75
+%L X.75
+%A ITU
+%R ITU-T Recommendation X.75
+%T Packet-switched Signalling System between Public Networks Providing Data Transmission Services
+%D October 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
 %K x680
 %L X.680
 %A ITU
-%R ITU-T Recommendation X.680
-%T Abstract Syntax Notation One (ASN.1): Specification of Basic Notation
+%R ITU-T Recommendation X.680 [ISO/IEC 8824-1 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Specification of Basic Notation
 %D July 1994
 %C Geneva
-%I ITU-T Telecommunication Standardization Sector of ITU
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x681
+%L X.681
+%A ITU
+%R ITU-T Recommendation X.681 [ISO/IEC 8824-2 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Information Object Specification
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x682
+%L X.682
+%A ITU
+%R ITU-T Recommendation X.682 [ISO/IEC 8824-3 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Constraint Specification
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x683
+%L X.683
+%A ITU
+%R ITU-T Recommendation X.683 [ISO/IEC 8824-4 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Parameterization of ASN.1 Specifications
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x690
+%L X.690
+%A ITU
+%R ITU-T Recommendation X.690 [ISO/IEC 8825-1 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): ASN.1 Encoding Rules: Specification of Basic Encoding Rules (BER), Canonical Encoding Rules (CER) and Distinguished Encoding Rules (DER)
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x691
+%L X.691
+%A ITU
+%R ITU-T Recommendation X.691 [ISO/IEC 8825-2 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): ASN.1 Encoding Rules: Specification of Packet Encoding Rules (PER)
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %O (Previously "CCITT Recommendation")
 
 %K x200
@@ -1793,7 +1954,7 @@ Part 1: Protocol Specification
 %A ITU
 %R ITU-T Recommendation X.200 [ISO/IEC 7498-1 : 1994]
 %T Information Technology \(em Open Systems Interconnection
-%D 1993
+%D November 1993
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %O (Previously "CCITT Recommendation")
@@ -1821,7 +1982,7 @@ Part 1: Protocol Specification
 %K x213
 %L X.213
 %A ITU
-%R ITU-T Recommendation X.213 [ISO/IEC 8072]
+%R ITU-T Recommendation X.213 [ISO/IEC 8348]
 %T OSI \(em Network Service Definition
 %D November 1995
 %C Geneva
@@ -1878,20 +2039,30 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %O (Previously "CCITT Recommendation")
 
+%K x223
+%L X.223
+%A ITU
+%R ITU-T Recommendation X.223 (ISO/IEC 8878)
+%T Use of X.25 to Provide the OSI Connection-mode Network Service for ITU-T Applications
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
 %K x224
 %L X.224
 %A ITU
 %R ITU-T Recommendation X.224 (ISO/IEC 8073)
-%T Transport Protocol Speciication for Open System Interconnection (OSI) for CCITT Applications
-%D 1993
+%T Transport Protocol Speciication for Open System Interconnection (OSI) for ITU-T Applications
+%D November 1993
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %O (Previously "CCITT Recommendation")
 
 %K x225
 %L X.225
-%A ITU
 %R ITU-T Recommendation X.225 [ISO/IEC 8327-1 : 1996]
+%A ITU
 %T Information Technology \(em Open Systems Interconnection \(em Connection-oriented session protocol: Protocol specification
 %D 1995
 %C Geneva
@@ -1928,6 +2099,26 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %O (Previously "CCITT Recommendation")
 
+%K x233
+%L X.233
+%A ITU
+%R ITU-T Recommendation X.233 [ISO/IEC 8473-1 : 1993]
+%T Data Communication Networks \(em Information Technology \(em Protocol for Providing the Connectionless-mode Network Service: Protocol Specification
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x234
+%L X.234
+%A ITU
+%R ITU-T Recommendation X.234 [ISO/IEC 8602 : 1994]
+%T Data Communication Networks \(em Information Technology \(em Protocol for Providing the Connectionless-mode Network Service: Protocol Specification
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
 %K x235
 %L X.235
 %A ITU
@@ -1955,6 +2146,66 @@ Part 1: Protocol Specification
 %C Geneva 
 %D 1995
 %T Information Technology \(em Open Systems Interconnection \(em Connectionless protocol for the Association Control Service Element: Protocol Specification
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x622
+%L X.622
+%A ITU
+%R ITU-T Recommendation X.622 [ISO/IEC 8473-3 : 1995]
+%C Geneva
+%D July 1994
+%T Information Technology \(em Open Systems Interconnection \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the Underlying Service by an X.25 Subnetwork
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x623
+%L X.623
+%A ITU
+%R ITU-T Recommendation X.622 [ISO/IEC 8473-4 : 1995]
+%C Geneva
+%D July 1994
+%T Information Technology \(em Open Systems Interconnection \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the Underlying Service by a Subnetwork that Provides the OSI Data Link Service
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x625
+%L X.625
+%A ITU
+%R ITU-T Recommendation X.625
+%C Geneva
+%D October 1996
+%T Information Technology \(em Open Systems Interconnection \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the Underlying Service by ISDN Circuit-Switched B-Channels
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x637
+%L X.637
+%A ITU
+%R ITU-T Recommendation X.637
+%C Geneva
+%D October 1996
+%T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Basic Connection-Oriented Common Upper Layer Requirements
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x638
+%L X.638
+%A ITU
+%R ITU-T Recommendation X.638
+%C Geneva
+%D October 1996
+%T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Minimal OSI Facilities to Support Basic Communications Applications
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x639
+%L X.639
+%A ITU
+%R ITU-T Recommendation X.639
+%C Geneva
+%D October 1996
+%T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Basic Connection-Oriented Requirements for ROSE-based Profiles
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %O (Previously "CCITT Recommendation")
 
@@ -2057,42 +2308,44 @@ Part 1: Protocol Specification
 %I American National Standards Institute
 
 %L ISO 3309
-%A ISO/IEC
-%Q ISO/IEC
-%L ISO 3309:1988
-%T Data Communication \(em High-Level Data Link Control Procedures \(em Frame Structure
 %R ISO/IEC 3309:1988
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Data Communication \(em High-Level Data Link Control Procedures \(em Frame Structure
 %D 1988
-%I International Standards Organization
+%I International Organization for Standardization
 
 %L ISO 4335
-%A ISO/IEC
-%Q ISO/IEC
-%L ISO 4335:1988
-%T Data Communication \(em High-Level Data Link Control Procedures \(em Consolidation of Elements of Procedures
 %R ISO/IEC 4335:1988
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Data Communication \(em High-Level Data Link Control Procedures \(em Consolidation of Elements of Procedures
 %D 1988
-%I International Standards Organization
+%I International Organization for Standardization
 
 %L ISO 8649
-%A ISO/IEC
-%Q ISO/IEC
-%R ISO 8649:1988
-%T Information Processing Systems \(em Open Systems Interconnection \(em Service Definition for the Association Control Service Element
 %R ISO/IEC 8649:1988
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Information Processing Systems \(em Open Systems Interconnection \(em Service Definition for the Association Control Service Element
 %D 1988
-%C
-%I International Standards Organization
+%I International Organization for Standardization
 
 %L ISO 8650
-%A ISO/IEC
-%Q ISO/IEC
-%R ISO 8650:1988
-%T Information Processing Systems \(em Open Systems Interconnection \(em Protocol Specification for the Association Control Service Element
 %R ISO/IEC 8650:1988
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Information Processing Systems \(em Open Systems Interconnection \(em Protocol Specification for the Association Control Service Element
 %D 1988
-%C
-%I International Standards Organization
+%I International Organization for Standardization
+
+%L ISO 8881
+%R ISO/IEC 8881:1989
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Information Processing Systems \(em Data Communications \(em Use of the X.25 Packet Level Protocol in Local Area Networks
+%D 1989
+%I International Organization for Standardization
 
 %K jtq704
 %L JT-Q\)704
@@ -2766,14 +3019,30 @@ Part 1: Protocol Specification
 
 %K rfc768
 %L RFC 768
+%R RFC 768/STD 6
+%T User Datagram Protocol
 %A J. Postel
 %E J. Postel
-%Q Information Sciences Institute, University of Southern California
-%T User Datagram Protocol
-%R RFC 768
 %D August 28, 1980
+%O (Also STD0006) (Status: STANDARD)
+%Q Information Sciences Institute, University of Southern California
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc0768.txt
+
+%K rfc3828
+%L RFC 3828
+%R RFC 3828
+%A L-A. Larzon
+%T The Lightweight User Datagram Protocol (UDP-Lite)
+%A M. Degermark
+%A S. Pink
+%E L-E. Jonsson
+%E G. Fairhurst
+%D July 2004
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3828.txt
 
 %K rfc791
 %L RFC 791
@@ -2811,7 +3080,7 @@ Part 1: Protocol Specification
 %R RFC 892
 %D December 1983
 %I The Internet Society
-%O Obsoleted by RFC 905.
+%O (Obsoleted by RFC 905)
 %U http://www.ietf.org/rfc/rfc0892.txt
 
 %K rfc905
@@ -2822,26 +3091,37 @@ Part 1: Protocol Specification
 %R RFC 905
 %D April 1, 1984
 %I The Internet Society
-%O Obsoletes RFC 892.
+%O (Obsoletes RFC 892)
 %U http://www.ietf.org/rfc/rfc0905.txt
 
 %K rfc896
 %L RFC 896
-%A John Nagle
-%Q Internet Engineering Task Force \(em Network Working Group
-%T Congestion control in IP/TCP Internetworks
 %R RFC 896
+%A John Nagle
+%T Congestion control in IP/TCP Internetworks
 %D January 6, 1984
+%Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc0896.txt
 
+%K rfc926
+%L RFC 926
+%R RFC 926
+%A International Organization for Standardization
+%T Protocol for providing the Connectionless Mode Network Services.
+%D December 1984
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0926.txt
+%O (Obsoleted by RFC 994)
+
 %K rfc958
 %L RFC 958
-%A D. L. Mills
-%Q Internet Engineering Task Force \(em Network Working Group
-%T Network Time Protocol (NTP)
 %R RFC 958
+%A D. L. Mills
+%T Network Time Protocol (NTP)
 %D September 1985
+%Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc958.txt
 
@@ -2862,22 +3142,33 @@ Part 1: Protocol Specification
 %T ISO Transport Arrives on Top of the TCP
 %D April 1, 1986
 %R RFC 983
-%O Obsoleted by RFC 1006.
+%O (Obsoleted by RFC 1006)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc0983.txt
 
 %K rfc986
 %L RFC 986
+%R RFC 986
 %A R.W. Callon
 %A H.W. Braun
 %T Guidelines for the use of Internet-IP addesses in the ISO Connectionless-Mode Network Protocol
 %D June 1986
-%R RFC 986
-%O Obsoleted by RFC 1069.
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc0986.txt
+%O (Obsoleted by RFC 1069)
+
+%K rfc994
+%L RFC 994
+%R RFC 994
+%A International Organization for Standardization
+%T Final text of DIS 8473, Protocol for Providing the Connectionless-mode Network Service
+%D March 1986
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0994.txt
+%O (Obsoletes RFC 926)
 
 %K rfc995
 %L RFC 995
@@ -2896,7 +3187,7 @@ Part 1: Protocol Specification
 %T ISO Transport Service on top of the TCP \(em Version 3
 %D May 1987
 %R STD 35/RFC 1006
-%O Obsoletes RFC 983. Updated by RFC 2126.  Also STD 35.
+%O (Obsoletes RFC 983) (Updated by RFC 2126)  (Also STD 35)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1006.txt
@@ -2920,6 +3211,209 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1008.txt
 
+%K rfc1162
+%L RFC 1162
+%R RFC 1162
+%A G. Satz
+%T Connectionless Network Protocol (ISO 8473) and End System to Intermediate System (ISO 9542) Management Information Base
+%D June 1990
+%O (Obsoleted by RFC 1238) (Status: EXPERIMENTAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1162.txt
+
+%K rfc1238
+%L RFC 1238
+%R RFC 1238
+%T CLNS MIB for use with Connectionless Network Protocol (ISO 8473) and End System to Intermediate System (ISO 9542)
+%A G. Satz
+%D June 1991
+%O (Obsoletes RFC 1162) (Status: EXPERIMENTAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1162.txt
+
+%K rfc3277
+%L RFC 3277
+%R RFC 3277
+%T Intermediate System to Intermediate System (IS-IS) Transient Blackhole Avoidance
+%A D. McPherson
+%D April 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3277.txt
+
+%K rfc3358
+%L RFC 3358
+%R RFC 3358
+%T Optional Checksums in Intermediate System to Intermediate System (ISIS)
+%A R. Koodli
+%A R. Ravikanth
+%D August 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3358.txt
+
+%K rfc3359
+%L RFC 3359
+%R RFC 3359
+%T Reserved Type, Length and Value (TLV) Codepoints in Intermediate System to Intermediate System
+%A T. Przygienda
+%D August 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3359.txt
+
+%K rfc3373
+%L RFC 3373
+%R RFC 3373
+%T Three-Way Handshake for Intermediate System to Intermediate System (IS-IS) Point-to-Point Adjacencies
+%A D. Katz
+%A R. Saluja
+%D September 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3373.txt
+
+%K rfc3567
+%L RFC 3567
+%R RFC 3567
+%T Intermediate System to Intermediate System (IS-IS) Cryptographic Authentication
+%A T. Li
+%A R. Atkinson
+%D July 2003
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3567.txt
+
+%K rfc3719
+%L RFC 3719
+%R RFC 3719
+%T Recommendations for Interoperable Networks using Intermediate System to Intermediate System (IS-IS)
+%E J. Parker
+%D February 2004
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3719.txt
+
+%K rfc3784
+%L RFC 3784
+%R RFC 3784
+%T Intermediate System to Intermediate System (IS-IS) Extensions for Traffic Engineering (TE)
+%A H. Smit
+%A T. Li
+%D June 2004
+%O (Updated by RFC 4205) (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3784.txt
+
+%K rfc3785
+%L RFC 3785
+%R BCP 87/RFC 3785
+%T Use of Interior Gateway Protocol (IGP) Metric as a second MPLS Traffic Engineering (TE) Metric
+%A F. Le Faucheur
+%A R. Uppili
+%A A.  Vedrenne
+%A P. Merckx
+%A T. Telkamp
+%D May 2004
+%O (Also BCP0087) (Status: BEST CURRENT PRACTICE)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3785.txt http://www.ietf.org/rfc/bcp/bcp0087.txt
+
+%K rfc3786
+%L RFC 3786
+%R RFC 3786
+%T Extending the Number of Intermediate System to Intermediate System (IS-IS) Link State PDU (LSP) Fragments Beyond the 256 Limit
+%A A. Hermelin
+%A S. Previdi
+%A M. Shand
+%D May 2004
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3786.txt
+
+%K rfc3787
+%L RFC 3787
+%R RFC 3787
+%T Recommendations for Interoperable IP Networks using Intermediate System to Intermediate System (IS-IS)
+%E J. Parker
+%D May 2004
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3787.txt
+
+%K rfc3847
+%L RFC 3847
+%R RFC 3847
+%T Restart Signaling for Intermediate System to Intermediate System (IS-IS)
+%A M. Shand
+%A L. Ginsberg
+%D July 2004
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3847.txt
+
+%K rfc3906
+%L RFC 3906
+%R RFC 3906
+%T Calculating Interior Gateway Protocol (IGP) Routes Over Traffic Engineering Tunnels
+%A N. Shen
+%A H. Smit
+%D October 2004
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3906.txt
+
+%K rfc4205
+%L RFC 4205
+%R RFC 4205
+%T Intermediate System to Intermediate System (IS-IS) Extensions in Support of Generalized Multi-Protocol Label Switching (GMPLS)
+%E K.  Kompella
+%E Y. Rekhter
+%D October 2005
+%O (Updates RFC 3784) (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4205.txt
+
+%K rfc1613
+%L RFC 1613
+%R RFC 1613
+%T Cisco Systems X.25 over TCP (XOT)
+%E J. Forster
+%E G. Satz
+%E G. Glick
+%E R. Day
+%D May 1994
+%O (Status: INFORMATIONAL) (Defines TCP port number 1998.)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1613.txt
+
+%K rfc1371
+%L RFC 1371
+%R RFC 1371
+%T Choosing a Common IGP for the IP Internet
+%A P. Gross
+%D October 1992
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1371.txt
+
 %K rfc1069
 %L RFC 1069
 %R RFC 1069
@@ -2927,10 +3421,10 @@ Part 1: Protocol Specification
 %A H.W. Braun
 %T Guidelines for the Use of Internet-IP Addresses in the ISO Connectionless-Mode Network Protocol
 %D February 1989
-%O Obsoletes RFC 986.
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1069.txt
+%O (Obsoletes RFC 986) (Status: UNKNOWN)
 
 %K rfc1356
 %L RFC 1356
@@ -2995,21 +3489,6 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1598.txt
 
-%K rfc1613
-%L RFC 1613
-%R RFC 1613
-%E J. Forster
-%A J. Forster
-%A G. Satz
-%A G. Glick
-%A R. Day
-%T cisco Systems X.25 over TCP (XOT)
-%D May 1994
-%O Informational
-%Q Internet Engineering Task Force \(em Network Working Group
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc1613.txt
-
 %K rfc1277
 %L RFC 1277
 %A Steve E. Hardcastle-Kille
@@ -3040,6 +3519,19 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1859.txt
 
+%K rfc1070
+%L RFC 1070
+%R RFC 1070
+%A R.A. Hagens
+%A N.E. Hall
+%A Marshall T. Rose
+%T Use of the Internet as a Subnetwork for Experimentation with the OSI Network Layer
+%D February 1989
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1070.txt
+%O (This RFC allocates IP protocol number 80 and UDP port number 147.) (Status: UNKNOWN)
+
 %K rfc1085
 %L RFC 1085
 %R RFC 1085
@@ -3067,7 +3559,7 @@ Part 1: Protocol Specification
 %A R.A. Hagens
 %T Echo Function for ISO 8473
 %D January 1990
-%O Obsoleted by RFC 1574, RFC 1575.
+%O (Obsoleted by RFC 1574, RFC 1575)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1139.txt
@@ -3078,8 +3570,7 @@ Part 1: Protocol Specification
 %A Steve. E. Hardcastle-Kille
 %T Mapping between X.400(1988) / ISO 10021 and RFC 822
 %D December 1989
-%O Updates RFC 1026, RFC 987, RFC 822.
-%O Updated by RFC 1148.
+%O (Updates RFC 1026, RFC 987, RFC 822) (Updated by RFC 1148)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1138.txt
@@ -3090,8 +3581,7 @@ Part 1: Protocol Specification
 %A Steve. E. Hardcastle-Kille
 %T Mapping between X.400(1988) / ISO 10021 and RFC 822
 %D March 1990
-%O Updates RFC 1026, RFC 987, RFC 1138, RFC 822.
-%O Obsoleted by RFC 2156, RFC 1327.
+%O (Updates RFC 1026, RFC 987, RFC 1138, RFC 822) (Obsoleted by RFC 2156, RFC 1327)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1148.txt
@@ -3102,7 +3592,7 @@ Part 1: Protocol Specification
 %A G. Satz
 %T Connectionless Network Protocol (ISO 8473) and End System to Intermediate System (ISO 9542) Management Information Base
 %D June 1990
-%O Obsoleted by RFC 1238.
+%O (Obsoleted by RFC 1238)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1162.txt
@@ -3113,7 +3603,7 @@ Part 1: Protocol Specification
 %A G. Satz
 %T CLNS MIB for use with Connectionless Network Protocol (ISO 8473) and End System to Intermediate System (ISO 9542)
 %D June 1991
-%O Obsoletes RFC 1162.
+%O (Obsoletes RFC 1162)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1238.txt
@@ -3135,7 +3625,7 @@ Part 1: Protocol Specification
 %A C. Wittbrodt
 %T An Echo Function for CLNP (ISO 8473)
 %D February 1994
-%O Obsoletes RFC 1139.
+%O (Obsoletes RFC 1139)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1575.txt
@@ -3149,7 +3639,7 @@ Part 1: Protocol Specification
 %R RFC 1095
 %D April 1988
 %I The Internet Society
-%O Obsoleted by RFC 1189.
+%O (Obsoleted by RFC 1189)
 %U http://www.ietf.org/rfc/rfc1095.txt
 
 %K rfc1122
@@ -3197,7 +3687,7 @@ Part 1: Protocol Specification
 %R RFC 1189
 %D October 1990
 %I The Internet Society
-%O Obsoletes RFC 1095.
+%O (Obsoletes RFC 1095)
 %U http://www.ietf.org/rfc/rfc1189.txt
 
 %K rfc1212
@@ -3285,7 +3775,7 @@ Part 1: Protocol Specification
 %E Scott Bradner
 %Q Internet Engineering Task Force
 %T Key words for use in RFCs to Indicate Requirement Levels
-%R RFC 2119 \(em BCP 14
+%R BCP 14/RFC 2119
 %D March 1997
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2119.txt
@@ -3923,7 +4413,7 @@ Part 1: Protocol Specification
 %K rfc3372
 %K bcp63
 %L BCP 63
-%R BCP 63 (RFC 3372)
+%R BCP 63/RFC 3372
 %A Aparna Vemuri
 %A Jon Peterson
 %E Aparna Vemuri
@@ -4037,7 +4527,7 @@ Part 1: Protocol Specification
 %K rfc3666
 %K bcp76
 %L BCP 76
-%R BCP 76 (RFC 3666)
+%R BCP 76/RFC 3666
 %A Alan Johnston
 %A Steve Donovan
 %A Robert Sparks
@@ -4077,7 +4567,7 @@ Part 1: Protocol Specification
 %D June 2004
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3807.txt
-%O Updates RFC 3057.
+%O (Updates RFC 3057)
 
 %K SUA-RFC
 %K rfc3868

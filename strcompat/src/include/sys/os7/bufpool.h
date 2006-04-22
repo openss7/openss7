@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: bufpool.h,v 0.9.2.6 2005/07/18 12:25:40 brian Exp $
+ @(#) $Id: bufpool.h,v 0.9.2.7 2006/04/22 01:05:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,12 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
+ Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_BUFPOOL_H__
 #define __OS7_BUFPOOL_H__
+
+#ident "@(#) $RCSfile: bufpool.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  -------------------------------------------------------------------------
@@ -79,7 +80,7 @@ typedef struct ss7_bufpool {
 /*
    assumes bufpool is locked 
  */
-__OS7_EXTERN_INLINE mblk_t *
+__OS7_EXTERN_INLINE streamscall __hot mblk_t *
 __ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -101,7 +102,7 @@ __ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 /*
    for use in the bottom half or tasklet 
  */
-__OS7_EXTERN_INLINE mblk_t *
+__OS7_EXTERN_INLINE streamscall __hot mblk_t *
 ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -126,7 +127,7 @@ ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 /*
    for use outside the bottom half 
  */
-__OS7_EXTERN_INLINE mblk_t *
+__OS7_EXTERN_INLINE streamscall __hot mblk_t *
 ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -159,7 +160,7 @@ ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size, int prior)
 /*
    assumes bufpool is locked 
  */
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall __hot void
 __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -176,7 +177,7 @@ __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use inside the bottom half 
  */
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall __hot void
 ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -195,7 +196,7 @@ ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use outside the bottom half 
  */
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall __hot void
 ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -222,7 +223,7 @@ ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    assumes bufpool is locked 
  */
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall __hot void
 __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
@@ -236,7 +237,7 @@ __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use inside the bottom half 
  */
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall __hot void
 ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
@@ -250,7 +251,7 @@ ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use outside the bottom half 
  */
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall __hot void
 ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;

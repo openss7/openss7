@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9.2.6 2005/07/18 12:25:40 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.7 2006/04/22 01:05:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
+ Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __BUFQ_H__
 #define __BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 12:25:40 $"
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef psw_t
 #ifdef INT_PSW
@@ -79,36 +78,36 @@ bufq_init(bufq_t * q)
 	q->q_msgs = 0;
 	q->q_count = 0;
 }
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall __hot void
 bufq_lock(bufq_t * q)
 {
 	spin_lock_bh(&q->q_lock);
 }
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall __hot void
 bufq_unlock(bufq_t * q)
 {
 	spin_unlock_bh(&q->q_lock);
 }
 
-__OS7_EXTERN_INLINE size_t
+__OS7_EXTERN_INLINE streamscall __hot size_t
 bufq_length(bufq_t * q)
 {
 	return q->q_msgs;
 }
 
-__OS7_EXTERN_INLINE size_t
+__OS7_EXTERN_INLINE streamscall __hot size_t
 bufq_size(bufq_t * q)
 {
 	return q->q_count;
 }
 
-__OS7_EXTERN_INLINE mblk_t *
+__OS7_EXTERN_INLINE streamscall __hot mblk_t *
 bufq_head(bufq_t * q)
 {
 	return q->q_head;
 }
 
-__OS7_EXTERN_INLINE mblk_t *
+__OS7_EXTERN_INLINE streamscall __hot mblk_t *
 bufq_tail(bufq_t * q)
 {
 	return q->q_tail;
@@ -163,7 +162,7 @@ __bufq_queue(bufq_t * q, mblk_t *mp)
 	__bufq_add(q, mp);
 }
 
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 bufq_queue(bufq_t * q, mblk_t *mp)
 {
 	ensure(q && mp, return);
@@ -172,7 +171,7 @@ bufq_queue(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 bufq_queue_head(bufq_t * q, mblk_t *mp)
 {
 	ensure(q && mp, return);
@@ -187,7 +186,7 @@ bufq_queue_head(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	bufq_lock(q);
@@ -202,7 +201,7 @@ bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	ensure(q && mp && np, return);
@@ -263,7 +262,7 @@ __bufq_dequeue_tail(bufq_t * q)
 	return (mp);
 }
 
-__OS7_EXTERN_INLINE mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 bufq_dequeue_tail(bufq_t * q)
 {
 	mblk_t *mp;
@@ -293,7 +292,7 @@ __bufq_unlink(bufq_t * q, mblk_t *mp)
 	return mp;
 }
 
-__OS7_EXTERN_INLINE mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 bufq_unlink(bufq_t * q, mblk_t *mp)
 {
 	ensure(q && mp, return (NULL));
@@ -306,7 +305,7 @@ bufq_unlink(bufq_t * q, mblk_t *mp)
 /*
    splice bufq2 onto the head of bufq1 
  */
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 bufq_splice_head(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
@@ -320,7 +319,7 @@ bufq_splice_head(bufq_t * q1, bufq_t * q2)
 /*
    splice bufq2 onto the tail of bufq1 
  */
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
@@ -330,7 +329,7 @@ bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 		bufq_queue(q1, mp);
 }
 
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 bufq_freehead(bufq_t * q)
 {
 	bufq_lock(q);
@@ -339,7 +338,7 @@ bufq_freehead(bufq_t * q)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 bufq_purge(bufq_t * q)
 {
 	bufq_lock(q);
@@ -361,7 +360,7 @@ __bufq_supply(bufq_t * q, mblk_t *mp)
 	}
 }
 
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 bufq_supply(bufq_t * q, mblk_t *mp)
 {
 	bufq_lock(q);
@@ -369,7 +368,7 @@ bufq_supply(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount)
 {
 	bufq_lock(q);
@@ -383,7 +382,7 @@ bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount)
 }
 
 #ifndef SCTP_VERSION_2
-__OS7_EXTERN_INLINE void
+__OS7_EXTERN_INLINE streamscall void
 freechunks(mblk_t *mp)
 {
 	mblk_t *dp, *dp_next;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/27 01:25:38 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/04/22 01:10:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/27 01:25:38 $ by $Author: brian $
+ Last Modified $Date: 2006/04/22 01:10:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.42  2006/04/22 01:10:38  brian
+ - locking correction
+
  Revision 0.9.2.41  2006/03/27 01:25:38  brian
  - working up IP driver and SCTP testing
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/27 01:25:38 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/04/22 01:10:38 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/27 01:25:38 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/04/22 01:10:38 $";
 
 #include "sctp_compat.h"
 
@@ -74,7 +77,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/03/27 01:25:38 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/04/22 01:10:38 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4001,13 +4004,11 @@ sctp_lookup_listen(uint16_t dport, uint32_t daddr)
 			result = sp;
 		}
 	}
+	if (result)
+		sctp_hold(result);
 	read_unlock(&hp->lock);
 	usual(result);
-	if (result) {
-		sctp_hold(result);
-		return result;
-	}
-	return NULL;
+	return (result);
 }
 
 /*
@@ -4060,7 +4061,7 @@ sctp_lookup_bind(uint16_t dport, uint32_t daddr)
 			} else {
 				_ptrace(("ERROR: Unassigned port number stream = %p\n", sp));
 			}
-			if (score > 0) {
+			if (score > 1) {
 				result = sp;
 				break;
 			}
@@ -4070,13 +4071,11 @@ sctp_lookup_bind(uint16_t dport, uint32_t daddr)
 			}
 		}
 	}
+	if (result)
+		sctp_hold(result);
 	read_unlock(&hp->lock);
 	usual(result);
-	if (result) {
-		sctp_hold(result);
-		return (result);
-	}
-	return NULL;
+	return (result);
 }
 
 /*
@@ -4108,12 +4107,10 @@ sctp_lookup_tcb(uint16_t sport, uint16_t dport, uint32_t saddr, uint32_t daddr)
 	for (sp = hp->list; sp; sp = sp->tnext)
 		if (sctp_match_tcb(sp, saddr, daddr, sport, dport))
 			break;
-	read_unlock(&hp->lock);
-	if (sp) {
+	if (sp)
 		sctp_hold(sp);
-		return (sp);
-	}
-	return NULL;
+	read_unlock(&hp->lock);
+	return (sp);
 }
 
 /*

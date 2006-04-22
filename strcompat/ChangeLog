@@ -1,3 +1,20 @@
+2006-04-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strcompat.refs: added a few more references
+	* src/include/sys/os7/allocb.h: updated header and optimizations
+	* src/include/sys/os7/bufpool.h: updated header and optimizations
+	* src/include/sys/os7/bufq.h: updated header and optimizations
+	* src/include/sys/os7/compat.h: updated header and optimizations
+	* src/include/sys/os7/ddi.h: updated header and optimizations
+	* src/include/sys/os7/debug.h: updated header and optimizations
+	* src/include/sys/os7/lock.h: updated header and optimizations
+	* src/include/sys/os7/priv.h: updated header and optimizations
+	* src/include/sys/os7/queue.h: updated header and optimizations
+	* src/include/sys/os7/strconf.h: updated header and optimizations
+	* src/include/sys/os7/stream.h: updated header and optimizations
+	* src/include/sys/os7/timer.h: updated header and optimizations
+	* src/kernel/os7compat.c: optimizations
+
 2006-04-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strcompat.refs: corrected spelling error reported by spammer

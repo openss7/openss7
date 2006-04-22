@@ -1,0 +1,338 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: np.4.man,v 0.9.2.1 2006/04/22 01:07:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/04/22 01:07:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: np.4.man,v $
+.\" Revision 0.9.2.1  2006/04/22 01:07:10  brian
+.\" - updating manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH NP 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B np
+\- STREAMS Network Provider (NP) Driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/npi.h>
+.br
+.B #include <sys/npi_ip.h>
+.HP 12
+.BI "int " np_stream " = open(" np_device ", " oflag );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B NP
+driver provides an interface between
+.I STREAMS
+drivers and the Linux networking subsystems.  It present an
+.BR npi (7)
+.I Network Provider Interface
+.[
+NPI Revision 2.0.0
+.]
+to
+.I STREAMS
+drivers and provides access to the native Linux networking subsystems.
+.PP
+.B NP
+isimplemented as a
+.IR STREAMS (4)
+pseudo-device driver and provides the following devices:
+(These device types are described in more detail in separate manual pages for
+each.)
+.TP
+.IR /dev/np/eth ", " /dev/streams/np/eth
+This clone minor device provides access to the
+.B 802.2 LLC
+.[
+ISO/IEC 8802
+.]
+protocol service interface using the N-primitives of the
+.I Network Provider Interface
+.[
+NPI Revision 2.0.0
+.]
+as described in
+.BR np_eth (4).
+.TP
+.IR /dev/np/lapb ", " /dev/streams/np/lapb
+This clone minor device provides access to the
+.B X.25 LAPB
+.[
+x25
+.]
+protocol service interface using the N-primitives of the
+.I Network Provider Interface
+.[
+NPI Revision 2.0.0
+.]
+as described in
+.BR np_lapb (4).
+.TP
+.IR /dev/np/lapd ", " /dev/streams/np/lapd
+This clone minor device provides access to the
+.B Q.921 LAPD
+.[
+q921
+.]
+protocol service interface using the N-primitives of the
+.I Network Provider Interface
+.[
+NPI Revision 2.0.0
+.]
+as described in
+.BR np_lapd (4).
+.TP
+.IR /dev/np/lapf ", " /dev/streams/np/lapf
+This clone minor device provides access to the
+.B Q.922 LAPF
+.[
+q922
+.]
+protocol service interface using the N-primitives of the
+.I Network Provider Interface
+.[
+NPI Revision 2.0.0
+.]
+as described in
+.BR np_lapf (4).
+.TP
+.IR /dev/np/ip ", " /dev/streams/np/ip
+This clone minor device provides access to the
+.B IP
+.[
+rfc768
+.]
+protocol service interface using the N-primitives of the
+.I Network Provider Interface
+.[
+NPI Revision 2.0.0
+.]
+as described in
+.BR np_ip (4).
+.TP
+.IR /dev/np/x25 ", " /dev/streams/np/x25
+This clone minor device provides access to the
+.B X.25 PLP
+.[
+x25
+.]
+protocol service interface using the N-primitives of the
+.I Network Provider Interface
+.[
+NPI Revision 2.0.0
+.]
+as described in
+.BR np_x25 (4).
+.TP
+.IR /dev/np/clnl ", " /dev/streams/np/clnl
+This clone minor device provides access to the
+.B X.233 CLNP
+.[
+x233
+.]
+and
+.B ISO-IP
+.[
+rfc1070
+.]
+protocol service interface using the N-primitives of the
+.I Network Provider Interface
+.[
+NPI Revision 2.0.0
+.]
+as described in
+.BR np_clnl (4).
+.TP
+.IR /dev/np/cons ", " /dev/streams/np/cons
+This clone minor device provides access to the
+.B X.223 CONP
+.[
+x223
+.]
+protocol service interface using the N-primitives of the
+.I Network Provider Interface
+.[
+NPI Revision 2.0.0
+.]
+as described in
+.BR np_cons (4).
+.\"
+.\"
+.\".SH IOCTLS
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The current
+.B NP
+pseudo-device driver hooks directly into the Linux kernel networking
+subsystem.  Previous approaches used a STREAMS over Sockets method that was
+inefficient and inflexible.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.BR <sys/npi.h> ,
+.BR <sys/npi_ip.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/np/eth ", " /dev/streams/np/eth ,
+.IR /dev/np/lapb ", " /dev/streams/np/lapb ,
+.IR /dev/np/lapd ", " /dev/streams/np/lapd ,
+.IR /dev/np/lapf ", " /dev/streams/np/lapf ,
+.IR /dev/np/ip ", " /dev/streams/np/ip ,
+.IR /dev/np/x25 ", " /dev/streams/np/x25 ,
+.IR /dev/np/clnl ", " /dev/streams/np/clnl ,
+.IR /dev/np/cons ", " /dev/streams/np/cons .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ioctl (2),
+.BR npi (7),
+.BR npi_ip (7),
+.BR np_eth (4),
+.BR np_lapb (4),
+.BR np_lapd (4),
+.BR np_lapf (4),
+.BR np_ip (4),
+.BR np_x25 (4),
+.BR np_clnl (4),
+.BR np_cons (4),
+.BR streamio (7),
+.BR STREAMS (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B NP
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Not many
+.IR UNIX \(rg
+system provide any NPI drivers whatsoever.  Most normally skip from the DLPI
+level to the TPI level.
+.IR Solaris \(rg
+.[
+soldoc
+.]
+at one point used to provide an NPI interface and sockets support for npi
+drivers; however, its use appears deprecated in contemporary releases.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The NPI interfaces to networking services are implementation dependent and are
+not subject to standardization.  The ISO NPI interfaces, provided by this
+driver conform to the ISO specifications.
+.\"
+.\"
+.SH HISTORY
+.PP
+.I STREAMS
+access to networking services was originally performed using a STREAMS over
+Socket approach using the
+.BR INET (4)
+pseudo-device driver from the
+.I stinet
+package.  A more flexible direct implementation was performed using a separate
+driver that hooks directly into the Linux network subsystems.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T4

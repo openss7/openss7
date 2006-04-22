@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ip.4.man,v 0.9.2.2 2006/04/05 09:44:52 brian Exp $
+.\" @(#) $Id: ip.4.man,v 0.9.2.3 2006/04/22 01:07:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:52 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/22 01:07:10 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ip.4.man,v $
+.\" Revision 0.9.2.3  2006/04/22 01:07:10  brian
+.\" - updating manual pages
+.\"
 .\" Revision 0.9.2.2  2006/04/05 09:44:52  brian
 .\" - moved .so line and updated headers
 .\"
@@ -228,7 +231,7 @@ These management controls are described in
 .SH NOTICES
 .PP
 .B IP
-as several implementations.  This manpage is for the
+has several implementations.  This manpage is for the
 .IR STREAMS (4)
 implementation.  There is also an
 .BR INET (4)
@@ -326,7 +329,7 @@ implementations.
 .\"
 .SH CONFORMANCE
 .PP
-The TPI and tNPI interfaces to IP services are implementation dependent and
+The TPI and NPI interfaces to IP services are implementation dependent and
 are not subject to standardization.
 .\"
 .\"
@@ -338,7 +341,7 @@ approach using the
 .BR INET (4)
 pseudo-device driver from the
 .I strinet
-package.  A more flexible direct implementation was performed using separate
+package.  A more flexible direct implementation was performed using a separate
 driver that hooks directly into the Linux IP subsystem.
 .\"
 .\"

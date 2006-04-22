@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_udp.7.man,v 0.9.2.4 2006/04/05 09:44:28 brian Exp $
+.\" @(#) $Id: tpi_udp.7.man,v 0.9.2.6 2006/04/22 04:59:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,17 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:28 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/22 04:59:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_udp.7.man,v $
+.\" Revision 0.9.2.6  2006/04/22 04:59:34  brian
+.\" - updated manual pages for 2G drivers
+.\"
+.\" Revision 0.9.2.5  2006/04/22 01:06:35  brian
+.\" - updating manual pages
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:44:28  brian
 .\" - moved .so line and updated headers
 .\"
@@ -78,9 +84,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH TPI-UDP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transport Provider Interface (TPI)"
+.\"
+.\"
 .SH NAME
 .B tpi_udp
 \- Transport Provider Interface (TPI) \- User Datagram Protocol (UDP) Corrigendum
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/tihdr.h>
@@ -90,12 +100,27 @@ sort-adjacent-labels
 .B #include <sys/tpi_udp.h>
 .HP
 .BI "int " udp_stream " = open(" \fR\*(lq/dev/udp\*(rq\fI ", " flags );
+.PD 0
+.HP
+.BI "int " udp_stream " = open(" \fR\*(lq/dev/udp2\*(rq\fI ", " flags );
+.PD
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B TPI-UDP
-provides a stream supporting the Transport Provider Interface,
+provides a Stream supporting the Transport Provider Interface (TPI),
+.[
+TPI Revision 2.0.0
+.]
 .BR tpi (7),
-to the User Datagram Protocol,
+to the User Datagram Protocol (UDP),
+.[
+rfc768
+.]
+.[
+rfc3828
+.]
 .BR udp (7).
 This
 .IR STREAMS (4)
@@ -106,110 +131,1442 @@ protocol service interface using the T-primitives of the
 This interface is intended solely for use by user programs or protocol modules
 requiring the common
 .BR tpi (7)
-interfae, such as the
+interface, such as the
 .BR xti (3)
 and
 .BR sockets (3)
 library.
+.PP
+The difference between the
+.I /dev/udp
+and
+.I /dev/udp2
+devices is that the later is the second generation STREAMS UDP driver fully implemented in
+.IR STREAMS (4),
+where the former opens a socket internal to the kernel and simply provides a TPI service interface
+to that socket.
+Also, the
+.I /dev/udp2
+driver supports pseudo-connection-oriented modes whereas the
+.I /dev/udp
+driver only supports pure connectionless mode.
+.\"
+.\"
 .SS "ADDRESS FORMATS"
 .PP
+The UDP address format is structured as follows:
+.sp
+.nf
+\fC\s-1\
+struct sockaddr_in {
+    sa_family_t         sin_family;  /* Address family */
+    unsigned short int  sin_port;    /* Port number */
+    struct in_addr      sin_addr;    /* Internet address */
+    /* padding */
+};
+\s+1\fP
+.fi
+.PP
+The
+.B sockaddr_in
+structure contains the following members:
+.TP \w'sin_family\(em'u
+.I sin_family
+The address family.  Always set to
+.BR AF_INET " or " AF_UNSPEC .
+.PD 0
+.TP
+.I sin_port
+The port number of the transport endpoint.
+.TP
+.I sin_addr
+The IP address of the transport endpoint.
+.TP
+.I (padding)
+Padding to pad the size of the
+.B sockaddr_in
+structure to the size of a
+.B sockaddr
+structure.
+.PD
+.PP
+The structure is padded to the size of a
+.BR sockaddr
+structure.
+.\"
+.\"
 .SH "OPTIONS"
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure described in
+.BR xti (3).
+A UDP transport provider compliant to this specification supports none, all or
+any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in a privileged or read-only
+mode.
 .PP
 .B TPI-UDP
 provides options at the
-.B T_INET_UDP
-option level as described in the section that follow.  Of the
+.BR XTI_GENERIC ", " T_INET_IP " and " T_INET_UDP
+option levels as described in the subsections that follow.  Of the
 .B T_INET_UDP
 level protocol options, none of the options are of end-to-end significance.
-.SS "T_UDP_NODELAY"
+.\"
+.\"
+.SS "XTI_GENERIC"
 .PP
-.SS "T_UDP_MAXSEG"
+Options at this level are specific to the X/Open Transport Interface (XTI/TLI)
+and are common to all transport providers.  For more information, see
+.BR xti (3).
 .PP
-.SS "T_UDP_KEEPALIVE"
+The options defined with the option level
+.B XTI_GENERIC
+are as follows:
+.TP
+.B XTI_DEBUG
+Sets debugging flags for the Stream.  This option is formatted as an array of
+.BR t_uscalar_t .
+Legal values are implementation defined.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_LINGER
+Sets whether, and the amount of time if, the Stream will linger waiting for
+unsent data to be delivered.  This option is formatted as a
+.B t_linger
+structure as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;    /* option on/off */
+    t_scalar_t l_linger;   /* linger time */
+};
+\s-1\fP
+.fi
+.RS
+.TP \w'l_linger\(em'u
+.I l_onoff
+Specifies whether to linger
+.RB ( T_YES )
+or not
+.RB ( T_NO ).
+Legal values are
+.BR T_YES " and " T_NO .
+.TP
+.I l_linger
+Specifies the amount of time (in seconds) to linger.  Legal values are
+.BR T_INFINITE ", " T_UNSPEC
+and all positive numbers including zero.
+.RE
+.IP ""
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVBUF
+Specifies the size, in bytes, of the receive buffer.  This option is formatted
+as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Specifies the low water mark above which received data will be indicated and
+delivered to the user.  This option is formatted as
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information see
+.BR xti (3).
+.TP
+.B XTI_SNDBUF
+Specifies the size, in bytes, of the transmit buffer.  This option is
+formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information see
+.BR xti (3).
+.TP
+.B XTI_SNDLOWAT
+Specifies the low water mark above which queued data will be transmitted to
+the peer.  This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information see
+.BR xti (3).
+.\"
+.\"
+.SS "T_INET_IP"
 .PP
+Options within this level are specific to the Internet Protocol (IP) and are
+common to all the protocol levels in IP.  For more information, see
+.BR tpi_ip (7).
+.PP
+The options defined with the option level
+.B T_INET_IP
+are as follows:
+.TP
+.B T_IP_OPTIONS
+Provides control for the T_IP OPTIONS field.  Used for debugging.
+This option is formatted as an array of
+.BR "unsigned char" ,
+up to 40 elements.
+For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_TOS
+Provides control of the type-of-service byte present in each transmited T_IP
+packet.
+This option is formated as an
+.BR "unsigned char" .
+Legal values can be generated with the
+.BR SET_TOS ()
+macro described in
+.BR tpi_ip (7).
+For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_TTL
+Provides control of the time-to-live byte present in each transmitted T_IP
+packet.
+This option is formatted as an
+.BR "unsigned char" .
+Legal values are from 0 to 255.
+For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_REUSEADDR
+Allows multiple non-listening binds to the same address.
+This option is format as a
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_DONTROUTE
+Bypasses routing tables and routes directly to an interface.  Used for
+debugging.
+This option is format as a
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_BROADCAST
+Allows broadcast addresses to be used.  This option is not applicable to TCP
+and is always set to
+.BR T_NO .
+This option is format as a
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR tpi_ip (7).
+.\"
+.\"
+.SS "T_INET_UDP"
+.PP
+Options within this level are specific to the User Datagram
+Protocol (UDP) yet are used by protocol levels using UDP transport.
+.PP
+The options defined with the option level
+.B T_INET_UDP
+are as follows:
+.TP
+.B T_UDP_CHECKSUM
+This option allows disabling/enabling of the
+.B T_UDP
+checksum computation.  The legal values are
+.B T_YES
+(checksum enabled) and
+.B T_NO
+(checksum disabled).
+.sp
+If this option is returned with
+.BR t_rcvudata (3),
+its value indicates whether a checksum was present in the received datagram or
+not.
+.sp
+Numerous cases of undetected errors have been reported when applications
+choose to turn of checksums for efficiency.  The advisability of ever turning
+off the checksum algorithm is very controversial.
+.sp
+This option is formatted as a
+.BR t_uscalar_t .
+It can take on values
+.BR T_YES " and " T_NO .
+This option is an
+.IR "absolute requirement" .
+This option is of
+.IR "end-to-end significance" .
+.\"
+.\"
 .SH "LOCAL MANAGEMENT INTERFACE"
 .PP
-.SS T_INFO_REQ
+.\"
+.\"
+.SS T_INFO_REQ\fR(7)
 .PP
-.SS T_INFO_ACK
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.\"
+.SS T_INFO_ACK\fR(7)
 .PP
-.SS T_ADDR_REQ
+.TP
+.I TSDU_size
+.B TPI-UDP
+supports a maximum payload size of 65535 byte minus 40 bytes of IP header
+minus 12 bytes of UDP header, or 65480 bytes.
+.TP
+.I ETSDU_size
+.B TPI-IP
+does not support the concept of expedited data.  This field returns
+.BR T_INVALID ,
+and any attempt to send expedited data will return
+.BR TNOTSUPPORT .
+.TP
+.I CDATA_size
+.B TPI-UDP
+supports the concept of connection data in pseudo-connection oriented mode
+only.  In connectionless mode, this field returns
+.BR T_INVALID .
+In pseudo-connection oriented mode, this field returns 65480 as does the
+.I TSDU_size
+field.
+.TP
+.I DDATA_size
+.B TPI-UDP
+supports the conectp of disconnection data in pseduo-connection-oriented mode
+only.  In connectionless mode, this field returns
+.BR T_INVALID .
+In pseudo-connection-oriented mode, this field returns 65480 as does the
+.I TSDU_size
+field.
+.TP
+.I ADDR_size
+The maximum size of a UDP address.  This field returns the size of the
+.B sockaddr_in
+structure.  This field may return a larger number at a later date if
+.B TPI-UDP
+ever supports multi-homing.
+.TP
+.I OPT_size
+This is the maximum size of the
+.I OPT_length
+field in T-primitives which support options.  This value returns 65535 in the
+current implementation.
+.TP
+.I TIDU_size
+This is the maximum size of the interface data unit, which is the maximum
+size of data that can be transferred across the interface in a single
+.BR getmsg (2)
+or
+.BR putmsg (2)
+system call.  This size is alway less than or equal to the
+.I TSDU_size
+above.  In the current implementation, the size is 65480 as is the
+.IR TSDU_size .
+.TP
+.I SERV_type
+The service type is one of the following:
+.RS
+.TP
+.B T_CLTS
+Connectionless service.
+.B TPI-UDP
+support connectionless service by default.  When a Stream is first opened,
+.B T_CLTS
+will be returned.  After a successful bind or connect operation, the value
+returned may be
+.B T_COTS
+instead.
+.TP
+.B T_COTS
+Connection-oriented service without orderly release.
+.B TPI-UDP
+supports a pseudo-connection-oriented service.
+.TP
+.B T_COTS_ORD
+Connection-oriented service with orderly release.
+.B TPI-UDP
+does not support orderly release and this service type will not be returned in
+the
+.BR T_INFO_ACK (7).
+.RE
+.TP
+.I CURRENT_state
+The current state of the service interface as described in
+.BR tpi (7).
+.TP
+.I PROVIDER_flag
+Provider flags are a bitwise OR of zero or more of the following:
+.RS
+.TP
+.B T_SNDZERO
+Indicates that the transport user is permitted to send data with a message
+length of zero.
+.B TPI-UDP
+does not support the transmission of zero length TSDUs.  This flag will be
+clear.
+.TP
+.B XPG4_1
+Indicates that the transport provider conforms to XTI in XTP4 and supports
+the new primitives
+.BR T_ADDR_REQ (7)
+and
+.BR T_ADDR_ACK (7).
+This flag is normally set.
+.RE
+.\"
+.\"
+.SS T_ADDR_REQ\fR(7)
 .PP
-.SS T_ADDR_ACK
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.\"
+.SS T_ADDR_ACK\fR(7)
 .PP
-.SS T_CAPABILITY_REQ
+.TP
+.IR LOCADDR_length ", " LOCADDR_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure that describes the
+.BR TPI-UDP
+addresses to which the Stream is bound.  If the Stream is not in a bound
+state, then
+.IR LOCADDR_length " and " LOCADDR_offset
+return zero (0).
+.TP
+.IR REMADDR_length ", " REMADDR_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure that describes the
+.BR TPI-UDP
+address to which the Stream is connected.  If the Stream is not in a connected
+or connecting state, then
+.IR REMADDR_length " and " REMADDR_offset
+return zero (0).
+.IP ""
+Note that the
+.B TPI-UDP
+provider is only in a connected or connecting state when operating in the
+pseudo-connection-oriented mode.
+.\"
+.\"
+.SS T_CAPABILITY_REQ\fR(7)
 .PP
-.SS T_CAPABILITY_ACK
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.\"
+.SS T_CAPABILITY_ACK\fR(7)
 .PP
-.SS T_BIND_REQ
+This primitive returns the
+.BR T_info_ack (7)
+structure interpreted as described in
+.RI \(lq T_INFO_ACK \(rq,
+above.
+.\"
+.\"
+.SS T_BIND_REQ\fR(7)
 .PP
-.SS T_BIND_ACK
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.IR ADDR_length ", " ADDR_offset
+The length and offset from the beginning of the message block of the
+.B sockaddr_in
+structures that contain the
+.B TPI-UDP
+addresses to bind.
+.B TPI-UDP
+supports wildcard addresses and the address
+.BR INADDR_ANY .
+This field can currently only contain a signle address.
+.TP
+.IR CONIND_number
+Specifies the number of connection indications.  Specifying a non-zero number
+of connection indications will place the provider in the
+pseudo-connection-oriented mode.  Any packet received from a unique source
+address will generate a connection indication accompanied by data.  Connection
+indications can be accepted with or without data or refused with or without data.
+This number specifies the maximum number of outstanding connection indications
+(those that are neither accepted nor refused) that the provider will deliver.
+.\"
+.\"
+.SS T_BIND_ACK\fR(7)
 .PP
-.SS T_UNBIND_REQ
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.IR ADDR_length ", " ADDR_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure that contains the
+.B TPI-UDP
+address that was bound.  This field can currently only contain a single
+address.
+.IP ""
+The bound address
+.I sin_addr
+returned in this field may be
+.B INADDR_ANY
+if 
+.B INADDR_ANY
+was requested, or no address was provided to the bind.  However, the
+.I sin_port
+component of the address will be allocated dynamically and set to a non-zero
+port number if zero (indicating any port) was specified on bind, or no address
+was provided to the bind.  If a non-zero port number could not be dynamically
+allocated,
+.BR TNOADDR
+is returned in accordance with
+.BR tpi (7).
+.TP
+.I CONIND_number
+Inidicates the negotiated number of connection indications.  This is normally
+the same value a requested; however, if the user requests a number that is
+considered too large, this number might be a more conservative value.
+.IP ""
+Note that a non-zero number is returned in this field only if the provider is
+in the pseudo-connection-oriented mode.
+.\"
+.\"
+.SS T_UNBIND_REQ\fR(7)
 .PP
-.SS T_OK_ACK
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.\"
+.SS T_OK_ACK\fR(7)
 .PP
-.SS T_ERROR_ACK
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.\"
+.SS T_ERROR_ACK\fR(7)
 .PP
-.SS T_OPTMGMT_REQ
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.\"
+.SS T_OPTMGMT_REQ\fR(7)
 .PP
-.SS T_OPTMGMT_ACK
+This primitive is interpreted as in
+.BR tpi (7),
+with the options described under
+.RI \(lq OPTIONS \(rq,
+above.
+.\"
+.\"
+.SS T_OPTMGMT_ACK\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7),
+with the options described under
+.RI \(lq OPTIONS \(rq,
+above.
+.\"
+.\"
 .SH "PROTOCOL SERVICE INTERFACE"
 .PP
-.SS T_UNITDATA_REQ
+The
+.I /dev/udp
+driver provides a single service interface type: the connectionless mode.  The
+.I /dev/udp2
+driver provides both a connectionless mode service interface type, as well as a
+pseudo-connection-oriented mode service interface type.
+.\"
+.\"
+.SS T_UNITDATA_REQ\fR(7)
 .PP
-.SS T_UNITDATA_IND
+This primitive is interpreted as in
+.BR tpi (7)
+in the connectionless mode.
+.TP
+.IR DEST_length ", " DEST_offset
+Specifies the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure containing the destination IP address and port number to which the
+message is to be sent.
+.TP
+.IR OPT_length ", " OPT_offset
+Specifies the length and offset form the beginning of the message block of the
+options requested for the packet.  See
+.RI \(lq OPTIONS \(rq,
+above.  The only options that have an effect on the UDP packets sent by the
+.B TPI-UDP
+provider are as follows:
+.RS
+.TP
+.B T_IP_OPTIONS
+Specifying a value for this option will affect the IP options in the
+associated outgoing packet.  The value specified will be used instead of the
+default for the Stream.  (In the current implementation this option is not
+supported.)
+.TP
+.B T_IP_TOS
+Specifying a value for this option will affect the type of service field in
+the associated outgoing packet.  The value specified will be used instead of
+the default for the Stream.
+.TP
+.B T_IP_TTL
+Specifying a value for this option will affect the time to live field in
+the associated outgoing packet.  The value specified will be used instead of
+the default for the Stream.
+.TP
+.B T_IP_ADDR
+Specifying a value for this option will affect the source address of
+the associated outgoing packet.  The value specified will be used instead of
+the default for the outgoing interface.
+.TP
+.B T_UDP_CHECKSUM
+Specifying a value for this option will affect the checksumming of the
+associated outgoing packet.  The value specified will be used instead of
+the default for the Stream.
+.RE
+.IP ""
+Other option values specified with the primitive will be ignored.
+.\"
+.\"
+.SS T_UNITDATA_IND\fR(7)
 .PP
-.SS T_UDERROR_IND
+This primitive is interpreted as in
+.BR tpi (7)
+in the connectionless mode.
+.TP
+.IR SRC_length ", " SRC_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure containing the source address and port number from which the UDP
+packet was sent.
+.TP
+.IR OPT_length ", " OPT_offset
+Indicates the length and offset from the beginning of the message block of the
+options present in the packet.  See
+.RI \(lq OPTIONS \(rq,
+above.  The only options that are indicated by the
+.B TPI-UDP
+provider are as follows:
+.RS
+.TP
+.B T_IP_OPTIONS
+Indicates the IP options that were present in the received packet.  If no IP options were present,
+this option value will not be indicated.  This value does not affect the value used for outgoing
+packets. (In the current implementation this option is not supported.)
+.TP
+.B T_IP_TOS
+Indicates the value of the type of service field from the received packet.  This value does not
+affect the value used for outgoing packets.
+.TP
+.B T_IP_TTL
+Indicates the value of the time to live field from the received packet.  This value does not affect
+the value used for outgoing packets.
+.TP
+.B T_IP_ADDR
+Indicates the value of the IP destination (local) address from the received packet.  This value does
+not affect the value used for outgoing packets.
+.TP
+.B T_UDP_CHECKSUM
+Indicates whether the received packet was checksummed.  This value does not affect the value used
+for outgoing packets.
+.RE
+.IP ""
+No other option values will be indicated.
+.\"
+.\"
+.SS T_UDERROR_IND\fR(7)
 .PP
-.SS T_CONN_REQ
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.IR DEST_length ", " DEST_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure that contains the
+.B TPI-UDP
+address to which the unit data that encountered the error was sent.
+.TP
+.IR OPT_length ", " OPT_offset
+Indicates the length and offset from the beginning of the message block of the
+options associated with the unit data that encountered the error.  See
+.RI \(lq OPTIONS \(rq,
+above.
+.TP
+.I ERROR_type
+Error types in connectionless mode are a combination of the ICMP error type in
+the second lease significant byte combined with the ICMP error code in the
+least significant byte.  Values are a follows:
+.sp
+.TS
+tab(:);
+lblbci.
+_
+Code:Type:Value
+_
+ICMP_DEST_UNREACH:ICMP_NET_UNREACH:0x0300
+:ICMP_HOST_UNREACH:0x0301
+:ICMP_PROT_UNREACH:0x0302
+:ICMP_PORT_UNREACH:0x0303
+:ICMP_FRAG_NEEDED:0x0304
+:ICMP_SR_FAILED:0x0305
+:ICMP_NET_UNKNOWN:0x0306
+:ICMP_HOST_UNKNOWN:0x0307
+:ICMP_HOST_ISOLATED:0x0308
+:ICMP_NET_ANO:0x0309
+:ICMP_HOST_ANO:0x030a
+:ICMP_NET_UNR_TOS:0x030b
+:ICMP_HOST_UNR_TOS:0x030c
+:ICMP_PKT_FILTERED:0x030d
+:ICMP_PREC_VIOLATION:0x030e
+:ICMP_PREC_CUTOFF:0x030f
+_
+ICMP_SOURCE_QUENCH:\-:0x0400
+_
+ICMP_TIME_EXCEEDED:ICMP_EXC_TTL:0x0b00
+:ICMP_EXC_FRAGTIME:0x0b01
+_
+.TE
+.\"
+.\"
+.SS T_CONN_REQ\fR(7)
 .PP
-.SS T_CONN_CON
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7),
+with a few exceptions:
+.IP 1. \w'0.\(em'u
+The primitive can be issued on a Stream that has not yet been bound; i.e. that
+is in the
+.I TS_UNBND
+state.  The
+.B TPI-IP
+provider will autobind the Stream to an IP address of
+.BR INADDR_ANY ,
+and a port number that is selected dynamically.  The resulting Stream will be
+a pseudo-connection-oriented Stream.  This is primarily for compatibility with
+the
+.BR sockets (3)
+library, but is also the only way that a port number can be bound and then
+pseudo-connection-oriented mode entered.
+The
+TPI
+.[
+TPI Revision 2.0.0
+.]
+specification indicates that the reponse in this situation should be an
+.BR T_ERROR_ACK (7)
+primitive with either a
+.RB [ TNOTSUPPORT ]
+or a
+.RB [ TOUTSTATE ]
+error.
+.IP 2.
+The primitive can be issued on a Stream that has been bound, but which reports
+a service type of
+.I T_CLTS
+in the
+.BR T_INFO_ACK (7)
+primitive.  This, again, is primarily for compatibility with the
+.BR sockets (3)
+library.  The
+TPI
+.[
+TPI Revision 2.0.0
+.]
+specification indicates that the response in this situation should be an
+.BR T_ERROR_ACK (7)
+primitive with a
+.RB [ TNOTSUPPORT ]
+error.
+.TP
+.IR DEST_length " and " DEST_offset
+Specifies the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure containing the destination IP address and port number to which the
+connection is to be formed.
+.TP
+.IR OPT_length " and " OPT_offset
+Specifies the length and offset from the beginning of the message block of the
+options requested for the connection.  See
+.RI \(lq OPTIONS \(rq,
+above.  The only options that have an effect on the UDP packets sent by the
+.B TPI-UDP
+provider are as follows:
+.RS
+.TP
+.B T_IP_OPTIONS
+Specifying a value for this option will affect the IP options in the associated outgoing packet and
+further packets sent using the
+.BR T_DATA_REQ (7)
+primitive.  The value specified will become the default for the Stream.  (In the current
+implementation this option is not supported.)
+.TP
+.B T_IP_TOS
+Specifying a value for this option will affect the type of service field in the associated outgoing
+packet and further packets sent using the
+.BR T_DATA_REQ (7)
+primitive.  The value specified will become the default for the Stream.
+.TP
+.B T_IP_TTL
+Specifying a value for this option will affect the time to live field in the associated outgoing
+packet and further packets sent using the
+.BR T_DATA_REQ (7)
+primitive.  The value specified will become the default for the Stream.
+.TP
+.B T_IP_ADDR
+Specifying a value for this option will affect the source address of the associated outgoing packet
+and further packets sent using the
+.BR T_DATA_REQ (7)
+primitive.  The value specified will become the default for the outgoing interface.
+.TP
+.B T_UDP_CHECKSUM
+Specifying a value for this option will affect the checksumming of the associated outgoing packet
+and further packets sent using the
+.BR T_DATA_REQ (7)
+primitive.  The value specified will become the default for the Stream.
+.RE
+.IP ""
+Other option values specified with the primitive will be ignored.
+.\"
+.\"
+.SS T_CONN_CON\fR(7)
 .PP
-.SS T_CONN_IND
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7),
+with a few exceptions:
+.IP 1. \w'0.\(em'u
+The
+.B TPI-UDP
+provider does not provide true confirmation of a connection in
+pseudo-connection-oriented mode.  The confirmation is issued automatically by
+the
+.B TPI-UDP
+provider upon receipt of a proper
+.BR T_CONN_REQ (7)
+primitive.
+.TP
+.IR RES_length " and " RES_offset
+Specifies the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure that contains the responding address.
+.TP
+.IR OPT_length " and " OPT_offset
+Indicates the length and offset from the beginning of the message block of the options present in
+the connection request,
+.BR T_CONN_REQ (7).  See
+.RI \(lq OPTIONS \(rq,
+above.  The option values represent negotation with the local provider only and are not end-to-end.
+The only options that are indicated by the
+.B TPI-UDP
+provider are as follows:
+.RS
+.TP
+.B T_IP_OPTIONS
+Indicates the IP options that were present in the connection request.  If no IP options were
+present, this option value will not be indicated.  This value reflects the value used for outgoing
+packets.  (In the current implementation this option is not supported.)
+.TP
+.B T_IP_TOS
+Indicates the value of the type of service field from the connection request.  This value reflects
+the value used for outgoing packets.
+.TP
+.B T_IP_TTL
+Indicates the value of the time to live field from the connection request.  This value reflects the
+value used for outgoing packets.
+.TP
+.B T_IP_ADDR
+Indicates the value of the IP destination (local) address from the connection request.  This value
+reflects the value used for outgoing packets.
+.TP
+.B T_UDP_CHECKSUM
+Indicates the value of UDP checksum from the connection request. This value reflects the value used
+for outgoing packets.
+.RE
+.IP ""
+No other option values will be indicated.
+.\"
+.\"
+.SS T_CONN_IND\fR(7)
 .PP
-.SS T_CONN_RES
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7),
+with a few exceptions:
+.IP 1. \w'0.\(em'u
+The
+.B TPI-UDP
+provider does not provide true connection-oriented modes.  In pseudo-connection oriented mode with a
+listening Stream, connection indications are synthesized from any received packet that matches the
+listening Stream and delivered as a connection indication.
+.TP
+.IR SRC_length " and " SRC_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure containing the source address and port number from which the indicated UDP
+packet was sent.
+.TP
+.IR OPT_length " and " OPT_offset
+Indicates the length and offset from the beginning of the message block of the
+options present in the packet.  See
+.RI \(lq OPTIONS \(rq,
+above.  The only options that are indicated by the
+.B TPI-UDP
+provider are as follows:
+.RS
+.TP
+.B T_IP_OPTIONS
+Indicates the IP options that were present in the received packet.  If no IP options were present,
+this option value will not be indicated.  This value does not affect the value used for outgoing
+packets.  (In the current implementation this option is not supported.)
+.TP
+.B T_IP_TOS
+Indicates the value of the type of service field from the received packet.  This value does not
+affect the value used for outgoing packets.
+.TP
+.B T_IP_TTL
+Indicates the value of the time to live field from the received packet.  This value does not affect
+the value used for outgoing packets.
+.TP
+.B T_IP_ADDR
+Indicates the value of the IP destination (local) address from the received packet.  This value does
+not affect the value used for outgoing packets.
+.TP
+.B T_UDP_CHECKSUM
+Indicates whether the received packet was checksummed.  This value does not affect the value used
+for outgoing packets.
+.RE
+.IP ""
+No other option values will be indicated.
+.TP
+.IR SEQ_number
+Indicates the sequence number for the connection indication to be used by the TS user in a
+subsequent
+.BR T_DISCON_REQ (7)
+or
+.BR T_CONN_RES (7)
+primitive.
+.\"
+.\"
+.SS T_CONN_RES\fR(7)
 .PP
-.SS T_DATA_REQ
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7),
+with a few exceptions:
+.IP 1. \w'0.\(em'u
+The
+.B TPI-UDP
+provider does not support true connection-oriented modes: only a pseudo-connection-oriented mode.
+Accepting a connection indication with the primitive will deliver queued and any further received
+packets with the same source and destination address and port combinations to the accepting Stream.
+.IP 2.
+Default options associated with the Stream are not negotiated end-to-end and are simply set as
+specified.
+.TP
+.I ACCEPTOR_id
+Specifies the acceptor identifier of the Stream onto which the connection is to be accepted.  If the
+connection is to be accepted on the same Stream upon which the corresponding
+.BR T_CONN_IND (7)
+was received, this field should be zero (0).  It is an error to accept a connection on the listening
+Stream if there is more than one connection indication outstanding.
+.TP
+.IR OPT_length " and " OPT_offset
+Specifies the length and offset from the beginning of the message block of the
+options requested for the connection.  See
+.RI \(lq OPTIONS \(rq,
+above.  The only options that have an effect on the UDP packets sent by the
+.B TPI-UDP
+provider are as follows:
+.RS
+.TP
+.B T_IP_OPTIONS
+Specifying a value for this option will affect the IP options in the associated outgoing packet and
+for further packets sent using the
+.BR T_DATA_REQ (7)
+primitive.  The value specified will become the default for the Stream.  (In the current
+implementation this option is not supported.)
+.TP
+.B T_IP_TOS
+Specifying a value for this option will affect the type of service field in the associated outgoing
+packet and for further packets sent using the
+.BR T_DATA_REQ (7)
+primitive.  The value specified will become the default for the Stream.
+.TP
+.B T_IP_TTL
+Specifying a value for this option will affect the time to live field in the associated outgoing
+packet and for further packets sent using the
+.BR T_DATA_REQ (7)
+primitive.  The value specified will become the default for the Stream.
+.TP
+.B T_IP_ADDR
+Specifying a value for this option will affect the source address of the associated outgoing packet
+and for further packets sent using the
+.BR T_DATA_REQ (7)
+primitive.  The value specified will become the default for the outgoing interface.
+.TP
+.B T_UDP_CHECKSUM
+Specifying a value for this option will affect the checksumming of the associated outgoing packet
+and for further packets sent using the
+.BR T_DATA_REQ (7)
+primitive.  The value specified will become the default for the Stream.
+.RE
+.IP ""
+Other option values specified with the primitive will be ignored.
+.TP
+.I SEQ_number
+Specifies the sequence number in the corresponding
+.BR T_CONN_IND (7)
+primitive to which this primitive is responding.
+.\"
+.\"
+.SS T_DATA_REQ\fR(7)
 .PP
-.SS T_DATA_IND
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I MORE_flag
+The
+.B TPI-UDP
+provider does not support segmentation.  If this flag is non-zero, an
+.RB [ EPROTO ]
+fatal error will be issued.
+.\"
+.\"
+.SS T_DATA_IND\fR(7)
 .PP
-.SS T_EXDATA_REQ
+This primitive is interpreted as in
+.BR tpi (7)
+in the pseudo-connection-oriented mode.  The packet will be issued to the
+connected destination address.
+.TP
+.I MORE_flag
+The
+.B TPI-UDP
+provider does not support segmentation.  If this flag is non-zero, an
+.RB [ EPROTO ]
+fatal error will be issued.
+.\"
+.\"
+.SS T_EXDATA_REQ\fR(7)
 .PP
-.SS T_EXDATA_IND
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-UDP
+provider does not support expedited data in the pseud-connection-oriented
+mode.  If this primitive is issued, a
+.RB [ EPROTO ]
+fatal error will be issued by the provider.
+.TP
+.I MORE_flag
+The
+.B TPI-UDP
+provider does not support segmentation.  If this flag is non-zero, an
+.RB [ EPROTO ]
+fatal error will be issued.
+.\"
+.\"
+.SS T_EXDATA_IND\fR(7)
 .PP
-.SS T_OPTDATA_REQ
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-UDP
+provider does not support expedited data and will not issue this primitive.
+.\"
+.\"
+.SS T_OPTDATA_REQ\fR(7)
 .PP
-.SS T_OPTDATA_IND
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I DATA_flag
+The
+.B TPI-UDP
+provider does not support segmentation.  Segmentation of IP packets is
+performed at a lower layer.  Therefore, if the
+.I DATA_flag
+field contains a non-zero value, the provider will issue a fatal
+.RB [ EPROTO ]
+error.
+.TP
+.IR OPT_length " and " OPT_offset
+Specifies the length and offset from the beginning of the message block of the
+options requested for the packet.  See
+.RI \(lq OPTIONS \(rq,
+above.  The only options that have an effect on the UDP packets sent by the
+.B TPI-UDP
+provider are as follows:
+.RS
+.TP
+.B T_IP_OPTIONS
+Specifying a value for this option will affect the IP options in the
+associated outgoing packet.  The value specified will be used instead of the
+default for the Stream.  (In the current implementation this option is not
+supported.)
+.TP
+.B T_IP_TOS
+Specifying a value for this option will affect the type of service field in
+the associated outgoing packet.  The value specified will be used instead of
+the default for the Stream.
+.TP
+.B T_IP_TTL
+Specifying a value for this option will affect the time to live field in
+the associated outgoing packet.  The value specified will be used instead of
+the default for the Stream.
+.TP
+.B T_IP_ADDR
+Specifying a value for this option will affect the source address of
+the associated outgoing packet.  The value specified will be used instead of
+the default for the outgoing interface.
+.TP
+.B T_UDP_CHECKSUM
+Specifying a value for this option will affect the checksumming of the
+associated outgoing packet.  The value specified will be used instead of
+the default for the Stream.
+.RE
+.IP ""
+Other option values specified with the primitive will be ignored.
+.\"
+.\"
+.SS T_OPTDATA_IND\fR(7)
 .PP
-.SS T_DISCON_REQ
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I DATA_flag
+The
+.B TPI-UDP
+provider performs reassembly of fragmented IP packets before delivery.
+Therefore, the
+.I DATA_flag
+will alway contain zero (0).
+.TP
+.IR OPT_length " and " OPT_offset
+Indicates the length and offset from the beginning of the message block of the
+options present in the packet.  See
+.RI \(lq OPTIONS \(rq,
+above.  The only options that are indicated by the
+.B TPI-UDP
+provider are as follows:
+.RS
+.TP
+.B T_IP_OPTIONS
+Indicates the IP options that were present in the received packet.  If no IP
+options were present, this option value will not be indicated.  (In the
+current implementation this option is not supported.)
+.TP
+.B T_IP_TOS
+Indicates the value of the type of service field from the received packet.
+.TP
+.B T_IP_TTL
+Indicates the value of the time to live field from the received packet.
+.TP
+.B T_IP_ADDR
+Indicates the value of the IP destination (local) address from the received packet.
+.TP
+.B T_UDP_CHECKSUM
+Indicates whether the received packet was checksummed.
+.RE
+.IP ""
+No other option values will be indicated.
+.\"
+.\"
+.SS T_DISCON_REQ\fR(7)
 .PP
-.SS T_DISCON_IND
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7).
+.\"
+.\"
+.SS T_DISCON_IND\fR(7)
 .PP
-.SS T_ORDREL_REQ
+The
+.I /dev/udp
+driver does not support psuedo-connection-oriented service modes.  For the
+.I /dev/udp2
+driver, this primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I DISCON_reason
+Disconnect reasons in pseudo-connection-oriented mode are a combination of the
+ICMP error type in the second least significant byte combined with the ICMP
+error code in the least significant byte.  Values are as follows:
+.sp
+.TS
+tab(:);
+lblbci.
+_
+Code:Type:Value
+_
+ICMP_DEST_UNREACH:ICMP_NET_UNREACH:0x0300
+:ICMP_HOST_UNREACH:0x0301
+:ICMP_PROT_UNREACH:0x0302
+:ICMP_PORT_UNREACH:0x0303
+:ICMP_FRAG_NEEDED:0x0304
+:ICMP_SR_FAILED:0x0305
+:ICMP_NET_UNKNOWN:0x0306
+:ICMP_HOST_UNKNOWN:0x0307
+:ICMP_HOST_ISOLATED:0x0308
+:ICMP_NET_ANO:0x0309
+:ICMP_HOST_ANO:0x030a
+:ICMP_NET_UNR_TOS:0x030b
+:ICMP_HOST_UNR_TOS:0x030c
+:ICMP_PKT_FILTERED:0x030d
+:ICMP_PREC_VIOLATION:0x030e
+:ICMP_PREC_CUTOFF:0x030f
+_
+ICMP_SOURCE_QUENCH:\-:0x0400
+_
+ICMP_TIME_EXCEEDED:ICMP_EXC_TTL:0x0b00
+:ICMP_EXC_FRAGTIME:0x0b01
+_
+.TE
+.TP
+.I SEQ_number
+The sequence number of a currently outstanding connection indication to which
+the disconnect corresponds.  This value is non-zero only on a listening Stream
+for which an outstanding
+.BR T_CONN_IND (7)
+primitive has been issued with no
+.BR T_DISCON_REQ (7)
+or
+.BR T_CONN_RES (8)
+having been issued by the TS user with the same sequence number.
+.\"
+.\"
+.SS T_ORDREL_REQ\fR(7)
 .PP
-.SS T_ORDREL_IND
+This primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-UDP
+provider does not support orderly release.  If the TS user issues this
+primitive, the provider will negatively acknowledge the primitive with a fatal
+.RB [ EPROTO ]
+error.
+.\"
+.\"
+.SS T_ORDREL_IND\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-UDP
+provider does not support orderly release.  The provider will not issue this
+primitive.
+.\"
+.\"
 .SH "IOCTLS"
 .PP
+The
+.B TPI-UDP
+provider does not support input-output controls.  For a standard set of
+input-output controls supporting the
+.BR xti (3)
+library functions, push the
+.BR timod (4)
+module.
+.\"
+.\"
 .SH "ERROR HANDLING"
 .PP
+Error handling is in accordance with
+.BR tpi (7).
+.\"
+.\"
 .SH "ERRORS"
 .PP
+Errors are in accordance with
+.BR tpi (7).
+They are repeated here as follows:
+.SS Error Acknowledgement Codes
+.PP
+The following error codes can be present in the
+.I TLI_error
+field of the
+.BR T_ERROR_ACK (7)
+message.
+.TP \w'[TPROVMISMATCH]\(em'u
+.RB [ TBADADDR ]
+Bad address format.
+.PD 0
+.TP
+.RB [ TBADOPT ]
+Bad options format.
+.TP
+.RB [ TACCES ]
+Bad permissions.
+.TP
+.RB [ TBADF ]
+Bad file descriptor.
+.TP
+.RB [ TNOADDR ]
+Unable to allocate an address.
+.TP
+.RB [ TOUTSTATE ]
+Would place interface out of state.
+.TP
+.RB [ TBADSEQ ]
+Bad call sequence number.
+.TP
+.RB [ TSYSERR ]
+A system error occured.  The UNIX error code is present in the
+.I UNIX_error
+field of the primitive.
+.TP
+.RB [ TBADDATA ]
+Bad amount of data.
+.TP
+.RB [ TBADFLAG ]
+Bad flags.
+.TP
+.RB [ TNOTSUPPORT ]
+Not supported.
+.TP
+.RB [ TADDRBUSY ]
+Address already in use.
+.TP
+.RB [ TPROVMISMATCH ]
+Not same transport provider.
+.TP
+.RB [ TRESQLEN ]
+Connection acceptor has qlen > 0.
+.TP
+.RB [ TRESADDR ]
+Conn. acceptor bound to different address.
+.PD
+.\"
+.\"
+.SS Unitdata Error and Disconnect Codes
+.PP
+THe following error codes can be present in the
+.I ERROR_type
+field of a
+.BR T_UDERROR_IND (7)
+primitive, or in the
+.I DISCON_reason
+field of a
+.BR T_DISCON_IND (7)
+primitive.
+.TP \w'[ICMP_DEST_UNREACH/ICMP_PREC_VIOLATION]\(em'u
+.RB [ ICMP_DEST_UNREACH / ICMP_NET_UNREACH ]
+Network unreachable.
+.PD 0
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_HOST_UNREACH ]
+Host unreachable.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_PROT_UNREACH ]
+UDP protocol unreachable.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_PORT_UNREACH ]
+UDP port unreachable.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_FRAG_NEEDED ]
+Fragmentation needed and none requested.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_SR_FAILED ]
+Source route failed.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_NET_UNKNOWN ]
+Network unknown.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_HOST_UNKNOWN ]
+Host unknown.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_HOST_ISOLATED ]
+Host isolated.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_NET_ANO ]
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_HOST_ANO ]
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_NET_UNR_TOS ]
+Type of service unrecognized by network.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_HOST_UNR_TOS ]
+Type of service unrecognized by host.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_PKT_FILTERED ]
+Packet filtered.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_PREC_VIOLATION ]
+Precedence violation.
+.TP
+.RB [ ICMP_DEST_UNREACH / ICMP_PREC_CUTOFF ]
+Precedence cutoff.
+.TP
+.RB [ ICMP_SOURCE_QUENCH ]
+Source quench (congestion).
+.TP
+.RB [ ICMP_TIME_EXCEEDED / ICMP_EXC_TTL ]
+Time to live exceeded (too many hops).
+.TP
+.RB [ ICMP_TIME_EXCEEDED / ICMP_EXC_FRAGTIME ]
+Fragmentation time exceeded.
+.PD
+.\"
+.\"
 .SH "CAVEATS"
 .PP
+.\"
+.\"
 .SH "SEE ALSO"
 .BR udp (7),
 .BR tpi (7),
 .BR xti (3),
 .BR sockets (3).
+.\"
+.\"
 .SH HISTORY
 .PP
 The Transport Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
+.\"
+.\"
 .SH CONFORMANCE
 .PP
 This interface conforms to TPI Version 2, Draft 2.

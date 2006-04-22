@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/18 17:55:42 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/22 01:08:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/18 17:55:42 $ by $Author: brian $
+ Last Modified $Date: 2006/04/22 01:08:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.9  2006/04/22 01:08:52  brian
+ - working up second generation UPD driver
+
  Revision 0.9.2.8  2006/04/18 17:55:42  brian
  - raiontalizing rawip and udp drivers
 
@@ -76,9 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/18 17:55:42 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/22 01:08:52 $"
 
-static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/18 17:55:42 $";
+static char const ident[] =
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/22 01:08:52 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -125,7 +129,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $)
 #include <net/snmp.h>
 
 #include <net/udp.h>
-#include <net/tcp.h> /* for checksumming */
+#include <net/tcp.h>		/* for checksumming */
 
 #ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
@@ -155,7 +159,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $)
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/18 17:55:42 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/22 01:08:52 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -234,65 +238,27 @@ STATIC struct module_info udp_minfo = {
 	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
-STATIC streamscall int udp_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC streamscall int udp_close(queue_t *, int, cred_t *);
-
-STATIC streamscall int udp_rput(queue_t *, mblk_t *);
-STATIC streamscall int udp_rsrv(queue_t *);
+STATIC streamscall int udp_qopen(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int udp_qclose(queue_t *, int, cred_t *);
 
 STATIC struct qinit udp_rinit = {
-	.qi_putp = udp_rput,		/* Read put (msg from below) */
-	.qi_srvp = udp_rsrv,		/* Read queue service */
-	.qi_qopen = udp_open,		/* Each open */
-	.qi_qclose = udp_close,		/* Last close */
+	.qi_putp = &ss7_oput,		/* Read put (msg from below) */
+	.qi_srvp = &ss7_osrv,		/* Read queue service */
+	.qi_qopen = udp_qopen,		/* Each open */
+	.qi_qclose = udp_qclose,	/* Last close */
 	.qi_minfo = &udp_minfo,		/* Information */
 };
-
-STATIC streamscall int udp_wput(queue_t *, mblk_t *);
-STATIC streamscall int udp_wsrv(queue_t *);
 
 STATIC struct qinit udp_winit = {
-	.qi_putp = udp_wput,		/* Write put (msg from above) */
-	.qi_srvp = udp_wsrv,		/* Write queue service */
-	.qi_minfo = &udp_minfo,		/* Information */
-};
-
-STATIC streamscall int mux_rput(queue_t *, mblk_t *);
-STATIC streamscall int mux_rsrv(queue_t *);
-
-STATIC struct qinit mux_rinit = {
-	.qi_putp = mux_rput,		/* Read put (msg from below) */
-	.qi_srvp = mux_rsrv,		/* Read queue service */
-	.qi_minfo = &udp_minfo,		/* Information */
-};
-
-STATIC streamscall int mux_wput(queue_t *, mblk_t *);
-STATIC streamscall int mux_wsrv(queue_t *);
-
-STATIC struct qinit mux_winit = {
-	.qi_putp = mux_wput,		/* Write put (msg from above) */
-	.qi_srvp = mux_wsrv,		/* Write queue service */
+	.qi_putp = &ss7_iput,		/* Write put (msg from above) */
+	.qi_srvp = &ss7_isrv,		/* Write queue service */
 	.qi_minfo = &udp_minfo,		/* Information */
 };
 
 MODULE_STATIC struct streamtab udp_info = {
 	.st_rdinit = &udp_rinit,	/* Upper read queue */
 	.st_wrinit = &udp_winit,	/* Upper write queue */
-	.st_muxrinit = &mux_rinit,	/* Lower read queue */
-	.st_muxwinit = &mux_winit,	/* Lower write queue */
 };
-
-/*
- *  Queue put and service return values.
- */
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
 
 /*
  *  TLI Interface state flags
@@ -341,54 +307,6 @@ MODULE_STATIC struct streamtab udp_info = {
 #endif
 
 /*
- *  NPI Interface state flags
- */
-#define NSF_UNBND	( 1 << NS_UNBND		)
-#define NSF_WACK_BREQ	( 1 << NS_WACK_BREQ	)
-#define NSF_WACK_UREQ	( 1 << NS_WACK_UREQ	)
-#define NSF_IDLE	( 1 << NS_IDLE		)
-#define NSF_WACK_OPTREQ	( 1 << NS_WACK_OPTREQ	)
-#define NSF_WACK_RRES	( 1 << NS_WACK_RRES	)
-#define NSF_WCON_CREQ	( 1 << NS_WCON_CREQ	)
-#define NSF_WRES_CIND	( 1 << NS_WRES_CIND	)
-#define NSF_WACK_CRES	( 1 << NS_WACK_CRES	)
-#define NSF_DATA_XFER	( 1 << NS_DATA_XFER	)
-#define NSF_WCON_RREQ	( 1 << NS_WCON_RREQ	)
-#define NSF_WRES_RIND	( 1 << NS_WRES_RIND	)
-#define NSF_WACK_DREQ6	( 1 << NS_WACK_DREQ6	)
-#define NSF_WACK_DREQ7	( 1 << NS_WACK_DREQ7	)
-#define NSF_WACK_DREQ9	( 1 << NS_WACK_DREQ9	)
-#define NSF_WACK_DREQ10	( 1 << NS_WACK_DREQ10	)
-#define NSF_WACK_DREQ11	( 1 << NS_WACK_DREQ11	)
-#define NSF_NOSTATES	( 1 << NS_NOSTATES	)
-#define NSM_WACK_DREQ	(NSF_WACK_DREQ6\
-			|NSF_WACK_DREQ7\
-			|NSF_WACK_DREQ9\
-			|NSF_WACK_DREQ10\
-			|NSF_WACK_DREQ11)
-#define NSM_LISTEN	(NSF_IDLE\
-			|NSF_WRES_CIND\
-			|NSF_WACK_CRES)
-#define NSM_CONNECTED	(NSF_WCON_CREQ\
-			|NSF_WRES_CIND\
-			|NSF_WACK_CRES\
-			|NSF_DATA_XFER\
-			|NSF_WCON_RREQ\
-			|NSF_WRES_RIND\
-			|NSF_WACK_RRES)
-#define NSM_DISCONN	(NSF_IDLE\
-			|NSF_UNBND)
-#define NSM_INDATA	(NSF_DATA_XFER\
-			|NSF_WCON_RREQ)
-#define NSM_OUTDATA	(NSF_DATA_XFER\
-			|NSF_WRES_RIND\
-			|NSF_WACK_RRES)
-#ifndef N_PROVIDER
-#define N_PROVIDER  0
-#define N_USER	    1
-#endif
-
-/*
  *  =========================================================================
  *
  *  UDP Private Datastructures
@@ -424,31 +342,23 @@ typedef struct udp_options {
 	} udp;
 } udp_options_t;
 
+struct udp_bind_bucket;
+
 typedef struct udp {
-	struct udp *next;		/* list of all UDP-Users */
-	struct udp **prev;		/* list of all UDP-Users */
-	major_t cmajor;			/* major device number */
-	minor_t cminor;			/* minor device number */
-	queue_t *rq;			/* associated rd queue */
-	queue_t *wq;			/* associated wr queue */
-	cred_t cred;			/* credentials */
-	atomic_t refcnt;		/* structure reference count */
-	spinlock_t qlock;		/* queue lock */
-	queue_t *rwait;			/* RD queue waiting on lock */
-	queue_t *wwait;			/* WR queue waiting on lock */
-	int users;			/* lock holders */
-	bcid_t rbid;			/* RD buffer call id */
-	bcid_t wbid;			/* WR buffer call id */
-	t_uscalar_t i_flags;		/* TPI interface flags */
-	t_uscalar_t i_state;		/* TPI interface state */
-	np_ulong n_flags;		/* NPI interface flags */
-	np_ulong n_state;		/* NPI interface state */
+	STR_DECLARATION (struct udp);	/* Streams declaration */
 	struct udp *bnext;		/* linkage for bind hash */
 	struct udp **bprev;		/* linkage for bind hash */
 	struct udp_bind_bucket *bindb;	/* linkage for bind hash */
-	short port;			/* bound port number - host order */
-	struct sockaddr_storage src;	/* bound address */
-	struct sockaddr_storage dst;	/* connected address */
+	struct udp *cnext;		/* linkage for connection hash */
+	struct udp **cprev;		/* linkage for connection hash */
+	struct udp_chash_bucket *hashb;	/* linkage for connection hash */
+	unsigned short port;		/* bound port number - host order */
+	struct sockaddr_storage bind;	/* bound address */
+	struct sockaddr_storage srce;	/* source address */
+	struct sockaddr_storage dest;	/* connected address */
+	t_uscalar_t CONIND_number;	/* maximum number of connection indications */
+	bufq_t conq;			/* queue outstanding connection indications */
+	struct T_info_ack info;		/* information */
 	struct udp_options options;	/* protocol options */
 	unsigned char _pad[40];		/* pad for ip options */
 } udp_t;
@@ -515,26 +425,39 @@ struct udp_bhash_bucket {
 	rwlock_t lock;
 	struct udp_bind_bucket *list;
 };
+struct udp_chash_bucket {
+	rwlock_t lock;
+	struct udp *list;
+};
+
+STATIC struct udp_bhash_bucket *udp_bhash;
+STATIC size_t udp_bhash_size = 0;
+STATIC size_t udp_bhash_order = 0;
+
+STATIC struct udp_chash_bucket *udp_chash;
+STATIC size_t udp_chash_size = 0;
+STATIC size_t udp_chash_order = 0;
+
+STATIC INLINE fastcall uint
+udp_bhashfn(uint16_t num)
+{
+	return ((udp_bhash_size - 1) & num);
+}
+STATIC INLINE fastcall uint
+udp_chashfn(uint16_t dport, uint16_t sport)
+{
+	return ((udp_chash_size - 1) & (dport + (sport << 4)));
+}
 
 STATIC kmem_cache_t *udp_bind_cachep;
 STATIC kmem_cache_t *udp_priv_cachep;
 
 STATIC INLINE struct udp *
-udp_get(void)
-{
-	struct udp *udp;
-
-	if ((udp = kmem_cache_alloc(udp_priv_cachep, SLAB_ATOMIC))) {
-		bzero(udp, sizeof(*udp));
-		atomic_set(&udp->refcnt, 1);
-	}
-	return (udp);
-}
-STATIC INLINE void
-udp_hold(struct udp *udp)
+udp_get(struct udp *udp)
 {
 	if (udp)
 		atomic_inc(&udp->refcnt);
+	return (udp);
 }
 STATIC INLINE void
 udp_put(struct udp *udp)
@@ -542,38 +465,24 @@ udp_put(struct udp *udp)
 	if (udp && atomic_dec_and_test(&udp->refcnt))
 		kmem_cache_free(udp_priv_cachep, udp);
 }
-
-/*
- *  LOCKING
- */
-STATIC int
-udp_trylockq(queue_t *q)
+STATIC INLINE void
+udp_release(struct udp **udpp)
 {
-	int res;
-	struct udp *udp = PRIV(q);
-
-	spin_lock_bh(&udp->qlock);
-	if (!(res = !udp->users++)) {
-		if (q == udp->rq)
-			udp->rwait = q;
-		if (q == udp->wq)
-			udp->wwait = q;
-	}
-	spin_unlock_bh(&udp->qlock);
-	return (res);
+	udp_put(xchg(udpp, NULL));
 }
-STATIC void
-udp_unlockq(queue_t *q)
+STATIC INLINE struct udp *
+udp_alloc(void)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp;
 
-	spin_lock_bh(&udp->qlock);
-	if (udp->rwait)
-		qenable(xchg(&udp->rwait, NULL));
-	if (udp->wwait)
-		qenable(xchg(&udp->wwait, NULL));
-	udp->users = 0;
-	spin_unlock_bh(&udp->qlock);
+	if ((udp = kmem_cache_alloc(udp_priv_cachep, SLAB_ATOMIC))) {
+		bzero(udp, sizeof(*udp));
+		atomic_set(&udp->refcnt, 1);
+		spin_lock_init(&udp->lock);	/* "udp-lock" */
+		np->priv_put = &udp_put;
+		np->priv_get = &udp_get;
+	}
+	return (udp);
 }
 
 /*
@@ -630,280 +539,18 @@ tpi_set_state(struct udp *udp, long state)
 {
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, udp, tpi_state_name(state),
 		tpi_state_name(udp->i_state)));
-	udp->i_state = state;
+	udp->i_state = udp->info.CURRENT_state = state;
 }
-STATIC long
+STATIC INLINE fastcall long
 tpi_get_state(struct udp *udp)
 {
 	return (udp->i_state);
 }
-
-#ifdef _DEBUG
-STATIC const char *
-npi_state_name(np_long state)
+STATIC INLINE fastcall long
+tpi_get_statef(struct udp *udp)
 {
-	switch (state) {
-	case NS_UNBND:
-		return ("NS_UNBND");
-	case NS_WACK_BREQ:
-		return ("NS_WACK_BREQ");
-	case NS_WACK_UREQ:
-		return ("NS_WACK_UREQ");
-	case NS_IDLE:
-		return ("NS_IDLE");
-	case NS_WACK_OPTREQ:
-		return ("NS_WACK_OPTREQ");
-	case NS_WACK_RRES:
-		return ("NS_WACK_RRES");
-	case NS_WCON_CREQ:
-		return ("NS_WCON_CREQ");
-	case NS_WRES_CIND:
-		return ("NS_WRES_CIND");
-	case NS_WACK_CRES:
-		return ("NS_WACK_CRES");
-	case NS_DATA_XFER:
-		return ("NS_DATA_XFER");
-	case NS_WCON_RREQ:
-		return ("NS_WCON_RREQ");
-	case NS_WRES_RIND:
-		return ("NS_WRES_RIND");
-	case NS_WACK_DREQ6:
-		return ("NS_WACK_DREQ6");
-	case NS_WACK_DREQ7:
-		return ("NS_WACK_DREQ7");
-	case NS_WACK_DREQ9:
-		return ("NS_WACK_DREQ9");
-	case NS_WACK_DREQ10:
-		return ("NS_WACK_DREQ10");
-	case NS_WACK_DREQ11:
-		return ("NS_WACK_DREQ11");
-	case NS_NOSTATES:
-		return ("NS_NOSTATES");
-	default:
-		return ("(unknown)");
-	}
+	return (1 << tpi_get_state(udp));
 }
-#endif				/* _DEBUG */
-
-STATIC void
-npi_set_state(struct udp *udp, long state)
-{
-	printd(("%s: %p: %s <- %s\n", DRV_NAME, udp, npi_state_name(state),
-		npi_state_name(udp->n_state)));
-	udp->n_state = state;
-}
-STATIC long
-npi_get_state(struct udp *udp)
-{
-	return (udp->n_state);
-}
-
-/*
- *  BUFFER ALLOCATION
- */
-
-/**
- *  udp_bufsrv: - safe bufcalls
- *  @data: opaque client data
- *
- *  Whereas sockets allocate most buffers in user mode, where it is possible
- *  to simply return an error to a system call, the STREAMS driver runs as a
- *  coroutine and there is no (valid) user present.  This is done with
- *  bufcalls.  However, for LiS and a number of other STREAMS implementations,
- *  bufcalls are unsafe.  Here we do reference counting against the STREAMS
- *  private structure when buffer calls are issued and when they complete.
- *  STREAMS private structures will not be deallocated until the buffer calls
- *  are complete.  There are some mi_bufcall() compatibility functions that
- *  accomplish the same ends.  All of this can go away when this driver only
- *  needs to be used with Linux Fast-STREAMS that has safe buffer callbacks.
- */
-STATIC void streamscall
-udp_bufsrv(long data)
-{
-	struct udp *udp;
-	queue_t *q;
-
-	q = (queue_t *) data;
-	ensure(q, return);
-	udp = PRIV(q);
-	ensure(udp, return);
-
-	if (q == udp->rq && xchg(&udp->rbid, 0) != 0)
-		udp_put(udp);
-	if (q == udp->wq && xchg(&udp->wbid, 0) != 0)
-		udp_put(udp);
-	qenable(q);
-	return;
-}
-
-/**
- *  udp_unbufcall: - reliably cancel a buffer callback
- *  @q: the queue whose callback to cancel
- *
- *  Cancel a qenable() buffer callback associated with one queue in the queue pair.  udp_unbufcall()
- *  effectively undoes the actions performed by udp_bufcall().
- *
- *  NOTICES: Cancellation of buffer callbacks on LiS using unbufcall() is unreliable.  The callback
- *  function could execute some time shortly after the call to unbufcall() has returned.   LiS
- *  abbrogates the SVR 4 STREAMS principles for unbufcall().  This is why you will find atomic
- *  exchanges here and in the callback function and why reference counting is performed on the
- *  structure and queue pointers are checked for NULL.
- */
-STATIC void
-udp_unbufcall(queue_t *q)
-{
-	struct udp *udp;
-	bufcall_id_t bid;
-
-	ensure(q, return);
-	udp = PRIV(q);
-	ensure(udp, return);
-
-	if (q == udp->rq && (bid = xchg(&udp->rbid, 0))) {
-		unbufcall(bid);
-		udp_put(udp);
-	}
-	if (q == udp->wq && (bid = xchg(&udp->wbid, 0))) {
-		unbufcall(bid);
-		udp_put(udp);
-	}
-	return;
-}
-
-/**
- *  udp_bufcall: - generate a buffer callback to enable a queue
- *  @q: the queue to enable on callback
- *  @size: size of the allocation
- *  @prior: priority of the allocation
- *
- *  Maintain one buffer call for each queue in the queue pair.  The callback function will simply
- *  perform a qenable(9).
- *
- *  NOTICES: One of the reasons for going to such extents is that LiS has completely unsafe buffer
- *  callbacks.  The buffer callback function can be invoked (shortly) after unbufcall() returns
- *  under LiS in abrogation of SVR 4 STREAMS principles.  This is why you will find atomic exchanges
- *  here and in the callback function and why reference counting is performed on the structure and
- *  queue pointers are checked for NULL.
- */
-STATIC void
-udp_bufcall(queue_t *q, size_t size, int prior)
-{
-	struct udp *udp;
-	bufcall_id_t bid;
-
-	ensure(q, return);
-	udp = UDP_PRIV(q);
-	ensure(udp, return);
-	udp_hold(udp);
-	if (q == udp->wq) {
-		if ((bid = xchg(&udp->wbid, bufcall(size, prior, &udp_bufsrv, (long) udp)))) {
-			unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
-			udp_put(udp);
-		}
-		return;
-	}
-	if (q == udp->rq) {
-		if ((bid = xchg(&udp->rbid, bufcall(size, prior, &udp_bufsrv, (long) udp)))) {
-			unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
-			udp_put(udp);
-		}
-		return;
-	}
-	swerr();
-	return;
-}
-
-/**
- *  udp_allocb: - reliable allocb()
- *  @q: the queue to enable when allocation can succeed
- *  @size: the size to allocate
- *  @prior: the priority of the allocation
- *
- *  This helper function can be used by most STREAMS message handling procedures that allocate a
- *  buffer in response to an incoming message.  If the allocation fails, this routine will return
- *  NULL and issue a buffer callback to reenable the queue @q when the allocation could succeed.
- *  When NULL is returned, the caller should simply place the incoming message on the queue (i.e.
- *  with putq() from a put procedure or putbq() from a service procedure) and return.  The queue
- *  will be rescheduled with qenable() when the allocation could succeed.
- */
-STATIC mblk_t *
-udp_allocb(queue_t *q, size_t size, int prior)
-{
-	mblk_t *mp;
-
-	if (!(mp = allocb(size, prior)))
-		udp_bufcall(q, size, prior);
-	return (mp);
-}
-
-/**
- *  udp_allocb: - reliable allocb()
- *  @q: the queue to enable when allocation can succeed
- *  @base: the base of the external data buffer
- *  @size: the size of the external data buffer
- *  @prior: the priority of the allocation
- *  @frtn: a pointer to a free routine structure (containing callback and client data)
- *
- *  This helper function can be used by most STREAMS message handling procedures that allocate a
- *  message block with an external buffer in response to an incoming message.  If the allocation
- *  fails, this routine will return NULL and issue a buffer callback to reenable the queue @q when
- *  the allocation could succeed.  When NULL is returned, the caller should simply place the
- *  incoming message on the queue (i.e.  with putq() from a put procedure or putbq() from a service
- *  procedure) and return.  The queue will be rescheduled with qenable() when the allocation could
- *  succeed.
- */
-STATIC mblk_t *
-udp_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
-{
-	mblk_t *mp;
-
-	if (!(mp = esballoc(base, size, prior, frtn)))
-		udp_bufcall(q, FASTBUF, prior);
-	return (mp);
-}
-
-/**
- *  udp_dupmsg: - reliable dupmsg()
- *  @q: queue to enable when duplication can succeed
- *
- *  This helper function can be used by most STREAMS message handling procedures that duplicate a an
- *  incoming message.  If the allocation fails, this routine will return NULL and issue a buffer
- *  callback to reenable the queue @q when the duplication could succeed.  When NULL is returned,
- *  the caller should simply place the incoming message on the queue (i.e.  with putq() from a put
- *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
- *  qenable() when the duplication could succeed.
- */
-STATIC mblk_t *
-udp_dupmsg(queue_t *q, mblk_t *bp)
-{
-	mblk_t *mp;
-
-	if (!(mp = dupmsg(bp)) && (q != NULL))
-		udp_bufcall(q, FASTBUF, BPRI_MED);
-	return (mp);
-}
-
-/**
- *  udp_dupb: - reliable dupb()
- *  @q: queue to enable when duplication can succeed
- *
- *  This helper function can be used by most STREAMS message handling procedures that duplicate a an
- *  incoming message block.  If the allocation fails, this routine will return NULL and issue a
- *  buffer callback to reenable the queue @q when the duplication could succeed.  When NULL is
- *  returned, the caller should simply place the incoming message on the queue (i.e.  with putq()
- *  from a put procedure or putbq() from a service procedure) and return.  The queue will be
- *  rescheduled with qenable() when the duplication could succeed.
- */
-STATIC mblk_t *
-udp_dupb(queue_t *q, mblk_t *bp)
-{
-	mblk_t *mp;
-
-	if (!(mp = dupb(bp)) && (q != NULL))
-		udp_bufcall(q, FASTBUF, BPRI_MED);
-	return (mp);
-}
-
 
 /*
  *  Option Handling
@@ -949,7 +596,7 @@ STATIC struct udp_options udp_defaults = {
 #define t_defaults udp_defaults
 
 /**
- * t_opts_size: - size options from received UDP message
+ * t_opts_size - size options from received UDP message
  * @t: private structure
  * @mp: message pointer for UDP message
  */
@@ -972,7 +619,7 @@ t_opts_size(const struct udp *t, mblk_t *mp)
 }
 
 /**
- * t_opts_build: - build options output from received UDP message
+ * t_opts_build - build options output from received UDP message
  * @t: private structure
  * @mp: message pointer for UDP message
  * @op: output pointer
@@ -1053,19 +700,30 @@ t_opts_build(const struct udp *t, mblk_t *mp, unsigned char *op, size_t olen)
 }
 
 /**
- * t_errs_size: - size options from received ICMP message
+ * t_errs_size - size options from received ICMP message
  * @t: private structure
  * @mp: message pointer for ICMP message
  */
 STATIC int
 t_errs_size(const struct udp *t, mblk_t *mp)
 {
-	fixme(("Write this function."));
-	return (0);
+	int size = 0;
+	struct iphdr *iph;
+	int optlen = 0;
+
+	iph = (struct iphdr *) mp->b_datap->db_base;
+	optlen = (iph->ihl << 2) - sizeof(struct iphdr);
+	if (optlen > 0)
+		size += T_SPACE(optlen);	/* T_IP_OPTIONS */
+	size += _T_SPACE_SIZEOF(t_defaults.ip.ttl);	/* T_IP_TTL */
+	size += _T_SPACE_SIZEOF(t_defaults.ip.tos);	/* T_IP_TOS */
+	size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
+	size += _T_SPACE_SIZEOF(t_defaults.udp.checksum);	/* T_UDP_CHECKSUM */
+	return (size);
 }
 
 /**
- * t_errs_build: - build options output from receive ICMP message
+ * t_errs_build - build options output from receive ICMP message
  * @t: private structure
  * @mp: message pointer for ICMP message
  * @op: output pointer
@@ -1074,12 +732,151 @@ t_errs_size(const struct udp *t, mblk_t *mp)
 STATIC int
 t_errs_build(const struct udp *t, mblk_t *mp, unsigned char *op, size_t olen, int *etypep)
 {
-	fixme(("Write this function."));
+	struct iphdr *iph;
+	struct udphdr *uh;
+	struct t_optlhdr *oh;
+	int optlen;
+
+	if (op == NULL || olen == 0)
+		return (0);
+	oh = _T_OPT_FIRSTHDR_OFS(op, olen, 0);
+	iph = (struct iphdr *) mp->b_datap->db_base;
+	optlen = (iph->ihl << 2) - sizeof(*iph);
+	if (optlen > 0) {
+		if (oh == NULL)
+			goto efault;
+		oh->len = T_LENGTH(optlen);
+		oh->level = T_INET_IP;
+		oh->name = T_IP_OPTIONS;
+		oh->status = T_SUCCESS;
+		bcopy((iph + 1), T_OPT_DATA(oh), optlen);
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+	{
+		if (oh == NULL)
+			goto efault;
+		oh->len = _T_LENGTH_SIZEOF(unsigned char);
+
+		oh->level = T_INET_IP;
+		oh->name = T_IP_TOS;
+		oh->status = T_SUCCESS;
+		*((unsigned char *) T_OPT_DATA(oh)) = iph->tos;
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+	{
+		if (oh == NULL)
+			goto efault;
+		oh->len = _T_LENGTH_SIZEOF(unsigned char);
+
+		oh->level = T_INET_IP;
+		oh->name = T_IP_TTL;
+		oh->status = T_SUCCESS;
+		*((unsigned char *) T_OPT_DATA(oh)) = iph->ttl;
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+	{
+		if (oh == NULL)
+			goto efault;
+		oh->len = _T_LENGTH_SIZEOF(uint32_t);
+
+		oh->level = T_INET_IP;
+		oh->name = T_IP_ADDR;
+		oh->status = T_SUCCESS;
+		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+	uh = (struct udphdr *) (mp->b_datap->db_base + (iph->ihl << 2));
+	{
+		if (oh == NULL)
+			goto efault;
+		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+		oh->level = T_INET_UDP;
+		oh->name = T_UDP_CHECKSUM;
+		oh->status = T_SUCCESS;
+		*((t_uscalar_t *) T_OPT_DATA(oh)) = (uh->check == 0) ? T_NO : T_YES;
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+	assure(oh == NULL);
+	return (olen);
+      efault:
+	swerr();
 	return (-EFAULT);
 }
 
 /**
- * t_size_default_options: - size default options
+ * t_opts_parse - parse options from received primitive
+ * @opts: pointer to options structure
+ * @ip: pointer to options
+ * @ilen: length of options
+ */
+STATIC int
+t_opts_parse(unsigned char *ip, size_t ilen, struct udp_options *op)
+{
+	struct t_opthdr *ih;
+	int optlen;
+	int err;
+
+	err = TBADOPT;
+	for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0); unlikely(ih != NULL);
+	     ih = _T_OPT_NEXTHDR_OFS(ip, ilen, ih, 0)) {
+		if (unlikely(ih->len < sizeof(*ih)))
+			goto error;
+		if (unlikely((unsigned char *) ih + ih->len > ip + ilen))
+			goto error;
+		optlen = ih->len - sizeof(*ih);
+		switch (ih->level) {
+		default:
+		      goto error:
+		case T_INET_IP:
+			switch (ih->name) {
+			default:
+				goto error;
+			case T_IP_OPTIONS:
+				t_set_bit(_T_BIT_IP_OPTIONS, op->flags);
+				continue;
+			case T_IP_TOS:
+				t_set_bit(_T_BIT_IP_TOS, op->flags);
+				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
+				continue;
+			case T_IP_TTL:
+				t_set_bit(_T_BIT_IP_TTL, op->flags);
+				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
+				continue;
+			case T_IP_DONTROUTE:
+				t_set_bit(_T_BIT_IP_DONTROUTE, op->flags);
+				op->ip.dontroute = *(t_uscalar_t *) T_OPT_DATA(ih);
+				continue;
+			case T_IP_BROADCAST:
+				t_set_bit(_T_BIT_IP_BROADCAST, op->flags);
+				op->ip.broadcast = *(t_uscalar_t *) T_OPT_DATA(ih);
+				continue;
+			case T_IP_ADDR:
+				t_set_bit(_T_BIT_IP_ADDR, op->flags);
+				op->ip.addr = *(uint32_t *) T_OPT_DATA(ih);
+				continue;
+			case T_IP_REUSEADDR:
+				t_set_bit(_T_BIT_IP_REUSEADDR, op->flags);
+				op->ip.reuseaddr = *(t_uscalar_t *) T_OPT_DATA(ih);
+				continue;
+			}
+		case T_INET_UDP:
+			switch (ih->name) {
+			default:
+				goto error;
+			case T_UDP_CHECKSUM:
+				t_set_bit(_T_BIT_UDP_CHECKSUM, op->flags);
+				op->udp.checksum = *(t_uscalar_t *) T_OPT_DATA(ih);
+				continue;
+			}
+		}
+	}
+	return (0);
+      error:
+	return (err);
+}
+
+/**
+ * t_size_default_options - size default options
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -1209,7 +1006,7 @@ t_size_default_options(struct udp *t, const unsigned char *ip, size_t ilen)
 }
 
 /**
- * t_size_current_options: - calculate size of current options
+ * t_size_current_options - calculate size of current options
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -1336,7 +1133,7 @@ t_size_current_options(struct udp *t, const unsigned char *ip, size_t ilen)
 }
 
 /**
- * t_size_check_option: - determine size of options output for T_CHECK
+ * t_size_check_option - determine size of options output for T_CHECK
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -1493,7 +1290,7 @@ t_size_check_options(const struct udp *t, const unsigned char *ip, size_t ilen)
 }
 
 /**
- * t_size_negotiate_options: - determine size of options output for T_NEGOTIATE
+ * t_size_negotiate_options - determine size of options output for T_NEGOTIATE
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -1656,7 +1453,7 @@ t_size_negotiate_options(const struct udp *t, const unsigned char *ip, size_t il
 }
 
 /**
- * t_overall_result: - determine overall options results
+ * t_overall_result - determine overall options results
  * @overall: current overall result
  * @result: result to include in the overall result
  *
@@ -1693,7 +1490,7 @@ t_overall_result(uint * overall, uint result)
 }
 
 /**
- * t_build_default_options: - build options output for T_DEFAULT
+ * t_build_default_options - build options output for T_DEFAULT
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -1927,7 +1724,7 @@ t_build_default_options(const struct udp * t, const unsigned char *ip, size_t il
 }
 
 /**
- * t_build_current_options: - build options output for T_CURRENT
+ * t_build_current_options - build options output for T_CURRENT
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -2178,7 +1975,7 @@ t_build_current_options(const struct udp * t, const unsigned char *ip, size_t il
 #endif
 
 /**
- * t_build_check_options: - built output options for T_CHECK
+ * t_build_check_options - built output options for T_CHECK
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -2584,7 +2381,7 @@ t_build_check_options(const struct udp * t, const unsigned char *ip, size_t ilen
 }
 
 /**
- * t_build_negotiate_options: - build output options for T_NEGOTIATE
+ * t_build_negotiate_options - build output options for T_NEGOTIATE
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -3047,7 +2844,7 @@ t_build_negotiate_options(struct udp * t, const unsigned char *ip, size_t ilen, 
 }
 
 /**
- * t_build_options: - build the output options
+ * t_build_options - build the output options
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -3076,237 +2873,437 @@ t_build_options(struct udp * t, unsigned char *ip, size_t ilen, unsigned char *o
 }
 
 /*
- *  NS User -> NS Provider  (Request, Response) Primitives
- */
-/**
- * n_bind_req: - send an N_BIND_REQ downstream
- * @q: active queue in queue pair
- * @add: address to bind
- * @add_len: length of the address
- * @conind: number of connection indications
- * @flags: bind flags
- */
-STATIC int
-n_bind_req(queue_t *q, struct sockaddr *add, socklen_t add_len, np_ulong conind, np_ulong flags)
-{
-	struct udp *udp = UDP_PRIV(q);
-	mblk_t *mp;
-	N_bind_req_t *p;
-	queue_t *wq = udp->wq->q_next ? udp->wq : npi_bottom;
-
-	if ((mp = udp_allocb(q, sizeof(*p) + add_len + 1, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = N_BIND_REQ;
-		p->ADDR_length = add_len;
-		p->ADDR_offset = add_len ? sizeof(*p) : 0;
-		p->CONIND_number = conind;
-		p->BIND_flags = flags;
-		p->PROTOID_length = 1;
-		p->PROTOID_offset = sizeof(*p) + add_len;
-		mp->b_wptr += sizeof(*p);
-		if (add_len) {
-			bcopy(add, mp->b_wptr, add_len);
-			mp->b_wptr += add_len;
-		}
-		*(unsigned char *) mp->b_wptr++ = IPPROTO_UDP;
-		npi_set_state(udp, NS_WACK_BREQ);
-		printd(("%s: %p: N_BIND_REQ ->\n", DRV_NAME, udp));
-		putnext(wq, mp);
-		return (0);
-	}
-	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-	return (-ENOBUFS);
-}
-
-/**
- * n_unbind_req: - send an N_UNBIND_REQ downstream
- * @q: active queue in queue pair
- */
-STATIC int
-n_unbind_req(queue_t *q)
-{
-	struct udp *udp = UDP_PRIV(q);
-	mblk_t *mp;
-	N_unbind_req_t *p;
-	queue_t *wq = udp->wq->q_next ? udp->wq : npi_bottom;
-
-	if ((mp = udp_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = N_UNBIND_REQ;
-		mp->b_wptr += sizeof(*p);
-		npi_set_state(udp, NS_WACK_UREQ);
-		printd(("%s: %p: N_UNBIND_REQ ->\n", DRV_NAME, udp));
-		putnext(wq, mp);
-		return (0);
-	}
-	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-	return (-ENOBUFS);
-}
-
-/**
- * n_unitdata_req: - send an N_UNITDATA_REQ downstream
- * @q: active queue in queue pair
- * @dst: destination address
- * @dst_len: length of destination address
- * @src: source address
- * @src_len: length of source address
- * @dp: data
- */
-STATIC int
-n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct sockaddr *src,
-	       socklen_t src_len, mblk_t *dp)
-{
-	struct udp *udp = UDP_PRIV(q);
-	mblk_t *mp;
-	N_unitdata_req_t *p;
-	queue_t *wq = udp->wq->q_next ? udp->wq : npi_bottom;
-
-	if (wq != NULL) {
-		if (bcanputnext(wq, dp->b_band)) {
-			if ((mp = udp_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
-				mp->b_datap->db_type = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_UNITDATA_REQ;
-				p->DEST_length = dst_len;
-				p->DEST_offset = dst_len ? sizeof(*p) : 0;
-				p->RESERVED_field[0] = src_len;
-				p->RESERVED_field[1] = src_len ? sizeof(*p) + dst_len : 0;
-				mp->b_wptr += sizeof(*p);
-				if (dst_len) {
-					bcopy(dst, mp->b_wptr, dst_len);
-					mp->b_wptr += dst_len;
-				}
-				if (src_len) {
-					bcopy(src, mp->b_wptr, src_len);
-					mp->b_wptr += src_len;
-				}
-				mp->b_cont = dp;
-				mp->b_band = dp->b_band;
-				printd(("%s: %p: N_UNITDATA_REQ ->\n", DRV_NAME, udp));
-				putnext(wq, mp);
-				return (0);
-			}
-			ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-			return (-ENOBUFS);
-		}
-		ptrace(("%s: ERROR: Flow controlled\n", DRV_NAME));
-		return (-EBUSY);
-	}
-	ptrace(("%s: ERROR: No queue\n", DRV_NAME));
-	return (-EAGAIN);
-}
-
-/*
  * UDP actions
  */
 
-STATIC struct udp *
-udp_lookup(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
+/**
+ * udp_lookup_conn = look up a stream in the connection hashes
+ * @dport: destination port (of recieved packet)
+ * @sport: soruce port (of recieved packet)
+ * @daddr: destination address (of recieved packet)
+ * @saddr: source address (of recieved packet)
+ */
+STATIC INLINE fastcall __hot_in struct udp *
+udp_lookup_conn(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
 {
-	fixme(("Write this function."));
-	return (NULL);
+	struct udp *udp;
+	struct udp_chash_bucket *hp = &udp_chash[udp_chashfn(dport, sport)];
+
+	read_lock(&hp->lock);
+	for (udp = hp->list; udp; udp = udp->cnext) {
+		struct sockaddr_in *sin = (struct sockaddr_in *) &udp->srce;
+		struct sockaddr_in *din = (struct sockaddr_in *) &udp->dest;
+
+		if (sin->sin_port == dport && din->sin_port == sport
+		    && sin->sin_addr.s_addr == daddr && din->sin_addr.s_addr == saddr)
+			break;
+	}
+	udp_get(udp);
+	read_unlock(&hp->lock);
+	return (udp);
 }
 
-STATIC struct udp *
-udp_lookup_icmp(uint16_t sport, uint16_t dport, uint32_t saddr, uint32_t daddr)
+/**
+ * udp_lookup_bind - look up a stream in the bind hashes
+ * @dport: destination port (of received packet)
+ * @daddr: destination address (of received packet)
+ *
+ * There are two types of Streams that exist in the bind hashes: CLTS Streams that need to be sent
+ * received messages, and COTS Streams that are bound listening or not.  When performing a lookup
+ * for receive packets, we are only interested CLTS Streams or pseudo-COTS Streams that are bound in
+ * a listening state.
+ */
+STATIC INLINE fastcall __hot_in struct udp *
+udp_lookup_bind(uint16_t dport, uint32_t daddr)
 {
-	fixme(("Write this function."));
+	struct udp *result = NULL;
+	int snum = htohs(dport);
+	struct udp_bind_bucket *ub;
+	struct udp_bhash_bucket *hp = &udp_bhash[udp_bhashfn(snum)];
+
+	read_lock(&hp->lock);
+	for (ub = hp->list; ub && ub->port != snum; ub = ub->next) ;
+	if (ub) {
+		struct udp *udp;
+		int hiscore = 0;
+
+		for (udp = ub->owners; udp; udp = udp->bnext) {
+			int score = 0;
+			struct sockaddr_int *sin = (struct sockaddr_in *) &udp->srce;
+			t_uscalar_t state;
+			uint16_t sport;
+			uint32_t saddr;
+
+			/* only listening T_COTS(_ORD) Streams and T_CLTS Streams */
+			if (udp->CONIND_number == 0 && udp->info.SERV_type != T_CLTS)
+				continue;
+			/* only Streams in the (close to) correct state */
+			if ((state = tpi_get_state(udp)) != TS_IDLE && state != TS_WACK_UREQ)
+				continue;
+			sport = sin->sin_port;
+			if (sport == 0)
+				continue;
+			if (boprt != dport)
+				continue;
+			score++;
+			saddr = sin->sin_addr.s_addr;
+			if (saddr != 0) {
+				if (saddr != daddr)
+					continue;
+				score++;
+			}
+			if (score == 2) {
+				/* perfect match */
+				result = sp;
+				break;
+			}
+			if (score > hiscore) {
+				hiscore = score;
+				result = sp;
+			}
+		}
+	}
+	udp_get(result);
+	read_unlock(&hp->lock);
+	usual(result);
+	return (result);
+}
+
+STATIC INLINE fastcall __hot_in struct udp *
+udp_lookup(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
+{
+	struct udp *udp;
+
+	if ((udp = udp_lookup_conn(dport, sport, daddr, saddr)))
+		return (udp);
+	if ((udp = udl_lookup_bind(dport, daddr)))
+		return (udp);
 	return (NULL);
 }
 
 /**
- * udp_bind: - bind a Stream to an NSAP
+ * udp_bind - bind a Stream to a TSAP
  * @q: active queue in queue pair (write queue)
  * @add: address to bind
  * @add_len: length of address
  *
- * There are two ways to bind a Stream:  1) When the Stream is a pseudo-device driver or when the
- * Stream is a multiplex driver, the bind is performed internally using hash tables.  2) When the
- * Stream is a pushable module, the bind is transformed into an N_BIND_REQ message and passed
- * downstream.
- */
-STATIC int
-udp_bind(queue_t *q, struct sockaddr *add, socklen_t add_len)
-{
-	struct udp *udp = UDP_PRIV(q);
-
-	if (q->q_next != NULL) {
-		return n_bind_req(q, add, add_len, 0, 0);
-	} else {
-		/* check if address is in use or return TADDRBUSY */
-		/* really bind */
-		bcopy(add, &udp->src, add_len);
-		return (0);
-	}
-}
-
-/**
- * udp_unbind: - unbind a Stream from an NSAP
- * @q: active queue in queue pair (write queue)
+ * Assign a port number and bind to it, or bind to the selected port.
  *
- * There are two ways to unbind a Stream:  1) when the Stream is a pseudo-device driver or when the
- * Stream is a multiplex driver, the unbind is performed internally using hash tables.  2) When the
- * Stream is a pushable module, the bind is transformed into an N_UNBIND_REQ message and passed
- * downstream.
+ * Linux UDP uses a specific port range for dynamic assignment of port numbers.  We take the same
+ * approach here, however, we need to use a range that does not overlap with the Linux UDP range.
+ *
+ * TODO: also check Linux UPD bind hashes.  If the port is specifically in the Linux UDP dynamic
+ * port assignment range, we should just refuse it.  This is because Linux UDP believes that it owns
+ * this range and will assign within this range without the user having any control.  If outside
+ * this range, it might be an idea to check the Linux UDP hashes to make sure that noone else is
+ * using this port at the moment.  It does not keep Linux UDP from assigning it later, resulting in
+ * a conflict.
+ *
  */
 STATIC int
-udp_unbind(queue_t *q)
+udp_bind(struct udp *udp, struct sockaddr *add, socklen_t add_len)
 {
-	struct udp *udp = UDP_PRIV(q);
+	static unsigned short udp_prev_port = 10000;
+	static const unsigned short udp_frst_port = 10000;	/* XXX */
+	static const unsigned short udp_last_port = 16000;	/* XXX */
 
-	if (q->q_next != NULL) {
-		return n_unbind_req(q);
-	} else {
-		/* really unbind */
-		bzero(&udp->src, sizeof(udp->src));
-		return (0);
+	struct udp_bind_bucket *bp;
+	struct sockaddr_in *sin = (struct sockaddr_in *) add;
+	unsigned short bport = sin->sin_port;
+	unsigned short num = 0;
+	int err = 0;
+
+	if (bport == 0) {
+		num = udp_prev_port;	/* UNSAFE */
+		bport = htons(num);
 	}
+	for (;;) {
+		struct udp *test;
+
+		bp = &udp_bhash[udp_bhashfn(bport)];
+		write_lock(&bp->lock);
+		for (test = bp->list; test; test = test->bnext) {
+			struct sockaddr_in *sit = (struct sockaddr_in *) &test->srce;
+
+			if (bport == sit->sin_port &&
+			    (sit->sin_addr.s_addr == 0
+			     || sit->sin_addr.s_addr = sin->sin_addr.s_addr))
+				break;
+		}
+		if (test != NULL) {
+			write_unlock(&bp->lock);
+			if (num == 0)
+				/* specific port number requested */
+				return (TADDRBUSY);
+			if (++num > udp_last_port)
+				num = udp_frst_port;
+			if (num != udp_prev_port)
+				continue;
+			return (TNOADDR);
+		}
+		if (num != 0)
+			udp_prev_port = num;
+		break;
+	}
+	sin->sin_port = bport;
+	bcopy(sin, &udp->srce, sizeof(*sin));
+	if ((udp->bnext = bp->list))
+		udp->bnext->bprev = &udp->bnext;
+	udp->bprev = &bp->list;
+	bp->list = udp_get(udp);
+	udp->bindb = bp;
+	write_unlock(&bp->lock);
+	return (0);
 }
 
 /**
- * udp_xmitmsg: - send a message from a Stream
+ * udp_unbind - unbind a Stream from an NSAP
+ * @udp: UDP private structure
+ *
+ * Simply remove it from the hashes.  This function can be called whether the stream is bound or
+ * not (and is always called before the private structure is freed.
+ */
+STATIC int
+udp_unbind(struct udp *udp)
+{
+	struct udp_bind_bucket *bp;
+
+	if ((bp = udp->bindb)) {
+		write_lock(&bp->lock);
+		if ((*udp->bprev = udp->bnext))
+			udp->bnext->bprev = udp->bprev;
+		udp->bnext = NULL;
+		udp->bprev = &udp->bnext;
+		udp->bindb = NULL;
+		write_unlock(&bp->lock);
+		bzero(&udp->srce, sizeof(udp->srce));
+		udp_release(&udp);
+	}
+	return (0);
+}
+
+/**
+ * udp_connect - connect a Stream to an TSAP
+ * @q: active queue (write queue)
+ * @add: address to connect to
+ * @add_len: length of address
+ *
+ * Connect to the specified port and address.  If the connection results in a conflict, TADDRBUSY is
+ * returned, zero (0) on success.
+ */
+STATIC int
+udp_connect(struct udp *udp, struct sockaddr *add, socklen_t add_len)
+{
+	struct udp *up;
+	struct sockaddr_in *sin, *din;
+	uint16_t sport, dport;
+	uint32_t saddr, daddr;
+	struct udp_chash_bucket *hp;
+
+	sin = (struct sockaddr_in *) &udp->srce;
+	sport = sin->sin_port;
+	saddr = sin->sin_addr.s_addr;
+	din = (struct sockaddr_in *) add;
+	dport = din->sin_port;
+	daddr = din->sin_addr.s_addr;
+	hp = &udp_chash[udp_chashfn(dport, sport)];
+
+	write_lock(&hp->lock);
+	for (up = hp->list; up; up = up->cnext) {
+		sin = (typeof(sin)) & up->srce;
+		din = (typeof(din)) & up->dest;
+		if (sin->sin_port == sport && din->sin_port == dport)
+			break;
+	}
+	if (up != NULL) {
+		write_unlock(&hp->lock);
+		return (TADDRBUSY);
+	}
+	if ((udp->cnext = hp->list))
+		udp->cnext->cprev = &udp->cnext;
+	udp->cprev = &hp->list;
+	hp->list = udp_get(udp);
+	udp->hashb = hp;
+	din = (typeof(din)) & udp->dest;
+	din->sin_family = AF_INET;
+	din->sin_port = dport;
+	din->sin_addr.s_addr = daddr;
+	write_unlock(&hp->lock);
+	return (0);
+}
+
+/**
+ * udp_disconnect - disconnect from the connection hashes
+ * @q: active queue (write queue)
+ */
+STATIC int
+udp_disconnect(struct udp *udp)
+{
+	struct udp_chash_bucket *hp;
+
+	if ((hp = udp->hashb)) {
+		write_lock(&hp->lock);
+		if ((*udp->cprev = udp->cnext))
+			udp->cnext->cprev = udp->cprev;
+		udp->cnext = NULL;
+		udp->cprev = &udp->cnext;
+		udp->hashb = NULL;
+		write_unlock(&hp->lock);
+		bzero(&udp->dest, sizeof(udp->dest));
+		udp_release(&udp);
+	}
+	return (0);
+}
+
+#if defined HAVE_KFUNC_DST_OUTPUT
+STATIC INLINE int
+udp_queue_xmit(struct sk_buff *skb)
+{
+	struct rtable *rt = (struct rtable *) skb->dst;
+	struct iphdr *iph = skb->nh.iph;
+
+#if defined NETIF_F_TSO
+	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
+#else				/* !defined NETIF_F_TSO */
+	ip_select_ident(iph, &rt->u.dst, NULL);
+#endif				/* defined NETIF_F_TSO */
+	ip_send_check(iph);
+#if defined HAVE_KFUNC_IP_DST_OUTPUT
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
+#else				/* !defined HAVE_KFUNC_IP_DST_OUTPUT */
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
+#endif				/* defined HAVE_KFUNC_IP_DST_OUTPUT */
+}
+#else				/* !defined HAVE_KFUNC_DST_OUTPUT */
+STATIC INLINE int
+udp_queue_xmit(struct sk_buff *skb)
+{
+	struct rtable *rt = (struct rtable *) skb->dst;
+	struct iphdr *iph = skb->nh.iph;
+
+	if (skb->len > dst_pmtu(&rt->u.dst)) {
+		rare();
+		return ip_fragment(skb, skb->dst->output);
+	} else {
+		iph->frag_off |= __constant_htons(IP_DF);
+		ip_send_check(iph);
+		return skb->dst->output(skb);
+	}
+}
+#endif				/* defined HAVE_KFUNC_DST_OUTPUT */
+
+/**
+ * udp_xmitmsg - send a message from a Stream
  * @q: active queue in queue pair (write queue)
  * @mp: T_UNITDATA_REQ message
  * @opts: UDP options for send
  *
- * There are two ways to send a message: 1) When the Stream is a multiplex driver or when the Stream
- * is a pushable module, the message is transformed into an N_UNITDATA_REQ and passed to the lower
- * multiplex or downstream.  2) When the Stream is a pseudo-device driver, the message is sent to
- * the IP layer directly.
+ * TODO: We need to handle IP options specified using the T_IP_OPTIONS option at the T_INET_IP
+ * level.  Currently these are being ignored and all packets are being sent without IP options of
+ * any kind. (We are, however, processing them on receive.)
+ *
+ * Yes, it is possible with STREAMS to use the Van Jacobson approach (simultaneous copy from user
+ * and checksum); however, we need to place this function in the Stream head.  The approach would
+ * specify to the Stream head the form of the checksum to use and then each mblk_t containing data
+ * copied from the user would also contain a partial checksum of the appropriate type.  That is for
+ * later.
  */
-STATIC int
-udp_xmitmsg(queue_t *q, mblk_t *mp, struct udp_options *opts)
+STATIC INLINE fastcall __hot_out int
+udp_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct udp_options *opts)
 {
 	struct udp *udp = UDP_PRIV(q);
-	queue_t *wq = udp->wq->q_next ? udp->wq : npi_bottom;
+	struct rtable *rt = NULL;
+	int err;
 
-	if (wq != NULL) {
-		int rtn;
-		struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
-		struct sockaddr *src = NULL, *dst;
-		socklen_t src_len = 0, dst_len;
-		struct sockaddr_in sin;
+	if (likely((err = ip_route_output(&rt, sin->sin_addr.s_addr, 0, 0, 0)) == 0)) {
+		struct sk_buff *skb;
+		struct net_device *dev = rt->u.dst.dev;
+		size_t hlen = (dev->hard_header_len + 15) & ~15;
+		size_t ulen = msgdsize(dp);
+		size_t plen = sizeof(struct udphdr) + ulen;
+		size_t tlen = sizeof(struct iphdr) + plen;
 
-		if (opts != NULL && t_tst_bit(_T_BIT_IP_ADDR, opts->flags)) {
-			sin.sin_family = AF_INET;
-			sin.sin_port = htons(udp->port);
-			sin.sin_addr.s_addr = opts->ip.addr;
-			src = (struct sockaddr *) &sin;
-			src_len = sizeof(sin);
+		if (likely((skb = alloc_skb(hlen + tlen, GFP_ATOMIC)) != NULL)) {
+			mblk_t *bp;
+			struct iphdr *iph;
+			struct udphdr *uh;
+			unsigned char *data;
+
+			skb_reserve(skb, hlen);
+			/* find headers */
+			iph = (typeof(iph)) __skb_put(skb, tlen);
+			/* We need to process IP options, but are not doing so yet. */
+			uh = (typeof(uh)) (iph + 1);
+			data = (unsigned char *) (uh + 1);
+			uh->dest = sin->sin_port;
+			uh->source = htons(udp->port);
+			uh->len = htons(ulen);
+			uh->check = 0;
+			skb->dst = &rt->u.dst;
+			/* Should probably add an XTI_PRIORITY option at the XTI_GENERIC level. */
+			skb->priority = 0;
+			iph->version = 4;
+			iph->ihl = 5;
+			/* Can be set using the T_IP_TOS option at the T_INET_IP level. */
+			iph->tos = opts->ip.tos;
+			iph->frag_off = 0;
+			/* Can be set using the T_IP_TTL option at the T_INET_IP level. */
+			iph->ttl = opts->ip.ttl;
+			iph->daddr = rt->rt_dst;
+			/* Yes the TS user can override the source address using the T_IP_ADDR
+			   option at the T_INET_IP level. */
+			if (t_tst_bit(_T_BIT_IP_ADDR, opts.flags))
+				iph->saddr = opts.ip.addr;
+			else
+				iph->saddr = rt->rt_src;
+			iph->protocol = IPPROTO_UDP;
+			iph->tot_len = htons(tlen);
+			skb->nh.iph = iph;
+#if !defined HAVE_KFUNC_DST_OUTPUT
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+			__ip_select_ident(iph, &rt->u.dst);
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+			__ip_select_ident(iph, &rt->u.dst, 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
+#endif				/* !defined HAVE_KFUNC_DST_OUTPUT */
+			for (bp = dp; bp; bp = bp->b_cont) {
+				int blen = bp->b_wptr - bp->b_rptr;
+
+				if (likely(blen > 0)) {
+					bcopy(bp->b_rptr, data, blen);
+					data += blen;
+				} else
+					rare();
+			}
+			uh->check = 0;
+			fixme(("Need a checksum function."));
+			if (opts->udp.checksum == T_YES)
+				if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
+					uh->check = htonl(cksum_generate(uh, plen));
+			// UDP_INC_STATS(UdpOutPackets);
+#if defined HAVE_KFUNC_DST_OUTPUT
+			udp_queue_xmit(skb);
+#else				/* !defined HAVE_KFUNC_DST_OUTPUT */
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, udp_queue_xmit);
+#endif				/* defined HAVE_KFUNC_DST_OUTPUT */
+			return (QR_DONE);
 		}
-		dst = (struct sockaddr *) ((unsigned char *) p + p->DEST_offset);
-		dst_len = p->DEST_length;
-		rtn = n_unitdata_req(q, dst, dst_len, src, src_len, mp->b_cont);
-		if (rtn == QR_DONE)
-			return (QR_TRIMMED);
-		return (rtn);
-
-	} else {
-		/* FIXME: need to send message directly */
-		return (-EFAULT);
+		/* Note that this is kind of a sneaky trick.  When we are able to allocate a
+		   message block of the appropriate size, the chances of allocating an sk_buff of
+		   the same size are also likely. */
+		ss7_bufcall(q, hlen + tlen, BPRI_MED);
+		return (-ENOBUFS);
 	}
+	if (err == -ENOMEM) {
+		/* Note that this is kind of a sneaky trick.  When we are able to allocate a
+		   message block of the appropriate size, the chances of allocating an rtable entry
+		   are also likely. */
+		ss7_bufcall(q, sizeof(*rt), BPRI_MED);
+		return (-ENOMEM);
+	}
+	return (err);
 }
 
 /*
@@ -3322,16 +3319,17 @@ udp_xmitmsg(queue_t *q, mblk_t *mp, struct udp_options *opts)
 STATIC int
 m_flush(queue_t *q, int how, int band)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 
-	if ((mp = udp_allocb(q, 2, BPRI_HI))) {
-		mp->b_datap->db_type = M_FLUSH;
-		*mp->b_wptr++ = how;
-		*mp->b_wptr++ = band;
-		putnext(udp->rq, mp);
-		return (QR_DONE);
-	}
+	if (unlikely((mp = ss7_allocb(q, 2, BPRI_HI)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_FLUSH;
+	*mp->b_wptr++ = how;
+	*mp->b_wptr++ = band;
+	putnext(udp->oq, mp);
+	return (QR_DONE);
+      enobufs:
 	return (-ENOBUFS);
 }
 
@@ -3341,40 +3339,50 @@ m_flush(queue_t *q, int how, int band)
  * @error: the error to deliver
  */
 STATIC int
-m_error(queue_t *q, int error)
+m_error(queue_t *q, int error, mblk_t *mp)
 {
-	struct udp *udp = PRIV(q);
-	mblk_t *mp;
+	struct udp *udp = UDP_PRIV(q);
+	mblk_t *pp = mp;
 	int hangup = 0;
 
-	if (error < 0)
-		error = -error;
 	switch (error) {
-	case EBUSY:
-	case ENOBUFS:
-	case EAGAIN:
-	case ENOMEM:
-		return (-error);
-	case EPIPE:
-	case ENETDOWN:
-	case EHOSTUNREACH:
+	case 0:
+		seldom();
+		return (0);
+	case -EBUSY:
+	case -ENOBUFS:
+	case -EAGAIN:
+	case -ENOMEM:
+		return (error);
+	case -EPIPE:
+	case -ENETDOWN:
+	case -EHOSTUNREACH:
 		hangup = 1;
+		error = EPIPE;
+		break;
+	default:
+		error = EPROTO;
+		break;
 	}
-	if ((mp = udp_allocb(q, 2, BPRI_HI))) {
-		if (hangup) {
-			printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, udp));
-			mp->b_datap->db_type = M_HANGUP;
-			putnext(udp->rq, mp);
-			error = EPIPE;
-		} else {
-			printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, udp, error));
-			mp->b_datap->db_type = M_ERROR;
-			*(mp->b_wptr)++ = error;
-			*(mp->b_wptr)++ = error;
-			putnext(udp->rq, mp);
-		}
-		return (-error);
+	if (unlikely((mp == NULL || mp->b_datap->db_refs > 1) && (mp = ss7_allocb(q, 2, BPRI_HI)) == NULL))
+		goto enobufs;
+	mp->b_wptr = mp->b_rptr = mp->b_datap->db_base;
+	if (mp->b_cont)
+		freemsg(XCHG(&mp->b_cont, NULL));
+	if (hangup) {
+		printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, udp));
+		mp->b_datap->db_type = M_HANGUP;
+		mp->b_band = 0;
+	} else {
+		printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, udp, error));
+		mp->b_datap->db_type = M_ERROR;
+		mp->b_band = 0;
+		*(mp->b_wptr)++ = error;
+		*(mp->b_wptr)++ = error;
 	}
+	qrepy(q, mp);
+	return (pp == mp) ? (QR_ABSORBED) : (QR_DONE);
+      enobufs:
 	rare();
 	return (-ENOBUFS);
 }
@@ -3386,29 +3394,20 @@ m_error(queue_t *q, int error)
 STATIC int
 t_info_ack(queue_t *q)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	struct T_info_ack *p;
 
-	if ((mp = udp_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_INFO_ACK;
-		p->TSDU_size = (unsigned short) 0xffff;
-		p->ETSDU_size = T_INVALID;
-		p->CDATA_size = T_INVALID;
-		p->DDATA_size = T_INVALID;
-		p->ADDR_size = sizeof(struct sockaddr_in);
-		p->OPT_size = (unsigned short) 0xffff;
-		p->TIDU_size = T_INVALID;
-		p->SERV_type = T_CLTS;
-		p->CURRENT_state = tpi_get_state(udp);
-		p->PROVIDER_flag = T_XPG4_1 & ~T_SNDZERO;
-		mp->b_wptr += sizeof(*p);
-		printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, udp));
-		putnext(udp->rq, mp);
-		return (0);
-	}
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
+	*p = udp->info;
+	mp->b_wptr += sizeof(*p);
+	printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, udp));
+	putnext(udp->oq, mp);
+	return (0);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
@@ -3423,254 +3422,545 @@ t_info_ack(queue_t *q)
 STATIC int
 t_bind_ack(queue_t *q, struct sockaddr *add, socklen_t add_len, t_uscalar_t conind)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	struct T_bind_ack *p;
 
-	if ((mp = udp_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_BIND_ACK;
-		p->ADDR_length = add_len;
-		p->ADDR_offset = add_len ? sizeof(*p) : 0;
-		p->CONIND_number = conind;
-		mp->b_wptr += sizeof(*p);
-		if (add_len) {
-			bcopy(add, mp->b_wptr, add_len);
-			mp->b_wptr += add_len;
-		}
-		tpi_set_state(udp, TS_IDLE);
-		printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, udp));
-		putnext(udp->rq, mp);
-		return (0);
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
+	p->PRIM_type = T_BIND_ACK;
+	p->ADDR_length = add_len;
+	p->ADDR_offset = add_len ? sizeof(*p) : 0;
+	p->CONIND_number = conind;
+	mp->b_wptr += sizeof(*p);
+	if (add_len) {
+		bcopy(add, mp->b_wptr, add_len);
+		mp->b_wptr += add_len;
 	}
+	tpi_set_state(udp, TS_IDLE);
+	printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, udp));
+	putnext(udp->oq, mp);
+	return (0);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
 /**
- * t_error_ack: send a T_ERROR_ACK upstream with state changes
- * @q: a queue in the queue pair
+ * t_error_ack: deliver a T_ERROR_ACK upstream with state changes
+ * @q: active queue (write queue)
  * @prim: primitive in error
- * @error: TPI/UNIX error
+ * @err: TLI or UNIX error number
+ * @mp: message block to reuse
  */
 STATIC int
-t_error_ack(queue_t *q, t_scalar_t prim, t_scalar_t error)
+t_error_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error)
 {
-	struct udp *udp = PRIV(q);
-	mblk_t *mp;
+	struct udp *udp = UDP_PRIV(q);
 	struct T_error_ack *p;
+	mblk_t *pp = mp;
+	int err;
 
+	/* rollback state */
+	tpi_set_state(udp, udp->i_oldstate);
+	udp->i_oldstate = tpi_get_state(udp);
+
+	err = error;
 	switch (error) {
-	case -EBUSY:
-	case -EAGAIN:
-	case -ENOMEM:
 	case -ENOBUFS:
-		seldom();
-		return (error);
+	case -ENOMEM:
+	case -EAGAIN:
+	case -EBUSY:
+		goto error;
 	case 0:
-		never();
-		return (error);
+		err = -EFAULT;
+		goto error;
 	}
-	if (!(mp = udp_allocb(q, sizeof(*p), BPRI_MED)))
-		goto enobufs;
+	err = -ENOBUFS;
+	if ((mp == NULL || mp->b_datap->db_refs > 1)
+	    && (mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL)
+		goto error;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr;
+	mp->b_band = 0;
+	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = T_ERROR_ACK;
 	p->ERROR_prim = prim;
-	p->TLI_error = error < 0 ? TSYSERR : error;
-	p->UNIX_error = error < 0 ? -error : 0;
-	mp->b_wptr += sizeof(*p);
-	/* This is to only try and get the state correct for putnext. */
-	if (error != TOUTSTATE) {
-		switch (tpi_get_state(udp)) {
-#ifdef TS_WACK_OPTREQ
-		case TS_WACK_OPTREQ:
-			tpi_set_state(udp, TS_IDLE);
-			break;
-#endif
-		case TS_WACK_BREQ:
-			tpi_set_state(udp, TS_UNBND);
-			break;
-		case TS_WACK_UREQ:
-			tpi_set_state(udp, TS_IDLE);
-			break;
-		default:
-			/* Note: if we are not in a WACK state we simply do not change state.  This 
-			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
-			   TS_IDLE state. */
-			break;
-		}
-	}
+	p->TLI_error = error > 0 ? error : TSYSERR;
+	p->UNIX_error = error > 0 ? 0 : -error;
+	if (mp->b_cont)
+		freemsg(XCHG(&mp->b_cont, NULL));
 	printd(("%s: %p: <- T_ERROR_ACK\n", DRV_NAME, udp));
-	putnext(udp->rq, mp);
-	/* Returning -EPROTO here will make sure that the old state is restored correctly.  If we
-	   return QR_DONE, then the state will never be restored. */
-	if (error < 0)
-		return (error);
-	return (-EPROTO);
-      enobufs:
-	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-	return (-ENOBUFS);
+	qreply(q, mp);
+	return (mp == pp) ? (QR_ABSORBED) : (QR_DONE);
+      error:
+	return (err);
+
 }
 
 /**
  * t_ok_ack: deliver a T_OK_ACK upstream with state changes
  * @q: a queue in the queue pair
  * @prim: correct primitive
+ * @mp: message block to reuse
+ * @cp: connection indication
+ * @dp: user data
+ * @ap; accepting stream
  */
-STATIC int
-t_ok_ack(queue_t *q, t_scalar_t prim)
+STATIC INLINE fastcall __hot_put int
+t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct udp *ap)
 {
-	int err = -EFAULT;
-	struct udp *udp = PRIV(q);
-	mblk_t *mp;
+	struct udp *udp = UDP_PRIV(q);
 	struct T_ok_ack *p;
+	mblk_t *pp = mp;
+	int err;
 
-	if ((mp = udp_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_OK_ACK;
-		p->CORRECT_prim = prim;
-		mp->b_wptr += sizeof(*p);
-		switch (tpi_get_state(udp)) {
-		case TS_WACK_UREQ:
-			if ((err = udp_unbind(q)))
-				goto free_error;
-			/* TPI spec says that if the provider must flush both queues before
-			   responding with a T_OK_ACK primitive when responding to a T_UNBIND_REQ.
-			   This is to flush queued data for connectionless providers. */
-			if (m_flush(q, FLUSHRW, 0) == -ENOBUFS)
-				goto enobufs;
-			tpi_set_state(udp, TS_UNBND);
-			break;
-		default:
-			break;
-			/* Note: if we are not in a WACK state we simply do not change state.  This 
-			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
-			   the TS_IDLE state. */
+	err = -ENOBUFS;
+	if ((mp == NULL || mp->b_datap->db_refs > 1)
+	    && (mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL)
+		goto error;
+	mp->b_datap->db_type = M_PCPROTO;
+	mp->b_band = 0;
+	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	p = (typeof(p)) mp->b_wptr++;
+	p->PRIM_type = T_OK_ACK;
+	p->CORRECT_prim = prim;
+	switch (tpi_get_state(udp)) {
+	case TS_WACK_UREQ:
+		if ((err = udp_unbind(udp)))
+			goto error;
+		/* TPI spec says that if the provider must flush both queues before responding with 
+		   a T_OK_ACK primitive when responding to a T_UNBIND_REQ. This is to flush queued
+		   data for connectionless providers. */
+		if ((err = m_flush(q, FLUSHRW, 0)))
+			goto error;
+		tpi_set_state(udp, TS_UNBND);
+		break;
+	case TS_WACK_CREQ:
+		if ((err = udp_connect(udp, &udp->dest, sizeof(udp->dest))))
+			goto error;
+		tpi_set_state(udp, TS_WCON_CREQ);
+		if ((err = udp_xmitmsg(q, dp, &udp->options))) {
+			udp_disconnect(udp);
+			goto error;
 		}
-		printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, udp));
-		putnext(udp->rq, mp);
-		return (QR_DONE);
+		break;
+	case TS_WACK_CRES:
+		if ((err = udp_connect(ap, &ap->dest, sizeof(ap->dest))))
+			goto error;
+		ap->i_oldstate = tpi_get_state(ap);
+		tpi_set_state(ap, TS_DATA_XFER);
+		if ((err = udp_xmitmsg(q, dp, &ap->options))) {
+			udp_disconnect(ap);
+			tpi_set_state(ap, ap->i_oldstate);
+			goto error;
+		}
+		bufq_dequeue(&udp->conq, cp);
+		udp_coninds--;
+		freeb(XCHG(&cp, cp->b_cont));
+		/* queue any pending data */
+		while (cp)
+			put(ap->oq, XCHG(&cp, cp->b_cont));
+		if (ap != udp) {
+			if (bufq_length(&udp->conq) > 0)
+				tpi_set_state(udp, TS_WRES_CIND);
+			else
+				tpi_set_state(udp, TS_IDLE);
+		}
+		break;
+	case TS_WACK_DREQ6:
+	case TS_WACK_DREQ7:
+	case TS_WACK_DREQ9:
+	case TS_WACK_DREQ10:
+	case TS_WACK_DREQ11:
+		if (cp != NULL) {
+			bufq_dequeue(&udp->conq, cp);
+			freemsg(cp);
+		} else
+			udp_disconnect(udp)
+			    tpi_set_state(udp,
+					  (bufq_length(&udp->conq) > 0) ? TS_WRES_CIND : TS_IDLE);
+		break;
+	default:
+		break;
+		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
+		   normally when we are responding to a T_OPTMGMT_REQ in other than the TS_IDLE
+		   state. */
 	}
-      enobufs:
-	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-	return (-ENOBUFS);
-      free_error:
-	freemsg(mp);
-	return t_error_ack(q, prim, err);
+	if (mp->b_cont)
+		freemsg(XCHG(&mp->b_cont, NULL));
+	printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, udp));
+	qreply(q, mp);
+	return (mp == pp) ? (QR_ABSORBED) : (QR_DONE);
+      error:
+	if (mp != pp)
+		freemsg(mp);
+	return t_error_ack(q, prim, mp, err);
 }
 
 /**
- * t_unitdata_ind: - send a T_UNITDATA_IND upstream
+ * t_reply_ack: send a T_OK_ACK or T_ERROR_ACK upstream with state changes
  * @q: a queue in the queue pair
+ * @prim: primitive in error
+ * @error: TPI/UNIX error
+ * @mp: message to reuse
+ * @cp: connection indication pointer
+ */
+STATIC int
+t_reply_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error, mblk_t *cp, mblk_t *dp,
+	    struct udp *ap)
+{
+	if (error == 0)
+		return t_ok_ack(q, prim, mp, cp, dp, ap);
+	return t_error_ack(q, prim, mp, error);
+}
+
+/**
+ * t_unitdata_ind - send a T_UNITDATA_IND upstream
+ * @q: read queue
  * @dp: data block containing IP packet
  *
  * IMPLEMENTATION: The data block contains the IP, UDP header and UDP payload starting at
  * dp->b_datap->db_base.  The UDP message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
  */
-STATIC int
+STATIC INLINE fastcall __hot_get int
 t_unitdata_ind(queue_t *q, mblk_t *dp)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	struct T_unitdata_ind *p;
-	size_t opt_len = t_opts_size(udp, dp);
-	const size_t src_len = sizeof(struct sockaddr_in);
+	t_scalar_t OPT_length, SRC_length;
 
-	if ((mp = udp_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_UNITDATA_IND;
-		p->SRC_length = src_len;
-		p->SRC_offset = src_len ? sizeof(*p) : 0;
-		p->OPT_length = opt_len;
-		p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
-		mp->b_wptr += sizeof(*p);
-		if (src_len) {
-			struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
-			struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
-			struct udphdr *uh = (typeof(uh)) (dp->b_datap->db_base + (iph->ihl << 2));
+	if (unlikely(tpi_get_state(udp) != TS_IDLE))
+		goto discard;
+	OPT_length = t_opts_size(udp, dp);
+	SRC_length = sizeof(struct sockaddr_in);
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + SRC_length + OPT_length, BPRI_MED)) == NULL))
+		goto enobufs;
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
+	mp->b_datap->db_type = M_PROTO;
+	p = (typeof(p)) mp->b_wptr++;
+	p->PRIM_type = T_UNITDATA_IND;
+	p->SRC_length = SRC_length;
+	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
+	p->OPT_length = OPT_length;
+	p->OPT_offset = OPT_length ? sizeof(*p) + SRC_length : 0;
+	if (SRC_length) {
+		struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
+		struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
+		struct udphdr *uh = (typeof(uh)) (dp->b_datap->db_base + (iph->ihl << 2));
 
-			sin->sin_family = AF_INET;
-			sin->sin_port = uh->source;
-			sin->sin_addr.s_addr = iph->saddr;
-			mp->b_wptr += src_len;
-		}
-		if (opt_len) {
-			t_opts_build(udp, dp, mp->b_wptr, opt_len);
-			mp->b_wptr += opt_len;
-		}
-		mp->b_cont = dp;
-		printd(("%s: %p: <- T_UNITDATA_IND\n", DRV_NAME, udp));
-		putnext(udp->rq, mp);
-		return (QR_ABSORBED);
+		sin->sin_family = AF_INET;
+		sin->sin_port = uh->source;
+		sin->sin_addr.s_addr = iph->saddr;
+		mp->b_wptr += SRC_length;
 	}
+	if (OPT_length) {
+		t_opts_build(udp, dp, mp->b_wptr, OPT_length);
+		mp->b_wptr += OPT_length;
+	}
+	dp->b_datap->db_type = M_DATA;
+	mp->b_cont = dp;
+	printd(("%s: %p: <- T_UNITDATA_IND\n", DRV_NAME, udp));
+	putnext(q, mp);
+	return (QR_ABSORBED);
+      ebusy:
+	freeb(mp);
+	return (-EBUSY);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
+      discard:
+	return (QR_DONE);
 }
 
 /**
- * t_uderror_ind: - send a T_UDERROR_IND upstream
- * @q: a queue in the queue pair
+ * t_conn_ind - send a T_CONN_IND upstream
+ * @q: read queue
  * @dp: data block containing IP packet
  *
- * IMPLEMENTATION: The data block contains the IP, ICMP header and ICMP payload starting at
- * dp->b_datap->db_base.  The ICMP message payload starts at dp->b_rptr. This function extracts IP
+ * IMPLEMENTATION: The data block contains the IP, UDP header and UDP payload starting at
+ * dp->b_datap->db_base.  The UDP message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
+ */
+STATIC INLINE fastcall __hot_get int
+t_conn_ind(queue_t *q, mblk_t *dp)
+{
+	struct udp *udp = UDP_PRIV(q);
+	mblk_t *mp, *cp;
+	struct T_conn_ind *p;
+	t_scalar_t OPT_length, SRC_length;
+	struct sockaddr_in *sin;
+	struct iphdr *iph;
+	struct udphdr *uh;
+
+	if (unlikely(tpi_get_statef(udp) & ~(TSF_IDLE | TSF_WRES_CIND | TSF_WACK_CRES)))
+		goto discard;
+
+	iph = (typeof(iph)) dp->b_datap->db_base;
+	uh = (typeof(uh)) (dp->b_datap->db_base + (iph->ihl << 2));
+
+	spin_lock_bh(&udp->conq.q_lock);
+	for (cp = bufq_head(&udp->conq); cp; cp = cp->b_next) {
+		p = (typeof(p)) cp->b_rptr;
+		sin = (typeof(sin)) (cp->b_rptr + p->SRC_offset);
+		if (sin->sin_port != uh->source || sin->sin_addr.s_addr != iph->saddr)
+			continue;
+		break;
+	}
+	if (cp != NULL) {
+		/* already have a connection indication, link the data */
+		linkb(cp, dp);
+		spin_unlock_bh(&udp->conq.q_lock);
+		return (QR_ABSORBED);
+	}
+	spin_unlock_bh(&udp->conq.q_lock);
+
+	/* If there are already too many connection indications outstanding, discard further
+	   connection indications until some are accepted.  Note that data for existing outstanding
+	   connection indications is preserved above. */
+	if (unlikely(bufq_length(&udp->conq) >= udp->CONIND_number))
+		goto eagain;
+	/* If there is already a connection accepted on the listening stream, discard further
+	   connection indications until the current connection disconnects */
+	if (unlikely(tpi_get_statef(udp) & ~(TSF_IDLE | TSF_WRES_CIND)))
+		goto eagain;
+
+	OPT_length = t_opts_size(udp, dp);
+	SRC_length = sizeof(struct sockaddr_in);
+
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + SRC_length + OPT_length, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (typeof(p)) mp->b_wptr++;
+	p->PRIM_type = T_CONN_IND;
+	p->SRC_length = SRC_length;
+	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
+	p->OPT_length = OPT_length;
+	p->OPT_offset = OPT_length ? sizeof(*p) + SRC_length : 0;
+	if (SRC_length) {
+		struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
+
+		sin->sin_family = AF_INET;
+		sin->sin_port = uh->source;
+		sin->sin_addr.s_addr = iph->saddr;
+		mp->b_wptr += SRC_length;
+	}
+	if (OPT_length) {
+		t_opts_build(udp, dp, mp->b_wptr, OPT_length);
+		mp->b_wptr += OPT_length;
+	}
+	if (unlikely((cp = ss7_copyb(q, mp)) == NULL))
+		goto free_enobufs;
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
+	bufq_queue(&udp->conq, cp);
+	dp->b_datap->db_type = M_DATA;
+	mp->b_cont = dp;
+	tpi_set_state(udp, TS_WRES_CIND);
+	printd(("%s: %p: <- T_CONN_IND\n", DRV_NAME, udp));
+	putnext(q, mp);
+	return (QR_ABSORBED);
+      ebusy:
+	freeb(cp);
+	freeb(mp);
+	return (-EBUSY);
+      free_enobufs:
+	freeb(mp);
+      enobufs:
+	return (-ENOBUFS);
+      eagain:
+	return (-EAGAIN);
+      discard:
+	return (QR_DONE);
+}
+
+/**
+ * t_optdata_ind - send a T_OPTDATA_IND upstream
+ * @q: read queue
+ * @dp: data block containing IP packet
+ *
+ * IMPLEMENTATION: The data block containst the IP, UDP header and UDP payload, starting at
+ * dp->b_datap->db_base.  The UDP message payload starts at dp->b_rptr.  This function extracts IP
+ * header information and uses it to create options.
+ */
+STATIC INLINE fastcall __hot_get int
+t_optdata_ind(queue_t *q, mblk_t *dp)
+{
+	struct udp *udp = UDP_PRIV(q);
+	mblk_t *mp;
+	struct T_optdata_ind *p;
+	t_scalar_t OPT_length = t_opts_size(udp, dp);
+
+	if (unlikely(tpi_get_statef(udp) & ~(TSF_DATA_XFER | TSF_WIND_ORDREL)))
+		goto discard;
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + OPT_length, BPRI_MED)) == NULL))
+		goto enobufs;
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
+	mp->b_datap->db_type = M_PROTO;
+	p = (typeof(p)) mp->b_wptr++;
+	p->PRIM_type = T_OPTDATA_IND;
+	p->DATA_flag = 0;
+	p->OPT_length = OPT_length;
+	p->OPT_offset = OPT_length ? sizeof(*p) : 0;
+	if (OPT_length) {
+		t_opts_build(udp, dp, mp->b_wptr, OPT_length);
+		mp->b_wptr += OPT_length;
+	}
+	dp->b_datap->db_type = M_DATA;
+	mp->b_cont = dp;
+	printd(("%s: %p: <= T_OPTDATA_IND\n", DRV_NAME, udp));
+	putnext(q, mp);
+	return (QR_ABSORBED);
+      ebusy:
+	freeb(mp);
+	return (-EBUSY);
+      enobufs:
+	return (-ENOBUFS);
+      discard:
+	return (QR_DONE);
+}
+
+/**
+ * t_uderror_ind - send a T_UDERROR_IND upstream
+ * @q: read queue
+ * @dp: data block containing ICMP packet
+ *
+ * IMPLEMENTATION: The data block contains the ICMP header, IP header and UDP header starting at
+ * dp->b_datap->db_base.  The UDP header starts at dp->b_rptr. This function extracts IP header
+ * information and uses it to create options.
  */
 STATIC INLINE int
 t_uderror_ind(queue_t *q, mblk_t *dp)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	struct T_uderror_ind *p;
 	size_t opt_len = t_errs_size(udp, dp);
-	int etype = 0;
+	t_uscalar_t ERROR_type = 0;
 	const size_t src_len = sizeof(struct sockaddr_in);
 
-	if (canputnext(udp->rq)) {
-		if ((mp = udp_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			mp->b_band = 2;	/* XXX move ahead of data indications */
-			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = T_UDERROR_IND;
-			p->DEST_length = src_len;
-			p->DEST_offset = src_len ? sizeof(*p) : 0;
-			p->OPT_length = opt_len;
-			p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
-			mp->b_wptr += sizeof(*p);
-			if (src_len) {
-				struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
-				struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
-				struct udphdr *uh = (typeof(uh)) (mp->b_datap->db_base + (iph->ihl << 2));
+	if (unlikely(tpi_get_statef(udp) & ~(TSF_IDLE)))
+		goto discard;
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED)) == NULL))
+		goto enobufs;
+	if (unlikely(!canputnext(udp->oq)))
+		goto ebusy;
+	mp->b_datap->db_type = M_PROTO;
+	mp->b_band = 2;		/* XXX move ahead of data indications */
+	p = (typeof(p)) mp->b_wptr;
+	p->PRIM_type = T_UDERROR_IND;
+	p->DEST_length = src_len;
+	p->DEST_offset = sizeof(*p);
+	p->OPT_length = opt_len;
+	p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
+	mp->b_wptr += sizeof(*p);
+	{
+		struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
+		struct icmphdr *icmph = (typeof(icmph)) dp->b_datap->db_base;
+		struct iphdr *iph = (typeof(iph)) (icmph + 1);
+		struct udphdr *uh = (typeof(uh)) dp->b_rptr;
 
-				sin->sin_family = AF_INET;
-				sin->sin_port = uh->source;
-				sin->sin_addr.s_addr = iph->saddr;
-				mp->b_wptr += src_len;
-			}
-			if (opt_len) {
-				t_errs_build(udp, dp, mp->b_wptr, opt_len, &etype);
-				mp->b_wptr += opt_len;
-			}
-			p->ERROR_type = etype;
-			mp->b_cont = dp;
-			printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, udp));
-			putnext(udp->rq, mp);
-			return (0);
-		}
-		ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-		return (-ENOBUFS);
+		sin->sin_family = AF_INET;
+		sin->sin_port = uh->dest;
+		sin->sin_addr.s_addr = iph->daddr;
+		mp->b_wptr += src_len;
+
+		ERROR_type = ((t_uscalar_t) icmph->type << 8) | ((t_uscalar_t) icmph->code);
 	}
+	if (opt_len) {
+		t_errs_build(udp, dp, mp->b_wptr, opt_len, &ERROR_type);
+		mp->b_wptr += opt_len;
+	}
+	p->ERROR_type = ERROR_type;
+	dp->b_datap->db_type = M_DATA;
+	mp->b_cont = dp;
+	printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, udp));
+	putnext(udp->oq, mp);
+	return (QR_ABSORBED);
+      ebusy:
+	freeb(mp);
 	ptrace(("%s: ERROR: Flow controlled\n", DRV_NAME));
 	return (-EBUSY);
+      enobufs:
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
+	return (-ENOBUFS);
+      discard:
+	return (QR_DONE);
 }
 
 /**
- * t_optmgmt_ack: - send a T_OPTMGMT_ACK upstream
+ * t_discon_ind - send a T_DISCON_IND upstream
+ * @q: read queue
+ * @dp: data block containing ICMP packet
+ */
+STATIC INLINE int
+t_discon_ind(queue_t *q, mblk_t *dp)
+{
+	struct upd *udp = UDP_PRIV(q);
+	mblk_t *mp, *cp;
+	union T_primitives *p;
+	struct sockaddr_in *sin;
+	struct iphdr *iph;
+	struct udphdr *uh;
+	struct icmphdr *icmph;
+	t_uscalar_t DISCON_reason = 0;
+
+	if (unlikely(tpi_get_statef(udp) & ~(TSF_WRES_CIND | TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+		goto discard;
+
+	icmph = (typeof(icmph)) dp->b_datap->db_base;
+	iph = (typeof(iph)) (icmph + 1);
+	uh = (typeof(uh)) dp->b_rptr;
+
+	spin_lock_bh(&udp->conq.q_lock);
+	for (cp = bufq_head(&udp->conq); cp; cp = cp->b_next) {
+		p = (typeof(p)) cp->b_rptr;
+		sin = (typeof(sin)) (cp->b_rptr + p->conn_ind.SRC_offset);
+		if (sin->sin_port != uh->dest || sin->sin_addr.s_addr != iph->daddr)
+			continue;
+		break;
+	}
+	if (cp != NULL)
+		/* have a connection indication, unlink it */
+		__bufq_dequeue(&udp->conq, cp);
+	spin_unlock_bh(&udp->conq.q_lock);
+
+	if (cp == NULL
+	    && (tpi_get_statef(udp) & ~(TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL)))
+		goto discard;
+
+	if (unlikely((mp = ss7_allocb(q, sizeof(p->discon_ind), BPRI_MED)) == NULL))
+		goto enobufs;
+
+	DISCON_reason = ((t_uscalar_t) icmph->type << 8) | ((t_uscalar_t) icmph->code);
+
+	mp->b_datap->db_type = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(p->discon_ind);
+	p->discon_ind.PRIM_type = T_DISCON_IND;
+	p->discon_ind.DISCON_reason = DISCON_reason;
+	p->discon_ind.SEQ_number = (t_uscalar_t) (long) cp;
+	if (cp)
+		freemsg(cp);
+	tpi_set_state(udp, bufq_length(&udp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
+	printd(("%s: %p: <- T_DISCON_IND\n", DRV_NAME, udp));
+	putnext(q, mp);
+      discard:
+	return (QR_DONE);
+      enobufs:
+	if (cp != NULL)
+		bufq_queue(&udp->conq, cp);
+	return (-ENOBUFS);
+}
+
+/**
+ * t_optmgmt_ack - send a T_OPTMGMT_ACK upstream
  * @q: a queue in the queue pair
  * @flags: result flags
  * @req: requested options pointer from T_OPTMGMT_REQ
@@ -3683,40 +3973,41 @@ t_uderror_ind(queue_t *q, mblk_t *dp)
 STATIC int
 t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, size_t opt_len)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	struct T_optmgmt_ack *p;
 
-	if ((mp = udp_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		if ((flags = t_build_options(udp, req, req_len, mp->b_wptr, &opt_len, flags)) < 0) {
-			freemsg(mp);
-			return (flags);
-		}
-		p->PRIM_type = T_OPTMGMT_ACK;
-		p->OPT_length = opt_len;
-		p->OPT_offset = opt_len ? sizeof(*p) : 0;
-		p->MGMT_flags = flags;
-		if (opt_len) {
-			mp->b_wptr += opt_len;
-		}
-#ifdef TS_WACK_OPTREQ
-		if (tpi_get_state(udp) == TS_WACK_OPTREQ)
-			tpi_set_state(udp, TS_IDLE);
-#endif
-		printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, udp));
-		putnext(udp->rq, mp);
-		return (0);
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
+	if ((flags = t_build_options(udp, req, req_len, mp->b_wptr, &opt_len, flags)) < 0) {
+		freemsg(mp);
+		return (flags);
 	}
+	p->PRIM_type = T_OPTMGMT_ACK;
+	p->OPT_length = opt_len;
+	p->OPT_offset = opt_len ? sizeof(*p) : 0;
+	p->MGMT_flags = flags;
+	if (opt_len) {
+		mp->b_wptr += opt_len;
+	}
+#ifdef TS_WACK_OPTREQ
+	if (tpi_get_state(udp) == TS_WACK_OPTREQ)
+		tpi_set_state(udp, TS_IDLE);
+#endif
+	printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, udp));
+	putnext(udp->oq, mp);
+	return (0);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
 #ifdef T_ADDR_ACK
 /**
- * t_addr_ack: - send a T_ADDR_ACK upstream
+ * t_addr_ack - send a T_ADDR_ACK upstream
  * @q: a queue in the queue pair
  * @loc: local address
  * @loc_len: local address length
@@ -3727,31 +4018,32 @@ STATIC int
 t_addr_ack(queue_t *q, struct sockaddr *loc, socklen_t loc_len, struct sockaddr *rem,
 	   socklen_t rem_len)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	struct T_addr_ack *p;
 
-	if ((mp = udp_allocb(q, sizeof(*p) + loc_len + rem_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_ADDR_ACK;
-		p->LOCADDR_length = loc_len;
-		p->LOCADDR_offset = loc_len ? sizeof(*p) : 0;
-		p->REMADDR_length = rem_len;
-		p->REMADDR_offset = rem_len ? sizeof(*p) + loc_len : 0;
-		mp->b_wptr += sizeof(*p);
-		if (loc_len) {
-			bcopy(loc, mp->b_wptr, loc_len);
-			mp->b_wptr += loc_len;
-		}
-		if (rem_len) {
-			bcopy(rem, mp->b_wptr, rem_len);
-			mp->b_wptr += rem_len;
-		}
-		printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, udp));
-		putnext(udp->rq, mp);
-		return (0);
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + loc_len + rem_len, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
+	p->PRIM_type = T_ADDR_ACK;
+	p->LOCADDR_length = loc_len;
+	p->LOCADDR_offset = loc_len ? sizeof(*p) : 0;
+	p->REMADDR_length = rem_len;
+	p->REMADDR_offset = rem_len ? sizeof(*p) + loc_len : 0;
+	mp->b_wptr += sizeof(*p);
+	if (loc_len) {
+		bcopy(loc, mp->b_wptr, loc_len);
+		mp->b_wptr += loc_len;
 	}
+	if (rem_len) {
+		bcopy(rem, mp->b_wptr, rem_len);
+		mp->b_wptr += rem_len;
+	}
+	printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, udp));
+	putnext(udp->oq, mp);
+	return (0);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
@@ -3759,7 +4051,7 @@ t_addr_ack(queue_t *q, struct sockaddr *loc, socklen_t loc_len, struct sockaddr 
 
 #ifdef T_CAPABILITY_ACK
 /**
- * t_capability_ack: - send a T_CAPABILITY_ACK upstream
+ * t_capability_ack - send a T_CAPABILITY_ACK upstream
  * @q: a queue in the queue pair
  * @caps: capability bits
  * @type: STREAMS message type M_PROTO or M_PCPROTO
@@ -3767,35 +4059,26 @@ t_addr_ack(queue_t *q, struct sockaddr *loc, socklen_t loc_len, struct sockaddr 
 STATIC int
 t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	struct T_capability_ack *p;
 
-	if ((mp = udp_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = type;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_CAPABILITY_ACK;
-		p->CAP_bits1 = caps & (TC1_INFO | TC1_ACCEPTOR_ID);
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (t_uscalar_t) (long) udp->rq : 0;
-		mp->b_wptr += sizeof(*p);
-		if (caps & TC1_INFO) {
-			p->INFO_ack.PRIM_type = T_INFO_ACK;
-			p->INFO_ack.TSDU_size = (unsigned short) 0xffff;
-			p->INFO_ack.ETSDU_size = T_INVALID;
-			p->INFO_ack.CDATA_size = T_INVALID;
-			p->INFO_ack.DDATA_size = T_INVALID;
-			p->INFO_ack.ADDR_size = sizeof(struct sockaddr_in);
-			p->INFO_ack.OPT_size = T_INFINITE;
-			p->INFO_ack.TIDU_size = (unsigned short) 0xffff;
-			p->INFO_ack.SERV_type = T_CLTS;
-			p->INFO_ack.CURRENT_state = tpi_get_state(udp);
-			p->INFO_ack.PROVIDER_flag = T_XPG4_1 & ~T_SNDZERO;
-		} else
-			bzero(&p->INFO_ack, sizeof(p->INFO_ack));
-		printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, udp));
-		putnext(udp->rq, mp);
-		return (0);
-	}
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = type;
+	p = (typeof(p)) mp->b_wptr;
+	p->PRIM_type = T_CAPABILITY_ACK;
+	p->CAP_bits1 = caps & (TC1_INFO | TC1_ACCEPTOR_ID);
+	p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (t_uscalar_t) (long) udp->oq : 0;
+	mp->b_wptr += sizeof(*p);
+	if (caps & TC1_INFO) {
+		p->INFO_ack = udp->info;
+	} else
+		bzero(&p->INFO_ack, sizeof(p->INFO_ack));
+	printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, udp));
+	putnext(udp->oq, mp);
+	return (0);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
@@ -3803,10 +4086,11 @@ t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
 
 /*
  *  TS User -> TS Provider (Request and Response) primitives
+ *  ========================================================
  */
 
 /**
- * t_info_req: - process a T_INFO_REQ primitive
+ * t_info_req - process a T_INFO_REQ primitive
  * @q: active queue in queue pair
  * @mp: the message
  */
@@ -3817,224 +4101,576 @@ t_info_req(queue_t *q, mblk_t *mp)
 }
 
 /**
- * t_bind_req: - process a T_BIND_REQ primitive
+ * t_bind_req - process a T_BIND_REQ primitive
  * @q: active queue in queue pair
  * @mp: the message
  */
 STATIC int
 t_bind_req(queue_t *q, mblk_t *mp)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	int err, add_len, type;
-	const struct T_bind_req *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr *add = (struct sockaddr *)&udp->src;
+	const struct T_bind_req *p;
+	struct sockaddr *add = (struct sockaddr *) &udp->srce;
 	struct sockaddr_in *add_in;
+	int err;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	if (tpi_get_state(udp) != TS_UNBND)
-		goto outstate;
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_BIND_REQ))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_state(udp) != TS_UNBND))
+		goto error;
 	tpi_set_state(udp, TS_WACK_BREQ);
-	if (p->ADDR_length && (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)) {
-		ptrace(("%s: %p: ADDR_offset(%u) or ADDR_length(%u) are incorrect\n", DRV_NAME, udp,
-			p->ADDR_offset, p->ADDR_length));
-		goto badaddr;
-	}
+	err = TBADADDR;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length))
+		goto error;
 	if ((add_len = p->ADDR_length) == 0) {
 		bzero(add, sizeof(add));
 		add_len = sizeof(struct sockaddr_in);
 		add->sa_family = AF_INET;
 	} else {
-		if (add_len < sizeof(struct sockaddr_in)) {
-			ptrace(("%s: %p: add_len(%u) < sizeof(struct sockaddr_in)(%u)\n",
-				DRV_NAME, udp, add_len, sizeof(struct sockaddr_in)));
+		err = TBADADDR;
+		if (unlikely(add_len < sizeof(struct sockaddr_in)))
+			goto error;
+		if (unlikely(add_len > sizeof(struct sockaddr_in)))
+			goto error;
+		if (unlikely(add->sa_family != AF_INET && add->sa_family != 0))
 			goto badaddr;
-		}
-		if (add_len > sizeof(struct sockaddr_in)) {
-			ptrace(("%s: %p: add_len(%u) > sizeof(struct sockaddr_in)(%u)\n",
-				DRV_NAME, udp, add_len, sizeof(struct sockaddr_in)));
-			goto badaddr;
-		}
-		if (add->sa_family != AF_INET && add->sa_family != 0) {
-			ptrace(("%s: %p: sa_family incorrect (%u)\n", DRV_NAME, udp,
-				add->sa_family));
-			goto badaddr;
-		}
 		add = (typeof(add)) (mp->b_rptr + p->ADDR_offset);
 	}
 	add_in = (typeof(add_in)) add;
 	type = inet_addr_type(add_in->sin_addr.s_addr);
-	if (sysctl_ip_nonlocal_bind == 0 && add_in->sin_addr.s_addr != INADDR_ANY && type != RTN_LOCAL
-	    && type != RTN_MULTICAST && type != RTN_BROADCAST)
-		goto noaddr;
+	err = TNOADDR;
+	if (sysctl_ip_nonlocal_bind == 0 && add_in->sin_addr.s_addr != INADDR_ANY
+	    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
+		goto error;
 	udp->port = ntohs(add_in->sin_port);
 	/* check for bind to privileged port */
-	if (udp->port && udp->port < PROT_SOCK && !capable(CAP_NET_BIND_SERVICE))
-		goto acces;
-	if ((err = udp_bind(q, add, add_len)))
-		goto error;
-	return t_bind_ack(q, (struct sockaddr *)&udp->src, sizeof(struct sockaddr_in), p->CONIND_number);
-      acces:
 	err = TACCES;
-	ptrace(("%s: ERROR: no permission for address\n", DRV_NAME));
-	goto error;
-      noaddr:
-	err = TNOADDR;
-	ptrace(("%s: ERROR: address could not be assigned\n", DRV_NAME));
-	goto error;
-      badaddr:
-	err = TBADADDR;
-	ptrace(("%s: ERROR: address is invalid\n", DRV_NAME));
-	goto error;
-      einval:
-	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
-	goto error;
-      outstate:
-	err = TOUTSTATE;
-	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
-	goto error;
+	if (udp->port && udp->port < PROT_SOCK && !capable(CAP_NET_BIND_SERVICE))
+		goto error;
+	if ((err = udp_bind(udp, add, add_len)))
+		goto error;
+	return t_bind_ack(q, (struct sockaddr *) &udp->srce, sizeof(struct sockaddr_in),
+			  p->CONIND_number);
       error:
-	return t_error_ack(q, T_BIND_REQ, err);
+	return t_error_ack(q, T_BIND_REQ, mp, err);
 }
 
 /**
- * t_unbind_req: - process a T_UNBIND_REQ primitive
+ * t_unbind_req - process a T_UNBIND_REQ primitive
  * @q: active queue in queue pair
  * @mp: the primitive
  */
 STATIC int
 t_unbind_req(queue_t *q, mblk_t *mp)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
+	int err;
 
+	err = TOUTSTATE;
 	if (tpi_get_state(udp) != TS_IDLE)
-		goto outstate;
+		goto error;
 	tpi_set_state(udp, TS_WACK_UREQ);
-	return t_ok_ack(q, T_UNBIND_REQ);
-      outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
-	return t_error_ack(q, T_UNBIND_REQ, TOUTSTATE);
+	err = 0;
+      error:
+	return t_reply_ack(q, T_UNBIND_REQ, mp, err, NULL);
 }
 
 /**
- * t_unitdata_req: - process a T_UNITDATA_REQ primitive
- * @q: active queue in queue pair
+ * t_conn_req - process a T_CONN_REQ primitive
+ * @q: active queue (write queue)
  * @mp: the primitive
  */
 STATIC int
-t_unitdata_req(queue_t *q, mblk_t *mp)
+t_conn_req(queue_t *q, mblk_t *mp)
 {
-	struct udp *udp = PRIV(q);
-	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
-	const struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
+	struct udp *udp = UDP_PRIV(q);
+	union T_primitives *p;
+	struct T_conn_req *p;
+	struct T_ok_ack *r;
+	struct T_error_ack *e;
+	struct T_conn_con *c;
+	int err;
+	size_t mlen;
+	mblk_t *dp, *rp = NULL;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	if (dlen == 0)
-		goto baddata;
-	if (dlen > (unsigned short) 0xffff)
-		goto baddata;
-	if (tpi_get_state(udp) != TS_IDLE)
-		goto outstate;
-	if ((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
-	    || (p->DEST_length < sizeof(struct sockaddr_in)))
-		goto badadd;
-	if (p->OPT_length == 0)
-		return udp_xmitmsg(q, mp, NULL);
-	{
-		struct udp_options opts;
-		unsigned char *ip;
-		size_t ilen;
-		struct t_opthdr *ih;
-		int optlen;
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->conn_req)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->conn_req.PRIM_type != T_CONN_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(udp->info.SERV_type == T_CLTS && udp->info.CURRENT_state != TS_UNBND))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(!(tpi_get_statef(udp) & (TSF_IDLE | TSF_UNBND))))
+		goto error;
+	err = TNOADDR;
+	if (unlikely(p->conn_req.DEST_length == 0))
+		goto error;
+	err = TBADADDR;
+	if (unlikely(p->conn_req.DEST_length < udp->info.ADDR_size))
+		goto error;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->conn_req.DEST_offset + p->conn_req.DEST_length))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(p->conn_req.OPT_length > udp->info.OPT_size))
+		goto error;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->conn_req.OPT_offset + p->conn_req.OPT_length))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) != NULL))
+		if (unlikely((mlen = msgsize(dp)) == 0 || mlen > udp->info.CDATA_size))
+			goto error;
+	if (likely(p->conn_req.DEST_length != 0)) {
+		struct sockaddr_in *sin = (struct sockaddr_in *) &udp->dest;
 
-		opts = udp->options;
-		ip = mp->b_rptr + p->OPT_offset;
-		ilen = p->OPT_length;
-
-		for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0); ih;
-		     ih = _T_OPT_NEXTHDR_OFS(ip, ilen, ih, 0)) {
-			if (ih->len < sizeof(*ih))
-				goto badopt;
-			if ((unsigned char *) ih + ih->len > ip + ilen)
-				goto badopt;
-			optlen = ih->len - sizeof(*ih);
-			switch (ih->level) {
-			default:
-				goto badopt;
-			case T_INET_IP:
-				switch (ih->name) {
-				default:
-					goto badopt;
-				case T_IP_OPTIONS:
-					t_set_bit(_T_BIT_IP_OPTIONS, opts.flags);
-					continue;
-				case T_IP_TOS:
-					t_set_bit(_T_BIT_IP_TOS, opts.flags);
-					opts.ip.tos = *(unsigned char *) T_OPT_DATA(ih);
-					continue;
-				case T_IP_TTL:
-					t_set_bit(_T_BIT_IP_TTL, opts.flags);
-					opts.ip.ttl = *(unsigned char *) T_OPT_DATA(ih);
-					continue;
-				case T_IP_DONTROUTE:
-					t_set_bit(_T_BIT_IP_DONTROUTE, opts.flags);
-					opts.ip.dontroute = *(t_uscalar_t *) T_OPT_DATA(ih);
-					continue;
-				case T_IP_BROADCAST:
-					t_set_bit(_T_BIT_IP_BROADCAST, opts.flags);
-					opts.ip.broadcast = *(t_uscalar_t *) T_OPT_DATA(ih);
-					continue;
-				case T_IP_ADDR:
-					t_set_bit(_T_BIT_IP_ADDR, opts.flags);
-					opts.ip.addr = *(uint32_t *) T_OPT_DATA(ih);
-					continue;
-				case T_IP_REUSEADDR:
-					t_set_bit(_T_BIT_IP_REUSEADDR, opts.flags);
-					/* or do we generate a T_UDERROR_IND */
-					continue;
-				}
-			case T_INET_UDP:
-				switch (ih->name) {
-				default:
-					goto badopt;
-				case T_UDP_CHECKSUM:
-					t_set_bit(_T_BIT_UDP_CHECKSUM, opts.flags);
-					opts.udp.checksum = *(t_uscalar_t *) T_OPT_DATA(ih);
-					continue;
-				}
-			}
-		}
-		return udp_xmitmsg(q, mp, &opts);
+		bcopy(mp->b_rptr + p->conn_req.DEST_offset, sin, sizeof(*sin));
+		err = TBADADDR;
+		if (unlikely(sin->sin_family != AF_INET))
+			goto error;
+		if (unlikely(sin->sin_port == 0))
+			goto error;
+		if (unlikely(sin->sin_addr.s_addr == 0))
+			goto error;
 	}
-	/* FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
-      badopt:
-	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
-	goto error;
-#if 0
-      acces:
-	ptrace(("%s: ERROR: no permission to address or options\n", DRV_NAME));
-	goto error;
-#endif
-      badadd:
-	ptrace(("%s: ERROR: bad destination address\n", DRV_NAME));
-	goto error;
-      einval:
-	ptrace(("%s: ERROR: invalid primitive\n", DRV_NAME));
-	goto error;
-      outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
-	goto error;
-      baddata:
-	ptrace(("%s: ERROR: bad data size\n", DRV_NAME));
-	goto error;
+	if (likely(p->conn_req.OPT_length != 0)) {
+		struct udp_options opts = udp->options;
+		unsigned char *ip = mp->b_wptr + p->conn_res.OPT_offset;
+		size_t ilen = p->conn_res.OPT_length;
+
+		if ((err = t_opts_parse(ip, ilen, &opts)))
+			goto error;
+		udp->options = opts;
+	}
+	err = -ENOBUFS;
+	if (unlikely((rp = ss7_allocb(q, sizeof(p->ok_ack), BPRI_MED)) == NULL))
+		goto error;
+	udp->info.SERV_type = T_COTS;
+	if (udp->info.CURRENT_state == TS_UNBND) {
+		struct sockaddr_in *sin = (struct sockaddr_in *) &udp->bind;
+
+		/* need to autobind the Stream */
+		sin->sin_family = 0;
+		sin->sin_port = 0;
+		sin->sin_addr.s_addr = 0;
+		if ((err = udp_bind(udp, &udp->bind, sizeof(udp->bind))))
+			goto error;
+		tpi_set_state(udp, TS_IDLE);
+	}
+	tpi_set_state(udp, TS_WACK_CREQ);
+	if ((err = t_ok_ack(q, T_CONN_REQ, rp, NULL, dp, NULL)) != QR_ABSORBED)
+		goto error;
+	p->PRIM_type = T_CONN_CON;
+	/* all of the other fields and contents are the same */
+	tpi_set_state(udp, TS_DATA_XFER);
+	qreply(q, mp);
+	return (QR_ABSORBED);
       error:
-	return m_error(q, EPROTO);
+	if (rp != NULL)
+		freeb(rp);
+	return t_error_ack(q, T_CONN_REQ, mp, err);
+}
+
+STATIC INLINE fastcall mblk_t *
+t_seq_check(struct udp *udp, t_uscalar_t seq)
+{
+	mblk_t *mp;
+
+	spin_lock_bh(&udp->conq.q_lock);
+	for (mp = bufq_head(&udp->conq); mp && (t_uscalar_t) (long) mp != seq; mp = mp->b_next) ;
+	spin_unlock_bh(&udp->conq.q_lock);
+	usual(mp);
+	return (mp);
+}
+STATIC INLINE fastcall struct udp *
+t_tok_check(t_uscalar_t tok)
+{
+	struct udp *ap;
+
+	spin_lock_bh(&udp_lock);
+	for (ap = udp_opens; ap && (t_uscalar_t) (long) ap->oq != tok; ap = ap->next) ;
+	spin_unlock_bh(&udp_lock);
+	usual(ap);
+	return (ap);
 }
 
 /**
- * t_optmgmt_req: - handle T_OPTMGMT_REQ primitive
+ * t_conn_res = process a T_CONN_RES primitive
+ * @q: write queue
+ * @mp: the primitive
+ */
+STATIC int
+t_conn_res(queue_t *q, mblk_t *mp)
+{
+	struct udp *udp = UDP_PRIV(q), *ap;
+	struct T_conn_res *p;
+	mblk_t *dp, *cp;
+	size_t mlen;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_CONN_RES))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(udp->info.SERV_type == T_CLTS))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_state(udp) != TS_WRES_CIND))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(p->OPT_length > udp->info.OPT_size))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
+		goto error;
+	err = TBADDATA;
+	if ((dp = mp->b_cont))
+		if (unlikely((mlen = msgsize(dp)) > udp->info.CDATA_size))
+			goto error;
+	err = TBADSEQ;
+	if (unlikely((cp = t_seq_check(udp, p->SEQ_number)) == NULL))
+		goto error;
+	if (p->ACCEPTOR_id == 0) {
+		ap = udp;
+		err = TBADF;
+		if (bufq_length(&udp->conq) > 1)
+			goto error;
+	} else {
+		struct sockaddr_in *sin, *ain;
+
+		err = TBADF;
+		if (unlikely((ap = t_tok_check(udp, p->ACCEPTOR_id)) == NULL))
+			goto error;
+		err = TPROVMISMATCH;
+		if (unlikely(ap->info.SERV_type == T_CLTS))
+			goto error;
+		err = TRESQLEN;
+		if (unlikely(ap->CONIND_number > 0))
+			goto error;
+		err = TOUTSTATE;
+		if (tpi_get_statef(ap) != TS_IDLE)
+			goto error;
+		sin = (struct sockaddr_in *) &udp->srce;
+		ain = (struct sockaddr_in *) &ap->srce;
+		err = TRESADDR;
+		if (sin->sin_port != ain->sin_port || sin->sin_addr.s_addr != ain->sin_addr.s_addr)
+			goto error;
+	}
+	if (likely(p->OPT_length != 0)) {
+		struct upd_options opts = ap->options;
+
+		if ((err = t_opts_parse(mp->b_rptr + p->OPT_offset, p->OPT_length, &opts)))
+			goto error;
+		/* TPI options processing rules allows us to set some (or all) of the options on
+		   the Stream even if the primitive is about to fail. */
+		ap->options = opts;
+	}
+	{
+		struct T_conn_ind *c = (typeof(c)) cp->b_rptr;
+
+		bcopy(cp->b_rptr + c->SRC_offset, &ap->dest, c->SRC_length);
+	}
+	tpi_set_state(udp, TS_WACK_CRES);
+	return t_ok_ack(q, T_CONN_RES, mp, cp, dp, ap);
+      error:
+	return t_error_ack(q, T_CONN_RES, mp, err);
+}
+
+/**
+ * t_discon_req - process a T_DISCON_REQ primitive
+ * @q: active queue (write queue)
+ * @mp: the primitive
+ */
+STATIC int
+t_discon_req(queue_t *q, mblk_t *mp)
+{
+	struct udp *udp = UDP_PRIV(q);
+	union T_primitives *p;
+	t_uscalar_t state;
+	mblk_t *dp, *cp = NULL;
+	size_t mlen;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->discon_req)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->discon_req.PRIM_type != T_DISCON_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(udp->info.SERV_type == T_CLTS))
+		goto error;
+	state = tpi_get_state(udp);
+	err = TOUTSTATE;
+	if (unlikely((1 << state) & ~(TSM_CONNECTED)))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) != NULL))
+		if (unlikely((mlen = msgsize(dp)) == 0 || mlen > udp->info.DDATA_size))
+			goto error;
+	switch (state) {
+	case TS_WCON_CREQ:
+		tpi_set_state(udp, TS_WACK_DREQ6);
+		break;
+	case TS_WRES_CIND:
+		err = TBADSEQ;
+		if (unlikely((cp = t_seq_check(udp, p->discon_req.SEQ_number)) == NULL))
+			goto error;
+		tpi_set_state(udp, TS_WACK_DREQ7);
+		break;
+	case TS_DATA_XFER:
+		tpi_set_state(udp, TS_WACK_DREQ9);
+		break;
+	case TS_WIND_ORDREL:
+		tpi_set_state(udp, TS_WACK_DREQ10);
+		break;
+	case TS_WREQ_ORDREL:
+		tpi_set_state(udp, TS_WACK_DREQ11);
+		break;
+	}
+	return t_ok_ack(q, T_DISCON_REQ, mp, cp, dp, NULL);
+      error:
+	return t_error_ack(q, T_DISCON_REQ, mp, err);
+}
+
+/**
+ * t_unitdata_req - process a T_UNITDATA_REQ primitive
+ * @q: write queue
+ * @mp: the primitive
+ */
+STATIC INLINE fastcall __hot_put int
+t_unitdata_req(queue_t *q, mblk_t *mp)
+{
+	struct udp *udp = UDP_PRIV(q);
+	struct T_unitdata_req *p;
+	struct sockaddr_in sin;
+	struct udp_options opts;
+	size_t mlen;
+	mblk_t *dp;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_UNITDATA_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(udp->info.SERV_type != T_CLTS))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_state(udp) != TS_IDLE))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto error;
+	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > udp->info.TSDU_size))
+		goto error;
+	err = TNOADDR;
+	if (unlikely(p->DEST_length == 0))
+		goto error;
+	err = TBADADDR;
+	if (unlikely((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)))
+		goto error;
+	if (unlikely(p->DEST_length < sizeof(struct sockaddr_in)))
+		goto error;
+	bcopy(mp->b_rptr + p->DEST_length, &sin, sizeof(sin));
+	err = TBADOPT;
+	if (unlikely(p->OPT_length > udp->info.OPT_size))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
+		goto error;
+	opts = udp->options;
+	if (unlikely(p->OPT_length != 0))
+		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
+			goto error;
+	if ((err = udp_xmitmsg(q, dp, &sin, &opts)))
+		goto err;
+	return (QR_DONE);
+      error:
+	/* FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
+	return m_error(q, err, mp);
+}
+
+/**
+ * t_optdata_req - process a T_OPTDATA_REQ primitive
+ * @q: write queue
+ * @mp: the primitive
+ */
+STATIC INLINE fastcall __hot_put int
+t_optdata_req(queue_t *q, mblk_t *mp)
+{
+	struct udp *udp = UDP_PRIV(q);
+	struct T_optdata_req *p;
+	struct sockaddr_in *sin;
+	struct udp_options opts;
+	size_t mlen;
+	mblk_t *dp;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_OPTDATA_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(udp->info.SERV_type == T_CLTS))
+		goto error;
+	if (unlikely(tpi_get_state(udp) == TS_IDLE))
+		goto discard;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_statef(udp) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+		goto error;
+	err = TBADFLAG;
+	if (unlikely(p->DATA_flag != 0))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(p->OPT_length > udp->info.OPT_size))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto error;
+	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > udp->info.TSDU_size))
+		goto error;
+	opts = udp->options;
+	if (unlikely(p->OPT_length != 0))
+		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
+			goto error;
+	sin = (typeof(sin)) & udp->dest;
+	if ((err = udp_xmitmsg(q, dp, sin, &opts)))
+		goto error;
+	return (QR_DONE);
+      error:
+	return m_error(q, err, mp);
+}
+
+/**
+ * t_data_req - process a T_DATA_REQ primitive
+ * @q: write queue
+ * @mp: the primitive
+ */
+STATIC INLINE fastcall __hot_put int
+t_data_req(queue_t *q, mblk_t *mp)
+{
+	struct udp *udp = UDP_PRIV(q);
+	struct T_data_req *p;
+	struct sockaddr_in *sin;
+	struct udp_options *opts;
+	size_t mlen;
+	mblk_t *dp;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_DATA_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(udp->info.SERV_type == T_CLTS))
+		goto error;
+	if (unlikely(udp->info.TSDU_size == T_INVALID))
+		goto error;
+	err = QR_DONE;
+	if (unlikely(tpi_get_state(udp) == TS_IDLE))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_statef(udp) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+		goto error;
+	err = TBADFLAG;
+	if (unlikely(p->MORE_flag != 0))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto error;
+	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > udp->info.TSDU_size))
+		goto error;
+	opts = &udp->options;
+	sin = (typeof(sin)) & udp->dest;
+	if ((err = udp_xmitmsg(q, dp, sin, opts)))
+		goto error;
+	return (QR_DONE);
+      error:
+	return m_error(q, err, mp);
+}
+
+/**
+ * t_exdata_req - process a T_EXDATA_REQ primitive
+ * @q: write queue
+ * @mp: the primitive
+ */
+STATIC int
+t_exdata_req(queue_t *q, mblk_t *mp)
+{
+	struct udp *udp = UDP_PRIV(q);
+	struct T_exdata_req *p;
+	struct sockaddr_in *sin;
+	struct udp_options *opts;
+	size_t mlen;
+	mblk_t *dp;
+	int statef;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_EXDATA_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(udp->info.SERV_type == T_CLTS))
+		goto error;
+	if (unlikely(udp->info.ETSDU_size == T_INVALID))
+		goto error;
+	err = QR_DONE;
+	if (unlikely((statef = tpi_get_statef(udp)) & TSF_IDLE))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(statef & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+		goto error;
+	err = TBADFLAG;
+	if (unlikely(p->MORE_flag != 0))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto error;
+	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > udp->info.ETSDU_size))
+		goto error;
+	opts = &udp->options;
+	sin = (typeof(sin)) & udp->dest;
+	if ((err = udp_xmitmsg(q, dp, sin, opts)))
+		goto error;
+	return (QR_DONE);
+      error:
+	return m_error(q, err, mp);
+
+}
+
+/**
+ * t_optmgmt_req - handle T_OPTMGMT_REQ primitive
  * @q: active queue in the queue pair
  * @mp: the primitive
  *
@@ -4056,18 +4692,26 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 STATIC int
 t_optmgmt_req(queue_t *q, mblk_t *mp)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	int err, opt_len;
-	const struct T_optmgmt_req *p = (typeof(p)) mp->b_rptr;
+	const struct T_optmgmt_req *p;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	if (unlikely(p->PRIM_type != T_OPTMGMT_REQ))
+		goto error;
 #ifdef TS_WACK_OPTREQ
 	if (tpi_get_state(udp) == TS_IDLE)
 		tpi_set_state(udp, TS_WACK_OPTREQ);
 #endif
-	if (p->OPT_length && mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
-		goto badopt;
+	err = TBADOPT;
+	if (unlikely(p->OPT_length > udp->info.OPT_size))
+		goto error;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
+		goto error;
+	err = TBADFLAG;
 	switch (p->MGMT_flags) {
 	case T_DEFAULT:
 		opt_len = t_size_default_options(udp, mp->b_rptr + p->OPT_offset, p->OPT_length);
@@ -4082,20 +4726,22 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 		opt_len = t_size_negotiate_options(udp, mp->b_rptr + p->OPT_offset, p->OPT_length);
 		break;
 	default:
-		goto badflag;
+		goto error;
 	}
-	if (opt_len < 0) {
+	if (unlikely(opt_len < 0)) {
 		switch (-(err = opt_len)) {
 		case EINVAL:
-			goto badopt;
+			err = TBADOPT;
+			goto error;
 		case EACCES:
-			goto acces;
+			err = TACCES;
+			goto error;
 		default:
-			goto provspec;
+			goto error;
 		}
 	}
-	if ((err = t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset,
-				 p->OPT_length, opt_len)) < 0) {
+	err = t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len);
+	if (unlikely(err < 0)) {
 		switch (-err) {
 		case EINVAL:
 			goto badopt;
@@ -4105,433 +4751,149 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 		case ENOMEM:
 			break;
 		default:
-			goto provspec;
+			goto error;
 		}
 	}
 	return (err);
-      provspec:
-	err = err;
-	ptrace(("%s: ERROR: provider specific\n", DRV_NAME));
-	goto error;
-      badflag:
-	err = TBADFLAG;
-	ptrace(("%s: ERROR: bad options flags\n", DRV_NAME));
-	goto error;
-      acces:
-	err = TACCES;
-	ptrace(("%s: ERROR: no permission for option\n", DRV_NAME));
-	goto error;
-      badopt:
-	err = TBADOPT;
-	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
-	goto error;
-      einval:
-	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
-	goto error;
       error:
-	return t_error_ack(q, T_OPTMGMT_REQ, err);
+	return t_error_ack(q, T_OPTMGMT_REQ, mp, err);
 }
 
 #ifdef T_ADDR_REQ
 /**
- * t_addr_req: - process a T_ADDR_REQ primitive
+ * t_addr_req - process a T_ADDR_REQ primitive
  * @q: active queue in queue pair
  * @mp: the primitive
  */
 STATIC int
 t_addr_req(queue_t *q, mblk_t *mp)
 {
-	struct udp *udp = PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
+	struct T_addr_req *p;
+	int err;
 
-	(void) mp;
-	switch (tpi_get_state(udp)) {
-	case TS_UNBND:
-		return t_addr_ack(q, NULL, 0, NULL, 0);
-	case TS_IDLE:
-		return t_addr_ack(q, (struct sockaddr *) &udp->src, sizeof(struct sockaddr_in),
-				  NULL, 0);
-	case TS_WCON_CREQ:
-	case TS_DATA_XFER:
-	case TS_WIND_ORDREL:
-	case TS_WREQ_ORDREL:
-		return t_addr_ack(q, (struct sockaddr *) &udp->src, sizeof(struct sockaddr_in),
-				  (struct sockaddr *) &udp->dst, sizeof(struct sockaddr_in));
-	case TS_WRES_CIND:
-		return t_addr_ack(q, NULL, 0, (struct sockaddr *) &udp->dst,
-				  sizeof(struct sockaddr_in));
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_ADDR_REQ))
+		goto error;
+	{
+		struct sockaddr *loc, *rem;
+		socklen_t loc_len, rem_len;
+
+		err = TOUTSTATE;
+		switch (tpi_get_state(udp)) {
+		case TS_UNBND:
+			loc = NULL;
+			loc_len = 0;
+			rem = NULL;
+			rem_len = 0;
+			break;
+		case TS_IDLE:
+		case TS_WRES_CIND:
+			loc = (struct sockaddr *) &udp->srce;
+			loc_len = sizeof(struct sockaddr_in);
+			rem = NULL;
+			rem_len = 0;
+			break;
+		case TS_WCON_CREQ:
+		case TS_DATA_XFER:
+		case TS_WIND_ORDREL:
+		case TS_WREQ_ORDREL:
+			loc = (struct sockaddr *) &udp->srce;
+			loc_len = sizeof(struct sockaddr_in);
+			rem = (struct sockaddr *) &udp->dest;
+			rem_len = sizeof(struct sockaddr_in);
+			break;
+		default:
+			goto error;
+		}
+		return t_addr_ack(q, loc, loc_len, rem, rem_len);
 	}
-	return t_error_ack(q, T_ADDR_REQ, TOUTSTATE);
+      error:
+	return t_error_ack(q, T_ADDR_REQ, mp, err);
 }
 #endif				/* T_ADDR_REQ */
 
 #ifdef T_CAPABILITY_REQ
 /**
- * t_capability_req: - process a T_CAPABILITY_REQ primitive
+ * t_capability_req - process a T_CAPABILITY_REQ primitive
  * @q: active queue in queue pair
  * @mp: the primitive
  */
 STATIC int
 t_capability_req(queue_t *q, mblk_t *mp)
 {
-	int err = -EFAULT;
-	struct T_capability_req *p = (typeof(p)) mp->b_rptr;
+	struct T_capability_req *p;
+	int err;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	return t_capability_ack(q, p->CAP_bits1, mp->b_datap->db_type);
-      einval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid message format\n", DRV_NAME));
-	goto error;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_CAPABILITY_REQ))
+		goto error;
+	return t_capability_ack(q, p->CAP_bits1, mp->b_datap->db_type);
       error:
-	return t_error_ack(q, T_CAPABILITY_REQ, err);
+	return t_error_ack(q, T_CAPABILITY_REQ, mp, err);
 }
 #endif				/* T_CAPABILITY_REQ */
 
 /**
- * t_other_req: - process unsupported recognized primitive type
+ * t_other_req - process unsupported recognized primitive type
  * @q: active queue in queue pair
  * @mp: the primitive
  */
 STATIC int
 t_other_req(queue_t *q, mblk_t *mp)
 {
-	t_scalar_t prim = *((t_scalar_t *) mp->b_rptr);
+	t_scalar_t prim;
+	int err;
 
-	return t_error_ack(q, prim, TNOTSUPPORT);
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(prim)))
+		goto error;
+	prim = *((t_scalar_t *) mp->b_rptr);
+	err = TNOTSUPPORT;
+      error:
+	return t_error_ack(q, prim, mp, err);
 }
 
-/*
- * NS Provider -> NS User primitives
- */
-
-/**
- * n_bind_ack: - process an N_BIND_ACK primitive
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-n_bind_ack(queue_t *q, mblk_t *mp)
-{
-	struct udp *udp = UDP_PRIV(q);
-	N_bind_ack_t *p;
-	struct sockaddr *add = NULL;
-	socklen_t add_len = 0;
-	int rtn = 0;
-
-	switch (npi_get_state(udp)) {
-	case NS_WACK_BREQ:
-		p = (typeof(p)) mp->b_rptr;
-		if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-			goto efault;
-		if (p->ADDR_length) {
-			if (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)
-				goto efault;
-			add = (struct sockaddr *) ((unsigned char *) p + p->ADDR_offset);
-			add_len = p->ADDR_length;
-		}
-		rtn = t_bind_ack(q, add, add_len, p->CONIND_number);
-		if (rtn >= 0)
-			npi_set_state(udp, NS_IDLE);
-		break;
-	default:
-		break;
-	}
-	return (rtn);
-      efault:
-	return (-EFAULT);
-}
-
-/**
- * n_ok_ack: - process an N_OK_ACK primitive
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-n_ok_ack(queue_t *q, mblk_t *mp)
-{
-	struct udp *udp = UDP_PRIV(q);
-	int rtn = 0;
-
-	switch (npi_get_state(udp)) {
-	case NS_WACK_UREQ:
-		rtn = t_ok_ack(q, T_UNBIND_REQ);
-		if (rtn >= 0)
-			npi_set_state(udp, NS_UNBND);
-		break;
-	case NS_WACK_OPTREQ:
-		if (rtn >= 0)
-			npi_set_state(udp, NS_IDLE);
-		break;
-	default:
-		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
-		   normally when this is a response to an N_OPTMGMT_REQ that was issued in other
-		   than the NS_IDLE state. */
-		break;
-	}
-	return (rtn);
-}
-
-/**
- * n_tpi_error: - map NPI errors to TPI errors
- * @p: pointer to N_ERROR_ACK primitive
- */
-STATIC t_scalar_t
-n_tpi_error(N_error_ack_t * p)
-{
-	switch (p->NPI_error) {
-	case NBADADDR:
-		return (TBADADDR);
-	case NBADOPT:
-		return (TBADOPT);
-	case NACCESS:
-		return (TACCES);
-	case NNOADDR:
-		return (TNOADDR);
-	case NOUTSTATE:
-		return (TOUTSTATE);
-	case NBADSEQ:
-		return (TBADSEQ);
-	case NSYSERR:
-		return (-(t_scalar_t) p->UNIX_error);
-	case NBADDATA:
-		return (TBADDATA);
-	case NBADFLAG:
-		return (TBADOPT);
-	case NNOTSUPPORT:
-		return (TNOTSUPPORT);
-	case NBOUND:
-		return (TADDRBUSY);
-	case NBADQOSPARAM:
-		return (TBADOPT);
-	case NBADQOSTYPE:
-		return (TBADOPT);
-	case NBADTOKEN:
-		return (TBADF);
-	case NNOPROTOID:
-		return (TNOADDR);
-	default:
-		return (-EINVAL);
-	}
-}
-
-/**
- * n_error_ack: - process an N_ERROR_ACK primitive
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-n_error_ack(queue_t *q, mblk_t *mp)
-{
-	struct udp *udp = UDP_PRIV(q);
-	int rtn = 0;
-
-	switch (npi_get_state(udp)) {
-	case NS_WACK_OPTREQ:
-		if (rtn >= 0)
-			npi_set_state(udp, NS_IDLE);
-		break;
-	case NS_WACK_BREQ:
-		rtn = t_error_ack(q, T_BIND_REQ, n_tpi_error((N_error_ack_t *) mp->b_rptr));
-		if (rtn >= 0)
-			npi_set_state(udp, NS_UNBND);
-		break;
-	case NS_WACK_UREQ:
-		rtn = t_error_ack(q, T_UNBIND_REQ, n_tpi_error((N_error_ack_t *) mp->b_rptr));
-		if (rtn >= 0)
-			npi_set_state(udp, NS_IDLE);
-		break;
-	default:
-		/* Note: if not in a WACK state simply do not change state.  This occurs normally
-		   when responding to an N_OPTMGMT_REQ in other than NS_IDLE state. */
-		break;
-	}
-	return (rtn);
-}
-
-/**
- * n_unitdata_ind: - process an N_UNITDATA_IND primitive
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-n_unitdata_ind(queue_t *q, mblk_t *mp)
-{
-	int rtn;
-
-	rtn = t_unitdata_ind(q, mp->b_cont);
-	if (rtn == QR_DONE) {
-		freeb(mp);
-		return (QR_ABSORBED);
-	}
-	return (rtn);
-}
-
-/**
- * n_uderror_ind: - process an N_UDERROR_IND primitive
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-n_uderror_ind(queue_t *q, mblk_t *mp)
-{
-	int rtn;
-
-	rtn = t_uderror_ind(q, mp->b_cont);
-	if (rtn == QR_DONE) {
-		freeb(mp);
-		return (QR_ABSORBED);
-	}
-	return (rtn);
-}
-
-/**
- * n_other_ind: - process an unsupported primitvie type
- * @q: active queue in queue pair (read queue)
- * @mp: the primitive
- */
-STATIC int
-n_other_ind(queue_t *q, mblk_t *mp)
-{
-	return (-EOPNOTSUPP);
-}
-
-/*
- *  NPI IP Provider -> UDP Provider messages.
- */
-
-/**
- * l_unidata_ind: - process N_UNITDATA_IND from linked NPI IP provider
- * @q: active queue in queue pair (read queue)
- * @mp: the N_UNITDATA_IND message
- *
- * N_UNITDATA_IND messages are passed from a linked NPI IP provider.  They are processed similar to
- * IP messages incoming in udp_v4_rcv().  The data block contains the IP header, UDP header and UDP
- * payload starting at mp->b_cont->b_datap->db_base.  The UDP message payload starts at
- * mp->b_cont->b_rptr.  This function extracts IP header information and uses it to create options.
- *
- * LOCKING: Holding udp_lock protects against the upper stream closing.  udp->qlock protects the
- * state of the private structure.  udp->refs protects the structure from being deallocated.
- */
-STATIC int
-l_unitdata_ind(queue_t *q, mblk_t *mp)
-{
-	struct udp *udp;
-	mblk_t *dp = mp->b_cont;
-	struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
-	struct udphdr *uh = (typeof(uh)) (dp->b_datap->db_base + (iph->ihl << 2));
-
-	read_lock_bh(&udp_lock);
-	udp = udp_lookup(uh->dest, uh->source, iph->daddr, iph->saddr);
-	if (udp == NULL)
-		goto no_stream;
-	spin_lock_bh(&udp->qlock);
-	if (tpi_get_state(udp) != TS_IDLE)
-		goto outstate;
-	if (bcanput(udp->rq, mp->b_band)) {
-		put(udp->rq, mp);
-		return (QR_ABSORBED);
-	}
-	/* Note: when flow control subsides, the upper read queue must backenable the lower read
-	   queue for this to work.  Another possibility is to simply discard the message. */
-	return (-EBUSY);
-      no_stream:
-	read_unlock_bh(&udp_lock);
-	/* When there is no Stream associated with the message, we want the NPI IP driver to still
-	   be able to pass the message along to another protocol, so we return it as an M_CTL
-	   message.  Note that we do not check for flow control. */
-	mp->b_datap->db_type = M_CTL;
-	qreply(q, mp);
-	return (QR_ABSORBED);
-      outstate:
-	spin_unlock_bh(&udp->qlock);
-	udp_put(udp);
-	read_unlock_bh(&udp_lock);
-	/* discard */
-	return (QR_DONE);
-}
-
-/**
- * l_uderror_ind: - process N_UDERROR_IND from linked NPI IP provider
- * @q: active queue in queue pair (read queue)
- * @mp: the N_UDERROR_IND message
- *
- * N_UDERROR_IND messages are passed from a linked NPI IP provider.  They are processed similar to
- * ICMP messages incoming in udp_v4_err().
- */
-STATIC INLINE fastcall int
-l_uderror_ind(queue_t *q, mblk_t *mp)
-{
-	struct udp *udp;
-	mblk_t *dp = mp->b_cont;
-	struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
-	struct udphdr *uh = (typeof(uh)) (dp->b_datap->db_base + (iph->ihl << 2));
-
-	udp = udp_lookup_icmp(uh->source, uh->dest, iph->saddr, iph->daddr);
-	if (udp == NULL)
-		goto no_stream;
-	if (bcanput(udp->rq, mp->b_band)) {
-		put(udp->rq, mp);
-		return (QR_ABSORBED);
-	}
-	/* Note: when flow control subsides, the upper read queue must backenable the lower read
-	   queue for this to work.  Another possibility is to simply discard the message. */
-	return (-EBUSY);
-      no_stream:
-	/* When there is no Stream associated with the message, we want the NPI IP driver to still
-	   be able to pass the message along to another protocol, so we return it as an M_CTL
-	   message.  Note that we do not check for flow control. */
-	mp->b_datap->db_type = M_CTL;
-	qreply(q, mp);
-	return (QR_ABSORBED);
-}
-
-/**
- * l_other_ind: - process unsupported indication from linked NPI IP provider
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- *
- * Unexpected message.
- */
-STATIC INLINE fastcall int
-l_other_ind(queue_t *q, mblk_t *mp)
-{
-	swerr();
-	/* discard it */
-	return (QR_DONE);
-}
 /*
  *  STREAMS MESSAGE HANDLING
  */
 
 /**
- * upd_w_proto: - M_PROTO, M_PCPROTO handling
+ * upd_w_proto - M_PROTO, M_PCPROTO handling
  * @q: active queue in queue pair (write queue)
  * @mp: the message
  */
-STATIC int
+STATIC INLINE fastcall __hot_put int
 udp_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	t_scalar_t prim;
-	udp_t *udp = PRIV(q);
-	t_uscalar_t oldstate = tpi_get_state(udp);
+	struct udp *udp = UDP_PRIV(q);
+
+	udp->i_oldstate = tpi_get_state(udp);	/* checkpoint */
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(t_scalar_t))
 		goto eproto;
 	switch ((prim = *((t_scalar_t *) mp->b_rptr))) {
 	case T_CONN_REQ:
 		printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, udp));
-		rtn = t_other_req(q, mp);
+		rtn = t_conn_req(q, mp);
 		break;
 	case T_CONN_RES:
 		printd(("%s: %p: -> T_CONN_RES\n", DRV_NAME, udp));
-		rtn = t_other_req(q, mp);
+		rtn = t_conn_res(q, mp);
 		break;
 	case T_DISCON_REQ:
 		printd(("%s: %p: -> T_DISCON_REQ\n", DRV_NAME, udp));
-		rtn = t_other_req(q, mp);
+		rtn = t_discon_req(q, mp);
 		break;
 	case T_DATA_REQ:
 		printd(("%s: %p: -> T_DATA_REQ\n", DRV_NAME, udp));
@@ -4600,7 +4962,7 @@ udp_w_proto(queue_t *q, mblk_t *mp)
 	case T_CAPABILITY_ACK:
 #endif
 	      eproto:
-		rtn = m_error(q, EPROTO);
+		rtn = m_error(q, EPROTO, mp);
 		break;
 	default:
 		rtn = t_other_req(q, mp);
@@ -4611,7 +4973,8 @@ udp_w_proto(queue_t *q, mblk_t *mp)
 		/* not so rare() during conformance suite testing */
 		rare();
 #endif
-		tpi_set_state(udp, oldstate);
+		tpi_set_state(udp, udp->i_oldstate);
+		udp->i_oldstate = tpi_get_state(udp);
 		/* The put and srv procedures do not recognize all errors.  Sometimes we return an
 		   error to here just to restore the previous state. */
 		switch (rtn) {
@@ -4629,100 +4992,49 @@ udp_w_proto(queue_t *q, mblk_t *mp)
 }
 
 /**
- * udp_w_flush: - M_FLUSH handling (write queue)
+ * upd_w_ioctl - M_IOCTL handling
  * @q: active queue in queue pair (write queue)
  * @mp: the message
  *
- * Canonical flushing, taking into account that this might be a module pushed over a driver on the
- * stream or this might be the Stream end in either direction (i.e. if the Stream is the lower
- * multiplex or driver).
+ * This TPI-UDP provider does not support any input-output controls and, therefore, all input-output
+ * controls are negatively acknowledged.
  */
 STATIC int
-udp_w_flush(queue_t *q, mblk_t *mp)
+udp_w_ioctl(queue_t *q, mblk_t *mp)
 {
-	if (*mp->b_rptr & FLUSHW) {
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(q, FLUSHALL);
-		*mp->b_rptr &= ~FLUSHW;
-		if (q->q_next) {
-			putnext(q, mp);
-			return (QR_ABSORBED);
-		}
-	}
-	if (*mp->b_rptr & FLUSHR) {
-		if (q->q_next) {
-			putnext(q, mp);
-			return (QR_ABSORBED);
-		}
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(RD(q), FLUSHALL);
-		if (RD(q)->q_next) {
-			qreply(q, mp);
-			return (QR_ABSORBED);
-		}
-	}
-	return (QR_DONE);
+	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
+
+	mp->b_datap->db_type = M_IOCNAK;
+	iocp->ioc_count = 0;
+	iocp->ioc_error = EINVAL;
+	iocp->ioc_rval = -1;
+	qreply(q, mp);
+	return (QR_ABSORBED);
 }
 
 /**
- * udp_r_flush: - M_FLUSH handling (read queue)
- * @q: active queue in the queue pair (read queue)
- * @mp: the message
- *
- * Canonical flushing, taking into account that this might be a module pushed over a driver on the
- * stream or this might be the Stream end in either direction (i.e. if the Stream is the lower
- * multiplex or driver).
- */
-STATIC int
-udp_r_flush(queue_t *q, mblk_t *mp)
-{
-	if (*mp->b_rptr & FLUSHR) {
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(q, FLUSHALL);
-		if (q->q_next) {
-			putnext(q, mp);
-			return (QR_ABSORBED);
-		}
-	}
-	if (*mp->b_rptr & FLUSHW) {
-		if (q->q_next) {
-			putnext(q, mp);
-			return (QR_ABSORBED);
-		}
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(WR(q), mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(WR(q), FLUSHALL);
-		if (WR(q)->q_next) {
-			qreply(q, mp);
-			return (QR_ABSORBED);
-		}
-	}
-	return (QR_DONE);
-}
-
-/**
- * udp_r_data: - M_DATA handling
+ * udp_r_data - M_DATA handling
  * @q: active queue in queue pair (read queue)
  * @mp: the message
  *
  * M_DATA messages are placed on the read queue from below by udp_v4_rcv().  These messages are
- * transformed into T_UNITDATA_IND M_PROTO messages and passed along upstream.
+ * transformed into T_UNITDATA_IND, T_CONN_IND or T_OPTDATA_IND M_PROTO messages and passed along
+ * upstream.
  */
-STATIC int
+STATIC INLINE fastcall __hot_get int
 udp_r_data(queue_t *q, mblk_t *mp)
 {
-	return t_unitdata_ind(q, mp);
+	struct udp *udp = UDP_PRIV(q);
+
+	if (udp->info.SERV_type == T_CLTS)
+		return t_unitdata_ind(q, mp);
+	if (udp->CONIND_number > 0)
+		return t_conn_ind(q, mp);
+	return t_optdata_ind(q, mp);
 }
 
 /**
- * udp_r_error: - M_ERROR handling
+ * udp_r_error - M_ERROR handling
  * @q: active queue in queue pair (read queue)
  * @mp: the message
  *
@@ -4732,59 +5044,19 @@ udp_r_data(queue_t *q, mblk_t *mp)
 STATIC int
 udp_r_error(queue_t *q, mblk_t *mp)
 {
-	return t_uderror_ind(q, mp);
+	struct udp *udp = UDP_PRIV(q);
+
+	if (udp->info.SERV_type == T_CLTS)
+		return t_uderror_ind(q, mp);
+	return t_discon_ind(q, mp);
 }
 
 /**
- * udp_r_proto: - M_PROTO, M_PCPROTO handling
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- *
- * M_PROTO, M_PCPROTO messages are placed on the read queue by an NPI IP Stream below the UDP
- * driver.  The purpose of this function is for using a general purpose NPI Stream, in which case,
- * UDP can be a multiplexing driver and have a UDP protocol bound NPI-IP Stream linked beneath it at
- * initialization time, or can be a pushable module that is pushed over an NPI-IP Stream.  It is
- * that NPI-IP lower multiplex or driver Stream that places these messages on the read queue.
- */
-STATIC int
-udp_r_proto(queue_t *q, mblk_t *mp)
-{
-	int rtn;
-	np_long prim;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(prim))
-		goto eproto;
-	switch ((prim = *((np_long *) mp->b_rptr))) {
-	case N_UNITDATA_IND:
-		rtn = n_unitdata_ind(q, mp);
-		break;
-	case N_UDERROR_IND:
-		rtn = n_uderror_ind(q, mp);
-		break;
-	case N_BIND_ACK:
-		rtn = n_bind_ack(q, mp);
-		break;
-	case N_OK_ACK:
-		rtn = n_ok_ack(q, mp);
-		break;
-	case N_ERROR_ACK:
-		rtn = n_error_ack(q, mp);
-		break;
-	default:
-		rtn = n_other_ind(q, mp);
-		break;
-	}
-	return (rtn);
-      eproto:
-	return (-EPROTO);
-}
-
-/**
- * udp_w_prim: - process primitive on write queue
+ * udp_w_prim - process primitive on write queue
  * @q: active queue in queue pair (write queue)
  * @mp: the message
  */
-STATIC int
+STATIC streamscall __hot_put int
 udp_w_prim(queue_t *q, mblk_t *mp)
 {
 	assert(q);
@@ -4793,63 +5065,22 @@ udp_w_prim(queue_t *q, mblk_t *mp)
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
-		return udp_w_flush(q, mp);
+		return ss7_w_flush(q, mp);
 	case M_PROTO:
 	case M_PCPROTO:
 		return udp_w_proto(q, mp);
+	case M_IOCTL:
+		return udp_w_ioctl(q, mp);
 	}
 	return (-EOPNOTSUPP);
 }
 
-STATIC int
-mux_w_proto(queue_t *q, mblk_t *mp)
-{
-	fixme(("Write this function."));
-	return (-EFAULT);
-}
-
 /**
- * mux_r_proto: - process an M_PROTO message on the lower read queue
- * @q: active queue in queue pair (read queue)
- * @mp: the M_PROTO, M_PCPROTO message
- *
- * M_PROTO, M_PCPROTO messages are placed on the lower read queue by an NPI IP Stream linked beneath
- * the UDP multiplexing driver.  These are NPI message that have not yet been associated with a
- * Stream.  This function performs a similar function to that of the udp_v4_rcv() function.
- */
-STATIC int
-mux_r_proto(queue_t *q, mblk_t *mp)
-{
-	int rtn;
-	np_ulong prim;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(prim))
-		goto eproto;
-	switch ((prim = *((np_ulong *) mp->b_rptr))) {
-	case N_UNITDATA_IND:
-		rtn = l_unitdata_ind(q, mp);
-		break;
-	case N_UDERROR_IND:
-		rtn = l_uderror_ind(q, mp);
-		break;
-	case N_BIND_ACK:
-	case N_OK_ACK:
-	case N_ERROR_ACK:
-	default:
-		rtn = l_other_ind(q, mp);
-		break;
-	}
-	return (rtn);
-      eproto:
-	return (-EPROTO);
-}
-
-/**
- * udp_r_prim: - process primitive on read queue
+ * udp_r_prim - process primitive on read queue
  * @q: active queue in queue pair (read queue)
  * @mp: the message
  */
-STATIC int
+STATIC streamscall __hot_get int
 udp_r_prim(queue_t *q, mblk_t *mp)
 {
 	assert(q);
@@ -4858,370 +5089,13 @@ udp_r_prim(queue_t *q, mblk_t *mp)
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
-		return udp_r_flush(q, mp);
+		return ss7_r_flush(q, mp);
 	case M_DATA:
 		return udp_r_data(q, mp);
 	case M_ERROR:
 		return udp_r_error(q, mp);
-	case M_PROTO:
-	case M_PCPROTO:
-		return udp_r_proto(q, mp);
-	}
-	return (-EOPNOTSUPP);
-}
-
-/**
- * mux_w_prim: - proccess primitive on lower mux write queue
- * @q: active queue in queue pair (write queue)
- * @mp: the message
- */
-STATIC int
-mux_w_prim(queue_t *q, mblk_t *mp)
-{
-	assert(q);
-	assert(mp);
-	assert(mp->b_datap);
-
-	switch (mp->b_datap->db_type) {
-	case M_FLUSH:
-		return udp_w_flush(q, mp);
-	case M_PROTO:
-	case M_PCPROTO:
-		return mux_w_proto(q, mp);
 	}
 	return (QR_PASSFLOW);
-}
-
-/**
- * mux_r_prim: - proccess primitive on lower mux read queue
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-mux_r_prim(queue_t *q, mblk_t *mp)
-{
-	assert(q);
-	assert(mp);
-	assert(mp->b_datap);
-
-	switch (mp->b_datap->db_type) {
-	case M_FLUSH:
-		return udp_r_flush(q, mp);
-	case M_PROTO:
-	case M_PCPROTO:
-		return mux_r_proto(q, mp);
-	}
-	return (-EOPNOTSUPP);
-}
-
-/*
- *  QUEUE PUT and SERVICE Routines
- */
-
-/**
- * udp_putq: - common put procedure
- * @q: active queue in queue pair
- * @mp: mesage to put
- * @proc: poceedure for processing message
- */
-STATIC int
-udp_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
-{
-	int rtn = 0, locked;
-
-	if (mp->b_datap->db_type < QPCTL && (q->q_first || q->q_flag & QSVCBUSY)) {
-		if (!putq(q, mp))
-			freemsg(mp);	/* FIXME */
-		return (0);
-	}
-	if ((locked = udp_trylockq(q)) || mp->b_datap->db_type == M_FLUSH) {
-		do {
-			/* Fast Path */
-			if ((rtn = (*proc) (q, mp)) == QR_DONE) {
-				freemsg(mp);
-				break;
-			}
-			switch (rtn) {
-			case QR_DONE:
-				freemsg(mp);
-			case QR_ABSORBED:
-				break;
-			case QR_STRIP:
-				if (mp->b_cont)
-					if (!putq(q, mp->b_cont))
-						freemsg(mp->b_cont);	/* FIXME */
-			case QR_TRIMMED:
-				freeb(mp);
-				break;
-			case QR_LOOP:
-				if (!q->q_next) {
-					qreply(q, mp);
-					break;
-				}
-			case QR_PASSALONG:
-				if (q->q_next) {
-					putnext(q, mp);
-					break;
-				}
-				rtn = -EOPNOTSUPP;
-			default:
-				freemsg(mp);
-				break;
-			case QR_DISABLE:
-				if (!putq(q, mp))
-					freemsg(mp);	/* FIXME */
-				rtn = 0;
-				break;
-			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
-					putnext(q, mp);
-					break;
-				}
-			case -ENOBUFS:
-			case -EBUSY:
-			case -EAGAIN:
-			case -ENOMEM:
-				if (!putq(q, mp))
-					freemsg(mp);	/* FIXME */
-				break;
-			}
-		}
-		while (0);
-		if (locked)
-			udp_unlockq(q);
-	} else {
-		if (!putq(q, mp))
-			freemsg(mp);	/* FIXME */
-	}
-	return (rtn);
-}
-
-/**
- * udp_putq: - common service procedure
- * @q: active queue in queue pair
- * @proc: poceedure for processing messages
- * @procwake: wakeup method invoked after processing
- */
-STATIC int
-udp_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_t *))
-{
-	int rtn = 0;
-
-	if (udp_trylockq(q)) {
-		mblk_t *mp;
-
-		while ((mp = getq(q))) {
-			/* Fast Path */
-			if ((rtn = proc(q, mp)) == QR_DONE) {
-				freemsg(mp);
-				continue;
-			}
-			switch (rtn) {
-			case QR_DONE:
-				freemsg(mp);
-			case QR_ABSORBED:
-				continue;
-			case QR_STRIP:
-				if (mp->b_cont)
-					if (!putbq(q, mp->b_cont))
-						freemsg(mp->b_cont);
-			case QR_TRIMMED:
-				freeb(mp);
-				continue;
-			case QR_LOOP:
-				if (!q->q_next) {
-					qreply(q, mp);
-					continue;
-				}
-			case QR_PASSALONG:
-				if (q->q_next) {
-					putnext(q, mp);
-					continue;
-				}
-				rtn = -EOPNOTSUPP;
-			default:
-				ptrace(("%s: ERROR: (q dropping) %d\n", DRV_NAME, rtn));
-				freemsg(mp);
-				continue;
-			case QR_DISABLE:
-				ptrace(("%s: ERROR: (q disabling)\n", DRV_NAME));
-				noenable(q);
-				if (!putbq(q, mp))
-					freemsg(mp);	/* FIXME */
-				rtn = 0;
-				break;
-			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
-					putnext(q, mp);
-					continue;
-				}
-			case -ENOBUFS:	/* caller must schedule bufcall */
-			case -EBUSY:	/* caller must have failed canput */
-			case -EAGAIN:	/* caller must re-enable queue */
-			case -ENOMEM:	/* caller must re-enable queue */
-				if (mp->b_datap->db_type < QPCTL) {
-					ptrace(("%s: ERROR: (q stalled) %d\n", DRV_NAME, rtn));
-					if (!putbq(q, mp))
-						freemsg(mp);	/* FIXME */
-					break;
-				}
-				/* Be careful not to put a priority message back on the queue.  */
-				switch (mp->b_datap->db_type) {
-				case M_PCPROTO:
-					mp->b_datap->db_type = M_PROTO;
-					break;
-				case M_PCRSE:
-					mp->b_datap->db_type = M_RSE;
-					break;
-				case M_READ:
-					mp->b_datap->db_type = M_CTL;
-					break;
-				default:
-					ptrace(("%s: ERROR: (q dropping) %d\n", DRV_NAME, rtn));
-					freemsg(mp);
-					continue;
-				}
-				mp->b_band = 255;
-				if (!putq(q, mp))
-					freemsg(mp);	/* FIXME */
-				break;
-			}
-			break;
-		}
-		if (procwake != NULL)
-			procwake(q);
-		udp_unlockq(q);
-	}
-	return (rtn);
-}
-
-/**
- * udp_rwake: - an upper read queue has awoken
- * @q: active queue in the queue pair (read queue)
- *
- * The upper read queue service procudure is invoked only by back enabling (because we do not ever
- * place any message on the upper read queue but always put them to the next read queue).  When
- * invoked, we need to manually enable any lower multiplex (NPI IP) read queue.  This permits flow
- * control to work across the multiplexing driver.
- */
-STATIC void
-udp_rwake(queue_t *q)
-{
-	read_lock_bh(&udp_lock);
-	if (npi_bottom != NULL)
-		/* There is an NPI IP Stream linked under the driver. */
-		qenable(RD(npi_bottom));
-	read_unlock_bh(&udp_lock);
-}
-
-/**
- * mux_wwake: - the lower write queue has awoken
- * @q: active queue in queue pair (write queue)
- *
- * The lower write service procedure is used merely for backenabling across the multiplexing driver.
- * We never put messages to the lower write queue, but put them to the next queue below the lower
- * write queue.  When a bcanput() fails on the next queue to thelower write queue, a back enable
- * will invoke the lower write queue service procedure which can then be used to explicitly enable
- * the upper write queue(s) feeding the lower write queue.  This permits flow control to work across
- * the multiplexing driver.
- */
-STATIC void
-mux_wwake(queue_t *q)
-{
-	struct udp *top;
-
-	read_lock_bh(&udp_lock);
-	for (top = udp_opens; top; top = top->next)
-		qenable(top->wq);
-	read_unlock_bh(&udp_lock);
-}
-
-/**
- * udp_rput: - read side put procedure
- * @q: queue to put message to
- * @mp: message to put
- */
-STATIC streamscall int
-udp_rput(queue_t *q, mblk_t *mp)
-{
-	return udp_putq(q, mp, &udp_r_prim);
-}
-
-/**
- * udp_rsrv: - read side service procedure
- * @q: queue to service
- */
-STATIC streamscall int
-udp_rsrv(queue_t *q)
-{
-	return udp_srvq(q, &udp_r_prim, &udp_rwake);
-}
-
-/**
- * udp_wput: - write side put procedure
- * @q: queue to put message to
- * @mp: message to put
- */
-STATIC streamscall int
-udp_wput(queue_t *q, mblk_t *mp)
-{
-	return udp_putq(q, mp, &udp_w_prim);
-}
-
-/**
- * udp_wsrv: - write side service procedure
- * @q: queue to service
- */
-STATIC streamscall int
-udp_wsrv(queue_t *q)
-{
-	return udp_srvq(q, &udp_w_prim, NULL);
-}
-
-/**
- * mux_rput: - read side put procedure
- * @q: queue to put message to
- * @mp: message to put
- */
-STATIC streamscall int
-mux_rput(queue_t *q, mblk_t *mp)
-{
-	return udp_putq(q, mp, &mux_r_prim);
-}
-
-/**
- * mux_rsrv: - read side service procedure
- * @q: queue to service
- *
- * If the lower read put procedure encounters flow control on the queue beyond the accepting upper
- * read queue, it places the message back on its qeue and waits for the upper read queue service
- * procedure to enable it when congestion is cleared, or when a connection is formed.
- */
-STATIC streamscall int
-mux_rsrv(queue_t *q)
-{
-	return udp_srvq(q, &mux_r_prim, NULL);
-}
-
-/**
- * mux_wput: - write side put procedure
- * @q: queue to put message to
- * @mp: message to put
- */
-STATIC streamscall int
-mux_wput(queue_t *q, mblk_t *mp)
-{
-	return udp_putq(q, mp, &mux_w_prim);
-}
-
-/**
- * mux_wsrv: - write side service procedure
- * @q: queue to service
- */
-STATIC streamscall int
-mux_wsrv(queue_t *q)
-{
-	return udp_srvq(q, &mux_w_prim, &mux_wwake);
 }
 
 /*
@@ -5233,55 +5107,8 @@ mux_wsrv(queue_t *q)
  */
 
 #ifdef LINUX
-#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
-STATIC struct inet_protocol *udp_next_proto = NULL;
-#endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
-STATIC struct net_protocol *udp_next_proto = NULL;
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 /**
- * udp_next_pkt_handler: - pass socket buffer to next packet handler
- * @skbp: pointer to the socket buffer to pass
- *
- * Return Value: Returns true when the socket buffer has been passed to the next packet handler and
- * the caller is no longer responsible for the buffer; false, when the socket buffer has not been
- * passed, and the caller is still responsible for the buffer.
- */
-STATIC int
-udp_next_pkt_handler(struct sk_buff **skbp)
-{
-	if (udp_next_proto != NULL) {
-		struct sk_buff *skb;
-
-		skb = *skbp;
-		*skbp = NULL;
-		return (*udp_next_proto->handler) (skb);
-	}
-	return (0);
-}
-
-/**
- * udp_next_err_handler: - pass socket buffer to next error handler
- * @skbp: pointer to the socket buffer to pass
- *
- * Return Value: Returns true when the socket buffer has been passed to the next error handler and
- * the caller is no longer responsible for the buffer; false, when the socket buffer has not been
- * passed, and the caller is still responsible for the buffer.
- */
-STATIC void
-udp_next_err_handler(struct sk_buff **skbp, u32 info)
-{
-	if (udp_next_proto != NULL) {
-		struct sk_buff *skb = *skbp;
-
-		skb = *skbp;
-		*skbp = NULL;
-		(*udp_next_proto->err_handler) (skb, info);
-	}
-}
-
-/**
- * udp_free: - message block free function for mblks esballoc'ed from sk_buffs
+ * udp_free - message block free function for mblks esballoc'ed from sk_buffs
  * @data: client data (sk_buff pointer in this case)
  */
 STATIC void streamscall
@@ -5294,12 +5121,11 @@ udp_free(char *data)
 }
 
 /**
- * udp_v4_rcv: - receive IPv4 UDP protocol packets
+ * udp_v4_rcv - receive IPv4 UDP protocol packets
  */
-STATIC int
+STATIC __hot_in int
 udp_v4_rcv(struct sk_buff *skb)
 {
-	mblk_t *mp = NULL;
 	ushort ulen;
 	struct udp *udp;
 	struct iphdr *iph;
@@ -5308,7 +5134,7 @@ udp_v4_rcv(struct sk_buff *skb)
 	frtn_t fr = { &udp_free, (char *) skb };
 	int rtn;
 
-//	IP_INC_STATS_BH(IpInDelivers);	/* should wait... */
+//      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 
 	if (!pskb_may_pull(skb, sizeof(struct udphdr)))
 		goto too_small;
@@ -5319,7 +5145,7 @@ udp_v4_rcv(struct sk_buff *skb)
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
 		/* need to do something about broadcast and multicast */ ;
 
-//	UDP_INC_STATS_BH(UdpInDatagrams);
+//      UDP_INC_STATS_BH(UdpInDatagrams);
 	/* pull up the udp header */
 	uh = skb->h.uh;
 	ulen = ntohs(uh->len);
@@ -5333,6 +5159,7 @@ udp_v4_rcv(struct sk_buff *skb)
 	read_lock(&udp_lock);
 	if (!(udp = udp_lookup(uh->dest, uh->source, iph->daddr, iph->saddr)))
 		goto no_stream;
+	udp_v4_steal(skb);	/* its ours */
 	/* checksum initialization */
 	if (uh->check == 0)
 		skb->ip_summed = CHECKSUM_UNNECESSARY;
@@ -5345,76 +5172,78 @@ udp_v4_rcv(struct sk_buff *skb)
 	   netfilter hooks linearize anyway. */
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
 		goto linear_fail;
-	/* now allocate an mblk */
-	if (!(mp = esballoc(skb->nh.raw, skb->len + (skb->data - skb->nh.raw), BPRI_MED, &fr)))
-		goto no_buffers;
-	mp->b_datap->db_type = M_DATA;
-	mp->b_wptr = mp->b_rptr + skb->len + (skb->data - skb->nh.raw);
-	/* trim the ip header */
-	mp->b_rptr += skb->h.raw - skb->nh.raw;
-	uh2 = (typeof(uh2)) mp->b_rptr;
-	if (uh->check != uh2->check)
-		goto sanity;
-	mp->b_rptr += sizeof(struct udphdr);
-	skb->dev = NULL;
-	if (!udp->rq || !canput(udp->rq) || !putq(udp->rq, mp))
-		goto flow_controlled;
-//	UDP_INC_STATS_BH(UdpInDatagrams);
-	udp_put(udp);
-	read_unlock(&udp_lock);
-	return (0);
+	{
+		mblk_t *mp;
+		size_t mlen = skb->len + (skb->data - skb->nh.raw);
+
+		/* now allocate an mblk */
+		if (!(mp = esballoc(skb->nh.raw, mlen, BPRI_MED, &fr)))
+			goto no_buffers;
+		mp->b_wptr = mp->b_rptr + mlen;
+		/* trim the ip header */
+		mp->b_rptr = skb->h.raw;
+		uh2 = (typeof(uh2)) mp->b_rptr;
+		if (uh->check != uh2->check)
+			goto sanity;
+		mp->b_rptr += sizeof(struct udphdr);
+		skb->dev = NULL;
+
+		if (!udp->oq || !canput(udp->oq))
+			goto flow_controlled;
+		put(udp->oq, mp);
+//              UDP_INC_STATS_BH(UdpInDatagrams);
+		udp_put(udp);
+		read_unlock(&udp_lock);
+		return (0);
+	      sanity:
+	      flow_controlled:
+		udp_put(udp);
+		read_unlock(&udp_lock);
+		freeb(mp);	/* will take sk_buff with it */
+		return (0);
+	      no_buffers:
+		udp_put(udp);
+		read_unlock(&udp_lock);
+		goto discard_it;
+	}
       no_stream:
 	read_unlock(&udp_lock);
 	ptrace(("ERROR: No stream\n"));
-	/* Note, if there is nobody to pass it too, we have to complete the checksum check before
-	   dropping it to handle stats correctly. */
+	/* Note, in case there is nobody to pass it too, we have to complete the checksum check
+	   before dropping it to handle stats correctly. */
 	if (skb->ip_summed != CHECKSUM_UNNECESSARY
 	    && (unsigned short) csum_fold(skb_checksum(skb, 0, skb->len, skb->csum)))
 		goto bad_checksum;
-//	UDP_INC_STATS_BH(UdpNoPorts);	/* should wait... */
+//      UDP_INC_STATS_BH(UdpNoPorts);   /* should wait... */
 	goto pass_it;
-      pass_it:
-	rtn = udp_next_pkt_handler(&skb);
-	if (skb == NULL)
-		return (rtn);
-	goto discard_it;
       bad_checksum:
-//	UDP_INC_STATS_BH(UdpInErrors);
-//	IP_INC_STATS_BH(IpInDiscards);
+//      UDP_INC_STATS_BH(UdpInErrors);
+//      IP_INC_STATS_BH(IpInDiscards);
 	/* decrement IpInDelivers ??? */
 	udp_put(udp);
-	goto free_it;
-      free_it:
-	freemsg(mp);
-	return (0);
-      too_small:
 	goto discard_it;
-      linear_fail:
-	udp_put(udp);
-	read_unlock(&udp_lock);
-	goto discard_it;
-      bad_pkt_type:
-	goto discard_it;
-      discard_it:
-	kfree_skb(skb);
-	return (0);
-      flow_controlled:
-	udp_put(udp);
-	read_unlock(&udp_lock);
-	goto free_it;
-      sanity:
-	udp_put(udp);
-	read_unlock(&udp_lock);
-	goto free_it;
       no_buffers:
 	ptrace(("ERROR: Could not allocate mblk\n"));
 	udp_put(udp);
 	read_unlock(&udp_lock);
 	goto discard_it;
+      linear_fail:
+	udp_put(udp);
+	read_unlock(&udp_lock);
+	goto discard_it;
+      discard_it:
+	kfree_skb(skb);
+	return (0);
+      bad_pkt_type:
+	goto pass_it;
+      too_small:
+	goto pass_it;
+      pass_it:
+	return udp_v4_rcv_next(skb);
 }
 
 /**
- * udp_v4_err: - receive IPv4 UDP protocol ICMP packets
+ * udp_v4_err - receive IPv4 UDP protocol ICMP packets
  * @skb: socket buffer containing message with headers pulled
  * @u32: icmp error (unused)
  *
@@ -5426,20 +5255,22 @@ udp_v4_rcv(struct sk_buff *skb)
  * udp->qlock protects the state of private structure.  udp->refs protects the private structure
  * from being deallocated before locking.
  */
-STATIC void
+STATIC __hot_in void
 udp_v4_err(struct sk_buff *skb, u32 info)
 {
 	struct udp *udp;
 	struct udphdr *uh;
-	struct iphdr *iph = (struct iphdr *) skb->data;
+	struct iphdr *iph;
 	size_t ihl;
 
+	iph = (struct iphdr *) skb->data;
 #define ICMP_MIN_LENGTH 8
 	if (skb->len < (ihl = iph->ihl << 2) + ICMP_MIN_LENGTH)
 		goto drop;
 	uh = (struct udphdr *) (skb->data + ihl);
 	read_lock(&udp_lock);
-	udp = udp_lookup_icmp(uh->source, uh->dest, iph->saddr, iph->daddr);
+	/* reverse port numbers and addresses in lookup */
+	udp = udp_lookup(uh->source, uh->dest, iph->saddr, iph->daddr);
 	if (udp == NULL)
 		goto no_stream;
 	spin_lock(&udp->qlock);
@@ -5447,20 +5278,22 @@ udp_v4_err(struct sk_buff *skb, u32 info)
 		goto closed;
 	{
 		mblk_t *mp;
-		size_t mlen = sizeof(uint32_t) + sizeof(struct icmphdr *);
+		size_t mlen = sizeof(struct icmphdr) + skb->len;
 
 		/* Create a queue a specialized M_ERROR message to the Stream's read queue for
 		   further processing.  The Stream will convert this message into a T_UDERR_IND
-		   message and pass it along. */
-		if (!udp->rq || !canput(udp->rq))
+		   or T_DISCON_IND message and pass it along. */
+		if (!udp->oq || !canput(udp->oq))
 			goto flow_controlled;
 		if (!(mp = allocb(mlen, BPRI_MED)))
 			goto no_buffers;
 		mp->b_datap->db_type = M_ERROR;
-		*(uint32_t *) mp->b_wptr++ = iph->daddr;
-		*(struct icmphdr *) mp->b_wptr++ = *skb->h.icmph;
-		if (!putq(udp->rq, mp))
-			freemsg(mp);
+		bcopy(skb->h.icmph, mp->b_wptr, sizeof(struct icmphdr));
+		mp->b_wptr += sizeof(struct icmphdr);
+		bcopy(skb->data, mp->b_wptr, skb->len);
+		mp->b_rptr = mp->b_wptr + ihl;
+		mp->b_wptr += skb->len;
+		put(udp->oq, mp);
 		goto unlock_discard_put;
 	}
 	goto discard_and_put;
@@ -5502,15 +5335,89 @@ udp_v4_err(struct sk_buff *skb, u32 info)
  *  Private structure allocation and deallocation.
  */
 STATIC struct udp *
-udp_alloc_priv(queue_t *q, struct udp **udpp, major_t major, minor_t minor, cred_t *crp)
+udp_alloc_priv(queue_t *q, struct udp **udpp, dev_t *devp, cred_t *crp)
 {
-	fixme(("Write this function."));
-	return (NULL);
+	struct udp *udp;
+
+	if ((udp = udp_alloc())) {
+		major_t cmajor = getmajor(*devp);
+		minor_t cminor = getminor(*devp);
+
+		/* udp generic members */
+		udp->u.dev.cmajor = cmajor;
+		udp->u.dev.cminor = cminor;
+		udp->cred = *crp;
+		(udp->oq = RD(q))->q_ptr = udp_get(udp);
+		(udp->iq = WR(q))->q_ptr = udp_get(udp);
+		udp->i_prim = &udp_w_prim;
+		udp->o_prim = &udp_r_prim;
+		udp->i_wakeup = NULL;
+		udp->o_wakeup = NULL;
+		udp->type = IPPROTO_UDP;
+		spinlock_init(&udp->qlock);
+		udp->i_version = T_CURRENT_VERSION;
+		udp->i_style = 2;
+		udp->i_state = udp->i_oldstate = udp->udp_info.CURRENT_state = TS_UNBND;
+		/* initialized information */
+		udp->info.PRIM_type = T_INFO_ACK;
+		udp->info.TSDU_size = 65535;
+		udp->info.ETSDU_size = T_INVALID;
+		udp->info.CDATA_size = 65535;
+		udp->info.DDATA_size = 65535;
+		udp->info.ADDR_size = sizeof(struct sockaddr_in);
+		udp->info.OPT_size = 65535;
+		udp->info.TIDU_size = 4096;
+		udp->info.SERV_type = T_CLTS;	/* by default */
+		udp->info.CURRENT_state = TS_UNBND;
+		udp->info.PROVIDER_flag = T_XPG4_1 & ~T_SNDZERO;
+		bufq_init(&udp->conq);
+		/* link into master list */
+		if ((udp->next = *udpp))
+			udp->next->prev = &udp->next;
+		udp->prev = udpp;
+		*udpp = udp_get(udp);
+	} else
+		strlog(DRV_ID, getminor(*devp), LOG_WARNING, SL_WARN | SL_CONSOLE,
+		       "could not allocate driver private structure");
+	return (udp);
 }
 STATIC void
 udp_free_priv(queue_t *q)
 {
-	fixme(("Write this function."));
+	struct udp *udp = UDP_PRIV(q);
+
+	strlog(DRV_ID, udp->u.dev.cminor, LOG_DEBUG, SL_TRACE,
+	       "unlinking private structure: reference count = %d", atomic_read(&udp->refcnt));
+	/* make sure the stream is disconnected */
+	if (udp->hashb != NULL) {
+		udp_disconnect(udp);
+		bufq_purge(&udp->conq);
+		tpi_set_state(udp, TS_IDLE);
+	}
+	/* make sure the stream is unbound */
+	if (udp->bindb != NULL) {
+		udp_unbind(udp);
+		tpi_set_state(udp, TS_UNBND);
+	}
+	bufq_purge(&udp->conq);
+	ss7_unbufcall((str_t *) udp);
+	strlog(DRV_ID, udp->u.dev.cminor, LOG_DEBUG, SL_TRACE,
+	       "removed bufcalls: reference count = %d", atomic_read(&udp->refcnt));
+	/* remove from master list */
+	write_lock_bh(&udp_lock);
+	if ((*udp->prev = udp->next))
+		udp->next->prev = udp->prev;
+	udp->next = NULL;
+	udp->prev = &udp->next;
+	write_unlock_bh(&udp_lock);
+	strlog(DRV_ID, udp->u.dev.cminor, LOG_DEBUG, SL_TRACE,
+	       "unlinked: reference count = %d", atomic_read(&udp->refcnt));
+	udp_release(&udp->oq->q_ptr);
+	udp->oq = NULL;
+	udp_release(&udp->iq->q_ptr);
+	udp->iq = NULL;
+	assure(atomic_read(&udp->refcnt) == 1);
+	udp_release(&udp);
 	return;
 }
 
@@ -5520,7 +5427,7 @@ udp_free_priv(queue_t *q)
 STATIC int udp_majors[UDP_CMAJORS] = { UDP_CMAJOR_0, };
 
 /**
- * udp_open: - open a Stream
+ * udp_qopen - open a Stream
  * @q: read queue in queue pair
  * @devp: pointer to the device number opened
  * @flag: open flags
@@ -5528,7 +5435,7 @@ STATIC int udp_majors[UDP_CMAJORS] = { UDP_CMAJOR_0, };
  * @crp: credentials pointer
  */
 STATIC streamscall int
-udp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+udp_qopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int mindex = 0;
 	int cmajor = getmajor(*devp);
@@ -5563,12 +5470,12 @@ udp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		cminor = 1;
 	write_lock_bh(&udp_lock);
 	for (; *udpp; udpp = &(*udpp)->next) {
-		if (cmajor != (*udpp)->cmajor)
+		if (cmajor != (*udpp)->u.dev.cmajor)
 			break;
-		if (cmajor == (*udpp)->cmajor) {
-			if (cminor < (*udpp)->cminor)
+		if (cmajor == (*udpp)->u.dev.cmajor) {
+			if (cminor < (*udpp)->u.dev.cminor)
 				break;
-			if (cminor == (*udpp)->cminor) {
+			if (cminor == (*udpp)->u.dev.cminor) {
 				if (++cminor >= UDP_UNITS) {
 					if (+mindex >= UDP_CMAJORS
 					    || !(cmajor = udp_majors[mindex]))
@@ -5597,16 +5504,16 @@ udp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 }
 
 /**
- * udp_close: - close a Stream
+ * udp_qclose - close a Stream
  * @q: read queue in queue pair
  * @flag: open flags
  * @crp: credentials pointer
  */
 STATIC streamscall int
-udp_close(queue_t *q, int flag, cred_t *crp)
+udp_qclose(queue_t *q, int flag, cred_t *crp)
 {
-	printd(("%s: closing character device %d:%d\n", DRV_NAME, (int) UDP_PRIV(q)->cmajor,
-		(int) UDP_PRIV(q)->cminor));
+	printd(("%s: closing character device %d:%d\n", DRV_NAME, (int) UDP_PRIV(q)->u.dev.cmajor,
+		(int) UDP_PRIV(q)->u.dev.cminor));
 #ifdef LIS
 	/* protect against LiS bugs */
 	if (q->q_ptr == NULL) {
@@ -5621,8 +5528,9 @@ udp_close(queue_t *q, int flag, cred_t *crp)
 #endif				/* LIS */
 	goto skip_pop;
       skip_pop:
+	/* make sure procedures are off */
 	qprocsoff(q);
-	udp_free_priv(q);
+	udp_free_priv(q);	/* free and unlink the structure */
 	goto quit;
       quit:
 	return (0);
@@ -5656,16 +5564,20 @@ udp_init_caches(void)
 	return;
 }
 
-STATIC struct udp_bhash_bucket *udp_bhash;
-STATIC size_t udp_bhash_size = 0;
-STATIC size_t udp_bhash_order = 0;
 STATIC void
 udp_term_hashes(void)
 {
 	if (udp_bhash) {
 		free_pages((unsigned long) udp_bhash, udp_bhash_order);
 		udp_bhash = NULL;
+		udp_bhash_size = 0;
 		udp_bhash_order = 0;
+	}
+	if (udp_chash) {
+		free_pages((unsigned long) udp_chash, udp_chash_order);
+		udp_chash = NULL;
+		udp_chash_size = 0;
+		udp_chash_order = 0;
 	}
 }
 STATIC void
@@ -5684,10 +5596,16 @@ udp_init_hashes(void)
 	} while (udp_bhash == NULL && --order >= 0);
 	if (!udp_bhash)
 		cmn_err(CE_PANIC, "%s: Failed to allocate UDP bind hash table\n", __FUNCTION__);
+	udp_bhash_size = udp_chash_size = udp_bhash_size >> 1;
+	udp_bhash_order = udp_chash_order = udp_bhash_order - 1;
 	bzero(udp_bhash, udp_bhash_size * sizeof(struct udp_bhash_bucket));
+	bzero(udp_chash, udp_chash_size * sizeof(struct udp_chash_bucket));
 	for (i = 0; i < udp_bhash_size; i++)
 		rwlock_init(&udp_bhash[i].lock);
+	for (i = 0; i < udp_chash_size; i++)
+		rwlock_init(&udp_chash[i].lock);
 	printd(("%s: INFO: bind hash table configured size = %d\n", DRV_NAME, udp_bhash_size));
+	printd(("%s: INFO: conn hash table configured size = %d\n", DRV_NAME, udp_chash_size));
 }
 
 /*
@@ -5697,95 +5615,238 @@ udp_init_hashes(void)
 STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
 
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
-struct inet_protocol udp_net_protocol = {
-	.handler = &udp_v4_rcv,
-	.err_handler = &udp_v4_err,
+struct inet_protocol udp_inet_protocol = {
 	.protocol = IPPROTO_UDP,
 	.name = "streams-udp",
-	.next = NULL,
-	.copy = 0,
-};
-
-/**
- * udp_term_nproto: - terminate UDP network protocol override
- *
- * This is largely a 2.4 version of the network protocol override function.
- */
-STATIC void
-udp_term_nproto(void)
-{
-	unsigned char hash = IPPROTO_UDP & (MAX_INET_PROTOS - 1);
-	struct inet_protocol **p = (struct inet_protocol **)&inet_protosp[hash];
-
-	br_write_lock_bh(BR_NETPROTO_LOCK);
-	while ((*p) != NULL && (*p) != &udp_net_protocol)
-		p = &(*p)->next;
-	if ((*p) == &udp_net_protocol)
-		(*p) = udp_next_proto;
-	br_write_unlock_bh(BR_NETPROTO_LOCK);
-}
-
-/**
- * udp_init_nproto: - initialize UDP network protocol override
- *
- * This is largely a 2.4 version of the network protocol override function.
- */
-STATIC void
-udp_init_nproto(void)
-{
-	unsigned char hash = IPPROTO_UDP & (MAX_INET_PROTOS - 1);
-	struct inet_protocol **p = (struct inet_protocol **)&inet_protosp[hash];
-
-	br_write_lock_bh(BR_NETPROTO_LOCK);
-	udp_next_proto = (*p);
-	(*p) = &udp_net_protocol;
-	br_write_unlock_bh(BR_NETPROTO_LOCK);
-}
-#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
-
-struct net_protocol udp_net_protocol = {
-#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
-	/* 2.6.15 is different */
-	.proto = IPPROTO_UDP,
-#endif
 	.handler = &udp_v4_rcv,
 	.err_handler = &udp_v4_err,
-	.no_policy = 1,
+	.copy = 0,
+	.next = NULL,
 };
+
+struct inet_protocol *udp_proto = NULL;
+
+/**
+ * udp_v4_steal = steal a socket buffer
+ * @skb: socket buffer to steal
+ *
+ * In the pakcet handler, if the packet is for us, steal the packet by overwritting the protocol and
+ * returning.  This is only done for normal packets and not error packets (that do not need to be
+ * stolen).  In the 2.4 handler loop, iph->protocol is examined on each iteration, permitting us to
+ * stead the packet by overwritting the protocol number.
+ */
+STATIC INLINE fastcall __hot_in void
+udp_v4_steal(struct sk_buff *skb)
+{
+	skb->nh.iph->protocol = 255;
+}
+
+/**
+ * udp_v4_rcv_next - pass a socket buffer to the next handler
+ * @skb: socket buffer to pass
+ *
+ * In the packet handler, if the packet is for us, pass it to the next handler by simply freeing the
+ * cloned copy and returning.
+ */
+STATIC INLINE fastcall __hot_in int
+udp_v4_rcv_next(struct sk_buff *skb)
+{
+	kfree_skb(skb);
+	return (0);
+}
+
+/**
+ * udp_v4_err_next - pass a socket buffer to the next error handler
+ * @skb: socket buffer to pass
+ *
+ * In the error packet handler, if the packet is not for us, pass it to the next handler by simply
+ * returning.  Error packets are not cloned, so don't free it.
+ */
+STATIC INLINE fastcall __hot_in int
+upd_v4_err_next(struct sk_buff *skb, __u32 info)
+{
+	return (0);
+}
+
+/**
+ * udp_init_nproto - initialize UDP network protocol override
+ *
+ * This is largely a 2.4 version of the network protocol override function.  Under 2.4, simply add
+ * the protocol to the network using an inet_protocol structure and the inet_add_protocol()
+ * function.
+ */
+STATIC int
+udp_init_nproto(void)
+{
+	struct inet_protocol *ip;
+
+	if ((ip = udp_proto) != NULL)
+		return (-EALREADY);
+	ip = udp_proto = &udp_inet_protocol;
+	inet_add_protocol(ip, IPPROTO_UDP);
+	return (0);
+}
+
+/**
+ * udp_term_nproto - terminate UDP network protocol override
+ *
+ * This is largely a 2.4 version of the network protocol override function.  Under 2.4 simply remove
+ * the protocol from the network using the inet_protocol structure and the inet_del_protocol()
+ * function.
+ */
+STATIC int
+udp_term_nproto(void)
+{
+	struct inet_protocol *ip;
+
+	if ((ip = udp_proto) == NULL)
+		return (-EALREADY);	/* already terminated */
+	inet_del_protocol(ip, IPPROTO_UDP);
+	udp_proto = NULL;
+	return (0);
+}
+
+#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+
+/*
+ *  Under 2.6, attempt to do the equivalent of inet_add_protocol().  If it fails (as would be
+ *  expected as UDP is permanent protocol), check whether a module owns the net_protocol structure
+ *  and, if so, try to increment the module count (to keep it from unloading).  Take a reference to
+ *  the old net_protocol structure.  Then replace the net_protocol pointer with or own in the
+ *  hashes.  If it succeeds (which we would not expect) it reduces to the same as
+ *  inet_add_protocol().  In the packet handler, if the packet is not for us, simply pass it to the
+ *  next handler.  If the packet is for us, clone it, free the original and work with the clone.
+ */
+
+struct inet_protocol = {
+	struct net_protocol proto;
+	struct net_protocol *next;
+	struct module *kmod;
+};
+
+struct inet_protocol udp_inet_protocol = {
+	.proto = {
+#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
+		  .proto = IPPROTO_UDP,
+#endif				/* HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO */
+		  .handler = &udp_v4_rcv,
+		  .err_handler = &udp_v4_err,
+		  .no_policy = 1,
+		  },
+	.next = NULL,
+	.kmod = NULL,
+};
+
+struct inet_protocol *udp_proto = NULL;
+
+/**
+ * udp_v4_steal - steal a socket buffer
+ * @skb: socket buffer to steal
+ *
+ * In the packet handler, if the packet is for us, steal the packet by simply not passing it to the
+ * next handler.
+ */
+STATIC INLINE fastcall __hot_in void
+udp_v4_steal(struct sk_buff *skb)
+{
+}
+
+/**
+ * upd_v4_rcv_next - pass a socket buffer to the next handler
+ * @skb - socket buffer to pass
+ *
+ * If the packet is not for us, pass it to the next handler.  If there is no next handler, free the
+ * packet and return.  Note that we do not have to lock the hash because we own it and are also
+ * holding a reference to any module owning the next handler.
+ */
+STATIC INLINE fastcall __hot_in int
+udp_v4_rcv_next(struct sk_buff *skb)
+{
+	struct inet_protocol *ip;
+
+	if ((ip = udp_proto) != NULL && ip->next != NULL)
+		return ip->next->proto.handler(skb);
+	kfree_skb(skb);
+	return (0);
+}
+
+/**
+ * udp_v4_err_next - pass a socket buffer to the next error handler
+ * @skb - socket buffer to pass
+ *
+ * Error packets are not cloned, so pass it to the next handler.  If there is not next handler,
+ * simply return.
+ */
+STATIC INLINE fastcall __hot_in int
+udp_v4_err_next(struct sk_buff *skb, __u32 info)
+{
+	struct inet_protocol *ip;
+
+	if ((ip = udp_proto) != NULL && ip->next != NULL)
+		ip->next->proto.err_handler(skb, info);
+	return (0);
+}
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 
 /**
- * udp_term_nproto: - terminate UDP network protocol override
+ * udp_init_nproto - initialize UDP network protocol override
  *
- * This is largely a 2.6 version of the network protocol override function.
+ * This is largely a 2.6 version of the network protocol override function.  The module stuff here
+ * is just for ourselves (other kernel modules pulling the same trick) as Linux UDP is kernel
+ * resident.
  */
-STATIC void
-udp_term_nproto(void)
+STATIC int
+udp_init_nproto(void)
 {
+	struct inet_protocol *ip;
 	int hash = IPPROTO_UDP & (MAX_INET_PROTOS - 1);
 
+	if ((ip = udp_proto) != NULL)
+		return (-EALREADY);	/* already initialized */
+	ip = udp_proto = &udp_inet_protocol;
+	/* reduces to inet_add_protocol() if no protocol registered */
 	spin_lock_bh(inet_proto_lockp);
-	if (inet_protosp[hash] == &udp_net_protocol)
-		inet_protosp[hash] = udp_next_proto;
+	if ((ip->next = inet_protosp[hash]) != NULL) {
+		if ((ip->kmod = module_text_address(ip->next))
+		    && ip->kmod != THIS_MODULE) {
+			if (!try_to_get_module(ip->kmod)) {
+				spin_unlock_bh(inet_proto_lockp);
+				return (-EAGAIN);
+			}
+		}
+	}
+	inet_protosp[hash] = &ip->proto;
 	spin_unlock_bh(inet_proto_lockp);
 	synchronize_net();
+	return (0);
 }
 
 /**
- * udp_init_nproto: - initialize UDP network protocol override
+ * udp_term_nproto - terminate UDP network protocol override
  *
- * This is largely a 2.6 version of the network protocol override function.
+ * This is largely a 2.6 version of the network protocol override function.  The module stuff here
+ * is just for ourselves (other kernel modules pulling the same trick) as Linux UDP is kernel
+ * resident.
  */
-STATIC void
-udp_init_nproto(void)
+STATIC int
+udp_term_nproto(void)
 {
+	struct inet_protocol *ip;
 	int hash = IPPROTO_UDP & (MAX_INET_PROTOS - 1);
 
+	if ((ip = udp_proto) == NULL)
+		return (-EALREADY);	/* already terminated */
+	/* reduces to inet_del_protocol() if no protocol was registered */
 	spin_lock_bh(inet_proto_lockp);
-	udp_next_proto = inet_protosp[hash];
-	inet_protosp[hash] = &udp_net_protocol;
+	inet_protos[hash] = ip->next;
 	spin_unlock_bh(inet_proto_lockp);
+	synchronize_net();
+	udp_proto = NULL;
+	if (ip->next != NULL && ip->kmod != NULL && ip->kmod != THIS_MODULE)
+		module_put(ip->kmod);
+	return (0);
 }
+
 #else
 #error HAVE_KTYPE_STRUCT_INET_PROTOCOL or HAVE_KTYPE_STRUCT_NET_PROTOCOL must be defined.
 #endif
@@ -5896,15 +5957,14 @@ udpinit(void)
 {
 	int err, mindex = 0;
 
-	(void)udp_unbufcall;
-	(void)udp_esballoc;
-	(void)udp_dupmsg;
-	(void)udp_dupb;
-
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	udp_init_hashes();
 	udp_init_caches();
-	udp_init_nproto();
+	if ((err = udp_init_nproto())) {
+		udp_term_caches();
+		udp_term_hashes();
+		return (err);
+	}
 	for (mindex = 0; mindex < CMAJORS; mindex++) {
 		if ((err = udp_register_strdev(udp_majors[mindex])) < 0) {
 			if (mindex) {

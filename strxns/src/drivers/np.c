@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/04/18 22:19:37 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/22 01:08:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/18 22:19:37 $ by $Author: brian $
+ Last Modified $Date: 2006/04/22 01:08:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 0.9.2.4  2006/04/22 01:08:03  brian
+ - working up NP driver
+
  Revision 0.9.2.3  2006/04/18 22:19:37  brian
  - working up np driver
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/04/18 22:19:37 $"
+#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/22 01:08:03 $"
 
 static char const ident[] =
-    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/04/18 22:19:37 $";
+    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/22 01:08:03 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -103,7 +106,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2006/04/18 22:19:37 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2006/04/22 01:08:03 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -400,7 +403,7 @@ np_release(struct np **npp)
 {
 	np_put(xchg(npp, NULL));
 }
-STATIC INLINE void
+STATIC INLINE struct np *
 np_alloc(void)
 {
 	struct np *np;
@@ -2364,15 +2367,14 @@ struct inet_protocol *np_ip_protos[256];
  * stolen).  In the 2.4 handler loop, ihp->protocol is examined on each iteration, permitting us to
  * steal the packet by overwritting the protocol number.
  */
-STATIC int
+STATIC void
 np_ip_v4_steal(struct sk_buff *skb)
 {
 	skb->nh.iph->protocol = 255;
-	return (0);
 }
 /**
  * np_ip_v4_rcv_next - pass a socket buffer to the next handler
- * @skb - socket buffer to pass
+ * @skb: socket buffer to pass
  *
  * In the packet handler, if the packet is not for us, pass it to the next handler by simply freeing
  * the cloned copy and returning.
@@ -2385,13 +2387,13 @@ np_ip_v4_rcv_next(struct sk_buff *skb)
 }
 /**
  * np_ip_v4_err_next - pass a socket buffer to the next error handler
- * @skb - socket buffer to pass
+ * @skb: socket buffer to pass
  *
  * In the error packet handler, if the packet is not for us, pass it to the next handler by simply
  * returning.  Error packets are not cloned, so don't free it.
  */
 STATIC int
-np_ip_v4_err_next(struct sk_buff *skb)
+np_ip_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 	return (0);
 }
@@ -2409,11 +2411,12 @@ np_ip_init_proto(unsigned char proto)
 
 	if ((ip = np_ip_protos[proto]) != NULL)
 		return (-EALREADY);	/* already initialized */
-	if ((ip = kmalloc(sizeof(*ip), GFP_KERNEL)) == NULL)
+	if ((ip = np_ip_protos[proto] = kmalloc(sizeof(*ip), GFP_KERNEL)) == NULL)
 		return (-ENOMEM);
 	bzero(ip, sizeof(*ip));
 	ip->protocol = proto;
-	ip->name = "streams-np", ip->handler = &np_ip_v4_rcv;
+	ip->name = "streams-np";
+	ip->handler = &np_ip_v4_rcv;
 	ip->err_handler = &n_ip_v4_err;
 	ip->copy = 0;
 	ip->next = NULL;
@@ -2436,6 +2439,7 @@ np_ip_term_proto(unsigned char proto)
 	if ((ip = np_ip_protos[proto]) == NULL)
 		return (-EALREADY);	/* already terminated */
 	inet_del_protocol(ip, proto);
+	np_ip_protos[proto] = NULL;
 	kfree(ip);
 	return (0);
 }
@@ -2455,10 +2459,9 @@ np_ip_term_proto(unsigned char proto)
  * In the packet handler, if the packet is for us, steal the packet by simply not passing it to the
  * next handler.
  */
-STATIC int
+STATIC void
 np_ip_v4_steal(struct sk_buff *skb)
 {
-	return (0);
 }
 /**
  * np_ip_v4_rcv_next - pass a socket buffer to the next handler
@@ -2491,7 +2494,7 @@ np_ip_v4_err_next(struct sk_buff *skb, __u32 info)
 	struct inet_protocol *ip;
 
 	if ((ip = np_ip_protos[skb->nh.iph->protocol]) != NULL && ip->next != NULL)
-		return ip->next->proto.err_handler(skb, info);
+		ip->next->proto.err_handler(skb, info);
 	/* don't free for error handlers */
 	return (0);
 }
@@ -2507,10 +2510,11 @@ STATIC int
 np_ip_init_proto(unsigned char proto)
 {
 	struct inet_protocol *ip;
+	int hash = proto & (MAX_INET_PROTOS - 1);
 
 	if ((ip = np_ip_protos[proto]) != NULL)
 		return (-EALREADY);	/* already initialized */
-	if ((ip = kmalloc(sizeof(*ip), GFP_ATOMIC)) == NULL)
+	if ((ip = np_ip_protos[proto] = kmalloc(sizeof(*ip), GFP_ATOMIC)) == NULL)
 		return (-ENOMEM);
 	bzero(ip, sizeof(*ip));
 #ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
@@ -2524,7 +2528,8 @@ np_ip_init_proto(unsigned char proto)
 	/* reduces to inet_add_protocol() if no protocol registered */
 	spin_lock_bh(inet_proto_lockp);
 	if ((ip->next = inet_protosp[hash]) != NULL) {
-		if ((ip->kmod = module_text_address(ip->next))) {
+		if ((ip->kmod = module_text_address(ip->next))
+		    && ip->kmod != THIS_MODULE) {
 			if (!try_to_get_module(ip->kmod)) {
 				spin_unlock_bh(inet_proto_lockp);
 				kfree(ip);
@@ -2532,7 +2537,7 @@ np_ip_init_proto(unsigned char proto)
 			}
 		}
 	}
-	inet_protos[hash] = &ip->proto;
+	inet_protosp[hash] = &ip->proto;
 	spin_unlock_bh(inet_proto_lockp);
 	synchronized_net();
 	return (0);
@@ -2549,16 +2554,18 @@ STATIC int
 np_ip_term_proto(unsigned char proto)
 {
 	struct inet_protocol *ip;
+	int hash = proto & (MAX_INET_PROTOS - 1);
 
 	if ((ip = np_ip_protos[proto]) == NULL)
 		return (-EALREADY);	/* already terminated */
 	/* reduces to inet_del_protocol() if no protocol was registered */
 	spin_lock_bh(inet_proto_lockp);
-	inet_protos[hash] = ip->next;
+	inet_protosp[hash] = ip->next;
 	spin_unlock_bh(inet_proto_lockp);
 	synchronized_net();
-	if (ip->kmod)
+	if (ip->kmod && ip->kmod != THIS_MODULE)
 		module_put(ip->kmod);
+	np_ip_protos[proto] = NULL;
 	kfree(ip);
 	return (0);
 }
@@ -2605,25 +2612,72 @@ np_ip_v4_rcv(struct sk_buff *skb)
 	if (skb_is_nonlinear(skb) && unlikely(skb_linearize(skb, GFP_ATOMIC) != 0))
 		goto linear_fail;
 	{
-		mblk_t *mp;
+		mblk_t *mp, *dp;
 		size_t mlen = skb->len + (skb->data - skb->nh.raw);
 		frtn_t fr = { &np_ip_free, (char *) skb };
 
-		/* Create and queue a specialized M_RSE message to the Stream's read queue for
-		   further (immediate or deferred) processing.  The Stream will convert this
-		   message into an N_DATA_IND or N_UNITDATA_IND message and pass it along. */
-		if (unlikely((mp = esballoc(skb->nh.raw, mlen, BPRI_MED, &fr)) == NULL))
-			goto no_buffers;
-		mp->b_datap->db_type = M_RSE;
-		mp->b_wptr = mp->b_rptr + mlen;
-		/* trim the ip header */
-		mp->b_rptr = skb->h.raw;
-		/* leave the udp-like header */
-		skb->dev = NULL;
+		/* Create and queue a N_UNITDATA_IND message to the Stream's read queue for further 
+		   (immediate or deferred) processing.  The Stream will convert this message into
+		   an N_DATA_IND or N_UNITDATA_IND message and pass it along. */
+		if (np->info.SERV_type == N_CLNS) {
+			N_unitdata_ind_t *p;
+			struct sockaddr_in *sin;
+
+			mp = allocb(sizeof(*p) + (sizeof(*sin) << 1), BPRI_MED);
+			if (unlikely(mp == NULL))
+				goto no_buffers;
+			dp = esballoc(skb->nh.raw, mlen, BPRI_MED, &fr);
+			if (unlikely(dp == NULL))
+				goto no_blocks;
+			dp->b_wptr = dp->b_rptr + mlen;
+			/* trim the ip header */
+			dp->b_rptr = skb->h.raw;
+			/* leave the udp-like header */
+			skb->dev = NULL;
+			mp->b_datap->db_type = M_PROTO;
+			p = (typeof(p)) mp->b_wptr++;
+			p->PRIM_type = N_UNITDATA_IND;
+			p->DEST_length = sizeof(*sin);
+			p->DEST_offset = sizeof(*p);
+			p->SRC_length = sizeof(*sin);
+			p->SRC_offset = sizeof(*p) + sizeof(*sin);
+			p->ERROR_type = 0;
+			sin = (typeof(sin)) mp->b_wptr++;
+			sin->sin_family = AF_INET;
+			sin->sin_port = uh->dest;
+			sin->sin_addr.s_addr = iph->daddr;
+			sin = (typeof(sin)) mp->b_wptr++;
+			sin->sin_family = AF_INET;
+			sin->sin_port = uh->source;
+			sin->sin_addr.s_addr = iph->saddr;
+			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_UNITDATA_IND"); */
+		} else {
+			N_data_ind_t *p;
+
+			mp = allocb(sizeof(*p), BPRI_MED);
+			if (unlikely(mp == NULL))
+				goto no_buffers;
+			dp = esballoc(skb->nh.raw, mlen, BPRI_MED, &fr);
+			if (unlikely(dp == NULL))
+				goto no_blocks;
+			dp->b_wptr = dp->b_rptr + mlen;
+			/* trim the ip header */
+			dp->b_rptr = skb->h.raw;
+			/* leave the udp-like header */
+			skb->dev = NULL;
+			mp->b_datap->db_type = M_PROTO;
+			p = (typeof(p)) mp->b_wptr++;
+			p->PRIM_type = N_DATA_IND;
+			p->DATA_xfer_flags = 0;
+			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_DATA_IND"); */
+		}
+		mp->b_cont = dp;
 		put(np->rq, mp);
 		np_release(&np);
 		read_unlock(&np_ip_lock);
 		return (0);
+	      no_blocks:
+		freeb(mp);
 	}
       no_buffers:
       linear_fail:
@@ -2657,7 +2711,6 @@ np_ip_v4_err(struct sk_buff *skb, __u32 info)
 	struct udphdr *uh;
 	struct iphdr *iph = (struct iphdr *) skb->data;
 	size_t ihl;
-	struct sk_buff *nskb;
 
 #define ICMP_MIN_LENGTH 8
 	if (skb->len < (ihl = iph->ihl << 2) + ICMP_MIN_LENGTH)
@@ -2671,24 +2724,44 @@ np_ip_v4_err(struct sk_buff *skb, __u32 info)
 		goto closed;
 	if (unlikely(np->rq == NULL || !canput(np->rq)))
 		goto flow_controlled;
-	if (unlikely((nskb = skb_clone(skb)) == NULL))
-		goto no_clone;
 	{
 		mblk_t *mp;
-		size_t mlen = skb->len + (skb->data - skb->nh.raw);
-		frtn_t fr = { &np_ip_free, (char *) nskb };
 
-		/* Create and queue a specialized M_PCRSE message to the Stream's read queue for
-		   further (immediate or deferred) processing.  The Stream will convert this
-		   message into a N_UDERROR_IND message and pass it along. */
-		if (unlikely((mp = esballoc(skb->nh.raw, mlen, BPRI_MED, &fr)) == NULL))
-			goto no_buffers;
-		mp->b_datap->db_type = M_PCRSE;
-		mp->b_wptr = mp->b_rptr + mlen;
-		/* trim the ip and icmp header */
-		mp->b_rptr = skb->data;
-		/* leave the udp-like header */
-		skb->dev = NULL;
+		/* Create and queue a N_UDERROR_IND message to the Stream's read queue for further
+		   (immediate or deferred) processing.  The Stream will convert this message into a 
+		   N_RESET_IND or N_UDERROR_IND message and pass it along. */
+		if (np->SERV_type == N_CLNS) {
+			N_uderror_ind_t *p;
+			struct sockaddr_in *sin;
+
+			mp = allocb(sizeof(*p) + sizeof(*sin), BPRI_MED);
+			if (unlikely(mp == NULL))
+				goto no_buffers;
+			mp->b_datap->db_type = M_PROTO;
+			p = (typeof(p)) mp->b_wptr++;
+			p->PRIM_type = N_UDERROR_IND;
+			p->DEST_length = sizeof(*sin);
+			p->DEST_offset = sizeof(*p);
+			p->ERROR_type = FIXME;
+			sin = (typeof(sin)) mp->b_wptr++;
+			sin->sin_family = AF_INET;
+			sin->sin_port = uh->dest;
+			sin->sin_addr.s_addr = iph->daddr;
+			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_UDERROR_IND"); */
+		} else {
+			N_reset_ind_t *p;
+
+			mp = allocb(sizeof(*p), BPRI_MED);
+			if (unlikely(mp == NULL))
+				goto no_buffers;
+			mp->b_datap->db_type = M_PROTO;
+			p = (typeof(p)) mp->b_wptr++;
+			p->PRIM_type = N_RESET_IND;
+			p->RESET_orig = N_PROVIDER;
+			p->RESET_reason = FIXME;
+			np_set_state(np, NS_WRES_RIND);
+			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_RESET_IND"); */
+		}
 		put(np->rq, mp);
 		np_release(&np);
 		read_unlock(&np_ip_lock);
@@ -2697,7 +2770,6 @@ np_ip_v4_err(struct sk_buff *skb, __u32 info)
 		return np_ip_v4_err_next(skb, info);
 	}
       no_buffers:
-	kfree_skb(nskb);
       no_clone:
       flow_controlled:
       closed:
@@ -2940,10 +3012,10 @@ STATIC int
 ne_ip_bind_req(struct np *np, struct ne_bind_req *ep)
 {
 	np_long NPI_error;
+	struct sockaddr_in *sin = (struct sockaddr_in *) np->ADDR_buffer;
 
+	np->BIND_flags = ep->BIND_flags;
 	if (ep->ADDR_length == 0) {
-		struct sockaddr_in *sin = (struct sockaddr_in *) np->ADDR_buffer;
-
 		sin->sin_family = AF_INET;
 		sin->sin_port = 0;
 		sin->sin_addr.s_addr = 0;
@@ -2963,6 +3035,9 @@ ne_ip_bind_req(struct np *np, struct ne_bind_req *ep)
 		bcopy(ep->ADDR_buffer, np->ADDR_buffer, ep->ADDR_length);
 		np->ADDR_length = ep->ADDR_length;
 	}
+	NPI_error = NBADADDR;
+	if (sin->sin_port == 0 & ~(np->BIND_flags & (DEFAULT_LISTENER|TOKEN_REQUEST)))
+		goto error;
 	if (ep->PROTOID_length == 0) {
 		uchar *proto = (uchar *) np->PROTOID_buffer;
 
@@ -2979,7 +3054,6 @@ ne_ip_bind_req(struct np *np, struct ne_bind_req *ep)
 		bcopy(ep->PROTOID_buffer, np->PROTOID_buffer, ep->PROTOID_length);
 		np->PROTOID_length = ep->PROTOID_length;
 	}
-	np->BIND_flags = ep->BIND_flags;
 	np->info.SERV_type =
 	    (ep->BIND_flags & (DEFAULT_LISTENER | TOKEN_REQUEST)) ? N_CONS : N_CLNS;
 	/* now the address and protocol ids are in the np structure, do the bind */
@@ -3011,6 +3085,7 @@ STATIC int
 ne_ip_conn_req(struct np *np, struct ne_conn_req *ep)
 {
 	np_long NPI_error;
+	N_conn_res_t *p;
 
 	NPI_error = NNOADDR;
 	if (ep->DEST_length == 0)
@@ -3026,8 +3101,34 @@ ne_ip_conn_req(struct np *np, struct ne_conn_req *ep)
 		goto error;
 	bcopy(ep->DEST_buffer, np->DEST_buffer, ep->DEST_length);
 	np->DEST_length = ep->DEST_length;
-	/* for each of the IP protocol numbers, we need to create a bind */
-	NPI_error = np_ip_conn(np);
+	NPI_error = -ENOBUFS;
+	if ((mp = ss7_allocb(np->iq, sizeof(*p) + np->DEST_length + np->QOS_length))) {
+		/* for each of the IP protocol numbers, we need to create a bind */
+		if (unlikely((NPI_error = np_ip_conn(np)) != 0)) {
+			freeb(mp);
+			goto error;
+		}
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p))mp->b_wptr++;
+		p->PRIM_type = N_CONN_CON;
+		p->RES_length = np->DEST_length;
+		p->RES_offset = np->DEST_length ? sizeof(*p) : 0;
+		p->CONN_flags = ep->CONN_flags;
+		p->QOS_length = np->QOS_length;
+		p->QOS_offset = np->QOS_length ? sizeof(*p) + np->DEST_length : 0;
+		if (np->DEST_length) {
+			bcopy(np->DEST_buffer, mp->b_wptr, np->DEST_length);
+			mp->b_wptr += np->DEST_length;
+		}
+		if (np->QOS_length) {
+			bcopy(np->QOS_buffer, mp->b_wptr, np->QOS_length);
+			mp->b_wptr += np->QOS_length;
+		}
+		np_set_state(np, NS_DATA_XFER);
+		strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_CONN_CON");
+		putnext(np->oq, mp);
+		return (0);
+	}
       error:
 	return (NPI_error);
 }
@@ -3277,9 +3378,9 @@ n_conn_req(queue_t *q, mblk_t *mp)
 	err = NBADFLAG;
 	if ((ne.CONN_flags = p->CONN_flags) & ~(REC_CONF_OPT | EX_DATA_OPT))
 		goto error;
+	np_set_state(np, NS_WCON_CREQ);
 	if ((err = np->np_event(q, np, &ne)))
 		goto error;
-	np_set_state(np, NS_WCON_CREQ);
 	return (QR_TRIMMED);
       error:
 	return n_reply_ack(np, N_CONN_REQ, err, mp);
@@ -3583,8 +3684,11 @@ n_bind_req(queue_t *q, mblk_t *mp)
 	if ((ne.BIND_flags = p->BIND_flags) & ~(DEFAULT_LISTENER | TOKEN_REQUEST | DEFAULT_DEST))
 		goto error;
 	ne.CONIND_number = p->bind_req.CONIND_number;
-	if (unlikely((err = np->np_event(q, np, &ne))))
+	np_set_state(np, NS_WACK_BREQ);
+	if (unlikely((err = np->np_event(q, np, &ne)))) {
+		np_set_state(np, NS_UNBND);
 		goto error;
+	}
 	if (mp->b_cont)
 		freemsg(XCHG(&mp->b_cont, NULL));
 	size = sizeof(p->bind_ack) + ne.ADDR_length + ne.PROTOID_length;
@@ -3640,6 +3744,7 @@ n_unbind_req(queue_t *q, mblk_t *mp)
 	err = -EFAULT;
 	if (p->type != N_UNBIND_REQ)
 		goto error;
+	np_set_state(np, NS_WACK_UREQ);
 	if ((err = np->np_event(q, np, &ne)) == 0)
 		np_set_state(np, NS_UNBND);
       error:
@@ -4343,7 +4448,7 @@ np_alloc_priv(queue_t *q, struct np **npp, uint type, int sflag, dev_t *devp, cr
 
 	if ((np = np_alloc())) {
 		major_t cmajor = getmajor(*devp);
-		major_t cminor = getminor(*devp);
+		minor_t cminor = getminor(*devp);
 
 		/* np generic members */
 		np->u.dev.cmajor = cmajor;

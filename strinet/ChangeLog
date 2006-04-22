@@ -1,3 +1,12 @@
+2006-04-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strinet.refs: added a few more references
+	* doc/man/man3/xti_udp.3.man: updating manual pages
+	* doc/man/man7/tpi_ip.7.man: updating manual pages
+	* doc/man/man7/tpi_udp.7.man: updating manual pages
+	* src/drivers/udp.c: working up second generation UPD driver
+	* src/drivers/inet.c: locking correction
+
 2006-04-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/cmot.c: added module for cmot

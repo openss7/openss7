@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_ip.7.man,v 0.9.2.5 2006/04/05 09:44:28 brian Exp $
+.\" @(#) $Id: tpi_ip.7.man,v 0.9.2.7 2006/04/22 04:59:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,17 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:28 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/22 04:59:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_ip.7.man,v $
+.\" Revision 0.9.2.7  2006/04/22 04:59:34  brian
+.\" - updated manual pages for 2G drivers
+.\"
+.\" Revision 0.9.2.6  2006/04/22 01:06:35  brian
+.\" - updating manual pages
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:28  brian
 .\" - moved .so line and updated headers
 .\"
@@ -78,20 +84,514 @@ sort-adjacent-labels
 .\"
 .\"
 .TH TPI-IP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transport Provider Interface (TPI)"
+.\"
+.\"
 .SH NAME
 .B tpi_ip
 \- Transport Provider Interface (TPI) \- Internet Protocol (IP) Corrigendum
+.\"
+.\"
 .SH SYNOPSIS
-.HP 12
+.PP
+.B #include <sys/tihdr.h>
+.br
 .B #include <sys/tpi_ip.h>
+.HP
+.BI "int " ip_stream " = open(" \fR\*(lq/dev/rawip\*(rq\fI ", " flags );
+.PD 0
+.HP
+.BI "int " ip_stream " = open(" \fR\*(lq/dev/rawip2\*(rq\fI ", " flags );
+.PD
+.\"
+.\"
 .SH DESCRIPTION
+.PP
+.B TPI-IP
+provides a Stream supporting the Transport Provider Interface (TPI),
+.[
+TPI Revision 2.0.0
+.]
+.BR tpi (7),
+to the Internet Protocol (IP),
+.[
+rfc769
+.]
+.BR ip (7),
+protocol service interface using the T-primitives of the
+.BR tpi (7).
+This interface is intended solely for use by user programs or protocol modules requiring the common
+.BR tpi (7).
+interface, such as the
+.BR xti (3)
+and
+.BR sockets (3)
+library.
+.PP
+The difference between the
+.I /dev/rawip
+and
+.I /dev/rawip2
+devices is that the later is the second generation STREAMS RAWIP driver fully implemented in
+.IR STREAMS (4),
+where the former opens a socket internal to the kernel and simply provides a TPI service interface
+to that socket.  Also, the
+.I /dev/rawip2
+driver supports pseudo-connection-oriented modes whereas the
+.I /dev/rawip
+driver only supports pure connectionless mode.
+.\"
+.\"
+.SS "ADDRESS FORMATS"
+.PP
+The IP address format is structured as follows:
+.sp
+.nf
+\fC\s-1\
+struct sockaddr_in {
+    sa_family_t         sin_family;  /* Address family */
+    unsigned short int  sin_port;    /* Port number */
+    struct in_addr      sin_addr;    /* Internet address */
+    /* padding */
+};
+\s+1\fP
+.fi
+.PP
+The
+.B sockaddr_in
+structure contains the following members:
+.TP \w'sin_family\(em'u
+.I sin_family
+The address family.  Always set to
+.BR AF_INET " or " AF_UNSPEC .
+.PD 0
+.TP
+.I sin_port
+The port number of the transport endpoint.
+.TP
+.I sin_addr
+The IP address of the transport endpoint.
+.TP
+.I (padding)
+Padding to pad the size of the
+.B sockaddr_in
+structure to the size of a
+.B sockaddr
+structure.
+.PD
+.PP
+The structure is padded to the size of a
+.BR sockaddr
+structure.
+.\"
+.\"
+.SH "OPTIONS"
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure described in
+.BR xti (3).
+A UDP transport provider compliant to this specification supports none, all or
+any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in a privileged or read-only
+mode.
+.PP
+.B TPI-UDP
+provides options at the
+.BR XTI_GENERIC " and " T_INET_IP "
+option levels as described in the subsections that follow.  Of the
+.B T_INET_IP
+level protocol options, none of the options are of end-to-end significance.
+.\"
+.\"
+.SS "XTI_GENERIC"
+.PP
+Options at this level are specific to the X/Open Transport Interface (XTI/TLI)
+and are common to all transport providers.  For more information, see
+.BR xti (3).
+.PP
+The options defined with the option level
+.B XTI_GENERIC
+are as follows:
+.TP
+.B XTI_DEBUG
+Sets debugging flags for the Stream.  This option is formatted as an array of
+.BR t_uscalar_t .
+Legal values are implementation defined.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_LINGER
+Sets whether, and the amount of time if, the Stream will linger waiting for
+unsent data to be delivered.  This option is formatted as a
+.B t_linger
+structure as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;    /* option on/off */
+    t_scalar_t l_linger;   /* linger time */
+};
+\s-1\fP
+.fi
+.RS
+.TP
+.I l_onoff
+Specifies whether to linger
+.RB ( T_YES )
+or not
+.RB ( T_NO ).
+Legal values are
+.BR T_YES " and " T_NO .
+.TP
+.I l_linger
+Specifies the amount of time (in seconds) to linger.  Legal values are
+.BR T_INFINITE ", " T_UNSPEC
+and all positive numbers including zero.
+.RE
+.IP ""
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVBUF
+Specifies the size, in bytes, of the receive buffer.  This option is formatted
+as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Specifies the low water mark above which received data will be indicated and
+delivered to the user.  This option is formatted as
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information see
+.BR xti (3).
+.TP
+.B XTI_SNDBUF
+Specifies the size, in bytes, of the transmit buffer.  This option is
+formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information see
+.BR xti (3).
+.TP
+.B XTI_SNDLOWAT
+Specifies the low water mark above which queued data will be transmitted to
+the peer.  This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information see
+.BR xti (3).
+.\"
+.\"
+.SS "T_INET_IP"
+.PP
+.TP
+.B T_IP_OPTIONS
+.\"IP per-packet options.
+.\".sp
+This option is used to set (retreive) the OPTIONS field of each outgoing
+(incoming) IP datagram.  It value is a string of octets composed of a number
+of T_IP options, whose format matches those defined in the IP specification
+with one exception: the linst of addresses for the souce routing option must
+include the first-hop gateway at the beginning of the list of gateways.  The
+first-hop gateway address will be extracted from the option list and the size
+adjusted accordingly before use.
+.sp
+The option is disabled if it is specified with \*(lqno value\*(rq; that is,
+with an option header only.
+.sp
+The functions
+.BR t_connect (3)
+(in synchronous mode),
+.BR t_listen "(3), " t_rcvconnect "(3) and " t_rcvudata (3)
+return the OPTIONS field, if any, of the received IP datagram associated with
+this call.  The function
+.BR t_rcvuderr (3)
+returns the OPTIONS field of the data unit previously sent that produced the
+error.  The function
+.BR t_optmgmt ()
+with
+.B T_CURRENT
+set retrieves the currently effective
+.B T_IP_OPTIONS
+that is sent with outgoing datagrams.
+.sp
+Common application never need this option.  It is mainly used for network
+debugging and control purposes.
+.sp
+This option is formated as an array (maximum 40 elements) of
+.BR "unsigned char" .
+This option is an
+.IR "absolute requirement" .
+This option has
+.IR "end-to-end significance" .
+.TP
+.B T_IP_TOS
+.\"IP per-packet type of service.
+.\".sp
+This option is used to set (retrieve) the type-of-service filed of an
+outgoing (incoming)
+.B T_IP
+datagram.  This field can be constructed by any OR'ed combination of one of
+the precedence flags and the type-of-service flags.
+.RS
+.PP
+.BI SET_TOS( prec ", " tos )
+.PP
+The option value is set using the macro
+.BI SET_TOS( prec ", " tos )\fR,
+where
+.I prec
+is set to one of the precedence flags and
+.I tos
+to one or an OR'ed combination of the type-of-service flags.
+.BR  SET_TOS ()
+returns the option value.
+.TP
+.I prec
+The precedence flags specify datagram precedence, allowing senders to
+indicate the importance of each datagram.  They are intended for
+Department of Defence applications.  Applications using
+.B T_IP_TOS
+but not the precedence level should use the value of
+.B T_ROUTINE
+for precedence.
+.I prec
+can be one of the following values:
+.RS
+.TP \w'T_OVERRIDEFLASH\(em'u
+.B T_ROUTINE
+routine.
+.PD 0
+.TP
+.B T_PRIORITY
+priority precedence.
+.TP
+.B T_IMMEDIATE
+immediate precedence.
+.TP
+.B T_FLASH
+flash precedence.
+.TP
+.B T_OVERRIDEFLASH
+flash override precedence.
+.TP
+.B T_CRITIC_ECP
+flash override override precedence.
+.TP
+.B T_INETCONTROL
+internetwork control.
+.TP
+.B T_NETCONTROL
+network control.
+.PD
+.RE
+.TP
+.I tos
+The type-of-service flags specify the type of service the IP datagram
+desires.
+.I tos
+can be one of the following values:
+.RS
+.TP \w'T_OVERRIDEFLASH\(em'u
+.B T_NOTOS
+no type of service.
+.PD 0
+.TP
+.B T_LDELAY
+low delay.
+.TP
+.B T_HITHRPT
+high throughput.
+.TP
+.B T_HIREL
+high reliability.
+.TP
+.B T_LOCOST
+low cost.
+.PD
+.RE
+.PP
+The functions
+.BR t_connect "(3), " t_listen "(3), " t_rcvconnect "(3) and " t_rcvudata (3)
+return the type-of-service
+.PP
+This option is formatted as an
+.BR "unsigned char" .
+This option is an
+.IR "absolute requirement" .
+This option has
+.IR "end-to-end significance" .
+
+.RE
+.TP
+.B T_IP_TTL
+.\"IP per-packet time to live.
+.\".sp
+This option is used to set the time-to-live field in an outgoing IP
+datagram.  It specifies how long, in seconds, the datagram is allowed to
+remain in the Internet.  The time-to-live field of an incoming datagram is
+not returned by any function (since it is not an option with
+.IR "end-to-end significance" ).
+.sp
+This option is formatted as an
+.BR "unsigned char" .
+It can take on values between
+.BR 0 " and " 255 .
+This option is an
+.IR "absolute requirement" .
+This option has
+.IR "local significance" .
+.TP
+.B T_IP_REUSEADDR
+.\"Allow local address reuse.
+.\".sp
+Many TCP implementations do not allow the user to bind more than one
+transport endpoint address with identical port numbers.  If
+.B T_IP_REUSEADDR
+is set to
+.B T_YES
+this restriction is relaxed in the sense that it is now allowed to bind a
+transport endpoint to an address with a port number and an underspecified
+internet address (\*(lqwild card\*(rq address) and further endpoints to
+addresses with the same port number and (mutually exclusive) fully specified
+internet addresses.
+.sp
+This option is formatted as an
+.BR "unsigned int" .
+It can take on values
+.BR T_YES " or " T_NO .
+This option is an
+.IR "absolute requirement" .
+This option has
+.IR "local significance" .
+.TP
+.B T_IP_DONTROUTE
+.\"Just use interface address.
+.\".sp
+This option indicates that outgoing messages should bypass the standard
+routing facilities.  It is mainly used for testing and development.
+.sp
+This option is formatted as an
+.BR "unsigned int" .
+It can take on values
+.BR T_YES " or " T_NO .
+This option is an
+.IR "absolute requirement" .
+This option has
+.IR "local significance" .
+.TP
+.B T_IP_BROADCAST
+.\"Permit sending of broadcast messages.
+.\".sp
+This option requests permission to send broadcast datagrams.  It was
+defined to make sure that broadcasts are not generated by mistake.  The
+use of this option is often restricted to privileged users.
+.sp
+This option is formated as an
+.BR "unsigned int" .
+It can take on values
+.BR T_YES " or " T_NO .
+This option is an
+.IR "absolute requirement" .
+This option has
+.IR "local significance" .
+.\"
+.\"
+.SH LOCAL MANAGEMENT INTERFACE
+.\"
+.SS T_INFO_REQ\fR(7)
+.\"
+.SS T_INFO_ACK\fR(7)
+.\"
+.SS T_ADDR_REQ\fR(7)
+.\"
+.SS T_ADDR_ACK\fR(7)
+.\"
+.SS T_CAPABILITY_REQ\fR(7)
+.\"
+.SS T_CAPABILITY_ACK\fR(7)
+.\"
+.SS T_BIND_REQ\fR(7)
+.\"
+.SS T_BIND_ACK\fR(7)
+.\"
+.SS T_UNBIND_REQ\fR(7)
+.\"
+.SS T_OK_ACK\fR(7)
+.\"
+.SS T_ERROR_ACK\fR(7)
+.\"
+.SS T_OPTMGMT_REQ\fR(7)
+.\"
+.SS T_OPTMGMT_ACK\fR(7)
+.\"
+.\"
+.SH PROTOCOL SERVICE INTERFACE
+.\"
+.SS T_UNITDATA_REQ\fR(7)
+.\"
+.SS T_UNITDATA_IND\fR(7)
+.\"
+.SS T_UDERROR_IND\fR(7)
+.\"
+.SS T_CONN_REQ\fR(7)
+.\"
+.SS T_CONN_CON\fR(7)
+.\"
+.SS T_CONN_IND\fR(7)
+.\"
+.SS T_CONN_RES\fR(7)
+.\"
+.SS T_DATA_REQ\fR(7)
+.\"
+.SS T_DATA_IND\fR(7)
+.\"
+.SS T_EXDATA_REQ\fR(7)
+.\"
+.SS T_EXDATA_IND\fR(7)
+.\"
+.SS T_OPTDATA_REQ\fR(7)
+.\"
+.SS T_OPTDATA_IND\fR(7)
+.\"
+.SS T_DISCON_REQ\fR(7)
+.\"
+.SS T_DISCON_IND\fR(7)
+.\"
+.SS T_ORDREL_REQ\fR(7)
+.\"
+.SS T_ORDREL_IND\fR(7)
+.\"
+.\"
+.SH IOCTLS
+.\"
+.\"
+.SH "ERROR HANDLING"
+.\"
+.\"
+.SH ERRORS
+.\"
+.SS Error Acknowledgement Codes
+.\"
+.SS Unitdata Error and Disconnect Codes
+.\"
+.\"
+.SH CAVEATS
+.\"
+.\"
 .SH "SEE ALSO"
+.\"
+.\"
 .SH HISTORY
 .PP
 The Transport Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
+.\"
+.\"
 .SH CONFORMANCE
 .PP
 This interface conforms to TPI Version 2, Draft 2.
