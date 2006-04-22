@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/18 17:55:41 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/22 10:51:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/18 17:55:41 $ by $Author: brian $
+ Last Modified $Date: 2006/04/22 10:51:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.8  2006/04/22 10:51:03  brian
+ - working up UDP and RAWIP drivers
+
  Revision 0.9.2.7  2006/04/18 17:55:41  brian
  - raiontalizing rawip and udp drivers
 
@@ -73,9 +76,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/18 17:55:41 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/22 10:51:03 $"
 
-static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/18 17:55:41 $";
+static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/22 10:51:03 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -149,7 +152,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.7 
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/04/18 17:55:41 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/22 10:51:03 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -228,65 +231,27 @@ STATIC struct module_info raw_minfo = {
 	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
-STATIC streamscall int raw_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC streamscall int raw_close(queue_t *, int, cred_t *);
-
-STATIC streamscall int raw_rput(queue_t *, mblk_t *);
-STATIC streamscall int raw_rsrv(queue_t *);
+STATIC streamscall int raw_qopen(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int raw_qclose(queue_t *, int, cred_t *);
 
 STATIC struct qinit raw_rinit = {
-	.qi_putp = raw_rput,		/* Read put (msg from below) */
-	.qi_srvp = raw_rsrv,		/* Read queue service */
-	.qi_qopen = raw_open,		/* Each open */
-	.qi_qclose = raw_close,		/* Last close */
+	.qi_putp = &ss7_oput,		/* Read put (msg from below) */
+	.qi_srvp = &ss7_osrv,		/* Read queue service */
+	.qi_qopen = raw_qopen,		/* Each open */
+	.qi_qclose = raw_qclose,	/* Last close */
 	.qi_minfo = &raw_minfo,		/* Information */
 };
-
-STATIC streamscall int raw_wput(queue_t *, mblk_t *);
-STATIC streamscall int raw_wsrv(queue_t *);
 
 STATIC struct qinit raw_winit = {
-	.qi_putp = raw_wput,		/* Write put (msg from above) */
-	.qi_srvp = raw_wsrv,		/* Write queue service */
-	.qi_minfo = &raw_minfo,		/* Information */
-};
-
-STATIC streamscall int mux_rput(queue_t *, mblk_t *);
-STATIC streamscall int mux_rsrv(queue_t *);
-
-STATIC struct qinit mux_rinit = {
-	.qi_putp = mux_rput,		/* Read put (msg from below) */
-	.qi_srvp = mux_rsrv,		/* Read queue service */
-	.qi_minfo = &raw_minfo,		/* Information */
-};
-
-STATIC streamscall int mux_wput(queue_t *, mblk_t *);
-STATIC streamscall int mux_wsrv(queue_t *);
-
-STATIC struct qinit mux_winit = {
-	.qi_putp = mux_wput,		/* Write put (msg from above) */
-	.qi_srvp = mux_wsrv,		/* Write queue service */
+	.qi_putp = &ss7_iput,		/* Write put (msg from above) */
+	.qi_srvp = &ss7_isrv,		/* Write queue service */
 	.qi_minfo = &raw_minfo,		/* Information */
 };
 
 MODULE_STATIC struct streamtab raw_info = {
 	.st_rdinit = &raw_rinit,	/* Upper read queue */
 	.st_wrinit = &raw_winit,	/* Upper write queue */
-	.st_muxrinit = &mux_rinit,	/* Lower read queue */
-	.st_muxwinit = &mux_winit,	/* Lower write queue */
 };
-
-/*
- *  Queue put and service return values.
- */
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
 
 /*
  *  TLI Interface state flags
@@ -335,54 +300,6 @@ MODULE_STATIC struct streamtab raw_info = {
 #endif
 
 /*
- *  NPI Interface state flags
- */
-#define NSF_UNBND	( 1 << NS_UNBND		)
-#define NSF_WACK_BREQ	( 1 << NS_WACK_BREQ	)
-#define NSF_WACK_UREQ	( 1 << NS_WACK_UREQ	)
-#define NSF_IDLE	( 1 << NS_IDLE		)
-#define NSF_WACK_OPTREQ	( 1 << NS_WACK_OPTREQ	)
-#define NSF_WACK_RRES	( 1 << NS_WACK_RRES	)
-#define NSF_WCON_CREQ	( 1 << NS_WCON_CREQ	)
-#define NSF_WRES_CIND	( 1 << NS_WRES_CIND	)
-#define NSF_WACK_CRES	( 1 << NS_WACK_CRES	)
-#define NSF_DATA_XFER	( 1 << NS_DATA_XFER	)
-#define NSF_WCON_RREQ	( 1 << NS_WCON_RREQ	)
-#define NSF_WRES_RIND	( 1 << NS_WRES_RIND	)
-#define NSF_WACK_DREQ6	( 1 << NS_WACK_DREQ6	)
-#define NSF_WACK_DREQ7	( 1 << NS_WACK_DREQ7	)
-#define NSF_WACK_DREQ9	( 1 << NS_WACK_DREQ9	)
-#define NSF_WACK_DREQ10	( 1 << NS_WACK_DREQ10	)
-#define NSF_WACK_DREQ11	( 1 << NS_WACK_DREQ11	)
-#define NSF_NOSTATES	( 1 << NS_NOSTATES	)
-#define NSM_WACK_DREQ	(NSF_WACK_DREQ6\
-			|NSF_WACK_DREQ7\
-			|NSF_WACK_DREQ9\
-			|NSF_WACK_DREQ10\
-			|NSF_WACK_DREQ11)
-#define NSM_LISTEN	(NSF_IDLE\
-			|NSF_WRES_CIND\
-			|NSF_WACK_CRES)
-#define NSM_CONNECTED	(NSF_WCON_CREQ\
-			|NSF_WRES_CIND\
-			|NSF_WACK_CRES\
-			|NSF_DATA_XFER\
-			|NSF_WCON_RREQ\
-			|NSF_WRES_RIND\
-			|NSF_WACK_RRES)
-#define NSM_DISCONN	(NSF_IDLE\
-			|NSF_UNBND)
-#define NSM_INDATA	(NSF_DATA_XFER\
-			|NSF_WCON_RREQ)
-#define NSM_OUTDATA	(NSF_DATA_XFER\
-			|NSF_WRES_RIND\
-			|NSF_WACK_RRES)
-#ifndef N_PROVIDER
-#define N_PROVIDER  0
-#define N_USER	    1
-#endif
-
-/*
  *  =========================================================================
  *
  *  RAW Private Datastructures
@@ -415,31 +332,23 @@ typedef struct raw_options {
 	} ip;
 } raw_options_t;
 
+struct raw_bind_bucket;
+
 typedef struct raw {
-	struct raw *next;		/* list of all RAW-Users */
-	struct raw **prev;		/* list of all RAW-Users */
-	major_t cmajor;			/* major device number */
-	minor_t cminor;			/* minor device number */
-	queue_t *rq;			/* associated rd queue */
-	queue_t *wq;			/* associated wr queue */
-	cred_t cred;			/* credentials */
-	atomic_t refcnt;		/* structure reference count */
-	spinlock_t qlock;		/* queue lock */
-	queue_t *rwait;			/* RD queue waiting on lock */
-	queue_t *wwait;			/* WR queue waiting on lock */
-	int users;			/* lock holders */
-	bcid_t rbid;			/* RD buffer call id */
-	bcid_t wbid;			/* WR buffer call id */
-	t_uscalar_t i_flags;		/* TPI interface flags */
-	t_uscalar_t i_state;		/* TPI interface state */
-	np_ulong n_flags;		/* NPI interface flags */
-	np_ulong n_state;		/* NPI interface state */
+	STR_DECLARATION (struct raw);	/* Streams declaration */
 	struct raw *bnext;		/* linkage for bind hash */
 	struct raw **bprev;		/* linkage for bind hash */
 	struct raw_bind_bucket *bindb;	/* linkage for bind hash */
-	short proto;			/* protocol number - host order */
-	struct sockaddr_storage src;	/* bound address */
-	struct sockaddr_storage dst;	/* connected address */
+	struct raw *cnext;		/* linkage for connection hash */
+	struct raw **cprev;		/* linkage for connection hash */
+	struct raw_chash_bucket *hashb;	/* linkage for connection hash */
+	unsigned short proto;		/* protocol number - host order */
+	struct sockaddr_storage bind;	/* bound address */
+	struct sockaddr_storage srce;	/* source address */
+	struct sockaddr_storage dest;	/* connected address */
+	t_uscalar_t CONIND_number;	/* maximum number of connection indications */
+	bufq_t conq;			/* queue outstanding connection indications */
+	struct T_info_ack info;		/* information */
 	struct raw_options options;	/* protocol options */
 	unsigned char _pad[40];		/* pad for ip options */
 } raw_t;
@@ -501,30 +410,43 @@ struct raw_bind_bucket {
 	struct raw *owners;		/* list of owners of this protocol */
 	struct raw *dflt;		/* default destinations for this protocol */
 };
+struct raw_chash_bucket {
+	rwlock_t lock;
+	struct raw *list;
+};
 struct raw_bhash_bucket {
 	rwlock_t lock;
 	struct raw_bind_bucket *list;
 };
 
+STATIC struct raw_bhash_bucket *raw_bhash;
+STATIC size_t raw_bhash_size = 0;
+STATIC size_t raw_bhash_order = 0;
+
+STATIC struct raw_chash_bucket *raw_chash;
+STATIC size_t raw_chash_size = 0;
+STATIC size_t raw_chash_order = 0;
+
+STATIC INLINE fastcall uint
+raw_bhashfn(uint16_t num)
+{
+	return ((raw_bhash_size - 1) & num);
+}
+STATIC INLINE fastcall uint
+raw_chashfn(uint16_t dprot, uint16_t sprot)
+{
+	return ((raw_chash_size -1) & (dprot + (sprot << 4)));
+}
+
 STATIC kmem_cache_t *raw_bind_cachep;
 STATIC kmem_cache_t *raw_priv_cachep;
 
 STATIC INLINE struct raw *
-raw_get(void)
-{
-	struct raw *raw;
-
-	if ((raw = kmem_cache_alloc(raw_priv_cachep, SLAB_ATOMIC))) {
-		bzero(raw, sizeof(*raw));
-		atomic_set(&raw->refcnt, 1);
-	}
-	return (raw);
-}
-STATIC INLINE void
-raw_hold(struct raw *raw)
+raw_get(struct raw *raw)
 {
 	if (raw)
 		atomic_inc(&raw->refcnt);
+	return (raw);
 }
 STATIC INLINE void
 raw_put(struct raw *raw)
@@ -532,38 +454,24 @@ raw_put(struct raw *raw)
 	if (raw && atomic_dec_and_test(&raw->refcnt))
 		kmem_cache_free(raw_priv_cachep, raw);
 }
-
-/*
- *  LOCKING
- */
-STATIC int
-raw_trylockq(queue_t *q)
+STATIC INLINE void
+raw_release(struct raw **rawp)
 {
-	int res;
-	struct raw *raw = PRIV(q);
-
-	spin_lock_bh(&raw->qlock);
-	if (!(res = !raw->users++)) {
-		if (q == raw->rq)
-			raw->rwait = q;
-		if (q == raw->wq)
-			raw->wwait = q;
-	}
-	spin_unlock_bh(&raw->qlock);
-	return (res);
+	raw_put(xchg(rawp, NULL));
 }
-STATIC void
-raw_unlockq(queue_t *q)
+STATIC INLINE struct raw *
+raw_alloc(void)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw;
 
-	spin_lock_bh(&raw->qlock);
-	if (raw->rwait)
-		qenable(xchg(&raw->rwait, NULL));
-	if (raw->wwait)
-		qenable(xchg(&raw->wwait, NULL));
-	raw->users = 0;
-	spin_unlock_bh(&raw->qlock);
+	if ((raw = kmem_cache_alloc(raw_priv_cachep, SLAB_ATOMIC))) {
+		bzero(raw, sizeof(*raw));
+		atomic_set(&raw->refcnt, 1);
+		spin_lock_init(&raw->lock);	/* "raw-lock" */
+		raw->priv_put = &raw_put;
+		raw->priv_get = &raw_get;
+	}
+	return (raw);
 }
 
 /*
@@ -615,285 +523,23 @@ tpi_state_name(t_scalar_t state)
 	}
 }
 #endif				/* _DEBUG */
-STATIC void
+STATIC INLINE fastcall void
 tpi_set_state(struct raw *raw, long state)
 {
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, raw, tpi_state_name(state),
 		tpi_state_name(raw->i_state)));
-	raw->i_state = state;
+	raw->i_state = raw->info.CURRENT_state = state;
 }
-STATIC long
+STATIC INLINE fastcall long
 tpi_get_state(struct raw *raw)
 {
 	return (raw->i_state);
 }
-
-#ifdef _DEBUG
-STATIC const char *
-npi_state_name(np_long state)
+STATIC INLINE fastcall long
+tpi_get_statef(struct raw *raw)
 {
-	switch (state) {
-	case NS_UNBND:
-		return ("NS_UNBND");
-	case NS_WACK_BREQ:
-		return ("NS_WACK_BREQ");
-	case NS_WACK_UREQ:
-		return ("NS_WACK_UREQ");
-	case NS_IDLE:
-		return ("NS_IDLE");
-	case NS_WACK_OPTREQ:
-		return ("NS_WACK_OPTREQ");
-	case NS_WACK_RRES:
-		return ("NS_WACK_RRES");
-	case NS_WCON_CREQ:
-		return ("NS_WCON_CREQ");
-	case NS_WRES_CIND:
-		return ("NS_WRES_CIND");
-	case NS_WACK_CRES:
-		return ("NS_WACK_CRES");
-	case NS_DATA_XFER:
-		return ("NS_DATA_XFER");
-	case NS_WCON_RREQ:
-		return ("NS_WCON_RREQ");
-	case NS_WRES_RIND:
-		return ("NS_WRES_RIND");
-	case NS_WACK_DREQ6:
-		return ("NS_WACK_DREQ6");
-	case NS_WACK_DREQ7:
-		return ("NS_WACK_DREQ7");
-	case NS_WACK_DREQ9:
-		return ("NS_WACK_DREQ9");
-	case NS_WACK_DREQ10:
-		return ("NS_WACK_DREQ10");
-	case NS_WACK_DREQ11:
-		return ("NS_WACK_DREQ11");
-	case NS_NOSTATES:
-		return ("NS_NOSTATES");
-	default:
-		return ("(unknown)");
-	}
+	return (1 << tpi_get_state(raw));
 }
-#endif				/* _DEBUG */
-
-STATIC void
-npi_set_state(struct raw *raw, long state)
-{
-	printd(("%s: %p: %s <- %s\n", DRV_NAME, raw, npi_state_name(state),
-		npi_state_name(raw->n_state)));
-	raw->n_state = state;
-}
-STATIC long
-npi_get_state(struct raw *raw)
-{
-	return (raw->n_state);
-}
-
-/*
- *  BUFFER ALLOCATION
- */
-
-/**
- *  raw_bufsrv: - safe bufcalls
- *  @data: opaque client data
- *
- *  Whereas sockets allocate most buffers in user mode, where it is possible
- *  to simply return an error to a system call, the STREAMS driver runs as a
- *  coroutine and there is no (valid) user present.  This is done with
- *  bufcalls.  However, for LiS and a number of other STREAMS implementations,
- *  bufcalls are unsafe.  Here we do reference counting against the STREAMS
- *  private structure when buffer calls are issued and when they complete.
- *  STREAMS private structures will not be deallocated until the buffer calls
- *  are complete.  There are some mi_bufcall() compatibility functions that
- *  accomplish the same ends.  All of this can go away when this driver only
- *  needs to be used with Linux Fast-STREAMS that has safe buffer callbacks.
- */
-STATIC void streamscall
-raw_bufsrv(long data)
-{
-	struct raw *raw;
-	queue_t *q;
-
-	q = (queue_t *) data;
-	ensure(q, return);
-	raw = PRIV(q);
-	ensure(raw, return);
-
-	if (q == raw->rq && xchg(&raw->rbid, 0) != 0)
-		raw_put(raw);
-	if (q == raw->wq && xchg(&raw->wbid, 0) != 0)
-		raw_put(raw);
-	qenable(q);
-	return;
-}
-
-/**
- *  raw_unbufcall: - reliably cancel a buffer callback
- *  @q: the queue whose callback to cancel
- *
- *  Cancel a qenable() buffer callback associated with one queue in the queue pair.  raw_unbufcall()
- *  effectively undoes the actions performed by raw_bufcall().
- *
- *  NOTICES: Cancellation of buffer callbacks on LiS using unbufcall() is unreliable.  The callback
- *  function could execute some time shortly after the call to unbufcall() has returned.   LiS
- *  abbrogates the SVR 4 STREAMS principles for unbufcall().  This is why you will find atomic
- *  exchanges here and in the callback function and why reference counting is performed on the
- *  structure and queue pointers are checked for NULL.
- */
-STATIC void
-raw_unbufcall(queue_t *q)
-{
-	struct raw *raw;
-	bufcall_id_t bid;
-
-	ensure(q, return);
-	raw = PRIV(q);
-	ensure(raw, return);
-
-	if (q == raw->rq && (bid = xchg(&raw->rbid, 0))) {
-		unbufcall(bid);
-		raw_put(raw);
-	}
-	if (q == raw->wq && (bid = xchg(&raw->wbid, 0))) {
-		unbufcall(bid);
-		raw_put(raw);
-	}
-	return;
-}
-
-/**
- *  raw_bufcall: - generate a buffer callback to enable a queue
- *  @q: the queue to enable on callback
- *  @size: size of the allocation
- *  @prior: priority of the allocation
- *
- *  Maintain one buffer call for each queue in the queue pair.  The callback function will simply
- *  perform a qenable(9).
- *
- *  NOTICES: One of the reasons for going to such extents is that LiS has completely unsafe buffer
- *  callbacks.  The buffer callback function can be invoked (shortly) after unbufcall() returns
- *  under LiS in abrogation of SVR 4 STREAMS principles.  This is why you will find atomic exchanges
- *  here and in the callback function and why reference counting is performed on the structure and
- *  queue pointers are checked for NULL.
- */
-STATIC void
-raw_bufcall(queue_t *q, size_t size, int prior)
-{
-	struct raw *raw;
-	bufcall_id_t bid;
-
-	ensure(q, return);
-	raw = RAW_PRIV(q);
-	ensure(raw, return);
-	raw_hold(raw);
-	if (q == raw->wq) {
-		if ((bid = xchg(&raw->wbid, bufcall(size, prior, &raw_bufsrv, (long) raw)))) {
-			unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
-			raw_put(raw);
-		}
-		return;
-	}
-	if (q == raw->rq) {
-		if ((bid = xchg(&raw->rbid, bufcall(size, prior, &raw_bufsrv, (long) raw)))) {
-			unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
-			raw_put(raw);
-		}
-		return;
-	}
-	swerr();
-	return;
-}
-
-/**
- *  raw_allocb: - reliable allocb()
- *  @q: the queue to enable when allocation can succeed
- *  @size: the size to allocate
- *  @prior: the priority of the allocation
- *
- *  This helper function can be used by most STREAMS message handling procedures that allocate a
- *  buffer in response to an incoming message.  If the allocation fails, this routine will return
- *  NULL and issue a buffer callback to reenable the queue @q when the allocation could succeed.
- *  When NULL is returned, the caller should simply place the incoming message on the queue (i.e.
- *  with putq() from a put procedure or putbq() from a service procedure) and return.  The queue
- *  will be rescheduled with qenable() when the allocation could succeed.
- */
-STATIC mblk_t *
-raw_allocb(queue_t *q, size_t size, int prior)
-{
-	mblk_t *mp;
-
-	if (!(mp = allocb(size, prior)))
-		raw_bufcall(q, size, prior);
-	return (mp);
-}
-
-/**
- *  raw_allocb: - reliable allocb()
- *  @q: the queue to enable when allocation can succeed
- *  @base: the base of the external data buffer
- *  @size: the size of the external data buffer
- *  @prior: the priority of the allocation
- *  @frtn: a pointer to a free routine structure (containing callback and client data)
- *
- *  This helper function can be used by most STREAMS message handling procedures that allocate a
- *  message block with an external buffer in response to an incoming message.  If the allocation
- *  fails, this routine will return NULL and issue a buffer callback to reenable the queue @q when
- *  the allocation could succeed.  When NULL is returned, the caller should simply place the
- *  incoming message on the queue (i.e.  with putq() from a put procedure or putbq() from a service
- *  procedure) and return.  The queue will be rescheduled with qenable() when the allocation could
- *  succeed.
- */
-STATIC mblk_t *
-raw_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
-{
-	mblk_t *mp;
-
-	if (!(mp = esballoc(base, size, prior, frtn)))
-		raw_bufcall(q, FASTBUF, prior);
-	return (mp);
-}
-
-/**
- *  raw_dupmsg: - reliable dupmsg()
- *  @q: queue to enable when duplication can succeed
- *
- *  This helper function can be used by most STREAMS message handling procedures that duplicate a an
- *  incoming message.  If the allocation fails, this routine will return NULL and issue a buffer
- *  callback to reenable the queue @q when the duplication could succeed.  When NULL is returned,
- *  the caller should simply place the incoming message on the queue (i.e.  with putq() from a put
- *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
- *  qenable() when the duplication could succeed.
- */
-STATIC mblk_t *
-raw_dupmsg(queue_t *q, mblk_t *bp)
-{
-	mblk_t *mp;
-
-	if (!(mp = dupmsg(bp)) && (q != NULL))
-		raw_bufcall(q, FASTBUF, BPRI_MED);
-	return (mp);
-}
-
-/**
- *  raw_dupb: - reliable dupb()
- *  @q: queue to enable when duplication can succeed
- *
- *  This helper function can be used by most STREAMS message handling procedures that duplicate a an
- *  incoming message block.  If the allocation fails, this routine will return NULL and issue a
- *  buffer callback to reenable the queue @q when the duplication could succeed.  When NULL is
- *  returned, the caller should simply place the incoming message on the queue (i.e.  with putq()
- *  from a put procedure or putbq() from a service procedure) and return.  The queue will be
- *  rescheduled with qenable() when the duplication could succeed.
- */
-STATIC mblk_t *
-raw_dupb(queue_t *q, mblk_t *bp)
-{
-	mblk_t *mp;
-
-	if (!(mp = dupb(bp)) && (q != NULL))
-		raw_bufcall(q, FASTBUF, BPRI_MED);
-	return (mp);
-}
-
 
 /*
  *  Option Handling
@@ -936,7 +582,7 @@ STATIC struct raw_options raw_defaults = {
 #define t_defaults raw_defaults
 
 /**
- * t_opts_size: - size options from received RAW message
+ * t_opts_size - size options from received RAW message
  * @t: private structure
  * @mp: message pointer for RAW message
  */
@@ -958,7 +604,7 @@ t_opts_size(const struct raw *t, mblk_t *mp)
 }
 
 /**
- * t_opts_build: - build options output from received RAW message
+ * t_opts_build - build options output from received RAW message
  * @t: private structure
  * @mp: message pointer for RAW message
  * @op: output pointer
@@ -1027,19 +673,29 @@ t_opts_build(const struct raw *t, mblk_t *mp, unsigned char *op, size_t olen)
 }
 
 /**
- * t_errs_size: - size options from received ICMP message
+ * t_errs_size - size options from received ICMP message
  * @t: private structure
  * @mp: message pointer for ICMP message
  */
 STATIC int
 t_errs_size(const struct raw *t, mblk_t *mp)
 {
-	fixme(("Write this function."));
-	return (0);
+	int size = 0;
+	struct iphdr *iph;
+	int optlen = 0;
+
+	iph = (struct iphdr *) mp->b_datap->db_base;
+	optlen = (iph->ihl << 2) - sizeof(struct iphdr);
+	if (optlen > 0)
+		size += T_SPACE(optlen);	/* T_IP_OPTIONS */
+	size += _T_SPACE_SIZEOF(t_defaults.ip.ttl);	/* T_IP_TTL */
+	size += _T_SPACE_SIZEOF(t_defaults.ip.tos);	/* T_IP_TOS */
+	size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
+	return (size);
 }
 
 /**
- * t_errs_build: - build options output from receive ICMP message
+ * t_errs_build - build options output from receive ICMP message
  * @t: private structure
  * @mp: message pointer for ICMP message
  * @op: output pointer
@@ -1048,12 +704,130 @@ t_errs_size(const struct raw *t, mblk_t *mp)
 STATIC int
 t_errs_build(const struct raw *t, mblk_t *mp, unsigned char *op, size_t olen, int *etypep)
 {
-	fixme(("Write this function."));
+	struct iphdr *iph;
+	struct t_opthdr *oh;
+	int optlen;
+
+	if (op == NULL || olen == 0)
+		return (0);
+	oh = _T_OPT_FIRSTHDR_OFS(op, olen, 0);
+	iph = (struct iphdr *) mp->b_datap->db_base;
+	optlen = (iph->ihl << 2) - sizeof(*iph);
+	if (optlen > 0) {
+		if (oh == NULL)
+			goto efault;
+		oh->len = T_LENGTH(optlen);
+		oh->level = T_INET_IP;
+		oh->name = T_IP_OPTIONS;
+		oh->status = T_SUCCESS;
+		bcopy((iph + 1), T_OPT_DATA(oh), optlen);
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+	{
+		if (oh == NULL)
+			goto efault;
+		oh->len = _T_LENGTH_SIZEOF(unsigned char);
+
+		oh->level = T_INET_IP;
+		oh->name = T_IP_TOS;
+		oh->status = T_SUCCESS;
+		*((unsigned char *) T_OPT_DATA(oh)) = iph->tos;
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+	{
+		if (oh == NULL)
+			goto efault;
+		oh->len = _T_LENGTH_SIZEOF(unsigned char);
+
+		oh->level = T_INET_IP;
+		oh->name = T_IP_TTL;
+		oh->status = T_SUCCESS;
+		*((unsigned char *) T_OPT_DATA(oh)) = iph->ttl;
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+	{
+		if (oh == NULL)
+			goto efault;
+		oh->len = _T_LENGTH_SIZEOF(uint32_t);
+
+		oh->level = T_INET_IP;
+		oh->name = T_IP_ADDR;
+		oh->status = T_SUCCESS;
+		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+	assure(oh == NULL);
+	return (olen);
+      efault:
+	swerr();
 	return (-EFAULT);
 }
 
 /**
- * t_size_default_options: - size default options
+ * t_opts_parse - parse options from received primitive
+ * @opts: pointer to options structure
+ * @ip: pointer to options
+ * @ilen: length of options
+ */
+STATIC int
+t_opts_parse(unsigned char *ip, size_t ilen, struct raw_options *op)
+{
+	struct t_opthdr *ih;
+	int optlen;
+	int err;
+
+	err = TBADOPT;
+	for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0); unlikely(ih != NULL);
+	     ih = _T_OPT_NEXTHDR_OFS(ip, ilen, ih, 0)) {
+		if (unlikely(ih->len < sizeof(*ih)))
+			goto error;
+		if (unlikely((unsigned char *) ih + ih->len > ip + ilen))
+			goto error;
+		optlen = ih->len - sizeof(*ih);
+		switch (ih->level) {
+		default:
+		      goto error:
+		case T_INET_IP:
+			switch (ih->name) {
+			default:
+				goto error;
+			case T_IP_OPTIONS:
+				t_set_bit(_T_BIT_IP_OPTIONS, op->flags);
+				continue;
+			case T_IP_TOS:
+				t_set_bit(_T_BIT_IP_TOS, op->flags);
+				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
+				continue;
+			case T_IP_TTL:
+				t_set_bit(_T_BIT_IP_TTL, op->flags);
+				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
+				continue;
+			case T_IP_DONTROUTE:
+				t_set_bit(_T_BIT_IP_DONTROUTE, op->flags);
+				op->ip.dontroute = *(t_uscalar_t *) T_OPT_DATA(ih);
+				continue;
+			case T_IP_BROADCAST:
+				t_set_bit(_T_BIT_IP_BROADCAST, op->flags);
+				op->ip.broadcast = *(t_uscalar_t *) T_OPT_DATA(ih);
+				continue;
+			case T_IP_ADDR:
+				t_set_bit(_T_BIT_IP_ADDR, op->flags);
+				op->ip.addr = *(uint32_t *) T_OPT_DATA(ih);
+				continue;
+			case T_IP_REUSEADDR:
+				t_set_bit(_T_BIT_IP_REUSEADDR, op->flags);
+				op->ip.reuseaddr = *(t_uscalar_t *) T_OPT_DATA(ih);
+				continue;
+			}
+		}
+	}
+	return (0);
+      error:
+	return (err);
+}
+
+/**
+ * t_size_default_options - size default options
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -1170,7 +944,7 @@ t_size_default_options(struct raw *t, const unsigned char *ip, size_t ilen)
 }
 
 /**
- * t_size_current_options: - calculate size of current options
+ * t_size_current_options - calculate size of current options
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -1284,7 +1058,7 @@ t_size_current_options(struct raw *t, const unsigned char *ip, size_t ilen)
 }
 
 /**
- * t_size_check_option: - determine size of options output for T_CHECK
+ * t_size_check_option - determine size of options output for T_CHECK
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -1426,7 +1200,7 @@ t_size_check_options(const struct raw *t, const unsigned char *ip, size_t ilen)
 }
 
 /**
- * t_size_negotiate_options: - determine size of options output for T_NEGOTIATE
+ * t_size_negotiate_options - determine size of options output for T_NEGOTIATE
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -1573,7 +1347,7 @@ t_size_negotiate_options(const struct raw *t, const unsigned char *ip, size_t il
 }
 
 /**
- * t_overall_result: - determine overall options results
+ * t_overall_result - determine overall options results
  * @overall: current overall result
  * @result: result to include in the overall result
  *
@@ -1610,7 +1384,7 @@ t_overall_result(uint * overall, uint result)
 }
 
 /**
- * t_build_default_options: - build options output for T_DEFAULT
+ * t_build_default_options - build options output for T_DEFAULT
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -1822,7 +1596,7 @@ t_build_default_options(const struct raw * t, const unsigned char *ip, size_t il
 }
 
 /**
- * t_build_current_options: - build options output for T_CURRENT
+ * t_build_current_options - build options output for T_CURRENT
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -2050,7 +1824,7 @@ t_build_current_options(const struct raw * t, const unsigned char *ip, size_t il
 #endif
 
 /**
- * t_build_check_options: - built output options for T_CHECK
+ * t_build_check_options - built output options for T_CHECK
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -2424,7 +2198,7 @@ t_build_check_options(const struct raw * t, const unsigned char *ip, size_t ilen
 }
 
 /**
- * t_build_negotiate_options: - build output options for T_NEGOTIATE
+ * t_build_negotiate_options - build output options for T_NEGOTIATE
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -2852,7 +2626,7 @@ t_build_negotiate_options(struct raw * t, const unsigned char *ip, size_t ilen, 
 }
 
 /**
- * t_build_options: - build the output options
+ * t_build_options - build the output options
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
@@ -2881,237 +2655,421 @@ t_build_options(struct raw * t, unsigned char *ip, size_t ilen, unsigned char *o
 }
 
 /*
- *  NS User -> NS Provider  (Request, Response) Primitives
- */
-/**
- * n_bind_req: - send an N_BIND_REQ downstream
- * @q: active queue in queue pair
- * @add: address to bind
- * @add_len: length of the address
- * @conind: number of connection indications
- * @flags: bind flags
- */
-STATIC int
-n_bind_req(queue_t *q, struct sockaddr *add, socklen_t add_len, np_ulong conind, np_ulong flags)
-{
-	struct raw *raw = RAW_PRIV(q);
-	mblk_t *mp;
-	N_bind_req_t *p;
-	queue_t *wq = raw->wq->q_next ? raw->wq : npi_bottom;
-
-	if ((mp = raw_allocb(q, sizeof(*p) + add_len + 1, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = N_BIND_REQ;
-		p->ADDR_length = add_len;
-		p->ADDR_offset = add_len ? sizeof(*p) : 0;
-		p->CONIND_number = conind;
-		p->BIND_flags = flags;
-		p->PROTOID_length = 1;
-		p->PROTOID_offset = sizeof(*p) + add_len;
-		mp->b_wptr += sizeof(*p);
-		if (add_len) {
-			bcopy(add, mp->b_wptr, add_len);
-			mp->b_wptr += add_len;
-		}
-		*(unsigned char *) mp->b_wptr++ = raw->proto;
-		npi_set_state(raw, NS_WACK_BREQ);
-		printd(("%s: %p: N_BIND_REQ ->\n", DRV_NAME, raw));
-		putnext(wq, mp);
-		return (0);
-	}
-	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-	return (-ENOBUFS);
-}
-
-/**
- * n_unbind_req: - send an N_UNBIND_REQ downstream
- * @q: active queue in queue pair
- */
-STATIC int
-n_unbind_req(queue_t *q)
-{
-	struct raw *raw = RAW_PRIV(q);
-	mblk_t *mp;
-	N_unbind_req_t *p;
-	queue_t *wq = raw->wq->q_next ? raw->wq : npi_bottom;
-
-	if ((mp = raw_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = N_UNBIND_REQ;
-		mp->b_wptr += sizeof(*p);
-		npi_set_state(raw, NS_WACK_UREQ);
-		printd(("%s: %p: N_UNBIND_REQ ->\n", DRV_NAME, raw));
-		putnext(wq, mp);
-		return (0);
-	}
-	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-	return (-ENOBUFS);
-}
-
-/**
- * n_unitdata_req: - send an N_UNITDATA_REQ downstream
- * @q: active queue in queue pair
- * @dst: destination address
- * @dst_len: length of destination address
- * @src: source address
- * @src_len: length of source address
- * @dp: data
- */
-STATIC int
-n_unitdata_req(queue_t *q, struct sockaddr *dst, socklen_t dst_len, struct sockaddr *src,
-	       socklen_t src_len, mblk_t *dp)
-{
-	struct raw *raw = RAW_PRIV(q);
-	mblk_t *mp;
-	N_unitdata_req_t *p;
-	queue_t *wq = raw->wq->q_next ? raw->wq : npi_bottom;
-
-	if (wq != NULL) {
-		if (bcanputnext(wq, dp->b_band)) {
-			if ((mp = raw_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
-				mp->b_datap->db_type = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_UNITDATA_REQ;
-				p->DEST_length = dst_len;
-				p->DEST_offset = dst_len ? sizeof(*p) : 0;
-				p->RESERVED_field[0] = src_len;
-				p->RESERVED_field[1] = src_len ? sizeof(*p) + dst_len : 0;
-				mp->b_wptr += sizeof(*p);
-				if (dst_len) {
-					bcopy(dst, mp->b_wptr, dst_len);
-					mp->b_wptr += dst_len;
-				}
-				if (src_len) {
-					bcopy(src, mp->b_wptr, src_len);
-					mp->b_wptr += src_len;
-				}
-				mp->b_cont = dp;
-				mp->b_band = dp->b_band;
-				printd(("%s: %p: N_UNITDATA_REQ ->\n", DRV_NAME, raw));
-				putnext(wq, mp);
-				return (0);
-			}
-			ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-			return (-ENOBUFS);
-		}
-		ptrace(("%s: ERROR: Flow controlled\n", DRV_NAME));
-		return (-EBUSY);
-	}
-	ptrace(("%s: ERROR: No queue\n", DRV_NAME));
-	return (-EAGAIN);
-}
-
-/*
  * RAW actions
  */
 
-STATIC struct raw *
-raw_lookup(uint16_t protocol, uint32_t daddr, uint32_t saddr)
+/**
+ * raw_lookup_conn - look up a stream in the connection hashes
+ * @dprot: destination protocol (of received packet)
+ * @sprot: source protocol (of received packet)
+ * @daddr: destination address (of received packet)
+ * @saddr: source address (of received packet)
+ */
+STATIC INLINE fastcall __hot_in struct raw *
+raw_lookup_conn(uint16_t dprot, uint16_t sprot, uint32_t daddr, uint32_t saddr)
 {
-	fixme(("Write this function."));
-	return (NULL);
+	struct raw *raw;
+	struct raw_chash_bucket *hp = &raw_chash[raw_chashfn(dprot, sprot)];
+
+	read_lock(&hp->lock);
+	for (raw = hp->list; raw; raw = raw->cnext) {
+		struct sockaddr_in *sin = (struct sockaddr_in *) &raw->srce;
+		struct sockaddr_in *din = (struct sockaddr_in *) &raw->dest;
+
+		if (sin->sin_port == dprot && din->din_port == sprot
+		    && sin->sin_addr.s_addr == daddr && din->sin_addr.s_addr == saddr)
+			break;
+	}
+	raw_get(raw);
+	read_unlock(&hp->lock);
+	return (raw);
 }
 
-STATIC struct raw *
-raw_lookup_icmp(uint16_t protocol, uint32_t saddr, uint32_t daddr)
+/**
+ * raw_lookup_bind - look up a stream in the bind hashes
+ * @dprot: destination protocol (of received packet)
+ * @daddr: destination address (of received packet)
+ *
+ * There are two types of Streams that exist in the bind hashes: CLTS Streams that need to be sent
+ * received messages, and COTS Streams that are bound listening or not.  When performing a lookup
+ * for receive packets, we are only interested in CLTS Streams or pseudo-COTS Streams that are bound
+ * in a listening state.
+ */
+STATIC INLINE fastcall __hot_in struct raw *
+raw_lookup_bind(uint16_t dprot, uint32_t daddr)
 {
-	fixme(("Write this function."));
+	struct raw *result = NULL;
+	int snum = htons(dprot);
+	struct raw_bind_bucket *rb;
+	struct raw_bhash_bucket *hp = &raw_bhash[raw_bhashfn(snum)];
+
+	read_lock(&hp->lock);
+	for (rb = hp->list; rb && rb->prot != snum; rb = rb->next) ;
+	if (rb) {
+		struct raw *raw;
+		int hiscore = 0;
+
+		for (raw = rb->owners; raw; raw = raw->bnext) {
+			int score = 0;
+			struct sockaddr_in *sin = (struct sockaddr_in *) &raw->srce;
+			t_uscalar_t state;
+			uint16_t sprot;
+			uint32_t saddr;
+
+			/* only listening T_COTS(_ORD) Streams and T_CLTS Streams */
+			if (raw->CONIND_number == 0 && raw->info.SERV_type != T_CLTS)
+				continue;
+			/* only Streams in the (close to) correct state */
+			if ((state = tpi_get_state(raw)) != TS_IDLE && state != TS_WACK_UREQ)
+				continue;
+			sprot = sin->sin_port;
+			if (sprot == 0)
+				continue;
+			if (bprot != dprot)
+				continue;
+			score++;
+			saddr = sin->sin_addr.s_addr;
+			if (saddr != 0) {
+				if (saddr != daddr)
+					continue;
+				score++;
+			}
+			if (score == 2) {
+				/* perfect match */
+				result = raw;
+				break;
+			}
+			if (score > hiscore) {
+				hiscore = score;
+				result = raw;
+			}
+		}
+	}
+	raw_get(result);
+	read_unlock(&hp->lock);
+	usual(result);
+	return (result);
+}
+
+STATIC INLINE fastcall __hot_in struct raw *
+raw_lookup(uint16_t dprot, uint16_t sprot, uint32_t daddr, uint32_t saddr)
+{
+	struct raw *raw;
+
+	if ((raw = raw_lookup_conn(dprot, sprot, daddr, saddr)))
+		return (raw);
+	if ((raw = raw_lookup_bind(dprot, daddr)))
+		return (raw);
 	return (NULL);
 }
 
 /**
- * raw_bind: - bind a Stream to an NSAP
+ * raw_bind - bind a Stream to a TSAP
  * @q: active queue in queue pair (write queue)
  * @add: address to bind
  * @add_len: length of address
  *
- * There are two ways to bind a Stream:  1) When the Stream is a pseudo-device driver or when the
- * Stream is a multiplex driver, the bind is performed internally using hash tables.  2) When the
- * Stream is a pushable module, the bind is transformed into an N_BIND_REQ message and passed
- * downstream.
+ * Assign a protocol number and bind to it, or bind to the selected protocol.
  */
 STATIC int
-raw_bind(queue_t *q, struct sockaddr *add, socklen_t add_len)
+raw_bind(struct raw *raw, struct sockaddr *add, socklen_t add_len)
 {
-	struct raw *raw = RAW_PRIV(q);
+	static unsigned short raw_prev_port = 10000;
+	static const unsigned short raw_frst_port = 10000;	/* XXX */
+	static const unsigned short raw_last_port = 16000;	/* XXX */
 
-	if (q->q_next != NULL) {
-		return n_bind_req(q, add, add_len, 0, 0);
-	} else {
-		/* check if address is in use or return TADDRBUSY */
-		/* really bind */
-		bcopy(add, &raw->src, add_len);
-		return (0);
+	struct raw_bind_bucket *bp;
+	struct sockaddr_in *sin = (struct sockaddr_in *) add;
+	unsigned short bport = sin->sin_port;
+	unsigned short num = 0;
+	int err = 0;
+
+	if (bport == 0) {
+		num = raw_prev_port;	/* UNSAFE */
+		bport = htons(num);
 	}
+	for (;;) {
+		struct raw *test;
+
+		bp = &raw_bhash[raw_bhashfn(bport)];
+		write_lock(&bp->lock);
+		for (test = bp->list; test; test = test->bnext) {
+			struct sockaddr_in *sit = (struct sockaddr_in *) &test->srce;
+
+			if (bport == sit->sin_port &&
+			    (sit->sin_addr.s_addr == 0
+			     || sit->sin_addr.s_addr = sin->sin_addr.s_addr))
+				break;
+		}
+		if (test != NULL) {
+			write_unlock(&bp->lock);
+			if (num == 0)
+				/* specific port number requested */
+				return (TADDRBUSY);
+			if (++num > raw_last_port)
+				num = raw_frst_port;
+			if (num != raw_prev_port)
+				continue;
+			return (TNOADDR);
+		}
+		if (num != 0)
+			raw_prev_port = num;
+		break;
+	}
+	sin->sin_port = bport;
+	bcopy(sin, &raw->srce, sizeof(*sin));
+	if ((raw->bnext = bp->list))
+		raw->bnext->bprev = &raw->bnext;
+	raw->bprev = &bp->list;
+	bp->list = raw_get(raw);
+	raw->bindb = bp;
+	write_unlock(&bp->lock);
+	return (0);
 }
 
 /**
- * raw_unbind: - unbind a Stream from an NSAP
- * @q: active queue in queue pair (write queue)
+ * raw_unbind - unbind a Stream from an NSAP
+ * @raw: RAW private structure
  *
- * There are two ways to unbind a Stream:  1) when the Stream is a pseudo-device driver or when the
- * Stream is a multiplex driver, the unbind is performed internally using hash tables.  2) When the
- * Stream is a pushable module, the bind is transformed into an N_UNBIND_REQ message and passed
- * downstream.
+ * Simply remove it from the hashes.  This function can be called whether the stream is bound or
+ * not (and is always called before the private structure is freed.
  */
 STATIC int
-raw_unbind(queue_t *q)
+raw_unbind(struct raw *raw)
 {
-	struct raw *raw = RAW_PRIV(q);
+	struct raw_bind_bucket *bp;
 
-	if (q->q_next != NULL) {
-		return n_unbind_req(q);
-	} else {
-		/* really unbind */
-		bzero(&raw->src, sizeof(raw->src));
-		return (0);
+	if ((bp = raw->bindb)) {
+		write_lock(&bp->lock);
+		if ((*raw->bprev = raw->bnext))
+			raw->bnext->bprev = raw->bprev;
+		raw->bnext = NULL;
+		raw->bprev = &raw->bnext;
+		raw->bindb = NULL;
+		write_unlock(&bp->lock);
+		bzero(&raw->srce, sizeof(raw->srce));
+		raw_release(&raw);
 	}
+	return (0);
 }
 
 /**
- * raw_xmitmsg: - send a message from a Stream
+ * raw_connect - connect a Stream to an TSAP
+ * @q: active queue (write queue)
+ * @add: address to connect to
+ * @add_len: length of address
+ *
+ * Connect to the specified port and address.  If the connection results in a conflict, TADDRBUSY is
+ * returned, zero (0) on success.
+ */
+STATIC int
+raw_connect(struct raw *raw, struct sockaddr *add, socklen_t add_len)
+{
+	struct raw *up;
+	struct sockaddr_in *sin, *din;
+	uint16_t sport, dport;
+	uint32_t saddr, daddr;
+	struct raw_chash_bucket *hp;
+
+	sin = (struct sockaddr_in *) &raw->srce;
+	sport = sin->sin_port;
+	saddr = sin->sin_addr.s_addr;
+	din = (struct sockaddr_in *) add;
+	dport = din->sin_port;
+	daddr = din->sin_addr.s_addr;
+	hp = &raw_chash[raw_chashfn(dport, sport)];
+
+	write_lock(&hp->lock);
+	for (up = hp->list; up; up = up->cnext) {
+		sin = (typeof(sin)) & up->srce;
+		din = (typeof(din)) & up->dest;
+		if (sin->sin_port == sport && din->sin_port == dport)
+			break;
+	}
+	if (up != NULL) {
+		write_unlock(&hp->lock);
+		return (TADDRBUSY);
+	}
+	if ((raw->cnext = hp->list))
+		raw->cnext->cprev = &raw->cnext;
+	raw->cprev = &hp->list;
+	hp->list = raw_get(raw);
+	raw->hashb = hp;
+	din = (typeof(din)) & raw->dest;
+	din->sin_family = AF_INET;
+	din->sin_port = dport;
+	din->sin_addr.s_addr = daddr;
+	write_unlock(&hp->lock);
+	return (0);
+}
+
+/**
+ * raw_disconnect - disconnect from the connection hashes
+ * @q: active queue (write queue)
+ */
+STATIC int
+raw_disconnect(struct raw *raw)
+{
+	struct raw_chash_bucket *hp;
+
+	if ((hp = raw->hashb)) {
+		write_lock(&hp->lock);
+		if ((*raw->cprev = raw->cnext))
+			raw->cnext->cprev = raw->cprev;
+		raw->cnext = NULL;
+		raw->cprev = &raw->cnext;
+		raw->hashb = NULL;
+		write_unlock(&hp->lock);
+		bzero(&raw->dest, sizeof(raw->dest));
+		raw_release(&raw);
+	}
+	return (0);
+}
+
+#if defined HAVE_KFUNC_DST_OUTPUT
+STATIC INLINE int
+raw_queue_xmit(struct sk_buff *skb)
+{
+	struct rtable *rt = (struct rtable *) skb->dst;
+	struct iphdr *iph = skb->nh.iph;
+
+#if defined NETIF_F_TSO
+	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
+#else				/* !defined NETIF_F_TSO */
+	ip_select_ident(iph, &rt->u.dst, NULL);
+#endif				/* defined NETIF_F_TSO */
+	ip_send_check(iph);
+#if defined HAVE_KFUNC_IP_DST_OUTPUT
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
+#else				/* !defined HAVE_KFUNC_IP_DST_OUTPUT */
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
+#endif				/* defined HAVE_KFUNC_IP_DST_OUTPUT */
+}
+#else				/* !defined HAVE_KFUNC_DST_OUTPUT */
+STATIC INLINE int
+raw_queue_xmit(struct sk_buff *skb)
+{
+	struct rtable *rt = (struct rtable *) skb->dst;
+	struct iphdr *iph = skb->nh.iph;
+
+	if (skb->len > dst_pmtu(&rt->u.dst)) {
+		rare();
+		return ip_fragment(skb, skb->dst->output);
+	} else {
+		iph->frag_off |= __constant_htons(IP_DF);
+		ip_send_check(iph);
+		return skb->dst->output(skb);
+	}
+}
+#endif				/* defined HAVE_KFUNC_DST_OUTPUT */
+
+/**
+ * raw_xmitmsg - send a message from a Stream
  * @q: active queue in queue pair (write queue)
  * @mp: T_UNITDATA_REQ message
- * @opts: RAW options for send
+ * @opts: UDP options for send
  *
- * There are two ways to send a message: 1) When the Stream is a multiplex driver or when the Stream
- * is a pushable module, the message is transformed into an N_UNITDATA_REQ and passed to the lower
- * multiplex or downstream.  2) When the Stream is a pseudo-device driver, the message is sent to
- * the IP layer directly.
+ * TODO: We need to handle IP options specified using the T_IP_OPTIONS option at the T_INET_IP
+ * level.  Currently these are being ignored and all packets are being sent without IP options of
+ * any kind. (We are, however, processing them on receive.)
+ *
+ * Yes, it is possible with STREAMS to use the Van Jacobson approach (simultaneous copy from user
+ * and checksum); however, we need to place this function in the Stream head.  The approach would
+ * specify to the Stream head the form of the checksum to use and then each mblk_t containing data
+ * copied from the user would also contain a partial checksum of the appropriate type.  That is for
+ * later.
  */
-STATIC int
-raw_xmitmsg(queue_t *q, mblk_t *mp, struct raw_options *opts)
+STATIC INLINE fastcall __hot_out int
+raw_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct raw_options *opts)
 {
-	struct raw *raw = RAW_PRIV(q);
-	queue_t *wq = raw->wq->q_next ? raw->wq : npi_bottom;
+	struct raw *raw = UDP_PRIV(q);
+	struct rtable *rt = NULL;
+	int err;
 
-	if (wq != NULL) {
-		int rtn;
-		struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
-		struct sockaddr *src = NULL, *dst;
-		socklen_t src_len = 0, dst_len;
-		struct sockaddr_in sin;
+	if (likely((err = ip_route_output(&rt, sin->sin_addr.s_addr, 0, 0, 0)) == 0)) {
+		struct sk_buff *skb;
+		struct net_device *dev = rt->u.dst.dev;
+		size_t hlen = (dev->hard_header_len + 15) & ~15;
+		size_t ulen = msgdsize(dp);
+		size_t plen = sizeof(struct udphdr) + ulen;
+		size_t tlen = sizeof(struct iphdr) + plen;
 
-		if (opts != NULL && t_tst_bit(_T_BIT_IP_ADDR, opts->flags)) {
-			sin.sin_family = AF_INET;
-			sin.sin_port = htons(raw->proto);
-			sin.sin_addr.s_addr = opts->ip.addr;
-			src = (struct sockaddr *) &sin;
-			src_len = sizeof(sin);
+		if (likely((skb = alloc_skb(hlen + tlen, GFP_ATOMIC)) != NULL)) {
+			mblk_t *bp;
+			struct iphdr *iph;
+			struct udphdr *uh;
+			unsigned char *data;
+
+			skb_reserve(skb, hlen);
+			/* find headers */
+			iph = (typeof(iph)) __skb_put(skb, tlen);
+			/* We need to process IP options, but are not doing so yet. */
+			uh = (typeof(uh)) (iph + 1);
+			data = (unsigned char *) (uh + 1);
+			uh->dest = sin->sin_port;
+			uh->source = htons(raw->port);
+			uh->len = htons(ulen);
+			uh->check = 0;
+			skb->dst = &rt->u.dst;
+			/* Should probably add an XTI_PRIORITY option at the XTI_GENERIC level. */
+			skb->priority = 0;
+			iph->version = 4;
+			iph->ihl = 5;
+			/* Can be set using the T_IP_TOS option at the T_INET_IP level. */
+			iph->tos = opts->ip.tos;
+			iph->frag_off = 0;
+			/* Can be set using the T_IP_TTL option at the T_INET_IP level. */
+			iph->ttl = opts->ip.ttl;
+			iph->daddr = rt->rt_dst;
+			/* Yes the TS user can override the source address using the T_IP_ADDR
+			   option at the T_INET_IP level. */
+			if (t_tst_bit(_T_BIT_IP_ADDR, opts.flags))
+				iph->saddr = opts.ip.addr;
+			else
+				iph->saddr = rt->rt_src;
+			iph->protocol = IPPROTO_UDP;
+			iph->tot_len = htons(tlen);
+			skb->nh.iph = iph;
+#if !defined HAVE_KFUNC_DST_OUTPUT
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+			__ip_select_ident(iph, &rt->u.dst);
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+			__ip_select_ident(iph, &rt->u.dst, 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
+#endif				/* !defined HAVE_KFUNC_DST_OUTPUT */
+			for (bp = dp; bp; bp = bp->b_cont) {
+				int blen = bp->b_wptr - bp->b_rptr;
+
+				if (likely(blen > 0)) {
+					bcopy(bp->b_rptr, data, blen);
+					data += blen;
+				} else
+					rare();
+			}
+			uh->check = 0;
+#if defined HAVE_KFUNC_DST_OUTPUT
+			raw_queue_xmit(skb);
+#else				/* !defined HAVE_KFUNC_DST_OUTPUT */
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, raw_queue_xmit);
+#endif				/* defined HAVE_KFUNC_DST_OUTPUT */
+			return (QR_DONE);
 		}
-		dst = (struct sockaddr *) ((unsigned char *) p + p->DEST_offset);
-		dst_len = p->DEST_length;
-		rtn = n_unitdata_req(q, dst, dst_len, src, src_len, mp->b_cont);
-		if (rtn == QR_DONE)
-			return (QR_TRIMMED);
-		return (rtn);
-
-	} else {
-		/* FIXME: need to send message directly */
-		return (-EFAULT);
+		/* Note that this is kind of a sneaky trick.  When we are able to allocate a
+		   message block of the appropriate size, the chances of allocating an sk_buff of
+		   the same size are also likely. */
+		ss7_bufcall(q, hlen + tlen, BPRI_MED);
+		return (-ENOBUFS);
 	}
+	if (err == -ENOMEM) {
+		/* Note that this is kind of a sneaky trick.  When we are able to allocate a
+		   message block of the appropriate size, the chances of allocating an rtable entry
+		   are also likely. */
+		ss7_bufcall(q, sizeof(*rt), BPRI_MED);
+		return (-ENOMEM);
+	}
+	return (err);
 }
 
 /*
@@ -3127,16 +3085,17 @@ raw_xmitmsg(queue_t *q, mblk_t *mp, struct raw_options *opts)
 STATIC int
 m_flush(queue_t *q, int how, int band)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 
-	if ((mp = raw_allocb(q, 2, BPRI_HI))) {
-		mp->b_datap->db_type = M_FLUSH;
-		*mp->b_wptr++ = how;
-		*mp->b_wptr++ = band;
-		putnext(raw->rq, mp);
-		return (QR_DONE);
-	}
+	if (unlikely((mp = ss7_allocb(q, 2, BPRI_HI)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_FLUSH;
+	*mp->b_wptr++ = how;
+	*mp->b_wptr++ = band;
+	putnext(raw->oq, mp);
+	return (QR_DONE);
+      enobufs:
 	return (-ENOBUFS);
 }
 
@@ -3144,42 +3103,53 @@ m_flush(queue_t *q, int how, int band)
  * m_error: deliver an M_ERROR message upstream
  * @q: a queue in the queue pair
  * @error: the error to deliver
+ * @mp: message to reuse
  */
 STATIC int
-m_error(queue_t *q, int error)
+m_error(queue_t *q, int error, mblk_t *mp)
 {
-	struct raw *raw = PRIV(q);
-	mblk_t *mp;
+	struct raw *raw = RAW_PRIV(q);
+	mblk_t *pp = mp;
 	int hangup = 0;
 
-	if (error < 0)
-		error = -error;
 	switch (error) {
-	case EBUSY:
-	case ENOBUFS:
-	case EAGAIN:
-	case ENOMEM:
-		return (-error);
-	case EPIPE:
-	case ENETDOWN:
-	case EHOSTUNREACH:
+	case 0:
+		seldom();
+		return (0);
+	case -EBUSY:
+	case -ENOBUFS:
+	case -EAGAIN:
+	case -ENOMEM:
+		return (error);
+	case -EPIPE:
+	case -ENETDOWN:
+	case -EHOSTUNREACH:
 		hangup = 1;
+		error = EPIPE;
+		break;
+	default:
+		error = EPROTO;
+		break;
 	}
-	if ((mp = raw_allocb(q, 2, BPRI_HI))) {
-		if (hangup) {
-			printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, raw));
-			mp->b_datap->db_type = M_HANGUP;
-			putnext(raw->rq, mp);
-			error = EPIPE;
-		} else {
-			printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, raw, error));
-			mp->b_datap->db_type = M_ERROR;
-			*(mp->b_wptr)++ = error;
-			*(mp->b_wptr)++ = error;
-			putnext(raw->rq, mp);
-		}
-		return (-error);
+	if (unlikely((mp == NULL || mp->b_datap->db_refs > 1) && (mp = ss7_allocb(q, 2, BPRI_HI)) == NULL))
+		goto enobufs;
+	mp->b_wptr = mp->b_rptr = mp->b_datap->db_base;
+	if (mp->b_cont)
+		freemsg(XCHG(&mp->b_cont, NULL));
+	if (hangup) {
+		printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, raw));
+		mp->b_datap->db_type = M_HANGUP;
+		mp->b_band = 0;
+	} else {
+		printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, raw, error));
+		mp->b_datap->db_type = M_ERROR;
+		mp->b_band = 0;
+		*(mp->b_wptr)++ = error;
+		*(mp->b_wptr)++ = error;
 	}
+	qreply(q, mp);
+	return (pp == mp) ? (QR_ABSORBED) : (QR_DONE);
+      enobufs:
 	rare();
 	return (-ENOBUFS);
 }
@@ -3191,29 +3161,20 @@ m_error(queue_t *q, int error)
 STATIC int
 t_info_ack(queue_t *q)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 	struct T_info_ack *p;
 
-	if ((mp = raw_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_INFO_ACK;
-		p->TSDU_size = (unsigned short) 0xffff;
-		p->ETSDU_size = T_INVALID;
-		p->CDATA_size = T_INVALID;
-		p->DDATA_size = T_INVALID;
-		p->ADDR_size = sizeof(struct sockaddr_in);
-		p->OPT_size = (unsigned short) 0xffff;
-		p->TIDU_size = T_INVALID;
-		p->SERV_type = T_CLTS;
-		p->CURRENT_state = tpi_get_state(raw);
-		p->PROVIDER_flag = T_XPG4_1 & ~T_SNDZERO;
-		mp->b_wptr += sizeof(*p);
-		printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, raw));
-		putnext(raw->rq, mp);
-		return (0);
-	}
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
+	*p = raw->info;
+	mp->b_wptr += sizeof(*p);
+	printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, raw));
+	putnext(raw->oq, mp);
+	return (0);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
@@ -3228,252 +3189,537 @@ t_info_ack(queue_t *q)
 STATIC int
 t_bind_ack(queue_t *q, struct sockaddr *add, socklen_t add_len, t_uscalar_t conind)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 	struct T_bind_ack *p;
 
-	if ((mp = raw_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_BIND_ACK;
-		p->ADDR_length = add_len;
-		p->ADDR_offset = add_len ? sizeof(*p) : 0;
-		p->CONIND_number = conind;
-		mp->b_wptr += sizeof(*p);
-		if (add_len) {
-			bcopy(add, mp->b_wptr, add_len);
-			mp->b_wptr += add_len;
-		}
-		tpi_set_state(raw, TS_IDLE);
-		printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, raw));
-		putnext(raw->rq, mp);
-		return (0);
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
+	p->PRIM_type = T_BIND_ACK;
+	p->ADDR_length = add_len;
+	p->ADDR_offset = add_len ? sizeof(*p) : 0;
+	p->CONIND_number = conind;
+	mp->b_wptr += sizeof(*p);
+	if (add_len) {
+		bcopy(add, mp->b_wptr, add_len);
+		mp->b_wptr += add_len;
 	}
+	tpi_set_state(raw, TS_IDLE);
+	printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, raw));
+	putnext(raw->oq, mp);
+	return (0);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
 /**
- * t_error_ack: send a T_ERROR_ACK upstream with state changes
- * @q: a queue in the queue pair
+ * t_error_ack: deliver a T_ERROR_ACK upstream with state changes
+ * @q: active queue (write queue)
  * @prim: primitive in error
- * @error: TPI/UNIX error
+ * @err: TLI or UNIX error number
+ * @mp: message block to reuse
  */
 STATIC int
-t_error_ack(queue_t *q, t_scalar_t prim, t_scalar_t error)
+t_error_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error)
 {
-	struct raw *raw = PRIV(q);
-	mblk_t *mp;
+	struct raw *raw = RAW_PRIV(q);
 	struct T_error_ack *p;
+	mblk_t *pp = mp;
+	int err;
 
+	/* rollback state */
+	tpi_set_state(raw, raw->i_oldstate);
+	raw->i_oldstate = tpi_get_state(raw);
+
+	err = error;
 	switch (error) {
-	case -EBUSY:
-	case -EAGAIN:
-	case -ENOMEM:
 	case -ENOBUFS:
-		seldom();
-		return (error);
+	case -ENOMEM:
+	case -EAGAIN:
+	case -EBUSY:
+		goto error;
 	case 0:
-		never();
-		return (error);
+		err = -EFAULT;
+		goto error;
 	}
-	if (!(mp = raw_allocb(q, sizeof(*p), BPRI_MED)))
-		goto enobufs;
+	err = -ENOBUFS;
+	if ((mp == NULL || mp->b_datap->db_refs > 1)
+	    && (mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL)
+		goto error;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr;
+	mp->b_band = 0;
+	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = T_ERROR_ACK;
 	p->ERROR_prim = prim;
-	p->TLI_error = error < 0 ? TSYSERR : error;
-	p->UNIX_error = error < 0 ? -error : 0;
-	mp->b_wptr += sizeof(*p);
-	/* This is to only try and get the state correct for putnext. */
-	if (error != TOUTSTATE) {
-		switch (tpi_get_state(raw)) {
-#ifdef TS_WACK_OPTREQ
-		case TS_WACK_OPTREQ:
-			tpi_set_state(raw, TS_IDLE);
-			break;
-#endif
-		case TS_WACK_BREQ:
-			tpi_set_state(raw, TS_UNBND);
-			break;
-		case TS_WACK_UREQ:
-			tpi_set_state(raw, TS_IDLE);
-			break;
-		default:
-			/* Note: if we are not in a WACK state we simply do not change state.  This 
-			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
-			   TS_IDLE state. */
-			break;
-		}
-	}
+	p->TLI_error = error > 0 ? error : TSYSERR;
+	p->UNIX_error = error > 0 ? 0 : -error;
+	if (mp->b_cont)
+		freemsg(XCHG(&mp->b_cont, NULL));
 	printd(("%s: %p: <- T_ERROR_ACK\n", DRV_NAME, raw));
-	putnext(raw->rq, mp);
-	/* Returning -EPROTO here will make sure that the old state is restored correctly.  If we
-	   return QR_DONE, then the state will never be restored. */
-	if (error < 0)
-		return (error);
-	return (-EPROTO);
-      enobufs:
-	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-	return (-ENOBUFS);
+	qreply(q, mp);
+	return (mp == pp) ? (QR_ABSORBED) : (QR_DONE);
+      error:
+	return (err);
 }
 
 /**
  * t_ok_ack: deliver a T_OK_ACK upstream with state changes
  * @q: a queue in the queue pair
  * @prim: correct primitive
+ * @mp: message block to reuse
+ * @cp: connection indication
+ * @dp: user data
+ * @ap; accepting stream
  */
-STATIC int
-t_ok_ack(queue_t *q, t_scalar_t prim)
+STATIC INLINE fastcall __hot_put int
+t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct raw *ap)
 {
-	int err = -EFAULT;
-	struct raw *raw = PRIV(q);
-	mblk_t *mp;
+	struct raw *raw = RAW_PRIV(q);
 	struct T_ok_ack *p;
+	mblk_t *pp = mp;
+	int err;
 
-	if ((mp = raw_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_OK_ACK;
-		p->CORRECT_prim = prim;
-		mp->b_wptr += sizeof(*p);
-		switch (tpi_get_state(raw)) {
-		case TS_WACK_UREQ:
-			if ((err = raw_unbind(q)))
-				goto free_error;
-			/* TPI spec says that if the provider must flush both queues before
-			   responding with a T_OK_ACK primitive when responding to a T_UNBIND_REQ.
-			   This is to flush queued data for connectionless providers. */
-			if (m_flush(q, FLUSHRW, 0) == -ENOBUFS)
-				goto enobufs;
-			tpi_set_state(raw, TS_UNBND);
-			break;
-		default:
-			break;
-			/* Note: if we are not in a WACK state we simply do not change state.  This 
-			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
-			   the TS_IDLE state. */
+	err = -ENOBUFS;
+	if ((mp == NULL || mp->b_datap->db_refs > 1)
+	    && (mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL)
+		goto error;
+	mp->b_datap->db_type = M_PCPROTO;
+	mp->b_band = 0;
+	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	p = (typeof(p)) mp->b_wptr++;
+	p->PRIM_type = T_OK_ACK;
+	p->CORRECT_prim = prim;
+	switch (tpi_get_state(raw)) {
+	case TS_WACK_UREQ:
+		if ((err = raw_unbind(raw)))
+			goto error;
+		/* TPI spec says that if the provider must flush both queues before responding with
+		   a T_OK_ACK primitive when responding to a T_UNBIND_REQ. This is to flush queued
+		   data for connectionless providers. */
+		if ((err = m_flush(q, FLUSHRW, 0)))
+			goto error;
+		tpi_set_state(raw, TS_UNBND);
+		break;
+	case TS_WACK_CREQ:
+		if ((err = raw_connect(raw, &raw->dest, sizeof(raw->dest))))
+			goto error;
+		tpi_set_state(raw, TS_WCON_CREQ);
+		if ((err = raw_xmitmsg(q, dp, &raw->options))) {
+			raw_disconnect(raw);
+			goto error;
 		}
-		printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, raw));
-		putnext(raw->rq, mp);
-		return (QR_DONE);
+		break;
+	case TS_WACK_CRES:
+		if ((err = raw_connect(ap, &ap->dest, sizeof(ap->dest))))
+			goto error;
+		ap->i_oldstate = tpi_get_state(ap);
+		tpi_set_state(ap, TS_DATA_XFER);
+		if ((err = raw_xmitmsg(q, dp, &ap->options))) {
+			raw_disconnect(ap);
+			tpi_set_state(ap, ap->i_oldstate);
+			goto error;
+		}
+		bufq_dequeue(&raw->conq, cp);
+		freeb(XCHG(&cp, cp->b_cont));
+		/* queue any pending data */
+		while (cp)
+			put(ap->oq, XCHG(&cp, cp->b_cont));
+		if (ap != raw) {
+			if (bufq_length(&raw->conq) > 0)
+				tpi_set_state(raw, TS_WRES_CIND);
+			else
+				tpi_set_state(raw, TS_IDLE);
+		}
+		break;
+	case TS_WACK_DREQ6:
+	case TS_WACK_DREQ7:
+	case TS_WACK_DREQ9:
+	case TS_WACK_DREQ10:
+	case TS_WACK_DREQ11:
+		if (cp != NULL) {
+			bufq_dequeue(&raw->conq, cp);
+			freemsg(cp);
+		} else
+			raw_disconnect(raw)
+			    tpi_set_state(raw,
+					  (bufq_length(&raw->conq) > 0) ? TS_WRES_CIND : TS_IDLE);
+		break;
+	default:
+		break;
+		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
+		   normally when we are responding to a T_OPTMGMT_REQ in other than the TS_IDLE
+		   state. */
 	}
-      enobufs:
-	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-	return (-ENOBUFS);
-      free_error:
-	freemsg(mp);
-	return t_error_ack(q, prim, err);
+	if (mp->b_cont)
+		freemsg(XCHG(&mp->b_cont, NULL));
+	printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, raw));
+	qreply(q, mp);
+	return (mp == pp) ? (QR_ABSORBED) : (QR_DONE);
+      error:
+	if (mp != pp)
+		freemsg(mp);
+	return t_error_ack(q, prim, pp, err);
 }
 
 /**
- * t_unitdata_ind: - send a T_UNITDATA_IND upstream
+ * t_reply_ack: send a T_OK_ACK or T_ERROR_ACK upstream with state changes
  * @q: a queue in the queue pair
+ * @prim: primitive in error
+ * @error: TPI/UNIX error
+ * @mp: message to reuse
+ * @cp: connection indication pointer
+ */
+STATIC int
+t_reply_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error, mblk_t *cp, mblk_t *dp,
+	    struct raw *ap)
+{
+	if (error == 0)
+		return t_ok_ack(q, prim, mp, cp, dp, ap);
+	return t_error_ack(q, prim, mp, error);
+}
+
+/**
+ * t_unitdata_ind - send a T_UNITDATA_IND upstream
+ * @q: read queue
  * @dp: data block containing IP packet
  *
  * IMPLEMENTATION: The data block contains the IP, RAW header and RAW payload starting at
  * dp->b_datap->db_base.  The RAW message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
  */
-STATIC int
+STATIC INLINE fastcall __hot_get int
 t_unitdata_ind(queue_t *q, mblk_t *dp)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 	struct T_unitdata_ind *p;
-	size_t opt_len = t_opts_size(raw, dp);
-	const size_t src_len = sizeof(struct sockaddr_in);
+	t_scalar_t OPT_length, SRC_length;
 
-	if ((mp = raw_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_UNITDATA_IND;
-		p->SRC_length = src_len;
-		p->SRC_offset = src_len ? sizeof(*p) : 0;
-		p->OPT_length = opt_len;
-		p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
-		mp->b_wptr += sizeof(*p);
-		if (src_len) {
-			struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
-			struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
+	if (unlikely(tpi_get_state(raw) != TS_IDLE))
+		goto discard;
+	OPT_length = t_opts_size(raw, dp);
+	SRC_length = sizeof(struct sockaddr_in);
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + SRC_length + OPT_length, BPRI_MED)) == NULL))
+		goto enobufs;
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
+	mp->b_datap->db_type = M_PROTO;
+	p = (typeof(p)) mp->b_wptr++;
+	p->PRIM_type = T_UNITDATA_IND;
+	p->SRC_length = SRC_length;
+	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
+	p->OPT_length = OPT_length;
+	p->OPT_offset = OPT_length ? sizeof(*p) + SRC_length : 0;
+	if (SRC_length) {
+		struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
+		struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
 
-			sin->sin_family = AF_INET;
-			sin->sin_port = iph->protocol;
-			sin->sin_addr.s_addr = iph->saddr;
-			mp->b_wptr += src_len;
-		}
-		if (opt_len) {
-			t_opts_build(raw, dp, mp->b_wptr, opt_len);
-			mp->b_wptr += opt_len;
-		}
-		mp->b_cont = dp;
-		printd(("%s: %p: <- T_UNITDATA_IND\n", DRV_NAME, raw));
-		putnext(raw->rq, mp);
-		return (QR_ABSORBED);
+		sin->sin_family = AF_INET;
+		sin->sin_port = iph->protocol;
+		sin->sin_addr.s_addr = iph->saddr;
+		mp->b_wptr += SRC_length;
 	}
+	if (OPT_length) {
+		t_opts_build(raw, dp, mp->b_wptr, OPT_length);
+		mp->b_wptr += OPT_length;
+	}
+	dp->b_datap->db_type = M_DATA;
+	mp->b_cont = dp;
+	printd(("%s: %p: <- T_UNITDATA_IND\n", DRV_NAME, raw));
+	putnext(q, mp);
+	return (QR_ABSORBED);
+      ebusy:
+	freeb(mp);
+	return (-EBUSY);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
+      discard:
+	return (QR_DONE);
 }
 
 /**
- * t_uderror_ind: - send a T_UDERROR_IND upstream
- * @q: a queue in the queue pair
+ * t_conn_ind - send a T_CONN_IND upstream
+ * @q: read queue
  * @dp: data block containing IP packet
  *
- * IMPLEMENTATION: The data block contains the IP, ICMP header and ICMP payload starting at
- * dp->b_datap->db_base.  The ICMP message payload starts at dp->b_rptr. This function extracts IP
+ * IMPLEMENTATION: The data block contains the IP, UDP header and UDP payload starting at
+ * dp->b_datap->db_base.  The UDP message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
+ */
+STATIC INLINE fastcall __hot_get int
+t_conn_ind(queue_t *q, mblk_t *dp)
+{
+	struct raw *raw = RAW_PRIV(q);
+	mblk_t *mp, *cp;
+	struct T_conn_ind *p;
+	t_scalar_t OPT_length, SRC_length;
+	struct sockaddr_in *sin;
+	struct iphdr *iph;
+
+	if (unlikely(tpi_get_statef(raw) & ~(TSF_IDLE | TSF_WRES_CIND | TSF_WACK_CRES)))
+		goto discard;
+
+	iph = (typeof(iph)) dp->b_datap->db_base;
+
+	spin_lock_bh(&raw->conq.q_lock);
+	for (cp = bufq_head(&raw->conq); cp; cp = cp->b_next) {
+		p = (typeof(p)) cp->b_rptr;
+		sin = (typeof(sin)) (cp->b_rptr + p->SRC_offset);
+		if (sin->sin_port != iph->protocol || sin->sin_addr.s_addr != iph->saddr)
+			continue;
+		break;
+	}
+	if (cp != NULL) {
+		/* already have a connection indication, link the data */
+		linkb(cp, dp);
+		spin_unlock_bh(&raw->conq.q_lock);
+		return (QR_ABSORBED);
+	}
+	spin_unlock_bh(&raw->conq.q_lock);
+
+	/* If there are already too many connection indications outstanding, discard further
+	   connection indications until some are accepted.  Note that data for existing outstanding
+	   connection indications is preserved above. */
+	if (unlikely(bufq_length(&raw->conq) >= raw->CONIND_number))
+		goto eagain;
+	/* If there is already a connection accepted on the listening stream, discard further
+	   connection indications until the current connection disconnects */
+	if (unlikely(tpi_get_statef(raw) & ~(TSF_IDLE | TSF_WRES_CIND)))
+		goto eagain;
+
+	OPT_length = t_opts_size(raw, dp);
+	SRC_length = sizeof(struct sockaddr_in);
+
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + SRC_length + OPT_length, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (typeof(p)) mp->b_wptr++;
+	p->PRIM_type = T_CONN_IND;
+	p->SRC_length = SRC_length;
+	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
+	p->OPT_length = OPT_length;
+	p->OPT_offset = OPT_length ? sizeof(*p) + SRC_length : 0;
+	if (SRC_length) {
+		struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
+
+		sin->sin_family = AF_INET;
+		sin->sin_port = uh->source;
+		sin->sin_addr.s_addr = iph->saddr;
+		mp->b_wptr += SRC_length;
+	}
+	if (OPT_length) {
+		t_opts_build(raw, dp, mp->b_wptr, OPT_length);
+		mp->b_wptr += OPT_length;
+	}
+	if (unlikely((cp = ss7_copyb(q, mp)) == NULL))
+		goto free_enobufs;
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
+	bufq_queue(&raw->conq, cp);
+	dp->b_datap->db_type = M_DATA;
+	mp->b_cont = dp;
+	tpi_set_state(raw, TS_WRES_CIND);
+	printd(("%s: %p: <- T_CONN_IND\n", DRV_NAME, raw));
+	putnext(q, mp);
+	return (QR_ABSORBED);
+      ebusy:
+	freeb(cp);
+	freeb(mp);
+	return (-EBUSY);
+      free_enobufs:
+	freeb(mp);
+      enobufs:
+	return (-ENOBUFS);
+      eagain:
+	return (-EAGAIN);
+      discard:
+	return (QR_DONE);
+}
+
+/**
+ * t_optdata_ind - send a T_OPTDATA_IND upstream
+ * @q: read queue
+ * @dp: data block containing IP packet
+ *
+ * IMPLEMENTATION: The data block containst the IP header and payload, starting at
+ * dp->b_datap->db_base.  The IP message payload starts at dp->b_rptr.  This function extracts IP
+ * header information and uses it to create options.
+ */
+STATIC INLINE fastcall __hot_get int
+t_optdata_ind(queue_t *q, mblk_t *dp)
+{
+	struct raw *raw = RAW_PRIV(q);
+	mblk_t *mp;
+	struct T_optdata_ind *p;
+	t_scalar_t OPT_length = t_opts_size(raw, dp);
+
+	if (unlikely(tpi_get_statef(raw) & ~(TSF_DATA_XFER | TSF_WIND_ORDREL)))
+		goto discard;
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + OPT_length, BPRI_MED)) == NULL))
+		goto enobufs;
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
+	mp->b_datap->db_type = M_PROTO;
+	p = (typeof(p)) mp->b_wptr++;
+	p->PRIM_type = T_OPTDATA_IND;
+	p->DATA_flag = 0;
+	p->OPT_length = OPT_length;
+	p->OPT_offset = OPT_length ? sizeof(*p) : 0;
+	if (OPT_length) {
+		t_opts_build(raw, dp, mp->b_wptr, OPT_length);
+		mp->b_wptr += OPT_length;
+	}
+	dp->b_datap->db_type = M_DATA;
+	mp->b_cont = dp;
+	printd(("%s: %p: <= T_OPTDATA_IND\n", DRV_NAME, raw));
+	putnext(q, mp);
+	return (QR_ABSORBED);
+      ebusy:
+	freeb(mp);
+	return (-EBUSY);
+      enobufs:
+	return (-ENOBUFS);
+      discard:
+	return (QR_DONE);
+}
+
+/**
+ * t_uderror_ind - send a T_UDERROR_IND upstream
+ * @q: read queue
+ * @dp: data block containing ICMP packet
+ *
+ * IMPLEMENTATION: The data block contains the ICMP header, IP header and payload starting at
+ * dp->b_datap->db_base.  The IP payload starts at dp->b_rptr. This function extracts IP header
+ * information and uses it to create options.
  */
 STATIC INLINE int
 t_uderror_ind(queue_t *q, mblk_t *dp)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 	struct T_uderror_ind *p;
-	size_t opt_len = t_errs_size(raw, dp);
-	int etype = 0;
-	const size_t src_len = sizeof(struct sockaddr_in);
+	t_uscalar_t OPT_length = t_errs_size(raw, dp);
+	t_uscalar_t ERROR_type = 0;
+	const t_uscalar_t SRC_length = sizeof(struct sockaddr_in);
 
-	if (canputnext(raw->rq)) {
-		if ((mp = raw_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			mp->b_band = 2;	/* XXX move ahead of data indications */
-			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = T_UDERROR_IND;
-			p->DEST_length = src_len;
-			p->DEST_offset = src_len ? sizeof(*p) : 0;
-			p->OPT_length = opt_len;
-			p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
-			mp->b_wptr += sizeof(*p);
-			if (src_len) {
-				struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
-				struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
+	if (unlikely(tpi_get_statef(raw) & ~(TSF_IDLE)))
+		goto discard;
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + SRC_length + OPT_length, BPRI_MED)) == NULL))
+		goto enobufs;
+	if (unlikely(!canputnext(raw->rq)))
+		goto ebusy;
+	mp->b_datap->db_type = M_PROTO;
+	mp->b_band = 2;		/* XXX move ahead of data indications */
+	p = (typeof(p)) mp->b_wptr;
+	p->PRIM_type = T_UDERROR_IND;
+	p->DEST_length = SRC_length;
+	p->DEST_offset = sizeof(*p);
+	p->OPT_length = OPT_length;
+	p->OPT_offset = OPT_length ? sizeof(*p) + SRC_length : 0;
+	mp->b_wptr += sizeof(*p);
+	{
+		struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
+		struct icmphdr *icmph = (typeof(icmph)) dp->b_datap->db_base;
+		struct iphdr *iph = (typeof(iph)) (icmph + 1);
 
-				sin->sin_family = AF_INET;
-				sin->sin_port = iph->protocol;
-				sin->sin_addr.s_addr = iph->saddr;
-				mp->b_wptr += src_len;
-			}
-			if (opt_len) {
-				t_errs_build(raw, dp, mp->b_wptr, opt_len, &etype);
-				mp->b_wptr += opt_len;
-			}
-			p->ERROR_type = etype;
-			mp->b_cont = dp;
-			printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, raw));
-			putnext(raw->rq, mp);
-			return (0);
-		}
-		ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
-		return (-ENOBUFS);
+		sin->sin_family = AF_INET;
+		sin->sin_port = iph->protocol;
+		sin->sin_addr.s_addr = iph->daddr;
+		mp->b_wptr += SRC_length;
+
+		ERROR_type = ((t_uscalar_t) icmph->type << 8) | ((t_uscalar_t) icmph->code);
 	}
+	if (OPT_length) {
+		t_errs_build(raw, dp, mp->b_wptr, OPT_length, &ERROR_type);
+		mp->b_wptr += OPT_length;
+	}
+	p->ERROR_type = ERROR_type;
+	dp->b_datap->db_type = M_DATA;
+	mp->b_cont = dp;
+	printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, raw));
+	putnext(raw->oq, mp);
+	return (QR_ABSORBED);
+      ebusy:
+	freeb(mp);
 	ptrace(("%s: ERROR: Flow controlled\n", DRV_NAME));
 	return (-EBUSY);
+      enobufs:
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
+	return (-ENOBUFS);
+      discard:
+	return (QR_DONE);
 }
 
 /**
- * t_optmgmt_ack: - send a T_OPTMGMT_ACK upstream
+ * t_discon_ind - send a T_DISCON_IND upstream
+ * @q: read queue
+ * @dp: data block containing ICMP packet
+ */
+STATIC INLINE int
+t_discon_ind(queue_t *q, mblk_t *dp)
+{
+	struct upd *raw = RAW_PRIV(q);
+	mblk_t *mp, *cp;
+	union T_primitives *p;
+	struct sockaddr_in *sin;
+	struct iphdr *iph;
+	struct icmphdr *icmph;
+	t_uscalar_t DISCON_reason = 0;
+
+	if (unlikely(tpi_get_statef(raw) & ~(TSF_WRES_CIND | TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+		goto discard;
+
+	icmph = (typeof(icmph)) dp->b_datap->db_base;
+	iph = (typeof(iph)) (icmph + 1);
+
+	spin_lock_bh(&raw->conq.q_lock);
+	for (cp = bufq_head(&raw->conq); cp; cp = cp->b_next) {
+		p = (typeof(p)) cp->b_rptr;
+		sin = (typeof(sin)) (cp->b_rptr + p->conn_ind.SRC_offset);
+		if (sin->sin_port != iph->protocol || sin->sin_addr.s_addr != iph->daddr)
+			continue;
+		break;
+	}
+	if (cp != NULL)
+		/* have a connection indication, unlink it */
+		__bufq_dequeue(&raw->conq, cp);
+	spin_unlock_bh(&raw->conq.q_lock);
+
+	if (cp == NULL
+	    && (tpi_get_statef(raw) & ~(TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL)))
+		goto discard;
+
+	if (unlikely((mp = ss7_allocb(q, sizeof(p->discon_ind), BPRI_MED)) == NULL))
+		goto enobufs;
+
+	DISCON_reason = ((t_uscalar_t) icmph->type << 8) | ((t_uscalar_t) icmph->code);
+
+	mp->b_datap->db_type = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(p->discon_ind);
+	p->discon_ind.PRIM_type = T_DISCON_IND;
+	p->discon_ind.DISCON_reason = DISCON_reason;
+	p->discon_ind.SEQ_number = (t_uscalar_t) (long) cp;
+	if (cp)
+		freemsg(cp);
+	tpi_set_state(raw, bufq_length(&raw->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
+	printd(("%s: %p: <- T_DISCON_IND\n", DRV_NAME, raw));
+	putnext(q, mp);
+      discard:
+	return (QR_DONE);
+      enobufs:
+	if (cp != NULL)
+		bufq_queue(&raw->conq, cp);
+	return (-ENOBUFS);
+}
+
+/**
+ * t_optmgmt_ack - send a T_OPTMGMT_ACK upstream
  * @q: a queue in the queue pair
  * @flags: result flags
  * @req: requested options pointer from T_OPTMGMT_REQ
@@ -3486,40 +3732,41 @@ t_uderror_ind(queue_t *q, mblk_t *dp)
 STATIC int
 t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, size_t opt_len)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 	struct T_optmgmt_ack *p;
 
-	if ((mp = raw_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		if ((flags = t_build_options(raw, req, req_len, mp->b_wptr, &opt_len, flags)) < 0) {
-			freemsg(mp);
-			return (flags);
-		}
-		p->PRIM_type = T_OPTMGMT_ACK;
-		p->OPT_length = opt_len;
-		p->OPT_offset = opt_len ? sizeof(*p) : 0;
-		p->MGMT_flags = flags;
-		if (opt_len) {
-			mp->b_wptr += opt_len;
-		}
-#ifdef TS_WACK_OPTREQ
-		if (tpi_get_state(raw) == TS_WACK_OPTREQ)
-			tpi_set_state(raw, TS_IDLE);
-#endif
-		printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, raw));
-		putnext(raw->rq, mp);
-		return (0);
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
+	if ((flags = t_build_options(raw, req, req_len, mp->b_wptr, &opt_len, flags)) < 0) {
+		freemsg(mp);
+		return (flags);
 	}
+	p->PRIM_type = T_OPTMGMT_ACK;
+	p->OPT_length = opt_len;
+	p->OPT_offset = opt_len ? sizeof(*p) : 0;
+	p->MGMT_flags = flags;
+	if (opt_len) {
+		mp->b_wptr += opt_len;
+	}
+#ifdef TS_WACK_OPTREQ
+	if (tpi_get_state(raw) == TS_WACK_OPTREQ)
+		tpi_set_state(raw, TS_IDLE);
+#endif
+	printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, raw));
+	putnext(raw->rq, mp);
+	return (0);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
 #ifdef T_ADDR_ACK
 /**
- * t_addr_ack: - send a T_ADDR_ACK upstream
+ * t_addr_ack - send a T_ADDR_ACK upstream
  * @q: a queue in the queue pair
  * @loc: local address
  * @loc_len: local address length
@@ -3534,27 +3781,28 @@ t_addr_ack(queue_t *q, struct sockaddr *loc, socklen_t loc_len, struct sockaddr 
 	mblk_t *mp;
 	struct T_addr_ack *p;
 
-	if ((mp = raw_allocb(q, sizeof(*p) + loc_len + rem_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_ADDR_ACK;
-		p->LOCADDR_length = loc_len;
-		p->LOCADDR_offset = loc_len ? sizeof(*p) : 0;
-		p->REMADDR_length = rem_len;
-		p->REMADDR_offset = rem_len ? sizeof(*p) + loc_len : 0;
-		mp->b_wptr += sizeof(*p);
-		if (loc_len) {
-			bcopy(loc, mp->b_wptr, loc_len);
-			mp->b_wptr += loc_len;
-		}
-		if (rem_len) {
-			bcopy(rem, mp->b_wptr, rem_len);
-			mp->b_wptr += rem_len;
-		}
-		printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, raw));
-		putnext(raw->rq, mp);
-		return (0);
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + loc_len + rem_len, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
+	p->PRIM_type = T_ADDR_ACK;
+	p->LOCADDR_length = loc_len;
+	p->LOCADDR_offset = loc_len ? sizeof(*p) : 0;
+	p->REMADDR_length = rem_len;
+	p->REMADDR_offset = rem_len ? sizeof(*p) + loc_len : 0;
+	mp->b_wptr += sizeof(*p);
+	if (loc_len) {
+		bcopy(loc, mp->b_wptr, loc_len);
+		mp->b_wptr += loc_len;
 	}
+	if (rem_len) {
+		bcopy(rem, mp->b_wptr, rem_len);
+		mp->b_wptr += rem_len;
+	}
+	printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, raw));
+	putnext(raw->rq, mp);
+	return (0);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
@@ -3562,7 +3810,7 @@ t_addr_ack(queue_t *q, struct sockaddr *loc, socklen_t loc_len, struct sockaddr 
 
 #ifdef T_CAPABILITY_ACK
 /**
- * t_capability_ack: - send a T_CAPABILITY_ACK upstream
+ * t_capability_ack - send a T_CAPABILITY_ACK upstream
  * @q: a queue in the queue pair
  * @caps: capability bits
  * @type: STREAMS message type M_PROTO or M_PCPROTO
@@ -3570,35 +3818,26 @@ t_addr_ack(queue_t *q, struct sockaddr *loc, socklen_t loc_len, struct sockaddr 
 STATIC int
 t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
 	mblk_t *mp;
 	struct T_capability_ack *p;
 
-	if ((mp = raw_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = type;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = T_CAPABILITY_ACK;
-		p->CAP_bits1 = caps & (TC1_INFO | TC1_ACCEPTOR_ID);
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (t_uscalar_t) (long) raw->rq : 0;
-		mp->b_wptr += sizeof(*p);
-		if (caps & TC1_INFO) {
-			p->INFO_ack.PRIM_type = T_INFO_ACK;
-			p->INFO_ack.TSDU_size = (unsigned short) 0xffff;
-			p->INFO_ack.ETSDU_size = T_INVALID;
-			p->INFO_ack.CDATA_size = T_INVALID;
-			p->INFO_ack.DDATA_size = T_INVALID;
-			p->INFO_ack.ADDR_size = sizeof(struct sockaddr_in);
-			p->INFO_ack.OPT_size = T_INFINITE;
-			p->INFO_ack.TIDU_size = (unsigned short) 0xffff;
-			p->INFO_ack.SERV_type = T_CLTS;
-			p->INFO_ack.CURRENT_state = tpi_get_state(raw);
-			p->INFO_ack.PROVIDER_flag = T_XPG4_1 & ~T_SNDZERO;
-		} else
-			bzero(&p->INFO_ack, sizeof(p->INFO_ack));
-		printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, raw));
-		putnext(raw->rq, mp);
-		return (0);
-	}
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = type;
+	p = (typeof(p)) mp->b_wptr;
+	p->PRIM_type = T_CAPABILITY_ACK;
+	p->CAP_bits1 = caps & (TC1_INFO | TC1_ACCEPTOR_ID);
+	p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (t_uscalar_t) (long) raw->oq : 0;
+	mp->b_wptr += sizeof(*p);
+	if (caps & TC1_INFO) {
+		p->INFO_ack = raw->info;
+	} else
+		bzero(&p->INFO_ack, sizeof(p->INFO_ack));
+	printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, raw));
+	putnext(raw->oq, mp);
+	return (0);
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
@@ -3606,10 +3845,11 @@ t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
 
 /*
  *  TS User -> TS Provider (Request and Response) primitives
+ *  ========================================================
  */
 
 /**
- * t_info_req: - process a T_INFO_REQ primitive
+ * t_info_req - process a T_INFO_REQ primitive
  * @q: active queue in queue pair
  * @mp: the message
  */
@@ -3620,215 +3860,576 @@ t_info_req(queue_t *q, mblk_t *mp)
 }
 
 /**
- * t_bind_req: - process a T_BIND_REQ primitive
+ * t_bind_req - process a T_BIND_REQ primitive
  * @q: active queue in queue pair
  * @mp: the message
  */
 STATIC int
 t_bind_req(queue_t *q, mblk_t *mp)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
 	int err, add_len, type;
-	const struct T_bind_req *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr *add = (struct sockaddr *)&raw->src;
+	const struct T_bind_req *p;
+	struct sockaddr *add = (struct sockaddr *) &raw->srce;
 	struct sockaddr_in *add_in;
+	int err;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	if (tpi_get_state(raw) != TS_UNBND)
-		goto outstate;
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_BIND_REQ))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_state(raw) != TS_UNBND))
+		goto error;
 	tpi_set_state(raw, TS_WACK_BREQ);
-	if (p->ADDR_length && (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)) {
-		ptrace(("%s: %p: ADDR_offset(%u) or ADDR_length(%u) are incorrect\n", DRV_NAME, raw,
-			p->ADDR_offset, p->ADDR_length));
-		goto badaddr;
-	}
+	err = TBADADDR;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length))
+		goto error;
 	if ((add_len = p->ADDR_length) == 0) {
 		bzero(add, sizeof(add));
 		add_len = sizeof(struct sockaddr_in);
 		add->sa_family = AF_INET;
 	} else {
-		if (add_len < sizeof(struct sockaddr_in)) {
-			ptrace(("%s: %p: add_len(%u) < sizeof(struct sockaddr_in)(%u)\n",
-				DRV_NAME, raw, add_len, sizeof(struct sockaddr_in)));
-			goto badaddr;
-		}
-		if (add_len > sizeof(struct sockaddr_in)) {
-			ptrace(("%s: %p: add_len(%u) > sizeof(struct sockaddr_in)(%u)\n",
-				DRV_NAME, raw, add_len, sizeof(struct sockaddr_in)));
-			goto badaddr;
-		}
-		if (add->sa_family != AF_INET && add->sa_family != 0) {
-			ptrace(("%s: %p: sa_family incorrect (%u)\n", DRV_NAME, raw,
-				add->sa_family));
-			goto badaddr;
-		}
+		err = TBADADDR;
+		if (unlikely(add_len < sizeof(struct sockaddr_in)))
+			goto error;
+		if (unlikely(add_len > sizeof(struct sockaddr_in)))
+			goto error;
+		if (unlikely(add->sa_family != AF_INET && add->sa_family != 0))
+			goto error;
 		add = (typeof(add)) (mp->b_rptr + p->ADDR_offset);
 	}
 	add_in = (typeof(add_in)) add;
 	type = inet_addr_type(add_in->sin_addr.s_addr);
-	if (sysctl_ip_nonlocal_bind == 0 && add_in->sin_addr.s_addr != INADDR_ANY && type != RTN_LOCAL
-	    && type != RTN_MULTICAST && type != RTN_BROADCAST)
-		goto noaddr;
+	err = TNOADDR:
+	if (sysctl_ip_nonlocal_bind == 0 && add_in->sin_addr.s_addr != INADDR_ANY
+	    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
+		goto error;
 	raw->proto = ntohs(add_in->sin_port);
 	/* check for bind to privileged protocol */
-	if (raw->proto && raw->proto < PROT_SOCK && !capable(CAP_NET_BIND_SERVICE))
-		goto acces;
-	if ((err = raw_bind(q, add, add_len)))
-		goto error;
-	return t_bind_ack(q, (struct sockaddr *)&raw->src, sizeof(struct sockaddr_in), p->CONIND_number);
-      acces:
 	err = TACCES;
-	ptrace(("%s: ERROR: no permission for address\n", DRV_NAME));
-	goto error;
-      noaddr:
-	err = TNOADDR;
-	ptrace(("%s: ERROR: address could not be assigned\n", DRV_NAME));
-	goto error;
-      badaddr:
-	err = TBADADDR;
-	ptrace(("%s: ERROR: address is invalid\n", DRV_NAME));
-	goto error;
-      einval:
-	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
-	goto error;
-      outstate:
-	err = TOUTSTATE;
-	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
-	goto error;
+	if (raw->proto && raw->proto < PROT_SOCK && !capable(CAP_NET_BIND_SERVICE))
+		goto error;
+	if ((err = raw_bind(raw, add, add_len)))
+		goto error;
+	return t_bind_ack(q, (struct sockaddr *) &raw->srce, sizeof(struct sockaddr_in),
+			  p->CONIND_number);
       error:
-	return t_error_ack(q, T_BIND_REQ, err);
+	return t_error_ack(q, T_BIND_REQ, mp, err);
 }
 
 /**
- * t_unbind_req: - process a T_UNBIND_REQ primitive
+ * t_unbind_req - process a T_UNBIND_REQ primitive
  * @q: active queue in queue pair
  * @mp: the primitive
  */
 STATIC int
 t_unbind_req(queue_t *q, mblk_t *mp)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
+	int err;
 
-	if (tpi_get_state(raw) != TS_IDLE)
-		goto outstate;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_state(raw) != TS_IDLE))
+		goto error;
 	tpi_set_state(raw, TS_WACK_UREQ);
-	return t_ok_ack(q, T_UNBIND_REQ);
-      outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
-	return t_error_ack(q, T_UNBIND_REQ, TOUTSTATE);
+	err = 0;
+      error:
+	return t_reply_ack(q, T_UNBIND_REQ, mp, err, NULL);
 }
 
 /**
- * t_unitdata_req: - process a T_UNITDATA_REQ primitive
- * @q: active queue in queue pair
+ * t_conn_req - process a T_CONN_REQ primitive
+ * @q: active queue (write queue)
  * @mp: the primitive
  */
 STATIC int
-t_unitdata_req(queue_t *q, mblk_t *mp)
+t_conn_req(queue_t *q, mblk_t *mp)
 {
-	struct raw *raw = PRIV(q);
-	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
-	const struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
+	struct raw *raw = RAW_PRIV(q);
+	union T_primitives *p;
+	struct T_conn_req *p;
+	struct T_ok_ack *r;
+	struct T_error_ack *e;
+	struct T_conn_con *c;
+	int err;
+	size_t mlen;
+	mblk_t *dp, *rp = NULL;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	if (dlen == 0)
-		goto baddata;
-	if (dlen > (unsigned short) 0xffff)
-		goto baddata;
-	if (tpi_get_state(raw) != TS_IDLE)
-		goto outstate;
-	if ((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
-	    || (p->DEST_length < sizeof(struct sockaddr_in)))
-		goto badadd;
-	if (p->OPT_length == 0)
-		return raw_xmitmsg(q, mp, NULL);
-	{
-		struct raw_options opts;
-		unsigned char *ip;
-		size_t ilen;
-		struct t_opthdr *ih;
-		int optlen;
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->conn_req)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->conn_req.PRIM_type != T_CONN_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(raw->info.SERV_type == T_CLTS && raw->info.CURRENT_state != TS_UNBND))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(!(tpi_get_statef(raw) & (TSF_IDLE | TSF_UNBND))))
+		goto error;
+	err = TNOADDR;
+	if (unlikely(p->conn_req.DEST_length == 0))
+		goto error;
+	err = TBADADDR;
+	if (unlikely(p->conn_req.DEST_length < raw->info.ADDR_size))
+		goto error;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->conn_req.DEST_offset + p->conn_req.DEST_length))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(p->conn_req.OPT_length > raw->info.OPT_size))
+		goto error;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->conn_req.OPT_offset + p->conn_req.OPT_length))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) != NULL))
+		if (unlikely((mlen = msgsize(dp)) == 0 || mlen > raw->info.CDATA_size))
+			goto error;
+	if (likely(p->conn_req.DEST_length != 0)) {
+		struct sockaddr_in *sin = (struct sockaddr_in *) &raw->dest;
 
-		opts = raw->options;
-		ip = mp->b_rptr + p->OPT_offset;
-		ilen = p->OPT_length;
-
-		for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0); ih;
-		     ih = _T_OPT_NEXTHDR_OFS(ip, ilen, ih, 0)) {
-			if (ih->len < sizeof(*ih))
-				goto badopt;
-			if ((unsigned char *) ih + ih->len > ip + ilen)
-				goto badopt;
-			optlen = ih->len - sizeof(*ih);
-			switch (ih->level) {
-			default:
-				goto badopt;
-			case T_INET_IP:
-				switch (ih->name) {
-				default:
-					goto badopt;
-				case T_IP_OPTIONS:
-					t_set_bit(_T_BIT_IP_OPTIONS, opts.flags);
-					continue;
-				case T_IP_TOS:
-					t_set_bit(_T_BIT_IP_TOS, opts.flags);
-					opts.ip.tos = *(unsigned char *) T_OPT_DATA(ih);
-					continue;
-				case T_IP_TTL:
-					t_set_bit(_T_BIT_IP_TTL, opts.flags);
-					opts.ip.ttl = *(unsigned char *) T_OPT_DATA(ih);
-					continue;
-				case T_IP_DONTROUTE:
-					t_set_bit(_T_BIT_IP_DONTROUTE, opts.flags);
-					opts.ip.dontroute = *(t_uscalar_t *) T_OPT_DATA(ih);
-					continue;
-				case T_IP_BROADCAST:
-					t_set_bit(_T_BIT_IP_BROADCAST, opts.flags);
-					opts.ip.broadcast = *(t_uscalar_t *) T_OPT_DATA(ih);
-					continue;
-				case T_IP_ADDR:
-					t_set_bit(_T_BIT_IP_ADDR, opts.flags);
-					opts.ip.addr = *(uint32_t *) T_OPT_DATA(ih);
-					continue;
-				case T_IP_REUSEADDR:
-					t_set_bit(_T_BIT_IP_REUSEADDR, opts.flags);
-					/* or do we generate a T_UDERROR_IND */
-					continue;
-				}
-			}
-		}
-		return raw_xmitmsg(q, mp, &opts);
+		bcopy(mp->b_rptr + p->conn_req.DEST_offset, sin, sizeof(*sin));
+		err = TBADADDR;
+		if (unlikely(sin->sin_family != AF_INET))
+			goto error;
+		if (unlikely(sin->sin_port == 0))
+			goto error;
+		if (unlikely(sin->sin_addr.s_addr == 0))
+			goto error;
 	}
-	/* FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
-      badopt:
-	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
-	goto error;
-#if 0
-      acces:
-	ptrace(("%s: ERROR: no permission to address or options\n", DRV_NAME));
-	goto error;
-#endif
-      badadd:
-	ptrace(("%s: ERROR: bad destination address\n", DRV_NAME));
-	goto error;
-      einval:
-	ptrace(("%s: ERROR: invalid primitive\n", DRV_NAME));
-	goto error;
-      outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
-	goto error;
-      baddata:
-	ptrace(("%s: ERROR: bad data size\n", DRV_NAME));
-	goto error;
+	if (likely(p->conn_req.OPT_length != 0)) {
+		struct raw_options opts = raw->options;
+		unsigned char *ip = mp->b_wptr + p->conn_res.OPT_offset;
+		size_t ilen = p->conn_res.OPT_length;
+
+		if ((err = t_opts_parse(ip, ilen, &opts)))
+			goto error;
+		raw->options = opts;
+	}
+	err = -ENOBUFS;
+	if (unlikely((rp = ss7_allocb(q, sizeof(p->ok_ack), BPRI_MED)) == NULL))
+		goto error;
+	raw->info.SERV_type = T_COTS;
+	if (raw->info.CURRENT_state == TS_UNBND) {
+		struct sockaddr_in *sin = (struct sockaddr_in *) &raw->bind;
+
+		/* need to autobind the Stream */
+		sin->sin_family = 0;
+		sin->sin_port = 0;
+		sin->sin_addr.s_addr = 0;
+		if ((err = raw_bind(raw, &raw->bind, sizeof(raw->bind))))
+			goto error;
+		tpi_set_state(raw, TS_IDLE);
+	}
+	tpi_set_state(raw, TS_WACK_CREQ);
+	if ((err = t_ok_ack(q, T_CONN_REQ, rp, NULL, dp, NULL)) != QR_ABSORBED)
+		goto error;
+	p->PRIM_type = T_CONN_CON;
+	/* all of the other fields and contents are the same */
+	tpi_set_state(raw, TS_DATA_XFER);
+	qreply(q, mp);
+	return (QR_ABSORBED);
       error:
-	return m_error(q, EPROTO);
+	if (rp != NULL)
+		freeb(rp);
+	return t_error_ack(q, T_CONN_REQ, mp, err);
+}
+
+STATIC INLINE fastcall mblk_t *
+t_seq_check(struct raw *raw, t_uscalar_t seq)
+{
+	mblk_t *mp;
+
+	spin_lock_bh(&raw->conq.q_lock);
+	for (mp = bufq_head(&raw->conq); mp && (t_uscalar_t) (long) mp != seq; mp = mp->b_next) ;
+	spin_unlock_bh(&raw->conq.q_lock);
+	usual(mp);
+	return (mp);
+}
+STATIC INLINE fastcall struct raw *
+t_tok_check(t_uscalar_t tok)
+{
+	struct raw *ap;
+
+	spin_lock_bh(&raw_lock);
+	for (ap = raw_opens; ap && (t_uscalar_t) (long) ap->oq != tok; ap = ap->next) ;
+	spin_unlock_bh(&raw_lock);
+	usual(ap);
+	return (ap);
 }
 
 /**
- * t_optmgmt_req: - handle T_OPTMGMT_REQ primitive
+ * t_conn_res = process a T_CONN_RES primitive
+ * @q: write queue
+ * @mp: the primitive
+ */
+STATIC int
+t_conn_res(queue_t *q, mblk_t *mp)
+{
+	struct raw *raw = RAW_PRIV(q), *ap;
+	struct T_conn_res *p;
+	mblk_t *dp, *cp;
+	size_t mlen;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_CONN_RES))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(raw->info.SERV_type == T_CLTS))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_state(raw) != TS_WRES_CIND))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(p->OPT_length > raw->info.OPT_size))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
+		goto error;
+	err = TBADDATA;
+	if ((dp = mp->b_cont))
+		if (unlikely((mlen = msgsize(dp)) > raw->info.CDATA_size))
+			goto error;
+	err = TBADSEQ;
+	if (unlikely((cp = t_seq_check(raw, p->SEQ_number)) == NULL))
+		goto error;
+	if (p->ACCEPTOR_id == 0) {
+		ap = raw;
+		err = TBADF;
+		if (bufq_length(&raw->conq) > 1)
+			goto error;
+	} else {
+		struct sockaddr_in *sin, *ain;
+
+		err = TBADF;
+		if (unlikely((ap = t_tok_check(raw, p->ACCEPTOR_id)) == NULL))
+			goto error;
+		err = TPROVMISMATCH;
+		if (unlikely(ap->info.SERV_type == T_CLTS))
+			goto error;
+		err = TRESQLEN;
+		if (unlikely(ap->CONIND_number > 0))
+			goto error;
+		err = TOUTSTATE;
+		if (tpi_get_statef(ap) != TS_IDLE)
+			goto error;
+		sin = (struct sockaddr_in *) &raw->srce;
+		ain = (struct sockaddr_in *) &ap->srce;
+		err = TRESADDR;
+		if (sin->sin_port != ain->sin_port || sin->sin_addr.s_addr != ain->sin_addr.s_addr)
+			goto error;
+	}
+	if (likely(p->OPT_length != 0)) {
+		struct upd_options opts = ap->options;
+
+		if ((err = t_opts_parse(mp->b_rptr + p->OPT_offset, p->OPT_length, &opts)))
+			goto error;
+		/* TPI options processing rules allows us to set some (or all) of the options on
+		   the Stream even if the primitive is about to fail. */
+		ap->options = opts;
+	}
+	{
+		struct T_conn_ind *c = (typeof(c)) cp->b_rptr;
+
+		bcopy(cp->b_rptr + c->SRC_offset, &ap->dest, c->SRC_length);
+	}
+	tpi_set_state(raw, TS_WACK_CRES);
+	return t_ok_ack(q, T_CONN_RES, mp, cp, dp, ap);
+      error:
+	return t_error_ack(q, T_CONN_RES, mp, err);
+}
+
+/**
+ * t_discon_req - process a T_DISCON_REQ primitive
+ * @q: active queue (write queue)
+ * @mp: the primitive
+ */
+STATIC int
+t_discon_req(queue_t *q, mblk_t *mp)
+{
+	struct raw *raw = RAW_PRIV(q);
+	union T_primitives *p;
+	t_uscalar_t state;
+	mblk_t *dp, *cp = NULL;
+	size_t mlen;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->discon_req)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->discon_req.PRIM_type != T_DISCON_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(raw->info.SERV_type == T_CLTS))
+		goto error;
+	state = tpi_get_state(raw);
+	err = TOUTSTATE;
+	if (unlikely((1 << state) & ~(TSM_CONNECTED)))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) != NULL))
+		if (unlikely((mlen = msgsize(dp)) == 0 || mlen > raw->info.DDATA_size))
+			goto error;
+	switch (state) {
+	case TS_WCON_CREQ:
+		tpi_set_state(raw, TS_WACK_DREQ6);
+		break;
+	case TS_WRES_CIND:
+		err = TBADSEQ;
+		if (unlikely((cp = t_seq_check(raw, p->discon_req.SEQ_number)) == NULL))
+			goto error;
+		tpi_set_state(raw, TS_WACK_DREQ7);
+		break;
+	case TS_DATA_XFER:
+		tpi_set_state(raw, TS_WACK_DREQ9);
+		break;
+	case TS_WIND_ORDREL:
+		tpi_set_state(raw, TS_WACK_DREQ10);
+		break;
+	case TS_WREQ_ORDREL:
+		tpi_set_state(raw, TS_WACK_DREQ11);
+		break;
+	}
+	return t_ok_ack(q, T_DISCON_REQ, mp, cp, dp, NULL);
+      error:
+	return t_error_ack(q, T_DISCON_REQ, mp, err);
+}
+
+/**
+ * t_unitdata_req - process a T_UNITDATA_REQ primitive
+ * @q: write queue
+ * @mp: the primitive
+ */
+STATIC INLINE fastcall __hot_put int
+t_unitdata_req(queue_t *q, mblk_t *mp)
+{
+	struct raw *raw = RAW_PRIV(q);
+	struct T_unitdata_req *p;
+	struct sockaddr_in sin;
+	struct raw_options opts;
+	size_t mlen;
+	mblk_t *dp;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_UNITDATA_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(raw->info.SERV_type != T_CLTS))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_state(raw) != TS_IDLE))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto error;
+	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > raw->info.TSDU_size))
+		goto error;
+	err = TNOADDR;
+	if (unlikely(p->DEST_length == 0))
+		goto error;
+	err = TBADADDR;
+	if (unlikely((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)))
+		goto error;
+	if (unlikely(p->DEST_length < sizeof(struct sockaddr_in)))
+		goto error;
+	bcopy(mp->b_rptr + p->DEST_length, &sin, sizeof(sin));
+	err = TBADOPT;
+	if (unlikely(p->OPT_length > raw->info.OPT_size))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
+		goto error;
+	opts = raw->options;
+	if (unlikely(p->OPT_length != 0))
+		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
+			goto error;
+	if ((err = raw_xmitmsg(q, dp, &sin, &opts)))
+		goto err;
+	return (QR_DONE);
+      error:
+	/* FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
+	return m_error(q, err, mp);
+}
+
+/**
+ * t_optdata_req - process a T_OPTDATA_REQ primitive
+ * @q: write queue
+ * @mp: the primitive
+ */
+STATIC INLINE fastcall __hot_put int
+t_optdata_req(queue_t *q, mblk_t *mp)
+{
+	struct raw *raw = RAW_PRIV(q);
+	struct T_optdata_req *p;
+	struct sockaddr_in *sin;
+	struct raw_options opts;
+	size_t mlen;
+	mblk_t *dp;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_OPTDATA_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(raw->info.SERV_type == T_CLTS))
+		goto error;
+	if (unlikely(tpi_get_state(raw) == TS_IDLE))
+		goto discard;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_statef(raw) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+		goto error;
+	err = TBADFLAG;
+	if (unlikely(p->DATA_flag != 0))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(p->OPT_length > raw->info.OPT_size))
+		goto error;
+	err = TBADOPT;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto error;
+	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > raw->info.TSDU_size))
+		goto error;
+	opts = raw->options;
+	if (unlikely(p->OPT_length != 0))
+		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
+			goto error;
+	sin = (typeof(sin)) & raw->dest;
+	if ((err = raw_xmitmsg(q, dp, sin, &opts)))
+		goto error;
+	return (QR_DONE);
+      error:
+	return m_error(q, err, mp);
+}
+
+/**
+ * t_data_req - process a T_DATA_REQ primitive
+ * @q: write queue
+ * @mp: the primitive
+ */
+STATIC INLINE fastcall __hot_put int
+t_data_req(queue_t *q, mblk_t *mp)
+{
+	struct raw *raw = RAW_PRIV(q);
+	struct T_data_req *p;
+	struct sockaddr_in *sin;
+	struct raw_options *opts;
+	size_t mlen;
+	mblk_t *dp;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_DATA_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(raw->info.SERV_type == T_CLTS))
+		goto error;
+	if (unlikely(raw->info.TSDU_size == T_INVALID))
+		goto error;
+	err = QR_DONE;
+	if (unlikely(tpi_get_state(raw) == TS_IDLE))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(tpi_get_statef(raw) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+		goto error;
+	err = TBADFLAG;
+	if (unlikely(p->MORE_flag != 0))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto error;
+	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > raw->info.TSDU_size))
+		goto error;
+	opts = &raw->options;
+	sin = (typeof(sin)) & raw->dest;
+	if ((err = raw_xmitmsg(q, dp, sin, opts)))
+		goto error;
+	return (QR_DONE);
+      error:
+	return m_error(q, err, mp);
+}
+
+/**
+ * t_exdata_req - process a T_EXDATA_REQ primitive
+ * @q: write queue
+ * @mp: the primitive
+ */
+STATIC int
+t_exdata_req(queue_t *q, mblk_t *mp)
+{
+	struct raw *raw = RAW_PRIV(q);
+	struct T_exdata_req *p;
+	struct sockaddr_in *sin;
+	struct raw_options *opts;
+	size_t mlen;
+	mblk_t *dp;
+	int statef;
+	int err;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_EXDATA_REQ))
+		goto error;
+	err = TNOTSUPPORT;
+	if (unlikely(raw->info.SERV_type == T_CLTS))
+		goto error;
+	if (unlikely(raw->info.ETSDU_size == T_INVALID))
+		goto error;
+	err = QR_DONE;
+	if (unlikely((statef = tpi_get_statef(raw)) & TSF_IDLE))
+		goto error;
+	err = TOUTSTATE;
+	if (unlikely(statef & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+		goto error;
+	err = TBADFLAG;
+	if (unlikely(p->MORE_flag != 0))
+		goto error;
+	err = TBADDATA;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto error;
+	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > raw->info.ETSDU_size))
+		goto error;
+	opts = &raw->options;
+	sin = (typeof(sin)) & raw->dest;
+	if ((err = raw_xmitmsg(q, dp, sin, opts)))
+		goto error;
+	return (QR_DONE);
+      error:
+	return m_error(q, err, mp);
+
+}
+
+/**
+ * t_optmgmt_req - handle T_OPTMGMT_REQ primitive
  * @q: active queue in the queue pair
  * @mp: the primitive
  *
@@ -3850,18 +4451,27 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 STATIC int
 t_optmgmt_req(queue_t *q, mblk_t *mp)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
 	int err, opt_len;
-	const struct T_optmgmt_req *p = (typeof(p)) mp->b_rptr;
+	const struct T_optmgmt_req *p;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_OPTMGMT_REQ))
+		goto error;
 #ifdef TS_WACK_OPTREQ
 	if (tpi_get_state(raw) == TS_IDLE)
 		tpi_set_state(raw, TS_WACK_OPTREQ);
 #endif
-	if (p->OPT_length && mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
-		goto badopt;
+	err = TBADOPT;
+	if (unlikely(p->OPT_length > udp->info.OPT_size))
+		goto error;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
+		goto error;
+	err = TBADFLAG;
 	switch (p->MGMT_flags) {
 	case T_DEFAULT:
 		opt_len = t_size_default_options(raw, mp->b_rptr + p->OPT_offset, p->OPT_length);
@@ -3878,18 +4488,20 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 	default:
 		goto badflag;
 	}
-	if (opt_len < 0) {
+	if (unlikely(opt_len < 0)) {
 		switch (-(err = opt_len)) {
 		case EINVAL:
-			goto badopt;
+			err = TBADOPT;
+			goto error;
 		case EACCES:
-			goto acces;
+			err = TACCES;
+			goto error;
 		default:
-			goto provspec;
+			goto error;
 		}
 	}
-	if ((err = t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset,
-				 p->OPT_length, opt_len)) < 0) {
+	err = t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len);
+	if (unlikely(err < 0)) {
 		switch (-err) {
 		case EINVAL:
 			goto badopt;
@@ -3899,439 +4511,158 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 		case ENOMEM:
 			break;
 		default:
-			goto provspec;
+			goto error;
 		}
 	}
 	return (err);
-      provspec:
-	err = err;
-	ptrace(("%s: ERROR: provider specific\n", DRV_NAME));
-	goto error;
-      badflag:
-	err = TBADFLAG;
-	ptrace(("%s: ERROR: bad options flags\n", DRV_NAME));
-	goto error;
-      acces:
-	err = TACCES;
-	ptrace(("%s: ERROR: no permission for option\n", DRV_NAME));
-	goto error;
-      badopt:
-	err = TBADOPT;
-	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
-	goto error;
-      einval:
-	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
-	goto error;
       error:
-	return t_error_ack(q, T_OPTMGMT_REQ, err);
+	return t_error_ack(q, T_OPTMGMT_REQ, mp, err);
 }
 
 #ifdef T_ADDR_REQ
 /**
- * t_addr_req: - process a T_ADDR_REQ primitive
+ * t_addr_req - process a T_ADDR_REQ primitive
  * @q: active queue in queue pair
  * @mp: the primitive
  */
 STATIC int
 t_addr_req(queue_t *q, mblk_t *mp)
 {
-	struct raw *raw = PRIV(q);
+	struct raw *raw = RAW_PRIV(q);
+	struct T_addr_req *p;
+	int err;
 
-	(void) mp;
-	switch (tpi_get_state(raw)) {
-	case TS_UNBND:
-		return t_addr_ack(q, NULL, 0, NULL, 0);
-	case TS_IDLE:
-		return t_addr_ack(q, (struct sockaddr *) &raw->src, sizeof(struct sockaddr_in),
-				  NULL, 0);
-	case TS_WCON_CREQ:
-	case TS_DATA_XFER:
-	case TS_WIND_ORDREL:
-	case TS_WREQ_ORDREL:
-		return t_addr_ack(q, (struct sockaddr *) &raw->src, sizeof(struct sockaddr_in),
-				  (struct sockaddr *) &raw->dst, sizeof(struct sockaddr_in));
-	case TS_WRES_CIND:
-		return t_addr_ack(q, NULL, 0, (struct sockaddr *) &raw->dst,
-				  sizeof(struct sockaddr_in));
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_ADDR_REQ))
+		goto error;
+	{
+		struct sockaddr *LOCADDR_buffer, *REMADDR_buffer;
+		socklen_t LOCADDR_length, REMADDR_length;
+
+		err = TOUTSTATE;
+		switch (tpi_get_state(raw)) {
+		case TS_UNBND:
+			LOCADDR_buffer = NULL;
+			LOCADDR_length = 0;
+			REMADDR_buffer = NULL;
+			REMADDR_length = 0;
+			break;
+		case TS_IDLE:
+		case TS_WRES_CIND:
+			LOCADDR_buffer = (struct sockaddr *) &raw->srce;
+			LOCADDR_length = sizeof(struct sockaddr_in);
+			REMADDR_buffer = NULL;
+			REMADDR_length = 0;
+			break;
+		case TS_WCON_CREQ:
+		case TS_DATA_XFER:
+		case TS_WIND_ORDREL:
+		case TS_WREQ_ORDREL:
+			LOCADDR_buffer = (struct sockaddr *) &raw->srce;
+			LOCADDR_length = sizeof(struct sockaddr_in);
+			REMADDR_buffer = (struct sockaddr *) &raw->dest;
+			REMADDR_length = sizeof(struct sockaddr_in);
+			break;
+		default:
+			goto error;
+		}
+		return t_addr_ack(q, LOCADDR_buffer, LOCADDR_length, REMADDR_buffer,
+				  REMADDR_length);
 	}
-	return t_error_ack(q, T_ADDR_REQ, TOUTSTATE);
+      error:
+	return t_error_ack(q, T_ADDR_REQ, mp, err);
 }
 #endif				/* T_ADDR_REQ */
 
 #ifdef T_CAPABILITY_REQ
 /**
- * t_capability_req: - process a T_CAPABILITY_REQ primitive
+ * t_capability_req - process a T_CAPABILITY_REQ primitive
  * @q: active queue in queue pair
  * @mp: the primitive
  */
 STATIC int
 t_capability_req(queue_t *q, mblk_t *mp)
 {
-	int err = -EFAULT;
-	struct T_capability_req *p = (typeof(p)) mp->b_rptr;
+	struct T_capability_req *p;
+	int err;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	return t_capability_ack(q, p->CAP_bits1, mp->b_datap->db_type);
-      einval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid message format\n", DRV_NAME));
-	goto error;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
+	if (unlikely(p->PRIM_type != T_CAPABILITY_REQ))
+		goto error;
+	return t_capability_ack(q, p->CAP_bits1, mp->b_datap->db_type);
       error:
-	return t_error_ack(q, T_CAPABILITY_REQ, err);
+	return t_error_ack(q, T_CAPABILITY_REQ, mp, err);
 }
 #endif				/* T_CAPABILITY_REQ */
 
 /**
- * t_other_req: - process unsupported recognized primitive type
+ * t_other_req - process unsupported recognized primitive type
  * @q: active queue in queue pair
  * @mp: the primitive
  */
 STATIC int
 t_other_req(queue_t *q, mblk_t *mp)
 {
-	t_scalar_t prim = *((t_scalar_t *) mp->b_rptr);
+	t_scalar_t prim;
+	int err;
 
-	return t_error_ack(q, prim, TNOTSUPPORT);
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(prim)))
+		goto error;
+	prim = *((t_scalar_t *) mp->b_rptr);
+	err = TNOTSUPPORT;
+      error:
+	return t_error_ack(q, prim, mp, err);
 }
 
-/*
- * NS Provider -> NS User primitives
- */
-
-/**
- * n_bind_ack: - process an N_BIND_ACK primitive
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-n_bind_ack(queue_t *q, mblk_t *mp)
-{
-	struct raw *raw = RAW_PRIV(q);
-	N_bind_ack_t *p;
-	struct sockaddr *add = NULL;
-	socklen_t add_len = 0;
-	int rtn = 0;
-
-	switch (npi_get_state(raw)) {
-	case NS_WACK_BREQ:
-		p = (typeof(p)) mp->b_rptr;
-		if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-			goto efault;
-		if (p->ADDR_length) {
-			if (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)
-				goto efault;
-			add = (struct sockaddr *) ((unsigned char *) p + p->ADDR_offset);
-			add_len = p->ADDR_length;
-		}
-		rtn = t_bind_ack(q, add, add_len, p->CONIND_number);
-		if (rtn >= 0)
-			npi_set_state(raw, NS_IDLE);
-		break;
-	default:
-		break;
-	}
-	return (rtn);
-      efault:
-	return (-EFAULT);
-}
-
-/**
- * n_ok_ack: - process an N_OK_ACK primitive
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-n_ok_ack(queue_t *q, mblk_t *mp)
-{
-	struct raw *raw = RAW_PRIV(q);
-	int rtn = 0;
-
-	switch (npi_get_state(raw)) {
-	case NS_WACK_UREQ:
-		rtn = t_ok_ack(q, T_UNBIND_REQ);
-		if (rtn >= 0)
-			npi_set_state(raw, NS_UNBND);
-		break;
-	case NS_WACK_OPTREQ:
-		if (rtn >= 0)
-			npi_set_state(raw, NS_IDLE);
-		break;
-	default:
-		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
-		   normally when this is a response to an N_OPTMGMT_REQ that was issued in other
-		   than the NS_IDLE state. */
-		break;
-	}
-	return (rtn);
-}
-
-/**
- * n_tpi_error: - map NPI errors to TPI errors
- * @p: pointer to N_ERROR_ACK primitive
- */
-STATIC t_scalar_t
-n_tpi_error(N_error_ack_t * p)
-{
-	switch (p->NPI_error) {
-	case NBADADDR:
-		return (TBADADDR);
-	case NBADOPT:
-		return (TBADOPT);
-	case NACCESS:
-		return (TACCES);
-	case NNOADDR:
-		return (TNOADDR);
-	case NOUTSTATE:
-		return (TOUTSTATE);
-	case NBADSEQ:
-		return (TBADSEQ);
-	case NSYSERR:
-		return (-(t_scalar_t) p->UNIX_error);
-	case NBADDATA:
-		return (TBADDATA);
-	case NBADFLAG:
-		return (TBADOPT);
-	case NNOTSUPPORT:
-		return (TNOTSUPPORT);
-	case NBOUND:
-		return (TADDRBUSY);
-	case NBADQOSPARAM:
-		return (TBADOPT);
-	case NBADQOSTYPE:
-		return (TBADOPT);
-	case NBADTOKEN:
-		return (TBADF);
-	case NNOPROTOID:
-		return (TNOADDR);
-	default:
-		return (-EINVAL);
-	}
-}
-
-/**
- * n_error_ack: - process an N_ERROR_ACK primitive
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-n_error_ack(queue_t *q, mblk_t *mp)
-{
-	struct raw *raw = RAW_PRIV(q);
-	int rtn = 0;
-
-	switch (npi_get_state(raw)) {
-	case NS_WACK_OPTREQ:
-		if (rtn >= 0)
-			npi_set_state(raw, NS_IDLE);
-		break;
-	case NS_WACK_BREQ:
-		rtn = t_error_ack(q, T_BIND_REQ, n_tpi_error((N_error_ack_t *) mp->b_rptr));
-		if (rtn >= 0)
-			npi_set_state(raw, NS_UNBND);
-		break;
-	case NS_WACK_UREQ:
-		rtn = t_error_ack(q, T_UNBIND_REQ, n_tpi_error((N_error_ack_t *) mp->b_rptr));
-		if (rtn >= 0)
-			npi_set_state(raw, NS_IDLE);
-		break;
-	default:
-		/* Note: if not in a WACK state simply do not change state.  This occurs normally
-		   when responding to an N_OPTMGMT_REQ in other than NS_IDLE state. */
-		break;
-	}
-	return (rtn);
-}
-
-/**
- * n_unitdata_ind: - process an N_UNITDATA_IND primitive
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-n_unitdata_ind(queue_t *q, mblk_t *mp)
-{
-	int rtn;
-
-	rtn = t_unitdata_ind(q, mp->b_cont);
-	if (rtn == QR_DONE) {
-		freeb(mp);
-		return (QR_ABSORBED);
-	}
-	return (rtn);
-}
-
-/**
- * n_uderror_ind: - process an N_UDERROR_IND primitive
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-n_uderror_ind(queue_t *q, mblk_t *mp)
-{
-	int rtn;
-
-	rtn = t_uderror_ind(q, mp->b_cont);
-	if (rtn == QR_DONE) {
-		freeb(mp);
-		return (QR_ABSORBED);
-	}
-	return (rtn);
-}
-
-/**
- * n_other_ind: - process an unsupported primitvie type
- * @q: active queue in queue pair (read queue)
- * @mp: the primitive
- */
-STATIC int
-n_other_ind(queue_t *q, mblk_t *mp)
-{
-	return (-EOPNOTSUPP);
-}
-
-/*
- *  NPI IP Provider -> UDP Provider messages.
- */
-
-/**
- * l_unidata_ind: - process N_UNITDATA_IND from linked NPI IP provider
- * @q: active queue in queue pair (read queue)
- * @mp: the N_UNITDATA_IND message
- *
- * N_UNITDATA_IND messages are passed from a linked NPI IP provider.  They are processed similar to
- * IP messages incoming in raw_v4_rcv().  The data block contains the IP header, UDP header and UDP
- * payload starting at mp->b_cont->b_datap->db_base.  The UDP message payload starts at
- * mp->b_cont->b_rptr.  This function extracts IP header information and uses it to create options.
- *
- * LOCKING: Holding raw_lock protects against the upper stream closing.  raw->qlock protects the
- * state of the private structure.  raw->refs protects the structure from being deallocated.
- */
-STATIC INLINE fastcall int
-l_unitdata_ind(queue_t *q, mblk_t *mp)
-{
-	struct raw *raw;
-	mblk_t *dp = mp->b_cont;
-	struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
-
-	read_lock_bh(&raw_lock);
-	raw = raw_lookup(iph->protocol, iph->daddr, iph->saddr);
-	if (raw == NULL)
-		goto no_stream;
-	spin_lock_bh(&raw->qlock);
-	if (tpi_get_state(raw) != TS_IDLE)
-		goto outstate;
-	if (bcanput(raw->rq, mp->b_band)) {
-		put(raw->rq, mp);
-		return (QR_ABSORBED);
-	}
-	/* Note: when flow control subsides, the upper read queue must backenable the lower read
-	   queue for this to work.  Another possibility is to simply discard the message. */
-	return (-EBUSY);
-      no_stream:
-	read_unlock_bh(&raw_lock);
-	/* When there is no Stream associated with the message, we want the NPI IP driver to still
-	   be able to pass the message along to another protocol, so we return it as an M_CTL
-	   message.  Note that we do not check for flow control. */
-	mp->b_datap->db_type = M_CTL;
-	qreply(q, mp);
-	return (QR_ABSORBED);
-      outstate:
-	spin_unlock_bh(&raw->qlock);
-	raw_put(raw);
-	read_unlock_bh(&raw_lock);
-	/* discard */
-	return (QR_DONE);
-}
-
-/**
- * l_uderror_ind: - process N_UDERROR_IND from linked NPI IP provider
- * @q: active queue in queue pair (read queue)
- * @mp: the N_UDERROR_IND message
- *
- * N_UDERROR_IND messages are passed from a linked NPI IP provider.  They are processed similar to
- * ICMP messages incoming in raw_v4_err().
- */
-STATIC INLINE fastcall int
-l_uderror_ind(queue_t *q, mblk_t *mp)
-{
-	struct raw *raw;
-	mblk_t *dp = mp->b_cont;
-	struct iphdr *iph = (typeof(iph)) dp->b_datap->db_base;
-
-	raw = raw_lookup_icmp(iph->protocol, iph->saddr, iph->daddr);
-	if (raw == NULL)
-		goto no_stream;
-	if (bcanput(raw->rq, mp->b_band)) {
-		put(raw->rq, mp);
-		return (QR_ABSORBED);
-	}
-	/* Note: when flow control subsides, the upper read queue must backenable the lower read
-	   queue for this to work.  Another possibility is to simply discard the message. */
-	return (-EBUSY);
-      no_stream:
-	/* When there is no Stream associated with the message, we want the NPI IP driver to still
-	   be able to pass the message along to another protocol, so we return it as an M_CTL
-	   message.  Note that we do not check for flow control. */
-	mp->b_datap->db_type = M_CTL;
-	qreply(q, mp);
-	return (QR_ABSORBED);
-}
-
-/**
- * l_other_ind: - process unsupported indication from linked NPI IP provider
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- *
- * Unexpected message.
- */
-STATIC INLINE fastcall int
-l_other_ind(queue_t *q, mblk_t *mp)
-{
-	swerr();
-	/* discard it */
-	return (QR_DONE);
-}
 /*
  *  STREAMS MESSAGE HANDLING
  */
 
 /**
- * upd_w_proto: - M_PROTO, M_PCPROTO handling
+ * upd_w_proto - M_PROTO, M_PCPROTO handling
  * @q: active queue in queue pair (write queue)
  * @mp: the message
  */
-STATIC int
+STATIC INLINE fastcall __hot_put int
 raw_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	t_scalar_t prim;
-	raw_t *raw = PRIV(q);
-	t_uscalar_t oldstate = tpi_get_state(raw);
+	struct raw *raw = RAW_PRIV(q);
+
+	raw->i_oldstate = tpi_get_state(raw);	/* checkpoint */
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(t_scalar_t))
 		goto eproto;
 	switch ((prim = *((t_scalar_t *) mp->b_rptr))) {
 	case T_CONN_REQ:
 		printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, raw));
-		rtn = t_other_req(q, mp);
+		rtn = t_conn_req(q, mp);
 		break;
 	case T_CONN_RES:
 		printd(("%s: %p: -> T_CONN_RES\n", DRV_NAME, raw));
-		rtn = t_other_req(q, mp);
+		rtn = t_conn_res(q, mp);
 		break;
 	case T_DISCON_REQ:
 		printd(("%s: %p: -> T_DISCON_REQ\n", DRV_NAME, raw));
-		rtn = t_other_req(q, mp);
+		rtn = t_discon_req(q, mp);
 		break;
 	case T_DATA_REQ:
 		printd(("%s: %p: -> T_DATA_REQ\n", DRV_NAME, raw));
-		rtn = t_other_req(q, mp);
+		rtn = t_data_req(q, mp);
 		break;
 	case T_EXDATA_REQ:
 		printd(("%s: %p: -> T_EXDATA_REQ\n", DRV_NAME, raw));
-		rtn = t_other_req(q, mp);
+		rtn = t_exdata_req(q, mp);
 		break;
 	case T_INFO_REQ:
 		printd(("%s: %p: -> T_INFO_REQ\n", DRV_NAME, raw));
@@ -4359,7 +4690,7 @@ raw_w_proto(queue_t *q, mblk_t *mp)
 		break;
 	case T_OPTDATA_REQ:
 		printd(("%s: %p: -> T_OPTDATA_REQ\n", DRV_NAME, raw));
-		rtn = t_other_req(q, mp);
+		rtn = t_optdata_req(q, mp);
 		break;
 #ifdef T_ADDR_REQ
 	case T_ADDR_REQ:
@@ -4392,7 +4723,7 @@ raw_w_proto(queue_t *q, mblk_t *mp)
 	case T_CAPABILITY_ACK:
 #endif
 	      eproto:
-		rtn = m_error(q, EPROTO);
+		rtn = m_error(q, EPROTO, mp);
 		break;
 	default:
 		rtn = t_other_req(q, mp);
@@ -4403,7 +4734,7 @@ raw_w_proto(queue_t *q, mblk_t *mp)
 		/* not so rare() during conformance suite testing */
 		rare();
 #endif
-		tpi_set_state(raw, oldstate);
+		tpi_set_state(raw, raw->i_oldstate);
 		/* The put and srv procedures do not recognize all errors.  Sometimes we return an
 		   error to here just to restore the previous state. */
 		switch (rtn) {
@@ -4421,100 +4752,49 @@ raw_w_proto(queue_t *q, mblk_t *mp)
 }
 
 /**
- * raw_w_flush: - M_FLUSH handling (write queue)
+ * raw_w_ioctl - M_IOCTL handling
  * @q: active queue in queue pair (write queue)
  * @mp: the message
  *
- * Canonical flushing, taking into account that this might be a module pushed over a driver on the
- * stream or this might be the Stream end in either direction (i.e. if the Stream is the lower
- * multiplex or driver).
+ * This TPI-UDP provider does not support any input-output controls and, therefore, all input-output
+ * controls are negatively acknowledged.
  */
 STATIC int
-raw_w_flush(queue_t *q, mblk_t *mp)
+raw_w_ioctl(queue_t *q, mblk_t *mp)
 {
-	if (*mp->b_rptr & FLUSHW) {
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(q, FLUSHALL);
-		*mp->b_rptr &= ~FLUSHW;
-		if (q->q_next) {
-			putnext(q, mp);
-			return (QR_ABSORBED);
-		}
-	}
-	if (*mp->b_rptr & FLUSHR) {
-		if (q->q_next) {
-			putnext(q, mp);
-			return (QR_ABSORBED);
-		}
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(RD(q), FLUSHALL);
-		if (RD(q)->q_next) {
-			qreply(q, mp);
-			return (QR_ABSORBED);
-		}
-	}
-	return (QR_DONE);
+	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
+
+	mp->b_datap->db_type = M_IOCNAK;
+	iocp->ioc_count = 0;
+	iocp->ioc_error = EINVAL;
+	iocp->ioc_rval = -1;
+	qreply(q, mp);
+	return (QR_ABSORBED);
 }
 
 /**
- * raw_r_flush: - M_FLUSH handling (read queue)
- * @q: active queue in the queue pair (read queue)
- * @mp: the message
- *
- * Canonical flushing, taking into account that this might be a module pushed over a driver on the
- * stream or this might be the Stream end in either direction (i.e. if the Stream is the lower
- * multiplex or driver).
- */
-STATIC int
-raw_r_flush(queue_t *q, mblk_t *mp)
-{
-	if (*mp->b_rptr & FLUSHR) {
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(q, FLUSHALL);
-		if (q->q_next) {
-			putnext(q, mp);
-			return (QR_ABSORBED);
-		}
-	}
-	if (*mp->b_rptr & FLUSHW) {
-		if (q->q_next) {
-			putnext(q, mp);
-			return (QR_ABSORBED);
-		}
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(WR(q), mp->b_rptr[1], FLUSHALL);
-		else
-			flushq(WR(q), FLUSHALL);
-		if (WR(q)->q_next) {
-			qreply(q, mp);
-			return (QR_ABSORBED);
-		}
-	}
-	return (QR_DONE);
-}
-
-/**
- * raw_r_data: - M_DATA handling
+ * raw_r_data - M_DATA handling
  * @q: active queue in queue pair (read queue)
  * @mp: the message
  *
  * M_DATA messages are placed on the read queue from below by raw_v4_rcv().  These messages are
- * transformed into T_UNITDATA_IND M_PROTO messages and passed along upstream.
+ * transformed into T_UNITDATA_IND, T_CONN_IND or T_OPTDATA_IND M_PROTO messages and passed along
+ * upstream.
  */
-STATIC int
+STATIC INLINE fastcall __hot_get int
 raw_r_data(queue_t *q, mblk_t *mp)
 {
-	return t_unitdata_ind(q, mp);
+	struct raw *raw = RAW_PRIV(q);
+
+	if (raw->info.SERV_type == T_CLTS)
+		return t_unitdata_ind(q, mp);
+	if (raw->CONIND_number > 0)
+		return t_conn_ind(q, mp);
+	return t_optdata_ind(q, mp);
 }
 
 /**
- * raw_r_error: - M_ERROR handling
+ * raw_r_error - M_ERROR handling
  * @q: active queue in queue pair (read queue)
  * @mp: the message
  *
@@ -4524,59 +4804,19 @@ raw_r_data(queue_t *q, mblk_t *mp)
 STATIC int
 raw_r_error(queue_t *q, mblk_t *mp)
 {
-	return t_uderror_ind(q, mp);
+	struct raw *raw = RAW_PRIV(q);
+
+	if (raw->info.SERV_type == T_CLTS)
+		return t_uderror_ind(q, mp);
+	return t_discon_ind(q, mp);
 }
 
 /**
- * raw_r_proto: - M_PROTO, M_PCPROTO handling
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- *
- * M_PROTO, M_PCPROTO messages are placed on the read queue by an NPI IP Stream below the RAW
- * driver.  The purpose of this function is for using a general purpose NPI Stream, in which case,
- * RAW can be a multiplexing driver and have a RAW protocol bound NPI-IP Stream linked beneath it at
- * initialization time, or can be a pushable module that is pushed over an NPI-IP Stream.  It is
- * that NPI-IP lower multiplex or driver Stream that places these messages on the read queue.
- */
-STATIC int
-raw_r_proto(queue_t *q, mblk_t *mp)
-{
-	int rtn;
-	np_long prim;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(prim))
-		goto eproto;
-	switch ((prim = *((np_long *) mp->b_rptr))) {
-	case N_UNITDATA_IND:
-		rtn = n_unitdata_ind(q, mp);
-		break;
-	case N_UDERROR_IND:
-		rtn = n_uderror_ind(q, mp);
-		break;
-	case N_BIND_ACK:
-		rtn = n_bind_ack(q, mp);
-		break;
-	case N_OK_ACK:
-		rtn = n_ok_ack(q, mp);
-		break;
-	case N_ERROR_ACK:
-		rtn = n_error_ack(q, mp);
-		break;
-	default:
-		rtn = n_other_ind(q, mp);
-		break;
-	}
-	return (rtn);
-      eproto:
-	return (-EPROTO);
-}
-
-/**
- * raw_w_prim: - process primitive on write queue
+ * raw_w_prim - process primitive on write queue
  * @q: active queue in queue pair (write queue)
  * @mp: the message
  */
-STATIC int
+STATIC streamscall __hot_put int
 raw_w_prim(queue_t *q, mblk_t *mp)
 {
 	assert(q);
@@ -4585,63 +4825,22 @@ raw_w_prim(queue_t *q, mblk_t *mp)
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
-		return raw_w_flush(q, mp);
+		return ss7_w_flush(q, mp);
 	case M_PROTO:
 	case M_PCPROTO:
 		return raw_w_proto(q, mp);
+	case M_IOCTL:
+		return raw_w_ioctl(q, mp);
 	}
 	return (-EOPNOTSUPP);
 }
 
-STATIC int
-mux_w_proto(queue_t *q, mblk_t *mp)
-{
-	fixme(("Write this function."));
-	return (-EFAULT);
-}
-
 /**
- * mux_r_proto: - process an M_PROTO message on the lower read queue
- * @q: active queue in queue pair (read queue)
- * @mp: the M_PROTO, M_PCPROTO message
- *
- * M_PROTO, M_PCPROTO messages are placed on the lower read queue by an NPI IP Stream linked beneath
- * the UDP multiplexing driver.  These are NPI message that have not yet been associated with a
- * Stream.  This function performs a similar function to that of the raw_v4_rcv() function.
- */
-STATIC int
-mux_r_proto(queue_t *q, mblk_t *mp)
-{
-	int rtn;
-	np_ulong prim;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(prim))
-		goto eproto;
-	switch ((prim = *((np_ulong *) mp->b_rptr))) {
-	case N_UNITDATA_IND:
-		rtn = l_unitdata_ind(q, mp);
-		break;
-	case N_UDERROR_IND:
-		rtn = l_uderror_ind(q, mp);
-		break;
-	case N_BIND_ACK:
-	case N_OK_ACK:
-	case N_ERROR_ACK:
-	default:
-		rtn = l_other_ind(q, mp);
-		break;
-	}
-	return (rtn);
-      eproto:
-	return (-EPROTO);
-}
-
-/**
- * raw_r_prim: - process primitive on read queue
+ * raw_r_prim - process primitive on read queue
  * @q: active queue in queue pair (read queue)
  * @mp: the message
  */
-STATIC int
+STATIC streamscall __hot_get int
 raw_r_prim(queue_t *q, mblk_t *mp)
 {
 	assert(q);
@@ -4650,370 +4849,13 @@ raw_r_prim(queue_t *q, mblk_t *mp)
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
-		return raw_r_flush(q, mp);
+		return ss7_r_flush(q, mp);
 	case M_DATA:
 		return raw_r_data(q, mp);
 	case M_ERROR:
 		return raw_r_error(q, mp);
-	case M_PROTO:
-	case M_PCPROTO:
-		return raw_r_proto(q, mp);
 	}
-	return (-EOPNOTSUPP);
-}
-
-/**
- * mux_w_prim: - proccess primitive on lower mux write queue
- * @q: active queue in queue pair (write queue)
- * @mp: the message
- */
-STATIC int
-mux_w_prim(queue_t *q, mblk_t *mp)
-{
-	assert(q);
-	assert(mp);
-	assert(mp->b_datap);
-
-	switch (mp->b_datap->db_type) {
-	case M_FLUSH:
-		return raw_w_flush(q, mp);
-	case M_PROTO:
-	case M_PCPROTO:
-		return mux_w_proto(q, mp);
-	}
-	return (-EOPNOTSUPP);
-}
-
-/**
- * mux_r_prim: - proccess primitive on lower mux read queue
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC int
-mux_r_prim(queue_t *q, mblk_t *mp)
-{
-	assert(q);
-	assert(mp);
-	assert(mp->b_datap);
-
-	switch (mp->b_datap->db_type) {
-	case M_FLUSH:
-		return raw_r_flush(q, mp);
-	case M_PROTO:
-	case M_PCPROTO:
-		return mux_r_proto(q, mp);
-	}
-	return (-EOPNOTSUPP);
-}
-
-/*
- *  QUEUE PUT and SERVICE Routines
- */
-
-/**
- * raw_putq: - common put procedure
- * @q: active queue in queue pair
- * @mp: mesage to put
- * @proc: poceedure for processing message
- */
-STATIC int
-raw_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
-{
-	int rtn = 0, locked;
-
-	if (mp->b_datap->db_type < QPCTL && (q->q_first || q->q_flag & QSVCBUSY)) {
-		if (!putq(q, mp))
-			freemsg(mp);	/* FIXME */
-		return (0);
-	}
-	if ((locked = raw_trylockq(q)) || mp->b_datap->db_type == M_FLUSH) {
-		do {
-			/* Fast Path */
-			if ((rtn = (*proc) (q, mp)) == QR_DONE) {
-				freemsg(mp);
-				break;
-			}
-			switch (rtn) {
-			case QR_DONE:
-				freemsg(mp);
-			case QR_ABSORBED:
-				break;
-			case QR_STRIP:
-				if (mp->b_cont)
-					if (!putq(q, mp->b_cont))
-						freemsg(mp->b_cont);	/* FIXME */
-			case QR_TRIMMED:
-				freeb(mp);
-				break;
-			case QR_LOOP:
-				if (!q->q_next) {
-					qreply(q, mp);
-					break;
-				}
-			case QR_PASSALONG:
-				if (q->q_next) {
-					putnext(q, mp);
-					break;
-				}
-				rtn = -EOPNOTSUPP;
-			default:
-				freemsg(mp);
-				break;
-			case QR_DISABLE:
-				if (!putq(q, mp))
-					freemsg(mp);	/* FIXME */
-				rtn = 0;
-				break;
-			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
-					putnext(q, mp);
-					break;
-				}
-			case -ENOBUFS:
-			case -EBUSY:
-			case -EAGAIN:
-			case -ENOMEM:
-				if (!putq(q, mp))
-					freemsg(mp);	/* FIXME */
-				break;
-			}
-		}
-		while (0);
-		if (locked)
-			raw_unlockq(q);
-	} else {
-		if (!putq(q, mp))
-			freemsg(mp);	/* FIXME */
-	}
-	return (rtn);
-}
-
-/**
- * raw_putq: - common service procedure
- * @q: active queue in queue pair
- * @proc: poceedure for processing messages
- * @procwake: wakeup method invoked after processing
- */
-STATIC int
-raw_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_t *))
-{
-	int rtn = 0;
-
-	if (raw_trylockq(q)) {
-		mblk_t *mp;
-
-		while ((mp = getq(q))) {
-			/* Fast Path */
-			if ((rtn = proc(q, mp)) == QR_DONE) {
-				freemsg(mp);
-				continue;
-			}
-			switch (rtn) {
-			case QR_DONE:
-				freemsg(mp);
-			case QR_ABSORBED:
-				continue;
-			case QR_STRIP:
-				if (mp->b_cont)
-					if (!putbq(q, mp->b_cont))
-						freemsg(mp->b_cont);
-			case QR_TRIMMED:
-				freeb(mp);
-				continue;
-			case QR_LOOP:
-				if (!q->q_next) {
-					qreply(q, mp);
-					continue;
-				}
-			case QR_PASSALONG:
-				if (q->q_next) {
-					putnext(q, mp);
-					continue;
-				}
-				rtn = -EOPNOTSUPP;
-			default:
-				ptrace(("%s: ERROR: (q dropping) %d\n", DRV_NAME, rtn));
-				freemsg(mp);
-				continue;
-			case QR_DISABLE:
-				ptrace(("%s: ERROR: (q disabling)\n", DRV_NAME));
-				noenable(q);
-				if (!putbq(q, mp))
-					freemsg(mp);	/* FIXME */
-				rtn = 0;
-				break;
-			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
-					putnext(q, mp);
-					continue;
-				}
-			case -ENOBUFS:	/* caller must schedule bufcall */
-			case -EBUSY:	/* caller must have failed canput */
-			case -EAGAIN:	/* caller must re-enable queue */
-			case -ENOMEM:	/* caller must re-enable queue */
-				if (mp->b_datap->db_type < QPCTL) {
-					ptrace(("%s: ERROR: (q stalled) %d\n", DRV_NAME, rtn));
-					if (!putbq(q, mp))
-						freemsg(mp);	/* FIXME */
-					break;
-				}
-				/* Be careful not to put a priority message back on the queue.  */
-				switch (mp->b_datap->db_type) {
-				case M_PCPROTO:
-					mp->b_datap->db_type = M_PROTO;
-					break;
-				case M_PCRSE:
-					mp->b_datap->db_type = M_RSE;
-					break;
-				case M_READ:
-					mp->b_datap->db_type = M_CTL;
-					break;
-				default:
-					ptrace(("%s: ERROR: (q dropping) %d\n", DRV_NAME, rtn));
-					freemsg(mp);
-					continue;
-				}
-				mp->b_band = 255;
-				if (!putq(q, mp))
-					freemsg(mp);	/* FIXME */
-				break;
-			}
-			break;
-		}
-		if (procwake != NULL)
-			procwake(q);
-		raw_unlockq(q);
-	}
-	return (rtn);
-}
-
-/**
- * raw_rwake: - an upper read queue has awoken
- * @q: active queue in the queue pair (read queue)
- *
- * The upper read queue service procudure is invoked only by back enabling (because we do not ever
- * place any message on the upper read queue but always put them to the next read queue).  When
- * invoked, we need to manually enable any lower multiplex (NPI IP) read queue.  This permits flow
- * control to work across the multiplexing driver.
- */
-STATIC void
-raw_rwake(queue_t *q)
-{
-	read_lock_bh(&raw_lock);
-	if (npi_bottom != NULL)
-		/* There is an NPI IP Stream linked under the driver. */
-		qenable(RD(npi_bottom));
-	read_unlock_bh(&raw_lock);
-}
-
-/**
- * mux_wwake: - the lower write queue has awoken
- * @q: active queue in queue pair (write queue)
- *
- * The lower write service procedure is used merely for backenabling across the multiplexing driver.
- * We never put messages to the lower write queue, but put them to the next queue below the lower
- * write queue.  When a bcanput() fails on the next queue to thelower write queue, a back enable
- * will invoke the lower write queue service procedure which can then be used to explicitly enable
- * the upper write queue(s) feeding the lower write queue.  This permits flow control to work across
- * the multiplexing driver.
- */
-STATIC void
-mux_wwake(queue_t *q)
-{
-	struct raw *top;
-
-	read_lock_bh(&raw_lock);
-	for (top = raw_opens; top; top = top->next)
-		qenable(top->wq);
-	read_unlock_bh(&raw_lock);
-}
-
-/**
- * raw_rput: - read side put procedure
- * @q: queue to put message to
- * @mp: message to put
- */
-STATIC streamscall int
-raw_rput(queue_t *q, mblk_t *mp)
-{
-	return raw_putq(q, mp, &raw_r_prim);
-}
-
-/**
- * raw_rsrv: - read side service procedure
- * @q: queue to service
- */
-STATIC streamscall int
-raw_rsrv(queue_t *q)
-{
-	return raw_srvq(q, &raw_r_prim, NULL);
-}
-
-/**
- * raw_wput: - write side put procedure
- * @q: queue to put message to
- * @mp: message to put
- */
-STATIC streamscall int
-raw_wput(queue_t *q, mblk_t *mp)
-{
-	return raw_putq(q, mp, &raw_w_prim);
-}
-
-/**
- * raw_wsrv: - write side service procedure
- * @q: queue to service
- */
-STATIC streamscall int
-raw_wsrv(queue_t *q)
-{
-	return raw_srvq(q, &raw_w_prim, NULL);
-}
-
-/**
- * mux_rput: - read side put procedure
- * @q: queue to put message to
- * @mp: message to put
- */
-STATIC streamscall int
-mux_rput(queue_t *q, mblk_t *mp)
-{
-	return raw_putq(q, mp, &mux_r_prim);
-}
-
-/**
- * mux_rsrv: - read side service procedure
- * @q: queue to service
- *
- * If the lower read put procedure encounters flow control on the queue beyond the accepting upper
- * read queue, it places the message back on its qeue and waits for the upper read queue service
- * procedure to enable it when congestion is cleared, or when a connection is formed.
- */
-STATIC streamscall int
-mux_rsrv(queue_t *q)
-{
-	return raw_srvq(q, &mux_r_prim, NULL);
-}
-
-/**
- * mux_wput: - write side put procedure
- * @q: queue to put message to
- * @mp: message to put
- */
-STATIC streamscall int
-mux_wput(queue_t *q, mblk_t *mp)
-{
-	return raw_putq(q, mp, &mux_w_prim);
-}
-
-/**
- * mux_wsrv: - write side service procedure
- * @q: queue to service
- */
-STATIC streamscall int
-mux_wsrv(queue_t *q)
-{
-	return raw_srvq(q, &mux_w_prim, NULL);
+	return (QR_PASSFLOW);
 }
 
 /*
@@ -5025,55 +4867,8 @@ mux_wsrv(queue_t *q)
  */
 
 #ifdef LINUX
-#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
-STATIC struct inet_protocol *raw_next_proto = NULL;
-#endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
-STATIC struct net_protocol *raw_next_proto = NULL;
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 /**
- * raw_next_pkt_handler: - pass socket buffer to next packet handler
- * @skbp: pointer to the socket buffer to pass
- *
- * Return Value: Returns true when the socket buffer has been passed to the next packet handler and
- * the caller is no longer responsible for the buffer; false, when the socket buffer has not been
- * passed, and the caller is still responsible for the buffer.
- */
-STATIC int
-raw_next_pkt_handler(struct sk_buff **skbp)
-{
-	if (raw_next_proto != NULL) {
-		struct sk_buff *skb;
-
-		skb = *skbp;
-		*skbp = NULL;
-		return (*raw_next_proto->handler) (skb);
-	}
-	return (0);
-}
-
-/**
- * raw_next_err_handler: - pass socket buffer to next error handler
- * @skbp: pointer to the socket buffer to pass
- *
- * Return Value: Returns true when the socket buffer has been passed to the next error handler and
- * the caller is no longer responsible for the buffer; false, when the socket buffer has not been
- * passed, and the caller is still responsible for the buffer.
- */
-STATIC void
-raw_next_err_handler(struct sk_buff **skbp, u32 info)
-{
-	if (raw_next_proto != NULL) {
-		struct sk_buff *skb = *skbp;
-
-		skb = *skbp;
-		*skbp = NULL;
-		(*raw_next_proto->err_handler) (skb, info);
-	}
-}
-
-/**
- * raw_free: - message block free function for mblks esballoc'ed from sk_buffs
+ * raw_free - message block free function for mblks esballoc'ed from sk_buffs
  * @data: client data (sk_buff pointer in this case)
  */
 STATIC void streamscall
@@ -5086,19 +4881,23 @@ raw_free(char *data)
 }
 
 /**
- * raw_v4_rcv: - receive IPv4 RAW protocol packets
+ * raw_v4_rcv - receive IPv4 RAW protocol packets
  */
-STATIC int
+STATIC __hot_in int
 raw_v4_rcv(struct sk_buff *skb)
 {
-	mblk_t *mp = NULL;
+	ushort ulen;
 	struct raw *raw;
 	struct iphdr *iph;
 	struct rtable *rt;
+
 	frtn_t fr = { &raw_free, (char *) skb };
 	int rtn;
 
 //	IP_INC_STATS_BH(IpInDelivers);	/* should wait... */
+
+	if (!pskb_may_pull(skb, sizeof(struct udphdr)))
+		goto too_small;
 
 	if (skb->pkt_type != PACKET_HOST)
 		goto bad_pkt_type;
@@ -5111,56 +4910,61 @@ raw_v4_rcv(struct sk_buff *skb)
 	read_lock(&raw_lock);
 	if (!(raw = raw_lookup(iph->protocol, iph->daddr, iph->saddr)))
 		goto no_stream;
+	raw_v4_steal(skb);	/* its ours */
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
 		goto linear_fail;
-	/* now allocate an mblk */
-	if (!(mp = esballoc(skb->nh.raw, skb->len + (skb->data - skb->nh.raw), BPRI_MED, &fr)))
-		goto no_buffers;
-	mp->b_datap->db_type = M_DATA;
-	mp->b_wptr = mp->b_rptr + skb->len + (skb->data - skb->nh.raw);
-	/* trim the ip header */
-	mp->b_rptr += skb->h.raw - skb->nh.raw;
-	skb->dev = NULL;
-	if (!raw->rq || !canput(raw->rq) || !putq(raw->rq, mp))
-		goto flow_controlled;
-//
-	raw_put(raw);
-	read_unlock(&raw_lock);
-	return (0);
+	{
+		mblk_t *mp;
+		size_t mlen = skb->len + (skb->data - skb->nh.raw);
+
+		/* now allocate an mblk */
+		if (!(mp = esballoc(skb->nh.raw, mlen, BPRI_MED, &fr)))
+			goto no_buffers;
+		mp->b_wptr = mp->b_rptr + mlen;
+		/* trim the ip header */
+		mp->b_rptr = skb->h.raw;
+		skb->dev = NULL;
+
+		if (!raw->oq || !canput(raw->oq))
+			goto flow_controlled;
+		put(raw->oq, mp);
+//              UDP_INC_STATS_BH(UdpInDatagrams);
+		raw_put(raw);
+		read_unlock(&raw_lock);
+		return (0);
+	      flow_controlled:
+		raw_put(raw);
+		read_unlock(&raw_lock);
+		freeb(mp);	/* will take sk_buff with it */
+		return (0);
+	      no_buffers:
+		raw_put(raw);
+		read_unlock(&raw_lock);
+		goto discard_it;
+	}
       no_stream:
 	read_unlock(&raw_lock);
 	ptrace(("ERROR: No stream\n"));
+//      UDP_INC_STATS_BH(UdpNoPorts);   /* should wait... */
 	goto pass_it;
-      pass_it:
-	rtn = raw_next_pkt_handler(&skb);
-	if (skb == NULL)
-		return (rtn);
 	goto discard_it;
-      free_it:
-	freemsg(mp);
-	return (0);
       linear_fail:
 	raw_put(raw);
 	read_unlock(&raw_lock);
 	goto discard_it;
-      bad_pkt_type:
-	goto discard_it;
       discard_it:
 	kfree_skb(skb);
 	return (0);
-      flow_controlled:
-	raw_put(raw);
-	read_unlock(&raw_lock);
-	goto free_it;
-      no_buffers:
-	ptrace(("ERROR: Could not allocate mblk\n"));
-	raw_put(raw);
-	read_unlock(&raw_lock);
-	goto discard_it;
+      bad_pkt_type:
+	goto pass_it;
+      too_small:
+	goto pass_it;
+      pass_it:
+	return raw_v4_rcv_next(skb);
 }
 
 /**
- * raw_v4_err: - receive IPv4 RAW protocol ICMP packets
+ * raw_v4_err - receive IPv4 RAW protocol ICMP packets
  * @skb: socket buffer containing message with headers pulled
  * @u32: icmp error (unused)
  *
@@ -5168,7 +4972,7 @@ raw_v4_rcv(struct sk_buff *skb)
  * are received.  The function looks up the Stream and, if found, wraps the packet in an M_ERROR
  * message and passes it to the read queue of the Stream.
  *
- * LOCKING: raw_lock protects the master list and protects from open, close, link and unlink
+ * LOCKING: raw_lock protects the master list and protects from open, close, link and unlink.
  * raw->qlock protects the state of private structure.  raw->refs protects the private structure
  * from being deallocated before locking.
  */
@@ -5176,16 +4980,16 @@ STATIC void
 raw_v4_err(struct sk_buff *skb, u32 info)
 {
 	struct raw *raw;
-
-	struct iphdr *iph = (struct iphdr *) skb->data;
+	struct iphdr *iph;
 	size_t ihl;
 
+	iph = (struct iphdr *) skb->data;
 #define ICMP_MIN_LENGTH 8
 	if (skb->len < (ihl = iph->ihl << 2) + ICMP_MIN_LENGTH)
 		goto drop;
-
 	read_lock(&raw_lock);
-	raw = raw_lookup_icmp(iph->protocol, iph->saddr, iph->daddr);
+	/* reverse addresses in lookup */
+	raw = raw_lookup(iph->protocol, iph->saddr, iph->daddr);
 	if (raw == NULL)
 		goto no_stream;
 	spin_lock(&raw->qlock);
@@ -5193,21 +4997,23 @@ raw_v4_err(struct sk_buff *skb, u32 info)
 		goto closed;
 	{
 		mblk_t *mp;
-		size_t mlen = sizeof(uint32_t) + sizeof(struct icmphdr *);
+		size_t mlen = sizeof(struct icmphdr) + skb->len;
 
 		/* Create a queue a specialized M_ERROR message to the Stream's read queue for
 		   further processing.  The Stream will convert this message into a T_UDERR_IND
-		   message and pass it along. */
-		if (!raw->rq || !canput(raw->rq))
+		   or T_DISCON_IND message and pass it along. */
+		if (!raw->oq || !canput(raw->oq))
 			goto flow_controlled;
 		if (!(mp = allocb(mlen, BPRI_MED)))
 			goto no_buffers;
 		mp->b_datap->db_type = M_ERROR;
-		*(uint32_t *) mp->b_wptr++ = iph->daddr;
-		*(struct icmphdr *) mp->b_wptr++ = *skb->h.icmph;
-		if (!putq(raw->rq, mp))
-			freemsg(mp);
-		goto discard_and_put;
+		bcopy(skb->h.icmph, mp->b_wptr, sizeof(struct icmphdr));
+		mp->b_wptr += sizeof(struct icmphdr);
+		bcopy(skb->data, mp->b_wptr, skb->len);
+		mp->b_rptr = mp->b_wptr + ihl;
+		mp->b_wptr += skb->len;
+		put(raw->oq, mp);
+		goto unlock_discard_put;
 	}
 	goto discard_and_put;
       unlock_discard_put:
@@ -5248,15 +5054,89 @@ raw_v4_err(struct sk_buff *skb, u32 info)
  *  Private structure allocation and deallocation.
  */
 STATIC struct raw *
-raw_alloc_priv(queue_t *q, struct raw **rawp, major_t major, minor_t minor, cred_t *crp)
+raw_alloc_priv(queue_t *q, struct raw **rawp, dev_t *devp, cred_t *crp)
 {
-	fixme(("Write this function."));
-	return (NULL);
+	struct raw *raw;
+
+	if ((raw = raw_alloc())) {
+		major_t cmajor = getmajor(*devp);
+		minor_t cminor = getminor(*devp);
+
+		/* raw generic members */
+		raw->u.dev.cmajor = cmajor;
+		raw->u.dev.cminor = cminor;
+		raw->cred = *crp;
+		(rarawoq = RD(q))->q_ptr = raw_get(raw);
+		(raw->iq = WR(q))->q_ptr = raw_get(raw);
+		raw->i_prim = &raw_w_prim;
+		raw->o_prim = &raw_r_prim;
+		raw->i_wakeup = NULL;
+		raw->o_wakeup = NULL;
+		raw->type = IPPROTO_UDP;
+		spinlock_init(&raw->qlock);
+		raw->i_version = T_CURRENT_VERSION;
+		raw->i_style = 2;
+		raw->i_state = raw->i_oldstate = raw->info.CURRENT_state = TS_UNBND;
+		/* initialized information */
+		raw->info.PRIM_type = T_INFO_ACK;
+		raw->info.TSDU_size = 65535;
+		raw->info.ETSDU_size = T_INVALID;
+		raw->info.CDATA_size = 65535;
+		raw->info.DDATA_size = 65535;
+		raw->info.ADDR_size = sizeof(struct sockaddr_in);
+		raw->info.OPT_size = 65535;
+		raw->info.TIDU_size = 4096;
+		raw->info.SERV_type = T_CLTS;	/* by default */
+		raw->info.CURRENT_state = TS_UNBND;
+		raw->info.PROVIDER_flag = T_XPG4_1 & ~T_SNDZERO;
+		bufq_init(&raw->conq);
+		/* link into master list */
+		if ((raw->next = *rawp))
+			raw->next->prev = &raw->next;
+		raw->prev = rawp;
+		*rawp = raw_get(raw);
+	} else
+		strlog(DRV_ID, getminor(*devp), LOG_WARNING, SL_WARN | SL_CONSOLE,
+		       "could not allocate driver private structure");
+	return (raw);
 }
 STATIC void
 raw_free_priv(queue_t *q)
 {
-	fixme(("Write this function."));
+	struct raw *raw = RAW_PRIV(q);
+
+	strlog(DRV_ID, raw->u.dev.cminor, LOG_DEBUG, SL_TRACE,
+	       "unlinking private structure: reference count = %d", atomic_read(&raw->refcnt));
+	/* make sure the stream is disconnected */
+	if (raw->hashb != NULL) {
+		raw_disconnect(raw);
+		bufq_purge(&raw->conq);
+		tpi_set_state(raw, TS_IDLE);
+	}
+	/* make sure the stream is unbound */
+	if (raw->bindb != NULL) {
+		raw_unbind(raw);
+		tpi_set_state(raw, TS_UNBND);
+	}
+	bufq_purge(&raw->conq);
+	ss7_unbufcall((str_t *) raw);
+	strlog(DRV_ID, raw->u.dev.cminor, LOG_DEBUG, SL_TRACE,
+	       "removed bufcalls: reference count = %d", atomic_read(&raw->refcnt));
+	/* remove from master list */
+	write_lock_bh(&raw_lock);
+	if ((*raw->prev = raw->next))
+		raw->next->prev = raw->prev;
+	raw->next = NULL;
+	raw->prev = &raw->next;
+	write_unlock_bh(&raw_lock);
+	strlog(DRV_ID, raw->u.dev.cminor, LOG_DEBUG, SL_TRACE,
+	       "unlinked: reference count = %d", atomic_read(&raw->refcnt));
+	raw_release(&raw->oq->q_ptr);
+	raw->oq = NULL;
+	raw_release(&raw->iq->q_ptr);
+	raw->iq = NULL;
+	assure(atomic_read(&raw->refcnt) == 1);
+	raw_release(&raw);
 	return;
 }
 
@@ -5266,7 +5146,7 @@ raw_free_priv(queue_t *q)
 STATIC int raw_majors[RAW_CMAJORS] = { RAW_CMAJOR_0, };
 
 /**
- * raw_open: - open a Stream
+ * raw_qopen - open a Stream
  * @q: read queue in queue pair
  * @devp: pointer to the device number opened
  * @flag: open flags
@@ -5274,7 +5154,7 @@ STATIC int raw_majors[RAW_CMAJORS] = { RAW_CMAJOR_0, };
  * @crp: credentials pointer
  */
 STATIC streamscall int
-raw_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+raw_qopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int mindex = 0;
 	int cmajor = getmajor(*devp);
@@ -5343,13 +5223,13 @@ raw_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 }
 
 /**
- * raw_close: - close a Stream
+ * raw_qclose - close a Stream
  * @q: read queue in queue pair
  * @flag: open flags
  * @crp: credentials pointer
  */
 STATIC streamscall int
-raw_close(queue_t *q, int flag, cred_t *crp)
+raw_qclose(queue_t *q, int flag, cred_t *crp)
 {
 	printd(("%s: closing character device %d:%d\n", DRV_NAME, (int) RAW_PRIV(q)->cmajor,
 		(int) RAW_PRIV(q)->cminor));
@@ -5367,8 +5247,9 @@ raw_close(queue_t *q, int flag, cred_t *crp)
 #endif				/* LIS */
 	goto skip_pop;
       skip_pop:
+	/* make sure procedures are off */
 	qprocsoff(q);
-	raw_free_priv(q);
+	raw_free_priv(q);	/* free and unlink the structure */
 	goto quit;
       quit:
 	return (0);
@@ -5402,16 +5283,20 @@ raw_init_caches(void)
 	return;
 }
 
-STATIC struct raw_bhash_bucket *raw_bhash;
-STATIC size_t raw_bhash_size = 0;
-STATIC size_t raw_bhash_order = 0;
 STATIC void
 raw_term_hashes(void)
 {
 	if (raw_bhash) {
 		free_pages((unsigned long) raw_bhash, raw_bhash_order);
 		raw_bhash = NULL;
+		raw_bhash_size = 0;
 		raw_bhash_order = 0;
+	}
+	if (raw_chash) {
+		free_pages((unsigned long) raw_chash, raw_chash_order);
+		raw_chash = NULL;
+		raw_chash_size = 0;
+		raw_chash_order = 0;
 	}
 }
 STATIC void
@@ -5430,10 +5315,16 @@ raw_init_hashes(void)
 	} while (raw_bhash == NULL && --order >= 0);
 	if (!raw_bhash)
 		cmn_err(CE_PANIC, "%s: Failed to allocate RAW bind hash table\n", __FUNCTION__);
+	raw_bhash_size = raw_chash_size = raw_bhash_size >> 1;
+	raw_bhash_order = raw_chash_order = raw_bhash_order - 1;
 	bzero(raw_bhash, raw_bhash_size * sizeof(struct raw_bhash_bucket));
+	bzero(raw_chash, raw_chash_size * sizeof(struct raw_chash_bucket));
 	for (i = 0; i < raw_bhash_size; i++)
 		rwlock_init(&raw_bhash[i].lock);
+	for (i = 0; i < raw_chash_size; i++)
+		rwlock_init(&raw_chash[i].lock);
 	printd(("%s: INFO: bind hash table configured size = %d\n", DRV_NAME, raw_bhash_size));
+	printd(("%s: INFO: conn hash table configured size = %d\n", DRV_NAME, raw_chash_size));
 }
 
 /*
@@ -5444,94 +5335,238 @@ STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PRO
 
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
 struct inet_protocol raw_net_protocol = {
-	.handler = &raw_v4_rcv,
-	.err_handler = &raw_v4_err,
 	.protocol = IPPROTO_RAW,
 	.name = "streams-rawip",
-	.next = NULL,
-	.copy = 0,
-};
-
-/**
- * raw_term_nproto: - terminate RAW network protocol override
- *
- * This is largely a 2.4 version of the network protocol override function.
- */
-STATIC void
-raw_term_nproto(void)
-{
-	unsigned char hash = IPPROTO_RAW & (MAX_INET_PROTOS - 1);
-	struct inet_protocol **p = (struct inet_protocol **)&inet_protosp[hash];
-
-	br_write_lock_bh(BR_NETPROTO_LOCK);
-	while ((*p) != NULL && (*p) != &raw_net_protocol)
-		p = &(*p)->next;
-	if ((*p) == &raw_net_protocol)
-		(*p) = raw_next_proto;
-	br_write_unlock_bh(BR_NETPROTO_LOCK);
-}
-
-/**
- * raw_init_nproto: - initialize RAW network protocol override
- *
- * This is largely a 2.4 version of the network protocol override function.
- */
-STATIC void
-raw_init_nproto(void)
-{
-	unsigned char hash = IPPROTO_RAW & (MAX_INET_PROTOS - 1);
-	struct inet_protocol **p = (struct inet_protocol **)&inet_protosp[hash];
-
-	br_write_lock_bh(BR_NETPROTO_LOCK);
-	raw_next_proto = (*p);
-	(*p) = &raw_net_protocol;
-	br_write_unlock_bh(BR_NETPROTO_LOCK);
-}
-#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
-/* FIXME: need to allocate these on demand */
-struct net_protocol raw_net_protocol = {
-#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
-	/* 2.6.15 is different */
-	.proto = 0,
-#endif
 	.handler = &raw_v4_rcv,
 	.err_handler = &raw_v4_err,
-	.no_policy = 1,
+	.copy = 0,
+	.next = NULL,
 };
+
+struct inet_protocol *raw_proto[256] = { };
+
+/**
+ * raw_v4_steal = steal a socket buffer
+ * @skb: socket buffer to steal
+ *
+ * In the pakcet handler, if the packet is for us, steal the packet by overwritting the protocol and
+ * returning.  This is only done for normal packets and not error packets (that do not need to be
+ * stolen).  In the 2.4 handler loop, iph->protocol is examined on each iteration, permitting us to
+ * stead the packet by overwritting the protocol number.
+ */
+STATIC INLINE fastcall __hot_in void
+raw_v4_steal(struct sk_buff *skb)
+{
+	skb->nh.iph->protocol = 255;
+}
+
+/**
+ * raw_v4_rcv_next - pass a socket buffer to the next handler
+ * @skb: socket buffer to pass
+ *
+ * In the packet handler, if the packet is for us, pass it to the next handler by simply freeing the
+ * cloned copy and returning.
+ */
+STATIC INLINE fastcall __hot_in int
+raw_v4_rcv_next(struct sk_buff *skb)
+{
+	kfree_skb(skb);
+	return (0);
+}
+
+/**
+ * raw_v4_err_next - pass a socket buffer to the next error handler
+ * @skb: socket buffer to pass
+ *
+ * In the error packet handler, if the packet is not for us, pass it to the next handler by simply
+ * returning.  Error packets are not cloned, so don't free it.
+ */
+STATIC INLINE fastcall __hot_in int
+raw_v4_err_next(struct sk_buff *skb, __u32 info)
+{
+	return (0);
+}
+
+/**
+ * raw_init_nproto - initialize RAW network protocol override
+ *
+ * This is largely a 2.4 version of the network protocol override function.  Under 2.4, simply add
+ * the protocol to the network using an inet_protocol structure and the inet_add_protocol()
+ * function.
+ */
+STATIC int
+raw_init_nproto(unsigned char proto)
+{
+	struct inet_protocol *ip;
+
+	if ((ip = raw_proto[proto]) != NULL)
+		return (-EALREADY);
+	ip = raw_proto[proto] = &raw_inet_protocol;
+	inet_add_protocol(ip, proto);
+	return (0);
+}
+
+/**
+ * raw_term_nproto - terminate RAW network protocol override
+ *
+ * This is largely a 2.4 version of the network protocol override function.  Under 2.4 simply remove
+ * the protocol from the network using the inet_protocol structure and the inet_del_protocol()
+ * function.
+ */
+STATIC int
+raw_term_nproto(unsigned char proto)
+{
+	struct inet_protocol *ip;
+
+	if ((ip = raw_proto[proto]) == NULL)
+		return (-EALREADY);	/* already terminated */
+	inet_del_protocol(ip, proto);
+	raw_proto[proto] = NULL;
+	return (0);
+}
+
+#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+
+/*
+ *  Under 2.6, attempt to do the equivalent of inet_add_protocol().  If it fails (as would be
+ *  expected as IP is permanent protocol), check whether a module owns the net_protocol structure
+ *  and, if so, try to increment the module count (to keep it from unloading).  Take a reference to
+ *  the old net_protocol structure.  Then replace the net_protocol pointer with our own in the
+ *  hashes.  If it succeeds (which we would not expect) it reduces to the same as
+ *  inet_add_protocol().  In the packet handler, if the packet is not for us, simply pass it to the
+ *  next handler.  If the packet is for us, clone it, free the original and work with the clone.
+ */
+
+struct inet_protocol = {
+	struct net_protocol proto;
+	struct net_protocol *next;
+	struct module *kmod;
+};
+
+/* FIXME: have to allocate an array of these */
+struct inet_protocol raw_net_protocol = {
+	.proto = {
+#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
+		  .proto = IPPROTO_RAW,
+#endif				/* HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO */
+		  .handler = &raw_v4_rcv,
+		  .err_handler = &raw_v4_err,
+		  .no_policy = 1,
+		  },
+	.next = NULL,
+	.kmod = NULL,
+};
+
+struct inet_protocol *raw_proto = NULL;
+
+/**
+ * raw_v4_steal - steal a socket buffer
+ * @skb: socket buffer to steal
+ *
+ * In the packet handler, if the packet is for us, steal the packet by simply not passing it to the
+ * next handler.
+ */
+STATIC INLINE fastcall __hot_in void
+raw_v4_steal(struct sk_buff *skb)
+{
+}
+
+/**
+ * upd_v4_rcv_next - pass a socket buffer to the next handler
+ * @skb - socket buffer to pass
+ *
+ * If the packet is not for us, pass it to the next handler.  If there is no next handler, free the
+ * packet and return.  Note that we do not have to lock the hash because we own it and are also
+ * holding a reference to any module owning the next handler.
+ */
+STATIC INLINE fastcall __hot_in int
+raw_v4_rcv_next(struct sk_buff *skb)
+{
+	struct inet_protocol *ip;
+
+	if ((ip = raw_proto) != NULL && ip->next != NULL)
+		return ip->next->proto.handler(skb);
+	kfree_skb(skb);
+	return (0);
+}
+
+/**
+ * raw_v4_err_next - pass a socket buffer to the next error handler
+ * @skb - socket buffer to pass
+ *
+ * Error packets are not cloned, so pass it to the next handler.  If there is not next handler,
+ * simply return.
+ */
+STATIC INLINE fastcall __hot_in int
+raw_v4_err_next(struct sk_buff *skb, __u32 info)
+{
+	struct inet_protocol *ip;
+
+	if ((ip = raw_proto) != NULL && ip->next != NULL)
+		ip->next->proto.err_handler(skb, info);
+	return (0);
+}
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 
 /**
- * raw_term_nproto: - terminate RAW network protocol override
+ * raw_init_nproto - initialize RAW network protocol override
  *
- * This is largely a 2.6 version of the network protocol override function.
+ * This is largely a 2.6 version of the network protocol override function.  The module stuff here
+ * is just for ourselves (other kernel modules pulling the same trick) as Linux IP is kernel
+ * resident.
  */
-STATIC void
-raw_term_nproto(void)
+STATIC int
+raw_init_nproto(unsigned char proto)
 {
-	int hash = IPPROTO_RAW & (MAX_INET_PROTOS - 1);
+	struct inet_protocol *ip;
+	int hash = proto & (MAX_INET_PROTOS - 1);
 
+	if ((ip = raw_proto[proto]) != NULL)
+		return (-EALREADY);
+	ip = raw_proto[proto] = &raw_inet_protocol;
+	/* reduces to inet_add_protocol() if no protocol registered */
 	spin_lock_bh(inet_proto_lockp);
-	if (inet_protosp[hash] == &raw_net_protocol)
-		inet_protosp[hash] = raw_next_proto;
+	if ((ip->next = inet_protosp[hash]) != NULL) {
+		if ((ip->kmod = module_text_address(ip->next))
+		    && ip->kmod != THIS_MODULE) {
+			if (!try_to_get_module(ip->kmod)) {
+				spin_unlock_bh(inet_proto_lockp);
+				return (-EAGAIN);
+			}
+		}
+	}
+	inet_protos[hash] = &ip->proto;
 	spin_unlock_bh(inet_proto_lockp);
 	synchronize_net();
+	return (0);
 }
 
 /**
- * raw_init_nproto: - initialize RAW network protocol override
+ * raw_term_nproto - terminate RAW network protocol override
  *
- * This is largely a 2.6 version of the network protocol override function.
+ * This is largely a 2.6 version of the network protocol override function.  The module stuff here
+ * is just for ourselves (other kernel modules pulling the same trick) as Linux IP is kernel
+ * resident.
  */
-STATIC void
-raw_init_nproto(void)
+STATIC int
+raw_term_nproto(unsigned char proto)
 {
-	int hash = IPPROTO_RAW & (MAX_INET_PROTOS - 1);
+	struct inet_protocol *ip;
+	int hash = proto & (MAX_INET_PROTOS - 1);
 
+	if ((ip = raw_proto[proto]) == NULL)
+		return (-EALREADY);	/* already terminated */
+	/* reduces to inet_del_protocol() if no protocol was registered */
 	spin_lock_bh(inet_proto_lockp);
-	raw_next_proto = inet_protosp[hash];
-	inet_protosp[hash] = &raw_net_protocol;
+	inet_protos[hash] = ip->next;
 	spin_unlock_bh(inet_proto_lockp);
+	synchronize_net();
+	raw_proto[proto] = NULL;
+	if (ip->next != NULL && ip->kmod != NULL && ip->kmod != THIS_MODULE)
+		module_put(ip->kmod);
+	return (0);
 }
+
 #else
 #error HAVE_KTYPE_STRUCT_INET_PROTOCOL or HAVE_KTYPE_STRUCT_NET_PROTOCOL must be defined.
 #endif
@@ -5642,15 +5677,14 @@ rawinit(void)
 {
 	int err, mindex = 0;
 
-	(void)raw_unbufcall;
-	(void)raw_esballoc;
-	(void)raw_dupmsg;
-	(void)raw_dupb;
-
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	raw_init_hashes();
 	raw_init_caches();
-	raw_init_nproto();
+	if ((err = raw_init_nproto())) {
+		raw_term_caches();
+		raw_term_hashes();
+		return (err);
+	}
 	for (mindex = 0; mindex < CMAJORS; mindex++) {
 		if ((err = raw_register_strdev(raw_majors[mindex])) < 0) {
 			if (mindex) {

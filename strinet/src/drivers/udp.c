@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/22 01:08:52 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 10:51:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:08:52 $ by $Author: brian $
+ Last Modified $Date: 2006/04/22 10:51:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.10  2006/04/22 10:51:04  brian
+ - working up UDP and RAWIP drivers
+
  Revision 0.9.2.9  2006/04/22 01:08:52  brian
  - working up second generation UPD driver
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/22 01:08:52 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 10:51:04 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/22 01:08:52 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 10:51:04 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -159,7 +162,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/22 01:08:52 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 10:51:04 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -479,8 +482,8 @@ udp_alloc(void)
 		bzero(udp, sizeof(*udp));
 		atomic_set(&udp->refcnt, 1);
 		spin_lock_init(&udp->lock);	/* "udp-lock" */
-		np->priv_put = &udp_put;
-		np->priv_get = &udp_get;
+		udp->priv_put = &udp_put;
+		udp->priv_get = &udp_get;
 	}
 	return (udp);
 }
@@ -534,7 +537,7 @@ tpi_state_name(t_scalar_t state)
 	}
 }
 #endif				/* _DEBUG */
-STATIC void
+STATIC INLINE fastcall void
 tpi_set_state(struct udp *udp, long state)
 {
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, udp, tpi_state_name(state),
@@ -2877,7 +2880,7 @@ t_build_options(struct udp * t, unsigned char *ip, size_t ilen, unsigned char *o
  */
 
 /**
- * udp_lookup_conn = look up a stream in the connection hashes
+ * udp_lookup_conn - look up a stream in the connection hashes
  * @dport: destination port (of recieved packet)
  * @sport: soruce port (of recieved packet)
  * @daddr: destination address (of recieved packet)
@@ -2910,8 +2913,8 @@ udp_lookup_conn(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
  *
  * There are two types of Streams that exist in the bind hashes: CLTS Streams that need to be sent
  * received messages, and COTS Streams that are bound listening or not.  When performing a lookup
- * for receive packets, we are only interested CLTS Streams or pseudo-COTS Streams that are bound in
- * a listening state.
+ * for receive packets, we are only interested in CLTS Streams or pseudo-COTS Streams that are bound
+ * in a listening state.
  */
 STATIC INLINE fastcall __hot_in struct udp *
 udp_lookup_bind(uint16_t dport, uint32_t daddr)
@@ -2929,7 +2932,7 @@ udp_lookup_bind(uint16_t dport, uint32_t daddr)
 
 		for (udp = ub->owners; udp; udp = udp->bnext) {
 			int score = 0;
-			struct sockaddr_int *sin = (struct sockaddr_in *) &udp->srce;
+			struct sockaddr_in *sin = (struct sockaddr_in *) &udp->srce;
 			t_uscalar_t state;
 			uint16_t sport;
 			uint32_t saddr;
@@ -2954,12 +2957,12 @@ udp_lookup_bind(uint16_t dport, uint32_t daddr)
 			}
 			if (score == 2) {
 				/* perfect match */
-				result = sp;
+				result = udp;
 				break;
 			}
 			if (score > hiscore) {
 				hiscore = score;
-				result = sp;
+				result = udp;
 			}
 		}
 	}
@@ -2976,7 +2979,7 @@ udp_lookup(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
 
 	if ((udp = udp_lookup_conn(dport, sport, daddr, saddr)))
 		return (udp);
-	if ((udp = udl_lookup_bind(dport, daddr)))
+	if ((udp = udp_lookup_bind(dport, daddr)))
 		return (udp);
 	return (NULL);
 }
@@ -3337,6 +3340,7 @@ m_flush(queue_t *q, int how, int band)
  * m_error: deliver an M_ERROR message upstream
  * @q: a queue in the queue pair
  * @error: the error to deliver
+ * @mp: message to reuse
  */
 STATIC int
 m_error(queue_t *q, int error, mblk_t *mp)
@@ -3380,7 +3384,7 @@ m_error(queue_t *q, int error, mblk_t *mp)
 		*(mp->b_wptr)++ = error;
 		*(mp->b_wptr)++ = error;
 	}
-	qrepy(q, mp);
+	qreply(q, mp);
 	return (pp == mp) ? (QR_ABSORBED) : (QR_DONE);
       enobufs:
 	rare();
@@ -3497,7 +3501,6 @@ t_error_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error)
 	return (mp == pp) ? (QR_ABSORBED) : (QR_DONE);
       error:
 	return (err);
-
 }
 
 /**
@@ -3558,7 +3561,6 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
 			goto error;
 		}
 		bufq_dequeue(&udp->conq, cp);
-		udp_coninds--;
 		freeb(XCHG(&cp, cp->b_cont));
 		/* queue any pending data */
 		while (cp)
@@ -3597,7 +3599,7 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
       error:
 	if (mp != pp)
 		freemsg(mp);
-	return t_error_ack(q, prim, mp, err);
+	return t_error_ack(q, prim, pp, err);
 }
 
 /**
@@ -3841,13 +3843,13 @@ t_uderror_ind(queue_t *q, mblk_t *dp)
 	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp;
 	struct T_uderror_ind *p;
-	size_t opt_len = t_errs_size(udp, dp);
+	t_uscalar_t OPT_length = t_errs_size(udp, dp);
 	t_uscalar_t ERROR_type = 0;
-	const size_t src_len = sizeof(struct sockaddr_in);
+	const t_uscalar_t SRC_length = sizeof(struct sockaddr_in);
 
 	if (unlikely(tpi_get_statef(udp) & ~(TSF_IDLE)))
 		goto discard;
-	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED)) == NULL))
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + SRC_length + OPT_length, BPRI_MED)) == NULL))
 		goto enobufs;
 	if (unlikely(!canputnext(udp->oq)))
 		goto ebusy;
@@ -3855,10 +3857,10 @@ t_uderror_ind(queue_t *q, mblk_t *dp)
 	mp->b_band = 2;		/* XXX move ahead of data indications */
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_UDERROR_IND;
-	p->DEST_length = src_len;
+	p->DEST_length = SRC_length;
 	p->DEST_offset = sizeof(*p);
-	p->OPT_length = opt_len;
-	p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
+	p->OPT_length = OPT_length;
+	p->OPT_offset = OPT_length ? sizeof(*p) + SRC_length : 0;
 	mp->b_wptr += sizeof(*p);
 	{
 		struct sockaddr_in *sin = (typeof(sin)) mp->b_wptr;
@@ -3869,13 +3871,13 @@ t_uderror_ind(queue_t *q, mblk_t *dp)
 		sin->sin_family = AF_INET;
 		sin->sin_port = uh->dest;
 		sin->sin_addr.s_addr = iph->daddr;
-		mp->b_wptr += src_len;
+		mp->b_wptr += SRC_length;
 
 		ERROR_type = ((t_uscalar_t) icmph->type << 8) | ((t_uscalar_t) icmph->code);
 	}
-	if (opt_len) {
-		t_errs_build(udp, dp, mp->b_wptr, opt_len, &ERROR_type);
-		mp->b_wptr += opt_len;
+	if (OPT_length) {
+		t_errs_build(udp, dp, mp->b_wptr, OPT_length, &ERROR_type);
+		mp->b_wptr += OPT_length;
 	}
 	p->ERROR_type = ERROR_type;
 	dp->b_datap->db_type = M_DATA;
@@ -4140,7 +4142,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 		if (unlikely(add_len > sizeof(struct sockaddr_in)))
 			goto error;
 		if (unlikely(add->sa_family != AF_INET && add->sa_family != 0))
-			goto badaddr;
+			goto error;
 		add = (typeof(add)) (mp->b_rptr + p->ADDR_offset);
 	}
 	add_in = (typeof(add_in)) add;
@@ -4174,7 +4176,7 @@ t_unbind_req(queue_t *q, mblk_t *mp)
 	int err;
 
 	err = TOUTSTATE;
-	if (tpi_get_state(udp) != TS_IDLE)
+	if (unlikely(tpi_get_state(udp) != TS_IDLE))
 		goto error;
 	tpi_set_state(udp, TS_WACK_UREQ);
 	err = 0;
@@ -4700,6 +4702,7 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
+	err = -EFAULT;
 	if (unlikely(p->PRIM_type != T_OPTMGMT_REQ))
 		goto error;
 #ifdef TS_WACK_OPTREQ
@@ -4780,37 +4783,38 @@ t_addr_req(queue_t *q, mblk_t *mp)
 	if (unlikely(p->PRIM_type != T_ADDR_REQ))
 		goto error;
 	{
-		struct sockaddr *loc, *rem;
-		socklen_t loc_len, rem_len;
+		struct sockaddr *LOCADDR_buffer, *REMADDR_buffer;
+		socklen_t LOCADDR_length, REMADDR_length;
 
 		err = TOUTSTATE;
 		switch (tpi_get_state(udp)) {
 		case TS_UNBND:
-			loc = NULL;
-			loc_len = 0;
-			rem = NULL;
-			rem_len = 0;
+			LOCADDR_buffer = NULL;
+			LOCADDR_length = 0;
+			REMADDR_buffer = NULL;
+			REMADDR_length = 0;
 			break;
 		case TS_IDLE:
 		case TS_WRES_CIND:
-			loc = (struct sockaddr *) &udp->srce;
-			loc_len = sizeof(struct sockaddr_in);
-			rem = NULL;
-			rem_len = 0;
+			LOCADDR_buffer = (struct sockaddr *) &udp->srce;
+			LOCADDR_length = sizeof(struct sockaddr_in);
+			REMADDR_buffer = NULL;
+			REMADDR_length = 0;
 			break;
 		case TS_WCON_CREQ:
 		case TS_DATA_XFER:
 		case TS_WIND_ORDREL:
 		case TS_WREQ_ORDREL:
-			loc = (struct sockaddr *) &udp->srce;
-			loc_len = sizeof(struct sockaddr_in);
-			rem = (struct sockaddr *) &udp->dest;
-			rem_len = sizeof(struct sockaddr_in);
+			LOCADDR_buffer = (struct sockaddr *) &udp->srce;
+			LOCADDR_length = sizeof(struct sockaddr_in);
+			REMADDR_buffer = (struct sockaddr *) &udp->dest;
+			REMADDR_length = sizeof(struct sockaddr_in);
 			break;
 		default:
 			goto error;
 		}
-		return t_addr_ack(q, loc, loc_len, rem, rem_len);
+		return t_addr_ack(q, LOCADDR_buffer, LOCADDR_length, REMADDR_buffer,
+				  REMADDR_length);
 	}
       error:
 	return t_error_ack(q, T_ADDR_REQ, mp, err);
@@ -4897,11 +4901,11 @@ udp_w_proto(queue_t *q, mblk_t *mp)
 		break;
 	case T_DATA_REQ:
 		printd(("%s: %p: -> T_DATA_REQ\n", DRV_NAME, udp));
-		rtn = t_other_req(q, mp);
+		rtn = t_data_req(q, mp);
 		break;
 	case T_EXDATA_REQ:
 		printd(("%s: %p: -> T_EXDATA_REQ\n", DRV_NAME, udp));
-		rtn = t_other_req(q, mp);
+		rtn = t_exdata_req(q, mp);
 		break;
 	case T_INFO_REQ:
 		printd(("%s: %p: -> T_INFO_REQ\n", DRV_NAME, udp));
@@ -4929,7 +4933,7 @@ udp_w_proto(queue_t *q, mblk_t *mp)
 		break;
 	case T_OPTDATA_REQ:
 		printd(("%s: %p: -> T_OPTDATA_REQ\n", DRV_NAME, udp));
-		rtn = t_other_req(q, mp);
+		rtn = t_optdata_req(q, mp);
 		break;
 #ifdef T_ADDR_REQ
 	case T_ADDR_REQ:
@@ -4974,7 +4978,6 @@ udp_w_proto(queue_t *q, mblk_t *mp)
 		rare();
 #endif
 		tpi_set_state(udp, udp->i_oldstate);
-		udp->i_oldstate = tpi_get_state(udp);
 		/* The put and srv procedures do not recognize all errors.  Sometimes we return an
 		   error to here just to restore the previous state. */
 		switch (rtn) {
@@ -4992,7 +4995,7 @@ udp_w_proto(queue_t *q, mblk_t *mp)
 }
 
 /**
- * upd_w_ioctl - M_IOCTL handling
+ * udp_w_ioctl - M_IOCTL handling
  * @q: active queue in queue pair (write queue)
  * @mp: the message
  *
@@ -5222,11 +5225,6 @@ udp_v4_rcv(struct sk_buff *skb)
 	/* decrement IpInDelivers ??? */
 	udp_put(udp);
 	goto discard_it;
-      no_buffers:
-	ptrace(("ERROR: Could not allocate mblk\n"));
-	udp_put(udp);
-	read_unlock(&udp_lock);
-	goto discard_it;
       linear_fail:
 	udp_put(udp);
 	read_unlock(&udp_lock);
@@ -5357,7 +5355,7 @@ udp_alloc_priv(queue_t *q, struct udp **udpp, dev_t *devp, cred_t *crp)
 		spinlock_init(&udp->qlock);
 		udp->i_version = T_CURRENT_VERSION;
 		udp->i_style = 2;
-		udp->i_state = udp->i_oldstate = udp->udp_info.CURRENT_state = TS_UNBND;
+		udp->i_state = udp->i_oldstate = udp->info.CURRENT_state = TS_UNBND;
 		/* initialized information */
 		udp->info.PRIM_type = T_INFO_ACK;
 		udp->info.TSDU_size = 65535;
@@ -5663,7 +5661,7 @@ udp_v4_rcv_next(struct sk_buff *skb)
  * returning.  Error packets are not cloned, so don't free it.
  */
 STATIC INLINE fastcall __hot_in int
-upd_v4_err_next(struct sk_buff *skb, __u32 info)
+udp_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 	return (0);
 }
@@ -5712,7 +5710,7 @@ udp_term_nproto(void)
  *  Under 2.6, attempt to do the equivalent of inet_add_protocol().  If it fails (as would be
  *  expected as UDP is permanent protocol), check whether a module owns the net_protocol structure
  *  and, if so, try to increment the module count (to keep it from unloading).  Take a reference to
- *  the old net_protocol structure.  Then replace the net_protocol pointer with or own in the
+ *  the old net_protocol structure.  Then replace the net_protocol pointer with our own in the
  *  hashes.  If it succeeds (which we would not expect) it reduces to the same as
  *  inet_add_protocol().  In the packet handler, if the packet is not for us, simply pass it to the
  *  next handler.  If the packet is for us, clone it, free the original and work with the clone.
