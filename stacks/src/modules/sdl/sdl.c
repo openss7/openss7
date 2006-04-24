@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:39 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/04/24 05:01:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:43:39 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:01:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:39 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/04/24 05:01:01 $"
 
 static char const ident[] =
-    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:39 $";
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/04/24 05:01:01 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides the
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:39 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/04/24 05:01:01 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2006,7 +2006,7 @@ sdl_r_data(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 sdl_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -2026,7 +2026,7 @@ sdl_w_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSALONG);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 sdl_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* 

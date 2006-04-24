@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/04 13:00:31 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/04/24 05:01:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:31 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:01:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400p-ss7.c,v $
+ Revision 0.9.2.20  2006/04/24 05:01:03  brian
+ - call interface corrections
+
  Revision 0.9.2.19  2006/03/04 13:00:31  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/04 13:00:31 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/04/24 05:01:03 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/04 13:00:31 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/04/24 05:01:03 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -98,7 +101,7 @@ static char const ident[] =
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2006/03/04 13:00:31 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2006/04/24 05:01:03 $"
 #define X400P_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -3669,13 +3672,13 @@ lm_w_proto(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 xp_r_prim(queue_t *q, mblk_t *mp)
 {
 	return (QR_PASSFLOW);
 }
 
-STATIC INLINE int
+STATIC INLINE streamscall int
 sdl_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
@@ -3695,7 +3698,7 @@ sdl_w_prim(queue_t *q, mblk_t *mp)
 	return (QR_PASSFLOW);
 }
 
-STATIC INLINE int
+STATIC INLINE streamscall int
 ch_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
@@ -3715,7 +3718,7 @@ ch_w_prim(queue_t *q, mblk_t *mp)
 	return (QR_PASSFLOW);
 }
 
-STATIC INLINE int
+STATIC INLINE streamscall int
 mx_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
@@ -3735,7 +3738,7 @@ mx_w_prim(queue_t *q, mblk_t *mp)
 	return (QR_PASSFLOW);
 }
 
-STATIC INLINE int
+STATIC INLINE streamscall int
 lm_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */

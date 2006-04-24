@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:11:56 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:11:56 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:01:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 0.9.2.18  2006/04/24 05:01:02  brian
+ - call interface corrections
+
  Revision 0.9.2.17  2006/03/07 01:11:56  brian
  - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:11:56 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:02 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:11:56 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:02 $";
 
 #include <sys/os7/compat.h>
 
@@ -66,7 +69,7 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:11:56 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:02 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -130,7 +133,7 @@ STATIC struct module_info sl_minfo = {
 STATIC int streamscall sl_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int streamscall sl_close(queue_t *, int, cred_t *);
 
-STATIC int sl_r_prim(queue_t *q, mblk_t *mp);
+STATIC streamscall int sl_r_prim(queue_t *q, mblk_t *mp);
 
 STATIC struct qinit sl_rinit = {
 	.qi_putp = NULL,		/* put */
@@ -142,7 +145,7 @@ STATIC struct qinit sl_rinit = {
 	.qi_mstat = NULL,		/* stat */
 };
 
-STATIC int sl_w_prim(queue_t *q, mblk_t *mp);
+STATIC streamscall int sl_w_prim(queue_t *q, mblk_t *mp);
 
 STATIC struct qinit sl_winit = {
 	.qi_putp = ss7_iput,		/* put */
@@ -166,7 +169,7 @@ STATIC struct module_info sl_lminfo = {
 	.mi_lowat = 512L,		/* low water mark */
 };
 
-STATIC int ls_r_prim(queue_t *q, mblk_t *mp);
+STATIC streamscall int ls_r_prim(queue_t *q, mblk_t *mp);
 
 STATIC struct qinit sl_lrinit = {
 	.qi_putp = ss7_iput,		/* put */
@@ -178,7 +181,7 @@ STATIC struct qinit sl_lrinit = {
 	.qi_mstat = NULL,		/* stat */
 };
 
-STATIC int ls_w_prim(queue_t *q, mblk_t *mp);
+STATIC streamscall int ls_w_prim(queue_t *q, mblk_t *mp);
 
 STATIC struct qinit sl_lwinit = {
 	.qi_putp = NULL,		/* put */
@@ -813,7 +816,7 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  */
 
-STATIC int
+STATIC streamscall int
 sl_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -824,7 +827,7 @@ sl_r_prim(queue_t *q, mblk_t *mp)
 	}
 }
 
-STATIC int
+STATIC streamscall int
 sl_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -842,7 +845,7 @@ sl_w_prim(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  */
 
-STATIC int
+STATIC streamscall int
 ls_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -858,7 +861,7 @@ ls_r_prim(queue_t *q, mblk_t *mp)
 	}
 }
 
-STATIC int
+STATIC streamscall int
 ls_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {

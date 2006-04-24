@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:11:46 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:11:46 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:01:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 0.9.2.15  2006/04/24 05:01:02  brian
+ - call interface corrections
+
  Revision 0.9.2.14  2006/03/07 01:11:46  brian
  - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:11:46 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:02 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:11:46 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:02 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -76,7 +79,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 01:11:46 $"
+#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:02 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1419,7 +1422,7 @@ sl_iac_stop(queue_t *q, struct sl *sl)
 	return (QR_DONE);
 }
 
-STATIC void sl_tx_wakeup(queue_t *q);
+STATIC streamscall void sl_tx_wakeup(queue_t *q);
 
 STATIC INLINE void
 sl_daedt_transmitter_wakeup(queue_t *q, struct sl *sl)
@@ -3448,7 +3451,7 @@ sl_lsc_pdu(queue_t *q, struct sl *sl, mblk_t *mp, ulong priority)
  *  TX WAKEUP
  *  -----------------------------------
  */
-STATIC void
+STATIC streamscall void
 sl_tx_wakeup(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -3465,7 +3468,7 @@ sl_tx_wakeup(queue_t *q)
  *  RX WAKEUP
  *  -----------------------------------
  */
-STATIC void
+STATIC streamscall void
 sl_rx_wakeup(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -5681,7 +5684,7 @@ sl_r_data(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 sl_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -5701,7 +5704,7 @@ sl_w_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSALONG);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 sl_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* 

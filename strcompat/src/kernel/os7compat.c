@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:11:05 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 05:00:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/23 18:11:05 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:00:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.12  2006/04/24 05:00:47  brian
+ - call interface corrections
+
  Revision 0.9.2.11  2006/04/23 18:11:05  brian
  - minor corrections
 
@@ -88,9 +91,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:11:05 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 05:00:47 $"
 
-static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:11:05 $";
+static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 05:00:47 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -111,7 +114,7 @@ static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:11:05 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 05:00:47 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -477,7 +480,7 @@ EXPORT_SYMBOL_NOVERS(ss7_r_flush);
  * has exclusive access to the queue pair private structure.
  */
 streamscall __hot int
-ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
+ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0, locked = 0;
 
@@ -567,7 +570,7 @@ EXPORT_SYMBOL_NOVERS(ss7_putq);
  * for running D_MP under Linux Fast-STREAMS.
  */
 streamscall __hot int
-ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_t *))
+ss7_srvq(queue_t *q, int streamscall (*proc) (queue_t *, mblk_t *), void streamscall (*procwake) (queue_t *))
 {
 	int rtn = 0;
 

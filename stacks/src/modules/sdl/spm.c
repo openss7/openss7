@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/30 12:52:17 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/30 12:52:17 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:01:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/30 12:52:17 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:01 $"
 
 static char const ident[] =
-    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/30 12:52:17 $";
+    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:01 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -72,7 +72,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/30 12:52:17 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:01 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1259,7 +1259,7 @@ spm_r_flush(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 spm_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -1282,7 +1282,7 @@ spm_r_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 spm_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -1305,7 +1305,7 @@ spm_w_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSFLOW);
 }
-STATIC void
+STATIC streamscall void
 spm_rx_wakeup(queue_t *q)
 {
 }
@@ -1319,7 +1319,7 @@ spm_rsrv(queue_t *q)
 {
 	return (int) ss7_srvq(q, &spm_r_prim, &spm_rx_wakeup);
 }
-STATIC void
+STATIC streamscall void
 spm_tx_wakeup(queue_t *q)
 {
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/03 12:06:10 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 12:06:10 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:01:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/03 12:06:10 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:02 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/03 12:06:10 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:02 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/03 12:06:10 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:02 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL"
@@ -1698,7 +1698,7 @@ sdt_rx_wakeup(queue_t *q)
 	(void) q;
 	return (0);
 }
-STATIC void
+STATIC streamscall void
 sdt_r_wakeup(queue_t *q)
 {
 	sdt_rx_wakeup(q);
@@ -1762,7 +1762,7 @@ sdt_tx_wakeup(queue_t *q)
 	seldom();
 	return (QR_DONE);
 }
-STATIC void
+STATIC streamscall void
 sdt_w_wakeup(queue_t *q)
 {
 	sdt_tx_wakeup(q);
@@ -4240,7 +4240,7 @@ sdt_r_data(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 sdt_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -4260,7 +4260,7 @@ sdt_w_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 sdt_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* 

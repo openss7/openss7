@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 0.9.2.10 2006/04/22 01:05:35 brian Exp $
+ @(#) $Id: queue.h,v 0.9.2.11 2006/04/24 05:00:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:00:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_QUEUE_H__
 #define __OS7_QUEUE_H__
 
-#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define QR_DONE		0
 #define QR_ABSORBED	1
@@ -65,9 +65,9 @@
 
 extern int streamscall ss7_w_flush(queue_t *q, mblk_t *mp);
 extern int streamscall ss7_r_flush(queue_t *q, mblk_t *mp);
-extern int streamscall ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *));
-extern int streamscall ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *),
-				void (*wakeup) (queue_t *));
+extern int streamscall ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *));
+extern int streamscall ss7_srvq(queue_t *q, int streamscall (*proc) (queue_t *, mblk_t *),
+				void streamscall (*wakeup) (queue_t *));
 extern int streamscall ss7_oput(queue_t *q, mblk_t *mp);
 extern int streamscall ss7_osrv(queue_t *q);
 extern int streamscall ss7_iput(queue_t *q, mblk_t *mp);

@@ -1,3 +1,16 @@
+2006-04-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/m2pa/m2pa_sl.c: call interface correction
+	* src/modules/sdl/sdl.c: call interface correction
+	* src/modules/sdl/sdlm.c: call interface correction
+	* src/modules/sdl/spm.c: call interface correction
+	* src/modules/sdt/sdt.c: call interface correction
+	* src/modules/sl/sl.c: call interface correction
+	* src/modules/sl/sl_mux.c: call interface correction
+	* src/modules/ss7ip/sdt_tpi.c: call interface correction
+	* src/modules/x400p-ss7/x100p-ss7.c: call interface correction
+	* src/modules/x400p-ss7/x400p-ss7.c: call interface correction
+
 2006-04-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strss7.refs: added a few more references

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:01:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:01 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:01 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:01 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -169,8 +169,6 @@ STATIC struct module_stat dl_wmstat = {
 	.ms_flags = 0,			/* bool stats -- for future use */
 };
 
-STATIC int dl_r_prim(queue_t *, mblk_t *);
-
 STATIC struct qinit dl_rinit = {
 	.qi_putp = ss7_oput,		/* Read put (msg from below) */
 	.qi_srvp = ss7_osrv,		/* Read queue service */
@@ -180,8 +178,6 @@ STATIC struct qinit dl_rinit = {
 	.qi_minfo = &dl_minfo,		/* Information */
 	.qi_mstat = &dl_rmstat,		/* Statistics */
 };
-
-STATIC int dl_w_prim(queue_t *, mblk_t *);
 
 STATIC struct qinit dl_winit = {
 	.qi_putp = ss7_iput,		/* Write put (msg from above) */
@@ -215,8 +211,6 @@ STATIC struct module_stat dl_lw_mstat = {
 	.ms_flags = 0,			/* bool stats -- for future use */
 };
 
-STATIC int sd_r_prim(queue_t *, mblk_t *);
-
 STATIC struct qinit sd_rinit = {
 	.qi_putp = ss7_iput,		/* Read put (msg from below) */
 	.qi_srvp = ss7_isrv,		/* Read queue service */
@@ -226,8 +220,6 @@ STATIC struct qinit sd_rinit = {
 	.qi_minfo = &dl_minfo,		/* Information */
 	.qi_mstat = &dl_lr_mstat,	/* Statistics */
 };
-
-STATIC int sd_w_prim(queue_t *, mblk_t *);
 
 STATIC struct qinit sd_winit = {
 	.qi_putp = ss7_oput,		/* Write put (msg from above) */
@@ -346,6 +338,9 @@ dl_put(struct dl *dl)
 	}
 }
 
+STATIC streamscall int dl_r_prim(queue_t *, mblk_t *);
+STATIC streamscall int dl_w_prim(queue_t *, mblk_t *);
+
 STATIC struct dl *
 sdlm_alloc_dl(queue_t *q, struct dl **dpp, major_t cmajor, minor_t cminor, cred_t *crp)
 {
@@ -440,6 +435,9 @@ sdlm_put(struct sd *sd)
 		printd(("%s: %s: %p: deallocated sd structure", DRV_NAME, __FUNCTION__, sd));
 	}
 }
+
+STATIC streamscall int sd_w_prim(queue_t *, mblk_t *);
+STATIC streamscall int sd_r_prim(queue_t *, mblk_t *);
 
 STATIC struct sd *
 sdlm_alloc_sd(queue_t *q, struct sd **spp, ulong index, cred_t *crp)
@@ -829,7 +827,7 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
  *  UPPER MUX Queues
  *  -----------------------------------
  */
-STATIC int
+STATIC streamscall int
 dl_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -839,7 +837,7 @@ dl_r_prim(queue_t *q, mblk_t *mp)
 		return (QR_PASSFLOW);
 	}
 }
-STATIC int
+STATIC streamscall int
 dl_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -860,7 +858,7 @@ dl_w_prim(queue_t *q, mblk_t *mp)
  *  LOWER MUX Queues
  *  -----------------------------------
  */
-STATIC int
+STATIC streamscall int
 sd_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -870,7 +868,7 @@ sd_r_prim(queue_t *q, mblk_t *mp)
 		return (QR_PASSFLOW);
 	}
 }
-STATIC int
+STATIC streamscall int
 sd_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {

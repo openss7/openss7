@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/04/24 05:01:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:01:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/04/24 05:01:02 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/04/24 05:01:02 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -75,7 +75,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2006/04/24 05:01:02 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2182,7 +2182,7 @@ sdt_term_tables(void)
  *  This is called before the queue service routine unlocks the queue.  We
  *  must check if back-enabling has occured on an empty read queue.
  */
-STATIC void
+STATIC streamscall void
 sdt_rx_wakeup(queue_t *q)
 {
 	(void) q;
@@ -2195,7 +2195,7 @@ sdt_rx_wakeup(queue_t *q)
  *  This is called before the queue service routine unlocks the queue.
  *  sdt_tx_block will pull data from the queue as necessary.
  */
-STATIC void
+STATIC streamscall void
 sdt_tx_wakeup(queue_t *q)
 {
 	struct sdt *s = SDT_PRIV(q);
@@ -4092,7 +4092,7 @@ sdt_r_data(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 sdt_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -4112,7 +4112,7 @@ sdt_w_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSALONG);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 sdt_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* 

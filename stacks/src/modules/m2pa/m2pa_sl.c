@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:32 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:43:32 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:01:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:32 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:00 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:32 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:00 $";
 
 #include <sys/os7/compat.h>
 
@@ -72,7 +72,7 @@ static char const ident[] =
 // #define _DEBUG
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:32 $"
+#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:00 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2376,7 +2376,7 @@ sl_t4_timeout(struct sl *sl)
 	return (-EPROTO);
 }
 
-STATIC void sl_tx_wakeup(queue_t *q);
+STATIC void streamscall sl_tx_wakeup(queue_t *q);
 STATIC INLINE int
 sl_lsc_status_in_service(queue_t *q, struct sl *sl, mblk_t *mp)
 {
@@ -2513,7 +2513,7 @@ sl_rb_congestion_function(queue_t *q, struct sl *sl)
 	return (0);
 }
 
-STATIC void
+STATIC streamscall void
 sl_rx_wakeup(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -2926,7 +2926,7 @@ sl_rc_signal_unit(queue_t *q, struct sl *sl, mblk_t *mp)
 	}
 }
 
-STATIC void
+STATIC streamscall void
 sl_tx_wakeup(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -6240,7 +6240,7 @@ sl_r_data(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 sl_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -6258,7 +6258,7 @@ sl_r_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSALONG);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 sl_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* 

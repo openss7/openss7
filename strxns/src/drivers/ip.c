@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/03 10:57:25 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:00:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/03 10:57:25 $ by $Author: brian $
+ Last Modified $Date: 2006/04/24 05:00:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.18  2006/04/24 05:00:33  brian
+ - call interface corrections
+
  Revision 0.9.2.17  2006/04/03 10:57:25  brian
  - need attributes on definition as well as declaration
 
@@ -104,10 +107,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/03 10:57:25 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:00:33 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/03 10:57:25 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:00:33 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -162,7 +165,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/03 10:57:25 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:00:33 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -3769,7 +3772,7 @@ ip_r_error(queue_t *q, mblk_t *mp)
 /*
  *  IP Read Message
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 ip_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -3781,7 +3784,7 @@ ip_r_prim(queue_t *q, mblk_t *mp)
 		return ip_r_other(q, mp);
 	}
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 ip_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
