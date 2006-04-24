@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/04/04 04:16:11 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/04/23 18:13:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/04 04:16:11 $ by $Author: brian $
+# Last Modified $Date: 2006/04/23 18:13:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -247,7 +247,33 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
-])
+#include <net/udp.h>
+#include <net/tcp.h>
+    ])
+    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
+			ip_route_output_key __in_dev_get_rcu], [], [], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#if HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+#include <linux/inetdevice.h>
+    ])
     _LINUX_CHECK_TYPES([irqreturn_t,
 			struct inet_protocol,
 			struct net_protocol], [:], [:], [
@@ -275,10 +301,36 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #include <linux/time.h>		/* for struct timespec */
 #include <net/protocol.h>
 ])
+    _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#if HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+    ])
     _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
 			  struct inet_protocol.copy,
 			  struct inet_protocol.no_policy,
 			  struct net_protocol.no_policy,
+			  struct dst_entry.path,
+			  struct sk_buff.h.sh,
+			  struct sock.protinfo.af_inet.ttl,
+			  struct sock.protinfo.af_inet.uc_ttl,
+			  struct sock.tp_pinfo.af_sctp,
 			  struct net_protocol.proto,
 			  struct dst_entry.path], [], [], [
 #include <linux/config.h>
@@ -288,12 +340,15 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
 #include <net/protocol.h>
 #ifdef HAVE_NET_DST_H
 #include <net/dst.h>
 #endif
     ])
-    _LINUX_KERNEL_SYMBOLS([icmp_err_convert,
+    _LINUX_KERNEL_SYMBOLS([afinet_get_info,
+			   icmp_err_convert,
 			   icmp_statistics,
 			   inet_bind,
 			   inet_getname,
@@ -313,7 +368,13 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 			   sysctl_ip_dynaddr,
 			   sysctl_ip_nonlocal_bind,
 			   sysctl_local_port_range,
+			   tcp_prot,
+			   udp_prot,
 			   raw_prot,
+			   tcp_memory_allocated,
+			   tcp_orphan_count,
+			   tcp_sockets_allocated,
+			   tcp_tw_count,
 			   ip_frag_nqueues,
 			   ip_frag_mem,
 			   __tcp_push_pending_frames,
@@ -449,6 +510,8 @@ dnl 	fi
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
 #include <net/protocol.h>
 	    ])
 	AC_CHECK_MEMBER([struct inet_protocol.no_policy],
@@ -461,6 +524,8 @@ dnl 	fi
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
 #include <net/protocol.h>
 	    ])
 	AC_CHECK_MEMBER([struct dst_entry.path],
@@ -473,6 +538,8 @@ dnl 	fi
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
 #include <net/dst.h>
 	    ])
 	])
@@ -577,7 +644,7 @@ dnl 	fi
 			   tcp_current_mss,
 			   tcp_set_skb_tso_segs,
 			   tcp_set_skb_tso_factor], [], [])
-    _LINUX_CHECK_FUNCS([inet_csk], [], [], [
+    _LINUX_CHECK_FUNCS([inet_csk dst_mtu], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>

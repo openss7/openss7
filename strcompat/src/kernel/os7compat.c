@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 01:05:36 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:11:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:05:36 $ by $Author: brian $
+ Last Modified $Date: 2006/04/23 18:11:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.11  2006/04/23 18:11:05  brian
+ - minor corrections
+
+ Revision 0.9.2.11  2006/04/23 18:08:19  brian
+ - minor corrections
+
  Revision 0.9.2.10  2006/04/22 01:05:36  brian
  - updated headers and optimitization
 
@@ -82,9 +88,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 01:05:36 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:11:05 $"
 
-static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 01:05:36 $";
+static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:11:05 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -105,7 +111,7 @@ static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 01:05:36 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:11:05 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -560,7 +566,7 @@ EXPORT_SYMBOL_NOVERS(ss7_putq);
  * lacking qprocson()/qprocsoff() and other poor behaviour.  Only the synchronization is necessary
  * for running D_MP under Linux Fast-STREAMS.
  */
-streascall __hot int
+streamscall __hot int
 ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*procwake) (queue_t *))
 {
 	int rtn = 0;

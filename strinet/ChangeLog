@@ -1,3 +1,10 @@
+2006-04-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: reorder
+	* acinclude.m4: additional checks for udp2 and rawip2
+	* src/drivers/rawip.c: changes for compile
+	* src/drivers/udp.c: changes for compile
+
 2006-04-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strinet.refs: added a few more references

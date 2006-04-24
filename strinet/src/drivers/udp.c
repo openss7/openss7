@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 10:51:04 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:13:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 10:51:04 $ by $Author: brian $
+ Last Modified $Date: 2006/04/23 18:13:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.11  2006/04/23 18:13:22  brian
+ - changes for compile
+
  Revision 0.9.2.10  2006/04/22 10:51:04  brian
  - working up UDP and RAWIP drivers
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 10:51:04 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:13:22 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 10:51:04 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:13:22 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -162,7 +165,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/22 10:51:04 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/23 18:13:22 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -275,7 +278,7 @@ MODULE_STATIC struct streamtab udp_info = {
 #endif
 #define TSF_WACK_CREQ	( 1 << TS_WACK_CREQ	)
 #define TSF_WCON_CREQ	( 1 << TS_WCON_CREQ	)
-#define TSF_WRES_CIND	( 1 << TS_WREQ_CIND	)
+#define TSF_WRES_CIND	( 1 << TS_WRES_CIND	)
 #define TSF_WACK_CRES	( 1 << TS_WACK_CRES	)
 #define TSF_DATA_XFER	( 1 << TS_DATA_XFER	)
 #define TSF_WIND_ORDREL	( 1 << TS_WIND_ORDREL	)
@@ -351,7 +354,7 @@ typedef struct udp {
 	STR_DECLARATION (struct udp);	/* Streams declaration */
 	struct udp *bnext;		/* linkage for bind hash */
 	struct udp **bprev;		/* linkage for bind hash */
-	struct udp_bind_bucket *bindb;	/* linkage for bind hash */
+	struct udp_bhash_bucket *bindb;	/* linkage for bind hash */
 	struct udp *cnext;		/* linkage for connection hash */
 	struct udp **cprev;		/* linkage for connection hash */
 	struct udp_chash_bucket *hashb;	/* linkage for connection hash */
@@ -371,8 +374,6 @@ typedef struct udp {
 
 STATIC struct udp *udp_opens = NULL;
 STATIC rwlock_t udp_lock = RW_LOCK_UNLOCKED;
-
-STATIC queue_t *npi_bottom = NULL;
 
 typedef int (*udp_rcv_fnc_t) (struct sk_buff *);
 
@@ -737,7 +738,7 @@ t_errs_build(const struct udp *t, mblk_t *mp, unsigned char *op, size_t olen, in
 {
 	struct iphdr *iph;
 	struct udphdr *uh;
-	struct t_optlhdr *oh;
+	struct t_opthdr *oh;
 	int optlen;
 
 	if (op == NULL || olen == 0)
@@ -829,7 +830,7 @@ t_opts_parse(unsigned char *ip, size_t ilen, struct udp_options *op)
 		optlen = ih->len - sizeof(*ih);
 		switch (ih->level) {
 		default:
-		      goto error:
+		      goto error;
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
@@ -2880,14 +2881,14 @@ t_build_options(struct udp * t, unsigned char *ip, size_t ilen, unsigned char *o
  */
 
 /**
- * udp_lookup_conn - look up a stream in the connection hashes
+ * t_udp_lookup_conn - look up a stream in the connection hashes
  * @dport: destination port (of recieved packet)
  * @sport: soruce port (of recieved packet)
  * @daddr: destination address (of recieved packet)
  * @saddr: source address (of recieved packet)
  */
 STATIC INLINE fastcall __hot_in struct udp *
-udp_lookup_conn(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
+t_udp_lookup_conn(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
 {
 	struct udp *udp;
 	struct udp_chash_bucket *hp = &udp_chash[udp_chashfn(dport, sport)];
@@ -2907,7 +2908,7 @@ udp_lookup_conn(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
 }
 
 /**
- * udp_lookup_bind - look up a stream in the bind hashes
+ * t_udp_lookup_bind - look up a stream in the bind hashes
  * @dport: destination port (of received packet)
  * @daddr: destination address (of received packet)
  *
@@ -2917,10 +2918,10 @@ udp_lookup_conn(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
  * in a listening state.
  */
 STATIC INLINE fastcall __hot_in struct udp *
-udp_lookup_bind(uint16_t dport, uint32_t daddr)
+t_udp_lookup_bind(uint16_t dport, uint32_t daddr)
 {
 	struct udp *result = NULL;
-	int snum = htohs(dport);
+	int snum = htons(dport);
 	struct udp_bind_bucket *ub;
 	struct udp_bhash_bucket *hp = &udp_bhash[udp_bhashfn(snum)];
 
@@ -2946,7 +2947,7 @@ udp_lookup_bind(uint16_t dport, uint32_t daddr)
 			sport = sin->sin_port;
 			if (sport == 0)
 				continue;
-			if (boprt != dport)
+			if (sport != dport)
 				continue;
 			score++;
 			saddr = sin->sin_addr.s_addr;
@@ -2973,19 +2974,19 @@ udp_lookup_bind(uint16_t dport, uint32_t daddr)
 }
 
 STATIC INLINE fastcall __hot_in struct udp *
-udp_lookup(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
+t_udp_lookup(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
 {
 	struct udp *udp;
 
-	if ((udp = udp_lookup_conn(dport, sport, daddr, saddr)))
+	if ((udp = t_udp_lookup_conn(dport, sport, daddr, saddr)))
 		return (udp);
-	if ((udp = udp_lookup_bind(dport, daddr)))
+	if ((udp = t_udp_lookup_bind(dport, daddr)))
 		return (udp);
 	return (NULL);
 }
 
 /**
- * udp_bind - bind a Stream to a TSAP
+ * t_udp_bind - bind a Stream to a TSAP
  * @q: active queue in queue pair (write queue)
  * @add: address to bind
  * @add_len: length of address
@@ -3004,17 +3005,17 @@ udp_lookup(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
  *
  */
 STATIC int
-udp_bind(struct udp *udp, struct sockaddr *add, socklen_t add_len)
+t_udp_bind(struct udp *udp, struct sockaddr *add, socklen_t add_len)
 {
 	static unsigned short udp_prev_port = 10000;
 	static const unsigned short udp_frst_port = 10000;	/* XXX */
 	static const unsigned short udp_last_port = 16000;	/* XXX */
 
-	struct udp_bind_bucket *bp;
+	struct udp_bhash_bucket *hp;
+	struct udp_bind_bucket **bp;
 	struct sockaddr_in *sin = (struct sockaddr_in *) add;
 	unsigned short bport = sin->sin_port;
 	unsigned short num = 0;
-	int err = 0;
 
 	if (bport == 0) {
 		num = udp_prev_port;	/* UNSAFE */
@@ -3023,18 +3024,31 @@ udp_bind(struct udp *udp, struct sockaddr *add, socklen_t add_len)
 	for (;;) {
 		struct udp *test;
 
-		bp = &udp_bhash[udp_bhashfn(bport)];
-		write_lock(&bp->lock);
-		for (test = bp->list; test; test = test->bnext) {
+		hp = &udp_bhash[udp_bhashfn(bport)];
+		write_lock(&hp->lock);
+		for (bp = &hp->list; (*bp) && (*bp)->port != num; bp = &(*bp)->next) ;
+		if ((*bp) == NULL) {
+			(*bp) = kmem_cache_alloc(udp_bind_cachep, SLAB_ATOMIC);
+			if ((*bp) == NULL) {
+				write_unlock(&hp->lock);
+				return (-ENOMEM);
+			}
+			(*bp)->next = NULL;
+			(*bp)->prev = bp;
+			(*bp)->port = num;
+			(*bp)->owners = NULL;
+			(*bp)->dflt = NULL;
+		}
+		for (test = (*bp)->owners; test; test = test->bnext) {
 			struct sockaddr_in *sit = (struct sockaddr_in *) &test->srce;
 
 			if (bport == sit->sin_port &&
 			    (sit->sin_addr.s_addr == 0
-			     || sit->sin_addr.s_addr = sin->sin_addr.s_addr))
+			     || sit->sin_addr.s_addr == sin->sin_addr.s_addr))
 				break;
 		}
 		if (test != NULL) {
-			write_unlock(&bp->lock);
+			write_unlock(&hp->lock);
 			if (num == 0)
 				/* specific port number requested */
 				return (TADDRBUSY);
@@ -3050,35 +3064,35 @@ udp_bind(struct udp *udp, struct sockaddr *add, socklen_t add_len)
 	}
 	sin->sin_port = bport;
 	bcopy(sin, &udp->srce, sizeof(*sin));
-	if ((udp->bnext = bp->list))
+	if ((udp->bnext = (*bp)->owners))
 		udp->bnext->bprev = &udp->bnext;
-	udp->bprev = &bp->list;
-	bp->list = udp_get(udp);
-	udp->bindb = bp;
-	write_unlock(&bp->lock);
+	udp->bprev = &(*bp)->owners;
+	(*bp)->owners = udp_get(udp);
+	udp->bindb = hp;
+	write_unlock(&hp->lock);
 	return (0);
 }
 
 /**
- * udp_unbind - unbind a Stream from an NSAP
+ * t_udp_unbind - unbind a Stream from an NSAP
  * @udp: UDP private structure
  *
  * Simply remove it from the hashes.  This function can be called whether the stream is bound or
  * not (and is always called before the private structure is freed.
  */
 STATIC int
-udp_unbind(struct udp *udp)
+t_udp_unbind(struct udp *udp)
 {
-	struct udp_bind_bucket *bp;
+	struct udp_bhash_bucket *hp;
 
-	if ((bp = udp->bindb)) {
-		write_lock(&bp->lock);
+	if ((hp = udp->bindb)) {
+		write_lock(&hp->lock);
 		if ((*udp->bprev = udp->bnext))
 			udp->bnext->bprev = udp->bprev;
 		udp->bnext = NULL;
 		udp->bprev = &udp->bnext;
 		udp->bindb = NULL;
-		write_unlock(&bp->lock);
+		write_unlock(&hp->lock);
 		bzero(&udp->srce, sizeof(udp->srce));
 		udp_release(&udp);
 	}
@@ -3086,7 +3100,7 @@ udp_unbind(struct udp *udp)
 }
 
 /**
- * udp_connect - connect a Stream to an TSAP
+ * t_udp_connect - connect a Stream to an TSAP
  * @q: active queue (write queue)
  * @add: address to connect to
  * @add_len: length of address
@@ -3095,7 +3109,7 @@ udp_unbind(struct udp *udp)
  * returned, zero (0) on success.
  */
 STATIC int
-udp_connect(struct udp *udp, struct sockaddr *add, socklen_t add_len)
+t_udp_connect(struct udp *udp, struct sockaddr *add, socklen_t add_len)
 {
 	struct udp *up;
 	struct sockaddr_in *sin, *din;
@@ -3136,11 +3150,11 @@ udp_connect(struct udp *udp, struct sockaddr *add, socklen_t add_len)
 }
 
 /**
- * udp_disconnect - disconnect from the connection hashes
+ * t_udp_disconnect - disconnect from the connection hashes
  * @q: active queue (write queue)
  */
 STATIC int
-udp_disconnect(struct udp *udp)
+t_udp_disconnect(struct udp *udp)
 {
 	struct udp_chash_bucket *hp;
 
@@ -3158,9 +3172,15 @@ udp_disconnect(struct udp *udp)
 	return (0);
 }
 
+#ifdef HAVE_KFUNC_DST_MTU
+/* Why do stupid people rename things like this? */
+#undef dst_pmtu
+#define dst_pmtu dst_mtu
+#endif				/* HAVE_KFUNC_DST_MTU */
+
 #if defined HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
-udp_queue_xmit(struct sk_buff *skb)
+t_udp_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
@@ -3179,7 +3199,7 @@ udp_queue_xmit(struct sk_buff *skb)
 }
 #else				/* !defined HAVE_KFUNC_DST_OUTPUT */
 STATIC INLINE int
-udp_queue_xmit(struct sk_buff *skb)
+t_udp_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
@@ -3195,8 +3215,10 @@ udp_queue_xmit(struct sk_buff *skb)
 }
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
+uint32_t cksum_generate(struct udphdr *uh, size_t plen); /* FIXME */
+
 /**
- * udp_xmitmsg - send a message from a Stream
+ * t_udp_xmitmsg - send a message from a Stream
  * @q: active queue in queue pair (write queue)
  * @mp: T_UNITDATA_REQ message
  * @opts: UDP options for send
@@ -3212,7 +3234,7 @@ udp_queue_xmit(struct sk_buff *skb)
  * later.
  */
 STATIC INLINE fastcall __hot_out int
-udp_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct udp_options *opts)
+t_udp_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct udp_options *opts)
 {
 	struct udp *udp = UDP_PRIV(q);
 	struct rtable *rt = NULL;
@@ -3255,8 +3277,8 @@ udp_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct udp_options 
 			iph->daddr = rt->rt_dst;
 			/* Yes the TS user can override the source address using the T_IP_ADDR
 			   option at the T_INET_IP level. */
-			if (t_tst_bit(_T_BIT_IP_ADDR, opts.flags))
-				iph->saddr = opts.ip.addr;
+			if (t_tst_bit(_T_BIT_IP_ADDR, opts->flags))
+				iph->saddr = opts->ip.addr;
 			else
 				iph->saddr = rt->rt_src;
 			iph->protocol = IPPROTO_UDP;
@@ -3287,9 +3309,9 @@ udp_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct udp_options 
 					uh->check = htonl(cksum_generate(uh, plen));
 			// UDP_INC_STATS(UdpOutPackets);
 #if defined HAVE_KFUNC_DST_OUTPUT
-			udp_queue_xmit(skb);
+			t_udp_queue_xmit(skb);
 #else				/* !defined HAVE_KFUNC_DST_OUTPUT */
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, udp_queue_xmit);
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, t_udp_queue_xmit);
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 			return (QR_DONE);
 		}
@@ -3345,7 +3367,6 @@ m_flush(queue_t *q, int how, int band)
 STATIC int
 m_error(queue_t *q, int error, mblk_t *mp)
 {
-	struct udp *udp = UDP_PRIV(q);
 	mblk_t *pp = mp;
 	int hangup = 0;
 
@@ -3368,7 +3389,7 @@ m_error(queue_t *q, int error, mblk_t *mp)
 		error = EPROTO;
 		break;
 	}
-	if (unlikely((mp == NULL || mp->b_datap->db_refs > 1) && (mp = ss7_allocb(q, 2, BPRI_HI)) == NULL))
+	if (unlikely((mp == NULL || mp->b_datap->db_ref > 1) && (mp = ss7_allocb(q, 2, BPRI_HI)) == NULL))
 		goto enobufs;
 	mp->b_wptr = mp->b_rptr = mp->b_datap->db_base;
 	if (mp->b_cont)
@@ -3483,7 +3504,7 @@ t_error_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error)
 		goto error;
 	}
 	err = -ENOBUFS;
-	if ((mp == NULL || mp->b_datap->db_refs > 1)
+	if ((mp == NULL || mp->b_datap->db_ref > 1)
 	    && (mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL)
 		goto error;
 	mp->b_datap->db_type = M_PCPROTO;
@@ -3521,7 +3542,7 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
 	int err;
 
 	err = -ENOBUFS;
-	if ((mp == NULL || mp->b_datap->db_refs > 1)
+	if ((mp == NULL || mp->b_datap->db_ref > 1)
 	    && (mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL)
 		goto error;
 	mp->b_datap->db_type = M_PCPROTO;
@@ -3532,7 +3553,7 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
 	p->CORRECT_prim = prim;
 	switch (tpi_get_state(udp)) {
 	case TS_WACK_UREQ:
-		if ((err = udp_unbind(udp)))
+		if ((err = t_udp_unbind(udp)))
 			goto error;
 		/* TPI spec says that if the provider must flush both queues before responding with 
 		   a T_OK_ACK primitive when responding to a T_UNBIND_REQ. This is to flush queued
@@ -3542,25 +3563,25 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
 		tpi_set_state(udp, TS_UNBND);
 		break;
 	case TS_WACK_CREQ:
-		if ((err = udp_connect(udp, &udp->dest, sizeof(udp->dest))))
+		if ((err = t_udp_connect(udp, (struct sockaddr *)&udp->dest, sizeof(udp->dest))))
 			goto error;
 		tpi_set_state(udp, TS_WCON_CREQ);
-		if ((err = udp_xmitmsg(q, dp, &udp->options))) {
-			udp_disconnect(udp);
+		if ((err = t_udp_xmitmsg(q, dp, (struct sockaddr_in *)&udp->dest, &udp->options))) {
+			t_udp_disconnect(udp);
 			goto error;
 		}
 		break;
 	case TS_WACK_CRES:
-		if ((err = udp_connect(ap, &ap->dest, sizeof(ap->dest))))
+		if ((err = t_udp_connect(ap, (struct sockaddr *)&ap->dest, sizeof(ap->dest))))
 			goto error;
 		ap->i_oldstate = tpi_get_state(ap);
 		tpi_set_state(ap, TS_DATA_XFER);
-		if ((err = udp_xmitmsg(q, dp, &ap->options))) {
-			udp_disconnect(ap);
+		if ((err = t_udp_xmitmsg(q, dp, (struct sockaddr_in *)&ap->dest, &ap->options))) {
+			t_udp_disconnect(ap);
 			tpi_set_state(ap, ap->i_oldstate);
 			goto error;
 		}
-		bufq_dequeue(&udp->conq, cp);
+		bufq_unlink(&udp->conq, cp);
 		freeb(XCHG(&cp, cp->b_cont));
 		/* queue any pending data */
 		while (cp)
@@ -3578,12 +3599,11 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
 	case TS_WACK_DREQ10:
 	case TS_WACK_DREQ11:
 		if (cp != NULL) {
-			bufq_dequeue(&udp->conq, cp);
+			bufq_unlink(&udp->conq, cp);
 			freemsg(cp);
 		} else
-			udp_disconnect(udp)
-			    tpi_set_state(udp,
-					  (bufq_length(&udp->conq) > 0) ? TS_WRES_CIND : TS_IDLE);
+			t_udp_disconnect(udp);
+		tpi_set_state(udp, (bufq_length(&udp->conq) > 0) ? TS_WRES_CIND : TS_IDLE);
 		break;
 	default:
 		break;
@@ -3844,7 +3864,7 @@ t_uderror_ind(queue_t *q, mblk_t *dp)
 	mblk_t *mp;
 	struct T_uderror_ind *p;
 	t_uscalar_t OPT_length = t_errs_size(udp, dp);
-	t_uscalar_t ERROR_type = 0;
+	int ERROR_type = 0;
 	const t_uscalar_t SRC_length = sizeof(struct sockaddr_in);
 
 	if (unlikely(tpi_get_statef(udp) & ~(TSF_IDLE)))
@@ -3904,7 +3924,7 @@ t_uderror_ind(queue_t *q, mblk_t *dp)
 STATIC INLINE int
 t_discon_ind(queue_t *q, mblk_t *dp)
 {
-	struct upd *udp = UDP_PRIV(q);
+	struct udp *udp = UDP_PRIV(q);
 	mblk_t *mp, *cp;
 	union T_primitives *p;
 	struct sockaddr_in *sin;
@@ -3930,7 +3950,7 @@ t_discon_ind(queue_t *q, mblk_t *dp)
 	}
 	if (cp != NULL)
 		/* have a connection indication, unlink it */
-		__bufq_dequeue(&udp->conq, cp);
+		__bufq_unlink(&udp->conq, cp);
 	spin_unlock_bh(&udp->conq.q_lock);
 
 	if (cp == NULL
@@ -4111,7 +4131,7 @@ STATIC int
 t_bind_req(queue_t *q, mblk_t *mp)
 {
 	struct udp *udp = UDP_PRIV(q);
-	int err, add_len, type;
+	int add_len, type;
 	const struct T_bind_req *p;
 	struct sockaddr *add = (struct sockaddr *) &udp->srce;
 	struct sockaddr_in *add_in;
@@ -4156,7 +4176,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	err = TACCES;
 	if (udp->port && udp->port < PROT_SOCK && !capable(CAP_NET_BIND_SERVICE))
 		goto error;
-	if ((err = udp_bind(udp, add, add_len)))
+	if ((err = t_udp_bind(udp, add, add_len)))
 		goto error;
 	return t_bind_ack(q, (struct sockaddr *) &udp->srce, sizeof(struct sockaddr_in),
 			  p->CONIND_number);
@@ -4181,7 +4201,7 @@ t_unbind_req(queue_t *q, mblk_t *mp)
 	tpi_set_state(udp, TS_WACK_UREQ);
 	err = 0;
       error:
-	return t_reply_ack(q, T_UNBIND_REQ, mp, err, NULL);
+	return t_reply_ack(q, T_UNBIND_REQ, mp, err, NULL, NULL, NULL);
 }
 
 /**
@@ -4194,10 +4214,6 @@ t_conn_req(queue_t *q, mblk_t *mp)
 {
 	struct udp *udp = UDP_PRIV(q);
 	union T_primitives *p;
-	struct T_conn_req *p;
-	struct T_ok_ack *r;
-	struct T_error_ack *e;
-	struct T_conn_con *c;
 	int err;
 	size_t mlen;
 	mblk_t *dp, *rp = NULL;
@@ -4264,14 +4280,14 @@ t_conn_req(queue_t *q, mblk_t *mp)
 		sin->sin_family = 0;
 		sin->sin_port = 0;
 		sin->sin_addr.s_addr = 0;
-		if ((err = udp_bind(udp, &udp->bind, sizeof(udp->bind))))
+		if ((err = t_udp_bind(udp, (struct sockaddr *)&udp->bind, sizeof(udp->bind))))
 			goto error;
 		tpi_set_state(udp, TS_IDLE);
 	}
 	tpi_set_state(udp, TS_WACK_CREQ);
 	if ((err = t_ok_ack(q, T_CONN_REQ, rp, NULL, dp, NULL)) != QR_ABSORBED)
 		goto error;
-	p->PRIM_type = T_CONN_CON;
+	p->conn_con.PRIM_type = T_CONN_CON;
 	/* all of the other fields and contents are the same */
 	tpi_set_state(udp, TS_DATA_XFER);
 	qreply(q, mp);
@@ -4354,7 +4370,7 @@ t_conn_res(queue_t *q, mblk_t *mp)
 		struct sockaddr_in *sin, *ain;
 
 		err = TBADF;
-		if (unlikely((ap = t_tok_check(udp, p->ACCEPTOR_id)) == NULL))
+		if (unlikely((ap = t_tok_check(p->ACCEPTOR_id)) == NULL))
 			goto error;
 		err = TPROVMISMATCH;
 		if (unlikely(ap->info.SERV_type == T_CLTS))
@@ -4372,7 +4388,7 @@ t_conn_res(queue_t *q, mblk_t *mp)
 			goto error;
 	}
 	if (likely(p->OPT_length != 0)) {
-		struct upd_options opts = ap->options;
+		struct udp_options opts = ap->options;
 
 		if ((err = t_opts_parse(mp->b_rptr + p->OPT_offset, p->OPT_length, &opts)))
 			goto error;
@@ -4502,8 +4518,8 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(p->OPT_length != 0))
 		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
 			goto error;
-	if ((err = udp_xmitmsg(q, dp, &sin, &opts)))
-		goto err;
+	if ((err = t_udp_xmitmsg(q, dp, &sin, &opts)))
+		goto error;
 	return (QR_DONE);
       error:
 	/* FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
@@ -4560,8 +4576,9 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
 			goto error;
 	sin = (typeof(sin)) & udp->dest;
-	if ((err = udp_xmitmsg(q, dp, sin, &opts)))
+	if ((err = t_udp_xmitmsg(q, dp, sin, &opts)))
 		goto error;
+      discard:
 	return (QR_DONE);
       error:
 	return m_error(q, err, mp);
@@ -4611,7 +4628,7 @@ t_data_req(queue_t *q, mblk_t *mp)
 		goto error;
 	opts = &udp->options;
 	sin = (typeof(sin)) & udp->dest;
-	if ((err = udp_xmitmsg(q, dp, sin, opts)))
+	if ((err = t_udp_xmitmsg(q, dp, sin, opts)))
 		goto error;
 	return (QR_DONE);
       error:
@@ -4663,7 +4680,7 @@ t_exdata_req(queue_t *q, mblk_t *mp)
 		goto error;
 	opts = &udp->options;
 	sin = (typeof(sin)) & udp->dest;
-	if ((err = udp_xmitmsg(q, dp, sin, opts)))
+	if ((err = t_udp_xmitmsg(q, dp, sin, opts)))
 		goto error;
 	return (QR_DONE);
       error:
@@ -4747,9 +4764,11 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 	if (unlikely(err < 0)) {
 		switch (-err) {
 		case EINVAL:
-			goto badopt;
+			err = TBADOPT;
+			goto error;
 		case EACCES:
-			goto acces;
+			err = TACCES;
+			goto error;
 		case ENOBUFS:
 		case ENOMEM:
 			break;
@@ -4854,7 +4873,7 @@ t_capability_req(queue_t *q, mblk_t *mp)
 STATIC int
 t_other_req(queue_t *q, mblk_t *mp)
 {
-	t_scalar_t prim;
+	t_scalar_t prim = -1;
 	int err;
 
 	err = -EINVAL;
@@ -5123,6 +5142,10 @@ udp_free(char *data)
 	return;
 }
 
+STATIC fastcall __hot_in void udp_v4_steal(struct sk_buff *skb);
+STATIC fastcall __hot_in int udp_v4_rcv_next(struct sk_buff *skb);
+STATIC fastcall __hot_in int udp_v4_err_next(struct sk_buff *skb, __u32 info);
+
 /**
  * udp_v4_rcv - receive IPv4 UDP protocol packets
  */
@@ -5135,7 +5158,6 @@ udp_v4_rcv(struct sk_buff *skb)
 	struct rtable *rt;
 	struct udphdr *uh, *uh2;
 	frtn_t fr = { &udp_free, (char *) skb };
-	int rtn;
 
 //      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 
@@ -5160,7 +5182,7 @@ udp_v4_rcv(struct sk_buff *skb)
 	/* we do the lookup before the checksum */
 	iph = skb->nh.iph;
 	read_lock(&udp_lock);
-	if (!(udp = udp_lookup(uh->dest, uh->source, iph->daddr, iph->saddr)))
+	if (!(udp = t_udp_lookup(uh->dest, uh->source, iph->daddr, iph->saddr)))
 		goto no_stream;
 	udp_v4_steal(skb);	/* its ours */
 	/* checksum initialization */
@@ -5268,7 +5290,7 @@ udp_v4_err(struct sk_buff *skb, u32 info)
 	uh = (struct udphdr *) (skb->data + ihl);
 	read_lock(&udp_lock);
 	/* reverse port numbers and addresses in lookup */
-	udp = udp_lookup(uh->source, uh->dest, iph->saddr, iph->daddr);
+	udp = t_udp_lookup(uh->source, uh->dest, iph->saddr, iph->daddr);
 	if (udp == NULL)
 		goto no_stream;
 	spin_lock(&udp->qlock);
@@ -5314,9 +5336,7 @@ udp_v4_err(struct sk_buff *skb, u32 info)
       no_stream:
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
 	read_unlock(&udp_lock);
-	udp_next_err_handler(&skb, info);
-	if (skb == NULL)
-		return;
+	udp_v4_err_next(skb, info);
 	goto drop;
       drop:
 #ifdef HAVE_KINC_LINUX_SNMP_H
@@ -5352,7 +5372,7 @@ udp_alloc_priv(queue_t *q, struct udp **udpp, dev_t *devp, cred_t *crp)
 		udp->i_wakeup = NULL;
 		udp->o_wakeup = NULL;
 		udp->type = IPPROTO_UDP;
-		spinlock_init(&udp->qlock);
+		spin_lock_init(&udp->qlock);
 		udp->i_version = T_CURRENT_VERSION;
 		udp->i_style = 2;
 		udp->i_state = udp->i_oldstate = udp->info.CURRENT_state = TS_UNBND;
@@ -5375,7 +5395,7 @@ udp_alloc_priv(queue_t *q, struct udp **udpp, dev_t *devp, cred_t *crp)
 		udp->prev = udpp;
 		*udpp = udp_get(udp);
 	} else
-		strlog(DRV_ID, getminor(*devp), LOG_WARNING, SL_WARN | SL_CONSOLE,
+		strlog(DRV_ID, getminor(*devp), 0, SL_WARN | SL_CONSOLE,
 		       "could not allocate driver private structure");
 	return (udp);
 }
@@ -5384,22 +5404,22 @@ udp_free_priv(queue_t *q)
 {
 	struct udp *udp = UDP_PRIV(q);
 
-	strlog(DRV_ID, udp->u.dev.cminor, LOG_DEBUG, SL_TRACE,
+	strlog(DRV_ID, udp->u.dev.cminor, 0, SL_TRACE,
 	       "unlinking private structure: reference count = %d", atomic_read(&udp->refcnt));
 	/* make sure the stream is disconnected */
 	if (udp->hashb != NULL) {
-		udp_disconnect(udp);
+		t_udp_disconnect(udp);
 		bufq_purge(&udp->conq);
 		tpi_set_state(udp, TS_IDLE);
 	}
 	/* make sure the stream is unbound */
 	if (udp->bindb != NULL) {
-		udp_unbind(udp);
+		t_udp_unbind(udp);
 		tpi_set_state(udp, TS_UNBND);
 	}
 	bufq_purge(&udp->conq);
 	ss7_unbufcall((str_t *) udp);
-	strlog(DRV_ID, udp->u.dev.cminor, LOG_DEBUG, SL_TRACE,
+	strlog(DRV_ID, udp->u.dev.cminor, 0, SL_TRACE,
 	       "removed bufcalls: reference count = %d", atomic_read(&udp->refcnt));
 	/* remove from master list */
 	write_lock_bh(&udp_lock);
@@ -5408,11 +5428,11 @@ udp_free_priv(queue_t *q)
 	udp->next = NULL;
 	udp->prev = &udp->next;
 	write_unlock_bh(&udp_lock);
-	strlog(DRV_ID, udp->u.dev.cminor, LOG_DEBUG, SL_TRACE,
+	strlog(DRV_ID, udp->u.dev.cminor, 0, SL_TRACE,
 	       "unlinked: reference count = %d", atomic_read(&udp->refcnt));
-	udp_release(&udp->oq->q_ptr);
+	udp_release((struct udp **)&udp->oq->q_ptr);
 	udp->oq = NULL;
-	udp_release(&udp->iq->q_ptr);
+	udp_release((struct udp **)&udp->iq->q_ptr);
 	udp->iq = NULL;
 	assure(atomic_read(&udp->refcnt) == 1);
 	udp_release(&udp);
@@ -5491,7 +5511,7 @@ udp_qopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	printd(("%s: opened character device %d:%d\n", DRV_NAME, camjor, cminor));
 	*devp = makedevice(cmajor, cminor);
-	if (!(udp = udp_alloc_priv(q, udpp, cmajor, cminor, crp))) {
+	if (!(udp = udp_alloc_priv(q, udpp, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		write_unlock_bh(&udp_lock);
 		return (ENOMEM);
@@ -5633,7 +5653,7 @@ struct inet_protocol *udp_proto = NULL;
  * stolen).  In the 2.4 handler loop, iph->protocol is examined on each iteration, permitting us to
  * stead the packet by overwritting the protocol number.
  */
-STATIC INLINE fastcall __hot_in void
+STATIC fastcall __hot_in void
 udp_v4_steal(struct sk_buff *skb)
 {
 	skb->nh.iph->protocol = 255;
@@ -5646,7 +5666,7 @@ udp_v4_steal(struct sk_buff *skb)
  * In the packet handler, if the packet is for us, pass it to the next handler by simply freeing the
  * cloned copy and returning.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC fastcall __hot_in int
 udp_v4_rcv_next(struct sk_buff *skb)
 {
 	kfree_skb(skb);
@@ -5660,7 +5680,7 @@ udp_v4_rcv_next(struct sk_buff *skb)
  * In the error packet handler, if the packet is not for us, pass it to the next handler by simply
  * returning.  Error packets are not cloned, so don't free it.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC fastcall __hot_in int
 udp_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 	return (0);
@@ -5716,7 +5736,7 @@ udp_term_nproto(void)
  *  next handler.  If the packet is for us, clone it, free the original and work with the clone.
  */
 
-struct inet_protocol = {
+struct inet_protocol {
 	struct net_protocol proto;
 	struct net_protocol *next;
 	struct module *kmod;
@@ -5744,7 +5764,7 @@ struct inet_protocol *udp_proto = NULL;
  * In the packet handler, if the packet is for us, steal the packet by simply not passing it to the
  * next handler.
  */
-STATIC INLINE fastcall __hot_in void
+STATIC fastcall __hot_in void
 udp_v4_steal(struct sk_buff *skb)
 {
 }
@@ -5757,13 +5777,13 @@ udp_v4_steal(struct sk_buff *skb)
  * packet and return.  Note that we do not have to lock the hash because we own it and are also
  * holding a reference to any module owning the next handler.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC fastcall __hot_in int
 udp_v4_rcv_next(struct sk_buff *skb)
 {
 	struct inet_protocol *ip;
 
 	if ((ip = udp_proto) != NULL && ip->next != NULL)
-		return ip->next->proto.handler(skb);
+		return ip->next->handler(skb);
 	kfree_skb(skb);
 	return (0);
 }
@@ -5775,13 +5795,13 @@ udp_v4_rcv_next(struct sk_buff *skb)
  * Error packets are not cloned, so pass it to the next handler.  If there is not next handler,
  * simply return.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC fastcall __hot_in int
 udp_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 	struct inet_protocol *ip;
 
 	if ((ip = udp_proto) != NULL && ip->next != NULL)
-		ip->next->proto.err_handler(skb, info);
+		ip->next->err_handler(skb, info);
 	return (0);
 }
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
@@ -5805,9 +5825,9 @@ udp_init_nproto(void)
 	/* reduces to inet_add_protocol() if no protocol registered */
 	spin_lock_bh(inet_proto_lockp);
 	if ((ip->next = inet_protosp[hash]) != NULL) {
-		if ((ip->kmod = module_text_address(ip->next))
+		if ((ip->kmod = module_text_address((ulong)ip->next))
 		    && ip->kmod != THIS_MODULE) {
-			if (!try_to_get_module(ip->kmod)) {
+			if (!try_module_get(ip->kmod)) {
 				spin_unlock_bh(inet_proto_lockp);
 				return (-EAGAIN);
 			}

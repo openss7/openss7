@@ -1,3 +1,7 @@
+2006-04-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: rationalized back to strinet drivers
+
 2006-04-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strsctp.refs: added a few more references

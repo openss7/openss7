@@ -1,3 +1,8 @@
+2006-04-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/os7/priv.h: minor corrections
+	* src/kernel/os7compat.c: minor corrections
+
 2006-04-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strcompat.refs: added a few more references

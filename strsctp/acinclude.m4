@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/04/03 10:56:18 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/04/23 18:14:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/03 10:56:18 $ by $Author: brian $
+# Last Modified $Date: 2006/04/23 18:14:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -348,7 +348,10 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 		version of ip_route_output.])
 	fi
     ])
-    _LINUX_CHECK_HEADERS([linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h], [], [], [
+    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
+			  linux/locks.h asm/softirq.h linux/brlock.h \
+			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h \
+			  net/request_sock.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -368,6 +371,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #if HAVE_KINC_NET_DST_H
 #include <net/dst.h>
 #endif
+#include <linux/sched.h>
     ])
     _LINUX_CHECK_TYPES([struct sockaddr_storage], [], [], [
 #include <linux/config.h>
@@ -380,10 +384,12 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/udp.h>
 #include <net/tcp.h>
     ])
-    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output ip_route_output_key __in_dev_get_rcu], [], [], [
+    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
+			ip_route_output_key __in_dev_get_rcu], [], [], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #if HAVE_KINC_LINUX_SLAB_H
@@ -402,6 +408,33 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #endif
 #include <linux/inetdevice.h>
     ])
+    _LINUX_CHECK_TYPES([irqreturn_t,
+			struct inet_protocol,
+			struct net_protocol], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#include <linux/time.h>		/* for struct timespec */
+#include <net/protocol.h>
+])
     _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -431,7 +464,9 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			  struct sk_buff.h.sh,
 			  struct sock.protinfo.af_inet.ttl,
 			  struct sock.protinfo.af_inet.uc_ttl,
-			  struct sock.tp_pinfo.af_sctp], [], [], [
+			  struct sock.tp_pinfo.af_sctp,
+			  struct net_protocol.proto,
+			  struct dst_entry.path], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -476,6 +511,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			   tcp_tw_count,
 			   ip_frag_nqueues,
 			   ip_frag_mem,
+			   __tcp_push_pending_frames,
 			   __xfrm_policy_check,
 			   xfrm_policy_delete,
 			   __xfrm_sk_clone_policy])
@@ -660,7 +696,7 @@ dnl fi
 #include <net/dst.h>
 		])
 	    ])
-    fi
+	fi
     if test :"${sctp_cv_inet_protocol_style:+set}" = :set ; then
 	case "$sctp_cv_inet_protocol_style" in
 	    old)

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/03/24 06:16:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/04/23 18:13:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/24 06:16:37 $ by $Author: brian $
+# Last Modified $Date: 2006/04/23 18:13:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.57  2006/04/23 18:13:21  brian
+# - changes for compile
+#
 # Revision 0.9.2.56  2006/03/24 06:16:37  brian
 # - added next generation rawip driver
 #
@@ -156,8 +159,8 @@ EXTRA_LIBRARIES			+=
 
 nodist_EXTRA_libINETmods_a_SOURCES = \
 				  src/drivers/inet.c \
-				  src/drivers/rawip.c \
 				  src/drivers/udp.c \
+				  src/drivers/rawip.c \
 				  src/drivers/udp_hooks.h
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
@@ -244,8 +247,8 @@ EXTRA_LIBRARIES			+=
 
 nodist_EXTRA_libINETmods_a_SOURCES	= \
 				  src/drivers/inet.c \
-				  src/drivers/rawip.c \
 				  src/drivers/udp.c \
+				  src/drivers/rawip.c \
 				  src/drivers/udp_hooks.h
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: priv.h,v 0.9.2.7 2006/04/22 01:05:35 brian Exp $
+ @(#) $Id: priv.h,v 0.9.2.8 2006/04/23 18:11:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
+ Last Modified $Date: 2006/04/23 18:11:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_PRIV_H__
 #define __OS7_PRIV_H__
 
-#ident "@(#) $RCSfile: priv.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: priv.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -97,10 +97,10 @@ typedef struct head {
 	cred_t cred;				/* credential */ \
 	queue_t *iq;				/* iput queue */ \
 	queue_t *oq;				/* oput queue */ \
-	int (*i_prim)(queue_t *, mblk_t *);	/* iput function */ \
-	int (*o_prim)(queue_t *, mblk_t *);	/* oput function */ \
-	void (*i_wakeup)(queue_t *);		/* isrv wakeup function */ \
-	void (*o_wakeup)(queue_t *);		/* osrv wakeup function */ \
+	int streamscall (*i_prim)(queue_t *, mblk_t *);	/* iput function */ \
+	int streamscall (*o_prim)(queue_t *, mblk_t *);	/* oput function */ \
+	void streamscall (*i_wakeup)(queue_t *);		/* isrv wakeup function */ \
+	void streamscall (*o_wakeup)(queue_t *);		/* osrv wakeup function */ \
 	spinlock_t qlock;			/* queue lock */ \
 	uint users;				/* queue users */ \
 	uint ibid;				/* iput bufcall id */ \
