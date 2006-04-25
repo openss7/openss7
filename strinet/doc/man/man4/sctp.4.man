@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sctp.4.man,v 0.9.2.4 2006/04/05 09:44:26 brian Exp $
+.\" @(#) $Id: sctp.4.man,v 0.9.2.5 2006/04/25 08:54:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:26 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/25 08:54:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sctp.4.man,v $
+.\" Revision 0.9.2.5  2006/04/25 08:54:30  brian
+.\" - updated references and manual pages
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:44:26  brian
 .\" - moved .so line and updated headers
 .\"
@@ -94,10 +97,12 @@ sort-adjacent-labels
 .B #include <sys/xti_sctp.h>
 .HP
 .BI "int " sctp_stream " = open(" sctp_device ", " flags );
+.PD 0
 .HP
 .BI "int " sctp_xtistr " = t_open(" sctp_device ", " flags );
 .HP
 .BI "int " sctp_socket " = socket(" PF_INET ", " socket_type ", " \fRIPPROTO_SCTP\fR );
+.PD
 .SH DESCRIPTION
 .PP
 .B SCTP
@@ -105,11 +110,11 @@ is an implementation of the Stream Control Transmission Protocol
 .RB ( SCTP )
 define in RFC 2960
 .[
-RFC 2960
+rfc2960
 .]
 and RFC 3309.
 .[
-RFC 3309
+rfc3309
 .]
 .B SCTP
 provides reliable deliver of ordered or unordered packets over a full duplex
@@ -321,16 +326,16 @@ For more information on this version, see
 .\"
 .XX
 .[
-sctp-mib
+rfc3873
 .]
 .[
-prsctp
+rfc3758
 .]
 .[
-addip
+addip-08
 .]
 .[
-sctpig
+sctpig-10
 .]
 .\"
 .[

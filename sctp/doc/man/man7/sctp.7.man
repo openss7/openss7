@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sctp.7.man,v 0.9.2.6 2006/04/05 09:42:53 brian Exp $
+.\" @(#) $Id: sctp.7.man,v 0.9.2.7 2006/04/25 08:54:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:53 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/25 08:54:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sctp.7.man,v $
+.\" Revision 0.9.2.7  2006/04/25 08:54:21  brian
+.\" - updated references and manual pages
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:42:53  brian
 .\" - moved .so line and updated headers
 .\"
@@ -1758,10 +1761,9 @@ The number of ICMP errors that were dropped because the socket was locked.
 .B ListenOverflows
 The number of COOKIE-ECHO chunks dropped due to listen queue overflows.
 .PP
-\fBSCTP\fR provides for SNMP Protocol Information following the SCTP MIB
-<draft-ietf-sigtran-sctp-mib-10.txt>.
+\fBSCTP\fR provides for SNMP Protocol Information following the SCTP MIB.
 .[
-sctp-mib-10
+rfc3873
 .]
 Protocol information is available in \fI\fC/proc/net/snmp\fR as well as with the \fI-s\fR flag to
 the \fBnetstat\fR(8) command.  SCTP Protocol Statistics that are applicable to \fBSCTP\fR are as
@@ -1861,10 +1863,9 @@ The number of packets received for processing from the IP layer.
 The last time at which SCTP statistics suffered a discontinuity.
 .SS "Connection Information"
 .PP
-\fBSCTP\fR provides for SNMP Connection Information following the SCTP MIB
-<draft-ietf-sigtran-sctp-mib-10.txt>.
+\fBSCTP\fR provides for SNMP Connection Information following the SCTP MIB.
 .[
-sctp-mib-10
+rfc3873
 .]
 Connection information is available in \fI\fC/proc/net/sctp\fR but is not yet available with a
 \fI-sctp\fR flag to the \fBnetstat\fR(8) command.  (Extensions to the \fBnetstat\fR(8) command are
@@ -2048,19 +2049,46 @@ and
 .BR write (2) "."
 .XX
 .[
-rfc2960
-.]
-.[
 rfc1122
 .]
 .[
-rfc3309
+rfc2960
 .]
 .[
 rfc3168
 .]
 .[
-sctp-mib-10
+rfc3257
+.]
+.[
+rfc3286
+.]
+.[
+rfc3309
+.]
+.[
+rfc3436
+.]
+.[
+rfc3554
+.]
+.[
+rfc3708
+.]
+.[
+rfc3758
+.]
+.[
+rfc3873
+.]
+.[
+rfc4138
+.]
+.[
+rfc4166
+.]
+.[
+rfc4168
 .]
 .[
 sctpimpguide-10

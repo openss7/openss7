@@ -4003,7 +4003,10 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2959.txt
 
+%K rfc2960
 %L RFC 2960
+%R RFC 2960
+%T Stream Control Transmission Protocol (SCTP)
 %A Randall R. Stewart
 %A Qiaobing Xie
 %A Ken Morneault
@@ -4015,10 +4018,9 @@ Part 1: Protocol Specification
 %A Lixia Zhang
 %A Vern Paxson
 %E Randall R. Stewart
+%D October 2000
+%O (Updated by RFC 3309) (Status: PROPOSED STANDARD)
 %Q Internet Engineering Task Force
-%T Stream Control Transmission Protocol (SCTP)
-%R RFC 2960
-%D February 2000
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2960.txt
 
@@ -4195,11 +4197,22 @@ Part 1: Protocol Specification
 %A Ho Zonoun
 %A M. Watson
 %E Eric Zimmerer
-%Q Internet Engineering Task Force
 %T MIME Media Types for ISUP and QSIG Objects
 %D December 2001
+%Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3204.txt
+
+%K rfc3257
+%L RFC 3257
+%R RFC 3257
+%T Stream Control Transmission Protocol Applicability Statement
+%A L. Coene
+%D April 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3257.txt
 
 %K rfc3260
 %L RFC 3260
@@ -4280,15 +4293,29 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3267.txt
 
+%K rfc3286
+%L RFC 3286
+%R RFC 3286
+%T An Introduction to the Stream Control Transmission Protocol (SCTP)
+%A L. Ong
+%A J. Yoakum
+%D May 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3286.txt
+
+%k rfc3309
 %L RFC 3309
+%R RFC 3309
+%T Stream Control Transmission Protocol (SCTP) Checksum Change
 %A Jonathan Stone
 %A Randall R. Stewart
 %A Douglas Otis
 %E Jonathan Stone
-%Q Internet Engineering Task Force
-%T Stream Control Transmission Protocol (SCTP) Checksum Change
-%R RFC 3309
 %D September 2002
+%O (Updates RFC 2960) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3309.txt
 
@@ -4510,14 +4537,15 @@ Part 1: Protocol Specification
 
 %K rfc3436
 %L RFC 3436
+%R RFC 3436
+%T Transport Layer Security over Stream Control Transmission Protocol
 %A Adreas Jungmaier
 %A Eric Rescorla
 %A Michael Tuexen
 %E Adreas Jungmaier
-%Q Internet Engineering Task Force
-%T Transport Layer Security over Stream Control Transmission Protocol
-%R RFC 3436
 %D December 2002
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3436.txt
 
@@ -4551,11 +4579,26 @@ Part 1: Protocol Specification
 %A Marcello Pantaleo
 %A Tom Taylor
 %E Tom Taylor
-%Q Internet Engineering Task Force
 %T Gateway Control Protocol Version 1
 %D June 2003
+%Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3525.txt
+
+%K rfc3554
+%L RFC 3554
+%R RFC 3554
+%T On the Use of Stream Control Transmission Protocol (SCTP) wih IPsec
+%A S. Bellovin
+%A J. Ioannidis
+%A A. Keromytis
+%A R. Stewart
+%E S. Bellovin
+%D July 2003
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3554.txt
 
 %K rfc3666
 %K bcp76
@@ -4573,18 +4616,31 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/bcp/bcp76.txt
 
+%K rfc3708
+%L RFC 3708
+%R RFC 3708
+%T Using TCP Duplicate Selective Acknowledgement (DSACKs) and Stream Control Transmission Protocol (SCTP) Duplicat Transmission Sequence Numbers (TSNs) to Detect Spurious Retransmissions
+%A E. Blanton
+%A M. Allman
+%D February 2004
+%O (Status: EXPERIMENTAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3708.txt
+
 %K rfc3758
 %L RFC 3758
+%R RFC 3758
+%T Stream Control Transmission Protocol (SCTP) Partial Reliability Extension
 %A Randall R. Stewart
 %A Michael A. Ramalho
 %A Qiaobing Xie
 %A Michael Tuexen
 %A Phillip T. Conrad
 %E Randall R. Stewart
-%Q Internet Engineering Task Force
-%T Stream Control Transmission Protocol (SCTP) Partial Reliability Extension
-%R RFC 3758
 %D May 2004
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3758.txt
 
@@ -4619,6 +4675,19 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3868.txt
 
+%K SCTP-MIB
+%K rfc3873
+%L RFC 3873
+%R RFC 3873
+%T Stream Control Transmission Protocol (SCTP) Mangement Information Base (MIB)
+%A J. Pastor
+%A M. Belinchon
+%D September 2004
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3873.txt
+
 %K rfc3910
 %L RFC 3910
 %R RFC 3910
@@ -4634,6 +4703,43 @@ Part 1: Protocol Specification
 %D October 2004
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3910.txt
+
+%K rfc4138
+%L RFC 4138
+%R RFC 4138
+%T Forward RTO-Recovery (F-RTO); An Algorithm for Detecting Spurious Retransmission Timeouts with TCP and the Stream Control Transmission Protocol (SCTP)
+%A P. Sarolahti
+%A M. Kojo
+%D August 2005
+%O (Status: EXPERIMENTAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4138.txt
+
+%K rfc4166
+%L RFC 4166
+%R RFC 4166
+%T Telephony Signalling Transport over Stream Control Transmission Protoocl (SCTP) Applicability Statement
+%A L. Coene
+%A J. Pastor-Balbas
+%D February 2006
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4166.txt
+
+%K rfc4168
+%L RFC 4168
+%R RFC 4168
+%T The Stream Control Transmission Protocol (SCTP) as a Transport for the Session Initiation Protocol (SIP)
+%A J. Rosenberg
+%A H. Schulzrinne
+%A G. Camarillo
+%D October 2005
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4168.txt
 
 %K streamio
 %Q AT&T Bell Laboratories
