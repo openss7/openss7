@@ -3046,19 +3046,25 @@ Part 1: Protocol Specification
 
 %K rfc791
 %L RFC 791
-%Q Internet Engineering Task Force \(em Network Working Group
+%R RFC 791/STD 5
 %T Internet Protocol \(em DARPA Internet Program \(em Protocol Specification
-%R RFC 791
+%A J. Postel
+%E J. Postel
 %D September 1981
+%O (Also ST0005) (Status: STANDARD) (Updated by RFC 1349)
+%Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc0791.txt
 
 %K rfc793
 %L RFC 793
-%Q Information Sciences Institute, University of Southern California
+%R RFC 793/STD 7
 %T Transmission Control Protocol, DARPA Internet Program, Protocol Specification
-%R RFC 793
+%A J. Postel
+%E J. Postel
 %D September 1981
+%O (Also STD0007) (Updated by RFC 3168) (Status: STANDARD)
+%Q Information Sciences Institute, University of Southern California
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc0793.txt
 
@@ -3735,14 +3741,29 @@ Part 1: Protocol Specification
 
 %K rfc1349
 %L RFC 1349
+%R RFC 1349
+%T Type of Service in the Internet Protocol Suite
 %A Philip Almquist
 %E Philip Almquist
-%Q Internet Engineering Task Force
-%T Type of Service in the Internet Protocol Suite
-%R RFC 1349
 %D July 1992
+%O (Obsoleted by RFC 2474) (Updates RFC 1248, RFC 1247, RFC 1195, RFC 1123, RFC 1122, RFC 1060, RFC 0791) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1349.txt
+
+%K rfc2474
+%L RFC 2474
+%R RFC 2474
+%T Definition of the Differentiated Services Field (DS Field) in the IPv4 and IPv6 Headers
+%A K. Nichols
+%A S. Blake
+%A F. Baker
+%A D. Black
+%D December 1998
+%O (Obsoletes RFC 1455, RFC 1349) (Updated by RFC 3168, RFC 3260) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2474.txt
 
 %K rfc1889
 %L RFC 1889
@@ -4137,14 +4158,15 @@ Part 1: Protocol Specification
 
 %K rfc3168
 %L RFC 3168
+%R RFC 3168
+%T The Addition of Explicit Congestion Notification (ECN) to IP
 %A K. K. Ramakrishnan
 %A Sally Floyd
 %A David L. Black
 %E K. K. Ramakrishnan
-%Q Internet Engineering Task Force
-%T The Addition of Explicit Congestion Notification (ECN) to IP
-%R RFC 3168
 %D September 2001
+%O (Obsoletes RFC 2481) (Updates RFC 2474, RFC 2401, RFC 793) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3168.txt
 
@@ -4178,6 +4200,17 @@ Part 1: Protocol Specification
 %D December 2001
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3204.txt
+
+%K rfc3260
+%L RFC 3260
+%R RFC 3260
+%T New Terminology and Clarifications for Diffserv
+%E D. Grossman
+%D April 2002
+%O (Updates RFC 2474, RFC 2475, RFC 2597) (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3260.txt
 
 %K rfc3261
 %K siprfc

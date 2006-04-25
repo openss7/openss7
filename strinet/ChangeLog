@@ -4,6 +4,9 @@
 	* doc/man/man3/xti_tcp.3.man: updated manual page
 	* doc/man/man7/tpi_ip.7.man: updated manual page
 	* doc/man/man7/tpi_tcp.7.man: updated manual page
+	* Makefile.am: added 2nd gen TCP driver
+	* src/drivers/lis.conf.in: added 2nd gen TCP driver
+	* src/drivers/tcp.c: added 2nd gen TCP driver
 
 2006-04-24  Brian Bidulock  <bidulock@openss7.org>
 

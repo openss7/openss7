@@ -1,3 +1,7 @@
+2006-04-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strss7.refs: more references
+
 2006-04-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/m2pa/m2pa_sl.c: call interface correction
