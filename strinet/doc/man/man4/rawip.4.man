@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: rawip.4.man,v 0.9.2.5 2006/04/05 09:44:26 brian Exp $
+.\" @(#) $Id: rawip.4.man,v 0.9.2.6 2006/04/24 22:13:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:26 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/24 22:13:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: rawip.4.man,v $
+.\" Revision 0.9.2.6  2006/04/24 22:13:59  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:26  brian
 .\" - moved .so line and updated headers
 .\"
@@ -109,9 +112,21 @@ sort-adjacent-labels
 .B RAWIP
 is an implementation of the Internet Protocol
 .RB ( IP )
-defined in RFC 768.
+defined in RFC 791.
 .[
-RFC 768
+rfc791
+.]
+.[
+rfc1349
+.]
+.[
+rfc2474
+.]
+.[
+rfc3168
+.]
+.[
+rfc3260
 .]
 It implements a connectionless, unreliable datagram packet service.  Packets may be reordered or
 duplicated before they arrive.

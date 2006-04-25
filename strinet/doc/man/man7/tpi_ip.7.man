@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_ip.7.man,v 0.9.2.8 2006/04/22 08:39:08 brian Exp $
+.\" @(#) $Id: tpi_ip.7.man,v 0.9.2.10 2006/04/25 01:34:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,17 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/22 08:39:08 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/25 01:34:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_ip.7.man,v $
+.\" Revision 0.9.2.10  2006/04/25 01:34:42  brian
+.\" - updated manual pages
+.\"
+.\" Revision 0.9.2.9  2006/04/24 22:13:59  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.8  2006/04/22 08:39:08  brian
 .\" - updated manual pages
 .\"
@@ -117,7 +123,19 @@ TPI Revision 2.0.0
 .BR tpi (7),
 to the Internet Protocol (IP),
 .[
-rfc768
+rfc791
+.]
+.[
+rfc1349
+.]
+.[
+rfc2474
+.]
+.[
+rfc3168
+.]
+.[
+rfc3260
 .]
 .BR ip (7),
 protocol service interface using the T-primitives of the

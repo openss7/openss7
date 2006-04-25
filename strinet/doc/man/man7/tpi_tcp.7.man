@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_tcp.7.man,v 0.9.2.4 2006/04/05 09:44:28 brian Exp $
+.\" @(#) $Id: tpi_tcp.7.man,v 0.9.2.6 2006/04/25 01:34:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,17 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:28 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/25 01:34:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_tcp.7.man,v $
+.\" Revision 0.9.2.6  2006/04/25 01:34:42  brian
+.\" - updated manual pages
+.\"
+.\" Revision 0.9.2.5  2006/04/24 22:13:59  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:44:28  brian
 .\" - moved .so line and updated headers
 .\"
@@ -96,7 +102,22 @@ sort-adjacent-labels
 .B TPI-TCP
 provides a stream supporting the Transport Provider Interface,
 .BR tpi (7),
-to the Transmission Control Protocol,
+to the Transmission Control Protocol (TCP),
+.[
+rfc793
+.]
+.[
+rfc2401
+.]
+.[
+rfc2474
+.]
+.[
+rfc3168
+.]
+.[
+rfc3260
+.]
 .BR tcp (7).
 This
 .IR STREAMS (4)
@@ -112,152 +133,1261 @@ interfae, such as the
 and
 .BR sockets (3)
 library.
+.PP
+The difference between the
+.I /dev/tcp
+and
+.I /dev/tcp2
+devices is that the later is the second generation STREAMS TCP driver fully
+implemeneted in
+.IR STREAMS (4),
+where the former opens a socket internal to the kernel and simply provides a
+TPI service interface to that socket.
+.\"
+.\"
 .SS "ADDRESS FORMATS"
 .PP
+The TCP address format is structured as follows:
+.sp
+.nf
+\fC\s-1\
+struct sockaddr_in {
+    sa_family_t         sin_family;  /* Address family */
+    unsigned short int  sin_port;    /* Port number */
+    struct in_addr      sin_addr;    /* Internet address */
+    /* padding */
+};
+\s+1\fP
+.fi
+.PP
+The
+.B sockaddr_in
+structure contains the following members:
+.TP \w'sin_family\(em'u
+.I sin_family
+The address family.  Always set to
+.BR AF_INET " or " AF_UNSPEC .
+.PD 0
+.TP
+.I sin_port
+The port number of the transport endpoint in network byte order.
+.TP
+.I sin_addr
+The IP address of the transport endpoint in network byte order.
+.TP
+.I (padding)
+Padding to pad the size of the
+.B sockaddr_in
+structure to the size of a
+.B sockaddr
+structure.
+.PD
+.PP
+The structure is padded to the size of a
+.B sockaddr
+structure.
 .SH "OPTIONS"
 .PP
+Options are formatted according to the
+.B t_opthdr
+structure described in
+.BR xti (3).
+A TCP transport provider compliant to this specification supports non, all or
+any subset of the options defined here.  An implementation may restrict the use
+of any of these options by offering them only in a privileged or read-only
+mode.
 .PP
 .B TPI-TCP
 provides options at the
-.B T_INET_TCP
-option level as described in the section that follow.  Of the
+.BR XTI_GENERIC ", " T_INET_TCP " and " T_INET_IP
+option levels as described in the subsections that follow.  Of the
 .B T_INET_TCP
 level protocol options, none of the options are of end-to-end significance.
-.SS "T_TCP_NODELAY"
+.\"
+.\"
+.SS XTI_GENERIC
 .PP
+Options at this level are specific to the X/Open Transport Interface (XTI/TLI)
+and are common to all transport providers.  For more information, see
+.BR xti (3).
 .PP
-.SS "T_TCP_MAXSEG"
+The options defined with the option level
+.B XTI_GENERIC
+are as follows:
+.TP
+.B XTI_DEBUG
+Sets debugging flags for the Stream.  This option is formatted as an array of
+.BR t_uscalar_t .
+Legal values are implementation defined.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_LINGER
+Sets whether, and the amount of time if, the Stream will linger waiting for
+unsent data to be delivered.  This option is formatted as a
+.B t_linger
+structure as follows:
+.RS
+.nf
+\fC\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;   /* option on/off */
+    t_scalar_t l_linger;  /* linger time */
+};
+\s+1\fP
+.fi
+.TP \w'l_linger\(em'u
+.I l_onoff
+Specifies whether to linger
+.RB ( T_YES ") or not (" T_NO ).
+Legal values are
+.BR T_YES " and " T_NO .
+.PD 0
+.TP
+.I l_linger
+Specifies the amount of time (in seconds) to linger.  Legal values are
+.BR T_INFINITE ", " T_UNSPEC
+and all positive numbers including zero.
+.PD
+.RE
+.TP
+.B XTI_RCVBUF
+Specifies the size, in bytes, of the receive buffer.  This option is formatted
+as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Specifies the low water mark above which received data will be indicated and
+delivered to the user.  This option is formatted as
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDBUF
+Specifies the size, in bytes, of the transmit buffer.  This option is
+formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDLOWAT
+Specifies the low water mark above which queued data will be transmitted to
+the peer.  This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.  For more information, see
+.BR xti (3).
+.\"
+.\"
+.SS T_INET_IP
 .PP
+Options with this level are specific to the Internet Protocol (IP)
+.[
+rfc791
+.]
+and are common to all the protocol levels in IP.  For more information, see
+.BR tpi_ip (7).
 .PP
-.SS "T_TCP_KEEPALIVE"
+The options defined with the option level
+.B T_INET_IP
+are as follows:
+.TP
+.B T_IP_OPTIONS
+Provides control fro the T_IP OPTIONS field.  Used for debugging.  This option
+if formatted as an array of
+.BR "unsigned char" ,
+up to 40 elements.  For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_TOS
+Provides control of the type-of-service byte present in each transmitted T_IP
+packet.  This option is formatted as an
+.BR "unsigned char" .
+Legal values are from 0 to 255.  For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_TTL
+Provides control of the time-to-live byte present in each transmitted T_IP
+packet.  This option is formatted as an
+.BR "unsigned char" .
+Legal values are from 0 to 255.  For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_REUSEADDR
+Allows multiple non-listening binds to the same address.  This option is
+formatted as an
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_DONTROUTE
+Bypasses routing tables and routes directly to an interface.  Use for
+debugging.  This option is formated as an
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_BROADCAST
+Allows broadcast addresses to be used.  This option is not applicable to TCP
+and is always set to
+.BR T_NO .
+This options is formatted as an
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR tpi_ip (7).
+.\"
+.\"
+.SS T_INET_TCP
 .PP
+Options within this level are specific to the Transmission Control Protocol
+(TCP)
+.[
+rfc793
+.]
+yet are used by protocol levels using TCP transport.
 .PP
+The options defined with the option level
+.B T_INET_TCP
+are as follows:
+.TP
+.B T_TCP_NODELAY
+Under most circumstances, TCP sends data as soon as it is presented.  When outstanding data has not
+yet been acknowledged, it gathers small amounts of output to be sent in a single packet once an
+acknowledgement is received.  For a small number of clients, such as a window system (for exampl,
+.IR "MIT X Window System" )
+that send a stream of mouse events which receive no replies, this packetisation may cause
+significant delays.
+.B T_TCP_NODELAY
+is used to defeat this algorithm.  Legal option values are
+.BR T_YES "(\(lqdon't delay\(rq) and " T_NO "(\(lqdelay\(rq)".
+.IP ""
+This option can be negotiated in any state; however, this option will not take effect until data is
+sent with
+.BR T_DATA_REQ "(7) or " T_OPTDATA_REQ (7),
+or unless data is already queued for transmission at the time that the option is negotiated.  A
+value for this option can be proposed in
+.BR T_OPTMGMT_REQ "(7), " T_CONN_REQ "(7) or " T_CONN_RES (7).
+.IP ""
+This option is mutually exclusive with
+.BR T_TCP_CORK .
+Attempts to negotiate this option to
+.B T_YES
+when
+.B T_TCP_CORK
+has already been negotiated to
+.B T_YES
+will fail.
+.IP ""
+This option is formatted as a
+.BR t_uscalar_t .
+It can take on values
+.BR T_YES " or " T_NO .
+This option is an
+.IR "absolute requirement" .
+.TP
+.B T_TCP_MAXSEG
+This option determines the maximum segment size for outgoing packets.  Values greater than the
+association MTU are ignored and have no effect.  The value determines the maximum size (in octets)
+above which TCP will fragment larger data segments into smaller ones.  Normally this value is the
+connection MTU value minus the size of the current IP and TCP headers.  If the transport user
+negotiates this value to a lower value, the lower value will be used.
+.IP ""
+Per
+.IR "XNS 5.2" ,
+.[
+xns 5.2
+.]
+It is used only to retrieve the maximum TCP segment size.  The write behaviour described here is for
+compatibility with the
+.B Linux
+.BR tcp (7)
+implementation.
+.IP ""
+This option is formatted as a
+.BR t_uscalar_t .
+It can take on any positive value.  This option is not an
+.IR "absolute requirement" .
+The implementation may impose lower and upper bounds on the value.  If the proposed value is less
+than the lower bound, the option will be negotiated to the lower bound.
+.TP
+.B T_TCP_KEEPALIVE
+If this option is set, a keep-alive timer is activated to monitor idle connections that might no
+longer exist.  If a connection has been idle since the last keep-alive timeout, a keep-alive packet
+is sent to check if the connection is still alive or broken.
+.RS
+.PP
+Keep-alive packets are not an explicit feature of TCP, and this practice is not universally
+accepted.  According to
+.I RFC 1122
+.[
+rfc1122
+.]
+\*(lqa keep-alive mechanism should only be invoked in service applications that might otherwise hang
+indefinitely and consume resources unnecessarily if a client crashes or aborts a connection during a
+network failure.\*(rq
+.PP
+The option value consists of a
+.B t_kpalive
+structure, with the following members:
+.PP
+.nf
+\fC\s-1\
+struct t_kpalive {
+    t_scalar_t kp_onoff;    /* option on/off */
+    t_scalar_t kp_timeout;  /* timeout in minutes */
+};
+\s+1\fP
+.fi
+.TP \w'kp_timeout\(em'u
+.I kp_onoff
+The
+.I kp_onoff
+field determines whether keep-alive is activated and can assume values
+.BR T_NO " or " T_YES .
+.PD 0
+.TP
+.I kp_timeout
+The
+.I kp_timeout
+field determines the frequency of keep-alive packets being sent, in minutes.  The transport user can
+request the default value by setting the field to
+.BR T_UNSPEC .
+The default is implementation-dependent, but at least
+.B 120
+minutes (see
+.IR "RFC 1122" ).
+.[
+rfc1122
+.]
+Legal values for this field are
+.B T_UNSPEC
+and all positive numbers.
+.PD
+.PP
+The timeout value is not an
+.IR "absolute requirement" .
+The implementation may impose upper and lower limits on this value.  Requests that fall short of the
+lower limit may be negotiated to the lower limit.  The use of this option might be restricted to
+privileged users.
+.PP
+This option is formatted as
+.B t_kpalive
+structure.  This option is an
+.IR "absolute requirement" .
+.RE
+.PP
+The following options are not described in XTI/TLI
+.[
+xti
+.]
+or XNS 5.2
+.[
+xns 5.2
+.]
+literature, however, they are provided for compatibility with the socket options of the
+.B Linux
+socket implementation (see
+.BR tcp (7)).
+.TP
+.B T_TCP_CORK
+Never send partially complete segments.  This option determines whether to cork the transmission
+stream waiting for subsequent transmission requewsts.  When set
+.RB ( T_YES ),
+this option permits a number of
+.BR t_snd (3)
+operations to be peformed without send the data subsequent to the cork.  When the cork is released
+.RB ( T_NO ),
+all data will be permitted to proceed to tranmsission.
+.RS
+.PP
+This option can only be negotiated to
+.B T_YES
+if the option
+.B T_TCP_NODELAY
+has been negotiated to
+.BR T_NO .
+Otherwise, negotiation will fail.
+.PP
+This option is formatted as a
+.BR t_uscalar_t .
+It can take on values
+.BR T_YES ,
+conveying that the transmission is corked, or,
+.BR T_NO ,
+conveying that transmission is uncorked.
+This option is not an
+.IR "absolute requirement" .
+.RE
+.TP
+.B T_TCP_KEEPIDLE
+Start keepalives after this period.  This option determines the period of time, in seconds, that the
+endpoint will allow the connection to remain idle util initiating sending of keepalive packets.
+Valid values are any positive value greater than zero (0).
+.RS
+.PP
+This option is formatted as a
+.BR t_uscalar_t .
+It can take on any positive, non-zero value.
+This option is not an
+.IR "absolute requirement" .
+The implementation may impose upper and lower limits on the value.  Proposed values less than the
+lower limit will be negotiated to the lower limit.
+.RE
+.TP
+.B T_TCP_KEEPCNT
+Number of keepalives before death.  This option determines the number of keepalives that will be
+sent without response before aborting the connection.  Valid values are any positive value greater
+than zero (0).
+.RS
+.PP
+This options is formatted as a
+.BR t_uscalar_t .
+It can take on any positive, non-zero value.  This options is not an
+.IR "absolute requirement" .
+The implementation may impose upper and lower limits on the value.  Proposed values less than the
+lower limit will be negotiated to the lower limit.
+.RE
+.TP
+.B T_TCP_SYNCNT
+Number of SYN retransmits.  This option determines the number of times that a SYN will be resent
+before abandoning transport connection establishment.  Valid values are any positive value greater
+than zero (0).
+.RS
+.PP
+This option is valid in state
+.B T_IDLE
+with a
+.I qlen
+of zero and can be negotiated with
+.BR t_optmgmt (3)
+or
+.BR t_connect (3).
+.PP
+This options is formatted as a
+.BR t_uscalar_t .
+It can take on any positive, non-zero value.  This options is not an
+.IR "absolute requirement" .
+The implementation may impose upper and lower limits on the value.  Proposed values less than the
+lower limit will be negotiated to the lower limit.
+.RE
+.TP
+.B T_TCP_LINGER2
+Life time of orphaned FIN-WAIT-2 state.  This option determines the amount of time (in seconds) that
+a TCP connection will be allowed to persist in the half-closed state before aborting the connection.
+It is useful for servers that may otherwise accumulate a large number of half-closed TCP
+connections, exhausting system or network resources.
+.RS
+.PP
+This option may be negotiated in any state; however, the value will not be effective until an
+orderly release is initiated with a
+.BR t_sndrel (3)
+call.
+.PP
+This options is formatted as a
+.BR t_uscalar_t .
+It can take on any positive, or zero value.  This options is not an
+.IR "absolute requirement" .
+The implementation may impose upper and lower limits on the value.  Proposed values less than the
+lower limit will be negotiated to the lower limit.
+.RE
+.TP
+.B T_TCP_DEFER_ACCEPT
+Wake up listener only when data arrives.  This option controls the behaviour of the implementation
+in response to the
+.BR t_listen (3)
+call.  When set to
+.BR T_NO ,
+as is normally the case,
+.BR t_listen (3)
+will return a connection indication as soon as an incoming TCP connection is established.  When
+negotiated to
+.BR T_YES ,
+.BR t_listen (3)
+will return a connection indication only after data is first received on an established incoming TCP
+connection.
+.RS
+.PP
+This option can only be negotiated in the
+.BR T_IDLE
+state for a stream bound with
+.I qlen
+greater than zero.  This option may be set on a listening stream using
+.BR t_optmgmt (3)
+prior to a call to
+.BR t_listen (3)
+in fitting with
+.B XTI-TCP
+connection indication options negotiation.
+.PP
+This option is formatted as a
+.BR t_uscalar_t .
+It can take on values
+.BR T_YES " and " T_NO .
+This option is not an
+.IR "absolute requirement" .
+.RE
+.TP
+.B T_TCP_WINDOW_CLAMP
+Bound advertised window.  This option specifies an upper bound on the advertised receive window.
+Values greater that the actual or effective receive window size will be ignored.
+.RS
+.PP
+This options is formatted as a
+.BR t_uscalar_t .
+It can take on any positive, non-zero value.
+This options is not an
+.IR "absolute requirement" .
+The implementation may impose upper and lower limits on the value.  Proposed values less than the
+lower limit will be negotiated to the lower limit.
+.RE
+.TP
+.B T_TCP_INFO
+Information about this connection.
+.RS
+.PP
+This option is read-only and can be read with a call to
+.BR t_optmgmt (3)
+in any state.
+.PP
+This option is formatted as a
+.B t_tcp_info
+structure, formatted as follows:
+.PP
+.nf
+\fC\s-1\
+struct t_tcp_info {
+    u_char_t tcpi_state;
+    u_char_t tcpi_ca_state;
+    u_char_t tcpi_retransmits;
+    u_char_t tcpi_probes;
+    u_char_t tcpi_backoff;
+    u_char_t tcpi_options;
+    u_char_t tcpi_snd_wscale:4, tcpi_rcv_wscale:4;
+    uint32_t tcpi_rto;
+    uint32_t tcpi_ato;
+    uint32_t tcpi_snd_mss;
+    uint32_t tcpi_rcv_mss;
+    uint32_t tcpi_unacked;
+    uint32_t tcpi_sacked;
+    uint32_t tcpi_lost;
+    uint32_t tcpi_retrans;
+    uint32_t tcpi_fackets;
+    /* Times. */
+    uint32_t tcpi_last_data_sent;
+    uint32_t tcpi_last_ack_sent; /* Not remembered, sorry. */
+    uint32_t tcpi_last_data_recv;
+    uint32_t tcpi_last_ack_recv;
+    /* Metrics. */
+    uint32_t tcpi_pmtu;
+    uint32_t tcpi_rcv_ssthresh;
+    uint32_t tcpi_rtt;
+    uint32_t tcpi_rttvar;
+    uint32_t tcpi_snd_ssthresh;
+    uint32_t tcpi_snd_cwnd;
+    uint32_t tcpi_advmss;
+    uint32_t tcpi_reordering;
+};
+\s+1\fP
+.fi
+.TP
+.I tcpi_state
+.PD 0
+.TP
+.I tcpi_ca_state
+.RS
+.TP
+.B TCP_CA_Open
+.TP
+.B TCP_CA_Disorder
+.TP
+.B TCP_CA_CWR
+.TP
+.B TCP_CA_Recovery
+.TP
+.B TCP_CA_Loss
+.RE
+.TP
+.I tcpi_retransmits
+.TP
+.I tcpi_probes
+.TP
+.I tcpi_backoff
+.TP
+.I tcpi_options
+.TP
+.I tcpi_snd_wscale
+.TP
+.I tcpi_rcv_wscale
+.TP
+.I tcpi_rto
+.TP
+.I tcpi_ato
+.TP
+.I tcpi_snd_mss
+.TP
+.I tcpi_rcv_mss
+.TP
+.I tcpi_unacked
+.TP
+.I tcpi_sacked
+.TP
+.I tcpi_lost
+.TP
+.I tcpi_retrans
+.TP
+.I tcpi_fackets
+.TP
+.I tcpi_last_data_sent
+.TP
+.I tcpi_last_ack_sent
+.TP
+.I tcpi_last_data_recv
+.TP
+.I tcpi_last_ack_recv
+.TP
+.I tcpi_pmtu
+.TP
+.I tcpi_rcv_ssthresh
+.TP
+.I tcpi_rtt
+.TP
+.I tcpi_rttvar
+.TP
+.I tcpi_snd_ssthresh
+.TP
+.I tcpi_snd_cwnd
+.TP
+.I tcpi_advmss
+.TP
+.I tcpi_reordering
+.PD
+.RE
+.TP
+.B T_TCP_QUICKACK
+Block or reenable quick acks.
+.RS
+.PP
+This option is formatted as a
+.BR t_uscalar_t .
+It can take on values
+.BR T_YES " or " T_NO .
+This option is not an
+.IR "absolute requirement" .
+.RE
+.\"
+.\"
 .SH "LOCAL MANAGEMENT INTERFACE"
 .PP
+.\"
+.SS T_INFO_REQ\fR(7)
 .PP
-.SS T_INFO_REQ
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.SS T_INFO_ACK\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.TP \w'\fIPROVIDER_flag\fP\(em'u
+.I TSDU_size
+The
+.B TPI-TCP
+provider has no concept of a TSDU and returns zero (0) in this field in accordance with
+.BR tpi (7).
+.TP
+.I ETSDU_size
+The
+.B TPI-TCP
+provider only supports 1 byte at a time of urgent (out of band) data and, therefore, returns one (1)
+in this field.
+.TP
+.I CDATA_size
+The
+.B TPI-TCP
+provider does not support data carried with the SYN packet and, therefore, returns
+.B T_INVALID
+in this field.
+.TP
+.I DDATA_size
+The
+.B TPI-TCP
+provider does not support data carried with the FIN packet and, therefore, returns
+.B T_INVALID
+in this field.
+.TP
+.I ADDR_size
+The
+.B TPI-TCP
+provider only supports a single address in any address specification and, therefore, returns the
+size of a
+.B sockaddr_in
+structure in this field.
+.TP
+.I OPT_size
+The
+.B TPI-TCP
+provider can support any number of options and returns
+.B T_INFINITE
+in this field.
+.TP
+.I TIDU_size
+The
+.B TPI-TCP
+provider cannot support a segment larger than 65535 bytes and therefore returns 65535 in this field.
+.TP
+.I SERV_type
+The
+.B TPI-TCP
+is a connection-oriented provider with orderly release and returns
+.B T_COTS_ORD
+in this field.
+.TP
+.I CURRENT_state
+The current state of the interface.
+.TP
+.I PROVIDER_flag
+The
+.B TPI-TCP
+provider does not support the transmission of zero-byte messages and supports the address request
+and acknowledgement primitives, and, therefore, returns
+.B XPG4_1
+and not
+.B T_SNDZERO
+in this field.
+.\"
+.SS T_ADDR_REQ\fR(7)
 .PP
-.SS T_INFO_ACK
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.SS T_ADDR_ACK\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.IR LOCADDR_length ", " LOCADDR_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure that describes the
+.B TPI-TCP
+address to which the Stream is bound.  If the Stream is not in a bound state, then
+.IR LOCADDR_length " and " LOCADDR_offset
+return zero (0).
+.TP
+.IR REMADDR_length ", " REMADDR_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure that describes the
+.B TPI-TCP
+address to which the Stream is connected.  If the Stream is not in a connected or connecting state,
+.IR REMADDR_length " and " REMADDR_offset
+return zero (0).
+.\"
+.SS T_CAPABILITY_REQ\fR(7)
 .PP
-.SS T_ADDR_REQ
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.SS T_CAPABILITY_ACK\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
 .PP
-.SS T_ADDR_ACK
+This primitive returns
+.BR T_info_ack (7)
+structure interpreted as described under
+.RI \(lq T_INFO_ACK ,\(rq
+above.
+.\"
+.SS T_BIND_REQ\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.IR ADDR_length ", " ADDR_offset
+Specifies the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure that contains the
+.B TPI-TCP
+address to which to bind.
+The
+.B TPI-TCP
+provider supports wildcard addresses and the address
+.BR INADDR_ANY .
+This field can currently only contain a single address.
+.TP
+.I CONIND_number
+Specifies the number of connection indications.  Specifying a non-zero number of connection
+indications will palce the Stream in listening mode.  Any SYN packet received from a unique source
+address will generate a connection indication.  Connection indications can be accepted or refused
+(without data).  This number specifies the maximum number of outstanding connection indications
+(those that have neither been accepted nor refused) that the provider will deliver.  Because this
+limit is reached does not mean that the provider discards additional connection indications, but may
+queue them internally until the number of outstanding connection indications drops beneath the
+number specified.  See
+.BR tpi (7)
+for more information.
+.\"
+.SS T_BIND_ACK\fR(7)
 .PP
-.SS T_CAPABILITY_REQ
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.IR ADDR_length ", " ADDR_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure that contains the
+.B TPI-TCP
+address that was bound.  This field can currently only contain one address.
+.IP ""
+The boudn address,
+.IR sin_addr ,
+returned in this field may be
+.B INADDR_ANY
+if
+.B INADDR_ANY
+was requested, or no address was provided to the bind.  However, the
+.I sin_port
+component of the address will be allocated dynamically and set to a non-zero port number if zero
+(indicating any port) was specified on bind, or no address was provided to the bind.  If a non-zero
+port number could not be dynamically allocated,
+.RB [ TNOADDR ]
+is returned in accordacne with
+.BR tpi (7).
+.TP
+.I CONIND_number
+Indicates the negotiated number of connection indications.  This is normally the same value as was
+requested; however, if the user requests a number that is considered too large, this number might be
+a more conservative value.
+.\"
+.SS T_UNBIND_REQ\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.SS T_OK_ACK\fR(7)
 .PP
-.SS T_CAPABILITY_ACK
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.SS T_ERROR_ACK\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.SS T_OPTMGMT_REQ\fR(7)
 .PP
-.SS T_BIND_REQ
+This primitive is interpreted as in
+.BR tpi (7),
+with the options described under
+.RI \(lq OPTIONS ,\(rq
+above.
+.\"
+.SS T_OPTMGMT_ACK\fR(7)
 .PP
-.PP
-.SS T_BIND_ACK
-.PP
-.PP
-.SS T_UNBIND_REQ
-.PP
-.PP
-.SS T_OK_ACK
-.PP
-.PP
-.SS T_ERROR_ACK
-.PP
-.PP
-.SS T_OPTMGMT_REQ
-.PP
-.PP
-.SS T_OPTMGMT_ACK
-.PP
-.PP
+This primitive is interpreted as in
+.BR tpi (7),
+with the options described under
+.RI \(lq OPTIONS ,\(rq
+above.
+.\"
+.\"
 .SH "PROTOCOL SERVICE INTERFACE"
 .PP
+The
+.I /dev/tcp
+and
+.I /dev/tcp2
+drivers provide a single interface type: connection-oriented mode with orderly release.
+.\"
+.SS T_UNITDATA_REQ\fR(7)
 .PP
-.SS T_UNITDATA_REQ
+This primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-TCP
+provide does not support connectionless mode service and any attempt to issue this primitive will
+result in a
+.BR T_ERROR_ACK (7)
+primitive with the error number
+.RB [ TNOTSUPPORT ].
+.\"
+.SS T_UNITDATA_IND\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-TCP
+provide does not support connectionless mode service and will not issue this primitive.
+.\"
+.SS T_UDERROR_IND\fR(7)
 .PP
-.SS T_UNITDATA_IND
+This primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-TCP
+provide does not support connectionless mode service and will not issue this primitive.
+.\"
+.SS T_CONN_REQ\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.IR DEST_length ", " DEST_offset
+Specifies the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure containing the destination IP address and port number to which the connection is to be
+formed.  Both the
+.I sin_addr
+and
+.I sin_port
+fields must be non-zero and must specify a valid unicast endpoint.
+.TP
+.IR OPT_length ", " OPT_offset
+Specifies the length and offset from the beginning of the message block of the
+options requested for the connection.  See
+.RI \(lq OPTIONS ,\(rq
+above.
+.\"
+.SS T_CONN_CON\fR(7)
 .PP
-.SS T_UDERROR_IND
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.IR RES_length ", " RES_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure containing the responding address.
+.TP
+.IR OPT_length ", " OPT_offset
+Indicates the length and offset from the beginning of the message block of the options present in
+the connection request and options that are negotiated end-to-end.  See
+.RI \(lq OPTIONS ,\(rq
+above.  The option values represent the negotiation with the local provider as well as end-to-end
+negotiation with the TCP peer.
+.\"
+.SS T_CONN_IND\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.IR SRC_length ", " SRC_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structure containing the source address and port number form which the connection attempt was
+received.
+.TP
+.IR OPT_length ", " OPT_offset
+Indicates the length and offset from the beginning of the message block of the options of end-to-end
+significance that were present in the connection request.  See
+.RI \(lq OPTIONS ,\(rq
+above.  The only options indicated are those that are of end-to-end significance and which do not
+have default values.
+.TP
+.I SEQ_number
+.\"
+.SS T_CONN_RES\fR(7)
 .PP
-.SS T_CONN_REQ
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I ACCEPTOR_id
+Specifies the acceptor identifier of the Stream onto which the connection is to be accepted.  If the
+connection is to be accepted on the same Stream upon which the corresponding
+.BR T_CONN_IND (7)
+was received, this field should be zero (0).  It is an error to accept a connection on the listening
+Stream if there is more than one connection indication outstanding.
+.TP
+.IR OPT_length ", " OPT_offset
+Specifies the length and offset from the beginning of the message block of the options requested for
+the connection.  See
+.RI \(lq OPTIONS ,\(rq
+above.  Options of local significance are negotiated locally.  Options of end-to-end significance
+are negotiated with the peer.
+.TP
+.I SEQ_number
+Specifies the sequence number in the corresponding
+.BR T_CONN_IND (7)
+primitive to which this primitive is responding.
+.\"
+.SS T_DATA_REQ\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I MORE_flag
+The
+.B TPI-TCP
+provider does not support record boundaries, and this flag is ignored.
+.\"
+.SS T_DATA_IND\fR(7)
 .PP
-.SS T_CONN_CON
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I MORE_flag
+The
+.B TPI-TCP
+provider does not support record boundaries, and this flag is always set to zero (0).
+.\"
+.SS T_EXDATA_REQ\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I MORE_flag
+The
+.B TPI-TCP
+provider does not support record boundaries, and this flag is ignored.
+.\"
+.SS T_EXDATA_IND\fR(7)
 .PP
-.SS T_CONN_IND
+This primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-TCP
+provider does not support record boundaries, and this flag is always set to zero (0).
+.\"
+.SS T_OPTDATA_REQ\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I DATA_flag
+The
+.B TPI-TCP
+provider does not support record boundaries, and this flag is ignored.
+.TP
+.IR OPT_length ", " OPT_offset
+Specifies the length and offset from the beginning of the message block of the options requested for
+the transmission.  See
+.RI \(lq OPTIONS ,\(rq
+above.  Some options of largely local significance are supported.
+.\"
+.SS T_OPTDATA_IND\fR(7)
 .PP
-.SS T_CONN_RES
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I DATA_flag
+The
+.B TPI-TCP
+provider does not support record boundaries, and this flag is always set to zero (0).
+.TP
+.IR OPT_length ", " OPT_offset
+Indicates the length and offset from the beginning of the message block of the options associated
+with the received message.  See
+.RI \(lq OPTIONS ,\(rq
+above.  Some options of largely local significance are supported.
+.\"
+.SS T_DISCON_REQ\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.SS T_DISCON_IND\fR(7)
 .PP
-.SS T_DATA_REQ
+This primitive is interpreted as in
+.BR tpi (7).
+.TP
+.I DISCON_reason
+.TP
+.I SEQ_number
+The sequence number of a currently outstanding connection indication to which the disconnect
+corresponds.  This value is non-zero only on a listening Stream for which an outstanding
+.BR T_CONN_IND (7)
+primtiive has been issued with no
+.BR T_DISCON_REQ (7)
+or
+.BR T_CONN_RES (7)
+primitive having been issued by the TS user with the same sequence number.
+.\"
+.SS T_ORDREL_REQ\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+This primitive requests or responds to the
+.B TPI-TCP
+provider orderly release function.
+.\"
+.SS T_ORDREL_IND\fR(7)
 .PP
-.SS T_DATA_IND
-.PP
-.PP
-.SS T_EXDATA_REQ
-.PP
-.PP
-.SS T_EXDATA_IND
-.PP
-.PP
-.SS T_OPTDATA_REQ
-.PP
-.PP
-.SS T_OPTDATA_IND
-.PP
-.PP
-.SS T_DISCON_REQ
-.PP
-.PP
-.SS T_DISCON_IND
-.PP
-.PP
-.SS T_ORDREL_REQ
-.PP
-.PP
-.SS T_ORDREL_IND
-.PP
-.PP
+This primitive is interpreted as in
+.BR tpi (7).
+This primitive indicates or confirms the
+.B TPI-TCP
+provider orderly release function.
+.\"
+.\"
 .SH "IOCTLS"
 .PP
-.PP
+The
+.B TPI-TCP
+provider does not support input-output controls.  For a standard set of
+input-output controls supporting the
+.BR xti (3)
+library functions, push the
+.BR timod (4)
+module.
+.\"
+.\"
 .SH "ERROR HANDLING"
 .PP
-.PP
+Error handling is in accordance with
+.BR tpi (7).
+.\"
+.\"
 .SH "ERRORS"
 .PP
+Errors are in accordance with
+.BR tpi (7).
+They are repeated here as follows:
+.\"
+.SS "Error Acknowledgement Codes"
 .PP
+The following error codes can be present in the
+.I TLI_error
+field of the
+.BR T_ERROR_ACK (7)
+message.
+.TP \w'[\fBTPROVMISMATCH\fP]\(em'u
+.RB [ TBADADDR ]
+A specified address was improperly formatted or contained invalid information.
+.TP
+.RB [ TBADOPT ]
+The specified options were improperly formatted or contained invalid information.
+.TP
+.RB [ TACCES ]
+The user did not have permission to a requested address or option.
+.TP
+.RB [ TBADF ]
+The
+.I ACCEPTOR_id
+does not identify a valid open Stream.
+.TP
+.RB [ TNOADDR ]
+The user did not specify an address and one could not be allocated by the TS provider.
+.TP
+.RB [ TOUTSTATE ]
+The primitive would place the interface out of state.
+.TP
+.RB [ TBADSEQ ]
+The sequence number provided did not correspond to an outstanding connection indication.
+.TP
+.RB [ TSYSERR ]
+A system error occured and the UNIX error code is present in the
+.I UNIX_error
+field of the primitive.
+.TP
+.RB [ TBADDATA ]
+The user specified an amount of data that exceeds the corresponding limit as reported in the
+.BR T_INFO_ACK (7)
+primitive.
+.TP
+.RB [ TBADFLAG ]
+The flags specified were invalid or not supported.
+.TP
+.RB [ TNOTSUPPORT ]
+The primitive is not support by the service provider, or not supported in the current mode of
+operation.
+.TP
+.RB [ TADDRBUSY ]
+The user specified an address that is already bound to another Stream.
+.TP
+.RB [ TPROVMISMATCH ]
+The user specified an
+.I ACCEPTOR_id
+that corresponds to a Stream that belongs to another provider.
+.TP
+.RB [ TRESQLEN ]
+The user specified an
+.I ACCEPTOR_id
+that corresponds to a Stream that is bound in the listening mode.
+.TP
+.RB [ TRESADDR ]
+The user specified an
+.I ACCEPTOR_id
+that corresponds to a Stream that is bound to a different address than that of the listening Stream
+(and the provider does not support this).
+.\"
+.SS "Disconnect Codes"
+.PP
+The following error codes can be present in the
+.I DISCON_reason
+field of a
+.BR T_DISCON_IND (7)
+primitive:
+.\"
+.\"
 .SH "CAVEATS"
 .PP
-.PP
+.B TCP
+has several imlementations.  This manpage is for the
+.BR INET (4)
+implementation that provides
+.BR tpi (7)
+access to the Linux NET4 version of
+.BR TCP .
+For more information on the
+Linux NET4
+version, see
+.BR tcp (7).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR tcp (7),
+.BR tcp (4),
+.BR tcp2 (4),
 .BR tpi (7),
+.BR tpi_ip (7),
 .BR xti (3),
+.BR xti_ip (3),
+.BR xti_tcp (3),
 .BR sockets (3).
-.SH HISTORY
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
-The Transport Provider Interface first appeared in SVR 4.
+The
+.B @PACKAGE_TITLE@
+implementation of
+.B TCP
+for
+.I STREAMS
+is largely compatible with
+.IR STREAMS -based
+implementations such as
+Lachman or Mentat TCP/IP stacks and
+.IR Solaris \(rg
+documentation.
 .[
-svr4
+soldoc
 .]
+.\"
+.\"
 .SH CONFORMANCE
 .PP
 This interface conforms to TPI Version 2, Draft 2.
 .[
 TPI Revision 2.0.0
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Transport Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
 .XX
 .[
 magic

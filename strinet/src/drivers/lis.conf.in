@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/24 16:03:25 $
+# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/24 22:14:12 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/24 16:03:25 $ by $Author: brian $
+## Last Modified $Date: 2006/04/24 22:14:12 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -72,7 +72,7 @@ driver	rawip		raw	*
 ##	type	name		object name
 objname driver	inet		inet
 objname	driver	udp		udp
-objname driver	raw		rawip
+objname driver	rawip		rawip
 
 ##
 ## Loadable specifications
@@ -85,7 +85,7 @@ objname driver	raw		rawip
 ##
 loadable inet
 loadable udp
-loadable raw
+loadable rawip
 
 ##
 ## Node specifications

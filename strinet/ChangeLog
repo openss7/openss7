@@ -1,7 +1,19 @@
+2006-04-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strinet.refs: more references
+	* doc/man/man3/xti_tcp.3.man: updated manual page
+	* doc/man/man7/tpi_ip.7.man: updated manual page
+	* doc/man/man7/tpi_tcp.7.man: updated manual page
+
 2006-04-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/rawip.c: working up RAWIP driver
 	* src/drivers/udp.c: working up UDP driver
+	* doc/man/strinet.refs: updated references
+	* doc/man/man4/rawip.4.man: updated references
+	* doc/man/man7/tpi_ip.7.man: updated references
+	* doc/man/man7/tpi_tcp.7.man: updated references
+	* src/drivers/lis.conf.in: corrected loadable rawip
 
 2006-04-23  Brian Bidulock  <bidulock@openss7.org>
 
