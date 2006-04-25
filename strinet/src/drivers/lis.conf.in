@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/04/24 22:14:12 $
+# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/04/25 06:47:00 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/04/24 22:14:12 $ by $Author: brian $
+## Last Modified $Date: 2006/04/25 06:47:00 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -65,14 +65,16 @@
 driver	inet		ss_	30
 driver	udp		udp	*
 driver	rawip		raw	*
+driver	tcp		tcp	*
 
 ##
 ## Object name specifications
 ##
 ##	type	name		object name
-objname driver	inet		inet
+objname	driver	inet		inet
 objname	driver	udp		udp
-objname driver	rawip		rawip
+objname	driver	rawip		rawip
+objname	driver	tcp		tcp
 
 ##
 ## Loadable specifications
@@ -86,6 +88,7 @@ objname driver	rawip		rawip
 loadable inet
 loadable udp
 loadable rawip
+loadable tcp
 
 ##
 ## Node specifications
@@ -130,4 +133,5 @@ node	/dev/ticlts	     c	0666	inet		44
 @WITH_OPENSS7_SCTP_TRUE@node	/dev/sctp	     c	0666	inet		45
 node	/dev/udp2	     c	0666	230		udp
 node	/dev/rawip2	     c	0666	230		rawip
+node	/dev/tcp2	     c	0666	230		tcp
 

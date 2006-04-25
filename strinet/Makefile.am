@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/04/23 18:13:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/04/25 06:46:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/23 18:13:21 $ by $Author: brian $
+# Last Modified $Date: 2006/04/25 06:46:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.58  2006/04/25 06:46:58  brian
+# - added 2nd gen TCP driver
+#
 # Revision 0.9.2.57  2006/04/23 18:13:21  brian
 # - changes for compile
 #
@@ -161,6 +164,7 @@ nodist_EXTRA_libINETmods_a_SOURCES = \
 				  src/drivers/inet.c \
 				  src/drivers/udp.c \
 				  src/drivers/rawip.c \
+				  src/drivers/tcp.c \
 				  src/drivers/udp_hooks.h
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
@@ -249,6 +253,7 @@ nodist_EXTRA_libINETmods_a_SOURCES	= \
 				  src/drivers/inet.c \
 				  src/drivers/udp.c \
 				  src/drivers/rawip.c \
+				  src/drivers/tcp.c \
 				  src/drivers/udp_hooks.h
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
