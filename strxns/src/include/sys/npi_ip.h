@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_ip.h,v 0.9.2.3 2006/03/30 10:47:34 brian Exp $
+ @(#) $Id: npi_ip.h,v 0.9.2.4 2006/04/26 10:47:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/30 10:47:34 $ by $Author: brian $
+ Last Modified $Date: 2006/04/26 10:47:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_ip.h,v $
+ Revision 0.9.2.4  2006/04/26 10:47:55  brian
+ - sync
+
  Revision 0.9.2.3  2006/03/30 10:47:34  brian
  - working up NPI IP test and mux driver
 
@@ -63,7 +66,7 @@
 #ifndef SYS_NPI_IP_H
 #define SYS_NPI_IP_H
 
-#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/npi.h>
 
@@ -78,8 +81,13 @@
 
 typedef struct N_qos_sel_info_ip {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_INFO_IP */
-	np_ulong ttl;
-	np_ulong tos;
+	np_ulong protocol;		/* default protocol for data transmission */
+	np_ulong priority;		/* default priority for data transmission */
+	np_ulong ttl;			/* default time-to-live for outgoing packets */
+	np_ulong tos;			/* default type-of-service for outgoing packets */
+	np_ulong mtu;			/* default mtu for outgoing packets */
+	np_ulong saddr;			/* default srce IP address for outgoing packets */
+	np_ulong daddr;			/* default dest IP address for outgoing packets */
 } N_qos_sel_info_ip_t;
 
 typedef struct N_qos_range_info_ip {
@@ -88,16 +96,18 @@ typedef struct N_qos_range_info_ip {
 
 typedef struct N_qos_sel_conn_ip {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_CONN_IP */
-	np_ulong ttl;
-	np_ulong tos;
-	np_ulong mtu;
+	np_ulong protocol;
+	np_ulong priority;
+	np_ulong ttl;			/* default time-to-live for connection */
+	np_ulong tos;			/* default type-of-service for connection */
+	np_ulong mtu;			/* default maximum-transfer-unit for connection */
 } N_qos_sel_conn_ip_t;
 
 typedef struct N_qos_sel_reset_ip {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_RESET_IP */
-	np_ulong ttl;
-	np_ulong tos;
-	np_ulong mtu;
+	np_ulong ttl;			/* time-to-liver for connection */
+	np_ulong tos;			/* type-of-service for connection */
+	np_ulong mtu;			/* maximum-transfer-unit for connection */
 } N_qos_sel_reset_ip_t;
 
 typedef struct N_qos_sel_ud_ip {
@@ -106,7 +116,7 @@ typedef struct N_qos_sel_ud_ip {
 	np_ulong priority;		/* priority for outgoing packet */
 	np_ulong ttl;			/* time to live for outgoing packet */
 	np_ulong tos;			/* type of service for outgoing packet */
-	np_ulong ipaddr;		/* source IP address for outgoing packet */
+	np_ulong saddr;			/* source IP address for outgoing packet */
 } N_qos_sel_ud_ip_t;
 
 /* 

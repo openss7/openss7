@@ -4741,6 +4741,21 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc4168.txt
 
+%K rfc4460
+%L RFC 4460
+%R RFC 4460
+%T Stream Control Transmission Protocol (SCTP) Specification Errata and Issues
+%A R. Stewart
+%A I. Aria-Rodriguez
+%A K. Poon
+%A A. Caro
+%A M. Tuexen
+%D April 2006
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4460.txt
+
 %K streamio
 %Q AT&T Bell Laboratories
 %A Dennis M. Ritchie

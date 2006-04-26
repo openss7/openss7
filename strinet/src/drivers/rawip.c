@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/24 09:25:09 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/26 10:47:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/24 09:25:09 $ by $Author: brian $
+ Last Modified $Date: 2006/04/26 10:47:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.11  2006/04/26 10:47:51  brian
+ - sync
+
  Revision 0.9.2.10  2006/04/24 09:25:09  brian
  - working up RAWIP and UDP drivers
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/24 09:25:09 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/26 10:47:51 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/24 09:25:09 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/26 10:47:51 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -159,7 +162,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/04/24 09:25:09 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/26 10:47:51 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -3459,13 +3462,13 @@ t_error_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error)
 	struct tpi *tpi = TPI_PRIV(q);
 	struct T_error_ack *p;
 	mblk_t *pp = mp;
-	int err;
+	t_scalar_t TLI_error;
 
 	/* rollback state */
 	tpi_set_state(tpi, tpi->i_oldstate);
 	tpi->i_oldstate = tpi_get_state(tpi);
 
-	err = error;
+	TLI_error = error;
 	switch (error) {
 	case -ENOBUFS:
 	case -ENOMEM:
@@ -3473,10 +3476,10 @@ t_error_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error)
 	case -EBUSY:
 		goto error;
 	case 0:
-		err = -EFAULT;
+		TLI_error = -EFAULT;
 		goto error;
 	}
-	err = -ENOBUFS;
+	TLI_error = -ENOBUFS;
 	if ((mp == NULL || mp->b_datap->db_ref > 1)
 	    && (mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL)
 		goto error;
@@ -3494,7 +3497,7 @@ t_error_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error)
 	qreply(q, mp);
 	return (mp == pp) ? (QR_ABSORBED) : (QR_DONE);
       error:
-	return (err);
+	return (TLI_error);
 }
 
 /**
@@ -3512,9 +3515,9 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
 	struct tpi *tpi = TPI_PRIV(q);
 	struct T_ok_ack *p;
 	mblk_t *pp = mp;
-	int err;
+	t_scalar_t TLI_error;
 
-	err = -ENOBUFS;
+	TLI_error = -ENOBUFS;
 	if ((mp == NULL || mp->b_datap->db_ref > 1)
 	    && (mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL)
 		goto error;
@@ -3526,20 +3529,20 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
 	p->CORRECT_prim = prim;
 	switch (tpi_get_state(tpi)) {
 	case TS_WACK_UREQ:
-		if ((err = t_tpi_unbind(tpi)))
+		if ((TLI_error = t_tpi_unbind(tpi)))
 			goto error;
 		/* TPI spec says that if the provider must flush both queues before responding with 
 		   a T_OK_ACK primitive when responding to a T_UNBIND_REQ. This is to flush queued
 		   data for connectionless providers. */
-		if ((err = m_flush(q, FLUSHRW, 0)))
+		if ((TLI_error = m_flush(q, FLUSHRW, 0)))
 			goto error;
 		tpi_set_state(tpi, TS_UNBND);
 		break;
 	case TS_WACK_CREQ:
-		if ((err = t_tpi_connect(tpi, &tpi->DEST_buffer, tpi->DEST_length)))
+		if ((TLI_error = t_tpi_connect(tpi, &tpi->DEST_buffer, tpi->DEST_length)))
 			goto error;
 		tpi_set_state(tpi, TS_WCON_CREQ);
-		if ((err =
+		if ((TLI_error =
 		     t_tpi_xmitmsg(q, dp, (struct sockaddr_in *) &tpi->DEST_buffer,
 				   &tpi->options))) {
 			t_tpi_disconnect(tpi);
@@ -3547,11 +3550,11 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
 		}
 		break;
 	case TS_WACK_CRES:
-		if ((err = t_tpi_connect(ap, &ap->DEST_buffer, ap->DEST_length)))
+		if ((TLI_error = t_tpi_connect(ap, &ap->DEST_buffer, ap->DEST_length)))
 			goto error;
 		ap->i_oldstate = tpi_get_state(ap);
 		tpi_set_state(ap, TS_DATA_XFER);
-		if ((err =
+		if ((TLI_error =
 		     t_tpi_xmitmsg(q, dp, (struct sockaddr_in *) &ap->DEST_buffer, &ap->options))) {
 			t_tpi_disconnect(ap);
 			tpi_set_state(ap, ap->i_oldstate);
@@ -3595,7 +3598,7 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
       error:
 	if (mp != pp)
 		freemsg(mp);
-	return t_error_ack(q, prim, pp, err);
+	return t_error_ack(q, prim, pp, TLI_error);
 }
 
 /**
@@ -4105,54 +4108,54 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	t_uscalar_t ADDR_length;
 	int type;
 	const struct T_bind_req *p;
-	struct sockaddr *ADDR_buffer = (struct sockaddr *) &tpi->SRC_buffer;
-	struct sockaddr_in *add_in;
-	int err;
+	struct sockaddr_in ADDR_buffer[8] = { {AF_INET,}, };
+	size_t anum = 0;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->PRIM_type != T_BIND_REQ))
 		goto error;
-	err = TOUTSTATE;
+	TLI_error = TOUTSTATE;
 	if (unlikely(tpi_get_state(tpi) != TS_UNBND))
 		goto error;
 	tpi_set_state(tpi, TS_WACK_BREQ);
-	err = TBADADDR;
+	TLI_error = TBADADDR;
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length))
 		goto error;
 	if ((ADDR_length = p->ADDR_length) == 0) {
-		bzero(ADDR_buffer, sizeof(ADDR_buffer));
-		ADDR_length = sizeof(struct sockaddr_in);
-		ADDR_buffer->sa_family = AF_INET;
+		bzero(ADDR_buffer, sizeof(ADDR_buffer[0]));
+		ADDR_length = sizeof(ADDR_buffer[0]);
+		anum = 1;
 	} else {
-		err = TBADADDR;
-		if (unlikely(ADDR_length / sizeof(struct sockaddr_in) < 1))
+		TLI_error = TBADADDR;
+		if (unlikely((anum = ADDR_length / sizeof(ADDR_buffer[0])) < 1 || anum > 8))
 			goto error;
-		if (unlikely(ADDR_length % sizeof(struct sockaddr_in) != 0))
+		if (unlikely(ADDR_length % sizeof(ADDR_buffer[0]) != 0))
 			goto error;
-		if (unlikely(ADDR_buffer->sa_family != AF_INET && ADDR_buffer->sa_family != 0))
+		bcopy(mp->b_rptr + p->ADDR_offset, ADDR_buffer, ADDR_length);
+		if (unlikely(ADDR_buffer[0].sin_family != AF_INET
+			     && ADDR_buffer[0].sin_family != 0))
 			goto error;
-		ADDR_buffer = (typeof(ADDR_buffer)) (mp->b_rptr + p->ADDR_offset);
 	}
-	add_in = (typeof(add_in)) ADDR_buffer;
-	type = inet_addr_type(add_in->sin_addr.s_addr);
-	err = TNOADDR;
-	if (sysctl_ip_nonlocal_bind == 0 && add_in->sin_addr.s_addr != INADDR_ANY
+	type = inet_addr_type(ADDR_buffer[0].sin_addr.s_addr);
+	TLI_error = TNOADDR;
+	if (sysctl_ip_nonlocal_bind == 0 && ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY
 	    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
 		goto error;
-	tpi->proto = ntohs(add_in->sin_port);
+	tpi->proto = ntohs(ADDR_buffer[0].sin_port);
 	/* check for bind to privileged protocol */
-	err = TACCES;
+	TLI_error = TACCES;
 	if (tpi->proto && tpi->proto < 255 && !capable(CAP_NET_BIND_SERVICE))
 		goto error;
-	if ((err = t_tpi_bind(tpi, (struct sockaddr_storage *) ADDR_buffer, ADDR_length)))
+	if ((TLI_error = t_tpi_bind(tpi, (struct sockaddr_storage *) ADDR_buffer, ADDR_length)))
 		goto error;
 	return t_bind_ack(q, &tpi->SRC_buffer, tpi->SRC_length, p->CONIND_number);
       error:
-	return t_error_ack(q, T_BIND_REQ, mp, err);
+	return t_error_ack(q, T_BIND_REQ, mp, TLI_error);
 }
 
 /**
@@ -4164,15 +4167,15 @@ STATIC int
 t_unbind_req(queue_t *q, mblk_t *mp)
 {
 	struct tpi *tpi = TPI_PRIV(q);
-	int err;
+	t_scalar_t TLI_error;
 
-	err = TOUTSTATE;
+	TLI_error = TOUTSTATE;
 	if (unlikely(tpi_get_state(tpi) != TS_IDLE))
 		goto error;
 	tpi_set_state(tpi, TS_WACK_UREQ);
-	err = 0;
+	TLI_error = 0;
       error:
-	return t_reply_ack(q, T_UNBIND_REQ, mp, err, NULL, NULL, NULL);
+	return t_reply_ack(q, T_UNBIND_REQ, mp, TLI_error, NULL, NULL, NULL);
 }
 
 /**
@@ -4185,37 +4188,37 @@ t_conn_req(queue_t *q, mblk_t *mp)
 {
 	struct tpi *tpi = TPI_PRIV(q);
 	union T_primitives *p;
-	int err;
+	t_scalar_t TLI_error;
 	size_t mlen;
 	mblk_t *dp, *rp = NULL;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->conn_req)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->conn_req.PRIM_type != T_CONN_REQ))
 		goto error;
-	err = TNOTSUPPORT;
+	TLI_error = TNOTSUPPORT;
 	if (unlikely(tpi->info.SERV_type == T_CLTS && tpi->info.CURRENT_state != TS_UNBND))
 		goto error;
-	err = TOUTSTATE;
+	TLI_error = TOUTSTATE;
 	if (unlikely(!(tpi_get_statef(tpi) & (TSF_IDLE | TSF_UNBND))))
 		goto error;
-	err = TNOADDR;
+	TLI_error = TNOADDR;
 	if (unlikely(p->conn_req.DEST_length == 0))
 		goto error;
-	err = TBADADDR;
+	TLI_error = TBADADDR;
 	if (unlikely(p->conn_req.DEST_length < tpi->info.ADDR_size))
 		goto error;
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->conn_req.DEST_offset + p->conn_req.DEST_length))
 		goto error;
-	err = TBADOPT;
+	TLI_error = TBADOPT;
 	if (unlikely(p->conn_req.OPT_length > tpi->info.OPT_size))
 		goto error;
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->conn_req.OPT_offset + p->conn_req.OPT_length))
 		goto error;
-	err = TBADDATA;
+	TLI_error = TBADDATA;
 	if (unlikely((dp = mp->b_cont) != NULL))
 		if (unlikely((mlen = msgsize(dp)) == 0 || mlen > tpi->info.CDATA_size))
 			goto error;
@@ -4223,7 +4226,7 @@ t_conn_req(queue_t *q, mblk_t *mp)
 		struct sockaddr_in *sin = (struct sockaddr_in *) &tpi->DEST_buffer;
 
 		bcopy(mp->b_rptr + p->conn_req.DEST_offset, sin, sizeof(*sin));
-		err = TBADADDR;
+		TLI_error = TBADADDR;
 		if (unlikely(sin->sin_family != AF_INET))
 			goto error;
 		if (unlikely(sin->sin_port == 0))
@@ -4236,11 +4239,11 @@ t_conn_req(queue_t *q, mblk_t *mp)
 		unsigned char *ip = mp->b_wptr + p->conn_res.OPT_offset;
 		size_t ilen = p->conn_res.OPT_length;
 
-		if ((err = t_opts_parse(ip, ilen, &opts)))
+		if ((TLI_error = t_opts_parse(ip, ilen, &opts)))
 			goto error;
 		tpi->options = opts;
 	}
-	err = -ENOBUFS;
+	TLI_error = -ENOBUFS;
 	if (unlikely((rp = ss7_allocb(q, sizeof(p->ok_ack), BPRI_MED)) == NULL))
 		goto error;
 	tpi->info.SERV_type = T_COTS;
@@ -4251,12 +4254,12 @@ t_conn_req(queue_t *q, mblk_t *mp)
 		sin->sin_family = 0;
 		sin->sin_port = 0;
 		sin->sin_addr.s_addr = 0;
-		if ((err = t_tpi_bind(tpi, &tpi->ADDR_buffer, tpi->ADDR_length)))
+		if ((TLI_error = t_tpi_bind(tpi, &tpi->ADDR_buffer, tpi->ADDR_length)))
 			goto error;
 		tpi_set_state(tpi, TS_IDLE);
 	}
 	tpi_set_state(tpi, TS_WACK_CREQ);
-	if ((err = t_ok_ack(q, T_CONN_REQ, rp, NULL, dp, NULL)) != QR_ABSORBED)
+	if ((TLI_error = t_ok_ack(q, T_CONN_REQ, rp, NULL, dp, NULL)) != QR_ABSORBED)
 		goto error;
 	p->conn_con.PRIM_type = T_CONN_CON;
 	/* all of the other fields and contents are the same */
@@ -4266,7 +4269,7 @@ t_conn_req(queue_t *q, mblk_t *mp)
       error:
 	if (rp != NULL)
 		freeb(rp);
-	return t_error_ack(q, T_CONN_REQ, mp, err);
+	return t_error_ack(q, T_CONN_REQ, mp, TLI_error);
 }
 
 STATIC INLINE fastcall mblk_t *
@@ -4304,64 +4307,64 @@ t_conn_res(queue_t *q, mblk_t *mp)
 	struct T_conn_res *p;
 	mblk_t *dp, *cp;
 	size_t mlen;
-	int err;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->PRIM_type != T_CONN_RES))
 		goto error;
-	err = TNOTSUPPORT;
+	TLI_error = TNOTSUPPORT;
 	if (unlikely(tpi->info.SERV_type == T_CLTS))
 		goto error;
-	err = TOUTSTATE;
+	TLI_error = TOUTSTATE;
 	if (unlikely(tpi_get_state(tpi) != TS_WRES_CIND))
 		goto error;
-	err = TBADOPT;
+	TLI_error = TBADOPT;
 	if (unlikely(p->OPT_length > tpi->info.OPT_size))
 		goto error;
-	err = TBADOPT;
+	TLI_error = TBADOPT;
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
 		goto error;
-	err = TBADDATA;
+	TLI_error = TBADDATA;
 	if ((dp = mp->b_cont))
 		if (unlikely((mlen = msgsize(dp)) > tpi->info.CDATA_size))
 			goto error;
-	err = TBADSEQ;
+	TLI_error = TBADSEQ;
 	if (unlikely((cp = t_seq_check(tpi, p->SEQ_number)) == NULL))
 		goto error;
 	if (p->ACCEPTOR_id == 0) {
 		ap = tpi;
-		err = TBADF;
+		TLI_error = TBADF;
 		if (bufq_length(&tpi->conq) > 1)
 			goto error;
 	} else {
 		struct sockaddr_in *sin, *ain;
 
-		err = TBADF;
+		TLI_error = TBADF;
 		if (unlikely((ap = t_tok_check(p->ACCEPTOR_id)) == NULL))
 			goto error;
-		err = TPROVMISMATCH;
+		TLI_error = TPROVMISMATCH;
 		if (unlikely(ap->info.SERV_type == T_CLTS))
 			goto error;
-		err = TRESQLEN;
+		TLI_error = TRESQLEN;
 		if (unlikely(ap->CONIND_number > 0))
 			goto error;
-		err = TOUTSTATE;
+		TLI_error = TOUTSTATE;
 		if (tpi_get_statef(ap) != TS_IDLE)
 			goto error;
 		sin = (struct sockaddr_in *) &tpi->SRC_buffer;
 		ain = (struct sockaddr_in *) &ap->SRC_buffer;
-		err = TRESADDR;
+		TLI_error = TRESADDR;
 		if (sin->sin_port != ain->sin_port || sin->sin_addr.s_addr != ain->sin_addr.s_addr)
 			goto error;
 	}
 	if (likely(p->OPT_length != 0)) {
 		struct tpi_options opts = ap->options;
 
-		if ((err = t_opts_parse(mp->b_rptr + p->OPT_offset, p->OPT_length, &opts)))
+		if ((TLI_error = t_opts_parse(mp->b_rptr + p->OPT_offset, p->OPT_length, &opts)))
 			goto error;
 		/* TPI options processing rules allows us to set some (or all) of the options on
 		   the Stream even if the primitive is about to fail. */
@@ -4375,7 +4378,7 @@ t_conn_res(queue_t *q, mblk_t *mp)
 	tpi_set_state(tpi, TS_WACK_CRES);
 	return t_ok_ack(q, T_CONN_RES, mp, cp, dp, ap);
       error:
-	return t_error_ack(q, T_CONN_RES, mp, err);
+	return t_error_ack(q, T_CONN_RES, mp, TLI_error);
 }
 
 /**
@@ -4391,23 +4394,23 @@ t_discon_req(queue_t *q, mblk_t *mp)
 	t_uscalar_t state;
 	mblk_t *dp, *cp = NULL;
 	size_t mlen;
-	int err;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->discon_req)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->discon_req.PRIM_type != T_DISCON_REQ))
 		goto error;
-	err = TNOTSUPPORT;
+	TLI_error = TNOTSUPPORT;
 	if (unlikely(tpi->info.SERV_type == T_CLTS))
 		goto error;
 	state = tpi_get_state(tpi);
-	err = TOUTSTATE;
+	TLI_error = TOUTSTATE;
 	if (unlikely((1 << state) & ~(TSM_CONNECTED)))
 		goto error;
-	err = TBADDATA;
+	TLI_error = TBADDATA;
 	if (unlikely((dp = mp->b_cont) != NULL))
 		if (unlikely((mlen = msgsize(dp)) == 0 || mlen > tpi->info.DDATA_size))
 			goto error;
@@ -4416,7 +4419,7 @@ t_discon_req(queue_t *q, mblk_t *mp)
 		tpi_set_state(tpi, TS_WACK_DREQ6);
 		break;
 	case TS_WRES_CIND:
-		err = TBADSEQ;
+		TLI_error = TBADSEQ;
 		if (unlikely((cp = t_seq_check(tpi, p->discon_req.SEQ_number)) == NULL))
 			goto error;
 		tpi_set_state(tpi, TS_WACK_DREQ7);
@@ -4433,7 +4436,7 @@ t_discon_req(queue_t *q, mblk_t *mp)
 	}
 	return t_ok_ack(q, T_DISCON_REQ, mp, cp, dp, NULL);
       error:
-	return t_error_ack(q, T_DISCON_REQ, mp, err);
+	return t_error_ack(q, T_DISCON_REQ, mp, TLI_error);
 }
 
 /**
@@ -4450,51 +4453,51 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 	struct tpi_options opts;
 	size_t mlen;
 	mblk_t *dp;
-	int err;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->PRIM_type != T_UNITDATA_REQ))
 		goto error;
-	err = TNOTSUPPORT;
+	TLI_error = TNOTSUPPORT;
 	if (unlikely(tpi->info.SERV_type != T_CLTS))
 		goto error;
-	err = TOUTSTATE;
+	TLI_error = TOUTSTATE;
 	if (unlikely(tpi_get_state(tpi) != TS_IDLE))
 		goto error;
-	err = TBADDATA;
+	TLI_error = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
 	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > tpi->info.TSDU_size))
 		goto error;
-	err = TNOADDR;
+	TLI_error = TNOADDR;
 	if (unlikely(p->DEST_length == 0))
 		goto error;
-	err = TBADADDR;
+	TLI_error = TBADADDR;
 	if (unlikely((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)))
 		goto error;
 	if (unlikely(p->DEST_length != sizeof(struct sockaddr_in)))
 		goto error;
 	bcopy(mp->b_rptr + p->DEST_length, &sin, sizeof(sin));
-	err = TBADOPT;
+	TLI_error = TBADOPT;
 	if (unlikely(p->OPT_length > tpi->info.OPT_size))
 		goto error;
-	err = TBADOPT;
+	TLI_error = TBADOPT;
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
 		goto error;
 	opts = tpi->options;
 	if (unlikely(p->OPT_length != 0))
-		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
+		if ((TLI_error = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
 			goto error;
-	if ((err = t_tpi_xmitmsg(q, dp, &sin, &opts)))
+	if ((TLI_error = t_tpi_xmitmsg(q, dp, &sin, &opts)))
 		goto error;
 	return (QR_DONE);
       error:
 	/* FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
-	return m_error(q, err, mp);
+	return m_error(q, TLI_error, mp);
 }
 
 /**
@@ -4511,48 +4514,48 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 	struct tpi_options opts;
 	size_t mlen;
 	mblk_t *dp;
-	int err;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->PRIM_type != T_OPTDATA_REQ))
 		goto error;
-	err = TNOTSUPPORT;
+	TLI_error = TNOTSUPPORT;
 	if (unlikely(tpi->info.SERV_type == T_CLTS))
 		goto error;
 	if (unlikely(tpi_get_state(tpi) == TS_IDLE))
 		goto discard;
-	err = TOUTSTATE;
+	TLI_error = TOUTSTATE;
 	if (unlikely(tpi_get_statef(tpi) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
-	err = TBADFLAG;
+	TLI_error = TBADFLAG;
 	if (unlikely(p->DATA_flag != 0))
 		goto error;
-	err = TBADOPT;
+	TLI_error = TBADOPT;
 	if (unlikely(p->OPT_length > tpi->info.OPT_size))
 		goto error;
-	err = TBADOPT;
+	TLI_error = TBADOPT;
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
 		goto error;
-	err = TBADDATA;
+	TLI_error = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
 	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > tpi->info.TSDU_size))
 		goto error;
 	opts = tpi->options;
 	if (unlikely(p->OPT_length != 0))
-		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
+		if ((TLI_error = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
 			goto error;
 	sin = (typeof(sin)) & tpi->DEST_buffer;
-	if ((err = t_tpi_xmitmsg(q, dp, sin, &opts)))
+	if ((TLI_error = t_tpi_xmitmsg(q, dp, sin, &opts)))
 		goto error;
       discard:
 	return (QR_DONE);
       error:
-	return m_error(q, err, mp);
+	return m_error(q, TLI_error, mp);
 }
 
 /**
@@ -4569,41 +4572,41 @@ t_data_req(queue_t *q, mblk_t *mp)
 	struct tpi_options *opts;
 	size_t mlen;
 	mblk_t *dp;
-	int err;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->PRIM_type != T_DATA_REQ))
 		goto error;
-	err = TNOTSUPPORT;
+	TLI_error = TNOTSUPPORT;
 	if (unlikely(tpi->info.SERV_type == T_CLTS))
 		goto error;
 	if (unlikely(tpi->info.TSDU_size == T_INVALID))
 		goto error;
-	err = QR_DONE;
+	TLI_error = QR_DONE;
 	if (unlikely(tpi_get_state(tpi) == TS_IDLE))
 		goto error;
-	err = TOUTSTATE;
+	TLI_error = TOUTSTATE;
 	if (unlikely(tpi_get_statef(tpi) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
-	err = TBADFLAG;
+	TLI_error = TBADFLAG;
 	if (unlikely(p->MORE_flag != 0))
 		goto error;
-	err = TBADDATA;
+	TLI_error = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
 	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > tpi->info.TSDU_size))
 		goto error;
 	opts = &tpi->options;
 	sin = (typeof(sin)) & tpi->DEST_buffer;
-	if ((err = t_tpi_xmitmsg(q, dp, sin, opts)))
+	if ((TLI_error = t_tpi_xmitmsg(q, dp, sin, opts)))
 		goto error;
 	return (QR_DONE);
       error:
-	return m_error(q, err, mp);
+	return m_error(q, TLI_error, mp);
 }
 
 /**
@@ -4621,41 +4624,41 @@ t_exdata_req(queue_t *q, mblk_t *mp)
 	size_t mlen;
 	mblk_t *dp;
 	int statef;
-	int err;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->PRIM_type != T_EXDATA_REQ))
 		goto error;
-	err = TNOTSUPPORT;
+	TLI_error = TNOTSUPPORT;
 	if (unlikely(tpi->info.SERV_type == T_CLTS))
 		goto error;
 	if (unlikely(tpi->info.ETSDU_size == T_INVALID))
 		goto error;
-	err = QR_DONE;
+	TLI_error = QR_DONE;
 	if (unlikely((statef = tpi_get_statef(tpi)) & TSF_IDLE))
 		goto error;
-	err = TOUTSTATE;
+	TLI_error = TOUTSTATE;
 	if (unlikely(statef & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
-	err = TBADFLAG;
+	TLI_error = TBADFLAG;
 	if (unlikely(p->MORE_flag != 0))
 		goto error;
-	err = TBADDATA;
+	TLI_error = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
 	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > tpi->info.ETSDU_size))
 		goto error;
 	opts = &tpi->options;
 	sin = (typeof(sin)) & tpi->DEST_buffer;
-	if ((err = t_tpi_xmitmsg(q, dp, sin, opts)))
+	if ((TLI_error = t_tpi_xmitmsg(q, dp, sin, opts)))
 		goto error;
 	return (QR_DONE);
       error:
-	return m_error(q, err, mp);
+	return m_error(q, TLI_error, mp);
 
 }
 
@@ -4683,26 +4686,27 @@ STATIC int
 t_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct tpi *tpi = TPI_PRIV(q);
-	int err, opt_len;
+	int opt_len;
 	const struct T_optmgmt_req *p;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->PRIM_type != T_OPTMGMT_REQ))
 		goto error;
 #ifdef TS_WACK_OPTREQ
 	if (tpi_get_state(tpi) == TS_IDLE)
 		tpi_set_state(tpi, TS_WACK_OPTREQ);
 #endif
-	err = TBADOPT;
+	TLI_error = TBADOPT;
 	if (unlikely(p->OPT_length > tpi->info.OPT_size))
 		goto error;
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
 		goto error;
-	err = TBADFLAG;
+	TLI_error = TBADFLAG;
 	switch (p->MGMT_flags) {
 	case T_DEFAULT:
 		opt_len = t_size_default_options(tpi, mp->b_rptr + p->OPT_offset, p->OPT_length);
@@ -4720,25 +4724,26 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 		goto error;
 	}
 	if (unlikely(opt_len < 0)) {
-		switch (-(err = opt_len)) {
+		switch (-(TLI_error = opt_len)) {
 		case EINVAL:
-			err = TBADOPT;
+			TLI_error = TBADOPT;
 			goto error;
 		case EACCES:
-			err = TACCES;
+			TLI_error = TACCES;
 			goto error;
 		default:
 			goto error;
 		}
 	}
-	err = t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len);
-	if (unlikely(err < 0)) {
-		switch (-err) {
+	TLI_error =
+	    t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len);
+	if (unlikely(TLI_error < 0)) {
+		switch (-TLI_error) {
 		case EINVAL:
-			err = TBADOPT;
+			TLI_error = TBADOPT;
 			goto error;
 		case EACCES:
-			err = TACCES;
+			TLI_error = TACCES;
 			goto error;
 		case ENOBUFS:
 		case ENOMEM:
@@ -4747,9 +4752,9 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 			goto error;
 		}
 	}
-	return (err);
+	return (TLI_error);
       error:
-	return t_error_ack(q, T_OPTMGMT_REQ, mp, err);
+	return t_error_ack(q, T_OPTMGMT_REQ, mp, TLI_error);
 }
 
 #ifdef T_ADDR_REQ
@@ -4763,20 +4768,20 @@ t_addr_req(queue_t *q, mblk_t *mp)
 {
 	struct tpi *tpi = TPI_PRIV(q);
 	struct T_addr_req *p;
-	int err;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->PRIM_type != T_ADDR_REQ))
 		goto error;
 	{
 		struct sockaddr_storage *LOCADDR_buffer, *REMADDR_buffer;
 		socklen_t LOCADDR_length, REMADDR_length;
 
-		err = TOUTSTATE;
+		TLI_error = TOUTSTATE;
 		switch (tpi_get_state(tpi)) {
 		case TS_UNBND:
 			LOCADDR_buffer = NULL;
@@ -4807,7 +4812,7 @@ t_addr_req(queue_t *q, mblk_t *mp)
 				  REMADDR_length);
 	}
       error:
-	return t_error_ack(q, T_ADDR_REQ, mp, err);
+	return t_error_ack(q, T_ADDR_REQ, mp, TLI_error);
 }
 #endif				/* T_ADDR_REQ */
 
@@ -4821,18 +4826,18 @@ STATIC int
 t_capability_req(queue_t *q, mblk_t *mp)
 {
 	struct T_capability_req *p;
-	int err;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
-	err = -EFAULT;
+	TLI_error = -EFAULT;
 	if (unlikely(p->PRIM_type != T_CAPABILITY_REQ))
 		goto error;
 	return t_capability_ack(q, p->CAP_bits1, mp->b_datap->db_type);
       error:
-	return t_error_ack(q, T_CAPABILITY_REQ, mp, err);
+	return t_error_ack(q, T_CAPABILITY_REQ, mp, TLI_error);
 }
 #endif				/* T_CAPABILITY_REQ */
 
@@ -4845,15 +4850,15 @@ STATIC int
 t_other_req(queue_t *q, mblk_t *mp)
 {
 	t_scalar_t prim = -1;
-	int err;
+	t_scalar_t TLI_error;
 
-	err = -EINVAL;
+	TLI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(prim)))
 		goto error;
 	prim = *((t_scalar_t *) mp->b_rptr);
-	err = TNOTSUPPORT;
+	TLI_error = TNOTSUPPORT;
       error:
-	return t_error_ack(q, prim, mp, err);
+	return t_error_ack(q, prim, mp, TLI_error);
 }
 
 /*
@@ -5685,7 +5690,7 @@ tpiterminate(void)
 				tpi_majors[mindex] = 0;
 		}
 	}
-	(void) tpi_term_nproto; /* removed on demand */
+	(void) tpi_term_nproto;	/* removed on demand */
 	tpi_term_protos();
 	tpi_term_caches();
 	tpi_term_hashes();
@@ -5700,7 +5705,7 @@ tpiinit(void)
 	tpi_init_hashes();
 	tpi_init_caches();
 	tpi_init_protos();
-	(void) tpi_init_nproto; /* added on demand */
+	(void) tpi_init_nproto;	/* added on demand */
 	for (mindex = 0; mindex < CMAJORS; mindex++) {
 		if ((err = tpi_register_strdev(tpi_majors[mindex])) < 0) {
 			if (mindex) {

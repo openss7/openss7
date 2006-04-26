@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sctp.7.man,v 0.9.2.7 2006/04/25 08:54:21 brian Exp $
+.\" @(#) $Id: sctp.7.man,v 0.9.2.8 2006/04/26 10:44:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/25 08:54:21 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/26 10:44:52 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sctp.7.man,v $
+.\" Revision 0.9.2.8  2006/04/26 10:44:52  brian
+.\" - updated manual pages and references
+.\"
 .\" Revision 0.9.2.7  2006/04/25 08:54:21  brian
 .\" - updated references and manual pages
 .\"
@@ -443,7 +446,10 @@ Silly Window Syndrome (SWS) avoidance per RFC 1122
 rfc1122
 .]
 Section 4.2.3.2 and 4.2.3.3 as recommended
-in the SCTP Implementor's Guide.
+in the SCTP Specification Errata and Issues.
+.[
+rfc4460
+.]
 .TP 3
 \(bu
 Nagle algorithm per RFC 896
@@ -488,12 +494,12 @@ Deferral of checksum calculation until after socket lookup for protection from s
 checksum DoS attacks.
 .TP 3
 \(bu
-Support for the changes and modifications in the SCTP Implementers Guide
-<draft-ietf-tsvwg-sctpimpguide-10.txt>.
+Support for the changes and modifications in the SCTP Specification Errata and
+Issues
 .[
-sctpimpguide-10
+rfc4460
 .]
- (See \fB\)CAVEATS\fR.).
+(See \fB\)CAVEATS\fR.).
 .\" ------------------------------------------------------------------------
 .\" ------------------------------------------------------------------------
 .PP
@@ -781,14 +787,15 @@ default for new sockets.  The value for a given socket can be changed with the s
 .TP
 .B sctp_max_burst
 Defines the default maximum number of MTUs of new data chunks that will be sent in a burst in
-accordance with <draft-ietf-tsvwg-sctpimpguide-10.txt>.
+accordance with
+SCTP Specification Errata and Issues.
 .[
-sctpimpguide-10
+rfc4460
 .]
 Valid values are one (1) or greater (\fCMAXINT\fR).  The default value is the value recommended in
-<draft-ietf-tsvwg-sctpimpguide-10.txt>
+the SCTP Specification Errata and Issues
 .[
-sctpimpguide-10
+rfc4460
 .]
 (4 MTUs).  This system control defines the default for new sockets.  The value for a given socket
 can be changed with the socket option \fI\fCSCTP_MAX_BURST\fR as described under \fBSOCKET
@@ -1452,9 +1459,9 @@ socket.
 .TP
 .B SCTP_MAX_BURST
 Set or get the number of MTUs of data that will be sent in a single burst as defined by
-<draft-ietf-tsvwg-sctpimpguide-10.txt>.
+the SCTP Specification Errata and Issues.
 .[
-sctpimpguide-10
+rfc4460
 .]
 Valid values are one (1) or greater.  The default value
 is set by the system control \fBsctp_max_burst\fR.  This socket option may be changed at any
@@ -1886,17 +1893,19 @@ multiple records being assigned interleaving TSNs.  Portable programs should ref
 record fragments to more than one stream at a time.
 .PP
 \fBSCTP\fR ignores the source address list in INIT and INIT-ACK chunks when searching for
-Transmission Control Blocks in opposition to <draft-ietf-tsvwg-sctpimpguide-10.txt>
+Transmission Control Blocks in opposition to the SCTP Specification Errata and
+Issues
 .[
-sctpimpguide-10
+rfc4460
 .]
 section 2.18.  This is because the procedure described there introduces severe vulnerability to DoS
 and Spoofing attacks.  \fBSCTP\fR does not have this vulnerability.
 .PP
 \fBSCTP\fR ignores the source address list in INIT chunks when searching for Transmission
-Control Block matches in opposition to <draft-ietf-tsvwg-sctpimpguide-10.txt>
+Control Block matches in opposition to the SCTP Specification Errata and
+Issues
 .[
-sctpimpguide-10
+rfc4460
 .]
 section 2.6.  This is because the procedure described there introduces severe vulnerability to DoS
 attacks by revealing detailed information about existing associations.  \fBSCTP\fR does not have
@@ -2091,7 +2100,7 @@ rfc4166
 rfc4168
 .]
 .[
-sctpimpguide-10
+rfc4460
 .]
 .[
 sctpsocket-07
@@ -2111,7 +2120,7 @@ rfc3758
 .\".br
 .\"RFC 3168 for Explicit Congestion Notification
 .\".br
-.\"draft-ietf-sigtran-sctp-mib-10.txt for the SCTP MIB.
+.\"RFC 3873 for the SCTP MIB.
 .\".br
 .\"draft-ietf-tsvwg-sctpimpguide-10.txt for the SCTP Implementer's Guide modifications to RFC 2960.
 .\".br

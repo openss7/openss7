@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: OpenSS7.4.man,v 0.9.2.8 2006/04/05 09:43:02 brian Exp $
+.\" @(#) $Id: OpenSS7.4.man,v 0.9.2.9 2006/04/26 10:45:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:02 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/26 10:45:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: OpenSS7.4.man,v $
+.\" Revision 0.9.2.9  2006/04/26 10:45:00  brian
+.\" - updated manual pages and references
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:43:02  brian
 .\" - moved .so line and updated headers
 .\"
@@ -217,13 +220,13 @@ lbl.
 socksys\fR(4):Socket System
 sctp\fR(4):Stream Control Transmission Protocol (SCTP)
 .[
-RFC 2960
+rfc2960
 .]
 .[
-RFC 3309
+rfc3309
 .]
 .[
-draft-ietf-tsvwg-prsctp-00.txt
+rfc3758
 .]
 .[
 draft-stewart-tsvwg-addip-07.txt
@@ -242,10 +245,10 @@ Note that
 also provides a Linux NET4 native kernel socket implementation of Stream
 Control Transmission Protocol (SCTP).
 .[
-RFC 2960
+rfc2960
 .]
 .[
-RFC 3309
+rfc3309
 .]
 See
 .BR sctp (7)

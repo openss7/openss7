@@ -385,8 +385,12 @@ Deferral of checksum calculation until after socket lookup for protection from s
 checksum DoS attacks.
 .TP 3
 \(bu
-Support for the changes and modifications in the SCTP Implementers Guide
-(draft-ietf-tsvwg-sctpimpguide-10.txt).  (See \fB\)CAVEATS\fR.).
+Support for the changes and modifications in the SCTP Specification Errata and Issues
+(RFC 4460).
+.[
+rfc4460
+.]
+(See \fB\)CAVEATS\fR.).
 .PP
 \fBSCTP\fR provides the following added features:
 .TP 3
@@ -617,11 +621,18 @@ default for new sockets.  The value for a given socket can be changed with the s
 .TP
 .B sctp_max_burst
 Defines the default maximum number of MTUs of new data chunks that will be sent in a burst in
-accordance with draft-ietf-tsvwg-sctpimpguide-10.txt.  Valid values are one (1) or greater
-(\fCINT_MAX\fR).  The default value is the value recommended in
-draft-ietf-tsvwg-sctpimpguide-10.txt (4 MTUs).  This system control defines the default for new
-sockets.  The value for a given socket can be changed with the socket option
-\fI\fCSCTP_MAX_BURST\fR as described under \fBSOCKET OPTIONS\fR.
+accordance with RFC 4460.
+.[
+rfc4460
+.]
+Valid values are one (1) or greater (\fCINT_MAX\fR).  The default value is the value recommended in
+RFC 4460
+.[
+rfc4460
+.]
+(4 MTUs).  This system control defines the default for new sockets.  The value for a given socket
+can be changed with the socket option \fI\fCSCTP_MAX_BURST\fR as described under \fBSOCKET
+OPTIONS\fR.
 .TP
 .B sctp_assoc_max_retrans
 Defines the number of times that the sending endpoint will attempt retransmitting a packet on
@@ -1221,9 +1232,12 @@ socket.
 .TP
 .B SCTP_MAX_BURST
 Set or get the number of MTUs of data that will be sent in a single burst as defined by
-draft-ietf-tsvwg-sctpimpguide-10.txt.  Valid values are one (1) or greater.  The default value
-is set by the system control \fBsctp_max_burst\fR.  This socket option may be changed at any
-time during the life of the socket.
+RFC 4460.
+.[
+rfc4460
+.]
+Valid values are one (1) or greater.  The default value is set by the system control
+\fBsctp_max_burst\fR.  This socket option may be changed at any time during the life of the socket.
 .TP
 .B SCTP_ASSOC_MAX_RETRANS
 Set or get the number of times that the sending endpoint will attempt retransmitting a packet
@@ -1523,10 +1537,13 @@ The number of ICMP errors that were dropped because the socket was locked.
 .B ListenOverflows
 The number of COOKIE-ECHO chunks dropped due to listen queue overflows.
 .PP
-\fBSCTP\fR provides for SNMP Protocol Information following the SCTP MIB
-<draft-ietf-sigtran-sctp-mib-10.txt>.  Protocol information is available in
-\fI\fC/proc/net/snmp\fR as well as with the \fI-s\fR flag to the \fBnetstat\fR(8) command.
-SCTP Protocol Statistics that are applicable to \fBSCTP\fR are as follows:
+\fBSCTP\fR provides for SNMP Protocol Information following the SCTP MIB.
+.[
+rfc3873
+.]
+Protocol information is available in \fI\fC/proc/net/snmp\fR as well as with the \fI-s\fR flag to
+the \fBnetstat\fR(8) command.  SCTP Protocol Statistics that are applicable to \fBSCTP\fR are as
+follows:
 .TP 18
 .B RtoAlgorithm
 The algorithm used to determine the timeout value (T3-rtx) used for retransmitting
@@ -1622,11 +1639,13 @@ The number of packets received for processing from the IP layer.
 The last time at which SCTP statistics suffered a discontinuity.
 .SS "Connection Information"
 .PP
-\fBSCTP\fR provides for SNMP Connection Information following the SCTP MIB
-<draft-ietf-sigtran-sctp-mib-10.txt>.  Connection information is available in
-\fI\fC/proc/net/sctp\fR but is not yet available with a \fI-sctp\fR flag to the
-\fBnetstat\fR(8) command.  (Extensions to the \fBnetstat\fR(8) command are required to access
-this information.)
+\fBSCTP\fR provides for SNMP Connection Information following the SCTP MIB.
+.[
+rfc3873
+.]
+Connection information is available in \fI\fC/proc/net/sctp\fR but is not yet available with a
+\fI-sctp\fR flag to the \fBnetstat\fR(8) command.  (Extensions to the \fBnetstat\fR(8) command are
+required to access this information.)
 .SS "Socket Usage Information"
 .PP
 \fBSCTP\fR provides for socket usage information available in \fI\fC/proc/net/sockstat\fR.
@@ -1640,15 +1659,21 @@ interleaving TSNs.  Portable programs should refrain from writing record fragmen
 than one stream at a time.
 .PP
 \fBSCTP\fR ignores the source address list in INIT and INIT-ACK chunks when searching for
-Transmission Control Blocks in opposition to <draft-ietf-tsvwg-sctpimpguide-10.txt> section
-2.18.  This is because the procedure described there introduces severe vulnerability to DoS
+Transmission Control Blocks in opposition to RFC 4460.
+.[
+rfc4460
+.]
+section 2.18.  This is because the procedure described there introduces severe vulnerability to DoS
 and Spoofing attacks.  \fBSCTP\fR does not have this vulnerability.
 .PP
 \fBSCTP\fR ignores the source address list in INIT chunks when searching for Transmission
-Control Block matches in opposition to <draft-ietf-tsvwg-sctpimpguide-10.txt> section 2.6.
-This is because the procedure described there introduces severe vulnerability to DoS attacks
-by revealing detailed information about existing associations.  \fBSCTP\fR does not have this
-vulnerability.
+Control Block matches in opposition to RFC 4460
+.[
+rfc4460
+.]
+section 2.6.  This is because the procedure described there introduces severe vulnerability to DoS
+attacks by revealing detailed information about existing associations.  \fBSCTP\fR does not have
+this vulnerability.
 .PP
 \fBSCTP\fR does not implement the UDP-like interface of <draft-ietf-tsvwg-sctpsocket-07.txt>.
 This is because the socket interface presented in that draft provides unorthodox interface to a
@@ -1787,9 +1812,9 @@ RFC 3309 for a description of the CRC-32c checksum algorithm.
 .br
 RFC 3168 for Explicit Congestion Notification
 .br
-draft-ietf-sigtran-sctp-mib-10.txt for the SCTP MIB.
+RFC 3873 for the SCTP MIB.
 .br
-draft-ietf-tsvwg-sctpimpguide-10.txt for the SCTP Implementer's Guide modifications to RFC 2960.
+RFC 4460 for the SCTP Specification Errata and Issues.
 .br
 draft-ietf-tsvwg-sctpsocket-07.txt for the description of a TCP-compatible SCTP API for sockets.
 .br

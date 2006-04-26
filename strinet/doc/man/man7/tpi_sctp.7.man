@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_sctp.7.man,v 0.9.2.4 2006/04/05 09:44:28 brian Exp $
+.\" @(#) $Id: tpi_sctp.7.man,v 0.9.2.5 2006/04/26 10:45:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:28 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/26 10:45:12 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_sctp.7.man,v $
+.\" Revision 0.9.2.5  2006/04/26 10:45:12  brian
+.\" - updated manual pages and references
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:44:28  brian
 .\" - moved .so line and updated headers
 .\"
@@ -104,7 +107,7 @@ rfc2960
 rfc3309
 .]
 .[
-sctpig
+rfc4460
 .]
 .BR sctp (7).
 This
@@ -766,16 +769,16 @@ rfc2960
 rfc3309
 .]
 .[
-sctp-mib
+rfc3873
 .]
 .[
-prsctp
+rfc3758
 .]
 .[
-addip
+addip-08
 .]
 .[
-sctpig
+rfc4460
 .]
 .[
 $LIST$

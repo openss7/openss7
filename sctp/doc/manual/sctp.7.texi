@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: sctp.7.texi,v 0.9.2.2 2006/03/29 11:59:26 brian Exp $
+@c @(#) $Id: sctp.7.texi,v 0.9.2.3 2006/04/26 10:44:54 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/29 11:59:26 $ by $Author: brian $
+@c Last Modified $Date: 2006/04/26 10:44:54 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -464,8 +464,8 @@ high-speed networks.
 @item Deferral of checksum calculation until after socket lookup for protection from software
 checksum DoS attacks.
 @item Support for the changes and modifications in the SCTP Implementers Guide
-@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
-<draft-ietf-tsvwg-sctpimpguide-10.txt>}.  (See @b{CAVEATS}.).
+@uref{http://www.ietf.org/rfc/rfc4460.txt,
+<rfc4460.txt>}.  (See @b{CAVEATS}.).
 @end itemize
 
 @emph{SCTP} provides the following added features:
@@ -687,11 +687,11 @@ default for new sockets.  The value for a given socket can be changed with the s
 
 @item sctp_max_burst
 Defines the default maximum number of MTUs of new data chunks that will be sent in a burst in
-accordance with @uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
-<draft-ietf-tsvwg-sctpimpguide-10.txt>}.  Valid values are one (1) or greater (@code{INT_MAX}).  The
+accordance with @uref{http://www.ietf.org/rfc/rfc4460.txt,
+<rfc4460.txt>}.  Valid values are one (1) or greater (@code{INT_MAX}).  The
 default value is the value recommended in
-@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
-<draft-ietf-tsvwg-sctpimpguide-10.txt>} (4 MTUs).  This system control defines the default for new
+@uref{http://www.ietf.org/rfc/rfc4460.txt,
+<rfc4460.txt>} (4 MTUs).  This system control defines the default for new
 sockets.  The value for a given socket can be changed with the socket option @samp{SCTP_MAX_BURST}
 as described under @b{SOCKET OPTIONS}.
 
@@ -1293,8 +1293,8 @@ socket.
 
 @item SCTP_MAX_BURST
 Set or get the number of MTUs of data that will be sent in a single burst as defined by
-@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
-<draft-ietf-tsvwg-sctpimpguide-10.txt>}.  Valid values are one (1) or greater.  The default value is
+@uref{http://www.ietf.org/rfc/rfc4460.txt,
+<rfc4460.txt>}.  Valid values are one (1) or greater.  The default value is
 set by the system control @b{sctp_max_burst}.  This socket option may be changed at any time during
 the life of the socket.
 
@@ -1611,8 +1611,8 @@ The number of COOKIE-ECHO chunks dropped due to listen queue overflows.
 @end table
 
 @emph{SCTP} provides for SNMP Protocol Information following the SCTP MIB
-@uref{http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sctp-mib-10.txt,
-<draft-ietf-sigtran-sctp-mib-10.txt>}.  Protocol information is available in @samp{/proc/net/snmp}
+@uref{http://www.ietf.org/rfc/rfc3873.txt,
+<rfc3873.txt>}.  Protocol information is available in @samp{/proc/net/snmp}
 as well as with the @i{-s} flag to the @manref{netstat(8)} command.  SCTP Protocol Statistics that
 are applicable to @emph{SCTP} are as follows:
 
@@ -1712,8 +1712,8 @@ The last time at which SCTP statistics suffered a discontinuity.
 @unnumberedsubsec Connection Information
 
 @emph{SCTP} provides for SNMP Connection Information following the SCTP MIB
-@uref{http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sctp-mib-10.txt,
-<draft-ietf-sigtran-sctp-mib-10.txt>}.  Connection information is available in @samp{/proc/net/sctp}
+@uref{http://www.ietf.org/rfc/rfc3873.txt,
+<rfc3873.txt>}.  Connection information is available in @samp{/proc/net/sctp}
 but is not yet available with a @i{-sctp} flag to the @manref{netstat(8)} command.  (Extensions to
 the @manref{netstat(8)} command are required to access this information.)
 
@@ -1734,15 +1734,15 @@ should refrain from writing record fragments to more than one stream at a time.
 
 @emph{SCTP} ignores the source address list in INIT and INIT-ACK chunks when searching for
 Transmission Control Blocks in opposition to
-@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
-<draft-ietf-tsvwg-sctpimpguide-10.txt>} section 2.18.  This is because the procedure described there
+@uref{http://www.ietf.org/rfc/rfc4470.txt,
+<rfc4460.txt>} section 2.18.  This is because the procedure described there
 introduces severe vulnerability to DoS and Spoofing attacks.  @emph{SCTP} does not have this
 vulnerability.
 
 @emph{SCTP} ignores the source address list in INIT chunks when searching for Transmission Control
 Block matches in opposition to
-@uref{http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt,
-<draft-ietf-tsvwg-sctpimpguide-10.txt>} section 2.6.  This is because the procedure described there
+@uref{http://www.ietf.org/rfc/rfc4460.txt,
+<rfc4460.txt>} section 2.6.  This is because the procedure described there
 introduces severe vulnerability to DoS attacks by revealing detailed information about existing
 associations.  @emph{SCTP} does not have this vulnerability.
 
