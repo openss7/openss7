@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:00:33 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/04/26 04:04:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/24 05:00:33 $ by $Author: brian $
+ Last Modified $Date: 2006/04/26 04:04:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.21  2006/04/26 04:04:13  brian
+ - sync
+
+ Revision 0.9.2.20  2006/04/26 00:52:36  brian
+ - sync
+
+ Revision 0.9.2.19  2006/04/25 22:28:59  brian
+ - working up NPI-IP driver
+
  Revision 0.9.2.18  2006/04/24 05:00:33  brian
  - call interface corrections
 
@@ -107,21 +116,19 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:00:33 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/04/26 04:04:13 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:00:33 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/04/26 04:04:13 $";
 
 /*
-   This driver provides the functionality of an IP (Internet Protocol) hook
-   similar to raw sockets, with the exception that the hook acts as a port
-   bound intercept for IP packets for the bound protocol ids.  This dirver is
-   used primarily by OpenSS7 protocol test module (e.g. for SCTP) and for
-   applications where entire ranges of port numbers for an existing protocol
-   id must be intercepted (e.g. for RTP/RTCP).  This driver uses  hook into
-   the Linux IP protocol tables and passes packets tranparently on to the
-   underlying protocol in which it is not interested (bound).  The driver
-   uses the NPI (Network Provider Interface) API.
+   This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
+   with the exception that the hook acts as a port bound intercept for IP packets for the bound
+   protocol ids.  This dirver is used primarily by OpenSS7 protocol test module (e.g. for SCTP) and
+   for applications where entire ranges of port numbers for an existing protocol id must be
+   intercepted (e.g. for RTP/RTCP).  This driver uses  hook into the Linux IP protocol tables and
+   passes packets tranparently on to the underlying protocol in which it is not interested (bound).
+   The driver uses the NPI (Network Provider Interface) API.
 */
 
 #include <sys/os7/compat.h>
@@ -165,7 +172,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:00:33 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/04/26 04:04:13 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -237,42 +244,42 @@ MODULE_ALIAS("/dev/inet/ip");
 #endif				/* MODULE */
 
 STATIC struct module_info ip_minfo = {
-	.mi_idnum = DRV_ID,		/* Module ID number */
-	.mi_idname = DRV_NAME,		/* Module name */
-	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = 1 << 15,		/* Hi water mark */
-	.mi_lowat = 1 << 10,		/* Lo water mark */
+	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idname = DRV_NAME,	/* Module name */
+	.mi_minpsz = 0,		/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,	/* Hi water mark */
+	.mi_lowat = 1 << 10,	/* Lo water mark */
 };
 
-STATIC streamscall int ip_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC streamscall int ip_close(queue_t *, int, cred_t *);
+STATIC streamscall int ip_qopen(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int ip_qclose(queue_t *, int, cred_t *);
 
 STATIC struct qinit ip_rinit = {
-	.qi_putp = ss7_oput,		/* Read put (msg from below) */
-	.qi_srvp = ss7_osrv,		/* Read queue service */
-	.qi_qopen = ip_open,		/* Each open */
-	.qi_qclose = ip_close,		/* Last close */
-	.qi_minfo = &ip_minfo,		/* Information */
+	.qi_putp = ss7_oput,	/* Read put (msg from below) */
+	.qi_srvp = ss7_osrv,	/* Read queue service */
+	.qi_qopen = ip_qopen,	/* Each open */
+	.qi_qclose = ip_qclose,	/* Last close */
+	.qi_minfo = &ip_minfo,	/* Information */
 };
 
 STATIC struct qinit ip_winit = {
-	.qi_putp = ss7_iput,		/* Write put (msg from above) */
-	.qi_srvp = ss7_isrv,		/* Write queue service */
-	.qi_minfo = &ip_minfo,		/* Information */
+	.qi_putp = ss7_iput,	/* Write put (msg from above) */
+	.qi_srvp = ss7_isrv,	/* Write queue service */
+	.qi_minfo = &ip_minfo,	/* Information */
 };
 
 MODULE_STATIC struct streamtab ip_info = {
-	.st_rdinit = &ip_rinit,		/* Upper read queue */
-	.st_wrinit = &ip_winit,		/* Upper write queue */
+	.st_rdinit = &ip_rinit,	/* Upper read queue */
+	.st_wrinit = &ip_winit,	/* Upper write queue */
 };
 
 /*
  *  Primary data structures.
  */
 
-struct ip_bind_bucket;
-struct ip_conn_bucket;
+struct ip_bhash_bucket;
+struct ip_chash_bucket;
 
 typedef struct ip_daddr {
 	uint32_t addr;			/* IP address this destination */
@@ -296,13 +303,14 @@ typedef struct ip {
 	np_ulong provider;		/* provider type */
 	struct ip *bnext;		/* linkage for bind/list hash */
 	struct ip **bprev;		/* linkage for bind/list hash */
-	struct ip_bind_bucket *bindb;	/* linkage for bind/list hash */
+	struct ip_bhash_bucket *bindb;	/* linkage for bind/list hash */
 	struct ip *cnext;		/* linkage for conn hash */
 	struct ip **cprev;		/* linkage for conn hash */
-	struct ip_conn_bucket *connb;	/* linkage for conn hash */
+	struct ip_chash_bucket *connb;	/* linkage for conn hash */
 	unsigned char ttl;		/* default ttl */
 	unsigned char tos;		/* default tos */
 	unsigned short pmtu;		/* path MTU */
+	N_info_ack_t info;		/* network service provider information */
 	unsigned int maxinds;		/* maximum number of oustanding connection indications */
 	unsigned int coninds;		/* number of outstanding connection indications */
 	mblk_t *conq;			/* connection indication queue */
@@ -355,27 +363,36 @@ struct ip_conn_bucket {
 	struct ip *owners;		/* list of owners of this protocol/sport/dport combination */
 };
 
+struct ip_bhash_bucket {
+	rwlock_t lock;
+	struct ip *list;
+};
+struct ip_chash_bucket {
+	rwlock_t lock;
+	struct ip *list;
+};
+
 rwlock_t ip_hash_lock = RW_LOCK_UNLOCKED;
+
+#ifdef LINUX
+#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+struct inet_protocol {
+	struct net_protocol proto;
+	struct net_protocol *next;
+	struct module *kmod;
+};
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTCCOL */
+#endif				/* LINUX */
 
 struct ip_prot_bucket {
 	unsigned char proto;		/* protocol number */
-	char name[15];			/* protocol name */
 	int refs;			/* reference count */
-	int corefs;			/* reference count N_CONS */
-	int clrefs;			/* reference count N_CLNS */
-	int override;			/* was entry overriden */
-#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
+	int corefs;			/* N_CONS references */
+	int clrefs;			/* N_CLNS references */
 	struct inet_protocol prot;	/* Linux registration structure */
-	struct inet_protocol *next;	/* Linkage for protocol override */
-#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
-	struct net_protocol prot;	/* Linux registration structure */
-	struct net_protocol *next;	/* Linkage for protocol override */
-#else
-#error HAVE_KTYPE_STRUCT_INET_PROTOCOL or HAVE_KTYPE_STRUCT_NET_PROTOCOL must be defined.
-#endif
 };
 STATIC rwlock_t ip_prot_lock = RW_LOCK_UNLOCKED;
-STATIC struct ip_prot_bucket *ip_prots[MAX_INET_PROTOS];
+STATIC struct ip_prot_bucket *ip_prots[256];
 
 STATIC kmem_cache_t *ip_bind_cachep;
 STATIC kmem_cache_t *ip_prot_cachep;
@@ -549,304 +566,215 @@ STATIC int ip_v4_rcv(struct sk_buff *skb);
 STATIC void ip_v4_err(struct sk_buff *skb, u32 info);
 
 /*
- *  Some notes are in order here: These two functions, inet_override_protocol()  and
- *  inet_restore_protocol() are intended to provide a drop and insert packet tap on received IP
- *  packets.
- *
- *  There are two approaches: an older approach for 2.4 kernels and a newer approach for
- *  2.6 kernels (and some patched back 2.4 kernels like RHEL3).
- *
- *  Under the older approach, when multiple protocol users are registered with inet_add_protocol()
- *  the kernel will duplicate the sk_buffs and pass a copy to each registered protocol user.
- *
- *  Under the newer approach, inet_add_protocol() will refuse to register multiple protocol users
- *  and will simply return -1 if it is attempted.
- *
- *  What we want is a mechanism whereby a single sk_buff is passed.  Our protocol user is registered
- *  ahead of existing protocol users.  When our protocol user receives an sk_buff that is not for
- *  it, it has the option of passing the sk_buff on to the next registered protocol user and is
- *  given notice if the sk_buff was indeed passed.  This permits us to overlay a protocol stack over
- *  an existing protocol stack.  This is useful for rawip, UDP (for use by RTP) and SCTP.  For rawip
- *  it permits us to intercept specific packets.
- *
- *  In fact this is very similar to a netfilter hook on local ip delivery.  The problem is that icmp
- *  errors are delivered to net protocols but are not delivered to netfilter hooks: a (rather
- *  extensive) netfilter hook for icmp messages would also be necessary.
- *
- *  Note also that Linux only delivers ICMP messages to one net protocol: the first on the list.  We
- *  want to be able to also send ICMP messages onwards that we are not interested in.
+ *  IP subsystem management
  */
-
-#if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
+#ifdef LINUX
 /**
- *  inet_override_protocol: - register or override a net protocol
- *  @pb: freshly allocated protocol bucket
- *  @proto: the protocol to register or override
+ * npi_v4_steal - steal a socket buffer
+ * @skb: socket buffer to steal
  *
+ * In the 2.4 packet handler, if the packet is for us, steal the packet by overwritting the protocol
+ * and returning.  This is only done for normal packets and not error packets (that do not need to
+ * be stolen).  In the 2.4 handler loop, iph->protocol is examined on each iteration, permitting us
+ * to steal the packet by overwritting the protocol number.
+ *
+ * In the 2.6 packet handler, if the packet is not for us, steal the packet by simply not passing it
+ * to the next handler.
  */
-STATIC void
-inet_override_protocol(struct ip_prot_bucket *pb, int proto)
+STATIC INLINE fastcall __hot_in void
+npi_v4_steal(struct sk_buff *skb)
 {
-	bzero(pb, sizeof(*pb));
-	pb->refs = 0;
-	pb->corefs = 0;
-	pb->clrefs = 0;
-	pb->override = 1;
-	pb->proto = proto;
-	pb->prot.handler = &ip_v4_rcv;
-	pb->prot.err_handler = &ip_v4_err;
-	pb->prot.protocol = proto;
-	pb->prot.name = pb->name;
-	pb->prot.next = NULL;
-	pb->prot.copy = 0;
-	{
-		unsigned char hash = proto & (MAX_INET_PROTOS - 1);
-		struct inet_protocol **p = &inet_protos[hash];
-
-		br_write_lock_bh(BR_NETPROTO_LOCK);
-		{
-			/* FIXME: need to find the module that owns pb->prot.next and take a
-			   reference */
-			pb->next = (*p);
-			(*p) = &pb->prot;
-		}
-		br_write_unlock_bh(BR_NETPROTO_LOCK);
-	}
+#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
+	skb->nh.iph->protocol = 255;
+	skb->protocol = 255;
+#endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
 }
 
 /**
- *  inet_restore_protocol: - restore or deregister a new protocol
- *  @pb: existing registered protocol bucket
+ * npi_v4_rcv_next - pass a socket buffer to the next handler
+ * @skb: socket buffer to pass
  *
- */
-STATIC void
-inet_restore_protocol(struct ip_prot_bucket *pb)
-{
-	unsigned char proto = pb->proto;
-	unsigned char hash = proto & (MAX_INET_PROTOS - 1);
-	struct inet_protocol **p = &inet_protos[hash];
-
-	if (pb == NULL)
-		return;
-
-	br_write_lock_bh(BR_NETPROTO_LOCK);
-	{
-		while ((*p) != NULL && (*p) != &pb->prot)
-			p = &(*p)->next;
-		if ((*p) == &pb->prot)
-			(*p) = pb->next;
-		/* FIXME: restore copy pointers on the list */
-	}
-	br_write_unlock_bh(BR_NETPROTO_LOCK);
-}
-
-/**
- *  inet_pass_next_handler: - pass sk_buff to next handler
- *  @skbp: pointer to sk_buff pointer
+ * In the 2.6 packet handler, if the packet is not for us, pass it to the next handler.  If there is
+ * no next handler, free the packet and return.  Note that we do not have to lock the hash because
+ * we own it and are also holding a reference to any module owning the next handler.
  *
- *  Pass the sk_buff to the next handler, if any.  If the sk_buff is passed, NULL the pointer for
- *  the caller to indicate that the caller is no longer responsible for the sk_buff and return the
- *  return value that ip_v4_rcv() should return.
+ * In the 2.4 packet handler, if the packet is not for us, pass it to the next handler by simply
+ * freeing the cloned copy and returning.
  */
-STATIC int
-inet_pass_next_handler(struct sk_buff **skbp)
+STATIC INLINE fastcall __hot_in int
+npi_v4_rcv_next(struct sk_buff *skb)
 {
-	struct iphdr *iph = (*skbp)->nh.iph;
-	unsigned char proto = iph->protocol;
-	unsigned char hash = proto & (MAX_INET_PROTOS - 1);
-	struct inet_protocol **p = &inet_protos[hash];
+#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 	struct ip_prot_bucket *pb;
-	int rtn = 0;
+	struct net_protocol *np;
+	unsigned char proto;
 
-	br_read_lock_bh(BR_NETPROTO_LOCK);
-	{
-		if ((pb = ip_prots[hash])) {
-			for (; (*p); p = &(*p)->next)
-				if ((*p) == &pb->prot)
-					break;
-			for (; (*p); p = &(*p)->next)
-				if ((*p) != &pb->prot)
-					break;
-			if (*p) {
-				rtn = (*(*p)->handler) (*skbp);
-				*skbp = NULL;
-			}
-		}
-	}
-	br_read_unlock_bh(BR_NETPROTO_LOCK);
-	return (rtn);
+	proto = skb->nh.iph->protocol;
+	if ((pb = ip_prots[proto])
+	    && (np = pb->prot.next))
+		return (np->handler(skb));
+#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+	kfree_skb(skb);
+	return (0);
 }
 
 /**
- *  inet_pass_next_err_handler: - pass sk_buff to next error handler
- *  @skb: pointer to sk_buff
- *  @info: information
+ * npi_v4_err_next - pass a socket buffer to the next error handler
+ * @skb: socket buffer to pass
  *
- *  Pass the sk_buff to the next err_handler, if any.
+ * In the 2.6 packet error handler, if the packet is not for us, pass it to the next error handler.
+ * If there is no next error handler, simply return.
+ *
+ * In the 2.4 packet error handler, if the packet is not for us, pass it to the next error handler
+ * by simply returning.  Error packets are not cloned, so don't free it.
  */
-STATIC void
-inet_pass_next_err_handler(struct sk_buff *skb, __u32 info)
+STATIC INLINE fastcall __hot_in void
+npi_v4_err_next(struct sk_buff *skb, __u32 info)
 {
-	struct iphdr *iph = skb->nh.iph;
-	unsigned char proto = iph->protocol;
-	unsigned char hash = proto & (MAX_INET_PROTOS - 1);
-	struct inet_protocol **p = &inet_protos[hash];
+#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 	struct ip_prot_bucket *pb;
+	struct net_protocol *np;
+	unsigned char proto;
 
-	br_read_lock_bh(BR_NETPROTO_LOCK);
-	{
-		if ((pb = ip_prots[hash])) {
-			for (; (*p); p = &(*p)->next)
-				if ((*p) == &pb->prot)
-					break;
-			for (; (*p); p = &(*p)->next)
-				if ((*p) != &pb->prot)
-					break;
-			if (*p)
-				(*(*p)->err_handler) (skb, info);
-		}
-	}
-	br_read_unlock_bh(BR_NETPROTO_LOCK);
+	proto = ((struct iphdr *) skb->data)->protocol;
+	if ((pb = ip_prots[proto])
+	    && (np = pb->prot.next))
+		np->err_handler(skb, info);
+#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+	return;
 }
 
-#elif defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
+#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
-
 STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
+#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 
 /**
- *  inet_override_protocol: - register or override a net protocol
- *  @pb: freshly allocated protocol bucket
- *  @proto: the protocol to register or override
+ * npi_init_nproto - initialize network protocol override
+ * @proto: the protocol to register or override
  *
- *  This is the newer 2.6 (and patched back 2.4) version of the function.  We always register
- *  ourselves and detach the list.
- */
-STATIC void
-inet_override_protocol(struct ip_prot_bucket *pb, int proto)
-{
-	bzero(pb, sizeof(*pb));
-	pb->refs = 0;
-	pb->clrefs = 0;
-	pb->corefs = 0;
-	pb->proto = proto;
-	{
-		int hash = proto & (MAX_INET_PROTOS - 1);
-		struct net_protocol **p = &inet_protosp[hash];
-
-		spin_lock_bh(inet_proto_lockp);
-		{
-			/* FIXME: need to find the module that owns inet_protos[hash] and take a
-			   reference */
-			if (*p) {
-				/* override existing entry */
-				pb->override = 1;
-				pb->prot.handler = (*p)->handler;
-				pb->prot.err_handler = (*p)->err_handler;
-				pb->prot.no_policy = (*p)->no_policy;
-				(*p)->handler = &ip_v4_rcv;
-				(*p)->err_handler = &ip_v4_err;
-				(*p)->no_policy = 1;
-			} else {
-				/* add our own entry */
-				pb->override = 0;
-				pb->prot.handler = &ip_v4_rcv;
-				pb->prot.err_handler = &ip_v4_err;
-				pb->prot.no_policy = 1;
-				inet_protosp[hash] = &pb->prot;
-			}
-		}
-		spin_unlock_bh(inet_proto_lockp);
-	}
-}
-
-/**
- *  inet_restore_protocol: - restore or deregister a new protocol
- *  @pb: existing registered protocol bucket
+ * This is the network protocol override function.
  *
- *  This is the newer 2.6 (and patched back 2.4) version of the function.  We always deregister
- *  ourselves and reattach the list.
+ * Under 2.4, simply add the protocol to the network using an inet_protocol structure and the
+ * inet_add_protocol() function.  Each added function will be delivered a clone of the packet in an
+ * sk_buff, which is fine.
+ *
+ * Under 2.6, things are more complicated.  2.6 will refuse to register a network protocol if one
+ * already exists, so we hack the 2.6 tables.  If no other protocol was previously registered, this
+ * reduces to the 2.6 version of inet_add_protocol().  If there is a protocol previously registered,
+ * we take a reference on the kernel module owning the entry, if possible, and replace the entry
+ * with our own, saving a pointer to the previous entry for passing sk_bufs along that we are not
+ * interested in.  Taking a module reference is particularly for things like SCTP, where unloading
+ * the module after protocol override would break things horribly.  Taking the reference keeps the
+ * module from unloading (this works for OpenSS7 SCTP as well as lksctp).
  */
-STATIC void
-inet_restore_protocol(struct ip_prot_bucket *pb)
+STATIC struct ip_prot_bucket *
+npi_init_nproto(unsigned char proto, unsigned int type)
 {
-	unsigned char proto = pb->proto;
+	struct ip_prot_bucket *pb;
+	struct inet_protocol *ip;
 	int hash = proto & (MAX_INET_PROTOS - 1);
-	struct net_protocol **p = &inet_protosp[hash];
 
-	spin_lock_bh(inet_proto_lockp);
-	{
-		if (pb->override) {
-
-			/* could have already been removed */
-			if (*p) {
-				/* restore original values */
-				(*p)->handler = pb->prot.handler;
-				(*p)->err_handler = pb->prot.err_handler;
-				(*p)->no_policy = pb->prot.no_policy;
+	write_lock_bh(&ip_prot_lock);
+	if ((pb = ip_prots[proto]) != NULL) {
+		pb->refs++;
+		if (type & N_CONS)
+			++pb->corefs;
+		if (type & N_CLNS)
+			++pb->clrefs;
+	} else if ((pb = kmem_cache_alloc(ip_prot_cachep, SLAB_ATOMIC))) {
+		pb->refs = 1;
+		pb->corefs = (type & N_CONS) ? 1 : 0;
+		pb->clrefs = (type & N_CLNS) ? 1 : 0;
+		ip = &pb->prot;
+#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
+		ip->protocol = proto;
+		ip->name = "streams-ip";
+		ip->handler = &ip_v4_rcv;
+		ip->err_handler = &ip_v4_err;
+		ip->copy = 0;
+		ip->next = NULL;
+		inet_add_protocol(ip, proto);
+#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO
+		ip->proto.proto = proto;
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO */
+		ip->proto.handler = &ip_v4_rcv;
+		ip->proto.err_handler = &ip_v4_err;
+		ip->proto.no_policy = 1;
+		ip->next = NULL;
+		ip->kmod = NULL;
+		spin_lock_bh(&inet_proto_lockp);
+		if ((ip->next = inet_protosp[hash]) != NULL) {
+			if ((ip->kmod = module_text_address((ulong) ip->next))
+			    && ip->kmod != THIS_MODULE) {
+				if (!try_module_get(ip->kmod)) {
+					spin_unlock_bh(inet_proto_lockp);
+					kmem_cache_free(ip_prot_cachep, pb);
+					return (NULL);
+				}
 			}
-		} else {
-			inet_protos[hash] = NULL;
 		}
+		inet_protosp[hash] = &ip->proto;
+		spin_unlock_bh(&inet_proto_lockp);
+		synchronize_net();
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+		/* link into hash slot */
+		ip_prots[proto] = pb;
 	}
-	spin_unlock_bh(inet_proto_lockp);
-	synchronize_net();
+	write_unlock_bh(&ip_prot_lock);
+	return (pb);
 }
 
 /**
- *  inet_pass_next_handler: - pass sk_buff to next handler
- *  @skbp: pointer to sk_buff pointer
- *  
- *  If we are receiving a packet at the same time that an underlying protocol gets removed then
- *  there is a big problem.
- */
-STATIC int
-inet_pass_next_handler(struct sk_buff **skbp)
-{
-	struct iphdr *iph = (*skbp)->nh.iph;
-	unsigned char proto = iph->protocol;
-	struct ip_prot_bucket *pb;
-	int rtn = 0;
-
-	read_lock_bh(&master.lock);
-	{
-		if ((pb = ip_prots[proto])) {
-			if (pb->override) {
-				rtn = (*pb->prot.handler) (*skbp);
-				*skbp = NULL;
-			}
-		}
-	}
-	read_unlock_bh(&master.lock);
-	return (rtn);
-}
-
-/**
- *  inet_pass_next_err_handler: - pass sk_buff to next error handler
- *  @skb: pointer to sk_buff
- *  @info: information
+ * npi_term_nproto - terminate network protocol override
+ * @proto: network protocol to terminate
  *
- *  If we are receiving a packet at the same time that an underlying protocol gets removed then
- *  there is a big problem.
+ * This is the network protocol restoration function.
+ *
+ * Under 2.4, simply remove the protocol from the network using the inet_protocol structure and the
+ * inet_del_protocol() function, and we stop receiving packets.
+ * 
+ * Under 2.6, things are more complicated.
+ * The module stuff here is just for ourselves (other kernel modules pulling the same trick) as
+ * Linux IP protocols are normally kernel resident.  If a protocol was previously registered,
+ * restore the protocol's entry and drop the reference to its owning kernel module.  If there was no
+ * protocol previously registered, this reduces to the 2.6 version of inet_del_protocol().
  */
 STATIC void
-inet_pass_next_err_handler(struct sk_buff *skb, __u32 info)
+npi_term_nproto(unsigned char proto, unsigned int type)
 {
-	struct iphdr *iph = skb->nh.iph;
-	unsigned char proto = iph->protocol;
 	struct ip_prot_bucket *pb;
 
-	read_lock_bh(&master.lock);
-	if ((pb = ip_prots[proto])) {
-		if (pb->override)
-			(*pb->prot.err_handler) (skb, info);
-	}
-	read_unlock_bh(&master.lock);
-}
+	write_lock_bh(&ip_prot_lock);
+	if ((pb = ip_prots[proto]) != NULL) {
+		if (type & N_CONS)
+			--pb->corefs;
+		if (type & N_CLNS)
+			--pb->clrefs;
+		if (--pb->refs == 0) {
+			struct inet_protocol *ip = &pb->prot;
 
+#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
+			inet_del_protocol(ip, proto);
+#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+			spin_lock_bh(inet_proto_lockp);
+			inet_protosp[proto] = ip->next;
+			spin_unlock_bh(inet_proto_lockp);
+			synchronize_net();
+			if (ip->next != NULL && ip->kmod != NULL && ip->kmod != THIS_MODULE)
+				module_put(ip->kmod);
 #else
-#error HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY or HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY must be defined.
+#error
 #endif
+			/* unlink from hash slot */
+			ip_prots[proto] = NULL;
+			kmem_cache_free(ip_prot_cachep, pb);
+		}
+	}
+	write_unlock_bh(&ip_prot_lock);
+}
+#endif				/* LINUX */
 
 /**
  *  ip_bind_prot -  bind a protocol
@@ -871,27 +799,9 @@ ip_bind_prot(unsigned char proto, unsigned int type)
 {
 	struct ip_prot_bucket *pb;
 
-	write_lock_bh(&ip_prot_lock);
-	{
-		if ((pb = ip_prots[proto]) != NULL) {
-			++pb->refs;
-			if (type & N_CONS)
-				++pb->corefs;
-			if (type & N_CLNS)
-				++pb->clrefs;
-		} else if ((pb = kmem_cache_alloc(ip_prot_cachep, SLAB_ATOMIC)) != NULL) {
-			/* register protocol */
-			inet_override_protocol(pb, proto);
-			pb->refs = 1;
-			if (type & N_CONS)
-				pb->corefs = 1;
-			if (type & N_CLNS)
-				pb->clrefs = 1;
-			ip_prots[proto] = pb;
-		}
-	}
-	write_unlock_bh(&ip_prot_lock);
-	return ((pb != NULL) ? 0 : -ENOMEM);
+	if ((pb = npi_init_nproto(proto, type)))
+		return (0);
+	return (-ENOMEM);
 }
 
 /**
@@ -901,25 +811,7 @@ ip_bind_prot(unsigned char proto, unsigned int type)
 STATIC void
 ip_unbind_prot(unsigned char proto, unsigned int type)
 {
-	struct ip_prot_bucket *pb;
-
-	write_lock_bh(&ip_prot_lock);
-	{
-		if ((pb = ip_prots[proto]) != NULL) {
-			if (type & N_CONS)
-				--pb->corefs;
-			if (type & N_CLNS)
-				--pb->clrefs;
-			if (--pb->refs <= 0) {
-				ip_prots[proto] = NULL;
-				/* unregister protocol */
-				inet_restore_protocol(pb);
-				kmem_cache_free(ip_prot_cachep, pb);
-			}
-		}
-	}
-	write_unlock_bh(&ip_prot_lock);
-	return;
+	npi_term_nproto(proto, type);
 }
 
 /**
@@ -931,7 +823,8 @@ ip_unbind_prot(unsigned char proto, unsigned int type)
  *  @flag:	    default bind
  */
 STATIC int
-ip_bind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, unsigned int type, int flag)
+ip_bind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, unsigned int type,
+	     int flag)
 {
 	int err;
 
@@ -951,7 +844,8 @@ ip_bind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, unsig
  *  @flag:	    default unbind
  */
 STATIC void
-ip_unbind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, unsigned int type, int flag)
+ip_unbind_addr(struct ip *ip, struct sockaddr_in *addr, unsigned char proto, unsigned int type,
+	       int flag)
 {
 	/* FIXME: unbind from address... */
 	ip_unbind_prot(proto, type);
@@ -1025,7 +919,7 @@ ip_bind(struct ip *ip, struct sockaddr_in *add_in, size_t anum, unsigned char *p
 				else
 					add->sin_port = port;
 
-				/* FIXME: what flag?  what type? */
+				/* FIXME: what flag? what type? */
 				if ((err = ip_bind_addr(ip, add, proto, N_CONS, 0)))
 					break;
 			}
@@ -1034,7 +928,7 @@ ip_bind(struct ip *ip, struct sockaddr_in *add_in, size_t anum, unsigned char *p
 			for (; j >= 0; j--) {
 				struct sockaddr_in *add = &add_in[j];
 
-				/* FIXME: what flag?  what type? */
+				/* FIXME: what flag? what type? */
 				ip_unbind_addr(ip, add, proto, N_CONS, 0);
 			}
 			break;
@@ -3126,7 +3020,8 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 	if (p->SEQ_number) {
 		if (npi_get_state(ip) != NS_WRES_CIND)
 			goto badseq;
-		for (seq = ip->conq; seq && (np_ulong) (long) seq != p->SEQ_number; seq = seq->b_next) ;
+		for (seq = ip->conq; seq && (np_ulong) (long) seq != p->SEQ_number;
+		     seq = seq->b_next) ;
 		if (seq == NULL)
 			goto badseq;
 
@@ -3458,83 +3353,6 @@ ne_reset_res(queue_t *q, mblk_t *mp)
  */
 
 /**
- * ip_w_ctl: process an M_CTL, M_PCCTL message on the write queue
- * @q: active queue in queue pair (write queue)
- * @mp: the M_CTL, M_PCCTL message to process
- *
- * M_CTL and M_PCCTL are special messages for the NPI IP driver.  These are M_PROTO, M_PCPROTO
- * messages (N_UNITDATA_IND) messages that have been delivered to the upper layer, but, after
- * address processing are found to not be destined for the upper layer.  The upper layer returns
- * unwanteded N_UNITDATA_IND messages in M_CTL messages back downstream for further processing by
- * the IP layer.  We take these messages, extract the original socket buffer (with esballoc magic)
- * and pass them along to any other registered users of the IP protocol.
- */
-STATIC int
-ip_w_ctl(queue_t *q, mblk_t *mp)
-{
-	struct ip *ip = IP_PRIV(q), *ip2;
-	np_long prim;
-	mblk_t *dp;
-	dblk_t *db;
-	struct sk_buff *skb;
-	int rtn;
-
-	/* sanity checks */
-	if (ip->provider != N_CLNS)
-		goto discard;
-	if (mp->b_wptr < mp->b_rptr + sizeof(np_long))
-		goto discard;
-	if ((prim = *(np_long *) mp->b_rptr) != N_UNITDATA_IND)
-		goto discard;
-	if (mp->b_wptr < mp->b_rptr + sizeof(N_unitdata_ind_t))
-		goto discard;
-	if ((dp = mp->b_cont) == NULL)
-		goto discard;
-	if (dp->b_wptr < dp->b_rptr + sizeof(struct iphdr))
-		goto discard;
-	{
-		/* What we do is pass the mblk on to any other Streams bound to the same address
-		   specification.  This would permit, for example, multiple streams bound to the
-		   same protocol, but each using their own address mapping. */
-		struct iphdr *iph = (struct iphdr *) mp->b_cont->b_rptr;
-
-		/* FIXME: need read lock on hash lists */
-		for (ip2 = ip->bnext; ip2; ip2 = ip2->bnext) {
-			if ((ip2->protocol == 0 || ip2->protocol == iph->protocol)
-			    && (ip2->saddrs[0].addr == INADDR_ANY
-				|| ip2->saddrs[0].addr == iph->saddr)
-			    && (ip2->daddrs[0].addr == INADDR_ANY
-				|| ip2->daddrs[0].addr == iph->daddr))
-				break;
-		}
-		if (ip2 != NULL) {
-			/* found another Stream interested in this packet */
-			if (!canput(ip2->oq))
-				goto flow_controlled;
-			/* back to M_PROTO again */
-			mp->b_datap->db_type = M_PROTO;
-			put(ip2->oq, mp);
-			return (QR_ABSORBED);
-		}
-	}
-	/* No more Streams to pass too, try the next handler */
-	if ((db = dp->b_datap)->db_ref > 1)
-		goto discard;
-	/* esballoc magic: steal the socket buffer from the message if it can be passed to another
-	   handler.  Note that this is the same for Linux Fast-STREAMS, LiS and SVR4 compatibile
-	   dblk_t structures. */
-	skb = (struct sk_buff *) db->db_frtnp->free_arg;
-	rtn = inet_pass_next_handler(&skb);
-	if (rtn == 0 && skb == NULL)
-		db->db_frtnp->free_arg = NULL;
-	return (QR_DONE);
-      flow_controlled:
-	return (-EBUSY);
-      discard:
-	return (-EPROTO);
-}
-
-/**
  * ip_w_proto: process an M_PROTO, M_PCPROTO message on the write queue
  * @q: active queue in queue pair (write queue)
  * @mp: the M_PROTO, M_PCPROTO message to process
@@ -3790,9 +3608,6 @@ ip_w_prim(queue_t *q, mblk_t *mp)
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		return ip_w_data(q, mp);
-	case M_CTL:
-	case M_PCCTL:
-		return ip_w_ctl(q, mp);
 	case M_PROTO:
 	case M_PCPROTO:
 		return ip_w_proto(q, mp);
@@ -3810,124 +3625,28 @@ ip_w_prim(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC struct ip_bind_bucket *ip_bind_hash[1] = { };
-STATIC struct ip_conn_bucket *ip_conn_hash[1] = { };
-STATIC int
-ip_bind_hashfn(unsigned char protocol, unsigned short snum)
+STATIC struct ip_bhash_bucket *npi_bhash;
+STATIC size_t npi_bhash_size = 0;
+STATIC size_t npi_bhash_order = 0;
+
+STATIC struct ip_chash_bucket *npi_chash;
+STATIC size_t npi_chash_size = 0;
+STATIC size_t npi_chash_order = 0;
+
+STATIC INLINE fastcall int
+npi_bhashfn(unsigned char proto, unsigned short bport)
 {
-	swerr();
-	fixme(("write this function"));
-	return (0);
-}
-STATIC int
-ip_conn_hashfn(unsigned char protocol, unsigned short snum, unsigned short dnum)
-{
-	swerr();
-	fixme(("write this function"));
-	return (0);
+	return ((npi_bhash_size - 1) & (proto + bport));
 }
 
-/**
- * ip_match_bind_next: - match the next Stream in the bind or listen hashes
- * @ip_prev:	previous lookup value (NULL for new)
- * @list:	list to traverse
- * @dport:	destination port number (network order)
- * @daddr:	destination address (network order)
- * @type:	N_CONS or N_CLNS, or both
- */
-STATIC fastcall struct ip *
-ip_match_bind_next(struct ip *ip_prev, struct ip *list, unsigned short dport, uint32_t daddr, unsigned int type)
+STATIC INLINE fastcall int
+npi_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 {
-	struct ip *ip2, *ip_seen = NULL, *result = NULL;
-	int hiscore = 0;
-
-	for (ip2 = list; ip2; ip2 = ip2->bnext) {
-		int score = 0;
-
-		if (ip_seen != ip_prev)
-			continue;
-		if (ip2 == ip_prev) {
-			ip_seen = ip_prev;
-			continue;
-		}
-		if (ip2->provider != 0) {
-			if ((ip2->provider & type) == 0)
-				continue;
-			if (ip2->provider == type)
-				score++;
-		}
-		if (type == N_CONS) {
-			if (ip2->maxinds == 0)
-				continue;
-		}
-		if (ip2->bport) {
-			if (ip2->bport != dport)
-				continue;
-			score++;
-		}
-		if (ip2->bnum) {
-			int i;
-			for (i = 0; i < ip2->bnum; i++) {
-				if (ip2->baddrs[i].addr == INADDR_ANY)
-					break;
-				if (ip2->baddrs[i].addr == daddr) {
-					score++;
-					break;
-				}
-			}
-			if (i >= ip2->bnum)
-				continue;
-		}
-		if (score >= 3) {
-			result = ip2;
-			break;
-		}
-		if (score > hiscore) {
-			hiscore = score;
-			result = ip2;
-		}
-	}
-	return (result);
-}
-
-STATIC fastcall struct ip *
-ip_match_conn_next(struct ip *ip_prev, struct ip *list, uint32_t daddr, uint32_t saddr)
-{
-	struct ip *ip2, *ip_seen = NULL;
-
-	for (ip2 = list; ip2; ip2 = ip2->cnext) {
-		if (ip_seen != ip_prev)
-			continue;
-		if (ip2 == ip_prev) {
-			ip_seen = ip_prev;
-			continue;
-		}
-		if (ip2->provider != N_CONS) {
-			swerr();
-			continue;
-		}
-		if (npi_not_state(ip2, NSM_CONNECTED)) {
-			swerr();
-			continue;
-		}
-		{
-			int i;
-
-			for (i = 0; i < ip2->dnum && ip2->daddrs[i].addr != daddr; i++) ;
-			if (i >= ip2->dnum)
-				continue;
-			for (i = 0; i < ip2->snum && ip2->saddrs[i].addr != saddr; i++) ;
-			if (i >= ip2->snum)
-				continue;
-		}
-		break;
-	}
-	return (ip2);
+	return ((npi_chash_size - 1) & (proto + sport + dport));
 }
 
 /**
- * ip_lookup_conn_next: - lookup next Stream in the connection hashes
- * @ip_prev:	previous lookup value (NULL for new)
+ * ip_lookup_conn - lookup Stream in the connection hashes
  * @iph:	IP header
  * @uh:		UDP header
  *
@@ -3938,33 +3657,97 @@ ip_match_conn_next(struct ip *ip_prev, struct ip *list, uint32_t daddr, uint32_t
  * connection bucket must be traversed and checked for address matches.
  */
 STATIC INLINE fastcall struct ip *
-ip_lookup_conn_next(struct ip *ip_prev, struct iphdr *iph, struct udphdr *uh)
+ip_lookup_conn(struct iphdr *iph, struct udphdr *uh)
 {
-	unsigned char protocol = iph->protocol;
+	unsigned char proto = iph->protocol;
 	unsigned short sport = uh->source;
 	unsigned short dport = uh->dest;
+	uint32_t saddr = iph->saddr;
+	uint32_t daddr = iph->daddr;
 	struct ip *result = NULL;
-	struct ip_conn_bucket *ic, **hp;
+	int hiscore = 0;
+	struct ip_chash_bucket *hp, *hp1, *hp2;
 
-	hp = &ip_conn_hash[ip_conn_hashfn(protocol, sport, dport)];
+	hp1 = &npi_chash[npi_chashfn(proto, sport, dport)];
+	hp2 = &npi_chash[npi_chashfn(proto, 0, 0)];
 
-	read_lock_bh(&ip_hash_lock);
-	for (ic = (*hp); ic && (ic->proto != protocol || ic->dport != sport || ic->sport != dport);
-	     ic = ic->next) ;
-	if (ic) {
-		result = ip_match_conn_next(ip_prev, ic->owners, iph->daddr, iph->saddr);
-	}
-	if (result)
-		ip_get(result);
-	read_unlock_bh(&ip_hash_lock);
+	hp = hp1;
+	do {
+		read_lock_bh(&hp->lock);
+		{
+			struct ip *ip;
+			np_ulong state;
+			int i;
+
+			for (ip = hp->list; ip; ip = ip->cnext) {
+				int score = 0;
+
+				/* only Streams in close to the correct state */
+				if ((state = npi_get_state(ip)) != NS_DATA_XFER
+				    && state != NS_WRES_RIND)
+					continue;
+				if (ip->sport != 0) {
+					if (ip->sport != sport)
+						continue;
+					score++;
+				}
+				if (ip->dport != 0) {
+					if (ip->dport != dport)
+						continue;
+					score++;
+				}
+				{
+					int found = 0;
+
+					for (i = 0; i < ip->snum; i++) {
+						if (ip->saddrs[i].addr != 0) {
+							if (ip->saddrs[i].addr != saddr)
+								continue;
+							found = 1;
+							score++;
+							break;
+						} else
+							found = 1;
+					}
+					if (found == 0)
+						continue;
+				}
+				{
+					int found = 0;
+
+					for (i = 0; i < ip->snum; i++) {
+						if (ip->daddrs[i].addr != 0) {
+							if (ip->daddrs[i].addr != daddr)
+								continue;
+							found = 1;
+							score++;
+							break;
+						} else
+							found = 1;
+					}
+					if (found == 0)
+						continue;
+				}
+				if (score > hiscore) {
+					hiscore = score;
+					result = ip;
+				}
+				if (score == 4)
+					/* perfect match */
+					break;
+			}
+		}
+		read_unlock_bh(&hp->lock);
+	} while (hiscore < 4 && hp != hp2 && (hp = hp2));
+	ip_get(result);
+	usual(result);
 	return (result);
 }
 
 /**
- * ip_lookup_bind_next: - lookup Stream in the bind/listening hashes
- * @ip_prev:	previous result (NULL for new)
+ * ip_lookup_bind - lookup Stream in the bind/listening hashes
  * @iph:	IP header
- * @uh:		UDP header (NULL N_CLNS, non-NULL N_CONS)
+ * @uh:		UDP header
  *
  * Note that an N_CLNS Stream cannot bind to a port number and must bind to port number zero.  An
  * N_CONS Stream can only bind listening to a non-zero port number, but can bind normal to a zero
@@ -3975,28 +3758,74 @@ ip_lookup_conn_next(struct ip *ip_prev, struct iphdr *iph, struct udphdr *uh)
  * only if they are not listening).  N_CONS Streams that are not listening will not be matched.
  * Only the DEFAULT_LISTENER can be bound listening against a zero port (and it requires a wildcard
  * address).
+ *
+ * NOTICES: There are two types of Streams in the bind hashes, N_CONS and N_CLNS.  When lookup up
+ * a Stream for a received packet, we are interested in any N_CLNS Stream that matches or any N_CONS
+ * stream that is in the listening state that matches.
  */
-STATIC INLINE fastcall struct ip *
-ip_lookup_bind_next(struct ip *ip_prev, struct iphdr *iph, struct udphdr *uh, unsigned int type)
+STATIC INLINE fastcall __hot_in struct ip *
+ip_lookup_bind(struct iphdr *iph, struct udphdr *uh)
 {
-	unsigned char protocol = iph->protocol;
-	unsigned short dport = uh->dest, lport = (type == N_CONS) ? dport : 0;
+	unsigned char proto = iph->protocol;
+	unsigned short bport = uh->dest;
+	uint32_t daddr = iph->daddr;
 	struct ip *result = NULL;
-	struct ip_bind_bucket *ib, **hp;
-	
-	hp = &ip_bind_hash[ip_bind_hashfn(protocol, lport)];
+	int hiscore = 0;
+	struct ip_bhash_bucket *hp, *hp1, *hp2;
 
-	read_lock_bh(&ip_hash_lock);
-	for (ib = (*hp); ib && (ib->proto != protocol || ib->port != lport); ib = ib->next) ;
-	if (ib) {
-		if (result == NULL)
-			result = ip_match_bind_next(ip_prev, ib->owners, dport, iph->daddr, type);
-		if (result == NULL)
-			result = ip_match_bind_next(ip_prev, ib->dflt, dport, iph->daddr, type);
-	}
-	if (result)
-		ip_get(result);
-	read_unlock_bh(&ip_hash_lock);
+	hp1 = &npi_bhash[npi_bhashfn(proto, bport)];
+	hp2 = &npi_bhash[npi_bhashfn(proto, 0)];
+
+	hp = hp1;
+	do {
+		read_lock_bh(&hp->lock);
+		{
+			struct ip *ip;
+			np_ulong state;
+			int i;
+
+			for (ip = hp->list; ip; ip = ip->bnext) {
+				int score = 0;
+
+				/* only listening N_COTS Streams and N_CLTS Streams */
+				if (ip->maxinds == 0 && ip->info.SERV_type != N_CLNS)
+					continue;
+				/* only Streams in close to the correct state */
+				if ((state = npi_get_state(ip)) != NS_IDLE && state != NS_WACK_UREQ)
+					continue;
+				if (ip->bport != 0) {
+					if (ip->bport != bport)
+						continue;
+					score++;
+				}
+				{
+					int found = 0;
+
+					for (i = 0; i < ip->bnum; i++) {
+						if (ip->baddrs[i].addr != 0) {
+							if (ip->baddrs[i].addr != daddr)
+								continue;
+							found = 1;
+							score++;
+							break;
+						} else
+							found = 1;
+					}
+					if (found == 0)
+						continue;
+				}
+				if (score > hiscore) {
+					hiscore = score;
+					result = ip;
+				}
+				if (score == 2)
+					/* perfect match */
+					break;
+			}
+		}
+		read_unlock_bh(&hp->lock);
+	} while (hiscore < 2 && hp != hp2 && (hp = hp2));
+	ip_get(result);
 	usual(result);
 	return (result);
 }
@@ -4028,13 +3857,12 @@ ip_lookup_next(struct ip *ip_prev, struct iphdr *iph, struct udphdr *uh)
 	if ((pp = *ipp)) {
 		if (pp->corefs > 0) {
 			if (result == NULL)
-				result = ip_lookup_conn_next(ip_prev, iph, uh);
+				result = ip_lookup_conn(iph, uh);
 			if (result == NULL)
-				result = ip_lookup_bind_next(ip_prev, iph, uh, N_CONS);
-		}
-		if (pp->clrefs > 0) {
+				result = ip_lookup_bind(iph, uh);
+		} else if (pp->clrefs > 0) {
 			if (result == NULL)
-				result = ip_lookup_bind_next(ip_prev, iph, uh, N_CLNS);
+				result = ip_lookup_bind(iph, uh);
 		}
 	}
 	read_unlock_bh(&ip_prot_lock);
@@ -4093,13 +3921,14 @@ ip_v4_rcv(struct sk_buff *skb)
 {
 	int rtn = 0;
 
-	read_lock_bh(&master.lock);	/* lock stream lists */
+	read_lock_bh(&ip_prot_lock);	/* lock stream lists */
 	{
 		struct ip *ip;
 		struct iphdr *iph = skb->nh.iph;
 		struct udphdr *uh = (struct udphdr *) (skb->nh.raw + (iph->ihl << 2));
 
 		if ((ip = ip_lookup(iph, uh))) {
+			npi_v4_steal(skb);
 			if (ip->oq && canput(ip->oq)) {
 				mblk_t *mp;
 				frtn_t fr = { &ip_free, (char *) skb };
@@ -4110,17 +3939,14 @@ ip_v4_rcv(struct sk_buff *skb)
 					mp->b_datap->db_type = M_DATA;
 					mp->b_wptr += plen;
 					put(ip->oq, mp);
-					skb = NULL;
-				}
-			}
-		} else {
-			rtn = inet_pass_next_handler(&skb);
-			/* Need to generate ICMP error? */
-		}
+				} else
+					kfree_skb(skb);
+			} else
+				kfree_skb(skb);
+		} else
+			rtn = npi_v4_rcv_next(skb);
 	}
-	read_unlock_bh(&master.lock);
-	if (skb)
-		kfree_skb(skb);
+	read_unlock_bh(&ip_prot_lock);
 	return (rtn);
 }
 
@@ -4137,7 +3963,7 @@ ip_v4_rcv(struct sk_buff *skb)
 STATIC void
 ip_v4_err(struct sk_buff *skb, u32 info)
 {
-	read_lock_bh(&master.lock);
+	read_lock_bh(&ip_prot_lock);
 	{
 		struct ip *ip;
 
@@ -4154,11 +3980,10 @@ ip_v4_err(struct sk_buff *skb, u32 info)
 					put(ip->oq, mp);
 				}
 			}
-		} else {
-			inet_pass_next_err_handler(skb, info);
 		}
+		npi_v4_err_next(skb, info);
 	}
-	read_unlock_bh(&master.lock);
+	read_unlock_bh(&ip_prot_lock);
 	return;
 }
 
@@ -4178,6 +4003,7 @@ ip_term_caches(void)
 			return (-EBUSY);
 		}
 		printd(("%s: destroyed ip_prot_cachep\n", DRV_NAME));
+		ip_prot_cachep = NULL;
 	}
 	if (ip_bind_cachep != NULL) {
 		if (kmem_cache_destroy(ip_bind_cachep)) {
@@ -4185,6 +4011,7 @@ ip_term_caches(void)
 			return (-EBUSY);
 		}
 		printd(("%s: destroyed ip_bind_cachep\n", DRV_NAME));
+		ip_bind_cachep = NULL;
 	}
 	if (ip_priv_cachep != NULL) {
 		if (kmem_cache_destroy(ip_priv_cachep)) {
@@ -4192,6 +4019,7 @@ ip_term_caches(void)
 			return (-EBUSY);
 		}
 		printd(("%s: destroyed ip_priv_cachep\n", DRV_NAME));
+		ip_priv_cachep = NULL;
 	}
 	return (0);
 }
@@ -4229,6 +4057,50 @@ ip_init_caches(void)
 		printd(("%s: initialized driver protocol structure cache\n", DRV_NAME));
 	}
 	return (0);
+}
+
+STATIC void
+npi_term_hashes(void)
+{
+	if (npi_bhash) {
+		free_pages((unsigned long) npi_bhash, npi_bhash_order);
+		npi_bhash = NULL;
+		npi_bhash_size = 0;
+		npi_bhash_order = 0;
+	}
+	if (npi_chash) {
+		free_pages((unsigned long) npi_chash, npi_chash_order);
+		npi_chash = NULL;
+		npi_chash_size = 0;
+		npi_chash_order = 0;
+	}
+}
+STATIC void
+npi_init_hashes(void)
+{
+	int order, i;
+	unsigned long goal;
+
+	/* size and allocate bind hash table */
+	goal = num_physpages >> (20 - PAGE_SHIFT);
+	for (order = 0; (1 << order) < goal; order++) ;
+	do {
+		npi_bhash_order = order;
+		npi_bhash_size = (1 << order) * PAGE_SIZE / sizeof(struct ip_bhash_bucket);
+		npi_bhash = (struct ip_bhash_bucket *) __get_free_pages(GFP_ATOMIC, order);
+	} while (npi_bhash == NULL && --order >= 0);
+	if (!npi_bhash)
+		cmn_err(CE_PANIC, "%s: Failed to allocate bind hash table\n", __FUNCTION__);
+	npi_bhash_size = npi_chash_size = npi_bhash_size >> 1;
+	npi_bhash_order = npi_chash_order = npi_bhash_order - 1;
+	bzero(npi_bhash, npi_bhash_size * sizeof(struct ip_bhash_bucket));
+	bzero(npi_chash, npi_chash_size * sizeof(struct ip_chash_bucket));
+	for (i = 0; i < npi_bhash_size; i++)
+		rwlock_init(&npi_bhash[i].lock);
+	for (i = 0; i < npi_chash_size; i++)
+		rwlock_init(&npi_chash[i].lock);
+	printd(("%s: INFO: bind hash table configured size = %d\n", DRV_NAME, npi_bhash_size));
+	printd(("%s: INFO: conn hash table configured size = %d\n", DRV_NAME, npi_chash_size));
 }
 
 /**
@@ -4338,7 +4210,7 @@ ip_free_priv(queue_t *q)
 STATIC int ip_majors[IP_CMAJORS] = { IP_CMAJOR_0, };
 
 /**
- * ip_open: - NPI IP driver STREAMS open routine
+ * ip_qopen: - NPI IP driver STREAMS open routine
  * @q: read queue of opened Stream
  * @devp: pointer to device number opened
  * @oflag: flags to the open call
@@ -4346,7 +4218,7 @@ STATIC int ip_majors[IP_CMAJORS] = { IP_CMAJOR_0, };
  * @crp: pointer to opener's credentials
  */
 STATIC streamscall int
-ip_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+ip_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int mindex = 0;
 	int type = 0;
@@ -4413,13 +4285,13 @@ ip_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 }
 
 /**
- * ip_close: - NPI IP driver STREAMS close routine
+ * ip_qclose: - NPI IP driver STREAMS close routine
  * @q: read queue of closing Stream
  * @oflag: flags to open call
  * @crp: pointer to closer's credentials
  */
 STATIC streamscall int
-ip_close(queue_t *q, int oflag, cred_t *crp)
+ip_qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	ip_t *ip = PRIV(q);
 
@@ -4497,19 +4369,19 @@ STATIC struct cdevsw ip_cdev = {
 
 STATIC struct devnode ip_node_ip = {
 	.n_name = "ip",
-	.n_flag = D_CLONE,		/* clone minor */
+	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode ip_node_ipco = {
 	.n_name = "ipco",
-	.n_flag = D_CLONE,		/* clone minor */
+	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode ip_node_ipcl = {
 	.n_name = "ipcl",
-	.n_flag = D_CLONE,		/* clone minor */
+	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
@@ -4585,6 +4457,7 @@ ipterminate(void)
 	}
 	if ((err = ip_term_caches()))
 		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	npi_term_hashes();
 	return;
 }
 
@@ -4594,6 +4467,7 @@ ipinit(void)
 	int err, mindex = 0;
 
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	npi_init_hashes();
 	if ((err = ip_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
 		ipterminate();
