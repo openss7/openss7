@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: SIGTRAN.4.man,v 0.9.2.7 2006/04/05 09:43:02 brian Exp $
+.\" @(#) $Id: SIGTRAN.4.man,v 0.9.2.8 2006/04/27 09:34:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:02 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/27 09:34:40 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: SIGTRAN.4.man,v $
+.\" Revision 0.9.2.8  2006/04/27 09:34:40  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.7  2006/04/05 09:43:02  brian
 .\" - moved .so line and updated headers
 .\"
@@ -101,7 +104,7 @@ sort-adjacent-labels
 .PP
 .B SIGTRAN
 .[
-RFC 2719
+rfc2719
 .]
 provides the following SS7 pseudo-device drivers:
 .\"
@@ -163,7 +166,7 @@ for SUA-specific management,
 .BR m3ua (4)
 .I SS7 MTP3 User Adaptation Layer (M3UA)
 .[
-RFC 3332
+rfc3332
 .]
 protocol layer transporting and distributing the services provided by
 .BR mtp (4)
@@ -177,7 +180,7 @@ for M3UA-specific management,
 .BR m2ua (4)
 .I SS7 MTP2 User Adaptation Layer (M2UA)
 .[
-RFC 3331
+rfc3331
 .]
 protocol layer transporting and distributing the services provided by
 .BR sl (4)

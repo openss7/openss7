@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: m3ua.4.man,v 0.9.2.6 2006/04/05 09:43:03 brian Exp $
+.\" @(#) $Id: m3ua.4.man,v 0.9.2.7 2006/04/27 09:34:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/27 09:34:41 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m3ua.4.man,v $
+.\" Revision 0.9.2.7  2006/04/27 09:34:41  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:03  brian
 .\" - moved .so line and updated headers
 .\"
@@ -100,7 +103,7 @@ sort-adjacent-labels
 is an implementation of the SS7 MTP3 User Adaptation Layer (M3UA) defined in
 RFC 3332.
 .[
-RFC 3332
+rfc3332
 .]
 .B M3UA
 provides a back haul of the services of the
@@ -109,7 +112,7 @@ over an IP network using Stream Control Transmission Protocol,
 .BR sctp (4),
 as defined in RFC 2960.
 .[
-RFC 2960
+rfc2960
 .]
 In additon, it provides a building block for redundant and distributed SS7
 systems.  (See

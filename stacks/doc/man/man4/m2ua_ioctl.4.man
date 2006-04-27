@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: m2ua_ioctl.4.man,v 0.9.2.7 2006/04/05 09:43:03 brian Exp $
+.\" @(#) $Id: m2ua_ioctl.4.man,v 0.9.2.8 2006/04/27 09:34:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/27 09:34:41 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2ua_ioctl.4.man,v $
+.\" Revision 0.9.2.8  2006/04/27 09:34:41  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.7  2006/04/05 09:43:03  brian
 .\" - moved .so line and updated headers
 .\"
@@ -88,10 +91,10 @@ sort-adjacent-labels
 .\"
 .XX
 .[
-RFC 3331
+rfc3331
 .]
 .[
-RFC 2960
+rfc2960
 .]
 .[
 q703
