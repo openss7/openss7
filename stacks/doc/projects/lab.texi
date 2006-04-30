@@ -1,0 +1,1486 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: lab.texi,v 0.9.2.1 2006/04/29 21:30:19 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2006/04/29 21:30:19 $ by $Author: brian $
+%
+% =========================================================================
+%
+% $Log: lab.texi,v $
+% Revision 0.9.2.1  2006/04/29 21:30:19  brian
+% - added UNT lab project documentation
+%
+% =========================================================================
+\input texinfo @c -*-texinfo-*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c %**start of header
+@setfilename lab.info
+@include texi/args.texi
+@set MANUAL_TITLE SS7/SIGTRAN/VoIP Security Network
+@set MANUAL_TYPE Preliminary Design Document
+@settitle @value{MANUAL_TITLE}
+@c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* LAB: (lab).			SS7/SIGTRAN/VoIP Security Network
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE SS7/SIGTRAN/VoIP Security Network
+@set MANUAL_TYPE Preliminary Design Document
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file documents the OpenSS7 Home Location Register.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE SS7/SIGTRAN/VoIP Security Network
+@set MANUAL_TYPE Preliminary Design Document
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2006  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document provides a High-Level Design and Project Proposal for a SS7/SIGTRAN/VoIP Security Network
+and laboratory experiment configuration.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+@subsubheading Published by:
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
+
+@sp 1
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@ifnottex
+@node Top
+@top SS7/SIGTRAN/VoIP Security Network
+@end ifnottex
+
+@macro tabfig {image, number, caption}
+
+@float Table,Table \number\
+@image{\image\}
+@caption{\caption\}
+@end float
+
+@end macro
+
+@macro tabref {number}
+@emph{@ref{Table \number\}}
+@end macro
+
+@macro figure {image, number, caption}
+
+@cartouche
+@float Figure,Figure \number\
+@image{\image\}
+@caption{\caption\}
+@end float
+@end cartouche
+
+@end macro
+
+@macro figuresized {image, number, caption, size}
+
+@cartouche
+@float Figure,Figure \number\
+@image{\image\,\size\}
+@caption{\caption\}
+@end float
+@end cartouche
+
+@end macro
+
+@macro figref {number}
+@emph{@ref{Figure \number\}}
+@end macro
+
+@menu
+* Executive Overview::
+* Preface::
+* Introduction::
+* System Requirements::
+* Network Configuration::
+* Traffic Generation::
+* Operational Measurements::
+* Node Configuration::
+* Hardware Specification::
+* List of Figures::
+* List of Tables::
+* Index::
+@end menu
+
+@node Executive Overview
+@unnumbered Executive Overview
+
+This document provides a High Level Design and development proposal for a SS7/SIGTRAN/VoIP Security
+Network configuration for experimentation with signalling system security.  The initial and primary
+purpose of this equipment is to perform high-volume load testing and security analysis in the
+laboratory environment.  As such, the data sets that are used to populate the LAB can be constrained
+to a degree permitting high-performance from a small footprint, open source software and commodity
+hardware solution.
+
+@subsubheading The OpenSS7 Project
+
+The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software project that has
+developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
+Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
+OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
+License Version 2.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
+software under terms less restrictive than the GPL.
+
+@subsubheading SS7/SIGTRAN/VoIP Security Network
+
+OpenSS7 can provide SS7/SIGTRAN/VoIP Security Network capabilities in a high-performance, low-cost,
+small-footprint platform leveraging the GNU/Linux operating system distributions and tools, and
+utilizing low-cost commodity hardware.
+
+@subsubheading Open Source Software
+
+The OpenSS7 Project leverages the widespread use of GNU/Linux operation systems, distributions, and
+FSF tools such as @samp{autoconf} and @dfn{RPM}.  For example, this document was formatted for PDF,
+HTML, info and plain text using the GNU @dfn{texinfo} system, @samp{autoconf}, and the @TeX{}
+formatting system.
+
+The open source model avoids proprietary lock-in and permits in-house or outsourced development.
+All source code is available for use and modification by the end customer.  All build tools,
+documentation and associated resources are generally available.  The availability of the source code
+and complete documentation eases problem resolution and can offer upgrades and fixes even in advance
+of client problem reports.  
+
+@subsubheading Commodity Hardware
+
+By best utilizing commodity PC or standardized CompactPCI hardware, OpenSS7 makes available the
+highest performance platforms available on the market at back-to-school prices.  When carrier-grade
+is not essential, 3GHz Pentium class servers in hardened rack mount chassis can be used at a
+fraction of the cost, and yet outperform, other solutions.  Where carrier-grade is necessary,
+embedded Linux on standardized CompactPCI NEBS compliant chassis make for a higher cost, but more
+reliable alternative.
+
+@subsubheading Rapid Development
+
+The OpenSS7 Project has already developed protocol components completing the SS7 and SIGTRAN
+signalling stacks including MTP Level 2 and Level 3, ISUP, SCCP, TCAP; and SCTP, M2PA, M2UA, M3UA,
+SUA and TUA.  Development of an SS7/SIGTRAN/VoIP Security Network to meet laboratory experimentation
+needs only the integration of load generating and failed call detection.
+
+@subsubheading An Evolving Solution
+
+The OpenSS7 Project is evolving to support more protocol stacks including ISDN and VoIP.  Support
+for an ever expanding capability is demonstrated by the additional options available.
+
+@subsubheading Conclusions
+
+In summary, a high-performance platform for testing the security of SS7/SIGTRAN/VoIP platforms in
+the laboratory is an excellent application of the OpenSS7 SS7, SIGTRAN and VoIP stacks and can be
+provided at a affordable price on short time-lines, while offering an evolution path for future test
+or deployment applications.
+
+@sp 4
+
+@flushright
+@email{bidulock@@openss7.org, Brian Bidulock}
+The OpenSS7 Project
+@end flushright
+
+@node Preface
+@unnumbered Preface
+
+@section Document Information
+@c @cindex Document information
+
+@subsection Abstract
+@c @cindex Document abstract
+
+This document provides a High-Level Design and Project Proposal for an SS7/SIGTRAN/VoIP Security
+Network setup.
+
+@subsection Objective
+@c @cindex Document objective
+
+The objective of this document is to provide a High-Level Design and Project Proposal for the
+development of a low cost, high-performance, SS7/SIGTRAN/VoIP Security Network using OpenSS7 SS7
+stack components, software, and compatible systems and hardware.
+
+@subsection Intent
+@c @cindex Document intent
+
+The intent of this document is to act as a High-Level Design and Proposal for an OpenSS7 project for
+a SS7/SIGTRAN/VoIP Security Network platform.  As a High-Level Design and Proposal, this document
+discusses components and systems which are not necessarily complete.
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
+system or feature listed herein.
+
+@subsection Audience
+@c @cindex Document audience
+
+This document is intended for a technical audience.  The reader should be familiar with most ETSI
+and 3GPP specifications regarding GSM and UMTS.  In addition, the reader should be familiar with
+ANSI-41 and North American Digital Cellular.  Because much of the focus of an SS7/SIGTRAN/VoIP
+Security Network is on SS7 signalling, the reader should also be familiar with ITU-T, ETSI and ANSI
+standards regarding Signalling System No. 7.
+
+@subsection Revisions
+@c @cindex Document revisions
+
+Take care that you are working with a current version of this document: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+@ignore
+@subsubsection Version Control
+
+@smallexample
+
+$Log: lab.texi,v $
+Revision 0.9.2.1  2006/04/29 21:30:19  brian
+- added UNT lab project documentation
+
+
+@end smallexample
+@end ignore
+
+@subsubsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed or
+postscript) version of this document is an @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+@c @cindex Document disclaimer
+
+@noindent
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@section Document Organization
+@c @cindex Document organization
+
+This document is organized as follows:
+
+@ifnottex
+@menu
+* Introduction::
+* System Requirements::
+* Network Configuration::
+* Traffic Generation::
+* Operational Measurements::
+* Node Configuration::
+* Hardware Specification::
+* List of Figures::
+* List of Tables::
+* Index::
+@end menu
+@end ifnottex
+@iftex
+@table @emph
+@item @ref{Introduction}
+Introduction to the SS7/SIGTRAN Security Platform.
+@item @ref{System Requirements}
+Overarching system requirements for the SS7/SIGTRAN/VoIP Security Network.
+@item @ref{Network Configuration}
+Network configuration provided by the SS7/SIGTRAN/VoIP Security Network.
+@item @ref{Traffic Generation}
+Traffic generation points within the SS7/SIGTRAN/VoIP Security Network.
+@item @ref{Operational Measurements}
+Operational measurement points within the SS7/SIGTRAN/VoIP Security Network.
+@item @ref{Node Configuration}
+Node configuration provided for nodes in the SS7/SIGTRAN/VoIP Security Network.
+@item @ref{Hardware Specification}
+Specifications for each compute platfom in the SS7/SIGTRAN/VoIP Security Network.
+@item @ref{List of Figures}
+List of figures.
+@item @ref{List of Tables}
+List of tables.
+@item @ref{Index}
+Index of concepts.
+@end table
+@end iftex
+
+@node Introduction
+@chapter Introduction
+@cindex Introduction
+
+This document provides a High-Level Design and Project Proposal for an OpenSS7 platform to provide a
+high-performance, instrumented SS7 and SIGTRAN capabilities.  The primary driver for this
+High-Performance SS7/SIGTRAN/VoIP Security Network is to provide a system that will load ISUP call
+completions and detect missed or failed calls for the purposes of experimentation concerning the
+security of commercial SS7, SIGTRAN and VoIP stacks.  The document provides a High-Level Design and
+Proposal for a instrumented laboratory system to provide this capability.
+
+The proposal utilizes, where possible, existing OpenSS7 SS7, SIGTRAN and VoIP stack components and
+provides a development plan for components that are specific to the SS7/SIGTRAN/VoIP Security
+Network requirements.
+
+This document discusses the resulting software configuration that will be put in place on the
+production system, the platform configuration for the production system, and a lab network
+configuration for evaluation.  Also discussed is an overview of the project management logistics for
+successful completion over the course of this development project.
+
+It is intended that this document be a ``living'' document, that is updated over the course of this
+development project.
+
+@section SS7/SIGTRAN/VoIP Security Network
+@cindex SS7/SIGTRAN/VoIP Security Network
+
+This project provides an High Performance SS7/SIGTRAN/VoIP security testing platform that accepts
+and responds to high volume ISUP call completions.
+
+@section Project Drivers
+@cindex Project drivers
+
+The lead purpose of the High-Performance SS7/SIGTRAN/VoIP Security Network is to provide a
+high-performance PSTN sub-network to provide the ISUP call setup function for high-volume load
+testing of PSTN implementations in client laboratories.  The for use of experimentation with the
+platform will be investigation of the security of a commercial SS7/SIGTRAN/VoIP implementation.
+
+@section Scope
+@cindex Scope
+
+Because of its laboratory installation, initially the SS7/SIGTRAN/VoIP Security Network is
+constructed using commodity computing platforms and PCI based hardware cards.  This will initially
+result in a non-carrier grade system for low cost in the test lab environment.  For production
+SS7/SIGTRAN/VoIP platforms, carrier grade options are available but more costly.
+
+It is questionable whether a carrier-grade platform (reliability and availability) is necessary in
+the laboratory environment.  Carrier-grade hardware, such as PCMIG 2.15 CompactPCI cards with
+duplicated facilities, fail-over and self-healing neither increases nor decreases the security of the
+resulting system.  Of more importance than availability is the capacity of the system to handle ISUP
+call generation and completion during test runs.
+
+@c @include texi/fdl.texi
+
+@node System Requirements
+@chapter System Requirements
+@cindex System Requirements
+
+This section discusses SS7/SIGTRAN/VoIP Security Network system requirements generated by the need
+for testing of security frameworks present within the Public Switched Telephone Network (PSTN).
+
+It should be noted that UNT has not written even a high-level requirements document for the
+instrumentation required for experimentation.  The requirements in the sections that follow derive
+from discussions with Dr. Ram Dantu of UNT and consideration of the paper @cite{SS7 over IP:
+Signaling Interworking Vulnerabilities}.
+
+@menu
+* Experimentation Objectives::
+* Experimental Approach::
+* Experiment Requirements::
+@end menu
+
+@node Experimentation Objectives
+@section Experimentation Objectives
+@cindex Experimentation Objectives
+
+@figref{1} illustrates one network node configuration discussed in the paper @cite{SS7 over IP:
+Signaling Interworking Vulnerabilities} from the SS7 network perspective.
+
+@figure{lab000,1,Network Architecture}
+
+@figref{1} shows two demarcation points for interconnection.  A Point-of-Presence (POP) occurs at
+the facilities between interconnected SSPs.  The precise POP demarcation point is largely arbitrary
+as far as security is concerned.  A Signalling Point of Interface (SPOI) occurs either across the
+B/D-Links interconnecting STP associated pairs (indicated by dotted line (B)), or across the
+A/E-Links interconnecting the SSP to the SS7 network (indicated by dotted line (A)).
+
+The SSP on the right of @figref{1} can be further decomposed according to the SIGTRAN and TIPHON
+architectures as illustrated in @figref{2} and @figref{3}.
+
+@figure{lab005,2,SSP Decomposition - Demarcation B}
+
+As illustrated in @figref{2}, the SIGTRAN decomposition of the SSP at interconnection point (B)
+utilizes a pair of Signalling Gateways (SGs) that act as an associated pair of Signalling Transfer
+Points (STPs) to the SS7 network.  The Media Gateway Controller (MGC) provides SSP call control
+functions and acts as an ASP toward the SGs within the SIGTRAN network.  SUA, M3UA, M2UA or M2PA
+SIGTRAN protocols can be used.
+
+@figure{lab006,3,SSP Decomposition - Demarcation A}
+
+As illustrated in @figref{3}, the SIGTRAN decomposition of the SSP at interconnection point (A)
+utilizes a single Signalling Gateway (SG) that acts as a signalling end point (SEP) to the SS7
+network.  The Media Gateway Controller (MGC) provides SSP call control functions and acts as an ASP
+toward the SG within the SIGTRAN network.  SUA, M3UA, M2UA (but not M2PA) SIGTRAN protocols can be
+used.
+
+Typically, the networks labelled as @dfn{VoIP Control Network} in @figref{2} and @figref{3} is a
+secured private network.  Although the networks labelled as @dfn{VoIP Signalling Network} and
+@cite{VoIP Bearer Network} might be directly connected to the public Internet, they likely are not
+in real situations.  Normally an H.323 GK or SIP Proxy and firewalls would stand between the
+@cite{VoIP Signalling Network} and a public Internet or even a private network attached ultimately
+to a public Internet.  Normally a NAT, IP Proxy or Firewall would stand between the @dfn{VoIP Bearer
+Network} and a public Internet or even a private network attached ultimately to a public Internet.
+
+@node Experimental Approach
+@section Experimental Approach
+@cindex Experimental Approach
+
+The experimental approach is to provide a network environment that behaves much the same as the
+Public Switched Telephone Network (PSTN) in regard to the processing of calls and the functional
+platforms and logical nodes provided.  Commercial implementations of protocols and call processing
+functions will be used where possible.  This captive network environment will be instrumented and
+will carry a high volume of call traffic in the same manner as a typical deployment within the PSTN.
+Experiments will be run in attempting to attack the system using the techniques documented in the
+paper: @cite{SS7 over IP: Signaling Interworking Vulnerabilities}.
+
+Note that the use of real MGs, IMTs (Inter-Machine Trunks) and RTP channels for high traffic volumes
+is cost prohibitive.  Costs approaching that of the PSTN itself would result.  Call emulation
+consisting of the signalling components without the actual bearer-channel facilities can provide
+large-scale signalling traffic approaching that of a large network provider without the cost of the
+physical trunks.  Also, the security of the MEGACO/H.248 or MGCP protocols is not the subject of
+current investigations.
+
+@node Experiment Requirements
+@section Experiment Requirements
+@cindex Experiment Requirements
+
+In support of experimentation with signalling security, the following high-level requirements arise:
+
+@enumerate
+@item  The system should as closely as possible provide the configuration and capabilities found in
+a large public network.
+@item  The system must be able to sustain a high signalling load while performing experiments.
+@item  Call traffic generators and acceptors need to be provided to simulate the call traffic load
+of many subscribers in a large network.
+@item  The system needs to be instrumented and call traffic monitors and audits provided for correct
+completion and release of each call.  This is to assist in the determination of the results of a
+given experiment.@footnote{That is, to determine, for example, how many call failures were caused by
+a particular experiment, and the nature and extent of each failure.}
+@end enumerate
+
+The following efficiencies can be exploited:
+
+@enumerate
+@item
+As the actual bearer channels are not the subject of current investigation@footnote{Current
+investigation focusses on the signalling component and not the bearer component.}, an efficiency can
+be gained by not physically providing the Inter-Machine Trunks (IMTs), Media Gateways (MGs) or RTP
+channels necessary to provide the bearer capabilities for the generated traffic.
+
+@item
+Intra-switch traffic does not need to be generated; only inter-switch traffic.  Because intra-switch
+traffic (some 80% of the call traffic experienced within the PSTN) does not expose itself as ISUP
+SS7 signalling, it need not be simulated.  By not simulating intra-switch traffic, a PSTN
+environment of five (5) times the scale or more can be accomplished with the same amount of
+equipment.
+
+@item
+PSTN line-side interfaces and devices@footnote{An example of PSTN line-side device and interfaces
+are ISDN basic rate or ISDN primary rate interfaces, and BRI ISDN sets and PRI NT1s are an example
+of PSTN line-side devices.} do not need to be provided.  Traffic generation and acceptance can be
+simulated with direct ISUP traffic generation and acceptance.
+
+@item
+ISUP protocol stacks provide a set of standard operational measurements that can be used to
+instrument and monitor call completion and release.  Operations measurements include the number of
+lost or abnormal calls, including the nature of the failure and diagnostic information.  This
+information can be reused to instrument ISUP call processing within the test network in several
+ways:
+
+@enumerate
+@item
+Operational measurement statistics can be used to show the impact of an experiment on the ability of
+the system to function normally.  Operational measurement statistics are an indicator of the health
+of the system and are collected on an ongoing basis for all nodes.
+
+@item
+Operational measurement @dfn{studies}@footnote{An operational measurement study invokes the
+collection of operational measurements not normally collected on a regular basis.} can be defined to
+report the impact of specific experiments.
+
+@item
+Operational measurement alarms can be collected and used to indicate the level of maintenance and
+security response by an operator to experiments.
+@end enumerate
+
+@end enumerate
+
+@node Network Configuration
+@chapter Network Configuration
+@cindex Network Configuration
+
+To satisfy the requirements for experimentation with the security of the SS7/SIGTRAN/VoIP Security
+Network, the intention is for the laboratory system to provide a telecommunications sub-network and
+environment that parallels the Public Switched Telephone Network (PSTN).  The SS7/SIGTRAN/VoIP
+Security Network must provide a sub-network of the PSTN in which experiments can be performed.  To
+accomplish this, the physical nodes in the SS7/SIGTRAN/VoIP Security Network provide emulation of
+typical logical nodes in the PSTN.
+
+@menu
+* Logical Network Configuration::
+* Physical Network Configuration::
+@end menu
+
+@node Logical Network Configuration
+@section Logical Network Configuration
+@cindex Logical Network Configuration
+
+@menu
+* Logical Network Nodes::
+* Logical Node Configuration::
+* Proposed Logical Nodes::
+@end menu
+
+@node Logical Network Nodes
+@subsection Logical Network Nodes
+@cindex Logical Network Nodes
+
+To meet the requirements of PSTN experimentation, the logical nodes that need to be provided are as
+follows:
+
+@menu
+* Service Switching Point (SSP)::
+* Signalling Transfer Point (STP)::
+* Signalling Gateway (SG)::
+* Application Server Process (ASP)::
+* Media Gateway Controller (MGC)::
+* Media Gateway (MG)::
+@end menu
+
+@node Service Switching Point (SSP)
+@subsubsection Service Switching Point (SSP)
+@cindex Service Switching Point (SSP)
+
+Service switching points (SSPs) are Switches (end-offices, tandem, toll) within the PSTN under the
+SS7 signalling architecture.  These node initiate and terminate ISUP call connections.
+
+SS7 signalling links (A/F-links) connect SSP to STP within the PSTN.  Service switching points within
+the PSTN also terminate voice circuits for ISUP call connections.
+
+Each physical node within the SS7/SIGTRAN/VoIP Security Network is capable of providing multiple logical
+SSPs, each with their own set of SS7 signalling links (A/F-links) connected into the SS7 signalling
+network, and each with their own ISUP circuit connections.  For the purposes of signalling security
+experimentation, it is not necessary to provide circuit connections for ISUP call bearer circuits.
+
+Operational measurements that are available for experiment result analysis are the complete set of
+standard MTP and ISUP statistics and events as indicated in
+ITU-T Recommendation Q.752@footnote{ITU-T Recommendation Q.752, "Specification of Signalling System
+No. 7 -- Monitoring and Measurements for Signalling System No.  7," Jun 1997, (Geneva), ITU, ITU-T
+Telecommunication Standardization Sector of ITU.  (Previously "CCITT Recommendation")}.
+
+@node Signalling Transfer Point (STP)
+@subsubsection Signalling Transfer Point (STP)
+@cindex Signalling Transfer Point (STP)
+
+Signalling transfer poinrts (STPs) are signalling relay points within the PSTN under the SS7
+signalling architecture.  These nodes neither initiate nor terminate ISUP call connections, but
+transfer the signalling messages between SSPs that do.
+
+SS7 signalling links (A/F-links) connect SSP to STP within the PSTN.  STPs are also connected to other
+STPs using SS7 signalling links (B/C/D-links).  B/D-links are used to connect STPs together along the 
+signalling transfer path.  C-links (or cross-links) are used to connected mated pairs of STPs
+together to form redundant pairs of STPs.
+
+Each physical node within the SS7/SIGTRAN/VoIP Security Network is capable of providing multiple
+logical STPs, each with their own set of SS7 signalling links (B/C/D-links) connected into the SS7
+signalling network.
+
+Operational measurements that are available for experiment result analysis are the complete set of
+standard MTP statistics and events as indicated in
+ITU-T Recommendation Q.752@footnote{Ibid.}.
+
+@node Signalling Gateway (SG)
+@subsubsection Signalling Gateway (SG)
+@cindex Signalling Gateway (SG)
+
+Signalling gateways (SGs) are interworking points to the PSTN under the SIGTRAN signalling
+architecture.  These nodes neither initiate nor terminate ISUP call connections, but transfer and
+inter-work signalling messages between the SS7 signalling network and the SIGTRAN IP network.
+
+Signalling gateways (with the sole exception of M2PA) connect to the SS7 network using traditional
+SS7 signalling links and connect to the IP network using typical network interfaces (e.g.
+Ethernet).  Signalling gateways do not terminate ISUP call circuits within the SIGTRAN architecture.
+
+Two types of signalling gateways are possible, distinguished by how the node appears logically
+within the SS7 networks:
+
+@enumerate
+@item SG as SSP.
+When a signalling gateway appears within the SS7 network as a service switching point (SSP), the
+signalling gateway terminates A/F-links (SS7 signalling links) and presents the signalling point code
+of a service switching point.
+@item SG as STP.
+When a signalling gateway appears within the SS7 network as a signalling transfer point (STP), the
+signalling gateway terminates B/C/D-links (SS7 signalling links), are normally provisioned in mated pairs, and
+present the signalling point code of a signalling transfer point (STP) and proxy virtual signalling
+points (VSP) which are an emulated of A/F-link attached SSPs.
+@end enumerate
+
+Each physical node with the SS7/SIGTRAN/VoIP Security Network is capable of providing multiple
+logical SGs of either type, each with their own set of SS7 signalling links (A/B/C/D/E/F-links) and
+network interfaces or SCTP connections to the Internet Protocol network.
+
+Operational measurements that are available for experiment result analysis are the complete set of
+standard MTP statistics and events as indicated in
+ITU-T Recommendation Q.752@footnote{Ibid.}.
+There are no standard MIBs available for SIGTRAN protocols other than SCTP itself.
+
+@node Application Server Process (ASP)
+@subsubsection Application Server Process (ASP)
+@cindex Application Server Process (ASP)
+
+Application server processes (ASPs) are interworking points to the PSTN under the SIGTRAN signalling
+architecture.  These nodes may initiate or terminate ISUP call connections.
+
+Network interfaces (such as Ethernet) are used to connect ASPs to the SIGTRAN IP network, and ASPs
+may terminate ISUP call bearer circuits.  ASPs do not have SS7 signalling links.
+
+Each physical node within the SS7/SIGTRAN/VoIP Security Network is capable of providing multiple
+logical ASPs, each with their own set of network interfaces or SCTP connections to the Internet
+Protocol network, and each with their own set of ISUP call bearer circuits.
+
+Operational measurements that are available for experiment result analysis are the complete set of
+standard MTP and ISUP statistics and events as indicated in
+ITU-T Recommendation Q.752@footnote{Ibid.}.
+There are no standard MIBs available for SIGTRAN protocols other than SCTP itself.
+
+@node Media Gateway Controller (MGC)
+@subsubsection Media Gateway Controller (MGC)
+@cindex Media Gateway Controller (MGC)
+
+Media gateway controllers (MGCs) are interworking points to the PSTN under the ETSI TIPHON
+architecture.  These nodes neither initiate nor terminate ISUP call connections, but inter-work then
+to SIP or H.323 calls external to the PSTN.
+
+Media gateway controllers connect to the SS7 network using traditional SS7 signalling links
+(normally A/F-links) and act like an tandem SSP (non-end-office) within the PSTN.  Media gateway
+controls connect to the Internet Protocol network using network interfaces and form TCP or SCTP
+connections within that network.  Media gateway controllers connect to Media Gateways (MGs) using
+network interfaces and form TCP or SCTP connections within that network.  Media gateway controllers
+neither terminate ISUP call bearer circuits nor RTP sessions.
+
+Each physical node within the SS7/SIGTRAN/VoIP Security Network is capable of providing multiple
+logical MGCs, each with their own set of SS7 signalling links and IP network interfaces or TCP/SCTP
+connections.
+
+Operational measurements that are available for experiment result analysis are the complete set of
+standard MTP and ISUP statistics and events as indicated in
+ITU-T Recommendation Q.752@footnote{Ibid.}.
+
+@node Media Gateway (MG)
+@subsubsection Media Gateway (MG)
+@cindex Media Gateway (MG)
+
+Media gateway controllers (MGs) are bearer channel inter-working points to the PSTN under the ETSI
+TIPHON architecture.  These nodes neither initiate not terminate ISUP call connections, but
+inter-work between the TDM-based ISUP call bearer circuits in the PSTN and ephemeral RTP sessions
+within the IP network.
+
+Although each physical SS7/SIGTRAN/VoIP Security Network node is capable of providing multiple
+logical MG functions, this function is not necessary to the investigation of signalling security.
+
+@node Logical Node Configuration
+@subsection Logical Node Configuration
+@cindex Logical Node Configuration
+
+To satisfy the requirements for experimentation, the proposed logical node configuration is chosen
+to provide as many characteristics experienced in a real interconnect arrangement as possible, while
+limiting the interworking points to a few specific locations within the test network for the purpose
+of monitoring and collection of results of experimentation.
+
+@menu
+* SS7 Network Configuration::
+* TIPHON Network Configuration::
+* SIGTRAN Network Configuration::
+@end menu
+
+@node SS7 Network Configuration
+@subsubsection SS7 Network Configuration
+@cindex SS7 Network Configuration
+
+@figref{4} illustrates the typical network node configuration under the SS7 network
+architecture:
+
+@figure{lab001,4,SS7 Network Architecture}
+
+@figref{4} shows the types of nodes within the SS7/SIGTRAN/VoIP Security Network, and an indication
+of the @emph{number} of nodes within each type.  There are four types of nodes:
+
+@table @emph
+@item LEC service switching points (SSPs).
+
+For the purposes of security testing, more than one logical LEC SSP will be provided.  The purpose
+of providing multiple LEC SSPs is to be able to monitor any description of call traffic between LEC
+SSP nodes.
+
+In normal CO arrangements, LEC SSP call control is not connected to any publicly accessible IP
+network (full air gap).  The only manner in which attackers (and thus realistic experiments) can
+affect the operation of LEC SSPs is via the SS7 protocol.  Physical security of SSPs should be
+considered separate from signalling system security.
+
+Each LEC SSP is capable of providing varying degrees of screening on ISUP signalling on an trunk
+group by trunk group basis.  Whether a call is routed or billed correctly depends upon LEC security
+screening policy and policies with regards to software standards, translations, customer datafill,
+MATELs and RCOs.  These aspects should be considered as separate from signalling system security.
+
+@item LEC signalling transfer points (STPs).
+
+For the purpose of security testing, one logical associated pair of LEC STPs will be provided.
+Providing only one pair is consistent with the interconnect topology of relatively large LEC
+networks.
+
+In normal CO arrangements, LEC STPs are not connected to any publicly accessible IP network (full
+air gap).  The only manner in which attackers (and thus realistic experiments) can affect the
+operation of the LEC STP is via the SS7 protocol.  Physical security of STPs is, in practise, quite
+high, and should be considered separate from signalling system security.
+
+Each LEC STP is capable of providing Enhanced and Border Gateway Screening (EGWS/BGWS) applied on
+any or all attached SS7 links.  In real networks, any STP associated pair to which an external
+administration interconnects is so equipped and full screening is activated.
+
+@item IC signalling transfer points (STPs).
+
+For the purpose of security testing, one logical associated pair of IC STPs will be provided.
+Providing only one pair is consistent with the interconnect topology of relatively large IC (e.g.
+IXCs). 
+
+In normal CO arrangements, interconnects employ similar security policies to that of the LEC, a
+situation that is required for under FCC regulation.  It is not reasonable to assume that the IC
+STPs are any more subject to IP network attack than the LEC STPs.  It can be assumed that they are
+not attached (full air gap) to any publicly accessible IP network and that the only way that their
+behaviour can be affected is via SS7 signalling links.
+
+Each IC STP is capable of providing Enhanced and Border Gateway Screening (EGWS/BGWS) applied on any
+or all attached SS7 links.  In real networks, any STP associated pair to which an external
+administration interconnects is so equipped and full screening is activated.
+
+@item IC service switching points (SSPs).
+
+For the purpose of security testing, only one logical IC SSP need be provided.
+
+The particular IC SSPs of concern to the current investigations are SSPs that are decomposed into
+IETF SIGTRAN and ETSI TIPHON components as described under @ref{SIGTRAN Network Configuration} and
+@ref{TIPHON Network Configuration}, below.
+
+@end table
+
+@node TIPHON Network Configuration
+@subsubsection TIPHON Network Configuration
+@cindex TIPHON Network Configuration
+
+@figref{5} illustrates the typical network node configuration under the TIPHON network
+architecture.
+
+@figure{lab003,5,TIPHON Network Architecture}
+
+The ETSI TIPHON VoIP architecture decomposes the IC SSP in @figref{4} into the components
+illustrated in @figref{5}.  The components are as follows:
+
+@table @dfn
+@item Media Gateway Controller (MGC)
+
+The media gateway controller (MGC) is responsible for terminating call control signalling within
+both the SCN (Switched Circuit Network) and the IP Network and providing interworking between the
+protocols.  In some instances this interworking might be rather trivial (as in the case of ISUP and
+BICC, or Q.931 and H.245) or complex (as in the case of ISUP and SIP).
+
+@item Media Gateway (MG)
+
+@end table
+
+@node SIGTRAN Network Configuration
+@subsubsection SIGTRAN Network Configuration
+@cindex SIGTRAN Network Configuration
+
+@figref{6} illustrates the typical network node configuration under the SIGTRAN network
+architecture.
+
+@figure{lab002,6,SIGTRAN Network Architecture}
+
+@node Proposed Logical Nodes
+@subsection Proposed Logical Nodes
+@cindex Proposed Logical Nodes
+
+In fitting with diagrams @figref{4}, @figref{5} and @figref{6}, 9 logical nodes will be provided as
+follows:
+
+@tabfig{labnodes,T-1,Proposed Logical Nodes}
+
+As listed in @tabref{T-1}, logical nodes A, B and C are LEC SSPs that are interconnected to each
+other as well as to the IC SSP/MGC (node I).  Nodes D and E are LEC STPs that form the LEC SS7
+backbone network.  Nodes F and G are optional IC STP/SGs.  Node H is an SSP/SG within the SIGTRAN
+network behaving like an SSP.  Last, node I is an MGC/ASP acting as a gateway to the VoIP network.
+
+The proposed logical node network configuration is illustrated in @figref{7}.
+
+@figure{lab004,7,Proposed Logical Nodes Configuration}
+
+Note that in @figref{7}, only the signalling components are fully implemented.  The Inter-Machine
+Trunks (IMTs) shown in blue connecting SSP components are not implemented to reduce expense.  Also,
+the Media Gateways (MGs) shown are not implemented, the VoIP Control Network between the MGC and the
+MGs is not implemented, and the RTP network from the MGs is not implemented.
+
+@node Physical Network Configuration
+@section Physical Network Configuration
+@cindex Physical Network Configuration
+
+Each physical node within the SS7/SIGTRAN/VoIP Security Network consists of a high-performance commodity
+computing platform, specialized TDM interface cards for providing narrow-band and high-speed SS7
+signalling links and narrow-band ISUP call bearer circuits, as well as network interfaces (Ethernet)
+to the IP network.
+
+Each physical node within the SS7/SIGTRAN/VoIP Security Network can acts as multiple logical nodes
+within the SS7, SIGTRAN or VoIP architectures.  Logical nodes are assigned dedicated circuit
+facilities from TDM interfaces as well as forming dedicated TCP or SCTP connections over the IP
+network.
+
+Configuration of the network operating environment consists of the mapping of logical nodes onto
+physical nodes and the interconnection of the physical nodes.
+
+@subsection Logical Node Mapping Alternatives
+@cindex Logical Node Mapping Alternatives
+
+There are several alternatives for mechanisms used for the mapping of logical nodes onto physical
+compute platforms, referred to here as virtualization and non-virtualization approaches as follows:
+
+@table @dfn
+@item Virtualization
+
+Under a virtualization approach, the machine virtualization provided by the Xen Hypervisor allow one
+physical compute platform to run multiple operating system kernels.  Under this approach, each
+logical node would run on a different instance of the Linux operating system running under the
+hypervisor.
+
+The advantage of this approach for the investigation of stack security is that if the operating
+system can be caused to crash, it will only affect one logical node and not all logical nodes
+operating on the physical platform.  This has advantages in maintaining independence between
+logical nodes.  The disadvantage is configuration complexity.
+
+@item Non-Virtualization
+
+Under a non-virtualization approach, the machine runs a single Linux operating system.  Under this
+approach, each logical node would run as a set of processes on one instance of the Linux operating
+system running native on the machine.
+
+The advantage of this approach is simplicity.  The disadvantage of this approach for the
+investigation of stack security is that, if the operating system can be caused to crash, all logical
+nodes will be affected.
+
+@end table
+
+Because the OpenSS7 stacks have been designed to provide partitioned logical nodes in a
+non-virtualization environment, the non-virtualization approach will be take at least initially.  If
+the need arises, the virtualization approach can be assumed at a later date.
+
+@subsection Logical Nodes versus Physical Nodes
+@cindex Logical Nodes versus Physical Nodes
+
+Although the entire SS7/SIGTRAN/VoIP Security Network could be implemented on so little as a single
+compute platform, the objectives of experimentation with signalling system security is better met by
+multiple physical compute platforms for the following reasons:
+
+@table @dfn
+@item Signalling Capacity
+
+It is not possible for the SS7/SIGTRAN/VoIP Securty Network to approach the signalling capacity of
+even small PSTN LEC networks with a single compute platform.  Without large signalling capacity it
+is difficult to extrapolate from experimental results to the impact on large scale call handling.
+With a high-performance system providing the signalling capacity of a large LEC network,
+experimental results are directly applicable to real-world networks.
+
+@item Node Independence
+
+Although logical nodes can be defined so that more than one logical node exists on a given physical
+compute platform, doing so creates a dependence between the logical nodes that exists, even if the
+virtualization approach is taken.@footnote{Virtualization does not completely partition the platform
+into multiple virtual platforms: for example, hardware that can be reset directly, such as Ethernet
+cards, will become unusable for all virtual machines and thus all logical nodes.}  It could be
+argued that experimental results impacting a network run on a single physical compute platform would
+have less of an impact on networks composed of independent platforms.
+
+@item Node Isolation
+
+By placing logical nodes that are normally isolated from a public IP network by an air gap with logical
+nodes not so isolated from a public IP network, it might be tempting to show experimental results
+where one node affects the other directly through programmatic interfaces on the same machine rather
+than via the external interfaces normally associated with such a logical node on the network.
+
+For example, a LEC STP that is separated from an IP network by an air gap running on the same
+compute platform as, say, an MGC that is, perhaps, indirectly connected to a public IP network,
+would permit an experiment to use programmatic interfaces to the STP on the same platform as the
+MGC.  It could be argued that the results of such an experiment are not applicable to real-world
+networks.
+
+@item Security
+
+Physical platforms that have a narrow defined purpose are easier to secure than those that have a
+broad purpose.  If multiple logical nodes are implemented on the same physical compute platform, it
+could be argued that the experiment results would not be applicable to a real-world
+telecommunications platform that exists with a very narrow defined scope (such as an STP).
+
+@end table
+
+Nevertheless, small systems can be built using a single compute platform for purposes such
+as the indendent development of experiments.
+
+@node Traffic Generation
+@chapter Traffic Generation
+@cindex Traffic Generation
+
+To meet the purposes of providing an SS7/SIGTRAN/VoIP Security Network that parallels that found in
+actual deployments within the PSTN, generation of network signalling traffic at levels comparable to
+a LEC network is required.  To accomplish this, logical nodes terminating ISUP traffic will be
+equipped with virtual traffic load generators (i.e. load boxes) in the same physical node.
+
+Traffic loading points are illustrated in @figref{8}.
+
+@figure{lab007,8,Traffic Generation Points}
+
+There are four traffic load generation points within the SS7/SIGTRAN/VoIP Security Network: three
+(3) load generation points, one each at each of the LEC SSPs (nodes A, B, C) in the network
+configuration as illustrated in @figref{8}; and one (1) load generation point at the IC MGC (node
+I).
+
+The characteristics of the traffic load generators are as follows:
+
+@itemize
+@item
+Each traffic load generator will generate ISUP call traffic for a specific number of subscriber
+lines.  Suggested distribution of subscriber lines are 25% of the overall number of subscriber lines
+for each of the SSP and MGC traffic generation points.  A target figure is to generate signalling
+traffic for one million (1,000,000) overall subscriber lines.
+@item
+Each subscriber line will be modelled as a pure birth-death process providing between 4-8 CCS (Centi
+Call Seconds) of average day peak hour load.  An average holding time of 3-5 minutes will be
+used.@footnote{The lower CCS and holding times within the range are typical of residential (non-dial
+access) lines; the higher values in the range, indicative of business lines.}
+@item
+Of this load, 80% will be considered intra-switch and will not be generated.  20% will be considered
+inter-switch and will be generated.  Splitting of intra-switch and inter-switch traffic will be done
+using determinate load splitting of poisson distributed traffic.
+@item
+Distibution of calls over the available subscriber lines will be performed considering a fixed and
+equal probability of a call being generated between any given subscriber line and any other
+subscriber line.
+@item
+Busy treatment patterns will be simulated.  Subscriber line busy treatment will be based on actual
+subscriber line status.  60% of the subscriber lines will be considered as equipped with a
+busy/no-answer treatment that results in call connection (i.e. voice mail, CFBNA).  Calls that would
+otherwise encounter busy treatment (according to actual line status) will be considered to be
+abadonned without reattempt if the terminating line is not equipped with a CFB service.  When
+equipped with a CFB service the call will be considered to hold for only 30-60 seconds.
+@item
+No-answer treatment patterns will be simulated.  Subscriber line no-answer treatment will be
+considered on a fixed and equal probability.  Lines considered as having no-answer but equipped with
+a no-answer service (60% of the lines) will be considered to hold for only 30-60 seconds.
+@item
+All trunks busy treatment patterns will be actual.  Inter-office trunk groups will be engineered for
+the experienced traffic rates at an Erlang C blocking probability of 0.999 for high-day busy hour.
+This is consistent with toll grade trunks traffic engineering.  As the traffic is simulated for
+average-day busy hour, trunk blocking probability is almost zero.  Therfore, for the purpose of
+simplifying the simulation, all trunks busy treatment will be be applied.
+@end itemize
+
+@node Operational Measurements
+@chapter Operational Measurements
+@cindex Operational Measurements
+
+@menu
+* MTP Operational Measurements::
+* ISUP Operational Measurements::
+* Special Studies::
+@end menu
+
+Each SS7 node in the SS7/SIGTRAN/VoIP Security Network provides full operational measurements in
+accordance with @cite{ITU-T Recommendation Q.752}.  This recommendations provides for both basic
+statistics collection and basic alarm generation.
+
+@node MTP Operational Measurements
+@section MTP Operational Measurements
+@cindex MTP Operational Measurements
+
+Each logical node providing an MTP layer will provide complete Q.752 operational measurements for
+the MTP layers it provides.  In the proposed SS7/SIGTRAN/ISUP Security Network logical nodes
+(@pxref{Proposed Logical Nodes}), all logical nodes with the possible exception of the MGC/ASP
+node (node @samp{I})@footnote{Whether node @samp{I}, the MGC/ASP node, provides an MTP layer, or a
+portion of an MTP layer, is dependent on the SIGTRAN protocol used: if M3UA or SUA is used in the
+non-SG as STP arrangement, the MGC/ASP does not provide any portion of an MTP layer; if M2PA or M2UA
+is used, at least some portion of the MTP is provided by the node.}, provide some portion of the MTP
+layer and will provide operational measurements, statictical collection and alarm generation.
+
+Operational measurements for MTP listed in Q.752 are as follows:
+
+@subsubheading MTP Signalling link faults and performance.
+@multitable @columnfractions .10 .90
+@item 1.1 @tab Duration of link in the in-service state.
+@item 1.2 @tab Signalling link failure, all reasons.
+@item 1.3 @tab Signalling link failure, abnormal FIBR/BSNR.
+@item 1.4 @tab Signalling link failure, excessive delay of acknowledgement.
+@item 1.5 @tab Signalling link failure, excessive error rate.
+@item 1.6 @tab Signalling link failure, excessive duration of congestion.
+@item 1.7 @tab Signalling link alignment or proving failure.
+@item 1.8 @tab Number of signal units received in error.
+@item 1.9 @tab Number of negative acknowledgements received.
+@item 1.10 @tab Local automatic changeover.
+@item 1.11 @tab Local automatic changeback.
+@item 1.12 @tab Signalling link restoration.
+@end multitable
+
+@subsubheading MTP signalling link availability.
+@multitable @columnfractions .10 .90
+@item 2.1 @tab Duration of signalling link unavailability, for any reason.
+@item 2.5 @tab Duration of signalling link inhibition, local management actions.
+@item 2.6 @tab Duration of signalling link inhibition, remote management actions.
+@item 2.7 @tab Duration of signalling link unavailability, link failure.
+@item 2.9 @tab Duration of signalling link unavailability, remote processor outage.
+@item 2.10 @tab Start of remote processor outage.
+@item 2.11 @tab Stop of remote processor outage.
+@item 2.13 @tab Local management inhibit.
+@item 2.14 @tab Local management uninhibit.
+@item 2.15 @tab Duraction of local busy.
+@item 2.16 @tab Start of local inhibition.
+@item 2.17 @tab End of local inhibition.
+@item 2.18 @tab Start of remote inhibition.
+@item 2.19 @tab End of remote inhibition.
+@end multitable
+
+@subsubheading MTP signalling link utilization.
+@multitable @columnfractions .10 .90
+@item 3.1 @tab Number of SIF and SIO octets transmitted.
+@item 3.2 @tab Octets retransmitted.
+@item 3.3 @tab Number of message signal units transmitted.
+@item 3.4 @tab Number of SIF and SIO octets received.
+@item 3.5 @tab Number of message signal units received.
+@item 3.6 @tab Signalling link congestion indications.
+@item 3.7 @tab Cumulative duration of signalling link congestion.
+@item 3.10 @tab MSUs discarded, signalling link congestion.
+@item 3.11 @tab Number of congestion events resulting in loss of MSUs.
+@end multitable
+
+@subsubheading MTP signalling link set and route set availability.
+@multitable @columnfractions .10 .90
+@item 4.2 @tab Duration of unavailability of signalling link set.
+@item 4.3 @tab Start of link set failure.
+@item 4.4 @tab Stop of link set failure.
+@item 4.5 @tab Initiation of broadcast TFP, failure of measured link set.
+@item 4.6 @tab Initiation of broadcast TFA for recovery of measured link set.
+@item 4.9 @tab Unavailability of route set to a given destination (set).
+@item 4.10 @tab Duration of unavailability of a route set to a given destination (set).
+@item 4.11 @tab Start of unavailabilty of a route set to a given destination (set).
+@item 4.12 @tab Stop of unavailability of a route set to a given destination (set).
+@item 4.13 @tab Change in link set used to adjacent SP.
+@end multitable
+
+@subsubheading MTP signalling point status.
+@multitable @columnfractions .10 .90
+@item 5.1 @tab Adjacent SP inaccessible.
+@item 5.2 @tab Duration of adjacent SP inaccessible.
+@item 5.4 @tab Stop of adjacent SP inaccessible.
+@item 5.5 @tab MSU discarded, routing data error.
+@item 5.6 @tab User Part Unavailable MSU transmitted.
+@item 5.7 @tab User Part Unavailable MSU received.
+@item 5.8 @tab TFC received.
+@end multitable
+
+@subsubheading MTP signalling traffic distribution (signalling route utilization).
+@multitable @columnfractions .10 .90
+@item 6.1 @tab Number of SIF and SIO octets received with given OPC (set) at an SEP.
+@item 6.2 @tab Number of SIF and SIO octest transmitted with given DPC (set) at an SEP.
+@item 6.3 @tab Number of SIF and SIO octets handled with given SI (set) at an STP.
+@item 6.4 @tab Numeer of SIF and SIO octets received with given OPC (set) at an SEP.
+@item 6.5 @tab Number of SIF and SIO octets transmitted with given DPC (set) at an SEP.
+@item 6.6 @tab Number of SIF and SIO octets handled with given OPC set, DPC set and SI set, at an STP.
+@item 6.7 @tab Number of MSUs handled with given OPC set, DPC set and SI set, at an STP.
+@end multitable
+
+Operational measurements that collect statistics over a time period may have high or low water mark
+thresholds set to generate alarms.  Operational measurements marked as on-occurence or
+first-and-delta may also generate alarms.  In addition to these operational measurements, events
+within the MTP protocol providing for management events can also generate alarms.
+
+@node ISUP Operational Measurements
+@section ISUP Operational Measurements
+@cindex ISUP Operational Measurements
+
+Each logical node providing an ISUP layer will provide complete Q.752 operational measurements for
+the ISUP layer it provides.  In the proposed SS7/SIGTRAN/ISUP Security Network logical nodes
+(@pxref{Proposed Logical Nodes}), only the LEC SSPs (nodes @samp{A}, @samp{B}, @samp{C}) and IC MGC
+(node @samp{I}) provide an ISUP layer.  These coincide with ISUP traffic generation points (see
+@figref{8}).
+
+Operational measurements for ISUP listed in Q.752 are as follows:
+
+@subsubheading ISDN User Part availability.
+@multitable @columnfractions .10 .90
+@item 10.1 @tab Start of local ISUP unavailable, failure.
+@item 10.2 @tab Start of local ISUP unavailable, maintenance made busy.
+@item 10.3 @tab ISUP available.
+@item 10.4 @tab Total duration ISUP available.
+@item 10.5 @tab Start of local ISUP congestion.
+@item 10.6 @tab Stop of local ISUP congestion.
+@item 10.7 @tab Duration of local ISUP congestion.
+@item 10.8 @tab Start of remote ISUP unavailable.
+@item 10.9 @tab Stop of remote ISUP unavailable.
+@item 10.10 @tab Duration of remote ISUP unavailable.
+@item 10.11 @tab Start of remote ISUP congestion.
+@item 10.12 @tab Stop of remote ISUP congestion.
+@item 10.13 @tab Duration of remote ISUP congestion.
+@end multitable
+
+@subsubheading ISDN User Part utilization.
+@multitable @columnfractions .10 .90
+@item 11.1 @tab Total ISUP messages sent.
+@item 11.2 @tab Total ISUP messages received.
+@end multitable
+
+@subsubheading ISDN User Part errors.
+@multitable @columnfractions .10 .90
+@item 12.1 @tab No acknowledgement for circuit reset within T17.
+@item 12.2 @tab No GRA received for GRS within T23.
+@item 12.5 @tab RLC not received within T5.
+@item 12.6 @tab Release initiated due to abnormal conditions.
+@item 12.7 @tab Circuit BLO (excessive errors detected by CRC).
+@item 12.8 @tab Missing blocking acknowledgement in CGBA for previous CGB.
+@item 12.9 @tab Missing unblocking acknowledgement in CGUA for previous CGU.
+@item 12.10 @tab Abnormal blocking acknowledgement in CGBA for previous CGB.
+@item 12.11 @tab Abnormal blocking acknowledgement in CGUA for previous CGU.
+@item 12.12 @tab Unexpected CGBA with abnormal blocking acknowledgement.
+@item 12.13 @tab Unexpected CGUA with abnormal unblocking acknowledgement.
+@item 12.14 @tab Unexpected BLA with abnormal blocking acknowledgement.
+@item 12.15 @tab Unexpected ULA with abnormal unblocking acknowledgement.
+@item 12.16 @tab No BLA received for BLO within T13.
+@item 12.17 @tab No UBA received for UBL within T15.
+@item 12.18 @tab No CGBA received for CGB within T19.
+@item 12.19 @tab No CGUA received for CGU within T21.
+@item 12.20 @tab Message format error.
+@item 12.21 @tab Unexpected message received. 
+@item 12.22 @tab Release due to unrecognized information.
+@item 12.23 @tab Inability to release a circuit.
+@end multitable
+
+Operational measurements that collect statistics over a time period may have high or low water mark
+thresholds set to generate alarms.  Operational measurements marked as on-occurence or
+first-and-delta may also generate alarms.  In addition to these operational measurements, events
+within the MTP protocol providing for management events can also generate alarms.
+
+Most switches also perform trunk peg counts and operational measurements on a per-member basis for
+the purpose of trunk group sizing and traffic engineering.
+
+@node Special Studies
+@section Special Studies
+@cindex Special Studies
+
+On most switches, operational measurements associated with the translation process within the
+swichiing element can also be collected.  These operational measurements are based on originating
+and termination classes of service, class of service screening, trunk group screening, and call
+treatment.  In addition to operational measurements, billing records are generated that contain call
+detail records on a per-call basis for billable calls.  For the purpose of traffic engineering or
+other traffic studies, it is possible to institute special studies that collect information
+according to a study criteria.  It is also possible to collect call detail records and call traces
+on a specified criteria.  Alarms can be generated on statistics high and low water marks as well as
+a result of any number of events determined through translations on the switching element.  Alarms
+notify local maintenance personnel with both audible and visual alarms on a LADS (local alarm
+display system) and are logged locally and remotely.  Alarms also notify remote NOC (Network
+Operations Control) and security systems and personnel.
+
+The SS7/SIGTRAN/VoIP Security Network logical nodes that provide the ISUP call control will also
+provide the ability to perform special studies related to the load traffic for the purposes of
+determining the effected of experiments on the system.
+
+@node Node Configuration
+@chapter Node Configuration
+@cindex Node Configuration
+
+@menu
+* LEC SSP Nodes A, B and C::
+* LEC STP Nodes D and E::
+* IC STP/SG Nodes F and G::
+* IC MGC/SG Node H::
+* IC MGC/ASP Node I::
+@end menu
+
+@node LEC SSP Nodes A, B and C
+@section LEC SSP Nodes A, B and C
+@cindex LEC SSP Nodes A, B and C
+
+@node LEC STP Nodes D and E
+@section LEC STP Nodes D and E
+@cindex LEC STP Nodes D and E
+
+@node IC STP/SG Nodes F and G
+@section IC STP/SG Nodes F and G
+@cindex IC STP/SG Nodes F and G
+
+@node IC MGC/SG Node H
+@section IC MGC/SG Node H
+@cindex IC MGC/SG Node H
+
+@node IC MGC/ASP Node I
+@section IC MGC/ASP Node I
+@cindex IC MGC/ASP Node I
+
+@node Hardware Specification
+@chapter Hardware Specification
+@cindex Hardware Specification
+
+@menu
+* Hardware Requirements::
+* Site Requirements::
+* Capacity and Sizing::
+@end menu
+
+@node Hardware Requirements
+@section Hardware Requirements
+@cindex Hardware Requirements
+
+@menu
+* Compute Hardware::
+* TDM Interface Cards::
+* Ethernet Interface Cards::
+@end menu
+
+@node Compute Hardware
+@subsection Compute Hardware
+@cindex Compute Hardware
+
+As an efficiency, commodity compute hardware can be used in the SS7/SIGTRAN/VoIP Security Network.
+
+Carrier-grade compute platforms provide redundant processors in hot-swap serviceable, fault-tolerant
+architectures with the highest level of availability achievable in the industry.  However,
+carrier-grade compute platforms normally correct for transmission facility outages that are the
+effect of physical or atmospheric changes.  Whether a system protects against these items are of no
+moment in the investigation of signalling system security, and, thus, commodity compute platforms
+can be used, lowering the overall system cost significantly.
+
+Carrier-grade compute platforms are normally equipped to operate on 48 VDC power instead of
+commercial 110 VAC or 220 VAC power.  With the sole exception of the Central Office environment,
+providing a 48 VDC power source can be far more expensive than normal 110 VAC power.  Thus, the use
+of commodity compute platforms further lowers the overall system cost.
+
+Because of the need for specialized interface cards to provide interface to the SS7 signalling
+network using narrow-band and high-speed SS7 links, the compute hardware cannot be reduced to a
+commodity blade processor.  1U or 2U rack-mount systems are required to house the necessary
+interface cards and provide sufficient access for the associated cabling.
+
+A disadvantage of using commodity compute platforms powered by 110 VAC and using high-performance
+Intel or AMD processors is rack space, noise, cooling, power consumption and preventative
+maintenance.  Large scale platforms built with commodity 1U or 2U servers require a far greater
+amount of rack space, a heavier cooling load; because they are forced air cooled, a generate a far
+greater amount of noise (than the carrier-grade convection cooled systems), consume much more power
+(primarily due to processors and the necessary cooling fans), and require a higher degree of
+preventative maintenance (forced air cooling requires filter packs to be changed, and otherwise
+resutls in packing the equipment over time with dust).
+
+@node TDM Interface Cards
+@subsection TDM Interface Cards
+@cindex TDM Interface Cards
+
+@node Ethernet Interface Cards
+@subsection Ethernet Interface Cards
+@cindex Ethernet Interface Cards
+
+@node Site Requirements
+@section Site Requirements
+@cindex Site Requirements
+
+@subsection Equipment Enclosures
+@cindex Equipment Enclosures
+
+@subsection Noise
+@cindex Noise
+
+@subsection Cooling Requirements
+@cindex Cooling Requirements
+
+@subsection Preventative Maintenance
+@cindex Preventative Maintenance
+
+@subsection Power Consumption
+@cindex Power Consumption
+
+@node Capacity and Sizing
+@section Capacity and Sizing
+@cindex Capacity and Sizing
+
+@node List of Figures
+@unnumbered List of Figures
+@listoffloats Figure
+
+@node List of Tables
+@unnumbered List of Tables
+@listoffloats Table
+
+@node Index
+@unnumbered Index
+@printindex cp
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+

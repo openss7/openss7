@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/20 13:50:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/29 21:30:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 13:50:27 $ by $Author: brian $
+# Last Modified $Date: 2006/04/29 21:30:19 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.11  2006/04/29 21:30:19  brian
+# - added UNT lab project documentation
+#
 # Revision 0.9.2.10  2006/03/20 13:50:27  brian
 # - get automake to run clean
 #
@@ -68,7 +71,7 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= hlr.texi voip.texi
+info_TEXINFOS		+= lab.texi hlr.texi voip.texi
 
 EXTRA_info_TEXINFOS	= \
 			texi/args.texi \
@@ -123,7 +126,15 @@ FIG_FIGS		= \
 			voip_ifj.fig \
 			voip_ifj_ss7.fig \
 			voip_ifj_isdn.fig \
-			voip_ifj_gr303v5.fig
+			voip_ifj_gr303v5.fig \
+			lab000.fig \
+			lab001.fig \
+			lab002.fig \
+			lab003.fig \
+			lab004.fig \
+			lab005.fig \
+			lab006.fig \
+			lab007.fig
 
 TBL_TBLS		= \
 			hlr_schest.tbl \
@@ -136,7 +147,8 @@ TBL_TBLS		= \
 			hlr_gate5.tbl \
 			hlr_gate6.tbl \
 			hlr_traf.tbl \
-			hlr_cost.tbl
+			hlr_cost.tbl \
+			labnodes.tbl
 
 PNG_PNGS		= \
 			acb56.png \
