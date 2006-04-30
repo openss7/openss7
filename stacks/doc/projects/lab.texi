@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: lab.texi,v 0.9.2.1 2006/04/29 21:30:19 brian Exp $
+% @(#) $Id: lab.texi,v 0.9.2.2 2006/04/30 06:59:46 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/04/29 21:30:19 $ by $Author: brian $
+% Last Modified $Date: 2006/04/30 06:59:46 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: lab.texi,v $
+% Revision 0.9.2.2  2006/04/30 06:59:46  brian
+% - updating document
+%
 % Revision 0.9.2.1  2006/04/29 21:30:19  brian
 % - added UNT lab project documentation
 %
@@ -263,8 +266,7 @@ no obligation to provide any feature listed herein.
 * Introduction::
 * System Requirements::
 * Network Configuration::
-* Traffic Generation::
-* Operational Measurements::
+* Instrumentation::
 * Node Configuration::
 * Hardware Specification::
 * List of Figures::
@@ -396,6 +398,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: lab.texi,v $
+Revision 0.9.2.2  2006/04/30 06:59:46  brian
+- updating document
+
 Revision 0.9.2.1  2006/04/29 21:30:19  brian
 - added UNT lab project documentation
 
@@ -438,8 +443,7 @@ This document is organized as follows:
 * Introduction::
 * System Requirements::
 * Network Configuration::
-* Traffic Generation::
-* Operational Measurements::
+* Instrumentation::
 * Node Configuration::
 * Hardware Specification::
 * List of Figures::
@@ -455,10 +459,8 @@ Introduction to the SS7/SIGTRAN Security Platform.
 Overarching system requirements for the SS7/SIGTRAN/VoIP Security Network.
 @item @ref{Network Configuration}
 Network configuration provided by the SS7/SIGTRAN/VoIP Security Network.
-@item @ref{Traffic Generation}
-Traffic generation points within the SS7/SIGTRAN/VoIP Security Network.
-@item @ref{Operational Measurements}
-Operational measurement points within the SS7/SIGTRAN/VoIP Security Network.
+@item @ref{Instrumetnation}
+Instrumentation of the SS7/SIGTRAN/VoIP Security Network.
 @item @ref{Node Configuration}
 Node configuration provided for nodes in the SS7/SIGTRAN/VoIP Security Network.
 @item @ref{Hardware Specification}
@@ -973,7 +975,9 @@ follows:
 As listed in @tabref{T-1}, logical nodes A, B and C are LEC SSPs that are interconnected to each
 other as well as to the IC SSP/MGC (node I).  Nodes D and E are LEC STPs that form the LEC SS7
 backbone network.  Nodes F and G are optional IC STP/SGs.  Node H is an SSP/SG within the SIGTRAN
-network behaving like an SSP.  Last, node I is an MGC/ASP acting as a gateway to the VoIP network.
+network behaving like an SSP.  Node I is an MGC/ASP acting as a gateway to the VoIP network.  Node J
+(not shown in the diagrams) is an purely administrative node acting in the role of an OSS
+(Operational Support System).
 
 The proposed logical node network configuration is illustrated in @figref{7}.
 
@@ -1087,8 +1091,12 @@ telecommunications platform that exists with a very narrow defined scope (such a
 Nevertheless, small systems can be built using a single compute platform for purposes such
 as the indendent development of experiments.
 
+@node Instrumentation
+@chapter Instrumentation
+@cindex Instrumentation
+
 @node Traffic Generation
-@chapter Traffic Generation
+@section Traffic Generation
 @cindex Traffic Generation
 
 To meet the purposes of providing an SS7/SIGTRAN/VoIP Security Network that parallels that found in
@@ -1146,7 +1154,7 @@ simplifying the simulation, all trunks busy treatment will be be applied.
 @end itemize
 
 @node Operational Measurements
-@chapter Operational Measurements
+@section Operational Measurements
 @cindex Operational Measurements
 
 @menu
@@ -1160,7 +1168,7 @@ accordance with @cite{ITU-T Recommendation Q.752}.  This recommendations provide
 statistics collection and basic alarm generation.
 
 @node MTP Operational Measurements
-@section MTP Operational Measurements
+@subsection MTP Operational Measurements
 @cindex MTP Operational Measurements
 
 Each logical node providing an MTP layer will provide complete Q.752 operational measurements for
@@ -1263,7 +1271,7 @@ first-and-delta may also generate alarms.  In addition to these operational meas
 within the MTP protocol providing for management events can also generate alarms.
 
 @node ISUP Operational Measurements
-@section ISUP Operational Measurements
+@subsection ISUP Operational Measurements
 @cindex ISUP Operational Measurements
 
 Each logical node providing an ISUP layer will provide complete Q.752 operational measurements for
@@ -1331,7 +1339,7 @@ Most switches also perform trunk peg counts and operational measurements on a pe
 the purpose of trunk group sizing and traffic engineering.
 
 @node Special Studies
-@section Special Studies
+@subsection Special Studies
 @cindex Special Studies
 
 On most switches, operational measurements associated with the translation process within the
@@ -1351,6 +1359,55 @@ The SS7/SIGTRAN/VoIP Security Network logical nodes that provide the ISUP call c
 provide the ability to perform special studies related to the load traffic for the purposes of
 determining the effected of experiments on the system.
 
+@node Distributed Test Harness
+@section Distributed Test Harness
+@cindex Distributed Test Harness
+
+A distributed test harness will be provided for running experiments on the SS7/SIGTRAN/VoIP Security
+Network.  Each of the logical nodes in the system will be equipped with and run a network
+distributed copy of the @cite{TETWare 3.3h} distributed test system avilable from the
+@url{http://www.opengroup.org/,OpenGroup}.
+
+On logical nodes equipped with ISUP and subscriber call load generation (nodes A, B, C, I),
+@cite{TETWare} will provide access to the MTP and ISUP operational measurements, alarms, maintenance
+logs, special studies and
+other call completion information for collecting and reporting the impact on call processing of
+various experiments.  On the remaining logical nodes providing only SS7/SIGTRAN capabilities (nodes
+D, E, F, G, H), @cite{TETWare} will provide access to the MTP operational measurements, alarms,
+maintenance logs, and other SS7 system imformation for collecting and reporting the impact on SS7
+signalling of various experiments.
+
+On both sets of logical nodes (nodes A through I, but not J), @cite{TETWare} will provide a
+scripting and @samp{C}-language execution environment for the execution of experiments.  The
+adminstrative node (node J) is responsible for providing access to the entire SS7/SIGTRAN/VoIP
+Security Network for the syncrhonization and coordination of experiments.
+
+Experiments will typcially componsed of the following:
+
+@itemize
+@item Hypothetical Attack Script.
+@item Call processing monitors.
+@item SS7 signalling monitors.
+@end itemize
+
+@subsection Hypothetical Attack Script
+
+A hypothetical attack script is the portion of an experiment that represents an executable that has
+been invoked by an attacker of the system.
+
+Attack scripts can be run on any node in the system under the @cite{TETWare} server running on each
+node.  When run on a node in the system (except node J), it is presumed that the node has somehow
+been compromised and that some level of access has been afforded the attacker.  When run on node J,
+it is presumed that the attack is being launched from an machine external to the system.
+
+As they are not connected to a public IP network (i.e. they are separated from public networks by an
+air gap), it is not a valid assumption that nodes A, B, C, D and E are compromised and experiments
+that execute attack scripts on these nodes are of no value.
+
+Although they are attached via IP based networks other than the administrative LAN, due to the
+specialized nature of the interconnecting SIGTRAN network, it is a weak assumption that nodes E, F
+and G are compromised and experiments that execute attack scripts on these nodes are of low value.
+
 @node Node Configuration
 @chapter Node Configuration
 @cindex Node Configuration
@@ -1367,21 +1424,79 @@ determining the effected of experiments on the system.
 @section LEC SSP Nodes A, B and C
 @cindex LEC SSP Nodes A, B and C
 
+As listed in @tabref{T-1}, logical nodes A, B and C are LEC SSPs that are interconnected to each
+other (with Inter-Machine Trunks, IMTs) as well as to the IC SSP/MGC (node I).  Signalling
+connections are made between each of nodes A, B and C to each of the LEC STPs (nodes D and E).
+These nodes have only adminstrative LAN connection.
+
+Each node is equipped with an Signalling End Point (SEP) SS7 stack including the Message Transfer
+Part (MTP) and ISDN User Part (ISUP).  Load generation is provided for 250,000 subscribers
+(requiring 25 NXX's).
+
+@multitable @columnfractions .25 .75
+@item @dfn{TDM Interface:} @tab SS7 narrow-band signalling links.
+@item @dfn{Network Interface:} @tab Administrative LAN.
+@item @dfn{Protocol Components:} @tab MTP and ISUP.
+@item @dfn{Load Generation:} @tab 250,000 subscriber lines.
+@item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements.
+@item @tab ISUP Q.752 Operational Measurements.
+@item @tab Special Studies.
+@end multitable
+
 @node LEC STP Nodes D and E
 @section LEC STP Nodes D and E
 @cindex LEC STP Nodes D and E
+
+@multitable @columnfractions .25 .75
+@item @dfn{TDM Interface:} @tab SS7 narrow-band signalling links.
+@item @dfn{Network Interface:} @tab Administrative LAN.
+@item @dfn{Protocol Components:} @tab MTP.
+@item @dfn{Load Generation:} @tab None.
+@item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements
+@end multitable
 
 @node IC STP/SG Nodes F and G
 @section IC STP/SG Nodes F and G
 @cindex IC STP/SG Nodes F and G
 
+@multitable @columnfractions .25 .75
+@item @dfn{TDM Interface:} @tab SS7 narrow-band signalling links.
+@item @dfn{Network Interface:} @tab Administrative LAN.
+@item @tab SIGTRAN signalling network.
+@item @dfn{Protocol Components:} @tab MTP, M2PA, M2UA, and M3UA.
+@item @dfn{Load Generation:} @tab None.
+@item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements
+@end multitable
+
 @node IC MGC/SG Node H
 @section IC MGC/SG Node H
 @cindex IC MGC/SG Node H
 
+@multitable @columnfractions .25 .75
+@item @dfn{TDM Interface:} @tab SS7 narrow-band signalling links.
+@item @dfn{Network Interface:} @tab Administrative LAN.
+@item @tab SIGTRAN signalling network.
+@item @dfn{Protocol Components:} @tab MTP, M2PA, M2UA, and M3UA.
+@item @dfn{Load Generation:} @tab None.
+@item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements
+@end multitable
+
 @node IC MGC/ASP Node I
 @section IC MGC/ASP Node I
 @cindex IC MGC/ASP Node I
+
+@multitable @columnfractions .25 .75
+@item @dfn{TDM Interface:} @tab None.
+@item @dfn{Network Interface:} @tab Administrative LAN.
+@item @tab SIGTRAN signalling network.
+@item @dfn{Protocol Components:} @tab MTP, ISUP, M2PA, M2UA, and M3UA.
+@item @tab VoIP control network.
+@item @tab VoIP signalling network.
+@item @dfn{Load Generation:} @tab 250,000 subscriber lines.
+@item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements
+@item @tab ISUP Q.752 Operational Measurements
+@item @tab Special Studies.
+@end multitable
 
 @node Hardware Specification
 @chapter Hardware Specification
@@ -1400,7 +1515,8 @@ determining the effected of experiments on the system.
 @menu
 * Compute Hardware::
 * TDM Interface Cards::
-* Ethernet Interface Cards::
+* Network Interface Cards::
+* Direct Access Storage Devices::
 @end menu
 
 @node Compute Hardware
@@ -1426,6 +1542,8 @@ network using narrow-band and high-speed SS7 links, the compute hardware cannot 
 commodity blade processor.  1U or 2U rack-mount systems are required to house the necessary
 interface cards and provide sufficient access for the associated cabling.
 
+@figure{rack,9,Rack-mount Enclosures}
+
 A disadvantage of using commodity compute platforms powered by 110 VAC and using high-performance
 Intel or AMD processors is rack space, noise, cooling, power consumption and preventative
 maintenance.  Large scale platforms built with commodity 1U or 2U servers require a far greater
@@ -1439,26 +1557,191 @@ resutls in packing the equipment over time with dust).
 @subsection TDM Interface Cards
 @cindex TDM Interface Cards
 
-@node Ethernet Interface Cards
-@subsection Ethernet Interface Cards
-@cindex Ethernet Interface Cards
+The T400P-SS7 and E400P-SS7 cards are 4-span T1 or E1 cards manufactured by
+@uref{http://www.govarion.com/, Varion}.  These cards were previously manufactured by
+@uref{http://www.digium.com/, Digium}.
+@figref{10} shows a picture of a T400P-SS7 card.
+
+@figuresized{v400p,10,V400P-SS7 Card,4.0in}
+
+The T400P-SS7 and E400P-SS7 cards have the lowest level of signalling performance due to the lack of
+on-board HDLC functions.  Transfers to the host processor over the PCI bus use PCI I/O ports and
+memory mapping.
+
+@subsubheading Driver
+
+These cards are supported by the X400-SS7 driver.
+
+The function of the T/E400P-SS7 Channel driver is to provide for the termination of 2.048Mbps,
+1.544Mbps, 64kbps and 56kbps digital paths.  This driver provides direct access to the channelized
+or unchannelized T1 or E1 digital paths to OpenSS7 media and signalling protocol modules as well as
+providing T1 or E1 management, framing, coding, alarms, and synchronization.
+
+@subsubheading Features
+
+Following are the features of the T400P-SS7 and E400P-SS7 cards:
+
+@itemize @bullet
+@item 4 T1 or E1 spans per card.
+@item Dallas framer.
+@cindex Dallas framer
+@item PLX PCI 9030 PCI bus chip.
+@item Xilinx Spartan XC2S50 processor.
+@cindex Xilinx
+@item Raw transfer of octets from framers to PCI bus.
+@item Uses OpenSS7 Soft-HDLC engine for SS7, ISDN and ISO.
+@item 96 channels per card (T400P-SS7)
+@item 124 channels per card (E400P-SS7).
+@item Full span addressable.
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the T400P-SS7 and E400P-SS7 cards:
+
+@itemize @bullet
+@item Low cost.
+@item PC Compatibility.
+@item Released by Jim Dixon under the GNU Public License.
+@item Open Hardware design: schematics, artwork and Gerber plots available.
+@item Flash programmable Xilinx chip.
+@item Field upgradable.
+@item Supports a number of Open Source drivers.
+@item Asterisk driver support.
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the T400P-SS7 and E400P-SS7 cards:
+
+@itemize @bullet
+@item Lower performance.
+@item No on-board HLDC.
+@item Cannot TDM switch on card or between cards, media channels must be transferred through host to switch between cards.
+@item I/O Port and Memory Map instead of PCI DMA bus-mastering and burst transfers.
+@item Does not run on high speed buses.
+@item No integrated Ethernet for SIGTRAN and VoIP applications.
+@item Synchronization per-card instead of per-system.
+@end itemize
+
+Ultimately, the performance limiting factor of the T400P-SS7 and E400P-SS7 cards is the bandwidth of
+the PCI bus and the ability of the processor to perform Soft-HDLC and TDM switching in
+software.@footnote{A 350MHz processor is capable of processing the bandwidth of an entire E400P-SS7
+card (124 signalling links) with a combined link throughput of 8.192 Mbps.}
+These cards are very cost-effective and can provide 64kbps SS7 links at average incremental
+interface cost of approximately $7.00 USD per signalling link.
+
+@subsubheading Application
+
+For the High-Performance SS7/SIGTRAN/VoIP Security Network nodes, the performance is more than
+adequate.  A high grade 3.20 GHz 4-way 2U server should be capable of handling as many cards as can
+be equipped in the chassis (2-4 cards totalling 248-496 narrow-band signalling links) with adequate
+excess processor capacity available for background operations such as load generation and
+operational measurements collection.
+
+To allow for maximum system reconfiguration, each physical node will be equipped with 2 T400P-SS7
+cards, each on an independent PCI bus.  The T400P-SS7 are universal 32-bit PCI bus cards and will
+therefore operate on most PCI segements provided by popular server boards.  Each card provides
+interface for 4 T1 spans
+
+For TDM card cabling, @pxref{Digital Cross-Connect}.
+
+@node Network Interface Cards
+@subsection Network Interface Cards
+@cindex Network Interface Cards
+
+A number of the physical nodes in the system require high-speed Ethernet network access to one (1) or
+two (2) signalling or control networks, and lower-speed Ethernet access to one (1) adminstrative
+network.  For maximum flexibility, server boards should be equipped with on-board dual bondable
+1000/100/10baseT autosensing Gigabit Ethernet, and either on-board 100baseT Ethernet or the
+addition of a 100baseT PCI interface card for adminstrative LAN termination.
+
+@node Direct Access Storage Devices
+@subsection Direct Access Storage Devices
+@cindex Direct Access Storage Devices
+
+Direct Access Storage Devices (DASD) can be quite expensive.  Most of the logical nodes in the
+SS7/SIGTRAN/VoIP Security Network do not have a requirement for large capacity storage devices.
+Speed is of more of an issue than size: 15,000 rpm SCSI devices in a RAID 2 arrangement (striped
+and mirrored) is preferred.
 
 @node Site Requirements
 @section Site Requirements
 @cindex Site Requirements
 
+@menu
+* Equipment Enclosures::
+* Synchronization::
+* Digital Cross-Connect::
+* Network Switching::
+* Noise::
+* Cooling Requirements::
+* Preventative Maintenance::
+* Power Consumption::
+@end menu
+
+@node Equipment Enclosures
 @subsection Equipment Enclosures
 @cindex Equipment Enclosures
 
+@node Synchronization
+@subsection Synchronization
+@cindex Synchronization
+
+@node Digital Cross-Connect
+@subsection Digital Cross-Connect
+@cindex Digital Cross-Connect
+
+To allow for system reconfiguration and monitoring access, the SS7/SIGTRAN/VoIP Security Network
+platform will provide digital cross-connect capabilities.  To avoid costly Digital Automatic
+Cross-Connect System (DACCS) equipment, digital cross-connect (DSX) will be performed on a per-span
+(T1) basis (DSX-1).
+
+One 56 position 19" rack-mount Bantaam jack cross-connect pannel (wire-wrap or RJ-48c rear) and
+cabling will be required.  Each T400P-SS7 T1 interface card has 4 RJ-48c jacks.  Each physical node
+contains 2 T1 cards for a total of 8 T1 spans per node.  Seven (7) physical nodes with eight (8)
+spans each will require a 56 position DSX-1.  Cabling will be performed using clad category 5 UTP
+with an RJ-48c connector at one end, and wire-wrap connection at the rear of the DSX for all 56
+positions.  If minor growth of the system is anticiapted, a 64 position DSX-1 should be provided
+instead.
+
+Twenty-eight (28) 18-inch long dual Bantam patch cables will be required intially to interconnect
+the nodes in the system.
+
+@node Network Switching
+@subsection Network Switching
+@cindex Network Switching
+
+Network switching is required for 5 networks as follows:
+
+@enumerate
+@item Administrative LAN.
+@item SIGTRAN Network.
+@item VoIP Control Network.
+@item VoIP Signalling Network.
+@item VoIP Bearer Network.
+@end enumerate
+
+Either five (5) 8-port Gigabit Ethernet switches can be provided, or, for the purpose of reducing the
+amount of equipment required, the @dfn{SIGTRAN} and @dfn{VoIP Control} networks can be combined on a
+single switch, and the @dfn{VoIP Signalling} and @dfn{VoIP Bearer} networks can be combined on a
+single switch, for a total of three (3) 8-port Gigabit Ethernet switches.  These Ethernet switches
+should be rear mountable 19" rack mount 8-port (or higher) autosensing 1000/100/10baseT Gigabit
+Ethernet switches with 16-32 Gigabit capacity, RJ45, Category 5e UTP compatible.
+
+@node Noise
 @subsection Noise
 @cindex Noise
 
+@node Cooling Requirements
 @subsection Cooling Requirements
 @cindex Cooling Requirements
 
+@node Preventative Maintenance
 @subsection Preventative Maintenance
 @cindex Preventative Maintenance
 
+@node Power Consumption
 @subsection Power Consumption
 @cindex Power Consumption
 

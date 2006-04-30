@@ -17,8 +17,8 @@
 .\}
 .TS
 box center tab(:);
-cb|cb|cb|cb|cb|lbsss
-c|c|c|c|c|lsss.
+cb|cb|cb|cb|cb|lbsssss
+c|c|c|c|c|lsssss.
 Node:Role:SS7:SIGTRAN:VoIP:Comments
 =
 A:LEC:SSP:\-:\-:T{
@@ -51,5 +51,9 @@ T}
 :::_::_
 I:::ASP::T{
 Connected to SIGTRAN, VoIP Control and VoIP Signalling networks.
+T}
+:_:_:_:_:_
+J:X:Any:Any:Any:T{
+Administrative node and attacker simulation node.
 T}
 .TE
