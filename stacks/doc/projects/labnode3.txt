@@ -1,0 +1,22 @@
+                                                                                
+                                   C-Links                                      
+                                to associated                                   
+                                     pair                                        
+                                                                                
+                                       |                                        
+                                       O                                        
+                                       |                                        
+                                       |            SIGTRAN                     
+                                     __|__  ____    Signalling Network          
+                                    |     |/    L                               
+                1-T1 -O-------------| STP || SG |=L7========L7=                 
+                                 __/|_____|L____/                               
+        B/D-Links             __/      ||L__                                    
+        to nodes           __/         L7   L__                                 
+          D,E      1-T1 __O            ||      L__  1-T1                        
+                       /               ||         O__                           
+                                       ||                                       
+                        Administrative ||         A-Links                       
+                                   LAN L7        to node H                      
+                                       ||                                       
+                                                                                

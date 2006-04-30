@@ -1,0 +1,20 @@
+                                                                                
+                           L                                                    
+      A-Links         1-T1  O                                                   
+     to nodes                L                                                  
+       F, G     ___           L                                                 
+                   O___        L                                                
+              1-T1     L___     L                   SIGTRAN                     
+                           L___  L    ___   ____    Signalling Network          
+                               L__L  /   L /    L                               
+                                ___X{ SSP }| SG |=L7=======L7=                  
+                            ___/  /  L___/ L____/                               
+                        ___/     /     ||                                       
+              1-T1  ___/        /      L7                                       
+                ___O           /       ||                                       
+      E-Links           Administrative ||                                       
+     to nodes                /     LAN ||                                       
+       D, E           1-T1  O          ||                                       
+                           /           L7                                       
+                                       ||                                       
+                                                                                

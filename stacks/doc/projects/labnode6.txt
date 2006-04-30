@@ -1,0 +1,12 @@
+                                                                                
+                                                   ||                           
+                                    Administrative L7                           
+                                               LAN ||                           
+                                                   ||                           
+                                                   ||                           
+                                       SIGTRAN     L7                           
+                            Signalling Network   __||_                          
+                                                /     L                         
+                          ==L7==============L7==| OSS |                         
+                                                L_____/                         
+                                                                                

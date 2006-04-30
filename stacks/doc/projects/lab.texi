@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: lab.texi,v 0.9.2.2 2006/04/30 06:59:46 brian Exp $
+% @(#) $Id: lab.texi,v 0.9.2.3 2006/04/30 15:26:27 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/04/30 06:59:46 $ by $Author: brian $
+% Last Modified $Date: 2006/04/30 15:26:27 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: lab.texi,v $
+% Revision 0.9.2.3  2006/04/30 15:26:27  brian
+% - updated LAB document
+%
 % Revision 0.9.2.2  2006/04/30 06:59:46  brian
 % - updating document
 %
@@ -398,6 +401,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: lab.texi,v $
+Revision 0.9.2.3  2006/04/30 15:26:27  brian
+- updated LAB document
+
 Revision 0.9.2.2  2006/04/30 06:59:46  brian
 - updating document
 
@@ -1095,6 +1101,30 @@ as the indendent development of experiments.
 @chapter Instrumentation
 @cindex Instrumentation
 
+@menu
+* Traffic Generation::
+* Operational Measurements::
+* Distributed Test Harness::
+@end menu
+
+The SS7/SIGTRAN/VoIP Security Network will have three categories of instrumentation for the purpose
+of execution of experiments against the network:
+
+@enumerate
+@item @dfn{Traffic Generation.}
+
+Traffic generation provides the ability to determine the impact of specific experiments on the
+operation of large networks and specifically the processing of ISUP calls.
+@item @dfn{Operational Measurements.}
+
+Operational measurements provide statistics, event and alarm detection and collection that can be
+used to analyse the results of specific experiments on the operation of large networks.
+@item @dfn{Distributed Test Harness.}
+
+A distributed test harness provides a repeatable framework within which to generate and operation
+specific experiments.
+@end enumerate
+
 @node Traffic Generation
 @section Traffic Generation
 @cindex Traffic Generation
@@ -1120,7 +1150,8 @@ The characteristics of the traffic load generators are as follows:
 Each traffic load generator will generate ISUP call traffic for a specific number of subscriber
 lines.  Suggested distribution of subscriber lines are 25% of the overall number of subscriber lines
 for each of the SSP and MGC traffic generation points.  A target figure is to generate signalling
-traffic for one million (1,000,000) overall subscriber lines.
+traffic for ten million (10,000,000) overall subscriber lines (four million BHCA, or 288 million
+call minutes per day).
 @item
 Each subscriber line will be modelled as a pure birth-death process providing between 4-8 CCS (Centi
 Call Seconds) of average day peak hour load.  An average holding time of 3-5 minutes will be
@@ -1384,11 +1415,23 @@ Security Network for the syncrhonization and coordination of experiments.
 
 Experiments will typcially componsed of the following:
 
-@itemize
-@item Hypothetical Attack Script.
-@item Call processing monitors.
-@item SS7 signalling monitors.
-@end itemize
+@enumerate
+@item @dfn{Hypothetical Attack Script.}
+
+The hypothetical attack script corresponds to a test case within the @cite{TETWware} framework and
+provides a mechanism for executing an experiment against a specific logical node in the
+SS7/SIGTRAN/VoIP Security Network.
+@item @dfn{Call processing monitors.}
+
+Call processing monitors collect information from operational measurements and studies on the
+operation of call processing to provide a results report on the impact of the experiment for the
+purposes of report generation.
+@item @dfn{SS7 signalling monitors.}
+
+SS7 signalling monitors collect information from operational measurements on the operation of SS7
+signalling to provide a results report on the impact of the experiment for the purposes of report
+generation.
+@end enumerate
 
 @subsection Hypothetical Attack Script
 
@@ -1413,16 +1456,71 @@ and G are compromised and experiments that execute attack scripts on these nodes
 @cindex Node Configuration
 
 @menu
+* Logical Nodes::
+* Physical Nodes::
+@end menu
+
+Node configuration is separated for discussion into logical and physical nodes:
+
+@subsubheading Logical Nodes
+Logical nodes represent a functional grouping of SS7 newtork element capabilities into a logical
+netowrk element that is normally deployed spearately within the SS7 network.
+
+@subsubheading Physical Nodes
+Physical nodes represent a separate and distinct computing platform and the associated network
+interfaces that are used by logical network elements assigned to the physical platform.
+
+@node Logical Nodes
+@section Logical Nodes
+@cindex Logical Nodes
+
+@menu
 * LEC SSP Nodes A, B and C::
 * LEC STP Nodes D and E::
 * IC STP/SG Nodes F and G::
 * IC MGC/SG Node H::
 * IC MGC/ASP Node I::
+* Administrative Node J::
 @end menu
 
+Logical nodes provide for functional grouping of network element capabilities into a virtual network
+element that is indepenent of the executional platform on which the virtual network element
+executes.
+
+This section details the configuration of the following logical nodes:
+
+@itemize
+@item LEC SSP Nodes A, B and C.
+@item LEC STP Nodes D and E.
+@item IC STP/SG Nodes F and G.
+@item IC MGC/SG Node H.
+@item IC MGC/ASP Node I.
+@item Administrative Node J.
+@end itemize
+
 @node LEC SSP Nodes A, B and C
-@section LEC SSP Nodes A, B and C
+@subsection LEC SSP Nodes A, B and C
 @cindex LEC SSP Nodes A, B and C
+
+Interconnection of the LEC SSP Nodes A, B and C are illustrated in @figref{N-1}.
+
+@figure{labnode1,N-1,LEC SSP Nodes A B and C}
+
+@subsubheading Overview
+
+@multitable @columnfractions .25 .75
+@item @dfn{TDM Interface:} @tab 2 T1 spans of SS7 narrow-band signalling links.
+@item @dfn{Network Interface:} @tab Administrative LAN.
+@item @dfn{Protocol Components:} @tab MTP and ISUP.
+@item @dfn{Load Generation:} @tab 2,500,000 subscriber lines, 1,000,000 BHCA.
+@item @dfn{Inter-Machine Trunks:} @tab 3 effective trunk groups of 1,544 T1s each.
+@item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements.
+@item @tab ISUP Q.752 Operational Measurements.
+@item @tab Special Studies.
+@item @dfn{Test Harness:} @tab @dfn{TETWare} Distributed Node
+@end multitable
+
+@subsubheading Description
 
 As listed in @tabref{T-1}, logical nodes A, B and C are LEC SSPs that are interconnected to each
 other (with Inter-Machine Trunks, IMTs) as well as to the IC SSP/MGC (node I).  Signalling
@@ -1430,73 +1528,281 @@ connections are made between each of nodes A, B and C to each of the LEC STPs (n
 These nodes have only adminstrative LAN connection.
 
 Each node is equipped with an Signalling End Point (SEP) SS7 stack including the Message Transfer
-Part (MTP) and ISDN User Part (ISUP).  Load generation is provided for 250,000 subscribers
-(requiring 25 NXX's).
+Part (MTP) and ISDN User Part (ISUP).  Load generation is provided for 2,500,000 subscribers
+(requiring 250 NXX's).
 
-@multitable @columnfractions .25 .75
-@item @dfn{TDM Interface:} @tab SS7 narrow-band signalling links.
-@item @dfn{Network Interface:} @tab Administrative LAN.
-@item @dfn{Protocol Components:} @tab MTP and ISUP.
-@item @dfn{Load Generation:} @tab 250,000 subscriber lines.
-@item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements.
-@item @tab ISUP Q.752 Operational Measurements.
-@item @tab Special Studies.
-@end multitable
+Each node requires 2 T1 spans on 1 T400P-SS7 interface card.
+
+Each node has 3 inter-machine trunk groups, one each to the two other LEC SSP nodes and one to the
+IC MGC.  These inter-machine trunks are not implemented (to save on system cost).@footnote{1,000,000
+BHCA equates to about 4630 T1s of bearer circuits which would require approximately $1,000,000.00
+worth of equipment to fully realize.}  Instead, signalling load generation at equivalent levels is
+provided.
+
+Line-side signalling protocols are not used.  Line-side subscribers are simulated using load
+generation.
+
+Each node is connected only to the Adminstrative LAN.
+
+@subsubheading Physical Node Mapping
+
+The preferred physical node mapping for logical nodes A, B and C is to provide a separate physical
+node for each logical node.  However, in a minimal configuration, logical nodes A, B and C could be
+mapped onto a single physical node equipped with 2 T400P-SS7 interface cards.
 
 @node LEC STP Nodes D and E
-@section LEC STP Nodes D and E
+@subsection LEC STP Nodes D and E
 @cindex LEC STP Nodes D and E
 
+Interconnection of the LEC STP Nodes D and E are illustrated in @figref{N-2}.
+
+@figure{labnode2,N-2,LEC STP Nodes D and E}
+
+@subsubheading Overview
+
 @multitable @columnfractions .25 .75
-@item @dfn{TDM Interface:} @tab SS7 narrow-band signalling links.
+@item @dfn{TDM Interface:} @tab 7 T1 spans of SS7 narrow-band signalling links.
 @item @dfn{Network Interface:} @tab Administrative LAN.
-@item @dfn{Protocol Components:} @tab MTP.
+@item @dfn{Protocol Components:} @tab MTP with Enhanced/Border GWS.
 @item @dfn{Load Generation:} @tab None.
+@item @dfn{Inter-Machine Trunks:} @tab None.
 @item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements
+@item @dfn{Test Harness:} @tab @dfn{TETWare} Distributed Node
 @end multitable
+
+@subsubheading Description
+
+As listed in @tabref{T-1}, logical nodes D and E are LEC STPs that are interconnected to each other
+with SS7 C-links, connected to each of nodes F and G with SS7 B/D-links, and connected to node H
+with A/E-links.  Each node D and E are connected to each of LEC SSP nodes A, B and C with SS7
+A-links.
+
+Each node requires 7 T1 spans total on 2 T400P-SS7 interface cards.
+
+Each node is connected only to the Adminstrative LAN.
+
+@subsubheading Physical Node Mapping
+
+The preferred physical node mapping for logical nodes D and E is to provide a separate physical node
+for each logical node.  Because each logical node requires 2 T400P-SS7 cards, a minimal configuration 
+still requires one physical node for each logical node for 2U chassis that can only support 2 PCI
+expansion cards.  For server chassis that can support 4 PCI expansion cards, these two logical nodes
+could be mapped onto a single physical node.
 
 @node IC STP/SG Nodes F and G
-@section IC STP/SG Nodes F and G
+@subsection IC STP/SG Nodes F and G
 @cindex IC STP/SG Nodes F and G
 
+Interconnection of the IC STP/SG Nodes F and G are illustrated in @figref{N-3}.
+
+@figure{labnode3,N-3,IC STP/SG Node F and G}
+
+@subsubheading Overview
+
 @multitable @columnfractions .25 .75
-@item @dfn{TDM Interface:} @tab SS7 narrow-band signalling links.
+@item @dfn{TDM Interface:} @tab 4 T1 spans of SS7 narrow-band signalling links.
 @item @dfn{Network Interface:} @tab Administrative LAN.
 @item @tab SIGTRAN signalling network.
-@item @dfn{Protocol Components:} @tab MTP, M2PA, M2UA, and M3UA.
+@item @dfn{Protocol Components:} @tab MTP, M3UA.
 @item @dfn{Load Generation:} @tab None.
+@item @dfn{Inter-Machine Trunks:} @tab None.
 @item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements
+@item @dfn{Test Harness:} @tab @dfn{TETWare} Distributed Node
 @end multitable
+
+@subsubheading Description
+
+As listed in @tabref{T-1}, logical nodes G and F are IC STP/SGs that are interconnected to each
+other with SS7 C-links, connected to each of nodes D and E with SS7 B/D-links, connected to node H
+with SS7 A-links, and connected to node H with SIGTRAN M3UA.
+
+Each node requires 4 T1 spans total on 1 T400P-SS7 interface card.
+
+Each node is connected to the Administrative LAN as well as the SIGTRAN Signalling Network.  The
+SIGTRAN Signalling Network includes the associated pair SG as well as the SG node H and the ASP node
+I.  Each of these SG nodes provide access to the ASP node I.
+
+@subsubheading Physical Node Mapping
+
+The preferred physical node mapping for logical nodes F and G is to provide a separate physical node
+for each logical node.  As a minimal system, these logical nodes could be mapped onto a single
+physical node.  For server chassis that can support 3 PCI expansion cards, logical node H could also
+be mapped onto the same physical node.
 
 @node IC MGC/SG Node H
-@section IC MGC/SG Node H
+@subsection IC MGC/SG Node H
 @cindex IC MGC/SG Node H
 
+Interconnection of the IC SSP/SG Node H is illustrated in @figref{N-4}.
+
+@figure{labnode4,N-4,IC SSP/SG Node H}
+
+@subsubheading Overview
+
 @multitable @columnfractions .25 .75
-@item @dfn{TDM Interface:} @tab SS7 narrow-band signalling links.
+@item @dfn{TDM Interface:} @tab 4 T1 spans of SS7 narrow-band signalling links.
 @item @dfn{Network Interface:} @tab Administrative LAN.
 @item @tab SIGTRAN signalling network.
 @item @dfn{Protocol Components:} @tab MTP, M2PA, M2UA, and M3UA.
 @item @dfn{Load Generation:} @tab None.
+@item @dfn{Inter-Machine Trunks:} @tab None.
 @item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements
+@item @dfn{Test Harness:} @tab @dfn{TETWare} Distributed Node
 @end multitable
 
+@subsubheading Description
+
+As listed in @tabref{T-1}, logical node H is an IC SSP/SG that is interconnected to each of nodes D
+and E with SS7 E-links and each of nodes F and G with SS7 A-links.
+
+The node requires 4 T1 spans total on 1 T400P-SS7 interface card.
+
+The node is connected to the Administrative LAN as well as the SIGTRAN Signalling Network.
+
+The SIGTRAN Signalling Network includes the associated pair of SGs (nodes F and G) as well as the
+ASP node I.  Using M2UA or M3UA, this SG node provides access to the ASP node I.  Using M2PA, the SG
+node is connected to M2PA perr SG nodes F and G.
+
+@subsubheading Physical Node Mapping
+
+The preferred physical node mapping for logical node H is to provide a separate physical node for
+the logical node.  As a minimal system, when server chassis can support 3 PCI expansion cards,
+logical node H could be mapped onto the same physical node as logical nodes F and G.
+
 @node IC MGC/ASP Node I
-@section IC MGC/ASP Node I
+@subsection IC MGC/ASP Node I
 @cindex IC MGC/ASP Node I
+
+Interconnection of the IC MGC/ASP Node I is illustrated in @figref{N-5}.
+
+@figure{labnode5,N-5,IC MGC/ASP Node I}
+
+@subsubheading Overview
 
 @multitable @columnfractions .25 .75
 @item @dfn{TDM Interface:} @tab None.
 @item @dfn{Network Interface:} @tab Administrative LAN.
 @item @tab SIGTRAN signalling network.
-@item @dfn{Protocol Components:} @tab MTP, ISUP, M2PA, M2UA, and M3UA.
 @item @tab VoIP control network.
 @item @tab VoIP signalling network.
-@item @dfn{Load Generation:} @tab 250,000 subscriber lines.
+@item @dfn{Protocol Components:} @tab MTP, ISUP, M2PA, M2UA, and M3UA.
+@item @dfn{Load Generation:} @tab 2,500,000 subscriber lines.
+@item @dfn{Inter-Machine Trunks:} @tab 1 effective trunk groups of 1,544 T1s.
 @item @dfn{Op. Measurements:} @tab MTP Q.752 Operational Measurements
 @item @tab ISUP Q.752 Operational Measurements
 @item @tab Special Studies.
+@item @dfn{Test Harness:} @tab @dfn{TETWare} Distributed Node
 @end multitable
+
+@subsubheading Description
+
+As listed in @tabref{T-1}, logical node I is an IC MGC/ASP that is interconnected to each of nodes
+F, G and H with SIGTRAN signalling.
+
+The node does not require SS7 narrow-band signalling link interface.
+
+The node is connected to the Adminstrative LAN as well as the SIGTRAN Signalling Network.  The node
+also connects to Media Gateways (MGs) using the VoIP Control Newtork and exchanges signalling over
+the backbone VoIP Signalling Newtork.
+
+The SIGTRAN Signalling Network includes the associated pair of SGs (nodes F and G) as well as the
+SSP/SG node H.  M2UA or M3UA access is provided by SG nodes F and G.  M2PA peer access is provided
+by SG nodes F and G.  M2UA or M3UA access may also be provided by SG node H.
+
+Attached Media Gateways (MGs) have 3 inter-machine trunk groups, one to each of the LEC SSP nodes
+(nodes A, B, C).  These inter-machine trunks are not implemented (to save on system
+cost).@footnote{1,000,000 BHCA equates to about 4630 T1s of bearer circuits and over 100,000 RTP
+sessions which would require over $1,000,000.00 worth of equipment.}  Instead, signalling load
+generation at equivalent levels is provided.
+
+Line-side signalling protocols (H.323, SIP) are not used.  Line-side sibscribers are simulated using
+load generation.
+
+@subsubheading Physical Node Mapping
+
+The preferred physical node mapping for logical node I is to provide a separate physical node for
+the logical node.  As a minimal system, logical node I could be combined with the administrative
+node J on the same physical node.
+
+@node Administrative Node J
+@subsection Administrative Node J
+@cindex Administrative Node J
+
+Interconnection of the Admininstrative Node J is illustrated in @figref{N-6}.
+
+@figure{labnode6,N-6,Administrative Node J}
+
+@subsubheading Overview
+
+@multitable @columnfractions .25 .75
+@item @dfn{TDM Interface:} @tab None.
+@item @dfn{Newtork Interface:} @tab Administrative LAN.
+@item @tab SIGTRAN Signalling Network.
+@item @dfn{Protocol Components:} @tab M2PA, M2UA, M3UA.
+@item @dfn{Load Generation:} @tab None.
+@item @dfn{Inter-Machine Trunks:} @tab None.
+@item @dfn{Op. Measurements:} @tab None (collection only).
+@item @dfn{Test Harness:} @tab @dfn{TETWare} Distributed Master.
+@end multitable
+
+@subsubheading Description
+
+As listed in @tabref{T-1}, logical node J isa n Administrative node interconnected to other nodes
+in the system via the Adminstrative LAN.
+
+The node does not require an SS7 narrow-band signalling link interface.
+
+The node is connected to the Administrative LAN as well as the SIGTRAN Signalling Network.  The
+purpose of the SIGTRAN Signalling Network is to provide for experiments that wish to spoof into that
+network.  The node will provide the M2PA, M2UA and M3UA SIGTRAN protocols for use by attack scripts.
+
+@subsubheading Physical Node Mapping
+
+The preferred physical node mapping for logical node J is to provide a separate physical node for
+the logical node.  As a minimal system, logical node J could be combined with the MGC/ASP node I on
+the same physical node.
+
+@node Physical Nodes
+@section Physical Nodes
+@cindex Physical Nodes
+
+Logical nodes can be mapped into physical nodes in two ways:
+
+@table @dfn
+@item Preferred Mapping
+Preferred mapping is to provide a separate physical node for each logical node.
+@item Minimalist Mapping
+Minimalist mapping combines multiple logical nodes onto each physical node.
+@end table
+
+@menu
+* Preferred Physical Node Mapping::
+* Minimal Physical Node Mapping::
+@end menu
+
+@node Preferred Physical Node Mapping
+@subsection Preferred Physical Node Mapping
+@cindex Preferred Physical Node Mapping
+
+The preferred mapping of logical nodes onto physical nodes is to provide a separate physical node
+to host each logical node.
+
+@tabfig{labpref,T-2,Preferred Physical Nodes}
+
+The preferred mapping allows the use of 2U server chassis that can support a maximum of 2 PCI
+expansion cards.  The mapping requires 8 server chasses and 10 T400P-SS7 cards.
+
+@node Minimal Physical Node Mapping
+@subsection Minimal Physical Node Mapping
+@cindex Minimal Physical Node Mapping
+
+The minmalist mapping of logical nodes onto physical nodes combines like-nodes with complementary
+interface requirements onto the same physical node.
+
+@tabfig{labmini,T-3,Minimal Physical Nodes}
+
+The minimalist mapping requires 2U or 4U server chassis that must support a maximum of 4 PCI
+expansion cards.  The mapping requires only 4 server chasses and 9 T400P-SS7 cards.
 
 @node Hardware Specification
 @chapter Hardware Specification
@@ -1505,6 +1811,7 @@ Part (MTP) and ISDN User Part (ISUP).  Load generation is provided for 250,000 s
 @menu
 * Hardware Requirements::
 * Site Requirements::
+* System Software::
 * Capacity and Sizing::
 @end menu
 
@@ -1562,7 +1869,7 @@ The T400P-SS7 and E400P-SS7 cards are 4-span T1 or E1 cards manufactured by
 @uref{http://www.digium.com/, Digium}.
 @figref{10} shows a picture of a T400P-SS7 card.
 
-@figuresized{v400p,10,V400P-SS7 Card,4.0in}
+@figuresized{v400p,10,V400P-SS7 Card,3.0in}
 
 The T400P-SS7 and E400P-SS7 cards have the lowest level of signalling performance due to the lack of
 on-board HDLC functions.  Transfers to the host processor over the PCI bus use PCI I/O ports and
@@ -1672,6 +1979,7 @@ and mirrored) is preferred.
 @menu
 * Equipment Enclosures::
 * Synchronization::
+* Time Source::
 * Digital Cross-Connect::
 * Network Switching::
 * Noise::
@@ -1684,9 +1992,34 @@ and mirrored) is preferred.
 @subsection Equipment Enclosures
 @cindex Equipment Enclosures
 
+Equipment enclosure will be one (1) 19-inch rack mount enclosed equipment bay with elevation view as
+illustrated in @figref{E-1} and with the plan view as illustrated in @figref{E-2}.
+
+@figuresized{elev,E-1,Equipment Enclosure - Elevation View,3.5in}
+
+The equipment enclosure requires approximately 8 square feet of clearance (2 feet deep by 4 feet
+wide) at the read of the enclosure and approximately 12 square feet of clearance (3 feet deep by 4
+feet wide) at the front of the enclosure.
+
+@figuresized{floorplan,E-2,Equipment Enclosure - Plan View,1.75in}
+
 @node Synchronization
 @subsection Synchronization
 @cindex Synchronization
+
+TDM network syncrhonization will derive from logical nodes D and E (LEC STPs) in a hierarchal
+synchronization arrangement.  Logical node D will provide master synchronization and logical node E
+will slave from logical node D.  All other nodes will slave their syncrhonization on a per-span
+basis from their attachment to either logical node D or E.
+
+@node Time Source
+@subsection Time Source
+@cindex Time Source
+
+Logical nodes D and E will also act as a time source for Network Time Protocol.  If UNT can provide
+NTP network access to a high accuracy stratum clock, logical nodes D and E will slave off of that
+NTP source via the Administrative LAN.  All other logical nodes in the system will syncrhonize their
+local clocks to NTP broadcasts from logical nodes D and E on the Administrative LAN.
 
 @node Digital Cross-Connect
 @subsection Digital Cross-Connect
@@ -1733,17 +2066,70 @@ Ethernet switches with 16-32 Gigabit capacity, RJ45, Category 5e UTP compatible.
 @subsection Noise
 @cindex Noise
 
+Although equipment enclosures can be equipped with doors that reduce noise from cooling fans inside
+the equipment enclosure, cooling fans produce a considerable amount of noise.  Equipment enclosures
+should not be located in an office environment that is frequently occupied by personnel.  Equipment
+enclosures should be located in dedicated equipment rooms.
+
 @node Cooling Requirements
 @subsection Cooling Requirements
 @cindex Cooling Requirements
+
+Estimations of steady state operational cooling requirements (BTU-hours of A/C) are based on average
+operating AC power consumption.
 
 @node Preventative Maintenance
 @subsection Preventative Maintenance
 @cindex Preventative Maintenance
 
+Cooling fan filter packs must be inspected on a regular basis and changed as required.  Filter pack
+lifetimes will depend upon the air quality of the environment in which the equipment is operated.
+
 @node Power Consumption
 @subsection Power Consumption
 @cindex Power Consumption
+
+Power consuption is estimated by adding the power consumption of the each of the components in the
+equipment chassis.  All components must be provided with 110VAC 60Hz power.
+
+@node System Software
+@section System Software
+@cindex System Software
+
+OpenSS7 software requires a GNU/Linux operating system to be installed and operational on all
+physical nodes.
+
+@subsection Operating System Software
+
+OpenSS7 protocol software will operation on almost any 2.4 or 2.6 kernel Linux distribution.  The
+selected GNU/Linux distribution should meet the following criteria:
+
+If the compute platforms are provided by UNT or a third party hardware vendor, the GNU/Linux
+distribution selected should be one that is supported for the selected hardware.  Suggested
+distributions are vendor-supported enterprise versions such as SuSE Enterprise Linux, or RedHat
+Advanced Server.  Recent unsupported community distributions such as Debian, Fedora Core, or
+OpenSuSE can also be considered.
+
+OpenSS7 runs strict SELinux security policies on all platforms with remote logging and security
+scans enabled.
+
+@subsection Network Element Software
+
+OpenSS7 network element software consists of the latest non-public relase of the OpenSS7-0.9.2
+software package (currently at patchlevel D).  Software is installed and upgraded using RPM on
+RPM-compatible systems (e.g. SuSE and RedHat) and DSCs on Debian systems.
+
+Network element software will be custom configured for the SS7/SIGTRAN/VoIP Security Network detaile
+din this design document.
+
+@subsection Test Harness Software
+
+Test harness software consists of a current load of the networked version of the @cite{TETWare}
+package available in version 3.3h from the @url{http://www.opengroup.org/,OpenGroup} web server.
+
+Components for use in @cite{TETWare} attack scripts (test cases) and components for collection of
+operational measurements, events, alarms and studies for report generation, will be provided as part
+of the OpenSS7-0.9.2 package.
 
 @node Capacity and Sizing
 @section Capacity and Sizing

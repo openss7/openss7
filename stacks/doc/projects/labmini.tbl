@@ -1,0 +1,32 @@
+.ie '\*(.T'ps' \{
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS
+box center tab(:);
+cb|cb|cb|cb
+cb|cb|cb|cb
+l|l|n|n.
+Logical:Physical:T1:T400P
+Nodes:Node:Spans:Cards
+=
+Nodes A,B,C:Node 1:6:2
+Nodes D,E:Node 2:14:4
+Nodes F,G,H:Node 3:12:3
+Nodes I,J:Node 4:0:0
+=
+8 nodes:4 nodes:32:9
+.TE

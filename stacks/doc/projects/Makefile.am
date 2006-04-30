@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/29 21:30:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/30 15:26:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/29 21:30:19 $ by $Author: brian $
+# Last Modified $Date: 2006/04/30 15:26:27 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.12  2006/04/30 15:26:27  brian
+# - updated LAB document
+#
 # Revision 0.9.2.11  2006/04/29 21:30:19  brian
 # - added UNT lab project documentation
 #
@@ -134,7 +137,15 @@ FIG_FIGS		= \
 			lab004.fig \
 			lab005.fig \
 			lab006.fig \
-			lab007.fig
+			lab007.fig \
+			floorplan.fig \
+			elev.fig \
+			labnode1.fig \
+			labnode2.fig \
+			labnode3.fig \
+			labnode4.fig \
+			labnode5.fig \
+			labnode6.fig
 
 TBL_TBLS		= \
 			hlr_schest.tbl \
@@ -148,7 +159,9 @@ TBL_TBLS		= \
 			hlr_gate6.tbl \
 			hlr_traf.tbl \
 			hlr_cost.tbl \
-			labnodes.tbl
+			labnodes.tbl \
+			labpref.tbl \
+			labmini.tbl
 
 PNG_PNGS		= \
 			acb56.png \

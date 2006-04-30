@@ -1,0 +1,16 @@
+                                                                                
+                 Inter-Machine Trunks |||                                       
+                    (not implemented) |||       /                               
+                                      |||      O 1-T1                           
+                                      |||     /                                 
+                  2,500,000    ____   |||    /                                  
+                 Subscribers  |    | /   L  /     A-links                       
+                  1,000,000   |LOAD|{ SSP }X      to nodes                      
+                     BHCA     |____| L___/  L       D,E                         
+                                       ||    L                                  
+                                       L7     L                                 
+                        Administrative ||      O 1-T1                           
+                                   LAN ||       L                               
+                                       L7                                       
+                                       ||                                       
+                                                                                
