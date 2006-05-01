@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: lab.texi,v 0.9.2.3 2006/04/30 15:26:27 brian Exp $
+% @(#) $Id: lab.texi,v 0.9.2.5 2006/05/01 14:35:57 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,17 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/04/30 15:26:27 $ by $Author: brian $
+% Last Modified $Date: 2006/05/01 14:35:57 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: lab.texi,v $
+% Revision 0.9.2.5  2006/05/01 14:35:57  brian
+% - spelling corrections
+%
+% Revision 0.9.2.4  2006/05/01 14:19:22  brian
+% - updating LAB document
+%
 % Revision 0.9.2.3  2006/04/30 15:26:27  brian
 % - updated LAB document
 %
@@ -381,11 +387,11 @@ system or feature listed herein.
 @subsection Audience
 @c @cindex Document audience
 
-This document is intended for a technical audience.  The reader should be familiar with most ETSI
-and 3GPP specifications regarding GSM and UMTS.  In addition, the reader should be familiar with
-ANSI-41 and North American Digital Cellular.  Because much of the focus of an SS7/SIGTRAN/VoIP
-Security Network is on SS7 signalling, the reader should also be familiar with ITU-T, ETSI and ANSI
-standards regarding Signalling System No. 7.
+This document is intended for a technical audience.
+@c The reader should be familiar with most ETSI and 3GPP specifications regarding GSM and UMTS.  In
+@c addition, the reader should be familiar with ANSI-41 and North American Digital Cellular.
+Because much of the focus of an SS7/SIGTRAN/VoIP Security Network is on SS7 signalling, the reader
+should also be familiar with ITU-T, ETSI and ANSI standards regarding Signalling System No. 7.
 
 @subsection Revisions
 @c @cindex Document revisions
@@ -401,6 +407,12 @@ Project} website for a current version.
 @smallexample
 
 $Log: lab.texi,v $
+Revision 0.9.2.5  2006/05/01 14:35:57  brian
+- spelling corrections
+
+Revision 0.9.2.4  2006/05/01 14:19:22  brian
+- updating LAB document
+
 Revision 0.9.2.3  2006/04/30 15:26:27  brian
 - updated LAB document
 
@@ -458,26 +470,35 @@ This document is organized as follows:
 @end menu
 @end ifnottex
 @iftex
-@table @emph
+@itemize @bullet
 @item @ref{Introduction}
+
 Introduction to the SS7/SIGTRAN Security Platform.
 @item @ref{System Requirements}
+
 Overarching system requirements for the SS7/SIGTRAN/VoIP Security Network.
 @item @ref{Network Configuration}
+
 Network configuration provided by the SS7/SIGTRAN/VoIP Security Network.
-@item @ref{Instrumetnation}
+@item @ref{Instrumentation}
+
 Instrumentation of the SS7/SIGTRAN/VoIP Security Network.
 @item @ref{Node Configuration}
+
 Node configuration provided for nodes in the SS7/SIGTRAN/VoIP Security Network.
 @item @ref{Hardware Specification}
+
 Specifications for each compute platfom in the SS7/SIGTRAN/VoIP Security Network.
 @item @ref{List of Figures}
+
 List of figures.
 @item @ref{List of Tables}
+
 List of tables.
 @item @ref{Index}
+
 Index of concepts.
-@end table
+@end itemize
 @end iftex
 
 @node Introduction
@@ -533,17 +554,201 @@ call generation and completion during test runs.
 
 @c @include texi/fdl.texi
 
+@section Conventions
+@cindex Conventions
+
+This document uses @cite{texinfo} typographic conventions.
+
+Throughout this document, the word @dfn{STREAMS} will refer to the mechanism and the word
+@dfn{Stream} will refer to the path between a user application and a driver.  In connection with
+@dfn{STREAMS}-based pipes, @dfn{Stream} refers to the data transfer path in the kernel between the
+kernel and one or more user processes.
+
+System calls, @dfn{STREAMS} utility routines, header files, and data structures are given using
+@command{texinfo} @file{filename} typesetting, when they are mentioned in the text.
+
+Variable names, pointers, and parameters are given using @command{texinfo} @var{variable}
+typesetting conventions.  Routine, field, and structure names unique to the examples are also given
+using @command{texinfo} @var{variable} typesetting conventions when they are mentioned in the text.
+
+Declarations and short examples are in @command{texinfo} @samp{sample} typesetting.
+
+@command{texinfo} displays are used to show program source code.
+@ignore
+Screens are used to simulate what a user will see on a video display screen or to show program
+source code.
+@end ignore
+
+Data structure formats are also shown in @command{texinfo} displays.
+
+@section Related Manuals
+@cindex Related Manuals
+
+@itemize @bullet
+@item Data Link Provider Interface (DLPI), Revision 2.0.0, April 1992, OSI Work Group, UNIX International
+@item Network Provider Interface (NPI), Revision 2.0.0, April 1992, OSI Work Group, UNIX International
+@item Transport Provider Interface (TPI), Revision 1.5, December 1992, OSI Special Interest Group, UNIX International
+@item Transaction Interface (TRI), Application Programming Interface, Version 0.9a Edition 5, March 2006, OpenSS7 Corporation
+@item Transaction Component Interface (TCI), Application Programming Interface, Version 0.9a Edition 5, March 2006, OpenSS7 Corporation
+@item Call Control Interface (CCI), Application Programming Interface, Version 0.9a Edition 5, March 2006, OpenSS7 Corporation
+@item Test Environment Toolkit, TETware User Guide, Revision 1.2, TET3-UG-1.2, September 1998, The Open Group.
+@item Test Environment Toolkit, TETware Programmers Guide, Revision 1.2, TET3-PG-1.2, September 1998, The Open Group.
+@item Test Environment Toolkit, TETware Installation Guide for UNIX Operating Systems, Revision 1.2, TET3-IGU-1.2, September 1998, The Open Group.
+@end itemize
+
+@section Other Documentation
+@cindex Other Documentation
+
+@itemize @bullet
+@item High Performance HLR, Preliminary Design Document, Version 0.9a Edition 5, March 2006, OpenSS7 Corporation
+@item OpenSS7 VoIP Switch, Preliminary Design Document, Version 0.9a Edition 5, March 2006, OpenSS7 Corporation
+@end itemize
+
+@section Glossary
+@cindex Glossary
+
+@section Acronyms
+@cindex Acronyms
+
+Following is a list of acronyms used in this document.
+
+@multitable @columnfractions .15 .65
+@item @dfn{A/C}		@tab Air Conditioning
+@item @dfn{AC}		@tab Alternating Current
+@item @dfn{AMD}		@tab American Micro Devices (Company)
+@item @dfn{ANSI}	@tab American National Standards Institute
+@item @dfn{ASP}		@tab Application Server Process
+@item @dfn{AS}		@tab Application Server
+@item @dfn{BGWS}	@tab Border Gateway Screening
+@item @dfn{BHCA}	@tab Busy Hour Call Attempts
+@item @dfn{BIBR}	@tab Backward Indicator Bit Received
+@item @dfn{BICC}	@tab Bearer Independent Call Control
+@item @dfn{BLA}		@tab Blocking Acknowledgement
+@item @dfn{BLO}		@tab Blocking Request
+@item @dfn{BRI}		@tab Basic Rate Interface
+@item @dfn{BTU}		@tab British Thermal Units
+@item @dfn{CCS}		@tab Centi Call Seconds
+@item @dfn{CFBNA}	@tab Call Forwarding Busy/No Answer
+@item @dfn{CFB}		@tab Call Forwarding Busy
+@item @dfn{CFNA}	@tab Call Forwarding No Answer
+@item @dfn{CGBA}	@tab Circuit Group Blocking Acknowledgement
+@item @dfn{CGB}		@tab Circuit Group Blocking Request
+@item @dfn{CGUA}	@tab Circuit Group Unblocking Acknowledgement
+@item @dfn{CGU}		@tab Circuit Group Unblocking Request
+@item @dfn{CompactPCI}	@tab Compact Peripheral Component Interconnect
+@item @dfn{CO}		@tab Central Office
+@item @dfn{CRC}		@tab Cyclic Redundancy Check
+@item @dfn{DACCS}	@tab Digital Automatic Cross Connect System
+@item @dfn{DASD}	@tab Direct Access Storage Device
+@item @dfn{DCCS}	@tab Digital Cross Connect System
+@item @dfn{DC}		@tab Direct Current
+@item @dfn{DPC}		@tab Destination Point Code
+@item @dfn{DSC}		@tab Debian Source Control
+@item @dfn{DSX}		@tab Digital Cross Connect
+@item @dfn{EGWS}	@tab Enhanced Gateway Screening
+@item @dfn{ETSI}	@tab European Telecommunications Standards Institute
+@item @dfn{FCC}		@tab Federal Communications Commission
+@item @dfn{FIBR}	@tab Forward Indicator Bit Received
+@item @dfn{FSF}		@tab Free Software Foundation
+@item @dfn{GCP}		@tab Gateway Control Protocol
+@item @dfn{GK}		@tab Gate Keeper
+@item @dfn{GNU}		@tab GNU's Not UNIX
+@item @dfn{GRA}		@tab Group Reset Acknowledgement
+@item @dfn{GRS}		@tab Group Reset
+@item @dfn{GWS}		@tab Gateway Screening
+@item @dfn{HDLC}	@tab High-Level Data Link Control
+@item @dfn{HTML}	@tab Hyper Text Markup Language
+@item @dfn{IC}		@tab Inter-Connect
+@item @dfn{IMT}		@tab Inter-Machine Trunk
+@item @dfn{IP}		@tab Internet Protocol
+@item @dfn{ISDN}	@tab Integrated Services Digital Network
+@item @dfn{ISO}		@tab International Organization for Standardization
+@item @dfn{ISUP}	@tab ISDN User Part Part
+@item @dfn{ITU}		@tab International Telecommunications Union
+@item @dfn{ITU-T}	@tab International Telecommunications Union - Telephony Sector
+@item @dfn{IXC}		@tab Inter-Exchange Carrier
+@item @dfn{LADS}	@tab Local Alarm Display System
+@item @dfn{LAN}		@tab Local Area Network
+@item @dfn{LEC}		@tab Local Exchange Carrier
+@item @dfn{M2PA}	@tab MTP Level 2 Peer-to-Peer User Adaptation Layer
+@item @dfn{M2UA}	@tab MTP Level 2 User Adaptation Layer
+@item @dfn{M3UA}	@tab MTP Level 3 User Adaptation Layer
+@item @dfn{MEGACO}	@tab Media Gateway Control
+@item @dfn{MGCP}	@tab Media Gateway Control Protocol
+@item @dfn{MGC}		@tab Media Gateway Controller
+@item @dfn{MG}		@tab Media Gateway
+@item @dfn{MIB}		@tab Management Information Base
+@item @dfn{MSU}		@tab Message Signal Unit
+@item @dfn{MTP}		@tab Message Transfer Part
+@item @dfn{NAT}		@tab Network Address Translation
+@item @dfn{NEBS}	@tab Network Equipment Building Standard
+@item @dfn{NOC}		@tab Network Operation Control
+@item @dfn{NTP}		@tab Network Time Protocol
+@item @dfn{NT}		@tab Network Terminal
+@item @dfn{NXX}		@tab Central Office Prefix
+@item @dfn{OPC}		@tab Originating Point Code
+@item @dfn{OSS}		@tab Operations Support System
+@item @dfn{PCI}		@tab Peripheral Component Interconnect
+@item @dfn{PCMIG}	@tab Personal Computer Manufacturer's Industry Group
+@item @dfn{PC}		@tab Personal Computer
+@item @dfn{PDF}		@tab Portable Document Format
+@item @dfn{POP}		@tab Point of Presence
+@item @dfn{PRI}		@tab Primary Rate Interface
+@item @dfn{PSTN}	@tab Public Switched Telephone Network
+@item @dfn{RCO}		@tab Recent Change Order
+@item @dfn{RLC}		@tab Release Complete
+@item @dfn{RPM}		@tab RedHat Package Manager
+@item @dfn{RTCP}	@tab Real-time Transport Control Protocol
+@item @dfn{RTP}		@tab Real-time Transport Protocol
+@item @dfn{SCCP}	@tab Signalling Connection Control Part
+@item @dfn{SCN}		@tab Switched Circuit Network
+@item @dfn{SCP}		@tab Service Control Point
+@item @dfn{SCSI}	@tab Small Computer Serial Interface
+@item @dfn{SCTP}	@tab Stream Control Transmission Protocol
+@item @dfn{SEP}		@tab Signalling End Point
+@item @dfn{SG}		@tab Signalling Gateway
+@item @dfn{SIF}		@tab Service Information Field
+@item @dfn{SIGTRAN}	@tab Signalling Transport
+@item @dfn{SIO}		@tab Service Information Octet
+@item @dfn{SIP}		@tab Session Initiation Protocol
+@item @dfn{SI}		@tab Service Information
+@item @dfn{SPOI}	@tab Signalling Point of Interface
+@item @dfn{SP}		@tab Signalling Point
+@item @dfn{SS7}		@tab Signalling System Number 7
+@item @dfn{SSP}		@tab Service Switching Point
+@item @dfn{STP}		@tab Signalling Transfer Point
+@item @dfn{SUA}		@tab SCCP User Adaptation Layer
+@item @dfn{TA}		@tab Terminal Adapter
+@item @dfn{TCAP}	@tab Transaction Capabilities Application Part
+@item @dfn{TCP}		@tab Transmission Control Protocol
+@item @dfn{TDM}		@tab Time Division Multiplexing
+@item @dfn{TFA}		@tab Transfer Allowed
+@item @dfn{TFC}		@tab Transfer Controlled
+@item @dfn{TFP}		@tab Transfer Prohibited
+@item @dfn{TIPHON}	@tab Telecommunications and Internet Protocol Harmonization Over Networks
+@item @dfn{TUA}		@tab TCAP User Adaptation Layer
+@item @dfn{UA}		@tab User Agent
+@item @dfn{UBA}		@tab Unblocking Acknowledgement
+@item @dfn{UBL}		@tab Unblocking Request
+@item @dfn{UDP}		@tab User Datagram Protocol
+@item @dfn{UNT}		@tab University of North Texas
+@item @dfn{UTP}		@tab Unshielded Twisted Pair
+@item @dfn{VAC}		@tab Volts AC
+@item @dfn{VDC}		@tab Volts DC
+@item @dfn{VoIP}	@tab Voice over IP
+@item @dfn{VSP}		@tab Virtual Signalling Point
+@end multitable
+
 @node System Requirements
 @chapter System Requirements
 @cindex System Requirements
 
 This section discusses SS7/SIGTRAN/VoIP Security Network system requirements generated by the need
-for testing of security frameworks present within the Public Switched Telephone Network (PSTN).
-
-It should be noted that UNT has not written even a high-level requirements document for the
-instrumentation required for experimentation.  The requirements in the sections that follow derive
-from discussions with Dr. Ram Dantu of UNT and consideration of the paper @cite{SS7 over IP:
-Signaling Interworking Vulnerabilities}.
+for testing of security frameworks present within the Public Switched Telephone Network
+(PSTN).@footnote{It should be noted that UNT has not written even a high-level requirements document
+for the instrumentation required for experimentation.  The requirements in the sections that follow
+derive from discussions with Dr. Ram Dantu of UNT and consideration of the paper @cite{SS7 over IP:
+Signaling Interworking Vulnerabilities}.}
 
 @menu
 * Experimentation Objectives::
@@ -555,19 +760,40 @@ Signaling Interworking Vulnerabilities}.
 @section Experimentation Objectives
 @cindex Experimentation Objectives
 
+The primary objective of providing an SS7/SIGTRAN/VoIP Security Network is to provide an environment
+for experimentation in aspects of SS7 signalling security.  The network is expected to operate in a
+close a fashion to a LEC network as current deployed within the Public Switched Telephone Network
+(PSTN).  The network should run a realistic load of telephone network calls using the ISDN User Part
+(ISUP) protocol of Signalling System No. 7, and present network elements organized and configured
+according to current practises in the PSTN.
+
 @figref{1} illustrates one network node configuration discussed in the paper @cite{SS7 over IP:
 Signaling Interworking Vulnerabilities} from the SS7 network perspective.
 
 @figure{lab000,1,Network Architecture}
 
-@figref{1} shows two demarcation points for interconnection.  A Point-of-Presence (POP) occurs at
-the facilities between interconnected SSPs.  The precise POP demarcation point is largely arbitrary
-as far as security is concerned.  A Signalling Point of Interface (SPOI) occurs either across the
-B/D-Links interconnecting STP associated pairs (indicated by dotted line (B)), or across the
-A/E-Links interconnecting the SSP to the SS7 network (indicated by dotted line (A)).
+@figref{1} shows two typical demarcation points for interconnection.  A Point-of-Presence (POP)
+occurs at the facilities between interconnected SSPs.  The precise POP demarcation point is largely
+arbitrary as far as security is concerned.  A Signalling Point of Interface (SPOI) occurs either
+across the B/D-Links interconnecting STP associated pairs (indicated by dotted line (B)), or across
+the A/E-Links interconnecting the SSP to the SS7 network (indicated by dotted line (A)).
 
 The SSP on the right of @figref{1} can be further decomposed according to the SIGTRAN and TIPHON
-architectures as illustrated in @figref{2} and @figref{3}.
+architectures as illustrated in @figref{2} and @figref{3}.  The SIGTRAN architecture provides for
+two forms of decomposition and back-haul of SS7 signalling traffic over an IP network.  Each form
+corresponds to the demarcation points and interconnect strategies illustrated in @figref{1}.
+
+The TIPHON architecture provides for decomposition of a gateway appearing as an SSP within the SS7
+network that provides interworking between the traditional ISUP based call control of the SS7
+network and the BICC, H.323 or SIP call control of a VoIP network.
+
+The gateway is decomposed into three (3) roles: the Media Gateway Controller (MGC) that provides
+call control interworking between ISUP and BICC, H.323 or SIP; the Signalling Gateway (SG) that
+provides signalling interworking and distribution within the decomposed gateway; and, the Media
+Gateway (MG) the provides media conversion between TDM bearer channels in the Switched Circuit
+Network (SCN) and Real-Time Transport Protocol (RTP) sessions in the VoIP network.  This
+decomposition is the same independent of the demarcation point or interconnect strategy and is
+illustrated in both @figref{2} and @figref{3}.
 
 @figure{lab005,2,SSP Decomposition - Demarcation B}
 
@@ -587,11 +813,17 @@ used.
 
 Typically, the networks labelled as @dfn{VoIP Control Network} in @figref{2} and @figref{3} is a
 secured private network.  Although the networks labelled as @dfn{VoIP Signalling Network} and
-@cite{VoIP Bearer Network} might be directly connected to the public Internet, they likely are not
-in real situations.  Normally an H.323 GK or SIP Proxy and firewalls would stand between the
-@cite{VoIP Signalling Network} and a public Internet or even a private network attached ultimately
-to a public Internet.  Normally a NAT, IP Proxy or Firewall would stand between the @dfn{VoIP Bearer
-Network} and a public Internet or even a private network attached ultimately to a public Internet.
+@dfn{VoIP Bearer Network} might be directly or indirectly connected to the public Internet, they
+likely are not in real-world deployments.  Normally a BICC gateway (GW), H.323 Gate Keeper (GK) or
+SIP Proxy would stand between the @dfn{VoIP Signalling Network} and a public Internet or even a
+private network attached ultimately to a public Internet.  Normally a Network Address Translation
+(NAT) device, IP Proxy, IP Firewall and security routers would stand, both between the @dfn{SIGTRAN
+Signalling Network} and @dfn{VoIP Control Network} and any external attached network elements, as
+well as between the MGC and the @dfn{VoIP Signalling Network} and the MGs and the @dfn{VoIP Bearer
+Network}.
+
+Nevertheless, the objective of the SS7/SIGTRAN/VoIP Security Network is to provide experiment access
+to each node and control or signalling network in the system.
 
 @node Experimental Approach
 @section Experimental Approach
@@ -600,17 +832,20 @@ Network} and a public Internet or even a private network attached ultimately to 
 The experimental approach is to provide a network environment that behaves much the same as the
 Public Switched Telephone Network (PSTN) in regard to the processing of calls and the functional
 platforms and logical nodes provided.  Commercial implementations of protocols and call processing
-functions will be used where possible.  This captive network environment will be instrumented and
-will carry a high volume of call traffic in the same manner as a typical deployment within the PSTN.
-Experiments will be run in attempting to attack the system using the techniques documented in the
-paper: @cite{SS7 over IP: Signaling Interworking Vulnerabilities}.
-
-Note that the use of real MGs, IMTs (Inter-Machine Trunks) and RTP channels for high traffic volumes
-is cost prohibitive.  Costs approaching that of the PSTN itself would result.  Call emulation
-consisting of the signalling components without the actual bearer-channel facilities can provide
-large-scale signalling traffic approaching that of a large network provider without the cost of the
-physical trunks.  Also, the security of the MEGACO/H.248 or MGCP protocols is not the subject of
-current investigations.
+functions will be used throughout.  The SS7/SIGTRAN/VoIP Security Network is a captive network in
+the sense that it is not connected to the Public Switched Telephone Network (PTSN) nor Public
+Internet.  Each node in the captive network will be fully instrumented for the purpose of running
+experiments.  The captive network will carry a high volume of call traffic in the same manner as a
+typical medium scale deployment within the PSTN.  Call traffic will be generated using best practise
+load generation techniques (load box) normally used for testing the performance and capacity of
+telecommunications networks.@footnote{Note that the use of real MGs, IMTs (Inter-Machine Trunks) and
+RTP channels for high traffic volumes is cost prohibitive.  Costs approaching that of the PSTN
+itself would result.  Call emulation consisting of the signalling components without the actual
+bearer-channel facilities can provide large-scale signalling traffic approaching that of a large
+network provider without the cost of the physical trunks.  Also, the security of the MEGACO/H.248 or
+MGCP protocols is not the subject of current investigations and will not be implemented.}
+Experiments will then be run against this operating system in attempting to attack the system using
+the techniques documented in the paper: @cite{SS7 over IP: Signaling Interworking Vulnerabilities}.
 
 @node Experiment Requirements
 @section Experiment Requirements
@@ -620,17 +855,17 @@ In support of experimentation with signalling security, the following high-level
 
 @enumerate
 @item  The system should as closely as possible provide the configuration and capabilities found in
-a large public network.
+a medium to large scale public network.
 @item  The system must be able to sustain a high signalling load while performing experiments.
-@item  Call traffic generators and acceptors need to be provided to simulate the call traffic load
-of many subscribers in a large network.
-@item  The system needs to be instrumented and call traffic monitors and audits provided for correct
+@item  Call traffic generators and acceptors will be provided to simulate the call traffic load of
+many subscribers in a large network.
+@item  The system will be instrumented and call traffic monitors and audits provided for correct
 completion and release of each call.  This is to assist in the determination of the results of a
 given experiment.@footnote{That is, to determine, for example, how many call failures were caused by
 a particular experiment, and the nature and extent of each failure.}
 @end enumerate
 
-The following efficiencies can be exploited:
+The following efficiencies will be exploited:
 
 @enumerate
 @item
@@ -643,7 +878,7 @@ channels necessary to provide the bearer capabilities for the generated traffic.
 Intra-switch traffic does not need to be generated; only inter-switch traffic.  Because intra-switch
 traffic (some 80% of the call traffic experienced within the PSTN) does not expose itself as ISUP
 SS7 signalling, it need not be simulated.  By not simulating intra-switch traffic, a PSTN
-environment of five (5) times the scale or more can be accomplished with the same amount of
+environment of five (5) times the scale or more can be accomplished with the same capacity of
 equipment.
 
 @item
@@ -653,10 +888,14 @@ of PSTN line-side devices.} do not need to be provided.  Traffic generation and 
 simulated with direct ISUP traffic generation and acceptance.
 
 @item
+VoIP network User Agent (UAs), the equivalent of PSTN line-side devices, do not need to be provided
+for signalling security testing.  In a later phase, these devices could be simulated.
+
+@item
 ISUP protocol stacks provide a set of standard operational measurements that can be used to
 instrument and monitor call completion and release.  Operations measurements include the number of
 lost or abnormal calls, including the nature of the failure and diagnostic information.  This
-information can be reused to instrument ISUP call processing within the test network in several
+information will be reused to instrument ISUP call processing within the network in several
 ways:
 
 @enumerate
@@ -675,6 +914,28 @@ Operational measurement alarms can be collected and used to indicate the level o
 security response by an operator to experiments.
 @end enumerate
 
+@item
+Call processing logic in commercial PSTN SSPs provide for authentication, authorization, screening
+and verification of call signalling information for the purposes of telecommunications network
+security.  This authentication, authorization, screening and verification is aimed at providing
+security of telecommunications common equipment resources and billing audit and verification.  These
+processes are sophisticated and have evolved from a long history of attempted and successful abuse
+of the public telephone network.  However, these methods are not the focus of an investigation into
+the security of signalling systems and will not be implemented on load generated traffic.
+
+@item
+In actual deployments, network elements occur at a geographic distance and short and long haul
+telecommunications facilities connect the network elements.  For the purposes of signalling
+security, the distance between nodes and the facilities between them are not a focus.  All
+connecting facilities, although of the same type as found in real networks, will be intra-office
+facilities and within the system will be cage to cage connections not exceeding several meters.
+
+@item
+In network deployments there is a high degree of physical security surrounding primary network
+elements such as LEC primary STPs.  In these installations, simply opening a door can generate
+security alarms.  For the purpose of signalling security testing, this physical security will not be
+recreated.
+
 @end enumerate
 
 @node Network Configuration
@@ -682,11 +943,16 @@ security response by an operator to experiments.
 @cindex Network Configuration
 
 To satisfy the requirements for experimentation with the security of the SS7/SIGTRAN/VoIP Security
-Network, the intention is for the laboratory system to provide a telecommunications sub-network and
-environment that parallels the Public Switched Telephone Network (PSTN).  The SS7/SIGTRAN/VoIP
-Security Network must provide a sub-network of the PSTN in which experiments can be performed.  To
-accomplish this, the physical nodes in the SS7/SIGTRAN/VoIP Security Network provide emulation of
-typical logical nodes in the PSTN.
+Network, the intention is for the instrumentation to provide a telecommunications network and
+environment that parallels actual Local Exchange Carrier (LEC) deployments within the Public
+Switched Telephone Network (PSTN).  The SS7/SIGTRAN/VoIP Security Network will provide a captive
+network equivalent to the PSTN in which experiments can be performed and meaningful results
+collected.  To accomplish this, the logical nodes in the SS7/SIGTRAN/VoIP Security Network provide
+the capabilities of typical physical nodes, platforms and installations in the PSTN.
+
+The mapping of logical PSTN and VoIP network elements onto the physical nodes of the captive network
+is the subject of this section.  First the logical network configuration is determined, and then the
+mapping of logical network configuration onto a physical realization is provided.
 
 @menu
 * Logical Network Configuration::
@@ -696,6 +962,11 @@ typical logical nodes in the PSTN.
 @node Logical Network Configuration
 @section Logical Network Configuration
 @cindex Logical Network Configuration
+
+In this section the types of logical network elements (nodes) and their typical interconnection and
+configuration is discussed.  The number of logical nodes of each type and a single captive network
+configuration suitable for the purposes of experimentation in signalling system security is then
+proposed.
 
 @menu
 * Logical Network Nodes::
@@ -744,7 +1015,7 @@ Telecommunication Standardization Sector of ITU.  (Previously "CCITT Recommendat
 @subsubsection Signalling Transfer Point (STP)
 @cindex Signalling Transfer Point (STP)
 
-Signalling transfer poinrts (STPs) are signalling relay points within the PSTN under the SS7
+Signalling transfer points (STPs) are signalling relay points within the PSTN under the SS7
 signalling architecture.  These nodes neither initiate nor terminate ISUP call connections, but
 transfer the signalling messages between SSPs that do.
 
@@ -857,8 +1128,8 @@ logical MG functions, this function is not necessary to the investigation of sig
 
 To satisfy the requirements for experimentation, the proposed logical node configuration is chosen
 to provide as many characteristics experienced in a real interconnect arrangement as possible, while
-limiting the interworking points to a few specific locations within the test network for the purpose
-of monitoring and collection of results of experimentation.
+limiting the interworking points to a few specific locations within the captive network for the
+purpose of monitoring and collection of results of experimentation.
 
 @menu
 * SS7 Network Configuration::
@@ -878,12 +1149,11 @@ architecture:
 @figref{4} shows the types of nodes within the SS7/SIGTRAN/VoIP Security Network, and an indication
 of the @emph{number} of nodes within each type.  There are four types of nodes:
 
-@table @emph
-@item LEC service switching points (SSPs).
+@subsubheading LEC service switching points (SSPs).
 
-For the purposes of security testing, more than one logical LEC SSP will be provided.  The purpose
-of providing multiple LEC SSPs is to be able to monitor any description of call traffic between LEC
-SSP nodes.
+For the purposes of security experimentation, more than one logical LEC SSP will be provided.  The
+purpose of providing multiple LEC SSPs is to be able to monitor any description of call traffic
+between LEC SSP nodes.
 
 In normal CO arrangements, LEC SSP call control is not connected to any publicly accessible IP
 network (full air gap).  The only manner in which attackers (and thus realistic experiments) can
@@ -892,14 +1162,14 @@ considered separate from signalling system security.
 
 Each LEC SSP is capable of providing varying degrees of screening on ISUP signalling on an trunk
 group by trunk group basis.  Whether a call is routed or billed correctly depends upon LEC security
-screening policy and policies with regards to software standards, translations, customer datafill,
+screening policy and policies with regards to software standards, translations, customer data fill,
 MATELs and RCOs.  These aspects should be considered as separate from signalling system security.
 
-@item LEC signalling transfer points (STPs).
+@subsubheading LEC signalling transfer points (STPs).
 
-For the purpose of security testing, one logical associated pair of LEC STPs will be provided.
-Providing only one pair is consistent with the interconnect topology of relatively large LEC
-networks.
+For the purpose of security experimentation, one logical associated pair of LEC STPs will be
+provided.  Providing only one pair is consistent with the interconnect topology of relatively large
+LEC networks.
 
 In normal CO arrangements, LEC STPs are not connected to any publicly accessible IP network (full
 air gap).  The only manner in which attackers (and thus realistic experiments) can affect the
@@ -910,11 +1180,11 @@ Each LEC STP is capable of providing Enhanced and Border Gateway Screening (EGWS
 any or all attached SS7 links.  In real networks, any STP associated pair to which an external
 administration interconnects is so equipped and full screening is activated.
 
-@item IC signalling transfer points (STPs).
+@subsubheading IC signalling transfer points (STPs).
 
-For the purpose of security testing, one logical associated pair of IC STPs will be provided.
-Providing only one pair is consistent with the interconnect topology of relatively large IC (e.g.
-IXCs). 
+For the purpose of security experimentation, one logical associated pair of IC STPs will be
+provided.  Providing only one pair is consistent with the interconnect topology of relatively large
+IC (e.g.  IXCs). 
 
 In normal CO arrangements, interconnects employ similar security policies to that of the LEC, a
 situation that is required for under FCC regulation.  It is not reasonable to assume that the IC
@@ -926,15 +1196,13 @@ Each IC STP is capable of providing Enhanced and Border Gateway Screening (EGWS/
 or all attached SS7 links.  In real networks, any STP associated pair to which an external
 administration interconnects is so equipped and full screening is activated.
 
-@item IC service switching points (SSPs).
+@subsubheading IC service switching points (SSPs).
 
-For the purpose of security testing, only one logical IC SSP need be provided.
+For the purpose of security experimentation, only one logical IC SSP need be provided.
 
 The particular IC SSPs of concern to the current investigations are SSPs that are decomposed into
 IETF SIGTRAN and ETSI TIPHON components as described under @ref{SIGTRAN Network Configuration} and
 @ref{TIPHON Network Configuration}, below.
-
-@end table
 
 @node TIPHON Network Configuration
 @subsubsection TIPHON Network Configuration
@@ -948,17 +1216,24 @@ architecture.
 The ETSI TIPHON VoIP architecture decomposes the IC SSP in @figref{4} into the components
 illustrated in @figref{5}.  The components are as follows:
 
-@table @dfn
-@item Media Gateway Controller (MGC)
+@subsubheading Media Gateway Controller (MGC)
 
 The media gateway controller (MGC) is responsible for terminating call control signalling within
 both the SCN (Switched Circuit Network) and the IP Network and providing interworking between the
 protocols.  In some instances this interworking might be rather trivial (as in the case of ISUP and
 BICC, or Q.931 and H.245) or complex (as in the case of ISUP and SIP).
 
-@item Media Gateway (MG)
+@subsubheading Media Gateway (MG)
 
-@end table
+The media gateway (MG) is responsible for conversion of TDM bearer channels and Real-Time Transport
+(RTP) Audio-Video Profile (AVP) sessions.  The conversion is performed under the control of the
+Media Gateway Controller (MGC) using a media gateway control protocol such as MEGACO/H.248 or MGCP.
+
+@subsubheading Signalling Gateway (SG)
+
+The signalling gateway (SG) is responsible for conversion of TDM signalling access to an internal
+signalling representation usable by the Media Gateway Controller (MGC).  The signalling gateway (SG)
+is a functional component and is often integrated on the same platform as the MGC or MG.
 
 @node SIGTRAN Network Configuration
 @subsubsection SIGTRAN Network Configuration
@@ -1017,8 +1292,7 @@ physical nodes and the interconnection of the physical nodes.
 There are several alternatives for mechanisms used for the mapping of logical nodes onto physical
 compute platforms, referred to here as virtualization and non-virtualization approaches as follows:
 
-@table @dfn
-@item Virtualization
+@subsubheading Virtualization
 
 Under a virtualization approach, the machine virtualization provided by the Xen Hypervisor allow one
 physical compute platform to run multiple operating system kernels.  Under this approach, each
@@ -1030,7 +1304,7 @@ system can be caused to crash, it will only affect one logical node and not all 
 operating on the physical platform.  This has advantages in maintaining independence between
 logical nodes.  The disadvantage is configuration complexity.
 
-@item Non-Virtualization
+@subsubheading Non-Virtualization
 
 Under a non-virtualization approach, the machine runs a single Linux operating system.  Under this
 approach, each logical node would run as a set of processes on one instance of the Linux operating
@@ -1039,8 +1313,6 @@ system running native on the machine.
 The advantage of this approach is simplicity.  The disadvantage of this approach for the
 investigation of stack security is that, if the operating system can be caused to crash, all logical
 nodes will be affected.
-
-@end table
 
 Because the OpenSS7 stacks have been designed to provide partitioned logical nodes in a
 non-virtualization environment, the non-virtualization approach will be take at least initially.  If
@@ -1053,8 +1325,7 @@ Although the entire SS7/SIGTRAN/VoIP Security Network could be implemented on so
 compute platform, the objectives of experimentation with signalling system security is better met by
 multiple physical compute platforms for the following reasons:
 
-@table @dfn
-@item Signalling Capacity
+@subsubheading Signalling Capacity
 
 It is not possible for the SS7/SIGTRAN/VoIP Securty Network to approach the signalling capacity of
 even small PSTN LEC networks with a single compute platform.  Without large signalling capacity it
@@ -1062,7 +1333,7 @@ is difficult to extrapolate from experimental results to the impact on large sca
 With a high-performance system providing the signalling capacity of a large LEC network,
 experimental results are directly applicable to real-world networks.
 
-@item Node Independence
+@subsubheading Node Independence
 
 Although logical nodes can be defined so that more than one logical node exists on a given physical
 compute platform, doing so creates a dependence between the logical nodes that exists, even if the
@@ -1072,7 +1343,7 @@ cards, will become unusable for all virtual machines and thus all logical nodes.
 argued that experimental results impacting a network run on a single physical compute platform would
 have less of an impact on networks composed of independent platforms.
 
-@item Node Isolation
+@subsubheading Node Isolation
 
 By placing logical nodes that are normally isolated from a public IP network by an air gap with logical
 nodes not so isolated from a public IP network, it might be tempting to show experimental results
@@ -1085,17 +1356,15 @@ would permit an experiment to use programmatic interfaces to the STP on the same
 MGC.  It could be argued that the results of such an experiment are not applicable to real-world
 networks.
 
-@item Security
+@subsubheading Security
 
 Physical platforms that have a narrow defined purpose are easier to secure than those that have a
 broad purpose.  If multiple logical nodes are implemented on the same physical compute platform, it
 could be argued that the experiment results would not be applicable to a real-world
 telecommunications platform that exists with a very narrow defined scope (such as an STP).
 
-@end table
-
 Nevertheless, small systems can be built using a single compute platform for purposes such
-as the indendent development of experiments.
+as the independent development of experiments.
 
 @node Instrumentation
 @chapter Instrumentation
@@ -1118,7 +1387,7 @@ operation of large networks and specifically the processing of ISUP calls.
 @item @dfn{Operational Measurements.}
 
 Operational measurements provide statistics, event and alarm detection and collection that can be
-used to analyse the results of specific experiments on the operation of large networks.
+used to analyze the results of specific experiments on the operation of large networks.
 @item @dfn{Distributed Test Harness.}
 
 A distributed test harness provides a repeatable framework within which to generate and operation
@@ -1145,7 +1414,7 @@ I).
 
 The characteristics of the traffic load generators are as follows:
 
-@itemize
+@itemize @bullet
 @item
 Each traffic load generator will generate ISUP call traffic for a specific number of subscriber
 lines.  Suggested distribution of subscriber lines are 25% of the overall number of subscriber lines
@@ -1160,9 +1429,9 @@ access) lines; the higher values in the range, indicative of business lines.}
 @item
 Of this load, 80% will be considered intra-switch and will not be generated.  20% will be considered
 inter-switch and will be generated.  Splitting of intra-switch and inter-switch traffic will be done
-using determinate load splitting of poisson distributed traffic.
+using determinate load splitting of Poisson distributed traffic.
 @item
-Distibution of calls over the available subscriber lines will be performed considering a fixed and
+Distribution of calls over the available subscriber lines will be performed considering a fixed and
 equal probability of a call being generated between any given subscriber line and any other
 subscriber line.
 @item
@@ -1170,7 +1439,7 @@ Busy treatment patterns will be simulated.  Subscriber line busy treatment will 
 subscriber line status.  60% of the subscriber lines will be considered as equipped with a
 busy/no-answer treatment that results in call connection (i.e. voice mail, CFBNA).  Calls that would
 otherwise encounter busy treatment (according to actual line status) will be considered to be
-abadonned without reattempt if the terminating line is not equipped with a CFB service.  When
+abandoned without reattempt if the terminating line is not equipped with a CFB service.  When
 equipped with a CFB service the call will be considered to hold for only 30-60 seconds.
 @item
 No-answer treatment patterns will be simulated.  Subscriber line no-answer treatment will be
@@ -1180,7 +1449,7 @@ a no-answer service (60% of the lines) will be considered to hold for only 30-60
 All trunks busy treatment patterns will be actual.  Inter-office trunk groups will be engineered for
 the experienced traffic rates at an Erlang C blocking probability of 0.999 for high-day busy hour.
 This is consistent with toll grade trunks traffic engineering.  As the traffic is simulated for
-average-day busy hour, trunk blocking probability is almost zero.  Therfore, for the purpose of
+average-day busy hour, trunk blocking probability is almost zero.  Therefore, for the purpose of
 simplifying the simulation, all trunks busy treatment will be be applied.
 @end itemize
 
@@ -1209,7 +1478,7 @@ node (node @samp{I})@footnote{Whether node @samp{I}, the MGC/ASP node, provides 
 portion of an MTP layer, is dependent on the SIGTRAN protocol used: if M3UA or SUA is used in the
 non-SG as STP arrangement, the MGC/ASP does not provide any portion of an MTP layer; if M2PA or M2UA
 is used, at least some portion of the MTP is provided by the node.}, provide some portion of the MTP
-layer and will provide operational measurements, statictical collection and alarm generation.
+layer and will provide operational measurements, statistical collection and alarm generation.
 
 Operational measurements for MTP listed in Q.752 are as follows:
 
@@ -1240,7 +1509,7 @@ Operational measurements for MTP listed in Q.752 are as follows:
 @item 2.11 @tab Stop of remote processor outage.
 @item 2.13 @tab Local management inhibit.
 @item 2.14 @tab Local management uninhibit.
-@item 2.15 @tab Duraction of local busy.
+@item 2.15 @tab Duration of local busy.
 @item 2.16 @tab Start of local inhibition.
 @item 2.17 @tab End of local inhibition.
 @item 2.18 @tab Start of remote inhibition.
@@ -1269,7 +1538,7 @@ Operational measurements for MTP listed in Q.752 are as follows:
 @item 4.6 @tab Initiation of broadcast TFA for recovery of measured link set.
 @item 4.9 @tab Unavailability of route set to a given destination (set).
 @item 4.10 @tab Duration of unavailability of a route set to a given destination (set).
-@item 4.11 @tab Start of unavailabilty of a route set to a given destination (set).
+@item 4.11 @tab Start of unavailability of a route set to a given destination (set).
 @item 4.12 @tab Stop of unavailability of a route set to a given destination (set).
 @item 4.13 @tab Change in link set used to adjacent SP.
 @end multitable
@@ -1288,16 +1557,16 @@ Operational measurements for MTP listed in Q.752 are as follows:
 @subsubheading MTP signalling traffic distribution (signalling route utilization).
 @multitable @columnfractions .10 .90
 @item 6.1 @tab Number of SIF and SIO octets received with given OPC (set) at an SEP.
-@item 6.2 @tab Number of SIF and SIO octest transmitted with given DPC (set) at an SEP.
+@item 6.2 @tab Number of SIF and SIO octets transmitted with given DPC (set) at an SEP.
 @item 6.3 @tab Number of SIF and SIO octets handled with given SI (set) at an STP.
-@item 6.4 @tab Numeer of SIF and SIO octets received with given OPC (set) at an SEP.
+@item 6.4 @tab Number of SIF and SIO octets received with given OPC (set) at an SEP.
 @item 6.5 @tab Number of SIF and SIO octets transmitted with given DPC (set) at an SEP.
 @item 6.6 @tab Number of SIF and SIO octets handled with given OPC set, DPC set and SI set, at an STP.
 @item 6.7 @tab Number of MSUs handled with given OPC set, DPC set and SI set, at an STP.
 @end multitable
 
 Operational measurements that collect statistics over a time period may have high or low water mark
-thresholds set to generate alarms.  Operational measurements marked as on-occurence or
+thresholds set to generate alarms.  Operational measurements marked as on-occurrence or
 first-and-delta may also generate alarms.  In addition to these operational measurements, events
 within the MTP protocol providing for management events can also generate alarms.
 
@@ -1350,7 +1619,7 @@ Operational measurements for ISUP listed in Q.752 are as follows:
 @item 12.12 @tab Unexpected CGBA with abnormal blocking acknowledgement.
 @item 12.13 @tab Unexpected CGUA with abnormal unblocking acknowledgement.
 @item 12.14 @tab Unexpected BLA with abnormal blocking acknowledgement.
-@item 12.15 @tab Unexpected ULA with abnormal unblocking acknowledgement.
+@item 12.15 @tab Unexpected UBA with abnormal unblocking acknowledgement.
 @item 12.16 @tab No BLA received for BLO within T13.
 @item 12.17 @tab No UBA received for UBL within T15.
 @item 12.18 @tab No CGBA received for CGB within T19.
@@ -1362,7 +1631,7 @@ Operational measurements for ISUP listed in Q.752 are as follows:
 @end multitable
 
 Operational measurements that collect statistics over a time period may have high or low water mark
-thresholds set to generate alarms.  Operational measurements marked as on-occurence or
+thresholds set to generate alarms.  Operational measurements marked as on-occurrence or
 first-and-delta may also generate alarms.  In addition to these operational measurements, events
 within the MTP protocol providing for management events can also generate alarms.
 
@@ -1374,7 +1643,7 @@ the purpose of trunk group sizing and traffic engineering.
 @cindex Special Studies
 
 On most switches, operational measurements associated with the translation process within the
-swichiing element can also be collected.  These operational measurements are based on originating
+switchiing element can also be collected.  These operational measurements are based on originating
 and termination classes of service, class of service screening, trunk group screening, and call
 treatment.  In addition to operational measurements, billing records are generated that contain call
 detail records on a per-call basis for billable calls.  For the purpose of traffic engineering or
@@ -1396,7 +1665,7 @@ determining the effected of experiments on the system.
 
 A distributed test harness will be provided for running experiments on the SS7/SIGTRAN/VoIP Security
 Network.  Each of the logical nodes in the system will be equipped with and run a network
-distributed copy of the @cite{TETWare 3.3h} distributed test system avilable from the
+distributed copy of the @cite{TETWare 3.3h} distributed test system available from the
 @url{http://www.opengroup.org/,OpenGroup}.
 
 On logical nodes equipped with ISUP and subscriber call load generation (nodes A, B, C, I),
@@ -1405,13 +1674,13 @@ logs, special studies and
 other call completion information for collecting and reporting the impact on call processing of
 various experiments.  On the remaining logical nodes providing only SS7/SIGTRAN capabilities (nodes
 D, E, F, G, H), @cite{TETWare} will provide access to the MTP operational measurements, alarms,
-maintenance logs, and other SS7 system imformation for collecting and reporting the impact on SS7
+maintenance logs, and other SS7 system information for collecting and reporting the impact on SS7
 signalling of various experiments.
 
 On both sets of logical nodes (nodes A through I, but not J), @cite{TETWare} will provide a
 scripting and @samp{C}-language execution environment for the execution of experiments.  The
-adminstrative node (node J) is responsible for providing access to the entire SS7/SIGTRAN/VoIP
-Security Network for the syncrhonization and coordination of experiments.
+administrative node (node J) is responsible for providing access to the entire SS7/SIGTRAN/VoIP
+Security Network for the synchronization and coordination of experiments.
 
 Experiments will typcially componsed of the following:
 
@@ -1448,8 +1717,21 @@ air gap), it is not a valid assumption that nodes A, B, C, D and E are compromis
 that execute attack scripts on these nodes are of no value.
 
 Although they are attached via IP based networks other than the administrative LAN, due to the
-specialized nature of the interconnecting SIGTRAN network, it is a weak assumption that nodes E, F
-and G are compromised and experiments that execute attack scripts on these nodes are of low value.
+specialized nature of the interconnecting SIGTRAN network, it is a weak assumption that nodes F, G
+and H are compromised and experiments that execute attack scripts on these nodes are of low value.
+
+Node I is directly or indirectly attached to a public IP network.  As a result, it could be
+considered compromised if adequate security procedures are not assumed.  Therefore, attack scripts
+executed on nodes I or J are of the greatest value.
+
+@subsection Call Processing Monitors
+
+Monitoring of call processing with operational measurements statistics collection, event reporting,
+alarm generation, logging and special studies will be integrated into @cite{TETWare} to provide for
+report generation of experiment (test case) results on systems running ISUP traffic generators
+(logical nodes A, B, C and H).
+
+@subsection SS7 Signalling Monitors
 
 @node Node Configuration
 @chapter Node Configuration
@@ -1463,8 +1745,8 @@ and G are compromised and experiments that execute attack scripts on these nodes
 Node configuration is separated for discussion into logical and physical nodes:
 
 @subsubheading Logical Nodes
-Logical nodes represent a functional grouping of SS7 newtork element capabilities into a logical
-netowrk element that is normally deployed spearately within the SS7 network.
+Logical nodes represent a functional grouping of SS7 network element capabilities into a logical
+network element that is normally deployed separately within the SS7 network.
 
 @subsubheading Physical Nodes
 Physical nodes represent a separate and distinct computing platform and the associated network
@@ -1484,12 +1766,12 @@ interfaces that are used by logical network elements assigned to the physical pl
 @end menu
 
 Logical nodes provide for functional grouping of network element capabilities into a virtual network
-element that is indepenent of the executional platform on which the virtual network element
+element that is independent of the executional platform on which the virtual network element
 executes.
 
 This section details the configuration of the following logical nodes:
 
-@itemize
+@itemize @bullet
 @item LEC SSP Nodes A, B and C.
 @item LEC STP Nodes D and E.
 @item IC STP/SG Nodes F and G.
@@ -1525,7 +1807,7 @@ Interconnection of the LEC SSP Nodes A, B and C are illustrated in @figref{N-1}.
 As listed in @tabref{T-1}, logical nodes A, B and C are LEC SSPs that are interconnected to each
 other (with Inter-Machine Trunks, IMTs) as well as to the IC SSP/MGC (node I).  Signalling
 connections are made between each of nodes A, B and C to each of the LEC STPs (nodes D and E).
-These nodes have only adminstrative LAN connection.
+These nodes have only @dfn{Administrative LAN} connection.
 
 Each node is equipped with an Signalling End Point (SEP) SS7 stack including the Message Transfer
 Part (MTP) and ISDN User Part (ISUP).  Load generation is provided for 2,500,000 subscribers
@@ -1542,7 +1824,7 @@ provided.
 Line-side signalling protocols are not used.  Line-side subscribers are simulated using load
 generation.
 
-Each node is connected only to the Adminstrative LAN.
+Each node is connected only to the @dfn{Administrative LAN}.
 
 @subsubheading Physical Node Mapping
 
@@ -1661,7 +1943,7 @@ The node is connected to the Administrative LAN as well as the SIGTRAN Signallin
 
 The SIGTRAN Signalling Network includes the associated pair of SGs (nodes F and G) as well as the
 ASP node I.  Using M2UA or M3UA, this SG node provides access to the ASP node I.  Using M2PA, the SG
-node is connected to M2PA perr SG nodes F and G.
+node is connected to M2PA peer SG nodes F and G.
 
 @subsubheading Physical Node Mapping
 
@@ -1701,9 +1983,9 @@ F, G and H with SIGTRAN signalling.
 
 The node does not require SS7 narrow-band signalling link interface.
 
-The node is connected to the Adminstrative LAN as well as the SIGTRAN Signalling Network.  The node
-also connects to Media Gateways (MGs) using the VoIP Control Newtork and exchanges signalling over
-the backbone VoIP Signalling Newtork.
+The node is connected to the Administrative LAN as well as the SIGTRAN Signalling Network.  The node
+also connects to Media Gateways (MGs) using the VoIP Control Network and exchanges signalling over
+the backbone VoIP Signalling Network.
 
 The SIGTRAN Signalling Network includes the associated pair of SGs (nodes F and G) as well as the
 SSP/SG node H.  M2UA or M3UA access is provided by SG nodes F and G.  M2PA peer access is provided
@@ -1715,7 +1997,7 @@ cost).@footnote{1,000,000 BHCA equates to about 4630 T1s of bearer circuits and 
 sessions which would require over $1,000,000.00 worth of equipment.}  Instead, signalling load
 generation at equivalent levels is provided.
 
-Line-side signalling protocols (H.323, SIP) are not used.  Line-side sibscribers are simulated using
+Line-side signalling protocols (H.323, SIP) are not used.  Line-side subscribers are simulated using
 load generation.
 
 @subsubheading Physical Node Mapping
@@ -1728,7 +2010,7 @@ node J on the same physical node.
 @subsection Administrative Node J
 @cindex Administrative Node J
 
-Interconnection of the Admininstrative Node J is illustrated in @figref{N-6}.
+Interconnection of the Administrative Node J is illustrated in @figref{N-6}.
 
 @figure{labnode6,N-6,Administrative Node J}
 
@@ -1736,7 +2018,7 @@ Interconnection of the Admininstrative Node J is illustrated in @figref{N-6}.
 
 @multitable @columnfractions .25 .75
 @item @dfn{TDM Interface:} @tab None.
-@item @dfn{Newtork Interface:} @tab Administrative LAN.
+@item @dfn{Network Interface:} @tab Administrative LAN.
 @item @tab SIGTRAN Signalling Network.
 @item @dfn{Protocol Components:} @tab M2PA, M2UA, M3UA.
 @item @dfn{Load Generation:} @tab None.
@@ -1748,7 +2030,7 @@ Interconnection of the Admininstrative Node J is illustrated in @figref{N-6}.
 @subsubheading Description
 
 As listed in @tabref{T-1}, logical node J isa n Administrative node interconnected to other nodes
-in the system via the Adminstrative LAN.
+in the system via the @dfn{Administrative LAN}.
 
 The node does not require an SS7 narrow-band signalling link interface.
 
@@ -1768,12 +2050,14 @@ the same physical node.
 
 Logical nodes can be mapped into physical nodes in two ways:
 
-@table @dfn
-@item Preferred Mapping
+@enumerate
+@item @dfn{Preferred Mapping.}
+
 Preferred mapping is to provide a separate physical node for each logical node.
-@item Minimalist Mapping
+@item @dfn{Minimalist Mapping.}
+
 Minimalist mapping combines multiple logical nodes onto each physical node.
-@end table
+@end enumerate
 
 @menu
 * Preferred Physical Node Mapping::
@@ -1790,19 +2074,19 @@ to host each logical node.
 @tabfig{labpref,T-2,Preferred Physical Nodes}
 
 The preferred mapping allows the use of 2U server chassis that can support a maximum of 2 PCI
-expansion cards.  The mapping requires 8 server chasses and 10 T400P-SS7 cards.
+expansion cards.  The mapping requires 8 server chassis and 10 T400P-SS7 cards.
 
 @node Minimal Physical Node Mapping
 @subsection Minimal Physical Node Mapping
 @cindex Minimal Physical Node Mapping
 
-The minmalist mapping of logical nodes onto physical nodes combines like-nodes with complementary
+The minimal mapping of logical nodes onto physical nodes combines like-nodes with complementary
 interface requirements onto the same physical node.
 
 @tabfig{labmini,T-3,Minimal Physical Nodes}
 
 The minimalist mapping requires 2U or 4U server chassis that must support a maximum of 4 PCI
-expansion cards.  The mapping requires only 4 server chasses and 9 T400P-SS7 cards.
+expansion cards.  The mapping requires only 4 server chassis and 9 T400P-SS7 cards.
 
 @node Hardware Specification
 @chapter Hardware Specification
@@ -1813,6 +2097,7 @@ expansion cards.  The mapping requires only 4 server chasses and 9 T400P-SS7 car
 * Site Requirements::
 * System Software::
 * Capacity and Sizing::
+* Hardware Manifest::
 @end menu
 
 @node Hardware Requirements
@@ -1839,17 +2124,20 @@ effect of physical or atmospheric changes.  Whether a system protects against th
 moment in the investigation of signalling system security, and, thus, commodity compute platforms
 can be used, lowering the overall system cost significantly.
 
-Carrier-grade compute platforms are normally equipped to operate on 48 VDC power instead of
-commercial 110 VAC or 220 VAC power.  With the sole exception of the Central Office environment,
-providing a 48 VDC power source can be far more expensive than normal 110 VAC power.  Thus, the use
-of commodity compute platforms further lowers the overall system cost.
+Carrier-grade compute platforms@footnote{Even the commodity based NEBS-3 compliant 4U servers HP
+c3310 and IBM x343 are normally equipped with -48 VDC power.} are normally equipped to operate on 48
+VDC power instead of commercial 110 VAC or 220 VAC power.  With the sole exception of the Central
+Office environment, providing a 48 VDC power source can be far more expensive than normal 110/220
+VAC power.  Thus, the use of commodity compute platforms further lowers the overall system cost.
 
 Because of the need for specialized interface cards to provide interface to the SS7 signalling
 network using narrow-band and high-speed SS7 links, the compute hardware cannot be reduced to a
-commodity blade processor.  1U or 2U rack-mount systems are required to house the necessary
+commodity blade processor.  2U or 4U rack-mount systems are required to house the necessary
 interface cards and provide sufficient access for the associated cabling.
 
-@figure{rack,9,Rack-mount Enclosures}
+@figuresized{rack,9,Rack-mount Enclosures,3.0in}
+
+@figuresized{rack2u,9a,2U Rack-mount Enclosures,4.0in}
 
 A disadvantage of using commodity compute platforms powered by 110 VAC and using high-performance
 Intel or AMD processors is rack space, noise, cooling, power consumption and preventative
@@ -1858,7 +2146,219 @@ amount of rack space, a heavier cooling load; because they are forced air cooled
 greater amount of noise (than the carrier-grade convection cooled systems), consume much more power
 (primarily due to processors and the necessary cooling fans), and require a higher degree of
 preventative maintenance (forced air cooling requires filter packs to be changed, and otherwise
-resutls in packing the equipment over time with dust).
+results in packing the equipment with dust).
+
+There are three suitable 2U rack mount servers for the SS7/SIGTRAN/VoIP Security Network physical
+nodes:
+
+@subsubsection Dell PowerEdge 2850 2U Rack-mount Server
+
+The Dell PowerEdge 2850 2U Rack-mount Server@footnote{Dell does not seem to provide a NEBS-3
+compilant solution.} is a rack mount optimized E7820 chip set based solution from Dell.  The server
+is illustrated in @figref{9c}.
+
+@figuresized{pe2850,9c,Dell PowerEdge 2850 2U Rack-mount Server,4.5in}
+
+
+@subsubheading Operating System Support
+@itemize @bullet
+@item Red Hat Linux Enterprise v2.1
+@item Red Hat Linux Enterprise v3
+@item Red Hat Linux Enterprise v3 AS EM64T
+@end itemize
+
+@subsubheading Features
+@itemize @bullet
+@item 2U rack mount
+@item Intel Xeon Processor up to 3.80 GHz/800 MHz FSB and Dual-Core Intel Xeon Processor 2.80 GHz
+@item 1 or 2 processors
+@item 2MB L2 cache per processor core
+@item 12GB 400MHz DDR2, 6 DIMM slots
+@item 3 PCI-X slots (64bit/133MHz) or two PCI-E (1x4 and 1x8 lane) and one PCI-X slot (64-bit/100MHz)
+@item 6 hot-swap drive bays
+@item 1.8TB maximum Ultra320 SCSI storage
+@item integrated dual Gigabit Ethernet (Intel PRO/1000 MT or MF)
+@item 1 or 2 700W power supplies
+@item hot swappable power supply, fans and hard disk drives
+@item optional RAID dual channel ROMB (PERC 4e/Di), PERC 4/DC and PERC 4e/Dc adapters
+@item optional PowerVault 110T internal tape driver (consumes 1 drive bay)
+@item IPMI, optional slot-free DRAC 4/I management
+@item E7820 Chip Set
+@end itemize
+
+@subsubheading Target System Cost
+@itemize @bullet
+@item $3,892.00 - low end system@footnote{The low end system is two 3.2GHz Xeon, 2GB SDRAM, RAID 1 2 x 15k RPM 38GB SCSI, redundant power.}
+@item $5,562.00 - high end system@footnote{The high end system is two 2.8GHz Dual-Core Xeon, 4GB SDRAM, RAID 5 3 x 15k 38GB SCSI, redundant power.}
+@end itemize
+
+@subsubheading Advantages
+@itemize @bullet
+@item 3 full profile PCI-X slots accepting Universal PCI cards.
+@item Integrated slot-less RAID.
+@item Lowest cost.
+@end itemize
+
+@subsubheading Disadvantages
+@itemize @bullet
+@end itemize
+
+@subsubheading Applications
+
+The Dell servers are the lowest cost for high end systems making it a good solution choice.  The IBM
+systems are only slightly more expensive; however, and provide additional memory and PCI-X expansion
+capabilities over the Dell solution.  One factor that could decide between the two are the types of
+systems that UNT is used to.
+
+The Dell servers are, nevertheless, a very usable solution for all but the minimal logical node to
+physical node mapping (see @tabref{T-3}): the servers simply cannot house the necessary interface
+cards for the full minimal solution.  If physical node 2 (as shown in @tabref{T-3}) were to be split
+into two physical nodes, then the expansion capabilities of the Dell servers would be just
+sufficient; however, it would also take splitting physical node 3 in the minimal system (as shown in
+@tabref{T-3}) to ensure that one PCI-X expansion slot remains available in each physical node.
+Therefore, a reasonable minimal system would require 6 servers at $3,892.00, or $23,352.
+
+Full blown system cost with the Dell servers would run about $44,496, making the Dell solution more
+attractive for the full blown system.  The full blown system will be cost estimated using the Dell server
+solution.
+
+@subsubsection IBM xSeries x346 2U Rack-mount Server
+
+The IBM xSeries x346 2U Rack-mount Server@footnote{IBM also provides a NEB-3 compatible telco-grade
+server, the x343, however, this server is quite expensive by comparison to the x346 (about three (3)
+times the cost) and is only provdided in a -48VDC power option.} is a rack mount optimized E7820
+chip set based solution from IBM.  The server is illustrated in @figref{9b}.
+
+@figuresized{x346,9b,IBM xSeries x346 2U Rack-mount Server,4.5in}
+
+@subsubheading Operating System Support
+@itemize @bullet
+@item Red Hat Linux
+@item SuSE Linux
+@end itemize
+
+@subsubheading Features
+@itemize @bullet
+@item 2U rack mount
+@item Intel Xeon Processor up to 3.80 GHz/800 MHz FSB and Dual-Core Intel Xeon Processor 2.80 GHz
+@item 1 or 2 processors
+@item 2MB L2 cache per processor core
+@item 16GB PC2-3200 DDR2, 8 DIMM slots
+@item 4 PCI-X@footnote{Note that 2 PCI-X slots are normal profile and the other 2 PCI-X slots are
+low-profile slots.} or 2 PCI-X and 2 PCI-Express
+@item 6 hot-swap drive bays
+@item 1.8TB maximum Ultra320 SCSI storage
+@item integrated dual Gigabit Ethernet (Broadcom NetXtreme 5721)
+@item 1 or 2 625W power supplies
+@item hot swappable power supply, fans and hard disk drives
+@item integrated RAID-0/1, and optional RAID-5 (on daughter card)
+@item optional 36/72GB DDS5 internal tape drive (occupies 2 drive bays)
+@item IPMI, optional slimline remote supervisor adaptor II management
+@item E7820 Chip Set
+@end itemize
+
+@subsubheading Target System Cost
+@itemize @bullet
+@item $4,125.00 - low end system@footnote{The low end system is two 3.2GHz Xeon, 2GB SDRAM, RAID 1 2 x 15k RPM 38GB SCSI, redundant power.}
+@item $6,238.00 - high end system@footnote{The high end system is two 2.8GHz Dual-Core Xeon, 4GB SDRAM, RAID 5 3 x 15k 38GB SCSI, redundant power.}
+@end itemize
+
+@subsubheading Advantages
+@itemize @bullet
+@item Provides 4 PCI-X expansion slots accepting Universal PCI expansion cards, although two are
+full profile and two are low-profile, this provides one additional PCI-X expansion slot over the
+other featured servers.
+@item RAID 5 slot-less upgrade.
+@item More flexible memory arrangement. (8 DIMM slots versus 6 on other systems.)
+@item Comparable cost on low-end system.
+@end itemize
+
+@subsubheading Disadvantages
+@itemize @bullet
+@item More costly that equivalent Dell solution on high-end system.
+@end itemize
+
+@itemize @bullet
+@item Will not accept 3 full profile Universal PCI expansion cards.
+@end itemize
+
+@subsubheading Applications
+
+The IBM system costs about the same as the Dell solution for low-end systems but provides better
+expansion for system upgrade.  Unfortunately, the 4 PCI-X expansion slots are not all full length;
+therefore, not even the IBM servers will provide the minimal logical to physical node mapping.
+Nevertheless, the 4 PCI-X slots will make reconfiguring the system for VoIP experiments easier
+because the addition of one or two additional GigE LAN cards is possible.
+
+The IBM systems are a very usable solution, an, even though they cannot provide for the full minimal
+logical node to physical node mapping (see @tabref{T-3}), when configured for 6 server nodes the
+cost is $24,750 but each server will have 2 low-provide PCI-X expansion slots and 4 DIMM slots
+available per server versus the Dell solution which would only have 1 full profile PCI-X expansion
+slot and 2 DIMM slots available per server.
+
+Full blown system cost with the IBM servers would run about $49,904, making the Dell solution more
+attractive for the full blown system.  The minimal system will be cost estimated using the IBM solution.
+
+@subsubsection HP Proliant DL380 G4 2U Rack-mount Server
+
+The HP (formerly Compaq) Proliant DL380 G4 2U Rack-mount Server@footnote{HP also provides the NEBS-3
+compatible telgo-grade server, the c3310, however, this server is only available in 1-way Xeon
+configurations, consumes 4U of rack space, is available with AC power, but not support dual
+integrated Gigabit Ethernet and is quite costly by comparison to the DL380 G4.}
+
+@figuresized{dl380g4,9d,HP Proliant DL380 G4 2U Rack-mount Server,4.0in}
+
+@subsubheading Operating System Support
+@itemize @bullet
+@item Red Hat Linux
+@item Novell (SuSE Linux)
+@end itemize
+
+@subsubheading Features
+@itemize @bullet
+@item 2U rack mount
+@item Intel Xeon Processor up to 3.80 GHz/800 MHz FSB and Dual-Core Intel Xeon Processor 2.80 GHz
+@item 1 or 2 processors
+@item 2MB L2 cache per processor core
+@item 12GB 2-processor interleaved 400MHz DDR2 SDRAM, 6 DIMM slots
+@item 3 full length PCI-X expansion slots (optional PCI-E)
+@item 6 hot-swap driver bays
+@item 1.8TB Ultra320 SCSI (optional SAS) storage
+@item integrated dual Gigabit Ethernet (NC7782)
+@item 575W hot-plug power supply
+@item optional redundant fan
+@item integrated Smart Array 6i RAID-0/1 and RAID 5 controller
+@item optional DAT (40 or 72) tape driver (consumes 1 drive bay)
+@item IPMI, HP integrated lights-out management
+@item E7820 Chip Set
+@end itemize
+
+@subsubheading Target System Cost
+@itemize @bullet
+@item $4,433.00 - low end system@footnote{The low end system is two 3.2GHz Xeon, 2GB SDRAM, RAID 1 2 x 15k RPM 38GB SCSI, redundant power.}
+@item $6,721.00 - high end system@footnote{The high end system is two 2.8GHz Dual-Core Xeon, 4GB SDRAM, RAID 5 3 x 15k 38GB SCSI, redundant power.}
+@end itemize
+
+@subsubheading Advantages
+@itemize @bullet
+@item 3 full profile PCI-X slots accepting Universal PCI cards.
+@item Integrated slot-less RAID 5.
+@end itemize
+
+@subsubheading Disadvantages
+@itemize @bullet
+@item Highest cost.
+@end itemize
+
+@subsubheading Applications
+
+The HP server solutions are comparable in features to the Dell systems (they have the same 3 PCI-X
+expansion slots and only 6 DIMM slots), however, they carry a significantly higher cost.  Minimal
+system costs would be $26,598 and full blown system cost would be $53,768.  The IBM solution is more
+attractive for the low-end minimal system of 6 nodes, and the Dell solution is more attractive for
+the high-end full blown system of 8 nodes.
+
+The HP solution will not be included in either the minimal or full blown system costing.
 
 @node TDM Interface Cards
 @subsection TDM Interface Cards
@@ -1902,6 +2402,13 @@ Following are the features of the T400P-SS7 and E400P-SS7 cards:
 @item Full span addressable.
 @end itemize
 
+@subsubheading Target System Cost
+@itemize @bullet
+@item $699.00 Each
+@item $625.00 5-9
+@item $599.00 10+
+@end itemize
+
 @subsubheading Advantages
 
 Following are the advantages of the T400P-SS7 and E400P-SS7 cards:
@@ -1936,7 +2443,7 @@ the PCI bus and the ability of the processor to perform Soft-HDLC and TDM switch
 software.@footnote{A 350MHz processor is capable of processing the bandwidth of an entire E400P-SS7
 card (124 signalling links) with a combined link throughput of 8.192 Mbps.}
 These cards are very cost-effective and can provide 64kbps SS7 links at average incremental
-interface cost of approximately $7.00 USD per signalling link.
+interface cost of less than $7.00 USD per signalling link.
 
 @subsubheading Application
 
@@ -1948,20 +2455,36 @@ operational measurements collection.
 
 To allow for maximum system reconfiguration, each physical node will be equipped with 2 T400P-SS7
 cards, each on an independent PCI bus.  The T400P-SS7 are universal 32-bit PCI bus cards and will
-therefore operate on most PCI segements provided by popular server boards.  Each card provides
+therefore operate on most PCI segments provided by popular server boards.  Each card provides
 interface for 4 T1 spans
 
 For TDM card cabling, @pxref{Digital Cross-Connect}.
+
+The full blown system requires 10 cards at $599.00 for $5,990.00.  The minimal system only requires
+9 cards at $625.00 is $5,625.  Because of the discount point at 10 cards, the relative costs of the
+two systems is comparable as far as interface cards is concerned.
+
+It is typical to run E1 systems in the laboratory when the pricing of E1 is the same as T1.  An
+additional 7 channels per span or 28 channels per card are available on the 2.048 Mbps E1 spans over
+those available on the 1.544 Mbps T1 spans.  However, if the system is even intended on
+interconnecting with other North American systems, T1 cards should be used.
 
 @node Network Interface Cards
 @subsection Network Interface Cards
 @cindex Network Interface Cards
 
 A number of the physical nodes in the system require high-speed Ethernet network access to one (1) or
-two (2) signalling or control networks, and lower-speed Ethernet access to one (1) adminstrative
-network.  For maximum flexibility, server boards should be equipped with on-board dual bondable
-1000/100/10baseT autosensing Gigabit Ethernet, and either on-board 100baseT Ethernet or the
-addition of a 100baseT PCI interface card for adminstrative LAN termination.
+two (2) signalling or control networks, and lower-speed Ethernet access to one (1) administrative
+network.  For maximum flexibility, server boards should be equipped with on-board dual
+1000/100/10baseT autos-ensing Gigabit Ethernet, and either on-board 100baseT Ethernet or the addition
+of a 1000/100/10baseT PCI interface card for administrative LAN termination.
+
+Note that in the logical node configuration (@pxref{Logical Nodes}), only Node I requires more than
+two LAN connections, and then only when VoIP security is to be investigated.  The server solutions
+(@pxref{Compute Hardware}) all provide slot-less dual GigE, therefore, the physical node supporting
+logical Node I, will be equipped with two additional GigE cards as required.  Note that Node I does
+not require TDM interface cards (T400P-SS7) and has all three (or four in the case of IBM) PCI-X
+expansion slots available.
 
 @node Direct Access Storage Devices
 @subsection Direct Access Storage Devices
@@ -1969,8 +2492,10 @@ addition of a 100baseT PCI interface card for adminstrative LAN termination.
 
 Direct Access Storage Devices (DASD) can be quite expensive.  Most of the logical nodes in the
 SS7/SIGTRAN/VoIP Security Network do not have a requirement for large capacity storage devices.
-Speed is of more of an issue than size: 15,000 rpm SCSI devices in a RAID 2 arrangement (striped
-and mirrored) is preferred.
+Speed is of more of an issue than size: 2 x 15,000 rpm 38GB SCSI devices in a RAID 1 arrangement or
+3 x 15,000 rpm 38GB SCSI devices in a RAID 5 arrangement (striped and mirrored) is preferred.  RAID
+1 will be provided on the low-end minimal IBM systems and RAID 5 provided on the high-end Dell
+systems in the full blown configuration.
 
 @node Site Requirements
 @section Site Requirements
@@ -2007,9 +2532,9 @@ feet wide) at the front of the enclosure.
 @subsection Synchronization
 @cindex Synchronization
 
-TDM network syncrhonization will derive from logical nodes D and E (LEC STPs) in a hierarchal
+TDM network synchronization will derive from logical nodes D and E (LEC STPs) in a hierarchal
 synchronization arrangement.  Logical node D will provide master synchronization and logical node E
-will slave from logical node D.  All other nodes will slave their syncrhonization on a per-span
+will slave from logical node D.  All other nodes will slave their synchronization on a per-span
 basis from their attachment to either logical node D or E.
 
 @node Time Source
@@ -2018,7 +2543,7 @@ basis from their attachment to either logical node D or E.
 
 Logical nodes D and E will also act as a time source for Network Time Protocol.  If UNT can provide
 NTP network access to a high accuracy stratum clock, logical nodes D and E will slave off of that
-NTP source via the Administrative LAN.  All other logical nodes in the system will syncrhonize their
+NTP source via the Administrative LAN.  All other logical nodes in the system will synchronize their
 local clocks to NTP broadcasts from logical nodes D and E on the Administrative LAN.
 
 @node Digital Cross-Connect
@@ -2030,15 +2555,15 @@ platform will provide digital cross-connect capabilities.  To avoid costly Digit
 Cross-Connect System (DACCS) equipment, digital cross-connect (DSX) will be performed on a per-span
 (T1) basis (DSX-1).
 
-One 56 position 19" rack-mount Bantaam jack cross-connect pannel (wire-wrap or RJ-48c rear) and
+One 56 position 19" rack-mount Bantam jack cross-connect panel (wire-wrap or RJ-48c rear) and
 cabling will be required.  Each T400P-SS7 T1 interface card has 4 RJ-48c jacks.  Each physical node
 contains 2 T1 cards for a total of 8 T1 spans per node.  Seven (7) physical nodes with eight (8)
 spans each will require a 56 position DSX-1.  Cabling will be performed using clad category 5 UTP
 with an RJ-48c connector at one end, and wire-wrap connection at the rear of the DSX for all 56
-positions.  If minor growth of the system is anticiapted, a 64 position DSX-1 should be provided
+positions.  If minor growth of the system is anticipated, a 64 position DSX-1 should be provided
 instead.
 
-Twenty-eight (28) 18-inch long dual Bantam patch cables will be required intially to interconnect
+Twenty-eight (28) 18-inch long dual Bantam patch cables will be required initially to interconnect
 the nodes in the system.
 
 @node Network Switching
@@ -2055,12 +2580,17 @@ Network switching is required for 5 networks as follows:
 @item VoIP Bearer Network.
 @end enumerate
 
-Either five (5) 8-port Gigabit Ethernet switches can be provided, or, for the purpose of reducing the
-amount of equipment required, the @dfn{SIGTRAN} and @dfn{VoIP Control} networks can be combined on a
-single switch, and the @dfn{VoIP Signalling} and @dfn{VoIP Bearer} networks can be combined on a
-single switch, for a total of three (3) 8-port Gigabit Ethernet switches.  These Ethernet switches
-should be rear mountable 19" rack mount 8-port (or higher) autosensing 1000/100/10baseT Gigabit
-Ethernet switches with 16-32 Gigabit capacity, RJ45, Category 5e UTP compatible.
+Either five (5) 8-port Gigabit Ethernet switches can be provided, or, for the purpose of reducing
+the amount of equipment required, the @dfn{SIGTRAN} and @dfn{VoIP Control} networks can be combined
+on a single switch, and the @dfn{VoIP Signalling} and @dfn{VoIP Bearer} networks can be combined on
+a single switch, for a total of three (3) 8-port Gigabit Ethernet switches.  For signalling system
+security experimentation, only 3 of the 5 switches are required (the @dfn{VoiP Signalling} and
+@dfn{VoIP Bearer} LANs are not implemented).  For signalling system security experimentation, only 2
+of the 3 switches are required.
+
+These Ethernet switches should be rear mountable 19" rack mount 8-port (or higher) auto-sensing
+1000/100/10baseT Gigabit Ethernet switches with 16-32 Gigabit capacity, RJ45, Category 5e UTP
+compatible.
 
 @node Noise
 @subsection Noise
@@ -2076,7 +2606,7 @@ enclosures should be located in dedicated equipment rooms.
 @cindex Cooling Requirements
 
 Estimations of steady state operational cooling requirements (BTU-hours of A/C) are based on average
-operating AC power consumption.
+operating AC power consumption (i.e. heat dissipation).
 
 @node Preventative Maintenance
 @subsection Preventative Maintenance
@@ -2089,8 +2619,11 @@ lifetimes will depend upon the air quality of the environment in which the equip
 @subsection Power Consumption
 @cindex Power Consumption
 
-Power consuption is estimated by adding the power consumption of the each of the components in the
-equipment chassis.  All components must be provided with 110VAC 60Hz power.
+Power consumption is estimated by adding the power consumption of the each of the components in the
+equipment chassis.  All components are provided with 110/220VAC 60Hz power.  Servers consume 5 to 7
+amps each at 110VAC.  Network switches consume 1 amp at 110VAC.  Total power consumption of the
+minimal system under full operation is approximately 32amps@@110VAC or approximately 3 kilowatts;
+the full blown system, 60amps@@110VAC or approximately 6 kilowatts.
 
 @node System Software
 @section System Software
@@ -2113,14 +2646,19 @@ OpenSuSE can also be considered.
 OpenSS7 runs strict SELinux security policies on all platforms with remote logging and security
 scans enabled.
 
+The price of supported version of Red Hat Enterprise Server or SuSE 9 Enterprise Server are not
+included in the price of the servers (@pxref{Compute Hardware}).  Suitable RHEL clones such as
+Lineox or WhiteBox are sufficient and will save up to $9,000 on the minimal system and $12,000 on the
+full blown system.
+
 @subsection Network Element Software
 
-OpenSS7 network element software consists of the latest non-public relase of the OpenSS7-0.9.2
-software package (currently at patchlevel D).  Software is installed and upgraded using RPM on
+OpenSS7 network element software consists of the latest non-public release of the OpenSS7-0.9.2
+software package (currently at patch level D).  Software is installed and upgraded using RPM on
 RPM-compatible systems (e.g. SuSE and RedHat) and DSCs on Debian systems.
 
-Network element software will be custom configured for the SS7/SIGTRAN/VoIP Security Network detaile
-din this design document.
+Network element software will be custom configured for the SS7/SIGTRAN/VoIP Security Network
+detailed in this design document.
 
 @subsection Test Harness Software
 
@@ -2131,9 +2669,80 @@ Components for use in @cite{TETWare} attack scripts (test cases) and components 
 operational measurements, events, alarms and studies for report generation, will be provided as part
 of the OpenSS7-0.9.2 package.
 
+@subsection Software Commissioning
+
+Commissioning of node software will be priced separately.
+
 @node Capacity and Sizing
 @section Capacity and Sizing
 @cindex Capacity and Sizing
+
+Capacity of the SS7/SIGTRAN/VoIP network was sized to provide 4 million BHCA derived from a
+theoretical 10 million residential subscriber base and the minimal system should be capable of
+sustaining these traffic loads continuously.  The complete system should be capable of up to ten (10)
+times that signalling traffic load, or 40 million BHCA on an effective subscriber base of 100
+million residential subscribers.
+
+However, available SS7 signalling links in the system will limit the load to 6 million BHCA at .40
+Erlang per signalling link.  At 1 Erlang per signalling link, 12 million BHCA on a subscriber base
+of 30 million residential subscribers could be possible.
+
+The system will be loaded to the maximum capacity possible.
+
+@node Hardware Manifest
+@section Hardware Manifest
+@cindex Hardware Manifest
+
+The sub-sections that follow provide a summary manifest of the hardware components discussed in this
+document for both the complete system and the minimal system.  Also provided is a cost estimate for
+each system.
+
+@menu
+* Minimal System Manifest and Cost Estimate::
+* Complete System Manifest and Cost Estimate::
+@end menu
+
+@node Minimal System Manifest
+@subsection Minimal System Manifest and Cost Estimate
+@cindex Minimal System Manifest
+@cindex Minimal System Cost Estimate
+
+Estimated costs are from manufacturer retail prices and does not include any hardware
+commissioning costs, applicable taxes, nor shipping.  Software and software commissioning costs are
+not included.
+
+@multitable @columnfractions .05 .40 .15 .15 .25
+@item @code{6} @tab IBM xSeries x346 Servers	@tab @code{$4,125.00} @tab @code{$24,750.00}
+@item @code{1} @tab 32U rack mount enclosure	@tab @code{$1,000.00} @tab @code{$*1,000.00}
+@item @code{2} @tab 8-port GigE Switch		@tab @code{$**250.00} @tab @code{$***500.00}
+@item @code{1} @tab 56 position DSX-1		@tab @code{$**899.00} @tab @code{$***899.00}
+@item @code{9} @tab T400P-SS7 Cards		@tab @code{$**625.00} @tab @code{$*5,625.00}
+@item @code{1} @tab System console		@tab @code{$1,500.00} @tab @code{$*1,500.00}
+@item @code{-} @tab PDU and cabling		@tab @code{$**800.00} @tab @code{$***800.00}
+@item @code{}  @tab =========================== @tab @code{}          @tab @code{==========}
+@item @code{}  @tab TOTAL			@tab @code{}	      @tab @code{$35,074.00}
+@end multitable
+
+@node Complete System Manifest
+@subsection Complete System Manifest and Cost Estimate
+@cindex Complete System Manifest
+@cindex Complete System Cost Estimate
+
+Estimated costs are from manufacturer retail prices and does not include any hardware
+commissioning costs, applicable taxes, nor shipping.  Software and software commissioning costs are
+not included.
+
+@multitable @columnfractions .05 .40 .15 .15 .25
+@item @code{8} @tab Dell PowerEdge 2850 Servers	@tab @code{$5,562.00} @tab @code{$44,496.00}
+@item @code{1} @tab 48U rack mount enclosure	@tab @code{$1,500.00} @tab @code{$*1,500.00}
+@item @code{3} @tab 8-port GigE Switch		@tab @code{$**250.00} @tab @code{$***750.00}
+@item @code{1} @tab 56 position DSX-1		@tab @code{$**899.00} @tab @code{$***899.00}
+@item @code{10} @tab T400P-SS7 Cards		@tab @code{$**599.00} @tab @code{$*5,990.00}
+@item @code{1} @tab System console		@tab @code{$1,500.00} @tab @code{$*1,500.00}
+@item @code{-} @tab PDU and cabling		@tab @code{$1,000.00} @tab @code{$*1,000.00}
+@item @code{}  @tab =========================== @tab @code{}          @tab @code{==========}
+@item @code{}  @tab TOTAL			@tab @code{}	      @tab @code{$56,135.00}
+@end multitable
 
 @node List of Figures
 @unnumbered List of Figures
