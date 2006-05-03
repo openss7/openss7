@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 09:25:10 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/03 11:53:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/24 09:25:10 $ by $Author: brian $
+ Last Modified $Date: 2006/05/03 11:53:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.13  2006/05/03 11:53:51  brian
+ - changes for compile, working up NPI-IP driver
+
  Revision 0.9.2.12  2006/04/24 09:25:10  brian
  - working up RAWIP and UDP drivers
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 09:25:10 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/03 11:53:51 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 09:25:10 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/03 11:53:51 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -168,7 +171,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 09:25:10 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/03 11:53:51 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -2953,7 +2956,7 @@ tpi_init_nproto(unsigned char proto)
 	if ((ip = tpi_bhash[slot].ipproto) != NULL)
 		return (-EALREADY);
 	ip = tpi_bhash[slot].ipproto = &tpi_proto[slot];
-	inet_add_protocol(ip, proto);
+	inet_add_protocol(ip);
 	return (0);
 }
 
@@ -2972,7 +2975,7 @@ tpi_term_nproto(unsigned char proto)
 
 	if ((ip = tpi_bhash[slot].ipproto) == NULL)
 		return (-EALREADY);	/* already terminated */
-	inet_del_protocol(ip, proto);
+	inet_del_protocol(ip);
 	tpi_bhash[slot].ipproto = NULL;
 	return (0);
 }
@@ -3394,6 +3397,14 @@ t_tpi_disconnect(struct tpi *tpi)
 /* Why do stupid people rename things like this? */
 #undef dst_pmtu
 #define dst_pmtu dst_mtu
+#else
+#ifndef HAVE_STRUCT_DST_ENTRY_PATH
+static inline u32
+dst_pmtu(struct dst_entry *dst)
+{
+	return (dst->pmtu);
+}
+#endif
 #endif				/* HAVE_KFUNC_DST_MTU */
 
 #if defined HAVE_KFUNC_DST_OUTPUT

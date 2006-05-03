@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/26 10:47:51 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/05/03 11:53:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/26 10:47:51 $ by $Author: brian $
+ Last Modified $Date: 2006/05/03 11:53:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.12  2006/05/03 11:53:51  brian
+ - changes for compile, working up NPI-IP driver
+
  Revision 0.9.2.11  2006/04/26 10:47:51  brian
  - sync
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/26 10:47:51 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/05/03 11:53:51 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/26 10:47:51 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/05/03 11:53:51 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -162,7 +165,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/04/26 10:47:51 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/05/03 11:53:51 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -2736,7 +2739,7 @@ tpi_init_nproto(unsigned char proto)
 	if ((ip = tpi_bhash[slot].ipproto) != NULL)
 		return (-EALREADY);
 	ip = tpi_bhash[slot].ipproto = &tpi_proto[slot];
-	inet_add_protocol(ip, proto);
+	inet_add_protocol(ip);
 	return (0);
 }
 
@@ -2755,7 +2758,7 @@ tpi_term_nproto(unsigned char proto)
 
 	if ((ip = tpi_bhash[slot].ipproto) == NULL)
 		return (-EALREADY);	/* already terminated */
-	inet_del_protocol(ip, proto);
+	inet_del_protocol(ip);
 	tpi_bhash[slot].ipproto = NULL;
 	return (0);
 }
@@ -3026,7 +3029,7 @@ t_tpi_bind(struct tpi *tpi, struct sockaddr_storage *ADDR_buffer, t_uscalar_t AD
 		struct tpi *test;
 
 		hp = &tpi_bhash[tpi_bhashfn(bport)];
-		write_lock(&hp->lock);
+		write_lock_bh(&hp->lock);
 		for (test = hp->list; test; test = test->bnext) {
 			struct sockaddr_in *sit = (struct sockaddr_in *) &test->SRC_buffer;
 
@@ -3036,18 +3039,21 @@ t_tpi_bind(struct tpi *tpi, struct sockaddr_storage *ADDR_buffer, t_uscalar_t AD
 				break;
 		}
 		if (test != NULL) {
-			write_unlock(&hp->lock);
+			write_unlock_bh(&hp->lock);
 			if (num == 0)
 				/* specific port number requested */
 				return (TADDRBUSY);
 			if (++num > tpi_last_port)
 				num = tpi_frst_port;
+			bport = htons(num);
 			if (num != tpi_prev_port)
 				continue;
 			return (TNOADDR);
 		}
-		if (num != 0)
+		if (num != 0) {
 			tpi_prev_port = num;
+			bport = htons(num);
+		}
 		break;
 	}
 	sin->sin_port = bport;
@@ -3058,7 +3064,7 @@ t_tpi_bind(struct tpi *tpi, struct sockaddr_storage *ADDR_buffer, t_uscalar_t AD
 	tpi->bprev = &hp->list;
 	hp->list = tpi_get(tpi);
 	tpi->bindb = hp;
-	write_unlock(&hp->lock);
+	write_unlock_bh(&hp->lock);
 	return (0);
 }
 
@@ -3165,6 +3171,14 @@ t_tpi_disconnect(struct tpi *tpi)
 /* Why do stupid people rename things like this? */
 #undef dst_pmtu
 #define dst_pmtu dst_mtu
+#else
+#ifndef HAVE_STRUCT_DST_ENTRY_PATH
+static inline u32
+dst_pmtu(struct dst_entry *dst)
+{
+	return (dst->pmtu);
+}
+#endif
 #endif				/* HAVE_KFUNC_DST_MTU */
 
 #if defined HAVE_KFUNC_DST_OUTPUT
@@ -5131,7 +5145,7 @@ tpi_v4_rcv(struct sk_buff *skb)
 
 //      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 
-	if (!pskb_may_pull(skb, sizeof(struct udphdr)))
+	if (!pskb_may_pull(skb, 4))
 		goto too_small;
 
 	if (skb->pkt_type != PACKET_HOST)
@@ -5343,12 +5357,12 @@ tpi_free_priv(queue_t *q)
 	/* make sure the stream is disconnected */
 	if (tpi->hashb != NULL) {
 		t_tpi_disconnect(tpi);
-		bufq_purge(&tpi->conq);
 		tpi_set_state(tpi, TS_IDLE);
 	}
 	/* make sure the stream is unbound */
 	if (tpi->bindb != NULL) {
 		t_tpi_unbind(tpi);
+		bufq_purge(&tpi->conq);
 		tpi_set_state(tpi, TS_UNBND);
 	}
 	bufq_purge(&tpi->conq);
