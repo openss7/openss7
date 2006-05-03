@@ -1,3 +1,25 @@
+2006-04-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/projects/Makefile.am: added UNT lab project documentation
+	* doc/projects/lab.texi: added UNT lab project documentation
+	* doc/projects/lab000.fig: added
+	* doc/projects/lab000.txt: added
+	* doc/projects/lab001.fig: added
+	* doc/projects/lab001.txt: added
+	* doc/projects/lab002.fig: added
+	* doc/projects/lab002.txt: added
+	* doc/projects/lab003.fig: added
+	* doc/projects/lab003.txt: added
+	* doc/projects/lab004.fig: added
+	* doc/projects/lab004.txt: added
+	* doc/projects/lab005.fig: added
+	* doc/projects/lab005.txt: added
+	* doc/projects/lab006.fig: added
+	* doc/projects/lab006.txt: added
+	* doc/projects/lab007.fig: added
+	* doc/projects/lab007.txt: added
+	* doc/projects/labnodes.tbl: added
+
 2006-04-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strss7.refs: more references

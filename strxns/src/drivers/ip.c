@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/04/27 09:34:58 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/03 01:04:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/27 09:34:58 $ by $Author: brian $
+ Last Modified $Date: 2006/05/03 01:04:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.24  2006/05/03 01:04:33  brian
+ - corrections for compile
+
  Revision 0.9.2.23  2006/04/27 09:34:58  brian
  - working up NPI-IP driver some more
 
@@ -122,10 +125,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/04/27 09:34:58 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/03 01:04:33 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/04/27 09:34:58 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/03 01:04:33 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -178,7 +181,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/04/27 09:34:58 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/03 01:04:33 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -1011,6 +1014,20 @@ npi_bind(struct np *np, struct sockaddr_in *add_in, size_t anum, unsigned char *
 	return (err);
 }
 
+#ifdef HAVE_KFUNC_DST_MTU
+/* Why do stupid people rename things like this? */
+#undef dst_pmtu
+#define dst_pmtu dst_mtu
+#else
+#ifndef HAVE_STRUCT_DST_ENTRY_PATH
+static inline u32
+dst_pmtu(struct dst_entry *dst)
+{
+	return (dst->pmtu);
+}
+#endif
+#endif
+
 /**
  * npi_connect - form a connection
  * @np: private structure
@@ -1234,18 +1251,6 @@ npi_ip_queue_xmit(struct sk_buff *skb)
 #endif
 }
 #else
-#ifdef HAVE_KFUNC_DST_MTU
-/* Why do stupid people rename things like this? */
-#undef dst_pmtu
-#define dst_pmtu dst_mtu
-#endif
-#ifndef HAVE_STRUCT_DST_ENTRY_PATH
-static inline u32
-dst_pmtu(struct dst_entry *dst)
-{
-	return (dst->pmtu);
-}
-#endif
 STATIC INLINE int
 npi_ip_queue_xmit(struct sk_buff *skb)
 {
