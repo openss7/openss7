@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_ip.h,v 0.9.2.4 2006/04/26 10:47:55 brian Exp $
+ @(#) $Id: npi_ip.h,v 0.9.2.5 2006/05/03 22:53:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/26 10:47:55 $ by $Author: brian $
+ Last Modified $Date: 2006/05/03 22:53:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_ip.h,v $
+ Revision 0.9.2.5  2006/05/03 22:53:39  brian
+ - working up NPI-IP driver
+
  Revision 0.9.2.4  2006/04/26 10:47:55  brian
  - sync
 
@@ -66,7 +69,7 @@
 #ifndef SYS_NPI_IP_H
 #define SYS_NPI_IP_H
 
-#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/npi.h>
 
@@ -90,10 +93,6 @@ typedef struct N_qos_sel_info_ip {
 	np_ulong daddr;			/* default dest IP address for outgoing packets */
 } N_qos_sel_info_ip_t;
 
-typedef struct N_qos_range_info_ip {
-	np_ulong n_qos_type;		/* always N_QOS_RANGE_INFO_IP */
-} N_qos_range_info_ip_t;
-
 typedef struct N_qos_sel_conn_ip {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_CONN_IP */
 	np_ulong protocol;
@@ -101,6 +100,8 @@ typedef struct N_qos_sel_conn_ip {
 	np_ulong ttl;			/* default time-to-live for connection */
 	np_ulong tos;			/* default type-of-service for connection */
 	np_ulong mtu;			/* default maximum-transfer-unit for connection */
+	np_ulong saddr;			/* default srce IP address for outgoing packets */
+	np_ulong daddr;			/* default dest IP address for outgoing packets */
 } N_qos_sel_conn_ip_t;
 
 typedef struct N_qos_sel_reset_ip {
@@ -118,6 +119,34 @@ typedef struct N_qos_sel_ud_ip {
 	np_ulong tos;			/* type of service for outgoing packet */
 	np_ulong saddr;			/* source IP address for outgoing packet */
 } N_qos_sel_ud_ip_t;
+
+typedef struct {
+	np_long priority_min_value;	/* */
+	np_long priority_max_value;	/* */
+} ip_priority_values_t;
+
+typedef struct {
+	np_long ttl_min_value;	/* */
+	np_long ttl_max_value;	/* */
+} ip_ttl_values_t;
+
+typedef struct {
+	np_long tos_min_value;	/* */
+	np_long tos_max_value;	/* */
+} ip_tos_values_t;
+
+typedef struct {
+	np_long mtu_min_value;	/* */
+	np_long mtu_max_value;	/* */
+} ip_mtu_values_t;
+
+typedef struct N_qos_range_info_ip {
+	np_ulong n_qos_type;		/* always N_QOS_RANGE_INFO_IP */
+	ip_priority_values_t priority;	/* priority range */
+	ip_ttl_values_t ttl;		/* ttl range */
+	ip_tos_values_t tos;		/* tos range */
+	ip_mtu_values_t mtu;		/* mtu range */
+} N_qos_range_info_ip_t;
 
 /* 
    NC reset request
