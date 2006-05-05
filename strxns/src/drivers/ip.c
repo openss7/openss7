@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/03 22:53:39 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/05/05 02:07:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/03 22:53:39 $ by $Author: brian $
+ Last Modified $Date: 2006/05/05 02:07:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.27  2006/05/05 02:07:52  brian
+ - working up NPI-IP driver
+
  Revision 0.9.2.26  2006/05/03 22:53:39  brian
  - working up NPI-IP driver
 
@@ -131,10 +134,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/03 22:53:39 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/05/05 02:07:52 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/03 22:53:39 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/05/05 02:07:52 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -187,7 +190,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/03 22:53:39 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/05/05 02:07:52 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -723,7 +726,7 @@ STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PRO
  * the module after protocol override would break things horribly.  Taking the reference keeps the
  * module from unloading (this works for OpenSS7 SCTP as well as lksctp).
  */
-STATIC struct ip_prot_bucket *
+STATIC INLINE fastcall struct ip_prot_bucket *
 npi_init_nproto(unsigned char proto, unsigned int type)
 {
 	struct ip_prot_bucket *pb;
@@ -797,7 +800,7 @@ npi_init_nproto(unsigned char proto, unsigned int type)
  * restore the protocol's entry and drop the reference to its owning kernel module.  If there was no
  * protocol previously registered, this reduces to the 2.6 version of inet_del_protocol().
  */
-STATIC void
+STATIC INLINE fastcall void
 npi_term_nproto(unsigned char proto, unsigned int type)
 {
 	struct ip_prot_bucket *pb;
@@ -850,7 +853,7 @@ npi_term_nproto(unsigned char proto, unsigned int type)
  *  only one function.  We don't want that either.  If the message is not for us, we want to pass it
  *  to the next protocol module.
  */
-STATIC int
+STATIC INLINE fastcall int
 npi_bind_prot(unsigned char proto, unsigned int type)
 {
 	struct ip_prot_bucket *pb;
@@ -864,50 +867,11 @@ npi_bind_prot(unsigned char proto, unsigned int type)
  *  npi_unbind_prot - unbind a protocol
  *  @proto:	    protocol number to unbind
  */
-STATIC void
+STATIC INLINE fastcall void
 npi_unbind_prot(unsigned char proto, unsigned int type)
 {
 	npi_term_nproto(proto, type);
 }
-
-#if 0
-/**
- *  npi_bind_addr -  bind an address and protocol id to a Stream
- *  @np:	    Stream to which to bind
- *  @add:	    sockaddr_in structure with address to bind
- *  @proto:	    protocol id to bind
- *  @type:	    type of bind (N_CLNS|N_CONS)
- *  @flag:	    default bind
- */
-STATIC int
-npi_bind_addr(struct np *np, struct sockaddr_in *addr, unsigned char proto, unsigned int type,
-	      int flag)
-{
-	int err;
-
-	if ((err = npi_bind_prot(proto, type)) != 0)
-		goto error;
-	/* FIXME: now bind to address... */
-      error:
-	return (err);
-}
-
-/**
- *  npi_unbind_addr - unbind an address and protocol id from a Stream
- *  @np:		    Stream to which to unbind
- *  @add:	    sockaddr_in structure with address to unbind
- *  @proto:	    protocl id to unbind
- *  @type:	    type of bind (N_CLNS|N_CONS)
- *  @flag:	    default unbind
- */
-STATIC void
-npi_unbind_addr(struct np *np, struct sockaddr_in *addr, unsigned char proto, unsigned int type,
-		int flag)
-{
-	/* FIXME: unbind from address... */
-	npi_unbind_prot(proto, type);
-}
-#endif
 
 /**
  * npi_bind - bind a Stream to an NSAP
@@ -936,8 +900,6 @@ npi_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	struct np *np2;
 	int i, j, err;
 
-	(void) npi_term_nproto;
-	(void) npi_unbind_prot;
 	PROTOID_length = 1;
 	hp = &npi_bhash[npi_bhashfn(proto, bport)];
 	write_lock_bh(&hp->lock);
@@ -1021,6 +983,80 @@ dst_pmtu(struct dst_entry *dst)
 #endif
 #endif
 
+STATIC fastcall int
+npi_conn_check(struct np *np, unsigned char proto)
+{
+	unsigned short sport = np->sport;
+	unsigned short dport = np->dport;
+	struct np *conflict = NULL;
+	struct npi_chash_bucket *hp, *hp1, *hp2;
+
+	hp1 = &npi_chash[npi_chashfn(proto, dport, sport)];
+	hp2 = &npi_chash[npi_chashfn(proto, 0, 0)];
+
+	write_lock_bh(&hp1->lock);
+	if (hp1 != hp2)
+		read_lock(&hp2->lock);
+
+	hp = hp1;
+	do {
+		struct np *np2;
+		np_ulong state;
+
+		for (np2 = hp->list; np2; np2 = np2->cnext) {
+			int i, j;
+
+			if ((state = npi_get_state(np2)) != NS_DATA_XFER && state != NS_WRES_RIND)
+				continue;
+			if (np2->sport != sport)
+				continue;
+			if (np2->dport != dport)
+				continue;
+			for (i = 0; conflict == NULL && i < np2->snum; i++)
+				for (j = 0; conflict == NULL && j < np->snum; j++)
+					if (np2->saddrs[i].addr == np->saddrs[j].addr)
+						conflict = np2;
+			if (conflict == NULL)
+				continue;
+			conflict = NULL;
+			for (i = 0; conflict == NULL && i < np2->dnum; i++)
+				for (j = 0; conflict == NULL && j < np->dnum; j++)
+					if (np2->daddrs[i].addr == np->daddrs[j].addr)
+						conflict = np2;
+			if (conflict == NULL)
+				continue;
+			break;
+		}
+	} while (conflict == NULL && hp != hp2 && (hp = hp2));
+	if (conflict != NULL) {
+		int i;
+
+		if (hp1 != hp2)
+			read_unlock(&hp2->lock);
+		write_unlock_bh(&hp1->lock);
+		/* free dst caches */
+		for (i = 0; i < np->dnum; i++)
+			dst_release(XCHG(&np->daddrs[i].dst, NULL));
+		np->dnum = 0;
+		np->dport = 0;
+		/* blank source addresses */
+		np->snum = 0;
+		np->sport = 0;
+		/* how do we say already connected? (-EISCONN) */
+		return (NBADADDR);
+	}
+	/* link into connection hash */
+	if ((np->cnext = hp1->list))
+		np->cnext->cprev = &np->cnext;
+	np->cprev = &hp1->list;
+	hp1->list = np_get(np);
+	np->chash = hp1;
+	if (hp1 != hp2)
+		read_unlock(&hp2->lock);
+	write_unlock_bh(&hp1->lock);
+	return (0);
+}
+
 /**
  * npi_connect - form a connection
  * @np: private structure
@@ -1032,38 +1068,94 @@ dst_pmtu(struct dst_entry *dst)
  */
 STATIC INLINE fastcall int
 npi_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
-	    struct N_qos_sel_conn_ip * QOS_buffer, np_ulong CONN_flags)
+	    struct N_qos_sel_conn_ip *QOS_buffer, np_ulong CONN_flags)
 {
-	unsigned char proto = np->protoids[0];
-	unsigned short pmtu = 65535;
-	uint32_t saddr, daddr;
 	size_t dnum = DEST_length / sizeof(*DEST_buffer);
-	int i, j;
+	np_long NPI_error;
+	int i;
 
-	if (QOS_buffer->mtu > 0 && QOS_buffer->mtu != QOS_UNKNOWN && QOS_buffer->mtu < pmtu)
-		pmtu = QOS_buffer->mtu;
-
+	NPI_error = NBADQOSPARAM;
+	/* first validate parameters */
 	if (QOS_buffer->protocol != QOS_UNKNOWN) {
-		int found = 0;
-
-		for (i = 0; i < np->pnum; i++) {
-			if (QOS_buffer->protocol == np->protoids[i]) {
-				found = 1;
+		for (i = 0; i < np->pnum; i++)
+			if (np->protoids[i] == QOS_buffer->protocol)
 				break;
-			}
-		}
-		if (found == 0)
-			return (NBADQOSPARAM);
-		proto = QOS_buffer->protocol;
+		if (i >= np->pnum)
+			goto error;
+	} else {
+		QOS_buffer->protocol = np->qos.protocol;
+	}
+	if (QOS_buffer->priority != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->priority < np->qor.priority.priority_min_value)
+			goto error;
+		if ((np_long) QOS_buffer->priority > np->qor.priority.priority_max_value)
+			goto error;
+	} else {
+		QOS_buffer->priority = np->qos.priority;
+	}
+	if (QOS_buffer->ttl != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->ttl < np->qor.ttl.ttl_min_value)
+			goto error;
+		if ((np_long) QOS_buffer->ttl > np->qor.ttl.ttl_max_value)
+			goto error;
+	} else {
+		QOS_buffer->ttl = np->qos.ttl;
+	}
+	if (QOS_buffer->tos != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->tos < np->qor.tos.tos_min_value)
+			goto error;
+		if ((np_long) QOS_buffer->tos > np->qor.tos.tos_max_value)
+			goto error;
+	} else {
+		QOS_buffer->tos = np->qos.tos;
+	}
+	if (QOS_buffer->mtu != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->mtu < np->qor.mtu.mtu_min_value)
+			goto error;
+		if ((np_long) QOS_buffer->mtu > np->qor.mtu.mtu_max_value)
+			goto error;
+	} else {
+		QOS_buffer->mtu = np->qos.mtu;
 	}
 
-	/* The default destination address is the first address in the list. */
+	/* Need to determine source addressess from bound addresses before we can test the source
+	   address.  If we are bound to specific addresses, then the source address list is simply
+	   the destination address list. If bound to a wildcard address, then the source address
+	   list could be determined from the scope of the destination addresses and the available
+	   interfaces and their addresses.  However, for the moment it is probably easier to simply 
+	   allow wildcard source addresses and let the user specify any address when there is a
+	   wildcard source address. */
 
-	daddr = DEST_buffer[0].sin_addr.s_addr;
+	np->sport = np->bport;
+	np->snum = np->bnum;
+	for (i = 0; i < np->bnum; i++)
+		np->saddrs[i].addr = np->baddrs[i].addr;
 
-	/* The default source address is the source address of the outgoing interface. */
-
-	saddr = 0;
+	if (QOS_buffer->saddr != QOS_UNKNOWN) {
+		if (QOS_buffer->saddr != 0) {
+			for (i = 0; i < np->snum; i++) {
+				if (np->saddrs[i].addr == INADDR_ANY)
+					break;
+				if (np->saddrs[i].addr == QOS_buffer->saddr)
+					break;
+			}
+			if (i >= np->snum)
+				goto error;
+		}
+	} else {
+		QOS_buffer->saddr = np->qos.saddr;
+	}
+	if (QOS_buffer->daddr != QOS_UNKNOWN) {
+		/* Specified default destination address must be in the destination address list. */
+		for (i = 0; i < dnum; i++)
+			if (DEST_buffer[i].sin_addr.s_addr == QOS_buffer->daddr)
+				break;
+		if (i >= dnum)
+			goto error;
+	} else {
+		/* The default destination address is the first address in the list. */
+		QOS_buffer->daddr = DEST_buffer[0].sin_addr.s_addr;
+	}
 
 	/* Destination addresses have been checked as follows: they have been aligned. There is at
 	   least 1 address and no more than 8 addresses.  The first address has an address family
@@ -1075,23 +1167,21 @@ npi_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_lengt
 
 	np->dport = DEST_buffer[0].sin_port;
 
-	if (np->dport == 0 && (np->bport != 0 || np->sport != 0)) {
-		return (NBADADDR);
-	}
-	if (np->dport != 0 && np->sport == 0) {
+	NPI_error = NBADADDR;
+	if (np->dport == 0 && (np->bport != 0 || np->sport != 0))
+		goto error;
+	if (np->dport != 0 && np->sport == 0)
 		/* TODO: really need to autobind the stream to a dynamically allocated source port
 		   number. */
-		return (NBADADDR);
-	}
+		goto error;
 
 	for (i = 0; i < dnum; i++) {
 		struct rtable *rt = NULL;
-		int err;
 
-		if ((err = ip_route_output(&rt, DEST_buffer[i].sin_addr.s_addr, 0, 0, 0))) {
+		if ((NPI_error = ip_route_output(&rt, DEST_buffer[i].sin_addr.s_addr, 0, 0, 0))) {
 			while (--i >= 0)
-				dst_release(xchg(&np->daddrs[i].dst, NULL));
-			return (err);
+				dst_release(XCHG(&np->daddrs[i].dst, NULL));
+			goto error;
 		}
 		np->daddrs[i].dst = &rt->u.dst;
 
@@ -1104,90 +1194,26 @@ npi_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_lengt
 		np->daddrs[i].ttl = QOS_buffer->ttl;
 		np->daddrs[i].tos = QOS_buffer->tos;
 		np->daddrs[i].mtu = dst_pmtu(np->daddrs[i].dst);
-		if (np->daddrs[i].mtu < pmtu)
-			pmtu = np->daddrs[i].mtu;
+		if (np->daddrs[i].mtu < QOS_buffer->mtu)
+			QOS_buffer->mtu = np->daddrs[i].mtu;
 	}
 	np->dnum = dnum;
 
 	/* try to place in connection hashes with conflict checks */
-	{
-		unsigned short sport = np->sport;
-		unsigned short dport = np->dport;
-		struct np *conflict = NULL;
-		struct npi_chash_bucket *hp, *hp1, *hp2;
+	if ((NPI_error = npi_conn_check(np, QOS_buffer->protocol)) != 0)
+		goto error;
 
-		hp1 = &npi_chash[npi_chashfn(proto, dport, sport)];
-		hp2 = &npi_chash[npi_chashfn(proto, 0, 0)];
-
-		write_lock_bh(&hp1->lock);
-		if (hp1 != hp2)
-			read_lock(&hp2->lock);
-
-		hp = hp1;
-		do {
-			struct np *np2;
-			np_ulong state;
-
-			for (np2 = hp->list; np2; np2 = np2->cnext) {
-				if ((state = npi_get_state(np2)) != NS_DATA_XFER
-				    && state != NS_WRES_RIND)
-					continue;
-				if (np2->sport != sport)
-					continue;
-				if (np2->dport != dport)
-					continue;
-				for (i = 0; conflict == NULL && i < np2->snum; i++)
-					for (j = 0; conflict == NULL && j < np->snum; j++)
-						if (np2->saddrs[i].addr == np->saddrs[j].addr)
-							conflict = np2;
-				if (conflict == NULL)
-					continue;
-				conflict = NULL;
-				for (i = 0; conflict == NULL && i < np2->dnum; i++)
-					for (j = 0; conflict == NULL && j < dnum; j++)
-						if (np2->daddrs[i].addr == np->daddrs[j].addr)
-							conflict = np2;
-				if (conflict == NULL)
-					continue;
-				break;
-			}
-		} while (conflict == NULL && hp != hp2 && (hp = hp2));
-		if (conflict != NULL) {
-			if (hp1 != hp2)
-				read_unlock(&hp2->lock);
-			write_unlock_bh(&hp1->lock);
-			/* free dst caches */
-			for (i = 0; i < dnum; i++)
-				dst_release(XCHG(&np->daddrs[i].dst, NULL));
-			np->dnum = 0;
-			np->dport = 0;
-			/* how do we say already connected? (-EISCONN) */
-			return (NBADADDR);
-		}
-		/* link into connection hash */
-		if ((np->cnext = hp1->list))
-			np->cnext->cprev = &np->cnext;
-		np->cprev = &hp1->list;
-		hp1->list = np_get(np);
-		np->chash = hp1;
-		if (hp1 != hp2)
-			read_unlock(&hp2->lock);
-		write_unlock_bh(&hp1->lock);
-	}
-
-	/* XXX should this be inside locks? */
-	/* store returned qos values */
-	np->qos.protocol = proto;
-	if (QOS_buffer->priority != QOS_UNKNOWN)
-		np->qos.priority = QOS_buffer->priority;
-	if (QOS_buffer->ttl != QOS_UNKNOWN)
-		np->qos.ttl = QOS_buffer->ttl;
-	if (QOS_buffer->tos != QOS_UNKNOWN)
-		np->qos.tos = QOS_buffer->tos;
-	np->qos.mtu = pmtu;
-	np->qos.saddr = saddr;
-	np->qos.daddr = daddr;
+	/* store negotiated qos values */
+	np->qos.protocol = QOS_buffer->protocol;
+	np->qos.priority = QOS_buffer->priority;
+	np->qos.ttl = QOS_buffer->ttl;
+	np->qos.tos = QOS_buffer->tos;
+	np->qos.mtu = QOS_buffer->mtu;
+	np->qos.saddr = QOS_buffer->saddr;
+	np->qos.daddr = QOS_buffer->daddr;
 	return (0);
+      error:
+	return (NPI_error);
 }
 
 STATIC int
@@ -1199,55 +1225,53 @@ npi_reset(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
 }
 
 STATIC int
-npi_optmgmt(struct np *np, void *QOS_buffer, np_ulong OPTMGMT_flags)
+npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_flags)
 {
-	np_ulong type;
 	int i;
 
-	switch ((type = *(typeof(type) *) QOS_buffer)) {
+	switch (QOS_buffer->n_qos_type) {
 	case N_QOS_SEL_INFO_IP:
-	{
-		struct N_qos_sel_info_ip *qos = (typeof(qos)) QOS_buffer;
-
 		/* protocol must be one of the bound protocol ids */
-		if (qos->protocol != QOS_UNKNOWN) {
+		if (QOS_buffer->n_qos_sel_info.protocol != QOS_UNKNOWN) {
 			for (i = 0; i < np->pnum; i++)
-				if (np->protoids[i] == qos->protocol)
+				if (np->protoids[i] == QOS_buffer->n_qos_sel_info.protocol)
 					break;
 			if (i >= np->pnum)
 				return (NBADQOSPARAM);
 		}
-		if (qos->priority != QOS_UNKNOWN) {
-			if ((np_long) qos->priority < np->qor.priority.priority_min_value)
+		if (QOS_buffer->n_qos_sel_info.priority != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_info.priority <
+			    np->qor.priority.priority_min_value)
 				return (NBADQOSPARAM);
-			if ((np_long) qos->priority > np->qor.priority.priority_max_value)
-				return (NBADQOSPARAM);
-		}
-		if (qos->ttl != QOS_UNKNOWN) {
-			if ((np_long) qos->ttl < np->qor.ttl.ttl_min_value)
-				return (NBADQOSPARAM);
-			if ((np_long) qos->ttl > np->qor.ttl.ttl_max_value)
+			if ((np_long) QOS_buffer->n_qos_sel_info.priority >
+			    np->qor.priority.priority_max_value)
 				return (NBADQOSPARAM);
 		}
-		if (qos->tos != QOS_UNKNOWN) {
-			if ((np_long) qos->tos < np->qor.tos.tos_min_value)
+		if (QOS_buffer->n_qos_sel_info.ttl != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_info.ttl < np->qor.ttl.ttl_min_value)
 				return (NBADQOSPARAM);
-			if ((np_long) qos->tos > np->qor.tos.tos_max_value)
+			if ((np_long) QOS_buffer->n_qos_sel_info.ttl > np->qor.ttl.ttl_max_value)
 				return (NBADQOSPARAM);
 		}
-		if (qos->mtu != QOS_UNKNOWN) {
-			if ((np_long) qos->mtu < np->qor.mtu.mtu_min_value)
+		if (QOS_buffer->n_qos_sel_info.tos != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_info.tos < np->qor.tos.tos_min_value)
 				return (NBADQOSPARAM);
-			if ((np_long) qos->mtu > np->qor.mtu.mtu_max_value)
+			if ((np_long) QOS_buffer->n_qos_sel_info.tos > np->qor.tos.tos_max_value)
+				return (NBADQOSPARAM);
+		}
+		if (QOS_buffer->n_qos_sel_info.mtu != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_info.mtu < np->qor.mtu.mtu_min_value)
+				return (NBADQOSPARAM);
+			if ((np_long) QOS_buffer->n_qos_sel_info.mtu > np->qor.mtu.mtu_max_value)
 				return (NBADQOSPARAM);
 		}
 		/* source address should be one of the specified source addresses */
-		if (qos->saddr != QOS_UNKNOWN) {
-			if (qos->saddr != 0) {
+		if (QOS_buffer->n_qos_sel_info.saddr != QOS_UNKNOWN) {
+			if (QOS_buffer->n_qos_sel_info.saddr != 0) {
 				for (i = 0; i < np->snum; i++) {
 					if (np->saddrs[i].addr == INADDR_ANY)
 						break;
-					if (np->saddrs[i].addr == qos->saddr)
+					if (np->saddrs[i].addr == QOS_buffer->n_qos_sel_info.saddr)
 						break;
 				}
 				if (i >= np->snum)
@@ -1255,82 +1279,74 @@ npi_optmgmt(struct np *np, void *QOS_buffer, np_ulong OPTMGMT_flags)
 			}
 		}
 		/* destination address must be one of the specified destination addresses */
-		if (qos->daddr != QOS_UNKNOWN) {
+		if (QOS_buffer->n_qos_sel_info.daddr != QOS_UNKNOWN) {
 			for (i = 0; i < np->dnum; i++)
-				if (np->daddrs[i].addr == qos->daddr)
+				if (np->daddrs[i].addr == QOS_buffer->n_qos_sel_info.daddr)
 					break;
 			if (i >= np->dnum)
 				return (NBADQOSPARAM);
 		}
-		if (qos->protocol != QOS_UNKNOWN)
-			np->qos.protocol = qos->protocol;
-		if (qos->priority != QOS_UNKNOWN)
-			np->qos.priority = qos->priority;
-		if (qos->ttl != QOS_UNKNOWN)
-			np->qos.ttl = qos->ttl;
-		if (qos->tos != QOS_UNKNOWN)
-			np->qos.tos = qos->tos;
-		if (qos->mtu != QOS_UNKNOWN)
-			np->qos.mtu = qos->mtu;
-		if (qos->saddr != QOS_UNKNOWN)
-			np->qos.saddr = qos->saddr;
-		if (qos->daddr != QOS_UNKNOWN)
-			np->qos.daddr = qos->daddr;
+		if (QOS_buffer->n_qos_sel_info.protocol != QOS_UNKNOWN)
+			np->qos.protocol = QOS_buffer->n_qos_sel_info.protocol;
+		if (QOS_buffer->n_qos_sel_info.priority != QOS_UNKNOWN)
+			np->qos.priority = QOS_buffer->n_qos_sel_info.priority;
+		if (QOS_buffer->n_qos_sel_info.ttl != QOS_UNKNOWN)
+			np->qos.ttl = QOS_buffer->n_qos_sel_info.ttl;
+		if (QOS_buffer->n_qos_sel_info.tos != QOS_UNKNOWN)
+			np->qos.tos = QOS_buffer->n_qos_sel_info.tos;
+		if (QOS_buffer->n_qos_sel_info.mtu != QOS_UNKNOWN)
+			np->qos.mtu = QOS_buffer->n_qos_sel_info.mtu;
+		if (QOS_buffer->n_qos_sel_info.saddr != QOS_UNKNOWN)
+			np->qos.saddr = QOS_buffer->n_qos_sel_info.saddr;
+		if (QOS_buffer->n_qos_sel_info.daddr != QOS_UNKNOWN)
+			np->qos.daddr = QOS_buffer->n_qos_sel_info.daddr;
 		break;
-	}
 	case N_QOS_RANGE_INFO_IP:
-	{
-		struct N_qos_range_info_ip *qos = (typeof(qos)) QOS_buffer;
-
-		(void) qos;
 		return (NBADQOSTYPE);
-	}
 	case N_QOS_SEL_CONN_IP:
-	{
-		struct N_qos_sel_conn_ip *qos = (typeof(qos)) QOS_buffer;
-		int i;
-
 		if (!(np->info.SERV_type & N_CONS))
 			return (NBADQOSTYPE);
 		/* protocol must be one of the bound protocol ids */
-		if (qos->protocol != QOS_UNKNOWN) {
+		if (QOS_buffer->n_qos_sel_conn.protocol != QOS_UNKNOWN) {
 			for (i = 0; i < np->pnum; i++)
-				if (np->protoids[i] == qos->protocol)
+				if (np->protoids[i] == QOS_buffer->n_qos_sel_conn.protocol)
 					break;
 			if (i >= np->pnum)
 				return (NBADQOSPARAM);
 		}
-		if (qos->priority != QOS_UNKNOWN) {
-			if ((np_long) qos->priority < np->qor.priority.priority_min_value)
+		if (QOS_buffer->n_qos_sel_conn.priority != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_conn.priority <
+			    np->qor.priority.priority_min_value)
 				return (NBADQOSPARAM);
-			if ((np_long) qos->priority > np->qor.priority.priority_max_value)
-				return (NBADQOSPARAM);
-		}
-		if (qos->ttl != QOS_UNKNOWN) {
-			if ((np_long) qos->ttl < np->qor.ttl.ttl_min_value)
-				return (NBADQOSPARAM);
-			if ((np_long) qos->ttl > np->qor.ttl.ttl_max_value)
+			if ((np_long) QOS_buffer->n_qos_sel_conn.priority >
+			    np->qor.priority.priority_max_value)
 				return (NBADQOSPARAM);
 		}
-		if (qos->tos != QOS_UNKNOWN) {
-			if ((np_long) qos->tos < np->qor.tos.tos_min_value)
+		if (QOS_buffer->n_qos_sel_conn.ttl != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_conn.ttl < np->qor.ttl.ttl_min_value)
 				return (NBADQOSPARAM);
-			if ((np_long) qos->tos > np->qor.tos.tos_max_value)
+			if ((np_long) QOS_buffer->n_qos_sel_conn.ttl > np->qor.ttl.ttl_max_value)
 				return (NBADQOSPARAM);
 		}
-		if (qos->mtu != QOS_UNKNOWN) {
-			if ((np_long) qos->mtu < np->qor.mtu.mtu_min_value)
+		if (QOS_buffer->n_qos_sel_conn.tos != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_conn.tos < np->qor.tos.tos_min_value)
 				return (NBADQOSPARAM);
-			if ((np_long) qos->mtu > np->qor.mtu.mtu_max_value)
+			if ((np_long) QOS_buffer->n_qos_sel_conn.tos > np->qor.tos.tos_max_value)
+				return (NBADQOSPARAM);
+		}
+		if (QOS_buffer->n_qos_sel_conn.mtu != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_conn.mtu < np->qor.mtu.mtu_min_value)
+				return (NBADQOSPARAM);
+			if ((np_long) QOS_buffer->n_qos_sel_conn.mtu > np->qor.mtu.mtu_max_value)
 				return (NBADQOSPARAM);
 		}
 		/* source address should be one of the specified source addresses */
-		if (qos->saddr != QOS_UNKNOWN) {
-			if (qos->saddr != 0) {
+		if (QOS_buffer->n_qos_sel_conn.saddr != QOS_UNKNOWN) {
+			if (QOS_buffer->n_qos_sel_conn.saddr != 0) {
 				for (i = 0; i < np->snum; i++) {
 					if (np->saddrs[i].addr == INADDR_ANY)
 						break;
-					if (np->saddrs[i].addr == qos->saddr)
+					if (np->saddrs[i].addr == QOS_buffer->n_qos_sel_conn.saddr)
 						break;
 				}
 				if (i >= np->snum)
@@ -1338,118 +1354,111 @@ npi_optmgmt(struct np *np, void *QOS_buffer, np_ulong OPTMGMT_flags)
 			}
 		}
 		/* destination address must be one of the specified destination addresses */
-		if (qos->daddr != QOS_UNKNOWN) {
+		if (QOS_buffer->n_qos_sel_conn.daddr != QOS_UNKNOWN) {
 			for (i = 0; i < np->dnum; i++)
-				if (np->daddrs[i].addr == qos->daddr)
+				if (np->daddrs[i].addr == QOS_buffer->n_qos_sel_conn.daddr)
 					break;
 			if (i >= np->dnum)
 				return (NBADQOSPARAM);
 		}
-		if (qos->protocol != QOS_UNKNOWN)
-			np->qos.protocol = qos->protocol;
-		if (qos->priority != QOS_UNKNOWN)
-			np->qos.priority = qos->priority;
-		if (qos->ttl != QOS_UNKNOWN)
-			np->qos.ttl = qos->ttl;
-		if (qos->tos != QOS_UNKNOWN)
-			np->qos.tos = qos->tos;
-		if (qos->mtu != QOS_UNKNOWN)
-			np->qos.mtu = qos->mtu;
-		if (qos->saddr != QOS_UNKNOWN)
-			np->qos.saddr = qos->saddr;
-		if (qos->daddr != QOS_UNKNOWN)
-			np->qos.daddr = qos->daddr;
+		if (QOS_buffer->n_qos_sel_conn.protocol != QOS_UNKNOWN)
+			np->qos.protocol = QOS_buffer->n_qos_sel_conn.protocol;
+		if (QOS_buffer->n_qos_sel_conn.priority != QOS_UNKNOWN)
+			np->qos.priority = QOS_buffer->n_qos_sel_conn.priority;
+		if (QOS_buffer->n_qos_sel_conn.ttl != QOS_UNKNOWN)
+			np->qos.ttl = QOS_buffer->n_qos_sel_conn.ttl;
+		if (QOS_buffer->n_qos_sel_conn.tos != QOS_UNKNOWN)
+			np->qos.tos = QOS_buffer->n_qos_sel_conn.tos;
+		if (QOS_buffer->n_qos_sel_conn.mtu != QOS_UNKNOWN)
+			np->qos.mtu = QOS_buffer->n_qos_sel_conn.mtu;
+		if (QOS_buffer->n_qos_sel_conn.saddr != QOS_UNKNOWN)
+			np->qos.saddr = QOS_buffer->n_qos_sel_conn.saddr;
+		if (QOS_buffer->n_qos_sel_conn.daddr != QOS_UNKNOWN)
+			np->qos.daddr = QOS_buffer->n_qos_sel_conn.daddr;
 		break;
-	}
 	case N_QOS_SEL_RESET_IP:
-	{
-		struct N_qos_sel_reset_ip *qos = (typeof(qos)) QOS_buffer;
-
 		if (!(np->info.SERV_type & N_CONS))
 			return (NBADQOSTYPE);
-		if (qos->ttl != QOS_UNKNOWN) {
-			if ((np_long) qos->ttl < np->qor.ttl.ttl_min_value)
+		if (QOS_buffer->n_qos_sel_reset.ttl != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_reset.ttl < np->qor.ttl.ttl_min_value)
 				return (NBADQOSPARAM);
-			if ((np_long) qos->ttl > np->qor.ttl.ttl_max_value)
-				return (NBADQOSPARAM);
-		}
-		if (qos->tos != QOS_UNKNOWN) {
-			if ((np_long) qos->tos < np->qor.tos.tos_min_value)
-				return (NBADQOSPARAM);
-			if ((np_long) qos->tos > np->qor.tos.tos_max_value)
+			if ((np_long) QOS_buffer->n_qos_sel_reset.ttl > np->qor.ttl.ttl_max_value)
 				return (NBADQOSPARAM);
 		}
-		if (qos->mtu != QOS_UNKNOWN) {
-			if ((np_long) qos->mtu < np->qor.mtu.mtu_min_value)
+		if (QOS_buffer->n_qos_sel_reset.tos != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_reset.tos < np->qor.tos.tos_min_value)
 				return (NBADQOSPARAM);
-			if ((np_long) qos->mtu > np->qor.mtu.mtu_max_value)
+			if ((np_long) QOS_buffer->n_qos_sel_reset.tos > np->qor.tos.tos_max_value)
 				return (NBADQOSPARAM);
 		}
-		if (qos->ttl != QOS_UNKNOWN)
-			np->qos.ttl = qos->ttl;
-		if (qos->tos != QOS_UNKNOWN)
-			np->qos.tos = qos->tos;
-		if (qos->mtu != QOS_UNKNOWN)
-			np->qos.mtu = qos->mtu;
+		if (QOS_buffer->n_qos_sel_reset.mtu != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_reset.mtu < np->qor.mtu.mtu_min_value)
+				return (NBADQOSPARAM);
+			if ((np_long) QOS_buffer->n_qos_sel_reset.mtu > np->qor.mtu.mtu_max_value)
+				return (NBADQOSPARAM);
+		}
+		if (QOS_buffer->n_qos_sel_reset.ttl != QOS_UNKNOWN)
+			np->qos.ttl = QOS_buffer->n_qos_sel_reset.ttl;
+		if (QOS_buffer->n_qos_sel_reset.tos != QOS_UNKNOWN)
+			np->qos.tos = QOS_buffer->n_qos_sel_reset.tos;
+		if (QOS_buffer->n_qos_sel_reset.mtu != QOS_UNKNOWN)
+			np->qos.mtu = QOS_buffer->n_qos_sel_reset.mtu;
 		break;
-	}
 	case N_QOS_SEL_UD_IP:
-	{
-		struct N_qos_sel_ud_ip *qos = (typeof(qos)) QOS_buffer;
-
 		if (!(np->info.SERV_type & N_CLNS))
 			return (NBADQOSTYPE);
 		/* protocol must be one of the bound protocol ids */
-		if (qos->protocol != QOS_UNKNOWN) {
+		if (QOS_buffer->n_qos_sel_ud.protocol != QOS_UNKNOWN) {
 			for (i = 0; i < np->pnum; i++)
-				if (np->protoids[i] == qos->protocol)
+				if (np->protoids[i] == QOS_buffer->n_qos_sel_ud.protocol)
 					break;
 			if (i >= np->pnum)
 				return (NBADQOSPARAM);
 		}
-		if (qos->priority != QOS_UNKNOWN) {
-			if ((np_long) qos->priority < np->qor.priority.priority_min_value)
+		if (QOS_buffer->n_qos_sel_ud.priority != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_ud.priority <
+			    np->qor.priority.priority_min_value)
 				return (NBADQOSPARAM);
-			if ((np_long) qos->priority > np->qor.priority.priority_max_value)
-				return (NBADQOSPARAM);
-		}
-		if (qos->ttl != QOS_UNKNOWN) {
-			if ((np_long) qos->ttl < np->qor.ttl.ttl_min_value)
-				return (NBADQOSPARAM);
-			if ((np_long) qos->ttl > np->qor.ttl.ttl_max_value)
+			if ((np_long) QOS_buffer->n_qos_sel_ud.priority >
+			    np->qor.priority.priority_max_value)
 				return (NBADQOSPARAM);
 		}
-		if (qos->tos != QOS_UNKNOWN) {
-			if ((np_long) qos->tos < np->qor.tos.tos_min_value)
+		if (QOS_buffer->n_qos_sel_ud.ttl != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_ud.ttl < np->qor.ttl.ttl_min_value)
 				return (NBADQOSPARAM);
-			if ((np_long) qos->tos > np->qor.tos.tos_max_value)
+			if ((np_long) QOS_buffer->n_qos_sel_ud.ttl > np->qor.ttl.ttl_max_value)
+				return (NBADQOSPARAM);
+		}
+		if (QOS_buffer->n_qos_sel_ud.tos != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_ud.tos < np->qor.tos.tos_min_value)
+				return (NBADQOSPARAM);
+			if ((np_long) QOS_buffer->n_qos_sel_ud.tos > np->qor.tos.tos_max_value)
 				return (NBADQOSPARAM);
 		}
 		/* source address should be one of the specified source addresses */
-		if (qos->saddr != QOS_UNKNOWN) {
-			if (qos->saddr != 0) {
+		if (QOS_buffer->n_qos_sel_ud.saddr != QOS_UNKNOWN) {
+			if (QOS_buffer->n_qos_sel_ud.saddr != 0) {
 				for (i = 0; i < np->snum; i++) {
 					if (np->saddrs[i].addr == INADDR_ANY)
 						break;
-					if (np->saddrs[i].addr == qos->saddr)
+					if (np->saddrs[i].addr == QOS_buffer->n_qos_sel_ud.saddr)
 						break;
 				}
 				if (i >= np->snum)
 					return (NBADQOSPARAM);
 			}
 		}
-		if (qos->protocol != QOS_UNKNOWN)
-			np->qos.protocol = qos->protocol;
-		if (qos->priority != QOS_UNKNOWN)
-			np->qos.priority = qos->priority;
-		if (qos->ttl != QOS_UNKNOWN)
-			np->qos.ttl = qos->ttl;
-		if (qos->tos != QOS_UNKNOWN)
-			np->qos.tos = qos->tos;
-		if (qos->saddr != QOS_UNKNOWN)
-			np->qos.saddr = qos->saddr;
+		if (QOS_buffer->n_qos_sel_ud.protocol != QOS_UNKNOWN)
+			np->qos.protocol = QOS_buffer->n_qos_sel_ud.protocol;
+		if (QOS_buffer->n_qos_sel_ud.priority != QOS_UNKNOWN)
+			np->qos.priority = QOS_buffer->n_qos_sel_ud.priority;
+		if (QOS_buffer->n_qos_sel_ud.ttl != QOS_UNKNOWN)
+			np->qos.ttl = QOS_buffer->n_qos_sel_ud.ttl;
+		if (QOS_buffer->n_qos_sel_ud.tos != QOS_UNKNOWN)
+			np->qos.tos = QOS_buffer->n_qos_sel_ud.tos;
+		if (QOS_buffer->n_qos_sel_ud.saddr != QOS_UNKNOWN)
+			np->qos.saddr = QOS_buffer->n_qos_sel_ud.saddr;
 		break;
-	}
 	default:
 		return (NBADQOSTYPE);
 	}
@@ -1474,6 +1483,7 @@ npi_unbind(struct np *np)
 		np->bnext = NULL;
 		np->bprev = &np->bnext;
 		np->bhash = NULL;
+		npi_unbind_prot(np->protoids[0], np->info.SERV_type);
 		np_release(&np);
 		write_unlock_bh(&hp->lock);
 		return (0);
@@ -1481,13 +1491,227 @@ npi_unbind(struct np *np)
 	return (-EALREADY);
 }
 
+/**
+ * npi_passive - perform a passive connection
+ * @np: private structure
+ * @RES_buffer: responding addresses
+ * @RES_length: length of responding addresses
+ * @QOS_buffer: quality of service parameters
+ * @SEQ_number: connection indication being accepted
+ * @TOKEN_value: accepting Stream private structure
+ * @CONN_flags: connection flags
+ */
 STATIC int
 npi_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
-	    struct N_qos_sel_conn_ip * QOS_buffer, mblk_t *SEQ_number, struct np *TOKEN_value,
+	    struct N_qos_sel_conn_ip *QOS_buffer, mblk_t *SEQ_number, struct np *TOKEN_value,
 	    np_ulong CONN_flags)
 {
-	fixme(("Write this function.\n"));
-	return (-EFAULT);
+	size_t rnum = RES_length / sizeof(*RES_buffer);
+	np_long NPI_error;
+	struct iphdr *iph;
+	struct udphdr *uh;
+	int i;
+
+	/* Get at the connection indication.  The packet is contained in the SEQ_number message
+	   block starting with the IP header. */
+	iph = (typeof(iph)) SEQ_number->b_rptr;
+	uh = (typeof(uh)) (SEQ_number->b_rptr + (iph->ihl << 2));
+
+	NPI_error = NBADTOKEN;
+	/* Accepting Stream must be bound to the same protocol as connection indication. */
+	for (i = 0; i < TOKEN_value->pnum; i++)
+		if (TOKEN_value->protoids[i] == iph->protocol)
+			break;
+	if (i >= TOKEN_value->pnum)
+		/* Must be bound to the same protocol. */
+		goto error;
+	/* Accepting Stream must be bound to the same address (or wildcard) including destination
+	   address in connection indication. */
+	for (i = 0; i < TOKEN_value->bnum; i++)
+		if (TOKEN_value->baddrs[i].addr == INADDR_ANY
+		    || TOKEN_value->baddrs[i].addr == iph->daddr)
+			break;
+	if (i >= TOKEN_value->bnum)
+		goto error;
+
+	/* validate parameters */
+	NPI_error = NBADQOSPARAM;
+	/* Cannot really validate parameters here.  One of the problems is that some of the
+	   information against which we should be checking is contained in the connection
+	   indication packet, and other information is associated with the destination addresses
+	   themselves, that are contained in the responding address(es) for NPI-IP.  Therefore, QOS 
+	   parameter checks must be performed in the npi_passive() function instead. */
+	if (QOS_buffer->protocol != QOS_UNKNOWN) {
+		/* Specified protocol probably needs to be the same as the indication, but since we 
+		   only bind to one protocol id at the moment that is not a problem.  The
+		   connection indication protocol was checked against the accepting Stream above. */
+		for (i = 0; i < TOKEN_value->pnum; i++)
+			if (TOKEN_value->protoids[i] == QOS_buffer->protocol)
+				break;
+		if (i >= TOKEN_value->pnum)
+			goto error;
+	} else {
+		QOS_buffer->protocol = TOKEN_value->qos.protocol;
+	}
+	if (QOS_buffer->priority != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->priority < TOKEN_value->qor.priority.priority_min_value)
+			goto error;
+		if ((np_long) QOS_buffer->priority > TOKEN_value->qor.priority.priority_max_value)
+			goto error;
+	} else {
+		QOS_buffer->priority = TOKEN_value->qos.priority;
+	}
+	if (QOS_buffer->ttl != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->ttl < TOKEN_value->qor.ttl.ttl_min_value)
+			goto error;
+		if ((np_long) QOS_buffer->ttl > TOKEN_value->qor.ttl.ttl_max_value)
+			goto error;
+	} else {
+		QOS_buffer->ttl = TOKEN_value->qos.ttl;
+	}
+	if (QOS_buffer->tos != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->tos < TOKEN_value->qor.tos.tos_min_value)
+			goto error;
+		if ((np_long) QOS_buffer->tos > TOKEN_value->qor.tos.tos_max_value)
+			goto error;
+	} else {
+		/* FIXME: TOS should be negotiated.  The TOS should be upgraded to whatever TOS the 
+		   caller wishes, but not downgraded. */
+		QOS_buffer->tos = TOKEN_value->qos.tos;
+	}
+	if (QOS_buffer->mtu != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->mtu < TOKEN_value->qor.mtu.mtu_min_value)
+			goto error;
+		if ((np_long) QOS_buffer->mtu > TOKEN_value->qor.mtu.mtu_max_value)
+			goto error;
+		/* FIXME: MTU should be negotiated.  The MTU should be downgraded to the lesser
+		   value of what the connection requires or what was specified, but not upgraded. */
+	} else {
+		QOS_buffer->mtu = TOKEN_value->qos.mtu;
+	}
+
+	/* Need to determine source addressess from bound addresses before we can test the source
+	   address.  If we are bound to specific addresses, then the source address list is simply
+	   the destination address list. If bound to a wildcard address, then the source address
+	   list could be determined from the scope of the destination addresses and the available
+	   interfaces and their addresses.  However, for the moment it is probably easier to simply 
+	   allow wildcard source addresses and let the user specify any address when there is a
+	   wildcard source address. */
+
+	TOKEN_value->sport = TOKEN_value->bport;
+	TOKEN_value->snum = TOKEN_value->bnum;
+	for (i = 0; i < TOKEN_value->bnum; i++)
+		TOKEN_value->saddrs[i].addr = TOKEN_value->baddrs[i].addr;
+
+	if (QOS_buffer->saddr != QOS_UNKNOWN) {
+		if (QOS_buffer->saddr != 0) {
+			for (i = 0; i < TOKEN_value->snum; i++) {
+				if (TOKEN_value->saddrs[i].addr == INADDR_ANY)
+					break;
+				if (TOKEN_value->saddrs[i].addr == QOS_buffer->saddr)
+					break;
+			}
+			if (i >= TOKEN_value->snum)
+				goto error;
+		}
+	} else {
+		QOS_buffer->saddr = TOKEN_value->qos.saddr;
+	}
+
+	/* Here's a problem: we don't realy have any destination addresses yet, so we can't check
+	   at this point. */
+
+	if (QOS_buffer->daddr != QOS_UNKNOWN) {
+		if (rnum > 0) {
+			/* Specified destination addresses must be in the responding address list. */
+			for (i = 0; i < rnum; i++)
+				if (RES_buffer[i].sin_addr.s_addr == QOS_buffer->daddr)
+					break;
+			if (i >= rnum)
+				goto error;
+		} else {
+			/* If no responding address list is provided (rnum == 0), the destination
+			   address must be the source address of the connection indication. */
+			if (QOS_buffer->daddr != iph->saddr)
+				goto error;
+		}
+	} else {
+		QOS_buffer->daddr = rnum ? RES_buffer[0].sin_addr.s_addr : iph->saddr;
+	}
+
+	TOKEN_value->dport = rnum ? RES_buffer[0].sin_port : uh->source;
+
+	NPI_error = NBADADDR;
+	if (TOKEN_value->dport == 0 && (TOKEN_value->bport != 0 || TOKEN_value->sport != 0))
+		goto error;
+	if (TOKEN_value->dport != 0 && TOKEN_value->sport == 0)
+		/* TODO: really need to autobind the stream to a dynamically allocated source port
+		   number. */
+		goto error;
+
+	if (rnum > 0) {
+		for (i = 0; i < rnum; i++) {
+			struct rtable *rt = NULL;
+
+			if ((NPI_error =
+			     ip_route_output(&rt, RES_buffer[i].sin_addr.s_addr, 0, 0, 0))) {
+				while (--i >= 0)
+					dst_release(XCHG(&TOKEN_value->daddrs[i].dst, NULL));
+				goto error;
+			}
+			TOKEN_value->daddrs[i].dst = &rt->u.dst;
+
+			/* Note that we do not have to use the destination reference cached above.
+			   It is enough that we hold a reference to it so that it remains in the
+			   routing caches so lookups to this destination are fast.  They will be
+			   released upon disconnection. */
+
+			TOKEN_value->daddrs[i].addr = RES_buffer[i].sin_addr.s_addr;
+			TOKEN_value->daddrs[i].ttl = QOS_buffer->ttl;
+			TOKEN_value->daddrs[i].tos = QOS_buffer->tos;
+			TOKEN_value->daddrs[i].mtu = dst_pmtu(TOKEN_value->daddrs[i].dst);
+			if (TOKEN_value->daddrs[i].mtu < QOS_buffer->mtu)
+				QOS_buffer->mtu = TOKEN_value->daddrs[i].mtu;
+		}
+		TOKEN_value->dnum = rnum;
+	} else {
+		struct rtable *rt = NULL;
+
+		if ((NPI_error = ip_route_output(&rt, iph->saddr, 0, 0, 0)))
+			goto error;
+		TOKEN_value->daddrs[0].dst = &rt->u.dst;
+
+		/* Note that we do not have to use the destination reference cached above.  It is
+		   enough that we hold a reference to it so that it remains in the routing caches
+		   so lookups to this destination are fast.  They will be released upon
+		   disconnection. */
+
+		TOKEN_value->daddrs[0].addr = RES_buffer[0].sin_addr.s_addr;
+		TOKEN_value->daddrs[0].ttl = QOS_buffer->ttl;
+		TOKEN_value->daddrs[0].tos = QOS_buffer->tos;
+		TOKEN_value->daddrs[0].mtu = dst_pmtu(TOKEN_value->daddrs[0].dst);
+		if (TOKEN_value->daddrs[0].mtu < QOS_buffer->mtu)
+			QOS_buffer->mtu = TOKEN_value->daddrs[0].mtu;
+
+		TOKEN_value->dnum = 1;
+	}
+
+	/* try to place in connection hashes with conflict checks */
+	if ((NPI_error = npi_conn_check(TOKEN_value, QOS_buffer->protocol)) != 0)
+		goto error;
+
+	/* store negotiated qos values */
+	TOKEN_value->qos.protocol = QOS_buffer->protocol;
+	TOKEN_value->qos.priority = QOS_buffer->priority;
+	TOKEN_value->qos.ttl = QOS_buffer->ttl;
+	TOKEN_value->qos.tos = QOS_buffer->tos;
+	TOKEN_value->qos.mtu = QOS_buffer->mtu;
+	TOKEN_value->qos.saddr = QOS_buffer->saddr;
+	TOKEN_value->qos.daddr = QOS_buffer->daddr;
+	return (0);
+
+      error:
+	return (NPI_error);
 }
 
 STATIC int
@@ -1832,7 +2056,8 @@ ne_info_ack(queue_t *q)
 	p->PROVIDER_type = N_SNICFP;
 	p->NODU_size = np->qos.mtu ? : 536;
 	p->PROTOID_length = PROTOID_length;
-	p->PROTOID_offset = PROTOID_length ? sizeof(*p) + ADDR_length + QOS_length + QOS_range_length : 0;
+	p->PROTOID_offset =
+	    PROTOID_length ? sizeof(*p) + ADDR_length + QOS_length + QOS_range_length : 0;
 	p->NPI_version = N_VERSION_2;
 	if (ADDR_length) {
 		for (i = 0; i < np->snum; i++) {
@@ -1890,9 +2115,10 @@ ne_bind_ack(queue_t *q, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 
-	if (unlikely((NPI_error = npi_bind(np, PROTOID_buffer, PROTOID_length,
-					   ADDR_buffer, ADDR_length, CONIND_number,
-					   BIND_flags)) != 0))
+	NPI_error =
+	    npi_bind(np, PROTOID_buffer, PROTOID_length, ADDR_buffer, ADDR_length, CONIND_number,
+		     BIND_flags);
+	if (unlikely(NPI_error != 0))
 		goto free_error;
 
 	mp->b_datap->db_type = M_PCPROTO;
@@ -2065,18 +2291,22 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 	mp->b_wptr += sizeof(*p);
 	switch (npi_get_state(np)) {
 	case NS_WACK_OPTREQ:
-		if ((NPI_error = npi_optmgmt(np, QOS_buffer, flags)) < 0)
+		NPI_error = npi_optmgmt(np, QOS_buffer, flags);
+		if (unlikely(NPI_error != 0))
 			goto error;
 		npi_set_state(np, np->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 		break;
 	case NS_WACK_UREQ:
-		if ((NPI_error = npi_unbind(np)) < 0)
+		NPI_error = npi_unbind(np);
+		if (unlikely(NPI_error != 0))
 			goto error;
 		npi_set_state(np, NS_UNBND);
 		break;
 	case NS_WACK_CRES:
-		if ((NPI_error = npi_passive(np, ADDR_buffer, ADDR_length, QOS_buffer, SEQ_number,
-						TOKEN_value, flags)) < 0)
+		NPI_error =
+		    npi_passive(np, ADDR_buffer, ADDR_length, QOS_buffer, SEQ_number, TOKEN_value,
+				flags);
+		if (unlikely(NPI_error != 0))
 			goto error;
 		if (np != TOKEN_value) {
 			npi_set_state(np, np->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
@@ -2086,7 +2316,8 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		}
 		break;
 	case NS_WACK_RRES:
-		if ((NPI_error = npi_reset(np, ADDR_buffer, ADDR_length, N_USER, N_REASON_UNDEFINED)) < 0)
+		NPI_error = npi_reset(np, ADDR_buffer, ADDR_length, N_USER, N_REASON_UNDEFINED);
+		if (unlikely(NPI_error != 0))
 			goto error;
 		npi_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 		break;
@@ -2095,7 +2326,8 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 	case NS_WACK_DREQ9:
 	case NS_WACK_DREQ10:
 	case NS_WACK_DREQ11:
-		if ((NPI_error = npi_disconnect(np, ADDR_buffer, SEQ_number, flags)) < 0)
+		NPI_error = npi_disconnect(np, ADDR_buffer, SEQ_number, flags);
+		if (unlikely(NPI_error != 0))
 			goto error;
 		npi_set_state(np, np->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 		break;
@@ -2141,7 +2373,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
  */
 STATIC INLINE fastcall int
 ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
-	    struct N_qos_sel_conn_ip * QOS_buffer, np_ulong CONN_flags)
+	    struct N_qos_sel_conn_ip *QOS_buffer, np_ulong CONN_flags)
 {
 	struct np *np = NP_PRIV(q);
 	mblk_t *mp = NULL;
@@ -2155,8 +2387,8 @@ ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 
-	if (unlikely
-	    ((NPI_error = npi_connect(np, RES_buffer, RES_length, QOS_buffer, CONN_flags)) != 0))
+	NPI_error = npi_connect(np, RES_buffer, RES_length, QOS_buffer, CONN_flags);
+	if (unlikely(NPI_error != 0))
 		goto free_error;
 
 	mp->b_datap->db_type = M_PCPROTO;
@@ -2211,8 +2443,8 @@ ne_reset_con(queue_t *q, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
 
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto nobufs;
-	if (unlikely((NPI_error = npi_reset(np, DEST_buffer, DEST_length, RESET_orig,
-					    RESET_reason)) != 0))
+	NPI_error = npi_reset(np, DEST_buffer, DEST_length, RESET_orig, RESET_reason);
+	if (unlikely(NPI_error != 0))
 		goto free_error;
 
 	mp->b_datap->db_type = M_PROTO;
@@ -3152,40 +3384,39 @@ ne_bind_req(queue_t *q, mblk_t *mp)
 	if (unlikely(p->PROTOID_length == 0))
 		goto error;
 	{
-		struct sockaddr_storage sa = { 0, };
-		struct sockaddr_in *ADDR_buffer = (typeof(ADDR_buffer)) & sa;
+		struct sockaddr_in ADDR_buffer[8];
 		size_t ADDR_length = p->ADDR_length;
 		unsigned char *PROTOID_buffer =
 		    (typeof(PROTOID_buffer)) (mp->b_rptr + p->PROTOID_offset);
 
 		if (ADDR_length) {
 			NPI_error = NBADADDR;
-			if (unlikely(ADDR_length < sizeof(*ADDR_buffer)))
+			if (unlikely(ADDR_length < sizeof(struct sockaddr_in)))
 				goto error;
-			if (unlikely(ADDR_length > (sizeof(*ADDR_buffer) << 3)))
+			if (unlikely(ADDR_length > (sizeof(struct sockaddr_in) << 3)))
 				goto error;
-			if (unlikely(ADDR_length % sizeof(*ADDR_buffer) != 0))
+			if (unlikely(ADDR_length % sizeof(struct sockaddr_in) != 0))
 				goto error;
 			/* avoid alignment problems */
 			bcopy(mp->b_rptr + p->ADDR_offset, ADDR_buffer, ADDR_length);
-			if (unlikely(ADDR_buffer->sin_family != AF_INET))
+			if (unlikely(ADDR_buffer[0].sin_family != AF_INET))
 				goto error;
 			/* cannot specify address if default listener */
 			if (unlikely((p->BIND_flags & DEFAULT_LISTENER) &&
-				     (ADDR_buffer->sin_port != 0 ||
-				      ADDR_buffer->sin_addr.s_addr != INADDR_ANY)))
+				     (ADDR_buffer[0].sin_port != 0 ||
+				      ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY)))
 				goto error;
 			/* cannot listen on wildcard port number */
-			if (unlikely(p->CONIND_number > 0 && ADDR_buffer->sin_port == 0))
+			if (unlikely(p->CONIND_number > 0 && ADDR_buffer[0].sin_port == 0))
 				goto error;
 			/* cannot specify port if connectionless */
-			if (unlikely(np->info.SERV_type == N_CLNS && ADDR_buffer->sin_port != 0))
+			if (unlikely(np->info.SERV_type == N_CLNS && ADDR_buffer[0].sin_port != 0))
 				goto error;
 		} else {
-			ADDR_length = sizeof(*ADDR_buffer);
-			ADDR_buffer->sin_family = AF_INET;
-			ADDR_buffer->sin_port = 0;
-			ADDR_buffer->sin_addr.s_addr = INADDR_ANY;
+			ADDR_length = sizeof(struct sockaddr_in);
+			ADDR_buffer[0].sin_family = AF_INET;
+			ADDR_buffer[0].sin_port = 0;
+			ADDR_buffer[0].sin_addr.s_addr = INADDR_ANY;
 		}
 		NPI_error = ne_bind_ack(q, PROTOID_buffer, p->PROTOID_length,
 					ADDR_buffer, ADDR_length, p->CONIND_number, p->BIND_flags);
@@ -3235,7 +3466,7 @@ ne_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 	N_optmgmt_req_t *p;
-	struct N_qos_sel_info_ip *QOS_buffer = NULL;
+	union N_qos_ip_types qos_buf, *QOS_buffer = NULL;
 	np_long NPI_error;
 
 	NPI_error = -EINVAL;
@@ -3251,21 +3482,38 @@ ne_optmgmt_req(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length))
 		goto error;
 	if (p->QOS_length) {
-		QOS_buffer = (typeof(QOS_buffer)) (mp->b_rptr + p->QOS_offset);
 		NPI_error = NBADOPT;
 		if (p->QOS_length < sizeof(QOS_buffer->n_qos_type))
 			goto error;
+		if (p->QOS_length > sizeof(*QOS_buffer))
+			goto error;
 		NPI_error = NBADQOSTYPE;
-		/* FIXME: we can handle more option structures than this */
-		if (QOS_buffer->n_qos_type != N_QOS_SEL_INFO_IP)
+		QOS_buffer = &qos_buf;
+		bcopy(mp->b_rptr + p->QOS_offset, QOS_buffer, p->QOS_length);
+		switch (QOS_buffer->n_qos_type) {
+		case N_QOS_SEL_INFO_IP:
+			if (p->QOS_length != sizeof(QOS_buffer->n_qos_sel_info))
+				goto error;
+			break;
+		case N_QOS_SEL_CONN_IP:
+			if (p->QOS_length != sizeof(QOS_buffer->n_qos_sel_conn))
+				goto error;
+			break;
+		case N_QOS_SEL_RESET_IP:
+			if (p->QOS_length != sizeof(QOS_buffer->n_qos_sel_reset))
+				goto error;
+			break;
+		case N_QOS_SEL_UD_IP:
+			if (p->QOS_length != sizeof(QOS_buffer->n_qos_sel_ud))
+				goto error;
+			break;
+		case N_QOS_RANGE_INFO_IP:
+			if (p->QOS_length != sizeof(QOS_buffer->n_qos_range_info))
+				goto error;
+			break;
+		default:
 			goto error;
-		NPI_error = NBADOPT;
-		if (p->QOS_length != sizeof(*QOS_buffer))
-			goto error;
-		if (QOS_buffer->tos != QOS_UNKNOWN)
-			np->qos.tos = QOS_buffer->tos;
-		if (QOS_buffer->ttl != QOS_UNKNOWN)
-			np->qos.ttl = QOS_buffer->ttl;
+		}
 	}
 	if (p->OPTMGMT_flags & DEFAULT_RC_SEL)
 		np->i_flags |= IP_FLAG_DEFAULT_RC_SEL;
@@ -3312,6 +3560,7 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 	struct sockaddr_in dst_buf, *DEST_buffer = NULL;
 	struct N_qos_sel_ud_ip qos_buf, *QOS_buffer = NULL;
 	np_long NPI_error;
+	int i;
 
 	NPI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -3337,17 +3586,17 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 		NPI_error = NBADADDR;
 		if (unlikely(mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length))
 			goto error;
-		if (unlikely(p->DEST_length < sizeof(struct sockaddr_in)))
+		if (unlikely(p->DEST_length != sizeof(struct sockaddr_in)))
 			goto error;
 		/* avoid alignemnt problems */
-		bcopy(mp->b_rptr + p->DEST_offset, &dst_buf, sizeof(dst_buf));
-		if (unlikely(dst_buf.sin_family != AF_INET))
-			goto error;
-		if (unlikely(dst_buf.sin_port == 0))	/* this is really the IP protocol */
-			goto error;
-		if (unlikely(dst_buf.sin_addr.s_addr == INADDR_ANY))
-			goto error;
 		DEST_buffer = &dst_buf;
+		bcopy(mp->b_rptr + p->DEST_offset, DEST_buffer, p->DEST_length);
+		if (unlikely(DEST_buffer->sin_family != AF_INET))
+			goto error;
+		if (unlikely(DEST_buffer->sin_port == 0))	/* this is really the IP protocol */
+			goto error;
+		if (unlikely(DEST_buffer->sin_addr.s_addr == INADDR_ANY))
+			goto error;
 		hlen = 0;
 	}
 #define QOS_length RESERVED_field[0]
@@ -3356,22 +3605,20 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 	/* Actually, the proper way to do this is to set the appropriate values using
 	   N_QOS_SEL_UD_IP to N_OPTMGMT_REQ(7) and then sending the data. */
 	if (p->QOS_length) {
-		int i;
-
 		NPI_error = NBADOPT;
 		if (unlikely(mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length))
 			goto error;
-		if (unlikely(p->QOS_length < sizeof(qos_buf.n_qos_type)))
+		if (unlikely(p->QOS_length < sizeof(QOS_buffer->n_qos_type)))
 			goto error;
-		bcopy(mp->b_rptr + p->QOS_offset, &qos_buf, sizeof(qos_buf.n_qos_type));
+		QOS_buffer = &qos_buf;
+		bcopy(mp->b_rptr + p->QOS_offset, QOS_buffer, sizeof(QOS_buffer->n_qos_type));
 		NPI_error = NBADQOSTYPE;
-		if (unlikely(qos_buf.n_qos_type != N_QOS_SEL_UD_IP))
+		if (unlikely(QOS_buffer->n_qos_type != N_QOS_SEL_UD_IP))
 			goto error;
-		if (unlikely(p->QOS_length != sizeof(qos_buf)))
+		if (unlikely(p->QOS_length != sizeof(*QOS_buffer)))
 			goto error;
 		/* avoid alignment problems */
-		bcopy(mp->b_rptr + p->QOS_offset, &qos_buf, sizeof(qos_buf));
-		QOS_buffer = &qos_buf;
+		bcopy(mp->b_rptr + p->QOS_offset, QOS_buffer, sizeof(*QOS_buffer));
 		NPI_error = NBADQOSPARAM;
 		/* check qos parameter values */
 		/* protocol must be one of the bound protocol ids */
@@ -3455,7 +3702,7 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 	N_conn_req_t *p;
-	struct N_qos_sel_conn_ip qos_buf = { N_QOS_SEL_CONN_IP, }, *QOS_buffer = NULL;
+	struct N_qos_sel_conn_ip qos_buf = { N_QOS_SEL_CONN_IP, }, *QOS_buffer = &qos_buf;
 	struct sockaddr_in dst_buf[8] = { {AF_INET,}, }, *DEST_buffer = NULL;
 	np_long NPI_error;
 	int i;
@@ -3491,8 +3738,6 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	if (unlikely(p->CONN_flags != 0))
 		goto error;
 	if (p->DEST_length != 0) {
-		int i;
-
 		NPI_error = NBADADDR;
 		if (unlikely(mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length))
 			goto error;
@@ -3502,86 +3747,38 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 			goto error;
 		if (unlikely(p->DEST_length % sizeof(*DEST_buffer) != 0))
 			goto error;
-		bcopy(mp->b_rptr + p->DEST_offset, &dst_buf, p->DEST_length);
-#if 0
-		/* well, no... the destination can be a wildcard port as long as the stream is
-		   bound to a wildcard port, then port numbers are effectively ignored */
-		if (unlikely(dst_buf[0].sin_port == 0))
-			goto error;
-#endif
-		if (unlikely(dst_buf[0].sin_family != AF_INET && dst_buf[0].sin_family != 0))
+		DEST_buffer = dst_buf;
+		bcopy(mp->b_rptr + p->DEST_offset, DEST_buffer, p->DEST_length);
+		if (unlikely
+		    (DEST_buffer[0].sin_family != AF_INET && DEST_buffer[0].sin_family != 0))
 			goto error;
 		for (i = 0; i < p->DEST_length / sizeof(*DEST_buffer); i++)
-			if (unlikely(dst_buf[i].sin_addr.s_addr == INADDR_ANY))
+			if (unlikely(DEST_buffer[i].sin_addr.s_addr == INADDR_ANY))
 				goto error;
-		DEST_buffer = dst_buf;
 	}
 	if (p->QOS_length != 0) {
 		NPI_error = NBADOPT;
 		if (unlikely(mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length))
 			goto error;
-		if (unlikely(p->QOS_length < sizeof(qos_buf.n_qos_type)))
+		if (unlikely(p->QOS_length < sizeof(QOS_buffer->n_qos_type)))
 			goto error;
-		bcopy(mp->b_rptr + p->QOS_offset, &qos_buf, sizeof(qos_buf.n_qos_type));
+		bcopy(mp->b_rptr + p->QOS_offset, QOS_buffer, sizeof(QOS_buffer->n_qos_type));
 		NPI_error = NBADQOSTYPE;
-		if (unlikely(qos_buf.n_qos_type != N_QOS_SEL_CONN_IP))
+		if (unlikely(QOS_buffer->n_qos_type != N_QOS_SEL_CONN_IP))
 			goto error;
-		if (unlikely(p->QOS_length != sizeof(qos_buf)))
+		if (unlikely(p->QOS_length != sizeof(*QOS_buffer)))
 			goto error;
-		bcopy(mp->b_rptr + p->QOS_offset, &qos_buf, sizeof(qos_buf));
-		QOS_buffer = &qos_buf;
-		NPI_error = NBADQOSPARAM;
-		/* validate parameters */
-		if (QOS_buffer->protocol != QOS_UNKNOWN) {
-			for (i = 0; i < np->pnum; i++)
-				if (np->protoids[i] == QOS_buffer->protocol)
-					break;
-			if (i >= np->pnum)
-				goto error;
-		}
-		if (QOS_buffer->priority != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->priority < np->qor.priority.priority_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->priority > np->qor.priority.priority_max_value)
-				goto error;
-		}
-		if (QOS_buffer->ttl != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->ttl < np->qor.ttl.ttl_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->ttl > np->qor.ttl.ttl_max_value)
-				goto error;
-		}
-		if (QOS_buffer->tos != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->tos < np->qor.tos.tos_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->tos > np->qor.tos.tos_max_value)
-				goto error;
-		}
-		if (QOS_buffer->mtu != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->mtu < np->qor.mtu.mtu_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->mtu > np->qor.mtu.mtu_max_value)
-				goto error;
-		}
-		if (QOS_buffer->saddr != QOS_UNKNOWN) {
-			if (QOS_buffer->saddr != 0) {
-				for (i = 0; i < np->snum; i++) {
-					if (np->saddrs[i].addr == INADDR_ANY)
-						break;
-					if (np->saddrs[i].addr == QOS_buffer->saddr)
-						break;
-				}
-				if (i >= np->snum)
-					goto error;
-			}
-		}
-		if (QOS_buffer->daddr != QOS_UNKNOWN) {
-			for (i = 0; i < np->dnum; i++)
-				if (np->daddrs[i].addr == QOS_buffer->daddr)
-					break;
-			if (i >= np->dnum)
-				goto error;
-		}
+		bcopy(mp->b_rptr + p->QOS_offset, QOS_buffer, p->QOS_length);
+	} else {
+		/* set default values in QOS buffer */
+		QOS_buffer->n_qos_type = N_QOS_SEL_CONN_IP;
+		QOS_buffer->protocol = QOS_UNKNOWN;
+		QOS_buffer->priority = QOS_UNKNOWN;
+		QOS_buffer->ttl = QOS_UNKNOWN;
+		QOS_buffer->tos = QOS_UNKNOWN;
+		QOS_buffer->mtu = QOS_UNKNOWN;
+		QOS_buffer->saddr = QOS_UNKNOWN;
+		QOS_buffer->daddr = QOS_UNKNOWN;
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	if (unlikely((NPI_error = ne_conn_con(q, DEST_buffer, p->DEST_length,
@@ -3605,6 +3802,11 @@ ne_conn_req(queue_t *q, mblk_t *mp)
  * connection indication queue and to perform a passive connection (NE_PASS_CON even) on the
  * indicated Stream.  In addition, the user can set QOS parameters for the Stream to which a passive
  * connection is made and for any reponse message (data attached to the N_CONN_RES message).
+ *
+ * There is a deviation here from the NPI specifications: the responding address(es) in the
+ * N_CONN_RES primitive contains the list of destination address(es) to which to form the
+ * connection.  If no responding addresses are provided, then the destination address is the source
+ * address from the connection indication.
  */
 STATIC INLINE fastcall int
 ne_conn_res(queue_t *q, mblk_t *mp)
@@ -3642,7 +3844,7 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 		if (unlikely(p->RES_length % sizeof(*RES_buffer) != 0))
 			goto error;
 		/* Cannot be sure that the address is properly aligned, and to keep unscrupulous
-		   users from DoS attacks, copy the informatoin into an aligned buffer. */
+		   users from DoS attacks, copy the information into an aligned buffer. */
 		bcopy(mp->b_rptr + p->RES_offset, &res_buf, p->RES_length);
 		if (unlikely(res_buf[0].sin_family != AF_INET && res_buf[0].sin_family != 0))
 			goto error;
@@ -3651,8 +3853,6 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 		RES_buffer = res_buf;
 	}
 	if (p->QOS_length != 0) {
-		int i;
-
 		NPI_error = NBADOPT;
 		if (unlikely(mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length))
 			goto error;
@@ -3669,60 +3869,8 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 			goto error;
 		if (unlikely(p->QOS_length != sizeof(qos_buf)))
 			goto error;
-		bcopy(mp->b_rptr + p->QOS_offset, &qos_buf, sizeof(qos_buf));
 		QOS_buffer = &qos_buf;
-		NPI_error = NBADQOSPARAM;
-		/* validate parameters */
-		if (QOS_buffer->protocol != QOS_UNKNOWN) {
-			for (i = 0; i < np->pnum; i++)
-				if (np->protoids[i] == QOS_buffer->protocol)
-					break;
-			if (i >= np->pnum)
-				goto error;
-		}
-		if (QOS_buffer->priority != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->priority < np->qor.priority.priority_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->priority > np->qor.priority.priority_max_value)
-				goto error;
-		}
-		if (QOS_buffer->ttl != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->ttl < np->qor.ttl.ttl_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->ttl > np->qor.ttl.ttl_max_value)
-				goto error;
-		}
-		if (QOS_buffer->tos != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->tos < np->qor.tos.tos_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->tos > np->qor.tos.tos_max_value)
-				goto error;
-		}
-		if (QOS_buffer->mtu != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->mtu < np->qor.mtu.mtu_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->mtu > np->qor.mtu.mtu_max_value)
-				goto error;
-		}
-		if (QOS_buffer->saddr != QOS_UNKNOWN) {
-			if (QOS_buffer->saddr != 0) {
-				for (i = 0; i < np->snum; i++) {
-					if (np->saddrs[i].addr == INADDR_ANY)
-						break;
-					if (np->saddrs[i].addr == QOS_buffer->saddr)
-						break;
-				}
-				if (i >= np->snum)
-					goto error;
-			}
-		}
-		if (QOS_buffer->daddr != QOS_UNKNOWN) {
-			for (i = 0; i < np->dnum; i++)
-				if (np->daddrs[i].addr == QOS_buffer->daddr)
-					break;
-			if (i >= np->dnum)
-				goto error;
-		}
+		bcopy(mp->b_rptr + p->QOS_offset, QOS_buffer, p->QOS_length);
 	}
 	NPI_error = NBADDATA;
 	if (unlikely((dp = mp->b_cont) != NULL && dp->b_wptr - dp->b_rptr <= 0))
@@ -3745,18 +3893,24 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 		NPI_error = NBADTOKEN;
 		if (unlikely(TOKEN_value == NULL))
 			goto error;
-		if (unlikely(npi_get_state(TOKEN_value) == NS_UNBND))
-			goto error;	/* we could bind it */
-		if (unlikely(TOKEN_value->CONIND_number > 0))
+		if (npi_get_state(TOKEN_value) != NS_IDLE)
+			/* Later we could auto bind if in NS_UNBND state. Note that the Stream to
+			   which we do a passive connection could be already connected: we just are 
+			   just adding another address to a multihomed connection.  But this is not 
+			   as useful as adding or removing an address with N_OPTMGMT_REQ. */
 			goto error;
-		/* Note that the Stream to which we do a passive connection could be already
-		   connected: we just are just adding another address to a multihomed connection.
-		   But this is not as useful as adding or removing an address with N_OPTMGMT_REQ. */
+		if (TOKEN_value->info.SERV_type != N_CONS)
+			/* Must be connection-oriented Stream. */
+			goto error;
+	} else {
+		NPI_error = NOUTSTATE;
+		if (np->coninds > 1)
+			goto error;
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	npi_set_state(np, NS_WACK_CRES);
-	return ne_ok_ack(q, N_CONN_RES, RES_buffer, p->RES_length, QOS_buffer, SEQ_number,
-			 TOKEN_value, p->CONN_flags);
+	return ne_ok_ack(q, N_CONN_RES, RES_buffer, p->RES_length,
+			 QOS_buffer, SEQ_number, TOKEN_value, p->CONN_flags);
       error:
 	return ne_error_ack(q, N_CONN_RES, NPI_error);
 }
@@ -4919,7 +5073,46 @@ npi_alloc_priv(queue_t *q, struct np **slp, int type, dev_t *devp, cred_t *crp)
 		np->i_version = 1;
 		np->i_oldstate = (1);	// LMI_UNUSABLE;
 		/* np specific members */
-		np->info.SERV_type = type;
+		np->info.PRIM_type = N_INFO_ACK;
+		np->info.NSDU_size = 65535;
+		np->info.ENSDU_size = 0;
+		np->info.CDATA_size = 65535;
+		np->info.DDATA_size = 65535;
+		np->info.ADDR_size = sizeof(struct sockaddr_storage);
+		np->info.ADDR_length = 0;
+		np->info.ADDR_offset = 0;
+		np->info.QOS_length = 0;
+		np->info.QOS_offset = 0;
+		np->info.QOS_range_length = 0;
+		np->info.QOS_range_offset = 0;
+		np->info.OPTIONS_flags = 0;
+		np->info.NIDU_size = 65535;
+		np->info.SERV_type = type ? : (N_CLNS | N_CONS);
+		np->info.CURRENT_state = NS_UNBND;
+		np->info.PROVIDER_type = N_SUBNET;
+		np->info.NODU_size = 536;
+		np->info.PROTOID_length = 0;
+		np->info.PROTOID_offset = 0;
+		np->info.NPI_version = N_CURRENT_VERSION;
+		/* qos defaults */
+		np->qos.n_qos_type = N_QOS_SEL_INFO_IP;
+		np->qos.protocol = QOS_UNKNOWN;
+		np->qos.priority = 0;
+		np->qos.ttl = 64;
+		np->qos.tos = 0;
+		np->qos.mtu = 65535;
+		np->qos.saddr = 0;
+		np->qos.daddr = QOS_UNKNOWN;
+		/* qos range info */
+		np->qor.n_qos_type = N_QOS_RANGE_INFO_IP;
+		np->qor.priority.priority_min_value = 0;
+		np->qor.priority.priority_min_value = 255;
+		np->qor.ttl.ttl_min_value = 1;
+		np->qor.ttl.ttl_max_value = 255;
+		np->qor.tos.tos_min_value = 0;
+		np->qor.tos.tos_min_value = 15;
+		np->qor.mtu.mtu_min_value = 536;
+		np->qor.mtu.mtu_max_value = 65535;
 		/* link into master list */
 		write_lock_bh(&master.lock);
 		{
@@ -4959,7 +5152,27 @@ npi_free_priv(queue_t *q)
 		npi_unbind(np);
 		npi_set_state(np, NS_UNBND);
 	}
-	/* FIXME: purge conq and resq */
+	{
+		mblk_t *b, *b_prev, *b_next;
+
+		/* purge connection indication queue, conq */
+		b_next = XCHG(&np->conq, NULL);
+		while ((b = b_next)) {
+			b_next = XCHG(&b->b_next, NULL);
+			/* might be data hanging off of b_prev pointer */
+			b_prev = b;
+			while ((b = b_prev)) {
+				b_prev = XCHG(&b->b_prev, NULL);
+				freemsg(b);
+			}
+		}
+		/* purge reset indication queue, resq */
+		b_next = XCHG(&np->resq, NULL);
+		while ((b = b_next)) {
+			b_next = XCHG(&b->b_next, NULL);
+			freemsg(b);
+		}
+	}
 	ss7_unbufcall((str_t *) np);
 	printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME,
 		atomic_read(&np->refcnt)));

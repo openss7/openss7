@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_ip.h,v 0.9.2.5 2006/05/03 22:53:39 brian Exp $
+ @(#) $Id: npi_ip.h,v 0.9.2.6 2006/05/05 02:07:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/03 22:53:39 $ by $Author: brian $
+ Last Modified $Date: 2006/05/05 02:07:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_ip.h,v $
+ Revision 0.9.2.6  2006/05/05 02:07:54  brian
+ - working up NPI-IP driver
+
  Revision 0.9.2.5  2006/05/03 22:53:39  brian
  - working up NPI-IP driver
 
@@ -69,7 +72,7 @@
 #ifndef SYS_NPI_IP_H
 #define SYS_NPI_IP_H
 
-#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/npi.h>
 
@@ -147,6 +150,15 @@ typedef struct N_qos_range_info_ip {
 	ip_tos_values_t tos;		/* tos range */
 	ip_mtu_values_t mtu;		/* mtu range */
 } N_qos_range_info_ip_t;
+
+union N_qos_ip_types {
+	np_ulong n_qos_type;
+	struct N_qos_sel_info_ip n_qos_sel_info;
+	struct N_qos_sel_conn_ip n_qos_sel_conn;
+	struct N_qos_sel_reset_ip n_qos_sel_reset;
+	struct N_qos_sel_ud_ip n_qos_sel_ud;
+	struct N_qos_range_info_ip n_qos_range_info;
+};
 
 /* 
    NC reset request
