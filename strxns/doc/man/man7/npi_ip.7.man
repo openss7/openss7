@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: npi_ip.7.man,v 0.9.2.5 2006/04/26 10:45:22 brian Exp $
+.\" @(#) $Id: npi_ip.7.man,v 0.9.2.6 2006/05/06 10:22:24 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/26 10:45:22 $ by $Author: brian $
+.\" Last Modified $Date: 2006/05/06 10:22:24 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: npi_ip.7.man,v $
+.\" Revision 0.9.2.6  2006/05/06 10:22:24  brian
+.\" - added test suite for NPI-IP driver
+.\"
 .\" Revision 0.9.2.5  2006/04/26 10:45:22  brian
 .\" - updated manual pages and references
 .\"
@@ -147,15 +150,15 @@ structure is described in
 .BR ipv6 (7).
 .PP
 .B NPI-IP
-supports the notion of multihoming in support of the Stream Control
+supports the notion of multi-homing in support of the Stream Control
 Transmission Protocol (SCTP)
 .[
 rfc2960
 .]
 described in
-.BR sctp (7).
+.BR sctp (4).
 SCTP requires that an association be bound to multiple IP or IPv6 addresses.
-In support of multihoming,
+In support of multi-homing,
 .B NPI-IP
 permits multiple addresses to be specified to bind.  When multiple addresses
 are required, they are specified as a special packed list of
@@ -195,62 +198,42 @@ struct sockaddr_ina {
 .B NPI-IP
 provides Quality of Service parameters using
 .BR IP -specific
-and
-.B OSI 
-conforming structures as described in the sections that follow.
-.HP
-.I DESIGN\ NOTES:\-\ \c
-This is really problematic trying to map OSI conforming connectionless QOS parameters onto IP QOS
-parameters.  What is really needed here is
-.BR N_QOS_IP_CL_SEL1
-and
-.BR N_QOQ_IP_CL_RANGE1
-structures.
-
+as described in the sections that follow.
+.B OSI
+conforming structures are not used.
 .\"
 .TP
-.B N_QOS_CL_SEL1
+.B N_QOS_SEL_INFO_IP
 Used with the
 .BR N_INFO_ACK (7)
 and
 .BR N_OPTMGMT_REQ (7)
-primitives, it provides a selection of quality of service parameters for connectionless providers.
+primitives, it provides a selection of quality of service parameters for both connectionless and
+connection-oriented providers.  The structure contains the following fields:
 .RS
 .TP
 .I n_qos_type
 Always
-.B N_QOS_CL_SEL1
+.B N_QOS_SEL_INFO_IP
 indicating the
-.B n_qos_cl_sel1
+.B N_qos_sel_info_ip
 structure.
 .TP
-.I transit_delay_max
-TTL field.
+.I protocol
+Specifies or indicates the IP protocol number being used on the connection or for outgoing
+connectionless IP packets.
 .TP
-.I residual_error_rate
-TOS type of service.
+.I priority
+Specifies or indicates the priority of IP packets.  This priority is only used for queueing within
+the local system.
 .TP
-.I protection_sel
-Provides the protection selection.  Values can be one of:
-.BR N_NO_PROT ,
-no protection;
-.BR N_PASSIVE_PROT ,
-protection against passive monitoring;
-.BR N_ACTIVE_PROT ,
-protection against active monitoring; and,
-.BR N_ACTIVE_PASSIVE_PROT ,
-protection against active and passive monitoring.
-The
-.B NPI-IP
-provider only need support
-.BR N_NO_PROT .
+.I ttl
+Specifies or indicates the IP time-to-live being used on the connection or for outgoing
+connectionless IP packets.
 .TP
-.I priority_sel
-Provideds selection of the priority of a given packet or packets within an association.  Under
-.B NPI-IP
-this is the
-.I TOS Precedence
-and can have values:
+.I tos
+Specifies or indicates the IP type-of-service being used on the connection or for outgoing
+connectionless IP packets.  This is the TOS precedence and can have values:
 .BR N_ROUTINE ,
 .BR N_PRIORITY ,
 .BR N_IMMEDIATE ,
@@ -258,152 +241,341 @@ and can have values:
 .BR N_OVERRIDEFLASH ,
 .BR N_CRITIC_ECP ,
 .BR N_INETCONTROL ,
-and
+or
 .BR N_NETCONTROL .
 .TP
-.I max_accept_cost
+.I mtu
+Specifies or indicates the maximum-transfer-unit being used on the connection or for outgoing
+connectionless IP packets.  When used with multi-homed connections, this is the minimum of the
+maximum-transfer-unit values associated with each destination in the multi-homed connection.
+.TP
+.I saddr
+Specifies or indicates the source address being used on the connection or for outgoing
+connectionless IP packets.  If specified as
+.BR INADDR_ANY ,
+the source address associated with the outgoing route for a given packet will be used instead.
+.TP
+.I daddr
+Specifies or indicates the destination address being used on the connection.  This parameter is only
+significant for multi-homed connections and specifies to which of the list of destinations is
+currently being used as a primary destination for sending packets.  This parameter has no effect on
+connectionless providers.
 .RE
 .\"
 .TP
-.B N_QOS_CL_RANGE1
+.B N_QOS_SEL_CONN_IP
 Used with the
-.BR N_INFO_ACK (7)
-primitive, it provides a range of quality of service parameters for connectionless providers.
+.BR N_CONN_REQ (7),
+.BR N_CONN_IND (7),
+.BR N_CONN_RES (7),
+.BR N_CONN_CON (7)
+and
+.BR N_OPTMGMT_REQ (7)
+primitives, it provide a selection of quality of service parameters for connection-oriented
+providers.  The structure contains the following fields:
 .RS
 .TP
 .I n_qos_type
 Always
-.B N_QOS_CL_RANGE1
+.B N_QOS_SEL_CONN_IP
 indicating the
-.B n_qos_cl_range1
+.B N_qos_sel_conn_ip
 structure.
 .TP
-.I transit_delay_max
-.RS
+.I protocol
+Specifies or indicates the IP protocol number being used or requested for the connection.  This
+parameter is of end-to-end significance.
 .TP
-.I td_targ_value
+.I priority
+Specifies or indicates the queueing priority of messages for the connection.  This parameter is of
+local significance.
 .TP
-.I td_max_value
+.I ttl
+Specifies or indicates the IP header time-to-live being used or requested for the connection.  This
+parameter is of local significance.
+.TP
+.I tos
+Specifies or indicates the IP header type-of-service being used or requested for the connection.
+This parameter is of end-to-end significance.  This is the TOS precedence and can have values:
+.BR N_ROUTINE ,
+.BR N_PRIORITY ,
+.BR N_IMMEDIATE ,
+.BR N_FLASH ,
+.BR N_OVERRIDEFLASH ,
+.BR N_CRITIC_ECP ,
+.BR N_INETCONTROL ,
+or
+.BR N_NETCONTROL .
+.TP
+.I mtu
+Specifies or indicates the maximum-transfer-unit being used for the connection.  This parameter is
+of local significance.
+.TP
+.I saddr
+Specifies or indicates the source address being used or requested for the connection.  This
+parameter is of end-to-end significance.
+.TP
+.I daddr
+Specifies or indicates the destination address being used or requested for the connection.  This
+parameter is of local significance.
 .RE
+.\"
 .TP
-.I residual_error_rate
-.TP
-.I protection_range
+.B N_QOS_SEL_UD_IP
+Used with the
+.BR N_OPTMGMT_REQ (7)
+primitive, it provide a selection of quality of service parameters for connectionless providers.
+The structure contains the following fields:
 .RS
 .TP
-.I protect_targ_value
+.I n_qos_type
+Always
+.B N_QOS_SEL_UD_IP
+indicating the
+.B N_qos_sel_ud_ip
+structure.
 .TP
-.I protect_min_value
+.I protocol
+Specifies the IP protocol number requested for outgoing IP packets.
+.TP
+.I priority
+Specifies the queueing priority for outgoing IP packets.
+.TP
+.I ttl
+Specifies the IP header time-to-live parameter for outgoing IP packets.
+.TP
+.I tos
+Specifies the IP header type-of-service parameter for outgoing IP packets.
+This is the TOS precedence and can have values:
+.BR N_ROUTINE ,
+.BR N_PRIORITY ,
+.BR N_IMMEDIATE ,
+.BR N_FLASH ,
+.BR N_OVERRIDEFLASH ,
+.BR N_CRITIC_ECP ,
+.BR N_INETCONTROL ,
+or
+.BR N_NETCONTROL .
+.TP
+.I saddr
+Specifies the IP header source address parameter for outgoing IP packets.  If specifies as
+.BR INADDR_ANY ,
+the source address associated with the outgoing interface will be used for each given packet.
 .RE
+.\"
 .TP
-.I priority_range
+.B N_QOS_RANGE_INFO_IP
+Used with the
+.BR N_INFO_ACK (7)
+primitive, it provides a range of quality of service parameters available to connection-oriented and
+connectionless providers.  The structure contains the following fields:
 .RS
 .TP
-.I priority_targ_value
+.I n_qos_type
+Always
+.BR N_QOS_RANGE_INFO_IP
+indicating the
+.B N_qos_range_info_ip
+structure.
+.TP
+.I priority
+Indicates the acceptable range of the priority parameter.
+This field is a
+.B ip_priority_values_t
+structure containing the following members:
+.RS
 .TP
 .I priority_min_value
+Indicates the minimum acceptable priority value.  This value is normally zero (0).
+.TP
+.I priority_max_value
+Indicates the maximum acceptable priority value.  This value is normally two hundred and fifty-five
+(255).
 .RE
 .TP
-.I max_accept_cost
+.I ttl
+Indicates the acceptable range of the time-to-live parameter.
+This field is a
+.B ip_ttl_values_t
+structure containing the following members:
+.RS
+.TP
+.I ttl_min_value
+Indicates the minimum acceptable time-to-live value.  This value is normally one (1).
+.TP
+.I ttl_max_value
+Indicates the maximum acceptable time-to-live value.  This value is normally one hundred and
+twenty-seven (127).
+.RE
+.TP
+.I tos
+Indicates the acceptable range of the type-of-service parameter.
+This field is a
+.B ip_tos_values_t
+structure containing the following members:
+.RS
+.TP
+.I tos_min_value
+Indicates the minimum acceptable type-of-service value.  This value is normally
+.BR N_ROUTINE .
+.TP
+.I tos_max_value
+Indicates the maximum acceptable type-of-service value.  This value is normally
+.BR N_NETCONTROL .
+.RE
+.TP
+.I mtu
+Indicates the acceptable range of the maximum-transfer-unit parameter.
+This field is a
+.B ip_mtu_values_t
+structure containing the following members:
+.RS
+.TP
+.I mtu_min_value
+Indicates the minimum acceptable maximum-transfer-unit.  This value is normally forty (40).
+.TP
+.I mtu_max_value
+Indicates the maximum acceptable maximum-transfer-unit.  This value is normally six thousand five
+hundred and thirty five (65535).
+.RE
 .RE
 .\"
 .\"
 .SS "Local Management Interface"
 .PP
-For the most part, the local management interface of the NPI operates for the
-NPI-IP provider in accordance with the Network Provider Interface Revision
-2.0.0 specifications.
+For the most part, the local management interface of the NPI operates for the NPI-IP provider in
+accordance with the Network Provider Interface Revision 2.0.0 specifications.
 .[
 NPI Revision 2.0.0
 .]
-Some enhancements are provided to addressing in support of the Stream Control
-Transmission Protocol (SCTP)
+Some enhancements are provided to addressing in support of the Stream Control Transmission Protocol
+(SCTP),
 .[
 rfc2960
 .]
-and multihomed associations.
+.BR sctp (4),
+and multi-homed associations.
 .PP
-The local management primitives are interpreted and issued as
-follows:
+The local management primitives are interpreted and issued as follows:
 .TP
 .BR N_INFO_REQ (7)
-This primitive is interpreted by the NPI-IP provider in accordance with the
-NPI specifications.
+This primitive is interpreted by the NPI-IP provider in accordance with the NPI specifications.
 .[
 NPI Revision 2.0.0
 .]
+.RS
+.PP
+Fields of the primitive are intepreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_INFO_REQ
+specifying the information request primitive.
+.RE
 .TP
 .BR N_INFO_ACK (7)
-This primitive is issued by the NPI-IP provider in accordances with the NPI
-specifications
+This primitive is issued by the NPI-IP provider in accordance with the NPI specifications
 .[
 NPI Revision 2.0.0
 .]
 with the following considerations:
 .RS
+.IP 1. \w'0.\(em'u
+.IP 2.
+.RE
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_INFO_ACK
+indicating the information acknowledgement primitive.
 .TP
 .I NSDU_size
-This field reflects the current Maximum Transfer Unit (MTU) (minus the size of
-the IP header), times the number of IP packets that can be generated
-considering IP fragmentation, for the Stream given the protocol addresses to
-which the Stream is bound.
+This field reflects the current Maximum Transfer Unit (MTU) (minus the size of the IP header), times
+the number of IP packets that can be generated considering IP fragmentation, for the Stream given
+the protocol addresses to which the Stream is bound.
 .TP
 .I ENSDU_size
-The NPI-IP provider, being a CLNS provider, has no concept of expedited data
-and this field is always set to zero
+The NPI-IP provider, being a CLNS provider, has no concept of expedited data and this field is
+always set to zero
 .RB ( 0 ).
 .TP
 .I CDATA_size
-The NPI-IP provider, being a CLNS proivder, has no concept of connection data
-and this field is always set to zero
+The NPI-IP provider, being a CLNS provider, has no concept of connection data and this field is
+always set to zero
 .RB ( 0 ).
 .TP
 .I DDATA_size
-The NPI-IP provider, being a CLNS proivder, has no concept of connection data
-and this field is always set to zero
+The NPI-IP provider, being a CLNS provider, has no concept of connection data and this field is
+always set to zero
 .RB ( 0 ).
 .TP
 .I ADDR_size
-Specifies the maximum address size.  For a device that supports IPv4, this is
-the size of the
+Specifies the maximum address size.  For a device that supports IPv4, this is the size of the
 .B sockaddr_in
-structure.  For an NPI-IP provider supporting multihoming, this value will
-be an integer multiple of the size of the
+structure.  For an NPI-IP provider supporting multi-homing, this value will be an integer multiple
+of the size of the
 .B sockaddr_in
 structure.  For a device that supports IPv6, the size of the
 .B sockaddr_in6
-structure, or, supprorting multihoming, an integer multiple.
+structure, or, supporting multi-homing, an integer multiple.
 .TP
 .IR ADDR_length ", " ADDR_offset
-The length and offset from the beginning of the message block of the bound protocol addresses.  For an NPI-IP provider
-supporting multihoming, the length and offset specify a list of address
+The length and offset from the beginning of the message block of the bound protocol addresses.  For
+an NPI-IP provider supporting multi-homing, the length and offset specify a list of address
 structures as described above under
 .RB \*(lq "Address Formats" \*(rq.
 .TP
 .IR QOS_length ", " QOS_offset
-The length and offset from the beginning of the message block of the current selected QOS parameters.  This will be an
-.B N_QOS_CL_SEL1
+The length and offset from the beginning of the message block of the current selected QOS
+parameters.  This will be an
+.B N_QOS_SEL_INFO_IP
 structure completed as described above under
 .RB \*(lq "QOS Parameters" .\*(rq
-It may be necessary to bind a Stream before a value will be returned in the
-information acknowledgement.
+It may be necessary to bind a Stream before a value will be returned in the information
+acknowledgement.
+.IP ""
+In the connection-mode environment, when this primitive is invoked before the NC is established on
+the Stream, the values returned specify the default values provided by the NS provider.  When this
+primitive is invoked after an NC has been established on the Stream, the values returns indicate
+negotiated values for the QOS parameters.
+.IP ""
+In the connectionless-mode environment, these values represent the default of the selected QOS
+parameter values.  In case of QOS parameter is not supported by the NS provider, a value of
+.B QOS_UNKNOWN
+will be returned in the corresponding field.  In the case where no QOS parameters are supported by
+the NS provider, the
+.B QOS_length
+field will be zero (0).
 .TP
 .IR QOS_range_length ", " QOS_range_offset
-The length and offset from the beginning of the message block of the current range of QOS parameters.  This will be an
-.B N_QOS_CL_RANGE1
+The length and offset from the beginning of the message block of the current range of QOS
+parameters.  This will be an
+.B N_QOS_RANGE_INFO_IP
 structure completed as described above under
 .RB \*(lq "QOS Parameters" .\*(rq
-It may be necessary to bind a Stream before a value will be returned in the
-information acknowledgement.
+It may be necessary to bind a Stream before a value will be returned in the information
+acknowledgement.
+.IP ""
+These ranges are used by the NS user to select QOS parameter values that are valid with the NS
+provider.  QOS parameter values are selected, or the default values altered via the
+.BR N_OPTMGMT_REQ (7)
+primitive.  In the connection-mode environment, the values for end-to-end QOS parameter may be
+specified with the N_CONN primitives for negotiation. If the NS provider does not support a certain
+QOS parameter, its value will be set to
+.BR QOS_UNKNOWN .
+In the case where no QOS parameters are supported by the NS provider, the length of this field will
+be zero (0).
 .TP
 .I OPTIONS_flags
 The NPI-IP provider sets no options flags and this field is always set to zero
 .RB ( 0 ).
 .TP
 .I NIDU_size
-The NPI-IP provider, being a CLNS proivder, has no concept of interface data
-unit size
-and this field is always set to zero
+The NPI-IP provider, being a CLNS provider, has no concept of interface data unit size and this
+field is always set to zero
 .RB ( 0 ).
 .TP
 .I SERV_type
@@ -412,21 +584,19 @@ The NPI-IP provider always sets this field to
 for connectionless network service.
 .TP
 .I CURRENT_state
-Indicates the current state of the NPI provider in accordance with the NPI
-specifications.
+Indicates the current state of the NPI provider in accordance with the NPI specifications.
 .TP
 .I PROVIDER_type
-The NPI-IP proivder always sets this field to
+The NPI-IP provider always sets this field to
 .B N_SNICFP
 for Subnetwork Independent Convergence Function/Protocol.
 .TP
 .I NODU_size
-This field reflects the current Maximum Transfer Unit (MTU) (minus the size of
-the IP header) for the Stream given the protocol address to which the Stream
-is bound.  Sending a packet using the
+This field reflects the current Maximum Transfer Unit (MTU) (minus the size of the IP header) for
+the Stream given the protocol address to which the Stream is bound.  Sending a packet using the
 .BR N_UNITDATA_REQ
-primitive with a data payload of less than or equal to this size will not
-normally result in IP fragmentation.
+primitive with a data payload of less than or equal to this size will not normally result in IP
+fragmentation.
 .TP
 .IR PROTOID_length ", " PROTOID_offset
 The length and offset from the beginning of the message block of the bound protocol identifiers.
@@ -434,27 +604,38 @@ The length and offset from the beginning of the message block of the bound proto
 .I NPI_version
 The NPI-IP always sets this field to
 .B N_VERSION_2
-to indicat Network Provider Interface Revision 2.0.0.
+to indicate Network Provider Interface Revision 2.0.0.
 .[
 NPI Revision 2.0.0
 .]
 .RE
 .TP
 .BR N_OPTMGMT_REQ (7)
+This primitive is interpreted by the NPI-IP provider as specified in the NPI specification.
+.[
+NPI Revision 2.0.0
+.]
 .RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.IR PRIM_type
+Always
+.B N_OPTMGMT_REQ
+specifying the option management request primitive.
 .TP
 .IR QOS_length ", " QOS_offset
-The length and offset from the beginning of the message block of the protocol
-options.
-The NPI-IP provider will only recognize the
-.B N_QOS_CL_SEL1
-structure type and will return
+The length and offset from the beginning of the message block of the protocol options.  The NPI-IP
+provider will only recognize the
+.BR N_QOS_SEL_INFO_IP ,
+.BR N_QOS_SEL_CONN_IP ,
+.BR N_QOS_SEL_UD_IP ,
+structure types and will return
 .BR NBADQOSTYPE
 for all other structures.
 .TP
 .I OPTMGMT_flags
-The NPI-IP provider does not support receipt acknowledgement and will ignore
-the
+The NPI-IP provider does not support receipt acknowledgement and will ignore the
 .B DEFAULT_RC_SEL
 flag because it is a CLNS provider as specified in the NPI.
 .[
@@ -463,209 +644,370 @@ NPI Revision 2.0.0
 .RE
 .TP
 .BR N_BIND_REQ (7)
+This primitive is interpreted by the NPI-IP provider as specified in the NPI specification,
+.[
+NPI Revision 2.0.0
+.]
+with the following considerations:
 .RS
+.IP 1. \w'0.\(em'u
+When the
+.B DEFAULT_LISTENER
+flag is set, the Stream is always considered connection-oriented.  Each protocol identifier and port
+number combination (whether the port number is zero or not) is permitted multiple
+.B DEFAULT_LISTENER
+Streams (one for each IP address, and one for the wildcard IP address).
+.B DEFAULT_LISTENER
+Streams are only considered when there is no match for any other listening Stream.  It is ok unsed
+NPI-IP to set the
+.B DEFAULT_LISTENER
+flag, even though
+.I CONIND_number
+is set to zero, in which case, it merely specifies that the Stream is to be a
+pseudo-conenction-oriented Stream.
+.IP 2. 
+When the
+.B DEFAULT_DEST
+flag is set, the Stream is always considered connectionless.  Each protocol identifier is permitted
+multiple
+.B DEFAULT_DEST
+Streams (one for each IP address, and one for the wildcard IP address).
+.B DEFAULT_DEST
+Streams are only considered when there is no match for any other connectionless bound Stream that
+matches the destination address.
+.IP 3.
+If the number of connection indications,
+.IR CONIND_number ,
+is zero, the bind is performed and the service type set to connectionless
+.BR ( N_CLNS ).
+If the number of connection indications,
+.IR CONIND_number ,
+is non-zero, the bind is performed and the service type set to connection-oriented
+.RB ( N_CONS ).
+If, however, the
+.B TOKEN_REQUEST
+flag is set, then the bind is always considered connection-oriented, even if the number of
+connection indications,
+.IR CONIND_number ,
+is set to zero, as this is the typical case for an accepting Stream.
+.RE
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
 .TP
 .I PRIM_type
+Always
+.B N_BIND_REQ
+specifying the bind request primitive.
 .TP
 .IR ADDR_length ", " ADDR_offset
-Specifies the length in bytes of the network addresses to be bound to the
-Stream and the offset from the beginning of the
+Specifies the length in bytes of the network addresses to be bound to the Stream and the offset from
+the beginning of the
 .BR M_PROTO (9)
-message block where the network addresses begin.
-Typically in NPI the network address consists of a single address.  In support
-of the Stream Control Transmission Protocol (SCTP), the
+message block where the network addresses begin.  Typically in NPI the network address consists of a
+single address.  In support of the Stream Control Transmission Protocol (SCTP),
+.BR sctp (4),
+the
 .B NPI-IP
-driver supports the specification of multiple addresses in the form of a
-list of addresses.  See
+driver supports the specification of multiple addresses in the form of a list of addresses.  See
 .RB \*(lq "ADDRESS FORMAT" ,\*(rq
 above.
 .TP
 .I CONIND_number
-This number is ignored in CLNS in accordance with the NPI specification.
+If
+.I CONIND_number
+is non-zero, the Stream is considered to be a CONS Stream.  If zero, whether the Stream is
+considered a CONS or a CLNS stream is dependent upon other factors.
 .TP
 .I BIND_flags
+The
+.I BIND_flags
+can be a bitwise OR of the following flags:
+.RB ( DEFAULT_LISTENER " and " TOKEN_REQUEST
+are mutually exclusive with
+.BR DEFAULT_DEST .)
 .RS
 .TP
 .B DEFAULT_LISTENER
-This flag is ignored in CLNS in accordance with the NPI specification.
+When set, the Stream is considered to be a CONS Stream.  When clear, whether the Stream is
+considered CONS or CLNS is dependent upon other factors.
 .TP
 .B TOKEN_REQUEST
-This flag is ignored in CLNS in accordance with the NPI specification.
+When set, the Stream is considered to be a CONS Stream.  When clear, whether the Stream is
+considered CONS or CLNS is dependent upon other factors.
 .TP
 .B DEFAULT_DEST
-This flag is honored by NPI-IP.  When set, this flag indicates that this
-Stream is the \*(lqdefault destination Stream.\*(rq  This Stream will receive
-all packets destined for the NSAP specified in the bind request.  If no NSAP
-is specified in the bind request, then this Stream should receive all packets
-destined to an NSAP which is bound to no other Stream.  Only one default
-destination Stream per NSAP is allowed per occurrence of NPI.  An attempt to
-bind a default destination Stream to an NSAP when one is already bound should
-result in an error of type
+When set, the Stream is considered to be a CLNS Stream.  When clear, whether the Stream is CONS or
+CLNS is dependent upon other factors.
+.IP ""
+This flag is honoured by NPI-IP.  When set, this flag indicates that this Stream is the \*(lqdefault
+destination Stream.\*(rq  This Stream will receive all packets destined for the NSAP specified in
+the bind request.  If no NSAP is specified in the bind request, then this Stream should receive all
+packets destined to an NSAP which is bound to no other Stream.  Only one default destination Stream
+per NSAP is allowed per occurrence of NPI.  An attempt to bind a default destination Stream to an
+NSAP when one is already bound should result in an error of type
 .BR NBOUND .
 .RE
 .TP
 .IR PROTOID_length ", " PROTOID_offset
-Specifies the length in bytes of the protocol ids and the offset from the
-beginning of the
+Specifies the length in bytes of the protocol identifiers and the offset from the beginning of the
 .BR M_PROTO (9)
-message block where the protocol ids begin.  Protocol ids for NPI-IP consist
-of IP protocol numbers.  Typically only one IP protocol number is bound in a
-given bind request.
+message block where the protocol identifiers begin.  Protocol identifiers for NPI-IP consist of IP protocol numbers.
+Typically only one IP protocol number is bound in a given bind request.
 .RE
 .TP
 .BR N_BIND_ACK (7)
-The bind acknowledgement primitive is issued in accordance with the NPI
-specifications.  When a multihomed address was specified to the bind, the
+The bind acknowledgement primitive is issued in accordance with the NPI specifications,
+.[
+NPI Revision 2.0.0
+.]
+with the following considerations:
+.RS
+.IP 1. \w'0.\(em'u
+When a multi-homed address was specified to the bind, the
 .IR ADDR_length " and " ADDR_offset
-fields may specify a bound address that consists of a list of addresses as
-indicated under
+fields may specify a bound address that consists of a list of addresses as indicated under
 .RB \*(lq "ADDRESS FORMATS" ,\*(rq
 above.
-.RS
-.PP
-If no address was specified to the bind, the NPI-IP provider will assume that
-all local addresses are to be bound.  The NPI-IP provider also respects the
+.IP 2.
+If no address was specified to the bind, the NPI-IP provider will assume that all local addresses
+are to be bound.  The NPI-IP provider also respects the
 .B INADDR_ANY
 value in the address, as well as the special port number zero (0).
+.IP 3.
+NPI-IP does not currently bind more than one protocol identifier and will always only return the
+first protocol identifier in the
+.BR N_BIND_ACK (7)
+primitive.
+.RE
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_BIND_ACK
+indicating the bind acknowledgement primitive.
+.TP
+.IR ADDR_length ", " ADDR_offset
+Indicates the length and offset from the beginning of the
+.BR M_PCPROTO (9)
+message block containing the bound address.
+.TP
+.I CONIND_number
+Indicates the negotiated maximum number of connection indications.
+.TP
+.I TOKEN_value
+Indicates the token value when requested on bind, zero otherwise.
+.TP
+.I PROTOID_length ", " PROTOID_offset
+Indicates the length and offset from the beginning of the of the
+.BR M_PCPROTO (9)
+message block containing the protocol identifiers that were bound.
 .RE
 .TP
 .BR N_UNBIND_REQ (7)
-The unbind request primitive is interpreted by the NPI-IP provider in
-accordance with the NPI specifications.  If the user specified multiple
-addresses to the bind request, the unbind request is interpreted as unbinding
-all bound addresses.
+The unbind request primitive is interpreted by the NPI-IP provider in accordance with the NPI
+specifications,
+.[
+NPI Revision 2.0.0
+.]
+with the following considerations:
+.RS
+.IP 1. \w'0.\(em'u
+If the user specified multiple addresses to the bind request, the unbind request is interpreted as
+unbinding all bound addresses and protocol identifiers.
+.RE
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_UNBIND_REQ
+specifying the unbind request primitive.
+.RE
 .TP
 .BR N_OK_ACK (7)
-The NPI-IP provider issues this primitive in accordance with the NPI
-specifications.
+The NPI-IP provider issues this primitive in accordance with the NPI specifications.
 .[
 NPI Revision 2.0.0
 .]
+Acknowledges the successful completion of primitives requiring positive acknowledgement.
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_OK_ACK
+specifying the success acknowledgement primitive.
+.TP
+.I CORRECT_prim
+The successful primitive that is being acknowledged.
+.RE
 .TP
 .BR N_ERROR_ACK (7)
-The NPI-IP provider issues this primitive in accordance with the NPI
-specifications.
+The NPI-IP provider issues this primitive in accordance with the NPI specifications.
 .[
 NPI Revision 2.0.0
 .]
+Provides negative acknowledgement for non-fatal errors for primitives requiring negative
+acknowledgement.
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_ERROR_ACK
+specifying the error acknowledgement primitive.
+.TP
+.I ERROR_prim
+The primitive that was in error.
+.TP
+.I NPI_error
+The NPI error.
+.TP
+.I UNIX_error
+When
+.I NPI_error
+is
+.BR NSYSERR ,
+the UNIX error number.
+.RE
 .\"
 .\"
 .SS "Connectionless Data Transfer"
 .PP
-The NPI-IP provider is a CLNS (Connectionless Network Service) provider that
-uses the connectionless data transfer N-primitives to transfer data.  For the
-most part, these primitives are used in strict accordance with the NPI
-specifications.
+The NPI-IP provider is a CLNS (Connectionless Network Service) provider that uses the connectionless
+data transfer N-primitives to transfer data.  For the most part, these primitives are used in strict
+accordance with the NPI specifications.
 .[
 NPI Revision 2.0.0
 .]
-Some enhancements are provided to addressing in support of the Stream Control
-Transmission Protocol (SCTP)
+Some enhancements are provided to addressing in support of the Stream Control Transmission Protocol
+(SCTP),
 .[
 rfc2960
 .]
-and multihomed associations.
+.BR sctp (4),
+and multi-homed associations.
 .PP
-The connectionless data transfer primitives are interpreted and issued as
-follows:
+The connectionless data transfer primitives are interpreted and issued as follows:
 .TP
 .BR N_UNITDATA_REQ (7)
-This primitive is interpreted by the NPI-IP provider as specified in the NPI specification.
+This primitive is interpreted by the NPI-IP provider as specified in the NPI specification,
 .[
 NPI Revision 2.0.0
 .]
+with the following considerations:
 .RS
+.IP 1. \w'0.\(em'u
+For outgoing IP packets, the values of the various header fields other than the destination address
+are controlled using the quality-of-service selection for unit data for IP (see,
+.RI \(lq "QOS Parameters" ,\(rq
+above).
+.RE
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_UNITDATA_REQ
+specifying that this is a unit data request primitive.
 .TP
 .IR DEST_length ", " DEST_offset
-These fields are interpreted as the destination address for the IP packet.
-The specified address must be a single address and cannot contain a list.
+These fields are interpreted as the destination address for the IP packet.  The specified address
+must be a single address and cannot contain a list.  A destination address must be specified (i.e.
+.I DEST_length
+cannot be zero).
 .TP
 .IR RESERVED_Field "[0] and " RESERVED_field [1]
 These fields are reserved for DLPI
 .[
 DLPI
 .]
-compatibility and are normally set to zero.  For multihomed hosts in support
-of the Stream Control Transmission Protocol (SCTP),
-.[
-rfc2960
-.]
-and when the Stream is bound to multiple addresses, these fields can be
-treated as
-.IR SRC_length ", " SRC_offset
-fields and used to specify the source address for the outgoing packet.
-The source address specified must normally be one of the addresses to which the
-Stream is bound.  If not, the NPI-IP provider may return the
-.B NBADADDR
-error in a
-.BR N_UDERROR_IND (7)
-primitive.
-If a source address is not specified (i.e.
-.I SRC_length
-is zero), then the NPI-IP provider will select a source address from those to
-which the Stream was bound.
-If only one address was bound, these fields are ignored and the NPI-IP provider
-will use the bound address as the source address for the packet.
-.PP
-In addition to the normal use of the
-.BR N_UNITDATA_REQ (7)
-primitive, the primitive can be used to return a message delivered to the
-NPI-IP NS User with the
-.BR N_UNITDATA_IND (7)
-primitive.  This is accomplished by simply changing the
-.I PRIM_type
-from
-.B N_UNITDATA_IND
-to
-.B N_UNITDATA_REQ
-and passing the message back downstream.  The NPI-IP NS Provider will detect
-that the destination address is one of the addresses bound to the Stream and
-will pass the message to any other Linux IP user registered against the
-protocol ID, if there is no other Linux IP user registered against the
-protocol ID, these messages are simply discarded.
+compatibility and are set to zero.
 .RE
 .TP
 .BR N_UNITDATA_IND (7)
-This primitive is issued by the NPI-IP provider in accordance with the NPI
-specification.
+This primitive is issued by the NPI-IP provider in accordance with the NPI specification,
 .[
 NPI Revision 2.0.0
 .]
+with the following considerations:
 .RS
+.IP 1. \w'0.\(em'u
+IP addresses, IP options and other IP particulars are available in the message block.  The message
+body (attached
+.BR M_DATA (9)
+message blocks) contains the entire IP packet including IP network and transport headers and
+payload.  The base pointer of the first data block points to the IP header, although the read
+pointer of the first message block points to the transport header.  This means that the IP
+information is available for inter-module use but is unavailable to a User-space user of the service
+interface.
+.IP 2.
+It is normally only necessary for the NPI provider to specify the destination address if it is not
+implicit to the receiving Stream: that is, if the receiving Stream is a default destination Stream.
+For NPI-IP, it is also necessary that the destination address be specified by the NPI-IP provider
+when the receiving Stream is bound to more than one address.
+.IP 3.
+The NPI-IP provider may indicate the
+.B N_UD_CONGESTION
+value in the
+.I ERROR_type
+field when the IP packet is marked for Explicit Congestion Notification or other congestion
+indication.  Otherwise, the
+.I ERROR_type
+field is set to zero (0).
+.RE
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_UNITDATA_IND
+indicating that this is a unit data indication primitive.
 .TP
 .IR DEST_length ", " DEST_offset
-It is normally only necessary for the NPI provider to specify the destination
-address if it is not implicit to the receiving Stream: that is, if the
-receiving Stream is a default destination Stream.  For NPI-IP, it is also
-necessary that the destination address be specified by the NPI-IP provider
-when the receiving Stream is bound to more than one address.  These fields
-specify a single address.
+Populated by the NPI provider in accordance with the NPI specifications.  These fields specify a
+single address.
 .TP
 .IR SRC_length ", " SRC_offset
-Populated by the NPI provider in accordance with the NPI specifications.
-These fields specify a single address.
+Populated by the NPI provider in accordance with the NPI specifications.  These fields specify a
+single address.
 .TP
 .IR ERROR_type
-Populated by the NPI provider in accordance with the NPI specifications.  The
-NPI-IP provider may indicate the
-.B N_UD_CONGESTION
-value in this field when the IP packet is marked for Explicit Congestion
-Notification or other congestion indication.
-.PP
-Note that addresses, IP options and other IP particulars are available in the
-message block.  The message body (attached
-.BR M_DATA (9)
-message blocks) contains the entire IP packet including IP network and
-transport headers and payload.
+Populated by the NPI provider in accordance with the NPI specifications.
 .RE
 .TP
 .BR N_UDERROR_IND (7)
-This primitive is issued by the NPI-IP provider in accordance with the NPI
-specification.
+This primitive is issued by the NPI-IP provider in accordance with the NPI specification,
 .[
 NPI Revision 2.0.0
 .]
+with the following considerations:
 .RS
+.IP 1. \w'0.\(em'u
+The original IP header, IP options and portion of the transport packet are available in the message
+body.  The message body (attached
+.BR M_DATA (9)
+message blocks) contains the entire IP packet including IP and ICMP headers and payload.  The base
+pointer of the first data block points to the ICMP IP header, although the read pointer of the first
+message block points to the ICMP payload.  This means that the ICMP IP information is available for
+inter-module use but is unavailable to a user-space user of the the service interface.
+.RE
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_UDERROR_IND
+indication that this is a unit data error indication primitive.
 .TP
 .IR DEST_length ", " DEST_offset
 Populated by the NPI-IP provider in accordance with the NPI specifications.
@@ -686,7 +1028,7 @@ NPI Revision 2.0.0
 .\".[
 .\"DLPI
 .\".]
-.\"compatibility and are normally set to zero.  For multihomed hosts in support
+.\"compatibility and are normally set to zero.  For multi-homed hosts in support
 .\"of the Stream Control Transmission Protocol (SCTP),
 .\".[
 .\"rfc2960
@@ -701,82 +1043,71 @@ NPI Revision 2.0.0
 .\"proivder.
 .TP
 .I ERROR_type
-This field is populated by the NPI-IP provider in accordance with the NPI
-specifications.  Some of the
+This field is populated by the NPI-IP provider in accordance with the NPI specifications.  Some of
+the
 .BR N_UDERROR_IND (7)
-reason codes have additional meaning when issued by the NPI-IP provider as
-follows:
+reason codes have additional meaning when issued by the NPI-IP provider as follows:
 .RS
 .TP
 .B N_UD_UNDEFINED
 No reason was specified.
 .TP
 .B N_UD_TD_EXCEEDED
-Transit delay exceeded.
-This can be generated by the NPI-IP provider in response to an ICMP message
+Transit delay exceeded.  This can be generated by the NPI-IP provider in response to an ICMP message
 .RB ( ICMP_TIME_EXCEEDED/ICMP_EXC_FRAGTIME ).
 .TP
 .B N_UD_CONGESTION
-NS Provider congestion encountered.
-This can be generated by the NPI-IP provider in response to an ICMP message
+NS Provider congestion encountered.  This can be generated by the NPI-IP provider in response to an
+ICMP message
 .RB ( ICMP_SOURCE_QUENCH ).
 .TP
 .B N_UD_QOS_UNAVAIL
 Requested QOS/service characteristic unavailable.
 .TP
 .B N_UD_LIFE_EXCEEDED
-NSDU lifetime exceeded.  This is an indication that the specified lifeimte
-(TTL) was exceeded as detected to the NPI-IP provider in a returned ICMP
-message.
+NSDU lifetime exceeded.  This is an indication that the specified lifetime (TTL) was exceeded as
+detected to the NPI-IP provider in a returned ICMP message.
 This can be generated by the NPI-IP provider in response to an ICMP message
 .RB ( ICMP_TIME_EXCEEDED/ICMP_EXC_TTL ).
 .TP
 .B N_UD_ROUTE_UNAVAIL
-Suitable route unavailable.  This is used by the NPI-IP provider to specify
-many separate error conditions as indicated by the received ICMP messages.
-This can be generated by the NPI-IP provider in response to an ICMP message
+Suitable route unavailable.  This is used by the NPI-IP provider to specify many separate error
+conditions as indicated by the received ICMP messages.  This can be generated by the NPI-IP provider
+in response to an ICMP message
 .RB ( ICMP_DEST_UNREACH/ICMP_PROT_UNREACH ", " ICMP_PORT_UNREACH ", "
 .BR ICMP_NET_UNKNOWN ", " ICMP_HOST_UNKNOWN ", " ICMP_HOST_ISOLATED ", "
 .BR ICMP_NET_ANO ", " ICMP_HOST_ANO ", " ICMP_PKG_FILTERED ", "
 .BR ICMP_PREC_VIOLATION ", " ICMP_PREC_CUTOFF ).
 .TP
 .B N_UD_SEG_REQUIRED
-Segmentation was required where none permitted.  This error is used in
-conjunction the Path MTU Discovery and is used ot indicate that a packet that
-was marked don't fragment encounter a path with an MTU less than the packet
-size.
-This can be generated by the NPI-IP provider in response to an ICMP message
+Segmentation was required where none permitted.  This error is used in conjunction the Path MTU
+Discovery and is used to indicate that a packet that was marked don't fragment encounter a path with
+an MTU less than the packet size.  This can be generated by the NPI-IP provider in response to an
+ICMP message
 .RB ( ICMP_DEST_UNREACH/ICMP_FRAG_NEEDED ).
 .RE
-.PP
-Note that the source address, IP options and ICMP particulars are available in
-the message body.  The message body (attached
-.BR M_DATA (9)
-message blocks) contains the entire IP packet including IP and ICMP headers
-and payload.
 .RE
 .\"
 .\"
 .SS Connection-Oriented Connection Establishment
 .PP
-The NPI-IP provider also provides a pseudo-CONS (Connection Oriented Network
-Service) provider that uses the connection mode data transfer N-primitives to
-transfer data.  For the most part, these primitives are used in accordance
-with the NPI specifications.
+The NPI-IP provider also provides a pseudo-CONS (Connection Oriented Network Service) provider that
+uses the connection mode data transfer N-primitives to transfer data.  For the most part, these
+primitives are used in accordance with the NPI specifications.
 .[
 NPI Revision 2.0.0
 .]
-Some enhancements are provided to addressing in support of the multi-homed
-nature of the Stream Control Transmission Protocol (SCTP).
+Some enhancements are provided to addressing in support of the multi-homed nature of the Stream
+Control Transmission Protocol (SCTP),
 .[
 rfc2960
 .]
+.BR sctp (4).
 .PP
 The connection establishment primitives are interpreted as follows:
 .TP
 .BR N_CONN_REQ (7)
-This primitive is interpreted by the NPI-IP provider in accordances with the
-NPI specification,
+This primitive is interpreted by the NPI-IP provider in accordance with the NPI specification,
 .[
 NPI Revision 2.0.0
 .]
@@ -784,18 +1115,16 @@ NPI Revision 2.0.0
 with the following considerations:
 .RS
 .IP 1. \w'0.\(em'u
-The primitive can be issued on a Stream that has not yet been bound; i.e. that
-is in the
+The primitive can be issued on a Stream that has not yet been bound; i.e. that is in the
 .I NS_UNBND
 state.  The
 .B NPI-IP
-provider will autobind the Stream to an IP addres of
+provider will automatically bind the Stream to an IP address of
 .BR INADDR_ANY ,
-a dynamically assigned port number, and the UDP protocol number.  The
-resulting Stream will be a pseudo-connection-oriented mode Stream.  This is
-primarily for compatibility with the
+a dynamically assigned port number, and the UDP protocol number.  The resulting Stream will be a
+pseudo-connection-oriented mode Stream.  This is primarily for compatibility with the
 .BR sockets (3)
-library.  The NPI specificiation,
+library.  The NPI specification,
 .[
 NPI Revision 2.0.0
 .]
@@ -827,18 +1156,23 @@ indicates that the response in this situation should be a
 primitive with a
 .RB [ NNOTSUPPORT ]
 error.
+.RE
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
 .TP
 .IR DEST_length ", " DEST_offset
 The length and offset from the beginning of the
 .BR M_PROTO (9)
-message block of the memory extent containing the destination address(es), to
-which the connection is to be formed.
-This field can contain more than one IP address, but can only contain one port
+message block of the memory extent containing the destination address(es), to which the connection
+is to be formed.  This field can contain more than one IP address, but can only contain one port
 number.
 .TP
 .IR CONN_flags
-Specifies connection options flags associated with the connection request.
-The folowing connection flags are defined, but not supported:
+Specifies connection options flags associated with the connection request.  The following connection
+flags are defined, but not supported:
 .RS
 .TP
 .B REC_CONF_OPT
@@ -850,15 +1184,14 @@ invalid.
 .B EX_DATA_OPT
 Specifies that expedited data transfer is to be enabled by default.  The
 .B NPI-IP
-provider does not support expedited data transfer and setting this flag is
-invalid.
+provider does not support expedited data transfer and setting this flag is invalid.
 .RE
 .TP
 .IR QOS_length ", " QOS_offset
 The length and offset from the beginning of the
 .BR M_PROTO (9)
-message block of the memory extent containing the quality-of-service parameters
-to be associated with the connection.  See
+message block of the memory extent containing the quality-of-service parameters to be associated
+with the connection.  See
 .RI \(lq "Quality of Service" ,\(rq
 above.  The only QOS data type accepted in the
 .BR N_CONN_REQ (7)
@@ -890,12 +1223,18 @@ Specifies the maximum-transfer-unit to be used for packets sent on the network c
 MTU of the path upon which IP packets are sent is less than this value, the lower MTU will be used.
 If the MTU of the path on which IP packets are sent is greater than this value, the lower MTU will
 be used.
+.TP
+.I saddr
+Specifies the default source address to be used in outgoing packets on the connection.
+.TP
+.I daddr
+Specifies the default destination address to be used in outgoing packets on the connection.  This
+parameter is only necessary if the connection is multi-homed.
 .RE
 .RE
 .TP
 .BR N_CONN_IND (7)
-This primitive is issued by the NPI-IP provider in accordances with the
-NPI specification,
+This primitive is issued by the NPI-IP provider in accordance with the NPI specification,
 .[
 NPI Revision 2.0.0
 .]
@@ -908,22 +1247,26 @@ The
 provider does not provide true connection-oriented modes.  In pseudo-connection-oriented mode, with
 a listening Stream, connection indications are synthesized from any received packet that matches the
 listening Stream and delivered as a connection indication (with data).
+.RE
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
 .TP
 .IR DEST_length ", " DEST_offset
 The length and offset from the beginning of the
 .BR M_PROTO (9)
-message block of the memory extent containing the destination address of the
-IP packet causing the connection indication.  This field will contain only one
-destination address and is structured as a
+message block of the memory extent containing the destination address of the IP packet causing the
+connection indication.  This field will contain only one destination address and is structured as a
 .BR sockaddr_in
 structure.
 .TP
 .IR SRC_length ", " SRC_offset
 The length and offset from the beginning of the
 .BR M_PROTO (9)
-message block of the memory extent containing the source address of the IP
-packet causing the connection indication.  This field will contain only one
-source address and is structured as a
+message block of the memory extent containing the source address of the IP packet causing the
+connection indication.  This field will contain only one source address and is structured as a
 .BR sockaddr_in
 structure.
 .TP
@@ -948,7 +1291,7 @@ provider does not support receipt confirmation and this flag will not be indicat
 .B EX_DATA_OPT
 Indicates that expedited data transfer is requested to be enabled by default.  The
 .B NPI-IP
-provider does not suport expedited data transfer and this flag will not be indicated.
+provider does not support expedited data transfer and this flag will not be indicated.
 .RE
 .TP
 .IR QOS_length ", " QOS_offset
@@ -983,14 +1326,20 @@ Indicates the time-to-live field received in the packet that invoked the connect
 Indicates the type-of-service field received in the packet that invoked the connection indicaiton.
 .TP
 .I mtu
-Indicates the maximum-transfer-unit to be used for packets sent on the network connection
-toward the source address of the received packet that invoked the connection indiciation.
+Indicates the maximum-transfer-unit to be used for packets sent on the network connection toward the
+source address of the received packet that invoked the connection indiciation.
+.TP
+.I saddr
+Specifies the default source address to be used in outgoing packets on the connection.
+.TP
+.I daddr
+Specifies the default destination address to be used in outgoing packets on the connection.  This
+parameter is only necessary if the connection is multi-homed.
 .RE
 .RE
 .TP
 .BR N_CONN_RES (7)
-This primitive is interpreted by the NPI-IP provider in accordances with the
-NPI specification,
+This primitive is interpreted by the NPI-IP provider in accordance with the NPI specification,
 .[
 NPI Revision 2.0.0
 .]
@@ -1000,7 +1349,7 @@ with the following considerations:
 .IP 1. \w'0.\(em'u
 The
 .B NPI-IP
-provider does nto support true connection-oriented modes; only a pseud-connection-oriented mode.
+provider does not support true connection-oriented modes; only a pseudo-connection-oriented mode.
 Accepting a connection indication with this primitive will deliver queued and any further received
 packets with the same source and destination addresses, port numbers and protocol number to the
 accepting Stream.
@@ -1010,6 +1359,12 @@ are simply set as specified.
 .IP 3.
 The responding address(es) do no represent the local addresses that form the connection, but the
 remote addresses involved in a multi-homed association.
+.RS
+.RE
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
 .TP
 .IR TOKEN_value
 Specifies the token value of the Stream onto which the connection is to be accepted.  If the
@@ -1036,14 +1391,12 @@ defined; but not supported:
 .B REC_CONF_OPT
 Specifies that receipt confirmation is to be used by default.  The
 .B NPI-IP
-provider does not support receipt confirmation and setting this flag is
-invalid.
+provider does not support receipt confirmation and setting this flag is invalid.
 .TP
 .B EX_DATA_OPT
 Specifies that expedited data transfer is to be enabled by default.  The
 .B NPI-IP
-provider does not support expedited data transfer and setting this flag is
-invalid.
+provider does not support expedited data transfer and setting this flag is invalid.
 .RE
 .TP
 .IR QOS_length ", " QOS_offset
@@ -1052,8 +1405,7 @@ The length and offset from the beginning of the
 message block of the memory extent containing the quality-of-service parameters to be used with the
 completed NS connection.  See
 .RI \(lq "Quality of Service" ,\(rq
-above.
-The only QOS data type allowed in the 
+above.  The only QOS data type allowed in the 
 .BR N_CONN_RES (7)
 primitive by the
 .B NPI-IP
@@ -1079,15 +1431,20 @@ Specifies the time-to-live field to be used in packets sent on the network conne
 Specifies the type-of-service field to be used in packets sent on the network connection.
 .TP
 .I mtu
-Specifies the maximum-transfer-unit to be used for packets sent on the network connection.
-If the underlying maximum-transfer-unit is different from this value, the smaller of the two will be
-used.
+Specifies the maximum-transfer-unit to be used for packets sent on the network connection.  If the
+underlying maximum-transfer-unit is different from this value, the smaller of the two will be used.
+.TP
+.I saddr
+Specifies the default source address to be used in outgoing packets on the connection.
+.TP
+.I daddr
+Specifies the default destination address to be used in outgoing packets on the connection.  This
+parameter is only necessary if the connection is multi-homed.
 .RE
 .RE
 .TP
 .BR N_CONN_CON (7)
-This primitive is issued by the NPI-IP provider in accordances with the
-NPI specification,
+This primitive is issued by the NPI-IP provider in accordance with the NPI specification,
 .[
 NPI Revision 2.0.0
 .]
@@ -1106,6 +1463,12 @@ primitive.
 .IP 2.
 Quality of service values confirmed are the result of negotiation with the local provider only and
 are not the result of end-to-end negotiation in pseudo-connection-oriented mode.
+.RE
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
 .TP
 .IR RES_length ", " RES_offset
 The length and offset from the beginning of the
@@ -1127,7 +1490,7 @@ provider does not support receipt confirmation and this flag will not be indicat
 .B EX_DATA_OPT
 Indicates that expedited data transfer is requested to be enabled by default.  The
 .B NPI-IP
-provider does not suport expedited data transfer and this flag will not be indicated.
+provider does not support expedited data transfer and this flag will not be indicated.
 .RE
 .TP
 .IR QOS_length ", " QOS_offset
@@ -1166,25 +1529,38 @@ Confirms the type-of-service value to be used in outgoing packets on the network
 Confirms the maximum-transfer-unit to be used for outgoing packets on the network connection.  This
 is the minimum of the individual maximum-transfer-units of all the destinations for the network
 connection and the requested maximum-transfer-unit.
+.TP
+.I saddr
+Specifies the default source address to be used in outgoing packets on the connection.
+.TP
+.I daddr
+Specifies the default destination address to be used in outgoing packets on the connection.  This
+parameter is only necessary if the connection is multi-homed.
 .RE
 .RE
 .\"
 .\"
 .SS Connection-Oriented Data Transfer
 .PP
+The established connection data transfer primitives are interpreted as follows:
+.PP
 .TP
 .BR N_DATA_REQ (7)
 In pseudo-connection-oriented mode, the NPI-IP user transfers data using the
 .BR N_DATA_REQ (7)
-primitive.  When the destination host is multi-homed, the data will be sent to
-the primary destination address.  The current primary destination address can
-be changed with the
+primitive.  When the destination host is multi-homed, the data will be sent to the primary
+destination address.  The current primary destination address can be changed with the
 .BR N_OPTMGMT_REQ (7)
-primitive.  The source address on the IP packet will be one of the addresses
-associated with the route and the outgoing interface.
-.IP ""
-Fields of the primitive are interpreted as follows:
+primitive.  The source address on the IP packet will be one of the addresses associated with the
+route and the outgoing interface.
 .RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_DATA_REQ
+specifying the data transfer request primitive.
 .TP
 .I DATA_xfer_flags
 .RS
@@ -1199,71 +1575,131 @@ level, this flag is unused.  Setting this flag will result in a fatal
 error condition.
 .TP
 .B N_RC_FLAG
-This flag may be set in accordance with the NPI specifications; however, as
-the
+This flag may be set in accordance with the NPI specifications; however, as the
 .B NPI-IP
-provider does not support receipt verification, this flag is unused.  Setting
-this flag will result in a fatal
+provider does not support receipt verification, this flag is unused.  Setting this flag will result
+in a fatal
 .RB [ EPROTO ]
 error condition.
 .RE
 .RE
 .TP
 .BR N_DATA_IND (7)
-In pseudo-connection-oriented mode, the NPI-IP provider transfers data to the
-NPI-IP user with the
+In pseudo-connection-oriented mode, the NPI-IP provider transfers data to the NPI-IP user with the
 .BR N_DATA_IND (7)
-primitive.  For multihomed local or remote hosts, information concerning the
-source address and destination address of the packet is lost.  For a service
-that provides this information, use the connectionless mode.
-.IP ""
-Fields of the primitive are interpreted as follows:
+primitive.  For multi-homed local or remote hosts, information concerning the source address and
+destination address of the packet is lost.  For a service that provides this information, use the
+connectionless mode.
 .RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_DATA_IND
+indicating the data transfer indication primitive.
 .TP
 .I DATA_xfer_flags
 .RS
 .TP
 .B N_MORE_DATA_FLAG
-This flag is populated by the NPI-IP provider in accordance with the NPI
-specifications; however, because the
+This flag is populated by the NPI-IP provider in accordance with the NPI specifications; however,
+because the
 .B NPI-IP
 provider performs segmentation and reassembly at the
 .B IP
 level, this flag is unused and is never set by the NPI-IP provider.
 .TP
 .B N_RC_FLAG
-This flag is populated by the NPI-IP provider in accordance with the NPI
-specifications; however, because the
+This flag is populated by the NPI-IP provider in accordance with the NPI specifications; however,
+because the
 .B NPI-IP
-provider does not support receipt verification, this flag is unused and is
-never set by the NPI-IP provider.
+provider does not support receipt verification, this flag is unused and is never set by the NPI-IP
+provider.
 .RE
 .RE
 .TP
 .BR N_DATACK_REQ "(7), " N_DATACK_IND (7)
 The
 .B NPI-IP
-provider does not support receipt confirmation because it is not provided by
-the underlying
+provider does not support receipt confirmation because it is not provided by the underlying
 .B IP
 protocol.
 .TP
-.BR N_RESET_REQ "(7), " N_RESET_IND "(7), " N_RESET_RES "(7), " N_RESET_CON (7)
-The
-.B NPI-IP
-provider does not support connection reset because it is not provided by the
-underlying
-.B IP
-protocol.
+.BR N_RESET_REQ (7)
+This primitive is interpreted by the NPI-IP provider in accordance with the NPI specification,
+.[
+NPI Revision 2.0.0
+.]
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_RESET_REQ
+specifying the reset request primitive.
+.TP
+.I RESET_reason
+.RE
+.TP
+.BR N_RESET_RES (7)
+This primitive is interpreted by the NPI-IP provider in accordance with the NPI specification,
+.[
+NPI Revision 2.0.0
+.]
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_RESET_RES
+specifying the reset response primitive.
+.RE
+.TP
+.BR N_RESET_CON (7)
+This primitive is issued by the NPI-IP provider in accordance with the NPI specification,
+.[
+NPI Revision 2.0.0
+.]
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_RESET_CON
+indicating the reset confirmation primitive.
+.RE
+.TP
+.BR N_RESET_IND (7)
+This primitive is issued by the NPI-IP provider in accordance with the NPI specification,
+.[
+NPI Revision 2.0.0
+.]
+.RS
+.PP
+Fields of the primitive are interpreted as follows:
+.TP
+.I PRIM_type
+Always
+.B N_RESET_CON
+indicating the reset indication primitive.
 .TP
 .I RESET_orig
 .RS
-.TP
+.TP \w'N_PROVIDER\(em'u
 .B N_PROVIDER
+The origin of the reset is the NS provider.
+.PD 0
 .TP
 .B N_USER
+The origin of the reset is the peer NS user.
 .TP
 .B N_UNDEFINED
+The origin of the reset is unknown.
+.PD
 .RE
 .TP
 .I RESET_reason
@@ -1275,10 +1711,12 @@ is
 .BR N_PROVIDER ,
 the following reasons apply:
 .RS
-.TP
+.TP \w'N_RESET_UNSPECIFIED\(em'u
 .B N_CONGESTION
+.PD 0
 .TP
 .B N_RESET_UNSPECIFIED
+.PD
 .RE
 .PP
 When
@@ -1301,14 +1739,17 @@ the following reasons apply:
 .B N_REASON_UNDEFINED
 .RE
 .RE
+.RE
 .\"
 .\"
 .SS Connection-Oriented Connection Termination
 .PP
+The connection release primitives are interpreted as follows:
+.PP
 .TP
 .BR N_DISCON_REQ (7)
-Disconnect requests result in the abortive relase of the psuedo-connection.
-The primitive is acknowledge in accordance with NPI specifications.
+Disconnect requests result in the abortive release of the pseudo-connection.  The primitive is
+acknowledge in accordance with NPI specifications.
 .RS
 .TP
 .IR DISCON_reason
@@ -1322,17 +1763,20 @@ message block of the memory extent containing the responding address(es).
 .RE
 .TP
 .BR N_DISCON_IND (7)
-Because the NPI-IP provider is only a pseudo-connection-oriented provider,
-disconnect indications are not issued by the provider.
+Because the NPI-IP provider is only a pseudo-connection-oriented provider, disconnect indications
+are not issued by the provider.
+.RS
 .TP
 .I DISCON_orig
 .RS
-.TP
+.TP \w'N_PROVIDER\(em'u
 .B N_PROVIDER
+.PD 0
 .TP
 .B N_USER
 .TP
 .B N_UNDEFINED
+.PD
 .RE
 .TP
 .I DISCON_reason
@@ -1396,6 +1840,7 @@ the following reasons apply:
 .B N_REASON_UNDEFINED
 .RE
 .RE
+.RE
 .\"
 .\"
 .SH IOCTLS
@@ -1407,7 +1852,6 @@ specification
 NPI Revision 2.0.0
 .]
 does not standardize on any input-output controls.
-
 .\"
 .\"
 .\".SH "ERROR HANDLING"
@@ -1425,28 +1869,31 @@ There are a number of purposes for this NPI-IP driver:
 The
 .I OpenSS7 Project
 has a need for a solution for providing a pseudo-device driver for RTP (Real-Time Transport
-Protocol).
+Protocol),
 .[
 rfc1889
 .]
-Because RTP runs over UDP (User Datagram Protocol), it is necessary to intercept packets
-ahead of Linux' native UDP at the IP level to avoid the inefficiencies of opening Sockets from
-inside the kernel.  This NPI-IP driver accomplishes that feat.  It also permits a single Stream to
-be opened but which communicates on many RTP channels.
+.BR rtp (4).
+Because RTP runs over UDP (User Datagram Protocol), it is necessary to intercept packets ahead of
+Linux' native UDP at the IP level to avoid the inefficiencies of opening Sockets from inside the
+kernel.  This NPI-IP driver accomplishes that feat.  It also permits a single Stream to be opened
+but which communicates on many RTP channels.
 .IP 2.
 The
 .I OpenSS7 Project
 has a need for a direct interface and interception (drop and insert) capabilities at the IP level
-for the purposes of testing both RTP (Real-Time Transport Protocol)
+for the purposes of testing both RTP (Real-Time Transport Protocol),
 .[
 rfc1889
 .]
-and SCTP (Stream Control Transmission Protocol).
+.BR rtp (4),
+and SCTP (Stream Control Transmission Protocol),
 .[
 rfc2960
 .]
-This need is less critical because of the availability of Ferry-Clip
-testing, using STREAMS-based pipes, that can be rigged to RTP and SCTP to acheive the same effect.
+.BR sctp (4).
+This need is less critical because of the availability of Ferry-Clip testing, using STREAMS-based
+pipes, that can be rigged to RTP and SCTP to achieve the same effect.
 .IP 3.
 Although historically the STREAMS SCTP driver hooks directly to the Linux native IP subsystem at the
 driver-kernel level, it might be of some advantage to make SCTP a pushable module that simply pushes

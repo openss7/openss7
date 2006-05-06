@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/18 09:42:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/06 10:22:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/18 09:42:10 $ by $Author: brian $
+# Last Modified $Date: 2006/05/06 10:22:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.16  2006/05/06 10:22:21  brian
+# - added test suite for NPI-IP driver
+#
 # Revision 0.9.2.15  2006/03/18 09:42:10  brian
 # - added in ip driver and manual pages
 #
@@ -294,7 +297,8 @@ man_MANS = \
 	man7/soon.7 \
 	man8/ldlconfig.8 \
 	man8/ldltest.8 \
-	man8/strxns_mknod.8
+	man8/strxns_mknod.8 \
+	man8/test-ip.8
 
 dist_noinst_MANS = \
 	man4/XNS.4.man \
@@ -522,7 +526,8 @@ dist_noinst_MANS = \
 	man7/soon.7.man \
 	man8/ldlconfig.8.man \
 	man8/ldltest.8.man \
-	man8/strxns_mknod.8.man
+	man8/strxns_mknod.8.man \
+	man8/test-ip.8.man
 
 ## PKG_BUILD_INDEP
 endif

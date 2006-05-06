@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/05/05 02:07:52 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/05/06 10:22:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/05 02:07:52 $ by $Author: brian $
+ Last Modified $Date: 2006/05/06 10:22:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.28  2006/05/06 10:22:29  brian
+ - added test suite for NPI-IP driver
+
  Revision 0.9.2.27  2006/05/05 02:07:52  brian
  - working up NPI-IP driver
 
@@ -134,10 +137,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/05/05 02:07:52 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/05/06 10:22:29 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/05/05 02:07:52 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/05/06 10:22:29 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -190,7 +193,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/05/05 02:07:52 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/05/06 10:22:29 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -1216,9 +1219,36 @@ npi_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_lengt
 	return (NPI_error);
 }
 
+/**
+ * npi_reset_loc - perform a local reset
+ * @np: Stream private structure
+ * @RESET_orig: origin of reset
+ * @RESET_reason: reason for reset
+ * @dp: ICMP message payload
+ *
+ * When completing a local reset, it is necessary to send an ICMP message to the peer.  The attached
+ * M_DATA message blocks contain the ICMP message payload.  The @RESET_reason parameter contains the
+ * reset reason that translates to an ICMP error code.  The destination for the reset on a
+ * multi-homed connection is the current default destination.
+ */
 STATIC int
-npi_reset(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
-	  np_ulong RESET_orig, np_ulong RESET_reason)
+npi_reset_loc(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
+{
+	fixme(("Write this function.\n"));
+	return (-EFAULT);
+}
+
+/**
+ * npi_reset_rem - perform a remote reset
+ * @np: Stream private structure
+ * @RESET_orig: origin of reset
+ * @RESET_reason: reason for reset
+ *
+ * When completing a remote reset, it is necessary to dequeue and free the earliest outstanding
+ * reset indication.
+ */
+STATIC int
+npi_reset_rem(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason)
 {
 	fixme(("Write this function.\n"));
 	return (-EFAULT);
@@ -1375,34 +1405,6 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 			np->qos.saddr = QOS_buffer->n_qos_sel_conn.saddr;
 		if (QOS_buffer->n_qos_sel_conn.daddr != QOS_UNKNOWN)
 			np->qos.daddr = QOS_buffer->n_qos_sel_conn.daddr;
-		break;
-	case N_QOS_SEL_RESET_IP:
-		if (!(np->info.SERV_type & N_CONS))
-			return (NBADQOSTYPE);
-		if (QOS_buffer->n_qos_sel_reset.ttl != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_reset.ttl < np->qor.ttl.ttl_min_value)
-				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_reset.ttl > np->qor.ttl.ttl_max_value)
-				return (NBADQOSPARAM);
-		}
-		if (QOS_buffer->n_qos_sel_reset.tos != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_reset.tos < np->qor.tos.tos_min_value)
-				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_reset.tos > np->qor.tos.tos_max_value)
-				return (NBADQOSPARAM);
-		}
-		if (QOS_buffer->n_qos_sel_reset.mtu != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_reset.mtu < np->qor.mtu.mtu_min_value)
-				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_reset.mtu > np->qor.mtu.mtu_max_value)
-				return (NBADQOSPARAM);
-		}
-		if (QOS_buffer->n_qos_sel_reset.ttl != QOS_UNKNOWN)
-			np->qos.ttl = QOS_buffer->n_qos_sel_reset.ttl;
-		if (QOS_buffer->n_qos_sel_reset.tos != QOS_UNKNOWN)
-			np->qos.tos = QOS_buffer->n_qos_sel_reset.tos;
-		if (QOS_buffer->n_qos_sel_reset.mtu != QOS_UNKNOWN)
-			np->qos.mtu = QOS_buffer->n_qos_sel_reset.mtu;
 		break;
 	case N_QOS_SEL_UD_IP:
 		if (!(np->info.SERV_type & N_CLNS))
@@ -1596,9 +1598,12 @@ npi_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	   list could be determined from the scope of the destination addresses and the available
 	   interfaces and their addresses.  However, for the moment it is probably easier to simply 
 	   allow wildcard source addresses and let the user specify any address when there is a
-	   wildcard source address. */
+	   wildcard source address.  Port number is a different situation: either the Stream is
+	   bound to the port number in the received connection indication, or it was bound to a
+	   wildcard port number.  In either case, the local port number for the connection is the
+	   port number to which the connection indication was sent. */
 
-	TOKEN_value->sport = TOKEN_value->bport;
+	TOKEN_value->sport = uh->dest;
 	TOKEN_value->snum = TOKEN_value->bnum;
 	for (i = 0; i < TOKEN_value->bnum; i++)
 		TOKEN_value->saddrs[i].addr = TOKEN_value->baddrs[i].addr;
@@ -1766,85 +1771,23 @@ npi_ip_queue_xmit(struct sk_buff *skb)
 #endif
 
 /**
- * npi_unitdata_req - process a unit data request
- * @q: write queue
- * @DEST_buffer: destintation address (or NULL)
- * @QOS_buffer: quality of service parameters (or NULL)
- * @mp: message
- *
- * Note that if @DEST_buffer is %NULL, then the message @mp starts with the IP header.  If
- * @DEST_buffer is non-NULL, then the message @mp starts with the transport header.
+ * npi_senddata - process a unit data request
+ * @np: Stream private structure
+ * @protocol: IP protocol number for packet
+ * @daddr: destination address
+ * @mp: message payload
  */
 STATIC INLINE fastcall __hot_put int
-npi_unitdata_req(queue_t *q, struct sockaddr_in *DEST_buffer, struct N_qos_sel_ud_ip *QOS_buffer,
-		 mblk_t *mp)
+npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 {
-	struct np *np = NP_PRIV(q);
 	struct rtable *rt = NULL;
-	struct iphdr *iph;
 
-	int protocol = np->qos.protocol;
-	int priority = np->qos.priority;
-	int tos = np->qos.tos;
-	int ttl = np->qos.ttl;
-	uint32_t saddr = np->qos.saddr;
-	uint32_t daddr = np->qos.daddr;
-
-	size_t ilen;
-
-	if (!DEST_buffer) {
-		/* no destination, packet includes IP header */
-		iph = (struct iphdr *) mp->b_rptr;
-		protocol = iph->protocol;
-		priority = mp->b_band;
-		tos = iph->tos;
-		ttl = iph->ttl;
-		saddr = iph->saddr;
-		if (saddr == 0)
-			saddr = np->qos.saddr;
-		daddr = iph->daddr;
-		if (daddr == 0)
-			daddr = np->qos.daddr;
-		if (iph->ihl < 5)
-			iph->ihl = 5;
-		ilen = (iph->ihl << 2);
-	} else if (QOS_buffer) {
-		/* if QOS provided, use values from QOS structure */
-		if (QOS_buffer->protocol != QOS_UNKNOWN)
-			protocol = QOS_buffer->protocol;
-		if (QOS_buffer->priority != QOS_UNKNOWN)
-			priority = QOS_buffer->priority;
-		if (QOS_buffer->tos != QOS_UNKNOWN)
-			tos = QOS_buffer->tos;
-		if (QOS_buffer->ttl != QOS_UNKNOWN)
-			ttl = QOS_buffer->ttl;
-		if (QOS_buffer->saddr != QOS_UNKNOWN)
-			saddr = QOS_buffer->saddr;
-		if (saddr == 0)
-			saddr = np->qos.saddr;
-		daddr = DEST_buffer->sin_addr.s_addr;
-		if (daddr == 0)
-			daddr = np->qos.daddr;
-		ilen = 0;
-	} else {
-		protocol = np->qos.protocol;
-		priority = np->qos.priority;
-		tos = np->qos.tos;
-		ttl = np->qos.ttl;
-		saddr = np->qos.saddr;
-		daddr = DEST_buffer->sin_addr.s_addr;
-		if (daddr == 0)
-			daddr = np->qos.daddr;
-		ilen = 0;
-	}
-
-	if (!ip_route_output(&rt, daddr, saddr, 0, 0)) {
+	if (!ip_route_output(&rt, daddr, np->qos.saddr, 0, 0)) {
 		struct sk_buff *skb;
 		struct net_device *dev = rt->u.dst.dev;
 		size_t hlen = (dev->hard_header_len + 15) & ~15;
-		size_t plen = msgdsize(mp) - ilen;
-		size_t xlen = ilen ? ilen : sizeof(struct iphdr);
-		size_t tlen = plen + xlen;
+		size_t plen = msgdsize(mp);
+		size_t tlen = plen + sizeof(struct iphdr);
 
 		usual(hlen);
 		usual(plen);
@@ -1857,20 +1800,15 @@ npi_unitdata_req(queue_t *q, struct sockaddr_in *DEST_buffer, struct N_qos_sel_u
 			skb_reserve(skb, hlen);
 			/* find headers */
 			iph = (typeof(iph)) __skb_put(skb, tlen);
-			data = (unsigned char *) iph + xlen;
+			data = (unsigned char *) iph + sizeof(struct iphdr);
 			skb->dst = &rt->u.dst;
-			skb->priority = priority;
-			if (ilen) {
-				/* copy and consume np header (with options) if it was provided */
-				bcopy(mp->b_rptr, iph, ilen);
-				mp->b_rptr += ilen;
-			}
+			skb->priority = np->qos.priority;
 			iph->version = 4;
 			iph->ihl = 5;
-			iph->tos = tos;
-			iph->ttl = ttl;
+			iph->tos = np->qos.tos;
+			iph->ttl = np->qos.ttl;
 			iph->daddr = rt->rt_dst;
-			iph->saddr = saddr ? saddr : rt->rt_src;
+			iph->saddr = np->qos.saddr ? np->qos.saddr : rt->rt_src;
 			iph->protocol = protocol;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
@@ -1911,35 +1849,8 @@ npi_unitdata_req(queue_t *q, struct sockaddr_in *DEST_buffer, struct N_qos_sel_u
 	return (QR_DONE);
 }
 
-STATIC INLINE fastcall __hot_put int
-npi_data_req(queue_t *q, mblk_t *mp)
-{
-	/* FIXME: this is really a connection-oriented send.  It is not necessary to reroute each
-	   time that we send to a destination: we have cached a route to each destination.  We only
-	   need to check if the route is obsolete and send on it.  This is somewhat different from
-	   the connectionless send which has no cached route.  Nevetheless, for the moment we
-	   reroute each packet.  Because we have cached the route, these per-packet lookups should
-	   be fast anyway.  */
-
-	return npi_unitdata_req(q, NULL, NULL, mp);
-}
-
 STATIC INLINE fastcall int
-npi_exdata_req(queue_t *q, mblk_t *mp)
-{
-	/* FIXME: this is really a connection-oriented send.  It is not necessary to reroute each
-	   time that we send to a destination: we have cached a route to each destination.  We only
-	   need to check if the route is obsolete and send on it.  This is somewhat different from
-	   the connectionless send which has no cached route.  Nevetheless, for the moment we
-	   reroute each packet.  Because we have cached the route, these per-packet lookups should
-	   be fast anyway.  */
-
-	/* not supported */
-	return (-EOPNOTSUPP);
-}
-
-STATIC INLINE fastcall int
-npi_datack_req(queue_t *q)
+npi_datack(queue_t *q)
 {
 	/* not supported */
 	return (-EOPNOTSUPP);
@@ -2023,42 +1934,27 @@ ne_info_ack(queue_t *q)
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_INFO_ACK;
-	p->NSDU_size = 65535;
-	p->ENSDU_size = 0;
-	p->CDATA_size = 65535;
-	p->DDATA_size = 65535;
-	p->ADDR_size = sizeof(struct sockaddr_storage);
+	p->NSDU_size = np->info.NSDU_size;
+	p->ENSDU_size = np->info.ENSDU_size;
+	p->CDATA_size = np->info.CDATA_size;
+	p->DDATA_size = np->info.DDATA_size;
+	p->ADDR_size = np->info.ADDR_size;
 	p->ADDR_length = ADDR_length;
 	p->ADDR_offset = ADDR_length ? sizeof(*p) : 0;
-	/* QOS_length: In the connection-mode environment, when this primitive is invoked before
-	   the NC is established on the stream, the values returned specify the default values
-	   supported by the NS provider.  When this primitive is invoked after a NC has been
-	   established on the stream, the values returned indicated negotiated values for the QOS
-	   parameters.  In the connection-less environment, these values represent the default or
-	   the selected QOS parameter values.  In case a QOS parameter is not supported by the NS
-	   Provider, a value of QOS_UNKNOWN will be returned.  In the case where no QOS parameters
-	   are supported by the NS provider, this field will be zero. */
 	p->QOS_length = QOS_length;
 	p->QOS_offset = QOS_length ? sizeof(*p) + ADDR_length : 0;
-	/* QOS_range_length: These ranges are used by the NS user to select QOS parameter values
-	   that are valid with the NS provider.  QOS parameter values are selected, or the default
-	   values altered via the N_OPTMGMT_REQ primitive.  In the connection-mode environment, the 
-	   values for end-to-end QOS parameter may be specified with the N_CONN primitives for
-	   negotiation. If the NS provider does not support a certain QOS parameter, its value will 
-	   be set to QOS_UNKNOWN.  In the case where no QOS parameters are supported by the NS
-	   provider, the length of this field will be zero. */
 	p->QOS_range_length = QOS_range_length;
 	p->QOS_range_offset = QOS_range_length ? sizeof(*p) + ADDR_length + QOS_length : 0;
-	p->OPTIONS_flags = 0;
-	p->NIDU_size = 65535;
+	p->OPTIONS_flags = np->info.OPTIONS_flags;
+	p->NIDU_size = np->info.NIDU_size;
 	p->SERV_type = np->info.SERV_type ? np->info.SERV_type : (N_CONS | N_CLNS);
 	p->CURRENT_state = npi_get_state(np);
-	p->PROVIDER_type = N_SNICFP;
-	p->NODU_size = np->qos.mtu ? : 536;
+	p->PROVIDER_type = np->info.PROVIDER_type;
+	p->NODU_size = 536;
 	p->PROTOID_length = PROTOID_length;
 	p->PROTOID_offset =
 	    PROTOID_length ? sizeof(*p) + ADDR_length + QOS_length + QOS_range_length : 0;
-	p->NPI_version = N_VERSION_2;
+	p->NPI_version = np->info.NPI_version;
 	if (ADDR_length) {
 		for (i = 0; i < np->snum; i++) {
 			ADDR_buffer = (struct sockaddr_in *) mp->b_wptr++;
@@ -2316,7 +2212,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		}
 		break;
 	case NS_WACK_RRES:
-		NPI_error = npi_reset(np, ADDR_buffer, ADDR_length, N_USER, N_REASON_UNDEFINED);
+		NPI_error = npi_reset_rem(np, N_USER, N_REASON_UNDEFINED);
 		if (unlikely(NPI_error != 0))
 			goto error;
 		npi_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
@@ -2425,46 +2321,29 @@ ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 /**
  * ne_reset_con: - generate a N_RESET_CON message
  * @q: active queue in queue pair (write queue)
+ * @RESET_orig: origin of the reset
+ * @RESET_reason: reason for the reset
  * @dp: message containing IP packet
+ *
+ * An N_RESET_CON message is sent only when the reset completes successfully.
  */
 STATIC INLINE fastcall int
-ne_reset_con(queue_t *q, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
-	     np_ulong RESET_orig, np_ulong RESET_reason)
+ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 {
 	struct np *np = NP_PRIV(q);
 	mblk_t *mp = NULL;
 	N_reset_con_t *p;
-	struct N_qos_sel_reset_ip *QOS_buffer;
-	const size_t QOS_length = sizeof(*QOS_buffer);
-	size_t size = sizeof(*p) + DEST_length + QOS_length;
+	size_t size = sizeof(*p);
 	np_long NPI_error;
-
-	npi_set_state(np, NS_WCON_RREQ);
 
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto nobufs;
-	NPI_error = npi_reset(np, DEST_buffer, DEST_length, RESET_orig, RESET_reason);
-	if (unlikely(NPI_error != 0))
+	if (unlikely((NPI_error = npi_reset_loc(np, RESET_orig, RESET_reason, dp)) != 0))
 		goto free_error;
 
 	mp->b_datap->db_type = M_PROTO;
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_RESET_CON;
-	p->DEST_length = DEST_length;
-	p->DEST_offset = DEST_length ? sizeof(*p) : 0;
-	p->QOS_length = QOS_length;
-	p->QOS_offset = QOS_length ? sizeof(*p) + DEST_length : 0;
-	if (DEST_length) {
-		bcopy(DEST_buffer, mp->b_wptr, DEST_length);
-		mp->b_wptr += DEST_length;
-	}
-	if (QOS_length) {
-		QOS_buffer = (typeof(QOS_buffer)) mp->b_wptr++;
-		QOS_buffer->n_qos_type = N_QOS_SEL_RESET_IP;
-		QOS_buffer->ttl = np->qos.ttl;
-		QOS_buffer->tos = np->qos.tos;
-		QOS_buffer->mtu = np->qos.mtu;
-	}
 	npi_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 	qreply(q, mp);
 	return (QR_DONE);
@@ -3124,14 +3003,9 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	struct np *np = NP_PRIV(q);
 	mblk_t *mp, *bp;
 	N_reset_ind_t *p;
-	struct sockaddr_in *DEST_buffer;
-	struct N_qos_sel_reset_ip *QOS_buffer;
-	const size_t DEST_length = sizeof(*DEST_buffer);
-	const size_t QOS_length = sizeof(*QOS_buffer);
-	const size_t size = sizeof(*p) + DEST_length + QOS_length;
+	const size_t size = sizeof(*p);
 	struct iphdr *iph = (struct iphdr *) dp->b_rptr;
 	struct icmphdr *icmp = (struct icmphdr *) (dp->b_rptr + (iph->ihl << 2));
-	ulong mtu = 0;
 
 	assure(dp->b_wptr >= dp->b_rptr + sizeof(*iph));
 	assure(dp->b_wptr >= dp->b_rptr + (iph->ihl << 2));
@@ -3167,7 +3041,23 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 			p->RESET_reason = N_UD_ROUTE_UNAVAIL;
 			break;
 		case ICMP_FRAG_NEEDED:
-			mtu = icmp->un.frag.mtu;
+			/* If the reason was fragmentation needed, then we sent a packet that was
+			   too large and so we might need to adjust down our NSDU_size as well as
+			   the np->qos.mtu that is being reported for the Stream.  When the user
+			   receives this error, it is their responsibility to check sizes again
+			   with N_INFO_REQ. */
+			if (np->qos.mtu > icmp->un.frag.mtu)
+				np->qos.mtu = icmp->un.frag.mtu;
+			if (np->info.NIDU_size + sizeof(struct iphdr) > np->qos.mtu)
+				np->info.NIDU_size = np->qos.mtu - sizeof(struct iphdr);
+			if (np->info.NSDU_size + sizeof(struct iphdr) > np->qos.mtu)
+				np->info.NSDU_size = np->qos.mtu - sizeof(struct iphdr);
+			if (np->info.ENSDU_size + sizeof(struct iphdr) > np->qos.mtu)
+				np->info.ENSDU_size = np->qos.mtu - sizeof(struct iphdr);
+			if (np->info.CDATA_size + sizeof(struct iphdr) > np->qos.mtu)
+				np->info.CDATA_size = np->qos.mtu - sizeof(struct iphdr);
+			if (np->info.DDATA_size + sizeof(struct iphdr) > np->qos.mtu)
+				np->info.DDATA_size = np->qos.mtu - sizeof(struct iphdr);
 			p->RESET_reason = N_UD_SEG_REQUIRED;
 			break;
 		case ICMP_NET_UNKNOWN:
@@ -3212,26 +3102,6 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	default:
 		p->RESET_reason = N_UD_UNDEFINED;
 		break;
-	}
-	p->DEST_length = DEST_length;
-	p->DEST_offset = DEST_length ? sizeof(*p) : 0;
-	p->QOS_length = QOS_length;
-	p->QOS_offset = QOS_length ? sizeof(*p) + DEST_length : 0;
-	if (DEST_length) {
-		DEST_buffer = (typeof(DEST_buffer)) mp->b_wptr++;
-		DEST_buffer->sin_family = AF_INET;
-		DEST_buffer->sin_port = iph->protocol;
-		DEST_buffer->sin_addr.s_addr = iph->saddr;
-	}
-	if (QOS_length) {
-		QOS_buffer = (typeof(QOS_buffer)) mp->b_wptr++;
-		QOS_buffer->n_qos_type = N_QOS_SEL_RESET_IP;
-		QOS_buffer->ttl = iph->ttl;
-		QOS_buffer->tos = iph->tos;
-		if (icmp->type == ICMP_DEST_UNREACH && icmp->code == ICMP_FRAG_NEEDED)
-			QOS_buffer->mtu = icmp->un.frag.mtu;
-		else
-			QOS_buffer->mtu = 0;
 	}
 	/* save original in reset indication list */
 	dp->b_next = np->resq;
@@ -3290,7 +3160,19 @@ ne_datack_ind(queue_t *q)
 STATIC int
 ne_info_req(queue_t *q, mblk_t *mp)
 {
+	N_info_req_t *p;
+	np_long NPI_error;
+
+	NPI_error = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	NPI_error = -EFAULT;
+	if (unlikely(p->PRIM_type != N_INFO_REQ))
+		goto error;
 	return ne_info_ack(q);
+      error:
+	return (NPI_error);
 }
 
 /**
@@ -3499,10 +3381,6 @@ ne_optmgmt_req(queue_t *q, mblk_t *mp)
 			if (p->QOS_length != sizeof(QOS_buffer->n_qos_sel_conn))
 				goto error;
 			break;
-		case N_QOS_SEL_RESET_IP:
-			if (p->QOS_length != sizeof(QOS_buffer->n_qos_sel_reset))
-				goto error;
-			break;
 		case N_QOS_SEL_UD_IP:
 			if (p->QOS_length != sizeof(QOS_buffer->n_qos_sel_ud))
 				goto error;
@@ -3529,38 +3407,23 @@ ne_optmgmt_req(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (write queue)
  * @mp: N_UNITDATA_REQ message
  *
- * N_UNITDATA_REQ does not have a qos parameter, nor source address field, only a destination
- * address field.  We use three different approaches to specifying pertinent information for the
- * packet:
- *
- * 1. If DEST_length is non-zero, it specifies a destination address.  If RESERVED_field[0] is zero,
- *    no QOS parameters are specified.  In this case, the tos, ttl, saddr, etc., come from the NPI
- *    IP stream.  The transport header starts with the attached M_DATA blocks.
- *
- * 2. If DEST_length is non-zero, it specifies a destination address.  If RESERVED_field[0] is also
- *    non-zero, QOS parameters are specified, in which case tos, ttl, saddr, etc., come from the QOS
- *    structure.  The transport header starts with the attached M_DATA_blocks.
- *
- * 3. If DEST_length is zero, it indicates that the IP header has been included in the data payload.
- *    Destination address, source address and QOS parameters come from the included IP header.  If
- *    the included IP header is only partially complete, the NPI-IP provider will complete the
- *    uncompleted fields.  The network header starts with the attached M_DATA blocks.
- *
- * The NPI-IP provider will request that the Stream head provide an additional write offset of 20
- * bytes to accomodate the IP header.
- *
- * Approach number (1) is recommended because it follows the NPI interface strictly.
+ * The destination address, DEST_length and DEST_offset, must be specified.  The port number is not
+ * significant: the attached M_DATA blocks begin with the transport header which will include any
+ * port numbers as required.  The IP header information for the transmitted packet can be set with a
+ * N_QOS_SEL_UD_IP structure to T_OPTMGMT_REQ and will be taken from the Stream private structure
+ * for all packets sent.  The NPI-IP provider will request that the Stream head provide an
+ * additional write offset of 20 bytes to accomodate the IP header.
  */
 STATIC INLINE fastcall __hot_put int
 ne_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
-	size_t mlen, hlen = sizeof(struct iphdr);
+	size_t mlen;
 	N_unitdata_req_t *p;
-	struct sockaddr_in dst_buf, *DEST_buffer = NULL;
-	struct N_qos_sel_ud_ip qos_buf, *QOS_buffer = NULL;
+	struct sockaddr_in dst_buf, *DEST_buffer = &dst_buf;
 	np_long NPI_error;
-	int i;
+	mblk_t *dp = mp->b_cont;
+	uint32_t daddr;
 
 	NPI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -3578,100 +3441,33 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(npi_not_state(np, NSF_IDLE)))
 		goto error;
 	NPI_error = NBADDATA;
-	if (unlikely(mp->b_cont == NULL))
+	if (unlikely(dp == NULL))
+		goto error;
+	if (unlikely((mlen = msgdsize(dp)) <= 0 || mlen > 65535 - sizeof(struct iphdr)))
 		goto error;
 	/* Note: no destination address is our clue that the upper layer had already included the
 	   IP header in the IP packet. */
-	if (p->DEST_length) {
-		NPI_error = NBADADDR;
-		if (unlikely(mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length))
-			goto error;
-		if (unlikely(p->DEST_length != sizeof(struct sockaddr_in)))
-			goto error;
-		/* avoid alignemnt problems */
-		DEST_buffer = &dst_buf;
-		bcopy(mp->b_rptr + p->DEST_offset, DEST_buffer, p->DEST_length);
-		if (unlikely(DEST_buffer->sin_family != AF_INET))
-			goto error;
-		if (unlikely(DEST_buffer->sin_port == 0))	/* this is really the IP protocol */
-			goto error;
-		if (unlikely(DEST_buffer->sin_addr.s_addr == INADDR_ANY))
-			goto error;
-		hlen = 0;
-	}
-#define QOS_length RESERVED_field[0]
-#define QOS_offset RESERVED_field[1]
-	/* Note: the reserved field can be used to send QOS data for the datagram. */
-	/* Actually, the proper way to do this is to set the appropriate values using
-	   N_QOS_SEL_UD_IP to N_OPTMGMT_REQ(7) and then sending the data. */
-	if (p->QOS_length) {
-		NPI_error = NBADOPT;
-		if (unlikely(mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length))
-			goto error;
-		if (unlikely(p->QOS_length < sizeof(QOS_buffer->n_qos_type)))
-			goto error;
-		QOS_buffer = &qos_buf;
-		bcopy(mp->b_rptr + p->QOS_offset, QOS_buffer, sizeof(QOS_buffer->n_qos_type));
-		NPI_error = NBADQOSTYPE;
-		if (unlikely(QOS_buffer->n_qos_type != N_QOS_SEL_UD_IP))
-			goto error;
-		if (unlikely(p->QOS_length != sizeof(*QOS_buffer)))
-			goto error;
-		/* avoid alignment problems */
-		bcopy(mp->b_rptr + p->QOS_offset, QOS_buffer, sizeof(*QOS_buffer));
-		NPI_error = NBADQOSPARAM;
-		/* check qos parameter values */
-		/* protocol must be one of the bound protocol ids */
-		if (QOS_buffer->protocol != QOS_UNKNOWN) {
-			for (i = 0; i < np->pnum; i++)
-				if (np->protoids[i] == QOS_buffer->protocol)
-					break;
-			if (i >= np->pnum)
-				goto error;
-		}
-		if (QOS_buffer->priority != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->priority < np->qor.priority.priority_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->priority > np->qor.priority.priority_max_value)
-				goto error;
-		}
-		if (QOS_buffer->ttl != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->ttl < np->qor.ttl.ttl_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->ttl > np->qor.ttl.ttl_max_value)
-				goto error;
-		}
-		if (QOS_buffer->tos != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->tos < np->qor.tos.tos_min_value)
-				goto error;
-			if ((np_long) QOS_buffer->tos > np->qor.tos.tos_max_value)
-				goto error;
-		}
-		/* source address should be one of the specified source addresses */
-		if (QOS_buffer->saddr != QOS_UNKNOWN) {
-			if (QOS_buffer->saddr != 0) {
-				for (i = 0; i < np->snum; i++) {
-					if (np->saddrs[i].addr == INADDR_ANY)
-						break;
-					if (np->saddrs[i].addr == QOS_buffer->saddr)
-						break;
-				}
-				if (i >= np->snum)
-					goto error;
-			}
-		}
-	}
-#undef QOS_length
-#undef QOS_offset
-	NPI_error = NBADDATA;
-	if (unlikely((mlen = msgdsize(mp->b_cont)) + hlen <= sizeof(struct iphdr)
-		     || mlen + hlen > 65535))
+	NPI_error = NNOADDR;
+	if (unlikely(p->DEST_length == 0))
 		goto error;
-	if (unlikely((NPI_error = npi_unitdata_req(q, DEST_buffer, QOS_buffer, mp->b_cont)) < 0))
+	NPI_error = NBADADDR;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length))
+		goto error;
+	if (unlikely(p->DEST_length != sizeof(struct sockaddr_in)))
+		goto error;
+	/* avoid alignment problems */
+	bcopy(mp->b_rptr + p->DEST_offset, DEST_buffer, p->DEST_length);
+	if (unlikely(DEST_buffer->sin_family != AF_INET))
+		goto error;
+	if (unlikely(DEST_buffer->sin_port == 0))	/* this is really the IP protocol */
+		goto error;
+	if (unlikely((daddr = DEST_buffer->sin_addr.s_addr) == INADDR_ANY))
+		goto error;
+	if (unlikely((NPI_error = npi_senddata(np, np->qos.protocol, daddr, dp)) < 0))
 		goto error;
 	return (QR_DONE);
       error:
-	return ne_uderror_reply(q, DEST_buffer, sizeof(*DEST_buffer), 0, NPI_error, mp->b_cont);
+	return ne_uderror_reply(q, DEST_buffer, sizeof(*DEST_buffer), 0, NPI_error, dp);
 }
 
 /**
@@ -4013,9 +3809,10 @@ ne_write_req(queue_t *q, mblk_t *mp)
 	   Stream is bound to a port, at least the size of a UDP header.  The length of the entire
 	   NSDU must not exceed 65535 bytes. */
 	NPI_error = NBADDATA;
-	if (unlikely((dlen = msgsize(mp)) < 20 || dlen > 65535))
+	if (unlikely((dlen = msgsize(mp)) == 0
+		     || dlen > np->info.NIDU_size || dlen > np->info.NSDU_size))
 		goto error;
-	if (unlikely((NPI_error = npi_data_req(q, mp)) < 0))
+	if (unlikely((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, mp)) < 0))
 		goto error;
       discard:
 	return (QR_DONE);
@@ -4029,14 +3826,8 @@ ne_write_req(queue_t *q, mblk_t *mp)
  * @mp: the N_DATA_REQ message
  *
  * Unfortunately, there is no standard way of specifying destination and source addreses for
- * multihomed hosts.  We could use N_OPTMGMT_REQ to change the primary destination address, source
- * address and QOS parameters.  We could define a non-standard DATA_xfer_flags to indicate that the
- * IP header is included in the attached M_DATA blocks.  Or, we could accept N_UNITDATA_REQ
- * primitives even though we are in N_CONS mode.
- *
- * TODO: We should check the MORE_DATA flag and see whether this is a complete NSDU or not.  If not,
- * we should accumulate the M_DATA block in a buffer waiting for a final N_DATA_REQ or delimited
- * message.
+ * multihomed hosts.  We use N_OPTMGMT_REQ to change the primary destination address, source address
+ * and QOS parameters.
  */
 STATIC INLINE fastcall __hot_put int
 ne_data_req(queue_t *q, mblk_t *mp)
@@ -4064,23 +3855,25 @@ ne_data_req(queue_t *q, mblk_t *mp)
 	   receives the N_DATA_REQ primitive, then the NS provider should discard the request
 	   without generating a fatal error. */
 	if (npi_chk_state(np, (NSF_IDLE | NSF_WRES_RIND)))
+		/* For multihomed operation, we should not actually discard the N_DATA_REQ if the
+		   destination of the request is an address that does not have an outstanding reset
+		   indication. */
 		goto discard;
-	/* For multihomed operation, we should not actually discard the N_DATA_REQ if the
-	   destination of the request is an address that does not have an outstanding reset
-	   indication. */
 	NPI_error = NOUTSTATE;
 	if (unlikely(npi_not_state(np, NSM_OUTDATA)))
 		goto error;
 	NPI_error = NBADFLAG;
 	if (unlikely(p->DATA_xfer_flags & (N_MORE_DATA_FLAG | N_RC_FLAG)))
+		/* TODO: We should check the N_MORE_DATA_FLAG and see whether this is a complete
+		   NSDU or not.  If not, we should accumulate the M_DATA block in a buffer waiting
+		   for a final N_DATA_REQ or delimited message.  */
 		goto error;
-	/* If there is no dst we must include the IP header, which is at least 20 bytes, and, if
-	   the Stream is bound to a port, at least the size of a UDP header.  The length of the
-	   entire NSDU must not exceed 65535 bytes. */
 	NPI_error = NBADDATA;
-	if (unlikely(!(dp = mp->b_cont) || (dlen = msgsize(dp)) < 20 || dlen > 65535))
+	if (unlikely(!(dp = mp->b_cont) || (dlen = msgsize(dp)) == 0
+		     || dlen > np->info.NIDU_size || dlen > np->info.NSDU_size))
 		goto error;
-	if (unlikely((NPI_error = npi_data_req(q, mp->b_cont)) < 0))
+	if (unlikely
+	    ((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
 		goto error;
 	return (QR_STRIP);
       discard:
@@ -4099,6 +3892,7 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 	N_exdata_req_t *p;
+	size_t dlen;
 	mblk_t *dp;
 	np_long NPI_error;
 
@@ -4123,9 +3917,11 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(npi_not_state(np, NSM_OUTDATA)))
 		goto error;
 	NPI_error = NBADDATA;
-	if (unlikely(!(dp = mp->b_cont) || dp->b_wptr < dp->b_rptr + 1))
+	if (unlikely(!(dp = mp->b_cont) || (dlen = msgsize(dp)) == 0
+		     || dlen > np->info.NIDU_size || dlen > np->info.ENSDU_size))
 		goto error;
-	if (unlikely((NPI_error = npi_exdata_req(q, mp->b_cont)) < 0))
+	if (unlikely
+	    ((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
 		goto error;
 	return (QR_STRIP);
       discard:
@@ -4171,7 +3967,7 @@ ne_datack_req(queue_t *q, mblk_t *mp)
 	   generating a fatal error. */
 	if (unlikely(np->datinds <= 0))
 		goto error;
-	if (unlikely((NPI_error = npi_datack_req(q)) < 0))
+	if (unlikely((NPI_error = npi_datack(q)) < 0))
 		goto error;
       discard:
 	return (QR_DONE);
@@ -4189,8 +3985,6 @@ ne_reset_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 	N_reset_req_t *p;
-	struct sockaddr_in *DEST_buffer = NULL;
-	np_ulong DEST_length;
 	np_long NPI_error;
 
 	NPI_error = -EINVAL;
@@ -4215,21 +4009,11 @@ ne_reset_req(queue_t *q, mblk_t *mp)
 	NPI_error = NOUTSTATE;
 	if (unlikely(npi_get_state(np) != NS_DATA_XFER))
 		goto error;
-	if ((DEST_length = p->DEST_length) != 0) {
-		NPI_error = NBADADDR;
-		if (unlikely(mp->b_wptr < mp->b_rptr + p->DEST_offset + DEST_length))
-			goto error;
-		if (unlikely(DEST_length != sizeof(*DEST_buffer)))
-			goto error;
-		DEST_buffer = (struct sockaddr_in *) (mp->b_rptr + p->DEST_offset);
-		if (unlikely(DEST_buffer->sin_family != AF_INET))
-			goto error;
-	}
 	/* Ok, message checks out. */
 	npi_set_state(np, NS_WCON_RREQ);
-	if ((NPI_error = ne_reset_con(q, DEST_buffer, DEST_length, N_USER, p->RESET_reason)) < 0)
+	if ((NPI_error = ne_reset_con(q, N_USER, p->RESET_reason, mp->b_cont)) != 0)
 		goto error;
-	return (NPI_error);
+	return (QR_STRIP);
       error:
 	return ne_error_ack(q, N_RESET_REQ, NPI_error);
 
@@ -4250,11 +4034,7 @@ ne_reset_res(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 	N_reset_res_t *p;
-	struct sockaddr_in dst_buf, *DEST_buffer = &dst_buf;
-	struct np_daddr *da;
-	mblk_t **bpp, **dpp = NULL;
 	np_long NPI_error;
-	int i;
 
 	NPI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -4271,40 +4051,9 @@ ne_reset_res(queue_t *q, mblk_t *mp)
 		goto error;
 	if (unlikely(npi_not_state(np, NSF_WRES_RIND)))
 		goto error;
-	NPI_error = NNOADDR;
-	if (unlikely(p->DEST_length == 0))
-		goto error;
-	NPI_error = NBADADDR;
-	if (unlikely(mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length))
-		goto error;
-	if (unlikely(p->DEST_length != sizeof(*DEST_buffer)))
-		goto error;
-	/* address might not be aligned */
-	bcopy(mp->b_rptr + p->DEST_offset, DEST_buffer, p->DEST_length);
-	if (unlikely(DEST_buffer->sin_family != AF_INET))
-		goto error;
-	NPI_error = NNOADDR;
-	if (unlikely(DEST_buffer->sin_addr.s_addr == INADDR_ANY))
-		goto error;
-	/* find pointer to pointer to oldest matching reset indication */
-	for (bpp = &np->resq; *(bpp); bpp = &(*bpp)->b_next) {
-		struct iphdr *iph = (struct iphdr *) (*bpp)->b_rptr;
-
-		if (np->qos.protocol == iph->protocol && DEST_buffer->sin_addr.s_addr == iph->saddr)
-			dpp = bpp;
-	}
-	NPI_error = NBADADDR;
-	if (!dpp)
-		goto error;
-	/* find pointer to corresponding destination routing information */
-	for (i = 0, da = np->daddrs; i < np->dnum; i++, da++)
-		if (da->addr == DEST_buffer->sin_addr.s_addr)
-			break;
-	if (i >= np->dnum)
-		goto error;
 	/* Ok, parameters check out. */
 	npi_set_state(np, NS_WACK_RRES);
-	return ne_ok_ack(q, N_RESET_RES, DEST_buffer, sizeof(*DEST_buffer), NULL, NULL, NULL, 0);
+	return ne_ok_ack(q, N_RESET_RES, NULL, 0, NULL, NULL, NULL, 0);
       error:
 	return ne_error_ack(q, N_RESET_RES, NPI_error);
 }
@@ -5074,10 +4823,10 @@ npi_alloc_priv(queue_t *q, struct np **slp, int type, dev_t *devp, cred_t *crp)
 		np->i_oldstate = (1);	// LMI_UNUSABLE;
 		/* np specific members */
 		np->info.PRIM_type = N_INFO_ACK;
-		np->info.NSDU_size = 65535;
+		np->info.NSDU_size = 65535 - sizeof(struct iphdr);
 		np->info.ENSDU_size = 0;
-		np->info.CDATA_size = 65535;
-		np->info.DDATA_size = 65535;
+		np->info.CDATA_size = 65535 - sizeof(struct iphdr);
+		np->info.DDATA_size = 65535 - sizeof(struct iphdr);
 		np->info.ADDR_size = sizeof(struct sockaddr_storage);
 		np->info.ADDR_length = 0;
 		np->info.ADDR_offset = 0;

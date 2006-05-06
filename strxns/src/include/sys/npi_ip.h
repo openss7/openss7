@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_ip.h,v 0.9.2.6 2006/05/05 02:07:54 brian Exp $
+ @(#) $Id: npi_ip.h,v 0.9.2.7 2006/05/06 10:22:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/05 02:07:54 $ by $Author: brian $
+ Last Modified $Date: 2006/05/06 10:22:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_ip.h,v $
+ Revision 0.9.2.7  2006/05/06 10:22:34  brian
+ - added test suite for NPI-IP driver
+
  Revision 0.9.2.6  2006/05/05 02:07:54  brian
  - working up NPI-IP driver
 
@@ -72,7 +75,7 @@
 #ifndef SYS_NPI_IP_H
 #define SYS_NPI_IP_H
 
-#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/npi.h>
 
@@ -82,8 +85,7 @@
 #define N_QOS_SEL_INFO_IP	0x0201
 #define N_QOS_RANGE_INFO_IP	0x0202
 #define N_QOS_SEL_CONN_IP	0x0203
-#define N_QOS_SEL_RESET_IP	0x0204
-#define N_QOS_SEL_UD_IP		0x0205
+#define N_QOS_SEL_UD_IP		0x0204
 
 typedef struct N_qos_sel_info_ip {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_INFO_IP */
@@ -106,13 +108,6 @@ typedef struct N_qos_sel_conn_ip {
 	np_ulong saddr;			/* default srce IP address for outgoing packets */
 	np_ulong daddr;			/* default dest IP address for outgoing packets */
 } N_qos_sel_conn_ip_t;
-
-typedef struct N_qos_sel_reset_ip {
-	np_ulong n_qos_type;		/* always N_QOS_SEL_RESET_IP */
-	np_ulong ttl;			/* time-to-liver for connection */
-	np_ulong tos;			/* type-of-service for connection */
-	np_ulong mtu;			/* maximum-transfer-unit for connection */
-} N_qos_sel_reset_ip_t;
 
 typedef struct N_qos_sel_ud_ip {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_UD_IP */
@@ -155,87 +150,27 @@ union N_qos_ip_types {
 	np_ulong n_qos_type;
 	struct N_qos_sel_info_ip n_qos_sel_info;
 	struct N_qos_sel_conn_ip n_qos_sel_conn;
-	struct N_qos_sel_reset_ip n_qos_sel_reset;
 	struct N_qos_sel_ud_ip n_qos_sel_ud;
 	struct N_qos_range_info_ip n_qos_range_info;
 };
 
-/* 
-   NC reset request
- */
-typedef struct {
-	np_ulong PRIM_type;		/* always N_RESET_REQ */
-	np_ulong RESET_reason;		/* reason for reset */
-	/* extensions */
-	np_ulong DEST_length;		/* destination address length */
-	np_ulong DEST_offset;		/* destination address offset */
-} N_reset_req_ip_t;
-#define N_reset_req_t N_reset_req_ip_t
+/* TOS values, logical OR of one from each group below */
 
-/* 
-   NC reset indication
- */
-typedef struct {
-	np_ulong PRIM_type;		/* always N_RESET_IND */
-	np_ulong RESET_orig;		/* reset originator */
-	np_ulong RESET_reason;		/* reason for reset */
-	/* extensions */
-	np_ulong DEST_length;		/* destination address length */
-	np_ulong DEST_offset;		/* destination address offset */
-	np_ulong QOS_length;		/* length of QOS parameter values */
-	np_ulong QOS_offset;		/* offset of QOS parameter values */
-} N_reset_ind_ip_t;
-#define N_reset_ind_t N_reset_ind_ip_t
+/* TOS precedence */
+#define N_ROUTINE		0x00
+#define N_PRIORITY		0x20
+#define N_IMMEDIATE		0x40
+#define N_FLASH			0x60
+#define N_OVERRIDEFLASH		0x80
+#define N_CRITIC_ECP		0xa0
+#define N_INETCONTROL		0xc0
+#define N_NETCONTROL		0xe0
 
-/* 
-   NC reset response
- */
-typedef struct {
-	np_ulong PRIM_type;		/* always N_RESET_RES */
-	/* extensions */
-	np_ulong DEST_length;		/* destination address length */
-	np_ulong DEST_offset;		/* destination address offset */
-} N_reset_res_ip_t;
-#define N_reset_res_t N_reset_res_ip_t
-
-/* 
-   NC reset confirmed
- */
-typedef struct {
-	np_ulong PRIM_type;		/* always N_RESET_CON */
-	/* extensions */
-	np_ulong DEST_length;		/* destination address length */
-	np_ulong DEST_offset;		/* destination address offset */
-	np_ulong QOS_length;		/* length of QOS parameter values */
-	np_ulong QOS_offset;		/* offset of QOS parameter values */
-} N_reset_con_ip_t;
-#define N_reset_con_t N_reset_con_ip_t
-
-/*
- *  For errors we have:
- *  ICMP_SOURCE_QUENCH:
- *  ICMP_DEST_UNREACH:
- *    ICMP_NET_UNREACH
- *    ICMP_HOST_UNREACH
- *    ICMP_PROT_UNREACH
- *    ICMP_PORT_UNREACH
- *    ICMP_FRAG_NEEDED
- *    ICMP_SR_FAILED
- *    ICMP_NET_UNKNOWN
- *    ICMP_HOST_UNKNOWN
- *    ICMP_HOST_ISOLATED
- *    ICMP_NET_ANO
- *    ICMP_HOST_ANO
- *    ICMP_NET_UNR_TOS
- *    ICMP_HOST_UNR_TOS
- *    ICMP_PKT_FILTERED
- *    ICMP_PREC_VIOLATION
- *    ICMP_PREC_CUTOFF
- *  ICMP_PARAMETERPROB:
- *  ICMP_TIME_EXCEEDED:
- *    ICMP_EXC_TTL
- *    ICMP_EXC_FRAGTIME
- */
-
+/* TOS type of service */
+#define N_NOTOS			0
+#define N_LDELAY		(1<<4)
+#define N_HITHRPT		(1<<3)
+#define N_HIREL			(1<<2)
+#define N_LOCOST		(1<<1)
 
 #endif				/* SYS_NPI_IP_H */

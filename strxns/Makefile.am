@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/21 13:24:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/05/06 10:22:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:24:44 $ by $Author: brian $
+# Last Modified $Date: 2006/05/06 10:22:16 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.45  2006/05/06 10:22:16  brian
+# - added test suite for NPI-IP driver
+#
 # Revision 0.9.2.44  2006/03/21 13:24:44  brian
 # - included pr.am
 #
@@ -96,10 +99,12 @@ if RPM_BUILD_USER
 EXTRA_PROGRAMS			+= \
 				  ldltest \
 				  ldlconfig \
+				  test-ip \
 				  @PACKAGE_TARNAME@_mknod
 
 pkglibexec_PROGRAMS		= \
-				  ldltest
+				  ldltest \
+				  test-ip
 
 
 sbin_PROGRAMS			= \
@@ -123,6 +128,12 @@ ldltest_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
 ldltest_LDFLAGS			= -static
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
+
+test_ip_SOURCES			= src/test/test-ip.c
+test_ip_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+test_ip_LDFLAGS			= -static
+test_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_ip_CFLAGS			= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif
@@ -178,10 +189,12 @@ if RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
 				  ldltest \
-				  ldlconfig
+				  ldlconfig \
+				  test-ip
 
 pkglibexec_PROGRAMS		= \
-				  ldltest
+				  ldltest \
+				  test-ip
 
 
 sbin_PROGRAMS			= \
@@ -205,6 +218,12 @@ ldltest_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
 ldltest_LDFLAGS			= -static
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
+
+test_ip_SOURCES			= src/test/test-ip.c
+test_ip_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+test_ip_LDFLAGS			= -static
+test_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_ip_CFLAGS			= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif
