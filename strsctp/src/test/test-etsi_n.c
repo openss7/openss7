@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 07:24:58 $
+ @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/07 07:24:58 $
 
  -----------------------------------------------------------------------------
 
@@ -63,8 +63,8 @@
 
  -----------------------------------------------------------------------------
 
- $Log: test-etsi_t.c,v $
- Revision 0.9.2.3  2006/05/07 07:24:58  brian
+ $Log: test-etsi_n.c,v $
+ Revision 0.9.2.1  2006/05/07 07:24:58  brian
  - updates for testing
 
  Revision 0.9.2.2  2006/03/27 01:25:51  brian
@@ -81,9 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 07:24:58 $"
+#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/07 07:24:58 $"
 
-static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 07:24:58 $";
+static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/07 07:24:58 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the

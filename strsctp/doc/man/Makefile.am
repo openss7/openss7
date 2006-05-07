@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/06 11:38:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/07 07:24:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:54 $ by $Author: brian $
+# Last Modified $Date: 2006/05/07 07:24:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2006/05/07 07:24:56  brian
+# - updates for testing
+#
 # Revision 0.9.2.12  2006/03/06 11:38:54  brian
 # - updated headers
 #
@@ -70,7 +73,9 @@ man_MANS = \
 	man8/test-sctp_n.8 \
 	man8/test-sctp_nc.8 \
 	man8/test-sctp_ns.8 \
-	man8/test-sctp_t.8
+	man8/test-sctp_t.8 \
+	man8/test-etsi_n.8 \
+	man8/test-etsi_t.8
 
 if WITH_OPENSS7_SCTP
 ## WITH_OPENSS7_SCTP
@@ -99,8 +104,9 @@ dist_noinst_MANS = \
 	man8/test-sctp_n.8.man \
 	man8/test-sctp_nc.8.man \
 	man8/test-sctp_ns.8.man \
-	man8/test-sctp_t.8.man
-
+	man8/test-sctp_t.8.man \
+	man8/test-etsi_n.8.man \
+	man8/test-etsi_t.8.man
 ## PKG_BUILD_INDEP
 endif
 

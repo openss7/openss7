@@ -1,3 +1,14 @@
+2006-05-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added ETSI test suite programs
+	* doc/man/Makefile.am: updating manual pages
+	* doc/man/man8/test-etsi_n.8.man: added ETSI test suite programs
+	* doc/man/man8/test-etsi_t.8.man: added ETSI test suite programs
+	* doc/man/man8/test-sctp_n.8.man: updating manual pages
+	* doc/man/man8/test-sctp_t.8.man: updating manual pages
+	* src/test/test-etsi_n.c: added ETSI test suite programs
+	* src/test/test-etsi_t.c: added ETSI test suite programs
+
 2006-05-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-sctp_n.c: rationalized to test-ip

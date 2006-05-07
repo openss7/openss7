@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/03/21 13:24:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/05/07 07:24:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:24:42 $ by $Author: brian $
+# Last Modified $Date: 2006/05/07 07:24:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.45  2006/05/07 07:24:55  brian
+# - updates for testing
+#
 # Revision 0.9.2.44  2006/03/21 13:24:42  brian
 # - included pr.am
 #
@@ -95,14 +98,18 @@ EXTRA_PROGRAMS			+= \
 				  test-sctp_n \
 				  test-sctp_nc \
 				  test-sctp_ns \
-				  test-sctp_t
+				  test-sctp_t \
+				  test-etsi_n \
+				  test-etsi_t
 
 pkglibexec_PROGRAMS		= \
 				  test-sctp \
 				  test-sctp_n \
 				  test-sctp_nc \
 				  test-sctp_ns \
-				  test-sctp_t
+				  test-sctp_t \
+				  test-etsi_n \
+				  test-etsi_t
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
@@ -142,6 +149,18 @@ test_sctp_t_LDADD		= $(STREAMS_LDADD)
 test_sctp_t_LDFLAGS		= -static
 test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
+
+test_etsi_n_SOURCES		= src/test/test-etsi_n.c
+test_etsi_n_LDADD		= $(STREAMS_LDADD)
+test_etsi_n_LDFLAGS		= -static
+test_etsi_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_etsi_n_CFLAGS		= $(USER_CFLAGS)
+
+test_etsi_t_SOURCES		= src/test/test-etsi_t.c
+test_etsi_t_LDADD		= $(STREAMS_LDADD)
+test_etsi_t_LDFLAGS		= -static
+test_etsi_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_etsi_t_CFLAGS		= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif
@@ -268,14 +287,18 @@ EXTRA_PROGRAMS			+= \
 				  test-sctp_n \
 				  test-sctp_nc \
 				  test-sctp_ns \
-				  test-sctp_t
+				  test-sctp_t \
+				  test-etsi_n \
+				  test-etsi_t
 
 pkglibexec_PROGRAMS		= \
 				  test-sctp \
 				  test-sctp_n \
 				  test-sctp_nc \
 				  test-sctp_ns \
-				  test-sctp_t
+				  test-sctp_t \
+				  test-etsi_n \
+				  test-etsi_t
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
@@ -315,6 +338,18 @@ test_sctp_t_LDADD		= $(STREAMS_LDADD)
 test_sctp_t_LDFLAGS		= -static
 test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
+
+test_etsi_n_SOURCES		= src/test/test-etsi_n.c
+test_etsi_n_LDADD		= $(STREAMS_LDADD)
+test_etsi_n_LDFLAGS		= -static
+test_etsi_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_etsi_n_CFLAGS		= $(USER_CFLAGS)
+
+test_etsi_t_SOURCES		= src/test/test-etsi_t.c
+test_etsi_t_LDADD		= $(STREAMS_LDADD)
+test_etsi_t_LDFLAGS		= -static
+test_etsi_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_etsi_t_CFLAGS		= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif
