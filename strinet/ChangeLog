@@ -1,3 +1,27 @@
+2006-05-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/strconf-sh: added module id base to strconf
+	* m4/strconf.m4: added module id base to strconf
+	* am/strconf.am: added module id base to strconf
+	* acinclude.m4: added module id base to strconf
+
+	* strinet.spec.in: updated headers, corrected init script removal
+	* src/util/init/README: updated headers
+	* src/util/init/strinet: updated headers
+	* src/util/init/strinet.sh: updated headers
+	* src/util/modutils/strinet.in: updated headers
+	* src/util/sysconfig/README: updated headers
+	* src/util/sysconfig/strinet: updated headers
+	* src/util/sysconfig/strinet.conf: updated headers
+
+2006-05-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: added tcp2 manual page
+	* doc/man/man4/tcp2.4.man: additional manual pages for new tcp driver
+	* src/drivers/tcp.c: strapped out missing cksum_generate()
+	* src/drivers/udp.c: strapped out missing cksum_generate()
+	* acinclude.m4: changed major base offset
+
 2006-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/rawip.c: changes for compile

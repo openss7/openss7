@@ -1,6 +1,38 @@
+2006-05-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/strconf-sh: added module id base to strconf
+	* m4/strconf.m4: added module id base to strconf
+	* am/strconf.am: added module id base to strconf
+	* acinclude.m4: added module id base to strconf
+	* Makefile.am: added init scripts for XNS
+	* src/util/init/README: added init scripts for XNS
+	* src/util/init/strxns: added init scripts for XNS
+	* src/util/init/strxns.sh: added init scripts for XNS
+	* src/util/modutils/strxns.in: added init scripts for XNS
+	* src/util/sysconfig/README: added init scripts for XNS
+	* src/util/sysconfig/strxns: added init scripts for XNS
+	* src/util/sysconfig/strxns.conf: added init scripts for XNS
+	* strxns.spec.in: added np_ip module, corrected init script removal
+	* NEWS: updates
+	* README: updates
+	* src/modules/ip_strm_mod.c: added two debug statements
+
 2006-05-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/Makefile.am: shifted over to np_ip for NPI-IP
+	* doc/man/man4/ipcl.4.man: shifted over to np_ip for NPI-IP
+	* doc/man/man4/ipco.4.man: shifted over to np_ip for NPI-IP
+	* doc/man/man4/np_ip.4.man: shifted over to np_ip for NPI-IP
+	* doc/man/man4/npi_ip.4.man: shifted over to np_ip for NPI-IP
+	* doc/man/man8/test-np_ip.8.man: shifted over to np_ip for NPI-IP
+	* src/drivers/ip.c: shifted over to np_ip for NPI-IP
+	* src/drivers/lis.conf: shifted over to np_ip for NPI-IP
+	* src/drivers/np_ip.c: shifted over to np_ip for NPI-IP
 	* src/test/test-ip.c: working up test program
+	* src/test/test-np_ip.c: shifted over to np_ip for NPI-IP
+	* tests/Makefile.am: shifted over to np_ip for NPI-IP
+	* tests/testsuite-np_ip.at: shifted over to np_ip for NPI-IP
+	* acinclude.m4: changed major base offset
 
 2006-05-06  Brian Bidulock  <bidulock@openss7.org>
 

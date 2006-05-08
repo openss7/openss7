@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/06 10:22:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/07 22:12:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/06 10:22:21 $ by $Author: brian $
+# Last Modified $Date: 2006/05/07 22:12:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.17  2006/05/07 22:12:54  brian
+# - updated for NPI-IP driver
+#
 # Revision 0.9.2.16  2006/05/06 10:22:21  brian
 # - added test suite for NPI-IP driver
 #
@@ -73,7 +76,9 @@ MANS_UNUSED = \
 
 man_MANS = \
 	man4/XNS.4 \
-	man4/ip.4 \
+	man4/ipcl.4 \
+	man4/ipco.4 \
+	man4/np_ip.4 \
 	man4/ip2xinet.4 \
 	man4/ip_strms.4 \
 	man4/ip_strm_mod.4 \
@@ -298,11 +303,15 @@ man_MANS = \
 	man8/ldlconfig.8 \
 	man8/ldltest.8 \
 	man8/strxns_mknod.8 \
-	man8/test-ip.8
+	man8/test-np_ip.8
+#	man4/ip.4
+#	man8/test-ip.8
 
 dist_noinst_MANS = \
 	man4/XNS.4.man \
-	man4/ip.4.man \
+	man4/ipcl.4.man \
+	man4/ipco.4.man \
+	man4/np_ip.4.man \
 	man4/ip2xinet.4.man \
 	man4/ip_strms.4.man \
 	man4/ip_strm_mod.4.man \
@@ -527,7 +536,9 @@ dist_noinst_MANS = \
 	man8/ldlconfig.8.man \
 	man8/ldltest.8.man \
 	man8/strxns_mknod.8.man \
-	man8/test-ip.8.man
+	man8/test-np_ip.8.man
+#	man4/ip.4.man
+#	man8/test-ip.8.man
 
 ## PKG_BUILD_INDEP
 endif

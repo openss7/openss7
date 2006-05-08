@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/05/06 10:22:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/05/08 03:36:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/06 10:22:16 $ by $Author: brian $
+# Last Modified $Date: 2006/05/08 03:36:49 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.47  2006/05/08 03:36:49  brian
+# - added init scripts
+#
+# Revision 0.9.2.46  2006/05/07 22:12:53  brian
+# - updated for NPI-IP driver
+#
 # Revision 0.9.2.45  2006/05/06 10:22:16  brian
 # - added test suite for NPI-IP driver
 #
@@ -99,12 +105,14 @@ if RPM_BUILD_USER
 EXTRA_PROGRAMS			+= \
 				  ldltest \
 				  ldlconfig \
-				  test-ip \
+				  test-np_ip \
 				  @PACKAGE_TARNAME@_mknod
+#				  test-ip
 
 pkglibexec_PROGRAMS		= \
 				  ldltest \
-				  test-ip
+				  test-np_ip
+#				  test-ip
 
 
 sbin_PROGRAMS			= \
@@ -129,11 +137,17 @@ ldltest_LDFLAGS			= -static
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
 
-test_ip_SOURCES			= src/test/test-ip.c
-test_ip_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
-test_ip_LDFLAGS			= -static
-test_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_ip_CFLAGS			= $(USER_CFLAGS)
+#test_ip_SOURCES		= src/test/test-ip.c
+#test_ip_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+#test_ip_LDFLAGS		= -static
+#test_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+#test_ip_CFLAGS			= $(USER_CFLAGS)
+
+test_np_ip_SOURCES		= src/test/test-np_ip.c
+test_np_ip_LDADD		= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+test_np_ip_LDFLAGS		= -static
+test_np_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_np_ip_CFLAGS		= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif
@@ -163,8 +177,9 @@ libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/drivers/ip_to_dlpi.c \
 				  src/drivers/ldl.c \
-				  src/drivers/ip.c \
+				  src/drivers/np_ip.c \
 				  src/drivers/ip_hooks.h
+#				  src/drivers/ip.c
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
@@ -190,11 +205,13 @@ if RPM_BUILD_USER
 EXTRA_PROGRAMS			+= \
 				  ldltest \
 				  ldlconfig \
-				  test-ip
+				  test-np_ip
+#				  test-ip
 
 pkglibexec_PROGRAMS		= \
 				  ldltest \
-				  test-ip
+				  test-np_ip
+#				  test-ip
 
 
 sbin_PROGRAMS			= \
@@ -219,11 +236,17 @@ ldltest_LDFLAGS			= -static
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
 
-test_ip_SOURCES			= src/test/test-ip.c
-test_ip_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
-test_ip_LDFLAGS			= -static
-test_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_ip_CFLAGS			= $(USER_CFLAGS)
+#test_ip_SOURCES		= src/test/test-ip.c
+#test_ip_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+#test_ip_LDFLAGS		= -static
+#test_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+#test_ip_CFLAGS			= $(USER_CFLAGS)
+
+test_np_ip_SOURCES		= src/test/test-np_ip.c
+test_np_ip_LDADD		= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+test_np_ip_LDFLAGS		= -static
+test_np_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_np_ip_CFLAGS		= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif
@@ -253,8 +276,9 @@ libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/drivers/ip_to_dlpi.c \
 				  src/drivers/ldl.c \
-				  src/drivers/ip.c \
+				  src/drivers/np_ip.c \
 				  src/drivers/ip_hooks.h
+#				  src/drivers/ip.c
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
@@ -365,20 +389,20 @@ if INSTALL_INITSCRIPTS
 if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@.sh
 
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		=
+dist_sysconf_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@.conf
 
-dist_config_DATA		=
+dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
 
 ## INSTALL_INITSCRIPTS
 endif

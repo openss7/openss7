@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/03 11:53:51 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:48 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/03 11:53:51 $ by $Author: brian $
+ Last Modified $Date: 2006/05/07 22:12:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.3  2006/05/07 22:12:48  brian
+ - updated for NPI-IP driver
+
  Revision 0.9.2.2  2006/05/03 11:53:51  brian
  - changes for compile, working up NPI-IP driver
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/03 11:53:51 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:48 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/03 11:53:51 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:48 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -137,7 +140,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/03 11:53:51 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:48 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -4382,7 +4385,11 @@ t_tpi_queue_xmit(struct sk_buff *skb)
 }
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
-uint32_t cksum_generate(struct tcphdr *th, size_t plen);	/* FIXME */
+uint32_t
+cksum_generate(struct tcphdr *th, size_t plen)
+{				/* FIXME */
+	return (0);
+}
 
 /**
  * t_tpi_xmitmsg - send a message from a Stream

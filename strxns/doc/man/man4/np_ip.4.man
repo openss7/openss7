@@ -1,0 +1,361 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: np_ip.4.man,v 0.9.2.1 2006/05/07 22:12:55 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/05/07 22:12:55 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: np_ip.4.man,v $
+.\" Revision 0.9.2.1  2006/05/07 22:12:55  brian
+.\" - updated for NPI-IP driver
+.\"
+.\" Revision 0.9.2.4  2006/04/26 00:52:35  brian
+.\" - sync
+.\"
+.\" Revision 0.9.2.3  2006/04/22 01:07:10  brian
+.\" - updating manual pages
+.\"
+.\" Revision 0.9.2.2  2006/04/05 09:44:52  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH IP 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B np_ip
+\- STREAMS Internet Protocol (IP) Driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.br
+.B #include <netinet/ip.h>
+.br
+.B #include <sys/npi.h>
+.br
+.B #include <sys/npi_ip.h>
+.HP 12
+.BI "int " ip_stream " = open(" ip_device ", " oflag );
+.PD 0
+.HP
+.BI "int " ip_xtistr " = t_open(" ip_device ", " oflag );
+.HP
+.BI "int " ip_socket " = socket(" \fRPF_INET ", " socket_type ", " \fRIPPROTO_IP );
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B NPI-IP
+driver provide an interface between
+.I STREAMS
+drivers and the Linux IP subsystem.  It presents an
+.BR npi (7)
+Netwwork Provider Interface 
+.[
+NPI Revision 2.0.0
+.]
+to
+.I STREAMS
+drivers and provides access to the native Linux IP subsystem.
+.PP
+.B NPI-IP
+is implemented as a
+.IR STREAMS (4)
+pseudo-device driver and provides the following devices:
+.TP
+.I /dev/np_ip
+This devices provides acess to the
+.B NPI-IP
+protocol service interface using the N-primitives of the Network Provider Interface,
+.[
+NPI Revision 2.0.0
+.]
+.BR npi (7),
+used for the Internet Protocol as described in
+.BR npi_ip (7).
+The
+.BR npi (7)
+interface provided on a stream opening this device is suitable for use with
+the
+.BR sockets (3)
+library and provides the
+.B NPI-IP
+interface using sockets as described in
+.BR npi_ip (7).
+This stream provides both connectionless and connection-oriented NPI services.
+.TP
+.I /dev/rawip
+This device provides access to the
+.B NPI-IP
+protocol service interface using the T-primitives of the Transport Provider
+Interface,
+.[
+TPI Revision 2.0.0
+.]
+.BR tpi (7),
+used for the Internet Protocol as described in
+.BR tpi_ip (7).
+The
+.BR tpi (7)
+interface provided on a stream opening this device is suitable for use with
+the
+.BR xnet (3)
+or
+.BR xti (3)
+library and proivdes the
+.B NPI-IP
+interface using XTI as described in
+.BR xti_ip (3).
+.PP
+.B NPI-IP
+provides one socket type for use by the
+.BR sockets (3)
+library
+.BR socket (7)
+calls.
+.B NPI-IP
+provides sockets in the protocol family
+.B PF_INET
+using the protocol number
+.BR IPPROTO_IP .
+The
+.I socket_type
+argument can be one of the following:
+.TP
+.B SOCK_RAW
+A standard
+.I SOCK_RAW
+socket that provides direct access to IP packets.  This socket uses the
+underlying
+.I /dev/rawip
+transport service provider.
+.\"
+.\"
+.SH USAGE
+.PP
+The following entries in
+.B /etc/protosw
+provides the information necessary for
+.BR socksys (4)
+to use these devices:
+.PP
+.nf
+\fC\s-1\
+PF_INET     SOCK_RAW      IPPROTO_IP    /dev/rawip   tpi   clts
+PF_INET     SOCK_RAW      IPPROTO_IP    /dev/np_ip   npi   clts
+\s+1\fP
+.fi
+.PP
+For additional information, see
+.BR socksys (4)
+and
+.BR protosw (5).
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of management IO controls using
+.BR ioctl (2)
+and
+.BR streamio (7)
+.I I_STR
+system calls on the
+.IR ip_stream ", " ip_xtistr " or " ip_socket .
+These management controls are described in
+.BR ip_ioctl (4).
+.\"
+.\"
+.SH NOTICES
+.PP
+.B NPI-IP
+has several implementations.  This manpage is for the
+.IR STREAMS (4)
+implementation.  There is also an
+.BR INET (4)
+implementation which provides
+.BR tpi (7)
+access to the Linux NET4 version of
+.BR NPI-IP .
+For more information, see
+.BR ip (7).
+.PP
+Note that using
+.BR sockets (3)
+over
+.I STREAMS
+for the
+.B NPI-IP
+driver might be rather inefficient: unless you need to push modules, use a
+direct Linux native socket instead.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The current
+.B NPI-IP
+pseudo-device driver hook directly into the Linux kernel IP subsystem.
+Previous approaches used a STREAMS over Sockets method that was inefficient
+and inflexible.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.BR <sys/socket.h> ,
+.BR <netinet/ip.h> ,
+.BR <sys/npi.h> ,
+.BR <sys/npi_ip.h> ,
+.BR <sys/tpi.h> ,
+.BR <sys/tpi_ip.h> ,
+.BR <sys/xti.h> ,
+.BR <sys/xti_ip.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/ip ,
+.IR /dev/rawip .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ioctl (2),
+.BR npi (7),
+.BR npi_ip (7),
+.BR protosw (5),
+.BR ip (7),
+.BR ip (8),
+.BR ip_ioctl (4),
+.BR socket (7),
+.BR sockets (3),
+.BR socksys (4),
+.BR streamio (7),
+.BR STREAMS (4),
+.BR tpi (7),
+.BR tpi_ip (7),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ip (3).
+.\"
+.\"
+.SH BUGS
+.B NPI-IP
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.I /dev/rawip
+device providing a Transport Provider Interface
+.[
+TPI Revision 2.0.0
+.]
+is roughly compatible with the raw ip TPI streams provided by
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and other
+.IR UNIX \(rg
+implementations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The TPI and NPI interfaces to IP services are implementation dependent and
+are not subject to standardization.
+.\"
+.\"
+.SH HISTORY
+.PP
+.I STREAMS
+access to IP services was originally performed using an STREAMS over Socket
+approach using the
+.BR INET (4)
+pseudo-device driver from the
+.I strinet
+package.  A more flexible direct implementation was performed using a separate
+driver that hooks directly into the Linux IP subsystem.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T4

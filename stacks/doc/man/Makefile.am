@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/15 07:21:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/05/07 22:12:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/15 07:21:30 $ by $Author: brian $
+# Last Modified $Date: 2006/05/07 22:12:43 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.30  2006/05/07 22:12:43  brian
+# - updated for NPI-IP driver
+#
 # Revision 0.9.2.29  2006/03/15 07:21:30  brian
 # - add unused man pages for public release
 #
@@ -832,7 +835,6 @@ ss7_man_MANS = \
 	man7/MX_optmgmt_req.7 \
 	man7/MX_OPTMGMT_REQ.7 \
 	man7/MX_optmgmt_req_t.7 \
-	man7/npi_ip.7 \
 	man7/npi_iso.7 \
 	man7/npi_mtp.7 \
 	man7/npi_q933.7 \
@@ -1380,6 +1382,7 @@ xns_man_MANS = \
 	man7/N_OPTMGMT_REQ.7 \
 	man7/N_optmgmt_req_t.7 \
 	man7/npi.7 \
+	man7/npi_ip.7 \
 	man7/N_RESET_CON.7 \
 	man7/N_reset_con_t.7 \
 	man7/N_RESET_IND.7 \
@@ -2260,7 +2263,6 @@ ss7_dist_noinst_MANS = \
 	man7/MX_optmgmt_req.7.man \
 	man7/MX_OPTMGMT_REQ.7.man \
 	man7/MX_optmgmt_req_t.7.man \
-	man7/npi_ip.7.man \
 	man7/npi_iso.7.man \
 	man7/npi_mtp.7.man \
 	man7/npi_q933.7.man \
@@ -2809,6 +2811,7 @@ xns_dist_noinst_MANS = \
 	man7/N_OPTMGMT_REQ.7.man \
 	man7/N_optmgmt_req_t.7.man \
 	man7/npi.7.man \
+	man7/npi_ip.7.man \
 	man7/N_RESET_CON.7.man \
 	man7/N_reset_con_t.7.man \
 	man7/N_RESET_IND.7.man \

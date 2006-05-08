@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/24 08:37:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/07 22:12:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/24 08:37:34 $ by $Author: brian $
+# Last Modified $Date: 2006/05/07 22:12:47 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.14  2006/05/07 22:12:47  brian
+# - updated for NPI-IP driver
+#
 # Revision 0.9.2.13  2006/03/24 08:37:34  brian
 # - added manpages for new udp and rawip drivers
 #
@@ -88,6 +91,7 @@ man_MANS = \
 	man4/rawip2.4 \
 	man4/rip.4 \
 	man4/tcp.4 \
+	man4/tcp2.4 \
 	man4/ticlts.4 \
 	man4/ticots.4 \
 	man4/ticots_ord.4 \
@@ -150,6 +154,7 @@ dist_noinst_MANS = \
 	man4/rip.4.man \
 	man4/sctp.4.man \
 	man4/tcp.4.man \
+	man4/tcp2.4.man \
 	man4/ticlts.4.man \
 	man4/ticots.4.man \
 	man4/ticots_ord.4.man \

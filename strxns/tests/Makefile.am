@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/06 10:22:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/07 22:13:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/06 10:22:38 $ by $Author: brian $
+# Last Modified $Date: 2006/05/07 22:13:00 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.14  2006/05/07 22:13:00  brian
+# - updated for NPI-IP driver
+#
 # Revision 0.9.2.13  2006/05/06 10:22:38  brian
 # - added test suite for NPI-IP driver
 #
@@ -86,7 +89,8 @@ include ../am/autotest.am
 TESTSUITE_DEPS		+= \
 			local.at \
 			kernel.at \
-			$(TESTSUITE)-ip.at \
+			$(TESTSUITE)-np_ip.at \
 			$(TESTSUITE).at
+#			$(TESTSUITE)-ip.at
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

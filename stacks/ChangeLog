@@ -1,3 +1,16 @@
+2006-05-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/strconf-sh: added module id base to strconf
+	* m4/strconf.m4: added module id base to strconf
+	* am/strconf.am: added module id base to strconf
+	* acinclude.m4: added module id base to strconf
+	* strss7.spec.in: updated headers, corrected init script removal
+	* src/util/modutils/strss7.in: updated headers
+
+2006-05-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: moved conflicting manual page
+
 2006-04-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/Makefile.am: added UNT lab project documentation

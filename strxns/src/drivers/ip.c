@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/05/06 10:22:29 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/05/07 22:12:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/06 10:22:29 $ by $Author: brian $
+ Last Modified $Date: 2006/05/07 22:12:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.29  2006/05/07 22:12:57  brian
+ - updated for NPI-IP driver
+
  Revision 0.9.2.28  2006/05/06 10:22:29  brian
  - added test suite for NPI-IP driver
 
@@ -137,10 +140,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/05/06 10:22:29 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/05/07 22:12:57 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/05/06 10:22:29 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/05/07 22:12:57 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -193,7 +196,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/05/06 10:22:29 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/05/07 22:12:57 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -212,10 +215,10 @@ MODULE_DESCRIPTION(IP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(IP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(IP_LICENSE);
-#endif
-#if defined MODULE_ALIAS
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-ip");
-#endif
+#endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -224,7 +227,7 @@ MODULE_ALIAS("streams-ip");
 #define IP_CMAJORS	CONFIG_STREAMS_IP_NMAJORS
 #define IP_CMAJOR_0	CONFIG_STREAMS_IP_MAJOR
 #define IP_UNITS	CONFIG_STREAMS_IP_NMINORS
-#endif
+#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
@@ -241,7 +244,6 @@ MODULE_ALIAS("char-major-" __stringify(IP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(IP_CMAJOR_0) "-0");
 MODULE_ALIAS("char-major-" __stringify(IP_CMAJOR_0) "-" __stringify(IP_CMINOR));
 MODULE_ALIAS("/dev/ip");
-MODULE_ALIAS("/dev/inet/ip");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 
@@ -264,7 +266,7 @@ MODULE_ALIAS("/dev/inet/ip");
 #define DRV_BANNER	IP_SPLASH
 #endif				/* MODULE */
 
-STATIC struct module_info ip_minfo = {
+STATIC struct module_info np_minfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
@@ -273,26 +275,33 @@ STATIC struct module_info ip_minfo = {
 	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
-STATIC streamscall int npi_qopen(queue_t *, dev_t *, int, int, cred_t *);
-STATIC streamscall int npi_qclose(queue_t *, int, cred_t *);
-
-STATIC struct qinit ip_rinit = {
-	.qi_putp = ss7_oput,		/* Read put (msg from below) */
-	.qi_srvp = ss7_osrv,		/* Read queue service */
-	.qi_qopen = npi_qopen,		/* Each open */
-	.qi_qclose = npi_qclose,	/* Last close */
-	.qi_minfo = &ip_minfo,		/* Information */
+STATIC struct module_stat np_mstat = {
 };
 
-STATIC struct qinit ip_winit = {
-	.qi_putp = ss7_iput,		/* Write put (msg from above) */
-	.qi_srvp = ss7_isrv,		/* Write queue service */
-	.qi_minfo = &ip_minfo,		/* Information */
+/* Upper multiplex is a N provider following the NPI. */
+
+STATIC streamscall int np_qopen(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int np_qclose(queue_t *, int, cred_t *);
+
+STATIC struct qinit np_rinit = {
+	.qi_putp = ss7_oput,		/* Read put procedure (message from below) */
+	.qi_srvp = ss7_osrv,		/* Read service procedure */
+	.qi_qopen = np_qopen,		/* Each open */
+	.qi_qclose = np_qclose,	/* Last close */
+	.qi_minfo = &np_minfo,		/* Module information */
+	.qi_mstat = &np_mstat,		/* Module statistics */
 };
 
-MODULE_STATIC struct streamtab ip_info = {
-	.st_rdinit = &ip_rinit,		/* Upper read queue */
-	.st_wrinit = &ip_winit,		/* Upper write queue */
+STATIC struct qinit np_winit = {
+	.qi_putp = ss7_iput,		/* Write put procedure (message from above) */
+	.qi_srvp = ss7_isrv,		/* Write service procedure */
+	.qi_minfo = &np_minfo,		/* Module information */
+	.qi_mstat = &np_mstat,		/* Module statistics */
+};
+
+MODULE_STATIC struct streamtab np_info = {
+	.st_rdinit = &np_rinit,		/* Upper read queue */
+	.st_wrinit = &np_winit,		/* Upper write queue */
 };
 
 /*
@@ -366,17 +375,17 @@ typedef int (*ip_rcv_fnc_t) (struct sk_buff *);
 /*
  *  Bind buckets, caches and hashes.
  */
-struct ip_bind_bucket {
-	struct ip_bind_bucket *next;	/* linkage of bind buckets for hash slot */
-	struct ip_bind_bucket **prev;	/* linkage of bind buckets for hash slot */
+struct np_bind_bucket {
+	struct np_bind_bucket *next;	/* linkage of bind buckets for hash slot */
+	struct np_bind_bucket **prev;	/* linkage of bind buckets for hash slot */
 	unsigned char proto;		/* IP protocol identifier */
 	unsigned short port;		/* port number (host order) */
 	struct np *owners;		/* list of owners of this protocol/port combination */
 	struct np *dflt;		/* default listeners/destinations for this protocol */
 };
-struct ip_conn_bucket {
-	struct ip_conn_bucket *next;	/* linkage of conn buckets for hash slot */
-	struct ip_conn_bucket **prev;	/* linkage of conn buckets for hash slot */
+struct np_conn_bucket {
+	struct np_conn_bucket *next;	/* linkage of conn buckets for hash slot */
+	struct np_conn_bucket **prev;	/* linkage of conn buckets for hash slot */
 	unsigned char proto;		/* IP protocol identifier */
 	unsigned short sport;		/* source port number (network order) */
 	unsigned short dport;		/* destination port number (network order) */
@@ -412,7 +421,7 @@ npi_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 	return ((npi_chash_size - 1) & (proto + sport + dport));
 }
 
-rwlock_t ip_hash_lock = RW_LOCK_UNLOCKED;
+rwlock_t np_hash_lock = RW_LOCK_UNLOCKED;
 
 #ifdef LINUX
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
@@ -424,15 +433,15 @@ struct inet_protocol {
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTCCOL */
 #endif				/* LINUX */
 
-struct ip_prot_bucket {
+struct np_prot_bucket {
 	unsigned char proto;		/* protocol number */
 	int refs;			/* reference count */
 	int corefs;			/* N_CONS references */
 	int clrefs;			/* N_CLNS references */
 	struct inet_protocol prot;	/* Linux registration structure */
 };
-STATIC rwlock_t ip_prot_lock = RW_LOCK_UNLOCKED;
-STATIC struct ip_prot_bucket *ip_prots[256];
+STATIC rwlock_t np_prot_lock = RW_LOCK_UNLOCKED;
+STATIC struct np_prot_bucket *np_prots[256];
 
 STATIC kmem_cache_t *npi_bind_cachep;
 STATIC kmem_cache_t *npi_prot_cachep;
@@ -655,12 +664,12 @@ STATIC INLINE fastcall __hot_in int
 npi_v4_rcv_next(struct sk_buff *skb)
 {
 #ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
-	struct ip_prot_bucket *pb;
+	struct np_prot_bucket *pb;
 	struct net_protocol *pp;
 	unsigned char proto;
 
 	proto = skb->nh.iph->protocol;
-	if ((pb = ip_prots[proto]) && (pp = pb->prot.next)) {
+	if ((pb = np_prots[proto]) && (pp = pb->prot.next)) {
 		pp->handler(skb);
 		return (1);
 	}
@@ -668,12 +677,12 @@ npi_v4_rcv_next(struct sk_buff *skb)
 	return (0);
 #endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 #ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
-	struct ip_prot_bucket *pb;
+	struct np_prot_bucket *pb;
 	unsigned char proto;
 
 	proto = skb->nh.iph->protocol;
 	kfree_skb(skb);
-	if ((pb = ip_prots[proto]))
+	if ((pb = np_prots[proto]))
 		return (pb->prot.copy != 0);
 	return (0);
 #endif
@@ -693,12 +702,12 @@ STATIC INLINE fastcall __hot_in void
 npi_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 #ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
-	struct ip_prot_bucket *pb;
+	struct np_prot_bucket *pb;
 	struct net_protocol *pp;
 	unsigned char proto;
 
 	proto = ((struct iphdr *) skb->data)->protocol;
-	if ((pb = ip_prots[proto])
+	if ((pb = np_prots[proto])
 	    && (pp = pb->prot.next))
 		pp->err_handler(skb, info);
 #endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
@@ -729,15 +738,15 @@ STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PRO
  * the module after protocol override would break things horribly.  Taking the reference keeps the
  * module from unloading (this works for OpenSS7 SCTP as well as lksctp).
  */
-STATIC INLINE fastcall struct ip_prot_bucket *
+STATIC INLINE fastcall struct np_prot_bucket *
 npi_init_nproto(unsigned char proto, unsigned int type)
 {
-	struct ip_prot_bucket *pb;
+	struct np_prot_bucket *pb;
 	struct inet_protocol *pp;
 	int hash = proto & (MAX_INET_PROTOS - 1);
 
-	write_lock_bh(&ip_prot_lock);
-	if ((pb = ip_prots[proto]) != NULL) {
+	write_lock_bh(&np_prot_lock);
+	if ((pb = np_prots[proto]) != NULL) {
 		pb->refs++;
 		if (type & N_CONS)
 			++pb->corefs;
@@ -782,9 +791,9 @@ npi_init_nproto(unsigned char proto, unsigned int type)
 		synchronize_net();
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 		/* link into hash slot */
-		ip_prots[proto] = pb;
+		np_prots[proto] = pb;
 	}
-	write_unlock_bh(&ip_prot_lock);
+	write_unlock_bh(&np_prot_lock);
 	return (pb);
 }
 
@@ -806,10 +815,10 @@ npi_init_nproto(unsigned char proto, unsigned int type)
 STATIC INLINE fastcall void
 npi_term_nproto(unsigned char proto, unsigned int type)
 {
-	struct ip_prot_bucket *pb;
+	struct np_prot_bucket *pb;
 
-	write_lock_bh(&ip_prot_lock);
-	if ((pb = ip_prots[proto]) != NULL) {
+	write_lock_bh(&np_prot_lock);
+	if ((pb = np_prots[proto]) != NULL) {
 		if (type & N_CONS)
 			--pb->corefs;
 		if (type & N_CLNS)
@@ -830,11 +839,11 @@ npi_term_nproto(unsigned char proto, unsigned int type)
 #error
 #endif
 			/* unlink from hash slot */
-			ip_prots[proto] = NULL;
+			np_prots[proto] = NULL;
 			kmem_cache_free(npi_prot_cachep, pb);
 		}
 	}
-	write_unlock_bh(&ip_prot_lock);
+	write_unlock_bh(&np_prot_lock);
 }
 #endif				/* LINUX */
 
@@ -859,7 +868,7 @@ npi_term_nproto(unsigned char proto, unsigned int type)
 STATIC INLINE fastcall int
 npi_bind_prot(unsigned char proto, unsigned int type)
 {
-	struct ip_prot_bucket *pb;
+	struct np_prot_bucket *pb;
 
 	if ((pb = npi_init_nproto(proto, type)))
 		return (0);
@@ -1855,6 +1864,49 @@ npi_datack(queue_t *q)
 	/* not supported */
 	return (-EOPNOTSUPP);
 }
+
+/*
+ *  Addressing:
+ *
+ *  NSAPs (Protocol IDs) are IP protocol numbers.  NSAP addresses consist of a port number and a
+ *  list of IP addreses.  If the port number is zero, any port number is used.  Initially it is only
+ *  supporting IPv4.
+ *
+ *  There are two types of providers: connectionless and connection oriented.
+ *
+ *  - Connectionless providers will start delivering packets after the bind.
+ *
+ *  - When the NS provider is bound to multiple protocol ids, or bound or connected to multiple
+ *    addresses, data will be delivered as N_DATA_IND primitives that contain the protocol id index,
+ *    destination address index, and source addresses index in the DATA_xfer_flags as the highest
+ *    order byte, next highest order byte and so on.  An index of 0 indicates the first bound
+ *    protocol id, source address or destination address.  In this way, the high order 3 bytes of
+ *    the DATA_xfer_flags are coded all zeros in the non-multiple case.
+ *
+ *    The NS user is also permitted to send N_DATA_REQ primitives that contain the protocol id,
+ *    destination address, and source addresses, similarly encoded in the DATA_xfer_flags.  Invalid
+ *    indexes will error the stream.
+ *
+ *  - Connection oriented provider bound as listening will start delivering packets as connection
+ *    indications after the bind.  The user can either reject these with a disconnect request or can
+ *    accept them with a connection response, with a slight difference from normal NPI: the
+ *    responding address in the connection response is the list of peer addresses to which to
+ *    establish a connection connect rather than the local responding address.
+ *
+ *    If the connection is accepted on the listening stream, no further connection indications will
+ *    be delivered.  If accepted on another stream, further connection indications (belonging to
+ *    annother association) will be delivered.
+ *
+ *  - Connection oriented providers bound as non-listening will deliver packets only after a
+ *    successful connection establishment operation.  Connection establishment does not doe anything
+ *    except to provide a port and list of addresses from which the provider is to deliver packets.
+ *    This can be useful for RTP and for establishing endpoint communication with SCTP.
+ *
+ *  - Before bind, the provider will report both N_CLNS and N_CONS.  When bound with bind flags
+ *    equal to N_CLNS in the second least significant BIND_flags byte, the provider will be
+ *    connectionless.  When bound with bind flags equal to N_CONS in the second least significant
+ *    BIND_flags byte, the provider will be connection-oriented.
+ */
 
 /*
  *  ===================================================================
@@ -4067,14 +4119,14 @@ ne_reset_res(queue_t *q, mblk_t *mp)
  */
 
 /**
- * npi_w_proto: process an M_PROTO, M_PCPROTO message on the write queue
+ * np_w_proto - process an M_PROTO, M_PCPROTO message on the write queue
  * @q: active queue in queue pair (write queue)
  * @mp: the M_PROTO, M_PCPROTO message to process
  *
  * These are normal N-primitives written from the upper layer protocol.
  */
 STATIC INLINE fastcall __hot_put int
-npi_w_proto(queue_t *q, mblk_t *mp)
+np_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn = -EPROTO;
 	np_long prim = 0;
@@ -4082,64 +4134,65 @@ npi_w_proto(queue_t *q, mblk_t *mp)
 	np_long oldstate = npi_get_state(np);
 
 	if (mp->b_wptr >= mp->b_rptr + sizeof(prim)) {
-		switch ((prim = *((np_long *) mp->b_rptr))) {
-		case N_UNITDATA_REQ:
+		switch ((prim = *(np_long *) mp->b_rptr)) {
+		case N_UNITDATA_REQ:	/* Connection-less data send request */
 			rtn = ne_unitdata_req(q, mp);
 			break;
-		case N_DATA_REQ:
+		case N_DATA_REQ:	/* Connection-Mode data transfer request */
 			rtn = ne_data_req(q, mp);
 			break;
-		case N_CONN_REQ:
+		case N_CONN_REQ:	/* NC request */
 			rtn = ne_conn_req(q, mp);
 			break;
-		case N_CONN_RES:
+		case N_CONN_RES:	/* Accept previous connection indication */
 			rtn = ne_conn_res(q, mp);
 			break;
-		case N_DISCON_REQ:
+		case N_DISCON_REQ:	/* NC disconnection request */
 			rtn = ne_discon_req(q, mp);
 			break;
-		case N_EXDATA_REQ:
+		case N_EXDATA_REQ:	/* Expedited data request */
 			rtn = ne_exdata_req(q, mp);
 			break;
-		case N_DATACK_REQ:
+		case N_DATACK_REQ:	/* Data acknowledgement request */
 			rtn = ne_datack_req(q, mp);
 			break;
-		case N_RESET_REQ:
+		case N_RESET_REQ:	/* NC reset request */
 			rtn = ne_reset_req(q, mp);
 			break;
-		case N_RESET_RES:
+		case N_RESET_RES:	/* Reset processing accepted */
 			rtn = ne_reset_res(q, mp);
 			break;
-		case N_INFO_REQ:
+		case N_INFO_REQ:	/* Information Request */
 			rtn = ne_info_req(q, mp);
 			break;
-		case N_BIND_REQ:
+		case N_BIND_REQ:	/* Bind a NS user to network address */
 			rtn = ne_bind_req(q, mp);
 			break;
-		case N_UNBIND_REQ:
+		case N_UNBIND_REQ:	/* Unbind NS user from network address */
 			rtn = ne_unbind_req(q, mp);
 			break;
-		case N_OPTMGMT_REQ:
+		case N_OPTMGMT_REQ:	/* Options Management request */
 			rtn = ne_optmgmt_req(q, mp);
 			break;
-		case N_CONN_IND:
-		case N_CONN_CON:
-		case N_DISCON_IND:
-		case N_DATA_IND:
-		case N_EXDATA_IND:
-		case N_INFO_ACK:
-		case N_BIND_ACK:
-		case N_ERROR_ACK:
-		case N_OK_ACK:
-		case N_UNITDATA_IND:
-		case N_UDERROR_IND:
-		case N_DATACK_IND:
-		case N_RESET_IND:
-		case N_RESET_CON:
+		case N_CONN_IND:	/* Incoming connection indication */
+		case N_CONN_CON:	/* Connection established */
+		case N_DISCON_IND:	/* NC disconnected */
+		case N_DATA_IND:	/* Incoming connection-mode data indication */
+		case N_EXDATA_IND:	/* Incoming expedited data indication */
+		case N_INFO_ACK:	/* Information Acknowledgement */
+		case N_BIND_ACK:	/* NS User bound to network address */
+		case N_ERROR_ACK:	/* Error Acknowledgement */
+		case N_OK_ACK:		/* Success Acknowledgement */
+		case N_UNITDATA_IND:	/* Connection-less data receive indication */
+		case N_UDERROR_IND:	/* UNITDATA Error Indication */
+		case N_DATACK_IND:	/* Data acknowledgement indication */
+		case N_RESET_IND:	/* Incoming NC reset request indication */
+		case N_RESET_CON:	/* Reset processing complete */
 			/* wrong direction */
 			rtn = -EPROTO;
 			break;
 		default:
+			/* unrecognized primitive */
 			rtn = -EOPNOTSUPP;
 			break;
 		}
@@ -4147,18 +4200,19 @@ npi_w_proto(queue_t *q, mblk_t *mp)
 	if (rtn < 0) {
 		seldom();
 		npi_set_state(np, oldstate);
-		/* The put and srv procedures do not recognize all errors.  Sometimes we return an
-		   error to here just to restore the previous state.  */
+		/* The put and service procedure do not recognize all errors. Sometimes we return
+		   an error to here just to restore the previous state. */
 		switch (rtn) {
-		case -EBUSY:
-		case -EAGAIN:
-		case -ENOMEM:
-		case -ENOBUFS:
-		case -EOPNOTSUPP:
+		case -EBUSY:		/* flow controlled */
+		case -EAGAIN:		/* try again */
+		case -ENOMEM:		/* could not allocate memory */
+		case -ENOBUFS:		/* could not allocate an mblk */
+		case -EOPNOTSUPP:	/* primitive not supported */
 			return ne_error_ack(q, prim, rtn);
 		case -EPROTO:
 			return ne_error_reply(q, -EPROTO);
 		default:
+			/* ignore all other errors */
 			rtn = 0;
 			break;
 		}
@@ -4174,7 +4228,7 @@ npi_w_proto(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE fastcall __hot_write int
-npi_w_data(queue_t *q, mblk_t *mp)
+np_w_data(queue_t *q, mblk_t *mp)
 {
 	return ne_write_req(q, mp);
 }
@@ -4187,7 +4241,7 @@ npi_w_data(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-npi_w_other(queue_t *q, mblk_t *mp)
+np_w_other(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 
@@ -4205,7 +4259,7 @@ npi_w_other(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-npi_r_other(queue_t *q, mblk_t *mp)
+np_r_other(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 
@@ -4221,7 +4275,7 @@ npi_r_other(queue_t *q, mblk_t *mp)
 }
 
 /**
- *  npi_r_data: process M_DATA message
+ *  np_r_data: process M_DATA message
  *  @q: active queue in queue pair (read queue)
  *  @mp: the M_DATA message
  *
@@ -4230,7 +4284,7 @@ npi_r_other(queue_t *q, mblk_t *mp)
  *  convert this to an upper layer indication and deliver it upstream.
  */
 STATIC INLINE fastcall __hot_in int
-npi_r_data(queue_t *q, mblk_t *mp)
+np_r_data(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 	int rtn;
@@ -4251,7 +4305,7 @@ npi_r_data(queue_t *q, mblk_t *mp)
 }
 
 /**
- *  npi_r_error: process M_ERROR message
+ *  np_r_error: process M_ERROR message
  *  @q: active queue in queue pair (read queue)
  *  @mp: the M_ERROR message
  *
@@ -4260,7 +4314,7 @@ npi_r_data(queue_t *q, mblk_t *mp)
  *  convert this to an upper layer indication and deliver it upstream.
  */
 STATIC fastcall int
-npi_r_error(queue_t *q, mblk_t *mp)
+np_r_error(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 	int rtn;
@@ -4295,30 +4349,30 @@ npi_r_error(queue_t *q, mblk_t *mp)
  *  IP Read Message
  */
 STATIC INLINE streamscall __hot_in int
-npi_r_prim(queue_t *q, mblk_t *mp)
+np_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
-		return npi_r_data(q, mp);
+		return np_r_data(q, mp);
 	case M_ERROR:
-		return npi_r_error(q, mp);
+		return np_r_error(q, mp);
 	default:
-		return npi_r_other(q, mp);
+		return np_r_other(q, mp);
 	}
 }
 STATIC INLINE streamscall __hot_put int
-npi_w_prim(queue_t *q, mblk_t *mp)
+np_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
-		return npi_w_data(q, mp);
+		return np_w_data(q, mp);
 	case M_PROTO:
 	case M_PCPROTO:
-		return npi_w_proto(q, mp);
+		return np_w_proto(q, mp);
 	case M_FLUSH:
 		return ss7_w_flush(q, mp);
 	default:
-		return npi_w_other(q, mp);
+		return np_w_other(q, mp);
 	}
 }
 
@@ -4516,7 +4570,7 @@ npi_lookup_bind(struct iphdr *iph, struct udphdr *uh)
 
 /**
  * npi_lookup_next - lookup next Stream by protocol, address and port.
- * @ip_prev:	result of previous lookup, NULL for new
+ * @np_prev:	result of previous lookup, NULL for new
  * @iph:	IP header
  * @uh:		UDP header
  *
@@ -4530,14 +4584,14 @@ npi_lookup_bind(struct iphdr *iph, struct udphdr *uh)
  * connectionless Stream bound to the protocol id.
  */
 STATIC INLINE fastcall struct np *
-npi_lookup_next(struct np *ip_prev, struct iphdr *iph, struct udphdr *uh)
+npi_lookup_next(struct np *np_prev, struct iphdr *iph, struct udphdr *uh)
 {
 	struct np *result = NULL;
-	struct ip_prot_bucket *pp, **ppp;
+	struct np_prot_bucket *pp, **ppp;
 
-	ppp = &ip_prots[iph->protocol];
+	ppp = &np_prots[iph->protocol];
 
-	read_lock_bh(&ip_prot_lock);
+	read_lock_bh(&np_prot_lock);
 	if ((pp = *ppp)) {
 		if (pp->corefs > 0) {
 			if (result == NULL)
@@ -4549,7 +4603,7 @@ npi_lookup_next(struct np *ip_prev, struct iphdr *iph, struct udphdr *uh)
 				result = npi_lookup_bind(iph, uh);
 		}
 	}
-	read_unlock_bh(&ip_prot_lock);
+	read_unlock_bh(&np_prot_lock);
 	return (result);
 }
 
@@ -4603,7 +4657,7 @@ npi_free(char *data)
 STATIC int
 npi_v4_rcv(struct sk_buff *skb)
 {
-	read_lock_bh(&ip_prot_lock);	/* lock stream lists */
+	read_lock_bh(&np_prot_lock);	/* lock stream lists */
 	{
 		struct np *np;
 		struct iphdr *iph = skb->nh.iph;
@@ -4629,7 +4683,7 @@ npi_v4_rcv(struct sk_buff *skb)
 			/* TODO: want to generate an ICMP error here */
 		}
 	}
-	read_unlock_bh(&ip_prot_lock);
+	read_unlock_bh(&np_prot_lock);
 	return (0);
 }
 
@@ -4646,7 +4700,7 @@ npi_v4_rcv(struct sk_buff *skb)
 STATIC void
 npi_v4_err(struct sk_buff *skb, u32 info)
 {
-	read_lock_bh(&ip_prot_lock);
+	read_lock_bh(&np_prot_lock);
 	{
 		struct np *np;
 
@@ -4666,7 +4720,7 @@ npi_v4_err(struct sk_buff *skb, u32 info)
 		}
 		npi_v4_err_next(skb, info);
 	}
-	read_unlock_bh(&ip_prot_lock);
+	read_unlock_bh(&np_prot_lock);
 	return;
 }
 
@@ -4808,8 +4862,8 @@ npi_alloc_priv(queue_t *q, struct np **slp, int type, dev_t *devp, cred_t *crp)
 		np->cred = *crp;
 		(np->oq = q)->q_ptr = np_get(np);
 		(np->iq = WR(q))->q_ptr = np_get(np);
-		np->i_prim = &npi_w_prim;
-		np->o_prim = &npi_r_prim;
+		np->i_prim = &np_w_prim;
+		np->o_prim = &np_r_prim;
 		// np->i_wakeup = NULL;
 		// np->o_wakeup = NULL;
 		spin_lock_init(&np->qlock);	/* "np-queue-lock" */
@@ -4955,10 +5009,10 @@ npi_free_priv(queue_t *q)
 #define  IPCL_CMINOR	N_CLNS
 #define  LAST_CMINOR	2
 #define  FREE_CMINOR	3
-STATIC int npi_majors[IP_CMAJORS] = { IP_CMAJOR_0, };
+STATIC int npi_majors[CMAJORS] = { CMAJOR_0, };
 
 /**
- * npi_qopen: - NPI IP driver STREAMS open routine
+ * np_qopen: - NPI IP driver STREAMS open routine
  * @q: read queue of opened Stream
  * @devp: pointer to device number opened
  * @oflag: flags to the open call
@@ -4966,7 +5020,7 @@ STATIC int npi_majors[IP_CMAJORS] = { IP_CMAJOR_0, };
  * @crp: pointer to opener's credentials
  */
 STATIC streamscall int
-npi_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int mindex = 0;
 	int type = 0;
@@ -4984,12 +5038,12 @@ npi_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		return (EIO);
 	}
 #if defined LIS
-	if (cmajor != IP_CMAJOR_0)
+	if (cmajor != CMAJOR_0)
 		return (ENXIO);
 #endif
 #if defined LFS
 	/* Linux Fast-STREAMS always passes internal major device numbers (modules ids) */
-	if (cmajor != IP_DRV_ID)
+	if (cmajor != DRV_ID)
 		return (ENXIO);
 #endif
 	if (cminor > LAST_CMINOR) {
@@ -5011,7 +5065,7 @@ npi_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				break;
 			if (cminor == (*npp)->u.dev.cminor) {
 				if (++cminor >= NMINORS) {
-					if (++mindex >= IP_CMAJORS
+					if (++mindex >= CMAJORS
 					    || !(cmajor = npi_majors[mindex]))
 						break;
 					cminor = 0;
@@ -5020,7 +5074,7 @@ npi_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			}
 		}
 	}
-	if (mindex >= IP_CMAJORS || !cmajor) {
+	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		write_unlock_bh(&master.lock);
 		freeb(mp);
@@ -5045,13 +5099,13 @@ npi_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 }
 
 /**
- * npi_qclose: - NPI IP driver STREAMS close routine
+ * np_qclose: - NPI IP driver STREAMS close routine
  * @q: read queue of closing Stream
  * @oflag: flags to open call
  * @crp: pointer to closer's credentials
  */
 STATIC streamscall int
-npi_qclose(queue_t *q, int oflag, cred_t *crp)
+np_qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	struct np *np = PRIV(q);
 
@@ -5118,55 +5172,55 @@ MODULE_PARM_DESC(major, "Device number for the IP driver. (0 for allocation.)");
  */
 #ifdef LFS
 
-STATIC struct cdevsw ip_cdev = {
+STATIC struct cdevsw np_cdev = {
 	.d_name = DRV_NAME,
-	.d_str = &ip_info,
+	.d_str = &np_info,
 	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
 };
 
-STATIC struct devnode ip_node_ip = {
+STATIC struct devnode np_node_ip = {
 	.n_name = "ip",
 	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode ip_node_ipco = {
+STATIC struct devnode np_node_ipco = {
 	.n_name = "ipco",
 	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode ip_node_ipcl = {
+STATIC struct devnode np_node_ipcl = {
 	.n_name = "ipcl",
 	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC int
-ip_register_strdev(major_t major)
+np_register_strdev(major_t major)
 {
 	int err;
 
-	if ((err = register_strdev(&ip_cdev, major)) < 0)
+	if ((err = register_strdev(&np_cdev, major)) < 0)
 		return (err);
-	register_strnod(&ip_cdev, &ip_node_ip, IP_CMINOR);
-	register_strnod(&ip_cdev, &ip_node_ipco, IPCO_CMINOR);
-	register_strnod(&ip_cdev, &ip_node_ipcl, IPCL_CMINOR);
+	register_strnod(&np_cdev, &np_node_ip, IP_CMINOR);
+	register_strnod(&np_cdev, &np_node_ipco, IPCO_CMINOR);
+	register_strnod(&np_cdev, &np_node_ipcl, IPCL_CMINOR);
 	return (0);
 }
 
 STATIC int
-ip_unregister_strdev(major_t major)
+np_unregister_strdev(major_t major)
 {
 	int err;
 
-	unregister_strnod(&ip_cdev, IP_CMINOR);
-	unregister_strnod(&ip_cdev, IPCO_CMINOR);
-	unregister_strnod(&ip_cdev, IPCL_CMINOR);
-	if ((err = unregister_strdev(&ip_cdev, major)) < 0)
+	unregister_strnod(&np_cdev, IP_CMINOR);
+	unregister_strnod(&np_cdev, IPCO_CMINOR);
+	unregister_strnod(&np_cdev, IPCL_CMINOR);
+	if ((err = unregister_strdev(&np_cdev, major)) < 0)
 		return (err);
 	return (0);
 }
@@ -5180,17 +5234,17 @@ ip_unregister_strdev(major_t major)
 #ifdef LIS
 
 STATIC int
-ip_register_strdev(major_t major)
+np_register_strdev(major_t major)
 {
 	int err;
 
-	if ((err = lis_register_strdev(major, &ip_info, UNITS, DRV_NAME)) < 0)
+	if ((err = lis_register_strdev(major, &np_info, UNITS, DRV_NAME)) < 0)
 		return (err);
 	return (0);
 }
 
 STATIC int
-ip_unregister_strdev(major_t major)
+np_unregister_strdev(major_t major)
 {
 	int err;
 
@@ -5208,7 +5262,7 @@ ipterminate(void)
 
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (npi_majors[mindex]) {
-			if ((err = ip_unregister_strdev(npi_majors[mindex])))
+			if ((err = np_unregister_strdev(npi_majors[mindex])))
 				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
 					npi_majors[mindex]);
 			if (mindex)
@@ -5234,7 +5288,7 @@ ipinit(void)
 		return (err);
 	}
 	for (mindex = 0; mindex < CMAJORS; mindex++) {
-		if ((err = ip_register_strdev(npi_majors[mindex])) < 0) {
+		if ((err = np_register_strdev(npi_majors[mindex])) < 0) {
 			if (mindex) {
 				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
 					npi_majors[mindex]);
