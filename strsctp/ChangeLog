@@ -12,6 +12,8 @@
 	* src/util/sysconfig/README: updated headers
 	* src/util/sysconfig/strsctp: updated headers
 	* src/util/sysconfig/strsctp.conf: updated headers
+	* src/test/test-etsi_n.c: duplicate enum
+	* src/test/test-etsi_t.c: duplicate enum
 
 2006-05-07  Brian Bidulock  <bidulock@openss7.org>
 

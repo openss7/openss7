@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/07 07:24:58 $
+ @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 12:48:21 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/07 07:24:58 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 12:48:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_n.c,v $
+ Revision 0.9.2.2  2006/05/08 12:48:21  brian
+ - duplicate enum
+
  Revision 0.9.2.1  2006/05/07 07:24:58  brian
  - updates for testing
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/07 07:24:58 $"
+#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 12:48:21 $"
 
-static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/07 07:24:58 $";
+static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 12:48:21 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -374,7 +377,7 @@ enum {
 	__TEST_INIT_ACK,
 	__TEST_COOKIE_ECHO,
 	__TEST_COOKIE_ACK,
-	__TEST_DATA,
+	__TEST_DATA_CHUNK,
 	__TEST_SACK,
 	__TEST_ERROR,
 	__TEST_SHUTDOWN,
@@ -1346,7 +1349,7 @@ event_string(int event)
 		return ("COOKIE-ECHO");
 	case __TEST_COOKIE_ACK:
 		return ("COOKIE-ACK");
-	case __TEST_DATA:
+	case __TEST_DATA_CHUNK:
 		return ("DATA");
 	case __TEST_SACK:
 		return ("SACK");
