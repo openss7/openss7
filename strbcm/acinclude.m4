@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/21 13:24:13 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 03:12:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:24:13 $ by $Author: brian $
+# Last Modified $Date: 2006/05/08 03:12:27 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.3  2006/05/08 03:12:27  brian
+# - added module id base to strconf
+#
 # Revision 0.9.2.2  2006/03/21 13:24:13  brian
 # - added problem report checks
 #
@@ -223,6 +226,7 @@ AC_DEFUN([_BCM_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=245
+    strconf_cv_midbase=20
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'
     strconf_cv_drvconf='drvconf.mk'

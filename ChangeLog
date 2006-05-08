@@ -1,3 +1,11 @@
+2006-05-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/strconf-sh: added module id base to strconf
+	* m4/strconf.m4: added module id base to strconf
+	* am/strconf.am: added module id base to strconf
+	* acinclude.m4: added module id base to strconf
+	* openss7.spec.in: updated headers
+
 2006-04-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.refs: more references

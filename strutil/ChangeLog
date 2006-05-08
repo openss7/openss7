@@ -1,3 +1,23 @@
+2006-05-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/strconf-sh: added module id base to strconf
+	* m4/strconf.m4: added module id base to strconf
+	* am/strconf.am: added module id base to strconf
+	* acinclude.m4: added module id base to strconf
+	* strutil.spec.in: updated headers, corrected init script removal
+	* src/util/init/README: updated headers
+	* src/util/init/strace: updated headers
+	* src/util/init/strace.sh: updated headers
+	* src/util/init/strerr: updated headers
+	* src/util/init/strerr.sh: updated headers
+	* src/util/init/strlogd: updated headers
+	* src/util/init/strlogd.sh: updated headers
+	* src/util/modutils/strutil.in: updated headers
+	* src/util/sysconfig/README: updated headers
+	* src/util/sysconfig/strace: updated headers
+	* src/util/sysconfig/strerr: updated headers
+	* src/util/sysconfig/strlogd: updated headers
+
 2006-04-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strutil.refs: more references

@@ -1,3 +1,18 @@
+2006-05-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/strconf-sh: added module id base to strconf
+	* m4/strconf.m4: added module id base to strconf
+	* am/strconf.am: added module id base to strconf
+	* acinclude.m4: added module id base to strconf
+	* strsctp.spec.in: updated headers, corrected init script removal
+	* src/util/init/README: updated headers
+	* src/util/init/strsctp: updated headers
+	* src/util/init/strsctp.sh: updated headers
+	* src/util/modutils/strsctp.in: updated headers
+	* src/util/sysconfig/README: updated headers
+	* src/util/sysconfig/strsctp: updated headers
+	* src/util/sysconfig/strsctp.conf: updated headers
+
 2006-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added ETSI test suite programs

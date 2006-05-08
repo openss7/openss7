@@ -16,6 +16,10 @@
 	* NEWS: updates
 	* README: updates
 	* src/modules/ip_strm_mod.c: added two debug statements
+	* acinclude.m4: add check for module_text_address symbol
+	* src/drivers/ip.c: rip module_text_address, hash table changes
+	* src/drivers/np.c: rip module_text_address
+	* src/drivers/np_ip.c: rip module_text_address, hash table changes
 
 2006-05-07  Brian Bidulock  <bidulock@openss7.org>
 

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/04/23 18:14:24 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/05/08 03:12:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -13,8 +13,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/23 18:14:24 $ by $Author: brian $
+# Last Modified $Date: 2006/05/08 03:12:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1128,6 +1127,7 @@ AC_DEFUN([_SCTP_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=242
+    strconf_cv_midbase=70
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'
     strconf_cv_drvconf='drvconf.mk'

@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/13 06:28:07 $
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2006/05/08 03:34:53 $
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -148,19 +148,18 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/13 06:28:07 $
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2006/05/08 03:34:53 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -194,7 +193,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/13 06:28:07 $ by $Author: brian $
+# Last Modified $Date: 2006/05/08 03:34:53 $ by $Author: brian $
 #
 # =============================================================================
 

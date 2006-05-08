@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.57 $) $Date: 2006/03/24 10:02:37 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.58 $) $Date: 2006/05/08 03:33:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/24 10:02:37 $ by $Author: brian $
+# Last Modified $Date: 2006/05/08 03:33:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1747,9 +1747,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.57  2006/03/24 10:02:37  brian
-# - added send-pr to %package test description
+# Revision 1.1.6.58  2006/05/08 03:33:25  brian
+# - updated headers, corrected init scrip removal
 #
+
+* Fri Mar 24 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.57  2006/03/24 10:02:37  brian
+- added send-pr to %package test description
 
 * Fri Mar 24 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.56  2006/03/24 00:03:27  brian

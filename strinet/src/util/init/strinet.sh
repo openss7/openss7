@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/01/17 02:53:55 $
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/08 03:35:05 $
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -214,19 +214,18 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/01/17 02:53:55 $
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/08 03:35:05 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -260,7 +259,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/01/17 02:53:55 $ by $Author: brian $
+# Last Modified $Date: 2006/05/08 03:35:05 $ by $Author: brian $
 #
 # =============================================================================
 

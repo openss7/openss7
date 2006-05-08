@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 11:27:48 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 03:37:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:27:48 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 03:37:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.c,v $
+ Revision 0.9.2.19  2006/05/08 03:37:17  brian
+ - added two debug statements
+
  Revision 0.9.2.18  2006/03/03 11:27:48  brian
  - 32/64-bit compatibility
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 11:27:48 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 03:37:17 $"
 
-static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 11:27:48 $";
+static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 03:37:17 $";
 
 #include <sys/os7/compat.h>
 
@@ -85,7 +88,7 @@ static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2006/03/03 11:27:48 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2006/05/08 03:37:17 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -1542,7 +1545,7 @@ MODULE_PARM_DESC(modid, "Module ID for IP_STRMS.");
 STATIC struct fmodsw ip_to_streams_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &ip_to_streams_info,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 
@@ -1576,10 +1579,13 @@ ip_to_streams_register_module(void)
 {
 	int err;
 
-	if ((err = ip_to_streams_register_ioctl32()) < 0)
+	if ((err = ip_to_streams_register_ioctl32()) < 0) {
+		cmn_err(CE_WARN, "%s: could not register 32-bit ioctl, err = %d", MOD_NAME, -err);
 		return (err);
+	}
 
 	if ((err = register_strmod(&ip_to_streams_fmod)) < 0) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, -err);
 		ip_to_streams_unregister_ioctl32();
 		return (err);
 	}

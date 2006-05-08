@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2006/03/24 10:02:57 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2006/05/08 03:33:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/24 10:02:57 $ by $Author: brian $
+# Last Modified $Date: 2006/05/08 03:33:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -93,12 +93,12 @@
 %global title       @PACKAGE_TITLE@
 %global stitle      @PACKAGE_SHORTTITLE@
 
-%global modules     streams-ip_strm_mod streams-ip_to_dlpi streams-ldl
+%global modules     streams-ip_strm_mod streams-ip_to_dlpi streams-ldl streams-np_ip
 #global preloads    
 #global libraries   
-%global tools       strxns_mknod ldlconfig ldltest
-%global infofiles   %{name} dlpi npi
-#global initfiles
+%global tools       %{base}_mknod ldlconfig ldltest
+%global infofiles   %{base} dlpi npi
+%global initfiles   %{base}
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
 %{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
@@ -1456,7 +1456,7 @@ if [ $arg = 1 ] ; then : # fresh install
         rm -f -- $prel_new
     fi
     # Fresh install, go looking for non-rpm initscripts and remove them.
-    list='%{initfiles}' ; for i in $list strms_up strms_dn ; do
+    list='%{initfiles}' ; for i in $list ; do
         if [ -f %_initrddir/$i ] ; then
             # Find the best working init script removal tool
             [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue
@@ -1719,9 +1719,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
-# Revision 0.9.2.109  2006/03/24 10:02:57  brian
-# - added send-pr to %package test description
+# Revision 0.9.2.110  2006/05/08 03:33:35  brian
+# - updated headers, corrected init scrip removal
 #
+
+* Fri Mar 24 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.109  2006/03/24 10:02:57  brian
+- added send-pr to %package test description
 
 * Fri Mar 24 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.108  2006/03/24 00:03:29  brian

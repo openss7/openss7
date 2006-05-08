@@ -1,4 +1,4 @@
-OpenSS7 STREAMS XNS -- readme first file.  2006-03-02
+OpenSS7 STREAMS XNS -- readme first file.  2006-05-07
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -116,6 +116,7 @@ drivers:
 	- streams_link_driver.ko    /dev/ldl
 	- streams_ip_to_dlpi.ko	    /dev/ip2xinet
 	- streams_ip_strms.ko	    module
+	- streams_np_ip.ko	    /dev/np_ip /dev/ipcl /dev/ipco
 
 The ldl(4) driver attempts to provide a DLPI interface to an existing
 Ethernet driver under Linux.  This driver was orignally written by Ole
@@ -140,6 +141,11 @@ Grothe and subsequently modified by Brian Bidulock of The OpenSS7
 Project.  It was originally distributed under the terms of the LGPL, but
 is distributed by The OpenSS7 Project under the terms of the GPL Version
 2.
+
+The np_ip(4) driver provides a Network Service Provider using the NPI
+Revision 2.0.0 service interface to the Linux IP subsystem.  The driver
+was originally written by Brian Bidulock for the OpenSS7 project for the
+purpose of testing SCTP and other direct IP based protocols.
 
 The OpenSS7 STREAMS XNS package includes kernel modules, SVR 4.2 STREAMS
 drivers, modules, libraries, utilities, test programs, daemons, and
