@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:27 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:10:27 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:00:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 0.9.2.14  2006/05/08 11:00:57  brian
+ - new compilers mishandle postincrement of cast pointers
+
  Revision 0.9.2.13  2006/03/07 01:10:27  brian
  - binary compatible callouts
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:27 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:57 $"
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:27 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:57 $";
 
 #include <sys/os7/compat.h>
 
@@ -73,7 +76,7 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:27 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:57 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -837,7 +840,8 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 		if (!(mp = ss7_allocb(q, sizeof(*p), BPRI_MED)))
 			goto enobufs;
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mx_primitive = MX_DATA_REQ;
 		p->mx_slot = ch->mx_slot;
 	}
@@ -1230,7 +1234,8 @@ mg_info_ack(queue_t *q)
 	size_t opt_len = sizeof(*o);
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mg_primitive = MG_INFO_ACK;
 		p->mg_se_id = se ? se->id : 0;
 		p->mg_opt_length = opt_len;
@@ -1238,7 +1243,8 @@ mg_info_ack(queue_t *q)
 		p->mg_prov_flags = 0;
 		p->mg_style = MG_STYLE2;
 		p->mg_version = MG_VERSION;
-		o = (typeof(o)) mp->b_wptr++;
+		o = (typeof(o)) mp->b_wptr;
+		mp->b_wptr += sizeof(*o);
 		o->mg_obj_type = MG_OBJ_TYPE_CH;
 		o->ch_block_size = mg->config.block_size;
 		o->ch_encoding = mg->config.encoding;
@@ -1271,7 +1277,8 @@ mg_optmgmt_ack(queue_t *q, struct mg *mg, uchar *opt_ptr, size_t opt_len, ulong 
 		struct MG_optmgmt_ack *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_OPTMGMT_ACK;
 			p->mg_opt_length = opt_len;
 			p->mg_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -1304,7 +1311,8 @@ mg_ok_ack(queue_t *q, struct mg *mg, long prim)
 		struct MG_ok_ack *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_OK_ACK;
 			p->mg_correct_prim = prim;
 			printd(("%s: %p: <- MG_OK_ACK\n", DRV_NAME, mg));
@@ -1332,7 +1340,8 @@ mg_error_ack(queue_t *q, struct mg *mg, long prim, long error)
 		struct MG_error_ack *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_ERROR_ACK;
 			p->mg_error_primitive = prim;
 			p->mg_error_type = error < 0 ? MGSYSERR : error;
@@ -1362,7 +1371,8 @@ mg_attach_ack(queue_t *q, struct mg *mg, struct ch *ch)
 		struct MG_attach_ack *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_ATTACH_ACK;
 			p->mg_mx_id = ch->mx.mx ? ch->mx.mx->id : 0;
 			p->mg_mx_slot = ch->mx_slot;
@@ -1392,7 +1402,8 @@ mg_join_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 		struct MG_join_con *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_JOIN_CON;
 			p->mg_se_id = se->id;
 			p->mg_tp_id = lg->id;
@@ -1422,7 +1433,8 @@ mg_action_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, struct ac
 		struct MG_action_con *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_ACTION_CON;
 			p->mg_action = ac->type;
 			p->mg_se_id = se->id;
@@ -1452,7 +1464,8 @@ mg_action_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, struct ac
 		struct MG_action_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_ACTION_IND;
 			p->mg_action = ac->type;
 			p->mg_se_id = se->id;
@@ -1482,7 +1495,8 @@ mg_conn_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 		struct MG_conn_con *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_CONN_CON;
 			p->mg_se_id = se ? se->id : 0;
 			p->mg_tp_id = lg ? lg->id : 0;
@@ -1514,7 +1528,8 @@ mg_data_ind(queue_t *q, struct mg *mg, ulong flags, mblk_t *dp)
 		struct MG_data_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_DATA_IND;
 			p->mg_flags = flags;
 			mp->b_cont = dp;
@@ -1543,7 +1558,8 @@ mg_discon_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong fla
 		struct MG_discon_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_DISCON_IND;
 			p->mg_se_id = se ? se->id : 0;
 			p->mg_tp_id = lg ? lg->id : 0;
@@ -1592,7 +1608,8 @@ mg_discon_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong fla
 		struct MG_discon_con *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_DISCON_CON;
 			p->mg_se_id = se ? se->id : 0;
 			p->mg_tp_id = lg ? lg->id : 0;
@@ -1646,7 +1663,8 @@ mg_leave_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong caus
 		struct MG_leave_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_LEAVE_IND;
 			p->mg_se_id = se ? se->id : 0;
 			p->mg_tp_id = lg ? lg->id : 0;
@@ -1681,7 +1699,8 @@ mg_leave_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 		struct MG_leave_con *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_LEAVE_CON;
 			p->mg_se_id = se ? se->id : 0;
 			p->mg_tp_id = lg ? lg->id : 0;
@@ -1714,7 +1733,8 @@ mg_notify_ind(queue_t *q, struct mg *mg, ulong event, uchar *dia_ptr, size_t dia
 		struct MG_notify_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + dia_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mg_primitive = MG_NOTIFY_IND;
 			p->mg_event = event;
 			p->mg_diag_length = dia_len;
@@ -1778,7 +1798,8 @@ mx_info_req(queue_t *q, struct mx *mx)
 		struct MX_info_req *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mx_primitive = MX_INFO_REQ;
 			printd(("%s: %p: MX_INFO_REQ ->\n", DRV_NAME, mx));
 			ss7_oput(mx->oq, mp);
@@ -1805,7 +1826,8 @@ mx_attach_req(queue_t *q, struct mx *mx, uchar *add_ptr, size_t add_len, ulong f
 		struct MX_attach_req *p;
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = MX_ATTACH_REQ;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mx_primitive = MX_ATTACH_REQ;
 			p->mx_addr_length = add_len;
 			p->mx_addr_offset = add_len ? sizeof(*p) : 0;
@@ -1839,7 +1861,8 @@ mx_enable_req(queue_t *q, struct mx *mx)
 		struct MX_enable_req *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = MX_ENABLE_REQ;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mx_primitive = MX_ENABLE_REQ;
 			mx->state = MGS_WCON_JREQ;
 			printd(("%s: %p: MX_ENABLE_REQ ->\n", DRV_NAME, mx));
@@ -1869,7 +1892,8 @@ mx_connect_req(queue_t *q, struct mx *mx, struct ch *ch)
 		struct MX_connect_req *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mx_primitive = MX_CONNECT_REQ;
 			p->mx_conn_flags = ch->flags & (MXF_RX_DIR | MXF_TX_DIR);
 			p->mx_slot = ch->mx_slot;
@@ -1902,7 +1926,8 @@ mx_data_req(queue_t *q, struct mx *mx, ulong slot, mblk_t *dp)
 			struct MX_data_req *p;
 			if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 				mp->b_datap->db_type = M_PROTO;
-				p = (typeof(p)) mp->b_wptr++;
+				p = (typeof(p)) mp->b_wptr;
+				mp->b_wptr += sizeof(*p);
 				p->mx_primitive = MX_DATA_REQ;
 				p->mx_slot = slot;
 				mp->b_cont = dp;
@@ -1936,7 +1961,8 @@ mx_disconnect_req(queue_t *q, struct mx *mx, struct ch *ch, ulong flags)
 		struct MX_disconnect_req *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mx_primitive = MX_DISCONNECT_REQ;
 			p->mx_conn_flags = flags;
 			p->mx_slot = ch->mx_slot;
@@ -1966,7 +1992,8 @@ mx_disable_req(queue_t *q, struct mx *mx)
 		struct MX_disable_req *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mx_primitive = MX_DISABLE_REQ;
 			mx->state = MGS_WCON_LREQ;
 			printd(("%s: %p: MX_DISABLE_REQ ->\n", DRV_NAME, mx));
@@ -1993,7 +2020,8 @@ mx_detach_req(queue_t *q, struct mx *mx)
 		struct MX_detach_req *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = MX_DETACH_REQ;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mx_primitive = MX_DETACH_REQ;
 			printd(("%s: %p: MX_DETACH_REQ ->\n", DRV_NAME, mx));
 			mx->state = MGS_WACK_UREQ;

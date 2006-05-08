@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/07 22:12:59 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 11:26:16 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/07 22:12:59 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:26:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.2  2006/05/08 11:26:16  brian
+ - post inc problem and working through test cases
+
  Revision 0.9.2.1  2006/05/07 22:12:59  brian
  - updated for NPI-IP driver
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/07 22:12:59 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 11:26:16 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/07 22:12:59 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 11:26:16 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -137,7 +140,7 @@ static const char *lpkgname = "OpenSS7 XNS Driver - NPI-IP";
 static const char *lstdname = "XNS 5.2/NPI Rev 2";
 static const char *sstdname = "XNS/NPI";
 static const char *shortname = "NPI-IP";
-static char devname[256] = "/dev/ip";
+static char devname[256] = "/dev/np_ip";
 
 static int exit_on_failure = 0;
 
@@ -3887,8 +3890,18 @@ wait_event(int child, int wait)
 					if (verbose > 4)
 						print_success(child);
 					if (verbose > 4) {
+						int i;
+
 						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "gotmsg from %d [%d,%d]:\n", child, ctrl.len, data.len);
+						fprintf(stdout, "[");
+						for (i = 0; i < ctrl.len; i++)
+							fprintf(stdout, "%02X", ctrl.buf[i]);
+						fprintf(stdout, "]\n");
+						fprintf(stdout, "[");
+						for (i = 0; i < data.len; i++)
+							fprintf(stdout, "%02X", data.buf[i]);
+						fprintf(stdout, "]\n");
 						fflush(stdout);
 						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}

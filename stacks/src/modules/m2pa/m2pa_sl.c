@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:00 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:00:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/24 05:01:00 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:00:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:00 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:00:52 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:00 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:00:52 $";
 
 #include <sys/os7/compat.h>
 
@@ -72,7 +72,7 @@ static char const ident[] =
 // #define _DEBUG
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/04/24 05:01:00 $"
+#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:00:52 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1030,9 +1030,11 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT3_1:
 		if ((mp = ss7_allocb(q, 2 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_PROVING_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ =
+			*(uint32_t *) mp->b_wptr = M2PA_PROVING_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr =
 			    __constant_htonl(2 * sizeof(uint32_t) + sizeof(filler));
+			mp->b_wptr += sizeof(uint32_t);
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
@@ -1048,12 +1050,17 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 		   the status proving message for sending proving data will fill bytes. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ =
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr =
 			    __constant_htonl(4 * sizeof(uint32_t) + sizeof(filler));
-			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnr);
-			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnt);
-			*(uint32_t *) mp->b_wptr++ = status;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint16_t *) mp->b_wptr = htons(sl->fsnr);
+			mp->b_wptr += sizeof(uint16_t);
+			*(uint16_t *) mp->b_wptr = htons(sl->fsnt);
+			mp->b_wptr += sizeof(uint16_t);
+			*(uint32_t *) mp->b_wptr = status;
+			mp->b_wptr += sizeof(uint32_t);
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
@@ -1073,12 +1080,17 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT11:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ =
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr =
 			    __constant_htonl(5 * sizeof(uint32_t) + sizeof(filler));
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
-			*(uint32_t *) mp->b_wptr++ = status;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnr & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnt & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = status;
+			mp->b_wptr += sizeof(uint32_t);
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
@@ -1093,10 +1105,13 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 		   messages. */
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ =
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr =
 			    __constant_htonl(3 * sizeof(uint32_t) + sizeof(filler));
-			*(uint32_t *) mp->b_wptr++ = status;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = status;
+			mp->b_wptr += sizeof(uint32_t);
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
@@ -1124,9 +1139,12 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT3_1:
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(3 * sizeof(uint32_t));
-			*(uint32_t *) mp->b_wptr++ = status;
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(3 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = status;
+			mp->b_wptr += sizeof(uint32_t);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
@@ -1139,11 +1157,16 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 		   draft-ietf-sigtran-m2pa-04.txt has sequence numbers in an M2PA-specific header. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(4 * sizeof(uint32_t));
-			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnr);
-			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnt);
-			*(uint32_t *) mp->b_wptr++ = status;
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(4 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint16_t *) mp->b_wptr = htons(sl->fsnr);
+			mp->b_wptr += sizeof(uint16_t);
+			*(uint16_t *) mp->b_wptr = htons(sl->fsnt);
+			mp->b_wptr += sizeof(uint16_t);
+			*(uint32_t *) mp->b_wptr = status;
+			mp->b_wptr += sizeof(uint32_t);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
@@ -1156,11 +1179,16 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT6_1:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(5 * sizeof(uint32_t));
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
-			*(uint32_t *) mp->b_wptr++ = status;
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(5 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnr & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnt & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = status;
+			mp->b_wptr += sizeof(uint32_t);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
@@ -1173,9 +1201,12 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 		   messages. */
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(3 * sizeof(uint32_t));
-			*(uint32_t *) mp->b_wptr++ = status;
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(3 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = status;
+			mp->b_wptr += sizeof(uint32_t);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
@@ -1187,11 +1218,16 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT11:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(5 * sizeof(uint32_t));
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
-			*(uint32_t *) mp->b_wptr++ = status;
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(5 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnr & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnt & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = status;
+			mp->b_wptr += sizeof(uint32_t);
 			switch (status) {
 			case M2PA_STATUS_PROCESSOR_OUTAGE:
 			case M2PA_STATUS_PROCESSOR_OUTAGE_ENDED:
@@ -1245,9 +1281,12 @@ sl_send_ack(queue_t *q, struct sl *sl)
 	case M2PA_VERSION_DRAFT3_1:
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_ACK_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(3 * sizeof(uint32_t));
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->rack);
+			*(uint32_t *) mp->b_wptr = M2PA_ACK_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(3 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->rack);
+			mp->b_wptr += sizeof(uint32_t);
 			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1271,11 +1310,16 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		   the receiver. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(4 * sizeof(uint32_t));
-			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnr);
-			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnt);
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_ACK;
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(4 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint16_t *) mp->b_wptr = htons(sl->fsnr);
+			mp->b_wptr += sizeof(uint16_t);
+			*(uint16_t *) mp->b_wptr = htons(sl->fsnt);
+			mp->b_wptr += sizeof(uint16_t);
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_ACK;
+			mp->b_wptr += sizeof(uint32_t);
 			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1290,11 +1334,16 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		   sequence numbers expected to appear in draft-ietf-sigtran-m2pa-05.txt. */
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(5 * sizeof(uint32_t));
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr);
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt);
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_ACK;
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(5 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnr);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnt);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_ACK;
+			mp->b_wptr += sizeof(uint32_t);
 			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1315,11 +1364,16 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		printd(("%s: %p: Sending separate ack\n", MOD_NAME, sl));
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(5 * sizeof(uint32_t));
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
-			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_IN_SERVICE;
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(5 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnr & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnt & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = M2PA_STATUS_IN_SERVICE;
+			mp->b_wptr += sizeof(uint32_t);
 			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1342,10 +1396,14 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		printd(("%s: %p: Sending separate ack\n", MOD_NAME, sl));
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_DATA_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(4 * sizeof(uint32_t));
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
+			*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(4 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnr & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnt & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1372,10 +1430,14 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		printd(("%s: %p: Sending separate ack\n", MOD_NAME, sl));
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*(uint32_t *) mp->b_wptr++ = M2PA_DATA_MESSAGE;
-			*(uint32_t *) mp->b_wptr++ = __constant_htonl(4 * sizeof(uint32_t));
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
-			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
+			*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = __constant_htonl(4 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnr & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnt & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1406,8 +1468,10 @@ sl_send_data(queue_t *q, struct sl *sl, mblk_t *dp)
 		case M2PA_VERSION_DRAFT3_1:
 			if ((mp = ss7_allocb(q, 2 * sizeof(uint32_t), BPRI_MED))) {
 				mp->b_datap->db_type = M_DATA;
-				*(uint32_t *) mp->b_wptr++ = M2PA_DATA_MESSAGE;
-				*(uint32_t *) mp->b_wptr++ = htonl(dlen + 2 * sizeof(uint32_t));
+				*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
+				mp->b_wptr += sizeof(uint32_t);
+				*(uint32_t *) mp->b_wptr = htonl(dlen + 2 * sizeof(uint32_t));
+				mp->b_wptr += sizeof(uint32_t);
 				mp->b_cont = db;
 				pullupmsg(mp, -1);
 				if ((err = n_data_req(q, sl, rcpt, &qos, sizeof(qos), mp)) >= 0)
@@ -1420,10 +1484,14 @@ sl_send_data(queue_t *q, struct sl *sl, mblk_t *dp)
 		case M2PA_VERSION_DRAFT4_1:
 			if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
 				mp->b_datap->db_type = M_DATA;
-				*(uint32_t *) mp->b_wptr++ = M2PA_DATA_MESSAGE;
-				*(uint32_t *) mp->b_wptr++ = htonl(dlen + 3 * sizeof(uint32_t));
-				*(uint16_t *) mp->b_wptr++ = htons(sl->fsnr);
-				*(uint16_t *) mp->b_wptr++ = htons(sl->fsnt + 1);
+				*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
+				mp->b_wptr += sizeof(uint32_t);
+				*(uint32_t *) mp->b_wptr = htonl(dlen + 3 * sizeof(uint32_t));
+				mp->b_wptr += sizeof(uint32_t);
+				*(uint16_t *) mp->b_wptr = htons(sl->fsnr);
+				mp->b_wptr += sizeof(uint16_t);
+				*(uint16_t *) mp->b_wptr = htons(sl->fsnt + 1);
+				mp->b_wptr += sizeof(uint16_t);
 				mp->b_cont = db;
 				pullupmsg(mp, -1);
 				if ((err = n_data_req(q, sl, rcpt, &qos, sizeof(qos), mp)) >= 0)
@@ -1442,10 +1510,14 @@ sl_send_data(queue_t *q, struct sl *sl, mblk_t *dp)
 		case M2PA_VERSION_DRAFT11:
 			if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 				mp->b_datap->db_type = M_DATA;
-				*(uint32_t *) mp->b_wptr++ = M2PA_DATA_MESSAGE;
-				*(uint32_t *) mp->b_wptr++ = htonl(dlen + 4 * sizeof(uint32_t));
-				*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
-				*(uint32_t *) mp->b_wptr++ = htonl((sl->fsnt + 1) & 0xffffff);
+				*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
+				mp->b_wptr += sizeof(uint32_t);
+				*(uint32_t *) mp->b_wptr = htonl(dlen + 4 * sizeof(uint32_t));
+				mp->b_wptr += sizeof(uint32_t);
+				*(uint32_t *) mp->b_wptr = htonl(sl->fsnr & 0xffffff);
+				mp->b_wptr += sizeof(uint32_t);
+				*(uint32_t *) mp->b_wptr = htonl((sl->fsnt + 1) & 0xffffff);
+				mp->b_wptr += sizeof(uint32_t);
 				mp->b_cont = db;
 				pullupmsg(mp, -1);
 				if ((err = n_data_req(q, sl, rcpt, &qos, sizeof(qos), mp)) >= 0)
@@ -3853,7 +3925,9 @@ sl_recv_datack(queue_t *q, struct sl *sl, mblk_t *mp)
 	{
 		size_t mlen = mp->b_wptr - mp->b_rptr;
 		if (mlen >= sizeof(uint32_t)) {
-			if ((count = ntohl(*(uint32_t *) mp->b_wptr++))) {
+			count = ntohl(*(uint32_t *) mp->b_wptr);
+			mp->b_wptr += sizeof(uint32_t);
+			if (count) {
 				if ((err = sl_txc_datack(q, sl, count)) < 0)
 					return (err);
 				return (QR_DONE);

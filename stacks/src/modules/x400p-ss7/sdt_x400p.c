@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:14:48 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:01:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:14:48 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:01:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_x400p.c,v $
+ Revision 0.9.2.18  2006/05/08 11:01:16  brian
+ - new compilers mishandle postincrement of cast pointers
+
  Revision 0.9.2.17  2006/03/07 01:14:48  brian
  - binary compatible callouts
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:14:48 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:01:16 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:14:48 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:01:16 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -98,7 +101,7 @@ static char const ident[] =
 
 #define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2006/03/07 01:14:48 $"
+#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:01:16 $"
 #define SDT_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1075,7 +1078,8 @@ sdt_rc_signal_unit_ind(queue_t *q, mblk_t *dp, ulong count)
 				sdt_rc_signal_unit_ind_t *p;
 				if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 					mp->b_datap->db_type = M_PROTO;
-					p = (typeof(p)) mp->b_wptr++;
+					p = (typeof(p)) mp->b_wptr;
+					mp->b_wptr += sizeof(*p);
 					p->sdt_primitive = SDT_RC_SIGNAL_UNIT_IND;
 					p->sdt_count = count;
 					mp->b_cont = dp;
@@ -1106,7 +1110,8 @@ sdt_rc_congestion_accept_ind(queue_t *q)
 	sdt_rc_congestion_accept_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_CONGESTION_ACCEPT_IND;
 		putnext(q, mp);
 		return (QR_DONE);
@@ -1126,7 +1131,8 @@ sdt_rc_congestion_discard_ind(queue_t *q)
 	sdt_rc_congestion_discard_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_CONGESTION_DISCARD_IND;
 		putnext(q, mp);
 		return (QR_DONE);
@@ -1146,7 +1152,8 @@ sdt_rc_no_congestion_ind(queue_t *q)
 	sdt_rc_no_congestion_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_NO_CONGESTION_IND;
 		putnext(q, mp);
 		return (QR_DONE);
@@ -1167,7 +1174,8 @@ sdt_iac_correct_su_ind(queue_t *q)
 		sdt_iac_correct_su_ind_t *p;
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->sdt_primitive = SDT_IAC_CORRECT_SU_IND;
 			putnext(q, mp);
 			return (QR_DONE);
@@ -1190,7 +1198,8 @@ sdt_iac_abort_proving_ind(queue_t *q)
 	sdt_iac_abort_proving_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_IAC_ABORT_PROVING_IND;
 		putnext(q, mp);
 		return (QR_DONE);
@@ -1210,7 +1219,8 @@ sdt_lsc_link_failure_ind(queue_t *q)
 	sdt_lsc_link_failure_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_LSC_LINK_FAILURE_IND;
 		putnext(q, mp);
 		return (QR_DONE);
@@ -1230,7 +1240,8 @@ sdt_txc_transmission_request_ind(queue_t *q)
 	sdt_txc_transmission_request_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_TXC_TRANSMISSION_REQUEST_IND;
 		putnext(q, mp);
 		return (QR_DONE);
@@ -1251,7 +1262,8 @@ lmi_info_ack(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 	lmi_info_ack_t *p;
 	if ((mp = xp_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
 		p->lmi_version = 1;
 		p->lmi_state = xp->state;
@@ -1280,7 +1292,8 @@ lmi_ok_ack(queue_t *q, ulong state, long prim)
 	lmi_ok_ack_t *p;
 	if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OK_ACK;
 		p->lmi_correct_primitive = prim;
 		p->lmi_state = xp->state = state;
@@ -1303,7 +1316,8 @@ lmi_error_ack(queue_t *q, ulong state, long prim, ulong errno, ulong reason)
 	lmi_error_ack_t *p;
 	if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_ACK;
 		p->lmi_errno = errno;
 		p->lmi_reason = reason;
@@ -1328,7 +1342,8 @@ lmi_enable_con(queue_t *q)
 	if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 		xp_t *xp = PRIV(q);
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ENABLE_CON;
 		p->lmi_state = xp->state = LMI_ENABLED;
 		qreply(q, mp);
@@ -1350,7 +1365,8 @@ lmi_disable_con(queue_t *q)
 	if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 		xp_t *xp = PRIV(q);
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DISABLE_CON;
 		p->lmi_state = xp->state = LMI_DISABLED;
 		qreply(q, mp);
@@ -1371,7 +1387,8 @@ lmi_optmgmt_ack(queue_t *q, ulong flags, caddr_t opt_ptr, size_t opt_len)
 	lmi_optmgmt_ack_t *p;
 	if ((mp = xp_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OPTMGMT_ACK;
 		p->lmi_opt_length = opt_len;
 		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -1395,7 +1412,8 @@ lmi_error_ind(queue_t *q, ulong errno, ulong reason)
 	lmi_error_ind_t *p;
 	if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_IND;
 		p->lmi_errno = errno;
 		p->lmi_reason = reason;
@@ -1419,7 +1437,8 @@ lmi_stats_ind(queue_t *q, ulong interval)
 		lmi_stats_ind_t *p;
 		if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->lmi_primitive = LMI_STATS_IND;
 			p->lmi_interval = interval;
 			p->lmi_timestamp = jiffies;
@@ -1445,7 +1464,8 @@ lmi_event_ind(queue_t *q, ulong oid, ulong level)
 		lmi_event_ind_t *p;
 		if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->lmi_primitive = LMI_EVENT_IND;
 			p->lmi_objectid = oid;
 			p->lmi_timestamp = jiffies;

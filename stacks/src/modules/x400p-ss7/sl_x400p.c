@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:14:58 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/08 11:01:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:14:58 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:01:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.17  2006/05/08 11:01:17  brian
+ - new compilers mishandle postincrement of cast pointers
+
  Revision 0.9.2.16  2006/03/07 01:14:58  brian
  - binary compatible callouts
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:14:58 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/08 11:01:17 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/07 01:14:58 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/08 11:01:17 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -490,7 +493,8 @@ sl_pdu_ind(queue_t *q, struct xp *xp, mblk_t *dp)
 	sl_pdu_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_PDU_IND;
 		mp->b_cont = dp;
 		ss7_oput(xp->oq, mp);
@@ -511,7 +515,8 @@ sl_link_congested_ind(queue_t *q, struct xp *xp, ulong cong, ulong disc)
 	sl_link_cong_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_LINK_CONGESTED_IND;
 		p->sl_cong_status = cong;
 		p->sl_disc_status = disc;
@@ -533,7 +538,8 @@ sl_link_congestion_ceased_ind(queue_t *q, struct xp *xp, ulong cong, ulong disc)
 	sl_link_cong_ceased_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_LINK_CONGESTION_CEASED_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_cong_status = cong;
@@ -556,7 +562,8 @@ sl_retrieved_message_ind(queue_t *q, struct xp *xp, mblk_t *dp)
 	sl_retrieved_msg_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVED_MESSAGE_IND;
 		mp->b_cont = dp;
 		ss7_oput(xp->oq, mp);
@@ -577,7 +584,8 @@ sl_retrieval_complete_ind(queue_t *q, struct xp *xp)
 	sl_retrieval_comp_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVAL_COMPLETE_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -597,7 +605,8 @@ sl_rb_cleared_ind(queue_t *q, struct xp *xp)
 	sl_rb_cleared_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RB_CLEARED_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -617,7 +626,8 @@ sl_bsnt_ind(queue_t *q, struct xp *xp, ulong bsnt)
 	sl_bsnt_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_BSNT_IND;
 		p->sl_bsnt = bsnt;
 		ss7_oput(xp->oq, mp);
@@ -638,7 +648,8 @@ sl_in_service_ind(queue_t *q, struct xp *xp)
 	sl_in_service_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_IN_SERVICE_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -658,7 +669,8 @@ sl_out_of_service_ind(queue_t *q, struct xp *xp, ulong reason)
 	sl_out_of_service_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_OUT_OF_SERVICE_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_reason = reason;
@@ -680,7 +692,8 @@ sl_remote_processor_outage_ind(queue_t *q, struct xp *xp)
 	sl_rem_proc_out_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_REMOTE_PROCESSOR_OUTAGE_IND;
 		p->sl_timestamp = jiffies;
 		ss7_oput(xp->oq, mp);
@@ -701,7 +714,8 @@ sl_remote_processor_recovered_ind(queue_t *q, struct xp *xp)
 	sl_rem_proc_recovered_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_REMOTE_PROCESSOR_RECOVERED_IND;
 		p->sl_timestamp = jiffies;
 		ss7_oput(xp->oq, mp);
@@ -722,7 +736,8 @@ sl_rtb_cleared_ind(queue_t *q, struct xp *xp)
 	sl_rtb_cleared_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RTB_CLEARED_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -742,7 +757,8 @@ sl_retrieval_not_possible_ind(queue_t *q, struct xp *xp)
 	sl_retrieval_not_poss_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVAL_NOT_POSSIBLE_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -762,7 +778,8 @@ sl_bsnt_not_retrievable_ind(queue_t *q, struct xp *xp, ulong bsnt)
 	sl_bsnt_not_retr_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_BSNT_NOT_RETRIEVABLE_IND;
 		p->sl_bsnt = bsnt;
 		ss7_oput(xp->oq, mp);
@@ -784,7 +801,8 @@ sl_optmgmt_ack(queue_t *q, struct xp *xp, caddr_t opt_ptr, size_t opt_len, ulong
 	sl_optmgmt_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_OPTMGMT_ACK;
 		p->opt_length = opt_len;
 		p->opt_offset = opt_len ? sizeof(*p) : 0;
@@ -809,7 +827,8 @@ sl_notify_ind(queue_t *q, struct xp *xp)
 	sl_notify_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_NOTIFY_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -830,7 +849,8 @@ lmi_info_ack(queue_t *q, struct xp *xp, caddr_t ppa_ptr, size_t ppa_len)
 	lmi_info_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
 		p->lmi_version = 1;
 		p->lmi_state = xp->i_state;
@@ -867,7 +887,8 @@ sdt_rc_signal_unit_ind(queue_t *q, struct xp *xp, mblk_t *dp, ulong count)
 			sdt_rc_signal_unit_ind_t *p;
 			if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 				mp->b_datap->db_type = M_PROTO;
-				p = (typeof(p)) mp->b_wptr++;
+				p = (typeof(p)) mp->b_wptr;
+				mp->b_wptr += sizeof(*p);
 				p->sdt_primitive = SDT_RC_SIGNAL_UNIT_IND;
 				p->sdt_count = count;
 				mp->b_cont = dp;
@@ -898,7 +919,8 @@ sdt_rc_congestion_accept_ind(queue_t *q, struct xp *xp)
 	sdt_rc_congestion_accept_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_CONGESTION_ACCEPT_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -918,7 +940,8 @@ sdt_rc_congestion_discard_ind(queue_t *q, struct xp *xp)
 	sdt_rc_congestion_discard_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_CONGESTION_DISCARD_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -938,7 +961,8 @@ sdt_rc_no_congestion_ind(queue_t *q, struct xp *xp)
 	sdt_rc_no_congestion_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_NO_CONGESTION_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -959,7 +983,8 @@ sdt_iac_correct_su_ind(queue_t *q, struct xp *xp)
 		sdt_iac_correct_su_ind_t *p;
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->sdt_primitive = SDT_IAC_CORRECT_SU_IND;
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
@@ -982,7 +1007,8 @@ sdt_iac_abort_proving_ind(queue_t *q, struct xp *xp)
 	sdt_iac_abort_proving_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_IAC_ABORT_PROVING_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -1002,7 +1028,8 @@ sdt_lsc_link_failure_ind(queue_t *q, struct xp *xp)
 	sdt_lsc_link_failure_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_LSC_LINK_FAILURE_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -1022,7 +1049,8 @@ sdt_txc_transmission_request_ind(queue_t *q, struct xp *xp)
 	sdt_txc_transmission_request_ind_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_TXC_TRANSMISSION_REQUEST_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -1061,7 +1089,8 @@ sdl_disconnect_ind(queue_t *q, struct xp *xp)
 	(void) xp;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdl_primitive = SDL_DISCONNECT_IND;
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
@@ -1081,7 +1110,8 @@ lmi_ok_ack(queue_t *q, struct xp *xp, ulong state, long prim)
 	lmi_ok_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OK_ACK;
 		p->lmi_correct_primitive = prim;
 		p->lmi_state = xp->i_state = state;
@@ -1103,7 +1133,8 @@ lmi_error_ack(queue_t *q, struct xp *xp, ulong state, long prim, ulong errno, ul
 	lmi_error_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_ACK;
 		p->lmi_errno = errno;
 		p->lmi_reason = reason;
@@ -1127,7 +1158,8 @@ lmi_enable_con(queue_t *q, struct xp *xp)
 	lmi_enable_con_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ENABLE_CON;
 		p->lmi_state = xp->i_state = LMI_ENABLED;
 		ss7_oput(xp->oq, mp);
@@ -1148,7 +1180,8 @@ lmi_disable_con(queue_t *q, struct xp *xp)
 	lmi_disable_con_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DISABLE_CON;
 		p->lmi_state = xp->i_state = LMI_DISABLED;
 		ss7_oput(xp->oq, mp);
@@ -1169,7 +1202,8 @@ lmi_optmgmt_ack(queue_t *q, struct xp *xp, ulong flags, caddr_t opt_ptr, size_t 
 	lmi_optmgmt_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OPTMGMT_ACK;
 		p->lmi_opt_length = opt_len;
 		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -1192,7 +1226,8 @@ lmi_error_ind(queue_t *q, struct xp *xp, ulong errno, ulong reason)
 	lmi_error_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_IND;
 		p->lmi_errno = errno;
 		p->lmi_reason = reason;
@@ -1216,7 +1251,8 @@ lmi_stats_ind(queue_t *q, struct xp *xp, ulong interval)
 		lmi_stats_ind_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->lmi_primitive = LMI_STATS_IND;
 			p->lmi_interval = interval;
 			p->lmi_timestamp = jiffies;
@@ -1242,7 +1278,8 @@ lmi_event_ind(queue_t *q, struct xp *xp, ulong oid, ulong level)
 		lmi_event_ind_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->lmi_primitive = LMI_EVENT_IND;
 			p->lmi_objectid = oid;
 			p->lmi_timestamp = jiffies;
@@ -2229,15 +2266,21 @@ STATIC INLINE void
 sl_daedt_fisu(queue_t *q, struct xp *xp, mblk_t *mp)
 {
 	if (xp->option.popt & SS7_POPT_XSN) {
-		*(sl_ushort *) mp->b_wptr++ =
+		*(sl_ushort *) mp->b_wptr =
 		    htons(xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
-		*(sl_ushort *) mp->b_wptr++ =
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr =
 		    htons(xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
-		*(sl_ushort *) mp->b_wptr++ = 0;
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr = 0;
+		mp->b_wptr += sizeof(sl_ushort);
 	} else {
-		*(sl_uchar *) mp->b_wptr++ = (xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
-		*(sl_uchar *) mp->b_wptr++ = (xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
-		*(sl_uchar *) mp->b_wptr++ = 0;
+		*(sl_uchar *) mp->b_wptr = (xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = (xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = 0;
+		mp->b_wptr += sizeof(sl_uchar);
 	}
 }
 
@@ -2245,17 +2288,24 @@ STATIC INLINE void
 sl_daedt_lssu(queue_t *q, struct xp *xp, mblk_t *mp)
 {
 	if (xp->option.popt & SS7_POPT_XSN) {
-		*(sl_ushort *) mp->b_wptr++ =
+		*(sl_ushort *) mp->b_wptr =
 		    htons(xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
-		*(sl_ushort *) mp->b_wptr++ =
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr =
 		    htons(xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
-		*(sl_ushort *) mp->b_wptr++ = htons(1);
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr = htons(1);
+		mp->b_wptr += sizeof(sl_ushort);
 	} else {
-		*(sl_uchar *) mp->b_wptr++ = (xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
-		*(sl_uchar *) mp->b_wptr++ = (xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
-		*(sl_uchar *) mp->b_wptr++ = 1;
+		*(sl_uchar *) mp->b_wptr = (xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = (xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = 1;
+		mp->b_wptr += sizeof(sl_uchar);
 	}
-	*(sl_uchar *) mp->b_wptr++ = (xp->sl.statem.tx.sio);
+	*(sl_uchar *) mp->b_wptr = (xp->sl.statem.tx.sio);
+	mp->b_wptr += sizeof(sl_uchar);
 }
 
 STATIC INLINE void

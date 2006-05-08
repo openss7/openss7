@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/04/24 05:01:02 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/08 11:01:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/24 05:01:02 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:01:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x100p-ss7.c,v $
+ Revision 0.9.2.22  2006/05/08 11:01:18  brian
+ - new compilers mishandle postincrement of cast pointers
+
  Revision 0.9.2.21  2006/04/24 05:01:02  brian
  - call interface corrections
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/04/24 05:01:02 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/08 11:01:18 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/04/24 05:01:02 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/08 11:01:18 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -91,7 +94,7 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2006/04/24 05:01:02 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2006/05/08 11:01:18 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2294,15 +2297,21 @@ STATIC INLINE void
 sl_daedt_fisu(queue_t *q, struct xp *xp, mblk_t *mp)
 {
 	if (xp->option.popt & SS7_POPT_XSN) {
-		*(sl_ushort *) mp->b_wptr++ =
+		*(sl_ushort *) mp->b_wptr =
 		    htons(xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
-		*(sl_ushort *) mp->b_wptr++ =
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr =
 		    htons(xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
-		*(sl_ushort *) mp->b_wptr++ = 0;
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr = 0;
+		mp->b_wptr += sizeof(sl_ushort);
 	} else {
-		*(sl_uchar *) mp->b_wptr++ = (xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
-		*(sl_uchar *) mp->b_wptr++ = (xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
-		*(sl_uchar *) mp->b_wptr++ = 0;
+		*(sl_uchar *) mp->b_wptr = (xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = (xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = 0;
+		mp->b_wptr += sizeof(sl_uchar);
 	}
 }
 
@@ -2310,17 +2319,24 @@ STATIC INLINE void
 sl_daedt_lssu(queue_t *q, struct xp *xp, mblk_t *mp)
 {
 	if (xp->option.popt & SS7_POPT_XSN) {
-		*(sl_ushort *) mp->b_wptr++ =
+		*(sl_ushort *) mp->b_wptr =
 		    htons(xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
-		*(sl_ushort *) mp->b_wptr++ =
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr =
 		    htons(xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
-		*(sl_ushort *) mp->b_wptr++ = htons(1);
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr = htons(1);
+		mp->b_wptr += sizeof(sl_ushort);
 	} else {
-		*(sl_uchar *) mp->b_wptr++ = (xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
-		*(sl_uchar *) mp->b_wptr++ = (xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
-		*(sl_uchar *) mp->b_wptr++ = 1;
+		*(sl_uchar *) mp->b_wptr = (xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = (xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = 1;
+		mp->b_wptr += sizeof(sl_uchar);
 	}
-	*(sl_uchar *) mp->b_wptr++ = (xp->sl.statem.tx.sio);
+	*(sl_uchar *) mp->b_wptr = (xp->sl.statem.tx.sio);
+	mp->b_wptr += sizeof(sl_uchar);
 }
 
 STATIC INLINE void

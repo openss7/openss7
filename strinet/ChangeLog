@@ -14,6 +14,10 @@
 	* src/util/sysconfig/strinet: updated headers
 	* src/util/sysconfig/strinet.conf: updated headers
 
+	* src/drivers/rawip.c: new gcc mishandles ++ of cast pointers
+	* src/drivers/tcp.c: new gcc mishandles ++ of cast pointers
+	* src/drivers/udp.c: new gcc mishandles ++ of cast pointers
+
 2006-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: added tcp2 manual page

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:36 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:10:36 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:00:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.14  2006/05/08 11:00:58  brian
+ - new compilers mishandle postincrement of cast pointers
+
  Revision 0.9.2.13  2006/03/07 01:10:36  brian
  - binary compatible callouts
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:36 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:58 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:36 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:58 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -88,7 +91,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:10:36 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:58 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1450,7 +1453,8 @@ m_error_ack(queue_t *q, struct mtp *mtp, ulong prim, ulong err)
 	}
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_ERROR_ACK;
 		p->mtp_error_primitive = prim;
 		p->mtp_mtpi_error = err < 0 ? MSYSERR : err;
@@ -1479,7 +1483,8 @@ m_ok_ack(queue_t *q, struct mtp *mtp, ulong prim)
 	struct MTP_ok_ack *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_OK_ACK;
 		p->mtp_correct_prim = prim;
 		switch (mtp_get_state(mtp)) {
@@ -1530,7 +1535,8 @@ m_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 	size_t add_len = add ? sizeof(*add) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_INFO_ACK;
 		p->mtp_addr_length = add_len;
 		p->mtp_addr_offset = add_len ? sizeof(*p) : 0;
@@ -1565,7 +1571,8 @@ m_addr_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *loc, struct mtp_addr *r
 	size_t rem_len = rem ? sizeof(*rem) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + loc_len + rem_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_ADDR_ACK;
 		p->mtp_loc_length = loc_len;
 		p->mtp_loc_offset = loc_len ? sizeof(*p) : 0;
@@ -1626,7 +1633,8 @@ m_info_ack(queue_t *q, struct mtp *mtp)
 	}
 	if ((mp = ss7_allocb(q, sizeof(*p) + src_len + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_INFO_ACK;
 		p->mtp_msu_size = 279;
 		p->mtp_addr_size = sizeof(struct mtp_addr);
@@ -1663,7 +1671,8 @@ m_optmgmt_ack(queue_t *q, struct mtp *mtp, struct mtp_opts *opt, ulong flags)
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_OPTMGMT_ACK;
 		p->mtp_opt_length = opt_len;
 		p->mtp_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -1695,7 +1704,8 @@ m_transfer_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, ulong sls, ulo
 		size_t src_len = src ? sizeof(*src) : 0;
 		if ((bp = ss7_allocb(q, sizeof(*p) + src_len, BPRI_MED))) {
 			bp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) bp->b_wptr++;
+			p = (typeof(p)) bp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->mtp_primitive = MTP_TRANSFER_IND;
 			p->mtp_srce_length = src_len;
 			p->mtp_srce_offset = src_len ? sizeof(*p) : 0;
@@ -1725,7 +1735,8 @@ m_pause_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 	const size_t add_len = sizeof(*add);
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_PAUSE_IND;
 		p->mtp_addr_length = add_len;
 		p->mtp_addr_offset = add_len ? sizeof(*p) : 0;
@@ -1753,7 +1764,8 @@ m_resume_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 	const size_t add_len = sizeof(*add);
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_RESUME_IND;
 		p->mtp_addr_length = add_len;
 		p->mtp_addr_offset = add_len ? sizeof(*p) : 0;
@@ -1782,7 +1794,8 @@ m_status_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add, struct mtp_opts 
 	const size_t add_len = sizeof(*add);
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_STATUS_IND;
 		p->mtp_addr_length = add_len;
 		p->mtp_addr_offset = add_len ? sizeof(*p) : 0;
@@ -1816,7 +1829,8 @@ m_restart_complete_ind(queue_t *q, struct mtp *mtp)
 	struct MTP_restart_complete_ind *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_RESTART_COMPLETE_IND;
 		printd(("%s: %p: <- MTP_RESTART_COMPLETE_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
@@ -1841,7 +1855,8 @@ n_conn_ind(queue_t *q, struct mtp *mtp, ulong seq, ulong flags, struct mtp_addr 
 	const size_t qos_len = qos ? sizeof(*qos) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + src_len + dst_len + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_CONN_IND;
 		p->SRC_length = src_len;
 		p->SRC_offset = src_len ? sizeof(*p) : 0;
@@ -1885,7 +1900,8 @@ n_conn_con(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_addr *res,
 	const size_t qos_len = qos ? sizeof(*qos) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + res_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_CONN_CON;
 		p->RES_length = res_len;
 		p->RES_offset = res_len ? sizeof(*p) : 0;
@@ -1924,7 +1940,8 @@ n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq, s
 	const size_t res_len = res ? sizeof(*res) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + res_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_DISCON_IND;
 		p->DISCON_orig = orig;
 		p->DISCON_reason = reason;
@@ -1955,7 +1972,8 @@ n_data_ind(queue_t *q, struct mtp *mtp, ulong flags, mblk_t *dp)
 	N_data_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_DATA_IND;
 		p->DATA_xfer_flags = flags;
 		mp->b_cont = dp;
@@ -1979,7 +1997,8 @@ n_exdata_ind(queue_t *q, struct mtp *mtp, mblk_t *dp)
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		mp->b_band = 1;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_EXDATA_IND;
 		mp->b_cont = dp;
 		printd(("%s: %p: <- N_EXDATA_IND\n", DRV_NAME, mtp));
@@ -2065,7 +2084,8 @@ n_info_ack(queue_t *q, struct mtp *mtp)
 	}
 	if ((mp = ss7_allocb(q, sizeof(*p) + src_len + dst_len + qos_len + qor_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_INFO_ACK;
 		p->NSDU_size = 279;
 		p->ENSDU_size = 0;
@@ -2096,13 +2116,15 @@ n_info_ack(queue_t *q, struct mtp *mtp)
 			mp->b_wptr += sizeof(mtp->dst);
 		}
 		if (qos_len) {
-			qos = (typeof(qos)) mp->b_wptr++;
+			qos = (typeof(qos)) mp->b_wptr;
+			mp->b_wptr += sizeof(*qos);
 			qos->n_qos_type = N_QOS_SEL_INFO_MTP;
 			qos->pvar = na->option.pvar;
 			qos->popt = na->option.popt;
 		}
 		if (qor_len) {
-			qor = (typeof(qor)) mp->b_wptr++;
+			qor = (typeof(qor)) mp->b_wptr;
+			mp->b_wptr += sizeof(*qor);
 			qor->n_qos_type = N_QOS_RANGE_INFO_MTP;
 			qor->sls_range = sp->ls.sls_mask;
 			qor->mp_range = (na->option.popt & SS7_POPT_MPLEV) ? 3 : 0;
@@ -2137,7 +2159,8 @@ n_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long err)
 	}
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_ERROR_ACK;
 		p->ERROR_prim = prim;
 		p->NPI_error = err < 0 ? NSYSERR : err;
@@ -2167,7 +2190,8 @@ n_ok_ack(queue_t *q, struct mtp *mtp, ulong prim)
 	int err;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_OK_ACK;
 		p->CORRECT_prim = prim;
 		switch (mtp_get_state(mtp)) {
@@ -2223,7 +2247,8 @@ n_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 	size_t add_len = add ? sizeof(*add) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_BIND_ACK;
 		p->ADDR_length = add_len;
 		p->ADDR_offset = add_len ? sizeof(*p) : 0;
@@ -2262,7 +2287,8 @@ n_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_add
 	size_t dst_len = dst ? sizeof(*dst) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + src_len + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_UNITDATA_IND;
 		p->SRC_length = src_len;
 		p->SRC_offset = src_len ? sizeof(*p) : 0;
@@ -2298,7 +2324,8 @@ n_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
 	size_t dst_len = dst ? sizeof(*dst) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_UDERROR_IND;
 		p->DEST_length = dst_len;
 		p->DEST_offset = dst_len ? sizeof(*p) : 0;
@@ -2327,7 +2354,8 @@ n_datack_ind(queue_t *q, struct mtp *mtp)
 	N_datack_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_DATACK_IND;
 		printd(("%s: %p: <- N_DATACK_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
@@ -2348,7 +2376,8 @@ n_reset_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason)
 	N_reset_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_RESET_IND;
 		p->RESET_orig = orig;
 		p->RESET_reason = reason;
@@ -2371,7 +2400,8 @@ n_reset_con(queue_t *q, struct mtp *mtp)
 	N_reset_con_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_RESET_CON;
 		printd(("%s: %p: <- N_RESET_CON\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
@@ -2405,7 +2435,8 @@ t_conn_con(queue_t *q, struct mtp *mtp, struct mtp_addr *res, struct mtp_opts *o
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_CONN_CON;
 		p->RES_length = res_len;
 		p->RES_offset = res_len ? sizeof(*p) : 0;
@@ -2451,7 +2482,8 @@ t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
 		struct T_data_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->PRIM_type = T_DATA_IND;
 			p->MORE_flag = more;
 			mp->b_cont = dp;
@@ -2488,7 +2520,8 @@ t_info_ack(queue_t *q, struct mtp *mtp)
 	struct T_info_ack *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_INFO_ACK;
 		*p = *mtp->prot;
 		printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, mtp));
@@ -2521,7 +2554,8 @@ t_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long error)
 	}
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_ERROR_ACK;
 		p->ERROR_prim = prim;
 		p->TLI_error = error < 0 ? TSYSERR : error;
@@ -2549,7 +2583,8 @@ t_ok_ack(queue_t *q, struct mtp *mtp, ulong prim)
 	struct T_ok_ack *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_OK_ACK;
 		p->CORRECT_prim = prim;
 		switch (mtp_get_state(mtp)) {
@@ -2609,7 +2644,8 @@ t_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 	size_t add_len = add ? sizeof(*add) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_BIND_ACK;
 		p->ADDR_length = add_len;
 		p->ADDR_offset = add_len ? sizeof(*p) : 0;
@@ -2645,7 +2681,8 @@ t_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_opt
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_UNITDATA_IND;
 		p->SRC_length = src_len;
 		p->SRC_offset = src_len ? sizeof(*p) : 0;
@@ -2686,7 +2723,8 @@ t_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			mp->b_band = 2;	/* XXX move ahead of data indications */
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->PRIM_type = T_UDERROR_IND;
 			p->DEST_length = dst_len;
 			p->DEST_offset = dst_len ? sizeof(*p) : 0;
@@ -2725,7 +2763,8 @@ t_optmgmt_ack(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt)
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_OPTMGMT_ACK;
 		p->OPT_length = opt_len;
 		p->OPT_offset = opt_len ? sizeof(*p) : 0;
@@ -2770,7 +2809,8 @@ t_optdata_ind(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt, mb
 		size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->PRIM_type = T_OPTDATA_IND;
 			p->OPT_length = opt_len;
 			p->OPT_offset = opt_len ? sizeof(*p) : 0;
@@ -2805,7 +2845,8 @@ t_addr_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *loc, struct mtp_addr *r
 	size_t rem_len = rem ? sizeof(*rem) : 0;
 	if ((mp = ss7_allocb(q, sizeof(*p) + loc_len + rem_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_ADDR_ACK;
 		p->LOCADDR_length = loc_len;
 		p->LOCADDR_offset = loc_len ? sizeof(*p) : 0;
@@ -2840,7 +2881,8 @@ t_capability_ack(queue_t *q, struct mtp *mtp, ulong caps)
 	struct T_capability_ack *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = TC1_INFO;
 		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) mtp->oq : 0;
@@ -2876,7 +2918,8 @@ sl_pdu_req(queue_t *q, struct sl *sl, mblk_t *dp)
 		sl_pdu_req_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->sl_primitive = SL_PDU_REQ;
 			p->sl_mp = 0;
 			mp->b_cont = dp;
@@ -2902,7 +2945,8 @@ sl_emergency_req(queue_t *q, struct sl *sl)
 	sl_emergency_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_EMERGENCY_REQ;
 		printd(("%s: %p: SL_EMERGENCY_REQ ->\n", DRV_NAME, sl));
 		/* 
@@ -2925,7 +2969,8 @@ sl_emergency_ceases_req(queue_t *q, struct sl *sl)
 	sl_emergency_ceases_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_EMERGENCY_CEASES_REQ;
 		printd(("%s: %p: SL_EMERGENCY_CEASES_REQ ->\n", DRV_NAME, sl));
 		/* 
@@ -2948,7 +2993,8 @@ sl_start_req(queue_t *q, struct sl *sl)
 	sl_start_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_START_REQ;
 		/* 
 		   routing state of link does not change */
@@ -2972,7 +3018,8 @@ sl_stop_req(queue_t *q, struct sl *sl)
 	sl_stop_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_STOP_REQ;
 		printd(("%s: %p: SL_STOP_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
@@ -2994,7 +3041,8 @@ sl_retrieve_bsnt_req(queue_t *q, struct sl *sl)
 	sl_retrieve_bsnt_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVE_BSNT_REQ;
 		printd(("%s: %p: SL_RETRIEVE_BSNT_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_WIND_BSNT);
@@ -3016,7 +3064,8 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, struct sl *sl, ulong fsnc)
 	sl_retrieval_req_and_fsnc_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVAL_REQUEST_AND_FSNC_REQ;
 		p->sl_fsnc = fsnc;
 		printd(("%s: %p: SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->\n", DRV_NAME, sl));
@@ -3039,7 +3088,8 @@ sl_resume_req(queue_t *q, struct sl *sl)
 	sl_resume_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RESUME_REQ;
 		printd(("%s: %p: SL_RESUME_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
@@ -3060,7 +3110,8 @@ sl_clear_buffers_req(queue_t *q, struct sl *sl)
 	sl_clear_buffers_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_CLEAR_BUFFERS_REQ;
 		printd(("%s: %p: SL_CLEAR_BUFFERS_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
@@ -3082,7 +3133,8 @@ sl_clear_rtb_req(queue_t *q, struct sl *sl)
 	sl_clear_rtb_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_CLEAR_RTB_REQ;
 		printd(("%s: %p: SL_CLEAR_RTB_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_WIND_CLRB);
@@ -3104,7 +3156,8 @@ sl_local_processor_outage_req(queue_t *q, struct sl *sl)
 	sl_local_proc_outage_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
 		printd(("%s: %p: SL_LOCAL_PROCESSOR_OUTAGE_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
@@ -3125,7 +3178,8 @@ sl_congestion_discard_req(queue_t *q, struct sl *sl)
 	sl_cong_discard_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_CONGESTION_DISCARD_REQ;
 		printd(("%s: %p: SL_CONGESTION_DISCARD_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
@@ -3146,7 +3200,8 @@ sl_congestion_accept_req(queue_t *q, struct sl *sl)
 	sl_cong_accept_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_CONGESTION_ACCEPT_REQ;
 		printd(("%s: %p: SL_CONGESTION_ACCEPT_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
@@ -3167,7 +3222,8 @@ sl_no_congestion_req(queue_t *q, struct sl *sl)
 	sl_no_cong_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_NO_CONGESTION_REQ;
 		printd(("%s: %p: SL_NO_CONGESTION_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
@@ -3188,7 +3244,8 @@ sl_power_on_req(queue_t *q, struct sl *sl)
 	sl_power_on_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_POWER_ON_REQ;
 		/* 
 		   should maybe set routing state to active */
@@ -3213,7 +3270,8 @@ sl_optmgmt_req(queue_t *q, struct sl *sl)
 	sl_optmgmt_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_OPTMGMT_REQ;
 		printd(("%s: %p: SL_OPTMGMT_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
@@ -3234,7 +3292,8 @@ sl_notify_req(queue_t *q, struct sl *sl)
 	sl_notify_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_NOTIFY_REQ;
 		printd(("%s: %p: SL_NOTIFY_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
@@ -3255,7 +3314,8 @@ lmi_info_req(queue_t *q, struct sl *sl)
 	lmi_info_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_REQ;
 		printd(("%s: %p: LMI_INFO_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
@@ -3276,7 +3336,8 @@ lmi_attach_req(queue_t *q, struct sl *sl, caddr_t ppa_ptr, size_t ppa_len)
 	lmi_attach_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ATTACH_REQ;
 		if (ppa_ptr && ppa_len) {
 			bcopy(ppa_ptr, mp->b_wptr, ppa_len);
@@ -3301,7 +3362,8 @@ lmi_detach_req(queue_t *q, struct sl *sl)
 	lmi_detach_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DETACH_REQ;
 		printd(("%s: %p: LMI_DETACH_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
@@ -3322,7 +3384,8 @@ lmi_enable_req(queue_t *q, struct sl *sl, caddr_t dst_ptr, size_t dst_len)
 	lmi_enable_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ENABLE_REQ;
 		if (dst_ptr && dst_len) {
 			bcopy(dst_ptr, mp->b_wptr, dst_len);
@@ -3347,7 +3410,8 @@ lmi_disable_req(queue_t *q, struct sl *sl)
 	lmi_disable_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DISABLE_REQ;
 		printd(("%s: %p: LMI_DISABLE_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
@@ -3368,7 +3432,8 @@ lmi_optmgmt_req(queue_t *q, struct sl *sl, ulong flags, caddr_t opt_ptr, size_t 
 	lmi_optmgmt_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OPTMGMT_REQ;
 		p->lmi_opt_length = opt_len;
 		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;

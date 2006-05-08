@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/18 18:00:45 $
+ @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 11:26:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/18 18:00:45 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:26:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_ip.c,v $
+ Revision 0.9.2.3  2006/05/08 11:26:11  brian
+ - post inc problem and working through test cases
+
  Revision 0.9.2.2  2006/04/18 18:00:45  brian
  - working up DL and NP drivers
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/18 18:00:45 $"
+#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 11:26:11 $"
 
 static char const ident[] =
-    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/18 18:00:45 $";
+    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 11:26:11 $";
 
 /*
  *  This is a DLPI driver for the IP subsystem.  The purpose of the driver is to directly access the
@@ -88,7 +91,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2006/04/18 18:00:45 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2006/05/08 11:26:11 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI DL_IP Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -489,7 +492,8 @@ dl_info_ack(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_INFO_ACK;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_INFO_ACK");
@@ -575,7 +579,8 @@ dl_bind_ack(queue_t *q, dl_ulong dl_sap, caddr_t dl_addr, size_t dl_addr_length)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_BIND_ACK;
 		p->dl_sap = dl_sap;
 		p->dl_addr_length = dl_addr_length;
@@ -617,7 +622,8 @@ dl_ok_ack(queue_t *q, const dl_ulong dl_correct_primitive, struct dl *ap, mblk_t
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_OK_ACK;
 		p->dl_correct_primitive = dl_correct_primitive;
 		switch (dl_get_state(dl)) {
@@ -728,7 +734,8 @@ dl_error_ack(queue_t *q, dl_ulong dl_error_primitive, dl_long error)
 	}
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_ERROR_ACK;
 		p->dl_error_primitive = dl_error_primitive;
 		p->dl_errno = error > 0 ? error : 0;
@@ -797,7 +804,8 @@ dl_subs_bind_ack(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_SUBS_BIND_ACK;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_SUBS_BIND_ACK");
@@ -814,7 +822,8 @@ dl_unitdata_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_UNITDATA_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_UNITDATA_IND");
@@ -831,7 +840,8 @@ dl_uderror_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_UDERROR_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_UDERROR_IND");
@@ -848,7 +858,8 @@ dl_connect_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_CONNECT_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_CONNECT_IND");
@@ -865,7 +876,8 @@ dl_connect_con(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_CONNECT_CON;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_CONNECT_CON");
@@ -882,7 +894,8 @@ dl_token_ack(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_TOKEN_ACK;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_TOKEN_ACK");
@@ -899,7 +912,8 @@ dl_disconnect_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_DISCONNECT_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_DISCONNECT_IND");
@@ -916,7 +930,8 @@ dl_reset_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_RESET_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_RESET_IND");
@@ -933,7 +948,8 @@ dl_reset_con(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_RESET_CON;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_RESET_CON");
@@ -950,7 +966,8 @@ dl_data_ack_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_DATA_ACK_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_DATA_ACK_IND");
@@ -967,7 +984,8 @@ dl_data_ack_status_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_DATA_ACK_STATUS_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_DATA_ACK_STATUS");
@@ -984,7 +1002,8 @@ dl_reply_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_REPLY_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_REPLY_IND");
@@ -1001,7 +1020,8 @@ dl_reply_status_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_REPLY_STATUS_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_REPLY_STATUS_IND");
@@ -1018,7 +1038,8 @@ dl_reply_update_status_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_REPLY_UPDATE_STATUS_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_REPLY_UPDATE_STATUS_IND");
@@ -1035,7 +1056,8 @@ dl_xid_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_XID_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_XID_IND");
@@ -1052,7 +1074,8 @@ dl_xid_con(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_XID_CON;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_XID_CON");
@@ -1069,7 +1092,8 @@ dl_test_ind(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_TEST_IND;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_TEST_IND");
@@ -1086,7 +1110,8 @@ dl_test_con(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_TEST_CON;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_TEST_CON");
@@ -1103,7 +1128,8 @@ dl_phys_addr_ack(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_PHYS_ADDR_ACK;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_PHYS_ADDR_ACK");
@@ -1120,7 +1146,8 @@ dl_get_statistics_ack(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_GET_STATISTICS_ACK;
 		strlog(DRV_ID, DL_PRIV(q)->u.dev.cminor, DL_LOG_DLSP_PRIM, SL_TRACE,
 		       "<- DL_GET_STATISTICS_ACK");

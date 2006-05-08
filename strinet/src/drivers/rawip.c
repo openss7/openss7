@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/05/03 11:53:51 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/08 11:26:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/03 11:53:51 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:26:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.13  2006/05/08 11:26:03  brian
+ - post inc problem and working through test cases
+
  Revision 0.9.2.12  2006/05/03 11:53:51  brian
  - changes for compile, working up NPI-IP driver
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/05/03 11:53:51 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/08 11:26:03 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/05/03 11:53:51 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/08 11:26:03 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -165,7 +168,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/05/03 11:53:51 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/08 11:26:03 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -3500,7 +3503,8 @@ t_error_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error)
 	mp->b_datap->db_type = M_PCPROTO;
 	mp->b_band = 0;
 	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_ERROR_ACK;
 	p->ERROR_prim = prim;
 	p->TLI_error = error > 0 ? error : TSYSERR;
@@ -3538,7 +3542,8 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
 	mp->b_datap->db_type = M_PCPROTO;
 	mp->b_band = 0;
 	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_OK_ACK;
 	p->CORRECT_prim = prim;
 	switch (tpi_get_state(tpi)) {
@@ -3658,7 +3663,8 @@ t_unitdata_ind(queue_t *q, mblk_t *dp)
 	if (unlikely(!canputnext(q)))
 		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_UNITDATA_IND;
 	p->SRC_length = SRC_length;
 	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
@@ -3748,7 +3754,8 @@ t_conn_ind(queue_t *q, mblk_t *dp)
 	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + SRC_length + OPT_length, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_CONN_IND;
 	p->SRC_length = SRC_length;
 	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
@@ -3815,7 +3822,8 @@ t_optdata_ind(queue_t *q, mblk_t *dp)
 	if (unlikely(!canputnext(q)))
 		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_OPTDATA_IND;
 	p->DATA_flag = 0;
 	p->OPT_length = OPT_length;

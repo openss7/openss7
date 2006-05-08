@@ -7,6 +7,29 @@
 	* strss7.spec.in: updated headers, corrected init script removal
 	* src/util/modutils/strss7.in: updated headers
 
+	* src/modules/isdn/isdn.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/isup/isup.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/m2pa/m2pa_sl.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/m2ua/m2ua.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/mg/mg.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/mtp/mtp.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/mtp/mtp_npi.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/mtp/mtp_tpi.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/mx/mx_sdl.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/sccp/sccp.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/sl/sl.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/sl/sl_mux.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/sl/sm_mod.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/ss7ip/sl_tpi.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/x400p-ss7/ch_x400p.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/x400p-ss7/mx_x400p.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/x400p-ss7/sdl_x400p.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/x400p-ss7/sdt_x400p.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/x400p-ss7/sl_x100p.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/x400p-ss7/sl_x400p.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/x400p-ss7/x100p-ss7.c: new compilers mishandle postincrement of cast pointers
+	* src/modules/x400p-ss7/x400p_mx.c: new compilers mishandle postincrement of cast pointers
+
 2006-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: moved conflicting manual page

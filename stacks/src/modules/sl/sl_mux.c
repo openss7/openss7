@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:02 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 11:01:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/24 05:01:02 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:01:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 0.9.2.19  2006/05/08 11:01:10  brian
+ - new compilers mishandle postincrement of cast pointers
+
  Revision 0.9.2.18  2006/04/24 05:01:02  brian
  - call interface corrections
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:02 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 11:01:10 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:02 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 11:01:10 $";
 
 #include <sys/os7/compat.h>
 
@@ -69,7 +72,7 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:02 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 11:01:10 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -498,7 +501,8 @@ restart_link(caddr_t data)
 	if ((dp = allocb(sizeof(long), BPRI_MED))) {
 		sl_start_req_t *p;
 		dp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) dp->b_wptr++;
+		p = (typeof(p)) dp->b_wptr;
+		dp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_START_REQ;
 		ptrace(("Sending SL_START_REQ\n"));
 		ls->recovery_attempts++;
@@ -522,7 +526,8 @@ failed_sltm(caddr_t data)
 		if ((dp = allocb(sizeof(long), BPRI_MED))) {
 			sl_stop_req_t *p;
 			dp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) dp->b_wptr++;
+			p = (typeof(p)) dp->b_wptr;
+			dp->b_wptr += sizeof(*p);
 			p->sl_primitive = SL_STOP_REQ;
 			ptrace(("Sending SL_STOP_REQ\n"));
 			ls->recovery_timer = timeout(&restart_link, (caddr_t) q, 12 * HZ);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:48 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/08 11:26:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/07 22:12:48 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:26:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.4  2006/05/08 11:26:04  brian
+ - post inc problem and working through test cases
+
  Revision 0.9.2.3  2006/05/07 22:12:48  brian
  - updated for NPI-IP driver
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:48 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/08 11:26:04 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:48 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/08 11:26:04 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -140,7 +143,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:48 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/08 11:26:04 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -4685,7 +4688,8 @@ t_error_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error)
 	mp->b_datap->db_type = M_PCPROTO;
 	mp->b_band = 0;
 	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_ERROR_ACK;
 	p->ERROR_prim = prim;
 	p->TLI_error = error > 0 ? error : TSYSERR;
@@ -4723,7 +4727,8 @@ t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct
 	mp->b_datap->db_type = M_PCPROTO;
 	mp->b_band = 0;
 	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_OK_ACK;
 	p->CORRECT_prim = prim;
 	switch (tpi_get_state(tpi)) {
@@ -4843,7 +4848,8 @@ t_unitdata_ind(queue_t *q, mblk_t *dp)
 	if (unlikely(!canputnext(q)))
 		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_UNITDATA_IND;
 	p->SRC_length = SRC_length;
 	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
@@ -4936,7 +4942,8 @@ t_conn_ind(queue_t *q, mblk_t *dp)
 	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + SRC_length + OPT_length, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_CONN_IND;
 	p->SRC_length = SRC_length;
 	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
@@ -5003,7 +5010,8 @@ t_optdata_ind(queue_t *q, mblk_t *dp)
 	if (unlikely(!canputnext(q)))
 		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_OPTDATA_IND;
 	p->DATA_flag = 0;
 	p->OPT_length = OPT_length;

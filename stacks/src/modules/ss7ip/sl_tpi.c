@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 12:06:11 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 11:01:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 12:06:11 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:01:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 12:06:11 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 11:01:12 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/03/03 12:06:11 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 11:01:12 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -2711,15 +2711,21 @@ sl_daedt_fisu(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	if (sl->option.popt & SS7_POPT_XSN) {
-		*(sl_ushort *) mp->b_wptr++ =
+		*(sl_ushort *) mp->b_wptr =
 		    htons(sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
-		*(sl_ushort *) mp->b_wptr++ =
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr =
 		    htons(sl->sl.statem.tx.N.fsn | sl->sl.statem.tx.N.fib);
-		*(sl_ushort *) mp->b_wptr++ = 0;
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr = 0;
+		mp->b_wptr += sizeof(sl_ushort);
 	} else {
-		*(sl_uchar *) mp->b_wptr++ = (sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
-		*(sl_uchar *) mp->b_wptr++ = (sl->sl.statem.tx.N.fsn | sl->sl.statem.tx.N.fib);
-		*(sl_uchar *) mp->b_wptr++ = 0;
+		*(sl_uchar *) mp->b_wptr = (sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = (sl->sl.statem.tx.N.fsn | sl->sl.statem.tx.N.fib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = 0;
+		mp->b_wptr += sizeof(sl_uchar);
 	}
 }
 
@@ -2728,17 +2734,24 @@ sl_daedt_lssu(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	if (sl->option.popt & SS7_POPT_XSN) {
-		*(sl_ushort *) mp->b_wptr++ =
+		*(sl_ushort *) mp->b_wptr =
 		    htons(sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
-		*(sl_ushort *) mp->b_wptr++ =
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr =
 		    htons(sl->sl.statem.tx.N.fsn | sl->sl.statem.tx.N.fib);
-		*(sl_ushort *) mp->b_wptr++ = htons(1);
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr = htons(1);
+		mp->b_wptr += sizeof(sl_ushort);
 	} else {
-		*(sl_uchar *) mp->b_wptr++ = (sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
-		*(sl_uchar *) mp->b_wptr++ = (sl->sl.statem.tx.N.fsn | sl->sl.statem.tx.N.fib);
-		*(sl_uchar *) mp->b_wptr++ = 1;
+		*(sl_uchar *) mp->b_wptr = (sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = (sl->sl.statem.tx.N.fsn | sl->sl.statem.tx.N.fib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = 1;
+		mp->b_wptr += sizeof(sl_uchar);
 	}
-	*(sl_uchar *) mp->b_wptr++ = (sl->sl.statem.tx.sio);
+	*(sl_uchar *) mp->b_wptr = (sl->sl.statem.tx.sio);
+	mp->b_wptr += sizeof(sl_uchar);
 	switch (sl->sl.statem.tx.sio) {
 	case LSSU_SIO:
 		printd(("%s: %p: <- SIO\n", SL_TPI_MOD_NAME, sl));

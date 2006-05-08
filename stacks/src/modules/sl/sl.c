@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:02 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/24 05:01:02 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:01:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 0.9.2.16  2006/05/08 11:01:10  brian
+ - new compilers mishandle postincrement of cast pointers
+
  Revision 0.9.2.15  2006/04/24 05:01:02  brian
  - call interface corrections
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:02 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:10 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:02 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:10 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -79,7 +82,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/04/24 05:01:02 $"
+#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:10 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1773,13 +1776,19 @@ STATIC INLINE void
 sl_daedt_fisu(queue_t *q, struct sl *sl, mblk_t *mp)
 {
 	if (sl->option.popt & SS7_POPT_XSN) {
-		*(sl_ushort *) mp->b_wptr++ = htons(sl->statem.tx.N.bsn | sl->statem.tx.N.bib);
-		*(sl_ushort *) mp->b_wptr++ = htons(sl->statem.tx.N.fsn | sl->statem.tx.N.fib);
-		*(sl_ushort *) mp->b_wptr++ = 0;
+		*(sl_ushort *) mp->b_wptr = htons(sl->statem.tx.N.bsn | sl->statem.tx.N.bib);
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr = htons(sl->statem.tx.N.fsn | sl->statem.tx.N.fib);
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr = 0;
+		mp->b_wptr += sizeof(sl_ushort);
 	} else {
-		*(sl_uchar *) mp->b_wptr++ = (sl->statem.tx.N.bsn | sl->statem.tx.N.bib);
-		*(sl_uchar *) mp->b_wptr++ = (sl->statem.tx.N.fsn | sl->statem.tx.N.fib);
-		*(sl_uchar *) mp->b_wptr++ = 0;
+		*(sl_uchar *) mp->b_wptr = (sl->statem.tx.N.bsn | sl->statem.tx.N.bib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = (sl->statem.tx.N.fsn | sl->statem.tx.N.fib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = 0;
+		mp->b_wptr += sizeof(sl_uchar);
 	}
 	sl->statem.txc_state = SL_STATE_SLEEPING;
 	printd(("%s: %p: FISU [%x/%x] %ld ->\n", MOD_NAME, sl,
@@ -1791,15 +1800,22 @@ STATIC INLINE void
 sl_daedt_lssu(queue_t *q, struct sl *sl, mblk_t *mp)
 {
 	if (sl->option.popt & SS7_POPT_XSN) {
-		*(sl_ushort *) mp->b_wptr++ = htons(sl->statem.tx.N.bsn | sl->statem.tx.N.bib);
-		*(sl_ushort *) mp->b_wptr++ = htons(sl->statem.tx.N.fsn | sl->statem.tx.N.fib);
-		*(sl_ushort *) mp->b_wptr++ = htons(1);
+		*(sl_ushort *) mp->b_wptr = htons(sl->statem.tx.N.bsn | sl->statem.tx.N.bib);
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr = htons(sl->statem.tx.N.fsn | sl->statem.tx.N.fib);
+		mp->b_wptr += sizeof(sl_ushort);
+		*(sl_ushort *) mp->b_wptr = htons(1);
+		mp->b_wptr += sizeof(sl_ushort);
 	} else {
-		*(sl_uchar *) mp->b_wptr++ = (sl->statem.tx.N.bsn | sl->statem.tx.N.bib);
-		*(sl_uchar *) mp->b_wptr++ = (sl->statem.tx.N.fsn | sl->statem.tx.N.fib);
-		*(sl_uchar *) mp->b_wptr++ = 1;
+		*(sl_uchar *) mp->b_wptr = (sl->statem.tx.N.bsn | sl->statem.tx.N.bib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = (sl->statem.tx.N.fsn | sl->statem.tx.N.fib);
+		mp->b_wptr += sizeof(sl_uchar);
+		*(sl_uchar *) mp->b_wptr = 1;
+		mp->b_wptr += sizeof(sl_uchar);
 	}
-	*(sl_uchar *) mp->b_wptr++ = (sl->statem.tx.sio);
+	*(sl_uchar *) mp->b_wptr = (sl->statem.tx.sio);
+	mp->b_wptr += sizeof(sl_uchar);
 	if (sl->statem.tx.sio != LSSU_SIB)
 		sl->statem.txc_state = SL_STATE_SLEEPING;
 	switch (sl->statem.tx.sio) {
