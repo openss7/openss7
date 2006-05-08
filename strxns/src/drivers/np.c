@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/22 01:08:03 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/05/08 11:26:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:08:03 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:26:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 0.9.2.6  2006/05/08 11:26:13  brian
+ - post inc problem and working through test cases
+
+ Revision 0.9.2.5  2006/05/08 08:16:43  brian
+ - module_text_address, hash alloc changes
+
  Revision 0.9.2.4  2006/04/22 01:08:03  brian
  - working up NP driver
 
@@ -64,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/22 01:08:03 $"
+#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/05/08 11:26:13 $"
 
 static char const ident[] =
-    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/22 01:08:03 $";
+    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/05/08 11:26:13 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -106,7 +112,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2006/04/22 01:08:03 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2006/05/08 11:26:13 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -1032,9 +1038,10 @@ ne_data_ind(struct np *np, struct ne_data_ind *ep)
 	if (unlikely(!canputnext(np->oq)))
 		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DATA_IND;
 	p->DATA_xfer_flags = ep->DATA_xfer_flags;
+	mp->b_wptr += sizeof(*p);
 	mp->b_cont = ep->DATA_blocks;
 	if (ep->DATA_xfer_flags & RC_FLAG)
 		np->np_datinds++;
@@ -1060,8 +1067,9 @@ ne_exdata_ind(struct np *np, struct ne_exdata_ind *ep)
 		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 1;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_EXDATA_IND;
+	mp->b_wptr += sizeof(*p);
 	mp->b_cont = ep->DATA_blocks;
 	strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_EXDATA_IND");
 	putnext(np->oq, mp);
@@ -1151,8 +1159,9 @@ ne_datack_ind(struct np *np, struct ne_datack_ind *ep)
 		goto enobufs;
 	if (unlikely(!canputnext(np->oq)))
 		mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DATACK_IND;
+	mp->b_wptr += sizeof(*p);
 	strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_DATACK_IND");
 	putnext(np->oq, mp);
 	return (0);
@@ -1172,10 +1181,11 @@ ne_reset_ind(struct np *np, struct ne_reset_ind *ep)
 	if (unlikely((mp = ss7_allocb(np->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_IND;
 	p->RESET_orig = ep->RESET_orig;
 	p->RESET_reason = ep->RESET_reason;
+	mp->b_wptr += sizeof(*p);
 	strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_RESET_IND");
 	putnext(np->oq, mp);
 	return (0);
@@ -1192,8 +1202,9 @@ ne_reset_con(struct np *np, struct ne_reset_con *ep)
 	if (unlikely((mp = ss7_allocb(np->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_CON;
+	mp->b_wptr += sizeof(*p);
 	strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_RESET_CON");
 	putnext(np->oq, mp);
 	return (0);
@@ -1216,8 +1227,9 @@ dle_info_req(struct dl *dl, struct dle_info_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_INFO_REQ;
+	mp->b_wptr += sizeof(*p);
 	dl_set_state(dl, dl_get_state(dl));
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_INFO_REQ");
 	putnext(dl->oq, mp);
@@ -1235,9 +1247,10 @@ dle_attach_req(struct dl *dl, struct dle_attach_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_ATTACH_REQ;
 	p->dl_ppa = ep->dl_ppa;
+	mp->b_wptr += sizeof(*p);
 	dl_set_state(dl, DL_ATTACH_PENDING);
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_ATTACH_REQ");
 	putnext(dl->oq, mp);
@@ -1255,8 +1268,9 @@ dle_detach_req(struct dl *dl, struct dle_detach_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_DETACH_REQ;
+	mp->b_wptr += sizeof(*p);
 	dl_set_state(dl, DL_DETACH_PENDING);
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_DETACH_REQ");
 	putnext(dl->oq, mp);
@@ -1274,13 +1288,14 @@ dle_bind_req(struct dl *dl, struct dle_bind_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_BIND_REQ;
 	p->dl_sap = ep->dl_sap;
 	p->dl_max_conind = ep->dl_max_conind;
 	p->dl_service_mode = ep->dl_service_mode;
 	p->dl_conn_mgmt = ep->dl_conn_mgmt;
 	p->dl_xidtest_flg = ep->dl_xidtest_flg;
+	mp->b_wptr += sizeof(*p);
 	dl_set_state(dl, DL_BIND_PENDING);
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_BIND_REQ");
 	putnext(dl->oq, mp);
@@ -1298,8 +1313,9 @@ dle_unbind_req(struct dl *dl, struct dle_unbind_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_UNBIND_REQ;
+	mp->b_wptr += sizeof(*p);
 	dl_set_state(dl, DL_UNBIND_PENDING);
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_UNBIND_REQ");
 	putnext(dl->oq, mp);
@@ -1318,11 +1334,12 @@ dle_subs_bind_req(struct dl *dl, struct dle_subs_bind_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_SUBS_BIND_REQ;
 	p->dl_subs_sap_offset = dl_subs_sap_length ? sizeof(*p) : 0;
 	p->dl_subs_sap_length = dl_subs_sap_length;
 	p->dl_subs_bind_class = ep->dl_subs_bind_class;
+	mp->b_wptr += sizeof(*p);
 	if (dl_subs_sap_length) {
 		bcopy(ep->dl_subs_sap_buffer, mp->b_wptr, dl_subs_sap_length);
 		mp->b_wptr += dl_subs_sap_length;
@@ -1345,10 +1362,11 @@ dle_subs_unbind_req(struct dl *dl, struct dle_subs_unbind_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_SUBS_UNBIND_REQ;
 	p->dl_subs_sap_offset = dl_subs_sap_length ? sizeof(*p) : 0;
 	p->dl_subs_sap_length = dl_subs_sap_length;
+	mp->b_wptr += sizeof(*p);
 	if (dl_subs_sap_length) {
 		bcopy(ep->dl_subs_sap_buffer, mp->b_wptr, dl_subs_sap_length);
 		mp->b_wptr += dl_subs_sap_length;
@@ -1371,10 +1389,11 @@ dle_enabmulti_req(struct dl *dl, struct dle_enabmulti_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_ENABMULTI_REQ;
 	p->dl_addr_offset = dl_addr_length ? sizeof(*p) : 0;
 	p->dl_addr_length = dl_addr_length;
+	mp->b_wptr += sizeof(*p);
 	if (dl_addr_length) {
 		bcopy(ep->dl_addr_buffer, mp->b_wptr, dl_addr_length);
 		mp->b_wptr += dl_addr_length;
@@ -1397,10 +1416,11 @@ dle_disabmulti_req(struct dl *dl, struct dle_disabmulti_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_DISABMULTI_REQ;
 	p->dl_addr_offset = dl_addr_length ? sizeof(*p) : 0;
 	p->dl_addr_length = dl_addr_length;
+	mp->b_wptr += sizeof(*p);
 	if (dl_addr_length) {
 		bcopy(ep->dl_addr_buffer, mp->b_wptr, dl_addr_length);
 		mp->b_wptr += dl_addr_length;
@@ -1422,9 +1442,10 @@ dle_promiscon_req(struct dl *dl, struct dle_promiscon_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_PROMISCON_REQ;
 	p->dl_level = ep->dl_level;
+	mp->b_wptr += sizeof(*p);
 	dl_set_state(dl, dl_get_state(dl));
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_PROMISCON_REQ");
 	putnext(dl->oq, mp);
@@ -1442,9 +1463,10 @@ dle_promiscoff_req(struct dl *dl, struct dle_promiscoff_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_PROMISCOFF_REQ;
 	p->dl_level = ep->dl_level;
+	mp->b_wptr += sizeof(*p);
 	dl_set_state(dl, dl_get_state(dl));
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_PROMISCOFF_REQ");
 	putnext(dl->oq, mp);
@@ -1465,11 +1487,12 @@ dle_unitdata_req(struct dl *dl, struct dle_unitdata_req *ep)
 	if (unlikely(!canputnext(dl->oq)))
 		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_UNITDATA_REQ;
 	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
 	p->dl_dest_addr_length = dl_dest_addr_length;
 	p->dl_priority = ep->dl_priority;
+	mp->b_wptr += sizeof(*p);
 	if (dl_dest_addr_length) {
 		bcopy(ep->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
 		mp->b_wptr += dl_dest_addr_length;
@@ -1496,10 +1519,11 @@ dle_udqos_req(struct dl *dl, struct dle_udqos_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_UDQOS_REQ;
 	p->dl_qos_offset = dl_qos_length ? sizeof(*p) : 0;
 	p->dl_qos_length = dl_qos_length;
+	mp->b_wptr += sizeof(*p);
 	if (dl_qos_length) {
 		bcopy(ep->dl_qos_buffer, mp->b_wptr, dl_qos_length);
 		mp->b_wptr += dl_qos_length;
@@ -1523,12 +1547,13 @@ dle_connect_req(struct dl *dl, struct dle_connect_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_CONNECT_REQ;
 	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
 	p->dl_dest_addr_length = dl_dest_addr_length;
 	p->dl_qos_offset = dl_qos_length ? sizeof(*p) + dl_dest_addr_length : 0;
 	p->dl_qos_length = dl_qos_length;
+	mp->b_wptr += sizeof(*p);
 	if (dl_dest_addr_length) {
 		bcopy(ep->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
 		mp->b_wptr += dl_dest_addr_length;
@@ -1555,12 +1580,13 @@ dle_connect_res(struct dl *dl, struct dle_connect_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_CONNECT_RES;
 	p->dl_correlation = (dl_ulong) (long) ep->dl_correlation;
 	p->dl_resp_token = (dl_ulong) (long) ep->dl_resp_token;
 	p->dl_qos_length = dl_qos_length;
 	p->dl_qos_offset = dl_qos_length ? sizeof(*p) : 0;
+	mp->b_wptr += sizeof(*p);
 	if (dl_qos_length) {
 		bcopy(ep->dl_qos_buffer, mp->b_wptr, dl_qos_length);
 		mp->b_wptr += dl_qos_length;
@@ -1582,8 +1608,9 @@ dle_token_req(struct dl *dl, struct dle_token_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_TOKEN_REQ;
+	mp->b_wptr += sizeof(*p);
 	dl_set_state(dl, dl_get_state(dl));
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_TOKEN_REQ");
 	putnext(dl->oq, mp);
@@ -1601,10 +1628,11 @@ dle_disconnect_req(struct dl *dl, struct dle_disconnect_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_DISCONNECT_REQ;
 	p->dl_reason = ep->dl_reason;
 	p->dl_correlation = (dl_ulong) (long) ep->dl_correlation;
+	mp->b_wptr += sizeof(*p);
 	switch (dl_get_state(dl)) {
 	case DL_OUTCON_PENDING:
 		dl_set_state(dl, DL_DISCON8_PENDING);
@@ -1638,8 +1666,9 @@ dle_reset_req(struct dl *dl, struct dle_reset_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_RESET_REQ;
+	mp->b_wptr += sizeof(*p);
 	dl_set_state(dl, DL_USER_RESET_PENDING);
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_RESET_REQ");
 	putnext(dl->oq, mp);
@@ -1657,8 +1686,9 @@ dle_reset_res(struct dl *dl, struct dle_reset_res *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_RESET_RES;
+	mp->b_wptr += sizeof(*p);
 	dl_set_state(dl, DL_RESET_RES_PENDING);
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_RESET_RES");
 	putnext(dl->oq, mp);
@@ -1680,7 +1710,7 @@ dle_data_ack_req(struct dl *dl, struct dle_data_ack_req *ep)
 	if (unlikely(!canputnext(dl->oq)))
 		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_DATA_ACK_REQ;
 	p->dl_correlation = ep->dl_correlation;
 	p->dl_dest_addr_length = dl_dest_addr_length;
@@ -1689,6 +1719,7 @@ dle_data_ack_req(struct dl *dl, struct dle_data_ack_req *ep)
 	p->dl_src_addr_offset = dl_src_addr_length ? sizeof(*p) + dl_dest_addr_length : 0;
 	p->dl_priority = ep->dl_priority;
 	p->dl_service_class = ep->dl_service_class;
+	mp->b_wptr += sizeof(*p);
 	if (dl_dest_addr_length) {
 		bcopy(ep->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
 		mp->b_wptr += dl_dest_addr_length;
@@ -1720,7 +1751,7 @@ dle_reply_req(struct dl *dl, struct dle_reply_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_REPLY_REQ;
 	p->dl_correlation = ep->dl_correlation;
 	p->dl_dest_addr_length = dl_dest_addr_length;
@@ -1729,6 +1760,7 @@ dle_reply_req(struct dl *dl, struct dle_reply_req *ep)
 	p->dl_src_addr_offset = dl_src_addr_length ? sizeof(*p) + dl_dest_addr_length : 0;
 	p->dl_priority = ep->dl_priority;
 	p->dl_service_class = ep->dl_service_class;
+	mp->b_wptr += sizeof(*p);
 	if (dl_dest_addr_length) {
 		bcopy(ep->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
 		mp->b_wptr += dl_dest_addr_length;
@@ -1756,11 +1788,12 @@ dle_reply_update_req(struct dl *dl, struct dle_reply_update_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_REPLY_UPDATE_REQ;
 	p->dl_correlation = ep->dl_correlation;
 	p->dl_src_addr_length = dl_src_addr_length;
 	p->dl_src_addr_offset = dl_src_addr_length ? sizeof(*p) : 0;
+	mp->b_wptr += sizeof(*p);
 	if (dl_src_addr_length) {
 		bcopy(ep->dl_src_addr_buffer, mp->b_wptr, dl_src_addr_length);
 		mp->b_wptr += dl_src_addr_length;
@@ -1784,11 +1817,12 @@ dle_xid_req(struct dl *dl, dle_xid_req * ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_XID_REQ;
 	p->dl_flag = ep->dl_flag;
 	p->dl_dest_addr_length = dl_dest_addr_length;
 	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	mp->b_wptr += sizeof(*p);
 	if (dl_dest_addr_length) {
 		bcopy(ep->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
 		mp->b_wptr += dl_dest_addr_length;
@@ -1812,11 +1846,12 @@ dle_xid_res(struct dl *dl, dle_xid_res * ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_XID_RES;
 	p->dl_flag = ep->dl_flag;
 	p->dl_dest_addr_length = dl_dest_addr_length;
 	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	mp->b_wptr += sizeof(*p);
 	if (dl_dest_addr_length) {
 		bcopy(ep->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
 		mp->b_wptr += dl_dest_addr_length;
@@ -1840,11 +1875,12 @@ dle_test_req(struct dl *dl, struct dle_test_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_TEST_REQ;
 	p->dl_flag = ep->dl_flag;
 	p->dl_dest_addr_length = dl_dest_addr_length;
 	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	mp->b_wptr += sizeof(*p);
 	if (dl_dest_addr_length) {
 		bcopy(ep->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
 		mp->b_wptr += dl_dest_addr_length;
@@ -1868,11 +1904,12 @@ dle_test_res(struct dl *dl, struct dle_test_res *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_TEST_RES;
 	p->dl_flag = ep->dl_flag;
 	p->dl_dest_addr_length = dl_dest_addr_length;
 	p->dl_dest_addr_offset = dl_dest_addr_length ? sizeof(*p) : 0;
+	mp->b_wptr += sizeof(*p);
 	if (dl_dest_addr_length) {
 		bcopy(ep->dl_dest_addr_buffer, mp->b_wptr, dl_dest_addr_length);
 		mp->b_wptr += dl_dest_addr_length;
@@ -1895,9 +1932,10 @@ dle_phys_addr_req(struct dl *dl, struct dle_phys_addr_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_PHYS_ADDR_REQ;
 	p->dl_addr_type = ep->dl_addr_type;
+	mp->b_wptr += sizeof(*p);
 	strlog(DRV_ID, dl->u.mux.index, DLS_LOG_DLSU_PRIM, SL_TRACE, "-> DL_PHYS_ADDR_REQ");
 	putnext(dl->oq, mp);
 	return (0);
@@ -1915,10 +1953,11 @@ dle_set_phys_addr_req(struct dl *dl, struct dle_set_phys_addr_req *ep)
 	if (unlikely((mp = ss7_allocb(dl->oq, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->dl_primitive = DL_SET_PHYS_ADDR_REQ;
 	p->dl_addr_length = dl_addr_length;
 	p->dl_addr_offset = dl_addr_length ? sizeof(*p) : 0;
+	mp->b_wptr += sizeof(*p);
 	if (dl_addr_length) {
 		bcopy(ep->dl_addr_buffer, mp->b_wptr, dl_addr_length);
 		mp->b_wptr += dl_addr_length;
@@ -2500,6 +2539,10 @@ np_ip_v4_err_next(struct sk_buff *skb, __u32 info)
 }
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
+#endif
+
 /**
  * np_ip_init_proto - initialize interception of IP protocol packets
  * @proto: IP protocol number to intercept
@@ -2635,21 +2678,24 @@ np_ip_v4_rcv(struct sk_buff *skb)
 			/* leave the udp-like header */
 			skb->dev = NULL;
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_UNITDATA_IND;
 			p->DEST_length = sizeof(*sin);
 			p->DEST_offset = sizeof(*p);
 			p->SRC_length = sizeof(*sin);
 			p->SRC_offset = sizeof(*p) + sizeof(*sin);
 			p->ERROR_type = 0;
-			sin = (typeof(sin)) mp->b_wptr++;
+			mp->b_wptr += sizeof(*p);
+			sin = (typeof(sin)) mp->b_wptr;
 			sin->sin_family = AF_INET;
 			sin->sin_port = uh->dest;
 			sin->sin_addr.s_addr = iph->daddr;
-			sin = (typeof(sin)) mp->b_wptr++;
+			mp->b_wptr += sizeof(*sin);
+			sin = (typeof(sin)) mp->b_wptr;
 			sin->sin_family = AF_INET;
 			sin->sin_port = uh->source;
 			sin->sin_addr.s_addr = iph->saddr;
+			mp->b_wptr += sizeof(*sin);
 			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_UNITDATA_IND"); */
 		} else {
 			N_data_ind_t *p;
@@ -2666,9 +2712,10 @@ np_ip_v4_rcv(struct sk_buff *skb)
 			/* leave the udp-like header */
 			skb->dev = NULL;
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_DATA_IND;
 			p->DATA_xfer_flags = 0;
+			mp->b_wptr += sizeof(*p);
 			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_DATA_IND"); */
 		}
 		mp->b_cont = dp;
@@ -2738,15 +2785,17 @@ np_ip_v4_err(struct sk_buff *skb, __u32 info)
 			if (unlikely(mp == NULL))
 				goto no_buffers;
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_UDERROR_IND;
 			p->DEST_length = sizeof(*sin);
 			p->DEST_offset = sizeof(*p);
 			p->ERROR_type = FIXME;
-			sin = (typeof(sin)) mp->b_wptr++;
+			mp->b_wptr += sizeof(*p);
+			sin = (typeof(sin)) mp->b_wptr;
 			sin->sin_family = AF_INET;
 			sin->sin_port = uh->dest;
 			sin->sin_addr.s_addr = iph->daddr;
+			mp->b_wptr += sizeof(*sin);
 			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_UDERROR_IND"); */
 		} else {
 			N_reset_ind_t *p;
@@ -2755,10 +2804,11 @@ np_ip_v4_err(struct sk_buff *skb, __u32 info)
 			if (unlikely(mp == NULL))
 				goto no_buffers;
 			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr++;
+			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_RESET_IND;
 			p->RESET_orig = N_PROVIDER;
 			p->RESET_reason = FIXME;
+			mp->b_wptr += sizeof(*p);
 			np_set_state(np, NS_WRES_RIND);
 			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_RESET_IND"); */
 		}
@@ -3109,13 +3159,14 @@ ne_ip_conn_req(struct np *np, struct ne_conn_req *ep)
 			goto error;
 		}
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p))mp->b_wptr++;
+		p = (typeof(p))mp->b_wptr;
 		p->PRIM_type = N_CONN_CON;
 		p->RES_length = np->DEST_length;
 		p->RES_offset = np->DEST_length ? sizeof(*p) : 0;
 		p->CONN_flags = ep->CONN_flags;
 		p->QOS_length = np->QOS_length;
 		p->QOS_offset = np->QOS_length ? sizeof(*p) + np->DEST_length : 0;
+		mp->b_wptr += sizeof(*p);
 		if (np->DEST_length) {
 			bcopy(np->DEST_buffer, mp->b_wptr, np->DEST_length);
 			mp->b_wptr += np->DEST_length;

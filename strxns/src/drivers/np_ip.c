@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:57 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/08 11:26:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/07 22:12:57 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:26:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.5  2006/05/08 11:26:13  brian
+ - post inc problem and working through test cases
+
+ Revision 0.9.2.4  2006/05/08 08:16:43  brian
+ - module_text_address, hash alloc changes
+
  Revision 0.9.2.3  2006/05/07 22:12:57  brian
  - updated for NPI-IP driver
 
@@ -61,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:57 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/08 11:26:13 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:57 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/08 11:26:13 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -75,6 +81,9 @@ static char const ident[] =
    passes packets tranparently on to the underlying protocol in which it is not interested (bound).
    The driver uses the NPI (Network Provider Interface) API.
 */
+
+#define CONFIG_STREAMS_DEBUG 1
+#define _DEBUG 1
 
 #include <sys/os7/compat.h>
 
@@ -117,7 +126,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2006/05/07 22:12:57 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2006/05/08 11:26:13 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -458,7 +467,7 @@ np_alloc(void)
 #define N_USER	    1
 #endif
 
-#ifdef DEBUG
+#ifdef _DEBUG
 STATIC const char *
 state_name(np_ulong state)
 {
@@ -639,6 +648,10 @@ npi_v4_err_next(struct sk_buff *skb, __u32 info)
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
 #endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
+#endif
 
 /**
  * npi_init_nproto - initialize network protocol override
@@ -1838,7 +1851,7 @@ npi_datack(queue_t *q)
  */
 /**
  * ne_error_reply: - reply to a message with an M_ERROR message
- * @q: active queue in queue pair (read queue)
+ * @q: active queue in queue pair (write queue)
  * @error: error number
  *
  * FIXME: This must process other errors as well.
@@ -1874,7 +1887,7 @@ ne_error_reply(queue_t *q, long error)
 			npi_unbind(np);
 			npi_set_state(np, NS_UNBND);
 		}
-		putnext(np->oq, mp);
+		qreply(q, mp);
 		return (QR_DONE);
 	}
 	return (-ENOBUFS);
@@ -1905,7 +1918,7 @@ ne_info_ack(queue_t *q)
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_INFO_ACK;
 	p->NSDU_size = np->info.NSDU_size;
 	p->ENSDU_size = np->info.ENSDU_size;
@@ -1928,12 +1941,14 @@ ne_info_ack(queue_t *q)
 	p->PROTOID_offset =
 	    PROTOID_length ? sizeof(*p) + ADDR_length + QOS_length + QOS_range_length : 0;
 	p->NPI_version = np->info.NPI_version;
+	mp->b_wptr += sizeof(*p);
 	if (ADDR_length) {
 		for (i = 0; i < np->snum; i++) {
-			ADDR_buffer = (struct sockaddr_in *) mp->b_wptr++;
+			ADDR_buffer = (struct sockaddr_in *) mp->b_wptr;
 			ADDR_buffer->sin_family = AF_INET;
 			ADDR_buffer->sin_port = np->sport;
 			ADDR_buffer->sin_addr.s_addr = np->saddrs[i].addr;
+			mp->b_wptr += sizeof(struct sockaddr_in);
 		}
 	}
 	if (QOS_length) {
@@ -1948,7 +1963,8 @@ ne_info_ack(queue_t *q)
 		bcopy(PROTOID_buffer, mp->b_wptr, PROTOID_length);
 		mp->b_wptr += PROTOID_length;
 	}
-	putnext(np->oq, mp);
+	printd(("%s: <- N_INFO_ACK\n", DRV_NAME));
+	qreply(q, mp);
 	return (QR_DONE);
 
       enobufs:
@@ -1991,7 +2007,7 @@ ne_bind_ack(queue_t *q, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 		goto free_error;
 
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_BIND_ACK;
 	p->ADDR_length = ADDR_length;
 	p->ADDR_offset = ADDR_length ? sizeof(*p) : 0;
@@ -1999,6 +2015,7 @@ ne_bind_ack(queue_t *q, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	p->TOKEN_value = (long) RD(q);
 	p->PROTOID_length = PROTOID_length;
 	p->PROTOID_offset = PROTOID_length ? sizeof(*p) + ADDR_length : 0;
+	mp->b_wptr += sizeof(*p);
 	if (ADDR_length) {
 		bcopy(ADDR_buffer, mp->b_wptr, ADDR_length);
 		mp->b_wptr += ADDR_length;
@@ -2008,7 +2025,7 @@ ne_bind_ack(queue_t *q, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 		mp->b_wptr += PROTOID_length;
 	}
 	npi_set_state(np, NS_IDLE);
-	putnext(np->oq, mp);
+	qreply(q, mp);
 	return (QR_DONE);
 
       free_error:
@@ -2206,7 +2223,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		   state. */
 		break;
 	}
-	putnext(np->oq, mp);
+	qreply(q, mp);
 	return (QR_DONE);
       error:
 	freemsg(mp);
@@ -2261,13 +2278,14 @@ ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		goto free_error;
 
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_CONN_CON;
 	p->RES_length = RES_length;
 	p->RES_offset = RES_length ? sizeof(*p) : 0;
 	p->CONN_flags = CONN_flags;
 	p->QOS_length = QOS_length;
 	p->QOS_offset = QOS_length ? sizeof(*p) + RES_length : 0;
+	mp->b_wptr += sizeof(*p);
 	if (RES_length) {
 		bcopy(RES_buffer, mp->b_wptr, RES_length);
 		mp->b_wptr += RES_length;
@@ -2315,8 +2333,9 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 		goto free_error;
 
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_CON;
+	mp->b_wptr += sizeof(*p);
 	npi_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 	qreply(q, mp);
 	return (QR_DONE);
@@ -2377,7 +2396,7 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 0;
-	p = (N_conn_ind_t *) mp->b_wptr++;
+	p = (N_conn_ind_t *) mp->b_wptr;
 	p->PRIM_type = N_CONN_IND;
 	p->DEST_length = DEST_length;
 	p->DEST_offset = DEST_length ? sizeof(*p) : 0;
@@ -2387,20 +2406,23 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	p->CONN_flags = 0;
 	p->QOS_length = QOS_length;
 	p->QOS_offset = QOS_length ? sizeof(*p) + DEST_length + SRC_length : 0;
+	mp->b_wptr += sizeof(N_conn_ind_t);
 	if (DEST_length) {
-		DEST_buffer = (struct sockaddr_in *) mp->b_wptr++;
+		DEST_buffer = (struct sockaddr_in *) mp->b_wptr;
 		DEST_buffer->sin_family = AF_INET;
 		DEST_buffer->sin_port = iph->protocol;
 		DEST_buffer->sin_addr.s_addr = iph->daddr;
+		mp->b_wptr += sizeof(struct sockaddr_in);
 	}
 	if (SRC_length) {
-		SRC_buffer = (struct sockaddr_in *) mp->b_wptr++;
+		SRC_buffer = (struct sockaddr_in *) mp->b_wptr;
 		SRC_buffer->sin_family = AF_INET;
 		SRC_buffer->sin_port = iph->protocol;
 		SRC_buffer->sin_addr.s_addr = iph->saddr;
+		mp->b_wptr += sizeof(struct sockaddr_in);
 	}
 	if (QOS_length) {
-		QOS_buffer = (struct N_qos_sel_conn_ip *) mp->b_wptr++;
+		QOS_buffer = (struct N_qos_sel_conn_ip *) mp->b_wptr;
 		QOS_buffer->n_qos_type = N_QOS_SEL_CONN_IP;
 		QOS_buffer->protocol = iph->protocol;
 		QOS_buffer->priority = bp->b_band;
@@ -2409,6 +2431,7 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		QOS_buffer->mtu = QOS_UNKNOWN;	/* FIXME: determine route and get mtu from it */
 		QOS_buffer->daddr = iph->daddr;
 		QOS_buffer->saddr = iph->saddr;
+		mp->b_wptr += sizeof(struct N_qos_sel_conn_ip);
 	}
 	/* should we pull the IP header? */
 	mp->b_cont = bp;
@@ -2447,13 +2470,14 @@ ne_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 2;		/* expedite */
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DISCON_IND;
 	p->DISCON_orig = DISCON_orig;
 	p->DISCON_reason = DISCON_reason;
 	p->RES_length = RES_length;
 	p->RES_offset = RES_length ? sizeof(*p) : 0;
 	p->SEQ_number = (np_ulong) (long) SEQ_number;
+	mp->b_wptr += sizeof(*p);
 	if (RES_length) {
 		bcopy(RES_buffer, mp->b_wptr, RES_length);
 		mp->b_wptr += RES_length;
@@ -2551,6 +2575,7 @@ ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
 			RESERVED_field = 0;
 			break;
 		case ICMP_EXC_FRAGTIME:
+			RESET_orig = N_PROVIDER;
 			RESET_reason = N_REJ_QOS_UNAVAIL_P;	// N_UD_TD_EXCEEDED;
 			RESERVED_field = 0;
 			break;
@@ -2640,10 +2665,11 @@ ne_data_ind(queue_t *q, mblk_t *dp)
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DATA_IND;
 	/* TODO: here we can set some info like ECN... */
 	p->DATA_xfer_flags = 0;
+	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
 	putnext(q, mp);
@@ -2716,28 +2742,31 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
 		goto ebusy;
 
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_UNITDATA_IND;
 	p->SRC_length = SRC_length;
 	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
 	p->DEST_length = DEST_length;
 	p->DEST_offset = DEST_length ? sizeof(*p) + SRC_length : 0;
 	p->ERROR_type = 0;
+	mp->b_wptr += sizeof(*p);
 
 	iph = (struct iphdr *) dp->b_rptr;
 	uh = (struct udphdr *) (dp->b_rptr + (iph->ihl << 2));
 
 	if (SRC_length) {
-		SRC_buffer = (struct sockaddr_in *) mp->b_wptr++;
+		SRC_buffer = (struct sockaddr_in *) mp->b_wptr;
 		SRC_buffer->sin_family = AF_INET;
 		SRC_buffer->sin_port = uh->source;
 		SRC_buffer->sin_addr.s_addr = iph->saddr;
+		mp->b_wptr += sizeof(struct sockaddr_in);
 	}
 	if (DEST_length) {
-		DEST_buffer = (struct sockaddr_in *) mp->b_wptr++;
+		DEST_buffer = (struct sockaddr_in *) mp->b_wptr;
 		DEST_buffer->sin_family = AF_INET;
 		DEST_buffer->sin_port = uh->dest;
 		DEST_buffer->sin_addr.s_addr = iph->daddr;
+		mp->b_wptr += sizeof(struct sockaddr_in);
 	}
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
@@ -2781,12 +2810,13 @@ ne_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, socklen_t DEST_lengt
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 2;		/* expedite */
 
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_UDERROR_IND;
 	p->DEST_length = DEST_length;
 	p->DEST_offset = DEST_length ? sizeof(*p) : 0;
 	p->RESERVED_field = RESERVED_field;
 	p->ERROR_type = ERROR_type;
+	mp->b_wptr += sizeof(*p);
 	if (DEST_length) {
 		bcopy(DEST_buffer, mp->b_wptr, DEST_length);
 		mp->b_wptr += DEST_length;
@@ -3001,9 +3031,10 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 2;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_IND;
 	p->RESET_orig = N_PROVIDER;
+	mp->b_wptr += sizeof(*p);
 	switch (icmp->type) {
 	case ICMP_DEST_UNREACH:
 		switch (icmp->code) {
@@ -3105,8 +3136,9 @@ ne_datack_ind(queue_t *q)
 		goto ebusy;
 
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DATACK_IND;
+	mp->b_wptr += sizeof(*p);
 
 	putnext(q, mp);
 	return (QR_DONE);
@@ -4057,42 +4089,55 @@ np_w_proto(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr >= mp->b_rptr + sizeof(prim)) {
 		switch ((prim = *(np_long *) mp->b_rptr)) {
 		case N_UNITDATA_REQ:	/* Connection-less data send request */
+			printd(("%s: N_UNITDATA_REQ ->\n", DRV_NAME));
 			rtn = ne_unitdata_req(q, mp);
 			break;
 		case N_DATA_REQ:	/* Connection-Mode data transfer request */
+			printd(("%s: N_DATA_REQ ->\n", DRV_NAME));
 			rtn = ne_data_req(q, mp);
 			break;
 		case N_CONN_REQ:	/* NC request */
+			printd(("%s: N_CONN_REQ ->\n", DRV_NAME));
 			rtn = ne_conn_req(q, mp);
 			break;
 		case N_CONN_RES:	/* Accept previous connection indication */
+			printd(("%s: N_CONN_RES ->\n", DRV_NAME));
 			rtn = ne_conn_res(q, mp);
 			break;
 		case N_DISCON_REQ:	/* NC disconnection request */
+			printd(("%s: N_DISCON_REQ ->\n", DRV_NAME));
 			rtn = ne_discon_req(q, mp);
 			break;
 		case N_EXDATA_REQ:	/* Expedited data request */
+			printd(("%s: N_EXDATA_REQ ->\n", DRV_NAME));
 			rtn = ne_exdata_req(q, mp);
 			break;
 		case N_DATACK_REQ:	/* Data acknowledgement request */
+			printd(("%s: N_DATACK_REQ ->\n", DRV_NAME));
 			rtn = ne_datack_req(q, mp);
 			break;
 		case N_RESET_REQ:	/* NC reset request */
+			printd(("%s: N_RESET_REQ ->\n", DRV_NAME));
 			rtn = ne_reset_req(q, mp);
 			break;
 		case N_RESET_RES:	/* Reset processing accepted */
+			printd(("%s: N_RESET_RES ->\n", DRV_NAME));
 			rtn = ne_reset_res(q, mp);
 			break;
 		case N_INFO_REQ:	/* Information Request */
+			printd(("%s: N_INFO_REQ ->\n", DRV_NAME));
 			rtn = ne_info_req(q, mp);
 			break;
 		case N_BIND_REQ:	/* Bind a NS user to network address */
+			printd(("%s: N_BIND_REQ ->\n", DRV_NAME));
 			rtn = ne_bind_req(q, mp);
 			break;
 		case N_UNBIND_REQ:	/* Unbind NS user from network address */
+			printd(("%s: N_UNBIND_REQ ->\n", DRV_NAME));
 			rtn = ne_unbind_req(q, mp);
 			break;
 		case N_OPTMGMT_REQ:	/* Options Management request */
+			printd(("%s: N_OPTMGMT_REQ ->\n", DRV_NAME));
 			rtn = ne_optmgmt_req(q, mp);
 			break;
 		case N_CONN_IND:	/* Incoming connection indication */
@@ -4688,7 +4733,7 @@ npi_init_caches(void)
 		npi_priv_cachep = kmem_cache_create("npi_priv_cachep", sizeof(struct np), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (npi_priv_cachep == NULL) {
-			cmn_err(CE_PANIC, "%s: Cannot allocate npi_priv_cachep", __FUNCTION__);
+			cmn_err(CE_WARN, "%s: Cannot allocate npi_priv_cachep", __FUNCTION__);
 			npi_term_caches();
 			return (-ENOMEM);
 		}
@@ -4698,7 +4743,7 @@ npi_init_caches(void)
 		npi_bind_cachep = kmem_cache_create("npi_bind_cachep", sizeof(struct np), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (npi_bind_cachep == NULL) {
-			cmn_err(CE_PANIC, "%s: Cannot allocate npi_bind_cachep", __FUNCTION__);
+			cmn_err(CE_WARN, "%s: Cannot allocate npi_bind_cachep", __FUNCTION__);
 			npi_term_caches();
 			return (-ENOMEM);
 		}
@@ -4708,7 +4753,7 @@ npi_init_caches(void)
 		npi_prot_cachep = kmem_cache_create("npi_prot_cachep", sizeof(struct np), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (npi_prot_cachep == NULL) {
-			cmn_err(CE_PANIC, "%s: Cannot allocate npi_prot_cachep", __FUNCTION__);
+			cmn_err(CE_WARN, "%s: Cannot allocate npi_prot_cachep", __FUNCTION__);
 			npi_term_caches();
 			return (-ENOMEM);
 		}
@@ -4736,29 +4781,43 @@ npi_term_hashes(void)
 STATIC void
 npi_init_hashes(void)
 {
-	int order, i;
-	unsigned long goal;
+	int i;
 
-	/* size and allocate bind hash table */
-	goal = num_physpages >> (20 - PAGE_SHIFT);
-	for (order = 0; (1 << order) < goal; order++) ;
-	do {
-		npi_bhash_order = order;
-		npi_bhash_size = (1 << order) * PAGE_SIZE / sizeof(struct npi_bhash_bucket);
-		npi_bhash = (struct npi_bhash_bucket *) __get_free_pages(GFP_ATOMIC, order);
-	} while (npi_bhash == NULL && --order >= 0);
-	if (!npi_bhash)
-		cmn_err(CE_PANIC, "%s: Failed to allocate bind hash table\n", __FUNCTION__);
-	npi_bhash_size = npi_chash_size = npi_bhash_size >> 1;
-	npi_bhash_order = npi_chash_order = npi_bhash_order - 1;
-	bzero(npi_bhash, npi_bhash_size * sizeof(struct npi_bhash_bucket));
-	bzero(npi_chash, npi_chash_size * sizeof(struct npi_chash_bucket));
-	for (i = 0; i < npi_bhash_size; i++)
-		rwlock_init(&npi_bhash[i].lock);
-	for (i = 0; i < npi_chash_size; i++)
-		rwlock_init(&npi_chash[i].lock);
-	printd(("%s: INFO: bind hash table configured size = %d\n", DRV_NAME, npi_bhash_size));
-	printd(("%s: INFO: conn hash table configured size = %d\n", DRV_NAME, npi_chash_size));
+	/* Start with just one page for each. */
+	if (npi_bhash == NULL) {
+		npi_bhash_order = 0;
+		if ((npi_bhash =
+		     (struct npi_bhash_bucket *) __get_free_pages(GFP_ATOMIC, npi_bhash_order))) {
+			npi_bhash_size =
+			    (1 << (npi_bhash_order + PAGE_SHIFT)) / sizeof(struct npi_bhash_bucket);
+			printd(("%s: INFO: bind hash table configured size = %ld\n", DRV_NAME,
+				(long) npi_bhash_size));
+			bzero(npi_bhash, npi_bhash_size * sizeof(struct npi_bhash_bucket));
+			for (i = 0; i < npi_bhash_size; i++)
+				rwlock_init(&npi_bhash[i].lock);
+		} else {
+			npi_term_hashes();
+			cmn_err(CE_PANIC, "%s: Failed to allocate bind hash table\n", __FUNCTION__);
+			return;
+		}
+	}
+	if (npi_chash == NULL) {
+		npi_chash_order = 0;
+		if ((npi_chash =
+		     (struct npi_chash_bucket *) __get_free_pages(GFP_ATOMIC, npi_chash_order))) {
+			npi_chash_size =
+			    (1 << (npi_chash_order + PAGE_SHIFT)) / sizeof(struct npi_chash_bucket);
+			printd(("%s: INFO: conn hash table configured size = %ld\n", DRV_NAME,
+				(long) npi_chash_size));
+			bzero(npi_chash, npi_chash_size * sizeof(struct npi_chash_bucket));
+			for (i = 0; i < npi_chash_size; i++)
+				rwlock_init(&npi_chash[i].lock);
+		} else {
+			npi_term_hashes();
+			cmn_err(CE_PANIC, "%s: Failed to allocate bind hash table\n", __FUNCTION__);
+			return;
+		}
+	}
 }
 
 /**
@@ -4838,15 +4897,11 @@ npi_alloc_priv(queue_t *q, struct np **slp, int type, dev_t *devp, cred_t *crp)
 		np->qor.mtu.mtu_min_value = 536;
 		np->qor.mtu.mtu_max_value = 65535;
 		/* link into master list */
-		write_lock_bh(&master.lock);
-		{
-			np_get(np);
-			if ((np->next = *slp))
-				np->next->prev = &np->next;
-			np->prev = slp;
-			*slp = np;
-		}
-		write_unlock_bh(&master.lock);
+		np_get(np);
+		if ((np->next = *slp))
+			np->next->prev = &np->next;
+		np->prev = slp;
+		*slp = np;
 	} else
 		ptrace(("%s: ERROR: Could not allocate module private structure\n", DRV_NAME));
 	return (np);
@@ -4900,12 +4955,10 @@ npi_free_priv(queue_t *q)
 	ss7_unbufcall((str_t *) np);
 	printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME,
 		atomic_read(&np->refcnt)));
-	write_lock_bh(&master.lock);
 	if ((*np->prev = np->next))
 		np->next->prev = np->prev;
 	np->next = NULL;
 	np->prev = &np->next;
-	write_unlock_bh(&master.lock);
 	np_put(np);
 	printd(("%s: unlinked, reference count = %d\n", DRV_NAME, atomic_read(&np->refcnt)));
 	np_release((struct np **) &np->oq->q_ptr);
@@ -4948,8 +5001,10 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	struct np *np, **npp = &master.np.list;
+#if 0
 	mblk_t *mp;
 	struct stroptions *so;
+#endif
 
 	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
@@ -4975,8 +5030,10 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = FREE_CMINOR;
+#if 0
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
+#endif
 	write_lock_bh(&master.lock);
 	for (; *npp; npp = &(*npp)->next) {
 		if (cmajor != (*npp)->u.dev.cmajor)
@@ -4998,7 +5055,9 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		write_unlock_bh(&master.lock);
+#if 0
 		freeb(mp);
+#endif
 		return (ENXIO);
 	}
 	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
@@ -5006,15 +5065,20 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (!(np = npi_alloc_priv(q, npp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		write_unlock_bh(&master.lock);
+#if 0
 		freeb(mp);
+#endif
 		return (ENOMEM);
 	}
 	write_unlock_bh(&master.lock);
+#if 0
 	/* want to set a write offet of 20 bytes */
-	so = (typeof(so)) mp->b_wptr++;
+	so = (typeof(so)) mp->b_wptr;
 	so->so_flags = SO_WROFF | SO_DELIM;
 	so->so_wroff = 20;
+	mp->b_wptr += sizeof(*so);
 	putnext(q, mp);
+#endif
 	qprocson(q);
 	return (0);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/05/07 22:12:57 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/05/08 11:26:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/07 22:12:57 $ by $Author: brian $
+ Last Modified $Date: 2006/05/08 11:26:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.31  2006/05/08 11:26:11  brian
+ - post inc problem and working through test cases
+
+ Revision 0.9.2.30  2006/05/08 08:16:42  brian
+ - module_text_address, hash alloc changes
+
  Revision 0.9.2.29  2006/05/07 22:12:57  brian
  - updated for NPI-IP driver
 
@@ -140,10 +146,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/05/07 22:12:57 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/05/08 11:26:11 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/05/07 22:12:57 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/05/08 11:26:11 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -196,7 +202,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/05/07 22:12:57 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/05/08 11:26:11 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -718,6 +724,10 @@ npi_v4_err_next(struct sk_buff *skb, __u32 info)
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
 #endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
+#endif
 
 /**
  * npi_init_nproto - initialize network protocol override
@@ -1984,7 +1994,8 @@ ne_info_ack(queue_t *q)
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_INFO_ACK;
 	p->NSDU_size = np->info.NSDU_size;
 	p->ENSDU_size = np->info.ENSDU_size;
@@ -2009,7 +2020,8 @@ ne_info_ack(queue_t *q)
 	p->NPI_version = np->info.NPI_version;
 	if (ADDR_length) {
 		for (i = 0; i < np->snum; i++) {
-			ADDR_buffer = (struct sockaddr_in *) mp->b_wptr++;
+			ADDR_buffer = (struct sockaddr_in *) mp->b_wptr;
+			mp->b_wptr += sizeof(struct sockaddr_in);
 			ADDR_buffer->sin_family = AF_INET;
 			ADDR_buffer->sin_port = np->sport;
 			ADDR_buffer->sin_addr.s_addr = np->saddrs[i].addr;
@@ -2070,7 +2082,8 @@ ne_bind_ack(queue_t *q, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 		goto free_error;
 
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_BIND_ACK;
 	p->ADDR_length = ADDR_length;
 	p->ADDR_offset = ADDR_length ? sizeof(*p) : 0;
@@ -2340,7 +2353,8 @@ ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		goto free_error;
 
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_CONN_CON;
 	p->RES_length = RES_length;
 	p->RES_offset = RES_length ? sizeof(*p) : 0;
@@ -2394,7 +2408,8 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 		goto free_error;
 
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_RESET_CON;
 	npi_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 	qreply(q, mp);
@@ -2456,7 +2471,8 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 0;
-	p = (N_conn_ind_t *) mp->b_wptr++;
+	p = (N_conn_ind_t *) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_CONN_IND;
 	p->DEST_length = DEST_length;
 	p->DEST_offset = DEST_length ? sizeof(*p) : 0;
@@ -2467,19 +2483,22 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	p->QOS_length = QOS_length;
 	p->QOS_offset = QOS_length ? sizeof(*p) + DEST_length + SRC_length : 0;
 	if (DEST_length) {
-		DEST_buffer = (struct sockaddr_in *) mp->b_wptr++;
+		DEST_buffer = (struct sockaddr_in *) mp->b_wptr;
+		mp->b_wptr += sizeof(struct sockaddr_in);
 		DEST_buffer->sin_family = AF_INET;
 		DEST_buffer->sin_port = iph->protocol;
 		DEST_buffer->sin_addr.s_addr = iph->daddr;
 	}
 	if (SRC_length) {
-		SRC_buffer = (struct sockaddr_in *) mp->b_wptr++;
+		SRC_buffer = (struct sockaddr_in *) mp->b_wptr;
+		mp->b_wptr += sizeof(struct sockaddr_in);
 		SRC_buffer->sin_family = AF_INET;
 		SRC_buffer->sin_port = iph->protocol;
 		SRC_buffer->sin_addr.s_addr = iph->saddr;
 	}
 	if (QOS_length) {
-		QOS_buffer = (struct N_qos_sel_conn_ip *) mp->b_wptr++;
+		QOS_buffer = (struct N_qos_sel_conn_ip *) mp->b_wptr;
+		mp->b_wptr += sizeof(struct N_qos_sel_conn_ip);
 		QOS_buffer->n_qos_type = N_QOS_SEL_CONN_IP;
 		QOS_buffer->protocol = iph->protocol;
 		QOS_buffer->priority = bp->b_band;
@@ -2526,7 +2545,8 @@ ne_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 2;		/* expedite */
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_DISCON_IND;
 	p->DISCON_orig = DISCON_orig;
 	p->DISCON_reason = DISCON_reason;
@@ -2719,7 +2739,8 @@ ne_data_ind(queue_t *q, mblk_t *dp)
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_DATA_IND;
 	/* TODO: here we can set some info like ECN... */
 	p->DATA_xfer_flags = 0;
@@ -2795,7 +2816,8 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
 		goto ebusy;
 
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_UNITDATA_IND;
 	p->SRC_length = SRC_length;
 	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
@@ -2807,13 +2829,15 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
 	uh = (struct udphdr *) (dp->b_rptr + (iph->ihl << 2));
 
 	if (SRC_length) {
-		SRC_buffer = (struct sockaddr_in *) mp->b_wptr++;
+		SRC_buffer = (struct sockaddr_in *) mp->b_wptr;
+		mp->b_wptr += sizeof(struct sockaddr_in);
 		SRC_buffer->sin_family = AF_INET;
 		SRC_buffer->sin_port = uh->source;
 		SRC_buffer->sin_addr.s_addr = iph->saddr;
 	}
 	if (DEST_length) {
-		DEST_buffer = (struct sockaddr_in *) mp->b_wptr++;
+		DEST_buffer = (struct sockaddr_in *) mp->b_wptr;
+		mp->b_wptr += sizeof(struct sockaddr_in);
 		DEST_buffer->sin_family = AF_INET;
 		DEST_buffer->sin_port = uh->dest;
 		DEST_buffer->sin_addr.s_addr = iph->daddr;
@@ -2860,7 +2884,8 @@ ne_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, socklen_t DEST_lengt
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 2;		/* expedite */
 
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_UDERROR_IND;
 	p->DEST_length = DEST_length;
 	p->DEST_offset = DEST_length ? sizeof(*p) : 0;
@@ -3080,7 +3105,8 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 2;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_RESET_IND;
 	p->RESET_orig = N_PROVIDER;
 	switch (icmp->type) {
@@ -3184,7 +3210,8 @@ ne_datack_ind(queue_t *q)
 		goto ebusy;
 
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_DATACK_IND;
 
 	putnext(q, mp);
@@ -4767,7 +4794,7 @@ npi_init_caches(void)
 		npi_priv_cachep = kmem_cache_create("npi_priv_cachep", sizeof(struct np), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (npi_priv_cachep == NULL) {
-			cmn_err(CE_PANIC, "%s: Cannot allocate npi_priv_cachep", __FUNCTION__);
+			cmn_err(CE_WARN, "%s: Cannot allocate npi_priv_cachep", __FUNCTION__);
 			npi_term_caches();
 			return (-ENOMEM);
 		}
@@ -4777,7 +4804,7 @@ npi_init_caches(void)
 		npi_bind_cachep = kmem_cache_create("npi_bind_cachep", sizeof(struct np), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (npi_bind_cachep == NULL) {
-			cmn_err(CE_PANIC, "%s: Cannot allocate npi_bind_cachep", __FUNCTION__);
+			cmn_err(CE_WARN, "%s: Cannot allocate npi_bind_cachep", __FUNCTION__);
 			npi_term_caches();
 			return (-ENOMEM);
 		}
@@ -4787,7 +4814,7 @@ npi_init_caches(void)
 		npi_prot_cachep = kmem_cache_create("npi_prot_cachep", sizeof(struct np), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (npi_prot_cachep == NULL) {
-			cmn_err(CE_PANIC, "%s: Cannot allocate npi_prot_cachep", __FUNCTION__);
+			cmn_err(CE_WARN, "%s: Cannot allocate npi_prot_cachep", __FUNCTION__);
 			npi_term_caches();
 			return (-ENOMEM);
 		}
@@ -4815,29 +4842,43 @@ npi_term_hashes(void)
 STATIC void
 npi_init_hashes(void)
 {
-	int order, i;
-	unsigned long goal;
+	int i;
 
-	/* size and allocate bind hash table */
-	goal = num_physpages >> (20 - PAGE_SHIFT);
-	for (order = 0; (1 << order) < goal; order++) ;
-	do {
-		npi_bhash_order = order;
-		npi_bhash_size = (1 << order) * PAGE_SIZE / sizeof(struct npi_bhash_bucket);
-		npi_bhash = (struct npi_bhash_bucket *) __get_free_pages(GFP_ATOMIC, order);
-	} while (npi_bhash == NULL && --order >= 0);
-	if (!npi_bhash)
-		cmn_err(CE_PANIC, "%s: Failed to allocate bind hash table\n", __FUNCTION__);
-	npi_bhash_size = npi_chash_size = npi_bhash_size >> 1;
-	npi_bhash_order = npi_chash_order = npi_bhash_order - 1;
-	bzero(npi_bhash, npi_bhash_size * sizeof(struct npi_bhash_bucket));
-	bzero(npi_chash, npi_chash_size * sizeof(struct npi_chash_bucket));
-	for (i = 0; i < npi_bhash_size; i++)
-		rwlock_init(&npi_bhash[i].lock);
-	for (i = 0; i < npi_chash_size; i++)
-		rwlock_init(&npi_chash[i].lock);
-	printd(("%s: INFO: bind hash table configured size = %d\n", DRV_NAME, npi_bhash_size));
-	printd(("%s: INFO: conn hash table configured size = %d\n", DRV_NAME, npi_chash_size));
+	/* Start with just one page for each. */
+	if (npi_bhash == NULL) {
+		npi_bhash_order = 0;
+		if ((npi_bhash =
+		     (struct npi_bhash_bucket *) __get_free_pages(GFP_ATOMIC, npi_bhash_order))) {
+			npi_bhash_size =
+			    (1 << (npi_bhash_order + PAGE_SHIFT)) / sizeof(struct npi_bhash_bucket);
+			printd(("%s: INFO: bind hash table configured size = %d\n", DRV_NAME,
+				npi_bhash_size));
+			bzero(npi_bhash, npi_bhash_size * sizeof(struct npi_bhash_bucket));
+			for (i = 0; i < npi_bhash_size; i++)
+				rwlock_init(&npi_bhash[i].lock);
+		} else {
+			npi_term_hashes();
+			cmn_err(CE_PANIC, "%s: Failed to allocate bind hash table\n", __FUNCTION__);
+			return;
+		}
+	}
+	if (npi_chash == NULL) {
+		npi_chash_order = 0;
+		if ((npi_chash =
+		     (struct npi_chash_bucket *) __get_free_pages(GFP_ATOMIC, npi_chash_order))) {
+			npi_chash_size =
+			    (1 << (npi_chash_order + PAGE_SHIFT)) / sizeof(struct npi_chash_bucket);
+			printd(("%s: INFO: conn hash table configured size = %d\n", DRV_NAME,
+				npi_chash_size));
+			bzero(npi_chash, npi_chash_size * sizeof(struct npi_chash_bucket));
+			for (i = 0; i < npi_chash_size; i++)
+				rwlock_init(&npi_chash[i].lock);
+		} else {
+			npi_term_hashes();
+			cmn_err(CE_PANIC, "%s: Failed to allocate bind hash table\n", __FUNCTION__);
+			return;
+		}
+	}
 }
 
 /**
@@ -5090,7 +5131,8 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	write_unlock_bh(&master.lock);
 	/* want to set a write offet of 20 bytes */
-	so = (typeof(so)) mp->b_wptr++;
+	so = (typeof(so)) mp->b_wptr;
+	mp->b_wptr += sizeof(*so);
 	so->so_flags = SO_WROFF | SO_DELIM;
 	so->so_wroff = 20;
 	putnext(q, mp);

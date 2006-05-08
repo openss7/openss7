@@ -20,6 +20,15 @@
 	* src/drivers/ip.c: rip module_text_address, hash table changes
 	* src/drivers/np.c: rip module_text_address
 	* src/drivers/np_ip.c: rip module_text_address, hash table changes
+	* src/drivers/dl.c: new gcc mishandles ++ of cast pointers
+	* src/drivers/dl_ip.c: new gcc mishandles ++ of cast pointers
+	* src/drivers/ip.c: new gcc mishandles ++ of cast pointers
+	* src/drivers/np.c: new gcc mishandles ++ of cast pointers
+	* src/drivers/np_ip.c: new gcc mishandles ++ of cast pointers
+	* src/drivers/np_ip.c: working through first few test cases
+	* src/test/test-np_ip.c: working through first few test cases
+	* tests/testsuite-np_ip.at: working through first few test cases
+	* tests/testsuite.at: working through first few test cases
 
 2006-05-07  Brian Bidulock  <bidulock@openss7.org>
 
