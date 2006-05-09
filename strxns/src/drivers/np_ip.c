@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/08 11:26:13 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/09 09:47:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:26:13 $ by $Author: brian $
+ Last Modified $Date: 2006/05/09 09:47:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.7  2006/05/09 09:47:56  brian
+ - changes from initial testing
+
+ Revision 0.9.2.6  2006/05/09 06:48:08  brian
+ - changes from testing
+
  Revision 0.9.2.5  2006/05/08 11:26:13  brian
  - post inc problem and working through test cases
 
@@ -67,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/08 11:26:13 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/09 09:47:56 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/08 11:26:13 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/09 09:47:56 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -126,7 +132,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2006/05/08 11:26:13 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2006/05/09 09:47:56 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -517,26 +523,26 @@ state_name(np_ulong state)
 STATIC INLINE fastcall void
 npi_set_state(struct np *np, np_ulong state)
 {
-	printd(("%s: %p: %s <- %s\n", DRV_NAME, np, state_name(state), state_name(np->i_state)));
-	np->i_state = state;
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, np, state_name(state), state_name(np->info.CURRENT_state)));
+	np->info.CURRENT_state = state;
 }
 
 STATIC INLINE fastcall np_ulong
 npi_get_state(struct np *np)
 {
-	return (np->i_state);
+	return (np->info.CURRENT_state);
 }
 
 STATIC INLINE fastcall np_ulong
 npi_chk_state(struct np * np, np_ulong mask)
 {
-	return (((1 << np->i_state) & (mask)) != 0);
+	return (((1 << np->info.CURRENT_state) & (mask)) != 0);
 }
 
 STATIC INLINE fastcall np_ulong
 npi_not_state(struct np * np, np_ulong mask)
 {
-	return (((1 << np->i_state) & (mask)) == 0);
+	return (((1 << np->info.CURRENT_state) & (mask)) == 0);
 }
 
 /*
@@ -2221,6 +2227,12 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
 		   normally when we are responding to a N_OPTMGMT_REQ in other than the NS_IDLE
 		   state. */
+		if (CORRECT_prim == N_OPTMGMT_REQ) {
+			NPI_error = npi_optmgmt(np, QOS_buffer, flags);
+			if (unlikely(NPI_error != 0))
+				goto error;
+			break;
+		}
 		break;
 	}
 	qreply(q, mp);
@@ -3338,7 +3350,10 @@ ne_unbind_req(queue_t *q, mblk_t *mp)
 	if (unlikely(npi_not_state(np, NSF_IDLE)))
 		goto error;
 	npi_set_state(np, NS_WACK_UREQ);
-	return ne_ok_ack(q, N_UNBIND_REQ, NULL, 0, NULL, NULL, NULL, 0);
+	NPI_error = ne_ok_ack(q, N_UNBIND_REQ, NULL, 0, NULL, NULL, NULL, 0);
+	if (unlikely(NPI_error != 0))
+		goto error;
+	return (QR_DONE);
       error:
 	return ne_error_ack(q, N_UNBIND_REQ, NPI_error);
 }
@@ -3402,7 +3417,10 @@ ne_optmgmt_req(queue_t *q, mblk_t *mp)
 		np->i_flags |= IP_FLAG_DEFAULT_RC_SEL;
 	else
 		np->i_flags &= ~IP_FLAG_DEFAULT_RC_SEL;
-	return ne_ok_ack(q, N_OPTMGMT_REQ, NULL, 0, QOS_buffer, NULL, NULL, p->OPTMGMT_flags);
+	NPI_error = ne_ok_ack(q, N_OPTMGMT_REQ, NULL, 0, QOS_buffer, NULL, NULL, p->OPTMGMT_flags);
+	if (unlikely(NPI_error != 0))
+		goto error;
+	return (QR_DONE);
       error:
 	return ne_error_ack(q, N_OPTMGMT_REQ, NPI_error);
 }
@@ -3710,8 +3728,11 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	npi_set_state(np, NS_WACK_CRES);
-	return ne_ok_ack(q, N_CONN_RES, RES_buffer, p->RES_length,
+	NPI_error = ne_ok_ack(q, N_CONN_RES, RES_buffer, p->RES_length,
 			 QOS_buffer, SEQ_number, TOKEN_value, p->CONN_flags);
+	if (unlikely(NPI_error != 0))
+		goto error;
+	return (QR_TRIMMED);
       error:
 	return ne_error_ack(q, N_CONN_RES, NPI_error);
 }
@@ -3772,8 +3793,11 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 			goto error;
 	}
 	/* Ok, all checking done.  Now we need to disconnect the address. */
-	return ne_ok_ack(q, N_DISCON_REQ, RES_buffer, p->RES_length, NULL, SEQ_number, NULL,
+	NPI_error = ne_ok_ack(q, N_DISCON_REQ, RES_buffer, p->RES_length, NULL, SEQ_number, NULL,
 			 p->DISCON_reason);
+	if (unlikely(NPI_error != 0))
+		goto error;
+	return (QR_TRIMMED);
       error:
 	return ne_error_ack(q, N_DISCON_REQ, NPI_error);
 }
@@ -3822,7 +3846,7 @@ ne_write_req(queue_t *q, mblk_t *mp)
       discard:
 	return (QR_DONE);
       error:
-	return ne_error_reply(q, NPI_error);
+	return ne_error_reply(q, -EPROTO);
 }
 
 /**
@@ -3884,7 +3908,7 @@ ne_data_req(queue_t *q, mblk_t *mp)
       discard:
 	return (QR_DONE);
       error:
-	return ne_error_reply(q, NPI_error);
+	return ne_error_reply(q, -EPROTO);
 }
 
 /**
@@ -3932,7 +3956,7 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
       discard:
 	return (QR_DONE);
       error:
-	return ne_error_reply(q, NPI_error);
+	return ne_error_reply(q, -EPROTO);
 }
 
 /**
@@ -3977,7 +4001,7 @@ ne_datack_req(queue_t *q, mblk_t *mp)
       discard:
 	return (QR_DONE);
       error:
-	return ne_error_reply(q, NPI_error);
+	return ne_error_reply(q, -EPROTO);
 }
 
 /**
@@ -4058,7 +4082,10 @@ ne_reset_res(queue_t *q, mblk_t *mp)
 		goto error;
 	/* Ok, parameters check out. */
 	npi_set_state(np, NS_WACK_RRES);
-	return ne_ok_ack(q, N_RESET_RES, NULL, 0, NULL, NULL, NULL, 0);
+	NPI_error = ne_ok_ack(q, N_RESET_RES, NULL, 0, NULL, NULL, NULL, 0);
+	if (unlikely(NPI_error != 0))
+		goto error;
+	return (QR_DONE);
       error:
 	return ne_error_ack(q, N_RESET_RES, NPI_error);
 }
@@ -4869,7 +4896,7 @@ npi_alloc_priv(queue_t *q, struct np **slp, int type, dev_t *devp, cred_t *crp)
 		np->info.QOS_range_length = 0;
 		np->info.QOS_range_offset = 0;
 		np->info.OPTIONS_flags = 0;
-		np->info.NIDU_size = 65535;
+		np->info.NIDU_size = 65535 - sizeof(struct iphdr);
 		np->info.SERV_type = type ? : (N_CLNS | N_CONS);
 		np->info.CURRENT_state = NS_UNBND;
 		np->info.PROVIDER_type = N_SUBNET;

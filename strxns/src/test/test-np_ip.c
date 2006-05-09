@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 11:26:16 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/09 09:47:57 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:26:16 $ by $Author: brian $
+ Last Modified $Date: 2006/05/09 09:47:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.4  2006/05/09 09:47:57  brian
+ - changes from initial testing
+
+ Revision 0.9.2.3  2006/05/09 06:48:09  brian
+ - changes from testing
+
  Revision 0.9.2.2  2006/05/08 11:26:16  brian
  - post inc problem and working through test cases
 
@@ -78,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 11:26:16 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/09 09:47:57 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 11:26:16 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/09 09:47:57 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -151,15 +157,15 @@ static int show_acks = 0;
 static int show_timeout = 0;
 static int show_data = 1;
 
-static int last_prim = 0;
 static int last_event = 0;
-static int last_errno = 0;
 static int last_retval = 0;
-static int last_n_errno = 0;
-static int last_qlen = 2;
-static int last_sequence = 1;
-static int last_servtype = N_CLNS;
-static int last_nstate = NS_UNBND;
+static int PRIM_type = 0;
+static int UNIX_error = 0;
+static int NPI_error = 0;
+static int CONIND_number = 2;
+static int SEQ_number = 1;
+static int SERV_type = N_CLNS;
+static int CURRENT_state = NS_UNBND;
 N_info_ack_t last_info = { 0, };
 static int last_prio = 0;
 
@@ -198,16 +204,16 @@ static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
 static int test_bufsize = 256;
 static int test_nidu = 256;
-static int test_mgmtflags = 0;
-static struct sockaddr_in *test_addr = NULL;
-static socklen_t test_alen = sizeof(*test_addr);
-static unsigned char test_prot[8];
-static size_t test_plen = 0;
+static int OPTMGMT_flags = 0;
+static struct sockaddr_in *ADDR_buffer = NULL;
+static socklen_t ADDR_length = sizeof(*ADDR_buffer);
+static unsigned char PROTOID_buffer[8];
+static size_t PROTOID_length = 0;
 static const char *test_data = NULL;
 static int test_resfd = -1;
 static int test_timout = 200;
-static void *test_opts = NULL;
-static int test_olen = 0;
+static void *QOS_buffer = NULL;
+static int QOS_length = 0;
 
 struct strfdinsert fdi = {
 	{BUFSIZE, 0, cbuf},
@@ -323,10 +329,10 @@ now(void)
 	struct timeval now;
 
 	if (gettimeofday(&now, NULL)) {
-		last_errno = errno;
+		UNIX_error = errno;
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "***************ERROR! couldn't get time!            !  !                    \n");
-		fprintf(stdout, "%20s! %-54s\n", __FUNCTION__, strerror(last_errno));
+		fprintf(stdout, "%20s! %-54s\n", __FUNCTION__, strerror(UNIX_error));
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		return (0);
@@ -1093,10 +1099,14 @@ const char *
 service_type(np_ulong type)
 {
 	switch (type) {
+	case 0:
+		return ("(none)");
 	case N_CLNS:
 		return ("N_CLNS");
 	case N_CONS:
 		return ("N_CONS");
+	case N_CLNS|N_CONS:
+		return ("N_CLNS|N_CONS");
 	default:
 		return ("(unknown)");
 	}
@@ -1875,6 +1885,10 @@ prim_string(np_ulong prim)
 		return ("N_RESET_IND-----");
 	case N_RESET_CON:
 		return ("N_RESET_CON-----");
+	case N_DATACK_REQ:
+		return ("N_DATACK_REQ----");
+	case N_DATACK_IND:
+		return ("N_DATACK_IND----");
 	default:
 		return ("N_????_???------");
 	}
@@ -2558,51 +2572,77 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 {
 	unsigned char *qos_ptr = (unsigned char *)(cmd_buf + qos_ofs);
 	union N_qos_ip_types *qos = (union N_qos_ip_types *) qos_ptr;
+	char buf[64];
 
 	if (qos_len) {
 		switch (qos->n_qos_type) {
 		case N_QOS_SEL_CONN_IP:
-			printf("CONN:");
-			printf(" protocol=%ld,", (long) qos->n_qos_sel_conn.protocol);
-			printf(" priority=%ld,", (long) qos->n_qos_sel_conn.priority);
-			printf(" ttl=%ld,", (long) qos->n_qos_sel_conn.ttl);
-			printf(" tos=%ld,", (long) qos->n_qos_sel_conn.tos);
-			printf(" mtu=%ld,", (long) qos->n_qos_sel_conn.mtu);
-			printf(" saddr=%ld,", (long) qos->n_qos_sel_conn.saddr);
-			printf(" daddr=%ld,", (long) qos->n_qos_sel_conn.daddr);
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_CONN_IP:");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_conn.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_conn.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_conn.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_conn.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " mtu = %ld,", (long) qos->n_qos_sel_conn.mtu);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = %ld,", (long) qos->n_qos_sel_conn.saddr);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " daddr = %ld,", (long) qos->n_qos_sel_conn.daddr);
+			print_string(child, buf);
 			break;
 
 		case N_QOS_SEL_UD_IP:
-			printf("DATA: ");
-			printf(" protocol=%ld,", (long) qos->n_qos_sel_conn.protocol);
-			printf(" priority=%ld,", (long) qos->n_qos_sel_conn.priority);
-			printf(" ttl=%ld,", (long) qos->n_qos_sel_conn.ttl);
-			printf(" tos=%ld,", (long) qos->n_qos_sel_conn.tos);
-			printf(" saddr=%ld,", (long) qos->n_qos_sel_conn.saddr);
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_UD_IP: ");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_conn.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_conn.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_conn.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_conn.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = %ld,", (long) qos->n_qos_sel_conn.saddr);
+			print_string(child, buf);
 			break;
 
 		case N_QOS_SEL_INFO_IP:
-			printf("INFO: ");
-			printf(" protocol=%ld,", (long) qos->n_qos_sel_conn.protocol);
-			printf(" priority=%ld,", (long) qos->n_qos_sel_conn.priority);
-			printf(" ttl=%ld,", (long) qos->n_qos_sel_conn.ttl);
-			printf(" tos=%ld,", (long) qos->n_qos_sel_conn.tos);
-			printf(" mtu=%ld,", (long) qos->n_qos_sel_conn.mtu);
-			printf(" saddr=%ld,", (long) qos->n_qos_sel_conn.saddr);
-			printf(" daddr=%ld,", (long) qos->n_qos_sel_conn.daddr);
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_INFO_IP: ");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_conn.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_conn.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_conn.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_conn.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " mtu = %ld,", (long) qos->n_qos_sel_conn.mtu);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = %ld,", (long) qos->n_qos_sel_conn.saddr);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " daddr = %ld,", (long) qos->n_qos_sel_conn.daddr);
+			print_string(child, buf);
 			break;
 
 		case N_QOS_RANGE_INFO_IP:
-			printf("RANGE: ");
+			snprintf(buf, sizeof(buf), "N_QOS_RANGE_INFO_IP: ");
+			print_string(child, buf);
 			break;
 
 		default:
-			printf("(unknown qos structure %lu)\n", (ulong) qos->n_qos_type);
+			snprintf(buf, sizeof(buf), "(unknown qos structure %lu)\n", (ulong) qos->n_qos_type);
+			print_string(child, buf);
 			break;
 		}
-	} else
-		printf("(no qos)");
-	printf("\n");
+	} else {
+		snprintf(buf, sizeof(buf), "(no qos)");
+		print_string(child, buf);
+	}
 }
 
 void
@@ -2612,29 +2652,29 @@ print_info(int child, N_info_ack_t *info)
 
 	if (verbose < 4)
 		return;
-	snprintf(buf, sizeof(buf), "NSDU  = %ld", (long) info->NSDU_size);
+	snprintf(buf, sizeof(buf), "NSDU_size = %ld", (long) info->NSDU_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "ENSDU = %ld", (long) info->ENSDU_size);
+	snprintf(buf, sizeof(buf), "ENSDU_size = %ld", (long) info->ENSDU_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "CDATA = %ld", (long) info->CDATA_size);
+	snprintf(buf, sizeof(buf), "CDATA_size = %ld", (long) info->CDATA_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "DDATA = %ld", (long) info->DDATA_size);
+	snprintf(buf, sizeof(buf), "DDATA_size = %ld", (long) info->DDATA_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "ADDR  = %ld", (long) info->ADDR_size);
+	snprintf(buf, sizeof(buf), "ADDR_size = %ld", (long) info->ADDR_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "OPTIONS = %lx", (long) info->OPTIONS_flags);
+	snprintf(buf, sizeof(buf), "OPTIONS_flags = %lx", (long) info->OPTIONS_flags);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "NIDU  = %ld", (long) info->NIDU_size);
+	snprintf(buf, sizeof(buf), "NIDU_size = %ld", (long) info->NIDU_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "<%s>", service_type(info->SERV_type));
+	snprintf(buf, sizeof(buf), "SERV_type = <%s>", service_type(info->SERV_type));
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "<%s>", state_string(info->CURRENT_state));
+	snprintf(buf, sizeof(buf), "CURRENT_state = <%s>", state_string(info->CURRENT_state));
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "<%s>", provider_type(info->PROVIDER_type));
+	snprintf(buf, sizeof(buf), "PROVIDER_type = <%s>", provider_type(info->PROVIDER_type));
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "NODU  = %ld", (long) info->NODU_size);
+	snprintf(buf, sizeof(buf), "NODU_size = %ld", (long) info->NODU_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "VERSION  = %ld", (long) info->NPI_version);
+	snprintf(buf, sizeof(buf), "NPI_version = %ld", (long) info->NPI_version);
 	print_string(child, buf);
 }
 
@@ -2663,8 +2703,8 @@ ip_n_open(const char *name, int *fdp)
 			print_success(fd);
 			return (__RESULT_SUCCESS);
 		}
-		print_errno(fd, (last_errno = errno));
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		print_errno(fd, (UNIX_error = errno));
+		if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 			continue;
 		return (__RESULT_FAILURE);
 	}
@@ -2682,8 +2722,8 @@ ip_close(int *fdp)
 			print_success(fd);
 			return __RESULT_SUCCESS;
 		}
-		print_errno(fd, (last_errno = errno));
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		print_errno(fd, (UNIX_error = errno));
+		if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 			continue;
 		return __RESULT_FAILURE;
 	}
@@ -2716,8 +2756,8 @@ test_ioctl(int child, int cmd, intptr_t arg)
 	print_ioctl(child, cmd, arg);
 	for (;;) {
 		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EINTR || last_errno == ERESTART)
+			print_errno(child, (UNIX_error = errno));
+			if (UNIX_error == EINTR || UNIX_error == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
@@ -2772,8 +2812,8 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			print_datcall(child, "putpmsg(2)----", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
-				print_errno(child, (last_errno = errno));
-				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				print_errno(child, (UNIX_error = errno));
+				if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 					continue;
 				return (__RESULT_FAILURE);
 			}
@@ -2792,8 +2832,8 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			print_datcall(child, "putmsg(2)-----", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
-				print_errno(child, (last_errno = errno));
-				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				print_errno(child, (UNIX_error = errno));
+				if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 					continue;
 				return (__RESULT_FAILURE);
 			}
@@ -2810,8 +2850,8 @@ test_write(int child, const void *buf, size_t len)
 	print_syscall(child, "write(2)------");
 	for (;;) {
 		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			print_errno(child, (UNIX_error = errno));
+			if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
@@ -2827,8 +2867,8 @@ test_writev(int child, const struct iovec *iov, int num)
 	print_syscall(child, "writev(2)-----");
 	for (;;) {
 		if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			print_errno(child, (UNIX_error = errno));
+			if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
@@ -2844,7 +2884,7 @@ test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 	print_syscall(child, "getmsg(2)-----");
 	for (;;) {
 		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
-			print_errno(child, (last_errno = errno));
+			print_errno(child, (UNIX_error = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2859,7 +2899,7 @@ test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, in
 	print_syscall(child, "getpmsg(2)----");
 	for (;;) {
 		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
-			print_errno(child, (last_errno = errno));
+			print_errno(child, (UNIX_error = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2874,7 +2914,7 @@ test_read(int child, void *buf, size_t count)
 	print_syscall(child, "read(2)-------");
 	for (;;) {
 		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
-			print_errno(child, (last_errno = errno));
+			print_errno(child, (UNIX_error = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2889,7 +2929,7 @@ test_readv(int child, const struct iovec *iov, int count)
 	print_syscall(child, "readv(2)------");
 	for (;;) {
 		if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
-			print_errno(child, (last_errno = errno));
+			print_errno(child, (UNIX_error = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2912,8 +2952,8 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 	print_ti_ioctl(child, cmd, arg);
 	for (;;) {
 		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EINTR || last_errno == ERESTART)
+			print_errno(child, (UNIX_error = errno));
+			if (UNIX_error == EINTR || UNIX_error == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
@@ -2950,8 +2990,8 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EINTR || last_errno == ERESTART)
+			print_errno(child, (UNIX_error = errno));
+			if (UNIX_error == EINTR || UNIX_error == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
@@ -2961,8 +3001,8 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EINTR || last_errno == ERESTART)
+			print_errno(child, (UNIX_error = errno));
+			if (UNIX_error == EINTR || UNIX_error == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
@@ -2980,8 +3020,8 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EINTR || last_errno == ERESTART)
+			print_errno(child, (UNIX_error = errno));
+			if (UNIX_error == EINTR || UNIX_error == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
@@ -2991,8 +3031,8 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EINTR || last_errno == ERESTART)
+			print_errno(child, (UNIX_error = errno));
+			if (UNIX_error == EINTR || UNIX_error == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
@@ -3015,8 +3055,8 @@ test_pipe(int child)
 			print_success(child);
 			return (__RESULT_SUCCESS);
 		}
-		print_errno(child, (last_errno = errno));
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		print_errno(child, (UNIX_error = errno));
+		if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 			continue;
 		return (__RESULT_FAILURE);
 	}
@@ -3034,8 +3074,8 @@ test_open(int child, const char *name)
 			print_success(child);
 			return (__RESULT_SUCCESS);
 		}
-		print_errno(child, (last_errno = errno));
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		print_errno(child, (UNIX_error = errno));
+		if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 			continue;
 		return (__RESULT_FAILURE);
 	}
@@ -3053,8 +3093,8 @@ test_close(int child)
 			print_success(child);
 			return __RESULT_SUCCESS;
 		}
-		print_errno(child, (last_errno = errno));
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		print_errno(child, (UNIX_error = errno));
+		if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 			continue;
 		return __RESULT_FAILURE;
 	}
@@ -3222,18 +3262,18 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_REQ:
 		ctrl->len = sizeof(p->conn_req)
-		    + (test_addr ? test_alen : 0)
-		    + (test_opts ? test_olen : 0);
+		    + (ADDR_buffer ? ADDR_length : 0)
+		    + (QOS_buffer ? QOS_length : 0);
 		p->conn_req.PRIM_type = N_CONN_REQ;
-		p->conn_req.DEST_length = test_addr ? test_alen : 0;
-		p->conn_req.DEST_offset = test_addr ? sizeof(p->conn_req) : 0;
+		p->conn_req.DEST_length = ADDR_buffer ? ADDR_length : 0;
+		p->conn_req.DEST_offset = ADDR_buffer ? sizeof(p->conn_req) : 0;
 		p->conn_req.CONN_flags = CONN_flags;
-		p->conn_req.QOS_length = test_opts ? test_olen : 0;
-		p->conn_req.QOS_offset = test_opts ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
-		if (test_addr)
-			bcopy(test_addr, ctrl->buf + p->conn_req.DEST_offset, p->conn_req.DEST_length);
-		if (test_opts)
-			bcopy(test_opts, ctrl->buf + p->conn_req.QOS_offset, p->conn_req.QOS_length);
+		p->conn_req.QOS_length = QOS_buffer ? QOS_length : 0;
+		p->conn_req.QOS_offset = QOS_buffer ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
+		if (ADDR_buffer)
+			bcopy(ADDR_buffer, ctrl->buf + p->conn_req.DEST_offset, p->conn_req.DEST_length);
+		if (QOS_buffer)
+			bcopy(QOS_buffer, ctrl->buf + p->conn_req.QOS_offset, p->conn_req.QOS_length);
 		if (test_data)
 			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
@@ -3252,7 +3292,7 @@ do_signal(int child, int action)
 		p->conn_ind.CONN_flags = 0;
 		p->conn_ind.QOS_length = 0;
 		p->conn_ind.QOS_offset = 0;
-		p->conn_ind.SEQ_number = last_sequence;
+		p->conn_ind.SEQ_number = SEQ_number;
 		data->len = snprintf(dbuf, BUFSIZE, "%s", "Connection indication test data.");
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3261,20 +3301,20 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_RES:
 		ctrl->len = sizeof(p->conn_res)
-		    + (test_addr ? test_alen : 0)
-		    + (test_opts ? test_olen : 0);
+		    + (ADDR_buffer ? ADDR_length : 0)
+		    + (QOS_buffer ? QOS_length : 0);
 		p->conn_res.PRIM_type = N_CONN_RES;
 		p->conn_res.TOKEN_value = 0;
-		p->conn_res.RES_length = test_addr ? test_alen : 0;
-		p->conn_res.RES_offset = test_addr ? sizeof(p->conn_res) : 0;
+		p->conn_res.RES_length = ADDR_buffer ? ADDR_length : 0;
+		p->conn_res.RES_offset = ADDR_buffer ? sizeof(p->conn_res) : 0;
 		p->conn_res.CONN_flags = CONN_flags;
-		p->conn_res.QOS_length = test_opts ? test_olen : 0;
-		p->conn_res.QOS_offset = test_opts ? sizeof(p->conn_res) + p->conn_res.RES_length : 0;
-		p->conn_res.SEQ_number = last_sequence;
-		if (test_addr)
-			bcopy(test_addr, ctrl->buf + p->conn_res.RES_offset, p->conn_res.RES_length);
-		if (test_opts)
-			bcopy(test_opts, ctrl->buf + p->conn_res.QOS_offset, p->conn_res.QOS_length);
+		p->conn_res.QOS_length = QOS_buffer ? QOS_length : 0;
+		p->conn_res.QOS_offset = QOS_buffer ? sizeof(p->conn_res) + p->conn_res.RES_length : 0;
+		p->conn_res.SEQ_number = SEQ_number;
+		if (ADDR_buffer)
+			bcopy(ADDR_buffer, ctrl->buf + p->conn_res.RES_offset, p->conn_res.RES_length);
+		if (QOS_buffer)
+			bcopy(QOS_buffer, ctrl->buf + p->conn_res.QOS_offset, p->conn_res.QOS_length);
 		if (test_data)
 			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
@@ -3303,14 +3343,14 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_DISCON_REQ:
 		ctrl->len = sizeof(p->discon_req)
-		    + (test_addr ? test_alen : 0);
+		    + (ADDR_buffer ? ADDR_length : 0);
 		p->discon_req.PRIM_type = N_DISCON_REQ;
 		p->discon_req.DISCON_reason = DISCON_reason;
-		p->discon_req.RES_length = test_addr ? test_alen : 0;
-		p->discon_req.RES_offset = test_addr ? sizeof(p->discon_req) : 0;
-		p->discon_req.SEQ_number = last_sequence;
-		if (test_addr)
-			bcopy(test_addr, ctrl->buf + p->discon_req.RES_offset, p->discon_req.RES_length);
+		p->discon_req.RES_length = ADDR_buffer ? ADDR_length : 0;
+		p->discon_req.RES_offset = ADDR_buffer ? sizeof(p->discon_req) : 0;
+		p->discon_req.SEQ_number = SEQ_number;
+		if (ADDR_buffer)
+			bcopy(ADDR_buffer, ctrl->buf + p->discon_req.RES_offset, p->discon_req.RES_length);
 		if (test_data)
 			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
@@ -3326,8 +3366,24 @@ do_signal(int child, int action)
 		p->discon_ind.DISCON_reason = 0;
 		p->discon_ind.RES_length = 0;
 		p->discon_ind.RES_offset = 0;
-		p->discon_ind.SEQ_number = last_sequence;
+		p->discon_ind.SEQ_number = SEQ_number;
 		data->len = snprintf(dbuf, BUFSIZE, "%s", "Disconnection indication test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_DATACK_REQ:
+		ctrl->len = sizeof(p->datack_req);
+		p->datack_req.PRIM_type = N_DATACK_REQ;
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_DATACK_IND:
+		ctrl->len = sizeof(p->datack_ind);
+		p->datack_ind.PRIM_type = N_DATACK_IND;
+		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3389,8 +3445,8 @@ do_signal(int child, int action)
 		p->info_ack.DDATA_size = test_bufsize;
 		p->info_ack.ADDR_size = test_bufsize;
 		p->info_ack.NIDU_size = test_nidu;
-		p->info_ack.SERV_type = last_servtype;
-		p->info_ack.CURRENT_state = last_nstate;
+		p->info_ack.SERV_type = SERV_type;
+		p->info_ack.CURRENT_state = CURRENT_state;
 		data = NULL;
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
@@ -3398,18 +3454,18 @@ do_signal(int child, int action)
 		print_info(child, &p->info_ack);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_REQ:
-		ctrl->len = sizeof(p->bind_req) + (test_addr ? test_alen : 0);
+		ctrl->len = sizeof(p->bind_req) + (ADDR_buffer ? ADDR_length : 0);
 		p->bind_req.PRIM_type = N_BIND_REQ;
-		p->bind_req.ADDR_length = test_addr ? test_alen : 0;
-		p->bind_req.ADDR_offset = test_addr ? sizeof(p->bind_req) : 0;
-		p->bind_req.CONIND_number = last_qlen;
+		p->bind_req.ADDR_length = ADDR_buffer ? ADDR_length : 0;
+		p->bind_req.ADDR_offset = ADDR_buffer ? sizeof(p->bind_req) : 0;
+		p->bind_req.CONIND_number = CONIND_number;
 		p->bind_req.BIND_flags = BIND_flags;
-		p->bind_req.PROTOID_length = test_prot ? test_plen : 0;
-		p->bind_req.PROTOID_offset = test_prot ? sizeof(p->bind_req) + p->bind_req.ADDR_length : 0;
-		if (test_addr)
-			bcopy(test_addr, ctrl->buf + p->bind_req.ADDR_offset, p->bind_req.ADDR_length);
-		if (test_prot)
-			bcopy(test_prot, ctrl->buf + p->bind_req.PROTOID_offset, p->bind_req.PROTOID_length);
+		p->bind_req.PROTOID_length = PROTOID_buffer ? PROTOID_length : 0;
+		p->bind_req.PROTOID_offset = PROTOID_buffer ? sizeof(p->bind_req) + p->bind_req.ADDR_length : 0;
+		if (ADDR_buffer)
+			bcopy(ADDR_buffer, ctrl->buf + p->bind_req.ADDR_offset, p->bind_req.ADDR_length);
+		if (PROTOID_buffer)
+			bcopy(PROTOID_buffer, ctrl->buf + p->bind_req.PROTOID_offset, p->bind_req.PROTOID_length);
 		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3421,7 +3477,7 @@ do_signal(int child, int action)
 		p->bind_ack.PRIM_type = N_BIND_ACK;
 		p->bind_ack.ADDR_length = 0;
 		p->bind_ack.ADDR_offset = 0;
-		p->bind_ack.CONIND_number = last_qlen;
+		p->bind_ack.CONIND_number = CONIND_number;
 		data = NULL;
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
@@ -3439,9 +3495,9 @@ do_signal(int child, int action)
 	case __TEST_ERROR_ACK:
 		ctrl->len = sizeof(p->error_ack);
 		p->error_ack.PRIM_type = N_ERROR_ACK;
-		p->error_ack.ERROR_prim = last_prim;
-		p->error_ack.NPI_error = last_n_errno;
-		p->error_ack.UNIX_error = last_errno;
+		p->error_ack.ERROR_prim = PRIM_type;
+		p->error_ack.NPI_error = NPI_error;
+		p->error_ack.UNIX_error = UNIX_error;
 		data = NULL;
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
@@ -3459,12 +3515,12 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_UNITDATA_REQ:
 		ctrl->len = sizeof(p->unitdata_req)
-		    + (test_addr ? test_alen : 0);
+		    + (ADDR_buffer ? ADDR_length : 0);
 		p->unitdata_req.PRIM_type = N_UNITDATA_REQ;
-		p->unitdata_req.DEST_length = test_addr ? test_alen : 0;
-		p->unitdata_req.DEST_offset = test_addr ? sizeof(p->unitdata_req) : 0;
-		if (test_addr)
-			bcopy(test_addr, ctrl->buf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length);
+		p->unitdata_req.DEST_length = ADDR_buffer ? ADDR_length : 0;
+		p->unitdata_req.DEST_offset = ADDR_buffer ? sizeof(p->unitdata_req) : 0;
+		if (ADDR_buffer)
+			bcopy(ADDR_buffer, ctrl->buf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length);
 		if (test_data)
 			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
@@ -3498,13 +3554,13 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_OPTMGMT_REQ:
 		ctrl->len = sizeof(p->optmgmt_req)
-		    + (test_opts ? test_olen : 0);
+		    + (QOS_buffer ? QOS_length : 0);
 		p->optmgmt_req.PRIM_type = N_OPTMGMT_REQ;
-		p->optmgmt_req.QOS_length = test_opts ? test_olen : 0;
-		p->optmgmt_req.QOS_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
-		p->optmgmt_req.OPTMGMT_flags = test_mgmtflags;
-		if (test_opts)
-			bcopy(test_opts, ctrl->buf + p->optmgmt_req.QOS_offset, p->optmgmt_req.QOS_length);
+		p->optmgmt_req.QOS_length = QOS_buffer ? QOS_length : 0;
+		p->optmgmt_req.QOS_offset = QOS_buffer ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPTMGMT_flags = OPTMGMT_flags;
+		if (QOS_buffer)
+			bcopy(QOS_buffer, ctrl->buf + p->optmgmt_req.QOS_offset, p->optmgmt_req.QOS_length);
 		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3554,7 +3610,7 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_PRIM_TOO_SHORT:
 		ctrl->len = sizeof(p->type);
-		p->type = last_prim;
+		p->type = PRIM_type;
 		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3562,7 +3618,7 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_PRIM_WAY_TOO_SHORT:
 		ctrl->len = sizeof(p->type) >> 1;
-		p->type = last_prim;
+		p->type = PRIM_type;
 		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3601,7 +3657,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	union N_primitives *p = (union N_primitives *) ctrl->buf;
 
 	if (ctrl->len >= sizeof(p->type)) {
-		switch ((last_prim = p->type)) {
+		switch ((PRIM_type = p->type)) {
 		case N_CONN_REQ:
 			event = __TEST_CONN_REQ;
 			print_rx_prim(child, prim_string(p->type));
@@ -3614,7 +3670,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case N_DISCON_REQ:
 			event = __TEST_DISCON_REQ;
-			last_sequence = p->discon_req.SEQ_number;
+			SEQ_number = p->discon_req.SEQ_number;
 			print_rx_prim(child, prim_string(p->type));
 			break;
 		case N_DATA_REQ:
@@ -3632,7 +3688,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case N_BIND_REQ:
 			event = __TEST_BIND_REQ;
-			last_qlen = p->bind_req.CONIND_number;
+			CONIND_number = p->bind_req.CONIND_number;
 			print_rx_prim(child, prim_string(p->type));
 			break;
 		case N_UNBIND_REQ:
@@ -3652,7 +3708,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case N_CONN_IND:
 			event = __TEST_CONN_IND;
-			last_sequence = p->conn_ind.SEQ_number;
+			SEQ_number = p->conn_ind.SEQ_number;
 			print_rx_prim(child, prim_string(p->type));
 			print_string(child, addr_string(cbuf + p->conn_ind.SRC_offset, p->conn_ind.SRC_length));
 			print_options(child, cbuf, p->conn_ind.QOS_offset, p->conn_ind.QOS_length);
@@ -3682,14 +3738,14 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case N_BIND_ACK:
 			event = __TEST_BIND_ACK;
-			last_qlen = p->bind_ack.CONIND_number;
+			CONIND_number = p->bind_ack.CONIND_number;
 			print_ack_prim(child, prim_string(p->type));
 			print_string(child, addr_string(cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length));
 			break;
 		case N_ERROR_ACK:
 			event = __TEST_ERROR_ACK;
-			last_n_errno = p->error_ack.NPI_error;
-			last_errno = p->error_ack.UNIX_error;
+			NPI_error = p->error_ack.NPI_error;
+			UNIX_error = p->error_ack.UNIX_error;
 			print_ack_prim(child, prim_string(p->type));
 			print_string(child, nerrno_string(p->error_ack.NPI_error, p->error_ack.UNIX_error));
 			break;
@@ -3767,7 +3823,7 @@ any_wait_event(int source, int wait)
 		case -1:
 			if ((errno == EAGAIN || errno == EINTR))
 				break;
-			print_errno(3, (last_errno = errno));
+			print_errno(3, (UNIX_error = errno));
 			break;
 		case 0:
 			print_nothing(3);
@@ -3849,8 +3905,8 @@ wait_event(int child, int wait)
 		pfd[0].revents = 0;
 		switch (poll(pfd, 1, wait)) {
 		case -1:
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			print_errno(child, (UNIX_error = errno));
+			if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 				break;
 			return (__RESULT_FAILURE);
 		case 0:
@@ -3877,10 +3933,10 @@ wait_event(int child, int wait)
 						print_syscall(child, "getmsg()");
 					if ((ret = getmsg(test_fd[child], &ctrl, &data, &flags)) >= 0)
 						break;
-					print_errno(child, (last_errno = errno));
-					if (last_errno == EINTR || last_errno == ERESTART)
+					print_errno(child, (UNIX_error = errno));
+					if (UNIX_error == EINTR || UNIX_error == ERESTART)
 						continue;
-					if (last_errno == EAGAIN)
+					if (UNIX_error == EAGAIN)
 						break;
 					return __RESULT_FAILURE;
 				}
@@ -4056,6 +4112,32 @@ postamble_0(int child)
 	return (__RESULT_FAILURE);
 }
 
+/* premable and postamble for the NS_UNBND state. */
+static int
+preamble_1_unbnd(int child)
+{
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_info.CURRENT_state != NS_UNBND)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+static int
+postamble_1_unbnd(int child)
+{
+	return postamble_0(child);
+}
+
 #if 0
 static int
 preamble_1(int child)
@@ -4063,9 +4145,9 @@ preamble_1(int child)
 #if 0
 	union T_primitives *p = (typeof(p)) cbuf;
 
-	test_mgmtflags = T_NEGOTIATE;
-	test_opts = &qos_info;
-	test_olen = sizeof(qos_info);
+	OPTMGMT_flags = T_NEGOTIATE;
+	QOS_buffer = &qos_info;
+	QOS_length = sizeof(qos_info);
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4076,9 +4158,9 @@ preamble_1(int child)
 		goto failure;
 	state++;
 #endif
-	test_addr = addrs[child];
-	test_alen = sizeof(addrs[child]);
-	last_qlen = (child == 2) ? 5 : 0;
+	ADDR_buffer = addrs[child];
+	ADDR_length = sizeof(addrs[child]);
+	CONIND_number = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4169,7 +4251,7 @@ postamble_1e(int child)
 		break;
 	}
 	state++;
-	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
+	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || UNIX_error != EPROTO) {
 		expect(child, SHORT_WAIT, __TEST_OK_ACK);
 		failed = (failed == -1) ? state : failed;
 	}
@@ -4196,11 +4278,11 @@ preamble_2_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = addrs[2];
-	test_alen = sizeof(addrs[2]);
+	ADDR_buffer = addrs[2];
+	ADDR_length = sizeof(addrs[2]);
 	test_data = NULL;
-	test_opts = &qos_conn;
-	test_olen = sizeof(qos_conn);
+	QOS_buffer = &qos_conn;
+	QOS_length = sizeof(qos_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4241,8 +4323,8 @@ preamble_2_list(int child)
 	state++;
 	test_resfd = test_fd[1];
 	test_data = NULL;
-	test_opts = &qos_conn;
-	test_olen = sizeof(qos_conn);
+	QOS_buffer = &qos_conn;
+	QOS_length = sizeof(qos_conn);
 	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4279,7 +4361,7 @@ postamble_2_conn(int child)
 	}
 	state++;
 	test_data = NULL;
-	last_sequence = 0;
+	SEQ_number = 0;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
@@ -4389,11 +4471,11 @@ preamble_2b_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = addrs[1];
-	test_alen = sizeof(addrs[1]);
+	ADDR_buffer = addrs[1];
+	ADDR_length = sizeof(addrs[1]);
 	test_data = "Hello World";
-	test_opts = &qos_conn;
-	test_olen = sizeof(qos_conn);
+	QOS_buffer = &qos_conn;
+	QOS_length = sizeof(qos_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4436,8 +4518,8 @@ preamble_2b_list(int child)
 	state++;
 	test_resfd = test_fd[1];
 	test_data = "Hello There!";
-	test_opts = &qos_conn;
-	test_olen = sizeof(qos_conn);
+	QOS_buffer = &qos_conn;
+	QOS_length = sizeof(qos_conn);
 	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4782,14 +4864,13 @@ test_case_1_2(int child)
 	if (last_info.ADDR_size != sizeof(struct sockaddr_in) << 3)
 		goto failure;
 	state++;
-	state++;
 	if (last_info.NODU_size != 536)
 		goto failure;
 	state++;
 	if (last_info.NIDU_size != 65515)
 		goto failure;
 	state++;
-	if (last_info.SERV_type != N_CLNS)
+	if (last_info.SERV_type != (N_CLNS|N_CONS))
 		goto failure;
 	state++;
 	if (last_info.CURRENT_state != NS_UNBND)
@@ -4816,6 +4897,575 @@ struct test_stream test_1_2_conn = { &preamble_1_2_conn, &test_case_1_2_conn, &p
 struct test_stream test_1_2_resp = { &preamble_1_2_resp, &test_case_1_2_resp, &postamble_1_2_resp };
 struct test_stream test_1_2_list = { &preamble_1_2_list, &test_case_1_2_list, &postamble_1_2_list };
 
+#define test_group_1_3 "Non-fatal errors in the NS_UNBND State."
+#define tgrp_case_1_3_1 test_group_1_3
+#define numb_case_1_3_1 "1.3.1"
+#define name_case_1_3_1 "NOUTSTATE for N_CONN_REQ in NS_UNBND state."
+#define sref_case_1_3_1 "NPI Rev 2.0.0"
+#define desc_case_1_3_1 "\
+Checks that NOUTSTATE is returned when N_CONN_REQ is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_3_1(int child)
+{
+	ADDR_buffer = NULL;
+	QOS_buffer = NULL;
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NOUTSTATE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_3_1_conn	test_case_1_3_1
+#define test_case_1_3_1_resp	test_case_1_3_1
+#define test_case_1_3_1_list	test_case_1_3_1
+
+#define preamble_1_3_1_conn	preamble_1_unbnd
+#define preamble_1_3_1_resp	preamble_1_unbnd
+#define preamble_1_3_1_list	preamble_1_unbnd
+
+#define postamble_1_3_1_conn	postamble_1_unbnd
+#define postamble_1_3_1_resp	postamble_1_unbnd
+#define postamble_1_3_1_list	postamble_1_unbnd
+
+struct test_stream test_1_3_1_conn = { &preamble_1_3_1_conn, &test_case_1_3_1_conn, &postamble_1_3_1_conn };
+struct test_stream test_1_3_1_resp = { &preamble_1_3_1_resp, &test_case_1_3_1_resp, &postamble_1_3_1_resp };
+struct test_stream test_1_3_1_list = { &preamble_1_3_1_list, &test_case_1_3_1_list, &postamble_1_3_1_list };
+
+#define tgrp_case_1_3_2 test_group_1_3
+#define numb_case_1_3_2 "1.3.2"
+#define name_case_1_3_2 "NOUTSTATE for N_CONN_RES in NS_UNBND state."
+#define sref_case_1_3_2 "NPI Rev 2.0.0"
+#define desc_case_1_3_2 "\
+Checks that NOUTSTATE is returned when N_CONN_RES is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_3_2(int child)
+{
+	ADDR_buffer = NULL;
+	QOS_buffer = NULL;
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NOUTSTATE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_3_2_conn	test_case_1_3_2
+#define test_case_1_3_2_resp	test_case_1_3_2
+#define test_case_1_3_2_list	test_case_1_3_2
+
+#define preamble_1_3_2_conn	preamble_1_unbnd
+#define preamble_1_3_2_resp	preamble_1_unbnd
+#define preamble_1_3_2_list	preamble_1_unbnd
+
+#define postamble_1_3_2_conn	postamble_1_unbnd
+#define postamble_1_3_2_resp	postamble_1_unbnd
+#define postamble_1_3_2_list	postamble_1_unbnd
+
+struct test_stream test_1_3_2_conn = { &preamble_1_3_2_conn, &test_case_1_3_2_conn, &postamble_1_3_2_conn };
+struct test_stream test_1_3_2_resp = { &preamble_1_3_2_resp, &test_case_1_3_2_resp, &postamble_1_3_2_resp };
+struct test_stream test_1_3_2_list = { &preamble_1_3_2_list, &test_case_1_3_2_list, &postamble_1_3_2_list };
+
+#define tgrp_case_1_3_3 test_group_1_3
+#define numb_case_1_3_3 "1.3.3"
+#define name_case_1_3_3 "NOUTSTATE for N_DISCON_REQ in NS_UNBND state."
+#define sref_case_1_3_3 "NPI Rev 2.0.0"
+#define desc_case_1_3_3 "\
+Checks that NOUTSTATE is returned when N_DISCON_REQ is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_3_3(int child)
+{
+	ADDR_buffer = NULL;
+	SEQ_number = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NOUTSTATE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_3_3_conn	test_case_1_3_3
+#define test_case_1_3_3_resp	test_case_1_3_3
+#define test_case_1_3_3_list	test_case_1_3_3
+
+#define preamble_1_3_3_conn	preamble_1_unbnd
+#define preamble_1_3_3_resp	preamble_1_unbnd
+#define preamble_1_3_3_list	preamble_1_unbnd
+
+#define postamble_1_3_3_conn	postamble_1_unbnd
+#define postamble_1_3_3_resp	postamble_1_unbnd
+#define postamble_1_3_3_list	postamble_1_unbnd
+
+struct test_stream test_1_3_3_conn = { &preamble_1_3_3_conn, &test_case_1_3_3_conn, &postamble_1_3_3_conn };
+struct test_stream test_1_3_3_resp = { &preamble_1_3_3_resp, &test_case_1_3_3_resp, &postamble_1_3_3_resp };
+struct test_stream test_1_3_3_list = { &preamble_1_3_3_list, &test_case_1_3_3_list, &postamble_1_3_3_list };
+
+#define tgrp_case_1_3_4 test_group_1_3
+#define numb_case_1_3_4 "1.3.4"
+#define name_case_1_3_4 "NOUTSTATE for N_UNBIND_REQ in NS_UNBND state."
+#define sref_case_1_3_4 "NPI Rev 2.0.0"
+#define desc_case_1_3_4 "\
+Checks that NOUTSTATE is returned when N_UNBIND_REQ is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_3_4(int child)
+{
+	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NOUTSTATE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_3_4_conn	test_case_1_3_4
+#define test_case_1_3_4_resp	test_case_1_3_4
+#define test_case_1_3_4_list	test_case_1_3_4
+
+#define preamble_1_3_4_conn	preamble_1_unbnd
+#define preamble_1_3_4_resp	preamble_1_unbnd
+#define preamble_1_3_4_list	preamble_1_unbnd
+
+#define postamble_1_3_4_conn	postamble_1_unbnd
+#define postamble_1_3_4_resp	postamble_1_unbnd
+#define postamble_1_3_4_list	postamble_1_unbnd
+
+struct test_stream test_1_3_4_conn = { &preamble_1_3_4_conn, &test_case_1_3_4_conn, &postamble_1_3_4_conn };
+struct test_stream test_1_3_4_resp = { &preamble_1_3_4_resp, &test_case_1_3_4_resp, &postamble_1_3_4_resp };
+struct test_stream test_1_3_4_list = { &preamble_1_3_4_list, &test_case_1_3_4_list, &postamble_1_3_4_list };
+
+#define tgrp_case_1_3_5 test_group_1_3
+#define numb_case_1_3_5 "1.3.5"
+#define name_case_1_3_5 "NOUTSTATE for N_RESET_REQ in NS_UNBND state."
+#define sref_case_1_3_5 "NPI Rev 2.0.0"
+#define desc_case_1_3_5 "\
+Checks that NOUTSTATE is returned when N_RESET_REQ is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_3_5(int child)
+{
+	RESET_reason = N_RESET_UNSPECIFIED;
+	if (do_signal(child, __TEST_RESET_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NOUTSTATE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_3_5_conn	test_case_1_3_5
+#define test_case_1_3_5_resp	test_case_1_3_5
+#define test_case_1_3_5_list	test_case_1_3_5
+
+#define preamble_1_3_5_conn	preamble_1_unbnd
+#define preamble_1_3_5_resp	preamble_1_unbnd
+#define preamble_1_3_5_list	preamble_1_unbnd
+
+#define postamble_1_3_5_conn	postamble_1_unbnd
+#define postamble_1_3_5_resp	postamble_1_unbnd
+#define postamble_1_3_5_list	postamble_1_unbnd
+
+struct test_stream test_1_3_5_conn = { &preamble_1_3_5_conn, &test_case_1_3_5_conn, &postamble_1_3_5_conn };
+struct test_stream test_1_3_5_resp = { &preamble_1_3_5_resp, &test_case_1_3_5_resp, &postamble_1_3_5_resp };
+struct test_stream test_1_3_5_list = { &preamble_1_3_5_list, &test_case_1_3_5_list, &postamble_1_3_5_list };
+
+#define tgrp_case_1_3_6 test_group_1_3
+#define numb_case_1_3_6 "1.3.6"
+#define name_case_1_3_6 "NOUTSTATE for N_RESET_RES in NS_UNBND state."
+#define sref_case_1_3_6 "NPI Rev 2.0.0"
+#define desc_case_1_3_6 "\
+Checks that NOUTSTATE is returned when N_RESET_RES is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_3_6(int child)
+{
+	if (do_signal(child, __TEST_RESET_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NOUTSTATE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_3_6_conn	test_case_1_3_6
+#define test_case_1_3_6_resp	test_case_1_3_6
+#define test_case_1_3_6_list	test_case_1_3_6
+
+#define preamble_1_3_6_conn	preamble_1_unbnd
+#define preamble_1_3_6_resp	preamble_1_unbnd
+#define preamble_1_3_6_list	preamble_1_unbnd
+
+#define postamble_1_3_6_conn	postamble_1_unbnd
+#define postamble_1_3_6_resp	postamble_1_unbnd
+#define postamble_1_3_6_list	postamble_1_unbnd
+
+struct test_stream test_1_3_6_conn = { &preamble_1_3_6_conn, &test_case_1_3_6_conn, &postamble_1_3_6_conn };
+struct test_stream test_1_3_6_resp = { &preamble_1_3_6_resp, &test_case_1_3_6_resp, &postamble_1_3_6_resp };
+struct test_stream test_1_3_6_list = { &preamble_1_3_6_list, &test_case_1_3_6_list, &postamble_1_3_6_list };
+
+#define test_group_1_4 "Fatal errors in the NS_UNBND State."
+#define tgrp_case_1_4_1 test_group_1_4
+#define numb_case_1_4_1 "1.4.1"
+#define name_case_1_4_1 "EPROTO for N_DATACK_REQ in NS_UNBND state."
+#define sref_case_1_4_1 "NPI Rev 2.0.0"
+#define desc_case_1_4_1 "\
+Checks that EPROTO is returned when N_DATACK_REQ is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_4_1(int child)
+{
+	if (do_signal(child, __TEST_DATACK_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (UNIX_error != EPROTO)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_4_1_conn	test_case_1_4_1
+#define test_case_1_4_1_resp	test_case_1_4_1
+#define test_case_1_4_1_list	test_case_1_4_1
+
+#define preamble_1_4_1_conn	preamble_1_unbnd
+#define preamble_1_4_1_resp	preamble_1_unbnd
+#define preamble_1_4_1_list	preamble_1_unbnd
+
+#define postamble_1_4_1_conn	postamble_1_unbnd
+#define postamble_1_4_1_resp	postamble_1_unbnd
+#define postamble_1_4_1_list	postamble_1_unbnd
+
+struct test_stream test_1_4_1_conn = { &preamble_1_4_1_conn, &test_case_1_4_1_conn, &postamble_1_4_1_conn };
+struct test_stream test_1_4_1_resp = { &preamble_1_4_1_resp, &test_case_1_4_1_resp, &postamble_1_4_1_resp };
+struct test_stream test_1_4_1_list = { &preamble_1_4_1_list, &test_case_1_4_1_list, &postamble_1_4_1_list };
+
+#define tgrp_case_1_4_2 test_group_1_4
+#define numb_case_1_4_2 "1.4.2"
+#define name_case_1_4_2 "EPROTO for N_DATA_REQ in NS_UNBND state."
+#define sref_case_1_4_2 "NPI Rev 2.0.0"
+#define desc_case_1_4_2 "\
+Checks that EPROTO is returned when N_DATA_REQ is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_4_2(int child)
+{
+	test_data = "Test case 1.4.2";
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (UNIX_error != EPROTO)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_4_2_conn	test_case_1_4_2
+#define test_case_1_4_2_resp	test_case_1_4_2
+#define test_case_1_4_2_list	test_case_1_4_2
+
+#define preamble_1_4_2_conn	preamble_1_unbnd
+#define preamble_1_4_2_resp	preamble_1_unbnd
+#define preamble_1_4_2_list	preamble_1_unbnd
+
+#define postamble_1_4_2_conn	postamble_1_unbnd
+#define postamble_1_4_2_resp	postamble_1_unbnd
+#define postamble_1_4_2_list	postamble_1_unbnd
+
+struct test_stream test_1_4_2_conn = { &preamble_1_4_2_conn, &test_case_1_4_2_conn, &postamble_1_4_2_conn };
+struct test_stream test_1_4_2_resp = { &preamble_1_4_2_resp, &test_case_1_4_2_resp, &postamble_1_4_2_resp };
+struct test_stream test_1_4_2_list = { &preamble_1_4_2_list, &test_case_1_4_2_list, &postamble_1_4_2_list };
+
+#define tgrp_case_1_4_3 test_group_1_4
+#define numb_case_1_4_3 "1.4.3"
+#define name_case_1_4_3 "EPROTO for N_EXDATA_REQ in NS_UNBND state."
+#define sref_case_1_4_3 "NPI Rev 2.0.0"
+#define desc_case_1_4_3 "\
+Checks that EPROTO is returned when N_EXDATA_REQ is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_4_3(int child)
+{
+	test_data = "Test case 1.4.3";
+	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (UNIX_error != EPROTO)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_4_3_conn	test_case_1_4_3
+#define test_case_1_4_3_resp	test_case_1_4_3
+#define test_case_1_4_3_list	test_case_1_4_3
+
+#define preamble_1_4_3_conn	preamble_1_unbnd
+#define preamble_1_4_3_resp	preamble_1_unbnd
+#define preamble_1_4_3_list	preamble_1_unbnd
+
+#define postamble_1_4_3_conn	postamble_1_unbnd
+#define postamble_1_4_3_resp	postamble_1_unbnd
+#define postamble_1_4_3_list	postamble_1_unbnd
+
+struct test_stream test_1_4_3_conn = { &preamble_1_4_3_conn, &test_case_1_4_3_conn, &postamble_1_4_3_conn };
+struct test_stream test_1_4_3_resp = { &preamble_1_4_3_resp, &test_case_1_4_3_resp, &postamble_1_4_3_resp };
+struct test_stream test_1_4_3_list = { &preamble_1_4_3_list, &test_case_1_4_3_list, &postamble_1_4_3_list };
+
+#define tgrp_case_1_4_4 test_group_1_4
+#define numb_case_1_4_4 "1.4.4"
+#define name_case_1_4_4 "EPROTO for M_DATA in NS_UNBND state."
+#define sref_case_1_4_4 "NPI Rev 2.0.0"
+#define desc_case_1_4_4 "\
+Checks that EPROTO is returned when M_DATA is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_4_4(int child)
+{
+	test_data = "Test case 1.4.4";
+	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (UNIX_error != EPROTO)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_4_4_conn	test_case_1_4_4
+#define test_case_1_4_4_resp	test_case_1_4_4
+#define test_case_1_4_4_list	test_case_1_4_4
+
+#define preamble_1_4_4_conn	preamble_1_unbnd
+#define preamble_1_4_4_resp	preamble_1_unbnd
+#define preamble_1_4_4_list	preamble_1_unbnd
+
+#define postamble_1_4_4_conn	postamble_1_unbnd
+#define postamble_1_4_4_resp	postamble_1_unbnd
+#define postamble_1_4_4_list	postamble_1_unbnd
+
+struct test_stream test_1_4_4_conn = { &preamble_1_4_4_conn, &test_case_1_4_4_conn, &postamble_1_4_4_conn };
+struct test_stream test_1_4_4_resp = { &preamble_1_4_4_resp, &test_case_1_4_4_resp, &postamble_1_4_4_resp };
+struct test_stream test_1_4_4_list = { &preamble_1_4_4_list, &test_case_1_4_4_list, &postamble_1_4_4_list };
+
+#define test_group_1_5 "Options Management in the NS_UNBND State."
+#define test_group_1_5_1 "Options Management non-fatal errors in the NS_UNBND State."
+#define tgrp_case_1_5_1_1 test_group_1_5_1
+#define numb_case_1_5_1_1 "1.5.1.1"
+#define name_case_1_5_1_1 "NBADQOSTYPE for N_OPTMGMT_REQ in NS_UNBND state."
+#define sref_case_1_5_1_1 "NPI Rev 2.0.0"
+#define desc_case_1_5_1_1 "\
+Checks that NBADQOSTYPE is returned when N_OPTMGMT_REQ is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_5_1_1(int child)
+{
+	np_ulong type = N_QOS_SEL_UD_IP + 10;
+
+	QOS_buffer = &type;
+	QOS_length = sizeof(type);
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NBADQOSTYPE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_5_1_1_conn	test_case_1_5_1_1
+#define test_case_1_5_1_1_resp	test_case_1_5_1_1
+#define test_case_1_5_1_1_list	test_case_1_5_1_1
+
+#define preamble_1_5_1_1_conn	preamble_1_unbnd
+#define preamble_1_5_1_1_resp	preamble_1_unbnd
+#define preamble_1_5_1_1_list	preamble_1_unbnd
+
+#define postamble_1_5_1_1_conn	postamble_1_unbnd
+#define postamble_1_5_1_1_resp	postamble_1_unbnd
+#define postamble_1_5_1_1_list	postamble_1_unbnd
+
+struct test_stream test_1_5_1_1_conn = { &preamble_1_5_1_1_conn, &test_case_1_5_1_1_conn, &postamble_1_5_1_1_conn };
+struct test_stream test_1_5_1_1_resp = { &preamble_1_5_1_1_resp, &test_case_1_5_1_1_resp, &postamble_1_5_1_1_resp };
+struct test_stream test_1_5_1_1_list = { &preamble_1_5_1_1_list, &test_case_1_5_1_1_list, &postamble_1_5_1_1_list };
+
+#define tgrp_case_1_5_1_2 test_group_1_5_1
+#define numb_case_1_5_1_2 "1.5.1.2"
+#define name_case_1_5_1_2 "NBADQOSPARAM for N_OPTMGMT_REQ in NS_UNBND state."
+#define sref_case_1_5_1_2 "NPI Rev 2.0.0"
+#define desc_case_1_5_1_2 "\
+Checks that NBADQOSPARAM is returned when N_OPTMGMT_REQ is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_5_1_2(int child)
+{
+	N_qos_sel_info_ip_t qos = {
+		.n_qos_type = N_QOS_SEL_INFO_IP,
+		.protocol = 2000,
+		.priority = 1000,
+		.ttl = 500,
+		.tos = 128,
+		.mtu = 128000,
+		.saddr = 0,
+		.daddr = 0,
+	};
+
+	QOS_buffer = &qos;
+	QOS_length = sizeof(qos);
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NBADQOSPARAM)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_5_1_2_conn	test_case_1_5_1_2
+#define test_case_1_5_1_2_resp	test_case_1_5_1_2
+#define test_case_1_5_1_2_list	test_case_1_5_1_2
+
+#define preamble_1_5_1_2_conn	preamble_1_unbnd
+#define preamble_1_5_1_2_resp	preamble_1_unbnd
+#define preamble_1_5_1_2_list	preamble_1_unbnd
+
+#define postamble_1_5_1_2_conn	postamble_1_unbnd
+#define postamble_1_5_1_2_resp	postamble_1_unbnd
+#define postamble_1_5_1_2_list	postamble_1_unbnd
+
+struct test_stream test_1_5_1_2_conn = { &preamble_1_5_1_2_conn, &test_case_1_5_1_2_conn, &postamble_1_5_1_2_conn };
+struct test_stream test_1_5_1_2_resp = { &preamble_1_5_1_2_resp, &test_case_1_5_1_2_resp, &postamble_1_5_1_2_resp };
+struct test_stream test_1_5_1_2_list = { &preamble_1_5_1_2_list, &test_case_1_5_1_2_list, &postamble_1_5_1_2_list };
+
+#define tgrp_case_1_5_1_3 test_group_1_5_1
+#define numb_case_1_5_1_3 "1.5.1.3"
+#define name_case_1_5_1_3 "EINVAL for N_OPTMGMT_REQ in NS_UNBND state."
+#define sref_case_1_5_1_3 "NPI Rev 2.0.0"
+#define desc_case_1_5_1_3 "\
+Checks that EINVAL is returned when N_OPTMGMT_REQ is attempted in the\n\
+NS_UNBND state."
+
+int
+test_case_1_5_1_3(int child)
+{
+	PRIM_type = N_OPTMGMT_REQ;
+	if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NSYSERR)
+		goto failure;
+	state++;
+	if (UNIX_error != EINVAL)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_5_1_3_conn	test_case_1_5_1_3
+#define test_case_1_5_1_3_resp	test_case_1_5_1_3
+#define test_case_1_5_1_3_list	test_case_1_5_1_3
+
+#define preamble_1_5_1_3_conn	preamble_1_unbnd
+#define preamble_1_5_1_3_resp	preamble_1_unbnd
+#define preamble_1_5_1_3_list	preamble_1_unbnd
+
+#define postamble_1_5_1_3_conn	postamble_1_unbnd
+#define postamble_1_5_1_3_resp	postamble_1_unbnd
+#define postamble_1_5_1_3_list	postamble_1_unbnd
+
+struct test_stream test_1_5_1_3_conn = { &preamble_1_5_1_3_conn, &test_case_1_5_1_3_conn, &postamble_1_5_1_3_conn };
+struct test_stream test_1_5_1_3_resp = { &preamble_1_5_1_3_resp, &test_case_1_5_1_3_resp, &postamble_1_5_1_3_resp };
+struct test_stream test_1_5_1_3_list = { &preamble_1_5_1_3_list, &test_case_1_5_1_3_list, &postamble_1_5_1_3_list };
 
 /*
  *  -------------------------------------------------------------------------
@@ -5112,6 +5762,32 @@ struct test_case {
 	&test_1_1_conn, &test_1_1_resp, &test_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, {
 	&test_1_2_conn, &test_1_2_resp, &test_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_3_1, tgrp_case_1_3_1, name_case_1_3_1, desc_case_1_3_1, sref_case_1_3_1, {
+	&test_1_3_1_conn, &test_1_3_1_resp, &test_1_3_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_3_2, tgrp_case_1_3_2, name_case_1_3_2, desc_case_1_3_2, sref_case_1_3_2, {
+	&test_1_3_2_conn, &test_1_3_2_resp, &test_1_3_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_3_3, tgrp_case_1_3_3, name_case_1_3_3, desc_case_1_3_3, sref_case_1_3_3, {
+	&test_1_3_3_conn, &test_1_3_3_resp, &test_1_3_3_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_3_4, tgrp_case_1_3_4, name_case_1_3_4, desc_case_1_3_4, sref_case_1_3_4, {
+	&test_1_3_4_conn, &test_1_3_4_resp, &test_1_3_4_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_3_5, tgrp_case_1_3_5, name_case_1_3_5, desc_case_1_3_5, sref_case_1_3_5, {
+	&test_1_3_5_conn, &test_1_3_5_resp, &test_1_3_5_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_3_6, tgrp_case_1_3_6, name_case_1_3_6, desc_case_1_3_6, sref_case_1_3_6, {
+	&test_1_3_6_conn, &test_1_3_6_resp, &test_1_3_6_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_4_1, tgrp_case_1_4_1, name_case_1_4_1, desc_case_1_4_1, sref_case_1_4_1, {
+	&test_1_4_1_conn, &test_1_4_1_resp, &test_1_4_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_4_2, tgrp_case_1_4_2, name_case_1_4_2, desc_case_1_4_2, sref_case_1_4_2, {
+	&test_1_4_2_conn, &test_1_4_2_resp, &test_1_4_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_4_3, tgrp_case_1_4_3, name_case_1_4_3, desc_case_1_4_3, sref_case_1_4_3, {
+	&test_1_4_3_conn, &test_1_4_3_resp, &test_1_4_3_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_4_4, tgrp_case_1_4_4, name_case_1_4_4, desc_case_1_4_4, sref_case_1_4_4, {
+	&test_1_4_4_conn, &test_1_4_4_resp, &test_1_4_4_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_5_1_1, tgrp_case_1_5_1_1, name_case_1_5_1_1, desc_case_1_5_1_1, sref_case_1_5_1_1, {
+	&test_1_5_1_1_conn, &test_1_5_1_1_resp, &test_1_5_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_5_1_2, tgrp_case_1_5_1_2, name_case_1_5_1_2, desc_case_1_5_1_2, sref_case_1_5_1_2, {
+	&test_1_5_1_2_conn, &test_1_5_1_2_resp, &test_1_5_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_5_1_3, tgrp_case_1_5_1_3, name_case_1_5_1_3, desc_case_1_5_1_3, sref_case_1_5_1_3, {
+	&test_1_5_1_3_conn, &test_1_5_1_3_resp, &test_1_5_1_3_list}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 

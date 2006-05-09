@@ -1,3 +1,12 @@
+2006-05-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: use info.CURRENT_state instead of i_state
+	* src/test/test-np_ip.c: expand printout of N_INFO_ACK
+	* tests/testsuite-np_ip.at: guard timer test expected to fail
+	* src/drivers/np_ip.c: changes from initial testing
+	* src/test/test-np_ip.c: changes from initial testing
+	* tests/testsuite-np_ip.at: changes from initial testing
+
 2006-05-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/strconf-sh: added module id base to strconf

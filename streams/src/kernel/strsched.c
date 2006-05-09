@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/04/18 17:55:04 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/05/09 06:29:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/18 17:55:04 $ by $Author: brian $
+ Last Modified $Date: 2006/05/09 06:29:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.127  2006/05/09 06:29:44  brian
+ - support OPENFAIL for SVR 3.2 compatibility
+
  Revision 0.9.2.126  2006/04/18 17:55:04  brian
  - added some strategic prefetches
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/04/18 17:55:04 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/05/09 06:29:44 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/04/18 17:55:04 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/05/09 06:29:44 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -2821,6 +2824,7 @@ __unlikely streams_fastcall int
 qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	qi_qopen_t q_open;
+	int err;
 
 	prefetch(q->q_ptr);
 
@@ -2833,16 +2837,17 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 #ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
 		struct syncq_cookie ck = {.sc_q = q, }, *sc = &ck;
-		int err;
 
 		if (unlikely((err = enter_inner_syncq_asopen(sc)) <= 0))
 			return (err);
 		err = q_open(q, devp, oflag, sflag, crp);
 		leave_syncq(sc);
-		return (err);
-	}
+	} else
 #endif
-	return q_open(q, devp, oflag, sflag, crp);
+		err = q_open(q, devp, oflag, sflag, crp);
+	/* SVR 3.2 compatibility of return codes and handle broken LiS modules */
+	err = (err == OPENFAIL) ? -ENXIO : (err > 0 ? -err : err);
+	return (err);
 }
 
 EXPORT_SYMBOL_NOVERS(qopen);
@@ -2859,6 +2864,7 @@ __unlikely streams_fastcall int
 qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	qi_qclose_t q_close;
+	int err;
 
 	prefetch(q->q_ptr);
 
@@ -2873,16 +2879,17 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 #ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
 		struct syncq_cookie ck = {.sc_q = q, }, *sc = &ck;
-		int err;
 
 		if (unlikely((err = enter_inner_syncq_asopen(sc)) <= 0))
 			return (err);
 		err = q_close(q, oflag, crp);
 		leave_syncq(sc);
-		return (err);
-	}
+	} else
 #endif
-	return ctrace(q_close(q, oflag, crp));
+		err = q_close(q, oflag, crp);
+	/* handle broken LiS modujles */
+	err = err > 0 ? -err : err;
+	return (err);
 }
 
 EXPORT_SYMBOL_NOVERS(qclose);
