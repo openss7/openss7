@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/09 09:47:57 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/09 22:13:04 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/09 09:47:57 $ by $Author: brian $
+ Last Modified $Date: 2006/05/09 22:13:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.5  2006/05/09 22:13:04  brian
+ - changes from testing
+
  Revision 0.9.2.4  2006/05/09 09:47:57  brian
  - changes from initial testing
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/09 09:47:57 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/09 22:13:04 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/09 09:47:57 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/09 22:13:04 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -207,7 +210,7 @@ static int test_nidu = 256;
 static int OPTMGMT_flags = 0;
 static struct sockaddr_in *ADDR_buffer = NULL;
 static socklen_t ADDR_length = sizeof(*ADDR_buffer);
-static unsigned char PROTOID_buffer[8];
+static unsigned char *PROTOID_buffer = NULL;
 static size_t PROTOID_length = 0;
 static const char *test_data = NULL;
 static int test_resfd = -1;
@@ -2598,34 +2601,34 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 		case N_QOS_SEL_UD_IP:
 			snprintf(buf, sizeof(buf), "N_QOS_SEL_UD_IP: ");
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_conn.protocol);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_ud.protocol);
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_conn.priority);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_ud.priority);
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_conn.ttl);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_ud.ttl);
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_conn.tos);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_ud.tos);
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " saddr = %ld,", (long) qos->n_qos_sel_conn.saddr);
+			snprintf(buf, sizeof(buf), " saddr = %ld,", (long) qos->n_qos_sel_ud.saddr);
 			print_string(child, buf);
 			break;
 
 		case N_QOS_SEL_INFO_IP:
 			snprintf(buf, sizeof(buf), "N_QOS_SEL_INFO_IP: ");
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_conn.protocol);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_info.protocol);
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_conn.priority);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_info.priority);
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_conn.ttl);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_info.ttl);
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_conn.tos);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_info.tos);
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " mtu = %ld,", (long) qos->n_qos_sel_conn.mtu);
+			snprintf(buf, sizeof(buf), " mtu = %ld,", (long) qos->n_qos_sel_info.mtu);
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " saddr = %ld,", (long) qos->n_qos_sel_conn.saddr);
+			snprintf(buf, sizeof(buf), " saddr = %ld,", (long) qos->n_qos_sel_info.saddr);
 			print_string(child, buf);
-			snprintf(buf, sizeof(buf), " daddr = %ld,", (long) qos->n_qos_sel_conn.daddr);
+			snprintf(buf, sizeof(buf), " daddr = %ld,", (long) qos->n_qos_sel_info.daddr);
 			print_string(child, buf);
 			break;
 
@@ -3454,7 +3457,9 @@ do_signal(int child, int action)
 		print_info(child, &p->info_ack);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_REQ:
-		ctrl->len = sizeof(p->bind_req) + (ADDR_buffer ? ADDR_length : 0);
+		ctrl->len = sizeof(p->bind_req)
+			+ (ADDR_buffer ? ADDR_length : 0)
+			+ (PROTOID_buffer ? PROTOID_length : 0);
 		p->bind_req.PRIM_type = N_BIND_REQ;
 		p->bind_req.ADDR_length = ADDR_buffer ? ADDR_length : 0;
 		p->bind_req.ADDR_offset = ADDR_buffer ? sizeof(p->bind_req) : 0;
@@ -5467,6 +5472,543 @@ struct test_stream test_1_5_1_3_conn = { &preamble_1_5_1_3_conn, &test_case_1_5_
 struct test_stream test_1_5_1_3_resp = { &preamble_1_5_1_3_resp, &test_case_1_5_1_3_resp, &postamble_1_5_1_3_resp };
 struct test_stream test_1_5_1_3_list = { &preamble_1_5_1_3_list, &test_case_1_5_1_3_list, &postamble_1_5_1_3_list };
 
+#define test_group_1_5_2 "Options Management correct operation in the NS_UNBND State."
+#define tgrp_case_1_5_2_1 test_group_1_5_2
+#define numb_case_1_5_2_1 "1.5.2.1"
+#define name_case_1_5_2_1 "N_QOS_SEL_INFO_IP for N_OPTMGMT_REQ in NS_UNBND state."
+#define sref_case_1_5_2_1 "NPI Rev 2.0.0"
+#define desc_case_1_5_2_1 "\
+Checks that the N_QOS_SEL_INFO_IP structure can be used with N_OPTMGMT_REQ\n\
+correctly in the NS_UNBND state.  Check that SERV_type is unaffected."
+
+int
+test_case_1_5_2_1(int child)
+{
+	N_qos_sel_info_ip_t test_qos = {
+		.n_qos_type = N_QOS_SEL_INFO_IP,
+		.protocol = QOS_UNKNOWN,
+		.priority = 0,
+		.ttl = 64,
+		.tos = N_ROUTINE|N_NOTOS,
+		.mtu = 536,
+		.saddr = QOS_UNKNOWN,
+		.daddr = QOS_UNKNOWN,
+	};
+
+	QOS_buffer = &test_qos;
+	QOS_length = sizeof(test_qos);
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_info.SERV_type != (N_CLNS|N_CONS))
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_5_2_1_conn	test_case_1_5_2_1
+#define test_case_1_5_2_1_resp	test_case_1_5_2_1
+#define test_case_1_5_2_1_list	test_case_1_5_2_1
+
+#define preamble_1_5_2_1_conn	preamble_1_unbnd
+#define preamble_1_5_2_1_resp	preamble_1_unbnd
+#define preamble_1_5_2_1_list	preamble_1_unbnd
+
+#define postamble_1_5_2_1_conn	postamble_1_unbnd
+#define postamble_1_5_2_1_resp	postamble_1_unbnd
+#define postamble_1_5_2_1_list	postamble_1_unbnd
+
+struct test_stream test_1_5_2_1_conn = { &preamble_1_5_2_1_conn, &test_case_1_5_2_1_conn, &postamble_1_5_2_1_conn };
+struct test_stream test_1_5_2_1_resp = { &preamble_1_5_2_1_resp, &test_case_1_5_2_1_resp, &postamble_1_5_2_1_resp };
+struct test_stream test_1_5_2_1_list = { &preamble_1_5_2_1_list, &test_case_1_5_2_1_list, &postamble_1_5_2_1_list };
+
+#define tgrp_case_1_5_2_2 test_group_1_5_2
+#define numb_case_1_5_2_2 "1.5.2.2"
+#define name_case_1_5_2_2 "N_QOS_SEL_UD_IP for N_OPTMGMT_REQ in NS_UNBND state."
+#define sref_case_1_5_2_2 "NPI Rev 2.0.0"
+#define desc_case_1_5_2_2 "\
+Checks that the N_QOS_SEL_UD_IP structure can be used with N_OPTMGMT_REQ\n\
+correctly in the NS_UNBND state.  Check that SERV_type becomes N_CLNS."
+
+int
+test_case_1_5_2_2(int child)
+{
+	N_qos_sel_ud_ip_t test_qos = {
+		.n_qos_type = N_QOS_SEL_UD_IP,
+		.protocol = QOS_UNKNOWN,
+		.priority = 0,
+		.ttl = 63,
+		.tos = N_ROUTINE|N_NOTOS,
+		.saddr = QOS_UNKNOWN,
+	};
+
+	QOS_buffer = &test_qos;
+	QOS_length = sizeof(test_qos);
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_info.SERV_type != N_CLNS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_5_2_2_conn	test_case_1_5_2_2
+#define test_case_1_5_2_2_resp	test_case_1_5_2_2
+#define test_case_1_5_2_2_list	test_case_1_5_2_2
+
+#define preamble_1_5_2_2_conn	preamble_1_unbnd
+#define preamble_1_5_2_2_resp	preamble_1_unbnd
+#define preamble_1_5_2_2_list	preamble_1_unbnd
+
+#define postamble_1_5_2_2_conn	postamble_1_unbnd
+#define postamble_1_5_2_2_resp	postamble_1_unbnd
+#define postamble_1_5_2_2_list	postamble_1_unbnd
+
+struct test_stream test_1_5_2_2_conn = { &preamble_1_5_2_2_conn, &test_case_1_5_2_2_conn, &postamble_1_5_2_2_conn };
+struct test_stream test_1_5_2_2_resp = { &preamble_1_5_2_2_resp, &test_case_1_5_2_2_resp, &postamble_1_5_2_2_resp };
+struct test_stream test_1_5_2_2_list = { &preamble_1_5_2_2_list, &test_case_1_5_2_2_list, &postamble_1_5_2_2_list };
+
+#define tgrp_case_1_5_2_3 test_group_1_5_2
+#define numb_case_1_5_2_3 "1.5.2.3"
+#define name_case_1_5_2_3 "N_QOS_SEL_CONN_IP for N_OPTMGMT_REQ in NS_UNBND state."
+#define sref_case_1_5_2_3 "NPI Rev 2.0.0"
+#define desc_case_1_5_2_3 "\
+Checks that the N_QOS_SEL_CONN_IP structure can be used with N_OPTMGMT_REQ\n\
+correctly in the NS_UNBND state.  Check that SERV_type becomes N_CONS."
+
+int
+test_case_1_5_2_3(int child)
+{
+	N_qos_sel_conn_ip_t test_qos = {
+		.n_qos_type = N_QOS_SEL_CONN_IP,
+		.protocol = QOS_UNKNOWN,
+		.priority = 0,
+		.ttl = 64,
+		.tos = N_ROUTINE|N_NOTOS,
+		.mtu = 536,
+		.saddr = QOS_UNKNOWN,
+		.daddr = QOS_UNKNOWN,
+	};
+
+	QOS_buffer = &test_qos;
+	QOS_length = sizeof(test_qos);
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_info.SERV_type != N_CONS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_5_2_3_conn	test_case_1_5_2_3
+#define test_case_1_5_2_3_resp	test_case_1_5_2_3
+#define test_case_1_5_2_3_list	test_case_1_5_2_3
+
+#define preamble_1_5_2_3_conn	preamble_1_unbnd
+#define preamble_1_5_2_3_resp	preamble_1_unbnd
+#define preamble_1_5_2_3_list	preamble_1_unbnd
+
+#define postamble_1_5_2_3_conn	postamble_1_unbnd
+#define postamble_1_5_2_3_resp	postamble_1_unbnd
+#define postamble_1_5_2_3_list	postamble_1_unbnd
+
+struct test_stream test_1_5_2_3_conn = { &preamble_1_5_2_3_conn, &test_case_1_5_2_3_conn, &postamble_1_5_2_3_conn };
+struct test_stream test_1_5_2_3_resp = { &preamble_1_5_2_3_resp, &test_case_1_5_2_3_resp, &postamble_1_5_2_3_resp };
+struct test_stream test_1_5_2_3_list = { &preamble_1_5_2_3_list, &test_case_1_5_2_3_list, &postamble_1_5_2_3_list };
+
+#define test_group_1_6_1 "Bind request non-fatal errors in the NS_UNBND State."
+#define tgrp_case_1_6_1_1 test_group_1_6_1
+#define numb_case_1_6_1_1 "1.6.1.1"
+#define name_case_1_6_1_1 "EINVAL in N_BIND_REQ in NS_UNBND state."
+#define sref_case_1_6_1_1 "NPI Rev 2.0.0"
+#define desc_case_1_6_1_1 "\
+Checks that EINVAL is returned under proper conditions when N_BIND_REQ is\n\
+issued in the NS_UNBND state."
+
+int
+test_case_1_6_1_1(int child)
+{
+	PRIM_type = N_BIND_REQ;
+	if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NSYSERR)
+		goto failure;
+	state++;
+	if (UNIX_error != EINVAL)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_6_1_1_conn	test_case_1_6_1_1
+#define test_case_1_6_1_1_resp	test_case_1_6_1_1
+#define test_case_1_6_1_1_list	test_case_1_6_1_1
+
+#define preamble_1_6_1_1_conn	preamble_1_unbnd
+#define preamble_1_6_1_1_resp	preamble_1_unbnd
+#define preamble_1_6_1_1_list	preamble_1_unbnd
+
+#define postamble_1_6_1_1_conn	postamble_1_unbnd
+#define postamble_1_6_1_1_resp	postamble_1_unbnd
+#define postamble_1_6_1_1_list	postamble_1_unbnd
+
+struct test_stream test_1_6_1_1_conn = { &preamble_1_6_1_1_conn, &test_case_1_6_1_1_conn, &postamble_1_6_1_1_conn };
+struct test_stream test_1_6_1_1_resp = { &preamble_1_6_1_1_resp, &test_case_1_6_1_1_resp, &postamble_1_6_1_1_resp };
+struct test_stream test_1_6_1_1_list = { &preamble_1_6_1_1_list, &test_case_1_6_1_1_list, &postamble_1_6_1_1_list };
+
+#define tgrp_case_1_6_1_2 test_group_1_6_1
+#define numb_case_1_6_1_2 "1.6.1.2"
+#define name_case_1_6_1_2 "NBADADDR in N_BIND_REQ in NS_UNBND state."
+#define sref_case_1_6_1_2 "NPI Rev 2.0.0"
+#define desc_case_1_6_1_2 "\
+Checks that NBADADDR is returned under proper conditions when N_BIND_REQ is\n\
+issued in the NS_UNBND state."
+
+int
+test_case_1_6_1_2(int child)
+{
+	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	unsigned char prot[] = { 140 };
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin) - 1;
+	CONIND_number = 0;
+	BIND_flags = 0;
+	PROTOID_buffer = prot;
+	PROTOID_length = sizeof(prot);
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NBADADDR)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_6_1_2_conn	test_case_1_6_1_2
+#define test_case_1_6_1_2_resp	test_case_1_6_1_2
+#define test_case_1_6_1_2_list	test_case_1_6_1_2
+
+#define preamble_1_6_1_2_conn	preamble_1_unbnd
+#define preamble_1_6_1_2_resp	preamble_1_unbnd
+#define preamble_1_6_1_2_list	preamble_1_unbnd
+
+#define postamble_1_6_1_2_conn	postamble_1_unbnd
+#define postamble_1_6_1_2_resp	postamble_1_unbnd
+#define postamble_1_6_1_2_list	postamble_1_unbnd
+
+struct test_stream test_1_6_1_2_conn = { &preamble_1_6_1_2_conn, &test_case_1_6_1_2_conn, &postamble_1_6_1_2_conn };
+struct test_stream test_1_6_1_2_resp = { &preamble_1_6_1_2_resp, &test_case_1_6_1_2_resp, &postamble_1_6_1_2_resp };
+struct test_stream test_1_6_1_2_list = { &preamble_1_6_1_2_list, &test_case_1_6_1_2_list, &postamble_1_6_1_2_list };
+
+#define tgrp_case_1_6_1_3 test_group_1_6_1
+#define numb_case_1_6_1_3 "1.6.1.3"
+#define name_case_1_6_1_3 "NBOUND in N_BIND_REQ in NS_UNBND state."
+#define sref_case_1_6_1_3 "NPI Rev 2.0.0"
+#define desc_case_1_6_1_3 "\
+Checks that NBOUND is returned under proper conditions when N_BIND_REQ is\n\
+issued in the NS_UNBND state."
+
+int
+test_case_1_6_1_3(int child)
+{
+#if 0
+	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	unsigned char prot[] = { 140 };
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	CONIND_number = 0;
+	BIND_flags = 0;
+	PROTOID_buffer = prot;
+	PROTOID_length = sizeof(prot);
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NBOUND)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+#else
+	return (__RESULT_SKIPPED);
+#endif
+}
+
+#define test_case_1_6_1_3_conn	test_case_1_6_1_3
+#define test_case_1_6_1_3_resp	test_case_1_6_1_3
+#define test_case_1_6_1_3_list	test_case_1_6_1_3
+
+#define preamble_1_6_1_3_conn	preamble_1_unbnd
+#define preamble_1_6_1_3_resp	preamble_1_unbnd
+#define preamble_1_6_1_3_list	preamble_1_unbnd
+
+#define postamble_1_6_1_3_conn	postamble_1_unbnd
+#define postamble_1_6_1_3_resp	postamble_1_unbnd
+#define postamble_1_6_1_3_list	postamble_1_unbnd
+
+struct test_stream test_1_6_1_3_conn = { &preamble_1_6_1_3_conn, &test_case_1_6_1_3_conn, &postamble_1_6_1_3_conn };
+struct test_stream test_1_6_1_3_resp = { &preamble_1_6_1_3_resp, &test_case_1_6_1_3_resp, &postamble_1_6_1_3_resp };
+struct test_stream test_1_6_1_3_list = { &preamble_1_6_1_3_list, &test_case_1_6_1_3_list, &postamble_1_6_1_3_list };
+
+#define tgrp_case_1_6_1_4 test_group_1_6_1
+#define numb_case_1_6_1_4 "1.6.1.4"
+#define name_case_1_6_1_4 "NNOADDR in N_BIND_REQ in NS_UNBND state."
+#define sref_case_1_6_1_4 "NPI Rev 2.0.0"
+#define desc_case_1_6_1_4 "\
+Checks that NNOADDR is returned under proper conditions when N_BIND_REQ is\n\
+issued in the NS_UNBND state."
+
+int
+test_case_1_6_1_4(int child)
+{
+#if 0
+	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	unsigned char prot[] = { 140 };
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	CONIND_number = 0;
+	BIND_flags = 0;
+	PROTOID_buffer = prot;
+	PROTOID_length = sizeof(prot);
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NNOADDR)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+#else
+	return (__RESULT_NOTAPPL);
+#endif
+}
+
+#define test_case_1_6_1_4_conn	test_case_1_6_1_4
+#define test_case_1_6_1_4_resp	test_case_1_6_1_4
+#define test_case_1_6_1_4_list	test_case_1_6_1_4
+
+#define preamble_1_6_1_4_conn	preamble_1_unbnd
+#define preamble_1_6_1_4_resp	preamble_1_unbnd
+#define preamble_1_6_1_4_list	preamble_1_unbnd
+
+#define postamble_1_6_1_4_conn	postamble_1_unbnd
+#define postamble_1_6_1_4_resp	postamble_1_unbnd
+#define postamble_1_6_1_4_list	postamble_1_unbnd
+
+struct test_stream test_1_6_1_4_conn = { &preamble_1_6_1_4_conn, &test_case_1_6_1_4_conn, &postamble_1_6_1_4_conn };
+struct test_stream test_1_6_1_4_resp = { &preamble_1_6_1_4_resp, &test_case_1_6_1_4_resp, &postamble_1_6_1_4_resp };
+struct test_stream test_1_6_1_4_list = { &preamble_1_6_1_4_list, &test_case_1_6_1_4_list, &postamble_1_6_1_4_list };
+
+#define tgrp_case_1_6_1_5 test_group_1_6_1
+#define numb_case_1_6_1_5 "1.6.1.5"
+#define name_case_1_6_1_5 "NACCESS in N_BIND_REQ in NS_UNBND state."
+#define sref_case_1_6_1_5 "NPI Rev 2.0.0"
+#define desc_case_1_6_1_5 "\
+Checks that NACCESS is returned under proper conditions when N_BIND_REQ is\n\
+issued in the NS_UNBND state."
+
+int
+test_case_1_6_1_5(int child)
+{
+#if 0
+	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	unsigned char prot[] = { 140 };
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	CONIND_number = 0;
+	BIND_flags = 0;
+	PROTOID_buffer = prot;
+	PROTOID_length = sizeof(prot);
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NACCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+#else
+	return (__RESULT_NOTAPPL);
+#endif
+}
+
+#define test_case_1_6_1_5_conn	test_case_1_6_1_5
+#define test_case_1_6_1_5_resp	test_case_1_6_1_5
+#define test_case_1_6_1_5_list	test_case_1_6_1_5
+
+#define preamble_1_6_1_5_conn	preamble_1_unbnd
+#define preamble_1_6_1_5_resp	preamble_1_unbnd
+#define preamble_1_6_1_5_list	preamble_1_unbnd
+
+#define postamble_1_6_1_5_conn	postamble_1_unbnd
+#define postamble_1_6_1_5_resp	postamble_1_unbnd
+#define postamble_1_6_1_5_list	postamble_1_unbnd
+
+struct test_stream test_1_6_1_5_conn = { &preamble_1_6_1_5_conn, &test_case_1_6_1_5_conn, &postamble_1_6_1_5_conn };
+struct test_stream test_1_6_1_5_resp = { &preamble_1_6_1_5_resp, &test_case_1_6_1_5_resp, &postamble_1_6_1_5_resp };
+struct test_stream test_1_6_1_5_list = { &preamble_1_6_1_5_list, &test_case_1_6_1_5_list, &postamble_1_6_1_5_list };
+
+#define tgrp_case_1_6_1_6 test_group_1_6_1
+#define numb_case_1_6_1_6 "1.6.1.6"
+#define name_case_1_6_1_6 "NNOPROTOID in N_BIND_REQ in NS_UNBND state."
+#define sref_case_1_6_1_6 "NPI Rev 2.0.0"
+#define desc_case_1_6_1_6 "\
+Checks that NNOPROTOID is returned under proper conditions when N_BIND_REQ is\n\
+issued in the NS_UNBND state."
+
+int
+test_case_1_6_1_6(int child)
+{
+	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	unsigned char prot[] = { 140 };
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	CONIND_number = 0;
+	BIND_flags = 0;
+	PROTOID_buffer = prot;
+	PROTOID_length = 0;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NNOPROTOID)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_6_1_6_conn	test_case_1_6_1_6
+#define test_case_1_6_1_6_resp	test_case_1_6_1_6
+#define test_case_1_6_1_6_list	test_case_1_6_1_6
+
+#define preamble_1_6_1_6_conn	preamble_1_unbnd
+#define preamble_1_6_1_6_resp	preamble_1_unbnd
+#define preamble_1_6_1_6_list	preamble_1_unbnd
+
+#define postamble_1_6_1_6_conn	postamble_1_unbnd
+#define postamble_1_6_1_6_resp	postamble_1_unbnd
+#define postamble_1_6_1_6_list	postamble_1_unbnd
+
+struct test_stream test_1_6_1_6_conn = { &preamble_1_6_1_6_conn, &test_case_1_6_1_6_conn, &postamble_1_6_1_6_conn };
+struct test_stream test_1_6_1_6_resp = { &preamble_1_6_1_6_resp, &test_case_1_6_1_6_resp, &postamble_1_6_1_6_resp };
+struct test_stream test_1_6_1_6_list = { &preamble_1_6_1_6_list, &test_case_1_6_1_6_list, &postamble_1_6_1_6_list };
+
+#define tgrp_case_1_6_1_7 test_group_1_6_1
+#define numb_case_1_6_1_7 "1.6.1.7"
+#define name_case_1_6_1_7 "NBADFLAG in N_BIND_REQ in NS_UNBND state."
+#define sref_case_1_6_1_7 "NPI Rev 2.0.0"
+#define desc_case_1_6_1_7 "\
+Checks that NBADFLAG is returned under proper conditions when N_BIND_REQ is\n\
+issued in the NS_UNBND state."
+
+int
+test_case_1_6_1_7(int child)
+{
+	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	unsigned char prot[] = { 140 };
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	CONIND_number = 0;
+	BIND_flags = 0xff;
+	PROTOID_buffer = prot;
+	PROTOID_length = sizeof(prot);
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NBADFLAG)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_6_1_7_conn	test_case_1_6_1_7
+#define test_case_1_6_1_7_resp	test_case_1_6_1_7
+#define test_case_1_6_1_7_list	test_case_1_6_1_7
+
+#define preamble_1_6_1_7_conn	preamble_1_unbnd
+#define preamble_1_6_1_7_resp	preamble_1_unbnd
+#define preamble_1_6_1_7_list	preamble_1_unbnd
+
+#define postamble_1_6_1_7_conn	postamble_1_unbnd
+#define postamble_1_6_1_7_resp	postamble_1_unbnd
+#define postamble_1_6_1_7_list	postamble_1_unbnd
+
+struct test_stream test_1_6_1_7_conn = { &preamble_1_6_1_7_conn, &test_case_1_6_1_7_conn, &postamble_1_6_1_7_conn };
+struct test_stream test_1_6_1_7_resp = { &preamble_1_6_1_7_resp, &test_case_1_6_1_7_resp, &postamble_1_6_1_7_resp };
+struct test_stream test_1_6_1_7_list = { &preamble_1_6_1_7_list, &test_case_1_6_1_7_list, &postamble_1_6_1_7_list };
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -5788,6 +6330,26 @@ struct test_case {
 	&test_1_5_1_2_conn, &test_1_5_1_2_resp, &test_1_5_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_5_1_3, tgrp_case_1_5_1_3, name_case_1_5_1_3, desc_case_1_5_1_3, sref_case_1_5_1_3, {
 	&test_1_5_1_3_conn, &test_1_5_1_3_resp, &test_1_5_1_3_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_5_2_1, tgrp_case_1_5_2_1, name_case_1_5_2_1, desc_case_1_5_2_1, sref_case_1_5_2_1, {
+	&test_1_5_2_1_conn, &test_1_5_2_1_resp, &test_1_5_2_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_5_2_2, tgrp_case_1_5_2_2, name_case_1_5_2_2, desc_case_1_5_2_2, sref_case_1_5_2_2, {
+	&test_1_5_2_2_conn, &test_1_5_2_2_resp, &test_1_5_2_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_5_2_3, tgrp_case_1_5_2_3, name_case_1_5_2_3, desc_case_1_5_2_3, sref_case_1_5_2_3, {
+	&test_1_5_2_3_conn, &test_1_5_2_3_resp, &test_1_5_2_3_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_6_1_1, tgrp_case_1_6_1_1, name_case_1_6_1_1, desc_case_1_6_1_1, sref_case_1_6_1_1, {
+	&test_1_6_1_1_conn, &test_1_6_1_1_resp, &test_1_6_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_6_1_2, tgrp_case_1_6_1_2, name_case_1_6_1_2, desc_case_1_6_1_2, sref_case_1_6_1_2, {
+	&test_1_6_1_2_conn, &test_1_6_1_2_resp, &test_1_6_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_6_1_3, tgrp_case_1_6_1_3, name_case_1_6_1_3, desc_case_1_6_1_3, sref_case_1_6_1_3, {
+	&test_1_6_1_3_conn, &test_1_6_1_3_resp, &test_1_6_1_3_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_6_1_4, tgrp_case_1_6_1_4, name_case_1_6_1_4, desc_case_1_6_1_4, sref_case_1_6_1_4, {
+	&test_1_6_1_4_conn, &test_1_6_1_4_resp, &test_1_6_1_4_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_6_1_5, tgrp_case_1_6_1_5, name_case_1_6_1_5, desc_case_1_6_1_5, sref_case_1_6_1_5, {
+	&test_1_6_1_5_conn, &test_1_6_1_5_resp, &test_1_6_1_5_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_6_1_6, tgrp_case_1_6_1_6, name_case_1_6_1_6, desc_case_1_6_1_6, sref_case_1_6_1_6, {
+	&test_1_6_1_6_conn, &test_1_6_1_6_resp, &test_1_6_1_6_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_6_1_7, tgrp_case_1_6_1_7, name_case_1_6_1_7, desc_case_1_6_1_7, sref_case_1_6_1_7, {
+	&test_1_6_1_7_conn, &test_1_6_1_7_resp, &test_1_6_1_7_list}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 

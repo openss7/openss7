@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/09 09:47:56 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/09 22:13:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/09 09:47:56 $ by $Author: brian $
+ Last Modified $Date: 2006/05/09 22:13:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.8  2006/05/09 22:13:04  brian
+ - changes from testing
+
  Revision 0.9.2.7  2006/05/09 09:47:56  brian
  - changes from initial testing
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/09 09:47:56 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/09 22:13:04 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/09 09:47:56 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/09 22:13:04 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -132,7 +135,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2006/05/09 09:47:56 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2006/05/09 22:13:04 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -1211,41 +1214,67 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 	switch (QOS_buffer->n_qos_type) {
 	case N_QOS_SEL_INFO_IP:
 		/* protocol must be one of the bound protocol ids */
-		if (QOS_buffer->n_qos_sel_info.protocol != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_info.protocol != QOS_UNKNOWN && np->pnum > 0) {
+			if ((np_long) QOS_buffer->n_qos_sel_info.protocol < 0) {
+				trace();
+				return (NBADQOSPARAM);
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_info.protocol > 255) {
+				trace();
+				return (NBADQOSPARAM);
+			}
 			for (i = 0; i < np->pnum; i++)
 				if (np->protoids[i] == QOS_buffer->n_qos_sel_info.protocol)
 					break;
-			if (i >= np->pnum)
+			if (i >= np->pnum) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_info.priority != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_info.priority != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_info.priority <
-			    np->qor.priority.priority_min_value)
+			    np->qor.priority.priority_min_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 			if ((np_long) QOS_buffer->n_qos_sel_info.priority >
-			    np->qor.priority.priority_max_value)
+			    np->qor.priority.priority_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_info.ttl != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_info.ttl < np->qor.ttl.ttl_min_value)
+		if ((np_long) QOS_buffer->n_qos_sel_info.ttl != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_info.ttl < np->qor.ttl.ttl_min_value) {
+				trace();
 				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_info.ttl > np->qor.ttl.ttl_max_value)
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_info.ttl > np->qor.ttl.ttl_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_info.tos != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_info.tos < np->qor.tos.tos_min_value)
+		if ((np_long) QOS_buffer->n_qos_sel_info.tos != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_info.tos < np->qor.tos.tos_min_value) {
+				trace();
 				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_info.tos > np->qor.tos.tos_max_value)
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_info.tos > np->qor.tos.tos_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_info.mtu != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_info.mtu < np->qor.mtu.mtu_min_value)
+		if ((np_long) QOS_buffer->n_qos_sel_info.mtu != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_info.mtu < np->qor.mtu.mtu_min_value) {
+				trace();
 				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_info.mtu > np->qor.mtu.mtu_max_value)
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_info.mtu > np->qor.mtu.mtu_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
 		/* source address should be one of the specified source addresses */
-		if (QOS_buffer->n_qos_sel_info.saddr != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_info.saddr != QOS_UNKNOWN && np->snum > 0) {
 			if (QOS_buffer->n_qos_sel_info.saddr != 0) {
 				for (i = 0; i < np->snum; i++) {
 					if (np->saddrs[i].addr == INADDR_ANY)
@@ -1253,31 +1282,35 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 					if (np->saddrs[i].addr == QOS_buffer->n_qos_sel_info.saddr)
 						break;
 				}
-				if (i >= np->snum)
+				if (i >= np->snum) {
+					trace();
 					return (NBADQOSPARAM);
+				}
 			}
 		}
 		/* destination address must be one of the specified destination addresses */
-		if (QOS_buffer->n_qos_sel_info.daddr != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_info.daddr != QOS_UNKNOWN && np->dnum > 0) {
 			for (i = 0; i < np->dnum; i++)
 				if (np->daddrs[i].addr == QOS_buffer->n_qos_sel_info.daddr)
 					break;
-			if (i >= np->dnum)
+			if (i >= np->dnum) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_info.protocol != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_info.protocol != QOS_UNKNOWN)
 			np->qos.protocol = QOS_buffer->n_qos_sel_info.protocol;
-		if (QOS_buffer->n_qos_sel_info.priority != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_info.priority != QOS_UNKNOWN)
 			np->qos.priority = QOS_buffer->n_qos_sel_info.priority;
-		if (QOS_buffer->n_qos_sel_info.ttl != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_info.ttl != QOS_UNKNOWN)
 			np->qos.ttl = QOS_buffer->n_qos_sel_info.ttl;
-		if (QOS_buffer->n_qos_sel_info.tos != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_info.tos != QOS_UNKNOWN)
 			np->qos.tos = QOS_buffer->n_qos_sel_info.tos;
-		if (QOS_buffer->n_qos_sel_info.mtu != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_info.mtu != QOS_UNKNOWN)
 			np->qos.mtu = QOS_buffer->n_qos_sel_info.mtu;
-		if (QOS_buffer->n_qos_sel_info.saddr != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_info.saddr != QOS_UNKNOWN)
 			np->qos.saddr = QOS_buffer->n_qos_sel_info.saddr;
-		if (QOS_buffer->n_qos_sel_info.daddr != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_info.daddr != QOS_UNKNOWN)
 			np->qos.daddr = QOS_buffer->n_qos_sel_info.daddr;
 		break;
 	case N_QOS_RANGE_INFO_IP:
@@ -1286,41 +1319,67 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 		if (!(np->info.SERV_type & N_CONS))
 			return (NBADQOSTYPE);
 		/* protocol must be one of the bound protocol ids */
-		if (QOS_buffer->n_qos_sel_conn.protocol != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_conn.protocol != QOS_UNKNOWN && np->pnum > 0) {
+			if ((np_long) QOS_buffer->n_qos_sel_conn.protocol < 0) {
+				trace();
+				return (NBADQOSPARAM);
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_conn.protocol > 255) {
+				trace();
+				return (NBADQOSPARAM);
+			}
 			for (i = 0; i < np->pnum; i++)
 				if (np->protoids[i] == QOS_buffer->n_qos_sel_conn.protocol)
 					break;
-			if (i >= np->pnum)
+			if (i >= np->pnum) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_conn.priority != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_conn.priority != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_conn.priority <
-			    np->qor.priority.priority_min_value)
+			    np->qor.priority.priority_min_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 			if ((np_long) QOS_buffer->n_qos_sel_conn.priority >
-			    np->qor.priority.priority_max_value)
+			    np->qor.priority.priority_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_conn.ttl != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_conn.ttl < np->qor.ttl.ttl_min_value)
+		if ((np_long) QOS_buffer->n_qos_sel_conn.ttl != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_conn.ttl < np->qor.ttl.ttl_min_value) {
+				trace();
 				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_conn.ttl > np->qor.ttl.ttl_max_value)
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_conn.ttl > np->qor.ttl.ttl_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_conn.tos != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_conn.tos < np->qor.tos.tos_min_value)
+		if ((np_long) QOS_buffer->n_qos_sel_conn.tos != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_conn.tos < np->qor.tos.tos_min_value) {
+				trace();
 				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_conn.tos > np->qor.tos.tos_max_value)
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_conn.tos > np->qor.tos.tos_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_conn.mtu != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_conn.mtu < np->qor.mtu.mtu_min_value)
+		if ((np_long) QOS_buffer->n_qos_sel_conn.mtu != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_conn.mtu < np->qor.mtu.mtu_min_value) {
+				trace();
 				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_conn.mtu > np->qor.mtu.mtu_max_value)
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_conn.mtu > np->qor.mtu.mtu_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
 		/* source address should be one of the specified source addresses */
-		if (QOS_buffer->n_qos_sel_conn.saddr != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_conn.saddr != QOS_UNKNOWN && np->snum > 0) {
 			if (QOS_buffer->n_qos_sel_conn.saddr != 0) {
 				for (i = 0; i < np->snum; i++) {
 					if (np->saddrs[i].addr == INADDR_ANY)
@@ -1328,66 +1387,93 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 					if (np->saddrs[i].addr == QOS_buffer->n_qos_sel_conn.saddr)
 						break;
 				}
-				if (i >= np->snum)
+				if (i >= np->snum) {
+					trace();
 					return (NBADQOSPARAM);
+				}
 			}
 		}
 		/* destination address must be one of the specified destination addresses */
-		if (QOS_buffer->n_qos_sel_conn.daddr != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_conn.daddr != QOS_UNKNOWN) {
 			for (i = 0; i < np->dnum; i++)
 				if (np->daddrs[i].addr == QOS_buffer->n_qos_sel_conn.daddr)
 					break;
-			if (i >= np->dnum)
+			if (i >= np->dnum) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_conn.protocol != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_conn.protocol != QOS_UNKNOWN)
 			np->qos.protocol = QOS_buffer->n_qos_sel_conn.protocol;
-		if (QOS_buffer->n_qos_sel_conn.priority != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_conn.priority != QOS_UNKNOWN)
 			np->qos.priority = QOS_buffer->n_qos_sel_conn.priority;
-		if (QOS_buffer->n_qos_sel_conn.ttl != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_conn.ttl != QOS_UNKNOWN)
 			np->qos.ttl = QOS_buffer->n_qos_sel_conn.ttl;
-		if (QOS_buffer->n_qos_sel_conn.tos != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_conn.tos != QOS_UNKNOWN)
 			np->qos.tos = QOS_buffer->n_qos_sel_conn.tos;
-		if (QOS_buffer->n_qos_sel_conn.mtu != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_conn.mtu != QOS_UNKNOWN)
 			np->qos.mtu = QOS_buffer->n_qos_sel_conn.mtu;
-		if (QOS_buffer->n_qos_sel_conn.saddr != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_conn.saddr != QOS_UNKNOWN)
 			np->qos.saddr = QOS_buffer->n_qos_sel_conn.saddr;
-		if (QOS_buffer->n_qos_sel_conn.daddr != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_conn.daddr != QOS_UNKNOWN)
 			np->qos.daddr = QOS_buffer->n_qos_sel_conn.daddr;
+		np->info.SERV_type = N_CONS;
 		break;
 	case N_QOS_SEL_UD_IP:
 		if (!(np->info.SERV_type & N_CLNS))
 			return (NBADQOSTYPE);
 		/* protocol must be one of the bound protocol ids */
-		if (QOS_buffer->n_qos_sel_ud.protocol != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_ud.protocol != QOS_UNKNOWN && np->pnum > 0) {
+			if ((np_long) QOS_buffer->n_qos_sel_ud.protocol < 0) {
+				trace();
+				return (NBADQOSPARAM);
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_ud.protocol > 255) {
+				trace();
+				return (NBADQOSPARAM);
+			}
 			for (i = 0; i < np->pnum; i++)
 				if (np->protoids[i] == QOS_buffer->n_qos_sel_ud.protocol)
 					break;
-			if (i >= np->pnum)
+			if (i >= np->pnum) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_ud.priority != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_ud.priority != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_ud.priority <
-			    np->qor.priority.priority_min_value)
+			    np->qor.priority.priority_min_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 			if ((np_long) QOS_buffer->n_qos_sel_ud.priority >
-			    np->qor.priority.priority_max_value)
+			    np->qor.priority.priority_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_ud.ttl != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_ud.ttl < np->qor.ttl.ttl_min_value)
+		if ((np_long) QOS_buffer->n_qos_sel_ud.ttl != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_ud.ttl < np->qor.ttl.ttl_min_value) {
+				trace();
 				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_ud.ttl > np->qor.ttl.ttl_max_value)
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_ud.ttl > np->qor.ttl.ttl_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
-		if (QOS_buffer->n_qos_sel_ud.tos != QOS_UNKNOWN) {
-			if ((np_long) QOS_buffer->n_qos_sel_ud.tos < np->qor.tos.tos_min_value)
+		if ((np_long) QOS_buffer->n_qos_sel_ud.tos != QOS_UNKNOWN) {
+			if ((np_long) QOS_buffer->n_qos_sel_ud.tos < np->qor.tos.tos_min_value) {
+				trace();
 				return (NBADQOSPARAM);
-			if ((np_long) QOS_buffer->n_qos_sel_ud.tos > np->qor.tos.tos_max_value)
+			}
+			if ((np_long) QOS_buffer->n_qos_sel_ud.tos > np->qor.tos.tos_max_value) {
+				trace();
 				return (NBADQOSPARAM);
+			}
 		}
 		/* source address should be one of the specified source addresses */
-		if (QOS_buffer->n_qos_sel_ud.saddr != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->n_qos_sel_ud.saddr != QOS_UNKNOWN && np->snum > 0) {
 			if (QOS_buffer->n_qos_sel_ud.saddr != 0) {
 				for (i = 0; i < np->snum; i++) {
 					if (np->saddrs[i].addr == INADDR_ANY)
@@ -1395,20 +1481,23 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 					if (np->saddrs[i].addr == QOS_buffer->n_qos_sel_ud.saddr)
 						break;
 				}
-				if (i >= np->snum)
+				if (i >= np->snum) {
+					trace();
 					return (NBADQOSPARAM);
+				}
 			}
 		}
-		if (QOS_buffer->n_qos_sel_ud.protocol != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_ud.protocol != QOS_UNKNOWN)
 			np->qos.protocol = QOS_buffer->n_qos_sel_ud.protocol;
-		if (QOS_buffer->n_qos_sel_ud.priority != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_ud.priority != QOS_UNKNOWN)
 			np->qos.priority = QOS_buffer->n_qos_sel_ud.priority;
-		if (QOS_buffer->n_qos_sel_ud.ttl != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_ud.ttl != QOS_UNKNOWN)
 			np->qos.ttl = QOS_buffer->n_qos_sel_ud.ttl;
-		if (QOS_buffer->n_qos_sel_ud.tos != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_ud.tos != QOS_UNKNOWN)
 			np->qos.tos = QOS_buffer->n_qos_sel_ud.tos;
-		if (QOS_buffer->n_qos_sel_ud.saddr != QOS_UNKNOWN)
+		if ((np_long) QOS_buffer->n_qos_sel_ud.saddr != QOS_UNKNOWN)
 			np->qos.saddr = QOS_buffer->n_qos_sel_ud.saddr;
+		np->info.SERV_type = N_CLNS;
 		break;
 	default:
 		return (NBADQOSTYPE);
@@ -2031,6 +2120,7 @@ ne_bind_ack(queue_t *q, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 		mp->b_wptr += PROTOID_length;
 	}
 	npi_set_state(np, NS_IDLE);
+	printd(("%s: <- N_BIND_ACK\n", DRV_NAME));
 	qreply(q, mp);
 	return (QR_DONE);
 
@@ -2146,6 +2236,7 @@ ne_error_ack(queue_t *q, int ERROR_prim, np_long NPI_error)
 			   to an N_OPTMGMT_REQ in other than the NS_IDLE state. */
 			break;
 		}
+		printd(("%s: <- N_ERROR_ACK\n", DRV_NAME));
 		qreply(q, mp);
 		return (0);
 	}
@@ -2235,6 +2326,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		}
 		break;
 	}
+	printd(("%s: <- N_OK_ACK\n", DRV_NAME));
 	qreply(q, mp);
 	return (QR_DONE);
       error:
@@ -2307,6 +2399,7 @@ ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		mp->b_wptr += QOS_length;
 	}
 
+	printd(("%s: <- N_CONN_CON\n", DRV_NAME));
 	qreply(q, mp);
 	return (QR_DONE);
 
@@ -2349,6 +2442,7 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 	p->PRIM_type = N_RESET_CON;
 	mp->b_wptr += sizeof(*p);
 	npi_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
+	printd(("%s: <- N_RESET_CON\n", DRV_NAME));
 	qreply(q, mp);
 	return (QR_DONE);
 
@@ -2450,6 +2544,7 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	/* save original in connection indication list */
 	SEQ_number->b_next = np->conq;
 	np->conq = SEQ_number;
+	printd(("%s: <- N_CONN_IND\n", DRV_NAME));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -2495,6 +2590,7 @@ ne_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		mp->b_wptr += RES_length;
 	}
 	mp->b_cont = dp;
+	printd(("%s: <- N_DISCON_IND\n", DRV_NAME));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -2684,6 +2780,7 @@ ne_data_ind(queue_t *q, mblk_t *dp)
 	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
+	printd(("%s: <- N_DATA_IND\n", DRV_NAME));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -2717,6 +2814,7 @@ ne_exdata_ind(queue_t *q, mblk_t *dp)
 	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
+	printd(("%s: <- N_EXDATA_IND\n", DRV_NAME));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -2782,6 +2880,7 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
 	}
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
+	printd(("%s: <- N_UNITDATA_IND\n", DRV_NAME));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -2835,6 +2934,7 @@ ne_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, socklen_t DEST_lengt
 	}
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* was M_ERROR in some cases */
+	printd(("%s: <- N_UDERROR_IND\n", DRV_NAME));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -3123,6 +3223,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	dp->b_next = np->resq;
 	np->resq = dp;
 	np->resinds++;
+	printd(("%s: <- N_RESET_IND\n", DRV_NAME));
 	putnext(q, mp);
       discard:
 	return (QR_DONE);
@@ -3152,6 +3253,7 @@ ne_datack_ind(queue_t *q)
 	p->PRIM_type = N_DATACK_IND;
 	mp->b_wptr += sizeof(*p);
 
+	printd(("%s: <- N_DATACK_IND\n", DRV_NAME));
 	putnext(q, mp);
 	return (QR_DONE);
 
@@ -3222,7 +3324,7 @@ ne_bind_req(queue_t *q, mblk_t *mp)
 	NPI_error = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
-	p = (typeof(p)) mp->b_wptr;
+	p = (typeof(p)) mp->b_rptr;
 	NPI_error = -EFAULT;
 	if (unlikely(p->PRIM_type != N_BIND_REQ))
 		goto error;
@@ -4916,11 +5018,11 @@ npi_alloc_priv(queue_t *q, struct np **slp, int type, dev_t *devp, cred_t *crp)
 		/* qos range info */
 		np->qor.n_qos_type = N_QOS_RANGE_INFO_IP;
 		np->qor.priority.priority_min_value = 0;
-		np->qor.priority.priority_min_value = 255;
+		np->qor.priority.priority_max_value = 255;
 		np->qor.ttl.ttl_min_value = 1;
 		np->qor.ttl.ttl_max_value = 255;
 		np->qor.tos.tos_min_value = 0;
-		np->qor.tos.tos_min_value = 15;
+		np->qor.tos.tos_max_value = 15;
 		np->qor.mtu.mtu_min_value = 536;
 		np->qor.mtu.mtu_max_value = 65535;
 		/* link into master list */
