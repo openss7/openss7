@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/09 22:13:04 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/05/10 09:42:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/09 22:13:04 $ by $Author: brian $
+ Last Modified $Date: 2006/05/10 09:42:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.9  2006/05/10 09:42:42  brian
+ - more testing on NPI-IP driver
+
  Revision 0.9.2.8  2006/05/09 22:13:04  brian
  - changes from testing
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/09 22:13:04 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/05/10 09:42:42 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/09 22:13:04 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/05/10 09:42:42 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -135,7 +138,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2006/05/09 22:13:04 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2006/05/10 09:42:42 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -226,7 +229,7 @@ STATIC struct qinit np_rinit = {
 	.qi_putp = ss7_oput,		/* Read put procedure (message from below) */
 	.qi_srvp = ss7_osrv,		/* Read service procedure */
 	.qi_qopen = np_qopen,		/* Each open */
-	.qi_qclose = np_qclose,	/* Last close */
+	.qi_qclose = np_qclose,		/* Last close */
 	.qi_minfo = &np_minfo,		/* Module information */
 	.qi_mstat = &np_mstat,		/* Module statistics */
 };
@@ -526,7 +529,8 @@ state_name(np_ulong state)
 STATIC INLINE fastcall void
 npi_set_state(struct np *np, np_ulong state)
 {
-	printd(("%s: %p: %s <- %s\n", DRV_NAME, np, state_name(state), state_name(np->info.CURRENT_state)));
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, np, state_name(state),
+		state_name(np->info.CURRENT_state)));
 	np->info.CURRENT_state = state;
 }
 
@@ -731,7 +735,7 @@ npi_init_nproto(unsigned char proto, unsigned int type)
 		}
 		inet_protosp[hash] = &pp->proto;
 		spin_unlock_bh(inet_proto_lockp);
-		synchronize_net();
+		// synchronize_net(); /* might sleep */
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 		/* link into hash slot */
 		np_prots[proto] = pb;
@@ -771,18 +775,20 @@ npi_term_nproto(unsigned char proto, unsigned int type)
 
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
 			inet_del_protocol(pp);
+			/* unlink from hash slot */
+			np_prots[proto] = NULL;
 #elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 			spin_lock_bh(inet_proto_lockp);
 			inet_protosp[proto] = pp->next;
 			spin_unlock_bh(inet_proto_lockp);
-			synchronize_net();
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
+			/* unlink from hash slot */
+			np_prots[proto] = NULL;
+			// synchronize_net(); /* might sleep */
 #else
 #error
 #endif
-			/* unlink from hash slot */
-			np_prots[proto] = NULL;
 			kmem_cache_free(npi_prot_cachep, pb);
 		}
 	}
@@ -921,6 +927,9 @@ npi_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	for (i = 0; i < anum; i++)
 		np->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
 	write_unlock_bh(&hp->lock);
+#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+	synchronize_net();	/* might sleep */
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 	return (0);
 }
 
@@ -1526,6 +1535,9 @@ npi_unbind(struct np *np)
 		npi_unbind_prot(np->protoids[0], np->info.SERV_type);
 		np_release(&np);
 		write_unlock_bh(&hp->lock);
+#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+		synchronize_net();	/* might sleep */
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 		return (0);
 	}
 	return (-EALREADY);
@@ -2107,7 +2119,7 @@ ne_bind_ack(queue_t *q, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	p->ADDR_length = ADDR_length;
 	p->ADDR_offset = ADDR_length ? sizeof(*p) : 0;
 	p->CONIND_number = CONIND_number;
-	p->TOKEN_value = (long) RD(q);
+	p->TOKEN_value = (BIND_flags & TOKEN_REQUEST) ? (long) RD(q) : 0;
 	p->PROTOID_length = PROTOID_length;
 	p->PROTOID_offset = PROTOID_length ? sizeof(*p) + ADDR_length : 0;
 	mp->b_wptr += sizeof(*p);
@@ -2893,7 +2905,7 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
 
 /**
  * ne_uderror_ind: - generate a N_UDERROR_IND message
- * @q: active queue in queue pair (read queue)
+ * @q: active queue in queue pair (read or write queue)
  * @DEST_buffer: pointer to destination address
  * @RESERVED_field: MTU if error is N_UD_SEG_REQUIRED
  * @ERROR_type: error number
@@ -2905,14 +2917,16 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
  * value indicates that the MTU value is present for supporting providers.
  */
 STATIC INLINE fastcall int
-ne_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
-	       np_ulong RESERVED_field, np_ulong ERROR_type, mblk_t *dp)
+ne_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_field,
+	       np_ulong ERROR_type, mblk_t *dp)
 {
+	struct np *np = NP_PRIV(q);
 	mblk_t *mp;
 	N_uderror_ind_t *p;
-	const size_t size = sizeof(*p) + DEST_length;
+	np_ulong DEST_length = sizeof(*DEST_buffer);
+	size_t size = sizeof(*p) + (DEST_buffer ? DEST_length : 0);
 
-	if (unlikely(!canputnext(q)))
+	if (unlikely(!canputnext(np->oq)))
 		goto ebusy;
 
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
@@ -2923,19 +2937,21 @@ ne_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, socklen_t DEST_lengt
 
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_UDERROR_IND;
-	p->DEST_length = DEST_length;
-	p->DEST_offset = DEST_length ? sizeof(*p) : 0;
+	p->DEST_length = DEST_buffer ? DEST_length : 0;
+	p->DEST_offset = DEST_buffer ? sizeof(*p) : 0;
 	p->RESERVED_field = RESERVED_field;
 	p->ERROR_type = ERROR_type;
 	mp->b_wptr += sizeof(*p);
-	if (DEST_length) {
+	if (DEST_buffer) {
 		bcopy(DEST_buffer, mp->b_wptr, DEST_length);
 		mp->b_wptr += DEST_length;
 	}
-	mp->b_cont = dp;
-	dp->b_datap->db_type = M_DATA;	/* was M_ERROR in some cases */
+	if (dp != NULL) {
+		mp->b_cont = dp;
+		dp->b_datap->db_type = M_DATA;	/* was M_ERROR in some cases */
+	}
 	printd(("%s: <- N_UDERROR_IND\n", DRV_NAME));
-	putnext(q, mp);
+	putnext(np->oq, mp);
 	return (QR_ABSORBED);
 
       enobufs:
@@ -3048,16 +3064,14 @@ ne_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 	/* hide ICMP header */
 	hidden = (unsigned char *) iph - mp->b_rptr;
 	mp->b_rptr = (unsigned char *) iph;
-	if ((err =
-	     ne_uderror_ind(q, DEST_buffer, sizeof(*DEST_buffer), RESERVED_field, ERROR_type,
-			    mp)) < 0)
+	if ((err = ne_uderror_ind(q, DEST_buffer, RESERVED_field, ERROR_type, mp)) < 0)
 		mp->b_rptr -= hidden;
 	return (err);
 }
 
 STATIC INLINE fastcall int
-ne_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
-		 np_ulong RESERVED_field, np_long ERROR_type, mblk_t *db)
+ne_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_field,
+		 np_long ERROR_type, mblk_t *db)
 {
 	int err;
 
@@ -3088,15 +3102,14 @@ ne_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, socklen_t DEST_len
 	case NBADADDR:
 	case NBADDATA:
 		break;
+	default:
 	case NOUTSTATE:
 	case -EINVAL:
 	case -EFAULT:
 		return ne_error_reply(q, -EPROTO);
 	}
-	if ((err =
-	     ne_uderror_ind(q, DEST_buffer, DEST_length, RESERVED_field, ERROR_type,
-			    db)) == QR_DONE)
-		return (QR_STRIP);
+	if ((err = ne_uderror_ind(q, DEST_buffer, RESERVED_field, ERROR_type, db)) == QR_ABSORBED)
+		return (QR_TRIMMED);
 	return (err);
 }
 
@@ -3410,8 +3423,9 @@ ne_bind_req(queue_t *q, mblk_t *mp)
 			/* cannot listen on wildcard port number */
 			if (unlikely(p->CONIND_number > 0 && ADDR_buffer[0].sin_port == 0))
 				goto error;
-			/* cannot specify port if connectionless */
-			if (unlikely(np->info.SERV_type == N_CLNS && ADDR_buffer[0].sin_port != 0))
+			/* cannot specify port if default destination */
+			if (unlikely((p->BIND_flags & DEFAULT_DEST) &&
+				     ADDR_buffer[0].sin_port != 0))
 				goto error;
 		} else {
 			ADDR_length = sizeof(struct sockaddr_in);
@@ -3545,7 +3559,7 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 	struct np *np = NP_PRIV(q);
 	size_t mlen;
 	N_unitdata_req_t *p;
-	struct sockaddr_in dst_buf, *DEST_buffer = &dst_buf;
+	struct sockaddr_in dst_buf, *DEST_buffer = NULL;
 	np_long NPI_error;
 	mblk_t *dp = mp->b_cont;
 	uint32_t daddr;
@@ -3565,13 +3579,6 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 		goto error;
 	if (unlikely(npi_not_state(np, NSF_IDLE)))
 		goto error;
-	NPI_error = NBADDATA;
-	if (unlikely(dp == NULL))
-		goto error;
-	if (unlikely((mlen = msgdsize(dp)) <= 0 || mlen > 65535 - sizeof(struct iphdr)))
-		goto error;
-	/* Note: no destination address is our clue that the upper layer had already included the
-	   IP header in the IP packet. */
 	NPI_error = NNOADDR;
 	if (unlikely(p->DEST_length == 0))
 		goto error;
@@ -3581,18 +3588,22 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(p->DEST_length != sizeof(struct sockaddr_in)))
 		goto error;
 	/* avoid alignment problems */
+	DEST_buffer = &dst_buf;
 	bcopy(mp->b_rptr + p->DEST_offset, DEST_buffer, p->DEST_length);
 	if (unlikely(DEST_buffer->sin_family != AF_INET))
 		goto error;
-	if (unlikely(DEST_buffer->sin_port == 0))	/* this is really the IP protocol */
-		goto error;
 	if (unlikely((daddr = DEST_buffer->sin_addr.s_addr) == INADDR_ANY))
+		goto error;
+	NPI_error = NBADDATA;
+	if (unlikely(dp == NULL))
+		goto error;
+	if (unlikely((mlen = msgdsize(dp)) <= 0 || mlen > 65535 - sizeof(struct iphdr)))
 		goto error;
 	if (unlikely((NPI_error = npi_senddata(np, np->qos.protocol, daddr, dp)) < 0))
 		goto error;
 	return (QR_DONE);
       error:
-	return ne_uderror_reply(q, DEST_buffer, sizeof(*DEST_buffer), 0, NPI_error, dp);
+	return ne_uderror_reply(q, DEST_buffer, 0, NPI_error, dp);
 }
 
 /**
@@ -3831,7 +3842,7 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	npi_set_state(np, NS_WACK_CRES);
 	NPI_error = ne_ok_ack(q, N_CONN_RES, RES_buffer, p->RES_length,
-			 QOS_buffer, SEQ_number, TOKEN_value, p->CONN_flags);
+			      QOS_buffer, SEQ_number, TOKEN_value, p->CONN_flags);
 	if (unlikely(NPI_error != 0))
 		goto error;
 	return (QR_TRIMMED);
@@ -3896,7 +3907,7 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 	}
 	/* Ok, all checking done.  Now we need to disconnect the address. */
 	NPI_error = ne_ok_ack(q, N_DISCON_REQ, RES_buffer, p->RES_length, NULL, SEQ_number, NULL,
-			 p->DISCON_reason);
+			      p->DISCON_reason);
 	if (unlikely(NPI_error != 0))
 		goto error;
 	return (QR_TRIMMED);
@@ -4003,10 +4014,9 @@ ne_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely(!(dp = mp->b_cont) || (dlen = msgsize(dp)) == 0
 		     || dlen > np->info.NIDU_size || dlen > np->info.NSDU_size))
 		goto error;
-	if (unlikely
-	    ((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
+	if (unlikely((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
 		goto error;
-	return (QR_STRIP);
+	return (QR_TRIMMED);
       discard:
 	return (QR_DONE);
       error:
@@ -4051,10 +4061,9 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(!(dp = mp->b_cont) || (dlen = msgsize(dp)) == 0
 		     || dlen > np->info.NIDU_size || dlen > np->info.ENSDU_size))
 		goto error;
-	if (unlikely
-	    ((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
+	if (unlikely((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
 		goto error;
-	return (QR_STRIP);
+	return (QR_TRIMMED);
       discard:
 	return (QR_DONE);
       error:
@@ -4144,7 +4153,7 @@ ne_reset_req(queue_t *q, mblk_t *mp)
 	npi_set_state(np, NS_WCON_RREQ);
 	if ((NPI_error = ne_reset_con(q, N_USER, p->RESET_reason, mp->b_cont)) != 0)
 		goto error;
-	return (QR_STRIP);
+	return (QR_TRIMMED);
       error:
 	return ne_error_ack(q, N_RESET_REQ, NPI_error);
 
@@ -4277,7 +4286,7 @@ np_w_proto(queue_t *q, mblk_t *mp)
 		case N_INFO_ACK:	/* Information Acknowledgement */
 		case N_BIND_ACK:	/* NS User bound to network address */
 		case N_ERROR_ACK:	/* Error Acknowledgement */
-		case N_OK_ACK:		/* Success Acknowledgement */
+		case N_OK_ACK:	/* Success Acknowledgement */
 		case N_UNITDATA_IND:	/* Connection-less data receive indication */
 		case N_UDERROR_IND:	/* UNITDATA Error Indication */
 		case N_DATACK_IND:	/* Data acknowledgement indication */
@@ -4298,10 +4307,10 @@ np_w_proto(queue_t *q, mblk_t *mp)
 		/* The put and service procedure do not recognize all errors. Sometimes we return
 		   an error to here just to restore the previous state. */
 		switch (rtn) {
-		case -EBUSY:		/* flow controlled */
-		case -EAGAIN:		/* try again */
-		case -ENOMEM:		/* could not allocate memory */
-		case -ENOBUFS:		/* could not allocate an mblk */
+		case -EBUSY:	/* flow controlled */
+		case -EAGAIN:	/* try again */
+		case -ENOMEM:	/* could not allocate memory */
+		case -ENOBUFS:	/* could not allocate an mblk */
 		case -EOPNOTSUPP:	/* primitive not supported */
 			return ne_error_ack(q, prim, rtn);
 		case -EPROTO:
@@ -5130,6 +5139,7 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	struct np *np, **npp = &master.np.list;
+
 #if 0
 	mblk_t *mp;
 	struct stroptions *so;
@@ -5172,8 +5182,7 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				break;
 			if (cminor == (*npp)->u.dev.cminor) {
 				if (++cminor >= NMINORS) {
-					if (++mindex >= CMAJORS
-					    || !(cmajor = npi_majors[mindex]))
+					if (++mindex >= CMAJORS || !(cmajor = npi_majors[mindex]))
 						break;
 					cminor = 0;
 				}
