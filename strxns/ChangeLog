@@ -1,3 +1,9 @@
+2006-05-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: corrections from testing
+	* src/test/test-np_ip.c: additional test cases
+	* tests/testsuite-np_ip.at: additional test cases
+
 2006-05-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/np_ip.c: corrections from testing

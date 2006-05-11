@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/10 20:56:31 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/11 10:59:37 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/10 20:56:31 $ by $Author: brian $
+ Last Modified $Date: 2006/05/11 10:59:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.8  2006/05/11 10:59:37  brian
+ - more testing of NPI-IP driver
+
  Revision 0.9.2.7  2006/05/10 20:56:31  brian
  - more testing
 
@@ -93,9 +96,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/10 20:56:31 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/11 10:59:37 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/10 20:56:31 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/11 10:59:37 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -221,7 +224,8 @@ static struct sockaddr_in *ADDR_buffer = NULL;
 static socklen_t ADDR_length = sizeof(*ADDR_buffer);
 static unsigned char *PROTOID_buffer = NULL;
 static size_t PROTOID_length = 0;
-static const char *test_data = NULL;
+static char *DATA_buffer = NULL;
+static size_t DATA_length = 0;
 static int test_resfd = -1;
 static int test_timout = 200;
 static void *QOS_buffer = NULL;
@@ -3301,9 +3305,10 @@ do_signal(int child, int action)
 			bcopy(ADDR_buffer, ctrl->buf + p->conn_req.DEST_offset, p->conn_req.DEST_length);
 		if (QOS_buffer)
 			bcopy(QOS_buffer, ctrl->buf + p->conn_req.QOS_offset, p->conn_req.QOS_length);
-		if (test_data)
-			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
-		else
+		if (DATA_buffer) {
+			data->buf = DATA_buffer;
+			data->len = DATA_length;
+		} else
 			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3342,9 +3347,10 @@ do_signal(int child, int action)
 			bcopy(ADDR_buffer, ctrl->buf + p->conn_res.RES_offset, p->conn_res.RES_length);
 		if (QOS_buffer)
 			bcopy(QOS_buffer, ctrl->buf + p->conn_res.QOS_offset, p->conn_res.QOS_length);
-		if (test_data)
-			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
-		else
+		if (DATA_buffer) {
+			data->buf = DATA_buffer;
+			data->len = DATA_length;
+		} else
 			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3378,9 +3384,10 @@ do_signal(int child, int action)
 		p->discon_req.SEQ_number = SEQ_number;
 		if (ADDR_buffer)
 			bcopy(ADDR_buffer, ctrl->buf + p->discon_req.RES_offset, p->discon_req.RES_length);
-		if (test_data)
-			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
-		else
+		if (DATA_buffer) {
+			data->buf = DATA_buffer;
+			data->len = DATA_length;
+		} else
 			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3419,9 +3426,10 @@ do_signal(int child, int action)
 		ctrl->len = sizeof(p->data_req);
 		p->data_req.PRIM_type = N_DATA_REQ;
 		p->data_req.DATA_xfer_flags = DATA_xfer_flags;
-		if (test_data)
-			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
-		else
+		if (DATA_buffer) {
+			data->buf = DATA_buffer;
+			data->len = DATA_length;
+		} else
 			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3439,9 +3447,10 @@ do_signal(int child, int action)
 	case __TEST_EXDATA_REQ:
 		ctrl->len = sizeof(p->exdata_req);
 		p->exdata_req.PRIM_type = N_EXDATA_REQ;
-		if (test_data)
-			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
-		else
+		if (DATA_buffer) {
+			data->buf = DATA_buffer;
+			data->len = DATA_length;
+		} else
 			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
@@ -3569,9 +3578,10 @@ do_signal(int child, int action)
 		p->unitdata_req.DEST_offset = ADDR_buffer ? sizeof(p->unitdata_req) : 0;
 		if (ADDR_buffer)
 			bcopy(ADDR_buffer, ctrl->buf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length);
-		if (test_data)
-			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
-		else
+		if (DATA_buffer) {
+			data->buf = DATA_buffer;
+			data->len = DATA_length;
+		} else
 			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -4208,7 +4218,7 @@ postamble_1_unbnd(int child)
 int
 preamble_1_idle_clns(int child)
 {
-	int port = htons(10000 + child);
+	unsigned short port = htons(10000 + child);
 	int proto = 140;
 	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
 	unsigned char prot[] = { proto };
@@ -4432,7 +4442,8 @@ preamble_2_conn(int child)
 	state++;
 	ADDR_buffer = addrs[2];
 	ADDR_length = sizeof(addrs[2]);
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -4474,7 +4485,8 @@ preamble_2_list(int child)
 		goto failure;
 	state++;
 	test_resfd = test_fd[1];
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
 	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
@@ -4512,7 +4524,8 @@ postamble_2_conn(int child)
 		break;
 	}
 	state++;
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	SEQ_number = 0;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
@@ -4625,7 +4638,8 @@ preamble_2b_conn(int child)
 	state++;
 	ADDR_buffer = addrs[1];
 	ADDR_length = sizeof(addrs[1]);
-	test_data = "Hello World";
+	DATA_buffer = "Hello World";
+	DATA_length = strlen(DATA_buffer);
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -4669,7 +4683,8 @@ preamble_2b_list(int child)
 		goto failure;
 	state++;
 	test_resfd = test_fd[1];
-	test_data = "Hello There!";
+	DATA_buffer = "Hello There!";
+	DATA_length = strlen(DATA_buffer);
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
 	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
@@ -4705,7 +4720,8 @@ postamble_3_conn(int child)
 		break;
 	}
 	state++;
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
@@ -4760,7 +4776,8 @@ postamble_3_resp(int child)
 		failed = (failed == -1) ? state : failed;
       got_release:
 	state++;
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
@@ -5070,7 +5087,8 @@ test_case_1_3_1(int child)
 {
 	ADDR_buffer = NULL;
 	QOS_buffer = NULL;
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5115,7 +5133,8 @@ test_case_1_3_2(int child)
 {
 	ADDR_buffer = NULL;
 	QOS_buffer = NULL;
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5372,7 +5391,8 @@ NS_UNBND state."
 int
 test_case_1_4_2(int child)
 {
-	test_data = "Test case 1.4.2";
+	DATA_buffer = "Test case 1.4.2";
+	DATA_length = strlen(DATA_buffer);
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5415,7 +5435,8 @@ NS_UNBND state."
 int
 test_case_1_4_3(int child)
 {
-	test_data = "Test case 1.4.3";
+	DATA_buffer = "Test case 1.4.3";
+	DATA_length = strlen(DATA_buffer);
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5458,7 +5479,8 @@ NS_UNBND state."
 int
 test_case_1_4_4(int child)
 {
-	test_data = "Test case 1.4.4";
+	DATA_buffer = "Test case 1.4.4";
+	DATA_length = strlen(DATA_buffer);
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7126,7 +7148,8 @@ int
 test_case_2_2_2(int child)
 {
 	DATA_xfer_flags = 0;
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7169,7 +7192,8 @@ NS_IDLE state."
 int
 test_case_2_2_3(int child)
 {
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7258,7 +7282,8 @@ test_case_2_3_2(int child)
 {
 	ADDR_buffer = NULL;
 	ADDR_length = 0;
-	test_data = "Test";
+	DATA_buffer = "Test";
+	DATA_length = strlen(DATA_buffer);
 	
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -7308,7 +7333,8 @@ test_case_2_4_1(int child)
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -7357,7 +7383,8 @@ test_case_2_4_2(int child)
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
-	test_data = "";
+	DATA_buffer = "";
+	DATA_length = strlen(DATA_buffer);
 	
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -7406,7 +7433,8 @@ test_case_2_4_3(int child)
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
-	test_data = NULL;
+	DATA_buffer = NULL;
+	DATA_length = 0;
 	
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -7455,7 +7483,8 @@ test_case_2_4_4(int child)
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
-	test_data = "Test";
+	DATA_buffer = "Test";
+	DATA_length = strlen(DATA_buffer);
 	
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -7504,7 +7533,8 @@ test_case_2_4_5(int child)
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
-	test_data = "Test";
+	DATA_buffer = "Test";
+	DATA_length = strlen(DATA_buffer);
 	
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -7543,18 +7573,26 @@ struct test_stream test_2_4_5_list = { &preamble_2_4_5_list, &test_case_2_4_5_li
 #define name_case_2_5_1 "Successful N_UNITDATA_REQ in NS_IDLE state."
 #define sref_case_2_5_1 "NPI Rev 2.0.0"
 #define desc_case_2_5_1 "\
-Checks that data can be transfer using N_UNITDATA_REQ."
+Checks that data can be transferred using N_UNITDATA_REQ."
 
 int
 test_case_2_5_1(int child)
 {
-	int port = htons(10000 + child);
-	struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000000) } };
+	unsigned short port = htons(10000 + child);
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+	char buf[] = "xxxxTest Data";
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
-	test_data = "Test Data";
-	
+	DATA_buffer = buf;
+	DATA_length = strlen(DATA_buffer);
+
+	/* source and destination port, port number in the destination address is meaningless. */
+	bcopy(&port, &buf[0], sizeof(port));
+	bcopy(&port, &buf[2], sizeof(port));
+
+	test_msleep(child, LONG_WAIT);
+	state++;
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7581,6 +7619,59 @@ test_case_2_5_1(int child)
 struct test_stream test_2_5_1_conn = { &preamble_2_5_1_conn, &test_case_2_5_1_conn, &postamble_2_5_1_conn };
 struct test_stream test_2_5_1_resp = { &preamble_2_5_1_resp, &test_case_2_5_1_resp, &postamble_2_5_1_resp };
 struct test_stream test_2_5_1_list = { &preamble_2_5_1_list, &test_case_2_5_1_list, &postamble_2_5_1_list };
+
+#define tgrp_case_2_5_2 test_group_2
+#define sgrp_case_2_5_2 test_group_2_5
+#define numb_case_2_5_2 "2.5.2"
+#define name_case_2_5_2 "Successful N_UNITDATA_REQ in NS_IDLE state."
+#define sref_case_2_5_2 "NPI Rev 2.0.0"
+#define desc_case_2_5_2 "\
+Checks that data can be transferred using N_UNITDATA_REQ."
+
+int
+test_case_2_5_2(int child)
+{
+	unsigned short port = htons(10000 + ((child + 1) % 3));
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+	char buf[] = "xxxxTest Data";
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	DATA_buffer = buf;
+	DATA_length = strlen(DATA_buffer);
+
+	/* source and destination port, port number in the destination address is meaningless. */
+	bcopy(&port, &buf[0], sizeof(port));
+	bcopy(&port, &buf[2], sizeof(port));
+
+	test_msleep(child, LONG_WAIT);
+	state++;
+	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_2_5_2_conn	test_case_2_5_2
+#define test_case_2_5_2_resp	test_case_2_5_2
+#define test_case_2_5_2_list	test_case_2_5_2
+
+#define preamble_2_5_2_conn	preamble_1_idle_clns
+#define preamble_2_5_2_resp	preamble_1_idle_clns
+#define preamble_2_5_2_list	preamble_1_idle_clns
+
+#define postamble_2_5_2_conn	postamble_1_idle
+#define postamble_2_5_2_resp	postamble_1_idle
+#define postamble_2_5_2_list	postamble_1_idle
+
+struct test_stream test_2_5_2_conn = { &preamble_2_5_2_conn, &test_case_2_5_2_conn, &postamble_2_5_2_conn };
+struct test_stream test_2_5_2_resp = { &preamble_2_5_2_resp, &test_case_2_5_2_resp, &postamble_2_5_2_resp };
+struct test_stream test_2_5_2_list = { &preamble_2_5_2_list, &test_case_2_5_2_list, &postamble_2_5_2_list };
 
 /*
  *  -------------------------------------------------------------------------
@@ -7974,6 +8065,8 @@ struct test_case {
 	&test_2_4_5_conn, &test_2_4_5_resp, &test_2_4_5_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_5_1, tgrp_case_2_5_1, sgrp_case_2_5_1, name_case_2_5_1, desc_case_2_5_1, sref_case_2_5_1, {
 	&test_2_5_1_conn, &test_2_5_1_resp, &test_2_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_5_2, tgrp_case_2_5_2, sgrp_case_2_5_2, name_case_2_5_2, desc_case_2_5_2, sref_case_2_5_2, {
+	&test_2_5_2_conn, &test_2_5_2_resp, &test_2_5_2_list}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 

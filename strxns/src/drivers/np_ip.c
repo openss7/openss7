@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/10 20:56:30 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/11 10:59:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/10 20:56:30 $ by $Author: brian $
+ Last Modified $Date: 2006/05/11 10:59:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.11  2006/05/11 10:59:36  brian
+ - more testing of NPI-IP driver
+
  Revision 0.9.2.10  2006/05/10 20:56:30  brian
  - more testing
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/10 20:56:30 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/11 10:59:36 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/10 20:56:30 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/11 10:59:36 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -141,7 +144,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2006/05/10 20:56:30 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2006/05/11 10:59:36 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -925,10 +928,12 @@ npi_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	/* copy into private structure */
 	np->CONIND_number = CONIND_number;
 	np->BIND_flags = BIND_flags;
+	np->pnum = PROTOID_length;
 	for (i = 0; i < PROTOID_length; i++)
 		np->protoids[i] = PROTOID_buffer[i];
 	np->bnum = anum;
 	np->bport = ADDR_buffer[0].sin_port;
+	ptrace(("%s: %s: bound to proto = %d, bport = %d\n", DRV_NAME, __FUNCTION__, (int) np->protoids[0], (int) ntohs(np->bport)));
 	for (i = 0; i < anum; i++)
 		np->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
 	write_unlock_bh(&hp->lock);
@@ -1230,60 +1235,60 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 		/* protocol must be one of the bound protocol ids */
 		if ((np_long) QOS_buffer->n_qos_sel_info.protocol != QOS_UNKNOWN && np->pnum > 0) {
 			if ((np_long) QOS_buffer->n_qos_sel_info.protocol < 0) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_info.protocol > 255) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			for (i = 0; i < np->pnum; i++)
 				if (np->protoids[i] == QOS_buffer->n_qos_sel_info.protocol)
 					break;
 			if (i >= np->pnum) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_info.priority != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_info.priority <
 			    np->qor.priority.priority_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_info.priority >
 			    np->qor.priority.priority_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_info.ttl != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_info.ttl < np->qor.ttl.ttl_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_info.ttl > np->qor.ttl.ttl_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_info.tos != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_info.tos < np->qor.tos.tos_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_info.tos > np->qor.tos.tos_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_info.mtu != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_info.mtu < np->qor.mtu.mtu_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_info.mtu > np->qor.mtu.mtu_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
@@ -1297,7 +1302,7 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 						break;
 				}
 				if (i >= np->snum) {
-					trace();
+					_trace();
 					return (NBADQOSPARAM);
 				}
 			}
@@ -1308,7 +1313,7 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 				if (np->daddrs[i].addr == QOS_buffer->n_qos_sel_info.daddr)
 					break;
 			if (i >= np->dnum) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
@@ -1335,60 +1340,60 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 		/* protocol must be one of the bound protocol ids */
 		if ((np_long) QOS_buffer->n_qos_sel_conn.protocol != QOS_UNKNOWN && np->pnum > 0) {
 			if ((np_long) QOS_buffer->n_qos_sel_conn.protocol < 0) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_conn.protocol > 255) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			for (i = 0; i < np->pnum; i++)
 				if (np->protoids[i] == QOS_buffer->n_qos_sel_conn.protocol)
 					break;
 			if (i >= np->pnum) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_conn.priority != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_conn.priority <
 			    np->qor.priority.priority_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_conn.priority >
 			    np->qor.priority.priority_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_conn.ttl != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_conn.ttl < np->qor.ttl.ttl_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_conn.ttl > np->qor.ttl.ttl_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_conn.tos != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_conn.tos < np->qor.tos.tos_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_conn.tos > np->qor.tos.tos_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_conn.mtu != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_conn.mtu < np->qor.mtu.mtu_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_conn.mtu > np->qor.mtu.mtu_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
@@ -1402,7 +1407,7 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 						break;
 				}
 				if (i >= np->snum) {
-					trace();
+					_trace();
 					return (NBADQOSPARAM);
 				}
 			}
@@ -1413,7 +1418,7 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 				if (np->daddrs[i].addr == QOS_buffer->n_qos_sel_conn.daddr)
 					break;
 			if (i >= np->dnum) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
@@ -1439,50 +1444,50 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 		/* protocol must be one of the bound protocol ids */
 		if ((np_long) QOS_buffer->n_qos_sel_ud.protocol != QOS_UNKNOWN && np->pnum > 0) {
 			if ((np_long) QOS_buffer->n_qos_sel_ud.protocol < 0) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_ud.protocol > 255) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			for (i = 0; i < np->pnum; i++)
 				if (np->protoids[i] == QOS_buffer->n_qos_sel_ud.protocol)
 					break;
 			if (i >= np->pnum) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_ud.priority != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_ud.priority <
 			    np->qor.priority.priority_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_ud.priority >
 			    np->qor.priority.priority_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_ud.ttl != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_ud.ttl < np->qor.ttl.ttl_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_ud.ttl > np->qor.ttl.ttl_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
 		if ((np_long) QOS_buffer->n_qos_sel_ud.tos != QOS_UNKNOWN) {
 			if ((np_long) QOS_buffer->n_qos_sel_ud.tos < np->qor.tos.tos_min_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 			if ((np_long) QOS_buffer->n_qos_sel_ud.tos > np->qor.tos.tos_max_value) {
-				trace();
+				_trace();
 				return (NBADQOSPARAM);
 			}
 		}
@@ -1496,7 +1501,7 @@ npi_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fl
 						break;
 				}
 				if (i >= np->snum) {
-					trace();
+					_trace();
 					return (NBADQOSPARAM);
 				}
 			}
@@ -1538,6 +1543,8 @@ npi_unbind(struct np *np)
 		np->bprev = &np->bnext;
 		np->bhash = NULL;
 		npi_unbind_prot(np->protoids[0], np->info.SERV_type);
+		np->bport = np->sport = 0;
+		np->bnum = np->snum = np->pnum = 0;
 		np_release(&np);
 		write_unlock_bh(&hp->lock);
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
@@ -1844,6 +1851,7 @@ npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 		size_t plen = msgdsize(mp);
 		size_t tlen = plen + sizeof(struct iphdr);
 
+		ptrace(("%s: %s: data sent\n", DRV_NAME, __FUNCTION__));
 		usual(hlen);
 		usual(plen);
 
@@ -1861,6 +1869,8 @@ npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 			iph->version = 4;
 			iph->ihl = 5;
 			iph->tos = np->qos.tos;
+			iph->frag_off = htons(IP_DF); /* never frag */
+			// iph->frag_off = 0; /* need qos bit */
 			iph->ttl = np->qos.ttl;
 			iph->daddr = rt->rt_dst;
 			iph->saddr = np->qos.saddr ? np->qos.saddr : rt->rt_src;
@@ -1878,6 +1888,7 @@ npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 #endif
 #endif
 #endif
+			skb->priority = np->qos.priority;
 			/* IMPLEMENTATION NOTE:- The passed in mblk_t pointer is possibly a message
 			   buffer chain and we must iterate along the b_cont pointer.  Rather than
 			   copying at this point, it is probably a better idea to create a
@@ -1892,15 +1903,16 @@ npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 				} else
 					rare();
 			}
+			printd(("sent message %p\n", skb));
 #ifdef HAVE_KFUNC_DST_OUTPUT
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, npi_ip_queue_xmit);
 #else
 			npi_ip_queue_xmit(skb);
 #endif
 		} else
-			rare();
+			__rare();
 	} else
-		rare();
+		__rare();
 	return (QR_DONE);
 }
 
@@ -3412,7 +3424,7 @@ ne_bind_req(queue_t *q, mblk_t *mp)
 			NPI_error = NBADADDR;
 			if (unlikely(ADDR_length < sizeof(struct sockaddr_in)))
 				goto error;
-			if (unlikely(ADDR_length > (sizeof(struct sockaddr_in) << 3)))
+			if (unlikely(ADDR_length > sizeof(ADDR_buffer)))
 				goto error;
 			if (unlikely(ADDR_length % sizeof(struct sockaddr_in) != 0))
 				goto error;
@@ -3438,6 +3450,8 @@ ne_bind_req(queue_t *q, mblk_t *mp)
 			ADDR_buffer[0].sin_port = 0;
 			ADDR_buffer[0].sin_addr.s_addr = INADDR_ANY;
 		}
+		ptrace(("%s: %s: proto = %d, bport = %d\n", DRV_NAME, __FUNCTION__,
+					(int) PROTOID_buffer[0], (int) ntohs(ADDR_buffer[0].sin_port)));
 		NPI_error = ne_bind_ack(q, PROTOID_buffer, p->PROTOID_length,
 					ADDR_buffer, ADDR_length, p->CONIND_number, p->BIND_flags);
 		if (unlikely(NPI_error != 0))
@@ -4543,38 +4557,26 @@ npi_lookup_conn(struct iphdr *iph, struct udphdr *uh)
 						continue;
 					score++;
 				}
-				{
-					int found = 0;
-
-					for (i = 0; i < np->snum; i++) {
-						if (np->saddrs[i].addr != 0) {
-							if (np->saddrs[i].addr != daddr)
-								continue;
-							found = 1;
-							score++;
-							break;
-						} else
-							found = 1;
-					}
-					if (found == 0)
+				for (i = 0; i < np->snum; i++) {
+					if (np->saddrs[i].addr == 0)
+						break;
+					if (np->saddrs[i].addr != daddr)
 						continue;
+					score++;
+					break;
 				}
-				{
-					int found = 0;
-
-					for (i = 0; i < np->snum; i++) {
-						if (np->daddrs[i].addr != 0) {
-							if (np->daddrs[i].addr != saddr)
-								continue;
-							found = 1;
-							score++;
-							break;
-						} else
-							found = 1;
-					}
-					if (found == 0)
+				if (i >= np->snum)
+					continue;
+				for (i = 0; i < np->dnum; i++) {
+					if (np->daddrs[i].addr == 0)
+						break;
+					if (np->daddrs[i].addr != saddr)
 						continue;
+					score++;
+					break;
 				}
+				if (i >= np->dnum)
+					continue;
 				if (score > hiscore) {
 					hiscore = score;
 					result = np;
@@ -4622,7 +4624,9 @@ npi_lookup_bind(struct iphdr *iph, struct udphdr *uh)
 	hp2 = &npi_bhash[npi_bhashfn(proto, 0)];
 
 	hp = hp1;
+	ptrace(("%s: %s: proto = %d, bport = %d\n", DRV_NAME, __FUNCTION__, (int) proto, (int) ntohs(bport)));
 	do {
+		_trace();
 		read_lock_bh(&hp->lock);
 		{
 			struct np *np;
@@ -4632,35 +4636,39 @@ npi_lookup_bind(struct iphdr *iph, struct udphdr *uh)
 			for (np = hp->list; np; np = np->bnext) {
 				int score = 0;
 
+				_trace();
 				/* only listening N_COTS Streams and N_CLTS Streams */
-				if (np->CONIND_number == 0 && np->info.SERV_type != N_CLNS)
+				if (np->CONIND_number == 0 && np->info.SERV_type != N_CLNS) {
+					_ptrace(("%s: %s: skipping based on service type\n", DRV_NAME, __FUNCTION__));
 					continue;
+				}
 				/* only Streams in close to the correct state */
-				if ((state = npi_get_state(np)) != NS_IDLE && state != NS_WACK_UREQ)
+				if ((state = npi_get_state(np)) != NS_IDLE && state != NS_WACK_UREQ) {
+					_ptrace(("%s: %s: skipping based on state %d\n", DRV_NAME, __FUNCTION__, state));
 					continue;
+				}
 				if (np->bport != 0) {
-					if (np->bport != bport)
+					if (np->bport != bport) {
+						_ptrace(("%s: %s: skipping based on port %d\n", DRV_NAME, __FUNCTION__, (int) ntohs(np->bport)));
 						continue;
+					}
 					score++;
 				}
 				if (!(np->BIND_flags & (DEFAULT_DEST | DEFAULT_LISTENER)))
 					score++;
-				{
-					int found = 0;
-
-					for (i = 0; i < np->bnum; i++) {
-						if (np->baddrs[i].addr != 0) {
-							if (np->baddrs[i].addr != daddr)
-								continue;
-							found = 1;
-							score++;
-							break;
-						} else
-							found = 1;
-					}
-					if (found == 0)
+				for (i = 0; i < np->bnum; i++) {
+					if (np->baddrs[i].addr == 0)
+						break;
+					if (np->baddrs[i].addr != daddr)
 						continue;
+					score++;
+					break;
 				}
+				if (i >= np->bnum) {
+					_ptrace(("%s: %s: skipping based on bound address\n", DRV_NAME, __FUNCTION__));
+					continue;
+				}
+				_trace();
 				if (score > hiscore) {
 					hiscore = score;
 					result = np;
@@ -4701,16 +4709,20 @@ npi_lookup_next(struct np *np_prev, struct iphdr *iph, struct udphdr *uh)
 	ppp = &np_prots[iph->protocol];
 
 	read_lock_bh(&np_prot_lock);
+	_trace();
 	if ((pp = *ppp)) {
+		_trace();
 		if (pp->corefs > 0) {
 			if (result == NULL)
 				result = npi_lookup_conn(iph, uh);
 			if (result == NULL)
 				result = npi_lookup_bind(iph, uh);
 		} else if (pp->clrefs > 0) {
+			_trace();
 			if (result == NULL)
 				result = npi_lookup_bind(iph, uh);
-		}
+		} else
+			rare();
 	}
 	read_unlock_bh(&np_prot_lock);
 	return (result);
@@ -4719,6 +4731,7 @@ npi_lookup_next(struct np *np_prev, struct iphdr *iph, struct udphdr *uh)
 STATIC INLINE fastcall struct np *
 npi_lookup(struct iphdr *iph, struct udphdr *uh)
 {
+	_trace();
 	return npi_lookup_next(NULL, iph, uh);
 }
 
@@ -4766,6 +4779,7 @@ npi_free(char *data)
 STATIC int
 npi_v4_rcv(struct sk_buff *skb)
 {
+	printd(("%s: %s: packet received %p\n", DRV_NAME, __FUNCTION__, skb));
 	read_lock_bh(&np_prot_lock);	/* lock stream lists */
 	{
 		struct np *np;
@@ -4783,11 +4797,15 @@ npi_v4_rcv(struct sk_buff *skb)
 				if ((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr))) {
 					mp->b_datap->db_type = M_DATA;
 					mp->b_wptr += plen;
-					put(np->oq, mp);
+					if (!putq(np->oq, mp))
+						freemsg(mp);
+					// put(np->oq, mp);
 				} else
 					kfree_skb(skb);
 			} else
 				kfree_skb(skb);
+			/* release reference from lookup */
+			np_release(&np);
 		} else if (npi_v4_rcv_next(skb)) {
 			/* TODO: want to generate an ICMP error here */
 		}
@@ -4809,6 +4827,7 @@ npi_v4_rcv(struct sk_buff *skb)
 STATIC void
 npi_v4_err(struct sk_buff *skb, u32 info)
 {
+	printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
 	read_lock_bh(&np_prot_lock);
 	{
 		struct np *np;
@@ -4823,9 +4842,13 @@ npi_v4_err(struct sk_buff *skb, u32 info)
 					mp->b_datap->db_type = M_ERROR;
 					bcopy(skb->nh.raw, mp->b_wptr, plen);
 					mp->b_wptr += plen;
-					put(np->oq, mp);
+					if (!putq(np->oq, mp))
+						freemsg(mp);
+					// put(np->oq, mp);
 				}
 			}
+			/* release reference from lookup */
+			np_release(&np);
 		}
 		npi_v4_err_next(skb, info);
 	}
