@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/05/10 09:42:43 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/10 20:56:31 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/10 09:42:43 $ by $Author: brian $
+ Last Modified $Date: 2006/05/10 20:56:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.7  2006/05/10 20:56:31  brian
+ - more testing
+
  Revision 0.9.2.6  2006/05/10 09:42:43  brian
  - more testing on NPI-IP driver
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/05/10 09:42:43 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/10 20:56:31 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/05/10 09:42:43 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/10 20:56:31 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -7289,7 +7292,7 @@ struct test_stream test_2_3_2_list = { &preamble_2_3_2_list, &test_case_2_3_2_li
 
 #define test_group_2_4 "2.4. Non-fatal errors in response to N_UNITDATA_REQ in the NS_IDLE state"
 #define tgrp_case_2_4_1 test_group_2
-#define sgrp_case_2_4_1 test_group_2_3
+#define sgrp_case_2_4_1 test_group_2_4
 #define numb_case_2_4_1 "2.4.1"
 #define name_case_2_4_1 "NBADDATA for N_UNITDATA_REQ in NS_IDLE state."
 #define sref_case_2_4_1 "NPI Rev 2.0.0"
@@ -7338,7 +7341,7 @@ struct test_stream test_2_4_1_resp = { &preamble_2_4_1_resp, &test_case_2_4_1_re
 struct test_stream test_2_4_1_list = { &preamble_2_4_1_list, &test_case_2_4_1_list, &postamble_2_4_1_list };
 
 #define tgrp_case_2_4_2 test_group_2
-#define sgrp_case_2_4_2 test_group_2_3
+#define sgrp_case_2_4_2 test_group_2_4
 #define numb_case_2_4_2 "2.4.2"
 #define name_case_2_4_2 "NBADDATA for N_UNITDATA_REQ in NS_IDLE state."
 #define sref_case_2_4_2 "NPI Rev 2.0.0"
@@ -7387,7 +7390,7 @@ struct test_stream test_2_4_2_resp = { &preamble_2_4_2_resp, &test_case_2_4_2_re
 struct test_stream test_2_4_2_list = { &preamble_2_4_2_list, &test_case_2_4_2_list, &postamble_2_4_2_list };
 
 #define tgrp_case_2_4_3 test_group_2
-#define sgrp_case_2_4_3 test_group_2_3
+#define sgrp_case_2_4_3 test_group_2_4
 #define numb_case_2_4_3 "2.4.3"
 #define name_case_2_4_3 "NBADDATA for N_UNITDATA_REQ in NS_IDLE state."
 #define sref_case_2_4_3 "NPI Rev 2.0.0"
@@ -7436,7 +7439,7 @@ struct test_stream test_2_4_3_resp = { &preamble_2_4_3_resp, &test_case_2_4_3_re
 struct test_stream test_2_4_3_list = { &preamble_2_4_3_list, &test_case_2_4_3_list, &postamble_2_4_3_list };
 
 #define tgrp_case_2_4_4 test_group_2
-#define sgrp_case_2_4_4 test_group_2_3
+#define sgrp_case_2_4_4 test_group_2_4
 #define numb_case_2_4_4 "2.4.4"
 #define name_case_2_4_4 "NBADADDR for N_UNITDATA_REQ in NS_IDLE state."
 #define sref_case_2_4_4 "NPI Rev 2.0.0"
@@ -7485,7 +7488,7 @@ struct test_stream test_2_4_4_resp = { &preamble_2_4_4_resp, &test_case_2_4_4_re
 struct test_stream test_2_4_4_list = { &preamble_2_4_4_list, &test_case_2_4_4_list, &postamble_2_4_4_list };
 
 #define tgrp_case_2_4_5 test_group_2
-#define sgrp_case_2_4_5 test_group_2_3
+#define sgrp_case_2_4_5 test_group_2_4
 #define numb_case_2_4_5 "2.4.5"
 #define name_case_2_4_5 "NBADADDR for N_UNITDATA_REQ in NS_IDLE state."
 #define sref_case_2_4_5 "NPI Rev 2.0.0"
@@ -7532,6 +7535,52 @@ test_case_2_4_5(int child)
 struct test_stream test_2_4_5_conn = { &preamble_2_4_5_conn, &test_case_2_4_5_conn, &postamble_2_4_5_conn };
 struct test_stream test_2_4_5_resp = { &preamble_2_4_5_resp, &test_case_2_4_5_resp, &postamble_2_4_5_resp };
 struct test_stream test_2_4_5_list = { &preamble_2_4_5_list, &test_case_2_4_5_list, &postamble_2_4_5_list };
+
+#define test_group_2_5 "2.5. Successful N_CLNS data transfer."
+#define tgrp_case_2_5_1 test_group_2
+#define sgrp_case_2_5_1 test_group_2_5
+#define numb_case_2_5_1 "2.5.1"
+#define name_case_2_5_1 "Successful N_UNITDATA_REQ in NS_IDLE state."
+#define sref_case_2_5_1 "NPI Rev 2.0.0"
+#define desc_case_2_5_1 "\
+Checks that data can be transfer using N_UNITDATA_REQ."
+
+int
+test_case_2_5_1(int child)
+{
+	int port = htons(10000 + child);
+	struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000000) } };
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	test_data = "Test Data";
+	
+	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_2_5_1_conn	test_case_2_5_1
+#define test_case_2_5_1_resp	test_case_2_5_1
+#define test_case_2_5_1_list	test_case_2_5_1
+
+#define preamble_2_5_1_conn	preamble_1_idle_clns
+#define preamble_2_5_1_resp	preamble_1_idle_clns
+#define preamble_2_5_1_list	preamble_1_idle_clns
+
+#define postamble_2_5_1_conn	postamble_1_idle
+#define postamble_2_5_1_resp	postamble_1_idle
+#define postamble_2_5_1_list	postamble_1_idle
+
+struct test_stream test_2_5_1_conn = { &preamble_2_5_1_conn, &test_case_2_5_1_conn, &postamble_2_5_1_conn };
+struct test_stream test_2_5_1_resp = { &preamble_2_5_1_resp, &test_case_2_5_1_resp, &postamble_2_5_1_resp };
+struct test_stream test_2_5_1_list = { &preamble_2_5_1_list, &test_case_2_5_1_list, &postamble_2_5_1_list };
 
 /*
  *  -------------------------------------------------------------------------
@@ -7923,6 +7972,8 @@ struct test_case {
 	&test_2_4_4_conn, &test_2_4_4_resp, &test_2_4_4_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_4_5, tgrp_case_2_4_5, sgrp_case_2_4_5, name_case_2_4_5, desc_case_2_4_5, sref_case_2_4_5, {
 	&test_2_4_5_conn, &test_2_4_5_resp, &test_2_4_5_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_5_1, tgrp_case_2_5_1, sgrp_case_2_5_1, name_case_2_5_1, desc_case_2_5_1, sref_case_2_5_1, {
+	&test_2_5_1_conn, &test_2_5_1_resp, &test_2_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 

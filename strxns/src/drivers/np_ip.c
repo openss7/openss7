@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/05/10 09:42:42 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/10 20:56:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/10 09:42:42 $ by $Author: brian $
+ Last Modified $Date: 2006/05/10 20:56:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.10  2006/05/10 20:56:30  brian
+ - more testing
+
  Revision 0.9.2.9  2006/05/10 09:42:42  brian
  - more testing on NPI-IP driver
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/05/10 09:42:42 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/10 20:56:30 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/05/10 09:42:42 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/10 20:56:30 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -138,7 +141,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2006/05/10 09:42:42 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2006/05/10 20:56:30 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -912,6 +915,8 @@ npi_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 		write_unlock_bh(&hp->lock);
 		return (err);
 	}
+	if ((np_long) np->qos.protocol == QOS_UNKNOWN)
+		np->qos.protocol = proto;
 	if ((np->bnext = hp->list))
 		np->bnext->bprev = &np->bnext;
 	np->bprev = &hp->list;
