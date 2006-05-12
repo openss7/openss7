@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/11 10:59:36 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/12 01:16:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/11 10:59:36 $ by $Author: brian $
+ Last Modified $Date: 2006/05/12 01:16:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.13  2006/05/12 01:16:20  brian
+ - more results from testing NPI-IP driver
+
+ Revision 0.9.2.12  2006/05/11 22:16:46  brian
+ - more testing of NPI-IP driver
+
  Revision 0.9.2.11  2006/05/11 10:59:36  brian
  - more testing of NPI-IP driver
 
@@ -85,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/11 10:59:36 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/12 01:16:20 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/11 10:59:36 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/12 01:16:20 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -144,7 +150,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2006/05/11 10:59:36 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2006/05/12 01:16:20 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -957,6 +963,134 @@ dst_pmtu(struct dst_entry *dst)
 #endif
 #endif
 
+#ifdef HAVE_KFUNC_DST_OUTPUT
+STATIC INLINE int
+npi_ip_queue_xmit(struct sk_buff *skb)
+{
+	struct rtable *rt = (struct rtable *) skb->dst;
+	struct iphdr *iph = skb->nh.iph;
+
+#ifdef NETIF_F_TSO
+	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
+#else
+	ip_select_ident(iph, &rt->u.dst, NULL);
+#endif
+	ip_send_check(iph);
+#ifdef HAVE_KFUNC_IP_DST_OUTPUT
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
+#else
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
+#endif
+}
+#else
+STATIC INLINE int
+npi_ip_queue_xmit(struct sk_buff *skb)
+{
+	struct rtable *rt = (struct rtable *) skb->dst;
+	struct iphdr *iph = skb->nh.iph;
+
+	if (skb->len > dst_pmtu(&rt->u.dst)) {
+		rare();
+		return ip_fragment(skb, skb->dst->output);
+	} else {
+		iph->frag_off |= __constant_htons(IP_DF);
+		ip_send_check(iph);
+		return skb->dst->output(skb);
+	}
+}
+#endif
+
+/**
+ * npi_senddata - process a unit data request
+ * @np: Stream private structure
+ * @protocol: IP protocol number for packet
+ * @daddr: destination address
+ * @mp: message payload
+ */
+STATIC INLINE fastcall __hot_put int
+npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
+{
+	struct rtable *rt = NULL;
+
+	if (!ip_route_output(&rt, daddr, np->qos.saddr, 0, 0)) {
+		struct sk_buff *skb;
+		struct net_device *dev = rt->u.dst.dev;
+		size_t hlen = (dev->hard_header_len + 15) & ~15;
+		size_t plen = msgdsize(mp);
+		size_t tlen = plen + sizeof(struct iphdr);
+
+		ptrace(("%s: %s: data sent\n", DRV_NAME, __FUNCTION__));
+		usual(hlen);
+		usual(plen);
+
+		if ((skb = alloc_skb(hlen + tlen, GFP_ATOMIC))) {
+			mblk_t *bp;
+			struct iphdr *iph;
+			unsigned char *data;
+
+			skb_reserve(skb, hlen);
+			/* find headers */
+			iph = (typeof(iph)) __skb_put(skb, tlen);
+			data = (unsigned char *) iph + sizeof(struct iphdr);
+			skb->dst = &rt->u.dst;
+			skb->priority = np->qos.priority;
+			iph->version = 4;
+			iph->ihl = 5;
+			iph->tos = np->qos.tos;
+			iph->frag_off = htons(IP_DF); /* never frag */
+			// iph->frag_off = 0; /* need qos bit */
+			iph->ttl = np->qos.ttl;
+			iph->daddr = rt->rt_dst;
+			iph->saddr = np->qos.saddr ? np->qos.saddr : rt->rt_src;
+			iph->protocol = protocol;
+			iph->tot_len = htons(tlen);
+			skb->nh.iph = iph;
+#ifndef HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+			__ip_select_ident(iph, &rt->u.dst);
+#else
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+			__ip_select_ident(iph, &rt->u.dst, 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
+#endif
+#endif
+			skb->priority = np->qos.priority;
+			/* IMPLEMENTATION NOTE:- The passed in mblk_t pointer is possibly a message
+			   buffer chain and we must iterate along the b_cont pointer.  Rather than
+			   copying at this point, it is probably a better idea to create a
+			   fragmented sk_buff and just point to the elements.  Of course, we also
+			   need an sk_buff destructor.  This is not done yet. */
+			for (bp = mp; bp; bp = bp->b_cont) {
+				int blen = bp->b_wptr - bp->b_rptr;
+
+				if (blen > 0) {
+					bcopy(bp->b_rptr, data, blen);
+					data += blen;
+				} else
+					rare();
+			}
+			printd(("sent message %p\n", skb));
+#ifdef HAVE_KFUNC_DST_OUTPUT
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, npi_ip_queue_xmit);
+#else
+			npi_ip_queue_xmit(skb);
+#endif
+		} else
+			__rare();
+	} else
+		__rare();
+	return (QR_DONE);
+}
+
+STATIC INLINE fastcall int
+npi_datack(queue_t *q)
+{
+	/* not supported */
+	return (-EOPNOTSUPP);
+}
+
 STATIC fastcall int
 npi_conn_check(struct np *np, unsigned char proto)
 {
@@ -1034,6 +1168,11 @@ npi_conn_check(struct np *np, unsigned char proto)
 /**
  * npi_connect - form a connection
  * @np: private structure
+ * @DEST_buffer: pointer to destination addresses
+ * @DEST_length: length of destination addresses
+ * @QOS_buffer: pointer to connection quality-of-service parameters
+ * @CONN_flags: connection flags
+ * @dp: user data
  *
  * Destination addresses and port number as well as connection request quality of service parameters
  * should already be stored into the private structure.  Yes, this information will remain if there
@@ -1042,7 +1181,7 @@ npi_conn_check(struct np *np, unsigned char proto)
  */
 STATIC INLINE fastcall int
 npi_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
-	    struct N_qos_sel_conn_ip *QOS_buffer, np_ulong CONN_flags)
+	    struct N_qos_sel_conn_ip *QOS_buffer, np_ulong CONN_flags, mblk_t *dp)
 {
 	size_t dnum = DEST_length / sizeof(*DEST_buffer);
 	np_long NPI_error;
@@ -1185,6 +1324,10 @@ npi_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_lengt
 	np->qos.mtu = QOS_buffer->mtu;
 	np->qos.saddr = QOS_buffer->saddr;
 	np->qos.daddr = QOS_buffer->daddr;
+
+	if (dp != NULL) 
+		npi_senddata(np, np->qos.protocol, np->qos.daddr, dp);
+
 	return (0);
       error:
 	return (NPI_error);
@@ -1789,141 +1932,6 @@ npi_disconnect(struct np *np, struct sockaddr_in *res, mblk_t *seq, np_ulong rea
 }
 
 /*
- *  =========================================================================
- *
- *  IP Message Transmission.
- *
- *  =========================================================================
- */
-#ifdef HAVE_KFUNC_DST_OUTPUT
-STATIC INLINE int
-npi_ip_queue_xmit(struct sk_buff *skb)
-{
-	struct rtable *rt = (struct rtable *) skb->dst;
-	struct iphdr *iph = skb->nh.iph;
-
-#ifdef NETIF_F_TSO
-	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
-#else
-	ip_select_ident(iph, &rt->u.dst, NULL);
-#endif
-	ip_send_check(iph);
-#ifdef HAVE_KFUNC_IP_DST_OUTPUT
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
-#else
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
-#endif
-}
-#else
-STATIC INLINE int
-npi_ip_queue_xmit(struct sk_buff *skb)
-{
-	struct rtable *rt = (struct rtable *) skb->dst;
-	struct iphdr *iph = skb->nh.iph;
-
-	if (skb->len > dst_pmtu(&rt->u.dst)) {
-		rare();
-		return ip_fragment(skb, skb->dst->output);
-	} else {
-		iph->frag_off |= __constant_htons(IP_DF);
-		ip_send_check(iph);
-		return skb->dst->output(skb);
-	}
-}
-#endif
-
-/**
- * npi_senddata - process a unit data request
- * @np: Stream private structure
- * @protocol: IP protocol number for packet
- * @daddr: destination address
- * @mp: message payload
- */
-STATIC INLINE fastcall __hot_put int
-npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
-{
-	struct rtable *rt = NULL;
-
-	if (!ip_route_output(&rt, daddr, np->qos.saddr, 0, 0)) {
-		struct sk_buff *skb;
-		struct net_device *dev = rt->u.dst.dev;
-		size_t hlen = (dev->hard_header_len + 15) & ~15;
-		size_t plen = msgdsize(mp);
-		size_t tlen = plen + sizeof(struct iphdr);
-
-		ptrace(("%s: %s: data sent\n", DRV_NAME, __FUNCTION__));
-		usual(hlen);
-		usual(plen);
-
-		if ((skb = alloc_skb(hlen + tlen, GFP_ATOMIC))) {
-			mblk_t *bp;
-			struct iphdr *iph;
-			unsigned char *data;
-
-			skb_reserve(skb, hlen);
-			/* find headers */
-			iph = (typeof(iph)) __skb_put(skb, tlen);
-			data = (unsigned char *) iph + sizeof(struct iphdr);
-			skb->dst = &rt->u.dst;
-			skb->priority = np->qos.priority;
-			iph->version = 4;
-			iph->ihl = 5;
-			iph->tos = np->qos.tos;
-			iph->frag_off = htons(IP_DF); /* never frag */
-			// iph->frag_off = 0; /* need qos bit */
-			iph->ttl = np->qos.ttl;
-			iph->daddr = rt->rt_dst;
-			iph->saddr = np->qos.saddr ? np->qos.saddr : rt->rt_src;
-			iph->protocol = protocol;
-			iph->tot_len = htons(tlen);
-			skb->nh.iph = iph;
-#ifndef HAVE_KFUNC_DST_OUTPUT
-#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
-			__ip_select_ident(iph, &rt->u.dst);
-#else
-#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
-			__ip_select_ident(iph, &rt->u.dst, 0);
-#else
-#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
-#endif
-#endif
-#endif
-			skb->priority = np->qos.priority;
-			/* IMPLEMENTATION NOTE:- The passed in mblk_t pointer is possibly a message
-			   buffer chain and we must iterate along the b_cont pointer.  Rather than
-			   copying at this point, it is probably a better idea to create a
-			   fragmented sk_buff and just point to the elements.  Of course, we also
-			   need an sk_buff destructor.  This is not done yet. */
-			for (bp = mp; bp; bp = bp->b_cont) {
-				int blen = bp->b_wptr - bp->b_rptr;
-
-				if (blen > 0) {
-					bcopy(bp->b_rptr, data, blen);
-					data += blen;
-				} else
-					rare();
-			}
-			printd(("sent message %p\n", skb));
-#ifdef HAVE_KFUNC_DST_OUTPUT
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, npi_ip_queue_xmit);
-#else
-			npi_ip_queue_xmit(skb);
-#endif
-		} else
-			__rare();
-	} else
-		__rare();
-	return (QR_DONE);
-}
-
-STATIC INLINE fastcall int
-npi_datack(queue_t *q)
-{
-	/* not supported */
-	return (-EOPNOTSUPP);
-}
-
-/*
  *  Addressing:
  *
  *  NSAPs (Protocol IDs) are IP protocol numbers.  NSAP addresses consist of a port number and a
@@ -2372,6 +2380,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
  * @RES_length: length of responding addresses
  * @QOS_buffer: connected quality of service
  * @CONN_flags: connected connection flags
+ * @dp: user data
  *
  * The NPI-IP driver only supports a pseudo-connection-oriented mode.  The destination address and
  * quality-of-service parameters returned in the N_CONN_CON do not represent a connection
@@ -2392,7 +2401,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
  */
 STATIC INLINE fastcall int
 ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
-	    struct N_qos_sel_conn_ip *QOS_buffer, np_ulong CONN_flags)
+	    struct N_qos_sel_conn_ip *QOS_buffer, np_ulong CONN_flags, mblk_t *dp)
 {
 	struct np *np = NP_PRIV(q);
 	mblk_t *mp = NULL;
@@ -2406,7 +2415,7 @@ ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 
-	NPI_error = npi_connect(np, RES_buffer, RES_length, QOS_buffer, CONN_flags);
+	NPI_error = npi_connect(np, RES_buffer, RES_length, QOS_buffer, CONN_flags, dp);
 	if (unlikely(NPI_error != 0))
 		goto free_error;
 
@@ -3576,7 +3585,7 @@ STATIC INLINE fastcall __hot_put int
 ne_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
-	size_t mlen;
+	size_t dlen;
 	N_unitdata_req_t *p;
 	struct sockaddr_in dst_buf, *DEST_buffer = NULL;
 	np_long NPI_error;
@@ -3616,7 +3625,7 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 	NPI_error = NBADDATA;
 	if (unlikely(dp == NULL))
 		goto error;
-	if (unlikely((mlen = msgdsize(dp)) <= 0 || mlen > 65535 - sizeof(struct iphdr)))
+	if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > np->info.NSDU_size))
 		goto error;
 	if (unlikely((NPI_error = npi_senddata(np, np->qos.protocol, daddr, dp)) < 0))
 		goto error;
@@ -3656,6 +3665,8 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	struct N_qos_sel_conn_ip qos_buf = { N_QOS_SEL_CONN_IP, }, *QOS_buffer = &qos_buf;
 	struct sockaddr_in dst_buf[8] = { {AF_INET,}, }, *DEST_buffer = NULL;
 	np_long NPI_error;
+	mblk_t *dp = mp->b_cont;
+	size_t dlen;
 	int i;
 
 	NPI_error = -EINVAL;
@@ -3688,25 +3699,25 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	NPI_error = NBADFLAG;
 	if (unlikely(p->CONN_flags != 0))
 		goto error;
-	if (p->DEST_length != 0) {
-		NPI_error = NBADADDR;
-		if (unlikely(mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length))
+	NPI_error = NNOADDR;
+	if (p->DEST_length == 0)
+		goto error;
+	NPI_error = NBADADDR;
+	if (unlikely(mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length))
+		goto error;
+	if (unlikely(p->DEST_length < sizeof(*DEST_buffer)))
+		goto error;
+	if (unlikely(p->DEST_length > (sizeof(*DEST_buffer) << 3)))
+		goto error;
+	if (unlikely(p->DEST_length % sizeof(*DEST_buffer) != 0))
+		goto error;
+	DEST_buffer = dst_buf;
+	bcopy(mp->b_rptr + p->DEST_offset, DEST_buffer, p->DEST_length);
+	if (unlikely(DEST_buffer[0].sin_family != AF_INET && DEST_buffer[0].sin_family != 0))
+		goto error;
+	for (i = 0; i < p->DEST_length / sizeof(*DEST_buffer); i++)
+		if (unlikely(DEST_buffer[i].sin_addr.s_addr == INADDR_ANY))
 			goto error;
-		if (unlikely(p->DEST_length < sizeof(*DEST_buffer)))
-			goto error;
-		if (unlikely(p->DEST_length > (sizeof(*DEST_buffer) << 3)))
-			goto error;
-		if (unlikely(p->DEST_length % sizeof(*DEST_buffer) != 0))
-			goto error;
-		DEST_buffer = dst_buf;
-		bcopy(mp->b_rptr + p->DEST_offset, DEST_buffer, p->DEST_length);
-		if (unlikely
-		    (DEST_buffer[0].sin_family != AF_INET && DEST_buffer[0].sin_family != 0))
-			goto error;
-		for (i = 0; i < p->DEST_length / sizeof(*DEST_buffer); i++)
-			if (unlikely(DEST_buffer[i].sin_addr.s_addr == INADDR_ANY))
-				goto error;
-	}
 	if (p->QOS_length != 0) {
 		NPI_error = NBADOPT;
 		if (unlikely(mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length))
@@ -3731,11 +3742,17 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 		QOS_buffer->saddr = QOS_UNKNOWN;
 		QOS_buffer->daddr = QOS_UNKNOWN;
 	}
+	if (dp != NULL) {
+		NPI_error = NBADDATA;
+		if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > np->info.CDATA_size))
+			goto error;
+	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
-	if (unlikely((NPI_error = ne_conn_con(q, DEST_buffer, p->DEST_length,
-					      QOS_buffer, p->CONN_flags)) < 0))
+	NPI_error = ne_conn_con(q, DEST_buffer, p->DEST_length, QOS_buffer, p->CONN_flags, dp);
+	goto error;
+	if (unlikely(NPI_error != 0))
 		goto error;
-	return (NPI_error);
+	return (QR_TRIMMED);
       error:
 	return ne_error_ack(q, N_CONN_REQ, NPI_error);
 }
@@ -3782,7 +3799,7 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 	NPI_error = NOUTSTATE;
 	if (unlikely(np->info.SERV_type != N_CONS))
 		goto error;
-	if (unlikely(npi_not_state(np, NSM_LISTEN)))
+	if (unlikely(npi_not_state(np, NSF_WRES_CIND)))
 		goto error;
 	if (p->RES_length != 0) {
 		NPI_error = NBADADDR;
@@ -3923,6 +3940,26 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 		NPI_error = NBADSEQ;
 		if (npi_get_state(np) == NS_WRES_CIND)
 			goto error;
+	}
+	NPI_error = NOUTSTATE;
+	switch (npi_get_state(np)) {
+	case NS_WCON_CREQ:
+		npi_set_state(np, NS_WACK_DREQ6);
+		break;
+	case NS_WRES_CIND:
+		npi_set_state(np, NS_WACK_DREQ7);
+		break;
+	case NS_DATA_XFER:
+		npi_set_state(np, NS_WACK_DREQ9);
+		break;
+	case NS_WCON_RREQ:
+		npi_set_state(np, NS_WACK_DREQ10);
+		break;
+	case NS_WRES_RIND:
+		npi_set_state(np, NS_WACK_DREQ11);
+		break;
+	default:
+		goto error;
 	}
 	/* Ok, all checking done.  Now we need to disconnect the address. */
 	NPI_error = ne_ok_ack(q, N_DISCON_REQ, RES_buffer, p->RES_length, NULL, SEQ_number, NULL,

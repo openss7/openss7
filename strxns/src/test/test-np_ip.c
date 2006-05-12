@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/11 10:59:37 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/12 01:16:22 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/11 10:59:37 $ by $Author: brian $
+ Last Modified $Date: 2006/05/12 01:16:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.10  2006/05/12 01:16:22  brian
+ - more results from testing NPI-IP driver
+
+ Revision 0.9.2.9  2006/05/11 22:16:47  brian
+ - more testing of NPI-IP driver
+
  Revision 0.9.2.8  2006/05/11 10:59:37  brian
  - more testing of NPI-IP driver
 
@@ -96,9 +102,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/11 10:59:37 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/12 01:16:22 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/11 10:59:37 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/12 01:16:22 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -4219,7 +4225,7 @@ int
 preamble_1_idle_clns(int child)
 {
 	unsigned short port = htons(10000 + child);
-	int proto = 140;
+	unsigned char proto = 140;
 	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
 	unsigned char prot[] = { proto };
 
@@ -4243,7 +4249,7 @@ preamble_1_idle_clns(int child)
 	if (TOKEN_value != 0)
 		goto failure;
 	state++;
-	if (PROTOID_length != 1)
+	if (PROTOID_length != sizeof(prot))
 		goto failure;
 	state++;
 	if (PROTOID_buffer[0] != proto)
@@ -4278,6 +4284,63 @@ preamble_1_idle_clns(int child)
 	return (__RESULT_FAILURE);
 }
 static int
+preamble_1_idle_cons(int child)
+{
+	unsigned short port = htons(10000 + child);
+	unsigned char proto = 140;
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	unsigned char prot[] = { proto };
+	int coninds = (child == 2) ? 1 : 0;
+
+	if (preamble_1_unbnd(child) != __RESULT_SUCCESS)
+		goto failure;
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	CONIND_number = coninds;
+	BIND_flags = TOKEN_REQUEST;
+	PROTOID_buffer = prot;
+	PROTOID_length = sizeof(prot);
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (CONIND_number != coninds)
+		goto failure;
+	state++;
+	if (TOKEN_value == 0)
+		goto failure;
+	state++;
+	if (PROTOID_length != sizeof(prot))
+		goto failure;
+	state++;
+	if (PROTOID_buffer[0] != proto)
+		goto failure;
+	state++;
+	if (ADDR_length != sizeof(struct sockaddr_in))
+		goto failure;
+	state++;
+	if (ADDR_buffer->sin_family != AF_INET)
+		goto failure;
+	state++;
+	if (ADDR_buffer->sin_addr.s_addr != INADDR_ANY)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_info.SERV_type != N_CONS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+static int
 postamble_1_idle(int child)
 {
 	int failed = -1;
@@ -4285,14 +4348,38 @@ postamble_1_idle(int child)
 	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto cannot_unbind;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS) {
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
-	}
       cannot_unbind:
 	state++;
-	if (postamble_1_unbnd(child) != __RESULT_SUCCESS) {
+	if (postamble_1_unbnd(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
-	}
+	state++;
+	if (failed == -1)
+		return (__RESULT_SUCCESS);
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+/* preamble and postamble for the NS_DATA_XFER state. */
+static int
+postamble_1_data_xfer(int child)
+{
+	int failed = -1;
+
+	ADDR_buffer = NULL;
+	ADDR_length = 0;
+	DISCON_reason = N_UNDEFINED;
+	SEQ_number = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto cannot_disconnect;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+      cannot_disconnect:
+	state++;
+	if (postamble_1_idle(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
 	state++;
 	if (failed == -1)
 		return (__RESULT_SUCCESS);
@@ -7092,7 +7179,7 @@ struct test_stream test_2_1_6_conn = { &preamble_2_1_6_conn, &test_case_2_1_6_co
 struct test_stream test_2_1_6_resp = { &preamble_2_1_6_resp, &test_case_2_1_6_resp, &postamble_2_1_6_resp };
 struct test_stream test_2_1_6_list = { &preamble_2_1_6_list, &test_case_2_1_6_list, &postamble_2_1_6_list };
 
-#define test_group_2_2 "2.2. Fatal errros in the NS_IDLE state"
+#define test_group_2_2 "2.2. Fatal errors in the NS_IDLE state"
 #define tgrp_case_2_2_1 test_group_2
 #define sgrp_case_2_2_1 test_group_2_2
 #define numb_case_2_2_1 "2.2.1"
@@ -7673,6 +7760,1136 @@ struct test_stream test_2_5_2_conn = { &preamble_2_5_2_conn, &test_case_2_5_2_co
 struct test_stream test_2_5_2_resp = { &preamble_2_5_2_resp, &test_case_2_5_2_resp, &postamble_2_5_2_resp };
 struct test_stream test_2_5_2_list = { &preamble_2_5_2_list, &test_case_2_5_2_list, &postamble_2_5_2_list };
 
+#define test_group_3 "3. Connection-oriented service"
+#define test_group_3_1 "3.1. Non-fatal errors in the NS_IDLE state"
+#define tgrp_case_3_1_1 test_group_3
+#define sgrp_case_3_1_1 test_group_3_1
+#define numb_case_3_1_1 "3.1.1"
+#define name_case_3_1_1 "NOUTSTATE for N_BIND_REQ in NS_IDLE state."
+#define sref_case_3_1_1 "NPI Rev 2.0.0"
+#define desc_case_3_1_1 "\
+Checks that NOUTSTATE is returned when N_BIND_REQ is attempted in the\n\
+NS_IDLE state."
+
+int
+test_case_3_1_1(int child)
+{
+	unsigned short port = htons(10000 + child);
+	unsigned char proto = 140;
+	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	unsigned char prot[] = { proto };
+	int coninds = (child == 2) ? 1 : 0;
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	CONIND_number = coninds;
+	BIND_flags = TOKEN_REQUEST;
+	PROTOID_buffer = prot;
+	PROTOID_length = sizeof(prot);
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NOUTSTATE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_1_1_conn	test_case_3_1_1
+#define test_case_3_1_1_resp	test_case_3_1_1
+#define test_case_3_1_1_list	test_case_3_1_1
+
+#define preamble_3_1_1_conn	preamble_1_idle_cons
+#define preamble_3_1_1_resp	preamble_1_idle_cons
+#define preamble_3_1_1_list	preamble_1_idle_cons
+
+#define postamble_3_1_1_conn	postamble_1_idle
+#define postamble_3_1_1_resp	postamble_1_idle
+#define postamble_3_1_1_list	postamble_1_idle
+
+struct test_stream test_3_1_1_conn = { &preamble_3_1_1_conn, &test_case_3_1_1_conn, &postamble_3_1_1_conn };
+struct test_stream test_3_1_1_resp = { &preamble_3_1_1_resp, &test_case_3_1_1_resp, &postamble_3_1_1_resp };
+struct test_stream test_3_1_1_list = { &preamble_3_1_1_list, &test_case_3_1_1_list, &postamble_3_1_1_list };
+
+#define tgrp_case_3_1_2 test_group_3
+#define sgrp_case_3_1_2 test_group_3_1
+#define numb_case_3_1_2 "3.1.2"
+#define name_case_3_1_2 "NOUTSTATE for N_CONN_RES in NS_IDLE state."
+#define sref_case_3_1_2 "NPI Rev 2.0.0"
+#define desc_case_3_1_2 "\
+Checks that NOUTSTATE is returned when N_CONN_RES is attempted in the\n\
+NS_IDLE state."
+
+int
+test_case_3_1_2(int child)
+{
+	unsigned short port = htons(10000 + child + 3);
+	struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000000) } };
+
+	TOKEN_value = 0;
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	CONN_flags = 0;
+	QOS_buffer = NULL;
+	QOS_length = 0;
+	SEQ_number = 0;
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NOUTSTATE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_1_2_conn	test_case_3_1_2
+#define test_case_3_1_2_resp	test_case_3_1_2
+#define test_case_3_1_2_list	test_case_3_1_2
+
+#define preamble_3_1_2_conn	preamble_1_idle_cons
+#define preamble_3_1_2_resp	preamble_1_idle_cons
+#define preamble_3_1_2_list	preamble_1_idle_cons
+
+#define postamble_3_1_2_conn	postamble_1_idle
+#define postamble_3_1_2_resp	postamble_1_idle
+#define postamble_3_1_2_list	postamble_1_idle
+
+struct test_stream test_3_1_2_conn = { &preamble_3_1_2_conn, &test_case_3_1_2_conn, &postamble_3_1_2_conn };
+struct test_stream test_3_1_2_resp = { &preamble_3_1_2_resp, &test_case_3_1_2_resp, &postamble_3_1_2_resp };
+struct test_stream test_3_1_2_list = { &preamble_3_1_2_list, &test_case_3_1_2_list, &postamble_3_1_2_list };
+
+#define tgrp_case_3_1_3 test_group_3
+#define sgrp_case_3_1_3 test_group_3_1
+#define numb_case_3_1_3 "3.1.3"
+#define name_case_3_1_3 "NOUTSTATE for N_RESET_RES in NS_IDLE state."
+#define sref_case_3_1_3 "NPI Rev 2.0.0"
+#define desc_case_3_1_3 "\
+Checks that NOUTSTATE is returned when N_RESET_RES is attempted in the\n\
+NS_IDLE state."
+
+int
+test_case_3_1_3(int child)
+{
+	if (do_signal(child, __TEST_RESET_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NOUTSTATE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_1_3_conn	test_case_3_1_3
+#define test_case_3_1_3_resp	test_case_3_1_3
+#define test_case_3_1_3_list	test_case_3_1_3
+
+#define preamble_3_1_3_conn	preamble_1_idle_cons
+#define preamble_3_1_3_resp	preamble_1_idle_cons
+#define preamble_3_1_3_list	preamble_1_idle_cons
+
+#define postamble_3_1_3_conn	postamble_1_idle
+#define postamble_3_1_3_resp	postamble_1_idle
+#define postamble_3_1_3_list	postamble_1_idle
+
+struct test_stream test_3_1_3_conn = { &preamble_3_1_3_conn, &test_case_3_1_3_conn, &postamble_3_1_3_conn };
+struct test_stream test_3_1_3_resp = { &preamble_3_1_3_resp, &test_case_3_1_3_resp, &postamble_3_1_3_resp };
+struct test_stream test_3_1_3_list = { &preamble_3_1_3_list, &test_case_3_1_3_list, &postamble_3_1_3_list };
+
+#define tgrp_case_3_1_4 test_group_3
+#define sgrp_case_3_1_4 test_group_3_1
+#define numb_case_3_1_4 "3.1.4"
+#define name_case_3_1_4 "NOUTSTATE for N_DISCON_REQ in NS_IDLE state."
+#define sref_case_3_1_4 "NPI Rev 2.0.0"
+#define desc_case_3_1_4 "\
+Checks that NOUTSTATE is returned when N_DISCON_REQ is attempted in the\n\
+NS_IDLE state."
+
+int
+test_case_3_1_4(int child)
+{
+	ADDR_buffer = NULL;
+	ADDR_length = 0;
+	DISCON_reason = N_UNDEFINED;
+	SEQ_number = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NOUTSTATE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_1_4_conn	test_case_3_1_4
+#define test_case_3_1_4_resp	test_case_3_1_4
+#define test_case_3_1_4_list	test_case_3_1_4
+
+#define preamble_3_1_4_conn	preamble_1_idle_cons
+#define preamble_3_1_4_resp	preamble_1_idle_cons
+#define preamble_3_1_4_list	preamble_1_idle_cons
+
+#define postamble_3_1_4_conn	postamble_1_idle
+#define postamble_3_1_4_resp	postamble_1_idle
+#define postamble_3_1_4_list	postamble_1_idle
+
+struct test_stream test_3_1_4_conn = { &preamble_3_1_4_conn, &test_case_3_1_4_conn, &postamble_3_1_4_conn };
+struct test_stream test_3_1_4_resp = { &preamble_3_1_4_resp, &test_case_3_1_4_resp, &postamble_3_1_4_resp };
+struct test_stream test_3_1_4_list = { &preamble_3_1_4_list, &test_case_3_1_4_list, &postamble_3_1_4_list };
+
+#define test_group_3_2 "3.2. Fatal errors in the NS_IDLE state"
+#define tgrp_case_3_2_1 test_group_3
+#define sgrp_case_3_2_1 test_group_3_2
+#define numb_case_3_2_1 "3.2.1"
+#define name_case_3_2_1 "EPROTO for N_UNITDATA_REQ in NS_IDLE state."
+#define sref_case_3_2_1 "NPI Rev 2.0.0"
+#define desc_case_3_2_1 "\
+Checks that EPROTO is returned when N_UNITDATA_REQ is attempted in the\n\
+NS_IDLE state."
+
+int
+test_case_3_2_1(int child)
+{
+	unsigned short port = htons(10000 + child);
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+	char buf[] = "xxxxTest Data";
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	DATA_buffer = buf;
+	DATA_length = strlen(DATA_buffer);
+
+	/* source and destination port, port number in the destination address is meaningless. */
+	bcopy(&port, &buf[0], sizeof(port));
+	bcopy(&port, &buf[2], sizeof(port));
+
+	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (UNIX_error != EPROTO)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_2_1_conn	test_case_3_2_1
+#define test_case_3_2_1_resp	test_case_3_2_1
+#define test_case_3_2_1_list	test_case_3_2_1
+
+#define preamble_3_2_1_conn	preamble_1_idle_cons
+#define preamble_3_2_1_resp	preamble_1_idle_cons
+#define preamble_3_2_1_list	preamble_1_idle_cons
+
+#define postamble_3_2_1_conn	postamble_1_idle
+#define postamble_3_2_1_resp	postamble_1_idle
+#define postamble_3_2_1_list	postamble_1_idle
+
+struct test_stream test_3_2_1_conn = { &preamble_3_2_1_conn, &test_case_3_2_1_conn, &postamble_3_2_1_conn };
+struct test_stream test_3_2_1_resp = { &preamble_3_2_1_resp, &test_case_3_2_1_resp, &postamble_3_2_1_resp };
+struct test_stream test_3_2_1_list = { &preamble_3_2_1_list, &test_case_3_2_1_list, &postamble_3_2_1_list };
+
+#define test_group_3_3 "3.3. Ignored errors in the NS_IDLE state"
+#define tgrp_case_3_3_1 test_group_3
+#define sgrp_case_3_3_1 test_group_3_3
+#define numb_case_3_3_1 "3.3.1"
+#define name_case_3_3_1 "Ignored N_DATACK_REQ in NS_IDLE state."
+#define sref_case_3_3_1 "NPI Rev 2.0.0"
+#define desc_case_3_3_1 "\
+Checks N_DATACK_REQ issued in the NS_IDLE state is ignored."
+
+int
+test_case_3_3_1(int child)
+{
+	if (do_signal(child, __TEST_DATACK_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_3_1_conn	test_case_3_3_1
+#define test_case_3_3_1_resp	test_case_3_3_1
+#define test_case_3_3_1_list	test_case_3_3_1
+
+#define preamble_3_3_1_conn	preamble_1_idle_cons
+#define preamble_3_3_1_resp	preamble_1_idle_cons
+#define preamble_3_3_1_list	preamble_1_idle_cons
+
+#define postamble_3_3_1_conn	postamble_1_idle
+#define postamble_3_3_1_resp	postamble_1_idle
+#define postamble_3_3_1_list	postamble_1_idle
+
+struct test_stream test_3_3_1_conn = { &preamble_3_3_1_conn, &test_case_3_3_1_conn, &postamble_3_3_1_conn };
+struct test_stream test_3_3_1_resp = { &preamble_3_3_1_resp, &test_case_3_3_1_resp, &postamble_3_3_1_resp };
+struct test_stream test_3_3_1_list = { &preamble_3_3_1_list, &test_case_3_3_1_list, &postamble_3_3_1_list };
+
+#define tgrp_case_3_3_2 test_group_3
+#define sgrp_case_3_3_2 test_group_3_3
+#define numb_case_3_3_2 "3.3.2"
+#define name_case_3_3_2 "Ignored N_DATA_REQ in NS_IDLE state."
+#define sref_case_3_3_2 "NPI Rev 2.0.0"
+#define desc_case_3_3_2 "\
+Checks N_DATA_REQ issued in the NS_IDLE state is ignored."
+
+int
+test_case_3_3_2(int child)
+{
+	DATA_xfer_flags = 0;
+	DATA_buffer = "Test data";
+	DATA_length = strlen(DATA_buffer);
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_3_2_conn	test_case_3_3_2
+#define test_case_3_3_2_resp	test_case_3_3_2
+#define test_case_3_3_2_list	test_case_3_3_2
+
+#define preamble_3_3_2_conn	preamble_1_idle_cons
+#define preamble_3_3_2_resp	preamble_1_idle_cons
+#define preamble_3_3_2_list	preamble_1_idle_cons
+
+#define postamble_3_3_2_conn	postamble_1_idle
+#define postamble_3_3_2_resp	postamble_1_idle
+#define postamble_3_3_2_list	postamble_1_idle
+
+struct test_stream test_3_3_2_conn = { &preamble_3_3_2_conn, &test_case_3_3_2_conn, &postamble_3_3_2_conn };
+struct test_stream test_3_3_2_resp = { &preamble_3_3_2_resp, &test_case_3_3_2_resp, &postamble_3_3_2_resp };
+struct test_stream test_3_3_2_list = { &preamble_3_3_2_list, &test_case_3_3_2_list, &postamble_3_3_2_list };
+
+#define tgrp_case_3_3_3 test_group_3
+#define sgrp_case_3_3_3 test_group_3_3
+#define numb_case_3_3_3 "3.3.3"
+#define name_case_3_3_3 "Ignored N_EXDATA_REQ in NS_IDLE state."
+#define sref_case_3_3_3 "NPI Rev 2.0.0"
+#define desc_case_3_3_3 "\
+Checks N_EXDATA_REQ issued in the NS_IDLE state is ignored."
+
+int
+test_case_3_3_3(int child)
+{
+	DATA_buffer = "Test data";
+	DATA_length = strlen(DATA_buffer);
+	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_3_3_conn	test_case_3_3_3
+#define test_case_3_3_3_resp	test_case_3_3_3
+#define test_case_3_3_3_list	test_case_3_3_3
+
+#define preamble_3_3_3_conn	preamble_1_idle_cons
+#define preamble_3_3_3_resp	preamble_1_idle_cons
+#define preamble_3_3_3_list	preamble_1_idle_cons
+
+#define postamble_3_3_3_conn	postamble_1_idle
+#define postamble_3_3_3_resp	postamble_1_idle
+#define postamble_3_3_3_list	postamble_1_idle
+
+struct test_stream test_3_3_3_conn = { &preamble_3_3_3_conn, &test_case_3_3_3_conn, &postamble_3_3_3_conn };
+struct test_stream test_3_3_3_resp = { &preamble_3_3_3_resp, &test_case_3_3_3_resp, &postamble_3_3_3_resp };
+struct test_stream test_3_3_3_list = { &preamble_3_3_3_list, &test_case_3_3_3_list, &postamble_3_3_3_list };
+
+#define tgrp_case_3_3_4 test_group_3
+#define sgrp_case_3_3_4 test_group_3_3
+#define numb_case_3_3_4 "3.3.4"
+#define name_case_3_3_4 "Ignored N_RESET_REQ in NS_IDLE state."
+#define sref_case_3_3_4 "NPI Rev 2.0.0"
+#define desc_case_3_3_4 "\
+Checks that an N_RESET_REQ is ignored when issued in the NS_IDLE state."
+
+int
+test_case_3_3_4(int child)
+{
+	RESET_reason = N_RESET_UNSPECIFIED;
+	if (do_signal(child, __TEST_RESET_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_3_4_conn	test_case_3_3_4
+#define test_case_3_3_4_resp	test_case_3_3_4
+#define test_case_3_3_4_list	test_case_3_3_4
+
+#define preamble_3_3_4_conn	preamble_1_idle_cons
+#define preamble_3_3_4_resp	preamble_1_idle_cons
+#define preamble_3_3_4_list	preamble_1_idle_cons
+
+#define postamble_3_3_4_conn	postamble_1_idle
+#define postamble_3_3_4_resp	postamble_1_idle
+#define postamble_3_3_4_list	postamble_1_idle
+
+struct test_stream test_3_3_4_conn = { &preamble_3_3_4_conn, &test_case_3_3_4_conn, &postamble_3_3_4_conn };
+struct test_stream test_3_3_4_resp = { &preamble_3_3_4_resp, &test_case_3_3_4_resp, &postamble_3_3_4_resp };
+struct test_stream test_3_3_4_list = { &preamble_3_3_4_list, &test_case_3_3_4_list, &postamble_3_3_4_list };
+
+#define test_group_3_4 "3.4. Failed N_CONN_REQ in the NS_IDLE state"
+#define tgrp_case_3_4_1 test_group_3
+#define sgrp_case_3_4_1 test_group_3_4
+#define numb_case_3_4_1 "3.4.1"
+#define name_case_3_4_1 "EINVAL for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_1 "NPI Rev 2.0.0"
+#define desc_case_3_4_1 "\
+Checks that EINVAL is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Primitive too short."
+
+int
+test_case_3_4_1(int child)
+{
+	PRIM_type = N_CONN_REQ;
+	if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (NPI_error != NSYSERR)
+		goto failure;
+	state++;
+	if (UNIX_error != EINVAL)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_1_conn	test_case_3_4_1
+#define test_case_3_4_1_resp	test_case_3_4_1
+#define test_case_3_4_1_list	test_case_3_4_1
+
+#define preamble_3_4_1_conn	preamble_1_idle_cons
+#define preamble_3_4_1_resp	preamble_1_idle_cons
+#define preamble_3_4_1_list	preamble_1_idle_cons
+
+#define postamble_3_4_1_conn	postamble_1_idle
+#define postamble_3_4_1_resp	postamble_1_idle
+#define postamble_3_4_1_list	postamble_1_idle
+
+struct test_stream test_3_4_1_conn = { &preamble_3_4_1_conn, &test_case_3_4_1_conn, &postamble_3_4_1_conn };
+struct test_stream test_3_4_1_resp = { &preamble_3_4_1_resp, &test_case_3_4_1_resp, &postamble_3_4_1_resp };
+struct test_stream test_3_4_1_list = { &preamble_3_4_1_list, &test_case_3_4_1_list, &postamble_3_4_1_list };
+
+#define tgrp_case_3_4_2 test_group_3
+#define sgrp_case_3_4_2 test_group_3_4
+#define numb_case_3_4_2 "3.4.2"
+#define name_case_3_4_2 "NACCESS for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_2 "NPI Rev 2.0.0"
+#define desc_case_3_4_2 "\
+Checks that NACCESS is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Listening stream."
+
+int
+test_case_3_4_2(int child)
+{
+	unsigned short port = htons(10000 + child);
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+
+	ADDR_buffer = &sin;
+	ADDR_length = sizeof(sin);
+	CONN_flags = 0;
+	QOS_buffer = NULL;
+	QOS_length = 0;
+	DATA_buffer = NULL;
+	DATA_length = 0;
+
+	if (child == 2) {
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NACCESS)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_2_conn	test_case_3_4_2
+#define test_case_3_4_2_resp	test_case_3_4_2
+#define test_case_3_4_2_list	test_case_3_4_2
+
+#define preamble_3_4_2_conn	preamble_1_idle_cons
+#define preamble_3_4_2_resp	preamble_1_idle_cons
+#define preamble_3_4_2_list	preamble_1_idle_cons
+
+#define postamble_3_4_2_conn	postamble_1_idle
+#define postamble_3_4_2_resp	postamble_1_idle
+#define postamble_3_4_2_list	postamble_1_idle
+
+struct test_stream test_3_4_2_conn = { &preamble_3_4_2_conn, &test_case_3_4_2_conn, &postamble_3_4_2_conn };
+struct test_stream test_3_4_2_resp = { &preamble_3_4_2_resp, &test_case_3_4_2_resp, &postamble_3_4_2_resp };
+struct test_stream test_3_4_2_list = { &preamble_3_4_2_list, &test_case_3_4_2_list, &postamble_3_4_2_list };
+
+#define tgrp_case_3_4_3 test_group_3
+#define sgrp_case_3_4_3 test_group_3_4
+#define numb_case_3_4_3 "3.4.3"
+#define name_case_3_4_3 "NBADFLAG for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_3 "NPI Rev 2.0.0"
+#define desc_case_3_4_3 "\
+Checks that NBADFLAG is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Invalid flags."
+
+int
+test_case_3_4_3(int child)
+{
+	if (child != 2) {
+		unsigned short port = htons(10000 + child);
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin);
+		CONN_flags = 0x7ff;
+		QOS_buffer = NULL;
+		QOS_length = 0;
+		DATA_buffer = NULL;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NBADFLAG)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_3_conn	test_case_3_4_3
+#define test_case_3_4_3_resp	test_case_3_4_3
+#define test_case_3_4_3_list	test_case_3_4_3
+
+#define preamble_3_4_3_conn	preamble_1_idle_cons
+#define preamble_3_4_3_resp	preamble_1_idle_cons
+#define preamble_3_4_3_list	preamble_1_idle_cons
+
+#define postamble_3_4_3_conn	postamble_1_idle
+#define postamble_3_4_3_resp	postamble_1_idle
+#define postamble_3_4_3_list	postamble_1_idle
+
+struct test_stream test_3_4_3_conn = { &preamble_3_4_3_conn, &test_case_3_4_3_conn, &postamble_3_4_3_conn };
+struct test_stream test_3_4_3_resp = { &preamble_3_4_3_resp, &test_case_3_4_3_resp, &postamble_3_4_3_resp };
+struct test_stream test_3_4_3_list = { &preamble_3_4_3_list, &test_case_3_4_3_list, &postamble_3_4_3_list };
+
+#define tgrp_case_3_4_4 test_group_3
+#define sgrp_case_3_4_4 test_group_3_4
+#define numb_case_3_4_4 "3.4.4"
+#define name_case_3_4_4 "NNOADDR for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_4 "NPI Rev 2.0.0"
+#define desc_case_3_4_4 "\
+Checks that NNOADDR is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  No destination address."
+
+int
+test_case_3_4_4(int child)
+{
+	if (child != 2) {
+		ADDR_buffer = NULL;
+		ADDR_length = 0;
+		CONN_flags = 0;
+		QOS_buffer = NULL;
+		QOS_length = 0;
+		DATA_buffer = NULL;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NNOADDR)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_4_conn	test_case_3_4_4
+#define test_case_3_4_4_resp	test_case_3_4_4
+#define test_case_3_4_4_list	test_case_3_4_4
+
+#define preamble_3_4_4_conn	preamble_1_idle_cons
+#define preamble_3_4_4_resp	preamble_1_idle_cons
+#define preamble_3_4_4_list	preamble_1_idle_cons
+
+#define postamble_3_4_4_conn	postamble_1_idle
+#define postamble_3_4_4_resp	postamble_1_idle
+#define postamble_3_4_4_list	postamble_1_idle
+
+struct test_stream test_3_4_4_conn = { &preamble_3_4_4_conn, &test_case_3_4_4_conn, &postamble_3_4_4_conn };
+struct test_stream test_3_4_4_resp = { &preamble_3_4_4_resp, &test_case_3_4_4_resp, &postamble_3_4_4_resp };
+struct test_stream test_3_4_4_list = { &preamble_3_4_4_list, &test_case_3_4_4_list, &postamble_3_4_4_list };
+
+#define tgrp_case_3_4_5 test_group_3
+#define sgrp_case_3_4_5 test_group_3_4
+#define numb_case_3_4_5 "3.4.5"
+#define name_case_3_4_5 "NBADADDR for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_5 "NPI Rev 2.0.0"
+#define desc_case_3_4_5 "\
+Checks that NBADADDR is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Short address."
+
+int
+test_case_3_4_5(int child)
+{
+	if (child != 2) {
+		unsigned short port = htons(10000 + child);
+		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin) - 1;
+		CONN_flags = 0;
+		QOS_buffer = NULL;
+		QOS_length = 0;
+		DATA_buffer = NULL;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NBADADDR)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_5_conn	test_case_3_4_5
+#define test_case_3_4_5_resp	test_case_3_4_5
+#define test_case_3_4_5_list	test_case_3_4_5
+
+#define preamble_3_4_5_conn	preamble_1_idle_cons
+#define preamble_3_4_5_resp	preamble_1_idle_cons
+#define preamble_3_4_5_list	preamble_1_idle_cons
+
+#define postamble_3_4_5_conn	postamble_1_idle
+#define postamble_3_4_5_resp	postamble_1_idle
+#define postamble_3_4_5_list	postamble_1_idle
+
+struct test_stream test_3_4_5_conn = { &preamble_3_4_5_conn, &test_case_3_4_5_conn, &postamble_3_4_5_conn };
+struct test_stream test_3_4_5_resp = { &preamble_3_4_5_resp, &test_case_3_4_5_resp, &postamble_3_4_5_resp };
+struct test_stream test_3_4_5_list = { &preamble_3_4_5_list, &test_case_3_4_5_list, &postamble_3_4_5_list };
+
+#define tgrp_case_3_4_6 test_group_3
+#define sgrp_case_3_4_6 test_group_3_4
+#define numb_case_3_4_6 "3.4.6"
+#define name_case_3_4_6 "NBADADDR for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_6 "NPI Rev 2.0.0"
+#define desc_case_3_4_6 "\
+Checks that NBADADDR is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Bad address family."
+
+int
+test_case_3_4_6(int child)
+{
+	if (child != 2) {
+		unsigned short port = htons(10000 + child);
+		struct sockaddr_in sin = { AF_X25, port, { htonl(0x7f000001) } };
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin);
+		CONN_flags = 0;
+		QOS_buffer = NULL;
+		QOS_length = 0;
+		DATA_buffer = NULL;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NBADADDR)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_6_conn	test_case_3_4_6
+#define test_case_3_4_6_resp	test_case_3_4_6
+#define test_case_3_4_6_list	test_case_3_4_6
+
+#define preamble_3_4_6_conn	preamble_1_idle_cons
+#define preamble_3_4_6_resp	preamble_1_idle_cons
+#define preamble_3_4_6_list	preamble_1_idle_cons
+
+#define postamble_3_4_6_conn	postamble_1_idle
+#define postamble_3_4_6_resp	postamble_1_idle
+#define postamble_3_4_6_list	postamble_1_idle
+
+struct test_stream test_3_4_6_conn = { &preamble_3_4_6_conn, &test_case_3_4_6_conn, &postamble_3_4_6_conn };
+struct test_stream test_3_4_6_resp = { &preamble_3_4_6_resp, &test_case_3_4_6_resp, &postamble_3_4_6_resp };
+struct test_stream test_3_4_6_list = { &preamble_3_4_6_list, &test_case_3_4_6_list, &postamble_3_4_6_list };
+
+#define tgrp_case_3_4_7 test_group_3
+#define sgrp_case_3_4_7 test_group_3_4
+#define numb_case_3_4_7 "3.4.7"
+#define name_case_3_4_7 "NBADADDR for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_7 "NPI Rev 2.0.0"
+#define desc_case_3_4_7 "\
+Checks that NBADADDR is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Wildcard address."
+
+int
+test_case_3_4_7(int child)
+{
+	if (child != 2) {
+		unsigned short port = htons(10000 + child);
+		struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin);
+		CONN_flags = 0;
+		QOS_buffer = NULL;
+		QOS_length = 0;
+		DATA_buffer = NULL;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NBADADDR)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_7_conn	test_case_3_4_7
+#define test_case_3_4_7_resp	test_case_3_4_7
+#define test_case_3_4_7_list	test_case_3_4_7
+
+#define preamble_3_4_7_conn	preamble_1_idle_cons
+#define preamble_3_4_7_resp	preamble_1_idle_cons
+#define preamble_3_4_7_list	preamble_1_idle_cons
+
+#define postamble_3_4_7_conn	postamble_1_idle
+#define postamble_3_4_7_resp	postamble_1_idle
+#define postamble_3_4_7_list	postamble_1_idle
+
+struct test_stream test_3_4_7_conn = { &preamble_3_4_7_conn, &test_case_3_4_7_conn, &postamble_3_4_7_conn };
+struct test_stream test_3_4_7_resp = { &preamble_3_4_7_resp, &test_case_3_4_7_resp, &postamble_3_4_7_resp };
+struct test_stream test_3_4_7_list = { &preamble_3_4_7_list, &test_case_3_4_7_list, &postamble_3_4_7_list };
+
+#define tgrp_case_3_4_8 test_group_3
+#define sgrp_case_3_4_8 test_group_3_4
+#define numb_case_3_4_8 "3.4.8"
+#define name_case_3_4_8 "NBADQOSTYPE for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_8 "NPI Rev 2.0.0"
+#define desc_case_3_4_8 "\
+Checks that NBADQOSTYPE is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Invalid QOS type."
+
+int
+test_case_3_4_8(int child)
+{
+	if (child != 2) {
+		unsigned short port = htons(10000 + child);
+		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		np_ulong type = N_QOS_SEL_UD_IP;
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin);
+		CONN_flags = 0;
+		QOS_buffer = &type;
+		QOS_length = sizeof(type);
+		DATA_buffer = NULL;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NBADQOSTYPE)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_8_conn	test_case_3_4_8
+#define test_case_3_4_8_resp	test_case_3_4_8
+#define test_case_3_4_8_list	test_case_3_4_8
+
+#define preamble_3_4_8_conn	preamble_1_idle_cons
+#define preamble_3_4_8_resp	preamble_1_idle_cons
+#define preamble_3_4_8_list	preamble_1_idle_cons
+
+#define postamble_3_4_8_conn	postamble_1_idle
+#define postamble_3_4_8_resp	postamble_1_idle
+#define postamble_3_4_8_list	postamble_1_idle
+
+struct test_stream test_3_4_8_conn = { &preamble_3_4_8_conn, &test_case_3_4_8_conn, &postamble_3_4_8_conn };
+struct test_stream test_3_4_8_resp = { &preamble_3_4_8_resp, &test_case_3_4_8_resp, &postamble_3_4_8_resp };
+struct test_stream test_3_4_8_list = { &preamble_3_4_8_list, &test_case_3_4_8_list, &postamble_3_4_8_list };
+
+#define tgrp_case_3_4_9 test_group_3
+#define sgrp_case_3_4_9 test_group_3_4
+#define numb_case_3_4_9 "3.4.9"
+#define name_case_3_4_9 "NBADQOSTYPE for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_9 "NPI Rev 2.0.0"
+#define desc_case_3_4_9 "\
+Checks that NBADQOSTYPE is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Short structure."
+
+int
+test_case_3_4_9(int child)
+{
+	if (child != 2) {
+		unsigned short port = htons(10000 + child);
+		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		np_ulong type = N_QOS_SEL_CONN_IP;
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin);
+		CONN_flags = 0;
+		QOS_buffer = &type;
+		QOS_length = sizeof(type);
+		DATA_buffer = NULL;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NBADQOSTYPE)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_9_conn	test_case_3_4_9
+#define test_case_3_4_9_resp	test_case_3_4_9
+#define test_case_3_4_9_list	test_case_3_4_9
+
+#define preamble_3_4_9_conn	preamble_1_idle_cons
+#define preamble_3_4_9_resp	preamble_1_idle_cons
+#define preamble_3_4_9_list	preamble_1_idle_cons
+
+#define postamble_3_4_9_conn	postamble_1_idle
+#define postamble_3_4_9_resp	postamble_1_idle
+#define postamble_3_4_9_list	postamble_1_idle
+
+struct test_stream test_3_4_9_conn = { &preamble_3_4_9_conn, &test_case_3_4_9_conn, &postamble_3_4_9_conn };
+struct test_stream test_3_4_9_resp = { &preamble_3_4_9_resp, &test_case_3_4_9_resp, &postamble_3_4_9_resp };
+struct test_stream test_3_4_9_list = { &preamble_3_4_9_list, &test_case_3_4_9_list, &postamble_3_4_9_list };
+
+#define tgrp_case_3_4_10 test_group_3
+#define sgrp_case_3_4_10 test_group_3_4
+#define numb_case_3_4_10 "3.4.10"
+#define name_case_3_4_10 "NBADQOSPARAM for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_10 "NPI Rev 2.0.0"
+#define desc_case_3_4_10 "\
+Checks that NBADQOSPARAM is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Short structure."
+
+int
+test_case_3_4_10(int child)
+{
+	if (child != 2) {
+		unsigned short port = htons(10000 + child);
+		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		N_qos_sel_conn_ip_t qos = {
+			.n_qos_type = N_QOS_SEL_CONN_IP,
+			.protocol = 2000,
+			.priority = 1000,
+			.ttl = 500,
+			.tos = 128,
+			.mtu = 128000,
+			.saddr = 0,
+			.daddr = 0,
+		};
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin);
+		CONN_flags = 0;
+		QOS_buffer = &qos;
+		QOS_length = sizeof(qos);
+		DATA_buffer = NULL;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NBADQOSPARAM)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_10_conn	test_case_3_4_10
+#define test_case_3_4_10_resp	test_case_3_4_10
+#define test_case_3_4_10_list	test_case_3_4_10
+
+#define preamble_3_4_10_conn	preamble_1_idle_cons
+#define preamble_3_4_10_resp	preamble_1_idle_cons
+#define preamble_3_4_10_list	preamble_1_idle_cons
+
+#define postamble_3_4_10_conn	postamble_1_idle
+#define postamble_3_4_10_resp	postamble_1_idle
+#define postamble_3_4_10_list	postamble_1_idle
+
+struct test_stream test_3_4_10_conn = { &preamble_3_4_10_conn, &test_case_3_4_10_conn, &postamble_3_4_10_conn };
+struct test_stream test_3_4_10_resp = { &preamble_3_4_10_resp, &test_case_3_4_10_resp, &postamble_3_4_10_resp };
+struct test_stream test_3_4_10_list = { &preamble_3_4_10_list, &test_case_3_4_10_list, &postamble_3_4_10_list };
+
+#define tgrp_case_3_4_11 test_group_3
+#define sgrp_case_3_4_11 test_group_3_4
+#define numb_case_3_4_11 "3.4.11"
+#define name_case_3_4_11 "NBADDATA for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_11 "NPI Rev 2.0.0"
+#define desc_case_3_4_11 "\
+Checks that NBADDATA is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Zero length data."
+
+int
+test_case_3_4_11(int child)
+{
+	if (child != 2) {
+		unsigned short port = htons(10000 + child);
+		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		char buf[] = "Test data";
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin);
+		CONN_flags = 0;
+		QOS_buffer = NULL;
+		QOS_length = 0;
+		DATA_buffer = buf;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NBADDATA)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_11_conn	test_case_3_4_11
+#define test_case_3_4_11_resp	test_case_3_4_11
+#define test_case_3_4_11_list	test_case_3_4_11
+
+#define preamble_3_4_11_conn	preamble_1_idle_cons
+#define preamble_3_4_11_resp	preamble_1_idle_cons
+#define preamble_3_4_11_list	preamble_1_idle_cons
+
+#define postamble_3_4_11_conn	postamble_1_idle
+#define postamble_3_4_11_resp	postamble_1_idle
+#define postamble_3_4_11_list	postamble_1_idle
+
+struct test_stream test_3_4_11_conn = { &preamble_3_4_11_conn, &test_case_3_4_11_conn, &postamble_3_4_11_conn };
+struct test_stream test_3_4_11_resp = { &preamble_3_4_11_resp, &test_case_3_4_11_resp, &postamble_3_4_11_resp };
+struct test_stream test_3_4_11_list = { &preamble_3_4_11_list, &test_case_3_4_11_list, &postamble_3_4_11_list };
+
+#define tgrp_case_3_4_12 test_group_3
+#define sgrp_case_3_4_12 test_group_3_4
+#define numb_case_3_4_12 "3.4.12"
+#define name_case_3_4_12 "NBADDATA for N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_4_12 "NPI Rev 2.0.0"
+#define desc_case_3_4_12 "\
+Checks that NBADDATA is returned when N_CONN_REQ is issued in the NS_IDLE state,\n\
+under error conditions.  Too much data."
+
+int
+test_case_3_4_12(int child)
+{
+	if (child != 2) {
+		unsigned short port = htons(10000 + child);
+		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		char buf[70000] = "Test data";
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin);
+		CONN_flags = 0;
+		QOS_buffer = NULL;
+		QOS_length = 0;
+		DATA_buffer = buf;
+		DATA_length = 70000;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (NPI_error != NBADDATA)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_4_12_conn	test_case_3_4_12
+#define test_case_3_4_12_resp	test_case_3_4_12
+#define test_case_3_4_12_list	test_case_3_4_12
+
+#define preamble_3_4_12_conn	preamble_1_idle_cons
+#define preamble_3_4_12_resp	preamble_1_idle_cons
+#define preamble_3_4_12_list	preamble_1_idle_cons
+
+#define postamble_3_4_12_conn	postamble_1_idle
+#define postamble_3_4_12_resp	postamble_1_idle
+#define postamble_3_4_12_list	postamble_1_idle
+
+struct test_stream test_3_4_12_conn = { &preamble_3_4_12_conn, &test_case_3_4_12_conn, &postamble_3_4_12_conn };
+struct test_stream test_3_4_12_resp = { &preamble_3_4_12_resp, &test_case_3_4_12_resp, &postamble_3_4_12_resp };
+struct test_stream test_3_4_12_list = { &preamble_3_4_12_list, &test_case_3_4_12_list, &postamble_3_4_12_list };
+
+#define test_group_3_5 "3.5. Successful N_CONN_REQ in the NS_IDLE state"
+#define tgrp_case_3_5_1 test_group_3
+#define sgrp_case_3_5_1 test_group_3_5
+#define numb_case_3_5_1 "3.5.1"
+#define name_case_3_5_1 "Successful N_CONN_REQ in the NS_IDLE state"
+#define sref_case_3_5_1 "NPI Rev 2.0.0"
+#define desc_case_3_5_1 "\
+Checks that a connection can be formed using N_CONN_REQ in the NS_IDLE state\n\
+with no data and no QOS parameters."
+
+int
+test_case_3_5_1(int child)
+{
+	if (child != 2) {
+		unsigned short port = htons(10000 + child);
+		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin);
+		CONN_flags = 0;
+		QOS_buffer = NULL;
+		QOS_length = 0;
+		DATA_buffer = NULL;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_5_1_conn	test_case_3_5_1
+#define test_case_3_5_1_resp	test_case_3_5_1
+#define test_case_3_5_1_list	test_case_3_5_1
+
+#define preamble_3_5_1_conn	preamble_1_idle_cons
+#define preamble_3_5_1_resp	preamble_1_idle_cons
+#define preamble_3_5_1_list	preamble_1_idle_cons
+
+#define postamble_3_5_1_conn	postamble_1_data_xfer
+#define postamble_3_5_1_resp	postamble_1_data_xfer
+#define postamble_3_5_1_list	postamble_1_data_xfer
+
+struct test_stream test_3_5_1_conn = { &preamble_3_5_1_conn, &test_case_3_5_1_conn, &postamble_3_5_1_conn };
+struct test_stream test_3_5_1_resp = { &preamble_3_5_1_resp, &test_case_3_5_1_resp, &postamble_3_5_1_resp };
+struct test_stream test_3_5_1_list = { &preamble_3_5_1_list, &test_case_3_5_1_list, &postamble_3_5_1_list };
+
+
+
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -8067,6 +9284,50 @@ struct test_case {
 	&test_2_5_1_conn, &test_2_5_1_resp, &test_2_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_5_2, tgrp_case_2_5_2, sgrp_case_2_5_2, name_case_2_5_2, desc_case_2_5_2, sref_case_2_5_2, {
 	&test_2_5_2_conn, &test_2_5_2_resp, &test_2_5_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_1, tgrp_case_3_1_1, sgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, sref_case_3_1_1, {
+	&test_3_1_1_conn, &test_3_1_1_resp, &test_3_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_2, tgrp_case_3_1_2, sgrp_case_3_1_2, name_case_3_1_2, desc_case_3_1_2, sref_case_3_1_2, {
+	&test_3_1_2_conn, &test_3_1_2_resp, &test_3_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_3, tgrp_case_3_1_3, sgrp_case_3_1_3, name_case_3_1_3, desc_case_3_1_3, sref_case_3_1_3, {
+	&test_3_1_3_conn, &test_3_1_3_resp, &test_3_1_3_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_4, tgrp_case_3_1_4, sgrp_case_3_1_4, name_case_3_1_4, desc_case_3_1_4, sref_case_3_1_4, {
+	&test_3_1_4_conn, &test_3_1_4_resp, &test_3_1_4_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_1, tgrp_case_3_2_1, sgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, sref_case_3_2_1, {
+	&test_3_2_1_conn, &test_3_2_1_resp, &test_3_2_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_1, tgrp_case_3_3_1, sgrp_case_3_3_1, name_case_3_3_1, desc_case_3_3_1, sref_case_3_3_1, {
+	&test_3_3_1_conn, &test_3_3_1_resp, &test_3_3_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_2, tgrp_case_3_3_2, sgrp_case_3_3_2, name_case_3_3_2, desc_case_3_3_2, sref_case_3_3_2, {
+	&test_3_3_2_conn, &test_3_3_2_resp, &test_3_3_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_3, tgrp_case_3_3_3, sgrp_case_3_3_3, name_case_3_3_3, desc_case_3_3_3, sref_case_3_3_3, {
+	&test_3_3_3_conn, &test_3_3_3_resp, &test_3_3_3_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_4, tgrp_case_3_3_4, sgrp_case_3_3_4, name_case_3_3_4, desc_case_3_3_4, sref_case_3_3_4, {
+	&test_3_3_4_conn, &test_3_3_4_resp, &test_3_3_4_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_1, tgrp_case_3_4_1, sgrp_case_3_4_1, name_case_3_4_1, desc_case_3_4_1, sref_case_3_4_1, {
+	&test_3_4_1_conn, &test_3_4_1_resp, &test_3_4_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_2, tgrp_case_3_4_2, sgrp_case_3_4_2, name_case_3_4_2, desc_case_3_4_2, sref_case_3_4_2, {
+	&test_3_4_2_conn, &test_3_4_2_resp, &test_3_4_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_3, tgrp_case_3_4_3, sgrp_case_3_4_3, name_case_3_4_3, desc_case_3_4_3, sref_case_3_4_3, {
+	&test_3_4_3_conn, &test_3_4_3_resp, &test_3_4_3_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_4, tgrp_case_3_4_4, sgrp_case_3_4_4, name_case_3_4_4, desc_case_3_4_4, sref_case_3_4_4, {
+	&test_3_4_4_conn, &test_3_4_4_resp, &test_3_4_4_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_5, tgrp_case_3_4_5, sgrp_case_3_4_5, name_case_3_4_5, desc_case_3_4_5, sref_case_3_4_5, {
+	&test_3_4_5_conn, &test_3_4_5_resp, &test_3_4_5_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_6, tgrp_case_3_4_6, sgrp_case_3_4_6, name_case_3_4_6, desc_case_3_4_6, sref_case_3_4_6, {
+	&test_3_4_6_conn, &test_3_4_6_resp, &test_3_4_6_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_7, tgrp_case_3_4_7, sgrp_case_3_4_7, name_case_3_4_7, desc_case_3_4_7, sref_case_3_4_7, {
+	&test_3_4_7_conn, &test_3_4_7_resp, &test_3_4_7_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_8, tgrp_case_3_4_8, sgrp_case_3_4_8, name_case_3_4_8, desc_case_3_4_8, sref_case_3_4_8, {
+	&test_3_4_8_conn, &test_3_4_8_resp, &test_3_4_8_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_9, tgrp_case_3_4_9, sgrp_case_3_4_9, name_case_3_4_9, desc_case_3_4_9, sref_case_3_4_9, {
+	&test_3_4_9_conn, &test_3_4_9_resp, &test_3_4_9_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_10, tgrp_case_3_4_10, sgrp_case_3_4_10, name_case_3_4_10, desc_case_3_4_10, sref_case_3_4_10, {
+	&test_3_4_10_conn, &test_3_4_10_resp, &test_3_4_10_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_11, tgrp_case_3_4_11, sgrp_case_3_4_11, name_case_3_4_11, desc_case_3_4_11, sref_case_3_4_11, {
+	&test_3_4_11_conn, &test_3_4_11_resp, &test_3_4_11_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_12, tgrp_case_3_4_12, sgrp_case_3_4_12, name_case_3_4_12, desc_case_3_4_12, sref_case_3_4_12, {
+	&test_3_4_12_conn, &test_3_4_12_resp, &test_3_4_12_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_1, tgrp_case_3_5_1, sgrp_case_3_5_1, name_case_3_5_1, desc_case_3_5_1, sref_case_3_5_1, {
+	&test_3_5_1_conn, &test_3_5_1_resp, &test_3_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 
