@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-np_ip.at,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/12 01:16:23 $
+dnl @(#) $RCSfile: testsuite-np_ip.at,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/12 09:58:04 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/05/12 01:16:23 $ by $Author: brian $
+dnl Last Modified $Date: 2006/05/12 09:58:04 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-np_ip.at,v $
+dnl Revision 0.9.2.11  2006/05/12 09:58:04  brian
+dnl - more testing results and corrections for NPI-IP driver
+dnl
 dnl Revision 0.9.2.10  2006/05/12 01:16:23  brian
 dnl - more results from testing NPI-IP driver
 dnl
@@ -484,5 +487,115 @@ AT_CLEANUP
 AT_SETUP([np-ip test 3.4.12])
 AT_KEYWORDS([NS_IDLE])
 AT_CHECK([test_np_ip 3.4.12], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.5.1])
+AT_KEYWORDS([NS_IDLE])
+AT_CHECK([test_np_ip 3.5.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.5.2])
+AT_KEYWORDS([NS_IDLE])
+AT_CHECK([test_np_ip 3.5.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.5.3])
+AT_KEYWORDS([NS_IDLE])
+AT_CHECK([test_np_ip 3.5.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.6.1])
+AT_KEYWORDS([N_BIND_REQ NS_WRES_CIND NOUTSTATE])
+AT_CHECK([test_np_ip 3.6.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.6.2])
+AT_KEYWORDS([N_UNBIND_REQ NS_WRES_CIND NOUTSTATE])
+AT_CHECK([test_np_ip 3.6.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.6.3])
+AT_KEYWORDS([N_CONN_REQ NS_WRES_CIND NOUTSTATE/NACCESS])
+AT_CHECK([test_np_ip 3.6.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.6.4])
+AT_KEYWORDS([N_RESET_REQ NS_WRES_CIND NOUTSTATE])
+AT_CHECK([test_np_ip 3.6.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.6.5])
+AT_KEYWORDS([N_RESET_RES NS_WRES_CIND NOUTSTATE])
+AT_CHECK([test_np_ip 3.6.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.6.6])
+AT_KEYWORDS([N_DISCON_REQ NS_WRES_CIND NBADSEQ])
+AT_CHECK([test_np_ip 3.6.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.7.1])
+AT_KEYWORDS([N_DATA_REQ NS_WRES_CIND EPROTO])
+AT_CHECK([test_np_ip 3.7.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.7.2])
+AT_KEYWORDS([N_EXDATA_REQ NS_WRES_CIND EPROTO])
+AT_CHECK([test_np_ip 3.7.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.7.3])
+AT_KEYWORDS([N_DATACK_REQ NS_WRES_CIND EPROTO])
+AT_CHECK([test_np_ip 3.7.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.7.4])
+AT_KEYWORDS([N_UNITDATA_REQ NS_WRES_CIND EPROTO])
+AT_CHECK([test_np_ip 3.7.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.8.1])
+AT_KEYWORDS([N_DISCON_REQ NS_WRES_CIND])
+AT_CHECK([test_np_ip 3.8.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.8.2])
+AT_KEYWORDS([N_CONN_RES NS_WRES_CIND])
+AT_CHECK([test_np_ip 3.8.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.8.3])
+AT_KEYWORDS([N_CONN_RES NS_WRES_CIND])
+AT_CHECK([test_np_ip 3.8.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.9.1])
+AT_KEYWORDS([N_BIND_REQ NS_DATA_XFER NOUTSTATE])
+AT_CHECK([test_np_ip 3.9.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.9.2])
+AT_KEYWORDS([N_UNBIND_REQ NS_DATA_XFER NOUTSTATE])
+AT_CHECK([test_np_ip 3.9.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.9.3])
+AT_KEYWORDS([N_CONN_REQ NS_DATA_XFER NOUTSTATE/NACCESS])
+AT_CHECK([test_np_ip 3.9.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.9.4])
+AT_KEYWORDS([N_RESET_RES NS_DATA_XFER NOUTSTATE])
+AT_CHECK([test_np_ip 3.9.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.9.5])
+AT_KEYWORDS([N_DISCON_REQ NS_DATA_XFER NBADSEQ])
+AT_CHECK([test_np_ip 3.9.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([np-ip test 3.10.1])
+AT_KEYWORDS([N_DATA_REQ NS_DATA_XFER EPROTO])
+AT_CHECK([test_np_ip 3.10.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
