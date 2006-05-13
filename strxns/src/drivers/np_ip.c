@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/12 09:58:00 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/13 02:43:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/12 09:58:00 $ by $Author: brian $
+ Last Modified $Date: 2006/05/13 02:43:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.16  2006/05/13 02:43:34  brian
+ - corrections for 2.4 testing
+
+ Revision 0.9.2.15  2006/05/12 23:54:40  brian
+ - close to last changes from testing
+
  Revision 0.9.2.14  2006/05/12 09:58:00  brian
  - more testing results and corrections for NPI-IP driver
 
@@ -94,10 +100,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/12 09:58:00 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/13 02:43:34 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/12 09:58:00 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/13 02:43:34 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -109,8 +115,8 @@ static char const ident[] =
    The driver uses the NPI (Network Provider Interface) API.
 */
 
-#define CONFIG_STREAMS_DEBUG 1
-#define _DEBUG 1
+// #define CONFIG_STREAMS_DEBUG 1
+// #define _DEBUG 1
 
 #include <sys/os7/compat.h>
 
@@ -153,7 +159,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2006/05/12 09:58:00 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2006/05/13 02:43:34 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -1349,7 +1355,9 @@ STATIC int
 npi_reset_loc(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 {
 	fixme(("Write this function.\n"));
-	return (-EFAULT);
+	/* should send ICMP, but just discarding it will work for now */
+	freemsg(dp);
+	return (QR_DONE);
 }
 
 /**
@@ -1364,8 +1372,18 @@ npi_reset_loc(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t 
 STATIC int
 npi_reset_rem(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason)
 {
-	fixme(("Write this function.\n"));
-	return (-EFAULT);
+	mblk_t *resp, **respp;
+
+	/* find last one on list */
+	for (respp = &np->resq; (*respp) && (*respp)->b_next; respp = &(*respp)->b_next) ;
+	if (*respp == NULL)
+		return (-EFAULT);
+	resp = *respp;
+	*respp = resp->b_next;
+	resp->b_next = NULL;
+	freemsg(resp);
+	np->resinds--;
+	return (0);
 }
 
 STATIC int
@@ -1717,29 +1735,49 @@ npi_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	np_long NPI_error;
 	struct iphdr *iph;
 	struct udphdr *uh;
-	int i;
+	int i, j;
 
 	/* Get at the connection indication.  The packet is contained in the SEQ_number message
 	   block starting with the IP header. */
 	iph = (typeof(iph)) SEQ_number->b_rptr;
 	uh = (typeof(uh)) (SEQ_number->b_rptr + (iph->ihl << 2));
 
-	NPI_error = NBADTOKEN;
-	/* Accepting Stream must be bound to the same protocol as connection indication. */
-	for (i = 0; i < TOKEN_value->pnum; i++)
-		if (TOKEN_value->protoids[i] == iph->protocol)
-			break;
-	if (i >= TOKEN_value->pnum)
-		/* Must be bound to the same protocol. */
-		goto error;
-	/* Accepting Stream must be bound to the same address (or wildcard) including destination
-	   address in connection indication. */
-	for (i = 0; i < TOKEN_value->bnum; i++)
-		if (TOKEN_value->baddrs[i].addr == INADDR_ANY
-		    || TOKEN_value->baddrs[i].addr == iph->daddr)
-			break;
-	if (i >= TOKEN_value->bnum)
-		goto error;
+	if (TOKEN_value != np) {
+		NPI_error = NBADTOKEN;
+#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
+		/* Accepting Stream must be bound to the same protocol as connection indication. */
+		for (j = 0; j < TOKEN_value->pnum; j++)
+			if (TOKEN_value->protoids[j] == iph->protocol)
+				break;
+		if (j >= TOKEN_value->pnum)
+			/* Must be bound to the same protocol. */
+			goto error;
+#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
+		/* Problem for 2.4: we overwrote iph->protocol with 255 to steal the packet, so we
+		   can't check it now.  Check that the accepting stream is bound to the same
+		   protocol id as the listening stream. */
+		/* Another approach for 2.4 would be to copy the sk_buff before stealing it. */
+		for (j = 0, i= 0; j < TOKEN_value->pnum; j++) {
+			for (i = 0; i < np->pnum; i++)
+				if (TOKEN_value->protoids[j] == np->protoids[i])
+					break;
+			if (TOKEN_value->protoids[j] == np->protoids[i])
+				break;
+		}
+		if (j >= TOKEN_value->pnum || i >= np->pnum)
+			/* Must be bound to the same protocol. */
+			goto error;
+#endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
+		/* Accepting Stream must be bound to the same address (or wildcard) including
+		   destination address in connection indication. */
+		for (i = 0; i < TOKEN_value->bnum; i++)
+			if (TOKEN_value->baddrs[i].addr == INADDR_ANY
+			    || TOKEN_value->baddrs[i].addr == iph->daddr)
+				break;
+		if (i >= TOKEN_value->bnum)
+			goto error;
+	}
 
 	/* validate parameters */
 	NPI_error = NBADQOSPARAM;
@@ -1922,7 +1960,7 @@ npi_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		/* might be data hanging off of b_prev pointer */
 		b = b_prev = SEQ_number;
 		while ((b = b_prev)) {
-			/* fixme, don't free these, deliver them... */
+			/* FIXME: don't free these, deliver them... */
 			b_prev = XCHG(&b->b_prev, NULL);
 			freemsg(b);
 		}
@@ -2635,6 +2673,8 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	if (QOS_length) {
 		QOS_buffer = (struct N_qos_sel_conn_ip *) mp->b_wptr;
 		QOS_buffer->n_qos_type = N_QOS_SEL_CONN_IP;
+		/* FIXME: might be a problem here on 2.4 where we steal the packet by overwritting
+		 * the protocol id. */
 		QOS_buffer->protocol = iph->protocol;
 		QOS_buffer->priority = bp->b_band;
 		QOS_buffer->ttl = iph->ttl;
@@ -4593,7 +4633,27 @@ np_r_error(queue_t *q, mblk_t *mp)
 		rtn = ne_uderror_ind_icmp(q, mp);
 		break;
 	case N_CONS:
-		rtn = ne_reset_ind(q, mp);
+		switch (npi_get_state(np)) {
+		case NS_DATA_XFER:
+		case NS_WCON_CREQ:
+		case NS_WACK_RRES:
+		case NS_WCON_RREQ:
+		case NS_WACK_DREQ6:
+		case NS_WACK_DREQ7:
+		case NS_WACK_DREQ9:
+		case NS_WACK_DREQ10:
+		case NS_WACK_DREQ11:
+			rtn = ne_reset_ind(q, mp);
+			break;
+		case NS_WRES_CIND:
+		case NS_WACK_CRES:
+			rtn = ne_discon_ind_icmp(q, mp);
+			break;
+		default:
+			/* ignore it now */
+			rtn = QR_DONE;
+			break;
+		}
 		break;
 	default:
 		swerr();
@@ -4664,13 +4724,8 @@ np_w_prim(queue_t *q, mblk_t *mp)
  * connection bucket must be traversed and checked for address matches.
  */
 STATIC INLINE fastcall struct np *
-npi_lookup_conn(struct iphdr *iph, struct udphdr *uh)
+npi_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
-	unsigned char proto = iph->protocol;
-	unsigned short sport = uh->source;
-	unsigned short dport = uh->dest;
-	uint32_t saddr = iph->saddr;
-	uint32_t daddr = iph->daddr;
 	struct np *result = NULL;
 	int hiscore = 0;
 	struct npi_chash_bucket *hp, *hp1, *hp2;
@@ -4741,8 +4796,9 @@ npi_lookup_conn(struct iphdr *iph, struct udphdr *uh)
 
 /**
  * npi_lookup_bind - lookup Stream in the bind/listening hashes
- * @iph:	IP header
- * @uh:		UDP header
+ * @proto:	protocol from IP header
+ * @daddr:	destination address from IP header
+ * @dport:	destination port from UDP header
  *
  * Note that an N_CLNS Stream can bind to either a port number or port number zero. An N_CONS Stream
  * can only bind listening to a non-zero port number, but can bind normal to a zero port number.
@@ -4757,21 +4813,18 @@ npi_lookup_conn(struct iphdr *iph, struct udphdr *uh)
  * stream that is in the listening state that matches.
  */
 STATIC INLINE fastcall __hot_in struct np *
-npi_lookup_bind(struct iphdr *iph, struct udphdr *uh)
+npi_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 {
-	unsigned char proto = iph->protocol;
-	unsigned short bport = uh->dest;
-	uint32_t daddr = iph->daddr;
 	struct np *result = NULL;
 	int hiscore = 0;
 	struct npi_bhash_bucket *hp, *hp1, *hp2;
 
-	hp1 = &npi_bhash[npi_bhashfn(proto, bport)];
+	hp1 = &npi_bhash[npi_bhashfn(proto, dport)];
 	hp2 = &npi_bhash[npi_bhashfn(proto, 0)];
 
 	hp = hp1;
-	ptrace(("%s: %s: proto = %d, bport = %d\n", DRV_NAME, __FUNCTION__, (int) proto,
-		(int) ntohs(bport)));
+	ptrace(("%s: %s: proto = %d, dport = %d\n", DRV_NAME, __FUNCTION__, (int) proto,
+		(int) ntohs(dport)));
 	do {
 		_trace();
 		read_lock_bh(&hp->lock);
@@ -4797,7 +4850,7 @@ npi_lookup_bind(struct iphdr *iph, struct udphdr *uh)
 					continue;
 				}
 				if (np->bport != 0) {
-					if (np->bport != bport) {
+					if (np->bport != dport) {
 						_ptrace(("%s: %s: skipping based on port %d\n",
 							 DRV_NAME, __FUNCTION__,
 							 (int) ntohs(np->bport)));
@@ -4837,9 +4890,37 @@ npi_lookup_bind(struct iphdr *iph, struct udphdr *uh)
 	return (result);
 }
 
+STATIC INLINE fastcall struct np *
+npi_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
+{
+	struct np *result = NULL;
+	struct np_prot_bucket *pp, **ppp;
+
+	ppp = &np_prots[proto];
+
+	read_lock_bh(&np_prot_lock);
+	_trace();
+	if ((pp = *ppp)) {
+		_trace();
+		if (pp->corefs > 0) {
+
+			if (result == NULL)
+				result = npi_lookup_conn(proto, daddr, dport, saddr, sport);
+			if (result == NULL)
+				result = npi_lookup_bind(proto, daddr, dport);
+		} else if (pp->clrefs > 0) {
+			_trace();
+			if (result == NULL)
+				result = npi_lookup_bind(proto, daddr, dport);
+		} else
+			rare();
+	}
+	read_unlock_bh(&np_prot_lock);
+	return (result);
+}
+
 /**
- * npi_lookup_next - lookup next Stream by protocol, address and port.
- * @np_prev:	result of previous lookup, NULL for new
+ * npi_lookup - lookup Stream by protocol, address and port.
  * @iph:	IP header
  * @uh:		UDP header
  *
@@ -4853,38 +4934,9 @@ npi_lookup_bind(struct iphdr *iph, struct udphdr *uh)
  * connectionless Stream bound to the protocol id.
  */
 STATIC INLINE fastcall struct np *
-npi_lookup_next(struct np *np_prev, struct iphdr *iph, struct udphdr *uh)
-{
-	struct np *result = NULL;
-	struct np_prot_bucket *pp, **ppp;
-
-	ppp = &np_prots[iph->protocol];
-
-	read_lock_bh(&np_prot_lock);
-	_trace();
-	if ((pp = *ppp)) {
-		_trace();
-		if (pp->corefs > 0) {
-			if (result == NULL)
-				result = npi_lookup_conn(iph, uh);
-			if (result == NULL)
-				result = npi_lookup_bind(iph, uh);
-		} else if (pp->clrefs > 0) {
-			_trace();
-			if (result == NULL)
-				result = npi_lookup_bind(iph, uh);
-		} else
-			rare();
-	}
-	read_unlock_bh(&np_prot_lock);
-	return (result);
-}
-
-STATIC INLINE fastcall struct np *
 npi_lookup(struct iphdr *iph, struct udphdr *uh)
 {
-	_trace();
-	return npi_lookup_next(NULL, iph, uh);
+	return npi_lookup_common(iph->protocol, iph->daddr, uh->dest, iph->saddr, uh->source);
 }
 
 /**
@@ -4898,8 +4950,13 @@ npi_lookup(struct iphdr *iph, struct udphdr *uh)
 STATIC INLINE fastcall struct np *
 npi_lookup_icmp(struct iphdr *iph, unsigned int len)
 {
-	fixme(("Write this function.\n"));
-	return (NULL);
+	struct udphdr *uh = (struct udphdr *) ((unsigned char *) iph + (iph->ihl << 2));
+
+	if (len < (iph->ihl << 2) + 4)
+		/* too short: don't have port numbers - ignore it */
+		return (NULL);
+
+	return npi_lookup_common(iph->protocol, iph->saddr, uh->source, iph->daddr, uh->dest);
 }
 
 STATIC streamscall void
@@ -4931,38 +4988,41 @@ npi_free(char *data)
 STATIC int
 npi_v4_rcv(struct sk_buff *skb)
 {
+	struct np *np;
+	struct iphdr *iph = skb->nh.iph;
+	struct udphdr *uh = (struct udphdr *) (skb->nh.raw + (iph->ihl << 2));
+
 	printd(("%s: %s: packet received %p\n", DRV_NAME, __FUNCTION__, skb));
-	read_lock_bh(&np_prot_lock);	/* lock stream lists */
-	{
-		struct np *np;
-		struct iphdr *iph = skb->nh.iph;
-		struct udphdr *uh = (struct udphdr *) (skb->nh.raw + (iph->ihl << 2));
+	if ((np = npi_lookup(iph, uh))) {
+		/* TODO: for 2.4 we overwrite iph->protocol to steal the packet.  This means that
+		   we loose the protocol information.  This is important if we ever allow binding
+		   to more than one protocol id (which we don't currently do).  At that point we
+		   would have to copy the sk_buff before stealing the original and free the
+		   original.  See the NBADTOKEN check in npi_passive(). */
+		/* FIXME: Another trick for 2.4 would be to copy the IP header and UDP header, but
+		   esballoc the payload.  That might be the best way to do things.  The problem is
+		   that we indicate iph->protocol on connection indications, and it will be the
+		   wrong protocol on 2.4. */
+		npi_v4_steal(skb);
+		if (np->oq && canput(np->oq)) {
+			mblk_t *mp;
+			frtn_t fr = { &npi_free, (char *) skb };
+			size_t plen = skb->len + (skb->data - skb->nh.raw);
 
-		if ((np = npi_lookup(iph, uh))) {
-			npi_v4_steal(skb);
-			if (np->oq && canput(np->oq)) {
-				mblk_t *mp;
-				frtn_t fr = { &npi_free, (char *) skb };
-				size_t plen = skb->len + (skb->data - skb->nh.raw);
-
-				/* FIXME: handle non-linear sk_buffs */
-				if ((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr))) {
-					mp->b_datap->db_type = M_DATA;
-					mp->b_wptr += plen;
-					if (!putq(np->oq, mp))
-						freemsg(mp);
-					// put(np->oq, mp);
-				} else
-					kfree_skb(skb);
+			/* FIXME: handle non-linear sk_buffs */
+			if ((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr))) {
+				mp->b_datap->db_type = M_DATA;
+				mp->b_wptr += plen;
+				put(np->oq, mp);
 			} else
 				kfree_skb(skb);
-			/* release reference from lookup */
-			np_release(&np);
-		} else if (npi_v4_rcv_next(skb)) {
-			/* TODO: want to generate an ICMP error here */
-		}
+		} else
+			kfree_skb(skb);
+		/* release reference from lookup */
+		np_release(&np);
+	} else if (npi_v4_rcv_next(skb)) {
+		/* TODO: want to generate an ICMP error here */
 	}
-	read_unlock_bh(&np_prot_lock);
 	return (0);
 }
 
@@ -4979,32 +5039,26 @@ npi_v4_rcv(struct sk_buff *skb)
 STATIC void
 npi_v4_err(struct sk_buff *skb, u32 info)
 {
+	struct np *np;
+
 	printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
-	read_lock_bh(&np_prot_lock);
-	{
-		struct np *np;
+	/* Note: use returned IP header and possibly payload for lookup */
+	if ((np = npi_lookup_icmp((struct iphdr *) skb->data, skb->len))) {
+		if (np->oq && canput(np->oq)) {
+			mblk_t *mp;
+			size_t plen = skb->len + (skb->data - skb->nh.raw);
 
-		/* Note: use returned IP header and possibly payload for lookup */
-		if ((np = npi_lookup_icmp((struct iphdr *) skb->data, skb->len))) {
-			if (np->oq && canput(np->oq)) {
-				mblk_t *mp;
-				size_t plen = skb->len + (skb->data - skb->nh.raw);
-
-				if ((mp = allocb(plen, BPRI_MED))) {
-					mp->b_datap->db_type = M_ERROR;
-					bcopy(skb->nh.raw, mp->b_wptr, plen);
-					mp->b_wptr += plen;
-					if (!putq(np->oq, mp))
-						freemsg(mp);
-					// put(np->oq, mp);
-				}
+			if ((mp = allocb(plen, BPRI_MED))) {
+				mp->b_datap->db_type = M_ERROR;
+				bcopy(skb->nh.raw, mp->b_wptr, plen);
+				mp->b_wptr += plen;
+				put(np->oq, mp);
 			}
-			/* release reference from lookup */
-			np_release(&np);
 		}
-		npi_v4_err_next(skb, info);
+		/* release reference from lookup */
+		np_release(&np);
 	}
-	read_unlock_bh(&np_prot_lock);
+	npi_v4_err_next(skb, info);
 	return;
 }
 

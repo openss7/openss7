@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/12 09:58:02 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/13 02:43:35 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/12 09:58:02 $ by $Author: brian $
+ Last Modified $Date: 2006/05/13 02:43:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.13  2006/05/13 02:43:35  brian
+ - corrections for 2.4 testing
+
+ Revision 0.9.2.12  2006/05/12 23:54:42  brian
+ - close to last changes from testing
+
  Revision 0.9.2.11  2006/05/12 09:58:02  brian
  - more testing results and corrections for NPI-IP driver
 
@@ -105,9 +111,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/12 09:58:02 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/13 02:43:35 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/12 09:58:02 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/13 02:43:35 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -199,6 +205,8 @@ static int DISCON_reason = 0;
 static int CONN_flags = 0;
 static int ERROR_type = 0;
 static int RESERVED_field[2] = { 0, 0 };
+
+#define TEST_PROTOCOL 250
 
 int test_fd[3] = { 0, 0, 0 };
 
@@ -4273,7 +4281,7 @@ int
 preamble_1_idle_clns(int child)
 {
 	unsigned short port = htons(10000 + child);
-	unsigned char proto = 140;
+	unsigned char proto = TEST_PROTOCOL;
 	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
 	unsigned char prot[] = { proto };
 
@@ -4335,7 +4343,7 @@ static int
 preamble_1_idle_cons(int child)
 {
 	unsigned short port = htons(10000 + child);
-	unsigned char proto = 140;
+	unsigned char proto = TEST_PROTOCOL;
 	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { proto };
 	int coninds = (child == 2) ? 1 : 0;
@@ -6224,7 +6232,7 @@ int
 test_case_1_6_1_2(int child)
 {
 	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
-	unsigned char prot[] = { 140 };
+	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin) - 1;
@@ -6276,7 +6284,7 @@ test_case_1_6_1_3(int child)
 {
 #if 0
 	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
-	unsigned char prot[] = { 140 };
+	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -6331,7 +6339,7 @@ test_case_1_6_1_4(int child)
 {
 #if 0
 	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
-	unsigned char prot[] = { 140 };
+	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -6386,7 +6394,7 @@ test_case_1_6_1_5(int child)
 {
 #if 0
 	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
-	unsigned char prot[] = { 140 };
+	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -6440,7 +6448,7 @@ int
 test_case_1_6_1_6(int child)
 {
 	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
-	unsigned char prot[] = { 140 };
+	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -6491,7 +6499,7 @@ int
 test_case_1_6_1_7(int child)
 {
 	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
-	unsigned char prot[] = { 140 };
+	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -6543,7 +6551,7 @@ int
 test_case_1_6_1_8(int child)
 {
 	struct sockaddr_in sin = { AF_INET, 10000, { 0x0000007f } };
-	unsigned char prot[] = { 140 };
+	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -6594,7 +6602,7 @@ int
 test_case_1_6_1_9(int child)
 {
 	struct sockaddr_in sin = { AF_INET, 10000, { INADDR_ANY } };
-	unsigned char prot[] = { 140 };
+	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -6645,7 +6653,7 @@ in the NS_UNBND state."
 int
 test_case_1_6_2_1(int child)
 {
-	unsigned char prot[] = { 140 + child };
+	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = NULL;
 	ADDR_length = 0;
@@ -6668,7 +6676,7 @@ test_case_1_6_2_1(int child)
 	if (PROTOID_length != 1)
 		goto failure;
 	state++;
-	if (PROTOID_buffer[0] != 140 + child)
+	if (PROTOID_buffer[0] != TEST_PROTOCOL + child)
 		goto failure;
 	state++;
 	if (ADDR_length != sizeof(struct sockaddr_in))
@@ -6729,7 +6737,7 @@ int
 test_case_1_6_2_2(int child)
 {
 	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
-	unsigned char prot[] = { 140 + child };
+	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -6752,7 +6760,7 @@ test_case_1_6_2_2(int child)
 	if (PROTOID_length != 1)
 		goto failure;
 	state++;
-	if (PROTOID_buffer[0] != 140 + child)
+	if (PROTOID_buffer[0] != TEST_PROTOCOL + child)
 		goto failure;
 	state++;
 	if (ADDR_length != sizeof(struct sockaddr_in))
@@ -6814,7 +6822,7 @@ test_case_1_6_2_3(int child)
 {
 	int port = htons(10000);
 	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
-	unsigned char prot[] = { 140 + child };
+	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -6837,7 +6845,7 @@ test_case_1_6_2_3(int child)
 	if (PROTOID_length != 1)
 		goto failure;
 	state++;
-	if (PROTOID_buffer[0] != 140 + child)
+	if (PROTOID_buffer[0] != TEST_PROTOCOL + child)
 		goto failure;
 	state++;
 	if (ADDR_length != sizeof(struct sockaddr_in))
@@ -6899,7 +6907,7 @@ int
 test_case_1_6_2_4(int child)
 {
 	int port = 0; // htons(10000);
-	int proto = 140;
+	int proto = TEST_PROTOCOL;
 	int flag = (child == 0) ? DEFAULT_DEST : ((child == 2) ? DEFAULT_LISTENER : 0) ;
 	int serv = (flag == DEFAULT_LISTENER) ? N_CONS : N_CLNS;
 	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
@@ -6990,7 +6998,7 @@ test_case_1_6_2_5(int child)
 {
 	int port = htons(10000);
 	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
-	unsigned char prot[] = { 140 + child };
+	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -7013,7 +7021,7 @@ test_case_1_6_2_5(int child)
 	if (PROTOID_length != 1)
 		goto failure;
 	state++;
-	if (PROTOID_buffer[0] != 140 + child)
+	if (PROTOID_buffer[0] != TEST_PROTOCOL + child)
 		goto failure;
 	state++;
 	if (ADDR_length != sizeof(struct sockaddr_in))
@@ -7076,7 +7084,7 @@ test_case_1_6_3_1(int child)
 {
 	int port = htons(10000);
 	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
-	unsigned char prot[] = { 140 + child };
+	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -7141,7 +7149,7 @@ int
 test_case_2_1_1(int child)
 {
 	int port = htons(10000 + child);
-	int proto = 140;
+	int proto = TEST_PROTOCOL;
 	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
 	unsigned char prot[] = { proto };
 
@@ -8012,7 +8020,7 @@ int
 test_case_3_1_1(int child)
 {
 	unsigned short port = htons(10000 + child);
-	unsigned char proto = 140;
+	unsigned char proto = TEST_PROTOCOL;
 	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
 	unsigned char prot[] = { proto };
 	int coninds = (child == 2) ? 1 : 0;
@@ -9269,7 +9277,7 @@ int
 test_case_3_6_1(int child)
 {
 	if (child == 2) {
-		unsigned char proto = 140;
+		unsigned char proto = TEST_PROTOCOL;
 
 		ADDR_buffer = NULL;
 		ADDR_length = 0;
@@ -10060,7 +10068,7 @@ int
 test_case_3_9_1(int child)
 {
 	if (child != 1) {
-		unsigned char proto = 140;
+		unsigned char proto = TEST_PROTOCOL;
 
 		ADDR_buffer = NULL;
 		ADDR_length = 0;
@@ -10399,6 +10407,209 @@ struct test_stream test_3_10_1_conn = { &preamble_3_10_1_conn, &test_case_3_10_1
 struct test_stream test_3_10_1_resp = { &preamble_3_10_1_resp, &test_case_3_10_1_resp, &postamble_3_10_1_resp };
 struct test_stream test_3_10_1_list = { &preamble_3_10_1_list, &test_case_3_10_1_list, &postamble_3_10_1_list };
 
+#define tgrp_case_3_10_2 test_group_3
+#define sgrp_case_3_10_2 test_group_3_10
+#define numb_case_3_10_2 "3.10.2"
+#define name_case_3_10_2 "EPROTO for N_EXDATA_REQ in the NS_DATA_XFER state"
+#define sref_case_3_10_2 "NPI Rev 2.0.0"
+#define desc_case_3_10_2 "\
+Checks that EPROTO is returned when N_EXDATA_REQ is issued in the\n\
+NS_DATA_XFER state (zero length data)."
+
+int
+test_case_3_10_2(int child)
+{
+	if (child != 1) {
+		char buf[] = "Test Data.";
+
+		DATA_buffer = buf;
+		DATA_length = 0;
+
+		if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (UNIX_error != EPROTO)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_10_2_conn	test_case_3_10_2
+#define test_case_3_10_2_resp	test_case_3_10_2
+#define test_case_3_10_2_list	test_case_3_10_2
+
+#define preamble_3_10_2_conn	preamble_1_data_xfer_conn
+#define preamble_3_10_2_resp	preamble_1_data_xfer_resp
+#define preamble_3_10_2_list	preamble_1_data_xfer_list
+
+#define postamble_3_10_2_conn	postamble_1_data_xfer
+#define postamble_3_10_2_resp	postamble_1_idle
+#define postamble_3_10_2_list	postamble_1_data_xfer
+
+struct test_stream test_3_10_2_conn = { &preamble_3_10_2_conn, &test_case_3_10_2_conn, &postamble_3_10_2_conn };
+struct test_stream test_3_10_2_resp = { &preamble_3_10_2_resp, &test_case_3_10_2_resp, &postamble_3_10_2_resp };
+struct test_stream test_3_10_2_list = { &preamble_3_10_2_list, &test_case_3_10_2_list, &postamble_3_10_2_list };
+
+#define tgrp_case_3_10_3 test_group_3
+#define sgrp_case_3_10_3 test_group_3_10
+#define numb_case_3_10_3 "3.10.3"
+#define name_case_3_10_3 "EPROTO for N_DATACK_REQ in the NS_DATA_XFER state"
+#define sref_case_3_10_3 "NPI Rev 2.0.0"
+#define desc_case_3_10_3 "\
+Checks that EPROTO is returned when N_DATACK_REQ is issued in the\n\
+NS_DATA_XFER state (zero length data)."
+
+int
+test_case_3_10_3(int child)
+{
+	if (child != 1) {
+		if (do_signal(child, __TEST_DATACK_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (UNIX_error != EPROTO)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_10_3_conn	test_case_3_10_3
+#define test_case_3_10_3_resp	test_case_3_10_3
+#define test_case_3_10_3_list	test_case_3_10_3
+
+#define preamble_3_10_3_conn	preamble_1_data_xfer_conn
+#define preamble_3_10_3_resp	preamble_1_data_xfer_resp
+#define preamble_3_10_3_list	preamble_1_data_xfer_list
+
+#define postamble_3_10_3_conn	postamble_1_data_xfer
+#define postamble_3_10_3_resp	postamble_1_idle
+#define postamble_3_10_3_list	postamble_1_data_xfer
+
+struct test_stream test_3_10_3_conn = { &preamble_3_10_3_conn, &test_case_3_10_3_conn, &postamble_3_10_3_conn };
+struct test_stream test_3_10_3_resp = { &preamble_3_10_3_resp, &test_case_3_10_3_resp, &postamble_3_10_3_resp };
+struct test_stream test_3_10_3_list = { &preamble_3_10_3_list, &test_case_3_10_3_list, &postamble_3_10_3_list };
+
+#define tgrp_case_3_10_4 test_group_3
+#define sgrp_case_3_10_4 test_group_3_10
+#define numb_case_3_10_4 "3.10.4"
+#define name_case_3_10_4 "EPROTO for N_UNITDATA_REQ in the NS_DATA_XFER state"
+#define sref_case_3_10_4 "NPI Rev 2.0.0"
+#define desc_case_3_10_4 "\
+Checks that EPROTO is returned when N_UNITDATA_REQ is issued in the\n\
+NS_DATA_XFER state (zero length data)."
+
+int
+test_case_3_10_4(int child)
+{
+	if (child != 1) {
+		unsigned short port = htons(10000 + 1);
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+		char buf[] = "xxxxTest Data";
+
+		ADDR_buffer = &sin;
+		ADDR_length = sizeof(sin);
+		DATA_buffer = buf;
+		DATA_length = strlen(DATA_buffer);
+
+		/* source and destination port, port number in the destination address is meaningless. */
+		bcopy(&port, &buf[0], sizeof(port));
+		bcopy(&port, &buf[2], sizeof(port));
+
+		if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (UNIX_error != EPROTO)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_10_4_conn	test_case_3_10_4
+#define test_case_3_10_4_resp	test_case_3_10_4
+#define test_case_3_10_4_list	test_case_3_10_4
+
+#define preamble_3_10_4_conn	preamble_1_data_xfer_conn
+#define preamble_3_10_4_resp	preamble_1_data_xfer_resp
+#define preamble_3_10_4_list	preamble_1_data_xfer_list
+
+#define postamble_3_10_4_conn	postamble_1_data_xfer
+#define postamble_3_10_4_resp	postamble_1_idle
+#define postamble_3_10_4_list	postamble_1_data_xfer
+
+struct test_stream test_3_10_4_conn = { &preamble_3_10_4_conn, &test_case_3_10_4_conn, &postamble_3_10_4_conn };
+struct test_stream test_3_10_4_resp = { &preamble_3_10_4_resp, &test_case_3_10_4_resp, &postamble_3_10_4_resp };
+struct test_stream test_3_10_4_list = { &preamble_3_10_4_list, &test_case_3_10_4_list, &postamble_3_10_4_list };
+
+
+#define test_group_3_11 "3.11. Successful data transfer in the NS_DATA_XFER state"
+#define tgrp_case_3_11_1 test_group_3
+#define sgrp_case_3_11_1 test_group_3_10
+#define numb_case_3_11_1 "3.11.1"
+#define name_case_3_11_1 "N_DATA_REQ in the NS_DATA_XFER state"
+#define sref_case_3_11_1 "NPI Rev 2.0.0"
+#define desc_case_3_11_1 "\
+Checks that data can be successfully transferred in the NS_DATA_XFER state."
+
+int
+test_case_3_11_1(int child)
+{
+	if (child != 1) {
+		unsigned short sport = htons(10000 + ((child == 0) ? 0 : 2));
+		unsigned short dport = htons(10000 + ((child == 0) ? 2 : 0));
+		char buf[] = "xxxxTest Data";
+
+		DATA_xfer_flags = 0;
+		DATA_buffer = buf;
+		DATA_length = strlen(DATA_buffer);
+
+		/* source and destination port, port number in the destination address is meaningless. */
+		bcopy(&sport, &buf[0], sizeof(sport));
+		bcopy(&dport, &buf[2], sizeof(dport));
+
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_3_11_1_conn	test_case_3_11_1
+#define test_case_3_11_1_resp	test_case_3_11_1
+#define test_case_3_11_1_list	test_case_3_11_1
+
+#define preamble_3_11_1_conn	preamble_1_data_xfer_conn
+#define preamble_3_11_1_resp	preamble_1_data_xfer_resp
+#define preamble_3_11_1_list	preamble_1_data_xfer_list
+
+#define postamble_3_11_1_conn	postamble_1_data_xfer
+#define postamble_3_11_1_resp	postamble_1_idle
+#define postamble_3_11_1_list	postamble_1_data_xfer
+
+struct test_stream test_3_11_1_conn = { &preamble_3_11_1_conn, &test_case_3_11_1_conn, &postamble_3_11_1_conn };
+struct test_stream test_3_11_1_resp = { &preamble_3_11_1_resp, &test_case_3_11_1_resp, &postamble_3_11_1_resp };
+struct test_stream test_3_11_1_list = { &preamble_3_11_1_list, &test_case_3_11_1_list, &postamble_3_11_1_list };
 
 
 
@@ -10882,6 +11093,14 @@ struct test_case {
 	&test_3_9_5_conn, &test_3_9_5_resp, &test_3_9_5_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_10_1, tgrp_case_3_10_1, sgrp_case_3_10_1, name_case_3_10_1, desc_case_3_10_1, sref_case_3_10_1, {
 	&test_3_10_1_conn, &test_3_10_1_resp, &test_3_10_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_10_2, tgrp_case_3_10_2, sgrp_case_3_10_2, name_case_3_10_2, desc_case_3_10_2, sref_case_3_10_2, {
+	&test_3_10_2_conn, &test_3_10_2_resp, &test_3_10_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_10_3, tgrp_case_3_10_3, sgrp_case_3_10_3, name_case_3_10_3, desc_case_3_10_3, sref_case_3_10_3, {
+	&test_3_10_3_conn, &test_3_10_3_resp, &test_3_10_3_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_10_4, tgrp_case_3_10_4, sgrp_case_3_10_4, name_case_3_10_4, desc_case_3_10_4, sref_case_3_10_4, {
+	&test_3_10_4_conn, &test_3_10_4_resp, &test_3_10_4_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_11_1, tgrp_case_3_11_1, sgrp_case_3_11_1, name_case_3_11_1, desc_case_3_11_1, sref_case_3_11_1, {
+	&test_3_11_1_conn, &test_3_11_1_resp, &test_3_11_1_list}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 
