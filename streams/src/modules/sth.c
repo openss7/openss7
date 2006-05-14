@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/03/08 00:03:56 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/05/14 06:58:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/08 00:03:56 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:58:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.143  2006/05/14 06:58:14  brian
+ - removed redundant or unused QR_ definitions
+
  Revision 0.9.2.142  2006/03/08 00:03:56  brian
  - ioctl32 functions are streams calls
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/03/08 00:03:56 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/05/14 06:58:14 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/03/08 00:03:56 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/05/14 06:58:14 $";
 
 //#define __NO_VERSION__
 
@@ -172,7 +175,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/03/08 00:03:56 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/05/14 06:58:14 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -193,16 +196,6 @@ MODULE_LICENSE(STH_LICENSE);
 MODULE_ALIAS("streams-sth");
 #endif
 #endif				/* CONFIG_STREAMS_STH_MODULE */
-
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
-#define QR_RETRY	8
 
 #ifndef CONFIG_STREAMS_STH_NAME
 //#define CONFIG_STREAMS_STH_NAME "sth"

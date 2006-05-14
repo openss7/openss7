@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/07 01:08:08 $
+ @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/14 06:58:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:08:08 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:58:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: h225.c,v $
+ Revision 0.9.2.13  2006/05/14 06:58:02  brian
+ - removed redundant or unused QR_ definitions
+
  Revision 0.9.2.12  2006/03/07 01:08:08  brian
  - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/07 01:08:08 $"
+#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/14 06:58:02 $"
 
 static char const ident[] =
-    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/07 01:08:08 $";
+    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/14 06:58:02 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -79,7 +82,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/07 01:08:08 $"
+#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/14 06:58:02 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -202,16 +205,6 @@ MODULE_STATIC struct streamtab h225info = {
 	st_muxrinit:&dl_rinit,		/* Lower read queue */
 	st_muxwinit:&dl_winit,		/* Lower write queue */
 };
-
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
-#define QR_RETRY	8
 
 /*
  *  =========================================================================

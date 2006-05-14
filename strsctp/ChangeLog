@@ -1,3 +1,12 @@
+2006-05-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* NEWS: updated
+	* tests/testsuite-sctp.at: added buffer leak checks
+	* tests/testsuite-sctp_n.at: added buffer leak checks
+	* tests/testsuite-sctp_t.at: added buffer leak checks
+	* src/drivers/sctp_n.c: removed reundant QR_ definitions
+	* src/drivers/sctp_t.c: removed reundant QR_ definitions
+
 2006-05-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/strconf-sh: added module id base to strconf

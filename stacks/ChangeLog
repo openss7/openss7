@@ -1,3 +1,14 @@
+2006-05-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/h225/h225.c: removed redundant QR_ definitions
+	* src/modules/inet/inet.c: removed redundant QR_ definitions
+	* src/modules/isdn/isdn.c: removed redundant QR_ definitions
+	* src/modules/mtp/mtp_min.c: removed redundant QR_ definitions
+	* src/modules/sctp/sctp_n.c: removed redundant QR_ definitions
+	* src/modules/sctp/sctp_t.c: removed redundant QR_ definitions
+	* src/modules/sdl/cdi.c: removed redundant QR_ definitions
+	* src/modules/ss7ip/sl_tpi.c: removed redundant QR_ definitions
+
 2006-05-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/strconf-sh: added module id base to strconf

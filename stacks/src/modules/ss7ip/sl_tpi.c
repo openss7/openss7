@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 11:01:12 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/14 06:58:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:01:12 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:58:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 11:01:12 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/14 06:58:11 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/08 11:01:12 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/14 06:58:11 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -157,15 +157,6 @@ STATIC struct streamtab sl_tpiinfo = {
 	.st_rdinit = &sl_rinit,		/* Upper read queue */
 	.st_wrinit = &sl_winit,		/* Upper write queue */
 };
-
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
 
 /*
  *  =========================================================================

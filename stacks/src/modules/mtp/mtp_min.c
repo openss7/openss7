@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:14 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/14 06:58:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:14 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:58:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_min.c,v $
+ Revision 0.9.2.13  2006/05/14 06:58:08  brian
+ - removed redundant or unused QR_ definitions
+
  Revision 0.9.2.12  2006/03/04 13:00:14  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:14 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/14 06:58:08 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:14 $";
+    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/14 06:58:08 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -82,7 +85,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/04 13:00:14 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/14 06:58:08 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -214,15 +217,6 @@ static struct streamtab mtp_mininfo = {
 	st_muxrinit:&sl_rinit,		/* Lower read queue */
 	st_muxwinit:&sl_winit,		/* Lower write queue */
 };
-
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
 
 /*
  *  =========================================================================

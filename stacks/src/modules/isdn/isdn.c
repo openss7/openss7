@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/08 11:00:44 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:58:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:00:44 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:58:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isdn.c,v $
+ Revision 0.9.2.18  2006/05/14 06:58:06  brian
+ - removed redundant or unused QR_ definitions
+
  Revision 0.9.2.17  2006/05/08 11:00:44  brian
  - new compilers mishandle postincrement of cast pointers
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/08 11:00:44 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:58:06 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/08 11:00:44 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:58:06 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -84,7 +87,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/08 11:00:44 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:58:06 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -207,16 +210,6 @@ STATIC struct streamtab isdn_info = {
 	st_muxrinit:&dl_rinit,		/* Lower read queue */
 	st_muxwinit:&dl_winit,		/* Lower write queue */
 };
-
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
-#define QR_RETRY	8
 
 /*
  *  =========================================================================

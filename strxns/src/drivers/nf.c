@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/25 10:26:32 $
+ @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/14 06:34:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/25 10:26:32 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:34:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nf.c,v $
+ Revision 0.9.2.2  2006/05/14 06:34:31  brian
+ - corrected buffer leaks
+
  Revision 0.9.2.1  2006/03/25 10:26:32  brian
  - added beginnings of netfilter driver
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/25 10:26:32 $"
+#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/14 06:34:31 $"
 
-static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/25 10:26:32 $";
+static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/14 06:34:31 $";
 
 /*
  *  This pseudo-device driver implements a range of netfilter hooks for
@@ -100,7 +103,7 @@ static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 #define NF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NF_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/25 10:26:32 $"
+#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/14 06:34:31 $"
 #define NF_DEVICE	"SVR 4.2 STREAMS NETFILTER Driver"
 #define NF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NF_LICENSE	"GPL"
@@ -207,18 +210,6 @@ MODULE_STATIC struct streamtab nf_info = {
 	.st_rdinit = &nf_rinit,		/* Upper read queue */
 	.st_wrinit = &nf_winit,		/* Lower read queue */
 };
-
-/*
-   Queue put and service return values 
- */
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
 
 /*
  *  Primary data structure.

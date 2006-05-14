@@ -98,3 +98,13 @@
 -Tqi_qadmin_t
 -Tstreamscall
 -Tss_t
+-Tt_scalar_t
+-Tt_uscalar_t
+-Tnp_long
+-Tnp_ulong
+-Tcd_long
+-Tcd_ulong
+-Tcd_ushort
+-Tdl_long
+-Tdl_ulong
+-Tdl_ushort

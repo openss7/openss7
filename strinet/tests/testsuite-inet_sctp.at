@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-inet_sctp.at,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/02/23 11:11:46 $
+dnl @(#) $RCSfile: testsuite-inet_sctp.at,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/14 06:51:37 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/02/23 11:11:46 $ by $Author: brian $
+dnl Last Modified $Date: 2006/05/14 06:51:37 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-inet_sctp.at,v $
+dnl Revision 0.9.2.14  2006/05/14 06:51:37  brian
+dnl - added buffer leak checks to testsuites
+dnl
 dnl Revision 0.9.2.13  2006/02/23 11:11:46  brian
 dnl - corrected verbosity for bug reporting
 dnl
@@ -113,8 +116,23 @@ function test_inet_sctp() {
     if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_sctp $options -e -o $1
-    return $?
+    if test-inet_sctp $options -e -o $1
+    then
+	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
+	then
+	    # check for leaks
+	    if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
+	    then
+		return 1
+	    else
+		return 0
+	    fi
+	else
+	    return 0
+	fi
+    else
+	return $?
+    fi
 }
 function test_inet_sctp_root() {
     if test `id -u` -ne 0 ; then return 77 ; fi

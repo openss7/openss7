@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/13 14:00:38 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:34:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/13 14:00:38 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:34:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.18  2006/05/14 06:34:31  brian
+ - corrected buffer leaks
+
  Revision 0.9.2.17  2006/05/13 14:00:38  brian
  - rationalized to rawip driver
 
@@ -103,10 +106,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/13 14:00:38 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:34:31 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/13 14:00:38 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:34:31 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -162,7 +165,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2006/05/13 14:00:38 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:34:31 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -880,8 +883,8 @@ np_unbind_prot(unsigned char proto, unsigned int type)
  */
 STATIC INLINE fastcall int
 np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
-	 struct sockaddr_in *ADDR_buffer, socklen_t ADDR_length, np_ulong CONIND_number,
-	 np_ulong BIND_flags)
+	struct sockaddr_in *ADDR_buffer, socklen_t ADDR_length, np_ulong CONIND_number,
+	np_ulong BIND_flags)
 {
 	struct np_bhash_bucket *hp;
 	unsigned short bport = ADDR_buffer[0].sin_port;
@@ -1198,7 +1201,7 @@ np_conn_check(struct np *np, unsigned char proto)
  */
 STATIC INLINE fastcall int
 np_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
-	    struct N_qos_sel_conn_ip *QOS_buffer, np_ulong CONN_flags)
+	   struct N_qos_sel_conn_ip *QOS_buffer, np_ulong CONN_flags)
 {
 	size_t dnum = DEST_length / sizeof(*DEST_buffer);
 	int err;
@@ -1363,8 +1366,7 @@ STATIC int
 np_reset_loc(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 {
 	fixme(("Write this function.\n"));
-	/* should send ICMP, but just discarding it will work for now */
-	freemsg(dp);
+	/* should send ICMP, but don't discard it because send function will not abosorb it. */
 	return (QR_DONE);
 }
 
@@ -1697,11 +1699,12 @@ np_unbind(struct np *np)
  * @SEQ_number: connection indication being accepted
  * @TOKEN_value: accepting Stream private structure
  * @CONN_flags: connection flags
+ * @dp: user connect data
  */
 STATIC int
 np_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
-	    struct N_qos_sel_conn_ip *QOS_buffer, mblk_t *SEQ_number, struct np *TOKEN_value,
-	    np_ulong CONN_flags)
+	   struct N_qos_sel_conn_ip *QOS_buffer, mblk_t *SEQ_number, struct np *TOKEN_value,
+	   np_ulong CONN_flags, mblk_t *dp)
 {
 	size_t rnum = RES_length / sizeof(*RES_buffer);
 	int err;
@@ -1730,7 +1733,7 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		   can't check it now.  Check that the accepting stream is bound to the same
 		   protocol id as the listening stream. */
 		/* Another approach for 2.4 would be to copy the sk_buff before stealing it. */
-		for (j = 0, i= 0; j < TOKEN_value->pnum; j++) {
+		for (j = 0, i = 0; j < TOKEN_value->pnum; j++) {
 			for (i = 0; i < np->pnum; i++)
 				if (TOKEN_value->protoids[j] == np->protoids[i])
 					break;
@@ -1873,8 +1876,7 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		for (i = 0; i < rnum; i++) {
 			struct rtable *rt = NULL;
 
-			if ((err =
-			     ip_route_output(&rt, RES_buffer[i].sin_addr.s_addr, 0, 0, 0))) {
+			if ((err = ip_route_output(&rt, RES_buffer[i].sin_addr.s_addr, 0, 0, 0))) {
 				while (--i >= 0)
 					dst_release(XCHG(&TOKEN_value->daddrs[i].dst, NULL));
 				goto error;
@@ -1920,11 +1922,15 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	if ((err = np_conn_check(TOKEN_value, QOS_buffer->protocol)) != 0)
 		goto error;
 
+	if (dp != NULL)
+		if (unlikely((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) != 0))
+			goto error;
 	if (SEQ_number != NULL) {
 		mblk_t *b, *b_prev, **conp;
 
 		err = NBADSEQ;
 		for (conp = &np->conq; (*conp) && (*conp) != SEQ_number; conp = &(*conp)->b_next) ;
+		/* this is really a fault */
 		if (*conp == NULL)
 			goto error;
 		*conp = SEQ_number->b_next;
@@ -1963,16 +1969,22 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
  */
 STATIC int
 np_disconnect(struct np *np, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
-	       np_ulong DISCON_reason, mblk_t *dp)
+	      np_ulong DISCON_reason, mblk_t *dp)
 {
 	struct np_chash_bucket *hp;
+	int err;
 
+	if (dp != NULL)
+		if (unlikely((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) != 0))
+			goto error;
 	if (SEQ_number != NULL) {
 		mblk_t *b, *b_prev, **conp;
 
+		err = NBADSEQ;
 		for (conp = &np->conq; (*conp) && (*conp) != SEQ_number; conp = &(*conp)->b_next) ;
+		/* this is really a fault */
 		if (*conp == NULL)
-			return (NBADSEQ);
+			goto error;
 		*conp = SEQ_number->b_next;
 		SEQ_number->b_next = NULL;
 		/* might be data hanging off of b_prev pointer */
@@ -1983,8 +1995,6 @@ np_disconnect(struct np *np, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
 		}
 		np->coninds--;
 	}
-	if (dp != NULL)
-		np_senddata(np, np->qos.protocol, np->qos.daddr, dp);
 	if ((hp = np->chash) != NULL) {
 		write_lock_bh(&hp->lock);
 		if ((*np->cprev = np->cnext))
@@ -1998,6 +2008,8 @@ np_disconnect(struct np *np, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
 		write_unlock_bh(&hp->lock);
 	}
 	return (0);
+      error:
+	return (err);
 }
 
 /*
@@ -2189,11 +2201,9 @@ ne_info_ack(queue_t *q)
 	size_t QOS_range_length = sizeof(*QOS_range_buffer);
 	size_t PROTOID_length = np->pnum;
 	size_t size = sizeof(*p) + ADDR_length + QOS_length + QOS_range_length + PROTOID_length;
-	int err;
 
-	err = -ENOBUFS;
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
-		goto error;
+		goto enobufs;
 
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -2247,8 +2257,8 @@ ne_info_ack(queue_t *q)
 	qreply(q, mp);
 	return (QR_DONE);
 
-      error:
-	return (err);
+      enobufs:
+	return (-ENOBUFS);
 }
 
 /**
@@ -2412,9 +2422,8 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 	const size_t size = sizeof(*p);
 	int err;
 
-	err = -ENOBUFS;
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
-		goto error;
+		goto enobufs;
 
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -2425,27 +2434,27 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 	case NS_WACK_OPTREQ:
 		err = np_optmgmt(np, QOS_buffer, flags);
 		if (unlikely(err != 0))
-			goto error;
+			goto free_error;
 		np_set_state(np, np->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 		break;
 	case NS_WACK_UREQ:
 		err = np_unbind(np);
 		if (unlikely(err != 0))
-			goto error;
+			goto free_error;
 		/* NPI spec says that if the provider must flush both queues before responding with 
 		   a N_OK_ACK primitive when responding to a N_UNBIND_REQ. This is to flush queued
 		   data for connectionless providers. */
 		err = m_flush(q, FLUSHRW, 0);
 		if (unlikely(err != 0))
-			goto error;
+			goto free_error;
 		np_set_state(np, NS_UNBND);
 		break;
 	case NS_WACK_CRES:
 		err =
 		    np_passive(np, ADDR_buffer, ADDR_length, QOS_buffer, SEQ_number, TOKEN_value,
-				flags);
+			       flags, dp);
 		if (unlikely(err != 0))
-			goto error;
+			goto free_error;
 		if (np != TOKEN_value) {
 			np_set_state(np, np->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 			np_set_state(TOKEN_value, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
@@ -2456,7 +2465,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 	case NS_WACK_RRES:
 		err = np_reset_rem(np, N_USER, N_REASON_UNDEFINED);
 		if (unlikely(err != 0))
-			goto error;
+			goto free_error;
 		np_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 		break;
 	case NS_WACK_DREQ6:
@@ -2466,7 +2475,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 	case NS_WACK_DREQ11:
 		err = np_disconnect(np, ADDR_buffer, SEQ_number, flags, dp);
 		if (unlikely(err != 0))
-			goto error;
+			goto free_error;
 		np_set_state(np, np->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 		break;
 	default:
@@ -2476,7 +2485,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		if (CORRECT_prim == N_OPTMGMT_REQ) {
 			err = np_optmgmt(np, QOS_buffer, flags);
 			if (unlikely(err != 0))
-				goto error;
+				goto free_error;
 			break;
 		}
 		break;
@@ -2484,8 +2493,13 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 	printd(("%s: %p: <- N_OK_ACK\n", DRV_NAME, np));
 	qreply(q, mp);
 	return (QR_DONE);
-      error:
+      free_error:
 	freemsg(mp);
+	goto error;
+      enobufs:
+	err = -ENOBUFS;
+	goto error;
+      error:
 	return (err);
 }
 
@@ -2527,15 +2541,12 @@ ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 
 	np_set_state(np, NS_WCON_CREQ);
 
-	err = -ENOBUFS;
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
-		goto error;
+		goto enobufs;
 
 	err = np_connect(np, RES_buffer, RES_length, QOS_buffer, CONN_flags);
-	if (unlikely(err != 0)) {
-		freeb(mp);
-		goto error;
-	}
+	if (unlikely(err != 0))
+		goto free_error;
 
 	np_set_state(np, NS_DATA_XFER);
 
@@ -2561,6 +2572,12 @@ ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	qreply(q, mp);
 	return (QR_DONE);
 
+      free_error:
+	freeb(mp);
+	goto error;
+      enobufs:
+	err = -ENOBUFS;
+	goto error;
       error:
 	return (err);
 
@@ -2689,7 +2706,7 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		QOS_buffer = (struct N_qos_sel_conn_ip *) mp->b_wptr;
 		QOS_buffer->n_qos_type = N_QOS_SEL_CONN_IP;
 		/* FIXME: might be a problem here on 2.4 where we steal the packet by overwritting
-		 * the protocol id. */
+		   the protocol id. */
 		QOS_buffer->protocol = iph->protocol;
 		QOS_buffer->priority = bp->b_band;
 		QOS_buffer->ttl = iph->ttl;
@@ -3229,8 +3246,6 @@ STATIC INLINE fastcall int
 ne_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_field,
 		 np_long ERROR_type, mblk_t *db)
 {
-	int err;
-
 	switch (ERROR_type) {
 	case -EBUSY:
 	case -EAGAIN:
@@ -3264,9 +3279,7 @@ ne_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_
 	case -EFAULT:
 		return ne_error_reply(q, -EPROTO);
 	}
-	if ((err = ne_uderror_ind(q, DEST_buffer, RESERVED_field, ERROR_type, db)) == QR_ABSORBED)
-		return (QR_TRIMMED);
-	return (err);
+	return ne_uderror_ind(q, DEST_buffer, RESERVED_field, ERROR_type, db);
 }
 
 /**
@@ -3432,48 +3445,6 @@ ne_datack_ind(queue_t *q)
       enobufs:
 	return (-ENOBUFS);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
  *  ===================================================================
@@ -3645,7 +3616,7 @@ ne_bind_req(queue_t *q, mblk_t *mp)
 		ptrace(("%s: %s: proto = %d, bport = %d\n", DRV_NAME, __FUNCTION__,
 			(int) PROTOID_buffer[0], (int) ntohs(ADDR_buffer[0].sin_port)));
 		err = ne_bind_ack(q, PROTOID_buffer, p->PROTOID_length,
-					ADDR_buffer, ADDR_length, p->CONIND_number, p->BIND_flags);
+				  ADDR_buffer, ADDR_length, p->CONIND_number, p->BIND_flags);
 		if (unlikely(err != 0))
 			goto error;
 		return (QR_DONE);
@@ -3744,8 +3715,7 @@ ne_optmgmt_req(queue_t *q, mblk_t *mp)
 		np->i_flags |= IP_FLAG_DEFAULT_RC_SEL;
 	else
 		np->i_flags &= ~IP_FLAG_DEFAULT_RC_SEL;
-	err =
-	    ne_ok_ack(q, N_OPTMGMT_REQ, NULL, 0, QOS_buffer, NULL, NULL, p->OPTMGMT_flags, NULL);
+	err = ne_ok_ack(q, N_OPTMGMT_REQ, NULL, 0, QOS_buffer, NULL, NULL, p->OPTMGMT_flags, NULL);
 	if (unlikely(err != 0))
 		goto error;
 	return (QR_DONE);
@@ -3813,9 +3783,11 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 		goto error;
 	if (unlikely((err = np_senddata(np, np->qos.protocol, daddr, dp)) < 0))
 		goto error;
-	return (QR_DONE);
+	return (QR_DONE);	/* np_senddata() does not consume message blocks */
       error:
-	return ne_uderror_reply(q, DEST_buffer, 0, err, dp);
+	if ((err = ne_uderror_reply(q, DEST_buffer, 0, err, dp)) == QR_ABSORBED)
+		return (QR_TRIMMED);
+	return (err);
 }
 
 /**
@@ -3938,7 +3910,7 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	/* send data only after connection complete */
 	if (dp != NULL)
 		np_senddata(np, np->qos.protocol, np->qos.daddr, dp);
-	return (QR_TRIMMED);
+	return (QR_DONE);	/* np_senddata() does not consume message blocks */
       error:
 	return ne_error_ack(q, N_CONN_REQ, err);
 }
@@ -4087,10 +4059,10 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	np_set_state(np, NS_WACK_CRES);
 	err = ne_ok_ack(q, N_CONN_RES, RES_buffer, p->RES_length,
-			      QOS_buffer, SEQ_number, TOKEN_value, p->CONN_flags, dp);
+			QOS_buffer, SEQ_number, TOKEN_value, p->CONN_flags, dp);
 	if (unlikely(err != 0))
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_DONE);	/* user data is not absorbed */
       error:
 	return ne_error_ack(q, N_CONN_RES, err);
 }
@@ -4177,10 +4149,10 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 	}
 	/* Ok, all checking done.  Now we need to disconnect the address. */
 	err = ne_ok_ack(q, N_DISCON_REQ, RES_buffer, p->RES_length, NULL, SEQ_number, NULL,
-			      p->DISCON_reason, dp);
+			p->DISCON_reason, dp);
 	if (unlikely(err != 0))
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_DONE);	/* user data is not absorbed */
       error:
 	return ne_error_ack(q, N_DISCON_REQ, err);
 }
@@ -4227,7 +4199,7 @@ ne_write_req(queue_t *q, mblk_t *mp)
 	if (unlikely((err = np_senddata(np, np->qos.protocol, np->qos.daddr, mp)) < 0))
 		goto error;
       discard:
-	return (QR_DONE);
+	return (QR_DONE);	/* np_senddata() does not consume message blocks */
       error:
 	return ne_error_reply(q, -EPROTO);
 }
@@ -4286,9 +4258,8 @@ ne_data_req(queue_t *q, mblk_t *mp)
 		goto error;
 	if (unlikely((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
 		goto error;
-	return (QR_TRIMMED);
       discard:
-	return (QR_DONE);
+	return (QR_DONE);	/* np_senddata() does not consume message blocks */
       error:
 	return ne_error_reply(q, -EPROTO);
 }
@@ -4333,9 +4304,8 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
 		goto error;
 	if (unlikely((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
 		goto error;
-	return (QR_TRIMMED);
       discard:
-	return (QR_DONE);
+	return (QR_DONE);	/* np_senddata() does not consume message blocks */
       error:
 	return ne_error_reply(q, -EPROTO);
 }
@@ -4423,7 +4393,7 @@ ne_reset_req(queue_t *q, mblk_t *mp)
 	np_set_state(np, NS_WCON_RREQ);
 	if ((err = ne_reset_con(q, N_USER, p->RESET_reason, mp->b_cont)) != 0)
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_DONE);	/* user data message blocks are not absorbed */
       error:
 	return ne_error_ack(q, N_RESET_REQ, err);
 
@@ -5153,12 +5123,8 @@ np_v4_rcv(struct sk_buff *skb)
 		return (0);
 	}
       no_buffers:
-	np_release(&np);
-	goto discard_it;
       linear_fail:
 	np_release(&np);
-	goto discard_it;
-      discard_it:
 	kfree_skb(skb);
 	return (0);
       no_stream:
@@ -5592,7 +5558,7 @@ np_init_caches(void)
 {
 	if (np_priv_cachep == NULL) {
 		np_priv_cachep = kmem_cache_create("np_priv_cachep", sizeof(struct np), 0,
-						    SLAB_HWCACHE_ALIGN, NULL, NULL);
+						   SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (np_priv_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate np_priv_cachep", __FUNCTION__);
 			np_term_caches();
@@ -5601,8 +5567,9 @@ np_init_caches(void)
 		printd(("%s: initialized driver private structure cache\n", DRV_NAME));
 	}
 	if (np_prot_cachep == NULL) {
-		np_prot_cachep = kmem_cache_create("np_prot_cachep", sizeof(struct np_prot_bucket), 0,
-						    SLAB_HWCACHE_ALIGN, NULL, NULL);
+		np_prot_cachep =
+		    kmem_cache_create("np_prot_cachep", sizeof(struct np_prot_bucket), 0,
+				      SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (np_prot_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate np_prot_cachep", __FUNCTION__);
 			np_term_caches();

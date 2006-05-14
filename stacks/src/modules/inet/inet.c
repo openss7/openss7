@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:58:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:58:27 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:58:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:58:04 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:58:04 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -211,7 +211,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:58:04 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -326,18 +326,6 @@ MODULE_STATIC struct streamtab ss_info = {
 	st_rdinit:&ss_rinit,		/* Upper read queue */
 	st_wrinit:&ss_winit,		/* Lower read queue */
 };
-
-/*
-   Queue put and service return values 
- */
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
 
 /*
    TLI interface state flags 

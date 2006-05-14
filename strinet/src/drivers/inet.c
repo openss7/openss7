@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/04/22 01:09:26 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/05/14 06:58:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:09:26 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:58:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.69  2006/05/14 06:58:17  brian
+ - removed redundant or unused QR_ definitions
+
  Revision 0.9.2.68  2006/04/22 01:09:26  brian
  - locking correction
 
@@ -81,10 +84,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/04/22 01:09:26 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/05/14 06:58:17 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/04/22 01:09:26 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/05/14 06:58:17 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -548,7 +551,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/04/22 01:09:26 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/05/14 06:58:17 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -720,18 +723,6 @@ MODULE_STATIC struct streamtab ss_info = {
 	.st_rdinit = &ss_rinit,		/* Upper read queue */
 	.st_wrinit = &ss_winit,		/* Lower read queue */
 };
-
-/*
-   Queue put and service return values 
- */
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
 
 /*
    TLI interface state flags 

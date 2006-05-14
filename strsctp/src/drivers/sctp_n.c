@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $
+ @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/14 06:58:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:58:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $"
+#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/14 06:58:24 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $";
+    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/14 06:58:24 $";
 
 #define __NO_VERSION__
 
@@ -216,15 +216,6 @@ STATIC struct streamtab sctp_n_info = {
 	st_rdinit:&sctp_n_rinit,	/* Upper read queue */
 	st_wrinit:&sctp_n_winit,	/* Upper write queue */
 };
-
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_STRIP	2
-#define QR_TRIMMED	3
-#define QR_LOOP		4
-#define QR_PASSALONG	5
-#define QR_PASSFLOW	6
-#define QR_DISABLE	7
 
 /*
  *  =========================================================================

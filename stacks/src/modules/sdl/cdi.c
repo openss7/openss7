@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:38 $
+ @(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/14 06:58:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:38 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 06:58:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:38 $"
+#ident "@(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/14 06:58:11 $"
 
-static char const ident[] = "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:38 $";
+static char const ident[] = "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/14 06:58:11 $";
 
 #define __NO_VERSION__
 
@@ -109,14 +109,6 @@ STATIC struct qinit cdi_winit = {
 	&cdi_minfo,			/* Information */
 	NULL				/* Statistics */
 };
-
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
 
 /*
  *  =========================================================================
