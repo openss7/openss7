@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/05/08 03:12:39 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/05/14 08:34:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:12:39 $ by $Author: brian $
+# Last Modified $Date: 2006/05/14 08:34:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -346,7 +346,8 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #include <net/dst.h>
 #endif
     ])
-    _LINUX_KERNEL_SYMBOLS([afinet_get_info,
+    _LINUX_KERNEL_SYMBOLS([module_text_address,
+			   afinet_get_info,
 			   icmp_err_convert,
 			   icmp_statistics,
 			   inet_bind,
@@ -702,7 +703,7 @@ AC_DEFUN([_INET_OUTPUT], [dnl
 AC_DEFUN([_INET_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=246
+    strconf_cv_majbase=247
     strconf_cv_midbase=60
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'

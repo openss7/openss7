@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:26:05 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/14 08:34:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:26:05 $ by $Author: brian $
+ Last Modified $Date: 2006/05/14 08:34:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.16  2006/05/14 08:34:30  brian
+ - changes for compile and load
+
  Revision 0.9.2.15  2006/05/08 11:26:05  brian
  - post inc problem and working through test cases
 
@@ -97,10 +100,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:26:05 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/14 08:34:30 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:26:05 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/14 08:34:30 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -177,7 +180,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:26:05 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/14 08:34:30 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -2917,6 +2920,7 @@ STATIC INLINE fastcall __hot_in void
 tpi_v4_steal(struct sk_buff *skb)
 {
 	skb->nh.iph->protocol = 255;
+	skb->protocol = 255;
 }
 
 /**
@@ -2929,7 +2933,14 @@ tpi_v4_steal(struct sk_buff *skb)
 STATIC INLINE fastcall __hot_in int
 tpi_v4_rcv_next(struct sk_buff *skb)
 {
+	struct inet_protocol *ip;
+	int slot;
+
+	slot = skb->nh.iph->protocol - BASE_INET_PROTOCOL;
+	assert(slot == 0);
 	kfree_skb(skb);
+	if ((ip = tpi_proto[slot]))
+		return (ip->prot.copy != 0);
 	return (0);
 }
 
@@ -2940,10 +2951,10 @@ tpi_v4_rcv_next(struct sk_buff *skb)
  * In the error packet handler, if the packet is not for us, pass it to the next handler by simply
  * returning.  Error packets are not cloned, so don't free it.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC INLINE fastcall __hot_in void
 tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 {
-	return (0);
+	return;
 }
 
 /**
@@ -3052,6 +3063,9 @@ tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 }
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
+#endif
 /**
  * tpi_init_nproto - initialize network protocol override
  *
@@ -3104,7 +3118,7 @@ tpi_term_nproto(unsigned char proto)
 		return (-EALREADY);	/* already terminated */
 	/* reduces to inet_del_protocol() if no protocol was registered */
 	spin_lock_bh(inet_proto_lockp);
-	inet_protos[hash] = ip->next;
+	inet_protosp[hash] = ip->next;
 	spin_unlock_bh(inet_proto_lockp);
 	synchronize_net();
 	tpi_bhash[slot].ipproto = NULL;
