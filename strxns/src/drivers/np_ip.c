@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:34:31 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/18 11:22:48 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/14 06:34:31 $ by $Author: brian $
+ Last Modified $Date: 2006/05/18 11:22:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.19  2006/05/18 11:22:48  brian
+ - rationalized to RAWIP driver
+
  Revision 0.9.2.18  2006/05/14 06:34:31  brian
  - corrected buffer leaks
 
@@ -106,10 +109,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:34:31 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/18 11:22:48 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:34:31 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/18 11:22:48 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -165,7 +168,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2006/05/14 06:34:31 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2006/05/18 11:22:48 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -296,6 +299,7 @@ struct np_baddr {
 	uint32_t addr;			/* IP address this bind */
 };
 
+/* Private structure */
 typedef struct np {
 	STR_DECLARATION (struct np);	/* Stream declaration */
 	struct np *bnext;		/* linkage for bind/list hash */
@@ -304,26 +308,26 @@ typedef struct np {
 	struct np *cnext;		/* linkage for conn hash */
 	struct np **cprev;		/* linkage for conn hash */
 	struct np_chash_bucket *chash;	/* linkage for conn hash */
-	N_info_ack_t info;		/* network service provider information */
+	N_info_ack_t info;		/* service provider information */
 	unsigned int BIND_flags;	/* bind flags */
 	unsigned int CONN_flags;	/* connect flags */
-	unsigned int CONIND_number;	/* maximum number of oustanding connection indications */
+	unsigned int CONIND_number;	/* maximum number of outstanding connection indications */
 	unsigned int coninds;		/* number of outstanding connection indications */
 	mblk_t *conq;			/* connection indication queue */
 	unsigned int datinds;		/* number of outstanding data indications */
-	mblk_t *resq;			/* reset indication queue */
-	unsigned int resinds;		/* number of outstanding reset indications */
 	mblk_t *datq;			/* data indication queue */
+	unsigned int resinds;		/* number of outstanding reset indications */
+	mblk_t *resq;			/* reset indication queue */
 	unsigned short pnum;		/* number of bound protocol ids */
 	uint8_t protoids[16];		/* bound protocol ids */
 	unsigned short bnum;		/* number of bound addresses */
-	unsigned short bport;		/* bound port number - network order */
+	unsigned short bport;		/* bound port number (network order) */
 	struct np_baddr baddrs[8];	/* bound addresses */
 	unsigned short snum;		/* number of source (connected) addresses */
-	unsigned short sport;		/* source (connected) port number - network order */
+	unsigned short sport;		/* source (connected) port number (network order) */
 	struct np_saddr saddrs[8];	/* source (connected) addresses */
 	unsigned short dnum;		/* number of destination (connected) addresses */
-	unsigned short dport;		/* destination (connected) port number - network order */
+	unsigned short dport;		/* destination (connected) port number (network order) */
 	struct np_daddr daddrs[8];	/* destination (connected) addresses */
 	struct N_qos_sel_info_ip qos;	/* network service provider quality of service */
 	struct N_qos_range_info_ip qor;	/* network service provider quality of service range */
@@ -897,24 +901,28 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	hp = &np_bhash[np_bhashfn(proto, bport)];
 	write_lock_bh(&hp->lock);
 	for (np2 = hp->list; np2; np2 = np2->bnext) {
-		if (bport == np2->bport) {
-			/* Allowed to bind to each NSAP once as DEFAULT_DEST, once as
-			   DEFAULT_LISTENER and once as neither. */
-			if ((BIND_flags & (DEFAULT_DEST | DEFAULT_LISTENER)) !=
-			    (np2->BIND_flags & (DEFAULT_DEST | DEFAULT_LISTENER)))
-				continue;
-			for (i = 0; i < np2->bnum; i++) {
-				if (np2->baddrs[i].addr == 0)
+		if (proto != np2->protoids[0])
+			continue;
+		if (bport != np2->bport)
+			continue;
+#if 1
+		/* Allowed to bind to each NSAP once as DEFAULT_DEST, once as
+		   DEFAULT_LISTENER and once as neither. */
+		if ((BIND_flags & (DEFAULT_DEST | DEFAULT_LISTENER)) !=
+		    (np2->BIND_flags & (DEFAULT_DEST | DEFAULT_LISTENER)))
+			continue;
+#endif
+		for (i = 0; i < np2->bnum; i++) {
+			if (np2->baddrs[i].addr == 0)
+				break;
+			for (j = 0; j < anum; j++)
+				if (np2->baddrs[i].addr == ADDR_buffer[j].sin_addr.s_addr)
 					break;
-				for (j = 0; j < anum; j++)
-					if (np2->baddrs[i].addr == ADDR_buffer[j].sin_addr.s_addr)
-						break;
-				if (j < anum)
-					break;
-			}
-			if (i < np2->bnum)
+			if (j < anum)
 				break;
 		}
+		if (i < np2->bnum)
+			break;
 	}
 	if (np2 != NULL) {
 		write_unlock_bh(&hp->lock);
@@ -958,9 +966,9 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	for (i = 0; i < PROTOID_length; i++)
 		np->protoids[i] = PROTOID_buffer[i];
 	np->bnum = anum;
-	np->bport = ADDR_buffer[0].sin_port;
+	np->bport = bport;
 	ptrace(("%s: %s: bound to proto = %d, bport = %d\n", DRV_NAME, __FUNCTION__,
-		(int) np->protoids[0], (int) ntohs(np->bport)));
+		(int) proto, (int) ntohs(bport)));
 	for (i = 0; i < anum; i++)
 		np->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
 	write_unlock_bh(&hp->lock);
@@ -982,28 +990,28 @@ dst_pmtu(struct dst_entry *dst)
 	return (dst->pmtu);
 }
 #endif
-#endif
+#endif				/* HAVE_KFUNC_DST_MTU */
 
-#ifdef HAVE_KFUNC_DST_OUTPUT
+#if defined HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
 np_ip_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
 
-#ifdef NETIF_F_TSO
+#if defined NETIF_F_TSO
 	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
-#else
+#else				/* !defined NETIF_F_TSO */
 	ip_select_ident(iph, &rt->u.dst, NULL);
-#endif
+#endif				/* defined NETIF_F_TSO */
 	ip_send_check(iph);
-#ifdef HAVE_KFUNC_IP_DST_OUTPUT
+#if defined HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
-#else
+#else				/* !defined HAVE_KFUNC_IP_DST_OUTPUT */
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
-#endif
+#endif				/* defined HAVE_KFUNC_IP_DST_OUTPUT */
 }
-#else
+#else				/* !defined HAVE_KFUNC_DST_OUTPUT */
 STATIC INLINE int
 np_ip_queue_xmit(struct sk_buff *skb)
 {
@@ -1019,7 +1027,7 @@ np_ip_queue_xmit(struct sk_buff *skb)
 		return skb->dst->output(skb);
 	}
 }
-#endif
+#endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
 /**
  * np_senddata - process a unit data request
@@ -1029,7 +1037,7 @@ np_ip_queue_xmit(struct sk_buff *skb)
  * @mp: message payload
  */
 STATIC INLINE fastcall __hot_put int
-np_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
+np_senddata(struct np *np, uint8_t protocol, uint32_t daddr, mblk_t *mp)
 {
 	struct rtable *rt = NULL;
 
@@ -1077,7 +1085,6 @@ np_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 #endif
 #endif
 #endif
-			skb->priority = np->qos.priority;
 			/* IMPLEMENTATION NOTE:- The passed in mblk_t pointer is possibly a message
 			   buffer chain and we must iterate along the b_cont pointer.  Rather than
 			   copying at this point, it is probably a better idea to create a
@@ -1105,13 +1112,20 @@ np_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 	return (QR_DONE);
 }
 
+#if 1
 STATIC INLINE fastcall int
 np_datack(queue_t *q)
 {
 	/* not supported */
 	return (-EOPNOTSUPP);
 }
+#endif
 
+/**
+ * np_conn_check - check and enter into connection hashes
+ * @np: private structure
+ * @proto: protocol to which to connect
+ */
 STATIC fastcall int
 np_conn_check(struct np *np, unsigned char proto)
 {
@@ -1209,6 +1223,14 @@ np_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_length
 
 	err = NBADQOSPARAM;
 	/* first validate parameters */
+	if (QOS_buffer->priority != QOS_UNKNOWN) {
+		if ((np_long) QOS_buffer->priority < np->qor.priority.priority_min_value)
+			goto error;
+		if ((np_long) QOS_buffer->priority > np->qor.priority.priority_max_value)
+			goto error;
+	} else {
+		QOS_buffer->priority = np->qos.priority;
+	}
 	if (QOS_buffer->protocol != QOS_UNKNOWN) {
 		for (i = 0; i < np->pnum; i++)
 			if (np->protoids[i] == QOS_buffer->protocol)
@@ -1217,14 +1239,6 @@ np_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_length
 			goto error;
 	} else {
 		QOS_buffer->protocol = np->qos.protocol;
-	}
-	if (QOS_buffer->priority != QOS_UNKNOWN) {
-		if ((np_long) QOS_buffer->priority < np->qor.priority.priority_min_value)
-			goto error;
-		if ((np_long) QOS_buffer->priority > np->qor.priority.priority_max_value)
-			goto error;
-	} else {
-		QOS_buffer->priority = np->qos.priority;
 	}
 	if (QOS_buffer->ttl != QOS_UNKNOWN) {
 		if ((np_long) QOS_buffer->ttl < np->qor.ttl.ttl_min_value)
@@ -1350,6 +1364,7 @@ np_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_length
 	return (err);
 }
 
+#if 1
 /**
  * np_reset_loc - perform a local reset
  * @np: Stream private structure
@@ -1395,6 +1410,7 @@ np_reset_rem(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason)
 	np->resinds--;
 	return (0);
 }
+#endif
 
 STATIC int
 np_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_flags)
@@ -1663,7 +1679,9 @@ np_optmgmt(struct np *np, union N_qos_ip_types *QOS_buffer, np_ulong OPTMGMT_fla
  * np_unbind - unbind a Stream from an NSAP
  * @np: private structure
  *
- * Simply remove the Stream from the bind hashes and release a reference to the Stream.
+ * Simply remove the Stream from the bind hashes and release a reference to the Stream.  This
+ * function can be called whether the stream is bound or not (and is always called before the
+ * private structure is freed.
  */
 STATIC int
 np_unbind(struct np *np)
@@ -1762,7 +1780,7 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	   themselves, that are contained in the responding address(es) for NPI-IP.  Therefore, QOS 
 	   parameter checks must be performed in the np_passive() function instead. */
 	if (QOS_buffer->protocol != QOS_UNKNOWN) {
-		/* Specified protocol probably needs to be the same as the indication, but since we 
+		/* Specified protocol probably needs to be the same as the indication, but since we
 		   only bind to one protocol id at the moment that is not a problem.  The
 		   connection indication protocol was checked against the accepting Stream above. */
 		for (i = 0; i < TOKEN_value->pnum; i++)
@@ -1908,7 +1926,7 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		   so lookups to this destination are fast.  They will be released upon
 		   disconnection. */
 
-		TOKEN_value->daddrs[0].addr = RES_buffer[0].sin_addr.s_addr;
+		TOKEN_value->daddrs[0].addr = iph->saddr;
 		TOKEN_value->daddrs[0].ttl = QOS_buffer->ttl;
 		TOKEN_value->daddrs[0].tos = QOS_buffer->tos;
 		TOKEN_value->daddrs[0].mtu = dst_pmtu(TOKEN_value->daddrs[0].dst);
@@ -1938,9 +1956,8 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		/* might be data hanging off of b_prev pointer */
 		b = b_prev = SEQ_number;
 		while ((b = b_prev)) {
-			/* FIXME: don't free these, deliver them... */
 			b_prev = XCHG(&b->b_prev, NULL);
-			freemsg(b);
+			put(TOKEN_value->oq, b);
 		}
 		np->coninds--;
 	}
@@ -2292,8 +2309,7 @@ ne_bind_ack(queue_t *q, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto error;
 
-	err = np_bind(np, PROTOID_buffer, PROTOID_length, ADDR_buffer, ADDR_length,
-		      CONIND_number, BIND_flags);
+	err = np_bind(np, PROTOID_buffer, PROTOID_length, ADDR_buffer, ADDR_length, CONIND_number, BIND_flags);
 	if (unlikely(err != 0)) {
 		freeb(mp);
 		goto error;
@@ -2431,12 +2447,14 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 	p->CORRECT_prim = CORRECT_prim;
 	mp->b_wptr += sizeof(*p);
 	switch (np_get_state(np)) {
+#if 1
 	case NS_WACK_OPTREQ:
 		err = np_optmgmt(np, QOS_buffer, flags);
 		if (unlikely(err != 0))
 			goto free_error;
 		np_set_state(np, np->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
 		break;
+#endif
 	case NS_WACK_UREQ:
 		err = np_unbind(np);
 		if (unlikely(err != 0))
@@ -2449,25 +2467,31 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 			goto free_error;
 		np_set_state(np, NS_UNBND);
 		break;
-	case NS_WACK_CRES:
-		err =
-		    np_passive(np, ADDR_buffer, ADDR_length, QOS_buffer, SEQ_number, TOKEN_value,
-			       flags, dp);
-		if (unlikely(err != 0))
-			goto free_error;
-		if (np != TOKEN_value) {
-			np_set_state(np, np->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
-			np_set_state(TOKEN_value, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
-		} else {
-			np_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
-		}
+#if 0
+	case NS_WCON_CREQ:
 		break;
+#endif
+	case NS_WACK_CRES:
+		if (np != TOKEN_value)
+			TOKEN_value->i_oldstate = np_get_state(TOKEN_value);
+		np_set_state(TOKEN_value, NS_DATA_XFER);
+		err = np_passive(np, ADDR_buffer, ADDR_length, QOS_buffer, SEQ_number,
+				TOKEN_value, flags, dp);
+		if (unlikely(err != 0)) {
+			np_set_state(TOKEN_value, TOKEN_value->i_oldstate);
+			goto free_error;
+		}
+		if (np != TOKEN_value)
+			np_set_state(np, np->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
+		break;
+#if 1
 	case NS_WACK_RRES:
 		err = np_reset_rem(np, N_USER, N_REASON_UNDEFINED);
 		if (unlikely(err != 0))
 			goto free_error;
 		np_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 		break;
+#endif
 	case NS_WACK_DREQ6:
 	case NS_WACK_DREQ7:
 	case NS_WACK_DREQ9:
@@ -2482,12 +2506,14 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
 		   normally when we are responding to a N_OPTMGMT_REQ in other than the NS_IDLE
 		   state. */
+#if 1
 		if (CORRECT_prim == N_OPTMGMT_REQ) {
 			err = np_optmgmt(np, QOS_buffer, flags);
 			if (unlikely(err != 0))
 				goto free_error;
 			break;
 		}
+#endif
 		break;
 	}
 	printd(("%s: %p: <- N_OK_ACK\n", DRV_NAME, np));
@@ -2583,6 +2609,7 @@ ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 
 }
 
+#if 1
 /**
  * ne_reset_con - generate a N_RESET_CON message
  * @q: active queue in queue pair (write queue)
@@ -2624,6 +2651,7 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
       error:
 	return (err);
 }
+#endif
 
 /**
  * ne_conn_ind - generate a N_CONN_IND message
@@ -2638,14 +2666,12 @@ STATIC INLINE fastcall __hot_get int
 ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 {
 	struct np *np = NP_PRIV(q);
-	mblk_t *mp, *bp;
+	mblk_t *mp, *cp;
 	N_conn_ind_t *p;
 	struct sockaddr_in *DEST_buffer, *SRC_buffer;
 	struct N_qos_sel_conn_ip *QOS_buffer;
-	const np_ulong DEST_length = sizeof(*DEST_buffer);
-	const np_ulong SRC_length = sizeof(*SRC_buffer);
-	const np_ulong QOS_length = sizeof(*QOS_buffer);
-	const size_t size = sizeof(*p) + DEST_length + SRC_length + QOS_length;
+	np_ulong DEST_length, SRC_length, QOS_length;
+	size_t size;
 	struct iphdr *iph = (struct iphdr *) SEQ_number->b_rptr;
 	struct udphdr *uh = (struct udphdr *) (SEQ_number->b_rptr + (iph->ihl << 2));
 
@@ -2653,31 +2679,48 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	assure(SEQ_number->b_wptr >= SEQ_number->b_rptr + (iph->ihl << 2));
 
 	/* Make sure we don't already have a connection indication */
-	for (bp = np->conq; bp; bp = bp->b_next) {
-		struct iphdr *iph2 = (struct iphdr *) bp->b_rptr;
+	for (cp = np->conq; cp; cp = cp->b_next) {
+		struct iphdr *iph2 = (struct iphdr *) cp->b_rptr;
 
 		if (iph->protocol == iph2->protocol
 		    && iph->saddr == iph2->saddr && iph->daddr == iph2->daddr) {
-			/* duplicate, just discard it */
-			return (QR_DONE);
+			/* already have a connection indication, link the data */
+			linkb(cp, SEQ_number);
+			goto absorbed;
 		}
 	}
 
-	if (np->coninds >= np->CONIND_number)
-		/* If there are too many connection indications, just discard it -- we might get
-		   fancy later and queue it anyway. */
-		return (QR_DONE);
+	if (unlikely(np->coninds >= np->CONIND_number))
+		/* If there are already too many connection indications outstanding, discard
+		   further connection indications until some are accepted -- we might get fancy
+		   later and queue it anyway.  Note that data for existing outstanding connection
+		   indications is preserved above. */
+		goto eagain;
+	if (unlikely(np_not_state(np, (NSF_IDLE|NSF_WRES_CIND))))
+		/* If there is already a connection accepted on the listening stream, discard
+		   further connection indications until the current connection disconnects */
+		goto eagain;
 
 	np_set_state(np, NS_WRES_CIND);
 
-	if (unlikely((bp = ss7_dupmsg(q, SEQ_number)) == NULL))
-		goto nobufs;
+	if (unlikely((cp = ss7_dupmsg(q, SEQ_number)) == NULL))
+		goto enobufs;
+
+	DEST_length = sizeof(*DEST_buffer);
+	SRC_length = sizeof(*SRC_buffer);
+	QOS_length = sizeof(*QOS_buffer);
+	size = sizeof(*p) + DEST_length + SRC_length + QOS_length;
+
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
-		goto free_nobufs;
+		goto free_enobufs;
+
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
 
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 0;
-	p = (N_conn_ind_t *) mp->b_wptr;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_CONN_IND;
 	p->DEST_length = DEST_length;
 	p->DEST_offset = DEST_length ? sizeof(*p) : 0;
@@ -2687,7 +2730,6 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	p->CONN_flags = 0;
 	p->QOS_length = QOS_length;
 	p->QOS_offset = QOS_length ? sizeof(*p) + DEST_length + SRC_length : 0;
-	mp->b_wptr += sizeof(N_conn_ind_t);
 	if (DEST_length) {
 		DEST_buffer = (struct sockaddr_in *) mp->b_wptr;
 		DEST_buffer->sin_family = AF_INET;
@@ -2708,31 +2750,37 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		/* FIXME: might be a problem here on 2.4 where we steal the packet by overwritting
 		   the protocol id. */
 		QOS_buffer->protocol = iph->protocol;
-		QOS_buffer->priority = bp->b_band;
+		QOS_buffer->priority = cp->b_band;
 		QOS_buffer->ttl = iph->ttl;
 		QOS_buffer->tos = iph->tos;
 		QOS_buffer->mtu = QOS_UNKNOWN;	/* FIXME: determine route and get mtu from it */
 		QOS_buffer->daddr = iph->daddr;
 		QOS_buffer->saddr = iph->saddr;
-		mp->b_wptr += sizeof(struct N_qos_sel_conn_ip);
+		mp->b_wptr += QOS_length;
 	}
 	/* should we pull the IP header? */
-	mp->b_cont = bp;
+	mp->b_cont = cp;
 	/* sure, all the info is in the qos structure and addresses */
-	bp->b_rptr += (iph->ihl << 2);
+	cp->b_rptr += (iph->ihl << 2);
 	/* save original in connection indication list */
 	SEQ_number->b_next = np->conq;
 	np->conq = SEQ_number;
 	np->coninds++;
 	printd(("%s: <- N_CONN_IND\n", DRV_NAME));
 	putnext(q, mp);
+      absorbed:
 	return (QR_ABSORBED);
 
-      free_nobufs:
-	freemsg(bp);
-	goto nobufs;
-      nobufs:
+      ebusy:
+	freeb(cp);
+	freeb(mp);
+	return (-EBUSY);
+      free_enobufs:
+	freemsg(cp);
+      enobufs:
 	return (-ENOBUFS);
+      eagain:
+	return (-EAGAIN);
 }
 
 /**
@@ -2749,11 +2797,16 @@ ne_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	      np_ulong RESERVED_field, np_ulong DISCON_orig, np_ulong DISCON_reason,
 	      mblk_t *SEQ_number, mblk_t *dp)
 {
+	struct np *np = NP_PRIV(q);
 	mblk_t *mp;
 	N_discon_ind_t *p;
+	size_t size = sizeof(*p) + RES_length;
 
-	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + RES_length, BPRI_MED)) == NULL))
-		goto nobufs;
+	if (unlikely(np_not_state(np, (NSF_WRES_CIND|NSF_DATA_XFER|NSF_WRES_RIND|NSF_WCON_RREQ))))
+		goto discard;
+
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+		goto enobufs;
 
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 2;		/* expedite */
@@ -2770,12 +2823,14 @@ ne_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		mp->b_wptr += RES_length;
 	}
 	mp->b_cont = dp;
-	printd(("%s: <- N_DISCON_IND\n", DRV_NAME));
+	printd(("%s: %p: <- N_DISCON_IND\n", DRV_NAME, np));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
-      nobufs:
+      enobufs:
 	return (-ENOBUFS);
+      discard:
+	return (QR_DONE);
 }
 
 /**
@@ -2791,8 +2846,10 @@ ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	struct icmphdr *icmp;
 	struct udphdr *uh;
 	struct sockaddr_in res_buf, *RES_buffer = &res_buf;
-	np_ulong RESERVED_field, RESET_orig, RESET_reason;
-	mblk_t **respp, **conpp, *SEQ_number;
+	np_ulong DISCON_reason;
+	np_ulong RESERVED_field, DISCON_orig;
+	mblk_t **respp;
+	mblk_t **conpp, *SEQ_number;
 	ptrdiff_t hidden;
 	int err;
 
@@ -2814,13 +2871,13 @@ ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
 		case ICMP_HOST_UNREACH:
 		case ICMP_PROT_UNREACH:
 		case ICMP_PORT_UNREACH:
-			RESET_orig = N_PROVIDER;
-			RESET_reason = N_REJ_NSAP_UNREACH_P;	// N_UD_ROUTE_UNAVAIL;
+			DISCON_orig = N_PROVIDER;
+			DISCON_reason = N_REJ_NSAP_UNREACH_P;	// N_UD_ROUTE_UNAVAIL;
 			RESERVED_field = 0;
 			break;
 		case ICMP_FRAG_NEEDED:
-			RESET_orig = N_PROVIDER;
-			RESET_reason = N_REJ_QOS_UNAVAIL_P;	// N_UD_SEG_REQUIRED;
+			DISCON_orig = N_PROVIDER;
+			DISCON_reason = N_REJ_QOS_UNAVAIL_P;	// N_UD_SEG_REQUIRED;
 			RESERVED_field = icmp->un.frag.mtu;
 			break;
 		case ICMP_NET_UNKNOWN:
@@ -2831,57 +2888,57 @@ ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
 		case ICMP_PKT_FILTERED:
 		case ICMP_PREC_VIOLATION:
 		case ICMP_PREC_CUTOFF:
-			RESET_orig = N_PROVIDER;
-			RESET_reason = N_REJ_NSAP_UNKNOWN;	// N_UD_ROUTE_UNAVAIL;
+			DISCON_orig = N_PROVIDER;
+			DISCON_reason = N_REJ_NSAP_UNKNOWN;	// N_UD_ROUTE_UNAVAIL;
 			RESERVED_field = 0;
 			break;
 		case ICMP_SR_FAILED:
 		case ICMP_NET_UNR_TOS:
 		case ICMP_HOST_UNR_TOS:
-			RESET_orig = N_PROVIDER;
-			RESET_reason = N_REJ_QOS_UNAVAIL_P;	// N_UD_QOS_UNAVAIL;
+			DISCON_orig = N_PROVIDER;
+			DISCON_reason = N_REJ_QOS_UNAVAIL_P;	// N_UD_QOS_UNAVAIL;
 			RESERVED_field = 0;
 			break;
 		default:
-			RESET_orig = N_UNDEFINED;
-			RESET_reason = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
+			DISCON_orig = N_UNDEFINED;
+			DISCON_reason = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
 			RESERVED_field = 0;
 			break;
 		}
 		break;
 	case ICMP_SOURCE_QUENCH:
 		/* Should not cause disconnect. */
-		RESET_orig = N_PROVIDER;
-		RESET_reason = N_CONGESTION;	// N_UD_CONGESTION;
+		DISCON_orig = N_PROVIDER;
+		DISCON_reason = N_CONGESTION;	// N_UD_CONGESTION;
 		RESERVED_field = 0;
 		break;
 	case ICMP_TIME_EXCEEDED:
 		switch (icmp->code) {
 		case ICMP_EXC_TTL:
-			RESET_orig = N_PROVIDER;
-			RESET_reason = N_REJ_QOS_UNAVAIL_P;	// N_UD_LIFE_EXCEEDED;
+			DISCON_orig = N_PROVIDER;
+			DISCON_reason = N_REJ_QOS_UNAVAIL_P;	// N_UD_LIFE_EXCEEDED;
 			RESERVED_field = 0;
 			break;
 		case ICMP_EXC_FRAGTIME:
-			RESET_orig = N_PROVIDER;
-			RESET_reason = N_REJ_QOS_UNAVAIL_P;	// N_UD_TD_EXCEEDED;
+			DISCON_orig = N_PROVIDER;
+			DISCON_reason = N_REJ_QOS_UNAVAIL_P;	// N_UD_TD_EXCEEDED;
 			RESERVED_field = 0;
 			break;
 		default:
-			RESET_orig = N_UNDEFINED;
-			RESET_reason = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
+			DISCON_orig = N_UNDEFINED;
+			DISCON_reason = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
 			RESERVED_field = 0;
 			break;
 		}
 		break;
 	case ICMP_PARAMETERPROB:
-		RESET_orig = N_UNDEFINED;
-		RESET_reason = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
+		DISCON_orig = N_UNDEFINED;
+		DISCON_reason = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
 		RESERVED_field = 0;
 		break;
 	default:
-		RESET_orig = N_UNDEFINED;
-		RESET_reason = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
+		DISCON_orig = N_UNDEFINED;
+		DISCON_reason = N_REASON_UNDEFINED;	// N_UD_UNDEFINED;
 		RESERVED_field = 0;
 		break;
 	}
@@ -2908,8 +2965,8 @@ ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	/* hide ICMP header */
 	hidden = (unsigned char *) iph - mp->b_rptr;
 	mp->b_rptr = (unsigned char *) iph;
-	if ((err = ne_discon_ind(q, RES_buffer, sizeof(*RES_buffer), RESERVED_field, RESET_orig,
-				 RESET_reason, SEQ_number, mp)) < 0)
+	if ((err = ne_discon_ind(q, RES_buffer, sizeof(*RES_buffer), RESERVED_field, DISCON_orig,
+				 DISCON_reason, SEQ_number, mp)) < 0)
 		mp->b_rptr -= hidden;
 	else if ((*conpp) != NULL) {
 		mblk_t *b, *b_prev;
@@ -2946,11 +3003,11 @@ ne_data_ind(queue_t *q, mblk_t *dp)
 	N_data_ind_t *p;
 	const size_t size = sizeof(*p);
 
-	if (unlikely(!canputnext(q)))
-		goto ebusy;
-
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
+
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
 
 	mp->b_datap->db_type = M_PROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -2960,15 +3017,15 @@ ne_data_ind(queue_t *q, mblk_t *dp)
 	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
-	printd(("%s: <- N_DATA_IND\n", DRV_NAME));
+	printd(("%s: %p: <- N_DATA_IND\n", DRV_NAME, NP_PRIV(q)));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
+      ebusy:
+	freeb(mp);
+	return (-EBUSY);
       enobufs:
 	return (-ENOBUFS);
-
-      ebusy:
-	return (-EBUSY);
 }
 
 /**
@@ -2994,7 +3051,7 @@ ne_exdata_ind(queue_t *q, mblk_t *dp)
 	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
-	printd(("%s: <- N_EXDATA_IND\n", DRV_NAME));
+	printd(("%s: %p: <- N_EXDATA_IND\n", DRV_NAME, NP_PRIV(q)));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -3017,15 +3074,18 @@ ne_exdata_ind(queue_t *q, mblk_t *dp)
 STATIC INLINE fastcall __hot_in int
 ne_unitdata_ind(queue_t *q, mblk_t *dp)
 {
+	struct np *np = NP_PRIV(q);
 	mblk_t *mp;
 	N_unitdata_ind_t *p;
 	struct sockaddr_in *SRC_buffer, *DEST_buffer;
 	const np_ulong SRC_length = sizeof(*SRC_buffer);
 	const np_ulong DEST_length = sizeof(*DEST_buffer);
-	const size_t size = sizeof(*p) + SRC_length + DEST_length;
+	size_t size = sizeof(*p) + SRC_length + DEST_length;
 	struct iphdr *iph;
 	struct udphdr *uh;
 
+	if (unlikely(np_get_state(np) != NS_IDLE))
+		goto discard;
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	if (unlikely(!canputnext(q)))
@@ -3049,18 +3109,18 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
 		SRC_buffer->sin_family = AF_INET;
 		SRC_buffer->sin_port = uh->source;
 		SRC_buffer->sin_addr.s_addr = iph->saddr;
-		mp->b_wptr += sizeof(struct sockaddr_in);
+		mp->b_wptr += SRC_length;
 	}
 	if (DEST_length) {
 		DEST_buffer = (struct sockaddr_in *) mp->b_wptr;
 		DEST_buffer->sin_family = AF_INET;
 		DEST_buffer->sin_port = uh->dest;
 		DEST_buffer->sin_addr.s_addr = iph->daddr;
-		mp->b_wptr += sizeof(struct sockaddr_in);
+		mp->b_wptr += DEST_length;
 	}
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
-	printd(("%s: <- N_UNITDATA_IND\n", DRV_NAME));
+	printd(("%s: %p: <- N_UNITDATA_IND\n", DRV_NAME, np));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -3069,7 +3129,59 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
 	return (-EBUSY);
       enobufs:
 	return (-ENOBUFS);
+      discard:
+	return (QR_DONE);
 }
+
+#if 0
+/**
+ * te_optdata_ind - send a T_OPTDATA_IND upstream
+ * @q: read queue
+ * @dp: data block containing IP packet
+ *
+ * IMPLEMENTATION: The data block containst the IP header and payload, starting at
+ * dp->b_datap->db_base.  The IP message payload starts at dp->b_rptr.  This function extracts IP
+ * header information and uses it to create options.
+ */
+STATIC INLINE fastcall __hot_get int
+te_optdata_ind(queue_t *q, mblk_t *dp)
+{
+	struct tp *tp = TP_PRIV(q);
+	mblk_t *mp;
+	struct T_optdata_ind *p;
+	t_scalar_t OPT_length = t_opts_size(tp, dp);
+
+	if (unlikely(tp_get_statef(tp) & ~(TSF_DATA_XFER | TSF_WIND_ORDREL)))
+		goto discard;
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + OPT_length, BPRI_MED)) == NULL))
+		goto enobufs;
+	if (unlikely(!canputnext(q)))
+		goto ebusy;
+	mp->b_datap->db_type = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
+	p->PRIM_type = T_OPTDATA_IND;
+	p->DATA_flag = 0;
+	p->OPT_length = OPT_length;
+	p->OPT_offset = OPT_length ? sizeof(*p) : 0;
+	if (OPT_length) {
+		t_opts_build(tp, dp, mp->b_wptr, OPT_length);
+		mp->b_wptr += OPT_length;
+	}
+	dp->b_datap->db_type = M_DATA;
+	mp->b_cont = dp;
+	printd(("%s: %p: <= T_OPTDATA_IND\n", DRV_NAME, tp));
+	putnext(q, mp);
+	return (QR_ABSORBED);
+      ebusy:
+	freeb(mp);
+	return (-EBUSY);
+      enobufs:
+	return (-ENOBUFS);
+      discard:
+	return (QR_DONE);
+}
+#endif
 
 /**
  * ne_uderror_ind - generate a N_UDERROR_IND message
@@ -3142,7 +3254,7 @@ ne_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_fi
  * Notification, but there is no ICMP message associated with that and it has not yet been coded:
  * probably need an ne_uderror_ind_ecn() function.
  *
- * Note that the special case of N_UD_SEG_REQUIRED, se use the RESERVED_field to indicate that the
+ * Note that the special case of N_UD_SEG_REQUIRED, we use the RESERVED_field to indicate that the
  * value of the MTU is for the destination, gleened from the ICMP message.  This is a sneaky trick,
  * because the field must be coded zero according to NPI spec, so the presence of a non-zero value
  * indicates the MTU value from a supporting NPI provider.
@@ -3282,6 +3394,7 @@ ne_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_
 	return ne_uderror_ind(q, DEST_buffer, RESERVED_field, ERROR_type, db);
 }
 
+#if 1
 /**
  * ne_reset_ind - generate a N_RESET_IND message
  * @q: active queue in queue pair (read queue)
@@ -3414,6 +3527,55 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 		freemsg(bp);
 	return (-ENOBUFS);
 }
+#endif
+
+#if 0
+/**
+ * t_optmgmt_ack - send a T_OPTMGMT_ACK upstream
+ * @q: a queue in the queue pair
+ * @flags: result flags
+ * @req: requested options pointer from T_OPTMGMT_REQ
+ * @req_len: length of requested options
+ * @opt_len: size of output options
+ *
+ * Note: opt_len is conservative but might not be actual size of the output options.  This will be
+ * adjusted when the option buffer is built.
+ */
+STATIC int
+t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, size_t opt_len)
+{
+	struct tp *tp = TP_PRIV(q);
+	mblk_t *mp;
+	struct T_optmgmt_ack *p;
+
+	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED)) == NULL))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
+	if ((flags = t_build_options(tp, req, req_len, mp->b_wptr, &opt_len, flags)) < 0) {
+		freemsg(mp);
+		return (flags);
+	}
+	p->PRIM_type = T_OPTMGMT_ACK;
+	p->OPT_length = opt_len;
+	p->OPT_offset = opt_len ? sizeof(*p) : 0;
+	p->MGMT_flags = flags;
+	if (opt_len) {
+		mp->b_wptr += opt_len;
+	}
+#ifdef TS_WACK_OPTREQ
+	if (tp_get_state(tp) == TS_WACK_OPTREQ)
+		tp_set_state(tp, TS_IDLE);
+#endif
+	printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, tp));
+	putnext(tp->oq, mp);
+	return (0);
+      enobufs:
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
+	return (-ENOBUFS);
+}
+#endif
 
 /**
  * ne_datack_ind - NE_DATACK_IND event
@@ -3746,6 +3908,7 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 	mblk_t *dp = mp->b_cont;
 	uint32_t daddr;
 
+
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
@@ -3759,7 +3922,7 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 	err = NOUTSTATE;
 	if (unlikely(np->info.SERV_type != N_CLNS))
 		goto error;
-	if (unlikely(np_not_state(np, NSF_IDLE)))
+	if (unlikely(np_get_state(np) != NS_IDLE))
 		goto error;
 	err = NNOADDR;
 	if (unlikely(p->DEST_length == 0))
@@ -3779,7 +3942,7 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 	err = NBADDATA;
 	if (unlikely(dp == NULL))
 		goto error;
-	if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > np->info.NSDU_size))
+	if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > np->info.NSDU_size))
 		goto error;
 	if (unlikely((err = np_senddata(np, np->qos.protocol, daddr, dp)) < 0))
 		goto error;
@@ -3828,7 +3991,7 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
-	p = (N_conn_req_t *) mp->b_rptr;
+	p = (typeof(p)) mp->b_rptr;
 	err = -EFAULT;
 	if (unlikely(p->PRIM_type != N_CONN_REQ))
 		goto error;
@@ -3852,13 +4015,17 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	err = NOUTSTATE;
 	if (unlikely(np_get_state(np) != NS_IDLE))
 		goto error;
+#if 1
 	err = NBADFLAG;
 	if (unlikely(p->CONN_flags != 0))
 		goto error;
+#endif
 	err = NNOADDR;
-	if (p->DEST_length == 0)
+	if (unlikely(p->DEST_length == 0))
 		goto error;
 	err = NBADADDR;
+	if (unlikely(p->DEST_length > np->info.ADDR_size))
+		goto error;
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length))
 		goto error;
 	if (unlikely(p->DEST_length < sizeof(*DEST_buffer)))
@@ -3900,7 +4067,7 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	}
 	if (dp != NULL) {
 		err = NBADDATA;
-		if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > np->info.CDATA_size))
+		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > np->info.CDATA_size))
 			goto error;
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
@@ -3969,7 +4136,7 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
-	p = (N_conn_res_t *) mp->b_rptr;
+	p = (typeof(p)) mp->b_rptr;
 	err = -EFAULT;
 	if (unlikely(p->PRIM_type != N_CONN_RES))
 		goto error;
@@ -4021,33 +4188,36 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 		bcopy(mp->b_rptr + p->QOS_offset, QOS_buffer, p->QOS_length);
 	}
 	err = NBADDATA;
-	if (unlikely((dp = mp->b_cont) != NULL &&
-		     ((dlen = msgdsize(dp)) <= 0 || dlen > np->info.CDATA_size)))
-		goto error;
+	if ((dp = mp->b_cont) != NULL)
+		if (unlikely((dlen = msgsize(dp)) == 0 || dlen > np->info.CDATA_size))
+			goto error;
 	err = NBADSEQ;
 	if (unlikely(p->SEQ_number == 0))
 		goto error;
 	err = NOUTSTATE;
 	if (unlikely(np_not_state(np, NSF_WRES_CIND) || np->coninds < 1))
 		goto error;
-	for (SEQ_number = np->conq; SEQ_number && (np_ulong) (long) SEQ_number != p->SEQ_number;
-	     SEQ_number = SEQ_number->b_next) ;
 	err = NBADSEQ;
-	if (unlikely(SEQ_number == NULL))
+	if (unlikely((SEQ_number = n_seq_check(np, p->SEQ_number)) == NULL))
 		goto error;
 	if (p->TOKEN_value != 0) {
-		for (TOKEN_value = master.np.list;
-		     TOKEN_value && (np_ulong) (long) TOKEN_value != p->TOKEN_value;
-		     TOKEN_value = TOKEN_value->next) ;
 		err = NBADTOKEN;
-		if (unlikely(TOKEN_value == NULL))
+		if (unlikely((TOKEN_value = n_tok_check(p->TOKEN_value)) == NULL))
 			goto error;
+		err = NBADTOKEN;
+		if (unlikely(TOKEN_value->info.SERV_type == N_CLNS))
+			goto error;
+		err = NBADTOKEN;
+		if (unlikely(TOKEN_value->CONIND_number > 0))
+			goto error;
+		err = NOUTSTATE;
 		if (np_get_state(TOKEN_value) != NS_IDLE)
 			/* Later we could auto bind if in NS_UNBND state. Note that the Stream to
 			   which we do a passive connection could be already connected: we just are 
 			   just adding another address to a multihomed connection.  But this is not 
 			   as useful as adding or removing an address with N_OPTMGMT_REQ. */
 			goto error;
+		err = NBADTOKEN;
 		if (TOKEN_value->info.SERV_type != N_CONS)
 			/* Must be connection-oriented Stream. */
 			goto error;
@@ -4078,9 +4248,11 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 	struct np *np = NP_PRIV(q);
 	N_discon_req_t *p;
 	struct sockaddr_in *RES_buffer = NULL;
+	size_t RES_length = 0;
 	mblk_t *dp, *SEQ_number = NULL;
 	size_t dlen;
 	int err;
+	np_long state;
 
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -4098,37 +4270,34 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 	err = NOUTSTATE;
 	if (unlikely(np_not_state(np, NSM_CONNECTED)))
 		goto error;
-	if (p->RES_length) {
+#if 1
+	if ((RES_length = p->RES_length)) {
 		err = -EINVAL;
-		if (mp->b_wptr < mp->b_rptr + p->RES_offset + p->RES_length)
+		if (mp->b_wptr < mp->b_rptr + p->RES_offset + RES_length)
 			goto error;
 		err = NBADADDR;
-		if (p->RES_length % sizeof(*RES_buffer) != 0)
+		if (RES_length % sizeof(*RES_buffer) != 0)
 			goto error;
 		RES_buffer = (struct sockaddr_in *) (mp->b_rptr + p->RES_offset);
 	}
-	if (p->SEQ_number) {
-		err = NBADSEQ;
-		if (np_get_state(np) != NS_WRES_CIND)
+#endif
+	err = NBADDATA;
+	if ((dp = mp->b_cont) != NULL)
+		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > np->info.DDATA_size))
 			goto error;
-		for (SEQ_number = np->conq;
-		     SEQ_number && (np_ulong) (long) SEQ_number != p->SEQ_number;
-		     SEQ_number = SEQ_number->b_next) ;
-		err = NBADSEQ;
-		if (SEQ_number == NULL)
+	state = np_get_state(np);
+	err = NBADSEQ;
+	if (p->SEQ_number != 0) {
+		if (unlikely(state != NS_WRES_CIND))
 			goto error;
-
+		if (unlikely((SEQ_number = n_seq_check(np, p->SEQ_number)) == NULL))
+			goto error;
 	} else {
-		err = NBADSEQ;
-		if (np_get_state(np) == NS_WRES_CIND)
+		if (unlikely(state == NS_WRES_CIND))
 			goto error;
 	}
-	err = NBADDATA;
-	if (unlikely((dp = mp->b_cont) != NULL &&
-		     ((dlen = msgdsize(dp)) <= 0 || dlen > np->info.DDATA_size)))
-		goto error;
 	err = NOUTSTATE;
-	switch (np_get_state(np)) {
+	switch (state) {
 	case NS_WCON_CREQ:
 		np_set_state(np, NS_WACK_DREQ6);
 		break;
@@ -4148,7 +4317,7 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 		goto error;
 	}
 	/* Ok, all checking done.  Now we need to disconnect the address. */
-	err = ne_ok_ack(q, N_DISCON_REQ, RES_buffer, p->RES_length, NULL, SEQ_number, NULL,
+	err = ne_ok_ack(q, N_DISCON_REQ, RES_buffer, RES_length, NULL, SEQ_number, NULL,
 			p->DISCON_reason, dp);
 	if (unlikely(err != 0))
 		goto error;
@@ -4225,7 +4394,7 @@ ne_data_req(queue_t *q, mblk_t *mp)
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
 		goto error;
-	p = (N_data_req_t *) mp->b_rptr;
+	p = (typeof(p)) mp->b_rptr;
 	err = -EFAULT;
 	if (unlikely(p->PRIM_type != N_DATA_REQ))
 		goto error;
@@ -4253,8 +4422,9 @@ ne_data_req(queue_t *q, mblk_t *mp)
 		   for a final N_DATA_REQ or delimited message.  */
 		goto error;
 	err = NBADDATA;
-	if (unlikely(!(dp = mp->b_cont) || (dlen = msgsize(dp)) == 0
-		     || dlen > np->info.NIDU_size || dlen > np->info.NSDU_size))
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto error;
+	if (unlikely((dlen = msgsize(dp)) == 0 || dlen > np->info.NIDU_size || dlen > np->info.NSDU_size))
 		goto error;
 	if (unlikely((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
 		goto error;
@@ -4299,8 +4469,9 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(np_not_state(np, NSM_OUTDATA)))
 		goto error;
 	err = NBADDATA;
-	if (unlikely(!(dp = mp->b_cont) || (dlen = msgsize(dp)) == 0
-		     || dlen > np->info.NIDU_size || dlen > np->info.ENSDU_size))
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto error;
+	if (unlikely((dlen = msgsize(dp)) == 0 || dlen > np->info.NIDU_size || dlen > np->info.ENSDU_size))
 		goto error;
 	if (unlikely((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
 		goto error;
@@ -5338,6 +5509,7 @@ np_free_priv(queue_t *q)
 		np_unbind(np);
 		np_set_state(np, NS_UNBND);
 	}
+#if 1
 	{
 		mblk_t *b, *b_prev, *b_next;
 
@@ -5359,6 +5531,9 @@ np_free_priv(queue_t *q)
 			freemsg(b);
 		}
 	}
+#else
+	bufq_purge(&np->conq);
+#endif
 	ss7_unbufcall((str_t *) np);
 	printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME,
 		atomic_read(&np->refcnt)));

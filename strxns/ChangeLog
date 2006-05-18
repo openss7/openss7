@@ -1,3 +1,7 @@
+2006-05-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: rationalized to RAWIP driver
+
 2006-05-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* .indent.pro: added np_long and friends to types
