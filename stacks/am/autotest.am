@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: autotest.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/24 10:07:43 $
+# @(#) $RCSfile: autotest.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/05/19 13:21:44 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/24 10:07:43 $ by $Author: brian $
+## Last Modified $Date: 2006/05/19 13:21:44 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: autotest.am,v $
+## Revision 0.9.2.6  2006/05/19 13:21:44  brian
+## - strip leading zeros from test case numbers
+##
 ## Revision 0.9.2.5  2006/03/24 10:07:43  brian
 ## - send-pr is architecture independent
 ##
@@ -121,7 +124,7 @@ retest-testsuite:
 	opts='-v' ; \
 	list="./testsuite.dir/*/run" ; for t in $$list ; do \
 		if test -x $$t ; then \
-			n=`echo $$t | sed -e 's|.*testsuite.dir/||;s|/run$$||'` ; \
+			n=`echo $$t | sed -e 's|.*testsuite.dir/||;s|/run$$||;s|^00*||'` ; \
 			opts="$$opts $$n" ; \
 		fi ; \
 	done ; \

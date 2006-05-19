@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/08 03:35:13 $
+# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/19 12:54:21 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -141,7 +141,13 @@ stop() {
 	$STRXNS_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]inet' /proc/modules 2>/dev/null | remove_modules
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]ip_strm_mod' /proc/modules 2>/dev/null | remove_modules
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]ip_to_dlpi' /proc/modules 2>/dev/null | remove_modules
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]ldl' /proc/modules 2>/dev/null | remove_modules
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]np_ip' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
@@ -183,7 +189,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/05/08 03:35:13 $
+# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/19 12:54:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -228,7 +234,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:35:13 $ by $Author: brian $
+# Last Modified $Date: 2006/05/19 12:54:21 $ by $Author: brian $
 #
 # =============================================================================
 

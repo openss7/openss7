@@ -1,3 +1,7 @@
+2006-05-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/strxns.sh: corrected removal for debian
+
 2006-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/np_ip.c: rationalized to RAWIP driver
