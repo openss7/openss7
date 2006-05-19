@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/18 11:52:11 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/18 21:01:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/18 11:52:11 $ by $Author: brian $
+ Last Modified $Date: 2006/05/18 21:01:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.17  2006/05/18 21:01:17  brian
+ - synced UDP driver to RAWIP driver
+
  Revision 0.9.2.16  2006/05/18 11:52:11  brian
  - working up RAWIP driver
 
@@ -100,10 +103,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/18 11:52:11 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/18 21:01:17 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/18 11:52:11 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/18 21:01:17 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -177,7 +180,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/18 11:52:11 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/18 21:01:17 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -248,12 +251,12 @@ MODULE_ALIAS("/dev/inet/rawip");
 #endif				/* MODULE */
 
 STATIC struct module_info tp_minfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
-	.mi_idname = DRV_NAME,	/* Module name */
-	.mi_minpsz = 0,		/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
-	.mi_hiwat = (1 << 15),	/* Hi water mark */
-	.mi_lowat = (1 << 10),	/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = (1 << 15),		/* Hi water mark */
+	.mi_lowat = (1 << 10),		/* Lo water mark */
 };
 
 STATIC struct module_stat tp_mstat = {
@@ -265,24 +268,24 @@ STATIC streamscall int tp_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int tp_qclose(queue_t *, int, cred_t *);
 
 STATIC struct qinit tp_rinit = {
-	.qi_putp = ss7_oput,	/* Read put procedure (message from below) */
-	.qi_srvp = ss7_osrv,	/* Read service procedure */
-	.qi_qopen = tp_qopen,	/* Each open */
-	.qi_qclose = tp_qclose,	/* Last close */
-	.qi_minfo = &tp_minfo,	/* Module information */
-	.qi_mstat = &tp_mstat,	/* Module statistics */
+	.qi_putp = ss7_oput,		/* Read put procedure (message from below) */
+	.qi_srvp = ss7_osrv,		/* Read service procedure */
+	.qi_qopen = tp_qopen,		/* Each open */
+	.qi_qclose = tp_qclose,		/* Last close */
+	.qi_minfo = &tp_minfo,		/* Module information */
+	.qi_mstat = &tp_mstat,		/* Module statistics */
 };
 
 STATIC struct qinit tp_winit = {
-	.qi_putp = ss7_iput,	/* Write put procedure (message from above) */
-	.qi_srvp = ss7_isrv,	/* Write service procedure */
-	.qi_minfo = &tp_minfo,	/* Module information */
-	.qi_mstat = &tp_mstat,	/* Module statistics */
+	.qi_putp = ss7_iput,		/* Write put procedure (message from above) */
+	.qi_srvp = ss7_isrv,		/* Write service procedure */
+	.qi_minfo = &tp_minfo,		/* Module information */
+	.qi_mstat = &tp_mstat,		/* Module statistics */
 };
 
 MODULE_STATIC struct streamtab tp_info = {
-	.st_rdinit = &tp_rinit,	/* Upper read queue */
-	.st_wrinit = &tp_winit,	/* Upper write queue */
+	.st_rdinit = &tp_rinit,		/* Upper read queue */
+	.st_wrinit = &tp_winit,		/* Upper write queue */
 };
 
 /*
@@ -351,7 +354,6 @@ typedef struct tp {
 	unsigned int BIND_flags;	/* bind flags */
 	unsigned int CONN_flags;	/* connect flags */
 	unsigned int CONIND_number;	/* maximum number of outstanding connection indications */
-	unsigned int coninds;		/* number of outstanding connection indications */
 	bufq_t conq;			/* queue outstanding connection indications */
 	unsigned short pnum;		/* number of bound protocol ids */
 	uint8_t protoids[16];		/* bound protocol ids */
@@ -3086,8 +3088,7 @@ tp_unbind_prot(unsigned char proto, unsigned int type)
  */
 STATIC INLINE fastcall int
 tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, t_uscalar_t ADDR_length,
-	t_uscalar_t CONIND_number
-	)
+	t_uscalar_t CONIND_number)
 {
 	struct tp_bhash_bucket *hp;
 	unsigned short bport = 0;
@@ -3104,8 +3105,8 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, t_uscalar_t ADDR_length,
 		if (bport != tp2->bport)
 			continue;
 #if 0
-		/* Allowed to bind to each NSAP once as DEFAULT_DEST, once as
-		   DEFAULT_LISTENER and once as neither. */
+		/* Allowed to bind to each NSAP once as DEFAULT_DEST, once as DEFAULT_LISTENER and
+		   once as neither. */
 		if ((BIND_flags & (DEFAULT_DEST | DEFAULT_LISTENER)) !=
 		    (np2->BIND_flags & (DEFAULT_DEST | DEFAULT_LISTENER)))
 			continue;
@@ -3239,7 +3240,7 @@ tp_senddata(struct tp *tp, uint8_t protocol, uint32_t daddr, mblk_t *mp)
 			iph = (typeof(iph)) __skb_put(skb, tlen);
 			data = (unsigned char *) iph + sizeof(struct iphdr);
 			skb->dst = &rt->u.dst;
-			skb->priority = 0; // tp->options.xti.priority;
+			skb->priority = 0;	// tp->options.xti.priority;
 			iph->version = 4;
 			iph->ihl = 5;
 			iph->tos = tp->options.ip.tos;
@@ -3392,7 +3393,7 @@ tp_conn_check(struct tp *tp, unsigned char proto)
  */
 STATIC INLINE fastcall int
 tp_connect(struct tp *tp, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
-		struct tp_options *OPT_buffer, t_uscalar_t CONN_flags)
+	   struct tp_options *OPT_buffer, t_uscalar_t CONN_flags)
 {
 	size_t dnum = DEST_length / sizeof(*DEST_buffer);
 	int err;
@@ -3421,7 +3422,7 @@ tp_connect(struct tp *tp, struct sockaddr_in *DEST_buffer, socklen_t DEST_length
 		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl < 1)
 			goto error;
 		// if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl > 255)
-			// goto error;
+		// goto error;
 	} else {
 		OPT_buffer->ip.ttl = tp->options.ip.ttl;
 	}
@@ -3796,8 +3797,8 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	   parameter checks must be performed in the np_passive() function instead. */
 	if ((t_scalar_t) (signed char) OPT_buffer->ip.protocol != T_UNSPEC) {
 		/* Specified protocol probably needs to be the same as the indication, but since we
-		   only bind to one protocol id at the moment that is not a problem.  The
-		   connection indication protocol was checked against the accepting Stream above. */
+		   only bind to one protocol id at the moment that is not a problem.  The connection 
+		   indication protocol was checked against the accepting Stream above. */
 		for (i = 0; i < ACCEPTOR_id->pnum; i++)
 			if (ACCEPTOR_id->protoids[i] == OPT_buffer->ip.protocol)
 				break;
@@ -3814,18 +3815,18 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	} else {
 		OPT_buffer->xti.priority = ACCEPTOR_id->options.xti.priority;
 	}
-	if ((t_scalar_t)(signed char)OPT_buffer->ip.ttl != T_UNSPEC) {
-		if ((t_scalar_t) (signed char)OPT_buffer->ip.ttl < 1)
+	if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl != T_UNSPEC) {
+		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl < 1)
 			goto error;
 		// if ((t_scalar_t) (signed char)OPT_buffer->ip.ttl > 127)
-			// goto error;
+		// goto error;
 	} else {
 		OPT_buffer->ip.ttl = ACCEPTOR_id->options.ip.ttl;
 	}
-	if ((t_scalar_t)(signed char)OPT_buffer->ip.tos != T_UNSPEC) {
-		if ((t_scalar_t) (signed char)OPT_buffer->ip.tos < 0)
+	if ((t_scalar_t) (signed char) OPT_buffer->ip.tos != T_UNSPEC) {
+		if ((t_scalar_t) (signed char) OPT_buffer->ip.tos < 0)
 			goto error;
-		if ((t_scalar_t) (signed char)OPT_buffer->ip.tos > 15)
+		if ((t_scalar_t) (signed char) OPT_buffer->ip.tos > 15)
 			goto error;
 	} else {
 		/* FIXME: TOS should be negotiated.  The TOS should be upgraded to whatever TOS the 
@@ -3990,14 +3991,16 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
  */
 STATIC int
 tp_disconnect(struct tp *tp, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
-		t_uscalar_t DISCON_reason, mblk_t *dp)
+	      t_uscalar_t DISCON_reason, mblk_t *dp)
 {
 	struct tp_chash_bucket *hp;
 	int err;
 
-	if (dp != NULL)
-		if (unlikely((err = tp_senddata(tp, tp->options.ip.protocol, tp->options.ip.daddr, dp)) != 0))
+	if (dp != NULL) {
+		err = tp_senddata(tp, tp->options.ip.protocol, tp->options.ip.daddr, dp);
+		if (unlikely(err != 0))
 			goto error;
+	}
 	if (SEQ_number != NULL) {
 		bufq_unlink(&tp->conq, SEQ_number);
 		freemsg(SEQ_number);
@@ -4238,7 +4241,8 @@ te_info_ack(queue_t *q)
  * Generate an T_BIND_ACK and pass it upstream.
  */
 STATIC INLINE fastcall int
-te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, socklen_t ADDR_length, t_uscalar_t CONIND_number)
+te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, socklen_t ADDR_length,
+	    t_uscalar_t CONIND_number)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp = NULL;
@@ -4361,13 +4365,14 @@ te_error_ack(queue_t *q, t_scalar_t ERROR_prim, t_scalar_t error)
  * @ADDR_buffer: destination or responding address
  * @ADDR_length: length of destination or responding addresses
  * @SEQ_number: sequence number (i.e. connection/reset indication sequence number)
- * @TOKEN_value: token (i.e. connection response token)
+ * @ACCEPTOR_id: token (i.e. connection response token)
  * @flags: mangement flags, connection flags, disconnect reason, etc.
  * @dp: user data
  */
 STATIC INLINE fastcall __hot_put int
-te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer, socklen_t ADDR_length,
-	  void *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id, t_uscalar_t flags, mblk_t *dp)
+te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer,
+	  socklen_t ADDR_length, void *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id,
+	  t_uscalar_t flags, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
 	struct T_ok_ack *p;
@@ -4417,7 +4422,7 @@ te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer, 
 			ACCEPTOR_id->i_oldstate = tp_get_state(ACCEPTOR_id);
 		tp_set_state(ACCEPTOR_id, TS_DATA_XFER);
 		err = tp_passive(tp, ADDR_buffer, ADDR_length, OPT_buffer, SEQ_number,
-				ACCEPTOR_id, flags, dp);
+				 ACCEPTOR_id, flags, dp);
 		if (unlikely(err != 0)) {
 			tp_set_state(ACCEPTOR_id, ACCEPTOR_id->i_oldstate);
 			goto error;
@@ -4503,7 +4508,7 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	mblk_t *mp = NULL;
 	struct T_conn_con *p;
 	int err;
-	size_t OPT_length = 0; // FIXME: t_size_conn_con_opts(OPT_buffer);
+	size_t OPT_length = 0;		// FIXME: t_size_conn_con_opts(OPT_buffer);
 	size_t size = sizeof(*p) + RES_length + OPT_length;
 
 	tp_set_state(tp, TS_WCON_CREQ);
@@ -4613,12 +4618,11 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	t_scalar_t SRC_length, OPT_length;
 	size_t size;
 	struct iphdr *iph = (struct iphdr *) SEQ_number->b_rptr;
+
 	// struct udphdr *uh = (struct udphdr *) (SEQ_number->b_rptr + (iph->ihl << 2));
 
 	if (unlikely(tp_get_statef(tp) & ~(TSF_IDLE | TSF_WRES_CIND | TSF_WACK_CRES)))
 		goto discard;
-
-	iph = (typeof(iph)) SEQ_number->b_datap->db_base;
 
 	spin_lock_bh(&tp->conq.q_lock);
 	for (cp = bufq_head(&tp->conq); cp; cp = cp->b_next) {
@@ -4669,7 +4673,7 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	p->SRC_offset = SRC_length ? sizeof(*p) : 0;
 	p->OPT_length = OPT_length;
 	p->OPT_offset = OPT_length ? sizeof(*p) + SRC_length : 0;
-	p->SEQ_number = (t_uscalar_t)(long) SEQ_number;
+	p->SEQ_number = (t_uscalar_t) (long) SEQ_number;
 	if (SRC_length) {
 		SRC_buffer = (struct sockaddr_in *) mp->b_wptr;
 		SRC_buffer->sin_family = AF_INET;
@@ -4717,8 +4721,7 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
  */
 STATIC INLINE fastcall int
 te_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
-	      t_uscalar_t DISCON_reason,
-	      mblk_t *SEQ_number, mblk_t *dp)
+	      t_uscalar_t DISCON_reason, mblk_t *SEQ_number, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -5521,7 +5524,8 @@ te_bind_req(queue_t *q, mblk_t *mp)
 	tp->options.ip.protocol = ntohs(ADDR_buffer[0].sin_port);
 	/* check for bind to privileged protocol */
 	err = TACCES;
-	if (tp->options.ip.protocol && tp->options.ip.protocol < 255 && !capable(CAP_NET_BIND_SERVICE))
+	if (tp->options.ip.protocol && tp->options.ip.protocol < 255
+	    && !capable(CAP_NET_BIND_SERVICE))
 		goto error;
 	if ((err = tp_bind(tp, ADDR_buffer, ADDR_length, p->CONIND_number)))
 		goto error;
@@ -5869,7 +5873,8 @@ te_conn_res(queue_t *q, mblk_t *mp)
 		if (ACCEPTOR_id != tp) {
 			/* FIXME: do this check in tp_passive() */
 			err = TRESADDR;
-			if (tp->sport != ACCEPTOR_id->sport || tp->saddrs[0].addr != ACCEPTOR_id->saddrs[0].addr)
+			if (tp->sport != ACCEPTOR_id->sport
+			    || tp->saddrs[0].addr != ACCEPTOR_id->saddrs[0].addr)
 				goto error;
 		}
 	} else {
@@ -5910,6 +5915,7 @@ te_discon_req(queue_t *q, mblk_t *mp)
 	mblk_t *dp, *SEQ_number = NULL;
 	size_t dlen;
 	int err;
+	t_uscalar_t state;
 
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -5942,15 +5948,23 @@ te_discon_req(queue_t *q, mblk_t *mp)
 	if ((dp = mp->b_cont) != NULL)
 		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
 			goto error;
+	state = tp_get_state(tp);
+	err = TBADSEQ;
+	if (p->SEQ_number != 0) {
+		if (unlikely(state != TS_WRES_CIND))
+			goto error;
+		if (unlikely((SEQ_number = t_seq_check(tp, p->SEQ_number)) == NULL))
+			goto error;
+	} else {
+		if (unlikely(state == TS_WRES_CIND))
+			goto error;
+	}
 	err = TOUTSTATE;
-	switch (tp_get_state(tp)) {
+	switch (state) {
 	case TS_WCON_CREQ:
 		tp_set_state(tp, TS_WACK_DREQ6);
 		break;
 	case TS_WRES_CIND:
-		err = TBADSEQ;
-		if (unlikely((SEQ_number = t_seq_check(tp, p->SEQ_number)) == NULL))
-			goto error;
 		tp_set_state(tp, TS_WACK_DREQ7);
 		break;
 	case TS_DATA_XFER:
@@ -5996,9 +6010,9 @@ te_write_req(queue_t *q, mblk_t *mp)
 	err = TOUTSTATE;
 	if (unlikely(tp->info.SERV_type != T_COTS))
 		goto error;
-	/* Note: If the interface is in the TS_IDLE state when the provider
-	   receives the T_DATA_REQ primitive, then the TS provider should discard the request
-	   without generating a fatal error. */
+	/* Note: If the interface is in the TS_IDLE state when the provider receives the T_DATA_REQ 
+	   primitive, then the TS provider should discard the request without generating a fatal
+	   error. */
 	if (unlikely(tp_chk_state(tp, (TSF_IDLE))))
 		goto discard;
 	/* For multihomed operation, we should not actually discard the N_DATA_REQ if the
@@ -6013,7 +6027,8 @@ te_write_req(queue_t *q, mblk_t *mp)
 	if (unlikely((dlen = msgsize(mp)) == 0
 		     || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
-	if (unlikely((err = tp_senddata(tp, tp->options.ip.protocol, tp->options.ip.daddr, mp)) < 0))
+	if (unlikely
+	    ((err = tp_senddata(tp, tp->options.ip.protocol, tp->options.ip.daddr, mp)) < 0))
 		goto error;
       discard:
 	return (QR_DONE);	/* np_senddata() does not consume message blocks */
@@ -6052,9 +6067,9 @@ te_data_req(queue_t *q, mblk_t *mp)
 	err = TOUTSTATE;
 	if (unlikely(tp->info.SERV_type != T_COTS))
 		goto error;
-	/* Note: If the interface is in the TS_IDLE state when the provider
-	   receives the T_DATA_REQ primitive, then the TS provider should discard the request
-	   without generating a fatal error. */
+	/* Note: If the interface is in the TS_IDLE state when the provider receives the T_DATA_REQ 
+	   primitive, then the TS provider should discard the request without generating a fatal
+	   error. */
 	if (tp_chk_state(tp, (TSF_IDLE)))
 		/* For multihomed operation, we should not actually discard the N_DATA_REQ if the
 		   destination of the request is an address that does not have an outstanding reset
@@ -6065,16 +6080,18 @@ te_data_req(queue_t *q, mblk_t *mp)
 		goto error;
 	err = TBADFLAG;
 	if (unlikely(p->MORE_flag != 0))
-		/* TODO: We should check the MORE_flag and see whether this is a complete
-		   TSDU or not.  If not, we should accumulate the M_DATA block in a buffer waiting
-		   for a final T_DATA_REQ or delimited message.  */
+		/* TODO: We should check the MORE_flag and see whether this is a complete TSDU or
+		   not.  If not, we should accumulate the M_DATA block in a buffer waiting for a
+		   final T_DATA_REQ or delimited message.  */
 		goto error;
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	if (unlikely((dlen = msgsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
+	if (unlikely
+	    ((dlen = msgsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
-	if (unlikely((err = tp_senddata(tp, tp->options.ip.protocol, tp->options.ip.daddr, dp)) < 0))
+	if (unlikely
+	    ((err = tp_senddata(tp, tp->options.ip.protocol, tp->options.ip.daddr, dp)) < 0))
 		goto error;
       discard:
 	return (QR_DONE);	/* tp_senddata() does not consume message blocks */
@@ -6109,9 +6126,9 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	err = TOUTSTATE;
 	if (unlikely(tp->info.SERV_type != T_COTS))
 		goto error;
-	/* Note: If the interface is in the TS_IDLE state when the provider
-	   receives the T_EXDATA_REQ primitive, then the TS provider should discard the request
-	   without generating a fatal error. */
+	/* Note: If the interface is in the TS_IDLE state when the provider receives the
+	   T_EXDATA_REQ primitive, then the TS provider should discard the request without
+	   generating a fatal error. */
 	if (tp_chk_state(tp, (TSF_IDLE)))
 		goto discard;
 	if (unlikely(tp_not_state(tp, TSM_OUTDATA)))
@@ -6122,9 +6139,11 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	if (unlikely((dlen = msgsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
+	dlen = msgsize(dp);
+	if (unlikely(dlen == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
 		goto error;
-	if (unlikely((err = tp_senddata(tp, tp->options.ip.protocol, tp->options.ip.daddr, dp)) < 0))
+	err = tp_senddata(tp, tp->options.ip.protocol, tp->options.ip.daddr, dp);
+	if (unlikely(err < 0))
 		goto error;
       discard:
 	return (QR_DONE);
@@ -6879,7 +6898,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 			for (tp = hp->list; tp; tp = tp->bnext) {
 				int score = 0;
 
-				/* only listening T_COTS Streams and T_CLTS Streams */
+				/* only listening T_COTS(_ORD) Streams and T_CLTS Streams */
 				if (tp->CONIND_number == 0 && tp->info.SERV_type != T_CLTS)
 					continue;
 				/* only Streams in close to the correct state */
@@ -6897,7 +6916,6 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 						continue;
 					score++;
 				}
-
 
 				for (i = 0; i < tp->bnum; i++) {
 					if (tp->baddrs[i].addr == 0)
@@ -7039,6 +7057,7 @@ tp_v4_rcv(struct sk_buff *skb)
 		/* need to do something about broadcast and multicast */ ;
 
 	printd(("%s: %s: packet received %p\n", DRV_NAME, __FUNCTION__, skb));
+//      UDP_INC_STATS_BH(UdpInDatagrams);
 	/* we do the lookup before the checksum */
 	if ((tp = tp_lookup(iph, uh)) == NULL)
 		goto no_stream;
@@ -7052,6 +7071,9 @@ tp_v4_rcv(struct sk_buff *skb)
 	   the payload.  That might be the best way to do things.  The problem is that we indicate
 	   iph->protocol on connection indications, and it will be the wrong protocol on 2.4. */
 	tp_v4_steal(skb);	/* its ours */
+	/* For now... We should actually place non-linear fragments into separate mblks and pass
+	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
+	   netfilter hooks linearize anyway. */
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
 		goto linear_fail;
 	{
@@ -7254,7 +7276,8 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		tp->prev = tpp;
 		*tpp = tp;
 	} else
-		strlog(DRV_ID, getminor(*devp), 0, SL_WARN | SL_CONSOLE, "could not allocate driver private structure");
+		strlog(DRV_ID, getminor(*devp), 0, SL_WARN | SL_CONSOLE,
+		       "could not allocate driver private structure");
 	return (tp);
 }
 
