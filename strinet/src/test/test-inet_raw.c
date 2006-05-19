@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/02/23 11:09:56 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/05/19 12:29:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/23 11:09:56 $ by $Author: brian $
+ Last Modified $Date: 2006/05/19 12:29:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.43  2006/05/19 12:29:09  brian
+ - results of testing, almost full pass
+
+ Revision 0.9.2.42  2006/05/19 08:49:50  brian
+ - working up RAWIP and UDP drivers and testing
+
  Revision 0.9.2.41  2006/02/23 11:09:56  brian
  - 64bit changes for x86_64
  - suppress lockf because it doesn't work too well on SMP
@@ -209,9 +215,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/02/23 11:09:56 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/05/19 12:29:09 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/02/23 11:09:56 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/05/19 12:29:09 $";
 
 /*
  *  Simple test program for INET streams.
@@ -1276,6 +1282,175 @@ terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 	}
 }
 
+#define ICMP_ECHOREPLY		0	/* Echo Reply			*/
+#define ICMP_DEST_UNREACH	3	/* Destination Unreachable	*/
+#define ICMP_SOURCE_QUENCH	4	/* Source Quench		*/
+#define ICMP_REDIRECT		5	/* Redirect (change route)	*/
+#define ICMP_ECHO		8	/* Echo Request			*/
+#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded		*/
+#define ICMP_PARAMETERPROB	12	/* Parameter Problem		*/
+#define ICMP_TIMESTAMP		13	/* Timestamp Request		*/
+#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply		*/
+#define ICMP_INFO_REQUEST	15	/* Information Request		*/
+#define ICMP_INFO_REPLY		16	/* Information Reply		*/
+#define ICMP_ADDRESS		17	/* Address Mask Request		*/
+#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply		*/
+#define NR_ICMP_TYPES		18
+
+/* Codes for UNREACH. */
+#define ICMP_NET_UNREACH	0	/* Network Unreachable		*/
+#define ICMP_HOST_UNREACH	1	/* Host Unreachable		*/
+#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable		*/
+#define ICMP_PORT_UNREACH	3	/* Port Unreachable		*/
+#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set	*/
+#define ICMP_SR_FAILED		5	/* Source Route failed		*/
+#define ICMP_NET_UNKNOWN	6
+#define ICMP_HOST_UNKNOWN	7
+#define ICMP_HOST_ISOLATED	8
+#define ICMP_NET_ANO		9
+#define ICMP_HOST_ANO		10
+#define ICMP_NET_UNR_TOS	11
+#define ICMP_HOST_UNR_TOS	12
+#define ICMP_PKT_FILTERED	13	/* Packet filtered */
+#define ICMP_PREC_VIOLATION	14	/* Precedence violation */
+#define ICMP_PREC_CUTOFF	15	/* Precedence cut off */
+#define NR_ICMP_UNREACH		15	/* instead of hardcoding immediate value */
+
+/* Codes for REDIRECT. */
+#define ICMP_REDIR_NET		0	/* Redirect Net			*/
+#define ICMP_REDIR_HOST		1	/* Redirect Host		*/
+#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS		*/
+#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS	*/
+
+/* Codes for TIME_EXCEEDED. */
+#define ICMP_EXC_TTL		0	/* TTL count exceeded		*/
+#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded	*/
+
+char *
+etype_string(t_uscalar_t etype)
+{
+	switch (etype) {
+	case TBADADDR:
+		return ("[TBADADDR]");
+	case TBADOPT:
+		return ("[TBADOPT]");
+	case TACCES:
+		return ("[TACCES]");
+	case TBADF:
+		return ("[TBADF]");
+	case TNOADDR:
+		return ("[TNOADDR]");
+	case TOUTSTATE:
+		return ("[TOUTSTATE]");
+	case TBADSEQ:
+		return ("[TBADSEQ]");
+	case TSYSERR:
+		return ("[TSYSERR]");
+	case TLOOK:
+		return ("[TLOOK]");
+	case TBADDATA:
+		return ("[TBADDATA]");
+	case TBUFOVFLW:
+		return ("[TBUFOVFLW]");
+	case TFLOW:
+		return ("[TFLOW]");
+	case TNODATA:
+		return ("[TNODATA]");
+	case TNODIS:
+		return ("[TNODIS]");
+	case TNOUDERR:
+		return ("[TNOUDERR]");
+	case TBADFLAG:
+		return ("[TBADFLAG]");
+	case TNOREL:
+		return ("[TNOREL]");
+	case TNOTSUPPORT:
+		return ("[TNOTSUPPORT]");
+	case TSTATECHNG:
+		return ("[TSTATECHNG]");
+	case TNOSTRUCTYPE:
+		return ("[TNOSTRUCTYPE]");
+	case TBADNAME:
+		return ("[TBADNAME]");
+	case TBADQLEN:
+		return ("[TBADQLEN]");
+	case TADDRBUSY:
+		return ("[TADDRBUSY]");
+	case TINDOUT:
+		return ("[TINDOUT]");
+	case TPROVMISMATCH:
+		return ("[TPROVMISMATCH]");
+	case TRESQLEN:
+		return ("[TRESQLEN]");
+	case TRESADDR:
+		return ("[TRESADDR]");
+	case TQFULL:
+		return ("[TQFULL]");
+	case TPROTO:
+		return ("[TPROTO]");
+	default:
+	{
+		unsigned char code = ((etype >> 0) & 0x00ff);
+		unsigned char type = ((etype >> 8) & 0x00ff);
+
+		switch (type) {
+		case ICMP_DEST_UNREACH:
+			switch (code) {
+			case ICMP_NET_UNREACH:
+				return ("<ICMP_NET_UNREACH>");
+			case ICMP_HOST_UNREACH:
+				return ("<ICMP_HOST_UNREACH>");
+			case ICMP_PROT_UNREACH:
+				return ("<ICMP_PROT_UNREACH>");
+			case ICMP_PORT_UNREACH:
+				return ("<ICMP_PORT_UNREACH>");
+			case ICMP_FRAG_NEEDED:
+				return ("<ICMP_FRAG_NEEDED>");
+			case ICMP_NET_UNKNOWN:
+				return ("<ICMP_NET_UNKNOWN>");
+			case ICMP_HOST_UNKNOWN:
+				return ("<ICMP_HOST_UNKNOWN>");
+			case ICMP_HOST_ISOLATED:
+				return ("<ICMP_HOST_ISOLATED>");
+			case ICMP_NET_ANO:
+				return ("<ICMP_NET_ANO>");
+			case ICMP_HOST_ANO:
+				return ("<ICMP_HOST_ANO>");
+			case ICMP_PKT_FILTERED:
+				return ("<ICMP_PKT_FILTERED>");
+			case ICMP_PREC_VIOLATION:
+				return ("<ICMP_PREC_VIOLATION>");
+			case ICMP_PREC_CUTOFF:
+				return ("<ICMP_PREC_CUTOFF>");
+			case ICMP_SR_FAILED:
+				return ("<ICMP_SR_FAILED>");
+			case ICMP_NET_UNR_TOS:
+				return ("<ICMP_NET_UNR_TOS>");
+			case ICMP_HOST_UNR_TOS:
+				return ("<ICMP_HOST_UNR_TOS>");
+			default:
+				return ("<ICMP_DEST_UNREACH?>");
+			}
+		case ICMP_SOURCE_QUENCH:
+			return ("<ICMP_SOURCE_QUENCH>");
+		case ICMP_TIME_EXCEEDED:
+			switch (code) {
+			case ICMP_EXC_TTL:
+				return ("<ICMP_EXC_TTL>");
+			case ICMP_EXC_FRAGTIME:
+				return ("<ICMP_EXC_FRAGTIME>");
+			default:
+				return ("<ICMP_TIME_EXCEEDED?>");
+			}
+		case ICMP_PARAMETERPROB:
+			return ("<ICMP_PARAMETERPROB>");
+		default:
+			return ("<ICMP_????>");
+		}
+	}
+	}
+}
+
 const char *
 event_string(int event)
 {
@@ -1672,9 +1847,9 @@ addr_string(char *add_ptr, size_t add_len)
 	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
-
+void print_string(int child, const char *string);
 void
-print_addrs(int fd, char *add_ptr, size_t add_len)
+print_addrs(int child, char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *sin;
 
@@ -1684,15 +1859,7 @@ print_addrs(int fd, char *add_ptr, size_t add_len)
 		char buf[128];
 
 		snprintf(buf, sizeof(buf), "%d.%d.%d.%d:%d", (sin->sin_addr.s_addr >> 0) & 0xff, (sin->sin_addr.s_addr >> 8) & 0xff, (sin->sin_addr.s_addr >> 16) & 0xff, (sin->sin_addr.s_addr >> 24) & 0xff, ntohs(sin->sin_port));
-		if (fd == test_fd[0]) {
-			fprintf(stdout, "%-20s|                               |  |                    \n", buf);
-		}
-		if (fd == test_fd[1]) {
-			fprintf(stdout, "                    |                               |  |     %-15s\n", buf);
-		}
-		if (fd == test_fd[2]) {
-			fprintf(stdout, "                    |                               |  |     %-15s\n", buf);
-		}
+		print_string(child, buf);
 	}
 }
 #endif
@@ -2990,6 +3157,11 @@ print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
 
 	if (verbose < 4)
 		return;
+	if (opt_len == 0) {
+		snprintf(buf, sizeof(buf), "(no options)");
+		print_string(child, buf);
+		return;
+	}
 	snprintf(buf, sizeof(buf), "opt len = %lu", (ulong) opt_len);
 	print_string(child, buf);
 	snprintf(buf, sizeof(buf), "opt ofs = %lu", (ulong) opt_ofs);
@@ -3104,11 +3276,21 @@ int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
 	if (flags & MSG_BAND || band) {
-		if (verbose > 3) {
+		if (verbose > 4) {
+			int i;
+
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			dummy = lockf(fileno(stdout), F_ULOCK, 0);
+			fprintf(stdout, "[");
+			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+				fprintf(stdout, "%02X", ctrl->buf[i]);
+			fprintf(stdout, "]\n");
+			fprintf(stdout, "[");
+			for (i = 0; i < (data ? data->len : 0); i++)
+				fprintf(stdout, "%02X", data->buf[i]);
+			fprintf(stdout, "]\n");
 			fflush(stdout);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (ctrl == NULL || data != NULL)
 			print_datcall(child, "putpmsg(2)----", data ? data->len : 0);
@@ -4380,6 +4562,9 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 		case T_UDERROR_IND:
 			event = __TEST_UDERROR_IND;
 			print_rx_prim(child, prim_string(p->type));
+			print_string(child, addr_string(cbuf + p->uderror_ind.DEST_offset, p->uderror_ind.DEST_length));
+			print_options(child, cbuf, p->uderror_ind.OPT_offset, p->uderror_ind.OPT_length);
+			print_string(child, etype_string(p->uderror_ind.ERROR_type));
 			break;
 		case T_OPTMGMT_ACK:
 			event = __TEST_OPTMGMT_ACK;
@@ -4602,8 +4787,18 @@ wait_event(int child, int wait)
 					if (verbose > 4)
 						print_success(child);
 					if (verbose > 4) {
+						int i;
+
 						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "gotmsg from %d [%d,%d]:\n", child, ctrl.len, data.len);
+						fprintf(stdout, "[");
+						for (i = 0; i < ctrl.len; i++)
+							fprintf(stdout, "%02X", ctrl.buf[i]);
+						fprintf(stdout, "]\n");
+						fprintf(stdout, "[");
+						for (i = 0; i < data.len; i++)
+							fprintf(stdout, "%02X", data.buf[i]);
+						fprintf(stdout, "]\n");
 						fflush(stdout);
 						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
@@ -5499,25 +5694,25 @@ test_case_1_2(int child)
 	state++;
 	switch (test_level) {
 	case T_INET_IP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -5530,25 +5725,25 @@ test_case_1_2(int child)
 			goto failure;
 		break;
 	case T_INET_UDP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -5686,25 +5881,25 @@ test_case_1_3_1(int child)
 	state++;
 	switch (test_level) {
 	case T_INET_IP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -5717,25 +5912,25 @@ test_case_1_3_1(int child)
 			goto failure;
 		break;
 	case T_INET_UDP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -16923,7 +17118,7 @@ struct test_stream test_1_10_1_list = { &preamble_1_10_1_list, &test_case_1_10_1
 #define desc_case_1_10_2 "\
 Check that an attempt to bind three streams to the same address\n\
 will result in one success and two failures.  Rawip streams do\n\
-not care about reuse, so all streams will successd for rawip."
+not care about reuse, so all streams will succeed for rawip."
 
 int
 test_case_1_10_2_conn(int child)

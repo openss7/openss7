@@ -1,7 +1,33 @@
+2006-05-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: updated
+	* src/drivers/inet.c: minor corrections
+	* src/drivers/lis.conf.in: avoid conflicts
+	* src/drivers/rawip.c: working up RAWIP driver
+	* src/drivers/udp.c: working up UDP driver
+	* src/test/test-inet_raw.c: working up RAWIP driver
+	* src/test/test-inet_sctp.c: spelling correction, rationalized
+	* src/test/test-inet_tcp.c: spelling correction, rationalized
+	* src/test/test-inet_udp.c: working up UDP driver
+	* tests/Makefile.am: added test suites for 2nd get drivers
+	* tests/testsuite-inet_raw2.at: added test suites for 2nd get drivers
+	* tests/testsuite-inet_udp2.at: added test suites for 2nd get drivers
+	* tests/testsuite.at: added test suites for 2nd get drivers
+	* strinet.spec.in: added 2nd gen drivers
+	* src/util/init/strinet: added 2nd gen drivers
+	* src/util/init/strinet.sh: added 2nd gen drivers
+
 2006-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/rawip.c: working up RAWIP driver
 	* src/drivers/udp.c: rationalized to RAWIP driver
+	* tests/testsuite-inet_raw2.at: added test suite for 2nd gen driver
+	* tests/testsuite-inet_udp2.at: added test suite for 2nd gen driver
+	* tests/testsuite.at: added test suites for 2nd gen drivers
+	* tests/Makefile.am: added test suites for 2nd gen drivers
+	* src/test/test-inet_raw.c: make sizes appropriate for 2nd gen drivers too
+	* src/test/test-inet_udp.c: make sizes appropriate for 2nd gen drivers too
+	* src/drivers/inet.c: correct SDU sizes for rawip and udp
 
 2006-05-14  Brian Bidulock  <bidulock@openss7.org>
 

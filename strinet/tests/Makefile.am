@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/06 11:38:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/19 08:50:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:52 $ by $Author: brian $
+# Last Modified $Date: 2006/05/19 08:50:30 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2006/05/19 08:50:30  brian
+# - working up RAWIP and UDP drivers and testing
+#
 # Revision 0.9.2.12  2006/03/06 11:38:52  brian
 # - updated headers
 #
@@ -83,6 +86,8 @@ include ../am/autotest.am
 TESTSUITE_DEPS		+= \
 			local.at \
 			kernel.at \
+			$(TESTSUITE)-inet_raw2.at \
+			$(TESTSUITE)-inet_udp2.at \
 			$(TESTSUITE)-inet_raw.at \
 			$(TESTSUITE)-inet_udp.at \
 			$(TESTSUITE)-inet_tcp.at \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/05/14 06:58:17 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/05/19 08:49:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/14 06:58:17 $ by $Author: brian $
+ Last Modified $Date: 2006/05/19 08:49:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.70  2006/05/19 08:49:38  brian
+ - working up RAWIP and UDP drivers and testing
+
  Revision 0.9.2.69  2006/05/14 06:58:17  brian
  - removed redundant or unused QR_ definitions
 
@@ -84,10 +87,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/05/14 06:58:17 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/05/19 08:49:38 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/05/14 06:58:17 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/05/19 08:49:38 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -551,7 +554,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/05/14 06:58:17 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/05/19 08:49:38 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -577,7 +580,7 @@ MODULE_ALIAS("streams-inet");
 #endif				/* LINUX */
 
 #ifdef LFS
-#define SS__DRV_ID	CONFIG_STREAMS_SS__MODID
+#define SS__DRV_ID	CONFIG_STREAMS_SS__MAJOR
 #define SS__DRV_NAME	CONFIG_STREAMS_SS__NAME
 #define SS__CMAJORS	CONFIG_STREAMS_SS__NMAJORS
 #define SS__CMAJOR_0	CONFIG_STREAMS_SS__MAJOR
@@ -614,7 +617,7 @@ MODULE_ALIAS("streams-inet");
 #ifdef LINUX
 #ifdef MODULE_ALIAS
 #ifdef LFS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SS__MODID));
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SS__MAJOR));
 MODULE_ALIAS("streams-driver-inet");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SS__MAJOR));
 MODULE_ALIAS("/dev/streams/inet");
@@ -13745,14 +13748,14 @@ ss_sock_recvmsg(queue_t *q)
 			printd(("%s: %p: control message pointer moved!\n", DRV_NAME, ss));
 			printd(("%s: %p: initial control buffer %p\n", DRV_NAME, ss,
 				msg->msg_control));
-			printd(("%s: %p: initial control length %d\n", DRV_NAME, ss,
-				msg->msg_controllen));
+			printd(("%s: %p: initial control length %ld\n", DRV_NAME, ss,
+				(long) msg->msg_controllen));
 			msg->msg_control = cbuf;
 			msg->msg_controllen = clen - msg->msg_controllen;
 			printd(("%s: %p: final control buffer %p\n", DRV_NAME, ss,
 				msg->msg_control));
-			printd(("%s: %p: final control length %d\n", DRV_NAME, ss,
-				msg->msg_controllen));
+			printd(("%s: %p: final control length %ld\n", DRV_NAME, ss,
+				(long) msg->msg_controllen));
 		} else if (msg->msg_controllen == clen && cbuf[0] == 0xdeadbeef) {
 			printd(("%s: %p: control message unchanged!\n", DRV_NAME, ss));
 			msg->msg_control = NULL;
@@ -14474,18 +14477,17 @@ t_bind_req(queue_t *q, mblk_t *mp)
 			add->sa_family = AF_INET;
 		} else {
 			if (add_len < sizeof(struct sockaddr_in)) {
-				ptrace(("%s: %p: add_len(%u) < sizeof(struct sockaddr_in)(%u)\n",
-					DRV_NAME, ss, add_len, sizeof(struct sockaddr_in)));
+				ptrace(("%s: %p: add_len(%d) < sizeof(struct sockaddr_in)(%lu)\n", DRV_NAME, ss, add_len, (ulong) sizeof(struct sockaddr_in)));
 				goto badaddr;
 			}
 			if (ss->p.prot.protocol != T_INET_SCTP) {
 				if (add_len > sizeof(struct sockaddr_in)) {
-					ptrace(("%s: %p: add_len(%u) > sizeof(struct sockaddr_in)(%u)\n", DRV_NAME, ss, add_len, sizeof(struct sockaddr_in)));
+					ptrace(("%s: %p: add_len(%d) > sizeof(struct sockaddr_in)(%lu)\n", DRV_NAME, ss, add_len, (ulong) sizeof(struct sockaddr_in)));
 					goto badaddr;
 				}
 			} else {
 				if ((add_len % sizeof(struct sockaddr_in)) != 0) {
-					ptrace(("%s: %p: add_len(%u) %% sizeof(struct sockaddr_in)(%u)\n", DRV_NAME, ss, add_len, sizeof(struct sockaddr_in)));
+					ptrace(("%s: %p: add_len(%d) %% sizeof(struct sockaddr_in)(%lu)\n", DRV_NAME, ss, add_len, (ulong) sizeof(struct sockaddr_in)));
 					goto badaddr;
 				}
 			}
@@ -14515,8 +14517,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 			add->sa_family = AF_UNIX;
 		} else {
 			if (add_len < sizeof(struct sockaddr_un)) {
-				ptrace(("%s: %p: add_len(%u) < sizeof(struct sockaddr_un)(%u)\n",
-					DRV_NAME, ss, add_len, sizeof(struct sockaddr_un)));
+				ptrace(("%s: %p: add_len(%d) < sizeof(struct sockaddr_un)(%lu)\n", DRV_NAME, ss, add_len, (ulong) sizeof(struct sockaddr_un)));
 				goto badaddr;
 			}
 			if (add->sa_family != AF_UNIX && add->sa_family != 0) {
@@ -15885,17 +15886,17 @@ ss_free_priv(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 
-	printd(("%s: unlinking private structure, reference count = %d\n", DRV_NAME, ss->refcnt));
+	printd(("%s: unlinking private structure, reference count = %lu\n", DRV_NAME, (ulong) ss->refcnt));
 	/* Unfortunately, ss_socket_put calls sock_release which can cause TCP to do a
 	   tcp_send_fin, and in tcp_send_fin an skbuff is allocated with GFP_KERNEL. */
 	if (ss->sock)
 		ss_socket_put(xchg(&ss->sock, NULL));
-	printd(("%s: removed socket, reference count = %d\n", DRV_NAME, ss->refcnt));
+	printd(("%s: removed socket, reference count = %lu\n", DRV_NAME, (ulong) ss->refcnt));
 	spin_lock_bh(&ss->lock);
 	{
 		bufq_purge(&ss->conq);
 		__ss_unbufcall(q);
-		printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME, ss->refcnt));
+		printd(("%s: removed bufcalls, reference count = %lu\n", DRV_NAME, (ulong) ss->refcnt));
 		spin_lock(&ss_lock);
 		if ((*ss->prev = ss->next))
 			ss->next->prev = ss->prev;
@@ -15903,7 +15904,7 @@ ss_free_priv(queue_t *q)
 		ss->prev = NULL;
 		spin_unlock(&ss_lock);
 		ss->refcnt--;
-		printd(("%s: unlinked, reference count = %d\n", DRV_NAME, ss->refcnt));
+		printd(("%s: unlinked, reference count = %lu\n", DRV_NAME, (ulong) ss->refcnt));
 		ss->rq->q_ptr = NULL;
 		ss->refcnt--;
 		ss->wq->q_ptr = NULL;
@@ -15912,7 +15913,7 @@ ss_free_priv(queue_t *q)
 	spin_unlock_bh(&ss->lock);
 	if (ss->refcnt) {
 		assure(ss->refcnt);
-		printd(("%s: WARNING: ss->refcnt = %d\n", DRV_NAME, ss->refcnt));
+		printd(("%s: WARNING: ss->refcnt = %lu\n", DRV_NAME, (ulong) ss->refcnt));
 	}
 	kmem_cache_free(ss_priv_cachep, ss);
 #if 0
@@ -15933,70 +15934,70 @@ ss_free_priv(queue_t *q)
  */
 STATIC const ss_profile_t ss_profiles[] = {
 	{{PF_INET, SOCK_RAW, IPPROTO_ICMP},
-	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 65515, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65515, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_INET, SOCK_RAW, IPPROTO_IGMP},
-	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 65515, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65515, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_INET, SOCK_RAW, IPPROTO_IPIP},
-	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 65515, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65515, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_INET, SOCK_STREAM, IPPROTO_TCP},
 	 {T_INFO_ACK, 0, 1, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65535, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_INET, SOCK_RAW, IPPROTO_EGP},
-	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 65515, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65515, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_INET, SOCK_RAW, IPPROTO_PUP},
-	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 65515, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65515, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_INET, SOCK_DGRAM, IPPROTO_UDP},
-	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 65507, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65507, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_INET, SOCK_RAW, IPPROTO_IDP},
-	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 65515, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65515, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_INET, SOCK_RAW, IPPROTO_RAW},
-	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 65515, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65515, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_UNIX, SOCK_STREAM, 0},
 	 {T_INFO_ACK, 0, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_un),
-	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65535, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_UNIX, SOCK_STREAM, 0},
 	 {T_INFO_ACK, 0, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_un),
-	  T_INFINITE, 0xffff, T_COTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65535, T_COTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_UNIX, SOCK_DGRAM, 0},
-	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 65507, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_un),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65507, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 #if defined HAVE_OPENSS7_SCTP
 	,
 	{{PF_INET, SOCK_SEQPACKET, IPPROTO_SCTP},
 	 {T_INFO_ACK, T_INFINITE, T_INFINITE, 536, T_INVALID,
 	  8 * sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	  T_INFINITE, 65535, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 #endif				/* defined HAVE_OPENSS7_SCTP */
 };
 STATIC int ss_majors[SS__CMAJORS] = { SS__CMAJOR_0, };
@@ -16268,21 +16269,35 @@ ss_register_strdev(major_t major)
 
 	if ((err = register_strdev(&ss_cdev, major)) < 0)
 		return (err);
-	register_strnod(&ss_cdev, &inet_node_ip, IP_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_icmp, ICMP_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_ggp, GGP_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_ipip, IPIP_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_tcp, TCP_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_egp, EGP_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_pup, PUP_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_udp, UDP_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_idp, IDP_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_rawip, RAWIP_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_ticots_ord, TICOTS_ORD_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_ticots, TICOTS_CMINOR);
-	register_strnod(&ss_cdev, &inet_node_ticlts, TICLTS_CMINOR);
+	if ((err = register_strnod(&ss_cdev, &inet_node_ip, IP_CMINOR)) < 0)
+		pswerr(("Could not register IP_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_icmp, ICMP_CMINOR)) < 0)
+		pswerr(("Could not register ICMP_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_ggp, GGP_CMINOR)) < 0)
+		pswerr(("Could not register GGP_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_ipip, IPIP_CMINOR)) < 0)
+		pswerr(("Could not register IPIP_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_tcp, TCP_CMINOR)) < 0)
+		pswerr(("Could not register TCP_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_egp, EGP_CMINOR)) < 0)
+		pswerr(("Could not register EGP_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_pup, PUP_CMINOR)) < 0)
+		pswerr(("Could not register PUP_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_udp, UDP_CMINOR)) < 0)
+		pswerr(("Could not register UDP_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_idp, IDP_CMINOR)) < 0)
+		pswerr(("Could not register IDP_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_rawip, RAWIP_CMINOR)) < 0)
+		pswerr(("Could not register RAWIP_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_ticots_ord, TICOTS_ORD_CMINOR)) < 0)
+		pswerr(("Could not register TICOTS_ORD_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_ticots, TICOTS_CMINOR)) < 0)
+		pswerr(("Could not register TICOTS_CMINOR, err = %d\n", err));
+	if ((err = register_strnod(&ss_cdev, &inet_node_ticlts, TICLTS_CMINOR)) < 0)
+		pswerr(("Could not register TICLTS_CMINOR, err = %d\n", err));
 #if defined HAVE_OPENSS7_SCTP
-	register_strnod(&ss_cdev, &inet_node_sctp, SCTP_CMINOR);
+	if ((err = register_strnod(&ss_cdev, &inet_node_sctp, SCTP_CMINOR)) < 0)
+		pswerr(("Could not register SCTP_CMINOR, err = %d\n", err));
 #endif
 	return (0);
 }
@@ -16293,21 +16308,35 @@ ss_unregister_strdev(major_t major)
 	int err;
 
 #if defined HAVE_OPENSS7_SCTP
-	unregister_strnod(&ss_cdev, SCTP_CMINOR);
+	if ((err = unregister_strnod(&ss_cdev, SCTP_CMINOR)) < 0)
+		pswerr(("Could not unregister SCTP_CMINOR, err = %d\n", err));
 #endif
-	unregister_strnod(&ss_cdev, TICLTS_CMINOR);
-	unregister_strnod(&ss_cdev, TICOTS_CMINOR);
-	unregister_strnod(&ss_cdev, TICOTS_ORD_CMINOR);
-	unregister_strnod(&ss_cdev, RAWIP_CMINOR);
-	unregister_strnod(&ss_cdev, IDP_CMINOR);
-	unregister_strnod(&ss_cdev, UDP_CMINOR);
-	unregister_strnod(&ss_cdev, PUP_CMINOR);
-	unregister_strnod(&ss_cdev, EGP_CMINOR);
-	unregister_strnod(&ss_cdev, TCP_CMINOR);
-	unregister_strnod(&ss_cdev, IPIP_CMINOR);
-	unregister_strnod(&ss_cdev, GGP_CMINOR);
-	unregister_strnod(&ss_cdev, ICMP_CMINOR);
-	unregister_strnod(&ss_cdev, IP_CMINOR);
+	if ((err = unregister_strnod(&ss_cdev, TICLTS_CMINOR)) < 0)
+		pswerr(("Could not unregister TICLTS_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, TICOTS_CMINOR)) < 0)
+		pswerr(("Could not unregister TICOTS_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, TICOTS_ORD_CMINOR)) < 0)
+		pswerr(("Could not unregister TICOTS_ORD_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, RAWIP_CMINOR)) < 0)
+		pswerr(("Could not unregister RAWIP_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, IDP_CMINOR)) < 0)
+		pswerr(("Could not unregister IDP_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, UDP_CMINOR)) < 0)
+		pswerr(("Could not unregister UDP_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, PUP_CMINOR)) < 0)
+		pswerr(("Could not unregister PUP_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, EGP_CMINOR)) < 0)
+		pswerr(("Could not unregister EGP_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, TCP_CMINOR)) < 0)
+		pswerr(("Could not unregister TCP_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, IPIP_CMINOR)) < 0)
+		pswerr(("Could not unregister IPIP_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, GGP_CMINOR)) < 0)
+		pswerr(("Could not unregister GGP_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, ICMP_CMINOR)) < 0)
+		pswerr(("Could not unregister ICMP_CMINOR, err = %d\n", err));
+	if ((err = unregister_strnod(&ss_cdev, IP_CMINOR)) < 0)
+		pswerr(("Could not unregister IP_CMINOR, err = %d\n", err));
 	if ((err = unregister_strdev(&ss_cdev, major)) < 0)
 		return (err);
 	return (0);

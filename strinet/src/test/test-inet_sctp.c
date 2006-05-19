@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/24 16:03:48 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/19 12:29:17 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/24 16:03:48 $ by $Author: brian $
+ Last Modified $Date: 2006/05/19 12:29:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.23  2006/05/19 12:29:17  brian
+ - results of testing, almost full pass
+
+ Revision 0.9.2.22  2006/05/19 08:49:58  brian
+ - working up RAWIP and UDP drivers and testing
+
  Revision 0.9.2.21  2006/03/24 16:03:48  brian
  - rationalized to strsctp package
 
@@ -190,9 +196,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/24 16:03:48 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/19 12:29:17 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/24 16:03:48 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/19 12:29:17 $";
 
 /*
  *  Simple test program for INET streams.
@@ -3005,6 +3011,11 @@ print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
 
 	if (verbose < 4)
 		return;
+	if (opt_len == 0) {
+		snprintf(buf, sizeof(buf), "(no options)");
+		print_string(child, buf);
+		return;
+	}
 	snprintf(buf, sizeof(buf), "opt len = %lu", (ulong) opt_len);
 	print_string(child, buf);
 	snprintf(buf, sizeof(buf), "opt ofs = %lu", (ulong) opt_ofs);
@@ -3119,11 +3130,21 @@ int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
 	if (flags & MSG_BAND || band) {
-		if (verbose > 3) {
+		if (verbose > 4) {
+			int i;
+
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			dummy = lockf(fileno(stdout), F_ULOCK, 0);
+			fprintf(stdout, "[");
+			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+				fprintf(stdout, "%02X", ctrl->buf[i]);
+			fprintf(stdout, "]\n");
+			fprintf(stdout, "[");
+			for (i = 0; i < (data ? data->len : 0); i++)
+				fprintf(stdout, "%02X", data->buf[i]);
+			fprintf(stdout, "]\n");
 			fflush(stdout);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (ctrl == NULL || data != NULL)
 			print_datcall(child, "putpmsg(2)----", data ? data->len : 0);
@@ -4680,8 +4701,18 @@ wait_event(int child, int wait)
 					if (verbose > 4)
 						print_success(child);
 					if (verbose > 4) {
+						int i;
+
 						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "gotmsg from %d [%d,%d]:\n", child, ctrl.len, data.len);
+						fprintf(stdout, "[");
+						for (i = 0; i < ctrl.len; i++)
+							fprintf(stdout, "%02X", ctrl.buf[i]);
+						fprintf(stdout, "]\n");
+						fprintf(stdout, "[");
+						for (i = 0; i < data.len; i++)
+							fprintf(stdout, "%02X", data.buf[i]);
+						fprintf(stdout, "]\n");
 						fflush(stdout);
 						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
@@ -5575,25 +5606,25 @@ test_case_1_2(int child)
 	state++;
 	switch (test_level) {
 	case T_INET_IP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -5606,25 +5637,25 @@ test_case_1_2(int child)
 			goto failure;
 		break;
 	case T_INET_UDP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -5762,25 +5793,25 @@ test_case_1_3_1(int child)
 	state++;
 	switch (test_level) {
 	case T_INET_IP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -5793,25 +5824,25 @@ test_case_1_3_1(int child)
 			goto failure;
 		break;
 	case T_INET_UDP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -17009,7 +17040,7 @@ struct test_stream test_1_10_1_list = { &preamble_1_10_1_list, &test_case_1_10_1
 #define desc_case_1_10_2 "\
 Check that an attempt to bind three streams to the same address\n\
 will result in one success and two failures.  Rawip streams do\n\
-not care about reuse, so all streams will successd for rawip."
+not care about reuse, so all streams will succeed for rawip."
 
 int
 test_case_1_10_2_conn(int child)
