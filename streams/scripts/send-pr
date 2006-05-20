@@ -2,7 +2,7 @@
 # vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
 # 
-# @(#) $RCSfile: send-pr,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/04/03 23:01:02 $
+# @(#) $RCSfile: send-pr,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/19 22:05:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/03 23:01:02 $ by $Author: brian $
+# Last Modified $Date: 2006/05/19 22:05:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: send-pr,v $
+# Revision 0.9.2.5  2006/05/19 22:05:32  brian
+# - added /proc/streams files to problem reports
+#
 # Revision 0.9.2.4  2006/04/03 23:01:02  brian
 # - preserve leading space
 #
@@ -99,14 +102,14 @@ dir=`dirname $0`
 path=`(cd $dir ; pwd)`
 errors=0
 warnings=0
-revision='$Revision: 0.9.2.4 $'
+revision='$Revision: 0.9.2.5 $'
 
 exec 5>${top_builddir}${top_builddir+/}$me.log
 
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.4 $) $Date: 2006/04/03 23:01:02 $'
+ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.5 $) $Date: 2006/05/19 22:05:32 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -1315,7 +1318,7 @@ function targetpr()
 	class=install
 	severity=serious
 	files="configure.log config.log"
-	envfiles="/proc/cpuinfo"
+	envfiles="/proc/cpuinfo /proc/streams/strinfo"
 	;;
     (compile.log)
 #	filename=compile.pr
@@ -1323,7 +1326,7 @@ function targetpr()
 	class=software
 	severity=serious
 	files="compile.log configure.log config.log"
-	envfiles="/proc/cpuinfo"
+	envfiles="/proc/cpuinfo /proc/streams/strinfo"
 	;;
     (check.log)
 #	filename=check.pr
@@ -1331,7 +1334,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="check.log compile.log configure.log config.log"
-	envfiles="/proc/cpuinfo"
+	envfiles="/proc/cpuinfo /proc/streams/strinfo"
 	;;
     (install.log)
 #	filename=install.pr
@@ -1339,7 +1342,7 @@ function targetpr()
 	class=install
 	severity=serious
 	files="install.log check.log compile.log configure.log config.log"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw"
 	;;
     (installcheck.log)
 #	filename=installcheck.pr
@@ -1347,7 +1350,7 @@ function targetpr()
 	class=software
 	severity=critical
 	files="testsuite.log tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw"
 	;;
     (uninstall.log)
 #	filename=uninstall.pr
@@ -1355,7 +1358,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="uninstall.log testsuite.log tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw"
 	;;
     (remove.log)
 #	filename=remove.pr
@@ -1363,7 +1366,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="remove.log testsuite.log tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw"
 	;;
     (dist.log|distcheck.log|rpms.log|sign.log|rebuild.log|resign.log|release.log|release-sign.log|srpm.log)
 #	filename=`echo "$target" | sed -e 's|\.log$|.pr|'`
@@ -1371,7 +1374,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="$1 remove.log uninstall.log testsuite.log tests/testsuite.log installcheck.log install.log check.log compile.log configure.log config.log"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw"
 	;;
     (none|*)
 #	filename=problem.pr
@@ -1379,7 +1382,7 @@ function targetpr()
 	class=software
 	severity=serious
 	files="config.log tests/testsuite.log ${targets[*]}"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw"
 	;;
     esac
     filename='problem.pr'
