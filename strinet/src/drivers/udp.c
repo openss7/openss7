@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/19 12:29:07 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/19 23:15:35 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/19 12:29:07 $ by $Author: brian $
+ Last Modified $Date: 2006/05/19 23:15:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.20  2006/05/19 23:15:35  brian
+ - corrections from testing
+
  Revision 0.9.2.19  2006/05/19 12:29:07  brian
  - results of testing, almost full pass
 
@@ -109,10 +112,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/19 12:29:07 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/19 23:15:35 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/19 12:29:07 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/19 23:15:35 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -189,7 +192,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/19 12:29:07 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/19 23:15:35 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -3502,9 +3505,9 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, t_uscalar_t ADDR_length,
 
 	if (bport == 0) {
 		num = tp_prev_port;	/* UNSAFE */
+	      try_again:
 		bport = htons(num);
 	}
-      try_again:
 	hp = &udp_bhash[udp_bhashfn(proto, bport)];
 	write_lock_bh(&hp->lock);
 	for (tp2 = hp->list; tp2; tp2 = tp2->bnext) {
@@ -5852,7 +5855,6 @@ te_bind_req(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length))
 		goto error;
 	if ((ADDR_length = p->ADDR_length) == 0) {
-		bzero(ADDR_buffer, sizeof(ADDR_buffer[0]));
 		ADDR_length = sizeof(ADDR_buffer[0]);
 		anum = 1;
 	} else {
