@@ -1,3 +1,7 @@
+2006-05-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/genksyms.am: load script missing -T option for 2.6
+
 2006-05-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/strconf-sh: added module id base to strconf
