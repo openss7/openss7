@@ -1,3 +1,10 @@
+2006-05-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* netlib.c: correction for zero return value
+	* nettest_xti.c: corrections for 64-bit operation
+	* man1/netperf.man: removed missing .C macro
+	* man8/netserver.man: removed missing .C macro
+
 2006-05-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/strconf-sh: added module id base to strconf

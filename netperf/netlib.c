@@ -1958,7 +1958,7 @@ if ((counter = select(FD_SETSIZE,
 }
 
 while ((tot_bytes_recvd != buflen) &&
-       ((bytes_recvd = recv(netlib_control, buf, bytes_left,0)) > 0 )) {
+       ((bytes_recvd = recv(netlib_control, buf, bytes_left,0)) >= 0 )) {
   tot_bytes_recvd += bytes_recvd;
   buf             += bytes_recvd;
   bytes_left      -= bytes_recvd;

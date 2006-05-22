@@ -73,12 +73,12 @@ netserver \- a network performance benchmark server
 .SH DESCRIPTION
 .B Netserver
 listens for connections from a
-.C netperf
+.B netperf
 benchmark, and responds accordingly.
 It can either be run from
-.C inetd
+.B inetd
 or as a standalone daemon (with the -p flag). If run from
-.C inetd
+.B inetd
 the -p option should not be used.
 
 .SS OPTIONS
@@ -117,7 +117,7 @@ it exists with a non-zero exit status and prints a diagnostic message.
 No known bugs at this time. If you think you have found a bug, please send email to Rick Jones <raj@cup.hp.com>.
 
 .SH SEE ALSO
-.C netperf
+.BR netperf (1)
 .br
 .I
 Netperf: A Network Performance Benchmark

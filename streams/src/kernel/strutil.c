@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2006/02/20 10:59:22 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2006/05/22 02:09:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:22 $ by $Author: brian $
+ Last Modified $Date: 2006/05/22 02:09:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.120  2006/05/22 02:09:06  brian
+ - changes from performance testing
+
  Revision 0.9.2.119  2006/02/20 10:59:22  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2006/02/20 10:59:22 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2006/05/22 02:09:06 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2006/02/20 10:59:22 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2006/05/22 02:09:06 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -436,7 +439,7 @@ freeb(mblk_t *mp)
 	dblk_t *dp, *db;
 
 	/* check null ptr, message still on queue */
-	dassert(mp);
+	dassert(mp != NULL);
 	/* we always null these when we take a message off a queue */
 	dassert(mp->b_prev == NULL);
 	dassert(mp->b_next == NULL);
@@ -447,7 +450,7 @@ freeb(mblk_t *mp)
 	printd(("%s: freeing mblk %p, refs %d\n", __FUNCTION__, mp, (int) (db ? db->db_ref : 0)));
 
 	/* check double free */
-	assert(db);
+	assert(db != NULL);
 	assert(db->db_ref > 0);
 
 	/* message block marked free above */
@@ -1449,7 +1452,13 @@ qschedule(queue_t *q)
 		/* put ourselves on the run list */
 		prefetchw(t);
 		q->q_link = NULL;
-		*XCHG(&t->qtail, &q->q_link) = qget(q);
+		{
+			unsigned long flags;
+
+			local_irq_save(flags);
+			*XCHG(&t->qtail, &q->q_link) = qget(q);
+			local_irq_restore(flags);
+		}
 		setqsched();
 	}
 }

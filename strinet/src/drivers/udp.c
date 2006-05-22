@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/19 23:15:35 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/05/22 02:09:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/19 23:15:35 $ by $Author: brian $
+ Last Modified $Date: 2006/05/22 02:09:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.21  2006/05/22 02:09:09  brian
+ - changes from performance testing
+
  Revision 0.9.2.20  2006/05/19 23:15:35  brian
  - corrections from testing
 
@@ -112,10 +115,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/19 23:15:35 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/05/22 02:09:09 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/19 23:15:35 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/05/22 02:09:09 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -192,7 +195,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/19 23:15:35 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/05/22 02:09:09 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -365,6 +368,8 @@ typedef struct tp {
 	struct tp **cprev;		/* linkage for conn hash */
 	struct tp_chash_bucket *chash;	/* linkage for conn hash */
 	struct T_info_ack info;		/* service provider information */
+	unsigned int sndmem;		/* send buffer memory allocated */
+	unsigned int rcvmem;		/* recv buffer memory allocated */
 	unsigned int BIND_flags;	/* bind flags */
 	unsigned int CONN_flags;	/* connect flags */
 	unsigned int CONIND_number;	/* maximum number of outstanding connection indications */
@@ -396,10 +401,10 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 
 #define xti_default_debug		{ 0, }
 #define xti_default_linger		(struct t_linger){T_YES, 120}
-#define xti_default_rcvbuf		SK_RMEM_MAX
+#define xti_default_rcvbuf		(SK_RMEM_MAX << 1)
 #define xti_default_rcvlowat		1
-#define xti_default_sndbuf		SK_WMEM_MAX
-#define xti_default_sndlowat		1
+#define xti_default_sndbuf		(SK_WMEM_MAX << 1)
+#define xti_default_sndlowat		SK_WMEM_MAX
 #define xti_default_priority		0
 
 #define ip_default_protocol		17
@@ -1878,7 +1883,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.sndlowat;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = sysctl_wmem_default >> 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 			}
@@ -2086,7 +2091,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->name = XTI_RCVBUF;
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.xti.rcvbuf;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.xti.rcvbuf >> 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -2108,7 +2113,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->name = XTI_SNDBUF;
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.xti.sndbuf;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.xti.sndbuf >> 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -2429,8 +2434,8 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen != sizeof(*valp))
 						goto einval;
-					if (*valp > sysctl_rmem_max) {
-						*valp = sysctl_rmem_max;
+					if (*valp > sysctl_wmem_max) {
+						*valp = sysctl_wmem_max;
 						oh->status =
 						    t_overall_result(&overall, T_PARTSUCCESS);
 					} else if (*valp < SOCK_MIN_SNDBUF / 2) {
@@ -2809,7 +2814,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 						    t_overall_result(&overall, T_PARTSUCCESS);
 					}
 				}
-				t->options.xti.rcvbuf = *valp;
+				t->options.xti.rcvbuf = *valp << 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -2857,8 +2862,8 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					*valp = sysctl_wmem_default;
 				} else {
 					*valp = *((typeof(valp)) T_OPT_DATA(ih));
-					if (*valp > sysctl_rmem_max) {
-						*valp = sysctl_rmem_max;
+					if (*valp > sysctl_wmem_max) {
+						*valp = sysctl_wmem_max;
 						oh->status =
 						    t_overall_result(&overall, T_PARTSUCCESS);
 					} else if (*valp < SOCK_MIN_SNDBUF / 2) {
@@ -2867,7 +2872,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 						    t_overall_result(&overall, T_PARTSUCCESS);
 					}
 				}
-				t->options.xti.sndbuf = *valp;
+				t->options.xti.sndbuf = *valp << 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -2883,7 +2888,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 				oh->status = T_SUCCESS;
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				if (ih->name == T_ALLOPT) {
-					*valp = t_defaults.xti.sndlowat;
+					*valp = sysctl_wmem_default >> 1;
 				} else {
 					*valp = *((typeof(valp)) T_OPT_DATA(ih));
 					if (*valp > 1) {
@@ -3491,9 +3496,9 @@ STATIC INLINE fastcall int
 tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, t_uscalar_t ADDR_length,
 	t_uscalar_t CONIND_number)
 {
-	static unsigned short tp_prev_port = 10000;
-	static const unsigned short tp_frst_port = 10000;	/* XXX */
-	static const unsigned short tp_last_port = 16000;	/* XXX */
+	static unsigned short tp_prev_port = 61000;
+	static const unsigned short tp_frst_port = 61000;	/* XXX */
+	static const unsigned short tp_last_port = 65000;	/* XXX */
 
 	struct tp_bhash_bucket *hp;
 	unsigned short bport = ADDR_buffer[0].sin_port;
@@ -3629,28 +3634,59 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
 /**
+ * tp_destructor - socket buffer destructor
+ * @skb: socket buffer to destroy
+ *
+ * This provide the impedance matching between socket buffer flow control and STREAMS flow control.
+ * When tp->sndmem is greater than tp->options.xti.sndbuf we place STREAMS buffers back on the send
+ * queue and stall the queue.  When the send memory falls below tp->options.xti.sndlowat (or to
+ * zero) and there are message on the send queue, we enable the queue.
+ */
+STATIC void __hot_out
+tp_destructor(struct sk_buff *skb)
+{
+	struct tp *tp;
+
+	if (likely((tp = (typeof(tp)) skb->sk) != NULL)) {
+		ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
+		tp->sndmem -= skb->truesize;
+		if ((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0)
+		    && tp->iq != NULL && tp->iq->q_first != NULL)
+			qenable(tp->iq);
+		skb->sk = NULL;
+		skb->destructor = NULL;
+		tp_release(&tp);
+	}
+}
+
+/**
  * tp_senddata - process a unit data request
  * @tp: Stream private structure
  * @dport: destination port
  * @opt: options to use
  * @mp: message payload
  */
-STATIC INLINE fastcall __hot_put int
+STATIC INLINE fastcall __hot_out int
 tp_senddata(struct tp *tp, unsigned short dport, struct tp_options *opt, mblk_t *mp)
 {
 	struct rtable *rt = NULL;
+
+	/* allows slop over by 1 buffer */
+	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
+		goto ebusy;
 
 	assert(opt != NULL);
 	if (!ip_route_output(&rt, opt->ip.daddr, opt->ip.addr, 0, 0)) {
 		struct sk_buff *skb;
 		struct net_device *dev = rt->u.dst.dev;
 		size_t hlen = (dev->hard_header_len + 15) & ~15;
-		size_t plen = msgdsize(mp);
-		size_t tlen = plen + sizeof(struct iphdr) + sizeof(struct udphdr);
+		size_t dlen = msgdsize(mp);
+		size_t plen = dlen + sizeof(struct udphdr);
+		size_t tlen = plen + sizeof(struct iphdr);
 
 		ptrace(("%s: %s: data sent\n", DRV_NAME, __FUNCTION__));
 		usual(hlen);
-		usual(plen);
+		usual(dlen);
 
 		if ((skb = alloc_skb(hlen + tlen, GFP_ATOMIC))) {
 			mblk_t *bp;
@@ -3658,6 +3694,9 @@ tp_senddata(struct tp *tp, unsigned short dport, struct tp_options *opt, mblk_t 
 			struct udphdr *uh;
 			unsigned char *data;
 
+			skb->sk = (struct sock *) tp_get(tp); /* borrow sk pointer */
+			skb->destructor = tp_destructor;
+			tp->sndmem += skb->truesize;
 			skb_reserve(skb, hlen);
 			/* find headers */
 			iph = (typeof(iph)) __skb_put(skb, tlen);
@@ -3682,7 +3721,9 @@ tp_senddata(struct tp *tp, unsigned short dport, struct tp_options *opt, mblk_t 
 			skb->h.uh = uh;
 			if (opt->udp.checksum == T_YES) {
 				skb->ip_summed = 0;
-				skb->csum = csum_tcpudp_nofold(iph->saddr, iph->daddr, plen, IPPROTO_UDP, 0);
+				skb->csum =
+				    csum_tcpudp_nofold(iph->saddr, iph->daddr, plen, IPPROTO_UDP,
+						       0);
 			} else {
 				skb->ip_summed = CHECKSUM_UNNECESSARY;
 				skb->csum = 0;
@@ -3727,6 +3768,8 @@ tp_senddata(struct tp *tp, unsigned short dport, struct tp_options *opt, mblk_t 
 	} else
 		__rare();
 	return (QR_DONE);
+      ebusy:
+	return (-EBUSY);
 }
 
 #if 0
@@ -3843,6 +3886,40 @@ tp_connect(struct tp *tp, struct sockaddr_in *DEST_buffer, socklen_t DEST_length
 
 	err = NBADOPT;
 	/* first validate parameters */
+	if (t_tst_bit(_T_BIT_XTI_RCVBUF, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.rcvbuf > sysctl_rmem_max)
+			OPT_buffer->xti.rcvbuf = sysctl_rmem_max;
+		if (OPT_buffer->xti.rcvbuf < SOCK_MIN_RCVBUF >> 1)
+			OPT_buffer->xti.rcvbuf = SOCK_MIN_RCVBUF >> 1;
+		OPT_buffer->xti.rcvbuf <<= 1;
+	} else {
+		OPT_buffer->xti.rcvbuf = tp->options.xti.rcvbuf;
+	}
+	if (t_tst_bit(_T_BIT_XTI_RCVLOWAT, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.rcvlowat > sysctl_rmem_max)
+			OPT_buffer->xti.rcvlowat = sysctl_rmem_max;
+		if (OPT_buffer->xti.rcvlowat < 1)
+			OPT_buffer->xti.rcvlowat = 1;
+	} else {
+		OPT_buffer->xti.rcvlowat = tp->options.xti.rcvlowat;
+	}
+	if (t_tst_bit(_T_BIT_XTI_SNDBUF, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.sndbuf > sysctl_wmem_max)
+			OPT_buffer->xti.sndbuf = sysctl_wmem_max;
+		if (OPT_buffer->xti.sndbuf < SOCK_MIN_SNDBUF >> 1)
+			OPT_buffer->xti.sndbuf = SOCK_MIN_SNDBUF >> 1;
+		OPT_buffer->xti.sndbuf <<= 1;
+	} else {
+		OPT_buffer->xti.sndbuf = tp->options.xti.sndbuf;
+	}
+	if (t_tst_bit(_T_BIT_XTI_SNDLOWAT, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.sndlowat > sysctl_wmem_max)
+			OPT_buffer->xti.sndlowat = sysctl_wmem_max;
+		if (OPT_buffer->xti.sndlowat < 1)
+			OPT_buffer->xti.sndlowat = 1;
+	} else {
+		OPT_buffer->xti.sndlowat = tp->options.xti.sndlowat;
+	}
 	if (t_tst_bit(_T_BIT_XTI_PRIORITY, OPT_buffer->flags)) {
 		if ((t_scalar_t) OPT_buffer->xti.priority < 0)
 			goto error;
@@ -4123,13 +4200,13 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		   protocol id as the listening stream. */
 		/* Another approach for 2.4 would be to copy the sk_buff before stealing it. */
 		for (j = 0, i = 0; j < ACCEPTOR_id->pnum; j++) {
-			for (i = 0; i < np->pnum; i++)
-				if (ACCEPTOR_id->protoids[j] == np->protoids[i])
+			for (i = 0; i < tp->pnum; i++)
+				if (ACCEPTOR_id->protoids[j] == tp->protoids[i])
 					break;
-			if (ACCEPTOR_id->protoids[j] == np->protoids[i])
+			if (ACCEPTOR_id->protoids[j] == tp->protoids[i])
 				break;
 		}
-		if (j >= ACCEPTOR_id->pnum || i >= np->pnum)
+		if (j >= ACCEPTOR_id->pnum || i >= tp->pnum)
 			/* Must be bound to the same protocol. */
 			goto error;
 #endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
@@ -4150,6 +4227,48 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	   indication packet, and other information is associated with the destination addresses
 	   themselves, that are contained in the responding address(es) for NPI-IP.  Therefore, QOS 
 	   parameter checks must be performed in the np_passive() function instead. */
+	if (t_tst_bit(_T_BIT_XTI_RCVBUF, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.rcvbuf > sysctl_rmem_max)
+			OPT_buffer->xti.rcvbuf = sysctl_rmem_max;
+		if (OPT_buffer->xti.rcvbuf < SOCK_MIN_RCVBUF >> 1)
+			OPT_buffer->xti.rcvbuf = SOCK_MIN_RCVBUF >> 1;
+		OPT_buffer->xti.rcvbuf <<= 1;
+	} else {
+		OPT_buffer->xti.rcvbuf = tp->options.xti.rcvbuf;
+	}
+	if (t_tst_bit(_T_BIT_XTI_RCVLOWAT, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.rcvlowat > sysctl_rmem_max)
+			OPT_buffer->xti.rcvlowat = sysctl_rmem_max;
+		if (OPT_buffer->xti.rcvlowat < 1)
+			OPT_buffer->xti.rcvlowat = 1;
+	} else {
+		OPT_buffer->xti.rcvlowat = tp->options.xti.rcvlowat;
+	}
+	if (t_tst_bit(_T_BIT_XTI_SNDBUF, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.sndbuf > sysctl_wmem_max)
+			OPT_buffer->xti.sndbuf = sysctl_wmem_max;
+		if (OPT_buffer->xti.sndbuf < SOCK_MIN_SNDBUF >> 1)
+			OPT_buffer->xti.sndbuf = SOCK_MIN_SNDBUF >> 1;
+		OPT_buffer->xti.sndbuf <<= 1;
+	} else {
+		OPT_buffer->xti.sndbuf = tp->options.xti.sndbuf;
+	}
+	if (t_tst_bit(_T_BIT_XTI_SNDLOWAT, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.sndlowat > sysctl_wmem_max)
+			OPT_buffer->xti.sndlowat = sysctl_wmem_max;
+		if (OPT_buffer->xti.sndlowat < 1)
+			OPT_buffer->xti.sndlowat = 1;
+	} else {
+		OPT_buffer->xti.sndlowat = tp->options.xti.sndlowat;
+	}
+	if (t_tst_bit(_T_BIT_XTI_PRIORITY, OPT_buffer->flags)) {
+		if ((t_scalar_t) OPT_buffer->xti.priority < 0)
+			goto error;
+		if ((t_scalar_t) OPT_buffer->xti.priority > 255)
+			goto error;
+	} else {
+		OPT_buffer->xti.priority = ACCEPTOR_id->options.xti.priority;
+	}
 	if (t_tst_bit(_T_BIT_IP_PROTOCOL, OPT_buffer->flags)) {
 		/* Specified protocol probably needs to be the same as the indication, but since we
 		   only bind to one protocol id at the moment that is not a problem.  The connection 
@@ -4161,14 +4280,6 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 			goto error;
 	} else {
 		OPT_buffer->ip.protocol = ACCEPTOR_id->options.ip.protocol;
-	}
-	if (t_tst_bit(_T_BIT_XTI_PRIORITY, OPT_buffer->flags)) {
-		if ((t_scalar_t) OPT_buffer->xti.priority < 0)
-			goto error;
-		if ((t_scalar_t) OPT_buffer->xti.priority > 255)
-			goto error;
-	} else {
-		OPT_buffer->xti.priority = ACCEPTOR_id->options.xti.priority;
 	}
 	if (t_tst_bit(_T_BIT_IP_TTL, OPT_buffer->flags)) {
 		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl < 1)
@@ -5969,7 +6080,7 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely(dp == NULL))
 		goto error;
-	if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
+	if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
 		goto error;
 	err = TBADOPT;
 	if (unlikely(p->OPT_length > tp->info.OPT_size))
@@ -6096,7 +6207,7 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	}
 	if (dp != NULL) {
 		err = TBADDATA;
-		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.CDATA_size))
+		if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.CDATA_size))
 			goto error;
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
@@ -6193,7 +6304,7 @@ te_conn_res(queue_t *q, mblk_t *mp)
 	}
 	err = TBADDATA;
 	if ((dp = mp->b_cont))
-		if (unlikely((dlen = msgsize(dp)) == 0 || dlen > tp->info.CDATA_size))
+		if (unlikely((dlen = msgdsize(dp)) == 0 || dlen > tp->info.CDATA_size))
 			goto error;
 	err = TBADSEQ;
 	if (unlikely(p->SEQ_number == 0))
@@ -6301,7 +6412,7 @@ te_discon_req(queue_t *q, mblk_t *mp)
 #endif
 	err = TBADDATA;
 	if ((dp = mp->b_cont) != NULL)
-		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
+		if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
 			goto error;
 	state = tp_get_state(tp);
 	err = TBADSEQ;
@@ -6379,7 +6490,7 @@ te_write_req(queue_t *q, mblk_t *mp)
 	   Stream is bound to a port, at least the size of a UDP header.  The length of the entire
 	   TSDU must not exceed 65535 bytes. */
 	err = TBADDATA;
-	if (unlikely((dlen = msgsize(mp)) == 0
+	if (unlikely((dlen = msgdsize(mp)) == 0
 		     || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
 	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, mp)) < 0))
@@ -6442,7 +6553,7 @@ te_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
 	if (unlikely
-	    ((dlen = msgsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
+	    ((dlen = msgdsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
 	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, dp)) < 0))
 		goto error;
@@ -6492,7 +6603,7 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	dlen = msgsize(dp);
+	dlen = msgdsize(dp);
 	if (unlikely(dlen == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
 		goto error;
 	err = tp_senddata(tp, tp->dport, &tp->options, dp);
@@ -6546,7 +6657,7 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > tp->info.TSDU_size))
+	if (unlikely((mlen = msgdsize(dp)) == 0 || mlen > tp->info.TSDU_size))
 		goto error;
 	opts = tp->options;
 	opts.flags[0] = 0;
@@ -7196,7 +7307,9 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 					continue;
 				if (score > hiscore) {
 					hiscore = score;
-					result = tp;
+					if (result != NULL)
+						tp_put(result);
+					result = tp_get(tp);
 				}
 				if (score == 4)
 					/* perfect match */
@@ -7205,7 +7318,6 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 		}
 		read_unlock_bh(&hp->lock);
 	} while (hiscore < 4 && hp != hp2 && (hp = hp2));
-	tp_get(result);
 	usual(result);
 	return (result);
 }
@@ -7282,7 +7394,9 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 					continue;
 				if (score > hiscore) {
 					hiscore = score;
-					result = tp;
+					if (result != NULL)
+						tp_put(result);
+					result = tp_get(tp);
 				}
 				if (score == 2)
 					/* perfect match */
@@ -7291,7 +7405,6 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 		}
 		read_unlock_bh(&hp->lock);
 	} while (hiscore < 2 && hp != hp2 && (hp = hp2));
-	tp_get(result);
 	usual(result);
 	return (result);
 }
@@ -7372,8 +7485,17 @@ tp_free(char *data)
 	struct sk_buff *skb = (typeof(skb)) data;
 
 	/* sometimes skb is NULL if it has been stolen */
-	if (skb != NULL)
+	if (likely(skb != NULL)) {
+		struct tp *tp;
+
+		if (likely((tp = (typeof(tp)) skb->sk) != NULL)) {
+			ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
+			tp->rcvmem -= skb->truesize;
+			skb->sk = NULL;
+			tp_release(&tp);
+		}
 		kfree_skb(skb);
+	}
 	return;
 }
 
@@ -7452,9 +7574,20 @@ tp_v4_rcv(struct sk_buff *skb)
 		/* now allocate an mblk */
 		if ((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr)) == NULL)
 			goto no_buffers;
-		/* check flow control only after we have a buffer */
-		if (tp->oq == NULL || !canput(tp->oq))
+		spin_lock(&tp->qlock);
+		/* Before passing the message up, check that there is room in the receive buffer. */
+		if (unlikely(tp->rcvmem > tp->options.xti.rcvbuf)) {
+			/* allows slop over by 1 buffer */
+			spin_unlock(&tp->qlock);
 			goto flow_controlled;
+		}
+		tp->rcvmem += skb->truesize;
+		spin_unlock(&tp->qlock);
+		/* XXX: if the socket buffer already belongs to somebody else it might be necessary 
+		   to clone the socket buffer before doing this, but I think that the ip receive
+		   functions already do this for us. */
+		assert(skb->sk == NULL);
+		skb->sk = (struct sock *) tp_get(tp);
 		// mp->b_datap->db_type = M_DATA;
 		mp->b_wptr += plen;
 		put(tp->oq, mp);
@@ -7632,10 +7765,10 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		bufq_init(&tp->conq);
 		/* option defaults */
 		tp->options.xti.linger = xti_default_linger;
-		tp->options.xti.rcvbuf = xti_default_rcvbuf;
+		tp->options.xti.rcvbuf = sysctl_rmem_default << 1;
 		tp->options.xti.rcvlowat = xti_default_rcvlowat;
-		tp->options.xti.sndbuf = xti_default_sndbuf;
-		tp->options.xti.sndlowat = xti_default_sndlowat;
+		tp->options.xti.sndbuf = sysctl_wmem_default << 1;
+		tp->options.xti.sndlowat = 16768;
 		tp->options.xti.priority = xti_default_priority;
 		tp->options.ip.protocol = ip_default_protocol;
 		tp->options.ip.tos = ip_default_tos;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 11:35:17 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/22 02:09:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:35:17 $ by $Author: brian $
+ Last Modified $Date: 2006/05/22 02:09:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.c,v $
+ Revision 0.9.2.22  2006/05/22 02:09:12  brian
+ - changes from performance testing
+
  Revision 0.9.2.21  2006/03/03 11:35:17  brian
  - 32/64-bit compatibility
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 11:35:17 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/22 02:09:12 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 11:35:17 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/22 02:09:12 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -88,7 +91,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/03 11:35:17 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/22 02:09:12 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -189,7 +192,7 @@ struct timod {
 
 static kmem_cache_t *timod_priv_cachep = NULL;
 
-static int
+static __unlikely int
 timod_init_caches(void)
 {
 	if (!timod_priv_cachep
@@ -203,7 +206,7 @@ timod_init_caches(void)
 	return (0);
 }
 
-static int
+static __unlikely int
 timod_term_caches(void)
 {
 	if (timod_priv_cachep) {
@@ -265,7 +268,7 @@ timod_free_priv(queue_t *q)
 	return;
 }
 
-static int
+static __hot_put int
 split_buffer(mblk_t *mp, int offset)
 {
 	unsigned char *ptr = mp->b_rptr + offset;
@@ -296,8 +299,8 @@ split_buffer(mblk_t *mp, int offset)
  *  
  *  -------------------------------------------------------------------------
  */
-static streamscall int
-timod_rput(queue_t *q, mblk_t *mp)
+static __hot_get int
+timod_rput_slow(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
 
@@ -542,9 +545,46 @@ timod_rput(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
+static streamscall __hot_in int
+timod_rput(queue_t *q, mblk_t *mp)
+{
+	struct timod *priv = q->q_ptr;
+	union T_primitives *p;
 
-static streamscall int
-timod_wput(queue_t *q, mblk_t *mp)
+	prefetchw(priv);
+#if defined LIS
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			MOD_NAME, __FUNCTION__);
+		freemsg(mp);
+		return (0);
+	}
+#endif				/* defined LIS */
+	/* fast path for data */
+	if (likely(mp->b_datap->db_type == M_PROTO)) {
+		if (likely(priv->iocblk == NULL)) {
+			p = (typeof(p)) mp->b_rptr;
+			switch (p->type) {
+			case T_UNITDATA_IND:
+			case T_UDERROR_IND:
+				priv->oldstate = priv->state;
+				priv->state = TS_IDLE;
+				putnext(q, mp);
+				return (0);
+			case T_EXDATA_IND:
+			case T_DATA_IND:
+				priv->oldstate = priv->state;
+				priv->state = TS_DATA_XFER;
+				putnext(q, mp);
+				return (0);
+			}
+		}
+	}
+	return timod_rput_slow(q, mp);
+}
+
+static __hot_put int
+timod_wput_slow(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
 
@@ -883,6 +923,42 @@ timod_wput(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
+static streamscall __hot_out int
+timod_wput(queue_t *q, mblk_t *mp)
+{
+	struct timod *priv = q->q_ptr;
+	union T_primitives *p;
+
+	prefetchw(priv);
+#if defined LIS
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			MOD_NAME, __FUNCTION__);
+		freemsg(mp);
+		return (0);
+	}
+#endif				/* defined LIS */
+	/* fast path for data */
+	if (likely(mp->b_datap->db_type == M_PROTO)) {
+		if (likely(mp->b_wptr >= mp->b_rptr + sizeof(p->type))) {
+			p = (typeof(p)) mp->b_rptr;
+			switch (p->type) {
+			case T_UNITDATA_REQ:
+				priv->oldstate = priv->state;
+				priv->state = TS_IDLE;
+				putnext(q, mp);
+				return (0);
+			case T_EXDATA_REQ:
+			case T_DATA_REQ:
+				priv->oldstate = priv->state;
+				priv->state = TS_DATA_XFER;
+				putnext(q, mp);
+				return (0);
+			}
+		}
+	}
+	return timod_wput_slow(q, mp);
+}
 
 #define TIMOD_HANGUP	01
 #define TIMOD_EPROTO	02
@@ -1046,7 +1122,7 @@ STATIC struct fmodsw timod_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-STATIC int
+STATIC __unlikely int
 timod_register_strmod(void)
 {
 	int err;
@@ -1056,7 +1132,7 @@ timod_register_strmod(void)
 	return (0);
 }
 
-STATIC int
+STATIC __unlikely int
 timod_unregister_strmod(void)
 {
 	int err;
@@ -1102,7 +1178,7 @@ STATIC timod_trans timod_trans_map[] = {
 	, {.cmd = 0,}
 };
 
-STATIC void
+STATIC __unlikely void
 timod_ioctl32_unregister(void)
 {
 	struct timod_trans *t;
@@ -1114,7 +1190,7 @@ timod_ioctl32_unregister(void)
 	return;
 }
 
-STATIC int
+STATIC __unlikely int
 timod_ioctl32_register(void)
 {
 	struct timod_trans *t;
@@ -1138,7 +1214,7 @@ timod_ioctl32_register(void)
  */
 #ifdef LIS
 
-STATIC int
+STATIC __unlikely int
 timod_register_strmod(void)
 {
 	int err;
@@ -1148,7 +1224,7 @@ timod_register_strmod(void)
 	return (0);
 }
 
-STATIC int
+STATIC __unlikely int
 timod_unregister_strmod(void)
 {
 	int err;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.67 2006/02/22 11:37:18 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.68 2006/05/22 02:09:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/22 11:37:18 $ by $Author: brian $
+ Last Modified $Date: 2006/05/22 02:09:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.68  2006/05/22 02:09:05  brian
+ - changes from performance testing
+
  Revision 0.9.2.67  2006/02/22 11:37:18  brian
  - split giant wait queue into 4 independent queues
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.67 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.68 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -731,7 +734,8 @@ extern struct file_operations strm_f_ops;
  */
 #if 0
 #define XCHG(__a,__b) xchg((__a),(__b))
-#else
+#endif
+#if 0
 #define XCHG(__a,__b) \
 ((typeof(__b))({ \
 	unsigned long __flags; \
@@ -741,6 +745,16 @@ extern struct file_operations strm_f_ops;
 	prefetchw(__result); \
 	*(__a) = (__b); \
 	local_irq_restore(__flags); \
+	__result; \
+}))
+#endif
+#if 1
+#define XCHG(__a,__b) \
+((typeof(__b))({ \
+	typeof(__b) __result; \
+	__result = *(__a); \
+	prefetchw(__result); \
+	*(__a) = (__b) ; \
 	__result; \
 }))
 #endif

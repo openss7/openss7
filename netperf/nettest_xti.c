@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2006/03/03 11:56:42 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/05/22 02:09:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:56:42 $ by $Author: brian $
+ Last Modified $Date: 2006/05/22 02:09:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2006/03/03 11:56:42 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/05/22 02:09:00 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2006/03/03 11:56:42 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/05/22 02:09:00 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -395,10 +395,10 @@ create_xti_endpoint(char *name, int level)
   /* and next, set the fields in the sock_option structure */
   sock_option->myopthdr.level = XTI_GENERIC;
   sock_option->myopthdr.name  = XTI_SNDBUF;
-  sock_option->myopthdr.len   = sizeof(struct t_opthdr) + sizeof(long);
+  sock_option->myopthdr.len   = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
   sock_option->value        = lss_size;
   
-  opt_req->opt.len          = sizeof(struct t_opthdr) + sizeof(long);
+  opt_req->opt.len          = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
   
   /* now, set-up the stuff to return the value in the end */
   /* we assume that the t_alloc call allocated a buffer that started */
@@ -448,10 +448,10 @@ create_xti_endpoint(char *name, int level)
   /* and next, set the fields in the sock_option structure */
   sock_option->myopthdr.level = XTI_GENERIC;
   sock_option->myopthdr.name  = XTI_RCVBUF;
-  sock_option->myopthdr.len   = sizeof(struct t_opthdr) + sizeof(long);
+  sock_option->myopthdr.len   = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
   sock_option->value        = lsr_size;
   
-  opt_req->opt.len          = sizeof(struct t_opthdr) + sizeof(long);
+  opt_req->opt.len          = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
   
   /* now, set-up the stuff to return the value in the end */
   /* we assume that the t_alloc call allocated a buffer that started */
@@ -533,10 +533,10 @@ create_xti_endpoint(char *name, int level)
       /* and next, set the fields in the sock_option structure */
       sock_option->myopthdr.level = T_INET_SCTP;
       sock_option->myopthdr.name  = T_SCTP_NODELAY;
-      sock_option->myopthdr.len   = sizeof(struct t_opthdr) + sizeof(long);
+      sock_option->myopthdr.len   = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
       sock_option->value          = T_NO;
       
-      opt_req->opt.len          = sizeof(struct t_opthdr) + sizeof(long);
+      opt_req->opt.len          = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
       
       /* now, set-up the stuff to return the value in the end */
       /* we assume that the t_alloc call allocated a buffer that started */
@@ -580,10 +580,10 @@ create_xti_endpoint(char *name, int level)
       /* and next, set the fields in the sock_option structure */
       sock_option->myopthdr.level = T_INET_TCP;
       sock_option->myopthdr.name  = T_TCP_NODELAY;
-      sock_option->myopthdr.len   = sizeof(struct t_opthdr) + sizeof(long);
+      sock_option->myopthdr.len   = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
       sock_option->value          = T_YES;
       
-      opt_req->opt.len          = sizeof(struct t_opthdr) + sizeof(long);
+      opt_req->opt.len          = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
       
       /* now, set-up the stuff to return the value in the end */
       /* we assume that the t_alloc call allocated a buffer that started */

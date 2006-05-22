@@ -845,7 +845,7 @@ applies to both the local and remote system.
 .TP
 \fB-p\fR,\ \fB--port=\fIPORTNUM\fR
 Connect to a
-.C netsetver
+.BR netsetver (8)
 listening on the specified port, rather than using /etc/services.
 .\" -------------------------------------------------------------------------
 .TP
@@ -2004,7 +2004,7 @@ manual. If you think you have found a bug, please send email to Rick
 Jones <raj@cup.hp.com>.
 
 .SH SEE ALSO
-.C netserver
+.BR netserver (8)
 .br
 .I
 Netperf: A Network Performance Benchmark

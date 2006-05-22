@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/05/09 06:29:44 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/05/22 02:09:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/09 06:29:44 $ by $Author: brian $
+ Last Modified $Date: 2006/05/22 02:09:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.128  2006/05/22 02:09:05  brian
+ - changes from performance testing
+
  Revision 0.9.2.127  2006/05/09 06:29:44  brian
  - support OPENFAIL for SVR 3.2 compatibility
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/05/09 06:29:44 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/05/22 02:09:05 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/05/09 06:29:44 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/05/22 02:09:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -993,7 +996,14 @@ mdbblock_free(mblk_t *mp)
 	prefetchw(mp);
 
 	mp->b_next = NULL;
-	*XCHG(&t->freemblk_tail, &mp->b_next) = mp;
+	{
+		unsigned long flags;
+
+		local_irq_save(flags);
+		*XCHG(&t->freemblk_tail, &mp->b_next) = mp;
+		t->freemblks++;
+		local_irq_restore(flags);
+	}
 	{
 		struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 
@@ -1008,7 +1018,7 @@ mdbblock_free(mblk_t *mp)
 	   blocks on the free list exceeds some (per-cpu) threshold.  Currently I set this to just
 	   1/16th of the maximum.  That should be ok for now.  I will create a sysctl for it
 	   later... */
-	if (unlikely((++t->freemblks > (sysctl_str_nstrmsgs >> 4))
+	if (unlikely((t->freemblks > (sysctl_str_nstrmsgs >> 4))
 		     && test_and_set_bit(freeblks, &t->flags) == 0))
 		__raise_streams();
 	raise_local_bufcalls();
@@ -1029,11 +1039,19 @@ freeblocks(struct strthread *t)
 {
 	mblk_t *mp, *mp_next;
 
-	clear_bit(freeblks, &t->flags);
+	prefetchw(t);
+	{
+		unsigned long flags;
 
-	if (likely((mp_next = XCHG(&t->freemblk_head, NULL)) != NULL)) {
-		t->freemblk_tail = &t->freemblk_head;
-		t->freemblks = 0;	/* doesn't need to be protected, just a monitor */
+		local_irq_save(flags);
+		__test_and_clear_bit(freeblks, &t->flags);
+		if (likely((mp_next = XCHG(&t->freemblk_head, NULL)) != NULL)) {
+			t->freemblk_tail = &t->freemblk_head;
+			t->freemblks = 0;
+		}
+		local_irq_restore(flags);
+	}
+	if (likely(mp_next != NULL)) {
 		mp = mp_next;
 		do {
 			struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
@@ -1409,8 +1427,13 @@ strsched_mfunc_fast(mblk_t *mp)
 	prefetchw(t);
 
 	mp->b_next = NULL;
-	*XCHG(&t->strmfuncs_tail, &mp->b_next) = mp;
+	{
+		unsigned long flags;
 
+		local_irq_save(flags);
+		*XCHG(&t->strmfuncs_tail, &mp->b_next) = mp;
+		local_irq_restore(flags);
+	}
 	if (!test_and_set_bit(strmfuncs, &t->flags))
 		__raise_streams();
 }
@@ -1459,8 +1482,13 @@ strsched_event(struct strevent *se)
 	id = ((se->se_id << EVENT_ID_SHIFT) | (se->se_seq & EVENT_SEQ_MASK));
 
 	se->se_next = NULL;
-	*XCHG(&t->strevents_tail, &se->se_next) = se;
+	{
+		unsigned long flags;
 
+		local_irq_save(flags);
+		*XCHG(&t->strevents_tail, &se->se_next) = se;
+		local_irq_restore(flags);
+	}
 	if (!test_and_set_bit(strevents, &t->flags))
 		__raise_streams();
 	return (id);
@@ -1487,8 +1515,13 @@ strsched_bufcall(struct strevent *se)
 	id = ((se->se_id << EVENT_ID_SHIFT) | (se->se_seq & EVENT_SEQ_MASK));
 
 	se->se_next = NULL;
-	*XCHG(&t->strbcalls_tail, &se->se_next) = se;
+	{
+		unsigned long flags;
 
+		local_irq_save(flags);
+		*XCHG(&t->strbcalls_tail, &se->se_next) = se;
+		local_irq_restore(flags);
+	}
 	set_bit(strbcwait, &t->flags);
 	return (id);
 }
@@ -1520,8 +1553,13 @@ timeout_function(unsigned long arg)
 	prefetchw(t);
 
 	se->se_next = NULL;
-	*XCHG(&t->strtimout_tail, &se->se_next) = se;
+	{
+		unsigned long flags;
 
+		local_irq_save(flags);
+		*XCHG(&t->strtimout_tail, &se->se_next) = se;
+		local_irq_restore(flags);
+	}
 	if (!test_and_set_bit(strtimout, &t->flags))
 #if defined CONFIG_STREAMS_KTHREADS || defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 		/* bind timeout back to the CPU that called for it */
@@ -2151,19 +2189,37 @@ defer_syncq(struct syncq_cookie *sc, int exclus)
 
 	if ((se = sc->sc_se)) {
 		se->se_next = NULL;
-		*XCHG(&sc->sc_sq->sq_etail, &se->se_next) = se;
+		{
+			unsigned long flags;
+
+			local_irq_save(flags);
+			*XCHG(&sc->sc_sq->sq_etail, &se->se_next) = se;
+			local_irq_restore(flags);
+		}
 	} else {
 		mblk_t *mp;
 
 		if ((mp = sc->sc_mp)) {
 			mp->b_next = NULL;
-			*XCHG(&sc->sc_sq->sq_mtail, &mp->b_next) = mp;
+			{
+				unsigned long flags;
+
+				local_irq_save(flags);
+				*XCHG(&sc->sc_sq->sq_mtail, &mp->b_next) = mp;
+				local_irq_restore(flags);
+			}
 		} else {
 			queue_t *q;
 
 			if ((q = sc->sc_q)) {
 				q->q_link = NULL;
-				*XCHG(&sc->sc_sq->sq_qtail, &q->q_link) = q;
+				{
+					unsigned long flags;
+
+					local_irq_save(flags);
+					*XCHG(&sc->sc_sq->sq_qtail, &q->q_link) = q;
+					local_irq_restore(flags);
+				}
 			}
 		}
 	}
@@ -3474,11 +3530,15 @@ domfuncs(struct strthread *t)
 {
 	do {
 		mblk_t *b, *b_next;
+		unsigned long flags;
 
 		prefetchw(t);
-		clear_bit(strmfuncs, &t->flags);
-		if (likely((b_next = XCHG(&t->strmfuncs_head, NULL)) != NULL)) {
+		local_irq_save(flags);
+		__test_and_clear_bit(strmfuncs, &t->flags);
+		if (likely((b_next = XCHG(&t->strmfuncs_head, NULL)) != NULL))
 			t->strmfuncs_tail = &t->strmfuncs_head;
+		local_irq_restore(flags);
+		if (likely(b_next != NULL)) {
 			b = b_next;
 			do {
 				b_next = b->b_next;
@@ -3502,11 +3562,15 @@ timeouts(struct strthread *t)
 {
 	do {
 		struct strevent *se, *se_next;
+		unsigned long flags;
 
 		prefetchw(t);
-		clear_bit(strtimout, &t->flags);
-		if (likely((se_next = XCHG(&t->strtimout_head, NULL)) != NULL)) {
+		local_irq_save(flags);
+		__test_and_clear_bit(strtimout, &t->flags);
+		if (likely((se_next = XCHG(&t->strtimout_head, NULL)) != NULL))
 			t->strtimout_tail = &t->strtimout_head;
+		local_irq_restore(flags);
+		if (likely(se_next != NULL)) {
 			se = se_next;
 			do {
 				se_next = se->se_next;
@@ -3540,8 +3604,13 @@ qscan(queue_t *q)
 
 	/* put ourselves on scan list */
 	q->q_link = NULL;
-	*XCHG(&t->scanqtail, &q->q_link) = qget(q);
+	{
+		unsigned long flags;
 
+		local_irq_save(flags);
+		*XCHG(&t->scanqtail, &q->q_link) = qget(q);
+		local_irq_restore(flags);
+	}
 	if (!test_and_set_bit(scanqflag, &t->flags))
 		__raise_streams();
 }
@@ -3561,11 +3630,15 @@ scanqueues(struct strthread *t)
 {
 	do {
 		struct queue *q, *q_link;
+		unsigned long flags;
 
 		prefetchw(t);
-		clear_bit(scanqflag, &t->flags);
-		if (likely((q_link = XCHG(&t->scanqhead, NULL)) != NULL)) {
+		local_irq_save(flags);
+		__test_and_clear_bit(scanqflag, &t->flags);
+		if (likely((q_link = XCHG(&t->scanqhead, NULL)) != NULL))
 			t->scanqtail = &t->scanqhead;
+		local_irq_restore(flags);
+		if (likely(q_link != NULL)) {
 			q = q_link;
 			do {
 				struct stdata *sd = qstream(q);
@@ -3576,6 +3649,7 @@ scanqueues(struct strthread *t)
 					mod_timer(&scan_timer, sd->sd_rtime);
 					break;
 				}
+				/* FIXME: what is all this about? */
 				if (&q->q_link == t->scanqtail) {
 					t->scanqtail = &t->scanqhead;
 					q->q_link = NULL;
@@ -3603,11 +3677,16 @@ STATIC streams_fastcall void
 doevents(struct strthread *t)
 {
 	struct strevent *se, *se_next;
+	unsigned long flags;
 
 	do {
-		clear_bit(strevents, &t->flags);
-		if ((se_next = XCHG(&t->strevents_head, NULL))) {	/* MP-SAFE */
+		prefetchw(t);
+		local_irq_save(flags);
+		__test_and_clear_bit(strevents, &t->flags);
+		if (likely((se_next = XCHG(&t->strevents_head, NULL)) != NULL))
 			t->strevents_tail = &t->strevents_head;
+		local_irq_restore(flags);
+		if (likely(se_next != NULL)) {
 			se = se_next;
 			do {
 				struct seinfo *s = (typeof(s)) se;
@@ -3680,12 +3759,19 @@ runsyncq(struct syncq *sq)
 	   more restrictive than the inner perimeter. */
 
 	do {
+		unsigned long flags;
+
 		{
 			mblk_t *b, *b_next;
 
 			/* process messages */
-			while (likely((b_next = XCHG(&sq->sq_mhead, NULL)) != NULL)) {	/* MP-SAFE */
-				sq->sq_mtail = &sq->sq_mhead;
+			for (;;) {
+				local_irq_save(flags);
+				if (likely((b_next = XCHG(&sq->sq_mhead, NULL)) != NULL))
+					sq->sq_mtail = &sq->sq_mhead;
+				local_irq_restore(flags);
+				if (unlikely(b_next == NULL))
+					break;
 				b = b_next;
 				do {
 					b_next = b->b_next;
@@ -3701,8 +3787,13 @@ runsyncq(struct syncq *sq)
 			prefetchw(t);
 
 			/* process queue service */
-			while (likely((q_link = XCHG(&sq->sq_qhead, NULL)) != NULL)) {	/* MP-SAFE */
-				sq->sq_qtail = &sq->sq_qhead;
+			for (;;) {
+				local_irq_save(flags);
+				if (likely((q_link = XCHG(&sq->sq_qhead, NULL)) != NULL))
+					sq->sq_qtail = &sq->sq_qhead;
+				local_irq_restore(flags);
+				if (unlikely(q_link == NULL))
+					break;
 				q = q_link;
 				do {
 					q_link = q->q_link;
@@ -3715,8 +3806,13 @@ runsyncq(struct syncq *sq)
 			struct strevent *se, *se_next;
 
 			/* process stream events */
-			while (likely((se_next = XCHG(&sq->sq_ehead, NULL)) != NULL)) {	/* MP-SAFE */
-				sq->sq_etail = &sq->sq_ehead;
+			for (;;) {
+				local_irq_save(flags);
+				if (likely((se_next = XCHG(&sq->sq_ehead, NULL)) != NULL))
+					sq->sq_etail = &sq->sq_ehead;
+				local_irq_restore(flags);
+				if (unlikely(se_next == NULL))
+					break;
 				se = se_next;
 				do {
 					se_next = se->se_next;
@@ -3760,11 +3856,16 @@ STATIC streams_fastcall void
 backlog(struct strthread *t)
 {
 	syncq_t *sq, *sq_link;
+	unsigned long flags;
 
 	do {
-		clear_bit(qsyncflag, &t->flags);
-		if ((sq_link = XCHG(&t->sqhead, NULL))) {	/* MP-SAFE */
+		prefetchw(t);
+		local_irq_save(flags);
+		__test_and_clear_bit(qsyncflag, &t->flags);
+		if (likely((sq_link = XCHG(&t->sqhead, NULL)) != NULL))
 			t->sqtail = &t->sqhead;
+		local_irq_restore(flags);
+		if (likely(sq_link != NULL)) {
 			sq = sq_link;
 			do {
 				sq_link = sq->sq_link;
@@ -3792,11 +3893,16 @@ STATIC streams_fastcall void
 bufcalls(struct strthread *t)
 {
 	struct strevent *se, *se_next;
+	unsigned long flags;
 
 	do {
-		clear_bit(strbcwait, &t->flags);
-		if ((se_next = XCHG(&t->strbcalls_head, NULL))) {	/* MP-SAFE */
+		prefetchw(t);
+		local_irq_save(flags);
+		__test_and_clear_bit(strbcwait, &t->flags);
+		if (likely((se_next = XCHG(&t->strbcalls_head, NULL)) != NULL))
 			t->strbcalls_tail = &t->strbcalls_head;
+		local_irq_restore(flags);
+		if (likely(se_next != NULL)) {
 			se = se_next;
 			do {
 				se_next = se->se_next;
@@ -3818,11 +3924,16 @@ STATIC streams_inline streams_fastcall __hot_in void
 queuerun(struct strthread *t)
 {
 	queue_t *q, *q_link;
+	unsigned long flags;
 
 	do {
-		clear_bit(qrunflag, &t->flags);
-		if (likely((q_link = XCHG(&t->qhead, NULL)) != NULL)) {
+		prefetchw(t);
+		local_irq_save(flags);
+		__test_and_clear_bit(qrunflag, &t->flags);
+		if (likely((q_link = XCHG(&t->qhead, NULL)) != NULL))
 			t->qtail = &t->qhead;
+		local_irq_restore(flags);
+		if (likely(q_link != NULL)) {
 			q = q_link;
 			do {
 				q_link = q->q_link;
@@ -3858,9 +3969,12 @@ sqsched(syncq_t *sq)
 	/* called with sq locked */
 	if (!sq->sq_link) {
 		struct strthread *t = this_thread;
+		unsigned long flags;
 
 		/* put ourselves on the run list */
+		local_irq_save(flags);
 		*XCHG(&t->sqtail, &sq->sq_link) = sq_get(sq);	/* MP-SAFE */
+		local_irq_restore(flags);
 		if (!test_and_set_bit(qsyncflag, &t->flags))
 			__raise_streams();
 	}
@@ -3878,10 +3992,16 @@ STATIC streams_fastcall void
 freechains(struct strthread *t)
 {
 	mblk_t *mp, *mp_next;
+	unsigned long flags;
 
-	clear_bit(flushwork, &t->flags);
-	if ((mp_next = XCHG(&t->freemsg_head, NULL))) {	/* MP-SAFE */
+	prefetchw(t);
+	local_irq_save(flags);
+	__test_and_clear_bit(flushwork, &t->flags);
+	if (likely((mp_next = XCHG(&t->freemsg_head, NULL)) != NULL))
 		t->freemsg_tail = &t->freemsg_head;
+	local_irq_restore(flags);
+
+	if (likely(mp_next != NULL)) {
 		mp = mp_next;
 		do {
 			mp_next = mp->b_next;
@@ -4374,6 +4494,8 @@ takeover_strsched(unsigned int cpu)
 		*XCHG(&t->freemblk_tail, o->freemblk_tail) = o->freemblk_head;
 		o->freemblk_head = NULL;
 		o->freemblk_tail = &o->freemblk_head;
+		t->freemblks += o->freemblks;
+		o->freemblks = 0;
 	}
 	if (o->freeevnt_head) {
 		*XCHG(&t->freeevnt_tail, o->freeevnt_tail) = o->freeevnt_head;
@@ -4637,25 +4759,17 @@ strsched_init(void)
 	for (i = 0; i < NR_CPUS; i++) {
 		struct strthread *t = &strthreads[i];
 
+		bzero(t, sizeof(*t));
 		atomic_set(&t->lock, 0);
-		/* initialize all the lists */
-		t->qhead = NULL;
+		/* initialize all the list tails */
 		t->qtail = &t->qhead;
-		t->strmfuncs_head = NULL;
 		t->strmfuncs_tail = &t->strmfuncs_head;
-		t->strbcalls_head = NULL;
 		t->strbcalls_tail = &t->strbcalls_head;
-		t->strtimout_head = NULL;
 		t->strtimout_tail = &t->strtimout_head;
-		t->strevents_head = NULL;
 		t->strevents_tail = &t->strevents_head;
-		t->scanqhead = NULL;
 		t->scanqtail = &t->scanqhead;
-		t->freemsg_head = NULL;
 		t->freemsg_tail = &t->freemsg_head;
-		t->freemblk_head = NULL;
 		t->freemblk_tail = &t->freemblk_head;
-		t->freeevnt_head = NULL;
 		t->freeevnt_tail = &t->freeevnt_head;
 	}
 	init_timer(&scan_timer);

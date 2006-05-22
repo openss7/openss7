@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/19 12:29:06 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/22 02:09:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/19 12:29:06 $ by $Author: brian $
+ Last Modified $Date: 2006/05/22 02:09:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.20  2006/05/22 02:09:09  brian
+ - changes from performance testing
+
  Revision 0.9.2.19  2006/05/19 12:29:06  brian
  - results of testing, almost full pass
 
@@ -109,10 +112,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/19 12:29:06 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/22 02:09:09 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/19 12:29:06 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/22 02:09:09 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -152,6 +155,8 @@ static char const ident[] =
 #include <linux/brlock.h>
 #endif
 
+#include <linux/udp.h>
+
 #include <net/ip.h>
 #include <net/icmp.h>
 #include <net/route.h>
@@ -186,7 +191,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/19 12:29:06 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/22 02:09:09 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -359,6 +364,8 @@ typedef struct tp {
 	struct tp **cprev;		/* linkage for conn hash */
 	struct tp_chash_bucket *chash;	/* linkage for conn hash */
 	struct T_info_ack info;		/* service provider information */
+	unsigned int sndmem;		/* send buffer memory allocated */
+	unsigned int rcvmem;		/* recv buffer memory allocated */
 	unsigned int BIND_flags;	/* bind flags */
 	unsigned int CONN_flags;	/* connect flags */
 	unsigned int CONIND_number;	/* maximum number of outstanding connection indications */
@@ -393,7 +400,7 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 #define xti_default_rcvbuf		SK_RMEM_MAX
 #define xti_default_rcvlowat		1
 #define xti_default_sndbuf		SK_WMEM_MAX
-#define xti_default_sndlowat		1
+#define xti_default_sndlowat		(SK_WMEM_MAX >> 1)
 #define xti_default_priority		0
 
 #define ip_default_protocol		17
@@ -1846,7 +1853,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.sndlowat;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = sysctl_wmem_default >> 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 			}
@@ -2397,8 +2404,8 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen != sizeof(*valp))
 						goto einval;
-					if (*valp > sysctl_rmem_max) {
-						*valp = sysctl_rmem_max;
+					if (*valp > sysctl_wmem_max) {
+						*valp = sysctl_wmem_max;
 						oh->status =
 						    t_overall_result(&overall, T_PARTSUCCESS);
 					} else if (*valp < SOCK_MIN_SNDBUF / 2) {
@@ -2777,6 +2784,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 						    t_overall_result(&overall, T_PARTSUCCESS);
 					}
 				}
+				*valp <<= 1;
 				t->options.xti.rcvbuf = *valp;
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -2825,8 +2833,8 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					*valp = sysctl_wmem_default;
 				} else {
 					*valp = *((typeof(valp)) T_OPT_DATA(ih));
-					if (*valp > sysctl_rmem_max) {
-						*valp = sysctl_rmem_max;
+					if (*valp > sysctl_wmem_max) {
+						*valp = sysctl_wmem_max;
 						oh->status =
 						    t_overall_result(&overall, T_PARTSUCCESS);
 					} else if (*valp < SOCK_MIN_SNDBUF / 2) {
@@ -2835,6 +2843,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 						    t_overall_result(&overall, T_PARTSUCCESS);
 					}
 				}
+				*valp <<= 1;
 				t->options.xti.sndbuf = *valp;
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -2851,7 +2860,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 				oh->status = T_SUCCESS;
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				if (ih->name == T_ALLOPT) {
-					*valp = t_defaults.xti.sndlowat;
+					*valp = sysctl_wmem_default >> 1;
 				} else {
 					*valp = *((typeof(valp)) T_OPT_DATA(ih));
 					if (*valp > 1) {
@@ -3565,6 +3574,32 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
 /**
+ * tp_destructor - socket buffer destructor
+ * @skb: socket buffer to destroy
+ *
+ * This provide the impedance matching between socket buffer flow control and STREAMS flow control.
+ * When tp->sndmem is greater than tp->options.xti.sndbuf we place STREAMS buffers back on the send
+ * queue and stall the queue.  When the send memory falls below tp->options.xti.sndlowat (or to
+ * zero) and there are message on the send queue, we enable the queue.
+ */
+STATIC void __hot_out
+tp_destructor(struct sk_buff *skb)
+{
+	struct tp *tp;
+
+	if (likely((tp = (typeof(tp)) skb->sk) != NULL)) {
+		ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
+		tp->sndmem -= skb->truesize;
+		if ((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0)
+		    && tp->iq != NULL && tp->iq->q_first != NULL)
+			qenable(tp->iq);
+		skb->sk = NULL;
+		skb->destructor = NULL;
+		tp_release(&tp);
+	}
+}
+
+/**
  * tp_senddata - process a unit data request
  * @tp: Stream private structure
  * @opt: options to use
@@ -3574,6 +3609,10 @@ STATIC INLINE fastcall __hot_put int
 tp_senddata(struct tp *tp, struct tp_options *opt, mblk_t *mp)
 {
 	struct rtable *rt = NULL;
+
+	/* allows slop over by 1 buffer */
+	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
+		goto ebusy;
 
 	assert(opt != NULL);
 	if (!ip_route_output(&rt, opt->ip.daddr, opt->ip.addr, 0, 0)) {
@@ -3592,6 +3631,9 @@ tp_senddata(struct tp *tp, struct tp_options *opt, mblk_t *mp)
 			struct iphdr *iph;
 			unsigned char *data;
 
+			skb->sk = (struct sock *) tp_get(tp); /* borrow sk pointer */
+			skb->destructor = tp_destructor;
+			tp->sndmem += skb->truesize;
 			skb_reserve(skb, hlen);
 			/* find headers */
 			iph = (typeof(iph)) __skb_put(skb, tlen);
@@ -3645,6 +3687,8 @@ tp_senddata(struct tp *tp, struct tp_options *opt, mblk_t *mp)
 	} else
 		__rare();
 	return (QR_DONE);
+      ebusy:
+	return (-EBUSY);
 }
 
 #if 0
@@ -3758,6 +3802,40 @@ tp_connect(struct tp *tp, struct sockaddr_in *DEST_buffer, socklen_t DEST_length
 
 	err = NBADOPT;
 	/* first validate parameters */
+	if (t_tst_bit(_T_BIT_XTI_RCVBUF, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.rcvbuf > sysctl_rmem_max)
+			OPT_buffer->xti.rcvbuf = sysctl_rmem_max;
+		if (OPT_buffer->xti.rcvbuf < SOCK_MIN_RCVBUF >> 1)
+			OPT_buffer->xti.rcvbuf = SOCK_MIN_RCVBUF >> 1;
+		OPT_buffer->xti.rcvbuf <<= 1;
+	} else {
+		OPT_buffer->xti.rcvbuf = tp->options.xti.rcvbuf;
+	}
+	if (t_tst_bit(_T_BIT_XTI_RCVLOWAT, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.rcvlowat > sysctl_rmem_max)
+			OPT_buffer->xti.rcvlowat = sysctl_rmem_max;
+		if (OPT_buffer->xti.rcvlowat < 1)
+			OPT_buffer->xti.rcvlowat = 1;
+	} else {
+		OPT_buffer->xti.rcvlowat = tp->options.xti.rcvlowat;
+	}
+	if (t_tst_bit(_T_BIT_XTI_SNDBUF, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.sndbuf > sysctl_wmem_max)
+			OPT_buffer->xti.sndbuf = sysctl_wmem_max;
+		if (OPT_buffer->xti.sndbuf < SOCK_MIN_SNDBUF >> 1)
+			OPT_buffer->xti.sndbuf = SOCK_MIN_SNDBUF >> 1;
+		OPT_buffer->xti.sndbuf <<= 1;
+	} else {
+		OPT_buffer->xti.sndbuf = tp->options.xti.sndbuf;
+	}
+	if (t_tst_bit(_T_BIT_XTI_SNDLOWAT, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.sndlowat > sysctl_wmem_max)
+			OPT_buffer->xti.sndlowat = sysctl_wmem_max;
+		if (OPT_buffer->xti.sndlowat < 1)
+			OPT_buffer->xti.sndlowat = 1;
+	} else {
+		OPT_buffer->xti.sndlowat = tp->options.xti.sndlowat;
+	}
 	if (t_tst_bit(_T_BIT_XTI_PRIORITY, OPT_buffer->flags)) {
 		if ((t_scalar_t) OPT_buffer->xti.priority < 0)
 			goto error;
@@ -4032,13 +4110,13 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		   protocol id as the listening stream. */
 		/* Another approach for 2.4 would be to copy the sk_buff before stealing it. */
 		for (j = 0, i = 0; j < ACCEPTOR_id->pnum; j++) {
-			for (i = 0; i < np->pnum; i++)
-				if (ACCEPTOR_id->protoids[j] == np->protoids[i])
+			for (i = 0; i < tp->pnum; i++)
+				if (ACCEPTOR_id->protoids[j] == tp->protoids[i])
 					break;
-			if (ACCEPTOR_id->protoids[j] == np->protoids[i])
+			if (ACCEPTOR_id->protoids[j] == tp->protoids[i])
 				break;
 		}
-		if (j >= ACCEPTOR_id->pnum || i >= np->pnum)
+		if (j >= ACCEPTOR_id->pnum || i >= tp->pnum)
 			/* Must be bound to the same protocol. */
 			goto error;
 #endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
@@ -4059,6 +4137,48 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	   indication packet, and other information is associated with the destination addresses
 	   themselves, that are contained in the responding address(es) for NPI-IP.  Therefore, QOS 
 	   parameter checks must be performed in the np_passive() function instead. */
+	if (t_tst_bit(_T_BIT_XTI_RCVBUF, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.rcvbuf > sysctl_rmem_max)
+			OPT_buffer->xti.rcvbuf = sysctl_rmem_max;
+		if (OPT_buffer->xti.rcvbuf < SOCK_MIN_RCVBUF >> 1)
+			OPT_buffer->xti.rcvbuf = SOCK_MIN_RCVBUF >> 1;
+		OPT_buffer->xti.rcvbuf <<= 1;
+	} else {
+		OPT_buffer->xti.rcvbuf = tp->options.xti.rcvbuf;
+	}
+	if (t_tst_bit(_T_BIT_XTI_RCVLOWAT, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.rcvlowat > sysctl_rmem_max)
+			OPT_buffer->xti.rcvlowat = sysctl_rmem_max;
+		if (OPT_buffer->xti.rcvlowat < 1)
+			OPT_buffer->xti.rcvlowat = 1;
+	} else {
+		OPT_buffer->xti.rcvlowat = tp->options.xti.rcvlowat;
+	}
+	if (t_tst_bit(_T_BIT_XTI_SNDBUF, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.sndbuf > sysctl_wmem_max)
+			OPT_buffer->xti.sndbuf = sysctl_wmem_max;
+		if (OPT_buffer->xti.sndbuf < SOCK_MIN_SNDBUF >> 1)
+			OPT_buffer->xti.sndbuf = SOCK_MIN_SNDBUF >> 1;
+		OPT_buffer->xti.sndbuf <<= 1;
+	} else {
+		OPT_buffer->xti.sndbuf = tp->options.xti.sndbuf;
+	}
+	if (t_tst_bit(_T_BIT_XTI_SNDLOWAT, OPT_buffer->flags)) {
+		if (OPT_buffer->xti.sndlowat > sysctl_wmem_max)
+			OPT_buffer->xti.sndlowat = sysctl_wmem_max;
+		if (OPT_buffer->xti.sndlowat < 1)
+			OPT_buffer->xti.sndlowat = 1;
+	} else {
+		OPT_buffer->xti.sndlowat = tp->options.xti.sndlowat;
+	}
+	if (t_tst_bit(_T_BIT_XTI_PRIORITY, OPT_buffer->flags)) {
+		if ((t_scalar_t) OPT_buffer->xti.priority < 0)
+			goto error;
+		if ((t_scalar_t) OPT_buffer->xti.priority > 255)
+			goto error;
+	} else {
+		OPT_buffer->xti.priority = ACCEPTOR_id->options.xti.priority;
+	}
 	if (t_tst_bit(_T_BIT_IP_PROTOCOL, OPT_buffer->flags)) {
 		/* Specified protocol probably needs to be the same as the indication, but since we
 		   only bind to one protocol id at the moment that is not a problem.  The connection 
@@ -4070,14 +4190,6 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 			goto error;
 	} else {
 		OPT_buffer->ip.protocol = ACCEPTOR_id->options.ip.protocol;
-	}
-	if (t_tst_bit(_T_BIT_XTI_PRIORITY, OPT_buffer->flags)) {
-		if ((t_scalar_t) OPT_buffer->xti.priority < 0)
-			goto error;
-		if ((t_scalar_t) OPT_buffer->xti.priority > 255)
-			goto error;
-	} else {
-		OPT_buffer->xti.priority = ACCEPTOR_id->options.xti.priority;
 	}
 	if (t_tst_bit(_T_BIT_IP_TTL, OPT_buffer->flags)) {
 		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl < 1)
@@ -7099,7 +7211,9 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 					continue;
 				if (score > hiscore) {
 					hiscore = score;
-					result = tp;
+					if (result != NULL)
+						tp_put(result);
+					result = tp_get(tp);
 				}
 				if (score == 4)
 					/* perfect match */
@@ -7108,7 +7222,6 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 		}
 		read_unlock_bh(&hp->lock);
 	} while (hiscore < 4 && hp != hp2 && (hp = hp2));
-	tp_get(result);
 	usual(result);
 	return (result);
 }
@@ -7185,7 +7298,9 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 					continue;
 				if (score > hiscore) {
 					hiscore = score;
-					result = tp;
+					if (result != NULL)
+						tp_put(result);
+					result = tp_get(tp);
 				}
 				if (score == 2)
 					/* perfect match */
@@ -7194,7 +7309,6 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 		}
 		read_unlock_bh(&hp->lock);
 	} while (hiscore < 2 && hp != hp2 && (hp = hp2));
-	tp_get(result);
 	usual(result);
 	return (result);
 }
@@ -7275,8 +7389,17 @@ tp_free(char *data)
 	struct sk_buff *skb = (typeof(skb)) data;
 
 	/* sometimes skb is NULL if it has been stolen */
-	if (skb != NULL)
+	if (likely(skb != NULL)) {
+		struct tp *tp;
+
+		if (likely((tp = (typeof(tp)) skb->sk) != NULL)) {
+			ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
+			tp->rcvmem -= skb->truesize;
+			skb->sk = NULL;
+			tp_release(&tp);
+		}
 		kfree_skb(skb);
+	}
 	return;
 }
 
@@ -7340,9 +7463,20 @@ tp_v4_rcv(struct sk_buff *skb)
 		/* now allocate an mblk */
 		if ((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr)) == NULL)
 			goto no_buffers;
-		/* check flow control only after we have a buffer */
-		if (tp->oq == NULL || !canput(tp->oq))
+		spin_lock(&tp->qlock);
+		/* Before passing the message up, check that there is room in the receive buffer. */
+		if (unlikely(tp->rcvmem > tp->options.xti.rcvbuf)) {
+			/* allows slop over by 1 buffer */
+			spin_unlock(&tp->qlock);
 			goto flow_controlled;
+		}
+		tp->rcvmem += skb->truesize;
+		spin_unlock(&tp->qlock);
+		/* XXX: if the socket buffer already belongs to somebody else it might be necessary 
+		   to clone the socket buffer before doing this, but I think that the ip receive
+		   functions already do this for us. */
+		assert(skb->sk == NULL);
+		skb->sk = (struct sock *) tp_get(tp);
 		// mp->b_datap->db_type = M_DATA;
 		mp->b_wptr += plen;
 		put(tp->oq, mp);
@@ -7510,10 +7644,10 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		bufq_init(&tp->conq);
 		/* option defaults */
 		tp->options.xti.linger = xti_default_linger;
-		tp->options.xti.rcvbuf = xti_default_rcvbuf;
+		tp->options.xti.rcvbuf = sysctl_rmem_default;
 		tp->options.xti.rcvlowat = xti_default_rcvlowat;
-		tp->options.xti.sndbuf = xti_default_sndbuf;
-		tp->options.xti.sndlowat = xti_default_sndlowat;
+		tp->options.xti.sndbuf = sysctl_wmem_default;
+		tp->options.xti.sndlowat = sysctl_wmem_default >> 1;
 		tp->options.xti.priority = xti_default_priority;
 		tp->options.ip.protocol = ip_default_protocol;
 		tp->options.ip.tos = ip_default_tos;
