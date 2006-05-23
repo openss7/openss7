@@ -1,12 +1,12 @@
 #!/bin/bash
 # =============================================================================
-#
-# @(#) $RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/05/14 08:30:03 $
+# 
+# @(#) $RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/05/23 06:57:49 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -30,10 +30,12 @@
 # techniques, or procedures embodied, described, or referred to herein.
 # The author is under no obligation to provide any feature listed herein.
 #
-# As an exception to the above, this software may be distributed under the GNU
-# General Public License (GPL) Version 2 or later, so long as the software is
-# distributed with, and only used for test of, OpenSS7 modules, drivers and
-# libraries.
+# -----------------------------------------------------------------------------
+#
+# As an exception to the above, this software may be distributed under the
+# GNU General Public License (GPL) Version 2, so long as the software is
+# distributed with, and only used for the testing of, OpenSS7 modules,
+# drivers, and libraries.
 #
 # -----------------------------------------------------------------------------
 #
@@ -53,10 +55,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:30:03 $ by <bidulock@openss7.org>
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
 #
 # -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/05/23 06:57:49 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
 # $Log: netperf_packet_byte,v $
+# Revision 1.1.2.6  2006/05/23 06:57:49  brian
+# - header updates
+#
 # Revision 1.1.2.5  2005/05/14 08:30:03  brian
 # - copyright header correction
 #
@@ -112,7 +123,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.5 $)'
+ident='$RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.6 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -666,34 +677,34 @@ function netperf_calibrate()
 	$ECHO "Performing local  CPU calibration"
 	$ECHO
 	$ECHO "------------------------------------"
-	$ECHO "$netperf ${port:+-p }$port -t LOC_CPU"
+	$ECHO "$netperf_command ${port:+-p }$port -t LOC_CPU"
     fi
     if test :${run:-yes} != :no ; then
-	loc_rate=`$netperf ${port:+-p }$port -t LOC_CPU`
+	loc_rate=`$netperf_command ${port:+-p }$port -t LOC_CPU`
     fi
     if test ${verbose:-1} -gt 1 ; then
 	$ECHO "  Local  CPU rate = $loc_rate"
 	$ECHO
 	$ECHO
     fi
-    if test ${loc_rate:-0} -gt 0 ; then
+    if test "${loc_rate:-0}" -gt 0 ; then
 	calibration="$calibration${calibration:+ }-c $loc_rate"
     fi
     if test ${verbose:-1} -gt 1 ; then
 	$ECHO "Performing remote CPU calibration"
 	$ECHO
 	$ECHO "------------------------------------"
-	$ECHO "$netperf ${port:+-p }$port -t REM_CPU -H $hostname"
+	$ECHO "$netperf_command ${port:+-p }$port -t REM_CPU -H $hostname"
     fi
     if test :${run:-yes} != :no ; then
-	rem_rate=`$netperf ${port:+-p }$port -t REM_CPU -H $hostname`
+	rem_rate=`$netperf_command ${port:+-p }$port -t REM_CPU -H $hostname`
     fi
     if test ${verbose:-1} -gt 1 ; then
 	$ECHO "  Remote CPU rate = $rem_rate"
 	$ECHO
 	$ECHO
     fi
-    if test ${rem_rate:-0} -gt 0 ; then
+    if test "${rem_rate:-0}" -gt 0 ; then
 	calibration="$calibration${calibration:+ }-C $rem_rate"
     fi
 }
@@ -838,6 +849,7 @@ function run_command()
     if test "${debug:-0}" -gt 0 ; then
 	debg="-d"
     fi
+    netperf_command="$netperf"
     netperf="$netperf $verb $debg"
     netperf_test
 }

@@ -1,9 +1,40 @@
+2006-05-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: updates
+	* netperf_arr: header updates
+	* netperf_packet_byte: header updates
+	* netperf_sctp_range: header updates
+	* netperf_sctp_rr: header updates
+	* netperf_sctp_stream: header updates
+	* netperf_snapshot: header updates
+	* netperf_tcp_range: header updates
+	* netperf_tcp_rr: header updates
+	* netperf_tcp_stream: header updates
+	* netperf_udp_range: header updates
+	* netperf_udp_rr: header updates
+	* netperf_udp_stream: header updates
+	* netserver.c: header updates
+	* netsh.c: header updates
+	* nettest_xti.c: proper handling of xti errors
+
 2006-05-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* netlib.c: correction for zero return value
 	* nettest_xti.c: corrections for 64-bit operation
 	* man1/netperf.man: removed missing .C macro
 	* man8/netserver.man: removed missing .C macro
+	* netperf_arr: cpu calibration under debug correction
+	* netperf_packet_byte: cpu calibration under debug correction
+	* netperf_sctp_range: cpu calibration under debug correction
+	* netperf_sctp_rr: cpu calibration under debug correction
+	* netperf_sctp_stream: cpu calibration under debug correction
+	* netperf_snapshot: cpu calibration under debug correction
+	* netperf_tcp_range: cpu calibration under debug correction
+	* netperf_tcp_rr: cpu calibration under debug correction
+	* netperf_tcp_stream: cpu calibration under debug correction
+	* netperf_udp_range: cpu calibration under debug correction
+	* netperf_udp_rr: cpu calibration under debug correction
+	* netperf_udp_stream: cpu calibration under debug correction
 
 2006-05-08  Brian Bidulock  <bidulock@openss7.org>
 

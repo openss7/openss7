@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2006/03/03 11:56:41 $
+ @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/05/23 06:57:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:56:41 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 06:57:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netserver.c,v $
+ Revision 1.1.1.14  2006/05/23 06:57:49  brian
+ - header updates
+
  Revision 1.1.1.13  2006/03/03 11:56:41  brian
  - 64-bit compatibility
 
@@ -65,9 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2006/03/03 11:56:41 $"
+#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/05/23 06:57:49 $"
 
-static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2006/03/03 11:56:41 $";
+static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/05/23 06:57:49 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -1179,9 +1182,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
