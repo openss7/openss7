@@ -3,6 +3,8 @@
 	* include/sys/streams/strsubr.h: minor changes to XCHG locking
 	* src/kernel/strsched.c: minor changes to XCHG locking
 	* src/kernel/strutil.c: minor changes to XCHG locking
+	* include/sys/streams/ddi.h: mark non-inline copies of inline functions unlikely
+	* include/sys/streams/stream.h: mark non-inline copies of inline functions unlikely
 
 2006-05-14  Brian Bidulock  <bidulock@openss7.org>
 

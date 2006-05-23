@@ -1,3 +1,11 @@
+2006-05-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/rawip.c: working up performance tests of 2nd gen drivers
+	* src/drivers/udp.c: working up performance tests of 2nd gen drivers
+	* src/drivers/inet.c: FC4 does not export sysctl_ip_default_ttl
+	* src/drivers/udp_hooks.h: FC4 does not export sysctl_ip_default_ttl
+	* acinclude.m4: FC4 does not export sysctl_ip_default_ttl
+
 2006-05-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/rawip.c: working up performance tests of 2nd gen drivers

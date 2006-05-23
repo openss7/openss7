@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.21 2005/12/28 09:51:47 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.22 2006/05/23 10:44:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:44:03 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_DDI_H__
 #define __SYS_LIS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/28 09:51:47 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/23 10:44:03 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -455,12 +455,12 @@ extern int _RP lis_pcibios_write_config_word(unsigned char bus, unsigned char de
 					     unsigned char where, unsigned short val);
 #endif
 
-__LIS_EXTERN_INLINE _RP int
+__LIS_EXTERN_INLINE _RP __unlikely int
 lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len)
 {
 	return copyin(ubuf, kbuf, len);
 }
-__LIS_EXTERN_INLINE _RP int
+__LIS_EXTERN_INLINE _RP __unlikely int
 lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len)
 {
 	return copyout(kbuf, ubuf, len);

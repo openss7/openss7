@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.4 2005/12/28 09:51:48 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.5 2006/05/23 10:44:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:44:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.5  2006/05/23 10:44:06  brian
+ - mark normal inline functions for unlikely text section
+
  Revision 0.9.2.4  2005/12/28 09:51:48  brian
  - remove warnings on FC4 compile
 
@@ -67,7 +70,7 @@
 #ifndef __SYS_OSF_STREAM_H__
 #define __SYS_OSF_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/osf/stream.h directly, include sys/stream.h instead."
@@ -97,7 +100,7 @@ extern int streams_close_comm(queue_t *, int, cred_t *);
 extern int streams_open_comm(unsigned int, queue_t *, dev_t *, int, int, cred_t *);
 extern int streams_open_ocomm(dev_t, unsigned int, queue_t *, dev_t *, int, int, cred_t *);
 
-__OSF_EXTERN_INLINE void
+__OSF_EXTERN_INLINE __unlikely void
 puthere(queue_t *q, mblk_t *mp)
 {
 	put(q, mp);

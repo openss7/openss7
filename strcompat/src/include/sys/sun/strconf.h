@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.11 2005/12/28 09:51:49 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.12 2006/05/23 10:44:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:44:07 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_STRCONF_H__
 #define __SYS_SUN_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/28 09:51:49 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/05/23 10:44:07 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -174,22 +174,22 @@ struct dev_ops {
 	int (*devo_power) (dev_info_t * dip, int component, int level);
 };
 
-__SUN_EXTERN_INLINE int
+__SUN_EXTERN_INLINE __unlikely int
 nodev(void)
 {
 	return (ENXIO);
 }
-__SUN_EXTERN_INLINE int
+__SUN_EXTERN_INLINE __unlikely int
 nulldev(void)
 {
 	return (0);
 }
-__SUN_EXTERN_INLINE int
+__SUN_EXTERN_INLINE __unlikely int
 nochpoll(void)
 {
 	return (ENXIO);
 }
-__SUN_EXTERN_INLINE int
+__SUN_EXTERN_INLINE __unlikely int
 ddi_prop_op(void)
 {
 	return (0);

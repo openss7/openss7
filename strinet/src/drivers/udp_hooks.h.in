@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: udp_hooks.h.in,v 0.9.2.2 2006/04/03 10:56:19 brian Exp $
+ @(#) $Id: udp_hooks.h.in,v 0.9.2.3 2006/05/23 10:40:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/03 10:56:19 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:40:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp_hooks.h.in,v $
+ Revision 0.9.2.3  2006/05/23 10:40:24  brian
+ - handle non-exported sysctl_ip_default_ttl on receive FC4 kernels
+
  Revision 0.9.2.2  2006/04/03 10:56:19  brian
  - xfrm_policy_delete now returns int instead of void
 
@@ -63,7 +66,7 @@
 #ifndef __LOCAL_UDP_HOOKS_H__
 #define __LOCAL_UDP_HOOKS_H__
 
-#ident "@(#) $RCSfile: udp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: udp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #undef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
 #ifndef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
@@ -129,6 +132,12 @@ extern int sysctl_ip_dynaddr;
 extern int sysctl_ip_nonlocal_bind;
 #ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
 #define sysctl_ip_nonlocal_bind (*((typeof(sysctl_ip_nonlocal_bind) *)HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR))
+#endif
+
+#undef HAVE_SYSCLT_IP_DEFAULT_TTL_ADDR
+extern int sysctl_ip_default_ttl;
+#ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
+#define sysctl_ip_default_ttl (*((typeof(sysctl_ip_default_ttl) *)HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR))
 #endif
 
 #undef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR

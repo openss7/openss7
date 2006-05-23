@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.9 2005/12/28 09:51:47 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.10 2006/05/23 10:44:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:44:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.10  2006/05/23 10:44:02  brian
+ - mark normal inline functions for unlikely text section
+
  Revision 0.9.2.9  2005/12/28 09:51:47  brian
  - remove warnings on FC4 compile
 
@@ -82,7 +85,7 @@
 #ifndef __SYS_LFS_DDI_H__
 #define __SYS_LFS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -109,21 +112,21 @@
 
 /* These functions are missing from LiS, but in the core in LfS */
 
-__LFS_EXTERN_INLINE int
+__LFS_EXTERN_INLINE __unlikely int
 bcmp(const void *s1, const void *s2, size_t len)
 {
 	return memcmp(s1, s2, len);
 }
 
 /* LiS 2.18.0 deprecated these for some reason... */
-__LFS_EXTERN_INLINE int
+__LFS_EXTERN_INLINE __unlikely int
 copyin(const void *from, void *to, size_t len)
 {
 	if (copy_from_user(to, from, len))
 		return (-EFAULT);
 	return (0);
 }
-__LFS_EXTERN_INLINE int
+__LFS_EXTERN_INLINE __unlikely int
 copyout(const void *from, void *to, size_t len)
 {
 	if (copy_to_user(to, from, len))
@@ -148,7 +151,7 @@ copyout(const void *from, void *to, size_t len)
 
 extern int drv_getparm(const unsigned int parm, void *value_p);
 
-__LFS_EXTERN_INLINE int
+__LFS_EXTERN_INLINE __unlikely int
 drv_priv(cred_t *crp)
 {
 	/* FIXME: also need to check for capabilities */
@@ -158,33 +161,33 @@ drv_priv(cred_t *crp)
 }
 
 /* FIXME: There are faster ways to do these... */
-__LFS_EXTERN_INLINE unsigned long
+__LFS_EXTERN_INLINE __unlikely unsigned long
 drv_hztomsec(unsigned long hz)
 {
 	return ((hz * 1000) / HZ);
 }
-__LFS_EXTERN_INLINE unsigned long
+__LFS_EXTERN_INLINE __unlikely unsigned long
 drv_hztousec(unsigned long hz)
 {
 	return ((hz * 1000000) / HZ);
 }
-__LFS_EXTERN_INLINE unsigned long
+__LFS_EXTERN_INLINE __unlikely unsigned long
 drv_msectohz(unsigned long msec)
 {
 	return (((msec + 999) * HZ) / 1000);
 }
-__LFS_EXTERN_INLINE unsigned long
+__LFS_EXTERN_INLINE __unlikely unsigned long
 drv_usectohz(unsigned long usec)
 {
 	return (((usec + 999999) * HZ) / 1000000);
 }
 
-__LFS_EXTERN_INLINE void
+__LFS_EXTERN_INLINE __unlikely void
 drv_usecwait(unsigned long usec)
 {
 	return (udelay(usec));
 }
-__LFS_EXTERN_INLINE void
+__LFS_EXTERN_INLINE __unlikely void
 delay(unsigned long ticks)
 {
 	set_current_state(TASK_INTERRUPTIBLE);

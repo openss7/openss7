@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.6 2005/12/28 09:51:49 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.7 2006/05/23 10:44:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:44:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.7  2006/05/23 10:44:07  brian
+ - mark normal inline functions for unlikely text section
+
  Revision 0.9.2.6  2005/12/28 09:51:49  brian
  - remove warnings on FC4 compile
 
@@ -73,7 +76,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -95,7 +98,7 @@
 
 #if defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
 
-__SUN_EXTERN_INLINE void
+__SUN_EXTERN_INLINE __unlikely void
 freezestr_SUN(queue_t *q)
 {
 	freezestr(q);
@@ -104,7 +107,7 @@ freezestr_SUN(queue_t *q)
 #undef freezestr
 #define freezestr freezestr_SUN
 
-__SUN_EXTERN_INLINE void
+__SUN_EXTERN_INLINE __unlikely void
 unfreezestr_SUN(queue_t *q)
 {
 #ifdef LFS
@@ -134,7 +137,7 @@ extern clock_t quntimeout(queue_t *q, timeout_id_t toid);
 
 #ifdef LFS
 /* LiS already defines this */
-__SUN_EXTERN_INLINE unsigned char
+__SUN_EXTERN_INLINE __unlikely unsigned char
 queclass(mblk_t *mp)
 {
 	return (mp->b_datap->db_type < QPCTL ? QNORM : QPCTL);
@@ -147,7 +150,7 @@ extern void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *
 
 #define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))
 
-__SUN_EXTERN_INLINE mblk_t *
+__SUN_EXTERN_INLINE __unlikely mblk_t *
 mkiocb(unsigned int command)
 {
 	mblk_t *mp;

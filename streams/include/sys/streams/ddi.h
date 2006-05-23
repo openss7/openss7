@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.35 2006/02/20 10:59:20 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.36 2006/05/23 10:39:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:39:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.36  2006/05/23 10:39:40  brian
+ - marked normally inline functions for unlikely text section
+
  Revision 0.9.2.35  2006/02/20 10:59:20  brian
  - updated copyright headers on changed files
 
@@ -57,7 +60,7 @@
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.35 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.36 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_DDI_H__
 #warning "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -102,7 +105,7 @@
 #include <sys/map.h>		/* for rm map definitions */
 #endif
 
-__STRUTIL_EXTERN_INLINE major_t
+__STRUTIL_EXTERN_INLINE __unlikely major_t
 getmajor(dev_t dev)
 {
 	ulong major = ((dev >> 16) & 0x0000ffff);
@@ -113,7 +116,7 @@ getmajor(dev_t dev)
 #endif
 	return (major);
 }
-__STRUTIL_EXTERN_INLINE minor_t
+__STRUTIL_EXTERN_INLINE __unlikely minor_t
 getminor(dev_t dev)
 {
 	ulong minor = (dev & 0x0000ffff);
@@ -126,7 +129,7 @@ getminor(dev_t dev)
 #endif
 	return (minor);
 }
-__STRUTIL_EXTERN_INLINE dev_t
+__STRUTIL_EXTERN_INLINE __unlikely dev_t
 makedevice(major_t major, minor_t minor)
 {
 	ulong maj = major & 0x0000ffff;
@@ -142,14 +145,14 @@ int umount2(char *pathname, int flags);
 int unlink(char *pathname);
 #endif
 
-__STRUTIL_EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE __unlikely int
 copyin(const void *from, void *to, size_t len)
 {
 	if (!copy_from_user(to, from, len))
 		return (0);
 	return (-EFAULT);
 }
-__STRUTIL_EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE __unlikely int
 copyout(const void *from, void *to, size_t len)
 {
 	if (!copy_to_user(to, from, len))
@@ -158,37 +161,37 @@ copyout(const void *from, void *to, size_t len)
 }
 
 /* FIXME: There are faster ways to do these... */
-__STRUTIL_EXTERN_INLINE unsigned long
+__STRUTIL_EXTERN_INLINE __unlikely unsigned long
 drv_hztousec(unsigned long hz)
 {
 	return ((hz * 1000000) / HZ);
 }
-__STRUTIL_EXTERN_INLINE unsigned long
+__STRUTIL_EXTERN_INLINE __unlikely unsigned long
 drv_usectohz(unsigned long usec)
 {
 	return (((usec + 999999) * HZ) / 1000000);
 }
 
-__STRUTIL_EXTERN_INLINE unsigned long
+__STRUTIL_EXTERN_INLINE __unlikely unsigned long
 drv_hztomsec(unsigned long hz)
 {
 	return ((hz * 1000) / HZ);
 }
-__STRUTIL_EXTERN_INLINE unsigned long
+__STRUTIL_EXTERN_INLINE __unlikely unsigned long
 drv_msectohz(unsigned long msec)
 {
 	return (((msec + 999) * HZ) / 1000);
 }
 
 #undef min
-__STREAMS_EXTERN_INLINE int
+__STREAMS_EXTERN_INLINE __unlikely int
 min(int a, int b)
 {
 	return ((a < b) ? a : b);
 }
 
 #undef max
-__STREAMS_EXTERN_INLINE int
+__STREAMS_EXTERN_INLINE __unlikely int
 max(int a, int b)
 {
 	return ((a < b) ? b : a);
@@ -213,7 +216,7 @@ extern ulong sysctl_str_strmsgsz;
 
 __STREAMS_EXTERN int drv_getparm(const unsigned int parm, void *value_p);
 
-__STRUTIL_EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE __unlikely int
 drv_priv(cred_t *crp)
 {
 	/* FIXME: also need to check for capabilities */
@@ -221,12 +224,12 @@ drv_priv(cred_t *crp)
 		return (0);
 	return (EPERM);
 }
-__STRUTIL_EXTERN_INLINE void
+__STRUTIL_EXTERN_INLINE __unlikely void
 drv_usecwait(unsigned long usec)
 {
 	return (udelay(usec));
 }
-__STRUTIL_EXTERN_INLINE void
+__STRUTIL_EXTERN_INLINE __unlikely void
 delay(unsigned long ticks)
 {
 	set_current_state(TASK_UNINTERRUPTIBLE);
@@ -268,34 +271,34 @@ typedef struct buf {
 		daddr_t un_daddr;
 	} b_priv2;
 } buf_t;
-__STREAMS_EXTERN_INLINE void biodone(buf_t * bp);	/* not implemented */
-__STREAMS_EXTERN_INLINE int biowait(buf_t * bp);	/* not implemented */
-__STREAMS_EXTERN_INLINE void bp_mapin(struct buf_t *bp);	/* not implemented */
-__STREAMS_EXTERN_INLINE void bp_mapout(struct buf_t *bp);	/* not implemented */
-__STREAMS_EXTERN_INLINE void brelse(struct buf_t *bp);	/* not implemented */
-__STREAMS_EXTERN_INLINE void clrbuf(buf_t * bp);	/* not implemented */
-__STREAMS_EXTERN_INLINE void freerbuf(buf_t * bp);	/* not implemented */
-__STREAMS_EXTERN_INLINE void geterror(buf_t * bp);	/* not implemented */
-__STREAMS_EXTERN_INLINE buf_t getrbuf(int flag);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely void biodone(buf_t * bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely int biowait(buf_t * bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely void bp_mapin(struct buf_t *bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely void bp_mapout(struct buf_t *bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely void brelse(struct buf_t *bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely void clrbuf(buf_t * bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely void freerbuf(buf_t * bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely void geterror(buf_t * bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely buf_t getrbuf(int flag);	/* not implemented */
 
-__STREAMS_EXTERN_INLINE ulong btop(ulong numbytes);	/* not implemented */
-__STREAMS_EXTERN_INLINE ulong btopr(ulong numbytes);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely ulong btop(ulong numbytes);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely ulong btopr(ulong numbytes);	/* not implemented */
 
-__STREAMS_EXTERN_INLINE void page_numtopp(void);	/* see uw7ddi.h */
-__STREAMS_EXTERN_INLINE void page_pptonum(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE __unlikely void page_numtopp(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE __unlikely void page_pptonum(void);	/* see uw7ddi.h */
 
-__STREAMS_EXTERN_INLINE void sleep(void);	/* see svr4ddi.h */
-__STREAMS_EXTERN_INLINE void wakeup(void);	/* see svr4ddi.h */
-__STREAMS_EXTERN_INLINE void spl(void);		/* see svr4ddi.h */
+__STREAMS_EXTERN_INLINE __unlikely void sleep(void);	/* see svr4ddi.h */
+__STREAMS_EXTERN_INLINE __unlikely void wakeup(void);	/* see svr4ddi.h */
+__STREAMS_EXTERN_INLINE __unlikely void spl(void);		/* see svr4ddi.h */
 
-__STREAMS_EXTERN_INLINE void rmalloc(void);	/* not implemented */
-__STREAMS_EXTERN_INLINE void rmfree(void);	/* not implemented */
-__STREAMS_EXTERN_INLINE void rminit(void);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely void rmalloc(void);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely void rmfree(void);	/* not implemented */
+__STREAMS_EXTERN_INLINE __unlikely void rminit(void);	/* not implemented */
 
-__STREAMS_EXTERN_INLINE void uiomove(void);	/* see uw7ddi.h */
-__STREAMS_EXTERN_INLINE void ureadc(void);	/* see uw7ddi.h */
-__STREAMS_EXTERN_INLINE void useracc(void);	/* see uw7ddi.h */
-__STREAMS_EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE __unlikely void uiomove(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE __unlikely void ureadc(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE __unlikely void useracc(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE __unlikely void uwritec(void);	/* see uw7ddi.h */
 #endif
 
 #endif				/* __SYS_STREAMS_DDI_H__ */

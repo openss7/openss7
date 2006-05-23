@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.10 2005/12/28 09:51:47 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.11 2006/05/23 10:44:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:44:00 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_IRIX_DDI_H__
 #define __SYS_IRIX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/28 09:51:47 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/05/23 10:44:00 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -73,7 +73,7 @@
 #endif
 #include <sys/svr4/ddi.h>	/* for lock_t */
 
-__IRIX_EXTERN_INLINE void
+__IRIX_EXTERN_INLINE __unlikely void
 icmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	return vcmn_err(err_lvl, fmt, args);

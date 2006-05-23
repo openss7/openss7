@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/05/22 02:09:00 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.15 $) $Date: 2006/05/23 10:41:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/22 02:09:00 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:41:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/05/22 02:09:00 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.15 $) $Date: 2006/05/23 10:41:47 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.14 $) $Date: 2006/05/22 02:09:00 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.15 $) $Date: 2006/05/23 10:41:47 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -1099,7 +1099,7 @@ Size (bytes)\n\
 		    send_ring->buffer_ptr,
 		    send_size,
 		    0)) != send_size) {
-        if ((len >=0) || (errno == EINTR)) {
+        if ((len >=0) || (t_errno == TSYSERR && errno == EINTR)) {
           /* the test was interrupted, must be the end of test */
           break;
         }
@@ -2277,7 +2277,7 @@ Send   Recv    Send   Recv\n\
 		    send_ring->buffer_ptr,
 		    req_size,
 		    0)) != req_size) {
-	if ((errno == EINTR) || (errno == 0)) {
+	if ((t_errno == TSYSERR && errno == EINTR) || (t_errno == 0)) {
 	  /* we hit the end of a */
 	  /* timed test. */
 	  timed_out = 1;
@@ -2301,7 +2301,7 @@ Send   Recv    Send   Recv\n\
 				  temp_message_ptr,
 				  rsp_bytes_left,
 				  &xti_flags)) == SOCKET_ERROR) {
-	  if (errno == EINTR) {
+	  if (t_errno == TSYSERR && errno == EINTR) {
 	    /* We hit the end of a timed test. */
 	    timed_out = 1;
 	    break;
@@ -3080,7 +3080,7 @@ Size (bytes)\n\
 		    send_ring->buffer_ptr,
 		    send_size,
 		    0)) != send_size) {
-        if ((len >=0) || (errno == EINTR)) {
+        if ((len >=0) || (t_errno == TSYSERR && errno == EINTR)) {
           /* the test was interrupted, must be the end of test */
           break;
         }
@@ -4272,7 +4272,7 @@ Send   Recv    Send   Recv\n\
 		    send_ring->buffer_ptr,
 		    req_size,
 		    0)) != req_size) {
-	if ((errno == EINTR) || (errno == 0)) {
+	if ((t_errno == TSYSERR && errno == EINTR) || (t_errno == 0)) {
 	  /* we hit the end of a */
 	  /* timed test. */
 	  timed_out = 1;
@@ -4296,7 +4296,7 @@ Send   Recv    Send   Recv\n\
 				  temp_message_ptr,
 				  rsp_bytes_left,
 				  &xti_flags)) == SOCKET_ERROR) {
-	  if (errno == EINTR) {
+	  if (t_errno == TSYSERR && errno == EINTR) {
 	    /* We hit the end of a timed test. */
 	    timed_out = 1;
 	    break;
@@ -4973,9 +4973,9 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
       
       if ((t_sndudata(data_socket,
 		      &unitdata))  != 0) {
-	if (errno == EINTR)
+	if (t_errno == TSYSERR && errno == EINTR)
 	  break;
-	if (errno == ENOBUFS) {
+	if (t_errno == TSYSERR && errno == ENOBUFS) {
 	  failed_sends++;
 	  continue;
 	}
@@ -5495,15 +5495,15 @@ recv_xti_udp_stream()
 	      errno,
 	      t_errno);
       fprintf(where," after %d messages\n",messages_recvd);
-      fprintf(where,"addrmax %d addrlen %d addrbuf %x\n",
+      fprintf(where,"addrmax %d addrlen %d addrbuf %p\n",
 	      unitdata.addr.maxlen,
 	      unitdata.addr.len,
 	      unitdata.addr.buf);
-      fprintf(where,"optmax %d optlen %d optbuf %x\n",
+      fprintf(where,"optmax %d optlen %d optbuf %p\n",
 	      unitdata.opt.maxlen,
 	      unitdata.opt.len,
 	      unitdata.opt.buf);
-      fprintf(where,"udatamax %d udatalen %d udatabuf %x\n",
+      fprintf(where,"udatamax %d udatalen %d udatabuf %p\n",
 	      unitdata.udata.maxlen,
 	      unitdata.udata.len,
 	      unitdata.udata.buf);
@@ -5513,10 +5513,10 @@ recv_xti_udp_stream()
     if (t_rcvudata(s_data, 
 		   &unitdata,
 		   &flags) != 0) {
-      if (errno == TNODATA) {
+      if (t_errno == TNODATA) {
 	continue;
       }
-      if (errno != EINTR) {
+      if (t_errno == TSYSERR && errno != EINTR) {
 	netperf_response.content.serv_errno = t_errno;
 	send_response();
 	exit(1);
@@ -6008,10 +6008,10 @@ bytes  bytes  bytes   bytes  secs.   per sec  %% %c    %% %c    us/Tr   us/Tr\n\
       if((t_rcvudata(send_socket,
 		     &recv_unitdata,
 		     &flags)) != 0) {
-	if (errno == TNODATA) {
+	if (t_errno == TNODATA) {
 	  continue;
 	}
-	if (errno == EINTR) {
+	if (t_errno == TSYSERR && errno == EINTR) {
 	  /* Again, we have likely hit test-end time */
 	  break;
 	}
@@ -6604,7 +6604,7 @@ void
       if (t_errno == TNODATA) {
 	continue;
       }
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* we must have hit the end of test time. */
 	break;
       }
@@ -6625,7 +6625,7 @@ void
     /* Now, send the response to the remote */
     if (t_sndudata(s_data,
 		   &send_unitdata) != 0) {
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* we have hit end of test time. */
 	break;
       }
@@ -7006,7 +7006,7 @@ recv_xti_sctp_rr()
 				    temp_message_ptr,
 				    request_bytes_remaining,
 				    &xti_flags)) == SOCKET_ERROR) {
-	if (errno == EINTR) {
+	if (t_errno == TSYSERR && errno == EINTR) {
 	  /* the timer popped */
 	  timed_out = 1;
 	  break;
@@ -7047,7 +7047,7 @@ recv_xti_sctp_rr()
 			 send_ring->buffer_ptr,
 			 xti_sctp_rr_request->response_size,
 			 0)) == -1) {
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* the test timer has popped */
 	timed_out = 1;
 	if (debug) {
@@ -7450,7 +7450,7 @@ Send   Recv    Send   Recv\n\
     if (connect(send_socket, 
 		(struct sockaddr *)&server,
 		sizeof(server)) == INVALID_SOCKET){
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* we hit the end of a */
 	/* timed test. */
 	timed_out = 1;
@@ -7469,7 +7469,7 @@ Send   Recv    Send   Recv\n\
 		 send_ring->buffer_ptr,
 		 req_size,
 		 0)) != req_size) {
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* we hit the end of a */
 	/* timed test. */
 	timed_out = 1;
@@ -7488,7 +7488,7 @@ Send   Recv    Send   Recv\n\
 			       temp_message_ptr,
 			       rsp_bytes_left,
 			       0)) == SOCKET_ERROR) {
-	if (errno == EINTR) {
+	if (t_errno == TSYSERR && errno == EINTR) {
 	  /* We hit the end of a timed test. */
 	  timed_out = 1;
 	  break;
@@ -7960,7 +7960,7 @@ recv_xti_sctp_conn_rr()
     if ((s_data=accept(s_listen,
 		       (struct sockaddr *)&peeraddr_in,
 		       &addrlen)) == INVALID_SOCKET) {
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* the timer popped */
 	timed_out = 1;
 	break;
@@ -7986,7 +7986,7 @@ recv_xti_sctp_conn_rr()
 				   temp_message_ptr,
 				   request_bytes_remaining,
 				   0)) == SOCKET_ERROR) {
-	if (errno == EINTR) {
+	if (t_errno == TSYSERR && errno == EINTR) {
 	  /* the timer popped */
 	  timed_out = 1;
 	  break;
@@ -8014,7 +8014,7 @@ recv_xti_sctp_conn_rr()
 			send_message_ptr,
 			xti_sctp_conn_rr_request->response_size,
 			0)) == SOCKET_ERROR) {
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* the test timer has popped */
 	timed_out = 1;
 	fprintf(where,"yo6\n");
@@ -8388,7 +8388,7 @@ recv_xti_tcp_rr()
 				    temp_message_ptr,
 				    request_bytes_remaining,
 				    &xti_flags)) == SOCKET_ERROR) {
-	if (errno == EINTR) {
+	if (t_errno == TSYSERR && errno == EINTR) {
 	  /* the timer popped */
 	  timed_out = 1;
 	  break;
@@ -8429,7 +8429,7 @@ recv_xti_tcp_rr()
 			 send_ring->buffer_ptr,
 			 xti_tcp_rr_request->response_size,
 			 0)) == -1) {
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* the test timer has popped */
 	timed_out = 1;
 	if (debug) {
@@ -8832,7 +8832,7 @@ Send   Recv    Send   Recv\n\
     if (connect(send_socket, 
 		(struct sockaddr *)&server,
 		sizeof(server)) == INVALID_SOCKET){
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* we hit the end of a */
 	/* timed test. */
 	timed_out = 1;
@@ -8851,7 +8851,7 @@ Send   Recv    Send   Recv\n\
 		 send_ring->buffer_ptr,
 		 req_size,
 		 0)) != req_size) {
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* we hit the end of a */
 	/* timed test. */
 	timed_out = 1;
@@ -8870,7 +8870,7 @@ Send   Recv    Send   Recv\n\
 			       temp_message_ptr,
 			       rsp_bytes_left,
 			       0)) == SOCKET_ERROR) {
-	if (errno == EINTR) {
+	if (t_errno == TSYSERR && errno == EINTR) {
 	  /* We hit the end of a timed test. */
 	  timed_out = 1;
 	  break;
@@ -9342,7 +9342,7 @@ recv_xti_tcp_conn_rr()
     if ((s_data=accept(s_listen,
 		       (struct sockaddr *)&peeraddr_in,
 		       &addrlen)) == INVALID_SOCKET) {
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* the timer popped */
 	timed_out = 1;
 	break;
@@ -9368,7 +9368,7 @@ recv_xti_tcp_conn_rr()
 				   temp_message_ptr,
 				   request_bytes_remaining,
 				   0)) == SOCKET_ERROR) {
-	if (errno == EINTR) {
+	if (t_errno == TSYSERR && errno == EINTR) {
 	  /* the timer popped */
 	  timed_out = 1;
 	  break;
@@ -9396,7 +9396,7 @@ recv_xti_tcp_conn_rr()
 			send_message_ptr,
 			xti_tcp_conn_rr_request->response_size,
 			0)) == SOCKET_ERROR) {
-      if (errno == EINTR) {
+      if (t_errno == TSYSERR && errno == EINTR) {
 	/* the test timer has popped */
 	timed_out = 1;
 	fprintf(where,"yo6\n");

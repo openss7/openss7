@@ -1,3 +1,28 @@
+2006-05-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/aix/stream.h: mark normal inline functions unlikely
+	* src/include/sys/irix/ddi.h: mark normal inline functions unlikely
+	* src/include/sys/lfs/ddi.h: mark normal inline functions unlikely
+	* src/include/sys/lfs/strconf.h: mark normal inline functions unlikely
+	* src/include/sys/lfs/stream.h: mark normal inline functions unlikely
+	* src/include/sys/lis/ddi.h: mark normal inline functions unlikely
+	* src/include/sys/lis/stream.h: mark normal inline functions unlikely
+	* src/include/sys/mps/ddi.h: mark normal inline functions unlikely
+	* src/include/sys/mps/stream.h: mark normal inline functions unlikely
+	* src/include/sys/os7/allocb.h: mark normal inline functions unlikely
+	* src/include/sys/os7/bufpool.h: mark normal inline functions unlikely
+	* src/include/sys/os7/bufq.h: mark normal inline functions unlikely
+	* src/include/sys/os7/timer.h: mark normal inline functions unlikely
+	* src/include/sys/osf/ddi.h: mark normal inline functions unlikely
+	* src/include/sys/osf/stream.h: mark normal inline functions unlikely
+	* src/include/sys/sun/ddi.h: mark normal inline functions unlikely
+	* src/include/sys/sun/strconf.h: mark normal inline functions unlikely
+	* src/include/sys/sun/stream.h: mark normal inline functions unlikely
+	* src/include/sys/sun/strsun.h: mark normal inline functions unlikely
+	* src/include/sys/svr3/ddi.h: mark normal inline functions unlikely
+	* src/include/sys/svr4/ddi.h: mark normal inline functions unlikely
+	* src/include/sys/uw7/ddi.h: mark normal inline functions unlikely
+
 2006-05-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/strconf-sh: added module id base to strconf

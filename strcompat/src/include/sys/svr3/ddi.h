@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.11 2005/12/28 09:51:49 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.12 2006/05/23 10:44:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:44:08 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR3_DDI_H__
 #define __SYS_SVR3_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/28 09:51:49 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/05/23 10:44:08 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -72,7 +72,7 @@
 #define dev_t __streams_dev_t
 #endif
 
-__SVR3_EXTERN_INLINE mblk_t *
+__SVR3_EXTERN_INLINE __unlikely mblk_t *
 alloc_proto(size_t psize, size_t dsize, int type, uint bpri)
 {
 	mblk_t *mp = NULL, *dp = NULL;
@@ -102,12 +102,12 @@ alloc_proto(size_t psize, size_t dsize, int type, uint bpri)
 }
 
 /* these two are included here because we need the STREAMS version of dev_t */
-__SVR3_EXTERN_INLINE major_t
+__SVR3_EXTERN_INLINE __unlikely major_t
 emajor(dev_t dev)
 {
 	return (getmajor(dev) + MAJOR(getminor(dev)));
 }
-__SVR3_EXTERN_INLINE minor_t
+__SVR3_EXTERN_INLINE __unlikely minor_t
 eminor(dev_t dev)
 {
 	return (MINOR(getminor(dev)));

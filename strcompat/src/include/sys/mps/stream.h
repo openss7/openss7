@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.7 2005/12/28 09:51:48 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.8 2006/05/23 10:44:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:44:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.8  2006/05/23 10:44:04  brian
+ - mark normal inline functions for unlikely text section
+
  Revision 0.9.2.7  2005/12/28 09:51:48  brian
  - remove warnings on FC4 compile
 
@@ -76,7 +79,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -116,7 +119,7 @@ extern int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, in
 			cred_t *credp);
 extern void mi_close_free(caddr_t ptr);
 
-__MPS_EXTERN_INLINE caddr_t
+__MPS_EXTERN_INLINE __unlikely caddr_t
 mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp)
 {
 	caddr_t ptr;
@@ -130,13 +133,13 @@ mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp)
 	return (NULL);
 }
 
-__MPS_EXTERN_INLINE void
+__MPS_EXTERN_INLINE __unlikely void
 mi_attach(queue_t *q, caddr_t ptr)
 {
 	q->q_ptr = WR(q)->q_ptr = ptr;
 }
 
-__MPS_EXTERN_INLINE int
+__MPS_EXTERN_INLINE __unlikely int
 mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag, int sflag,
 	     cred_t *credp)
 {
@@ -164,20 +167,20 @@ mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag, i
 
 extern void mi_close_unlink(caddr_t *mi_head, caddr_t ptr);
 
-__MPS_EXTERN_INLINE void
+__MPS_EXTERN_INLINE __unlikely void
 mi_detach(queue_t *q, caddr_t ptr)
 {
 	mi_close_unlink(NULL, ptr);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 }
 
-__MPS_EXTERN_INLINE void
+__MPS_EXTERN_INLINE __unlikely void
 mi_close_detached(caddr_t *mi_head, caddr_t ptr)
 {
 	mi_close_free(ptr);
 }
 
-__MPS_EXTERN_INLINE int
+__MPS_EXTERN_INLINE __unlikely int
 mi_close_comm(caddr_t *mi_head, queue_t *q)
 {
 	caddr_t ptr = q->q_ptr;
@@ -210,7 +213,7 @@ extern void mi_timer_free(mblk_t *mp);
 /*
  *  Buffer call helper function.
  */
-__MPS_EXTERN_INLINE void
+__MPS_EXTERN_INLINE __unlikely void
 mi_bufcall(queue_t *q, int size, int priority)
 {
 #ifdef LFS

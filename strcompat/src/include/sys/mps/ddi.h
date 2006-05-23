@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.10 2005/12/28 09:51:48 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.11 2006/05/23 10:44:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:44:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.11  2006/05/23 10:44:04  brian
+ - mark normal inline functions for unlikely text section
+
  Revision 0.9.2.10  2005/12/28 09:51:48  brian
  - remove warnings on FC4 compile
 
@@ -88,7 +91,7 @@
 #ifndef __SYS_MPS_DDI_H__
 #define __SYS_MPS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -109,7 +112,7 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_MPS) || defined(CONFIG_STREAMS_COMPAT_MPS_MODULE)
 
-__MPS_EXTERN_INLINE int
+__MPS_EXTERN_INLINE __unlikely int
 mi_bcmp(const void *s1, const void *s2, size_t len)
 {
 	return bcmp(s1, s2, len);
@@ -118,7 +121,7 @@ mi_bcmp(const void *s1, const void *s2, size_t len)
 /*
  *  Memory allocation functions.
  */
-__MPS_EXTERN_INLINE void *
+__MPS_EXTERN_INLINE __unlikely void *
 mi_alloc(size_t size, unsigned int pri)
 {
 	size_t *sp;
@@ -128,7 +131,7 @@ mi_alloc(size_t size, unsigned int pri)
 	return (sp);
 }
 
-__MPS_EXTERN_INLINE void *
+__MPS_EXTERN_INLINE __unlikely void *
 mi_alloc_sleep(size_t size, unsigned int pri)
 {
 	size_t *sp;
@@ -137,7 +140,7 @@ mi_alloc_sleep(size_t size, unsigned int pri)
 		*sp++ = size;
 	return (sp);
 }
-__MPS_EXTERN_INLINE caddr_t
+__MPS_EXTERN_INLINE __unlikely caddr_t
 mi_zalloc(size_t size)
 {
 	caddr_t memp;
@@ -146,7 +149,7 @@ mi_zalloc(size_t size)
 		bzero(memp, size);
 	return (memp);
 }
-__MPS_EXTERN_INLINE caddr_t
+__MPS_EXTERN_INLINE __unlikely caddr_t
 mi_zalloc_sleep(size_t size)
 {
 	caddr_t memp;
@@ -155,7 +158,7 @@ mi_zalloc_sleep(size_t size)
 		bzero(memp, size);
 	return (memp);
 }
-__MPS_EXTERN_INLINE void
+__MPS_EXTERN_INLINE __unlikely void
 mi_free(void *ptr)
 {
 	size_t *sp;

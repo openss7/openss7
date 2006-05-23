@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.18 2005/12/28 09:51:49 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.19 2006/05/23 10:44:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 10:44:07 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_DDI_H__
 #define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/28 09:51:49 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/23 10:44:07 $"
 
 #ifndef __SYS_SUNDDI_H__
 #warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."
@@ -76,24 +76,24 @@
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 
 #ifdef LFS
-__SUN_EXTERN_INLINE cred_t *
+__SUN_EXTERN_INLINE __unlikely cred_t *
 ddi_get_cred(void)
 {
 	return (current_creds);
 }
 #endif
-__SUN_EXTERN_INLINE clock_t
+__SUN_EXTERN_INLINE __unlikely clock_t
 ddi_get_lbolt(void)
 {
 	return (jiffies);
 }
-__SUN_EXTERN_INLINE pid_t
+__SUN_EXTERN_INLINE __unlikely pid_t
 ddi_get_pid(void)
 {
 	return (current->pid);
 }
 
-__SUN_EXTERN_INLINE time_t
+__SUN_EXTERN_INLINE __unlikely time_t
 ddi_get_time(void)
 {
 	struct timeval tv;
@@ -101,7 +101,7 @@ ddi_get_time(void)
 	do_gettimeofday(&tv);
 	return (tv.tv_sec);
 }
-__SUN_EXTERN_INLINE unsigned short
+__SUN_EXTERN_INLINE __unlikely unsigned short
 ddi_getiminor(dev_t dev)
 {
 #ifdef HAVE_KFUNC_TO_KDEV_T
@@ -127,7 +127,7 @@ typedef struct ddi_umem_cookie {
 	void *umem;
 } ddi_umem_cookie_t;
 
-__SUN_EXTERN_INLINE void *
+__SUN_EXTERN_INLINE __unlikely void *
 ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep)
 {
 	void *umem;
@@ -145,7 +145,7 @@ ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep)
 	}
 	return (umem);
 }
-__SUN_EXTERN_INLINE void *
+__SUN_EXTERN_INLINE __unlikely void *
 ddi_umem_free(ddi_umem_cookie_t * cookiep)
 {
 	if (cookiep)
