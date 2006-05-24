@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: testsuite.texi,v 1.1.2.1 2005/06/24 12:06:54 brian Exp $
+@c @(#) $Id: testsuite.texi,v 1.1.2.2 2006/05/23 22:43:35 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
@@ -17,7 +17,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/06/24 12:06:54 $ by $Author: brian $
+@c Last Modified $Date: 2006/05/23 22:43:35 $ by $Author: brian $
 @c
 @c =========================================================================
 

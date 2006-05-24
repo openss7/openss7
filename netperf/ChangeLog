@@ -1,5 +1,64 @@
 2006-05-23  Brian Bidulock  <bidulock@openss7.org>
 
+	* configure.nexusware: updated headers
+	* netbenchmark: updated headers
+	* netlib.h: updated headers
+	* netperf.c: updated headers
+	* netperf_arr: updated headers
+	* netperf_packet_byte: updated headers
+	* netperf_sctp_range: updated headers
+	* netperf_sctp_rr: updated headers
+	* netperf_sctp_stream: updated headers
+	* netperf_snapshot: updated headers
+	* netperf_tcp_range: updated headers
+	* netperf_tcp_rr: updated headers
+	* netperf_tcp_stream: updated headers
+	* netperf_udp_range: updated headers
+	* netperf_udp_rr: updated headers
+	* netperf_udp_stream: updated headers
+	* netserver.c: updated headers
+	* netsh.c: updated headers
+	* nettest_bsd.c: updated headers
+	* nettest_bsd.h: updated headers
+	* nettest_ipv6.h: updated headers
+	* nettest_xti.c: updated headers
+	* nettest_xti.h: updated headers
+	* sctp_range_script: updated headers
+	* sctp_rr_script: updated headers
+	* sctp_stream_script: updated headers
+	* debian/mscript_header.in: updated headers
+	* debian/mscript_postinst.in: updated headers
+	* debian/mscript_postrm.in: updated headers
+	* debian/mscript_preinst.in: updated headers
+	* debian/mscript_prerm.in: updated headers
+	* manual/configure.texi: updated headers
+	* manual/install.texi: updated headers
+	* manual/releases.texi: updated headers
+	* manual/rpm.texi: updated headers
+	* manual/testsuite.texi: updated headers
+	* manual/tree.texi: updated headers
+	* manual/texi/args.texi.in: updated headers
+	* manual/texi/install.texi: updated headers
+	* scripts/cflagcheck: updated headers
+	* scripts/check_commands: updated headers
+	* scripts/check_decls: updated headers
+	* scripts/check_headers: updated headers
+	* scripts/check_libs: updated headers
+	* scripts/check_mans: updated headers
+	* scripts/check_modules: updated headers
+	* scripts/check_streams: updated headers
+	* scripts/chkconfig: updated headers
+	* scripts/inet_mkdev: updated headers
+	* scripts/inet_rmdev: updated headers
+	* scripts/install_initd: updated headers
+	* scripts/remove_initd: updated headers
+	* scripts/texinfo.cnf: updated headers
+	* scripts/texi/args.texi.in: updated headers
+	* scripts/texi/funding.texi: updated headers
+	* scripts/texi/install.texi: updated headers
+
+2006-05-23  Brian Bidulock  <bidulock@openss7.org>
+
 	* ChangeLog: updates
 	* netperf_arr: header updates
 	* netperf_packet_byte: header updates

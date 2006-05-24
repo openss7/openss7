@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: nettest_xti.h,v 1.1.1.4 2005/05/14 08:30:06 brian Exp $
+ @(#) $Id: nettest_xti.h,v 1.1.1.5 2006/05/23 22:43:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,7 +44,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:06 $ by $Author: brian $
+ Last Modified $Date: 2006/05/23 22:43:32 $ by $Author: brian $
 
  *****************************************************************************/
 
