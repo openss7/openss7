@@ -1,3 +1,20 @@
+2006-05-24  Brian Bidulock  <bidulock@openss7.org>
+
+	- A problem was discovered in optimization with recent gcc compilers,
+	  such a 4.0.2, that perform -finline-functions-called-once at -O2
+	  optimization.  This largely breaks everywhere in the code that I split
+	  off a function to place it in a less likely text section.  One way
+	  around this is to declare the functions non-static (in which case the
+	  compiler cannot tell if it is only called once).  Another way arroud
+	  this is to test for support of the -fno-inline-functions-called-once
+	  flag and set it.  It is probably best to do both.
+
+	* src/modules/sth.c: bug in strallocpmsg; make strwaitgetq hot in
+	* src/kernel/strsched.c: make mdbblock_alloc, __runqueues, runqueues,
+	  put, kmem_alloc, kmem_free hot
+	* src/kernel/strutil.c: make freeb, getq, bcanputnext, putnext, allocb,
+	  esballoc hot
+
 2006-05-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/streams/strsubr.h: minor changes to XCHG locking

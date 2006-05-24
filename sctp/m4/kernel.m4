@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2006/03/14 12:23:34 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/05/24 10:49:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/14 12:23:34 $ by $Author: brian $
+# Last Modified $Date: 2006/05/24 10:49:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1608,7 +1608,14 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 		linux_cv_optimize='speed'
 		;;
 	    (normal)
-		linux_cflags="$linux_cflags${linux_cflags:+ }-O2 -g"
+dnl
+dnl Later compilers at -O2 seems to be inline calls to functions that are static and called once.
+dnl We should really add -fno-inline-functions-called-once but older compilers will puke at that.
+dnl We try -fno-inline-functions which is recognized by even older compilers to see if it shuts off
+dnl the inline-functions-called-once too.  Another approach is to simply make these functions
+dnl non-static so that recent compilers will not consider them for inlining at -O2.
+dnl
+		linux_cflags="$linux_cflags${linux_cflags:+ }-O2 -g -fno-inline-functions"
 		linux_cv_debug="_SAFE"
 		linux_cv_optimize='normal'
 		;;

@@ -1,3 +1,7 @@
+2006-05-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/os7compat.c: inlined queue locking functions
+
 2006-05-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/aix/stream.h: mark normal inline functions unlikely

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2006/05/22 02:09:06 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2006/05/24 10:50:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/22 02:09:06 $ by $Author: brian $
+ Last Modified $Date: 2006/05/24 10:50:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.121  2006/05/24 10:50:29  brian
+ - optimizations
+
  Revision 0.9.2.120  2006/05/22 02:09:06  brian
  - changes from performance testing
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2006/05/22 02:09:06 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2006/05/24 10:50:29 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2006/05/22 02:09:06 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2006/05/24 10:50:29 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -247,7 +250,7 @@ EXPORT_SYMBOL_NOVERS(adjmsg);		/* include/sys/streams/stream.h */
  *  @size:	size of message block in bytes
  *  @priority:	priority of the allocation
  */
-streams_fastcall __hot_out mblk_t *
+streams_fastcall __hot mblk_t *
 allocb(size_t size, uint priority)
 {
 	mblk_t *mp;
@@ -399,7 +402,7 @@ EXPORT_SYMBOL_NOVERS(dupmsg);		/* include/sys/streams/stream.h */
  *  @priority:	priority of message block header allocation
  *  @freeinfo:	free routine callback
  */
-streams_fastcall mblk_t *
+streams_fastcall __hot mblk_t *
 esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 {
 	mblk_t *mp;
@@ -433,7 +436,7 @@ EXPORT_SYMBOL_NOVERS(esballoc);
  *  freeb:	- free a message block
  *  @mp:	message block to free
  */
-streams_fastcall __hot_in void
+streams_fastcall __hot void
 freeb(mblk_t *mp)
 {
 	dblk_t *dp, *db;
@@ -1236,7 +1239,7 @@ EXPORT_SYMBOL_NOVERS(bcanput);
  *  compatibility there is little choice but to make bcanputnext() safe from an asynchronous
  *  context by taking a plumb read lock.
  */
-streams_fastcall __hot_out int
+streams_fastcall __hot int
 bcanputnext(register queue_t *q, unsigned char band)
 {
 	int result;
@@ -3074,7 +3077,7 @@ __getq(queue_t *q, bool *be)
  *  MP-STREAMS: Note that qbackenable() will take its own Stream head read lock for Stream ends
  *  making this function safe to be called from outside of STREAMS for Stream ends only.
  */
-streams_fastcall mblk_t *
+streams_fastcall __hot mblk_t *
 getq(register queue_t *q)
 {
 	mblk_t *mp;

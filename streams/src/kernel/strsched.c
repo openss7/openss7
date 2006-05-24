@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/05/22 02:09:05 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/05/24 10:50:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/22 02:09:05 $ by $Author: brian $
+ Last Modified $Date: 2006/05/24 10:50:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.129  2006/05/24 10:50:27  brian
+ - optimizations
+
  Revision 0.9.2.128  2006/05/22 02:09:05  brian
  - changes from performance testing
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/05/22 02:09:05 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/05/24 10:50:27 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/05/22 02:09:05 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/05/24 10:50:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -655,7 +658,10 @@ allocq(void)
 
 EXPORT_SYMBOL_NOVERS(allocq);	/* include/sys/streams/stream.h */
 
-BIG_STATIC_STH void streams_fastcall sd_put_slow(struct stdata **sdp);
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+void streams_fastcall sd_put_slow(struct stdata **sdp);
 
 /*
  *  __freeq:	- free a queue pair
@@ -806,8 +812,10 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
  *  Because misbehaving STREAMS modules and drivers normaly leak message blocks at an amazing rate,
  *  we also return an allocation failure if the number of message blocks exceeds a tunable
  *  threshold.
+ *
+ *  Note: non-static so that -finline-functions-called-once is not considered.
  */
-BIG_STATIC streams_fastcall __hot_out mblk_t *
+streams_fastcall __hot_out mblk_t *
 mdbblock_alloc_slow(uint priority, void *func)
 {
 	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
@@ -865,7 +873,7 @@ mdbblock_alloc_slow(uint priority, void *func)
       fail:
 	return (mp);
 }
-STATIC streams_fastcall __hot_out mblk_t *
+STATIC streams_fastcall __hot mblk_t *
 mdbblock_alloc(uint priority, void *func)
 {
 	struct strthread *t = this_thread;
@@ -2630,7 +2638,10 @@ qputp(queue_t *q, mblk_t *mp)
 	trace();
 }
 
-STATIC void
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+void
 qputp_slow(queue_t *q, mblk_t *mp)
 {
 	qputp(q, mp);
@@ -2676,7 +2687,7 @@ qputp_slow(queue_t *q, mblk_t *mp)
  *  procedures.  Care should be taken if the filtering function accesses shared state (e.g. the
  *  queue's private structure).
  */
-streams_fastcall void
+streams_fastcall __hot void
 put(queue_t *q, mblk_t *mp)
 {				/* PROFILED */
 	struct strthread *t = this_thread;
@@ -2788,7 +2799,7 @@ EXPORT_SYMBOL_NOVERS(put);
  *  NOTICES: Changed this function to take no locks.  Do not call from ISR.  Use put() instead.
  *  You can then simply call putnext() from the driver's queue put procedure if you'd like.
  */
-streams_fastcall __hot_out void
+streams_fastcall __hot void
 putnext(queue_t *q, mblk_t *mp)
 {
 	struct strthread *t = this_thread;
@@ -3420,7 +3431,7 @@ do_unweldq_event(struct strevent *se)
  *  @size:	amount of memory to allocate in bytes
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
-streams_fastcall void *
+streams_fastcall __hot void *
 kmem_alloc(size_t size, int flags)
 {
 	if (size == 0 || size > 131072)
@@ -3469,7 +3480,7 @@ EXPORT_SYMBOL_NOVERS(kmem_zalloc);	/* include/sys/streams/kmem.h */
  *  memory, we also want to raise pending buffer callbacks on all STREAMS scheduler threads so that
  *  they can attempt to use the memory.
  */
-streams_fastcall __hot_in void
+streams_fastcall __hot void
 kmem_free(void *addr, size_t size)
 {
 	kfree(addr);
@@ -4044,10 +4055,10 @@ freechain(mblk_t *mp, mblk_t **mpp)
  *  This is the internal softirq version of runqueues().
  */
 #if defined CONFIG_STREAMS_KTHREADS
-STATIC streams_fastcall __hot_in void
+STATIC streams_fastcall __hot void
 __runqueues(void)
 #else
-STATIC __hot_in void
+STATIC __hot void
 __runqueues(struct softirq_action *unused)
 #endif
 {				/* PROFILED */
@@ -4112,7 +4123,7 @@ __runqueues(struct softirq_action *unused)
  *  system call.  All stream heads (regular stream head, fifo/pipe stream head, socket stream
  *  head) need this function exported so that they can be called at the end of a system call.
  */
-streams_fastcall __hot_in void
+streams_fastcall __hot void
 runqueues(void)
 {				/* PROFILED */
 #if defined HAVE_KINC_LINUX_KTHREAD_H
@@ -4296,7 +4307,10 @@ sd_put(struct stdata **sdp)
 EXPORT_SYMBOL_NOVERS(sd_put);	/* include/sys/streams/strsubr.h */
 #endif
 
-BIG_STATIC_STH streams_fastcall void
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall void
 sd_put_slow(struct stdata **sdp)
 {
 	sd_put(sdp);

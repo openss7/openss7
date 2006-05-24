@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 05:00:47 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/24 10:50:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/24 05:00:47 $ by $Author: brian $
+ Last Modified $Date: 2006/05/24 10:50:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.13  2006/05/24 10:50:25  brian
+ - optimizations
+
  Revision 0.9.2.12  2006/04/24 05:00:47  brian
  - call interface corrections
 
@@ -91,9 +94,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 05:00:47 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/24 10:50:25 $"
 
-static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 05:00:47 $";
+static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/24 10:50:25 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -114,7 +117,7 @@ static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/04/24 05:00:47 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/24 10:50:25 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -307,7 +310,7 @@ EXPORT_SYMBOL_NOVERS(bufq_resupply);
  * against an implicit recursive put procedure (one that calls a put procedure that calls another
  * that calls the original put procedure).  Locking is strict and safe against interrupts.
  */
-streamscall __hot int
+INLINE streamscall __hot int
 ss7_trylockq(queue_t *q)
 {
 	int res;
@@ -339,7 +342,7 @@ EXPORT_SYMBOL_NOVERS(ss7_trylockq);
  * does not have a service procedure, one will still be called directly to drain deferred messages
  * from the queue.
  */
-streamscall __hot void
+INLINE streamscall __hot void
 ss7_unlockq(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);

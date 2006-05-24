@@ -1,3 +1,8 @@
+2006-05-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/hot.lds: try write path priority over read path
+	* m4/kernel.m4: add -fno-inline-functions at -O2
+
 2006-05-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/genksyms.am: load script missing -T option for 2.6

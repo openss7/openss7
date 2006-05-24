@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/23 10:40:22 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/24 10:50:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 10:40:22 $ by $Author: brian $
+ Last Modified $Date: 2006/05/24 10:50:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.23  2006/05/24 10:50:39  brian
+ - optimizations
+
  Revision 0.9.2.22  2006/05/23 10:40:22  brian
  - handle non-exported sysctl_ip_default_ttl on receive FC4 kernels
 
@@ -118,10 +121,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/23 10:40:22 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/24 10:50:39 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/23 10:40:22 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/24 10:50:39 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -198,7 +201,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/05/23 10:40:22 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/24 10:50:39 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -422,7 +425,7 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 #define ip_default_daddr		INADDR_ANY
 #define ip_default_mtu			536
 
-#define udp_default_checksum		T_NO
+#define udp_default_checksum		T_YES
 
 enum {
 	_T_BIT_XTI_DEBUG = 0,
@@ -745,7 +748,7 @@ STATIC struct tp_options tp_defaults = {
  * @t: private structure
  * @mp: message pointer for message
  */
-STATIC int
+STATIC fastcall __hot_get int
 t_opts_size(const struct tp *t, mblk_t *mp)
 {
 	int size = 0;
@@ -770,7 +773,7 @@ t_opts_size(const struct tp *t, mblk_t *mp)
  * @op: output pointer
  * @olen: output length
  */
-static int
+static INLINE fastcall __hot_in int
 t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, size_t olen)
 {
 	struct iphdr *iph;
@@ -852,8 +855,10 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, size_t olen)
  *
  * Note that mp->b_rptr points to the encapsulated IP header.  mp->b_datap->db_base points to the IP
  * header of the ICMP message itself.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+__unlikely int
 t_errs_size(const struct tp *t, mblk_t *mp)
 {
 	int size = 0;
@@ -883,8 +888,10 @@ t_errs_size(const struct tp *t, mblk_t *mp)
  *
  * Note that mp->b_rptr points to the encapsulated IP header.  mp->b_datap->db_base points to the IP
  * header of the ICMP message.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+__unlikely int
 t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, size_t olen)
 {
 	struct iphdr *iph;
@@ -966,8 +973,10 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, size_t olen)
  * @ilen: length of options
  *
  * T_UNITDATA_REQ ignores unrecognized options or option levels.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 t_opts_parse_ud(unsigned char *ip, size_t ilen, struct tp_options *op)
 {
 	struct t_opthdr *ih;
@@ -1164,8 +1173,10 @@ t_opts_parse(unsigned char *ip, size_t ilen, struct tp_options *op)
  *
  * Check the validity of the option structure, check for correct size of each supplied option given
  * the option management flag, and return the size required of the acknowledgement options field.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 t_size_default_options(struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -1293,8 +1304,10 @@ t_size_default_options(struct tp *t, const unsigned char *ip, size_t ilen)
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 t_size_current_options(struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -1422,8 +1435,10 @@ t_size_current_options(struct tp *t, const unsigned char *ip, size_t ilen)
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -1581,8 +1596,10 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
  * @t: private structure
  * @ip: input pointer
  * @ilen: input length
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -1787,8 +1804,10 @@ t_overall_result(uint * overall, uint result)
  * @olen: output length
  *
  * Perform the actions required of T_DEFAULT placing the output in the provided buffer.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC t_scalar_t
+t_scalar_t
 t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen,
 			unsigned char *op, size_t *olen)
 {
@@ -2023,8 +2042,10 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
  * @olen: output length
  *
  * Perform the actions required of T_CURRENT placing the output in the provided buffer.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC t_scalar_t
+t_scalar_t
 t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen,
 			unsigned char *op, size_t *olen)
 {
@@ -2276,8 +2297,10 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
  * @olen: output length
  *
  * Perform the actions required of T_CHECK placing the output in the provided buffer.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC t_scalar_t
+t_scalar_t
 t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 		      size_t *olen)
 {
@@ -2684,8 +2707,10 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
  * @olen: output length
  *
  * Perform the actions required of T_NEGOTIATE placing the output in the provided buffer.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC t_scalar_t
+t_scalar_t
 t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 			  size_t *olen)
 {
@@ -3151,8 +3176,10 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
  *
  * Perform the actions required of T_DEFAULT, T_CURRENT, T_CHECK and T_NEGOTIARE, placing the output
  * in the provided buffer.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC t_scalar_t
+t_scalar_t
 t_build_options(struct tp *t, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen,
 		t_scalar_t flag)
 {
@@ -3645,7 +3672,7 @@ tp_ip_queue_xmit(struct sk_buff *skb)
  * queue and stall the queue.  When the send memory falls below tp->options.xti.sndlowat (or to
  * zero) and there are message on the send queue, we enable the queue.
  */
-STATIC void __hot_out
+STATIC void __hot
 tp_destructor(struct sk_buff *skb)
 {
 	struct tp *tp;
@@ -3703,7 +3730,7 @@ tp_senddata(struct tp *tp, unsigned short dport, struct tp_options *opt, mblk_t 
 			struct udphdr *uh;
 			unsigned char *data;
 
-			skb->sk = (struct sock *) tp_get(tp); /* borrow sk pointer */
+			skb->sk = (struct sock *) tp_get(tp);	/* borrow sk pointer */
 			skb->destructor = tp_destructor;
 			spin_lock_bh(&tp->qlock);
 			tp->sndmem += skb->truesize;
@@ -3765,6 +3792,7 @@ tp_senddata(struct tp *tp, unsigned short dport, struct tp_options *opt, mblk_t 
 				} else
 					rare();
 			}
+			/* It would be more efficient to do this while copying above. */
 			if (opt->udp.checksum == T_YES) {
 				uh->check = csum_fold(skb_checksum(skb, 0, skb->len, skb->csum));
 			}
@@ -4128,12 +4156,6 @@ np_reset_rem(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason)
 }
 #endif
 
-uint32_t
-cksum_generate(struct udphdr *uh, size_t plen)
-{				/* FIXME */
-	return (0);
-}
-
 /**
  * tp_unbind - unbind a Stream from an NSAP
  * @tp: private structure
@@ -4177,8 +4199,10 @@ tp_unbind(struct tp *tp)
  * @ACCEPTOR_id: accepting Stream private structure
  * @CONN_flags: connection flags
  * @dp: user connect data
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	   struct tp_options *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id,
 	   t_uscalar_t CONN_flags, mblk_t *dp)
@@ -4547,8 +4571,10 @@ tp_disconnect(struct tp *tp, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
  * @q: a queue in the queue pair
  * @how: FLUSHBAND or FLUSHALL
  * @band: band to flush if how is FLUSHBAND
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall int
+fastcall int
 m_flush(queue_t *q, int how, int band)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -4570,8 +4596,10 @@ m_flush(queue_t *q, int how, int band)
  * @q: a queue in the queue pair
  * @error: the error to deliver
  * @mp: message to reuse
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 m_error(queue_t *q, int error, mblk_t *mp)
 {
 	mblk_t *pp = mp;
@@ -4667,8 +4695,10 @@ te_error_reply(queue_t *q, long error)
 /**
  * te_info_ack - generate a T_INFO_ACK and pass it upstream
  * @q: active queue in queue pair (write queue)
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall int
+fastcall int
 te_info_ack(queue_t *q)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -4711,8 +4741,10 @@ te_info_ack(queue_t *q)
  * @CONIND_number: maximum number of connection indications
  *
  * Generate an T_BIND_ACK and pass it upstream.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall int
+fastcall int
 te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, socklen_t ADDR_length,
 	    t_uscalar_t CONIND_number)
 {
@@ -4971,8 +5003,9 @@ te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer,
  * value for the destinations.  These values are set in the private structure by the tp_connect()
  * function.
  *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall int
+fastcall int
 te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	    struct tp_options *OPT_buffer, t_uscalar_t CONN_flags)
 {
@@ -5079,8 +5112,10 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
  * We generate connection indications to Streams that are bound as listening to an address including
  * the destination address of the IP packet, where no connection exists for the source address of
  * the IP packet.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __hot_get int
+fastcall __hot_get int
 te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5191,8 +5226,10 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
  * The N_DISCON_IND is sent when we encounter an error on a connection oriented Stream, i.e. as a
  * result of receiving an ICMP error.  For multihomed hosts, we only do this if all destination
  * addresses have errors, otherwise, we just perform a reset for the affected destination.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __hot_get int
+fastcall __hot_get int
 te_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	      t_uscalar_t DISCON_reason, mblk_t *SEQ_number, mblk_t *dp)
 {
@@ -5229,8 +5266,10 @@ te_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
  * te_discon_ind_icmp - TE_DISCON_IND event resulting from ICMP message
  * @q: active queue in queue pair
  * @mp: the ICMP message
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 te_discon_ind_icmp(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5445,8 +5484,10 @@ te_unitdata_ind(queue_t *q, mblk_t *dp)
  * IMPLEMENTATION: The data block containst the IP header and payload, starting at
  * dp->b_datap->db_base.  The IP message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __hot_get int
+fastcall __hot_get int
 te_optdata_ind(queue_t *q, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5494,8 +5535,10 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
  * @OPT_length: length of options in buffer
  * @ERROR_type: error number
  * @dp: message containing user data of errored packet
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC __unlikely int
+__unlikely int
 te_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, unsigned char *OPT_buffer,
 	       size_t OPT_length, t_uscalar_t ERROR_type, mblk_t *dp)
 {
@@ -5555,8 +5598,10 @@ te_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, unsigned char *OPT_b
  * There is another reason for issuing an T_UDERROR_IND and that is Explicit Congestion
  * Notification, but there is no ICMP message associated with that and it has not yet been coded:
  * probably need an ne_uderror_ind_ecn() function.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 te_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5590,7 +5635,10 @@ te_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 	return (err);
 }
 
-STATIC fastcall __unlikely int
+/*
+ * Note: non-static so that -finline-functions-called-once will not be considered.
+ */
+fastcall __unlikely int
 te_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, unsigned char *OPT_buffer,
 		 size_t OPT_length, t_scalar_t ERROR_type, mblk_t *db)
 {
@@ -5775,8 +5823,10 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
  *
  * Note: opt_len is conservative but might not be actual size of the output options.  This will be
  * adjusted when the option buffer is built.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, size_t opt_len)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5820,8 +5870,10 @@ t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, 
  * @LOCADDR_length: local address length
  * @REMADDR_buffer: remote address
  * @REMADDR_length: remote address length
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 t_addr_ack(queue_t *q, struct sockaddr_in *LOCADDR_buffer, t_uscalar_t LOCADDR_length,
 	   struct sockaddr_in *REMADDR_buffer, t_uscalar_t REMADDR_length)
 {
@@ -5863,8 +5915,10 @@ t_addr_ack(queue_t *q, struct sockaddr_in *LOCADDR_buffer, t_uscalar_t LOCADDR_l
  * @q: a queue in the queue pair
  * @caps: capability bits
  * @type: STREAMS message type M_PROTO or M_PCPROTO
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5907,8 +5961,10 @@ t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
  * te_info_req - TE_INFO_REQ information request event
  * @q: active queue in pair (write queue)
  * @mp: T_INFO_REQ message
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 te_info_req(queue_t *q, mblk_t *mp)
 {
 	struct T_info_req *p;
@@ -5950,8 +6006,10 @@ te_info_req(queue_t *q, mblk_t *mp)
  * Protocol ids must always be specified.  Currently we don't allow binding to more than one
  * protocol id, but, instead of generating an error, we simply bind to the first protocol id
  * specified and ignore the reset.  We will only return the first protocol id in the bind ack.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 te_bind_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6009,8 +6067,10 @@ te_bind_req(queue_t *q, mblk_t *mp)
  * te_unbind_req - process a T_UNBIND_REQ primitive
  * @q: active queue in queue pair
  * @mp: the primitive
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC int
+int
 te_unbind_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6134,8 +6194,9 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
  * parameters.  The primary address is used for subsequent TE_DATA_REQ and TE_EXDATA_REQ events
  * until changed with a TE_OPTMGMT_REQ event.
  *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __hot_put int
+fastcall __hot_put int
 te_conn_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6269,8 +6330,10 @@ t_tok_check(t_uscalar_t ACCEPTOR_id)
  * T_CONN_RES primitive contains the list of destination address(es) to which to form the
  * connection.  If no responding addresses are provided, then the destination address is the source
  * address from the connection indication.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall int
+fastcall int
 te_conn_res(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q), *ACCEPTOR_id = tp;
@@ -6373,8 +6436,10 @@ te_conn_res(queue_t *q, mblk_t *mp)
  * te_discon_req - process T_DISCON_REQ message
  * @q: active queue (write queue)
  * @mp: the T_DISCON_REQ message
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall int
+fastcall int
 te_discon_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6463,8 +6528,10 @@ te_discon_req(queue_t *q, mblk_t *mp)
  * TODO: We should check the MSGDELIM flag and see whether this was a complete write or not.  If
  * not, we should accumulate the M_DATA block in a buffer waiting for a delimited message or final
  * N_DATA_REQ.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 te_write_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6510,8 +6577,10 @@ te_write_req(queue_t *q, mblk_t *mp)
  * Unfortunately, there is no standard way of specifying destination and source addreses for
  * multihomed hosts.  We use T_OPTMGMT_REQ to change the primary destination address, source address
  * and options.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall int
+fastcall int
 te_data_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6566,8 +6635,10 @@ te_data_req(queue_t *q, mblk_t *mp)
  * te_exdata_req - process a T_EXDATA_REQ primitive
  * @q: write queue
  * @mp: the primitive
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall int
+fastcall int
 te_exdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6616,8 +6687,10 @@ te_exdata_req(queue_t *q, mblk_t *mp)
  * te_optdata_req - process a T_OPTDATA_REQ primitive
  * @q: write queue
  * @mp: the primitive
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall int
+fastcall int
 te_optdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6686,8 +6759,10 @@ te_optdata_req(queue_t *q, mblk_t *mp)
  * [TOUTSTATE] the primitive would place the transport interface out of state;
  * [TNOTSUPPORT] this prmitive is not supported;
  * [TSYSERR] a system error has occured and the UNIX system error is indicated in the primitive.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall int
+fastcall int
 te_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6764,8 +6839,10 @@ te_optmgmt_req(queue_t *q, mblk_t *mp)
  * te_addr_req - process a T_ADDR_REQ primitive
  * @q: active queue in queue pair
  * @mp: the primitive
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 te_addr_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6838,8 +6915,10 @@ te_addr_req(queue_t *q, mblk_t *mp)
  * te_capability_req - process a T_CAPABILITY_REQ primitive
  * @q: active queue in queue pair
  * @mp: the primitive
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 te_capability_req(queue_t *q, mblk_t *mp)
 {
 	struct T_capability_req *p;
@@ -6993,8 +7072,10 @@ tp_w_proto(queue_t *q, mblk_t *mp)
  * tp_wp_data - process M_DATA message
  * @q: active queue in pair (write queue)
  * @mp: the M_DATA message
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 tp_w_data(queue_t *q, mblk_t *mp)
 {
 	return te_write_req(q, mp);
@@ -7004,8 +7085,10 @@ tp_w_data(queue_t *q, mblk_t *mp)
  * tp_w_other - proces other message
  * @q: active queue in pair (write queue)
  * @mp: the message
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 tp_w_other(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7023,8 +7106,10 @@ tp_w_other(queue_t *q, mblk_t *mp)
  *
  * This TPI-UDP provider does not support any input-output controls and, therefore, all input-output
  * controls are negatively acknowledged.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 tp_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -7041,8 +7126,10 @@ tp_w_ioctl(queue_t *q, mblk_t *mp)
  * tp_r_other - process other message
  * @q: active queue in pair (read queue)
  * @mp: the message
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 tp_r_other(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7117,15 +7204,17 @@ tp_r_data(queue_t *q, mblk_t *mp)
 }
 
 /**
- *  tp_r_error - process M_ERROR message
- *  @q: active queue in queue pair (read queue)
- *  @mp: the M_ERROR message
+ * tp_r_error - process M_ERROR message
+ * @q: active queue in queue pair (read queue)
+ * @mp: the M_ERROR message
  *
- *  M_ERROR messages are placed to the read queue by the Linux IP tp_v4_err() callback.  The message
- *  contains a complete ICMP datagram starting with the IP header.  What needs to be done is to
- *  convert this to an upper layer indication and deliver it upstream.
+ * M_ERROR messages are placed to the read queue by the Linux IP tp_v4_err() callback.  The message
+ * contains a complete ICMP datagram starting with the IP header.  What needs to be done is to
+ * convert this to an upper layer indication and deliver it upstream.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely int
+fastcall __unlikely int
 tp_r_error(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7451,8 +7540,10 @@ tp_lookup(struct iphdr *iph, struct udphdr *uh)
  *
  * This needs to do a reverse lookup (where destination address and port are compared to source
  * address and port, and visa versa).
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC fastcall __unlikely struct tp *
+fastcall __unlikely struct tp *
 tp_lookup_icmp(struct iphdr *iph, unsigned int len)
 {
 	struct udphdr *uh = (struct udphdr *) ((unsigned char *) iph + (iph->ihl << 2));
@@ -7515,9 +7606,9 @@ tp_v4_rcv(struct sk_buff *skb)
 
 //      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 
-	if (!pskb_may_pull(skb, sizeof(struct udphdr)))
+	if (unlikely(!pskb_may_pull(skb, sizeof(struct udphdr))))
 		goto too_small;
-	if (skb->pkt_type != PACKET_HOST)
+	if (unlikely(skb->pkt_type != PACKET_HOST))
 		goto bad_pkt_type;
 	rt = (struct rtable *) skb->dst;
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
@@ -7528,12 +7619,12 @@ tp_v4_rcv(struct sk_buff *skb)
 	uh = skb->h.uh;
 	ulen = ntohs(uh->len);
 	/* sanity check UDP length */
-	if (ulen > skb->len || ulen < sizeof(struct udphdr))
+	if (unlikely(ulen > skb->len || ulen < sizeof(struct udphdr)))
 		goto too_small;
-	if (pskb_trim(skb, ulen))
+	if (unlikely(pskb_trim(skb, ulen)))
 		goto too_small;
 	/* we do the lookup before the checksum */
-	if ((tp = tp_lookup(iph, uh)) == NULL)
+	if (unlikely((tp = tp_lookup(iph, uh)) == NULL))
 		goto no_stream;
 
 	/* TODO: for 2.4 we overwrite iph->protocol to steal the packet.  This means that we loose
@@ -7555,7 +7646,7 @@ tp_v4_rcv(struct sk_buff *skb)
 	/* For now... We should actually place non-linear fragments into separate mblks and pass
 	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
 	   netfilter hooks linearize anyway. */
-	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
+	if (unlikely(skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0))
 		goto linear_fail;
 	/* Before passing the message up, check that there is room in the receive buffer.  Allows
 	   slop over by 1 buffer per processor. */
@@ -7710,8 +7801,10 @@ tp_v4_err(struct sk_buff *skb, u32 info)
  *
  * Allocates a new private structure, initializes it to appropriate values, and then inserts it into
  * the private structure list.
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC struct tp *
+struct tp *
 tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 {
 	struct tp *tp;
@@ -7783,8 +7876,10 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 /**
  * tp_free_priv - deallocate a private structure for the close routine
  * @q: read queue of closing Stream
+ *
+ * Note: non-static so that -finline-functions-called-once will not be considered.
  */
-STATIC void
+void
 tp_free_priv(queue_t *q)
 {
 	struct tp *tp;

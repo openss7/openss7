@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/05/14 06:58:14 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/05/24 10:50:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/14 06:58:14 $ by $Author: brian $
+ Last Modified $Date: 2006/05/24 10:50:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.144  2006/05/24 10:50:31  brian
+ - optimizations
+
  Revision 0.9.2.143  2006/05/14 06:58:14  brian
  - removed redundant or unused QR_ definitions
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/05/14 06:58:14 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/05/24 10:50:31 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/05/14 06:58:14 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/05/24 10:50:31 $";
 
 //#define __NO_VERSION__
 
@@ -175,7 +178,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/05/14 06:58:14 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/05/24 10:50:31 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1315,7 +1318,10 @@ strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 	zwunlock(sd, pl);
 }
 
-STATIC streams_fastcall mblk_t *
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __hot_in mblk_t *
 strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band)
 {				/* IRQ SUPPRESSED */
 	return strgetq(sd, q, flags, band);
@@ -1339,7 +1345,7 @@ strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band)
  *  what we need to do here, so we have to expose the internals of the wait queue implementation
  *  here.
  */
-STATIC mblk_t *
+STATIC streams_fastcall __hot_in mblk_t *
 strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
@@ -1582,7 +1588,10 @@ strgetfp(struct stdata *sd, queue_t *q)
 	goto error;
 }
 
-STATIC streams_fastcall __unlikely mblk_t *
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __unlikely mblk_t *
 strgetfp_slow(struct stdata *sd, queue_t *q)
 {
 	return strgetfp(sd, q);
@@ -2977,7 +2986,10 @@ strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 	}
 	return ((ssize_t) size);
 }
-STATIC streams_fastcall __hot_put ssize_t
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __hot_put ssize_t
 strsizecheck_slow(const struct stdata *sd, const msg_type_t type, ssize_t size)
 {				/* PROFILED */
 	return strsizecheck(sd, type, size);
@@ -3126,20 +3138,20 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 			/* copyin can sleep */
 			if (unlikely(clen > 0)) {	/* PROFILED */
 				if (likely(user)) {	/* PROFILED */
-					if ((err = strcopyin(ctlp->buf, dp->b_rptr, clen)))
+					err = strcopyin(ctlp->buf, dp->b_rptr, clen);
+					if (unlikely(err != 0))
 						break;
-					else
-						bcopy(ctlp->buf, dp->b_rptr, clen);
-				}
+				} else
+					bcopy(ctlp->buf, dp->b_rptr, clen);
 				dp = dp->b_cont;
 			}
 			if (likely(dlen > 0)) {	/* PROFILED */
 				if (likely(user)) {	/* PROFILED */
-					if ((err = strcopyin(datp->buf, dp->b_rptr, dlen)))
+					err = strcopyin(datp->buf, dp->b_rptr, dlen);
+					if (unlikely(err != 0))
 						break;
-					else
-						bcopy(datp->buf, dp->b_rptr, dlen);
-				}
+				} else
+					bcopy(datp->buf, dp->b_rptr, dlen);
 				dp = dp->b_cont;
 			}
 			mp->b_band = norm ? band : 0;
@@ -3562,6 +3574,9 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 	return (mask);
 }
 
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
 streams_fastcall unsigned int
 strpoll_slow(struct file *file, struct poll_table_struct *poll)
 {
@@ -4436,7 +4451,10 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	goto error;
 }
 
-STATIC ssize_t
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+ssize_t
 strread_slow(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	return strread_fast(file, buf, nbytes, ppos);
@@ -4702,7 +4720,10 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	goto error;
 }
 
-STATIC streams_fastcall ssize_t
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall ssize_t
 strwrite_slow(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	return strwrite_fast(file, buf, nbytes, ppos);
@@ -5102,7 +5123,10 @@ strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	goto error;
 }
 
-STATIC streams_fastcall int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall int
 strputpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
 		int flags)
 {
@@ -5486,7 +5510,10 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	goto error;
 }
 
-STATIC streams_fastcall int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall int
 strgetpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
 		int __user *bandp, int __user *flagsp)
 {
@@ -9269,7 +9296,10 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 	return (err);
 }
 
-STATIC streams_fastcall __hot int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __hot int
 strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	return strioctl_fast(file, cmd, arg);
@@ -9878,13 +9908,19 @@ str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 #endif
-STATIC streams_fastcall int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall int
 str_m_data_slow(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	return str_m_data(sd, q, mp);
 }
 
-STATIC streams_fastcall int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall int
 str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* Notes: OpenSolaris has this RFLUSHPCPROT read option to not flush M_PCPROTO messages
@@ -9949,7 +9985,10 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 #define WERRMASK (WERRNORM|WERRNONPERSIST)
 #endif
 
-STATIC streams_fastcall __unlikely int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __unlikely int
 str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	struct stroptions *so = (typeof(so)) mp->b_rptr;
@@ -10017,7 +10056,10 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall __unlikely int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __unlikely int
 str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	unsigned long pl;
@@ -10038,14 +10080,20 @@ str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall __unlikely int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __unlikely int
 str_m_pcsig(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	strsignal(sd, mp);
 	return (0);
 }
 
-STATIC streams_fastcall __unlikely int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __unlikely int
 str_m_error(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_ERROR -- when this message type is received, the first byte of the message 
@@ -10116,7 +10164,10 @@ str_m_error(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall __unlikely int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __unlikely int
 str_m_hangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_HANGUP -- if this message is received, the stream head is marked hung up.
@@ -10139,7 +10190,10 @@ str_m_hangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall __unlikely int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __unlikely int
 str_m_unhangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 #if 0
@@ -10152,7 +10206,10 @@ str_m_unhangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall int
 str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	if (!ctrace(strwakeiocack(sd, mp))) {
@@ -10173,7 +10230,10 @@ str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall int
 str_m_ioc(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	if (!ctrace(strwakeiocack(sd, mp)))
@@ -10181,7 +10241,10 @@ str_m_ioc(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall int
 str_m_ioctl(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_IOCTL -- It does not make sense to receive on of these messages at the
@@ -10205,7 +10268,10 @@ str_m_ioctl(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall __unlikely int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __unlikely int
 str_m_letsplay(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	struct strlp *lp = (typeof(lp)) mp->b_rptr;
@@ -10226,7 +10292,10 @@ str_m_letsplay(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall __unlikely int
+/*
+ * Note: non-static so that -finline-functions-called-once is not considered.
+ */
+streams_fastcall __unlikely int
 str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* Other messages are silently discarded */

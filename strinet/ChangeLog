@@ -1,3 +1,7 @@
+2006-05-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c: optimization from profiling
+
 2006-05-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/rawip.c: working up performance tests of 2nd gen drivers
