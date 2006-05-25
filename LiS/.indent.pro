@@ -49,7 +49,6 @@
 -Tcaddr_t
 -Tulong
 -Tushort
--Tinline
 -Twait_queue_head_t
 -Tssize_t
 -Tsize_t

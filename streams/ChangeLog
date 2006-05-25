@@ -1,3 +1,21 @@
+2006-05-25  Brian Bidulock  <bidulock@openss7.org>
+
+	- More on the compiler saga: it seems that compilers past 3.1 inline
+	  everything that they can.  We don't want this where an unlikely
+	  function is called from a hot one.  Therefore, I have had to go
+	  through the code an add 'noinline' to all such functions to get
+	  the compiler to place them in their own section and simply call the
+	  from the hot section.  Also, it looks like recent GNU loaders are
+	  recognizing .text.unlikely and maybe even .text.hot, so I had to
+	  change the section names to .streams.hot, etc.
+
+	* include/sys/streams/strdebug.h: changed section names, added noinline
+	* scripts/hot.lds: changes section names
+	* src/kernel/strsched.c: worked noinline code
+	* src/kernel/strutil.c: worked noinline code
+	* src/modules/pipemod.c: added an unlikely
+	* src/modules/sth.c: worked noinline code
+
 2006-05-24  Brian Bidulock  <bidulock@openss7.org>
 
 	- A problem was discovered in optimization with recent gcc compilers,

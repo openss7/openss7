@@ -1,3 +1,7 @@
+2006-05-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* .indent.pro: removed storage classes (inline)
+
 2006-05-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/hot.lds: try write path priority over read path

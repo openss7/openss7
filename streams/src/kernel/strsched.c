@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/05/24 10:50:27 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/05/25 08:30:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/24 10:50:27 $ by $Author: brian $
+ Last Modified $Date: 2006/05/25 08:30:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.130  2006/05/25 08:30:42  brian
+ - optimization for recent compilers
+
  Revision 0.9.2.129  2006/05/24 10:50:27  brian
  - optimizations
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/05/24 10:50:27 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/05/25 08:30:42 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/05/24 10:50:27 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/05/25 08:30:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -658,10 +661,7 @@ allocq(void)
 
 EXPORT_SYMBOL_NOVERS(allocq);	/* include/sys/streams/stream.h */
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-void streams_fastcall sd_put_slow(struct stdata **sdp);
+STATIC streams_noinline streams_fastcall void sd_put_slow(struct stdata **sdp);
 
 /*
  *  __freeq:	- free a queue pair
@@ -812,10 +812,8 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
  *  Because misbehaving STREAMS modules and drivers normaly leak message blocks at an amazing rate,
  *  we also return an allocation failure if the number of message blocks exceeds a tunable
  *  threshold.
- *
- *  Note: non-static so that -finline-functions-called-once is not considered.
  */
-streams_fastcall __hot_out mblk_t *
+STATIC streams_noinline streams_fastcall __hot_out mblk_t *
 mdbblock_alloc_slow(uint priority, void *func)
 {
 	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
@@ -1042,7 +1040,7 @@ mdbblock_free(mblk_t *mp)
  *  then work on them one by one.  After we free something, we want to raise pending buffer
  *  callbacks on all STREAMS scheduler threads in an attempt to let them use the freed blocks.
  */
-STATIC streams_fastcall void
+STATIC streams_noinline streams_fastcall void
 freeblocks(struct strthread *t)
 {
 	mblk_t *mp, *mp_next;
@@ -2638,10 +2636,7 @@ qputp(queue_t *q, mblk_t *mp)
 	trace();
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-void
+STATIC streams_noinline streams_fastcall void
 qputp_slow(queue_t *q, mblk_t *mp)
 {
 	qputp(q, mp);
@@ -2887,7 +2882,7 @@ qsrvp(queue_t *q)
  *
  *  CONTEXT: Must only be called from a blockable context.
  */
-__unlikely streams_fastcall int
+streams_fastcall __unlikely int
 qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	qi_qopen_t q_open;
@@ -2927,7 +2922,7 @@ EXPORT_SYMBOL_NOVERS(qopen);
  *
  *  CONTEXT: Must only be called from a blockable context.
  */
-__unlikely streams_fastcall int
+streams_fastcall __unlikely int
 qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	qi_qclose_t q_close;
@@ -3536,7 +3531,7 @@ EXPORT_SYMBOL_NOVERS(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
  *
  *  Process all message functions deferred from hardirq in the order in which they were received.
  */
-STATIC streams_fastcall void
+STATIC streams_noinline streams_fastcall void
 domfuncs(struct strthread *t)
 {
 	do {
@@ -3568,7 +3563,7 @@ domfuncs(struct strthread *t)
  *  
  *  Process all oustanding timeouts in the order in which they were received.
  */
-STATIC streams_fastcall void
+STATIC streams_noinline streams_fastcall void
 timeouts(struct strthread *t)
 {
 	do {
@@ -3636,7 +3631,7 @@ EXPORT_SYMBOL_NOVERS(qscan);	/* for stream head in include/sys/streams/strsubr.h
  *
  *  Note that the only queues on this list are stream head write queues.
  */
-STATIC streams_fastcall __unlikely void
+STATIC streams_noinline streams_fastcall __unlikely void
 scanqueues(struct strthread *t)
 {
 	do {
@@ -3684,7 +3679,7 @@ scanqueues(struct strthread *t)
  *  doevents:	- process STREAMS events
  *  @t:		STREAMS execution thread
  */
-STATIC streams_fastcall void
+STATIC streams_noinline streams_fastcall void
 doevents(struct strthread *t)
 {
 	struct strevent *se, *se_next;
@@ -3863,7 +3858,7 @@ runsyncq(struct syncq *sq)
  *  access was requested.  This is acceptable and reduces the burder of tracking two perimeters with
  *  shared or exclusive access.
  */
-STATIC streams_fastcall void
+STATIC streams_noinline streams_fastcall void
 backlog(struct strthread *t)
 {
 	syncq_t *sq, *sq_link;
@@ -3900,7 +3895,7 @@ backlog(struct strthread *t)
  *  subsystem will hang until an external event kicks it.  Therefore, we kick the chain every time
  *  an allocation is successful.
  */
-STATIC streams_fastcall void
+STATIC streams_noinline streams_fastcall void
 bufcalls(struct strthread *t)
 {
 	struct strevent *se, *se_next;
@@ -3999,7 +3994,7 @@ sqsched(syncq_t *sq)
  *  Free chains of message blocks outstanding from flush operations that were left over at the end
  *  of the CPU run.
  */
-STATIC streams_fastcall void
+STATIC streams_noinline streams_fastcall void
 freechains(struct strthread *t)
 {
 	mblk_t *mp, *mp_next;
@@ -4307,10 +4302,7 @@ sd_put(struct stdata **sdp)
 EXPORT_SYMBOL_NOVERS(sd_put);	/* include/sys/streams/strsubr.h */
 #endif
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall void
+STATIC streams_noinline streams_fastcall void
 sd_put_slow(struct stdata **sdp)
 {
 	sd_put(sdp);

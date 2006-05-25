@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/05/24 10:50:31 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/05/25 08:30:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/24 10:50:31 $ by $Author: brian $
+ Last Modified $Date: 2006/05/25 08:30:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.145  2006/05/25 08:30:45  brian
+ - optimization for recent compilers
+
  Revision 0.9.2.144  2006/05/24 10:50:31  brian
  - optimizations
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/05/24 10:50:31 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/05/25 08:30:45 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/05/24 10:50:31 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/05/25 08:30:45 $";
 
 //#define __NO_VERSION__
 
@@ -178,7 +181,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/05/24 10:50:31 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/05/25 08:30:45 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -724,7 +727,7 @@ straccess(struct stdata *sd, const register int access)
 	return (0);
 }
 
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 straccess_slow(struct stdata *sd, int access)
 {				/* PROFILED */
 	return straccess(sd, access);
@@ -1318,10 +1321,7 @@ strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 	zwunlock(sd, pl);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __hot_in mblk_t *
+STATIC streams_noinline streams_fastcall __hot_in mblk_t *
 strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band)
 {				/* IRQ SUPPRESSED */
 	return strgetq(sd, q, flags, band);
@@ -1345,7 +1345,7 @@ strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band)
  *  what we need to do here, so we have to expose the internals of the wait queue implementation
  *  here.
  */
-STATIC streams_fastcall __hot_in mblk_t *
+STATIC streams_noinline streams_fastcall mblk_t *
 strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
@@ -1588,17 +1588,14 @@ strgetfp(struct stdata *sd, queue_t *q)
 	goto error;
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __unlikely mblk_t *
+STATIC streams_noinline streams_fastcall __unlikely mblk_t *
 strgetfp_slow(struct stdata *sd, queue_t *q)
 {
 	return strgetfp(sd, q);
 }
 
 /**
- *  strwaitgetfp: - wait to get a file pointer from a stream ala I_RECVFD
+ *  __strwaitgetfp: - wait to get a file pointer from a stream ala I_RECVFD
  *  @sd: Stream head
  *  @q: queue from which to retrieve
  *
@@ -1613,8 +1610,8 @@ strgetfp_slow(struct stdata *sd, queue_t *q)
  *  what we need to do here, so we have to expose the internals of the wait queue implementation
  *  here.
  */
-STATIC __unlikely mblk_t *
-strwaitgetfp(struct stdata *sd, queue_t *q)
+STATIC streams_fastcall __unlikely mblk_t *
+__strwaitgetfp(struct stdata *sd, queue_t *q)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 	DEFINE_WAIT(wait);
@@ -1661,7 +1658,7 @@ strwaitgetfp(struct stdata *sd, queue_t *q)
 }
 
 STATIC streams_fastcall __unlikely mblk_t *
-strtestgetfp(struct stdata *sd, queue_t *q, const int f_flags)
+strwaitgetfp(struct stdata *sd, queue_t *q, const int f_flags)
 {
 	mblk_t *mp;
 	int err;
@@ -1683,7 +1680,7 @@ strtestgetfp(struct stdata *sd, queue_t *q, const int f_flags)
 	if (signal_pending(current))
 		return ERR_PTR(-ERESTARTSYS);
 
-	return strwaitgetfp(sd, q);
+	return __strwaitgetfp(sd, q);
 }
 
 /**
@@ -1697,7 +1694,7 @@ strtestgetfp(struct stdata *sd, queue_t *q, const int f_flags)
  *
  *  LOCKING: Must be called with a single read lock held on the STREAM head.
  */
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 __strwaitband(struct stdata *sd, int band)
 {
 	/* wait for band to become available */
@@ -1796,7 +1793,7 @@ strwaitband(struct stdata *sd, const int f_flags, const int band, const int flag
  *
  *  LOCKING: call with no locks held.
  */
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 __strwaitopen(struct stdata *sd, const int access)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
@@ -1959,7 +1956,7 @@ strwakeall(struct stdata *sd)
  *  writer of the FIFO.  For efficiency don't call this function when FNDELAY is set, or when
  *  FREAD|FWRITE is set.  Note that we no longer hold the open bit nor hold any locks.
  */
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 __strwaitfifo(struct stdata *sd, const int oflag)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
@@ -2119,7 +2116,7 @@ strwaitclose(struct stdata *sd, int oflag)
  *
  *  LOCKING: call with no locks held.
  */
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
@@ -2213,7 +2210,7 @@ strwakeioctl(struct stdata *sd)
 	srunlock(sd);		/* to balance strwaitioctl */
 }
 
-STATIC streams_fastcall mblk_t *
+STATIC streams_noinline streams_fastcall mblk_t *
 __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
@@ -2340,10 +2337,10 @@ strwakeiocack(struct stdata *sd, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 
-STATIC streams_fastcall int
+STATIC streams_inline streams_fastcall int
 strbcopyin(void __user *from, void *to, size_t len, bool user)
 {				/* PROFILED */
-	if (user)
+	if (likely(user))
 		return strcopyin(from, to, len);
 	bcopy(from, to, len);
 	return (0);
@@ -2986,10 +2983,7 @@ strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 	}
 	return ((ssize_t) size);
 }
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __hot_put ssize_t
+STATIC streams_noinline streams_fastcall __hot_put ssize_t
 strsizecheck_slow(const struct stdata *sd, const msg_type_t type, ssize_t size)
 {				/* PROFILED */
 	return strsizecheck(sd, type, size);
@@ -3137,21 +3131,15 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 			dp = mp;
 			/* copyin can sleep */
 			if (unlikely(clen > 0)) {	/* PROFILED */
-				if (likely(user)) {	/* PROFILED */
-					err = strcopyin(ctlp->buf, dp->b_rptr, clen);
-					if (unlikely(err != 0))
-						break;
-				} else
-					bcopy(ctlp->buf, dp->b_rptr, clen);
+				err = strbcopyin(ctlp->buf, dp->b_rptr, clen, user);
+				if (unlikely(err != 0))
+					break;
 				dp = dp->b_cont;
 			}
 			if (likely(dlen > 0)) {	/* PROFILED */
-				if (likely(user)) {	/* PROFILED */
-					err = strcopyin(datp->buf, dp->b_rptr, dlen);
-					if (unlikely(err != 0))
-						break;
-				} else
-					bcopy(datp->buf, dp->b_rptr, dlen);
+				err = strbcopyin(datp->buf, dp->b_rptr, dlen, user);
+				if (unlikely(err != 0))
+					break;
 				dp = dp->b_cont;
 			}
 			mp->b_band = norm ? band : 0;
@@ -3574,10 +3562,7 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 	return (mask);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall unsigned int
+STATIC streams_noinline streams_fastcall unsigned int
 strpoll_slow(struct file *file, struct poll_table_struct *poll)
 {
 	return strpoll_fast(file, poll);
@@ -4451,10 +4436,7 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	goto error;
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-ssize_t
+STATIC streams_noinline streams_fastcall ssize_t
 strread_slow(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	return strread_fast(file, buf, nbytes, ppos);
@@ -4555,7 +4537,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
  *
  *  LOCKING: Called with a Stream head read lock.  Release it before sleeping.
  */
-streams_fastcall STATIC __unlikely ssize_t
+STATIC streams_noinline streams_fastcall __unlikely ssize_t
 strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 {
 	char fastbuf[FASTBUF];
@@ -4720,10 +4702,7 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	goto error;
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall ssize_t
+STATIC streams_noinline streams_fastcall ssize_t
 strwrite_slow(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	return strwrite_fast(file, buf, nbytes, ppos);
@@ -5123,10 +5102,7 @@ strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	goto error;
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 strputpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
 		int flags)
 {
@@ -5510,10 +5486,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	goto error;
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 strgetpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
 		int __user *bandp, int __user *flagsp)
 {
@@ -5618,7 +5591,7 @@ strpipe(int fds[2])
 /**
  *  stty_tiocgsid:  - get the session id for a controlling terminal
  */
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 tty_tiocgsid(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	if (!test_bit(STRISTTY_BIT, &sd->sd_flag))
@@ -5629,7 +5602,7 @@ tty_tiocgsid(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 tty_tiocgsid32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	/* XXX is (pid_t *) compatible? */
@@ -5640,7 +5613,7 @@ tty_tiocgsid32(const struct file *file, struct stdata *sd, unsigned long arg)
 /*
  *  Get the process group that receives other than %SIGPOLL signals.
  */
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 tty_tiocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
@@ -5663,7 +5636,7 @@ tty_tiocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 tty_tiocgpgrp32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	/* XXX is (pid_t *) compatible? */
@@ -5674,7 +5647,7 @@ tty_tiocgpgrp32(const struct file *file, struct stdata *sd, unsigned long arg)
 /*
  *  Set the process group to receive other than %SIGPOLL signals.
  */
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 tty_tiocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	pid_t pgrp, *valp = (typeof(valp)) arg;
@@ -5703,7 +5676,7 @@ tty_tiocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 tty_tiocspgrp32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	/* XXX is (pid_t *) compatible? */
@@ -5724,7 +5697,7 @@ STATIC int streams_fastcall str_i_atmark(const struct file *file, struct stdata 
  *  with the %ANYMARK flag.  Note that this ioctl is pointless if we cannot read and so FREAD access
  *  is tested in strioctl() with straccess().
  */
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 sock_siocatmark(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
@@ -5735,14 +5708,14 @@ sock_siocatmark(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 sock_siocatmark32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return sock_siocatmark(file, sd, (unsigned long) compat_ptr(arg));
 }
 #endif				/* WITH_32BIT_CONVERSION */
 
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 sock_siocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
@@ -5761,7 +5734,7 @@ sock_siocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 sock_siocgpgrp32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	/* XXX is (pid_t *) compatible? */
@@ -5769,7 +5742,7 @@ sock_siocgpgrp32(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 #endif				/* WITH_32BIT_CONVERSION */
 
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 sock_siocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	pid_t pgrp, *valp = (typeof(valp)) arg;
@@ -5792,7 +5765,7 @@ sock_siocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 sock_siocspgrp32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	/* XXX is (pid_t *) compatible? */
@@ -5800,7 +5773,7 @@ sock_siocspgrp32(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 #endif				/* WITH_32BIT_CONVERSION */
 
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 file_fiogetown(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	if (test_bit(STRISTTY_BIT, &sd->sd_flag))
@@ -5825,7 +5798,7 @@ file_fiogetown(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 file_fiogetown32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	/* XXX is (pid_t *) compatible? */
@@ -5833,7 +5806,7 @@ file_fiogetown32(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 #endif				/* WITH_32BIT_CONVERSION */
 
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 file_fiosetown(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	if (test_bit(STRISTTY_BIT, &sd->sd_flag))
@@ -5859,7 +5832,7 @@ file_fiosetown(struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 file_fiosetown32(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return file_fiosetown(file, sd, (unsigned long) compat_ptr(arg));
@@ -5929,7 +5902,7 @@ file_fiosetown32(struct file *file, struct stdata *sd, unsigned long arg)
  *  from messages being added to or removed from the queue during examination of the messages on the
  *  queue.
  */
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_i_atmark(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	queue_t *q = sd->sd_rq;
@@ -5995,7 +5968,7 @@ str_i_atmark(const struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  Use poll(2) if you want speed.
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_canput(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err = -EINVAL;
@@ -6023,7 +5996,7 @@ str_i_canput(const struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  Use poll(2) if you want speed.
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_ckband(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err = -EINVAL;
@@ -6043,7 +6016,7 @@ str_i_ckband(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (err);
 }
 
-STATIC int
+STATIC streams_noinline int
 __str_i_fdinsert(const struct file *file, struct stdata *sd, struct strfdinsert *fdi)
 {
 	t_uscalar_t token = 0;
@@ -6141,7 +6114,7 @@ __str_i_fdinsert(const struct file *file, struct stdata *sd, struct strfdinsert 
  *
  *  Rarely used, doesn't have to bee too fast.
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strfdinsert fdi;
@@ -6161,7 +6134,7 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_fdinsert32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strfdinsert fdi;
@@ -6204,7 +6177,7 @@ str_i_fdinsert32(const struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  ACCESS: Don't care about STRHUP, STRDERR or STWRERR.
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	char name[FMNAMESZ + 1];
@@ -6231,7 +6204,7 @@ str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_find32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_find(file, sd, (unsigned long) compat_ptr(arg));
@@ -6244,7 +6217,7 @@ str_i_find32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct bandinfo bi;
@@ -6285,7 +6258,7 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_flushband32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_flushband(file, sd, (unsigned long) compat_ptr(arg));
@@ -6307,7 +6280,7 @@ str_i_flushband32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  flag when replying downstream with a M_FLUSH that arrived on the read side.  This helps with
  *  STREAMS-based pipes whose other STREAM head will not reply with the M_FLUSH if we set it now.
  */
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	mblk_t *mp;
@@ -6347,7 +6320,7 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	queue_t *q = sd->sd_rq;
@@ -6380,7 +6353,7 @@ str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_getband32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_getband(file, sd, (unsigned long) compat_ptr(arg));
@@ -6393,7 +6366,7 @@ str_i_getband32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_getcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
@@ -6408,7 +6381,7 @@ str_i_getcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_getcltime32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_getcltime(file, sd, (unsigned long) compat_ptr(arg));
@@ -6421,7 +6394,7 @@ str_i_getcltime32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_setcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int closetime;
@@ -6439,7 +6412,7 @@ str_i_setcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_setcltime32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_setcltime(file, sd, (unsigned long) compat_ptr(arg));
@@ -6456,7 +6429,7 @@ str_i_setcltime32(const struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  ACCESS: Ignore STRHUP, STRDERR, STWRERR.
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int flags;
@@ -6484,7 +6457,7 @@ str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_getsig32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	uint8_t byte;
@@ -6512,7 +6485,7 @@ str_i_getsig32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  %I_SETSIG only affects the calling process, thus controlling terminal restrictions do not apply
  *  (i.e. FEXCL is not set).
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_setsig(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	uint32_t flags = arg;
@@ -6541,7 +6514,7 @@ str_i_setsig(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_grdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int32_t rdopt;
@@ -6560,7 +6533,7 @@ str_i_grdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_grdopt32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_grdopt(file, sd, (unsigned long) compat_ptr(arg));
@@ -6600,7 +6573,7 @@ str_i_grdopt32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  RNORM and either RMSGD or RMSGN will result in the other flag overriding RNORM which is the
  *  default (and has the value zero).
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_srdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	uint32_t rdopt = arg;
@@ -6646,7 +6619,7 @@ str_i_srdopt(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_gwropt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int32_t wropt;
@@ -6665,7 +6638,7 @@ str_i_gwropt(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_gwropt32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_gwropt(file, sd, (unsigned long) compat_ptr(arg));
@@ -6682,7 +6655,7 @@ str_i_gwropt32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  implementation will not return %EINVAL as proscribed by POSIX when @arg includes either %SNDPIPE
  *  or %SNDHOLD or both.  Portable programs will not rely on negative behavior.
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_swropt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int32_t wropt = arg;
@@ -6738,7 +6711,7 @@ extern struct fmodsw sth_fmod;
  *  ACCESS: Errors on STRHUP, STRDERR, STWRERR, STPLEX, STRCLOSE, also if controlling tty and
  *  attempted from a background process.
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, const unsigned int cmd,
 	    const uint model)
 {
@@ -6997,7 +6970,7 @@ str_i_plink32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  proceedure will stop at the failed unlinking and return the error code for the failure.  It may
  *  take a subsequent MUXID_ALL call to complete the job.
  */
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const unsigned int cmd,
 	      const uint model)
 {
@@ -7147,7 +7120,7 @@ str_i_punlink32(struct file *file, struct stdata *sd, unsigned long arg)
  *  pop modules from the STREAM.  It should not be relied upon otherwise.  The list is accurate for
  *  the moment that the list was compiled.
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_list(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 #define STR_MLIST_FAST 8
@@ -7216,7 +7189,7 @@ str_i_list(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_list32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_list(file, sd, (unsigned long) compat_ptr(arg));
@@ -7229,7 +7202,7 @@ str_i_list32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_look(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	char fmname[FMNAMESZ + 1];
@@ -7249,7 +7222,7 @@ str_i_look(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_look32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_look(file, sd, (unsigned long) compat_ptr(arg));
@@ -7262,7 +7235,7 @@ str_i_look32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_i_nread(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err, msgs;
@@ -7286,14 +7259,14 @@ str_i_nread(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_nread32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_nread(file, sd, (unsigned long) compat_ptr(arg));
 }
 #endif				/* WITH_32BIT_CONVERSION */
 
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 __str_i_peek(const struct file *file, struct stdata *sd, struct strpeek *sp)
 {
 	int err, rtn = 0;
@@ -7394,7 +7367,7 @@ __str_i_peek(const struct file *file, struct stdata *sd, struct strpeek *sp)
  *
  *  FIXME: This is a tough one.  Rework this code.
  */
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err, rtn;
@@ -7428,7 +7401,7 @@ str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_peek32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strpeek sp;
@@ -7488,7 +7461,7 @@ str_i_peek32(const struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  Also, any error returned by the module's qi_qopen procedure can also be returned.
  */
-STATIC int
+STATIC streams_noinline  streams_fastcall int
 str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	char name[FMNAMESZ + 1];
@@ -7577,7 +7550,7 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_push32(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_push(file, sd, (unsigned long) compat_ptr(arg));
@@ -7599,7 +7572,7 @@ str_i_push32(struct file *file, struct stdata *sd, unsigned long arg)
  *  [EPERM]	only anchored modules exist and the called does not have adequate privilege to pop
  *		further modules.
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_pop(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
@@ -7669,7 +7642,7 @@ freefd_func(caddr_t arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct stdata *s2;
@@ -7756,7 +7729,7 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head of current open stream
  *  @sr: pointer to an kernel resident strrecvfd structure
  */
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
 {
 	int fd, err;
@@ -7766,7 +7739,7 @@ __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
 		mblk_t *mp = NULL;
 
 		if (!(err = straccess_rlock(sd, (FREAD | FEXCL | FNDELAY)))) {
-			if (IS_ERR(mp = strtestgetfp(sd, q, file->f_flags)))
+			if (IS_ERR(mp = strwaitgetfp(sd, q, file->f_flags)))
 				err = PTR_ERR(mp);
 			srunlock(sd);
 		}
@@ -7803,10 +7776,10 @@ __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
  *
  *  NOTICES: POSIX (and UnixWare) says to return ENXIO if the Stream is hung up, but we don't
  *  initially.  We will attempt to read the queue while STRHUP is set.  Once the queue is empty and
- *  the Stream is hung up, strtestgetfp() will return -ESTRPIPE that we convert into ENXIO.  This is
+ *  the Stream is hung up, strwaitgetfp() will return -ESTRPIPE that we convert into ENXIO.  This is
  *  consistent with read() and getpmsg() behavior and makes sense here.
  */
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strrecvfd sr;
@@ -7839,7 +7812,7 @@ str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_recvfd32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strrecvfd32 sr32;
@@ -7933,7 +7906,7 @@ str_i_recvfd32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  positive or negative acknowledgement message, in the event the ioctl() command sent downstream
  *  fails.  For these cases, %I_STR shall fail with errno(3) set to the value in the message.
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_str(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strioctl ic;
@@ -7973,7 +7946,7 @@ str_i_str(const struct file *file, struct stdata *sd, unsigned long arg)
  *  or, perhaps, some mechanism (e.g. flag) in the iocblk structure to permit us to indicate to the
  *  module or driver whether the control was a 32-bit or 64-bit call.
  */
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_str32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strioctl32 ic32;
@@ -8015,7 +7988,7 @@ str_i_str32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head of the open stream
  *  @arg: ioctl argument, pointer to an integer to contain the returned error options
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_gerropt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int eropt;
@@ -8034,7 +8007,7 @@ str_i_gerropt(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_gerropt32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_gerropt(file, sd, (unsigned long) compat_ptr(arg));
@@ -8047,7 +8020,7 @@ str_i_gerropt32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head of the open stream
  *  @arg: ioctl argument, integer error options to set
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_serropt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int eropt = arg;
@@ -8069,7 +8042,7 @@ str_i_serropt(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head of the open stream
  *  @arg: ioctl argument, integer index at which point to position anchor
  */
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_anchor(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
@@ -8170,7 +8143,7 @@ str_i_putpmsg32(struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: a pointer to a character string describing the path
  */
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_fattach(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	char path[256];
@@ -8188,7 +8161,7 @@ str_i_fattach(struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_fattach32(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_fattach(file, sd, (unsigned long) compat_ptr(arg));
@@ -8203,7 +8176,7 @@ str_i_fattach32(struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  Note the file and stream are unimportant.  This is a system call emulation.
  */
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_fdetach(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	char path[256];
@@ -8216,7 +8189,7 @@ str_i_fdetach(struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_fdetach32(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_fdetach(file, sd, (unsigned long) compat_ptr(arg));
@@ -8229,7 +8202,7 @@ str_i_fdetach32(struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ignored
  */
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_isastream(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return (1);
@@ -8244,7 +8217,7 @@ str_i_isastream(struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  Note the file and stream are unimportant.  This is a system call emulation.
  */
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int fds[2];
@@ -8268,7 +8241,7 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
  *  This is done a little different.  Open up one pipe device (/dev/sfx) another pipe device and
  *  then do ioctl(fd1, I_PIPE, fd2) to link them together into a bidirectional pipe.
  */
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
@@ -8325,14 +8298,14 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 #endif
 
 #ifdef WITH_32BIT_CONVERSION
-STATIC __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_i_pipe32(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_pipe(file, sd, (unsigned long) compat_ptr(arg));
 }
 #endif				/* WITH_32BIT_CONVERSION */
 
-STATIC int
+STATIC streams_noinline streams_fastcall int
 str_i_default(const struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg,
 	      size_t len, int access, const uint model)
 {
@@ -8370,7 +8343,7 @@ str_i_default(const struct file *file, struct stdata *sd, unsigned int cmd, unsi
  *  2.6.11+ kernels.  Unfortunately, the RHAS4 kernels are 2.6.9 kernels (yuck).
  */
 
-STATIC streams_fastcall __hot int
+STATIC streams_noinline streams_fastcall __hot int
 strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct stdata *sd = stri_lookup(file);
@@ -9296,10 +9269,7 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 	return (err);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __hot int
+STATIC streams_noinline streams_fastcall __hot int
 strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	return strioctl_fast(file, cmd, arg);
@@ -9313,7 +9283,7 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 EXPORT_SYMBOL_NOVERS(strioctl);
 
-STATIC __hot long
+STATIC streams_noinline __hot long
 _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct stdata *sd;
@@ -9402,7 +9372,7 @@ STATIC struct rw_semaphore *ioctl32_sem_addr = (struct rw_semaphore *) HAVE_IOCT
 #else
 #define IOCTL_HASHSIZE 1024
 #endif
-static inline int
+static inline streams_fastcall int
 ioctl32_hash(unsigned int cmd)
 {
 	return ((cmd >> 6) ^ (cmd >> 4) ^ cmd) % IOCTL_HASHSIZE;
@@ -9859,7 +9829,7 @@ strwsrv(queue_t *q)
  *  =========================================================================
  */
 
-STATIC streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_DATA, M_PROTO, M_PCPROTO, M_PASSFP -- after checking the message type, the 
@@ -9908,19 +9878,8 @@ str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 #endif
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall int
-str_m_data_slow(struct stdata *sd, queue_t *q, mblk_t *mp)
-{
-	return str_m_data(sd, q, mp);
-}
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* Notes: OpenSolaris has this RFLUSHPCPROT read option to not flush M_PCPROTO messages
@@ -9985,10 +9944,7 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 #define WERRMASK (WERRNORM|WERRNONPERSIST)
 #endif
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	struct stroptions *so = (typeof(so)) mp->b_rptr;
@@ -10056,10 +10012,7 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	unsigned long pl;
@@ -10080,20 +10033,14 @@ str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_m_pcsig(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	strsignal(sd, mp);
 	return (0);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_m_error(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_ERROR -- when this message type is received, the first byte of the message 
@@ -10164,10 +10111,7 @@ str_m_error(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_m_hangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_HANGUP -- if this message is received, the stream head is marked hung up.
@@ -10190,10 +10134,7 @@ str_m_hangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_m_unhangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 #if 0
@@ -10206,10 +10147,7 @@ str_m_unhangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	if (!ctrace(strwakeiocack(sd, mp))) {
@@ -10230,10 +10168,7 @@ str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_m_ioc(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	if (!ctrace(strwakeiocack(sd, mp)))
@@ -10241,10 +10176,7 @@ str_m_ioc(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_m_ioctl(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_IOCTL -- It does not make sense to receive on of these messages at the
@@ -10268,10 +10200,7 @@ str_m_ioctl(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_m_letsplay(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	struct strlp *lp = (typeof(lp)) mp->b_rptr;
@@ -10292,10 +10221,7 @@ str_m_letsplay(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- * Note: non-static so that -finline-functions-called-once is not considered.
- */
-streams_fastcall __unlikely int
+STATIC streams_noinline streams_fastcall __unlikely int
 str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* Other messages are silently discarded */
@@ -10342,6 +10268,7 @@ strrput(queue_t *q, mblk_t *mp)
 
 	/* data fast path */
 	if (likely(((db_type = mp->b_datap->db_type) & ~1) == 0))	/* PROFILED */
+	      m_data:
 		return str_m_data(sd, q, mp);
 
 	switch (db_type) {
@@ -10349,8 +10276,7 @@ strrput(queue_t *q, mblk_t *mp)
 	case M_PROTO:		/* bi - protocol info */
 	case M_PASSFP:		/* bi - pass file pointer */
 		printd(("%s: got M_DATA, M_PROTO or M_PASSFP\n", __FUNCTION__));
-		err = str_m_data_slow(sd, q, mp);
-		break;
+		goto m_data;
 	case M_PCPROTO:	/* bi - protocol info */
 		printd(("%s: got M_PCPROTO\n", __FUNCTION__));
 		err = str_m_pcproto(sd, q, mp);

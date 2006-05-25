@@ -2,14 +2,14 @@ SECTIONS
 {
 	.text :
 	{
-		*(.text.hot.put)
-		*(.text.hot.write)
-		*(.text.hot.out)
-		*(.text.hot)
-		*(.text.hot.in)
-		*(.text.hot.read)
-		*(.text.hot.get)
+		*(.streams.hot.put)
+		*(.streams.hot.write)
+		*(.streams.hot.out)
+		*(.streams.hot)
+		*(.streams.hot.in)
+		*(.streams.hot.read)
+		*(.streams.hot.get)
 		*(.text)
-		*(.text.unlikely)
+		*(.streams.unlikely)
 	}
 }

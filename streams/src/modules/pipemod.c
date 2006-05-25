@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 09:48:03 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/05/25 08:30:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:03 $ by $Author: brian $
+ Last Modified $Date: 2006/05/25 08:30:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 09:48:03 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/05/25 08:30:45 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 09:48:03 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/05/25 08:30:45 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 09:48:03 $"
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/05/25 08:30:45 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -145,7 +145,7 @@ static struct module_info pipemod_minfo = {
 static streamscall int
 pipemod_put(queue_t *q, mblk_t *mp)
 {
-	if (mp->b_datap->db_type == M_FLUSH) {
+	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
 		switch (mp->b_rptr[0] & (FLUSHR | FLUSHW)) {
 		case FLUSHR:
 			mp->b_rptr[0] &= ~FLUSHR;
