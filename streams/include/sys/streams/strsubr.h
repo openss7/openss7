@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.68 2006/05/22 02:09:05 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.69 2006/05/29 08:52:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/22 02:09:05 $ by $Author: brian $
+ Last Modified $Date: 2006/05/29 08:52:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.69  2006/05/29 08:52:58  brian
+ - started zero copy architecture
+
  Revision 0.9.2.68  2006/05/22 02:09:05  brian
  - changes from performance testing
 
@@ -63,7 +66,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.68 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.69 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -218,6 +221,7 @@ struct stdata {
 	pid_t sd_session;		/* controlling session id */
 	pid_t sd_pgrp;			/* foreground process group */
 	ushort sd_wroff;		/* write offset */
+	ushort sd_wrpad;		/* write padding */
 	unsigned char sd_band;		/* highest blocked band */
 	ssize_t sd_minpsz;		/* cached sd_wq->q_next->q_minpsz */
 	ssize_t sd_maxpsz;		/* cached sd_wq->q_next->q_maxpsz */
@@ -306,6 +310,8 @@ enum {
 	STRISPIPE_BIT,
 	STRISSOCK_BIT,
 	STRMOUNT_BIT,
+	STRCSUM_BIT,
+	STRCRC32C_BIT,
 };
 
 #define IOCWAIT	    (1<<IOCWAIT_BIT)	/* ioctl in progress */
@@ -329,6 +335,9 @@ enum {
 #define STRISPIPE   (1<<STRISPIPE_BIT)	/* stream is a STREAMS pipe */
 #define STRISSOCK   (1<<STRISSOCK_BIT)	/* stream is a STREAMS socket */
 #define STRMOUNT    (1<<STRMOUNT_BIT)	/* stream head is fattached */
+#define STRCSUM	    (1<<STRCSUM_BIT)	/* checksum on copyin for write (UDP/TCP) */
+#define STRCRC32C   (1<<STRCRC32C_BIT)	/* checksum on copyin for write (CRC32C) */
+
 
 /* unfortunately AIX appears to mix read and write option flags with stream head flags */
 #if 0				/* AIX compatible flags */
@@ -491,6 +500,7 @@ enum {
 #define QU_QSYNCH   (1 << QU_QSYNCH_BIT)
 
 /* 12 extra bytes on 32-bit, 24 extra on 64-bit */
+/* additional 8 bytes on 32-bit, 16 on 64-bit, debug mode */
 struct mbinfo {
 	mblk_t m_mblock;
 	void (*m_func) (void);		/* allocating function SVR4 compatible */
@@ -500,6 +510,7 @@ struct mbinfo {
 	struct list_head m_list;
 #endif
 };
+/* additional 8 bytes on 32-bit, 16 on 64-bit, debug mode */
 struct dbinfo {
 	dblk_t d_dblock;
 #if defined CONFIG_STREAMS_DEBUG
@@ -578,10 +589,10 @@ struct mdlinfo {
 #define was128	(32*sizeof(ulong))
 #define HDRSZ	(sizeof(struct mbinfo)+sizeof(struct dbinfo))
 #define BUFSZ	(was128-HDRSZ)
-#define FASTBUF ((BUFSZ >= 128) ? 128 : ((BUFSZ >= 64) ? 64 : 32))
-/* 128 - (28 + 12) - 20 = 60 => 64 bytes fastbuf on 32-bit (32 butes in debug mode) */
-/* 256 - (52 + 24) - 36 = 144 => 128 bytes fastbuf on 64-bit (104 => 64 bytes in debug mode) */
-/* having a bunch more for 64-bit is a good idea because elements of M_PROTO blocks will be larger
+#define FASTBUF ((BUFSZ >= 128) ? 128 : ((BUFSZ >= 96) ? 96 : ((BUFSZ >= 64) ? 64 : 32)))
+/* 128 - 32 - (12 + 20) = 64 => 64 bytes fastbuf on 32-bit (48 => 32 bytes in debug mode) */
+/* 256 - 64 - (24 + 32) = 136 => 128 bytes fastbuf on 64-bit (104 => 96 bytes in debug mode) */
+/* having a bunch more for 64-bit is a good idea because elements of M_PROTO blocks could be larger
    as well. */
 
 struct mdbblock {

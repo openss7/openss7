@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/02/20 10:59:21 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/05/29 08:53:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:21 $ by $Author: brian $
+ Last Modified $Date: 2006/05/29 08:53:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strprocfs.c,v $
+ Revision 0.9.2.51  2006/05/29 08:53:00  brian
+ - started zero copy architecture
+
  Revision 0.9.2.50  2006/02/20 10:59:21  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/02/20 10:59:21 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/05/29 08:53:00 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/02/20 10:59:21 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/05/29 08:53:00 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -649,6 +652,7 @@ get_streams_stdata_hdr(char *page, int maxlen)
 	len += snprintf(page + len, maxlen - len, ", sd_session");
 	len += snprintf(page + len, maxlen - len, ", sd_pgrp");
 	len += snprintf(page + len, maxlen - len, ", sd_wroff");
+	len += snprintf(page + len, maxlen - len, ", sd_wrpad");
 	len += snprintf(page + len, maxlen - len, ", sd_rerror");
 	len += snprintf(page + len, maxlen - len, ", sd_werror");
 	len += snprintf(page + len, maxlen - len, ", sd_opens");
@@ -698,6 +702,7 @@ get_streams_stdata(char *page, int maxlen, struct stdata *sd)
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_session);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_pgrp);
 	len += snprintf(page + len, maxlen - len, ", %hu", sd->sd_wroff);
+	len += snprintf(page + len, maxlen - len, ", %hu", sd->sd_wrpad);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_rerror);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_werror);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_opens);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/25 08:39:11 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/05/29 08:53:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/25 08:39:11 $ by $Author: brian $
+ Last Modified $Date: 2006/05/29 08:53:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.25  2006/05/29 08:53:07  brian
+ - started zero copy architecture
+
  Revision 0.9.2.24  2006/05/25 08:39:11  brian
  - added noinline in strategic places
 
@@ -124,10 +127,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/25 08:39:11 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/05/29 08:53:07 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/25 08:39:11 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/05/29 08:53:07 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -204,7 +207,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/25 08:39:11 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/05/29 08:53:07 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -3673,6 +3676,66 @@ tp_destructor(struct sk_buff *skb)
 		tp_release(&tp);
 	}
 }
+
+#if 0
+/**
+ * tp_alloc_skb - allocate a socket buffer from a message block
+ * @mp: the message block
+ *
+ * Description: this function is used for zero-copy allocation of a socket buffer from a message
+ * block.  The socket buffer contains all of the data in the message block including any head or
+ * tail room (db_base to db_lim).  The data portion of the socket buffer contains the data
+ * referenced by the message block (b_rptr to b_wptr).  A destructor is used to to free the message
+ * block when the socket buffer is freed.  The reference to the message block is consumed unless the
+ * function returns NULL.
+ */
+struct sk_buff *
+tp_alloc_skb(mblk_t *mp)
+{
+	struct sk_buff *skb;
+	unsigned char *end;
+
+	/* first, check if there is enough tail room in the data block for the skb_shared_info
+	   structure. */
+	end = (mp->b_wptr + (SMP_CACHE_BYTES - 1)) & ~(SMP_CACHE_BYTES - 1);
+	if (end + sizeof(struct skb_shared_info) > mp->b_datap->db_lim) {
+		/* No, there is not enough tail room: allocate a new buffer and copy. */
+		unsigned int tsize = mp->b_wptr - mp->b_datap->db_base;
+
+		if (likely((skb = alloc_skb(tsize, GFP_ATOMIC)) != NULL)) {
+			unsigned int bsize = mp->b_wptr - mp->b_rptr;
+			unsigned int hsize = tsize - bsize;
+
+			skb->data += hsize;
+			skb->tail += hsize + bsize;
+			bcopy(mp->b_rptr, skb->data, bsize);
+		}
+	} else {
+		/* Yes, there is enough tail room: allocate a socket buffer header and point to the
+		   data. */
+		if (likely((skb = kmem_cache_alloc(skbuff_head_cache, GFP_ATOMIC)) != NULL)) {
+			memset(skb, 0, offsetof(struct sk_buff, truesize));
+			skb->truesize = end - mp->b_datap->db_base + sizeof(struct sk_buff);
+			atomic_set(&skb->users, 1);
+			skb->head = mp->b_datap->db_base;
+			skb->data = mp->b_rptr;
+			skb->tail = mp->b_wptr;
+			skb->end = end;
+			skb->len = mp->b_wptr - mp->b_rptr;
+			/* other stuff for 2.4 */
+			skb->cloned = 0;
+			skb->data_len = 0;
+			/* initialize shared data structure */
+			memset(&skb_shinfo(skb), 0, sizeof(struct skb_shared_info));
+			atomic_set(&(skb_shinfo(skb)->dataref), 1);
+			/* do not attempt to free buffer */
+			skb->cloned = 1;
+			skb->destructor = tp_destructor;
+		}
+	}
+	return (skb);
+}
+#endif
 
 /**
  * tp_senddata - process a unit data request

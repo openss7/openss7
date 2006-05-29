@@ -1,3 +1,35 @@
+2006-05-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c: roughing in zero-copy architecture
+
+2006-05-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/sys/streams/stream.h:
+
+	  - added b_csum to mblk_t 
+	  - defined MSGCSUM and MSGCRC32C flags 
+	  - defined SO_WRPAD, SO_NOCSUM, SO_CSUM, SO_CRC32C flags for M_SETOPTS.
+
+	* include/sys/streams/strsubr.h:
+
+	  - added sd_wrpad member to stream head just after sd_wroff.
+	  - defined STRCSUM_BIT, STRCSUM, STRCRC32C_BIT, STRCRC32 flags for
+	    stream head.
+
+	* src/kernel/strprocfs.c:
+	  
+	  - added sd_wrpad member to stream head structure
+
+	* src/modules/sth.c:
+
+	  - added strdsize() function to pad as well as offset writes
+	  - added new so_wrpad, SO_WRPAD, SO_NOCSUM, SO_CSUM, SO_CRC32C
+	    handling.
+
+	* src/util/sysconfig/streams.conf:
+
+	  - changed streams.strthresh from 1Meg to 16Meg.
+
 2006-05-25  Brian Bidulock  <bidulock@openss7.org>
 
 	- More on the compiler saga: it seems that compilers past 3.1 inline

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.83 2006/05/23 10:39:40 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.84 2006/05/29 08:52:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 10:39:40 $ by $Author: brian $
+ Last Modified $Date: 2006/05/29 08:52:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.84  2006/05/29 08:52:58  brian
+ - started zero copy architecture
+
  Revision 0.9.2.83  2006/05/23 10:39:40  brian
  - marked normally inline functions for unlikely text section
 
@@ -68,7 +71,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.83 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.84 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -200,7 +203,7 @@ typedef struct free_rtn {
 	caddr_t free_arg;
 } frtn_t;
 
-/* 20 bytes on 32 bit, 36 on 64 bit */
+/* 20 bytes on 32 bit, 32 on 64 bit */
 typedef struct datab {
 	union {
 		struct datab *freep;
@@ -305,7 +308,7 @@ typedef enum msg_type {
 	M_CLOSE_REPL = 0x9c,		/* v H(0x95) */
 } msg_type_t;
 
-/* 32 bytes on 32 bit, 60 on 64 bit */
+/* 32 bytes on 32 bit, 64 on 64 bit */
 typedef struct msgb {
 	struct msgb *b_next;		/* next msgb on queue */
 	struct msgb *b_prev;		/* prev msgb on queue */
@@ -316,21 +319,22 @@ typedef struct msgb {
 	unsigned char b_band;		/* band of this message */
 	unsigned char b_pad1;		/* padding */
 	unsigned short b_flag;		/* message flags */
-#if 0
-	long b_pad2;			/* padding */
-#endif
+	unsigned char b_pad2[sizeof(ulong) - 4];	/* padding */
+	long b_csum;			/* checksum */
 } mblk_t;
 
-#define MSGMARK		(1<<0)	/* last byte of message is marked */
-#define MSGNOLOOP	(1<<1)	/* don't loop mesage at stream head */
-#define MSGDELIM	(1<<2)	/* message is delimited */
-#define MSGNOGET	(1<<3)	/* UnixWare/Solaris/Mac OT/ UXP/V getq does not return message */
-#define MSGATTEN	(1<<4)	/* UXP/V attention to on read side */
-#define MSGMARKNEXT	(1<<4)	/* Solaris */
-#define MSGLOG		(1<<4)	/* UnixWare */
-#define MSGNOTMARKNEXT	(1<<5)	/* Solaris */
-#define MSGCOMPRESS	(1<<8)	/* OSF: compress like messages as space allows */
-#define MSGNOTIFY	(1<<9)	/* OSF: notify when message consumed */
+#define MSGMARK		(1<< 0)	/* last byte of message is marked */
+#define MSGNOLOOP	(1<< 1)	/* don't loop mesage at stream head */
+#define MSGDELIM	(1<< 2)	/* message is delimited */
+#define MSGNOGET	(1<< 3)	/* UnixWare/Solaris/Mac OT/ UXP/V getq does not return message */
+#define MSGATTEN	(1<< 4)	/* UXP/V attention to on read side */
+#define MSGMARKNEXT	(1<< 4)	/* Solaris */
+#define MSGLOG		(1<< 4)	/* UnixWare */
+#define MSGNOTMARKNEXT	(1<< 5)	/* Solaris */
+#define MSGCOMPRESS	(1<< 8)	/* OSF: compress like messages as space allows */
+#define MSGNOTIFY	(1<< 9)	/* OSF: notify when message consumed */
+#define MSGCSUM		(1<<10) /* LfS: UDP/TCP partial checksum was performed on copyin */
+#define MSGCRC32C	(1<<11) /* LfS: CRC32C partial checksum was performed on copyin */
 
 #define NOERROR		(-1)	/* UnixWare, OSF, HP-UX */
 #define TRANSPARENT	(-1)
@@ -356,6 +360,7 @@ struct stroptions {
 	ushort so_erropt;		/* Solaris */
 	ssize_t so_maxblk;		/* Solaris */
 	ushort so_copyopt;		/* Solaris */
+	ushort so_wrpad;		/* write (tail) padding */
 };
 
 #define INFPSZ		( -1UL)	/* infinite packet size */
@@ -386,6 +391,10 @@ struct stroptions {
 #define SO_MAXBLK	(1<<20)	/* Solaris: maximum block size */
 #define SO_COWENABLE	(1<<21)	/* OSF/HPUX (1<<14) */
 #define SO_COWDISABLE	(1<<22)	/* OSF/HPUX (1<<15) */
+#define SO_WRPAD	(1<<23)	/* LfS: write tail padding */
+#define SO_NOCSUM	(1<<24) /* LfS: no checksum on copy */
+#define SO_CSUM		(1<<25) /* LfS: UDP/TCP checksum on copy */
+#define SO_CRC32C	(1<<26) /* LfS: SCTP CRC32C checksum on copy */
 
 #define DEF_IOV_MAX	16	/* Solaris */
 
