@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/25 08:39:10 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/31 10:27:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/25 08:39:10 $ by $Author: brian $
+ Last Modified $Date: 2006/05/31 10:27:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.24  2006/05/31 10:27:42  brian
+ - working up zero-copy
+
  Revision 0.9.2.23  2006/05/25 08:39:10  brian
  - added noinline in strategic places
 
@@ -121,10 +124,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/25 08:39:10 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/31 10:27:42 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/25 08:39:10 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/31 10:27:42 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -200,7 +203,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/25 08:39:10 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/31 10:27:42 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -406,10 +409,10 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 
 #define xti_default_debug		{ 0, }
 #define xti_default_linger		(struct t_linger){T_YES, 120}
-#define xti_default_rcvbuf		SK_RMEM_MAX
+#define xti_default_rcvbuf		(SK_RMEM_MAX << 1)
 #define xti_default_rcvlowat		1
-#define xti_default_sndbuf		SK_WMEM_MAX
-#define xti_default_sndlowat		(SK_WMEM_MAX >> 1)
+#define xti_default_sndbuf		(SK_WMEM_MAX << 1)
+#define xti_default_sndlowat		SK_WMEM_MAX
 #define xti_default_priority		0
 
 #define ip_default_protocol		17
@@ -424,7 +427,7 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 #define ip_default_daddr		INADDR_ANY
 #define ip_default_mtu			536
 
-#define udp_default_checksum		T_NO
+#define udp_default_checksum		T_YES
 
 enum {
 	_T_BIT_XTI_DEBUG = 0,
@@ -2070,7 +2073,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->name = XTI_RCVBUF;
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.xti.rcvbuf;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.xti.rcvbuf >> 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -3623,7 +3626,7 @@ tp_senddata(struct tp *tp, struct tp_options *opt, mblk_t *mp)
 {
 	struct rtable *rt = NULL;
 
-	/* allows slop over by 1 buffer */
+	/* Allows slop over by 1 buffer per processor. */
 	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
 		goto ebusy;
 
@@ -3645,7 +3648,7 @@ tp_senddata(struct tp *tp, struct tp_options *opt, mblk_t *mp)
 			struct iphdr *iph;
 			unsigned char *data;
 
-			skb->sk = (struct sock *) tp_get(tp); /* borrow sk pointer */
+			skb->sk = (struct sock *) tp_get(tp);	/* borrow sk pointer */
 			skb->destructor = tp_destructor;
 			spin_lock_bh(&tp->qlock);
 			tp->sndmem += skb->truesize;
@@ -6119,7 +6122,7 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	}
 	if (dp != NULL) {
 		err = TBADDATA;
-		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.CDATA_size))
+		if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.CDATA_size))
 			goto error;
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
@@ -6214,7 +6217,7 @@ te_conn_res(queue_t *q, mblk_t *mp)
 	}
 	err = TBADDATA;
 	if ((dp = mp->b_cont))
-		if (unlikely((dlen = msgsize(dp)) == 0 || dlen > tp->info.CDATA_size))
+		if (unlikely((dlen = msgdsize(dp)) == 0 || dlen > tp->info.CDATA_size))
 			goto error;
 	err = TBADSEQ;
 	if (unlikely(p->SEQ_number == 0))
@@ -6320,7 +6323,7 @@ te_discon_req(queue_t *q, mblk_t *mp)
 #endif
 	err = TBADDATA;
 	if ((dp = mp->b_cont) != NULL)
-		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
+		if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
 			goto error;
 	state = tp_get_state(tp);
 	err = TBADSEQ;
@@ -6398,7 +6401,7 @@ te_write_req(queue_t *q, mblk_t *mp)
 	   Stream is bound to a port, at least the size of a UDP header.  The length of the entire
 	   TSDU must not exceed 65535 bytes. */
 	err = TBADDATA;
-	if (unlikely((dlen = msgsize(mp)) == 0
+	if (unlikely((dlen = msgdsize(mp)) == 0
 		     || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
 	if (unlikely((err = tp_senddata(tp, &tp->options, mp)) < 0))
@@ -6459,7 +6462,7 @@ te_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
 	if (unlikely
-	    ((dlen = msgsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
+	    ((dlen = msgdsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
 	if (unlikely((err = tp_senddata(tp, &tp->options, dp)) < 0))
 		goto error;
@@ -6507,7 +6510,7 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	dlen = msgsize(dp);
+	dlen = msgdsize(dp);
 	if (unlikely(dlen == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
 		goto error;
 	err = tp_senddata(tp, &tp->options, dp);
@@ -6559,7 +6562,7 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > tp->info.TSDU_size))
+	if (unlikely((mlen = msgdsize(dp)) == 0 || mlen > tp->info.TSDU_size))
 		goto error;
 	opts = tp->options;
 	opts.flags[0] = 0;
@@ -7421,9 +7424,9 @@ tp_v4_rcv(struct sk_buff *skb)
 
 //      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 
-	if (!pskb_may_pull(skb, 4))
+	if (unlikely(!pskb_may_pull(skb, 4)))
 		goto too_small;
-	if (skb->pkt_type != PACKET_HOST)
+	if (unlikely(skb->pkt_type != PACKET_HOST))
 		goto bad_pkt_type;
 	rt = (struct rtable *) skb->dst;
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
@@ -7432,7 +7435,7 @@ tp_v4_rcv(struct sk_buff *skb)
 	printd(("%s: %s: packet received %p\n", DRV_NAME, __FUNCTION__, skb));
 //      UDP_INC_STATS_BH(UdpInDatagrams);
 	/* we do the lookup before the checksum */
-	if ((tp = tp_lookup(iph, uh)) == NULL)
+	if (unlikely((tp = tp_lookup(iph, uh)) == NULL))
 		goto no_stream;
 
 	/* TODO: for 2.4 we overwrite iph->protocol to steal the packet.  This means that we loose
@@ -7447,7 +7450,7 @@ tp_v4_rcv(struct sk_buff *skb)
 	/* For now... We should actually place non-linear fragments into separate mblks and pass
 	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
 	   netfilter hooks linearize anyway. */
-	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
+	if (unlikely(skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0))
 		goto linear_fail;
 	/* Before passing the message up, check that there is room in the receive buffer.  Allows
 	   slop over by 1 buffer per processor. */
@@ -7634,10 +7637,10 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		bufq_init(&tp->conq);
 		/* option defaults */
 		tp->options.xti.linger = xti_default_linger;
-		tp->options.xti.rcvbuf = sysctl_rmem_default;
+		tp->options.xti.rcvbuf = sysctl_rmem_default << 1;
 		tp->options.xti.rcvlowat = xti_default_rcvlowat;
-		tp->options.xti.sndbuf = sysctl_wmem_default;
-		tp->options.xti.sndlowat = sysctl_wmem_default >> 1;
+		tp->options.xti.sndbuf = sysctl_wmem_default << 1;
+		tp->options.xti.sndlowat = 16768;
 		tp->options.xti.priority = xti_default_priority;
 		tp->options.ip.protocol = ip_default_protocol;
 		tp->options.ip.tos = ip_default_tos;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/05/29 08:53:07 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/31 10:27:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/29 08:53:07 $ by $Author: brian $
+ Last Modified $Date: 2006/05/31 10:27:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.26  2006/05/31 10:27:40  brian
+ - working up zero-copy
+
  Revision 0.9.2.25  2006/05/29 08:53:07  brian
  - started zero copy architecture
 
@@ -127,10 +130,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/05/29 08:53:07 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/31 10:27:40 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/05/29 08:53:07 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/31 10:27:40 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -207,7 +210,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/05/29 08:53:07 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/31 10:27:40 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -3688,52 +3691,125 @@ tp_destructor(struct sk_buff *skb)
  * referenced by the message block (b_rptr to b_wptr).  A destructor is used to to free the message
  * block when the socket buffer is freed.  The reference to the message block is consumed unless the
  * function returns NULL.
+ *
+ * A problem exists in converting mblks to sk_buffs (although visa versa is easy):  sk_buffs put a
+ * hidden shared buffer structure at the end of the buffer (where it is easily overwritten on buffer
+ * overflows).  There is not necessarily enough room at the end of the mblk to add this structure.
+ * There are several things that I added to the Stream head to help with this:
+ *
+ * 1. A SO_WRPAD option to M_SETOPTS that will specify how much room to leave after the last SMP
+ *    cache line in the buffer.
+ *
+ * 2. Three flags, SO_NOCSUM, SO_CSUM, SO_CRC32C were added to the Stream head so that the stream
+ *    can support partial checksum while copying from the user.
+ *
+ * 3. db_lim is now always set to the end of the actual allocation rather than the end of the
+ *    requested allocation.  Linux kmalloc() allocates from 2^n size memory caches that are
+ *    always SMP cache line aligned.
+ *
+ * With these options in play, the size of the buffer should have sufficient room for the shared
+ * buffer structure.  If, however, the data block was not delivered by the Stream head (but an
+ * intermediate module) or has been modified (by an intermediate module) the tail room might not be
+ * available.  Instead of copying the entire buffer which would be quite memory intensive, in this
+ * case we allocate a new buffer and copy only the portion of the original buffer necessary to make
+ * room for the shared buffer structure.
+ *
+ * The same is true for the IP header portion.  Using SO_WROFF it is possible to reserve sufficient
+ * room for the hardware header, IP header and UDP header.  Message blocks should normally already
+ * contain this headroom.  However, again, it might be possible that the message block originated at
+ * an intermediate module or was modified by an intermediate module unaware of this policy.  If
+ * there is insufficient headroom, again we allocate a new message block large enough to contain the
+ * header and make two sk_buffs, one for the header and one for the payload.
+ *
+ * As a result, we might wind up with three socket buffers: one containing the headroom for the hard
+ * header, IP header and UDP header; one containing most of the data payload; and one containing the
+ * last fragment of the payload smaller than or equal to sizeof(struct skb_shared_info).  All but
+ * the initial socket buffer are placed in the frag_list of the first socket buffer.  Note that only
+ * the header need be completed.  If checksum has not yet been performed, it is necessary to walk
+ * through the data to generate the checksum.
  */
 struct sk_buff *
-tp_alloc_skb(mblk_t *mp)
+tp_alloc_skb(mblk_t *mp, unsigned int headroom)
 {
-	struct sk_buff *skb;
+	struct sk_buff *skb, *skb_head, **skbhp, *skb_tail, **skbtp;
 	unsigned char *end;
+	unsigned char *beg;
 
-	/* first, check if there is enough tail room in the data block for the skb_shared_info
-	   structure. */
+	/* First, check if there is enough head room in the data block. */
+	if (mp->b_datap->db_base + headroom > mp->b_rptr) {
+		/* not enough room */
+		if (unlikely((skb_head = alloc_skb(headroom, GFP_ATOMIC)) == NULL))
+			return (NULL);
+		skb_reserve(skb_head, headroom);
+		skbhp = &skb_head;
+		beg = mp->b_rptr;
+	} else {
+		skb_head = NULL;
+		skbhp = &skb;
+		beg = mp->b_rptr - headroom;
+	}
+
+	/* Next, check if there is enough tail room in the data block. */
 	end = (mp->b_wptr + (SMP_CACHE_BYTES - 1)) & ~(SMP_CACHE_BYTES - 1);
 	if (end + sizeof(struct skb_shared_info) > mp->b_datap->db_lim) {
 		/* No, there is not enough tail room: allocate a new buffer and copy. */
-		unsigned int tsize = mp->b_wptr - mp->b_datap->db_base;
-
-		if (likely((skb = alloc_skb(tsize, GFP_ATOMIC)) != NULL)) {
-			unsigned int bsize = mp->b_wptr - mp->b_rptr;
-			unsigned int hsize = tsize - bsize;
-
-			skb->data += hsize;
-			skb->tail += hsize + bsize;
-			bcopy(mp->b_rptr, skb->data, bsize);
+		if (unlikely
+		    ((skb_tail =
+		      alloc_skb(sizeof(struct skb_head_cache) << 2, GFP_ATOMIC)) == NULL)) {
+			if (unlikely(skb_head != NULL))
+				kfree_skb(skb_head);
+			return (NULL);
 		}
+		end =
+		    (mp->b_datap->db_lim - sizeof(struct skb_head_cache)) & ~(SMP_CACHE_BYTES - 1);
+		skb_put(skb_tail, mp->b_wptr - end);
+		bcopy(end, skb->data, mp->b_wptr - end);
+		mp->b_wptr = end;
+		skbtp = &skb_tail;
 	} else {
-		/* Yes, there is enough tail room: allocate a socket buffer header and point to the
-		   data. */
-		if (likely((skb = kmem_cache_alloc(skbuff_head_cache, GFP_ATOMIC)) != NULL)) {
-			memset(skb, 0, offsetof(struct sk_buff, truesize));
-			skb->truesize = end - mp->b_datap->db_base + sizeof(struct sk_buff);
-			atomic_set(&skb->users, 1);
-			skb->head = mp->b_datap->db_base;
-			skb->data = mp->b_rptr;
-			skb->tail = mp->b_wptr;
-			skb->end = end;
-			skb->len = mp->b_wptr - mp->b_rptr;
-			/* other stuff for 2.4 */
-			skb->cloned = 0;
-			skb->data_len = 0;
-			/* initialize shared data structure */
-			memset(&skb_shinfo(skb), 0, sizeof(struct skb_shared_info));
-			atomic_set(&(skb_shinfo(skb)->dataref), 1);
-			/* do not attempt to free buffer */
-			skb->cloned = 1;
-			skb->destructor = tp_destructor;
-		}
+		skb_tail = NULL;
+		skbtp = &skb;
 	}
-	return (skb);
+
+	/* Last, allocate a socket buffer header and point to the payload data. */
+	if (likely((skb = kmem_cache_alloc(skbuff_head_cache, GFP_ATOMIC)) != NULL)) {
+		memset(skb, 0, offsetof(struct sk_buff, truesize));
+		skb->truesize = end - beg + sizeof(struct sk_buff);
+		atomic_set(&skb->users, 1);
+		skb->head = beg;
+		skb->data = mp->b_rptr;
+		skb->tail = mp->b_wptr;
+		skb->end = end;
+		skb->len = mp->b_wptr - mp->b_rptr;
+		/* other stuff for 2.4 */
+		skb->cloned = 0;
+		skb->data_len = 0;
+		/* initialize shared data structure */
+		memset(&skb_shinfo(skb), 0, sizeof(struct skb_shared_info));
+		atomic_set(&(skb_shinfo(skb)->dataref), 1);
+		/* do not attempt to free buffer */
+		skb->cloned = 1;
+		skb->destructor = tp_destructor;
+	} else {
+		if (unlikely(skb_head != NULL))
+			kfree_skb(skb_head);
+		if (unlikely(skb_tail != NULL))
+			kfree_skb(skb_tail);
+		return (NULL);
+	}
+	/* Chain them together. */
+	if (likely(skb_head == NULL && skb_tail == NULL))
+		return (skb);
+	if (likely(skb_head == NULL)) {
+		/* FIXME: chain skb and skb_tail */
+		return (skb);
+	}
+	if (likely(skb_tail == NULL)) {
+		/* FIXME: chain skb_head and skb */
+		return (skb_head);
+	}
+	/* FIXME: chain skb_head, skb and skb_tail */
+	return (skb_head);
 }
 #endif
 
