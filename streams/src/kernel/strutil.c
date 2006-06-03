@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2006/05/25 08:30:43 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2006/06/03 08:54:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/25 08:30:43 $ by $Author: brian $
+ Last Modified $Date: 2006/06/03 08:54:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.123  2006/06/03 08:54:30  brian
+ - found bug in pullupmsg()
+
  Revision 0.9.2.122  2006/05/25 08:30:43  brian
  - optimization for recent compilers
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2006/05/25 08:30:43 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2006/06/03 08:54:30 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2006/05/25 08:30:43 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2006/06/03 08:54:30 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -672,10 +675,10 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	md->msgblk.m_mblock.b_datap = NULL;
 	/* fill out data block */
 	dp = &md->datablk.d_dblock;
-	db->db_frtnp = NULL;
+	dp->db_frtnp = NULL;
 	dp->db_base = base;
 	dp->db_lim = base + size;
-	db->db_ref = 1;
+	dp->db_ref = 1;
 	dp->db_type = db->db_type;
 	dp->db_size = size;
 	/* copy from old initial datab */
@@ -688,7 +691,7 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	mp->b_wptr += blen;
 	mp->b_datap = dp;
 	/* remove a reference from old initial datab */
-	if (db_dec_and_test(db)) {
+	if (likely(db_dec_and_test(db) != 0)) {
 		/* free data block */
 		mblk_t *mb = db_to_mb(db);
 

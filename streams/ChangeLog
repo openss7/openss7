@@ -1,3 +1,7 @@
+2006-06-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/strutil.c: found bug in pullupmsg()
+
 2006-05-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/udp.c: roughing in zero-copy architecture
