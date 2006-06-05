@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/05/25 08:30:42 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/06/04 21:59:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/25 08:30:42 $ by $Author: brian $
+ Last Modified $Date: 2006/06/04 21:59:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.131  2006/06/04 21:59:44  brian
+ - check in for testing
+
  Revision 0.9.2.130  2006/05/25 08:30:42  brian
  - optimization for recent compilers
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/05/25 08:30:42 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/06/04 21:59:44 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/05/25 08:30:42 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/06/04 21:59:44 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -871,6 +874,30 @@ mdbblock_alloc_slow(uint priority, void *func)
       fail:
 	return (mp);
 }
+#if 0
+int
+mdbblock_check(void)
+{
+	struct strthread *t = this_thread;
+	unsigned long flags;
+	mblk_t *b, *b_next;
+	int blocks;
+
+	local_irq_save(flags);
+	blocks = t->freemblks;
+	b = b_next = t->freemblk_head;
+	while (b_next) {
+		b = b_next;
+		b_next = b->b_next;
+		blocks--;
+	}
+	local_irq_restore(flags);
+	if (blocks != 0)
+		__printd(("List integrity check failed, lost %d blocks after %p\n", blocks, b));
+	return (blocks);
+}
+EXPORT_SYMBOL(mdbblock_check);
+#endif
 STATIC streams_fastcall __hot mblk_t *
 mdbblock_alloc(uint priority, void *func)
 {
@@ -885,14 +912,23 @@ mdbblock_alloc(uint priority, void *func)
 
 	prefetchw(t);
 
+#if 0
+	{
+		int blocks;
+		
+		if ((blocks = mdbblock_check()) != 0)
+			__ptrace(("List integrity check failed, lost %d blocks\n", blocks));
+	}
+#endif
+
 	local_irq_save(flags);
 	mp = t->freemblk_head;
 	prefetchw(mp);
 	if (likely(mp != NULL)) {
-		t->freemblk_head = mp->b_next;
-		mp->b_next = NULL;
-		if (t->freemblk_tail == &mp->b_next)
+		if ((t->freemblk_head = mp->b_next) == NULL)
 			t->freemblk_tail = &t->freemblk_head;
+		mp->b_next = NULL;
+		t->freemblks--;
 	}
 	local_irq_restore(flags);
 
@@ -995,19 +1031,34 @@ BIG_STATIC_INLINE streams_fastcall __hot_in void
 mdbblock_free(mblk_t *mp)
 {
 	struct strthread *t = this_thread;
+	int too_many;
 
 	printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
 
 	prefetchw(t);
 	prefetchw(mp);
 
+#if 0
+	{
+		int blocks;
+		
+		if ((blocks = mdbblock_check()) != 0)
+			__ptrace(("List integrity check failed, lost %d blocks\n", blocks));
+	}
+#endif
+
+	dassert(mp->b_next == NULL); /* check double free */
 	mp->b_next = NULL;
 	{
 		unsigned long flags;
 
 		local_irq_save(flags);
 		*XCHG(&t->freemblk_tail, &mp->b_next) = mp;
-		t->freemblks++;
+		/* Decide when to invoke freeblocks.  Current policy is to free blocks when then
+		   number of blocks on the free list exceeds some (per-cpu) threshold.  Currently I 
+		   set this to just 1/16th of the maximum.  That should be ok for now.  I will
+		   create a sysctl for it later... */
+		too_many = (++t->freemblks > (sysctl_str_nstrmsgs >> 4));
 		local_irq_restore(flags);
 	}
 	{
@@ -1020,12 +1071,7 @@ mdbblock_free(mblk_t *mp)
 #endif
 		atomic_dec(&sdi->si_cnt);
 	}
-	/* Decide when to invoke freeblocks.  Current policy is to free blocks when then number of
-	   blocks on the free list exceeds some (per-cpu) threshold.  Currently I set this to just
-	   1/16th of the maximum.  That should be ok for now.  I will create a sysctl for it
-	   later... */
-	if (unlikely((t->freemblks > (sysctl_str_nstrmsgs >> 4))
-		     && test_and_set_bit(freeblks, &t->flags) == 0))
+	if (unlikely(too_many && test_and_set_bit(freeblks, &t->flags) == 0))
 		__raise_streams();
 	raise_local_bufcalls();
 	/* other processors will just have to fight over the remaining memory */
@@ -1051,7 +1097,8 @@ freeblocks(struct strthread *t)
 
 		local_irq_save(flags);
 		__test_and_clear_bit(freeblks, &t->flags);
-		if (likely((mp_next = XCHG(&t->freemblk_head, NULL)) != NULL)) {
+		if (likely((mp_next = t->freemblk_head) != NULL)) {
+			t->freemblk_head = NULL;
 			t->freemblk_tail = &t->freemblk_head;
 			t->freemblks = 0;
 		}
