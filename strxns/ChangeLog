@@ -1,3 +1,7 @@
+2006-06-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: minor optimization tweaks
+
 2006-05-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/init/strxns.sh: corrected removal for debian

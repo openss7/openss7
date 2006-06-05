@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/31 10:27:40 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/05 02:53:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/31 10:27:40 $ by $Author: brian $
+ Last Modified $Date: 2006/06/05 02:53:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.27  2006/06/05 02:53:40  brian
+ - working up udp zero-copy
+
  Revision 0.9.2.26  2006/05/31 10:27:40  brian
  - working up zero-copy
 
@@ -130,10 +133,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/31 10:27:40 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/05 02:53:40 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/31 10:27:40 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/05 02:53:40 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -210,7 +213,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/05/31 10:27:40 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/05 02:53:40 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -3649,21 +3652,31 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
 /**
- * tp_destructor - socket buffer destructor
+ * tp_skb_destructor - socket buffer destructor
  * @skb: socket buffer to destroy
  *
- * This provide the impedance matching between socket buffer flow control and STREAMS flow control.
+ * This provides the impedance matching between socket buffer flow control and STREAMS flow control.
  * When tp->sndmem is greater than tp->options.xti.sndbuf we place STREAMS buffers back on the send
  * queue and stall the queue.  When the send memory falls below tp->options.xti.sndlowat (or to
  * zero) and there are message on the send queue, we enable the queue.
+ *
+ * Also, this function frees the original message block and data block that contained the data
+ * payload for the packet.
  */
+#if 0
 STATIC void __hot
-tp_destructor(struct sk_buff *skb)
+tp_skb_destructor(struct sk_buff *skb)
 {
+	mblk_t *mp;
 	struct tp *tp;
 
-	if (likely((tp = (typeof(tp)) skb->sk) != NULL)) {
-		/* technically we could have multiple processors freeing sk_buffs at the same time */
+	/* these are where we hid them */
+	if ((mp = (mblk_t *) skb_shinfo(skb)->frags[0].page) != NULL) {
+		tp = (struct tp *) mp->b_prev;
+		mp->b_prev = NULL;
+
+		/* technically we could have multiple processors freeing socket buffers at the same 
+		   time. */
 		spin_lock_bh(&tp->qlock);
 		ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 		tp->sndmem -= skb->truesize;
@@ -3674,16 +3687,50 @@ tp_destructor(struct sk_buff *skb)
 		} else {
 			spin_unlock_bh(&tp->qlock);
 		}
-		skb->sk = NULL;
+		skb_shinfo(skb)->frags[0].page = NULL;
+		skb->destructor = NULL;
+		tp_release(&tp);
+		freemsg(mp);
+	} else
+		swerr();
+	return;
+}
+#else
+/* just for testing */
+STATIC void __hot
+tp_skb_destructor(struct sk_buff *skb)
+{
+	struct tp *tp;
+
+	if (likely((tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page) != NULL)) {
+		spin_lock_bh(&tp->qlock);
+		ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
+		tp->sndmem -= skb->truesize;
+		if (unlikely((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0))) {
+			spin_unlock_bh(&tp->qlock);
+			if (tp->iq != NULL && tp->iq->q_first != NULL)
+				qenable(tp->iq);
+		} else {
+			spin_unlock_bh(&tp->qlock);
+		}
+		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
 		tp_release(&tp);
 	}
 }
+#endif
 
-#if 0
+#undef skbuff_head_cache
+#ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
+#define skbuff_head_cache (*((kmem_cache_t **) HAVE_SKBUFF_HEAD_CACHE_ADDR))
+#endif
+
 /**
  * tp_alloc_skb - allocate a socket buffer from a message block
+ * @tp: private pointer
  * @mp: the message block
+ * @headroom: header room for resulting sk_buff
+ * @gfp: general fault protection
  *
  * Description: this function is used for zero-copy allocation of a socket buffer from a message
  * block.  The socket buffer contains all of the data in the message block including any head or
@@ -3728,88 +3775,139 @@ tp_destructor(struct sk_buff *skb)
  * the header need be completed.  If checksum has not yet been performed, it is necessary to walk
  * through the data to generate the checksum.
  */
-struct sk_buff *
-tp_alloc_skb(mblk_t *mp, unsigned int headroom)
+#if 0
+STATIC INLINE fastcall __hot_out struct sk_buff *
+tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
-	struct sk_buff *skb, *skb_head, **skbhp, *skb_tail, **skbtp;
-	unsigned char *end;
-	unsigned char *beg;
+	struct sk_buff *skb, *skb_head = NULL, *skb_tail = NULL;
+	unsigned char *beg, *end;
 
+	assure(mp->b_datap->db_ref == 1);
+
+	beg = mp->b_rptr - headroom;
 	/* First, check if there is enough head room in the data block. */
-	if (mp->b_datap->db_base + headroom > mp->b_rptr) {
-		/* not enough room */
-		if (unlikely((skb_head = alloc_skb(headroom, GFP_ATOMIC)) == NULL))
-			return (NULL);
+	if (unlikely(beg < mp->b_datap->db_base)) {
+		/* No, there is not enough headroom, allocate an sk_buff for the header. */
+		skb_head = alloc_skb(headroom, gfp);
+		if (unlikely(skb_head == NULL))
+			goto no_head;
 		skb_reserve(skb_head, headroom);
-		skbhp = &skb_head;
 		beg = mp->b_rptr;
-	} else {
-		skb_head = NULL;
-		skbhp = &skb;
-		beg = mp->b_rptr - headroom;
 	}
-
 	/* Next, check if there is enough tail room in the data block. */
-	end = (mp->b_wptr + (SMP_CACHE_BYTES - 1)) & ~(SMP_CACHE_BYTES - 1);
-	if (end + sizeof(struct skb_shared_info) > mp->b_datap->db_lim) {
-		/* No, there is not enough tail room: allocate a new buffer and copy. */
-		if (unlikely
-		    ((skb_tail =
-		      alloc_skb(sizeof(struct skb_head_cache) << 2, GFP_ATOMIC)) == NULL)) {
-			if (unlikely(skb_head != NULL))
-				kfree_skb(skb_head);
-			return (NULL);
+	end = (unsigned char *) (((unsigned long) mp->b_wptr + (SMP_CACHE_BYTES - 1)) &
+				 ~(SMP_CACHE_BYTES - 1));
+	if (unlikely(end + sizeof(struct skb_shared_info) > mp->b_datap->db_lim)) {
+		/* No, there is not enough tailroom, allocate an sk_buff for the tail. */
+		skb_tail = alloc_skb(SMP_CACHE_BYTES + sizeof(struct skb_shared_info), gfp);
+		if (unlikely(skb_tail == NULL))
+			goto no_tail;
+		{
+			unsigned int len;
+
+			end = (unsigned char *) (((unsigned long) mp->b_datap->db_lim -
+						  sizeof(struct skb_shared_info)) &
+						 ~(SMP_CACHE_BYTES - 1));
+			len = mp->b_wptr - end;
+			bcopy(end, skb_put(skb_tail, len), len);
+			mp->b_wptr = end;
 		}
-		end =
-		    (mp->b_datap->db_lim - sizeof(struct skb_head_cache)) & ~(SMP_CACHE_BYTES - 1);
-		skb_put(skb_tail, mp->b_wptr - end);
-		bcopy(end, skb->data, mp->b_wptr - end);
-		mp->b_wptr = end;
-		skbtp = &skb_tail;
-	} else {
-		skb_tail = NULL;
-		skbtp = &skb;
 	}
 
-	/* Last, allocate a socket buffer header and point to the payload data. */
-	if (likely((skb = kmem_cache_alloc(skbuff_head_cache, GFP_ATOMIC)) != NULL)) {
-		memset(skb, 0, offsetof(struct sk_buff, truesize));
-		skb->truesize = end - beg + sizeof(struct sk_buff);
-		atomic_set(&skb->users, 1);
-		skb->head = beg;
-		skb->data = mp->b_rptr;
-		skb->tail = mp->b_wptr;
-		skb->end = end;
-		skb->len = mp->b_wptr - mp->b_rptr;
-		/* other stuff for 2.4 */
-		skb->cloned = 0;
-		skb->data_len = 0;
-		/* initialize shared data structure */
-		memset(&skb_shinfo(skb), 0, sizeof(struct skb_shared_info));
-		atomic_set(&(skb_shinfo(skb)->dataref), 1);
-		/* do not attempt to free buffer */
-		skb->cloned = 1;
-		skb->destructor = tp_destructor;
-	} else {
-		if (unlikely(skb_head != NULL))
-			kfree_skb(skb_head);
-		if (unlikely(skb_tail != NULL))
-			kfree_skb(skb_tail);
-		return (NULL);
-	}
-	/* Chain them together. */
-	if (likely(skb_head == NULL && skb_tail == NULL))
-		return (skb);
+	/* Last, allocate a socket buffer header and point it to the payload data. */
+	skb = kmem_cache_alloc(skbuff_head_cache, gfp);
+	if (unlikely(skb == NULL))
+		goto no_skb;
+
+	memset(skb, 0, offsetof(struct sk_buff, truesize));
+	skb->truesize = end - beg + sizeof(struct sk_buff);
+	atomic_set(&skb->users, 1);
+	skb->head = beg;
+	skb->data = mp->b_rptr;
+	skb->tail = mp->b_wptr;
+	skb->end = end;
+	skb->len = mp->b_wptr - mp->b_rptr;
+	skb->cloned = 1; /* do not attempt to free buffer */
+	skb->data_len = 0;
+	/* initialize shared data structure */
+	memset(skb_shinfo(skb), 0, sizeof(struct skb_shared_info));
+	atomic_set(&(skb_shinfo(skb)->dataref), 1);
+
+	spin_lock_bh(&tp->qlock);
+	tp->sndmem += skb->truesize;
+	spin_unlock_bh(&tp->qlock);
+
+	mp->b_prev = (mblk_t *) tp_get(tp);	/* not on a queue */
+	skb_shinfo(skb)->frags[0].page = (struct page *) mp;	/* only private pointer in an sk_buff */
+	skb->destructor = tp_skb_destructor;
+
 	if (likely(skb_head == NULL)) {
-		/* FIXME: chain skb and skb_tail */
+		if (unlikely(skb_tail != NULL)) {
+			/* Chain skb_tail onto skb. */
+			skb_shinfo(skb)->frag_list = skb_tail;
+			skb->data_len = skb_tail->len;
+			skb->len += skb->data_len;
+		}
 		return (skb);
 	}
 	if (likely(skb_tail == NULL)) {
-		/* FIXME: chain skb_head and skb */
-		return (skb_head);
+		/* Chain skb onto skb_head. */
+		skb_shinfo(skb_head)->frag_list = skb;
+		skb_head->data_len = skb->len;
+		skb_head->len += skb_head->data_len;
+	} else {
+		/* Chain skb and skb_tail onto skb_head. */
+		skb_shinfo(skb_head)->frag_list = skb;
+		skb->next = skb_tail;
+		skb_head->data_len = skb->len + skb_tail->len;
+		skb_head->len += skb_head->data_len;
 	}
-	/* FIXME: chain skb_head, skb and skb_tail */
 	return (skb_head);
+      no_skb:
+	if (skb_tail != NULL)
+		kfree_skb(skb_tail);
+      no_tail:
+	if (skb_head != NULL)
+		kfree_skb(skb_head);
+      no_head:
+	return (NULL);
+}
+#else
+/* just for testing - old copy method */
+STATIC INLINE fastcall __hot_out struct sk_buff *
+tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+{
+	struct sk_buff *skb;
+	unsigned int dlen = msgdsize(mp);
+
+	if (likely((skb = alloc_skb(headroom + dlen, GFP_ATOMIC)) != NULL)) {
+		skb_reserve(skb, headroom);
+		{
+			unsigned char *data;
+			mblk_t *b;
+			int blen;
+
+			data = skb_put(skb, dlen);
+			for (b = mp; b; b = b->b_cont) {
+				if ((blen = b->b_wptr - b->b_rptr) > 0) {
+					bcopy(b->b_rptr, data, blen);
+					data += blen;
+					__assert(data <= skb->tail);
+				} else
+					rare();
+			}
+		}
+		freemsg(mp);	/* must absorb */
+		/* we never have any page fragments, so we can steal a pointer from the page
+		   fragement list. */
+		assert(skb_shinfo(skb)->nr_frags == 0);
+		skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+		skb->destructor = tp_skb_destructor;
+		spin_lock_bh(&tp->qlock);
+		tp->sndmem += skb->truesize;
+		spin_unlock_bh(&tp->qlock);
+	}
+	return (skb);
 }
 #endif
 
@@ -3824,66 +3922,68 @@ STATIC INLINE fastcall __hot_out int
 tp_senddata(struct tp *tp, unsigned short dport, struct tp_options *opt, mblk_t *mp)
 {
 	struct rtable *rt = NULL;
+	int err;
 
 	/* Allows slop over by 1 buffer per processor. */
 	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
 		goto ebusy;
 
 	assert(opt != NULL);
-	if (!ip_route_output(&rt, opt->ip.daddr, opt->ip.addr, 0, 0)) {
+	if ((err = ip_route_output(&rt, opt->ip.daddr, opt->ip.addr, 0, 0)) == 0) {
 		struct sk_buff *skb;
 		struct net_device *dev = rt->u.dst.dev;
-		size_t hlen = (dev->hard_header_len + 15) & ~15;
+		size_t hlen = ((dev->hard_header_len + 15) & ~15)
+		    + sizeof(struct iphdr) + sizeof(struct udphdr);
 		size_t dlen = msgdsize(mp);
 		size_t plen = dlen + sizeof(struct udphdr);
 		size_t tlen = plen + sizeof(struct iphdr);
 
-		ptrace(("%s: %s: data sent\n", DRV_NAME, __FUNCTION__));
-		usual(hlen);
+		ptrace(("%s: %s: sending data message block %p\n", DRV_NAME, __FUNCTION__, mp));
+		usual(hlen > sizeof(struct iphdr) + sizeof(struct udphr));
 		usual(dlen);
 
-		if ((skb = alloc_skb(hlen + tlen, GFP_ATOMIC))) {
-			mblk_t *bp;
+		if (likely((skb = tp_alloc_skb(tp, mp, hlen, GFP_ATOMIC)) != NULL)) {
 			struct iphdr *iph;
 			struct udphdr *uh;
-			unsigned char *data;
+			uint32_t saddr = opt->ip.saddr ? opt->ip.saddr : rt->rt_src;
+			uint32_t daddr = rt->rt_dst;
 
-			skb->sk = (struct sock *) tp_get(tp);	/* borrow sk pointer */
-			skb->destructor = tp_destructor;
-			spin_lock_bh(&tp->qlock);
-			tp->sndmem += skb->truesize;
-			spin_unlock_bh(&tp->qlock);
-			skb_reserve(skb, hlen);
+			skb->ip_summed = CHECKSUM_UNNECESSARY;
+			skb->csum = 0;
+			if (unlikely(opt->udp.checksum != T_YES))
+				goto no_csum;
+			if (likely(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
+				goto no_csum;
+			skb->ip_summed = 0;
+			skb->csum = csum_tcpudp_nofold(saddr, daddr, skb->len, IPPROTO_UDP, 0);
+			skb->csum = csum_fold(skb_checksum(skb, 0, skb->len, skb->csum));
+
+		      no_csum:
 			/* find headers */
-			iph = (typeof(iph)) __skb_put(skb, tlen);
+			skb->h.raw = skb_push(skb, sizeof(struct udphdr));
+			skb->nh.raw = skb_push(skb, sizeof(struct iphdr));
+
 			skb->dst = &rt->u.dst;
 			skb->priority = 0;	// opt->xti.priority;
+
+			iph = skb->nh.iph;
 			iph->version = 4;
 			iph->ihl = 5;
 			iph->tos = opt->ip.tos;
 			iph->frag_off = htons(IP_DF);	/* never frag */
 			// iph->frag_off = 0; /* need qos bit */
 			iph->ttl = opt->ip.ttl;
-			iph->daddr = rt->rt_dst;
-			iph->saddr = opt->ip.saddr ? opt->ip.saddr : rt->rt_src;
+			iph->daddr = daddr;
+			iph->saddr = saddr;
 			iph->protocol = opt->ip.protocol;
 			iph->tot_len = htons(tlen);
-			skb->nh.iph = iph;
-			uh = (typeof(uh)) (iph + 1);
+
+			uh = skb->h.uh;
 			uh->dest = dport;
 			uh->source = tp->sport ? tp->sport : tp->bport;
 			uh->len = htons(plen);
 			uh->check = 0;
-			skb->h.uh = uh;
-			if (opt->udp.checksum == T_YES) {
-				skb->ip_summed = 0;
-				skb->csum =
-				    csum_tcpudp_nofold(iph->saddr, iph->daddr, plen, IPPROTO_UDP,
-						       0);
-			} else {
-				skb->ip_summed = CHECKSUM_UNNECESSARY;
-				skb->csum = 0;
-			}
+
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
@@ -3895,36 +3995,19 @@ tp_senddata(struct tp *tp, unsigned short dport, struct tp_options *opt, mblk_t 
 #endif
 #endif
 #endif
-			/* IMPLEMENTATION NOTE:- The passed in mblk_t pointer is possibly a message
-			   buffer chain and we must iterate along the b_cont pointer.  Rather than
-			   copying at this point, it is probably a better idea to create a
-			   fragmented sk_buff and just point to the elements.  Of course, we also
-			   need an sk_buff destructor.  This is not done yet. */
-			data = (unsigned char *) (uh + 1);
-			for (bp = mp; bp; bp = bp->b_cont) {
-				int blen = bp->b_wptr - bp->b_rptr;
-
-				if (blen > 0) {
-					bcopy(bp->b_rptr, data, blen);
-					data += blen;
-				} else
-					rare();
-			}
-			/* It would be more efficient to do this while copying above. */
-			if (opt->udp.checksum == T_YES) {
-				uh->check = csum_fold(skb_checksum(skb, 0, skb->len, skb->csum));
-			}
-			printd(("sent message %p\n", skb));
+			printd(("sending message %p\n", skb));
 #ifdef HAVE_KFUNC_DST_OUTPUT
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, tp_ip_queue_xmit);
 #else
 			tp_ip_queue_xmit(skb);
 #endif
-		} else
-			__rare();
-	} else
+			return (QR_ABSORBED);
+		}
 		__rare();
-	return (QR_DONE);
+		return (-ENOBUFS);
+	}
+	__rare();
+	return (err);
       ebusy:
 	return (-EBUSY);
 }
@@ -4574,7 +4657,7 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		goto error;
 
 	if (dp != NULL)
-		if (unlikely((err = tp_senddata(tp, tp->dport, OPT_buffer, dp)) != 0))
+		if (unlikely((err = tp_senddata(tp, tp->dport, OPT_buffer, dp)) != QR_ABSORBED))
 			goto error;
 	if (SEQ_number != NULL) {
 		bufq_unlink(&tp->conq, SEQ_number);
@@ -4592,7 +4675,7 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	ACCEPTOR_id->options.ip.mtu = OPT_buffer->ip.mtu;
 	ACCEPTOR_id->options.ip.saddr = OPT_buffer->ip.saddr;
 	ACCEPTOR_id->options.ip.daddr = OPT_buffer->ip.daddr;
-	return (0);
+	return (QR_ABSORBED);
 
       error:
 	return (err);
@@ -4615,7 +4698,7 @@ tp_disconnect(struct tp *tp, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
 
 	if (dp != NULL) {
 		err = tp_senddata(tp, tp->dport, &tp->options, dp);
-		if (unlikely(err != 0))
+		if (unlikely(err != QR_ABSORBED))
 			goto error;
 	}
 	if (SEQ_number != NULL) {
@@ -4634,7 +4717,7 @@ tp_disconnect(struct tp *tp, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
 		tp_release(&tp);
 		write_unlock_bh(&hp->lock);
 	}
-	return (0);
+	return (QR_ABSORBED);
       error:
 	return (err);
 }
@@ -4990,7 +5073,7 @@ te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer,
 	struct T_ok_ack *p;
 	mblk_t *mp;
 	const size_t size = sizeof(*p);
-	int err;
+	int err = QR_DONE;
 
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
@@ -5017,14 +5100,14 @@ te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer,
 			goto free_error;
 		tp_set_state(tp, TS_UNBND);
 		break;
-#if 1
+#if 0
 	case TS_WACK_CREQ:
-		/* FIXME: don't do this, use ne_conn_con() instead */
+		/* FIXME: don't do this, use te_conn_con() instead */
 		if ((err = tp_connect(tp, ADDR_buffer, ADDR_length, OPT_buffer, 0)))
 			goto error;
 		tp_set_state(tp, TS_WCON_CREQ);
 		if ((err = tp_senddata(tp, tp->dport, &tp->options, dp))) {
-			tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, dp);
+			tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, NULL);
 			goto error;
 		}
 		break;
@@ -5035,12 +5118,13 @@ te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer,
 		tp_set_state(ACCEPTOR_id, TS_DATA_XFER);
 		err = tp_passive(tp, ADDR_buffer, ADDR_length, OPT_buffer, SEQ_number,
 				 ACCEPTOR_id, flags, dp);
-		if (unlikely(err != 0)) {
+		if (unlikely(err != QR_ABSORBED)) {
 			tp_set_state(ACCEPTOR_id, ACCEPTOR_id->i_oldstate);
 			goto error;
 		}
 		if (tp != ACCEPTOR_id)
 			tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
+		err = QR_TRIMMED;
 		break;
 #if 0
 	case NS_WACK_RRES:
@@ -5056,7 +5140,7 @@ te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer,
 	case TS_WACK_DREQ10:
 	case TS_WACK_DREQ11:
 		err = tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, dp);
-		if (unlikely(err != 0))
+		if (unlikely(err != QR_ABSORBED))
 			goto error;
 		tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
 		break;
@@ -5076,7 +5160,7 @@ te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer,
 	}
 	printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
-	return (QR_DONE);
+	return (err);
       free_error:
 	freemsg(mp);
 	goto error;
@@ -6242,12 +6326,12 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(OPT_length != 0))
 		if (unlikely((err = t_opts_parse_ud(OPT_buffer, OPT_length, &opts)) != 0))
 			goto error;
-	if (unlikely((err = tp_senddata(tp, dport, &opts, dp)) != 0))
+	if (likely((err = tp_senddata(tp, dport, &opts, dp)) != QR_ABSORBED))
 		goto error;
-	return (QR_DONE);
+	return (QR_TRIMMED);
       error:
 	err = te_uderror_reply(q, DEST_buffer, OPT_buffer, OPT_length, err, dp);
-	if (err == QR_ABSORBED)
+	if (likely(err == QR_ABSORBED))
 		return (QR_TRIMMED);
 	return (err);
 }
@@ -6358,9 +6442,11 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	if (unlikely(err != 0))
 		goto error;
 	/* send data only after connection complete */
-	if (dp != NULL)
-		tp_senddata(tp, tp->dport, &tp->options, dp);
-	return (QR_DONE);	/* np_senddata() does not consume message blocks */
+	if (dp == NULL)
+		return (QR_DONE);
+	if (tp_senddata(tp, tp->dport, &tp->options, dp) != QR_ABSORBED)
+		goto error;
+	return (QR_TRIMMED);	/* tp_senddata() consumed message blocks */
       error:
 	return te_error_ack(q, T_CONN_REQ, err);
 }
@@ -6474,7 +6560,8 @@ te_conn_res(queue_t *q, mblk_t *mp)
 			   as useful as adding or removing an address with T_OPTMGMT_REQ. */
 			goto error;
 		err = TPROVMISMATCH;
-		if (ACCEPTOR_id->info.SERV_type != T_COTS && ACCEPTOR_id->info.SERV_type != T_COTS_ORD)
+		if (ACCEPTOR_id->info.SERV_type != T_COTS
+		    && ACCEPTOR_id->info.SERV_type != T_COTS_ORD)
 			/* Must be connection-oriented Stream. */
 			goto error;
 		if (ACCEPTOR_id != tp) {
@@ -6632,10 +6719,11 @@ te_write_req(queue_t *q, mblk_t *mp)
 	if (unlikely((dlen = msgdsize(mp)) == 0
 		     || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
-	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, mp)) < 0))
+	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, mp)) != QR_ABSORBED))
 		goto error;
+	return (QR_ABSORBED);	/* tp_senddata() consumed message block */
       discard:
-	return (QR_DONE);	/* np_senddata() does not consume message blocks */
+	return (QR_DONE);	/* tp_senddata() did not consume message blocks */
       error:
 	return te_error_reply(q, -EPROTO);
 }
@@ -6692,8 +6780,9 @@ te_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely
 	    ((dlen = msgdsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
-	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, dp)) < 0))
+	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
+	return (QR_TRIMMED);	/* tp_senddata() consumed message blocks */
       discard:
 	return (QR_DONE);	/* tp_senddata() does not consume message blocks */
       error:
@@ -6742,8 +6831,9 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(dlen == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
 		goto error;
 	err = tp_senddata(tp, tp->dport, &tp->options, dp);
-	if (unlikely(err < 0))
+	if (unlikely(err != QR_ABSORBED))
 		goto error;
+	return (QR_TRIMMED);
       discard:
 	return (QR_DONE);
       error:
@@ -6797,8 +6887,9 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(p->OPT_length != 0))
 		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
 			goto error;
-	if ((err = tp_senddata(tp, tp->dport, &opts, dp)))
+	if ((err = tp_senddata(tp, tp->dport, &opts, dp)) != QR_ABSORBED)
 		goto error;
+	return (QR_TRIMMED);
       discard:
 	return (QR_DONE);
       error:
@@ -7615,12 +7706,13 @@ tp_free(char *data)
 	if (likely(skb != NULL)) {
 		struct tp *tp;
 
-		if (likely((tp = (typeof(tp)) skb->sk) != NULL)) {
+		if (likely((tp = *(struct tp **) skb->cb) != NULL)) {
 			spin_lock_bh(&tp->qlock);
 			ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
 			tp->rcvmem -= skb->truesize;
 			spin_unlock_bh(&tp->qlock);
-			skb->sk = NULL;
+			/* put this back to null before freeing it */
+			*(struct tp **) skb->cb = NULL;
 			tp_release(&tp);
 		}
 		kfree_skb(skb);
@@ -7690,11 +7782,18 @@ tp_v4_rcv(struct sk_buff *skb)
 		skb->ip_summed = CHECKSUM_UNNECESSARY;
 	else if (skb->ip_summed != CHECKSUM_UNNECESSARY)
 		skb->csum = csum_tcpudp_nofold(iph->saddr, iph->daddr, ulen, IPPROTO_UDP, 0);
+#if 0
 	/* For now... We should actually place non-linear fragments into separate mblks and pass
 	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
 	   netfilter hooks linearize anyway. */
 	if (unlikely(skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0))
 		goto linear_fail;
+#else
+	if (unlikely(skb_is_nonlinear(skb))) {
+		__ptrace(("Non-linear sk_buff encountered!\n"));
+		goto linear_fail;
+	}
+#endif
 	/* Before passing the message up, check that there is room in the receive buffer.  Allows
 	   slop over by 1 buffer per processor. */
 	if (unlikely(tp->rcvmem > tp->options.xti.rcvbuf))
@@ -7707,11 +7806,9 @@ tp_v4_rcv(struct sk_buff *skb)
 		/* now allocate an mblk */
 		if (unlikely((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr)) == NULL))
 			goto no_buffers;
-		/* XXX: if the socket buffer already belongs to somebody else it might be necessary 
-		   to clone the socket buffer before doing this, but I think that the ip receive
-		   functions already do this for us. */
-		assert(skb->sk == NULL);
-		skb->sk = (struct sock *) tp_get(tp);
+		ptrace(("Allocated external buffer message block %p\n", mp));
+		/* We can do this because the buffer belongs to us. */
+		*(struct tp **) skb->cb = tp_get(tp);
 		/* already in bottom half */
 		spin_lock(&tp->qlock);
 		tp->rcvmem += skb->truesize;
@@ -7779,9 +7876,12 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 	struct tp *tp;
 	struct iphdr *iph = (struct iphdr *) skb->data;
 
+#if 0
+/* icmp.c does this for us */
 #define ICMP_MIN_LENGTH sizeof(struct udphdr)
 	if (skb->len < (iph->ihl << 2) + ICMP_MIN_LENGTH)
 		goto drop;
+#endif
 	printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
 	/* Note: use returned IP header and possibly payload for lookup */
 	if ((tp = tp_lookup_icmp(iph, skb->len)) == NULL)
@@ -7824,8 +7924,10 @@ tp_v4_err(struct sk_buff *skb, u32 info)
       no_stream:
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
 	tp_v4_err_next(skb, info);
+#if 0
 	goto drop;
       drop:
+#endif
 #ifdef HAVE_KINC_LINUX_SNMP_H
 	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
 #else

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/04/24 05:01:03 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/05 02:53:32 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/24 05:01:03 $ by $Author: brian $
+ Last Modified $Date: 2006/06/05 02:53:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400p-ss7.c,v $
+ Revision 0.9.2.21  2006/06/05 02:53:32  brian
+ - working up udp zero-copy
+
  Revision 0.9.2.20  2006/04/24 05:01:03  brian
  - call interface corrections
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/04/24 05:01:03 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/05 02:53:32 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/04/24 05:01:03 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/05 02:53:32 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -101,7 +104,7 @@ static char const ident[] =
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2006/04/24 05:01:03 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2006/06/05 02:53:32 $"
 #define X400P_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -4556,7 +4559,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		tasklet_init(&cd->tasklet, &xp_e1_card_tasklet, (unsigned long) cd);
 	} else {
 		int word;
-		__printd(("%s: T100P-SS7 (%s Rev. %d)\n", DRV_NAME,
+		__printd(("%s: T400P-SS7 (%s Rev. %d)\n", DRV_NAME,
 			  xp_t1_framer[(b & 0x30) >> 4], b & 0xf));
 		for (word = 0; word < 256; word++) {
 			int ebuf;

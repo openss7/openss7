@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/05/29 08:53:01 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/06/05 02:53:35 $
 
  -----------------------------------------------------------------------------
 
@@ -45,22 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/29 08:53:01 $ by $Author: brian $
+ Last Modified $Date: 2006/06/05 02:53:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
- Revision 0.9.2.146  2006/05/29 08:53:01  brian
- - started zero copy architecture
-
- Revision 0.9.2.145  2006/05/25 08:30:45  brian
- - optimization for recent compilers
-
- Revision 0.9.2.144  2006/05/24 10:50:31  brian
- - optimizations
-
- Revision 0.9.2.143  2006/05/14 06:58:14  brian
- - removed redundant or unused QR_ definitions
+ Revision 0.9.2.147  2006/06/05 02:53:35  brian
+ - working up udp zero-copy
 
  Revision 0.9.2.142  2006/03/08 00:03:56  brian
  - ioctl32 functions are streams calls
@@ -85,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/05/29 08:53:01 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/06/05 02:53:35 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/05/29 08:53:01 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/06/05 02:53:35 $";
 
 //#define __NO_VERSION__
 
@@ -184,7 +175,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/05/29 08:53:01 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/06/05 02:53:35 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -7493,7 +7484,7 @@ str_i_peek32(const struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  Also, any error returned by the module's qi_qopen procedure can also be returned.
  */
-STATIC streams_noinline  streams_fastcall int
+STATIC streams_noinline streams_fastcall int
 str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	char name[FMNAMESZ + 1];

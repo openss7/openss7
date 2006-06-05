@@ -1,3 +1,7 @@
+2006-06-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* stacks/src/modules/x400p-ss7/x400p-ss7.c: spelling correction
+
 2006-05-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/h225/h225.c: removed redundant QR_ definitions

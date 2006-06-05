@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/18 11:22:48 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/06/05 02:53:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/18 11:22:48 $ by $Author: brian $
+ Last Modified $Date: 2006/06/05 02:53:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.20  2006/06/05 02:53:42  brian
+ - working up udp zero-copy
+
  Revision 0.9.2.19  2006/05/18 11:22:48  brian
  - rationalized to RAWIP driver
 
@@ -109,10 +112,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/18 11:22:48 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/06/05 02:53:42 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/18 11:22:48 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/06/05 02:53:42 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -168,7 +171,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2006/05/18 11:22:48 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2006/06/05 02:53:42 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -5246,9 +5249,9 @@ np_v4_rcv(struct sk_buff *skb)
 
 //      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 
-	if (!pskb_may_pull(skb, 4))
+	if (unlikely(!pskb_may_pull(skb, 4)))
 		goto too_small;
-	if (skb->pkt_type != PACKET_HOST)
+	if (unlikely(skb->pkt_type != PACKET_HOST))
 		goto bad_pkt_type;
 	rt = (struct rtable *) skb->dst;
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
@@ -5268,7 +5271,7 @@ np_v4_rcv(struct sk_buff *skb)
 	   the payload.  That might be the best way to do things.  The problem is that we indicate
 	   iph->protocol on connection indications, and it will be the wrong protocol on 2.4. */
 	np_v4_steal(skb);	/* its ours */
-	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
+	if (unlikely(skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0))
 		goto linear_fail;
 	{
 		mblk_t *mp;
@@ -5337,9 +5340,12 @@ np_v4_err(struct sk_buff *skb, u32 info)
 	struct np *np;
 	struct iphdr *iph = (struct iphdr *) skb->data;
 
+#if 0
+	/* icmp.c does this for us */
 #define ICMP_MIN_LENGTH 4
 	if (skb->len < (iph->ihl << 2) + ICMP_MIN_LENGTH)
 		goto drop;
+#endif
 	printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
 	/* Note: use returned IP header and possibly payload for lookup */
 	if ((np = np_lookup_icmp(iph, skb->len)) == NULL)
@@ -5382,8 +5388,10 @@ np_v4_err(struct sk_buff *skb, u32 info)
       no_stream:
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
 	np_v4_err_next(skb, info);
+#if 0
 	goto drop;
       drop:
+#endif
 #ifdef HAVE_KINC_LINUX_SNMP_H
 	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
 #else

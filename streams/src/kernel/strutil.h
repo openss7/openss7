@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/14 11:43:20 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/06/05 02:53:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/14 11:43:20 $ by $Author: brian $
+ Last Modified $Date: 2006/06/05 02:53:34 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -69,7 +69,7 @@ extern struct syncq *global_syncq;
 #if 0
 extern bool __rmvq(queue_t *q, mblk_t *mp);
 #endif
-extern bool __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[]);
+extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[]);
 
 /*
  *  Simple locks, no nesting (not required).  Write locks suppress interrupts; read locks only

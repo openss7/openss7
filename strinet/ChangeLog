@@ -1,7 +1,16 @@
+2006-06-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: find symbol skbuff_head_cache
+	* src/drivers/udp.c: working up zero-copy architecture
+
 2006-05-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/udp.c: started zero-copy architecture
 	* src/drivers/rawip.c: rationalized to 2nd gen udp driver
+
+2006-05-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c: roughing in zero-copy architecture
 
 2006-05-25  Brian Bidulock  <bidulock@openss7.org>
 

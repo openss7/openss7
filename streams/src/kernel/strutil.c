@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2006/06/03 08:54:30 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/06/05 02:53:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,32 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/03 08:54:30 $ by $Author: brian $
+ Last Modified $Date: 2006/06/05 02:53:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
- Revision 0.9.2.123  2006/06/03 08:54:30  brian
- - found bug in pullupmsg()
-
- Revision 0.9.2.122  2006/05/25 08:30:43  brian
- - optimization for recent compilers
-
- Revision 0.9.2.121  2006/05/24 10:50:29  brian
- - optimizations
-
- Revision 0.9.2.120  2006/05/22 02:09:06  brian
- - changes from performance testing
+ Revision 0.9.2.124  2006/06/05 02:53:34  brian
+ - working up udp zero-copy
 
  Revision 0.9.2.119  2006/02/20 10:59:22  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2006/06/03 08:54:30 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/06/05 02:53:34 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2006/06/03 08:54:30 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/06/05 02:53:34 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -3159,7 +3150,7 @@ __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
  *  is to allocate the syncrhonization queues with setsq() and the set the queues with setq().
  *  Syncrhonization queues from a multiplexed queue pair can be removed with setsq(q, NULL).
  */
-__unlikely streams_fastcall void
+streams_fastcall __unlikely void
 setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	struct stdata *sd;
