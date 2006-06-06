@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/05 02:53:40 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/06 06:26:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/05 02:53:40 $ by $Author: brian $
+ Last Modified $Date: 2006/06/06 06:26:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.28  2006/06/06 06:26:47  brian
+ - second gen UDP driver working well now
+
  Revision 0.9.2.27  2006/06/05 02:53:40  brian
  - working up udp zero-copy
 
@@ -133,10 +136,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/05 02:53:40 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/06 06:26:47 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/05 02:53:40 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/06 06:26:47 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -213,7 +216,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/05 02:53:40 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/06 06:26:47 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -3659,44 +3662,7 @@ tp_ip_queue_xmit(struct sk_buff *skb)
  * When tp->sndmem is greater than tp->options.xti.sndbuf we place STREAMS buffers back on the send
  * queue and stall the queue.  When the send memory falls below tp->options.xti.sndlowat (or to
  * zero) and there are message on the send queue, we enable the queue.
- *
- * Also, this function frees the original message block and data block that contained the data
- * payload for the packet.
  */
-#if 0
-STATIC void __hot
-tp_skb_destructor(struct sk_buff *skb)
-{
-	mblk_t *mp;
-	struct tp *tp;
-
-	/* these are where we hid them */
-	if ((mp = (mblk_t *) skb_shinfo(skb)->frags[0].page) != NULL) {
-		tp = (struct tp *) mp->b_prev;
-		mp->b_prev = NULL;
-
-		/* technically we could have multiple processors freeing socket buffers at the same 
-		   time. */
-		spin_lock_bh(&tp->qlock);
-		ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
-		tp->sndmem -= skb->truesize;
-		if (unlikely((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0))) {
-			spin_unlock_bh(&tp->qlock);
-			if (tp->iq != NULL && tp->iq->q_first != NULL)
-				qenable(tp->iq);
-		} else {
-			spin_unlock_bh(&tp->qlock);
-		}
-		skb_shinfo(skb)->frags[0].page = NULL;
-		skb->destructor = NULL;
-		tp_release(&tp);
-		freemsg(mp);
-	} else
-		swerr();
-	return;
-}
-#else
-/* just for testing */
 STATIC void __hot
 tp_skb_destructor(struct sk_buff *skb)
 {
@@ -3718,12 +3684,59 @@ tp_skb_destructor(struct sk_buff *skb)
 		tp_release(&tp);
 	}
 }
-#endif
 
 #undef skbuff_head_cache
 #ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
 #define skbuff_head_cache (*((kmem_cache_t **) HAVE_SKBUFF_HEAD_CACHE_ADDR))
 #endif
+
+/**
+ * tp_alloc_skb_slow - allocate a socket buffer from a message block
+ * @tp: private pointer
+ * @mp: the message block
+ * @headroom: header room for resulting sk_buff
+ * @gfp: general fault protection
+ *
+ * This is the old slow way of allocating a socket buffer.  We simple allocate a socket buffer with
+ * sufficient head room and copy the data from the message block(s) to the socket buffer.  This is
+ * slow.  This is the only way that LiS can do things (because it has unworkable message block
+ * allocation).
+ */
+STATIC noinline fastcall __unlikely struct sk_buff *
+tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+{
+	struct sk_buff *skb;
+	unsigned int dlen = msgdsize(mp);
+
+	if (likely((skb = alloc_skb(headroom + dlen, GFP_ATOMIC)) != NULL)) {
+		skb_reserve(skb, headroom);
+		{
+			unsigned char *data;
+			mblk_t *b;
+			int blen;
+
+			data = skb_put(skb, dlen);
+			for (b = mp; b; b = b->b_cont) {
+				if ((blen = b->b_wptr - b->b_rptr) > 0) {
+					bcopy(b->b_rptr, data, blen);
+					data += blen;
+					__assert(data <= skb->tail);
+				} else
+					rare();
+			}
+		}
+		freemsg(mp);	/* must absorb */
+		/* we never have any page fragments, so we can steal a pointer from the page
+		   fragement list. */
+		assert(skb_shinfo(skb)->nr_frags == 0);
+		skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+		skb->destructor = tp_skb_destructor;
+		spin_lock_bh(&tp->qlock);
+		tp->sndmem += skb->truesize;
+		spin_unlock_bh(&tp->qlock);
+	}
+	return (skb);
+}
 
 /**
  * tp_alloc_skb - allocate a socket buffer from a message block
@@ -3735,8 +3748,9 @@ tp_skb_destructor(struct sk_buff *skb)
  * Description: this function is used for zero-copy allocation of a socket buffer from a message
  * block.  The socket buffer contains all of the data in the message block including any head or
  * tail room (db_base to db_lim).  The data portion of the socket buffer contains the data
- * referenced by the message block (b_rptr to b_wptr).  A destructor is used to to free the message
- * block when the socket buffer is freed.  The reference to the message block is consumed unless the
+ * referenced by the message block (b_rptr to b_wptr).  Because there is no socket buffer destructor
+ * capable of freeing the message block, we steal the kmem_alloc'ed buffer from the message and
+ * attach it tot he socket buffer header.  The reference to the message block is consumed unless the
  * function returns NULL.
  *
  * A problem exists in converting mblks to sk_buffs (although visa versa is easy):  sk_buffs put a
@@ -3775,14 +3789,26 @@ tp_skb_destructor(struct sk_buff *skb)
  * the header need be completed.  If checksum has not yet been performed, it is necessary to walk
  * through the data to generate the checksum.
  */
-#if 0
+#if defined LFS
+STATIC streamscall void __hot_out tp_dummy_free(caddr_t arg)
+{
+	return;
+}
 STATIC INLINE fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb, *skb_head = NULL, *skb_tail = NULL;
 	unsigned char *beg, *end;
 
-	assure(mp->b_datap->db_ref == 1);
+	/* must not be a fastbuf */
+	if (unlikely(mp->b_datap->db_size <= FASTBUF))
+		goto go_slow;
+	/* must not be esballoc'ed */
+	if (unlikely(mp->b_datap->db_frtnp != NULL))
+		goto go_slow;
+	/* must be only reference (for now) */
+	if (unlikely(mp->b_datap->db_ref > 1))
+		goto go_slow;
 
 	beg = mp->b_rptr - headroom;
 	/* First, check if there is enough head room in the data block. */
@@ -3822,24 +3848,35 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	memset(skb, 0, offsetof(struct sk_buff, truesize));
 	skb->truesize = end - beg + sizeof(struct sk_buff);
 	atomic_set(&skb->users, 1);
-	skb->head = beg;
+	skb->head = mp->b_datap->db_base;
 	skb->data = mp->b_rptr;
 	skb->tail = mp->b_wptr;
 	skb->end = end;
 	skb->len = mp->b_wptr - mp->b_rptr;
-	skb->cloned = 1; /* do not attempt to free buffer */
+	skb->cloned = 0;
 	skb->data_len = 0;
 	/* initialize shared data structure */
 	memset(skb_shinfo(skb), 0, sizeof(struct skb_shared_info));
 	atomic_set(&(skb_shinfo(skb)->dataref), 1);
 
+	/* need to release message block and data block without releasing buffer */
+
+	/* point into internal buffer */
+	mp->b_datap->db_frtnp = (struct free_rtn *)
+		((struct mdbblock *)((struct mbinfo *)mp->b_datap - 1))->databuf;
+	/* override with dummy free routine */
+	mp->b_datap->db_frtnp->free_func = tp_dummy_free;
+	mp->b_datap->db_frtnp->free_arg = NULL;
+	freemsg(mp);
+
+	/* we never have any page fragments, so we can steal a pointer from the page
+	   fragement list. */
+	assert(skb_shinfo(skb)->nr_frags == 0);
+	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+	skb->destructor = tp_skb_destructor;
 	spin_lock_bh(&tp->qlock);
 	tp->sndmem += skb->truesize;
 	spin_unlock_bh(&tp->qlock);
-
-	mp->b_prev = (mblk_t *) tp_get(tp);	/* not on a queue */
-	skb_shinfo(skb)->frags[0].page = (struct page *) mp;	/* only private pointer in an sk_buff */
-	skb->destructor = tp_skb_destructor;
 
 	if (likely(skb_head == NULL)) {
 		if (unlikely(skb_tail != NULL)) {
@@ -3871,43 +3908,14 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		kfree_skb(skb_head);
       no_head:
 	return (NULL);
+      go_slow:
+	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
 #else
-/* just for testing - old copy method */
 STATIC INLINE fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
-	struct sk_buff *skb;
-	unsigned int dlen = msgdsize(mp);
-
-	if (likely((skb = alloc_skb(headroom + dlen, GFP_ATOMIC)) != NULL)) {
-		skb_reserve(skb, headroom);
-		{
-			unsigned char *data;
-			mblk_t *b;
-			int blen;
-
-			data = skb_put(skb, dlen);
-			for (b = mp; b; b = b->b_cont) {
-				if ((blen = b->b_wptr - b->b_rptr) > 0) {
-					bcopy(b->b_rptr, data, blen);
-					data += blen;
-					__assert(data <= skb->tail);
-				} else
-					rare();
-			}
-		}
-		freemsg(mp);	/* must absorb */
-		/* we never have any page fragments, so we can steal a pointer from the page
-		   fragement list. */
-		assert(skb_shinfo(skb)->nr_frags == 0);
-		skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
-		skb->destructor = tp_skb_destructor;
-		spin_lock_bh(&tp->qlock);
-		tp->sndmem += skb->truesize;
-		spin_unlock_bh(&tp->qlock);
-	}
-	return (skb);
+	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
 #endif
 
@@ -8118,7 +8126,7 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	struct tp *tp, **tpp = &master.tp.list;
 
-#if 0
+#if defined LFS
 	mblk_t *mp;
 	struct stroptions *so;
 #endif
@@ -8151,7 +8159,7 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = FREE_CMINOR;
-#if 0
+#if defined LFS
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
 #endif
@@ -8175,7 +8183,7 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		write_unlock_bh(&master.lock);
-#if 0
+#if defined LFS
 		freeb(mp);
 #endif
 		return (ENXIO);
@@ -8185,18 +8193,20 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (!(tp = tp_alloc_priv(q, tpp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		write_unlock_bh(&master.lock);
-#if 0
+#if defined LFS
 		freeb(mp);
 #endif
 		return (ENOMEM);
 	}
 	write_unlock_bh(&master.lock);
-#if 0
-	/* want to set a write offet of 20 bytes */
+#if defined LFS
+	/* want to set a write offet of MAX_HEADER bytes */
 	so = (typeof(so)) mp->b_wptr;
-	so->so_flags = SO_WROFF | SO_DELIM;
-	so->so_wroff = 20;
+	so->so_flags = SO_WROFF | SO_WRPAD;
+	so->so_wroff = MAX_HEADER; /* this is too big */
+	so->so_wrpad = SMP_CACHE_BYTES + sizeof(struct skb_shared_info); /* this is too big */
 	mp->b_wptr += sizeof(*so);
+	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
 #endif
 	qprocson(q);

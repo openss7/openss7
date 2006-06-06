@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/06/04 21:59:44 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/06/06 06:26:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/04 21:59:44 $ by $Author: brian $
+ Last Modified $Date: 2006/06/06 06:26:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.132  2006/06/06 06:26:42  brian
+ - second gen UDP driver working well now
+
  Revision 0.9.2.131  2006/06/04 21:59:44  brian
  - check in for testing
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/06/04 21:59:44 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/06/06 06:26:42 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/06/04 21:59:44 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/06/06 06:26:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -874,30 +877,6 @@ mdbblock_alloc_slow(uint priority, void *func)
       fail:
 	return (mp);
 }
-#if 0
-int
-mdbblock_check(void)
-{
-	struct strthread *t = this_thread;
-	unsigned long flags;
-	mblk_t *b, *b_next;
-	int blocks;
-
-	local_irq_save(flags);
-	blocks = t->freemblks;
-	b = b_next = t->freemblk_head;
-	while (b_next) {
-		b = b_next;
-		b_next = b->b_next;
-		blocks--;
-	}
-	local_irq_restore(flags);
-	if (blocks != 0)
-		__printd(("List integrity check failed, lost %d blocks after %p\n", blocks, b));
-	return (blocks);
-}
-EXPORT_SYMBOL(mdbblock_check);
-#endif
 STATIC streams_fastcall __hot mblk_t *
 mdbblock_alloc(uint priority, void *func)
 {
@@ -912,33 +891,15 @@ mdbblock_alloc(uint priority, void *func)
 
 	prefetchw(t);
 
-#if 0
-	{
-		int blocks;
-		
-		if ((blocks = mdbblock_check()) != 0)
-			__ptrace(("List integrity check failed, lost %d blocks\n", blocks));
-	}
-#endif
-
 	local_irq_save(flags);
 	mp = t->freemblk_head;
 	prefetchw(mp);
 	if (likely(mp != NULL)) {
 		if ((t->freemblk_head = mp->b_next) == NULL)
 			t->freemblk_tail = &t->freemblk_head;
-		mp->b_next = NULL;
 		t->freemblks--;
-	}
-	local_irq_restore(flags);
-
-	if (likely(mp != NULL)) {
-#if 0
-		struct mdbblock *md = (struct mdbblock *) mp;
-
-		md->msgblk.m_func = func;
-		ctrace(md->msgblk.m_queue = NULL);
-#endif
+		local_irq_restore(flags);
+		mp->b_next = NULL;
 		{
 			struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 
@@ -958,6 +919,7 @@ mdbblock_alloc(uint priority, void *func)
 		ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 		return (mp);
 	}
+	local_irq_restore(flags);
 	return mdbblock_alloc_slow(priority, func);
 }
 
@@ -1031,34 +993,21 @@ BIG_STATIC_INLINE streams_fastcall __hot_in void
 mdbblock_free(mblk_t *mp)
 {
 	struct strthread *t = this_thread;
-	int too_many;
 
 	printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
 
 	prefetchw(t);
 	prefetchw(mp);
 
-#if 0
-	{
-		int blocks;
-		
-		if ((blocks = mdbblock_check()) != 0)
-			__ptrace(("List integrity check failed, lost %d blocks\n", blocks));
-	}
-#endif
-
-	dassert(mp->b_next == NULL); /* check double free */
+	dassert(mp->b_next == NULL);	/* check double free */
 	mp->b_next = NULL;
 	{
 		unsigned long flags;
 
 		local_irq_save(flags);
-		*XCHG(&t->freemblk_tail, &mp->b_next) = mp;
-		/* Decide when to invoke freeblocks.  Current policy is to free blocks when then
-		   number of blocks on the free list exceeds some (per-cpu) threshold.  Currently I 
-		   set this to just 1/16th of the maximum.  That should be ok for now.  I will
-		   create a sysctl for it later... */
-		too_many = (++t->freemblks > (sysctl_str_nstrmsgs >> 4));
+		*(t->freemblk_tail) = mp;
+		t->freemblk_tail = &mp->b_next;
+		t->freemblks++;
 		local_irq_restore(flags);
 	}
 	{
@@ -1071,7 +1020,12 @@ mdbblock_free(mblk_t *mp)
 #endif
 		atomic_dec(&sdi->si_cnt);
 	}
-	if (unlikely(too_many && test_and_set_bit(freeblks, &t->flags) == 0))
+	/* Decide when to invoke freeblocks.  Current policy is to free blocks when then number of
+	   blocks on the free list exceeds some (per-cpu) threshold.  Currently I set this to just 
+	   1/16th of the maximum.  That should be ok for now.  I will create a sysctl for it
+	   later... */
+	if (unlikely((t->freemblks > (sysctl_str_nstrmsgs >> 4))
+		     && test_and_set_bit(freeblks, &t->flags) == 0))
 		__raise_streams();
 	raise_local_bufcalls();
 	/* other processors will just have to fight over the remaining memory */

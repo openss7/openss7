@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/06/05 02:53:35 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/06/06 06:26:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/05 02:53:35 $ by $Author: brian $
+ Last Modified $Date: 2006/06/06 06:26:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.148  2006/06/06 06:26:43  brian
+ - second gen UDP driver working well now
+
  Revision 0.9.2.147  2006/06/05 02:53:35  brian
  - working up udp zero-copy
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/06/05 02:53:35 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/06/06 06:26:43 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/06/05 02:53:35 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/06/06 06:26:43 $";
 
 //#define __NO_VERSION__
 
@@ -175,7 +178,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/06/05 02:53:35 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/06/06 06:26:43 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -787,34 +790,6 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 	return (0);
 }
 
-/**
- * strdsize - size data block
- * @sd: stream head
- * @block: requested data size
- *
- * If there is a write offset we add that headroom to the buffer.  If there is write padding (LfS
- * concept), we pad the tail of the buffer to SMP_CACHE_BYTES alignment plus the write padding.
- * Write offsets are so that headers can be added later without copying the buffer (SVR4 concept).
- * Write padding is so that tail information can be added later without copying the buffer (LfS
- * concept).  This is primarily so that we can more easily convert mblks to sk_buffs in network
- * drivers without copying the contents.  Linux socket buffers hide a shared sk_buff information
- * structure at the first SMP cache line following the data.  This is only performed if it was
- * requested by the driver with M_SETOPTS with SO_WRPAD set and so_wrpad set to a non-zero value.
- */
-
-STATIC streams_inline streams_fastcall __hot_put size_t
-strdsize(struct stdata *sd, size_t block)
-{
-	size_t dsize;
-
-	dsize = sd->sd_wroff + block;
-
-	if (sd->sd_wrpad)
-		dsize = ((dsize + (SMP_CACHE_BYTES - 1)) & ~(SMP_CACHE_BYTES - 1)) + sd->sd_wrpad;
-
-	return (dsize);
-}
-
 STATIC streams_inline streams_fastcall __hot_put mblk_t *
 alloc_proto(struct stdata *sd, ssize_t psize, ssize_t dsize, int type, uint bpri)
 {
@@ -830,11 +805,17 @@ alloc_proto(struct stdata *sd, ssize_t psize, ssize_t dsize, int type, uint bpri
 			return (mp);
 	}
 	if (likely(dsize >= 0)) {	/* PROFILED */
+		int sd_wroff;
+		
+		sd_wroff = sd->sd_wroff;
 		ptrace(("Allocating data part %d bytes\n", dsize));
-		if (likely((dp = allocb(strdsize(sd, dsize), bpri)) != NULL)) {
+		if (likely((dp = allocb(sd_wroff + dsize + sd->sd_wrpad, bpri)) != NULL)) {
 			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
-			dp->b_rptr += sd->sd_wroff;
-			dp->b_wptr = dp->b_rptr + dsize;
+			if (sd_wroff) {
+				dp->b_rptr += sd_wroff;
+				dp->b_wptr += sd_wroff;;
+			}
+			dp->b_wptr += dsize;
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
 			if (likely(psize < 0))	/* PROFILED */
@@ -4661,6 +4642,7 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	do {
 		mblk_t *b;
 		size_t block;
+		int sd_wroff;
 
 		/* Note: if q_minpsz is zero and the nbytes length is greater than q_maxpsz, we are 
 		   supposed to break the message down into separate q_maxpsz segments. */
@@ -4668,15 +4650,16 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 		/* the following can sleep */
 
 		block = min(nbytes - written, q_maxpsz);
+		sd_wroff = sd->sd_wroff;
 
 		/* POSIX says always blocks awaiting message blocks */
-		if (unlikely((b = allocb(strdsize(sd, block), BPRI_WAITOK)) == NULL)) {
+		if (unlikely((b = allocb(sd_wroff + block + sd->sd_wrpad, BPRI_WAITOK)) == NULL)) {
 			err = -ENOSR;
 			break;
 		}
-		if (sd->sd_wroff) {
-			b->b_rptr += sd->sd_wroff;
-			b->b_wptr += sd->sd_wroff;
+		if (sd_wroff) {
+			b->b_rptr += sd_wroff;
+			b->b_wptr += sd_wroff;
 		}
 
 		if (likely((err = strcopyin(buf + written, b->b_wptr, block))) == 0) {
@@ -10046,6 +10029,7 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 	}
 	if (so->so_flags & SO_WRPAD)
 		sd->sd_wrpad = so->so_wrpad;
+	freemsg(mp);
 	return (0);
 }
 

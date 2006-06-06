@@ -1,3 +1,8 @@
+2006-06-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c: strapped in zero-copy and write offset and padding
+	- this tests well now
+
 2006-06-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: find symbol skbuff_head_cache
