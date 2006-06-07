@@ -1,3 +1,8 @@
+2006-06-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/inet.c: minor bug found by inspection in inet.c
+	- should not affect any real use of the driver
+
 2006-06-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/udp.c: strapped in zero-copy and write offset and padding
