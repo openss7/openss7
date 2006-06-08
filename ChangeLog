@@ -1,3 +1,8 @@
+2006-06-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: strip -fno-reorder-blocks which is keeping
+	  __builtin_expect from working on x86_64
+
 2006-05-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* .indent.pro: removed storage classes (inline)

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/05/24 10:49:06 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/06/08 08:20:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/24 10:49:06 $ by $Author: brian $
+# Last Modified $Date: 2006/06/08 08:20:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1677,6 +1677,11 @@ dnl
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude/asm| -I${ksrcdir}/include/asm|g"`
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iarch/| -I${ksrcdir}/arch/|g"`
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9s]]* | $linux_cflags |"`
+dnl
+dnl	Recent x86_64 makefiles add -fno-reorder-blocks which impedes __builtin_expect() which is
+dnl	not good.  Strip it off here.
+dnl
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-reorder-blocks||"`
 dnl
 dnl	Unfortunately, Linux 2.6 makefiles add (machine dependant) -I includes
 dnl	to CFLAGS instead of CPPFLAGS, which is just plain wrong, but that's
