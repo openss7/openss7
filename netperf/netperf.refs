@@ -792,6 +792,22 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-rfc3057bis-00.txt
 
+%K rfc4129
+%K DUArfc
+%L RFC 4129
+%R RFC 4129
+%A Ranjith Mukundan
+%A Ken Morneault
+%A Narsimullo Mangalpally
+%E Ranjith Mukundan
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Digital Private Network Signaling System (DPNSS)/Digital Access Signaling System 2 (DASS 2) Extensions to the IUA Protocol
+%D August 2005
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4129.txt
+
 %K dua-05
 %L DUA
 %A Ranjith Mukundan
@@ -1123,6 +1139,23 @@ Part 1: Protocol Specification
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %O (Previously "CCITT Recommendation")
+
+%K rfc4165
+%K M2PArfc
+%L RFC 4165
+%R RFC 4165
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George
+%T Signaling System 7 (SS7) Message Transfer Part 2 (MTP2) - User Peer-to-Peer Adaptation Layer (M2PA)
+%D September 2005
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4165.txt
 
 %K m2pa-09
 %L M2PA09
@@ -4081,8 +4114,24 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3054.txt
 
-%K IUA-RFC
-%L IUA
+%K rfc4233
+%K IUArfc
+%L RFC 4233
+%R RFC 4233
+%A Ken Morneault
+%A Selvam Rengasami
+%A Melleswar Kalla
+%A Greg Sidebottom
+%E Ken Morneault
+%T Integrated Services Digital Network (ISDN) Q.921-User Adaptation Layer
+%D January 2006
+%I The Internet Society
+%O (Obsoletes RFC 3057)
+%U http://www.ietf.org/rfc/rfc4233.txt
+
+%K rfc3057
+%L RFC 3057
+%R RFC 3057
 %A Ken Morneault
 %A Selvam Rengasami
 %A Melleswar Kalla
@@ -4093,6 +4142,7 @@ Part 1: Protocol Specification
 %R RFC 3057
 %D November 2000
 %I The Internet Society
+%O (Obsoleted by RFC 4233)
 %U http://www.ietf.org/rfc/rfc3057.txt
 
 %K rfc3064

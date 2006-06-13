@@ -1,3 +1,7 @@
+2006-06-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* openss7.refs: updated references for IUA, DUA, M2PA
+
 2006-06-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: strip -fno-reorder-blocks which is keeping

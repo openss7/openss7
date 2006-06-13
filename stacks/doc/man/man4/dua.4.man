@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dua.4.man,v 0.9.2.6 2006/04/05 09:43:03 brian Exp $
+.\" @(#) $Id: dua.4.man,v 0.9.2.7 2006/06/13 10:25:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/06/13 10:25:49 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dua.4.man,v $
+.\" Revision 0.9.2.7  2006/06/13 10:25:49  brian
+.\" - updated references for IUA, DUA, M2PA
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:03  brian
 .\" - moved .so line and updated headers
 .\"
@@ -127,8 +130,11 @@ sort-adjacent-labels
 .B DUA
 is an implementation of the
 .I DPNSS/DASS User Adaptation Layer (DUA)
-as sepcified in
-.BR draft-ietf-sigtran-dua-xx .
+as specified in
+.BR "RFC 4129" .
+.[
+DUArfc
+.]
 .B DUA
 provides a backhaul of the services of
 .BR dass "(4) and " dpnss (4)
@@ -136,6 +142,9 @@ over an IP network using Stream Control Transmission Protocol,
 .BR sctp (4)
 as defined in
 .BR "RFC 2960" .
+.[
+rfc2960
+.]
 .\"
 .\"
 .PP
@@ -291,9 +300,6 @@ release 0.8.4.
 .\"
 .\"
 .XX
-.[
-dua-05
-.]
 .[
 dpnss1
 .]

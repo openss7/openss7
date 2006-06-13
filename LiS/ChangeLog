@@ -1,3 +1,7 @@
+2006-06-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* man/lis.refs: updated references for IUA, DUA, M2PA
+
 2006-05-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/strconf-sh: added module id base to strconf

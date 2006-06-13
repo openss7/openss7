@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: SIGTRAN.4.man,v 0.9.2.8 2006/04/27 09:34:40 brian Exp $
+.\" @(#) $Id: SIGTRAN.4.man,v 0.9.2.9 2006/06/13 10:25:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/27 09:34:40 $ by $Author: brian $
+.\" Last Modified $Date: 2006/06/13 10:25:49 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: SIGTRAN.4.man,v $
+.\" Revision 0.9.2.9  2006/06/13 10:25:49  brian
+.\" - updated references for IUA, DUA, M2PA
+.\"
 .\" Revision 0.9.2.8  2006/04/27 09:34:40  brian
 .\" - updated references
 .\"
@@ -200,7 +203,7 @@ provides the following SS7 modules:
 .BR m2pa (4)
 .I SS7 MTP2 User Peer-to-Peer Adaptation Layer (M2PA)
 .[
-m2pa-09
+M2PArfc
 .]
 .\"
 .\"
@@ -214,10 +217,7 @@ provides the following ISDN pseudo-device drivers:
 .BR iua (4)
 .I ISDN Q.921 User Adaptation Layer (IUA)
 .[
-IUA-RFC
-.]
-.[
-IUA-BIS
+IUArfc
 .]
 protocol layer transporting and distributing the services provided by
 .BR dl (4),
@@ -231,7 +231,7 @@ for IUA-specific management,
 .BR dua (4)
 .I DPNSS/DASS 2 Extentions to the IUA Protocol (DUA)
 .[
-dua-05
+DUArfc
 .]
 protocol layer transporting and distributing the services provided by
 .BR dua (4),
