@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/25 08:39:08 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/06/14 10:37:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/25 08:39:08 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.15  2006/06/14 10:37:18  brian
+ - defeat a lot of debug traces in debug mode for testing
+ - changes to allow strinet to compile under LiS (why???)
+
  Revision 0.9.2.14  2006/05/25 08:39:08  brian
  - added noinline in strategic places
 
@@ -97,9 +101,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/25 08:39:08 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/06/14 10:37:18 $"
 
-static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/25 08:39:08 $";
+static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/06/14 10:37:18 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -120,7 +124,7 @@ static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/25 08:39:08 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/06/14 10:37:18 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -334,6 +338,9 @@ ss7_trylockq(queue_t *q)
 
 EXPORT_SYMBOL_NOVERS(ss7_trylockq);
 
+#ifdef LIS
+extern int enableq(queue_t *q);
+#endif
 /**
  * ss7_unlockq: - unlock a queue pair, enabling waiting queues
  * @q: queue whose put or service procedure is running

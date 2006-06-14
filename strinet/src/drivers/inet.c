@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2006/06/07 09:54:36 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/06/14 10:37:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/07 09:54:36 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.73  2006/06/14 10:37:34  brian
+ - defeat a lot of debug traces in debug mode for testing
+ - changes to allow strinet to compile under LiS (why???)
+
  Revision 0.9.2.72  2006/06/07 09:54:36  brian
  - minor non-service affecting bug found by inspection
 
@@ -93,10 +97,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2006/06/07 09:54:36 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/06/14 10:37:34 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2006/06/07 09:54:36 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/06/14 10:37:34 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -582,7 +586,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2006/06/07 09:54:36 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/06/14 10:37:34 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -16085,6 +16089,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		spin_unlock_bh(&ss_lock);
 		return (ENXIO);
 	}
+#if defined LFS
 	{
 		unsigned long flags = freezestr(q);
 		/* Pre-allocate queue band structures on the read side. */
@@ -16104,6 +16109,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		}
 		unfreezestr(q, flags);
 	}
+#endif
 	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(ss = ss_alloc_priv(q, ipp, cmajor, cminor, crp, prof))) {

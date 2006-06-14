@@ -1,3 +1,10 @@
+2006-06-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/os7/compat.h: added null section statements for LiS
+	* src/include/sys/os7/debug.h: rationalized to streams/strdebug.h for LiS
+	* src/include/sys/os7/strconf.h: sp correction
+	* src/kernel/os7compat.c: forward declaration for LiS
+
 2006-06-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strcompat.refs: updated references for IUA, DUA, M2PA

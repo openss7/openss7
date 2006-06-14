@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.4 2006/04/22 01:05:35 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.5 2006/06/14 10:37:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,17 +44,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:17 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OS7_STRCONF_H__
 #define __SYS_OS7_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
-#warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
+#warning "Do not include sys/os7/strconf.h directly, include sys/strconf.h instead."
 #endif
 
 #ifndef __KERNEL__

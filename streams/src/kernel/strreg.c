@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/28 09:48:02 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/06/14 10:37:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/28 09:48:02 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/06/14 10:37:23 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/28 09:48:02 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/06/14 10:37:23 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -188,20 +188,20 @@ register_strmod(struct fmodsw *fmod)
 	int err;
 
 	if (!fmod || !fmod->f_name || !fmod->f_name[0]) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-EINVAL);
 	} else {
 		struct streamtab *st;
 		struct qinit *qi;
 
 		if (!(st = fmod->f_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo)) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			return (-EINVAL);
 		}
 	}
 #if defined CONFIG_STREAMS_SYNCQS
 	if ((err = register_strsync(fmod))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (err);
 	}
 #endif
@@ -212,10 +212,10 @@ register_strmod(struct fmodsw *fmod)
 		/* check name for another module */
 		if ((f = __smod_search(fmod->f_name))) {
 			if (f != fmod) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto eperm;
 			}
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			goto ebusy;
 		}
 
@@ -224,7 +224,7 @@ register_strmod(struct fmodsw *fmod)
 			_ptrace(("Finding a free module id\n"));
 			for (modid = (modID_t) (-1UL); modid && __fmod_lookup(modid); modid--) ;
 			if (!modid) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto enxio;
 			}
 			mi->mi_idnum = modid;
@@ -233,10 +233,10 @@ register_strmod(struct fmodsw *fmod)
 			/* use specified module id */
 			if ((f = __fmod_lookup(modid))) {
 				if (f != fmod) {
-					ptrace(("Error path taken!\n"));
+					_ptrace(("Error path taken!\n"));
 					goto eperm;
 				}
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto ebusy;
 			}
 		}
@@ -314,20 +314,20 @@ register_strdrv(struct cdevsw *cdev)
 	int err = 0;
 
 	if (!cdev || !cdev->d_name || !cdev->d_name[0]) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-EINVAL);
 	} else {
 		struct streamtab *st;
 		struct qinit *qi;
 
 		if (!(st = cdev->d_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo)) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			return (-EINVAL);
 		}
 	}
 #if defined CONFIG_STREAMS_SYNCQS
 	if ((err = register_strsync((struct fmodsw *) cdev))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (err);
 	}
 #endif
@@ -338,10 +338,10 @@ register_strdrv(struct cdevsw *cdev)
 		/* check name for another module */
 		if ((c = __smod_search(cdev->d_name))) {
 			if (c != cdev) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto eperm;
 			}
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			goto ebusy;
 		}
 		if (!(modid = mi->mi_idnum)) {
@@ -349,7 +349,7 @@ register_strdrv(struct cdevsw *cdev)
 			_ptrace(("Finding a free module id\n"));
 			for (modid = (modID_t) (-1UL); modid && __cdrv_lookup(modid); modid--) ;
 			if (!modid) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto enxio;
 			}
 			mi->mi_idnum = modid;
@@ -358,17 +358,17 @@ register_strdrv(struct cdevsw *cdev)
 			/* use specified module id */
 			if ((c = __cdrv_lookup(modid))) {
 				if (c != cdev) {
-					ptrace(("Error path taken!\n"));
+					_ptrace(("Error path taken!\n"));
 					goto eperm;
 				}
 				/* already registered to us */
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto ebusy;
 			}
 		}
 		_ptrace(("Assigned module id %hu\n", modid));
 		if ((err = sdev_add(cdev, modid))) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			goto unregister_exit;
 		}
 		err = modid;
@@ -413,28 +413,28 @@ unregister_strdrv(struct cdevsw *cdev)
 
 	write_lock(&cdevsw_lock);
 	if (!cdev || !cdev->d_name || !cdev->d_name[0]) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto einval;
 	}
 	/* the cdev is not registered as a module */
 	if (!cdev->d_list.next || list_empty(&cdev->d_list)) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto enxio;
 	}
 	if (cdev->d_majors.next && !list_empty(&cdev->d_majors)) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto ebusy;
 	}
 	if (cdev->d_minors.next && !list_empty(&cdev->d_minors)) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto ebusy;
 	}
 	if (cdev->d_apush.next && !list_empty(&cdev->d_apush)) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto ebusy;
 	}
 	if (cdev->d_stlist.next && !list_empty(&cdev->d_stlist)) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto ebusy;
 	}
 #if defined CONFIG_STREAMS_SYNCQS
@@ -485,7 +485,7 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 	do {
 		err = -EINVAL;
 		if (!cdev || !cdev->d_name || !cdev->d_name[0] || !cmaj) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			break;
 		}
 		err = -EINVAL;
@@ -495,18 +495,18 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 		if (major >= MAX_CHRDEV)
 #endif
 		{
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			break;
 		}
 		err = -EINVAL;
 		/* ensure that the device is registered (as a module) */
 		if (!cdev->d_list.next || list_empty(&cdev->d_list)) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			break;
 		}
 		err = -EBUSY;
 		if (major && __cmaj_lookup(major)) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			break;
 		}
 #ifdef CONFIG_STREAMS_DEBUG
@@ -518,7 +518,7 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 #endif
 		/* register the character device */
 		if ((err = register_chrdev(major, cdev->d_name, fops)) < 0) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			break;
 		}
 #ifdef CONFIG_STREAMS_DEBUG
@@ -672,16 +672,16 @@ unregister_cmajor(struct cdevsw *cdev, major_t major)
 
 	err = -ENXIO;
 	if (!(cmaj = cmaj_get(cdev, major))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto error;
 	}
 	if ((err = unregister_xinode(cdev, cmaj, major)) < 0) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto error;
 	}
 	kfree(cmaj);
 	if ((err = unregister_strdrv(cdev)) < 0 && err != -EBUSY) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto error;
 	}
 	return (0);

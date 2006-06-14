@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/10 07:23:58 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:23:58 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.46  2006/06/14 10:37:27  brian
+ - defeat a lot of debug traces in debug mode for testing
+ - changes to allow strinet to compile under LiS (why???)
+
  Revision 0.9.2.45  2006/03/10 07:23:58  brian
  - rationalized streams and strutil package sources
 
@@ -61,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/10 07:23:58 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:27 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/10 07:23:58 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:27 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -91,7 +95,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/03/10 07:23:58 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:27 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -251,7 +255,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 		caddr_t uaddr;
 		size_t usize;
 
-		trace();
+		_trace();
 		ioc = (typeof(ioc)) mp->b_rptr;
 
 #ifdef WITH_32BIT_CONVERSION
@@ -269,16 +273,16 @@ sc_wput(queue_t *q, mblk_t *mp)
 			/* there is really no reason why a regular user cannot list modules and
 			   related information. */
 #if 0
-			trace();
+			_trace();
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto nak;
 			}
 #endif
-			trace();
+			_trace();
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
-				trace();
+				_trace();
 				if (uaddr == NULL) {
 					rval = str_mlist_count();
 					goto ack;
@@ -291,7 +295,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 				qreply(q, mp);
 				return (0);
 			}
-			trace();
+			_trace();
 			/* doesn't support I_STR yet, just TRANSPARENT */
 			err = -EINVAL;
 			goto nak;
@@ -303,12 +307,12 @@ sc_wput(queue_t *q, mblk_t *mp)
 
 		switch (ioc->copyresp.cp_cmd) {
 		case SC_IOC_LIST:
-			trace();
+			_trace();
 			if (ioc->copyresp.cp_rval != 0) {
-				ptrace(("Aborting ioctl!\n"));
+				_ptrace(("Aborting ioctl!\n"));
 				goto abort;
 			}
-			trace();
+			_trace();
 			if (ioc->copyresp.cp_private == (mblk_t *) 0) {
 				int n, count;
 				caddr_t uaddr;
@@ -322,7 +326,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 #ifdef WITH_32BIT_CONVERSION
 				if (ioc->copyresp.cp_flag == IOC_ILP32) {
 					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_list32)) {
-						ptrace(("Error path taken!\n"));
+						_ptrace(("Error path taken!\n"));
 						err = -EFAULT;
 						goto nak;
 					} else {
@@ -336,7 +340,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 #endif
 				{
 					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_list)) {
-						ptrace(("Error path taken!\n"));
+						_ptrace(("Error path taken!\n"));
 						err = -EFAULT;
 						goto nak;
 					} else {
@@ -348,12 +352,12 @@ sc_wput(queue_t *q, mblk_t *mp)
 					}
 				}
 				if (count < 0) {
-					ptrace(("Error path taken!\n"));
+					_ptrace(("Error path taken!\n"));
 					err = -EINVAL;
 					goto nak;
 				}
 				if (count > 100) {
-					ptrace(("Error path taken!\n"));
+					_ptrace(("Error path taken!\n"));
 					err = -ERANGE;
 					goto nak;
 				}
@@ -362,7 +366,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 					goto ack;
 				}
 				if (!(dp = allocb(usize, BPRI_MED))) {
-					ptrace(("Error path taken!\n"));
+					_ptrace(("Error path taken!\n"));
 					err = -ENOSR;
 					goto nak;
 				}
@@ -375,9 +379,9 @@ sc_wput(queue_t *q, mblk_t *mp)
 					uint flag = ioc->copyresp.cp_flag;
 					caddr_t mlist = (typeof(mlist)) dp->b_rptr;
 
-					trace();
+					_trace();
 					if (n < count) {
-						trace();
+						_trace();
 						/* output all devices */
 						read_lock(&cdevsw_lock);
 						list_for_each(pos, &cdevsw_list) {
@@ -396,9 +400,9 @@ sc_wput(queue_t *q, mblk_t *mp)
 						}
 						read_unlock(&cdevsw_lock);
 					}
-					trace();
+					_trace();
 					if (n < count) {
-						trace();
+						_trace();
 						/* output all modules */
 						read_lock(&fmodsw_lock);
 						list_for_each(pos, &fmodsw_list) {
@@ -416,13 +420,13 @@ sc_wput(queue_t *q, mblk_t *mp)
 						}
 						read_unlock(&fmodsw_lock);
 					}
-					trace();
+					_trace();
 					/* zero all excess elements */
 					for (; n < count; n++) {
 						mlist += sc_mlist_copy(-1, NULL, mlist, flag);
 					}
 				}
-				trace();
+				_trace();
 				mp->b_datap->db_type = M_COPYOUT;
 				ioc->copyreq.cq_addr = uaddr;
 				ioc->copyreq.cq_size = usize;
@@ -431,7 +435,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 				qreply(q, mp);
 				return (0);
 			} else {
-				trace();
+				_trace();
 				/* done */
 				rval = (int) (long) ioc->copyresp.cp_private;
 				goto ack;
@@ -452,7 +456,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 		qreply(q, mp);
 		return (0);
 	      abort:
-		ctrace(freemsg(mp));
+		_ctrace(freemsg(mp));
 		return (0);
 	}
 	putnext(q, mp);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/29 21:36:21 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/06/14 10:37:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:36:21 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/29 21:36:21 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/06/14 10:37:22 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/29 21:36:21 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/06/14 10:37:22 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -1136,7 +1136,7 @@ sdev_add(struct cdevsw *cdev, modID_t modid)
 	dev = makedevice(0, modid);
 
 	if (IS_ERR((inode = spec_snode(dev, cdev)))) {
-		ptrace(("couldn't get specfs inode\n"));
+		_ptrace(("couldn't get specfs inode\n"));
 		return PTR_ERR(inode);
 	}
 
@@ -1220,7 +1220,7 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 	dev = makedevice(cdev->d_modid, minor);
 
 	if (IS_ERR(inode = spec_snode(dev, cdev))) {
-		ptrace(("couldn't get specfs inode\n"));
+		_ptrace(("couldn't get specfs inode\n"));
 		return PTR_ERR(inode);
 	}
 	cdev->d_inode->i_nlink++;

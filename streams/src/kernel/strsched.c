@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/06/06 06:26:42 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/06/14 10:37:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/06 06:26:42 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.133  2006/06/14 10:37:23  brian
+ - defeat a lot of debug traces in debug mode for testing
+ - changes to allow strinet to compile under LiS (why???)
+
  Revision 0.9.2.132  2006/06/06 06:26:42  brian
  - second gen UDP driver working well now
 
@@ -79,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/06/06 06:26:42 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/06/14 10:37:23 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/06/06 06:26:42 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/06/14 10:37:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -690,7 +694,7 @@ __freeq(queue_t *rq)
 	atomic_dec(&si->si_cnt);
 	assert(!waitqueue_active(&qu->qu_qwait));
 	/* put STREAM head - if not already */
-	ctrace(sd_put_slow(&qu->qu_str));
+	_ctrace(sd_put_slow(&qu->qu_str));
 	/* clear flags */
 	rq->q_flag = QREADR;
 	wq->q_flag = 0;
@@ -745,7 +749,7 @@ qget(queue_t *q)
 	if (unlikely(q != NULL)) {	/* PROFILED */
 		qu = (typeof(qu)) RD(q);
 		assert(atomic_read(&qu->qu_refs) >= 1);
-		printd(("%s: queue pair %p ref count is now %d\n",
+		_printd(("%s: queue pair %p ref count is now %d\n",
 			__FUNCTION__, qu, atomic_read(&qu->qu_refs) + 1));
 		atomic_inc(&qu->qu_refs);
 	}
@@ -766,7 +770,7 @@ qput(queue_t **qp)
 		qu = (typeof(qu)) rq;
 		*qp = NULL;
 		assert(atomic_read(&qu->qu_refs) >= 1);
-		printd(("%s: queue pair %p ref count is now %d\n",
+		_printd(("%s: queue pair %p ref count is now %d\n",
 			__FUNCTION__, qu, atomic_read(&qu->qu_refs) - 1));
 		if (unlikely(atomic_dec_and_test(&qu->qu_refs) != 0))	/* PROFILED */
 			freeq(rq);
@@ -846,7 +850,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 		break;
 	}
 #endif
-	trace();
+	_trace();
 	if (likely((mp = kmem_cache_alloc(sdi->si_cache, slab_flags)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
 		struct mdbblock *md = (struct mdbblock *) mp;
@@ -856,7 +860,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 
 #if 0
 		md->msgblk.m_func = func;
-		ctrace(md->msgblk.m_queue = NULL);
+		_ctrace(md->msgblk.m_queue = NULL);
 #endif
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock_irqsave(&smi->si_rwlock, flags);
@@ -872,7 +876,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 		if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 			sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
-		ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
+		_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 	}
       fail:
 	return (mp);
@@ -884,7 +888,7 @@ mdbblock_alloc(uint priority, void *func)
 	unsigned long flags;
 	mblk_t *mp;
 
-	trace();
+	_trace();
 	/* Very first order of business: check free list.  Every priority is allowed to get a block
 	   from the free list now.  It is just a matter of speed.  If blocks are cached on the
 	   per-cpu free list we want to use them, not free them later. */
@@ -916,7 +920,7 @@ mdbblock_alloc(uint priority, void *func)
 				sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
 		}
-		ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
+		_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 		return (mp);
 	}
 	local_irq_restore(flags);
@@ -994,7 +998,7 @@ mdbblock_free(mblk_t *mp)
 {
 	struct strthread *t = this_thread;
 
-	printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
+	_printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
 
 	prefetchw(t);
 	prefetchw(mp);
@@ -1076,7 +1080,7 @@ freeblocks(struct strthread *t)
 			atomic_dec(&smi->si_cnt);
 #endif
 #endif
-			printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
+			_printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
 			prefetchw(sdi);
 			mp_next = mp->b_next;
 			prefetchw(mp_next);
@@ -1367,7 +1371,7 @@ event_free(struct strevent *se)
 #if defined CONFIG_STREAMS_DEBUG
 	struct seinfo *s = (struct seinfo *) se;
 
-	ctrace(qput(&s->s_queue));
+	_ctrace(qput(&s->s_queue));
 	write_lock(&si->si_rwlock);
 	list_del_init(&s->s_list);
 	write_unlock(&si->si_rwlock);
@@ -1398,7 +1402,7 @@ find_event(int event_id)
 streams_fastcall struct strevent *
 sealloc(void)
 {
-	return ctrace(event_alloc(SE_STREAM, NULL));
+	return _ctrace(event_alloc(SE_STREAM, NULL));
 }
 
 EXPORT_SYMBOL_NOVERS(sealloc);	/* include/sys/streams/strsubr.h */
@@ -1599,7 +1603,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = ctrace(event_alloc(SE_STREAM, q)))) {
+	if ((se = _ctrace(event_alloc(SE_STREAM, q)))) {
 		se->x.e.procp = procp;
 		se->x.e.events = events;
 		id = strsched_event(se);
@@ -1613,8 +1617,8 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = ctrace(event_alloc(SE_BUFCALL, q)))) {
-		ctrace(se->x.b.queue = qget(q));
+	if ((se = _ctrace(event_alloc(SE_BUFCALL, q)))) {
+		_ctrace(se->x.b.queue = qget(q));
 		se->x.b.func = func;
 		se->x.b.arg = arg;
 		se->x.b.size = size;
@@ -1628,8 +1632,8 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = ctrace(event_alloc(SE_TIMEOUT, q)))) {
-		ctrace(se->x.t.queue = qget(q));
+	if ((se = _ctrace(event_alloc(SE_TIMEOUT, q)))) {
+		_ctrace(se->x.t.queue = qget(q));
 		se->x.t.func = func;
 		se->x.t.arg = arg;
 		se->x.t.pl = pl;
@@ -1646,14 +1650,14 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = ctrace(event_alloc(SE_WELDQ, q)))) {
-		ctrace(se->x.w.queue = qget(q));
+	if ((se = _ctrace(event_alloc(SE_WELDQ, q)))) {
+		_ctrace(se->x.w.queue = qget(q));
 		se->x.w.func = func;
 		se->x.w.arg = arg;
-		ctrace(se->x.w.q1 = qget(q1));
-		ctrace(se->x.w.q2 = qget(q2));
-		ctrace(se->x.w.q3 = qget(q3));
-		ctrace(se->x.w.q4 = qget(q4));
+		_ctrace(se->x.w.q1 = qget(q1));
+		_ctrace(se->x.w.q2 = qget(q2));
+		_ctrace(se->x.w.q3 = qget(q3));
+		_ctrace(se->x.w.q4 = qget(q4));
 		id = strsched_event(se);
 	}
 	return (id);
@@ -1665,14 +1669,14 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = ctrace(event_alloc(SE_UNWELDQ, q)))) {
-		ctrace(se->x.w.queue = qget(q));
+	if ((se = _ctrace(event_alloc(SE_UNWELDQ, q)))) {
+		_ctrace(se->x.w.queue = qget(q));
 		se->x.w.func = func;
 		se->x.w.arg = arg;
-		ctrace(se->x.w.q1 = qget(q1));
-		ctrace(se->x.w.q2 = qget(q2));
-		ctrace(se->x.w.q3 = qget(q3));
-		ctrace(se->x.w.q4 = qget(q4));
+		_ctrace(se->x.w.q1 = qget(q1));
+		_ctrace(se->x.w.q2 = qget(q2));
+		_ctrace(se->x.w.q3 = qget(q3));
+		_ctrace(se->x.w.q4 = qget(q4));
 		id = strsched_event(se);
 	}
 	return (id);
@@ -1788,7 +1792,7 @@ untimeout(toid_t toid)
 
 	if ((se = find_event(toid))) {
 		se->x.t.func = NULL;
-		ctrace(qput(&se->x.t.queue));
+		_ctrace(qput(&se->x.t.queue));
 		rem = se->x.t.timer.expires - jiffies;
 		if (rem < 0)
 			rem = 0;
@@ -2156,7 +2160,7 @@ srvp_fast(queue_t *q)
 #endif
 		qwakeup(q);
 	}
-	ctrace(qput(&q));	/* cancel qget from qschedule */
+	_ctrace(qput(&q));	/* cancel qget from qschedule */
 }
 
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2425,7 +2429,7 @@ enter_syncq_writer(struct syncq_cookie *sc, void streamscall (*func) (queue_t *,
 		return (1);
 
 	m->m_func = (void *) &strwrit;
-	ctrace(m->m_queue = qget(sc->sc_q));
+	_ctrace(m->m_queue = qget(sc->sc_q));
 	m->m_private = (void *) func;
 
 	dassert(perim == PERIM_OUTER || perim == PERIM_INNER);
@@ -2447,7 +2451,7 @@ enter_inner_syncq_func(struct syncq_cookie *sc, void streamscall (*func) (void *
 		return (1);
 
 	m->m_func = (void *) func;
-	ctrace(m->m_queue = qget(sc->sc_q));
+	_ctrace(m->m_queue = qget(sc->sc_q));
 	m->m_private = arg;
 
 	return enter_inner_syncq_asputp(sc);
@@ -2463,7 +2467,7 @@ enter_inner_syncq_putp(struct syncq_cookie *sc)
 		return (1);
 
 	m->m_func = (void *) &putp;
-	ctrace(m->m_queue = qget(sc->sc_q));
+	_ctrace(m->m_queue = qget(sc->sc_q));
 	m->m_private = NULL;
 
 	return enter_inner_syncq_asputp(sc);
@@ -2633,8 +2637,8 @@ qputp(queue_t *q, mblk_t *mp)
 		return;
 	}
 #endif
-	ctrace(putp_fast(q, mp));
-	trace();
+	_ctrace(putp_fast(q, mp));
+	_trace();
 }
 
 STATIC streams_noinline streams_fastcall void
@@ -2720,14 +2724,14 @@ put(queue_t *q, mblk_t *mp)
 			while (q && q->q_ftmsg && !q->q_ftmsg(mp))
 				q = q->q_next;
 			if (unlikely(q == NULL)) {
-				ptrace(("message filtered, discarding\n"));
+				_ptrace(("message filtered, discarding\n"));
 				/* no queue wants the message - throw it away */
 				freemsg(mp);
 				goto done;
 			}
 		}
 #ifdef CONFIG_STREAMS_SYNCQS
-		ctrace(qputp(q, mp));
+		_ctrace(qputp(q, mp));
 #else
 		putp_fast(q, mp);
 #endif
@@ -2753,7 +2757,7 @@ put(queue_t *q, mblk_t *mp)
 		   at the bottom of the softirq stack, deferring at this point will execute at the
 		   earliest opportunity anyway. */
 		m->m_func = (void *) &putp;
-		ctrace(m->m_queue = qget(q));	/* don't let it get away */
+		_ctrace(m->m_queue = qget(q));	/* don't let it get away */
 		m->m_private = NULL;
 		/* schedule for execution inside STREAMS */
 		strsched_mfunc(mp);
@@ -2818,7 +2822,7 @@ putnext(queue_t *q, mblk_t *mp)
 	}
 #endif
 #ifdef CONFIG_STREAMS_SYNCQS
-	ctrace(qputp(q->q_next, mp));
+	_ctrace(qputp(q->q_next, mp));
 #else
 	putp_fast(q->q_next, mp);
 #endif
@@ -2834,7 +2838,7 @@ putnext(queue_t *q, mblk_t *mp)
 		prunlock(sd);
 	}
 #endif
-	trace();
+	_trace();
 }
 
 EXPORT_SYMBOL_NOVERS(putnext);	/* include/sys/streams/stream.h */
@@ -2978,7 +2982,7 @@ __strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *)
 		struct mbinfo *m = (typeof(m)) mp;
 
 		m->m_func = (void *) &strwrit;
-		ctrace(m->m_queue = qget(q));	/* don't let it get away */
+		_ctrace(m->m_queue = qget(q));	/* don't let it get away */
 		m->m_private = (void *) func;
 		/* schedule for execution inside STREAMS */
 		strsched_mfunc(mp);
@@ -3013,7 +3017,7 @@ __strfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, v
 		struct mbinfo *m = (typeof(m)) mp;
 
 		m->m_func = (void *) func;
-		ctrace(m->m_queue = qget(q));	/* don't let it get away */
+		_ctrace(m->m_queue = qget(q));	/* don't let it get away */
 		m->m_private = arg;
 		/* schedule for execution inside STREAMS */
 		strsched_mfunc(mp);
@@ -3047,7 +3051,7 @@ sq_doput_synced(mblk_t *mp)
 	else
 		/* deferred function is a qstrfunc function */
 		strfunc(m_func, m_queue, mp, m_private);
-	ctrace(qput(&m_queue));
+	_ctrace(qput(&m_queue));
 }
 
 STATIC void
@@ -3119,7 +3123,7 @@ do_bufcall_synced(struct strevent *se)
 		if (unlikely(safe))
 			local_irq_restore(flags);
 	}
-	ctrace(qput(&q));
+	_ctrace(qput(&q));
 }
 
 /**
@@ -3178,7 +3182,7 @@ do_timeout_synced(struct strevent *se)
 		if (unlikely(safe))
 			local_irq_restore(flags);
 	}
-	ctrace(qput(&q));
+	_ctrace(qput(&q));
 }
 
 /**
@@ -3223,20 +3227,20 @@ do_weldq_synced(struct strevent *se)
 	if (sd3)
 		write_lock(&sd3->sd_plumb);
 	if (q1)
-		ctrace(qn1 = xchg(&q1->q_next, qget(q2)));
+		_ctrace(qn1 = xchg(&q1->q_next, qget(q2)));
 	if (q3)
-		ctrace(qn3 = xchg(&q3->q_next, qget(q4)));
+		_ctrace(qn3 = xchg(&q3->q_next, qget(q4)));
 	if (sd3)
 		write_unlock(&sd3->sd_plumb);
 	if (sd1)
 		write_unlock(&sd1->sd_plumb);
 	local_irq_restore(flags);
-	ctrace(qput(&q1));
-	ctrace(qput(&q2));
-	ctrace(qput(&q3));
-	ctrace(qput(&q4));
-	ctrace(qput(&qn1));
-	ctrace(qput(&qn3));
+	_ctrace(qput(&q1));
+	_ctrace(qput(&q2));
+	_ctrace(qput(&q3));
+	_ctrace(qput(&q4));
+	_ctrace(qput(&qn1));
+	_ctrace(qput(&qn3));
 	if (se->x.w.func) {
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
 
@@ -3260,7 +3264,7 @@ do_weldq_synced(struct strevent *se)
 			zwunlock(sd, flags);
 		}
 	}
-	ctrace(qput(&q));
+	_ctrace(qput(&q));
 }
 
 STATIC void
@@ -3318,7 +3322,7 @@ do_mblk_func(mblk_t *b)
 	else
 		/* deferred function is a qstrfunc function */
 		(void) qstrfunc(m_func, m_queue, b, m_private);
-	ctrace(qput(&m_queue));
+	_ctrace(qput(&m_queue));
 }
 
 STATIC void
@@ -4060,50 +4064,50 @@ __runqueues(struct softirq_action *unused)
 {				/* PROFILED */
 	struct strthread *t;
 
-	trace();
+	_trace();
 	t = this_thread;
 
 	if (unlikely(!(t->flags & (QRUNFLAGS))))	/* PROFILED */
 		return;
 
 	if (unlikely(atomic_read(&t->lock) != 0))	/* PROFILED */
-		return ctrace(set_bit(qwantrun, &t->flags));
+		return _ctrace(set_bit(qwantrun, &t->flags));
 
 	atomic_inc(&t->lock);
 
 	do {
 		/* run queue service procedures if necessary */
 		if (likely(test_bit(qrunflag, &t->flags) != 0))	/* PROFILED */
-			ctrace(queuerun(t));
+			_ctrace(queuerun(t));
 		if (unlikely((t->flags & (FLUSHWORK | FREEBLKS | STRMFUNCS | QSYNCFLAG |
 					  STRTIMOUT | SCANQFLAG | STREVENTS | STRBCFLAG |
 					  STRBCWAIT)) != 0)) {
 			/* free flush chains if necessary */
 			if (unlikely(test_bit(flushwork, &t->flags) != 0))
-				ctrace(freechains(t));
+				_ctrace(freechains(t));
 			/* free mdbblocks to cache, if memory needed */
 			if (unlikely(test_bit(freeblks, &t->flags) != 0))
-				ctrace(freeblocks(t));
+				_ctrace(freeblocks(t));
 			/* do deferred m_func's first */
 			if (unlikely(test_bit(strmfuncs, &t->flags) != 0))
-				ctrace(domfuncs(t));
+				_ctrace(domfuncs(t));
 #if defined CONFIG_STREAMS_SYNCQS
 			/* catch up on backlog first */
 			if (unlikely(test_bit(qsyncflag, &t->flags) != 0))
-				ctrace(backlog(t));
+				_ctrace(backlog(t));
 #endif
 			/* do timeouts */
 			if (unlikely(test_bit(strtimout, &t->flags) != 0))
-				ctrace(timeouts(t));
+				_ctrace(timeouts(t));
 			/* do stream head write queue scanning */
 			if (unlikely(test_bit(scanqflag, &t->flags) != 0))
-				ctrace(scanqueues(t));
+				_ctrace(scanqueues(t));
 			/* do pending events */
 			if (unlikely(test_bit(strevents, &t->flags) != 0))
-				ctrace(doevents(t));
+				_ctrace(doevents(t));
 			/* do buffer calls if necessary */
 			if (unlikely(test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags)))
-				ctrace(bufcalls(t));
+				_ctrace(bufcalls(t));
 		}
 		clear_bit(qwantrun, &t->flags);
 	} while (unlikely(t->flags & (QRUNFLAGS)));
@@ -4210,11 +4214,11 @@ allocstr(void)
 			atomic_inc(&si->si_cnt);
 			if (atomic_read(&si->si_cnt) > si->si_hwl)
 				si->si_hwl = atomic_read(&si->si_cnt);
-			ctrace(sd->sd_rq = qget(q + 0));
-			ctrace(sd->sd_wq = qget(q + 1));
+			_ctrace(sd->sd_rq = qget(q + 0));
+			_ctrace(sd->sd_wq = qget(q + 1));
 			qstream(q) = sd;	/* don't do double get */
 
-			printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
+			_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
 				atomic_read(&sh->sh_refs)));
 		} else
 			__freeq(q);
@@ -4256,10 +4260,10 @@ sd_free(struct stdata *sd)
 	qstream(sd->sd_rq) = NULL;
 	/* these are left valid until last reference released */
 	assure(atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs) == 2);
-	ptrace(("queue references qu_refs = %d\n",
+	_ptrace(("queue references qu_refs = %d\n",
 		atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs)));
-	ctrace(qput(&sd->sd_wq));
-	ctrace(qput(&sd->sd_rq));	/* should be last put */
+	_ctrace(qput(&sd->sd_wq));
+	_ctrace(qput(&sd->sd_rq));	/* should be last put */
 	/* initial qget is balanced in qdetach()/qdelete() */
 	__freestr(sd);
 }
@@ -4271,7 +4275,7 @@ sd_get(struct stdata *sd)
 
 		assert(atomic_read(&sh->sh_refs) > 0);
 		atomic_inc(&sh->sh_refs);
-		printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
+		_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
 			atomic_read(&sh->sh_refs)));
 	}
 	return (sd);
@@ -4289,7 +4293,7 @@ sd_put(struct stdata **sdp)
 	prefetchw(&sh->sh_refs);
 	if (likely(sd != NULL)) {
 		*sdp = NULL;
-		printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
+		_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
 			atomic_read(&sh->sh_refs) - 1));
 
 		assert(atomic_read(&sh->sh_refs) >= 1);
@@ -4313,7 +4317,7 @@ streams_fastcall __unlikely void
 freestr(struct stdata *sd)
 {
 	/* FIXME: need to deallocate anything attached to the stream head */
-	ctrace(sd_put(&sd));
+	_ctrace(sd_put(&sd));
 }
 
 /* 
@@ -4324,6 +4328,29 @@ freestr(struct stdata *sd)
  *  -------------------------------------------------------------------------
  */
 
+#undef STREAMS_CACHE_FLAGS
+#if defined CONFIG_STREAMS_DEBUG
+#if defined CONFIG_SLAB_DEBUG
+#if defined SLAB_PANIC
+#define STREAMS_CACHE_FLAGS (SLAB_DEBUG_FREE|SLAB_RED_ZONE|SLAB_POISON|SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN|SLAB_PANIC)
+#else				/* defined SLAB_PANIC */
+#define STREAMS_CACHE_FLAGS (SLAB_DEBUG_FREE|SLAB_RED_ZONE|SLAB_POISON|SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN)
+#endif				/* defined SLAB_PANIC */
+#else				/* defined CONFIG_SLAB_DEBUG */
+#if defined SLAB_PANIC
+#define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN|SLAB_PANIC)
+#else				/* defined SLAB_PANIC */
+#define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN)
+#endif				/* defined SLAB_PANIC */
+#endif				/* defined CONFIG_SLAB_DEBUG */
+#else				/* defined CONFIG_STREAMS_DEBUG */
+#if defined SLA_DESTROY_BY_RCU
+#define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN)
+#else				/* defined SLA_DESTROY_BY_RCU */
+#define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN|SLAB_DESTROY_BY_RCU)
+#endif				/* defined SLA_DESTROY_BY_RCU */
+#endif				/* defined CONFIG_STREAMS_DEBUG */
+
 STATIC struct cacheinfo {
 	const char *name;
 	size_t size;
@@ -4333,20 +4360,20 @@ STATIC struct cacheinfo {
 	void (*dtor) (void *, kmem_cache_t *, unsigned long);
 } Cacheinfo[DYN_SIZE] = {
 	{
-	"DYN_STREAM", sizeof(struct shinfo), 0, SLAB_HWCACHE_ALIGN, &shinfo_ctor, NULL}, {
-	"DYN_QUEUE", sizeof(struct queinfo), 0, SLAB_HWCACHE_ALIGN, &queinfo_ctor, NULL}, {
-	"DYN_MSGBLOCK", 0, 0, SLAB_HWCACHE_ALIGN, NULL, NULL}, {
-	"DYN_MDBBLOCK", sizeof(struct mdbblock), 0, SLAB_HWCACHE_ALIGN, &mdbblock_ctor, NULL}, {
-	"DYN_LINKBLK", sizeof(struct linkinfo), 0, SLAB_HWCACHE_ALIGN, &linkinfo_ctor, NULL}, {
-	"DYN_STREVENT", sizeof(struct seinfo), 0, SLAB_HWCACHE_ALIGN | SLAB_NO_REAP,
+	"DYN_STREAM", sizeof(struct shinfo), 0, STREAMS_CACHE_FLAGS, &shinfo_ctor, NULL}, {
+	"DYN_QUEUE", sizeof(struct queinfo), 0, STREAMS_CACHE_FLAGS, &queinfo_ctor, NULL}, {
+	"DYN_MSGBLOCK", 0, 0, STREAMS_CACHE_FLAGS, NULL, NULL}, {
+	"DYN_MDBBLOCK", sizeof(struct mdbblock), 0, STREAMS_CACHE_FLAGS, &mdbblock_ctor, NULL}, {
+	"DYN_LINKBLK", sizeof(struct linkinfo), 0, STREAMS_CACHE_FLAGS, &linkinfo_ctor, NULL}, {
+	"DYN_STREVENT", sizeof(struct seinfo), 0, STREAMS_CACHE_FLAGS | SLAB_NO_REAP,
 		    &seinfo_ctor, NULL}, {
-	"DYN_QBAND", sizeof(struct qbinfo), 0, SLAB_HWCACHE_ALIGN, &qbinfo_ctor, NULL}, {
-	"DYN_STRAPUSH", sizeof(struct apinfo), 0, SLAB_HWCACHE_ALIGN, &apinfo_ctor, NULL}, {
-	"DYN_DEVINFO", sizeof(struct devinfo), 0, SLAB_HWCACHE_ALIGN, &devinfo_ctor, NULL}, {
-		"DYN_MODINFO", sizeof(struct mdlinfo), 0, SLAB_HWCACHE_ALIGN, &mdlinfo_ctor, NULL
+	"DYN_QBAND", sizeof(struct qbinfo), 0, STREAMS_CACHE_FLAGS, &qbinfo_ctor, NULL}, {
+	"DYN_STRAPUSH", sizeof(struct apinfo), 0, STREAMS_CACHE_FLAGS, &apinfo_ctor, NULL}, {
+	"DYN_DEVINFO", sizeof(struct devinfo), 0, STREAMS_CACHE_FLAGS, &devinfo_ctor, NULL}, {
+		"DYN_MODINFO", sizeof(struct mdlinfo), 0, STREAMS_CACHE_FLAGS, &mdlinfo_ctor, NULL
 #if defined CONFIG_STREAMS_SYNCQS
 	}, {
-		"DYN_SYNCQ", sizeof(struct syncq), 0, SLAB_HWCACHE_ALIGN, &syncq_ctor, NULL
+		"DYN_SYNCQ", sizeof(struct syncq), 0, STREAMS_CACHE_FLAGS, &syncq_ctor, NULL
 #endif
 	}
 };

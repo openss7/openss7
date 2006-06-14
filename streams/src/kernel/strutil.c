@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/06/05 02:53:34 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/06/14 10:37:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/05 02:53:34 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.125  2006/06/14 10:37:25  brian
+ - defeat a lot of debug traces in debug mode for testing
+ - changes to allow strinet to compile under LiS (why???)
+
  Revision 0.9.2.124  2006/06/05 02:53:34  brian
  - working up udp zero-copy
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/06/05 02:53:34 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/06/14 10:37:25 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/06/05 02:53:34 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/06/14 10:37:25 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -132,6 +136,7 @@ db_dec_and_test(dblk_t * db)
 	return ret;
 }
 
+#if 0
 #define msgblk_offset \
 	(((unsigned char *)&((struct mdbblock *)0)->msgblk) - ((unsigned char *)0))
 #define datablk_offset \
@@ -160,6 +165,29 @@ mb_to_mdb(mblk_t *mb)
 {
 	return ((struct mdbblock *) ((unsigned char *) mb - msgblk_offset));
 }
+#else
+STATIC streams_inline streams_fastcall __hot_out struct mdbblock *
+mb_to_mdb(mblk_t *mb)
+{
+	return ((struct mdbblock *) mb);
+}
+STATIC streams_inline streams_fastcall __hot_in mblk_t *
+db_to_mb(dblk_t * db)
+{
+	return ((mblk_t *) ((struct mbinfo *) db - 1));
+}
+STATIC streams_inline streams_fastcall __hot_in unsigned char *
+db_to_buf(dblk_t * db)
+{
+	return (&mb_to_mdb(db_to_mb(db))->databuf[0]);
+}
+
+STATIC streams_inline streams_fastcall __hot_in dblk_t *
+mb_to_db(mblk_t *mb)
+{
+	return (&mb_to_mdb(mb)->datablk.d_dblock);
+}
+#endif
 
 /**
  *  adjmsg:	- adjust a message
@@ -276,7 +304,7 @@ allocb(size_t size, uint priority)
 		mp->b_band = 0;
 		mp->b_flag = 0;
 	}
-	printd(("%s: allocated mblk %p, refs %d\n", __FUNCTION__, mp, (int) mp->b_datap->db_ref));
+	_printd(("%s: allocated mblk %p, refs %d\n", __FUNCTION__, mp, (int) mp->b_datap->db_ref));
 	return (mp);
       buf_alloc_error:
 	mdbblock_free(mp);
@@ -447,7 +475,7 @@ freeb(mblk_t *mp)
 	db = mp->b_datap;
 	mp->b_datap = NULL;
 
-	printd(("%s: freeing mblk %p, refs %d\n", __FUNCTION__, mp, (int) (db ? db->db_ref : 0)));
+	_printd(("%s: freeing mblk %p, refs %d\n", __FUNCTION__, mp, (int) (db ? db->db_ref : 0)));
 
 	/* check double free */
 	assert(db != NULL);
@@ -462,7 +490,7 @@ freeb(mblk_t *mp)
 			/* handle external data buffer */
 			if (!db->db_frtnp)
 				kmem_free(db->db_base, db->db_size);
-			else
+			else if (db->db_frtnp->free_func)
 				db->db_frtnp->free_func(db->db_frtnp->free_arg);
 		}
 		/* the entire mdbblock can go if the associated msgb is also unused */
@@ -690,7 +718,7 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 			/* handle external data buffer */
 			if (!db->db_frtnp)
 				kmem_free(db->db_base, db->db_size);
-			else
+			else if (db->db_frtnp->free_func)
 				db->db_frtnp->free_func(db->db_frtnp->free_arg);
 		}
 		/* the entire mdbblock can go if the associated msgb is also unused */
@@ -960,7 +988,7 @@ __bcanputany(queue_t *q)
 
 	pl = qrlock(q);
 	result = (q->q_blocked < q->q_nband);
-	ptrace(("queue bands blocked %d, available %d\n", q->q_blocked, q->q_nband));
+	_ptrace(("queue bands blocked %d, available %d\n", q->q_blocked, q->q_nband));
 	qrunlock(q, pl);
 
 	return (result);
@@ -2267,7 +2295,7 @@ qdelete(queue_t *q)
 	sd = qstream(q);
 	assert(sd);
 
-	ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
+	_ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
 
 	pl = pwlock(sd);
 
@@ -2276,7 +2304,7 @@ qdelete(queue_t *q)
 
 	pwunlock(sd, pl);
 
-	printd(("%s: cancelling initial allocation reference queue pair %p\n", __FUNCTION__, q));
+	_printd(("%s: cancelling initial allocation reference queue pair %p\n", __FUNCTION__, q));
 	_ctrace(qput(&q));	/* cancel initial allocation reference */
 }
 
@@ -2315,7 +2343,7 @@ qdetach(queue_t *q, int flags, cred_t *crp)
 
 	assert(q);
 
-	ptrace(("detaching stream %p queue pair %p\n", qstream(q), q));
+	_ptrace(("detaching stream %p queue pair %p\n", qstream(q), q));
 
 	err = _ctrace(qclose(q, flags, crp));
 	_ctrace(qprocsoff(q));	/* in case qclose forgot */
@@ -2357,7 +2385,7 @@ qinsert(struct stdata *sd, queue_t *irq)
 {
 	queue_t *iwq, *srq, *swq;
 
-	ptrace(("initial  half-insert of stream %p queue pair %p\n", sd, irq));
+	_ptrace(("initial  half-insert of stream %p queue pair %p\n", sd, irq));
 
 	prlock(sd);
 	srq = sd->sd_rq;
@@ -2438,7 +2466,7 @@ qprocsoff(queue_t *q)
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
 		}
 
-		ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
+		_ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
 
 		/* bypass this module: works for pipe, FIFO and other Stream heads queues too */
 		if ((bq = backq(rq)))
@@ -2762,7 +2790,7 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 			/* This is faster.  For flushall, we link the qband chain onto the free
 			   list and null out qband counts and markers. */
 			if ((**mppp = qb->qb_first)) {
-				ptrace(("queue %p, band %d, flag %d\n", q, (int) band, flag));
+				_ptrace(("queue %p, band %d, flag %d\n", q, (int) band, flag));
 				/* link around entire band */
 				if (qb->qb_first->b_prev)
 					qb->qb_first->b_prev->b_next = qb->qb_last->b_next;

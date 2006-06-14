@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/12/28 09:48:02 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/06/14 10:37:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/12/28 09:48:02 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/06/14 10:37:25 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/12/28 09:48:02 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/06/14 10:37:25 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -101,7 +101,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/12/28 09:48:02 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/06/14 10:37:25 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -282,7 +282,7 @@ spec_snode(dev_t dev, struct cdevsw *cdev)
 
 #if defined HAVE_KFUNC_IGET_LOCKED
 	if (!(snode = iget_locked(sb, dev))) {
-		ptrace(("couldn't allocate inode\n"));
+		_ptrace(("couldn't allocate inode\n"));
 		return ERR_PTR(-ENOMEM);
 	}
 	if (snode->i_state & I_NEW) {
@@ -292,7 +292,7 @@ spec_snode(dev_t dev, struct cdevsw *cdev)
 	}
 #else
 	if (!(snode = iget4(sb, dev, NULL, cdev))) {
-		ptrace(("couldn't allocate inode\n"));
+		_ptrace(("couldn't allocate inode\n"));
 		return ERR_PTR(-ENOMEM);
 	}
 #endif
@@ -314,7 +314,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 #define file_move(__f, __l) _file_move(__f, __l)
 #endif
 	if (!(mnt = mntget(specfs_mnt))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-ENODEV);
 	}
 	{
@@ -331,7 +331,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 					    cdev->d_name, getminor(dev));
 
 		if (!(dentry = d_alloc(NULL, &name))) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			err = -ENOMEM;
 			goto mnt_error;
 		}
@@ -340,7 +340,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	}
 
 	if (IS_ERR((snode = spec_snode(dev, cdev)))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		err = PTR_ERR(snode);
 		goto put_error;
 	}
@@ -348,7 +348,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 
 	err = -ENXIO;
 	if (!snode->i_fop || !snode->i_fop->open) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto put_error;
 	}
 
@@ -356,7 +356,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		struct file_operations *f_op;
 
 		if (!(f_op = fops_get(snode->i_fop))) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			goto put_error;
 		}
 #ifdef CONFIG_STREAMS_DEBUG
@@ -418,9 +418,9 @@ spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
 			return (0);
 
 		} else
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 	} else
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 
 	dput(file->f_dentry);
 	mntput(file->f_vfsmnt);
@@ -489,11 +489,11 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 				_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 					 atomic_read(&inode->i_count)));
 				d_add(new, inode);
-				ctrace(cdrv_put(cdev));
+				_ctrace(cdrv_put(cdev));
 				return (NULL);	/* success */
 			}
 			_ptrace(("no inode for cmin %s\n", cmin->n_name));
-			ctrace(cdrv_put(cdev));
+			_ctrace(cdrv_put(cdev));
 			return ERR_PTR(-EIO);
 		} else {
 			/* check if the name is a valid number */
@@ -510,19 +510,19 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 					if (IS_ERR((inode = spec_snode(dev, cdev)))) {
 						_ptrace(("no inode for number %s\n",
 							 new->d_name.name));
-						ctrace(cdrv_put(cdev));
+						_ctrace(cdrv_put(cdev));
 						return ((struct dentry *) inode);
 						/* already contains error */
 					}
 					_ptrace(("found inode for number %s\n", new->d_name.name));
 					d_add(new, inode);
-					ctrace(cdrv_put(cdev));
+					_ctrace(cdrv_put(cdev));
 					return (NULL);	/* success */
 				}
 			}
 		}
 		_ptrace(("no inode for %s\n", new->d_name.name));
-		ctrace(cdrv_put(cdev));
+		_ctrace(cdrv_put(cdev));
 	}
 	return ERR_PTR(-ENOENT);
 }
@@ -630,7 +630,7 @@ spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 				}
 			}
 			read_unlock(&cdevsw_lock);
-			ctrace(cdrv_put(cdev));
+			_ctrace(cdrv_put(cdev));
 		}
 		break;
 	}
@@ -696,7 +696,7 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 			igrab(inode);
 			_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 				 atomic_read(&inode->i_count)));
-			ctrace(sdev_put(cdev));
+			_ctrace(sdev_put(cdev));
 			d_add(new, inode);
 			return (NULL);	/* success */
 		}
@@ -704,7 +704,7 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 		   directory %s could demand load streams-%s, where streams-%s is not a driver but
 		   a module. */
 		_ptrace(("no inode for cdev %s\n", cdev->d_name));
-		ctrace(sdev_put(cdev));
+		_ctrace(sdev_put(cdev));
 	} else
 		_ptrace(("no cdev for %s\n", new->d_name.name));
 	return ERR_PTR(-ENOENT);
@@ -959,7 +959,7 @@ spec_read_inode(struct inode *inode)
 	inode->u.generic_ip = NULL;	/* done with it */
 	return;
       bad_inode:
-	ptrace(("bad inode no %lu\n", inode->i_ino));
+	_ptrace(("bad inode no %lu\n", inode->i_ino));
 	make_bad_inode(inode);
 	return;
 }

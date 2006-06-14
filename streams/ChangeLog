@@ -1,3 +1,30 @@
+2006-06-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/sys/streams/strdebug.h: added streams_noinline
+	* src/drivers/clone.c: defeat trace statements in debug mode
+	* src/drivers/echo.c: defeat trace statements in debug mode
+	* src/drivers/fifo.c: defeat trace statements in debug mode
+	* src/drivers/loop.c: defeat trace statements in debug mode
+	* src/drivers/mux.c: defeat trace statements in debug mode
+	* src/drivers/nsdev.c: defeat trace statements in debug mode
+	* src/drivers/nuls.c: defeat trace statements in debug mode
+	* src/kernel/strlookup.c: defeat trace statements in debug mode
+	* src/kernel/strpipe.c: defeat trace statements in debug mode
+	* src/kernel/strprocfs.c: correct printf warnings
+	* src/kernel/strreg.c: defeat trace statements in debug mode
+	* src/kernel/strsad.c: defeat trace statements in debug mode
+	* src/kernel/strsched.c:
+	  - defeat trace statements in debug mode
+	  - refined cache creation flags
+	* src/kernel/strspecfs.c: defeat trace statements in debug mode
+	* src/kernel/strutil.c:
+	  - defeat trace statements in debug mode
+	  - simplify message block to data block offset calculations
+	  - don't call free function if its null
+	* src/modules/sc.c: defeat trace statements in debug mode
+	* src/modules/sth.c: defeat trace statements in debug mode
+	* src/modules/testmod.c: defeat trace statements in debug mode
+
 2006-06-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/streams.refs: updated references for IUA, DUA, M2PA

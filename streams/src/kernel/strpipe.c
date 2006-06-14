@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 09:48:02 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/06/14 10:37:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 09:48:02 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/06/14 10:37:23 $"
 
 static char const ident[] =
-    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 09:48:02 $";
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/06/14 10:37:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -122,7 +122,7 @@ pipe_file_open(void)
 	struct dentry *dentry;
 	struct vfsmount *mnt;
 
-	ptrace(("%s: performing pipe open\n", __FUNCTION__));
+	_ptrace(("%s: performing pipe open\n", __FUNCTION__));
 	{
 		struct qstr name = {.name = "pipe",.len = 4, };
 
@@ -131,7 +131,7 @@ pipe_file_open(void)
 			file = ERR_PTR(-ENXIO);
 			if (!(mnt = specfs_mount()))
 				goto done;
-			printd(("%s: got mount point\n", __FUNCTION__));
+			_printd(("%s: got mount point\n", __FUNCTION__));
 			down(&mnt->mnt_root->d_inode->i_sem);
 			dentry = lookup_hash(&name, mnt->mnt_root);
 			up(&mnt->mnt_root->d_inode->i_sem);
@@ -139,12 +139,12 @@ pipe_file_open(void)
 		}
 	}
 	if (IS_ERR((file = (void *) dentry))) {
-		ptrace(("%s: parent lookup in error, errno %d\n", __FUNCTION__,
+		_ptrace(("%s: parent lookup in error, errno %d\n", __FUNCTION__,
 			-(int) PTR_ERR(file)));
 		goto done;
 	}
 	if (!dentry->d_inode) {
-		ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
+		_ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
 		goto enoent;
 	}
 	{
@@ -152,7 +152,7 @@ pipe_file_open(void)
 		struct qstr name = {.name = "0",.len = 1, };
 
 		name.hash = full_name_hash(name.name, name.len);
-		printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__, 0,
+		_printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__, 0,
 			name.name, name.len));
 		down(&parent->d_inode->i_sem);
 		dentry = lookup_hash(&name, parent);
@@ -160,19 +160,19 @@ pipe_file_open(void)
 		dput(parent);
 	}
 	if (IS_ERR((file = (void *) dentry))) {
-		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__,
+		_ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__,
 			-(int) PTR_ERR(file)));
 		goto done;
 	}
 	if (!dentry->d_inode) {
-		ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
+		_ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
 		goto enoent;
 	}
-	printd(("%s: opening dentry %p, inode %p (%ld)\n", __FUNCTION__, dentry, dentry->d_inode,
+	_printd(("%s: opening dentry %p, inode %p (%ld)\n", __FUNCTION__, dentry, dentry->d_inode,
 		dentry->d_inode->i_ino));
 	file = dentry_open(dentry, mntget(mnt), O_CLONE | 0x3);
 	if (IS_ERR(file)) {
-		ptrace(("%s: dentry_open returned error, errno %d\n", __FUNCTION__,
+		_ptrace(("%s: dentry_open returned error, errno %d\n", __FUNCTION__,
 			-(int) PTR_ERR(file)));
 		goto done;
 	}
@@ -273,11 +273,11 @@ do_spipe(int *fds)
 
 	err = -ENFILE;
 	if (!(fr = get_empty_filp())) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto error;
 	}
 	if (!(fw = get_empty_filp())) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto fr_put;
 	}
 	if ((cdev = cdev_find("pipe"))) {
@@ -288,33 +288,33 @@ do_spipe(int *fds)
 		modid = cdev->d_modid;
 		dev = makedevice(modid, minor);
 		snode = spec_snode(dev, cdev);
-		ctrace(sdev_put(cdev));
+		_ctrace(sdev_put(cdev));
 	} else {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto fw_put;
 	}
 	if (!snode) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto fw_put;
 	}
 	if (IS_ERR(snode)) {
 		err = PTR_ERR(snode);
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		goto fw_put;
 	}
 	if ((fdr = get_unused_fd()) < 0) {
 		err = fdr;
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		goto snode_put;
 	}
 	if ((fdw = get_unused_fd()) < 0) {
 		err = fdw;
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		goto fdr_put;
 	}
 	err = -ENODEV;
 	if (!(mnt = specfs_mount())) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto fdw_put;
 	}
 
@@ -326,7 +326,7 @@ do_spipe(int *fds)
 		name.len = snprintf(buf, sizeof(buf), "STR pipe/%lu", getminor(dev));
 		err = -ENOMEM;
 		if (!(dentry = d_alloc(NULL, &name))) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			goto mnt_put;
 		}
 		dentry->d_sb = snode->i_sb;
@@ -335,7 +335,7 @@ do_spipe(int *fds)
 	d_instantiate(dentry, snode);
 	err = -ENXIO;
 	if (!(f_op = snode->i_fop) || !f_op->open) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto dentry_put;
 	}
 	fops_get(f_op);
@@ -363,14 +363,14 @@ do_spipe(int *fds)
 
 	fr->f_flags |= O_CLONE;
 	if ((err = fr->f_op->open(snode, fr))) {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		goto cleanup_both;
 	}
 	fr->f_flags &= ~O_CLONE;
 
 	fw->f_flags |= O_CLONE;
 	if ((err = fw->f_op->open(snode, fw))) {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		goto cleanup_write;
 	}
 	fw->f_flags &= ~O_CLONE;

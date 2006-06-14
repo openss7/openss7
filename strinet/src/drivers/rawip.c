@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/31 10:27:42 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/06/14 10:37:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/31 10:27:42 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.25  2006/06/14 10:37:43  brian
+ - defeat a lot of debug traces in debug mode for testing
+ - changes to allow strinet to compile under LiS (why???)
+
  Revision 0.9.2.24  2006/05/31 10:27:42  brian
  - working up zero-copy
 
@@ -124,10 +128,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/31 10:27:42 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/06/14 10:37:43 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/31 10:27:42 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/06/14 10:37:43 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -203,7 +207,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/05/31 10:27:42 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/06/14 10:37:43 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -668,33 +672,33 @@ raw_state_name(t_scalar_t state)
 #endif				/* _DEBUG */
 
 STATIC INLINE fastcall __unlikely void
-tp_set_state(struct tp *tp, t_uscalar_t state)
+tp_set_state(struct tp *tp, const t_uscalar_t state)
 {
-	printd(("%s: %p: %s <- %s\n", DRV_NAME, tp, raw_state_name(state),
-		raw_state_name(tp->info.CURRENT_state)));
+	_printd(("%s: %p: %s <- %s\n", DRV_NAME, tp, raw_state_name(state),
+		 raw_state_name(tp->info.CURRENT_state)));
 	tp->info.CURRENT_state = state;
 }
 
 STATIC INLINE fastcall __unlikely t_uscalar_t
-tp_get_state(struct tp *tp)
+tp_get_state(const struct tp *tp)
 {
 	return (tp->info.CURRENT_state);
 }
 
 STATIC INLINE fastcall __unlikely t_uscalar_t
-tp_chk_state(struct tp *tp, t_uscalar_t mask)
+tp_chk_state(const struct tp *tp, const t_uscalar_t mask)
 {
 	return (((1 << tp->info.CURRENT_state) & (mask)) != 0);
 }
 
 STATIC INLINE fastcall __unlikely t_uscalar_t
-tp_not_state(struct tp *tp, t_uscalar_t mask)
+tp_not_state(const struct tp *tp, const t_uscalar_t mask)
 {
 	return (((1 << tp->info.CURRENT_state) & (mask)) == 0);
 }
 
 STATIC INLINE fastcall __unlikely long
-tp_get_statef(struct tp *tp)
+tp_get_statef(const struct tp *tp)
 {
 	return (1 << tp_get_state(tp));
 }
@@ -751,7 +755,7 @@ STATIC struct tp_options tp_defaults = {
  * @mp: message pointer for message
  */
 STATIC fastcall __hot_get int
-t_opts_size(const struct tp *t, mblk_t *mp)
+t_opts_size(const struct tp *t, const mblk_t *mp)
 {
 	int size = 0;
 	struct iphdr *iph;
@@ -776,7 +780,7 @@ t_opts_size(const struct tp *t, mblk_t *mp)
  * @olen: output length
  */
 static INLINE fastcall __hot_in int
-t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, size_t olen)
+t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t olen)
 {
 	struct iphdr *iph;
 	struct t_opthdr *oh;
@@ -846,7 +850,7 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, size_t olen)
  * header of the ICMP message itself.
  */
 STATIC noinline fastcall __unlikely int
-t_errs_size(const struct tp *t, mblk_t *mp)
+t_errs_size(const struct tp *t, const mblk_t *mp)
 {
 	int size = 0;
 
@@ -877,7 +881,7 @@ t_errs_size(const struct tp *t, mblk_t *mp)
  * header of the ICMP message.
  */
 STATIC noinline fastcall __unlikely int
-t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, size_t olen)
+t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t olen)
 {
 	struct iphdr *iph;
 	struct t_opthdr *oh;
@@ -947,7 +951,7 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, size_t olen)
  * T_UNITDATA_REQ ignores unrecognized options or option levels.
  */
 STATIC noinline fastcall int
-t_opts_parse_ud(unsigned char *ip, size_t ilen, struct tp_options *op)
+t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 {
 	struct t_opthdr *ih;
 	int optlen;
@@ -1039,7 +1043,7 @@ t_opts_parse_ud(unsigned char *ip, size_t ilen, struct tp_options *op)
  * @ilen: length of options
  */
 STATIC int
-t_opts_parse(unsigned char *ip, size_t ilen, struct tp_options *op)
+t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 {
 	struct t_opthdr *ih;
 	int optlen;
@@ -1145,7 +1149,7 @@ t_opts_parse(unsigned char *ip, size_t ilen, struct tp_options *op)
  * the option management flag, and return the size required of the acknowledgement options field.
  */
 STATIC noinline fastcall int
-t_size_default_options(struct tp *t, const unsigned char *ip, size_t ilen)
+t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	const struct t_opthdr *ih;
@@ -1260,7 +1264,7 @@ t_size_default_options(struct tp *t, const unsigned char *ip, size_t ilen)
 #endif
 		}
 	}
-	ptrace(("%p: Calculated option output size = %u\n", t, olen));
+	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
 	return (olen);
       einval:
 	ptrace(("%p: ERROR: Invalid input options\n", t));
@@ -1274,7 +1278,7 @@ t_size_default_options(struct tp *t, const unsigned char *ip, size_t ilen)
  * @ilen: input length
  */
 STATIC noinline fastcall int
-t_size_current_options(struct tp *t, const unsigned char *ip, size_t ilen)
+t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	const struct t_opthdr *ih;
@@ -1389,7 +1393,7 @@ t_size_current_options(struct tp *t, const unsigned char *ip, size_t ilen)
 #endif
 		}
 	}
-	ptrace(("%p: Calculated option output size = %u\n", t, olen));
+	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
 	return (olen);
       einval:
 	ptrace(("%p: ERROR: Invalid input options\n", t));
@@ -1548,7 +1552,7 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 #endif
 		}
 	}
-	ptrace(("%p: Calculated option output size = %u\n", t, olen));
+	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
 	return (olen);
       einval:
 	ptrace(("%p: ERROR: Invalid input options\n", t));
@@ -1713,7 +1717,7 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 #endif
 		}
 	}
-	ptrace(("%p: Calculated option output size = %u\n", t, olen));
+	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
 	return (olen);
       einval:
 	ptrace(("%p: ERROR: Invalid input options\n", t));
@@ -1728,7 +1732,7 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
  * Calculates the overall T_OPTMGMT_ACK flag result from individual results.
  */
 STATIC uint
-t_overall_result(uint * overall, uint result)
+t_overall_result(uint * overall, const uint result)
 {
 	switch (result) {
 	case T_NOTSUPPORT:
@@ -3132,8 +3136,8 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
  * in the provided buffer.
  */
 STATIC noinline fastcall t_scalar_t
-t_build_options(struct tp *t, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen,
-		t_scalar_t flag)
+t_build_options(struct tp *t, const unsigned char *ip, const size_t ilen, unsigned char *op,
+		size_t *olen, const t_scalar_t flag)
 {
 	switch (flag) {
 	case T_DEFAULT:
@@ -3462,8 +3466,8 @@ tp_unbind_prot(unsigned char proto, unsigned int type)
  * protocol id and port number.
  */
 STATIC INLINE fastcall __unlikely int
-tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, t_uscalar_t ADDR_length,
-	t_uscalar_t CONIND_number)
+tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_length,
+	const t_uscalar_t CONIND_number)
 {
 	struct tp_bhash_bucket *hp;
 	unsigned short bport = 0;
@@ -3521,8 +3525,8 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, t_uscalar_t ADDR_length,
 	tp->protoids[0] = proto;
 	tp->bnum = anum;
 	tp->bport = bport;
-	ptrace(("%s: %s: bound proto = %d, bport = %d\n", DRV_NAME, __FUNCTION__,
-		(int) proto, (int) ntohs(bport)));
+	_ptrace(("%s: %s: bound proto = %d, bport = %d\n", DRV_NAME, __FUNCTION__,
+		 (int) proto, (int) ntohs(bport)));
 	for (i = 0; i < anum; i++)
 		tp->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
 	write_unlock_bh(&hp->lock);
@@ -3622,7 +3626,7 @@ tp_destructor(struct sk_buff *skb)
  * @mp: message payload
  */
 STATIC INLINE fastcall __hot_out int
-tp_senddata(struct tp *tp, struct tp_options *opt, mblk_t *mp)
+tp_senddata(struct tp *tp, const struct tp_options *opt, mblk_t *mp)
 {
 	struct rtable *rt = NULL;
 
@@ -3725,7 +3729,7 @@ np_datack(queue_t *q)
  * @proto: protocol to which to connect
  */
 STATIC fastcall int
-tp_conn_check(struct tp *tp, unsigned char proto)
+tp_conn_check(struct tp *tp, const unsigned char proto)
 {
 	unsigned short sport = tp->sport;
 	unsigned short dport = tp->dport;
@@ -3812,8 +3816,8 @@ tp_conn_check(struct tp *tp, unsigned char proto)
  * and error, it is the caller's responsibility to set again the values of the options.
  */
 STATIC fastcall int
-tp_connect(struct tp *tp, struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
-	   struct tp_options *OPT_buffer, t_uscalar_t CONN_flags)
+tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t DEST_length,
+	   struct tp_options *OPT_buffer, const t_uscalar_t CONN_flags)
 {
 	size_t dnum = DEST_length / sizeof(*DEST_buffer);
 	int err;
@@ -4097,9 +4101,9 @@ tp_unbind(struct tp *tp)
  * @dp: user connect data
  */
 STATIC noinline fastcall int
-tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
+tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t RES_length,
 	   struct tp_options *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id,
-	   t_uscalar_t CONN_flags, mblk_t *dp)
+	   const t_uscalar_t CONN_flags, mblk_t *dp)
 {
 	size_t rnum = RES_length / sizeof(*RES_buffer);
 	int err;
@@ -4385,8 +4389,8 @@ tp_passive(struct tp *tp, struct sockaddr_in *RES_buffer, socklen_t RES_length,
  * @dp: user disconnect data
  */
 STATIC int
-tp_disconnect(struct tp *tp, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
-	      t_uscalar_t DISCON_reason, mblk_t *dp)
+tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
+	      const t_uscalar_t DISCON_reason, mblk_t *dp)
 {
 	struct tp_chash_bucket *hp;
 	int err;
@@ -4467,7 +4471,7 @@ tp_disconnect(struct tp *tp, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
  * @band: band to flush if how is FLUSHBAND
  */
 STATIC noinline fastcall int
-m_flush(queue_t *q, int how, int band)
+m_flush(queue_t *q, const int how, const int band)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -4485,87 +4489,19 @@ m_flush(queue_t *q, int how, int band)
 
 /**
  * m_error: deliver an M_ERROR message upstream
- * @q: a queue in the queue pair
+ * @q: a queue in the queue pair (write queue)
  * @error: the error to deliver
- * @mp: message to reuse
  */
 STATIC noinline fastcall __unlikely int
-m_error(queue_t *q, int error, mblk_t *mp)
-{
-	mblk_t *pp = mp;
-	int hangup = 0;
-
-	switch (error) {
-	case 0:
-		seldom();
-		return (0);
-	case -EBUSY:
-	case -ENOBUFS:
-	case -EAGAIN:
-	case -ENOMEM:
-		return (error);
-	case -EPIPE:
-	case -ENETDOWN:
-	case -EHOSTUNREACH:
-		hangup = 1;
-		error = EPIPE;
-		break;
-	default:
-		error = EPROTO;
-		break;
-	}
-	if (unlikely(mp == NULL || mp->b_datap->db_ref > 1))
-		if (unlikely((mp = ss7_allocb(q, 2, BPRI_HI)) == NULL))
-			goto enobufs;
-	mp->b_wptr = mp->b_rptr = mp->b_datap->db_base;
-	if (mp->b_cont)
-		freemsg(XCHG(&mp->b_cont, NULL));
-	if (hangup) {
-		printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, TP_PRIV(q)));
-		mp->b_datap->db_type = M_HANGUP;
-		mp->b_band = 0;
-	} else {
-		printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, TP_PRIV(q), error));
-		mp->b_datap->db_type = M_ERROR;
-		mp->b_band = 0;
-		*(mp->b_wptr)++ = error;
-		*(mp->b_wptr)++ = error;
-	}
-	qreply(q, mp);
-	return (pp == mp) ? (QR_ABSORBED) : (QR_DONE);
-      enobufs:
-	rare();
-	return (-ENOBUFS);
-}
-
-/**
- * te_error_reply - reply to a message with an M_ERROR message
- * @q: active queue in queue pair (write queue)
- * @error: error number
- *
- * FIXME: This must process other errors as well.
- */
-STATIC int
-te_error_reply(queue_t *q, long error)
+m_error(queue_t *q, const int error)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
 
-	switch (error) {
-	case -EBUSY:
-	case -EAGAIN:
-	case -ENOMEM:
-	case -ENOBUFS:
-		return (error);
-	case 0:
-	case 1:
-	case 2:
-		return (error);
-	}
-	if ((mp = ss7_allocb(q, 2, BPRI_HI))) {
+	if (likely((mp = ss7_allocb(q, 2, BPRI_HI)) != NULL)) {
 		mp->b_datap->db_type = M_ERROR;
-		*(mp->b_wptr)++ = (error < 0) ? -error : error;
-		*(mp->b_wptr)++ = (error < 0) ? -error : error;
+		mp->b_wptr[0] = mp->b_wptr[1] = error;
+		mp->b_wptr += 2;
 		/* make sure the stream is disconnected */
 		if (tp->chash != NULL) {
 			tp_disconnect(tp, NULL, NULL, N_REASON_UNDEFINED, NULL);
@@ -4576,10 +4512,69 @@ te_error_reply(queue_t *q, long error)
 			tp_unbind(tp);
 			tp_set_state(tp, TS_UNBND);
 		}
+		_printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, tp, error));
 		qreply(q, mp);
 		return (QR_DONE);
 	}
 	return (-ENOBUFS);
+}
+
+/**
+ * m_hangup: deliver an M_HANGUP message upstream
+ * @q: a queue in the queue pair (write queue)
+ */
+STATIC noinline fastcall __unlikely int
+m_hangup(queue_t *q)
+{
+	struct tp *tp = TP_PRIV(q);
+	mblk_t *mp;
+
+	if (likely((mp = ss7_allocb(q, 0, BPRI_HI)) != NULL)) {
+		mp->b_datap->db_type = M_HANGUP;
+		/* make sure the stream is disconnected */
+		if (tp->chash != NULL) {
+			tp_disconnect(tp, NULL, NULL, N_REASON_UNDEFINED, NULL);
+			tp_set_state(tp, TS_IDLE);
+		}
+		/* make sure the stream is unbound */
+		if (tp->bhash != NULL) {
+			tp_unbind(tp);
+			tp_set_state(tp, TS_UNBND);
+		}
+		_printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, tp));
+		qreply(q, mp);
+		return (QR_DONE);
+
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * te_error_reply - reply to a message with an M_ERROR message
+ * @q: active queue in queue pair (write queue)
+ * @error: error number
+ */
+STATIC noinline fastcall __unlikely int
+te_error_reply(queue_t *q, const long error)
+{
+	switch (error) {
+	case 0:
+	case 1:
+	case 2:
+		__seldom();
+		return (error);
+	case -EBUSY:
+	case -EAGAIN:
+	case -ENOMEM:
+	case -ENOBUFS:
+		return (error);
+	case -EPIPE:
+	case -ENETDOWN:
+	case -EHOSTUNREACH:
+		return m_hangup(q);
+	default:
+		return m_error(q, EPROTO);
+	}
 }
 
 /**
@@ -4613,7 +4608,7 @@ te_info_ack(queue_t *q)
 	p->CURRENT_state = tp->info.CURRENT_state;
 	p->PROVIDER_flag = tp->info.PROVIDER_flag;
 	mp->b_wptr += sizeof(*p);
-	printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
 	return (QR_DONE);
 
@@ -4631,8 +4626,8 @@ te_info_ack(queue_t *q)
  * Generate an T_BIND_ACK and pass it upstream.
  */
 STATIC noinline fastcall int
-te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, socklen_t ADDR_length,
-	    t_uscalar_t CONIND_number)
+te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_length,
+	    const t_uscalar_t CONIND_number)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp = NULL;
@@ -4667,7 +4662,7 @@ te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, socklen_t ADDR_length,
 	}
 	/* all ready, complete the bind */
 	tp_set_state(tp, TS_IDLE);
-	printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
 	return (QR_DONE);
 
@@ -4694,7 +4689,7 @@ te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, socklen_t ADDR_length,
  * specification, Revision 2.0.0.
  */
 STATIC int
-te_error_ack(queue_t *q, t_scalar_t ERROR_prim, t_scalar_t error)
+te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
 {
 	struct tp *tp = TP_PRIV(q);
 	struct T_error_ack *p;
@@ -4760,9 +4755,9 @@ te_error_ack(queue_t *q, t_scalar_t ERROR_prim, t_scalar_t error)
  * @dp: user data
  */
 STATIC fastcall __hot_put int
-te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer,
-	  socklen_t ADDR_length, void *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id,
-	  t_uscalar_t flags, mblk_t *dp)
+te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *ADDR_buffer,
+	  const socklen_t ADDR_length, void *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id,
+	  const t_uscalar_t flags, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
 	struct T_ok_ack *p;
@@ -4795,9 +4790,9 @@ te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer,
 			goto free_error;
 		tp_set_state(tp, TS_UNBND);
 		break;
-#if 1
+#if 0
 	case TS_WACK_CREQ:
-		/* FIXME: don't do this, use ne_conn_con() instead */
+		/* FIXME: don't do this, use te_conn_con() instead */
 		if ((err = tp_connect(tp, ADDR_buffer, ADDR_length, OPT_buffer, 0)))
 			goto error;
 		tp_set_state(tp, TS_WCON_CREQ);
@@ -4852,7 +4847,7 @@ te_ok_ack(queue_t *q, t_scalar_t CORRECT_prim, struct sockaddr_in *ADDR_buffer,
 #endif
 		break;
 	}
-	printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
 	return (QR_DONE);
       free_error:
@@ -4929,7 +4924,7 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		mp->b_wptr += OPT_length;
 	}
 
-	printd(("%s: %p: <- T_CONN_CON\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_CONN_CON\n", DRV_NAME, tp));
 	qreply(q, mp);
 	return (QR_DONE);
 
@@ -4955,7 +4950,7 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
  * An N_RESET_CON message is sent only when the reset completes successfully.
  */
 STATIC fastcall int
-ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
+ne_reset_con(queue_t *q, const np_ulong RESET_orig, const np_ulong RESET_reason, mblk_t *dp)
 {
 	struct np *np = NP_PRIV(q);
 	mblk_t *mp = NULL;
@@ -4964,7 +4959,7 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 	int err;
 
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
-		goto nobufs;
+		goto enobufs;
 	if (unlikely((err = np_reset_loc(np, RESET_orig, RESET_reason, dp)) != 0))
 		goto free_error;
 
@@ -4973,14 +4968,14 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 	p->PRIM_type = N_RESET_CON;
 	mp->b_wptr += sizeof(*p);
 	np_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
-	printd(("%s: <- N_RESET_CON\n", DRV_NAME));
+	_printd(("%s: <- N_RESET_CON\n", DRV_NAME));
 	qreply(q, mp);
 	return (QR_DONE);
 
       free_error:
 	freeb(mp);
 	goto error;
-      nobufs:
+      enobufs:
 	err = -ENOBUFS;
 	goto error;
       error:
@@ -5080,7 +5075,7 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	cp->b_rptr += (iph->ihl << 2);
 	/* save original in connection indication list */
 	bufq_queue(&tp->conq, SEQ_number);
-	printd(("%s: %p: <- T_CONN_IND\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_CONN_IND\n", DRV_NAME, tp));
 	putnext(q, mp);
       absorbed:
 	return (QR_ABSORBED);
@@ -5109,8 +5104,8 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
  * addresses have errors, otherwise, we just perform a reset for the affected destination.
  */
 STATIC noinline fastcall __hot_get int
-te_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
-	      t_uscalar_t DISCON_reason, mblk_t *SEQ_number, mblk_t *dp)
+te_discon_ind(queue_t *q, const struct sockaddr_in *RES_buffer, const socklen_t RES_length,
+	      const t_uscalar_t DISCON_reason, const mblk_t *SEQ_number, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -5131,7 +5126,7 @@ te_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	p->SEQ_number = (t_uscalar_t) (long) SEQ_number;
 	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
-	printd(("%s: %p: <- T_DISCON_IND\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_DISCON_IND\n", DRV_NAME, tp));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -5237,7 +5232,7 @@ te_data_ind(queue_t *q, mblk_t *dp)
 	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
-	printd(("%s: %p: <- T_DATA_IND\n", DRV_NAME, TP_PRIV(q)));
+	_printd(("%s: %p: <- T_DATA_IND\n", DRV_NAME, TP_PRIV(q)));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -5260,9 +5255,9 @@ te_exdata_ind(queue_t *q, mblk_t *dp)
 	struct T_exdata_ind *p;
 
 	if (unlikely((mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL))
-		goto nobufs;
+		goto enobufs;
 	if (unlikely(!bcanputnext(q, 1)))
-		goto busy;
+		goto ebusy;
 
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 1;
@@ -5272,14 +5267,14 @@ te_exdata_ind(queue_t *q, mblk_t *dp)
 	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
-	printd(("%s: %p: <- T_EXDATA_IND\n", DRV_NAME, TP_PRIV(q)));
+	_printd(("%s: %p: <- T_EXDATA_IND\n", DRV_NAME, TP_PRIV(q)));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
-      busy:
+      ebusy:
 	freeb(mp);
 	return (-EBUSY);
-      nobufs:
+      enobufs:
 	return (-ENOBUFS);
 }
 
@@ -5339,7 +5334,7 @@ te_unitdata_ind(queue_t *q, mblk_t *dp)
 	dp->b_rptr = (unsigned char *) uh;
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
-	printd(("%s: %p: <- T_UNITDATA_IND\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_UNITDATA_IND\n", DRV_NAME, tp));
 	putnext(q, mp);
 	return (QR_ABSORBED);
 
@@ -5389,7 +5384,7 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
 	}
 	dp->b_datap->db_type = M_DATA;
 	mp->b_cont = dp;
-	printd(("%s: %p: <= T_OPTDATA_IND\n", DRV_NAME, tp));
+	_printd(("%s: %p: <= T_OPTDATA_IND\n", DRV_NAME, tp));
 	putnext(q, mp);
 	return (QR_ABSORBED);
       ebusy:
@@ -5412,14 +5407,14 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
  * @dp: message containing user data of errored packet
  */
 STATIC noinline __unlikely int
-te_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, unsigned char *OPT_buffer,
-	       size_t OPT_length, t_uscalar_t ERROR_type, mblk_t *dp)
+te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned char *OPT_buffer,
+	       const size_t OPT_length, const t_uscalar_t ERROR_type, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
 	struct T_uderror_ind *p;
-	t_uscalar_t DEST_length = sizeof(*DEST_buffer);
-	size_t size = sizeof(*p) + (DEST_buffer ? DEST_length : 0) + OPT_length;
+	t_uscalar_t DEST_length = DEST_buffer ? sizeof(*DEST_buffer) : 0;
+	size_t size = sizeof(*p) + DEST_length + OPT_length;
 
 	if (unlikely(tp_get_state(tp) != TS_IDLE))
 		goto discard;
@@ -5431,13 +5426,13 @@ te_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, unsigned char *OPT_b
 	mp->b_band = 2;		/* XXX move ahead of data indications */
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_UDERROR_IND;
-	p->DEST_length = DEST_buffer ? DEST_length : 0;
-	p->DEST_offset = DEST_buffer ? sizeof(*p) : 0;
+	p->DEST_length = DEST_length;
+	p->DEST_offset = DEST_length ? sizeof(*p) : 0;
 	p->OPT_length = OPT_length;
-	p->OPT_offset = OPT_length ? sizeof(*p) + p->DEST_length : 0;
+	p->OPT_offset = OPT_length ? sizeof(*p) + DEST_length : 0;
 	p->ERROR_type = ERROR_type;
 	mp->b_wptr += sizeof(*p);
-	if (DEST_buffer) {
+	if (DEST_length) {
 		bcopy(DEST_buffer, mp->b_wptr, DEST_length);
 		mp->b_wptr += DEST_length;
 	}
@@ -5449,7 +5444,7 @@ te_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, unsigned char *OPT_b
 		mp->b_cont = dp;
 		dp->b_datap->db_type = M_DATA;	/* was M_ERROR in some cases */
 	}
-	printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
 	return (QR_ABSORBED);
       ebusy:
@@ -5507,8 +5502,8 @@ te_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 }
 
 STATIC noinline fastcall __unlikely int
-te_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, unsigned char *OPT_buffer,
-		 size_t OPT_length, t_scalar_t ERROR_type, mblk_t *db)
+te_uderror_reply(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned char *OPT_buffer,
+		 const size_t OPT_length, t_scalar_t ERROR_type, mblk_t *db)
 {
 	switch (ERROR_type) {
 	case -EBUSY:
@@ -5669,7 +5664,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	dp->b_next = np->resq;
 	np->resq = dp;
 	np->resinds++;
-	printd(("%s: <- N_RESET_IND\n", DRV_NAME));
+	_printd(("%s: <- N_RESET_IND\n", DRV_NAME));
 	putnext(q, mp);
       discard:
 	return (QR_DONE);
@@ -5693,7 +5688,8 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
  * adjusted when the option buffer is built.
  */
 STATIC noinline int
-t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, size_t opt_len)
+t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size_t req_len,
+	      size_t opt_len)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -5719,7 +5715,7 @@ t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, 
 	if (tp_get_state(tp) == TS_WACK_OPTREQ)
 		tp_set_state(tp, TS_IDLE);
 #endif
-	printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
 	return (0);
       enobufs:
@@ -5738,15 +5734,15 @@ t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, 
  * @REMADDR_length: remote address length
  */
 STATIC noinline int
-t_addr_ack(queue_t *q, struct sockaddr_in *LOCADDR_buffer, t_uscalar_t LOCADDR_length,
-	   struct sockaddr_in *REMADDR_buffer, t_uscalar_t REMADDR_length)
+t_addr_ack(queue_t *q, const struct sockaddr_in *LOCADDR_buffer, const t_uscalar_t LOCADDR_length,
+	   const struct sockaddr_in *REMADDR_buffer, const t_uscalar_t REMADDR_length)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
 	struct T_addr_ack *p;
+	size_t size = sizeof(*p) + LOCADDR_length + REMADDR_length;
 
-	if (unlikely
-	    ((mp = ss7_allocb(q, sizeof(*p) + LOCADDR_length + REMADDR_length, BPRI_MED)) == NULL))
+	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -5764,7 +5760,7 @@ t_addr_ack(queue_t *q, struct sockaddr_in *LOCADDR_buffer, t_uscalar_t LOCADDR_l
 		bcopy(REMADDR_buffer, mp->b_wptr, REMADDR_length);
 		mp->b_wptr += REMADDR_length;
 	}
-	printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
 	return (0);
       enobufs:
@@ -5781,7 +5777,7 @@ t_addr_ack(queue_t *q, struct sockaddr_in *LOCADDR_buffer, t_uscalar_t LOCADDR_l
  * @type: STREAMS message type M_PROTO or M_PCPROTO
  */
 STATIC noinline int
-t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
+t_capability_ack(queue_t *q, const t_uscalar_t caps, const int type)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -5799,7 +5795,7 @@ t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
 		p->INFO_ack = tp->info;
 	} else
 		bzero(&p->INFO_ack, sizeof(p->INFO_ack));
-	printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
 	return (0);
       enobufs:
@@ -6138,7 +6134,7 @@ te_conn_req(queue_t *q, mblk_t *mp)
 }
 
 STATIC INLINE fastcall mblk_t *
-t_seq_check(struct tp *tp, t_uscalar_t SEQ_number)
+t_seq_check(struct tp *tp, const t_uscalar_t SEQ_number)
 {
 	mblk_t *cp;
 
@@ -6150,7 +6146,7 @@ t_seq_check(struct tp *tp, t_uscalar_t SEQ_number)
 	return (cp);
 }
 STATIC INLINE fastcall struct tp *
-t_tok_check(t_uscalar_t ACCEPTOR_id)
+t_tok_check(const t_uscalar_t ACCEPTOR_id)
 {
 	struct tp *ap;
 
@@ -6246,7 +6242,8 @@ te_conn_res(queue_t *q, mblk_t *mp)
 			   as useful as adding or removing an address with T_OPTMGMT_REQ. */
 			goto error;
 		err = TPROVMISMATCH;
-		if (ACCEPTOR_id->info.SERV_type != T_COTS && ACCEPTOR_id->info.SERV_type != T_COTS_ORD)
+		if (ACCEPTOR_id->info.SERV_type != T_COTS
+		    && ACCEPTOR_id->info.SERV_type != T_COTS_ORD)
 			/* Must be connection-oriented Stream. */
 			goto error;
 		if (ACCEPTOR_id != tp) {
@@ -6574,7 +6571,7 @@ te_optdata_req(queue_t *q, mblk_t *mp)
       discard:
 	return (QR_DONE);
       error:
-	return m_error(q, err, mp);
+	return te_error_reply(q, err);
 }
 
 /**
@@ -6789,62 +6786,62 @@ tp_w_proto(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr >= mp->b_rptr + sizeof(prim)) {
 		switch ((prim = *((t_scalar_t *) mp->b_rptr))) {
 		case T_UNITDATA_REQ:	/* Connection-less data send request */
-			printd(("%s: %p: -> T_UNITDATA_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_UNITDATA_REQ\n", DRV_NAME, tp));
 			rtn = te_unitdata_req(q, mp);
 			break;
 		case T_DATA_REQ:	/* Connection-Mode data transfer request */
-			printd(("%s: %p: -> T_DATA_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_DATA_REQ\n", DRV_NAME, tp));
 			rtn = te_data_req(q, mp);
 			break;
 		case T_CONN_REQ:	/* TC request */
-			printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, tp));
 			rtn = te_conn_req(q, mp);
 			break;
 		case T_CONN_RES:	/* Accept previous connection indication */
-			printd(("%s: %p: -> T_CONN_RES\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_CONN_RES\n", DRV_NAME, tp));
 			rtn = te_conn_res(q, mp);
 			break;
 		case T_DISCON_REQ:	/* TC disconnection request */
-			printd(("%s: %p: -> T_DISCON_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_DISCON_REQ\n", DRV_NAME, tp));
 			rtn = te_discon_req(q, mp);
 			break;
 		case T_EXDATA_REQ:	/* Expedited data request */
-			printd(("%s: %p: -> T_EXDATA_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_EXDATA_REQ\n", DRV_NAME, tp));
 			rtn = te_exdata_req(q, mp);
 			break;
 		case T_INFO_REQ:	/* Information Request */
-			printd(("%s: %p: -> T_INFO_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_INFO_REQ\n", DRV_NAME, tp));
 			rtn = te_info_req(q, mp);
 			break;
 		case T_BIND_REQ:	/* Bind a TS user to transport address */
-			printd(("%s: %p: -> T_BIND_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_BIND_REQ\n", DRV_NAME, tp));
 			rtn = te_bind_req(q, mp);
 			break;
 		case T_UNBIND_REQ:	/* Unbind TS user from transport address */
-			printd(("%s: %p: -> T_UNBIND_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_UNBIND_REQ\n", DRV_NAME, tp));
 			rtn = te_unbind_req(q, mp);
 			break;
 		case T_OPTMGMT_REQ:	/* Options Management request */
-			printd(("%s: %p: -> T_OPTMGMT_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_OPTMGMT_REQ\n", DRV_NAME, tp));
 			rtn = te_optmgmt_req(q, mp);
 			break;
 		case T_ORDREL_REQ:	/* Orderly release request */
-			printd(("%s: %p: -> T_ORDREL_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_ORDREL_REQ\n", DRV_NAME, tp));
 			rtn = -EPROTO;
 			break;
 		case T_OPTDATA_REQ:	/* Data transfer with options request */
-			printd(("%s: %p: -> T_OPTDATA_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_OPTDATA_REQ\n", DRV_NAME, tp));
 			rtn = te_optdata_req(q, mp);
 			break;
 #if defined T_ADDR_REQ
 		case T_ADDR_REQ:	/* Address request */
-			printd(("%s: %p: -> T_ADDR_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_ADDR_REQ\n", DRV_NAME, tp));
 			rtn = te_addr_req(q, mp);
 			break;
 #endif				/* defined T_ADDR_REQ */
 #if defined T_CAPABILITY_REQ
 		case T_CAPABILITY_REQ:	/* Capablities request */
-			printd(("%s: %p: -> T_CAPABILITY_REQ\n", DRV_NAME, tp));
+			_printd(("%s: %p: -> T_CAPABILITY_REQ\n", DRV_NAME, tp));
 			rtn = te_capability_req(q, mp);
 			break;
 #endif				/* defined T_CAPABILITY_REQ */
@@ -7250,8 +7247,8 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	hp2 = &raw_bhash[raw_bhashfn(proto, 0)];
 
 	hp = hp1;
-	ptrace(("%s: %s: proto = %d, dport = %d\n", DRV_NAME, __FUNCTION__, (int) proto,
-		(int) ntohs(dport)));
+	_ptrace(("%s: %s: proto = %d, dport = %d\n", DRV_NAME, __FUNCTION__, (int) proto,
+		 (int) ntohs(dport)));
 	do {
 		read_lock_bh(&hp->lock);
 		{
@@ -7763,7 +7760,7 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	struct tp *tp, **tpp = &master.tp.list;
 
-#if 0
+#if defined LFS
 	mblk_t *mp;
 	struct stroptions *so;
 #endif
@@ -7796,7 +7793,7 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = FREE_CMINOR;
-#if 0
+#if defined LFS
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
 #endif
@@ -7820,28 +7817,30 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		write_unlock_bh(&master.lock);
-#if 0
+#if defined LFS
 		freeb(mp);
 #endif
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
+	_printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(tp = tp_alloc_priv(q, tpp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		write_unlock_bh(&master.lock);
-#if 0
+#if defined LFS
 		freeb(mp);
 #endif
 		return (ENOMEM);
 	}
 	write_unlock_bh(&master.lock);
-#if 0
-	/* want to set a write offet of 20 bytes */
+#if defined LFS
+	/* want to set a write offet of MAX_HEADER bytes */
 	so = (typeof(so)) mp->b_wptr;
-	so->so_flags = SO_WROFF | SO_DELIM;
-	so->so_wroff = 20;
+	so->so_flags = SO_WROFF | SO_WRPAD;
+	so->so_wroff = MAX_HEADER;	/* this is too big */
+	so->so_wrpad = SMP_CACHE_BYTES + sizeof(struct skb_shared_info);	/* this is too big */
 	mp->b_wptr += sizeof(*so);
+	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
 #endif
 	qprocson(q);
@@ -7862,8 +7861,8 @@ raw_qclose(queue_t *q, int oflag, cred_t *crp)
 	(void) oflag;
 	(void) crp;
 	(void) tp;
-	printd(("%s: closing character device %d:%d\n", DRV_NAME, tp->u.dev.cmajor,
-		tp->u.dev.cminor));
+	_printd(("%s: closing character device %d:%d\n", DRV_NAME, tp->u.dev.cmajor,
+		 tp->u.dev.cminor));
 #if defined LIS
 	/* protect against LiS bugs */
 	if (q->q_ptr == NULL) {
@@ -7897,7 +7896,7 @@ tp_term_caches(void)
 			cmn_err(CE_WARN, "%s: did not destroy raw_prot_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
-		printd(("%s: destroyed raw_prot_cachep\n", DRV_NAME));
+		_printd(("%s: destroyed raw_prot_cachep\n", DRV_NAME));
 		raw_prot_cachep = NULL;
 	}
 	if (raw_priv_cachep != NULL) {
@@ -7905,7 +7904,7 @@ tp_term_caches(void)
 			cmn_err(CE_WARN, "%s: did not destroy raw_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
-		printd(("%s: destroyed raw_priv_cachep\n", DRV_NAME));
+		_printd(("%s: destroyed raw_priv_cachep\n", DRV_NAME));
 		raw_priv_cachep = NULL;
 	}
 	return (0);
@@ -7921,7 +7920,7 @@ tp_init_caches(void)
 			tp_term_caches();
 			return (-ENOMEM);
 		}
-		printd(("%s: initialized driver private structure cache\n", DRV_NAME));
+		_printd(("%s: initialized driver private structure cache\n", DRV_NAME));
 	}
 	if (raw_prot_cachep == NULL) {
 		raw_prot_cachep =
@@ -7932,7 +7931,7 @@ tp_init_caches(void)
 			tp_term_caches();
 			return (-ENOMEM);
 		}
-		printd(("%s: initialized driver protocol structure cache\n", DRV_NAME));
+		_printd(("%s: initialized driver protocol structure cache\n", DRV_NAME));
 	}
 	return (0);
 }
@@ -7965,8 +7964,8 @@ tp_init_hashes(void)
 		     (struct tp_bhash_bucket *) __get_free_pages(GFP_ATOMIC, raw_bhash_order))) {
 			raw_bhash_size =
 			    (1 << (raw_bhash_order + PAGE_SHIFT)) / sizeof(struct tp_bhash_bucket);
-			printd(("%s: INFO: bind hash table configured size = %ld\n", DRV_NAME,
-				(long) raw_bhash_size));
+			_printd(("%s: INFO: bind hash table configured size = %ld\n", DRV_NAME,
+				 (long) raw_bhash_size));
 			bzero(raw_bhash, raw_bhash_size * sizeof(struct tp_bhash_bucket));
 			for (i = 0; i < raw_bhash_size; i++)
 				rwlock_init(&raw_bhash[i].lock);
@@ -7982,8 +7981,8 @@ tp_init_hashes(void)
 		     (struct tp_chash_bucket *) __get_free_pages(GFP_ATOMIC, raw_chash_order))) {
 			raw_chash_size =
 			    (1 << (raw_chash_order + PAGE_SHIFT)) / sizeof(struct tp_chash_bucket);
-			printd(("%s: INFO: conn hash table configured size = %ld\n", DRV_NAME,
-				(long) raw_chash_size));
+			_printd(("%s: INFO: conn hash table configured size = %ld\n", DRV_NAME,
+				 (long) raw_chash_size));
 			bzero(raw_chash, raw_chash_size * sizeof(struct tp_chash_bucket));
 			for (i = 0; i < raw_chash_size; i++)
 				rwlock_init(&raw_chash[i].lock);

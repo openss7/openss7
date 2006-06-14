@@ -1,3 +1,15 @@
+2006-06-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/inet.c: can't preallocate qband structures under LiS
+	* src/drivers/rawip.c: rationalize to udp driver
+	* src/drivers/tcp.c:
+	  - add missing definitions for LiS
+	  - correct printf warnings for LiS
+	* src/drivers/udp.c: 
+	  - defeated trace statements in debug mode
+	  - reworked m_error and te_error_reply
+	  - added const'ness
+
 2006-06-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strinet.refs: updated references for IUA, DUA, M2PA

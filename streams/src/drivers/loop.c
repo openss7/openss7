@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/29 21:36:18 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/06/14 10:37:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:36:18 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/29 21:36:18 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/06/14 10:37:21 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/29 21:36:18 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/06/14 10:37:21 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/29 21:36:18 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/06/14 10:37:21 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
@@ -362,33 +362,33 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 
-	ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor,
+	_ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor,
 		sflag));
 	if (q->q_ptr != NULL) {
-		printd(("%s: stream is already open\n", __FUNCTION__));
+		_printd(("%s: stream is already open\n", __FUNCTION__));
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		printd(("%s: cannot open as module\n", __FUNCTION__));
+		_printd(("%s: cannot open as module\n", __FUNCTION__));
 		return (ENXIO);	/* can't open as module */
 	}
 	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP))) {	/* we could sleep */
-		printd(("%s: could not allocate private structure\n", __FUNCTION__));
+		_printd(("%s: could not allocate private structure\n", __FUNCTION__));
 		return (ENOMEM);	/* no memory */
 	}
 	bzero(p, sizeof(*p));
 	switch (sflag) {
 	case CLONEOPEN:
-		printd(("%s: clone open\n", __FUNCTION__));
+		_printd(("%s: clone open\n", __FUNCTION__));
 		if (cminor < 1)
 			cminor = 1;
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
 
-		printd(("%s: driver open\n", __FUNCTION__));
+		_printd(("%s: driver open\n", __FUNCTION__));
 		if (cminor < 1) {
-			printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
+			_printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
 			return (ENXIO);
 		}
 		spin_lock_bh(&loop_lock);
@@ -413,7 +413,7 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
 			spin_unlock_bh(&loop_lock);
 			kmem_free(p, sizeof(*p));
-			printd(("%s: no minor devices left\n", __FUNCTION__));
+			_printd(("%s: no minor devices left\n", __FUNCTION__));
 			return (EBUSY);	/* no minors left */
 		}
 		p->dev = *devp = makedevice(cmajor, cminor);
@@ -427,7 +427,7 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		q->q_ptr = WR(q)->q_ptr = p;
 		spin_unlock_bh(&loop_lock);
 		qprocson(q);
-		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
+		_printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
 	}
@@ -440,7 +440,7 @@ loop_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct loop *p;
 
-	trace();
+	_trace();
 	if ((p = q->q_ptr) == NULL) {
 		pswerr(("%s: already closed\n", __FUNCTION__));
 		return (0);	/* already closed */
@@ -459,7 +459,7 @@ loop_close(queue_t *q, int oflag, cred_t *crp)
 	p->wq = NULL;
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	spin_unlock_bh(&loop_lock);
-	printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
+	_printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
 	return (0);
 }
 

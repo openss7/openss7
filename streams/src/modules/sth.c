@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/06/06 06:26:43 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/06/14 10:37:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/06 06:26:43 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.149  2006/06/14 10:37:27  brian
+ - defeat a lot of debug traces in debug mode for testing
+ - changes to allow strinet to compile under LiS (why???)
+
  Revision 0.9.2.148  2006/06/06 06:26:43  brian
  - second gen UDP driver working well now
 
@@ -79,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/06/06 06:26:43 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/06/14 10:37:27 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/06/06 06:26:43 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/06/14 10:37:27 $";
 
 //#define __NO_VERSION__
 
@@ -178,7 +182,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/06/06 06:26:43 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/06/14 10:37:27 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -293,10 +297,10 @@ stri_insert(struct file *file, struct stdata *sd)
 	   filesystem inode, but that's ok to because its locked at this point too. */
 
 	/* always hold the inode spinlock while lookup up the STREAM head */
-	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
+	_printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	stri_lock(inode);
-	ctrace(stri_lookup(file) = sd_get(sd));
-	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+	_ctrace(stri_lookup(file) = sd_get(sd));
+	_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	stri_unlock(inode);
 }
 
@@ -311,10 +315,10 @@ stri_acquire(struct file *file)
 	struct inode *inode = file->f_dentry->d_inode;
 
 	/* always hold the inode spinlock while lookup up the STREAM head */
-	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
+	_printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	stri_lock(inode);
-	ctrace(sd = sd_get(stri_lookup(file)));
-	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+	_ctrace(sd = sd_get(stri_lookup(file)));
+	_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	stri_unlock(inode);
 	return (sd);
 }
@@ -335,13 +339,13 @@ stri_remove(struct file *file)
 	assert(file);
 #if 0
 	/* always hold the inode spinlock while lookup up the STREAM head */
-	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
+	_printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	stri_lock(inode);
 #endif
 	sd = stri_lookup(file);
 	stri_lookup(file) = NULL;
 #if 0				/* leave locked */
-	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+	_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	stri_unlock(inode);
 #endif
 	return (sd);
@@ -367,7 +371,7 @@ strinsert(struct inode *inode, struct stdata *sd)
 	{
 		struct cdevsw *cdev;
 
-		ptrace(("adding stream %p to inode %p\n", sd, inode));
+		_ptrace(("adding stream %p to inode %p\n", sd, inode));
 		/* don't let the inode go away while we are linked to it */
 		/* no matter what filesystem it belongs to */
 		sd->sd_inode = igrab(inode);
@@ -404,7 +408,7 @@ strremove_locked(struct inode *inode, struct stdata *sd)
 		struct cdevsw *cdev;
 		struct stdata **sdp;
 
-		ptrace(("removing stream %p from inode %p\n", sd, inode));
+		_ptrace(("removing stream %p from inode %p\n", sd, inode));
 		for (sdp = (struct stdata **) &(inode->i_pipe); *sdp && *sdp != sd;
 		     sdp = &((*sdp)->sd_clone)) ;
 		assert(*sdp && *sdp == sd);
@@ -480,12 +484,12 @@ STATIC streams_inline streams_fastcall __hot_out void
 strput(struct stdata *sd, mblk_t *mp)
 {
 	if (likely(test_bit(STRHOLD_BIT, &sd->sd_flag) == 0)) {	/* PROFILED */
-		ctrace(putnext(sd->sd_wq, mp));
-		trace();
+		_ctrace(putnext(sd->sd_wq, mp));
+		_trace();
 		return;
 	}
-	ctrace(put(sd->sd_wq, mp));
-	trace();
+	_ctrace(put(sd->sd_wq, mp));
+	_trace();
 	return;
 }
 
@@ -500,10 +504,10 @@ strcopyout(const void *from, void __user *to, size_t len)
 	/* might sleep */
 	if (access_ok(VERIFY_WRITE, to, len)) {
 		if ((err = copyout(from, to, len)) < 0)
-			ptrace(("access_ok succeeded, copyout failed\n"));
+			_ptrace(("access_ok succeeded, copyout failed\n"));
 	} else {
 		if ((err = copyout(from, to, len)) == 0)
-			ptrace(("access_ok failed, copyout succeeded\n"));
+			_ptrace(("access_ok failed, copyout succeeded\n"));
 	}
 	return (err);
 }
@@ -519,10 +523,10 @@ strcopyin(const void __user *from, void *to, size_t len)
 	/* might sleep */
 	if (access_ok(VERIFY_READ, from, len)) {
 		if ((err = copyin(from, to, len)) < 0)
-			ptrace(("access_ok succeeded, copyin failed\n"));
+			_ptrace(("access_ok succeeded, copyin failed\n"));
 	} else {
 		if ((err = copyin(from, to, len)) == 0)
-			ptrace(("access_ok failed, copyin succeeded\n"));
+			_ptrace(("access_ok failed, copyin succeeded\n"));
 	}
 	return (err);
 }
@@ -797,7 +801,7 @@ alloc_proto(struct stdata *sd, ssize_t psize, ssize_t dsize, int type, uint bpri
 
 	/* yes, POSIX says we can send zero length control parts */
 	if (unlikely(psize >= 0)) {	/* PROFILED */
-		ptrace(("Allocating cntl part %d bytes\n", psize));
+		_ptrace(("Allocating cntl part %d bytes\n", psize));
 		if (likely((mp = allocb(psize, bpri)) != NULL)) {
 			mp->b_datap->db_type = type;
 			mp->b_wptr = mp->b_rptr + psize;
@@ -808,7 +812,7 @@ alloc_proto(struct stdata *sd, ssize_t psize, ssize_t dsize, int type, uint bpri
 		int sd_wroff;
 		
 		sd_wroff = sd->sd_wroff;
-		ptrace(("Allocating data part %d bytes\n", dsize));
+		_ptrace(("Allocating data part %d bytes\n", dsize));
 		if (likely((dp = allocb(sd_wroff + dsize + sd->sd_wrpad, bpri)) != NULL)) {
 			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
 			if (sd_wroff) {
@@ -950,18 +954,18 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 	struct strevent *se, **sep;
 	int err = 0;
 
-	printd(("%s: registering streams events %lu\n", __FUNCTION__, events));
+	_printd(("%s: registering streams events %lu\n", __FUNCTION__, events));
 	for (sep = &sd->sd_siglist;
 	     (se = *sep) && ((p = se->se_procp) != c) && (p->tgid != c->tgid); sep = &se->se_next) ;
 	if (se) {
-		printd(("%s: found existing registration se = %p\n", __FUNCTION__, se));
+		_printd(("%s: found existing registration se = %p\n", __FUNCTION__, se));
 		if (events) {
 			/* update */
-			printd(("%s: updating events se = %p\n", __FUNCTION__, se));
+			_printd(("%s: updating events se = %p\n", __FUNCTION__, se));
 			se->se_events = events;
 		} else {
 			/* delete */
-			printd(("%s: deleting events se = %p\n", __FUNCTION__, se));
+			_printd(("%s: deleting events se = %p\n", __FUNCTION__, se));
 			*sep = se->se_next;
 			sefree(se);
 		}
@@ -969,17 +973,17 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 			unsigned long new_events = 0;
 
 			/* recalc sig flags */
-			printd(("%s: recalculating events se = %p\n", __FUNCTION__, se));
+			_printd(("%s: recalculating events se = %p\n", __FUNCTION__, se));
 			for (se = sd->sd_siglist; se; se = se->se_next)
 				new_events |= se->se_events;
 			sd->sd_sigflags = new_events;
-			printd(("%s: new overall events %lu\n", __FUNCTION__, new_events));
+			_printd(("%s: new overall events %lu\n", __FUNCTION__, new_events));
 		}
 	} else if (!events) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		err = -EINVAL;	/* POSIX not on list */
 	} else if (!(se = sealloc())) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		err = -EAGAIN;	/* POSIX says EAGAIN not ENOSR */
 	} else {
 		struct task_struct *procp;
@@ -994,11 +998,11 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 		se->se_procp = procp;
 		se->se_events = events;
 		se->se_fd = fd;
-		printd(("%s: creating siglist events %lu, proc %p, fd %d\n", __FUNCTION__, events,
+		_printd(("%s: creating siglist events %lu, proc %p, fd %d\n", __FUNCTION__, events,
 			procp, fd));
 		/* calc sig flags */
 		sd->sd_sigflags |= events;
-		ptrace(("%s: new events %lu\n", __FUNCTION__, sd->sd_sigflags));
+		_ptrace(("%s: new events %lu\n", __FUNCTION__, sd->sd_sigflags));
 		/* link it in */
 		se->se_next = sd->sd_siglist;
 		sd->sd_siglist = se;
@@ -1020,7 +1024,7 @@ strevent_register(const struct file *file, struct stdata *sd, const unsigned lon
 {
 	int err;
 
-	printd(("%s: registering streams events %lu\n", __FUNCTION__, events));
+	_printd(("%s: registering streams events %lu\n", __FUNCTION__, events));
 	swlock(sd);
 	err = __strevent_register(file, sd, events);
 	swunlock(sd);
@@ -1029,7 +1033,7 @@ strevent_register(const struct file *file, struct stdata *sd, const unsigned lon
 STATIC streams_fastcall __unlikely int
 strevent_unregister(const struct file *file, struct stdata *sd)
 {
-	printd(("%s: unregistering streams events\n", __FUNCTION__));
+	_printd(("%s: unregistering streams events\n", __FUNCTION__));
 	return strevent_register(file, sd, 0);
 }
 
@@ -1418,8 +1422,8 @@ strsendmread(struct stdata *sd, const unsigned long len)
 			*((unsigned long *) b->b_rptr) = len;
 			b->b_wptr = b->b_rptr + sizeof(len);
 			if (!(err = straccess(sd, FREAD))) {
-				ctrace(strput(sd, b));
-				trace();
+				_ctrace(strput(sd, b));
+				_trace();
 			} else
 				freemsg(b);
 		} else if (!(err = straccess_rlock(sd, FNDELAY)))	/* XXX: why FNDELAY? */
@@ -2096,20 +2100,20 @@ strwaitclose(struct stdata *sd, int oflag)
 
 	/* STREAM head first */
 	if (wait && q->q_first)
-		ctrace(strwaitqueue(sd, q));
+		_ctrace(strwaitqueue(sd, q));
 
 	while ((q = SAMESTR(sd->sd_wq) ? sd->sd_wq->q_next : NULL)) {
 		if (wait && q->q_first)
-			ctrace(strwaitqueue(sd, q));
-		ctrace(qdetach(_RD(q), oflag, crp));
-		trace();
+			_ctrace(strwaitqueue(sd, q));
+		_ctrace(qdetach(_RD(q), oflag, crp));
+		_trace();
 	}
 	/* STREAM head last */
-	ctrace(qdetach(sd->sd_rq, oflag, crp));
+	_ctrace(qdetach(sd->sd_rq, oflag, crp));
 	/* procs are off for the STREAM head, flush queues now to dump M_PASSFP. */
 	flushq(sd->sd_rq, FLUSHALL);
 	flushq(sd->sd_wq, FLUSHALL);
-	trace();
+	_trace();
 }
 
 /**
@@ -2205,7 +2209,7 @@ strwakeioctl(struct stdata *sd)
 	/* clean out remaining blocks */
 	if (likely(mp != NULL)) {
 		swerr();
-		ctrace(freemsg(mp));
+		_ctrace(freemsg(mp));
 	}
 	clear_bit(IOCWAIT_BIT, &sd->sd_flag);
 	if (waitqueue_active(&sd->sd_iwaitq))
@@ -2306,7 +2310,7 @@ strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 STATIC streams_fastcall int
 strwakeiocack(struct stdata *sd, mblk_t *mp)
 {
-	ptrace(("%s: received ioctl response\n", __FUNCTION__));
+	_ptrace(("%s: received ioctl response\n", __FUNCTION__));
 	if (!sd->sd_iocblk && test_bit(IOCWAIT_BIT, &sd->sd_flag)) {
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
@@ -2319,16 +2323,16 @@ strwakeiocack(struct stdata *sd, mblk_t *mp)
 			if (unlikely(db != NULL)) {
 				prefetch(db->b_datap);
 				swerr();
-				ctrace(freemsg(db));
+				_ctrace(freemsg(db));
 			}
 			/* might not be sleeping yet */
 			if (waitqueue_active(&sd->sd_iwaitq))
 				wake_up(&sd->sd_iwaitq);
 			return (true);
 		} else
-			ptrace(("%s: ioctl response has wrong iocid\n", __FUNCTION__));
+			_ptrace(("%s: ioctl response has wrong iocid\n", __FUNCTION__));
 	} else
-		ptrace(("%s: not expecting ioctl response\n", __FUNCTION__));
+		_ptrace(("%s: not expecting ioctl response\n", __FUNCTION__));
 	return (false);
 }
 
@@ -2370,7 +2374,7 @@ strcopyinb(const caddr_t uaddr, mblk_t **dpp, size_t len, bool user)
 	if (!(dp = *dpp) || (dp->b_datap->db_lim < dp->b_rptr + len)) {
 		/* no room in current buffer */
 		if (dp)
-			ctrace(freemsg(dp));
+			_ctrace(freemsg(dp));
 		/* get a new data buffer -- use the one we just freed if possible, or block */
 		if (!((*dpp) = dp = allocb(len, BPRI_WAITOK)))
 			return (-ENOSR);
@@ -2462,7 +2466,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 
 	if (ic->ic_len < 0 || ic->ic_len > sysctl_str_strmsgsz) {
 		/* POSIX less than zero or larger than maximum data part. */
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-EINVAL);
 	}
 
@@ -2493,7 +2497,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	} else if (ic->ic_timout == 0) {
 		timeo = sd->sd_ioctime;
 	} else if (ic->ic_timout < (int) INFTIM) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		/* POSIX says if ic_timout < -1 return EINVAL */
 		freemsg(mb);
 		return (-EINVAL);
@@ -2510,15 +2514,15 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	ioc->iocblk.ioc_id = sd->sd_iocid;
 
 	do {
-		ctrace(strput(sd, mb));
-		trace();
+		_ctrace(strput(sd, mb));
+		_trace();
 
-		ptrace(("waiting for response\n"));
+		_ptrace(("waiting for response\n"));
 		mb = strwaitiocack(sd, &timeo, access);
 
 		if (IS_ERR(mb)) {
 			err = PTR_ERR(mb);
-			ptrace(("Error path taken! err = %d\n", err));
+			_ptrace(("Error path taken! err = %d\n", err));
 			break;
 		}
 
@@ -2533,12 +2537,12 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 			err = ioc->iocblk.ioc_error;
 			/* SVR 4 SPG says if error is zero return EINVAL */
 			if (err == 0) {
-				ptrace(("Error not set, now EINVAL!\n"));
+				_ptrace(("Error not set, now EINVAL!\n"));
 				err = EINVAL;
 			}
 			/* must return negative errors */
 			err = err > 0 ? -err : err;
-			ptrace(("Error path taken! err = %d\n", err));
+			_ptrace(("Error path taken! err = %d\n", err));
 			break;
 		case M_IOCACK:
 			/* implicit copyout for I_STR ioctl */
@@ -2548,7 +2552,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 					ic->ic_len = ioc->iocblk.ioc_count;
 					err = ioc->iocblk.ioc_rval;
 				} else
-					ptrace(("Error path taken! err = %d\n", err));
+					_ptrace(("Error path taken! err = %d\n", err));
 			} else
 				err = ioc->iocblk.ioc_rval;
 			break;
@@ -2569,8 +2573,8 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 			}
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
 			ioc->copyresp.cp_rval = (caddr_t) 1;
-			ctrace(strput(sd, mb));
-			trace();
+			_ctrace(strput(sd, mb));
+			_trace();
 			goto abort;
 		default:
 			never();
@@ -2628,7 +2632,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 	timeo = sd->sd_ioctime;
 
 	if ((err = strwaitioctl(sd, &timeo, access))) {
-		ctrace(freemsg(mb));
+		_ctrace(freemsg(mb));
 		return (err);
 	}
 
@@ -2636,8 +2640,8 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 	ioc->iocblk.ioc_id = sd->sd_iocid;
 
 	do {
-		ctrace(strput(sd, mb));
-		trace();
+		_ctrace(strput(sd, mb));
+		_trace();
 
 		mb = strwaitiocack(sd, &timeo, access);
 
@@ -2655,7 +2659,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 				err = EINVAL;
 			/* must return negative errors */
 			err = err > 0 ? -err : err;
-			ptrace(("Error path taken! err = %d\n", err));
+			_ptrace(("Error path taken! err = %d\n", err));
 			break;
 		case M_IOCACK:
 			/* no implicit copyout for TRANPARENT ioctl */
@@ -2677,15 +2681,15 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 			}
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
 			ioc->copyresp.cp_rval = (caddr_t) 1;
-			ctrace(strput(sd, mb));
-			trace();
+			_ctrace(strput(sd, mb));
+			_trace();
 			goto abort;
 		default:
 			never();
 			err = -EIO;
 			break;
 		}
-		ctrace(freemsg(mb));
+		_ctrace(freemsg(mb));
 		break;
 	} while (1);
       abort:
@@ -2762,8 +2766,8 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 
 	do {
 		/* could we place it directly to qtop? */
-		ctrace(strput(sd, mb));
-		trace();
+		_ctrace(strput(sd, mb));
+		_trace();
 
 		mb = strwaitiocack(sd, NULL, access);
 
@@ -2776,7 +2780,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 				err = ENXIO;
 			/* must return negative errors */
 			err = err > 0 ? -err : err;
-			ptrace(("Error path taken! err = %d\n", err));
+			_ptrace(("Error path taken! err = %d\n", err));
 			break;
 		case M_IOCACK:
 			err = 0;
@@ -2790,8 +2794,8 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 			ioc->copyresp.cp_flag = (ulong) model;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
 			ioc->copyresp.cp_rval = (caddr_t) 1;
-			ctrace(strput(sd, mb));
-			trace();
+			_ctrace(strput(sd, mb));
+			_trace();
 			goto abort;
 		default:
 			never();
@@ -2832,7 +2836,7 @@ strirput(queue_t *q, mblk_t *mp)
 	case M_IOCNAK:
 	case M_COPYIN:
 	case M_COPYOUT:
-		if (ctrace(strwakeiocack(sd, mp)))
+		if (_ctrace(strwakeiocack(sd, mp)))
 			return (0);
 	}
 	return ((*sd->sd_muxinit->qi_putp) (q, mp));
@@ -2916,8 +2920,8 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 
 	do {
 		/* place it directly to qtop, don't trust modules in between */
-		ctrace(put(l->l_qtop, mb));
-		trace();
+		_ctrace(put(l->l_qtop, mb));
+		_trace();
 
 		mb = strwaitiocack(sd, NULL, FTRUNC);	/* no errors please */
 
@@ -2935,8 +2939,8 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 			ioc->copyresp.cp_flag = (ulong) IOC_NATIVE;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
 			ioc->copyresp.cp_rval = (caddr_t) 1;
-			ctrace(strput(sd, mb));
-			trace();
+			_ctrace(strput(sd, mb));
+			_trace();
 			goto abort;
 		default:
 			never();
@@ -3238,7 +3242,7 @@ strunlink(struct stdata *stp)
 {
 	struct stdata *sd;
 
-	while (ctrace(sd = sd_get(stp->sd_links))) {
+	while (_ctrace(sd = sd_get(stp->sd_links))) {
 		bool detached;
 
 		{
@@ -3263,7 +3267,7 @@ strunlink(struct stdata *stp)
 			strlastclose(sd, 0);
 		}
 
-		ctrace(sd_put(&sd));	/* could be final put */
+		_ctrace(sd_put(&sd));	/* could be final put */
 	}
 }
 
@@ -3468,42 +3472,42 @@ strlastclose(struct stdata *sd, int oflag)
 {
 	struct stdata *sd_other;
 
-	ptrace(("last close of stream %p\n", sd));
+	_ptrace(("last close of stream %p\n", sd));
 	/* First order of business is to wake everybody up.  We have already set the STRCLOSE bit
 	   by this point and when the waiters wake up, straccess() will kick them out with an
 	   appropriate error. */
 
 	strwakeall(sd);
 
-	trace();
+	_trace();
 	if ((sd_other = sd->sd_other)) {
-		trace();
+		_trace();
 		/* Perhaps strlastclose() should first send a M_HANGUP message downstream in the
 		   same fashion as needs to be done for pipes and master pseudo-terminals, however
 		   rather than generating the message we perform the actions on the other stream
 		   head directly. */
 		strhangup(sd->sd_other);
-		ctrace(sd_put(&sd->sd_other));
+		_ctrace(sd_put(&sd->sd_other));
 		/* we do not free the stream head (or stream head queue pair) until the other
 		   stream head does this too */
 	}
 
 	/* 1st step: unlink any (temporary) linked streams */
-	ctrace(strunlink(sd));
+	_ctrace(strunlink(sd));
 
 	/* 2nd step: call the close routine of each module and pop the module. */
 	/* 3rd step: call the close routine of the driver and qdetach the driver */
-	ctrace(strwaitclose(sd, oflag));
+	_ctrace(strwaitclose(sd, oflag));
 
 	/* this balances holding the module in stralloc() and stropen() */
-	ctrace(cdrv_put(sd->sd_cdevsw));
+	_ctrace(cdrv_put(sd->sd_cdevsw));
 	sd->sd_cdevsw = NULL;
 
 	/* not last put, but it had better be the next to last if not a pipe */
 	assure(sd_other != NULL || atomic_read(&((struct shinfo *) sd)->sh_refs) == 2);
 
 	/* this sd_put() balances the original allocation of the stream */
-	ctrace(sd_put(&sd));	/* not last put */
+	_ctrace(sd_put(&sd));	/* not last put */
 }
 
 /* 
@@ -3595,7 +3599,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 			srunlock(sd);
 		} else
 			mask = POLLNVAL;
-		ctrace(sd_put(&sd));
+		_ctrace(sd_put(&sd));
 	} else
 		mask = POLLNVAL;
 	strsyscall();		/* save context switch */
@@ -3672,7 +3676,7 @@ stralloc(dev_t dev)
 	return (sd);
       no_sd:
 	rare();			/* this is highly unlikely as we block allocating stream heads */
-	ctrace(cdrv_put(cdev));
+	_ctrace(cdrv_put(cdev));
 	/* POSIX open() reference page also allows [ENOMEM] here. */
 	return ERR_PTR(-ENOSR);
 }
@@ -3719,21 +3723,21 @@ stropen(struct inode *inode, struct file *file)
 	cred_t *crp = current_creds;
 #endif
 
-	ptrace(("opening a stream\n"));
+	_ptrace(("opening a stream\n"));
 	oflag = make_oflag(file);
 	sflag = ((oflag & O_CLONE) == O_CLONE) ? CLONEOPEN : DRVOPEN;
 
 	/* always lock inode */
-	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
+	_printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	if ((err = stri_trylock(inode)))
 		goto error;
 	// spin_lock(&inode->i_lock);
 	/* first find out of we already have a stream head, or we need a new one anyway */
 	if (sflag != CLONEOPEN) {
-		ptrace(("driver open in effect\n"));
-		ctrace(sd = sd_get((struct stdata *) inode->i_pipe));
+		_ptrace(("driver open in effect\n"));
+		_ctrace(sd = sd_get((struct stdata *) inode->i_pipe));
 	} else {
-		ptrace(("clone open in effect\n"));
+		_ptrace(("clone open in effect\n"));
 		sd = NULL;
 	}
 
@@ -3742,7 +3746,7 @@ stropen(struct inode *inode, struct file *file)
 
 		/* need new STREAM head */
 		dev = file->private_data ? *((dev_t *) file->private_data) : inode->i_ino;
-		ptrace(("no stream head, allocating stream for dev %hu:%hu\n", getmajor(dev),
+		_ptrace(("no stream head, allocating stream for dev %hu:%hu\n", getmajor(dev),
 			getminor(dev)));
 		if (IS_ERR(sd = stralloc(dev))) {
 			err = PTR_ERR(sd);
@@ -3750,12 +3754,12 @@ stropen(struct inode *inode, struct file *file)
 		}
 		/* if we just allocated stream head we already hold the STWOPEN bit */
 		dev = strinccounts(file, sd, oflag);
-		ptrace(("performing qopen() on sd %p\n", sd));
+		_ptrace(("performing qopen() on sd %p\n", sd));
 		/* 1st step: attach the driver and call its open routine */
 		if ((err = qopen(sd->sd_rq, &dev, oflag, sflag, crp))) {
-			ptrace(("Error path taken for sd %p\n", sd));
+			_ptrace(("Error path taken for sd %p\n", sd));
 			qdelete(sd->sd_rq);	/* cancel original queue pair allocation */
-			ctrace(cdrv_put(xchg(&sd->sd_cdevsw, NULL)));	/* cancel hold on module */
+			_ctrace(cdrv_put(xchg(&sd->sd_cdevsw, NULL)));	/* cancel hold on module */
 			goto up_put_error;	/* will destroy new stream head */
 		}
 		/* 2nd step: check for redirected return */
@@ -3766,13 +3770,13 @@ stropen(struct inode *inode, struct file *file)
 			   inode rather than the initial inode. */
 			struct cdevsw *cdev;
 
-			ptrace(("open redirected on sd %p to dev %hu:%hu\n", sd, getmajor(dev),
+			_ptrace(("open redirected on sd %p to dev %hu:%hu\n", sd, getmajor(dev),
 				getminor(dev)));
-			printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+			_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 			stri_unlock(inode);
 			if (!(cdev = cdrv_get(getmajor(dev)))) {
 				err = -ENODEV;
-				ptrace(("Error path taken for sd %p\n", sd));
+				_ptrace(("Error path taken for sd %p\n", sd));
 				/* should be qclose instead */
 				qdetach(sd->sd_rq, oflag, crp);
 				goto up_put_error;
@@ -3781,41 +3785,41 @@ stropen(struct inode *inode, struct file *file)
 			/* qattach() should have already cleaned up the stream head and queue pairs 
 			 */
 			if ((err = spec_reparent(file, cdev, dev))) {
-				ptrace(("Error path taken for sd %p\n", sd));
+				_ptrace(("Error path taken for sd %p\n", sd));
 				/* should be qclose instead */
 				qdetach(sd->sd_rq, oflag, crp);
-				ctrace(cdrv_put(cdev));
+				_ctrace(cdrv_put(cdev));
 				goto up_put_error;
 			}
 			sd->sd_dev = dev;
-			ctrace(cdrv_put(sd->sd_cdevsw));
+			_ctrace(cdrv_put(sd->sd_cdevsw));
 			sd->sd_cdevsw = cdev;
 			/* FIXME: pull stuff out of qattach here. */
 			inode = file->f_dentry->d_inode;
-			printd(("%s: locking inode %p\n", __FUNCTION__, inode));
+			_printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 			stri_lock(inode);
 		}
-		ptrace(("publishing sd %p\n", sd));
+		_ptrace(("publishing sd %p\n", sd));
 		strinsert(inode, sd);	/* publish to inode, device */
-		printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+		_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 		stri_unlock(inode);
-		ptrace(("performing autopush() on sd %p\n", sd));
+		_ptrace(("performing autopush() on sd %p\n", sd));
 		/* 3rd step: autopush modules and call their open routines */
 		if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp))) {
-			ptrace(("Error path taken for sd %p\n", sd));
+			_ptrace(("Error path taken for sd %p\n", sd));
 			goto wake_error;
 		}
-		ctrace(sd_get(sd));	/* to balance sd_put() after put_error, below. */
+		_ctrace(sd_get(sd));	/* to balance sd_put() after put_error, below. */
 	} else {
 		/* FIXME: Push existing stream open stuff down to str_open() (again). */
 		queue_t *wq, *wq_next;
 		dev_t dev;
 
-		printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+		_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 		stri_unlock(inode);
 		/* already have STREAM head */
 		if ((err = strwaitopen(sd, FCREAT))) {
-			ptrace(("Error path taken for sd %p\n", sd));
+			_ptrace(("Error path taken for sd %p\n", sd));
 			goto put_error;
 		}
 		dev = strinccounts(file, sd, oflag);
@@ -3831,13 +3835,13 @@ stropen(struct inode *inode, struct file *file)
 			new_sflag = wq_next ? MODOPEN : sflag;
 			/* calling qopen for module/driver */
 			if ((err = qopen(_RD(wq), &dev, oflag, new_sflag, crp))) {
-				ptrace(("Error path taken for sd %p\n", sd));
+				_ptrace(("Error path taken for sd %p\n", sd));
 				break;
 			}
 		}
 	}
       wake_error:
-	ptrace(("performing strwakeopen() on sd %p\n", sd));
+	_ptrace(("performing strwakeopen() on sd %p\n", sd));
 	strwakeopen(sd);
 	if (!err) {
 		stri_insert(file, sd);	/* publish to file pointer */
@@ -3847,24 +3851,24 @@ stropen(struct inode *inode, struct file *file)
 			err = strwaitfifo(sd, oflag);
 	}
 	if (err) {
-		ptrace(("performing strclose() on sd %p\n", sd));
+		_ptrace(("performing strclose() on sd %p\n", sd));
 		sd_put(&sd);	/* avoid assure() statement in strclose() */
 		strclose(inode, file);
 		goto error;
 	}
       put_error:
-	ctrace(sd_put(&sd));
+	_ctrace(sd_put(&sd));
       error:
 	strsyscall();		/* save context switch */
 	return ((err < 0) ? err : -err);
       up_error:
-	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+	_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	stri_unlock(inode);
 	goto error;
       up_put_error:
-	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+	_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	stri_unlock(inode);
-	ctrace(sd_put(&sd));
+	_ctrace(sd_put(&sd));
 	goto error;
 }
 
@@ -3890,7 +3894,7 @@ strflush(struct file *file)
 	if (likely((sd = stri_acquire(file)) != NULL)) {
 		if (!(err = straccess_rlock(sd, FTRUNC)))
 			srunlock(sd);
-		ctrace(sd_put(&sd));
+		_ctrace(sd_put(&sd));
 	}
 	/* Not a separate system call, only called before strclose. */
 	return (err);
@@ -3981,13 +3985,13 @@ strclose(struct inode *inode, struct file *file)
 	assert(inode);
 	assert(file);
 
-	ptrace(("closing stream on inode %p\n", inode));
-	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
+	_ptrace(("closing stream on inode %p\n", inode));
+	_printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	stri_lock(inode);
 	if (likely((sd = stri_remove(file)) != NULL)) {
 		int oflag = make_oflag(file);
 
-		ptrace(("closing stream %p\n", sd));
+		_ptrace(("closing stream %p\n", sd));
 		/* Always deregister STREAMS events */
 		strevent_unregister(file, sd);
 
@@ -3995,27 +3999,27 @@ strclose(struct inode *inode, struct file *file)
 		   the last close or not.  If it is the last close remove the stream head from the
 		   inode before releasing the semaphore. */
 		if (strdeccounts(sd, oflag)) {
-			ptrace(("last close of stream %p\n", sd));
+			_ptrace(("last close of stream %p\n", sd));
 			/* remove from the inode clone list */
 			strremove_locked(inode, sd);
-			printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+			_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 			stri_unlock(inode);
-			ptrace(("putting inode %p\n", inode));
-			ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+			_ptrace(("putting inode %p\n", inode));
+			_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 				atomic_read(&inode->i_count) - 1));
 			iput(inode);	/* to cancel igrab() from strinsert */
 			/* closing stream head */
-			ctrace(strlastclose(sd, oflag));
+			_ctrace(strlastclose(sd, oflag));
 		} else {
-			printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+			_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 			stri_unlock(inode);
 		}
 
 		/* this put balances the sd_get() in stri_insert() */
-		ctrace(sd_put(&sd));	/* could be final */
+		_ctrace(sd_put(&sd));	/* could be final */
 	} else {
 		err = -EIO;
-		printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+		_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 		stri_unlock(inode);
 	}
 	strsyscall();		/* save context switch */
@@ -4050,7 +4054,7 @@ strfasync(int fd, struct file *file, int on)
 			}
 			srunlock(sd);
 		}
-		ctrace(sd_put(&sd));
+		_ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
 	strsyscall();		/* save context switch */
@@ -4249,41 +4253,41 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 
 	/* gotos to try to get into the loop faster */
 	if (unlikely(ppos != &file->f_pos && ppos && *ppos != 0)) {
-		ptrace(("Error path taken! ppos = %p, &file->f_pos = %p, *ppos = %ld, file->f_pos = %ld\n", ppos, &file->f_pos, (long) *ppos, (long) file->f_pos));
+		_ptrace(("Error path taken! ppos = %p, &file->f_pos = %p, *ppos = %ld, file->f_pos = %ld\n", ppos, &file->f_pos, (long) *ppos, (long) file->f_pos));
 		goto espipe;
 	}
 	if (unlikely(nbytes == 0))
 		goto error;	/* but return zero (0) */
 
-	printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
+	_printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
 	/* unfortunately I can't tell how we were called */
 #if defined WITH_32BIT_CONVERSION
 	{
 		uint8_t byte;
 
-		printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
+		_printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
 		/* linux kernel has a bug in access_ok under 32bit compatibility */
 		if (unlikely(strcopyin(buf, &byte, 1) != 0)) {
-			trace();
+			_trace();
 			goto efault;
 		}
 		if (unlikely(strcopyout(&byte, buf, 1) != 0)) {
-			trace();
+			_trace();
 			goto efault;
 		}
 		if (unlikely(strcopyin(buf + nbytes - 1, &byte, 1) != 0)) {
-			trace();
+			_trace();
 			goto efault;
 		}
 		if (unlikely(strcopyout(&byte, buf + nbytes - 1, 1) != 0)) {
-			trace();
+			_trace();
 			goto efault;
 		}
 	}
 #else				/* defined WITH_32BIT_CONVERSION */
-	printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
+	_printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
 	if (unlikely(!access_ok(VERIFY_WRITE, (void *) buf, nbytes))) {
-		trace();
+		_trace();
 		goto efault;
 	}
 #endif				/* defined WITH_32BIT_CONVERSION */
@@ -4399,7 +4403,7 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 
 		if (unlikely(IS_ERR(mp) != 0)) {
 			err = PTR_ERR(mp);
-			ptrace(("error is %d\n", err));
+			_ptrace(("error is %d\n", err));
 		}
 
 		/* Ok, now everything is ready to copyout() the message, but because copyout() can
@@ -4429,7 +4433,7 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	}
       error:
 	if (err < 0)
-		ptrace(("error is %ld\n", (long) err));
+		_ptrace(("error is %ld\n", (long) err));
 	return (err);
       espipe:
 	err = -ESPIPE;
@@ -4515,7 +4519,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 			err = strread_fast(file, buf, len, ppos);
 		else
 			err = sd->sd_directio->read(file, buf, len, ppos);
-		ctrace(sd_put(&sd));
+		_ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
 	goto exit;
@@ -4619,10 +4623,10 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	ssize_t err, q_maxpsz, written = 0;
 	int access;
 
-	printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
+	_printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
 	/* gotos to try to get into the loop faster */
 	if (unlikely(!access_ok(VERIFY_READ, buf, nbytes))) {	/* PROFILED */
-		trace();
+		_trace();
 		goto efault;
 	}
 
@@ -4686,8 +4690,8 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 		/* send off the message block */
 		if (likely(err == 0)) {
 			/* We don't really queue these, see strwput(). */
-			ctrace(strput(sd, b));
-			trace();
+			_ctrace(strput(sd, b));
+			_trace();
 			written += block;
 			/* subsequent access checks should return -ESTRPIPE instead of generating
 			   signals so that we can simply return the amount written. */
@@ -4701,7 +4705,7 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 
       error:
 	if (written <= 0 && err < 0)
-		ptrace(("error is %ld\n", (long) err));
+		_ptrace(("error is %ld\n", (long) err));
 	return ((written > 0) ? written : err);
       efault:
 	err = -EFAULT;
@@ -4800,7 +4804,7 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 			err = strwrite_fast(file, buf, len, ppos);
 		else
 			err = sd->sd_directio->write(file, buf, len, ppos);
-		ctrace(sd_put(&sd));
+		_ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
 	goto exit;
@@ -4945,8 +4949,8 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 		if (!more)
 			mp->b_flag |= MSGDELIM;
 		/* use put instead of putnext because of STRHOLD feature */
-		ctrace(strput(sd, mp));
-		trace();
+		_ctrace(strput(sd, mp));
+		_trace();
 		return (size);
 	}
       erange:
@@ -4968,7 +4972,7 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
 			err = strsendpage(file, page, offset, size, ppos, more);
 		else
 			err = sd->sd_directio->sendpage(file, page, offset, size, ppos, more);
-		ctrace(sd_put(&sd));
+		_ctrace(sd_put(&sd));
 	}
 	/* We want to give the driver queues an opportunity to run. */
 	strsyscall();		/* save context switch */
@@ -5094,8 +5098,8 @@ strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 		srunlock(sd);
 		if (likely(!IS_ERR(mp))) {
 			/* use put instead of putnext because of STRHOLD feature */
-			ctrace(strput(sd, mp));
-			trace();
+			_ctrace(strput(sd, mp));
+			_trace();
 		} else {
 			err = PTR_ERR(mp);
 		}
@@ -5139,7 +5143,7 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 				err = strputpmsg_fast(file, ctlp, datp, band, flags);
 			else
 				err = sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
-			ctrace(sd_put(&sd));
+			_ctrace(sd_put(&sd));
 		} else
 			err = -ENOSTR;
 	} else
@@ -5181,27 +5185,27 @@ strcopyin_gstrbuf(struct file *file, struct strbuf __user *from, struct strbuf *
 			else {
 				uint8_t byte;
 
-				printd(("%s: to->maxlen = %d\n", __FUNCTION__, to->maxlen));
-				printd(("%s: to->len = %d\n", __FUNCTION__, to->len));
-				printd(("%s: to->buf = %p\n", __FUNCTION__, to->buf));
+				_printd(("%s: to->maxlen = %d\n", __FUNCTION__, to->maxlen));
+				_printd(("%s: to->len = %d\n", __FUNCTION__, to->len));
+				_printd(("%s: to->buf = %p\n", __FUNCTION__, to->buf));
 				/* linux kernel has a bug in access_ok under 32bit compatibility */
 				if (unlikely(strcopyin(to->buf, &byte, 1) != 0)) {
-					trace();
+					_trace();
 					goto efault;
 				}
 				if (unlikely(strcopyout(&byte, to->buf, 1) != 0)) {
-					trace();
+					_trace();
 					goto efault;
 				}
 				if (unlikely(strcopyin(to->buf + to->maxlen - 1, &byte, 1) != 0)) {
-					trace();
+					_trace();
 					goto efault;
 				}
 				if (unlikely(strcopyout(&byte, to->buf + to->maxlen - 1, 1) != 0)) {
-					trace();
+					_trace();
 					goto efault;
 				}
-				trace();
+				_trace();
 			}
 		} else
 #endif				/* WITH_32BIT_CONVERSION */
@@ -5221,12 +5225,12 @@ strcopyin_gstrbuf(struct file *file, struct strbuf __user *from, struct strbuf *
 			if (likely(to->maxlen < 0))
 				to->maxlen = -1;
 			else {
-				printd(("%s: to->maxlen = %d\n", __FUNCTION__, to->maxlen));
-				printd(("%s: to->len = %d\n", __FUNCTION__, to->len));
-				printd(("%s: to->buf = %p\n", __FUNCTION__, to->buf));
+				_printd(("%s: to->maxlen = %d\n", __FUNCTION__, to->maxlen));
+				_printd(("%s: to->len = %d\n", __FUNCTION__, to->len));
+				_printd(("%s: to->buf = %p\n", __FUNCTION__, to->buf));
 				if (unlikely(!access_ok(VERIFY_WRITE, to->buf, to->maxlen)))
 					goto efault;
-				trace();
+				_trace();
 			}
 		}
 	} else {
@@ -5363,7 +5367,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 				part = data ? &dat : &ctl;
 				head = data ? &dtp : &ctp;
 
-				ptrace(("Processing %s block\n", data ? "M_DATA" : "M_(PC)PROTO"));
+				_ptrace(("Processing %s block\n", data ? "M_DATA" : "M_(PC)PROTO"));
 
 				if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 					blen = 0;
@@ -5454,7 +5458,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 				prefetchw(b->b_cont);
 				if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 					continue;
-				ptrace(("Copying out cntl part %d bytes\n", blen));
+				_ptrace(("Copying out cntl part %d bytes\n", blen));
 				strcopyout(b->b_rptr, ctl.buf + len, blen);
 				len += blen;
 			}
@@ -5465,7 +5469,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 				prefetchw(b->b_cont);
 				if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 					continue;
-				ptrace(("Copying out data part %d bytes\n", blen));
+				_ptrace(("Copying out data part %d bytes\n", blen));
 				strcopyout(b->b_rptr, dat.buf + len, blen);
 				len += blen;
 			}
@@ -5523,7 +5527,7 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 				err = strgetpmsg_fast(file, ctlp, datp, bandp, flagsp);
 			else
 				err = sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp);
-			ctrace(sd_put(&sd));
+			_ctrace(sd_put(&sd));
 		} else
 			err = -ENOSTR;
 	} else
@@ -6048,7 +6052,7 @@ __str_i_fdinsert(const struct file *file, struct stdata *sd, struct strfdinsert 
 		if ((f2 = fget(fdi->fildes)) && f2->f_op && f2->f_op->release == &strclose) {
 			struct stdata *sd2;
 
-			if (ctrace(sd2 = sd_get(stri_lookup(f2)))) {
+			if (_ctrace(sd2 = sd_get(stri_lookup(f2)))) {
 				/* POSIX says to return ENXIO when the passed in stream is hung up. 
 				   Note that we do not care if the stream is linked under a
 				   multiplexing driver or not, we can still pass its queue pointer.
@@ -6069,7 +6073,7 @@ __str_i_fdinsert(const struct file *file, struct stdata *sd, struct strfdinsert 
 					token = (typeof(token)) (ulong) _RD(qbot);
 					srunlock(sd2);
 				}
-				ctrace(sd_put(&sd2));
+				_ctrace(sd_put(&sd2));
 			} else
 				err = -EIO;
 			fput(f2);
@@ -6083,8 +6087,8 @@ __str_i_fdinsert(const struct file *file, struct stdata *sd, struct strfdinsert 
 				bcopy(&token, mp->b_rptr + fdi->offset, sizeof(token));
 				srunlock(sd);
 				/* use put instead of putnext because of STRHOLD feature */
-				ctrace(strput(sd, mp));
-				trace();
+				_ctrace(strput(sd, mp));
+				_trace();
 				return (0);
 			} else
 				err = PTR_ERR(mp);
@@ -6190,13 +6194,13 @@ str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
 	queue_t *wq = sd->sd_wq;
 	int err;
 
-	printd(("%s: copying string from user\n", __FUNCTION__));
+	_printd(("%s: copying string from user\n", __FUNCTION__));
 	if ((err = strncpy_from_user(name, (void *) arg, FMNAMESZ + 1)) < 0) {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	if (err < 1 || err > FMNAMESZ) {
-		ptrace(("Error path taken! strnlen = %d\n", err));
+		_ptrace(("Error path taken! strnlen = %d\n", err));
 		return (-EINVAL);
 	}
 
@@ -6231,18 +6235,18 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	if ((err = strcopyin((void *) arg, &bi, sizeof(bi)))) {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 
 	if ((bi.bi_flag & ~(FLUSHR | FLUSHW | FLUSHRW))
 	    || !(bi.bi_flag & (FLUSHR | FLUSHW | FLUSHRW))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-EINVAL);
 	}
 
 	if (!(mp = allocb(2, BPRI_WAITOK))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-ENOSR);
 	}
 
@@ -6252,11 +6256,11 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		srunlock(sd);
-		ctrace(strput(sd, mp));
-		trace();
+		_ctrace(strput(sd, mp));
+		_trace();
 		return (0);
 	} else {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		freeb(mp);
 	}
 
@@ -6294,26 +6298,26 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 	uint32_t flags = arg;
 
 	if (((flags & ~(FLUSHR | FLUSHW | FLUSHRW))) || !((flags & (FLUSHR | FLUSHW | FLUSHRW)))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-EINVAL);
 	}
 
 	if (!(mp = allocb(1, BPRI_WAITOK))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-ENOSR);
 	}
-	ptrace(("message block %p allocated\n", mp));
+	_ptrace(("message block %p allocated\n", mp));
 
 	mp->b_datap->db_type = M_FLUSH;
 	*mp->b_wptr++ = flags;
 
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		srunlock(sd);
-		ptrace(("putting message %p\n", mp));
-		ctrace(strput(sd, mp));
-		trace();
+		_ptrace(("putting message %p\n", mp));
+		_ctrace(strput(sd, mp));
+		_trace();
 	} else {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		freeb(mp);
 	}
 
@@ -6334,7 +6338,7 @@ str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	if (unlikely(!access_ok(VERIFY_WRITE, (void *) arg, sizeof(band)))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-EFAULT);
 	}
 
@@ -6347,7 +6351,7 @@ str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 			qrunlock(q, pl);
 		} else {
 			qrunlock(q, pl);
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			err = -ENODATA;
 		}
 		srunlock(sd);
@@ -6408,7 +6412,7 @@ str_i_setcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	if (!(err = strcopyin((void *) arg, &closetime, sizeof(closetime)))) {
 		if (0 > closetime || closetime >= 300000) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			return (-EINVAL);
 		}
 		if (!(err = straccess_unlocked(sd, (FAPPEND | FEXCL))))
@@ -6442,17 +6446,17 @@ str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	if (unlikely(!access_ok(VERIFY_WRITE, (void *) arg, sizeof(flags)))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-EFAULT);
 	}
-	ptrace(("**** Access ok!\n"));
+	_ptrace(("**** Access ok!\n"));
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
 		struct strevent *se;
 
 		if ((se = __strevent_find(sd)))
 			flags = se->se_events;
 		else {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			err = -EINVAL;
 		}
 		srunlock(sd);
@@ -6505,7 +6509,7 @@ str_i_setsig(const struct file *file, struct stdata *sd, unsigned long arg)
 		if (flags || (sd->sd_sigflags & S_ALL))
 			err = __strevent_register(file, sd, flags);
 		else {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			err = -EINVAL;
 		}
 		swunlock(sd);
@@ -6527,7 +6531,7 @@ str_i_grdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	if (unlikely(!access_ok(VERIFY_WRITE, (void *) arg, sizeof(rdopt)))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-EFAULT);
 	}
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
@@ -6632,7 +6636,7 @@ str_i_gwropt(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	if (unlikely(!access_ok(VERIFY_WRITE, (void *) arg, sizeof(wropt)))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-EFAULT);
 	}
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
@@ -6730,54 +6734,54 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 
 	err = -EINVAL;
 	if (mux->sd_flag & (STRISFIFO | STRISPIPE)) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto error;
 	}
 	if (!mux->sd_cdevsw || !mux->sd_cdevsw->d_str) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto error;
 	}
 	st = mux->sd_cdevsw->d_str;
 	if (!st->st_muxrinit || !st->st_muxwinit) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto error;
 	}
 
 	err = -ENOSR;
 	if (unlikely(!(l = alloclk()))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto error;
 	}
 
 	if ((err = strwaitopen(mux, (FREAD | FWRITE | FEXCL | FNDELAY)))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto free_error;
 	}
 
 	err = -EBADF;
 	if (!(f = fget(fd))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto unlock_error;
 	}
 
 	err = -EINVAL;
 	if (!f->f_op || f->f_op->release != &strclose) {	/* not a stream */
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto fput_error;
 	}
 	if (!(sd = stri_acquire(f)) || (sd == mux)) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto fput_error;
 	}
 
 	if ((err = strwaitopen(sd, 0))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto sdput_error;
 	}
 
 	err = -ENOSR;
 	if (setsq(sd->sd_rq, (struct fmodsw *) mux->sd_cdevsw) != 0) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		goto unlock2_error;
 	}
 
@@ -6811,14 +6815,14 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 		strwakeopen_swunlock(sd);
 		err = l->l_index;
 	} else {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		setsq(sd->sd_rq, NULL);
 		strwakeopen(sd);
 		err = err < 0 ? err : -err;	/* must be negative */
 	}
 	strwakeopen(mux);
 
-	ctrace(sd_put(&sd));	/* could be last put */
+	_ctrace(sd_put(&sd));	/* could be last put */
 	fput(f);
 	if (err < 0)
 		freelk(l);
@@ -6828,7 +6832,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	clear_bit(STWOPEN_BIT, &sd->sd_flag);
 	swunlock(sd);
       sdput_error:
-	ctrace(sd_put(&sd));
+	_ctrace(sd_put(&sd));
       fput_error:
 	fput(f);
       unlock_error:
@@ -7003,7 +7007,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 	swunlock(mux);
 
 	err = 0;
-	if (ctrace(sd = sd_get(*sdp))) {
+	if (_ctrace(sd = sd_get(*sdp))) {
 		do {
 			struct linkblk *l;
 
@@ -7029,7 +7033,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 			setq(sd->sd_rq, &str_rinit, &str_winit);
 			clear_bit(STPLEX_BIT, &sd->sd_flag);
 			strwakeopen_swunlock(sd);
-			ctrace(sd_put(&sd));
+			_ctrace(sd_put(&sd));
 
 		} while (index == MUXID_ALL && (sd = *sdp));
 	}
@@ -7039,7 +7043,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
       ioctl_error:
 	strwakeopen(sd);
       wait_error:
-	ctrace(sd_put(&sd));
+	_ctrace(sd_put(&sd));
 	goto wakemux_exit;
       unlock_error:
 	clear_bit(STWOPEN_BIT, &mux->sd_flag);
@@ -7474,13 +7478,13 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 	struct fmodsw *fmod;
 	int err;
 
-	printd(("%s: copying string from user\n", __FUNCTION__));
+	_printd(("%s: copying string from user\n", __FUNCTION__));
 	if ((err = strncpy_from_user(name, (const char *) arg, FMNAMESZ + 1)) < 0) {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	if (err < 1 || err > FMNAMESZ) {
-		ptrace(("Error path taken! strnlen = %d\n", err));
+		_ptrace(("Error path taken! strnlen = %d\n", err));
 		return (-EINVAL);
 	}
 
@@ -7535,20 +7539,20 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 					   error: drivers can return more informative errors.) It
 					   is a question here whether to leave modules on their
 					   honor or to set the error number for them. */
-					ptrace(("Error path taken! err = %d\n", err));
+					_ptrace(("Error path taken! err = %d\n", err));
 					assure(err == -ENXIO);
 				}
 			} else {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				err = -EINVAL;
 			}
 			strwakeopen(sd);
 		} else {
-			ptrace(("Error path taken! err = %d\n", err));
+			_ptrace(("Error path taken! err = %d\n", err));
 		}
 		fmod_put(fmod);
 	} else {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		err = -EINVAL;
 	}
 
@@ -7603,16 +7607,16 @@ str_i_pop(const struct file *file, struct stdata *sd, unsigned long arg)
 				sd->sd_pushcnt--;
 				qdetach(_RD(sd->sd_wq->q_next), oflag, crp);
 			} else {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				err = -EPERM;
 			}
 		} else {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			err = -EINVAL;
 		}
 		strwakeopen(sd);
 	} else {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 	}
 	return (err);
 }
@@ -7636,8 +7640,8 @@ freefd_func(caddr_t arg)
 
 	/* sneaky trick to free the file pointer when mblk freed, this means that M_PASSFP messages 
 	   flushed from a queue will free the file pointers referenced by them */
-	trace();
-	printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, file, file_count(file) - 1));
+	_trace();
+	_printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, file, file_count(file) - 1));
 	fput(file);
 	return;
 }
@@ -7678,7 +7682,7 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!(f2 = fget(fd)))
 		goto unlock2_exit;
 
-	printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2, file_count(f2)));
+	_printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2, file_count(f2)));
 
 	/* Ok, with this approach we have a problem with passing a file pointer that is associated
 	   with the stream head to which it is passed.  The problem is that if the M_PASSFP message
@@ -7724,7 +7728,7 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
       exit:
 	return (err);
       fput_exit:
-	printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2, file_count(f2) - 1));
+	_printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2, file_count(f2) - 1));
 	fput(f2);
 	goto unlock2_exit;
 }
@@ -7919,17 +7923,17 @@ str_i_str(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err, rtn;
 
 	if ((err = strcopyin((typeof(&ic)) arg, &ic, sizeof(ic)))) {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	if ((rtn = err =
 	     strdoioctl_str(sd, &ic, (FREAD | FWRITE | FEXCL | FNDELAY), 1, IOC_NATIVE)) < 0) {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	/* POSIX says to copy out the ic_len member upon success. */
 	if ((err = strcopyout(&ic.ic_len, &((typeof(&ic)) arg)->ic_len, sizeof(ic.ic_len)))) {
-		ptrace(("Error path taken! err = %d\n", err));
+		_ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	return (rtn);
@@ -8001,7 +8005,7 @@ str_i_gerropt(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	if (unlikely(!access_ok(VERIFY_WRITE, (void *) arg, sizeof(eropt)))) {
-		ptrace(("Error path taken!\n"));
+		_ptrace(("Error path taken!\n"));
 		return (-EFAULT);
 	}
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
@@ -8265,7 +8269,7 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 				struct stdata *sd2;
 
 				err = -EIO;
-				if (ctrace(sd2 = sd_get(stri_lookup(f2)))) {
+				if (_ctrace(sd2 = sd_get(stri_lookup(f2)))) {
 
 					err = -EINVAL;
 					if (sd != sd2 && !(err = straccess_rlock(sd2, FCREAT))) {
@@ -8292,7 +8296,7 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 						}
 						srunlock(sd2);
 					}
-					ctrace(sd_put(&sd2));
+					_ctrace(sd_put(&sd2));
 				}
 				fput(f2);
 			}
@@ -8363,11 +8367,11 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 
 	/* Fast path for data -- PROFILED */
 	if (likely(cmd == I_GETPMSG)) {	/* getpmsg syscall emulation */
-		printd(("%s: got I_GETPMSG\n", __FUNCTION__));
+		_printd(("%s: got I_GETPMSG\n", __FUNCTION__));
 		return str_i_getpmsg32(file, sd, arg);	/* not compatible */
 	}
 	if (likely(cmd == I_PUTPMSG)) {	/* putpmsg syscall emulation */
-		printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
+		_printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
 		return str_i_putpmsg32(file, sd, arg);	/* not compatible */
 	}
 
@@ -8375,120 +8379,120 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 	case _IOC_TYPE(I_STR):
 		switch (_IOC_NR(cmd)) {
 		case _IOC_NR(I_ATMARK):
-			printd(("%s: got I_ATMARK\n", __FUNCTION__));
+			_printd(("%s: got I_ATMARK\n", __FUNCTION__));
 			return str_i_atmark(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_CANPUT):
-			printd(("%s: got I_CANPUT\n", __FUNCTION__));
+			_printd(("%s: got I_CANPUT\n", __FUNCTION__));
 			return str_i_canput(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_CKBAND):
-			printd(("%s: got I_CKBAND\n", __FUNCTION__));
+			_printd(("%s: got I_CKBAND\n", __FUNCTION__));
 			return str_i_ckband(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_FDINSERT):
-			printd(("%s: got I_FDINSERT\n", __FUNCTION__));
+			_printd(("%s: got I_FDINSERT\n", __FUNCTION__));
 			return str_i_fdinsert32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_FIND):
-			printd(("%s: got I_FIND\n", __FUNCTION__));
+			_printd(("%s: got I_FIND\n", __FUNCTION__));
 			return str_i_find32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_FLUSHBAND):
-			printd(("%s: got I_FLUSHBAND\n", __FUNCTION__));
+			_printd(("%s: got I_FLUSHBAND\n", __FUNCTION__));
 			return str_i_flushband32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_FLUSH):
-			printd(("%s: got I_FLUSH\n", __FUNCTION__));
+			_printd(("%s: got I_FLUSH\n", __FUNCTION__));
 			return str_i_flush(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_GETBAND):
-			printd(("%s: got I_GETBAND\n", __FUNCTION__));
+			_printd(("%s: got I_GETBAND\n", __FUNCTION__));
 			return str_i_getband32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_GETCLTIME):
-			printd(("%s: got I_GETCLTIME\n", __FUNCTION__));
+			_printd(("%s: got I_GETCLTIME\n", __FUNCTION__));
 			return str_i_getcltime32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_GETSIG):
-			printd(("%s: got I_GETSIG\n", __FUNCTION__));
+			_printd(("%s: got I_GETSIG\n", __FUNCTION__));
 			return str_i_getsig32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_GRDOPT):
-			printd(("%s: got I_GRDOPT\n", __FUNCTION__));
+			_printd(("%s: got I_GRDOPT\n", __FUNCTION__));
 			return str_i_grdopt32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_GWROPT):
-			printd(("%s: got I_GWROPT\n", __FUNCTION__));
+			_printd(("%s: got I_GWROPT\n", __FUNCTION__));
 			return str_i_gwropt32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_LINK):
-			printd(("%s: got I_LINK\n", __FUNCTION__));
+			_printd(("%s: got I_LINK\n", __FUNCTION__));
 			return str_i_link32(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_LIST):
-			printd(("%s: got I_LIST\n", __FUNCTION__));
+			_printd(("%s: got I_LIST\n", __FUNCTION__));
 			return str_i_list32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_LOOK):
-			printd(("%s: got I_LOOK\n", __FUNCTION__));
+			_printd(("%s: got I_LOOK\n", __FUNCTION__));
 			return str_i_look32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_NREAD):
-			printd(("%s: got I_NREAD\n", __FUNCTION__));
+			_printd(("%s: got I_NREAD\n", __FUNCTION__));
 			return str_i_nread32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_PEEK):
-			printd(("%s: got I_PEEK\n", __FUNCTION__));
+			_printd(("%s: got I_PEEK\n", __FUNCTION__));
 			return str_i_peek32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_PLINK):
-			printd(("%s: got I_PLINK\n", __FUNCTION__));
+			_printd(("%s: got I_PLINK\n", __FUNCTION__));
 			return str_i_plink32(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_POP):
-			printd(("%s: got I_POP\n", __FUNCTION__));
+			_printd(("%s: got I_POP\n", __FUNCTION__));
 			return str_i_pop(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_PUNLINK):
-			printd(("%s: got I_PUNLINK\n", __FUNCTION__));
+			_printd(("%s: got I_PUNLINK\n", __FUNCTION__));
 			return str_i_punlink32(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_PUSH):
-			printd(("%s: got I_PUSH\n", __FUNCTION__));
+			_printd(("%s: got I_PUSH\n", __FUNCTION__));
 			return str_i_push32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_RECVFD):
-			printd(("%s: got I_RECVFD\n", __FUNCTION__));
+			_printd(("%s: got I_RECVFD\n", __FUNCTION__));
 			return str_i_recvfd32(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_SENDFD):
-			printd(("%s: got I_SENDFD\n", __FUNCTION__));
+			_printd(("%s: got I_SENDFD\n", __FUNCTION__));
 			return str_i_sendfd(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_SETCLTIME):
-			printd(("%s: got I_SETCLTIME\n", __FUNCTION__));
+			_printd(("%s: got I_SETCLTIME\n", __FUNCTION__));
 			return str_i_setcltime32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_SETSIG):
-			printd(("%s: got I_SETSIG\n", __FUNCTION__));
+			_printd(("%s: got I_SETSIG\n", __FUNCTION__));
 			return str_i_setsig(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_SRDOPT):
-			printd(("%s: got I_SRDOPT\n", __FUNCTION__));
+			_printd(("%s: got I_SRDOPT\n", __FUNCTION__));
 			return str_i_srdopt(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_STR):
-			printd(("%s: got I_STR\n", __FUNCTION__));
+			_printd(("%s: got I_STR\n", __FUNCTION__));
 			return str_i_str32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_SWROPT):
-			printd(("%s: got I_SWROPT\n", __FUNCTION__));
+			_printd(("%s: got I_SWROPT\n", __FUNCTION__));
 			return str_i_swropt(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_UNLINK):
-			printd(("%s: got I_UNLINK\n", __FUNCTION__));
+			_printd(("%s: got I_UNLINK\n", __FUNCTION__));
 			return str_i_unlink32(file, sd, arg);	/* compatible */
 			/* are these Solaris specific? */
 		case _IOC_NR(I_SERROPT):
-			printd(("%s: got I_SERROPT\n", __FUNCTION__));
+			_printd(("%s: got I_SERROPT\n", __FUNCTION__));
 			return str_i_serropt(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_GERROPT):
-			printd(("%s: got I_GERROPT\n", __FUNCTION__));
+			_printd(("%s: got I_GERROPT\n", __FUNCTION__));
 			return str_i_gerropt32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_ANCHOR):
-			printd(("%s: got I_ANCHOR\n", __FUNCTION__));
+			_printd(("%s: got I_ANCHOR\n", __FUNCTION__));
 			return str_i_anchor(file, sd, arg);	/* compatible */
 			/* Linux Fast-STREAMS special ioctls */
 		case _IOC_NR(I_GETPMSG):	/* getpmsg syscall emulation */
-			printd(("%s: got I_GETPMSG\n", __FUNCTION__));
+			_printd(("%s: got I_GETPMSG\n", __FUNCTION__));
 			return str_i_getpmsg32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_PUTPMSG):	/* putpmsg syscall emulation */
-			printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
+			_printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
 			return str_i_putpmsg32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_PIPE):	/* pipe syscall emulation */
-			printd(("%s: got I_PIPE\n", __FUNCTION__));
+			_printd(("%s: got I_PIPE\n", __FUNCTION__));
 			return str_i_pipe32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_FATTACH):	/* fattach syscall emulation */
-			printd(("%s: got I_FATTACH\n", __FUNCTION__));
+			_printd(("%s: got I_FATTACH\n", __FUNCTION__));
 			return str_i_fattach32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_FDETACH):	/* fdetach syscall emulation */
-			printd(("%s: got I_FDETACH\n", __FUNCTION__));
+			_printd(("%s: got I_FDETACH\n", __FUNCTION__));
 			return str_i_fdetach32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_ISASTREAM):
-			printd(("%s: got I_ISASTREAM\n", __FUNCTION__));
+			_printd(("%s: got I_ISASTREAM\n", __FUNCTION__));
 			return str_i_isastream(file, sd, arg);	/* compatible */
 #if (_IOC_TYPE(I_STR) != _IOC_TYPE(TCSBRK))
 		}
@@ -8597,13 +8601,13 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 			length = 0;	/* no argument - simple return */
 			break;
 		case _IOC_NR(TIOCGSID):	/* pid_t * *//* SVID *//* XXX */
-			printd(("%s: got TIOCGSID\n", __FUNCTION__));
+			_printd(("%s: got TIOCGSID\n", __FUNCTION__));
 			return tty_tiocgsid32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(TIOCGPGRP):	/* pid_t * *//* SVID *//* XXX */
-			printd(("%s: got TIOCGPGRP\n", __FUNCTION__));
+			_printd(("%s: got TIOCGPGRP\n", __FUNCTION__));
 			return tty_tiocgpgrp32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(TIOCSPGRP):	/* const pid_t * *//* SVID *//* XXX */
-			printd(("%s: got TIOCSPGRP\n", __FUNCTION__));
+			_printd(("%s: got TIOCSPGRP\n", __FUNCTION__));
 			return tty_tiocspgrp32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(TIOCSTI):	/* const char * *//* BSD *//* XXX */
 			access |= FEXCL;
@@ -8723,10 +8727,10 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		switch (_IOC_NR(cmd)) {
 #endif
 		case _IOC_NR(FIOGETOWN):	/* pid_t * */
-			printd(("%s: got FIOGETOWN\n", __FUNCTION__));
+			_printd(("%s: got FIOGETOWN\n", __FUNCTION__));
 			return file_fiogetown32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(FIOSETOWN):	/* const pid_t * */
-			printd(("%s: got FIOSETOWN\n", __FUNCTION__));
+			_printd(("%s: got FIOSETOWN\n", __FUNCTION__));
 			return file_fiosetown32(file, sd, arg);	/* not compatible */
 #if 0
 		case _IOC_NR(FIOCLEX):	/* void *//* XXX */
@@ -8764,16 +8768,16 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		switch (_IOC_NR(cmd)) {
 #endif
 		case _IOC_NR(SIOCATMARK):	/* int * */
-			printd(("%s: got SIOCATMARK\n", __FUNCTION__));
+			_printd(("%s: got SIOCATMARK\n", __FUNCTION__));
 			access |= FREAD;
 			return sock_siocatmark32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(SIOCSPGRP):	/* const pid_t * */
-			printd(("%s: got SIOCSPGRP\n", __FUNCTION__));
+			_printd(("%s: got SIOCSPGRP\n", __FUNCTION__));
 			access |= FEXCL;
 			length = sizeof(pid_t);
 			return sock_siocspgrp32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(SIOCGPGRP):	/* pid_t * */
-			printd(("%s: got SIOCGPGRP\n", __FUNCTION__));
+			_printd(("%s: got SIOCGPGRP\n", __FUNCTION__));
 			length = sizeof(pid_t);
 			return sock_siocgpgrp32(file, sd, arg);	/* not compatible */
 		}
@@ -8845,11 +8849,11 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 
 	/* Fast path for data -- PROFILED */
 	if (likely(cmd == I_GETPMSG)) {	/* getpmsg syscall emulation */
-		printd(("%s: got I_GETPMSG\n", __FUNCTION__));
+		_printd(("%s: got I_GETPMSG\n", __FUNCTION__));
 		return str_i_getpmsg(file, sd, arg);
 	}
 	if (likely(cmd == I_PUTPMSG)) {	/* putpmsg syscall emulation */
-		printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
+		_printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
 		return str_i_putpmsg(file, sd, arg);
 	}
 
@@ -8857,120 +8861,120 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 	case _IOC_TYPE(I_STR):
 		switch (_IOC_NR(cmd)) {
 		case _IOC_NR(I_ATMARK):
-			printd(("%s: got I_ATMARK\n", __FUNCTION__));
+			_printd(("%s: got I_ATMARK\n", __FUNCTION__));
 			return str_i_atmark(file, sd, arg);
 		case _IOC_NR(I_CANPUT):
-			printd(("%s: got I_CANPUT\n", __FUNCTION__));
+			_printd(("%s: got I_CANPUT\n", __FUNCTION__));
 			return str_i_canput(file, sd, arg);
 		case _IOC_NR(I_CKBAND):
-			printd(("%s: got I_CKBAND\n", __FUNCTION__));
+			_printd(("%s: got I_CKBAND\n", __FUNCTION__));
 			return str_i_ckband(file, sd, arg);
 		case _IOC_NR(I_FDINSERT):
-			printd(("%s: got I_FDINSERT\n", __FUNCTION__));
+			_printd(("%s: got I_FDINSERT\n", __FUNCTION__));
 			return str_i_fdinsert(file, sd, arg);
 		case _IOC_NR(I_FIND):
-			printd(("%s: got I_FIND\n", __FUNCTION__));
+			_printd(("%s: got I_FIND\n", __FUNCTION__));
 			return str_i_find(file, sd, arg);
 		case _IOC_NR(I_FLUSHBAND):
-			printd(("%s: got I_FLUSHBAND\n", __FUNCTION__));
+			_printd(("%s: got I_FLUSHBAND\n", __FUNCTION__));
 			return str_i_flushband(file, sd, arg);
 		case _IOC_NR(I_FLUSH):
-			printd(("%s: got I_FLUSH\n", __FUNCTION__));
+			_printd(("%s: got I_FLUSH\n", __FUNCTION__));
 			return str_i_flush(file, sd, arg);
 		case _IOC_NR(I_GETBAND):
-			printd(("%s: got I_GETBAND\n", __FUNCTION__));
+			_printd(("%s: got I_GETBAND\n", __FUNCTION__));
 			return str_i_getband(file, sd, arg);
 		case _IOC_NR(I_GETCLTIME):
-			printd(("%s: got I_GETCLTIME\n", __FUNCTION__));
+			_printd(("%s: got I_GETCLTIME\n", __FUNCTION__));
 			return str_i_getcltime(file, sd, arg);
 		case _IOC_NR(I_GETSIG):
-			printd(("%s: got I_GETSIG\n", __FUNCTION__));
+			_printd(("%s: got I_GETSIG\n", __FUNCTION__));
 			return str_i_getsig(file, sd, arg);
 		case _IOC_NR(I_GRDOPT):
-			printd(("%s: got I_GRDOPT\n", __FUNCTION__));
+			_printd(("%s: got I_GRDOPT\n", __FUNCTION__));
 			return str_i_grdopt(file, sd, arg);
 		case _IOC_NR(I_GWROPT):
-			printd(("%s: got I_GWROPT\n", __FUNCTION__));
+			_printd(("%s: got I_GWROPT\n", __FUNCTION__));
 			return str_i_gwropt(file, sd, arg);
 		case _IOC_NR(I_LINK):
-			printd(("%s: got I_LINK\n", __FUNCTION__));
+			_printd(("%s: got I_LINK\n", __FUNCTION__));
 			return str_i_link(file, sd, arg);
 		case _IOC_NR(I_LIST):
-			printd(("%s: got I_LIST\n", __FUNCTION__));
+			_printd(("%s: got I_LIST\n", __FUNCTION__));
 			return str_i_list(file, sd, arg);
 		case _IOC_NR(I_LOOK):
-			printd(("%s: got I_LOOK\n", __FUNCTION__));
+			_printd(("%s: got I_LOOK\n", __FUNCTION__));
 			return str_i_look(file, sd, arg);
 		case _IOC_NR(I_NREAD):
-			printd(("%s: got I_NREAD\n", __FUNCTION__));
+			_printd(("%s: got I_NREAD\n", __FUNCTION__));
 			return str_i_nread(file, sd, arg);
 		case _IOC_NR(I_PEEK):
-			printd(("%s: got I_PEEK\n", __FUNCTION__));
+			_printd(("%s: got I_PEEK\n", __FUNCTION__));
 			return str_i_peek(file, sd, arg);
 		case _IOC_NR(I_PLINK):
-			printd(("%s: got I_PLINK\n", __FUNCTION__));
+			_printd(("%s: got I_PLINK\n", __FUNCTION__));
 			return str_i_plink(file, sd, arg);
 		case _IOC_NR(I_POP):
-			printd(("%s: got I_POP\n", __FUNCTION__));
+			_printd(("%s: got I_POP\n", __FUNCTION__));
 			return str_i_pop(file, sd, arg);
 		case _IOC_NR(I_PUNLINK):
-			printd(("%s: got I_PUNLINK\n", __FUNCTION__));
+			_printd(("%s: got I_PUNLINK\n", __FUNCTION__));
 			return str_i_punlink(file, sd, arg);
 		case _IOC_NR(I_PUSH):
-			printd(("%s: got I_PUSH\n", __FUNCTION__));
+			_printd(("%s: got I_PUSH\n", __FUNCTION__));
 			return str_i_push(file, sd, arg);
 		case _IOC_NR(I_RECVFD):
-			printd(("%s: got I_RECVFD\n", __FUNCTION__));
+			_printd(("%s: got I_RECVFD\n", __FUNCTION__));
 			return str_i_recvfd(file, sd, arg);
 		case _IOC_NR(I_SENDFD):
-			printd(("%s: got I_SENDFD\n", __FUNCTION__));
+			_printd(("%s: got I_SENDFD\n", __FUNCTION__));
 			return str_i_sendfd(file, sd, arg);
 		case _IOC_NR(I_SETCLTIME):
-			printd(("%s: got I_SETCLTIME\n", __FUNCTION__));
+			_printd(("%s: got I_SETCLTIME\n", __FUNCTION__));
 			return str_i_setcltime(file, sd, arg);
 		case _IOC_NR(I_SETSIG):
-			printd(("%s: got I_SETSIG\n", __FUNCTION__));
+			_printd(("%s: got I_SETSIG\n", __FUNCTION__));
 			return str_i_setsig(file, sd, arg);
 		case _IOC_NR(I_SRDOPT):
-			printd(("%s: got I_SRDOPT\n", __FUNCTION__));
+			_printd(("%s: got I_SRDOPT\n", __FUNCTION__));
 			return str_i_srdopt(file, sd, arg);
 		case _IOC_NR(I_STR):
-			printd(("%s: got I_STR\n", __FUNCTION__));
+			_printd(("%s: got I_STR\n", __FUNCTION__));
 			return str_i_str(file, sd, arg);
 		case _IOC_NR(I_SWROPT):
-			printd(("%s: got I_SWROPT\n", __FUNCTION__));
+			_printd(("%s: got I_SWROPT\n", __FUNCTION__));
 			return str_i_swropt(file, sd, arg);
 		case _IOC_NR(I_UNLINK):
-			printd(("%s: got I_UNLINK\n", __FUNCTION__));
+			_printd(("%s: got I_UNLINK\n", __FUNCTION__));
 			return str_i_unlink(file, sd, arg);
 			/* are these Solaris specific? */
 		case _IOC_NR(I_SERROPT):
-			printd(("%s: got I_SERROPT\n", __FUNCTION__));
+			_printd(("%s: got I_SERROPT\n", __FUNCTION__));
 			return str_i_serropt(file, sd, arg);
 		case _IOC_NR(I_GERROPT):
-			printd(("%s: got I_GERROPT\n", __FUNCTION__));
+			_printd(("%s: got I_GERROPT\n", __FUNCTION__));
 			return str_i_gerropt(file, sd, arg);
 		case _IOC_NR(I_ANCHOR):
-			printd(("%s: got I_ANCHOR\n", __FUNCTION__));
+			_printd(("%s: got I_ANCHOR\n", __FUNCTION__));
 			return str_i_anchor(file, sd, arg);
 			/* Linux Fast-STREAMS special ioctls */
 		case _IOC_NR(I_GETPMSG):	/* getpmsg syscall emulation */
-			printd(("%s: got I_GETPMSG\n", __FUNCTION__));
+			_printd(("%s: got I_GETPMSG\n", __FUNCTION__));
 			return str_i_getpmsg(file, sd, arg);
 		case _IOC_NR(I_PUTPMSG):	/* putpmsg syscall emulation */
-			printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
+			_printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
 			return str_i_putpmsg(file, sd, arg);
 		case _IOC_NR(I_PIPE):	/* pipe syscall emulation */
-			printd(("%s: got I_PIPE\n", __FUNCTION__));
+			_printd(("%s: got I_PIPE\n", __FUNCTION__));
 			return str_i_pipe(file, sd, arg);
 		case _IOC_NR(I_FATTACH):	/* fattach syscall emulation */
-			printd(("%s: got I_FATTACH\n", __FUNCTION__));
+			_printd(("%s: got I_FATTACH\n", __FUNCTION__));
 			return str_i_fattach(file, sd, arg);
 		case _IOC_NR(I_FDETACH):	/* fdetach syscall emulation */
-			printd(("%s: got I_FDETACH\n", __FUNCTION__));
+			_printd(("%s: got I_FDETACH\n", __FUNCTION__));
 			return str_i_fdetach(file, sd, arg);
 		case _IOC_NR(I_ISASTREAM):
-			printd(("%s: got I_ISASTREAM\n", __FUNCTION__));
+			_printd(("%s: got I_ISASTREAM\n", __FUNCTION__));
 			return str_i_isastream(file, sd, arg);
 #if (_IOC_TYPE(I_STR) != _IOC_TYPE(TCSBRK))
 		}
@@ -9079,13 +9083,13 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 			length = 0;	/* no argument - simple return */
 			break;
 		case _IOC_NR(TIOCGSID):	/* pid_t * *//* SVID *//* XXX */
-			printd(("%s: got TIOCGSID\n", __FUNCTION__));
+			_printd(("%s: got TIOCGSID\n", __FUNCTION__));
 			return tty_tiocgsid(file, sd, arg);
 		case _IOC_NR(TIOCGPGRP):	/* pid_t * *//* SVID *//* XXX */
-			printd(("%s: got TIOCGPGRP\n", __FUNCTION__));
+			_printd(("%s: got TIOCGPGRP\n", __FUNCTION__));
 			return tty_tiocgpgrp(file, sd, arg);
 		case _IOC_NR(TIOCSPGRP):	/* const pid_t * *//* SVID *//* XXX */
-			printd(("%s: got TIOCSPGRP\n", __FUNCTION__));
+			_printd(("%s: got TIOCSPGRP\n", __FUNCTION__));
 			return tty_tiocspgrp(file, sd, arg);
 		case _IOC_NR(TIOCSTI):	/* const char * *//* BSD *//* XXX */
 			access |= FEXCL;
@@ -9205,11 +9209,11 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 		switch (_IOC_NR(cmd)) {
 #endif
 		case _IOC_NR(FIOGETOWN):	/* pid_t * */
-			printd(("%s: got FIOGETOWN\n", __FUNCTION__));
+			_printd(("%s: got FIOGETOWN\n", __FUNCTION__));
 			return file_fiogetown(file, sd, arg);
 			break;
 		case _IOC_NR(FIOSETOWN):	/* const pid_t * */
-			printd(("%s: got FIOSETOWN\n", __FUNCTION__));
+			_printd(("%s: got FIOSETOWN\n", __FUNCTION__));
 			return file_fiosetown(file, sd, arg);
 #if 0
 		case _IOC_NR(FIOCLEX):	/* void *//* XXX */
@@ -9247,16 +9251,16 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 		switch (_IOC_NR(cmd)) {
 #endif
 		case _IOC_NR(SIOCATMARK):	/* int * */
-			printd(("%s: got SIOCATMARK\n", __FUNCTION__));
+			_printd(("%s: got SIOCATMARK\n", __FUNCTION__));
 			access |= FREAD;
 			return sock_siocatmark(file, sd, arg);
 		case _IOC_NR(SIOCSPGRP):	/* const pid_t * */
-			printd(("%s: got SIOCSPGRP\n", __FUNCTION__));
+			_printd(("%s: got SIOCSPGRP\n", __FUNCTION__));
 			access |= FEXCL;
 			length = sizeof(pid_t);
 			return sock_siocspgrp(file, sd, arg);
 		case _IOC_NR(SIOCGPGRP):	/* pid_t * */
-			printd(("%s: got SIOCGPGRP\n", __FUNCTION__));
+			_printd(("%s: got SIOCGPGRP\n", __FUNCTION__));
 			length = sizeof(pid_t);
 			return sock_siocgpgrp(file, sd, arg);
 		}
@@ -9300,7 +9304,7 @@ _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			err = strioctl_fast(file, cmd, arg);
 		else
 			err = sd->sd_directio->ioctl(file, cmd, arg);
-		ctrace(sd_put(&sd));
+		_ctrace(sd_put(&sd));
 	}
 	strsyscall();		/* save context switch */
 	return (err);
@@ -9746,15 +9750,15 @@ strwput(queue_t *q, mblk_t *mp)
 		swerr();
 	} else if (likely(test_bit(STRHOLD_BIT, &sd->sd_flag) == 0)) {
 		/* fast path */
-		ctrace(putnext(q, mp));
-		trace();
+		_ctrace(putnext(q, mp));
+		_trace();
 	} else {
 		mblk_t *bp;
 
 		if ((bp = getq(q))) {
 			/* delayed one has to go - can't delay the other */
-			ctrace(putnext(q, bp));
-			ctrace(putnext(q, mp));
+			_ctrace(putnext(q, bp));
+			_ctrace(putnext(q, mp));
 		} else if (test_bit(STRDELIM_BIT, &sd->sd_flag)
 			   || !test_bit(STRHOLD_BIT, &sd->sd_flag)
 			   || mp->b_datap->db_type != M_DATA
@@ -9764,8 +9768,8 @@ strwput(queue_t *q, mblk_t *mp)
 			   || mp->b_wptr > mp->b_rptr + (FASTBUF >> 1)) {
 			/* Feature not activated, or not M_DATA, or delimited, or longer than one
 			   block or a zero-length message, or can't hold another write same size. */
-			ctrace(putnext(q, mp));
-			trace();
+			_ctrace(putnext(q, mp));
+			_trace();
 		} else {
 			/* new M_DATA message with more room */
 			putq(q, mp);
@@ -9893,9 +9897,9 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   ensures that there is only one M_PCPROTO message on the STREAM head read queue, if one
 	   exists, it is first on the queue.  It would be easy enough to hold onto it, but I don't
 	   see the need. */
-	trace();
+	_trace();
 	if (mp->b_rptr[0] & FLUSHR) {
-		trace();
+		_trace();
 		if (mp->b_rptr[0] & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHALL);
 		else {
@@ -9922,24 +9926,24 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 	}
 	/* We set MSGNOLOOP on flush messages returned downstream that if echoed back up in error
 	   are freed at the stream head. */
-	trace();
+	_trace();
 	if (!(mp->b_flag & MSGNOLOOP) && _WR(q)->q_next) {
-		trace();
+		_trace();
 		if (mp->b_rptr[0] & FLUSHW) {
-			trace();
+			_trace();
 			if (mp->b_rptr[1] & FLUSHBAND)
 				flushband(_WR(q), mp->b_rptr[1], FLUSHALL);
 			else
 				flushq(_WR(q), FLUSHALL);
 			mp->b_flag |= MSGNOLOOP;
-			ctrace(strput(sd, mp));
-			trace();
+			_ctrace(strput(sd, mp));
+			_trace();
 			return (0);
 		}
 	}
-	trace();
+	_trace();
 	freemsg(mp);
-	trace();
+	_trace();
 	return (0);
 }
 
@@ -10171,12 +10175,12 @@ str_m_unhangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 STATIC streams_noinline streams_fastcall int
 str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	if (!ctrace(strwakeiocack(sd, mp))) {
+	if (!_ctrace(strwakeiocack(sd, mp))) {
 		if (_WR(q)->q_next) {
 			union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
 			/* allow module or driver to free cp_private */
-			ptrace(("Rejecting M_COPYIN/M_COPYOUT.\n"));
+			_ptrace(("Rejecting M_COPYIN/M_COPYOUT.\n"));
 			mp->b_datap->db_type = M_IOCDATA;
 			mp->b_wptr = mp->b_rptr + sizeof(ioc->copyresp);
 			ioc->copyresp.cp_rval = (caddr_t) 1;
@@ -10192,7 +10196,7 @@ str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 STATIC streams_noinline streams_fastcall int
 str_m_ioc(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	if (!ctrace(strwakeiocack(sd, mp)))
+	if (!_ctrace(strwakeiocack(sd, mp)))
 		freemsg(mp);
 	return (0);
 }
@@ -10236,8 +10240,8 @@ str_m_letsplay(struct stdata *sd, queue_t *q, mblk_t *mp)
 		freemsg(mp);
 	} else {
 		mp->b_datap->db_type = M_DONTPLAY;
-		ctrace(put(lp->lp_queue, mp));
-		trace();
+		_ctrace(put(lp->lp_queue, mp));
+		_trace();
 	}
 	return (0);
 }
@@ -10296,61 +10300,61 @@ strrput(queue_t *q, mblk_t *mp)
 	case M_DATA:		/* bi - data */
 	case M_PROTO:		/* bi - protocol info */
 	case M_PASSFP:		/* bi - pass file pointer */
-		printd(("%s: got M_DATA, M_PROTO or M_PASSFP\n", __FUNCTION__));
+		_printd(("%s: got M_DATA, M_PROTO or M_PASSFP\n", __FUNCTION__));
 		goto m_data;
 	case M_PCPROTO:	/* bi - protocol info */
-		printd(("%s: got M_PCPROTO\n", __FUNCTION__));
+		_printd(("%s: got M_PCPROTO\n", __FUNCTION__));
 		err = str_m_pcproto(sd, q, mp);
 		break;
 	case M_FLUSH:		/* bi - flush queues */
-		printd(("%s: got M_FLUSH\n", __FUNCTION__));
+		_printd(("%s: got M_FLUSH\n", __FUNCTION__));
 		err = str_m_flush(sd, q, mp);
 		break;
 	case M_SETOPTS:	/* up - set stream head options */
 	case M_PCSETOPTS:	/* up - set stream head options */
-		printd(("%s: got M_SETOPTS, M_PCSETOPTS\n", __FUNCTION__));
+		_printd(("%s: got M_SETOPTS, M_PCSETOPTS\n", __FUNCTION__));
 		err = str_m_setopts(sd, q, mp);
 		break;
 	case M_SIG:		/* up - signal */
-		printd(("%s: got M_SIG\n", __FUNCTION__));
+		_printd(("%s: got M_SIG\n", __FUNCTION__));
 		err = str_m_sig(sd, q, mp);
 		break;
 	case M_PCSIG:		/* up - signal */
-		printd(("%s: got M_PCSIG\n", __FUNCTION__));
+		_printd(("%s: got M_PCSIG\n", __FUNCTION__));
 		err = str_m_pcsig(sd, q, mp);
 		break;
 	case M_ERROR:		/* up - report error */
-		printd(("%s: got M_ERROR\n", __FUNCTION__));
+		_printd(("%s: got M_ERROR\n", __FUNCTION__));
 		err = str_m_error(sd, q, mp);
 		break;
 	case M_HANGUP:		/* up - report hangup */
-		printd(("%s: got M_HANGUP\n", __FUNCTION__));
+		_printd(("%s: got M_HANGUP\n", __FUNCTION__));
 		err = str_m_hangup(sd, q, mp);
 		break;
 	case M_UNHANGUP:	/* up - report recovery */
-		printd(("%s: got M_UNHANGUP\n", __FUNCTION__));
+		_printd(("%s: got M_UNHANGUP\n", __FUNCTION__));
 		err = str_m_unhangup(sd, q, mp);
 		break;
 	case M_COPYIN:		/* up - copy data from user */
 	case M_COPYOUT:	/* up - copy data to user */
-		printd(("%s: got M_COPYIN or M_COPYOUT\n", __FUNCTION__));
+		_printd(("%s: got M_COPYIN or M_COPYOUT\n", __FUNCTION__));
 		err = str_m_copy(sd, q, mp);
 		break;
 	case M_IOCACK:		/* up - acknolwedge ioctl */
 	case M_IOCNAK:		/* up - refuse ioctl */
-		printd(("%s: got M_IOCACK or M_IOCNAK\n", __FUNCTION__));
+		_printd(("%s: got M_IOCACK or M_IOCNAK\n", __FUNCTION__));
 		err = str_m_ioc(sd, q, mp);
 		break;
 	case M_IOCTL:		/* dn - io control */
-		printd(("%s: got M_IOCTL\n", __FUNCTION__));
+		_printd(("%s: got M_IOCTL\n", __FUNCTION__));
 		err = str_m_ioctl(sd, q, mp);
 		break;
 	case M_LETSPLAY:	/* up - AIX only */
-		printd(("%s: got M_LETSPLAY\n", __FUNCTION__));
+		_printd(("%s: got M_LETSPLAY\n", __FUNCTION__));
 		err = str_m_letsplay(sd, q, mp);
 		break;
 	default:
-		printd(("%s: got other message\n", __FUNCTION__));
+		_printd(("%s: got other message\n", __FUNCTION__));
 #if 0
 	case M_BREAK:		/* dn - request to send "break" */
 	case M_DELAY:		/* dn - request delay on output */

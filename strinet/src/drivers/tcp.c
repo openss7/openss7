@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/14 08:34:30 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/06/14 10:37:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/14 08:34:30 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.6  2006/06/14 10:37:44  brian
+ - defeat a lot of debug traces in debug mode for testing
+ - changes to allow strinet to compile under LiS (why???)
+
  Revision 0.9.2.5  2006/05/14 08:34:30  brian
  - changes for compile and load
 
@@ -67,9 +71,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/14 08:34:30 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/06/14 10:37:44 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/14 08:34:30 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/06/14 10:37:44 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -146,7 +150,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.5 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/05/14 08:34:30 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/06/14 10:37:44 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -196,6 +200,13 @@ MODULE_ALIAS("/dev/tcp");
 MODULE_ALIAS("/dev/inet/tcp");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
+
+#ifdef LIS
+#define STRMINPSZ	0
+#define STRMAXPSZ	4096
+#define STRHIGH		5120
+#define STRLOW		1024
+#endif
 
 /*
  *  ==========================================================================
@@ -4578,11 +4589,11 @@ m_error(queue_t *q, int error, mblk_t *mp)
 	if (mp->b_cont)
 		freemsg(XCHG(&mp->b_cont, NULL));
 	if (hangup) {
-		printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, tpi));
+		printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, TPI_PRIV(q)));
 		mp->b_datap->db_type = M_HANGUP;
 		mp->b_band = 0;
 	} else {
-		printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, tpi, error));
+		printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, TPI_PRIV(q), error));
 		mp->b_datap->db_type = M_ERROR;
 		mp->b_band = 0;
 		*(mp->b_wptr)++ = error;
@@ -6700,7 +6711,7 @@ tpi_qopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		write_unlock_bh(&tpi_lock);
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", DRV_NAME, camjor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(tpi = tpi_alloc_priv(q, tpip, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
@@ -6810,8 +6821,8 @@ tpi_init_hashes(void)
 		rwlock_init(&tpi_bhash[i].lock);
 	for (i = 0; i < tpi_chash_size; i++)
 		rwlock_init(&tpi_chash[i].lock);
-	printd(("%s: INFO: bind hash table configured size = %d\n", DRV_NAME, tpi_bhash_size));
-	printd(("%s: INFO: conn hash table configured size = %d\n", DRV_NAME, tpi_chash_size));
+	printd(("%s: INFO: bind hash table configured size = %ld\n", DRV_NAME, (long) tpi_bhash_size));
+	printd(("%s: INFO: conn hash table configured size = %ld\n", DRV_NAME, (long) tpi_chash_size));
 }
 
 STATIC void

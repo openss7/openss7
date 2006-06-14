@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/29 21:36:18 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/14 10:37:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:36:18 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/29 21:36:18 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/14 10:37:21 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/29 21:36:18 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/14 10:37:21 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/29 21:36:18 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/14 10:37:21 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -184,11 +184,11 @@ STATIC struct module_info mux_minfo = {
 };
 
 #ifdef LIS
-#define trace() while (0) { }
-#define ptrace(__x) while (0) { }
-#define printd(__x) while (0) { }
+#define _trace() while (0) { }
+#define _ptrace(__x) while (0) { }
+#define _printd(__x) while (0) { }
 #define pswerr(__x) while (0) { }
-#define ctrace(__x) __x
+#define _ctrace(__x) __x
 
 #define QSVCBUSY QRUNNING
 
@@ -236,26 +236,26 @@ mux_uwput(queue_t *q, mblk_t *mp)
 	struct mux *mux = q->q_ptr, *bot;
 	int err;
 
-	trace();
+	_trace();
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
 	{
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
-		trace();
+		_trace();
 		switch (ioc->iocblk.ioc_cmd) {
 		case I_LINK:
 		case I_PLINK:
 		{
 			struct linkblk *l;
 
-			trace();
+			_trace();
 			if (!mp->b_cont) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto einval;
 			}
 			if (!(bot = kmem_alloc(sizeof(*bot), KM_NOSLEEP))) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto enomem;
 			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
@@ -279,9 +279,9 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			struct linkblk *l;
 
-			trace();
+			_trace();
 			if (!mp->b_cont) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto einval;
 			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
@@ -325,7 +325,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			int l_index;
 
-			trace();
+			_trace();
 			if (ioc->iocblk.ioc_count != sizeof(int))
 				goto einval;
 			if (!mp->b_cont)
@@ -352,7 +352,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			int l_index;
 
-			trace();
+			_trace();
 			if (ioc->iocblk.ioc_count != sizeof(int))
 				goto einval;
 			if (!mp->b_cont)
@@ -376,7 +376,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			goto ack;
 		}
 		default:
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			if (mux->other)
 				goto passmsg;
 		      einval:

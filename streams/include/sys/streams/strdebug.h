@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.35 2006/05/25 08:30:40 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.36 2006/06/14 10:37:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/25 08:30:40 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:20 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/05/25 08:30:40 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/06/14 10:37:20 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -153,6 +152,9 @@
 
 #undef streams_inline
 #define streams_inline
+
+#undef streams_noinline
+#define streams_noinline noinline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE

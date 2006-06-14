@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/05/29 08:53:00 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/06/14 10:37:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/29 08:53:00 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strprocfs.c,v $
+ Revision 0.9.2.52  2006/06/14 10:37:23  brian
+ - defeat a lot of debug traces in debug mode for testing
+ - changes to allow strinet to compile under LiS (why???)
+
  Revision 0.9.2.51  2006/05/29 08:53:00  brian
  - started zero copy architecture
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/05/29 08:53:00 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/06/14 10:37:23 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/05/29 08:53:00 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/06/14 10:37:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -833,15 +837,15 @@ get_streams_queue(char *page, int maxlen, queue_t *q)
 	len += snprintf(page + len, maxlen - len, ", %p", q->q_next);
 	len += snprintf(page + len, maxlen - len, ", %p", q->q_link);
 	len += snprintf(page + len, maxlen - len, ", %p", q->q_ptr);
-	len += snprintf(page + len, maxlen - len, ", %u", q->q_count);
+	len += snprintf(page + len, maxlen - len, ", %lu", (ulong) q->q_count);
 	len += snprintf(page + len, maxlen - len, ", %#08lx", q->q_flag);
-	len += snprintf(page + len, maxlen - len, ", %d", q->q_minpsz);
-	len += snprintf(page + len, maxlen - len, ", %d", q->q_maxpsz);
-	len += snprintf(page + len, maxlen - len, ", %u", q->q_hiwat);
-	len += snprintf(page + len, maxlen - len, ", %u", q->q_lowat);
+	len += snprintf(page + len, maxlen - len, ", %ld", (long) q->q_minpsz);
+	len += snprintf(page + len, maxlen - len, ", %ld", (long) q->q_maxpsz);
+	len += snprintf(page + len, maxlen - len, ", %lu", (ulong) q->q_hiwat);
+	len += snprintf(page + len, maxlen - len, ", %lu", (ulong) q->q_lowat);
 	len += snprintf(page + len, maxlen - len, ", %p", q->q_bandp);
-	len += snprintf(page + len, maxlen - len, ", %hhu", q->q_nband);
-	len += snprintf(page + len, maxlen - len, ", %d", q->q_msgs);
+	len += snprintf(page + len, maxlen - len, ", %hu", (ushort) q->q_nband);
+	len += snprintf(page + len, maxlen - len, ", %ld", (long) q->q_msgs);
 	// len += snprintf(page + len, maxlen - len, "%d", q->q_rwlock);
 	// len += snprintf(page + len, maxlen - len, ", %lu", q->q_iflags);
       done:
@@ -953,7 +957,7 @@ get_streams_msgb(char *page, int maxlen, struct msgb *b)
 	len += snprintf(page + len, maxlen - len, ", %p", b->b_rptr);
 	len += snprintf(page + len, maxlen - len, ", %p", b->b_wptr);
 	len += snprintf(page + len, maxlen - len, ", %p", b->b_datap);
-	len += snprintf(page + len, maxlen - len, ", %hhu", b->b_band);
+	len += snprintf(page + len, maxlen - len, ", %hu", (ushort) b->b_band);
 	len += snprintf(page + len, maxlen - len, ", %hu", b->b_flag);
       done:
 	return (len);
@@ -1051,9 +1055,9 @@ get_streams_datab(char *page, int maxlen, struct datab *db)
 	len += snprintf(page + len, maxlen - len, ", db_frtnp: %p", db->db_frtnp);
 	len += snprintf(page + len, maxlen - len, ", db_base: %p", db->db_base);
 	len += snprintf(page + len, maxlen - len, ", db_lim: %p", db->db_lim);
-	len += snprintf(page + len, maxlen - len, ", db_ref: %hhu", db->db_ref);
-	len += snprintf(page + len, maxlen - len, ", db_type: %hhu", db->db_type);
-	len += snprintf(page + len, maxlen - len, ", db_class: %hhu", db->db_class);
+	len += snprintf(page + len, maxlen - len, ", db_ref: %hu", (ushort) db->db_ref);
+	len += snprintf(page + len, maxlen - len, ", db_type: %hu", (ushort) db->db_type);
+	len += snprintf(page + len, maxlen - len, ", db_class: %hu", (ushort) db->db_class);
 	len += snprintf(page + len, maxlen - len, ", db_size: %d:", db->db_size);
 	// len += snprintf(page + len, maxlen - len, ", db_users: %d", atomic_read(&db->db_users));
       done:
@@ -1249,7 +1253,7 @@ get_streams_strevent(char *page, int maxlen, int type, struct strevent *se)
 		len += snprintf(page + len, maxlen - len, ", { SE_BUFCALL %p", se->x.b.queue);
 		len += snprintf(page + len, maxlen - len, ", %p", se->x.b.func);
 		len += snprintf(page + len, maxlen - len, ", %ld", se->x.b.arg);
-		len += snprintf(page + len, maxlen - len, ", %u }", se->x.b.size);
+		len += snprintf(page + len, maxlen - len, ", %lu }", (ulong) se->x.b.size);
 	case SE_TIMEOUT:
 		len += snprintf(page + len, maxlen - len, ", { SE_TIMEOUT %p", se->x.t.queue);
 		len += snprintf(page + len, maxlen - len, ", %p", se->x.t.func);
@@ -1354,14 +1358,14 @@ get_streams_qband(char *page, int maxlen, struct qband *qb)
 	if (!qb)
 		goto done;
 	len += snprintf(page + len, maxlen - len, ", %p", qb->qb_next);
-	len += snprintf(page + len, maxlen - len, ", %u", qb->qb_count);
+	len += snprintf(page + len, maxlen - len, ", %lu", (ulong) qb->qb_count);
 	len += snprintf(page + len, maxlen - len, ", %p", qb->qb_first);
 	len += snprintf(page + len, maxlen - len, ", %p", qb->qb_last);
-	len += snprintf(page + len, maxlen - len, ", %d", qb->qb_hiwat);
-	len += snprintf(page + len, maxlen - len, ", %d", qb->qb_lowat);
+	len += snprintf(page + len, maxlen - len, ", %ld", (long) qb->qb_hiwat);
+	len += snprintf(page + len, maxlen - len, ", %ld", (long) qb->qb_lowat);
 	len += snprintf(page + len, maxlen - len, ", %ld", qb->qb_msgs);
 	// len += snprintf(page + len, maxlen - len, ", %p", qb->qb_prev);
-	// len += snprintf(page + len, maxlen - len, ", %hhu", qb->qb_band);
+	// len += snprintf(page + len, maxlen - len, ", %hu", (ushort) qb->qb_band);
       done:
 	return (len);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/22 10:28:42 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/22 10:28:42 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:23 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/22 10:28:42 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -110,12 +110,12 @@ __autopush_add(struct cdevsw *cdev, struct strapush *sap)
 
 	err = -EEXIST;
 	if ((api = __autopush_find(cdev, sap->sap_minor)) != NULL) {
-		ptrace(("Error path taken! EEXIST\n"));
+		_ptrace(("Error path taken! EEXIST\n"));
 		goto error;
 	}
 	err = -ENOSR;
 	if ((api = ap_alloc(sap)) == NULL) {
-		ptrace(("Error path taken! ENOSR\n"));
+		_ptrace(("Error path taken! ENOSR\n"));
 		goto error;
 	}
 	ensure(cdev->d_apush.next, INIT_LIST_HEAD(&cdev->d_apush));
@@ -133,12 +133,12 @@ __autopush_del(struct cdevsw *cdev, struct strapush *sap)
 
 	err = -ENODEV;
 	if ((api = __autopush_find(cdev, sap->sap_minor)) == NULL) {
-		ptrace(("Error path taken! ENODEV\n"));
+		_ptrace(("Error path taken! ENODEV\n"));
 		goto error;
 	}
 	err = -ERANGE;
 	if (sap->sap_minor != api->api_sap.sap_minor) {
-		ptrace(("Error path taken! ERANGE\n"));
+		_ptrace(("Error path taken! ERANGE\n"));
 		goto error;
 	}
 	ap_put(api);
@@ -157,14 +157,14 @@ autopush_find(dev_t dev)
 	cdev = cdrv_get(getmajor(dev));
 	if (cdev == NULL)
 		goto notfound;
-	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
+	_printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 	/* XXX: do these locks have to be so severe? */
 	spin_lock_irqsave(&apush_lock, flags);
 	if ((api = __autopush_find(cdev, getminor(dev))) != NULL)
 		ap_get(api);
 	spin_unlock_irqrestore(&apush_lock, flags);
-	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
-	ctrace(sdev_put(cdev));
+	_printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
+	_ctrace(sdev_put(cdev));
       notfound:
 	return ((struct strapush *) api);
 }
@@ -189,14 +189,14 @@ autopush_search(const char *name, minor_t minor)
 
 	if (!(cdev = cdev_find(module)))
 		goto notfound;
-	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
+	_printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 	/* XXX: do these locks have to be so severe? */
 	spin_lock_irqsave(&apush_lock, flags);
 	if ((api = __autopush_find(cdev, minor)) != NULL)
 		ap_get(api);
 	spin_unlock_irqrestore(&apush_lock, flags);
-	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
-	ctrace(sdev_put(cdev));
+	_printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
+	_ctrace(sdev_put(cdev));
       notfound:
 	return ((struct strapush *) api);
 }
@@ -219,7 +219,7 @@ autopush_add(struct strapush *sap)
 	case SAP_RANGE:
 		err = -ERANGE;
 		if (sap->sap_lastminor <= sap->sap_minor) {
-			ptrace(("Error path taken! ERANGE\n"));
+			_ptrace(("Error path taken! ERANGE\n"));
 			goto error;
 		}
 		break;
@@ -229,29 +229,29 @@ autopush_add(struct strapush *sap)
 		break;
 	default:
 		err = -EINVAL;
-		ptrace(("Error path taken! EINVAL\n"));
+		_ptrace(("Error path taken! EINVAL\n"));
 		goto error;
 	}
 	err = -EINVAL;
 	if (sap->sap_module[0] == '\0')
 		if (sap->sap_major == 0
 		    || sap->sap_major != getmajor(makedevice(sap->sap_major, 0))) {
-			ptrace(("Error path taken! EINVAL\n"));
+			_ptrace(("Error path taken! EINVAL\n"));
 			goto error;
 		}
 	if (sap->sap_minor != getminor(makedevice(0, sap->sap_minor))) {
-		ptrace(("Error path taken! EINVAL\n"));
+		_ptrace(("Error path taken! EINVAL\n"));
 		goto error;
 	}
 	if (1 > sap->sap_npush || sap->sap_npush > MAXAPUSH) {
-		ptrace(("Error path taken! EINVAL\n"));
+		_ptrace(("Error path taken! EINVAL\n"));
 		goto error;
 	}
 	for (k = 0; k < sap->sap_npush; k++) {
 		int len = strnlen(sap->sap_list[k], FMNAMESZ + 1);
 
 		if (len == 0 || len == FMNAMESZ + 1) {
-			ptrace(("Error path taken! EINVAL\n"));
+			_ptrace(("Error path taken! EINVAL\n"));
 			goto error;
 		}
 	}
@@ -263,16 +263,16 @@ autopush_add(struct strapush *sap)
 		sap->sap_major = cdev->d_major;
 	}
 	if (cdev == NULL) {
-		ptrace(("Error path taken! ENOSTR\n"));
+		_ptrace(("Error path taken! ENOSTR\n"));
 		goto error;
 	}
-	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
+	_printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	/* XXX: do these logs have to be so severe? */
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_add(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
-	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	ctrace(sdev_put(cdev));
+	_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+	_ctrace(sdev_put(cdev));
       error:
 	return (err);
 }
@@ -292,11 +292,11 @@ autopush_del(struct strapush *sap)
 	if (sap->sap_module[0] == '\0')
 		if (sap->sap_major == 0
 		    || sap->sap_major != getmajor(makedevice(sap->sap_major, 0))) {
-			ptrace(("Error path taken! EINVAL\n"));
+			_ptrace(("Error path taken! EINVAL\n"));
 			goto error;
 		}
 	if (sap->sap_minor != getminor(makedevice(0, sap->sap_minor))) {
-		ptrace(("Error path taken! EINVAL\n"));
+		_ptrace(("Error path taken! EINVAL\n"));
 		goto error;
 	}
 	err = -ENODEV;
@@ -305,16 +305,16 @@ autopush_del(struct strapush *sap)
 	else
 		cdev = cdev_find(sap->sap_module);
 	if (cdev == NULL) {
-		ptrace(("Error path taken! ENODEV\n"));
+		_ptrace(("Error path taken! ENODEV\n"));
 		goto error;
 	}
-	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
+	_printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	/* XXX: do these logs have to be so severe? */
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_del(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
-	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	ctrace(sdev_put(cdev));
+	_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+	_ctrace(sdev_put(cdev));
       error:
 	return (err);
 }
@@ -334,12 +334,12 @@ autopush_vml(struct str_mlist *smp, int nmods)
 
 		len = strnlen(smp->l_name, FMNAMESZ + 1);
 		if (len == 0 || len == FMNAMESZ + 1) {
-			ptrace(("Error path taken! EINVAL\n"));
+			_ptrace(("Error path taken! EINVAL\n"));
 			goto einval;
 		}
 		if ((fmod = fmod_find(smp->l_name)) != NULL) {
-			printd(("%s: %s: got module\n", __FUNCTION__, fmod->f_name));
-			printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
+			_printd(("%s: %s: got module\n", __FUNCTION__, fmod->f_name));
+			_printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 			fmod_put(fmod);
 		} else
 			rtn = 1;
@@ -366,7 +366,7 @@ apush_set(struct strapush *sap)
 			return autopush_add(sap);
 		}
 	}
-	ptrace(("Error path taken! EINVAL\n"));
+	_ptrace(("Error path taken! EINVAL\n"));
 	return (-EINVAL);
 }
 
@@ -383,11 +383,11 @@ apush_get(struct strapush *sap)
 		if (sap->sap_module[0] == '\0')
 			if (sap->sap_major == 0
 			    || sap->sap_major != getmajor(makedevice(sap->sap_major, 0))) {
-				ptrace(("Error path taken! EINVAL\n"));
+				_ptrace(("Error path taken! EINVAL\n"));
 				goto einval;
 			}
 		if (sap->sap_minor != getminor(makedevice(0, sap->sap_minor))) {
-			ptrace(("Error path taken! EINVAL\n"));
+			_ptrace(("Error path taken! EINVAL\n"));
 			goto einval;
 		}
 		if (sap->sap_module[0] == '\0')
@@ -395,10 +395,10 @@ apush_get(struct strapush *sap)
 		else
 			cdev = cdev_find(sap->sap_module);
 		if (cdev == NULL) {
-			ptrace(("Error path taken! ENOSTR\n"));
+			_ptrace(("Error path taken! ENOSTR\n"));
 			goto enostr;
 		}
-		printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
+		_printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 		spin_lock_irqsave(&apush_lock, flags);
 		if ((ap = (struct strapush *) __autopush_find(cdev, sap->sap_minor)))
 			ap_get((struct apinfo *) ap);
@@ -407,10 +407,10 @@ apush_get(struct strapush *sap)
 			*sap = *ap;
 			ap_put((struct apinfo *) ap);
 		}
-		printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
-		ctrace(sdev_put(cdev));
+		_printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
+		_ctrace(sdev_put(cdev));
 		if (!ap) {
-			ptrace(("Error path taken! ENODEV\n"));
+			_ptrace(("Error path taken! ENODEV\n"));
 			goto enodev;
 		}
 		return (0);
@@ -460,16 +460,16 @@ autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sfl
 				err = -EIO;
 				goto abort_autopush;
 			}
-			printd(("%s: %s: found module\n", __FUNCTION__, fmod->f_name));
+			_printd(("%s: %s: found module\n", __FUNCTION__, fmod->f_name));
 			dev = *devp;	/* don't change dev nr */
 			if (fmod->f_str == NULL) {
-				printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
+				_printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 				fmod_put(fmod);
 				err = -EIO;
 				goto abort_autopush;
 			}
 			if ((err = qattach(sd, fmod, &dev, oflag, sflag, crp))) {
-				printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
+				_printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 				fmod_put(fmod);
 				goto abort_autopush;
 			}

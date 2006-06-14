@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.30 2006/04/22 01:05:35 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.31 2006/06/14 10:37:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
+ Last Modified $Date: 2006/06/14 10:37:17 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_COMPAT_H__
 #define __LOCAL_COMPAT_H__
 
-#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.30 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.31 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  Unfortunately this is necessary for older non-rpm LIS releases.
@@ -105,6 +105,15 @@ typedef void irqreturn_t;
 #define STREAMSCALL(__X) __X streamscall
 #define streams_fastcall __attribute__((__regparm__(3)))
 #define STREAMS_FASTCALL(__X) __X streams_fastcall
+#define __unlikely
+#define __hot
+#define __hot_in
+#define __hot_out
+#define __hot_put
+#define __hot_get
+#define __hot_read
+#define __hot_write
+#define XCHG xchg
 #endif
 
 #ifdef LFS
