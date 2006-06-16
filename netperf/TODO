@@ -1,4 +1,4 @@
-OpenSS7 Netperf -- things to do.  2006-02-23
+OpenSS7 Netperf -- things to do.  2006-06-16
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -21,7 +21,11 @@ Things to do:
 - Redo performance tests for strxnet/strinet package using recent
   release of OpenSS7 Modified Netperf.
 
+  *done*
+
 - Perform x86_64 HT SMP testing.
+
+  *done*
 
 
 =========================================================================

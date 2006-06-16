@@ -1,5 +1,5 @@
-OpenSS7 Master Package -- things to do.  2006-03-01
-$Id: TODO,v 0.9.2.4 2006/03/20 23:10:45 brian Exp $
+OpenSS7 Master Package -- things to do.  2006-06-16
+$Id: TODO,v 0.9.2.5 2006/06/16 10:48:08 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -9,27 +9,6 @@ Things to do:
 - Get master build package working better.  Currently the master build
   package does not build a master tarball or RPM distribution, which
   would be nice, only individual RPMs for subpackages.
-
-- Bug reporting.  We have these nice autotest test suites that generate
-  a lot of information when a test case fails in testsuite.log.  What I
-  would like to do is integrate that to our GNATS problem report system
-  so that testsuite will generate the template for a new problem report
-  upon test case failure.  Unfortunately autotest does not provide an m4
-  diversion point at which to hook into the failure branch of the test
-  script.  Several choices:
-
-	- distribute a modified set of autotest macros. uggh.
-	- submit a change to autoconf (2.59 is not going away soon).
-
-  Perhaps a better alternative is to provide a make target for problem
-  reports that will collect the testsuite.log and any other pertinent
-  information and generate a problem report template as a mail text file
-  that can then be editted by the user and mailed to the bugs address.
-  I like that.  That will work better.
-
-  Better still, it might be a good idea to modify the logging targets to
-  automatically generate a problem report when they fail.  That would be
-  better.
 
 - Cross-testing framework.  We have nice autotest test suites that are
   fine for native builds, but for cross-compile builds, it would also be
@@ -95,6 +74,29 @@ Things to do:
 
 - I want to someday write an ldterm for Linux Fast-STREAMS and provide
   truly STREAMS-based pseudo terminals.
+
+- Bug reporting.  We have these nice autotest test suites that generate
+  a lot of information when a test case fails in testsuite.log.  What I
+  would like to do is integrate that to our GNATS problem report system
+  so that testsuite will generate the template for a new problem report
+  upon test case failure.  Unfortunately autotest does not provide an m4
+  diversion point at which to hook into the failure branch of the test
+  script.  Several choices:
+
+	- distribute a modified set of autotest macros. uggh.
+	- submit a change to autoconf (2.59 is not going away soon).
+
+  Perhaps a better alternative is to provide a make target for problem
+  reports that will collect the testsuite.log and any other pertinent
+  information and generate a problem report template as a mail text file
+  that can then be editted by the user and mailed to the bugs address.
+  I like that.  That will work better.
+
+  Better still, it might be a good idea to modify the logging targets to
+  automatically generate a problem report when they fail.  That would be
+  better.
+
+  *done*
 
 - Provide an option for not installing documentation and development
   headers, etc.  Just the runtime.  This is mostly for embedded targets.

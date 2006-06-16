@@ -1,4 +1,4 @@
-OpenSS7 Linux Fast STREAMS -- things to do.  2006-03-11
+OpenSS7 Linux Fast STREAMS -- things to do.  2006-06-16
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -32,16 +32,6 @@ Things to do:
 
   TODO: Register panic notifier.
 
-- More performance testing and profiling on SMP.  On the same kernel
-  running non-SMP we get pipe performance of about 80-90% of a Linux
-  native pipe.  Just running an SMP kernel drops this to 60%
-  comparative.  Running both CPUs in an SMP kernel does not improve
-  matters.  Need to profile this up 80-90% on SMP too.  Also, so many
-  changes were made for 64bit and 32bit compatibility that the old
-  profiling information is out of date and needs to be updated.
-
-  TODO: Profile and performance test on SMP.
-
 - Per cpu data:- I am still using the older approach of using cacheline
   aligned arrays for per-cpu data.  This, of course, does not fully
   utilize NUMA architectures.  For NUMA architectures we need to use the
@@ -57,6 +47,16 @@ Things to do:
 - Timers and Buffer callbacks:- Still haven't tested these.
 
   TODO: Test.
+
+- More performance testing and profiling on SMP.  On the same kernel
+  running non-SMP we get pipe performance of about 80-90% of a Linux
+  native pipe.  Just running an SMP kernel drops this to 60%
+  comparative.  Running both CPUs in an SMP kernel does not improve
+  matters.  Need to profile this up 80-90% on SMP too.  Also, so many
+  changes were made for 64bit and 32bit compatibility that the old
+  profiling information is out of date and needs to be updated.
+
+  DONE: Profile and performance tests on SMP.
 
 - I am interested to convert the perftest program to use a FIFO instead
   of a pipe.  This is because a FIFO is more closely related to a Linux

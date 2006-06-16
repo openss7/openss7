@@ -1,4 +1,4 @@
-OpenSS7 STREAMS XNS -- things to do.  2006-03-25
+OpenSS7 STREAMS XNS -- things to do.  2006-06-16
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -62,6 +62,11 @@ Things to do:
       the NPI IP driver and then only the NPI IP driver needs to be
       ported, and not the other upper-layer protocols.  Yes, the
       approach still has some validity.)
+
+  *done*
+
+    The np_ip driver performs many of these functions now.  Test suites
+    for the driver are also provided.
 
 - This might be a useful place to drop all of the DLPI drivers from the
   strss7 package, particularly those for X.25, Frame Relay, and ISDN

@@ -1,9 +1,11 @@
-OpenSS7 STREAMS INET Driver -- things to do.  2006-03-01
+OpenSS7 STREAMS INET Driver -- things to do.  2006-06-16
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 Things to do:
+
+- Convert inet driver to use os7 common functions.
 
 - Pure STREAMS RAW and UDP implementation.  A higher performance RAW and
   UDP implementation supporting both TPI and NPI would be nice to have.
@@ -11,7 +13,24 @@ Things to do:
   primarily for use with RTP.  Also, it will be interesting to test the
   performance differences between STREAMS UDP and Sockets UDP.
 
+  *done*
+
+    udp2 and rawip2 drivers implemented and tested.  strxns package now
+    has an np_ip driver for raw access to IP (primarily for SCTP
+    conformance testing).  RTP drivers should be based on udp2 driver.
+
+
+- Connectionless testing using netperf competes well with
+  connection-oriented sockets.  Need to still modify netperf to use
+  (pseudo-)connection-oriented UDP for better comparison.
+
+
 - 32bit compatibiltiy testing.
+
+  *done*
+
+    Ran ix86 test suite binaries on x86_64.
+
 
 - SMP Testing.
 
