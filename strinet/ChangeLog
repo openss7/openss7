@@ -1,3 +1,13 @@
+2006-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c:
+	  - found very noxious buffer overflow bug
+	  - some rework, passes verification testsuite fine
+	* src/drivers/rawip.c:
+	  - rationalized to udp driver
+	  - some rework, passes verification testsuite fine
+	* TODO: updated things to do
+
 2006-06-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: can't preallocate qband structures under LiS

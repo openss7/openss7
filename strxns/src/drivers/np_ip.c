@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/06/05 02:53:42 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/16 08:02:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/05 02:53:42 $ by $Author: brian $
+ Last Modified $Date: 2006/06/16 08:02:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.21  2006/06/16 08:02:01  brian
+ - added constness, rationalized to udp
+
  Revision 0.9.2.20  2006/06/05 02:53:42  brian
  - working up udp zero-copy
 
@@ -112,10 +115,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/06/05 02:53:42 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/16 08:02:01 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/06/05 02:53:42 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/16 08:02:01 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -171,7 +174,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2006/06/05 02:53:42 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2006/06/16 08:02:01 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -389,13 +392,11 @@ np_bhashfn(unsigned char proto, unsigned short bport)
 	return ((np_bhash_size - 1) & (proto + bport));
 }
 
-STATIC INLINE fastcall int
+STATIC INLINE fastcall __unlikely int
 np_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 {
 	return ((np_chash_size - 1) & (proto + sport + dport));
 }
-
-rwlock_t np_hash_lock = RW_LOCK_UNLOCKED;
 
 #ifdef LINUX
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
@@ -420,14 +421,14 @@ STATIC struct np_prot_bucket *np_prots[256];
 STATIC kmem_cache_t *np_prot_cachep;
 STATIC kmem_cache_t *np_priv_cachep;
 
-STATIC INLINE struct np *
+static INLINE __unlikely struct np *
 np_get(struct np *np)
 {
 	if (np)
 		atomic_inc(&np->refcnt);
 	return (np);
 }
-STATIC INLINE void
+static INLINE __unlikely void
 np_put(struct np *np)
 {
 	if (np)
@@ -435,13 +436,13 @@ np_put(struct np *np)
 			kmem_cache_free(np_priv_cachep, np);
 		}
 }
-STATIC INLINE void
+static INLINE __unlikely void
 np_release(struct np **npp)
 {
 	if (npp != NULL)
 		np_put(XCHG(npp, NULL));
 }
-STATIC INLINE struct np *
+static INLINE __unlikely struct np *
 np_alloc(void)
 {
 	struct np *np;
@@ -559,34 +560,34 @@ state_name(np_ulong state)
 }
 #endif				/* _DEBUG */
 
-STATIC INLINE fastcall void
-np_set_state(struct np *np, np_ulong state)
+STATIC INLINE fastcall __unlikely void
+np_set_state(struct np *np, const np_ulong state)
 {
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, np, state_name(state),
 		state_name(np->info.CURRENT_state)));
 	np->info.CURRENT_state = state;
 }
 
-STATIC INLINE fastcall np_ulong
-np_get_state(struct np *np)
+STATIC INLINE fastcall __unlikely np_ulong
+np_get_state(const struct np *np)
 {
 	return (np->info.CURRENT_state);
 }
 
-STATIC INLINE fastcall np_ulong
-np_chk_state(struct np *np, np_ulong mask)
+STATIC INLINE fastcall __unlikely np_ulong
+np_chk_state(const struct np *np, const np_ulong mask)
 {
 	return (((1 << np->info.CURRENT_state) & (mask)) != 0);
 }
 
-STATIC INLINE fastcall np_ulong
-np_not_state(struct np *np, np_ulong mask)
+STATIC INLINE fastcall __unlikely np_ulong
+np_not_state(const struct np *np, const np_ulong mask)
 {
 	return (((1 << np->info.CURRENT_state) & (mask)) == 0);
 }
 
-STATIC INLINE fastcall np_ulong
-np_get_statef(struct np *np)
+STATIC INLINE fastcall __unlikely np_ulong
+np_get_statef(const struct np *np)
 {
 	return (1 << np_get_state(np));
 }
@@ -5551,7 +5552,8 @@ np_free_priv(queue_t *q)
 	np->next = NULL;
 	np->prev = &np->next;
 	np_put(np);
-	printd(("%s: unlinked, reference count = %d\n", DRV_NAME, atomic_read(&np->refcnt)));
+	printd(("%s: unlinked, reference count = %d\n", DRV_NAME,
+				atomic_read(&np->refcnt)));
 	np_release((struct np **) &np->oq->q_ptr);
 	np->oq = NULL;
 	np_release((struct np **) &np->iq->q_ptr);
@@ -5589,7 +5591,7 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	struct np *np, **npp = &master.np.list;
 
-#if 0
+#if defined LFS
 	mblk_t *mp;
 	struct stroptions *so;
 #endif
@@ -5622,7 +5624,7 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = FREE_CMINOR;
-#if 0
+#if defined LFS
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
 #endif
@@ -5646,28 +5648,30 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		write_unlock_bh(&master.lock);
-#if 0
+#if defined LFS
 		freeb(mp);
 #endif
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
+	_printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(np = np_alloc_priv(q, npp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		write_unlock_bh(&master.lock);
-#if 0
+#if defined LFS
 		freeb(mp);
 #endif
 		return (ENOMEM);
 	}
 	write_unlock_bh(&master.lock);
-#if 0
-	/* want to set a write offet of 20 bytes */
+#if defined LFS
+	/* want to set a write offet of MAX_HEADER bytes */
 	so = (typeof(so)) mp->b_wptr;
-	so->so_flags = SO_WROFF | SO_DELIM;
-	so->so_wroff = 20;
+	so->so_flags = SO_WROFF | SO_WRPAD;
+	so->so_wroff = MAX_HEADER;	/* this is too big */
+	so->so_wrpad = SMP_CACHE_BYTES + sizeof(struct skb_shared_info);	/* this is too big */
 	mp->b_wptr += sizeof(*so);
+	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
 #endif
 	qprocson(q);
@@ -5688,7 +5692,7 @@ np_qclose(queue_t *q, int oflag, cred_t *crp)
 	(void) oflag;
 	(void) crp;
 	(void) np;
-	printd(("%s: closing character device %d:%d\n", DRV_NAME, np->u.dev.cmajor,
+	_printd(("%s: closing character device %d:%d\n", DRV_NAME, np->u.dev.cmajor,
 		np->u.dev.cminor));
 #if defined LIS
 	/* protect against LiS bugs */
@@ -5715,7 +5719,7 @@ np_qclose(queue_t *q, int oflag, cred_t *crp)
 /*
  *  Private structure reference counting, allocation, deallocation and cache
  */
-STATIC int
+STATIC __unlikely int
 np_term_caches(void)
 {
 	if (np_prot_cachep != NULL) {
@@ -5736,7 +5740,7 @@ np_term_caches(void)
 	}
 	return (0);
 }
-STATIC int
+STATIC __unlikely int
 np_init_caches(void)
 {
 	if (np_priv_cachep == NULL) {
@@ -5763,7 +5767,7 @@ np_init_caches(void)
 	return (0);
 }
 
-STATIC void
+STATIC __unlikely void
 np_term_hashes(void)
 {
 	if (np_bhash) {
@@ -5779,7 +5783,7 @@ np_term_hashes(void)
 		np_chash_order = 0;
 	}
 }
-STATIC void
+STATIC __unlikely void
 np_init_hashes(void)
 {
 	int i;
@@ -5879,7 +5883,7 @@ STATIC struct devnode np_node_ipcl = {
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC int
+STATIC __unlikely int
 np_register_strdev(major_t major)
 {
 	int err;
@@ -5892,7 +5896,7 @@ np_register_strdev(major_t major)
 	return (0);
 }
 
-STATIC int
+STATIC __unlikely int
 np_unregister_strdev(major_t major)
 {
 	int err;
@@ -5912,7 +5916,7 @@ np_unregister_strdev(major_t major)
  */
 #ifdef LIS
 
-STATIC int
+STATIC __unlikely int
 np_register_strdev(major_t major)
 {
 	int err;
@@ -5922,7 +5926,7 @@ np_register_strdev(major_t major)
 	return (0);
 }
 
-STATIC int
+STATIC __unlikely int
 np_unregister_strdev(major_t major)
 {
 	int err;

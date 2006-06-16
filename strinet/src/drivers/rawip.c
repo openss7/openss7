@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/06/14 10:37:43 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/16 10:48:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:43 $ by $Author: brian $
+ Last Modified $Date: 2006/06/16 10:48:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.27  2006/06/16 10:48:03  brian
+ - recent updates
+
+ Revision 0.9.2.26  2006/06/16 08:01:39  brian
+ - found noxious buffer overflow
+
  Revision 0.9.2.25  2006/06/14 10:37:43  brian
  - defeat a lot of debug traces in debug mode for testing
  - changes to allow strinet to compile under LiS (why???)
@@ -128,10 +134,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/06/14 10:37:43 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/16 10:48:03 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/06/14 10:37:43 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/16 10:48:03 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -207,7 +213,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/06/14 10:37:43 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/16 10:48:03 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -768,7 +774,7 @@ t_opts_size(const struct tp *t, const mblk_t *mp)
 	size += _T_SPACE_SIZEOF(t_defaults.ip.ttl);	/* T_IP_TTL */
 	size += _T_SPACE_SIZEOF(t_defaults.ip.tos);	/* T_IP_TOS */
 	size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
-	// size += _T_SPACE_SIZEOF(t_defaults.udp.checksum);	/* T_UDP_CHECKSUM */
+	// size += _T_SPACE_SIZEOF(t_defaults.udp.checksum); /* T_UDP_CHECKSUM */
 	return (size);
 }
 
@@ -834,6 +840,20 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
+#if 0
+	uh = (struct udphdr *) (mp->b_datap->db_base + (iph->ihl << 2));
+	{
+		if (oh == NULL)
+			goto efault;
+		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
+		oh->level = T_INET_UDP;
+		oh->name = T_UDP_CHECKSUM;
+		oh->status = T_SUCCESS;
+		*((t_uscalar_t *) T_OPT_DATA(oh)) = (uh->check == 0) ? T_NO : T_YES;
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+#endif
 	assure(oh == NULL);
 	return (olen);
       efault:
@@ -865,7 +885,7 @@ t_errs_size(const struct tp *t, const mblk_t *mp)
 		size += _T_SPACE_SIZEOF(t_defaults.ip.ttl);	/* T_IP_TTL */
 		size += _T_SPACE_SIZEOF(t_defaults.ip.tos);	/* T_IP_TOS */
 		size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
-		// size += _T_SPACE_SIZEOF(t_defaults.udp.checksum);	/* T_UDP_CHECKSUM */
+		// size += _T_SPACE_SIZEOF(t_defaults.udp.checksum); /* T_UDP_CHECKSUM */
 	}
 	return (size);
 }
@@ -935,6 +955,20 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
+#if 0
+	uh = (struct udphdr *) (mp->b_rptr + (iph->ihl << 2));
+	{
+		if (oh == NULL)
+			goto efault;
+		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
+		oh->level = T_INET_UDP;
+		oh->name = T_UDP_CHECKSUM;
+		oh->status = T_SUCCESS;
+		*((t_uscalar_t *) T_OPT_DATA(oh)) = (uh->check == 0) ? T_NO : T_YES;
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+#endif
 	assure(oh == NULL);
 	return (olen);
       efault:
@@ -953,7 +987,7 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 STATIC noinline fastcall int
 t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 {
-	struct t_opthdr *ih;
+	const struct t_opthdr *ih;
 	int optlen;
 	int err;
 
@@ -968,67 +1002,178 @@ t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *o
 		switch (ih->level) {
 		default:
 			continue;
+#if 0
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
 				continue;
 			case XTI_DEBUG:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen > sizeof(op->xti.debug)))
+					goto error;
+				bcopy(valp, op->xti.debug, optlen);
 				t_set_bit(_T_BIT_XTI_DEBUG, op->flags);
-				bcopy(op->xti.debug, T_OPT_DATA(ih), sizeof(op->xti.debug));
-				continue;
-			case XTI_LINGER:
-				t_set_bit(_T_BIT_XTI_LINGER, op->flags);
-				op->xti.linger = *(struct t_linger *) T_OPT_DATA(ih);
-				continue;
-			case XTI_RCVBUF:
-				t_set_bit(_T_BIT_XTI_RCVBUF, op->flags);
-				op->xti.rcvbuf = *(t_uscalar_t *) T_OPT_DATA(ih);
-				continue;
-			case XTI_RCVLOWAT:
-				t_set_bit(_T_BIT_XTI_RCVLOWAT, op->flags);
-				op->xti.rcvlowat = *(t_uscalar_t *) T_OPT_DATA(ih);
-				continue;
-			case XTI_SNDBUF:
-				t_set_bit(_T_BIT_XTI_SNDBUF, op->flags);
-				op->xti.sndbuf = *(t_uscalar_t *) T_OPT_DATA(ih);
-				continue;
-			case XTI_SNDLOWAT:
-				t_set_bit(_T_BIT_XTI_SNDLOWAT, op->flags);
-				op->xti.sndlowat = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
 			}
+			case XTI_LINGER:
+			{
+				const struct t_linger *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.linger = *valp;
+				t_set_bit(_T_BIT_XTI_LINGER, op->flags);
+				continue;
+			}
+			case XTI_RCVBUF:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.rcvbuf = *valp;
+				t_set_bit(_T_BIT_XTI_RCVBUF, op->flags);
+				continue;
+			}
+			case XTI_RCVLOWAT:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.rcvlowat = *valp;
+				t_set_bit(_T_BIT_XTI_RCVLOWAT, op->flags);
+				continue;
+			}
+			case XTI_SNDBUF:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.sndbuf = *valp;
+				t_set_bit(_T_BIT_XTI_SNDBUF, op->flags);
+				continue;
+			}
+			case XTI_SNDLOWAT:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.sndlowat = *valp;
+				t_set_bit(_T_BIT_XTI_SNDLOWAT, op->flags);
+				continue;
+			}
+			}
+#endif
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
 				continue;
 			case T_IP_OPTIONS:
+			{
+				if (unlikely(optlen > 40))
+					goto error;
+				/* FIXME: handle options */
 				t_set_bit(_T_BIT_IP_OPTIONS, op->flags);
 				continue;
+			}
 			case T_IP_TOS:
+			{
+				const unsigned char *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->ip.tos = *valp;
 				t_set_bit(_T_BIT_IP_TOS, op->flags);
-				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
-				continue;
-			case T_IP_TTL:
-				t_set_bit(_T_BIT_IP_TTL, op->flags);
-				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
-				continue;
-			case T_IP_DONTROUTE:
-				t_set_bit(_T_BIT_IP_DONTROUTE, op->flags);
-				op->ip.dontroute = *(t_uscalar_t *) T_OPT_DATA(ih);
-				continue;
-			case T_IP_BROADCAST:
-				t_set_bit(_T_BIT_IP_BROADCAST, op->flags);
-				op->ip.broadcast = *(t_uscalar_t *) T_OPT_DATA(ih);
-				continue;
-			case T_IP_ADDR:
-				t_set_bit(_T_BIT_IP_ADDR, op->flags);
-				op->ip.addr = *(uint32_t *) T_OPT_DATA(ih);
-				continue;
-			case T_IP_REUSEADDR:
-				t_set_bit(_T_BIT_IP_REUSEADDR, op->flags);
-				op->ip.reuseaddr = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
 			}
+			case T_IP_TTL:
+			{
+				const unsigned char *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->ip.tos = *valp;
+				t_set_bit(_T_BIT_IP_TTL, op->flags);
+				continue;
+			}
+			case T_IP_DONTROUTE:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.dontroute = *valp;
+				t_set_bit(_T_BIT_IP_DONTROUTE, op->flags);
+				continue;
+			}
+			case T_IP_BROADCAST:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.broadcast = *valp;
+				t_set_bit(_T_BIT_IP_BROADCAST, op->flags);
+				continue;
+			}
+			case T_IP_ADDR:
+			{
+				const uint32_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				op->ip.addr = *valp;
+				t_set_bit(_T_BIT_IP_ADDR, op->flags);
+				continue;
+			}
+			case T_IP_REUSEADDR:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.reuseaddr = *valp;
+				t_set_bit(_T_BIT_IP_REUSEADDR, op->flags);
+				continue;
+			}
+			}
+#if 0
+		case T_INET_UDP:
+			switch (ih->name) {
+			default:
+				continue;
+			case T_UDP_CHECKSUM:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->udp.checksum = *valp;
+				t_set_bit(_T_BIT_UDP_CHECKSUM, op->flags);
+				continue;
+			}
+			}
+#endif
 		}
 	}
 	return (0);
@@ -1045,7 +1190,7 @@ t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *o
 STATIC int
 t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 {
-	struct t_opthdr *ih;
+	const struct t_opthdr *ih;
 	int optlen;
 	int err;
 
@@ -1065,61 +1210,149 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 			default:
 				goto error;
 			case XTI_DEBUG:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen > sizeof(op->xti.debug)))
+					goto error;
+				bcopy(valp, op->xti.debug, optlen);
 				t_set_bit(_T_BIT_XTI_DEBUG, op->flags);
-				bcopy(op->xti.debug, T_OPT_DATA(ih), sizeof(op->xti.debug));
 				continue;
+			}
 			case XTI_LINGER:
+			{
+				const struct t_linger *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.linger = *valp;
 				t_set_bit(_T_BIT_XTI_LINGER, op->flags);
-				op->xti.linger = *(struct t_linger *) T_OPT_DATA(ih);
 				continue;
+			}
 			case XTI_RCVBUF:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.rcvbuf = *valp;
 				t_set_bit(_T_BIT_XTI_RCVBUF, op->flags);
-				op->xti.rcvbuf = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case XTI_RCVLOWAT:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.rcvlowat = *valp;
 				t_set_bit(_T_BIT_XTI_RCVLOWAT, op->flags);
-				op->xti.rcvlowat = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case XTI_SNDBUF:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.sndbuf = *valp;
 				t_set_bit(_T_BIT_XTI_SNDBUF, op->flags);
-				op->xti.sndbuf = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case XTI_SNDLOWAT:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.sndlowat = *valp;
 				t_set_bit(_T_BIT_XTI_SNDLOWAT, op->flags);
-				op->xti.sndlowat = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			}
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
 				goto error;
 			case T_IP_OPTIONS:
+				if (unlikely(optlen > 40))
+					goto error;
+				/* FIXME: handle options */
 				t_set_bit(_T_BIT_IP_OPTIONS, op->flags);
 				continue;
 			case T_IP_TOS:
+			{
+				const unsigned char *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->ip.tos = *valp;
 				t_set_bit(_T_BIT_IP_TOS, op->flags);
-				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
 				continue;
+			}
 			case T_IP_TTL:
-				t_set_bit(_T_BIT_IP_TTL, op->flags);
+			{
+				const unsigned char *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
 				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
+				t_set_bit(_T_BIT_IP_TTL, op->flags);
 				continue;
+			}
 			case T_IP_DONTROUTE:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.dontroute = *valp;
 				t_set_bit(_T_BIT_IP_DONTROUTE, op->flags);
-				op->ip.dontroute = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case T_IP_BROADCAST:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.broadcast = *valp;
 				t_set_bit(_T_BIT_IP_BROADCAST, op->flags);
-				op->ip.broadcast = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case T_IP_ADDR:
+			{
+				const uint32_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				op->ip.addr = *valp;
 				t_set_bit(_T_BIT_IP_ADDR, op->flags);
-				op->ip.addr = *(uint32_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case T_IP_REUSEADDR:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.reuseaddr = *valp;
 				t_set_bit(_T_BIT_IP_REUSEADDR, op->flags);
-				op->ip.reuseaddr = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			}
 #if 0
 		case T_INET_UDP:
@@ -1127,9 +1360,17 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 			default:
 				goto error;
 			case T_UDP_CHECKSUM:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->udp.checksum = *valp;
 				t_set_bit(_T_BIT_UDP_CHECKSUM, op->flags);
-				op->udp.checksum = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			}
 #endif
 		}
@@ -3588,20 +3829,20 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
 /**
- * tp_destructor - socket buffer destructor
+ * tp_skb_destructor - socket buffer destructor
  * @skb: socket buffer to destroy
  *
- * This provide the impedance matching between socket buffer flow control and STREAMS flow control.
+ * This provides the impedance matching between socket buffer flow control and STREAMS flow control.
  * When tp->sndmem is greater than tp->options.xti.sndbuf we place STREAMS buffers back on the send
  * queue and stall the queue.  When the send memory falls below tp->options.xti.sndlowat (or to
  * zero) and there are message on the send queue, we enable the queue.
  */
 STATIC void __hot
-tp_destructor(struct sk_buff *skb)
+tp_skb_destructor(struct sk_buff *skb)
 {
 	struct tp *tp;
 
-	if (likely((tp = (typeof(tp)) skb->sk) != NULL)) {
+	if (likely((tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page) != NULL)) {
 		/* technically we could have multiple processors freeing sk_buffs at the same time */
 		spin_lock_bh(&tp->qlock);
 		ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
@@ -3613,11 +3854,241 @@ tp_destructor(struct sk_buff *skb)
 		} else {
 			spin_unlock_bh(&tp->qlock);
 		}
-		skb->sk = NULL;
+		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
 		tp_release(&tp);
 	}
 }
+
+#undef skbuff_head_cache
+#ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
+#define skbuff_head_cache (*((kmem_cache_t **) HAVE_SKBUFF_HEAD_CACHE_ADDR))
+#endif
+
+/**
+ * tp_alloc_skb_slow - allocate a socket buffer from a message block
+ * @tp: private pointer
+ * @mp: the message block
+ * @headroom: header room for resulting sk_buff
+ * @gfp: general fault protection
+ *
+ * This is the old slow way of allocating a socket buffer.  We simple allocate a socket buffer with
+ * sufficient head room and copy the data from the message block(s) to the socket buffer.  This is
+ * slow.  This is the only way that LiS can do things (because it has unworkable message block
+ * allocation).
+ */
+STATIC noinline fastcall __unlikely struct sk_buff *
+tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+{
+	struct sk_buff *skb;
+	unsigned int dlen = msgdsize(mp);
+
+	if (likely((skb = alloc_skb(headroom + dlen, GFP_ATOMIC)) != NULL)) {
+		skb_reserve(skb, headroom);
+		{
+			unsigned char *data;
+			mblk_t *b;
+			int blen;
+
+			data = skb_put(skb, dlen);
+			for (b = mp; b; b = b->b_cont) {
+				if ((blen = b->b_wptr - b->b_rptr) > 0) {
+					bcopy(b->b_rptr, data, blen);
+					data += blen;
+					__assert(data <= skb->tail);
+				} else
+					rare();
+			}
+		}
+		freemsg(mp);	/* must absorb */
+		/* we never have any page fragments, so we can steal a pointer from the page
+		   fragement list. */
+		assert(skb_shinfo(skb)->nr_frags == 0);
+		skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+		skb->destructor = tp_skb_destructor;
+		spin_lock_bh(&tp->qlock);
+		tp->sndmem += skb->truesize;
+		spin_unlock_bh(&tp->qlock);
+	}
+	return (skb);
+}
+
+/**
+ * tp_alloc_skb - allocate a socket buffer from a message block
+ * @tp: private pointer
+ * @mp: the message block
+ * @headroom: header room for resulting sk_buff
+ * @gfp: general fault protection
+ *
+ * Description: this function is used for zero-copy allocation of a socket buffer from a message
+ * block.  The socket buffer contains all of the data in the message block including any head or
+ * tail room (db_base to db_lim).  The data portion of the socket buffer contains the data
+ * referenced by the message block (b_rptr to b_wptr).  Because there is no socket buffer destructor
+ * capable of freeing the message block, we steal the kmem_alloc'ed buffer from the message and
+ * attach it tot he socket buffer header.  The reference to the message block is consumed unless the
+ * function returns NULL.
+ *
+ * A problem exists in converting mblks to sk_buffs (although visa versa is easy):  sk_buffs put a
+ * hidden shared buffer structure at the end of the buffer (where it is easily overwritten on buffer
+ * overflows).  There is not necessarily enough room at the end of the mblk to add this structure.
+ * There are several things that I added to the Stream head to help with this:
+ *
+ * 1. A SO_WRPAD option to M_SETOPTS that will specify how much room to leave after the last SMP
+ *    cache line in the buffer.
+ *
+ * 2. Three flags, SO_NOCSUM, SO_CSUM, SO_CRC32C were added to the Stream head so that the stream
+ *    can support partial checksum while copying from the user.
+ *
+ * 3. db_lim is now always set to the end of the actual allocation rather than the end of the
+ *    requested allocation.  Linux kmalloc() allocates from 2^n size memory caches that are
+ *    always SMP cache line aligned.
+ *
+ * With these options in play, the size of the buffer should have sufficient room for the shared
+ * buffer structure.  If, however, the data block was not delivered by the Stream head (but an
+ * intermediate module) or has been modified (by an intermediate module) the tail room might not be
+ * available.  Instead of copying the entire buffer which would be quite memory intensive, in this
+ * case we allocate a new buffer and copy only the portion of the original buffer necessary to make
+ * room for the shared buffer structure.
+ *
+ * The same is true for the IP header portion.  Using SO_WROFF it is possible to reserve sufficient
+ * room for the hardware header, IP header and UDP header.  Message blocks should normally already
+ * contain this headroom.  However, again, it might be possible that the message block originated at
+ * an intermediate module or was modified by an intermediate module unaware of this policy.  If
+ * there is insufficient headroom, again we allocate a new message block large enough to contain the
+ * header and make two sk_buffs, one for the header and one for the payload.
+ *
+ * As a result, we might wind up with three socket buffers: one containing the headroom for the hard
+ * header, IP header and UDP header; one containing most of the data payload; and one containing the
+ * last fragment of the payload smaller than or equal to sizeof(struct skb_shared_info).  All but
+ * the initial socket buffer are placed in the frag_list of the first socket buffer.  Note that only
+ * the header need be completed.  If checksum has not yet been performed, it is necessary to walk
+ * through the data to generate the checksum.
+ */
+#if defined LFS
+STATIC INLINE fastcall __hot_out struct sk_buff *
+tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+{
+	struct sk_buff *skb, *skb_head = NULL, *skb_tail = NULL;
+	unsigned char *beg, *end;
+
+	/* must not be a fastbuf */
+	if (unlikely(mp->b_datap->db_size <= FASTBUF))
+		goto go_slow;
+	/* must not be esballoc'ed */
+	if (unlikely(mp->b_datap->db_frtnp != NULL))
+		goto go_slow;
+	/* must be only reference (for now) */
+	if (unlikely(mp->b_datap->db_ref > 1))
+		goto go_slow;
+
+	beg = mp->b_rptr - headroom;
+	/* First, check if there is enough head room in the data block. */
+	if (unlikely(beg < mp->b_datap->db_base)) {
+		/* No, there is not enough headroom, allocate an sk_buff for the header. */
+		skb_head = alloc_skb(headroom, gfp);
+		if (unlikely(skb_head == NULL))
+			goto no_head;
+		skb_reserve(skb_head, headroom);
+		beg = mp->b_rptr;
+	}
+	/* Next, check if there is enough tail room in the data block. */
+	end = (unsigned char *) (((unsigned long) mp->b_wptr + (SMP_CACHE_BYTES - 1)) &
+				 ~(SMP_CACHE_BYTES - 1));
+	if (unlikely(end + sizeof(struct skb_shared_info) > mp->b_datap->db_lim)) {
+		/* No, there is not enough tailroom, allocate an sk_buff for the tail. */
+		skb_tail = alloc_skb(SMP_CACHE_BYTES + sizeof(struct skb_shared_info), gfp);
+		if (unlikely(skb_tail == NULL))
+			goto no_tail;
+		{
+			unsigned int len;
+
+			end = (unsigned char *) (((unsigned long) mp->b_datap->db_lim -
+						  sizeof(struct skb_shared_info)) &
+						 ~(SMP_CACHE_BYTES - 1));
+			len = mp->b_wptr - end;
+			bcopy(end, skb_put(skb_tail, len), len);
+			mp->b_wptr = end;
+		}
+	}
+
+	/* Last, allocate a socket buffer header and point it to the payload data. */
+	skb = kmem_cache_alloc(skbuff_head_cache, gfp);
+	if (unlikely(skb == NULL))
+		goto no_skb;
+
+	memset(skb, 0, offsetof(struct sk_buff, truesize));
+	skb->truesize = end - beg + sizeof(struct sk_buff);
+	atomic_set(&skb->users, 1);
+	skb->head = mp->b_datap->db_base;
+	skb->data = mp->b_rptr;
+	skb->tail = mp->b_wptr;
+	skb->end = end;
+	skb->len = mp->b_wptr - mp->b_rptr;
+	skb->cloned = 0;
+	skb->data_len = 0;
+	/* initialize shared data structure */
+	memset(skb_shinfo(skb), 0, sizeof(struct skb_shared_info));
+	atomic_set(&(skb_shinfo(skb)->dataref), 1);
+
+	/* need to release message block and data block without releasing buffer */
+
+	/* point into internal buffer */
+	mp->b_datap->db_frtnp = (struct free_rtn *)
+	    ((struct mdbblock *) ((struct mbinfo *) mp->b_datap - 1))->databuf;
+	/* override with dummy free routine */
+	mp->b_datap->db_frtnp->free_func = NULL;	/* tells freeb not to call */
+	mp->b_datap->db_frtnp->free_arg = NULL;
+	freemsg(mp);
+
+	/* we never have any page fragments, so we can steal a pointer from the page fragement
+	   list. */
+	assert(skb_shinfo(skb)->nr_frags == 0);
+	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+	skb->destructor = tp_skb_destructor;
+	spin_lock_bh(&tp->qlock);
+	tp->sndmem += skb->truesize;
+	spin_unlock_bh(&tp->qlock);
+
+	if (likely(skb_head == NULL)) {
+		if (unlikely(skb_tail != NULL)) {
+			/* Chain skb_tail onto skb. */
+			skb_shinfo(skb)->frag_list = skb_tail;
+			skb->data_len = skb_tail->len;
+			skb->len += skb->data_len;
+		}
+		return (skb);
+	}
+	if (likely(skb_tail == NULL)) {
+		/* Chain skb onto skb_head. */
+		skb_shinfo(skb_head)->frag_list = skb;
+		skb_head->data_len = skb->len;
+		skb_head->len += skb_head->data_len;
+	} else {
+		/* Chain skb and skb_tail onto skb_head. */
+		skb_shinfo(skb_head)->frag_list = skb;
+		skb->next = skb_tail;
+		skb_head->data_len = skb->len + skb_tail->len;
+		skb_head->len += skb_head->data_len;
+	}
+	return (skb_head);
+      no_skb:
+	if (skb_tail != NULL)
+		kfree_skb(skb_tail);
+      no_tail:
+	if (skb_head != NULL)
+		kfree_skb(skb_head);
+      no_head:
+	return (NULL);
+      go_slow:
+	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
+}
+#else
+STATIC INLINE fastcall __hot_out struct sk_buff *
+tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+{
+	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
+}
+#endif
 
 /**
  * tp_senddata - process a unit data request
@@ -3629,50 +4100,50 @@ STATIC INLINE fastcall __hot_out int
 tp_senddata(struct tp *tp, const struct tp_options *opt, mblk_t *mp)
 {
 	struct rtable *rt = NULL;
+	int err;
 
 	/* Allows slop over by 1 buffer per processor. */
 	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
 		goto ebusy;
 
 	assert(opt != NULL);
-	if (!ip_route_output(&rt, opt->ip.daddr, opt->ip.addr, 0, 0)) {
+	if (likely((err = ip_route_output(&rt, opt->ip.daddr, opt->ip.addr, 0, 0)) == 0)) {
 		struct sk_buff *skb;
 		struct net_device *dev = rt->u.dst.dev;
-		size_t hlen = (dev->hard_header_len + 15) & ~15;
+		size_t hlen = ((dev->hard_header_len + 15) & ~15)
+		    + sizeof(struct iphdr) + 0;
 		size_t dlen = msgdsize(mp);
 		size_t plen = dlen + 0;
 		size_t tlen = plen + sizeof(struct iphdr);
 
-		ptrace(("%s: %s: data sent\n", DRV_NAME, __FUNCTION__));
-		usual(hlen);
+		_ptrace(("%s: %s: sending data message block %p\n", DRV_NAME, __FUNCTION__, mp));
+		usual(hlen > sizeof(struct iphdr) + 0);
 		usual(dlen);
 
-		if ((skb = alloc_skb(hlen + tlen, GFP_ATOMIC))) {
-			mblk_t *bp;
+		if (likely((skb = tp_alloc_skb(tp, mp, hlen, GFP_ATOMIC)) != NULL)) {
 			struct iphdr *iph;
-			unsigned char *data;
+			uint32_t saddr = opt->ip.saddr ? opt->ip.saddr : rt->rt_src;
+			uint32_t daddr = rt->rt_dst;
 
-			skb->sk = (struct sock *) tp_get(tp);	/* borrow sk pointer */
-			skb->destructor = tp_destructor;
-			spin_lock_bh(&tp->qlock);
-			tp->sndmem += skb->truesize;
-			spin_unlock_bh(&tp->qlock);
-			skb_reserve(skb, hlen);
 			/* find headers */
-			iph = (typeof(iph)) __skb_put(skb, tlen);
+
+			skb->nh.raw = skb_push(skb, sizeof(struct iphdr));
+
 			skb->dst = &rt->u.dst;
 			skb->priority = 0;	// opt->xti.priority;
+
+			iph = skb->nh.iph;
 			iph->version = 4;
 			iph->ihl = 5;
 			iph->tos = opt->ip.tos;
 			iph->frag_off = htons(IP_DF);	/* never frag */
 			// iph->frag_off = 0; /* need qos bit */
 			iph->ttl = opt->ip.ttl;
-			iph->daddr = rt->rt_dst;
-			iph->saddr = opt->ip.saddr ? opt->ip.saddr : rt->rt_src;
+			iph->daddr = daddr;
+			iph->saddr = saddr;
 			iph->protocol = opt->ip.protocol;
 			iph->tot_len = htons(tlen);
-			skb->nh.iph = iph;
+
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
@@ -3684,32 +4155,19 @@ tp_senddata(struct tp *tp, const struct tp_options *opt, mblk_t *mp)
 #endif
 #endif
 #endif
-			/* IMPLEMENTATION NOTE:- The passed in mblk_t pointer is possibly a message
-			   buffer chain and we must iterate along the b_cont pointer.  Rather than
-			   copying at this point, it is probably a better idea to create a
-			   fragmented sk_buff and just point to the elements.  Of course, we also
-			   need an sk_buff destructor.  This is not done yet. */
-			data = (unsigned char *) (iph + 1);
-			for (bp = mp; bp; bp = bp->b_cont) {
-				int blen = bp->b_wptr - bp->b_rptr;
-
-				if (blen > 0) {
-					bcopy(bp->b_rptr, data, blen);
-					data += blen;
-				} else
-					rare();
-			}
-			printd(("sent message %p\n", skb));
+			_printd(("sending message %p\n", skb));
 #ifdef HAVE_KFUNC_DST_OUTPUT
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, tp_ip_queue_xmit);
 #else
 			tp_ip_queue_xmit(skb);
 #endif
-		} else
-			__rare();
-	} else
+			return (QR_ABSORBED);
+		}
 		__rare();
-	return (QR_DONE);
+		return (-ENOBUFS);
+	}
+	__rare();
+	return (err);
       ebusy:
 	return (-EBUSY);
 }
@@ -4356,7 +4814,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 		goto error;
 
 	if (dp != NULL)
-		if (unlikely((err = tp_senddata(tp, OPT_buffer, dp)) != 0))
+		if (unlikely((err = tp_senddata(tp, OPT_buffer, dp)) != QR_ABSORBED))
 			goto error;
 	if (SEQ_number != NULL) {
 		bufq_unlink(&tp->conq, SEQ_number);
@@ -4374,7 +4832,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 	ACCEPTOR_id->options.ip.mtu = OPT_buffer->ip.mtu;
 	ACCEPTOR_id->options.ip.saddr = OPT_buffer->ip.saddr;
 	ACCEPTOR_id->options.ip.daddr = OPT_buffer->ip.daddr;
-	return (0);
+	return (QR_ABSORBED);
 
       error:
 	return (err);
@@ -4397,7 +4855,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 
 	if (dp != NULL) {
 		err = tp_senddata(tp, &tp->options, dp);
-		if (unlikely(err != 0))
+		if (unlikely(err != QR_ABSORBED))
 			goto error;
 	}
 	if (SEQ_number != NULL) {
@@ -4416,7 +4874,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		tp_release(&tp);
 		write_unlock_bh(&hp->lock);
 	}
-	return (0);
+	return (QR_ABSORBED);
       error:
 	return (err);
 }
@@ -4736,7 +5194,7 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
 	p->TLI_error = (error < 0) ? TSYSERR : error;
 	p->UNIX_error = (error < 0) ? -error : 0;
 	mp->b_wptr += sizeof(*p);
-	printd(("%s: %p: <- T_ERROR_ACK\n", DRV_NAME, tp));
+	_printd(("%s: %p: <- T_ERROR_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
 	return (0);
       error:
@@ -4763,7 +5221,7 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 	struct T_ok_ack *p;
 	mblk_t *mp;
 	const size_t size = sizeof(*p);
-	int err;
+	int err = QR_DONE;
 
 	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
@@ -4796,7 +5254,7 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		if ((err = tp_connect(tp, ADDR_buffer, ADDR_length, OPT_buffer, 0)))
 			goto error;
 		tp_set_state(tp, TS_WCON_CREQ);
-		if ((err = tp_senddata(tp, &tp->options, dp))) {
+		if ((err = tp_senddata(tp, &tp->options, NULL))) {
 			tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, dp);
 			goto error;
 		}
@@ -4808,12 +5266,13 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		tp_set_state(ACCEPTOR_id, TS_DATA_XFER);
 		err = tp_passive(tp, ADDR_buffer, ADDR_length, OPT_buffer, SEQ_number,
 				 ACCEPTOR_id, flags, dp);
-		if (unlikely(err != 0)) {
+		if (unlikely(err != QR_ABSORBED)) {
 			tp_set_state(ACCEPTOR_id, ACCEPTOR_id->i_oldstate);
 			goto error;
 		}
 		if (tp != ACCEPTOR_id)
 			tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
+		err = QR_TRIMMED;
 		break;
 #if 0
 	case NS_WACK_RRES:
@@ -4829,7 +5288,7 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 	case TS_WACK_DREQ10:
 	case TS_WACK_DREQ11:
 		err = tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, dp);
-		if (unlikely(err != 0))
+		if (unlikely(err != QR_ABSORBED))
 			goto error;
 		tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
 		break;
@@ -4849,7 +5308,7 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 	}
 	_printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
-	return (QR_DONE);
+	return (err);
       free_error:
 	freemsg(mp);
 	goto error;
@@ -5887,16 +6346,19 @@ te_bind_req(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length))
 		goto error;
 	err = TNOADDR;
-	if (unlikely((ADDR_length = p->ADDR_length) == 0))
+	if (unlikely((ADDR_length = p->ADDR_length) == 0)) {
 		goto error;
-	err = TBADADDR;
-	if (unlikely((anum = ADDR_length / sizeof(ADDR_buffer[0])) < 1 || anum > 8))
-		goto error;
-	if (unlikely(ADDR_length % sizeof(ADDR_buffer[0]) != 0))
-		goto error;
-	bcopy(mp->b_rptr + p->ADDR_offset, ADDR_buffer, ADDR_length);
-	if (unlikely(ADDR_buffer[0].sin_family != AF_INET && ADDR_buffer[0].sin_family != 0))
-		goto error;
+	} else {
+		err = TBADADDR;
+		if (unlikely((anum = ADDR_length / sizeof(ADDR_buffer[0])) < 1 || anum > 8))
+			goto error;
+		if (unlikely(ADDR_length % sizeof(ADDR_buffer[0]) != 0))
+			goto error;
+		bcopy(mp->b_rptr + p->ADDR_offset, ADDR_buffer, ADDR_length);
+		if (unlikely(ADDR_buffer[0].sin_family != AF_INET
+			     && ADDR_buffer[0].sin_family != 0))
+			goto error;
+	}
 	type = inet_addr_type(ADDR_buffer[0].sin_addr.s_addr);
 	err = TNOADDR;
 	if (sysctl_ip_nonlocal_bind == 0 && ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY
@@ -6010,12 +6472,12 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(OPT_length != 0))
 		if (unlikely((err = t_opts_parse_ud(OPT_buffer, OPT_length, &opts)) != 0))
 			goto error;
-	if (unlikely((err = tp_senddata(tp, &opts, dp)) != 0))
+	if (unlikely((err = tp_senddata(tp, &opts, dp)) != QR_ABSORBED))
 		goto error;
-	return (QR_DONE);
+	return (QR_TRIMMED);
       error:
 	err = te_uderror_reply(q, DEST_buffer, OPT_buffer, OPT_length, err, dp);
-	if (err == QR_ABSORBED)
+	if (likely(err == QR_ABSORBED))
 		return (QR_TRIMMED);
 	return (err);
 }
@@ -6126,9 +6588,11 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	if (unlikely(err != 0))
 		goto error;
 	/* send data only after connection complete */
-	if (dp != NULL)
-		tp_senddata(tp, &tp->options, dp);
-	return (QR_DONE);	/* np_senddata() does not consume message blocks */
+	if (dp == NULL)
+		return (QR_DONE);
+	if (tp_senddata(tp, &tp->options, dp) != QR_ABSORBED)
+		goto error;
+	return (QR_TRIMMED);	/* tp_senddata() consumed message blocks */
       error:
 	return te_error_ack(q, T_CONN_REQ, err);
 }
@@ -6401,10 +6865,11 @@ te_write_req(queue_t *q, mblk_t *mp)
 	if (unlikely((dlen = msgdsize(mp)) == 0
 		     || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
-	if (unlikely((err = tp_senddata(tp, &tp->options, mp)) < 0))
+	if (unlikely((err = tp_senddata(tp, &tp->options, mp)) != QR_ABSORBED))
 		goto error;
+	return (QR_ABSORBED);	/* tp_senddata() consumed message block */
       discard:
-	return (QR_DONE);	/* np_senddata() does not consume message blocks */
+	return (QR_DONE);	/* tp_senddata() did not consume message blocks */
       error:
 	return te_error_reply(q, -EPROTO);
 }
@@ -6461,8 +6926,9 @@ te_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely
 	    ((dlen = msgdsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
-	if (unlikely((err = tp_senddata(tp, &tp->options, dp)) < 0))
+	if (unlikely((err = tp_senddata(tp, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
+	return (QR_TRIMMED);	/* tp_senddata() consumed message blocks */
       discard:
 	return (QR_DONE);	/* tp_senddata() does not consume message blocks */
       error:
@@ -6511,8 +6977,9 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(dlen == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
 		goto error;
 	err = tp_senddata(tp, &tp->options, dp);
-	if (unlikely(err < 0))
+	if (unlikely(err != QR_ABSORBED))
 		goto error;
+	return (QR_TRIMMED);
       discard:
 	return (QR_DONE);
       error:
@@ -6566,8 +7033,9 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(p->OPT_length != 0))
 		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
 			goto error;
-	if ((err = tp_senddata(tp, &opts, dp)))
+	if ((err = tp_senddata(tp, &opts, dp)) != QR_ABSORBED)
 		goto error;
+	return (QR_TRIMMED);
       discard:
 	return (QR_DONE);
       error:
@@ -7384,12 +7852,13 @@ tp_free(char *data)
 	if (likely(skb != NULL)) {
 		struct tp *tp;
 
-		if (likely((tp = (typeof(tp)) skb->sk) != NULL)) {
+		if (likely((tp = *(struct tp **) skb->cb) != NULL)) {
 			spin_lock_bh(&tp->qlock);
 			ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
 			tp->rcvmem -= skb->truesize;
 			spin_unlock_bh(&tp->qlock);
-			skb->sk = NULL;
+			/* put this back to null before freeing it */
+			*(struct tp **) skb->cb = NULL;
 			tp_release(&tp);
 		}
 		kfree_skb(skb);
@@ -7444,11 +7913,18 @@ tp_v4_rcv(struct sk_buff *skb)
 	   the payload.  That might be the best way to do things.  The problem is that we indicate
 	   iph->protocol on connection indications, and it will be the wrong protocol on 2.4. */
 	tp_v4_steal(skb);	/* its ours */
+#if 0
 	/* For now... We should actually place non-linear fragments into separate mblks and pass
 	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
 	   netfilter hooks linearize anyway. */
 	if (unlikely(skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0))
 		goto linear_fail;
+#else
+	if (unlikely(skb_is_nonlinear(skb))) {
+		__ptrace(("Non-linear sk_buff encountered!\n"));
+		goto linear_fail;
+	}
+#endif
 	/* Before passing the message up, check that there is room in the receive buffer.  Allows
 	   slop over by 1 buffer per processor. */
 	if (unlikely(tp->rcvmem > tp->options.xti.rcvbuf))
@@ -7461,11 +7937,9 @@ tp_v4_rcv(struct sk_buff *skb)
 		/* now allocate an mblk */
 		if (unlikely((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr)) == NULL))
 			goto no_buffers;
-		/* XXX: if the socket buffer already belongs to somebody else it might be necessary 
-		   to clone the socket buffer before doing this, but I think that the ip receive
-		   functions already do this for us. */
-		assert(skb->sk == NULL);
-		skb->sk = (struct sock *) tp_get(tp);
+		_ptrace(("Allocated external buffer message block %p\n", mp));
+		/* We can do this because the buffer belongs to us. */
+		*(struct tp **) skb->cb = tp_get(tp);
 		/* already in bottom half */
 		spin_lock(&tp->qlock);
 		tp->rcvmem += skb->truesize;
@@ -7523,9 +7997,12 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 	struct tp *tp;
 	struct iphdr *iph = (struct iphdr *) skb->data;
 
+#if 0
+/* icmp.c does this for us */
 #define ICMP_MIN_LENGTH 4
 	if (skb->len < (iph->ihl << 2) + ICMP_MIN_LENGTH)
 		goto drop;
+#endif
 	printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
 	/* Note: use returned IP header and possibly payload for lookup */
 	if ((tp = tp_lookup_icmp(iph, skb->len)) == NULL)
@@ -7568,8 +8045,10 @@ tp_v4_err(struct sk_buff *skb, u32 info)
       no_stream:
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
 	tp_v4_err_next(skb, info);
+#if 0
 	goto drop;
       drop:
+#endif
 #ifdef HAVE_KINC_LINUX_SNMP_H
 	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
 #else
@@ -7657,8 +8136,12 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		tp->prev = tpp;
 		*tpp = tp;
 	} else
+#if 0
 		strlog(DRV_ID, getminor(*devp), 0, SL_WARN | SL_CONSOLE,
 		       "could not allocate driver private structure");
+#else
+		ptrace(("%s: ERROR: Could not allocate module private structure\n", DRV_NAME));
+#endif
 	return (tp);
 }
 
@@ -7674,8 +8157,13 @@ tp_free_priv(queue_t *q)
 	ensure(q, return);
 	tp = TP_PRIV(q);
 	ensure(tp, return);
+#if 0
 	strlog(DRV_ID, tp->u.dev.cminor, 0, SL_TRACE,
 	       "unlinking private structure: reference count = %d", atomic_read(&tp->refcnt));
+#else
+	printd(("%s: unlinking private structure, reference count = %d\n", DRV_NAME,
+		atomic_read(&tp->refcnt)));
+#endif
 	/* make sure the stream is disconnected */
 	if (tp->chash != NULL) {
 		tp_disconnect(tp, NULL, NULL, 0, NULL);
@@ -7712,16 +8200,25 @@ tp_free_priv(queue_t *q)
 	bufq_purge(&tp->conq);
 #endif
 	ss7_unbufcall((str_t *) tp);
+#if 0
 	strlog(DRV_ID, tp->u.dev.cminor, 0, SL_TRACE, "removed bufcalls: reference count = %d",
 	       atomic_read(&tp->refcnt));
+#else
+	printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME,
+		atomic_read(&tp->refcnt)));
+#endif
 	/* remove from master list */
 	if ((*tp->prev = tp->next))
 		tp->next->prev = tp->prev;
 	tp->next = NULL;
 	tp->prev = &tp->next;
 	tp_put(tp);
+#if 0
 	strlog(DRV_ID, tp->u.dev.cminor, 0, SL_TRACE, "unlinked: reference count = %d",
 	       atomic_read(&tp->refcnt));
+#else
+	printd(("%s: unlinked, reference count = %d\n", DRV_NAME, atomic_read(&tp->refcnt)));
+#endif
 	tp_release((struct tp **) &tp->oq->q_ptr);
 	tp->oq = NULL;
 	tp_release((struct tp **) &tp->iq->q_ptr);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/06/14 10:37:44 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/06/16 10:48:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:44 $ by $Author: brian $
+ Last Modified $Date: 2006/06/16 10:48:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.31  2006/06/16 10:48:04  brian
+ - recent updates
+
+ Revision 0.9.2.30  2006/06/16 08:01:40  brian
+ - found noxious buffer overflow
+
  Revision 0.9.2.29  2006/06/14 10:37:44  brian
  - defeat a lot of debug traces in debug mode for testing
  - changes to allow strinet to compile under LiS (why???)
@@ -140,10 +146,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/06/14 10:37:44 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/06/16 10:48:04 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/06/14 10:37:44 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/06/16 10:48:04 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -220,7 +226,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/06/14 10:37:44 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/06/16 10:48:04 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -848,6 +854,7 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
+#if 1
 	uh = (struct udphdr *) (mp->b_datap->db_base + (iph->ihl << 2));
 	{
 		if (oh == NULL)
@@ -860,6 +867,7 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((t_uscalar_t *) T_OPT_DATA(oh)) = (uh->check == 0) ? T_NO : T_YES;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
+#endif
 	assure(oh == NULL);
 	return (olen);
       efault:
@@ -962,6 +970,7 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
+#if 1
 	uh = (struct udphdr *) (mp->b_rptr + (iph->ihl << 2));
 	{
 		if (oh == NULL)
@@ -974,6 +983,7 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((t_uscalar_t *) T_OPT_DATA(oh)) = (uh->check == 0) ? T_NO : T_YES;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
+#endif
 	assure(oh == NULL);
 	return (olen);
       efault:
@@ -992,7 +1002,7 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 STATIC noinline fastcall int
 t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 {
-	struct t_opthdr *ih;
+	const struct t_opthdr *ih;
 	int optlen;
 	int err;
 
@@ -1007,67 +1017,178 @@ t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *o
 		switch (ih->level) {
 		default:
 			continue;
+#if 0
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
 				continue;
 			case XTI_DEBUG:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen > sizeof(op->xti.debug)))
+					goto error;
+				bcopy(valp, op->xti.debug, optlen);
 				t_set_bit(_T_BIT_XTI_DEBUG, op->flags);
-				bcopy(op->xti.debug, T_OPT_DATA(ih), sizeof(op->xti.debug));
-				continue;
-			case XTI_LINGER:
-				t_set_bit(_T_BIT_XTI_LINGER, op->flags);
-				op->xti.linger = *(struct t_linger *) T_OPT_DATA(ih);
-				continue;
-			case XTI_RCVBUF:
-				t_set_bit(_T_BIT_XTI_RCVBUF, op->flags);
-				op->xti.rcvbuf = *(t_uscalar_t *) T_OPT_DATA(ih);
-				continue;
-			case XTI_RCVLOWAT:
-				t_set_bit(_T_BIT_XTI_RCVLOWAT, op->flags);
-				op->xti.rcvlowat = *(t_uscalar_t *) T_OPT_DATA(ih);
-				continue;
-			case XTI_SNDBUF:
-				t_set_bit(_T_BIT_XTI_SNDBUF, op->flags);
-				op->xti.sndbuf = *(t_uscalar_t *) T_OPT_DATA(ih);
-				continue;
-			case XTI_SNDLOWAT:
-				t_set_bit(_T_BIT_XTI_SNDLOWAT, op->flags);
-				op->xti.sndlowat = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
 			}
+			case XTI_LINGER:
+			{
+				const struct t_linger *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.linger = *valp;
+				t_set_bit(_T_BIT_XTI_LINGER, op->flags);
+				continue;
+			}
+			case XTI_RCVBUF:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.rcvbuf = *valp;
+				t_set_bit(_T_BIT_XTI_RCVBUF, op->flags);
+				continue;
+			}
+			case XTI_RCVLOWAT:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.rcvlowat = *valp;
+				t_set_bit(_T_BIT_XTI_RCVLOWAT, op->flags);
+				continue;
+			}
+			case XTI_SNDBUF:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.sndbuf = *valp;
+				t_set_bit(_T_BIT_XTI_SNDBUF, op->flags);
+				continue;
+			}
+			case XTI_SNDLOWAT:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.sndlowat = *valp;
+				t_set_bit(_T_BIT_XTI_SNDLOWAT, op->flags);
+				continue;
+			}
+			}
+#endif
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
 				continue;
 			case T_IP_OPTIONS:
+			{
+				if (unlikely(optlen > 40))
+					goto error;
+				/* FIXME: handle options */
 				t_set_bit(_T_BIT_IP_OPTIONS, op->flags);
 				continue;
+			}
 			case T_IP_TOS:
+			{
+				const unsigned char *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->ip.tos = *valp;
 				t_set_bit(_T_BIT_IP_TOS, op->flags);
-				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
-				continue;
-			case T_IP_TTL:
-				t_set_bit(_T_BIT_IP_TTL, op->flags);
-				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
-				continue;
-			case T_IP_DONTROUTE:
-				t_set_bit(_T_BIT_IP_DONTROUTE, op->flags);
-				op->ip.dontroute = *(t_uscalar_t *) T_OPT_DATA(ih);
-				continue;
-			case T_IP_BROADCAST:
-				t_set_bit(_T_BIT_IP_BROADCAST, op->flags);
-				op->ip.broadcast = *(t_uscalar_t *) T_OPT_DATA(ih);
-				continue;
-			case T_IP_ADDR:
-				t_set_bit(_T_BIT_IP_ADDR, op->flags);
-				op->ip.addr = *(uint32_t *) T_OPT_DATA(ih);
-				continue;
-			case T_IP_REUSEADDR:
-				t_set_bit(_T_BIT_IP_REUSEADDR, op->flags);
-				op->ip.reuseaddr = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
 			}
+			case T_IP_TTL:
+			{
+				const unsigned char *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->ip.tos = *valp;
+				t_set_bit(_T_BIT_IP_TTL, op->flags);
+				continue;
+			}
+			case T_IP_DONTROUTE:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.dontroute = *valp;
+				t_set_bit(_T_BIT_IP_DONTROUTE, op->flags);
+				continue;
+			}
+			case T_IP_BROADCAST:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.broadcast = *valp;
+				t_set_bit(_T_BIT_IP_BROADCAST, op->flags);
+				continue;
+			}
+			case T_IP_ADDR:
+			{
+				const uint32_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				op->ip.addr = *valp;
+				t_set_bit(_T_BIT_IP_ADDR, op->flags);
+				continue;
+			}
+			case T_IP_REUSEADDR:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.reuseaddr = *valp;
+				t_set_bit(_T_BIT_IP_REUSEADDR, op->flags);
+				continue;
+			}
+			}
+#if 1
+		case T_INET_UDP:
+			switch (ih->name) {
+			default:
+				continue;
+			case T_UDP_CHECKSUM:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->udp.checksum = *valp;
+				t_set_bit(_T_BIT_UDP_CHECKSUM, op->flags);
+				continue;
+			}
+			}
+#endif
 		}
 	}
 	return (0);
@@ -1084,7 +1205,7 @@ t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *o
 STATIC int
 t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 {
-	struct t_opthdr *ih;
+	const struct t_opthdr *ih;
 	int optlen;
 	int err;
 
@@ -1104,61 +1225,149 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 			default:
 				goto error;
 			case XTI_DEBUG:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen > sizeof(op->xti.debug)))
+					goto error;
+				bcopy(valp, op->xti.debug, optlen);
 				t_set_bit(_T_BIT_XTI_DEBUG, op->flags);
-				bcopy(op->xti.debug, T_OPT_DATA(ih), sizeof(op->xti.debug));
 				continue;
+			}
 			case XTI_LINGER:
+			{
+				const struct t_linger *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.linger = *valp;
 				t_set_bit(_T_BIT_XTI_LINGER, op->flags);
-				op->xti.linger = *(struct t_linger *) T_OPT_DATA(ih);
 				continue;
+			}
 			case XTI_RCVBUF:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.rcvbuf = *valp;
 				t_set_bit(_T_BIT_XTI_RCVBUF, op->flags);
-				op->xti.rcvbuf = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case XTI_RCVLOWAT:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.rcvlowat = *valp;
 				t_set_bit(_T_BIT_XTI_RCVLOWAT, op->flags);
-				op->xti.rcvlowat = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case XTI_SNDBUF:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.sndbuf = *valp;
 				t_set_bit(_T_BIT_XTI_SNDBUF, op->flags);
-				op->xti.sndbuf = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case XTI_SNDLOWAT:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->xti.sndlowat = *valp;
 				t_set_bit(_T_BIT_XTI_SNDLOWAT, op->flags);
-				op->xti.sndlowat = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			}
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
 				goto error;
 			case T_IP_OPTIONS:
+				if (unlikely(optlen > 40))
+					goto error;
+				/* FIXME: handle options */
 				t_set_bit(_T_BIT_IP_OPTIONS, op->flags);
 				continue;
 			case T_IP_TOS:
+			{
+				const unsigned char *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
+				op->ip.tos = *valp;
 				t_set_bit(_T_BIT_IP_TOS, op->flags);
-				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
 				continue;
+			}
 			case T_IP_TTL:
-				t_set_bit(_T_BIT_IP_TTL, op->flags);
+			{
+				const unsigned char *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				/* FIXME: validate value */
 				op->ip.tos = *(unsigned char *) T_OPT_DATA(ih);
+				t_set_bit(_T_BIT_IP_TTL, op->flags);
 				continue;
+			}
 			case T_IP_DONTROUTE:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.dontroute = *valp;
 				t_set_bit(_T_BIT_IP_DONTROUTE, op->flags);
-				op->ip.dontroute = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case T_IP_BROADCAST:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.broadcast = *valp;
 				t_set_bit(_T_BIT_IP_BROADCAST, op->flags);
-				op->ip.broadcast = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case T_IP_ADDR:
+			{
+				const uint32_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				op->ip.addr = *valp;
 				t_set_bit(_T_BIT_IP_ADDR, op->flags);
-				op->ip.addr = *(uint32_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			case T_IP_REUSEADDR:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->ip.reuseaddr = *valp;
 				t_set_bit(_T_BIT_IP_REUSEADDR, op->flags);
-				op->ip.reuseaddr = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			}
 #if 1
 		case T_INET_UDP:
@@ -1166,9 +1375,17 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 			default:
 				goto error;
 			case T_UDP_CHECKSUM:
+			{
+				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+				if (unlikely(optlen != sizeof(*valp)))
+					goto error;
+				if (unlikely(*valp != T_NO && *valp != T_YES))
+					goto error;
+				op->udp.checksum = *valp;
 				t_set_bit(_T_BIT_UDP_CHECKSUM, op->flags);
-				op->udp.checksum = *(t_uscalar_t *) T_OPT_DATA(ih);
 				continue;
+			}
 			}
 #endif
 		}
@@ -3673,6 +3890,7 @@ tp_skb_destructor(struct sk_buff *skb)
 	struct tp *tp;
 
 	if (likely((tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page) != NULL)) {
+		/* technically we could have multiple processors freeing sk_buffs at the same time */
 		spin_lock_bh(&tp->qlock);
 		ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 		tp->sndmem -= skb->truesize;
@@ -3794,11 +4012,6 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
  * through the data to generate the checksum.
  */
 #if defined LFS
-STATIC streamscall void __hot_out
-tp_dummy_free(caddr_t arg)
-{
-	return;
-}
 STATIC INLINE fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
@@ -3870,7 +4083,7 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	mp->b_datap->db_frtnp = (struct free_rtn *)
 	    ((struct mdbblock *) ((struct mbinfo *) mp->b_datap - 1))->databuf;
 	/* override with dummy free routine */
-	mp->b_datap->db_frtnp->free_func = tp_dummy_free;
+	mp->b_datap->db_frtnp->free_func = NULL;	/* tells freeb not to call */
 	mp->b_datap->db_frtnp->free_arg = NULL;
 	freemsg(mp);
 
@@ -3942,7 +4155,7 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 		goto ebusy;
 
 	assert(opt != NULL);
-	if ((err = ip_route_output(&rt, opt->ip.daddr, opt->ip.addr, 0, 0)) == 0) {
+	if (likely((err = ip_route_output(&rt, opt->ip.daddr, opt->ip.addr, 0, 0)) == 0)) {
 		struct sk_buff *skb;
 		struct net_device *dev = rt->u.dst.dev;
 		size_t hlen = ((dev->hard_header_len + 15) & ~15)
@@ -5110,8 +5323,8 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		if ((err = tp_connect(tp, ADDR_buffer, ADDR_length, OPT_buffer, 0)))
 			goto error;
 		tp_set_state(tp, TS_WCON_CREQ);
-		if ((err = tp_senddata(tp, tp->dport, &tp->options, dp))) {
-			tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, NULL);
+		if ((err = tp_senddata(tp, tp->dport, &tp->options, NULL))) {
+			tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, dp);
 			goto error;
 		}
 		break;
@@ -6331,7 +6544,7 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(OPT_length != 0))
 		if (unlikely((err = t_opts_parse_ud(OPT_buffer, OPT_length, &opts)) != 0))
 			goto error;
-	if (likely((err = tp_senddata(tp, dport, &opts, dp)) != QR_ABSORBED))
+	if (unlikely((err = tp_senddata(tp, dport, &opts, dp)) != QR_ABSORBED))
 		goto error;
 	return (QR_TRIMMED);
       error:
@@ -8020,8 +8233,12 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		tp->prev = tpp;
 		*tpp = tp;
 	} else
+#if 0
 		strlog(DRV_ID, getminor(*devp), 0, SL_WARN | SL_CONSOLE,
 		       "could not allocate driver private structure");
+#else
+		ptrace(("%s: ERROR: Could not allocate module private structure\n", DRV_NAME));
+#endif
 	return (tp);
 }
 
@@ -8037,8 +8254,13 @@ tp_free_priv(queue_t *q)
 	ensure(q, return);
 	tp = TP_PRIV(q);
 	ensure(tp, return);
+#if 0
 	strlog(DRV_ID, tp->u.dev.cminor, 0, SL_TRACE,
 	       "unlinking private structure: reference count = %d", atomic_read(&tp->refcnt));
+#else
+	printd(("%s: unlinking private structure, reference count = %d\n", DRV_NAME,
+		atomic_read(&tp->refcnt)));
+#endif
 	/* make sure the stream is disconnected */
 	if (tp->chash != NULL) {
 		tp_disconnect(tp, NULL, NULL, 0, NULL);
@@ -8075,16 +8297,25 @@ tp_free_priv(queue_t *q)
 	bufq_purge(&tp->conq);
 #endif
 	ss7_unbufcall((str_t *) tp);
+#if 0
 	strlog(DRV_ID, tp->u.dev.cminor, 0, SL_TRACE, "removed bufcalls: reference count = %d",
 	       atomic_read(&tp->refcnt));
+#else
+	printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME,
+		atomic_read(&tp->refcnt)));
+#endif
 	/* remove from master list */
 	if ((*tp->prev = tp->next))
 		tp->next->prev = tp->prev;
 	tp->next = NULL;
 	tp->prev = &tp->next;
 	tp_put(tp);
+#if 0
 	strlog(DRV_ID, tp->u.dev.cminor, 0, SL_TRACE, "unlinked: reference count = %d",
 	       atomic_read(&tp->refcnt));
+#else
+	printd(("%s: unlinked, reference count = %d\n", DRV_NAME, atomic_read(&tp->refcnt)));
+#endif
 	tp_release((struct tp **) &tp->oq->q_ptr);
 	tp->oq = NULL;
 	tp_release((struct tp **) &tp->iq->q_ptr);

@@ -1,3 +1,9 @@
+2006-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: const'ness and a little rationalization back to
+	  next gen upd driver
+	* TODO: updated things to do
+
 2006-06-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strxns.refs: updated references for IUA, DUA, M2PA
