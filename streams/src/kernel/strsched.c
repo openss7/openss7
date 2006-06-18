@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/06/14 10:37:23 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/06/17 21:20:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:23 $ by $Author: brian $
+ Last Modified $Date: 2006/06/17 21:20:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.134  2006/06/17 21:20:12  brian
+ - sync
+
  Revision 0.9.2.133  2006/06/14 10:37:23  brian
  - defeat a lot of debug traces in debug mode for testing
  - changes to allow strinet to compile under LiS (why???)
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/06/14 10:37:23 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/06/17 21:20:12 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/06/14 10:37:23 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/06/17 21:20:12 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -750,7 +753,7 @@ qget(queue_t *q)
 		qu = (typeof(qu)) RD(q);
 		assert(atomic_read(&qu->qu_refs) >= 1);
 		_printd(("%s: queue pair %p ref count is now %d\n",
-			__FUNCTION__, qu, atomic_read(&qu->qu_refs) + 1));
+			 __FUNCTION__, qu, atomic_read(&qu->qu_refs) + 1));
 		atomic_inc(&qu->qu_refs);
 	}
 	return (q);
@@ -771,7 +774,7 @@ qput(queue_t **qp)
 		*qp = NULL;
 		assert(atomic_read(&qu->qu_refs) >= 1);
 		_printd(("%s: queue pair %p ref count is now %d\n",
-			__FUNCTION__, qu, atomic_read(&qu->qu_refs) - 1));
+			 __FUNCTION__, qu, atomic_read(&qu->qu_refs) - 1));
 		if (unlikely(atomic_dec_and_test(&qu->qu_refs) != 0))	/* PROFILED */
 			freeq(rq);
 	}
@@ -823,7 +826,11 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
  *  we also return an allocation failure if the number of message blocks exceeds a tunable
  *  threshold.
  */
+#if defined SLAB_DESTROY_BY_RCU
+STATIC streams_fastcall __hot mblk_t *
+#else
 STATIC streams_noinline streams_fastcall __hot_out mblk_t *
+#endif
 mdbblock_alloc_slow(uint priority, void *func)
 {
 	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
@@ -884,6 +891,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 STATIC streams_fastcall __hot mblk_t *
 mdbblock_alloc(uint priority, void *func)
 {
+#if !defined SLAB_DESTROY_BY_RCU
 	struct strthread *t = this_thread;
 	unsigned long flags;
 	mblk_t *mp;
@@ -924,9 +932,11 @@ mdbblock_alloc(uint priority, void *func)
 		return (mp);
 	}
 	local_irq_restore(flags);
+#endif				/* !defined SLAB_DESTROY_BY_RCU */
 	return mdbblock_alloc_slow(priority, func);
 }
 
+#if !defined SLAB_DESTROY_BY_RCU
 /*
  *  raise_local_bufcalls: - raise buffer callbacks on the local STREAMS scheduler thread.
  */
@@ -939,6 +949,7 @@ raise_local_bufcalls(void)
 		if (!test_and_set_bit(strbcflag, &t->flags))
 			__raise_streams();
 }
+#endif				/* !defined SLAB_DESTROY_BY_RCU */
 
 /*
  *  raise_bufcalls: - raise buffer callbacks on all STREAMS scheduler threads
@@ -996,6 +1007,7 @@ raise_bufcalls(void)
 BIG_STATIC_INLINE streams_fastcall __hot_in void
 mdbblock_free(mblk_t *mp)
 {
+#if !defined SLAB_DESTROY_BY_RCU
 	struct strthread *t = this_thread;
 
 	_printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
@@ -1004,16 +1016,25 @@ mdbblock_free(mblk_t *mp)
 	prefetchw(mp);
 
 	dassert(mp->b_next == NULL);	/* check double free */
-	mp->b_next = NULL;
+	// mp->b_next = NULL;
 	{
 		unsigned long flags;
 
+		/* Originally freed blocks were added to the end of the list but this does not keep 
+		   mblks hot, so now a push-down pop-up stack is used instead. */
 		local_irq_save(flags);
+#if 1
+		if (unlikely((mp->b_next = t->freemblk_head) == NULL))
+			t->freemblk_tail = &mp->b_next;
+		t->freemblk_head = mp;
+#else
 		*(t->freemblk_tail) = mp;
 		t->freemblk_tail = &mp->b_next;
+#endif
 		t->freemblks++;
 		local_irq_restore(flags);
 	}
+#endif				/* !defined SLAB_DESTROY_BY_RCU */
 	{
 		struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 
@@ -1023,9 +1044,13 @@ mdbblock_free(mblk_t *mp)
 		atomic_dec(&smi->si_cnt);
 #endif
 		atomic_dec(&sdi->si_cnt);
+#if defined SLAB_DESTROY_BY_RCU
+		kmem_cache_free(sdi->si_cache, mp);
+#endif
 	}
+#if !defined SLAB_DESTROY_BY_RCU
 	/* Decide when to invoke freeblocks.  Current policy is to free blocks when then number of
-	   blocks on the free list exceeds some (per-cpu) threshold.  Currently I set this to just 
+	   blocks on the free list exceeds some (per-cpu) threshold.  Currently I set this to just
 	   1/16th of the maximum.  That should be ok for now.  I will create a sysctl for it
 	   later... */
 	if (unlikely((t->freemblks > (sysctl_str_nstrmsgs >> 4))
@@ -1033,8 +1058,13 @@ mdbblock_free(mblk_t *mp)
 		__raise_streams();
 	raise_local_bufcalls();
 	/* other processors will just have to fight over the remaining memory */
+#else				/* !defined SLAB_DESTROY_BY_RCU */
+	/* raise global bufcalls if we free anything to the cache */
+	raise_bufcalls();
+#endif				/* !defined SLAB_DESTROY_BY_RCU */
 }
 
+#if !defined SLAB_DESTROY_BY_RCU
 /* 
  *  freeblocks: - free message blocks
  *  @t:	    the STREAMS executive thread
@@ -1108,6 +1138,7 @@ term_freemblks(void)
 		freeblocks(t);
 	}
 }
+#endif				/* !defined SLAB_DESTROY_BY_RCU */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -1612,7 +1643,8 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 }
 #endif
 STATIC streams_fastcall long
-defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*func) (long), long arg)
+defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*func) (long),
+		    long arg)
 {
 	long id = 0;
 	struct strevent *se;
@@ -1627,7 +1659,8 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*
 	return (id);
 }
 STATIC streams_fastcall long
-defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsigned long pl, int cpu)
+defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsigned long pl,
+		    int cpu)
 {
 	long id = 0;
 	struct strevent *se;
@@ -1723,7 +1756,8 @@ EXPORT_SYMBOL_NOVERS(bufcall);	/* include/sys/streams/stream.h */
  *  @function:	the callback function when bytes and headers are available
  *  @arg:	a client argument to pass to the callback function
  */
-__STRSCHD_EXTERN_INLINE bcid_t esbbcall(int priority, void streamscall (*function) (long), long arg);
+__STRSCHD_EXTERN_INLINE bcid_t esbbcall(int priority, void streamscall (*function) (long),
+					long arg);
 
 EXPORT_SYMBOL_NOVERS(esbbcall);	/* include/sys/streams/stream.h */
 
@@ -2420,7 +2454,8 @@ enter_inner_syncq_asopen(struct syncq_cookie *sc)
 }
 
 STATIC int
-enter_syncq_writer(struct syncq_cookie *sc, void streamscall (*func) (queue_t *, mblk_t *), int perim)
+enter_syncq_writer(struct syncq_cookie *sc, void streamscall (*func) (queue_t *, mblk_t *),
+		   int perim)
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
 
@@ -2442,7 +2477,8 @@ enter_syncq_writer(struct syncq_cookie *sc, void streamscall (*func) (queue_t *,
 }
 
 STATIC int
-enter_inner_syncq_func(struct syncq_cookie *sc, void streamscall (*func) (void *, mblk_t *), void *arg)
+enter_inner_syncq_func(struct syncq_cookie *sc, void streamscall (*func) (void *, mblk_t *),
+		       void *arg)
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
 
@@ -4085,9 +4121,11 @@ __runqueues(struct softirq_action *unused)
 			/* free flush chains if necessary */
 			if (unlikely(test_bit(flushwork, &t->flags) != 0))
 				_ctrace(freechains(t));
+#if !defined SLAB_DESTROY_BY_RCU
 			/* free mdbblocks to cache, if memory needed */
 			if (unlikely(test_bit(freeblks, &t->flags) != 0))
 				_ctrace(freeblocks(t));
+#endif
 			/* do deferred m_func's first */
 			if (unlikely(test_bit(strmfuncs, &t->flags) != 0))
 				_ctrace(domfuncs(t));
@@ -4106,7 +4144,8 @@ __runqueues(struct softirq_action *unused)
 			if (unlikely(test_bit(strevents, &t->flags) != 0))
 				_ctrace(doevents(t));
 			/* do buffer calls if necessary */
-			if (unlikely(test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags)))
+			if (unlikely
+			    (test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags)))
 				_ctrace(bufcalls(t));
 		}
 		clear_bit(qwantrun, &t->flags);
@@ -4169,7 +4208,7 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_rtime = sysctl_str_rtime;	/* typically 10 milliseconds (saved in ticks) */
 	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved
 						   in ticks) */
-//	init_waitqueue_head(&sd->sd_waitq);	/* waiters */
+//      init_waitqueue_head(&sd->sd_waitq);     /* waiters */
 	init_waitqueue_head(&sd->sd_rwaitq);	/* waiters on read */
 	init_waitqueue_head(&sd->sd_wwaitq);	/* waiters on write */
 	init_waitqueue_head(&sd->sd_iwaitq);	/* waiters on ioctl */
@@ -4219,7 +4258,7 @@ allocstr(void)
 			qstream(q) = sd;	/* don't do double get */
 
 			_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
-				atomic_read(&sh->sh_refs)));
+				 atomic_read(&sh->sh_refs)));
 		} else
 			__freeq(q);
 	}
@@ -4261,7 +4300,7 @@ sd_free(struct stdata *sd)
 	/* these are left valid until last reference released */
 	assure(atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs) == 2);
 	_ptrace(("queue references qu_refs = %d\n",
-		atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs)));
+		 atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs)));
 	_ctrace(qput(&sd->sd_wq));
 	_ctrace(qput(&sd->sd_rq));	/* should be last put */
 	/* initial qget is balanced in qdetach()/qdelete() */
@@ -4276,7 +4315,7 @@ sd_get(struct stdata *sd)
 		assert(atomic_read(&sh->sh_refs) > 0);
 		atomic_inc(&sh->sh_refs);
 		_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
-			atomic_read(&sh->sh_refs)));
+			 atomic_read(&sh->sh_refs)));
 	}
 	return (sd);
 }
@@ -4294,7 +4333,7 @@ sd_put(struct stdata **sdp)
 	if (likely(sd != NULL)) {
 		*sdp = NULL;
 		_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
-			atomic_read(&sh->sh_refs) - 1));
+			 atomic_read(&sh->sh_refs) - 1));
 
 		assert(atomic_read(&sh->sh_refs) >= 1);
 		if (unlikely(atomic_dec_and_test(&sh->sh_refs) != 0))
@@ -4344,11 +4383,11 @@ freestr(struct stdata *sd)
 #endif				/* defined SLAB_PANIC */
 #endif				/* defined CONFIG_SLAB_DEBUG */
 #else				/* defined CONFIG_STREAMS_DEBUG */
-#if defined SLA_DESTROY_BY_RCU
-#define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN)
-#else				/* defined SLA_DESTROY_BY_RCU */
+#if defined SLAB_DESTROY_BY_RCU
 #define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN|SLAB_DESTROY_BY_RCU)
-#endif				/* defined SLA_DESTROY_BY_RCU */
+#else				/* defined SLAB_DESTROY_BY_RCU */
+#define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN)
+#endif				/* defined SLAB_DESTROY_BY_RCU */
 #endif				/* defined CONFIG_STREAMS_DEBUG */
 
 STATIC struct cacheinfo {
@@ -4363,7 +4402,8 @@ STATIC struct cacheinfo {
 	"DYN_STREAM", sizeof(struct shinfo), 0, STREAMS_CACHE_FLAGS, &shinfo_ctor, NULL}, {
 	"DYN_QUEUE", sizeof(struct queinfo), 0, STREAMS_CACHE_FLAGS, &queinfo_ctor, NULL}, {
 	"DYN_MSGBLOCK", 0, 0, STREAMS_CACHE_FLAGS, NULL, NULL}, {
-	"DYN_MDBBLOCK", sizeof(struct mdbblock), 0, STREAMS_CACHE_FLAGS, &mdbblock_ctor, NULL}, {
+	"DYN_MDBBLOCK", sizeof(struct mdbblock), 0, STREAMS_CACHE_FLAGS, &mdbblock_ctor, NULL},
+	{
 	"DYN_LINKBLK", sizeof(struct linkinfo), 0, STREAMS_CACHE_FLAGS, &linkinfo_ctor, NULL}, {
 	"DYN_STREVENT", sizeof(struct seinfo), 0, STREAMS_CACHE_FLAGS | SLAB_NO_REAP,
 		    &seinfo_ctor, NULL}, {
@@ -4438,7 +4478,8 @@ str_init_caches(void)
 		if (ci->size == 0)
 			continue;
 		si->si_cache =
-		    kmem_cache_create(ci->name, ci->size, ci->offset, ci->flags, ci->ctor, ci->dtor);
+		    kmem_cache_create(ci->name, ci->size, ci->offset, ci->flags, ci->ctor,
+				      ci->dtor);
 		if (si->si_cache != NULL)
 			continue;
 		printk(KERN_ERR "%s: could not allocate %s cache\n", __FUNCTION__, ci->name);
@@ -4524,6 +4565,7 @@ takeover_strsched(unsigned int cpu)
 		o->freemsg_head = NULL;
 		o->freemsg_tail = &o->freemsg_head;
 	}
+#if !defined SLAB_DESTROY_BY_RCU
 	if (o->freemblk_head) {
 		*XCHG(&t->freemblk_tail, o->freemblk_tail) = o->freemblk_head;
 		o->freemblk_head = NULL;
@@ -4531,6 +4573,7 @@ takeover_strsched(unsigned int cpu)
 		t->freemblks += o->freemblks;
 		o->freemblks = 0;
 	}
+#endif				/* !defined SLAB_DESTROY_BY_RCU */
 	if (o->freeevnt_head) {
 		*XCHG(&t->freeevnt_tail, o->freeevnt_tail) = o->freeevnt_head;
 		o->freeevnt_head = NULL;
@@ -4803,7 +4846,9 @@ strsched_init(void)
 		t->strevents_tail = &t->strevents_head;
 		t->scanqtail = &t->scanqhead;
 		t->freemsg_tail = &t->freemsg_head;
+#if !defined SLAB_DESTROY_BY_RCU
 		t->freemblk_tail = &t->freemblk_head;
+#endif				/* !defined SLAB_DESTROY_BY_RCU */
 		t->freeevnt_tail = &t->freeevnt_head;
 	}
 	init_timer(&scan_timer);
@@ -4824,7 +4869,9 @@ strsched_exit(void)
 {
 	del_timer(&scan_timer);
 	term_strsched();
+#if !defined SLAB_DESTROY_BY_RCU
 	term_freemblks();
+#endif
 #if defined CONFIG_STREAMS_SYNCQS
 	sq_put(&global_syncq);
 #endif

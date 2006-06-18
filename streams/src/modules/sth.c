@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/06/14 10:37:27 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2006/06/17 21:20:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:27 $ by $Author: brian $
+ Last Modified $Date: 2006/06/17 21:20:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.150  2006/06/17 21:20:15  brian
+ - sync
+
  Revision 0.9.2.149  2006/06/14 10:37:27  brian
  - defeat a lot of debug traces in debug mode for testing
  - changes to allow strinet to compile under LiS (why???)
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/06/14 10:37:27 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2006/06/17 21:20:15 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/06/14 10:37:27 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2006/06/17 21:20:15 $";
 
 //#define __NO_VERSION__
 
@@ -182,7 +185,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/06/14 10:37:27 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2006/06/17 21:20:15 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -496,12 +499,15 @@ strput(struct stdata *sd, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_in int
 strcopyout(const void *from, void __user *to, size_t len)
 {
+#if defined CONFIG_STREAMS_DEBUG
 	int err = -EFAULT;
+#endif
 
 	/* before every system call return or sleep -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) != 0))
 		runqueues();
 	/* might sleep */
+#if defined CONFIG_STREAMS_DEBUG
 	if (access_ok(VERIFY_WRITE, to, len)) {
 		if ((err = copyout(from, to, len)) < 0)
 			_ptrace(("access_ok succeeded, copyout failed\n"));
@@ -510,17 +516,23 @@ strcopyout(const void *from, void __user *to, size_t len)
 			_ptrace(("access_ok failed, copyout succeeded\n"));
 	}
 	return (err);
+#else
+	return copyout(from, to, len);
+#endif
 }
 
 STATIC streams_inline streams_fastcall __hot_out int
 strcopyin(const void __user *from, void *to, size_t len)
 {
+#if defined CONFIG_STREAMS_DEBUG
 	int err = -EFAULT;
+#endif
 
 	/* before every system call return or sleep -- saves a context switch */
 	if (unlikely((this_thread->flags & (QRUNFLAGS)) != 0))
 		runqueues();
 	/* might sleep */
+#if defined CONFIG_STREAMS_DEBUG
 	if (access_ok(VERIFY_READ, from, len)) {
 		if ((err = copyin(from, to, len)) < 0)
 			_ptrace(("access_ok succeeded, copyin failed\n"));
@@ -529,6 +541,9 @@ strcopyin(const void __user *from, void *to, size_t len)
 			_ptrace(("access_ok failed, copyin succeeded\n"));
 	}
 	return (err);
+#else
+	return copyin(from, to, len);
+#endif
 }
 
 /* 
