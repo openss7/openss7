@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2006/06/17 21:20:15 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2006/06/18 20:54:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/17 21:20:15 $ by $Author: brian $
+ Last Modified $Date: 2006/06/18 20:54:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.151  2006/06/18 20:54:08  brian
+ - minor optimizations from profiling
+
  Revision 0.9.2.150  2006/06/17 21:20:15  brian
  - sync
 
@@ -86,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2006/06/17 21:20:15 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2006/06/18 20:54:08 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2006/06/17 21:20:15 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2006/06/18 20:54:08 $";
 
 //#define __NO_VERSION__
 
@@ -185,7 +188,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2006/06/17 21:20:15 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2006/06/18 20:54:08 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3561,23 +3564,27 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 		mask = 0;
 		strschedule();
 		poll_wait(file, &sd->sd_polllist, poll);
-		if (test_bit(STRDERR_BIT, &sd->sd_flag) || test_bit(STWRERR_BIT, &sd->sd_flag))
-			mask |= POLLERR;
-		if (test_bit(STRHUP_BIT, &sd->sd_flag))
-			mask |= POLLHUP;
-		if (test_bit(STRPRI_BIT, &sd->sd_flag))
-			mask |= POLLPRI;
-		if (test_bit(STRMSIG_BIT, &sd->sd_flag))
-			mask |= POLLMSG;
-		if (test_bit(STPLEX_BIT, &sd->sd_flag))
-			mask |= POLLNVAL;
-		if (canget(sd->sd_rq))
+		if (unlikely((sd->sd_flag &
+			      (STRDERR | STWRERR | STRHUP | STRPRI | STRMSIG | STPLEX)) != 0)) {
+			if (test_bit(STRDERR_BIT, &sd->sd_flag)
+			    || test_bit(STWRERR_BIT, &sd->sd_flag))
+				mask |= POLLERR;
+			if (test_bit(STRHUP_BIT, &sd->sd_flag))
+				mask |= POLLHUP;
+			if (test_bit(STRPRI_BIT, &sd->sd_flag))
+				mask |= POLLPRI;
+			if (test_bit(STRMSIG_BIT, &sd->sd_flag))
+				mask |= POLLMSG;
+			if (test_bit(STPLEX_BIT, &sd->sd_flag))
+				mask |= POLLNVAL;
+		}
+		if (likely(canget(sd->sd_rq) != 0))
 			mask |= POLLIN | POLLRDNORM;
-		if (bcangetany(sd->sd_rq))
+		if (likely(bcangetany(sd->sd_rq) != 0))
 			mask |= POLLIN | POLLRDBAND;
-		if (canputnext(sd->sd_wq))
+		if (likely(canputnext(sd->sd_wq) != 0))
 			mask |= POLLOUT | POLLWRNORM;
-		if (bcanputnextany(sd->sd_wq))
+		if (likely(bcanputnextany(sd->sd_wq) != 0))
 			mask |= POLLOUT | POLLWRBAND;
 	} else
 		mask = POLLNVAL;
@@ -9747,7 +9754,7 @@ EXPORT_SYMBOL_NOVERS(strm_f_ops);
  *  the STREAM head write queue is called without STREAM head locks, so we need to take locks and
  *  check a bunch of things here, before attempting a putnext().
  */
-int streamscall
+streamscall __hot_out int
 strwput(queue_t *q, mblk_t *mp)
 {				/* PROFILED -- never happens any more */
 	struct stdata *sd;
@@ -9813,7 +9820,7 @@ EXPORT_SYMBOL_NOVERS(strwput);
  *  queue or queue band (or that the queue or queue band was just emptied).  We use these flags only
  *  for signalling streams events.
  */
-streamscall __hot_in int
+streamscall __hot_out int
 strwsrv(queue_t *q)
 {
 	struct stdata *sd;
@@ -10292,7 +10299,7 @@ str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
  *  In stead of putting everything in one big case statement (as is the practice for STREAMS), we
  *  do it with inlines so that we have a call stack in debug mode.
  */
-streamscall __hot_out int
+streamscall __hot_in int
 strrput(queue_t *q, mblk_t *mp)
 {
 	struct stdata *sd;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/06/17 21:20:12 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/06/18 20:54:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/17 21:20:12 $ by $Author: brian $
+ Last Modified $Date: 2006/06/18 20:54:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.135  2006/06/18 20:54:04  brian
+ - minor optimizations from profiling
+
  Revision 0.9.2.134  2006/06/17 21:20:12  brian
  - sync
 
@@ -86,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/06/17 21:20:12 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/06/18 20:54:04 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/06/17 21:20:12 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/06/18 20:54:04 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -864,6 +867,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 		unsigned long flags;
 #endif
+		prefetchw(mp);
 
 #if 0
 		md->msgblk.m_func = func;
@@ -2096,10 +2100,12 @@ putp_fast(queue_t *q, mblk_t *mp)
 		/* prefetch private structure */
 		prefetch(q->q_ptr);
 
+#if 0
 		/* prefetch most used message components */
 		prefetch(mp->b_datap);
 		prefetch(mp->b_rptr);
 		prefetch(mp->b_cont);
+#endif
 
 		dassert(q->q_qinfo != NULL);
 		dassert(q->q_qinfo->qi_putp != NULL);
@@ -2726,7 +2732,8 @@ qputp_slow(queue_t *q, mblk_t *mp)
 streams_fastcall __hot void
 put(queue_t *q, mblk_t *mp)
 {				/* PROFILED */
-	struct strthread *t = this_thread;
+	prefetch(q);
+	prefetch(mp);
 
 	dassert(mp);
 	dassert(q);
@@ -2750,7 +2757,6 @@ put(queue_t *q, mblk_t *mp)
 			prlock(sd);
 		}
 #endif
-		prefetchw(t);
 
 		if (unlikely(q->q_ftmsg != NULL)) {
 			/* This AIX message filtering thing is really bad for performance when done 
@@ -2838,9 +2844,9 @@ EXPORT_SYMBOL_NOVERS(put);
 streams_fastcall __hot void
 putnext(queue_t *q, mblk_t *mp)
 {
-	struct strthread *t = this_thread;
-
-	prefetchw(t);
+	prefetch(q);
+	prefetch(mp);
+	prefetch(q->q_next);
 
 	dassert(mp);
 	dassert(q);

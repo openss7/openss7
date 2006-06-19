@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/06/16 10:48:04 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/06/18 20:54:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/16 10:48:04 $ by $Author: brian $
+ Last Modified $Date: 2006/06/18 20:54:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.32  2006/06/18 20:54:13  brian
+ - minor optimizations from profiling
+
  Revision 0.9.2.31  2006/06/16 10:48:04  brian
  - recent updates
 
@@ -146,10 +149,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/06/16 10:48:04 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/06/18 20:54:13 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/06/16 10:48:04 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/06/18 20:54:13 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -226,7 +229,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/06/16 10:48:04 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/06/18 20:54:13 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -300,8 +303,8 @@ STATIC struct module_info udp_minfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 15),		/* Hi water mark */
-	.mi_lowat = (1 << 10),		/* Lo water mark */
+	.mi_hiwat = (1 << 17),		/* Hi water mark */
+	.mi_lowat = (1 << 16),		/* Lo water mark */
 };
 
 STATIC struct module_stat udp_mstat = {
@@ -399,6 +402,7 @@ typedef struct tp {
 	struct tp **cprev;		/* linkage for conn hash */
 	struct tp_chash_bucket *chash;	/* linkage for conn hash */
 	struct T_info_ack info;		/* service provider information */
+	unsigned int sndblk;		/* sending blocked */
 	unsigned int sndmem;		/* send buffer memory allocated */
 	unsigned int rcvmem;		/* recv buffer memory allocated */
 	unsigned int BIND_flags;	/* bind flags */
@@ -769,11 +773,68 @@ STATIC struct tp_options tp_defaults = {
 #define t_defaults tp_defaults
 
 /**
+ * t_opts_size_ud - size options from received message for unitdata
+ * @t: private structure
+ * @mp: message pointer for message
+ */
+STATIC INLINE fastcall __hot_in int
+t_opts_size_ud(const struct tp *t, const mblk_t *mp)
+{
+	if (likely(t->bnum == 1 && t->baddrs[0].addr == INADDR_ANY))
+		return (0);
+	/* only need to deliver up destination address info if the stream is multihomed (i.e.
+	   wildcard bound) */
+	{
+		int size = 0;
+		struct iphdr *iph;
+
+		iph = (struct iphdr *) mp->b_datap->db_base;
+		size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
+		return (size);
+	}
+}
+
+/**
+ * t_opts_build_ud - build options output from received message for unitdata
+ * @t: private structure
+ * @mp: message pointer for message
+ * @op: output pointer
+ * @olen: output length
+ */
+static INLINE fastcall __hot_in int
+t_opts_build_ud(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t olen)
+{
+	struct iphdr *iph;
+	struct t_opthdr *oh;
+
+	if (op == NULL || olen == 0)
+		return (0);
+	oh = _T_OPT_FIRSTHDR_OFS(op, olen, 0);
+	iph = (struct iphdr *) mp->b_datap->db_base;
+	{
+		if (oh == NULL)
+			goto efault;
+		oh->len = _T_LENGTH_SIZEOF(uint32_t);
+
+		oh->level = T_INET_IP;
+		oh->name = T_IP_ADDR;
+		oh->status = T_SUCCESS;
+		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
+		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+	}
+	assure(oh == NULL);
+	return (olen);
+      efault:
+	swerr();
+	return (-EFAULT);
+}
+
+/**
  * t_opts_size - size options from received message
  * @t: private structure
  * @mp: message pointer for message
  */
-STATIC fastcall __hot_get int
+STATIC INLINE fastcall __hot_in int
 t_opts_size(const struct tp *t, const mblk_t *mp)
 {
 	int size = 0;
@@ -811,7 +872,7 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 	oh = _T_OPT_FIRSTHDR_OFS(op, olen, 0);
 	iph = (struct iphdr *) mp->b_datap->db_base;
 	optlen = (iph->ihl << 2) - sizeof(*iph);
-	if (optlen > 0) {
+	if (unlikely(optlen > 0)) {
 		if (oh == NULL)
 			goto efault;
 		oh->len = T_LENGTH(optlen);
@@ -3883,6 +3944,11 @@ tp_ip_queue_xmit(struct sk_buff *skb)
  * When tp->sndmem is greater than tp->options.xti.sndbuf we place STREAMS buffers back on the send
  * queue and stall the queue.  When the send memory falls below tp->options.xti.sndlowat (or to
  * zero) and there are message on the send queue, we enable the queue.
+ *
+ * NOTE: There was not enough hysteresis in this function!  It was qenabling too fast.  We need a
+ * flag in the private structure that indicates that the queue is stalled awaiting subsiding below
+ * the send low water mark (or to zero) that is set when we stall the queue and reset when we fall
+ * beneath the low water mark.
  */
 STATIC void __hot
 tp_skb_destructor(struct sk_buff *skb)
@@ -3892,19 +3958,28 @@ tp_skb_destructor(struct sk_buff *skb)
 	if (likely((tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page) != NULL)) {
 		/* technically we could have multiple processors freeing sk_buffs at the same time */
 		spin_lock_bh(&tp->qlock);
-		ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
+		// ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 		tp->sndmem -= skb->truesize;
-		if (unlikely((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0))) {
-			spin_unlock_bh(&tp->qlock);
-			if (tp->iq != NULL && tp->iq->q_first != NULL)
-				qenable(tp->iq);
-		} else {
-			spin_unlock_bh(&tp->qlock);
-		}
+		if (unlikely(tp->sndblk != 0))
+			goto release_check;
+	      unlock_complete:
+		spin_unlock_bh(&tp->qlock);
+	      complete:
 		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
 		tp_release(&tp);
+		return;
 	}
+	return;
+      release_check:
+	if (unlikely((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0))) {
+		tp->sndblk = 0;	/* no longer blocked */
+		spin_unlock_bh(&tp->qlock);
+		if (tp->iq != NULL && tp->iq->q_first != NULL)
+			qenable(tp->iq);
+		goto complete;
+	}
+	goto unlock_complete;
 }
 
 #undef skbuff_head_cache
@@ -3928,7 +4003,7 @@ STATIC noinline fastcall __unlikely struct sk_buff *
 tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
-	unsigned int dlen = msgdsize(mp);
+	unsigned int dlen = msgsize(mp);
 
 	if (likely((skb = alloc_skb(headroom + dlen, GFP_ATOMIC)) != NULL)) {
 		skb_reserve(skb, headroom);
@@ -4160,7 +4235,7 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 		struct net_device *dev = rt->u.dst.dev;
 		size_t hlen = ((dev->hard_header_len + 15) & ~15)
 		    + sizeof(struct iphdr) + sizeof(struct udphdr);
-		size_t dlen = msgdsize(mp);
+		size_t dlen = msgsize(mp);
 		size_t plen = dlen + sizeof(struct udphdr);
 		size_t tlen = plen + sizeof(struct iphdr);
 
@@ -4186,8 +4261,8 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 
 		      no_csum:
 			/* find headers */
-			skb->h.raw = skb_push(skb, sizeof(struct udphdr));
-			skb->nh.raw = skb_push(skb, sizeof(struct iphdr));
+			skb->h.raw = __skb_push(skb, sizeof(struct udphdr));
+			skb->nh.raw = __skb_push(skb, sizeof(struct iphdr));
 
 			skb->dst = &rt->u.dst;
 			skb->priority = 0;	// opt->xti.priority;
@@ -5824,7 +5899,7 @@ te_unitdata_ind(queue_t *q, mblk_t *dp)
 	struct T_unitdata_ind *p;
 	struct sockaddr_in *SRC_buffer;
 	t_scalar_t SRC_length = sizeof(*SRC_buffer);
-	t_scalar_t OPT_length = t_opts_size(tp, dp);
+	t_scalar_t OPT_length = t_opts_size_ud(tp, dp);
 	size_t size = sizeof(*p) + SRC_length + OPT_length;
 	struct iphdr *iph;
 	struct udphdr *uh;
@@ -5855,8 +5930,8 @@ te_unitdata_ind(queue_t *q, mblk_t *dp)
 		SRC_buffer->sin_addr.s_addr = iph->saddr;
 		mp->b_wptr += SRC_length;
 	}
-	if (OPT_length) {
-		t_opts_build(tp, dp, mp->b_wptr, OPT_length);
+	if (unlikely(OPT_length != 0)) {
+		t_opts_build_ud(tp, dp, mp->b_wptr, OPT_length);
 		mp->b_wptr += OPT_length;
 	}
 	/* pull IP header and UDP header */
@@ -5892,7 +5967,7 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
 	struct T_optdata_ind *p;
-	t_scalar_t OPT_length = t_opts_size(tp, dp);
+	t_scalar_t OPT_length = t_opts_size_ud(tp, dp);
 
 	if (unlikely(tp_get_statef(tp) & ~(TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto discard;
@@ -5907,8 +5982,8 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
 	p->DATA_flag = 0;
 	p->OPT_length = OPT_length;
 	p->OPT_offset = OPT_length ? sizeof(*p) : 0;
-	if (OPT_length) {
-		t_opts_build(tp, dp, mp->b_wptr, OPT_length);
+	if (unlikely(OPT_length != 0)) {
+		t_opts_build_ud(tp, dp, mp->b_wptr, OPT_length);
 		mp->b_wptr += OPT_length;
 	}
 	dp->b_datap->db_type = M_DATA;
@@ -6528,7 +6603,7 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely(dp == NULL))
 		goto error;
-	if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
+	if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
 		goto error;
 	err = TBADOPT;
 	if (unlikely(p->OPT_length > tp->info.OPT_size))
@@ -6652,7 +6727,7 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	}
 	if (dp != NULL) {
 		err = TBADDATA;
-		if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.CDATA_size))
+		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.CDATA_size))
 			goto error;
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
@@ -6749,7 +6824,7 @@ te_conn_res(queue_t *q, mblk_t *mp)
 	}
 	err = TBADDATA;
 	if ((dp = mp->b_cont))
-		if (unlikely((dlen = msgdsize(dp)) == 0 || dlen > tp->info.CDATA_size))
+		if (unlikely((dlen = msgsize(dp)) == 0 || dlen > tp->info.CDATA_size))
 			goto error;
 	err = TBADSEQ;
 	if (unlikely(p->SEQ_number == 0))
@@ -6856,7 +6931,7 @@ te_discon_req(queue_t *q, mblk_t *mp)
 #endif
 	err = TBADDATA;
 	if ((dp = mp->b_cont) != NULL)
-		if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
+		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
 			goto error;
 	state = tp_get_state(tp);
 	err = TBADSEQ;
@@ -6934,7 +7009,7 @@ te_write_req(queue_t *q, mblk_t *mp)
 	   Stream is bound to a port, at least the size of a UDP header.  The length of the entire
 	   TSDU must not exceed 65535 bytes. */
 	err = TBADDATA;
-	if (unlikely((dlen = msgdsize(mp)) == 0
+	if (unlikely((dlen = msgsize(mp)) == 0
 		     || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
 	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, mp)) != QR_ABSORBED))
@@ -6996,7 +7071,7 @@ te_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
 	if (unlikely
-	    ((dlen = msgdsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
+	    ((dlen = msgsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
 	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
@@ -7045,7 +7120,7 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	dlen = msgdsize(dp);
+	dlen = msgsize(dp);
 	if (unlikely(dlen == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
 		goto error;
 	err = tp_senddata(tp, tp->dport, &tp->options, dp);
@@ -7098,7 +7173,7 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	if (unlikely((mlen = msgdsize(dp)) == 0 || mlen > tp->info.TSDU_size))
+	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > tp->info.TSDU_size))
 		goto error;
 	opts = tp->options;
 	opts.flags[0] = 0;
@@ -7614,13 +7689,8 @@ tp_r_error(queue_t *q, mblk_t *mp)
 	return (rtn);
 }
 
-/**
- * tp_r_prim - process primitive on read queue
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
-STATIC INLINE streamscall __hot_get int
-tp_r_prim(queue_t *q, mblk_t *mp)
+STATIC noinline streams_fastcall __hot_get int
+tp_r_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -7635,12 +7705,22 @@ tp_r_prim(queue_t *q, mblk_t *mp)
 }
 
 /**
- * tp_w_prim - process primitive on write queue
- * @q: active queue in queue pair (write queue)
+ * tp_r_prim - process primitive on read queue
+ * @q: active queue in queue pair (read queue)
  * @mp: the message
  */
-STATIC INLINE streamscall __hot_put int
-tp_w_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE streamscall __hot_get int
+tp_r_prim(queue_t *q, mblk_t *mp)
+{
+	if (likely(mp->b_datap->db_type == M_DATA))
+		/* fast path for data */
+		if (likely(TP_PRIV(q)->info.SERV_type == T_CLTS))
+			return te_unitdata_ind(q, mp);
+	return tp_r_prim_slow(q, mp);
+}
+
+STATIC noinline streams_fastcall __hot_put int
+tp_w_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -7655,6 +7735,42 @@ tp_w_prim(queue_t *q, mblk_t *mp)
 	default:
 		return tp_w_other(q, mp);
 	}
+}
+
+/**
+ * tp_w_prim - process primitive on write queue
+ * @q: active queue in queue pair (write queue)
+ * @mp: the message
+ */
+STATIC INLINE streamscall __hot_put int
+tp_w_prim(queue_t *q, mblk_t *mp)
+{
+	if (likely(mp->b_datap->db_type == M_PROTO)) {
+		/* fast path for data */
+		if (likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t))) {
+			if (likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ)) {
+				int rtn;
+
+				if (likely((rtn = te_unitdata_req(q, mp)) >= 0))
+					return (rtn);
+				switch (rtn) {
+				case -EBUSY:	/* flow controlled */
+				case -EAGAIN:	/* try again */
+				case -ENOMEM:	/* could not allocate memory */
+				case -ENOBUFS:	/* could not allocate an mblk */
+				case -EOPNOTSUPP:	/* primitive not supported */
+					return te_error_ack(q, T_UNITDATA_REQ, rtn);
+				case -EPROTO:
+					return te_error_reply(q, -EPROTO);
+				default:
+					rtn = 0;
+					break;
+				}
+				return (rtn);
+			}
+		}
+	}
+	return tp_w_prim_slow(q, mp);
 }
 
 /*
@@ -7926,7 +8042,7 @@ tp_free(char *data)
 
 		if (likely((tp = *(struct tp **) skb->cb) != NULL)) {
 			spin_lock_bh(&tp->qlock);
-			ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
+			// ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
 			tp->rcvmem -= skb->truesize;
 			spin_unlock_bh(&tp->qlock);
 			/* put this back to null before freeing it */
@@ -8008,7 +8124,7 @@ tp_v4_rcv(struct sk_buff *skb)
 		goto linear_fail;
 #else
 	if (unlikely(skb_is_nonlinear(skb))) {
-		__ptrace(("Non-linear sk_buff encountered!\n"));
+		_ptrace(("Non-linear sk_buff encountered!\n"));
 		goto linear_fail;
 	}
 #endif

@@ -1,3 +1,9 @@
+2006-06-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/strsched.c: minor performance optimizations
+	* src/kernel/strutil.c: minor performance optimizations
+	* src/modules/sth.c: minor performance optimizations
+
 2006-06-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* TODO: updated things to do

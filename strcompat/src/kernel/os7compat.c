@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/06/14 10:37:18 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/18 20:54:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:18 $ by $Author: brian $
+ Last Modified $Date: 2006/06/18 20:54:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.16  2006/06/18 20:54:02  brian
+ - minor optimizations from profiling
+
  Revision 0.9.2.15  2006/06/14 10:37:18  brian
  - defeat a lot of debug traces in debug mode for testing
  - changes to allow strinet to compile under LiS (why???)
@@ -101,9 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/06/14 10:37:18 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/18 20:54:02 $"
 
-static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/06/14 10:37:18 $";
+static char const ident[] =
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/18 20:54:02 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -124,7 +128,7 @@ static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/06/14 10:37:18 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/18 20:54:02 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -472,6 +476,58 @@ EXPORT_SYMBOL_NOVERS(ss7_r_flush);
  *  =========================================================================
  */
 
+static noinline streams_fastcall void
+ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
+{
+	switch (rtn) {
+	case QR_DONE:
+		freemsg(mp);
+	case QR_ABSORBED:
+		break;
+	case QR_STRIP:
+		if (mp->b_cont)
+			if (!putq(q, mp->b_cont))
+				freemsg(mp->b_cont);
+	case QR_TRIMMED:
+		freeb(mp);
+		break;
+	case QR_LOOP:
+		if (!q->q_next) {
+			qreply(q, mp);
+			break;
+		}
+	case QR_PASSALONG:
+		if (q->q_next) {
+			putnext(q, mp);
+			break;
+		}
+		rtn = -EOPNOTSUPP;
+	default:
+		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+			q->q_ptr, rtn));
+		freemsg(mp);
+		break;
+	case QR_DISABLE:
+		if (!putq(q, mp))
+			freemsg(mp);
+		break;
+	case QR_PASSFLOW:
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+			putnext(q, mp);
+			break;
+		}
+	case -ENOBUFS:
+	case -EBUSY:
+	case -ENOMEM:
+	case -EAGAIN:
+	case QR_RETRY:
+		if (!putq(q, mp))
+			freemsg(mp);
+		break;
+	}
+	return;
+}
+
 /**
  * ss7_putq: - canonical put (qi_putp_t) procedure
  * @q: queue to put
@@ -495,82 +551,128 @@ EXPORT_SYMBOL_NOVERS(ss7_r_flush);
 streamscall __hot int
 ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *))
 {
-	int rtn = 0, locked = 0;
+	int locked = 0;
 
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 
-	if (mp->b_datap->db_type < QPCTL && (q->q_first || q->q_flag & QSVCBUSY)) {
-		if (!putq(q, mp))
+	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
+		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 		return (0);
 	}
-	if (mp->b_datap->db_type == M_FLUSH || (locked = ss7_trylockq(q))) {
-		do {
-			/* Fast Path */
-			if ((rtn = proc(q, mp)) == QR_DONE) {
-				freemsg(mp);
-				break;
-			}
-			switch (rtn) {
-			case QR_DONE:
-				freemsg(mp);
-			case QR_ABSORBED:
-				break;
-			case QR_STRIP:
-				if (mp->b_cont)
-					if (!putq(q, mp->b_cont))
-						freemsg(mp->b_cont);
-			case QR_TRIMMED:
-				freeb(mp);
-				break;
-			case QR_LOOP:
-				if (!q->q_next) {
-					qreply(q, mp);
-					break;
-				}
-			case QR_PASSALONG:
-				if (q->q_next) {
-					putnext(q, mp);
-					break;
-				}
-				rtn = -EOPNOTSUPP;
-			default:
-				printd(("%s: %p: ERROR: (q dropping) %d\n",
-					q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
-				freemsg(mp);
-				break;
-			case QR_DISABLE:
-				if (!putq(q, mp))
-					freemsg(mp);
-				rtn = 0;
-				break;
-			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-					putnext(q, mp);
-					break;
-				}
-			case -ENOBUFS:
-			case -EBUSY:
-			case -ENOMEM:
-			case -EAGAIN:
-			case QR_RETRY:
-				if (!putq(q, mp))
-					freemsg(mp);
-				break;
-			}
-		} while (0);
-		if (locked)
-			ss7_unlockq(q);
+	if (likely((locked = ss7_trylockq(q))) || unlikely(mp->b_datap->db_type == M_FLUSH)) {
+		int rtn;
+
+		rtn = proc(q, mp);
+		/* Fast Paths */
+		if (likely(rtn == QR_TRIMMED)) {
+			freeb(mp);
+		      unlock_exit:
+			if (locked)
+				ss7_unlockq(q);
+			return (0);
+		}
+		if (likely(rtn == QR_DONE)) {
+			freemsg(mp);
+			goto unlock_exit;
+		}
+		ss7_putq_slow(q, mp, rtn);
+		goto unlock_exit;
 	} else {
 		seldom();
 		if (!putq(q, mp))
 			freemsg(mp);
 	}
-	return (rtn);
+	return (0);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_putq);
+
+static noinline streams_fastcall int
+ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
+{
+	switch (rtn) {
+	case QR_DONE:
+		freemsg(mp);
+	case QR_ABSORBED:
+		return (1);
+	case QR_STRIP:
+		if (mp->b_cont)
+			if (!putbq(q, mp->b_cont))
+				freemsg(mp->b_cont);
+	case QR_TRIMMED:
+		freeb(mp);
+		return (1);
+	case QR_LOOP:
+		if (!q->q_next) {
+			qreply(q, mp);
+			return (1);
+		}
+	case QR_PASSALONG:
+		if (q->q_next) {
+			putnext(q, mp);
+			return (1);
+		}
+		rtn = -EOPNOTSUPP;
+	default:
+		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+			q->q_ptr, rtn));
+		freemsg(mp);
+		return (1);
+	case QR_DISABLE:
+		printd(("%s: %p: ERROR: (q disabling) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+			q->q_ptr, rtn));
+		noenable(q);
+		if (!putbq(q, mp))
+			freemsg(mp);
+		rtn = 0;
+		return (0);
+	case QR_PASSFLOW:
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+			putnext(q, mp);
+			return (1);
+		}
+	case -ENOBUFS:		/* proc must have scheduled bufcall */
+	case -EBUSY:		/* proc must have failed canput */
+	case -ENOMEM:		/* proc must have scheduled bufcall */
+	case -EAGAIN:		/* proc must re-enable on some event */
+		if (mp->b_datap->db_type < QPCTL) {
+			printd(("%s: %p: ERROR: (q stalled) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+				q->q_ptr, rtn));
+			if (!putbq(q, mp))
+				freemsg(mp);
+			return (0);
+		}
+		/* 
+		 *  Be careful not to put a priority message back on the queue.
+		 */
+		switch (mp->b_datap->db_type) {
+		case M_PCPROTO:
+			mp->b_datap->db_type = M_PROTO;
+			break;
+		case M_PCRSE:
+			mp->b_datap->db_type = M_RSE;
+			break;
+		case M_PCCTL:
+			mp->b_datap->db_type = M_CTL;
+			break;
+		default:
+			printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+				q->q_ptr, rtn));
+			freemsg(mp);
+			return (1);
+		}
+		mp->b_band = 255;
+		if (!putq(q, mp))
+			freemsg(mp);
+		return (0);
+	case QR_RETRY:
+		if (!putbq(q, mp))
+			freemsg(mp);
+		return (1);
+	}
+}
 
 /**
  * ss7_srvq: - canonical service procedure
@@ -583,115 +685,47 @@ EXPORT_SYMBOL_NOVERS(ss7_putq);
  * for running D_MP under Linux Fast-STREAMS.
  */
 streamscall __hot int
-ss7_srvq(queue_t *q, int streamscall (*proc) (queue_t *, mblk_t *), void streamscall (*procwake) (queue_t *))
+ss7_srvq(queue_t *q, int streamscall (*proc) (queue_t *, mblk_t *),
+	 void streamscall (*procwake) (queue_t *))
 {
 	int rtn = 0;
 
 	ensure(q, return (-EFAULT));
-	if (ss7_trylockq(q)) {
+	if (likely(ss7_trylockq(q))) {
 		mblk_t *mp;
 
-		while ((mp = getq(q))) {
+		while (likely((mp = getq(q)) != NULL)) {
 
+			prefetch(mp);
+#if 0
 			prefetch(mp->b_datap);
 			prefetch(mp->b_rptr);
 			prefetch(mp->b_cont);
+#endif
 
+			rtn = proc(q, mp);
 			/* Fast Path */
-			if ((rtn = proc(q, mp)) == QR_DONE) {
-				freemsg(mp);
-				continue;
-			}
-			switch (rtn) {
-			case QR_DONE:
-				freemsg(mp);
-			case QR_ABSORBED:
-				continue;
-			case QR_STRIP:
-				if (mp->b_cont)
-					if (!putbq(q, mp->b_cont))
-						freemsg(mp->b_cont);
-			case QR_TRIMMED:
+			if (likely(rtn == QR_TRIMMED)) {
 				freeb(mp);
 				continue;
-			case QR_LOOP:
-				if (!q->q_next) {
-					qreply(q, mp);
-					continue;
-				}
-			case QR_PASSALONG:
-				if (q->q_next) {
-					putnext(q, mp);
-					continue;
-				}
-				rtn = -EOPNOTSUPP;
-			default:
-				printd(("%s: %p: ERROR: (q dropping) %d\n",
-					q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
+			}
+			if (likely(rtn == QR_DONE)) {
 				freemsg(mp);
 				continue;
-			case QR_DISABLE:
-				printd(("%s: %p: ERROR: (q disabling) %d\n",
-					q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
-				noenable(q);
-				if (!putbq(q, mp))
-					freemsg(mp);
-				rtn = 0;
-				break;
-			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-					putnext(q, mp);
-					continue;
-				}
-			case -ENOBUFS:	/* proc must have scheduled bufcall */
-			case -EBUSY:	/* proc must have failed canput */
-			case -ENOMEM:	/* proc must have scheduled bufcall */
-			case -EAGAIN:	/* proc must re-enable on some event */
-				if (mp->b_datap->db_type < QPCTL) {
-					printd(("%s: %p: ERROR: (q stalled) %d\n",
-						q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
-					if (!putbq(q, mp))
-						freemsg(mp);
-					break;
-				}
-				/* 
-				 *  Be careful not to put a priority message back on the queue.
-				 */
-				switch (mp->b_datap->db_type) {
-				case M_PCPROTO:
-					mp->b_datap->db_type = M_PROTO;
-					break;
-				case M_PCRSE:
-					mp->b_datap->db_type = M_RSE;
-					break;
-				case M_PCCTL:
-					mp->b_datap->db_type = M_CTL;
-					break;
-				default:
-					printd(("%s: %p: ERROR: (q dropping) %d\n",
-						q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
-					freemsg(mp);
-					continue;
-				}
-				mp->b_band = 255;
-				if (!putq(q, mp))
-					freemsg(mp);
-				break;
-			case QR_RETRY:
-				if (!putbq(q, mp))
-					freemsg(mp);
-				continue;
 			}
+			if (likely(ss7_srvq_slow(q, mp, rtn)))
+				continue;
 			break;
 		}
 		/* perform wakeups */
 		if (procwake)
 			procwake(q);
 		ss7_unlockq(q);
+		return (0);
 	} else {
 		rare();
+		return (0);
 	}
-	return (rtn);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_srvq);
@@ -710,12 +744,15 @@ ss7_oput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
 
+	prefetch(mp);
+#if 0
 	prefetch(mp->b_datap);
 	prefetch(mp->b_rptr);
 	prefetch(mp->b_cont);
+#endif
 
-	if (s->oq) {
-		if (s->o_prim) {
+	if (likely(s->oq != NULL)) {
+		if (likely(s->o_prim != NULL)) {
 			ss7_putq(s->oq, mp, s->o_prim);
 			return (0);
 		}
@@ -743,8 +780,8 @@ ss7_osrv(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
 
-	if (s->oq) {
-		if (s->o_prim) {
+	if (likely(s->oq != NULL)) {
+		if (likely(s->o_prim != NULL)) {
 			ss7_srvq(s->oq, s->o_prim, s->o_wakeup);
 			return (0);
 		} else if (s->o_wakeup) {
@@ -773,12 +810,15 @@ ss7_iput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
 
+	prefetch(mp);
+#if 0
 	prefetch(mp->b_datap);
 	prefetch(mp->b_rptr);
 	prefetch(mp->b_cont);
+#endif
 
-	if (s->iq) {
-		if (s->i_prim) {
+	if (likely(s->iq != NULL)) {
+		if (likely(s->i_prim != NULL)) {
 			ss7_putq(s->iq, mp, s->i_prim);
 			return (0);
 		}
@@ -806,8 +846,8 @@ ss7_isrv(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
 
-	if (s->iq) {
-		if (s->i_prim) {
+	if (likely(s->iq != NULL)) {
+		if (likely(s->i_prim != NULL)) {
 			ss7_srvq(s->iq, s->i_prim, s->i_wakeup);
 			return (0);
 		} else if (s->i_wakeup) {

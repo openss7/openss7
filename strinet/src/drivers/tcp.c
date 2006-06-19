@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/06/14 10:37:44 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/06/18 20:54:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:44 $ by $Author: brian $
+ Last Modified $Date: 2006/06/18 20:54:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.7  2006/06/18 20:54:13  brian
+ - minor optimizations from profiling
+
  Revision 0.9.2.6  2006/06/14 10:37:44  brian
  - defeat a lot of debug traces in debug mode for testing
  - changes to allow strinet to compile under LiS (why???)
@@ -71,9 +74,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/06/14 10:37:44 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/06/18 20:54:13 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/06/14 10:37:44 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/06/18 20:54:13 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -150,7 +153,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/06/14 10:37:44 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/06/18 20:54:13 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -4438,7 +4441,7 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 		struct sk_buff *skb;
 		struct net_device *dev = rt->u.dst.dev;
 		size_t hlen = (dev->hard_header_len + 15) & ~15;
-		size_t ulen = msgdsize(dp);
+		size_t ulen = msgsize(dp);
 		size_t plen = sizeof(struct tcphdr) + ulen;
 		size_t tlen = sizeof(struct iphdr) + plen;
 

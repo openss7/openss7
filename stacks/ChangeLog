@@ -1,3 +1,15 @@
+2006-06-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/drafts/idrefs: updates for draft rerelease
+	* doc/drafts/isua/draft-bidulock-sigtran-isua-03.me: updates for draft rerelease
+	* doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-02.me: updates for draft rerelease
+	* doc/drafts/tua/draft-bidulock-sigtran-tua-04.me: updates for draft rerelease
+	* doc/drafts/ua/draft-bidulock-sigtran-aspext-04.me: updates for draft rerelease
+	* doc/drafts/ua/draft-bidulock-sigtran-corid-04.me: updates for draft rerelease
+	* doc/drafts/ua/draft-bidulock-sigtran-loadgrp-04.me: updates for draft rerelease
+	* doc/drafts/ua/draft-bidulock-sigtran-loadsel-04.me: updates for draft rerelease
+	* doc/drafts/ua/draft-bidulock-sigtran-sginfo-05.me: updates for draft rerelease
+
 2006-06-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strss7.refs: updated references for IUA, DUA, M2PA

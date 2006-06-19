@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\" =========================================================================
 .\"
-.\" @(#) $Id: draft-bidulock-sigtran-m2ua-ss7test-02.me,v 0.9.2.3 2005/10/17 11:53:44 brian Exp $
+.\" @(#) $Id: draft-bidulock-sigtran-m2ua-ss7test-02.me,v 0.9.2.4 2006/06/18 20:53:33 brian Exp $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
@@ -47,12 +47,12 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Name:  $($Revision: 0.9.2.3 $) modified $Date: 2005/10/17 11:53:44 $ by $Author: brian $
+.\" $Name:  $($Revision: 0.9.2.4 $) modified $Date: 2006/06/18 20:53:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .ds version Version\ 0.2
-.ds date October\ 16,\ 2005
-.ds expiry April\ 2006
+.ds date June\ 18,\ 2006
+.ds expiry December\ 2006
 .so ../draft2.me
 .bp
 .bp
@@ -80,7 +80,7 @@ M2UA-SS7TEST
 .ne 4
 .\"
 .\"
-.#S 2005 \*[expiry] a
+.#S 2006 \*[expiry] a
 .\"
 .\"
 .uh Abstract
@@ -103,7 +103,7 @@ q781
 %Z 1
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 %Z 1
 .]
 .\"
@@ -123,14 +123,14 @@ q780
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 The general aspects for SS7 protocol testing
 .[
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 describes the requirement for an
 \fIMTP Level 3 Simulator\fR
@@ -139,7 +139,7 @@ in the test environment for SS7 MTP Level 2 testing.
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 This 
 \fIMTP Level 3 Simulator\fR
@@ -149,7 +149,7 @@ well as sending and receiving signalling messages.
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 .pp
 This memo describes how the
@@ -168,7 +168,7 @@ Although the SS7 MTP Level 2 test cases
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 are applicable in entirety to SS7 signalling links implemented at the M2UA
 Signalling Gateway, this memo details the mapping of M2UA messages to SS7
@@ -186,7 +186,7 @@ signals used in the SS7 MTP Level 2 tests.
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 .\"
 .\"
@@ -340,14 +340,14 @@ The test environment for SS7 MTP Level 2
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 testing is described in the General Aspects of SS7 testing.
 .[
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 There are two types of testing that are accomodated as follows:
 .lp
@@ -455,7 +455,7 @@ As described in the SS7 Test Specification,
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 the SS7 Level 2 validation testing environment consists of the following
 components:
@@ -495,14 +495,14 @@ Specification.
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 This is the normal configuration for SS7 MTP Level 2 testing
 .[
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 and is not modified by this memo.  Normal SS7 MTP Level 2 testing \fBSHOULD\fR
 be performed on the M2UA SG before performing validation, compatibility or
@@ -548,7 +548,7 @@ As described in the SS7 Test Specification,
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 the SS7 Level 2 validation testing environment consists of the following
 components:
@@ -588,7 +588,7 @@ Under Test (IUT) and the MTP Level 3 Simulator
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 within the test environment.
 .pp
@@ -600,7 +600,7 @@ performance of SS7 MTP Level 2 testing.
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 The \fIMTP Level 3 Simulator\fR \fBSHALL\fR inject and collect the M2UA
 messages as decribed in
@@ -663,7 +663,7 @@ q780
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 The test envirnoment \fBSHOULD\fR include monitoring of the M2UA SCTP
 Association to ensure the mapping between SS7 MTP Level 2
@@ -678,7 +678,7 @@ signals, SS7 MTP Level 2 Test Specification
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 commands, and SS7 MTP2-User Adaptation Layer
 .[
@@ -733,7 +733,7 @@ As described in the SS7 Test Specification,
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 The SS7 Level 2 compatibility testing environment consists of the following
 components:
@@ -775,14 +775,14 @@ Test Specifications.
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 This is the normal configuration for SS7 MTP Level 2 testing
 .[
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 and is not modified by this memo.  Normal SS7 MTP Level 2 testing \fBSHOULD\fR
 be peformed on the M2UA SG before performing compatibility tests in the other
@@ -829,7 +829,7 @@ As described in the SS7 Test Specification,
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 The SS7 Level 2 compatibility testing environment consists of the following
 components:
@@ -870,7 +870,7 @@ Under Test (IUT) and the MTP Level 3 Simulator
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 within the test environment.
 .pp
@@ -882,7 +882,7 @@ messages to and from the IUT during the performance of SS7 MTP Level 2 testing.
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 The \fIMTP Level 3 Simulator\fR \fBSHALL\fR inject and collect the M2UA
 messages as decribed in
@@ -946,7 +946,7 @@ q780
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 The test environment \fBSHOULD\fR include monitoring of the M2UA SCTP
 Association to ensure the mapping between SS7 MTP Level 2
@@ -961,7 +961,7 @@ signals, SS7 MTP Level 2 Test Specification
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 commands, and SS7 MTP2-User Adaptation Layer
 .[
@@ -983,7 +983,7 @@ validation tests
 q781
 .] or\ 
 .[
-m2pa-test-05
+m2pa-test-07
 .]]
 directly.
 .np
@@ -993,7 +993,7 @@ validation tests
 q781
 .] or\ 
 .[
-m2pa-test-05
+m2pa-test-07
 .]]
 with M2UA interface between SG and \fIMTP Level 3 Simulator\fR.
 .np
@@ -1003,7 +1003,7 @@ compatibility tests
 q781
 .] or\ 
 .[
-m2pa-test-05
+m2pa-test-07
 .]]
 directly.
 .np
@@ -1013,7 +1013,7 @@ compatibility tests
 q781
 .] or\ 
 .[
-m2pa-test-05
+m2pa-test-07
 .]]
 with M2UA interface between SG and \fIMTP Level 3 Simulator\fR.
 .nr parareg \n($p
@@ -1028,7 +1028,7 @@ validation tests
 q781
 .] or\ 
 .[
-m2pa-test-05
+m2pa-test-07
 .]]
 directly, with SG/ASP interaction within the IUT.
 .np
@@ -1038,7 +1038,7 @@ compatibility tests
 q781
 .] or\ 
 .[
-m2pa-test-05
+m2pa-test-07
 .]]
 directly, with SG/ASP interaction within the IUT.
 .nr parareg \n($p
@@ -1069,7 +1069,7 @@ The normal methodology for testing SS7 MTP Level 2
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 is to perform validation testing on an IUT before performing compatibility
 testing.  The tests presented in
@@ -1077,7 +1077,7 @@ testing.  The tests presented in
 q781
 .] and\ 
 .[
-m2pa-test-05
+m2pa-test-07
 .]]
 test the functionality of the MTP
 Level 2 state machines; however, they do not adequately test the L2 to L3
@@ -1126,7 +1126,7 @@ tests of the SS7 MTP Level 2 Test Specification,
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 or other applicatble SS7 MTP Level 2 test specification,
 \fBSHALL\fR be performed.
@@ -1147,7 +1147,7 @@ signals, SS7 MTP Level 2 Test
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 commands, and SS7 MTP2-User Adaptation Layer
 .[
@@ -1166,7 +1166,7 @@ signal \fBSHALL\fR be mapped onto a
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 command or indication and onto a
 .[
@@ -1178,7 +1178,7 @@ When the SS7 MTP Level 2
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 test case calls for a given
 .[
@@ -1192,7 +1192,7 @@ signal or
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 command or indication, the corresponding
 .[
@@ -1316,7 +1316,7 @@ MTP Level 2 Test Specifications
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 do not provide a notation for "In Service" indication; however, in a number
 of test cases it is necessary to establish that the link is in the "In
@@ -1332,7 +1332,7 @@ MTP Level 2 Test Specifications
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 do not provide a notation for "Link Failure" indication; however, in a
 number of test cases it is necessary to establish that the link has failed.
@@ -1347,7 +1347,7 @@ MTP Level 2 Test Specifications
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 do not provide a notation for "Flush Buffers," "Clear RTB," "Continue," or
 "Resume."  However, use of these primitives is necessary in some test cases
@@ -1357,7 +1357,7 @@ q781
 .]
 test case 3.4.1
 .[ [
-m2pa-test-05
+m2pa-test-07
 .]]).
 The \fBSTATE Request\fR
 .[
@@ -1375,7 +1375,7 @@ MTP Level 2 Test Specifications
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 do not require the use of this request.
 .ip <5>
@@ -1392,7 +1392,7 @@ or SS7 MTP Level 2 Test
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 actions that correspond to these
 .[
@@ -1426,7 +1426,7 @@ messages, SS7 MTP Level 2 Tests
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 do not perform congestion testing that would generate these indications to the
 test environment.
@@ -1436,7 +1436,7 @@ MTP Level 2 Test Specifications
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 do not test retrieval.  Retrieval tests are performed by SS7 MTP Level 3
 testing.
@@ -1449,7 +1449,7 @@ MTP Level 2 Test Specifications
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 do not have a notation for signalling messages (other than indicating that
 an MSU is sent or received); however, signalling messages are exchanged
@@ -1459,7 +1459,7 @@ tests.
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 .ip <9>
 MTP Level 2 Test Specifications
@@ -1467,7 +1467,7 @@ MTP Level 2 Test Specifications
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 do not provide a notation for "Remote Processor Outage" or "Remote Processor
 Recovered" indications.  These indications are not required in SS7 MTP Level 2
@@ -1476,7 +1476,7 @@ tests;
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 however, these indications \fBSHOULD\fR be delivered to the test environment
 on entry and exit from the "Remote Processour Outage" state.
@@ -1486,7 +1486,7 @@ MTP Level 2 Test Specifications
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 defines these signals, and these signals are required
 within the test environment;
@@ -1494,7 +1494,7 @@ within the test environment;
 q780
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 however, these signals are outside the scope of the SS7 MTP2-User Adaptation
 Layer
@@ -1518,7 +1518,7 @@ Test Specification
 q781
 .]
 .[
-m2pa-test-05
+m2pa-test-07
 .]
 \fBSHALL\fR be performed in this fashion with the mapping presented in
 \fI\*(&t\n(&b\fR.  For other SS7 Conformance Test Specifications, a similar
@@ -1547,6 +1547,9 @@ There are no IANA considerations for this draft.
 This section provides historical information on the changes made to this
 draft.  This section will be removed from the document when the document is
 finalized.
+.sh 2 "Changes from Version 0.2 to Version 0.3" 0 3
+.np
+Updated version numbers and resubmitted.
 .sh 2 "Changes from Version 0.1 to Version 0.2" 0 2
 .np
 Updated first and last page to IETF boiler plate.
@@ -1564,6 +1567,9 @@ This is the first version of this document.
 .nf
 \fC\s-2
 $Log: draft-bidulock-sigtran-m2ua-ss7test-02.me,v $
+Revision 0.9.2.4  2006/06/18 20:53:33  brian
+- preparing for draft rerelease
+
 Revision 0.9.2.3  2005/10/17 11:53:44  brian
 - updated drafts for republication
 
@@ -1609,4 +1615,4 @@ $LIST$
 .lp
 This draft expires \*[expiry].
 .)b
-.#T 2005
+.#T 2006

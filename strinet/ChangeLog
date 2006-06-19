@@ -1,3 +1,10 @@
+2006-06-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/rawip.c: use msgsize instead of msgdsize
+	* src/drivers/tcp.c: use msgsize instead of msgdsize
+	* src/drivers/udp.c: use msgsize instead of msgdsize
+	  - fast path factoring
+
 2006-06-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/udp.c:

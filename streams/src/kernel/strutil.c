@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/06/14 10:37:25 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/06/18 20:54:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:25 $ by $Author: brian $
+ Last Modified $Date: 2006/06/18 20:54:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.126  2006/06/18 20:54:05  brian
+ - minor optimizations from profiling
+
  Revision 0.9.2.125  2006/06/14 10:37:25  brian
  - defeat a lot of debug traces in debug mode for testing
  - changes to allow strinet to compile under LiS (why???)
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/06/14 10:37:25 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/06/18 20:54:05 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/06/14 10:37:25 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/06/18 20:54:05 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -117,23 +120,35 @@ STATIC spinlock_t db_ref_lock = SPIN_LOCK_UNLOCKED;
 STATIC void
 db_inc(dblk_t * db)
 {
-	unsigned long flags;
+	/* When the number of references is 1 the buffer is exclusive to the
+	 * caller and locking is not required. */
+	if (likely(db->db_ref == 1))
+		return (void) (db->db_ref = 2);
+	{
+		unsigned long flags;
 
-	spin_lock_irqsave(&db_ref_lock, flags);
-	++db->db_ref;
-	spin_unlock_irqrestore(&db_ref_lock, flags);
+		spin_lock_irqsave(&db_ref_lock, flags);
+		++db->db_ref;
+		spin_unlock_irqrestore(&db_ref_lock, flags);
+	}
 }
 
 STATIC streams_inline streams_fastcall __hot_in int
 db_dec_and_test(dblk_t * db)
 {
-	unsigned long flags;
-	bool ret;
+	/* When the number of references is 1 the buffer is exclusive to the
+	 * caller and locking is not required. */
+	if (likely(db->db_ref == 1))
+		return ((db->db_ref = 0) == 0);
+	{
+		unsigned long flags;
+		bool ret;
 
-	spin_lock_irqsave(&db_ref_lock, flags);
-	ret = (--db->db_ref == 0);
-	spin_unlock_irqrestore(&db_ref_lock, flags);
-	return ret;
+		spin_lock_irqsave(&db_ref_lock, flags);
+		ret = (--db->db_ref == 0);
+		spin_unlock_irqrestore(&db_ref_lock, flags);
+		return ret;
+	}
 }
 
 #if 0
@@ -285,7 +300,7 @@ allocb(size_t size, uint priority)
 		unsigned char *base = md->databuf;
 		dblk_t *db = &md->datablk.d_dblock;
 
-		if (likely(size <= FASTBUF))
+		if (unlikely(size <= FASTBUF))
 			size = FASTBUF;
 		else if (unlikely((base = kmem_alloc(size, (priority == BPRI_WAITOK)
 					     ? KM_SLEEP : KM_NOSLEEP)) == NULL))
@@ -388,23 +403,37 @@ EXPORT_SYMBOL_NOVERS(datamsg);
  *  dupb:	- duplicates a message block
  *  @bp:	message block to duplicate
  */
-streams_fastcall __unlikely mblk_t *
+streams_fastcall __hot mblk_t *
 dupb(mblk_t *bp)
 {
 	mblk_t *mp;
 
-	if ((mp = mdbblock_alloc(BPRI_MED, &dupb))) {
+	if (likely((mp = mdbblock_alloc(BPRI_MED, &dupb)) != NULL)) {
 		struct mdbblock *md = (struct mdbblock *) mp;
 		dblk_t *db = bp->b_datap;
 
 		db_inc(db);
+#if 0
 		*mp = *bp;
 		mp->b_next = mp->b_prev = mp->b_cont = NULL;
+#else
+		mp->b_next = NULL;
+		mp->b_prev = NULL;
+		mp->b_cont = NULL;
+		mp->b_rptr = bp->b_rptr;
+		mp->b_wptr = bp->b_wptr;
+		mp->b_datap = bp->b_datap;
+		mp->b_band = bp->b_band;
+		mp->b_flag = bp->b_flag;
+		mp->b_csum = bp->b_csum;
+
+#endif
 		/* mark datab unused */
 		db = &md->datablk.d_dblock;
 		db->db_ref = 0;
+		return (mp);
 	}
-	return (mp);
+	return (NULL);
 }
 
 EXPORT_SYMBOL_NOVERS(dupb);
@@ -432,7 +461,7 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 {
 	mblk_t *mp;
 
-	if ((mp = mdbblock_alloc(priority, &esballoc))) {
+	if (likely((mp = mdbblock_alloc(priority, &esballoc)) != NULL)) {
 		struct mdbblock *md = mb_to_mdb(mp);
 		dblk_t *db = &md->datablk.d_dblock;
 
@@ -451,8 +480,9 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		mp->b_datap = db;
 		mp->b_band = 0;
 		mp->b_flag = 0;
+		return (mp);
 	}
-	return (mp);
+	return (NULL);
 }
 
 EXPORT_SYMBOL_NOVERS(esballoc);
@@ -3116,12 +3146,9 @@ getq(register queue_t *q)
 	pl = qwlock(q);
 	mp = __getq(q, &backenable);
 	qwunlock(q, pl);
-	if (unlikely(backenable != 0)) {
-		unsigned char b_band;
-
-		b_band = mp ? mp->b_band : 0;
-		qbackenable(q, b_band, NULL);
-	}
+	if (likely(backenable == 0))
+		return (mp);
+	qbackenable(q, mp ? mp->b_band : 0, NULL);
 	return (mp);
 }
 

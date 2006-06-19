@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/16 10:48:03 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/18 20:54:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/16 10:48:03 $ by $Author: brian $
+ Last Modified $Date: 2006/06/18 20:54:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.28  2006/06/18 20:54:12  brian
+ - minor optimizations from profiling
+
  Revision 0.9.2.27  2006/06/16 10:48:03  brian
  - recent updates
 
@@ -134,10 +137,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/16 10:48:03 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/18 20:54:12 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/16 10:48:03 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/18 20:54:12 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -213,7 +216,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/16 10:48:03 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/18 20:54:12 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -3881,7 +3884,7 @@ STATIC noinline fastcall __unlikely struct sk_buff *
 tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
-	unsigned int dlen = msgdsize(mp);
+	unsigned int dlen = msgsize(mp);
 
 	if (likely((skb = alloc_skb(headroom + dlen, GFP_ATOMIC)) != NULL)) {
 		skb_reserve(skb, headroom);
@@ -4112,7 +4115,7 @@ tp_senddata(struct tp *tp, const struct tp_options *opt, mblk_t *mp)
 		struct net_device *dev = rt->u.dst.dev;
 		size_t hlen = ((dev->hard_header_len + 15) & ~15)
 		    + sizeof(struct iphdr) + 0;
-		size_t dlen = msgdsize(mp);
+		size_t dlen = msgsize(mp);
 		size_t plen = dlen + 0;
 		size_t tlen = plen + sizeof(struct iphdr);
 
@@ -6456,7 +6459,7 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely(dp == NULL))
 		goto error;
-	if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
+	if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
 		goto error;
 	err = TBADOPT;
 	if (unlikely(p->OPT_length > tp->info.OPT_size))
@@ -6580,7 +6583,7 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	}
 	if (dp != NULL) {
 		err = TBADDATA;
-		if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.CDATA_size))
+		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.CDATA_size))
 			goto error;
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
@@ -6677,7 +6680,7 @@ te_conn_res(queue_t *q, mblk_t *mp)
 	}
 	err = TBADDATA;
 	if ((dp = mp->b_cont))
-		if (unlikely((dlen = msgdsize(dp)) == 0 || dlen > tp->info.CDATA_size))
+		if (unlikely((dlen = msgsize(dp)) == 0 || dlen > tp->info.CDATA_size))
 			goto error;
 	err = TBADSEQ;
 	if (unlikely(p->SEQ_number == 0))
@@ -6784,7 +6787,7 @@ te_discon_req(queue_t *q, mblk_t *mp)
 #endif
 	err = TBADDATA;
 	if ((dp = mp->b_cont) != NULL)
-		if (unlikely((dlen = msgdsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
+		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
 			goto error;
 	state = tp_get_state(tp);
 	err = TBADSEQ;
@@ -6862,7 +6865,7 @@ te_write_req(queue_t *q, mblk_t *mp)
 	   Stream is bound to a port, at least the size of a UDP header.  The length of the entire
 	   TSDU must not exceed 65535 bytes. */
 	err = TBADDATA;
-	if (unlikely((dlen = msgdsize(mp)) == 0
+	if (unlikely((dlen = msgsize(mp)) == 0
 		     || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
 	if (unlikely((err = tp_senddata(tp, &tp->options, mp)) != QR_ABSORBED))
@@ -6924,7 +6927,7 @@ te_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
 	if (unlikely
-	    ((dlen = msgdsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
+	    ((dlen = msgsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
 	if (unlikely((err = tp_senddata(tp, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
@@ -6973,7 +6976,7 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	dlen = msgdsize(dp);
+	dlen = msgsize(dp);
 	if (unlikely(dlen == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
 		goto error;
 	err = tp_senddata(tp, &tp->options, dp);
@@ -7026,7 +7029,7 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	if (unlikely((mlen = msgdsize(dp)) == 0 || mlen > tp->info.TSDU_size))
+	if (unlikely((mlen = msgsize(dp)) == 0 || mlen > tp->info.TSDU_size))
 		goto error;
 	opts = tp->options;
 	opts.flags[0] = 0;
