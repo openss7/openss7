@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/18 20:54:02 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/06/19 20:51:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/18 20:54:02 $ by $Author: brian $
+ Last Modified $Date: 2006/06/19 20:51:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.17  2006/06/19 20:51:27  brian
+ - more optimizations
+
  Revision 0.9.2.16  2006/06/18 20:54:02  brian
  - minor optimizations from profiling
 
@@ -104,10 +107,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/18 20:54:02 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/06/19 20:51:27 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/18 20:54:02 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/06/19 20:51:27 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -128,7 +131,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/18 20:54:02 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/06/19 20:51:27 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -486,7 +489,7 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 		break;
 	case QR_STRIP:
 		if (mp->b_cont)
-			if (!putq(q, mp->b_cont))
+			if (unlikely(putq(q, mp->b_cont) == 0))
 				freemsg(mp->b_cont);
 	case QR_TRIMMED:
 		freeb(mp);
@@ -508,7 +511,7 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 		freemsg(mp);
 		break;
 	case QR_DISABLE:
-		if (!putq(q, mp))
+		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 		break;
 	case QR_PASSFLOW:
@@ -521,7 +524,7 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	case -ENOMEM:
 	case -EAGAIN:
 	case QR_RETRY:
-		if (!putq(q, mp))
+		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 		break;
 	}
@@ -581,7 +584,7 @@ ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *))
 		goto unlock_exit;
 	} else {
 		seldom();
-		if (!putq(q, mp))
+		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	}
 	return (0);
@@ -664,7 +667,7 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 			return (1);
 		}
 		mp->b_band = 255;
-		if (!putq(q, mp))
+		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 		return (0);
 	case QR_RETRY:
@@ -730,6 +733,19 @@ ss7_srvq(queue_t *q, int streamscall (*proc) (queue_t *, mblk_t *),
 
 EXPORT_SYMBOL_NOVERS(ss7_srvq);
 
+static streams_noinline streams_fastcall int
+ss7_oput_slow(str_t * s, mblk_t *mp)
+{
+	if (likely(s->oq != NULL)) {
+		swerr();
+		if (s->oq->q_qinfo->qi_srvp && likely(putq(s->oq, mp) != 0))
+			return (0);	/* recovered */
+	}
+	swerr();
+	freemsg(mp);
+	return (-EFAULT);
+}
+
 /**
  * ss7_oput: - canonical put procedure for the output side
  * @q: queue to put
@@ -756,16 +772,25 @@ ss7_oput(queue_t *q, mblk_t *mp)
 			ss7_putq(s->oq, mp, s->o_prim);
 			return (0);
 		}
-		swerr();
-		if (s->oq->q_qinfo->qi_srvp && putq(s->oq, mp))
-			return (0);	/* recovered */
 	}
-	swerr();
-	freemsg(mp);
-	return (-EFAULT);
+	return ss7_oput_slow(s, mp);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_oput);
+
+static streams_noinline streams_fastcall int
+ss7_osrv_slow(str_t * s, queue_t *q)
+{
+	if (likely(s->oq != NULL)) {
+		if (s->o_wakeup) {
+			s->o_wakeup(s->oq);
+			return (0);
+		}
+	}
+	swerr();
+	noenable(q);
+	return (-EFAULT);
+}
 
 /**
  * ss7_osrv: - canoncial service procedure for the output side
@@ -784,17 +809,25 @@ ss7_osrv(queue_t *q)
 		if (likely(s->o_prim != NULL)) {
 			ss7_srvq(s->oq, s->o_prim, s->o_wakeup);
 			return (0);
-		} else if (s->o_wakeup) {
-			s->o_wakeup(s->oq);
-			return (0);
 		}
 	}
-	swerr();
-	noenable(q);
-	return (-EFAULT);
+	return ss7_osrv_slow(s, q);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_osrv);
+
+static streams_noinline streams_fastcall int
+ss7_iput_slow(str_t * s, mblk_t *mp)
+{
+	if (likely(s->iq != NULL)) {
+		swerr();
+		if (s->iq->q_qinfo->qi_srvp && likely(putq(s->iq, mp) != 0))
+			return (0);	/* recovered */
+	}
+	swerr();
+	freemsg(mp);
+	return (-EFAULT);
+}
 
 /**
  * ss7_iput: - canonical put procedure for the input side
@@ -822,16 +855,25 @@ ss7_iput(queue_t *q, mblk_t *mp)
 			ss7_putq(s->iq, mp, s->i_prim);
 			return (0);
 		}
-		swerr();
-		if (s->iq->q_qinfo->qi_srvp && putq(s->iq, mp))
-			return (0);	/* recovered */
 	}
-	swerr();
-	freemsg(mp);
-	return (-EFAULT);
+	return ss7_iput_slow(s, mp);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_iput);
+
+static streams_noinline streams_fastcall int
+ss7_isrv_slow(str_t * s, queue_t *q)
+{
+	if (likely(s->iq != NULL)) {
+		if (s->i_wakeup) {
+			s->i_wakeup(s->iq);
+			return (0);
+		}
+	}
+	swerr();
+	noenable(q);
+	return (-EFAULT);
+}
 
 /**
  * ss7_isrv: - canoncial service procedure for the input side
@@ -850,14 +892,9 @@ ss7_isrv(queue_t *q)
 		if (likely(s->i_prim != NULL)) {
 			ss7_srvq(s->iq, s->i_prim, s->i_wakeup);
 			return (0);
-		} else if (s->i_wakeup) {
-			s->i_wakeup(s->iq);
-			return (0);
 		}
 	}
-	swerr();
-	noenable(q);
-	return (-EFAULT);
+	return ss7_isrv_slow(s, q);
 }
 
 EXPORT_SYMBOL_NOVERS(ss7_isrv);

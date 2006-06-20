@@ -1,3 +1,7 @@
+2006-06-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c: some optimization; dest caching
+
 2006-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/rawip.c: use msgsize instead of msgdsize

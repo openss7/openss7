@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2006/06/18 20:54:08 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2006/06/19 20:51:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/18 20:54:08 $ by $Author: brian $
+ Last Modified $Date: 2006/06/19 20:51:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.152  2006/06/19 20:51:28  brian
+ - more optimizations
+
  Revision 0.9.2.151  2006/06/18 20:54:08  brian
  - minor optimizations from profiling
 
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2006/06/18 20:54:08 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2006/06/19 20:51:28 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2006/06/18 20:54:08 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2006/06/19 20:51:28 $";
 
 //#define __NO_VERSION__
 
@@ -188,7 +191,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2006/06/18 20:54:08 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2006/06/19 20:51:28 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -630,8 +633,8 @@ pgrp_session(pid_t pgrp)
  *  Use an explicit constant for @access so that many instructions will be inlined out.
  *
  */
-STATIC streams_inline streams_fastcall __hot int
-straccess(struct stdata *sd, const register int access)
+STATIC streams_noinline streams_fastcall __unlikely int
+straccess_slow(struct stdata *sd, const register int access, const register int flags)
 {
 #if defined HAVE_IS_IGNORED_ADDR
 	static int (*is_ignored) (int sig) = (typeof(is_ignored)) HAVE_IS_IGNORED_ADDR;
@@ -640,7 +643,6 @@ straccess(struct stdata *sd, const register int access)
 	static int (*is_orphaned_pgrp) (int pgrp) =
 	    (typeof(is_orphaned_pgrp)) HAVE_IS_ORPHANED_PGRP_ADDR;
 #endif
-	register int flags = sd->sd_flag;
 
 	/* POSIX semantics for pipes and FIFOs */
 	if (likely(access & (FREAD | FWRITE))) {
@@ -746,8 +748,41 @@ straccess(struct stdata *sd, const register int access)
 	return (0);
 }
 
+STATIC streams_inline streams_fastcall __hot int
+straccess(struct stdata *sd, const register int access)
+{
+	register int flags = sd->sd_flag;
+
+	/* POSIX semantics for pipes and FIFOs */
+	if (likely(access & (FREAD | FWRITE))) {
+		if (unlikely((flags & STRISPIPE) != 0)) {
+			if (likely((access & (FREAD | FWRITE)) != 0))
+				if (unlikely
+				    (sd->sd_other == NULL
+				     || (sd->sd_other->sd_flag & STRCLOSE) != 0))
+					goto go_slow;
+		}
+		if ((unlikely(flags & STRISFIFO) != 0)) {
+			if (likely((access & FREAD) != 0))
+				if (unlikely(sd->sd_writers == 0))
+					goto go_slow;
+			if (likely((access & FWRITE) != 0))
+				if (unlikely(sd->sd_readers == 0))
+					goto go_slow;
+		}
+	}
+	/* no errors for close */
+	if (likely((access & FTRUNC) == 0))	/* PROFILED */
+		if (unlikely((flags & (STPLEX | STRCLOSE | STRDERR | STWRERR | STRHUP)) != 0))
+			goto go_slow;
+	if (likely((flags & STRISTTY) == 0))	/* PROFILED */
+		return (0);
+      go_slow:
+	return straccess_slow(sd, access, flags);
+}
+
 STATIC streams_noinline streams_fastcall int
-straccess_slow(struct stdata *sd, int access)
+straccess_noinline(struct stdata *sd, int access)
 {				/* PROFILED */
 	return straccess(sd, access);
 }
@@ -803,7 +838,7 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 {				/* PROFILED */
 	int err;
 
-	if (unlikely((err = straccess_slow(sd, access)) != 0))
+	if (unlikely((err = straccess_noinline(sd, access)) != 0))
 		return (err);
 	if (unlikely(signal_pending(current)))
 		return ((*timeo == MAX_SCHEDULE_TIMEOUT) ? -ERESTARTSYS : -EINTR);
@@ -1239,60 +1274,15 @@ strsignal_locked(struct stdata *sd, mblk_t *mp, const int access)
  *  -------------------------------------------------------------------------
  */
 
-/**
- *  strgetq: - get a message from a stream ala getpmsg
- *  @sd: stream head
- *  @q: stream head read queue
- *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
- *  @band: band from which to retrieve message
- *  @plp: pointer to save irq flags.
- *
- *  LOCKING: This function must be called with the Stream head read locked.
- *
- *  We freeze the Stream so that we can do getq() in one place and put it back with putbq() in
- *  another (or search the queue and use rmvq()) without races with other procedures acting on the
- *  queue.  Also there needs to be atomicity between setting or clearing the STRPRI bit and placing
- *  or removing an M_PCPROTO from the queue.  The write lock acheives that atomicity too.  Perhaps
- *  we should not even use the STRPRI bit, because we could always check
- *  q->q_first->b_datap->db_type with the queue locked, but that is 3 pointer dereferences.  But,
- *  perhaps we don't need to use atomic bit operations on the STRPRI bit inside the locks.
- *
- *  strgetq() is almost identical to sgtgetfp().  The only difference is that strgetq() will
- *  retrieve an M_PROTO, M_PCPROTO or M_DATA message and return EBADMSG on M_PASSFP, and for
- *  strgetfp() the situation is reversed.  Both procedures handle M_SIG messages the same.
- *
- *  NOTICES: Note that M_PCPROTO is the only priority message that we place on the stream head read
- *  queue, so if the STRPRI bit is set, there is one (and only one) there.  We leave the STRPRI bit
- *  set because we need to release locks between taking the message off and putting it back.
- *  strread() and strgetpmsg() will clear the bit if necessary after the final disposition of the
- *  message is known.
- *
- *  PROFILING NOTES: This function didn't event take a hit, but it is done under locks and we only
- *  used timer interrupts.  The rest are guesses.
- */
-STATIC streams_inline streams_fastcall __hot_in mblk_t *
-strgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
+STATIC streams_noinline streams_fastcall __unlikely mblk_t *
+strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band, unsigned long pl)
 {				/* IRQ SUPPRESSED */
 	mblk_t *b = NULL;
-	unsigned long pl;
 	int err;
 
-	pl = zwlock(sd);
 	/* like a mini service procedure */
 	while (likely((b = q->q_first) != NULL)) {
-		int type = b->b_datap->db_type;
-
-		/* fast path for data */
-		if (likely(type == M_DATA) || likely(type == M_PROTO)) {
-			if (unlikely(flags == MSG_HIPRI || b->b_band < band))
-				goto ebadmsg;
-			if (b->b_next && unlikely(b->b_next->b_datap->db_type == M_SIG))
-				set_bit(STRMSIG_BIT, &sd->sd_flag);
-			rmvq(q, b);
-			zwunlock(sd, pl);
-			return (b);
-		}
-		switch (type) {
+		switch (b->b_datap->db_type) {
 		case M_PROTO:
 		case M_DATA:
 			if (unlikely(flags == MSG_HIPRI || b->b_band < band))
@@ -1329,6 +1319,61 @@ strgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 	goto error;
 }
 
+/**
+ *  strgetq: - get a message from a stream ala getpmsg
+ *  @sd: stream head
+ *  @q: stream head read queue
+ *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
+ *  @band: band from which to retrieve message
+ *  @plp: pointer to save irq flags.
+ *
+ *  LOCKING: This function must be called with the Stream head read locked.
+ *
+ *  We freeze the Stream so that we can do getq() in one place and put it back with putbq() in
+ *  another (or search the queue and use rmvq()) without races with other procedures acting on the
+ *  queue.  Also there needs to be atomicity between setting or clearing the STRPRI bit and placing
+ *  or removing an M_PCPROTO from the queue.  The write lock acheives that atomicity too.  Perhaps
+ *  we should not even use the STRPRI bit, because we could always check
+ *  q->q_first->b_datap->db_type with the queue locked, but that is 3 pointer dereferences.  But,
+ *  perhaps we don't need to use atomic bit operations on the STRPRI bit inside the locks.
+ *
+ *  strgetq() is almost identical to sgtgetfp().  The only difference is that strgetq() will
+ *  retrieve an M_PROTO, M_PCPROTO or M_DATA message and return EBADMSG on M_PASSFP, and for
+ *  strgetfp() the situation is reversed.  Both procedures handle M_SIG messages the same.
+ *
+ *  NOTICES: Note that M_PCPROTO is the only priority message that we place on the stream head read
+ *  queue, so if the STRPRI bit is set, there is one (and only one) there.  We leave the STRPRI bit
+ *  set because we need to release locks between taking the message off and putting it back.
+ *  strread() and strgetpmsg() will clear the bit if necessary after the final disposition of the
+ *  message is known.
+ *
+ *  PROFILING NOTES: This function didn't event take a hit, but it is done under locks and we only
+ *  used timer interrupts.  The rest are guesses.
+ */
+STATIC streams_inline streams_fastcall __hot_in mblk_t *
+strgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
+{				/* IRQ SUPPRESSED */
+	mblk_t *b = NULL;
+	unsigned long pl;
+
+	pl = zwlock(sd);
+	/* fast path for data */
+	if (unlikely((b = q->q_first) == NULL))
+		goto unlock_return;
+	if (unlikely((b->b_datap->db_type & ~1) != 0))
+		goto go_slow;
+	if (unlikely(flags == MSG_HIPRI || b->b_band < band))
+		goto go_slow;
+	if (unlikely(b->b_next && b->b_next->b_datap->db_type == M_SIG))
+		set_bit(STRMSIG_BIT, &sd->sd_flag);
+	rmvq(q, b);
+      unlock_return:
+	zwunlock(sd, pl);
+	return (b);
+      go_slow:
+	return strgetq_slow(sd, q, flags, band, pl);
+}
+
 STATIC streams_fastcall void
 strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 {				/* IRQ SUPPRESSED */
@@ -1344,12 +1389,6 @@ strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 		clear_bit(STRMSIG_BIT, &sd->sd_flag);
 	insq(q, q->q_first, mp);
 	zwunlock(sd, pl);
-}
-
-STATIC streams_noinline streams_fastcall __hot_in mblk_t *
-strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band)
-{				/* IRQ SUPPRESSED */
-	return strgetq(sd, q, flags, band);
 }
 
 /**
@@ -1401,7 +1440,7 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 			mp = ERR_PTR(-EINTR);
 			break;
 		}
-		if (likely((mp = strgetq_slow(sd, q, flags, band)) != NULL))
+		if (likely((mp = strgetq(sd, q, flags, band)) != NULL))
 			break;
 		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
@@ -1843,7 +1882,7 @@ __strwaitopen(struct stdata *sd, const int access)
 		set_current_state(TASK_INTERRUPTIBLE);
 #endif
 		swlock(sd);
-		if ((err = straccess_slow(sd, access)))
+		if ((err = straccess_noinline(sd, access)))
 			break;
 		if (signal_pending(current)) {
 			err = -EINTR;
@@ -8809,7 +8848,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		swlock(sd);
 	else if (locking & FREAD)
 		srlock(sd);
-	if ((access != (FREAD | FWRITE)) || unlikely((err = straccess_slow(sd, access)) != 0))
+	if ((access != (FREAD | FWRITE)) || unlikely((err = straccess_noinline(sd, access)) != 0))
 		err = str_i_default(file, sd, cmd, arg, length, access, IOC_ILP32);
 	if (locking & FWRITE)
 		swunlock(sd);
@@ -8852,8 +8891,8 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
  *  used to point to the stream head at the other end of a pipe (i.e., when %STRISPIPE is
  *  set).
  */
-STATIC streams_inline streams_fastcall __hot int
-strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
+STATIC streams_noinline streams_fastcall int
+strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct stdata *sd = stri_lookup(file);
 	int access = FNDELAY;		/* default access check is for io */
@@ -8868,16 +8907,6 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 	if (unlikely((file->f_flags & FILP32) == FILP32))
 		return strioctl_compat(file, cmd, arg);
 #endif				/* defined WITH_32BIT_CONVERSION */
-
-	/* Fast path for data -- PROFILED */
-	if (likely(cmd == I_GETPMSG)) {	/* getpmsg syscall emulation */
-		_printd(("%s: got I_GETPMSG\n", __FUNCTION__));
-		return str_i_getpmsg(file, sd, arg);
-	}
-	if (likely(cmd == I_PUTPMSG)) {	/* putpmsg syscall emulation */
-		_printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
-		return str_i_putpmsg(file, sd, arg);
-	}
 
 	switch (_IOC_TYPE(cmd)) {
 	case _IOC_TYPE(I_STR):
@@ -9292,7 +9321,7 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 		swlock(sd);
 	else if (locking & FREAD)
 		srlock(sd);
-	if ((access != (FREAD | FWRITE)) || unlikely((err = straccess_slow(sd, access)) != 0))
+	if ((access != (FREAD | FWRITE)) || unlikely((err = straccess_noinline(sd, access)) != 0))
 		err = str_i_default(file, sd, cmd, arg, length, access, IOC_NATIVE);
 	if (locking & FWRITE)
 		swunlock(sd);
@@ -9301,13 +9330,33 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 	return (err);
 }
 
-STATIC streams_noinline streams_fastcall __hot int
-strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
+STATIC streams_inline streams_fastcall __hot int
+strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 {
-	return strioctl_fast(file, cmd, arg);
+	struct stdata *sd = stri_lookup(file);
+
+	if (unlikely(!sd))
+		goto go_slow;
+
+#if defined WITH_32BIT_CONVERSION
+	if (unlikely((file->f_flags & FILP32) == FILP32))
+		goto go_slow;
+#endif
+
+	/* Fast path for data -- PROFILED */
+	if (likely(cmd == I_PUTPMSG)) { /* putpmsg syscall emulation */
+		_printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
+		return str_i_putpmsg(file, sd, arg);
+	}
+	if (likely(cmd == I_GETPMSG)) {	/* getpmsg syscall emulation */
+		_printd(("%s: got I_GETPMSG\n", __FUNCTION__));
+		return str_i_getpmsg(file, sd, arg);
+	}
+     go_slow:
+	return strioctl_slow(file, cmd, arg);
 }
 
-streams_fastcall __hot int
+streams_fastcall int
 strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	return strioctl_slow(file, cmd, arg);
@@ -10299,31 +10348,19 @@ str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
  *  In stead of putting everything in one big case statement (as is the practice for STREAMS), we
  *  do it with inlines so that we have a call stack in debug mode.
  */
-streamscall __hot_in int
-strrput(queue_t *q, mblk_t *mp)
+STATIC streams_noinline streams_fastcall __unlikely int
+strrput_slow(queue_t *q, mblk_t *mp)
 {
-	struct stdata *sd;
-	int db_type;
+	struct stdata *sd = qstream(q);
 	int err;
 
-	assert(q);
-	assert(mp);
-
-	sd = qstream(q);
-
-	assert(sd);
-
-	/* data fast path */
-	if (likely(((db_type = mp->b_datap->db_type) & ~1) == 0))	/* PROFILED */
-	      m_data:
-		return str_m_data(sd, q, mp);
-
-	switch (db_type) {
+	switch (mp->b_datap->db_type) {
 	case M_DATA:		/* bi - data */
 	case M_PROTO:		/* bi - protocol info */
 	case M_PASSFP:		/* bi - pass file pointer */
 		_printd(("%s: got M_DATA, M_PROTO or M_PASSFP\n", __FUNCTION__));
-		goto m_data;
+		err = str_m_data(sd, q, mp);
+		break;
 	case M_PCPROTO:	/* bi - protocol info */
 		_printd(("%s: got M_PCPROTO\n", __FUNCTION__));
 		err = str_m_pcproto(sd, q, mp);
@@ -10400,6 +10437,17 @@ strrput(queue_t *q, mblk_t *mp)
 		break;
 	}
 	return (err);
+}
+
+streamscall __hot_in int
+strrput(queue_t *q, mblk_t *mp)
+{
+	struct stdata *sd = qstream(q);
+
+	/* data fast path */
+	if (likely((mp->b_datap->db_type & ~1) == 0)) /* PROFILED */
+		return str_m_data(sd, q, mp);
+	return strrput_slow(q, mp);
 }
 
 #if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \

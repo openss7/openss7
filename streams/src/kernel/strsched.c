@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/06/18 20:54:04 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/06/19 20:51:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/18 20:54:04 $ by $Author: brian $
+ Last Modified $Date: 2006/06/19 20:51:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.136  2006/06/19 20:51:27  brian
+ - more optimizations
+
  Revision 0.9.2.135  2006/06/18 20:54:04  brian
  - minor optimizations from profiling
 
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/06/18 20:54:04 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/06/19 20:51:27 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/06/18 20:54:04 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/06/19 20:51:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1078,7 +1081,7 @@ mdbblock_free(mblk_t *mp)
  *  then work on them one by one.  After we free something, we want to raise pending buffer
  *  callbacks on all STREAMS scheduler threads in an attempt to let them use the freed blocks.
  */
-STATIC streams_noinline streams_fastcall void
+STATIC streams_noinline streams_fastcall __unlikely void
 freeblocks(struct strthread *t)
 {
 	mblk_t *mp, *mp_next;
@@ -2100,7 +2103,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 		/* prefetch private structure */
 		prefetch(q->q_ptr);
 
-#if 0
+#if 1
 		/* prefetch most used message components */
 		prefetch(mp->b_datap);
 		prefetch(mp->b_rptr);
@@ -2689,6 +2692,25 @@ qputp_slow(queue_t *q, mblk_t *mp)
 	qputp(q, mp);
 }
 
+static streams_noinline streams_fastcall __unlikely int
+put_filter(queue_t **qp, mblk_t *mp)
+{
+	queue_t *q = *qp;
+	/* This AIX message filtering thing is really bad for performance when done the old way
+	   (from qputp()). Consider that if there are 100 modules on the Stream, the old way will
+	   check 5000 times.  This can be done by put(), but NOT by putnext()! */
+	while (q && q->q_ftmsg && !q->q_ftmsg(mp))
+		q = q->q_next;
+	if (unlikely(q == NULL)) {
+		_ptrace(("message filtered, discarding\n"));
+		/* no queue wants the message - throw it away */
+		freemsg(mp);
+		return (1);
+	}
+	*qp = q;
+	return (0);
+}
+
 /**
  *  put:	- call a queue's qi_putq() procedure
  *  @q:		the queue's procedure to call
@@ -2759,18 +2781,8 @@ put(queue_t *q, mblk_t *mp)
 #endif
 
 		if (unlikely(q->q_ftmsg != NULL)) {
-			/* This AIX message filtering thing is really bad for performance when done 
-			   the old way (from qputp()). Consider that if there are 100 modules on
-			   the Stream, the old way will check 5000 times.  This can be done by
-			   put(), but NOT by putnext()! */
-			while (q && q->q_ftmsg && !q->q_ftmsg(mp))
-				q = q->q_next;
-			if (unlikely(q == NULL)) {
-				_ptrace(("message filtered, discarding\n"));
-				/* no queue wants the message - throw it away */
-				freemsg(mp);
+			if (put_filter(&q, mp))
 				goto done;
-			}
 		}
 #ifdef CONFIG_STREAMS_SYNCQS
 		_ctrace(qputp(q, mp));
@@ -3578,7 +3590,7 @@ EXPORT_SYMBOL_NOVERS(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
  *
  *  Process all message functions deferred from hardirq in the order in which they were received.
  */
-STATIC streams_noinline streams_fastcall void
+STATIC streams_noinline streams_fastcall __unlikely void
 domfuncs(struct strthread *t)
 {
 	do {
@@ -3610,7 +3622,7 @@ domfuncs(struct strthread *t)
  *  
  *  Process all oustanding timeouts in the order in which they were received.
  */
-STATIC streams_noinline streams_fastcall void
+STATIC streams_noinline streams_fastcall __unlikely void
 timeouts(struct strthread *t)
 {
 	do {
@@ -3726,7 +3738,7 @@ scanqueues(struct strthread *t)
  *  doevents:	- process STREAMS events
  *  @t:		STREAMS execution thread
  */
-STATIC streams_noinline streams_fastcall void
+STATIC streams_noinline streams_fastcall __unlikely void
 doevents(struct strthread *t)
 {
 	struct strevent *se, *se_next;
@@ -3905,7 +3917,7 @@ runsyncq(struct syncq *sq)
  *  access was requested.  This is acceptable and reduces the burder of tracking two perimeters with
  *  shared or exclusive access.
  */
-STATIC streams_noinline streams_fastcall void
+STATIC streams_noinline streams_fastcall __unlikely void
 backlog(struct strthread *t)
 {
 	syncq_t *sq, *sq_link;
@@ -3942,7 +3954,7 @@ backlog(struct strthread *t)
  *  subsystem will hang until an external event kicks it.  Therefore, we kick the chain every time
  *  an allocation is successful.
  */
-STATIC streams_noinline streams_fastcall void
+STATIC streams_noinline streams_fastcall __unlikely void
 bufcalls(struct strthread *t)
 {
 	struct strevent *se, *se_next;
@@ -4041,7 +4053,7 @@ sqsched(syncq_t *sq)
  *  Free chains of message blocks outstanding from flush operations that were left over at the end
  *  of the CPU run.
  */
-STATIC streams_noinline streams_fastcall void
+STATIC streams_noinline streams_fastcall __unlikely void
 freechains(struct strthread *t)
 {
 	mblk_t *mp, *mp_next;
@@ -4090,6 +4102,39 @@ freechain(mblk_t *mp, mblk_t **mpp)
 	}
 }
 
+STATIC streams_noinline streams_fastcall __unlikely void
+__runqueues_slow(struct strthread *t)
+{
+	/* free flush chains if necessary */
+	if (unlikely(test_bit(flushwork, &t->flags) != 0))
+		_ctrace(freechains(t));
+#if !defined SLAB_DESTROY_BY_RCU
+	/* free mdbblocks to cache, if memory needed */
+	if (unlikely(test_bit(freeblks, &t->flags) != 0))
+		_ctrace(freeblocks(t));
+#endif
+	/* do deferred m_func's first */
+	if (unlikely(test_bit(strmfuncs, &t->flags) != 0))
+		_ctrace(domfuncs(t));
+#if defined CONFIG_STREAMS_SYNCQS
+	/* catch up on backlog first */
+	if (unlikely(test_bit(qsyncflag, &t->flags) != 0))
+		_ctrace(backlog(t));
+#endif
+	/* do timeouts */
+	if (unlikely(test_bit(strtimout, &t->flags) != 0))
+		_ctrace(timeouts(t));
+	/* do stream head write queue scanning */
+	if (unlikely(test_bit(scanqflag, &t->flags) != 0))
+		_ctrace(scanqueues(t));
+	/* do pending events */
+	if (unlikely(test_bit(strevents, &t->flags) != 0))
+		_ctrace(doevents(t));
+	/* do buffer calls if necessary */
+	if (unlikely(test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags)))
+		_ctrace(bufcalls(t));
+}
+
 /*
  *  __runqueues:	- run scheduled STRAMS events on the current processor
  *  @unused:	unused
@@ -4123,37 +4168,8 @@ __runqueues(struct softirq_action *unused)
 			_ctrace(queuerun(t));
 		if (unlikely((t->flags & (FLUSHWORK | FREEBLKS | STRMFUNCS | QSYNCFLAG |
 					  STRTIMOUT | SCANQFLAG | STREVENTS | STRBCFLAG |
-					  STRBCWAIT)) != 0)) {
-			/* free flush chains if necessary */
-			if (unlikely(test_bit(flushwork, &t->flags) != 0))
-				_ctrace(freechains(t));
-#if !defined SLAB_DESTROY_BY_RCU
-			/* free mdbblocks to cache, if memory needed */
-			if (unlikely(test_bit(freeblks, &t->flags) != 0))
-				_ctrace(freeblocks(t));
-#endif
-			/* do deferred m_func's first */
-			if (unlikely(test_bit(strmfuncs, &t->flags) != 0))
-				_ctrace(domfuncs(t));
-#if defined CONFIG_STREAMS_SYNCQS
-			/* catch up on backlog first */
-			if (unlikely(test_bit(qsyncflag, &t->flags) != 0))
-				_ctrace(backlog(t));
-#endif
-			/* do timeouts */
-			if (unlikely(test_bit(strtimout, &t->flags) != 0))
-				_ctrace(timeouts(t));
-			/* do stream head write queue scanning */
-			if (unlikely(test_bit(scanqflag, &t->flags) != 0))
-				_ctrace(scanqueues(t));
-			/* do pending events */
-			if (unlikely(test_bit(strevents, &t->flags) != 0))
-				_ctrace(doevents(t));
-			/* do buffer calls if necessary */
-			if (unlikely
-			    (test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags)))
-				_ctrace(bufcalls(t));
-		}
+					  STRBCWAIT)) != 0))
+			__runqueues_slow(t);
 		clear_bit(qwantrun, &t->flags);
 	} while (unlikely(t->flags & (QRUNFLAGS)));
 

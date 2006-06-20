@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/06/18 20:54:05 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/06/19 20:51:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/18 20:54:05 $ by $Author: brian $
+ Last Modified $Date: 2006/06/19 20:51:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.127  2006/06/19 20:51:28  brian
+ - more optimizations
+
  Revision 0.9.2.126  2006/06/18 20:54:05  brian
  - minor optimizations from profiling
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/06/18 20:54:05 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/06/19 20:51:28 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/06/18 20:54:05 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/06/19 20:51:28 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -117,20 +120,24 @@ static char const ident[] =
 
 STATIC spinlock_t db_ref_lock = SPIN_LOCK_UNLOCKED;
 
-STATIC void
+STATIC streams_noinline streams_fastcall __unlikely void
+db_inc_slow(dblk_t *db)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&db_ref_lock, flags);
+	++db->db_ref;
+	spin_unlock_irqrestore(&db_ref_lock, flags);
+}
+
+STATIC streams_inline streams_fastcall __hot_get void
 db_inc(dblk_t * db)
 {
 	/* When the number of references is 1 the buffer is exclusive to the
 	 * caller and locking is not required. */
 	if (likely(db->db_ref == 1))
 		return (void) (db->db_ref = 2);
-	{
-		unsigned long flags;
-
-		spin_lock_irqsave(&db_ref_lock, flags);
-		++db->db_ref;
-		spin_unlock_irqrestore(&db_ref_lock, flags);
-	}
+	return db_inc_slow(db);
 }
 
 STATIC streams_inline streams_fastcall __hot_in int
@@ -508,20 +515,25 @@ freeb(mblk_t *mp)
 	_printd(("%s: freeing mblk %p, refs %d\n", __FUNCTION__, mp, (int) (db ? db->db_ref : 0)));
 
 	/* check double free */
-	assert(db != NULL);
-	assert(db->db_ref > 0);
+	dassert(db != NULL);
+	dassert(db->db_ref > 0);
 
 	/* message block marked free above */
 	if (likely(db_dec_and_test(db) != 0)) {
 		/* free data block */
 		mblk_t *mb = db_to_mb(db);
 
-		if (unlikely(db->db_base != db_to_buf(db))) {
+		if (likely(db->db_base != db_to_buf(db))) {
+			register struct free_rtn *frtnp;
+
 			/* handle external data buffer */
-			if (!db->db_frtnp)
+			if ((frtnp = db->db_frtnp)) {
+				register void streamscall (*free_func) (caddr_t);
+
+				if ((free_func = frtnp->free_func))
+					free_func(frtnp->free_arg);
+			} else
 				kmem_free(db->db_base, db->db_size);
-			else if (db->db_frtnp->free_func)
-				db->db_frtnp->free_func(db->db_frtnp->free_arg);
 		}
 		/* the entire mdbblock can go if the associated msgb is also unused */
 		if (likely(mb->b_datap == NULL))
@@ -530,8 +542,10 @@ freeb(mblk_t *mp)
 	/* if the message block refers to the associated data block then we have already freed the
 	   mdbblock above when necessary; otherwise the entire mdbblock can go if the datab is also 
 	   unused */
-	if (unlikely(db != (dp = mb_to_db(mp)) && !dp->db_ref))
+	if (unlikely(db != (dp = mb_to_db(mp)) && !dp->db_ref)) {
 		mdbblock_free(mp);
+		return;
+	}
 	return;
 }
 
@@ -744,15 +758,21 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 		/* free data block */
 		mblk_t *mb = db_to_mb(db);
 
-		if (db->db_base != db_to_buf(db)) {
+		if (likely(db->db_base != db_to_buf(db))) {
+			register struct free_rtn *frtnp;
+
 			/* handle external data buffer */
-			if (!db->db_frtnp)
+			if ((frtnp = db->db_frtnp)) {
+				register void streamscall (*free_func) (caddr_t);
+
+				if ((free_func = frtnp->free_func))
+					free_func(frtnp->free_arg);
+
+			} else
 				kmem_free(db->db_base, db->db_size);
-			else if (db->db_frtnp->free_func)
-				db->db_frtnp->free_func(db->db_frtnp->free_arg);
 		}
 		/* the entire mdbblock can go if the associated msgb is also unused */
-		if (!mb->b_datap)
+		if (likely(mb->b_datap == NULL))
 			mdbblock_free(mb);
 	}
 	for (mpp = &mp->b_cont; (bp = *mpp);) {
@@ -882,7 +902,7 @@ STATIC struct qband *__get_qband(queue_t *q, unsigned char band);
  *  takes a Stream head read lock.  This is a little bit overkill for intermediate modules, so we
  *  now only take a Stream head read lock if the queue is a Stream end (i.e., no q->q_next pointer).
  */
-streams_fastcall void
+streams_noinline streams_fastcall void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
 	queue_t *q_back;
@@ -1141,6 +1161,26 @@ __get_qband(queue_t *q, unsigned char band)
 	return (qb);
 }
 
+STATIC streams_noinline streams_fastcall __unlikely int
+__bcanput_slow(queue_t *q, unsigned char band)
+{
+	unsigned long pl;
+
+	pl = qrlock(q);
+	if (likely(band <= q->q_nband && q->q_blocked > 0)) {
+		struct qband *qb;
+
+		if ((qb = __find_qband(q, band)) && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
+			set_bit(QB_WANTW_BIT, &qb->qb_flag);
+			qrunlock(q, pl);
+			return (0);
+		}
+	}
+	/* Note: a non-existent band is considered empty */
+	qrunlock(q, pl);
+	return (1);
+}
+
 /*
  *  __bcanput:
  *
@@ -1165,39 +1205,27 @@ __get_qband(queue_t *q, unsigned char band)
 STATIC streams_inline streams_fastcall __hot_out int
 __bcanput(queue_t *q, unsigned char band)
 {
-	int result = 1;
 	unsigned long pl;
 	queue_t *q_next;
 
 	/* It might be an idea to cache the forward queue with a service procedure as Solaris does.
-	 * Solaris uses a q_nfsrv pointer for this that is adjusted when the driver is attached and
-	 * when modules are pushed or popped.  It's just so much trouble to go to... */
+	   Solaris uses a q_nfsrv pointer for this that is adjusted when the driver is attached and
+	   when modules are pushed or popped.  It's just so much trouble to go to... */
 
 	/* find first queue with service procedure or no q_next pointer */
 	for (q_next = q; !q->q_qinfo->qi_srvp && (q_next = q->q_next); q = q_next) ;
 
-	pl = qrlock(q);
-
 	if (likely(band == 0)) {
-		if (test_bit(QFULL_BIT, &q->q_flag)) {
-			set_bit(QWANTW_BIT, &q->q_flag);
-			result = 0;
+		pl = qrlock(q);
+		if (likely(test_bit(QFULL_BIT, &q->q_flag) == 0)) {
+			qrunlock(q, pl);
+			return (1);
 		}
-	} else {
-		struct qband *qb;
-
-		if (likely(band <= q->q_nband && q->q_blocked > 0)) {
-			if ((qb = __find_qband(q, band)) && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
-				set_bit(QB_WANTW_BIT, &qb->qb_flag);
-				result = 0;
-			}
-		}
-		/* Note: a non-existent band is considered empty */
+		set_bit(QWANTW_BIT, &q->q_flag);
+		qrunlock(q, pl);
+		return (0);
 	}
-
-	qrunlock(q, pl);
-
-	return (result);
+	return __bcanput_slow(q, band);
 }
 
 /**
@@ -1680,6 +1708,34 @@ __putbq(queue_t *q, mblk_t *mp)
 	}
 }
 
+STATIC streams_noinline streams_fastcall int
+putbq_result(queue_t *q, const int result)
+{
+	switch (result) {
+	case 3:		/* success - high priority enable */
+		qenable(q);
+		break;
+	case 2:		/* success - enable if not noenabled */
+		enableq(q);
+		break;
+	case 1:		/* success - don't enable */
+		break;
+	default:
+		assert(result == 0);
+	case 0:		/* failure */
+		assert(0);
+		/* This should never happen, because it takes a qband structure allocation failure
+		   to get here, and since we are putting the message back on the queue, there
+		   should already be a qband structure. Unless, however, putbq() is just used to
+		   insert messages ahead of others rather than really putting them back.
+		   Nevertheless, a way to avoid this error is to always ensure that a qband
+		   structure exists (e.g., with strqset) before calling putbq on a band for the
+		   first time. */
+		return (0);
+	}
+	return (1);
+}
+
 /**
  *  putbq:	- put a message back on a queue
  *  @q:		queue to place back message
@@ -1699,31 +1755,9 @@ putbq(register queue_t *q, register mblk_t *mp)
 	pl = qwlock(q);
 	result = __putbq(q, mp);
 	qwunlock(q, pl);
-	if (unlikely(result != 1)) {
-		switch (result) {
-		case 3:	/* success - high priority enable */
-			qenable(q);
-			break;
-		case 2:	/* success - enable if not noenabled */
-			enableq(q);
-			break;
-		case 1:	/* success - don't enable */
-			break;
-		default:
-			assert(result == 0);
-		case 0:	/* failure */
-			assert(0);
-			/* This should never happen, because it takes a qband structure allocation
-			   failure to get here, and since we are putting the message back on the
-			   queue, there should already be a qband structure. Unless, however,
-			   putbq() is just used to insert messages ahead of others rather than
-			   really putting them back. Nevertheless, a way to avoid this error is to
-			   always ensure that a qband structure exists (e.g., with strqset) before
-			   calling putbq on a band for the first time. */
-			return (0);
-		}
-	}
-	return (1);
+	if (likely(result == 1))
+		return (1);
+	return putbq_result(q, result);
 }
 
 EXPORT_SYMBOL_NOVERS(putbq);
@@ -1894,7 +1928,7 @@ EXPORT_SYMBOL_NOVERS(putnextctl2);
  *  1) When a banded message arrives at an empty queue band, should the queue be enabled?
  *
  */
-STATIC streams_fastcall int
+STATIC streams_inline streams_fastcall __hot int
 __putq(queue_t *q, mblk_t *mp)
 {
 	int enable;
@@ -1961,6 +1995,31 @@ __putq(queue_t *q, mblk_t *mp)
 	}
 }
 
+STATIC streams_noinline streams_fastcall int
+putq_result(queue_t *q, mblk_t *mp, const int result)
+{
+	switch (result) {
+	case 3:		/* success - high priority enable */
+		qenable(q);
+		break;
+	case 2:		/* success - enable if not noenabled */
+		enableq(q);
+		break;
+	case 1:		/* success - don't enable */
+		break;
+	default:
+		assert(result == 0);
+	case 0:		/* failure */
+		assert(mp->b_band != 0);
+		/* This can happen and it is bad.  We use the return value to putq but it is
+		   typically ignored by the module.  One way to ensure that this never happens is
+		   to call strqset() for the band before calling putq on the band for the first
+		   time. (See also putbq()) */
+		return (0);
+	}
+	return (1);
+}
+
 /**
  *  putq:	- put a message block to a queue
  *  @q:		queue to which to put the message
@@ -1969,7 +2028,7 @@ __putq(queue_t *q, mblk_t *mp)
  *  CONTEXT: Any.  It is safe to call this function directly from an ISR to place messages on a
  *  driver's lowest read queue.  Should not be frozen by the caller.
  */
-streams_fastcall int
+streams_fastcall __hot int
 putq(register queue_t *q, register mblk_t *mp)
 {
 	int result;
@@ -1983,28 +2042,9 @@ putq(register queue_t *q, register mblk_t *mp)
 	pl = qwlock(q);
 	result = __putq(q, mp);
 	qwunlock(q, pl);
-	if (unlikely(result != 1)) {
-		switch (result) {
-		case 3:	/* success - high priority enable */
-			qenable(q);
-			break;
-		case 2:	/* success - enable if not noenabled */
-			enableq(q);
-			break;
-		case 1:	/* success - don't enable */
-			break;
-		default:
-			assert(result == 0);
-		case 0:	/* failure */
-			assert(mp->b_band != 0);
-			/* This can happen and it is bad.  We use the return value to putq but it
-			   is typically ignored by the module.  One way to ensure that this never
-			   happens is to call strqset() for the band before calling putq on the
-			   band for the first time. (See also putbq()) */
-			return (0);
-		}
-	}
-	return (1);
+	if (likely(result == 1))
+		return (1);
+	return putq_result(q, mp, result);
 }
 
 EXPORT_SYMBOL_NOVERS(putq);
@@ -2090,6 +2130,27 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	}
 }
 
+STATIC streams_noinline streams_fastcall int
+insq_result(queue_t *q, const int result)
+{
+	switch (result) {
+	case 3:		/* success - high priority enable */
+		assert(0);
+		qenable(q);
+		break;
+	case 2:		/* success - enable if not noenabled */
+		enableq(q);
+		break;
+	case 1:		/* success - don't enable */
+		break;
+	default:
+		never();
+	case 0:		/* failure */
+		return (0);
+	}
+	return (1);
+}
+
 /**
  *  insq:	- insert a message before another on a queue
  *  @q:		the queue into which to insert
@@ -2114,24 +2175,9 @@ insq(register queue_t *q, register mblk_t *emp, register mblk_t *nmp)
 	pl = qwlock(q);
 	result = __insq(q, emp, nmp);
 	qwunlock(q, pl);
-	if (unlikely(result != 1)) {
-		switch (result) {
-		case 3:	/* success - high priority enable */
-			assert(0);
-			qenable(q);
-			break;
-		case 2:	/* success - enable if not noenabled */
-			enableq(q);
-			break;
-		case 1:	/* success - don't enable */
-			break;
-		default:
-			never();
-		case 0:	/* failure */
-			return (0);
-		}
-	}
-	return (1);
+	if (likely(result == 1))
+		return (1);
+	return insq_result(q, result);
 }
 
 EXPORT_SYMBOL_NOVERS(insq);
@@ -2164,24 +2210,9 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	result = __insq(q, emp ? emp->b_next : emp, nmp);
 	qwunlock(q, pl);
 	/* do enabling outside the locks */
-	if (unlikely(result != 1)) {
-		switch (result) {
-		case 3:	/* success - high priority enable */
-			assert(0);
-			qenable(q);
-			break;
-		case 2:	/* success - enable if not noenabled */
-			enableq(q);
-			break;
-		case 1:	/* success - don't enable */
-			break;
-		default:
-			never();
-		case 0:	/* failure */
-			return (0);
-		}
-	}
-	return (1);
+	if (likely(result == 1))
+		return (1);
+	return insq_result(q, result);
 }
 
 EXPORT_SYMBOL_NOVERS(appq);
@@ -2762,8 +2793,9 @@ rmvq(register queue_t *q, register mblk_t *mp)
 	qwunlock(q, pl);
 
 	/* Backenabling under locks is not so severe when write locks only suppress soft irq. */
-	if (unlikely(backenable != 0))
-		qbackenable(q, mp->b_band, NULL);
+	if (likely(backenable == 0))
+		return;
+	qbackenable(q, mp->b_band, NULL);
 }
 
 EXPORT_SYMBOL_NOVERS(rmvq);

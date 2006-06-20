@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/06/18 20:54:13 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/06/19 20:51:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/18 20:54:13 $ by $Author: brian $
+ Last Modified $Date: 2006/06/19 20:51:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.33  2006/06/19 20:51:29  brian
+ - more optimizations
+
  Revision 0.9.2.32  2006/06/18 20:54:13  brian
  - minor optimizations from profiling
 
@@ -149,10 +152,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/06/18 20:54:13 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/06/19 20:51:29 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/06/18 20:54:13 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/06/19 20:51:29 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -229,7 +232,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/06/18 20:54:13 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/06/19 20:51:29 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -3936,6 +3939,20 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 }
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
+STATIC streams_noinline fastcall void
+tp_skb_destructor_slow(struct tp *tp)
+{
+	if (unlikely((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0))) {
+		tp->sndblk = 0;	/* no longer blocked */
+		spin_unlock_bh(&tp->qlock);
+		if (tp->iq != NULL && tp->iq->q_first != NULL)
+			qenable(tp->iq);
+		return;
+	}
+	spin_unlock_bh(&tp->qlock);
+	return;
+}
+
 /**
  * tp_skb_destructor - socket buffer destructor
  * @skb: socket buffer to destroy
@@ -3950,7 +3967,7 @@ tp_ip_queue_xmit(struct sk_buff *skb)
  * the send low water mark (or to zero) that is set when we stall the queue and reset when we fall
  * beneath the low water mark.
  */
-STATIC void __hot
+STATIC __hot void
 tp_skb_destructor(struct sk_buff *skb)
 {
 	struct tp *tp;
@@ -3961,25 +3978,15 @@ tp_skb_destructor(struct sk_buff *skb)
 		// ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 		tp->sndmem -= skb->truesize;
 		if (unlikely(tp->sndblk != 0))
-			goto release_check;
-	      unlock_complete:
-		spin_unlock_bh(&tp->qlock);
-	      complete:
+			tp_skb_destructor_slow(tp);
+		else
+			spin_unlock_bh(&tp->qlock);
 		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
 		tp_release(&tp);
 		return;
 	}
 	return;
-      release_check:
-	if (unlikely((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0))) {
-		tp->sndblk = 0;	/* no longer blocked */
-		spin_unlock_bh(&tp->qlock);
-		if (tp->iq != NULL && tp->iq->q_first != NULL)
-			qenable(tp->iq);
-		goto complete;
-	}
-	goto unlock_complete;
 }
 
 #undef skbuff_head_cache
@@ -4212,6 +4219,37 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 }
 #endif
 
+STATIC noinline fastcall int
+tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable **rtp)
+{
+	int err;
+
+	if (tp->daddrs[0].dst != NULL) {
+		dst_release(tp->daddrs[0].dst);
+		tp->daddrs[0].dst = NULL;
+	}
+	if (likely((err = ip_route_output(rtp, opt->ip.daddr, opt->ip.addr, 0, 0)) == 0)) {
+		dst_hold(&(*rtp)->u.dst);
+		tp->daddrs[0].dst = &(*rtp)->u.dst;
+	}
+	return (err);
+}
+
+STATIC INLINE fastcall __hot_out int
+tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp)
+{
+	register struct rtable *rt;
+
+	if (likely((rt = (struct rtable *) tp->daddrs[0].dst) != NULL)) {
+		if (likely(rt->rt_dst == opt->ip.daddr)) {
+			dst_hold(&rt->u.dst);
+			*rtp = rt;
+			return (0);
+		}
+	}
+	return tp_route_output_slow(tp, opt, rtp);
+}
+
 /**
  * tp_senddata - process a unit data request
  * @tp: Stream private structure
@@ -4230,7 +4268,7 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 		goto ebusy;
 
 	assert(opt != NULL);
-	if (likely((err = ip_route_output(&rt, opt->ip.daddr, opt->ip.addr, 0, 0)) == 0)) {
+	if (likely((err = tp_route_output(tp, opt, &rt)) == 0)) {
 		struct sk_buff *skb;
 		struct net_device *dev = rt->u.dst.dev;
 		size_t hlen = ((dev->hard_header_len + 15) & ~15)
@@ -4304,10 +4342,10 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 #endif
 			return (QR_ABSORBED);
 		}
-		__rare();
+		_rare();
 		return (-ENOBUFS);
 	}
-	__rare();
+	_rare();
 	return (err);
       ebusy:
 	return (-EBUSY);
@@ -5290,7 +5328,7 @@ te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_le
  * issuing the T_ERROR_ACK according to the Sequence of Primities of the Transport Provider Interface
  * specification, Revision 2.0.0.
  */
-STATIC int
+STATIC noinline fastcall __unlikely int
 te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7689,7 +7727,7 @@ tp_r_error(queue_t *q, mblk_t *mp)
 	return (rtn);
 }
 
-STATIC noinline streams_fastcall __hot_get int
+STATIC noinline fastcall __unlikely int
 tp_r_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -7719,7 +7757,7 @@ tp_r_prim(queue_t *q, mblk_t *mp)
 	return tp_r_prim_slow(q, mp);
 }
 
-STATIC noinline streams_fastcall __hot_put int
+STATIC noinline fastcall __unlikely int
 tp_w_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -7734,6 +7772,23 @@ tp_w_prim_slow(queue_t *q, mblk_t *mp)
 		return tp_w_ioctl(q, mp);
 	default:
 		return tp_w_other(q, mp);
+	}
+}
+
+STATIC noinline fastcall __unlikely int
+tp_w_prim_error(queue_t *q, const int rtn)
+{
+	switch (rtn) {
+	case -EBUSY:		/* flow controlled */
+	case -EAGAIN:		/* try again */
+	case -ENOMEM:		/* could not allocate memory */
+	case -ENOBUFS:		/* could not allocate an mblk */
+	case -EOPNOTSUPP:	/* primitive not supported */
+		return te_error_ack(q, T_UNITDATA_REQ, rtn);
+	case -EPROTO:
+		return te_error_reply(q, -EPROTO);
+	default:
+		return (0);
 	}
 }
 
@@ -7753,20 +7808,7 @@ tp_w_prim(queue_t *q, mblk_t *mp)
 
 				if (likely((rtn = te_unitdata_req(q, mp)) >= 0))
 					return (rtn);
-				switch (rtn) {
-				case -EBUSY:	/* flow controlled */
-				case -EAGAIN:	/* try again */
-				case -ENOMEM:	/* could not allocate memory */
-				case -ENOBUFS:	/* could not allocate an mblk */
-				case -EOPNOTSUPP:	/* primitive not supported */
-					return te_error_ack(q, T_UNITDATA_REQ, rtn);
-				case -EPROTO:
-					return te_error_reply(q, -EPROTO);
-				default:
-					rtn = 0;
-					break;
-				}
-				return (rtn);
+				return tp_w_prim_error(q, rtn);
 			}
 		}
 	}
@@ -7794,7 +7836,7 @@ tp_w_prim(queue_t *q, mblk_t *mp)
  * combination (but possibly different IP adresses).  These Streams that are "owners" of the
  * connection bucket must be traversed and checked for address matches.
  */
-STATIC INLINE fastcall __hot_in struct tp *
+STATIC noinline fastcall __unlikely struct tp *
 tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
 	struct tp *result = NULL;
@@ -7961,30 +8003,45 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	return (result);
 }
 
+STATIC noinline fastcall __unlikely struct tp *
+tp_lookup_common_slow(struct tp_prot_bucket *pp, uint8_t proto, uint32_t daddr, uint16_t dport,
+		      uint32_t saddr, uint16_t sport)
+{
+	struct tp *result;
+
+	if ((result = tp_lookup_conn(proto, daddr, dport, saddr, sport)) == NULL)
+		result = tp_lookup_bind(proto, daddr, dport);
+	return (result);
+}
+
 STATIC INLINE fastcall __hot_in struct tp *
 tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
-	struct tp *result = NULL;
 	struct tp_prot_bucket *pp, **ppp;
 
 	ppp = &udp_prots[proto];
 
 	read_lock_bh(&udp_prot_lock);
-	if ((pp = *ppp)) {
-		if (pp->corefs > 0) {
+	if (likely((pp = *ppp) != NULL)) {
+		struct tp *result;
 
-			if (result == NULL)
-				result = tp_lookup_conn(proto, daddr, dport, saddr, sport);
-			if (result == NULL)
+		if (likely(pp->corefs == 0)) {
+			if (likely(pp->clrefs > 0)) {
 				result = tp_lookup_bind(proto, daddr, dport);
-		} else if (pp->clrefs > 0) {
-			if (result == NULL)
-				result = tp_lookup_bind(proto, daddr, dport);
-		} else
-			rare();
+				read_unlock_bh(&udp_prot_lock);
+				return (result);
+			} else {
+				read_unlock_bh(&udp_prot_lock);
+				return (NULL);
+			}
+		} else {
+			result = tp_lookup_common_slow(pp, proto, daddr, dport, saddr, sport);
+			read_unlock_bh(&udp_prot_lock);
+			return (result);
+		}
 	}
 	read_unlock_bh(&udp_prot_lock);
-	return (result);
+	return (NULL);
 }
 
 /**
@@ -8048,6 +8105,8 @@ tp_free(char *data)
 			/* put this back to null before freeing it */
 			*(struct tp **) skb->cb = NULL;
 			tp_release(&tp);
+			kfree_skb(skb);
+			return;
 		}
 		kfree_skb(skb);
 	}
@@ -8386,6 +8445,10 @@ tp_free_priv(queue_t *q)
 	if (tp->bhash != NULL) {
 		tp_unbind(tp);
 		tp_set_state(tp, TS_UNBND);
+	}
+	if (tp->daddrs[0].dst != NULL) {
+		dst_release(tp->daddrs[0].dst);
+		tp->daddrs[0].dst = NULL;
 	}
 #if 0
 	{
