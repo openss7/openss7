@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2006/03/23 11:19:14 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2006/06/21 09:33:45 $
 #
 #! -----------------------------------------------------------------------------
 #!
@@ -46,11 +46,14 @@
 #!
 #! -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/23 11:19:14 $ by $Author: brian $
+## Last Modified $Date: 2006/06/21 09:33:45 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.92  2006/06/21 09:33:45  brian
+## - added noinline stuff to ctags ignore list
+##
 ## Revision 0.9.2.91  2006/03/23 11:19:14  brian
 ## - working up send-pr
 ##
@@ -349,6 +352,7 @@ CTAGIDS			= -I __initdata \
 			  -I STREAMSCALL \
 			  -I STREAMS_FASTCALL \
 			  -I STREAMS_REGPARMS \
+			  -I asmlinkage \
 			  -I fastcall \
 			  -I streamscall \
 			  -I streams_fastcall \
@@ -366,6 +370,8 @@ CTAGIDS			= -I __initdata \
 			  -I BIG_STATIC_INLINE_STH=inline \
 			  -I streams_inline=inline \
 			  -I INLINE=inline \
+			  -I streams_noinline \
+			  -I noinline \
 			  -I _RP \
 			  -I __depr \
 			  -I HEAD_DECLARATION+ \
