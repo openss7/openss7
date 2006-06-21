@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/06/08 08:20:35 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/06/21 10:18:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/08 08:20:35 $ by $Author: brian $
+# Last Modified $Date: 2006/06/21 10:18:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1606,16 +1606,21 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 		linux_cflags="$linux_cflags${linux_cflags:+ }-O3 -g"
 		linux_cv_debug="_NONE"
 		linux_cv_optimize='speed'
+dnl
+dnl		Recent x86_64 makefiles add -fno-reorder-blocks which impedes __builtin_expect()
+dnl		which is not good.  Strip it off here.
+dnl
+		linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-reorder-blocks||"`
+		linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-reorder-functions||"`
+dnl
+dnl		Recent kernels add -fno-unit-at-a-time, probably because of a whole bunch of
+dnl		top-level asm problems.  Because it impedes optimization independent of positioning
+dnl		of functions in a file, we want to kick it out.
+dnl
+		linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-unit-at-a-time||"`
 		;;
 	    (normal)
-dnl
-dnl Later compilers at -O2 seems to be inline calls to functions that are static and called once.
-dnl We should really add -fno-inline-functions-called-once but older compilers will puke at that.
-dnl We try -fno-inline-functions which is recognized by even older compilers to see if it shuts off
-dnl the inline-functions-called-once too.  Another approach is to simply make these functions
-dnl non-static so that recent compilers will not consider them for inlining at -O2.
-dnl
-		linux_cflags="$linux_cflags${linux_cflags:+ }-O2 -g -fno-inline-functions"
+		linux_cflags="$linux_cflags${linux_cflags:+ }-O2 -g"
 		linux_cv_debug="_SAFE"
 		linux_cv_optimize='normal'
 		;;
@@ -1659,12 +1664,7 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	    [enable_k_inline='no'])
 	if test :"${enable_k_inline:-no}" != :no 
 	then
-	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	    then
-		linux_cflags="$linux_cflags${linux_cflags:+ }-finline-functions"
-	    else
-		linux_cflags="$linux_cflags${linux_cflags:+ }-Winline -finline-functions"
-	    fi
+	    linux_cflags="$linux_cflags${linux_cflags:+ }-finline-functions"
 	fi
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude | -I${kbuilddir}/include |g"`
 	eval "linux_dir=\"${kbuilddir}/include2\"" ; if test -d "$linux_dir" ; then
@@ -1677,11 +1677,6 @@ dnl
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude/asm| -I${ksrcdir}/include/asm|g"`
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iarch/| -I${ksrcdir}/arch/|g"`
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9s]]* | $linux_cflags |"`
-dnl
-dnl	Recent x86_64 makefiles add -fno-reorder-blocks which impedes __builtin_expect() which is
-dnl	not good.  Strip it off here.
-dnl
-	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-reorder-blocks||"`
 dnl
 dnl	Unfortunately, Linux 2.6 makefiles add (machine dependant) -I includes
 dnl	to CFLAGS instead of CPPFLAGS, which is just plain wrong, but that's
