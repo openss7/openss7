@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.9 2005/12/28 09:51:47 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.10 2006/06/22 13:11:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:20 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_AIX_STRCONF_H__
 #define __SYS_AIX_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/28 09:51:47 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/06/22 13:11:20 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -62,8 +62,12 @@
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern __inline__
+#endif
+
 #ifndef __AIX_EXTERN_INLINE
-#define __AIX_EXTERN_INLINE extern __inline__
+#define __AIX_EXTERN_INLINE __EXTERN_INLINE
 #endif				/* __EXTERN_INLINE */
 
 #ifndef _AIX_SOURCE

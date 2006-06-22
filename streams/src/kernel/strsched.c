@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2006/06/22 04:47:52 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2006/06/22 13:11:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 04:47:52 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.139  2006/06/22 13:11:39  brian
+ - more optmization tweaks and fixes
+
  Revision 0.9.2.138  2006/06/22 04:47:52  brian
  - corrected bug in optimization
 
@@ -98,10 +101,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2006/06/22 04:47:52 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2006/06/22 13:11:39 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2006/06/22 04:47:52 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2006/06/22 13:11:39 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -842,7 +845,7 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
  *  threshold.
  */
 #if defined SLAB_DESTROY_BY_RCU
-STATIC streams_fastcall __hot mblk_t *
+STATIC streams_inline streams_fastcall __hot mblk_t *
 #else
 STATIC streams_noinline streams_fastcall __hot_out mblk_t *
 #endif
@@ -855,11 +858,13 @@ mdbblock_alloc_slow(uint priority, void *func)
 		mblk_t *mp = NULL;
 		int slab_flags;
 
+#if !defined CONFIG_STREAMS_OPTIMIZE_SPEED
 		/* might be able to do this first for other than BRPI_HI and BPRI_FT.  Another
 		   thing to do is the percentage of thewall trick: BPRI_LO => 80%, BPRI_MED => 90%, 
 		   BPRI_HI => 100% */
 		if (unlikely(atomic_read(&sdi->si_cnt) > sysctl_str_nstrmsgs))	/* PROFILED */
 			goto fail;
+#endif				/* !defined CONFIG_STREAMS_OPTIMIZE_SPEED */
 		slab_flags = (priority == BPRI_WAITOK) ? SLAB_KERNEL : SLAB_ATOMIC;
 #if 0
 		switch (priority) {
@@ -898,13 +903,16 @@ mdbblock_alloc_slow(uint priority, void *func)
 			if (atomic_read(&smi->si_cnt) > smi->si_hwl)
 				smi->si_hwl = atomic_read(&smi->si_cnt);
 #endif
+#if !defined CONFIG_STREAMS_OPTIMIZE_SPEED
 			atomic_inc(&sdi->si_cnt);
+#endif				/* !defined CONFIG_STREAMS_OPTIMIZE_SPEED */
 #if !defined CONFIG_STREAMS_NONE
 			if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 				sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 		}
+		goto fail;
 	      fail:
 		return (mp);
 	}
@@ -945,7 +953,9 @@ mdbblock_alloc(uint priority, void *func)
 				if (atomic_read(&smi->si_cnt) > smi->si_hwl)
 					smi->si_hwl = atomic_read(&smi->si_cnt);
 #endif
+#if !defined CONFIG_STREAMS_OPTIMIZE_SPEED
 				atomic_inc(&sdi->si_cnt);
+#endif				/* !defined CONFIG_STREAMS_OPTIMIZE_SPEED */
 #if !defined CONFIG_STREAMS_NONE
 				if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 					sdi->si_hwl = atomic_read(&sdi->si_cnt);
@@ -1075,7 +1085,11 @@ mdbblock_free(mblk_t *mp)
 
 		atomic_dec(&smi->si_cnt);
 #endif
+#if !defined CONFIG_STREAMS_OPTIMIZE_SPEED
 		atomic_dec(&sdi->si_cnt);
+#else
+		(void) sdi;
+#endif				/* !defined CONFIG_STREAMS_OPTIMIZE_SPEED */
 #if defined SLAB_DESTROY_BY_RCU
 		kmem_cache_free(sdi->si_cache, mp);
 #endif
@@ -2135,7 +2149,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 		dassert(q->q_qinfo != NULL);
 		dassert(q->q_qinfo->qi_putp != NULL);
 		/* some weirdness in older compilers */
-		(*q->q_qinfo->qi_putp)(q, mp);
+		(*q->q_qinfo->qi_putp) (q, mp);
 		qwakeup(q);
 	}
 #ifdef CONFIG_SMP
@@ -2211,7 +2225,7 @@ srvp_fast(queue_t *q)
 			dassert(q->q_qinfo);
 			dassert(q->q_qinfo->qi_srvp);
 			/* some weirdness in older compilers */
-			(*q->q_qinfo->qi_srvp)(q);
+			(*q->q_qinfo->qi_srvp) (q);
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
 		}
 #ifdef CONFIG_SMP
@@ -2712,6 +2726,7 @@ static streams_noinline streams_fastcall __unlikely int
 put_filter(queue_t **qp, mblk_t *mp)
 {
 	queue_t *q = *qp;
+
 	/* This AIX message filtering thing is really bad for performance when done the old way
 	   (from qputp()). Consider that if there are 100 modules on the Stream, the old way will
 	   check 5000 times.  This can be done by put(), but NOT by putnext()! */

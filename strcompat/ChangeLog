@@ -1,3 +1,59 @@
+2006-06-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/aix/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/aix/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/aix/stream.h: corrected extern inline for quick compile
+	* src/include/sys/hpux/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/hpux/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/hpux/stream.h: corrected extern inline for quick compile
+	* src/include/sys/irix/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/irix/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/irix/stream.h: corrected extern inline for quick compile
+	* src/include/sys/lfs/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/lfs/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/lfs/stream.h: corrected extern inline for quick compile
+	* src/include/sys/lis/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/lis/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/lis/stream.h: corrected extern inline for quick compile
+	* src/include/sys/mac/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/mac/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/mac/stream.h: corrected extern inline for quick compile
+	* src/include/sys/mps/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/mps/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/mps/stream.h: corrected extern inline for quick compile
+	* src/include/sys/os7/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/os7/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/os7/stream.h: corrected extern inline for quick compile
+	* src/include/sys/osf/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/osf/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/osf/stream.h: corrected extern inline for quick compile
+	* src/include/sys/sun/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/sun/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/sun/stream.h: corrected extern inline for quick compile
+	* src/include/sys/sun/strsun.h: corrected extern inline for quick compile
+	* src/include/sys/svr3/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/svr3/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/svr3/stream.h: corrected extern inline for quick compile
+	* src/include/sys/svr4/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/svr4/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/svr4/stream.h: corrected extern inline for quick compile
+	* src/include/sys/uw7/ddi.h: corrected extern inline for quick compile
+	* src/include/sys/uw7/strconf.h: corrected extern inline for quick compile
+	* src/include/sys/uw7/stream.h: corrected extern inline for quick compile
+	* src/kernel/aixcompat.c: corrected extern inline for quick compile
+	* src/kernel/hpuxcompat.c: corrected extern inline for quick compile
+	* src/kernel/irixcompat.c: corrected extern inline for quick compile
+	* src/kernel/lfscompat.c: corrected extern inline for quick compile
+	* src/kernel/liscompat.c: corrected extern inline for quick compile
+	* src/kernel/maccompat.c: corrected extern inline for quick compile
+	* src/kernel/mpscompat.c: corrected extern inline for quick compile
+	* src/kernel/os7compat.c: corrected extern inline for quick compile
+	* src/kernel/osfcompat.c: corrected extern inline for quick compile
+	* src/kernel/suncompat.c: corrected extern inline for quick compile
+	* src/kernel/svr3compat.c: corrected extern inline for quick compile
+	* src/kernel/svr4compat.c: corrected extern inline for quick compile
+	* src/kernel/uw7compat.c: corrected extern inline for quick compile
+
 2006-06-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/os7/allocb.h: some optimizations and one bug (by

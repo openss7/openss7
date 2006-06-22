@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2006/06/22 01:17:13 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2006/06/22 13:11:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 01:17:13 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.154  2006/06/22 13:11:40  brian
+ - more optmization tweaks and fixes
+
  Revision 0.9.2.153  2006/06/22 01:17:13  brian
  - syncing notebook, latest changes are not stable yet
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2006/06/22 01:17:13 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2006/06/22 13:11:40 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2006/06/22 01:17:13 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2006/06/22 13:11:40 $";
 
 //#define __NO_VERSION__
 
@@ -194,7 +197,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2006/06/22 01:17:13 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2006/06/22 13:11:40 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -873,7 +876,7 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 }
 
 STATIC streams_inline streams_fastcall __hot_put mblk_t *
-alloc_proto(struct stdata *sd, ssize_t psize, ssize_t dsize, int type, uint bpri)
+alloc_proto(const struct stdata *sd, ssize_t psize, ssize_t dsize, const int type, const uint bpri)
 {
 	mblk_t *mp = NULL, *dp = NULL;
 
@@ -888,14 +891,23 @@ alloc_proto(struct stdata *sd, ssize_t psize, ssize_t dsize, int type, uint bpri
 	}
 	if (likely(dsize >= 0)) {	/* PROFILED */
 		int sd_wroff;
+		int sd_wrpad;
 		
-		sd_wroff = sd->sd_wroff;
+		/* only apply offset and padding when we are requesting more
+		 * than a FASTBUF worth of data. */
+		if (likely(dsize <= FASTBUF)) {
+			sd_wroff = 0;
+			sd_wrpad = 0;
+		} else {
+			sd_wroff = sd->sd_wroff;
+			sd_wrpad = sd->sd_wrpad;
+		}
 		_ptrace(("Allocating data part %d bytes\n", dsize));
-		if (likely((dp = allocb(sd_wroff + dsize + sd->sd_wrpad, bpri)) != NULL)) {
+		if (likely((dp = allocb(sd_wroff + dsize + sd_wrpad, bpri)) != NULL)) {
 			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
 			if (sd_wroff) {
 				dp->b_rptr += sd_wroff;
-				dp->b_wptr += sd_wroff;;
+				dp->b_wptr += sd_wroff;
 			}
 			dp->b_wptr += dsize;
 			mp = linkmsg(mp, dp);
@@ -909,6 +921,38 @@ alloc_proto(struct stdata *sd, ssize_t psize, ssize_t dsize, int type, uint bpri
 		}
 	}
 	return (mp);
+}
+
+STATIC streams_inline streams_fastcall __hot_write mblk_t *
+alloc_data(const struct stdata *sd, ssize_t dsize, const uint bpri)
+{
+	mblk_t *dp;
+
+	if (likely(dsize >= 0)) {	/* PROFILED */
+		int sd_wroff;
+		int sd_wrpad;
+
+		/* only apply offset and padding when we are requesting more
+		 * than a FASTBUF worth of data. */
+		if (likely(dsize <= FASTBUF)) {
+			sd_wroff = 0;
+			sd_wrpad = 0;
+		} else {
+			sd_wroff = sd->sd_wroff;
+			sd_wrpad = sd->sd_wrpad;
+		}
+		_ptrace(("Allocating data part %d bytes\n", dsize));
+		if (likely((dp = allocb(sd_wroff + dsize + sd_wrpad, bpri)) != NULL)) {
+			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
+			if (sd_wroff) {
+				dp->b_rptr += sd_wroff;
+				dp->b_wptr += sd_wroff;
+			}
+			dp->b_wptr += dsize;
+		}
+		return (dp);
+	}
+	return (NULL);
 }
 
 /* 
@@ -3072,11 +3116,13 @@ strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 	}
 	return ((ssize_t) size);
 }
+#if 0
 STATIC streams_noinline streams_fastcall __hot_put ssize_t
 strsizecheck_slow(const struct stdata *sd, const msg_type_t type, ssize_t size)
 {				/* PROFILED */
 	return strsizecheck(sd, type, size);
 }
+#endif
 
 #if 0
 /**
@@ -3155,10 +3201,10 @@ strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct s
 				if (unlikely(!access_ok(VERIFY_READ, datp->buf, dlen)))
 					goto efault;
 	if (unlikely(clen >= 0))
-		if (unlikely((err = strsizecheck_slow(sd, M_PROTO, clen)) < -1))
+		if (unlikely((err = strsizecheck(sd, M_PROTO, clen)) < -1))
 			goto error;
 	if (likely(dlen >= 0)) {
-		if (unlikely((err = strsizecheck_slow(sd, M_DATA, dlen)) < -1))
+		if (unlikely((err = strsizecheck(sd, M_DATA, dlen)) < -1))
 			goto error;
 		if (unlikely((size_t) dlen > (size_t) err)) {
 			/* control part apply putpmsg() rules */
@@ -4652,8 +4698,12 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 	if (!sd->sd_wq->q_first)
 		return (0);
 
+#if 0
 	if (nbytes == 0 || nbytes >= FASTBUF || test_bit(STRDELIM_BIT, &sd->sd_flag)
 	    || sd->sd_wroff > 0 || sd->sd_wrpad > 0)
+#else
+	if (nbytes == 0 || nbytes >= FASTBUF || test_bit(STRDELIM_BIT, &sd->sd_flag))
+#endif
 		nbytes = 0;
 
 	srunlock(sd);
@@ -4745,7 +4795,6 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	do {
 		mblk_t *b;
 		size_t block;
-		int sd_wroff;
 
 		/* Note: if q_minpsz is zero and the nbytes length is greater than q_maxpsz, we are 
 		   supposed to break the message down into separate q_maxpsz segments. */
@@ -4753,21 +4802,14 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 		/* the following can sleep */
 
 		block = min(nbytes - written, q_maxpsz);
-		sd_wroff = sd->sd_wroff;
 
 		/* POSIX says always blocks awaiting message blocks */
-		if (unlikely((b = allocb(sd_wroff + block + sd->sd_wrpad, BPRI_WAITOK)) == NULL)) {
+		if (unlikely((b = alloc_data(sd, block, BPRI_WAITOK)) == NULL)) {
 			err = -ENOSR;
 			break;
 		}
-		if (sd_wroff) {
-			b->b_rptr += sd_wroff;
-			b->b_wptr += sd_wroff;
-		}
 
 		if (likely((err = strcopyin(buf + written, b->b_wptr, block))) == 0) {
-
-			b->b_wptr += block;
 
 			/* locks on */
 			if (likely((err = straccess_rlock(sd, access)) == 0)) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.37 2006/06/22 01:17:09 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.38 2006/06/22 13:11:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 01:17:09 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:35 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/06/22 01:17:09 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/06/22 13:11:35 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -123,6 +123,31 @@
 
 #undef streams_noinline
 #define streams_noinline noinline
+
+#if defined(_DEBUG) && !defined(CONFIG_STREAMS_DEBUG)
+#define CONFIG_STREAMS_DEBUG 1
+#endif
+#if defined(_TEST) && !defined(CONFIG_STREAMS_TEST)
+#define CONFIG_STREAMS_TEST 1
+#endif
+#if defined(_SAFE) && !defined(CONFIG_STREAMS_SAFE)
+#define CONFIG_STREAMS_SAFE 1
+#endif
+#if defined(_NONE) && !defined(CONFIG_STREAMS_NONE)
+#define CONFIG_STREAMS_NONE 1
+#endif
+#if defined(_OPTIMIZE_NONE) && !defined(CONFIG_STREAMS_OPTIMIZE_NONE)
+#define CONFIG_STREAMS_OPTIMIZE_NONE 1
+#endif
+#if defined(_OPTIMIZE_SIZE) && !defined(CONFIG_STREAMS_OPTIMIZE_SIZE)
+#define CONFIG_STREAMS_OPTIMIZE_SIZE 1
+#endif
+#if defined(_OPTIMIZE_SPEED) && !defined(CONFIG_STREAMS_OPTIMIZE_SPEED)
+#define CONFIG_STREAMS_OPTIMIZE_SPEED 1
+#endif
+#if defined(_OPTIMIZE_NORMAL) && !defined(CONFIG_STREAMS_OPTIMIZE_NORMAL)
+#define CONFIG_STREAMS_OPTIMIZE_NORMAL 1
+#endif
 
 #if defined(CONFIG_STREAMS_OPTIMIZE_NONE) || defined(CONFIG_STREAMS_DEBUG)
 

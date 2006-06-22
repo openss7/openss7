@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.3 2005/12/28 09:51:49 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.4 2006/06/22 13:11:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.4  2006/06/22 13:11:31  brian
+ - more optmization tweaks and fixes
+
  Revision 0.9.2.3  2005/12/28 09:51:49  brian
  - remove warnings on FC4 compile
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_UW7_STREAM_H__
 #define __SYS_UW7_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/uw7/stream.h directly, include sys/stream.h instead."
@@ -74,8 +77,12 @@
 #error "Do not include kernel header files in user space programs."
 #endif
 
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern __inline__
+#endif
+
 #ifndef __UW7_EXTERN_INLINE
-#define __UW7_EXTERN_INLINE extern __inline__
+#define __UW7_EXTERN_INLINE __EXTERN_INLINE
 #endif
 
 #ifndef _UW7_SOURCE

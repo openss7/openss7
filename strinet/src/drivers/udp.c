@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/06/22 04:47:52 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/06/22 13:11:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 04:47:52 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.36  2006/06/22 13:11:45  brian
+ - more optmization tweaks and fixes
+
  Revision 0.9.2.35  2006/06/22 04:47:52  brian
  - corrected bug in optimization
 
@@ -158,10 +161,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/06/22 04:47:52 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/06/22 13:11:45 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/06/22 04:47:52 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/06/22 13:11:45 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -238,7 +241,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/06/22 04:47:52 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/06/22 13:11:45 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -312,8 +315,8 @@ STATIC struct module_info udp_minfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 17),		/* Hi water mark */
-	.mi_lowat = 1,			/* Lo water mark */
+	.mi_hiwat = (1 << 18),		/* Hi water mark */
+	.mi_lowat = (1 << 17),		/* Lo water mark */
 };
 
 STATIC struct module_stat udp_mstat = {
@@ -445,10 +448,10 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 
 #define xti_default_debug		{ 0, }
 #define xti_default_linger		(struct t_linger){T_YES, 120}
-#define xti_default_rcvbuf		(SK_RMEM_MAX << 1)
+#define xti_default_rcvbuf		(SK_RMEM_MAX << 1)  /* needs to be sysctl_rmem_default */
 #define xti_default_rcvlowat		1
-#define xti_default_sndbuf		(SK_WMEM_MAX << 1)
-#define xti_default_sndlowat		SK_WMEM_MAX
+#define xti_default_sndbuf		(SK_WMEM_MAX << 1)  /* needs to be sysctl_wmem_default */
+#define xti_default_sndlowat		SK_WMEM_MAX /* needs to be sysctl_wmem_default >> 1 */
 #define xti_default_priority		0
 
 #define ip_default_protocol		17
@@ -529,7 +532,7 @@ STATIC struct tp_chash_bucket *udp_chash;
 STATIC size_t udp_chash_size = 0;
 STATIC size_t udp_chash_order = 0;
 
-STATIC inline fastcall __hot_in int
+STATIC INLINE fastcall __hot_in int
 udp_bhashfn(unsigned char proto, unsigned short bport)
 {
 	return ((udp_bhash_size - 1) & (proto + bport));
@@ -564,14 +567,14 @@ STATIC struct tp_prot_bucket *udp_prots[256];
 STATIC kmem_cache_t *udp_prot_cachep;
 STATIC kmem_cache_t *udp_priv_cachep;
 
-static inline fastcall __unlikely struct tp *
+static INLINE fastcall __unlikely struct tp *
 tp_get(struct tp *tp)
 {
 	dassert(tp != NULL);
 	atomic_inc(&tp->refcnt);
 	return (tp);
 }
-static inline fastcall __hot void
+static INLINE fastcall __hot void
 tp_put(struct tp *tp)
 {
 	dassert(tp != NULL);
@@ -579,7 +582,7 @@ tp_put(struct tp *tp)
 		kmem_cache_free(udp_priv_cachep, tp);
 	}
 }
-static inline fastcall __hot void
+static INLINE fastcall __hot void
 tp_release(struct tp **tpp)
 {
 	struct tp *tp;
@@ -1329,7 +1332,7 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 				if (unlikely(optlen != sizeof(*valp)))
 					goto error;
 				/* FIXME: validate value */
-				op->xti.rcvbuf = *valp;
+				op->xti.rcvbuf = *valp << 1;
 				t_set_bit(_T_BIT_XTI_RCVBUF, op->flags);
 				continue;
 			}
@@ -1351,7 +1354,7 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 				if (unlikely(optlen != sizeof(*valp)))
 					goto error;
 				/* FIXME: validate value */
-				op->xti.sndbuf = *valp;
+				op->xti.sndbuf = *valp << 1;
 				t_set_bit(_T_BIT_XTI_SNDBUF, op->flags);
 				continue;
 			}
@@ -3907,7 +3910,7 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 #define dst_pmtu dst_mtu
 #else
 #ifndef HAVE_STRUCT_DST_ENTRY_PATH
-static inline u32
+static INLINE u32
 dst_pmtu(struct dst_entry *dst)
 {
 	return (dst->pmtu);
@@ -5887,6 +5890,7 @@ te_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	return (err);
 }
 
+#if 0
 /**
  * te_data_ind - generate a T_DATA_IND message
  * @q: active queue in queue pair (read queue)
@@ -5926,7 +5930,9 @@ te_data_ind(queue_t *q, mblk_t *dp)
       enobufs:
 	return (-ENOBUFS);
 }
+#endif
 
+#if 0
 /**
  * te_exdata_ind - generate a T_EXDATA_IND message
  * @q: active queue in queue pair (read queue)
@@ -5961,6 +5967,7 @@ te_exdata_ind(queue_t *q, mblk_t *dp)
       enobufs:
 	return (-ENOBUFS);
 }
+#endif
 
 /**
  * te_unitdata_ind - send a T_UNITDATA_IND upstream
@@ -8488,9 +8495,9 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		bufq_init(&tp->conq);
 		/* option defaults */
 		tp->options.xti.linger = xti_default_linger;
-		tp->options.xti.rcvbuf = sysctl_rmem_default << 1;
+		tp->options.xti.rcvbuf = sysctl_rmem_default;
 		tp->options.xti.rcvlowat = xti_default_rcvlowat;
-		tp->options.xti.sndbuf = sysctl_wmem_default << 1;
+		tp->options.xti.sndbuf = sysctl_wmem_default;
 		tp->options.xti.sndlowat = 16768;
 		tp->options.xti.priority = xti_default_priority;
 		tp->options.ip.protocol = ip_default_protocol;

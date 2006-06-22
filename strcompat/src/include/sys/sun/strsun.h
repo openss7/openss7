@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.7 2006/05/23 10:44:07 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.8 2006/06/22 13:11:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 10:44:07 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:28 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/23 10:44:07 $"
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/06/22 13:11:28 $"
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."
@@ -62,8 +62,12 @@
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern __inline__
+#endif
+
 #ifndef __SUN_EXTERN_INLINE
-#define __SUN_EXTERN_INLINE extern __inline__
+#define __SUN_EXTERN_INLINE __EXTERN_INLINE
 #endif				/* __SUN_EXTERN_INLINE */
 
 #include <linux/types.h>

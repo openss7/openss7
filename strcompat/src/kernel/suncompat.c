@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/22 13:11:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:50 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/22 13:11:33 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/22 13:11:33 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -66,7 +66,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __SUN_EXTERN_INLINE inline
+#define __SUN_EXTERN_INLINE INLINE streamscall
 
 #define _SUN_SOURCE
 
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/06/22 13:11:33 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.7 2006/05/23 10:44:07 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.8 2006/06/22 13:11:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 10:44:07 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.8  2006/06/22 13:11:28  brian
+ - more optmization tweaks and fixes
+
  Revision 0.9.2.7  2006/05/23 10:44:07  brian
  - mark normal inline functions for unlikely text section
 
@@ -76,7 +79,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -86,8 +89,12 @@
 #error "Do not include kernel header files in user space programs."
 #endif
 
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern __inline__
+#endif
+
 #ifndef __SUN_EXTERN_INLINE
-#define __SUN_EXTERN_INLINE extern __inline__
+#define __SUN_EXTERN_INLINE __EXTERN_INLINE
 #endif
 
 #ifndef _SUN_SOURCE
@@ -145,7 +152,7 @@ queclass(mblk_t *mp)
 #endif
 
 #ifdef LFS
-extern void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter);
+__SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter);
 #endif
 
 #define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))

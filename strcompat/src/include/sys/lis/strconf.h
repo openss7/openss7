@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.14 2006/03/07 00:41:20 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.15 2006/06/22 13:11:23 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 00:41:20 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:23 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_STRCONF_H__
 #define __SYS_LIS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/07 00:41:20 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/06/22 13:11:23 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -73,8 +73,12 @@
 #undef _RP
 #define _RP streamscall __depr
 
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern __inline__
+#endif
+
 #ifndef __LIS_EXTERN_INLINE
-#define __LIS_EXTERN_INLINE extern __inline__
+#define __LIS_EXTERN_INLINE __EXTERN_INLINE
 #endif				/* __LIS_EXTERN_INLINE */
 
 #ifndef _LIS_SOURCE

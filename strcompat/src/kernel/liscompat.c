@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/01/03 12:00:13 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/06/22 13:11:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/01/03 12:00:13 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/01/03 12:00:13 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/06/22 13:11:32 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/01/03 12:00:13 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/06/22 13:11:32 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -66,7 +66,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __LIS_EXTERN_INLINE inline
+#define __LIS_EXTERN_INLINE INLINE streamscall
 #define __LIS_NO_MACROS
 #define __depr
 
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/01/03 12:00:13 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/06/22 13:11:32 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/06/22 13:11:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/06/22 13:11:33 $"
 
 static char const ident[] =
-    "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $";
+    "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/06/22 13:11:33 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -66,7 +66,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __MAC_EXTERN_INLINE inline
+#define __MAC_EXTERN_INLINE INLINE streamscall
 
 #define _MAC_SOURCE
 
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $"
+#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/06/22 13:11:33 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"

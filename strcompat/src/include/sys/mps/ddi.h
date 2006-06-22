@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.11 2006/05/23 10:44:04 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.12 2006/06/22 13:11:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 10:44:04 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.12  2006/06/22 13:11:25  brian
+ - more optmization tweaks and fixes
+
  Revision 0.9.2.11  2006/05/23 10:44:04  brian
  - mark normal inline functions for unlikely text section
 
@@ -91,14 +94,18 @@
 #ifndef __SYS_MPS_DDI_H__
 #define __SYS_MPS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern __inline__
+#endif
+
 #ifndef __MPS_EXTERN_INLINE
-#define __MPS_EXTERN_INLINE extern __inline__
+#define __MPS_EXTERN_INLINE __EXTERN_INLINE
 #endif				/* __AIX_EXTERN_INLINE */
 
 #ifndef _MPS_SOURCE

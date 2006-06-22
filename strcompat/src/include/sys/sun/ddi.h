@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.19 2006/05/23 10:44:07 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.20 2006/06/22 13:11:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 10:44:07 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:28 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_DDI_H__
 #define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/05/23 10:44:07 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/06/22 13:11:28 $"
 
 #ifndef __SYS_SUNDDI_H__
 #warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."
@@ -62,8 +62,12 @@
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern __inline__
+#endif
+
 #ifndef __SUN_EXTERN_INLINE
-#define __SUN_EXTERN_INLINE extern __inline__
+#define __SUN_EXTERN_INLINE __EXTERN_INLINE
 #endif				/* __SUN_EXTERN_INLINE */
 
 #ifndef _SUN_SOURCE

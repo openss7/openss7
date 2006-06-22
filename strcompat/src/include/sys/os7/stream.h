@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.5 2006/04/22 01:05:35 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.6 2006/06/22 13:11:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:26 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OS7_STREAM_H__
 #define __SYS_OS7_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/irix/stream.h directly, include sys/stream.h instead."
@@ -61,8 +61,12 @@
 #error "Do not include kernel header files in user space programs."
 #endif
 
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern __inline__
+#endif
+
 #ifndef __OS7_EXTERN_INLINE
-#define __OS7_EXTERN_INLINE extern __inline__
+#define __OS7_EXTERN_INLINE __EXTERN_INLINE
 #endif
 
 #ifndef _OS7_SOURCE

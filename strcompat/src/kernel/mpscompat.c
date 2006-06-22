@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/03 11:11:14 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/06/22 13:11:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:11:14 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.24  2006/06/22 13:11:33  brian
+ - more optmization tweaks and fixes
+
  Revision 0.9.2.23  2006/03/03 11:11:14  brian
  - 64-bit compatibility, fixes, updates for release
 
@@ -123,10 +126,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/03 11:11:14 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/06/22 13:11:33 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/03 11:11:14 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/06/22 13:11:33 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -139,7 +142,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __MPS_EXTERN_INLINE inline
+#define __MPS_EXTERN_INLINE INLINE streamscall
 
 #ifdef LIS
 #define _LFS_SOURCE
@@ -154,7 +157,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/03 11:11:14 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/06/22 13:11:33 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -438,7 +441,7 @@ EXPORT_SYMBOL_NOVERS(mi_open_link);	/* mps/ddi.h */
  *  MI_OPEN_DETACHED
  *  -------------------------------------------------------------------------
  */
-caddr_t mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp);
+__MPS_EXTERN_INLINE caddr_t mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp);
 
 EXPORT_SYMBOL_NOVERS(mi_open_detached);	/* mps/ddi.h */
 
@@ -517,7 +520,7 @@ EXPORT_SYMBOL_NOVERS(mi_close_detached);	/* mps/ddi.h */
  *  MI_CLOSE_COMM
  *  -------------------------------------------------------------------------
  */
-int mi_close_comm(caddr_t *mi_head, queue_t *q);
+__MPS_EXTERN_INLINE int mi_close_comm(caddr_t *mi_head, queue_t *q);
 
 EXPORT_SYMBOL_NOVERS(mi_close_comm);	/* mps/ddi.h, aix/ddi.h */
 

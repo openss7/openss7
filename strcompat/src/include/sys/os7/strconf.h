@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.5 2006/06/14 10:37:17 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.6 2006/06/22 13:11:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:17 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:26 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OS7_STRCONF_H__
 #define __SYS_OS7_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/os7/strconf.h directly, include sys/strconf.h instead."
@@ -61,8 +61,12 @@
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern __inline__
+#endif
+
 #ifndef __OS7_EXTERN_INLINE
-#define __OS7_EXTERN_INLINE extern __inline__
+#define __OS7_EXTERN_INLINE __EXTERN_INLINE
 #endif				/* __OS7_EXTERN_INLINE */
 
 #ifndef _OS7_SOURCE

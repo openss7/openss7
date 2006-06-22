@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 11:11:14 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/22 13:11:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:11:14 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 13:11:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.21  2006/06/22 13:11:32  brian
+ - more optmization tweaks and fixes
+
  Revision 0.9.2.20  2006/03/03 11:11:14  brian
  - 64-bit compatibility, fixes, updates for release
 
@@ -113,10 +116,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 11:11:14 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/22 13:11:32 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 11:11:14 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/22 13:11:32 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -129,7 +132,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __LFS_EXTERN_INLINE inline
+#define __LFS_EXTERN_INLINE INLINE streamscall
 
 #define _LFS_SOURCE
 
@@ -139,7 +142,7 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 11:11:14 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/22 13:11:32 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
