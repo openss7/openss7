@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/02/23 12:11:10 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/06/22 01:17:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/23 12:11:10 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 01:17:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/02/23 12:11:10 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/06/22 01:17:21 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/02/23 12:11:10 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/06/22 01:17:21 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -81,7 +81,7 @@ static char const ident[] =
 #define _T_DEFAULT_CONNLEN	256
 #define _T_DEFAULT_DISCLEN	256
 #define _T_DEFAULT_OPTLEN	256
-#define _T_DEFAULT_DATALEN	1024
+#define _T_DEFAULT_DATALEN	16384
 #define _T_TIMEOUT		-1
 #define _T_IOV_MAX		16
 
@@ -6151,10 +6151,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.17 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.18 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.17 $)
- * @date \$Date: 2006/02/23 12:11:10 $
+ * @version \$Name:  $(\$Revision: 0.9.2.18 $)
+ * @date \$Date: 2006/06/22 01:17:21 $
  *
  * @}
  */

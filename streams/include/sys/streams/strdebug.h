@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.36 2006/06/14 10:37:20 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.37 2006/06/22 01:17:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:20 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 01:17:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/06/14 10:37:20 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/06/22 01:17:09 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -121,6 +121,9 @@
 #define unlikely(__exp) (__exp)
 #endif
 
+#undef streams_noinline
+#define streams_noinline noinline
+
 #if defined(CONFIG_STREAMS_OPTIMIZE_NONE) || defined(CONFIG_STREAMS_DEBUG)
 
 #undef prefetchw
@@ -135,13 +138,13 @@
 #undef unlikely
 #define unlikely(__exp) (__exp)
 
-#define __hot
-#define __hot_read
-#define __hot_write
 #define __hot_put
-#define __hot_get
+#define __hot_write
 #define __hot_out
+#define __hot
 #define __hot_in
+#define __hot_read
+#define __hot_get
 #define __unlikely
 
 #undef STATIC
@@ -152,9 +155,6 @@
 
 #undef streams_inline
 #define streams_inline
-
-#undef streams_noinline
-#define streams_noinline noinline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE
@@ -170,14 +170,14 @@
 #define prefetch(__a) __builtin_prefetch((__a),0,3)
 
 /* these don't affect size, just position */
-#define __hot       __attribute__((section(".streams.hot")))
-#define __hot_read  __attribute__((section(".streams.hot.read")))
-#define __hot_write __attribute__((section(".streams.hot.write")))
-#define __hot_put   __attribute__((section(".streams.hot.put")))
-#define __hot_get   __attribute__((section(".streams.hot.get")))
-#define __hot_out   __attribute__((section(".streams.hot.out")))
-#define __hot_in    __attribute__((section(".streams.hot.in")))
-#define __unlikely  __attribute__((section(".streams.unlikely")))
+#define __hot_put   __attribute__((section(".text.streams.hot.put")))
+#define __hot_write __attribute__((section(".text.streams.hot.write")))
+#define __hot_out   __attribute__((section(".text.streams.hot.out")))
+#define __hot       __attribute__((section(".text.streams.hot")))
+#define __hot_in    __attribute__((section(".text.streams.hot.in")))
+#define __hot_read  __attribute__((section(".text.streams.hot.read")))
+#define __hot_get   __attribute__((section(".text.streams.hot.get")))
+#define __unlikely  __attribute__((section(".text.streams.unlikely")))
 
 #undef STATIC
 #define STATIC static
@@ -187,9 +187,6 @@
 
 #undef streams_inline
 #define streams_inline
-
-#undef streams_noinline
-#define streams_noinline noinline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern
@@ -205,14 +202,14 @@
 #define prefetch(__a) __builtin_prefetch((__a),0,3)
 
 /* these don't affect size, just position */
-#define __hot       __attribute__((section(".streams.hot")))
-#define __hot_read  __attribute__((section(".streams.hot.read")))
-#define __hot_write __attribute__((section(".streams.hot.write")))
-#define __hot_put   __attribute__((section(".streams.hot.put")))
-#define __hot_get   __attribute__((section(".streams.hot.get")))
-#define __hot_out   __attribute__((section(".streams.hot.out")))
-#define __hot_in    __attribute__((section(".streams.hot.in")))
-#define __unlikely  __attribute__((section(".streams.unlikely")))
+#define __hot_put   __attribute__((section(".text.streams.hot.put")))
+#define __hot_write __attribute__((section(".text.streams.hot.write")))
+#define __hot_out   __attribute__((section(".text.streams.hot.out")))
+#define __hot       __attribute__((section(".text.streams.hot")))
+#define __hot_in    __attribute__((section(".text.streams.hot.in")))
+#define __hot_read  __attribute__((section(".text.streams.hot.read")))
+#define __hot_get   __attribute__((section(".text.streams.hot.get")))
+#define __unlikely  __attribute__((section(".text.streams.unlikely")))
 
 #undef STATIC
 #define STATIC static
@@ -222,9 +219,6 @@
 
 #undef streams_inline
 #define streams_inline inline
-
-#undef streams_noinline
-#define streams_noinline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE inline
@@ -239,14 +233,14 @@
 #define prefetch(__a) __builtin_prefetch((__a),0,3)
 
 /* these don't affect size, just position */
-#define __hot       __attribute__((section(".streams.hot")))
-#define __hot_read  __attribute__((section(".streams.hot.read")))
-#define __hot_write __attribute__((section(".streams.hot.write")))
-#define __hot_put   __attribute__((section(".streams.hot.put")))
-#define __hot_get   __attribute__((section(".streams.hot.get")))
-#define __hot_out   __attribute__((section(".streams.hot.out")))
-#define __hot_in    __attribute__((section(".streams.hot.in")))
-#define __unlikely  __attribute__((section(".streams.unlikely")))
+#define __hot_put   __attribute__((section(".text.streams.hot.put")))
+#define __hot_write __attribute__((section(".text.streams.hot.write")))
+#define __hot_out   __attribute__((section(".text.streams.hot.out")))
+#define __hot       __attribute__((section(".text.streams.hot")))
+#define __hot_in    __attribute__((section(".text.streams.hot.in")))
+#define __hot_read  __attribute__((section(".text.streams.hot.read")))
+#define __hot_get   __attribute__((section(".text.streams.hot.get")))
+#define __unlikely  __attribute__((section(".text.streams.unlikely")))
 
 #undef STATIC
 #define STATIC static
@@ -256,9 +250,6 @@
 
 #undef streams_inline
 #define streams_inline inline
-
-#undef streams_noinline
-#define streams_noinline noinline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern inline

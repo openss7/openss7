@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.84 2006/05/29 08:52:58 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.85 2006/06/22 01:17:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/29 08:52:58 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 01:17:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.85  2006/06/22 01:17:09  brian
+ - syncing notebook, latest changes are not stable yet
+
  Revision 0.9.2.84  2006/05/29 08:52:58  brian
  - started zero copy architecture
 
@@ -71,7 +74,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.84 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.85 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -1165,13 +1168,20 @@ msgdsize(register mblk_t *mp)
 __STRUTIL_EXTERN_INLINE __unlikely size_t
 msgsize(mblk_t *mp)
 {
-	register mblk_t *b;
-	size_t size = 0;
+	prefetch(mp);
+	{
+		register mblk_t *b;
+		register size_t size = 0;
 
-	for (b = mp; b; b = b->b_cont)
-		if (b->b_wptr > b->b_rptr)
-			size += b->b_wptr - b->b_rptr;
-	return (size);
+		if (likely((b = mp) != NULL)) {
+			do {
+				prefetch(b->b_cont);
+				if (likely(b->b_wptr > b->b_rptr))
+					size += b->b_wptr - b->b_rptr;
+			} while (unlikely((b = b->b_cont) != NULL)) ;
+		}
+		return (size);
+	}
 }
 
 __STRUTIL_EXTERN_INLINE __unlikely int
@@ -1288,7 +1298,7 @@ OTHERQ(queue_t *q)
 #endif
 
 __STRUTIL_EXTERN_INLINE __unlikely queue_t *
-RD(queue_t *q)
+RD(register queue_t *q)
 {
 	dassert(q);
 	return (q->q_flag & QREADR) ? q : q - 1;
@@ -1299,7 +1309,7 @@ RD(queue_t *q)
 #endif
 
 __STRUTIL_EXTERN_INLINE __unlikely queue_t *
-WR(queue_t *q)
+WR(register queue_t *q)
 {
 	dassert(q);
 	return ((q->q_flag & QREADR) ? q + 1 : q);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: allocb.h,v 0.9.2.10 2006/05/23 10:44:05 brian Exp $
+ @(#) $Id: allocb.h,v 0.9.2.11 2006/06/22 01:17:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 10:44:05 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 01:17:06 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_ALLOCB_H__
 #define __OS7_ALLOCB_H__
 
-#ident "@(#) $RCSfile: allocb.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: allocb.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -229,7 +229,7 @@ ss7_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
 
-	if ((mp = allocb(size, prior)))
+	if (likely((mp = allocb(size, prior)) != NULL))
 		return (mp);
 	rare();
 	ss7_bufcall(q, size, prior);
@@ -257,7 +257,7 @@ ss7_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *fr
 {
 	mblk_t *mp;
 
-	if ((mp = esballoc(base, size, prior, frtn)))
+	if (likely((mp = esballoc(base, size, prior, frtn)) != NULL))
 		return (mp);
 	rare();
 	ss7_esbbcall(q, prior);
@@ -303,7 +303,7 @@ ss7_dupb(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
 
-	if ((mp = dupb(bp)))
+	if (likely((mp = dupb(bp)) != NULL))
 		return (mp);
 	rare();
 	ss7_bufcall(q, bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0, BPRI_MED);
@@ -327,7 +327,7 @@ ss7_dupmsg(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
 
-	if ((mp = dupmsg(bp)))
+	if (likely((mp = dupmsg(bp)) != NULL))
 		return (mp);
 	rare();
 	ss7_bufcall(q, msgsize(bp), BPRI_MED);
@@ -351,7 +351,7 @@ ss7_copyb(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
 
-	if ((mp = copyb(bp)))
+	if (likely((mp = copyb(bp)) != NULL))
 		return (mp);
 	rare();
 	ss7_bufcall(q, bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0, BPRI_MED);
@@ -375,7 +375,7 @@ ss7_copymsg(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
 
-	if (!(mp = copymsg(bp)))
+	if (likely((mp = copymsg(bp)) != NULL))
 		return (mp);
 	ss7_bufcall(q, msgsize(bp), BPRI_MED);
 	return (mp);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/06/19 20:51:29 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/06/22 04:47:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/19 20:51:29 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 04:47:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.35  2006/06/22 04:47:52  brian
+ - corrected bug in optimization
+
+ Revision 0.9.2.34  2006/06/22 01:17:18  brian
+ - syncing notebook, latest changes are not stable yet
+
  Revision 0.9.2.33  2006/06/19 20:51:29  brian
  - more optimizations
 
@@ -152,10 +158,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/06/19 20:51:29 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/06/22 04:47:52 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/06/19 20:51:29 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/06/22 04:47:52 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -232,7 +238,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/06/19 20:51:29 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/06/22 04:47:52 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -307,7 +313,7 @@ STATIC struct module_info udp_minfo = {
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
 	.mi_hiwat = (1 << 17),		/* Hi water mark */
-	.mi_lowat = (1 << 16),		/* Lo water mark */
+	.mi_lowat = 1,			/* Lo water mark */
 };
 
 STATIC struct module_stat udp_mstat = {
@@ -523,7 +529,7 @@ STATIC struct tp_chash_bucket *udp_chash;
 STATIC size_t udp_chash_size = 0;
 STATIC size_t udp_chash_order = 0;
 
-STATIC INLINE fastcall __unlikely int
+STATIC inline fastcall __hot_in int
 udp_bhashfn(unsigned char proto, unsigned short bport)
 {
 	return ((udp_bhash_size - 1) & (proto + bport));
@@ -558,26 +564,28 @@ STATIC struct tp_prot_bucket *udp_prots[256];
 STATIC kmem_cache_t *udp_prot_cachep;
 STATIC kmem_cache_t *udp_priv_cachep;
 
-static INLINE __unlikely struct tp *
+static inline fastcall __unlikely struct tp *
 tp_get(struct tp *tp)
 {
-	if (tp)
-		atomic_inc(&tp->refcnt);
+	dassert(tp != NULL);
+	atomic_inc(&tp->refcnt);
 	return (tp);
 }
-static INLINE __unlikely void
+static inline fastcall __hot void
 tp_put(struct tp *tp)
 {
-	if (tp)
-		if (atomic_dec_and_test(&tp->refcnt)) {
-			kmem_cache_free(udp_priv_cachep, tp);
-		}
+	dassert(tp != NULL);
+	if (atomic_dec_and_test(&tp->refcnt)) {
+		kmem_cache_free(udp_priv_cachep, tp);
+	}
 }
-static INLINE __unlikely void
+static inline fastcall __hot void
 tp_release(struct tp **tpp)
 {
-	if (tpp != NULL)
-		tp_put(XCHG(tpp, NULL));
+	struct tp *tp;
+	dassert(tpp != NULL);
+	if (likely((tp = XCHG(tpp, NULL)) != NULL))
+		tp_put(tp);
 }
 static INLINE __unlikely struct tp *
 tp_alloc(void)
@@ -705,7 +713,7 @@ tp_set_state(struct tp *tp, const t_uscalar_t state)
 	tp->info.CURRENT_state = state;
 }
 
-STATIC INLINE fastcall __unlikely t_uscalar_t
+STATIC INLINE fastcall __hot t_uscalar_t
 tp_get_state(const struct tp *tp)
 {
 	return (tp->info.CURRENT_state);
@@ -775,6 +783,19 @@ STATIC struct tp_options tp_defaults = {
 
 #define t_defaults tp_defaults
 
+STATIC noinline fastcall __unlikely int
+t_opts_size_ud_slow(const struct tp *tp, const mblk_t *mp)
+{
+	int size = 0;
+	struct iphdr *iph;
+
+	/* only need to deliver up destination address info if the stream is multihomed (i.e.
+	   wildcard bound) */
+	iph = (struct iphdr *) mp->b_datap->db_base;
+	size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
+	return (size);
+}
+
 /**
  * t_opts_size_ud - size options from received message for unitdata
  * @t: private structure
@@ -783,18 +804,10 @@ STATIC struct tp_options tp_defaults = {
 STATIC INLINE fastcall __hot_in int
 t_opts_size_ud(const struct tp *t, const mblk_t *mp)
 {
-	if (likely(t->bnum == 1 && t->baddrs[0].addr == INADDR_ANY))
-		return (0);
-	/* only need to deliver up destination address info if the stream is multihomed (i.e.
-	   wildcard bound) */
-	{
-		int size = 0;
-		struct iphdr *iph;
-
-		iph = (struct iphdr *) mp->b_datap->db_base;
-		size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
-		return (size);
-	}
+	if (likely(t->bnum == 1))
+		if (likely(t->baddrs[0].addr != INADDR_ANY))
+			return (0);
+	return t_opts_size_ud_slow(t, mp);
 }
 
 /**
@@ -3906,50 +3919,58 @@ dst_pmtu(struct dst_entry *dst)
 STATIC INLINE __hot_out int
 tp_ip_queue_xmit(struct sk_buff *skb)
 {
-	struct rtable *rt = (struct rtable *) skb->dst;
+	struct dst_entry *dst = skb->dst;
 	struct iphdr *iph = skb->nh.iph;
 
 #if defined NETIF_F_TSO
-	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
+	ip_select_ident_more(iph, dst, NULL, 0);
 #else				/* !defined NETIF_F_TSO */
-	ip_select_ident(iph, &rt->u.dst, NULL);
+	ip_select_ident(iph, dst, NULL);
 #endif				/* defined NETIF_F_TSO */
 	ip_send_check(iph);
 #if defined HAVE_KFUNC_IP_DST_OUTPUT
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, ip_dst_output);
 #else				/* !defined HAVE_KFUNC_IP_DST_OUTPUT */
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, dst_output);
 #endif				/* defined HAVE_KFUNC_IP_DST_OUTPUT */
 }
 #else				/* !defined HAVE_KFUNC_DST_OUTPUT */
 STATIC INLINE __hot_out int
 tp_ip_queue_xmit(struct sk_buff *skb)
 {
-	struct rtable *rt = (struct rtable *) skb->dst;
+	struct dst_entry *dst = skb->dst;
 	struct iphdr *iph = skb->nh.iph;
 
-	if (skb->len > dst_pmtu(&rt->u.dst)) {
+	if (skb->len > dst_pmtu(dst)) {
 		rare();
-		return ip_fragment(skb, skb->dst->output);
+		return ip_fragment(skb, dst->output);
 	} else {
 		iph->frag_off |= __constant_htons(IP_DF);
 		ip_send_check(iph);
-		return skb->dst->output(skb);
+		return dst->output(skb);
 	}
 }
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
-STATIC streams_noinline fastcall void
-tp_skb_destructor_slow(struct tp *tp)
+STATIC noinline fastcall void
+tp_skb_destructor_slow(struct tp *tp, struct sk_buff *skb)
 {
+	spin_lock_bh(&tp->qlock);
+	// ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
+	tp->sndmem -= skb->truesize;
 	if (unlikely((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0))) {
 		tp->sndblk = 0;	/* no longer blocked */
 		spin_unlock_bh(&tp->qlock);
 		if (tp->iq != NULL && tp->iq->q_first != NULL)
 			qenable(tp->iq);
-		return;
+	} else {
+		spin_unlock_bh(&tp->qlock);
 	}
-	spin_unlock_bh(&tp->qlock);
+#if 0				/* destructor is nulled by skb_orphan */
+	skb_shinfo(skb)->frags[0].page = NULL;
+	skb->destructor = NULL;
+#endif
+	tp_put(tp);
 	return;
 }
 
@@ -3967,26 +3988,27 @@ tp_skb_destructor_slow(struct tp *tp)
  * the send low water mark (or to zero) that is set when we stall the queue and reset when we fall
  * beneath the low water mark.
  */
-STATIC __hot void
+STATIC __hot_out void
 tp_skb_destructor(struct sk_buff *skb)
 {
 	struct tp *tp;
 
-	if (likely((tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page) != NULL)) {
+	tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page;
+	dassert(tp != NULL);
+	if (likely(tp->sndblk == 0)) {
 		/* technically we could have multiple processors freeing sk_buffs at the same time */
 		spin_lock_bh(&tp->qlock);
 		// ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 		tp->sndmem -= skb->truesize;
-		if (unlikely(tp->sndblk != 0))
-			tp_skb_destructor_slow(tp);
-		else
-			spin_unlock_bh(&tp->qlock);
+		spin_unlock_bh(&tp->qlock);
+#if 0				/* destructor is nulled by skb_orphan */
 		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
-		tp_release(&tp);
+#endif
+		tp_put(tp);
 		return;
 	}
-	return;
+	tp_skb_destructor_slow(tp, skb);
 }
 
 #undef skbuff_head_cache
@@ -4097,8 +4119,11 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 STATIC INLINE fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
-	struct sk_buff *skb, *skb_head = NULL, *skb_tail = NULL;
+	struct sk_buff *skb;
 	unsigned char *beg, *end;
+#if 0
+	struct sk_buff *skb_head = NULL, *skb_tail = NULL;
+#endif
 
 	/* must not be a fastbuf */
 	if (unlikely(mp->b_datap->db_size <= FASTBUF))
@@ -4113,17 +4138,22 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	beg = mp->b_rptr - headroom;
 	/* First, check if there is enough head room in the data block. */
 	if (unlikely(beg < mp->b_datap->db_base)) {
+#if 0
 		/* No, there is not enough headroom, allocate an sk_buff for the header. */
 		skb_head = alloc_skb(headroom, gfp);
 		if (unlikely(skb_head == NULL))
 			goto no_head;
 		skb_reserve(skb_head, headroom);
 		beg = mp->b_rptr;
+#else
+		goto go_frag;
+#endif
 	}
 	/* Next, check if there is enough tail room in the data block. */
 	end = (unsigned char *) (((unsigned long) mp->b_wptr + (SMP_CACHE_BYTES - 1)) &
 				 ~(SMP_CACHE_BYTES - 1));
 	if (unlikely(end + sizeof(struct skb_shared_info) > mp->b_datap->db_lim)) {
+#if 0
 		/* No, there is not enough tailroom, allocate an sk_buff for the tail. */
 		skb_tail = alloc_skb(SMP_CACHE_BYTES + sizeof(struct skb_shared_info), gfp);
 		if (unlikely(skb_tail == NULL))
@@ -4138,6 +4168,9 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 			bcopy(end, skb_put(skb_tail, len), len);
 			mp->b_wptr = end;
 		}
+#else
+		goto go_frag;
+#endif
 	}
 
 	/* Last, allocate a socket buffer header and point it to the payload data. */
@@ -4178,6 +4211,7 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	tp->sndmem += skb->truesize;
 	spin_unlock_bh(&tp->qlock);
 
+#if 0
 	if (likely(skb_head == NULL)) {
 		if (unlikely(skb_tail != NULL)) {
 			/* Chain skb_tail onto skb. */
@@ -4200,6 +4234,11 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		skb_head->len += skb_head->data_len;
 	}
 	return (skb_head);
+#else
+      no_skb:
+	return (skb);
+#endif
+#if 0
       no_skb:
 	if (skb_tail != NULL)
 		kfree_skb(skb_tail);
@@ -4207,7 +4246,9 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	if (skb_head != NULL)
 		kfree_skb(skb_head);
       no_head:
+#endif
 	return (NULL);
+      go_frag: /* for now */
       go_slow:
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
@@ -4224,10 +4265,8 @@ tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable 
 {
 	int err;
 
-	if (tp->daddrs[0].dst != NULL) {
-		dst_release(tp->daddrs[0].dst);
-		tp->daddrs[0].dst = NULL;
-	}
+	if (XCHG(rtp, NULL) != NULL)
+		dst_release(XCHG(&tp->daddrs[0].dst, NULL));
 	if (likely((err = ip_route_output(rtp, opt->ip.daddr, opt->ip.addr, 0, 0)) == 0)) {
 		dst_hold(&(*rtp)->u.dst);
 		tp->daddrs[0].dst = &(*rtp)->u.dst;
@@ -4240,10 +4279,9 @@ tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp
 {
 	register struct rtable *rt;
 
-	if (likely((rt = (struct rtable *) tp->daddrs[0].dst) != NULL)) {
+	if (likely((rt = *rtp) != NULL)) {
 		if (likely(rt->rt_dst == opt->ip.daddr)) {
 			dst_hold(&rt->u.dst);
-			*rtp = rt;
 			return (0);
 		}
 	}
@@ -4260,8 +4298,12 @@ tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp
 STATIC INLINE fastcall __hot_out int
 tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *opt, mblk_t *mp)
 {
-	struct rtable *rt = NULL;
+	struct rtable *rt;
 	int err;
+
+	prefetch(opt);
+	rt = (struct rtable *) tp->daddrs[0].dst;
+	prefetch(rt);
 
 	/* Allows slop over by 1 buffer per processor. */
 	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
@@ -4719,7 +4761,7 @@ tp_unbind(struct tp *tp)
 		tp_unbind_prot(tp->protoids[0], tp->info.SERV_type);
 		tp->bport = tp->sport = 0;
 		tp->bnum = tp->snum = tp->pnum = 0;
-		tp_release(&tp);
+		tp_put(tp);
 		write_unlock_bh(&hp->lock);
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 		synchronize_net();	/* might sleep */
@@ -5053,7 +5095,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		tp->chash = NULL;
 		tp->dport = tp->sport = 0;
 		tp->dnum = tp->snum = 0;
-		tp_release(&tp);
+		tp_put(tp);
 		write_unlock_bh(&hp->lock);
 	}
 	return (QR_ABSORBED);
@@ -5936,7 +5978,7 @@ te_unitdata_ind(queue_t *q, mblk_t *dp)
 	mblk_t *mp;
 	struct T_unitdata_ind *p;
 	struct sockaddr_in *SRC_buffer;
-	t_scalar_t SRC_length = sizeof(*SRC_buffer);
+	const t_scalar_t SRC_length = sizeof(*SRC_buffer);
 	t_scalar_t OPT_length = t_opts_size_ud(tp, dp);
 	size_t size = sizeof(*p) + SRC_length + OPT_length;
 	struct iphdr *iph;
@@ -6582,7 +6624,7 @@ te_unbind_req(queue_t *q, mblk_t *mp)
 }
 
 /**
- * te_unitdata_req - process a T_UNITDATA_REQ primitive
+ * te_unitdata_req_slow - process a T_UNITDATA_REQ primitive
  * @q: write queue
  * @mp: the primitive
  *
@@ -6593,8 +6635,8 @@ te_unbind_req(queue_t *q, mblk_t *mp)
  * for all packets sent.  The TPI-IP provider will request that the Stream head provide an
  * additional write offset of 20 bytes to accomodate the IP header.
  */
-STATIC INLINE fastcall __hot_put int
-te_unitdata_req(queue_t *q, mblk_t *mp)
+STATIC noinline fastcall __unlikely int
+te_unitdata_req_slow(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	size_t dlen;
@@ -6665,6 +6707,71 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	if (likely(err == QR_ABSORBED))
 		return (QR_TRIMMED);
 	return (err);
+}
+
+/**
+ * te_unitdata_req - process a T_UNITDATA_REQ primitive
+ * @q: write queue
+ * @mp: the primitive
+ *
+ * Optimize fast path for no options and correct behaviour.  This should run much faster than the
+ * old plodding way of doing things.
+ */
+STATIC INLINE fastcall __hot_put int
+te_unitdata_req(queue_t *q, mblk_t *mp)
+{
+	struct tp *tp = TP_PRIV(q);
+	struct T_unitdata_req *p;
+	mblk_t *dp;
+	int err;
+	struct sockaddr_in dst_buf;
+
+	prefetch(tp);
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto go_slow;
+	p = (typeof(p)) mp->b_rptr;
+	prefetch(p);
+	dassert(p->PRIM_type == T_UNITDATA_REQ);
+	if (unlikely(tp->info.SERV_type == T_COTS || tp->info.SERV_type == T_COTS_ORD))
+		goto go_slow;
+	if (unlikely(tp->info.SERV_type != T_CLTS))
+		goto go_slow;
+	if (unlikely(tp_get_state(tp) != TS_IDLE))
+		goto go_slow;
+	if (unlikely(p->DEST_length == 0))
+		goto go_slow;
+	if (unlikely((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)))
+		goto go_slow;
+	if (unlikely(p->DEST_length != sizeof(struct sockaddr_in)))
+		goto go_slow;
+	/* avoid alignment problems */
+	bcopy(mp->b_rptr + p->DEST_offset, &dst_buf, p->DEST_length);
+	if (unlikely(dst_buf.sin_family != AF_INET))
+		goto go_slow;
+	if (unlikely(dst_buf.sin_addr.s_addr == INADDR_ANY))
+		goto go_slow;
+	if (unlikely(dst_buf.sin_port == 0))
+		goto go_slow;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto go_slow;
+	prefetch(dp);
+	if (unlikely(p->OPT_length != 0))
+		goto go_slow;
+	{
+		size_t dlen;
+		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
+			goto go_slow;
+	}
+	if (unlikely((err = tp_senddata(tp, dst_buf.sin_port, &tp->options, dp)) != QR_ABSORBED))
+		goto error;
+	return (QR_TRIMMED);
+      error:
+	err = te_uderror_reply(q, &dst_buf, NULL, 0, err, dp);
+	if (likely(err == QR_ABSORBED))
+		return (QR_TRIMMED);
+	return (err);
+      go_slow:
+	return te_unitdata_req_slow(q, mp);
 }
 
 /**
@@ -7747,7 +7854,7 @@ tp_r_prim_slow(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair (read queue)
  * @mp: the message
  */
-STATIC INLINE streamscall __hot_get int
+STATIC INLINE streamscall __hot_in int
 tp_r_prim(queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_datap->db_type == M_DATA))
@@ -7950,18 +8057,17 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	do {
 		read_lock_bh(&hp->lock);
 		{
-			struct tp *tp;
-			t_uscalar_t state;
-			int i;
+			register struct tp *tp;
 
 			for (tp = hp->list; tp; tp = tp->bnext) {
-				int score = 0;
+				register int score = 0;
+				register int i;
 
 				/* only listening T_COTS(_ORD) Streams and T_CLTS Streams */
 				if (tp->CONIND_number == 0 && tp->info.SERV_type != T_CLTS)
 					continue;
 				/* only Streams in close to the correct state */
-				if ((state = tp_get_state(tp)) != TS_IDLE && state != TS_WACK_UREQ)
+				if (tp_not_state(tp, (TSF_IDLE|TSF_WACK_CREQ)))
 					continue;
 				for (i = 0; i < tp->pnum; i++) {
 					if (tp->protoids[i] != proto)
@@ -8007,10 +8113,14 @@ STATIC noinline fastcall __unlikely struct tp *
 tp_lookup_common_slow(struct tp_prot_bucket *pp, uint8_t proto, uint32_t daddr, uint16_t dport,
 		      uint32_t saddr, uint16_t sport)
 {
-	struct tp *result;
+	struct tp *result = NULL;
 
-	if ((result = tp_lookup_conn(proto, daddr, dport, saddr, sport)) == NULL)
-		result = tp_lookup_bind(proto, daddr, dport);
+	if (likely(pp != NULL)) {
+		if (likely(pp->corefs != 0))
+			result = tp_lookup_conn(proto, daddr, dport, saddr, sport);
+		if (result == NULL && (pp->corefs != 0 || pp->clrefs != 0))
+			result = tp_lookup_bind(proto, daddr, dport);
+	}
 	return (result);
 }
 
@@ -8018,30 +8128,23 @@ STATIC INLINE fastcall __hot_in struct tp *
 tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
 	struct tp_prot_bucket *pp, **ppp;
+	register struct tp *result;
 
 	ppp = &udp_prots[proto];
 
 	read_lock_bh(&udp_prot_lock);
 	if (likely((pp = *ppp) != NULL)) {
-		struct tp *result;
-
 		if (likely(pp->corefs == 0)) {
 			if (likely(pp->clrefs > 0)) {
 				result = tp_lookup_bind(proto, daddr, dport);
+			      done:
 				read_unlock_bh(&udp_prot_lock);
 				return (result);
-			} else {
-				read_unlock_bh(&udp_prot_lock);
-				return (NULL);
 			}
-		} else {
-			result = tp_lookup_common_slow(pp, proto, daddr, dport, saddr, sport);
-			read_unlock_bh(&udp_prot_lock);
-			return (result);
 		}
 	}
-	read_unlock_bh(&udp_prot_lock);
-	return (NULL);
+	result = tp_lookup_common_slow(pp, proto, daddr, dport, saddr, sport);
+	goto done;
 }
 
 /**
@@ -8088,29 +8191,28 @@ tp_lookup_icmp(struct iphdr *iph, unsigned int len)
  * tp_free - message block free function for mblks esballoc'ed from sk_buffs
  * @data: client data (sk_buff pointer in this case)
  */
-STATIC streamscall __hot_out void
+STATIC streamscall __hot_get void
 tp_free(char *data)
 {
 	struct sk_buff *skb = (typeof(skb)) data;
+	struct tp *tp;
 
-	/* sometimes skb is NULL if it has been stolen */
-	if (likely(skb != NULL)) {
-		struct tp *tp;
-
-		if (likely((tp = *(struct tp **) skb->cb) != NULL)) {
-			spin_lock_bh(&tp->qlock);
-			// ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
-			tp->rcvmem -= skb->truesize;
-			spin_unlock_bh(&tp->qlock);
-			/* put this back to null before freeing it */
-			*(struct tp **) skb->cb = NULL;
-			tp_release(&tp);
-			kfree_skb(skb);
-			return;
-		}
+	dassert(skb != NULL);
+	if (likely((tp = *(struct tp **) skb->cb) != NULL)) {
+		spin_lock_bh(&tp->qlock);
+		// ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
+		tp->rcvmem -= skb->truesize;
+		spin_unlock_bh(&tp->qlock);
+#if 0
+		/* put this back to null before freeing it */
+		*(struct tp **) skb->cb = NULL;
+#endif
+		tp_put(tp);
+	      done:
 		kfree_skb(skb);
+		return;
 	}
-	return;
+	goto done;
 }
 
 /**
@@ -8211,13 +8313,19 @@ tp_v4_rcv(struct sk_buff *skb)
 		put(tp->oq, mp);
 //              UDP_INC_STATS_BH(UdpInDatagrams);
 		/* release reference from lookup */
-		tp_release(&tp);
+		tp_put(tp);
 		return (0);
 	}
+      bad_checksum:
+//      UDP_INC_STATS_BH(UdpInErrors);
+//      IP_INC_STATS_BH(IpInDiscards);
+	/* decrement IpInDelivers ??? */
+	// goto linear_fail;
       no_buffers:
       flow_controlled:
       linear_fail:
-	tp_release(&tp);
+	if (tp)
+		tp_put(tp);
 	kfree_skb(skb);
 	return (0);
       no_stream:
@@ -8228,17 +8336,12 @@ tp_v4_rcv(struct sk_buff *skb)
 	    && (unsigned short) csum_fold(skb_checksum(skb, 0, skb->len, skb->csum)))
 		goto bad_checksum;
 //      UDP_INC_STATS_BH(UdpNoPorts);   /* should wait... */
-	goto pass_it;
-      bad_checksum:
-//      UDP_INC_STATS_BH(UdpInErrors);
-//      IP_INC_STATS_BH(IpInDiscards);
-	/* decrement IpInDelivers ??? */
-	goto linear_fail;
+	// goto pass_it;
       bad_pkt_type:
-	goto pass_it;
+	// goto pass_it;
       too_small:
-	goto pass_it;
-      pass_it:
+	// goto pass_it;
+      // pass_it:
 	if (tp_v4_rcv_next(skb)) {
 		/* TODO: want to generate an ICMP error here */
 	}
@@ -8305,7 +8408,7 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 	}
       discard_put:
 	/* release reference from lookup */
-	tp_release(&tp);
+	tp_put(tp);
 	tp_v4_err_next(skb, info);	/* anyway */
 	return;
       no_buffers:

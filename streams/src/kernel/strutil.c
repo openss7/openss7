@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/06/19 20:51:28 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/06/22 01:17:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/19 20:51:28 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 01:17:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.128  2006/06/22 01:17:11  brian
+ - syncing notebook, latest changes are not stable yet
+
  Revision 0.9.2.127  2006/06/19 20:51:28  brian
  - more optimizations
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/06/19 20:51:28 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/06/22 01:17:11 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2006/06/19 20:51:28 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/06/22 01:17:11 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -121,7 +124,7 @@ static char const ident[] =
 STATIC spinlock_t db_ref_lock = SPIN_LOCK_UNLOCKED;
 
 STATIC streams_noinline streams_fastcall __unlikely void
-db_inc_slow(dblk_t *db)
+db_inc_slow(register dblk_t *db)
 {
 	unsigned long flags;
 
@@ -131,7 +134,7 @@ db_inc_slow(dblk_t *db)
 }
 
 STATIC streams_inline streams_fastcall __hot_get void
-db_inc(dblk_t * db)
+db_inc(register dblk_t * db)
 {
 	/* When the number of references is 1 the buffer is exclusive to the
 	 * caller and locking is not required. */
@@ -140,22 +143,26 @@ db_inc(dblk_t * db)
 	return db_inc_slow(db);
 }
 
-STATIC streams_inline streams_fastcall __hot_in int
-db_dec_and_test(dblk_t * db)
+STATIC streams_noinline streams_fastcall __unlikely int
+db_dec_and_test_slow(register dblk_t * db)
 {
-	/* When the number of references is 1 the buffer is exclusive to the
-	 * caller and locking is not required. */
+	unsigned long flags;
+	register bool ret;
+
+	spin_lock_irqsave(&db_ref_lock, flags);
+	ret = (--db->db_ref == 0);
+	spin_unlock_irqrestore(&db_ref_lock, flags);
+	return ret;
+}
+
+STATIC streams_inline streams_fastcall __hot_in int
+db_dec_and_test(register dblk_t * db)
+{
+	/* When the number of references is 1 the buffer is exclusive to the caller and locking is
+	   not required. */
 	if (likely(db->db_ref == 1))
 		return ((db->db_ref = 0) == 0);
-	{
-		unsigned long flags;
-		bool ret;
-
-		spin_lock_irqsave(&db_ref_lock, flags);
-		ret = (--db->db_ref == 0);
-		spin_unlock_irqrestore(&db_ref_lock, flags);
-		return ret;
-	}
+	return (db_dec_and_test_slow(db));
 }
 
 #if 0
@@ -189,23 +196,23 @@ mb_to_mdb(mblk_t *mb)
 }
 #else
 STATIC streams_inline streams_fastcall __hot_out struct mdbblock *
-mb_to_mdb(mblk_t *mb)
+mb_to_mdb(register mblk_t *mb)
 {
 	return ((struct mdbblock *) mb);
 }
 STATIC streams_inline streams_fastcall __hot_in mblk_t *
-db_to_mb(dblk_t * db)
+db_to_mb(register dblk_t * db)
 {
 	return ((mblk_t *) ((struct mbinfo *) db - 1));
 }
 STATIC streams_inline streams_fastcall __hot_in unsigned char *
-db_to_buf(dblk_t * db)
+db_to_buf(register dblk_t * db)
 {
 	return (&mb_to_mdb(db_to_mb(db))->databuf[0]);
 }
 
 STATIC streams_inline streams_fastcall __hot_in dblk_t *
-mb_to_db(mblk_t *mb)
+mb_to_db(register mblk_t *mb)
 {
 	return (&mb_to_mdb(mb)->datablk.d_dblock);
 }
@@ -297,7 +304,7 @@ EXPORT_SYMBOL_NOVERS(adjmsg);		/* include/sys/streams/stream.h */
  *  @size:	size of message block in bytes
  *  @priority:	priority of the allocation
  */
-streams_fastcall __hot mblk_t *
+streams_fastcall __hot_out mblk_t *
 allocb(size_t size, uint priority)
 {
 	mblk_t *mp;
@@ -463,7 +470,7 @@ EXPORT_SYMBOL_NOVERS(dupmsg);		/* include/sys/streams/stream.h */
  *  @priority:	priority of message block header allocation
  *  @freeinfo:	free routine callback
  */
-streams_fastcall __hot mblk_t *
+streams_fastcall __hot_in mblk_t *
 esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 {
 	mblk_t *mp;
@@ -961,7 +968,7 @@ EXPORT_SYMBOL_NOVERS(qbackenable);
  *  IMPLEMENTATION: The current implementation is much faster than the older method of walking the
  *  queue bands, even considering that there were probably few, if any, queue bands.
  */
-streams_inline streams_fastcall __hot_in int
+streams_inline streams_fastcall __hot int
 bcangetany(queue_t *q)
 {
 	int found = 0;
@@ -1000,7 +1007,7 @@ EXPORT_SYMBOL_NOVERS(bcangetany);
  *
  *  LOCKING: No locks are required across the call.
  */
-streams_fastcall __hot_in int
+streams_fastcall __hot int
 bcanget(queue_t *q, unsigned char band)
 {
 	int found = 0;
@@ -1027,7 +1034,7 @@ bcanget(queue_t *q, unsigned char band)
 
 EXPORT_SYMBOL_NOVERS(bcanget);		/* include/sys/streams/stream.h */
 
-STATIC streams_inline streams_fastcall __hot_in int
+STATIC streams_inline streams_fastcall __hot int
 __bcanputany(queue_t *q)
 {
 	bool result;
@@ -1086,10 +1093,10 @@ EXPORT_SYMBOL_NOVERS(bcanputany);	/* include/sys/streams/stream.h */
  *  CONTEXT: bcanputnextany() can be called from STREAMS scheduler context, or from any context that
  *  holds a stream head read or write lock across the call.
  */
-streams_inline streams_fastcall __hot_in int
+streams_inline streams_fastcall __hot int
 bcanputnextany(queue_t *q)
 {
-	int result;
+	register int result;
 	struct stdata *sd;
 
 	dassert(q);
@@ -1202,7 +1209,7 @@ __bcanput_slow(queue_t *q, unsigned char band)
  *  will enable the queue if necessary.  If it back-enables before we call putbq(9) then the service
  *  procedure will go for another run anyway.
  */
-STATIC streams_inline streams_fastcall __hot_out int
+STATIC streams_inline streams_fastcall __hot int
 __bcanput(queue_t *q, unsigned char band)
 {
 	unsigned long pl;
@@ -1272,7 +1279,7 @@ __bcanput(queue_t *q, unsigned char band)
 streams_fastcall int
 bcanput(register queue_t *q, unsigned char band)
 {
-	int result;
+	register int result;
 	struct stdata *sd;
 
 	dassert(q);
@@ -1325,7 +1332,7 @@ EXPORT_SYMBOL_NOVERS(bcanput);
 streams_fastcall __hot int
 bcanputnext(register queue_t *q, unsigned char band)
 {
-	int result;
+	register int result;
 	struct stdata *sd;
 
 	dassert(q);
@@ -2031,7 +2038,7 @@ putq_result(queue_t *q, mblk_t *mp, const int result)
 streams_fastcall __hot int
 putq(register queue_t *q, register mblk_t *mp)
 {
-	int result;
+	register int result;
 	unsigned long pl;
 
 	assert(q);
@@ -2164,7 +2171,7 @@ insq_result(queue_t *q, const int result)
 streams_fastcall int
 insq(register queue_t *q, register mblk_t *emp, register mblk_t *nmp)
 {
-	int result;
+	register int result;
 	unsigned long pl;
 
 	assert(q);
@@ -2198,7 +2205,7 @@ EXPORT_SYMBOL_NOVERS(insq);
 streams_fastcall __unlikely int
 appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
-	int result;
+	register int result;
 	unsigned long pl;
 
 	assert(q);

@@ -1,3 +1,11 @@
+2006-06-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c: corrected minor bug in optimization
+
+2006-06-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c: more oprofile optimizations
+
 2006-06-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/udp.c: some optimization; dest caching

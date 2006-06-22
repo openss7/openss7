@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.16 $) $Date: 2006/05/23 22:43:32 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2006/06/22 01:17:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 22:43:32 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 01:17:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.16 $) $Date: 2006/05/23 22:43:32 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2006/06/22 01:17:03 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.16 $) $Date: 2006/05/23 22:43:32 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2006/06/22 01:17:03 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -5259,7 +5259,9 @@ recv_xti_udp_stream()
   int	            flags = 0;
 
   struct sockaddr_in myaddr_in;
+#if 0
   struct sockaddr_in fromaddr_in;
+#endif
 
   SOCKET s_data;
   unsigned int	bytes_received = 0;
@@ -5457,9 +5459,15 @@ recv_xti_udp_stream()
   /* since we are going to call t_rcvudata() instead of t_rcv() we */
   /* need to init the unitdata structure raj 3/95 */
 
+#if 0
   unitdata.addr.maxlen = sizeof(fromaddr_in);
   unitdata.addr.len    = sizeof(fromaddr_in);
   unitdata.addr.buf    = (char *)&fromaddr_in;
+#else
+  unitdata.addr.maxlen = 0;
+  unitdata.addr.len    = 0;
+  unitdata.addr.buf    = NULL;
+#endif
 
   unitdata.opt.maxlen = 0;
   unitdata.opt.len    = 0;

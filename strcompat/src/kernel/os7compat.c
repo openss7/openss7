@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/06/19 20:51:27 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/06/22 01:17:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/19 20:51:27 $ by $Author: brian $
+ Last Modified $Date: 2006/06/22 01:17:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.18  2006/06/22 01:17:07  brian
+ - syncing notebook, latest changes are not stable yet
+
  Revision 0.9.2.17  2006/06/19 20:51:27  brian
  - more optimizations
 
@@ -107,10 +110,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/06/19 20:51:27 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/06/22 01:17:07 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/06/19 20:51:27 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/06/22 01:17:07 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -131,7 +134,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/06/19 20:51:27 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/06/22 01:17:07 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -733,7 +736,7 @@ ss7_srvq(queue_t *q, int streamscall (*proc) (queue_t *, mblk_t *),
 
 EXPORT_SYMBOL_NOVERS(ss7_srvq);
 
-static streams_noinline streams_fastcall int
+static noinline streams_fastcall int
 ss7_oput_slow(str_t * s, mblk_t *mp)
 {
 	if (likely(s->oq != NULL)) {
@@ -778,7 +781,7 @@ ss7_oput(queue_t *q, mblk_t *mp)
 
 EXPORT_SYMBOL_NOVERS(ss7_oput);
 
-static streams_noinline streams_fastcall int
+static noinline streams_fastcall int
 ss7_osrv_slow(str_t * s, queue_t *q)
 {
 	if (likely(s->oq != NULL)) {
@@ -816,7 +819,7 @@ ss7_osrv(queue_t *q)
 
 EXPORT_SYMBOL_NOVERS(ss7_osrv);
 
-static streams_noinline streams_fastcall int
+static noinline streams_fastcall int
 ss7_iput_slow(str_t * s, mblk_t *mp)
 {
 	if (likely(s->iq != NULL)) {
@@ -861,7 +864,7 @@ ss7_iput(queue_t *q, mblk_t *mp)
 
 EXPORT_SYMBOL_NOVERS(ss7_iput);
 
-static streams_noinline streams_fastcall int
+static noinline streams_fastcall int
 ss7_isrv_slow(str_t * s, queue_t *q)
 {
 	if (likely(s->iq != NULL)) {
