@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/06/21 10:18:49 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/06/23 05:36:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/21 10:18:49 $ by $Author: brian $
+# Last Modified $Date: 2006/06/23 05:36:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1603,7 +1603,10 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 		linux_cv_optimize='size'
 		;;
 	    (speed)
-		linux_cflags="$linux_cflags${linux_cflags:+ }-O3 -g"
+dnl
+dnl		Please don't inline everything at -O3.
+dnl
+		linux_cflags="$linux_cflags${linux_cflags:+ }-O3 -g -fno-inline-functions"
 		linux_cv_debug="_NONE"
 		linux_cv_optimize='speed'
 dnl
@@ -1625,7 +1628,11 @@ dnl
 		linux_cv_optimize='normal'
 		;;
 	    (quick)
-		linux_cflags="$linux_cflags${linux_cflags:+ }-O0 -g"
+dnl
+dnl		Linux kernel header files have some functions that are expected to "disappear" just
+dnl		because they are static inline and never referenced.
+dnl
+		linux_cflags="$linux_cflags${linux_cflags:+ }-O0 -g -finline -fno-keep-inline-functions -fno-keep-static-consts"
 		linux_cv_debug="_TEST"
 		linux_cv_optimize='quick'
 		;;
