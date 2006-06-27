@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2006/06/22 13:11:39 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/06/27 09:22:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:39 $ by $Author: brian $
+ Last Modified $Date: 2006/06/27 09:22:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.140  2006/06/27 09:22:14  brian
+ - move sd->sd_rq dereferencing inside read locks
+
  Revision 0.9.2.139  2006/06/22 13:11:39  brian
  - more optmization tweaks and fixes
 
@@ -101,10 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2006/06/22 13:11:39 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/06/27 09:22:14 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2006/06/22 13:11:39 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/06/27 09:22:14 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -763,8 +766,7 @@ BIG_STATIC streams_fastcall __hot_out queue_t *
 qget(queue_t *q)
 {
 	prefetchw(q);
-	dassert(q != NULL);
-	{
+	if (q) {
 		struct queinfo *qu;
 
 		qu = (typeof(qu)) RD(q);
@@ -774,15 +776,19 @@ qget(queue_t *q)
 		atomic_inc(&qu->qu_refs);
 		return (q);
 	}
+	assure(q != NULL);
+	return (NULL);
 }
 BIG_STATIC streams_fastcall __hot_in void
 qput(queue_t **qp)
 {
-	queue_t *q = *qp;
+	queue_t *q;
+
+	dassert(qp != NULL);
+	q = *qp;
 
 	prefetchw(q);
-	dassert(q != NULL);
-	{
+	if (q) {
 		queue_t *rq;
 		struct queinfo *qu;
 
@@ -795,7 +801,9 @@ qput(queue_t **qp)
 			 __FUNCTION__, qu, atomic_read(&qu->qu_refs) - 1));
 		if (unlikely(atomic_dec_and_test(&qu->qu_refs) != 0))	/* PROFILED */
 			freeq(rq);
+		return;
 	}
+	assure(q != NULL);
 }
 
 /* 
@@ -1363,6 +1371,7 @@ sq_put(struct syncq **sqp)
 {
 	struct syncq *sq;
 
+	dassert(sap != NULL);
 	sq = *sap;
 	prefetchw(sq);
 	if (sq != NULL) {
@@ -4374,15 +4383,14 @@ sd_free(struct stdata *sd)
 BIG_STATIC_INLINE_STH streams_fastcall __hot struct stdata *
 sd_get(struct stdata *sd)
 {
-	if (likely(sd != NULL)) {
+	if (sd) {
 		struct shinfo *sh = (struct shinfo *) sd;
 
 		assert(atomic_read(&sh->sh_refs) > 0);
 		atomic_inc(&sh->sh_refs);
 		_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
 			 atomic_read(&sh->sh_refs)));
-	} else
-		assure(sd != NULL);
+	}
 	return (sd);
 }
 
@@ -4398,7 +4406,7 @@ sd_put(struct stdata **sdp)
 	prefetchw(&sh->sh_refs);
 #endif
 	dassert(sdp != NULL);
-	if (likely((sd = XCHG(sdp, NULL)) != NULL)) {
+	if ((sd = XCHG(sdp, NULL)) != NULL) {
 		struct shinfo *sh;
 
 		sh = (struct shinfo *) sd;
@@ -4409,8 +4417,7 @@ sd_put(struct stdata **sdp)
 		if (likely(atomic_dec_and_test(&sh->sh_refs) == 0))
 			return;
 		sd_free(sd);
-	} else
-		assure(sd != NULL);
+	}
 	return;
 }
 
@@ -4567,17 +4574,28 @@ STATIC int
 kstreamd(void *__bind_cpu)
 {
 	set_user_nice(current, 19);
+#ifdef PF_NOFREEZE
+	current->flags |= PF_NOFREEZE;
+#endif
 	set_current_state(TASK_INTERRUPTIBLE);
 	while (!kthread_should_stop()) {
-		if (!(this_thread->flags & (QRUNFLAGS)))
-			schedule();
-		__set_current_state(TASK_RUNNING);
 		preempt_disable();
-		if (cpu_is_offline((long) __bind_cpu))
-			goto wait_to_die;
-		__runqueues();
+		if (!(this_thread->flags & (QRUNFLAGS))) {
+			preempt_enable_no_resched();
+			schedule();
+			preempt_disable();
+		}
+		__set_current_state(TASK_RUNNING);
+
+		while (this_thread->flags & (QRUNFLAGS)) {
+			if (cpu_is_offline((long) __bind_cpu))
+				goto wait_to_die;
+			__runqueues();
+			preempt_enable_no_resched();
+			cond_resched();
+			preempt_disable();
+		}
 		preempt_enable();
-		cond_resched();
 		set_current_state(TASK_INTERRUPTIBLE);
 	}
 	__set_current_state(TASK_RUNNING);

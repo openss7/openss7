@@ -4,8 +4,8 @@
 Network Working Group                                     Brian Bidulock
 INTERNET-DRAFT                                       OpenSS7 Corporation
 
-                                                        October 16, 2005
-Expires in April 2006
+                                                           June 18, 2006
+Expires in December 2006
 
 
 
@@ -40,25 +40,24 @@ Status of this Memo
 
 Copyright
 
-    Copyright (C) The Internet Society (2005).
+    Copyright (C) The Internet Society (2006).
 
 Abstract
 
     This Internet-Draft describes Load Selection (LOADSEL) for
-  Signalling User Adaptation Protocols [IUA-BIS..SUA, DUA..TUA], which
-  permits an Application Server Processes (ASP) to indicate its
-  placement within an Application Server and permits an Signalling
-  Gateway (SG) to distribute traffic over ASPs in Application Servers
-  under Application Server Process (ASP) control.
-
-
+  Signalling User Adaptation Protocols [IUA-BIS], [DUA], [V5UA],
+  [GR303UA00], [M2UA], [M3UA-BIS], [SUA], [ISUA], [TUA], which permits
+  an Application Server Processes (ASP) to indicate its placement within
+  an Application Server and permits an Signalling Gateway (SG) to
+  distribute traffic over ASPs in Application Servers under Application
+  Server Process (ASP) control.
 
 
 
 
 B. Bidulock                    Version 0.4                        Page 1
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 Contents
 
@@ -71,10 +70,11 @@ Contents
 
     This Internet-Draft provides parameters and associated procedures in
   extension to the parameters and procedures of the Signalling User
-  Adaptation Layers (UAs) [IUA-BIS..SUA, DUA..TUA], for the purpose of
-  permitting Application Server Process control over placement of ASPs
-  within Application Servers (or Load Groups) [LOADGRP] as part of the
-  normal procedures of these UA protocols.
+  Adaptation Layers (UAs) [IUA-BIS], [DUA], [V5UA], [GR303UA00], [M2UA],
+  [M3UA-BIS], [SUA], [ISUA], [TUA], for the purpose of permitting
+  Application Server Process control over placement of ASPs within
+  Application Servers (or Load Groups) [LOADGRP] as part of the normal
+  procedures of these UA protocols.
 
     UA implementations supporting LOADSEL are intended to be compatible
   with UA implementations not supporting LOADSEL.
@@ -105,30 +105,30 @@ Contents
 1.3.  Terminology
 
     LOADSEL supplements the terminology used in the UA documents [IUA-
-  BIS..SUA, DUA..TUA] by adding the following terms:
+  BIS], [DUA], [V5UA], [GR303UA00], [M2UA], [M3UA-BIS], [SUA], [ISUA],
+  [TUA] by adding the following terms:
 
   Load Selection - a partition of traffic within an Application Server
       described by the Load Selection parameter and identified by a Load
       Selector parameter.
 
-  Load Selector (LS) - an identifier that uniquely identifies a
-      partition of traffic flow within an Application Server.  This
-
 
 B. Bidulock                    Version 0.4                        Page 2
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
+  Load Selector (LS) - an identifier that uniquely identifies a
+      partition of traffic flow within an Application Server.  This
       identifier is only guaranteed unique within the scope of an
       Application Server and must be combined with a Routing Context (or
       Interface Identifier(s)) (explicitly or implicitly) to uniquely
       define a partition of traffic flow at a Signalling Gateway.
 
   Signalling User Adaptation Layer (UA) - one or more of the Stream
-      Control Transmission Protocol (SCTP) [RFC 2960] ISDN Signalling
-      User Adaptation Layers [IUA-BIS, DUA..GR303UA00] or SS7 Signalling
-      User Adaptation Layers [M2UA..SUA, ISUA, TUA] supporting the
-      concept of an Application Server.
+      Control Transmission Protocol (SCTP) [RFC2960] ISDN Signalling
+      User Adaptation Layers [IUA-BIS], [DUA], [V5UA], [GR303UA00] or
+      SS7 Signalling User Adaptation Layers [M2UA], [M3UA-BIS], [SUA],
+      [ISUA], [TUA] supporting the concept of an Application Server.
 
 1.4.  Overview
 
@@ -150,11 +150,12 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
    (4)   Systems that require ASP control over load-sharing.
 
-    LOADSEL for the Signalling User Adaptation Layers [IUA-BIS..SUA,
-  DUA..TUA] permits close control over the placement and grouping of
-  Application Server Processes serving an Application Server that
-  provides for load selection placement within the Application Server: a
-  capability not present in the existing scheme.
+    LOADSEL for the Signalling User Adaptation Layers [IUA-BIS], [DUA],
+  [V5UA], [GR303UA00], [M2UA], [M3UA-BIS], [SUA], [ISUA], [TUA] permits
+  close control over the placement and grouping of Application Server
+  Processes serving an Application Server that provides for load
+  selection placement within the Application Server: a capability not
+  present in the existing scheme.
 
     Under existing UA traffic distribution, there is no mechanism which
   permits an Application Server Process (ASP) to indicate which of a
@@ -168,15 +169,35 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   receive additional load selections within the AS.  LOADSEL also
   permits grouping of ASPs within a load selection.
 
+
+
+B. Bidulock                    Version 0.4                        Page 3
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
 1.4.1.  Non-Load Selection Traffic Distribution
 
     Figure 1 illustrates the existing traffic distribution algorithm
   that is used across the Signalling User Adaptation Layers.
 
+    When an SGP distributes a Signalling User Adaptation Layer message
+  toward the Application Server based on the Routing (Link) Key, it
+  selects an ASP that is active for the AS according to the Traffic Mode
+  Type that is associated with the AS.  The Traffic Mode Type describes
+  three general distribution algorithms: Override, Load-share and
+  Broadcast.
 
-B. Bidulock                    Version 0.4                        Page 3
-
-Internet Draft                 UA LOADSEL               October 16, 2005
+    The detailed actions taken for these distribution algorithms are
+  described in Section 4 of the Signalling User Adaptation Layer
+  specifications [IUA-BIS], [DUA], [V5UA], [GR303UA00], [M2UA], [M3UA-
+  BIS], [SUA], [ISUA], [TUA]; however, they can be summarized as
+  follows:
+
+  Override:-  When distributing messages to an Override Application
+      Server, the SGP selects the ASP which is active for the
+      Application Server.  In an Override Application Server, at most
+      one ASP can be active for the AS at any given point in time.  The
+      active ASP for the AS is selected.
 
 
                                              ____
@@ -206,23 +227,11 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
            Figure 1.  Non-Load Selection Traffic Distribution
 
-    When an SGP distributes a Signalling User Adaptation Layer message
-  toward the Application Server based on the Routing (Link) Key, it
-  selects an ASP that is active for the AS according to the Traffic Mode
-  Type that is associated with the AS.  The Traffic Mode Type describes
-  three general distribution algorithms: Override, Load-share and
-  Broadcast.
 
-    The detailed actions taken for these distribution algorithms are
-  described in Section 4 of the Signalling User Adaptation Layer
-  specifications [IUA-BIS..SUA, DUA..TUA]; however, they can be
-  summarized as follows:
 
-  Override:-  When distributing messages to an Override Application
-      Server, the SGP selects the ASP which is active for the
-      Application Server.  In an Override Application Server, at most
-      one ASP can be active for the AS at any given point in time.  The
-      active ASP for the AS is selected.
+B. Bidulock                    Version 0.4                        Page 4
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
       A major limitation of the Override AS that is removed by LOADSEL
       is that only one ASP can be active within an Application Server.
@@ -232,11 +241,6 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   Load-share:-  When distributing messages to a Load-share Application
       Server, the SGP selects one of the ASPs that are active for the
       Application Server using an implementation dependent load-sharing
-
-B. Bidulock                    Version 0.4                        Page 4
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
       algorithm based on some unspecified aspect of the traffic or
       static configuration data.
 
@@ -282,19 +286,10 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
     When an SGP distributes a Signalling User Adaptation Layer message
   toward an Application Server based on the Routing (Link) Key, it first
-  derives a Load Selector according to a UA-specific, AS-specific and
-  implementation-dependent load selection algorithm.  This load
-  selection algorithm is configured at the SGP and may consist, for
-  example, of the Signalling Link Selection (SLS) [Q.704], Circuit
-  Identification Code (CIC) [Q.723, Q.763], Subsystem Number (SSN)
-  [Q.713], Destination Local Reference (DLR) [Q.713], or Transaction Id
-  (TID) [Q.773], value contained in the message for distribution.
-
-
 
 B. Bidulock                    Version 0.4                        Page 5
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 
                  Traffic        Load         ____
@@ -324,12 +319,20 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
              Figure 2.  Load Selection Traffic Distribution
 
+  derives a Load Selector according to a UA-specific, AS-specific and
+  implementation-dependent load selection algorithm.  This load
+  selection algorithm is configured at the SGP and may consist, for
+  example, of the Signalling Link Selection (SLS) [Q.704], Circuit
+  Identification Code (CIC) [Q.723], [Q.763], Subsystem Number (SSN)
+  [Q.713], Destination Local Reference (DLR) [Q.713], or Transaction Id
+  (TID) [Q.773], value contained in the message for distribution.
+
     Once the SGP has determined the Load Selector to which the message
   corresponds, an ASP that is active for the associated Load Selection
   within the AS is selected.  When multiple ASPs are active for the same
   Load Selection within an AS, the SGP uses the traffic handling mode
   based on the Traffic Mode Type associated with the Application Server
-  (or Load Group[1]) to choose the ASP within the load selection.
+  (or Load Group<1>) to choose the ASP within the load selection.
 
     Under LOADSEL, the Traffic Mode Type continues to describe three
   general distribution algorithms: Override, Load-share and Broadcast.
@@ -341,6 +344,11 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   Override:-  When distributing messages to an Override Application
       Server, the SGP first determines the Load Selector associated with
       the message.  The SGP then distributes the message to the ASP that
+
+B. Bidulock                    Version 0.4                        Page 6
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
       is active for the traffic flow indicated by the Load Selector
       within the AS.  In an Override Application Server, at most one ASP
       can be active for the AS within a Load Selector at any given point
@@ -350,11 +358,6 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   Load-share:-  When distributing messages to a Load-share Application
       Server, the SGP first determines the Load Selector associated with
       the message.  The SGP then selects one of the active ASPs
-
-B. Bidulock                    Version 0.4                        Page 6
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
       associated with the Load Selector within the AS using an
       implementation dependent load-sharing algorithm based on some
       unspecified aspect of the traffic or static configuration data.
@@ -373,7 +376,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
 Notes for Section 1
 
-  [1]  Another draft: UA Load Grouping [LOADGRP], provides for
+  <1>  Another draft: UA Load Grouping [LOADGRP], provides for
        selection of Load Distribution methods within a Load Selector.
        The draft [LOADGRP] refers to a group of ASPs within the same
        traffic load selection as a Load Group and associates a Load
@@ -384,10 +387,9 @@ Notes for Section 1
 
 2.  Conventions
 
-    The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-  "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-  "OPTIONAL", when they appear in this document, are to be interpreted
-  as described in [RFC 2119].
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in [RFC2119].
 
 3.  Protocol Elements
 
@@ -398,6 +400,13 @@ Notes for Section 1
 
     LOADSEL adds one new parameter: the Load Selector parameter.
 
+
+
+
+B. Bidulock                    Version 0.4                        Page 7
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
 3.1.1.  Load Selector
 
     The Load Selector parameter is used in the REG RSP, ASPAC, ASPAC
@@ -407,12 +416,7 @@ Notes for Section 1
   registering, activating or deactivating, or when the SG is indicating
   or notifying of an ASP state change.
 
-  The Load Selector parameter is formatted as follows: [1]
-
-
-B. Bidulock                    Version 0.4                        Page 7
-
-Internet Draft                 UA LOADSEL               October 16, 2005
+  The Load Selector parameter is formatted as follows: <1>
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -455,23 +459,18 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   Identifier(s)) representing a single Application Server SHOULD be
   associated (specified or implied) with the message.
 
+
+
+B. Bidulock                    Version 0.4                        Page 8
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
 3.1.2.  Load Selection
 
     The Load Selection parameter is used in the REG REQ message.  It is
   used to register the placement of an ASP within an Application Server.
 
-  The Load Selection parameter is formatted as follows: [2]
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                        Page 8
-
-Internet Draft                 UA LOADSEL               October 16, 2005
+  The Load Selection parameter is formatted as follows: <2>
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -517,6 +516,13 @@ Internet Draft                 UA LOADSEL               October 16, 2005
           any Address Range parameter present in the Routing Key
           parameter for routing purposes.
 
+
+
+
+B. Bidulock                    Version 0.4                        Page 9
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
   Note 4: When the Transaction Id Range parameter is used in the Load
           Selection, it SHOULD be more restrictive than (a subset of)
           any Transaction Id Range parameter present in the Routing Key
@@ -525,18 +531,11 @@ Internet Draft                 UA LOADSEL               October 16, 2005
     The Load Selection parameter SHOULD contain at least one Load
   Selection Parameter.
 
-
-
-
-B. Bidulock                    Version 0.4                        Page 9
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
 3.2.  Messages
 
     LOADSEL adds the Load Selector parameter as an OPTIONAL parameter to
   be used in conjunction with the common Traffic Mode Type in the
-  following messages: [3]
+  following messages: <3>
 
       REG REQ     Registration Request message
       REG RSP     Registration Response message
@@ -551,8 +550,8 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
     LOADSEL supplements the Registration Request (REG REQ) message by
   permitting the following optional parameters to be included in the
-  Routing Key [M3UA-BIS, SUA, ISUA, TUA] or Link Key [M2UA] parameter
-  within the message:
+  Routing Key [M3UA-BIS], [SUA], [ISUA], [TUA] or Link Key [M2UA]
+  parameter within the message:
 
       Extension Parameters
       -----------------------------------------
@@ -564,16 +563,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   registering ASP.
 
   The format of the resulting Routing Key or Link Key parameter is as
-  follows: [4]
-
-
-
-
-
-
-
-
-
+  follows: <4>
 
 
 
@@ -589,7 +579,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
 B. Bidulock                    Version 0.4                       Page 10
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -640,16 +630,17 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   permitting the following optional parameters to be include in the
   Registration Result parameter within the message:
 
-      Extension Parameters
-      -----------------------------------------
+
 
 
 
 
 B. Bidulock                    Version 0.4                       Page 11
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
+      Extension Parameters
+      -----------------------------------------
       Load Selector               Optional
 
 
@@ -686,7 +677,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
     LOADSEL extends the common Registration Status parameter in the REG
   RSP message by adding the following values to the Registration Status:
 
-        Value[5]   Description
+        Value<5>   Description
         -----------------------------------------------------
            12      Error - Unsupported Load Selection
            13      Error - Invalid Load Selection
@@ -696,6 +687,15 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
     No other changes to the REG RSP message or Registration Response
   parameter formats are provided by this extension.
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 12
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 3.2.3.  ASP Active (ASPAC)
 
@@ -707,9 +707,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
       Load Selector               Optional
 
 
-Internet Draft                 UA LOADSEL               October 16, 2005
-
-  The format of the resulting ASPAC message is as follows: [3][6]
+  The format of the resulting ASPAC message is as follows: <3><6>
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -750,6 +748,13 @@ Internet Draft                 UA LOADSEL               October 16, 2005
     No other changes to the ASPAC message format are provided by this
   extension.
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 13
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
 3.2.4.  ASP Active Ack (ASPAC ACK)
 
     LOADSEL supplements the ASP Active Ack (ASPAC ACK) message by
@@ -761,14 +766,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
       Load Selector               Optional
 
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 13
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
-  The format of the resulting ASPAC ACK message is as follows: [3][7]
+  The format of the resulting ASPAC ACK message is as follows: <3><7>
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -810,6 +808,11 @@ Internet Draft                 UA LOADSEL               October 16, 2005
     No other changes to the ASPAC ACK message format are provided by
   this extension.
 
+
+B. Bidulock                    Version 0.4                       Page 14
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
 3.2.5.  ASP Inactive (ASPIA)
 
     LOADSEL supplements the ASP Inactive (ASPIA) message by permitting
@@ -820,14 +823,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
       Load Selector               Optional
 
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 14
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
-  The format of the resulting ASPIA message is as follows: [3][8]
+  The format of the resulting ASPIA message is as follows: <3><8>
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -870,21 +866,17 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   permitting the following parameters to be included in the ASPIA ACK
   message:
 
+
+B. Bidulock                    Version 0.4                       Page 15
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
       Extension Parameters
       -----------------------------------------
       Load Selector               Optional
 
 
-  The format of the resulting ASPIA ACK message is as follows: [3][9]
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 15
-
-Internet Draft                 UA LOADSEL               October 16, 2005
+  The format of the resulting ASPIA ACK message is as follows: <3><9>
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -928,22 +920,21 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   values to the common mandatory Error Code parameter in the ERR
   message:
 
-      29   Invalid Load Selector [10]
-
-
-  These new error codes are interpreted as follows: [3]
-
-  The "Invalid Load Selector" error would be sent in an ERR message if
-      the SG determines that one or more Load Selectors in the Load
-      Selector parameter provided by the ASP is invalid, is not
-      configured, or cannot be supported.
+      29   Invalid Load Selector <10>
 
 
 
 
 B. Bidulock                    Version 0.4                       Page 16
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
+  These new error codes are interpreted as follows: <3>
+
+  The "Invalid Load Selector" error would be sent in an ERR message if
+      the SG determines that one or more Load Selectors in the Load
+      Selector parameter provided by the ASP is invalid, is not
+      configured, or cannot be supported.
 
     No other changes to the ERR message or Error Code parameter format
   are provided by this extension.  See Section 4 for extension
@@ -959,7 +950,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
       Load Selector               Optional
 
 
-  The format of the resulting NTFY message is as follows: [3][11]
+  The format of the resulting NTFY message is as follows: <3><11>
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -992,18 +983,16 @@ Internet Draft                 UA LOADSEL               October 16, 2005
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
+B. Bidulock                    Version 0.4                       Page 17
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
     The Load Selector parameter is used by the SGP in the NTFY message
   to indicate the traffic load positions which led to or have
   contributed to the change in state of an associated Application Server
   when sending a NTFY message that indicates and Application Server
   state change.  The Application Servers for which the Load Selectors
   apply is either indicated in the NTFY message by providing the
-
-
-B. Bidulock                    Version 0.4                       Page 17
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
   associated Routing Context (Interface Identifiers) or, if there is no
   Routing Context (Interface Identifier) parameter in the NTFY message,
   the associated Application Servers are implied by SGP and ASP
@@ -1014,61 +1003,62 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
 Notes for Section 3
 
-  [1]  EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
+  <1>  EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
        be assigned by IANA within the common parameter range of the
        SIGTRAN UAs and may change its value in further versions of
        this document.
 
-  [2]  EDITOR'S NOTE:-  The parameter tag values shown as 0x0019) will
+  <2>  EDITOR'S NOTE:-  The parameter tag values shown as 0x0019) will
        be assigned by IANA within the common parameter range of the
        SIGTRAN UAs and may change its value in further versions of
        this document.
 
-  [3]  For a detailed description of these messages, see Section 3 of
+  <3>  For a detailed description of these messages, see Section 3 of
        the SIGTRAN UA specifications cited under "References" [IUA-
-       BIS..SUA, DUA..TUA].
+       BIS], [DUA], [V5UA], [GR303UA00], [M2UA], [M3UA-BIS], [SUA],
+       [ISUA], [TUA].
 
-  [4]  EDITOR'S NOTE:-  The parameter tag values shown as 0x0019) will
+  <4>  EDITOR'S NOTE:-  The parameter tag values shown as 0x0019) will
        be assigned by IANA within the common parameter range of the
        SIGTRAN UAs and may change its value in further versions of
        this document.
 
-  [5]  EDITOR'S NOTE:-  The Registration Status values shown as 12,
+  <5>  EDITOR'S NOTE:-  The Registration Status values shown as 12,
        13, 14 and 15 will be assigned by IANA as a value of the UA-
        specific Registration Status parameter for each SIGTRAN UA and
        may change its value in further versions of this document.
 
-  [6]  EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
+  <6>  EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
        be assigned by IANA within the common parameter range of the
        SIGTRAN UAs and may change its value in further versions of
        this document.
 
-  [7]  EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
+  <7>  EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
        be assigned by IANA within the common parameter range of the
        SIGTRAN UAs and may change its value in further versions of
        this document.
 
-  [8]  EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
+  <8>  EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
        be assigned by IANA within the common parameter range of the
-       SIGTRAN UAs and may change its value in further versions of
-       this document.
-
-  [9]  EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
-       be assigned by IANA within the common parameter range of the
-       SIGTRAN UAs and may change its value in further versions of
-       this document.
-
 
 B. Bidulock                    Version 0.4                       Page 18
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
-  [10] EDITOR'S NOTE:-  The Error Code value shown as 29) will be
+       SIGTRAN UAs and may change its value in further versions of
+       this document.
+
+  <9>  EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
+       be assigned by IANA within the common parameter range of the
+       SIGTRAN UAs and may change its value in further versions of
+       this document.
+
+  <10> EDITOR'S NOTE:-  The Error Code value shown as 29) will be
        assigned by IANA as a value of the common Error Code parameter
        for SIGTRAN UAs and may change its value in further versions of
        this document.
 
-  [11] EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
+  <11> EDITOR'S NOTE:-  The parameter tag values shown as 0x0018) will
        be assigned by IANA within the common parameter range of the
        SIGTRAN UAs and may change its value in further versions of
        this document.
@@ -1096,8 +1086,9 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
 4.1.1.  ASP State
 
-    LOADSEL uses the existing UA [IUA-BIS..SUA, DUA..TUA] definitions
-  and procedures with regard to ASP State.
+    LOADSEL uses the existing UA [IUA-BIS], [DUA], [V5UA], [GR303UA00],
+  [M2UA], [M3UA-BIS], [SUA], [ISUA], [TUA] definitions and procedures
+  with regard to ASP State.
 
 4.1.2.  AS State
 
@@ -1105,6 +1096,12 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   User Adaptation Layer on the SGPs.  The state of the Application
   Server changes due to ASP state transitions.  The possible states of
   an Application Server using LOADSEL are:
+
+
+
+B. Bidulock                    Version 0.4                       Page 19
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
   AS-DOWN:        The Application Server is unavailable.  This state
                   implies that all related ASPs are in the ASP-DOWN
@@ -1117,10 +1114,6 @@ Internet Draft                 UA LOADSEL               October 16, 2005
                   in the ASP-INACTIVE state, but there is no ASP in the
                   ASP-ACTIVE state).  The recovery timer T(r) is not
                   running or has expired.
-
-B. Bidulock                    Version 0.4                       Page 19
-
-Internet Draft                 UA LOADSEL               October 16, 2005
 
   AS-ACTIVE:      The Application Server is available and application
                   traffic is active.  This state implies that there is
@@ -1158,8 +1151,15 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   AS), the SGP also follows the "Notification Procedures" (described in
   Section 4.1.7) for the Application Server.
 
-    Otherwise, the "ASP Up Procedures" described by the UAs [1] apply
+    Otherwise, the "ASP Up Procedures" described by the UAs <1> apply
   also to LOADSEL.
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 20
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 4.1.4.  ASP Down Procedures
 
@@ -1175,13 +1175,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   Selections results in a state change in the associated Application
   Servers, the SGP moves the Application Server to the AS-DOWN state.
 
-
-
-B. Bidulock                    Version 0.4                       Page 20
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
-    Otherwise, the "ASP Down Procedures" described by the UAs [1] apply
+    Otherwise, the "ASP Down Procedures" described by the UAs <1> apply
   also to LOADSEL.
 
 4.1.5.  ASP Active Procedures
@@ -1220,7 +1214,12 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   the SGP follows the "Notification Procedures" (described in Section
   4.1.7) for the Application Server.
 
-    Otherwise, the "ASP Active Procedures" described by the UAs [1]
+
+B. Bidulock                    Version 0.4                       Page 21
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
+    Otherwise, the "ASP Active Procedures" described by the UAs <1>
   apply also to LOADSEL.
 
 4.1.6.  ASP Inactive Procedures
@@ -1235,11 +1234,6 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   ASPIA ACK message including the Load Selector parameter for which the
   ASP has been deactivated.  If the SGP is responding to an ASP that
   included the Load Selector parameter in the ASPIA message, the SG MUST
-
-B. Bidulock                    Version 0.4                       Page 21
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
   include the Load Selector parameter in the response ASPIA ACK message.
 
     If the SGP receives an ASPIA message from an ASP that is active for
@@ -1269,7 +1263,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   the SGP follows the "Notification Procedures" (described in Section
   4.1.7) for the Application Server.
 
-    Otherwise, the "ASP Inactive Procedures" described by the UAs [1]
+    Otherwise, the "ASP Inactive Procedures" described by the UAs <1>
   apply also to LOADSEL.
 
 4.1.7.  Notify Procedures
@@ -1278,6 +1272,11 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
     When an ASP makes a state transition and is configured for a set of
   Load Selections in one or more Application Servers, the ASP state
+
+B. Bidulock                    Version 0.4                       Page 22
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
   transition may result in a change to the state of the associated
   Application Servers, or Load Selections within those AS, at the SGP.
   When a recovery timer T(r) expires, the associated Application Server
@@ -1295,17 +1294,13 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   for which the Application Server is configured that caused the AS
   state change or is perpetuating the AS state.
 
-B. Bidulock                    Version 0.4                       Page 22
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
     The SGP includes the Routing Context (Interface Identifiers) that
   identifies the Application Server for which the NTFY message is being
   sent.  If, however, the ASP is not configured for more than one
   Application Server, the Routing Context (Interface Identifier) MAY be
   excluded from the NTFY message as it is implied by configuration data.
 
-    Otherwise, the "Notification Procedures" described by the UAs [1]
+    Otherwise, the "Notification Procedures" described by the UAs <1>
   apply also to LOADSEL.
 
     Examples are given in Section 5.
@@ -1319,7 +1314,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   associated AS and any ASP Identifier associated with the ASP for which
   the notification is being given.
 
-    Otherwise, the "Notification Procedures" described by the UAs [1]
+    Otherwise, the "Notification Procedures" described by the UAs <1>
   apply also to LOADSEL.
 
 4.1.8.  Registration Procedures
@@ -1333,6 +1328,12 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   parameter in the REG REQ message to the SGP.  The Load Selection
   parameter describes the range of traffic load for which the ASP wishes
   to obtain a Load Selector value.
+
+
+
+B. Bidulock                    Version 0.4                       Page 23
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
     When an SGP receives a REG REQ message with a Load Selection
   parameter, it will determine whether the Load Selection parameter
@@ -1353,10 +1354,6 @@ Internet Draft                 UA LOADSEL               October 16, 2005
      and MUST be sent in an Registration Response (REG RSP) message
      whenever the SG determines that the Load Selection provided in a
      REG REQ message is not supported by the SG.
-
-B. Bidulock                    Version 0.4                       Page 23
-
-Internet Draft                 UA LOADSEL               October 16, 2005
 
   "Error - Invalid Load Selection."
 
@@ -1382,13 +1379,19 @@ Internet Draft                 UA LOADSEL               October 16, 2005
      Unsupported LS Parameter Field".  This result MAY be used if, for
      example, the SGP does not support the CIC Range parameter.
 
-    Otherwise, the "Registration Procedures" described by the UAs [1]
+    Otherwise, the "Registration Procedures" described by the UAs <1>
   apply also to LOADSEL.
 
 4.2.  Interworking Procedures
 
     LOADSEL supports the ASP Extension procedures described in ASPEXT
   [ASPEXT] and defines the following ASP Extension value:
+
+
+
+B. Bidulock                    Version 0.4                       Page 24
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
       1   LOADSEL Extension
 
@@ -1407,24 +1410,14 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   support LOADSEL and MUST fall back to the non-Load Selection UA
   procedures.
 
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 24
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
-
 Notes for Section 4
 
-  [1]  For a detailed description of these procedures, see Section 4
+  <1>  For a detailed description of these procedures, see Section 4
        of the SIGTRAN UA specifications cited under "References" [IUA-
-       BIS..SUA, DUA..TUA].
+       BIS], [DUA], [V5UA], [GR303UA00], [M2UA], [M3UA-BIS], [SUA],
+       [ISUA], [TUA].
 
-  [2]  EXAMPLE:- An ASP (e.g, ASP-1) moving to state ASP-INACTIVE
+  <2>  EXAMPLE:- An ASP (e.g, ASP-1) moving to state ASP-INACTIVE
        within a Load Selector (e.g, LS-1) results in the state of the
        AS moving to AS-PENDING.  The SGP sends NTFY("Application
        Server Pending") with "LS-1" in the Load Selector parameter in
@@ -1452,6 +1445,12 @@ Notes for Section 4
    + Two SGs (SG1 and SG2) acting as STPs in the SS7 network and
      consisting (for example) of a single SGP.  Each SG is connected to
      each of the ASPs in the example configuration.
+
+
+B. Bidulock                    Version 0.4                       Page 25
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
    + Four ASPs (ASP1, ASP2, ASP3 and ASP4).  Each ASP is connected to
      both of the SGs in the example configuration.
    + Two Load Selections (LS1 and LS2) are associated with the
@@ -1472,9 +1471,13 @@ Notes for Section 4
 
 
 
-B. Bidulock                    Version 0.4                       Page 25
-
-Internet Draft                 UA LOADSEL               October 16, 2005
+
+
+
+
+
+
+
 
 
                            SCTP
@@ -1499,6 +1502,12 @@ Internet Draft                 UA LOADSEL               October 16, 2005
                                         |________|    \_________/
 
                     Figure 3.  Example Configuration
+
+
+
+B. Bidulock                    Version 0.4                       Page 26
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 
 5.1.1.  Initialization
@@ -1530,11 +1539,6 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
     Figure 4 illustrates the common initialization procedure use for all
   of the examples.  Each ASP establishes an SCTP Association with SG1
-
-B. Bidulock                    Version 0.4                       Page 26
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
   and sends an ASPUP message to which it receives and ASP Up response.
   The ASPs are not statically configured to serve specific AS or LS
   within the AS, so no Notify messages are received.  The same sequence
@@ -1551,6 +1555,17 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   value for ISUP (SI=5).  The Load Selections (LS1 and LS2) correspond
   to two sets of CIC values which correspond to two different trunk
   groups between MGC1 and MGC2 (TG1 and TG2).
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 27
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 
 5.2.1.  Activation
@@ -1589,11 +1604,6 @@ Internet Draft                 UA LOADSEL               October 16, 2005
   within the Override Application Server.  The sequence of events is as
   follows:
 
-
-B. Bidulock                    Version 0.4                       Page 27
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
    (1)   ASP1 sends an ASPAC message to SG1 identifying Load Selection
          LS1 within Application Server AS1/RC1 and receives an
          acknowledgement and a notification.  Data is transferred
@@ -1609,6 +1619,11 @@ Internet Draft                 UA LOADSEL               October 16, 2005
    (3)   ASP3 sends an ASPIA message to SG1 identifying Load Selection
          LS1 within Application Server AS1/RC1 and receives an
          acknowledgement and a notification.
+
+
+B. Bidulock                    Version 0.4                       Page 28
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
    (4)   ASP4 sends an ASPIA message to SG1 identifying Load Selection
          LS1 and LS2 within Application Server AS1/RC1 and receives an
@@ -1648,11 +1663,6 @@ Internet Draft                 UA LOADSEL               October 16, 2005
     Figure 6 illustrates the failure of ASP1.  The sequence of events is
   as follows:
 
-
-B. Bidulock                    Version 0.4                       Page 28
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
    (1)   Data for LS1 within AS1 is exchanged between SG1 and ASP1.
          Data for LS2 within AS1 is exchanged between SG1 and ASP2.
 
@@ -1665,6 +1675,13 @@ Internet Draft                 UA LOADSEL               October 16, 2005
          activates for LS1 in AS1/RC1.  ASP2, ASP3 and ASP4 receive an
          AS-ACTIVE notification.  Data for LS1 in AS1 is now exchanged
          with ASP4.
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 29
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 
 5.2.3.  Sparing
@@ -1707,16 +1724,22 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
     This example is for an SUA [SUA] configuration with the Application
   Server (AS1) configured with a Traffic Mode Type of Load-share.  The
-
-B. Bidulock                    Version 0.4                       Page 29
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
   Application Server (AS1) has associated with it (RK1) that consists of
   Destination Point Code and Subsystem Number that corresponds to the
   AS1 (HLR1) point code (PC1).  The Load Selections (LS1 and LS2)
   correspond to two sets of Global Titles which correspond to Mobile and
   GSTN numbering.
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 30
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 
 5.3.1.  Activation
@@ -1766,14 +1789,15 @@ Internet Draft                 UA LOADSEL               October 16, 2005
    (2)   ASP2 sends an ASPAC message to SG1 identifying Load Selection
          LS2 within Application Server AS1/RC1 and receives an
          acknowledgement and a notification.  ASP1 also receives
-
-B. Bidulock                    Version 0.4                       Page 30
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
          notification that AS1/RC1 is active for LS2.  Data is
          transferred between the SG and ASP2 for Load Selection LS2
          within AS1.
+
+
+
+B. Bidulock                    Version 0.4                       Page 31
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
    (3)   ASP3 sends an ASPAC message to SG1 identifying Load Selection
          LS1 within Application Server AS1/RC1 and receives an
@@ -1824,14 +1848,14 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
 
 
-
-
-B. Bidulock                    Version 0.4                       Page 31
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
     Figure 9 illustrates the failure of ASP1 followed by the failure of
   ASP2.  The sequence of events is as follows:
+
+
+
+B. Bidulock                    Version 0.4                       Page 32
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
    (1)   Data for LS1 within AS1 is load-shared between ASP1 and ASP3.
          Data for LS2 within AS1 is exchanged with ASP2.
@@ -1884,13 +1908,13 @@ Internet Draft                 UA LOADSEL               October 16, 2005
    (1)   Data for LS1 in AS1 is load-shared between SG1 and ASP1 and
          ASP3.
 
-
-B. Bidulock                    Version 0.4                       Page 32
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
    (2)   ASP4 (spare) activates for LS1 in AS1 and receives and
          acknowledgement.  Data for LS1 in AS1 is now being load-shared
+
+B. Bidulock                    Version 0.4                       Page 33
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
          between SG1 and ASP1, ASP3 and ASP4.
 
    (3)   ASP1 deactivates for LS1 in AS1 and receives and
@@ -1944,9 +1968,10 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
                    Figure 11.  TUA Example - Activation
 
-B. Bidulock                    Version 0.4                       Page 33
+
+B. Bidulock                    Version 0.4                       Page 34
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
     Figure 11 illustrates activation of the ASPs for Load Selections
   within the Broadcast Application Server.  The sequence of events is as
@@ -2002,10 +2027,9 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 34
+B. Bidulock                    Version 0.4                       Page 35
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 
 5.4.2.  Failure of ASP1 and ASP2
@@ -2059,13 +2083,14 @@ Internet Draft                 UA LOADSEL               October 16, 2005
          notified of the failure of ASP1 as well of the AS1 state change
          to AS-PENDING.  Data for LS2 is queued at the SG.
 
+
+
+B. Bidulock                    Version 0.4                       Page 36
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
    (4)   ASP4 (spare) responds to the AS-PENDING notification and
          activates for LS2 in AS1/RC1.  ASP3 and ASP4 receive an AS-
-
-B. Bidulock                    Version 0.4                       Page 35
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
          ACTIVE notification.  Data for LS2 in AS1 is now exchanged with
          ASP4.  Initial DATA messages for LS2 in AS1 are tagged with a
          Correlation Id.
@@ -2115,74 +2140,89 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
    (5)   ASP1 can now be taken down and out of service.
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 37
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
 6.  Security
 
     LOADSEL does not introduce any new security risks or considerations
-  that are not already inherent in the UA [IUA-BIS..SUA, DUA..TUA]
-  Please see SIGTRAN Security document [SIGSEC] for security
-
-B. Bidulock                    Version 0.4                       Page 36
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
-  considerations and recommendations that are applicable to each UA.
+  that are not already inherent in the UA [IUA-BIS], [DUA], [V5UA],
+  [GR303UA00], [M2UA], [M3UA-BIS], [SUA], [ISUA], [TUA] Please see
+  SIGTRAN Security document [SIGSEC] for security considerations and
+  recommendations that are applicable to each UA.
 
 7.  IANA Considerations
 
     LOADSEL adds the following parameter tag value (described in Section
   3) to the Common Parameter numbering range of the SIGTRAN UAs [IUA-
-  BIS..SUA, DUA..TUA]:
+  BIS], [DUA], [V5UA], [GR303UA00], [M2UA], [M3UA-BIS], [SUA], [ISUA],
+  [TUA]:
 
-      Tag Value[1]   Parameter Name
+      Tag Value<1>   Parameter Name
       ------------------------------
          0x0018      Load Selector
          0x0019      Load Selection
 
 
     LOADSEL adds the following value to the Error Code parameter
-  (described in Section 3 and 4) for the SIGTRAN UAs [IUA-BIS..SUA,
-  DUA..TUA].
+  (described in Section 3 and 4) for the SIGTRAN UAs [IUA-BIS], [DUA],
+  [V5UA], [GR303UA00], [M2UA], [M3UA-BIS], [SUA], [ISUA], [TUA].
 
-      29   Invalid Load Selector [2]
+      29   Invalid Load Selector <2>
 
 
     LOADSEL adds the following values to the Registration Status field
-  of the Registration Result parameter for the UAs [M2UA..SUA, ISUA,
-  TUA].
+  of the Registration Result parameter for the UAs [M2UA], [M3UA-BIS],
+  [SUA], [ISUA], [TUA].
 
-      12   Error - Unsupported Load Selection [3]
+      12   Error - Unsupported Load Selection <3>
       13   Error - Invalid Load Selection
       14   Error - Cannot Support Unique Loadsharing
       15   Error - Unsupported LS Parameter Field
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 38
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
+
 Notes for Section 7
 
-  [1]  EDITOR'S NOTE:-  The Load Selector and Load Selection tag
+  <1>  EDITOR'S NOTE:-  The Load Selector and Load Selection tag
        values shown throughout this document as 0x0018) and 0x0019)
        will be assigned by IANA within the common parameter range of
        the SIGTRAN UAs and may change its value in further versions of
        this document.
 
-  [2]  EDITOR'S NOTE:-  The Error Code value shown throughout this
+  <2>  EDITOR'S NOTE:-  The Error Code value shown throughout this
        document as 29) will be assigned by IANA as a value of the
        common Error Code parameter for SIGTRAN UAs and may change its
        value in further versions of this document.
 
-  [3]  EDITOR'S NOTE:-  The Registration Status values shown as 12,
+  <3>  EDITOR'S NOTE:-  The Registration Status values shown as 12,
        13, 14 and 15 will be assigned by IANA as a value of each UA-
        specific Registration Status parameter for each SIGTRAN UA and
        may change its value in further versions of this document.
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 37
-
-Internet Draft                 UA LOADSEL               October 16, 2005
 
 
 0.  Revision History
@@ -2195,6 +2235,7 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
    + updated to IETF boilerplate for first and last page.
    + updated references, version numbers and dates.
+   + resubmitted to sync with IETF numbering
 
 0.3.  Changes from Version 0.2 to Version 0.3
 
@@ -2217,6 +2258,11 @@ Internet Draft                 UA LOADSEL               October 16, 2005
    + updated references,
    + updated postscript diagrams,
    + minor formatting changes,
+
+B. Bidulock                    Version 0.4                       Page 39
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
    + updated author's address.
 
 0.0.  Version 0.0
@@ -2226,8 +2272,17 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 0.0.0.  Change Log
 
     $Log: draft-bidulock-sigtran-loadsel-04.txt,v $
-    Revision 0.9.2.1  2005/12/28 05:52:55  brian
-    - missed files
+    Revision 0.9.2.2  2006/06/27 09:56:37  brian
+    - rereleased drafts
+
+    Revision 0.9.2.6  2006/06/27 09:41:15  brian
+    - rereleased drafts
+
+    Revision 0.9.2.5  2006/06/18 20:53:35  brian
+    - preparing for draft rerelease
+
+    Revision 0.9.2.4  2005/11/01 11:20:49  brian
+    - updates for testing and documentation
 
     Revision 0.9.2.3  2005/10/17 11:53:46  brian
     - updated drafts for republication
@@ -2242,16 +2297,39 @@ Internet Draft                 UA LOADSEL               October 16, 2005
     Added abbreviations, updated format.
 
 
-B. Bidulock                    Version 0.4                       Page 38
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 40
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 
 R.  References
 
 R.1.  Normative References
 
-  [RFC 2119]  Bradner, S., "Key words for use in RFCs to Indicate
+  [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
        Requirement Levels," RFC 2119 - BCP 14, The Internet Society
        (March 1997).
 
@@ -2277,7 +2355,7 @@ R.1.  Normative References
        Adaptation Layer (SUA)," RFC 3868, Internet Engineering Task
        Force - Signalling Transport Working Group (October, 2004).
 
-  [RFC 2960]  Stewart, R., Xie, Q., Morneault, K., Sharp, C.,
+  [RFC2960]  Stewart, R., Xie, Q., Morneault, K., Sharp, C.,
        Schwarzbauer, H. J., Taylor, T., Rytina, I., Kalla, H., Zhang, L.
        and Paxson, V., "Stream Control Transmission Protocol (SCTP),"
        RFC 2960, The Internet Society (February 2000).
@@ -2299,30 +2377,30 @@ R.2.  Informative References
        Adaption Layer (V5UA)," RFC 3807, Internet Engineering Task Force
        - Signalling Transport Working Group (June 2004).
 
-  [GR303UA00]  Mukundan, R., Morneault, K., "GR-303 extensions to the
 
-B. Bidulock                    Version 0.4                       Page 39
+B. Bidulock                    Version 0.4                       Page 41
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
+  [GR303UA00]  Mukundan, R., Morneault, K., "GR-303 extensions to the
        IUA Protocol," draft-ietf-sigtran-gr303ua-00.txt, Internet
        Engineering Task Force - Signalling Transport Working Group
        (December 2002).  Work In Progress
 
   [ISUA]  Bidulock, B., "SS7 ISUP-User Adaptation Layer (ISUA)," <draft-
        bidulock-sigtran-isua-03.txt>, Internet Engineering Task Force -
-       Signalling Transport Working Group (October 16, 2005).  Work In
+       Signalling Transport Working Group (June 18, 2006).  Work In
        Progress.
 
   [TUA]  Bidulock, B., "SS7 TCAP-User Adaptation Layer (TUA)," <draft-
        bidulock-sigtran-tua-04.txt>, Internet Engineering Task Force -
-       Signalling Transport Working Group (October 16, 2005).  Work In
+       Signalling Transport Working Group (June 18, 2006).  Work In
        Progress.
 
   [LOADGRP]  Bidulock, B., "Load Grouping Extension for Signalling User
        Adaptation Layers (LOADGRP)," <draft-bidulock-sigtran-
        loadgrp-04.txt>, Internet Engineering Task Force - Signalling
-       Transport Working Group (October 16, 2005).  Work In Progress.
+       Transport Working Group (June 18, 2006).  Work In Progress.
 
   [Q.704]  ITU, "Message Transfer Part - Signalling Network Functions
        and Messages," ITU-T Recommendation Q.704, ITU-T
@@ -2351,18 +2429,16 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
   [ASPEXT]  Bidulock, B., "Application Server Process (ASP) Extension
        Framework," <draft-bidulock-sigtran-aspext-04.txt>, Internet
-       Engineering Task Force - Signalling Transport Working Group
-       (October 16, 2005).  Work In Progress.
+       Engineering Task Force - Signalling Transport Working Group (June
+       18, 2006).  Work In Progress.
 
 
 
 
 
-
-
-B. Bidulock                    Version 0.4                       Page 40
+B. Bidulock                    Version 0.4                       Page 42
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 
 Acknowledgements
@@ -2386,7 +2462,7 @@ Author's Addresses
 
 
 
-  This draft expires April 2006.
+  This draft expires December 2006.
 
 
 
@@ -2398,125 +2474,6 @@ Author's Addresses
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 41
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
-
-                        List of Illustrations
-
-  Figure 1. Non-Load Selection Traffic Distribution ...............    4
-  Figure 2. Load Selection Traffic Distribution ...................    6
-  Figure 3. Example Configuration .................................   26
-  Figure 4. Example - Initialization ..............................   26
-  Figure 5. M3UA Example - Activation .............................   27
-  Figure 6. M3UA Example - Failure of ASP1 ........................   28
-  Figure 7. M3UA Example - Sparing ................................   29
-  Figure 8. SUA Example - Activation ..............................   30
-  Figure 9. SUA Example - Failure of ASP1 and ASP2 ................   31
-  Figure 10. SUA Example - Sparing ................................   32
-  Figure 11. TUA Example - Activation .............................   34
-  Figure 12. TUA Example - Failure of ASP1 ........................   35
-  Figure 13. TUA Example - Sparing ................................   36
-
-                          Table of Contents
-
-  Status of this Memo .............................................    1
-  Copyright .......................................................    1
-  Abstract ........................................................    1
-  Contents ........................................................    2
-  1 Introduction ..................................................    2
-  1.1 Scope .......................................................    2
-  1.2 Abbreviations ...............................................    2
-  1.3 Terminology .................................................    2
-  1.4 Overview ....................................................    3
-  1.4.1 Non-Load Selection Traffic Distribution ...................    3
-  1.4.2 Load Selection Traffic Distribution .......................    5
-  Notes for Section 1 .............................................    7
-  2 Conventions ...................................................    7
-  3 Protocol Elements .............................................    7
-  3.1 Parameters ..................................................    7
-  3.1.1 Load Selector .............................................    7
-  3.1.2 Load Selection ............................................    8
-  3.2 Messages ....................................................   10
-  3.2.1 Registration Request (REG REQ) ............................   10
-  3.2.2 Registration Response (REG RSP) ...........................   11
-  3.2.3 ASP Active (ASPAC) ........................................   12
-  3.2.4 ASP Active Ack (ASPAC ACK) ................................   13
-  3.2.5 ASP Inactive (ASPIA) ......................................   14
-  3.2.6 ASP Inactive Ack (ASPIA ACK) ..............................   15
-  3.2.7 Error (ERR) ...............................................   16
-  3.2.8 Notify (NTFY) .............................................   17
-  Notes for Section 3 .............................................   18
-  4 Procedures ....................................................   19
-  4.1 AS and ASP State Maintenance ................................   19
-  4.1.1 ASP State .................................................   19
-  4.1.2 AS State ..................................................   19
-  4.1.3 ASP Up Procedures .........................................   20
-  4.1.4 ASP Down Procedures .......................................   20
-  4.1.5 ASP Active Procedures .....................................   21
-  4.1.6 ASP Inactive Procedures ...................................   21
-
-B. Bidulock                    Version 0.4                       Page 42
-
-Internet Draft                 UA LOADSEL               October 16, 2005
-
-  4.1.7 Notify Procedures .........................................   22
-  4.1.8 Registration Procedures ...................................   23
-  4.2 Interworking Procedures .....................................   24
-  Notes for Section 4 .............................................   25
-  5 Examples ......................................................   25
-  5.1.1 Initialization ............................................   26
-  5.2 M3UA with Override AS and Load Selection based on CIC .......   27
-  5.2.1 Activation ................................................   27
-  5.2.2 Failure of ASP1 ...........................................   28
-  5.2.3 Sparing ...................................................   29
-  5.3 SUA with Load-share AS and Load Selection based on GT .......   29
-  5.3.1 Activation ................................................   30
-  5.3.2 Failure of ASP1 and ASP2 ..................................   31
-  5.3.3 Sparing ...................................................   32
-  5.4 TUA with Broadcast AS and Load Selection based on DID .......   33
-  5.4.1 Activation ................................................   33
-  5.4.2 Failure of ASP1 and ASP2 ..................................   35
-  5.4.3 Sparing ...................................................   36
-  6 Security ......................................................   36
-  7 IANA Considerations ...........................................   37
-  Notes for Section 7 .............................................   37
-  0 Revision History ..............................................   38
-  0.4 Changes from Version 0.3 to Version 0.4 .....................   38
-  0.3 Changes from Version 0.2 to Version 0.3 .....................   38
-  0.2 Changes from Version 0.1 to Version 0.2 .....................   38
-  0.1 Changes from Version 0.0 to Version 0.1 .....................   38
-  0.0 Version 0.0 .................................................   38
-  0.0.0 Change Log ................................................   38
-  R References ....................................................   39
-  R.1 Normative References ........................................   39
-  R.2 Informative References ......................................   39
-  Acknowledgements ................................................   41
-  Author's Addresses ..............................................   41
-  List of Illustrations ...........................................   42
-  Table of Contents ...............................................   42
 
 
 
@@ -2539,7 +2496,123 @@ Internet Draft                 UA LOADSEL               October 16, 2005
 
 B. Bidulock                    Version 0.4                       Page 43
 
-Internet Draft                 UA LOADSEL               October 16, 2005
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
+
+                        List of Illustrations
+
+  Figure 1. Non-Load Selection Traffic Distribution ...............    4
+  Figure 2. Load Selection Traffic Distribution ...................    6
+  Figure 3. Example Configuration .................................   26
+  Figure 4. Example - Initialization ..............................   27
+  Figure 5. M3UA Example - Activation .............................   28
+  Figure 6. M3UA Example - Failure of ASP1 ........................   29
+  Figure 7. M3UA Example - Sparing ................................   30
+  Figure 8. SUA Example - Activation ..............................   31
+  Figure 9. SUA Example - Failure of ASP1 and ASP2 ................   32
+  Figure 10. SUA Example - Sparing ................................   33
+  Figure 11. TUA Example - Activation .............................   34
+  Figure 12. TUA Example - Failure of ASP1 ........................   36
+  Figure 13. TUA Example - Sparing ................................   37
+
+                          Table of Contents
+
+  Status of this Memo .............................................    1
+  Copyright .......................................................    1
+  Abstract ........................................................    1
+  Contents ........................................................    2
+  1 Introduction ..................................................    2
+  1.1 Scope .......................................................    2
+  1.2 Abbreviations ...............................................    2
+  1.3 Terminology .................................................    2
+  1.4 Overview ....................................................    3
+  1.4.1 Non-Load Selection Traffic Distribution ...................    4
+  1.4.2 Load Selection Traffic Distribution .......................    5
+  Notes for Section 1 .............................................    7
+  2 Conventions ...................................................    7
+  3 Protocol Elements .............................................    7
+  3.1 Parameters ..................................................    7
+  3.1.1 Load Selector .............................................    8
+  3.1.2 Load Selection ............................................    9
+  3.2 Messages ....................................................   10
+  3.2.1 Registration Request (REG REQ) ............................   10
+  3.2.2 Registration Response (REG RSP) ...........................   11
+  3.2.3 ASP Active (ASPAC) ........................................   13
+  3.2.4 ASP Active Ack (ASPAC ACK) ................................   14
+  3.2.5 ASP Inactive (ASPIA) ......................................   15
+  3.2.6 ASP Inactive Ack (ASPIA ACK) ..............................   15
+  3.2.7 Error (ERR) ...............................................   16
+  3.2.8 Notify (NTFY) .............................................   17
+  Notes for Section 3 .............................................   18
+  4 Procedures ....................................................   19
+  4.1 AS and ASP State Maintenance ................................   19
+  4.1.1 ASP State .................................................   19
+  4.1.2 AS State ..................................................   19
+  4.1.3 ASP Up Procedures .........................................   20
+  4.1.4 ASP Down Procedures .......................................   21
+  4.1.5 ASP Active Procedures .....................................   21
+
+B. Bidulock                    Version 0.4                       Page 44
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
+
+  4.1.6 ASP Inactive Procedures ...................................   22
+  4.1.7 Notify Procedures .........................................   22
+  4.1.8 Registration Procedures ...................................   23
+  4.2 Interworking Procedures .....................................   24
+  Notes for Section 4 .............................................   25
+  5 Examples ......................................................   25
+  5.1.1 Initialization ............................................   27
+  5.2 M3UA with Override AS and Load Selection based on CIC .......   27
+  5.2.1 Activation ................................................   28
+  5.2.2 Failure of ASP1 ...........................................   29
+  5.2.3 Sparing ...................................................   30
+  5.3 SUA with Load-share AS and Load Selection based on GT .......   30
+  5.3.1 Activation ................................................   31
+  5.3.2 Failure of ASP1 and ASP2 ..................................   32
+  5.3.3 Sparing ...................................................   33
+  5.4 TUA with Broadcast AS and Load Selection based on DID .......   34
+  5.4.1 Activation ................................................   34
+  5.4.2 Failure of ASP1 and ASP2 ..................................   36
+  5.4.3 Sparing ...................................................   37
+  6 Security ......................................................   38
+  7 IANA Considerations ...........................................   38
+  Notes for Section 7 .............................................   39
+  0 Revision History ..............................................   39
+  0.4 Changes from Version 0.3 to Version 0.4 .....................   39
+  0.3 Changes from Version 0.2 to Version 0.3 .....................   39
+  0.2 Changes from Version 0.1 to Version 0.2 .....................   39
+  0.1 Changes from Version 0.0 to Version 0.1 .....................   39
+  0.0 Version 0.0 .................................................   40
+  0.0.0 Change Log ................................................   40
+  R References ....................................................   41
+  R.1 Normative References ........................................   41
+  R.2 Informative References ......................................   41
+  Acknowledgements ................................................   43
+  Author's Addresses ..............................................   43
+  List of Illustrations ...........................................   44
+  Table of Contents ...............................................   44
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 45
+
+Internet Draft                 UA LOADSEL                  June 18, 2006
 
 Intellectual Property
 
@@ -2577,7 +2650,7 @@ Disclaimer of Validity
 
 Full Copyright Statement
 
-  Copyright (C) The Internet Society (2005).  This document is subject
+  Copyright (C) The Internet Society (2006).  This document is subject
   to the rights, licenses and restrictions contained in BCP 78, and
   except as set forth therein, the authors retain all their rights.
 
@@ -2595,6 +2668,5 @@ Acknowledgement
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 44
+B. Bidulock                    Version 0.4                       Page 46
 

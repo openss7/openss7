@@ -53,7 +53,7 @@
 %N journal issue number
 %X annotation (separate paragraph after citation)
 
-%L RFC 2119
+%L RFC2119
 %A Scott Bradner
 %E Scott Bradner, (ed)
 %T Key words for use in RFCs to Indicate Requirement Levels
@@ -62,7 +62,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2126
+%L RFC2126
 %A Y. Pouffray
 %A A. Young
 %E Y. Pouffray
@@ -72,7 +72,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2196
+%L RFC2196
 %A Barbara Y. Frazer
 %E Barbara Y. Frazer, (ed)
 %Q Internet Engineering Task Force
@@ -81,7 +81,7 @@
 %D September 1997
 %I Internet Engineering Task Force
 
-%L RFC 2246
+%L RFC2246
 %A Time Dierke
 %A Christopher Allen
 %E Time Dierke, (ed)
@@ -91,7 +91,7 @@
 %D January 1999
 %I The Internet Society
 
-%L RFC 2279
+%L RFC2279
 %A Francois Yergenau
 %Q Internet Engineering Task Force
 %T UTF-8, a transformation format of ISO 10646
@@ -100,7 +100,7 @@
 %D January 1998
 %I Internet Engineering Task Force
 
-%L RFC 2401
+%L RFC2401
 %K ipsec
 %A Stephen Kent
 %A Randall Atkinson
@@ -112,7 +112,7 @@
 %D November 1998
 %I Internet Engineering Task Force
 
-%L RFC 2406
+%L RFC2406
 %K ipsecesp
 %A Stephen Kent
 %A Randall Atkinson
@@ -124,7 +124,7 @@
 %D November 1998
 %I Internet Engineering Task Force
 
-%L RFC 2407
+%L RFC2407
 %K ipsecdoi
 %A Derrell Piper
 %Q Internet Engineering Task Force
@@ -134,7 +134,7 @@
 %D November 1998
 %I Internet Engineering Task Force
 
-%L RFC 2409
+%L RFC2409
 %K ike
 %A Dan Harkins
 %A Dave Carrel
@@ -146,7 +146,7 @@
 %D November 1998
 %I Internet Engineering Task Force
 
-%L RFC 2916
+%L RFC2916
 %A Patrik Falstrom
 %Q Internet Engineering Task Force
 %T E.164 number and DNS (ENUM)
@@ -155,7 +155,7 @@
 %D September 2000
 %I The Internet Society
 
-%L RFC 2960
+%L RFC2960
 %A Randall Stewart
 %A Qiaobing Xie
 %A Ken Morneault
@@ -173,7 +173,7 @@
 %D February 2000
 %I The Internet Society
 
-%L RFC 3309
+%L RFC3309
 %A Jonathan Stone
 %A Randall Stewart
 %A Douglas Otis
@@ -184,7 +184,7 @@
 %D September 2002
 %I The Internet Society
 
-%L RFC 3436
+%L RFC3436
 %A Adreas Jungmaier
 %A Eric Rescorla
 %A Michael Tuxen
@@ -195,7 +195,7 @@
 %D December 2002
 %I The Internet Society
 
-%L RFC 1155
+%L RFC1155
 %R RFC 1155
 %A Marshall T. Rose
 %A Keith McCloghrie
@@ -205,7 +205,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 1157
+%L RFC1157
 %R RFC 1157
 %A Jeffrey D. Case
 %A Mark Fedor
@@ -217,7 +217,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 1901
+%L RFC1901
 %R RFC 1901
 %A Jeffrey D. Case
 %A Keith McCloghrie
@@ -229,7 +229,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 1902
+%L RFC1902
 %R RFC 1902
 %A Jeffrey D. Case
 %A Keith McCloghrie
@@ -241,7 +241,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 1903
+%L RFC1903
 %R RFC 1903
 %A Jeffrey D. Case
 %A Keith McCloghrie
@@ -253,7 +253,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 1904
+%L RFC1904
 %R RFC 1904
 %A Jeffrey D. Case
 %A Keith McCloghrie
@@ -265,7 +265,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 1905
+%L RFC1905
 %R RFC 1905
 %A Jeffrey D. Case
 %A Keith McCloghrie
@@ -277,7 +277,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 1906
+%L RFC1906
 %R RFC 1906
 %A Jeffrey D. Case
 %A Keith McCloghrie
@@ -289,7 +289,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2271
+%L RFC2271
 %R RFC 2271
 %A Bert Wijnen
 %A Dave Harrington
@@ -300,7 +300,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2272
+%L RFC2272
 %R RFC 2272
 %A Jeffrey D. Case
 %A Dave Harrington
@@ -312,7 +312,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2273
+%L RFC2273
 %R RFC 2273
 %A David B. Levi
 %A Paul Meyer
@@ -323,7 +323,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2275
+%L RFC2275
 %R RFC 2275
 %A Bert Wijnen
 %A Randy Presuhn
@@ -334,7 +334,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2575
+%L RFC2575
 %R RFC 2575
 %A Bert Wijnen
 %A Randy Presuhn
@@ -345,7 +345,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2574
+%L RFC2574
 %R RFC 2574
 %A Uri Blumenthal
 %A Bert Wijnen
@@ -355,7 +355,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2578
+%L RFC2578
 %R RFC 2578
 %A Keith McCloghrie
 %A David Perkins
@@ -366,7 +366,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2579
+%L RFC2579
 %R RFC 2579
 %A Keith McCloghrie
 %A David Perkins
@@ -377,7 +377,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 2580
+%L RFC2580
 %R RFC 2580
 %A Keith McCloghrie
 %A David Perkins
@@ -388,7 +388,7 @@
 %Q The Internet Society
 %I The Internet Society
 
-%L RFC 3410
+%L RFC3410
 %R RFC 3410
 %A Jeffrey Case
 %A Russ Mundy
@@ -1546,7 +1546,7 @@
 %I ITU-T Telecommunication Standardization Sector of ITU
 %O (Previously "CCITT Recommendation")
 
-%L RFC 2719
+%L RFC2719
 %A Lyndon Ong
 %A Ian Rytina
 %A Matt Holdrege
@@ -1563,7 +1563,7 @@
 %D October, 1999
 %I The Internet Society
 
-%L RFC 2434
+%L RFC2434
 %A Thomas Narten
 %A Herald Tveit Alvestrand
 %E Thomas Narten, (ed)
@@ -2390,14 +2390,14 @@
 %O Work In Progress
 %I Internet Engineering Task Force - Transport Area Working Group
 
-%L RFC 791
+%L RFC791
 %Q Internet Engineering Task Force - Network Working Group
 %T Internet Protocol \- DARPA Internet Program \- Protocol Specification
 %R RFC 791
 %D September 1981
 %I The Internet Society
 
-%L RFC 896
+%L RFC896
 %A John Nagle
 %Q Internet Engineering Task Force - Network Working Group
 %T Congestion control in IP/TCP Internetworks
@@ -2405,7 +2405,7 @@
 %D January 6, 1984
 %I The Internet Society
 
-%L RFC 813
+%L RFC813
 %A D. Clark
 %Q Internet Engineering Task Force - Network Working Group
 %T Window and Acknowledgment Strategy in TCP
@@ -2413,7 +2413,7 @@
 %D July, 1982
 %I The Internet Society
 
-%L RFC 1122
+%L RFC1122
 %A Robert Braden
 %E Robert Braden
 %Q Internet Engineering Task Force - Network Working Group

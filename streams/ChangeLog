@@ -5,6 +5,7 @@
 	* src/kernel/streams.c: corrected extern inline for quick compile
 	* src/kernel/strsched.c: collapse mdbblock_alloc_slow
 	* src/modules/sth.c: don't pad when smaller than a FASTBUF
+	- move sd->sd_rq derefencing inside read locks
 
 2006-06-21  Brian Bidulock  <bidulock@openss7.org>
 

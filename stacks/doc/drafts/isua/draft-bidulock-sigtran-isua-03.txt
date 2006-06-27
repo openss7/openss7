@@ -4,8 +4,8 @@
 Network Working Group                                     Brian Bidulock
 INTERNET-DRAFT                                       OpenSS7 Corporation
 
-                                                        October 16, 2005
-Expires in April 2006
+                                                           June 18, 2006
+Expires in December 2006
 
 
 
@@ -36,17 +36,17 @@ Status of this Memo
     The list of Internet-Draft Shadow Directories can be accessed at
   http://www.ietf.org/shadow.html.
 
-    This Internet-Draft will expire in April 2006.
+    This Internet-Draft will expire in December 2006.
 
 Copyright
 
-    Copyright (C) The Internet Society (2005).
+    Copyright (C) The Internet Society (2006).
 
 Abstract
 
     This document defines a protocol for the transport of any SS7 ISUP-
   User signalling (e.g, Call Control) over IP using the Stream Control
-  Transport Protocol [RFC 2960].  The protocol should be modular and
+  Transport Protocol [RFC2960].  The protocol should be modular and
   symmetric, to allow it to work in diverse architectures, such as a
   Signalling Gateway and IP Signalling End-point architecture.  Protocol
   elements are added to allow seamless operation between peers in the
@@ -55,10 +55,9 @@ Abstract
 
 
 
-
 B. Bidulock                    Version 0.3                        Page 1
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
 Contents
 
@@ -67,9 +66,9 @@ Contents
 
 1.  Introduction
 
-    This draft defines a protocol for the transport of SS7 ISUP [Q.761,
-  T1.113] Users (i.e, Call Control) signalling messages over IP using
-  the Stream Control Transmission Protocol (SCTP) [RFC 2960].  This
+    This draft defines a protocol for the transport of SS7 ISUP [Q.761],
+  [T1.113] Users (i.e, Call Control) signalling messages over IP using
+  the Stream Control Transmission Protocol (SCTP) [RFC2960].  This
   protocol would be used between a Signalling Gateway (SG) and
   Signalling End-point located in an IP network.  Additionally, the
   protocol can be used to transport SS7 ISUP users between two
@@ -82,14 +81,14 @@ Contents
   include support for SS7 signalling protocols.  IP provides an
   effective way to transport user data and for operators to expand their
   networks and build new services.  In these networks, there is a need
-  for interworking between the SS7 and IP domains [RFC 2719].
+  for interworking between the SS7 and IP domains [RFC2719].
 
     This document details the delivery of Call Control messages over IP
   between two signalling end-points.  Consideration is given for the
   transport from an SS7 Signalling Gateway (SG) to an IP signalling node
   (such as an IP-resident Database) as described in the Framework
-  Architecture for Signalling Transport [RFC 2719] This protocol can
-  also support transport of Call Control messages between two end-points
+  Architecture for Signalling Transport [RFC2719] This protocol can also
+  support transport of Call Control messages between two end-points
   wholly contained within and IP network.
 
   The delivery mechanism addresses the following criteria:
@@ -110,15 +109,15 @@ Contents
       API  -- Application Programming Interface.
       AS   -- Application Server.
       ASP  -- Application Server Process.
-      BLA  -- Blocking Acknowledgement.
 
 
 
 
 B. Bidulock                    Version 0.3                        Page 2
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
+      BLA  -- Blocking Acknowledgement.
       BLO  -- Blocking Request.
       CA   -- Certificate Authority.
       CC   -- Call Control.
@@ -170,14 +169,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       STP  -- Signalling Transfer Point.
       TLI  -- Transport Layer Interface.
       TLS  -- Transport Layer Security.
-      TLV  -- Tag-Length-Value.
-      UBA  -- Unblocking Acknowledgement.
 
 
 B. Bidulock                    Version 0.3                        Page 3
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
+      TLV  -- Tag-Length-Value.
+      UBA  -- Unblocking Acknowledgement.
       UBL  -- Unblocking Request.
       VPN  -- Virtual Private Network.
       XTI  -- X/Open Transport Interface.
@@ -201,7 +200,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       contains an SCTP end-point and may be configured to process
       traffic within more that one Application Server.
 
-  Association - refers to an SCTP association [RFC 2960].  The
+  Association - refers to an SCTP association [RFC2960].  The
       association provides the transport for the delivery of ISUP
       protocol data units and ISUA layer peer messages.
 
@@ -229,26 +228,26 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       Fail-over may apply upon the return to service of a previously
       unavailable Application Server Process.
 
-  Host - the computing platform that the process (SGP, ASP or IPSP) is
-      running on.
-
 
 B. Bidulock                    Version 0.3                        Page 4
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+  Host - the computing platform that the process (SGP, ASP or IPSP) is
+      running on.
 
   IP Server Process (IPSP) - a process instance of an IP-based
       application.  An IPSP is essentially the same as an ASP, except
       that it uses ISUA in a point-to-point fashion.
 
   ISDN User Part (ISUP) - The Integrated Services Digital Network (ISDN)
-      User Part [Q.761, T1.113] of the SS7 protocol.
+      User Part [Q.761], [T1.113] of the SS7 protocol.
 
   Layer Management (LM) - a nodal function that handles the inputs and
       outputs between the ISUA layer and a local management entity.
 
-  Message Transfer Part (MTP) - The Message Transfer Part [Q.701,
-      T1.111] of the SS7 protocol.
+  Message Transfer Part (MTP) - The Message Transfer Part [Q.701],
+      [T1.111] of the SS7 protocol.
 
   Nodal Interworking Function (NIF) - an implementation dependent
       interworking function present at a Signalling Gateway that
@@ -274,27 +273,28 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       handled by a particular Application Server.
 
   Signalling Gateway (SG) - a signalling agent that exchanges SCN native
-      signalling at the edge of the IP network [RFC 2719].  An SG
-      appears to the SS7 network as an SS7 Signalling Point.  An SG
-      contains a set of one or more Signalling Gateway Processes, of
-      which one or more is normally actively processing traffic.  When
-      an SG contains more than one SGP, the SG is a logical entity and
-      the contained SGPs are assumed to be coordinated into a single
-      management view both toward the SS7 network and toward the
-      supported Application Servers.
+      signalling at the edge of the IP network [RFC2719].  An SG appears
+      to the SS7 network as an SS7 Signalling Point.  An SG contains a
+      set of one or more Signalling Gateway Processes, of which one or
+      more is normally actively processing traffic.  When an SG contains
+      more than one SGP, the SG is a logical entity and the contained
+      SGPs are assumed to be coordinated into a single management view
+      both toward the SS7 network and toward the supported Application
+      Servers.
 
   Signalling Gateway Process (SGP) - a process instance of a Signalling
       Gateway.  It serves as an active, backup, load-sharing or
       broadcast process of a Signalling Gateway.
 
+
+B. Bidulock                    Version 0.3                        Page 5
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   Stream - an SCTP stream; a unidirectional logical channel established
       from one SCTP endpoint to another associated SCTP endpoint, within
       which all user messages are delivered in sequence, except for
       those submitted to the unordered delivery service.
-
-B. Bidulock                    Version 0.3                        Page 5
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   Circuit Mapping Function (CMF) - an implementation dependent function
       that is responsible for resolving the address and application
@@ -306,14 +306,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Transport Address - an address that serves as a source or destination
       for the unreliable packet transport service used by SCTP.  In IP
       networks, a transport address is defined by the combination of IP
-      address and an SCTP port number [1].
+      address and an SCTP port number <1>.
 
 1.3.  ISUA Overview
 
 1.3.1.  Signalling Transport Architecture
 
     The framework architecture that has been defined for SCN signalling
-  transport over IP [RFC 2719] uses multiple components, including an IP
+  transport over IP [RFC2719] uses multiple components, including an IP
   transport protocol, a signalling common transport protocol and an
   adaptation module to support the services expected by a particular SCN
   signalling protocol from its underlying protocol layer.
@@ -345,15 +345,9 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
 
-
-
-
-
-
-
 B. Bidulock                    Version 0.3                        Page 6
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
           .........         ...............        .........
           :       :         :             :        :       :
@@ -409,10 +403,9 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
 
-
 B. Bidulock                    Version 0.3                        Page 7
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
                    ........        ........
                    :      :   IP   :      :
@@ -466,13 +459,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   the ISUA shall support Call Control transparently.  Call Control
   consists of two major functional blocks:
 
-    Call Processing is responsible for signalling and control of calls
-  (as opposed to circuits).  Call processing functions move a call
+
 
 B. Bidulock                    Version 0.3                        Page 8
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
+    Call Processing is responsible for signalling and control of calls
+  (as opposed to circuits).  Call processing functions move a call
   through its life-cycle by providing the following functions:
 
    + call setup,
@@ -522,15 +516,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   supervision functions in the SG to trigger events in the IP and SS7
   domain.
 
-    The ISUA layer provides transparent passing of circuit reset,
-  blocking and query primitives (RESET, BLOCKING, UNBLOCKING, CCT GROUP
-  QUERY) as provided for in ITU-T Q.724 [Q.724] Q.764 [Q.764], and ANSI
-  T1.113 [T1.113].
+
 
 
 B. Bidulock                    Version 0.3                        Page 9
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
 
            Table 1. Mapping of Circuit Supervision Primitives
@@ -538,7 +529,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
  +---------------------------+---------------------------+------------+
  |           Name            |          Message          |    ISUA    |
  +--------------+------------+-------------+-------------+ Cc't Supv. |
- | Generic [2]  | Specific   | ITU-T Q.764 | ANSI T1.113 |  Message   |
+ | Generic <2>  | Specific   | ITU-T Q.764 | ANSI T1.113 |  Message   |
  +--------------+------------+-------------+-------------+------------+
  |CONT RECHECK  | Request    |     CCR     |     CCR     |    CCNT    |
  |              | Indication |             |             |            |
@@ -572,12 +563,23 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
  |              | Confirm    |             |             |            |
  +--------------+------------+-------------+-------------+------------+
 
+    The ISUA layer provides transparent passing of circuit reset,
+  blocking and query primitives (RESET, BLOCKING, UNBLOCKING, CCT GROUP
+  QUERY) as provided for in ITU-T Q.724 [Q.724] Q.764 [Q.764], and ANSI
+  T1.113 [T1.113].
+
 1.3.5.4.  Support for the Management of SCTP Associations
 
     The ISUA layer at the SGP maintains the availability state of all
   configured remote ASPs, to manage the SCTP Associations and the
   traffic between ISUA peers.  As well, the active/inactive and
   congestion state of remote ASPs is maintained.
+
+
+
+B. Bidulock                    Version 0.3                       Page 10
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     The ISUA layer MAY be instructed by local management to establish an
   SCTP association to a peer ISUA node.  This can be achieved using the
@@ -586,11 +588,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   redundant SCTP associations between two ISUA peers, one side (client)
   SHOULD be designated to establish the SCTP association, or ISUA
   configuration information maintained to detect redundant associations
-
-B. Bidulock                    Version 0.3                       Page 10
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   (e.g, via knowledge of the expected local and remote SCTP endpoint
   addresses).
 
@@ -637,6 +634,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   discriminate signalling traffic to be started or stopped.  At an ASP,
   the Routing Context parameter uniquely identifies the range of
   signalling traffic associated with each Application Server that the
+
+B. Bidulock                    Version 0.3                       Page 11
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   ASP is configured to receive.
 
 1.4.1.2.  Routing Key Limitations
@@ -645,11 +647,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   message SHOULD have a full or partial match to a single routing
   result.  It is not necessary for the parameter range values within a
   particular Routing Key to be continuous.  For example, an AS could be
-
-B. Bidulock                    Version 0.3                       Page 11
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   configured to support call processing for multiple ranges of circuits
   that are not represented by contiguous Circuit Identification Codes.
 
@@ -695,6 +692,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   IP destination, the SGP must perform a circuit mapping function using
   information from the received ISUP message.
 
+
+B. Bidulock                    Version 0.3                       Page 12
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     To support this circuit mapping, the SGP might, for example,
   maintain the equivalent of a network address translation table,
   mapping incoming ISUP message information to an Application Server for
@@ -704,11 +706,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Routing Keys in the SGP.  These Routing Keys could in turn map
   directly to an Application Server that is enabled by one or more ASPs.
   These ASPs proxy dynamic status information regarding their
-
-B. Bidulock                    Version 0.3                       Page 12
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   availability, call handling capabilities and congestion to the SGP
   using various management messages defined in the ISUA protocol.
 
@@ -751,6 +748,13 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   and receiving transactions.  The routing context itself is used by the
   ASP to select the SGP.
 
+
+
+
+B. Bidulock                    Version 0.3                       Page 13
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
 1.4.1.5.  Signalling Gateway SS7 Layers
 
     The SG is responsible for terminating up to the Call Control of the
@@ -763,10 +767,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     Note that it is also possible for the MTP services to be provided
   using the services of the MTP-User Adaptation Layer (M3UA) [M3UA].
-
-B. Bidulock                    Version 0.3                       Page 13
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The ISUP-SAP through which ISUA at the SG obtains its services could
   reside at a Signalling Transfer Point (STP) or Signalling End Point
@@ -809,6 +809,10 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   requiring sequenced message transfer need to be sent over a stream
   using sequenced delivery.
 
+B. Bidulock                    Version 0.3                       Page 14
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     ISUA SHOULD NOT use stream 0 for ISUA circuit supervision messages.
   It is OPTIONAL that sequence delivery be used to preserve the order of
   circuit supervision message delivery.
@@ -822,11 +826,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   delivery.  All Call Processing (CP) messages relating to the same call
   MUST be sent on the same stream as other Call Processing (CP) messages
   relating to the same call.  The stream selected is based upon the Call
-
-B. Bidulock                    Version 0.3                       Page 14
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   Reference given by the Call Control over the primitive interface and
   other traffic information available to the SGP or ASP.
 
@@ -867,12 +866,17 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     At an ASP or IPSP, the ISUA layer indicates congestion to local Call
   Control by means of an appropriate ISUP primitive, as per current ISUP
   procedures, to invoke appropriate upper layer responses.  When an SG
+
+B. Bidulock                    Version 0.3                       Page 15
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   determines that the transport of SS7 messages is encountering
   congestion, the SG might trigger SS7 Congestion messages to
   originating SS7 nodes, per the congestion procedures of the relevant
-  ISUP [T1.113, Q.764] or MTP [T1.111, Q.704] standard.  (The triggering
-  of SS7 Management messages from an SG is an implementation-dependent
-  function.)
+  ISUP [Q.764], [T1.113] or MTP [Q.704], [T1.111] standard.  (The
+  triggering of SS7 Management messages from an SG is an implementation-
+  dependent function.)
 
 1.5.  Definition of ISUA Boundaries
 
@@ -880,11 +884,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   and Call Control; a lower boundary between ISUA and SCTP; and a layer
   management boundary between ISUA and the Layer Management Function.
   Figure 3 illustrates the ISUA protocol boundaries.
-
-
-B. Bidulock                    Version 0.3                       Page 15
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
                       ...........
                       :   CC    :
@@ -904,7 +903,8 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 1.5.1.  Definition of Upper Boundary
 
     The primitives and messages listed in Table 2 are provided between
-  the ISUA and Call Control in support of Call Control [Q.761, T1.113].
+  the ISUA and Call Control in support of Call Control [Q.761],
+  [T1.113].
                Table 2. Mapping of Call Control Primitives
 
     +-------------+------------+---------------+---------------+------+
@@ -920,6 +920,19 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     |             | Confirm    |               |               |      |
     +-------------+------------+---------------+---------------+------+
     |MORE INFO    | Request    |       -       |       -       | CMOR |
+    +-------------+------------+---------------+---------------+------+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 16
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+    +-------------+------------+---------------+---------------+------+
+    |Generic      | Specific   |  ITU-T Q.764  |  ANSI T1.113  | ISUA |
+    |Name         | Name       |    Message    |    Message    | Msg  |
+    +-------------+------------+---------------+---------------+------+
     |             | Indication |               |               |      |
     +-------------+------------+---------------+---------------+------+
     |TIMEOUT      | Indication |       -       |       -       | CTOT |
@@ -935,19 +948,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     +-------------+------------+---------------+---------------+------+
     |PROG         | Request    |   ACM, CPG    |   ACM, CPG    | CPRG |
     |             | Indication |               |               |      |
-    +-------------+------------+---------------+---------------+------+
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 16
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
-    +-------------+------------+---------------+---------------+------+
-    |Generic      | Specific   |  ITU-T Q.764  |  ANSI T1.113  | ISUA |
-    |Name         | Name       |    Message    |    Message    | Msg  |
     +-------------+------------+---------------+---------------+------+
     |Call Established Messages                                        |
     +-------------+------------+---------------+---------------+------+
@@ -980,6 +980,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Purpose:   LM request ASP to establish an SCTP association with its
              peer.
 
+
+
+
+B. Bidulock                    Version 0.3                       Page 17
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+
   M-SCTP_ESTABLISH confirm
   Direction: ISUA -> LM
   Purpose:   ASP confirms to LM that it has established an SCTP
@@ -996,14 +1004,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
              peer.
 
   M-SCTP_RELEASE confirm
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 17
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   Direction: ISUA -> LM
   Purpose:   ASP confirms to LM that it has released SCTP association
              with its peer.
@@ -1040,6 +1040,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Direction: ISUA -> LM
   Purpose:   ISUA reports status of local or remote ASP.
 
+
+B. Bidulock                    Version 0.3                       Page 18
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+
   M-AS_STATUS request
   Direction: LM -> ISUA
   Purpose:   LM requests ISUA to report the status of an AS.
@@ -1055,14 +1061,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   M-ERROR indication
   Direction: ISUA -> LM
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 18
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   Purpose:   ISUA reports that it has received an Error (ERR) message
              from its peer or that a local operation has been
              unsuccessful.
@@ -1098,6 +1096,13 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   M-ASP_ACTIVE request
   Direction: LM -> ISUA
+
+
+
+B. Bidulock                    Version 0.3                       Page 19
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   Purpose:   LM requests ASP to send an ASP Active (ASPAC) message to
              its peer.
 
@@ -1115,12 +1120,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Direction: LM -> ISUA
   Purpose:   LM requests ASP to send an ASP Inactive (ASPIA) message
              to its peer.
-
-
-
-B. Bidulock                    Version 0.3                       Page 19
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   M-ASP_INACTIVE confirm
   Direction: LM -> ISUA
@@ -1154,6 +1153,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
              sending Registration Request (REG REQ) message
 
   M-RK_REG confirm
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 20
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   Direction: ISUA -> LM
   Purpose:   ASP reports that it has received Registration Response
              (REG RSP) message with registration status as successful
@@ -1171,16 +1178,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   M-RK_DEREG confirm
   Direction: ISUA -> LM
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 20
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   Purpose:   ASP reports that it has received Deregistration Request
              (DEREG REQ) message with deregistration status as
              successful from its peer.
@@ -1195,24 +1192,32 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 1.5.3.  Definition of the Lower Boundary
 
   The upper layer primitives provided by the SCTP are provided in the
-  SCTP specification "Stream Control Transmission Protocol (SCTP)" [RFC
-  2960].
+  SCTP specification "Stream Control Transmission Protocol (SCTP)"
+  [RFC2960].
 
 Notes for Section 1
 
-  [1]  IMPLEMENTATION NOTE:-  Only one SCTP port may be defined for
+  <1>  IMPLEMENTATION NOTE:-  Only one SCTP port may be defined for
        each endpoint, but each SCTP endpoint may have multiple IP
-       addresses [RFC 2960].
+       addresses [RFC2960].
 
 2.  Conventions
 
-    The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-  "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-  "OPTIONAL", when they appear in this document, are to be interpreted
-  as described in [RFC 2119].
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in [RFC2119].
 
   In this document, the following conventions are used to describe how a
   parameter is used in the message:
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 21
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     Mandatory     The parameter MUST be present in the message.  A
                   message listing a parameter as Mandatory without
@@ -1230,15 +1235,6 @@ Notes for Section 1
                   Optional without containing such a parameter is
                   correctly formatted.
 
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 21
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 3.  Protocol Elements
 
@@ -1275,6 +1271,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
    + The Reserved field SHALL be coded zero by the sender of the message
      and SHALL be ignored by the receiver of the message.
 
+
+
+B. Bidulock                    Version 0.3                       Page 22
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
 3.1.1.  ISUA Protocol Version
 
   Version: 8-bits (unsigned integer)
@@ -1292,12 +1294,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The Message Class field of the Common Message Header contains the
     class of the message.  The supported classes are as follows:
 
-
-
-
-B. Bidulock                    Version 0.3                       Page 22
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
         0        Management (MGMT) Message
         7        Reserved for Other Signalling Adaptation Layers
@@ -1331,6 +1327,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     128 -  255  Reserved for IETF-Defined Message Class Extensions
 
     Application Server Process State Maintenance (ASPSM) Messages
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 23
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
       0         Reserved
       1         ASP Up (UP)
       2         ASP Down (DOWN)
@@ -1349,14 +1353,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       4         ASP Inactive Ack (ASPIA ACK)
       5 -  127  Reserved by the IETF
     128 -  255  Reserved for IETF-Defined Message Class Extensions
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 23
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     Routing Key Management (RKM) Messages
       0         Reserved
@@ -1391,6 +1387,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       0         Reserved
       1         Continuity Check (CCNT)
       2         Loop Back (CLBK)
+
+
+B. Bidulock                    Version 0.3                       Page 24
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
       3         Report (CREP)
       4         Reset (CRSC)
       5         Reset Acknowledgement (CRSA)
@@ -1411,18 +1413,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The Message Length field of the Common Message Header defines the
     length of the message in octets, including the header.
 
-
-
-B. Bidulock                    Version 0.3                       Page 24
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
 3.1.5.  Tag-Length-Value Format
 
     ISUA messages consist of a Common Message Header followed by zero or
   more parameters, as defined by the message type.  The Tag-Length-Value
   (TLV) parameters contained in a message are defined in a Tag-Length-
-  Value format as shown below [1].
+  Value format as shown below <1>.
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1449,6 +1445,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     bytes, since all parameters contained within this composite
     parameter will considered multiples of 4 bytes.
 
+
+
+B. Bidulock                    Version 0.3                       Page 25
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   Parameter Value: variable-length
 
     The Parameter Value field contains the actual information to be
@@ -1469,12 +1471,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   (CP) and Circuit Supervision (CS) messages.
 
   The ISUA Message Header is formatted as follows:
-
-
-
-B. Bidulock                    Version 0.3                       Page 25
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1507,6 +1503,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   Note 2: Under some circumstances, the Correlation Id parameter MUST be
           included in the ISUA Message Header.  See sections "3.9.9 -
+
+
+B. Bidulock                    Version 0.3                       Page 26
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
           Correlation Id" and "4.3.4.3 - ASP Active Procedures".
 
 3.3.  ISUA Call Processing (CP) Messages
@@ -1527,14 +1529,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       CP Header                                   3.3.1
       Setup                 CSET         1        3.3.2
       More Information      CMOR         2        3.3.3
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 26
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
       Timeout               CTOT         3        3.3.4
       Information           CINF         4        3.3.5
       Proceeding            CPRO         5        3.3.6
@@ -1559,6 +1553,19 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Message header in these messages.
 
   The CP Message Header is formatted as follows:
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 27
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1588,12 +1595,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
           assigend to the call by the SGP before the message was sent.
           If Circuit Id was not assigned by the SGP before the ASP sends
           a CP message, the ASP MAY include the Circuit Id parameter for
-
-
-B. Bidulock                    Version 0.3                       Page 27
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
           simplicity, but it MUST then be coded zero (0).  CP messages
           for which a Circuit Id has not been assigned by the SGP
           include only the Setup (CSET) request message sent from the
@@ -1618,9 +1619,15 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   message is sent from an SGP to an ASP to indicate an incoming ISUP
   call setup.
 
+
+
+B. Bidulock                    Version 0.3                       Page 28
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     The CSET message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Control `Setup' (Request, Indication) primitive and the ITU-T and
-  ANSI ISUP `IAM' message [T1.113, Q.763].
+  ANSI ISUP `IAM' message [Q.763], [T1.113].
 
   The CSET message is formatted as follows:
 
@@ -1649,10 +1656,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
-B. Bidulock                    Version 0.3                       Page 28
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   The CSET message can contain the following parameters:
 
       Parameters
@@ -1674,6 +1677,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The More Information (CMOR) message is sent from an SGP to an ASP to
   request additional address information for an outgoing ISUP call
+
+
+B. Bidulock                    Version 0.3                       Page 29
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   setup.
 
     The CMOR message does not correspond to a Call Control primitive or
@@ -1703,14 +1712,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CINF message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Control `Info' primitive and the ITU-T and ANSI ISUP `SAM'
-  message [T1.113, Q.763].
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 29
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+  message [Q.763], [T1.113].
 
   The CINF message is formatted as follows:
 
@@ -1733,6 +1735,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The CINF message can contain the following parameters:
 
+
+
+B. Bidulock                    Version 0.3                       Page 30
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
       Parameters
       ------------------------------------------
       Subsequent Number           Mandatory
@@ -1750,26 +1758,9 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CPRO message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   `Proceeding' primitive and the ITU-T and ANSI ISUP `ACM' and `CPG'
-  message [T1.113, Q.763].
+  message [Q.763], [T1.113].
 
   The CPRO message is formatted as follows:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 30
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1802,11 +1793,17 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The Alerting (CALR) message is sent from an ASP to an SG to indicate
   that the terminating access on a incoming call setup is being alerted.
   The CALR message is sent from an SGP to an ASP to indicate that the
+
+
+B. Bidulock                    Version 0.3                       Page 31
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   terminating access on an outgoing call setup is being alerted.
 
     The CALR message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
-  `Alerting' primitive and the ITU-T and ANSI `IAM' message [T1.113,
-  Q.763].
+  `Alerting' primitive and the ITU-T and ANSI `IAM' message [Q.763],
+  [T1.113].
 
   The CALR message is formatted as follows:
 
@@ -1823,12 +1820,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The CALR message can contain the following parameters:
 
-
-
-
-B. Bidulock                    Version 0.3                       Page 31
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
         Parameters
         ------------------------------------------
@@ -1848,9 +1839,23 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CPRG message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   `Progress' primitive and the ITU-T and ANSI ISUP `ACM' and `CPG'
-  message [T1.113, Q.763].
+  message [Q.763], [T1.113].
 
   The CPRG message is formatted as follows:
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 32
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1883,12 +1888,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   Note 1:
 
-
-
-B. Bidulock                    Version 0.3                       Page 32
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
 3.3.9.  Connect (CCON)
 
     The Connect (CCON) message is sent from an ASP to an SG to indicate
@@ -1898,9 +1897,23 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CCON message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Control `Setup' (Response and Confirmation) primitive and the
-  ITU-T `ANM' and `CON' and ANSI `ANM' message [T1.113, Q.763].
+  ITU-T `ANM' and `CON' and ANSI `ANM' message [Q.763], [T1.113].
 
   The CCON message is formatted as follows:
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 33
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1931,22 +1944,9 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CSUS message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Control `Suspend' primitive and the ITU-T and ANSI `SUS' message
-  [T1.113, Q.763].
+  [Q.763], [T1.113].
 
   The CSUS message is formatted as follows:
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 33
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1965,6 +1965,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The CSUS message can contain the following parameters:
 
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 34
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
       Parameters
       ------------------------------------------
       Suspend/Resume Flags        Mandatory
@@ -1981,7 +1989,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CRES message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Control `Resume' primitive and the ITU-T and ANSI `RES' message
-  [T1.113, Q.763].
+  [Q.763], [T1.113].
 
   The CRES message is formatted as follows:
 
@@ -2000,13 +2008,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
-
-
-
-B. Bidulock                    Version 0.3                       Page 34
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   The CRES message can contain the following parameters:
 
       Parameters
@@ -2022,6 +2023,13 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The Reattempt (CREA) Indication message is sent from an SGP to an
   ASP to indicate that a call attempt on a circuit should be reattempted
   on an alternate circuit.
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 35
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     If the ASP selected the outgoing circuit in the corresponding CSET,
   then the ASP is responsible for selecting another circuit and issuing
@@ -2060,13 +2068,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CERR message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Failure `Call Failure' primitive and the ITU-T and ANSI `RST,'
-
-
-B. Bidulock                    Version 0.3                       Page 35
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
-  `REL' and `RLC' message [T1.113, Q.763].
+  `REL' and `RLC' message [Q.763], [T1.113].
 
   The CERR message is formatted as follows:
 
@@ -2080,6 +2082,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
   The CERR message can contain the following parameters:
+
+
+
+B. Bidulock                    Version 0.3                       Page 36
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
       Parameters
       -------------------------------------------
@@ -2098,7 +2106,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CIBI message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Setup `In Band Information' primitive and the ITU-T and ANSI
-  `ACM' and `CPG' message [T1.113, Q.763].
+  `ACM' and `CPG' message [Q.763], [T1.113].
 
   The CIBI message is formatted as follows:
 
@@ -2117,14 +2125,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
       Parameters
       ------------------------------------------
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 36
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
       Optional Parameters         Optional
                                              *1
 
@@ -2136,9 +2136,16 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CREL message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Control `Release' (Request, Indication) primitive and the ITU-T
-  and ANSI `REL' message [T1.113, Q.763].
+  and ANSI `REL' message [Q.763], [T1.113].
 
   The CREL message is formatted as follows:
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 37
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2163,7 +2170,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CRLC message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Control `Release' (Response, Confirmation) primitive and the ITU-
-  T and ANSI `REL' and `RLC' message [T1.113, Q.763].
+  T and ANSI `REL' and `RLC' message [Q.763], [T1.113].
 
   The CRLC message is formatted as follows:
 
@@ -2177,12 +2184,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
   The CRLC message can contain the following parameters:
-
-
-
-B. Bidulock                    Version 0.3                       Page 37
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
       Parameters
       ------------------------------------------
@@ -2198,6 +2199,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Message Header, and the CS Message Header, together with a list of
   zero or more parameters as defined by the Message Type.  For forward
   compatibility, all Message Types MAY have optional attached parameters
+
+
+B. Bidulock                    Version 0.3                       Page 38
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   in addition to the message headers.
 
   These messages are ISUA Circuit Supervision (CS) Messages:
@@ -2239,10 +2246,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
-B. Bidulock                    Version 0.3                       Page 38
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   The CS Message Header contains the following parameters:
 
       Parameters
@@ -2254,12 +2257,18 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The Continuity Check (CCNT) message is sent from an ASP to an SGP to
   request an continuity check on a specified circuit.  The CCNT message
+
+
+B. Bidulock                    Version 0.3                       Page 39
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   is sent from an SGP to an ASP to indicate an a continuity check
   request on the specified circuit.
 
     The CCNT message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Control `Continuity Recheck' (Request) primitive and the ITU-T
-  and ANSI ISUP `CCR' message [T1.113, Q.763].
+  and ANSI ISUP `CCR' message [Q.763], [T1.113].
 
     The CCNT message has no message-type-specific parameters beyond the
   CS Message Header.
@@ -2274,7 +2283,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CLBK message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   Call Control `Continuity Recheck' (Confirmation) primitive and the
-  ITU-T and ANSI ISUP `LPA' message [T1.113, Q.763].
+  ITU-T and ANSI ISUP `LPA' message [Q.763], [T1.113].
 
     The CLBK message has no message-type-specific parameters beyond the
   CS Message Header.
@@ -2287,20 +2296,9 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CREP message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   `Continuity Report' primitive and the ITU-T and ANSI ISUP `COT'
-  message [T1.113, Q.763].
+  message [Q.763], [T1.113].
 
   The CREP message is formatted as follows:
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 39
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2315,6 +2313,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
       Parameters
       ------------------------------------------
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 40
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
       Check Result                Mandatory
 
 
@@ -2326,7 +2332,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CRSC message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   `Reset' (Request) primitive and the ITU-T and ANSI ISUP `RSC' and
-  `GRS' message [T1.113, Q.763].
+  `GRS' message [Q.763], [T1.113].
 
   The CRSC message is formatted as follows:
 
@@ -2353,14 +2359,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
           Circuit Range is not present in the message, the CRSC message
           corresponds to the `RSC' message.
 
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 40
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
 3.4.6.  Reset Acknowledgement (CRSA)
 
     The Reset Acknowledgement (CRSA) message is sent from an SGP to an
@@ -2371,6 +2369,15 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   'GRA' message.
 
   The CRSA message is formatted as follows:
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 41
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2408,18 +2415,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The CBLO message is formatted as follows:
 
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 41
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2432,6 +2427,15 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
   The CBLO message can contain the following parameters:
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 42
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
       Parameters
       ---------------------------------------------
@@ -2473,12 +2477,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       Circuit Range               Conditional   *1
 
 
-
-
-B. Bidulock                    Version 0.3                       Page 42
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   Note 1: When the Circuit Range parameter is included in the message,
           the CBLA message corresponds to the `CGBA' message and the
           Circuit Range parameter SHOULD match the corresponding
@@ -2491,6 +2489,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The Unblock (CUBL) Request message is sent from an ASP to an SG or
   IPSP to perform a unblocking request.  The CUBL Indication message is
   sent from the SGP to an ASP to indicate the unblocking indication.
+
+
+B. Bidulock                    Version 0.3                       Page 43
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     The CUBL message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   `UNBLOCKING' primitive and the ITU-T and ANSI `UBL' and `CGU' message.
@@ -2531,13 +2534,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   `UNBLOCKING' primitive and the ITU-T and ANSI `UBA' and `CGUA'
   message.
 
-
-
-
-B. Bidulock                    Version 0.3                       Page 43
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   The CUBA message is formatted as follows:
 
      0                     1                   2                   3
@@ -2550,6 +2546,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     \                                                               \
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+
+
+B. Bidulock                    Version 0.3                       Page 44
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The CUBA message can contain the following parameters:
 
@@ -2589,14 +2591,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The CQRY message can contain the following parameters:
 
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 44
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
       Parameters
       ------------------------------------------
       Circuit Range               Mandatory   1
@@ -2611,6 +2605,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The CQRA message corresponds to the ITU-T [Q.764] and ANSI [T1.113]
   `CCT GROUP QUERY' primitive and the ITU-T and ANSI `CQMA' message.
+
+
+B. Bidulock                    Version 0.3                       Page 45
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The CQRA message is formatted as follows:
 
@@ -2645,17 +2644,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The ASP UP message is formatted as follows:
 
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 45
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2672,6 +2660,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
   The ASP UP message can contain the following parameters:
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 46
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
       Parameters
       ---------------------------------------------
@@ -2709,12 +2705,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       Info String                 Optional
 
 
-
-
-B. Bidulock                    Version 0.3                       Page 46
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
 3.5.3.  ASP Down (DOWN)
 
     The ASP Down (DOWN) message is used to indicate to a remote ISUA
@@ -2732,6 +2722,10 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     \                                                               \
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+B. Bidulock                    Version 0.3                       Page 47
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The ASP DOWN message can contain the following parameters:
 
@@ -2769,11 +2763,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
        The ASP DOWN ACK message will always be sent to acknowledge an
        ASP DOWN message.
 
-
-B. Bidulock                    Version 0.3                       Page 47
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
 3.5.5.  Heartbeat (BEAT)
 
     The Heartbeat (BEAT) message is optionally used to ensure that the
@@ -2791,6 +2780,10 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     \                                                               \
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+B. Bidulock                    Version 0.3                       Page 48
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The BEAT message can contain the following parameters:
 
@@ -2826,13 +2819,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       Heartbeat Data              Optional
 
 
-
-
-
-B. Bidulock                    Version 0.3                       Page 48
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
 3.6.  Application Server Process Traffic Maintenance (ASPTM) Messages
 
 3.6.1.  ASP Active (ASPAC)
@@ -2842,6 +2828,20 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   traffic for a particular Application Server.
 
   The ASPAC message is formatted as follows:
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 49
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2887,12 +2887,19 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The ASP Active Ack (ASPAC) Ack message is used to acknowledge an
   ASPAC message received from a remote ISUA peer.
 
-
-B. Bidulock                    Version 0.3                       Page 49
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   The ASPAC ACK message is formatted as follows:
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 50
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2947,9 +2954,10 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
 
-B. Bidulock                    Version 0.3                       Page 50
+
+B. Bidulock                    Version 0.3                       Page 51
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3005,10 +3013,9 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
-
-B. Bidulock                    Version 0.3                       Page 51
+B. Bidulock                    Version 0.3                       Page 52
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The ASPIA message can contain the following parameters:
 
@@ -3032,6 +3039,41 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   ERR messages.
 
   The ERR message is formatted as follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 53
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3063,12 +3105,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     \                                                               \
     /                         Diagnostic Info                       /
     \                                                               \
-
-
-B. Bidulock                    Version 0.3                       Page 52
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
@@ -3092,6 +3128,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
           Reference parameter MUST contain the call reference for which
           status is unknown or unauthorized.
 
+
+B. Bidulock                    Version 0.3                       Page 54
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   Note 3: When the Error Code is "Circuit Status Unknown," the Circuit
           Id parameter MUST contain the circuit for which status is
           unknown or unauthorized.
@@ -3110,23 +3151,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   ISUA events at an SG or IPSP to an ASP.
 
   The NTFY message is formatted as follows:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 53
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3159,6 +3183,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       ---------------------------------------------
       Status                      Mandatory
       ASP Identifier              Conditional   *1
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 55
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
       Routing Context             Conditional   *2
       Info String                 Optional
 
@@ -3180,12 +3212,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     Routing Key Management (RKM) messages are used to manage the Routing
   Keys that are used by an SG to direct traffic toward an Application
   Server.
-
-
-
-B. Bidulock                    Version 0.3                       Page 54
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 3.8.1.  Registration Request (REG REQ)
 
@@ -3218,6 +3244,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
+
+B. Bidulock                    Version 0.3                       Page 56
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   The REG REQ message can contain the following parameters:
 
       Parameters
@@ -3239,12 +3270,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   successful, the REG RSP message contains the Routing Context assigned
   to the one or more Routing Keys that were presented in the REG REQ
   message.
-
-
-
-B. Bidulock                    Version 0.3                       Page 55
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The REG RSP message is formatted as follows:
 
@@ -3276,6 +3301,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       Registration Result         Mandatory   *1
 
 
+
+
+B. Bidulock                    Version 0.3                       Page 57
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   Note 1: REG RSP message.  Whereas it is OPTIONAL for an implementation
           to be able to generate a REG RSP message with more than one
           Routing Key parameter, it is REQUIRED that the implementation
@@ -3291,19 +3322,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   RSP message in return with the associated Routing Context value.
 
   The DEREG REQ message is formatted as follows:
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 56
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3338,6 +3356,15 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The DEREG REQ message is formatted as follows:
 
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 58
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3358,11 +3385,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     \                                                               \
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-
-
-B. Bidulock                    Version 0.3                       Page 57
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The DEREG REQ message contains the following parameters:
 
@@ -3393,6 +3415,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       Not used in ISUA                 0x0005         -
       Routing Context                  0x0006      3.9.2
       Diagnostic Info                  0x0007      3.9.3
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 59
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
       Not used in ISUA                 0x0008         -
       Heartbeat Data                   0x0009      3.9.4
       Not used in ISUA                 0x000A         -
@@ -3418,11 +3448,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   and ASPTM messages to provide additional debugging or diagnostic
   information.
 
-
-B. Bidulock                    Version 0.3                       Page 58
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   The Info String parameter is formatted as follows:
 
      0                   1                   2                   3
@@ -3440,7 +3465,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   Info String field: variable (ASCII string)
 
-    The Info String field can carry any meaningful UTF-8 [RFC 2279]
+    The Info String field can carry any meaningful UTF-8 [RFC2279]
     character string along with the message.  Length of the Info String
     field is from 0 to 255 characters.  No procedures are presently
     identified for its use but implementations may use the Info String
@@ -3450,6 +3475,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The Routing Context parameter is included in all ISUA CP and CS
   messages as well as in MGMT, ASPTM, ASPSM that reference one or more
+
+
+B. Bidulock                    Version 0.3                       Page 60
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   Application Servers.  The Routing Context parameter is used to
   uniquely identify an Application Server and Routing Key within an
   association between an SGP and ASP.
@@ -3475,13 +3506,8 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     integers indexing the Application Server traffic that the sending
     ASP is configured or registered to receive.  There is one-to-one
     relationship between a Routing Context value, an SG Routing Key and
-    an Application Server [2].  If the Routing Context parameter is
+    an Application Server <2>.  If the Routing Context parameter is
     present, it SHOULD be the first parameter in the message as it
-
-B. Bidulock                    Version 0.3                       Page 59
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
     defines the format and/or interpretation of the parameters
     containing a PC or SSN value.
 
@@ -3507,6 +3533,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
   The Diagnostic Info parameter contains the following fields:
+
+
+B. Bidulock                    Version 0.3                       Page 61
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   Diagnostic Info field: variable length (bytes)
 
@@ -3535,12 +3566,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
-
-
-B. Bidulock                    Version 0.3                       Page 60
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   The Heartbeat Data parameter contains the following fields:
 
   Heartbeat Data field: variable length (opaque)
@@ -3563,6 +3588,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Application Server has associated with it only one Traffic Mode Type.
 
   The Traffic Mode Type parameter is formatted as follows:
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 62
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3594,12 +3627,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     ASP in the AS.  In Load-share mode, when the ASP becomes active for
     the AS, the ASP will share in the traffic distribution with any
     other active ASPs.  In Broadcast mode, when the ASP becomes active
-
-
-B. Bidulock                    Version 0.3                       Page 61
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
     for the AS, the ASP will receive the same traffic as any other
     active ASPs.
 
@@ -3620,6 +3647,13 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     |                          Error Code                           |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 63
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The Error Code parameter contains the following fields:
 
@@ -3653,12 +3687,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The "Invalid Version" error is sent if a message was received with
   an invalid or unsupported version.  The ERR message contains the
   supported version in the Common header.  The ERR message could
-
-
-B. Bidulock                    Version 0.3                       Page 62
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   optionally provide the supported version in the Diagnostic parameter.
 
     The "Unsupported Message Class" error is sent if a message with an
@@ -3679,6 +3707,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   message and not send an ERR message).  For example, silent discard is
   used by an ASP if it received a ISUA CP message from an SGP while it
   was in the ASP-INACTIVE state.  If the Unexpected message contained
+
+
+B. Bidulock                    Version 0.3                       Page 64
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   Routing Context(s), the Routing Context(s) SHOULD be included in the
   ERR message.
 
@@ -3713,11 +3747,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The "Parameter Field Error" would be sent if a message is received
   with a parameter having a wrong length field.
 
-
-B. Bidulock                    Version 0.3                       Page 63
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
     The "Unexpected Parameter" error would be sent if a message contains
   an invalid parameter.
 
@@ -3737,6 +3766,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   from a peer with an invalid (not configured) Routing Context value, or
   if a message is received from a peer without a Routing Context
   parameter and it is not known by configuration data which Application
+
+B. Bidulock                    Version 0.3                       Page 65
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   Servers are referenced.  For this error, the invalid Routing
   Context(s) MUST be included in the ERR message.
 
@@ -3766,17 +3800,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The Status parameter is formatted as follows:
 
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 64
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3800,6 +3823,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The Status ID parameter contains more detailed information for the
     notification, based on the value of the Status Type.
+
+
+B. Bidulock                    Version 0.3                       Page 66
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     (1)   If the Status Type is "AS_State_Change", then the Status ID
           values are as follows:
@@ -3830,12 +3858,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
      is informed when an alternate ASP transitions to the ASP-Active
      state in Override mode.
 
-
-
-B. Bidulock                    Version 0.3                       Page 65
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
 3.9.8.  ASP Identifier
 
   The ASP Identifier parameter is formatted as follows:
@@ -3857,6 +3879,13 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     significant among the ASPs that support an AS.  The SGP should save
     the ASP Identifier to be used, if necessary, with the Notify (NTFY)
     message (see Section 3.7.2).
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 67
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
 3.9.9.  Correlation Id
 
@@ -3885,15 +3914,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     attached to the ISUA Message Header of the first CP message sent to
     an ASP by an SG after sending an ASP Active Ack or otherwise
     starting traffic to an ASP.  The Correlation Id is only significant
-    within a Routing Context [3].
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 66
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+    within a Routing Context <3>.
 
 3.9.10.  Registration Result
 
@@ -3917,6 +3938,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
   The Registration Result parameter can contain the following fields:
+
+
+
+B. Bidulock                    Version 0.3                       Page 68
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   Local Routing Key Identifier: TLV
 
@@ -3948,12 +3975,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   of a successful or unsuccessful deregistration operation for a
   specific Routing Key.
 
-
-
-B. Bidulock                    Version 0.3                       Page 67
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   The Deregistration Result parameter is formatted as follows:
 
      0                   1                   2                   3
@@ -3975,6 +3996,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     parameter.  The Routing Context field contains the same TLV
     formatted Routing Context parameter as found in the corresponding
     Deregistration Request (DEREG REQ) message.
+
+
+
+B. Bidulock                    Version 0.3                       Page 69
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   Deregistration Status: TLV
 
@@ -4007,12 +4034,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The Registration Status field indicates the success or the reason
     for failure of a registration request.
 
-
-
-B. Bidulock                    Version 0.3                       Page 68
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
     Its values can be:
 
          0   Successfully Registered
@@ -4033,6 +4054,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The Deregistration Status parameter is used to indicate the success
   or failure of a deregistration operation.
+
+
+
+B. Bidulock                    Version 0.3                       Page 70
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The Deregistration Status parameter is formatted as follows:
 
@@ -4066,12 +4093,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The Local Routing Key Identifier parameter is used for correlating
   the Routing Key parameter in a specific Registration Request (REG REQ)
-
-
-B. Bidulock                    Version 0.3                       Page 69
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   message with the Registration Result parameter in the corresponding
   Registration Response (REG RSP) message.
 
@@ -4090,6 +4111,13 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   fields:
 
   Local Routing Key Identifier: 32-bits (unsigned integer)
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 71
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     The Local Routing Key Identifier value is assigned by the ASP and is
     used to correlate the response in a Registration Response (REG RSP)
@@ -4121,16 +4149,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
         Optional Parameters      0x050E     3.10.1.14
         ----------------------------------------------
 
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 70
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
             Parameters used in CS Messages
         ---------------------------------------
         Parameter Name  Parameter ID  Section
@@ -4149,6 +4167,15 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
         Local Point Code       0x0524     3.10.3.5
         Remote Point Code      0x0525     3.10.3.5
         -------------------------------------------
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 72
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
 3.10.1.  Parameters used in CP Messages
 
@@ -4181,15 +4208,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     For a given AS and Routing Context, either the SG or the ASP is
     responsible for assigning Call Reference, but not both.
 
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 71
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
 3.10.1.2.  Call Type
 
   The Call Type parameter is formatted as follows:
@@ -4208,6 +4226,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Call Type field: 32-bits (unsigned integer)
 
     The Call Type field can take on the following values:
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 73
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
         0   Speech
         1   64 kbit/s unrestricted digital information
@@ -4243,12 +4269,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       The Satellite Indicator field corresponds to the Nature of Address
       Indicators of ITU-T ISUP [Q.763] and indicate the number of
       satellites present in the ISUP connection.  The Satellite
-
-
-B. Bidulock                    Version 0.3                       Page 72
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
       Indicator field can take on the following values:
 
           0   no satellite in circuit
@@ -4266,10 +4286,19 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       circuit.  The Continuity Check Indicator field can take on the
       following values:
 
+
+
+
+B. Bidulock                    Version 0.3                       Page 74
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+
           0   no continuity check required
           1   continuity check performed on previous circuit
           2   continuity check required
           3   (reserved)
+
 
 
     Outgoing Half Echo Control Device: 1-bit (bit 27)
@@ -4302,12 +4331,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       methods are available.  The End to End Method field can take on
       the following values:
 
-
-
-B. Bidulock                    Version 0.3                       Page 73
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
           0   link by link method only
           1   pass along method available
           2   SCCP end to end method available
@@ -4324,6 +4347,9 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
           0   no interworking encountered
           1   interworking encountered
 
+B. Bidulock                    Version 0.3                       Page 75
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     End to End Information Available: 1-bit (bit 22)
 
@@ -4360,13 +4386,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     SCCP Methods Available: 2-bits (bit 18-19)
 
-
-
-
-B. Bidulock                    Version 0.3                       Page 74
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
       The SCCP Methods Available field corresponds to the Forward Call
       Indicators of the ITU-T ISUP [Q.763] and indicates the SCCP method
       available.  The SCCP Methods Available field can take on the
@@ -4381,6 +4400,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 3.10.1.4.  Called Party Number
 
   The Called Party Number parameter is formatted as follows:
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 76
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -4420,12 +4447,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The Reattempt Reason parameter is formatted as follows:
 
-
-
-B. Bidulock                    Version 0.3                       Page 75
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -4441,6 +4462,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The Reattempt Reason field indicates the reason that a call
     reattempt is indicated.  The Reattempt Reason field can take on one
+
+B. Bidulock                    Version 0.3                       Page 77
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     of the following values:
 
         1   dual sizeure
@@ -4476,15 +4502,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The "continuity check failure" reason indicates that continuity
       check failed on the selected circuit.
 
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 76
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
 3.10.1.7.  Check Result
 
   The Check Result parameter is formatted as follows:
@@ -4501,6 +4518,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   The Check Result parameter contains the following fields:
 
   Check Result field: 32-bits (unsigned integer)
+
+
+
+B. Bidulock                    Version 0.3                       Page 78
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     The Check Result field indicates the success of failure of the
     continuity check.  The Check Result field can take on one of the
@@ -4536,14 +4559,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       values:
 
           1   charge
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 77
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
           2   no charge
               all other values reserved
 
@@ -4560,6 +4575,13 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
           2   connection free
               all other values reserved
 
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 79
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     Payphone: 2-bits (bit 26-27)
 
@@ -4597,12 +4619,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
           1   interworking encountered
 
 
-
-
-B. Bidulock                    Version 0.3                       Page 78
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
     End to End Information Available: 1-bit (bit 22)
 
       The End to End Information Available field corresponds to the
@@ -4619,6 +4635,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
       The ISUP All the Way field corresponds to the Backward Call
       Indicators of ITU-T ISUP [Q.763] and indicates whether ISDN User
+
+
+B. Bidulock                    Version 0.3                       Page 80
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
       Part was used all the way.  The ISUP All the Way field can take on
       one of the following values:
 
@@ -4656,12 +4678,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       the call.  The Incoming Half Echo Control Device field can take on
       one of the following values:
 
-
-
-B. Bidulock                    Version 0.3                       Page 79
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
           0   no incoming half echo control device
           1   incoming half echo control device
 
@@ -4675,6 +4691,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
           0   no SCCP method available
           1   connectionless SCCP method available
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 81
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
           2   connection oriented SCCP method available
           3   both SCCP methods available
 
@@ -4715,12 +4739,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       alerted.  This event is indicated only if a CPRO message has
       already been received.
 
-
-
-B. Bidulock                    Version 0.3                       Page 80
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
     The "progress" event indicates that the call is progressing with the
       specified optional parameters.
 
@@ -4731,6 +4749,13 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       forwarded on busy and the optional parameters (if any) in the
       message contain the attributes of the forwarding (e.g. redirecting
       number).
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 82
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     The "call forwarded on no answer" event indicates that the call has
       been forwarded on no answer and the optional parameters (if any)
@@ -4772,14 +4797,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
           1   event presentation restricted
 
 
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 81
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
 3.10.1.11.  Suspend/Resume Flags
 
   The Suspend/Resume Flags parameter is formatted as follows:
@@ -4792,6 +4809,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     |                      Suspend/Resume Flags                     |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+
+B. Bidulock                    Version 0.3                       Page 83
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The Suspend/Resume Flags parameter contains the following fields:
 
@@ -4831,14 +4853,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
         1   continuity check failure
         2   received release complete
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 82
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
         3   blocking
         4   T6 timeout
         5   T7 timeout
@@ -4853,6 +4867,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The "continuity check failure" reason indicates that continuity
       check on the circuit failed.  The applies to incoming calls only.
+
+
+B. Bidulock                    Version 0.3                       Page 84
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     The "received release complete" reason indicates that the selected
       circuit was not completely released by the distant end.  The
@@ -4887,17 +4906,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The Cause parameter is formatted as follows:
 
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 83
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -4913,6 +4921,15 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The Cause field indicates the reason for call release and can take
     on the following values:
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 85
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
           ITU-T                            ANSI
     --------------------------------------------------------------------
@@ -4949,16 +4966,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
      47   resource unavailable
      50   not subscribed
      51   ------------------------------   call type incompatible
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 84
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
-          ITU-T                            ANSI
-    --------------------------------------------------------------------
      53   og call barred in CUG
      54   ------------------------------   group restrictions
      55   ic call barred in CUG
@@ -4976,6 +4983,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
      91   invalid transit ntwk selection
      95   invalid message
      97   message type not impl.
+
+
+B. Bidulock                    Version 0.3                       Page 86
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+          ITU-T                            ANSI
+    --------------------------------------------------------------------
      99   parameter not impl.
     102   recovery on timer expiry
     103   parameter passed on
@@ -5006,17 +5021,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Optional Parameters field: (ISUP Optional Parameters)
 
     The Optional Parameters field is formatted according to the format
-    of the ISUP Optional Parameters Part [T1.113, Q.763] of the ISUP
+    of the ISUP Optional Parameters Part [Q.763], [T1.113] of the ISUP
     message, starting with the first byte of the first optional
     parameter in the ISUP Optional Parameters Part of the message and
     continuing through and including the ISUP End of Optional Parameters
-
-
-B. Bidulock                    Version 0.3                       Page 85
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
-    parameter [T1.113, Q.763].
+    parameter [Q.763], [T1.113].
 
     The ISUP Optional Parameters from the ISUP message MUST be placed
     transparently in this fashion into the ISUA Optional Parameters
@@ -5032,6 +5041,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The Circuit Status parameter indicates the state of a circuit.  The
   state of a circuit is maintained and obtained by the SG and
   communicated to the ASP.
+
+
+B. Bidulock                    Version 0.3                       Page 87
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The Circuit Status parameter is formatted as follows:
 
@@ -5057,7 +5071,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The Circuit Id field contains the circuit identifier for one
     circuit.  This is the least significant bit aligned Circuit
-    Identification Code (CIC) [T1.113, Q.763] associated with the
+    Identification Code (CIC) [Q.763], [T1.113] associated with the
     circuit.  Unused bits are coded zero (0).
 
     For example, a 12-bit Circuit Identification Code (CIC) is formatted
@@ -5071,15 +5085,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
               |MSB-----------------LSB|
 
 
-B. Bidulock                    Version 0.3                       Page 86
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   Circuit State field: 32-bits (integer)
 
     The Circuit State field contains the least significant bit aligned
-    Circuit State Indicator (CSI) [T1.113, Q.763] indicating the status
-    of the circuit.  Unused bits are coded zero (0).
+    Circuit State Indicator (CSI) [Q.763], [T1.113] indicating the
+    status of the circuit.  Unused bits are coded zero (0).
 
     For example, the ITU-T Circuit State Indicator (CSI) is formatted
     into the Circuit State field as follows:
@@ -5091,6 +5101,9 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                           |MSB-----LSB|
 
+B. Bidulock                    Version 0.3                       Page 88
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     The ITU-T Circuit State Indicator (CSI) [Q.763] can take on the
     following values:
@@ -5126,19 +5139,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
         |         |            |           +----------+--------+
         |10 11 00 |            |           |  remote  | active |
         |10 11 01 |            |           |          | local  |
-        +---------+------------+-----------+----------+--------+
-
-
-
-B. Bidulock                    Version 0.3                       Page 87
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
-        +---------+------------------------+-------------------+
-        |         |         State          |  Blocking|State   |
-        |  CSI    +------------+-----------+----------+--------+
-        |         |   Maint    | Call Proc | Hardware | Maint  |
-        +---------+------------+-----------+----------+--------+
         |10 11 10 |            |           |          | remote |
         |10 11 11 |            |           |          |  both  |
         |         |            |           +----------+--------+
@@ -5156,6 +5156,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Header to identify one or more circuits within the Application Server
   indicated by the Routing Context parameter (in the ISUA Message
   Header).
+
+
+
+B. Bidulock                    Version 0.3                       Page 89
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The Circuit Id parameter is formatted as follows:
 
@@ -5175,8 +5181,9 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The Circuit Id field contains the circuit identifier for the circuit
     within an Application Server that the sending ASP ro SGP is
     configured or registered to control and manage.  This is the least
-    significant bit aligned Circuit Identification Code (CIC) [T1.113,
-    Q.763] associated with the circuit.  Unused bits are coded zero (0).
+    significant bit aligned Circuit Identification Code (CIC) [Q.763],
+    [T1.113] associated with the circuit.  Unused bits are coded zero
+    (0).
 
     For example, a 12-bit Circuit Identification Code (CIC) is formatted
     into the Circuit Id field as follows:
@@ -5187,11 +5194,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
       |0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0|          CIC          |
       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                                               |MSB-----------------LSB|
-
-
-B. Bidulock                    Version 0.3                       Page 88
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     a list of one or more 32-bit unsigned integers indexing the circuits
     within an Application Server that the sending ASP is configured or
@@ -5211,6 +5213,13 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Network Appearance parameter contains an invalid value.
 
   The Network Appearance parameter is formatted as follows:
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 90
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -5243,15 +5252,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The Routing Key parameter is formatted as follows:
 
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 89
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -5274,6 +5274,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     by the ASP and is used to correlate the response in a REG RSP
     message with the original registration request.  The identifier
     value must remain unique until the REG RSP (or ERR) message is
+
+B. Bidulock                    Version 0.3                       Page 91
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     received.
 
   Key field: variable (TLV parameters)
@@ -5301,16 +5306,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   The Circuit Range parameter is formatted as follows:
 
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 90
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -5334,8 +5329,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The Circuit Id Beg field contains the circuit identifier for the
     circuit at the beginning of the range (inclusive).  This is the
     least significant bit aligned Circuit Identification Code (CIC)
-    [T1.113, Q.763] associated with the first circuit in the range.
+    [Q.763], [T1.113] associated with the first circuit in the range.
     Unused bits are coded zero (0).  The first and last circuit in the
+
+
+B. Bidulock                    Version 0.3                       Page 92
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     range MAY be the same circuit.
 
     For example, a 12-bit Circuit Identification Code (CIC) is formatted
@@ -5353,22 +5354,13 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The Circuit Id End field contains the circuit identifier for the
     circuit at the end of the range (inclusive).  This is the least
-    significant bit aligned Circuit Identification Code (CIC) [T1.113,
-    Q.763] associated with the last circuit in the range.  Unused bits
+    significant bit aligned Circuit Identification Code (CIC) [Q.763],
+    [T1.113] associated with the last circuit in the range.  Unused bits
     are coded zero (0).  The first and last circuit in the range MAY be
     the same circuit.
 
     For example, a 12-bit Circuit Identification Code (CIC) is formatted
     into the Circuit Id End field as follows:
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 91
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
        1       2                   3
        6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -5396,6 +5388,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     |                          Point Code                           |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+
+
+B. Bidulock                    Version 0.3                       Page 93
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
   The Local Point Code parameters contains the following fields:
 
@@ -5425,9 +5423,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                                         |MSB---------------------LSB|
 
-B. Bidulock                    Version 0.3                       Page 92
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 3.10.3.6.  Remote Point Code
 
@@ -5452,46 +5447,20 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
   Point Code field: 32-bits (unsigned integer)
 
+
+
+B. Bidulock                    Version 0.3                       Page 94
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     The Point Code field contains an SS7 signalling point code.  Point
     codes that are less than 32-bits are padded on the left to the
     32-bit boundary.  For examples of point codes, see the Local Point
     Code parameter description.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 93
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
-
 Notes for Section 3
 
-  [1]  IMPLEMENTATION NOTE:-  The use of TLV in principle allows the
+  <1>  IMPLEMENTATION NOTE:-  The use of TLV in principle allows the
        parameters to be placed in a random order in the message.
        However, some guidelines should be considered for easy
        processing in the following order:
@@ -5505,7 +5474,7 @@ Notes for Section 3
         + The receiver SHOULD accept parameters in any order, except
           where explicitly mandated.
 
-  [2]  IMPLEMENTATION NOTE:-  An Application Server Process may be
+  <2>  IMPLEMENTATION NOTE:-  An Application Server Process may be
        configured to process traffic for more than one logical
        Application Server.  From the perspective of an ASP, a Routing
        Context defines a range of signalling traffic that the ASP is
@@ -5524,7 +5493,7 @@ Notes for Section 3
        or individual SCTP associations are dedicated to each SS7
        network context, this functionality is not needed.
 
-  [3]  IMPLEMENTATION NOTE:-  Correlation Id parameter can be used for
+  <3>  IMPLEMENTATION NOTE:-  Correlation Id parameter can be used for
        features like Synchronization of ASPs and SGPs in a Broadcast
        Mode AS or SG; avoid message duplication and mis-sequencing in
        case of fail-over of association from one ASP or SGP to another
@@ -5537,15 +5506,12 @@ Notes for Section 3
     The ISUA layer needs to respond to various local primitives it
   receives from other layers as well as the messages that it receives
   from the peer ISUA layer.  This section describes the ISUA procedures
-  in response to these events.
 
-
-
-
-
-B. Bidulock                    Version 0.3                       Page 94
+B. Bidulock                    Version 0.3                       Page 95
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+  in response to these events.
 
 4.1.  Procedures to Support Call Control
 
@@ -5595,16 +5561,20 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
                         Figure 4.  ISUA Layer Model
 
 
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 96
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
 4.1.2.  Receipt of Primitives from ISUP
 
     Upon receiving a ISUP indication or confirmation primitive from ISUP
   at an SG, the Nodal Interworking Function passes the primitive to
   ISUA.  The ISUA layer sends a corresponding ISUA Call Processing (CP)
   message (see Section 3) to its ISUA peer at the ASP.
-
-B. Bidulock                    Version 0.3                       Page 95
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The ISUA peer receiving the CP message delivers the corresponding
   ISUP primitive to Call Control at the ASP as illustrated in Figure 5.
@@ -5652,6 +5622,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   and issued on the corresponding SCTP association.  If more than one
   ASP is in the ASP-ACTIVE state (i.e., traffic is to be load-shared
   across more than one ASP), one of the ASPs in the ASP-ACTIVE state is
+
+B. Bidulock                    Version 0.3                       Page 97
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   selected from the list.  (If the ASPs are in Broadcast Mode, all
   active ASPs will be selected and the message sent to each of the
   active ASPs.)  The selection algorithm is implementation dependent but
@@ -5659,11 +5634,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   appropriate selection algorithm must be chosen carefully as it is
   dependent on application assumptions and understanding of the degree
   of state coordination between the ASP-ACTIVE ASPs in the AS.
-
-
-B. Bidulock                    Version 0.3                       Page 96
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     In addition, the message needs to be sent on the appropriate SCTP
   stream, again taking care to meet the message sequencing needs of the
@@ -5710,6 +5680,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   that initiated the request, the ISUA layer will send an M-SCTP_RELEASE
   confirm primitive to Layer Management when the association shutdown is
   complete.  At the peer ISUA Layer, an M-SCTP_RELEASE indication
+
+B. Bidulock                    Version 0.3                       Page 98
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   primitive is sent to Layer Management upon abort or successful
   shutdown of an SCTP association.
 
@@ -5720,18 +5695,14 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   maps the association status information to an M-SCTP_STATUS confirm
   primitive.  No peer protocol is invoked.
 
-B. Bidulock                    Version 0.3                       Page 97
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
     Similar LM-to-ISUA-to-SCTP and SCTP-to-ISUA-to-LM primitive mappings
   can be described for the various other SCTP Upper Layer primitives in
-  RFC 2960 [2960] such as INITIALIZE, SET PRIMARY, CHANGE HEARTBEAT,
-  REQUEST HEARTBEAT, GET SRTT REPORT, SET FAILURE THRESHOLD, SET
-  PROTOCOL PARAMETERS, DESTROY SCTP INSTANCE, SEND FAILURE, AND NETWORK
-  STATUS CHANGE.  Alternatively, these SCTP Upper Layer primitives (and
-  Status as well) can be considered for modeling purposes as a Layer
-  Management interaction directly with the SCTP Layer.
+  [RFC2960] such as INITIALIZE, SET PRIMARY, CHANGE HEARTBEAT, REQUEST
+  HEARTBEAT, GET SRTT REPORT, SET FAILURE THRESHOLD, SET PROTOCOL
+  PARAMETERS, DESTROY SCTP INSTANCE, SEND FAILURE, AND NETWORK STATUS
+  CHANGE.  Alternatively, these SCTP Upper Layer primitives (and Status
+  as well) can be considered for modeling purposes as a Layer Management
+  interaction directly with the SCTP Layer.
 
     M-NOTIFY indication and M-ERROR indication primitives indicate to
   Layer Management the notification or error information contained in a
@@ -5766,6 +5737,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   AS_INACTIVE, and M-AS_DOWN indication primitives to the local Layer
   Management.
 
+
+
+B. Bidulock                    Version 0.3                       Page 99
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     M-NOTIFY indication and M-ERROR indication primitives indicate to
   Layer Management the notification or error information contained in a
   received ISUA Notify (NTFY) or Error (ERR) message.  These indications
@@ -5778,11 +5755,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   sent on one of the streams used to carry data traffic related to the
   Routing Context(s), to minimize possible message loss.  BEAT, BEAT
   ACK, and NTFY messages MAY be sent using out-of-order delivery, and
-
-B. Bidulock                    Version 0.3                       Page 98
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   MAY be sent on any stream.
 
 4.3.  AS and ASP State Maintenance
@@ -5825,6 +5797,10 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The remaining sections contain specific IPSP Considerations
   subsections.
 
+B. Bidulock                    Version 0.3                      Page 100
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
 4.3.1.  ASP/IPSP States
 
     The state of each remote ASP/IPSP, in each AS that it is configured
@@ -5836,12 +5812,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
    + reception of some messages from the peer ISUA layer at other
      ASPs/IPSPs in the AS (e.g, ASP Active message indicating
      "Override");
-
-
-B. Bidulock                    Version 0.3                       Page 99
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
    + reception of indications from the SCTP layer; or,
    + Local Management intervention.
 
@@ -5851,18 +5821,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   ASP-DOWN:     The remote ISUA peer at the ASP/IPSP is unavailable or
                 the related SCTP association is down.  Initially all
                 ASPs/IPSPs will be in this state.  An ASP/IPSP in this
-                state SHOULD NOT be sent any ISUA messages, with the
-                exception of Heartbeat (BEAT), ASP Down Ack (ASPDN ACK)
-                and Error (ERR) messages.
-
-  ASP-INACTIVE: The remote ISUA peer at the ASP/IPSP is available (and
-                the related SCTP association is up) but application
-                traffic is stopped.  In this state, the ASP/IPSP SHOULD
-                NOT be sent any CP or CS messages for the AS for which
-                the ASP/IPSP is inactive.
-
-  ASP-ACTIVE:   The remote ISUA peer at the ASP is available and
-                application traffic is active (for a particular Routing
 
                                           +--------------+
                                           |              |
@@ -5897,10 +5855,22 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
 
-B. Bidulock                    Version 0.3                      Page 100
+B. Bidulock                    Version 0.3                      Page 101
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
+                state SHOULD NOT be sent any ISUA messages, with the
+                exception of Heartbeat (BEAT), ASP Down Ack (ASPDN ACK)
+                and Error (ERR) messages.
+
+  ASP-INACTIVE: The remote ISUA peer at the ASP/IPSP is available (and
+                the related SCTP association is up) but application
+                traffic is stopped.  In this state, the ASP/IPSP SHOULD
+                NOT be sent any CP or CS messages for the AS for which
+                the ASP/IPSP is inactive.
+
+  ASP-ACTIVE:   The remote ISUA peer at the ASP is available and
+                application traffic is active (for a particular Routing
                 Context or set of Routing Contexts).
 
   SCTP CDI:     The SCTP CDI denotes the local SCTP layer's
@@ -5942,6 +5912,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
                 traffic is active.  This state implies that at least one
                 ASP is in the ASP-ACTIVE state.
 
+
+B. Bidulock                    Version 0.3                      Page 102
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   AS-PENDING:   An active ASP has transitioned to ASP-INACTIVE or ASP-
                 DOWN and it was the last remaining active ASP in the AS.
                 A recovery timer T(r) SHOULD be started and all incoming
@@ -5955,10 +5930,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   previously queued messages.  The AS will move to the AS-INACTIVE state
   if at least one ASP is in ASP-INACTIVE state, otherwise it will move
   to AS-DOWN state.
-
-B. Bidulock                    Version 0.3                      Page 101
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
          +----------+   one ASP trans to ACTIVE  +-------------+
          |    AS-   |--------------------------->|     AS-     |
@@ -5999,6 +5970,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     For example, where the AS configuration data is not created until
   Registration of the first ASP, the AS-INACTIVE state is entered
+
+B. Bidulock                    Version 0.3                      Page 103
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   directly upon the first successful REG REQ from an ASP.  Another
   example is where the AS configuration data is not created until the
   first ASP successfully enters the ASP-ACTIVE state.  In this case the
@@ -6013,11 +5989,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     Before the establishment of an SCTP association the ASP state at
   both the SGP and ASP is assumed to be in the state ASP-DOWN.
-
-
-B. Bidulock                    Version 0.3                      Page 102
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     Once the SCTP association is established (see Section 4.2.1) and
   assuming that local Call Control is ready, the local ISUA ASP
@@ -6057,6 +6028,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     When an ASP Up (ASPUP) message is received at an SGP and internally
   the remote ASP is in the ASP-DOWN state and not considered locked-out
   for local management reasons, the SGP marks the remote ASP in the
+
+B. Bidulock                    Version 0.3                      Page 104
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   state ASP-INACTIVE and informs Layer Management with an M-ASP_Up
   indication primitive.  If the SGP is aware, via current configuration
   data, which Application Servers the ASP is configured to operate in,
@@ -6071,12 +6047,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   send an ASP Up Ack (ASPUP ACK) message in response to a received ASP
   Up (ASPUP) message even if the ASP is already marked as ASP-INACTIVE
   at the SGP.
-
-
-
-B. Bidulock                    Version 0.3                      Page 103
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     If for any local reason (e.g, management lock-out) the SGP cannot
   respond with an ASP Up Ack (ASPUP ACK) message, the SGP responds to an
@@ -6116,6 +6086,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     If an ASP Up (ASPUP) message with an unsupported version is
   received, the receiving end responds with an Error (ERR) message,
   indicating the version the receiving node supports and notifies Layer
+
+B. Bidulock                    Version 0.3                      Page 105
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   Management.
 
     This is useful when protocol version upgrades are being performed in
@@ -6132,10 +6107,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   it.  The IPSP may inform Layer Management of the change in state of
   the remote IPSP using M-ASP_UP or M-ASP_DN indication or confirmation
   primitives.
-
-B. Bidulock                    Version 0.3                      Page 104
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     Alternatively, when using the IPSP DE model, an interchange of ASPUP
   messages from each end MUST be performed.  Four messages are needed
@@ -6173,6 +6144,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     At the ASP, the ASP Down Ack (ASPDN ACK) message received is not
   acknowledged.  Layer Management is informed with an M-ASP_DOWN confirm
+
+B. Bidulock                    Version 0.3                      Page 106
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   primitive.  If the ASP receives an ASP Down Ack without having sent an
   ASP Down (ASPDN) message, the ASP should now consider itself as in the
   ASP-DOWN state.  If the ASP was previously in the ASP-ACTIVE or
@@ -6188,13 +6164,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   under control of Layer Management.  In this method, expiry of T(ack)
   results in an M-ASP_DOWN confirm primitive carrying a negative
   indication.
-
-
-
-
-B. Bidulock                    Version 0.3                      Page 105
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 4.3.4.3.  ASP Active Procedures
 
@@ -6233,6 +6202,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Ack (ASPAC ACK) message, the SGP or IPSP is now ready to receive and
   send traffic for the related Routing Context(s).  The ASP SHOULD NOT
   send CP messages for the related Routing Context(s) before receiving
+
+B. Bidulock                    Version 0.3                      Page 107
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   an ASP Active Ack (ASPAC ACK) message, or it will risk message loss.
 
     Multiple ASP Active Ack (ASPAC ACK) messages MAY be used in response
@@ -6250,10 +6224,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The SGP MUST send an ASP Active Ack (ASPAC ACK) message in response
   to a received ASP Active (ASPAC) message from the ASP, if the ASP is
   already marked in the ASP-ACTIVE state at the SGP.
-
-B. Bidulock                    Version 0.3                      Page 106
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     At the ASP, the ASP Active Ack (ASPAC ACK) message received is not
   acknowledged.  Layer Management is informed with an M-ASP_ACTIVE
@@ -6290,6 +6260,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     In the case of an Override mode AS, reception of an ASP Active
   (ASPAC) message at an SGP causes the (re)direction of all traffic for
   the AS to the ASP that sent the ASP Active (ASPAC) message.  Any
+
+B. Bidulock                    Version 0.3                      Page 108
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   previously active ASP in the AS is now considered to be in state ASP-
   INACTIVE and SHOULD no longer receive traffic from the SGP within the
   AS.  The SGP or IPSP then MUST send a Notify (NTFY) message
@@ -6309,11 +6284,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     An SGP or IPSP, upon reception of an ASP Active (ASPAC) message for
   the first ASP in a Load-share AS, MAY choose not to direct traffic to
-
-B. Bidulock                    Version 0.3                      Page 107
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   a newly active ASP until it determines that there are sufficient
   resources to handle the expected load (e.g, until there are "n" ASPs
   in state ASP-ACTIVE in the AS).
@@ -6349,6 +6319,10 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Active Ack (ASPAC ACK) message may mark the peer as ASP-Active, if it
   is not already in the ASP- ACTIVE state.
 
+B. Bidulock                    Version 0.3                      Page 109
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     Alternatively, when using the IPSP DE model, an interchange of ASPAC
   messages from each end MUST be performed.  Four messages are needed
   for completion.
@@ -6367,12 +6341,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
    + If the RK is not registered, or the RC information is not valid,
      the peer must respond with an Error (ERR) message with error code
      "Invalid Routing Context".
-
-
-B. Bidulock                    Version 0.3                      Page 108
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
    + If the RC is missing and its specification is needed according to
      the used configuration, the peer must respond with an Error (ERR)
      message with error code "No Configured AS for ASP".
@@ -6407,6 +6375,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   is sent to the ASP after all traffic is halted and Layer Management is
   informed with an M-ASP_INACTIVE indication primitive.
 
+
+
+B. Bidulock                    Version 0.3                      Page 110
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     In the case of a Broadcast mode AS, the SGP moves the ASP to the
   ASP- INACTIVE state and the AS traffic is broadcast only to the
   remaining ASPs in the state ASP-ACTIVE.  A Notify (NTFY) message
@@ -6426,11 +6400,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The SGP MUST send an ASP Inactive Ack (ASPIA ACK) message in
   response to a received ASP Inactive (ASPIA) message from the ASP and
   the ASP is already marked as ASP-INACTIVE at the SGP.
-
-
-B. Bidulock                    Version 0.3                      Page 109
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     At the ASP, the ASP Inactive Ack (ASPIA ACK) message received is not
   acknowledged.  Layer Management is informed with an M-ASP_INACTIVE
@@ -6464,6 +6433,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   after an ASP Inactive or ASP Inactive Ack (ASPIA ACK) message has been
   received from it.
 
+
+
+B. Bidulock                    Version 0.3                      Page 111
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     Alternatively, when using the IPSP DE model, an interchange of ASPIA
   messages from each end MUST be performed.  Four messages are needed
   for completion.
@@ -6486,11 +6461,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   that now has no ASPs active to service the traffic, or where a Notify
   NTFY ("Insufficient ASP resources active in AS") message MUST be sent
   in the Load-share or Broadcast mode, the Notify (NTFY) message does
-
-B. Bidulock                    Version 0.3                      Page 110
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   not explicitly compel the ASP(s) receiving the message to become
   active.  The ASPs remain in control of what (and when) traffic action
   is taken.
@@ -6522,6 +6492,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   is considered unavailable.  Transmission of Heartbeat (BEAT) messages
   is stopped and the signalling process SHOULD attempt to re-establish
   communication if it is configured as the client for the disconnected
+
+B. Bidulock                    Version 0.3                      Page 112
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   ISUA peer.
 
     The Heartbeat (BEAT) message may optionally contain an opaque
@@ -6545,11 +6520,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     An ASP MAY dynamically register with an SGP as an ASP within an
   Application Server using the REG REQ message.  A Routing Key parameter
   in the REG REQ message specifies the parameters associated with the
-
-B. Bidulock                    Version 0.3                      Page 111
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   Routing Key.
 
     The SGP examines the contents of the received Routing Key parameter
@@ -6580,6 +6550,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     If the SGP determines that a unique Routing Key cannot be created,
   the SGP returns a Registration Response (REG RSP) message to the ASP,
+
+B. Bidulock                    Version 0.3                      Page 113
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   with a Registration Status of "Error - "Cannot Support Unique
   Routing." An incoming signalling message received at an SGP should not
   match against more than one Routing Key.
@@ -6604,11 +6579,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   are not supported for the purpose of creating new Routing Key entries,
   the SGP returns a Registration Response (REG RSP) message to the ASP,
   containing a Registration Result "Error - Unsupported RK parameter
-
-B. Bidulock                    Version 0.3                      Page 112
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   field".  This result MAY be used if, for example, the SGP does not
   support RK Address parameter.
 
@@ -6638,6 +6608,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   send related SS7 Signalling Network Management messaging, if this did
   not previously start upon the ASP transition to state ASP-INACTIVE
 
+
+B. Bidulock                    Version 0.3                      Page 114
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
 4.4.2.  Deregistration
 
     An ASP MAY dynamically deregister with an SGP as an ASP within an
@@ -6661,12 +6636,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   in which case the Routing Key data MUST NOT be deleted.  If a
   Deregistration results in no more ASPs in an Application Server, an
   SGP MAY delete the Routing Key data.
-
-
-
-B. Bidulock                    Version 0.3                      Page 113
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The SGP acknowledges the deregistration request by returning a DEREG
   RSP message to the requesting ASP.  The result of the deregistration
@@ -6698,6 +6667,10 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   of the CS messages consistently with the information received in the
   primitives.
 
+B. Bidulock                    Version 0.3                      Page 115
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     CS messages SHOULD NOT be sent on stream "0" and MAY use ordered
   delivery.
 
@@ -6722,15 +6695,10 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     At an ASP, upon receiving an ISUA Circuit Supervision (CS) message
   from the remote ISUA Peer, the ISUA layer updates the status of the
-
-B. Bidulock                    Version 0.3                      Page 114
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   affected circuit(s) via the originating SG and determines, whether or
   not the overall status of the affected circuits(s) has changed.  If
   so, the ISUA layer invokes the appropriate primitive indications to
-  the resident Call Control [1].  Local management is informed.
+  the resident Call Control <1>.  Local management is informed.
 
 4.5.3.  ASP Auditing
 
@@ -6756,6 +6724,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The SGP SHOULD either respond to a CQRY messages with CS messages
   indicating the status of the circuit, or SHOULD respond with an ERR
+
+B. Bidulock                    Version 0.3                      Page 116
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   ("Circuit Status Unknown") or ERR ("Call Reference Status Unknown")
   message for each Circuit Id or Call Reference requested in the CQRY
   message.
@@ -6768,7 +6741,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   SGP cannot provide information.
 
     In some cases, the SGP MAY chose not to respond to a CQRY message or
-  a component of a CQRY message on the basis of policy [2].
+  a component of a CQRY message on the basis of policy <2>.
 
     Any CQRY message in response to a CQRY message MAY contain a list of
   Call References.
@@ -6781,11 +6754,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   function identifies the appropriate Application Server (AS) and
   selects an active ASP from the list of ASPs servicing this AS.  The
   appropriate ASP can be determined based on the routing information in
-
-B. Bidulock                    Version 0.3                      Page 115
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   the incoming message, local load sharing information, etc.  The
   appropriate ISUA message is then constructed and sent to the
   appropriate endpoint, via the correct SCTP association and stream.
@@ -6809,14 +6777,25 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
    (2)   a valid IP address or host name to reach another ASP in the IP
          network via the appropriate SCTP association.
 
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                      Page 117
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+
 Notes for Section 4
 
-  [1]  IMPLEMENTATION NOTE:-  To accomplish the handling of CS
+  <1>  IMPLEMENTATION NOTE:-  To accomplish the handling of CS
        messages from multiple SGs in a multiple SG configuration, the
        ISUA layer at an ASP maintains the status of circuits via each
        SG.
 
-  [2]  IMPLEMENTATION NOTE:-  For example, an SGP MAY chose to not
+  <2>  IMPLEMENTATION NOTE:-  For example, an SGP MAY chose to not
        respond to a request for the circuit status of a specific
        circuit in the CQRY message because the ASP that issued the
        CQRY message is not authorized to obtain information concerning
@@ -6832,18 +6811,6 @@ Notes for Section 4
   establishment of traffic between an SG and an ASP, where only one ASP
   is configured within an AS (no backup).  It is assumed that the SCTP
   association is already set-up.
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                      Page 116
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
                  SG                              ASP
                   |                                |
@@ -6868,6 +6835,16 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   ASP Active (ASPAC) messages are Override or Load-share mode although
   typically this example would use an Override mode.
 
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                      Page 118
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
        SG                       ASP1                       ASP2
         |                         |                          |
         |<--------ASP Up----------|                          |
@@ -6890,19 +6867,6 @@ case)
   Application Server, where the two ASPs are brought to "active" and
   load-share the traffic load.  In this case, one ASP is sufficient to
   handle the total traffic load.
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                      Page 117
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
        SG                       ASP1                       ASP2
         |                         |                          |
@@ -6930,6 +6894,15 @@ sharing case)
   share the load.  In this case, a minimum of two ASPs are required to
   handle the total traffic load (2+1 sparing).
 
+
+
+
+
+
+B. Bidulock                    Version 0.3                      Page 119
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
     SG                  ASP1                 ASP2                ASP3
      |                    |                   |                   |
      |<------ASP Up-------|                   |                   |
@@ -6955,13 +6928,6 @@ sharing case)
 5.1.2.1.  (1+1 Sparing, withdrawal of ASP, Back-up Override)
 
     ASP1 withdraws from service:
-
-
-
-
-B. Bidulock                    Version 0.3                      Page 118
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
        SG                       ASP1                       ASP2
         |                         |                          |
@@ -6990,6 +6956,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
         |                         |                          |
 
 
+
+B. Bidulock                    Version 0.3                      Page 120
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
 5.1.2.3.  (n+k Sparing, Load-sharing case, withdrawal of ASP)
 
     ASP1 withdraws from service:
@@ -7015,12 +6986,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Note: If the SG detects loss of the ASP1 ISUA peer (ISUA heartbeat
         loss or detection of SCTP failure), the first SG-ASP1 ASP
         Inactive (ASPIA) message exchange would not occur.
-
-
-
-B. Bidulock                    Version 0.3                      Page 119
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 5.1.3.  ISUP/CC Service Translation Examples
 
@@ -7050,6 +7015,10 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
    (3)   Determine the correct stream in the SCTP association based on
          the DID
 
+B. Bidulock                    Version 0.3                      Page 121
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
    (4)   Build the CP message, fill in ISUA Message Header, fill in
          Common Header
 
@@ -7059,27 +7028,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   An example of the message flows for establishing a dialogue service is
   shown below.  An active association between ASP and SG is established
   (Section 5.1) prior to the following message flows.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.3                      Page 120
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
                SG                             ASP
@@ -7123,6 +7071,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   ASPAC but can only declare unavailability when all ASPs have issued
   ASPIA.
 
+
+
+B. Bidulock                    Version 0.3                      Page 122
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
 5.2.1.  Establishment of ISUA connectivity
 
     The following shows an example establishment of ISUA connectivity.
@@ -7135,10 +7089,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     The following must be established before ISUA traffic can flow.  A
   connection-less flow is shown for simplicity.
-
-B. Bidulock                    Version 0.3                      Page 121
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     Each node is configured (via MIB, for example) with the connections
   that need to be setup
@@ -7180,6 +7130,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     <---------------ASP Act Ack--------------+
 
                          <----------------ASP Act--------------------+
+
+B. Bidulock                    Version 0.3                      Page 123
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
                          +----------------ASP Act Ack---------------->
 
     Traffic can now flow directly between ASPs.
@@ -7190,14 +7145,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 5.2.2.  Fail-over scenarios
 
     The following sequences address fail-over of ASP
-
-
-
-
-
-B. Bidulock                    Version 0.3                      Page 122
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 5.2.2.1.  Successful ASP Fail-over scenario
 
@@ -7241,7 +7188,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
                 ISUA "5"
 
-    The SCTP Payload Protocol Identifier value "5" [1] SHOULD be
+
+B. Bidulock                    Version 0.3                      Page 124
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+    The SCTP Payload Protocol Identifier value "5" <1> SHOULD be
   included in each SCTP DATA chunk, to indicate that the SCTP is
   carrying the ISUA protocol.  The value "0" (unspecified) is also
   allowed but any other values MUST NOT be used.  This Payload Protocol
@@ -7253,10 +7205,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   a way of determining additional information about the data being
   presented to it by SCTP.  A request will be made to IANA to assign CTP
   Payload Protocol IDs.
-
-B. Bidulock                    Version 0.3                      Page 123
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 7.2.  Port Number
 
@@ -7276,7 +7224,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     The definition and use of new message classes, types and parameters
   is an integral part of SIGTRAN adaptation layers.  Thus, these
   extensions are assigned by IANA through an IETF Consensus action as
-  defined in [RFC 2434].
+  defined in [RFC2434].
 
     The proposed extension MUST in no way adversely affect the general
   working of the protocol.
@@ -7297,6 +7245,12 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     Documentation of the message type MUST contain the following
   information:
 
+
+
+B. Bidulock                    Version 0.3                      Page 125
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
    (1)   A long and short name for the new message type;
 
    (2)   A detailed description of the structure of the message.
@@ -7312,11 +7266,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     When an implementation receives a message type which it does not
   support, it MUST respond with an Error (ERR) message, with an Error
-
-B. Bidulock                    Version 0.3                      Page 124
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   Code = Unsupported Message Type.
 
 7.3.3.  IETF-defined TLV Parameter Extension
@@ -7339,7 +7288,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 Notes for Section 7
 
-  [1]  EDITOR'S NOTE:-  The value shown as "5" is to be assigned by
+  <1>  EDITOR'S NOTE:-  The value shown as "5" is to be assigned by
        IANA an may change in future versions of this document.
 
 8.  Timer Values
@@ -7352,6 +7301,14 @@ Notes for Section 7
       Tr        -                           2 seconds
       T(ack)    Inactivity Send Timer       7 minutes
       T(ias)    Inactivity Receive Timer   15 minutes
+
+
+
+
+B. Bidulock                    Version 0.3                      Page 126
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
       T(beat)   Heartbeat Timer            30 seconds
 
 
@@ -7370,12 +7327,6 @@ A.1.  Signalling Network Architecture
   for reliable transport of signalling traffic over IP.  The ISUA
   protocol is flexible enough to allow its operation and management in a
   variety of physical configurations, enabling Network Operators to meet
-
-
-B. Bidulock                    Version 0.3                      Page 125
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   their performance and reliability requirements.
 
     To meet the stringent SS7 signalling reliability and performance
@@ -7393,6 +7344,28 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     One example of a physical network architecture relevant to SS7
   carrier-grade operation in the IP network domain is shown in Figure 7.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                      Page 127
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
             SGs                                     MGCs
            ..............                          ..............
@@ -7430,11 +7403,6 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
     In this model, each host MAY have many application processes.  In
   the case of the MGC, an ASP may provide service to one or more
-
-B. Bidulock                    Version 0.3                      Page 126
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   Application Servers, and is identified as an SCTP end point. One or
   more Signalling Gateway Processes make up a single Signalling Gateway.
 
@@ -7451,6 +7419,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   signalling routes to signalling points in the SS7 network , and the
   redundancy model (override, load-sharing, broadcast) of the remote
   signalling processes.
+
+
+B. Bidulock                    Version 0.3                      Page 128
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     For carrier grade networks, the failure or isolation of a particular
   signalling process should not cause transactions to be lost.  This
@@ -7489,11 +7462,6 @@ A.2.1.  Application Server Redundancy
   to the "active" state upon failure of, or loss of connectivity to,
   ASP1/Host1.
 
-
-B. Bidulock                    Version 0.3                      Page 127
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
     The AS List at SGP1 in Host1 might also be set up in load-share
   mode:
 
@@ -7509,6 +7477,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
     Care might need to be exercised by a Network Operator in the
   selection of the routing information to be used as the Routing Key for
   a particular AS.
+
+
+B. Bidulock                    Version 0.3                      Page 129
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     For example, where Application Servers are defined using ranges of
   Circuit Identification Codes (CICs), the Operator is implicitly
@@ -7547,12 +7520,6 @@ A.2.2.  Signalling Gateway Redundancy
 
     It may also be possible for an ASP to use more than one SG to access
   a specific SS7 end point, in a model that resembles an SS7 STP mated
-
-
-B. Bidulock                    Version 0.3                      Page 128
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   pair.  Typically, SS7 STPs are deployed in mated pairs, with traffic
   load-shared between them.  Other models are also possible, subject to
   the limitations of the local SS7 network provisioning guidelines.
@@ -7569,6 +7536,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   knowledge of the current capability of the SGPs to handle traffic to
   destinations, subsystems and applications of interest.  This
   information is crucial to the overall reliability of the service, for
+
+B. Bidulock                    Version 0.3                      Page 130
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
   override, load-sharing and broadcast models, in the event of failures,
   recovery and maintenance activities.  The ASP ISUA may also use this
   information for congestion avoidance purposes.  The distribution of
@@ -7587,6 +7559,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
    + updated to new IETF boilerplate for first and last page.
    + updated references, version numbers and dates.
+   + resubmitted to sync with IETF numbering
 
 0.2.  Changes from Version 0.1 to Version 0.2
 
@@ -7608,16 +7581,26 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 0.0.0.  Change Log
 
-B. Bidulock                    Version 0.3                      Page 129
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
     $Log: draft-bidulock-sigtran-isua-03.txt,v $
-    Revision 0.9.2.1  2005/12/28 05:52:33  brian
-    - missed files
+    Revision 0.9.2.2  2006/06/27 09:56:26  brian
+    - rereleased drafts
+
+    Revision 0.9.2.6  2006/06/27 09:41:10  brian
+    - rereleased drafts
+
+    Revision 0.9.2.5  2006/06/18 20:53:31  brian
+    - preparing for draft rerelease
+
+    Revision 0.9.2.4  2005/11/01 11:20:43  brian
+    - updates for testing and documentation
 
     Revision 0.9.2.3  2005/10/17 11:53:43  brian
     - updated drafts for republication
+
+
+B. Bidulock                    Version 0.3                      Page 131
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
     Revision 0.9.2.2  2005/05/14 08:33:11  brian
     - copyright header correction
@@ -7641,16 +7624,16 @@ R.  References
 
 R.1.  Normative References
 
-  [RFC 2119]  Bradner, S., "Key words for use in RFCs to Indicate
+  [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
        Requirement Levels," RFC 2119 - BCP 14, The Internet Society
        (March 1997).
 
-  [RFC 2960]  Stewart, R., Xie, Q., Morneault, K., Sharp, C.,
+  [RFC2960]  Stewart, R., Xie, Q., Morneault, K., Sharp, C.,
        Schwarzbauer, H. J., Taylor, T., Rytina, I., Kalla, H., Zhang, L.
        and Paxson, V., "Stream Control Transmission Protocol (SCTP),"
        RFC 2960, The Internet Society (February 2000).
 
-  [RFC 2279]  Yergenau, F., "UTF-8, a transformation format of ISO
+  [RFC2279]  Yergenau, F., "UTF-8, a transformation format of ISO
        10646," RFC 2279, Internet Engineering Task Force (January 1998).
 
   [SIGSEC]  Loughney, J., Tuexen, M. and Pastor-Balbas, J., "Security
@@ -7658,7 +7641,7 @@ R.1.  Normative References
        3788, Internet Engineering Task Force - Signalling Transport
        Working Group (June 2004).
 
-  [RFC 2434]  Narten, T., Alvestrand, H. T., "Guidelines for Writing an
+  [RFC2434]  Narten, T., Alvestrand, H. T., "Guidelines for Writing an
        IANA Considerations Section in RFCs," RFC 2434, The Internet
        Society (October, 1998).
 
@@ -7669,15 +7652,15 @@ R.2.  Informative References
        Telecommunication Standardization Sector of ITU, Geneva (March
        1993).  (Previously "CCITT Recommendation")
 
-
-B. Bidulock                    Version 0.3                      Page 130
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
   [T1.113]  ANSI, "Signalling System No. 7 - ISDN User Part," ANSI
        T1.113, American National Standards Institue (1992).
 
-  [RFC 2719]  Ong, L., Rytina, I., Holdrege, M., Coene, L., Garcia,
+
+B. Bidulock                    Version 0.3                      Page 132
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+  [RFC2719]  Ong, L., Rytina, I., Holdrege, M., Coene, L., Garcia,
        M.-A., Sharp, C., Juhasz, I., Lin, H. P. and Schwarzbauer,
        HannsJ., "Framework Architecture for Signaling Transport," RFC
        2719, The Internet Society (October, 1999).
@@ -7718,7 +7701,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   [CORID]  Bidulock, B., "Correlation Id and Heartbeat Procedures
        Supporting Lossless Fail-Over," <draft-bidulock-sigtran-
        corid-04.txt>, Internet Engineering Task Force - Signalling
-       Transport Working Group (October 16, 2005).  Work In Progress.
+       Transport Working Group (June 18, 2006).  Work In Progress.
 
 
 
@@ -7729,9 +7712,11 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
 
 
 
-B. Bidulock                    Version 0.3                      Page 131
+
+
+B. Bidulock                    Version 0.3                      Page 133
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
 
 Acknowledgments
@@ -7756,7 +7741,7 @@ Author's Addresses
 
 
 
-  This draft expires April 2006.
+  This draft expires December 2006.
 
 
 
@@ -7787,10 +7772,9 @@ Author's Addresses
 
 
 
-
-B. Bidulock                    Version 0.3                      Page 132
+B. Bidulock                    Version 0.3                      Page 134
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
 
                             List of Tables
@@ -7803,10 +7787,10 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   Figure 1. Protocol Architecture .................................    7
   Figure 2. All IP Architecture ...................................    8
   Figure 3. ISUA Protocol Boundaries ..............................   16
-  Figure 4. ISUA Layer Model ......................................   95
-  Figure 5. ASP State Transition Diagram (Per AS) .................  100
-  Figure 6. AS State Transition Diagram ...........................  102
-  Figure 7. Physical Model ........................................  126
+  Figure 4. ISUA Layer Model ......................................   96
+  Figure 5. ASP State Transition Diagram (Per AS) .................  101
+  Figure 6. AS State Transition Diagram ...........................  103
+  Figure 7. Physical Model ........................................  128
 
                           Table of Contents
 
@@ -7831,7 +7815,7 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   1.4.2 Redundancy Models .........................................   15
   1.4.3 Flow Control ..............................................   15
   1.4.4  Congestion Management ....................................   15
-  1.5 Definition of ISUA Boundaries ...............................   15
+  1.5 Definition of ISUA Boundaries ...............................   16
   1.5.1 Definition of Upper Boundary ..............................   16
   1.5.2 Definition of Boundary between ISUA and Layer Management
     ...............................................................   17
@@ -7840,193 +7824,189 @@ Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
   2 Conventions ...................................................   21
   3 Protocol Elements .............................................   22
   3.1 Common Message Header .......................................   22
-  3.1.1 ISUA Protocol Version .....................................   22
-  3.1.2 Message Classes ...........................................   22
+  3.1.1 ISUA Protocol Version .....................................   23
+  3.1.2 Message Classes ...........................................   23
   3.1.3 Message Types .............................................   23
-  3.1.4 Message Length ............................................   24
+  3.1.4 Message Length ............................................   25
   3.1.5 Tag-Length-Value Format ...................................   25
-  3.2 ISUA Message Header .........................................   25
-
-B. Bidulock                    Version 0.3                      Page 133
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
-  3.3 ISUA Call Processing (CP) Messages ..........................   26
-  3.3.1 CP Message Header .........................................   27
-  3.3.2 Setup (CSET) ..............................................   28
-  3.3.3 More Information (CMOR) ...................................   29
-  3.3.4 Timeout (CTOT) ............................................   29
-  3.3.5 Information (CINF) ........................................   29
-  3.3.6 Proceeding (CPRO) .........................................   30
-  3.3.7 Alerting (CALR) ...........................................   31
-  3.3.8 Progress (CPRG) ...........................................   32
-  3.3.9 Connect (CCON) ............................................   33
-  3.3.10 Suspend (CSUS) ...........................................   33
-  3.3.11 Resume (CRES) ............................................   34
-  3.3.12 Reattempt (CREA) .........................................   35
-  3.3.13 Failure (CERR) ...........................................   35
-  3.3.14 In Band Information (CIBI) ...............................   36
-  3.3.15 Release (CREL) ...........................................   37
-  3.3.16 Release Complete (CRLC) ..................................   37
-  3.4 ISUA Circuit Supervision (CS) Messaegs ......................   38
-  3.4.1 CS Message Header .........................................   38
-  3.4.2 Continuity Check (CCNT) ...................................   39
-  3.4.3 Loop Back (CLBK) ..........................................   39
-  3.4.4 Report (CREP) .............................................   39
-  3.4.5 Reset (CRSC) ..............................................   40
-  3.4.6 Reset Acknowledgement (CRSA) ..............................   41
-  3.4.7 Block (CBLO) ..............................................   41
-  3.4.8 Block Acknowledgement (CBLA) ..............................   42
-  3.4.9 Unblock (CUBL) ............................................   43
-  3.4.10 Unblock Acknowledgement (CUBA) ...........................   43
-  3.4.11 Query (CQRY) .............................................   44
-  3.4.12 Query Acknowledgement (CQRA) .............................   45
-  3.5 Application Server Process State Maintenance (ASPSM)
-    Messages ......................................................   45
-  3.5.1 ASP Up (UP) ...............................................   45
-  3.5.2 ASP Up Ack (UP ACK) .......................................   46
-  3.5.3 ASP Down (DOWN) ...........................................   47
-  3.5.4 ASP Down Ack (DOWN ACK) ...................................   47
-  3.5.5 Heartbeat (BEAT) ..........................................   48
-  3.5.6 Heartbeat Ack (BEAT ACK) ..................................   48
-  3.6 Application Server Process Traffic Maintenance (ASPTM)
-    Messages ......................................................   49
-  3.6.1 ASP Active (ASPAC) ........................................   49
-  3.6.2 ASP Active Ack (ASPAC ACK) ................................   49
-  3.6.3 ASP Inactive (ASPIA) ......................................   50
-  3.6.4 ASP Inactive Ack (ASPIA ACK) ..............................   51
-  3.7 Management (MGMT) Messages ..................................   52
-  3.7.1 Error (ERR) ...............................................   52
-  3.7.2 Notify (NTFY) .............................................   53
-  3.8 Routing Key Management (RKM) Messages .......................   54
-  3.8.1 Registration Request (REG REQ) ............................   55
-  3.8.2 Registration Response (REG RSP) ...........................   55
-  3.8.3 Deregistration Request (DEREG REQ) ........................   56
-  3.8.4 Deregistration Response (DEREG RSP) .......................   57
-  3.9 Common Parameters ...........................................   58
-  3.9.1 Info String ...............................................   58
-
-B. Bidulock                    Version 0.3                      Page 134
-
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
-
-  3.9.2 Routing Context ...........................................   59
-  3.9.3 Diagnostic Information ....................................   60
-  3.9.4 Heartbeat Data ............................................   60
-  3.9.5 Traffic Mode Type .........................................   61
-  3.9.6 Error Code ................................................   62
-  3.9.7 Status ....................................................   64
-  3.9.8 ASP Identifier ............................................   66
-  3.9.9 Correlation Id ............................................   66
-  3.9.10 Registration Result ......................................   67
-  3.9.11 Deregistration Result ....................................   67
-  3.9.12 Registration Status ......................................   68
-  3.9.13 Deregistration Status ....................................   69
-  3.9.14 Local Routing Key Identifier .............................   69
-  3.10 ISUA-Specific parameters ...................................   70
-  3.10.1 Parameters used in CP Messages ...........................   71
-  3.10.2 Parameters used in CS Messages ...........................   86
-  3.10.3 Other Parameters .........................................   88
-  Notes for Section 3 .............................................   94
-  4 Procedures ....................................................   94
-  4.1 Procedures to Support Call Control ..........................   95
-  4.1.1 Receipt of Primitives from Call Control ...................   95
-  4.1.2 Receipt of Primitives from ISUP ...........................   95
-  4.1.3 Receipt of Primitive from the Layer Management ............   97
-  4.2 Procedures to Support the Management of SCTP Associations
-    ...............................................................   98
-  4.2.1 Receipt of ISUA Peer Management Messages ..................   98
-  4.3 AS and ASP State Maintenance ................................   99
-  4.3.1 ASP/IPSP States ...........................................   99
-  4.3.2 AS States .................................................  101
-  4.3.3 ISUA Management Procedures for Primitives .................  102
-  4.3.4 ASPM Procedures for Peer-to-Peer Messages .................  103
-  4.4 Routing Key Management Procedures ...........................  111
-  4.4.1 Registration ..............................................  111
-  4.4.2 Deregistration ............................................  113
-  4.4.3 IPSP Considerations (REG/DEREG) ...........................  114
-  4.5 Procedures to Support Circuit and Call State ................  114
-  4.5.1 At an SGP .................................................  114
-  4.5.2 At an ASP .................................................  114
-  4.5.3 ASP Auditing ..............................................  115
-  4.5.4 ISUP - ISUA Interworking at the SG ........................  115
-  Notes for Section 4 .............................................  116
-  5 Examples of ISUA Procedures ...................................  116
-  5.1 Establishment of Association and Traffic between SGPs and
-    ASPs ..........................................................  116
-  5.1.2 ASP Traffic Fail-over Examples ............................  118
-  5.1.3 ISUP/CC Service Translation Examples ......................  120
-  5.2 IP-IP Architecture ..........................................  121
-  5.2.1 Establishment of ISUA connectivity ........................  121
-  5.2.2 Fail-over scenarios .......................................  122
-  6 Security Considerations .......................................  123
-  7 IANA Considerations ...........................................  123
-  7.1 SCTP Payload Protocol ID ....................................  123
-  7.2 Port Number .................................................  124
-  7.3 Protocol Extensions .........................................  124
 
 B. Bidulock                    Version 0.3                      Page 135
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
-  7.3.1 IETF Defined Message Classes ..............................  124
-  7.3.2 IETF Defined Message Types ................................  124
-  7.3.3 IETF-defined TLV Parameter Extension ......................  125
-  Notes for Section 7 .............................................  125
-  8 Timer Values ..................................................  125
-  Appendices ......................................................  125
-  A Operational Considerations ....................................  125
-  A.1 Signalling Network Architecture .............................  125
-  A.2 Redundancy Models ...........................................  127
-  A.2.1 Application Server Redundancy .............................  127
-  A.2.2 Signalling Gateway Redundancy .............................  128
-  0 Change History ................................................  129
-  0.3 Changes from Version 0.2 to Version 0.3 .....................  129
-  0.2 Changes from Version 0.1 to Version 0.2 .....................  129
-  0.1 Changes from Version 0.0 to Version 0.1 .....................  129
-  0.0 Version 0.0 .................................................  129
-  0.0.0 Change Log ................................................  129
-  R References ....................................................  130
-  R.1 Normative References ........................................  130
-  R.2 Informative References ......................................  130
-  Acknowledgments .................................................  132
-  Author's Addresses ..............................................  132
-  List of Tables ..................................................  133
-  List of Illustrations ...........................................  133
-  Table of Contents ...............................................  133
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  3.2 ISUA Message Header .........................................   26
+  3.3 ISUA Call Processing (CP) Messages ..........................   27
+  3.3.1 CP Message Header .........................................   27
+  3.3.2 Setup (CSET) ..............................................   28
+  3.3.3 More Information (CMOR) ...................................   29
+  3.3.4 Timeout (CTOT) ............................................   30
+  3.3.5 Information (CINF) ........................................   30
+  3.3.6 Proceeding (CPRO) .........................................   31
+  3.3.7 Alerting (CALR) ...........................................   31
+  3.3.8 Progress (CPRG) ...........................................   32
+  3.3.9 Connect (CCON) ............................................   33
+  3.3.10 Suspend (CSUS) ...........................................   34
+  3.3.11 Resume (CRES) ............................................   35
+  3.3.12 Reattempt (CREA) .........................................   35
+  3.3.13 Failure (CERR) ...........................................   36
+  3.3.14 In Band Information (CIBI) ...............................   37
+  3.3.15 Release (CREL) ...........................................   37
+  3.3.16 Release Complete (CRLC) ..................................   38
+  3.4 ISUA Circuit Supervision (CS) Messaegs ......................   38
+  3.4.1 CS Message Header .........................................   39
+  3.4.2 Continuity Check (CCNT) ...................................   39
+  3.4.3 Loop Back (CLBK) ..........................................   40
+  3.4.4 Report (CREP) .............................................   40
+  3.4.5 Reset (CRSC) ..............................................   41
+  3.4.6 Reset Acknowledgement (CRSA) ..............................   41
+  3.4.7 Block (CBLO) ..............................................   42
+  3.4.8 Block Acknowledgement (CBLA) ..............................   43
+  3.4.9 Unblock (CUBL) ............................................   43
+  3.4.10 Unblock Acknowledgement (CUBA) ...........................   44
+  3.4.11 Query (CQRY) .............................................   45
+  3.4.12 Query Acknowledgement (CQRA) .............................   45
+  3.5 Application Server Process State Maintenance (ASPSM)
+    Messages ......................................................   46
+  3.5.1 ASP Up (UP) ...............................................   46
+  3.5.2 ASP Up Ack (UP ACK) .......................................   47
+  3.5.3 ASP Down (DOWN) ...........................................   47
+  3.5.4 ASP Down Ack (DOWN ACK) ...................................   48
+  3.5.5 Heartbeat (BEAT) ..........................................   48
+  3.5.6 Heartbeat Ack (BEAT ACK) ..................................   49
+  3.6 Application Server Process Traffic Maintenance (ASPTM)
+    Messages ......................................................   49
+  3.6.1 ASP Active (ASPAC) ........................................   49
+  3.6.2 ASP Active Ack (ASPAC ACK) ................................   50
+  3.6.3 ASP Inactive (ASPIA) ......................................   51
+  3.6.4 ASP Inactive Ack (ASPIA ACK) ..............................   52
+  3.7 Management (MGMT) Messages ..................................   53
+  3.7.1 Error (ERR) ...............................................   53
+  3.7.2 Notify (NTFY) .............................................   55
+  3.8 Routing Key Management (RKM) Messages .......................   56
+  3.8.1 Registration Request (REG REQ) ............................   56
+  3.8.2 Registration Response (REG RSP) ...........................   57
+  3.8.3 Deregistration Request (DEREG REQ) ........................   58
+  3.8.4 Deregistration Response (DEREG RSP) .......................   58
 
 B. Bidulock                    Version 0.3                      Page 136
 
-Internet Draft       SS7 ISUP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+  3.9 Common Parameters ...........................................   59
+  3.9.1 Info String ...............................................   60
+  3.9.2 Routing Context ...........................................   60
+  3.9.3 Diagnostic Information ....................................   61
+  3.9.4 Heartbeat Data ............................................   62
+  3.9.5 Traffic Mode Type .........................................   62
+  3.9.6 Error Code ................................................   63
+  3.9.7 Status ....................................................   66
+  3.9.8 ASP Identifier ............................................   67
+  3.9.9 Correlation Id ............................................   68
+  3.9.10 Registration Result ......................................   68
+  3.9.11 Deregistration Result ....................................   69
+  3.9.12 Registration Status ......................................   70
+  3.9.13 Deregistration Status ....................................   70
+  3.9.14 Local Routing Key Identifier .............................   71
+  3.10 ISUA-Specific parameters ...................................   72
+  3.10.1 Parameters used in CP Messages ...........................   73
+  3.10.2 Parameters used in CS Messages ...........................   87
+  3.10.3 Other Parameters .........................................   89
+  Notes for Section 3 .............................................   95
+  4 Procedures ....................................................   95
+  4.1 Procedures to Support Call Control ..........................   96
+  4.1.1 Receipt of Primitives from Call Control ...................   96
+  4.1.2 Receipt of Primitives from ISUP ...........................   97
+  4.1.3 Receipt of Primitive from the Layer Management ............   98
+  4.2 Procedures to Support the Management of SCTP Associations
+    ...............................................................   99
+  4.2.1 Receipt of ISUA Peer Management Messages ..................   99
+  4.3 AS and ASP State Maintenance ................................  100
+  4.3.1 ASP/IPSP States ...........................................  101
+  4.3.2 AS States .................................................  102
+  4.3.3 ISUA Management Procedures for Primitives .................  104
+  4.3.4 ASPM Procedures for Peer-to-Peer Messages .................  104
+  4.4 Routing Key Management Procedures ...........................  113
+  4.4.1 Registration ..............................................  113
+  4.4.2 Deregistration ............................................  115
+  4.4.3 IPSP Considerations (REG/DEREG) ...........................  115
+  4.5 Procedures to Support Circuit and Call State ................  115
+  4.5.1 At an SGP .................................................  115
+  4.5.2 At an ASP .................................................  116
+  4.5.3 ASP Auditing ..............................................  116
+  4.5.4 ISUP - ISUA Interworking at the SG ........................  117
+  Notes for Section 4 .............................................  118
+  5 Examples of ISUA Procedures ...................................  118
+  5.1 Establishment of Association and Traffic between SGPs and
+    ASPs ..........................................................  118
+  5.1.2 ASP Traffic Fail-over Examples ............................  120
+  5.1.3 ISUP/CC Service Translation Examples ......................  121
+  5.2 IP-IP Architecture ..........................................  122
+  5.2.1 Establishment of ISUA connectivity ........................  123
+  5.2.2 Fail-over scenarios .......................................  124
+  6 Security Considerations .......................................  124
+  7 IANA Considerations ...........................................  124
+
+B. Bidulock                    Version 0.3                      Page 137
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
+
+  7.1 SCTP Payload Protocol ID ....................................  124
+  7.2 Port Number .................................................  125
+  7.3 Protocol Extensions .........................................  125
+  7.3.1 IETF Defined Message Classes ..............................  125
+  7.3.2 IETF Defined Message Types ................................  125
+  7.3.3 IETF-defined TLV Parameter Extension ......................  126
+  Notes for Section 7 .............................................  126
+  8 Timer Values ..................................................  126
+  Appendices ......................................................  127
+  A Operational Considerations ....................................  127
+  A.1 Signalling Network Architecture .............................  127
+  A.2 Redundancy Models ...........................................  129
+  A.2.1 Application Server Redundancy .............................  129
+  A.2.2 Signalling Gateway Redundancy .............................  130
+  0 Change History ................................................  131
+  0.3 Changes from Version 0.2 to Version 0.3 .....................  131
+  0.2 Changes from Version 0.1 to Version 0.2 .....................  131
+  0.1 Changes from Version 0.0 to Version 0.1 .....................  131
+  0.0 Version 0.0 .................................................  131
+  0.0.0 Change Log ................................................  131
+  R References ....................................................  132
+  R.1 Normative References ........................................  132
+  R.2 Informative References ......................................  132
+  Acknowledgments .................................................  134
+  Author's Addresses ..............................................  134
+  List of Tables ..................................................  135
+  List of Illustrations ...........................................  135
+  Table of Contents ...............................................  135
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                      Page 138
+
+Internet Draft       SS7 ISUP-User Adaptation Layer        June 18, 2006
 
 Intellectual Property
 
@@ -8064,7 +8044,7 @@ Disclaimer of Validity
 
 Full Copyright Statement
 
-  Copyright (C) The Internet Society (2005).  This document is subject
+  Copyright (C) The Internet Society (2006).  This document is subject
   to the rights, licenses and restrictions contained in BCP 78, and
   except as set forth therein, the authors retain all their rights.
 
@@ -8082,6 +8062,5 @@ Acknowledgement
 
 
 
-
-B. Bidulock                    Version 0.3                      Page 137
+B. Bidulock                    Version 0.3                      Page 139
 

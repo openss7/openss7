@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\" =========================================================================
 .\"
-.\" @(#) $Id: draft-bidulock-sigtran-tua-04.me,v 0.9.2.5 2006/06/18 20:53:33 brian Exp $
+.\" @(#) $Id: draft-bidulock-sigtran-tua-04.me,v 0.9.2.6 2006/06/27 09:41:13 brian Exp $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
@@ -47,14 +47,14 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Name:  $($Revision: 0.9.2.5 $) modified $Date: 2006/06/18 20:53:33 $ by $Author: brian $
+.\" $Name:  $($Revision: 0.9.2.6 $) modified $Date: 2006/06/27 09:41:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .ds version Version\ 0.4
 .ds date June\ 18,\ 2006
 .ds expiry December\ 2006
 .nr levels 0
-.so ../draft2.me
+.so ../draft3.me
 .bp
 .sz \n(tp
 .he 'Internet Draft'SS7 TCAP-User Adaptation Layer'\\\\*[date]'
@@ -1884,6 +1884,7 @@ The \fI\)TUNI\fR message is formatted as follows:
 .lp
 The \fI\)TUNI\fR message can contain the following parameters:
 .ix +4
+.(b L
 .TS
 tab(:);
 lbw(2.5i)ss
@@ -1898,6 +1899,7 @@ Security Context:Optional:
 Confidentiality:Optional:
 Components:Optional:*2
 .TE
+.)b
 .ip "Note 1:" 8
 The \fI\)Destination Address\fR or \fI\)Originating Address\fR parameter
 \fB\)MUST\fR be present in the \fI\)TUNI\fR message when either parameter is
@@ -3768,6 +3770,7 @@ The \fI\)NTFY\fR message is formatted as follows:
 .lp
 The \fI\)NTFY\fR message can contain the following parameters:
 .ix +4
+.(b L
 .TS
 tab(:);
 lbw(2.5i)ss
@@ -3779,6 +3782,7 @@ ASP Identifier:Conditional:*1
 Routing Context:Conditional:*2
 Info String:Optional
 .TE
+.)b
 .ip "Note 1:" 8
 ASP Identifier \fB\)MUST\fR be used where the IPSP/SGP cannot identify
 the ASP by pre-configured address/port number information (e.g, where an
@@ -4237,6 +4241,7 @@ The Traffic Mode Type field identifies the traffic mode of operation of
 an ASP within an AS.  The valid values for the Traffic Mode Type field
 are as follows:
 .ix +4
+.(b L
 .TS
 tab(;);
 nl.
@@ -4244,6 +4249,7 @@ nl.
 2;Load-share
 3;Broadcast
 .TE
+.)b
 .ix -4
 .ip "" 2
 Within a Routing Context, Override, Load-share Types and Broadcast
@@ -5639,6 +5645,7 @@ The \fI\)Report Cause\fR parameter contains the following fields:
 The \fI\)Report Cause\fR field indicates the reason that a TC-User
 message could not be delivered and has the following values:
 .ix +4
+.(b L
 .TS
 tab(:);
 nl.
@@ -5658,6 +5665,7 @@ nl.
 13:segmentation not supported
 14:segmentation failed.
 .TE
+.)b
 .sh 4 "Abort Reason"
 .pp
 The \fI\)Abort Reason\fR parameter indicates whether a dialogue is
@@ -7171,7 +7179,10 @@ When the SCTP responds, the TUA layer maps the association status information
 to an M-SCTP_STATUS confirm primitive.  No peer protocol is invoked.
 .pp
 Similar LM-to-TUA-to-SCTP and SCTP-to-TUA-to-LM primitive mappings can be
-described for the various other SCTP Upper Layer primitives in RFC 2960 [2960]
+described for the various other SCTP Upper Layer primitives in RFC 2960
+.[
+rfc2960
+.]
 such as INITIALIZE, SET PRIMARY, CHANGE HEARTBEAT, REQUEST HEARTBEAT, GET SRTT
 REPORT, SET FAILURE THRESHOLD, SET PROTOCOL PARAMETERS, DESTROY SCTP INSTANCE,
 SEND FAILURE, AND NETWORK STATUS CHANGE.  Alternatively, these SCTP Upper
@@ -8921,6 +8932,9 @@ updated author's address.
 .nf
 \fC\s-3
 $Log: draft-bidulock-sigtran-tua-04.me,v $
+Revision 0.9.2.6  2006/06/27 09:41:13  brian
+- rereleased drafts
+
 Revision 0.9.2.5  2006/06/18 20:53:33  brian
 - preparing for draft rerelease
 

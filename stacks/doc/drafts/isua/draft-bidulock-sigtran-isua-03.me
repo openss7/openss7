@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\" =========================================================================
 .\"
-.\" @(#) $Id: draft-bidulock-sigtran-isua-03.me,v 0.9.2.5 2006/06/18 20:53:31 brian Exp $
+.\" @(#) $Id: draft-bidulock-sigtran-isua-03.me,v 0.9.2.6 2006/06/27 09:41:10 brian Exp $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
@@ -47,14 +47,14 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Name:  $($Revision: 0.9.2.5 $) modified $Date: 2006/06/18 20:53:31 $ by $Author: brian $
+.\" $Name:  $($Revision: 0.9.2.6 $) modified $Date: 2006/06/27 09:41:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .ds version Version\ 0.3
 .ds date June\ 18,\ 2006
 .ds expiry December\ 2006
 .nr levels 0
-.so ../draft2.me
+.so ../draft3.me
 .bp
 .sz \n(tp
 .he 'Internet Draft'SS7 ISUP-User Adaptation Layer'\\\\*[date]'
@@ -4957,6 +4957,7 @@ circuit.
 The Continuity Check Indicator field can take on the following
 values:
 .ix +4
+.(b L
 .TS
 tab(:);
 nl.
@@ -4967,6 +4968,7 @@ nl.
 nli.
 3:(reserved)
 .TE
+.)b
 .ip "\fB\)Outgoing Half Echo Control Device: 1-bit (bit 27)\fR" 2
 .ip "" 2
 The Outgoing Half Echo Control Device field corresponds to the Nature of
@@ -6478,7 +6480,10 @@ When the SCTP responds, the ISUA layer maps the association status information
 to an M-SCTP_STATUS confirm primitive.  No peer protocol is invoked.
 .pp
 Similar LM-to-ISUA-to-SCTP and SCTP-to-ISUA-to-LM primitive mappings can be
-described for the various other SCTP Upper Layer primitives in RFC 2960 [2960]
+described for the various other SCTP Upper Layer primitives in
+.[
+RFC 2960
+.]
 such as INITIALIZE, SET PRIMARY, CHANGE HEARTBEAT, REQUEST HEARTBEAT, GET SRTT
 REPORT, SET FAILURE THRESHOLD, SET PROTOCOL PARAMETERS, DESTROY SCTP INSTANCE,
 SEND FAILURE, AND NETWORK STATUS CHANGE.  Alternatively, these SCTP Upper
@@ -8179,6 +8184,9 @@ This is the initial version of this document.
 .nf
 \fC\s-3
 $Log: draft-bidulock-sigtran-isua-03.me,v $
+Revision 0.9.2.6  2006/06/27 09:41:10  brian
+- rereleased drafts
+
 Revision 0.9.2.5  2006/06/18 20:53:31  brian
 - preparing for draft rerelease
 

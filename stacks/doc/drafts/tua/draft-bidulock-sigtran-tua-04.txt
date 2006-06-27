@@ -4,8 +4,8 @@
 Network Working Group                                     Brian Bidulock
 INTERNET-DRAFT                                       OpenSS7 Corporation
 
-                                                        October 16, 2005
-Expires in April 2006
+                                                           June 18, 2006
+Expires in December 2006
 
 
 
@@ -36,17 +36,17 @@ Status of this Memo
     The list of Internet-Draft Shadow Directories can be accessed at
   http://www.ietf.org/shadow.html.
 
-    This Internet-Draft will expire in April 2006.
+    This Internet-Draft will expire in December 2006.
 
 Copyright
 
-    Copyright (C) The Internet Society (2005).
+    Copyright (C) The Internet Society (2006).
 
 Abstract
 
     This document defines a protocol for the transport of any SS7 TCAP-
   User signalling (e.g, INAP, MAP, etc.) over IP using the Stream
-  Control Transport Protocol [RFC 2960].  The protocol should be modular
+  Control Transport Protocol [RFC2960].  The protocol should be modular
   and symmetric, to allow it to work in diverse architectures, such as a
   Signalling Gateway and IP Signalling End-point architecture.  Protocol
   elements are added to allow seamless operation between peers in the
@@ -55,10 +55,9 @@ Abstract
 
 
 
-
 B. Bidulock                    Version 0.4                        Page 1
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 Contents
 
@@ -72,10 +71,10 @@ Contents
   need support for SS7 and SS7-like signalling protocols.  IP provides
   an effective way to transport user data and for operators to expand
   their networks and build new services.  In these networks, there is a
-  need for interworking between the SS7 and IP domains [RFC 2719].  This
+  need for interworking between the SS7 and IP domains [RFC2719].  This
   draft defines a protocol for the transport of SS7 TCAP User protocols
-  [Q.771, T1.114], such as MAP and INAP, over IP using the Stream
-  Control Transmission Protocol (SCTP) [RFC 2960].
+  [Q.771], [T1.114], such as MAP and INAP, over IP using the Stream
+  Control Transmission Protocol (SCTP) [RFC2960].
 
 1.1.  Scope
 
@@ -83,7 +82,7 @@ Contents
   INAP, etc.) over IP between two signalling end-points.  Consideration
   is given for the transport from an SS7 Signalling Gateway (SG) to an
   IP signalling node (such as an IP-resident Database) as described in
-  the Framework Architecture for Signalling Transport [RFC 2719] This
+  the Framework Architecture for Signalling Transport [RFC2719] This
   protocol can also support transport of TC-user messages between two
   end-points wholly contained within and IP network.
 
@@ -110,15 +109,15 @@ Contents
       ID   -- Identifier.
       IMSI -- International Mobile Station Identifier.
       INAP -- Intelligent Network Application Part.
-      IPSP -- IP Signalling Point.
 
 
 
 
 B. Bidulock                    Version 0.4                        Page 2
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
+      IPSP -- IP Signalling Point.
       MAP  -- Mobile Application Protocol.
       MIB  -- Management Information Base.
       MSC  -- Mobile Switching Center.
@@ -157,7 +156,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       contains an SCTP end-point and may be configured to process
       traffic within more that one Application Server.
 
-  Association - refers to an SCTP association [RFC 2960].  The
+  Association - refers to an SCTP association [RFC2960].  The
       association provides the transport for the delivery of TCAP
       protocol data units and TUA layer peer messages.
 
@@ -172,11 +171,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       unavailable Application Server Process.
 
 
-
-
 B. Bidulock                    Version 0.4                        Page 3
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
   Host - the computing platform that the process (SGP, ASP or IPSP) is
       running on.
@@ -189,7 +186,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       outputs between the TUA layer and a local management entity.
 
   Message Transfer Part (MTP)
-      The Message Transfer Part [Q.701, T1.111] of the SS7 protocol.
+      The Message Transfer Part [Q.701], [T1.111] of the SS7 protocol.
 
   Nodal Interworking Function (NIF) - an implementation dependent
       interworking function present at a Signalling Gateway that
@@ -218,24 +215,23 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       Control Part [Q.711] of the SS7 protocol.
 
   Signalling Gateway (SG) - a signalling agent that exchanges SCN native
-      signalling at the edge of the IP network [RFC 2719].  An SG
-      appears to the SS7 network as an SS7 Signalling Point.  An SG
-      contains a set of one or more Signalling Gateway Processes, of
-      which one or more is normally actively processing traffic.  When
-      an SG contains more than one SGP, the SG is a logical entity and
-      the contained SGPs are assumed to be coordinated into a single
-      management view both toward the SS7 network and toward the
-      supported Application Servers.
+      signalling at the edge of the IP network [RFC2719].  An SG appears
+      to the SS7 network as an SS7 Signalling Point.  An SG contains a
+      set of one or more Signalling Gateway Processes, of which one or
+      more is normally actively processing traffic.  When an SG contains
+      more than one SGP, the SG is a logical entity and the contained
+      SGPs are assumed to be coordinated into a single management view
+      both toward the SS7 network and toward the supported Application
+      Servers.
 
   Signalling Gateway Process (SGP) - a process instance of a Signalling
       Gateway.  It serves as an active, backup, load-sharing or
       broadcast process of a Signalling Gateway.
 
 
-
 B. Bidulock                    Version 0.4                        Page 4
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
   Stream - an SCTP stream; a unidirectional logical channel established
       from one SCTP endpoint to another associated SCTP endpoint, within
@@ -243,7 +239,8 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       those submitted to the unordered delivery service.
 
   Transaction Capabilities Application Part (TCAP) - The Transaction
-      Capabilities Application Part [Q.771, T1.114] of the SS7 protocol.
+      Capabilities Application Part [Q.771], [T1.114] of the SS7
+      protocol.
 
   Transaction Mapping Function (TMF) - an implementation dependent
       function that is responsible for resolving the address and
@@ -258,14 +255,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   Transport Address - an address that serves as a source or destination
       for the unreliable packet transport service used by SCTP.  In IP
       networks, a transport address is defined by the combination of IP
-      address and an SCTP port number [1].
+      address and an SCTP port number <1>.
 
 1.3.  TUA Overview
 
 1.3.1.  Signalling Transport Architecture
 
     The framework architecture that has been defined for SCN signalling
-  transport over IP [RFC 2719] uses multiple components, including an IP
+  transport over IP [RFC2719] uses multiple components, including an IP
   transport protocol, a signalling common transport protocol and an
   adaptation module to support the services expected by a particular SCN
   signalling protocol from its underlying protocol layer.
@@ -290,11 +287,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-
 B. Bidulock                    Version 0.4                        Page 5
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
           .........         ...............        .........
           :       :         :             :        :       :
@@ -350,10 +345,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
 B. Bidulock                    Version 0.4                        Page 6
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
                      ........        ........
                      :      :   IP   :      :
@@ -409,10 +403,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
 B. Bidulock                    Version 0.4                        Page 7
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
     Operation Class 1 - provides for transactions reporting both
                         success and failure.
@@ -468,10 +461,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
 B. Bidulock                    Version 0.4                        Page 8
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
                 Table 1. Mapping of Management Primitives
 
@@ -526,12 +518,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     Local management MAY request from the TUA layer the status of the
   underlying SCTP associations using the M-SCTP_STATUS request and
-  confirm primitives.  Also, the TUA MAY autonomously inform local
 
 B. Bidulock                    Version 0.4                        Page 9
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
+  confirm primitives.  Also, the TUA MAY autonomously inform local
   management of the reason for the release of an SCTP association,
   determined either locally within the TUA layer or by a primitive from
   the SCTP.
@@ -582,15 +574,17 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   subscribers that are not represented by contiguous Global Title
   Addresses.
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 10
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 1.4.3.  Managing Routing Context and Routing Keys
 
     There are two ways to provision a Routing Key at an SGP.  A Routing
   Key may be configured statically using an implementation dependent
-
-B. Bidulock                    Version 0.4                       Page 10
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   management interface, or dynamically managed using the the TUA Routing
   Key registration procedures.
 
@@ -605,7 +599,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   use of an Transaction Mapping Function (TMF).  This function is
   considered part of TUA, but the way it is realized is left
   implementation or deployment dependent (local tables, SCCP GTT
-  database, DNS [RFC 2916], LDAP, etc.)
+  database, DNS [RFC2916], LDAP, etc.)
 
     The TMF is invoked when a message is received at the incoming
   interface.  The TMF is responsible for resolving the application
@@ -640,16 +634,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   Server that is enabled by one or more ASPs.  These ASPs proxy dynamic
   status information regarding their availability, transaction handling
   capabilities and congestion to the SGP using various management
+
+B. Bidulock                    Version 0.4                       Page 11
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   messages defined in the TUA protocol.
 
     The list of ASPs in the AS is assumed to be dynamic, taking into
   account the availability, transaction handling capability and
   congestion status of the individual ASPs in the list, as well as
-
-B. Bidulock                    Version 0.4                       Page 11
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   configuration changes and possible fail-over mechanisms.
 
     Normally, one or more ASPs are active in the AS (i.e, currently
@@ -676,7 +670,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   outgoing message, SS7 network status, SGP availability, and Routing
   Context configuration tables.
 
-    A Signalling Gateway may be composed of one or more SGPs [2].  There
+    A Signalling Gateway may be composed of one or more SGPs <2>.  There
   is, however, no TUA messaging to manage the status of an SGP.
   Whenever an SCTP association to an SGP exists, it is assumed to be
   available.  Also, every SGP of one SG communicating with one ASP
@@ -697,6 +691,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   standard SS7 network interfaces, using the services of the SCCP
   [Q.711] and MTP [Q.704] to provide transport of the messages.
 
+
+
+B. Bidulock                    Version 0.4                       Page 12
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
     Note that it is also possible for the SCCP services to be provided
   using the services of the SCCP-User Adaptation Layer (SUA) [SUA] and
   the MTP3-User Adaptation Layer (M3UA) [M3UA].
@@ -704,10 +704,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The TC-SAP through which TUA at the SG obtains its services could
   reside at a Signalling Transfer Point (STP) or Signalling End Point
   (SEP) [Q.705].
-
-B. Bidulock                    Version 0.4                       Page 12
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 1.4.6.  SS7 and TUA Interworking at the SG
 
@@ -754,6 +750,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   sequenced message transfer need to be sent over a stream using
   sequenced delivery.
 
+
+B. Bidulock                    Version 0.4                       Page 13
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
     TUA SHOULD NOT use stream 0 for TUA management messages.  It is
   OPTIONAL that sequence delivery be used to preserve the order of
   management message delivery.
@@ -761,13 +762,8 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     All TUA Dialogue Handling (DH) messages not using the optional
   component handling interface (i.e, DH messages with components
   included) MAY select unordered delivery, depending on the requirements
-  of the TC-User [3].  All TUA Component Handling (CH) messages and
+  of the TC-User <3>.  All TUA Component Handling (CH) messages and
   Dialogue Handling (DH) messages with external components SHOULD select
-
-B. Bidulock                    Version 0.4                       Page 13
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   ordered delivery.
 
     The stream selected is based upon the Sequence Control field in the
@@ -812,9 +808,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   upper layer responses.  When an SG determines that the transport of
   SS7 messages is encountering congestion, the SG might trigger SS7
   Congestion messages to originating SS7 nodes, per the congestion
-  procedures of the relevant SCCP [Q.711, T1.112] or MTP [T1.111, Q.704]
-  standard.  (The triggering of SS7 Management messages from an SG is an
-  implementation-dependent function.)
+
+B. Bidulock                    Version 0.4                       Page 14
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
+  procedures of the relevant SCCP [Q.711], [T1.112] or MTP [Q.704],
+  [T1.111] standard.  (The triggering of SS7 Management messages from an
+  SG is an implementation-dependent function.)
 
 1.5.  Definition of TUA Boundaries
 
@@ -822,10 +823,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   the TC-User; a lower boundary between TUA and SCTP; and a layer
   management boundary between TUA and the Layer Management Function.
   Figure 3 illustrates the TUA protocol boundaries.
-
-B. Bidulock                    Version 0.4                       Page 14
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
                       ...........
                       : TC-User :
@@ -845,7 +842,34 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 1.5.1.  Definition of Upper Boundary
 
     The primitives and messages listed in Table 2 are provided between
-  the TUA and TC-User in support of Dialogue Handling [Q.771, T1.114].
+  the TUA and TC-User in support of Dialogue Handling [Q.771], [T1.114].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 15
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
              Table 2. Mapping of Dialogue Handling Primitives
 
@@ -881,14 +905,29 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     +--------------+------------+-------------+----------------+------+
 
 
-
-B. Bidulock                    Version 0.4                       Page 15
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
     The primitives and messages listed in Table 3 are provided between
-  the TUA and TC-User in OPTIONAL support of Component Handling [Q.771,
-  T1.114].
+  the TUA and TC-User in OPTIONAL support of Component Handling [Q.771],
+  [T1.114].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 16
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
             Table 3. Mapping of Component Handling Primitives
 
@@ -938,16 +977,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   Purpose:   TUA informs LM that a remote ASP has established an SCTP
              association.
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 16
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
-
   M-SCTP_RELEASE request
   Direction: LM -> TUA
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 17
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   Purpose:   LM requests ASP to release an SCTP association with its
              peer.
 
@@ -998,14 +1037,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   M-NOTIFY indication
   Direction: TUA -> LM
-
-
-B. Bidulock                    Version 0.4                       Page 17
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Purpose:   TUA reports that it has received a Notify (NTFY) message
              from its peer.
+
+
+B. Bidulock                    Version 0.4                       Page 18
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 
   M-ERROR indication
   Direction: TUA -> LM
@@ -1056,15 +1095,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   M-ASP_ACTIVE indication
   Direction: TUA -> LM
-
-
-
-B. Bidulock                    Version 0.4                       Page 18
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Purpose:   TUA reports it has successfully processed an incoming ASP
              Active (ASPAC) message from its peer.
+
+
+B. Bidulock                    Version 0.4                       Page 19
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 
   M-ASP_INACTIVE request
   Direction: LM -> TUA
@@ -1114,15 +1152,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
              incoming Registration Request (REG REQ) message.
 
   M-RK_DEREG request
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 19
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Direction: LM -> TUA
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 20
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   Purpose:   LM requests ASP to deregister RK(s) with its peer by
              sending Deregistration Request (DEREG REQ) message.
 
@@ -1141,16 +1179,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 1.5.3.  Definition of the Lower Boundary
 
   The upper layer primitives provided by the SCTP are provided in the
-  SCTP specification "Stream Control Transmission Protocol (SCTP)" [RFC
-  2960].
+  SCTP specification "Stream Control Transmission Protocol (SCTP)"
+  [RFC2960].
 
 Notes for Section 1
 
-  [1]  IMPLEMENTATION NOTE:-  Only one SCTP port may be defined for
+  <1>  IMPLEMENTATION NOTE:-  Only one SCTP port may be defined for
        each endpoint, but each SCTP endpoint may have multiple IP
-       addresses [RFC 2960].
+       addresses [RFC2960].
 
-  [2]  IMPLEMENTATION NOTE:-  Where more than one route (or SG) is
+  <2>  IMPLEMENTATION NOTE:-  Where more than one route (or SG) is
        possible for routing to the SS7 network, the ASP could, for
        example, maintain a dynamic table of available SG routes for
        the SS7 destinations and subsystems, taking into account the
@@ -1158,7 +1196,7 @@ Notes for Section 1
        received from the SG(s), the availability status of individual
        SGs and configuration changes or fail-over mechanisms.
 
-  [3]  IMPLEMENTATION NOTE:-  When the TC-User selects sequenced
+  <3>  IMPLEMENTATION NOTE:-  When the TC-User selects sequenced
        delivery using the "Sequence Control" fields in the Quality of
        Service parameter, the DH message SHOULD be sent on an SCTP
        stream using ordered delivery.  When the TC-User does not
@@ -1169,20 +1207,17 @@ Notes for Section 1
 
 2.  Conventions
 
-    The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-  "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-  "OPTIONAL", when they appear in this document, are to be interpreted
-  as described in [RFC 2119].
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 20
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in [RFC2119].
 
   In this document, the following conventions are used to describe how a
   parameter is used in the message:
+
+
+B. Bidulock                    Version 0.4                       Page 21
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
     Mandatory     The parameter MUST be present in the message.  A
                   message listing a parameter as Mandatory without
@@ -1234,14 +1269,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
    + Optional parameters can only occur at most once in a TUA message.
    + All fields in the TUA message MUST be transmitted in the network
      byte order, unless otherwise stated.
-
-
-B. Bidulock                    Version 0.4                       Page 21
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
    + The Reserved field is set to 0 in messages sent and is not examined
      in messages received.
+
+
+B. Bidulock                    Version 0.4                       Page 22
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 3.1.1.  TUA Protocol Version
 
@@ -1291,16 +1325,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     SS7 Signalling Network Management (SSNM) Messages
       0         Reserved
       1         Destination Unavailable (DUNA)
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 22
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
       2         Destination Available (DAVA)
       3         Destination State Audit (DAUD)
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 23
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
       4         Destination Congestion (SCON)
       5         Destination User Part Unavailable (DUPU)
       6         Destination Restricted (DRST)
@@ -1352,13 +1386,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       2         Result (CRES)
       3         Error (CERR)
       4         Reject (CREJ)
-
-
-B. Bidulock                    Version 0.4                       Page 23
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
       5         Cancel (CCAN)
+
+
+B. Bidulock                    Version 0.4                       Page 24
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
       6 -  127  Reserved by the IETF
     128 -  255  Reserved for IETF-Defined Message Class Extensions
 
@@ -1375,7 +1409,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     TUA messages consist of a Common Message Header followed by zero or
   more parameters, as defined by the message type.  The Tag-Length-Value
   (TLV) parameters contained in a message are defined in a Tag-Length-
-  Value format as shown below [1].
+  Value format as shown below <1>.
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1413,9 +1447,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-B. Bidulock                    Version 0.4                       Page 24
+B. Bidulock                    Version 0.4                       Page 25
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 3.2.  TUA Message Header
 
@@ -1469,12 +1503,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
           Dialogue Id parameter SHOULD always be placed in the TUA
           Message Header.  The Dialogue Id parameter MAY be excluded
           from the TUA header for TUNI and TPAB DH messages, or may be
-          included but then MUST contain a value of zero.
 
 
-B. Bidulock                    Version 0.4                       Page 25
+B. Bidulock                    Version 0.4                       Page 26
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
+          included but then MUST contain a value of zero.
 
 3.3.  TUA Dialogue Handling (DH) Messages
 
@@ -1523,17 +1558,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   operation.
 
     The TUNI message corresponds to the ITU-T `TC-UNI' primitive
-  [Q.771], and the ITU-T and ANSI `Unidirectional' message [T1.114,
-  Q.773].
+  [Q.771], and the ITU-T and ANSI `Unidirectional' message [Q.773],
+  [T1.114].
+
+
+
+B. Bidulock                    Version 0.4                       Page 27
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
   The TUNI message is formatted as follows:
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 26
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1584,16 +1618,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The TUNI message can contain the following parameters:
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 28
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
+
       Parameters
       ---------------------------------------------
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 27
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
       Destination Address         Conditional   *1
       Originating Address         Conditional   *1
       Application Context Name    Optional
@@ -1601,6 +1635,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       Security Context            Optional
       Confidentiality             Optional
       Components                  Optional      *2
+
 
 
   Note 1: The Destination Address or Originating Address parameter MUST
@@ -1644,14 +1679,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 28
+B. Bidulock                    Version 0.4                       Page 29
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1707,10 +1737,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   The TQRY message can contain the following parameters:
 
 
-
-B. Bidulock                    Version 0.4                       Page 29
+B. Bidulock                    Version 0.4                       Page 30
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
       Parameters
       ---------------------------------------------
@@ -1766,10 +1795,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 30
+B. Bidulock                    Version 0.4                       Page 31
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1821,15 +1849,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       Parameters
       ---------------------------------------------
       Transaction Id              Conditional   *1
-      Originating Address         Conditional   *2
 
 
 
 
-B. Bidulock                    Version 0.4                       Page 31
+B. Bidulock                    Version 0.4                       Page 32
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
+      Originating Address         Conditional   *2
       Application Context Name    Conditional   *3
       User Information            Conditional   *3
       Security Context            Conditional   *3
@@ -1883,11 +1911,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-
-B. Bidulock                    Version 0.4                       Page 32
+B. Bidulock                    Version 0.4                       Page 33
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1940,14 +1966,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       Components                  Optional    *2
 
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 34
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   Note 1: These dialogue portion parameters SHOULD only be optionally
           included in the TRSP message when it is issued in response to
-
-
-B. Bidulock                    Version 0.4                       Page 33
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
           an TQRY message.  When the TRSP message is in response to a
           TCNV message, the dialogue portion parameters SHOULD NOT be
           included in the TRSP message.
@@ -2000,12 +2027,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   The TUAB message can contain the following parameters:
 
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 34
+B. Bidulock                    Version 0.4                       Page 35
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
       Parameters
       ---------------------------------------------
@@ -2061,10 +2085,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 35
+B. Bidulock                    Version 0.4                       Page 36
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
     The TNOT message corresponds to the ITU-T [Q.771] TC-NOTICE
   primitive.
@@ -2120,10 +2143,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 36
+B. Bidulock                    Version 0.4                       Page 37
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2179,10 +2201,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 37
+B. Bidulock                    Version 0.4                       Page 38
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2238,10 +2259,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 38
+B. Bidulock                    Version 0.4                       Page 39
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2297,10 +2317,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 39
+B. Bidulock                    Version 0.4                       Page 40
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2356,10 +2375,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 40
+B. Bidulock                    Version 0.4                       Page 41
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
         Parameters
         ------------------------------------------
@@ -2415,10 +2433,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 41
+B. Bidulock                    Version 0.4                       Page 42
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2474,10 +2491,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 42
+B. Bidulock                    Version 0.4                       Page 43
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 3.5.2.  Destination Available (DAVA)
 
@@ -2528,16 +2544,17 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The DAVA message can contain the following parameters:
 
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 44
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
       Parameters
       ----------------------------------------------------
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 43
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
       Routing Context                    Mandatory
       Affected Point Code                Mandatory
       Subsystem Number                   Conditional   *1
@@ -2590,12 +2607,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 44
+B. Bidulock                    Version 0.4                       Page 45
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2649,13 +2663,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     When the SCON message contains the Subsystem Number parameter, the
   message corresponds to the ITU-T [Q.711] and ANSI [T1.112] `N-STATE'
-  primitive.  When the SCON message does not contain the Subsystem
 
 
-B. Bidulock                    Version 0.4                       Page 45
+B. Bidulock                    Version 0.4                       Page 46
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
+  primitive.  When the SCON message does not contain the Subsystem
   Number parameter, message, the message corresponds to the ITU-T
   [Q.711] and ANSI [T1.112] `N-PCSTATE' primitive.
 
@@ -2705,15 +2719,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       Congestion Level                   Mandatory
       Subsystem Number                   Optional    *1
       Subsystem Multiplicity Indicator   Optional    *2
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 47
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
       Info String                        Optional
 
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 46
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   Note 1: The Subsystem Number parameter SHALL be present in the SCON
           message when indicating the congestion of a subsystem, and
@@ -2764,16 +2779,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The DUPU message can contain the following parameters:
 
+
+
+B. Bidulock                    Version 0.4                       Page 48
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
       Parameters
       -------------------------------------------
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 47
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
       Routing Context             Mandatory
       Affected Point Code         Mandatory
       User/Cause                  Mandatory   *1
@@ -2826,12 +2839,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 48
+B. Bidulock                    Version 0.4                       Page 49
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2885,13 +2895,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   Note 3: The Subsystem Multiplicity Indicator parameter SHOULD NOT be
           present in the SCON message when the Subsystem Number
           parameter is not also present.  The Subsystem Multiplicity
-          Indicator parameter SHALL be present in the SCON message when
 
 
-B. Bidulock                    Version 0.4                       Page 49
+B. Bidulock                    Version 0.4                       Page 50
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
+          Indicator parameter SHALL be present in the SCON message when
           requesting or indicating a coordinated service outage, and
           SHALL NOT be present when responding to or confirming a
           coordinated service outage.
@@ -2945,11 +2955,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-
-B. Bidulock                    Version 0.4                       Page 50
+B. Bidulock                    Version 0.4                       Page 51
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3005,10 +3013,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 51
+B. Bidulock                    Version 0.4                       Page 52
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3064,10 +3071,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   any change.
 
 
-
-B. Bidulock                    Version 0.4                       Page 52
+B. Bidulock                    Version 0.4                       Page 53
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
   The BEAT ACK message is formatted as follows:
 
@@ -3120,13 +3126,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
-  The ASPAC message can contain the following parameters:
 
 
 
-B. Bidulock                    Version 0.4                       Page 53
+B. Bidulock                    Version 0.4                       Page 54
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
+  The ASPAC message can contain the following parameters:
 
       Parameters
       ---------------------------------------------
@@ -3176,16 +3183,18 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
       Parameters
       ---------------------------------------------
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 55
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
       Routing Context             Conditional   *1
       Traffic Mode Type           Optional
       Info String                 Optional
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 54
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   Note 1: When an ASP is registered or configured for multiple AS with
           an SG, the Routing Context associated with the AS whose
@@ -3235,16 +3244,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The ASP Inactive Ack (ASPIA ACK) message is used to acknowledge an
   ASPIA message received from a remote TUA peer.
 
-  The ASPIA message is formatted as follows:
 
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 55
+B. Bidulock                    Version 0.4                       Page 56
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
+  The ASPIA message is formatted as follows:
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3298,12 +3303,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 56
+B. Bidulock                    Version 0.4                       Page 57
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3356,14 +3358,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
           Context parameter MUST contain the invalid routing context
           value(s).
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 58
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   Note 2: When the Error Code is "Destination Status Unknown" or
           "Subsystem Status Unknown," the Affected Point Code parameter
-
-
-B. Bidulock                    Version 0.4                       Page 57
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
           MUST contain the point codes for which status is unknown or
           unauthorized.
 
@@ -3413,20 +3416,21 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The NTFY message can contain the following parameters:
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 59
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
+
       Parameters
       ---------------------------------------------
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 58
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
       Status                      Mandatory
       ASP Identifier              Conditional   *1
       Routing Context             Conditional   *2
       Info String                 Optional
+
 
 
   Note 1: ASP Identifier MUST be used where the IPSP/SGP cannot identify
@@ -3457,6 +3461,26 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The REG REQ message is formatted as follows:
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 60
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3477,10 +3501,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     \                                                               \
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-
-B. Bidulock                    Version 0.4                       Page 59
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The REG REQ message can contain the following parameters:
 
@@ -3505,6 +3525,19 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   message.
 
   The REG RSP message is formatted as follows:
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 61
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3534,13 +3567,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       Registration Result         Mandatory   *1
 
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 60
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Note 1: REG RSP message.  Whereas it is OPTIONAL for an implementation
           to be able to generate a REG RSP message with more than one
           Routing Key parameter, it is REQUIRED that the implementation
@@ -3556,6 +3582,20 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   RSP message in return with the associated Routing Context value.
 
   The DEREG REQ message is formatted as follows:
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 62
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3590,16 +3630,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The DEREG REQ message is formatted as follows:
 
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 61
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
      0                     1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3620,6 +3650,10 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     \                                                               \
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+B. Bidulock                    Version 0.4                       Page 63
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
   The DEREG REQ message contains the following parameters:
 
@@ -3651,14 +3685,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       Routing Context                  0x0006      3.10.2
       Diagnostic Info                  0x0007      3.10.3
       Not used in TUA                  0x0008         -
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 62
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
       Heartbeat Data                   0x0009      3.10.4
       Not used in TUA                  0x000A         -
       Traffic Mode Type                0x000B      3.10.5
@@ -3681,6 +3707,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The Info String parameter is optionally included in all MGMT, ASPSM
   and ASPTM messages to provide additional debugging or diagnostic
+
+
+B. Bidulock                    Version 0.4                       Page 64
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   information.
 
   The Info String parameter is formatted as follows:
@@ -3700,7 +3732,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   Info String field: variable (ASCII string)
 
-    The Info String field can carry any meaningful UTF-8 [RFC 2279]
+    The Info String field can carry any meaningful UTF-8 [RFC2279]
     character string along with the message.  Length of the Info String
     field is from 0 to 255 characters.  No procedures are presently
     identified for its use but implementations may use the Info String
@@ -3712,12 +3744,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   messages as well as in MGMT, ASPTM, ASPSM that reference one or more
   Application Servers.  The Routing Context parameter is used to
   uniquely identify an Application Server and Routing Key within an
-
-
-B. Bidulock                    Version 0.4                       Page 63
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   association between an SGP and ASP.
 
   The Routing Context parameter is formatted as follows:
@@ -3740,8 +3766,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The Routing Context field contains (a list of) 32-bit unsigned
     integers indexing the Application Server traffic that the sending
     ASP is configured or registered to receive.  There is one-to-one
+
+B. Bidulock                    Version 0.4                       Page 65
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
     relationship between a Routing Context value, an SG Routing Key and
-    an Application Server [2].  If the Routing Context parameter is
+    an Application Server <2>.  If the Routing Context parameter is
     present, it SHOULD be the first parameter in the message as it
     defines the format and/or interpretation of the parameters
     containing a PC or SSN value.
@@ -3771,12 +3802,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   Diagnostic Info field: variable length (bytes)
 
-
-
-B. Bidulock                    Version 0.4                       Page 64
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
     The Diagnostic Info field can contain any information germane to the
     error condition, to assist in the identification of the error
     condition.  The Diagnostic Info SHOULD be the first 40 bytes of the
@@ -3790,6 +3815,19 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   parameter are described in Section 4.
 
   The Heartbeat Data parameter is formatted as follows:
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 66
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -3825,17 +3863,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The Traffic Mode Type parameter is formatted as follows:
 
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 65
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3853,9 +3880,18 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     of an ASP within an AS.  The valid values for the Traffic Mode Type
     field are as follows:
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 67
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
+
         1   Override
         2   Load-share
         3   Broadcast
+
 
 
     Within a Routing Context, Override, Load-share Types and Broadcast
@@ -3889,12 +3925,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The Error Code parameter contains the following fields:
 
-
-
-B. Bidulock                    Version 0.4                       Page 66
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Error Code field: 32-bit (unsigned integer)
 
     The Error Code field indicates the reason for the Error Message.
@@ -3907,6 +3937,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
          6   Unexpected Message
          7   Protocol Error
          9   Invalid Stream Identifier
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 68
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
         13   Refused - Management Blocking
         14   ASP Identifier Required
         15   Invalid ASP Identifier
@@ -3947,13 +3985,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   Routing Context(s), the Routing Context(s) SHOULD be included in the
   ERR message.
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 67
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
     The "Protocol Error" error is sent for any protocol anomaly (i.e.,
   reception of a parameter that is syntactically correct but unexpected
   in the current situation.
@@ -3966,6 +3997,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The "Refused - Management Blocking" error is sent when an ASP Up
   (ASPUP) or ASP Active (ASPAC) message is received and the request is
   refused for management reasons (e.g, management lockout").  If this
+
+
+B. Bidulock                    Version 0.4                       Page 69
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   error is in response to an ASP Active (ASPAC) message, the Routing
   Context(s) in the ASP Active (ASPAC) message SHOULD be included in the
   ERR message.
@@ -4008,11 +4045,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The "Invalid Routing Context" error is sent if a message is received
   from a peer with an invalid (not configured) Routing Context value, or
   if a message is received from a peer without a Routing Context
-
-B. Bidulock                    Version 0.4                       Page 68
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   parameter and it is not known by configuration data which Application
   Servers are referenced.  For this error, the invalid Routing
   Context(s) MUST be included in the ERR message.
@@ -4024,6 +4056,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The "Subsystem Status Unknown" Error MAY be sent if a DAUD is
   received at an SG inquiring of the availability or congestion status
   of a subsystem, and the SG does not wish to provide the status (e.g,
+
+B. Bidulock                    Version 0.4                       Page 70
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   the sender is not authorized to know the status).  For this error, the
   invalid or unauthorized Point Code and Subsystem Number MUST be
   included along with any Network Appearance or Routing Context
@@ -4064,14 +4101,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     (1)   If the Status Type is "AS_State_Change", then the Status ID
           values are as follows:
 
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 69
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
               1   reserved
               2   Application Server Inactive (AS-Inactive)
               3   Application Server Active (AS-Active)
@@ -4084,6 +4113,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     (2)   If the Status Type is "Other", then the following Status
           Information values are defined:
+
+
+B. Bidulock                    Version 0.4                       Page 71
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
               1   Insufficient ASP resources active in AS
               2   Alternate ASP Active
@@ -4124,13 +4158,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The Affected Point Code parameter is formatted as follows:
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 70
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -4145,6 +4172,10 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     |     Mask      |             Affected Point Code n             |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+B. Bidulock                    Version 0.4                       Page 72
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
   The Affected Point Code parameter contains the following fields:
 
@@ -4186,10 +4217,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
                                           |MSB---------------------LSB|
 
 
-B. Bidulock                    Version 0.4                       Page 71
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
       It is OPTIONAL for an implementation to generate an Affected Point
       Code parameter with more than one Affected Point Code field; but,
       the implementation MUST accept and process the Affected Point Code
@@ -4202,6 +4229,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       Identifying a contiguous range of Affected Point Codes may be
       useful when a management event simultaneously affects the status
       of a series of destinations at an SG.
+
+
+B. Bidulock                    Version 0.4                       Page 73
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
       The Mask parameter is an integer representing a bit mask that can
       be applied to the related Affected PC field.  The bit mask
@@ -4244,13 +4276,8 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     traffic flow of TUA messages the ASP is joining.  It is attached to
     the TUA Message Header of the first DH or CH message sent to an ASP
     by an SG after sending an ASP Active Ack or otherwise starting
-
-B. Bidulock                    Version 0.4                       Page 72
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
     traffic to an ASP.  The Correlation Id is only significant within a
-    Routing Context [3].
+    Routing Context <3>.
 
 3.10.11.  Registration Result
 
@@ -4259,6 +4286,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   Routing Key.
 
   The Registration Result parameter is formatted as follows:
+
+
+
+B. Bidulock                    Version 0.4                       Page 74
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -4303,14 +4336,20 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The Deregistration Result parameter is used to indicate the result
   of a successful or unsuccessful deregistration operation for a
-
-B. Bidulock                    Version 0.4                       Page 73
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   specific Routing Key.
 
   The Deregistration Result parameter is formatted as follows:
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 75
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -4363,11 +4402,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The Registration Status field indicates the success or the reason
     for failure of a registration request.
 
-B. Bidulock                    Version 0.4                       Page 74
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
     Its values can be:
+
+
+B. Bidulock                    Version 0.4                       Page 76
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
          0   Successfully Registered
          1   Error - Unknown
@@ -4420,13 +4460,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The Local Routing Key Identifier parameter is used for correlating
   the Routing Key parameter in a specific Registration Request (REG REQ)
-
-
-B. Bidulock                    Version 0.4                       Page 75
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   message with the Registration Result parameter in the corresponding
+
+
+B. Bidulock                    Version 0.4                       Page 77
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   Registration Response (REG RSP) message.
 
   The Local Routing Key Identifier parameter is formatted as follows:
@@ -4481,9 +4521,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-B. Bidulock                    Version 0.4                       Page 76
+B. Bidulock                    Version 0.4                       Page 78
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
             Parameters used in CH Messages
         ----------------------------------------
@@ -4536,13 +4576,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
-  The Dialogue Id parameter contains the following fields:
 
 
 
-B. Bidulock                    Version 0.4                       Page 77
+B. Bidulock                    Version 0.4                       Page 79
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
+  The Dialogue Id parameter contains the following fields:
 
   Dialogue Id field: 32-bits (unsigned integer)
 
@@ -4594,15 +4635,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     Bit 29: Components Present
 
+
+
+B. Bidulock                    Version 0.4                       Page 80
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
       The Components Present bit is set in the indication (i.e, sent
       from SG to ASP) forms of Dialogue Handling (DH) messages to
       indicate that Component Handling (CH) messages will follow
       containing the components associated with the Dialogue Handing
-
-B. Bidulock                    Version 0.4                       Page 78
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
       message.
 
     Bit 20: Permission
@@ -4650,18 +4692,19 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     Spare bits are coded zero.
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 81
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   Return Option field: 1-bit (boolean)
 
     Specifies whether the SCCP "return message on error" is requested
     when the Protocol Class field is set to SCCP Protocol Class 0 or 1.
     When the Protocol Class field is set to SCCP Protocol Class 2 or 3,
     this field MAY be ignored by the SG.  The Return Option field has
-
-
-B. Bidulock                    Version 0.4                       Page 79
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
     the following values:
 
         0   No "Return On Error" option requested.
@@ -4682,7 +4725,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The Importance field contains the SCCP Importance level requested by
     the TC-User.  Where the underlying SCCP transport at an SG does not
     support SCCP flow control [Q.714], this field SHOULD be coded to
-    zero and MUST be ignored by the SG [4].  Valid values for the
+    zero and MUST be ignored by the SG <4>.  Valid values for the
     Importance field are as follows:
 
         0   SCCP Importance Level 0 or Unspecified
@@ -4701,11 +4744,19 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     requested when the underlying SS7 transport at an SG supports
     multiple congestion levels [Q.704].  When the underlying transport
     does not support multiplex congestion levels or states, this field
-    SHOULD be coded to zero and MUST be ignored by the SG [5].  Valid
+    SHOULD be coded to zero and MUST be ignored by the SG <5>.  Valid
     values for the Message Priority field are as follows:
 
         0   Message Priority 0 or Unspecified
         1   Message Priority 1
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 82
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
         2   Message Priority 2
         3   Message Priority 3
 
@@ -4713,13 +4764,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 3.11.1.4.  Destination Address
 
   The Destination Address parameter is formatted as follows:
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 80
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -4765,6 +4809,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
+
+
+B. Bidulock                    Version 0.4                       Page 83
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   The Originating Address parameter contains the following fields:
 
   Address field: variable length (address parameter list)
@@ -4773,12 +4823,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     At least one address parameter MUST be present in the Address field.
     The Address field can contain the following parameters:
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 81
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
           Parameters
           ---------------------------------------------
@@ -4822,6 +4866,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   Application Id Type field: 32-bits (unsigned integer)
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 84
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
     The Application Id Type field indicates the type of Application
     Identifier that is present in the Application Identifier field.
     Valid values for the Application Id Type are as follows:
@@ -4831,13 +4882,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
   Application Identifier field: variable length (bytes)
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 82
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The Application Identifier contains an identifier of the application
     context that is being proposed by the dialogue initiator or
@@ -4878,6 +4922,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     they were provided to the TUA layer by the TC-User in a TC-BEGIN,
     TC-CONT, or TC-END primitive.
 
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 85
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 3.11.1.8.  Security Context
 
     The Security Context parameter contains the identifier of the
@@ -4885,18 +4938,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   responder.
 
   The Security Context parameter is formatted as follows:
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 83
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -4940,6 +4981,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The Confidentiality parameter is formatted as follows:
 
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 86
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -4952,10 +5001,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     \                                                               \
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-
-B. Bidulock                    Version 0.4                       Page 84
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The Confidentiality parameter contains the following fields:
 
@@ -4996,6 +5041,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
+
+
+B. Bidulock                    Version 0.4                       Page 87
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   The Termination parameter contains the following fields:
 
   Termination field: 32-bit (unsigned integer)
@@ -5006,15 +5057,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
         0   Prearranged
         1   Basic
 
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 85
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 3.11.1.11.  Abort Cause
 
@@ -5040,6 +5082,28 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The Abort Cause field indicates the reason for aborting the dialogue
     and has a TCAP protocol-variant-specific value.  Example values for
     ITU [Q.773] and ANSI [T1.114] are as follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 88
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 
          ITU-T Description               ANSI Description
@@ -5068,13 +5132,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 86
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
 3.11.1.12.  Report Cause
 
     The Report Cause parameter indicates the reason for the sending of
@@ -5099,6 +5156,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The Report Cause field indicates the reason that a TC-User message
     could not be delivered and has the following values:
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 89
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
+
          0   no translation for an address of such nature
          1   no translation for this specific address
          2   subsystem congestion
@@ -5116,6 +5181,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
         14   segmentation failed.
 
 
+
 3.11.1.13.  Abort Reason
 
     The Abort Reason parameter indicates whether a dialogue is aborted
@@ -5123,16 +5189,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   alternative one can be proposed or because of any other user problem.
 
   The Abort Reason parameter is formatted as follows:
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 87
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -5155,6 +5211,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
         0   application context not supported
         1   user specific
 
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 90
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 3.11.1.14.  Components
 
@@ -5188,11 +5253,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
-
-B. Bidulock                    Version 0.4                       Page 88
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   The Components parameter contains the following parameters:
 
       Parameters
@@ -5209,6 +5269,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   CRES, CCAN, etc.) that is contained within a Component parameter.
 
   The Component Type parameter is formatted as follows:
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 91
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -5245,13 +5314,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   Component field: variable length (TLV parameter list)
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 89
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
     The Component field contains the parameters associated with the
     component.  This field may contains the following components,
     however, the formatting of the Component field MUST be the same as
@@ -5267,6 +5329,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
         --------------------+  CRES     3.4.3
         3   Result Not Last |
         --------------------+------------------
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 92
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+                            |
         4   Error           |  CERR     3.4.4
         --------------------+------------------
         5   Reject (User)   |
@@ -5305,12 +5375,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The Invoke Id parameter identifies an invoke component.  This
   identifier is only significant within the scope of a transaction and
-
-
-B. Bidulock                    Version 0.4                       Page 90
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   need only uniquely identify a dialogue within a transaction in a given
   direction (e.g, from SGP to ASP).  The value of the Invoke Id
   parameter is chosen by the TUA peer sending the Invoke.  As both the
@@ -5319,6 +5383,17 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   one direction.
 
   The Invoke Id parameter is formatted as follows:
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 93
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -5365,11 +5440,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The Component Flags parameter is formatted as follows:
 
-
-B. Bidulock                    Version 0.4                       Page 91
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -5378,6 +5448,10 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     |                          unused                             |N|
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+B. Bidulock                    Version 0.4                       Page 94
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
   The Component Flags parameter contains the following fields:
 
@@ -5415,20 +5489,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The Operation parameter is formatted as follows:
 
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 92
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -5443,6 +5503,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     \                                                               \
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 95
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
   The Operation parameter contains the following fields:
 
@@ -5479,15 +5546,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     [X.680].  representing the requested operation.  The value of this
     field is TCAP protocol-variant-specific.
 
-
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 93
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
 3.11.2.5.  Parameters
 
     The Parameters parameter identifies the parameter set or parameter
@@ -5506,6 +5564,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
+
+B. Bidulock                    Version 0.4                       Page 96
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   The Parameters parameter contains the following fields:
 
   Parameters field: variable length (bytes)
@@ -5513,7 +5576,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The Parameters field contains all of the parameters coded according
     to the coding [X.680] for Parameter Sequences or Parameter Sets per
     the applicable TCAP protocol specification.  For example, ITU
-    [Q.773] or ANSI [T1.114].  [6]
+    [Q.773] or ANSI [T1.114].  <6>
 
 3.11.2.6.  Error
 
@@ -5539,14 +5602,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The Error Type field indicates the level (i.e, local or global) at
     which the error was generated.  It has the following values:
 
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 94
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
         1   National TCAP Error   INTEGER
         2   Private TCAP Error    INTEGER
         3   Local TCAP Error      INTEGER
@@ -5562,6 +5617,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     be formatted as an OBJECT IDENTIFIER [X.680] representing the
     indicated error.  The value of this field is TCAP protocol-variant-
     specific.
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 97
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 3.11.2.7.  Problem Code
 
@@ -5600,12 +5664,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     with the Problem Type.  For more information on problem codes, see
     Q.773 Chapter 4.2.2.6 and ANSI T1.114.3 Chapter 5.16.2.
 
-
-
-B. Bidulock                    Version 0.4                       Page 95
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Problem Code field: 32-bit (signed integer)
 
     The Problem Code field indicates the specific problem associated
@@ -5618,6 +5676,17 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   General 0 | unrecognized component     | -
   Problem 1 | mis-typed component        | unrecognized component type
           2 | badly structured component | incorrect component portion
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 98
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+            |                            |
+            | ITU                        | ANSI
+  ----------+----------------------------+------------------------------
           3 | -                          | badly structured component
             |                            | portion
   ----------+----------------------------+------------------------------
@@ -5659,12 +5728,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The Timeout parameter is formatted as follows:
 
-
-
-B. Bidulock                    Version 0.4                       Page 96
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -5673,6 +5736,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     |                            Timeout                            |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+
+
+B. Bidulock                    Version 0.4                       Page 99
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
   The Timeout parameter contains the following fields:
 
@@ -5704,7 +5773,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   SSN field: 8-bits (unsigned integer)
 
-    The SSN field contains the SCCP subsystem number [T1.112, Q.713].
+    The SSN field contains the SCCP subsystem number [Q.713], [T1.112].
 
 3.11.3.2.  Subsystem Multiplicity Indicator
 
@@ -5719,11 +5788,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
-
-B. Bidulock                    Version 0.4                       Page 97
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   The Subsystem Multiplicity Indicator contains the following fields:
 
   Reserved field: 24-bits (coded zero)
@@ -5731,6 +5795,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     Reserved bits are coded zero.
 
   SMI field: 8-bits (unsigned integer)
+
+
+B. Bidulock                    Version 0.4                      Page 100
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
     The SMI field contains the SCCP subsystem multiplicity indicator.
     Valid values for the SMI field are as follows:
@@ -5775,14 +5844,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     by the Affected Point Code(s) also in the SCON message.  In this
     case, valid values for the Congestion Level field are as follows:
 
-
-
-
-
-B. Bidulock                    Version 0.4                       Page 98
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
         0   No Congestion or Undefined
         1   Congestion Level 1
         2   Congestion Level 2
@@ -5792,6 +5853,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     When the Congestion Level parameter is included in a SCON message
     that corresponds to an N-STATE request or indication primitive, the
     Congestion Level field indicates the SCCP restricted importance
+
+
+B. Bidulock                    Version 0.4                      Page 101
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
     level experienced by the local or affected subsystem as indicated by
     the Affected Point Code and Subsystem Number also in the SCON
     message.  In this case, valid values for the Congestion Level field
@@ -5836,18 +5903,19 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The Network Appearance parameter is used as a parameter in the
   Registration Request (REG REQ) message to indicate the network context
-
-
-B. Bidulock                    Version 0.4                       Page 99
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   in which the remainder of the Routing Key parameters are to be
   interpreted.  The Network Appearance parameter is also used in the
   Error (ERR) message in response to a REG REQ message when a received
   Network Appearance parameter contains an invalid value.
 
   The Network Appearance parameter is formatted as follows:
+
+
+
+
+B. Bidulock                    Version 0.4                      Page 102
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -5896,17 +5964,17 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The Routing Key parameter can contain the following fields:
 
-
-B. Bidulock                    Version 0.4                      Page 100
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Local Routing Key Identifier field: 32-bits (unsigned integer)
 
     The Local Routing Key Identifier field is used to uniquely identify
     the registration request.  The identifier value is assigned by the
     ASP and is used to correlate the response in a REG RSP message with
     the original registration request.  The identifier value must remain
+
+B. Bidulock                    Version 0.4                      Page 103
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
     unique until the REG RSP (or ERR) message is received.
 
   Key field: variable (TLV parameters)
@@ -5952,19 +6020,18 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The Address field can contain the following parameters:
 
-
-
-
-
-B. Bidulock                    Version 0.4                      Page 101
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
         Parameters
         ---------------------------------------------
         Originating Address         Conditional   *1
         Destination Address         Conditional   *1
 
+
+
+
+
+B. Bidulock                    Version 0.4                      Page 104
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
     Note 1: The Address field must contain pairs of Originating
             Addresses or Destination Addresses and MUST contain one and
@@ -6014,14 +6081,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The Originating Transaction Id field contains the Originating
     Transaction Identifier associated with the dialogue.
 
-
-B. Bidulock                    Version 0.4                      Page 102
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
 3.11.3.10.  Transaction Id Range
 
   The Transaction Id Range parameter is formatted as follows:
+
+
+
+B. Bidulock                    Version 0.4                      Page 105
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -6072,13 +6140,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   The Global Title parameters contains the following fields:
 
-
-
-B. Bidulock                    Version 0.4                      Page 103
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Number of Digits field: 8-bits (unsigned integer)
+
+
+
+
+B. Bidulock                    Version 0.4                      Page 106
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
     The Number of Digits field contains the number of address signals
     that are represented in the Global Title Address field.
@@ -6131,13 +6200,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The Nature of Address field contains an indication of the nature of
     the information represented in the Global Title Address field.  This
     is a TCAP protocol-variant-specific value.  Example valid values for
-
-
-B. Bidulock                    Version 0.4                      Page 104
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
     ITU [Q.713] are as follows:
+
+
+B. Bidulock                    Version 0.4                      Page 107
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
            0     unknown
            1     subscriber number
@@ -6188,17 +6256,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       0xC   code 12
       0xD   spare
       0xE   spare
-
-
-
-
-B. Bidulock                    Version 0.4                      Page 105
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
       0xF   ST
 
   When the Encoding Scheme is not "BCD," both the TUA layer at the ASP
+
+
+B. Bidulock                    Version 0.4                      Page 108
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   and the TUA layer at the SG should treat the Global Title Address as
   opaque.
 
@@ -6251,14 +6317,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-B. Bidulock                    Version 0.4                      Page 106
+
+
+B. Bidulock                    Version 0.4                      Page 109
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 
 Notes for Section 3
 
-  [1]  IMPLEMENTATION NOTE:-  The use of TLV in principle allows the
+  <1>  IMPLEMENTATION NOTE:-  The use of TLV in principle allows the
        parameters to be placed in a random order in the message.
        However, some guidelines should be considered for easy
        processing in the following order:
@@ -6272,7 +6340,7 @@ Notes for Section 3
         + The receiver SHOULD accept parameters in any order, except
           where explicitly mandated.
 
-  [2]  IMPLEMENTATION NOTE:-  An Application Server Process may be
+  <2>  IMPLEMENTATION NOTE:-  An Application Server Process may be
        configured to process traffic for more than one logical
        Application Server.  From the perspective of an ASP, a Routing
        Context defines a range of signalling traffic that the ASP is
@@ -6291,7 +6359,7 @@ Notes for Section 3
        or individual SCTP associations are dedicated to each SS7
        network context, this functionality is not needed.
 
-  [3]  IMPLEMENTATION NOTE:-  Correlation Id parameter can be used for
+  <3>  IMPLEMENTATION NOTE:-  Correlation Id parameter can be used for
        features like Synchronization of ASPs and SGPs in a Broadcast
        Mode AS or SG; avoid message duplication and mis-sequencing in
        case of fail-over of association from one ASP or SGP to another
@@ -6299,20 +6367,19 @@ Notes for Section 3
        For application of the Correlation Id parameter see CORID
        [CORID].
 
-  [4]  IMPLEMENTATION NOTE:-  The value in the Importance field in the
+  <4>  IMPLEMENTATION NOTE:-  The value in the Importance field in the
        Quality of Service parameter MAY be ignored or modified by a
        Signalling Gateway if the value contained is not consistent
        with SCCP flow control policy at the SG.
 
-  [5]  IMPLEMENTATION NOTE:-  The value in the Message Priority field
+  <5>  IMPLEMENTATION NOTE:-  The value in the Message Priority field
        in the Quality of Service parameter MAY be ignored or modified
        by a Signalling Gateway if the value contained is not
        consistent with MTP congestion policy at the SG.
 
-
-B. Bidulock                    Version 0.4                      Page 107
+B. Bidulock                    Version 0.4                      Page 110
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
        IMPLEMENTATION NOTE:-  The Signalling Gateway MAY, at its
        option, segment the Parameters field into multiple parameters
@@ -6368,10 +6435,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-
-B. Bidulock                    Version 0.4                      Page 108
+B. Bidulock                    Version 0.4                      Page 111
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
       _______________         _______       _______         _______
      |               |       |       |     |       |       |       |
@@ -6426,12 +6492,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     For TC-BEGIN indications, the TUA Transaction Mapping Function (TMF)
   determines the Application Server (AS) based on comparing the address
-  and dialogue portion information in the primitive with a provisioned
 
-B. Bidulock                    Version 0.4                      Page 109
+B. Bidulock                    Version 0.4                      Page 112
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
+  and dialogue portion information in the primitive with a provisioned
   Routing Key.
 
     From the list of ASPs within an AS table, an ASP in the ASP-ACTIVE
@@ -6483,14 +6549,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   signalling application.  Dialogue Handling (DH) and Component Handling
   (CH) messages SHOULD be sent on an SCTP stream other than stream `0'.
 
+
+
+B. Bidulock                    Version 0.4                      Page 113
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
     When there is no Routing Key match, or only a partial match, for an
   incoming SS7 message, a default treatment MAY be specified.  Possible
   solutions are to provide a default Application Server at the SGP that
-
-B. Bidulock                    Version 0.4                      Page 110
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   directs all unallocated traffic to a (set of) default ASP(s), or to
   drop the message and provide a notification to Layer Management in an
   M-ERROR indication primitive.  The treatment of unallocated traffic is
@@ -6540,16 +6607,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     Similar LM-to-TUA-to-SCTP and SCTP-to-TUA-to-LM primitive mappings
   can be described for the various other SCTP Upper Layer primitives in
-  RFC 2960 [2960] such as INITIALIZE, SET PRIMARY, CHANGE HEARTBEAT,
+  RFC 2960 [RFC2960] such as INITIALIZE, SET PRIMARY, CHANGE HEARTBEAT,
+
+B. Bidulock                    Version 0.4                      Page 114
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   REQUEST HEARTBEAT, GET SRTT REPORT, SET FAILURE THRESHOLD, SET
   PROTOCOL PARAMETERS, DESTROY SCTP INSTANCE, SEND FAILURE, AND NETWORK
   STATUS CHANGE.  Alternatively, these SCTP Upper Layer primitives (and
   Status as well) can be considered for modeling purposes as a Layer
-
-B. Bidulock                    Version 0.4                      Page 111
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Management interaction directly with the SCTP Layer.
 
     M-NOTIFY indication and M-ERROR indication primitives indicate to
@@ -6599,16 +6666,16 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   ACK, and NTFY messages MAY be sent using out-of-order delivery, and
   MAY be sent on any stream.
 
+
+B. Bidulock                    Version 0.4                      Page 115
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 4.3.  AS and ASP State Maintenance
 
     The TUA layer on the SGP maintains the state of each remote ASP, in
   each Application Server that the ASP is configured to receive traffic,
   as input to the TUA message distribution function.  Similarly, where
-
-B. Bidulock                    Version 0.4                      Page 112
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   IPSPs use TUA in a point-to-point fashion, the TUA layer in an IPSP
   maintains the state of remote IPSPs.
 
@@ -6656,6 +6723,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
      ASPs/IPSPs in the AS (e.g, ASP Active message indicating
      "Override");
    + reception of indications from the SCTP layer; or,
+
+
+B. Bidulock                    Version 0.4                      Page 116
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
    + Local Management intervention.
 
     The ASP/IPSP state transition diagram is shown in Figure 5.  The
@@ -6663,11 +6736,19 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   ASP-DOWN:     The remote TUA peer at the ASP/IPSP is unavailable or
                 the related SCTP association is down.  Initially all
+                ASPs/IPSPs will be in this state.  An ASP/IPSP in this
+                state SHOULD NOT be sent any TUA messages, with the
+                exception of Heartbeat (BEAT), ASP Down Ack (ASPDN ACK)
+                and Error (ERR) messages.
 
-B. Bidulock                    Version 0.4                      Page 113
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+  ASP-INACTIVE: The remote TUA peer at the ASP/IPSP is available (and
+                the related SCTP association is up) but application
+                traffic is stopped.  In this state, the ASP/IPSP SHOULD
+                NOT be sent any DH, CH or SSNM messages for the AS for
+                which the ASP/IPSP is inactive.
 
+  ASP-ACTIVE:   The remote TUA peer at the ASP/IPSP is available and
+                application traffic is active (for a particular Routing
 
                                           +--------------+
                                           |              |
@@ -6700,19 +6781,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
               Figure 5.  ASP State Transition Diagram (Per AS)
 
-                ASPs/IPSPs will be in this state.  An ASP/IPSP in this
-                state SHOULD NOT be sent any TUA messages, with the
-                exception of Heartbeat (BEAT), ASP Down Ack (ASPDN ACK)
-                and Error (ERR) messages.
 
-  ASP-INACTIVE: The remote TUA peer at the ASP/IPSP is available (and
-                the related SCTP association is up) but application
-                traffic is stopped.  In this state, the ASP/IPSP SHOULD
-                NOT be sent any DH, CH or SSNM messages for the AS for
-                which the ASP/IPSP is inactive.
 
-  ASP-ACTIVE:   The remote TUA peer at the ASP/IPSP is available and
-                application traffic is active (for a particular Routing
+B. Bidulock                    Version 0.4                      Page 117
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
                 Context or set of Routing Contexts).
 
   SCTP CDI:     The SCTP CDI denotes the local SCTP layer's
@@ -6722,10 +6796,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
                 connectivity to the ASPs peer SCTP layer.  SCTP CDI is
                 understood as either a SHUTDOWN_COMPLETE notification or
                 COMMUNICATION_LOST notification from the SCTP layer.
-
-B. Bidulock                    Version 0.4                      Page 114
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   SCTP RI:      The local SCTP layer's Restart indication to the upper
                 layer protocol (TUA) on an SG.  The local SCTP will send
@@ -6770,21 +6840,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   other alternative, the SGP may stop queuing messages and discard all
   previously queued messages.  The AS will move to the AS-INACTIVE state
   if at least one ASP is in ASP-INACTIVE state, otherwise it will move
-  to AS-DOWN state.
 
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                      Page 115
+B. Bidulock                    Version 0.4                      Page 118
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
+  to AS-DOWN state.
 
          +----------+   one ASP trans to ACTIVE  +-------------+
          |    AS-   |--------------------------->|     AS-     |
@@ -6835,15 +6896,17 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The AS state diagram for the AS-SG case is applicable for IPSP
   communication.
 
+
+
+
+B. Bidulock                    Version 0.4                      Page 119
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 4.3.3.  TUA Management Procedures for Primitives
 
     Before the establishment of an SCTP association the ASP state at
   both the SGP and ASP is assumed to be in the state ASP-DOWN.
-
-
-B. Bidulock                    Version 0.4                      Page 116
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     Once the SCTP association is established (see Section 4.2.1) and
   assuming that the local TC-User is ready, the local TUA ASP
@@ -6893,16 +6956,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   available for future configuration within Application Server(s),
   determined in a subsequent Registration Request or ASP Active
   procedure.  If the ASP Up (ASPUP) message contains an ASP Identifier,
+
+B. Bidulock                    Version 0.4                      Page 120
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   the SGP should save the ASP Identifier for that ASP.  The SGP MUST
   send an ASP Up Ack (ASPUP ACK) message in response to a received ASP
   Up (ASPUP) message even if the ASP is already marked as ASP-INACTIVE
   at the SGP.
-
-
-
-B. Bidulock                    Version 0.4                      Page 117
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     If for any local reason (e.g, management lock-out) the SGP cannot
   respond with an ASP Up Ack (ASPUP ACK) message, the SGP responds to an
@@ -6950,6 +7012,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   ASPs initiate the ASP Up procedure it is assumed that the Error (ERR)
   message would normally come from the SGP.
 
+
+
+
+B. Bidulock                    Version 0.4                      Page 121
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 4.3.4.1.2.  IPSP Considerations
 
     An IPSP may be considered in the ASP-INACTIVE state after and ASPUP
@@ -6958,10 +7027,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   it.  The IPSP may inform Layer Management of the change in state of
   the remote IPSP using M-ASP_UP or M-ASP_DN indication or confirmation
   primitives.
-
-B. Bidulock                    Version 0.4                      Page 118
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     Alternatively, when using the IPSP DE model, an interchange of ASPUP
   messages from each end MUST be performed.  Four messages are needed
@@ -7007,6 +7072,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     When the ASP sends an ASP Down (ASPDN) message it starts timer
   T(ack).  If the ASP does not receive a response to an ASP Down (ASPDN)
+
+B. Bidulock                    Version 0.4                      Page 122
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   message within T(ack), the ASP MAY restart T(ack) and resend ASP Down
   (ASPDN) messages until it receives an ASP Down Ack (ASPDN ACK)
   message.  T(ack) is provisionable, with a default of 2 seconds.
@@ -7014,13 +7084,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   under control of Layer Management.  In this method, expiry of T(ack)
   results in an M-ASP_DOWN confirm primitive carrying a negative
   indication.
-
-
-
-
-B. Bidulock                    Version 0.4                      Page 119
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 4.3.4.3.  ASP Active Procedures
 
@@ -7067,6 +7130,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   allowing the SGP or IPSP to independently acknowledge the ASP Active
   (ASPAC) message for different (sets of) Routing Contexts.  The SGP or
   IPSP MUST send an Error (ERR) message ("Invalid Routing Context") for
+
+B. Bidulock                    Version 0.4                      Page 123
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   each Routing Context value that cannot be successfully activated.
 
     Whenever an "out-of-the-blue" ASP Active (ASPAC message is received
@@ -7076,11 +7144,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The SGP MUST send an ASP Active Ack (ASPAC ACK) message in response
   to a received ASP Active (ASPAC) message from the ASP, if the ASP is
-
-B. Bidulock                    Version 0.4                      Page 120
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   already marked in the ASP-ACTIVE state at the SGP.
 
     At the ASP, the ASP Active Ack (ASPAC ACK) message received is not
@@ -7125,6 +7188,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   SHOULD stop traffic to or from that ASP.  The ASP receiving this
   Notify MUST consider itself now in the ASP-INACTIVE state, if it is
   not already aware of this via inter- ASP communication with the
+
+B. Bidulock                    Version 0.4                      Page 124
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   Overriding ASP.
 
     In the case of a Load-share mode AS, reception of an ASP Active
@@ -7134,11 +7202,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   SGP for load-sharing traffic within an AS to all the active ASPs is
   implementation dependent.  The algorithm could, for example, be round
   robin or based on information in the DH or CH  message.
-
-
-B. Bidulock                    Version 0.4                      Page 121
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     An SGP or IPSP, upon reception of an ASP Active (ASPAC) message for
   the first ASP in a Load-share AS, MAY choose not to direct traffic to
@@ -7181,6 +7244,13 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   messages from each end MUST be performed.  Four messages are needed
   for completion.
 
+
+
+
+B. Bidulock                    Version 0.4                      Page 125
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 4.3.4.4.  ASP Inactive Procedures
 
     When an ASP wishes to withdraw from receiving traffic within an AS,
@@ -7193,12 +7263,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
    + If the corresponding RK is registered (statically or dynamically),
      the peer should respond with an ASP Inactive Ack (ASPIA Ack)
      message.
-
-
-B. Bidulock                    Version 0.4                      Page 122
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
    + If the RK is not registered, or the RC information is not valid,
      the peer must respond with an Error (ERR) message with error code
      "Invalid Routing Context".
@@ -7240,6 +7304,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   ("Insufficient ASP resources active in AS") MAY be sent to all
   inactive ASPs, if required.  An ASP Inactive Ack (ASPIA ACK) message
   is sent to the ASP after all traffic is halted and Layer Management is
+
+B. Bidulock                    Version 0.4                      Page 126
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   informed with an M-ASP_INACTIVE indication primitive.
 
     Multiple ASP Inactive Ack (ASPIA ACK) messages MAY be used in
@@ -7253,10 +7322,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The SGP MUST send an ASP Inactive Ack (ASPIA ACK) message in
   response to a received ASP Inactive (ASPIA) message from the ASP and
   the ASP is already marked as ASP-INACTIVE at the SGP.
-
-B. Bidulock                    Version 0.4                      Page 123
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     At the ASP, the ASP Inactive Ack (ASPIA ACK) message received is not
   acknowledged.  Layer Management is informed with an M-ASP_INACTIVE
@@ -7294,6 +7359,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   messages from each end MUST be performed.  Four messages are needed
   for completion.
 
+
+
+
+
+B. Bidulock                    Version 0.4                      Page 127
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 4.3.4.5.  Notify Procedures
 
     A Notify (NTFY) message reflecting a change in the AS state MUST be
@@ -7312,11 +7385,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   that now has no ASPs active to service the traffic, or where a Notify
   NTFY ("Insufficient ASP resources active in AS") message MUST be sent
   in the Load-share or Broadcast mode, the Notify (NTFY) message does
-
-B. Bidulock                    Version 0.4                      Page 124
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   not explicitly compel the ASP(s) receiving the message to become
   active.  The ASPs remain in control of what (and when) traffic action
   is taken.
@@ -7352,6 +7420,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The Heartbeat (BEAT) message may optionally contain an opaque
   Heartbeat Data parameter that MUST be echoed back unchanged in the
+
+B. Bidulock                    Version 0.4                      Page 128
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   related Heartbeat Ack (BEAT ACK) message.  The sender, upon examining
   the contents of the returned Heartbeat Ack (BEAT ACK) message, MAY
   choose to consider the remote TUA peer as unavailable.  The contents
@@ -7371,11 +7444,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     An ASP MAY dynamically register with an SGP as an ASP within an
   Application Server using the REG REQ message.  A Routing Key parameter
   in the REG REQ message specifies the parameters associated with the
-
-B. Bidulock                    Version 0.4                      Page 125
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Routing Key.
 
     The SGP examines the contents of the received Routing Key parameter
@@ -7410,6 +7478,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   Routing." An incoming signalling message received at an SGP should not
   match against more than one Routing Key.
 
+
+B. Bidulock                    Version 0.4                      Page 129
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
     If the SGP does not authorize the registration request, the SGP
   returns a REG RSP message to the ASP containing the Registration
   Result "Error - Permission Denied".
@@ -7430,11 +7503,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   are not supported for the purpose of creating new Routing Key entries,
   the SGP returns a Registration Response (REG RSP) message to the ASP,
   containing a Registration Result "Error - Unsupported RK parameter
-
-B. Bidulock                    Version 0.4                      Page 126
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   field".  This result MAY be used if, for example, the SGP does not
   support RK Address parameter.
 
@@ -7468,6 +7536,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     An ASP MAY dynamically deregister with an SGP as an ASP within an
   Application Server using the DEREG REQ message.  A Routing Context
+
+B. Bidulock                    Version 0.4                      Page 130
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   parameter in the DEREG REQ  message specifies which Routing Keys to
   deregister.  An ASP SHOULD move to the ASP-INACTIVE state for an
   Application Server before attempting to deregister the Routing Key
@@ -7487,12 +7560,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   in which case the Routing Key data MUST NOT be deleted.  If a
   Deregistration results in no more ASPs in an Application Server, an
   SGP MAY delete the Routing Key data.
-
-
-
-B. Bidulock                    Version 0.4                      Page 127
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The SGP acknowledges the deregistration request by returning a DEREG
   RSP message to the requesting ASP.  The result of the deregistration
@@ -7527,6 +7594,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     SSNM messages SHOULD NOT be sent on stream "0" and MAY use ordered
   delivery.
 
+
+B. Bidulock                    Version 0.4                      Page 131
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 4.5.2.  At an ASP
 
 4.5.2.1.  Single SG Configurations
@@ -7548,16 +7620,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     At an ASP, upon receiving a SS7 Signalling Network Management (SSNM)
   message from the remote TUA Peer, the TUA layer updates the status of
-
-B. Bidulock                    Version 0.4                      Page 128
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   the affected route(s) via the originating SG and determines, whether
   or not the overall availability or congestion status of the effected
   destination(s) or subsystem(s) has changed.  If so, the TUA layer
   invokes the appropriate primitive indications to the resident TC-Users
-  [1].  Local management is informed.
+  <1>.  Local management is informed.
 
 4.5.3.  ASP Auditing
 
@@ -7579,12 +7646,17 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
                 congestion status of the affected destinations or
                 subsystems.  The Timer is reset upon issuing a DAUD.  In
                 this case the DAUD is sent to the SGP that originally
-                sent the SSNM message [2].
+                sent the SSNM message <2>.
 
   - Isolation:  The ASP is newly ASP-ACTIVE or has been isolated from an
                 SG for an extended period.  The ASP MAY request the
                 availability and congestion status of one or more SS7
                 destinations or subsystems to which it expects to
+
+B. Bidulock                    Version 0.4                      Page 132
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
                 communicate.
 
     The SGP SHOULD either respond to a DAUD messages with SSNM messages
@@ -7606,14 +7678,8 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   with a list of all the destinations and subsystems for which the SGP
   cannot provide information.
 
-
-
-B. Bidulock                    Version 0.4                      Page 129
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
     In some cases, the SGP MAY chose not to respond to a DAUD message or
-  a component of a DAUD message on the basis of policy [3].
+  a component of a DAUD message on the basis of policy <3>.
 
     Any DUNA or DAVA message in response to a DAUD message MAY contain a
   list of Affected Point Codes.
@@ -7644,6 +7710,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   .np a valid SS7 address to reach a destination in the SS7 network via
   the appropriate SCTP association to a SG .np a valid IP address or
   host name to reach another ASP in the IP network via the appropriate
+
+B. Bidulock                    Version 0.4                      Page 133
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   SCTP association.
 
 4.5.4.2.  Segmenting and Reassembly of Components
@@ -7656,29 +7727,15 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   the underling transport, the SGP will respond with a TNOT message with
   "Segmentation Not Supported" or "Segmentation Failed" or "Destination
   cannot perform reassembly" indicated in the Report Cause within the
-  TNOT message considering local SG SCCP procedures [4].
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                      Page 130
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
+  TNOT message considering local SG SCCP procedures <4>.
 
 Notes for Section 4
 
-  [1]  IMPLEMENTATION NOTE:-  To accomplish the handling of SSNM
+  <1>  IMPLEMENTATION NOTE:-  To accomplish the handling of SSNM
        messages from multiple SGs in a multiple SG configuration, the
        TUA layer at an ASP maintains the status of routes via each SG.
 
-  [2]  IMPLEMENTATION NOTE:-  In the case of a Periodic audit, the
+  <2>  IMPLEMENTATION NOTE:-  In the case of a Periodic audit, the
        auditing procedure might not be invoked for the case of a
        received SCON message containing a congestion level value of
        "no congestion" or undefined" (i.e., congestion Level = "0").
@@ -7691,13 +7748,13 @@ Notes for Section 4
        reason, in the second of the cases above a DAUD message cannot
        reveal any congested destination(s).
 
-  [3]  IMPLEMENTATION NOTE:-  For example, an SGP MAY chose to not
+  <3>  IMPLEMENTATION NOTE:-  For example, an SGP MAY chose to not
        respond to a request for the destination or subsystem status of
        a specific point code in the DAUD message because the ASP that
        issued the DAUD message is not authorized to obtain information
        concerning the status of the destination as requested.
 
-  [4]  IMPLEMENTATION NOTE:-  Typically a TC-User is responsible for
+  <4>  IMPLEMENTATION NOTE:-  Typically a TC-User is responsible for
        performing the segmentation and reassembly of components.
 
 5.  Examples of TUA Procedures
@@ -7710,6 +7767,11 @@ Notes for Section 4
   establishment of traffic between an SG and an ASP, where only one ASP
   is configured within an AS (no backup).  It is assumed that the SCTP
   association is already set-up.
+
+
+B. Bidulock                    Version 0.4                      Page 134
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
                  SG                              ASP
                   |                                |
@@ -7725,11 +7787,6 @@ Notes for Section 4
 
     This scenario shows the example TUA message flows for the
   establishment of traffic between an SG and two ASPs in the same
-
-B. Bidulock                    Version 0.4                      Page 131
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Application Server, where ASP1 is configured to be "active" and ASP2 a
   "standby" in the event of communication failure or the withdrawal from
   service of ASP1.  ASP2 may act as a hot, warm, or cold standby
@@ -7762,6 +7819,18 @@ case)
   load-share the traffic load.  In this case, one ASP is sufficient to
   handle the total traffic load.
 
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                      Page 135
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
        SG                       ASP1                       ASP2
         |                         |                          |
         |<---------ASP Up---------|                          |
@@ -7784,11 +7853,6 @@ sharing case)
 
     This scenario shows the example TUA message flows for the
   establishment of traffic between an SG and three ASPs in the same
-
-B. Bidulock                    Version 0.4                      Page 132
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   Application Server, where two of the ASPs are brought to "active" and
   share the load.  In this case, a minimum of two ASPs are required to
   handle the total traffic load (2+1 sparing).
@@ -7819,6 +7883,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     ASP1 withdraws from service:
 
+
+
+B. Bidulock                    Version 0.4                      Page 136
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
        SG                       ASP1                       ASP2
         |                         |                          |
         |<-----ASP Inactive-------|                          |
@@ -7837,16 +7907,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 5.1.2.2.  (1+1 Sparing, Back-up Override)
 
     ASP2 wishes to override ASP1 and take over the traffic:
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                      Page 133
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
        SG                       ASP1                       ASP2
         |                         |                          |
@@ -7882,6 +7942,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
         or detection of SCTP failure), the first SG-ASP1 ASP Inactive
         (ASPIA) message exchange would not occur.
 
+
+B. Bidulock                    Version 0.4                      Page 137
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
 5.1.3.  TCAP/TC-User Service Translation Examples
 
   When the TUA layer on the ASP has a DH message to send to the SG, it
@@ -7903,10 +7968,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   When the TUA layer on the SG has a DH message to send to the ASP, it
   will do the following:
 
-B. Bidulock                    Version 0.4                      Page 134
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
    (1)   Determine the AS
 
    (2)   Determine the Active ASP (SCTP association) within the AS
@@ -7923,6 +7984,26 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   An example of the message flows for establishing a dialogue service is
   shown below.  An active association between ASP and SG is established
   (Section 5.1) prior to the following message flows.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                      Page 138
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 
                SG                             ASP
@@ -7961,11 +8042,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     The sequences below outline logical steps for a variety of scenarios
   within an IP-IP architecture.  Please note that these scenarios cover
-
-B. Bidulock                    Version 0.4                      Page 135
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   a Primary/Backup configuration.  Where there is a load-sharing
   configuration then the AS can declare availability when 1 ASP issues
   ASPAC but can only declare unavailability when all ASPs have issued
@@ -7980,6 +8056,12 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   simplicity, the Management Instances and ASPs are considered as a
   separate entity.  This is not a requirement, as they can be collocated
   with an ASP.
+
+
+
+B. Bidulock                    Version 0.4                      Page 139
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
     The following must be established before TUA traffic can flow.  A
   connection-less flow is shown for simplicity.
@@ -8020,11 +8102,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
                          <----------------ASP Up---------------------+
                          +----------------ASP Up Ack----------------->
 
-
-B. Bidulock                    Version 0.4                      Page 136
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
     +---------------ASP Act------------------>
     <---------------ASP Act Ack--------------+
 
@@ -8035,6 +8112,14 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
     +-------------------------------TCAP_User Message------------------>
 
+
+
+
+
+
+B. Bidulock                    Version 0.4                      Page 140
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 5.2.2.  Fail-over scenarios
 
@@ -8080,10 +8165,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   the SCTP DATA chunk.  The following SCTP Payload Protocol Identifier
   is registered:
 
-B. Bidulock                    Version 0.4                      Page 137
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
                 TUA "5"
 
     The SCTP Payload Protocol Identifier value "5" SHOULD be included in
@@ -8092,6 +8173,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   values MUST NOT be used.  This Payload Protocol Identifier is not
   directly used by SCTP but MAY be used by certain network entities to
   identify the type of information being carried in a DATA chunk.
+
+
+B. Bidulock                    Version 0.4                      Page 141
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
       EDITOR'S NOTE:-  The value shown above as "5" is to be
       assigned by IANA an may change in future versions of this
@@ -8121,7 +8207,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
     The definition and use of new message classes, types and parameters
   is an integral part of SIGTRAN adaptation layers.  Thus, these
   extensions are assigned by IANA through an IETF Consensus action as
-  defined in [RFC 2434].
+  defined in [RFC2434].
 
     The proposed extension MUST in no way adversely affect the general
   working of the protocol.
@@ -8137,12 +8223,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
    (2)   A detailed description of the purpose of the message class.
 
-
-
-B. Bidulock                    Version 0.4                      Page 138
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
 7.3.2.  IETF Defined Message Types
 
     Documentation of the message type MUST contain the following
@@ -8151,6 +8231,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
    (1)   A long and short name for the new message type;
 
    (2)   A detailed description of the structure of the message.
+
+
+B. Bidulock                    Version 0.4                      Page 142
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
    (3)   A detailed definition and description of intended use of each
          field within the message.
@@ -8196,12 +8281,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
       T(beat)   Heartbeat Timer            30 seconds
 
 
-
-
-B. Bidulock                    Version 0.4                      Page 139
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
 Appendices
 
 A.  Operational Considerations
@@ -8210,6 +8289,12 @@ A.1.  Signalling Network Architecture
 
     A Signalling Gateway is used to support the transport of TC-User
   signalling traffic received from the SS7 network to multiple
+
+
+B. Bidulock                    Version 0.4                      Page 143
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   distributed ASPs (e.g., MGCs and IP Databases).  Clearly, the TUA
   protocol is not designed to meet the performance and reliability
   requirements for such transport by itself.  However, the conjunction
@@ -8257,9 +8342,16 @@ A.1.  Signalling Network Architecture
 
 
 
-B. Bidulock                    Version 0.4                      Page 140
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                      Page 144
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
             SGs                                     MGCs
            ..............                          ..............
@@ -8315,10 +8407,9 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   signalling processes.
 
 
-
-B. Bidulock                    Version 0.4                      Page 141
+B. Bidulock                    Version 0.4                      Page 145
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
     For carrier grade networks, the failure or isolation of a particular
   signalling process should not cause transactions to be lost.  This
@@ -8374,10 +8465,9 @@ A.2.1.  Application Server Redundancy
   a particular AS.
 
 
-
-B. Bidulock                    Version 0.4                      Page 142
+B. Bidulock                    Version 0.4                      Page 146
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
     For example, where Application Servers are defined using ranges of
   GT Address values, the Operator is implicitly splitting up control of
@@ -8432,12 +8522,12 @@ A.2.2.  Signalling Gateway Redundancy
   destinations, subsystems and applications of interest.  This
   information is crucial to the overall reliability of the service, for
   override, load-sharing and broadcast models, in the event of failures,
-  recovery and maintenance activities.  The ASP TUA may also use this
 
-B. Bidulock                    Version 0.4                      Page 143
+B. Bidulock                    Version 0.4                      Page 147
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
+  recovery and maintenance activities.  The ASP TUA may also use this
   information for congestion avoidance purposes.  The distribution of
   the TC-user messages over the SGPs should be done in such a way to
   minimize message mis-sequencing, as required by the some TCAP
@@ -8454,6 +8544,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
    + changed to new boilerplate for first and last page
    + updated references and version numbers
+   + resubmitted to sync with IETF numbering
 
 0.3.  Changes from Version 0.2 to Version 0.3
 
@@ -8478,11 +8569,24 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 Change Log
 
     $Log: draft-bidulock-sigtran-tua-04.txt,v $
-    Revision 0.9.2.1  2005/12/28 05:52:48  brian
-    - missed files
+    Revision 0.9.2.2  2006/06/27 09:56:33  brian
+    - rereleased drafts
+
+    Revision 0.9.2.6  2006/06/27 09:41:13  brian
+    - rereleased drafts
+
+    Revision 0.9.2.5  2006/06/18 20:53:33  brian
+    - preparing for draft rerelease
+
+    Revision 0.9.2.4  2005/11/01 11:20:46  brian
+    - updates for testing and documentation
 
     Revision 0.9.2.3  2005/10/17 11:53:44  brian
     - updated drafts for republication
+
+B. Bidulock                    Version 0.4                      Page 148
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
     Revision 0.9.2.2  2005/05/14 08:33:17  brian
     - copyright header correction
@@ -8496,25 +8600,23 @@ Change Log
     Revision 0.8.2.4  2003/07/28 13:12:48  brian
     Reformatting.
 
-B. Bidulock                    Version 0.4                      Page 144
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+
 
 
 R.  References
 
 R.1.  Normative References
 
-  [RFC 2119]  Bradner, S., "Key words for use in RFCs to Indicate
+  [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
        Requirement Levels," RFC 2119 - BCP 14, The Internet Society
        (March 1997).
 
-  [RFC 2960]  Stewart, R., Xie, Q., Morneault, K., Sharp, C.,
+  [RFC2960]  Stewart, R., Xie, Q., Morneault, K., Sharp, C.,
        Schwarzbauer, H. J., Taylor, T., Rytina, I., Kalla, H., Zhang, L.
        and Paxson, V., "Stream Control Transmission Protocol (SCTP),"
        RFC 2960, The Internet Society (February 2000).
 
-  [RFC 2279]  Yergenau, F., "UTF-8, a transformation format of ISO
+  [RFC2279]  Yergenau, F., "UTF-8, a transformation format of ISO
        10646," RFC 2279, Internet Engineering Task Force (January 1998).
 
   [X.680]  ITU, "Abstract Syntax Notation One (ASN.1): Specification of
@@ -8527,18 +8629,23 @@ R.1.  Normative References
        3788, Internet Engineering Task Force - Signalling Transport
        Working Group (June 2004).
 
-  [RFC 2434]  Narten, T., Alvestrand, H. T., "Guidelines for Writing an
+  [RFC2434]  Narten, T., Alvestrand, H. T., "Guidelines for Writing an
        IANA Considerations Section in RFCs," RFC 2434, The Internet
        Society (October, 1998).
 
 R.2.  Informative References
 
-  [RFC 2719]  Ong, L., Rytina, I., Holdrege, M., Coene, L., Garcia,
+  [RFC2719]  Ong, L., Rytina, I., Holdrege, M., Coene, L., Garcia,
        M.-A., Sharp, C., Juhasz, I., Lin, H. P. and Schwarzbauer,
        HannsJ., "Framework Architecture for Signaling Transport," RFC
        2719, The Internet Society (October, 1999).
 
   [Q.771]  ITU, "Signalling System No. 7 - Functional Description of
+
+B. Bidulock                    Version 0.4                      Page 149
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
        Transaction Capabilities," ITU-T Recommendation Q.771, ITU-T
        Telecommunication Standardization Sector of ITU, Geneva (March
        1993).  (Previously "CCITT Recommendation")
@@ -8555,16 +8662,12 @@ R.2.  Informative References
   [T1.111]  ANSI, "Signalling System No. 7 - Message Transfer Part,"
        ANSI T1.111, American National Standards Institue (1992).
 
-B. Bidulock                    Version 0.4                      Page 145
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
   [Q.711]  ITU, "Functional Description of Signalling Connection Control
        Part," ITU-T Recommendation Q.711, ITU-T Telecommunication
        Standardization Sector of ITU, Geneva (March 1993).  (Previously
        "CCITT Recommendation")
 
-  [RFC 2916]  Falstrom, P., "E.164 number and DNS (ENUM)," RFC 2916, The
+  [RFC2916]  Falstrom, P., "E.164 number and DNS (ENUM)," RFC 2916, The
        Internet Society (September 2000).
 
   [Q.704]  ITU, "Message Transfer Part - Signalling Network Functions
@@ -8596,6 +8699,11 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
        Telecommunication Standardization Sector of ITU, Geneva (March
        1993).  (Previously "CCITT Recommendation")
 
+
+B. Bidulock                    Version 0.4                      Page 150
+
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
+
   [Q.775]  ITU, "Signalling System No. 7 - Guidelines for Using
        Transaction Capabilities," ITU-T Recommendation Q.775, ITU-T
        Telecommunication Standardization Sector of ITU, Geneva (March
@@ -8604,7 +8712,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   [CORID]  Bidulock, B., "Correlation Id and Heartbeat Procedures
        Supporting Lossless Fail-Over," <draft-bidulock-sigtran-
        corid-03.txt>, Internet Engineering Task Force - Signalling
-       Transport Working Group (February 24, 2004).  Work In Progress.
+       Transport Working Group (October 16, 2005).  Work In Progress.
 
   [Q.714]  ITU, "Signalling Connection Control Part Procedures," ITU-T
        Recommendation Q.714, ITU-T Telecommunication Standardization
@@ -8613,11 +8721,6 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
   [Q.713]  ITU, "Signalling Connection Control Part Formats and Codes,"
        ITU-T Recommendation Q.713, ITU-T Telecommunication
-
-B. Bidulock                    Version 0.4                      Page 146
-
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
-
        Standardization Sector of ITU, Geneva (March 1993).  (Previously
        "CCITT Recommendation")
 
@@ -8644,7 +8747,7 @@ Author's Addresses
 
 
 
-  This draft expires April 2006.
+  This draft expires December 2006.
 
 
 
@@ -8655,44 +8758,26 @@ Author's Addresses
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                      Page 147
+B. Bidulock                    Version 0.4                      Page 151
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 
                             List of Tables
 
   Table 1. Mapping of Management Primitives .......................    9
-  Table 2. Mapping of Dialogue Handling Primitives ................   15
-  Table 3. Mapping of Component Handling Primitives ...............   16
+  Table 2. Mapping of Dialogue Handling Primitives ................   16
+  Table 3. Mapping of Component Handling Primitives ...............   17
 
                         List of Illustrations
 
   Figure 1. Protocol Architecture .................................    6
   Figure 2. All IP Architecture ...................................    7
   Figure 3. TUA Protocol Boundaries ...............................   15
-  Figure 4. TUA Layer Model .......................................  109
-  Figure 5. ASP State Transition Diagram (Per AS) .................  114
-  Figure 6. AS State Transition Diagram ...........................  116
-  Figure 7. Physical Model ........................................  141
+  Figure 4. TUA Layer Model .......................................  112
+  Figure 5. ASP State Transition Diagram (Per AS) .................  117
+  Figure 6. AS State Transition Diagram ...........................  119
+  Figure 7. Physical Model ........................................  145
 
                           Table of Contents
 
@@ -8715,7 +8800,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   1.4.1 Dialogue Identifiers, Routing Contexts and Routing Keys
     ...............................................................   10
   1.4.2 Routing Key Limitations ...................................   10
-  1.4.3 Managing Routing Context and Routing Keys .................   10
+  1.4.3 Managing Routing Context and Routing Keys .................   11
   1.4.4 Transaction Mapping Function ..............................   11
   1.4.5 Signalling Gateway SS7 Layers .............................   12
   1.4.6 SS7 and TUA Interworking at the SG ........................   13
@@ -8724,167 +8809,162 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
   1.4.9 Application Server Redundancy .............................   14
   1.4.10 Flow Control .............................................   14
   1.4.11  Congestion Management ...................................   14
-  1.5 Definition of TUA Boundaries ................................   14
+  1.5 Definition of TUA Boundaries ................................   15
   1.5.1 Definition of Upper Boundary ..............................   15
   1.5.2 Definition of Boundary between TUA and Layer Management
-    ...............................................................   16
-  1.5.3 Definition of the Lower Boundary ..........................   20
-  Notes for Section 1 .............................................   20
-  2 Conventions ...................................................   20
+    ...............................................................   17
+  1.5.3 Definition of the Lower Boundary ..........................   21
+  Notes for Section 1 .............................................   21
 
-B. Bidulock                    Version 0.4                      Page 148
+B. Bidulock                    Version 0.4                      Page 152
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
-  3 Protocol Elements .............................................   21
-  3.1 Common Message Header .......................................   21
-  3.1.1 TUA Protocol Version ......................................   22
-  3.1.2 Message Classes ...........................................   22
-  3.1.3 Message Types .............................................   22
-  3.1.4 Message Length ............................................   24
-  3.1.5 Tag-Length-Value Format ...................................   24
-  3.2 TUA Message Header ..........................................   25
-  3.3 TUA Dialogue Handling (DH) Messages .........................   26
-  3.3.1 DH Message Header .........................................   26
-  3.3.2 Unidirectional (TUNI) .....................................   26
-  3.3.3 Query (TQRY) ..............................................   28
-  3.3.4 Conversation (TCNV) .......................................   30
-  3.3.5 Response (TRSP) ...........................................   32
-  3.3.6 U-Abort (TUAB) ............................................   34
-  3.3.7 P-Abort (TPAB) ............................................   35
-  3.3.8 Notice (TNOT) .............................................   35
-  3.4 TUA Component Handling (CH) Messages ........................   36
-  3.4.1 CH Message Header .........................................   36
-  3.4.2 Invoke (CINV) .............................................   37
-  3.4.3 Result (CRES) .............................................   38
-  3.4.4 Error (CERR) ..............................................   39
-  3.4.5 Reject (CREJ) .............................................   40
-  3.4.6 Cancel (CCAN) .............................................   41
-  3.5 SS7 Signalling Network Management (SSNM) Messages ...........   41
-  3.5.1 Destination Unavailable (DUNA) ............................   41
-  3.5.2 Destination Available (DAVA) ..............................   43
-  3.5.3 Destination State Audit (DAUD) ............................   44
-  3.5.4 Network Congestion (SCON) .................................   45
-  3.5.5 Destination User Part Unavailable (DUPU) ..................   47
-  3.5.6 Destination Restricted (DRST) .............................   48
+  2 Conventions ...................................................   21
+  3 Protocol Elements .............................................   22
+  3.1 Common Message Header .......................................   22
+  3.1.1 TUA Protocol Version ......................................   23
+  3.1.2 Message Classes ...........................................   23
+  3.1.3 Message Types .............................................   23
+  3.1.4 Message Length ............................................   25
+  3.1.5 Tag-Length-Value Format ...................................   25
+  3.2 TUA Message Header ..........................................   26
+  3.3 TUA Dialogue Handling (DH) Messages .........................   27
+  3.3.1 DH Message Header .........................................   27
+  3.3.2 Unidirectional (TUNI) .....................................   27
+  3.3.3 Query (TQRY) ..............................................   29
+  3.3.4 Conversation (TCNV) .......................................   31
+  3.3.5 Response (TRSP) ...........................................   33
+  3.3.6 U-Abort (TUAB) ............................................   35
+  3.3.7 P-Abort (TPAB) ............................................   36
+  3.3.8 Notice (TNOT) .............................................   36
+  3.4 TUA Component Handling (CH) Messages ........................   37
+  3.4.1 CH Message Header .........................................   37
+  3.4.2 Invoke (CINV) .............................................   38
+  3.4.3 Result (CRES) .............................................   39
+  3.4.4 Error (CERR) ..............................................   40
+  3.4.5 Reject (CREJ) .............................................   41
+  3.4.6 Cancel (CCAN) .............................................   42
+  3.5 SS7 Signalling Network Management (SSNM) Messages ...........   42
+  3.5.1 Destination Unavailable (DUNA) ............................   42
+  3.5.2 Destination Available (DAVA) ..............................   44
+  3.5.3 Destination State Audit (DAUD) ............................   45
+  3.5.4 Network Congestion (SCON) .................................   46
+  3.5.5 Destination User Part Unavailable (DUPU) ..................   48
+  3.5.6 Destination Restricted (DRST) .............................   49
   3.6 Application Server Process State Maintenance (ASPSM)
-    Messages ......................................................   50
-  3.6.1 ASP Up (UP) ...............................................   50
-  3.6.2 ASP Up Ack (UP ACK) .......................................   50
-  3.6.3 ASP Down (DOWN) ...........................................   51
-  3.6.4 ASP Down Ack (DOWN ACK) ...................................   51
-  3.6.5 Heartbeat (BEAT) ..........................................   52
-  3.6.6 Heartbeat Ack (BEAT ACK) ..................................   52
+    Messages ......................................................   51
+  3.6.1 ASP Up (UP) ...............................................   51
+  3.6.2 ASP Up Ack (UP ACK) .......................................   51
+  3.6.3 ASP Down (DOWN) ...........................................   52
+  3.6.4 ASP Down Ack (DOWN ACK) ...................................   52
+  3.6.5 Heartbeat (BEAT) ..........................................   53
+  3.6.6 Heartbeat Ack (BEAT ACK) ..................................   53
   3.7 Application Server Process Traffic Maintenance (ASPTM)
-    Messages ......................................................   53
-  3.7.1 ASP Active (ASPAC) ........................................   53
-  3.7.2 ASP Active Ack (ASPAC ACK) ................................   54
-  3.7.3 ASP Inactive (ASPIA) ......................................   55
-  3.7.4 ASP Inactive Ack (ASPIA ACK) ..............................   55
-  3.8 Management (MGMT) Messages ..................................   56
-  3.8.1 Error (ERR) ...............................................   56
-  3.8.2 Notify (NTFY) .............................................   58
-  3.9 Routing Key Management (RKM) Messages .......................   59
-  3.9.1 Registration Request (REG REQ) ............................   59
-  3.9.2 Registration Response (REG RSP) ...........................   60
-  3.9.3 Deregistration Request (DEREG REQ) ........................   61
-  3.9.4 Deregistration Response (DEREG RSP) .......................   61
-  3.10 Common Parameters ..........................................   62
+    Messages ......................................................   54
+  3.7.1 ASP Active (ASPAC) ........................................   54
+  3.7.2 ASP Active Ack (ASPAC ACK) ................................   55
+  3.7.3 ASP Inactive (ASPIA) ......................................   56
+  3.7.4 ASP Inactive Ack (ASPIA ACK) ..............................   56
+  3.8 Management (MGMT) Messages ..................................   57
+  3.8.1 Error (ERR) ...............................................   57
+  3.8.2 Notify (NTFY) .............................................   59
+  3.9 Routing Key Management (RKM) Messages .......................   60
+  3.9.1 Registration Request (REG REQ) ............................   60
+  3.9.2 Registration Response (REG RSP) ...........................   61
+  3.9.3 Deregistration Request (DEREG REQ) ........................   62
 
-B. Bidulock                    Version 0.4                      Page 149
+B. Bidulock                    Version 0.4                      Page 153
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
-  3.10.1 Info String ..............................................   63
-  3.10.2 Routing Context ..........................................   63
-  3.10.3 Diagnostic Information ...................................   64
-  3.10.4 Heartbeat Data ...........................................   65
-  3.10.5 Traffic Mode Type ........................................   65
-  3.10.6 Error Code ...............................................   66
-  3.10.7 Status ...................................................   69
-  3.10.8 ASP Identifier ...........................................   70
-  3.10.9 Affected Point Code ......................................   70
-  3.10.10 Correlation Id ..........................................   72
-  3.10.11 Registration Result .....................................   73
-  3.10.12 Deregistration Result ...................................   73
-  3.10.13 Registration Status .....................................   74
-  3.10.14 Deregistration Status ...................................   75
-  3.10.15 Local Routing Key Identifier ............................   75
-  3.11 TUA-Specific parameters ....................................   76
-  3.11.1 Parameters used in DH Messages ...........................   77
-  3.11.2 Parameters used in CH Messages ...........................   90
-  3.11.3 Other Parameters .........................................   97
-  Notes for Section 3 .............................................  107
-  4 Procedures ....................................................  108
-  4.1 Procedures to Support the TC-User ...........................  108
-  4.1.1 Receipt of Primitives from the TC-User ....................  108
-  4.1.2 Receipt of Primitives from TCAP ...........................  109
-  4.1.3 Receipt of Primitive from the Layer Management ............  111
+  3.9.4 Deregistration Response (DEREG RSP) .......................   63
+  3.10 Common Parameters ..........................................   64
+  3.10.1 Info String ..............................................   64
+  3.10.2 Routing Context ..........................................   65
+  3.10.3 Diagnostic Information ...................................   66
+  3.10.4 Heartbeat Data ...........................................   66
+  3.10.5 Traffic Mode Type ........................................   67
+  3.10.6 Error Code ...............................................   68
+  3.10.7 Status ...................................................   71
+  3.10.8 ASP Identifier ...........................................   72
+  3.10.9 Affected Point Code ......................................   72
+  3.10.10 Correlation Id ..........................................   74
+  3.10.11 Registration Result .....................................   74
+  3.10.12 Deregistration Result ...................................   75
+  3.10.13 Registration Status .....................................   76
+  3.10.14 Deregistration Status ...................................   77
+  3.10.15 Local Routing Key Identifier ............................   77
+  3.11 TUA-Specific parameters ....................................   78
+  3.11.1 Parameters used in DH Messages ...........................   79
+  3.11.2 Parameters used in CH Messages ...........................   93
+  3.11.3 Other Parameters .........................................  100
+  Notes for Section 3 .............................................  110
+  4 Procedures ....................................................  111
+  4.1 Procedures to Support the TC-User ...........................  111
+  4.1.1 Receipt of Primitives from the TC-User ....................  111
+  4.1.2 Receipt of Primitives from TCAP ...........................  112
+  4.1.3 Receipt of Primitive from the Layer Management ............  114
   4.2 Procedures to Support the Management of SCTP Associations
-    ...............................................................  112
-  4.2.1 Receipt of TUA Peer Management Messages ...................  112
-  4.3 AS and ASP State Maintenance ................................  112
-  4.3.1 ASP/IPSP States ...........................................  113
-  4.3.2 AS States .................................................  115
-  4.3.3 TUA Management Procedures for Primitives ..................  116
-  4.3.4 ASPM Procedures for Peer-to-Peer Messages .................  117
-  4.4 Routing Key Management Procedures ...........................  125
-  4.4.1 Registration ..............................................  125
-  4.4.2 Deregistration ............................................  127
-  4.4.3 IPSP Considerations (REG/DEREG) ...........................  128
-  4.5 Procedures to Support Point Code and Subsystem State ........  128
-  4.5.1 At an SGP .................................................  128
-  4.5.2 At an ASP .................................................  128
-  4.5.3 ASP Auditing ..............................................  129
-  4.5.4 TCAP - TUA Interworking at the SG .........................  130
-  Notes for Section 4 .............................................  131
-  5 Examples of TUA Procedures ....................................  131
+    ...............................................................  115
+  4.2.1 Receipt of TUA Peer Management Messages ...................  115
+  4.3 AS and ASP State Maintenance ................................  116
+  4.3.1 ASP/IPSP States ...........................................  116
+  4.3.2 AS States .................................................  118
+  4.3.3 TUA Management Procedures for Primitives ..................  120
+  4.3.4 ASPM Procedures for Peer-to-Peer Messages .................  120
+  4.4 Routing Key Management Procedures ...........................  129
+  4.4.1 Registration ..............................................  129
+  4.4.2 Deregistration ............................................  130
+  4.4.3 IPSP Considerations (REG/DEREG) ...........................  131
+  4.5 Procedures to Support Point Code and Subsystem State ........  131
+  4.5.1 At an SGP .................................................  131
+  4.5.2 At an ASP .................................................  132
+  4.5.3 ASP Auditing ..............................................  132
+  4.5.4 TCAP - TUA Interworking at the SG .........................  133
+  Notes for Section 4 .............................................  134
+  5 Examples of TUA Procedures ....................................  134
   5.1 Establishment of Association and Traffic between SGPs and
-    ASPs ..........................................................  131
-  5.1.2 ASP Traffic Fail-over Examples ............................  133
-  5.1.3 TCAP/TC-User Service Translation Examples .................  134
-  5.2 IP-IP Architecture ..........................................  135
-  5.2.1 Establishment of TUA connectivity .........................  136
-  5.2.2 Fail-over scenarios .......................................  137
-  6 Security Considerations .......................................  137
-  7 IANA Considerations ...........................................  137
-  7.1 SCTP Payload Protocol ID ....................................  137
+    ASPs ..........................................................  134
+  5.1.2 ASP Traffic Fail-over Examples ............................  136
+  5.1.3 TCAP/TC-User Service Translation Examples .................  138
+  5.2 IP-IP Architecture ..........................................  139
+  5.2.1 Establishment of TUA connectivity .........................  139
+  5.2.2 Fail-over scenarios .......................................  141
 
-B. Bidulock                    Version 0.4                      Page 150
+B. Bidulock                    Version 0.4                      Page 154
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
-  7.2 Port Number .................................................  138
-  7.3 Protocol Extensions .........................................  138
-  7.3.1 IETF Defined Message Classes ..............................  138
-  7.3.2 IETF Defined Message Types ................................  139
-  7.3.3 IETF-defined TLV Parameter Extension ......................  139
-  8 Timer Values ..................................................  139
-  Appendices ......................................................  140
-  A Operational Considerations ....................................  140
-  A.1 Signalling Network Architecture .............................  140
-  A.2 Redundancy Models ...........................................  142
-  A.2.1 Application Server Redundancy .............................  142
-  A.2.2 Signalling Gateway Redundancy .............................  143
-  0 Change History ................................................  144
-  0.4 Changes from Version 0.3 to Version 0.4 .....................  144
-  0.3 Changes from Version 0.2 to Version 0.3 .....................  144
-  0.2 Changes from Version 0.1 to Version 0.2 .....................  144
-  0.1 Changes from Version 0.0 to Version 0.1 .....................  144
-  Change Log ......................................................  144
-  R References ....................................................  145
-  R.1 Normative References ........................................  145
-  R.2 Informative References ......................................  145
-  Acknowledgments .................................................  147
-  Author's Addresses ..............................................  147
-  List of Tables ..................................................  148
-  List of Illustrations ...........................................  148
-  Table of Contents ...............................................  148
-
-
-
-
-
+  6 Security Considerations .......................................  141
+  7 IANA Considerations ...........................................  141
+  7.1 SCTP Payload Protocol ID ....................................  141
+  7.2 Port Number .................................................  142
+  7.3 Protocol Extensions .........................................  142
+  7.3.1 IETF Defined Message Classes ..............................  142
+  7.3.2 IETF Defined Message Types ................................  142
+  7.3.3 IETF-defined TLV Parameter Extension ......................  143
+  8 Timer Values ..................................................  143
+  Appendices ......................................................  143
+  A Operational Considerations ....................................  143
+  A.1 Signalling Network Architecture .............................  143
+  A.2 Redundancy Models ...........................................  146
+  A.2.1 Application Server Redundancy .............................  146
+  A.2.2 Signalling Gateway Redundancy .............................  147
+  0 Change History ................................................  148
+  0.4 Changes from Version 0.3 to Version 0.4 .....................  148
+  0.3 Changes from Version 0.2 to Version 0.3 .....................  148
+  0.2 Changes from Version 0.1 to Version 0.2 .....................  148
+  0.1 Changes from Version 0.0 to Version 0.1 .....................  148
+  Change Log ......................................................  148
+  R References ....................................................  149
+  R.1 Normative References ........................................  149
+  R.2 Informative References ......................................  149
+  Acknowledgments .................................................  151
+  Author's Addresses ..............................................  151
+  List of Tables ..................................................  152
+  List of Illustrations ...........................................  152
+  Table of Contents ...............................................  152
 
 
 
@@ -8909,9 +8989,10 @@ Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
 
 
 
-B. Bidulock                    Version 0.4                      Page 151
+
+B. Bidulock                    Version 0.4                      Page 155
 
-Internet Draft       SS7 TCAP-User Adaptation Layer     October 16, 2005
+Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 
 Intellectual Property
 
@@ -8949,7 +9030,7 @@ Disclaimer of Validity
 
 Full Copyright Statement
 
-  Copyright (C) The Internet Society (2005).  This document is subject
+  Copyright (C) The Internet Society (2006).  This document is subject
   to the rights, licenses and restrictions contained in BCP 78, and
   except as set forth therein, the authors retain all their rights.
 
@@ -8967,6 +9048,5 @@ Acknowledgement
 
 
 
-
-B. Bidulock                    Version 0.4                      Page 152
+B. Bidulock                    Version 0.4                      Page 156
 

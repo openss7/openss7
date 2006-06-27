@@ -4,8 +4,8 @@
 Network Working Group                                     Brian Bidulock
 INTERNET-DRAFT                                       OpenSS7 Corporation
 
-                                                        October 16, 2005
-Expires in April 2006
+                                                           June 18, 2006
+Expires in December 2006
 
 
 
@@ -37,28 +37,32 @@ Status of this Memo
     The list of Internet-Draft Shadow Directories can be accessed at
   http://www.ietf.org/shadow.html.
 
-    This Internet-Draft will expire in April 2006.
+    This Internet-Draft will expire in December 2006.
 
 Copyright
 
-    Copyright (C) The Internet Society (2005).
+    Copyright (C) The Internet Society (2006).
 
 Abstract
 
     This Internet-Draft describes ASP Extensions (ASPEXT) for Signalling
-  User Adaptation Protocols [IUA-BIS..SUA, DUA..TUA], which permits
-  cooperating Signalling Peer Processes (SPPs) to indicate to each other
-  the specific protocol extensions that each supports.
+  User Adaptation Protocols [IUA-BIS], [DUA], [V5UA], [GR303UA00],
+  [M2UA], [M3UA-BIS], [SUA], [ISUA], [TUA], which permits cooperating
+  Signalling Peer Processes (SPPs) to indicate to each other the
+  specific protocol extensions that each supports.
+
+
+
+
+
+B. Bidulock                    Version 0.4                        Page 1
+
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
 Contents
 
     A complete table of contents, list of tables and illustrations, and
   change history appears at the end of this document.
-
-
-B. Bidulock                    Version 0.4                        Page 1
-
-Internet Draft                  UA ASPEXT               October 16, 2005
 
 1.  Introduction
 
@@ -66,9 +70,10 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
     This Internet-Draft provides parameters and procedures in extension
   to the parameters and procedures of the Signalling User Adaptation
-  Layers (UAs) [IUA-BIS..SUA, DUA..TUA], for the purpose of supporting a
-  framework for extending the parameters and procedures of these
-  Adaptation Layers.
+  Layers (UAs) [IUA-BIS], [DUA], [V5UA], [GR303UA00], [M2UA], [M3UA-
+  BIS], [SUA], [ISUA], [TUA], for the purpose of supporting a framework
+  for extending the parameters and procedures of these Adaptation
+  Layers.
 
     UA implementations with ASPEXT are intended to be compatible with UA
   implementations not supporting this configuration.
@@ -104,6 +109,14 @@ Internet Draft                  UA ASPEXT               October 16, 2005
       SSP     --Service Switching Point.
       SUA     --SS7 SCCP-User Adpatation Layer.
       TCAP    --Transaction Capabilities Application Part.
+
+
+
+
+B. Bidulock                    Version 0.4                        Page 2
+
+Internet Draft                  UA ASPEXT                  June 18, 2006
+
       TUA     --SS7 TCAP-User Adaptation Layer.
       UA      --User Adaptation Layer.
       WG      --Working Group
@@ -114,11 +127,6 @@ Internet Draft                  UA ASPEXT               October 16, 2005
     ASPEXT adds the following terms to the terminology presented in the
   UA documents:
 
-
-B. Bidulock                    Version 0.4                        Page 2
-
-Internet Draft                  UA ASPEXT               October 16, 2005
-
   ASP Extension (ASPEXT) - An extension to one or more of the the UAs
       that requires identification of the capabilities of the SPP to
       support the extension as part of its requirements.
@@ -126,10 +134,10 @@ Internet Draft                  UA ASPEXT               October 16, 2005
   Signalling Peer Process (SPP) - refers to an ASP, SGP or IPSP.
 
   Signalling User Adaptation Layer (UA) - one or more of the Stream
-      Control Transmission Protocol (SCTP) [RFC 2960] ISDN Signalling
-      User Adaptation Layers [IUA-BIS, DUA..GR303UA00] or SS7 Signalling
-      User Adaptation Layers [M2UA..SUA, ISUA, TUA].  supporting the
-      concept of ASP Management[1].
+      Control Transmission Protocol (SCTP) [RFC2960] ISDN Signalling
+      User Adaptation Layers [IUA-BIS], [DUA], [V5UA], [GR303UA00] or
+      SS7 Signalling User Adaptation Layers [M2UA], [M3UA-BIS], [SUA],
+      [ISUA], [TUA].  supporting the concept of ASP Management<1>.
 
 1.4.  Overview
 
@@ -145,7 +153,7 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
 1.4.1.  Existing Extension Management
 
-    The existing UA procedures[2] make no provisions for the management
+    The existing UA procedures<2> make no provisions for the management
   of extensions.  Any mechanism that an SPP might use to determine the
   extension support of peer SPPs depends upon implementation dependent
   configuration information or protocols between SPPs.
@@ -157,8 +165,15 @@ Internet Draft                  UA ASPEXT               October 16, 2005
   mechanism to determine this information.
 
     The lack of an IETF procedure for managing extension support
-  represents a deficiency of the existing UA procedures[2] that detracts
+  represents a deficiency of the existing UA procedures<2> that detracts
   from interoperability between separate implementations of SPP peers.
+
+
+
+
+B. Bidulock                    Version 0.4                        Page 3
+
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
 1.4.2.  ASP Extension Management
 
@@ -171,38 +186,29 @@ Internet Draft                  UA ASPEXT               October 16, 2005
    + Support for an SPP supporting ASPEXT interworking with an SPP that
      does not support ASPEXT.
 
-
-
-
-B. Bidulock                    Version 0.4                        Page 3
-
-Internet Draft                  UA ASPEXT               October 16, 2005
-
-
 Notes for Section 1
 
-  [1]  Currently all SS7 Signalling User Adaptation Layers support ASP
+  <1>  Currently all SS7 Signalling User Adaptation Layers support ASP
        Management with the exception of M2PA [M2PA].
 
-  [2]  See, for example, Section 4 of the specific UA document [M3UA-
-       BIS, SUA, ISUA, TUA].
+  <2>  See, for example, Section 4 of the specific UA document [M3UA-
+       BIS], [SUA], [ISUA], [TUA].
 
 2.  Conventions
 
-    The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-  "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-  "OPTIONAL", when they appear in this document, are to be interpreted
-  as described in [RFC 2119].
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in [RFC2119].
 
 3.  Protocol Elements
 
     ASPEXT provides the following parameters and the messages in which
-  they are included in addition to the parameters of the UAs.[1]
+  they are included in addition to the parameters of the UAs.<1>
 
 3.1.  Parameters
 
     ASPEXT provides the following parameters in addition to the
-  parameters defined for the UAs.[1]
+  parameters defined for the UAs.<1>
 
 3.1.1.  ASP Extensions
 
@@ -211,7 +217,21 @@ Notes for Section 1
   ASP (ASPUP) and the extension capabilities of the SGP or IPSP (ASPUP
   ACK).
 
-    The ASP Extensions parameter is formatted as follows: [2]
+    The ASP Extensions parameter is formatted as follows: <2>
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                        Page 4
+
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -230,12 +250,6 @@ Notes for Section 1
     |                       ASP Extension #n                        |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-
-
-
-B. Bidulock                    Version 0.4                        Page 4
-
-Internet Draft                  UA ASPEXT               October 16, 2005
 
     The ASP Extensions parameter contains one or more of the following
   fields:
@@ -268,7 +282,14 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
 3.2.  Messages
 
-    ASPEXT extends the following messages defined for the UAs.[1]
+    ASPEXT extends the following messages defined for the UAs.<1>
+
+
+
+
+B. Bidulock                    Version 0.4                        Page 5
+
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
 3.2.1.  ASP Up (ASPUP)
 
@@ -280,21 +301,7 @@ Internet Draft                  UA ASPEXT               October 16, 2005
       ASP Extensions              Optional
 
 
-    The format of the resulting ASPUP message is as follows: [3]
-
-
-
-
-
-
-
-
-
-
-
-B. Bidulock                    Version 0.4                        Page 5
-
-Internet Draft                  UA ASPEXT               October 16, 2005
+    The format of the resulting ASPUP message is as follows: <3>
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -334,26 +341,13 @@ Internet Draft                  UA ASPEXT               October 16, 2005
       ASP Extensions              Optional
 
 
-    The format of the resulting ASPUP ACK message is as follows: [4]
-
-
-
-
-
-
-
-
-
-
-
-
-
+    The format of the resulting ASPUP ACK message is as follows: <4>
 
 
 
 B. Bidulock                    Version 0.4                        Page 6
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -381,20 +375,20 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
 Notes for Section 3
 
-  [1]  See, for example, Section 3 of the specific UA document [M3UA-
-       BIS, SUA, ISUA, TUA].
+  <1>  See, for example, Section 3 of the specific UA document [M3UA-
+       BIS], [SUA], [ISUA], [TUA].
 
-  [2]  EDITOR'S NOTE:-  The parameter tag values shown as 0xXXXX will
+  <2>  EDITOR'S NOTE:-  The parameter tag values shown as 0xXXXX will
        be assigned by IANA within the common parameter range of the
        SIGTRAN UAs and may change its value in further versions of
        this document.
 
-  [3]  EDITOR'S NOTE:-  The parameter tag values shown as 0xXXXX will
+  <3>  EDITOR'S NOTE:-  The parameter tag values shown as 0xXXXX will
        be assigned by IANA within the common parameter range of the
        SIGTRAN UAs and may change its value in further versions of
        this document.
 
-  [4]  EDITOR'S NOTE:-  The parameter tag values shown as 0xXXXX will
+  <4>  EDITOR'S NOTE:-  The parameter tag values shown as 0xXXXX will
        be assigned by IANA within the common parameter range of the
        SIGTRAN UAs and may change its value in further versions of
        this document.
@@ -409,14 +403,13 @@ Notes for Section 3
 
 
 
-
 B. Bidulock                    Version 0.4                        Page 7
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
 4.1.1.  ASP Up Procedures
 
-    In extension of the "ASP Up Procedures" of the UAs[2], ASPEXT
+    In extension of the "ASP Up Procedures" of the UAs<2>, ASPEXT
   provides the following procedures:
 
     Whenever an ASP, as part of the normal UA procedures, sends an ASP
@@ -448,7 +441,7 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
 4.1.2.  ASP Down Procedures
 
-    In extension to the "ASP Down Procedure" of the UAs[2], ASPEXT
+    In extension to the "ASP Down Procedure" of the UAs<2>, ASPEXT
   provides the following procedures:
 
     Whenever an ASP, as part of the normal UA procedures, sends an ASP
@@ -468,10 +461,9 @@ Internet Draft                  UA ASPEXT               October 16, 2005
     Figure 1 illustrates an example where both the ASP and the SGP or
   IPSP support ASPEXT.
 
-
 B. Bidulock                    Version 0.4                        Page 8
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
               ASP                                    SGP/IPSP
                |                                         |
@@ -527,10 +519,9 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
 
 
-
 B. Bidulock                    Version 0.4                        Page 9
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
               ASP                                    SGP/IPSP
                |                                         |
@@ -586,10 +577,9 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
 
 
-
 B. Bidulock                    Version 0.4                       Page 10
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
               ASP                                    SGP/IPSP
                |                                         |
@@ -645,10 +635,9 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
 
 
-
 B. Bidulock                    Version 0.4                       Page 11
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
 5.2.2.  SGP/IPSP supports ASP Extensions, ASP does not
 
@@ -692,10 +681,10 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 6.  Security
 
     ASPEXT does not introduce any new security risks or considerations
-  that are not already inherent in the UA [IUA-BIS..SUA, DUA..TUA].
-  Please see the SIGTRAN security document [SIGSEC] for security
-  considerations and recommendations that are applicable to each of
-  these UAs.
+  that are not already inherent in the UA [IUA-BIS], [DUA], [V5UA],
+  [GR303UA00], [M2UA], [M3UA-BIS], [SUA], [ISUA], [TUA].  Please see the
+  SIGTRAN security document [SIGSEC] for security considerations and
+  recommendations that are applicable to each of these UAs.
 
     It is possible that an attacker or malicious endpoint might
   manipulate the ASP Extensions parameter in an attempt to cause denial
@@ -704,10 +693,9 @@ Internet Draft                  UA ASPEXT               October 16, 2005
   without the ASPEXT capability, ASPEXT introduces no further threat if
   the endpoint adheres to the following rule:
 
-
 B. Bidulock                    Version 0.4                       Page 12
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
     Although an endpoint has registered an ASP extension against a peer
   endpoint, the registering endpoint SHOULD take this information as
@@ -720,8 +708,8 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 7.1.  Extensions
 
     ASPEXT provides an additional ASP Extensions message parameter to
-  the common parameter range of the SIGTRAN UAs [IUA-BIS..SUA,
-  DUA..TUA]:
+  the common parameter range of the SIGTRAN UAs [IUA-BIS], [DUA],
+  [V5UA], [GR303UA00], [M2UA], [M3UA-BIS], [SUA], [ISUA], [TUA]:
 
    (a)   The parameter is named the ASP Extensions parameter.
 
@@ -733,7 +721,7 @@ Internet Draft                  UA ASPEXT               October 16, 2005
          parameter values is described in Section 3.1.1.
 
    (d)   This document also provides a detailed description of the
-         intended use of the ASP Extensions[1] parameter, and in which
+         intended use of the ASP Extensions<1> parameter, and in which
          messages the ASP Extensions parameter should appear, how many
          times, and when.
 
@@ -749,8 +737,8 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
     The definition and used of new message classes, types and parameters
   is an integral part of the SIGTRAN adaptation layers.  Thus, these
-  extensions are assigned by IANA through an IETF Consensus action [RFC
-  2434].
+  extensions are assigned by IANA through an IETF Consensus action
+  [RFC2434].
 
     The proposed extension MUST in no way adversely affect the general
   working of the protocol.
@@ -763,10 +751,9 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
 
 
-
 B. Bidulock                    Version 0.4                       Page 13
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
 7.2.1.  IETF Defined UA Protocol Extension
 
@@ -787,10 +774,44 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
 Notes for Section 7
 
-  [1]  EDITOR'S NOTE:-  The ASP Extensions parameter tag value shown
+  <1>  EDITOR'S NOTE:-  The ASP Extensions parameter tag value shown
        throughout this document as 0xXXXX will be assigned by IANA
        within the common parameter range of the SIGTRAN UAs and may
        change its value in further versions of this document.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 14
+
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
 
 0.  Revision History
@@ -807,6 +828,8 @@ Notes for Section 7
 
    + added ASPCONG extension.
 
+   + resubmitted to sync with IETF numbers
+
 0.3.  Changes from Version 0.2 to Version 0.3
 
    + updated references, version numbers and dates.
@@ -822,10 +845,6 @@ Notes for Section 7
    + split references.
 
    + updated version numbers and dates.
-
-B. Bidulock                    Version 0.4                       Page 14
-
-Internet Draft                  UA ASPEXT               October 16, 2005
 
    + updated security section.
 
@@ -848,11 +867,21 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
    + updated author's address.
 
+B. Bidulock                    Version 0.4                       Page 15
+
+Internet Draft                  UA ASPEXT                  June 18, 2006
+
 0.0.0.  Change Log
 
     $Log: draft-bidulock-sigtran-aspext-04.txt,v $
-    Revision 0.9.2.1  2005/12/28 05:52:51  brian
-    - missed files
+    Revision 0.9.2.2  2006/06/27 09:56:35  brian
+    - rereleased drafts
+
+    Revision 0.9.2.5  2006/06/27 09:41:15  brian
+    - rereleased drafts
+
+    Revision 0.9.2.4  2006/06/18 20:53:35  brian
+    - preparing for draft rerelease
 
     Revision 0.9.2.3  2005/10/17 11:53:45  brian
     - updated drafts for republication
@@ -885,16 +914,30 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
 
 
-B. Bidulock                    Version 0.4                       Page 15
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 16
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
 
 R.  References
 
 R.1.  Normative References
 
-  [RFC 2119]  Bradner, S., "Key words for use in RFCs to Indicate
+  [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
        Requirement Levels," RFC 2119 - BCP 14, The Internet Society
        (March 1997).
 
@@ -920,7 +963,7 @@ R.1.  Normative References
        Adaptation Layer (SUA)," RFC 3868, Internet Engineering Task
        Force - Signalling Transport Working Group (October, 2004).
 
-  [RFC 2960]  Stewart, R., Xie, Q., Morneault, K., Sharp, C.,
+  [RFC2960]  Stewart, R., Xie, Q., Morneault, K., Sharp, C.,
        Schwarzbauer, H. J., Taylor, T., Rytina, I., Kalla, H., Zhang, L.
        and Paxson, V., "Stream Control Transmission Protocol (SCTP),"
        RFC 2960, The Internet Society (February 2000).
@@ -930,7 +973,7 @@ R.1.  Normative References
        3788, Internet Engineering Task Force - Signalling Transport
        Working Group (June 2004).
 
-  [RFC 2434]  Narten, T., Alvestrand, H. T., "Guidelines for Writing an
+  [RFC2434]  Narten, T., Alvestrand, H. T., "Guidelines for Writing an
        IANA Considerations Section in RFCs," RFC 2434, The Internet
        Society (October, 1998).
 
@@ -942,12 +985,12 @@ R.2.  Informative References
        4129, Internet Engineering Task Force - Signalling Transport
        Working Group (August 2005).
 
-  [V5UA]  Weilandt, E., Khanchandani, N. and Rao, S., "V5.2-User
 
-B. Bidulock                    Version 0.4                       Page 16
+B. Bidulock                    Version 0.4                       Page 17
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
+  [V5UA]  Weilandt, E., Khanchandani, N. and Rao, S., "V5.2-User
        Adaption Layer (V5UA)," RFC 3807, Internet Engineering Task Force
        - Signalling Transport Working Group (June 2004).
 
@@ -958,12 +1001,12 @@ Internet Draft                  UA ASPEXT               October 16, 2005
 
   [ISUA]  Bidulock, B., "SS7 ISUP-User Adaptation Layer (ISUA)," <draft-
        bidulock-sigtran-isua-03.txt>, Internet Engineering Task Force -
-       Signalling Transport Working Group (October 16, 2005).  Work In
+       Signalling Transport Working Group (June 18, 2006).  Work In
        Progress.
 
   [TUA]  Bidulock, B., "SS7 TCAP-User Adaptation Layer (TUA)," <draft-
        bidulock-sigtran-tua-04.txt>, Internet Engineering Task Force -
-       Signalling Transport Working Group (October 16, 2005).  Work In
+       Signalling Transport Working Group (June 18, 2006).  Work In
        Progress.
 
   [M2PA]  George, T., Bidulock, B., Dantu, R., Schwarzbauer, H. J. and
@@ -973,39 +1016,39 @@ Internet Draft                  UA ASPEXT               October 16, 2005
        Group (September 2005).
 
   [SGINFO]  Bidulock, B., "Signalling Gateway (SG) Information Support,"
-       <draft-bidulock-sigtran-sginfo-04.txt>, Internet Engineering Task
-       Force - Signalling Transport Working Group (October 16, 2005).
-       Work In Progress.
+       <draft-bidulock-sigtran-sginfo-05.txt>, Internet Engineering Task
+       Force - Signalling Transport Working Group (June 18, 2006).  Work
+       In Progress.
 
   [LOADSEL]  Bidulock, B., "Load Selection Extension for Signalling User
        Adaptation Layers (LOADSEL)," <draft-bidulock-sigtran-
        loadsel-04.txt>, Internet Engineering Task Force - Signalling
-       Transport Working Group (October 16, 2005).  Work In Progress.
+       Transport Working Group (June 18, 2006).  Work In Progress.
 
   [LOADGRP]  Bidulock, B., "Load Grouping Extension for Signalling User
        Adaptation Layers (LOADGRP)," <draft-bidulock-sigtran-
        loadgrp-04.txt>, Internet Engineering Task Force - Signalling
-       Transport Working Group (October 16, 2005).  Work In Progress.
+       Transport Working Group (June 18, 2006).  Work In Progress.
 
   [CORID]  Bidulock, B., "Correlation Id and Heartbeat Procedures
        Supporting Lossless Fail-Over," <draft-bidulock-sigtran-
        corid-04.txt>, Internet Engineering Task Force - Signalling
-       Transport Working Group (October 16, 2005).  Work In Progress.
+       Transport Working Group (June 18, 2006).  Work In Progress.
 
   [REGEXT]  Bidulock, B., "Registration Extensions for SS7 Signalling
-       User Adaptation Layers," <draft-bidulock-sigtran-regext-04.txt>,
+       User Adaptation Layers," <draft-bidulock-sigtran-regext-03.txt>,
        Internet Engineering Task Force - Signalling Transport Working
-       Group (October 16, 2005).  Work In Progress.
+       Group (June 18, 2006).  Work In Progress.
 
   [SESSID]  Bidulock, B., "Session Identification for SS7 Signalling
-       User Adaptation Layers," <draft-bidulock-sigtran-sessid-04.txt>,
+       User Adaptation Layers," <draft-bidulock-sigtran-sessid-05.txt>,
        Internet Engineering Task Force - Signalling Transport Working
-       Group (October 16, 2005).  Work In Progress.
 
-
-B. Bidulock                    Version 0.4                       Page 17
+B. Bidulock                    Version 0.4                       Page 18
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
+
+       Group (June 18, 2006).  Work In Progress.
 
   [ASPCONG]  Bidulock, B., "ASP Congestion," <draft-bidulock-sigtran-
        aspcong-00.txt>, Internet Engineering Task Force - Signalling
@@ -1027,7 +1070,7 @@ Author's Addresses
 
 
 
-  This Internet draft expires April 2006.
+  This Internet draft expires December 2006.
 
 
 
@@ -1059,12 +1102,9 @@ Author's Addresses
 
 
 
-
-
-
-B. Bidulock                    Version 0.4                       Page 18
+B. Bidulock                    Version 0.4                       Page 19
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
 
                         List of Illustrations
@@ -1079,21 +1119,21 @@ Internet Draft                  UA ASPEXT               October 16, 2005
   Status of this Memo .............................................    1
   Copyright .......................................................    1
   Abstract ........................................................    1
-  Contents ........................................................    1
+  Contents ........................................................    2
   1 Introduction ..................................................    2
   1.1 Scope .......................................................    2
   1.2 Abbreviations ...............................................    2
-  1.3 Terminology .................................................    2
+  1.3 Terminology .................................................    3
   1.4 Overview ....................................................    3
   1.4.1 Existing Extension Management .............................    3
-  1.4.2 ASP Extension Management ..................................    3
+  1.4.2 ASP Extension Management ..................................    4
   Notes for Section 1 .............................................    4
   2 Conventions ...................................................    4
   3 Protocol Elements .............................................    4
   3.1 Parameters ..................................................    4
   3.1.1 ASP Extensions ............................................    4
   3.2 Messages ....................................................    5
-  3.2.1 ASP Up (ASPUP) ............................................    5
+  3.2.1 ASP Up (ASPUP) ............................................    6
   3.2.2 ASP Up Acknowledgment (ASPUP ACK) .........................    6
   Notes for Section 3 .............................................    7
   4 Procedures ....................................................    7
@@ -1111,78 +1151,76 @@ Internet Draft                  UA ASPEXT               October 16, 2005
   7.2 Protocol Extensions .........................................   13
   7.2.1 IETF Defined UA Protocol Extension ........................   14
   Notes for Section 7 .............................................   14
-  0 Revision History ..............................................   14
-  0.4 Changes from Version 0.3 to Version 0.4 .....................   14
-  0.3 Changes from Version 0.2 to Version 0.3 .....................   14
-  0.2 Changes from Version 0.1 to Version 0.2 .....................   14
+  0 Revision History ..............................................   15
+  0.4 Changes from Version 0.3 to Version 0.4 .....................   15
+  0.3 Changes from Version 0.2 to Version 0.3 .....................   15
+  0.2 Changes from Version 0.1 to Version 0.2 .....................   15
   0.1 Changes from Version 0.0 to Version 0.1 .....................   15
-  0.0.0 Change Log ................................................   15
-  R References ....................................................   16
-  R.1 Normative References ........................................   16
-  R.2 Informative References ......................................   16
-
-B. Bidulock                    Version 0.4                       Page 19
-
-Internet Draft                  UA ASPEXT               October 16, 2005
-
-  Author's Addresses ..............................................   18
-  List of Illustrations ...........................................   19
-  Table of Contents ...............................................   19
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  0.0.0 Change Log ................................................   16
+  R References ....................................................   17
+  R.1 Normative References ........................................   17
 
 B. Bidulock                    Version 0.4                       Page 20
 
-Internet Draft                  UA ASPEXT               October 16, 2005
+Internet Draft                  UA ASPEXT                  June 18, 2006
+
+  R.2 Informative References ......................................   17
+  Author's Addresses ..............................................   19
+  List of Illustrations ...........................................   20
+  Table of Contents ...............................................   20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                       Page 21
+
+Internet Draft                  UA ASPEXT                  June 18, 2006
 
 Intellectual Property
 
@@ -1220,7 +1258,7 @@ Disclaimer of Validity
 
 Full Copyright Statement
 
-  Copyright (C) The Internet Society (2005).  This document is subject
+  Copyright (C) The Internet Society (2006).  This document is subject
   to the rights, licenses and restrictions contained in BCP 78, and
   except as set forth therein, the authors retain all their rights.
 
@@ -1238,6 +1276,5 @@ Acknowledgement
 
 
 
-
-B. Bidulock                    Version 0.4                       Page 21
+B. Bidulock                    Version 0.4                       Page 22
 

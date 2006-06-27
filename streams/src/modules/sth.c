@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2006/06/22 13:11:40 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2006/06/27 09:22:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:40 $ by $Author: brian $
+ Last Modified $Date: 2006/06/27 09:22:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.155  2006/06/27 09:22:16  brian
+ - move sd->sd_rq dereferencing inside read locks
+
  Revision 0.9.2.154  2006/06/22 13:11:40  brian
  - more optmization tweaks and fixes
 
@@ -98,10 +101,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2006/06/22 13:11:40 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2006/06/27 09:22:16 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2006/06/22 13:11:40 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2006/06/27 09:22:16 $";
 
 //#define __NO_VERSION__
 
@@ -197,7 +200,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2006/06/22 13:11:40 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2006/06/27 09:22:16 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3689,19 +3692,24 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 
 	if (likely((sd = stri_lookup(file)) != NULL)) {	/* PROFILED */
 		unsigned int mask = 0;
+		queue_t *q;
 
 		strschedule();
 		poll_wait(file, &sd->sd_polllist, poll);
 		if (unlikely
 		    ((sd->sd_flag & (STRDERR | STWRERR | STRHUP | STRPRI | STRMSIG | STPLEX)) != 0))
 			mask |= strpoll_error(sd->sd_flag);
-		if (likely(canget(sd->sd_rq) != 0))
+		q = sd->sd_rq;
+		dassert(sd->sd_rq != NULL);
+		if (likely(canget(q) != 0))
 			mask |= POLLIN | POLLRDNORM;
-		if (likely(bcangetany(sd->sd_rq) != 0))
+		if (likely(bcangetany(q) != 0))
 			mask |= POLLIN | POLLRDBAND;
-		if (likely(canputnext(sd->sd_wq) != 0))
+		q = sd->sd_wq;
+		dassert(sd->sd_wq != NULL);
+		if (likely(canputnext(q) != 0))
 			mask |= POLLOUT | POLLWRNORM;
-		if (likely(bcanputnextany(sd->sd_wq) != 0))
+		if (likely(bcanputnextany(q) != 0))
 			mask |= POLLOUT | POLLWRBAND;
 		return (mask);
 	}
@@ -4390,10 +4398,8 @@ STATIC streams_inline streams_fastcall __hot_read ssize_t
 strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	struct stdata *sd = stri_lookup(file);
-	queue_t *q = sd->sd_rq;
-	ssize_t xferd, mread = nbytes;
-	bool ndelay, stop;
-	mblk_t *mp, *first;
+	ssize_t xferd;
+	bool ndelay;
 	ssize_t err = 0;
 
 	/* gotos to try to get into the loop faster */
@@ -4446,11 +4452,14 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 		const bool discard = ((sd->sd_rdopt & RMSGD) != 0);
 		const bool protnorm = ((sd->sd_rdopt & (RPROTDAT | RPROTDIS)) == 0);
 		const bool protdis = ((sd->sd_rdopt & RPROTDIS) != 0);
+		ssize_t mread = nbytes;
+		queue_t *q = sd->sd_rq;
+		mblk_t *mp, *first = NULL;
+		bool stop = false;
 
-		mp = NULL;
-		first = NULL;
 		xferd = 0;
-		stop = false;
+
+		dassert(sd->sd_rq != NULL);
 
 		for (;;) {
 			/* remember first block flag and band */
@@ -5408,11 +5417,8 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 		int __user *bandp, int __user *flagsp)
 {
 	struct stdata *sd = stri_lookup(file);
-	queue_t *q = sd->sd_rq;
-	mblk_t *mp = NULL;
 	struct strbuf ctl, dat;
 	int flags, band = 0;
-	int retval = 0;
 	int err;
 
 	if (unlikely(flagsp == NULL))
@@ -5467,7 +5473,11 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 
 	if (likely(!(err = straccess_rlock(sd, (FREAD | FNDELAY))))) {
 		mblk_t *chp = NULL, *dhp = NULL;
+		queue_t *q = sd->sd_rq;
+		int retval = 0;
+		mblk_t *mp;
 
+		dassert(sd->sd_rq != NULL);
 		{
 			ssize_t mread;
 
@@ -6061,15 +6071,16 @@ file_fiosetown32(struct file *file, struct stdata *sd, unsigned long arg)
 STATIC streams_noinline streams_fastcall int
 str_i_atmark(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	queue_t *q = sd->sd_rq;
-	mblk_t *b;
 	uint32_t flags = arg;
 	int err = -EINVAL;
 
 	if (!(flags & ~(ANYMARK | LASTMARK)) && (flags & (ANYMARK | LASTMARK))) {
 		if (!(err = straccess_rlock(sd, (FREAD | FNDELAY)))) {
+			queue_t *q = sd->sd_rq;
 			unsigned long pl;
+			mblk_t *b;
 
+			dassert(sd->sd_rq != NULL);
 			pl = qrlock(q);
 			if (flags == LASTMARK) {
 				if ((b = q->q_first) && b->b_flag & MSGMARK) {
@@ -6162,6 +6173,7 @@ str_i_ckband(const struct file *file, struct stdata *sd, unsigned long arg)
 		if (!(err = straccess_rlock(sd, (FREAD | FNDELAY)))) {
 			queue_t *q = sd->sd_rq;
 
+			dassert(sd->sd_rq != NULL);
 			if (band != ANYBAND)
 				err = bcanget(q, band) ? 1 : 0;
 			else
@@ -6479,7 +6491,6 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC streams_noinline streams_fastcall int
 str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	queue_t *q = sd->sd_rq;
 	int band = -1;
 	int err;
 
@@ -6489,8 +6500,10 @@ str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 	}
 
 	if (!(err = straccess_rlock(sd, (FREAD | FNDELAY)))) {
+		queue_t *q = sd->sd_rq;
 		unsigned long pl;
 
+		dassert(sd->sd_rq != NULL);
 		pl = qrlock(q);
 		if (q->q_first) {
 			band = q->q_first->b_band;
@@ -7401,6 +7414,7 @@ str_i_nread(const struct file *file, struct stdata *sd, unsigned long arg)
 		queue_t *q = sd->sd_rq;
 		unsigned long pl;
 
+		dassert(sd->sd_rq != NULL);
 		pl = qrlock(q);
 		if ((msgs = qsize(q)))
 			bytes = msgdsize(q->q_first);
@@ -7445,10 +7459,11 @@ __str_i_peek(const struct file *file, struct stdata *sd, struct strpeek *sp)
 	sp->databuf.len = -1;
 
 	if (!(err = straccess_rlock(sd, FREAD | FNDELAY))) {
-		mblk_t *b, *dp = NULL;
-		unsigned long pl;
 		queue_t *q = sd->sd_rq;
+		unsigned long pl;
+		mblk_t *b, *dp = NULL;
 
+		dassert(sd->sd_rq != NULL);
 		pl = qrlock(q);
 
 		if ((b = q->q_first)) {
@@ -7891,10 +7906,12 @@ __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
 	int fd, err;
 
 	if ((err = fd = get_unused_fd()) >= 0) {
-		queue_t *q = sd->sd_rq;
 		mblk_t *mp = NULL;
 
 		if (!(err = straccess_rlock(sd, (FREAD | FEXCL | FNDELAY)))) {
+			queue_t *q = sd->sd_rq;
+
+			dassert(sd->sd_rq != NULL);
 			if (IS_ERR(mp = strwaitgetfp(sd, q, file->f_flags)))
 				err = PTR_ERR(mp);
 			srunlock(sd);
