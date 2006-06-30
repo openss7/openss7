@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.3 2006/03/24 00:04:23 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.4 2006/06/30 01:23:43 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/03/24 00:04:23 $ by $Author: brian $
+@c Last Modified $Date: 2006/06/30 01:23:43 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: releases.texi,v $
+@c Revision 0.9.2.4  2006/06/30 01:23:43  brian
+@c - updated list of suporrted distros in release notes
+@c
 @c Revision 0.9.2.3  2006/03/24 00:04:23  brian
 @c - updated release notes
 @c
@@ -163,7 +166,7 @@ release.}
 @item RedHat Linux 9 (RH9) -- TBD
 @item SuSE 8.0 Professional -- TBD
 @item Fedora Core 1 (FC1) -- TBD
-@item Debian 3.0r2 Woody
+@item Debian 3.0r2 Woody -- TBD
 @item Mandrakelinux 9.2 (MDK92) -- TBD
 @item RedHat Enterprise Linux 3.0 (EL3)
 @item WhiteBox Enterprise Linux 3.0 (WBEL3)
@@ -182,10 +185,14 @@ release.}
 @item Lineox 4.053 (LEL4)
 @item Mandriva Linux LE2005 (MDK102) -- TBD
 @item Performance Technologies NexusWare 8.0
-@item Debian 3.1r0a Sarge (untested)
-@item SuSE 10.0 (untested)
-@item OpenSuSE (untested)
-@item Mandriva Linux LE2006 (MDK103) (untested)
+@item Debian 3.1r0a Sarge
+@item SuSE 10.0
+@item OpenSuSE
+@item Ubuntu 5.10
+@item Mandriva Linux LE2006 (MDK103)
+@item Fedora Core 5 (untested)
+@item Gentoo 2006.1 (untested)
+@item SuSE 10.1 (untested)
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably

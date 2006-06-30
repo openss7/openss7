@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2006/06/27 09:22:16 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2006/06/30 01:12:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/27 09:22:16 $ by $Author: brian $
+ Last Modified $Date: 2006/06/30 01:12:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.156  2006/06/30 01:12:15  brian
+ - fixed buffer overflow introduced with alloc_data() (thanks to git bisect)
+
  Revision 0.9.2.155  2006/06/27 09:22:16  brian
  - move sd->sd_rq dereferencing inside read locks
 
@@ -101,10 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2006/06/27 09:22:16 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2006/06/30 01:12:15 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2006/06/27 09:22:16 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2006/06/30 01:12:15 $";
 
 //#define __NO_VERSION__
 
@@ -200,7 +203,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2006/06/27 09:22:16 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2006/06/30 01:12:15 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -4818,7 +4821,7 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 			break;
 		}
 
-		if (likely((err = strcopyin(buf + written, b->b_wptr, block))) == 0) {
+		if (likely((err = strcopyin(buf + written, b->b_rptr, block))) == 0) {
 
 			/* locks on */
 			if (likely((err = straccess_rlock(sd, access)) == 0)) {
