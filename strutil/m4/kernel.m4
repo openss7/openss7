@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/06/23 05:36:22 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/06/29 23:38:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/23 05:36:22 $ by $Author: brian $
+# Last Modified $Date: 2006/06/29 23:38:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -509,7 +509,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		esac
 		linux_cv_k_base=`echo "$kversion" | sed -r -e s/-$linux_cv_k_boot$//`
 		;;
-	    (debian)
+	    (debian|ubuntu)
 		case "${kversion}" in
 		    # debian boot kernels
 		    (*)		    linux_cv_k_boot=		;;
@@ -728,6 +728,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		${DESTDIR}${rootdir}/usr/src/linux-obj
 		${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}
 		${DESTDIR}${rootdir}/usr/src/kernel-headers-${knumber}
+		${DESTDIR}${rootdir}/usr/src/linux-headers-${kversion}
+		${DESTDIR}${rootdir}/usr/src/linux-headers-${knumber}
 		${DESTDIR}${rootdir}/usr/src/linux-${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-${kbase}
 		${DESTDIR}${rootdir}/usr/src/linux-${knumber}
@@ -740,6 +742,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		${DESTDIR}/usr/src/linux-obj
 		${DESTDIR}/usr/src/kernel-headers-${kversion}
 		${DESTDIR}/usr/src/kernel-headers-${knumber}
+		${DESTDIR}/usr/src/linux-headers-${kversion}
+		${DESTDIR}/usr/src/linux-headers-${knumber}
 		${DESTDIR}/usr/src/linux-${kversion}
 		${DESTDIR}/usr/src/linux-${kbase}
 		${DESTDIR}/usr/src/linux-${kmajor}.${kminor}
@@ -833,6 +837,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 	    eval "k_source_search_path=\"
 		${kbuilddir}
 		${DESTDIR}${rootdir}/usr/src/kernel-source-${knumber}
+		${DESTDIR}${rootdir}/usr/src/linux-source-${knumber}
 		${DESTDIR}${rootdir}/usr/src/linux-${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-${kbase}
 		${DESTDIR}${rootdir}/usr/src/linux-${knumber}
@@ -842,6 +847,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}
 		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}
 		${DESTDIR}/usr/src/kernel-source-${knumber}
+		${DESTDIR}/usr/src/linux-source-${knumber}
 		${DESTDIR}/usr/src/linux-${kversion}
 		${DESTDIR}/usr/src/linux-${kbase}
 		${DESTDIR}/usr/src/linux-${knumber}
@@ -945,7 +951,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 			case "$target_vendor" in
 			    (mandrake)
 				;;
-			    (redhat|centos|whitebox|debian|suse|*)
+			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
 				AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -998,7 +1004,7 @@ dnl	    kernel architecture (i.e. System.map-2.4.18-1-686 and System.map-2.4.18-
 dnl	    version number is not included in the filename.  So, the version on one of these files
 dnl	    could be 2.4.18-13.1, another could be 2.4.18-12 and they do not necessarily match the
 dnl	    running kernel.  In fact, on debian, there is no way to tell which exact version of the
-dnl	    kernel is running.
+dnl	    kernel is running.  Ubuntu understandably has the same problem.
 dnl
 dnl	    Added some special search paths for newer and older NexusWare.
 dnl
@@ -1050,7 +1056,7 @@ dnl				image name approach with the Redhat kernel version number in the
 dnl				kernel image name approach to yeild reliable system map files.
 dnl
 				;;
-			    (redhat|centos|whitebox|debian|suse|*)
+			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
 dnl
 dnl				Unfortunately the redhat system map files are unreliable because the
 dnl				are not unique for each architecture.  The system map file has to be
@@ -1410,6 +1416,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
+		    ${DESTDIR}${rootdir}/usr/src/linux-headers-${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-obj/.config
 		    ${DESTDIR}${rootdir}/boot/config-${kversion}
@@ -1419,6 +1426,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 		    ${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/.config
 		    ${DESTDIR}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config
+		    ${DESTDIR}/usr/src/linux-headers-${kversion}/.config
 		    ${DESTDIR}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}/usr/src/linux-obj/.config
 		    ${DESTDIR}/boot/config-${kversion}
@@ -1431,6 +1439,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
+		    ${DESTDIR}${rootdir}/usr/src/linux-headers-${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-obj/.config
 		    ${kbuilddir}/.config
@@ -1438,6 +1447,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 		    ${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/.config
 		    ${DESTDIR}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config
+		    ${DESTDIR}/usr/src/linux-headers-${kversion}/.config
 		    ${DESTDIR}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}/usr/src/linux-obj/.config
 		    ${ksrcdir}/.config\""
@@ -1479,7 +1489,7 @@ dnl
 *** ])
 	else
 	    case "$linux_cv_k_config" in
-		(*/configs/*|*/arch/*/defconf*|*/kernel-headers-*|*/usr/src/kernels/*)
+		(*/configs/*|*/arch/*/defconf*|*/kernel-headers-*|*/linux-headers-*|*/usr/src/kernels/*)
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    AC_MSG_WARN([
@@ -1513,7 +1523,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
     AC_CACHE_CHECK([for kernel package release], [linux_cv_k_version], [dnl
 	linux_cv_k_version=unknown
 	case "$target_vendor" in
-	    (debian)
+	    (debian|ubuntu)
 		linux_pkg=`dpkg -S $linux_cv_k_sysmap 2>/dev/null | cut -f1 -d:` || linux_pkg=
 		if test -n "$linux_pkg" ; then
 		    linux_ver=`dpkg -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
@@ -1543,7 +1553,7 @@ dnl
 dnl		Mandrakelinux is built correctly.
 dnl
 		;;
-	    (debian)
+	    (debian|ubuntu)
 dnl
 dnl		Debian can have a mismatch in kernel version.
 dnl
@@ -1784,7 +1794,8 @@ dnl	directory makefiles; however, the modversions.h file is in the build
 dnl	directory, not the source directory.  For debian this means that we take
 dnl	the flags from the kernel-source package but the modversions.h file is
 dnl	in the kernel-headers package.  So, we need to change source directory
-dnl	to build directory unless they are the same.
+dnl	to build directory unless they are the same.  Debian and Ubuntu seem to
+dnl	handle this properly now for 2.6 kernels.
 dnl
 	if test :"$linux_cv_k_ko_modules" != :yes ; then
 	    eval "linux_src=\"$ksrcdir\""
