@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/04/03 21:08:45 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/06/30 00:36:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/03 21:08:45 $ by $Author: brian $
+# Last Modified $Date: 2006/06/30 00:36:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -140,6 +140,7 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	(*Red?Hat*|*RED?HAT*)				echo 'redhat'	;;
 	(*SuSE*|*SUSE*|*Novell*|*NOVELL*)		echo 'suse'	;;
 	(*Debian*|*DEBIAN*)				echo 'debian'	;;
+	(*Ubuntu*|*UBUNTU*)				echo 'ubuntu'	;;
     esac
 }
 dist_get_vendor() {
@@ -153,6 +154,7 @@ dnl AC_MSG_WARN([checking for vendor in $[1]])
 	(redhat)	echo 'redhat'	;;
 	(suse)		echo 'suse'	;;
 	(debian)	echo 'debian'	;;
+	(ubuntu)	echo 'ubuntu'	;;
 	(unknown)	echo 'pc'	;;
 	(*)		echo "$[1]"	;;
     esac
@@ -172,6 +174,7 @@ dnl AC_MSG_WARN([checking for distrib in $[1]])
 	(redhat)	echo 'Red Hat Linux' ;;
 	(suse)		echo 'SuSE Linux' ;;
 	(debian)	echo 'Debian GNU/Linux' ;;
+	(ubuntu)	echo 'Ubuntu' ;;
 	(unknown)	echo 'Unknown Linux' ;;
 	(*)		echo 'Linux' ;;
     esac
@@ -261,10 +264,8 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_REQUIRE([_DISTRO_FUNCTIONS])
     AC_CACHE_CHECK([for dist build flavor], [dist_cv_build_flavor], [dnl
-	if test :"${dist_cv_build_rel_file:-no}" != :no ; then
-	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` = 'debian_version' ; then
-		dist_cv_build_flavor='debian'
-	    else
+	if test -z "$dist_cv_build_flavor" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
+	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
 		dist_cv_build_flavor=$(dist_get_flavor "$(cat $dist_cv_build_rel_file)")
 	    fi
 	fi
@@ -281,6 +282,12 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_CODENAME
 	    unset DISTRIB_DESCRIPTION
 	fi
+	# do debian after lsb for Ubuntu
+	if test -z "$dist_cv_build_flavor" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
+	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` = 'debian_version' ; then
+		dist_cv_build_flavor='debian'
+	    fi
+	fi
 	if test -z "$dist_cv_build_flavor" -a ":${dist_cv_build_issue_file:-no}" != :no ; then
 	    dist_cv_build_flavor=$(dist_get_flavor "$(cat $dist_cv_build_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
@@ -293,7 +300,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	if test -z "$dist_cv_build_vendor" ; then dist_cv_build_vendor=$build_vendor ; fi
     ])
     AC_CACHE_CHECK([for dist build release], [dist_cv_build_release], [dnl
-	if test :"${dist_cv_build_rel_file:-no}" != :no ; then
+	if test -z "$dist_cv_build_release" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
 	    dist_cv_build_release=$(dist_get_release "$(cat $dist_cv_build_rel_file)")
 	fi
 	if test -z "$dist_cv_build_release" -a ":${dist_cv_build_lsb_file:-no}" != :no ; then
@@ -317,11 +324,10 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	dist_cv_build_distrib=$(dist_get_distrib "$dist_cv_build_flavor")
     ])
     AC_CACHE_CHECK([for dist build codename], [dist_cv_build_codename], [dnl
-	if test :"${dist_cv_build_rel_file:-no}" != :no ; then
+	if test -z "$dist_cv_build_codename" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
 	    case :`echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` in
 		(:debian_version)
-		    # for now ...  FIXME for Sarge
-		    dist_cv_build_codename='Woody'
+		    :
 		    ;;
 		(:SuSE-release)
 		    # SuSE never really had a codename, but now they put OSS on OpenSuSE
@@ -342,22 +348,33 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_CODENAME
 	    unset DISTRIB_DESCRIPTION
 	fi
+	if test -z "$dist_cv_build_codename" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
+	    case :`echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` in
+		# do debian after lsb for Ubuntu
+		(:debian_version)
+		    # under debian codenames are tied to release numbers
+		    case "$dist_cv_build_release" in
+			(3.0) dist_cv_build_codename='Woody' ;;
+			(3.1) dist_cv_build_codename='Sarge' ;;
+			(*)   dist_cv_build_codename='unknown' ;;
+		    esac
+		    ;;
+	    esac
+	fi
 	if test -z "$dist_cv_build_codename" -a ":${dist_cv_build_issue_file:-no}" != :no ; then
 	    dist_cv_build_codename=$(dist_get_codename "$(cat $dist_cv_build_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
 	# cannot get the codename from the compiler
     ])
     AC_CACHE_CHECK([for dist build cpu], [dist_cv_build_cpu], [dnl
-	if test :"${dist_cv_build_rel_file:-no}" != :no ; then
+	if test -z "$dist_cv_build_cpu" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
 		dist_cv_build_cpu=$(dist_get_cpu "$(cat $dist_cv_build_rel_file)")
 	    else
 		if test :${DEB_BUILD_ARCH+set} = :set ; then
 		    dist_cv_build_cpu="$DEB_BUILD_ARCH"
 		elif test -x /usr/bin/dpkg-architecture ; then
-		    eval "`/usr/bin/dpkg-architecture -f`"
-		    dist_cv_build_cpu="$DEB_BUILD_ARCH"
-		    eval "`/usr/bin/dpkg-architecture -u`"
+		    dist_cv_build_cpu=`LANG=C /usr/bin/dpkg-architecture -f -qDEB_BUILD_ARCH 2>/dev/null`
 		fi
 	    fi
 	fi
@@ -427,10 +444,8 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_REQUIRE([_DISTRO_FUNCTIONS])
     AC_CACHE_CHECK([for dist host flavor], [dist_cv_host_flavor], [dnl
-	if test :"${dist_cv_host_rel_file:-no}" != :no ; then
-	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` = 'debian_version' ; then
-		dist_cv_host_flavor='debian'
-	    else
+	if test -z "$dist_cv_host_flavor" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
+	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
 		dist_cv_host_flavor=$(dist_get_flavor "$(cat $dist_cv_host_rel_file)")
 	    fi
 	fi
@@ -447,6 +462,12 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_CODENAME
 	    unset DISTRIB_DESCRIPTION
 	fi
+	if test -z "$dist_cv_host_flavor" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
+	    # do debian after lsb for Ubuntu
+	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` = 'debian_version' ; then
+		dist_cv_host_flavor='debian'
+	    fi
+	fi
 	if test -z "$dist_cv_host_flavor" -a ":${dist_cv_host_issue_file:-no}" != :no ; then
 	    dist_cv_host_flavor=$(dist_get_flavor "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
@@ -456,7 +477,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	dist_cv_host_vendor=$(dist_get_vendor "${dist_cv_host_flavor:-unknown}")
     ])
     AC_CACHE_CHECK([for dist host release], [dist_cv_host_release], [dnl
-	if test :"${dist_cv_host_rel_file:-no}" != :no ; then
+	if test -z "$dist_cv_host_release" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
 	    dist_cv_host_release=$(dist_get_release "$(cat $dist_cv_host_rel_file)")
 	fi
 	if test -z "$dist_cv_host_release" -a ":${dist_cv_host_lsb_file:-no}" != :no ; then
@@ -479,11 +500,10 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	dist_cv_host_distrib=$(dist_get_distrib "$dist_cv_host_flavor")
     ])
     AC_CACHE_CHECK([for dist host codename], [dist_cv_host_codename], [dnl
-	if test :"${dist_cv_host_rel_file:-no}" != :no ; then
+	if test -z "$dist_cv_host_codename" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
 	    case :`echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` in
 		(:debian_version)
-		    # for now ...  FIXME for Sarge
-		    dist_cv_host_codename='Woody'
+		    :
 		    ;;
 		(:SuSE-release)
 		    # SuSE never really had a codename, but now they put OSS on OpenSuSE
@@ -504,23 +524,42 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_CODENAME
 	    unset DISTRIB_DESCRIPTION
 	fi
+	if test -z "$dist_cv_host_codename" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
+	    case :`echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` in
+		# do debian after lsb for Ubuntu
+		(:debian_version)
+		    # under debian codenames are tied to release numbers
+		    case "$dist_cv_host_release" in
+			(3.0) dist_cv_host_codename='Woody' ;;
+			(3.1) dist_cv_host_codename='Sarge' ;;
+			(*)   dist_cv_host_codename='unknown' ;;
+		    esac
+		    ;;
+	    esac
+	fi
 	if test -z "$dist_cv_host_codename" -a ":${dist_cv_host_issue_file:-no}" != :no ; then
 	    dist_cv_host_codename=$(dist_get_codename "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
 	# cannot get the codename from the compiler
     ])
     AC_CACHE_CHECK([for dist host cpu], [dist_cv_host_cpu], [dnl
-	if test :"${dist_cv_host_rel_file:-no}" != :no ; then
+	if test -z "$dist_cv_host_cpu" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
 		dist_cv_host_cpu=$(dist_get_cpu "$(cat $dist_cv_host_rel_file)")
 	    else
 		if test :${DEB_HOST_ARCH+set} = :set ; then
 		    dist_cv_host_cpu="$DEB_HOST_ARCH"
 		elif test -x /usr/bin/dpkg-architecture ; then
-		    dist_tmp=`echo "$host_os" | sed -e 's|-gnu||'`
-		    eval "`/usr/bin/dpkg-architecture -a${host_cpu} -t${host_cpu}-${dist_tmp} -f`"
-		    dist_cv_host_cpu="$DEB_HOST_ARCH"
-		    eval "`/usr/bin/dpkg-architecture -u`"
+		    case "$dist_cv_host_flavor" in
+			# debian needs the -gnu stripped, ubuntu does not
+			(ubuntu)
+			    dist_tmp="$host_os"
+			    ;;
+			(debian|*)
+			    dist_tmp=`echo "$host_os" | sed -e 's|-gnu||'`
+			    ;;
+		    esac
+		    dist_cv_host_cpu=`LANG=C /usr/bin/dpkg-architecture -a${host_cpu} -t${host_cpu}-${dist_tmp} -qDEB_HOST_ARCH 2>/dev/null`
 		fi
 	    fi
 	fi
@@ -544,7 +583,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     case "$build_vendor" in
 	(centos|lineox|whitebox|redhat|suse|debian)  
 	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
-	(mandrake)  
+	(mandrake|ubuntu)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
     esac
     build="${build_cpu}-${build_vendor}-${build_os}"
@@ -559,7 +598,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	case "$host_vendor" in
 	    (centos|lineox|whitebox|redhat|suse|debian)  
 		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
-	    (mandrake)  
+	    (mandrake|ubuntu)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
 	esac
     fi
@@ -575,7 +614,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	case "$target_vendor" in
 	    (centos|lineox|whitebox|redhat|suse|debian)  
 		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
-	    (mandrake)  
+	    (mandrake|ubuntu)  
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;
 	esac
     fi
