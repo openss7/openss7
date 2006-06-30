@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/06/29 23:38:09 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/06/30 10:11:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/29 23:38:09 $ by $Author: brian $
+# Last Modified $Date: 2006/06/30 10:11:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1545,6 +1545,26 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 	krelease=
     fi
     AC_SUBST([krelease])
+    case "$target_vendor" in
+	(debian)
+	    kernel_image='kernel-image'
+	    kernel_source='kernel-source'
+	    kernet_headers='kernel-headers'
+	    ;;
+	(ubuntu)
+	    kernel_image='linux-image'
+	    kernel_source='linux-source'
+	    kernet_headers='linux-headers'
+	    ;;
+	(*)
+	    kernel_image=
+	    kernel_source=
+	    kernet_headers=
+	    ;;
+    esac
+    AC_SUBST([kernel_image])
+    AC_SUBST([kernel_source])
+    AC_SUBST([kernel_headers])
     AC_MSG_CHECKING([for kernel file sanity])
 	eval "linux_cv_files=\"$linux_cv_k_sysmap $linux_cv_k_build $linux_cv_k_source $linux_cv_k_config\""
 	case "$target_vendor" in
