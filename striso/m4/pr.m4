@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/03/23 05:41:18 $
+# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/06/29 23:38:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/23 05:41:18 $ by $Author: brian $
+# Last Modified $Date: 2006/06/29 23:38:09 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: pr.m4,v $
+# Revision 0.9.2.3  2006/06/29 23:38:09  brian
+# - more variations for Ubuntu, which in most ways is much like Debian.
+#
 # Revision 0.9.2.2  2006/03/23 05:41:18  brian
 # - renamed auto-pr to send-pr
 #
@@ -93,6 +96,7 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 	    (mandrake)	ap_cv_distribution="MDK$dist_cv_host_release"	;;
 	    (suse)	ap_cv_distribution="SuSE$dist_cv_host_release"	;;
 	    (debian)	ap_cv_distribution="Debian$dist_cv_host_release" ;;
+	    (ubuntu)	ap_cv_distribution="Ubuntu$dist_cv_host_release" ;;
 	    (montavista) ap_cv_distribtuion="MontaVista"		;;
 	    (bluecat)	ap_cv_distribution="BlueCat"			;;
 	    (yellowdog)	ap_cv_distribution="YellowDog"			;;

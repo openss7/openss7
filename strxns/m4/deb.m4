@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/11 09:49:50 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/06/29 23:38:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 09:49:50 $ by $Author: brian $
+# Last Modified $Date: 2006/06/29 23:38:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -243,18 +243,30 @@ AC_DEFUN([_DEB_DPKG_SETUP_OPTIONS], [dnl
 AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
     AC_ARG_VAR([DPKG], [dpkg command])
     AC_PATH_TOOL([DPKG], [dpkg], [], [$PATH:/usr/local/bin:/usr/bin])
-    if test :"${DPKG:-no}" = :no -a :"$target_vendor" = :debian ; then
-	AC_MSG_WARN([Could not find dpkg program in PATH.])
+    if test :"${DPKG:-no}" = :no ; then
+	case "$target_vendor" in
+	    (debian|ubuntu)
+		AC_MSG_WARN([Could not find dpkg program in PATH.])
+		;;
+	esac
     fi
     AC_ARG_VAR([DPKG_SOURCE], [dpkg-source command])
     AC_PATH_TOOL([DPKG_SOURCE], [dpkg-source], [], [$PATH:/usr/local/bin:/usr/bin])
-    if test :"${DPKG_SOURCE:-no}" = :no -a :"$target_vendor" = :debian ; then
-	AC_MSG_WARN([Could not find dpkg-source program in PATH.])
+    if test :"${DPKG_SOURCE:-no}" = :no ; then
+	case "$target_vendor" in
+	    (debian|ubuntu)
+		AC_MSG_WARN([Could not find dpkg-source program in PATH.])
+		;;
+	esac
     fi
     AC_ARG_VAR([DPKG_BUILDPACKAGE], [dpkg-buildpackage command])
     AC_PATH_TOOL([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [], [$PATH:/usr/local/bin:/usr/bin])
-    if test :"${DPKG_BUILDPACKAGE:-no}" = :no -a :"$target_vendor" = :debian ; then
-	AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.])
+    if test :"${DPKG_BUILDPACKAGE:-no}" = :no ; then
+	case "$target_vendor" in
+	    (debian|ubuntu)
+		AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.])
+		;;
+	esac
     fi
     AC_ARG_VAR([DEB_BUILD_ARCH], [Debian build architecture])
     AC_ARG_VAR([DEB_BUILD_GNU_CPU], [Debian build cpu])

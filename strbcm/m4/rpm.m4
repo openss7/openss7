@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/04/03 21:08:45 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/06/29 23:38:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/03 21:08:45 $ by $Author: brian $
+# Last Modified $Date: 2006/06/29 23:38:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -202,6 +202,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		    (debian)
 			rpm_cv_dist_extra=".deb${dist_cv_host_release}"
 			;;
+		    (ubuntu)
+			rpm_cv_dist_extra=".Ubuntu${dist_cv_host_release}"
+			;;
 		esac
 		;;
 	    *)
@@ -263,6 +266,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		    (debian)
 			rpm_cv_dist_extra2=".deb${dist_cv_host_release}"
 			;;
+		    (ubuntu)
+			rpm_cv_dist_extra2=".Ubuntu${dist_cv_host_release}"
+			;;
 		esac
 		;;
 	    *)
@@ -280,6 +286,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	    (redhat)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
 	    (suse)	rpm_cv_dist_topdir='/usr/src/SuSE'   ;;
 	    (debian)	rpm_cv_dist_topdir='/usr/src/rpm'    ;;
+	    (ubuntu)	rpm_cv_dist_topdir='/usr/src/rpm'    ;;
 	    (*)		rpm_cv_dist_topdir="$ac_abs_top_buiddir" ;;
 	esac
     ])
