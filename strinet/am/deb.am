@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/03/06 11:35:14 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/06/30 03:49:38 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,17 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/06 11:35:14 $ by $Author: brian $
+## Last Modified $Date: 2006/06/30 03:49:38 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.67  2006/06/30 03:49:38  brian
+## - do not sign changes file when just building source package
+##
+## Revision 0.9.2.66  2006/06/30 03:17:26  brian
+## - don't sign source files by default
+##
 ## Revision 0.9.2.65  2006/03/06 11:35:14  brian
 ## - updated headers
 ##
@@ -146,7 +152,7 @@ $(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz $(debbuildd
 # you will be prompted for a passphrase with each signature.
 ##
 $(debian_dsc_file) $(debian_tar_file):: $(debian_dir)
-	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -uc $(DEBXOPTS) )
+	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -us -uc $(DEBXOPTS) )
 #	(cd "$(debbuilddir)" ; $(DPKG_SOURCE) -b -sn $(debian_dir))
 
 $(debtop_dsc_file) $(debtop_tar_file)::
