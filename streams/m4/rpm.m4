@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/06/29 23:38:09 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/06/30 19:36:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/29 23:38:09 $ by $Author: brian $
+# Last Modified $Date: 2006/06/30 19:36:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -156,18 +156,21 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra=".centos3"	;;
 			    (4|4.0)	rpm_cv_dist_extra=".centos4"	;;
+			    (5|5.0)	rpm_cv_dist_extra=".centos5"	;;
 			esac
 			;;
 		    (lineox)
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra=".lel3"	;;
 			    (4|4.0)	rpm_cv_dist_extra=".lel4"	;;
+			    (5|5.0)	rpm_cv_dist_extra=".lel5"	;;
 			esac
 			;;
 		    (whitebox)
 			case $dist_cv_host_release in
 			    (3|3.0)	rpm_cv_dist_extra=".WB3"	;;
 			    (4|4.0)	rpm_cv_dist_extra=".WB4"	;;
+			    (5|5.0)	rpm_cv_dist_extra=".WB5"	;;
 			esac
 			;;
 		    (fedora)
@@ -177,6 +180,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3)		rpm_cv_dist_extra=".FC3"	;;
 			    (4)		rpm_cv_dist_extra=".FC4"	;;
 			    (5)		rpm_cv_dist_extra=".FC5"	;;
+			    (6)		rpm_cv_dist_extra=".FC6"	;;
 			esac
 			;;
 		    (redhat)
@@ -190,6 +194,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (2|2.?)	rpm_cv_dist_extra=".EL"		;;
 			    (3|3.0)	rpm_cv_dist_extra=".E3"		;;
 			    (4|4.0)	rpm_cv_dist_extra=".EL4"	;;
+			    (5|5.0)	rpm_cv_dist_extra=".EL5"	;;
 			esac
 			;;
 		    (mandrake)
@@ -203,7 +208,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			rpm_cv_dist_extra=".deb${dist_cv_host_release}"
 			;;
 		    (ubuntu)
-			rpm_cv_dist_extra=".Ubuntu${dist_cv_host_release}"
+			rpm_cv_dist_extra=".ubuntu${dist_cv_host_release}"
 			;;
 		esac
 		;;
@@ -223,18 +228,21 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
+			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
 			esac
 			;;
 		    (lineox)
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
+			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
 			esac
 			;;
 		    (whitebox)
 			case $dist_cv_host_release in
 			    (3|3.0)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
+			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
 			esac
 			;;
 		    (fedora)
@@ -244,6 +252,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3)		rpm_cv_dist_extra2=".FC3"	;;
 			    (4)		rpm_cv_dist_extra2=".FC4"	;;
 			    (5)		rpm_cv_dist_extra2=".FC5"	;;
+			    (6)		rpm_cv_dist_extra2=".FC6"	;;
 			esac
 			;;
 		    (redhat)
@@ -254,6 +263,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (2|2.?)	rpm_cv_dist_extra2=".EL"	;;
 			    (3|3.0)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
+			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
 			esac
 			;;
 		    (mandrake)
@@ -267,7 +277,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			rpm_cv_dist_extra2=".deb${dist_cv_host_release}"
 			;;
 		    (ubuntu)
-			rpm_cv_dist_extra2=".Ubuntu${dist_cv_host_release}"
+			rpm_cv_dist_extra2=".ubuntu${dist_cv_host_release}"
 			;;
 		esac
 		;;
@@ -430,6 +440,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
     args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-tools(.)? , ,g;s,^ *,,;s, *$,,'`
     args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-arch(.)? , ,g;s,^ *,,;s, *$,,'`
     args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-indep(.)? , ,g;s,^ *,,;s, *$,,'`
+    args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-devel(.)? , ,g;s,^ *,,;s, *$,,'`
     args=`echo " $args " | sed -r -e 's, (.)?--with(out)?-lis(=[[^[:space:]]]*)?(.)? , ,g;s,^ *,,;s, *$,,'`
     args=`echo " $args " | sed -r -e 's, (.)?--with(out)?-lfs(=[[^[:space:]]]*)?(.)? , ,g;s,^ *,,;s, *$,,'`
     args=`echo " $args " | sed -r -e 's, (.)?--with(out)?-k-release(=[[^[:space:]]]*)?(.)? , ,g;s,^ *,,;s, *$,,'`

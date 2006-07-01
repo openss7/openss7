@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/06/30 10:11:00 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2006/06/30 21:52:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/30 10:11:00 $ by $Author: brian $
+# Last Modified $Date: 2006/06/30 21:52:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1549,17 +1549,17 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 	(debian)
 	    kernel_image='kernel-image'
 	    kernel_source='kernel-source'
-	    kernet_headers='kernel-headers'
+	    kernel_headers='kernel-headers'
 	    ;;
 	(ubuntu)
 	    kernel_image='linux-image'
 	    kernel_source='linux-source'
-	    kernet_headers='linux-headers'
+	    kernel_headers='linux-headers'
 	    ;;
 	(*)
-	    kernel_image=
-	    kernel_source=
-	    kernet_headers=
+	    kernel_image='kernel'
+	    kernel_source='kernel-sourcecode'
+	    kernel_headers='kernel-devel'
 	    ;;
     esac
     AC_SUBST([kernel_image])
