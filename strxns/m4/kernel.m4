@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2006/06/30 21:52:57 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/07/01 02:56:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/30 21:52:57 $ by $Author: brian $
+# Last Modified $Date: 2006/07/01 02:56:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1825,10 +1825,35 @@ dnl
 	    fi
 	fi
     ])
+    AC_CACHE_CHECK([for kernel KBUILD_STR], [linux_cv_k_bldflags], [dnl
+	cp -f "$kconfig" .config
+	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} bldflag-check`"
+	rm -f .config
+dnl
+dnl	As of 2.6.16+ the KBUILD_BASENAME is stringified on the command line
+dnl	and is no longer stringified in kernel source files.  This Makefile
+dnl	check checks to see if the KBUILD_STR symbol is defined by the
+dnl	makefile, and, if so, stringifies the KBUILD_BASENAME's.  We used to
+dnl	have -DKBUILD_BASENAME in the Makefile.am, but as it should always
+dnl	contain a name unique for the object linked into a module, it can
+dnl	always be derived from the compilation target, and so we do that here.
+dnl
+	case "$linux_cv_k_bldflags" in
+	    (*KBUILD_STR*)
+		linux_cv_k_bldflags='-D"KBUILD_STR(s)=\#s"'
+		;;
+	    (*)
+		linux_cv_k_bldflags='-D"KBUILD_STR(s)=s"'
+		;;
+	esac
+	linux_cv_k_bldflags="${linux_cv_k_bldflags} "'-DKBUILD_BASENAME="KBUILD_STR(`echo $@ | sed -e \'s|lib.*_a-||;s|\.o||;s|-|_|g\'`)"'
+    ])
     CFLAGS="$linux_cv_k_cflags"
     CPPFLAGS="$linux_cv_k_cppflags"
     KERNEL_MODFLAGS="$linux_cv_k_modflags"
     AC_SUBST([KERNEL_MODFLAGS])dnl
+    KERNEL_BLDFLAGS="$linux_cv_k_bldflags"
+    AC_SUBST([KERNEL_BLDFLAGS])dnl
 ])# _LINUX_SETUP_KERNEL_CFLAGS
 # =========================================================================
 
