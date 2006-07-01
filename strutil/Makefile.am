@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/21 13:24:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/07/01 11:59:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:24:43 $ by $Author: brian $
+# Last Modified $Date: 2006/07/01 11:59:44 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.16  2006/07/01 11:59:44  brian
+# - added new KERNEL_BLDFLAGS to makefiles
+#
 # Revision 0.9.2.15  2006/03/21 13:24:43  brian
 # - included pr.am
 #
@@ -445,7 +448,7 @@ libUTILlink_a_SOURCES		+= src/modules/sc.c
 libUTILlink_a_DEPENDENCIES	+= src/include/sys/sc.h src/include/sys/strutil/sc.h
 endif
 
-libUTILlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=strutil $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libUTILlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libUTILlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libUTILlink_a_OBJECTS):	$(libUTILlink_a_SOURCES) $(libUTILlink_a_DEPENDENCIES)
@@ -474,7 +477,7 @@ libUTILmods_a_SOURCES		+= src/modules/sc.c
 libUTILmods_a_DEPENDENCIES	+= src/include/sys/sc.h src/include/sys/strutil/sc.h
 endif
 
-libUTILmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libUTILmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libUTILmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libUTILmods_a_OBJECTS):	$(libUTILmods_a_DEPENDENCIES)
@@ -546,7 +549,7 @@ libUTILdrvs_a_SOURCES		+= src/drivers/spx.c
 libUTILdrvs_a_DEPENDENCIES	+=
 endif
 
-libUTILdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libUTILdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libUTILdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libUTILdrvs_a_OBJECTS):	$(libUTILdrvs_a_DEPENDENCIES)

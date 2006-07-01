@@ -1,25 +1,30 @@
+netperf (2.3.4-0) experimental; urgency=low
+
+  * Bumped version number for release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Thu, 29 Jun 2006 20:22:31 -0600
 
 netperf (2.3.3-0) experimental; urgency=low
 
   * Bumped version number for release.
 
- -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:20:38 -0700
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:20:38 -0700
 
 netperf (2.3.2-0) experimental; urgency=low
 
   * Bumped version number for release.
 
- -- Brian Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:20:38 -0700
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Tue,  7 Mar 2006 19:20:38 -0700
 
 netperf (2.3.1-0) experimental; urgency=low
 
   * Changed version numbering.
 
- -- Brian Bidulock <bidulock@openss7.org>  Wed, 16 Mar 2005 16:37:11 -0700
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Wed, 16 Mar 2005 16:37:11 -0700
 
 netperf-2.3.1 (0) experimental; urgency=low
 
   * Initial stab at debian build system.
 
- -- Brian Bidulock <bidulock@openss7.org>  Thu, 17 Feb 2005 23:13:02 -0700
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Thu, 17 Feb 2005 23:13:02 -0700
 

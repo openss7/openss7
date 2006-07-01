@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/05/08 03:36:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/07/01 11:59:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:36:49 $ by $Author: brian $
+# Last Modified $Date: 2006/07/01 11:59:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.48  2006/07/01 11:59:46  brian
+# - added new KERNEL_BLDFLAGS to makefiles
+#
 # Revision 0.9.2.47  2006/05/08 03:36:49  brian
 # - added init scripts
 #
@@ -171,7 +174,7 @@ mods_source_FILES		= $(nodist_EXTRA_libXNSmods_a_SOURCES)
 nodist_libXNSmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNSmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
@@ -186,7 +189,7 @@ drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
 libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/ip_hooks.h
-libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 libXNSdrvs_a_OBJECTS:		$(libXNSdrvs_a_DEPENDENCIES)
 
@@ -270,7 +273,7 @@ mods_source_FILES		= $(nodist_EXTRA_libXNSmods_a_SOURCES)
 nodist_libXNSmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNSmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
@@ -285,7 +288,7 @@ drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
 libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/ip_hooks.h
-libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 libXNSdrvs_a_OBJECTS:		$(libXNSdrvs_a_DEPENDENCIES)
 

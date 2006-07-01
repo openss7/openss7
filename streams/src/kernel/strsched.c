@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/06/27 09:22:14 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/07/01 11:44:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/27 09:22:14 $ by $Author: brian $
+ Last Modified $Date: 2006/07/01 11:44:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.141  2006/07/01 11:44:07  brian
+ - minor changes for 2.6.17 kernel
+
  Revision 0.9.2.140  2006/06/27 09:22:14  brian
  - move sd->sd_rq dereferencing inside read locks
 
@@ -104,10 +107,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/06/27 09:22:14 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/07/01 11:44:07 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/06/27 09:22:14 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/07/01 11:44:07 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -4468,6 +4471,10 @@ freestr(struct stdata *sd)
 #define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN)
 #endif				/* defined SLAB_DESTROY_BY_RCU */
 #endif				/* defined CONFIG_STREAMS_DEBUG */
+
+#ifndef SLAB_NO_REAP
+#define SLAB_NO_REAP 0
+#endif
 
 STATIC struct cacheinfo {
 	const char *name;

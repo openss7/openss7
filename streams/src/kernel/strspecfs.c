@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/06/14 10:37:25 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/07/01 11:44:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:25 $ by $Author: brian $
+ Last Modified $Date: 2006/07/01 11:44:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/06/14 10:37:25 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/07/01 11:44:08 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/06/14 10:37:25 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/07/01 11:44:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -101,7 +101,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/06/14 10:37:25 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/07/01 11:44:08 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -353,7 +353,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	}
 
 	{
-		struct file_operations *f_op;
+		const struct file_operations *f_op;
 
 		if (!(f_op = fops_get(snode->i_fop))) {
 			_ptrace(("Error path taken!\n"));
@@ -374,7 +374,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 			_printd(("%s: old f_ops have no owner!\n", __FUNCTION__));
 #endif
 		fops_put(file->f_op);
-		file->f_op = f_op;
+		file->f_op = (struct file_operations *)f_op;
 	}
 	dput(file->f_dentry);
 	file->f_dentry = dentry;

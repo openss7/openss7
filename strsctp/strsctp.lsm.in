@@ -28,10 +28,10 @@ Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,
-			LiS-2.18.3 or streams-0.7a.5 SVR 4.2 STREAMS,
-			strcompat-0.9.2.3,
-			strxns-0.9.2.3,
-			strxnet-0.9.2.8
+			streams-0.7a.6 SVR 4.2 STREAMS,
+			strcompat-0.9.2.4,
+			strxns-0.9.2.4,
+			strxnet-0.9.2.9
 Copying-policy:		GPL
 End
 

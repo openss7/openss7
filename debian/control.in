@@ -1,7 +1,7 @@
 Source: @PACKAGE_LCNAME@
 Section: devel
 Priority: optional
-Maintainer: Brian Bidulock <bidulock@openss7.org>
+Maintainer: Brian F. G. Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
 
 Package: @PACKAGE_LCNAME@-lis-core-@kversion@-@krelease@

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/03/29 11:32:18 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/07/01 11:41:53 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/29 11:32:18 $ by $Author: brian $
+## Last Modified $Date: 2006/07/01 11:41:53 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: kernel.am,v $
+## Revision 0.9.2.66  2006/07/01 11:41:53  brian
+## - changed to new KBUILD_ flags
+##
 ## Revision 0.9.2.65  2006/03/29 11:32:18  brian
 ## - spelling in comment
 ##
@@ -111,9 +114,9 @@ stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do \
 		test :$$m != :stamp-modpost || continue ; \
-		$(ECHO) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$m.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
+		$(ECHO) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$m.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
 		then mv -f $(DEPDIR)/$$m.mod.Tpo $(DEPDIR)/$$m.mod.Po ; else rm -f $(DEPDIR)/$$m.mod.Tpo ; exit 1 ; fi" ; \
-		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$m.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
+		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$m.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
 		then mv -f $(DEPDIR)/$$m.mod.Tpo $(DEPDIR)/$$m.mod.Po ; else rm -f $(DEPDIR)/$$m.mod.Tpo ; exit 1 ; fi ; \
 	done ; \
 	touch stamp-mobjects
@@ -127,9 +130,9 @@ stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 	for m in $$mods ; do \
 		test :$$m != :stamp-modpost || continue ; \
 		$(ECHO) "source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
+		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
 		source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
+		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
 	done ; \
 	touch stamp-mobjects
 ## AMDEP
@@ -139,8 +142,8 @@ stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do \
 		test :$$m != :stamp-modpost || continue ; \
-		$(ECHO) "$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
-		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
+		$(ECHO) "$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
+		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
 	done ; \
 	touch stamp-mobjects
 ## !AMDEP

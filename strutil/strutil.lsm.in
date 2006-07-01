@@ -16,7 +16,7 @@ Description:		@PACKAGE_TITLE@.
 			architectures as well.
 			Supports a wide range of new and old Linux distributions.
 			Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
-Keywords:		STREAMS, SVR 4.2 MP, LiS, LfS
+Keywords:		STREAMS, SVR 4.2 MP, LfS
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
@@ -27,6 +27,6 @@ Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,
-			LiS-2.18.3 or streams-0.7a.5 SVR 4.2 STREAMS
+			streams-0.7a.6 SVR 4.2 STREAMS
 Copying-policy:		GPL
 End

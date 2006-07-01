@@ -1,3 +1,11 @@
+2006-07-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/changelog: changes for Ubuntu dpkg build
+	* debian/control.in: changes for Ubuntu dpkg build
+	* debian/rules.in: changes for Ubuntu dpkg build
+	* netperf.lsm.in: updates for next release
+	* netperf-openss7.lsm.in: updates for next release
+
 2006-06-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* nettest_xti.c: don't request address when receiving (t_rcvudata)

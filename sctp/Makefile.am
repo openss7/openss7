@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/03/29 11:27:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/07/01 11:59:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/29 11:27:41 $ by $Author: brian $
+# Last Modified $Date: 2006/07/01 11:59:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.48  2006/07/01 11:59:38  brian
+# - added new KERNEL_BLDFLAGS to makefiles
+#
 # Revision 0.9.2.47  2006/03/29 11:27:41  brian
 # - corrections for rerelease, see ChangeLog
 #
@@ -232,7 +235,7 @@ sctp_source_FILES		= $(nodist_EXTRA_libSCTPmodl_a_SOURCES)
 nodist_libSCTPmodl_a_SOURCES	= $(sctp_source_FILES)
 
 libSCTPmodl_a_DEPENDENCIES	= $(CONFIG_HEADER)
-libSCTPmodl_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=sctp $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
+libSCTPmodl_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION)
 libSCTPmodl_a_CFLAGS		= $(KERNEL_CFLAGS)
 

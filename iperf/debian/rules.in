@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2006/03/08 11:58:17 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2006/07/01 11:51:43 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,9 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/08 11:58:17 $ by $Author: brian $
+## Last Modified $Date: 2006/07/01 11:51:43 $ by $Author: brian $
 ##
 ## =============================================================================
+
+CC = @CC@
+CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 
 PACKAGE = @PACKAGE@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
@@ -123,15 +128,21 @@ debian/${PACKAGE_LCNAME}-openss7.install:
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.docs
 
 debian/$(PACKAGE_LCNAME)-doc.docs:
+	( echo "ANNOUNCE" ; \
 	( echo "AUTHORS" ; \
-	  echo "ChangeLog" ; \
 	  echo "COPYING" ; \
+	  echo "ChangeLog" ; \
 	  echo "INSTALL" ; \
-	  echo "NEWS" ; \
-	  echo "README" ; \
-	  echo "THANKS" ; \
+	  echo "INSTALL-$(PACKAGE)" ; \
 	  echo "LICENSE" ; \
 	  echo "LSM" ; \
+	  echo "NEWS" ; \
+	  echo "README" ; \
+	  echo "README-cvs" ; \
+	  echo "README-make" ; \
+	  echo "README-nexusware" ; \
+	  echo "THANKS" ; \
+	  echo "TODO" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.manpages
@@ -264,6 +275,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.12  2006/07/01 11:51:43  brian
+# - changes for Ubuntu dpkg build
+#
 # Revision 1.1.2.11  2006/03/08 11:58:17  brian
 # - updates for release
 #

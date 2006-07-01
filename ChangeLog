@@ -1,3 +1,23 @@
+2006-07-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: changes for 2.6.17 kernel
+	* scripts/cflagscheck: check for KBUILD_STR
+	* am/kernel.am: add new build flags to modpost
+	* debian/changelog: changes for Ubuntu dpkg build
+	* debian/control.in: changes for Ubuntu dpkg build
+
+2006-06-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/rpm.m4: changes for Fedora Core 5
+	* m4/deb.m4: changes for Fedora Core 5
+	* m4/kernel.m4: changes for Fedora Core 5
+
+2006-06-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/rpm.m4: variations for Ubuntu
+	* m4/deb.m4: variations for Ubuntu
+	* m4/kernel.m4: changes for Ubuntu
+
 2006-06-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: kick out -fno-unit-at-a-time flags

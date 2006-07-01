@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.12 $) $Date: 2006/03/08 11:58:18 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.13 $) $Date: 2006/07/01 11:51:48 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,9 +47,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/08 11:58:18 $ by $Author: brian $
+## Last Modified $Date: 2006/07/01 11:51:48 $ by $Author: brian $
 ##
 ## =============================================================================
+
+CC = @CC@
+CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 
 PACKAGE = @PACKAGE@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
@@ -168,14 +173,20 @@ pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.docs
 
 debian/$(PACKAGE_LCNAME)-doc.docs:
 	( echo "AUTHORS" ; \
-	  echo "ChangeLog" ; \
 	  echo "COPYING" ; \
+	  echo "ChangeLog" ; \
 	  echo "INSTALL" ; \
+	  echo "INSTALL-$(PACKAGE)" ; \
+	  echo "LSM" ; \
 	  echo "NEWS" ; \
 	  echo "README" ; \
+	  echo "README-alpha" ; \
+	  echo "README-cvs" ; \
+	  echo "README-make" ; \
+	  echo "README-nexusware" ; \
 	  echo "THANKS" ; \
+	  echo "TODO" ; \
 	  echo "manual" ; \
-	  echo "LSM" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.manpages
@@ -358,6 +369,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.4.13  2006/07/01 11:51:48  brian
+# - changes for Ubuntu dpkg build
+#
 # Revision 1.1.4.12  2006/03/08 11:58:18  brian
 # - updates for release
 #

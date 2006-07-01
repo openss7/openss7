@@ -1,3 +1,11 @@
+2006-07-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/changelog: changes for Ubuntu dpkg build
+	* debian/control.in: changes for Ubuntu dpkg build
+	* debian/rules.in: changes for Ubuntu dpkg build
+	* Makefile.am: added new KERNEL_BLDFLAGS build flags for 2.6.16+
+	* stacks.lsm.in: updates for next release
+
 2006-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/drafts/idrefs: updates for draft rerelease

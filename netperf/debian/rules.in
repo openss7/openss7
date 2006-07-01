@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2006/03/08 11:58:19 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2006/07/01 11:51:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,9 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/08 11:58:19 $ by $Author: brian $
+## Last Modified $Date: 2006/07/01 11:51:51 $ by $Author: brian $
 ##
 ## =============================================================================
+
+CC = @CC@
+CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 
 PACKAGE = @PACKAGE@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
@@ -123,21 +128,26 @@ pkg_scripts_files	= $(pkg_lis_scripts_files) $(pkg_lfs_scripts_files)
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.docs
 
 debian/$(PACKAGE_LCNAME)-doc.docs:
-	( echo "AUTHORS" ; \
-	  echo "ChangeLog" ; \
+	( echo "ACKNWLDGMNTS" ; \
+	  echo "AUTHORS" ; \
 	  echo "COPYING" ; \
+	  echo "COPYRIGHT" ; \
+	  echo "ChangeLog" ; \
 	  echo "INSTALL" ; \
+	  echo "INSTALL-$(PACKAGE)" ; \
+	  echo "LICENSE" ; \
+	  echo "LSM" ; \
 	  echo "NEWS" ; \
 	  echo "README" ; \
-	  echo "THANKS" ; \
-	  echo "ACKNWLDGMNTS" ; \
-	  echo "COPYRIGHT" ; \
-	  echo "netperf_hp.ps" ; \
+	  echo "README-cvs" ; \
+	  echo "README-make" ; \
+	  echo "README-nexusware" ; \
 	  echo "README.ovms" ; \
 	  echo "Release_Notes" ; \
-	  echo "netperf.pdf" ; \
-	  echo "netperf.html" ; \
-	  echo "LSM" ; \
+	  echo "THANKS" ; \
+	  echo "TODO" ; \
+	  echo "manual" ; \
+	  echo "netperf_hp.ps" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.manpages
@@ -320,6 +330,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.14  2006/07/01 11:51:51  brian
+# - changes for Ubuntu dpkg build
+#
 # Revision 1.1.2.13  2006/03/08 11:58:19  brian
 # - updates for release
 #

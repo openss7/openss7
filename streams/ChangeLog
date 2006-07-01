@@ -1,3 +1,12 @@
+2006-07-01  Brian Bidulock  <bidulock@openss7.org>
+	
+	* Makefile.am: changed to new KBUILD_STR build flags
+	* src/kernel/strsched.c: 2.6.17 has no SLAB_NO_REAP flag
+	* src/kernel/strspecfs.c: 2.6.17 has const f_op pointer
+	* debian/changelog: changes for Ubuntu dpkg build
+	* debian/control.in: changes for Ubuntu dpkg build
+	* debian/rules.in: changes for Ubuntu dpkg build
+
 2006-06-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/strsched.c: coorected minor bug in optimization

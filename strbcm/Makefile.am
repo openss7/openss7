@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/21 13:24:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/07/01 11:59:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:24:38 $ by $Author: brian $
+# Last Modified $Date: 2006/07/01 11:59:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2006/07/01 11:59:41  brian
+# - added new KERNEL_BLDFLAGS to makefiles
+#
 # Revision 0.9.2.5  2006/03/21 13:24:38  brian
 # - included pr.am
 #
@@ -143,7 +146,7 @@ EXTRA_LIBRARIES			+=
 EXTRA_libBCMlink_a_SOURCES	= 
 libBCMlink_a_SOURCES		= 
 libBCMlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libBCMlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=strbcm $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libBCMlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libBCMlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libBCMlink_a_OBJECTS):	$(libBCMlink_a_SOURCES) $(libBCMlink_a_DEPENDENCIES)
@@ -153,7 +156,7 @@ libBCMmods_a_SOURCES		= \
 				  src/modules/testmod.h \
 				  src/modules/testmod.c
 libBCMmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libBCMmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libBCMmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libBCMmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libBCMmods_a_OBJECTS):	$(libBCMmods_a_DEPENDENCIES)
@@ -163,7 +166,7 @@ libBCMdrvs_a_SOURCES		= \
 				  src/drivers/testdrv.h \
 				  src/drivers/testdrv.c
 libBCMdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libBCMdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libBCMdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libBCMdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libBCMdrvs_a_OBJECTS):	$(libBCMdrvs_a_DEPENDENCIES)

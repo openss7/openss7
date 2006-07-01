@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/06 11:39:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/01 12:09:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:39:00 $ by $Author: brian $
+# Last Modified $Date: 2006/07/01 12:09:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.14  2006/07/01 12:09:20  brian
+# - missing dependencies for testsuite
+#
 # Revision 0.9.2.13  2006/03/06 11:39:00  brian
 # - updated headers
 #
@@ -86,7 +89,9 @@ include ../am/autotest.am
 TESTSUITE_DEPS		+= \
 			local.at \
 			kernel.at \
+			$(TESTSUITE)-sctp.at \
 			$(TESTSUITE)-sctp_t.at \
+			$(TESTSUITE)-sctp_n.at \
 			$(TESTSUITE).at
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

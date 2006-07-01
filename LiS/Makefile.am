@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.35 $) $Date: 2006/03/21 13:24:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.36 $) $Date: 2006/07/01 11:59:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:24:34 $ by $Author: brian $
+# Last Modified $Date: 2006/07/01 11:59:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.36  2006/07/01 11:59:37  brian
+# - added new KERNEL_BLDFLAGS to makefiles
+#
 # Revision 1.1.6.35  2006/03/21 13:24:34  brian
 # - included pr.am
 #
@@ -185,7 +188,7 @@ libLiShead_a_SOURCES		= head/head.c \
 				  head/linux/lismem.c \
 				  head/linux/lispci.c
 libLiShead_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libLiShead_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=streams $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
+libLiShead_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME=`echo $* | sed -e 's/^.*-//'`
 libLiShead_a_CFLAGS		= $(KERNEL_CFLAGS)
@@ -200,7 +203,7 @@ libLiSdrvr_a_SOURCES		= drivers/str/clone.c \
 				  drivers/str/linux/connld.c \
 				  drivers/str/relay.c
 libLiSdrvr_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libLiSdrvr_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=streams $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
+libLiSdrvr_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) \
 				  -DLIS_OBJNAME=`echo $* | sed -e 's/^.*-//'`
 libLiSdrvr_a_CFLAGS		= $(KERNEL_CFLAGS)
@@ -224,7 +227,7 @@ libLiSload_a_SOURCES		= drivers/str/pipemod.c \
 				  drivers/str/mux.c
 
 libLiSload_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libLiSload_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
+libLiSload_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  -DLIS_OBJNAME=`echo $* | sed -e 's/^.*-//'`
 libLiSload_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libLiSload_a_OBJECTS): $(libLiSload_a_DEPENDENCIES)

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/07/01 02:56:40 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/07/01 11:37:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/01 02:56:40 $ by $Author: brian $
+# Last Modified $Date: 2006/07/01 11:37:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -94,8 +94,9 @@ linux_kernel_env_push() {
 dnl We need safe versions of these flags without warnings or strange optimizations
 dnl but with module flags included
 dnl But we need to skip -DMODVERSIONS and -include /blah/blah/modversion.h on rh systems.
+    BLDFLAGS=`echo "$KERNEL_BLDFLAGS" | sed -e "s|'||g;s|.#s|#s|;s|-DKBUILD_BASENAME.*|-DKBUILD_BASENAME=KBUILD_STR(phony)|"`
     MODFLAGS=`echo " $KERNEL_MODFLAGS " | sed -e 's| -DMOVERSIONS||g;s| -include [[^ ]]*||g'`
-    CPPFLAGS=`echo " $MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
+    CPPFLAGS=`echo " $BLDFLAGS $MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     CFLAGS=`echo " $KERNEL_CFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     LDFLAGS=`echo " $KERNEL_LDFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     CFLAGS="$CFLAGS -Werror"
@@ -1840,13 +1841,13 @@ dnl	always be derived from the compilation target, and so we do that here.
 dnl
 	case "$linux_cv_k_bldflags" in
 	    (*KBUILD_STR*)
-		linux_cv_k_bldflags='-D"KBUILD_STR(s)=\#s"'
+		linux_cv_k_bldflags="'-DKBUILD_STR(s)=\#s'"
 		;;
 	    (*)
-		linux_cv_k_bldflags='-D"KBUILD_STR(s)=s"'
+		linux_cv_k_bldflags="'-DKBUILD_STR(s)=s'"
 		;;
 	esac
-	linux_cv_k_bldflags="${linux_cv_k_bldflags} "'-DKBUILD_BASENAME="KBUILD_STR(`echo $@ | sed -e \'s|lib.*_a-||;s|\.o||;s|-|_|g\'`)"'
+	linux_cv_k_bldflags="${linux_cv_k_bldflags} '-DKBUILD_BASENAME=KBUILD_STR(`echo [$][@] | sed -e s,lib.*_a-,,;s,\.o,,;s,-,_,g`)'"
     ])
     CFLAGS="$linux_cv_k_cflags"
     CPPFLAGS="$linux_cv_k_cppflags"
