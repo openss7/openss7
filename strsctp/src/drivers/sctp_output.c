@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $
+ @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:26:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
+ Last Modified $Date: 2006/07/02 12:26:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $"
+#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:26:23 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $";
+    "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:26:23 $";
 
 #define __NO_VERSION__
 
@@ -226,24 +226,6 @@ sctp_queue_xmit(struct sk_buff *skb)
  *  destination address and a message block.  The only time that we use this
  *  is for responding to OOTB packets with ABORT or SHUTDOWN COMPLETE.
  */
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132
-#endif
-#ifndef HAVE_IP_ROUTE_OUTPUT
-static inline int
-ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
-{
-	struct flowi fl = {.oif = oif,
-		.nl_u = {.ip4_u = {.daddr = daddr,
-				   .saddr = saddr,
-				   .tos = tos}},
-		.proto = IPPROTO_SCTP,
-		.uli_u = {.ports = {.sport = 0,.dport = 0}}
-	};
-
-	return ip_route_output_key(rp, &fl);
-}
-#endif
 void
 sctp_xmit_ootb(daddr, saddr, mp)
 	uint32_t daddr;

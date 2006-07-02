@@ -1,12 +1,12 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.19 2006/06/30 01:22:07 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.20 2006/07/02 12:13:45 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
-@c Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
 @c
@@ -17,7 +17,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/06/30 01:22:07 $ by $Author: brian $
+@c Last Modified $Date: 2006/07/02 12:13:45 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -89,7 +89,7 @@ Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
 @itemize @bullet
 @item A fairly LSB compliant GNU/Linux distribution.
 @footnote{@xref{GNU/Linux Distributions}, for more information.}
-@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.15)
+@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.17)
 @item glibc2 or better.
 @item GNU info (for info files).
 @item GNU groff (for man pages).
@@ -130,40 +130,41 @@ is, in a future release, the distributions marked @samp{TBD} will not longer be 
 release.}
 
 @itemize @bullet
-@item RedHat Linux 7.2 (RH7)
-@item RedHat Linux 7.3 (RH7)
-@item Performance Technlogies @dfn{NexusWare24} -- TBD
-@item RedHat Linux 8.0 (RH8) -- TBD
-@item RedHat Linux 9 (RH9) -- TBD
-@item SuSE 8.0 Professional -- TBD
-@item Fedora Core 1 (FC1) -- TBD
-@item Debian 3.0r2 Woody -- TBD
-@item Mandrakelinux 9.2 (MDK92) -- TBD
-@item RedHat Enterprise Linux 3.0 (EL3)
-@item WhiteBox Enterprise Linux 3.0 (WBEL3)
 @item CentOS Enterprise Linux 3.4 (centos34)
-@item Fedora Core 2 (FC2) -- TBD
-@item SuSE 9.1 Personal -- TBD
-@item Mandrakelinux 10.0 (MDK100) -- TBD
-@item SuSE 9.2 Professional (SuSE9.2) -- TBD
-@item Mandrakelinux 10.1 (MDK101) -- TBD
-@item Fedora Core 3 (FC3) -- TBD
-@item RedHat Enterprise Linux 4 (EL4)
 @item CentOS Enterprise Linux 4.0 (centos4)
-@item WhiteBox Enterprise Linux 4 (WBEL4)
+@item Debian 3.0r2 Woody -- TBD
+@item Debian 3.1r0a Sarge
+@item Fedora Core 1 (FC1) -- TBD
+@item Fedora Core 2 (FC2) -- TBD
+@item Fedora Core 3 (FC3) -- TBD
 @item Fedora Core 4 (FC4)
+@item Fedora Core 5
+@item Gentoo 2006.1 (untested)
 @item Lineox 4.026 (LEL4) -- TBD
 @item Lineox 4.053 (LEL4)
+@item Mandrakelinux 10.0 (MDK100) -- TBD
+@item Mandrakelinux 10.1 (MDK101) -- TBD
+@item Mandrakelinux 9.2 (MDK92) -- TBD
 @item Mandriva Linux LE2005 (MDK102) -- TBD
-@item Performance Technologies NexusWare 8.0
-@item Debian 3.1r0a Sarge
-@item SuSE 10.0
-@item OpenSuSE
-@item Ubuntu 5.10
 @item Mandriva Linux LE2006 (MDK103)
-@item Fedora Core 5 (untested)
-@item Gentoo 2006.1 (untested)
+@item Mandriva One (untested)
+@item Performance Technlogies @dfn{NexusWare24} -- TBD
+@item Performance Technologies NexusWare 8.0
+@item RedHat Linux 7.2 (RH7)
+@item RedHat Linux 7.3 (RH7)
+@item RedHat Linux 8.0 (RH8) -- TBD
+@item RedHat Linux 9 (RH9) -- TBD
+@item RedHat Enterprise Linux 3.0 (EL3)
+@item RedHat Enterprise Linux 4 (EL4)
+@item SuSE 8.0 Professional -- TBD
+@item SuSE 9.1 Personal -- TBD
+@item SuSE 9.2 Professional (SuSE9.2) -- TBD
+@item SuSE OpenSuSE
+@item SuSE 10.0
 @item SuSE 10.1 (untested)
+@item Ubuntu 5.10
+@item WhiteBox Enterprise Linux 3.0 (WBEL3)
+@item WhiteBox Enterprise Linux 4 (WBEL4)
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
@@ -174,12 +175,19 @@ distributions against which the current maintainer creates and tests builds.
 @subsection Kernel
 @cindex Kernel
 
-@dfn{@value{PACKAGE_TITLE}} compiles as a @dfn{Linux} kernel module.  It is not ncessary to patch the
-@dfn{Linux} kernel to use the package.  At a later date, it is possible to move this package into the
-kernel.
+The @cite{@value{PACKAGE_TITLE}} package compiles as a @dfn{Linux} kernel module.  It is not
+necessary to patch the @dfn{Linux} kernel to build or use the package.@footnote{At a later date, it
+is possible to move this package into the kernel, however, with continued resistance to STREAMS from
+within the @dfn{Linux} developer community, this is currently unlikely.} Nor do you have to
+recompile your kernel to build or use the package.  OpenSS7 packages use @command{autoconf} scripts
+to adapt the package source to your existing kernel.  The package builds and runs nicely against
+production kernels from the distributions listed above.  Rather than relying on kernel versions, the
+@command{autoconf} scripts interrogate the kernel for specific features and variants to better adapt
+to distribution production kernels that have had patches applied over the official
+@url{http://www.kernel.org/, kernel.org} sources.
 
 The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10 and has
-been tested up to and including 2.4.27.  It has been tested from 2.6.3 up to and including 2.6.15.
+been tested up to and including 2.4.27.  It has been tested from 2.6.3 up to and including 2.6.17.
 
 UP validation testing for kernels is performed on all supported architectures.  SMP validation
 testing is performed on UP machines, as well as on an Intel 3.0GHz Pentium IV 630 with

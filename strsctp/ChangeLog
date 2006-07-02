@@ -1,3 +1,12 @@
+2006-07-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/releases.texi: updates for release
+	* src/drivers/sctp_compat.h: changes for 2.6.17 kernel
+	* acinclude.m4: make inet tests compatible
+	* src/drivers/sctp_hooks.h.in: make inet tests compatible
+	* src/drivers/sctp_output.c: make inet tests compatible
+	* src/drivers/sctp_route.c: make inet tests compatible
+
 2006-07-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/changelog: changes for Ubuntu dpkg build

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/06/05 02:53:39 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/07/02 12:26:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/05 02:53:39 $ by $Author: brian $
+# Last Modified $Date: 2006/07/02 12:26:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,7 +67,7 @@ m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
-m4_include([m4/xopen.m4])
+dnl m4_include([m4/xopen.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
 
@@ -159,32 +159,130 @@ AC_DEFUN([_INET_OPTIONS], [dnl
 # =============================================================================
 
 # =============================================================================
+# _INET_SETUP_DEBUG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_INET_SETUP_DEBUG], [dnl
+    case "$linux_cv_debug" in
+    _DEBUG)
+	AC_DEFINE_UNQUOTED([INET_CONFIG_DEBUG], [], [Define to perform
+			    internal structure tracking within INET as well as
+			    to provide additional /proc filesystem files for
+			    examining internal structures.])
+	;;
+    _TEST)
+	AC_DEFINE_UNQUOTED([INET_CONFIG_TEST], [], [Define to perform
+			    performance testing with debugging.  This mode
+			    does not dump massive amounts of information into
+			    system logs, but peforms all assertion checks.])
+	;;
+    _SAFE)
+	AC_DEFINE_UNQUOTED([INET_CONFIG_SAFE], [], [Define to perform
+			    fundamental assertion checks.  This is a safer
+			    mode of operation.])
+	;;
+    _NONE | *)
+	AC_DEFINE_UNQUOTED([INET_CONFIG_NONE], [], [Define to perform no
+			    assertion checks but report software errors.  This
+			    is the smallest footprint, highest performance
+			    mode of operation.])
+	;;
+    esac
+])# _INET_SETUP_DEBUG
+# =============================================================================
+
+# =============================================================================
+# _INET_OTHER_SCTP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_INET_OTHER_SCTP], [dnl
+    linux_cv_other_sctp='no'
+    linux_cv_lksctp_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp compiled in], [CONFIG_IP_SCTP])
+    if test :"$linux_cv_CONFIG_IP_SCTP" = :"yes" ; then
+	linux_cv_other_sctp='lksctp'
+	linux_cv_lksctp_sctp='yes'
+	AC_MSG_ERROR([
+**** 
+**** Configure has detected a kernel with the deprecated lksctp compiled in.
+**** This is NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on
+**** such a bastardized kernel will most likely result in an unstable
+**** situation.  Try a different kernel, or try recompiling your kernel with
+**** lksctp removed (or at least compiled as a module).
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp as module], [CONFIG_IP_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_IP_SCTP_MODULE" = :"yes" ; then
+	linux_cv_other_sctp='lksctp'
+	linux_cv_lksctp_sctp='yes'
+	AC_DEFINE([HAVE_LKSCTP_SCTP], [1], [Some more recent 2.4.25 and
+	    greater kernels have this poorman version of SCTP included in the
+	    kernel.  Define this symbol if you have such a bastardized kernel.
+	    When we have such a kernel we need to define lksctp's header
+	    wrapper defines so that none of the lksctp header files are
+	    included (we use our own instead).])
+    fi
+    linux_cv_openss7_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp compiled in], [CONFIG_SCTP])
+    if test :"$linux_cv_CONFIG_SCTP" = :"yes" ; then
+	linux_cv_other_sctp='openss7'
+	linux_cv_openss7_sctp='yes'
+	AC_MSG_WARN([
+**** 
+**** Configure has detected a kernel with OpenSS7 SCTP compiled in.  This is
+**** NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on such a
+**** kernel can lead to difficulties.  Try a different kernel, or try
+**** recompiling with OpenSS7 SCTP compiled as a module, and perhaps removed.
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp module], [CONFIG_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_SCTP_MODULE" = :"yes" ; then
+	linux_cv_other_sctp='openss7'
+	linux_cv_openss7_sctp='yes'
+	AC_DEFINE([HAVE_OPENSS7_SCTP], [1], [Define if your kernel supports
+	    the OpenSS7 Linux Kernel Sockets SCTP patches.  This enables
+	    support in the SCTP driver for STREAMS on top of the OpenSS7 Linux
+	    Kernel Sockets SCTP implementation.])
+    fi
+    AM_CONDITIONAL([WITH_LKSCTP_SCTP], [ test :"${linux_cv_lksctp_sctp:-no}"  = :yes])dnl
+    AM_CONDITIONAL([WITH_OPENSS7_SCTP], [test :"${linux_cv_openss7_sctp:-no}" = :yes])dnl
+])# _INET_OTHER_SCTP
+# =============================================================================
+
+# =============================================================================
 # _INET_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_SETUP], [dnl
     _LINUX_KERNEL
     _LINUX_DEVFS
     _GENKSYMS
-    _INET_CONFIG_KERNEL
     _LINUX_STREAMS
     _STRCOMP
-    with_inet='yes'
-    _XOPEN
+dnl with_inet='yes'
+dnl _XOPEN
     _XNS
     _XTI
-    AC_CACHE_CHECK([for sctp openss7 kernel], [inet_cv_openss7_sctp], [dnl
-	_LINUX_KERNEL_ENV([dnl
-	    AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <net/sctp.h>
-#ifdef SCTPCB_FLAG_CONF
-    yes_we_have_openss7_kernel_sctp
-#endif
-	    ], [inet_cv_openss7_sctp=yes], [inet_cv_openss7_sctp=no]) ]) ])
-    AM_CONDITIONAL([WITH_OPENSS7_SCTP], test :"${inet_cv_openss7_sctp:-no}" = :yes)dnl
+    # here we have our flags set and can perform preprocessor and compiler
+    # checks on the kernel
+    _INET_OTHER_SCTP
+    _INET_SETUP_MODULE
+    _INET_CONFIG_KERNEL
+    _INET_SETUP_DEBUG
 ])# _INET_SETUP
+# =============================================================================
+
+# =============================================================================
+# _INET_SETUP_MODULE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_INET_SETUP_MODULE], [dnl
+    if test :"${linux_cv_k_linkage:-loadable}" = :loadable ; then
+	AC_DEFINE_UNQUOTED([INET_CONFIG_MODULE], [], [When defined, INET is
+			    being compiled as a loadable kernel module.])
+    else
+	AC_DEFINE_UNQUOTED([INET_CONFIG], [], [When defined, INET is being
+			    compiled as a kernel linkable object.])
+    fi
+    AM_CONDITIONAL([INET_CONFIG_MODULE], [test :${linux_cv_k_linkage:-loadable} = :loadable])
+    AM_CONDITIONAL([INET_CONFIG], [test :${linux_cv_k_linkage:-loadable} = :linkable])
+])# _INET_SETUP_MODULE
 # =============================================================================
 
 # =============================================================================
@@ -326,10 +424,6 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 			  struct inet_protocol.no_policy,
 			  struct net_protocol.no_policy,
 			  struct dst_entry.path,
-			  struct sk_buff.h.sh,
-			  struct sock.protinfo.af_inet.ttl,
-			  struct sock.protinfo.af_inet.uc_ttl,
-			  struct sock.tp_pinfo.af_sctp,
 			  struct net_protocol.proto,
 			  struct dst_entry.path], [], [], [
 #include <linux/config.h>
@@ -339,8 +433,6 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
 #include <net/protocol.h>
 #ifdef HAVE_NET_DST_H
 #include <net/dst.h>
@@ -348,7 +440,6 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
     ])
     _LINUX_KERNEL_SYMBOLS([module_text_address,
 			   skbuff_head_cache,
-			   afinet_get_info,
 			   icmp_err_convert,
 			   icmp_statistics,
 			   inet_bind,
@@ -369,16 +460,8 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 			   sysctl_ip_dynaddr,
 			   sysctl_ip_nonlocal_bind,
 			   sysctl_local_port_range,
-			   tcp_prot,
-			   udp_prot,
-			   raw_prot,
-			   tcp_memory_allocated,
-			   tcp_orphan_count,
-			   tcp_sockets_allocated,
-			   tcp_tw_count,
 			   ip_frag_nqueues,
 			   ip_frag_mem,
-			   __tcp_push_pending_frames,
 			   __xfrm_policy_check,
 			   xfrm_policy_delete,
 			   __xfrm_sk_clone_policy])
@@ -500,10 +583,11 @@ dnl *** ])
 dnl 	fi
     ])
     _LINUX_KERNEL_SYMBOLS([inet_proto_lock, inet_protos])
-    _LINUX_KERNEL_ENV([dnl
-	AC_CHECK_MEMBER([struct inet_protocol.protocol],
-	    [inet_cv_inet_protocol_style='old'],
-	    [:], [
+    if test :"${with_inet:-no}" = :yes ; then
+	_LINUX_KERNEL_ENV([dnl
+	    AC_CHECK_MEMBER([struct inet_protocol.protocol],
+		[linux_cv_inet_protocol_style='old'],
+		[:], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -511,13 +595,11 @@ dnl 	fi
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
 #include <net/protocol.h>
-	    ])
-	AC_CHECK_MEMBER([struct inet_protocol.no_policy],
-	    [inet_cv_inet_protocol_style='new'],
-	    [:], [
+		])
+	    AC_CHECK_MEMBER([struct inet_protocol.no_policy],
+		[linux_cv_inet_protocol_style='new'],
+		[:], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -525,13 +607,11 @@ dnl 	fi
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
 #include <net/protocol.h>
-	    ])
-	AC_CHECK_MEMBER([struct dst_entry.path],
-	    [inet_cv_dst_entry_path='yes'],
-	    [inet_cv_dst_entry_path='no'], [
+		])
+	    AC_CHECK_MEMBER([struct dst_entry.path],
+		[linux_cv_dst_entry_path='yes'],
+		[linux_cv_dst_entry_path='no'], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -539,13 +619,12 @@ dnl 	fi
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
 #include <net/dst.h>
+		])
 	    ])
-	])
-    if test :"${inet_cv_inet_protocol_style:+set}" = :set ; then
-	case "$inet_cv_inet_protocol_style" in
+    fi
+    if test :"${linux_cv_inet_protocol_style:+set}" = :set ; then
+	case "$linux_cv_inet_protocol_style" in
 	    old)
 		AC_DEFINE([HAVE_OLD_STYLE_INET_PROTOCOL], [1], [Most
 		2.4 kernels have the old style struct inet_protocol and the
@@ -568,7 +647,7 @@ dnl 	fi
     else
 	with_udp='no'
     fi
-    if test :"${inet_cv_dst_entry_path:-no}" = :yes ; then
+    if test :"${linux_cv_dst_entry_path:-no}" = :yes ; then
 	AC_DEFINE([HAVE_STRUCT_DST_ENTRY_PATH], [1], [Newer RHEL3
 	kernels change the destination entry structure.  Define this macro to
 	use the newer structure.])
@@ -595,6 +674,37 @@ dnl 	fi
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
+dnl
+dnl These are INET-only checks
+dnl
+    _LINUX_CHECK_MEMBERS([struct sk_buff.h.sh,
+			  struct sock.protinfo.af_inet.ttl,
+			  struct sock.protinfo.af_inet.uc_ttl,
+			  struct sock.tp_pinfo.af_sctp], [], [], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+#include <net/protocol.h>
+#ifdef HAVE_NET_DST_H
+#include <net/dst.h>
+#endif
+    ])
+    _LINUX_KERNEL_SYMBOLS([
+			   afinet_get_info,
+			   tcp_prot,
+			   udp_prot,
+			   raw_prot,
+			   tcp_memory_allocated,
+			   tcp_orphan_count,
+			   tcp_sockets_allocated,
+			   tcp_tw_count,
+			   __tcp_push_pending_frames])
     _LINUX_CHECK_MEMBER([struct sock.__sk_common], [
 	_LINUX_CHECK_MEMBER([struct inet_opt.tos],
 	[AC_DEFINE([HAVE_TRN_SOCK_STRUCTURE], [1], [Define to 1 i you have the transitional Linux
@@ -688,6 +798,103 @@ dnl 	fi
 	AC_DEFINE([HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK], [1], [Define to 1 if function
 	tcp_set_skb_tso_segs takes a (struct sock *, struct sk_buff *) argument list.])
     fi
+dnl
+dnl These were INET-only checks
+dnl
+    _LINUX_KERNEL_EXPORTS([
+	    add_wait_queue,
+	    add_wait_queue_exclusive,
+	    alloc_skb,
+	    create_proc_entry,
+	    del_timer,
+	    dev_base_lock,
+	    dev_base,
+	    do_softirq,
+	    free_pages,
+	    __generic_copy_to_user,
+	    __get_free_pages,
+	    __get_user_4,
+	    inet_accept,
+	    inet_add_protocol,
+	    inet_addr_type,
+	    inet_del_protocol,
+	    inetdev_lock,
+	    inet_family_ops,
+	    inet_getsockopt,
+	    inet_recvmsg,
+	    inet_register_protosw,
+	    inet_release,
+	    inet_sendmsg,
+	    inet_setsockopt,
+	    inet_shutdown,
+	    inet_stream_connect,
+	    inet_unregister_protosw,
+	    ip_cmsg_recv,
+	    ip_fragment,
+	    ip_route_output_key,
+	    __ip_select_ident,
+	    ip_send_check,
+	    irq_stat,
+	    jiffies,
+	    kfree,
+	    __kfree_skb,
+	    kill_pg,
+	    kill_proc,
+	    kmem_cache_alloc,
+	    kmem_cache_create,
+	    kmem_cache_destroy,
+	    kmem_cache_free,
+	    kmem_find_general_cachep,
+	    __lock_sock,
+	    mod_timer,
+	    net_statistics,
+	    nf_hooks,
+	    nf_hook_slow,
+	    num_physpages,
+	    __out_of_line_bug,
+	    panic,
+	    __pollwait,
+	    printk,
+	    proc_dointvec_jiffies,
+	    proc_dointvec_minmax,
+	    proc_dointvec,
+	    proc_doulongvec_ms_jiffies_minmax,
+	    proc_net,
+	    ___pskb_trim,
+	    put_cmsg,
+	    register_sysctl_table,
+	    __release_sock,
+	    remove_proc_entry,
+	    remove_wait_queue,
+	    schedule_timeout,
+	    secure_tcp_sequence_number,
+	    send_sig,
+	    sk_alloc,
+	    skb_clone,
+	    skb_copy_datagram_iovec,
+	    skb_linearize,
+	    skb_over_panic,
+	    skb_realloc_headroom,
+	    skb_under_panic,
+	    sk_free,
+	    sk_run_filter,
+	    sock_no_mmap,
+	    sock_no_sendpage,
+	    sock_no_socketpair,
+	    sock_wake_async,
+	    sock_wfree,
+	    sprintf,
+	    sysctl_intvec,
+	    sysctl_ip_default_ttl,
+	    sysctl_jiffies,
+	    sysctl_local_port_range,
+	    unregister_sysctl_table,
+	    __wake_up], [], [dnl
+	    AC_MSG_WARN([
+**** 
+**** Linux kernel symbol ']LK_Export[' should be exported but it
+**** isn't.  This could cause problems later.
+**** ])])
 ])# _INET_CONFIG_KERNEL
 # =============================================================================
 

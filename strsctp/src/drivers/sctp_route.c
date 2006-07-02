@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/28 10:01:03 $
+ @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/02 12:26:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:03 $ by $Author: brian $
+ Last Modified $Date: 2006/07/02 12:26:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/28 10:01:03 $"
+#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/02 12:26:23 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/28 10:01:03 $";
+    "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/02 12:26:23 $";
 
 #define __NO_VERSION__
 
@@ -306,32 +306,6 @@ dst_pmtu(struct dst_entry *dst)
 {
 	return (dst->pmtu);
 }
-#endif
-#if defined HAVE_NEW_STYLE_INET_PROTOCOL
-#ifndef ip_route_output_flow
-#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
-int
-ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags)
-{
-	int (*func) (struct rtable **, struct flowi *, struct sock *, int)
-	= (typeof(func)) HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR;
-
-	return func(rp, flp, sk, flags);
-}
-#endif
-#endif
-#ifndef __ip_route_output_key
-#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
-int
-__ip_route_output_key(struct rtable **rp, const struct flowi *flp)
-{
-	int (*func) (struct rtable **, const struct flowi *)
-	= (typeof(func)) HAVE___IP_ROUTE_OUTPUT_KEY_ADDR;
-
-	return func(rp, flp);
-}
-#endif
-#endif
 #endif
 /*
  *  sysctl_ip_dynaddr: this symbol is normally not exported, but we exported

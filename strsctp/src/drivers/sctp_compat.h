@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_compat.h,v 0.9.2.7 2006/03/03 11:47:02 brian Exp $
+ @(#) $Id: sctp_compat.h,v 0.9.2.8 2006/07/02 12:21:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:47:02 $ by $Author: brian $
+ Last Modified $Date: 2006/07/02 12:21:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_compat.h,v $
+ Revision 0.9.2.8  2006/07/02 12:21:11  brian
+ - changes for 2.6.17 kernel
+
  Revision 0.9.2.7  2006/03/03 11:47:02  brian
  - 32/64-bit compatibility
 
@@ -57,7 +60,7 @@
 #ifndef __LOCAL_SCTP_COMPAT_H__
 #define __LOCAL_SCTP_COMPAT_H__
 
-#ident "@(#) $RCSfile: sctp_compat.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_compat.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/os7/compat.h>
 
@@ -122,6 +125,7 @@
 #include <net/route.h>
 #include <net/inet_ecn.h>
 #include <net/snmp.h>
+#include <net/protocol.h>
 
 #undef sctp_addr
 #undef sctp_daddr
@@ -169,6 +173,7 @@
 #include <linux/skbuff.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
+#include <linux/inetdevice.h>
 #endif				/* LINUX */
 
 #endif				/* __LOCAL_SCTP_COMPAT_H__ */

@@ -4488,7 +4488,7 @@ put_control(int fd, int len, int pri, int ack)
 {
   int error;
   int flags = 0;
-  dl_error_ack_t *err_ack = (dl_error_ack_t *)control_data;
+  dl_error_ack_t *err_ack = (dl_error_ack_t *)control_message.buf;
 
   control_message.len = len;
 
@@ -4524,7 +4524,7 @@ int
 dl_open(char devfile[], int ppa)
 {
   int fd;
-  dl_attach_req_t *attach_req = (dl_attach_req_t *)control_data;
+  dl_attach_req_t *attach_req = (dl_attach_req_t *)control_message.buf;
 
   if ((fd = open(devfile, O_RDWR)) == -1) {
     fprintf(where,"netperf: dl_open: open of %s failed, errno = %d\n",
@@ -4548,8 +4548,8 @@ dl_open(char devfile[], int ppa)
 int
 dl_bind(int fd, int sap, int mode, char *dlsap_ptr, int *dlsap_len)
 {
-  dl_bind_req_t *bind_req = (dl_bind_req_t *)control_data;
-  dl_bind_ack_t *bind_ack = (dl_bind_ack_t *)control_data;
+  dl_bind_req_t *bind_req = (dl_bind_req_t *)control_message.buf;
+  dl_bind_ack_t *bind_ack = (dl_bind_ack_t *)control_message.buf;
 
   bind_req->dl_primitive = DL_BIND_REQ;
   bind_req->dl_sap = sap;
@@ -4584,7 +4584,7 @@ dl_bind(int fd, int sap, int mode, char *dlsap_ptr, int *dlsap_len)
 int
 dl_connect(int fd, unsigned char *rem_addr, int rem_addr_len)
 {
-  dl_connect_req_t *connection_req = (dl_connect_req_t *)control_data;
+  dl_connect_req_t *connection_req = (dl_connect_req_t *)control_message.buf;
   struct pollfd pinfo;
 
   int flags = 0;
@@ -4653,8 +4653,8 @@ dl_connect(int fd, unsigned char *rem_addr, int rem_addr_len)
 int
 dl_accept(int fd, unsigned char *rem_addr, int rem_addr_len)
 {
-  dl_connect_ind_t *connect_ind = (dl_connect_ind_t *)control_data;
-  dl_connect_res_t *connect_res = (dl_connect_res_t *)control_data;
+  dl_connect_ind_t *connect_ind = (dl_connect_ind_t *)control_message.buf;
+  dl_connect_res_t *connect_res = (dl_connect_res_t *)control_message.buf;
   int tmp_cor;
   int flags = 0;
 

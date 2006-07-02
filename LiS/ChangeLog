@@ -1,3 +1,9 @@
+2006-07-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.lsm.in: documentation updates for release
+	* manual/LiS.texi: documentation updates for release
+	* manual/releases.texi: documentation updates for release
+
 2006-07-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/changelog: changes for Ubuntu dpkg build

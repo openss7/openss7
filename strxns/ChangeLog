@@ -1,3 +1,11 @@
+2006-07-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/releases.texi: updates for release
+	* src/drivers/np_ip.c: changes for 2.6.17 kernel
+	* src/test/ldltest.c: changes for gcc 4.1.1 compile
+	* acinclude.m4: make inet tests compatible
+	* src/drivers/ip_hooks.h.in: make inet tests compatible
+
 2006-07-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/changelog: changes for Ubuntu dpkg build

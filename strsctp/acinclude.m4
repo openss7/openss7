@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/05/08 03:12:41 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/07/02 12:26:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:12:41 $ by $Author: brian $
+# Last Modified $Date: 2006/07/02 12:26:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,6 +67,7 @@ m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
+dnl m4_include([m4/xopen.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
 
@@ -159,131 +160,6 @@ AC_DEFUN([_SCTP_OPTIONS], [dnl
 # =============================================================================
 
 # =============================================================================
-# _SCTP_SETUP_DEBUG
-# -----------------------------------------------------------------------------
-AC_DEFUN([_SCTP_SETUP_DEBUG], [dnl
-    case "$linux_cv_debug" in
-    _DEBUG)
-	AC_DEFINE_UNQUOTED([SCTP_CONFIG_DEBUG], [], [Define to perform
-			    internal structure tracking within SCTP as well as
-			    to provide additional /proc filesystem files for
-			    examining internal structures.])
-	;;
-    _TEST)
-	AC_DEFINE_UNQUOTED([SCTP_CONFIG_TEST], [], [Define to perform
-			    performance testing with debugging.  This mode
-			    does not dump massive amounts of information into
-			    system logs, but peforms all assertion checks.])
-	;;
-    _SAFE)
-	AC_DEFINE_UNQUOTED([SCTP_CONFIG_SAFE], [], [Define to perform
-			    fundamental assertion checks.  This is a safer
-			    mode of operation.])
-	;;
-    _NONE | *)
-	AC_DEFINE_UNQUOTED([SCTP_CONFIG_NONE], [], [Define to perform no
-			    assertion checks but report software errors.  This
-			    is the smallest footprint, highest performance
-			    mode of operation.])
-	;;
-    esac
-])# _SCTP_SETUP_DEBUG
-# =============================================================================
-
-# =============================================================================
-# _SCTP_OTHER_SCTP
-# -----------------------------------------------------------------------------
-AC_DEFUN([_SCTP_OTHER_SCTP], [dnl
-    sctp_cv_other_sctp='no'
-    sctp_cv_lksctp_sctp='no'
-    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp compiled in], [CONFIG_IP_SCTP])
-    if test :"$linux_cv_CONFIG_IP_SCTP" = :"yes" ; then
-	sctp_cv_other_sctp='lksctp'
-	sctp_cv_lksctp_sctp='yes'
-	AC_MSG_ERROR([
-**** 
-**** Configure has detected a kernel with the deprecated lksctp compiled in.
-**** This is NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on
-**** such a bastardized kernel will most likely result in an unstable
-**** situation.  Try a different kernel, or try recompiling your kernel with
-**** lksctp removed (or at least compiled as a module).
-**** ])
-    fi
-    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp as module], [CONFIG_IP_SCTP_MODULE])
-    if test :"$linux_cv_CONFIG_IP_SCTP_MODULE" = :"yes" ; then
-	sctp_cv_other_sctp='lksctp'
-	sctp_cv_lksctp_sctp='yes'
-	AC_DEFINE([HAVE_LKSCTP_SCTP], [1], [Some more recent 2.4.25 and
-	    greater kernels have this poorman version of SCTP included in the
-	    kernel.  Define this symbol if you have such a bastardized kernel.
-	    When we have such a kernel we need to define lksctp's header
-	    wrapper defines so that none of the lksctp header files are
-	    included (we use our own instead).])
-    fi
-    sctp_cv_openss7_sctp='no'
-    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp compiled in], [CONFIG_SCTP])
-    if test :"$linux_cv_CONFIG_SCTP" = :"yes" ; then
-	sctp_cv_other_sctp='openss7'
-	sctp_cv_openss7_sctp='yes'
-	AC_MSG_WARN([
-**** 
-**** Configure has detected a kernel with OpenSS7 SCTP compiled in.  This is
-**** NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on such a
-**** kernel can lead to difficulties.  Try a different kernel, or try
-**** recompiling with OpenSS7 SCTP compiled as a module, and perhaps removed.
-**** ])
-    fi
-    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp module], [CONFIG_SCTP_MODULE])
-    if test :"$linux_cv_CONFIG_SCTP_MODULE" = :"yes" ; then
-	sctp_cv_other_sctp='openss7'
-	sctp_cv_openss7_sctp='yes'
-	AC_DEFINE([HAVE_OPENSS7_SCTP], [1], [Define if your kernel supports
-	    the OpenSS7 Linux Kernel Sockets SCTP patches.  This enables
-	    support in the SCTP driver for STREAMS on top of the OpenSS7 Linux
-	    Kernel Sockets SCTP implementation.])
-    fi
-    AM_CONDITIONAL([WITH_LKSCTP_SCTP], [ test :"${sctp_cv_lksctp_sctp:-no}"  = :yes])dnl
-    AM_CONDITIONAL([WITH_OPENSS7_SCTP], [test :"${sctp_cv_openss7_sctp:-no}" = :yes])dnl
-])# _SCTP_OTHER_SCTP
-# =============================================================================
-
-# =============================================================================
-# _SCTP_SETUP
-# -----------------------------------------------------------------------------
-AC_DEFUN([_SCTP_SETUP], [dnl
-    _LINUX_KERNEL
-    _LINUX_DEVFS
-    _GENKSYMS
-    _LINUX_STREAMS
-    _STRCOMP
-    _XNS
-    _XTI
-    # here we have our flags set and can perform preprocessor and compiler
-    # checks on the kernel
-    _SCTP_OTHER_SCTP
-    _SCTP_SETUP_MODULE
-    _SCTP_CHECK_KERNEL
-    _SCTP_SETUP_DEBUG
-])# _SCTP_SETUP
-# =============================================================================
-
-# =============================================================================
-# _SCTP_SETUP_MODULE
-# -----------------------------------------------------------------------------
-AC_DEFUN([_SCTP_SETUP_MODULE], [dnl
-    if test :"${linux_cv_k_linkage:-loadable}" = :loadable ; then
-	AC_DEFINE_UNQUOTED([SCTP_CONFIG_MODULE], [], [When defined, SCTP is
-			    being compiled as a loadable kernel module.])
-    else
-	AC_DEFINE_UNQUOTED([SCTP_CONFIG], [], [When defined, SCTP is being
-			    compiled as a kernel linkable object.])
-    fi
-    AM_CONDITIONAL([SCTP_CONFIG_MODULE], [test :${linux_cv_k_linkage:-loadable} = :loadable])
-    AM_CONDITIONAL([SCTP_CONFIG], [test :${linux_cv_k_linkage:-loadable} = :linkable])
-])# _SCTP_SETUP_MODULE
-# =============================================================================
-
-# =============================================================================
 # _SCTP_CHECK_SCTP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP_CHECK_SCTP], [dnl
@@ -325,9 +201,139 @@ AC_DEFUN([_SCTP_CHECK_SCTP], [dnl
 # =============================================================================
 
 # =============================================================================
-# _SCTP_CHECK_KERNEL
+# _SCTP_SETUP_DEBUG
 # -----------------------------------------------------------------------------
-AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
+AC_DEFUN([_SCTP_SETUP_DEBUG], [dnl
+    case "$linux_cv_debug" in
+    _DEBUG)
+	AC_DEFINE_UNQUOTED([SCTP_CONFIG_DEBUG], [], [Define to perform
+			    internal structure tracking within SCTP as well as
+			    to provide additional /proc filesystem files for
+			    examining internal structures.])
+	;;
+    _TEST)
+	AC_DEFINE_UNQUOTED([SCTP_CONFIG_TEST], [], [Define to perform
+			    performance testing with debugging.  This mode
+			    does not dump massive amounts of information into
+			    system logs, but peforms all assertion checks.])
+	;;
+    _SAFE)
+	AC_DEFINE_UNQUOTED([SCTP_CONFIG_SAFE], [], [Define to perform
+			    fundamental assertion checks.  This is a safer
+			    mode of operation.])
+	;;
+    _NONE | *)
+	AC_DEFINE_UNQUOTED([SCTP_CONFIG_NONE], [], [Define to perform no
+			    assertion checks but report software errors.  This
+			    is the smallest footprint, highest performance
+			    mode of operation.])
+	;;
+    esac
+])# _SCTP_SETUP_DEBUG
+# =============================================================================
+
+# =============================================================================
+# _SCTP_OTHER_SCTP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SCTP_OTHER_SCTP], [dnl
+    linux_cv_other_sctp='no'
+    linux_cv_lksctp_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp compiled in], [CONFIG_IP_SCTP])
+    if test :"$linux_cv_CONFIG_IP_SCTP" = :"yes" ; then
+	linux_cv_other_sctp='lksctp'
+	linux_cv_lksctp_sctp='yes'
+	AC_MSG_ERROR([
+**** 
+**** Configure has detected a kernel with the deprecated lksctp compiled in.
+**** This is NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on
+**** such a bastardized kernel will most likely result in an unstable
+**** situation.  Try a different kernel, or try recompiling your kernel with
+**** lksctp removed (or at least compiled as a module).
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp as module], [CONFIG_IP_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_IP_SCTP_MODULE" = :"yes" ; then
+	linux_cv_other_sctp='lksctp'
+	linux_cv_lksctp_sctp='yes'
+	AC_DEFINE([HAVE_LKSCTP_SCTP], [1], [Some more recent 2.4.25 and
+	    greater kernels have this poorman version of SCTP included in the
+	    kernel.  Define this symbol if you have such a bastardized kernel.
+	    When we have such a kernel we need to define lksctp's header
+	    wrapper defines so that none of the lksctp header files are
+	    included (we use our own instead).])
+    fi
+    linux_cv_openss7_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp compiled in], [CONFIG_SCTP])
+    if test :"$linux_cv_CONFIG_SCTP" = :"yes" ; then
+	linux_cv_other_sctp='openss7'
+	linux_cv_openss7_sctp='yes'
+	AC_MSG_WARN([
+**** 
+**** Configure has detected a kernel with OpenSS7 SCTP compiled in.  This is
+**** NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on such a
+**** kernel can lead to difficulties.  Try a different kernel, or try
+**** recompiling with OpenSS7 SCTP compiled as a module, and perhaps removed.
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp module], [CONFIG_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_SCTP_MODULE" = :"yes" ; then
+	linux_cv_other_sctp='openss7'
+	linux_cv_openss7_sctp='yes'
+	AC_DEFINE([HAVE_OPENSS7_SCTP], [1], [Define if your kernel supports
+	    the OpenSS7 Linux Kernel Sockets SCTP patches.  This enables
+	    support in the SCTP driver for STREAMS on top of the OpenSS7 Linux
+	    Kernel Sockets SCTP implementation.])
+    fi
+    AM_CONDITIONAL([WITH_LKSCTP_SCTP], [ test :"${linux_cv_lksctp_sctp:-no}"  = :yes])dnl
+    AM_CONDITIONAL([WITH_OPENSS7_SCTP], [test :"${linux_cv_openss7_sctp:-no}" = :yes])dnl
+])# _SCTP_OTHER_SCTP
+# =============================================================================
+
+# =============================================================================
+# _SCTP_SETUP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SCTP_SETUP], [dnl
+    _LINUX_KERNEL
+    _LINUX_DEVFS
+    _GENKSYMS
+    _LINUX_STREAMS
+    _STRCOMP
+dnl with_sctp='yes'
+dnl _XOPEN
+    _XNS
+    _XTI
+    # here we have our flags set and can perform preprocessor and compiler
+    # checks on the kernel
+    _SCTP_OTHER_SCTP
+    _SCTP_SETUP_MODULE
+    _SCTP_CONFIG_KERNEL
+    _SCTP_SETUP_DEBUG
+])# _SCTP_SETUP
+# =============================================================================
+
+# =============================================================================
+# _SCTP_SETUP_MODULE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SCTP_SETUP_MODULE], [dnl
+    if test :"${linux_cv_k_linkage:-loadable}" = :loadable ; then
+	AC_DEFINE_UNQUOTED([SCTP_CONFIG_MODULE], [], [When defined, SCTP is
+			    being compiled as a loadable kernel module.])
+    else
+	AC_DEFINE_UNQUOTED([SCTP_CONFIG], [], [When defined, SCTP is being
+			    compiled as a kernel linkable object.])
+    fi
+    AM_CONDITIONAL([SCTP_CONFIG_MODULE], [test :${linux_cv_k_linkage:-loadable} = :loadable])
+    AM_CONDITIONAL([SCTP_CONFIG], [test :${linux_cv_k_linkage:-loadable} = :linkable])
+])# _SCTP_SETUP_MODULE
+# =============================================================================
+
+# =============================================================================
+# _SCTP_CONFIG_KERNEL
+# -----------------------------------------------------------------------------
+# These are a bunch of kernel configuraiton checks primarily in support of 2.5
+# and 2.6 kernels.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
     _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel ip_route_output], [linux_cv_have_ip_route_output], [dnl
 	    CFLAGS="$CFLAGS -Werror-implicit-function-declaration"
@@ -460,10 +466,6 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			  struct inet_protocol.no_policy,
 			  struct net_protocol.no_policy,
 			  struct dst_entry.path,
-			  struct sk_buff.h.sh,
-			  struct sock.protinfo.af_inet.ttl,
-			  struct sock.protinfo.af_inet.uc_ttl,
-			  struct sock.tp_pinfo.af_sctp,
 			  struct net_protocol.proto,
 			  struct dst_entry.path], [], [], [
 #include <linux/config.h>
@@ -473,14 +475,13 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
 #include <net/protocol.h>
 #ifdef HAVE_NET_DST_H
 #include <net/dst.h>
 #endif
     ])
-    _LINUX_KERNEL_SYMBOLS([afinet_get_info,
+    _LINUX_KERNEL_SYMBOLS([module_text_address,
+			   skbuff_head_cache,
 			   icmp_err_convert,
 			   icmp_statistics,
 			   inet_bind,
@@ -501,16 +502,8 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			   sysctl_ip_dynaddr,
 			   sysctl_ip_nonlocal_bind,
 			   sysctl_local_port_range,
-			   tcp_prot,
-			   udp_prot,
-			   raw_prot,
-			   tcp_memory_allocated,
-			   tcp_orphan_count,
-			   tcp_sockets_allocated,
-			   tcp_tw_count,
 			   ip_frag_nqueues,
 			   ip_frag_mem,
-			   __tcp_push_pending_frames,
 			   __xfrm_policy_check,
 			   xfrm_policy_delete,
 			   __xfrm_sk_clone_policy])
@@ -631,29 +624,11 @@ dnl *** 2 arguments or whether it takes 3 arguments.
 dnl *** ])
 dnl 	fi
     ])
-    _LINUX_CHECK_HEADERS([linux/percpu.h], [:], [:], [
-#include <linux/compiler.h>
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
-])
-
-    AC_REQUIRE([_SCTP_OTHER_SCTP])dnl
-dnl if test :"${sctp_cv_openss7_sctp:-no}" = :yes ; then
-dnl     with_sctp='no'
-dnl     with_sctp2='no'
-dnl fi
-    if test :"${with_sctp2:-no}" = :yes ; then
-	with_sctp='no'
-    fi
-    if test :"${with_sctp:-no}" = :yes -o :"${with_sctp2:-no}" = :yes ; then
-	_LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_update_pmtu], [with_sctp='no'; with_sctp2='no'])
-    fi
+    _LINUX_KERNEL_SYMBOLS([inet_proto_lock, inet_protos])
     if test :"${with_sctp:-no}" = :yes -o :"${with_sctp2:-no}" = :yes ; then
 	_LINUX_KERNEL_ENV([dnl
 	    AC_CHECK_MEMBER([struct inet_protocol.protocol],
-		[sctp_cv_inet_protocol_style='old'],
+		[linux_cv_inet_protocol_style='old'],
 		[:], [
 #include <linux/config.h>
 #include <linux/version.h>
@@ -662,12 +637,10 @@ dnl fi
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
 #include <net/protocol.h>
 		])
 	    AC_CHECK_MEMBER([struct inet_protocol.no_policy],
-		[sctp_cv_inet_protocol_style='new'],
+		[linux_cv_inet_protocol_style='new'],
 		[:], [
 #include <linux/config.h>
 #include <linux/version.h>
@@ -676,13 +649,11 @@ dnl fi
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
 #include <net/protocol.h>
 		])
 	    AC_CHECK_MEMBER([struct dst_entry.path],
-		[sctp_cv_dst_entry_path='yes'],
-		[sctp_cv_dst_entry_path='no'], [
+		[linux_cv_dst_entry_path='yes'],
+		[linux_cv_dst_entry_path='no'], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -690,14 +661,12 @@ dnl fi
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
 #include <net/dst.h>
 		])
 	    ])
-	fi
-    if test :"${sctp_cv_inet_protocol_style:+set}" = :set ; then
-	case "$sctp_cv_inet_protocol_style" in
+    fi
+    if test :"${linux_cv_inet_protocol_style:+set}" = :set ; then
+	case "$linux_cv_inet_protocol_style" in
 	    old)
 		AC_DEFINE([HAVE_OLD_STYLE_INET_PROTOCOL], [1], [Most
 		2.4 kernels have the old style struct inet_protocol and the
@@ -721,7 +690,7 @@ dnl fi
 	with_sctp='no'
 	with_sctp2='no'
     fi
-    if test :"${sctp_cv_dst_entry_path:-no}" = :yes ; then
+    if test :"${linux_cv_dst_entry_path:-no}" = :yes ; then
 	AC_DEFINE([HAVE_STRUCT_DST_ENTRY_PATH], [1], [Newer RHEL3
 	kernels change the destination entry structure.  Define this macro to
 	use the newer structure.])
@@ -744,9 +713,35 @@ dnl fi
 	])
     _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_nonlocal_bind])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_default_ttl])
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
+dnl
+dnl These are SCTP-only checks
+dnl
+    _LINUX_CHECK_HEADERS([linux/percpu.h], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+])
+
+    AC_REQUIRE([_SCTP_OTHER_SCTP])dnl
+dnl if test :"${linux_cv_openss7_sctp:-no}" = :yes ; then
+dnl     with_sctp='no'
+dnl     with_sctp2='no'
+dnl fi
+    if test :"${with_sctp2:-no}" = :yes ; then
+	with_sctp='no'
+    fi
+    if test :"${with_sctp:-no}" = :yes -o :"${with_sctp2:-no}" = :yes ; then
+	_LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_update_pmtu], [with_sctp='no'; with_sctp2='no'])
+    fi
+dnl
+dnl These were SCTP-only checks
+dnl
     _LINUX_KERNEL_EXPORTS([
 	    add_wait_queue,
 	    add_wait_queue_exclusive,
@@ -841,7 +836,7 @@ dnl fi
 **** Linux kernel symbol ']LK_Export[' should be exported but it
 **** isn't.  This could cause problems later.
 **** ])])
-])# _SCTP_CHECK_KERNEL
+])# _SCTP_CONFIG_KERNEL
 # =============================================================================
 
 # =============================================================================
@@ -901,7 +896,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
 	AS_HELP_STRING([--enable-sctp-discard-ootb],
 	    [enable discard out-of-the-blue packets. @<:@default=no@:>@]),
 	[sctp_cv_discard_ootb="$enableval"],
-	[if test :"${sctp_cv_openss7_sctp:-no}" = :yes ; then
+	[if test :"${linux_cv_openss7_sctp:-no}" = :yes ; then
 	    sctp_cv_discard_ootb='yes'
 	 else
 	    sctp_cv_discard_ootb='no'

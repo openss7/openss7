@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/16 08:02:01 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/02 12:22:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/16 08:02:01 $ by $Author: brian $
+ Last Modified $Date: 2006/07/02 12:22:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.22  2006/07/02 12:22:16  brian
+ - changes for 2.6.17 kernel
+
  Revision 0.9.2.21  2006/06/16 08:02:01  brian
  - added constness, rationalized to udp
 
@@ -115,10 +118,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/16 08:02:01 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/02 12:22:16 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/16 08:02:01 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/02 12:22:16 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -161,6 +164,8 @@ typedef unsigned int socklen_t;
 #include <net/dst.h>
 #endif
 
+#include <net/protocol.h>
+
 #include <linux/skbuff.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
@@ -174,7 +179,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2006/06/16 08:02:01 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2006/07/02 12:22:16 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"

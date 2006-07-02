@@ -11,7 +11,7 @@ Description:	@PACKAGE_TITLE@.
 		This distribution is currently applicable to 2.4 and 2.6 kernels
 		and was targetted at ix86, x86_64, ppc and ppc64 architectures,
 		but should build and install for other architectures as well.
-		Mailing-List: lis@wanware.com
+		Mailing-List: openss7-develop@openss7.org, lis@wanware.com
 		Supports a wide range of new and old Linux distributions.
 		Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
 Keywords:	STREAMS, SVR4, LiS

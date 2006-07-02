@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.13 2006/03/22 10:01:55 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.14 2006/07/02 12:13:45 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/03/22 10:01:55 $ by $Author: brian $
+% Last Modified $Date: 2006/07/02 12:13:45 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -300,9 +300,6 @@ and currently maintains and the package.
 
 See @ref{Author Index}, for a complete listing and cross-index of authors to
 sections of this document.
-
-Francisco Ballesteros still maintains an LiS mailing list.  Click Here to
-Subscribe to the LiS mailing list
 @auindex Grothe, David
 @auindex Husgaard, Ole
 @auindex Boyd, John
@@ -311,11 +308,16 @@ Subscribe to the LiS mailing list
 @auindex Yeganjaiah, G
 @auindex Bidulock, Brian F. G.
 
+@ignore
+Francisco Ballesteros still maintains an LiS mailing list.  Click Here to
+Subscribe to the LiS mailing list
+
 You can mail to the group by addressing email to
 @email{linux-streams@@gsyc.escet.urjc.es}.
 
 You can view the archives at
 @uref{http://gsyc.escet.urjc.es/mailarchive/linux-streams}.
+@end ignore
 
 @node Introduction
 @chapter Introduction

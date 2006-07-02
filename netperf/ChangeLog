@@ -1,3 +1,8 @@
+2006-07-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* manual/releases.texi: documentation updates for release
+	* netlib.c: changes for gcc 4.1.1 compile
+
 2006-07-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/changelog: changes for Ubuntu dpkg build

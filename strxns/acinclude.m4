@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/05/08 08:16:51 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/07/02 12:26:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 08:16:51 $ by $Author: brian $
+# Last Modified $Date: 2006/07/02 12:26:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,7 +67,7 @@ m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
-m4_include([m4/xopen.m4])
+dnl m4_include([m4/xopen.m4])
 
 # =============================================================================
 # AC_XNS
@@ -155,18 +155,128 @@ AC_DEFUN([_XNS_OPTIONS], [dnl
 # =============================================================================
 
 # =============================================================================
+# _XNS_SETUP_DEBUG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNS_SETUP_DEBUG], [dnl
+    case "$linux_cv_debug" in
+    _DEBUG)
+	AC_DEFINE_UNQUOTED([XNS_CONFIG_DEBUG], [], [Define to perform
+			    internal structure tracking within XNS as well as
+			    to provide additional /proc filesystem files for
+			    examining internal structures.])
+	;;
+    _TEST)
+	AC_DEFINE_UNQUOTED([XNS_CONFIG_TEST], [], [Define to perform
+			    performance testing with debugging.  This mode
+			    does not dump massive amounts of information into
+			    system logs, but peforms all assertion checks.])
+	;;
+    _SAFE)
+	AC_DEFINE_UNQUOTED([XNS_CONFIG_SAFE], [], [Define to perform
+			    fundamental assertion checks.  This is a safer
+			    mode of operation.])
+	;;
+    _NONE | *)
+	AC_DEFINE_UNQUOTED([XNS_CONFIG_NONE], [], [Define to perform no
+			    assertion checks but report software errors.  This
+			    is the smallest footprint, highest performance
+			    mode of operation.])
+	;;
+    esac
+])# _XNS_SETUP_DEBUG
+# =============================================================================
+
+# =============================================================================
+# _XNS_OTHER_SCTP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNS_OTHER_SCTP], [dnl
+    linux_cv_other_sctp='no'
+    linux_cv_lksctp_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp compiled in], [CONFIG_IP_SCTP])
+    if test :"$linux_cv_CONFIG_IP_SCTP" = :"yes" ; then
+	linux_cv_other_sctp='lksctp'
+	linux_cv_lksctp_sctp='yes'
+	AC_MSG_ERROR([
+**** 
+**** Configure has detected a kernel with the deprecated lksctp compiled in.
+**** This is NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on
+**** such a bastardized kernel will most likely result in an unstable
+**** situation.  Try a different kernel, or try recompiling your kernel with
+**** lksctp removed (or at least compiled as a module).
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp as module], [CONFIG_IP_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_IP_SCTP_MODULE" = :"yes" ; then
+	linux_cv_other_sctp='lksctp'
+	linux_cv_lksctp_sctp='yes'
+	AC_DEFINE([HAVE_LKSCTP_SCTP], [1], [Some more recent 2.4.25 and
+	    greater kernels have this poorman version of SCTP included in the
+	    kernel.  Define this symbol if you have such a bastardized kernel.
+	    When we have such a kernel we need to define lksctp's header
+	    wrapper defines so that none of the lksctp header files are
+	    included (we use our own instead).])
+    fi
+    linux_cv_openss7_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp compiled in], [CONFIG_SCTP])
+    if test :"$linux_cv_CONFIG_SCTP" = :"yes" ; then
+	linux_cv_other_sctp='openss7'
+	linux_cv_openss7_sctp='yes'
+	AC_MSG_WARN([
+**** 
+**** Configure has detected a kernel with OpenSS7 SCTP compiled in.  This is
+**** NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on such a
+**** kernel can lead to difficulties.  Try a different kernel, or try
+**** recompiling with OpenSS7 SCTP compiled as a module, and perhaps removed.
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp module], [CONFIG_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_SCTP_MODULE" = :"yes" ; then
+	linux_cv_other_sctp='openss7'
+	linux_cv_openss7_sctp='yes'
+	AC_DEFINE([HAVE_OPENSS7_SCTP], [1], [Define if your kernel supports
+	    the OpenSS7 Linux Kernel Sockets SCTP patches.  This enables
+	    support in the SCTP driver for STREAMS on top of the OpenSS7 Linux
+	    Kernel Sockets SCTP implementation.])
+    fi
+    AM_CONDITIONAL([WITH_LKSCTP_SCTP], [ test :"${linux_cv_lksctp_sctp:-no}"  = :yes])dnl
+    AM_CONDITIONAL([WITH_OPENSS7_SCTP], [test :"${linux_cv_openss7_sctp:-no}" = :yes])dnl
+])# _XNS_OTHER_SCTP
+# =============================================================================
+
+# =============================================================================
 # _XNS_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_SETUP], [dnl
     _LINUX_KERNEL
     _LINUX_DEVFS
-    _XNS_CONFIG_KERNEL
     _GENKSYMS
     _LINUX_STREAMS
     _STRCOMP
-    with_xns='yes'
-    _XOPEN
+dnl with_xns='yes'
+dnl _XOPEN
+    # here we have our flags set and can perform preprocessor and compiler
+    # checks on the kernel
+    _XNS_OTHER_SCTP
+    _XNS_SETUP_MODULE
+    _XNS_CONFIG_KERNEL
+    _XNS_SETUP_DEBUG
 ])# _XNS_SETUP
+# =============================================================================
+
+# =============================================================================
+# _XNS_SETUP_MODULE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNS_SETUP_MODULE], [dnl
+    if test :"${linux_cv_k_linkage:-loadable}" = :loadable ; then
+	AC_DEFINE_UNQUOTED([XNS_CONFIG_MODULE], [], [When defined, XNS is
+			    being compiled as a loadable kernel module.])
+    else
+	AC_DEFINE_UNQUOTED([XNS_CONFIG], [], [When defined, XNS is being
+			    compiled as a kernel linkable object.])
+    fi
+    AM_CONDITIONAL([XNS_CONFIG_MODULE], [test :${linux_cv_k_linkage:-loadable} = :loadable])
+    AM_CONDITIONAL([XNS_CONFIG], [test :${linux_cv_k_linkage:-loadable} = :linkable])
+])
 # =============================================================================
 
 # =============================================================================
@@ -197,7 +307,8 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
     ])
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/brlock.h \
-			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h], [:], [:], [
+			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h \
+			  net/request_sock.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -227,15 +338,61 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
     ])
-    _LINUX_CHECK_FUNCS([dst_output dst_mtu ip_dst_output ip_route_output_key \
-			try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
-			process_group cpu_raise_softirq check_region pcibios_init \
-			pcibios_find_class pcibios_find_device pcibios_present \
-			pcibios_read_config_byte pcibios_read_config_dword \
-			pcibios_read_config_word pcibios_write_config_byte \
-			pcibios_write_config_dword pcibios_write_config_word \
-			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti dev_init_buffers], [:], [:], [
+    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
+			ip_route_output_key __in_dev_get_rcu], [], [], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#if HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+#include <linux/inetdevice.h>
+    ])
+    _LINUX_CHECK_TYPES([irqreturn_t,
+			struct inet_protocol,
+			struct net_protocol], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#include <linux/time.h>		/* for struct timespec */
+#include <net/protocol.h>
+])
+    _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -255,53 +412,12 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #if HAVE_KINC_NET_DST_H
 #include <net/dst.h>
 #endif
-#include <linux/sched.h>
-#if HAVE_KINC_LINUX_KDEV_T_H
-#include <linux/kdev_t.h>
-#endif
-#if HAVE_KINC_LINUX_STATFS_H
-#include <linux/statfs.h>
-#endif
-#if HAVE_KINC_LINUX_NAMESPACE_H
-#include <linux/namespace.h>
-#endif
-#include <linux/interrupt.h>	/* for cpu_raise_softirq */
-#include <linux/ioport.h>	/* for check_region */
-#include <linux/pci.h>		/* for pci checks */
-])
-    _LINUX_CHECK_TYPES([irqreturn_t,
-			struct inet_protocol,
-			struct net_protocol], [:], [:], [
-#include <linux/compiler.h>
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/module.h>
-#include <linux/init.h>
-#if HAVE_KINC_LINUX_SLAB_H
-#include <linux/slab.h>
-#endif
-#include <linux/fs.h>
-#include <linux/socket.h>
-#include <net/sock.h>
-#include <net/protocol.h>
-#include <linux/sched.h>
-#if HAVE_KINC_LINUX_KDEV_T_H
-#include <linux/kdev_t.h>
-#endif
-#if HAVE_KINC_LINUX_STATFS_H
-#include <linux/statfs.h>
-#endif
-#if HAVE_KINC_LINUX_NAMESPACE_H
-#include <linux/namespace.h>
-#endif
-#include <linux/interrupt.h>	/* for irqreturn_t */ 
-#include <linux/time.h>		/* for struct timespec */
-])
+    ])
     _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
 			  struct inet_protocol.copy,
 			  struct inet_protocol.no_policy,
 			  struct net_protocol.no_policy,
+			  struct dst_entry.path,
 			  struct net_protocol.proto,
 			  struct dst_entry.path], [], [], [
 #include <linux/config.h>
@@ -317,6 +433,7 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #endif
     ])
     _LINUX_KERNEL_SYMBOLS([module_text_address,
+			   skbuff_head_cache,
 			   icmp_err_convert,
 			   icmp_statistics,
 			   inet_bind,
@@ -337,7 +454,6 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 			   sysctl_ip_dynaddr,
 			   sysctl_ip_nonlocal_bind,
 			   sysctl_local_port_range,
-			   raw_prot,
 			   ip_frag_nqueues,
 			   ip_frag_mem,
 			   __xfrm_policy_check,
@@ -460,6 +576,101 @@ dnl *** 2 arguments or whether it takes 3 arguments.
 dnl *** ])
 dnl 	fi
     ])
+    _LINUX_KERNEL_SYMBOLS([inet_proto_lock, inet_protos])
+    if test :"${with_ip:-yes}" = :yes ; then
+	_LINUX_KERNEL_ENV([dnl
+	    AC_CHECK_MEMBER([struct inet_protocol.protocol],
+		[linux_cv_inet_protocol_style='old'],
+		[:], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+		])
+	    AC_CHECK_MEMBER([struct inet_protocol.no_policy],
+		[linux_cv_inet_protocol_style='new'],
+		[:], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+		])
+	    AC_CHECK_MEMBER([struct dst_entry.path],
+		[linux_cv_dst_entry_path='yes'],
+		[linux_cv_dst_entry_path='no'], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/dst.h>
+		])
+	    ])
+    fi
+    if test :"${linux_cv_inet_protocol_style:+set}" = :set ; then
+	case "$linux_cv_inet_protocol_style" in
+	    old)
+		AC_DEFINE([HAVE_OLD_STYLE_INET_PROTOCOL], [1], [Most
+		2.4 kernels have the old style struct inet_protocol and the
+		old prototype for inet_add_protocol() and inet_del_protocol()
+		defined in <net/protocol.h>.  Some more recent RH kernels
+		(such as EL3) use the 2.6 style of structure and prototypes.
+		Define this macro if your kernel has the old style structure
+		and prototypes.])
+		;;
+	    new)
+		AC_DEFINE([HAVE_NEW_STYLE_INET_PROTOCOL], [1], [Most
+		2.4 kernels have the old style struct inet_protocol and the
+		old prototype for inet_add_protocol() and inet_del_protocol()
+		defined in <net/protocol.h>.  Some more recent RH kernels
+		(such as EL3) use the 2.6 style of structure and prototypes.
+		Define this macro if your kernel has the new style structure
+		and prototypes.])
+		;;
+	esac
+    else
+	with_ip='no'
+    fi
+    if test :"${linux_cv_dst_entry_path:-no}" = :yes ; then
+	AC_DEFINE([HAVE_STRUCT_DST_ENTRY_PATH], [1], [Newer RHEL3
+	kernels change the destination entry structure.  Define this macro to
+	use the newer structure.])
+    fi
+    _LINUX_KERNEL_ENV([
+	AC_CHECK_TYPES([struct sockaddr_storage], [
+	    AC_DEFINE([HAVE_STRUCT_SOCKADDR_STORAGE], [1], [Most 2.4
+		kernels do not define struct sockaddr_storage.  Define to 1 if
+		your kernel supports struct sockaddr_storage.])], [:], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+	    ])
+	])
+    _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_nonlocal_bind])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_default_ttl])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
+dnl
+dnl These are XNS-only checks
+dnl
     _LINUX_CHECK_MEMBERS([struct task_struct.namespace.sem,
 			 struct super_block.s_fs_info,
 			 struct super_block.u.generic_sbp,
@@ -491,97 +702,6 @@ dnl 	fi
 #endif
 #include <linux/netdevice.h>
 ])
-    _LINUX_KERNEL_SYMBOLS([inet_proto_lock, inet_protos])
-    if test :"${with_ip:-yes}" = :yes ; then
-	_LINUX_KERNEL_ENV([dnl
-	    AC_CHECK_MEMBER([struct inet_protocol.protocol],
-		[xns_cv_inet_protocol_style='old'],
-		[:], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/protocol.h>
-		])
-	    AC_CHECK_MEMBER([struct inet_protocol.no_policy],
-		[xns_cv_inet_protocol_style='new'],
-		[:], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/protocol.h>
-		])
-	    AC_CHECK_MEMBER([struct dst_entry.path],
-		[xns_cv_dst_entry_path='yes'],
-		[xns_cv_dst_entry_path='no'], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/dst.h>
-		])
-	    ])
-    fi
-    if test :"${xns_cv_inet_protocol_style:+set}" = :set ; then
-	case "$xns_cv_inet_protocol_style" in
-	    old)
-		AC_DEFINE([HAVE_OLD_STYLE_INET_PROTOCOL], [1], [Most
-		2.4 kernels have the old style struct inet_protocol and the
-		old prototype for inet_add_protocol() and inet_del_protocol()
-		defined in <net/protocol.h>.  Some more recent RH kernels
-		(such as EL3) use the 2.6 style of structure and prototypes.
-		Define this macro if your kernel has the old style structure
-		and prototypes.])
-		;;
-	    new)
-		AC_DEFINE([HAVE_NEW_STYLE_INET_PROTOCOL], [1], [Most
-		2.4 kernels have the old style struct inet_protocol and the
-		old prototype for inet_add_protocol() and inet_del_protocol()
-		defined in <net/protocol.h>.  Some more recent RH kernels
-		(such as EL3) use the 2.6 style of structure and prototypes.
-		Define this macro if your kernel has the new style structure
-		and prototypes.])
-		;;
-	esac
-    else
-	with_ip='no'
-    fi
-    if test :"${xns_cv_dst_entry_path:-no}" = :yes ; then
-	AC_DEFINE([HAVE_STRUCT_DST_ENTRY_PATH], [1], [Newer RHEL3
-	kernels change the destination entry structure.  Define this macro to
-	use the newer structure.])
-    fi
-    _LINUX_KERNEL_ENV([
-	AC_CHECK_TYPES([struct sockaddr_storage], [
-	    AC_DEFINE([HAVE_STRUCT_SOCKADDR_STORAGE], [1], [Most 2.4
-		kernels do not define struct sockaddr_storage.  Define to 1 if
-		your kernel supports struct sockaddr_storage.])], [:], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
-	    ])
-	])
-    _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_nonlocal_bind])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
     _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel member struct packet_type.func takes 4 args],
 	    [linux_cv_kmem_struct_packet_type_func_4_args], [
@@ -604,6 +724,9 @@ my_autoconf_structure_pointer->func = my_autoconf_function_pointer;]]) ],
 	    if the func member of the packet_type structure passes four
 	    arguments instead of three.])
     fi
+dnl
+dnl These were XNS-only checks
+dnl
     _LINUX_KERNEL_EXPORTS([
 	    add_wait_queue,
 	    add_wait_queue_exclusive,
@@ -705,7 +828,7 @@ my_autoconf_structure_pointer->func = my_autoconf_function_pointer;]]) ],
 # _XNS_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_OUTPUT], [dnl
-    _XNS_STRCONF
+    _XNS_STRCONF dnl
 ])# _XNS_OUTPUT
 # =============================================================================
 

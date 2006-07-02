@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 11:27:48 $
+ @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:23:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:27:48 $ by $Author: brian $
+ Last Modified $Date: 2006/07/02 12:23:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldltest.c,v $
+ Revision 0.9.2.10  2006/07/02 12:23:36  brian
+ - changes for gcc 4.1.1 compile
+
  Revision 0.9.2.9  2006/03/03 11:27:48  brian
  - 32/64-bit compatibility
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 11:27:48 $"
+#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:23:36 $"
 
 static char const ident[] =
-    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 11:27:48 $";
+    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:23:36 $";
 
 /*
  *  ldltest: Test program for dlpi driver
@@ -1336,7 +1339,7 @@ do_send_unitdata(int fd, unsigned char *data, int datalen, caddr_t dlsap)
 {
 	struct {
 		struct ethhdr hdr __attribute__ ((packed));
-		char data[4096] __attribute__ ((packed));
+		char data[4096];
 	} pkt;
 	struct strbuf ctlbuf, databuf;
 	struct {
@@ -2307,7 +2310,7 @@ rcv_test_xid(int fd)
 	int buflen;
 	int i;
 	struct {
-		struct eth_llc_hdr frm __attribute__ ((packed));
+		struct eth_llc_hdr frm;
 		unsigned char extra[1024];
 	} pkt;
 	unsigned char *saddr, *ssap;
