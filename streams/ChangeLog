@@ -1,3 +1,15 @@
+2006-07-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* README: updated for release
+	* README-alpha: updated for release
+	* README-cvs: updated for release
+	* README-nexusware: updated for release
+	* acinclude.m4: updated for release
+	* doc/manual/install.texi: updated for release
+	* doc/manual/releases.texi: updated for release
+	* src/kernel/strattach.c: namespace_sem
+	  - I don't know why only Ubuntu 6.06 caught this error
+
 2006-07-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/releases.texi: updates for release

@@ -1,5 +1,5 @@
-OpenSS7 Linux Fast-STREAMS -- alpha release introduction.  2006-03-02
-$Id: README-alpha,v 0.9.2.10 2006/03/03 10:57:09 brian Exp $
+OpenSS7 Linux Fast-STREAMS -- alpha release introduction.  2006-07-03
+$Id: README-alpha,v 0.9.2.11 2006/07/03 02:59:21 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -17,19 +17,18 @@ The following is an extract from the Installation and Reference Manual:
 5.4.3 Beta Releases
 -------------------
 
-"Beta" releases are releases that have received some testing, but the
-testing to date is not exhaustive.  "Beta" release packages do not ship
-with known defects.  All known defects are respolved before
-distribution; however, as exhaustive testing has not been performed,
-unknown defects may exist.  The purpose for a "beta" release is to
-provide a baseline for other organizations to participate in the
-rigorous testing of the package.
+"Beta" releases are releases that have received some testing, but the testing
+to date is not exhaustive.  "Beta" release packages do not ship with known
+defects.  All known defects are respolved before distribution; however, as
+exhaustive testing has not been performed, unknown defects may exist.  The
+purpose for a "beta" release is to provide a baseline for other organizations
+to participate in the rigorous testing of the package.
 
-"Beta" release packages ship containing warnings that the package has
-not been exhaustively tested and that the package may cause systems to
-crash.  Suitability of software in this category for production use is
-not advised by the project; however, as always, is at the discretion of
-the user of the software.
+"Beta" release packages ship containing warnings that the package has not been
+exhaustively tested and that the package may cause systems to crash.
+Suitability of software in this category for production use is not advised by
+the project; however, as always, is at the discretion of the user of the
+software.
 
 5.5 Bugs
 ========
@@ -37,24 +36,22 @@ the user of the software.
 5.5.1 Defect Notices
 --------------------
 
-"Linux Fast-STREAMS" could contain unknown defects.  This is a "beta"
-release.  Some defects could be harmful.  Validation testing has been
-performed by the `OpenSS7 Project' on this software for only a
-restricted set of systems.  The software might fail to configure or
-compile on other systems.  The `OpenSS7 Project' recommends that you do
-not use this software for purposes other than validation testing and
-evaluation, and then only with care. Use at your own risk.  Remember
-that there is NO WARRANTY.(1)
+"Linux Fast-STREAMS" could contain unknown defects.  This is a "beta" release.
+Some defects could be harmful.  Validation testing has been performed by the
+`OpenSS7 Project' on this software for only a restricted set of systems.  The
+software might fail to configure or compile on other systems.  The `OpenSS7
+Project' recommends that you do not use this software for purposes other than
+validation testing and evaluation, and then only with care. Use at your own
+risk.  Remember that there is NO WARRANTY.(1)
 
 This software is beta software.  As such, it might crash your kernel.
 Installation of the software might mangle your header files or Linux
-distribution in such a way as to make it unusable.  Crashes could lock
-your system and rebooting the system might not repair the problem.  You
-can possibly loose all the data on your system.  Because this software
-might crash your kernel, the resulting unstable system could possibly
-destroy computer hardware or peripherals making them ususable.  You
-might void the warranty on any system on which you run this software.
-YOU HAVE BEEN WARNED.
+distribution in such a way as to make it unusable.  Crashes could lock your
+system and rebooting the system might not repair the problem.  You can possibly
+loose all the data on your system.  Because this software might crash your
+kernel, the resulting unstable system could possibly destroy computer hardware
+or peripherals making them ususable.  You might void the warranty on any system
+on which you run this software.  YOU HAVE BEEN WARNED.
 
 ---------- Footnotes ----------
 
@@ -63,11 +60,10 @@ YOU HAVE BEEN WARNED.
 5.5.2 Known Defects
 -------------------
 
-With the exception of packages not originaly created by the `OpenSS7
-Project', the `OpenSS7 Project' software does not ship with known bugs
-in any release stage except "pre-alpha".  "Linux Fast-STREAMS" had no
-known bugs at the time of release.
-
+With the exception of packages not originaly created by the `OpenSS7 Project',
+the `OpenSS7 Project' software does not ship with known bugs in any release
+stage except "pre-alpha".  "Linux Fast-STREAMS" had no known bugs at the time
+of release.
 
 
 =========================================================================

@@ -1,4 +1,5 @@
-OpenSS7 Iperf -- readme first file.  2006-03-02
+OpenSS7 Iperf -- readme first file.  2006-07-03
+$Id$
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -6,17 +7,17 @@ See the end for copying conditions (for this file).
 OpenSS7 Modified Iperf
 ======================
 
-This is the iperf-2.0.3 package.  It, and the current version, can
+This is the iperf-2.0.4 package.  It, and the current version, can
 be obtained from the download area of The OpenSS7 Project website at
-http://www.openss7.org/download.html as iperf-2.0.3.tar.bz2 using a
+http://www.openss7.org/download.html as iperf-2.0.4.tar.bz2 using a
 command such as
 
-	wget http://www.openss7.org/tarballs/iperf-2.0.3.tar.bz2
+	wget http://www.openss7.org/tarballs/iperf-2.0.4.tar.bz2
 
 Please see the NEWS file for release notes and history of user visible
 changes for the current version, and the ChangeLog file for a more
 detailed history of implementation changes.  The TODO file lists
-features not yet implemented or other outstandinng items.
+features not yet implemented or other outstanding items.
 
 Please see the INSTALL, INSTALL-iperf and README-make files (or the
 installation and reference manual) for installation instructions.  When
@@ -55,11 +56,11 @@ Installation
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-	wget http://www.openss7.org/tarballs/iperf-2.0.3.tar.bz2
-	tar -xjvf iperf-2.0.3.tar.bz2
+	wget http://www.openss7.org/tarballs/iperf-2.0.4.tar.bz2
+	tar -xjvf iperf-2.0.4.tar.bz2
 	mkdir build
 	cd build
-	../iperf-2.0.3.configure
+	../iperf-2.0.4/configure
 	make
 	make check
 	sudo make install
@@ -67,8 +68,13 @@ validate, uninstall and remove the package:
 	sudo make uninstall
 	cd ..
 	sudo rm -rf build
-	rm -rf iperf-2.0.3.
-	rm -f iperf-2.0.3.tar.bz2
+	rm -rf iperf-2.0.4.
+	rm -f iperf-2.0.4.tar.bz2
+
+For custom applications, see the INSTALL and INSTALL-iperf files or
+the installation and reference manual as listed below.  If you encounter
+troubles, see the trouble shooting section of the installation and
+reference manual before issuing a bug report.
 
 Manual
 ------
@@ -77,7 +83,7 @@ More detailed installation instructions can be found in the Installation
 and Reference Manual, contained in the distribution in `text', `info',
 `html', and `pdf' formats:
 
-	cd ../iperf-2.0.3
+	cd ../iperf-2.0.4
 	less doc/manual/iperf.txt
 	lynx doc/manual/iperf.html
 	info -f doc/manual/iperf.info
@@ -127,32 +133,32 @@ The OpenSS7 Modified Iperf package is available from the downloads area
 of The OpenSS7 Project website: <http://www.openss7.org/download.html>
 using a command such as:
 
-	wget http://www.openss7.org/tarballs/iperf-2.0.3.tar.bz2
+	wget http://www.openss7.org/tarballs/iperf-2.0.4.tar.bz2
 
 Unpack the tarball using a command such as:
 
-	tar -xjvf iperf-2.0.3.tar.bz2
+	tar -xjvf iperf-2.0.4.tar.bz2
 
 The tarball will unpack into the relative subdirectory named after the
-package name: iperf-2.0.3  The package builds using the GNU autoconf
+package name: iperf-2.0.4  The package builds using the GNU autoconf
 utilities and the `configure' script.  To build the package, we
 recommend using a separate build directory as follows:
 
 	mkdir build
 	cd build
-	../iperf-2.0.3/configure
+	../iperf-2.0.4/configure
 
 In general, the package configures and builds without adding any special
 options to the configure script.  For general options to the configure
 script, see the GNU `INSTALL' file in the distribution:
 
-	less ../iperf-2.0.3/INSTALL
+	less ../iperf-2.0.4/INSTALL
 
 For specific options to the configure script, see the INSTALL-iperf
 file in the distribution, or simply execute the configure script with
 the --help option like so:
 
-	../iperf-2.0.3/configure --help
+	../iperf-2.0.4/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the `make' command:
@@ -189,8 +195,8 @@ Then the build directory and tarball can be simply removed:
 
 	cd ..
 	rm -rf build
-	rm -rf iperf-2.0.3
-	rm -f iperf-2.0.3.tar.bz2
+	rm -rf iperf-2.0.4
+	rm -f iperf-2.0.4.tar.bz2
 
 
 =========================================================================

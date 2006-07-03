@@ -1,5 +1,5 @@
-OpenSS7 Linux Fast STREAMS -- NexusWare procedures.  2006-03-03
-$Id: README-nexusware,v 0.9.2.3 2006/03/03 10:57:09 brian Exp $
+OpenSS7 Linux Fast STREAMS -- NexusWare procedures.  2006-07-03
+$Id: README-nexusware,v 0.9.2.4 2006/07/03 02:59:21 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -18,9 +18,9 @@ build process does not required `root' privilege.)
 
 Folowing is an example of a native build against the running kernel:
 
-     % wget http://www.openss7.org/streams-0.7a.4.tar.bz2
-     % tar -xjvf streams-0.7a.4.tar.bz2
-     % pushd streams-0.7a.4
+     % wget http://www.openss7.org/streams-0.7a.6.tar.bz2
+     % tar -xjvf streams-0.7a.6.tar.bz2
+     % pushd streams-0.7a.6
      % ./configure
      % make
      % popd
@@ -37,9 +37,9 @@ find them, or they must be specified with declarations such as
 `CC=/u5/NexusWare24/ppc-linux/gcc' on the `configure' command line.  Look in
 the file `configure.nexusware' in the release package for an example.
 
-     % wget http://www.openss7.org/streams-0.7a.4.tar.bz2
-     % tar -xjvf streams-0.7a.4.tar.bz2
-     % pushd streams-0.7a.4
+     % wget http://www.openss7.org/streams-0.7a.6.tar.bz2
+     % tar -xjvf streams-0.7a.6.tar.bz2
+     % pushd streams-0.7a.6
      % ./configure DESTDIR="/some/other/root" \
      	--with-k-release=2.4.18 --host sparc-linux
      % make
@@ -105,9 +105,9 @@ tree is rooted at `/u5/NexusWare'.)
      % ./nexus quick
      % . SETUP.sh
      % popd
-     % wget http://www.openss7.org/streams-0.7a.4.tar.bz2
-     % tar -xjvf streams-0.7a.4.tar.bz2
-     % pushd streams-0.7a.4
+     % wget http://www.openss7.org/streams-0.7a.6.tar.bz2
+     % tar -xjvf streams-0.7a.6.tar.bz2
+     % pushd streams-0.7a.6
      % ./configure.nexusware --with-k-release=2.4.25 --with-k-optimize=size
      % make
      % make DESTDIR="$NEXUSWARE_PREFIX" install-strip
@@ -129,11 +129,13 @@ to remote mount the `/usr' directory after boot), then specify the
 
 In addition, because `NexusWare' does not include an `/etc/modules.conf' file
 by default, it will be necessary to add one or edit your `rc.4' file to
-`insmod' the necessary `streams' modules at boot time.  Also, `NexusWare' does
-not configure its kernels for CONFIG_KMOD, so any kernel modules must be loaded
-by the `rc.4' init script at boot.  On more recent `NexusWare' releases, the
-init scripts will be installed in `$NEXUSWARE_PREFIX/etc/rc.d/init.d/' but you
-must manually edit your `rc.4' script to invoke these scripts.
+`insmod' the necessary `streams' modules at boot time.
+
+Also, `NexusWare' does not configure its kernels for CONFIG_KMOD, so any kernel
+modules must be loaded by the `rc.4' init script at boot.  On more recent
+`NexusWare' releases, the init scripts will be installed in
+`$NEXUSWARE_PREFIX/etc/rc.d/init.d/' but you must manually edit your `rc.4'
+script to invoke these scripts.
 
 Once you have completed the necessary `.spec' and `rc.4' file entries, you need
 to rebuild the `generic' kernel flash image once more for these objects to be
@@ -166,12 +168,12 @@ Another, perhaps simpler approach, is to make the necessary edits to the
 unpack the tar ball into the `NexusWare' directory, and build the `NexusWare'
 flash image as normal:
 
-     % wget http://www.openss7.org/streams-0.7a.4.tar.bz2
+     % wget http://www.openss7.org/streams-0.7a.6.tar.bz2
      % pushd /u5/NexusWare24
      % source SETUP.sh
      % pushd usr/src
-     % tar -xjvf ${DIRSTACK[2]}/streams-0.7a.4.tar.bz2
-     % ln -sf streams-0.7a.4 streams
+     % tar -xjvf ${DIRSTACK[2]}/streams-0.7a.6.tar.bz2
+     % ln -sf streams-0.7a.6 streams
      % popd
      % make
      % popd
@@ -187,7 +189,6 @@ unlikely to be the kernel version of the target machine, except by coincidence.
 configuration, these instructions should work equally well for the Solaris
 `NexusWare' cross-building environment as it does for the Linux `NexusWare'
 cross-building environment.
-
 
 -----
 

@@ -1,5 +1,5 @@
-OpenSS7 STREAMS XNS -- CVS procedures.  2006-03-02
-$Id: README-cvs,v 0.9.2.6 2006/03/04 13:06:07 brian Exp $
+OpenSS7 STREAMS XNS -- CVS procedures.  2006-07-03
+$Id: README-cvs,v 0.9.2.7 2006/07/03 02:59:31 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -10,25 +10,24 @@ The following is an extract from the manual to assist CVS developers:
 --------------------------
 
 If you are a subscriber or sponsor of The OpenSS7 Project
-(http://www.openss7.org/) with CVS archive access privileges then you
-can download release or mid-release versions of the `strxns' package
-from the project CVS archive.
+(http://www.openss7.org/) with CVS archive access privileges then you can
+download release or mid-release versions of the `strxns' package from the
+project CVS archive.
 
-The OpenSS7 XNS Networking package is located in the `strxns'
-subdirectory of `/var/cvs'.  For release tag information, see *Note
-Releases::.
+The OpenSS7 XNS Networking package is located in the `strxns' subdirectory of
+`/var/cvs'.  For release tag information, see *Note Releases::.
 
-To access the archive from the project CVS pserver, use the following
-commands to check out a version from the archive:
+To access the archive from the project CVS pserver, use the following commands
+to check out a version from the archive:
 
      % export CVSROOT='-d:pserver:USERNAME@cvs.openss7.com:2401/var/cvs'
      % cvs login
      Password: *********
-     % cvs co -r strxns-0_9_2_3 strxns
+     % cvs co -r strxns_0.9.2.4 strxns
      % cvs logout
 
-It is, of course, possible to check out by date or by other criteria.
-For more information, see *Note cvs(1): (*manpages*)cvs(1).
+It is, of course, possible to check out by date or by other criteria.  For more
+information, see *Note cvs(1): (*manpages*)cvs(1).
 
  Preparing the CVS Working Directory
 ....................................
@@ -43,54 +42,78 @@ The build host requires the following GNU tools:
    * `automake 1.9.6'
    * `libtool 1.5.22'
    * `gettext 0.14.5'
+
+It should be stressed that, in particular, the `autoconf' and `automake' must
+be at version releases `2.59' and `1.9'.  _The versions normally distributed in
+mainstream GNU/Linux distributions are, in fact, much older than these
+versions._(1)  GNU version of these packages configured and installed to default
+directories will install in `/usr/local/' allowing them to coexist with
+distribution installed versions.
+
+For building documentation, the build host also requires the following
+documentation tools:
+
+   * `gs 8.15'
+   * `tetex 3.0'
    * `texinfo 4.8'
+   * `transfig 3.2.5'
+   * `imagemagick 6.2.4'
+   * `groff 1.17.2'
 
-It should be stressed that, in particular, the `autoconf' and `automake'
-must be at version releases `2.59' and `1.9'.  _The versions normally
-distributed in mainstream GNU/Linux distributions are, in fact, much
-older than these versions._(1)  GNU version of these packages configured
-and installed to default directories will install in `/usr/local/'
-allowing them to coexist with distribution installed versions.
+Most desktop GNU/Linux distributions will have these tools; however, some
+server-style installations (e.g. `Ubuntu'-server) will not and they must be
+installed separately.
 
-In addition, the build host requires a complete tool chain for compiling
-for the target host, including kernel tools such as `genksyms' and
-others.
+For uncooked manual pages, the entire `groff' package is required on `Debian'
+and `Ubuntu' systems (the base package does not include grefer which is used
+extensively by uncooked manual pages).  The following will get what you need:
 
-To generate a configuration script and the necessary scriptlets required
-by the GNU autoconf system, execute the following commands on the
-working directory:
+     Debian: % apt-get install groff_ext
+     Ubuntu: % apt-get install groff
+
+In addition, the build host requires a complete tool chain for compiling for the
+target host, including kernel tools such as `genksyms' and others.
+
+If you wish to package rpms on an `rpm' system, or debs on a `dpkg' system, you
+will need the appropriate tool chain.  Systems based on `rpm' typically have
+the necessary toolchain available, however, `dpkg' systems do not.  The
+following on a `Debian' or `Ubuntu' system will get what you need:
+
+     % apt-get install debhelper
+     % apt-get install fakeroot
+
+To generate a configuration script and the necessary scriptlets required by the
+GNU `autoconf' system, execute the following commands on the working directory:
 
      % autoreconf -fiv strxns
 
-where, `strxns' is the name of the directory to where the working copy
-was checked out under the previous step.  This command generates the
-`configure' script and other missing pieces that are normally
-distributed with the release Tar Balls, SRPMs and DSCs.
+where, `strxns' is the name of the directory to where the working copy was
+checked out under the previous step.  This command generates the `configure'
+script and other missing pieces that are normally distributed with the release
+Tar Balls, SRPMs and DSCs.
 
-Make sure that `autoreconf --version' returns `2.59'.  Otherwise, you
-may need to perform something like the following:
+Make sure that `autoreconf --version' returns `2.59'.  Otherwise, you may need
+to perform something like the following:
 
      % PATH="/usr/local/bin:$PATH"
      % autoreconf -fiv strxns
 
-After reconfiguring the directory, the package can then be configured
-and built using the same instructions as are used for the Tar Ball, see
-*Note Configuring the Tar Ball::, and *Note Building from the Tar
-Ball::.
+After reconfiguring the directory, the package can then be configured and built
+using the same instructions as are used for the Tar Ball, see *Note Configuring
+the Tar Ball::, and *Note Building from the Tar Ball::.
 
-Do note, however, that `make' will rebuild the documentation that is
-normally released with the package.  Additional tools may be necessary
-for building the documentation.
+Do note, however, that `make' will rebuild the documentation that is normally
+released with the package.  Additional tools may be necessary for building the
+documentation.
 
 When configuring the package in a working directory and while working a
-change-compile-test cycle that involves configuration macros or
-documentation, I find it of great advantage to invoke the GNU
-`configure' options `--enable-maintainer-mode' and
-`--enable-dependency-tracking'.  The first of these two options will add
-maintainer-specific targets to any generated `Makefile', and the later
-will invoke automatic dependency tracking within the `Makefile' so
-rebuilds after changes to macro, source or documentation files will be
-automatically rebuilt.
+change-compile-test cycle that involves configuration macros or documentation, I
+find it of great advantage to invoke the GNU `configure' options
+`--enable-maintainer-mode' and `--enable-dependency-tracking'.  The first of
+these two options will add maintainer-specific targets to any generated
+`Makefile', and the later will invoke automatic dependency tracking within the
+`Makefile' so rebuilds after changes to macro, source or documentation files
+will be automatically rebuilt.
 
 ---------- Footnotes ----------
 

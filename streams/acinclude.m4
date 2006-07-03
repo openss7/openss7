@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2006/05/08 03:12:28 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2006/07/03 02:59:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:12:28 $ by $Author: brian $
+# Last Modified $Date: 2006/07/03 02:59:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.118  2006/07/03 02:59:21  brian
+# - updated documentation for release
+#
 # Revision 0.9.2.117  2006/05/08 03:12:28  brian
 # - added module id base to strconf
 #
@@ -1296,7 +1299,7 @@ retval = do_settimeofday(&ts);]]) ],
 AC_DEFUN([_LFS_CONFIG_FATTACH], [dnl
     lfs_pipe=yes
     lfs_fattach=yes
-    _LINUX_KERNEL_SYMBOLS([mount_sem, check_mnt])
+    _LINUX_KERNEL_SYMBOLS([namespace_sem, mount_sem, check_mnt])
     _LINUX_KERNEL_SYMBOL_EXPORT([clone_mnt], [lfs_fattach=no; lfs_pipe=no])
     _LINUX_KERNEL_SYMBOL_EXPORT([graft_tree], [lfs_fattach=no; lfs_pipe=no])
     _LINUX_KERNEL_SYMBOL_EXPORT([do_umount], [lfs_fattach=no; lfs_pipe=no])

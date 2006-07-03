@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.10 2006/07/02 12:13:55 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.11 2006/07/03 02:59:20 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/07/02 12:13:55 $ by $Author: brian $
+@c Last Modified $Date: 2006/07/03 02:59:20 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -145,13 +145,13 @@ release.}
 @itemize @bullet
 @item CentOS Enterprise Linux 3.4 (centos34)
 @item CentOS Enterprise Linux 4.0 (centos4)
-@item Debian 3.0r2 Woody -- TBD
-@item Debian 3.1r0a Sarge
+@item Debian 3.0r2 Woody (deb3.0) -- TBD
+@item Debian 3.1r0a Sarge (deb3.1)
 @item Fedora Core 1 (FC1) -- TBD
 @item Fedora Core 2 (FC2) -- TBD
 @item Fedora Core 3 (FC3) -- TBD
 @item Fedora Core 4 (FC4)
-@item Fedora Core 5
+@item Fedora Core 5 (FC5)
 @item Gentoo 2006.1 (untested)
 @item Lineox 4.026 (LEL4) -- TBD
 @item Lineox 4.053 (LEL4)
@@ -169,13 +169,14 @@ release.}
 @item RedHat Linux 9 (RH9) -- TBD
 @item RedHat Enterprise Linux 3.0 (EL3)
 @item RedHat Enterprise Linux 4 (EL4)
-@item SuSE 8.0 Professional -- TBD
-@item SuSE 9.1 Personal -- TBD
+@item SuSE 8.0 Professional (SuSE8.0) -- TBD
+@item SuSE 9.1 Personal (SuSE9.1) -- TBD
 @item SuSE 9.2 Professional (SuSE9.2) -- TBD
-@item SuSE OpenSuSE
-@item SuSE 10.0
-@item SuSE 10.1 (untested)
-@item Ubuntu 5.10
+@item SuSE OpenSuSE (SuSEOSS)
+@item SuSE 10.0 (SuSE10.0)
+@item SuSE 10.1 (SuSE10.1) (untested)
+@item Ubuntu 5.10 (ubu5.10)
+@item Ubuntu 6.06 LTS (ubu6.06)
 @item WhiteBox Enterprise Linux 3.0 (WBEL3)
 @item WhiteBox Enterprise Linux 4 (WBEL4)
 @end itemize
@@ -201,6 +202,10 @@ to distribution production kernels that have had patches applied over the offici
 
 The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10 and has
 been tested up to and including 2.4.27.  It has been tested from 2.6.3 up to and including 2.6.17.
+Please note that your mileage may vary if you use a kernel more recent than 2.6.17: it is difficult
+to anticipate changes that kernel developers will make in the future.  Many kernels in the 2.6
+series now vary widely ny release version and if you encounter problems, try a kernel within the
+supported series.
 
 UP validation testing for kernels is performed on all supported architectures.  SMP validation
 testing is performed on UP machines, as well as on an Intel 3.0GHz Pentium IV 630 with

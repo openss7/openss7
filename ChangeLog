@@ -1,3 +1,14 @@
+2006-07-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* README: updated for release
+	* README-alpha: updated for release
+	* README-cvs: updated for release
+	* scripts/texi/install.texi: updated for release
+	* scripts/texi/testsuite.texi: updated for release
+	* texi/install.texi: updated for release
+	* texi/testsuite.texi: updated for release
+	* m4/kernel.m4: still a problem with KBUILD_STR quotes
+
 2006-07-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: changes for 2.6.17 kernel

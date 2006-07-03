@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.23 2006/05/23 22:43:39 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.26 2006/07/03 06:04:44 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/05/23 22:43:39 $ by $Author: brian $
+@c Last Modified $Date: 2006/07/03 06:04:44 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -651,7 +651,6 @@ The build host requires the following GNU tools:
 @item @command{automake 1.9.6}
 @item @command{libtool 1.5.22}
 @item @command{gettext 0.14.5}
-@item @command{texinfo 4.8}
 @end itemize
 
 It should be stressed that, in particular, the @command{autoconf} and
@@ -662,11 +661,53 @@ Debian.}  GNU version of these packages configured and installed to default
 directories will install in @file{/usr/local/} allowing them to coexist with
 distribution installed versions.
 
+For building documentation, the build host also requires the following
+documentation tools:
+
+@itemize
+@item @command{gs 8.15}
+@item @command{tetex 3.0}
+@item @command{texinfo 4.8}
+@item @command{transfig 3.2.5}
+@item @command{imagemagick 6.2.4}
+@item @command{groff 1.17.2}
+@end itemize
+
+Most desktop GNU/Linux distributions will have these tools; however, some
+server-style installations (e.g. @cite{Ubuntu}-server) will not and they must
+be installed separately.
+
+For uncooked manual pages, the entire @command{groff} package is required on
+@cite{Debian} and @cite{Ubuntu} systems (the base package does not include
+grefer which is used extensively by uncooked manual pages).  The following will
+get what you need:
+
+@cartouche
+@example
+Debian: % apt-get install groff_ext
+Ubuntu: % apt-get install groff
+@end example
+@end cartouche
+
 In addition, the build host requires a complete tool chain for compiling for the
 target host, including kernel tools such as @command{genksyms} and others.
 
+If you wish to package rpms on an @command{rpm} system, or debs on a
+@command{dpkg} system, you will need the appropriate tool chain.  Systems based
+on @command{rpm} typically have the necessary toolchain available, however,
+@command{dpkg} systems do not.  The following on a @cite{Debian} or
+@cite{Ubuntu} system will get what you need:
+
+@cartouche
+@example
+% apt-get install debhelper
+% apt-get install fakeroot
+@end example
+@end cartouche
+
 To generate a configuration script and the necessary scriptlets required by the
-GNU autoconf system, execute the following commands on the working directory:
+GNU @command{autoconf} system, execute the following commands on the working
+directory:
 
 @cartouche
 @example

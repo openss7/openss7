@@ -1,5 +1,5 @@
-OpenSS7 STREAMS SS7/ISDN/VoIP/SIGTRAN Stacks -- alpha release introduction.  2006-03-02
-$Id: README-alpha,v 0.9.2.5 2006/03/03 12:06:08 brian Exp $
+OpenSS7 STREAMS SS7/ISDN/VoIP/SIGTRAN Stacks -- alpha release introduction.  2006-07-03
+$Id: README-alpha,v 0.9.2.6 2006/07/03 02:59:07 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -18,17 +18,16 @@ The following is an extract from the Installation and Reference Manual:
 4.4.2 Alpha Releases
 --------------------
 
-"Alpha" release are releases that have received little to no testing, or
-that have been tested and contains known bugs or defects that make the
-package unsuitable even for testing.  The purpose for an "alpha" release
-are the same as for the pre-alpha release, with the additional purpose
-that it is an earily release of partially functional code that has
-problems that an external developer might be willing to fix themselves
-and contribute back to the project.
+"Alpha" release are releases that have received little to no testing, or that
+have been tested and contains known bugs or defects that make the package
+unsuitable even for testing.  The purpose for an "alpha" release are the same
+as for the pre-alpha release, with the additional purpose that it is an earily
+release of partially functional code that has problems that an external
+developer might be willing to fix themselves and contribute back to the project.
 
-"Alpha" release packages ship containing warnings that executing the
-code can crash machines and might possibly do damage to systems upon
-which it is executed.
+"Alpha" release packages ship containing warnings that executing the code can
+crash machines and might possibly do damage to systems upon which it is
+executed.
 
 4.5 Bugs
 ========
@@ -36,23 +35,22 @@ which it is executed.
 4.5.1 Defect Notices
 --------------------
 
-"OpenSS7 SS7 Stack" has unknown defects.  This is a "alpha" release.
-Some defects could be harmful.  No validation testing whatsoever has
-been performed by the `OpenSS7 Project' on this software.  The software
-might fail to configure or compile on some systems.  The `OpenSS7
-Project' recommends that you do not use this software for purposes other
-than develoment or evaluation, and then only with great care. Use at
-your own risk.  Remember that there is NO WARRANTY.(1)
+"OpenSS7 SS7 Stack" has unknown defects.  This is a "alpha" release.  Some
+defects could be harmful.  No validation testing whatsoever has been performed
+by the `OpenSS7 Project' on this software.  The software might fail to
+configure or compile on some systems.  The `OpenSS7 Project' recommends that
+you do not use this software for purposes other than develoment or evaluation,
+and then only with great care. Use at your own risk.  Remember that there is NO
+WARRANTY.(1)
 
-This software is alpha software.  As such, it can likely crash your
-kernel.  Installation of the software can irreparably mangle your header
-files or Linux distribution in such a way as to make it unusable.
-Crashes could lock your system and rebooting the system might not repair
-the problem.  You can possibly loose all the data on your system.
-Because this software can crash your kernel, the resulting unstable
-system could destroy computer hardware or peripherals making them
-ususable.  You could void the warranty on any system on which you run
-this software.  YOU HAVE BEEN WARNED.
+This software is alpha software.  As such, it can likely crash your kernel.
+Installation of the software can irreparably mangle your header files or Linux
+distribution in such a way as to make it unusable.  Crashes could lock your
+system and rebooting the system might not repair the problem.  You can possibly
+loose all the data on your system.  Because this software can crash your kernel,
+the resulting unstable system could destroy computer hardware or peripherals
+making them ususable.  You could void the warranty on any system on which you
+run this software.  YOU HAVE BEEN WARNED.
 
 ---------- Footnotes ----------
 
@@ -61,11 +59,10 @@ this software.  YOU HAVE BEEN WARNED.
 4.5.2 Known Defects
 -------------------
 
-With the exception of packages not originaly created by the `OpenSS7
-Project', the `OpenSS7 Project' software does not ship with known bugs
-in any release stage except "pre-alpha".  "OpenSS7 SS7 Stack" had no
-known bugs at the time of release.
-
+With the exception of packages not originaly created by the `OpenSS7 Project',
+the `OpenSS7 Project' software does not ship with known bugs in any release
+stage except "pre-alpha".  "OpenSS7 SS7 Stack" had no known bugs at the time of
+release.
 
 
 =========================================================================

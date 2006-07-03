@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:02 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/07/03 03:06:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
+ Last Modified $Date: 2006/07/03 03:06:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:02 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/07/03 03:06:35 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:02 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/07/03 03:06:35 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -89,6 +89,9 @@ static char const ident[] =
 
 #if defined HAVE_MOUNT_SEM_ADDR
 #define mount_sem (*((struct semaphore *)HAVE_MOUNT_SEM_ADDR))
+#endif
+#if defined HAVE_NAMESPACE_SEM_ADDR
+#define namespace_sem (*((struct rw_semaphore *)HAVE_NAMESPACE_SEM_ADDR))
 #endif
 
 #if defined HAVE_CLONE_MNT_ADDR
@@ -160,10 +163,14 @@ do_fattach(const struct file *file, const char *file_name)
 	if (!mnt)
 		goto release;
 
-#ifndef HAVE_MOUNT_SEM_ADDR
-	down_write(&current->namespace->sem);
+#ifdef HAVE_NAMESPACE_SEM_ADDR
+	down_write(&namespace_sem);
 #else
+#ifdef HAVE_MOUNT_SEM_ADDR
 	down(&mount_sem);
+#else
+	down_write(&current->namespace->sem);
+#endif
 #endif
 
 	/* Something was mounted here while we slept */
@@ -182,10 +189,14 @@ do_fattach(const struct file *file, const char *file_name)
 	err = graft_tree(mnt, &nd);
 
       unlock:
-#ifndef HAVE_MOUNT_SEM_ADDR
-	up_write(&current->namespace->sem);
+#ifdef HAVE_NAMESPACE_SEM_ADDR
+	up_write(&namespace_sem);
 #else
+#ifdef HAVE_MOUNT_SEM_ADDR
 	up(&mount_sem);
+#else
+	up_write(&current->namespace->sem);
+#endif
 #endif
 	mntput(mnt);
       release:

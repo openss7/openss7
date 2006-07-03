@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/07/01 11:37:37 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/07/03 04:09:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/01 11:37:37 $ by $Author: brian $
+# Last Modified $Date: 2006/07/03 04:09:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1847,7 +1847,8 @@ dnl
 		linux_cv_k_bldflags="'-DKBUILD_STR(s)=s'"
 		;;
 	esac
-	linux_cv_k_bldflags="${linux_cv_k_bldflags} '-DKBUILD_BASENAME=KBUILD_STR(`echo [$][@] | sed -e s,lib.*_a-,,;s,\.o,,;s,-,_,g`)'"
+	# the escapes and quotes here are delicate: don't change them!
+	linux_cv_k_bldflags="${linux_cv_k_bldflags} '-DKBUILD_BASENAME=KBUILD_STR('\`echo [\$][@] | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'\`')'"
     ])
     CFLAGS="$linux_cv_k_cflags"
     CPPFLAGS="$linux_cv_k_cppflags"
