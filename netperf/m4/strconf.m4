@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/07/05 07:51:27 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/07/05 08:22:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/05 07:51:27 $ by $Author: brian $
+# Last Modified $Date: 2006/07/05 08:22:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -88,19 +88,24 @@ dnl It's complicated but this is how we prune a whole bunch of directories
 dnl when the build and source directory are the same and the build directory
 dnl is already configured.  One should really do a distclean, but hey.
 dnl
-    STRCONF_CONFIGS=`find $srcdir -type f \
+    STRCONF_CONFIGS=
+    for strconf_tmp in `find $srcdir -type f \
 	\( -name "$STRCONF_STEM" -o -name "$STRCONF_STEM.in" \) \
 	-not \( \( \
 	    -path ${srcdir}/${PACKAGE}/'*' -o \
 	    -path ${srcdir}/${PACKAGE}-${VERSION}/'*' -o \
-	    -path ${srcdir}/${PACKAGE}-${VERSION}-bin/'*' -o \
+	    -path ${srcdir}/${PACKAGE}-bin-${VERSION}/'*' -o \
 	    -path ${srcdir}/${PACKAGE_LCNAME}/'*' -o \
 	    -path ${srcdir}/${PACKAGE_LCNAME}-${VERSION}/'*' -o \
-	    -path ${srcdir}/${PACKAGE_LCNAME}-${VERSION}-bin/'*' -o \
+	    -path ${srcdir}/${PACKAGE_LCNAME}-bin-${VERSION}/'*' -o \
 	    -path ${srcdir}/debian/'*' -o \
 	    -path ${srcdir}/_build/'*' -o \
 	    -path ${srcdir}/_install/'*' \
 	\) -prune \)`
+    do
+	if test -f "$strconf_tmp" ; then
+	    STRCONF_CONFIGS="$strconf_tmp${STRCONF_CONFIGS:+ $STRCONF_CONFIGS}"
+	fi
     done
     AC_MSG_RESULT([$STRCONF_CONFIGS])
     AC_MSG_CHECKING([for strconf script])
@@ -290,9 +295,14 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	# skip subtending debian build directories as well
 	case $strconf_tmp in
 	    ("$ac_abs_builddir"/debian/* | "$ac_abs_builddir"/*/debian/*) continue ;;
-	    ("$ac_abs_builddir/$PACKAGE"/* | "$ac_abs_builddir/"*/"$PACKAGE"/*) continue ;;
-	    ("$ac_abs_builddir/$PACKAGE-$VERSION"/* | "$ac_abs_builddir/"*/"$PACKAGE-$VERSION"/*) continue ;;
-	    ("$ac_abs_builddir/$PACKAGE-bin-$VERSION"/* | "$ac_abs_builddir/"*/"$PACKAGE-bin-$VERSION"/*) continue ;;
+	    ("$ac_abs_builddir"/_build/* | "$ac_abs_builddir"/*/_build/*) continue ;;
+	    ("$ac_abs_builddir"/_install/* | "$ac_abs_builddir"/*/_install/*) continue ;;
+	    ("$ac_abs_builddir/${PACKAGE}"/* | "$ac_abs_builddir/"*/"${PACKAGE}"/*) continue ;;
+	    ("$ac_abs_builddir/${PACKAGE}-${VERSION}"/* | "$ac_abs_builddir/"*/"${PACKAGE}-${VERSION}"/*) continue ;;
+	    ("$ac_abs_builddir/${PACKAGE}-bin-${VERSION}"/* | "$ac_abs_builddir/"*/"${PACKAGE}-bin-${VERSION}"/*) continue ;;
+	    ("$ac_abs_builddir/${PACKAGE_LCNAME}"/* | "$ac_abs_builddir/"*/"${PACKAGE_LCNAME}"/*) continue ;;
+	    ("$ac_abs_builddir/${PACKAGE_LCNAME}-${VERSION}"/* | "$ac_abs_builddir/"*/"${PACKAGE_LCNAME}-${VERSION}"/*) continue ;;
+	    ("$ac_abs_builddir/${PACKAGE_LCNAME}-bin-${VERSION}"/* | "$ac_abs_builddir/"*/"${PACKAGE_LCNAME}-bin-${VERSION}"/*) continue ;;
 	esac
 	# convert back to relative
 	if test -n "$ac_abs_builddir" ; then
