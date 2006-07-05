@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/05/08 03:07:24 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/07/05 07:51:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:07:24 $ by $Author: brian $
+# Last Modified $Date: 2006/07/05 07:51:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,11 +83,24 @@ AC_DEFUN([_STRCONF_SETUP], [dnl
     STRCONF_STEM="${strconf_cv_stem:-Config}"
     AC_MSG_RESULT([$STRCONF_STEM])
     AC_MSG_CHECKING([for strconf config files in $srcdir])
-    STRCONF_CONFIGS=
-    for strconf_tmp in `find $srcdir -name "$STRCONF_STEM" -o -name "$STRCONF_STEM.in"` ; do
-	if test -f "$strconf_tmp" ; then
-	    STRCONF_CONFIGS="$strconf_tmp${STRCONF_CONFIGS:+ }${STRCONF_CONFIGS}"
-	fi
+dnl
+dnl It's complicated but this is how we prune a whole bunch of directories
+dnl when the build and source directory are the same and the build directory
+dnl is already configured.  One should really do a distclean, but hey.
+dnl
+    STRCONF_CONFIGS=`find $srcdir -type f \
+	\( -name "$STRCONF_STEM" -o -name "$STRCONF_STEM.in" \) \
+	-not \( \( \
+	    -path ${srcdir}/${PACKAGE}/'*' -o \
+	    -path ${srcdir}/${PACKAGE}-${VERSION}/'*' -o \
+	    -path ${srcdir}/${PACKAGE}-${VERSION}-bin/'*' -o \
+	    -path ${srcdir}/${PACKAGE_LCNAME}/'*' -o \
+	    -path ${srcdir}/${PACKAGE_LCNAME}-${VERSION}/'*' -o \
+	    -path ${srcdir}/${PACKAGE_LCNAME}-${VERSION}-bin/'*' -o \
+	    -path ${srcdir}/debian/'*' -o \
+	    -path ${srcdir}/_build/'*' -o \
+	    -path ${srcdir}/_install/'*' \
+	\) -prune \)`
     done
     AC_MSG_RESULT([$STRCONF_CONFIGS])
     AC_MSG_CHECKING([for strconf script])
@@ -184,7 +197,7 @@ dnl
     strconf_cv_packagedir=
     strconf_dir="$with_strconf_pkgdir"
     # clean it up
-    strconf_dir=`echo $strconf_dir | sed -e 's|///*|/|g;s|/\./|/|g;s|/\.$||;s|/$||;s|^\./||'`
+    strconf_dir=`echo $strconf_dir | sed -e 's,///*,/,g;s,/\./,/,g;s,/[[^/]]*/\.\./,/,;s,/\.[$],,;s,/[$],,;s,^\./,,;s,^\.[$],,'`
     if test -n "$strconf_dir" ; then
 	case $strconf_dir in
 	    (.*|/*) # if it begin a . or a / then it is not vpath relative
@@ -274,7 +287,9 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
     ac_abs_pkgdir_mask="^`echo $ac_abs_pkgdir | sed -e 's|.|.|g'`"
     for strconf_tmp in $strconf_list ; do
 	# skip lower level build directories in list (to avoid duplicates)
+	# skip subtending debian build directories as well
 	case $strconf_tmp in
+	    ("$ac_abs_builddir"/debian/* | "$ac_abs_builddir"/*/debian/*) continue ;;
 	    ("$ac_abs_builddir/$PACKAGE"/* | "$ac_abs_builddir/"*/"$PACKAGE"/*) continue ;;
 	    ("$ac_abs_builddir/$PACKAGE-$VERSION"/* | "$ac_abs_builddir/"*/"$PACKAGE-$VERSION"/*) continue ;;
 	    ("$ac_abs_builddir/$PACKAGE-bin-$VERSION"/* | "$ac_abs_builddir/"*/"$PACKAGE-bin-$VERSION"/*) continue ;;
