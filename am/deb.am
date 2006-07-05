@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2006/07/04 11:04:56 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2006/07/04 18:53:05 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/07/04 11:04:56 $ by $Author: brian $
+## Last Modified $Date: 2006/07/04 18:53:05 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.72  2006/07/04 18:53:05  brian
+## - correct flags
+##
 ## Revision 0.9.2.71  2006/07/04 11:04:56  brian
 ## - try building arch and indep separately
 ##
@@ -224,16 +227,16 @@ each-deb: $(debian_dir)
 # conditionals WITH_LIS and WITH_LFS to be false and the plain rule above will be used instead.
 ##
 one-deb:
-@WITH_LIS_FALSE@@WITH_LFS_FALSE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-B' BUILD_CFGOPTIONS='--without-indep' AM_BINARY_TARGET='binary-arch' each-deb
+@WITH_LIS_FALSE@@WITH_LFS_FALSE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-B' BUILD_CFGOPTIONS='--disable-indep' AM_BINARY_TARGET='binary-arch' each-deb
 
 lis-deb:
-@WITH_LIS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-B' BUILD_CFGOPTIONS='--with-lis --without-lfs --without-indep' AM_BINARY_TARGET='binary-lis' each-deb
+@WITH_LIS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-B' BUILD_CFGOPTIONS='--with-lis --without-lfs --disable-indep' AM_BINARY_TARGET='binary-lis' each-deb
 
 lfs-deb:
-@WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-B' BUILD_CFGOPTIONS='--with-lfs --without-lis --without-indep' AM_BINARY_TARGET='binary-lfs' each-deb
+@WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-B' BUILD_CFGOPTIONS='--with-lfs --without-lis --disable-indep' AM_BINARY_TARGET='binary-lfs' each-deb
 
 noa-deb:
-	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-b' BUILD_CFGOPTIONS='--without-arch' AM_BINARY_TARGET='binary-indep' each-deb
+	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-b' BUILD_CFGOPTIONS='--disable-arch' AM_BINARY_TARGET='binary-indep' each-deb
 
 chg-deb:
 	@if test "$(PACKAGE_DEBTOPDIR)" != "$(debbuilddir)" ; then \
