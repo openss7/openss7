@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2006/07/06 14:31:03 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2006/07/08 05:25:56 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,26 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/07/06 14:31:03 $ by $Author: brian $
+## Last Modified $Date: 2006/07/08 05:25:56 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.81  2006/07/08 05:25:56  brian
+## - no architecture last
+##
+## Revision 0.9.2.80  2006/07/08 04:41:45  brian
+## - no architecture last
+##
+## Revision 0.9.2.79  2006/07/08 04:05:32  brian
+## - cannot depend on a directory
+##
+## Revision 0.9.2.78  2006/07/08 03:42:54  brian
+## - cannot depend on directory
+##
+## Revision 0.9.2.77  2006/07/08 03:40:34  brian
+## - do not rebuild build directory all the time
+##
 ## Revision 0.9.2.76  2006/07/06 14:31:03  brian
 ## - match order of noarch build
 ##
@@ -162,7 +177,7 @@ DEBXOPTS	= -D
 #! --help' for more information on options.
 #!
 $(debian_dir):: $(debian_dir_stamp)
-$(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz $(debbuilddir)
+$(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz
 	rm -rf $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir)
 	$(mkdir_p) $(debbuilddir)/$(PACKAGE)-$(VERSION)
 	$(GZIP_CMD) -dc $< | tar xf - -C $(debbuilddir)
@@ -180,7 +195,8 @@ $(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz $(debbuildd
 # builds that including signing.  If you don't like the security issues that raises, dont use it and
 # you will be prompted for a passphrase with each signature.
 ##
-$(debian_dsc_file) $(debian_tar_file):: $(debian_dir)
+$(debian_dsc_file) $(debian_tar_file):: $(debian_dir_stamp)
+	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
 	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -us -uc $(DEBXOPTS) )
 #	(cd "$(debbuilddir)" ; $(DPKG_SOURCE) -b -sn $(debian_dir))
 
@@ -229,7 +245,8 @@ AM_BINARY_TARGET = binary-arch
 # This is the type of thing that needs to be included in the master makefile to build debs for the
 # current target, we also build any defined AM_DEBTARGETS
 ##
-each-deb: $(debian_dir)
+each-deb: $(debian_dir_stamp)
+	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
 	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(DEBBOPTS) -rfakeroot -uc $(DEBXOPTS) -nc )
 #	( cd $(debian_dir) ; dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=4 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
 
@@ -271,7 +288,7 @@ chg-deb:
 #!     @PACKAGE_LCNAME@-*_@VERSION@-@PACKAGE_DEBRELEASE@_*.deb, where the stars indicate the subpackage and
 #!     the architecture.
 #!
-debs: noa-deb lis-deb lfs-deb one-deb chg-deb
+debs: lis-deb lfs-deb one-deb noa-deb chg-deb
 
 #! csig:
 #!     This target signs the .dsc file.  You will be prompted for a password,
@@ -306,7 +323,7 @@ all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_
 all-sigs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
 all-csig:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
 
-RELEASE			+= all-dsc all-noa-deb all-lis-deb all-lfs-deb all-one-deb all-chg-deb
+RELEASE			+= all-dsc all-lis-deb all-lfs-deb all-one-deb all-noa-deb all-chg-deb
 RELEASE_SIGN		+= all-sigs all-csig
 RELEASE_DIRECTORIES	+= 
 
