@@ -3,6 +3,10 @@ Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes in iperf-2.0.5rc1
+
+  Release candidate for Mark Fugate.
+
 * Major changes in iperf-2.0.5
 
   Added --enable-devel configure option for embedded targets.

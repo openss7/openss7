@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/05/08 03:33:29 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/07/07 21:08:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:33:29 $ by $Author: brian $
+# Last Modified $Date: 2006/07/07 21:08:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1011,8 +1011,7 @@ programs.
 %defattr(-,root,root)
 %{_libdir}/*.a
 %dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*.h
-%{_includedir}/%{name}/sys/*
+%{_includedir}/%{name}/*
 %endif
 
 %if %{FILES_dev}
@@ -1020,8 +1019,7 @@ programs.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*.h
-%{_includedir}/%{name}/sys/*
+%{_includedir}/%{name}/*
 %endif
 
 # ===========================================================================
@@ -1748,6 +1746,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
+# Revision 0.9.2.143  2006/07/07 21:08:36  brian
+# - place all header files in development subpackage
+#
 # Revision 0.9.2.142  2006/05/08 03:33:29  brian
 # - updated headers, corrected init scrip removal
 #

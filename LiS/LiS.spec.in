@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.58 $) $Date: 2006/05/08 03:33:25 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.59 $) $Date: 2006/07/07 21:08:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:33:25 $ by $Author: brian $
+# Last Modified $Date: 2006/07/07 21:08:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -997,8 +997,7 @@ SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE
 %defattr(-,root,root)
 %{_libdir}/*.a
 %dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*.h
-%{_includedir}/%{name}/sys/*
+%{_includedir}/%{name}/*
 %endif
 
 %if %{FILES_dev}
@@ -1006,8 +1005,7 @@ SMP.  THIS PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*.h
-%{_includedir}/%{name}/sys/*
+%{_includedir}/%{name}/*
 %endif
 
 # ===========================================================================
@@ -1747,6 +1745,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
+# Revision 1.1.6.59  2006/07/07 21:08:35  brian
+# - place all header files in development subpackage
+#
 # Revision 1.1.6.58  2006/05/08 03:33:25  brian
 # - updated headers, corrected init scrip removal
 #

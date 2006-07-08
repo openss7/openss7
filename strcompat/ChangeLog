@@ -1,3 +1,26 @@
+2006-07-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/copyright: typo
+
+2006-07-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/changelog: packaged release candidate for Mark Fugate
+	* debian/control.in: first full debian master package build of debs on Ubuntu
+	* debian/rules.in:: first full debian master package build of debs on Ubuntu
+
+2006-07-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* NEWS: package release candidate for Mark Fugate
+	* .pkgrelease: package release candidate for Mark Fugate
+
+2006-07-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/os7compat.c: corrections for LiS-only compile on FC5
+	* src/include/sys/os7/compat.h: corrections for LiS-only compile on FC5
+	* strcompat.spec.in: place all include files in development sub-package
+	* doc/man/Makefile.am: corrections for complete distribution check,
+	  missing manual page in LiS-only build.
+
 2006-07-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updated for release
@@ -5,6 +28,18 @@
 	* README-nexusware: updated for release
 	* acinclude.m4: updated for release
 	* doc/manual/releases.texi: updated for release
+	* src/kernel/lfscompat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/irixcompat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/hpuxcompat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/aixcompat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/uw7compat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/svr4compat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/svr3compat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/suncompat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/osfcompat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/mpscompat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/maccompat.c: changes to correct LiS-only compile on FC5
+	* src/kernel/liscompat.c: changes to correct LiS-only compile on FC5
 
 2006-07-02  Brian Bidulock  <bidulock@openss7.org>
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/25 08:39:14 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/07 21:14:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/25 08:39:14 $ by $Author: brian $
+ Last Modified $Date: 2006/07/07 21:14:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.c,v $
+ Revision 0.9.2.24  2006/07/07 21:14:53  brian
+ - correct compile back to RH 7.2
+
  Revision 0.9.2.23  2006/05/25 08:39:14  brian
  - added noinline in strategic places
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/25 08:39:14 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/07 21:14:53 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/25 08:39:14 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/07 21:14:53 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -94,7 +97,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/25 08:39:14 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/07 21:14:53 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -302,7 +305,7 @@ split_buffer(mblk_t *mp, int offset)
  *  
  *  -------------------------------------------------------------------------
  */
-static noinline fastcall __hot_get int
+static noinline streams_fastcall __hot_get int
 timod_rput_slow(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
@@ -586,7 +589,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 	return timod_rput_slow(q, mp);
 }
 
-static noinline fastcall __hot_put int
+static noinline streams_fastcall __hot_put int
 timod_wput_slow(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;

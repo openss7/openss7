@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.55 $) $Date: 2006/03/24 10:02:39 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.56 $) $Date: 2006/07/07 20:56:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/24 10:02:39 $ by $Author: brian $
+# Last Modified $Date: 2006/07/07 20:56:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,7 +60,7 @@
 %global BUILD_noarch  1
 %global BUILD_arch    1
 %global BUILD_source  1
-%global BUILD_test    0
+%global BUILD_test    1
 %global BUILD_lis     0
 %global BUILD_lfs     0
 
@@ -581,8 +581,8 @@ submitting problem reports to @PACKAGE_BUGREPORT@.
 %files test
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_libexecdir}/%{name}/atlocal
-%{_libexecdir}/%{name}/testsuite*
+#%{_libexecdir}/%{name}/atlocal
+#%{_libexecdir}/%{name}/testsuite*
 %{_libexecdir}/%{name}/send-pr
 %{_libexecdir}/%{name}/send-pr.config
 %endif
@@ -731,6 +731,9 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.56  2006/07/07 20:56:36  brian
+# - release send-pr scripts in test package
+#
 # Revision 1.1.2.55  2006/03/24 10:02:39  brian
 # - added send-pr to %package test description
 #

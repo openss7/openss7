@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.22 $) $Date: 2006/02/20 11:38:49 $
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.23 $) $Date: 2006/03/05 04:03:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,24 +45,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 11:38:49 $ by $Author: brian $
+ Last Modified $Date: 2006/03/05 04:03:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: linux-mdep.c,v $
+ Revision 1.1.1.11.4.23  2006/03/05 04:03:03  brian
+ - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
+ - updates for new release
+
  Revision 1.1.1.11.4.22  2006/02/20 11:38:49  brian
  - corrections for some 64bit architectures, from patches
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.22 $) $Date: 2006/02/20 11:38:49 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.23 $) $Date: 2006/03/05 04:03:03 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.22 2006/02/20 11:38:49 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.23 2006/03/05 04:03:03 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -337,6 +341,7 @@ void lis_print_dentry(struct dentry *d, char *comment);
 
 #if defined(_S390X_LIS_) || defined (_PPC64_LIS_) || defined(_X86_64_LIS_)
 extern long sys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg);
+
 #ifdef HAVE_KFUNC_REGISTER_IOCTL32_CONVERSION
 extern int register_ioctl32_conversion(unsigned int fd,
 				       int (*handler) (unsigned int fd, unsigned int cmd,
@@ -678,8 +683,7 @@ struct super_operations lis_super_ops = {
  */
 #define MODCNT()	lis_modcnt(THIS_MODULE)
 
-static inline
-    long
+static inline long
 lis_modcnt(struct module *mod)
 {
 #if defined(THIS_MODULE)
@@ -2452,7 +2456,7 @@ lis_get_fifo(struct file **f)
 	if ((error = lis_new_file_name_dev(*f, name, dev)) == 0) {
 		if ((error = lis_stropen((*f)->f_dentry->d_inode, *f)) < 0) {
 			fops_put((*f)->f_op);
-			(*f)->f_op->owner = NULL;
+			(*f)->f_op = NULL;
 			fput(*f);
 			*f = NULL;
 		}
@@ -2576,6 +2580,42 @@ lis_ioc_pipe(unsigned int *fildes)
 	return error;
 }
 
+#ifndef PIPE_WAIT
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_MUTEX
+#define PIPE_MUTEX(inode)		(&(inode).i_mutex)
+#else				/* HAVE_KMEMB_STRUCT_INODE_I_MUTEX */
+#define PIPE_SEM(inode)			(&(inode).i_sem)
+#endif				/* HAVE_KMEMB_STRUCT_INODE_I_MUTEX */
+#define PIPE_WAIT(inode)		(&(inode).i_pipe->wait)
+#define PIPE_READERS(inode)		((inode).i_pipe->readers)
+#define PIPE_WRITERS(inode)		((inode).i_pipe->writers)
+#define PIPE_WAITING_WRITERS(inode)	((inode).i_pipe->waiting_writers)
+#define PIPE_RCOUNTER(inode)		((inode).i_pipe->r_counter)
+#define PIPE_WCOUNTER(inode)		((inode).i_pipe->w_counter)
+#define PIPE_FASYNC_READERS(inode)	(&((inode).i_pipe->fasync_readers))
+#define PIPE_FASYNC_WRITERS(inode)	(&((inode).i_pipe->fasync_writers))
+#endif
+
+static int
+lis_lock_pipe(struct inode *i)
+{
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_MUTEX
+	mutex_lock(PIPE_MUTEX(*i));
+	return (0);
+#else				/* HAVE_KMEMB_STRUCT_INODE_I_MUTEX */
+	return lis_kernel_down(PIPE_SEM(*i));
+#endif				/* HAVE_KMEMB_STRUCT_INODE_I_MUTEX */
+}
+static void
+lis_unlock_pipe(struct inode *i)
+{
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_MUTEX
+	return mutex_unlock(PIPE_MUTEX(*i));
+#else				/* HAVE_KMEMB_STRUCT_INODE_I_MUTEX */
+	return lis_kernel_up(PIPE_SEM(*i));
+#endif				/* HAVE_KMEMB_STRUCT_INODE_I_MUTEX */
+}
+
 /*
  *  the following ..._sync() routines are adaptations of the kernel
  *  fifo open routines, used here to implement conventional FIFO
@@ -2598,11 +2638,11 @@ lis_fifo_wait(struct inode *i)
 	DECLARE_WAITQUEUE(wait, current);
 	current->state = TASK_INTERRUPTIBLE;
 	add_wait_queue(PIPE_WAIT(*i), &wait);
-	lis_kernel_up(PIPE_SEM(*i));
+	lis_unlock_pipe(i);
 	schedule();
 	remove_wait_queue(PIPE_WAIT(*i), &wait);
 	current->state = TASK_RUNNING;
-	lis_kernel_down(PIPE_SEM(*i));
+	lis_lock_pipe(i);
 }
 
 static inline void
@@ -2666,7 +2706,7 @@ lis_fifo_open_sync(struct inode *i, struct file *f)
 		       head ? head->sd_name : "No-Strm", (int) f->f_mode, (int) f->f_flags);
 
 	ret = -ERESTARTSYS;
-	if (lis_kernel_down(PIPE_SEM(*i)))
+	if (lis_lock_pipe(i))
 		goto err_nolock_nocleanup;
 
 	if (!i->i_pipe) {
@@ -2740,7 +2780,7 @@ lis_fifo_open_sync(struct inode *i, struct file *f)
 		goto err;
 	}
 
-	lis_kernel_up(PIPE_SEM(*i));
+	lis_unlock_pipe(i);
 
 	if (LIS_DEBUG_VOPEN)
 		printk("lis_fifo_open_sync(i@0x%p/%d,f@0x%p/%d)#%ld"
@@ -2769,7 +2809,7 @@ lis_fifo_open_sync(struct inode *i, struct file *f)
 	}
 
       err_nocleanup:
-	lis_kernel_up(PIPE_SEM(*i));
+	lis_unlock_pipe(i);
 
       err_nolock_nocleanup:
 	if (LIS_DEBUG_VOPEN)
@@ -2786,7 +2826,7 @@ lis_fifo_close_sync(struct inode *i, struct file *f)
 	stdata_t *head = INODE_STR(i);
 	long this_close = K_ATOMIC_READ(&lis_close_cnt);
 
-	lis_kernel_down(PIPE_SEM(*i));
+	lis_lock_pipe(i);
 
 	PIPE_READERS(*i) -= (f && f->f_mode & FMODE_READ ? 1 : 0);
 	PIPE_WRITERS(*i) -= (f && f->f_mode & FMODE_WRITE ? 1 : 0);
@@ -2805,7 +2845,7 @@ lis_fifo_close_sync(struct inode *i, struct file *f)
 		lis_wake_up_interruptible(PIPE_WAIT(*i));
 	}
 
-	lis_kernel_up(PIPE_SEM(*i));
+	lis_unlock_pipe(i);
 }
 
 int
@@ -3272,7 +3312,7 @@ lis_sendfd(stdata_t *sendhd, unsigned int fd, struct file *fp)
 		if (!(dfp->f_dentry = lis_d_alloc_root(igrab(i), LIS_D_ALLOC_ROOT_NORMAL))) {
 			ULOCK_INO(i);
 			fops_put(dfp->f_op);
-			dfp->f_op->owner = NULL;
+			dfp->f_op = NULL;
 			fput(dfp);
 			fput(fp);
 			goto bad_file;
@@ -3917,12 +3957,11 @@ int
 streams_compat_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg, struct file *file)
 {
 	if (file && file->f_dentry && file->f_dentry->d_inode &&
-			(file->f_dentry->d_inode->i_mode & S_IFMT) == S_IFBLK)
+	    (file->f_dentry->d_inode->i_mode & S_IFMT) == S_IFBLK)
 		return ioctl32_convert_next(fd, cmd, arg, file);
 	return sys_ioctl(fd, cmd, arg);
 }
 #endif
-
 
 int
 lis_init_module(void)
@@ -4202,10 +4241,9 @@ lis_thread_func(void *argp)
 #if defined(KERNEL_2_5)
 	daemonize("%s", arg->name);	/* make me a daemon */
 #else
+	daemonize();		/* make me a daemon */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,16)
 	reparent_to_init();	/* disown all parentage */
-#else
-	daemonize();		/* make me a daemon */
 #endif
 #endif
 

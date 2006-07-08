@@ -1,6 +1,13 @@
+strbcm (0.9.2.1rc1-0) experimental; urgency=low
+
+  * Release candidate for Mark.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Wed,  5 Jul 2006 19:44:05 -0600
+
 strbcm (0.9.2.1-0) experimental; urgency=low
 
   * Initial stab at debian build system.
+  * Extensive rework of rules file for Debian 3.1 and Ubuntu 6.06.
 
  -- Brian F. G. Bidulock <bidulock@openss7.org>  Sun,  3 Jul 2005 14:32:46 -0600
 

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.62 $) $Date: 2006/03/24 10:02:37 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.63 $) $Date: 2006/07/07 21:08:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/24 10:02:37 $ by $Author: brian $
+# Last Modified $Date: 2006/07/07 21:08:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -517,8 +517,7 @@ programs.
 %defattr(-,root,root)
 %{_libdir}/*.a
 #dir %{_includedir}/%{name}
-#{includedir}/%{name}/*.h
-#{includedir}/%{name}/sys/*
+#{includedir}/%{name}/*
 %endif
 
 %if %{FILES_dev}
@@ -526,8 +525,7 @@ programs.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #dir %{_includedir}/%{name}
-#{includedir}/%{name}/*.h
-#{includedir}/%{name}/sys/*
+#{includedir}/%{name}/*
 %endif
 
 # ===========================================================================
@@ -760,6 +758,9 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.63  2006/07/07 21:08:47  brian
+# - place all header files in development subpackage
+#
 # Revision 1.1.2.62  2006/03/24 10:02:37  brian
 # - added send-pr to %package test description
 #

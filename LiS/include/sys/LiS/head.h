@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: head.h,v 1.1.1.4.4.7 2005/12/19 03:22:22 brian Exp $
+ @(#) $Id: head.h,v 1.1.1.4.4.8 2005/12/28 09:53:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:22 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:53:33 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: head.h,v 1.1.1.4.4.7 2005/12/19 03:22:22 brian Exp $
+ * RCS Id          : $Id: head.h,v 1.1.1.4.4.8 2005/12/28 09:53:33 brian Exp $
  * Purpose         : here you have utilites to handle str heads.
  * ----------------______________________________________________
  *
@@ -70,7 +70,7 @@
 #ifndef _HEAD_H
 #define _HEAD_H 1
 
-#ident "@(#) $RCSfile: head.h,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2005/12/19 03:22:22 $"
+#ident "@(#) $RCSfile: head.h,v $ $Name:  $($Revision: 1.1.1.4.4.8 $) $Date: 2005/12/28 09:53:33 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -408,7 +408,7 @@ extern char lis_queueflag;		/* the function queuerun is running */
 extern int lis_nstrpush;		/* maximum # of pushed modules */
 extern int lis_strhold;			/* if not zero str hold feature's activated */
 extern unsigned long lis_strthresh;	/* configurable STREAMS memory limit */
-extern unsigned int lis_iocseq;		/* ioctl id */
+extern int lis_iocseq;			/* ioctl id */
 #endif
 #endif				/* __KERNEL__ */
 

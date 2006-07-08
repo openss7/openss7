@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/22 13:11:33 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/07/07 20:49:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:33 $ by $Author: brian $
+ Last Modified $Date: 2006/07/07 20:49:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/22 13:11:33 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/07/07 20:49:55 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/22 13:11:33 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/07/07 20:49:55 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -66,7 +66,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __SVR4_EXTERN_INLINE INLINE streamscall
+#define __SVR4_EXTERN_INLINE __inline__ streamscall
 
 #define _SVR4_SOURCE
 
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/06/22 13:11:33 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/07/07 20:49:55 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"

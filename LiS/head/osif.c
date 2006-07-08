@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.14 $) $Date: 2006/02/20 11:38:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/02/20 11:38:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: osif.c,v $
+ Revision 1.1.1.4.4.14  2006/02/20 11:38:50  brian
+ - corrections for some 64bit architectures, from patches
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.13 $) $Date: 2006/01/03 13:05:20 $"
+#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.14 $) $Date: 2006/02/20 11:38:50 $"
 
 /************************************************************************
 *                   Operating System Interface                          *
@@ -439,7 +442,16 @@ void _RP
 lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_t size,
 			     int direction)
 {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
+	if ((direction == PCI_DMA_BIDIRECTIONAL) || (direction == PCI_DMA_TODEVICE)) {
+		pci_dma_sync_single_for_device(hwdev, dma_handle, size, direction);
+	}
+	if ((direction == PCI_DMA_BIDIRECTIONAL) || (direction == PCI_DMA_FROMDEVICE)) {
+		pci_dma_sync_single_for_cpu(hwdev, dma_handle, size, direction);
+	}
+#else
 	pci_dma_sync_single(hwdev, dma_handle, size, direction);
+#endif
 }
 #endif
 
@@ -447,7 +459,16 @@ lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_
 void _RP
 lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nelems, int direction)
 {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
+	if ((direction == PCI_DMA_BIDIRECTIONAL) || (direction == PCI_DMA_TODEVICE)) {
+		pci_dma_sync_sg_for_device(hwdev, sg, nelems, direction);
+	}
+	if ((direction == PCI_DMA_BIDIRECTIONAL) || (direction == PCI_DMA_FROMDEVICE)) {
+		pci_dma_sync_sg_for_cpu(hwdev, sg, nelems, direction);
+	}
+#else
 	pci_dma_sync_sg(hwdev, sg, nelems, direction);
+#endif
 }
 #endif
 
@@ -534,7 +555,16 @@ void _RP
 lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
 				 int direction)
 {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
+	if ((direction == PCI_DMA_BIDIRECTIONAL) || (direction == PCI_DMA_TODEVICE)) {
+		pci_dac_dma_sync_single_for_device(pdev, dma_addr, len, direction);
+	}
+	if ((direction == PCI_DMA_BIDIRECTIONAL) || (direction == PCI_DMA_FROMDEVICE)) {
+		pci_dac_dma_sync_single_for_cpu(pdev, dma_addr, len, direction);
+	}
+#else
 	pci_dac_dma_sync_single(pdev, dma_addr, len, direction);
+#endif
 }
 #endif
 
@@ -573,7 +603,7 @@ lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t d
  * pass to the kernel's request_irq function.  This routine then calls
  * the LiS style irq handler using the LiS parameter passing convention.
  *
- * So we construct a "deice id" as the pointer to one of these structures
+ * So we construct a "device id" as the pointer to one of these structures
  * in which we save the user's original dev_id parameter which we then
  * pass back to the user's interrupt handler.  We are going to appropriate
  * the lis_incr_lock spin lock for our list protection.
@@ -691,11 +721,12 @@ lis_free_irq(unsigned int irq, void *dev_id)
 	lis_spin_lock_irqsave(&lis_incr_lock, &psw);
 	for (; dv != NULL; dv = dv->link) {
 		if (dv->dev_id == dev_id) {
+			free_irq(irq, dv);
 			dv->handler = NULL;
 			dv->dev_id = NULL;
 			dv->irq = 0;
 			lis_spin_unlock_irqrestore(&lis_incr_lock, &psw);
-			free_irq(irq, dv);
+			FREE(dv);
 			return;
 		}
 	}

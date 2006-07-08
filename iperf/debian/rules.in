@@ -1,11 +1,12 @@
 #!/usr/bin/make -f
+# @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2006/07/01 11:51:43 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2006/07/07 21:47:54 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
@@ -46,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/07/01 11:51:43 $ by $Author: brian $
+## Last Modified $Date: 2006/07/07 21:47:54 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -58,13 +59,16 @@ CXXCPP = @CXXCPP@
 PACKAGE = @PACKAGE@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
 VERSION = @VERSION@
-PACKAGE_DISTDIR = @PACKAGE_DISTDIR@
+
+srcdir=.
+debbuilddir = ..
+debtmpdir = debian/tmp
 PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
-PACKAGE_DEBTOPDIR = @PACKAGE_DEBTOPDIR@
-debbuilddir = @debbuilddir@
-mytmpdir = /var/tmp/$(PACKAGE)-$(VERSION)
 
 rootdir = @rootdir@
+kversion = @kversion@
+krelease = @krelease@
+kmoduledir = @kmoduledir@
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
@@ -83,10 +87,12 @@ oldincludedir = @oldincludedir@
 
 configdir = @configdir@
 initrddir = @initrddir@
+modutildir = @modutildir@
 
 pkgdatadir = $(datadir)/$(PACKAGE)
 pkglibdir = $(libdir)/$(PACKAGE)
 pkgincludedir = $(includedir)/$(PACKAGE)
+pkglibexecdir = $(libexecdir)/$(PACKAGE)
 
 export DEB_HOST_ARCH
 export DH_VERBOSE = 1
@@ -95,78 +101,115 @@ export DH_OPTIONS =
 export BUILD_CFGOPTIONS =
 
 name = $(PACKAGE)
-
-srcdir=@srcdir@
 epoch = @PACKAGE_RPMEPOCH@
 base = @PACKAGE_LCNAME@
 title = @PACKAGE_TITLE@
 stitle = @PACKAGE_SHORTTITLE@
 
-pkg_control_files	=
-pkg_scripts_files	=
+control =
 
-##$(pkg_scripts_files):
-##	@f=`echo "$@" | sed -e 's|^.*/||;s|$(core_name)|core|;s|$(info_name)|info|'` ; \
-##	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
-##	test "$@" -ef "$$d$$f" && exit 0 ; \
-##	test -f "$@" -a "$@" -nt "$$d$$f" || { \
-##		echo "cp -f -- $$d$$f $@" ; \
-##		cp -f -- $$d$$f $@ ; \
-##	}
-##
-##pkg_scripts_files	+= debian/$(PACKAGE_LCNAME)-$(core_name).preinst \
-##			   debian/$(PACKAGE_LCNAME)-$(core_name).postinst \
-##			   debian/$(PACKAGE_LCNAME)-$(core_name).prerm \
-##			   debian/$(PACKAGE_LCNAME)-$(core_name).postrm
+#
+#   Libraries:
+#
 
-pkg_control_files	+= debian/${PACKAGE_LCNAME}-openss7.install
+#control	+= debian/$(PACKAGE_LCNAME)-lib.preinst
 
-debian/${PACKAGE_LCNAME}-openss7.install:
-	( echo '$(mytmpdir)$(bindir)/*' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.docs
+#control	+= debian/$(PACKAGE_LCNAME)-lib.install
+
+
+
+debian/$(PACKAGE_LCNAME)-lib.install:
+	( [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
+	  [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.la' ) \
+	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
+
+control	+= debian/$(PACKAGE_LCNAME)-doc.docs
 
 debian/$(PACKAGE_LCNAME)-doc.docs:
-	( echo "ANNOUNCE" ; \
 	( echo "AUTHORS" ; \
+	  [ ! -f ANNOUNCE ] || echo "ANNOUNCE" ; \
+	  [ ! -f ABOUT-NLS ] || echo "ABOUT-NLS" ; \
+	  [ ! -f BUGS ] || echo "BUGS" ; \
 	  echo "COPYING" ; \
 	  echo "ChangeLog" ; \
 	  echo "INSTALL" ; \
 	  echo "INSTALL-$(PACKAGE)" ; \
-	  echo "LICENSE" ; \
+	  [ ! -f LICENSE ] || echo "LICENSE" ; \
 	  echo "LSM" ; \
 	  echo "NEWS" ; \
 	  echo "README" ; \
+	  [ ! -f README-LiS ] || echo "README-LiS" ; \
+	  [ ! -f README-alpha ] || echo "README-alpha" ; \
 	  echo "README-cvs" ; \
 	  echo "README-make" ; \
 	  echo "README-nexusware" ; \
+	  [ ! -f RELEASE-NOTES ] || echo "RELEASE-NOTES" ; \
 	  echo "THANKS" ; \
 	  echo "TODO" ; \
+	  [ ! -d doc/manual ] || echo "doc/manual" ; \
+	  [ ! -d manual ] || echo "manual" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
-pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.manpages
+control	+= debian/$(PACKAGE_LCNAME)-doc.manpages
 
 debian/$(PACKAGE_LCNAME)-doc.manpages:
-	( find $(mytmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
+	( [ ! -d $(debtmpdir)/$(mandir) ] || \
+	    find $(debtmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
 
-@COOKED_MANPAGES_FALSE@pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.install
+@COOKED_MANPAGES_FALSE@control	+= debian/$(PACKAGE_LCNAME)-doc.install
 
 debian/$(PACKAGE_LCNAME)-doc.install:
-	( echo '$(mytmpdir)$(mandir)/*.refs' ; \
-	  echo '$(mytmpdir)$(mandir)/*.macros' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+	( [ -d $(debtmpdir)$(mandir) ] || echo '$(debtmpdir)$(mandir)/*.refs' ; \
+	  [ -d $(debtmpdir)$(mandir) ] || echo '$(debtmpdir)$(mandir)/*.macros' ) \
+	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
-##pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.info
-##
-##debian/$(PACKAGE_LCNAME)-doc.info:
-##	( find $(mytmpdir)$(infodir) -type f -name '*.info*' ) > $@
-##
+#control	+= debian/$(PACKAGE_LCNAME)-doc.info
+
+debian/$(PACKAGE_LCNAME)-doc.info:
+	( [ ! -d $(debtmpdir)/$(infodir) ] || \
+	    find $(debtmpdir)$(infodir) -type f -name '*.info*' ) > $@
+
+#control	+= debian/$(PACKAGE_LCNAME)-devel.install
+
+debian/$(PACKAGE_LCNAME)-devel.install:
+	( [ ! -d $(debtmpdir)$(pkgincludedir) ]	|| echo '$(debtmpdir)$(pkgincludedir)/*' ; \
+	  [ ! -d $(debtmpdir)$(libdir) ] 	|| echo '$(debtmpdir)$(libdir)/*.a' ) \
+	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
+
+#control	+= debian/$(PACKAGE_LCNAME)-source.install
+
+debian/$(PACKAGE_LCNAME)-source.install:
+	echo './$(PACKAGE)-$(VERSION)/ usr/src' > $@;
+
+control	+= debian/${PACKAGE_LCNAME}-openss7.install
+
+debian/${PACKAGE_LCNAME}-openss7.install:
+	( [ ! -d $(debtmpdir)$(bindir) ]	|| echo '$(debtmpdir)$(bindir)/*' ; \
+	  [ ! -d $(debtmpdir)$(sbindir) ]	|| echo '$(debtmpdir)$(sbindir)/*' ; \
+	  [ ! -d $(debtmpdir)$(pkglibexecdir) ]	|| echo '$(debtmpdir)$(pkglibexecdir)/*' ) \
+	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
+
+#@INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.install
+
+debian/$(PACKAGE_LCNAME)-init.install:
+	( [ ! -d $(debtmpdir)$(configdir) ] || echo '$(debtmpdir)$(configdir)/*' ; \
+	  [ ! -d $(debtmpdir)$(initrddir) ] || echo '$(debtmpdir)$(initrddir)/*' ) \
+	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
+
+#@INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.$(PACKAGE_LCNAME).sh
+
+debian/$(PACKAGE_LCNAME)-init.%.sh:
+	[ ! -f src/util/init/$*.sh ] || cp -f -- src/util/init/$*.sh $@
+
 csite_file=$(debbuilddir)/$(DEB_HOST_ARCH)-config.site
 
-build: build-stamp
-build-stamp:
-	dh_testdir
+build:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	dh_testdir -v
+#	rm -fr $(PACKAGE)-$(VERSION)
+	[ ! -f Makefile ] || $(MAKE) distclean
+	rm -f $(control)
 	./configure \
 		CC='$(CC)' \
 		CFLAGS='$(CFLAGS)' \
@@ -196,85 +239,117 @@ build-stamp:
 		--with-gnu-ld \
 		$(PACKAGE_DEBOPTIONS) \
 		$(BUILD_CFGOPTIONS)
-	$(MAKE) -f Makefile
-	$(MAKE) -f Makefile check
+	$(MAKE)
+#	mkdir -p $(PACKAGE)-$(VERSION)
+#	tar cf - --exclude=$(debtmpdir) --exclude=$(PACKAGE)-$(VERSION) . | \
+#	tar xf - -C $(PACKAGE)-$(VERSION)
+	$(MAKE) check check-clean
 	chmod +x debian/rules
-	touch build-stamp
 
 clean:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	dh_testdir -v
 	dh_testroot -v
-	[ ! -f Makefile ] || $(MAKE) -f Makefile distclean
-	rm -fr $(mytmpdir)
-	rm -f build-stamp
-	rm -f $(pkg_control_files) $(pkg_scripts_files)
+	rm -fr $(PACKAGE)-$(VERSION)
+	[ ! -f Makefile ] || $(MAKE) distclean
+	rm -f $(control)
+	rm -fr $(debtmpdir)
 	dh_clean -v
 
-install: DH_OPTIONS =
-install: build
+install:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	dh_testdir -v
 	dh_testroot -v
 	dh_clean -v -k
 	dh_installdirs -v
-	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
-	$(MAKE) -f debian/rules $(pkg_control_files) $(pkg_scripts_files)
-	dh_install -v
+	$(MAKE) DESTDIR=`pwd`/$(debtmpdir) install
+	$(MAKE) -f debian/rules $(control)
+	dh_install -v --list-missing
 
 binary-common:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	dh_testdir -v
 	dh_testroot -v
+#	dh_installmodules -v
 	dh_installchangelogs -v
-	dh_installdocs -v -A debian/README.Debian debian/TODO.Debian
+	dh_installdocs -v debian/README.Debian debian/TODO.Debian
 	dh_installdebconf -v
-	dh_installinit -v
-	dh_installinfo -v
+#	dh_installinit -v --init-script=$(PACKAGE_LCNAME).sh -- start 33 S . stop 33 0 6 .
 	dh_installman -v
+	dh_installinfo -v
 	dh_strip -v
 	dh_link -v
-	dh_compress -v
+	dh_compress -v -X$(PACKAGE_LCNAME).macros -X$(PACKAGE_LCNAME).refs
 	dh_fixperms -v
 	dh_makeshlibs -v
 	dh_installdeb -v
-	dh_shlibdeps -v
-	dh_gencontrol -v
+	dh_shlibdeps -v -X.ko -X.o
+	dh_gencontrol -v $(dversion)
 	dh_md5sums -v
 	dh_builddeb -v
 
-# Build architecture-independent files here.
-binary-indep: build install
+binary-lis:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+
+binary-lfs:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+
+binary-nos:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+
+#
+#  dkpg-buildpackage invoke this makefile in one of two ways: with the -b flag,
+#  the 'binary' target is invoked to build both arch and indep binary packages;
+#  with the -B flag, the 'binary-arch' target is invoked to build only the arch
+#  binary packages and not the indep binary packages.  We further distinguish
+#  arch packages as being for lis, for lfs, or we don't care based on the
+#  setting of the passed in BUILD_CFGOPTIONS environment variable.
+#
+binary-indep: DL_OPTIONS = -i
+binary-indep: install
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
-# Build architecture-dependent files here.
-binary-arch:
+binary-arch: DL_OPTIONS = -a
+binary-arch: install
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	@case " $(BUILD_CFGOPTIONS) " in \
-		(*" --with-lis "*) targ=binary-lis ;; \
-		(*" --with-lfs "*) targ=binary-lfs ;; \
-		(*)		   targ=binary-nos ;; \
+		(*" --with-lfs "*)  targ=binary-lfs ;; \
+		(*" --with-lis "*)  targ=binary-lis ;; \
+		(*)		    targ=binary-nos ;; \
 	esac ; \
 	echo "$(MAKE) -f debian/rules $$targ" ; \
 	$(MAKE) -f debian/rules $$targ
 
 binary:
-	$(MAKE) -f debian/rules binary-indep
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	$(MAKE) -f debian/rules binary-arch
+	$(MAKE) -f debian/rules binary-indep
 
-binary-lis:
+#
+#   Another way that we can be invoked is with a specific package name.  Again,
+#   we distinguish between lis and lfs package names.
+#
 
-binary-lfs:
-
-binary-nos: build install
-	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
-
-binary-%: build install
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$* binary-common
+binary-$(PACKAGE_LCNAME)-%: DH_OPTIONS = -p$(PACKAGE_LCNAME)-$*
+binary-$(PACKAGE_LCNAME)-%: install
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$* binary-common
 
 get-orig-source:
 	wget http://www.openss7.org/tarballs/$(PACKAGE)-$(VERSION).tar.bz
 
-.PHONY: build clean binary-indep binary-arch binary install binary-lis binary-lfs
+.PHONY: build clean \
+	binary-indep binary-arch binary binary-lis binary-lfs binary-indep \
+	install-indep install-arch install install-lis install-lfs install-indep \
+	get-orig-source
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.13  2006/07/07 21:47:54  brian
+# - first full package build on Ubuntu
+#
 # Revision 1.1.2.12  2006/07/01 11:51:43  brian
 # - changes for Ubuntu dpkg build
 #

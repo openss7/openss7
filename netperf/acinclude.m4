@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.24 $) $Date: 2006/05/08 03:12:24 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.25 $) $Date: 2006/07/07 21:31:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:12:24 $ by $Author: brian $
+# Last Modified $Date: 2006/07/07 21:31:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -91,8 +91,12 @@ AC_DEFUN([AC_NETPERF], [dnl
 	    ])
 	fi
     else
-	_STRCOMP
-	_XNS
+	if test :"${with_compat:-auto}" != :no ; then
+	    _STRCOMP
+	    if test :"${with_xns:-auto}" != :no ; then
+		_XNS
+	    fi
+	fi
 	if test :"${xns_cv_includes:-no}" = :no ; then
 	    if test  :"${with_xns:-no}" != :no ; then
 		AC_MSG_ERROR([
@@ -105,7 +109,9 @@ AC_DEFUN([AC_NETPERF], [dnl
 		])
 	    fi
 	fi
-	_XTI
+	if test :"${with_xns:-auto}" != :no ; then
+	    _XTI
+	fi
 	if test :"${xti_cv_includes:-no}" = :no ; then
 	    if test :"${with_xti:-no}" != :no ; then
 		AC_MSG_ERROR([
@@ -118,7 +124,9 @@ AC_DEFUN([AC_NETPERF], [dnl
 		])
 	    fi
 	else
-	    _INET
+	    if test :"${with_inet:-auto}" != :no ; then
+		_INET
+	    fi
 	    if test :"${inet_cv_includes:-no}" = :no ; then
 		if test :"${with_inet:-no}" != :no ; then
 		    AC_MSG_ERROR([
@@ -133,7 +141,9 @@ AC_DEFUN([AC_NETPERF], [dnl
 	    fi
 	fi
     fi
-    _SCTP
+    if test :"${with_sctp:-auto}" != :no ; then
+	_SCTP
+    fi
     if test :"${sctp_cv_includes:-no}" = :no ; then
 	if test :"${with_sctp:-no}" != :no ; then
 	    AC_MSG_ERROR([

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: msg.c,v $ $Name:  $($Revision: 1.1.1.4.4.3 $) $Date: 2005/12/18 05:41:23 $
+ @(#) $RCSfile: msg.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/12/19 03:22:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: msg.c,v $ $Name:  $($Revision: 1.1.1.4.4.3 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile: msg.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/12/19 03:22:19 $"
 
 /*                               -*- Mode: C -*- 
  * msg.c --- streams message handling
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: msg.c,v 1.1.1.4.4.3 2005/12/18 05:41:23 brian Exp $
+ * RCS Id          : $Id: msg.c,v 1.1.1.4.4.4 2005/12/19 03:22:19 brian Exp $
  * Purpose         : provide streams message handling
  *                 : this is the main memory allocation related module.
  * ----------------______________________________________________
@@ -375,7 +375,7 @@ lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr, char *fil
 {
 	return (lis_allocb(size, priority, file_name, line_nr));
 
-}				/* lis_allocb */
+}				/* lis_allocb_physreq */
 
 /*  -------------------------------------------------------------------  */
 

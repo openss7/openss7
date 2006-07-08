@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/07/02 12:26:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/07/07 21:14:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/02 12:26:20 $ by $Author: brian $
+# Last Modified $Date: 2006/07/07 21:14:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -756,7 +756,7 @@ dnl
 			   tcp_current_mss,
 			   tcp_set_skb_tso_segs,
 			   tcp_set_skb_tso_factor], [], [])
-    _LINUX_CHECK_FUNCS([inet_csk dst_mtu], [], [], [
+    _LINUX_CHECK_FUNCS([inet_csk], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>

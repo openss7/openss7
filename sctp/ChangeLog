@@ -1,3 +1,18 @@
+2006-07-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/copyright: typo
+
+2006-07-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/changelog: packaged release candidate for Mark Fugate
+	* debian/control.in: first full debian master package build of debs on Ubuntu
+	* debian/rules.in:: first full debian master package build of debs on Ubuntu
+
+2006-07-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* NEWS: package release candidate for Mark Fugate
+	* .pkgrelease: package release candidate for Mark Fugate
+
 2006-07-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updated for release

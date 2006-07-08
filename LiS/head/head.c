@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.13 $) $Date: 2006/02/20 11:38:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,21 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/02/20 11:38:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: head.c,v $
+ Revision 1.1.1.12.4.13  2006/02/20 11:38:47  brian
+ - corrections for some 64bit architectures, from patches
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.12 $) $Date: 2005/12/28 09:53:31 $"
+#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.13 $) $Date: 2006/02/20 11:38:47 $"
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.1.1.12.4.12 2005/12/28 09:53:31 brian Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.12.4.13 2006/02/20 11:38:47 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *
@@ -536,7 +539,7 @@ volatile unsigned long lis_runq_wakeups[LIS_NR_CPUS];
 int lis_nstrpush;			/* maximum # of pushed modules */
 int lis_strhold;			/* if not zero str hold feature's activated */
 unsigned long lis_strthresh;		/* configurable STREAMS memory limit */
-unsigned int lis_iocseq;		/* ioctl id */
+int lis_iocseq;				/* ioctl id */
 stdata_t *lis_stdata_head;		/* list of stdata structures */
 lis_atomic_t lis_stdata_cnt;		/* counts stdata structs in use */
 lis_atomic_t lis_open_cnt;		/* count opens */
@@ -1015,10 +1018,12 @@ lis_i_unlink(struct inode *i, struct file *f, stdata_t *hd, int l_index, int cmd
 			       lis_queue_name(hp->sd_wq->q_next));
 		}
 
+#if 0
 		/* restore queues */
 		err = lis_set_q_sync(hp->sd_rq, LIS_QLOCK_QUEUE);	/* strm head queue */
 		if (err < 0)
 			goto error_rtn;	/* fairly ungraceful */
+#endif
 
 		lis_setq(hp->sd_rq, &strmhd_rdinit, &strmhd_wrinit);
 		LIS_QISRLOCK(hd->sd_wq, &psw1);
@@ -1476,10 +1481,12 @@ lis_alloc_stdata(void)
 		return NULL;
 	}
 
+#if 0
 	if (lis_set_q_sync(q, LIS_QLOCK_NONE) < 0) {
 		lis_freeq(q);
 		return (NULL);
 	}
+#endif
 
 	head = (stdata_t *) LIS_HEAD_ALLOC(sizeof(stdata_t), "stream-head ");
 	if (head == NULL) {
@@ -2914,16 +2921,21 @@ void
 lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
 {
 	int typ;
+
+#if 0
 	int err;
+#endif
 
 	CP(shead, mp);
 	typ = lis_btype(mp);
 	CP(shead, mp);
+#if 0
 	if ((err = lis_lockq(q)) < 0) {	/* lock the queue */
 		freemsg(mp);
 		lis_stream_error(shead, err, err);
 		return;
 	}
+#endif
 
 	CP(q, mp);
 	if (F_ISSET(shead->sd_flag, STRCLOSE)	/* stream is closing */
@@ -3152,8 +3164,12 @@ lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
 	case M_IOCTL:		/* upside-down ioctl */
 		CP(mp, 0);
 		snd_iocnak(LIS_WR(q), mp, 1);
+#if 0
 		lis_unlockq(q);
 		return;		/* w/head unlocked */
+#else
+		return;
+#endif
 	case M_READ:		/* always discard */
 	default:
 		CP(mp, 0);
@@ -3181,7 +3197,7 @@ lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
  * LOCK ORDERING:  We are entered from the streams scheduler with the
  * queue locked.  The routine lis_process_rput needs both the head lock
  * and the queue lock.  It needs to get the head lock first, which means
- * that we need to release the qeuue lock.  
+ * that we need to release the queue lock.  
  */
 int _RP
 lis_strrsrv(queue_t *q)
@@ -3190,7 +3206,10 @@ lis_strrsrv(queue_t *q)
 	stdata_t *hd;
 	lis_flags_t psw;
 	int need_qenable;
+
+#if 0
 	int err;
+#endif
 
 	if (!LIS_CHECK_Q_MAGIC(q)
 	    || (hd = q->q_str) == NULL || hd->magic != STDATA_MAGIC || hd->sd_rq != q) {
@@ -3199,7 +3218,9 @@ lis_strrsrv(queue_t *q)
 	}
 
 	CP(q, 0);
+#if 0
 	lis_unlockq(q);		/* unlock the queue */
+#endif
 	/* nothing locked now */
 
 	while ((mp = lis_get_rput_q(hd)) != NULL) {
@@ -3215,11 +3236,18 @@ lis_strrsrv(queue_t *q)
 	need_qenable = (hd->sd_rput_hd != NULL);	/* msg(s) appeared */
 	LIS_QISRUNLOCK(q, &psw);
 	CP(q, 0);
+#if 0
 	err = lis_lockq(q);	/* re-lock queue, but not head */
 	if (!err && need_qenable)
 		qenable(q);
 	CP(q, err);
 	return (err);
+#else
+	if (need_qenable)
+		qenable(q);
+	CP(q, 0);
+	return (0);
+#endif
 }
 
 /*  -------------------------------------------------------------------  */
@@ -5351,13 +5379,15 @@ lis_strputpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int ban
 				lis_freemsg(msg);
 				RTN(-EINVAL);	/* no, sorry */
 			}
-		} else /* regular priority msg */ if (F_ISSET(flags, MSG_BAND)) {
-			/* non-zero band */
-			if (band >= 0 && band <= LIS_MAX_BAND)	/* range check */
-				lis_bband(msg) = (unsigned char) band;
-			else {
-				lis_freemsg(msg);
-				RTN(-EINVAL);
+		} else {	/* regular priority msg */
+			if (F_ISSET(flags, MSG_BAND)) {
+				/* non-zero band */
+				if (band >= 0 && band <= LIS_MAX_BAND)	/* range check */
+					lis_bband(msg) = (unsigned char) band;
+				else {
+					lis_freemsg(msg);
+					RTN(-EINVAL);
+				}
 			}
 		}
 	} else {		/* putmsg */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.2 $) $Date: 2005/04/12 22:45:01 $
+ @(#) $RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/07/13 12:01:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:45:01 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.2 $) $Date: 2005/04/12 22:45:01 $"
+#ident "@(#) $RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/07/13 12:01:18 $"
 
 /*                               -*- Mode: C -*- 
  * stream.c --- STREAMS entry points and main routines 
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: stream.c,v 1.1.1.4.4.2 2005/04/12 22:45:01 brian Exp $
+ * RCS Id          : $Id: stream.c,v 1.1.1.4.4.4 2005/07/13 12:01:18 brian Exp $
  * ----------------______________________________________________
  *
  *   Copyright (C) 1995  Francisco J. Ballesteros, Graham Wheeler,
@@ -132,10 +132,14 @@ extern void lis_cpfl(void *p, long a, const char *fcn, const char *f, int l);
  * lock.
  *
  * Locking order:  When getting the lis_qhead_lock and the queue lock for a
- * given queue simultaneously, get the queue lock first.  This ordering is
- * dictated by lis_qenable which is called from user service procedures with
- * the queue locked, and which needs to get lis_qhead_lock to protect its
- * insertion into the global queue scheduling lists.
+ * given queue simultaneously, we must get the queue lock first.  This 
+ * ordering is dictated by lis_qenable which is called from user service 
+ * procedures with the queue locked, and which needs to get lis_qhead_lock to 
+ * protect its insertion into the global queue scheduling lists.  However,
+ * that lock order doesn't work here.  We don't know what the queue is (to be
+ * able to lock it) until we get it off of the scan list which is protected by
+ * lis_qhead_lock.  See the note below on how a resulting race condition is
+ * avoided.
  */
 static void
 queuerun(int cpu_id)
@@ -163,6 +167,30 @@ queuerun(int cpu_id)
 			lis_scanqtail = NULL;
 
 		K_ATOMIC_DEC(&lis_runq_req_cnt);	/* one less thing to do */
+		/* 
+		 * The normal rule is to obtain the queue lock and then lis_qhead_lock.
+		 * But we can't do that in this case.  We don't know what the queue is
+		 * until we get it off of lis_scanqhead which is protected by
+		 * lis_qhead_lock.
+		 *
+		 * The following race condition therefore exists: This routine gets
+		 * the queue off of lis_scanqhead.  Before we lock the queue, 
+		 * lis_qdetach() runs on another CPU and frees the queue (including
+		 * destroying the lock).  This routine then tries to lock and use the
+		 * queue which is no longer valid.
+		 *
+		 * This race condition is avoided by setting the QRUNNING flag now.
+		 * lis_qdetach() takes the queue off of lis_scanqhead before looking
+		 * for the QRUNNING flag.  Since we are now holding the lock for
+		 * lis_scanqhead, we will prevent it from getting past that point.
+		 * It will then hold off freeing the queue until we clear it after
+		 * running the queue.  If lis_qdetach() gets to the lock for
+		 * lis_scanqhead first, we won't have found the q in the scan list
+		 * (lis_qdetach() takes the queue off the scan list before giving up
+		 * that lock).
+		 */
+		q->q_flag |= QRUNNING;	/* protects from lis_qdetach */
+
 		lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw);
 
 		lis_currq[cpu_id] = q;	/* for debugging */
@@ -179,7 +207,9 @@ queuerun(int cpu_id)
 		}
 
 		LIS_QISRLOCK(q, &pswq);
+#if 0
 		q->q_flag |= QRUNNING;	/* protects from lis_qdetach */
+#endif
 		q->q_flag &= ~QSCAN;
 		procsoff = (q->q_flag & (QCLOSING | QPROCSOFF));
 		strmhd = (stdata_t *) q->q_str;
@@ -241,6 +271,8 @@ queuerun(int cpu_id)
 #endif
 		lis_qhead = q->q_link;	/* remove it from the list */
 		q->q_link = NULL;
+		q->q_flag |= QRUNNING;	/* protects from lis_qdetach */
+
 		if (q == lis_qtail)	/* entry at end of list */
 			lis_qtail = NULL;
 
@@ -271,7 +303,9 @@ queuerun(int cpu_id)
 
 		LIS_QISRLOCK(q, &pswq);
 		CP(q->q_str, q->q_flag);
+#if 0
 		q->q_flag |= QRUNNING;	/* protects from lis_qdetach */
+#endif
 		q->q_flag &= ~QENAB;	/* allow qenable again */
 		procsoff = (q->q_flag & QPROCSOFF);	/* queue procs off */
 		strmhd = (stdata_t *) q->q_str;

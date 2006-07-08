@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/07/02 12:19:53 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/07/07 21:15:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/02 12:19:53 $ by $Author: brian $
+ Last Modified $Date: 2006/07/07 21:15:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.30  2006/07/07 21:15:00  brian
+ - correct compile back to RH 7.2
+
  Revision 0.9.2.29  2006/07/02 12:19:53  brian
  - changes for 2.6.17 kernel
 
@@ -140,10 +143,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/07/02 12:19:53 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/07/07 21:15:00 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/07/02 12:19:53 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/07/07 21:15:00 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -221,7 +224,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/07/02 12:19:53 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/07/07 21:15:00 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -511,13 +514,13 @@ STATIC struct tp_chash_bucket *raw_chash;
 STATIC size_t raw_chash_size = 0;
 STATIC size_t raw_chash_order = 0;
 
-STATIC INLINE fastcall __unlikely int
+STATIC INLINE streams_fastcall __unlikely int
 raw_bhashfn(unsigned char proto, unsigned short bport)
 {
 	return ((raw_bhash_size - 1) & (proto + bport));
 }
 
-STATIC INLINE fastcall __unlikely int
+STATIC INLINE streams_fastcall __unlikely int
 raw_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 {
 	return ((raw_chash_size - 1) & (proto + sport + dport));
@@ -685,7 +688,7 @@ raw_state_name(t_scalar_t state)
 }
 #endif				/* _DEBUG */
 
-STATIC INLINE fastcall __unlikely void
+STATIC INLINE streams_fastcall __unlikely void
 tp_set_state(struct tp *tp, const t_uscalar_t state)
 {
 	_printd(("%s: %p: %s <- %s\n", DRV_NAME, tp, raw_state_name(state),
@@ -693,25 +696,25 @@ tp_set_state(struct tp *tp, const t_uscalar_t state)
 	tp->info.CURRENT_state = state;
 }
 
-STATIC INLINE fastcall __unlikely t_uscalar_t
+STATIC INLINE streams_fastcall __unlikely t_uscalar_t
 tp_get_state(const struct tp *tp)
 {
 	return (tp->info.CURRENT_state);
 }
 
-STATIC INLINE fastcall __unlikely t_uscalar_t
+STATIC INLINE streams_fastcall __unlikely t_uscalar_t
 tp_chk_state(const struct tp *tp, const t_uscalar_t mask)
 {
 	return (((1 << tp->info.CURRENT_state) & (mask)) != 0);
 }
 
-STATIC INLINE fastcall __unlikely t_uscalar_t
+STATIC INLINE streams_fastcall __unlikely t_uscalar_t
 tp_not_state(const struct tp *tp, const t_uscalar_t mask)
 {
 	return (((1 << tp->info.CURRENT_state) & (mask)) == 0);
 }
 
-STATIC INLINE fastcall __unlikely long
+STATIC INLINE streams_fastcall __unlikely long
 tp_get_statef(const struct tp *tp)
 {
 	return (1 << tp_get_state(tp));
@@ -768,7 +771,7 @@ STATIC struct tp_options tp_defaults = {
  * @t: private structure
  * @mp: message pointer for message
  */
-STATIC fastcall __hot_get int
+STATIC streams_fastcall __hot_get int
 t_opts_size(const struct tp *t, const mblk_t *mp)
 {
 	int size = 0;
@@ -793,7 +796,7 @@ t_opts_size(const struct tp *t, const mblk_t *mp)
  * @op: output pointer
  * @olen: output length
  */
-static INLINE fastcall __hot_in int
+static INLINE streams_fastcall __hot_in int
 t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t olen)
 {
 	struct iphdr *iph;
@@ -877,7 +880,7 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
  * Note that mp->b_rptr points to the encapsulated IP header.  mp->b_datap->db_base points to the IP
  * header of the ICMP message itself.
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 t_errs_size(const struct tp *t, const mblk_t *mp)
 {
 	int size = 0;
@@ -908,7 +911,7 @@ t_errs_size(const struct tp *t, const mblk_t *mp)
  * Note that mp->b_rptr points to the encapsulated IP header.  mp->b_datap->db_base points to the IP
  * header of the ICMP message.
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t olen)
 {
 	struct iphdr *iph;
@@ -992,7 +995,7 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
  *
  * T_UNITDATA_REQ ignores unrecognized options or option levels.
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 {
 	const struct t_opthdr *ih;
@@ -1397,7 +1400,7 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
  * Check the validity of the option structure, check for correct size of each supplied option given
  * the option management flag, and return the size required of the acknowledgement options field.
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -1526,7 +1529,7 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
  * @ip: input pointer
  * @ilen: input length
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -1655,7 +1658,7 @@ t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
  * @ip: input pointer
  * @ilen: input length
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -1814,7 +1817,7 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
  * @ip: input pointer
  * @ilen: input length
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -2020,7 +2023,7 @@ t_overall_result(uint * overall, const uint result)
  *
  * Perform the actions required of T_DEFAULT placing the output in the provided buffer.
  */
-STATIC noinline fastcall t_scalar_t
+STATIC noinline streams_fastcall t_scalar_t
 t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen,
 			unsigned char *op, size_t *olen)
 {
@@ -2256,7 +2259,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
  *
  * Perform the actions required of T_CURRENT placing the output in the provided buffer.
  */
-STATIC noinline fastcall t_scalar_t
+STATIC noinline streams_fastcall t_scalar_t
 t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen,
 			unsigned char *op, size_t *olen)
 {
@@ -2509,7 +2512,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
  *
  * Perform the actions required of T_CHECK placing the output in the provided buffer.
  */
-STATIC noinline fastcall t_scalar_t
+STATIC noinline streams_fastcall t_scalar_t
 t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 		      size_t *olen)
 {
@@ -2917,7 +2920,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
  *
  * Perform the actions required of T_NEGOTIATE placing the output in the provided buffer.
  */
-STATIC noinline fastcall t_scalar_t
+STATIC noinline streams_fastcall t_scalar_t
 t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 			  size_t *olen)
 {
@@ -3384,7 +3387,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
  * Perform the actions required of T_DEFAULT, T_CURRENT, T_CHECK and T_NEGOTIARE, placing the output
  * in the provided buffer.
  */
-STATIC noinline fastcall t_scalar_t
+STATIC noinline streams_fastcall t_scalar_t
 t_build_options(struct tp *t, const unsigned char *ip, const size_t ilen, unsigned char *op,
 		size_t *olen, const t_scalar_t flag)
 {
@@ -3428,7 +3431,7 @@ STATIC void tp_v4_err(struct sk_buff *skb, u32 info);
  * In the 2.6 packet handler, if the packet is not for us, steal the packet by simply not passing it
  * to the next handler.
  */
-STATIC INLINE fastcall __hot_in void
+STATIC INLINE streams_fastcall __hot_in void
 tp_v4_steal(struct sk_buff *skb)
 {
 #ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
@@ -3452,7 +3455,7 @@ tp_v4_steal(struct sk_buff *skb)
  * handler, and one (1) if the packet has or will be seen by another packet handler.  This return
  * value is used to determine whether to generate ICMP errors or not.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC INLINE streams_fastcall __hot_in int
 tp_v4_rcv_next(struct sk_buff *skb)
 {
 #ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
@@ -3490,7 +3493,7 @@ tp_v4_rcv_next(struct sk_buff *skb)
  * In the 2.4 packet error handler, if the packet is not for us, pass it to the next error handler
  * by simply returning.  Error packets are not cloned, so don't free it.
  */
-STATIC INLINE fastcall __hot_in void
+STATIC INLINE streams_fastcall __hot_in void
 tp_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 #ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
@@ -3534,7 +3537,7 @@ STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PRO
  * the module after protocol override would break things horribly.  Taking the reference keeps the
  * module from unloading (this works for OpenSS7 SCTP as well as lksctp).
  */
-STATIC INLINE fastcall __unlikely struct tp_prot_bucket *
+STATIC INLINE streams_fastcall __unlikely struct tp_prot_bucket *
 tp_init_nproto(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
@@ -3622,7 +3625,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
  * restore the protocol's entry and drop the reference to its owning kernel module.  If there was no
  * protocol previously registered, this reduces to the 2.6 version of inet_del_protocol().
  */
-STATIC INLINE fastcall __unlikely void
+STATIC INLINE streams_fastcall __unlikely void
 tp_term_nproto(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
@@ -3682,7 +3685,7 @@ tp_term_nproto(unsigned char proto, unsigned int type)
  *  only one function.  We don't want that either.  If the message is not for us, we want to pass it
  *  to the next protocol module.
  */
-STATIC INLINE fastcall __unlikely int
+STATIC INLINE streams_fastcall __unlikely int
 tp_bind_prot(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
@@ -3696,7 +3699,7 @@ tp_bind_prot(unsigned char proto, unsigned int type)
  *  tp_unbind_prot - unbind a protocol
  *  @proto:	    protocol number to unbind
  */
-STATIC INLINE fastcall __unlikely void
+STATIC INLINE streams_fastcall __unlikely void
 tp_unbind_prot(unsigned char proto, unsigned int type)
 {
 	tp_term_nproto(proto, type);
@@ -3714,7 +3717,7 @@ tp_unbind_prot(unsigned char proto, unsigned int type)
  * IP address.  The bind hash contains bind buckets that list Streams that are bound to the same
  * protocol id and port number.
  */
-STATIC INLINE fastcall __unlikely int
+STATIC INLINE streams_fastcall __unlikely int
 tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_length,
 	const t_uscalar_t CONIND_number)
 {
@@ -3784,20 +3787,6 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 	return (0);
 }
-
-#ifdef HAVE_KFUNC_DST_MTU
-/* Why do stupid people rename things like this? */
-#undef dst_pmtu
-#define dst_pmtu dst_mtu
-#else
-#ifndef HAVE_STRUCT_DST_ENTRY_PATH
-static inline u32
-dst_pmtu(struct dst_entry *dst)
-{
-	return (dst->pmtu);
-}
-#endif
-#endif				/* HAVE_KFUNC_DST_MTU */
 
 #if defined HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE __hot_out int
@@ -3885,7 +3874,7 @@ tp_skb_destructor(struct sk_buff *skb)
  * slow.  This is the only way that LiS can do things (because it has unworkable message block
  * allocation).
  */
-STATIC noinline fastcall __unlikely struct sk_buff *
+STATIC noinline streams_fastcall __unlikely struct sk_buff *
 tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
@@ -3973,7 +3962,7 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
  * through the data to generate the checksum.
  */
 #if defined LFS
-STATIC INLINE fastcall __hot_out struct sk_buff *
+STATIC INLINE streams_fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb, *skb_head = NULL, *skb_tail = NULL;
@@ -4091,7 +4080,7 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
 #else
-STATIC INLINE fastcall __hot_out struct sk_buff *
+STATIC INLINE streams_fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
@@ -4104,7 +4093,7 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
  * @opt: options to use
  * @mp: message payload
  */
-STATIC INLINE fastcall __hot_out int
+STATIC INLINE streams_fastcall __hot_out int
 tp_senddata(struct tp *tp, const struct tp_options *opt, mblk_t *mp)
 {
 	struct rtable *rt = NULL;
@@ -4181,7 +4170,7 @@ tp_senddata(struct tp *tp, const struct tp_options *opt, mblk_t *mp)
 }
 
 #if 0
-STATIC INLINE fastcall int
+STATIC INLINE streams_fastcall int
 np_datack(queue_t *q)
 {
 	/* not supported */
@@ -4194,7 +4183,7 @@ np_datack(queue_t *q)
  * @tp: private structure
  * @proto: protocol to which to connect
  */
-STATIC fastcall int
+STATIC streams_fastcall int
 tp_conn_check(struct tp *tp, const unsigned char proto)
 {
 	unsigned short sport = tp->sport;
@@ -4281,7 +4270,7 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
  * is an error in the connection request.  When any primitive containing options fails and returns
  * and error, it is the caller's responsibility to set again the values of the options.
  */
-STATIC fastcall int
+STATIC streams_fastcall int
 tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t DEST_length,
 	   struct tp_options *OPT_buffer, const t_uscalar_t CONN_flags)
 {
@@ -4566,7 +4555,7 @@ tp_unbind(struct tp *tp)
  * @CONN_flags: connection flags
  * @dp: user connect data
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t RES_length,
 	   struct tp_options *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id,
 	   const t_uscalar_t CONN_flags, mblk_t *dp)
@@ -4936,7 +4925,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
  * @how: FLUSHBAND or FLUSHALL
  * @band: band to flush if how is FLUSHBAND
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 m_flush(queue_t *q, const int how, const int band)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -4958,7 +4947,7 @@ m_flush(queue_t *q, const int how, const int band)
  * @q: a queue in the queue pair (write queue)
  * @error: the error to deliver
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 m_error(queue_t *q, const int error)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -4989,7 +4978,7 @@ m_error(queue_t *q, const int error)
  * m_hangup: deliver an M_HANGUP message upstream
  * @q: a queue in the queue pair (write queue)
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 m_hangup(queue_t *q)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5020,7 +5009,7 @@ m_hangup(queue_t *q)
  * @q: active queue in queue pair (write queue)
  * @error: error number
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 te_error_reply(queue_t *q, const long error)
 {
 	switch (error) {
@@ -5047,7 +5036,7 @@ te_error_reply(queue_t *q, const long error)
  * te_info_ack - generate a T_INFO_ACK and pass it upstream
  * @q: active queue in queue pair (write queue)
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 te_info_ack(queue_t *q)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5091,7 +5080,7 @@ te_info_ack(queue_t *q)
  *
  * Generate an T_BIND_ACK and pass it upstream.
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_length,
 	    const t_uscalar_t CONIND_number)
 {
@@ -5220,7 +5209,7 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
  * @flags: mangement flags, connection flags, disconnect reason, etc.
  * @dp: user data
  */
-STATIC fastcall __hot_put int
+STATIC streams_fastcall __hot_put int
 te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *ADDR_buffer,
 	  const socklen_t ADDR_length, void *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id,
 	  const t_uscalar_t flags, mblk_t *dp)
@@ -5351,7 +5340,7 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
  * value for the destinations.  These values are set in the private structure by the tp_connect()
  * function.
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	    struct tp_options *OPT_buffer, t_uscalar_t CONN_flags)
 {
@@ -5416,7 +5405,7 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
  *
  * An N_RESET_CON message is sent only when the reset completes successfully.
  */
-STATIC fastcall int
+STATIC streams_fastcall int
 ne_reset_con(queue_t *q, const np_ulong RESET_orig, const np_ulong RESET_reason, mblk_t *dp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5459,7 +5448,7 @@ ne_reset_con(queue_t *q, const np_ulong RESET_orig, const np_ulong RESET_reason,
  * the destination address of the IP packet, where no connection exists for the source address of
  * the IP packet.
  */
-STATIC noinline fastcall __hot_get int
+STATIC noinline streams_fastcall __hot_get int
 te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5570,7 +5559,7 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
  * result of receiving an ICMP error.  For multihomed hosts, we only do this if all destination
  * addresses have errors, otherwise, we just perform a reset for the affected destination.
  */
-STATIC noinline fastcall __hot_get int
+STATIC noinline streams_fastcall __hot_get int
 te_discon_ind(queue_t *q, const struct sockaddr_in *RES_buffer, const socklen_t RES_length,
 	      const t_uscalar_t DISCON_reason, const mblk_t *SEQ_number, mblk_t *dp)
 {
@@ -5608,7 +5597,7 @@ te_discon_ind(queue_t *q, const struct sockaddr_in *RES_buffer, const socklen_t 
  * @q: active queue in queue pair
  * @mp: the ICMP message
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 te_discon_ind_icmp(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5678,7 +5667,7 @@ te_discon_ind_icmp(queue_t *q, mblk_t *mp)
  * Very fast.  In fact, we could just pass the raw M_DATA blocks upstream.  We leave the IP header
  * in the block.
  */
-STATIC INLINE fastcall __hot_get int
+STATIC INLINE streams_fastcall __hot_get int
 te_data_ind(queue_t *q, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -5715,7 +5704,7 @@ te_data_ind(queue_t *q, mblk_t *dp)
  * @q: active queue in queue pair (read queue)
  * @dp: message containing IP packet
  */
-STATIC INLINE fastcall __hot_get int
+STATIC INLINE streams_fastcall __hot_get int
 te_exdata_ind(queue_t *q, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -5754,7 +5743,7 @@ te_exdata_ind(queue_t *q, mblk_t *dp)
  * dp->b_datap->db_base.  The message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
  */
-STATIC INLINE fastcall __hot_get int
+STATIC INLINE streams_fastcall __hot_get int
 te_unitdata_ind(queue_t *q, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5824,7 +5813,7 @@ te_unitdata_ind(queue_t *q, mblk_t *dp)
  * dp->b_datap->db_base.  The IP message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
  */
-STATIC noinline fastcall __hot_get int
+STATIC noinline streams_fastcall __hot_get int
 te_optdata_ind(queue_t *q, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5934,7 +5923,7 @@ te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned
  * Notification, but there is no ICMP message associated with that and it has not yet been coded:
  * probably need an ne_uderror_ind_ecn() function.
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 te_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5968,7 +5957,7 @@ te_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 	return (err);
 }
 
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 te_uderror_reply(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned char *OPT_buffer,
 		 const size_t OPT_length, t_scalar_t ERROR_type, mblk_t *db)
 {
@@ -6419,7 +6408,7 @@ te_unbind_req(queue_t *q, mblk_t *mp)
  * for all packets sent.  The TPI-IP provider will request that the Stream head provide an
  * additional write offset of 20 bytes to accomodate the IP header.
  */
-STATIC INLINE fastcall __hot_put int
+STATIC INLINE streams_fastcall __hot_put int
 te_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6511,7 +6500,7 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
  * parameters.  The primary address is used for subsequent TE_DATA_REQ and TE_EXDATA_REQ events
  * until changed with a TE_OPTMGMT_REQ event.
  */
-STATIC noinline fastcall __hot_put int
+STATIC noinline streams_fastcall __hot_put int
 te_conn_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6605,7 +6594,7 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	return te_error_ack(q, T_CONN_REQ, err);
 }
 
-STATIC INLINE fastcall mblk_t *
+STATIC INLINE streams_fastcall mblk_t *
 t_seq_check(struct tp *tp, const t_uscalar_t SEQ_number)
 {
 	mblk_t *cp;
@@ -6617,7 +6606,7 @@ t_seq_check(struct tp *tp, const t_uscalar_t SEQ_number)
 	usual(cp);
 	return (cp);
 }
-STATIC INLINE fastcall struct tp *
+STATIC INLINE streams_fastcall struct tp *
 t_tok_check(const t_uscalar_t ACCEPTOR_id)
 {
 	struct tp *ap;
@@ -6648,7 +6637,7 @@ t_tok_check(const t_uscalar_t ACCEPTOR_id)
  * connection.  If no responding addresses are provided, then the destination address is the source
  * address from the connection indication.
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 te_conn_res(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q), *ACCEPTOR_id = tp;
@@ -6753,7 +6742,7 @@ te_conn_res(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the T_DISCON_REQ message
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 te_discon_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6843,7 +6832,7 @@ te_discon_req(queue_t *q, mblk_t *mp)
  * not, we should accumulate the M_DATA block in a buffer waiting for a delimited message or final
  * N_DATA_REQ.
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 te_write_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6891,7 +6880,7 @@ te_write_req(queue_t *q, mblk_t *mp)
  * multihomed hosts.  We use T_OPTMGMT_REQ to change the primary destination address, source address
  * and options.
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 te_data_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6948,7 +6937,7 @@ te_data_req(queue_t *q, mblk_t *mp)
  * @q: write queue
  * @mp: the primitive
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 te_exdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6999,7 +6988,7 @@ te_exdata_req(queue_t *q, mblk_t *mp)
  * @q: write queue
  * @mp: the primitive
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 te_optdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7070,7 +7059,7 @@ te_optdata_req(queue_t *q, mblk_t *mp)
  * [TNOTSUPPORT] this prmitive is not supported;
  * [TSYSERR] a system error has occured and the UNIX system error is indicated in the primitive.
  */
-STATIC noinline fastcall int
+STATIC noinline streams_fastcall int
 te_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7148,7 +7137,7 @@ te_optmgmt_req(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair
  * @mp: the primitive
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 te_addr_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7222,7 +7211,7 @@ te_addr_req(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair
  * @mp: the primitive
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 te_capability_req(queue_t *q, mblk_t *mp)
 {
 	struct T_capability_req *p;
@@ -7250,7 +7239,7 @@ te_capability_req(queue_t *q, mblk_t *mp)
  *
  * These are normal T-primitives written from the upper layer protocol.
  */
-STATIC INLINE fastcall __hot_put int
+STATIC INLINE streams_fastcall __hot_put int
 tp_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn = -EPROTO;
@@ -7377,7 +7366,7 @@ tp_w_proto(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (write queue)
  * @mp: the M_DATA message
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 tp_w_data(queue_t *q, mblk_t *mp)
 {
 	return te_write_req(q, mp);
@@ -7388,7 +7377,7 @@ tp_w_data(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (write queue)
  * @mp: the message
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 tp_w_other(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7407,7 +7396,7 @@ tp_w_other(queue_t *q, mblk_t *mp)
  * This TPI-IP provider does not support any input-output controls and, therefore, all input-output
  * controls are negatively acknowledged.
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 tp_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -7425,7 +7414,7 @@ tp_w_ioctl(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (read queue)
  * @mp: the message
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 tp_r_other(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7450,7 +7439,7 @@ tp_r_other(queue_t *q, mblk_t *mp)
  * contains a complete IP datagram starting with the IP header.  What needs to be done is to convert
  * this to an upper layer indication and deliver it upstream.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC INLINE streams_fastcall __hot_in int
 tp_r_data(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7508,7 +7497,7 @@ tp_r_data(queue_t *q, mblk_t *mp)
  * contains a complete ICMP datagram starting with the IP header.  What needs to be done is to
  * convert this to an upper layer indication and deliver it upstream.
  */
-STATIC noinline fastcall __unlikely int
+STATIC noinline streams_fastcall __unlikely int
 tp_r_error(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7614,7 +7603,7 @@ tp_w_prim(queue_t *q, mblk_t *mp)
  * combination (but possibly different IP adresses).  These Streams that are "owners" of the
  * connection bucket must be traversed and checked for address matches.
  */
-STATIC INLINE fastcall __hot_in struct tp *
+STATIC INLINE streams_fastcall __hot_in struct tp *
 tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
 	struct tp *result = NULL;
@@ -7712,7 +7701,7 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
  * a Stream for a received packet, we are interested in any T_CLTS Stream that matches or any T_COTS
  * stream that is in the listening state that matches.
  */
-STATIC INLINE fastcall __hot_in struct tp *
+STATIC INLINE streams_fastcall __hot_in struct tp *
 tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 {
 	struct tp *result = NULL;
@@ -7781,7 +7770,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	return (result);
 }
 
-STATIC INLINE fastcall __hot_in struct tp *
+STATIC INLINE streams_fastcall __hot_in struct tp *
 tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
 	struct tp *result = NULL;
@@ -7821,7 +7810,7 @@ tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
  * to the protocol id.  Bind hashes are only searched for connectionless Streams if there is a
  * connectionless Stream bound to the protocol id.
  */
-STATIC INLINE fastcall __hot_in struct tp *
+STATIC INLINE streams_fastcall __hot_in struct tp *
 tp_lookup(struct iphdr *iph, struct udphdr *uh)
 {
 	return tp_lookup_common(iph->protocol, iph->daddr, uh->dest, iph->saddr, uh->source);
@@ -7835,7 +7824,7 @@ tp_lookup(struct iphdr *iph, struct udphdr *uh)
  * This needs to do a reverse lookup (where destination address and port are compared to source
  * address and port, and visa versa).
  */
-STATIC noinline fastcall __unlikely struct tp *
+STATIC noinline streams_fastcall __unlikely struct tp *
 tp_lookup_icmp(struct iphdr *iph, unsigned int len)
 {
 	struct udphdr *uh = (struct udphdr *) ((unsigned char *) iph + (iph->ihl << 2));

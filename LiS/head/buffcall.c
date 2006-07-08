@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2006/04/05 09:53:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/04/05 09:53:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: buffcall.c,v $
+ Revision 1.1.1.3.4.5  2006/04/05 09:53:07  brian
+ - fixe buffer call list linkage: fix provided by John Wenker
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2006/04/05 09:53:07 $"
 
 /*                               -*- Mode: C -*- 
  * buffcall.c --- buffcall management
@@ -60,7 +63,7 @@
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
  * Last Modified On: Fri Dec 27 09:48:15 CST 1996
- * RCS Id          : $Id: buffcall.c,v 1.1.1.3.4.4 2005/12/19 03:22:18 brian Exp $
+ * RCS Id          : $Id: buffcall.c,v 1.1.1.3.4.5 2006/04/05 09:53:07 brian Exp $
  * ----------------______________________________________________
  *
  *    Copyright (C) 1995  Graham Wheeler, Francisco J. Ballesteros,
@@ -154,14 +157,17 @@ bc_link(int size, void _RP(*function) (long), long arg)
 	if ((id = ++id_num) == 0)
 		id = ++id_num;	/* id must be non-zero */
 
-	if (bcinfo == NULL)
+	if (bcinfo == NULL) {
+		lis_spin_unlock_irqrestore(&lis_bc_lock, &psw);
+
 		bcinfo = ALLOCF(sizeof(*bcinfo), " buffcall struct");
 
-	if (bcinfo == NULL) {
-		LisUpFailCount(BUFCALLS);	/* stats array */
-		LisDownCount(BUFCALLS);	/* stats array */
-		lis_spin_unlock_irqrestore(&lis_bc_lock, &psw);
-		return (0);	/* table full */
+		if (bcinfo == NULL) {
+			LisUpFailCount(BUFCALLS);	/* stats array */
+			LisDownCount(BUFCALLS);	/* stats array */
+			return (0);	/* table full */
+		}
+		lis_spin_lock_irqsave(&lis_bc_lock, &psw);
 	}
 
 	/* 
@@ -183,7 +189,7 @@ bc_link(int size, void _RP(*function) (long), long arg)
 	bcinfo->prev = list->last;	/* current to old last element */
 	/* fix from JW */
 	if (list->last != NULL)
-		list->last->next = bcinfo; /* Link previous tail to new */
+		list->last->next = bcinfo;	/* Link previous tail to new */
 	/* fix from JW */
 	list->last = bcinfo;	/* list to new entry */
 	if (list->first == NULL)	/* maybe only entry */
@@ -343,7 +349,6 @@ lis_unbufcall(int bcid)
 void
 lis_dobufcall(int cpu_id)
 {
-	int cnt;
 	int i;
 	lis_flags_t psw;
 	bclist_t *list;
@@ -359,7 +364,6 @@ lis_dobufcall(int cpu_id)
 	}
 
 	lis_strbcflag = 0;	/* no more calls till timer */
-	lis_spin_unlock_irqrestore(&lis_bc_lock, &psw);
 
 	for (i = 0; lis_bc_cnt != 0 && i < N_BCHASH; i++) {
 		list = (bclist_t *) & lis_bchash[i];
@@ -370,13 +374,10 @@ lis_dobufcall(int cpu_id)
 		 * it.  New entries go on the end.  We remove entries from
 		 * the front.  In that way we will process the older entries.
 		 */
-		for (cnt = list->n_elts; cnt > 0; cnt--) {
-			lis_spin_lock_irqsave(&lis_bc_lock, &psw);
+		while (list->n_elts) {
 			bc = list->first;
-			if (bc == NULL) {	/* should not be the case */
-				lis_spin_unlock_irqrestore(&lis_bc_lock, &psw);
-				continue;	/* but skip anyway */
-			}
+			if (bc == NULL)	/* should not be the case */
+				break;
 
 			fcn = bc->usr_f;
 			arg = bc->usr_arg;
@@ -389,12 +390,10 @@ lis_dobufcall(int cpu_id)
 			lis_spin_lock_irqsave(&lis_bc_lock, &psw);
 			bc->state = BC_STATE_UNUSED;
 			bc_ulink(bc);	/* remove from list */
-			lis_spin_unlock_irqrestore(&lis_bc_lock, &psw);
 			LisDownCount(BUFCALLS);	/* stats array */
 		}
 	}
 
-	lis_spin_lock_irqsave(&lis_bc_lock, &psw);
 	lis_strbctimer = 0;	/* timer not running */
 	if (lis_bc_cnt != 0 && lis_strbctimer == 0) {	/* more bufcalls to do */
 		lis_strbctimer = 1;

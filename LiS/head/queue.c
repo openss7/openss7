@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.5 $) $Date: 2005/12/18 05:41:23 $
+ @(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2005/12/19 03:22:19 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,18 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.5 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2005/12/19 03:22:19 $"
 
 /*                               -*- Mode: C -*- 
  * queue.c --- streams statistics
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: queue.c,v 1.1.1.5.4.5 2005/12/18 05:41:23 brian Exp $
+ * RCS Id          : $Id: queue.c,v 1.1.1.5.4.6 2005/12/19 03:22:19 brian Exp $
  * Purpose         : provide some queue for LiS
  * ----------------______________________________________________
  *
@@ -937,7 +936,7 @@ lis_putq(queue_t *q, mblk_t *mp)
 void _RP
 lis_putqf(queue_t *q, mblk_t *mp)
 {
-	if (!lis_putq(q, mp))
+	if (mp != NULL && !lis_putq(q, mp))
 		freemsg(mp);
 }
 
@@ -1758,27 +1757,31 @@ lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 void
 lis_free_q_sync(queue_t *q)
 {
+	lis_q_sync_t *origqsp = q->q_qsp;
+	lis_q_sync_t *origoqsp = q->q_other->q_qsp;
+
+	q->q_qsp = NULL;
+	q->q_other->q_qsp = NULL;
+
 	switch (q->q_qlock_option) {
 	case LIS_QLOCK_NONE:
 	case LIS_QLOCK_GLOBAL:
 		break;		/* nothing allocated */
 
 	case LIS_QLOCK_QUEUE:
-		if (q->q_other->q_qsp != NULL) {
-			lis_sem_destroy(&q->q_other->q_qsp->qs_sem);
-			LIS_QSYNC_FREE(q->q_other->q_qsp);
+		if (origoqsp != NULL) {
+			lis_sem_destroy(&origoqsp->qs_sem);
+			LIS_QSYNC_FREE(origoqsp);
 		}
 		/* fall into next case */
 	case LIS_QLOCK_QUEUE_PAIR:
-		if (q->q_qsp != NULL) {
-			lis_sem_destroy(&q->q_qsp->qs_sem);
-			LIS_QSYNC_FREE(q->q_qsp);
+		if (origqsp != NULL) {
+			lis_sem_destroy(&origqsp->qs_sem);
+			LIS_QSYNC_FREE(origqsp);
 		}
 		break;
 	}
 
-	q->q_qsp = NULL;
-	q->q_other->q_qsp = NULL;
 	q->q_qlock_option = -1;	/* not specified */
 	q->q_other->q_qlock_option = -1;	/* not specified */
 }
@@ -1787,11 +1790,13 @@ int
 lis_set_q_sync(queue_t *q, int qlock_option)
 {
 	static lis_q_sync_t qsz;
+	lis_q_sync_t *tmpqsp;
 
-	lis_free_q_sync(q);	/* clear out old option */
-	/* sets q_qlock_option to -1 */
 	switch (qlock_option) {
 	case LIS_QLOCK_NONE:
+		lis_free_q_sync(q);	/* clear out old option */
+		/* sets q_qlock_option to -1 */
+
 		q->q_qsp = NULL;
 		q->q_other->q_qsp = NULL;
 		break;
@@ -1799,8 +1804,22 @@ lis_set_q_sync(queue_t *q, int qlock_option)
 	case LIS_QLOCK_QUEUE:
 	default:
 		qlock_option = LIS_QLOCK_QUEUE;
-		q->q_qsp = LIS_QSYNC_ALLOC(sizeof(lis_q_sync_t), "Qsync");
-		q->q_other->q_qsp = LIS_QSYNC_ALLOC(sizeof(lis_q_sync_t), "Qsync");
+		if (q->q_qsp == NULL) {
+			tmpqsp = LIS_QSYNC_ALLOC(sizeof(lis_q_sync_t), "Qsync");
+			if (tmpqsp != NULL) {
+				*tmpqsp = qsz;
+				lis_sem_init(&tmpqsp->qs_sem, 1);
+				q->q_qsp = tmpqsp;
+			}
+		}
+		if (q->q_other->q_qsp == NULL) {
+			tmpqsp = LIS_QSYNC_ALLOC(sizeof(lis_q_sync_t), "Qsync");
+			if (tmpqsp != NULL) {
+				*tmpqsp = qsz;
+				lis_sem_init(&tmpqsp->qs_sem, 1);
+				q->q_other->q_qsp = tmpqsp;
+			}
+		}
 		if (q->q_qsp == NULL || q->q_other->q_qsp == NULL) {
 			if (q->q_qsp != NULL)
 				LIS_QSYNC_FREE(q->q_qsp);
@@ -1811,22 +1830,31 @@ lis_set_q_sync(queue_t *q, int qlock_option)
 			q->q_other->q_qsp = NULL;
 			return (-ENOMEM);
 		}
-		*q->q_qsp = qsz;
-		*q->q_other->q_qsp = qsz;
-		lis_sem_init(&q->q_qsp->qs_sem, 1);
-		lis_sem_init(&q->q_other->q_qsp->qs_sem, 1);
 		break;
 
 	case LIS_QLOCK_QUEUE_PAIR:
-		q->q_qsp = LIS_QSYNC_ALLOC(sizeof(lis_q_sync_t), "Qsync");
-		if (q->q_qsp == NULL)
-			return (-ENOMEM);
+		if ((q->q_other->q_qsp != NULL) && (q->q_other->q_qsp != q->q_qsp)) {
+			tmpqsp = q->q_other->q_qsp;
+			q->q_other->q_qsp = NULL;
+			lis_sem_destroy(&tmpqsp->qs_sem);
+			LIS_QSYNC_FREE(tmpqsp);
+		}
+		if (q->q_qsp == NULL) {
+			tmpqsp = LIS_QSYNC_ALLOC(sizeof(lis_q_sync_t), "Qsync");
+			if (tmpqsp == NULL) {
+				return (-ENOMEM);
+			} else {
+				*tmpqsp = qsz;
+				lis_sem_init(&tmpqsp->qs_sem, 1);
+				q->q_qsp = tmpqsp;
+			}
+		}
 		q->q_other->q_qsp = q->q_qsp;
-		*q->q_qsp = qsz;
-		lis_sem_init(&q->q_qsp->qs_sem, 1);
 		break;
 
 	case LIS_QLOCK_GLOBAL:
+		lis_free_q_sync(q);	/* clear out old option */
+		/* sets q_qlock_option to -1 */
 		q->q_qsp = &lis_queue_sync;
 		q->q_other->q_qsp = &lis_queue_sync;
 		break;

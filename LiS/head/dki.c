@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dki.c,v $ $Name:  $($Revision: 1.1.1.6.4.3 $) $Date: 2005/12/18 05:41:23 $
+ @(#) $RCSfile: dki.c,v $ $Name:  $($Revision: 1.1.1.6.4.4 $) $Date: 2005/12/19 03:22:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dki.c,v $ $Name:  $($Revision: 1.1.1.6.4.3 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile: dki.c,v $ $Name:  $($Revision: 1.1.1.6.4.4 $) $Date: 2005/12/19 03:22:18 $"
 
 /************************************************************************
 *                      SVR4 Driver-Kernel Interface                     *
@@ -123,7 +123,7 @@ enter_timer_in_list(tlist_t * tp)
 	*headp = tp;
 }
 
-static INLINE void
+static INLINE int
 remove_timer_from_list(tlist_t * tp)
 {
 	tlist_t *t;
@@ -132,13 +132,13 @@ remove_timer_from_list(tlist_t * tp)
 
 	if ((t = *headp) == NULL) {	/* nothing in that hash list */
 		tp->next = NULL;
-		return;
+		return 0;
 	}
 
 	if (t == tp) {		/* our entry is first in list */
 		*headp = tp->next;
 		tp->next = NULL;
-		return;
+		return 1;
 	}
 
 	/* Find this entry starting at the 2nd element and on down the list */
@@ -147,11 +147,12 @@ remove_timer_from_list(tlist_t * tp)
 		if (nxt == tp) {
 			t->next = tp->next;
 			tp->next = NULL;
-			return;
+			return 1;
 		}
 	}
 
 	tp->next = NULL;	/* ensure null next pointer */
+	return 0;
 }
 
 static INLINE tlist_t *
@@ -184,7 +185,10 @@ sys_timeout_fcn(ulong arg)
 
 	lis_spin_lock_irqsave(&lis_tlist_lock, &psw);
 
-	remove_timer_from_list(tp);	/* handle can no longer be found */
+	if (!remove_timer_from_list(tp)) {
+		lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw);
+		return;
+	}
 	if (tp->handle != 0 && tp->fcn != NULL) {
 		fcn = tp->fcn;	/* save local copy */
 		uarg = tp->arg;
@@ -259,22 +263,22 @@ lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name, 
 
 	lis_spin_lock_irqsave(&lis_tlist_lock, &psw);
 
-	handle = alloc_handle();
 	tp = alloc_timer(file_name, line_nr);	/* available timer struct */
 	if (tp == NULL) {	/* must allocate a new one */
 		lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw);
 		return (0);	/* no memory for timer */
 	}
 
+	handle = alloc_handle();
 	*tp = z;		/* zero out structure */
 	tp->handle = handle;
 	tp->fcn = timo_fcn;
 	tp->arg = arg;
 
 	enter_timer_in_list(tp);	/* hashed by handle */
-	lis_tmout(&tp->tl, sys_timeout_fcn, (long) tp, ticks);
-	/* start system timer */
 	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw);
+	/* start system timer */
+	lis_tmout(&tp->tl, sys_timeout_fcn, (long) tp, ticks);
 
 	return (handle);	/* return handle */
 

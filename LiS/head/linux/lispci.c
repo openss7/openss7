@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lispci.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/12/18 05:41:24 $
+ @(#) $RCSfile: lispci.c,v $ $Name:  $($Revision: 1.1.1.4.4.6 $) $Date: 2005/12/19 03:22:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lispci.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/12/18 05:41:24 $"
+#ident "@(#) $RCSfile: lispci.c,v $ $Name:  $($Revision: 1.1.1.4.4.6 $) $Date: 2005/12/19 03:22:20 $"
 
 /************************************************************************
 *                          LiS PCI Interface                            *
@@ -422,6 +422,7 @@ lis_pci_cleanup(void)
 void *_RP
 lis_pci_alloc_consistent(lis_pci_dev_t *dev, size_t size, lis_dma_addr_t * dma_handle)
 {
+#ifdef CONFIG_PCI
 	dma_addr_t *dp = (dma_addr_t *) dma_handle->opaque;
 	void *vaddr;
 
@@ -431,15 +432,20 @@ lis_pci_alloc_consistent(lis_pci_dev_t *dev, size_t size, lis_dma_addr_t * dma_h
 	dma_handle->vaddr = vaddr;
 
 	return (vaddr);
+#else
+	return (0);
+#endif
 }
 
 void *_RP
 lis_pci_free_consistent(lis_dma_addr_t * dma_handle)
 {
+#ifdef CONFIG_PCI
 	if (dma_handle->vaddr != NULL)
 		pci_free_consistent(dma_handle->dev->kern_ptr, dma_handle->size, dma_handle->vaddr,
 				    *((dma_addr_t *) dma_handle->opaque));
 	dma_handle->vaddr = NULL;
+#endif
 	return (NULL);
 }
 

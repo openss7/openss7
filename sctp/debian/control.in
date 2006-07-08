@@ -3,29 +3,47 @@ Section: devel
 Priority: optional
 Maintainer: Brian F. G. Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
-Build-Depends: @kernel_source@-@knumber@ (>= @krelease@), @kernel_headers@-@kversion@ (= @krelease@), modutils (>= 2.4.12), gcc (>= 2.95.3),
- groff (>= 1.17.2), groff-base (>= 1.17.2), gzip (>= 1.3.2), texinfo (>= 4.0),
- tetex-base (>=1.0), tetex-bin (>=1.0), tetex-extra (>=1.0), gs (>= 6.51)
+Build-Depends: @kernel_source@-@kmajor@.@kminor@ | @kernel_headers@-@kmajor@.@kminor@,
+ gcc (>= 2.95.3), groff (>= 1.17.2), groff-base (>= 1.17.2),
+ gzip (>= 1.3.2), texinfo (>= 4.0), tetex-base (>=1.0),
+ tetex-bin (>=1.0), tetex-extra (>=1.0), gs (>= 6.51)
 
-Package: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
+Package: @PACKAGE_LCNAME@-core-@VERSION@
 Architecture: any
 Section: base
 Priority: optional
-Provides: SCTP-core, @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-core-@kversion@
+Provides: @PACKAGE_LCNAME@-core, SCTP-core, SCTP-core-@VERSION@
+Conflicts: SCTP-core, SCTP-core-@VERSION@
+Replaces: SCTP-core, SCTP-core-@VERSION@
 Depends: @kernel_image@-@kversion@ (= @krelease@),
  @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Pre-Depends: @kernel_image@-@kversion@ (= @krelease@)
 Description: Core kernel modules for @PACKAGE_TITLE@
- Kernel modules that provide the Linux kernel @PACKAGE_TITLE@ Linux/BSD NET4
- protocol modules.
- These binaries are heavily tied to the kernel for which they were compiled:
- applies to kernel version @kversion@.
+ Kernel modules that provide the Linux kernel @PACKAGE_TITLE@
+ Linux/BSD NET4 protocol modules.  These binaries are heavily tied to
+ the kernel for which they were compiled: applies to kernel version
+ @kversion@.
+
+Package: @PACKAGE_LCNAME@-info-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: SCTP-info, @PACKAGE_LCNAME@-info
+Depends: @kernel_image@-@kversion@ (= @krelease@)
+Description: Kernel module versions for @PACKAGE_TITLE@
+ Kernel modules symbol information for development of kernel modules
+ against the core kernel modules included in the @PACKAGE_LCNAME@-core package.
+ Symbol information is tied to the core kernel modules and kernel for
+ which they were compiled:  these apply to core kernel modules
+ @PACKAGE_LCNAME@-core-@kversion@ for kernel version @kversion@.
 
 Package: @PACKAGE_LCNAME@-util
 Architecture: any
 Section: base
 Priority: optional
 Provides: SCTP-util
+Conflicts: SCTP-util
+Replaces: SCTP-util
 Depends: ${shlib:Depends}
 Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Utitlity and test programs for @PACKAGE_TITLE@
@@ -39,17 +57,16 @@ Priority: optional
 Provides: SCTP-devel
 Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: C headers and static libraries for @PACKAGE_TITLE@
- Static libraries and kernel headers to develop @PACKAGE_TITLE@ modules and
- drivers; user-space headers and static libraries required to compile
- @PACKAGE_TITLE@ applications programs;  all @PACKAGE_TITLE@ manual pages and
- info files for both kernel and user-space functions.
+ Static libraries and kernel headers to develop @PACKAGE_TITLE@
+ modules and drivers; user-space headers and static libraries required
+ to compile @PACKAGE_TITLE@ applications programs.
 
 Package: @PACKAGE_LCNAME@-init
 Architecture: all
 Section: base
 Priority: optional
 Provides: SCTP-init
-Conflicts: lis-init
+Conflicts: SCTP-init
 Depends: @PACKAGE_LCNAME@-util(= @VERSION@-@PACKAGE_DEBRELEASE@), ${misc:Depends}
 Description: Init scripts and config files for @PACKAGE_TITLE@
  SysV init scripts and configuration files for @PACKAGE_TITLE@.
@@ -59,9 +76,13 @@ Architecture: all
 Section: doc
 Priority: optional
 Provides: SCTP-doc
+Conflicts: SCTP-doc
+Replaces: SCTP-doc
 Description: Documentation and man pages for @PACKAGE_TITLE@
  Pdf and html documentation for installation and the development of
- @PACKAGE_TITLE@ applications, modules and drivers.
+ @PACKAGE_TITLE@ applications, modules and drivers; and all
+ @PACKAGE_TITLE@ manual pages and info files for both kernel and
+ user-space functions.
 
 Package: @PACKAGE_LCNAME@-source
 Architecture: all
@@ -69,7 +90,7 @@ Section: devel
 Priority: optional
 Provides: SCTP-source
 Description: Source code for @PACKAGE_TITLE@
- Source code for building the @PACKAGE_TITLE@ release: autoconf configuration
- utilities necessary to create and distribute this dpkg -- required for
- recompiling against recompiled kernel.
+ Source code for building the @PACKAGE_TITLE@ release: autoconf
+ configuration utilities necessary to create and distribute this dpkg --
+ required for recompiling against recompiled kernel.
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2005/12/19 03:22:19 $
+ @(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.11 $) $Date: 2005/12/28 09:53:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:53:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2005/12/19 03:22:19 $"
+#ident "@(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.11 $) $Date: 2005/12/28 09:53:31 $"
 
 /*                               -*- Mode: C -*- 
  * mod.c --- module mgmt
@@ -951,9 +951,8 @@ lis_loadmod(const char *name)
 	if ((err = lis_down(&lis_mod_reg)) < 0)
 		return (err);
 
-	if (id == LIS_NULL_MID && (id = find_empty_mod_index(name)) == LIS_NULL_MID) {	/* mod
-											   table is 
-											   full */
+	if (id == LIS_NULL_MID && (id = find_empty_mod_index(name)) == LIS_NULL_MID) {
+		/* mod table is full */
 		lis_up(&lis_mod_reg);
 		return (LIS_NULL_MID);
 	}
@@ -1039,7 +1038,7 @@ lis_enable_intr(struct streamtab *strtab, int major, const char *name)
 	if (devptr->irq <= 0)
 		return;
 
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_PPC64_LIS) && !defined(_X86_64_LIS_))
 	retval = request_irq(devptr->irq, devptr->handler, 0, name, NULL);
 	if (retval) {
 		printk("lis_enable_intr(%s): request_irq(%d) failed: %d\n", name, devptr->irq,
@@ -1172,7 +1171,7 @@ lis_unregister_strdev(major_t major)
 		if (i >= 0) {
 			devptr = &lis_device_config[i];
 			if (devptr->irq > 0) {
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_PPC64_LIS) && !defined(_X86_64_LIS_))
 				free_irq(devptr->irq, NULL);
 #endif
 
@@ -1330,7 +1329,7 @@ lis_apush_set(struct strapush *ap)
 	   obtain their module id. */
 	for (i = 0; i < ap->sap_npush; ++i) {
 		j = lis_loadmod(ap->sap_list[i]);
-		if (j <= 0) {
+		if (j == LIS_NULL_MID) {
 			/* Unknown module */
 			FREE(a);
 			return -EINVAL;

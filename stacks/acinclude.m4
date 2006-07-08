@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/05/08 03:12:26 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/07 21:17:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:12:26 $ by $Author: brian $
+# Last Modified $Date: 2006/07/07 21:17:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -108,7 +108,7 @@ AC_DEFUN([AC_SS7], [dnl
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
-    USER_LDFLAGS="$LDFLAGS"
+    USER_LDFLAGS="$LDADD"
     _SS7_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
@@ -120,7 +120,7 @@ AC_DEFUN([AC_SS7], [dnl
 dnl if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
 dnl	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
 dnl fi
-    PKG_MODFLAGS='$(STREAMS_MODFLAGS)'
+    PKG_MODFLAGS='$(STREAMS_MODFLAGS) $(STRCOMP_MODFLAGS)'
 dnl Just check config.log if you want to see these...
 dnl AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
 dnl AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
@@ -161,21 +161,131 @@ AC_DEFUN([_SS7_OPTIONS], [dnl
 # =============================================================================
 
 # =============================================================================
+# _SS7_SETUP_DEBUG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_SETUP_DEBUG], [dnl
+    case "$linux_cv_debug" in
+    _DEBUG)
+	AC_DEFINE_UNQUOTED([SS7_CONFIG_DEBUG], [], [Define to perform
+			    internal structure tracking within SS7 as well as
+			    to provide additional /proc filesystem files for
+			    examining internal structures.])
+	;;
+    _TEST)
+	AC_DEFINE_UNQUOTED([SS7_CONFIG_TEST], [], [Define to perform
+			    performance testing with debugging.  This mode
+			    does not dump massive amounts of information into
+			    system logs, but peforms all assertion checks.])
+	;;
+    _SAFE)
+	AC_DEFINE_UNQUOTED([SS7_CONFIG_SAFE], [], [Define to perform
+			    fundamental assertion checks.  This is a safer
+			    mode of operation.])
+	;;
+    _NONE | *)
+	AC_DEFINE_UNQUOTED([SS7_CONFIG_NONE], [], [Define to perform no
+			    assertion checks but report software errors.  This
+			    is the smallest footprint, highest performance
+			    mode of operation.])
+	;;
+    esac
+])# _SS7_SETUP_DEBUG
+# =============================================================================
+
+# =============================================================================
+# _SS7_OTHER_SCTP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_OTHER_SCTP], [dnl
+    linux_cv_other_sctp='no'
+    linux_cv_lksctp_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp compiled in], [CONFIG_IP_SCTP])
+    if test :"$linux_cv_CONFIG_IP_SCTP" = :"yes" ; then
+	linux_cv_other_sctp='lksctp'
+	linux_cv_lksctp_sctp='yes'
+	AC_MSG_ERROR([
+**** 
+**** Configure has detected a kernel with the deprecated lksctp compiled in.
+**** This is NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on
+**** such a bastardized kernel will most likely result in an unstable
+**** situation.  Try a different kernel, or try recompiling your kernel with
+**** lksctp removed (or at least compiled as a module).
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp as module], [CONFIG_IP_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_IP_SCTP_MODULE" = :"yes" ; then
+	linux_cv_other_sctp='lksctp'
+	linux_cv_lksctp_sctp='yes'
+	AC_DEFINE([HAVE_LKSCTP_SCTP], [1], [Some more recent 2.4.25 and
+	    greater kernels have this poorman version of SCTP included in the
+	    kernel.  Define this symbol if you have such a bastardized kernel.
+	    When we have such a kernel we need to define lksctp's header
+	    wrapper defines so that none of the lksctp header files are
+	    included (we use our own instead).])
+    fi
+    linux_cv_openss7_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp compiled in], [CONFIG_SCTP])
+    if test :"$linux_cv_CONFIG_SCTP" = :"yes" ; then
+	linux_cv_other_sctp='openss7'
+	linux_cv_openss7_sctp='yes'
+	AC_MSG_WARN([
+**** 
+**** Configure has detected a kernel with OpenSS7 SCTP compiled in.  This is
+**** NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on such a
+**** kernel can lead to difficulties.  Try a different kernel, or try
+**** recompiling with OpenSS7 SCTP compiled as a module, and perhaps removed.
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp module], [CONFIG_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_SCTP_MODULE" = :"yes" ; then
+	linux_cv_other_sctp='openss7'
+	linux_cv_openss7_sctp='yes'
+	AC_DEFINE([HAVE_OPENSS7_SCTP], [1], [Define if your kernel supports
+	    the OpenSS7 Linux Kernel Sockets SCTP patches.  This enables
+	    support in the SCTP driver for STREAMS on top of the OpenSS7 Linux
+	    Kernel Sockets SCTP implementation.])
+    fi
+    AM_CONDITIONAL([WITH_LKSCTP_SCTP], [ test :"${linux_cv_lksctp_sctp:-no}"  = :yes])dnl
+    AM_CONDITIONAL([WITH_OPENSS7_SCTP], [test :"${linux_cv_openss7_sctp:-no}" = :yes])dnl
+])# _SS7_OTHER_SCTP
+# =============================================================================
+
+# =============================================================================
 # _SS7_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SS7_SETUP], [dnl
     _LINUX_KERNEL
     _LINUX_DEVFS
     _GENKSYMS
-    _SS7_CONFIG_KERNEL
     _LINUX_STREAMS
     _STRCOMP
+    with_ss7='yes'
     _XOPEN
     _XNS
     _XTI
     _INET
     _SCTP
+    # here we have our flags set and can perform preprocessor and compiler
+    # checks on the kernel
+    _SS7_OTHER_SCTP
+    _SS7_SETUP_MODULE
+    _SS7_CONFIG_KERNEL
+    _SS7_SETUP_DEBUG
 ])# _SS7_SETUP
+
+# =============================================================================
+# _SS7_SETUP_MODULE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_SETUP_MODULE], [dnl
+    if test :"${linux_cv_k_linkage:-loadable}" = :loadable ; then
+	AC_DEFINE_UNQUOTED([SS7_CONFIG_MODULE], [], [When defined, SS7 is
+			    being compiled as a loadable kernel module.])
+    else
+	AC_DEFINE_UNQUOTED([SS7_CONFIG], [], [When defined, SS7 is being
+			    compiled as a kernel linkable object.])
+    fi
+    AM_CONDITIONAL([SS7_CONFIG_MODULE], [test :${linux_cv_k_linkage:-loadable} = :loadable])
+    AM_CONDITIONAL([SS7_CONFIG], [test :${linux_cv_k_linkage:-loadable} = :linkable])
+])# _SS7_SETUP_MODULE
 # =============================================================================
 
 # =============================================================================
@@ -183,7 +293,9 @@ AC_DEFUN([_SS7_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
-			  linux/locks.h asm/softirq.h linux/slab.h linux/security.h], [:], [:], [
+			  linux/locks.h asm/softirq.h linux/brlock.h \
+			  linux/slab.h linux/security.h \
+			  ], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -194,11 +306,12 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
-])
+    ])
     _LINUX_CHECK_TYPES([irqreturn_t, pm_message_t], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #if HAVE_KINC_LINUX_SLAB_H

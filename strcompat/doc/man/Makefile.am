@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/03/06 11:38:28 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/07/07 21:19:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:28 $ by $Author: brian $
+# Last Modified $Date: 2006/07/07 21:19:36 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.20  2006/07/07 21:19:36  brian
+# - pass "make check" on LiS-only build
+#
 # Revision 0.9.2.19  2006/03/06 11:38:28  brian
 # - updated headers
 #
@@ -699,7 +702,8 @@ lfs_compat_pages = \
 	man9/unregister_strdev.9 \
 	man9/unregister_strdrv.9 \
 	man9/unregister_strmod.9 \
-	man9/unregister_strnod.9
+	man9/unregister_strnod.9 \
+	man9/vstrlog.9
 
 mac_unimpl_pages = \
 	man9/allocbi.9 \
@@ -1494,7 +1498,8 @@ dist_noinst_lfs_compat_pages = \
 	man9/unregister_strdev.9.man \
 	man9/unregister_strdrv.9.man \
 	man9/unregister_strmod.9.man \
-	man9/unregister_strnod.9.man
+	man9/unregister_strnod.9.man \
+	man9/vstrlog.9.man
 
 dist_noinst_mac_unimpl_pages = \
 	man9/allocbi.9.man \

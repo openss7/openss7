@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/12/18 06:37:53 $
+ @(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/12/19 03:22:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:37:53 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/12/18 06:37:53 $"
+#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/12/19 03:22:18 $"
 
 /*                               -*- Mode: C -*- 
  * relay.c --- A simple relay pushable module
  * Author          : Dave Grothe
  * Created On      : Dec 30, 1995
  * Last Modified By: Dave Grothe
- * RCS Id          : $Id: relay.c,v 1.1.1.3.4.5 2005/12/18 06:37:53 brian Exp $
+ * RCS Id          : $Id: relay.c,v 1.1.1.3.4.6 2005/12/19 03:22:18 brian Exp $
  * Purpose         : relay messages just to test pushable modules
  * ----------------______________________________________________
  *
@@ -233,7 +233,9 @@ relay_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 static int _RP
 relay_wput(queue_t *q, mblk_t *mp)
 {
+#ifdef DEBUG
 	lis_print_msg(mp, "relay_wput", PRINT_DATA_RDWR);
+#endif
 	putnext(q, mp);		/* relay downstream */
 	return (0);
 }
@@ -245,7 +247,9 @@ relay_wput(queue_t *q, mblk_t *mp)
 static int _RP
 relay_rput(queue_t *q, mblk_t *mp)
 {
+#ifdef DEBUG
 	lis_print_msg(mp, "relay_rput", PRINT_DATA_RDWR);
+#endif
 	putnext(q, mp);		/* relay upstream */
 	return (0);
 }

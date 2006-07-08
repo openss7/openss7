@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/02 12:19:54 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/07 21:15:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/02 12:19:54 $ by $Author: brian $
+ Last Modified $Date: 2006/07/07 21:15:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.9  2006/07/07 21:15:02  brian
+ - correct compile back to RH 7.2
+
  Revision 0.9.2.8  2006/07/02 12:19:54  brian
  - changes for 2.6.17 kernel
 
@@ -77,9 +80,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/02 12:19:54 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/07 21:15:02 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/02 12:19:54 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/07 21:15:02 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -158,7 +161,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.8 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/02 12:19:54 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/07 21:15:02 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -473,12 +476,12 @@ STATIC struct tpi_chash_bucket *tpi_chash;
 STATIC size_t tpi_chash_size = 0;
 STATIC size_t tpi_chash_order = 0;
 
-STATIC INLINE fastcall uint
+STATIC INLINE streams_fastcall uint
 tpi_bhashfn(uint16_t num)
 {
 	return ((tpi_bhash_size - 1) & num);
 }
-STATIC INLINE fastcall uint
+STATIC INLINE streams_fastcall uint
 tpi_chashfn(uint16_t dport, uint16_t sport)
 {
 	return ((tpi_chash_size - 1) & (dport + (sport << 4)));
@@ -568,19 +571,19 @@ tpi_state_name(t_scalar_t state)
 	}
 }
 #endif				/* _DEBUG */
-STATIC INLINE fastcall void
+STATIC INLINE streams_fastcall void
 tpi_set_state(struct tpi *tpi, long state)
 {
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, tpi, tpi_state_name(state),
 		tpi_state_name(tpi->i_state)));
 	tpi->i_state = tpi->info.CURRENT_state = state;
 }
-STATIC INLINE fastcall long
+STATIC INLINE streams_fastcall long
 tpi_get_state(struct tpi *tpi)
 {
 	return (tpi->i_state);
 }
-STATIC INLINE fastcall long
+STATIC INLINE streams_fastcall long
 tpi_get_statef(struct tpi *tpi)
 {
 	return (1 << tpi_get_state(tpi));
@@ -3873,7 +3876,7 @@ struct inet_protocol tpi_proto[MAX_INET_SLOTS] = { };
  * stolen).  In the 2.4 handler loop, iph->protocol is examined on each iteration, permitting us to
  * stead the packet by overwritting the protocol number.
  */
-STATIC INLINE fastcall __hot_in void
+STATIC INLINE streams_fastcall __hot_in void
 tpi_v4_steal(struct sk_buff *skb)
 {
 	skb->nh.iph->protocol = 255;
@@ -3886,7 +3889,7 @@ tpi_v4_steal(struct sk_buff *skb)
  * In the packet handler, if the packet is for us, pass it to the next handler by simply freeing the
  * cloned copy and returning.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC INLINE streams_fastcall __hot_in int
 tpi_v4_rcv_next(struct sk_buff *skb)
 {
 	kfree_skb(skb);
@@ -3900,7 +3903,7 @@ tpi_v4_rcv_next(struct sk_buff *skb)
  * In the error packet handler, if the packet is not for us, pass it to the next handler by simply
  * returning.  Error packets are not cloned, so don't free it.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC INLINE streams_fastcall __hot_in int
 tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 	return (0);
@@ -3966,7 +3969,7 @@ struct inet_protocol tpi_proto[MAX_INET_SLOTS] = { };
  * In the packet handler, if the packet is for us, steal the packet by simply not passing it to the
  * next handler.
  */
-STATIC INLINE fastcall __hot_in void
+STATIC INLINE streams_fastcall __hot_in void
 tpi_v4_steal(struct sk_buff *skb)
 {
 }
@@ -3979,7 +3982,7 @@ tpi_v4_steal(struct sk_buff *skb)
  * packet and return.  Note that we do not have to lock the hash because we own it and are also
  * holding a reference to any module owning the next handler.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC INLINE streams_fastcall __hot_in int
 tpi_v4_rcv_next(struct sk_buff *skb)
 {
 	struct inet_protocol *ip;
@@ -3999,7 +4002,7 @@ tpi_v4_rcv_next(struct sk_buff *skb)
  * Error packets are not cloned, so pass it to the next handler.  If there is not next handler,
  * simply return.
  */
-STATIC INLINE fastcall __hot_in int
+STATIC INLINE streams_fastcall __hot_in int
 tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 	struct inet_protocol *ip;
@@ -4092,7 +4095,7 @@ tpi_term_nproto(unsigned char proto)
  * @daddr: destination address (of received packet)
  * @saddr: source address (of received packet)
  */
-STATIC INLINE fastcall __hot_in struct tpi *
+STATIC INLINE streams_fastcall __hot_in struct tpi *
 t_tpi_lookup_conn(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
 {
 	struct tpi *tpi;
@@ -4122,7 +4125,7 @@ t_tpi_lookup_conn(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr
  * for receive packets, we are only interested in CLTS Streams or pseudo-COTS Streams that are bound
  * in a listening state.
  */
-STATIC INLINE fastcall __hot_in struct tpi *
+STATIC INLINE streams_fastcall __hot_in struct tpi *
 t_tpi_lookup_bind(uint16_t dport, uint32_t daddr)
 {
 	struct tpi *result = NULL;
@@ -4176,7 +4179,7 @@ t_tpi_lookup_bind(uint16_t dport, uint32_t daddr)
 	return (result);
 }
 
-STATIC INLINE fastcall __hot_in struct tpi *
+STATIC INLINE streams_fastcall __hot_in struct tpi *
 t_tpi_lookup(uint16_t dport, uint16_t sport, uint32_t daddr, uint32_t saddr)
 {
 	struct tpi *tpi;
@@ -4362,20 +4365,6 @@ t_tpi_disconnect(struct tpi *tpi)
 	return (0);
 }
 
-#ifdef HAVE_KFUNC_DST_MTU
-/* Why do stupid people rename things like this? */
-#undef dst_pmtu
-#define dst_pmtu dst_mtu
-#else
-#ifndef HAVE_STRUCT_DST_ENTRY_PATH
-static inline u32
-dst_pmtu(struct dst_entry *dst)
-{
-	return (dst->pmtu);
-}
-#endif
-#endif				/* HAVE_KFUNC_DST_MTU */
-
 #if defined HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
 t_tpi_queue_xmit(struct sk_buff *skb)
@@ -4435,7 +4424,7 @@ cksum_generate(struct tcphdr *th, size_t plen)
  * copied from the user would also contain a partial checksum of the appropriate type.  That is for
  * later.
  */
-STATIC INLINE fastcall __hot_out int
+STATIC INLINE streams_fastcall __hot_out int
 t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_options *opts)
 {
 	struct tpi *tpi = TPI_PRIV(q);
@@ -4737,7 +4726,7 @@ t_error_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error)
  * @dp: user data
  * @ap; accepting stream
  */
-STATIC INLINE fastcall __hot_put int
+STATIC INLINE streams_fastcall __hot_put int
 t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, mblk_t *cp, mblk_t *dp, struct tpi *ap)
 {
 	struct tpi *tpi = TPI_PRIV(q);
@@ -4856,7 +4845,7 @@ t_reply_ack(queue_t *q, t_scalar_t prim, mblk_t *mp, t_scalar_t error, mblk_t *c
  * dp->b_datap->db_base.  The message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
  */
-STATIC INLINE fastcall __hot_get int
+STATIC INLINE streams_fastcall __hot_get int
 t_unitdata_ind(queue_t *q, mblk_t *dp)
 {
 	struct tpi *tpi = TPI_PRIV(q);
@@ -4918,7 +4907,7 @@ t_unitdata_ind(queue_t *q, mblk_t *dp)
  * dp->b_datap->db_base.  The TCP message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
  */
-STATIC INLINE fastcall __hot_get int
+STATIC INLINE streams_fastcall __hot_get int
 t_conn_ind(queue_t *q, mblk_t *dp)
 {
 	struct tpi *tpi = TPI_PRIV(q);
@@ -5020,7 +5009,7 @@ t_conn_ind(queue_t *q, mblk_t *dp)
  * dp->b_datap->db_base.  The IP message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
  */
-STATIC INLINE fastcall __hot_get int
+STATIC INLINE streams_fastcall __hot_get int
 t_optdata_ind(queue_t *q, mblk_t *dp)
 {
 	struct tpi *tpi = TPI_PRIV(q);
@@ -5510,7 +5499,7 @@ t_conn_req(queue_t *q, mblk_t *mp)
 	return t_error_ack(q, T_CONN_REQ, mp, err);
 }
 
-STATIC INLINE fastcall mblk_t *
+STATIC INLINE streams_fastcall mblk_t *
 t_seq_check(struct tpi *tpi, t_uscalar_t seq)
 {
 	mblk_t *mp;
@@ -5521,7 +5510,7 @@ t_seq_check(struct tpi *tpi, t_uscalar_t seq)
 	usual(mp);
 	return (mp);
 }
-STATIC INLINE fastcall struct tpi *
+STATIC INLINE streams_fastcall struct tpi *
 t_tok_check(t_uscalar_t tok)
 {
 	struct tpi *ap;
@@ -5682,7 +5671,7 @@ t_discon_req(queue_t *q, mblk_t *mp)
  * @q: write queue
  * @mp: the primitive
  */
-STATIC INLINE fastcall __hot_put int
+STATIC INLINE streams_fastcall __hot_put int
 t_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tpi *tpi = TPI_PRIV(q);
@@ -5743,7 +5732,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
  * @q: write queue
  * @mp: the primitive
  */
-STATIC INLINE fastcall __hot_put int
+STATIC INLINE streams_fastcall __hot_put int
 t_optdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tpi *tpi = TPI_PRIV(q);
@@ -5801,7 +5790,7 @@ t_optdata_req(queue_t *q, mblk_t *mp)
  * @q: write queue
  * @mp: the primitive
  */
-STATIC INLINE fastcall __hot_put int
+STATIC INLINE streams_fastcall __hot_put int
 t_data_req(queue_t *q, mblk_t *mp)
 {
 	struct tpi *tpi = TPI_PRIV(q);
@@ -6106,7 +6095,7 @@ t_other_req(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair (write queue)
  * @mp: the message
  */
-STATIC INLINE fastcall __hot_put int
+STATIC INLINE streams_fastcall __hot_put int
 tpi_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -6255,7 +6244,7 @@ tpi_w_ioctl(queue_t *q, mblk_t *mp)
  * transformed into T_UNITDATA_IND, T_CONN_IND or T_OPTDATA_IND M_PROTO messages and passed along
  * upstream.
  */
-STATIC INLINE fastcall __hot_get int
+STATIC INLINE streams_fastcall __hot_get int
 tpi_r_data(queue_t *q, mblk_t *mp)
 {
 	struct tpi *tpi = TPI_PRIV(q);

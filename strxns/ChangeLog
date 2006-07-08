@@ -1,3 +1,25 @@
+2006-07-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/copyright: typo
+
+2006-07-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/changelog: packaged release candidate for Mark Fugate
+	* debian/control.in: first full debian master package build of debs on Ubuntu
+	* debian/rules.in:: first full debian master package build of debs on Ubuntu
+
+2006-07-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* NEWS: package release candidate for Mark Fugate
+	* .pkgrelease: package release candidate for Mark Fugate
+
+2006-07-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: changes to correct LiS only compile on FC5
+	* strxns.spec.in: place all include files in development sub-package
+	* src/drivers/ip_hooks.h.in: correct compile back to RH 7.2
+	* acinclude.m4: corrections for compile on FC5 with 2.6.17 kernel
+
 2006-07-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updated for release

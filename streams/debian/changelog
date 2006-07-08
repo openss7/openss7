@@ -1,6 +1,13 @@
+streams (0.7a.6rc1-0) experimental; urgency=low
+
+  * Release candidate for Mark.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Wed,  5 Jul 2006 19:44:05 -0600
+
 streams (0.7a.6-0) experimental; urgency=low
 
   * Bumped version number for release.
+  * Extensive rework of rules file for Debian 3.1 and Ubuntu 6.06.
 
  -- Brian F. G. Bidulock <bidulock@openss7.org>  Thu, 29 Jun 2006 20:22:31 -0600
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/06/22 13:11:33 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/07/07 20:59:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:33 $ by $Author: brian $
+ Last Modified $Date: 2006/07/07 20:59:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.20  2006/07/07 20:59:09  brian
+ - change to correct LIS-only compile on FC5
+
  Revision 0.9.2.19  2006/06/22 13:11:33  brian
  - more optmization tweaks and fixes
 
@@ -113,10 +116,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/06/22 13:11:33 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/07/07 20:59:09 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/06/22 13:11:33 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/07/07 20:59:09 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -129,7 +132,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __OS7_EXTERN_INLINE INLINE streamscall
+#define __OS7_EXTERN_INLINE __inline__ streamscall
 
 #define _OS7_SOURCE
 
@@ -137,7 +140,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/06/22 13:11:33 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/07/07 20:59:09 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -418,7 +421,7 @@ EXPORT_SYMBOL_NOVERS(ss7_unlockq);
  * queue in the flow and QR_ABSORBED returned, otherwise, the directional flag is cleared and
  * QR_DONE returned.
  */
-STATIC INLINE fastcall int
+STATIC INLINE streams_fastcall int
 ss7_flushq(queue_t *q, mblk_t *mp, const unsigned char flag)
 {
 	if (mp->b_rptr[0] & flag) {

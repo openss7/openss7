@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.45 $) $Date: 2006/05/08 03:12:23 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.46 $) $Date: 2006/07/07 21:17:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:12:23 $ by $Author: brian $
+# Last Modified $Date: 2006/07/07 21:17:36 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.46  2006/07/07 21:17:36  brian
+# - corrections for compile of FC5 with 2.6.17 kernel
+#
 # Revision 1.1.6.45  2006/05/08 03:12:23  brian
 # - added module id base to strconf
 #
@@ -631,7 +634,8 @@ dnl
 			  struct file_system_type.get_sb,
 			  struct super_operations.read_inode2,
 			  struct kstatfs.f_type,
-			  struct kobject.kref], [:], [:], [
+			  struct kobject.kref,
+			  struct inode.i_mutex], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>

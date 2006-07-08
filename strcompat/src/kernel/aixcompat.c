@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/02 12:17:53 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/07 20:49:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/02 12:17:53 $ by $Author: brian $
+ Last Modified $Date: 2006/07/07 20:49:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/02 12:17:53 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/07 20:49:55 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/02 12:17:53 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/07 20:49:55 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -66,7 +66,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __AIX_EXTERN_INLINE INLINE streamscall
+#define __AIX_EXTERN_INLINE __inline__ streamscall
 
 #define _AIX_SOURCE
 
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/02 12:17:53 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/07 20:49:55 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"

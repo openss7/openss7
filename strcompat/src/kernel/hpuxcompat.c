@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/22 13:11:32 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/07 20:49:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:32 $ by $Author: brian $
+ Last Modified $Date: 2006/07/07 20:49:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/22 13:11:32 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/07 20:49:55 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/22 13:11:32 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/07 20:49:55 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -66,7 +66,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __HPUX_EXTERN_INLINE INLINE streamscall
+#define __HPUX_EXTERN_INLINE __inline__ streamscall
 
 #define _HPUX_SOURCE
 
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/22 13:11:32 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/07 20:49:55 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"

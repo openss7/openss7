@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.19 $) $Date: 2006/02/20 11:38:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/02/20 11:38:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: exports.c,v $
+ Revision 1.1.1.7.4.19  2006/02/20 11:38:51  brian
+ - corrections for some 64bit architectures, from patches
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.18 $) $Date: 2006/01/03 13:05:22 $"
+#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.19 $) $Date: 2006/02/20 11:38:51 $"
 
 /************************************************************************
 *                       STREAMS Exported Symbols			*
@@ -209,9 +212,9 @@ EXPORT_SYMBOL_NOVERS(lis_makedevice);
 EXPORT_SYMBOL_NOVERS(lis_major);
 EXPORT_SYMBOL_NOVERS(lis_malloc);
 EXPORT_SYMBOL_NOVERS(lis_mark_mem_fcn);
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_) && !defined(_PPC64_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_) && !defined(_PPC64_LIS_) && !defined(_X86_64_LIS))
 EXPORT_SYMBOL_NOVERS(lis_membar);
-#endif				/* S390 or S390X or HPPA or PPC64 */
+#endif				/* S390 or S390X or HPPA or PPC64 or X86_64 */
 EXPORT_SYMBOL_NOVERS(lis_milli_to_ticks);
 EXPORT_SYMBOL_NOVERS(lis_mknod);
 EXPORT_SYMBOL_NOVERS(lis_msecs);
@@ -341,7 +344,7 @@ EXPORT_SYMBOL_NOVERS(lis_secs);
 EXPORT_SYMBOL_NOVERS(lis_sem_alloc);
 EXPORT_SYMBOL_NOVERS(lis_sem_destroy);
 EXPORT_SYMBOL_NOVERS(lis_sem_init);
-EXPORT_SYMBOL_NOVERS(lis_setq); /* for clone and friends */
+EXPORT_SYMBOL_NOVERS(lis_setq);	/* for clone and friends */
 #ifdef HAVE_KFUNC_SLEEP_ON
 EXPORT_SYMBOL_NOVERS(lis_sleep_on);
 #endif
@@ -441,6 +444,7 @@ EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_page_to_dma);
 #endif
 #endif				/* 2.4.13 */
 
+#if (!defined(_X86_64_LIS))
 /*
  * Wrapper functions
  */
@@ -458,5 +462,6 @@ EXPORT_SYMBOL_NOVERS(__wrap_strlen);
 EXPORT_SYMBOL_NOVERS(__wrap_memset);
 EXPORT_SYMBOL_NOVERS(__wrap_memcpy);
 EXPORT_SYMBOL_NOVERS(__wrap_memcmp);
+#endif				/* X86_64 */
 
 #endif				/* S390 or S390X or HPPA or PPC64 */

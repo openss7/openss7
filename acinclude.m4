@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/03/21 13:24:07 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/07/07 21:31:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/21 13:24:07 $ by $Author: brian $
+# Last Modified $Date: 2006/07/07 21:31:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -277,38 +277,82 @@ AC_DEFUN([_OS7_SETUP], [dnl
     _LINUX_DEVFS
 dnl _GENKSYMS
     _OS7_CONFIG_KERNEL
+    with_lis='yes'
+    with_lfs='yes'
     if test :"${with_LIS:-no}" = :no ; then
-	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lis --without-lis\""
-	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lis'"
-	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-lis"
 	with_lis='no'
     fi
     if test :"${with_STREAMS:-yes}" = :no ; then
+	with_lfs='no'
+    fi
+dnl
+dnl Make this darn specific
+dnl
+    if test :"${with_lis}" = :yes ; then
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lis --with-lis\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lis'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lis"
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lis --without-lis\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lis'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-lis"
+    fi
+    if test :"${with_lfs}" = :yes ; then
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lfs --with-lfs\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lfs'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lfs"
+    else
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lfs --without-lfs\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lfs'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-lfs"
-	with_lfs='no'
     fi
     if test :"${with_LIS:-no}" != :no -o :"${with_STREAMS:-yes}" != :no ; then
 	_LINUX_STREAMS
     fi
+dnl
+dnl Make this darn specific too
+dnl
     if test :"${with_STRCOMPAT:-yes}" != :no ; then
 	_STRCOMP
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_compat --without-compat\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-compat'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-compat"
     fi
     if test :"${with_STRXNS:-yes}" != :no ; then
 	_XNS
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_xns --without-xns\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-xns'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-xns"
     fi
     if test :"${with_STRXNET:-yes}" != :no ; then
 	_XTI
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_xti --without-xti\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-xti'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-xti"
     fi
     if test :"${with_STRINET:-yes}" != :no ; then
 	_INET
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_inet --without-inet\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-inet'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-inet"
     fi
     if test :"${with_STRSCTP:-yes}" != :no ; then
 	_SCTP
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_sctp --without-sctp\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-sctp'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-sctp"
     fi
     if test :"${with_STACKS:-yes}" != :no ; then
 	_SS7
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_ss7 --without-ss7\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-ss7'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-ss7"
     fi
 ])# _OS7_SETUP
 # =============================================================================
