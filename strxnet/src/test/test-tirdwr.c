@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/02/23 11:51:08 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:38 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/23 11:51:08 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 07:26:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.26  2006/07/08 07:26:38  brian
+ - removed trigraphs
+
  Revision 0.9.2.25  2006/02/23 11:51:08  brian
  - updated headers
 
@@ -126,9 +129,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/02/23 11:51:08 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:38 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/02/23 11:51:08 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:38 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -1959,7 +1962,7 @@ prim_string(ulong prim)
 	case T_CAPABILITY_ACK:
 		return ("T_CAPABILITY_ACK");
 	default:
-		return ("T_????_???------");
+		return ("T_????_??? -----");
 	}
 }
 

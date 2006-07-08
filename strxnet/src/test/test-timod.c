@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/03/27 01:25:52 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:38 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/27 01:25:52 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 07:26:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.26  2006/07/08 07:26:38  brian
+ - removed trigraphs
+
  Revision 0.9.2.25  2006/03/27 01:25:52  brian
  - working up IP driver and SCTP testing
 
@@ -126,9 +129,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/03/27 01:25:52 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:38 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/03/27 01:25:52 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:38 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -1969,7 +1972,7 @@ prim_string(t_uscalar_t prim)
 	case T_CAPABILITY_ACK:
 		return ("T_CAPABILITY_ACK");
 	default:
-		return ("T_????_???------");
+		return ("T_????_??? -----");
 	}
 }
 

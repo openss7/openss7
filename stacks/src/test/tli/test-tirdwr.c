@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 12:06:14 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/08 07:25:45 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 12:06:14 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 07:25:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.9  2006/07/08 07:25:45  brian
+ - removed trigraphs
+
  Revision 0.9.2.8  2006/03/03 12:06:14  brian
  - 32/64-bit compatibility
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 12:06:14 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/08 07:25:45 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 12:06:14 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/08 07:25:45 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -1752,7 +1755,7 @@ do_decode_ctrl(int fd, struct strbuf *ctrl, struct strbuf *data)
 		default:
 			if (verbose) {
 				lockf(fileno(stdout), F_LOCK, 0);
-				fprintf(stdout, "<-T_????_???--------|  |                               |                    [%d]\n", state);
+				fprintf(stdout, "<-T_????_??? -------|  |                               |                    [%d]\n", state);
 				fflush(stdout);
 				lockf(fileno(stdout), F_ULOCK, 0);
 			}
@@ -1895,7 +1898,7 @@ do_decode_ctrl(int fd, struct strbuf *ctrl, struct strbuf *data)
 		default:
 			if (verbose) {
 				lockf(fileno(stdout), F_LOCK, 0);
-				fprintf(stdout, "                    |  |- - - - - - - - - - - - - - - >|--T_????_???------> (%d)\n", state);
+				fprintf(stdout, "                    |  |- - - - - - - - - - - - - - - >|--T_????_??? -----> (%d)\n", state);
 				fflush(stdout);
 				lockf(fileno(stdout), F_ULOCK, 0);
 			}

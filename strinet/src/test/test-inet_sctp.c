@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/19 12:29:17 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/08 07:25:56 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/19 12:29:17 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 07:25:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.24  2006/07/08 07:25:56  brian
+ - removed trigraphs
+
  Revision 0.9.2.23  2006/05/19 12:29:17  brian
  - results of testing, almost full pass
 
@@ -196,9 +199,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/19 12:29:17 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/08 07:25:56 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/05/19 12:29:17 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/08 07:25:56 $";
 
 /*
  *  Simple test program for INET streams.
@@ -2255,7 +2258,7 @@ prim_string(t_uscalar_t prim)
 	case T_CAPABILITY_ACK:
 		return ("T_CAPABILITY_ACK");
 	default:
-		return ("T_????_???------");
+		return ("T_????_??? -----");
 	}
 }
 

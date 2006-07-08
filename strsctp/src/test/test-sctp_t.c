@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/25 10:20:32 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/07/08 07:26:26 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/25 10:20:32 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 07:26:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.16  2006/07/08 07:26:26  brian
+ - removed trigraphs
+
  Revision 0.9.2.15  2006/03/25 10:20:32  brian
  - working up ETSI test cases for SCTP
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/25 10:20:32 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/07/08 07:26:26 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/25 10:20:32 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/07/08 07:26:26 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -2150,7 +2153,7 @@ prim_string(t_uscalar_t prim)
 	case T_CAPABILITY_ACK:
 		return ("T_CAPABILITY_ACK");
 	default:
-		return ("T_????_???------");
+		return ("T_????_??? -----");
 	}
 }
 

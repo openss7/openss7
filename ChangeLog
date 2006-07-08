@@ -1,3 +1,10 @@
+2006-07-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: bumped version to release candidate 2
+	* NEWS: bumped version to release candidate 2
+	* debian/changelog: bumped version to release candidate 2
+	* debian/rules.in: clean deb package master build
+
 2006-07-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/copyright: typo

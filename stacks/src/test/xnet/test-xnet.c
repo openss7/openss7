@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 12:06:14 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/08 07:25:46 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 12:06:14 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 07:25:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.9  2006/07/08 07:25:46  brian
+ - removed trigraphs
+
  Revision 0.9.2.8  2006/03/03 12:06:14  brian
  - 32/64-bit compatibility
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 12:06:14 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/08 07:25:46 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 12:06:14 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/08 07:25:46 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -2457,7 +2460,7 @@ do_decode_ctrl(int fd, struct strbuf *ctrl, struct strbuf *data)
 		default:
 			if (verbose) {
 				lockf(fileno(stdout), F_LOCK, 0);
-				fprintf(stdout, "<-T_????_???--------|  |                               |                    [%d]\n", state);
+				fprintf(stdout, "<-T_????_??? -------|  |                               |                    [%d]\n", state);
 				fflush(stdout);
 				lockf(fileno(stdout), F_ULOCK, 0);
 			}
@@ -2604,7 +2607,7 @@ do_decode_ctrl(int fd, struct strbuf *ctrl, struct strbuf *data)
 		default:
 			if (verbose) {
 				lockf(fileno(stdout), F_LOCK, 0);
-				fprintf(stdout, "                    |  |- - - - - - - - - - - - - - - >|--T_????_???------> (%d)\n", state);
+				fprintf(stdout, "                    |  |- - - - - - - - - - - - - - - >|--T_????_??? -----> (%d)\n", state);
 				fflush(stdout);
 				lockf(fileno(stdout), F_ULOCK, 0);
 			}

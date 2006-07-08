@@ -1,8 +1,12 @@
-OpenSS7 Iperf -- history of user-visible changes.  2006-03-23
+OpenSS7 Iperf -- history of user-visible changes.  2006-07-08
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes in iperf-2.0.5-rc2
+
+  Second release candidate.
+
 * Major changes in iperf-2.0.5rc1
 
   Release candidate for Mark Fugate.

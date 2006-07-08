@@ -1,3 +1,18 @@
+2006-07-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: bumped version to release candidate 2
+	* NEWS: bumped version to release candidate 2
+	* debian/changelog: bumped version to release candidate 2
+	* debian/rules.in: clean deb package master build
+	* src/test/test-inet_raw.c: removed trigraphs
+	* src/test/test-inet_sctp.c: removed trigraphs
+	* src/test/test-inet_tcp.c: removed trigraphs
+	* src/test/test-inet_udp.c: removed trigraphs
+	* acinclude.m4: handle old SLES 9 2.6.5 kernel
+	* src/drivers/rawip.c: handle old SLES 9 2.6.5 kernel
+	* src/drivers/tcp.c: handle old SLES 9 2.6.5 kernel
+	* src/drivers/udp.c: handle old SLES 9 2.6.5 kernel
+
 2006-07-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/copyright: typo

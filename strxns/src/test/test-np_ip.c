@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/13 02:43:35 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/08 07:26:47 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/13 02:43:35 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 07:26:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.14  2006/07/08 07:26:47  brian
+ - removed trigraphs
+
  Revision 0.9.2.13  2006/05/13 02:43:35  brian
  - corrections for 2.4 testing
 
@@ -111,9 +114,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/13 02:43:35 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/08 07:26:47 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/13 02:43:35 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/08 07:26:47 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -1953,7 +1956,7 @@ prim_string(np_ulong prim)
 	case N_DATACK_IND:
 		return ("N_DATACK_IND----");
 	default:
-		return ("N_????_???------");
+		return ("N_????_??? -----");
 	}
 }
 

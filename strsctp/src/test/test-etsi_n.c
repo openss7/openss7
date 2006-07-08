@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 12:48:21 $
+ @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/07/08 07:26:25 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 12:48:21 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 07:26:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_n.c,v $
+ Revision 0.9.2.3  2006/07/08 07:26:25  brian
+ - removed trigraphs
+
  Revision 0.9.2.2  2006/05/08 12:48:21  brian
  - duplicate enum
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 12:48:21 $"
+#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/07/08 07:26:25 $"
 
-static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 12:48:21 $";
+static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/07/08 07:26:25 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -2243,7 +2246,7 @@ prim_string(t_uscalar_t prim)
 	case T_CAPABILITY_ACK:
 		return ("T_CAPABILITY_ACK");
 	default:
-		return ("T_????_???------");
+		return ("T_????_??? -----");
 	}
 }
 

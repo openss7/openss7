@@ -1,3 +1,9 @@
+strsctp (0.9.2.6-rc2-0) experimental; urgency=low
+
+  * Second release candidate.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Fri,  7 Jul 2006 19:14:29 -0600
+
 strsctp (0.9.2.6rc1-0) experimental; urgency=low
 
   * Release candidate for Mark.

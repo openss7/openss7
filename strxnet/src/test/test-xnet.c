@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/02/23 11:51:09 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:39 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/23 11:51:09 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 07:26:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.26  2006/07/08 07:26:39  brian
+ - removed trigraphs
+
  Revision 0.9.2.25  2006/02/23 11:51:09  brian
  - updated headers
 
@@ -126,9 +129,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/02/23 11:51:09 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:39 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/02/23 11:51:09 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:39 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -2081,7 +2084,7 @@ prim_string(ulong prim)
 	case T_CAPABILITY_ACK:
 		return ("T_CAPABILITY_ACK");
 	default:
-		return ("T_????_???------");
+		return ("T_????_??? -----");
 	}
 }
 
