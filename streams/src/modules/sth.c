@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2006/06/30 01:12:15 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2006/07/08 09:37:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/30 01:12:15 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 09:37:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.157  2006/07/08 09:37:46  brian
+ - handle old SLES 9 2.6.5 kernel (untested)
+
  Revision 0.9.2.156  2006/06/30 01:12:15  brian
  - fixed buffer overflow introduced with alloc_data() (thanks to git bisect)
 
@@ -104,10 +107,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2006/06/30 01:12:15 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2006/07/08 09:37:46 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2006/06/30 01:12:15 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2006/07/08 09:37:46 $";
 
 //#define __NO_VERSION__
 
@@ -140,7 +143,7 @@ static char const ident[] =
 #define __user
 #endif
 
-#ifdef __LP64__
+#if defined __LP64__ && defined CONFIG_COMPAT
 #  undef WITH_32BIT_CONVERSION
 #  define WITH_32BIT_CONVERSION 1
 #endif
@@ -203,7 +206,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2006/06/30 01:12:15 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2006/07/08 09:37:46 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -9741,7 +9744,7 @@ streams_override_ioctl32_conversion(struct ioctl_trans *t)
 {
 	unsigned long hash = ioctl32_hash(t->cmd);
 
-#if defined WITH_KO_MODULES
+#if defined HAVE_IOCTL32_SEM_ADDR
 	down_write(&ioctl32_sem);
 #else
 	lock_kernel();
@@ -9749,7 +9752,7 @@ streams_override_ioctl32_conversion(struct ioctl_trans *t)
 	/* just place ourselves at the head of each hash list */
 	t->next = ioctl32_hash_table[hash];
 	ioctl32_hash_table[hash] = t;
-#if defined WITH_KO_MODULES
+#if defined HAVE_IOCTL32_SEM_ADDR
 	up_write(&ioctl32_sem);
 #else
 	unlock_kernel();
@@ -9763,7 +9766,7 @@ streams_release_ioctl32_conversion(struct ioctl_trans *t)
 	struct ioctl_trans **tp;
 	unsigned long hash = ioctl32_hash(t->cmd);
 
-#if defined WITH_KO_MODULES
+#if defined HAVE_IOCTL32_SEM_ADDR
 	down_write(&ioctl32_sem);
 #else
 	lock_kernel();
@@ -9777,7 +9780,7 @@ streams_release_ioctl32_conversion(struct ioctl_trans *t)
 	} else {
 		swerr();
 	}
-#if defined WITH_KO_MODULES
+#if defined HAVE_IOCTL32_SEM_ADDR
 	up_write(&ioctl32_sem);
 #else
 	unlock_kernel();

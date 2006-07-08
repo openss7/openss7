@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/07/07 21:14:53 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/07/08 09:37:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/07 21:14:53 $ by $Author: brian $
+# Last Modified $Date: 2006/07/08 09:37:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -396,6 +396,7 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
 #include <linux/time.h>		/* for struct timespec */
+#include <net/sock.h>
 #include <net/protocol.h>
 ])
     _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [

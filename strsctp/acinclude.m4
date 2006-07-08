@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/07/02 12:26:22 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/07/08 09:37:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/02 12:26:22 $ by $Author: brian $
+# Last Modified $Date: 2006/07/08 09:37:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -438,6 +438,7 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
 #include <linux/time.h>		/* for struct timespec */
+#include <net/sock.h>
 #include <net/protocol.h>
 ])
     _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [

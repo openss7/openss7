@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/07/07 21:14:59 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/07/08 09:37:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/07 21:14:59 $ by $Author: brian $
+ Last Modified $Date: 2006/07/08 09:37:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.40  2006/07/08 09:37:52  brian
+ - handle old SLES 9 2.6.5 kernel (untested)
+
  Revision 0.9.2.39  2006/07/07 21:14:59  brian
  - correct compile back to RH 7.2
 
@@ -170,10 +173,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/07/07 21:14:59 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/07/08 09:37:52 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/07/07 21:14:59 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/07/08 09:37:52 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -252,7 +255,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/07/07 21:14:59 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/07/08 09:37:52 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -3572,8 +3575,11 @@ tp_v4_rcv_next(struct sk_buff *skb)
 
 	proto = skb->nh.iph->protocol;
 	kfree_skb(skb);
-	if ((pb = udp_prots[proto]))
+	pb = udp_prots[proto];
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
+	if (pb)
 		return (pb->prot.copy != 0);
+#endif
 	return (0);
 #endif
 }
@@ -3667,13 +3673,24 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 		pp = &pb->prot;
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
 		(void) hash;
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 		pp->protocol = proto;
 		pp->name = "streams-ip";
+#endif
 		pp->handler = &tp_v4_rcv;
 		pp->err_handler = &tp_v4_err;
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
 		pp->copy = 0;
 		pp->next = NULL;
+#endif
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
+		pp->no_policy = 1;
+#endif
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 		inet_add_protocol(pp);
+#else
+		inet_add_protocol(pp, proto);
+#endif
 #elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO
 		pp->proto.proto = proto;
@@ -3740,7 +3757,11 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 			struct inet_protocol *pp = &pb->prot;
 
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 			inet_del_protocol(pp);
+#else
+			inet_del_protocol(pp, proto);
+#endif
 			/* unlink from hash slot */
 			udp_prots[proto] = NULL;
 #elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
