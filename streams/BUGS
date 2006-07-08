@@ -1,0 +1,101 @@
+OpenSS7 Linux Fast-STREAMS -- bug list.  2006-07-05
+$Id: BUGS,v 1.1.2.1 2006/07/07 21:32:41 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+5.5.2 Known Defects
+-------------------
+
+With the exception of packages not originaly created by the `OpenSS7 Project',
+the `OpenSS7 Project' software does not ship with known bugs in any release
+stage except "pre-alpha".  "Linux Fast-STREAMS" had no known bugs at the time
+of release.
+
+Nevertheless, this file contains bugs encountered during development and
+their resolutions.  The OpenSS7 Project does not release software with
+known bugs, so this list serves two purposes:
+
+1. It captures bugs encountered between releases during development that
+   could possibly reoccur (and the Moon is made of blue cheese).  It
+   therefore provides a place for users to look if they encounter a
+   problem.
+
+2. I provides a low overhead bug list between releases for developers to
+   use as a TODO list.
+
+Bugs
+----
+
+001. 2006-07-05T21:54:49+0000
+
+     Fedora Core 5 reports a rwlock bug during udp module unloading as
+     follows:
+
+     BUG: rwlock wrong CPU on CPU#0, rmmod/7515
+     Call Trace:
+       {rwlock_bug+100}
+       {_raw_write_unlock+88}
+       {:streams:unregister_strnod+211}
+       {:streams:unregister_clone+64}
+       {:streams:unregister_strdev+24}
+       {:streams_udp:udpterminate+26}
+       {sys_delete_module+406}
+       {system_call+126}
+
+     It appears that unregister_strnod() is scheduling while holding a
+     write lock on cdevsw_lock.  This is probably in iput() called
+     within cmin_del.
+
+
+=========================================================================
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by
+ the source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and the
+ Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
