@@ -1,9 +1,42 @@
-OpenSS7 Linux Fast STREAMS -- things to do.  2006-06-16
+OpenSS7 Linux Fast STREAMS -- things to do.  2006-07-09
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 Things to do:
+
+- Add a tail padding amount to the stream head as a option to facilitate
+  conversion of mblks to sk_bufs.
+
+  DONE: Implemented as SO_WRPAD.
+
+- Socket buffer handling:
+
+  1. Rather than write offset and padding, why not provide a flag (e.g.
+     SO_SKBUFF) to indicate to the stream head to allocate an sk_buff
+     with the message block and share buffers between mblk and sk_buff,
+     then, the sk_buff can be used without allocation in the bottom
+     half.  esballoc() and alloc_skbuff() can be used to set up the
+     message block.  dup() could be made aware of the hidden sk_buff and
+     increment the shared sk_buff count as well.  Also, msgpullup() and
+     pullupmsg() could be made aware of message blocks containing
+     sk_buffs and have them do the appropriate thing.
+
+  2. The other thing that is needed is some way to tell the other end of
+     a loopback connection that the sk_buff it has received already has
+     an mblk attached to it as above.  Then the message block could be
+     simply passed upstream and one would not need to be esballoc'ed for
+     it.
+
+  3. Another thing is to provide the ability to partial checksum and
+     copy data from user into these sk_buffs, but setting an SO_CSUM
+     flag along with the SO_SKBUFF flag to indicate the type of checksum
+     to perform.
+
+  The combination of the above three items should provide some serious
+  performance gains for Linux networking based stream heads.
+
+  TODO: Implement these three items.
 
 - Had another look at specfs, devfs and udev.  It looks like we can
   create minor device nodes within /dev (not just /dev/streams) using
@@ -241,4 +274,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: tw=72 nocindent
+vim: tw=72 nocindent fo=tcqlorn
