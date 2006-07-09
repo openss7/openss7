@@ -1,5 +1,5 @@
 OpenSS7 Netperf -- readme first file.  2006-07-03
-$Id$
+$Id: README,v 1.1.1.6 2006/07/09 10:33:11 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -33,6 +33,8 @@ specific licensing terms (if any) can be found in the file LICENSING.
 Please respect these licensing arrangements.  If you are interested in
 different licensing terms, please contact the copyright holder, OpenSS7
 Corporation, http://www.openss7.com/ or mailto:bidulock@openss7.org.
+
+See README-alpha (if it exists) for alpha release information.
 
 Prerequisites
 -------------
@@ -82,17 +84,39 @@ validate, uninstall and remove the package:
 	wget http://www.openss7.org/tarballs/netperf-2.3.4.tar.bz2
 	tar -xjvf netperf-2.3.4.tar.bz2
 	mkdir build
-	cd build
-	../netperf-2.3.4/configure
+	pushd build
+	../netperf-2.3.4/configure --enable-autotest
 	make
 	make check
 	sudo make install
 	sudo make installcheck
 	sudo make uninstall
-	cd ..
+	popd
 	sudo rm -rf build
 	rm -rf netperf-2.3.4.
 	rm -f netperf-2.3.4.tar.bz2
+
+If you have problems, try building with the logging targets instead.  If
+the make of a logging target fails, an automatic problem report will be
+generated that can be mailed to The OpenSS7 Project.  Installation using
+the logging targets proceeds as follows:
+
+	wget http://www.openss7.org/tarballs/netperf-2.3.4.tar.bz2
+	tar -xjvf netperf-2.3.4.tar.bz2
+	mkdir build
+	pushd build
+	../netperf-2.3.4/configure --enable-autotest
+	make compile.log
+	make check.log
+	sudo make install.log
+	sudo make installcheck.log
+	sudo make uninstall.log
+	popd
+	sudo rm -rf build
+	rm -rf netperf-2.3.4.
+	rm -f netperf-2.3.4.tar.bz2
+
+See README-make for additional specialized make targets.
 
 For custom applications, see the INSTALL and INSTALL-netperf files or
 the installation and reference manual as listed below.  If you encounter
@@ -207,6 +231,9 @@ package has been installed by invoking the `installcheck' target.  This
 target can either be invoked as root, or as a normal user, like so:
 
 	make installcheck
+
+(Note: you must add the --enable-autotest flag to `configure', above for
+ the testsuites to be invoked with `make installcheck'.)
 
 The package can be cleanly removed by invoking the `uninstall' target
 (as root):
