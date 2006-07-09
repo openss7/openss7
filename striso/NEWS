@@ -4,7 +4,7 @@ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-* Initial release striso-0.9.2.1
+* Initial release striso-0.9.2.1.rc2
 
   Initial autoconf/RPM packaging of the `striso' release.
 
