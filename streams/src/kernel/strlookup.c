@@ -1186,6 +1186,8 @@ sdev_rel(struct cdevsw *cdev)
 	cdev->d_inode = NULL;
 }
 
+EXPORT_SYMBOL_NOVERS(sdev_rel);
+
 streams_fastcall void
 cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 {
