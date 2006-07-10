@@ -8089,34 +8089,48 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 				register int i;
 
 				/* only listening T_COTS(_ORD) Streams and T_CLTS Streams */
-				if (tp->CONIND_number == 0 && tp->info.SERV_type != T_CLTS)
+				if (tp->CONIND_number == 0 && tp->info.SERV_type != T_CLTS) {
+					__trace();
 					continue;
+				}
 				/* only Streams in close to the correct state */
-				if (tp_not_state(tp, (TSF_IDLE|TSF_WACK_CREQ)))
+				if (tp_not_state(tp, (TSF_IDLE|TSF_WACK_CREQ))) {
+					__trace();
 					continue;
+				}
 				for (i = 0; i < tp->pnum; i++) {
-					if (tp->protoids[i] != proto)
+					if (tp->protoids[i] != proto) {
+						__trace();
 						continue;
+					}
 					break;
 				}
-				if (i >= tp->pnum)
+				if (i >= tp->pnum) {
+					__trace();
 					continue;
+				}
 				if (tp->bport != 0) {
-					if (tp->bport != dport)
+					if (tp->bport != dport) {
+						__trace();
 						continue;
+					}
 					score++;
 				}
 
 				for (i = 0; i < tp->bnum; i++) {
 					if (tp->baddrs[i].addr == 0)
 						break;
-					if (tp->baddrs[i].addr != daddr)
+					if (tp->baddrs[i].addr != daddr) {
+						__trace();
 						continue;
+					}
 					score++;
 					break;
 				}
-				if (i >= tp->bnum)
+				if (i >= tp->bnum) {
+					__trace();
 					continue;
+				}
 				if (score > hiscore) {
 					hiscore = score;
 					if (result != NULL)
@@ -8130,7 +8144,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 		}
 		read_unlock_bh(&hp->lock);
 	} while (hiscore < 2 && hp != hp2 && (hp = hp2));
-	usual(result);
+	__usual(result);
 	return (result);
 }
 
@@ -8165,9 +8179,12 @@ tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
 			      done:
 				read_unlock_bh(&udp_prot_lock);
 				return (result);
-			}
-		}
-	}
+			} else
+				__rare();
+		} else
+			__rare();
+	} else
+		__rare();
 	result = tp_lookup_common_slow(pp, proto, daddr, dport, saddr, sport);
 	goto done;
 }
