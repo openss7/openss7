@@ -5,6 +5,7 @@
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -128,13 +129,13 @@ struct strevent {
 		} e;			/* stream event */
 		struct {
 			queue_t *queue;
-			void streamscall(*func) (long);
+			void streamscall (*func) (long);
 			long arg;
 			size_t size;
 		} b;			/* bufcall event */
 		struct {
 			queue_t *queue;
-			void streamscall(*func) (caddr_t);
+			void streamscall (*func) (caddr_t);
 			caddr_t arg;
 			int pl;
 			int cpu;
@@ -142,7 +143,7 @@ struct strevent {
 		} t;			/* timeout event */
 		struct {
 			queue_t *queue;
-			void streamscall(*func) (void *);
+			void streamscall (*func) (void *);
 			void *arg;
 			queue_t *q1, *q2, *q3, *q4;
 		} w;			/* weld request */
@@ -242,7 +243,7 @@ struct stdata {
 	struct fasync_struct *sd_fasync;	/* list of procs for SIGIO */
 	// struct pollhead sd_polllist; /* list of poll wakeup functions */
 	wait_queue_head_t sd_polllist;	/* waiters on poll */
-//	wait_queue_head_t sd_waitq;	/* waiters */
+//      wait_queue_head_t sd_waitq;     /* waiters */
 	wait_queue_head_t sd_rwaitq;	/* waiters on read/getmsg/getpmsg/I_RECVFD */
 	wait_queue_head_t sd_wwaitq;	/* waiters on write/putmsg/putpmsg/I_SENDFD */
 	wait_queue_head_t sd_iwaitq;	/* waiters on ioctl */
@@ -340,7 +341,6 @@ enum {
 #define STRMOUNT    (1<<STRMOUNT_BIT)	/* stream head is fattached */
 #define STRCSUM	    (1<<STRCSUM_BIT)	/* checksum on copyin for write (UDP/TCP) */
 #define STRCRC32C   (1<<STRCRC32C_BIT)	/* checksum on copyin for write (CRC32C) */
-
 
 /* unfortunately AIX appears to mix read and write option flags with stream head flags */
 #if 0				/* AIX compatible flags */
@@ -513,6 +513,7 @@ struct mbinfo {
 	struct list_head m_list;
 #endif
 };
+
 /* additional 8 bytes on 32-bit, 16 on 64-bit, debug mode */
 struct dbinfo {
 	dblk_t d_dblock;
@@ -607,7 +608,7 @@ struct mdbblock {
 
 /* from strsched.c */
 __STREAMS_EXTERN bcid_t __bufcall(queue_t *q, unsigned size, int priority,
-				  void streamscall(*function) (long), long arg);
+				  void streamscall (*function) (long), long arg);
 __STREAMS_EXTERN toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
 				  unsigned long pl, int cpu);
 
@@ -621,9 +622,9 @@ extern struct list_head fmodsw_list;	/* Modules go here */
 #if 0
 __STREAMS_EXTERN struct list_head cminsw_list;	/* Minors go here */
 #endif
-extern int cdev_count;	/* Driver count */
-extern int fmod_count;	/* Module count */
-extern int cmin_count;	/* Node count */
+extern int cdev_count;			/* Driver count */
+extern int fmod_count;			/* Module count */
+extern int cmin_count;			/* Node count */
 __STREAMS_EXTERN struct devnode *__cmaj_lookup(major_t major);
 __STREAMS_EXTERN struct cdevsw *__cdev_lookup(major_t major);
 __STREAMS_EXTERN struct cdevsw *__cdrv_lookup(modID_t modid);
@@ -655,13 +656,15 @@ __STREAMS_EXTERN int register_cmajor(struct cdevsw *cdev, major_t major,
 __STREAMS_EXTERN int unregister_cmajor(struct cdevsw *cdev, major_t major);
 
 /* other internals */
-__STREAMS_EXTERN int sdev_add(struct cdevsw *cdev, modID_t modid);
+__STREAMS_EXTERN int sdev_ini(struct cdevsw *cdev, modID_t modid);
+__STREAMS_EXTERN int sdev_add(struct cdevsw *cdev);
 __STREAMS_EXTERN void sdev_del(struct cdevsw *cdev);
 __STREAMS_EXTERN void sdev_rel(struct cdevsw *cdev);
 extern rwlock_t cdevsw_lock;
 __STREAMS_EXTERN void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
 __STREAMS_EXTERN void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
-__STREAMS_EXTERN int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
+__STREAMS_EXTERN int cmin_ini(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
+__STREAMS_EXTERN int cmin_add(struct devnode *cmin, struct cdevsw *cdev);
 __STREAMS_EXTERN void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
 __STREAMS_EXTERN void cmin_rel(struct devnode *cmin);
 

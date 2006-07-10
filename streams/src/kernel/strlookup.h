@@ -4,14 +4,14 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -71,12 +71,14 @@ extern struct list_head fmodsw_list;
 
 __STREAMS_EXTERN void fmod_add(struct fmodsw *fmod, modID_t modid);
 __STREAMS_EXTERN void fmod_del(struct fmodsw *fmod);
-__STREAMS_EXTERN int sdev_add(struct cdevsw *cdev, modID_t modid);
+__STREAMS_EXTERN int sdev_ini(struct cdevsw *cdev, modID_t modid);
+__STREAMS_EXTERN int sdev_add(struct cdevsw *cdev);
 __STREAMS_EXTERN void sdev_del(struct cdevsw *cdev);
 __STREAMS_EXTERN void sdev_rel(struct cdevsw *cdev);
 __STREAMS_EXTERN void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
 __STREAMS_EXTERN void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
-__STREAMS_EXTERN int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
+__STREAMS_EXTERN int cmin_ini(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
+__STREAMS_EXTERN int cmin_add(struct devnode *cmin, struct cdevsw *cdev);
 __STREAMS_EXTERN void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
 __STREAMS_EXTERN void cmin_rel(struct devnode *cmin);
 

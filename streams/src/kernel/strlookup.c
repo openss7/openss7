@@ -4,15 +4,14 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -132,12 +131,14 @@ static char const ident[] =
 
 rwlock_t cdevsw_lock = RW_LOCK_UNLOCKED;
 rwlock_t fmodsw_lock = RW_LOCK_UNLOCKED;
+
 #if 0
 rwlock_t cminsw_lock = RW_LOCK_UNLOCKED;
 #endif
 
 struct list_head cdevsw_list = LIST_HEAD_INIT(cdevsw_list);	/* Devices go here */
 struct list_head fmodsw_list = LIST_HEAD_INIT(fmodsw_list);	/* Modules go here */
+
 #if 0
 struct list_head cminsw_list = LIST_HEAD_INIT(cminsw_list);	/* Minors go here */
 #endif
@@ -427,10 +428,10 @@ cdev_grab(struct cdevsw *cdev)
 		if (cdev->d_str) {
 			if (try_module_get(cdev->d_kmod)) {
 				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
-					cdev->d_name));
+					 cdev->d_name));
 				_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
-					cdev->d_name, cdev->d_kmod->name,
-					module_refcount(cdev->d_kmod)));
+					 cdev->d_name, cdev->d_kmod->name,
+					 module_refcount(cdev->d_kmod)));
 				return (cdev);
 			}
 		}
@@ -448,10 +449,10 @@ fmod_grab(struct fmodsw *fmod)
 		if (fmod->f_str) {
 			if (try_module_get(fmod->f_kmod)) {
 				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
-					fmod->f_name));
+					 fmod->f_name));
 				_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
-					fmod->f_name, fmod->f_kmod->name,
-					module_refcount(fmod->f_kmod)));
+					 fmod->f_name, fmod->f_kmod->name,
+					 module_refcount(fmod->f_kmod)));
 				return (fmod);
 			}
 		}
@@ -701,10 +702,10 @@ cdev_search(const char *name, int load)
 		if (cdev && cdev->d_str)
 			if (try_module_get(cdev->d_kmod)) {
 				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
-					cdev->d_name));
+					 cdev->d_name));
 				_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
-					cdev->d_name, cdev->d_kmod->name,
-					module_refcount(cdev->d_kmod)));
+					 cdev->d_name, cdev->d_kmod->name,
+					 module_refcount(cdev->d_kmod)));
 				break;
 			}
 		cdev = NULL;
@@ -752,7 +753,7 @@ fmod_search(const char *name, int load)
 		if (fmod && fmod->f_str)
 			if (try_module_get(fmod->f_kmod)) {
 				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
-					fmod->f_name));
+					 fmod->f_name));
 				break;
 			}
 		fmod = NULL;
@@ -1104,15 +1105,14 @@ fmod_del(struct fmodsw *fmod)
 EXPORT_SYMBOL_NOVERS(fmod_del);
 
 /**
- *  sdev_add:	- add a STREAMS device to the registration list
- *  @cdev:	STREAMS device structure to add
+ *  sdev_ini:	- initialize a STREAMS device for the registration list
+ *  @cdev:	STREAMS device structure to initialize
  *  @modid:	assigned module identifier
  *
- *  Notices: sdev_add() and sdev_del() had to be renamed from cdev_add() and cdev_put() because
- *  later 2.6 kernels use those names for character devices.
+ *  Locking: spec_snode might sleep, so this needs to be called without any locks held.
  */
 streams_fastcall int
-sdev_add(struct cdevsw *cdev, modID_t modid)
+sdev_ini(struct cdevsw *cdev, modID_t modid)
 {
 	struct inode *inode;
 	dev_t dev;
@@ -1139,15 +1139,29 @@ sdev_add(struct cdevsw *cdev, modID_t modid)
 		_ptrace(("couldn't get specfs inode\n"));
 		return PTR_ERR(inode);
 	}
-
-	inode->i_sb->s_root->d_inode->i_nlink++;
 	cdev->d_inode = inode;
 	cdev->d_modid = modid;
+	return (0);
+}
+
+EXPORT_SYMBOL_NOVERS(sdev_ini);
+
+/**
+ *  sdev_add:	- add a STREAMS device to the registration list
+ *  @cdev:	STREAMS device structure to add
+ *
+ *  Notices: sdev_add() and sdev_del() had to be renamed from cdev_add() and cdev_put() because
+ *  later 2.6 kernels use those names for character devices.
+ *
+ *  Locking: this function needs to be called with the cdevsw_lock held.
+ */
+streams_fastcall int
+sdev_add(struct cdevsw *cdev)
+{
+	cdev->d_inode->i_sb->s_root->d_inode->i_nlink++;
+	/* add to list and hash */
 	list_add(&cdev->d_list, &cdevsw_list);
-	list_add(&cdev->d_hash, strmod_hash_slot(modid));
-
-	assert(cdev->d_list.next && !list_empty(&cdev->d_list));
-
+	list_add(&cdev->d_hash, strmod_hash_slot(cdev->d_modid));
 	cdev_count++;
 	return (0);
 }
@@ -1181,7 +1195,7 @@ sdev_rel(struct cdevsw *cdev)
 	inode = cdev->d_inode;
 	/* put away dentry if necessary */
 	_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
-		atomic_read(&inode->i_count) - 1));
+		 atomic_read(&inode->i_count) - 1));
 	iput(inode);
 	cdev->d_inode = NULL;
 }
@@ -1219,7 +1233,7 @@ cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 EXPORT_SYMBOL_NOVERS(cmaj_del);
 
 streams_fastcall int
-cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
+cmin_ini(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 {
 	struct inode *inode;
 	dev_t dev;
@@ -1230,7 +1244,6 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 		_ptrace(("couldn't get specfs inode\n"));
 		return PTR_ERR(inode);
 	}
-	cdev->d_inode->i_nlink++;
 	cmin->n_inode = inode;
 	cmin->n_dev = cdev;
 	cmin->n_modid = cdev->d_modid;
@@ -1241,12 +1254,20 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 		cmin->n_mode = cdev->d_mode;
 	if (!(cmin->n_mode & S_IFMT))
 		cmin->n_mode = S_IFCHR | S_IRUGO | S_IWUGO;
+	return (0);
+}
 
+EXPORT_SYMBOL_NOVERS(cmin_ini);
+
+streams_fastcall int
+cmin_add(struct devnode *cmin, struct cdevsw *cdev)
+{
 	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
+	cdev->d_inode->i_nlink++;
 	/* add to list and hash */
 	list_add(&cmin->n_list, &cdev->d_minors);
-	list_add(&cmin->n_hash, strnod_hash_slot(minor));
+	list_add(&cmin->n_hash, strnod_hash_slot(cmin->n_minor));
 	cmin_count++;
 	return (0);
 }
@@ -1256,10 +1277,10 @@ EXPORT_SYMBOL_NOVERS(cmin_add);
 streams_fastcall void
 cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 {
-	cdev->d_inode->i_nlink--;
-
 	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
+	cdev->d_inode->i_nlink--;
+	/* remove from list and hash */
 	list_del_init(&cmin->n_list);
 	list_del_init(&cmin->n_hash);
 	cmin_count--;
@@ -1275,7 +1296,7 @@ cmin_rel(struct devnode *cmin)
 	inode = cmin->n_inode;
 	/* put away inode if required */
 	_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
-		atomic_read(&inode->i_count) - 1));
+		 atomic_read(&inode->i_count) - 1));
 	iput(inode);
 	cmin->n_inode = NULL;
 	cmin->n_dev = NULL;
