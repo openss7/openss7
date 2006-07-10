@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/07/10 08:51:05 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/07/10 12:22:42 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/10 08:51:05 $ by $Author: brian $
+ Last Modified $Date: 2006/07/10 12:22:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/07/10 08:51:05 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/07/10 12:22:42 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/07/10 08:51:05 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/07/10 12:22:42 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -366,30 +365,47 @@ register_strdrv(struct cdevsw *cdev)
 				goto ebusy;
 			}
 		}
+		write_unlock(&cdevsw_lock);
 		_ptrace(("Assigned module id %hu\n", modid));
-		if ((err = sdev_add(cdev, modid))) {
+		err = sdev_ini(cdev, modid);
+		write_lock(&cdevsw_lock);
+		if (err) {
 			_ptrace(("Error path taken!\n"));
-			goto unregister_exit;
+			goto unlock_release_exit;
 		}
-		err = modid;
-		goto unlock_exit;
+		if ((err = __cdrv_lookup(modid) ? -EPERM : 0)) {
+			/* someone stole our modid while the lock was released */
+			_ptrace(("Error path taken!\n"));
+			goto unlock_release_exit;
+		}
+		if ((err = sdev_add(cdev))) {
+			_ptrace(("Error path taken!\n"));
+			goto unlock_release_exit;
+		}
+		write_unlock(&cdevsw_lock);
+		return (modid);
 	}
       eperm:
 	err = -EPERM;
-	goto unregister_exit;
+	goto unlock_unregister_exit;
       ebusy:
 	err = -EBUSY;
-	goto unregister_exit;
+	goto unlock_unregister_exit;
       enxio:
 	err = -ENXIO;
+	goto unlock_unregister_exit;
+      unlock_unregister_exit:
+	write_unlock(&cdevsw_lock);
 	goto unregister_exit;
+      unlock_release_exit:
+	write_unlock(&cdevsw_lock);
+	goto release_exit;
+      release_exit:
+	sdev_rel(cdev);
       unregister_exit:
 #if defined CONFIG_STREAMS_SYNCQS
 	unregister_strsync((struct fmodsw *) cdev);
 #endif
-	goto unlock_exit;
-      unlock_exit:
-	write_unlock(&cdevsw_lock);
 	return (err);
 }
 
@@ -515,7 +531,7 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 #ifdef CONFIG_STREAMS_DEBUG
 		if (fops->owner)
 			_printd(("%s: [%s] count is now %d\n", __FUNCTION__,
-				fops->owner->name, module_refcount(fops->owner)));
+				 fops->owner->name, module_refcount(fops->owner)));
 		else
 			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
 #endif
@@ -527,7 +543,7 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 #ifdef CONFIG_STREAMS_DEBUG
 		if (fops->owner)
 			_printd(("%s: [%s] count is now %d\n", __FUNCTION__,
-				fops->owner->name, module_refcount(fops->owner)));
+				 fops->owner->name, module_refcount(fops->owner)));
 		else
 			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
 #endif
@@ -749,11 +765,22 @@ register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 				break;
 			}
 		}
-		if ((err = cmin_add(cmin, cdev, minor)))
+		write_unlock(&cdevsw_lock);
+		err = cmin_ini(cmin, cdev, minor);
+		write_lock(&cdevsw_lock);
+		if (err)
 			break;
+		if ((err = __cmin_lookup(cdev, minor) ? -EPERM : 0))
+			goto unlock_release_exit;
+		if ((err = cmin_add(cmin, cdev)))
+			goto unlock_release_exit;
 		err = minor;
 	} while (0);
 	write_unlock(&cdevsw_lock);
+	return (err);
+      unlock_release_exit:
+	write_unlock(&cdevsw_lock);
+	cmin_rel(cmin);
 	return (err);
 }
 
@@ -809,4 +836,3 @@ unregister_strnod(struct cdevsw *cdev, minor_t minor)
 }
 
 EXPORT_SYMBOL_NOVERS(unregister_strnod);
-
