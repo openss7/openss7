@@ -7972,7 +7972,7 @@ STATIC noinline streams_fastcall __unlikely struct tp *
 tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
 	struct tp *result = NULL;
-	int hiscore = 0;
+	int hiscore = -1;
 	struct tp_chash_bucket *hp, *hp1, *hp2;
 
 	hp1 = &udp_chash[udp_chashfn(proto, sport, dport)];
@@ -8070,7 +8070,7 @@ STATIC INLINE streams_fastcall __hot_in struct tp *
 tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 {
 	struct tp *result = NULL;
-	int hiscore = 0;
+	int hiscore = -1;
 	struct tp_bhash_bucket *hp, *hp1, *hp2;
 
 	hp1 = &udp_bhash[udp_bhashfn(proto, dport)];
