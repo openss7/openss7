@@ -780,7 +780,7 @@ register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 	return (err);
       unlock_release_exit:
 	write_unlock(&cdevsw_lock);
-	cmin_rel(cmin, cdev);
+	cmin_rel(cmin);
 	return (err);
 }
 
