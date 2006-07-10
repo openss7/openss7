@@ -441,6 +441,9 @@ unregister_strdrv(struct cdevsw *cdev)
 	unregister_strsync((struct fmodsw *) cdev);
 #endif
 	sdev_del(cdev);
+	write_unlock(&cdevsw_lock);
+	sdev_rel(cdev);
+	return (0);
       unlock_exit:
 	write_unlock(&cdevsw_lock);
 	return (err);

@@ -1164,15 +1164,7 @@ EXPORT_SYMBOL_NOVERS(sdev_add);
 streams_fastcall void
 sdev_del(struct cdevsw *cdev)
 {
-	struct inode *inode;
-
 	cdev->d_inode->i_sb->s_root->d_inode->i_nlink--;
-	inode = cdev->d_inode;
-	/* put away dentry if necessary */
-	_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
-		atomic_read(&inode->i_count) - 1));
-	iput(inode);
-	cdev->d_inode = NULL;
 	/* remove from list and hash */
 	list_del_init(&cdev->d_list);
 	list_del_init(&cdev->d_hash);
@@ -1180,6 +1172,19 @@ sdev_del(struct cdevsw *cdev)
 }
 
 EXPORT_SYMBOL_NOVERS(sdev_del);
+
+streams_fastcall void
+sdev_rel(struct cdevsw *cdev)
+{
+	struct inode *inode;
+
+	inode = cdev->d_inode;
+	/* put away dentry if necessary */
+	_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+		atomic_read(&inode->i_count) - 1));
+	iput(inode);
+	cdev->d_inode = NULL;
+}
 
 streams_fastcall void
 cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)

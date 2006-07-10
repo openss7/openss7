@@ -73,6 +73,7 @@ __STREAMS_EXTERN void fmod_add(struct fmodsw *fmod, modID_t modid);
 __STREAMS_EXTERN void fmod_del(struct fmodsw *fmod);
 __STREAMS_EXTERN int sdev_add(struct cdevsw *cdev, modID_t modid);
 __STREAMS_EXTERN void sdev_del(struct cdevsw *cdev);
+__STREAMS_EXTERN void sdev_rel(struct cdevsw *cdev);
 __STREAMS_EXTERN void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
 __STREAMS_EXTERN void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
 __STREAMS_EXTERN int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
