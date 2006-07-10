@@ -1249,18 +1249,7 @@ EXPORT_SYMBOL_NOVERS(cmin_add);
 streams_fastcall void
 cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 {
-	struct inode *inode;
-
 	cdev->d_inode->i_nlink--;
-	inode = cmin->n_inode;
-	/* put away inode if required */
-	_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
-		atomic_read(&inode->i_count) - 1));
-	iput(inode);
-	cmin->n_inode = NULL;
-	cmin->n_dev = NULL;
-	cmin->n_modid = -1;
-	cmin->n_minor = -1;
 
 	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
@@ -1270,6 +1259,24 @@ cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 }
 
 EXPORT_SYMBOL_NOVERS(cmin_del);
+
+streams_fastcall void
+cmin_rel(struct devnode *cmin)
+{
+	struct inode *inode;
+
+	inode = cmin->n_inode;
+	/* put away inode if required */
+	_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+		atomic_read(&inode->i_count) - 1));
+	iput(inode);
+	cmin->n_inode = NULL;
+	cmin->n_dev = NULL;
+	cmin->n_modid = -1;
+	cmin->n_minor = -1;
+}
+
+EXPORT_SYMBOL_NOVERS(cmin_rel);
 
 BIG_STATIC int
 strlookup_init(void)

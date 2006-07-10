@@ -780,6 +780,9 @@ unregister_strnod(struct cdevsw *cdev, minor_t minor)
 			if (!(cmin = __cmin_lookup(cdev, minor)))
 				break;
 			cmin_del(cmin, cdev);
+			write_unlock(&cdevsw_lock);
+			cmin_rel(cmin);
+			return (0);
 		} else {
 			/* deregister all minor devices */
 			struct list_head *pos;
@@ -790,6 +793,9 @@ unregister_strnod(struct cdevsw *cdev, minor_t minor)
 				cmin = list_entry(pos, struct devnode, n_list);
 
 				cmin_del(cmin, cdev);
+				write_unlock(&cdevsw_lock);
+				cmin_rel(cmin);
+				write_lock(&cdevsw_lock);
 			}
 			INIT_LIST_HEAD(&cdev->d_minors);
 		}

@@ -77,6 +77,7 @@ __STREAMS_EXTERN void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_
 __STREAMS_EXTERN void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
 __STREAMS_EXTERN int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
 __STREAMS_EXTERN void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
+__STREAMS_EXTERN void cmin_rel(struct devnode *cmin);
 
 __STREAMS_EXTERN struct fmodsw *fmod_str(const struct streamtab *str);
 __STREAMS_EXTERN struct cdevsw *cdev_str(const struct streamtab *str);
