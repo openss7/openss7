@@ -1,3 +1,10 @@
+2006-07-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: distribute ISO and other partial implementations
+	* src/drivers/cd.c: changes for partial compile
+	* src/drivers/dl.c: changes for parital compile
+	* src/drivers/lis.conf: roughed in driver definitions
+
 2006-07-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updated quick installation instructions

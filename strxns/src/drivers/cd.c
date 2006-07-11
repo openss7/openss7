@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/12 20:36:03 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/07/11 12:32:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/12 20:36:03 $ by $Author: brian $
+ Last Modified $Date: 2006/07/11 12:32:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.2  2006/07/11 12:32:07  brian
+ - added ISO and other implementations to distribution
+
  Revision 0.9.2.1  2006/04/12 20:36:03  brian
  - added some experimental drivers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/12 20:36:03 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/07/11 12:32:07 $"
 
 static char const ident[] =
-    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/12 20:36:03 $";
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/07/11 12:32:07 $";
 
 /*
  *  This module is a master device driver for Communications Device Streams presending the
@@ -87,7 +90,7 @@ static char const ident[] =
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CD_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $ ($Revision: 0.9.2.1 $) $Date: 2006/04/12 20:36:03 $"
+#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2006/07/11 12:32:07 $"
 #define CD_DEVICE	"SVR 4.2 STREAMS CDI OSI Communications Device Provider"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL"

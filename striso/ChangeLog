@@ -1,3 +1,18 @@
+2006-07-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added ISO files to the distribution
+	* doc/man/Makefile.am: added ISO manpages to the distribution
+	* src/drivers/clns.c: changes for clean compile
+	* src/drivers/lis.conf: added driver definitions
+	* src/drivers/tp.c: changes for compile
+	* src/modules/cmot.c: added module
+	* src/modules/isot.c: added module
+	* src/modules/itot.c: added module
+	* src/modules/lis.conf: added module definitions
+	* src/modules/lpp.c: added module
+	* src/modules/tcpns.c: added module
+	* src/modules/xot.c: added module
+
 2006-06-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/striso.refs: updated references for IUA, DUA, M2PA

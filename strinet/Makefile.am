@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2006/07/01 11:59:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/07/11 12:32:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/01 11:59:43 $ by $Author: brian $
+# Last Modified $Date: 2006/07/11 12:32:00 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.60  2006/07/11 12:32:00  brian
+# - added ISO and other implementations to distribution
+#
 # Revision 0.9.2.59  2006/07/01 11:59:43  brian
 # - added new KERNEL_BLDFLAGS to makefiles
 #

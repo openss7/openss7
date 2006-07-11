@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/11 18:30:10 $
+ @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/11 18:30:10 $ by $Author: brian $
+ Last Modified $Date: 2006/07/11 12:32:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isot.c,v $
+ Revision 1.1.2.1  2006/07/11 12:32:05  brian
+ - added ISO and other implementations to distribution
+
  Revision 0.9.2.1  2006/04/11 18:30:10  brian
  - added new ISO over TCP modules
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/11 18:30:10 $"
+#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $"
 
-static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/11 18:30:10 $";
+static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
