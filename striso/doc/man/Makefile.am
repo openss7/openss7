@@ -56,11 +56,48 @@ MANMACRO_PFX			= @PACKAGE_TARNAME@
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-MANS_UNUSED = 
+MANS_UNUSED = \
+	man4/ISO.4
 
-man_MANS = 
+man_MANS = \
+	man4/cmot.4 \
+	man4/ISO.4 \
+	man4/iso-ip.4 \
+	man4/iso-lan.4 \
+	man4/isos.4 \
+	man4/isot.4 \
+	man4/iso-udp.4 \
+	man4/lpp.4 \
+	man4/ns-tcp.4 \
+	man4/tp0.4 \
+	man4/tp1.4 \
+	man4/tp2.4 \
+	man4/tp3.4 \
+	man4/tp4.4 \
+	man4/tp.4 \
+	man4/xol.4 \
+	man4/xot.4 \
+	man7/npi_osi.7
 
-dist_noinst_MANS = 
+dist_noinst_MANS = \
+	man4/cmot.4.man \
+	man4/ISO.4.man \
+	man4/iso-ip.4.man \
+	man4/iso-lan.4.man \
+	man4/isos.4.man \
+	man4/isot.4.man \
+	man4/iso-udp.4.man \
+	man4/lpp.4.man \
+	man4/ns-tcp.4.man \
+	man4/tp0.4.man \
+	man4/tp1.4.man \
+	man4/tp2.4.man \
+	man4/tp3.4.man \
+	man4/tp4.4.man \
+	man4/tp.4.man \
+	man4/xol.4.man \
+	man4/xot.4.man \
+	man7/npi_osi.7.man
 
 ## PKG_BUILD_INDEP
 endif
