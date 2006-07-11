@@ -6798,6 +6798,7 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
 			goto go_slow;
 	}
+	tp->options.ip.daddr = dst_buf.sin_addr.s_addr;
 	if (unlikely((err = tp_senddata(tp, dst_buf.sin_port, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
 	return (QR_TRIMMED);
