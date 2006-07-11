@@ -1,3 +1,10 @@
+2006-07-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* README-LiS: new README file warning of deprecated LiS
+	* README-nexusware: new missing README file for NexusWare
+	* Makefile.am: distribute TODO and README files
+	* am/genksyms.am: NexusWare hates empty load scripts
+
 2006-07-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updated quick installation instructions
