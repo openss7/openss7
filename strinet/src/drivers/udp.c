@@ -4398,6 +4398,17 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 #endif
 #endif
 			_printd(("sending message %p\n", skb));
+			__printd(("sending message %d.%d.%d.%d:%d, %d.%d.%d.%d:%d\n",
+						(ntohl(iph->saddr) >> 24) & 0xff,
+						(ntohl(iph->saddr) >> 16) & 0xff,
+						(ntohl(iph->saddr) >>  8) & 0xff,
+						(ntohl(iph->saddr) >>  9) & 0xff,
+						(int) ntohs(uh->dest),
+						(ntohl(iph->daddr) >> 24) & 0xff,
+						(ntohl(iph->daddr) >> 16) & 0xff,
+						(ntohl(iph->daddr) >>  8) & 0xff,
+						(ntohl(iph->daddr) >>  9) & 0xff,
+						(int) ntohs(uh->source)));
 #ifdef HAVE_KFUNC_DST_OUTPUT
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, tp_ip_queue_xmit);
 #else
@@ -8420,7 +8431,7 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 	if (skb->len < (iph->ihl << 2) + ICMP_MIN_LENGTH)
 		goto drop;
 #endif
-	printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
+	__printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
 	/* Note: use returned IP header and possibly payload for lookup */
 	if ((tp = tp_lookup_icmp(iph, skb->len)) == NULL)
 		goto no_stream;
