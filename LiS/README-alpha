@@ -39,7 +39,7 @@ which it is executed.
 5.5.1 Defect Notices
 --------------------
 
-"Linux STREAMS (LiS)", both releases from `OpenSS7' and `GCOM', contany
+"Linux STREAMS (LiS)", both releases from `OpenSS7' and `GCOM', contain
 many known bugs. These are unstable releases.  Although there are no
 bugs known to be harmful, the `OpenSS7 Project' has tested the release
 and found defects that cause the kernel to lock or crash. Use at your
