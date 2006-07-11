@@ -1,3 +1,7 @@
+2006-07-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c: fixed mysterious testcase 1074 1222 failure
+
 2006-07-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updated quick installation instructions
