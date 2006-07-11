@@ -30,8 +30,6 @@ Please respect these licensing arrangements.  If you are interested in
 different licensing terms, please contact the copyright holder, OpenSS7
 Corporation, http://www.openss7.com/ or mailto:bidulock@openss7.org.
 
-See README-alpha (if it exists) for alpha release information.
-
 Prerequisites
 -------------
 
@@ -55,20 +53,6 @@ When configuring and building multiple OpenSS7 Project release packages,
 place all of the source packages (unpackaged tarballs) at the same
 directory level and all build directories at the same directory level.
 
-When installing packages that install as kernel modules, it is necessary
-to have the correct kernel development package installed.  For the
-following distributions, use the following commands:
-
-    Ubuntu:  apt-get install linux-headers
-    Debian:  apt-get install kernel-headers
-    Fedora:  yum install kernel-devel
-
-You also need the same version of gcc compiler with which the kernel
-was built.  If it is not the default, add CC=kgcc on the line after
-./configure, for example:
-
-	../striso-0.9.2.1/configure CC='gcc-3.4'
-
 Installation
 ------------
 
@@ -78,44 +62,17 @@ validate, uninstall and remove the package:
 	wget http://www.openss7.org/tarballs/striso-0.9.2.1.tar.bz2
 	tar -xjvf striso-0.9.2.1.tar.bz2
 	mkdir build
-	pushd build
-	../striso-0.9.2.1.configure --enable-autotest
+	cd build
+	../striso-0.9.2.1.configure
 	make
 	make check
 	sudo make install
 	sudo make installcheck
 	sudo make uninstall
-	popd
+	cd ..
 	sudo rm -rf build
 	rm -rf striso-0.9.2.1.
 	rm -f striso-0.9.2.1.tar.bz2
-
-If you have problems, try building with the logging targets instead.  If
-the make of a logging target fails, an automatic problem report will be
-generated that can be mailed to The OpenSS7 Project.  Installation using
-the logging targets proceeds as follows:
-
-	wget http://www.openss7.org/tarballs/striso-0.9.2.1.tar.bz2
-	tar -xjvf striso-0.9.2.1.tar.bz2
-	mkdir build
-	pushd build
-	../striso-0.9.2.1.configure --enable-autotest
-	make compile.log
-	make check.log
-	sudo make install.log
-	sudo make installcheck.log
-	sudo make uninstall.log
-	popd
-	sudo rm -rf build
-	rm -rf striso-0.9.2.1.
-	rm -f striso-0.9.2.1.tar.bz2
-
-See README-make for additional specialized make targets.
-
-For custom applications, see the INSTALL and INSTALL-striso files or
-the installation and reference manual as listed below.  If you encounter
-troubles, see the trouble shooting section of the installation and
-reference manual before issuing a bug report.
 
 Manual
 ------
@@ -256,9 +213,6 @@ package has been installed by invoking the `installcheck' target.  This
 target can either be invoked as root, or as a normal user, like so:
 
 	make installcheck
-
-(Note: you must add the --enable-autotest flag to `configure', above for
- the testsuites to be invoked with `make installcheck'.)
 
 The package can be cleanly removed by invoking the `uninstall' target
 (as root):

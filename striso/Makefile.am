@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2006/04/07 21:56:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/08 03:39:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,13 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/07 21:56:37 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9  2006/04/07 21:56:37  brian
-# - initial addition of striso files
+# Last Modified $Date: 2006/04/08 03:39:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,7 +64,7 @@ include am/help.am
 ##
 include am/pr.am
 
-lib_LTLIBRARIES			=
+lib_LTLIBRARIES			= 
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
@@ -81,7 +75,12 @@ if PUBLIC_RELEASE
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
+EXTRA_PROGRAMS			+= 
+
+pkglibexec_PROGRAMS		= 
+
+sbin_PROGRAMS			= \
+				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -140,11 +139,12 @@ EXTRA_PROGRAMS			+=
 pkglibexec_PROGRAMS		= 
 
 
-sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
+sbin_PROGRAMS			= \
+				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-@PACKAGE_TARNAME@_mknod_LDADD		= 
+@PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
@@ -177,7 +177,7 @@ drvs_source_FILES		= $(nodist_EXTRA_libISOdrvs_a_SOURCES)
 
 nodist_libISOdrvs_a_SOURCES	= $(drvs_source_FILES)
 
-libISOdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/ip_hooks.h
+libISOdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libISOdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libISOdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 libISOdrvs_a_OBJECTS:		$(libISOdrvs_a_DEPENDENCIES)
@@ -222,9 +222,11 @@ KERNEL_MODMAPS			= $(STREAMS_MODMAP) $(STRCOMP_MODMAP)
 if WITH_KO_MODULES
 ## WITH_KO_MODULES
 kpre				= streams_
-else
-kpre				= streams-
 ## WITH_KO_MODULES
+else
+## ! WITH_KO_MODULES
+kpre				= streams-
+## ! WITH_KO_MODULES
 endif
 
 include am/kernel.am
@@ -233,7 +235,8 @@ if WITH_KO_MODULES
 else
 if PKG_BUILD_INDEP
 if RPM_BUILD_USER
-dist_modutil_DATA		= src/util/modutils/@PACKAGE_LCNAME@
+dist_modutil_DATA		= \
+				src/util/modutils/@PACKAGE_LCNAME@
 endif
 endif
 endif
@@ -241,12 +244,12 @@ endif
 ##
 ## Rules for building libraries
 ##
-##include am/libraries.am
+include am/libraries.am
 ##
 ##AUTOCONFIG_H			= $(PKGINCL)/config.h
 ##
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
+
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
@@ -266,7 +269,13 @@ include am/strconf.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = src . tests
+SUBDIRS = src
+
+if PKG_BUILD_ARCH
+SUBDIRS += intl m4 po
+endif
+
+SUBDIRS += . tests
 
 if DEVELOPMENT
 SUBDIRS += doc
@@ -323,8 +332,8 @@ include am/archive.am
 ##
 ## Rules for making rpms
 ##
-AM_RPMFLAGS			= --define "_kversion $(kversion)"
-AM_SRPMFLAGS			= $(AM_RPMFLAGS)
+AM_RPMFLAGS 			= --define "_kversion $(kversion)"
+AM_SRPMFLAGS 			= $(AM_RPMFLAGS)
 
 include am/rpm.am
 
@@ -356,4 +365,17 @@ MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/scripts/missing \
 				  $(top_srcdir)/scripts/texinfo.tex
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/04/08 03:39:14  brian
+# - working up striso package
+#
+# Revision 0.9.2.1  2006/04/07 22:01:25  brian
+# - initial branch
+#
+# Revision 0.9  2006/04/07 21:56:37  brian
+# - initial addition of striso files
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor nocin nosi

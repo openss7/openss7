@@ -1,0 +1,223 @@
+OpenSS7 STREAMS ISO -- notes.  2006-04-10
+Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+Notes:
+======
+Here are some notes on all things ISO:
+
+See the OSI-FAQ at http://www.cl.cam.ac.uk/~mgk25/osi-faq.txt
+
+Ethernet Types:
+---------------
+
+- 0x00FE shown in RFC 1701 (GRE) for OSI Network Layer, but it
+  conflicts with the 802.3 length field.  RFC 1700 shows this
+  as the LSAP for ISO CLNS IS 8473.
+
+- 0x0800 is IPv4.
+
+- 0x0801 is X.75 Internet
+- 0x0805 is X.25 Level 3 (PLP?). (Likely ISO 8881: X.25 for use on LANs)
+- 0x0806 is ARP
+
+IP Protocol Numbers:
+--------------------
+
+- Protocol Number 29 'ISO-TP4' is assigned by IANA for ISO Transport
+  Protocol Class 4 for RFC905 (Marshal T. Rose).  (Linux /etc/protocols
+  notes that this is ISO Transport Protocol Class 4.)  RFC905 is just a
+  copy of a draft of X.224 | ISO/IEC 8073 (COTS).  I suppose this is ISO
+  TP4 directly over IP without CLNS, but I cannot find a reference to
+  this.
+
+- Protocol Number 80 'ISO-IP' is assigned by IANA for ISO Internet
+  Protocol (Marshall T. Rose). (Linux /etc/protocols lists this with no
+  notes.)  There is no RFC reference.  I suppose this is CLNS over IP.
+  (Actually, there is a direct reference by Marshall in RFC 1070 for
+  this protocol number.)
+
+- Protocol Number 124 'ISIS over IPv4' is assigned by IANA. (Linux
+  /etc/protocols lists this with no notes.)  There is no RFC reference.
+
+TCP/UDP/SCTP Port Numbers:
+--------------------------
+
+Well Known Port Numbers:
+
+- TCP/UDP/SCTP port number 102 'iso-tsap' is assigned by IANA for
+  ISO-TSAP Class 0 (Marshall T. Rose)  (Linux /etc/services notes that
+  this port is used for ISODE.)  (I think that this is TP0 over TCP as
+  described by Marshall in RFC 1006 (ISOT).)
+
+- TCP/UDP/SCTP port number 146 'iso-tp0' is assigned by IANA for ISO-IP0
+  (Marshall T. Rose) (not listed in /etc/services)  (Mentioned directly
+  by Marshall in RFC 1086, "ISO-TP0 bridge between TCP and X25," for
+  TCP.)
+
+- TCP/UDP/SCTP port number 147 'iso-ip' is assigned by IANA for ISO-IP
+  (Marshall T. Rose) (not listed in /etc/services) (Mentioned directly
+  by Marshall in RFC 1070 for UDP.)
+
+- TCP/UDP/SCTP port number 163 'cmip-man' is assigned by IANA for
+  CMIP/TCP Manager (Mashall T. Rose).  (Linux /etc/services notes that
+  this port is used for ISO Management over IP (CMOT)).  This is
+  definitely RFC 1095, which is now "Historical".
+
+- TCP/UDP/SCTP port number 164 'cmip-agent' is assigned by IANA for
+  CMIP/TCP Agent (Mashall T. Rose).  (Linux /etc/services notes that
+  this port is used for ISO Management over IP (CMOT)).  This is
+  definitely RFC 1095, which is now "Historical".
+
+- TCP/UDP/SCTP port number 399 'iso-tsap-c2' is assigned by IANA for ISO
+  Transport Class 2 Non-Control over TCP/UDP (Yannic Pouffary). (not
+  listed in /etc/services) (I think this is TP2 over TCP as described by
+  Yannic in RFC 2126 (ITOT).)
+
+- TCP/UDP/SCTP port number 499 'iso-ill' is assigned by IANA for ISO ILL
+  Protocol (Mark H. Needleman) (not listed in /etc/services)
+
+Registered Port Numbers:
+
+- TCP/UDP/SCTP port number 1106 'isoipsigport-1' is assigned by IANA for
+  ISOIPSIGPORT-1 (Peter Egli) (not listed in /etc/services)
+
+- TCP/UDP/SCTP port number 1107 'isoipsigport-2' is assigned by IANA for
+  ISOIPSIGPORT-2 (Peter Egli) (not listed in /etc/services)
+
+- TCP/UDP/SCTP port number 1998 'x25-svs-port' is assigned by IANA for
+  Cisco X.25 Service (XOT). (not listed in /etc/services) (Defined in
+  RFC 1613.)
+
+- TCP/UDP/SCTP port number 3782 'iso-tp0s' is assigned by IANA for
+  Secure ISO TP0 port (Herbert Falk) (not listed in /etc/services)
+
+- TCP/UDP/SCTP port number 17007 'isode-dua' is assigned by IANA. (not
+  listed in /etc/services)  (Probably ISODE DUA-DSA for directory
+  services.)
+
+Design Notes:
+=============
+
+Tricks for TP4 over CLNS
+------------------------
+
+Could use an NPI CLNL driver with a wildcard bind to link underneath the
+TP4 CLNS driver.  This NPI driver would register for inet protocol 80
+'ISO-IP' and deliver packets based on Internet NSAPs.  The network
+address selector would distinguish between CLNS, ESIS and ISIS.  It
+could also register a packet handler for IP and filter UDP port 147
+ISO-grams.  It could also register for CLNL sap ethernet, 802.2 and
+SNAP packets.  If wanrouter was fixed in the Linux kernel, we would also
+receive MPOX, MPOFR and MPOA encapsulated packets in addition to MP SNAP
+packets.  Performing outgoing packet routing (interface selection) gets
+a little tricky.  Another trick would be to register for LLC and HDLC
+packets and perform our own de-encapsulation.  The trick here is that
+most protocol modules should check for PACKET_HOST before processing the
+packet.  If we want to steal a packet, just set the packet type on the
+sk_buff to -1 or something.  NITs like pcap(3) will still see the
+packet.
+
+Better Idea
+-----------
+
+TP can use Linux' device independent packet layer and some wanrouter
+magic to do what it needs, at least for CLNS.  Any special devices that
+we want to support in the scheme of things can be wrappered to pseudo
+network devices under Linux.  This could be acheived by opening a
+network stream and linking DLPI streams underneath.  NP streams would
+not be linked under the TP, the TP would access them via Linux packet
+handling.  Specific X.25 PLP CONS connections could be temporarily
+linked underneath the TP driver for use by specific TP2, TP3 or TP4 CONS
+streams.  It would require an X.25 PLP CONS packet handler and routing
+logic, as Linux doesn't have one of those.
+
+For ISO-IP, no additional packet handler is required as IP routing and
+handling can be used instead.  What underlying networking is performed
+can be handled by using the TP transport address and selectors reserved
+for IP.  Sent packets can use the entire IP subsystem.  Received packets
+can be filtered.  CONS over LAN can also be performed easily provided
+that there is an X.121 ARP facility, or that TP can hook and provide
+one.
+
+Zero copy conversion between sk_buffs and msgbs:
+------------------------------------------------
+
+Converting from an sk_buff to a chain of mblks is probably pretty easy.
+Use esballoc to allocate a message block for the sk_buff header, map
+each page in the page fragment list and esballoc a message block, hiding
+the vaddr in the internal data buffer somewhere, and then do the same
+for each sk_buff in the frag list.  Each time an mblk is esballoc'ed
+take another reference on the original sk_buff with skb_get() (except
+for the inital mblk).  When the external buffer databs are freed, each
+paged fragment has its vaddr unmapped and a reference released on the
+head sk_buff with kfree_skb(), each real memory block simply releases a
+reference on the head sk_buff with kfree_skb().  When the last reference
+to the head sk_buff is released, the head sk_buff is freed. 
+
+Coversion the other way might be difficult.  The major hurdle is that
+the sk_buff saves shared information hidden at the end of the data
+buffer.  One possibilty for msgb chains is to allocate a zero-length
+sk_buff as a header and then place the data buffer information into the
+paged frag list (up to 6 buffers in the chain) and then pull some
+portion of the header (say the first fragment).  Then these pages could
+be mapped by the user of the sk_buff as required.  An skb->destructor is
+set that uses information in the control block.  Another wrinkle is that
+the control block is overwritten between layers.  This could be
+overcome, I suppose, by placing the sk_buff pointer in the head msblk
+(b_prev) and then linking them into a hash table (b_next).  The
+destructor could then search this hash and free the corresponding mblk.
+
+
+=========================================================================
+
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by
+ the source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and the
+ Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn

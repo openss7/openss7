@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: dummy2.m4,v $ $Name:  $($Revision: 0.9 $) $Date: 2006/04/07 21:56:45 $
+dnl @(#) $RCSfile: dummy2.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/07 22:01:34 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,7 +61,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/04/07 21:56:45 $ by $Author: brian $
+dnl Last Modified $Date: 2006/04/07 22:01:34 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
@@ -75,6 +75,9 @@ AT_CLEANUP
 
 dnl ==========================================================================
 dnl $Log: dummy2.m4,v $
+dnl Revision 0.9.2.1  2006/04/07 22:01:34  brian
+dnl - initial branch
+dnl
 dnl Revision 0.9  2006/04/07 21:56:45  brian
 dnl - initial addition of striso files
 dnl

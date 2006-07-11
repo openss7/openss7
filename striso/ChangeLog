@@ -1,6 +1,66 @@
-2006-07-09  Brian Bidulock  <bidulock@openss7.org>
+2006-06-13  Brian Bidulock  <bidulock@openss7.org>
 
-	* README: updated quick installation instructions
+	* doc/man/striso.refs: updated references for IUA, DUA, M2PA
+
+2006-05-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/strconf-sh: added module id base to strconf
+	* m4/strconf.m4: added module id base to strconf
+	* am/strconf.am: added module id base to strconf
+	* acinclude.m4: added module id base to strconf
+	* striso.spec.in: updated headers, corrected init script removal
+
+2006-05-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man7/npi_osi.7.man: added manual page
+
+2006-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/tp.c: sp correction
+
+2006-04-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/striso.refs: more references
+
+2006-04-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/striso.refs: added a few more references
+
+2006-04-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* NOTES: added working notes
+	* doc/man/striso.macros: added references
+	* doc/man/striso.refs: added references
+	* doc/man/man4/ISO.4.man: added manual page
+	* doc/man/man4/cmot.4.man: added manual page
+	* doc/man/man4/iso-ip.4.man: added manual page
+	* doc/man/man4/iso-lan.4.man: added manual page
+	* doc/man/man4/iso-udp.4.man: added manual page
+	* doc/man/man4/isos.4.man: added manual page
+	* doc/man/man4/isot.4.man: added manual page
+	* doc/man/man4/lpp.4.man: added manual page
+	* doc/man/man4/ns-tcp.4.man: added manual page
+	* doc/man/man4/tp.4.man: added manual page
+	* doc/man/man4/tp0.4.man: added manual page
+	* doc/man/man4/tp1.4.man: added manual page
+	* doc/man/man4/tp2.4.man: added manual page
+	* doc/man/man4/tp3.4.man: added manual page
+	* doc/man/man4/tp4.4.man: added manual page
+	* doc/man/man4/xol.4.man: added manual page
+	* doc/man/man4/xot.4.man: added manual page
+	* doc/specs/rfc1277.pdf: added specification
+	* doc/specs/rfc1277.ps: added specification
+	* src/drivers/tp.c: working up TP drier
+
+2006-04-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/tp.c: working up ISO Connection-Oriented Transport driver
+	* NOTES: added notes on ISO ethertypes, protocol numbers and ports
+
+2006-04-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/striso.refs: corrected spelling error reported by spammer
+	* src/drivers/tp.c: working up ISO Connection-Oriented Transport driver
 
 2006-04-07  Brian Bidulock  <bidulock@openss7.org>
 

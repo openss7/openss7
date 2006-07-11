@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2006/04/07 21:56:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/08 03:39:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/07 21:56:41 $ by $Author: brian $
+# Last Modified $Date: 2006/04/08 03:39:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,7 +56,8 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= @PACKAGE_TARNAME@.texi
+## this must be literal
+info_TEXINFOS		+= striso.texi
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
@@ -79,6 +80,12 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/04/08 03:39:15  brian
+# - working up striso package
+#
+# Revision 0.9.2.1  2006/04/07 22:01:29  brian
+# - initial branch
+#
 # Revision 0.9  2006/04/07 21:56:41  brian
 # - initial addition of striso files
 #

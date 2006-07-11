@@ -1,0 +1,100 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile: striso-lib.preinst.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/07 22:01:27 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/04/07 22:01:27 $ by $Author: brian $
+#
+# =============================================================================
+@mscript_header@
+
+#
+# This is an initial installation of the doc subpackage.  We need to check for non-deb installations
+# on the host and remove any info entries that might later conflict with our entries.  We treat
+# every fresh installation like an upgrade from non-deb install.
+#
+function install_lib_preinst() { :
+    #
+    # Unfortunately, non-autoconf releases of LiS placed libraries all over the place.  On an
+    # initial installation, this checks for other libraries with the same name and deletes them.
+    #
+    for lib in $libraries ; do
+	old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
+	if [ -n "$old_libs" ] ; then
+#	    old libraries hanging around, delete them
+	    echo "warning: Deleting old non-rpm libraries $old_libs" >&2
+	    rm -f $old_libs
+	fi
+    done
+}
+
+#
+# This is our chance to check that an old-prerm upgrade scriplet did at least somewhat what it was
+# supposed to do.  This is not as extensive as the non-deb install since we do not have to check
+# that package files are removed and we don't have to check for things from non-deb versions.
+#
+function upgrade_lib_preinst() { :
+    #
+    # Nothing to do really.
+    #
+}
+
+subpkg=lib
+
+@mscript_preinst@
+
+# =============================================================================
+#
+# $Log: striso-lib.preinst.in,v $
+# Revision 0.9.2.1  2006/04/07 22:01:27  brian
+# - initial branch
+#
+# Revision 0.9  2006/04/07 21:56:39  brian
+# - initial addition of striso files
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn
