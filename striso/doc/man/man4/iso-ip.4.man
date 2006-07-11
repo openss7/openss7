@@ -1,0 +1,240 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: iso-ip.4.man,v 0.9.2.1 2006/04/11 18:22:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/04/11 18:22:12 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: iso-ip.4.man,v $
+.\" Revision 0.9.2.1  2006/04/11 18:22:12  brian
+.\" - added manual pages and references
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH ISO-IP 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B ISO-IP, ISO-UDP
+\- ISO CLNS over IP
+.\"
+.\"
+.SH DESCRIPTION
+.B ISO-IP
+is an implementation of an ISO CLNP
+.[
+ISO/IEC 8473
+.]
+Subnetwork Convergence Function Protocol directly over the services of IP
+.[
+rfc793
+.]
+or between networks using the User Datagram Protocol (UDP),
+.[
+rfc768
+.]
+as defined for experimental use in RFC 1070.
+.[
+rfc1070
+.]
+.PP
+.B ISO-IP
+provides for simple and straightforward encapsulation of CLNS NPDUs in IP
+packets or UDP datagrams.
+.PP
+For providing the ISO CLNS using IP, the IP protocol number
+.B 80
+has been assigned;
+.[
+rfc1070
+.]
+using UDP, the UDP well-known port number
+.B 147
+has been assigned.
+.[
+rfc1070
+.]
+.\"
+.\"
+.SH USAGE
+.PP
+For a Connectionless-mode Network Service Provider
+.[
+x213
+.]
+using IP and protocol number
+.B 80
+providing the Network Provider Interface (NPI),
+.BR npi (7),
+.[
+NPI Revision 2.0.0
+.]
+the
+.I STREAMS
+pseudo-device driver
+.B /dev/iso-ip
+can be opened.
+.PP
+For a Connectionless-mode Network Service Provider
+.[
+x213
+.]
+using UDP and port number
+.B 147
+providing the Network Provider Interface (NPI),
+.BR npi (7),
+.[
+NPI Revision 2.0.0
+.]
+the
+.I STREAMS
+pseudo-device driver
+.B /dev/iso-udp
+can be opened.
+.PP
+Either Stream can be used directly, or bound and linked underneath the
+.BR tp4 (4)
+driver to provide Connectionless-mode Network Services for Transport Protocol
+Class 4 operation.
+.\"
+.\"
+.SH "NETWORK PROVIDER INTERFACE"
+.PP
+Both forms of the Network Service Provider provider the
+.IR STREAMS -based
+Service Interface specified in the Network Provider Interface.
+.[
+NPI Revision 2.0.0
+.]
+.\"
+.SS "Address Format"
+.PP
+Address format is as described in RFC 1069.
+.[
+rfc1069
+.]
+.\"
+.SS "Quality of Service Parameters"
+.PP
+Quality of service parameters are as described in RFC 1070.
+.[
+rfc1070
+.]
+.\"
+.SS "Network Service Primitives"
+.PP
+.TP
+.BR N_INFO_REQ "(7), " N_INFO_ACK (7)
+.TP
+.BR N_BIND_REQ "(7), " N_BIND_ACK "(7), " N_ERROR_ACK (7)
+.TP
+.BR N_OPTMGMT_REQ "(7), " N_OK_ACK "(7), " N_ERROR_ACK (7)
+.TP
+.BR N_UNITDATA_REQ "(7), " N_UNITDATA_IND "(7), " N_UDERROR_IND (7)
+.TP
+.BR N_UNBIND_REQ "(7), " N_OK_ACK "(7), " N_ERROR_ACK (7)
+.\"
+.\"
+.SH NOTICES
+.PP
+Both RFCs
+.[
+rfc1069
+.]
+.[
+rfc1070
+.]
+are described as
+.IR Experimental .
+The RFC Editor lists both with status
+.IR UNKNOWN .
+Neither of these RFCs propose a standard. Use of these protocols in the
+DARPA Internet is not recommended.
+.PP
+Nevertheless, the IP version of the protocol provides a good mechanism for
+transporting CLNS over LANs; the UDP version, transporting CLNS between LANs
+over an Internetwork using existing IP bridges, switches and routers.
+.PP
+.B ISO-IP
+has the advantages that it reuses exsiting IP network management and
+internetwork routing; i.e, it does not require the use of X.75 packet data
+switches, or ES-IS/IS-IS routing protocols.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR XOL (7),
+.BR XOT (7),
+.BR ISOT (7),
+.BR ITOT (7),
+.BR ISO-TP4 (7).
+.[
+$LIST$
+.]
+.TI

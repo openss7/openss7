@@ -1,0 +1,432 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: npi_osi.7.man,v 0.9.2.1 2006/05/07 22:12:51 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/05/07 22:12:51 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: npi_osi.7.man,v $
+.\" Revision 0.9.2.1  2006/05/07 22:12:51  brian
+.\" - updated for NPI-IP driver
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH NPI-OSI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Provider Interface (NPI)"
+.\"
+.\"
+.SH NAME
+.B npi_osi
+\- Network Provider Interface (NPI) - Open Systems Interconnect (OSI) Corrigendum
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/npi.h>
+.PP
+Note that it is sufficient to include
+.B <sys/npi.h>
+as this header file exposes the OSI conforming definitions.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B NPI-OSI
+provides a Stream support the Network Provider Interface (NPI),
+.[
+NPI Revision 2.0.0
+.]
+.BR npi (7),
+to the Open System Interconnect (OSI) Connectionless Network Protocol (CLNP)
+.[
+x233
+.]
+and Connection Oriented Network Protocol (CONP).
+.[
+x223
+.]
+This
+.IR STREAMS (4)
+interfafce provides the
+.BR cons (7)
+and
+.BR clns (7)
+interface using the N-primitives of the
+.BR npi (7).
+This interface is intended solely for use by user programs or protocol modules
+requiring the common
+.BR npi (7)
+interface, such as the
+.BR xti (3)
+and
+.BR sockets (3)
+library.
+.\"
+.SS "Address Formats"
+.PP
+For consistency with other protocol modules, the address format used by
+.BR NPI-OSI
+is an X.25 socket address
+.RB ( sockaddr_x25 " structure)
+in address family
+.BR AF_INET .
+The
+.B sockaddr_x25
+structure is described in
+.BR x25 (7).
+.PP
+The format of the address is a
+.B sockaddr_x25
+structure defined as follows:
+.sp
+.nf
+\fC\s-1\
+struct sockaddr_x25 {
+    sa_family_t   sx25_family;  /* must be AF_X25 */
+    x25_address   sx25_addr;    /* X.121 Address */
+};
+\s+1\fP
+.fi
+.\"
+.SS "QOS Parameters"
+.PP
+.B NPI-OSI
+provides quality-of-service parameters using OSI-specific and OSI conforming
+sutructures as described in the sections that follow:
+.TP
+.B N_QOS_CO_SEL1
+.RS
+.TP
+.I n_qos_type
+Always
+.B N_QOS_CO_SEL1
+indicating the
+.B n_qos_co_sel1
+structure.
+The
+.B n_qos_co_sel1
+structure contains this field and the following fields:
+.TP
+.I src_throughput_sel
+.TP
+.I dest_throughput_sel
+.TP
+.I transit_delay_sel
+.TP
+.I protection_sel
+.TP
+.I priority_sel
+.RE
+.TP
+.B N_QOS_CO_RANGE1
+.RS
+.TP
+.I n_qos_type
+Always
+.B N_QOS_CO_RANGE1
+indicating the
+.B n_qos_co_range1
+structure.
+The
+.B n_qos_co_range1
+structure contains this field and the following fields:
+.TP
+.I src_throughput_range
+.TP
+.I dest_throughput_range
+.TP
+.I transit_delay_range
+.TP
+.I protection_range
+.TP
+.I priority_range
+.RE
+.TP
+.B N_QOS_CL_SEL1
+Use with the
+.BR N_INFO_ACK "(7) and " N_OPTMGMT_REQ (7)
+primitives, it provides a selection of quality-of-service parameters for
+connectionless providers.
+.RS
+.TP
+.I n_qos_type
+Always
+.B N_QOS_CL_SEL1
+indicating the
+.B n_qos_cl_sel1
+structure.
+The
+.B n_qos_cl_sel1
+structure contains this field and the following fields:
+.TP
+.I transit_delay_max
+.TP
+.I residual_error_rate
+.TP
+.I protection_sel
+Provides protection selection.  Values can be one of:
+.BR N_NO_PROT ,
+no protection;
+.BR N_PASSIVE_PROT ,
+protection against passive monitoring;
+.BR N_ACTIVE_PROT ,
+protection against active monitoring; and
+.BR N_ACTIVE_PASSIVE_PROT ,
+protection against active and passive monitoring.
+.TP
+.I priority_sel
+Provides selectin of the priority of a given packet or pakcets within an
+association.
+.TP
+.I max_accept_cost
+.RE
+.TP
+.B N_QOS_CL_RANGE1
+Used with the
+.BR N_INFO_ACK (7)
+primitive, it provides a range of quality-of-service paramters for
+connectionless providers.
+.RS
+.TP
+.I n_qos_type
+Always
+.B N_QOS_CL_RANGE1
+indicating the
+.B n_qos_cl_range1
+structure.
+The
+.B n_qos_cl_range1
+structure contains this field and the following fields:
+.TP
+.I transit_delay_max
+.RS
+.TP
+.I td_targ_value
+.TP
+.I td_max_value
+.RE
+.TP
+.I residual_error_rate
+.TP
+.I protection_range
+.RS
+.TP
+.I protect_targ_value
+.TP
+.I protect_min_value
+.RE
+.TP
+.I priority_range
+.RS
+.TP
+.I priority_targ_value
+.TP
+.I priority_min_value
+.RE
+.TP
+.I max_accept_cost
+.RE
+.TP
+.B N_QOS_CO_OPT_SEL1
+.RS
+.TP
+.I n_qos_type
+Always
+.B N_QOS_CO_OPT_SEL1
+indicating the
+.B n_qos_co_opt_sel1
+structure.
+The
+.B n_qos_co_opt_sel1
+structure contains this field and the following fields:
+.TP
+.I src_throughput
+.TP
+.I dest_throughput
+.TP
+.I transit_delat_t
+.TP
+.I nc_estab_delay
+.TP
+.I nc_estab_fail_prob
+.TP
+.I residual_error_rate
+.TP
+.I xfer_fail_prob
+.TP
+.I nc_resilience
+.TP
+.I nc_rel_delay
+.TP
+.I nc_rel_fail_prob
+.TP
+.I protection_sel
+.TP
+.I priority_sel
+.TP
+.I max_accept_cost
+.RE
+.TP
+.B N_QOS_CO_OPT_RANGE1
+.RS
+.TP
+.I n_qos_type
+Always
+.B N_QOS_CO_OPT_RANGE1
+indicating the
+.B n_qos_co_opt_range1
+structure.
+The
+.B n_qos_co_opt_range1
+structure contains this field and the following fields:
+.TP
+.I src_throughput
+.TP
+.I dest_throughput
+.TP
+.I transit_delat_t
+.TP
+.I nc_estab_delay
+.TP
+.I nc_estab_fail_prob
+.TP
+.I residual_error_rate
+.TP
+.I xfer_fail_prob
+.TP
+.I nc_resilience
+.TP
+.I nc_rel_delay
+.TP
+.I nc_rel_fail_prob
+.TP
+.I protection_sel
+.TP
+.I priority_sel
+.TP
+.I max_accept_cost
+.RE
+.\"
+.SS "Local Management Interface"
+.PP
+For the most part, the local management interface of the NPI operates for the
+.B NPI-OSI
+provider in accordance with the
+.I Network Provider Interface Revision 2.0.0
+specifications.
+.[
+NPI Revision 2.0.0
+.]
+Some enhancements are provided to addressing in support of the Stream Control
+Transmission Protocol (SCTP)
+.[
+rfc2960
+.]
+.[
+rfc3309
+.]
+and multihomed associations.
+.PP
+The local management primitives are interpreted as follows:
+.TP
+.BR N_INFO_REQ (7)
+This primitive is interpreted by the
+.B NPI-OSI
+provider in accordance wiht the NPI specifications,
+.[
+NPI Revision 2.0.0
+.]
+.BR npi (7).
+.TP
+.BR N_INFO_ACK (7)
+This primitive is interpreted by the
+.B NPI-OSI
+provider in accordance wiht the NPI specifications,
+.[
+NPI Revision 2.0.0
+.]
+.BR npi (7),
+with the following considerations:
+
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This Corrigendum conforms where possible to the
+.I Network Provider Interface Revision 2.0.0
+.[
+NPI Revision 2.0.0
+.]
+but its application to the Open Systems Interconnect (OSI) is implementation specific and not
+subject to standardization.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2
