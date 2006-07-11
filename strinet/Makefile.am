@@ -108,7 +108,8 @@ if RPM_BUILD_USER
 EXTRA_PROGRAMS			+= test-inet_raw \
 				  test-inet_udp \
 				  test-inet_tcp \
-				  test-inet_sctp
+				  test-inet_sctp \
+				  @PACKAGE_TARNAME@_mknod
 
 pkglibexec_PROGRAMS		= test-inet_raw \
 				  test-inet_udp \
@@ -118,7 +119,8 @@ if WITH_OPENSS7_SCTP
 pkglibexec_PROGRAMS		+= test-inet_sctp
 endif
 
-sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
+sbin_PROGRAMS			= \
+				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -169,6 +171,14 @@ nodist_EXTRA_libINETmods_a_SOURCES = \
 				  src/drivers/rawip.c \
 				  src/drivers/tcp.c \
 				  src/drivers/udp_hooks.h
+
+dist_EXTRA_libINETmods_a_SOURCES = \
+				  src/modules/cmot.c \
+				  src/modules/isot.c \
+				  src/modules/itot.c \
+				  src/modules/lpp.c \
+				  src/modules/tcpns.c \
+				  src/modules/xot.c
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 
@@ -258,6 +268,14 @@ nodist_EXTRA_libINETmods_a_SOURCES	= \
 				  src/drivers/rawip.c \
 				  src/drivers/tcp.c \
 				  src/drivers/udp_hooks.h
+
+dist_EXTRA_libINETmods_a_SOURCES = \
+				  src/modules/cmot.c \
+				  src/modules/isot.c \
+				  src/modules/itot.c \
+				  src/modules/lpp.c \
+				  src/modules/tcpns.c \
+				  src/modules/xot.c
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 

@@ -103,7 +103,9 @@ noinst_LIBRARIES		= libISOmods.a libISOdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libISOmods_a_SOURCES = \
-				  src/modules/cmot.c \
+				  src/modules/cmot.c
+
+dist_EXTRA_libISOmods_a_SOURCES = \
 				  src/modules/isot.c \
 				  src/modules/itot.c \
 				  src/modules/lpp.c \
@@ -119,7 +121,9 @@ libISOmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $
 libISOmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libISOdrvs_a_SOURCES = \
-				  src/drivers/clns.c \
+				  src/drivers/clns.c
+
+dist_EXTRA_libISOdrvs_a_SOURCES = \
 				  src/drivers/tp.c \
 				  src/drivers/x25-lapb.c \
 				  src/drivers/x25-plp.c
@@ -173,7 +177,9 @@ noinst_LIBRARIES		= libISOmods.a libISOdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libISOmods_a_SOURCES = \
-				  src/modules/cmot.c \
+				  src/modules/cmot.c
+
+dist_EXTRA_libISOmods_a_SOURCES = \
 				  src/modules/isot.c \
 				  src/modules/itot.c \
 				  src/modules/lpp.c \
@@ -189,7 +195,9 @@ libISOmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $
 libISOmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libISOdrvs_a_SOURCES = \
-				  src/drivers/clns.c \
+				  src/drivers/clns.c
+
+dist_EXTRA_libISOdrvs_a_SOURCES = \
 				  src/drivers/tp.c \
 				  src/drivers/x25-lapb.c \
 				  src/drivers/x25-plp.c

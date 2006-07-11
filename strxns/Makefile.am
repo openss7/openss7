@@ -166,6 +166,7 @@ noinst_LIBRARIES		= libXNSmods.a libXNSdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libXNSmods_a_SOURCES = \
+				  src/modules/debug.h \
 				  src/modules/ip_strm_mod.c \
 				  src/modules/ip_strm_mod.h
 
@@ -178,11 +179,22 @@ libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $
 libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
+				  src/drivers/debug.h \
+				  src/drivers/ip_hooks.h \
 				  src/drivers/ip_to_dlpi.c \
 				  src/drivers/ldl.c \
-				  src/drivers/np_ip.c \
-				  src/drivers/ip_hooks.h
-#				  src/drivers/ip.c
+				  src/drivers/np_ip.c
+
+dist_EXTRA_libXNSdrvs_a_SOURCES = \
+				  src/drivers/cd.c \
+				  src/drivers/dl.c \
+				  src/drivers/dl.h \
+				  src/drivers/dl_ip.c \
+				  src/drivers/dlp.c \
+				  src/drivers/ip.c \
+				  src/drivers/nf.c \
+				  src/drivers/np.c \
+				  src/drivers/np.h
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
@@ -265,6 +277,7 @@ noinst_LIBRARIES		= libXNSmods.a libXNSdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libXNSmods_a_SOURCES = \
+				  src/modules/debug.h \
 				  src/modules/ip_strm_mod.c \
 				  src/modules/ip_strm_mod.h
 
@@ -277,11 +290,22 @@ libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $
 libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
+				  src/drivers/debug.h \
+				  src/drivers/ip_hooks.h \
 				  src/drivers/ip_to_dlpi.c \
 				  src/drivers/ldl.c \
-				  src/drivers/np_ip.c \
-				  src/drivers/ip_hooks.h
-#				  src/drivers/ip.c
+				  src/drivers/np_ip.c
+
+dist_EXTRA_libXNSdrvs_a_SOURCES = \
+				  src/drivers/cd.c \
+				  src/drivers/dl.c \
+				  src/drivers/dl.h \
+				  src/drivers/dl_ip.c \
+				  src/drivers/dlp.c \
+				  src/drivers/ip.c \
+				  src/drivers/nf.c \
+				  src/drivers/np.c \
+				  src/drivers/np.h
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 

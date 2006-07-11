@@ -163,6 +163,7 @@ MODULE_ALIAS("/dev/dl");
  */
 
 #define DRV_ID		DL_DRV_ID
+#define DRV_NAME	DL_DRV_NAME
 #define CMAJORS		DL_CMAJORS
 #define CMAJOR_0	DL_CMAJOR_0
 #define UNITS		DL_UNITS
@@ -171,6 +172,8 @@ MODULE_ALIAS("/dev/dl");
 #else				/* MODULE */
 #define DRV_BANNER	DL_SPLASH
 #endif				/* MODULE */
+
+/* Upper multiplex is a DL provider following the DLPI. */
 
 STATIC struct module_info dl_minfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
@@ -183,8 +186,6 @@ STATIC struct module_info dl_minfo = {
 
 STATIC struct module_stat dl_mstat = {
 };
-
-/* Upper multiplex is a DL provider following the DLPI. */
 
 STATIC streamscall int dl_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int dl_qclose(queue_t *, int, cred_t *);
@@ -206,6 +207,18 @@ STATIC struct qinit dl_winit = {
 };
 
 /* Lower multiplex is a CD user following the CDI. */
+
+STATIC struct module_info cd_minfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size acceptd */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_hiwat = 1 << 10,		/* Lo water mark */
+};
+
+STATIC struct module_stat cd_mstat = {
+};
 
 STATIC struct qinit cd_rinit = {
 	.qi_putp = &ss7_iput,		/* Read put procedure (message from below) */

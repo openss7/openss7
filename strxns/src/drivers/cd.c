@@ -57,7 +57,8 @@
 
 #ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/12 20:36:03 $"
 
-static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/12 20:36:03 $";
+static char const ident[] =
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/12 20:36:03 $";
 
 /*
  *  This module is a master device driver for Communications Device Streams presending the
@@ -78,6 +79,8 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 #define d_clr_bit(nr,addr)	__clear_bit(nr,addr)
 
 #include <linux/interrupt.h>
+
+#endif				/* LINUX */
 
 #include <sys/cdi.h>
 
@@ -135,11 +138,31 @@ MODULE_ALIAS("/dev/cd");
 #endif				/* LINUX */
 
 /*
+ *  Logging.
+ */
+#ifndef LOG_EMERG
+
+#define LOG_EMERG	0
+#define LOG_ALERT	1
+#define LOG_CRIT	2
+#define LOG_ERR		3
+#define LOG_WARNING	4
+#define LOG_NOTICE	5
+#define LOG_INFO	6
+#define LOG_DEBUG	7
+
+#define LOG_KERN    (0<<3)
+#define LOG_USER    (1<<3)
+
+#endif				/* LOG_EMERG */
+
+/*
  *  STREAMS Definitions
  *  ===================
  */
 
 #define DRV_ID		CD_DRV_ID
+#define DRV_NAME	CD_DRV_NAME
 #define CMAJORS		CD_CMAJORS
 #define CMAJOR_0	CD_CMAJOR_0
 #define UNITS		CD_UNITS
@@ -150,12 +173,12 @@ MODULE_ALIAS("/dev/cd");
 #endif				/* MODULE */
 
 STATIC struct module_info cd_minfo = {
-	.mi_idnum = DRV_ID,		/* Module ID number */
-	.mi_idname = DRV_NAME,		/* Module name */
-	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size acceptd */
-	.mi_hiwat = 1 << 15,		/* Hi water mark */
-	.mi_hiwat = 1 << 10,		/* Lo water mark */
+	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idname = DRV_NAME,	/* Module name */
+	.mi_minpsz = 0,		/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,	/* Max packet size acceptd */
+	.mi_hiwat = 1 << 15,	/* Hi water mark */
+	.mi_hiwat = 1 << 10,	/* Lo water mark */
 };
 
 /* Upper multiplex is a CD provider following the CDI. */
@@ -164,18 +187,18 @@ STATIC streamscall int cd_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int cd_qclose(queue_t *, int, cred_t *);
 
 STATIC struct qinit cd_rinit = {
-	.qi_qopen = &cd_qopen,		/* Each open */
+	.qi_qopen = &cd_qopen,	/* Each open */
 	.qi_qclose = &cd_qclose,	/* Last close */
-	.qi_minfo = &cd_minfo,		/* Module information */
+	.qi_minfo = &cd_minfo,	/* Module information */
 };
 
 STATIC struct qinit cd_winit = {
-	.qi_minfo = &cd_minfo,		/* Module information */
+	.qi_minfo = &cd_minfo,	/* Module information */
 };
 
 STATIC struct streamtab cd_info = {
-	.st_rdinit = &cd_rinit,		/* Upper read queue */
-	.st_wrinit = &cd_winit,		/* Upper write queue */
+	.st_rdinit = &cd_rinit,	/* Upper read queue */
+	.st_wrinit = &cd_winit,	/* Upper write queue */
 };
 
 #define MAX_MINORS 16
@@ -216,13 +239,13 @@ cd_register_device(struct streamtab *str, major_t major, minor_t minor)
 	write_lock(&cd_devices_lock);
 	if (minor < 0 || minor > MAX_MINORS || str == NULL)
 		goto einval;
-	if (cd_devices[minor].d_str != str && cd_devices[minor].d_str != NULL)
+	if (cd_devices[minor].cd_str != str && cd_devices[minor].cd_str != NULL)
 		goto eacces;
-	if (cd_devices[minor].d_str == str)
+	if (cd_devices[minor].cd_str == str)
 		goto ealready;
 
-	cd_devices[minor].d_str = str;
-	cd_devices[minor].d_major = major;
+	cd_devices[minor].cd_str = str;
+	cd_devices[minor].cd_major = major;
 
 	/* For LFS, register a minor device node. */
 
@@ -242,23 +265,26 @@ cd_register_device(struct streamtab *str, major_t major, minor_t minor)
 	write_unlock(&cd_devices_lock);
 	return (err);
 }
+
 EXPORT_SYMBOL(cd_register_device);
 
 int
 cd_unregister_device(struct streamtab *str, major_t major, minor_t minor)
 {
+	int err;
+
 	write_lock(&cd_devices_lock);
 	if (minor < 0 || minor > MAX_MINORS || str == NULL)
 		goto einval;
-	if (cd_devices[minor].d_str != str)
+	if (cd_devices[minor].cd_str != str)
 		goto eacces;
-	if (cd_devices[minor].d_str == NULL)
+	if (cd_devices[minor].cd_str == NULL)
 		goto ealready;
 
 	/* For LFS, unregister a minor device node. */
 
-	cd_devices[minor].d_str = NULL;
-	cd_devices[minor].d_major = 0;
+	cd_devices[minor].cd_str = NULL;
+	cd_devices[minor].cd_major = 0;
 
 	write_unlock(&cd_devices_lock);
 	return (0);
@@ -276,6 +302,7 @@ cd_unregister_device(struct streamtab *str, major_t major, minor_t minor)
 	write_unlock(&cd_devices_lock);
 	return (err);
 }
+
 EXPORT_SYMBOL(cd_unregister_device);
 
 /*
@@ -348,7 +375,7 @@ cd_qclose(queue_t *q, int oflags, cred_t *crp)
 	/* We should never get here.  One of the major reasons is that STREAMS should have
 	   allocated the new streamtab because the registered driver should have opened with its
 	   own major device numbers. */
-	mi_close_comm(&cd_device_list, q);
+	// mi_close_comm(&cd_device_list, q);
 	return (0);
 }
 
