@@ -266,6 +266,14 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test ! -d "$srcdir/strbcm" ; then
 	with_STRBCM='no'
     fi
+    AC_ARG_WITH([STRISO],
+		AS_HELP_STRING([--with-STRISO],
+			       [include STRISO in master pack @<:@detected@:>@]),
+		[with_STRISO="$withval"],
+		[with_STRISO="$with_ALL"])
+    if test ! -d "$srcdir/striso" ; then
+	with_STRISO='no'
+    fi
 ])# _OS7_OPTIONS
 # =============================================================================
 
@@ -319,6 +327,13 @@ dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-compat'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-compat"
     fi
+    if test :"${with_STRUTIL:-yes}" != :no ; then
+	:
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_util --without-util\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-util'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-util"
+    fi
     if test :"${with_STRXNS:-yes}" != :no ; then
 	_XNS
     else
@@ -353,6 +368,20 @@ dnl
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_ss7 --without-ss7\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-ss7'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-ss7"
+    fi
+    if test :"${with_STRBCM:-yes}" != :no ; then
+	:
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_bcm --without-bcm\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-bcm'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-bcm"
+    fi
+    if test :"${with_STRISO:-yes}" != :no ; then
+	:
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_iso --without-iso\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-iso'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-iso"
     fi
 ])# _OS7_SETUP
 # =============================================================================
@@ -390,6 +419,9 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     fi
     if test :${with_STRBCM:-auto} = :auto ; then
 	with_STRBCM='no'
+    fi
+    if test :${with_STRISO:-auto} = :auto ; then
+	with_STRISO='no'
     fi
     if test :${with_SCTP:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([sctp])
@@ -429,6 +461,9 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     fi
     if test :${with_STRBCM:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strbcm])
+    fi
+    if test :${with_STRISO:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([striso])
     fi
     AC_CACHE_CHECK([for master srcdir],[os7_cv_master_srcdir],[dnl
 	os7_cv_master_srcdir=`(cd $srcdir; pwd)`
