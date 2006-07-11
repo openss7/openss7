@@ -56,7 +56,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_REVISION([$Id: configure.ac,v 0.9.2.2 2006/04/08 03:39:14 brian Exp $])
 AC_PREREQ(2.59)
-AC_INIT([striso],[0.9a],[bugs@openss7.org])
+AC_INIT([striso],[0.9.2],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
@@ -99,7 +99,7 @@ AC_PROG_MAKE_SET
 AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION(0.14.1)
+dnl AM_GNU_GETTEXT_VERSION(0.14.1)
 
 dnl
 dnl Checks for libraries.
@@ -145,7 +145,7 @@ AC_CHECK_TYPES([ptrdiff_t])
 dnl
 dnl Checks for library functions.
 dnl
-AM_GNU_GETTEXT
+dnl AM_GNU_GETTEXT
 AC_FUNC_ERROR_AT_LINE
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
@@ -167,15 +167,12 @@ AC_ISO
 
 AC_CONFIG_FILES([Makefile
 		 scripts/texi/args.texi
-		 src/Makefile
 		 src/include/Makefile
+		 src/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
-		 doc/manual/texi/args.texi
-		 m4/Makefile
-		 intl/Makefile
-		 po/Makefile.in])
+		 doc/manual/texi/args.texi])
 
 AC_OUTPUT
 
@@ -185,5 +182,6 @@ AC_OUTPUT
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocindent nosmartindent
