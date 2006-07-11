@@ -179,8 +179,8 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`$(ECHO) "$$s" | sed -e 's|^.*/||;s|\.c$$||'` ; \
-		$(ECHO) "touch \"$$r.ver\"" ; \
-		touch "$$r.ver" ; \
+		$(ECHO) "$(ECHO) '/* dummy load script */' > \"$$r.ver\"" ; \
+		$(ECHO) '/* dummy load script */' > "$$r.ver" ; \
 	done ; \
 	touch stamp-verfiles
 
