@@ -102,7 +102,13 @@ ADDON_OBJS			=
 noinst_LIBRARIES		= libISOmods.a libISOdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
-nodist_EXTRA_libISOmods_a_SOURCES = 
+nodist_EXTRA_libISOmods_a_SOURCES = \
+				  src/modules/cmot.c \
+				  src/modules/isot.c \
+				  src/modules/itot.c \
+				  src/modules/lpp.c \
+				  src/modules/tcpns.c \
+				  src/modules/xot.c
 
 mods_source_FILES		= $(nodist_EXTRA_libISOmods_a_SOURCES)
 
@@ -112,13 +118,17 @@ libISOmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libISOmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libISOmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-nodist_EXTRA_libISOdrvs_a_SOURCES = 
+nodist_EXTRA_libISOdrvs_a_SOURCES = \
+				  src/drivers/clns.c \
+				  src/drivers/tp.c \
+				  src/drivers/x25-lapb.c \
+				  src/drivers/x25-plp.c
 
 drvs_source_FILES		= $(nodist_EXTRA_libISOdrvs_a_SOURCES)
 
 nodist_libISOdrvs_a_SOURCES	= $(drvs_source_FILES)
 
-libISOdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/ip_hooks.h
+libISOdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libISOdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libISOdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 libISOdrvs_a_OBJECTS:		$(libISOdrvs_a_DEPENDENCIES)
@@ -162,7 +172,13 @@ ADDON_OBJS			=
 noinst_LIBRARIES		= libISOmods.a libISOdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
-nodist_EXTRA_libISOmods_a_SOURCES = 
+nodist_EXTRA_libISOmods_a_SOURCES = \
+				  src/modules/cmot.c \
+				  src/modules/isot.c \
+				  src/modules/itot.c \
+				  src/modules/lpp.c \
+				  src/modules/tcpns.c \
+				  src/modules/xot.c
 
 mods_source_FILES		= $(nodist_EXTRA_libISOmods_a_SOURCES)
 
@@ -172,7 +188,11 @@ libISOmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libISOmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libISOmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-nodist_EXTRA_libISOdrvs_a_SOURCES = 
+nodist_EXTRA_libISOdrvs_a_SOURCES = \
+				  src/drivers/clns.c \
+				  src/drivers/tp.c \
+				  src/drivers/x25-lapb.c \
+				  src/drivers/x25-plp.c
 
 drvs_source_FILES		= $(nodist_EXTRA_libISOdrvs_a_SOURCES)
 

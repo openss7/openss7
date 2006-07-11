@@ -108,30 +108,33 @@ static char const ident[] =
 
 #include <linux/interrupt.h>
 
+#endif				/* LINUX */
+
 #include <sys/dlpi.h>
 #include <sys/npi.h>
+#include <sys/strlog.h>
 
-#define CLNL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CLNL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define CLNL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNL_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2006/04/13 18:32:48 $"
-#define CLNL_DEVICE	"SVR 4.2 STREAMS CLNL OSI Network Provider"
-#define CLNL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CLNL_LICENSE	"GPL"
-#define CLNL_BANNER	CLNL_DESCRIP	"\n" \
-			CLNL_EXTRA	"\n" \
-			CLNL_COPYRIGHT	"\n" \
-			CLNL_DEVICE	"\n" \
-			CLNL_CONTACT
-#define CLNL_SPLASH	CLNL_DESCRIP	"\n" \
-			CLNL_REVISION
+#define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
+#define CLNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2006/04/13 18:32:48 $"
+#define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
+#define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define CLNS_LICENSE	"GPL"
+#define CLNS_BANNER	CLNS_DESCRIP	"\n" \
+			CLNS_EXTRA	"\n" \
+			CLNS_COPYRIGHT	"\n" \
+			CLNS_DEVICE	"\n" \
+			CLNS_CONTACT
+#define CLNS_SPLASH	CLNS_DESCRIP	"\n" \
+			CLNS_REVISION
 
 #ifdef LINUX
-MODULE_AUTHOR(CLNL_CONTACT);
-MODULE_DESCRIPTION(CLNL_DESCRIP);
-MODULE_SUPPORTED_DEVICE(CLNL_DEVICE);
+MODULE_AUTHOR(CLNS_CONTACT);
+MODULE_DESCRIPTION(CLNS_DESCRIP);
+MODULE_SUPPORTED_DEVICE(CLNS_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(CLNL_LICENSE);
+MODULE_LICENSE(CLNS_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-dl");
@@ -139,19 +142,19 @@ MODULE_ALIAS("streams-dl");
 #endif				/* LINUX */
 
 #ifdef LFS
-#define CLNL_DRV_ID	CONFIG_STREAMS_CLNL_MODID
-#define CLNL_DRV_NAME	CONFIG_STREAMS_CLNL_NAME
-#define CLNL_CMAJORS	CONFIG_STREAMS_CLNL_NMAJOR
-#define CLNL_CMAJOR_0	CONFIG_STREAMS_CLNL_MAJOR
-#define CLNL_UNITS	CONFIG_STREAMS_CLNL_NMINORS
+#define CLNS__DRV_ID	CONFIG_STREAMS_CLNS__MODID
+#define CLNS__DRV_NAME	CONFIG_STREAMS_CLNS__NAME
+#define CLNS__CMAJORS	CONFIG_STREAMS_CLNS__NMAJORS
+#define CLNS__CMAJOR_0	CONFIG_STREAMS_CLNS__MAJOR
+#define CLNS__UNITS	CONFIG_STREAMS_CLNS__NMINORS
 #endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
 #ifdef LFS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CLNL_MODID));
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CLNS__MODID));
 MODULE_ALIAS("streams-driver-dl");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLNL_MAJOR));
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLNS__MAJOR));
 MODULE_ALIAS("/dev/streams/clnl");
 MODULE_ALIAS("/dev/streams/clnl/*");
 MODULE_ALIAS("/dev/streams/clnl/clnl");
@@ -160,10 +163,10 @@ MODULE_ALIAS("/dev/streams/clnl/esis");
 MODULE_ALIAS("/dev/streams/clnl/isis");
 MODULE_ALIAS("/dev/streams/clone/clnl");
 #endif				/* LFS */
-MODULE_ALIAS("char-major-" __stringify(CLNL_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(CLNL_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(CLNL_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(CLNL_CMAJOR_0) "-" __stringify(CLNL_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CLNS__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(CLNS__CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(CLNS__CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CLNS__CMAJOR_0) "-" __stringify(CLNS__CMINOR));
 MODULE_ALIAS("/dev/clnl");
 MODULE_ALIAS("/dev/clns");
 MODULE_ALIAS("/dev/esis");
@@ -176,77 +179,477 @@ MODULE_ALIAS("/dev/isis");
  *  ===================
  */
 
-#define DRV_ID		CLNL_DRV_ID
-#define CMAJORS		CLNL_CMAJORS
-#define CMAJOR_0	CLNL_CMAJOR_0
-#define UNITS		CLNL_UNITS
+#define DRV_ID		CLNS__DRV_ID
+#define DRV_NAME	CLNS__DRV_NAME
+#define CMAJORS		CLNS__CMAJORS
+#define CMAJOR_0	CLNS__CMAJOR_0
+#define UNITS		CLNS__UNITS
 #ifdef MODULE
-#define DRV_BANNER	CLNL_BANNER
+#define DRV_BANNER	CLNS_BANNER
 #else				/* MODULE */
-#define DRV_BANNER	CLNL_SPLASH
+#define DRV_BANNER	CLNS_SPLASH
 #endif				/* MODULE */
 
+/* Upper multiplex is a N provider following the NPI. */
+
 STATIC struct module_info np_minfo = {
-	.mi_idnum = DRV_ID,		/* Module ID number */
-	.mi_idname = DRV_NAME,		/* Module name */
-	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size acceptd */
-	.mi_hiwat = 1 << 15,		/* Hi water mark */
-	.mi_hiwat = 1 << 10,		/* Lo water mark */
+	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idname = DRV_NAME,	/* Module name */
+	.mi_minpsz = 0,		/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,	/* Max packet size acceptd */
+	.mi_hiwat = 1 << 15,	/* Hi water mark */
+	.mi_hiwat = 1 << 10,	/* Lo water mark */
 };
 
 STATIC struct module_stat np_mstat = {
 };
 
-/* Upper multiplex is a N provider following the NPI. */
-
 STATIC streamscall int np_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int np_qclose(queue_t *, int, cred_t *);
 
 STATIC struct qinit np_rinit = {
-	.qi_putp = &ss7_oput,		/* Read put procedure (message from below) */
-	.qi_srvp = &ss7_osrv,		/* Read service procedure */
-	.qi_qopen = &np_qopen,		/* Each open */
+	.qi_putp = &ss7_oput,	/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_osrv,	/* Read service procedure */
+	.qi_qopen = &np_qopen,	/* Each open */
 	.qi_qclose = &np_qclose,	/* Last close */
-	.qi_minfo = &np_minfo,		/* Module information */
-	.qi_mstat = &np_mstat,		/* Module statistics */
+	.qi_minfo = &np_minfo,	/* Module information */
+	.qi_mstat = &np_mstat,	/* Module statistics */
 };
 
 STATIC struct qinit np_winit = {
-	.qi_putp = &ss7_iput,		/* Read put procedure (message from below) */
-	.qi_srvp = &ss7_isrv,		/* Read service procedure */
-	.qi_minfo = &np_minfo,		/* Module information */
-	.qi_mstat = &np_mstat,		/* Module statistics */
+	.qi_putp = &ss7_iput,	/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_isrv,	/* Read service procedure */
+	.qi_minfo = &np_minfo,	/* Module information */
+	.qi_mstat = &np_mstat,	/* Module statistics */
 };
 
 /* Lower multiplex is a DL user following the DLPI. */
 
+STATIC struct module_info dl_minfo = {
+	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idname = DRV_NAME,	/* Module name */
+	.mi_minpsz = 0,		/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,	/* Max packet size acceptd */
+	.mi_hiwat = 1 << 15,	/* Hi water mark */
+	.mi_hiwat = 1 << 10,	/* Lo water mark */
+};
+
+STATIC struct module_stat dl_mstat = {
+};
+
 STATIC struct qinit dl_rinit = {
-	.qi_putp = &ss7_iput,		/* Read put procedure (message from below) */
-	.qi_srvp = &ss7_isrv,		/* Read service procedure */
-	.qi_minfo = &dl_minfo,		/* Module information */
-	.qi_mstat = &dl_mstat,		/* Module statistics */
+	.qi_putp = &ss7_iput,	/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_isrv,	/* Read service procedure */
+	.qi_minfo = &dl_minfo,	/* Module information */
+	.qi_mstat = &dl_mstat,	/* Module statistics */
 };
 
 STATIC struct qinit dl_winit = {
-	.qi_putp = &ss7_oput,		/* Read put procedure (message from below) */
-	.qi_srvp = &ss7_osrv,		/* Read service procedure */
-	.qi_minfo = &dl_minfo,		/* Module information */
-	.qi_mstat = &dl_mstat,		/* Module statistics */
+	.qi_putp = &ss7_oput,	/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_osrv,	/* Read service procedure */
+	.qi_minfo = &dl_minfo,	/* Module information */
+	.qi_mstat = &dl_mstat,	/* Module statistics */
 };
 
 STATIC struct streamtab np_info = {
-	.st_rdinit = &np_rinit,		/* Upper read queue */
-	.st_wrinit = &np_winit,		/* Upper write queue */
+	.st_rdinit = &np_rinit,	/* Upper read queue */
+	.st_wrinit = &np_winit,	/* Upper write queue */
 	.st_muxrinit = &dl_rinit,	/* Lower read queue */
 	.st_muxwinit = &dl_winit,	/* Lower write queue */
 };
+
+/* Private structures */
+typedef struct np {
+	STR_DECLARATION (struct np);	/* Stream declaration */
+	struct np *bnext;		/* linkage for bind/list hash */
+	struct np **bprev;		/* linkage for bind/list hash */
+#if 0
+	struct np_bhash_bucket *bhash;	/* linkage for bind/list hash */
+#endif
+	struct np *cnext;		/* linkage for conn hash */
+	struct np **cprev;		/* linkage for conn hash */
+#if 0
+	struct np_chash_bucket *chash;	/* linkage for conn hash */
+#endif
+	N_info_ack_t info;		/* service provider information */
+	unsigned int BIND_flags;	/* bind flags */
+	unsigned int CONN_flags;	/* connect flags */
+	unsigned int CONIND_number;	/* maximum number of outstanding connection indications */
+	unsigned int coninds;		/* number of outstanding connection indications */
+	mblk_t *conq;			/* connection indication queue */
+	unsigned int datinds;		/* number of outstanding data indications */
+	mblk_t *datq;			/* data indication queue */
+	unsigned int resinds;		/* number of outstanding reset indications */
+	mblk_t *resq;			/* reset indication queue */
+	unsigned short pnum;		/* number of bound protocol ids */
+	uint8_t protoids[16];		/* bound protocol ids */
+	unsigned short bnum;		/* number of bound addresses */
+	unsigned short bport;		/* bound port number (network order) */
+#if 0
+	struct np_baddr baddrs[8];	/* bound addresses */
+#endif
+	unsigned short snum;		/* number of source (connected) addresses */
+	unsigned short sport;		/* source (connected) port number (network order) */
+#if 0
+	struct np_saddr saddrs[8];	/* source (connected) addresses */
+#endif
+	unsigned short dnum;		/* number of destination (connected) addresses */
+	unsigned short dport;		/* destination (connected) port number (network order) */
+#if 0
+	struct np_daddr daddrs[8];	/* destination (connected) addresses */
+#endif
+#if 0
+	struct N_qos_sel_info_ip qos;	/* network service provider quality of service */
+	struct N_qos_range_info_ip qor;	/* network service provider quality of service range */
+#endif
+} np_t;
+
+#define PRIV(__q) (((__q)->q_ptr))
+#define NP_PRIV(__q) ((struct np *)((__q)->q_ptr))
+
+STATIC kmem_cache_t *np_priv_cachep;
+
+static INLINE __unlikely struct np *
+np_get(struct np *np)
+{
+	if (np)
+		atomic_inc(&np->refcnt);
+	return (np);
+}
+static INLINE __unlikely void
+np_put(struct np *np)
+{
+	if (np)
+		if (atomic_dec_and_test(&np->refcnt)) {
+			kmem_cache_free(np_priv_cachep, np);
+		}
+}
+static INLINE __unlikely void
+np_release(struct np **npp)
+{
+	if (npp != NULL)
+		np_put(XCHG(npp, NULL));
+}
+static INLINE __unlikely struct np *
+np_alloc(void)
+{
+	struct np *np;
+
+	if ((np = kmem_cache_alloc(np_priv_cachep, SLAB_ATOMIC))) {
+		bzero(np, sizeof(*np));
+		atomic_set(&np->refcnt, 1);
+		spin_lock_init(&np->lock);	/* "np-lock" */
+		np->priv_put = &np_put;
+		np->priv_get = &np_get;
+		// np->type = 0;
+		// np->id = 0;
+		// np->state = 0;
+		// np->flags = 0;
+	}
+	return (np);
+}
+
+typedef struct dl {
+	STR_DECLARATION (struct dl);
+	dl_info_ack_t info;
+} dl_t;
+
+#define PRIV(__q) (((__q)->q_ptr))
+#define DL_PRIV(__q) ((struct dl *)((__q)->q_ptr))
+
+STATIC kmem_cache_t *dl_priv_cachep;
+
+static INLINE __unlikely struct dl *
+dl_get(struct dl *dl)
+{
+	if (dl)
+		atomic_inc(&dl->refcnt);
+	return (dl);
+}
+static INLINE __unlikely void
+dl_put(struct dl *dl)
+{
+	if (dl)
+		if (atomic_dec_and_test(&dl->refcnt)) {
+			kmem_cache_free(dl_priv_cachep, dl);
+		}
+}
+static INLINE __unlikely void
+dl_release(struct dl **dlp)
+{
+	if (dlp != NULL)
+		dl_put(XCHG(dlp, NULL));
+}
+static INLINE __unlikely struct dl *
+dl_alloc(void)
+{
+	struct dl *dl;
+
+	if ((dl = kmem_cache_alloc(dl_priv_cachep, SLAB_ATOMIC))) {
+		bzero(dl, sizeof(*dl));
+		atomic_set(&dl->refcnt, 1);
+		spin_lock_init(&dl->lock);	/* "dl-lock" */
+		dl->priv_put = &dl_put;
+		dl->priv_get = &dl_get;
+		// dl->type = 0;
+		// dl->id = 0;
+		// dl->state = 0;
+		// dl->flags = 0;
+	}
+	return (dl);
+}
+
+typedef struct df {
+	rwlock_t lock;			/* structure lock */
+	SLIST_HEAD (np, np);		/* master list of np (open) structures */
+	SLIST_HEAD (dl, dl);		/* master list of dl (link) structures */
+} df_t;
+
+STATIC struct df master = {.lock = RW_LOCK_UNLOCKED, };
+
+/*
+ *  Logging.
+ */
+#ifndef LOG_EMERG
+
+#define LOG_EMERG	0
+#define LOG_ALERT	1
+#define LOG_CRIT	2
+#define LOG_ERR		3
+#define LOG_WARNING	4
+#define LOG_NOTICE	5
+#define LOG_INFO	6
+#define LOG_DEBUG	7
+
+#define LOG_KERN    (0<<3)
+#define LOG_USER    (1<<3)
+
+#endif				/* LOG_EMERG */
+
+/*
+ *  State changes.
+ */
+
+/* State flags */
+#define NSF_UNBND	(1 << NS_UNBND		)
+#define NSF_WACK_BREQ	(1 << NS_WACK_BREQ	)
+#define NSF_WACK_UREQ	(1 << NS_WACK_UREQ	)
+#define NSF_IDLE	(1 << NS_IDLE		)
+#ifdef NS_WACK_OPTREQ
+#define NSF_WACK_OPTREQ	(1 << NS_WACK_OPTREQ	)
+#endif
+#define NSF_WACK_RRES	(1 << NS_WACK_RRES	)
+#define NSF_WCON_CREQ	(1 << NS_WCON_CREQ	)
+#define NSF_WRES_CIND	(1 << NS_WRES_CIND	)
+#define NSF_WACK_CRES	(1 << NS_WACK_CRES	)
+#define NSF_DATA_XFER	(1 << NS_DATA_XFER	)
+#define NSF_WCON_RREQ	(1 << NS_WCON_RREQ	)
+#define NSF_WRES_RIND	(1 << NS_WRES_RIND	)
+#define NSF_WACK_DREQ6	(1 << NS_WACK_DREQ6	)
+#define NSF_WACK_DREQ7	(1 << NS_WACK_DREQ7	)
+#define NSF_WACK_DREQ9	(1 << NS_WACK_DREQ9	)
+#define NSF_WACK_DREQ10	(1 << NS_WACK_DREQ10	)
+#define NSF_WACK_DREQ11	(1 << NS_WACK_DREQ11	)
+#define NSF_NOSTATES	(1 << NS_NOSTATES	)
+
+/* State masks */
+#define NSM_ALLSTATES	(NSF_NOSTATES - 1)
+#define NSM_WACK_DREQ	(NSF_WACK_DREQ6 \
+			|NSF_WACK_DREQ7 \
+			|NSF_WACK_DREQ9 \
+			|NSF_WACK_DREQ10 \
+			|NSF_WACK_DREQ11)
+#define NSM_LISTEN	(NSF_IDLE \
+			|NSF_WRES_CIND)
+#define NSM_CONNECTED	(NSF_WCON_CREQ\
+			|NSF_WRES_CIND\
+			|NSF_DATA_XFER\
+			|NSF_WCON_RREQ\
+			|NSF_WRES_RIND)
+#define NSM_DISCONN	(NSF_IDLE\
+			|NSF_UNBND)
+#define NSM_INDATA	(NSF_DATA_XFER\
+			|NSF_WCON_RREQ)
+#define NSM_OUTDATA	(NSF_DATA_XFER\
+			|NSF_WRES_RIND)
+
+#ifndef N_PROVIDER
+#define N_PROVIDER  0
+#define N_USER	    1
+#endif
+
+#ifdef _DEBUG
+STATIC const char *
+np_state_name(np_ulong state)
+{
+	switch (state) {
+	case NS_UNBND:
+		return ("NS_UNBND");
+	case NS_WACK_BREQ:
+		return ("NS_WACK_BREQ");
+	case NS_WACK_UREQ:
+		return ("NS_WACK_UREQ");
+	case NS_IDLE:
+		return ("NS_IDLE");
+	case NS_WACK_OPTREQ:
+		return ("NS_WACK_OPTREQ");
+	case NS_WACK_RRES:
+		return ("NS_WACK_RRES");
+	case NS_WCON_CREQ:
+		return ("NS_WCON_CREQ");
+	case NS_WRES_CIND:
+		return ("NS_WRES_CIND");
+	case NS_WACK_CRES:
+		return ("NS_WACK_CRES");
+	case NS_DATA_XFER:
+		return ("NS_DATA_XFER");
+	case NS_WCON_RREQ:
+		return ("NS_WCON_RREQ");
+	case NS_WRES_RIND:
+		return ("NS_WRES_RIND");
+	case NS_WACK_DREQ6:
+		return ("NS_WACK_DREQ6");
+	case NS_WACK_DREQ7:
+		return ("NS_WACK_DREQ7");
+	case NS_WACK_DREQ9:
+		return ("NS_WACK_DREQ9");
+	case NS_WACK_DREQ10:
+		return ("NS_WACK_DREQ10");
+	case NS_WACK_DREQ11:
+		return ("NS_WACK_DREQ11");
+	case NS_NOSTATES:
+		return ("NS_NOSTATES");
+	default:
+		return ("(unknown)");
+	}
+}
+#endif				/* _DEBUG */
+
+STATIC INLINE streams_fastcall __unlikely void
+np_set_state(struct np *np, const np_ulong state)
+{
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, np, np_state_name(state),
+		np_state_name(np->info.CURRENT_state)));
+	np->info.CURRENT_state = state;
+}
+
+STATIC INLINE streams_fastcall __unlikely np_ulong
+np_get_state(const struct np *np)
+{
+	return (np->info.CURRENT_state);
+}
+
+STATIC INLINE streams_fastcall __unlikely np_ulong
+np_chk_state(const struct np *np, const np_ulong mask)
+{
+	return (((1 << np->info.CURRENT_state) & (mask)) != 0);
+}
+
+STATIC INLINE streams_fastcall __unlikely np_ulong
+np_not_state(const struct np *np, const np_ulong mask)
+{
+	return (((1 << np->info.CURRENT_state) & (mask)) == 0);
+}
+
+STATIC INLINE streams_fastcall __unlikely np_ulong
+np_get_statef(const struct np *np)
+{
+	return (1 << np_get_state(np));
+}
+
+#ifdef _DEBUG
+STATIC const char *
+dl_state_name(dl_ulong state)
+{
+	switch (state) {
+	case DL_UNATTACHED:
+		return ("DL_UNATTACHED");
+	case DL_ATTACH_PENDING:
+		return ("DL_ATTACH_PENDING");
+	case DL_DETACH_PENDING:
+		return ("DL_DETACH_PENDING");
+	case DL_UNBOUND:
+		return ("DL_UNBOUND");
+	case DL_BIND_PENDING:
+		return ("DL_BIND_PENDING");
+	case DL_UNBIND_PENDING:
+		return ("DL_UNBIND_PENDING");
+	case DL_IDLE:
+		return ("DL_IDLE");
+	case DL_UDQOS_PENDING:
+		return ("DL_UDQOS_PENDING");
+	case DL_OUTCON_PENDING:
+		return ("DL_OUTCON_PENDING");
+	case DL_INCON_PENDING:
+		return ("DL_INCON_PENDING");
+	case DL_CONN_RES_PENDING:
+		return ("DL_CONN_RES_PENDING");
+	case DL_DATAXFER:
+		return ("DL_DATAXFER");
+	case DL_USER_RESET_PENDING:
+		return ("DL_USER_RESET_PENDING");
+	case DL_PROV_RESET_PENDING:
+		return ("DL_PROV_RESET_PENDING");
+	case DL_RESET_RES_PENDING:
+		return ("DL_RESET_RES_PENDING");
+	case DL_DISCON8_PENDING:
+		return ("DL_DISCON8_PENDING");
+	case DL_DISCON9_PENDING:
+		return ("DL_DISCON9_PENDING");
+	case DL_DISCON11_PENDING:
+		return ("DL_DISCON11_PENDING");
+	case DL_DISCON12_PENDING:
+		return ("DL_DISCON12_PENDING");
+	case DL_DISCON13_PENDING:
+		return ("DL_DISCON13_PENDING");
+	case DL_SUBS_BIND_PND:
+		return ("DL_SUBS_BIND_PND");
+	case DL_SUBS_UNBIND_PND:
+		return ("DL_SUBS_UNBIND_PND");
+	default:
+		return ("(unknown)");
+	}
+}
+#endif				/* _DEBUG */
+
+STATIC INLINE streams_fastcall __unlikely void
+dl_set_state(struct dl *dl, const dl_ulong state)
+{
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, dl, dl_state_name(state),
+		dl_state_name(dl->info.dl_current_state)));
+	dl->info.dl_current_state = state;
+}
+
+STATIC INLINE streams_fastcall __unlikely dl_ulong
+dl_get_state(const struct dl *dl)
+{
+	return (dl->info.dl_current_state);
+}
+
+STATIC INLINE streams_fastcall __unlikely dl_ulong
+dl_chk_state(const struct dl *dl, const dl_ulong mask)
+{
+	return (((1 << dl->info.dl_current_state) & (mask)) != 0);
+}
+
+STATIC INLINE streams_fastcall __unlikely dl_ulong
+dl_not_state(const struct dl *dl, const dl_ulong mask)
+{
+	return (((1 << dl->info.dl_current_state) & (mask)) == 0);
+}
+
+STATIC INLINE streams_fastcall __unlikely dl_ulong
+dl_get_statef(const struct dl *dl)
+{
+	return (1 << dl_get_state(dl));
+}
 
 /*
  *  Service Primitives passed downwards -- lower multiplex or module
  *  ----------------------------------------------------------------
  */
 
+#if 0
 STATIC int
 dl_info_req(queue_t *q, queue_t *oq)
 {
@@ -269,10 +672,6 @@ dl_unbind_req(queue_t *q, queue_t *oq)
 }
 STATIC int
 dl_subs_bind_req(queue_t *q, queue_t *oq)
-{
-}
-STATIC int
-dl_subs_bind_ack(queue_t *q, queue_t *oq)
 {
 }
 STATIC int
@@ -327,12 +726,14 @@ STATIC int
 dl_reset_res(queue_t *q, queue_t *oq)
 {
 }
+#endif				/* 0 */
 
 /*
  *  Service Primitives passed upwards -- upper multiplex or module
  *  --------------------------------------------------------------
  */
 
+#if 0
 STATIC int
 n_conn_ind(queue_t *q, queue_t *oq)
 {
@@ -361,10 +762,19 @@ STATIC int
 n_bind_ack(queue_t *q, queue_t *oq)
 {
 }
+#endif				/* 0 */
 STATIC int
-n_error_ack(queue_t *q, queue_t *oq)
+n_error_ack(queue_t *q, np_long prim, np_long rtn)
 {
+	return (-EFAULT);
 }
+STATIC int
+n_error_reply(queue_t *q, np_long rtn)
+{
+	return (-EFAULT);
+}
+
+#if 0
 STATIC int
 n_ok_ack(queue_t *q, queue_t *oq)
 {
@@ -389,16 +799,19 @@ STATIC int
 n_reset_con(queue_t *q, queue_t *oq)
 {
 }
+#endif				/* 0 */
 
 /*
  *  Service Primitives from above -- lower multiplex
  *  ------------------------------------------------
  */
 
+#if 0
 STATIC int
-n_w_rse(queue_t *q, mblk_t *mp)
+dl_w_rse(queue_t *q, mblk_t *mp)
 {
 }
+#endif				/* 0 */
 
 /*
  *  Service Primitives from above -- upper multiplex
@@ -407,54 +820,67 @@ n_w_rse(queue_t *q, mblk_t *mp)
 STATIC int
 n_conn_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_conn_res(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_discon_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_data_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_exdata_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_info_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_bind_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_unbind_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_unitdata_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_optmgmt_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_datack_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_reset_req(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 n_reset_res(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 
 STATIC INLINE fastcall __hot_put int
@@ -463,7 +889,7 @@ np_w_proto(queue_t *q, mblk_t *mp)
 	int rtn = -EPROTO;
 	np_long prim = 0;
 	struct np *np = NP_PRIV(q);
-	np_long oldstate = npi_get_state(np);
+	np_long oldstate = np_get_state(np);
 
 	if (mp->b_wptr >= mp->b_rptr + sizeof(prim)) {
 		switch ((prim = *(np_long *) mp->b_rptr)) {
@@ -532,7 +958,7 @@ np_w_proto(queue_t *q, mblk_t *mp)
 	}
 	if (rtn < 0) {
 		seldom();
-		npi_set_state(np, oldstate);
+		np_set_state(np, oldstate);
 		/* The put and service procedure do not recognize all errors. Sometimes we return
 		   an error to here just to restore the previous state. */
 		switch (rtn) {
@@ -555,14 +981,17 @@ np_w_proto(queue_t *q, mblk_t *mp)
 STATIC int
 np_w_data(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 np_w_ctl(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 np_w_ioctl(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 
 /*
@@ -574,8 +1003,9 @@ np_w_ioctl(queue_t *q, mblk_t *mp)
  */
 
 STATIC int
-dl_r_rse(queue_t *q, mblk_t *mp)
+np_r_rse(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 
 /*
@@ -585,70 +1015,87 @@ dl_r_rse(queue_t *q, mblk_t *mp)
 STATIC int
 dl_info_ack(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_ok_ack(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_error_ack(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_subs_bind_ack(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_unitdata_ind(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_uderror_ind(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_connect_ind(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_connect_con(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_token_ack(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_disconnect_ind(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_reset_ind(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_reset_con(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_data_ack_ind(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_data_ack_status_ind(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_reply_ind(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_reply_status_ind(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_reply_update_status_ind(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 
 STATIC INLINE fastcall __hot_read int
@@ -656,8 +1103,8 @@ dl_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn = -EPROTO;
 	dl_long prim = 0;
-	struct dl *dl = CD_PRIV(q);
-	dl_long oldstate = dlpi_get_state(dl);
+	struct dl *dl = DL_PRIV(q);
+	dl_long oldstate = dl_get_state(dl);
 
 	if (mp->b_wptr >= mp->b_rptr + sizeof(prim)) {
 		switch ((prim = *(dl_long *) mp->b_rptr)) {
@@ -747,7 +1194,7 @@ dl_r_proto(queue_t *q, mblk_t *mp)
 	}
 	if (rtn < 0) {
 		seldom();
-		dlpi_set_state(dl, oldstate);
+		dl_set_state(dl, oldstate);
 		/* The put and service procedure do not recognize all errors. Sometimes we return
 		   an error to here just to restore the previous state. */
 		switch (rtn) {
@@ -776,22 +1223,27 @@ dl_r_proto(queue_t *q, mblk_t *mp)
 STATIC INLINE fastcall __hot_read int
 dl_r_data(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_r_ctl(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_r_ioctl(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_r_hangup(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 STATIC int
 dl_r_error(queue_t *q, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 
 /*
@@ -857,6 +1309,13 @@ np_r_prim(queue_t *q, mblk_t *mp)
 	return (QR_PASSFLOW);
 }
 
+STATIC void
+np_r_wakeup(queue_t *q)
+{
+	qenable(q);
+}
+
+#if 0
 /**
  * dl_w_prim - process messages for the lower multiplex write queue
  * @q: lower multiplex write queue
@@ -887,6 +1346,7 @@ dl_w_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSFLOW);
 }
+#endif				/* 0 */
 
 /**
  * dl_r_prim - process messages on the lower multiplex read queue or the module read queue
@@ -1025,11 +1485,11 @@ np_free_priv(queue_t *q)
 	write_unlock_bh(&master.lock);
 	strlog(DRV_ID, np->u.dev.cminor, LOG_DEBUG, SL_TRACE,
 	       "unlinked: reference count = %d", atomic_read(&np->refcnt));
-	np_release(&np->oq->q_ptr);
+	np_release((struct np **) &np->oq->q_ptr);
 	np->oq = NULL;
-	np_release(&np->iq->q_ptr);
+	np_release((struct np **) &np->iq->q_ptr);
 	np->iq = NULL;
-	assure(atomic_read(&tp->refcnt) == 1);
+	assure(atomic_read(&np->refcnt) == 1);
 	np_release(&np);
 	return;
 }
@@ -1038,6 +1498,8 @@ np_free_priv(queue_t *q)
  *  STREAMS Open and Close
  *  ======================
  */
+STATIC int np_majors[CMAJORS] = { CMAJOR_0, };
+
 STATIC streamscall int
 np_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
@@ -1073,7 +1535,7 @@ np_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		cminor = 1;
 	}
 	write_lock_bh(&master.lock);
-	for (npp = &master.drv.list; *npp; npp = &(*npp)->next) {
+	for (npp = &master.np.list; *npp; npp = &(*npp)->next) {
 		if (cmajor != (*npp)->u.dev.cmajor)
 			break;
 		if (cmajor == (*npp)->u.dev.cmajor) {
@@ -1147,7 +1609,7 @@ MODULE_PARM(modid, "h");
 #else				/* module_param */
 module_param(modid, ushort, 0);
 #endif				/* module_param */
-MODULE_PARM_DESC(modid, "Module ID number for CLNL driver (0-for allocation).");
+MODULE_PARM_DESC(modid, "Module ID number for CLNS driver (0-for allocation).");
 
 major_t major = CMAJOR_0;
 
@@ -1156,7 +1618,7 @@ MODULE_PARM(major, "h");
 #else				/* module_param */
 module_param(major, uint, 0);
 #endif				/* module_param */
-MODULE_PARM_DESC(major, "Major device number for CLNL driver (0 for allocation).");
+MODULE_PARM_DESC(major, "Major device number for CLNS driver (0 for allocation).");
 
 #endif				/* LINUX */
 

@@ -99,7 +99,7 @@ static char const ident[] =
 #ifdef LINUX
 #undef ASSERT
 
-#include <linux/bitopts.h>
+#include <linux/bitops.h>
 
 #define t_tst_bit(nr,addr)	test_bit(nr,addr);
 #define t_set_bit(nr,addr)	__set_bit(nr,addr);
@@ -107,19 +107,23 @@ static char const ident[] =
 
 #include <linux/interrupt.h>
 
+#endif				/* LINUX */
+
 #undef socklen_t
 typedef unsigned int socklen_t;
 
 #define socklen_t socklen_t
 
-#ifdef defined HAVE_TIHDR_H
+#if defined HAVE_TIHDR_H
 #   include <tidhr.h>
 #else
 #   include <sys/tihdr.h>
 #endif
 
 #include <sys/npi.h>
-#include <sys/npi_osi.h>
+//#include <sys/npi_osi.h>
+
+#include <sys/xti.h>
 
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
@@ -149,30 +153,30 @@ MODULE_ALIAS("streams-tp");
 #endif
 
 #ifdef LFS
-#define TP_DRV_ID	CONFIG_STREAMS_TP_MODID
-#define TP_MOD_ID	CONFIG_STREAMS_TP_MODID
-#define TP_DRV_NAME	CONFIG_STREAMS_TP_NAME
-#define TP_MOD_NAME	CONFIG_STREAMS_TP_NAME
-#define TP_CMAJORS	CONFIG_STREAMS_TP_NMAJOR
-#define TP_CMAJOR_0	CONFIG_STREAMS_TP_MAJOR
-#define TP_UNITS	CONFIG_STREAMS_TP_NMINORS
+#define TP__DRV_ID	CONFIG_STREAMS_TP__MODID
+#define TP__MOD_ID	CONFIG_STREAMS_TP__MODID
+#define TP__DRV_NAME	CONFIG_STREAMS_TP__NAME
+#define TP__MOD_NAME	CONFIG_STREAMS_TP__NAME
+#define TP__CMAJORS	CONFIG_STREAMS_TP__NMAJOR
+#define TP__CMAJOR_0	CONFIG_STREAMS_TP__MAJOR
+#define TP__UNITS	CONFIG_STREAMS_TP__NMINORS
 #endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
 #ifdef LFS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TP_MODID));
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TP__MODID));
 MODULE_ALIAS("streams-driver-tp");
 MODULE_ALIAS("streams-module-tp");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_IP_MAJOR));
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_TP__MAJOR));
 MODULE_ALIAS("/dev/streams/tp");
 MODULE_ALIAS("/dev/streams/tp/*");
 MODULE_ALIAS("/dev/streams/clone/tp");
 #endif				/* LFS */
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-" __stringify(TP_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(TP__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(TP__CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(TP__CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(TP__CMAJOR_0) "-" __stringify(TP__CMINOR));
 MODULE_ALIAS("/dev/tp0");
 MODULE_ALIAS("/dev/tp1");
 MODULE_ALIAS("/dev/tp2");
@@ -186,11 +190,12 @@ MODULE_ALIAS("/dev/tp4_clns");
  *  ===================
  */
 
-#define DRV_ID		TP_DRV_ID
-#define MOD_ID		TP_MOD_ID
-#define CMAJORS		TP_CMAJORS
-#define CMAJOR_0	TP_CMAJOR_0
-#define UNITS		TP_UNITS
+#define DRV_ID		TP__DRV_ID
+#define DRV_NAME	TP__DRV_NAME
+#define MOD_ID		TP__MOD_ID
+#define CMAJORS		TP__CMAJORS
+#define CMAJOR_0	TP__CMAJOR_0
+#define UNITS		TP__UNITS
 #ifdef MODULE
 #define DRV_BANNER	TP_BANNER
 #else				/* MODULE */
@@ -223,7 +228,7 @@ STATIC struct qinit tp_rinit = {
 STATIC streamscall int tp_wput(queue_t *q, mblk_t *mp);
 STATIC streamscall int tp_wsrv(queue_t *q);
 
-STATIC struct qinit tp_rinit = {
+STATIC struct qinit tp_winit = {
 	.qi_putp = &tp_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = &tp_wsrv,		/* Write service procedure */
 	.qi_minfo = &tp_minfo,		/* Module information */
@@ -250,7 +255,7 @@ STATIC struct qinit np_rinit = {
 STATIC streamscall int np_wput(queue_t *q, mblk_t *mp);
 STATIC streamscall int np_wsrv(queue_t *q);
 
-STATIC struct qinit np_rinit = {
+STATIC struct qinit np_winit = {
 	.qi_putp = &np_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = &np_wsrv,		/* Write service procedure */
 	.qi_minfo = &np_minfo,		/* Module information */
