@@ -4398,6 +4398,17 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 #endif
 #endif
 			_printd(("sending message %p\n", skb));
+			__printd(("sending message %d.%d.%d.%d:%d, %d.%d.%d.%d:%d\n",
+						(ntohl(iph->saddr) >> 24) & 0xff,
+						(ntohl(iph->saddr) >> 16) & 0xff,
+						(ntohl(iph->saddr) >>  8) & 0xff,
+						(ntohl(iph->saddr) >>  9) & 0xff,
+						(int) ntohs(uh->dest),
+						(ntohl(iph->daddr) >> 24) & 0xff,
+						(ntohl(iph->daddr) >> 16) & 0xff,
+						(ntohl(iph->daddr) >>  8) & 0xff,
+						(ntohl(iph->daddr) >>  9) & 0xff,
+						(int) ntohs(uh->source)));
 #ifdef HAVE_KFUNC_DST_OUTPUT
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, tp_ip_queue_xmit);
 #else
@@ -7972,7 +7983,7 @@ STATIC noinline streams_fastcall __unlikely struct tp *
 tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
 	struct tp *result = NULL;
-	int hiscore = 0;
+	int hiscore = -1;
 	struct tp_chash_bucket *hp, *hp1, *hp2;
 
 	hp1 = &udp_chash[udp_chashfn(proto, sport, dport)];
@@ -8070,7 +8081,7 @@ STATIC INLINE streams_fastcall __hot_in struct tp *
 tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 {
 	struct tp *result = NULL;
-	int hiscore = 0;
+	int hiscore = -1;
 	struct tp_bhash_bucket *hp, *hp1, *hp2;
 
 	hp1 = &udp_bhash[udp_bhashfn(proto, dport)];
@@ -8089,34 +8100,48 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 				register int i;
 
 				/* only listening T_COTS(_ORD) Streams and T_CLTS Streams */
-				if (tp->CONIND_number == 0 && tp->info.SERV_type != T_CLTS)
+				if (tp->CONIND_number == 0 && tp->info.SERV_type != T_CLTS) {
+					__trace();
 					continue;
+				}
 				/* only Streams in close to the correct state */
-				if (tp_not_state(tp, (TSF_IDLE|TSF_WACK_CREQ)))
+				if (tp_not_state(tp, (TSF_IDLE|TSF_WACK_CREQ))) {
+					__trace();
 					continue;
+				}
 				for (i = 0; i < tp->pnum; i++) {
-					if (tp->protoids[i] != proto)
+					if (tp->protoids[i] != proto) {
+						__trace();
 						continue;
+					}
 					break;
 				}
-				if (i >= tp->pnum)
+				if (i >= tp->pnum) {
+					__trace();
 					continue;
+				}
 				if (tp->bport != 0) {
-					if (tp->bport != dport)
+					if (tp->bport != dport) {
+						__trace();
 						continue;
+					}
 					score++;
 				}
 
 				for (i = 0; i < tp->bnum; i++) {
 					if (tp->baddrs[i].addr == 0)
 						break;
-					if (tp->baddrs[i].addr != daddr)
+					if (tp->baddrs[i].addr != daddr) {
+						__trace();
 						continue;
+					}
 					score++;
 					break;
 				}
-				if (i >= tp->bnum)
+				if (i >= tp->bnum) {
+					__trace();
 					continue;
+				}
 				if (score > hiscore) {
 					hiscore = score;
 					if (result != NULL)
@@ -8130,7 +8155,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 		}
 		read_unlock_bh(&hp->lock);
 	} while (hiscore < 2 && hp != hp2 && (hp = hp2));
-	usual(result);
+	__usual(result);
 	return (result);
 }
 
@@ -8165,9 +8190,12 @@ tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
 			      done:
 				read_unlock_bh(&udp_prot_lock);
 				return (result);
-			}
-		}
-	}
+			} else
+				__rare();
+		} else
+			__rare();
+	} else
+		__rare();
 	result = tp_lookup_common_slow(pp, proto, daddr, dport, saddr, sport);
 	goto done;
 }
@@ -8403,7 +8431,7 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 	if (skb->len < (iph->ihl << 2) + ICMP_MIN_LENGTH)
 		goto drop;
 #endif
-	printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
+	__printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
 	/* Note: use returned IP header and possibly payload for lookup */
 	if ((tp = tp_lookup_icmp(iph, skb->len)) == NULL)
 		goto no_stream;
