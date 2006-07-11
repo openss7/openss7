@@ -112,6 +112,10 @@ include am/rpm.am
 include am/deb.am
 
 EXTRA_DIST			+= \
+				  TODO \
+				  README-cvs \
+				  README-nexusware \
+				  README-LiS \
 				  debian/README.Debian \
 				  debian/TODO.Debian
 
