@@ -350,7 +350,6 @@ typedef struct msgb {
 #define MSGNOTIFY	(1<< 9)	/* OSF: notify when message consumed */
 #define MSGCSUM		(1<<10) /* LfS: UDP/TCP partial checksum was performed on copyin */
 #define MSGCRC32C	(1<<11) /* LfS: CRC32C partial checksum was performed on copyin */
-#define MSGSKBUFF	(1<<12)	/* LfS: data buffer is an sk_buff */
 
 #define NOERROR		(-1)	/* UnixWare, OSF, HP-UX */
 #define TRANSPARENT	(-1)
