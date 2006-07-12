@@ -139,6 +139,8 @@ static char const ident[] =
 #include <linux/socket.h>	/* for FIOCGETOWN, etc. */
 #endif
 
+#include <linux/skbuff.h>	/* for sk_buffs */
+
 #ifndef __user
 #define __user
 #endif
@@ -877,7 +879,39 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 }
 
 /**
- *  alloc_data - alocate an M_DATA message block for write data
+ *  freeb_skb - free an sk_buff allocated as a data block buffer
+ *  @arg: opaque argument (sk_buff pointer)
+ */
+streamscall __hot_out void
+freeb_skb(caddr_t arg)
+{
+	kfree_skb((struct sk_buff *) arg);
+}
+
+/**
+ *  allocb_skb - allocate an M_DATA message block containing an sk_buff
+ *  @size: number of bytes to allocate
+ *  @priority: priority of the allocation
+ */
+STATIC streams_inline streams_fastcall __hot_write mblk_t *
+allocb_skb(size_t size, uint priority)
+{
+	mblk_t *mp = NULL;
+	struct sk_buff *skb;
+	int gfp = (priority == BPRI_WAITOK) ? GFP_KERNEL : GFP_ATOMIC;
+
+	if (likely((skb = alloc_skb(size, gfp)) != NULL)) {
+		frtn_t free_skb_rtn = {.free_func = &freeb_skb,.free_arg = skb, };
+
+		if (likely((mp = esballoc(skb->data, size, priority, &free_skb_rtn)) != NULL))
+			return (mp);
+		kfree_skb(skb);
+	}
+	return (NULL);
+}
+
+/**
+ *  alloc_data - allocate an M_DATA message block for write data
  *  @sd stream head
  *  @dlen: M_DATA size
  *  @dbuf: user data pointer
@@ -896,9 +930,14 @@ alloc_data(const struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 	if (likely(dlen >= 0)) {	/* PROFILED */
 		int sd_wroff = sd->sd_wroff;
 		int sd_wrpad = sd->sd_wrpad;
+		ssize_t tlen = sd_wroff + dlen + sd_wrpad;
 
 		_ptrace(("Allocating data part %d bytes\n", dlen));
-		if (likely((dp = allocb(sd_wroff + dlen + sd_wrpad, BPRI_WAITOK)) != NULL)) {
+		if (sd->sd_flag & (STRSKBUFF))
+			dp = allocb_skb(tlen, BPRI_WAITOK);
+		else
+			dp = allocb(tlen, BPRI_WAITOK);
+		if (likely(dp != NULL)) {
 			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
 			if (sd_wroff) {
 				dp->b_rptr += sd_wroff;
@@ -907,7 +946,7 @@ alloc_data(const struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 			if (likely(dlen > 0)) {
 				int err = 0;
 
-				switch (sd->sd_flags & (STRCSUM | STRCRC32C)) {
+				switch (sd->sd_flag & (STRCSUM | STRCRC32C)) {
 				case 0:
 					err = strcopyin(dbuf, dp->b_rptr, dlen);
 					break;
