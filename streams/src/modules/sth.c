@@ -902,18 +902,9 @@ alloc_data(const struct stdata *sd, ssize_t dlen, void __user *dbuf)
 	mblk_t *dp;
 
 	if (likely(dlen >= 0)) {	/* PROFILED */
-		int sd_wroff;
-		int sd_wrpad;
+		int sd_wroff = sd->sd_wroff;
+		int sd_wrpad = sd->sd_wrpad;
 
-		/* only apply offset and padding when we are requesting more than a FASTBUF worth
-		   of data. */
-		if (likely(dlen <= FASTBUF)) {
-			sd_wroff = 0;
-			sd_wrpad = 0;
-		} else {
-			sd_wroff = sd->sd_wroff;
-			sd_wrpad = sd->sd_wrpad;
-		}
 		_ptrace(("Allocating data part %d bytes\n", dlen));
 		if (likely((dp = allocb(sd_wroff + dlen + sd_wrpad, BPRI_WAITOK)) != NULL)) {
 			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
