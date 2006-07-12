@@ -140,6 +140,7 @@ static char const ident[] =
 #endif
 
 #include <linux/skbuff.h>	/* for sk_buffs */
+#include <net/checksum.h>	/* for various checksums */
 
 #ifndef __user
 #define __user
@@ -951,37 +952,45 @@ alloc_data(const struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 
 		_ptrace(("Allocating data part %d bytes\n", dlen));
 		dp = allocb_buf(sd, sd_wroff + dlen + sd->sd_wrpad, BPRI_WAITOK);
-		if (likely(dp != NULL)) {
-			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
-			if (sd_wroff) {
-				dp->b_rptr += sd_wroff;
-				dp->b_wptr += sd_wroff;
-			}
-			if (likely(dlen > 0)) {
-				int err = 0;
-
-				switch (sd->sd_flag & (STRCSUM | STRCRC32C)) {
-				case 0:
-					err = strcopyin(dbuf, dp->b_rptr, dlen);
-					break;
-				case STRCSUM:
-					err = -ENOSYS;
-					break;
-				case STRCRC32C:
-					err = -ENOSYS;
-					break;
-				}
-				if (unlikely(err != 0)) {
-					freeb(dp);
-					return (ERR_PTR(err));
-				}
-				dp->b_wptr += dlen;
-			}
-			return (dp);
+		if (unlikely(dp == NULL))
+			goto enosr;
+		// dp->b_datap->db_type = M_DATA; /* trust allocb() */
+		if (sd_wroff) {
+			dp->b_rptr += sd_wroff;
+			dp->b_wptr += sd_wroff;
 		}
-		return (ERR_PTR(-ENOSR));
+		if (likely(dlen > 0)) {
+			int err = 0;
+
+			switch (sd->sd_flag & (STRCSUM | STRCRC32C)) {
+			case STRCRC32C:
+#if 0
+				/* not doing this just yet */
+				dp->b_csum =
+				    crc32c_and_copy_from_user(dbuf, dp->b_rptr, dlen, 0, &err);
+				dp->b_flag |= MSGCRC32C;
+				break;
+#endif
+			case 0:
+				err = strcopyin(dbuf, dp->b_rptr, dlen);
+				break;
+			case STRCSUM:
+				dp->b_csum =
+				    csum_and_copy_from_user(dbuf, dp->b_rptr, dlen, 0, &err);
+				dp->b_flag |= MSGCSUM;
+				break;
+			}
+			if (unlikely(err != 0)) {
+				freeb(dp);
+				return (ERR_PTR(err));
+			}
+			dp->b_wptr += dlen;
+		}
+		return (dp);
 	}
 	return (NULL);
+      enosr:
+	return (ERR_PTR(-ENOSR));
 }
 
 /**
