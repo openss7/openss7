@@ -930,8 +930,8 @@ alloc_data(const struct stdata *sd, ssize_t dsize)
 /**
  *  alloc_proto - allocate an M_(PC)PROTO and M_DATA message blocks for put(p)msg data
  *  @sd: stream head
- *  @psize: M_(PC)PROTO size
- *  @dsize: M_DATA size
+ *  @ctlp: pointer to control part
+ *  @datp: pointer to data part
  *  @type: type of proto block (M_PROTO or M_PCPROTO)
  *
  *  Allocates a protocol and/or data message block of the specified sizes and returns them linked
@@ -942,12 +942,14 @@ alloc_data(const struct stdata *sd, ssize_t dsize)
  *  block is not allocated.  Zero length blocks will be allocated.
  */
 STATIC streams_inline streams_fastcall __hot_put mblk_t *
-alloc_proto(const struct stdata *sd, ssize_t psize, ssize_t dsize, const int type)
+alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
+	    const int type)
 {
 	mblk_t *mp = NULL, *dp = NULL;
+	ssize_t psize, dsize;
 
 	/* yes, POSIX says we can send zero length control parts */
-	if (unlikely(psize >= 0)) {	/* PROFILED */
+	if (unlikely((psize = ctlp ? ctlp->len : -1) >= 0)) {	/* PROFILED */
 		_ptrace(("Allocating cntl part %d bytes\n", psize));
 		if (likely((mp = allocb(psize, BPRI_WAITOK)) != NULL)) {
 			mp->b_datap->db_type = type;
@@ -955,7 +957,7 @@ alloc_proto(const struct stdata *sd, ssize_t psize, ssize_t dsize, const int typ
 		} else
 			return (mp);
 	}
-	if (likely(dsize >= 0)) {	/* PROFILED */
+	if (likely((dsize = datp ? datp->len : -1) >= 0)) {	/* PROFILED */
 		if (likely((dp = alloc_data(sd, dsize)) != NULL)) {
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
@@ -3277,7 +3279,7 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 		mblk_t *dp;
 
 		/* cannot wait on message blocks with STREAM head read locked */
-		if ((mp = alloc_proto(sd, clen, dlen, type))) {
+		if ((mp = alloc_proto(sd, ctlp, datp, type))) {
 			dp = mp;
 			/* copyin can sleep */
 			if (unlikely(clen > 0)) {	/* PROFILED */
