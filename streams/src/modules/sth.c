@@ -887,8 +887,8 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 /**
  *  alloc_data - alocate an M_DATA message block for write data
  *  @sd stream head
- *  @dsize: M_DATA size
- *  @duser: user data pointer
+ *  @dlen: M_DATA size
+ *  @dbuf: user data pointer
  *
  *  Allocates a data message block of the specified size and returns it.  The b_rptr o fthe block
  *  points to the start of the data range and the b_wptr points to the byte past the last byte in
@@ -897,39 +897,39 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
  *  number, (e.g. -1), the block is not allocated.  Zero length blocks will be allocated.
  */
 STATIC streams_inline streams_fastcall __hot_write mblk_t *
-alloc_data(const struct stdata *sd, ssize_t dsize, void __user *duser)
+alloc_data(const struct stdata *sd, ssize_t dlen, void __user *dbuf)
 {
 	mblk_t *dp;
 
-	if (likely(dsize >= 0)) {	/* PROFILED */
+	if (likely(dlen >= 0)) {	/* PROFILED */
 		int sd_wroff;
 		int sd_wrpad;
 
 		/* only apply offset and padding when we are requesting more than a FASTBUF worth
 		   of data. */
-		if (likely(dsize <= FASTBUF)) {
+		if (likely(dlen <= FASTBUF)) {
 			sd_wroff = 0;
 			sd_wrpad = 0;
 		} else {
 			sd_wroff = sd->sd_wroff;
 			sd_wrpad = sd->sd_wrpad;
 		}
-		_ptrace(("Allocating data part %d bytes\n", dsize));
-		if (likely((dp = allocb(sd_wroff + dsize + sd_wrpad, BPRI_WAITOK)) != NULL)) {
+		_ptrace(("Allocating data part %d bytes\n", dlen));
+		if (likely((dp = allocb(sd_wroff + dlen + sd_wrpad, BPRI_WAITOK)) != NULL)) {
 			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
 			if (sd_wroff) {
 				dp->b_rptr += sd_wroff;
 				dp->b_wptr += sd_wroff;
 			}
-			if (likely(dsize > 0)) {
+			if (likely(dlen > 0)) {
 				int err;
 
-				err = strcopyin(duser, dp->b_rptr, dsize);
+				err = strcopyin(dbuf, dp->b_rptr, dlen);
 				if (unlikely(err != 0)) {
 					freeb(dp);
 					return (ERR_PTR(err));
 				}
-				dp->b_wptr += dsize;
+				dp->b_wptr += dlen;
 			}
 			return (dp);
 		}
@@ -957,16 +957,16 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 	    const int type)
 {
 	mblk_t *mp = NULL, *dp = NULL;
-	ssize_t psize, dsize;
+	ssize_t clen, dlen;
 
 	/* yes, POSIX says we can send zero length control parts */
-	if (unlikely((psize = ctlp ? ctlp->len : -1) >= 0)) {	/* PROFILED */
-		_ptrace(("Allocating cntl part %d bytes\n", psize));
-		if (likely((mp = allocb(psize, BPRI_WAITOK)) != NULL)) {
+	if (unlikely((clen = ctlp ? ctlp->len : -1) >= 0)) {	/* PROFILED */
+		_ptrace(("Allocating cntl part %d bytes\n", clen));
+		if (likely((mp = allocb(clen, BPRI_WAITOK)) != NULL)) {
 			mp->b_datap->db_type = type;
-			mp->b_wptr = mp->b_rptr + psize;
-			if (unlikely(psize > 0)) {
-				err = strcopyin(ctlp->buf, mp->b_rptr, psize);
+			mp->b_wptr = mp->b_rptr + clen;
+			if (unlikely(clen > 0)) {
+				err = strcopyin(ctlp->buf, mp->b_rptr, clen);
 				if (unlikely(err != 0)) {
 					freeb(mp);
 					return (ERR_PTR(err));
@@ -975,11 +975,11 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 		} else
 			return (ERR_PTR(-ENOSR));
 	}
-	if (likely((dsize = datp ? datp->len : -1) >= 0)) {	/* PROFILED */
-		if (likely(!IS_ERR((dp = alloc_data(sd, dsize, datp->buf))))) {
+	if (likely((dlen = datp ? datp->len : -1) >= 0)) {	/* PROFILED */
+		if (likely(!IS_ERR((dp = alloc_data(sd, dlen, datp->buf))))) {
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
-			if (likely(psize < 0))	/* PROFILED */
+			if (likely(clen < 0))	/* PROFILED */
 				dp->b_flag |= MSGDELIM;
 		} else {
 			if (unlikely(mp != NULL))
