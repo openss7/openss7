@@ -8773,9 +8773,8 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 #if defined LFS
 	/* want to set a write offet of MAX_HEADER bytes */
 	so = (typeof(so)) mp->b_wptr;
-	so->so_flags = SO_WROFF | SO_WRPAD;
+	so->so_flags = SO_WROFF | SO_SKBUFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
-	so->so_wrpad = SMP_CACHE_BYTES + sizeof(struct skb_shared_info);	/* this is too big */
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
