@@ -918,8 +918,11 @@ allocb_buf(const struct stdata *sd, size_t size, uint priority)
 			mblk_t *mp;
 
 			mp = esballoc(skb->data, size, priority, &free_skb_rtn);
-			if (likely(mp != NULL))
+			if (likely(mp != NULL)) {
+				/* mark as containing a socket buffer */
+				mp->b_flag |= MSGSKBUFF;
 				return (mp);
+			}
 			kfree_skb(skb);
 		}
 		return (NULL);

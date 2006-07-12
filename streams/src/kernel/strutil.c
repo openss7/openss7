@@ -363,7 +363,7 @@ copyb(register mblk_t *mp)
 			b->b_wptr += size;
 			b->b_datap->db_type = mp->b_datap->db_type;
 			b->b_band = mp->b_band;
-			b->b_flag = mp->b_flag;
+			b->b_flag = mp->b_flag & ~(MSGSKBUFF);
 		}
 	}
 	return (b);
@@ -760,6 +760,8 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	mp->b_rptr = mp->b_wptr = db->db_base;
 	mp->b_wptr += blen;
 	mp->b_datap = dp;
+	/* if old data block was a socket buffer it isn't any more */
+	mp->b_flag &= ~(MSGSKBUFF);
 	/* remove a reference from old initial datab */
 	if (likely(db_dec_and_test(db) != 0)) {
 		/* free data block */
