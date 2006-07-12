@@ -922,8 +922,9 @@ alloc_data(const struct stdata *sd, ssize_t dsize, void __user *duser)
 				dp->b_wptr += sd_wroff;
 			}
 			dp->b_wptr += dsize;
+			return (dp);
 		}
-		return (dp);
+		return (ERR_PTR(-ENOSR));
 	}
 	return (NULL);
 }
@@ -959,7 +960,7 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 			return (ERR_PTR(-ENOSR));
 	}
 	if (likely((dsize = datp ? datp->len : -1) >= 0)) {	/* PROFILED */
-		if (likely((dp = alloc_data(sd, dsize, datp->buf)) != NULL)) {
+		if (likely(!IS_ERR((dp = alloc_data(sd, dsize, datp->buf))))) {
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
 			if (likely(psize < 0))	/* PROFILED */
@@ -967,7 +968,7 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 		} else {
 			if (unlikely(mp != NULL))
 				freemsg(mp);
-			return (ERR_PTR(-ENOSR));
+			return (dp);
 		}
 	}
 	return (mp);
@@ -4830,8 +4831,8 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 		where = buf + written;
 
 		/* POSIX says always blocks awaiting message blocks */
-		if (unlikely((b = alloc_data(sd, block, where)) == NULL)) {
-			err = -ENOSR;
+		if (unlikely(IS_ERR((b = alloc_data(sd, block, where))))) {
+			err = PTR_ERR(b);
 			break;
 		}
 
