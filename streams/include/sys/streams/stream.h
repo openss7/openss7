@@ -219,12 +219,17 @@ typedef struct datab {
 	unsigned char db_ref;		/* shadow reference count */
 	unsigned char db_type;
 	union {
-		unsigned char db_class;
-		unsigned char db_iswhat;	/* Mac OT, OSF/1, DGUX */
-	};
-	union {
-		unsigned char db_pad;
-		unsigned char db_filler2;	/* Mac OT, OSF/1, DGUX */
+		struct {
+			union {
+				unsigned char db_class;		/* SVR3.1 */
+				unsigned char db_iswhat;	/* Mac OT, OSF/1, DGUX */
+			};
+			union {
+				unsigned char db_pad;		/* SVR3.1 */
+				unsigned char db_filler2;	/* Mac OT, OSF/1, DGUX */
+			};
+		};
+		unsigned short db_flag;
 	};
 	unsigned int db_size;		/* not really necessary (db_lim - db_base) but present in
 					   SVR3.1 */
