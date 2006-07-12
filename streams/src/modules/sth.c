@@ -3265,7 +3265,7 @@ strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct s
  */
 STATIC streams_inline streams_fastcall __hot_put mblk_t *
 strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
-	     const int band, const int flags, const int user)
+	     const int band, const int flags)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3283,13 +3283,13 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 			dp = mp;
 			/* copyin can sleep */
 			if (unlikely(clen > 0)) {	/* PROFILED */
-				err = strbcopyin(ctlp->buf, dp->b_rptr, clen, user);
+				err = strbcopyin(ctlp->buf, dp->b_rptr, clen, 1);
 				if (unlikely(err != 0))
 					break;
 				dp = dp->b_cont;
 			}
 			if (likely(dlen > 0)) {	/* PROFILED */
-				err = strbcopyin(datp->buf, dp->b_rptr, dlen, user);
+				err = strbcopyin(datp->buf, dp->b_rptr, dlen, 1);
 				if (unlikely(err != 0))
 					break;
 				dp = dp->b_cont;
@@ -3331,7 +3331,7 @@ strputpmsg_common(const struct file *file, const struct strbuf *ctlp, const stru
 		goto error;
 	if (unlikely((err = strwaitband(sd, file->f_flags, band, flags))))	/* PROFILED */
 		goto error;
-	return strallocpmsg(sd, ctlp, datp, band, flags, 1);
+	return strallocpmsg(sd, ctlp, datp, band, flags);
       error:
 	return ERR_PTR(err);
 }
@@ -3359,7 +3359,7 @@ strwrite_common(const struct file *file, const char *buf, size_t len, loff_t *pp
 	if ((err = strwaitband(sd, file->f_flags, band, flags)))
 		return ERR_PTR(err);
 
-	if (IS_ERR(mp = strallocpmsg(sd, NULL, &dat, 0 MSG_BAND, 1)))
+	if (IS_ERR(mp = strallocpmsg(sd, NULL, &dat, MSG_BAND)))
 		return (mp);
 
 	if (dat.len == len)	/* full write */
