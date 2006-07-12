@@ -465,10 +465,10 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 
 #define xti_default_debug		{ 0, }
 #define xti_default_linger		(struct t_linger){T_YES, 120}
-#define xti_default_rcvbuf		(SK_RMEM_MAX << 1)  /* needs to be sysctl_rmem_default */
+#define xti_default_rcvbuf		(SK_RMEM_MAX << 1)	/* needs to be sysctl_rmem_default */
 #define xti_default_rcvlowat		1
-#define xti_default_sndbuf		(SK_WMEM_MAX << 1)  /* needs to be sysctl_wmem_default */
-#define xti_default_sndlowat		SK_WMEM_MAX /* needs to be sysctl_wmem_default >> 1 */
+#define xti_default_sndbuf		(SK_WMEM_MAX << 1)	/* needs to be sysctl_wmem_default */
+#define xti_default_sndlowat		SK_WMEM_MAX	/* needs to be sysctl_wmem_default >> 1 */
 #define xti_default_priority		0
 
 #define ip_default_protocol		17
@@ -603,6 +603,7 @@ static INLINE streams_fastcall __hot void
 tp_release(struct tp **tpp)
 {
 	struct tp *tp;
+
 	dassert(tpp != NULL);
 	if (likely((tp = XCHG(tpp, NULL)) != NULL))
 		tp_put(tp);
@@ -4089,7 +4090,7 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 }
 
 /**
- * tp_alloc_skb - allocate a socket buffer from a message block
+ * tp_alloc_skb_old - allocate a socket buffer from a message block
  * @tp: private pointer
  * @mp: the message block
  * @headroom: header room for resulting sk_buff
@@ -4141,10 +4142,11 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
  */
 #if defined LFS
 STATIC INLINE streams_fastcall __hot_out struct sk_buff *
-tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
 	unsigned char *beg, *end;
+
 #if 0
 	struct sk_buff *skb_head = NULL, *skb_tail = NULL;
 #endif
@@ -4272,17 +4274,23 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
       no_head:
 #endif
 	return (NULL);
-      go_frag: /* for now */
+      go_frag:			/* for now */
       go_slow:
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
-#else
+#else				/* defined LFS */
 STATIC INLINE streams_fastcall __hot_out struct sk_buff *
-tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
-#endif
+#endif				/* defined LFS */
+
+STATIC INLINE streams_fastcall __hot_out struct sk_buff *
+tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+{
+	return tp_alloc_skb_old(tp, mp, headroom, gfp);
+}
 
 STATIC noinline streams_fastcall int
 tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable **rtp)
@@ -4325,7 +4333,7 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 	struct rtable *rt;
 	int err;
 
-	prefetch((void *)opt);
+	prefetch((void *) opt);
 	rt = (struct rtable *) tp->daddrs[0].dst;
 	prefetch(rt);
 
@@ -6787,6 +6795,7 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 		goto go_slow;
 	{
 		size_t dlen;
+
 		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
 			goto go_slow;
 	}
@@ -8096,7 +8105,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 				if (tp->CONIND_number == 0 && tp->info.SERV_type != T_CLTS)
 					continue;
 				/* only Streams in close to the correct state */
-				if (tp_not_state(tp, (TSF_IDLE|TSF_WACK_CREQ)))
+				if (tp_not_state(tp, (TSF_IDLE | TSF_WACK_CREQ)))
 					continue;
 				for (i = 0; i < tp->pnum; i++) {
 					if (tp->protoids[i] != proto)
@@ -8370,7 +8379,7 @@ tp_v4_rcv(struct sk_buff *skb)
 	// goto pass_it;
       too_small:
 	// goto pass_it;
-      // pass_it:
+	// pass_it:
 	if (tp_v4_rcv_next(skb)) {
 		/* TODO: want to generate an ICMP error here */
 	}
