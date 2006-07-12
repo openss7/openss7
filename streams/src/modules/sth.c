@@ -956,7 +956,7 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 			mp->b_datap->db_type = type;
 			mp->b_wptr = mp->b_rptr + psize;
 		} else
-			return (mp);
+			return (ERR_PTR(-ENOSR));
 	}
 	if (likely((dsize = datp ? datp->len : -1) >= 0)) {	/* PROFILED */
 		if (likely((dp = alloc_data(sd, dsize, datp->buf)) != NULL)) {
@@ -967,7 +967,7 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 		} else {
 			if (unlikely(mp != NULL))
 				freemsg(mp);
-			return (dp);
+			return (ERR_PTR(-ENOSR));
 		}
 	}
 	return (mp);
@@ -3280,7 +3280,7 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 		mblk_t *dp;
 
 		/* cannot wait on message blocks with STREAM head read locked */
-		if ((mp = alloc_proto(sd, ctlp, datp, type))) {
+		if (!IS_ERR((mp = alloc_proto(sd, ctlp, datp, type)))) {
 			dp = mp;
 			/* copyin can sleep */
 			if (unlikely(clen > 0)) {	/* PROFILED */
@@ -3296,17 +3296,17 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 				dp = dp->b_cont;
 			}
 			mp->b_band = norm ? band : 0;
-		} else
-			err = -ENOSR;
+		}
 	} while (0);
 	srlock(sd);
 
-	if (likely(mp != NULL)) {	/* PROFILED */
-		if (likely(!err) && likely(!(err = straccess(sd, FWRITE))))	/* PROFILED */
-			return (mp);
-		freemsg(mp);
+	if (likely(!IS_ERR(mp))) {	/* PROFILED */
+		if (unlikely(err) || unlikely((err = straccess(sd, FWRITE)))) {	/* PROFILED */
+			freemsg(mp);
+			return ERR_PTR(err);
+		}
 	}
-	return ERR_PTR(err);
+	return (mp);
 }
 
 /**
