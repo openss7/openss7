@@ -4141,7 +4141,7 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
  * through the data to generate the checksum.
  */
 #if defined LFS
-STATIC INLINE streams_fastcall __hot_out struct sk_buff *
+STATIC noinline streams_fastcall __unlikely struct sk_buff *
 tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
@@ -4282,9 +4282,30 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 STATIC INLINE streams_fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
-	goto old_way;
+	struct sk_buff *skb;
+
+	if (unlikely((mp->b_datap->db_flag & (DB_SKBUFF)) == 0))
+		goto old_way;
+	if (unlikely((mp->b_rptr < mp->b_datap->db_base + headroom)))
+		goto go_slow;
+	if (unlikely((skb = (typeof(skb)) mp->b_datap->db_frtnp->free_arg) == NULL))
+		goto go_slow;
+	skb_get(skb);
+	skb_reserve(skb, mp->b_rptr - skb->data);
+	skb_put(skb, mp->b_wptr - mp->b_rptr);
+	/* we never have any page fragments, so we can steal a pointer from the page fragement
+	   list. */
+	assert(skb_shinfo(skb)->nr_frags == 0);
+	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+	skb->destructor = tp_skb_destructor;
+	spin_lock_bh(&tp->qlock);
+	tp->sndmem += skb->truesize;
+	spin_unlock_bh(&tp->qlock);
+	return (skb);
       old_way:
 	return tp_alloc_skb_old(tp, mp, headroom, gfp);
+      go_slow:
+	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
 #else				/* !defined LFS */
 STATIC INLINE streams_fastcall __hot_out struct sk_buff *
