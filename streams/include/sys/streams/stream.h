@@ -221,15 +221,15 @@ typedef struct datab {
 	union {
 		struct {
 			union {
-				unsigned char db_class;		/* SVR3.1 */
+				unsigned char db_class;	/* SVR3.1 */
 				unsigned char db_iswhat;	/* Mac OT, OSF/1, DGUX */
 			};
 			union {
-				unsigned char db_pad;		/* SVR3.1 */
+				unsigned char db_pad;	/* SVR3.1 */
 				unsigned char db_filler2;	/* Mac OT, OSF/1, DGUX */
 			};
 		};
-		unsigned short db_flag;
+		unsigned short db_flag;	/* UnixWare */
 	};
 	unsigned int db_size;		/* not really necessary (db_lim - db_base) but present in
 					   SVR3.1 */
@@ -252,6 +252,7 @@ typedef struct datab {
 
 #define DB_WASDUPED	0x01	/* UnixWare */
 #define DB_2PIECE	0x02	/* UnixWare */
+#define DB_SKBUFF	0x04	/* LfS */
 
 /* 
  *  Message type compatibility:
