@@ -524,10 +524,6 @@ strcopyout(const void *from, void __user *to, size_t len)
 	int err = -EFAULT;
 #endif
 
-	/* before every system call return or sleep -- saves a context switch */
-	if (unlikely((this_thread->flags & (QRUNFLAGS)) != 0))
-		runqueues();
-	/* might sleep */
 #if defined CONFIG_STREAMS_DEBUG
 	if (access_ok(VERIFY_WRITE, to, len)) {
 		if ((err = copyout(from, to, len)) < 0)
@@ -549,10 +545,6 @@ strcopyin(const void __user *from, void *to, size_t len)
 	int err = -EFAULT;
 #endif
 
-	/* before every system call return or sleep -- saves a context switch */
-	if (unlikely((this_thread->flags & (QRUNFLAGS)) != 0))
-		runqueues();
-	/* might sleep */
 #if defined CONFIG_STREAMS_DEBUG
 	if (access_ok(VERIFY_READ, from, len)) {
 		if ((err = copyin(from, to, len)) < 0)
