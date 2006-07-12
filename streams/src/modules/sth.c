@@ -882,7 +882,7 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
  *  freeb_skb - free an sk_buff allocated as a data block buffer
  *  @arg: opaque argument (sk_buff pointer)
  */
-streamscall __hot_out void
+void streamscall __hot_out
 freeb_skb(caddr_t arg)
 {
 	kfree_skb((struct sk_buff *) arg);
@@ -901,7 +901,7 @@ allocb_skb(size_t size, uint priority)
 	int gfp = (priority == BPRI_WAITOK) ? GFP_KERNEL : GFP_ATOMIC;
 
 	if (likely((skb = alloc_skb(size, gfp)) != NULL)) {
-		frtn_t free_skb_rtn = {.free_func = &freeb_skb,.free_arg = skb, };
+		frtn_t free_skb_rtn = {.free_func = &freeb_skb,.free_arg = (caddr_t) skb, };
 
 		if (likely((mp = esballoc(skb->data, size, priority, &free_skb_rtn)) != NULL))
 			return (mp);
