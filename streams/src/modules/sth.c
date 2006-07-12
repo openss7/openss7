@@ -884,54 +884,18 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall __hot_put mblk_t *
-alloc_proto(const struct stdata *sd, ssize_t psize, ssize_t dsize, const int type, const uint bpri)
-{
-	mblk_t *mp = NULL, *dp = NULL;
-
-	/* yes, POSIX says we can send zero length control parts */
-	if (unlikely(psize >= 0)) {	/* PROFILED */
-		_ptrace(("Allocating cntl part %d bytes\n", psize));
-		if (likely((mp = allocb(psize, bpri)) != NULL)) {
-			mp->b_datap->db_type = type;
-			mp->b_wptr = mp->b_rptr + psize;
-		} else
-			return (mp);
-	}
-	if (likely(dsize >= 0)) {	/* PROFILED */
-		int sd_wroff;
-		int sd_wrpad;
-		
-		/* only apply offset and padding when we are requesting more
-		 * than a FASTBUF worth of data. */
-		if (likely(dsize <= FASTBUF)) {
-			sd_wroff = 0;
-			sd_wrpad = 0;
-		} else {
-			sd_wroff = sd->sd_wroff;
-			sd_wrpad = sd->sd_wrpad;
-		}
-		_ptrace(("Allocating data part %d bytes\n", dsize));
-		if (likely((dp = allocb(sd_wroff + dsize + sd_wrpad, bpri)) != NULL)) {
-			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
-			if (sd_wroff) {
-				dp->b_rptr += sd_wroff;
-				dp->b_wptr += sd_wroff;
-			}
-			dp->b_wptr += dsize;
-			mp = linkmsg(mp, dp);
-			/* STRHOLD feature in strwput uses this */
-			if (likely(psize < 0))	/* PROFILED */
-				dp->b_flag |= MSGDELIM;
-		} else {
-			if (unlikely(mp != NULL))
-				freemsg(mp);
-			return (dp);
-		}
-	}
-	return (mp);
-}
-
+/**
+ *  alloc_data - alocate an M_DATA message block for write data
+ *  @sd stream head
+ *  @dsize: M_DATA size
+ *  @bpri: buffer priority
+ *
+ *  Allocates a data message block of the specified size and returns it.  The b_rptr o fthe block
+ *  points to the start of the data range and the b_wptr points to the byte past the last byte in
+ *  the data range.  M_DATA blocks are offset with the stream head sd_wroff write offset and padded
+ *  with the stream head sd_wrpad write padding.  If the size of the block is set to a negative
+ *  number, (e.g. -1), the block is not allocated.  Zero length blocks will be allocated.
+ */
 STATIC streams_inline streams_fastcall __hot_write mblk_t *
 alloc_data(const struct stdata *sd, ssize_t dsize, const uint bpri)
 {
@@ -962,6 +926,50 @@ alloc_data(const struct stdata *sd, ssize_t dsize, const uint bpri)
 		return (dp);
 	}
 	return (NULL);
+}
+
+/**
+ *  alloc_proto - allocate an M_(PC)PROTO and M_DATA message blocks for put(p)msg data
+ *  @sd: stream head
+ *  @psize: M_(PC)PROTO size
+ *  @dsize: M_DATA size
+ *  @type: type of proto block (M_PROTO or M_PCPROTO)
+ *  @bpri: buffer priority
+ *
+ *  Allocates a protocol and/or data message block of the specified sizes and returns them linked
+ *  together.  The b_rptr of each block points to the start of the data range and the b_wptr of each
+ *  block point to the byte past the last byte in the buffer.  M_DATA blocks are offset with the
+ *  stream head sd_wroff write offset and padded with the stream head sd_wrpad write padding.  If
+ *  the size of the corresponding block is set to a negative number (e.g. -1) the corresponding
+ *  block is not allocated.  Zero length blocks will be allocated.
+ */
+STATIC streams_inline streams_fastcall __hot_put mblk_t *
+alloc_proto(const struct stdata *sd, ssize_t psize, ssize_t dsize, const int type, const uint bpri)
+{
+	mblk_t *mp = NULL, *dp = NULL;
+
+	/* yes, POSIX says we can send zero length control parts */
+	if (unlikely(psize >= 0)) {	/* PROFILED */
+		_ptrace(("Allocating cntl part %d bytes\n", psize));
+		if (likely((mp = allocb(psize, bpri)) != NULL)) {
+			mp->b_datap->db_type = type;
+			mp->b_wptr = mp->b_rptr + psize;
+		} else
+			return (mp);
+	}
+	if (likely(dsize >= 0)) {	/* PROFILED */
+		if (likely((dp = alloc_data(sd, dsize, bpri)) != NULL)) {
+			mp = linkmsg(mp, dp);
+			/* STRHOLD feature in strwput uses this */
+			if (likely(psize < 0))	/* PROFILED */
+				dp->b_flag |= MSGDELIM;
+		} else {
+			if (unlikely(mp != NULL))
+				freemsg(mp);
+			return (dp);
+		}
+	}
+	return (mp);
 }
 
 /* 
