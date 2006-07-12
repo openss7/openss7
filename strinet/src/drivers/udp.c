@@ -4278,19 +4278,21 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
       go_slow:
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
-#else				/* defined LFS */
-STATIC INLINE streams_fastcall __hot_out struct sk_buff *
-tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
-{
-	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
-}
-#endif				/* defined LFS */
 
 STATIC INLINE streams_fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
+	goto old_way;
+      old_way:
 	return tp_alloc_skb_old(tp, mp, headroom, gfp);
 }
+#else				/* !defined LFS */
+STATIC INLINE streams_fastcall __hot_out struct sk_buff *
+tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+{
+	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
+}
+#endif				/* !defined LFS */
 
 STATIC noinline streams_fastcall int
 tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable **rtp)
