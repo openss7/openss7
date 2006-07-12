@@ -921,6 +921,7 @@ allocb_buf(const struct stdata *sd, size_t size, uint priority)
 			if (likely(mp != NULL)) {
 				/* mark as containing a socket buffer */
 				mp->b_flag |= MSGSKBUFF;
+				mp->b_datap->db_flag |= DB_SKBUFF;
 				return (mp);
 			}
 			kfree_skb(skb);
