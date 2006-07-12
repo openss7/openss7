@@ -905,8 +905,8 @@ alloc_data(const struct stdata *sd, ssize_t dsize, void __user *duser)
 		int sd_wroff;
 		int sd_wrpad;
 
-		/* only apply offset and padding when we are requesting more
-		 * than a FASTBUF worth of data. */
+		/* only apply offset and padding when we are requesting more than a FASTBUF worth
+		   of data. */
 		if (likely(dsize <= FASTBUF)) {
 			sd_wroff = 0;
 			sd_wrpad = 0;
@@ -921,7 +921,16 @@ alloc_data(const struct stdata *sd, ssize_t dsize, void __user *duser)
 				dp->b_rptr += sd_wroff;
 				dp->b_wptr += sd_wroff;
 			}
-			dp->b_wptr += dsize;
+			if (likely(dsize > 0)) {
+				int err;
+
+				err = strcopyin(duser, dp->b_rptr, dsize);
+				if (unlikely(err != 0)) {
+					freeb(dp);
+					return (ERR_PTR(err));
+				}
+				dp->b_wptr += dsize;
+			}
 			return (dp);
 		}
 		return (ERR_PTR(-ENOSR));
@@ -956,6 +965,13 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 		if (likely((mp = allocb(psize, BPRI_WAITOK)) != NULL)) {
 			mp->b_datap->db_type = type;
 			mp->b_wptr = mp->b_rptr + psize;
+			if (unlikely(psize > 0)) {
+				err = strcopyin(ctlp->buf, mp->b_rptr, psize);
+				if (unlikely(err != 0)) {
+					freeb(mp);
+					return (ERR_PTR(err));
+				}
+			}
 		} else
 			return (ERR_PTR(-ENOSR));
 	}
@@ -1140,7 +1156,7 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 		se->se_events = events;
 		se->se_fd = fd;
 		_printd(("%s: creating siglist events %lu, proc %p, fd %d\n", __FUNCTION__, events,
-			procp, fd));
+			 procp, fd));
 		/* calc sig flags */
 		sd->sd_sigflags |= events;
 		_ptrace(("%s: new events %lu\n", __FUNCTION__, sd->sd_sigflags));
@@ -3135,6 +3151,7 @@ strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 	}
 	return ((ssize_t) size);
 }
+
 #if 0
 STATIC streams_noinline streams_fastcall __hot_put ssize_t
 strsizecheck_slow(const struct stdata *sd, const msg_type_t type, ssize_t size)
@@ -3270,42 +3287,24 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 	     const int band, const int flags)
 {
 	mblk_t *mp;
-	int err = 0;
+	int err;
+	int norm = (flags == MSG_BAND);
+	int type = norm ? M_PROTO : M_PCPROTO;
 
 	srunlock(sd);
-	do {
-		int clen = ctlp ? ctlp->len : -1;
-		int dlen = datp ? datp->len : -1;
-		int norm = (flags == MSG_BAND);
-		int type = norm ? M_PROTO : M_PCPROTO;
-		mblk_t *dp;
-
+	{
 		/* cannot wait on message blocks with STREAM head read locked */
-		if (!IS_ERR((mp = alloc_proto(sd, ctlp, datp, type)))) {
-			dp = mp;
-			/* copyin can sleep */
-			if (unlikely(clen > 0)) {	/* PROFILED */
-				err = strcopyin(ctlp->buf, dp->b_rptr, clen);
-				if (unlikely(err != 0))
-					break;
-				dp = dp->b_cont;
-			}
-			if (likely(dlen > 0)) {	/* PROFILED */
-				err = strcopyin(datp->buf, dp->b_rptr, dlen);
-				if (unlikely(err != 0))
-					break;
-				dp = dp->b_cont;
-			}
-			mp->b_band = norm ? band : 0;
-		}
-	} while (0);
+		mp = alloc_proto(sd, ctlp, datp, type);
+	}
 	srlock(sd);
 
 	if (likely(!IS_ERR(mp))) {	/* PROFILED */
-		if (unlikely(err) || unlikely((err = straccess(sd, FWRITE)))) {	/* PROFILED */
+		/* have to recheck access because we released locks */
+		if (unlikely((err = straccess(sd, FWRITE)))) {	/* PROFILED */
 			freemsg(mp);
 			return ERR_PTR(err);
 		}
+		mp->b_band = norm ? band : 0;
 	}
 	return (mp);
 }
@@ -3683,7 +3682,7 @@ strpoll_error(register const unsigned int flags)
 {
 	register unsigned int mask = 0;
 
-	if (flags & (STRDERR|STWRERR))
+	if (flags & (STRDERR | STWRERR))
 		mask |= POLLERR;
 	if (flags & (STRHUP))
 		mask |= POLLHUP;
@@ -3916,7 +3915,7 @@ stropen(struct inode *inode, struct file *file)
 		/* need new STREAM head */
 		dev = file->private_data ? *((dev_t *) file->private_data) : inode->i_ino;
 		_ptrace(("no stream head, allocating stream for dev %hu:%hu\n", getmajor(dev),
-			getminor(dev)));
+			 getminor(dev)));
 		if (IS_ERR(sd = stralloc(dev))) {
 			err = PTR_ERR(sd);
 			goto up_error;
@@ -3940,7 +3939,7 @@ stropen(struct inode *inode, struct file *file)
 			struct cdevsw *cdev;
 
 			_ptrace(("open redirected on sd %p to dev %hu:%hu\n", sd, getmajor(dev),
-				getminor(dev)));
+				 getminor(dev)));
 			_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 			stri_unlock(inode);
 			if (!(cdev = cdrv_get(getmajor(dev)))) {
@@ -4175,7 +4174,7 @@ strclose(struct inode *inode, struct file *file)
 			stri_unlock(inode);
 			_ptrace(("putting inode %p\n", inode));
 			_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
-				atomic_read(&inode->i_count) - 1));
+				 atomic_read(&inode->i_count) - 1));
 			iput(inode);	/* to cancel igrab() from strinsert */
 			/* closing stream head */
 			_ctrace(strlastclose(sd, oflag));
@@ -4836,23 +4835,20 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 			break;
 		}
 
-		if (likely((err = strcopyin(where, b->b_rptr, block))) == 0) {
+		/* locks on */
+		if (likely((err = straccess_rlock(sd, access)) == 0)) {
 
-			/* locks on */
-			if (likely((err = straccess_rlock(sd, access)) == 0)) {
+			if (likely(written + block >= nbytes)
+			    && unlikely(test_bit(STRDELIM_BIT, &sd->sd_flag)))
+				/* If we performed a full write of the requested number of bytes,
+				   we set the MSGDELIM flag to indicate that a full write was
+				   performed.  If we perform a partial write this flag will not be
+				   set. */
+				b->b_flag |= MSGDELIM;
 
-				if (likely(written + block >= nbytes)
-				    && unlikely(test_bit(STRDELIM_BIT, &sd->sd_flag)))
-					/* If we performed a full write of the requested number of
-					   bytes, we set the MSGDELIM flag to indicate that a full
-					   write was performed.  If we perform a partial write this 
-					   flag will not be set. */
-					b->b_flag |= MSGDELIM;
-
-				/* possibly wait for message band */
-				err = strwaitband(sd, file->f_flags, 0, MSG_BAND);
-				srunlock(sd);
-			}
+			/* possibly wait for message band */
+			err = strwaitband(sd, file->f_flags, 0, MSG_BAND);
+			srunlock(sd);
 		}
 
 		/* send off the message block */
@@ -5553,7 +5549,8 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 					if (((*bp) = b->b_cont))
 						b->b_cont = NULL;
 				} else if ((b = dupb(b))) {
-					_printd(("Partial: blen = %d, dlen = %d\n", (int)blen, (int)dlen));
+					_printd(("Partial: blen = %d, dlen = %d\n", (int) blen,
+						 (int) dlen));
 					/* partial: duplicate */
 					retval |= data ? MOREDATA : MORECTL;
 					(*bp)->b_rptr += dlen;
@@ -7820,7 +7817,8 @@ freefd_func(caddr_t arg)
 	/* sneaky trick to free the file pointer when mblk freed, this means that M_PASSFP messages 
 	   flushed from a queue will free the file pointers referenced by them */
 	_trace();
-	_printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, file, file_count(file) - 1));
+	_printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, file,
+		 file_count(file) - 1));
 	fput(file);
 	return;
 }
@@ -9530,8 +9528,9 @@ register_ioctl32(unsigned int cmd)
 {
 	/* when the kernel has compat_ioctl all ioctl values will be delivered to the driver and
 	   there is no need to register them */
-	return ((void *)(long)(-1));
+	return ((void *) (long) (-1));
 }
+
 EXPORT_SYMBOL(register_ioctl32);
 
 __unlikely streams_fastcall void
@@ -9541,6 +9540,7 @@ unregister_ioctl32(void *opaque)
 	   there is no need to register them */
 	return;
 }
+
 EXPORT_SYMBOL(unregister_ioctl32);
 
 #else				/* defined HAVE_COMPAT_IOCTL */
@@ -9732,22 +9732,22 @@ STATIC struct ioctl_trans streams_translations[] = {
 	{.cmd = SIOCSPGRP,.handler = &streams_compat_ioctl,.next = NULL,},
 	{.cmd = SIOCGPGRP,.handler = &streams_compat_ioctl,.next = NULL,},
 	/* the following use the new register_ioctl32 function */
-//	{.cmd = TM_IOC_HANGUP,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = TM_IOC_RDERR,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = TM_IOC_WRERR,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = TM_IOC_RWERR,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = TM_IOC_PSIGNAL,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = TM_IOC_NSIGNAL,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = TM_IOC_IOCTL,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = TM_IOC_COPYIN,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = TM_IOC_COPYOUT,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = TM_IOC_COPYIO,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = SC_IOC_LIST,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = SAD_SAP,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = SAD_GAP,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = SAD_VML,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = SAD_SAP_SOL,.handler = &streams_compat_ioctl,.next = NULL,},
-//	{.cmd = SAD_GAP_SOL,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = TM_IOC_HANGUP,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = TM_IOC_RDERR,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = TM_IOC_WRERR,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = TM_IOC_RWERR,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = TM_IOC_PSIGNAL,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = TM_IOC_NSIGNAL,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = TM_IOC_IOCTL,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = TM_IOC_COPYIN,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = TM_IOC_COPYOUT,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = TM_IOC_COPYIO,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = SC_IOC_LIST,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = SAD_SAP,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = SAD_GAP,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = SAD_VML,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = SAD_SAP_SOL,.handler = &streams_compat_ioctl,.next = NULL,},
+//      {.cmd = SAD_GAP_SOL,.handler = &streams_compat_ioctl,.next = NULL,},
 	{.cmd = 0,.handler = NULL,.next = NULL,},
 };
 
@@ -9831,15 +9831,16 @@ __unlikely streams_fastcall void *
 register_ioctl32(unsigned int cmd)
 {
 	struct ioctl_trans *t;
-	
+
 	if ((t = kmalloc(sizeof(*t), GFP_KERNEL)) != NULL) {
 		t->cmd = cmd;
 		t->handler = &streams_compat_ioctl;
 		t->next = NULL;
 		streams_override_ioctl32_conversion(t);
 	}
-	return ((void *)t);
+	return ((void *) t);
 }
+
 EXPORT_SYMBOL(register_ioctl32);
 
 /**
@@ -9850,11 +9851,13 @@ __unlikely streams_fastcall void
 unregister_ioctl32(void *opaque)
 {
 	struct ioctl_trans *t;
+
 	if ((t = (typeof(t)) opaque) != NULL) {
 		streams_release_ioctl32_conversion(t);
 		kfree(t);
 	}
 }
+
 EXPORT_SYMBOL(unregister_ioctl32);
 
 #endif				/* defined HAVE_COMPAT_IOCTL */
@@ -9865,8 +9868,9 @@ register_ioctl32(unsigned int cmd)
 {
 	/* when the kernel has compat_ioctl all ioctl values will be delivered to the driver and
 	   there is no need to register them */
-	return ((void *)(long)(-1));
+	return ((void *) (long) (-1));
 }
+
 EXPORT_SYMBOL(register_ioctl32);
 
 __unlikely streams_fastcall void
@@ -9876,6 +9880,7 @@ unregister_ioctl32(void *opaque)
 	   there is no need to register them */
 	return;
 }
+
 EXPORT_SYMBOL(unregister_ioctl32);
 
 #endif				/* defined WITH_32BIT_CONVERSION */
@@ -10586,7 +10591,7 @@ strrput(queue_t *q, mblk_t *mp)
 	struct stdata *sd = qstream(q);
 
 	/* data fast path */
-	if (likely((mp->b_datap->db_type & ~1) == 0)) /* PROFILED */
+	if (likely((mp->b_datap->db_type & ~1) == 0))	/* PROFILED */
 		return str_m_data(sd, q, mp);
 	return strrput_slow(q, mp);
 }
