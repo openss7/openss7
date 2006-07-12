@@ -8356,12 +8356,14 @@ tp_v4_rcv(struct sk_buff *skb)
 		goto flow_controlled;
 	{
 		mblk_t *mp;
-		frtn_t fr = { &tp_free, (char *) skb };
+		frtn_t fr = { &tp_free, (caddr_t) skb };
 		size_t plen = skb->len + (skb->data - skb->nh.raw);
 
 		/* now allocate an mblk */
 		if (unlikely((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr)) == NULL))
 			goto no_buffers;
+		/* tell others it is a socket buffer */
+		mp->b_datap->db_flag |= DB_SKBUFF;
 		_ptrace(("Allocated external buffer message block %p\n", mp));
 		/* We can do this because the buffer belongs to us. */
 		*(struct tp **) skb->cb = tp_get(tp);
