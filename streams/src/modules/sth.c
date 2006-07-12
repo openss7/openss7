@@ -3283,13 +3283,13 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 			dp = mp;
 			/* copyin can sleep */
 			if (unlikely(clen > 0)) {	/* PROFILED */
-				err = strbcopyin(ctlp->buf, dp->b_rptr, clen, 1);
+				err = strcopyin(ctlp->buf, dp->b_rptr, clen);
 				if (unlikely(err != 0))
 					break;
 				dp = dp->b_cont;
 			}
 			if (likely(dlen > 0)) {	/* PROFILED */
-				err = strbcopyin(datp->buf, dp->b_rptr, dlen, 1);
+				err = strcopyin(datp->buf, dp->b_rptr, dlen);
 				if (unlikely(err != 0))
 					break;
 				dp = dp->b_cont;
