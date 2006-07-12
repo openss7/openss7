@@ -888,7 +888,6 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
  *  alloc_data - alocate an M_DATA message block for write data
  *  @sd stream head
  *  @dsize: M_DATA size
- *  @bpri: buffer priority
  *
  *  Allocates a data message block of the specified size and returns it.  The b_rptr o fthe block
  *  points to the start of the data range and the b_wptr points to the byte past the last byte in
@@ -897,7 +896,7 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
  *  number, (e.g. -1), the block is not allocated.  Zero length blocks will be allocated.
  */
 STATIC streams_inline streams_fastcall __hot_write mblk_t *
-alloc_data(const struct stdata *sd, ssize_t dsize, const uint bpri)
+alloc_data(const struct stdata *sd, ssize_t dsize)
 {
 	mblk_t *dp;
 
@@ -915,7 +914,7 @@ alloc_data(const struct stdata *sd, ssize_t dsize, const uint bpri)
 			sd_wrpad = sd->sd_wrpad;
 		}
 		_ptrace(("Allocating data part %d bytes\n", dsize));
-		if (likely((dp = allocb(sd_wroff + dsize + sd_wrpad, bpri)) != NULL)) {
+		if (likely((dp = allocb(sd_wroff + dsize + sd_wrpad, BPRI_WAITOK)) != NULL)) {
 			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
 			if (sd_wroff) {
 				dp->b_rptr += sd_wroff;
@@ -957,7 +956,7 @@ alloc_proto(const struct stdata *sd, ssize_t psize, ssize_t dsize, const int typ
 			return (mp);
 	}
 	if (likely(dsize >= 0)) {	/* PROFILED */
-		if (likely((dp = alloc_data(sd, dsize, BPRI_WAITOK)) != NULL)) {
+		if (likely((dp = alloc_data(sd, dsize)) != NULL)) {
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
 			if (likely(psize < 0))	/* PROFILED */
@@ -4826,7 +4825,7 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 		block = min(nbytes - written, q_maxpsz);
 
 		/* POSIX says always blocks awaiting message blocks */
-		if (unlikely((b = alloc_data(sd, block, BPRI_WAITOK)) == NULL)) {
+		if (unlikely((b = alloc_data(sd, block)) == NULL)) {
 			err = -ENOSR;
 			break;
 		}
