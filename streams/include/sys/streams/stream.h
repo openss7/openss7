@@ -398,6 +398,7 @@ struct stroptions {
 #define SO_NOCSUM	(1<<24) /* LfS: no checksum on copy */
 #define SO_CSUM		(1<<25) /* LfS: UDP/TCP checksum on copy */
 #define SO_CRC32C	(1<<26) /* LfS: SCTP CRC32C checksum on copy */
+#define SO_SKBUFF	(1<<27)	/* LfS: allocate sk_buffs for data */
 
 #define DEF_IOV_MAX	16	/* Solaris */
 
