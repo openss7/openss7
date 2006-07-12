@@ -319,6 +319,7 @@ enum {
 	STRMOUNT_BIT,
 	STRCSUM_BIT,
 	STRCRC32C_BIT,
+	STRSKBUFF_BIT,
 };
 
 #define IOCWAIT	    (1<<IOCWAIT_BIT)	/* ioctl in progress */
@@ -344,6 +345,7 @@ enum {
 #define STRMOUNT    (1<<STRMOUNT_BIT)	/* stream head is fattached */
 #define STRCSUM	    (1<<STRCSUM_BIT)	/* checksum on copyin for write (UDP/TCP) */
 #define STRCRC32C   (1<<STRCRC32C_BIT)	/* checksum on copyin for write (CRC32C) */
+#define STRSKBUFF   (1<<STRSKBUFF_BIT)	/* allocated sk_buffs for data at stream head */
 
 /* unfortunately AIX appears to mix read and write option flags with stream head flags */
 #if 0				/* AIX compatible flags */
