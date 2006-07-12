@@ -889,7 +889,7 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
  *  number, (e.g. -1), the block is not allocated.  Zero length blocks will be allocated.
  */
 STATIC streams_inline streams_fastcall __hot_write mblk_t *
-alloc_data(const struct stdata *sd, ssize_t dlen, void __user *dbuf)
+alloc_data(const struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 {
 	mblk_t *dp;
 
@@ -949,6 +949,8 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 			mp->b_datap->db_type = type;
 			mp->b_wptr = mp->b_rptr + clen;
 			if (unlikely(clen > 0)) {
+				int err;
+
 				err = strcopyin(ctlp->buf, mp->b_rptr, clen);
 				if (unlikely(err != 0)) {
 					freeb(mp);
@@ -4802,7 +4804,7 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	do {
 		mblk_t *b;
 		size_t block;
-		void __user *where;
+		const void __user *where;
 
 		/* Note: if q_minpsz is zero and the nbytes length is greater than q_maxpsz, we are 
 		   supposed to break the message down into separate q_maxpsz segments. */
@@ -10232,7 +10234,7 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 	if (so->so_flags & SO_SKBUFF)
 		set_bit(STRSKBUFF_BIT, &sd->sd_flag);
 	if (so->so_flags & SO_NOSKBUFF)
-		clr_bit(STRSKBUFF_BIT, &sd->sd_flag);
+		clear_bit(STRSKBUFF_BIT, &sd->sd_flag);
 	freemsg(mp);
 	return (0);
 }
