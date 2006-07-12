@@ -888,6 +888,7 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
  *  alloc_data - alocate an M_DATA message block for write data
  *  @sd stream head
  *  @dsize: M_DATA size
+ *  @duser: user data pointer
  *
  *  Allocates a data message block of the specified size and returns it.  The b_rptr o fthe block
  *  points to the start of the data range and the b_wptr points to the byte past the last byte in
@@ -896,7 +897,7 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
  *  number, (e.g. -1), the block is not allocated.  Zero length blocks will be allocated.
  */
 STATIC streams_inline streams_fastcall __hot_write mblk_t *
-alloc_data(const struct stdata *sd, ssize_t dsize)
+alloc_data(const struct stdata *sd, ssize_t dsize, void __user *duser)
 {
 	mblk_t *dp;
 
@@ -958,7 +959,7 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 			return (mp);
 	}
 	if (likely((dsize = datp ? datp->len : -1) >= 0)) {	/* PROFILED */
-		if (likely((dp = alloc_data(sd, dsize)) != NULL)) {
+		if (likely((dp = alloc_data(sd, dsize, datp->buf)) != NULL)) {
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
 			if (likely(psize < 0))	/* PROFILED */
@@ -4818,6 +4819,7 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	do {
 		mblk_t *b;
 		size_t block;
+		void __user *where;
 
 		/* Note: if q_minpsz is zero and the nbytes length is greater than q_maxpsz, we are 
 		   supposed to break the message down into separate q_maxpsz segments. */
@@ -4825,14 +4827,15 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 		/* the following can sleep */
 
 		block = min(nbytes - written, q_maxpsz);
+		where = buf + written;
 
 		/* POSIX says always blocks awaiting message blocks */
-		if (unlikely((b = alloc_data(sd, block)) == NULL)) {
+		if (unlikely((b = alloc_data(sd, block, where)) == NULL)) {
 			err = -ENOSR;
 			break;
 		}
 
-		if (likely((err = strcopyin(buf + written, b->b_rptr, block))) == 0) {
+		if (likely((err = strcopyin(where, b->b_rptr, block))) == 0) {
 
 			/* locks on */
 			if (likely((err = straccess_rlock(sd, access)) == 0)) {
