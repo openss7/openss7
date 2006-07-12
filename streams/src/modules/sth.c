@@ -905,9 +905,19 @@ alloc_data(const struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 				dp->b_wptr += sd_wroff;
 			}
 			if (likely(dlen > 0)) {
-				int err;
+				int err = 0;
 
-				err = strcopyin(dbuf, dp->b_rptr, dlen);
+				switch (sd->sd_flags & (STRCSUM | STRCRC32C)) {
+				case 0:
+					err = strcopyin(dbuf, dp->b_rptr, dlen);
+					break;
+				case STRCSUM:
+					err = -ENOSYS;
+					break;
+				case STRCRC32C:
+					err = -ENOSYS;
+					break;
+				}
 				if (unlikely(err != 0)) {
 					freeb(dp);
 					return (ERR_PTR(err));
