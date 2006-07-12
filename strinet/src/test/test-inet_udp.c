@@ -1453,7 +1453,7 @@ etype_string(t_uscalar_t etype)
 		case ICMP_PARAMETERPROB:
 			return ("<ICMP_PARAMETERPROB>");
 		default:
-			return ("<ICMP_????>");
+			return ("<ICMP_???? >");
 		}
 	}
 	}
