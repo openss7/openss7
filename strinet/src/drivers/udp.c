@@ -4301,6 +4301,7 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	spin_lock_bh(&tp->qlock);
 	tp->sndmem += skb->truesize;
 	spin_unlock_bh(&tp->qlock);
+	freemsg(mp);
 	return (skb);
       old_way:
 	return tp_alloc_skb_old(tp, mp, headroom, gfp);
