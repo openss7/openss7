@@ -885,29 +885,45 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 void streamscall __hot_out
 freeb_skb(caddr_t arg)
 {
-	kfree_skb((struct sk_buff *) arg);
+	struct sk_buff *skb = (typeof(skb)) arg;
+
+	if (likely(skb != NULL))
+		kfree_skb(skb);
 }
 
 /**
- *  allocb_skb - allocate an M_DATA message block containing an sk_buff
+ *  allocb_buf - allocate an M_DATA message block and choose a buffer
+ *  @sd: stream head
  *  @size: number of bytes to allocate
  *  @priority: priority of the allocation
+ *
+ *  When the stream head is marked for sk_buff operation, the buffer allocated to the data block is
+ *  an sk_buff; otherwise, the normal internal data block buffer is used.  This is to provide the
+ *  option to used sk_buff buffers as data buffers for the data blocks for streams that know that
+ *  they need a sk_buff at the driver.  This feature can be set using the SO_SKBUFF option using an
+ *  M_SETOPTS message sent upstream to the stream head from the driver.
  */
 STATIC streams_inline streams_fastcall __hot_write mblk_t *
-allocb_skb(size_t size, uint priority)
+allocb_buf(const struct stdata *sd, size_t size, uint priority)
 {
-	mblk_t *mp = NULL;
-	struct sk_buff *skb;
-	int gfp = (priority == BPRI_WAITOK) ? GFP_KERNEL : GFP_ATOMIC;
+	if ((sd->sd_flag & (STRSKBUFF)) == 0) {
+		return (allocb(size, priority));
+	} else {
+		struct sk_buff *skb;
+		int gfp = (priority == BPRI_WAITOK) ? GFP_KERNEL : GFP_ATOMIC;
 
-	if (likely((skb = alloc_skb(size, gfp)) != NULL)) {
-		frtn_t free_skb_rtn = {.free_func = &freeb_skb,.free_arg = (caddr_t) skb, };
+		skb = alloc_skb(size, gfp);
+		if (likely(skb != NULL)) {
+			frtn_t free_skb_rtn = {.free_func = &freeb_skb,.free_arg = (caddr_t) skb, };
+			mblk_t *mp;
 
-		if (likely((mp = esballoc(skb->data, size, priority, &free_skb_rtn)) != NULL))
-			return (mp);
-		kfree_skb(skb);
+			mp = esballoc(skb->data, size, priority, &free_skb_rtn);
+			if (likely(mp != NULL))
+				return (mp);
+			kfree_skb(skb);
+		}
+		return (NULL);
 	}
-	return (NULL);
 }
 
 /**
@@ -929,14 +945,9 @@ alloc_data(const struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 
 	if (likely(dlen >= 0)) {	/* PROFILED */
 		int sd_wroff = sd->sd_wroff;
-		int sd_wrpad = sd->sd_wrpad;
-		ssize_t tlen = sd_wroff + dlen + sd_wrpad;
 
 		_ptrace(("Allocating data part %d bytes\n", dlen));
-		if (sd->sd_flag & (STRSKBUFF))
-			dp = allocb_skb(tlen, BPRI_WAITOK);
-		else
-			dp = allocb(tlen, BPRI_WAITOK);
+		dp = allocb_buf(sd, sd_wroff + dlen + sd->sd_wrpad, BPRI_WAITOK);
 		if (likely(dp != NULL)) {
 			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
 			if (sd_wroff) {
