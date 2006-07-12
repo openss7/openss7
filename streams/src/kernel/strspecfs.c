@@ -1299,18 +1299,18 @@ STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE);
 #endif
 #endif
 
-STATIC spinlock_t specfs_lock = SPIN_LOCK_UNLOCKED;
+STATIC DECLARE_MUTEX(specfs_sem);
 
 streams_fastcall struct vfsmount *
 specfs_mount(void)
 {
-	spin_lock(&specfs_lock);
+	down(&specfs_sem);
 	if (!specfs_mnt) {
 		specfs_mnt = kern_mount(&spec_fs_type);
 		if (IS_ERR(specfs_mnt))
 			specfs_mnt = NULL;
 	}
-	spin_unlock(&specfs_lock);
+	up(&specfs_sem);
 	return (mntget(specfs_mnt));
 }
 
@@ -1326,12 +1326,12 @@ specfs_umount(void)
 {
 	if (specfs_mnt) {
 		mntput(specfs_mnt);
-		spin_lock(&specfs_lock);
+		down(&specfs_sem);
 		if (atomic_read(&specfs_mnt->mnt_count) == 1) {
 			kern_umount(specfs_mnt);
 			specfs_mnt = NULL;
 		}
-		spin_unlock(&specfs_lock);
+		up(&specfs_sem);
 	}
 }
 
