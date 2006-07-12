@@ -10229,6 +10229,10 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 	}
 	if (so->so_flags & SO_WRPAD)
 		sd->sd_wrpad = so->so_wrpad;
+	if (so->so_flags & SO_SKBUFF)
+		set_bit(STRSKBUFF_BIT, &sd->sd_flag);
+	if (so->so_flags & SO_NOSKBUFF)
+		clr_bit(STRSKBUFF_BIT, &sd->sd_flag);
 	freemsg(mp);
 	return (0);
 }
