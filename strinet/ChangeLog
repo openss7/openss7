@@ -1,3 +1,11 @@
+2006-07-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c:
+	  (tp_alloc_skb): - reworked to use stream head sk_buff buffer
+	  allocation mechanism
+	* src/test/test-inet_raw.c: - removed trigraph
+	* src/test/test-inet_udp.c: - removed trigraph
+
 2006-07-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/udp.c: fixed mysterious testcase 1074 1222 failure

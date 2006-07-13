@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/08 07:25:49 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/13 08:07:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/08 07:25:49 $ by $Author: brian $
+ Last Modified $Date: 2006/07/13 08:07:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.45  2006/07/13 08:07:59  brian
+ - added sk_buff data buffer allocation mechanism for stream head
+
  Revision 0.9.2.44  2006/07/08 07:25:49  brian
  - removed trigraphs
 
@@ -218,9 +221,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/08 07:25:49 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/13 08:07:59 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/08 07:25:49 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/13 08:07:59 $";
 
 /*
  *  Simple test program for INET streams.

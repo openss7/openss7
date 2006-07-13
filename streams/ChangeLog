@@ -1,3 +1,23 @@
+2006-07-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/sys/streams/stream.h:
+	  (struct datab): - redefined for compatibility and added db_flag
+	  (DB_SKBUFF): - added flag for data block containing sk_buff buffer
+	  (SO_SKBUFF, SO_NOSKBUFF): - added stream head options for sk_buff
+	  buffers for data blocks
+	* include/sys/streams/strsubr.h:
+	  (STRSKBUFF, STRSKBUFF_BIT): - added stream head flag for sk_buff
+	  buffers for data blocks
+	* src/kernel/strspecfs.c:
+	  (specfs_lock, specfs_sem): - changed spin lock to semaphore
+	* src/modules/sth.c:
+	  (strcopyin, strcopyout): - removed call to runqueues
+	  (freeb_skb, allocb_buf): - added functions for allocating sk_buff
+	  buffers for data blocks
+	  (alloc_data, alloc_proto): - reworked for allocating sk_buff buffers
+	  for data blocks
+	  - a lot of minor formatting and factoring
+
 2006-07-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/streams/strsubr.h: fix for rwlock_t held across schedule on FC5 2.6.17 kernel
