@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.24 2006/03/03 10:57:11 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.25 2006/07/13 12:55:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
+ Last Modified $Date: 2006/07/13 12:55:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts.h,v $
+ Revision 0.9.2.25  2006/07/13 12:55:48  brian
+ - updated documentation for sk_buffs
+
  Revision 0.9.2.24  2006/03/03 10:57:11  brian
  - 32-bit compatibility support, updates for release
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.24 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.25 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STROPTS_H__
 //#warning "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
@@ -159,6 +162,11 @@ typedef unsigned long int t_uscalar_t;
 #define FLUSHRW		(FLUSHR|FLUSHW)	/* Flush read and write queues.  */
 #define FLUSHBAND	(1<<2)	/* Flush only specified band.  */
 
+#define MAPINOK		(1<<0)	/* map instead of copyin */
+#define NOMAPIN		(1<<1)	/* normal copyin */
+#define REMAPOK		(1<<2)	/* page flip instead of copyout */
+#define NOREMAP		(1<<3)	/* normal copyout */
+
 #ifdef __KERNEL__
 #define S_INPUT_BIT	0
 #define S_HIPRI_BIT	1
@@ -188,6 +196,8 @@ typedef unsigned long int t_uscalar_t;
 #define S_ALL		(S_INPUT|S_HIPRI|S_OUTPUT|S_MSG|S_ERROR|S_HANGUP|S_RDNORM|S_WRNORM|S_RDBAND|S_WRBAND|S_BANDURG)
 
 #define RS_HIPRI	(1<<0)	/* only read hi priority messages */
+#define STRUIO_POSTPONE	(1<<3)	/* Solaris */
+#define STRUIO_MAPIN	(1<<4)	/* Solaris */
 #define RS_EXDATA	(1<<5)	/* Mac OT */
 #define RS_ALLOWAGAIN	(1<<6)	/* Mac OT */
 #define RS_DELIMITMSG	(1<<7)	/* Mac OT */

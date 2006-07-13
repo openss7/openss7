@@ -17,6 +17,12 @@
 	  (alloc_data, alloc_proto): - reworked for allocating sk_buff buffers
 	  for data blocks
 	  - a lot of minor formatting and factoring
+	* doc/man/man7/I_GERROPT.7.man: updated documentation for sk_buffs
+	* doc/man/man7/I_SERROPT.7.man: updated documentation for sk_buffs
+	* doc/man/man9/M_SETOPTS.9.man: updated documentation for sk_buffs
+	* doc/man/man9/datab.9.man: updated documentation for sk_buffs
+	* doc/man/man9/msgb.9.man: updated documentation for sk_buffs
+	* include/sys/streams/stropts.h: added flags for SO_COPYOPT
 
 2006-07-10  Brian Bidulock  <bidulock@openss7.org>
 

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: datab.9.man,v 0.9.2.20 2006/04/05 09:44:10 brian Exp $
+.\" @(#) $Id: datab.9.man,v 0.9.2.21 2006/07/13 12:55:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2006/07/13 12:55:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: datab.9.man,v $
+.\" Revision 0.9.2.21  2006/07/13 12:55:46  brian
+.\" - updated documentation for sk_buffs
+.\"
 .\" Revision 0.9.2.20  2006/04/05 09:44:10  brian
 .\" - moved .so line and updated headers
 .\"
@@ -91,7 +94,7 @@ sort-adjacent-labels
 .nf
 \fC\s-1
 typedef struct free_rtn {
-    void (*free_func) (caddr_t);
+    void streamscall (*free_func) (caddr_t);
     caddr_t free_arg;
 } frtn_t;
 
@@ -104,20 +107,29 @@ typedef struct datab {
 #define         db_frtnp db_f.frtnp
     unsigned char *db_base;
     unsigned char *db_lim;
-    unsigned char db_ref;       /* shadow reference count */
+    unsigned char db_ref;
     unsigned char db_type;
-    unsigned char db_class;
-    unsigned char db_pad;
-    uint db_size;               /* SVR 3 */
-    /* Linux Fast-STREAMS specific members */
-    atomic_t db_users;          /* actual reference count */
+    union {
+        struct {
+            union {
+                unsigned char db_class;   /* SVR3.1 */
+                unsigned char db_iswhat;  /* Mac OT, OSF/1, DGUX */
+            };
+            union {
+                unsigned char db_pad;     /* SVR3.1 */
+                unsigned char db_filler2; /* Mac OT, OSF/1, DGUX */
+            };
+        };
+        unsigned short db_flag;           /* UnixWare */
+    };
+    unsigned int db_size;                 /* SVR3.1 */
 } dblk_t;
-/* 18 bytes on 32 bit, 30 on 64 bit */
 
 #define DBLK_REFMIN     0x01    /* Solaris */
 
 #define DB_WASDUPED     0x01    /* UnixWare */
 #define DB_2PIECE       0x02    /* UnixWare */
+#define DB_SKBUFF       0x04    /* LfS */
 \s+1\fP
 .fi
 .\"
@@ -333,10 +345,72 @@ See
 .RE
 .TP
 .I db_class
-Indicates whether the message is a normal or priority message.
+Indicates whether the message is a normal or priority message.  Note that this
+member is not used by
+.BR "@PACKAGE_NAME@" :
+rather, the
+.I db_flag
+member is used instead.
+.TP
+.I db_iswhat
+.IR OSF/1 \(rg
+name for
+.I db_class
+member.  See
+.RB \(lq COMPATIBILITY \(rq,
+below.
 .TP
 .I db_pad
-Padding.
+Padding.  Note that this member is not used by
+.BR "@PACKAGE_NAME@" :
+rather, the
+.I db_flag
+member is used instead.
+.TP
+.I db_filler2
+.IR OSF/1 \(rg
+name for
+.I db_pad
+member.
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+.TP
+.I db_flag
+.IR UnixWare \(rg
+name for the
+.I db_class
+and
+.I db_pad
+members.
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+The
+.I db_flag
+field can contain a logical OR of zero or more of the following flags:
+.RS
+.TP \w'DB_WASDUPED\(em'u
+.B DB_WASDUPED
+the data block was duped.
+This flag is neither set nor examined by
+.BR "@PACKAGE_NAME@" .
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+.PD 0
+.TP
+.B DB_2PIECE
+the data block is a two-piece data block.
+This flag is neither set nor examined by
+.BR "@PACKAGE_NAME@" .
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+.TP
+.B DB_SKBUFF
+.PD
+.RE
 .TP
 .I db_size
 The size of the data buffer.  This should be the same as the difference
@@ -350,20 +424,20 @@ members, but is not always the case under
 svr3spg
 .]
 that defined the field.
-.PP
-The following members are
-.B Linux Fast-STREAMS
-specific members:
-.TP \w'\ db_msgaddr\ 'u
-.I db_users
-Because
-.B Linux
-does not have character sized atomic types, this is an integer atomic type
-count equivalent to the
-.I db_ref
-member.  This private member is used for atomic operations on the reference
-count, and then it is copied from here to
-.IR db_ref .
+.\".PP
+.\"The following members are
+.\".B Linux Fast-STREAMS
+.\"specific members:
+.\".TP \w'\ db_msgaddr\ 'u
+.\".I db_users
+.\"Because
+.\".B Linux
+.\"does not have character sized atomic types, this is an integer atomic type
+.\"count equivalent to the
+.\".I db_ref
+.\"member.  This private member is used for atomic operations on the reference
+.\"count, and then it is copied from here to
+.\".IR db_ref .
 .\"
 .\"
 .SH INTERFACE
@@ -642,19 +716,19 @@ implementation and architectural independence.
 See under
 .RI \(lq Macros \(rq,
 above.
-.PP
-The
-.I db_ref
-member is unreliable and should not be read or written by portable
-.I STREAMS
-drivers or modules.
-It is better to use the
-.BR DB_REF ()
-macro, described above, because under
-.B "@PACKAGE_TITLE@"
-this macro accesses the implementation specific atomic
-.I db_users
-member within the structure.
+.\".PP
+.\"The
+.\".I db_ref
+.\"member is unreliable and should not be read or written by portable
+.\".I STREAMS
+.\"drivers or modules.
+.\"It is better to use the
+.\".BR DB_REF ()
+.\"macro, described above, because under
+.\".B "@PACKAGE_TITLE@"
+.\"this macro accesses the implementation specific atomic
+.\".I db_users
+.\"member within the structure.
 .PP
 The
 .IR db_base ", " db_lim " and " db_size
@@ -754,6 +828,30 @@ the
 .I db_pad
 member,
 .IR db_filler2 .
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+defines these as an
+.B unsigned short
+.I db_flag
+field.
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+also defines the two flags
+.B DB_WASDUPED
+and
+.B DB_2PIECE
+for use in the
+.I db_flag
+field.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not access any of these fields.
+.IP \(em
 .IR OSF/1 \(rg
 .[
 osfspg
@@ -772,19 +870,7 @@ members that follow
 .IP ""
 Portable
 .I STREAMS
-drivers and modules will not access any of these fields.  If it is absolutely necessary to access
-the
-.I db_iswhat
-or
-.I db_filler2
-fields, the following macros should be defined:
-.IP ""
-.nf
-\fC\s-1\
-#define db_iswhat   db_class
-#define db_filler2  db_pad
-\s+1\fP
-.fi
+drivers and modules will not access any of these fields.
 .IP \(em
 .IR "SVR 3.1"
 placed the internal data buffer inside the

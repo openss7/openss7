@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: msgb.9.man,v 0.9.2.19 2006/04/05 09:44:14 brian Exp $
+.\" @(#) $Id: msgb.9.man,v 0.9.2.20 2006/07/13 12:55:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:14 $ by $Author: brian $
+.\" Last Modified $Date: 2006/07/13 12:55:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: msgb.9.man,v $
+.\" Revision 0.9.2.20  2006/07/13 12:55:46  brian
+.\" - updated documentation for sk_buffs
+.\"
 .\" Revision 0.9.2.19  2006/04/05 09:44:14  brian
 .\" - moved .so line and updated headers
 .\"
@@ -91,20 +94,18 @@ sort-adjacent-labels
 \fC\s-1
 .B #include <sys/stream.h>
 
-/* 28 bytes on 32 bit, 52 on 64 bit */
 typedef struct msgb {
-    struct msgb *b_next;    /* next msgb on queue */
-    struct msgb *b_prev;    /* prev msgb on queue */
-    struct msgb *b_cont;    /* next msgb in message */
-    unsigned char *b_rptr;  /* rd pointer into datab */
-    unsigned char *b_wptr;  /* wr pointer into datab */
-    struct datab *b_datap;  /* pointer to datab */
-    unsigned char b_band;   /* band of this message */
-    unsigned char b_pad1;   /* padding */
-    unsigned short b_flag;  /* message flags */
-#if 0
-    long b_pad2;            /* padding */
-#endif
+    struct msgb *b_next;   /* next msgb on queue */
+    struct msgb *b_prev;   /* prev msgb on queue */
+    struct msgb *b_cont;   /* next msgb in message */
+    unsigned char *b_rptr; /* rd pointer into datab */
+    unsigned char *b_wptr; /* wr pointer into datab */
+    struct datab *b_datap; /* pointer to datab */
+    unsigned char b_band;  /* band of this message */
+    unsigned char b_pad1;  /* padding */
+    unsigned short b_flag; /* message flags */
+    unsigned char b_pad2[sizeof(ulong) - 4]; /* padding */
+    long b_csum;           /* checksum */
 } mblk_t;
 \s+1\fP
 .fi
@@ -228,20 +229,33 @@ compress like messages as space allows;
 osfspg
 .]
 notify when message consumed;
+.TP
+.B MSGCSUM
+.IR "@PACKAGE_TITLE@" :
+.I b_csum
+contains TCP/UDP partial checksum;
+.TP
+.B MSGCRC32C
+.IR "@PACKAGE_TITLE@" :
+.I b_csum
+conatains SCTP partial checksum;
 .PD
 .RE
 .TP
 .I b_pad2
 padding.
+.PP
+The following members are
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+specific members:
+.TP \w'\ b_datap\ 'u
+.I b_csum
+checksum.
 .PD 0
 .PD
-.\".PP
-.\"The following members are
-.\".B Linux Fast-STREAMS
-.\".[
-.\"lfs
-.\".]
-.\"specific members:
 .\".TP \w'\ b_bandp\ 'u
 .\".I b_queue
 .\"the
@@ -755,6 +769,48 @@ Although
 defines the flag, the Stream head does not recognize it.
 For details, see
 .BR M_NOTIFY (9).
+.TP
+.B MSGCSUM
+.I @PACKAGE_TITLE@
+.[
+lfs
+.]
+defines this flag.  When checksumming is set on the Stream head with the
+.B SO_CSUM
+option flag set in a
+.BR M_SETOPTS (9)
+message, the Stream head performs TCP/UDP partial checksum while copying in the data portion of a
+.BR write (2s)-like
+operation and places the partial checsum result in the
+.I b_csum
+member of the
+.BR M_DATA (9)
+message block and sets this
+.B MSGCSUM
+flag in the
+.I b_flag
+member of the message block to indicate the validity of the partial checksum.
+.TP
+.B MSGCRC32C
+.I @PACKAGE_TITLE@
+.[
+lfs
+.]
+defines this flag.  When checksumming is set on the Stream head with the
+.B SO_CRC32C
+option flag set in a
+.BR M_SETOPTS (9)
+message, the Stream head performs SCTP partial checksum while copying in the data portion of a
+.BR write (2s)-like
+operation and places the partial checsum result in the
+.I b_csum
+member of the
+.BR M_DATA (9)
+message block and sets this
+.B MSGCRC32C
+flag in the
+.I b_flag
+member of the message block to indicate the validity of the partial checksum.
 .\"
 .\"
 .SH USAGE
