@@ -931,10 +931,7 @@ Internet Draft                  UA SGINFO              February 21, 2004
 
 0.0.0.  Change Log
 
-    $Log: draft-bidulock-sigtran-sginfo-04.txt,v $
-    Revision 0.9.2.1  2004/03/16 07:06:25  brian
-    - Added older drafts in pdf and txt form.
-
+    $Log: draft-bidulock-sigtran-sginfo-04.me,v $
     Revision 0.8.2.1  2003/08/01 12:23:16  brian
     Added abbreviations, updated format.
 

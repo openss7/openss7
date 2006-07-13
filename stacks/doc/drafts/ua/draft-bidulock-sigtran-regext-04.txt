@@ -1573,10 +1573,7 @@ Internet Draft                  UA REGEXT               October 16, 2005
 
 0.0.0.  Change Log
 
-    $Log: draft-bidulock-sigtran-regext-04.txt,v $
-    Revision 0.9.2.1  2005/12/28 05:52:55  brian
-    - missed files
-
+    $Log: draft-bidulock-sigtran-regext-04.me,v $
     Revision 0.9.2.3  2005/10/17 11:53:46  brian
     - updated drafts for republication
 

@@ -138,10 +138,7 @@ Internet Draft                  UA SESSID                  July 26, 2003
 
 0.0.0.  Change Log
 
-    $Log: draft-bidulock-sigtran-sessid-02.txt,v $
-    Revision 0.9.2.1  2004/03/16 07:06:21  brian
-    - Added older drafts in pdf and txt form.
-
+    $Log: draft-bidulock-sigtran-sessid-02.me,v $
     Revision 0.8.2.1  2003/07/28 13:12:21  brian
     Reformatting.
 

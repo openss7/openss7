@@ -195,7 +195,7 @@ SIGTRAN Data Model                Abstract                      OpenSS7 Corp
 
 
 
-$Revision: 0.9.2.1 $               Page i                  February 21, 2004
+$Revision: 0.8.2.1 $               Page i                  February 21, 2004
 
 SIGTRAN Data Model                 Preface                      OpenSS7 Corp
 
@@ -237,10 +237,7 @@ Take care that you are working with a current version of this document:  you
 will  not  be  informed  of  updates.  For a current version, please see the
 source documentation at http://www.openss7.org/.
 
-    $Log: datamodel.txt,v $
-    Revision 0.9.2.1  2004/03/16 07:05:59  brian
-    - Added older drafts in pdf and txt form.
-
+    $Log: datamodel.me,v $
     Revision 0.8.2.1  2003/02/23 00:52:29  brian
     Some idref and bullet changes.
 
@@ -264,7 +261,7 @@ source documentation at http://www.openss7.org/.
 
 
 
-$Revision: 0.9.2.1 $               Page ii                 February 21, 2004
+$Revision: 0.8.2.1 $               Page ii                 February 21, 2004
 
 
 
@@ -396,7 +393,7 @@ SIGTRAN Data Model                 Preface                      OpenSS7 Corp
 
 
 
-$Revision: 0.9.2.1 $               Page -1                 February 21, 2004
+$Revision: 0.8.2.1 $               Page -1                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -462,7 +459,7 @@ ____________________
 
 
 
-$Revision: 0.9.2.1 $              Page 1-1                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 1-1                 February 21, 2004
 
 
 
@@ -660,7 +657,7 @@ There is a many-to-many relationship between SP and SG.
 
 
 
-$Revision: 0.9.2.1 $              Page 2-3                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 2-3                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -726,7 +723,7 @@ There is a many-to-many relationship between AS and ASP.
 
 
 
-$Revision: 0.9.2.1 $              Page 2-4                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 2-4                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -792,7 +789,7 @@ There is a many-to-many relationship between AS and SGP.
 
 
 
-$Revision: 0.9.2.1 $              Page 2-5                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 2-5                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -858,7 +855,7 @@ There is a one-to-many relationship between SP and AS.
 
 
 
-$Revision: 0.9.2.1 $              Page 2-6                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 2-6                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -924,7 +921,7 @@ There is a many-to-many relationship between SG and AS.
 
 
 
-$Revision: 0.9.2.1 $              Page 2-7                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 2-7                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -990,7 +987,7 @@ The configuration structure contains the following fields:
            UA_ADD      This  command  requests  the  UA driver to create the
                        specified  object  and  return  any   driver-selected
 
-$Revision: 0.9.2.1 $              Page 3-1                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 3-1                 February 21, 2004
 
 
 
@@ -1122,7 +1119,7 @@ The argument to the control is a SPP configuration structure as follows:
 
 
 
-$Revision: 0.9.2.1 $              Page 3-3                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 3-3                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1188,7 +1185,7 @@ Dynamic configuration is performed in response to UA driver run-time events.
 
 
 
-$Revision: 0.9.2.1 $              Page 3-4                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 3-4                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1254,7 +1251,7 @@ driver in the newly opened state.
    trol Part) stream.
 
 
-$Revision: 0.9.2.1 $              Page 3-5                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 3-5                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1320,7 +1317,7 @@ mand on the UA_OBJ_TYPE_SS7_P object type.
 
 
 
-$Revision: 0.9.2.1 $              Page 3-6                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 3-6                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1386,7 +1383,7 @@ be  performed  by scanning the list of AS-U associated with the SP receiving
 the REG REQ.  If an AS-U exists for the routing (link)  key,  the  Interface
 Identifier  or  Routing  Context  associated  with the existing AS-U will be
 
-$Revision: 0.9.2.1 $              Page 3-7                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 3-7                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1452,7 +1449,7 @@ This section discusses the destruction of UA data structures.
 
 
 
-$Revision: 0.9.2.1 $              Page 3-8                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 3-8                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1518,7 +1515,7 @@ abling.
 
 
 
-$Revision: 0.9.2.1 $              Page 3-9                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 3-9                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1584,7 +1581,7 @@ ACTIVE management control to deactivate the AS-U.
 
 
 
-$Revision: 0.9.2.1 $              Page 3-10                February 21, 2004
+$Revision: 0.8.2.1 $              Page 3-10                February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1650,7 +1647,7 @@ lock   Structure lock.
 id     Identifier which uniquely identifies the SG data structure within
        the  UA  multiplexing  driver.   This identifier is used by Layer
 
-$Revision: 0.9.2.1 $              Page 4-1                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 4-1                 February 21, 2004
 
 
 
@@ -1782,7 +1779,7 @@ tures is illustrated in Figure 4-1.
 
 
 
-$Revision: 0.9.2.1 $              Page 4-3                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 4-3                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1848,7 +1845,7 @@ The AS data structure is as follows:
 
 
 
-$Revision: 0.9.2.1 $              Page 4-4                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 4-4                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1914,7 +1911,7 @@ flags  Run-time flags associated with the AS.  The following flags  are  de-
        AS_PENDING                  When  set, indicates that the AS is inac-
                                    tive (in the AS_DOWN  or  AS_INACTIVE  or
 
-$Revision: 0.9.2.1 $              Page 4-5                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 4-5                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -1980,7 +1977,7 @@ structure is as follows:
 
 
 
-$Revision: 0.9.2.1 $              Page 4-6                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 4-6                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -2046,7 +2043,7 @@ spp.spp, spp.next, spp.prev
 
 
 
-$Revision: 0.9.2.1 $              Page 4-7                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 4-7                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -2112,7 +2109,7 @@ the AS.
 When  active,  data traffic from the SS7 User is distributed over the avail-
 able SG and SGP according to traffic mode and load sharing algorithms.
 
-$Revision: 0.9.2.1 $              Page 5-1                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 5-1                 February 21, 2004
 
 
 
@@ -2244,7 +2241,7 @@ SIGTRAN Data Models                                      OpenSS7 Corporation
 
 
 
-$Revision: 0.9.2.1 $              Page 5-3                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 5-3                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -2310,7 +2307,7 @@ Figure 5-4 illustrates a simple Combined example.
 
 
 
-$Revision: 0.9.2.1 $              Page 5-4                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 5-4                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -2376,7 +2373,7 @@ SS7 User through that Application Server (AS) in the same fashion.
 
 
 
-$Revision: 0.9.2.1 $              Page 5-5                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 5-5                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -2442,7 +2439,7 @@ er and the local SS7 Provider on each processor.
 
 
 
-$Revision: 0.9.2.1 $              Page 5-6                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 5-6                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -2508,7 +2505,7 @@ The following points are notable:
 
 
 
-$Revision: 0.9.2.1 $              Page 5-7                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 5-7                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -2574,7 +2571,7 @@ SIGTRAN Data Models                                      OpenSS7 Corporation
 
 
 
-$Revision: 0.9.2.1 $              Page 5-1                 February 21, 2004
+$Revision: 0.8.2.1 $              Page 5-1                 February 21, 2004
 
 SIGTRAN Data Models                                      OpenSS7 Corporation
 
@@ -2640,7 +2637,7 @@ A.1.  Test Header
 
 
 
-$Revision: 0.9.2.1 $              Page A-1                 February 21, 2004
+$Revision: 0.8.2.1 $              Page A-1                 February 21, 2004
 
 
 
@@ -2772,7 +2769,7 @@ M2PA03.
 
 
 
-$Revision: 0.9.2.1 $               Page II                 February 21, 2004
+$Revision: 0.8.2.1 $               Page II                 February 21, 2004
 
 
 

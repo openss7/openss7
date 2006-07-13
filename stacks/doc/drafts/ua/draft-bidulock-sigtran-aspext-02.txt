@@ -839,10 +839,7 @@ Internet Draft                  UA ASPEXT                  July 26, 2003
 
 0.0.0.  Change Log
 
-    $Log: draft-bidulock-sigtran-aspext-02.txt,v $
-    Revision 0.9.2.1  2004/03/16 07:06:01  brian
-    - Added older drafts in pdf and txt form.
-
+    $Log: draft-bidulock-sigtran-aspext-02.me,v $
     Revision 0.8.2.4  2003/08/01 12:23:15  brian
     Added abbreviations, updated format.
 
