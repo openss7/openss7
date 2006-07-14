@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: allocb.9.man,v 0.9.2.29 2006/04/05 09:44:05 brian Exp $
+.\" @(#) $Id: allocb.9.man,v 0.9.2.30 2006/07/14 09:20:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:05 $ by $Author: brian $
+.\" Last Modified $Date: 2006/07/14 09:20:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: allocb.9.man,v $
+.\" Revision 0.9.2.30  2006/07/14 09:20:31  brian
+.\" - hid allocb_skb() behind allocb() using BPRI_SKBUFF flag
+.\"
 .\" Revision 0.9.2.29  2006/04/05 09:44:05  brian
 .\" - moved .so line and updated headers
 .\"
@@ -177,15 +180,20 @@ will be allocated.
 The
 .I pri
 can be one of the following values:
-.sp
-.TS
-expand tab(:);
-lb0ls.
-BPRI_LO\ \ :requests a low priority message buffer.
-BPRI_MED\ \ :requests a medium priority message buffer.
-BPRI_HI\ \ :requests a high priority message buffer.
-BPRI_WAITOK\ \ :block for a low priority message buffer.
-.TE
+.TP \w'\fBBPRI_WAITOK\fR\(em'u
+.B BPRI_LO
+requests a low priority message buffer.
+.PD 0
+.TP
+.B BPRI_MED
+requests a medium priority message buffer.
+.TP
+.B BPRI_HI
+requests a high priority message buffer.
+.TP
+.B BPRI_WAITOK
+block for a low priority message buffer.
+.PD
 .PP
 If
 .BR allocb ()
@@ -195,6 +203,16 @@ other than
 .BR BPRI_LO ", " BPRI_MED ", " BPRI_HI " or " BPRI_WAITOK ,
 the request will be treated as
 .BR BPRI_LO .
+.PP
+Under
+.BR "@PACKAGE_TITLE@" ,
+.I pri
+can also be logically OR'ed with zero or more of the following flags:
+.TP \w'\fBBPRI_WAITOK\fR\(em'u
+.B BPRI_SKBUFF
+requests that a
+.B Linux
+socket buffer be allocated for the data buffer.
 .PP
 The
 .I pri
@@ -242,6 +260,21 @@ or
 procedures, and if allocation failed would otherwise have to return an error from the
 .IR qi_qopen (9)
 open routine.
+.PP
+Priority flag
+.B BPRI_SKBUFF
+is added for
+.B @PACKAGE_TITLE@
+high-performance network drivers under
+.BR Linux .
+.B BPRI_SKBUFF
+is used primarily by the Stream head to preallocate socket buffers for use by
+network drivers.  A network driver can request that socket buffers be
+allocated for all data blocks using the
+.I SO_SKBUFF
+option flag in a
+.BR M_SETOPTS (9)
+message sent to the Stream head.
 .PP
 For consistency with past implementations of
 .IR STREAMS ,
@@ -470,6 +503,14 @@ The buffer allocation will be treated as
 but the caller will block waiting to obtain a buffer.  Where sleeping is acceptable, and a
 guarantee of success is also needed, use
 .BR BPRI_WAITOK .
+.TP
+.B BPRI_SKBUFF
+The buffer allocation will be treated the same as the priority without the
+flag; however, a socket buffer will be allocated with
+.BR alloc_skb ()
+for the data buffer instead of allocating an internal data buffer or external
+data buffer allocated with
+.BR kmem_alloc (9).
 .\".PP
 .\"In this way, the
 .\".I pri
@@ -711,6 +752,18 @@ for the
 .I pri
 argument instead of
 .BR uint .
+.IP \(em
+Flag
+.B BPRI_SKBUFF
+is a
+.B @PACKAGE_TITLE@
+specific feature.
+.IP ""
+Portable
+.I STREAMS
+driver and modules will not use the
+.B BPRI_SKBUFF
+priority flag.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

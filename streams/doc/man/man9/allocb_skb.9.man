@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: allocb_skb.9.man,v 0.9.2.29 2006/04/05 09:44:05 brian Exp $
+.\" @(#) $Id: allocb_skb.9.man,v 0.9.2.1 2006/07/14 09:20:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:05 $ by $Author: brian $
+.\" Last Modified $Date: 2006/07/14 09:20:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: allocb_skb.9.man,v $
+.\" Revision 0.9.2.1  2006/07/14 09:20:31  brian
+.\" - hid allocb_skb() behind allocb() using BPRI_SKBUFF flag
+.\"
 .\" Revision 0.9.2.29  2006/04/05 09:44:05  brian
 .\" - moved .so line and updated headers
 .\"

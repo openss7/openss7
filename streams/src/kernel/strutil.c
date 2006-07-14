@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/06/22 01:17:11 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/07/14 09:20:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 01:17:11 $ by $Author: brian $
+ Last Modified $Date: 2006/07/14 09:20:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.129  2006/07/14 09:20:33  brian
+ - hid allocb_skb() behind allocb() using BPRI_SKBUFF flag
+
  Revision 0.9.2.128  2006/06/22 01:17:11  brian
  - syncing notebook, latest changes are not stable yet
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/06/22 01:17:11 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/07/14 09:20:33 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/06/22 01:17:11 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/07/14 09:20:33 $";
 
 #include <linux/config.h>
 #include <linux/module.h>

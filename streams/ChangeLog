@@ -1,3 +1,12 @@
+2006-07-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/allocb.9.man: added description for the BPRI_SKBUFF flag
+	* doc/man/man9/allocb_skb.9.man: added manual page (no dist)
+	* doc/man/man9/skballoc.9.man: added manual page (no dist)
+	* include/sys/streams/stream.h: added BPRI_SKBUFF
+	* src/kernel/strutil.c: hide allocb_skb() behind allocb()
+	* src/modules/sth.c: use allocb() with BPRI_SKBUFF when required
+	
 2006-07-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/streams/stream.h:
