@@ -1,3 +1,9 @@
+2006-07-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* send-pr: added more files to output
+	* send-pr.config.in: added more files to output
+	* m4/openss7.m4: substitute config cache and site files
+
 2006-07-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* README-LiS: new README file warning of deprecated LiS

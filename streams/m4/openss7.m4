@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/03/25 12:55:08 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/07/14 00:12:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/25 12:55:08 $ by $Author: brian $
+# Last Modified $Date: 2006/07/14 00:12:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.33  2006/07/14 00:12:25  brian
+# - substitute config cache and site filenames
+#
 # Revision 0.9.2.32  2006/03/25 12:55:08  brian
 # - got enable_static backwards
 #
@@ -177,11 +180,13 @@ AC_DEFUN([_OPENSS7_CACHE], [dnl
 	    cat /dev/null > "$cache_file"
 	fi
     fi
+    AC_SUBST([cache_file])dnl
     # if site file not specified, use local site file
     if test :"$CONFIG_SITE" = :
     then
 	CONFIG_SITE='config.site'
     fi
+    AC_SUBST([CONFIG_SITE])dnl
     AC_CONFIG_COMMANDS([siteconfig], [dnl
 	if test :"$CONFIG_SITE" != : -a :"$cache_file" != :
 	then
