@@ -332,6 +332,7 @@ allocb(size_t size, uint priority)
 		mp->b_datap = db;
 		mp->b_band = 0;
 		mp->b_flag = 0;
+		mp->b_csum = 0;
 	}
 	_printd(("%s: allocated mblk %p, refs %d\n", __FUNCTION__, mp, (int) mp->b_datap->db_ref));
 	return (mp);
@@ -364,6 +365,7 @@ copyb(register mblk_t *mp)
 			b->b_datap->db_type = mp->b_datap->db_type;
 			b->b_band = mp->b_band;
 			b->b_flag = mp->b_flag;
+			b->b_csum = mp->b_csum;
 		}
 	}
 	return (b);
@@ -494,6 +496,7 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		mp->b_datap = db;
 		mp->b_band = 0;
 		mp->b_flag = 0;
+		mp->b_csum = 0;
 		return (mp);
 	}
 	return (NULL);
