@@ -362,10 +362,7 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 {
 	mblk_t *mp;
 
-	if (likely((mp = alloc_block(base, base + size, base, base, freeinfo, size, 0,
-				     &esballoc)) != NULL))
-		return (mp);
-	if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
+	if (likely((mp = mdbblock_alloc(priority, &esballoc)) != NULL)) {
 		struct mdbblock *md = mb_to_mdb(mp);
 		dblk_t *db = &md->datablk.d_dblock;
 		struct free_rtn *frtnp = (struct free_rtn *) md->databuf;
@@ -461,7 +458,7 @@ allocb_kmem(const size_t size, uint priority)
 	static const int allocation = (priority == BPRI_WAITOK) ? KM_SLEEP : KM_NOSLEEP;
 
 	if (likely((base = kmem_alloc(size, allocation)) != NULL)) {
-		if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
+		if (likely((mp = mdbblock_alloc(priority, &allocb_kmem)) != NULL)) {
 			struct mdbblock *md = mb_to_mdb(mp);
 			dblk_t *db = &md->datablk.d_dblock;
 
