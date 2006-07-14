@@ -3578,7 +3578,7 @@ tp_v4_err_next(struct sk_buff *skb, __u32 info)
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 #endif
 #ifdef HAVE_INET_PROTOS_ADDR
-STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
+STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
 #endif
 
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
@@ -3669,6 +3669,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 			ppp = &(*ppp)->next;
 #endif				/* HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL */
 		if (*ppp != NULL) {
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 			if ((pp->kmod = module_text_address((ulong) *ppp))
 			    && pp->kmod != THIS_MODULE) {
 				if (!try_module_get(pp->kmod)) {
@@ -3677,6 +3678,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 					return (NULL);
 				}
 			}
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 		}
 		*ppp = &pp->proto;
 		inet_protosp[hash] = &pp->proto;
@@ -3696,6 +3698,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 				return (NULL);
 			}
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 			if ((pp->kmod = module_text_address((ulong) *ppp))
 			    && pp->kmod != THIS_MODULE) {
 				if (!try_module_get(pp->kmod)) {
@@ -3704,6 +3707,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 					return (NULL);
 				}
 			}
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
 			pp->proto.copy = 0;
 			pp->proto.next = (*ppp)->next;
@@ -3776,8 +3780,10 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 			br_write_unlock_bh(BR_NETPROTO_LOCK);
 #endif				/* HAVE_INET_PROTO_LOCK_ADDR */
 
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 			/* unlink from hash slot */
 			udp_prots[proto] = NULL;
 
