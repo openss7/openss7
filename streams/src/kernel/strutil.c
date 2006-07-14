@@ -320,7 +320,7 @@ skballoc(struct sk_buff *skb, uint priority)
 {
 	mblk_t *mp;
 
-	if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
+	if (likely((mp = mdbblock_alloc(priority, &skballoc)) != NULL)) {
 		struct mdbblock *md = mb_to_mdb(mp);
 		dblk_t *db = &md->datablk.d_dblock;
 		struct free_rtn *frtnp = (struct free_rtn *) md->databuf;
