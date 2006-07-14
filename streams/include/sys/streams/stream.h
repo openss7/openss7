@@ -948,6 +948,7 @@ typedef void streamscall (*weld_fcn_t) (weld_arg_t);
 #define BPRI_HI		3
 #define BPRI_FT		4	/* Solaris */
 #define BPRI_WAITOK	255	/* OSF/HP-UX */
+#define BPRI_SKBUFF	(1<<8)	/* LfS */
 
 #define DRVOPEN		0x0
 #define MODOPEN		0x1
