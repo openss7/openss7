@@ -35,6 +35,7 @@
 -TSLIST_SMAP
 -Tqueue_t
 -Tmblk_t
+-Tdblk_t
 -Tfrtn_t
 -Tbcid_t
 -Ttoid_t
@@ -49,6 +50,7 @@
 -Tcaddr_t
 -Tulong
 -Tushort
+-Tinline
 -Twait_queue_head_t
 -Tssize_t
 -Tsize_t
