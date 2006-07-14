@@ -348,7 +348,7 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #include <net/tcp.h>
     ])
     _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
-			ip_route_output_key __in_dev_get_rcu], [], [], [
+			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
