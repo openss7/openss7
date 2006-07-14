@@ -402,7 +402,7 @@ allocb_skb(const size_t size, uint priority)
 {
 	mblk_t *mp;
 	struct sk_buff *skb;
-	static const int allocation = (priority == BPRI_WAITOK) ? GFP_KERNEL : GFP_ATOMIC;
+	int allocation = (priority == BPRI_WAITOK) ? GFP_KERNEL : GFP_ATOMIC;
 
 	if (likely((skb = alloc_skb(size, allocation)) != NULL)) {
 		if (likely((mp = skballoc(skb, priority)) != NULL))
@@ -455,7 +455,7 @@ allocb_kmem(const size_t size, uint priority)
 {
 	mblk_t *mp;
 	unsigned char *base;
-	static const int allocation = (priority == BPRI_WAITOK) ? KM_SLEEP : KM_NOSLEEP;
+	int allocation = (priority == BPRI_WAITOK) ? KM_SLEEP : KM_NOSLEEP;
 
 	if (likely((base = kmem_alloc(size, allocation)) != NULL)) {
 		if (likely((mp = mdbblock_alloc(priority, &allocb_kmem)) != NULL)) {
