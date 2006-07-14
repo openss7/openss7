@@ -301,50 +301,7 @@ adjmsg(mblk_t *mp, register ssize_t length)
 
 EXPORT_SYMBOL_NOVERS(adjmsg);		/* include/sys/streams/stream.h */
 
-STATIC streams_fastcall __hot mblk_t *
-alloc_block(unsigned char *db_base, unsigned char *db_lim, unsigned char *b_rptr,
-	    unsigned char *b_wptr, struct free_rtn *freeinfo, size_t db_size, unsigned short b_flag,
-	    void *func)
-{
-	mblk_t *mp;
-
-	if (likely((mp = mdbblock_alloc(priority, func)) != NULL)) {
-		struct mdbblock *md = mb_to_mdb(mp);
-		dblk_t *db = &md->datablk.d_dblock;
-		struct free_rtn *frtnp;
-
-		if (db_base == NULL) {
-			b_wptr = b_rptr = db_base = md->databuf;
-			db_lim = db_base + db_size;
-		}
-		if (likely(freeinfo == NULL)) {
-			frtnp = NULL;
-		} else {
-			frtnp = (struct free_rtn *) md->databuf;
-			*frtnp = *freeinfo;
-		}
-		/* set up data block */
-		db->db_frtnp = frtnp;
-		db->db_base = db_base;
-		db->db_lim = db_lim;
-		db->db_ref = 1;
-		db->db_type = M_DATA;
-		db->db_size = db_size;
-		db->db_flag = db_flag;
-		/* set up message block */
-		mp->b_next = mp->b_prev = mp->b_cont = NULL;
-		mp->b_rptr = b_rptr;
-		mp->b_wptr = b_wptr;
-		mp->b_datap = db;
-		mp->b_band = 0;
-		mp->b_flag = 0;
-		mp->b_csum = 0;
-		return (mp);
-	}
-	return (NULL);
-}
-
-streams_fastcall __hot_out void
+STATIC streams_fastcall __hot_out void
 freeb_skb(caddr_t arg)
 {
 	struct sk_buff *skb = (typeof(skb)) arg;
