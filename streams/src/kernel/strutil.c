@@ -300,6 +300,45 @@ adjmsg(mblk_t *mp, register ssize_t length)
 EXPORT_SYMBOL_NOVERS(adjmsg);		/* include/sys/streams/stream.h */
 
 /**
+ *  esballoc:	- allocate a message block with an external buffer
+ *  @base:	base address of message buffer
+ *  @size:	size of the message buffer
+ *  @priority:	priority of message block header allocation
+ *  @freeinfo:	free routine callback
+ */
+streams_fastcall __hot_in mblk_t *
+esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
+{
+	mblk_t *mp;
+
+	if (likely((mp = mdbblock_alloc(priority, &esballoc)) != NULL)) {
+		struct mdbblock *md = mb_to_mdb(mp);
+		dblk_t *db = &md->datablk.d_dblock;
+
+		/* set up internal buffer with free routine info */
+		*(struct free_rtn *) md->databuf = *freeinfo;
+		/* set up data block */
+		db->db_frtnp = (struct free_rtn *) md->databuf;
+		db->db_base = base;
+		db->db_lim = base + size;
+		db->db_ref = 1;
+		db->db_type = M_DATA;
+		db->db_size = size;
+		/* set up message block */
+		mp->b_next = mp->b_prev = mp->b_cont = NULL;
+		mp->b_rptr = mp->b_wptr = db->db_base;
+		mp->b_datap = db;
+		mp->b_band = 0;
+		mp->b_flag = 0;
+		mp->b_csum = 0;
+		return (mp);
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL_NOVERS(esballoc);
+
+/**
  *  allocb:	- allocate a message block
  *  @size:	size of message block in bytes
  *  @priority:	priority of the allocation
@@ -464,45 +503,6 @@ EXPORT_SYMBOL_NOVERS(dupb);
 __STRUTIL_EXTERN_INLINE mblk_t *dupmsg(mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(dupmsg);		/* include/sys/streams/stream.h */
-
-/**
- *  esballoc:	- allocate a message block with an external buffer
- *  @base:	base address of message buffer
- *  @size:	size of the message buffer
- *  @priority:	priority of message block header allocation
- *  @freeinfo:	free routine callback
- */
-streams_fastcall __hot_in mblk_t *
-esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
-{
-	mblk_t *mp;
-
-	if (likely((mp = mdbblock_alloc(priority, &esballoc)) != NULL)) {
-		struct mdbblock *md = mb_to_mdb(mp);
-		dblk_t *db = &md->datablk.d_dblock;
-
-		/* set up internal buffer with free routine info */
-		*(struct free_rtn *) md->databuf = *freeinfo;
-		/* set up data block */
-		db->db_frtnp = (struct free_rtn *) md->databuf;
-		db->db_base = base;
-		db->db_lim = base + size;
-		db->db_ref = 1;
-		db->db_type = M_DATA;
-		db->db_size = size;
-		/* set up message block */
-		mp->b_next = mp->b_prev = mp->b_cont = NULL;
-		mp->b_rptr = mp->b_wptr = db->db_base;
-		mp->b_datap = db;
-		mp->b_band = 0;
-		mp->b_flag = 0;
-		mp->b_csum = 0;
-		return (mp);
-	}
-	return (NULL);
-}
-
-EXPORT_SYMBOL_NOVERS(esballoc);
 
 /**
  *  freeb:	- free a message block
