@@ -979,6 +979,9 @@ alloc_data(const struct stdata *sd, ssize_t dlen, const void __user *dbuf)
  *  stream head sd_wroff write offset and padded with the stream head sd_wrpad write padding.  If
  *  the size of the corresponding block is set to a negative number (e.g. -1) the corresponding
  *  block is not allocated.  Zero length blocks will be allocated.
+ *
+ *  Note that this is now different from the SVR3-style alloc_proto() that is part of the streams
+ *  compatibility package.
  */
 STATIC streams_inline streams_fastcall __hot_put mblk_t *
 alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
