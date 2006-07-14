@@ -91,6 +91,8 @@ static char const ident[] =
 #include <linux/types.h>	/* for various types */
 #include <linux/interrupt.h>	/* for in_interrupt() */
 
+#include <linux/skbuff.h>	/* for sk_buffs */
+
 #include <asm/cache.h>		/* for L1_CACHE_BYTES */
 
 #include <stdbool.h>		/* for bool, true and false */
@@ -299,6 +301,58 @@ adjmsg(mblk_t *mp, register ssize_t length)
 
 EXPORT_SYMBOL_NOVERS(adjmsg);		/* include/sys/streams/stream.h */
 
+streams_fastcall __hot_out void
+freeb_skb(caddr_t arg)
+{
+	struct sk_buff *skb = (typeof(skb)) arg;
+
+	dassert(skb != NULL);
+	kfree_skb(skb);
+}
+
+/**
+ *  skballoc:	- allocate a message block with a socket buffer
+ *  @skb:	socket buffer
+ *  @priority:	priority of message block header allocation
+ */
+streams_fastcall __hot_in mblk_t *
+skballoc(struct sk_buff *skb, uint priority)
+{
+	mblk_t *mp;
+
+	if (likely((mp = mdbblock_alloc(priority, &skballoc)) != NULL)) {
+		struct mdbblock *md = mb_to_mdb(mp);
+		dblk_t *db = &md->datablk.d_dblock;
+		struct free_rtn *db_frtnp = (struct free_rtn *)md->databuf;
+
+		/* set up internal buffer with free routine info */
+		db_frtnp->free_func = &freeb_skb;
+		db_frtnp->free_arg = (caddr_t) skb;
+		/* set up data block */
+		db->db_frntp = db_frtnp;
+		db->db_base = skb->head;
+		db->db_lim = skb->end;
+		db->db_ref = 1;
+		db->db_type = M_DATA;
+		db->db_size = skb->end - skb->head;
+		db->db_flag = DB_SKBUFF;
+		/* set up message block */
+		mp->b_next = mp->b_prev = mp->b_cont = NULL;
+		mp->b_rptr = skb->data;
+		mp->b_wptr = skb->tail;
+		mp->b_datap = db;
+		mp->b_band = 0;
+		mp->b_flag = 0;
+		/* TODO: if the socket buffer contains checksum information we can copy it to the
+		 * message block. */
+		mp->b_csum = 0;
+		return (mp);
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL_NOVERS(skballoc);
+
 /**
  *  esballoc:	- allocate a message block with an external buffer
  *  @base:	base address of message buffer
@@ -324,6 +378,7 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		db->db_ref = 1;
 		db->db_type = M_DATA;
 		db->db_size = size;
+		db->db_flag = 0;
 		/* set up message block */
 		mp->b_next = mp->b_prev = mp->b_cont = NULL;
 		mp->b_rptr = mp->b_wptr = db->db_base;
@@ -337,6 +392,29 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 }
 
 EXPORT_SYMBOL_NOVERS(esballoc);
+
+/**
+ *  allocb_skb:	- allocate a message block with a socket buffer
+ *  @size:	size of message block in bytes
+ *  @priority:	priority of the allocation
+ */
+streams_fastcall __hot_out mblk_t *
+allocb_skb(size_t size, uint priority)
+{
+	struct sk_buff *skb;
+
+	if (likely((skb = alloc_skb(size, (priority == BPRI_WAITOK)
+				      ? GFP_KERNEL : GFP_ATOMIC)) != NULL)) {
+		mblk_t *mp;
+
+		if (likely((mp = skballoc(skb, priority)) != NULL))
+			return (mp);
+		kfree_skb(skb);
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL_NOVERS(allocb_skb);
 
 /**
  *  allocb:	- allocate a message block
@@ -365,6 +443,7 @@ allocb(size_t size, uint priority)
 		db->db_ref = 1;
 		db->db_type = M_DATA;
 		db->db_size = size;
+		db->db_flag = 0;
 		/* set up message block */
 		mp->b_next = mp->b_prev = mp->b_cont = NULL;
 		mp->b_rptr = mp->b_wptr = db->db_base;
@@ -754,6 +833,7 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	dp->db_ref = 1;
 	dp->db_type = db->db_type;
 	dp->db_size = size;
+	dp->db_flag = 0;
 	/* copy from old initial datab */
 	if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0)) {
 		bcopy(mp->b_rptr, base, blen);
