@@ -3576,6 +3576,12 @@ tp_v4_err_next(struct sk_buff *skb, __u32 info)
 
 #ifdef HAVE_INET_PROTO_LOCK_ADDR
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
+
+#define net_protocol_lock() spin_lock_bh(inet_proto_lockp)
+#define net_protocol_unlock() spin_unlock_bh(inet_proto_lockp)
+#else
+#define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
+#define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
 #endif
 #ifdef HAVE_INET_PROTOS_ADDR
 STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
@@ -3620,103 +3626,69 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 			break;
 		}
 	} else if ((pb = kmem_cache_alloc(udp_prot_cachep, SLAB_ATOMIC))) {
+		bzero(pb, sizeof(*pb));
 		pb->refs = 1;
 		switch (type) {
 		case T_COTS:
 		case T_COTS_ORD:
 			pb->corefs = 1;
-			pb->clrefs = 0;
 			break;
 		case T_CLTS:
-			pb->corefs = 0;
 			pb->clrefs = 1;
 			break;
 		}
 		pp = &pb->prot;
-#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
-
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 		pp->proto.protocol = proto;
-		pp->proto.name = "streams-ip";
+		pp->proto.name = "streams-udp";
 #endif
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
-		pp->proto.copy = 0;
-		pp->proto.next = NULL;
-#endif
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
-		pp->proto.no_policy = 1;
-#endif
-#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO
 		pp->proto.proto = proto;
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO */
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
 		pp->proto.no_policy = 1;
-#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+#endif
 		pp->proto.handler = &tp_v4_rcv;
 		pp->proto.err_handler = &tp_v4_err;
-		pp->kmod = NULL;
-		pp->next = NULL;
 		ppp = &inet_protosp[hash];
 
-#ifdef HAVE_INET_PROTO_LOCK_ADDR
-		spin_lock_bh(inet_proto_lockp);
-#ifdef HAVE_KMEM_STRUCT_NET_PROTOCOL_PROTO
-		while (*ppp && (*ppp)->proto != proto)
-			ppp = &(*ppp)->next;
-#endif				/* HAVE_KMEM_STRUCT_NET_PROTOCOL_PROTO */
-#ifdef HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL
-		while (*ppp && (*pp->next)->protocol != proto)
-			ppp = &(*ppp)->next;
-#endif				/* HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL */
-		if (*ppp != NULL) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-			if ((pp->kmod = module_text_address((ulong) *ppp))
-			    && pp->kmod != THIS_MODULE) {
-				if (!try_module_get(pp->kmod)) {
-					spin_unlock_bh(inet_proto_lockp);
+		{
+			net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+			while (*ppp && (*ppp)->protocol != proto)
+				ppp = &(*ppp)->next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+			if (*ppp != NULL) {
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
+				/* can only override last entry */
+				if ((*ppp)->copy != 0) {
+					__ptrace(("Cannot override copy entry\n"));
+					net_protocol_unlock();
+					write_unlock_bh(&udp_prot_lock);
 					kmem_cache_free(udp_prot_cachep, pb);
 					return (NULL);
 				}
-			}
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
-		}
-		*ppp = &pp->proto;
-		inet_protosp[hash] = &pp->proto;
-		spin_unlock_bh(inet_proto_lockp);
-#else				/* HAVE_INET_PROTO_LOCK_ADDR */
-		br_write_lock_bh(BR_NETPROTO_LOCK);
-#ifdef HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL
-		while (*ppp && (*ppp)->protocol != proto)
-			ppp = &(*ppp)->next;
-#endif				/* HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL */
-		if (*ppp != NULL) {
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
-			/* can only override last entry */
-			if ((*ppp)->copy != 0) {
-				br_write_unlock_bh(BR_NETPROTO_LOCK);
-				kmem_cache_free(udp_prot_cachep, pb);
-				return (NULL);
-			}
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-			if ((pp->kmod = module_text_address((ulong) *ppp))
-			    && pp->kmod != THIS_MODULE) {
-				if (!try_module_get(pp->kmod)) {
-					br_write_unlock_bh(BR_NETPROTO_LOCK);
-					kmem_cache_free(udp_prot_cachep, pb);
-					return (NULL);
+				if ((pp->kmod = module_text_address((ulong) *ppp))
+				    && pp->kmod != THIS_MODULE) {
+					if (!try_module_get(pp->kmod)) {
+						__ptrace(("Cannot acquire module\n"));
+						net_protocol_unlock();
+						write_unlock_bh(&udp_prot_lock);
+						kmem_cache_free(udp_prot_cachep, pb);
+						return (NULL);
+					}
 				}
-			}
 #endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
-			pp->proto.copy = 0;
-			pp->proto.next = (*ppp)->next;
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NEXT || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NEXT
+				pp->proto.next = (*ppp)->next;
 #endif
+			}
+			pp->next = (*ppp);
+			*ppp = &pp->proto;
+			net_protocol_unlock();
 		}
-		pp->next = (*ppp);
-		*ppp = &pp->proto;
-		br_write_unlock_bh(BR_NETPROTO_LOCK);
-#endif				/* HAVE_INET_PROTO_LOCK_ADDR */
 		/* link into hash slot */
 		udp_prots[proto] = pb;
 	}
@@ -3730,10 +3702,11 @@ tp_init_nproto(unsigned char proto, unsigned int type)
  *
  * This is the network protocol restoration function.
  *
- * This is complicated.  The module stuff here is just for ourselves (other kernel modules pulling
- * the same trick) as Linux IP protocols are normally kernel resident.  If a protocol was previously
- * registered, restore the protocol's entry and drop the reference to its owning kernel module.  If
- * there was no protocol previously registered, this reduces to inet_del_protocol().
+ * This is complicated and brittle.  The module stuff here is just for ourselves (other kernel
+ * modules pulling the same trick) as Linux IP protocols are normally kernel resident.  If a
+ * protocol was previously registered, restore the protocol's entry and drop the reference to its
+ * owning kernel module.  If there was no protocol previously registered, this reduces to
+ * inet_del_protocol().
  */
 STATIC INLINE streams_fastcall __unlikely void
 tp_term_nproto(unsigned char proto, unsigned int type)
@@ -3757,29 +3730,17 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 			int hash = proto & (MAX_INET_PROTOS - 1);
 
 			ppp = &inet_protosp[hash];
-
-#ifdef HAVE_INET_PROTO_LOCK_ADDR
-			spin_lock_bh(inet_proto_lockp);
-#ifdef HAVE_KMEM_STRUCT_NET_PROTOCOL_PROTO
-			while (*ppp && *ppp != &pp->proto)
-				ppp = &(*ppp)->next;
-#endif				/* HAVE_KMEM_STRUCT_NET_PROTOCOL_PROTO */
-#ifdef HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL
-			while (*ppp && *ppp != &pp->proto)
-				ppp = &(*ppp)->next;
-#endif				/* HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL */
-			*ppp = pp->next;
-			spin_unlock_bh(inet_proto_lockp);
-#else				/* HAVE_INET_PROTO_LOCK_ADDR */
-			br_write_lock_bh(BR_NETPROTO_LOCK);
-#ifdef HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL
-			while (*ppp && *ppp != &pp->proto)
-				ppp = &(*ppp)->next;
-#endif				/* HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL */
-			*ppp = pp->next;
-			br_write_unlock_bh(BR_NETPROTO_LOCK);
-#endif				/* HAVE_INET_PROTO_LOCK_ADDR */
-
+			{
+				net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+				while (*ppp && *ppp != &pp->proto)
+					ppp = &(*ppp)->next;
+				pp->next->next = pp->proto.next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+				__assert(*ppp == &pp->proto);
+				*ppp = pp->next;
+				net_protocol_unlock();
+			}
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
