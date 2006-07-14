@@ -136,17 +136,17 @@ db_inc_slow(register dblk_t *db)
 }
 
 STATIC streams_inline streams_fastcall __hot_get void
-db_inc(register dblk_t * db)
+db_inc(register dblk_t *db)
 {
 	/* When the number of references is 1 the buffer is exclusive to the
-	 * caller and locking is not required. */
+	   caller and locking is not required. */
 	if (likely(db->db_ref == 1))
 		return (void) (db->db_ref = 2);
 	return db_inc_slow(db);
 }
 
 STATIC streams_noinline streams_fastcall __unlikely int
-db_dec_and_test_slow(register dblk_t * db)
+db_dec_and_test_slow(register dblk_t *db)
 {
 	unsigned long flags;
 	register bool ret;
@@ -158,7 +158,7 @@ db_dec_and_test_slow(register dblk_t * db)
 }
 
 STATIC streams_inline streams_fastcall __hot_in int
-db_dec_and_test(register dblk_t * db)
+db_dec_and_test(register dblk_t *db)
 {
 	/* When the number of references is 1 the buffer is exclusive to the caller and locking is
 	   not required. */
@@ -176,12 +176,12 @@ db_dec_and_test(register dblk_t * db)
 	(((unsigned char *)&((struct mdbblock *)0)->databuf[0]) - ((unsigned char *)0))
 
 STATIC streams_inline streams_fastcall __hot_in mblk_t *
-db_to_mb(dblk_t * db)
+db_to_mb(dblk_t *db)
 {
 	return ((mblk_t *) ((unsigned char *) db - datablk_offset + msgblk_offset));
 }
 STATIC streams_inline streams_fastcall __hot_in unsigned char *
-db_to_buf(dblk_t * db)
+db_to_buf(dblk_t *db)
 {
 	return ((unsigned char *) db - datablk_offset + databuf_offset);
 }
@@ -203,12 +203,12 @@ mb_to_mdb(register mblk_t *mb)
 	return ((struct mdbblock *) mb);
 }
 STATIC streams_inline streams_fastcall __hot_in mblk_t *
-db_to_mb(register dblk_t * db)
+db_to_mb(register dblk_t *db)
 {
 	return ((mblk_t *) ((struct mbinfo *) db - 1));
 }
 STATIC streams_inline streams_fastcall __hot_in unsigned char *
-db_to_buf(register dblk_t * db)
+db_to_buf(register dblk_t *db)
 {
 	return (&mb_to_mdb(db_to_mb(db))->databuf[0]);
 }
@@ -301,6 +301,49 @@ adjmsg(mblk_t *mp, register ssize_t length)
 
 EXPORT_SYMBOL_NOVERS(adjmsg);		/* include/sys/streams/stream.h */
 
+STATIC streams_fastcall __hot mblk_t *
+alloc_block(unsigned char *db_base, unsigned char *db_lim, unsigned char *b_rptr,
+	    unsigned char *b_wptr, struct free_rtn *freeinfo, size_t db_size, unsigned short b_flag,
+	    void *func)
+{
+	mblk_t *mp;
+
+	if (likely((mp = mdbblock_alloc(priority, func)) != NULL)) {
+		struct mdbblock *md = mb_to_mdb(mp);
+		dblk_t *db = &md->datablk.d_dblock;
+		struct free_rtn *frtnp;
+
+		if (db_base == NULL) {
+			b_wptr = b_rptr = db_base = md->databuf;
+			db_lim = db_base + db_size;
+		}
+		if (likely(freeinfo == NULL)) {
+			frtnp = NULL;
+		} else {
+			frtnp = (struct free_rtn *) md->databuf;
+			*frtnp = *freeinfo;
+		}
+		/* set up data block */
+		db->db_frtnp = frtnp;
+		db->db_base = db_base;
+		db->db_lim = db_lim;
+		db->db_ref = 1;
+		db->db_type = M_DATA;
+		db->db_size = db_size;
+		db->db_flag = db_flag;
+		/* set up message block */
+		mp->b_next = mp->b_prev = mp->b_cont = NULL;
+		mp->b_rptr = b_rptr;
+		mp->b_wptr = b_wptr;
+		mp->b_datap = db;
+		mp->b_band = 0;
+		mp->b_flag = 0;
+		mp->b_csum = 0;
+		return (mp);
+	}
+	return (NULL);
+}
+
 streams_fastcall __hot_out void
 freeb_skb(caddr_t arg)
 {
@@ -320,12 +363,11 @@ skballoc(struct sk_buff *skb, uint priority)
 {
 	mblk_t *mp;
 
-	if (likely((mp = mdbblock_alloc(priority, &skballoc)) != NULL)) {
+	if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
 		struct mdbblock *md = mb_to_mdb(mp);
 		dblk_t *db = &md->datablk.d_dblock;
-		struct free_rtn *frtnp = (struct free_rtn *)md->databuf;
+		struct free_rtn *frtnp = (struct free_rtn *) md->databuf;
 
-		/* set up internal buffer with free routine info */
 		frtnp->free_func = &freeb_skb;
 		frtnp->free_arg = (caddr_t) skb;
 		/* set up data block */
@@ -343,8 +385,6 @@ skballoc(struct sk_buff *skb, uint priority)
 		mp->b_datap = db;
 		mp->b_band = 0;
 		mp->b_flag = 0;
-		/* TODO: if the socket buffer contains checksum information we can copy it to the
-		 * message block. */
 		mp->b_csum = 0;
 		return (mp);
 	}
@@ -365,14 +405,18 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 {
 	mblk_t *mp;
 
-	if (likely((mp = mdbblock_alloc(priority, &esballoc)) != NULL)) {
+	if (likely((mp = alloc_block(base, base + size, base, base, freeinfo, size, 0,
+				     &esballoc)) != NULL))
+		return (mp);
+	if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
 		struct mdbblock *md = mb_to_mdb(mp);
 		dblk_t *db = &md->datablk.d_dblock;
+		struct free_rtn *frtnp = (struct free_rtn *) md->databuf;
 
-		/* set up internal buffer with free routine info */
-		*(struct free_rtn *) md->databuf = *freeinfo;
+		frtnp->free_func = freeinfo->free_func;
+		frtnp->free_arg = freeinfo->free_arg;
 		/* set up data block */
-		db->db_frtnp = (struct free_rtn *) md->databuf;
+		db->db_frtnp = frtnp;
 		db->db_base = base;
 		db->db_lim = base + size;
 		db->db_ref = 1;
@@ -381,7 +425,8 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		db->db_flag = 0;
 		/* set up message block */
 		mp->b_next = mp->b_prev = mp->b_cont = NULL;
-		mp->b_rptr = mp->b_wptr = db->db_base;
+		mp->b_rptr = base;
+		mp->b_wptr = base;
 		mp->b_datap = db;
 		mp->b_band = 0;
 		mp->b_flag = 0;
@@ -398,15 +443,14 @@ EXPORT_SYMBOL_NOVERS(esballoc);
  *  @size:	size of message block in bytes
  *  @priority:	priority of the allocation
  */
-streams_fastcall __hot_out mblk_t *
-allocb_skb(size_t size, uint priority)
+STATIC streams_fastcall __hot_out mblk_t *
+allocb_skb(const size_t size, uint priority)
 {
+	mblk_t *mp;
 	struct sk_buff *skb;
+	static const int allocation = (priority == BPRI_WAITOK) ? GFP_KERNEL : GFP_ATOMIC;
 
-	if (likely((skb = alloc_skb(size, (priority == BPRI_WAITOK)
-				      ? GFP_KERNEL : GFP_ATOMIC)) != NULL)) {
-		mblk_t *mp;
-
+	if (likely((skb = alloc_skb(size, allocation)) != NULL)) {
 		if (likely((mp = skballoc(skb, priority)) != NULL))
 			return (mp);
 		kfree_skb(skb);
@@ -414,7 +458,78 @@ allocb_skb(size_t size, uint priority)
 	return (NULL);
 }
 
-EXPORT_SYMBOL_NOVERS(allocb_skb);
+/**
+ *  allocb_fast:- allocate a message block with an internal FASTBUF
+ *  @size:	size of message block in bytes (unused)
+ *  @priority:	priority of the allocation
+ */
+STATIC streams_fastcall __hot_out mblk_t *
+allocb_fast(const size_t size, uint priority)
+{
+	mblk_t *mp;
+	unsigned char *base;
+
+	(void) size;
+	if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
+		struct mdbblock *md = mb_to_mdb(mp);
+		dblk_t *db = &md->datablk.d_dblock;
+
+		base = md->databuf;
+		/* set up data block */
+		db->db_frtnp = NULL;
+		db->db_base = base;
+		db->db_lim = base + FASTBUF;
+		db->db_ref = 1;
+		db->db_type = M_DATA;
+		db->db_size = FASTBUF;
+		db->db_flag = 0;
+		/* set up message block */
+		mp->b_next = mp->b_prev = mp->b_cont = NULL;
+		mp->b_rptr = base;
+		mp->b_wptr = base;
+		mp->b_datap = db;
+		mp->b_band = 0;
+		mp->b_flag = 0;
+		mp->b_csum = 0;
+		return (mp);
+	}
+	return (NULL);
+}
+
+STATIC streams_fastcall __hot_out mblk_t *
+allocb_kmem(const size_t size, uint priority)
+{
+	mblk_t *mp;
+	unsigned char *base;
+	static const int allocation = (priority == BPRI_WAITOK) ? KM_SLEEP : KM_NOSLEEP;
+
+	if (likely((base = kmem_alloc(size, allocation)) != NULL)) {
+		if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
+			struct mdbblock *md = mb_to_mdb(mp);
+			dblk_t *db = &md->datablk.d_dblock;
+
+			/* set up data block */
+			db->db_frtnp = NULL;
+			db->db_base = base;
+			db->db_lim = base + size;
+			db->db_ref = 1;
+			db->db_type = M_DATA;
+			db->db_size = size;
+			db->db_flag = 0;
+			/* set up message block */
+			mp->b_next = mp->b_prev = mp->b_cont = NULL;
+			mp->b_rptr = base;
+			mp->b_wptr = base;
+			mp->b_datap = db;
+			mp->b_band = 0;
+			mp->b_flag = 0;
+			mp->b_csum = 0;
+			return (mp);
+		}
+		kmem_free(base, size);
+	}
+	return (NULL);
+}
 
 /**
  *  allocb:	- allocate a message block
@@ -424,39 +539,15 @@ EXPORT_SYMBOL_NOVERS(allocb_skb);
 streams_fastcall __hot_out mblk_t *
 allocb(size_t size, uint priority)
 {
-	mblk_t *mp;
+	streams_fastcall mblk_t *(*alloc_func) (const size_t, uint);
 
-	if (likely((mp = mdbblock_alloc(priority, &allocb)) != NULL)) {
-		struct mdbblock *md = mb_to_mdb(mp);
-		unsigned char *base = md->databuf;
-		dblk_t *db = &md->datablk.d_dblock;
-
-		if (unlikely(size <= FASTBUF))
-			size = FASTBUF;
-		else if (unlikely((base = kmem_alloc(size, (priority == BPRI_WAITOK)
-					     ? KM_SLEEP : KM_NOSLEEP)) == NULL))
-			goto buf_alloc_error;
-		/* set up data block */
-		db->db_frtnp = NULL;
-		db->db_base = base;
-		db->db_lim = base + size;
-		db->db_ref = 1;
-		db->db_type = M_DATA;
-		db->db_size = size;
-		db->db_flag = 0;
-		/* set up message block */
-		mp->b_next = mp->b_prev = mp->b_cont = NULL;
-		mp->b_rptr = mp->b_wptr = db->db_base;
-		mp->b_datap = db;
-		mp->b_band = 0;
-		mp->b_flag = 0;
-		mp->b_csum = 0;
-	}
-	_printd(("%s: allocated mblk %p, refs %d\n", __FUNCTION__, mp, (int) mp->b_datap->db_ref));
-	return (mp);
-      buf_alloc_error:
-	mdbblock_free(mp);
-	return (NULL);
+	if (unlikely(size <= FASTBUF))
+		alloc_func = &allocb_fast;
+	else if ((priority & BPRI_SKBUFF) == 0)
+		alloc_func = &allocb_kmem;
+	else
+		alloc_func = &allocb_skb;
+	return ((*alloc_func) (size, priority & 0xff));
 }
 
 EXPORT_SYMBOL_NOVERS(allocb);
@@ -652,7 +743,7 @@ EXPORT_SYMBOL_NOVERS(freemsg);
  *  isdatablk:	- test data block for data type
  *  @dp:	data block to test
  */
-__STRUTIL_EXTERN_INLINE int isdatablk(dblk_t * dp);
+__STRUTIL_EXTERN_INLINE int isdatablk(dblk_t *dp);
 
 EXPORT_SYMBOL_NOVERS(isdatablk);
 

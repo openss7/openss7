@@ -896,11 +896,9 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 STATIC streams_inline streams_fastcall __hot_write mblk_t *
 allocb_buf(const struct stdata *sd, size_t size, uint priority)
 {
-	if ((sd->sd_flag & (STRSKBUFF)) == 0) {
-		return (allocb(size, priority));
-	} else {
-		return (allocb_skb(size, priority));
-	}
+	if ((sd->sd_flag & (STRSKBUFF)) == 0)
+		priority |= BPRI_SKBUFF;
+	return (allocb(size, priority));
 }
 
 /**
