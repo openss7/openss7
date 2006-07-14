@@ -142,7 +142,6 @@ static char const ident[] =
 #include <linux/socket.h>	/* for FIOCGETOWN, etc. */
 #endif
 
-#include <linux/skbuff.h>	/* for sk_buffs */
 #include <net/checksum.h>	/* for various checksums */
 
 #ifndef __user
@@ -883,19 +882,6 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 }
 
 /**
- *  freeb_skb - free an sk_buff allocated as a data block buffer
- *  @arg: opaque argument (sk_buff pointer)
- */
-void streamscall __hot_out
-freeb_skb(caddr_t arg)
-{
-	struct sk_buff *skb = (typeof(skb)) arg;
-
-	if (likely(skb != NULL))
-		kfree_skb(skb);
-}
-
-/**
  *  allocb_buf - allocate an M_DATA message block and choose a buffer
  *  @sd: stream head
  *  @size: number of bytes to allocate
@@ -913,23 +899,7 @@ allocb_buf(const struct stdata *sd, size_t size, uint priority)
 	if ((sd->sd_flag & (STRSKBUFF)) == 0) {
 		return (allocb(size, priority));
 	} else {
-		struct sk_buff *skb;
-		int gfp = (priority == BPRI_WAITOK) ? GFP_KERNEL : GFP_ATOMIC;
-
-		skb = alloc_skb(size, gfp);
-		if (likely(skb != NULL)) {
-			frtn_t free_skb_rtn = {.free_func = &freeb_skb,.free_arg = (caddr_t) skb, };
-			mblk_t *mp;
-
-			mp = esballoc(skb->data, size, priority, &free_skb_rtn);
-			if (likely(mp != NULL)) {
-				/* mark as containing a socket buffer */
-				mp->b_datap->db_flag |= DB_SKBUFF;
-				return (mp);
-			}
-			kfree_skb(skb);
-		}
-		return (NULL);
+		return (allocb_skb(size, priority));
 	}
 }
 
