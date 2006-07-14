@@ -77,7 +77,7 @@ sort-adjacent-labels
 .so streams.macros
 .\"
 .\"
-.TH ALLOCB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH ALLOCB_SKB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
