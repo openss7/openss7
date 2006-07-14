@@ -323,13 +323,13 @@ skballoc(struct sk_buff *skb, uint priority)
 	if (likely((mp = mdbblock_alloc(priority, &skballoc)) != NULL)) {
 		struct mdbblock *md = mb_to_mdb(mp);
 		dblk_t *db = &md->datablk.d_dblock;
-		struct free_rtn *db_frtnp = (struct free_rtn *)md->databuf;
+		struct free_rtn *frtnp = (struct free_rtn *)md->databuf;
 
 		/* set up internal buffer with free routine info */
-		db_frtnp->free_func = &freeb_skb;
-		db_frtnp->free_arg = (caddr_t) skb;
+		frtnp->free_func = &freeb_skb;
+		frtnp->free_arg = (caddr_t) skb;
 		/* set up data block */
-		db->db_frntp = db_frtnp;
+		db->db_frtnp = frtnp;
 		db->db_base = skb->head;
 		db->db_lim = skb->end;
 		db->db_ref = 1;
