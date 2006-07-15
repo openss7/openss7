@@ -1,3 +1,9 @@
+2006-07-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: added symbols for new inet protocol hooks
+	* src/drivers/rawip.c: converted 2.4 inet protocol hooks to 2.6 style
+	* src/drivers/udp.c: converted 2.4 inet protocol hooks to 2.6 style
+
 2006-07-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: distribute ISO and other partial implementations

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/08 09:37:56 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/07/15 05:40:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/08 09:37:56 $ by $Author: brian $
+ Last Modified $Date: 2006/07/15 05:40:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.25  2006/07/15 05:40:39  brian
+ - converted 2.4 inet protocol hooks to 2.6 style
+
  Revision 0.9.2.24  2006/07/08 09:37:56  brian
  - handle old SLES 9 2.6.5 kernel (untested)
 
@@ -124,10 +127,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/08 09:37:56 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/07/15 05:40:39 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/08 09:37:56 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/07/15 05:40:39 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -185,7 +188,7 @@ typedef unsigned int socklen_t;
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2006/07/08 09:37:56 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.25 $) $Date: 2006/07/15 05:40:39 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
