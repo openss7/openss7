@@ -590,8 +590,8 @@ struct tp_prot_bucket {
 STATIC rwlock_t tp_prot_lock = RW_LOCK_UNLOCKED;
 STATIC struct tp_prot_bucket *tp_prots[256];
 
-STATIC kmem_cache_t *tp_prot_cachep;
-STATIC kmem_cache_t *tp_priv_cachep;
+STATIC kmem_cache_t *udp_prot_cachep;
+STATIC kmem_cache_t *udp_priv_cachep;
 
 static INLINE __unlikely struct tp *
 tp_get(struct tp *tp)
@@ -605,7 +605,7 @@ tp_put(struct tp *tp)
 {
 	dassert(tp != NULL);
 	if (atomic_dec_and_test(&tp->refcnt)) {
-		kmem_cache_free(tp_priv_cachep, tp);
+		kmem_cache_free(udp_priv_cachep, tp);
 	}
 }
 static INLINE streams_fastcall __hot void
@@ -622,7 +622,7 @@ tp_alloc(void)
 {
 	struct tp *tp;
 
-	if ((tp = kmem_cache_alloc(tp_priv_cachep, SLAB_ATOMIC))) {
+	if ((tp = kmem_cache_alloc(udp_priv_cachep, SLAB_ATOMIC))) {
 		bzero(tp, sizeof(*tp));
 		atomic_set(&tp->refcnt, 1);
 		spin_lock_init(&tp->lock);	/* "tp-lock" */
@@ -3633,7 +3633,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 			swerr();
 			break;
 		}
-	} else if ((pb = kmem_cache_alloc(tp_prot_cachep, SLAB_ATOMIC))) {
+	} else if ((pb = kmem_cache_alloc(udp_prot_cachep, SLAB_ATOMIC))) {
 		bzero(pb, sizeof(*pb));
 		pb->refs = 1;
 		switch (type) {
@@ -3676,7 +3676,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 					__ptrace(("Cannot override copy entry\n"));
 					net_protocol_unlock();
 					write_unlock_bh(&tp_prot_lock);
-					kmem_cache_free(tp_prot_cachep, pb);
+					kmem_cache_free(udp_prot_cachep, pb);
 					return (NULL);
 				}
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
@@ -3687,7 +3687,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 						__ptrace(("Cannot acquire module\n"));
 						net_protocol_unlock();
 						write_unlock_bh(&tp_prot_lock);
-						kmem_cache_free(tp_prot_cachep, pb);
+						kmem_cache_free(udp_prot_cachep, pb);
 						return (NULL);
 					}
 				}
@@ -3764,7 +3764,7 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 			/* unlink from hash slot */
 			tp_prots[proto] = NULL;
 
-			kmem_cache_free(tp_prot_cachep, pb);
+			kmem_cache_free(udp_prot_cachep, pb);
 		}
 	}
 	write_unlock_bh(&tp_prot_lock);
@@ -8797,43 +8797,43 @@ udp_qclose(queue_t *q, int oflag, cred_t *crp)
 STATIC __unlikely int
 tp_term_caches(void)
 {
-	if (tp_prot_cachep != NULL) {
-		if (kmem_cache_destroy(tp_prot_cachep)) {
-			cmn_err(CE_WARN, "%s: did not destroy tp_prot_cachep", __FUNCTION__);
+	if (udp_prot_cachep != NULL) {
+		if (kmem_cache_destroy(udp_prot_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy udp_prot_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
-		_printd(("%s: destroyed tp_prot_cachep\n", DRV_NAME));
-		tp_prot_cachep = NULL;
+		_printd(("%s: destroyed udp_prot_cachep\n", DRV_NAME));
+		udp_prot_cachep = NULL;
 	}
-	if (tp_priv_cachep != NULL) {
-		if (kmem_cache_destroy(tp_priv_cachep)) {
-			cmn_err(CE_WARN, "%s: did not destroy tp_priv_cachep", __FUNCTION__);
+	if (udp_priv_cachep != NULL) {
+		if (kmem_cache_destroy(udp_priv_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy udp_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
-		_printd(("%s: destroyed tp_priv_cachep\n", DRV_NAME));
-		tp_priv_cachep = NULL;
+		_printd(("%s: destroyed udp_priv_cachep\n", DRV_NAME));
+		udp_priv_cachep = NULL;
 	}
 	return (0);
 }
 STATIC __unlikely int
 tp_init_caches(void)
 {
-	if (tp_priv_cachep == NULL) {
-		tp_priv_cachep = kmem_cache_create("tp_priv_cachep", sizeof(struct tp), 0,
+	if (udp_priv_cachep == NULL) {
+		udp_priv_cachep = kmem_cache_create("udp_priv_cachep", sizeof(struct tp), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
-		if (tp_priv_cachep == NULL) {
-			cmn_err(CE_WARN, "%s: Cannot allocate tp_priv_cachep", __FUNCTION__);
+		if (udp_priv_cachep == NULL) {
+			cmn_err(CE_WARN, "%s: Cannot allocate udp_priv_cachep", __FUNCTION__);
 			tp_term_caches();
 			return (-ENOMEM);
 		}
 		_printd(("%s: initialized driver private structure cache\n", DRV_NAME));
 	}
-	if (tp_prot_cachep == NULL) {
-		tp_prot_cachep =
-		    kmem_cache_create("tp_prot_cachep", sizeof(struct tp_prot_bucket), 0,
+	if (udp_prot_cachep == NULL) {
+		udp_prot_cachep =
+		    kmem_cache_create("udp_prot_cachep", sizeof(struct tp_prot_bucket), 0,
 				      SLAB_HWCACHE_ALIGN, NULL, NULL);
-		if (tp_prot_cachep == NULL) {
-			cmn_err(CE_WARN, "%s: Cannot allocate tp_prot_cachep", __FUNCTION__);
+		if (udp_prot_cachep == NULL) {
+			cmn_err(CE_WARN, "%s: Cannot allocate udp_prot_cachep", __FUNCTION__);
 			tp_term_caches();
 			return (-ENOMEM);
 		}
