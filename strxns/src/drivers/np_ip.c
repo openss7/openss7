@@ -730,8 +730,8 @@ np_init_nproto(unsigned char proto, unsigned int type)
 #if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
 		pp->proto.no_policy = 1;
 #endif
-		pp->proto.handler = &tp_v4_rcv;
-		pp->proto.err_handler = &tp_v4_err;
+		pp->proto.handler = &np_v4_rcv;
+		pp->proto.err_handler = &np_v4_err;
 		ppp = &inet_protosp[hash];
 
 		{
