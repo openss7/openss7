@@ -6923,7 +6923,7 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	/* send data only after connection complete */
 	if (dp == NULL)
 		return (QR_DONE);
-	if (tp_senddata(tp, tp->dport, &tp->options, dp) != QR_ABSORBED)
+	if ((err = tp_senddata(tp, tp->dport, &tp->options, dp)) != QR_ABSORBED)
 		goto error;
 	return (QR_TRIMMED);	/* tp_senddata() consumed message blocks */
       error:
