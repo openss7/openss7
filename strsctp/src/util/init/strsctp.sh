@@ -12,7 +12,7 @@
 # by openss7 install_initd and remove_initd scripts.  Each line specifies
 # arguments to add and remove links after the the name argument:
 #
-# streams:	start and stop strinet subsystem
+# streams:	start and stop strsctp subsystem
 # update-rc.d:	start 33 S . stop 33 0 6 .
 # config:	/etc/default/streams
 # probe:	false
@@ -107,7 +107,7 @@ start() {
 	    echo "(failed.)"
 	fi
     fi
-    if [ -n "$STRINET_MKNOD" -a ":$STRINET_MAKEDEVICES" = ":yes" ] ; then
+    if [ -n "$STRSCTP_MKNOD" -a ":$STRSCTP_MAKEDEVICES" = ":yes" ] ; then
 	echo -n "Making STREAMS SCTP devices: "
 	$STRSCTP_MKNOD
 	RETVAL=$?
@@ -141,7 +141,7 @@ stop() {
 	$STRSCTP_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]inet' /proc/modules 2>/dev/null | remove_modules
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]sctp' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
