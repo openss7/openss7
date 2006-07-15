@@ -547,24 +547,24 @@ struct tp_chash_bucket {
 	struct tp *list;
 };
 
-STATIC struct tp_bhash_bucket *udp_bhash;
-STATIC size_t udp_bhash_size = 0;
-STATIC size_t udp_bhash_order = 0;
+STATIC struct tp_bhash_bucket *tp_bhash;
+STATIC size_t tp_bhash_size = 0;
+STATIC size_t tp_bhash_order = 0;
 
-STATIC struct tp_chash_bucket *udp_chash;
-STATIC size_t udp_chash_size = 0;
-STATIC size_t udp_chash_order = 0;
+STATIC struct tp_chash_bucket *tp_chash;
+STATIC size_t tp_chash_size = 0;
+STATIC size_t tp_chash_order = 0;
 
 STATIC INLINE streams_fastcall __hot_in int
-udp_bhashfn(unsigned char proto, unsigned short bport)
+tp_bhashfn(unsigned char proto, unsigned short bport)
 {
-	return ((udp_bhash_size - 1) & (proto + bport));
+	return ((tp_bhash_size - 1) & (proto + bport));
 }
 
 STATIC INLINE streams_fastcall __unlikely int
-udp_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
+tp_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 {
-	return ((udp_chash_size - 1) & (proto + sport + dport));
+	return ((tp_chash_size - 1) & (proto + sport + dport));
 }
 
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
@@ -587,11 +587,11 @@ struct tp_prot_bucket {
 	int clrefs;			/* T_CLTS references */
 	struct ipnet_protocol prot;	/* Linux registration structure */
 };
-STATIC rwlock_t udp_prot_lock = RW_LOCK_UNLOCKED;
-STATIC struct tp_prot_bucket *udp_prots[256];
+STATIC rwlock_t tp_prot_lock = RW_LOCK_UNLOCKED;
+STATIC struct tp_prot_bucket *tp_prots[256];
 
-STATIC kmem_cache_t *udp_prot_cachep;
-STATIC kmem_cache_t *udp_priv_cachep;
+STATIC kmem_cache_t *tp_prot_cachep;
+STATIC kmem_cache_t *tp_priv_cachep;
 
 static INLINE __unlikely struct tp *
 tp_get(struct tp *tp)
@@ -605,7 +605,7 @@ tp_put(struct tp *tp)
 {
 	dassert(tp != NULL);
 	if (atomic_dec_and_test(&tp->refcnt)) {
-		kmem_cache_free(udp_priv_cachep, tp);
+		kmem_cache_free(tp_priv_cachep, tp);
 	}
 }
 static INLINE streams_fastcall __hot void
@@ -622,7 +622,7 @@ tp_alloc(void)
 {
 	struct tp *tp;
 
-	if ((tp = kmem_cache_alloc(udp_priv_cachep, SLAB_ATOMIC))) {
+	if ((tp = kmem_cache_alloc(tp_priv_cachep, SLAB_ATOMIC))) {
 		bzero(tp, sizeof(*tp));
 		atomic_set(&tp->refcnt, 1);
 		spin_lock_init(&tp->lock);	/* "tp-lock" */
@@ -690,7 +690,7 @@ tp_alloc(void)
 
 #ifdef _DEBUG
 STATIC const char *
-udp_state_name(t_scalar_t state)
+tp_state_name(t_scalar_t state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -735,11 +735,13 @@ udp_state_name(t_scalar_t state)
 }
 #endif				/* _DEBUG */
 
+/* State functions */
+
 STATIC INLINE streams_fastcall __unlikely void
 tp_set_state(struct tp *tp, const t_uscalar_t state)
 {
-	_printd(("%s: %p: %s <- %s\n", DRV_NAME, tp, udp_state_name(state),
-		 udp_state_name(tp->info.CURRENT_state)));
+	_printd(("%s: %p: %s <- %s\n", DRV_NAME, tp, tp_state_name(state),
+		 tp_state_name(tp->info.CURRENT_state)));
 	tp->info.CURRENT_state = state;
 }
 
@@ -3549,7 +3551,7 @@ tp_v4_rcv_next(struct sk_buff *skb)
 	unsigned char proto;
 
 	proto = skb->nh.iph->protocol;
-	if ((pb = udp_prots[proto]) && (pp = pb->prot.next)) {
+	if ((pb = tp_prots[proto]) && (pp = pb->prot.next)) {
 		pp->handler(skb);
 		return (1);
 	}
@@ -3572,7 +3574,7 @@ tp_v4_err_next(struct sk_buff *skb, __u32 info)
 	unsigned char proto;
 
 	proto = ((struct iphdr *) skb->data)->protocol;
-	if ((pb = udp_prots[proto]) && (pp = pb->prot.next))
+	if ((pb = tp_prots[proto]) && (pp = pb->prot.next))
 		pp->err_handler(skb, info);
 	return;
 }
@@ -3616,8 +3618,8 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 	struct mynet_protocol **ppp;
 	int hash = proto & (MAX_INET_PROTOS - 1);
 
-	write_lock_bh(&udp_prot_lock);
-	if ((pb = udp_prots[proto]) != NULL) {
+	write_lock_bh(&tp_prot_lock);
+	if ((pb = tp_prots[proto]) != NULL) {
 		pb->refs++;
 		switch (type) {
 		case T_COTS:
@@ -3631,7 +3633,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 			swerr();
 			break;
 		}
-	} else if ((pb = kmem_cache_alloc(udp_prot_cachep, SLAB_ATOMIC))) {
+	} else if ((pb = kmem_cache_alloc(tp_prot_cachep, SLAB_ATOMIC))) {
 		bzero(pb, sizeof(*pb));
 		pb->refs = 1;
 		switch (type) {
@@ -3673,8 +3675,8 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 				if ((*ppp)->copy != 0) {
 					__ptrace(("Cannot override copy entry\n"));
 					net_protocol_unlock();
-					write_unlock_bh(&udp_prot_lock);
-					kmem_cache_free(udp_prot_cachep, pb);
+					write_unlock_bh(&tp_prot_lock);
+					kmem_cache_free(tp_prot_cachep, pb);
 					return (NULL);
 				}
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
@@ -3684,8 +3686,8 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 					if (!try_module_get(pp->kmod)) {
 						__ptrace(("Cannot acquire module\n"));
 						net_protocol_unlock();
-						write_unlock_bh(&udp_prot_lock);
-						kmem_cache_free(udp_prot_cachep, pb);
+						write_unlock_bh(&tp_prot_lock);
+						kmem_cache_free(tp_prot_cachep, pb);
 						return (NULL);
 					}
 				}
@@ -3699,9 +3701,9 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 			net_protocol_unlock();
 		}
 		/* link into hash slot */
-		udp_prots[proto] = pb;
+		tp_prots[proto] = pb;
 	}
-	write_unlock_bh(&udp_prot_lock);
+	write_unlock_bh(&tp_prot_lock);
 	return (pb);
 }
 
@@ -3722,16 +3724,16 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
 
-	write_lock_bh(&udp_prot_lock);
-	if ((pb = udp_prots[proto]) != NULL) {
+	write_lock_bh(&tp_prot_lock);
+	if ((pb = tp_prots[proto]) != NULL) {
 		switch (type) {
 		case T_COTS:
 		case T_COTS_ORD:
-			assure(pb->corefs > 1);
+			assure(pb->corefs > 0);
 			--pb->corefs;
 			break;
 		case T_CLTS:
-			assure(pb->clrefs > 1);
+			assure(pb->clrefs > 0);
 			--pb->clrefs;
 			break;
 		default:
@@ -3760,12 +3762,12 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 				module_put(pp->kmod);
 #endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 			/* unlink from hash slot */
-			udp_prots[proto] = NULL;
+			tp_prots[proto] = NULL;
 
-			kmem_cache_free(udp_prot_cachep, pb);
+			kmem_cache_free(tp_prot_cachep, pb);
 		}
 	}
-	write_unlock_bh(&udp_prot_lock);
+	write_unlock_bh(&tp_prot_lock);
 }
 #endif				/* LINUX */
 
@@ -3853,7 +3855,7 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 	      try_again:
 		bport = htons(num);
 	}
-	hp = &udp_bhash[udp_bhashfn(proto, bport)];
+	hp = &tp_bhash[tp_bhashfn(proto, bport)];
 	write_lock_bh(&hp->lock);
 	for (tp2 = hp->list; tp2; tp2 = tp2->bnext) {
 		if (proto != tp2->protoids[0])
@@ -3959,6 +3961,7 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 }
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
+#if 1
 STATIC noinline streams_fastcall void
 tp_skb_destructor_slow(struct tp *tp, struct sk_buff *skb)
 {
@@ -4017,6 +4020,7 @@ tp_skb_destructor(struct sk_buff *skb)
 	}
 	tp_skb_destructor_slow(tp, skb);
 }
+#endif
 
 #undef skbuff_head_cache
 #ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
@@ -4059,6 +4063,7 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 			}
 		}
 		freemsg(mp);	/* must absorb */
+#if 1
 		/* we never have any page fragments, so we can steal a pointer from the page
 		   fragement list. */
 		assert(skb_shinfo(skb)->nr_frags == 0);
@@ -4067,6 +4072,7 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		spin_lock_bh(&tp->qlock);
 		tp->sndmem += skb->truesize;
 		spin_unlock_bh(&tp->qlock);
+#endif
 	}
 	return (skb);
 }
@@ -4210,6 +4216,7 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	mp->b_datap->db_frtnp->free_arg = NULL;
 	freemsg(mp);
 
+#if 1
 	/* we never have any page fragments, so we can steal a pointer from the page fragement
 	   list. */
 	assert(skb_shinfo(skb)->nr_frags == 0);
@@ -4218,6 +4225,7 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	spin_lock_bh(&tp->qlock);
 	tp->sndmem += skb->truesize;
 	spin_unlock_bh(&tp->qlock);
+#endif
 
 #if 0
 	if (likely(skb_head == NULL)) {
@@ -4275,6 +4283,7 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	skb_get(skb);
 	skb_reserve(skb, mp->b_rptr - skb->data);
 	skb_put(skb, mp->b_wptr - mp->b_rptr);
+#if 1
 	/* we never have any page fragments, so we can steal a pointer from the page fragement
 	   list. */
 	assert(skb_shinfo(skb)->nr_frags == 0);
@@ -4283,6 +4292,7 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	spin_lock_bh(&tp->qlock);
 	tp->sndmem += skb->truesize;
 	spin_unlock_bh(&tp->qlock);
+#endif
 	freemsg(mp);
 	return (skb);
       old_way:
@@ -4343,9 +4353,11 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 	rt = (struct rtable *) tp->daddrs[0].dst;
 	prefetch(rt);
 
+	if (unlikely(tp->sndblk != 0))
+		goto ebusy;
 	/* Allows slop over by 1 buffer per processor. */
 	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
-		goto ebusy;
+		goto blocked;
 
 	assert(opt != NULL);
 	if (likely((err = tp_route_output(tp, opt, &rt)) == 0)) {
@@ -4427,6 +4439,8 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 	}
 	_rare();
 	return (err);
+      blocked:
+	tp->sndblk = 1;
       ebusy:
 	return (-EBUSY);
 }
@@ -4453,8 +4467,8 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 	struct tp *conflict = NULL;
 	struct tp_chash_bucket *hp, *hp1, *hp2;
 
-	hp1 = &udp_chash[udp_chashfn(proto, dport, sport)];
-	hp2 = &udp_chash[udp_chashfn(proto, 0, 0)];
+	hp1 = &tp_chash[tp_chashfn(proto, dport, sport)];
+	hp2 = &tp_chash[tp_chashfn(proto, 0, 0)];
 
 	write_lock_bh(&hp1->lock);
 	if (hp1 != hp2)
@@ -6616,7 +6630,8 @@ te_bind_req(queue_t *q, mblk_t *mp)
 	tp->bport = ntohs(ADDR_buffer[0].sin_port);
 	/* check for bind to privileged port */
 	err = TACCES;
-	if (tp->bport && tp->bport < PROT_SOCK && !capable(CAP_NET_BIND_SERVICE))
+	if (tp->bport && tp->bport < PROT_SOCK
+	    && !capable(CAP_NET_BIND_SERVICE))
 		goto error;
 	if (unlikely((err = te_bind_ack(q, ADDR_buffer, ADDR_length, p->CONIND_number)) != 0))
 		goto error;
@@ -7976,23 +7991,21 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 	int hiscore = -1;
 	struct tp_chash_bucket *hp, *hp1, *hp2;
 
-	hp1 = &udp_chash[udp_chashfn(proto, sport, dport)];
-	hp2 = &udp_chash[udp_chashfn(proto, 0, 0)];
+	hp1 = &tp_chash[tp_chashfn(proto, sport, dport)];
+	hp2 = &tp_chash[tp_chashfn(proto, 0, 0)];
 
 	hp = hp1;
 	do {
 		read_lock_bh(&hp->lock);
 		{
-			struct tp *tp;
-			t_uscalar_t state;
-			int i;
+			register struct tp *tp;
 
 			for (tp = hp->list; tp; tp = tp->cnext) {
-				int score = 0;
+				register int score = 0;
+				register int i;
 
 				/* only Streams in close to the correct state */
-				if ((state = tp_get_state(tp)) != TS_DATA_XFER
-				    && state != TS_WIND_ORDREL)
+				if (tp_not_state(tp, (TSF_DATA_XFER | TSF_WIND_ORDREL)))
 					continue;
 				/* must match a bound protocol id */
 				for (i = 0; i < tp->pnum; i++) {
@@ -8074,8 +8087,8 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	int hiscore = -1;
 	struct tp_bhash_bucket *hp, *hp1, *hp2;
 
-	hp1 = &udp_bhash[udp_bhashfn(proto, dport)];
-	hp2 = &udp_bhash[udp_bhashfn(proto, 0)];
+	hp1 = &tp_bhash[tp_bhashfn(proto, dport)];
+	hp2 = &tp_bhash[tp_bhashfn(proto, 0)];
 
 	hp = hp1;
 	_ptrace(("%s: %s: proto = %d, dport = %d\n", DRV_NAME, __FUNCTION__, (int) proto,
@@ -8156,15 +8169,15 @@ tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
 	struct tp_prot_bucket *pp, **ppp;
 	register struct tp *result;
 
-	ppp = &udp_prots[proto];
+	ppp = &tp_prots[proto];
 
-	read_lock_bh(&udp_prot_lock);
+	read_lock_bh(&tp_prot_lock);
 	if (likely((pp = *ppp) != NULL)) {
 		if (likely(pp->corefs == 0)) {
 			if (likely(pp->clrefs > 0)) {
 				result = tp_lookup_bind(proto, daddr, dport);
 			      done:
-				read_unlock_bh(&udp_prot_lock);
+				read_unlock_bh(&tp_prot_lock);
 				return (result);
 			}
 		}
@@ -8218,7 +8231,7 @@ tp_lookup_icmp(struct iphdr *iph, unsigned int len)
  * @data: client data (sk_buff pointer in this case)
  */
 STATIC streamscall __hot_get void
-tp_free(char *data)
+tp_free(caddr_t data)
 {
 	struct sk_buff *skb = (typeof(skb)) data;
 	struct tp *tp;
@@ -8784,43 +8797,43 @@ udp_qclose(queue_t *q, int oflag, cred_t *crp)
 STATIC __unlikely int
 tp_term_caches(void)
 {
-	if (udp_prot_cachep != NULL) {
-		if (kmem_cache_destroy(udp_prot_cachep)) {
-			cmn_err(CE_WARN, "%s: did not destroy udp_prot_cachep", __FUNCTION__);
+	if (tp_prot_cachep != NULL) {
+		if (kmem_cache_destroy(tp_prot_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy tp_prot_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
-		_printd(("%s: destroyed udp_prot_cachep\n", DRV_NAME));
-		udp_prot_cachep = NULL;
+		_printd(("%s: destroyed tp_prot_cachep\n", DRV_NAME));
+		tp_prot_cachep = NULL;
 	}
-	if (udp_priv_cachep != NULL) {
-		if (kmem_cache_destroy(udp_priv_cachep)) {
-			cmn_err(CE_WARN, "%s: did not destroy udp_priv_cachep", __FUNCTION__);
+	if (tp_priv_cachep != NULL) {
+		if (kmem_cache_destroy(tp_priv_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy tp_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
-		_printd(("%s: destroyed udp_priv_cachep\n", DRV_NAME));
-		udp_priv_cachep = NULL;
+		_printd(("%s: destroyed tp_priv_cachep\n", DRV_NAME));
+		tp_priv_cachep = NULL;
 	}
 	return (0);
 }
 STATIC __unlikely int
 tp_init_caches(void)
 {
-	if (udp_priv_cachep == NULL) {
-		udp_priv_cachep = kmem_cache_create("udp_priv_cachep", sizeof(struct tp), 0,
+	if (tp_priv_cachep == NULL) {
+		tp_priv_cachep = kmem_cache_create("tp_priv_cachep", sizeof(struct tp), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
-		if (udp_priv_cachep == NULL) {
-			cmn_err(CE_WARN, "%s: Cannot allocate udp_priv_cachep", __FUNCTION__);
+		if (tp_priv_cachep == NULL) {
+			cmn_err(CE_WARN, "%s: Cannot allocate tp_priv_cachep", __FUNCTION__);
 			tp_term_caches();
 			return (-ENOMEM);
 		}
 		_printd(("%s: initialized driver private structure cache\n", DRV_NAME));
 	}
-	if (udp_prot_cachep == NULL) {
-		udp_prot_cachep =
-		    kmem_cache_create("udp_prot_cachep", sizeof(struct tp_prot_bucket), 0,
+	if (tp_prot_cachep == NULL) {
+		tp_prot_cachep =
+		    kmem_cache_create("tp_prot_cachep", sizeof(struct tp_prot_bucket), 0,
 				      SLAB_HWCACHE_ALIGN, NULL, NULL);
-		if (udp_prot_cachep == NULL) {
-			cmn_err(CE_WARN, "%s: Cannot allocate udp_prot_cachep", __FUNCTION__);
+		if (tp_prot_cachep == NULL) {
+			cmn_err(CE_WARN, "%s: Cannot allocate tp_prot_cachep", __FUNCTION__);
 			tp_term_caches();
 			return (-ENOMEM);
 		}
@@ -8832,17 +8845,17 @@ tp_init_caches(void)
 STATIC __unlikely void
 tp_term_hashes(void)
 {
-	if (udp_bhash) {
-		free_pages((unsigned long) udp_bhash, udp_bhash_order);
-		udp_bhash = NULL;
-		udp_bhash_size = 0;
-		udp_bhash_order = 0;
+	if (tp_bhash) {
+		free_pages((unsigned long) tp_bhash, tp_bhash_order);
+		tp_bhash = NULL;
+		tp_bhash_size = 0;
+		tp_bhash_order = 0;
 	}
-	if (udp_chash) {
-		free_pages((unsigned long) udp_chash, udp_chash_order);
-		udp_chash = NULL;
-		udp_chash_size = 0;
-		udp_chash_order = 0;
+	if (tp_chash) {
+		free_pages((unsigned long) tp_chash, tp_chash_order);
+		tp_chash = NULL;
+		tp_chash_size = 0;
+		tp_chash_order = 0;
 	}
 }
 STATIC __unlikely void
@@ -8851,34 +8864,34 @@ tp_init_hashes(void)
 	int i;
 
 	/* Start with just one page for each. */
-	if (udp_bhash == NULL) {
-		udp_bhash_order = 0;
-		if ((udp_bhash =
-		     (struct tp_bhash_bucket *) __get_free_pages(GFP_ATOMIC, udp_bhash_order))) {
-			udp_bhash_size =
-			    (1 << (udp_bhash_order + PAGE_SHIFT)) / sizeof(struct tp_bhash_bucket);
+	if (tp_bhash == NULL) {
+		tp_bhash_order = 0;
+		if ((tp_bhash =
+		     (struct tp_bhash_bucket *) __get_free_pages(GFP_ATOMIC, tp_bhash_order))) {
+			tp_bhash_size =
+			    (1 << (tp_bhash_order + PAGE_SHIFT)) / sizeof(struct tp_bhash_bucket);
 			_printd(("%s: INFO: bind hash table configured size = %ld\n", DRV_NAME,
-				 (long) udp_bhash_size));
-			bzero(udp_bhash, udp_bhash_size * sizeof(struct tp_bhash_bucket));
-			for (i = 0; i < udp_bhash_size; i++)
-				rwlock_init(&udp_bhash[i].lock);
+				 (long) tp_bhash_size));
+			bzero(tp_bhash, tp_bhash_size * sizeof(struct tp_bhash_bucket));
+			for (i = 0; i < tp_bhash_size; i++)
+				rwlock_init(&tp_bhash[i].lock);
 		} else {
 			tp_term_hashes();
 			cmn_err(CE_PANIC, "%s: Failed to allocate bind hash table\n", __FUNCTION__);
 			return;
 		}
 	}
-	if (udp_chash == NULL) {
-		udp_chash_order = 0;
-		if ((udp_chash =
-		     (struct tp_chash_bucket *) __get_free_pages(GFP_ATOMIC, udp_chash_order))) {
-			udp_chash_size =
-			    (1 << (udp_chash_order + PAGE_SHIFT)) / sizeof(struct tp_chash_bucket);
+	if (tp_chash == NULL) {
+		tp_chash_order = 0;
+		if ((tp_chash =
+		     (struct tp_chash_bucket *) __get_free_pages(GFP_ATOMIC, tp_chash_order))) {
+			tp_chash_size =
+			    (1 << (tp_chash_order + PAGE_SHIFT)) / sizeof(struct tp_chash_bucket);
 			_printd(("%s: INFO: conn hash table configured size = %ld\n", DRV_NAME,
-				 (long) udp_chash_size));
-			bzero(udp_chash, udp_chash_size * sizeof(struct tp_chash_bucket));
-			for (i = 0; i < udp_chash_size; i++)
-				rwlock_init(&udp_chash[i].lock);
+				 (long) tp_chash_size));
+			bzero(tp_chash, tp_chash_size * sizeof(struct tp_chash_bucket));
+			for (i = 0; i < tp_chash_size; i++)
+				rwlock_init(&tp_chash[i].lock);
 		} else {
 			tp_term_hashes();
 			cmn_err(CE_PANIC, "%s: Failed to allocate bind hash table\n", __FUNCTION__);
