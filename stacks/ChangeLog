@@ -1,3 +1,8 @@
+2006-07-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/sctp/sctp2.c: take care with free_func's
+	* src/modules/sctp/sctp_input.c: take care with free_func's
+
 2006-07-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updated quick installation instructions

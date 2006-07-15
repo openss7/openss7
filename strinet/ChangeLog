@@ -1,7 +1,11 @@
 2006-07-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: added symbols for new inet protocol hooks
-	* src/drivers/np_ip.c: converted 2.4 inet protocol hooks to 2.6 style
+	* src/drivers/rawip.c: converted 2.4 inet protocol hooks to 2.6 style
+	* src/drivers/udp.c: converted 2.4 inet protocol hooks to 2.6 style
+	* src/drivers/rawip.c: rationalize to udp.c
+	* src/drivers/tcp.c: take care with free_func's
+	* src/drivers/udp.c: minor renaming, fixed buffer blocking hysteresis
 
 2006-07-13  Brian Bidulock  <bidulock@openss7.org>
 

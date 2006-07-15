@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/08 09:37:52 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/15 13:06:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/08 09:37:52 $ by $Author: brian $
+ Last Modified $Date: 2006/07/15 13:06:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.11  2006/07/15 13:06:10  brian
+ - rationalized np_ip.c and rawip.c to upd.c drivers
+
  Revision 0.9.2.10  2006/07/08 09:37:52  brian
  - handle old SLES 9 2.6.5 kernel (untested)
 
@@ -83,9 +86,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/08 09:37:52 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/15 13:06:10 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/08 09:37:52 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/15 13:06:10 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -164,7 +167,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/08 09:37:52 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/15 13:06:10 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"

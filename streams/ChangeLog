@@ -1,3 +1,7 @@
+2006-07-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/strutil.c: take care with free_func's
+
 2006-07-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/allocb.9.man: added description for the BPRI_SKBUFF flag

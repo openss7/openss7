@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/04/22 01:10:38 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/07/15 13:06:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:10:38 $ by $Author: brian $
+ Last Modified $Date: 2006/07/15 13:06:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.43  2006/07/15 13:06:13  brian
+ - rationalized np_ip.c and rawip.c to upd.c drivers
+
  Revision 0.9.2.42  2006/04/22 01:10:38  brian
  - locking correction
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/04/22 01:10:38 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/07/15 13:06:13 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/04/22 01:10:38 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/07/15 13:06:13 $";
 
 #include "sctp_compat.h"
 
@@ -77,7 +80,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/04/22 01:10:38 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/07/15 13:06:13 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

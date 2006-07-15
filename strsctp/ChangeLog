@@ -1,3 +1,9 @@
+2006-07-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/sctp2.c: take care with free_func's
+	* src/drivers/sctp_input.c: take care with free_func's
+	* src/util/init/strsctp.sh: corrected debian device installation
+
 2006-07-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updated quick installation instructions

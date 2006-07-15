@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/04 04:34:26 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 04:34:26 $ by $Author: brian $
+ Last Modified $Date: 2006/07/15 13:06:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.32  2006/07/15 13:06:28  brian
+ - rationalized np_ip.c and rawip.c to upd.c drivers
+
  Revision 0.9.2.31  2006/03/04 04:34:26  brian
  - corrections for FC4 x86_64 build
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/04 04:34:26 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/04 04:34:26 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -97,7 +100,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.31 $) $Date: 2006/03/04 04:34:26 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"

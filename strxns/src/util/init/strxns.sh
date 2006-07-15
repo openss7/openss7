@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/19 12:54:21 $
+# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/07/15 13:06:31 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -189,7 +189,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/19 12:54:21 $
+# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/07/15 13:06:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -234,7 +234,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/19 12:54:21 $ by $Author: brian $
+# Last Modified $Date: 2006/07/15 13:06:31 $ by $Author: brian $
 #
 # =============================================================================
 

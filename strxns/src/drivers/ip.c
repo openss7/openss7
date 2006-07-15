@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/05/08 11:26:11 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:26:11 $ by $Author: brian $
+ Last Modified $Date: 2006/07/15 13:06:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.32  2006/07/15 13:06:28  brian
+ - rationalized np_ip.c and rawip.c to upd.c drivers
+
  Revision 0.9.2.31  2006/05/08 11:26:11  brian
  - post inc problem and working through test cases
 
@@ -146,10 +149,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/05/08 11:26:11 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/05/08 11:26:11 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -202,7 +205,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/05/08 11:26:11 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
