@@ -4129,24 +4129,24 @@ ne_bind_req(queue_t *q, mblk_t *mp)
 			bcopy(mp->b_rptr + p->ADDR_offset, ADDR_buffer, ADDR_length);
 			if (unlikely(ADDR_buffer[0].sin_family != AF_INET))
 				goto error;
-			/* cannot specify address if default listener */
-			if (unlikely((p->BIND_flags & DEFAULT_LISTENER) &&
-				     (ADDR_buffer[0].sin_port != 0 ||
-				      ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY)))
-				goto error;
-			/* cannot listen on wildcard port number */
-			if (unlikely(p->CONIND_number > 0 && ADDR_buffer[0].sin_port == 0))
-				goto error;
-			/* cannot specify port if default destination */
-			if (unlikely((p->BIND_flags & DEFAULT_DEST) &&
-				     ADDR_buffer[0].sin_port != 0))
-				goto error;
 		} else {
 			ADDR_length = sizeof(struct sockaddr_in);
 			ADDR_buffer[0].sin_family = AF_INET;
 			ADDR_buffer[0].sin_port = 0;
 			ADDR_buffer[0].sin_addr.s_addr = INADDR_ANY;
 		}
+		/* cannot specify address if default listener */
+		if (unlikely((p->BIND_flags & DEFAULT_LISTENER) &&
+			     (ADDR_buffer[0].sin_port != 0 ||
+			      ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY)))
+			goto error;
+		/* cannot listen on wildcard port number */
+		if (unlikely(p->CONIND_number > 0 && ADDR_buffer[0].sin_port == 0))
+			goto error;
+		/* cannot specify port if default destination */
+		if (unlikely((p->BIND_flags & DEFAULT_DEST) &&
+			     ADDR_buffer[0].sin_port != 0))
+			goto error;
 		ptrace(("%s: %s: proto = %d, bport = %d\n", DRV_NAME, __FUNCTION__,
 			(int) PROTOID_buffer[0], (int) ntohs(ADDR_buffer[0].sin_port)));
 		err = ne_bind_ack(q, PROTOID_buffer, p->PROTOID_length,
