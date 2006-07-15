@@ -4508,8 +4508,10 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	/* send data only after connection complete */
 	if (dp == NULL)
 		return (QR_DONE);
-	if ((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) != QR_ABSORBED)
-		goto error;
+	if (np_senddata(np, np->qos.protocol, np->qos.daddr, dp) != QR_ABSORBED) {
+		pswerr(("Discarding data on N_CONN_REQ\n"));
+		return (QR_DONE);	/* discard the data */
+	}
 	return (QR_TRIMMED);	/* np_senddata() consumed message blocks */
       error:
 	return ne_error_ack(q, N_CONN_REQ, err);

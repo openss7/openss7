@@ -6923,8 +6923,10 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	/* send data only after connection complete */
 	if (dp == NULL)
 		return (QR_DONE);
-	if ((err = tp_senddata(tp, tp->dport, &tp->options, dp)) != QR_ABSORBED)
-		goto error;
+	if (tp_senddata(tp, tp->dport, &tp->options, dp) != QR_ABSORBED) {
+		pswerr(("Discarding data on T_CONN_REQ\n"));
+		return (QR_DONE);	/* discard the data */
+	}
 	return (QR_TRIMMED);	/* tp_senddata() consumed message blocks */
       error:
 	return te_error_ack(q, T_CONN_REQ, err);
