@@ -2851,7 +2851,6 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		}
 		if (np != TOKEN_value)
 			np_set_state(np, np->coninds > 0 ? NS_WRES_CIND : NS_IDLE);
-		err = QR_TRIMMED;
 		break;
 #if 1
 	case NS_WACK_RRES:
@@ -4665,9 +4664,9 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 	np_set_state(np, NS_WACK_CRES);
 	err = ne_ok_ack(q, N_CONN_RES, RES_buffer, p->RES_length,
 			QOS_buffer, SEQ_number, TOKEN_value, p->CONN_flags, dp);
-	if (unlikely(err != 0))
+	if (unlikely(err != QR_ABSORBED))
 		goto error;
-	return (QR_DONE);	/* user data is not absorbed */
+	return (QR_TRIMMED);	/* user data is absorbed */
       error:
 	return ne_error_ack(q, N_CONN_RES, err);
 }
@@ -4754,9 +4753,9 @@ ne_discon_req(queue_t *q, mblk_t *mp)
 	/* Ok, all checking done.  Now we need to disconnect the address. */
 	err = ne_ok_ack(q, N_DISCON_REQ, RES_buffer, RES_length, NULL, SEQ_number, NULL,
 			p->DISCON_reason, dp);
-	if (unlikely(err != 0))
+	if (unlikely(err != QR_ABSORBED))
 		goto error;
-	return (QR_DONE);	/* user data is not absorbed */
+	return (QR_TRIMMED);	/* user data is absorbed */
       error:
 	return ne_error_ack(q, N_DISCON_REQ, err);
 }

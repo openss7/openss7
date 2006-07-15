@@ -5439,7 +5439,6 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		}
 		if (tp != ACCEPTOR_id)
 			tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
-		err = QR_TRIMMED;
 		break;
 #if 0
 	case NS_WACK_RRES:
@@ -6971,9 +6970,9 @@ te_conn_res(queue_t *q, mblk_t *mp)
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	tp_set_state(tp, TS_WACK_CRES);
 	err = te_ok_ack(q, T_CONN_RES, NULL, 0, OPT_buffer, SEQ_number, ACCEPTOR_id, 0, dp);
-	if (unlikely(err != 0))
+	if (unlikely(err != QR_ABSORBED))
 		goto error;
-	return (QR_DONE);	/* user data is not absorbed */
+	return (QR_TRIMMED);	/* user data is absorbed */
       error:
 	return te_error_ack(q, T_CONN_RES, err);
 }
@@ -7057,9 +7056,9 @@ te_discon_req(queue_t *q, mblk_t *mp)
 	}
 	/* Ok, all checking done.  Now we need to disconnect the address. */
 	err = te_ok_ack(q, T_DISCON_REQ, RES_buffer, RES_length, NULL, SEQ_number, NULL, 0, dp);
-	if (unlikely(err != 0))
+	if (unlikely(err != QR_ABSORBED))
 		goto error;
-	return (QR_DONE);	/* user data is not absorbed */
+	return (QR_TRIMMED);	/* user data is absorbed */
       error:
 	return te_error_ack(q, T_DISCON_REQ, err);
 }
