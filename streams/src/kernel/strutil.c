@@ -304,7 +304,7 @@ adjmsg(mblk_t *mp, register ssize_t length)
 
 EXPORT_SYMBOL_NOVERS(adjmsg);		/* include/sys/streams/stream.h */
 
-STATIC streams_fastcall __hot_out void
+STATIC streamscall __hot_out void
 freeb_skb(caddr_t arg)
 {
 	struct sk_buff *skb = (typeof(skb)) arg;
