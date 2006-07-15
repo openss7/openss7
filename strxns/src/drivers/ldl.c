@@ -2568,7 +2568,7 @@ dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
 }
 
 void streamscall
-mblk_destructor(char *arg)
+mblk_destructor(caddr_t arg)
 {
 	kfree_skb((struct sk_buff *) arg);
 }

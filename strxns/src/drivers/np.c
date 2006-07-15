@@ -2617,7 +2617,7 @@ np_ip_term_proto(unsigned char proto)
 #endif
 
 STATIC void streamscall
-np_ip_free(char *data)
+np_ip_free(caddr_t data)
 {
 	struct sk_buff *skb = (struct sk_buff *)data;
 	kfree_skb(skb);

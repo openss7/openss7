@@ -7881,7 +7881,7 @@ tp_lookup_icmp(struct iphdr *iph, unsigned int len)
  * @data: client data (sk_buff pointer in this case)
  */
 STATIC streamscall __hot_out void
-tp_free(char *data)
+tp_free(caddr_t data)
 {
 	struct sk_buff *skb = (typeof(skb)) data;
 

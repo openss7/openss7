@@ -6346,7 +6346,7 @@ tpi_r_prim(queue_t *q, mblk_t *mp)
  * @data: client data (sk_buff pointer in this case)
  */
 STATIC void streamscall
-tpi_free(char *data)
+tpi_free(caddr_t data)
 {
 	struct sk_buff *skb = (struct sk_buff *) data;
 

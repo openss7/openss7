@@ -27263,7 +27263,7 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
  *  packet per RFC 2960.
  */
 STATIC void streamscall
-sctp_free(char *data)
+sctp_free(caddr_t data)
 {
 	struct sk_buff *skb = (struct sk_buff *) data;
 

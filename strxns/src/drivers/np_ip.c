@@ -5213,7 +5213,7 @@ np_lookup_icmp(struct iphdr *iph, unsigned int len)
  * @data: client data (sk_buff pointer in this case)
  */
 STATIC streamscall void
-np_free(char *data)
+np_free(caddr_t data)
 {
 	struct sk_buff *skb = (typeof(skb)) data;
 

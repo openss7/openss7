@@ -4656,7 +4656,7 @@ npi_lookup_icmp(struct iphdr *iph, unsigned int len)
 }
 
 STATIC streamscall void
-npi_free(char *data)
+npi_free(caddr_t data)
 {
 	struct sk_buff *skb = (typeof(skb)) data;
 

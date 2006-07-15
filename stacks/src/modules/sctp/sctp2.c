@@ -18105,8 +18105,8 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
  *  should be performing the Adler-32 checksum on the packet.  If the Adler-32
  *  checksum fails, then we should silently discard per RFC 2960.
  */
-STATIC void
-sctp_free(char *data)
+STATIC streamscall void
+sctp_free(caddr_t data)
 {
 	struct sk_buff *skb = (struct sk_buff *) data;
 	_trace();
