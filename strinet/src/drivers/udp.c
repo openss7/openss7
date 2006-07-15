@@ -3624,6 +3624,9 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 		case T_CLTS:
 			++pb->clrefs;
 			break;
+		default:
+			swerr();
+			break;
 		}
 	} else if ((pb = kmem_cache_alloc(udp_prot_cachep, SLAB_ATOMIC))) {
 		bzero(pb, sizeof(*pb));
@@ -3635,6 +3638,9 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 			break;
 		case T_CLTS:
 			pb->clrefs = 1;
+			break;
+		default:
+			swerr();
 			break;
 		}
 		pp = &pb->prot;
@@ -3718,10 +3724,15 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 		switch (type) {
 		case T_COTS:
 		case T_COTS_ORD:
+			assure(pb->corefs > 1);
 			--pb->corefs;
 			break;
 		case T_CLTS:
+			assure(pb->clrefs > 1);
 			--pb->clrefs;
+			break;
+		default:
+			swerr();
 			break;
 		}
 		if (--pb->refs == 0) {

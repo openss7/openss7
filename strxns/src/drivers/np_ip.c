@@ -438,23 +438,26 @@ STATIC kmem_cache_t *np_priv_cachep;
 static INLINE __unlikely struct np *
 np_get(struct np *np)
 {
-	if (np)
-		atomic_inc(&np->refcnt);
+	dassert(np != NULL);
+	atomic_inc(&np->refcnt);
 	return (np);
 }
 static INLINE __unlikely void
 np_put(struct np *np)
 {
-	if (np)
-		if (atomic_dec_and_test(&np->refcnt)) {
-			kmem_cache_free(np_priv_cachep, np);
-		}
+	dassert(np != NULL);
+	if (atomic_dec_and_test(&np->refcnt)) {
+		kmem_cache_free(np_priv_cachep, np);
+	}
 }
 static INLINE __unlikely void
 np_release(struct np **npp)
 {
-	if (npp != NULL)
-		np_put(XCHG(npp, NULL));
+	struct np *np;
+
+	dassert(npp != NULL);
+	if (likely((np = XCHG(npp, NULL)) != NULL))
+		np_put(np);
 }
 static INLINE __unlikely struct np *
 np_alloc(void)
@@ -699,7 +702,7 @@ STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_P
  * unloading the module after protocol override would break things horribly.  Taking the reference
  * keeps the module from unloading (this works for OpenSS7 SCTP as well as lksctp).
  */
-STATIC INLINE streams_fastcall struct np_prot_bucket *
+STATIC INLINE streams_fastcall __unlikely struct np_prot_bucket *
 np_init_nproto(unsigned char proto, unsigned int type)
 {
 	struct np_prot_bucket *pb;
@@ -710,15 +713,31 @@ np_init_nproto(unsigned char proto, unsigned int type)
 	write_lock_bh(&np_prot_lock);
 	if ((pb = np_prots[proto]) != NULL) {
 		pb->refs++;
-		if (type & N_CONS)
+		switch (type) {
+		case N_CONS:
 			++pb->corefs;
-		if (type & N_CLNS)
+			break;
+		case N_CLNS:
 			++pb->clrefs;
+			break;
+		default:
+			swerr();
+			break;
+		}
 	} else if ((pb = kmem_cache_alloc(np_prot_cachep, SLAB_ATOMIC))) {
 		bzero(pb, sizeof(*pb));
 		pb->refs = 1;
-		pb->corefs = (type & N_CONS) ? 1 : 0;
-		pb->clrefs = (type & N_CLNS) ? 1 : 0;
+		switch (type) {
+		case N_CONS:
+			pb->corefs = 1;
+			break;
+		case N_CLNS:
+			pb->clrefs = 1;
+			break;
+		default:
+			swerr();
+			break;
+		}
 		pp = &pb->prot;
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 		pp->proto.protocol = proto;
@@ -797,10 +816,19 @@ np_term_nproto(unsigned char proto, unsigned int type)
 
 	write_lock_bh(&np_prot_lock);
 	if ((pb = np_prots[proto]) != NULL) {
-		if (type & N_CONS)
+		switch (type) {
+		case N_CONS:
+			assure(pb->corefs > 1);
 			--pb->corefs;
-		if (type & N_CLNS)
+			break;
+		case N_CLNS:
+			assure(pb->clrefs > 1);
 			--pb->clrefs;
+			break;
+		default:
+			swerr();
+			break;
+		}
 		if (--pb->refs == 0) {
 			struct ipnet_protocol *pp = &pb->prot;
 			struct mynet_protocol **ppp;
@@ -913,8 +941,10 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 			continue;
 #endif
 		for (i = 0; i < np2->bnum; i++) {
+#if 0
 			if (np2->baddrs[i].addr == 0)
 				break;
+#endif
 			for (j = 0; j < anum; j++)
 				if (np2->baddrs[i].addr == ADDR_buffer[j].sin_addr.s_addr)
 					break;
@@ -1684,7 +1714,7 @@ np_unbind(struct np *np)
 		np_unbind_prot(np->protoids[0], np->info.SERV_type);
 		np->bport = np->sport = 0;
 		np->bnum = np->snum = np->pnum = 0;
-		np_release(&np);
+		np_put(np);
 		write_unlock_bh(&hp->lock);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
 		synchronize_net();	/* might sleep */
@@ -1989,7 +2019,7 @@ np_disconnect(struct np *np, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
 		np->chash = NULL;
 		np->dport = np->sport = 0;
 		np->dnum = np->snum = 0;
-		np_release(&np);
+		np_put(np);
 		write_unlock_bh(&hp->lock);
 	}
 	return (0);
@@ -5244,16 +5274,16 @@ np_v4_rcv(struct sk_buff *skb)
 		put(np->oq, mp);
 //              UDP_INC_STATS_BH(UdpInDatagrams);
 		/* release reference from lookup */
-		np_release(&np);
+		np_put(np);
 		return (0);
 	      flow_controlled:
-		np_release(&np);
+		np_put(np);
 		freeb(mp);	/* will take sk_buff with it */
 		return (0);
 	}
       no_buffers:
       linear_fail:
-	np_release(&np);
+	np_put(np);
 	kfree_skb(skb);
 	return (0);
       no_stream:
@@ -5331,7 +5361,7 @@ np_v4_err(struct sk_buff *skb, u32 info)
 	}
       discard_put:
 	/* release reference from lookup */
-	np_release(&np);
+	np_put(np);
 	np_v4_err_next(skb, info);	/* anyway */
 	return;
       no_buffers:

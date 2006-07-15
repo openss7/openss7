@@ -558,23 +558,26 @@ STATIC kmem_cache_t *raw_priv_cachep;
 static INLINE __unlikely struct tp *
 tp_get(struct tp *tp)
 {
-	if (tp)
-		atomic_inc(&tp->refcnt);
+	dassert(tp != NULL);
+	atomic_inc(&tp->refcnt);
 	return (tp);
 }
 static INLINE __unlikely void
 tp_put(struct tp *tp)
 {
-	if (tp)
-		if (atomic_dec_and_test(&tp->refcnt)) {
-			kmem_cache_free(raw_priv_cachep, tp);
-		}
+	dassert(tp != NULL);
+	if (atomic_dec_and_test(&tp->refcnt)) {
+		kmem_cache_free(raw_priv_cachep, tp);
+	}
 }
 static INLINE __unlikely void
 tp_release(struct tp **tpp)
 {
-	if (tpp != NULL)
-		tp_put(XCHG(tpp, NULL));
+	struct tp *tp;
+
+	dassert(tpp != NULL);
+	if (likely((tp = XCHG(tpp, NULL)) != NULL))
+		tp_put(tp);
 }
 static INLINE __unlikely struct tp *
 tp_alloc(void)
@@ -3522,6 +3525,9 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 		case T_CLTS:
 			++pb->clrefs;
 			break;
+		default:
+			swerr();
+			break;
 		}
 	} else if ((pb = kmem_cache_alloc(raw_prot_cachep, SLAB_ATOMIC))) {
 		bzero(pb, sizeof(*pb));
@@ -3533,6 +3539,9 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 			break;
 		case T_CLTS:
 			pb->clrefs = 1;
+			break;
+		default:
+			swerr();
 			break;
 		}
 		pp = &pb->prot;
@@ -3616,10 +3625,15 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 		switch (type) {
 		case T_COTS:
 		case T_COTS_ORD:
+			assure(pb->corefs > 1);
 			--pb->corefs;
 			break;
 		case T_CLTS:
+			assure(pb->clrefs > 1);
 			--pb->clrefs;
+			break;
+		default:
+			swerr();
 			break;
 		}
 		if (--pb->refs == 0) {
@@ -3844,7 +3858,7 @@ tp_skb_destructor(struct sk_buff *skb)
 		}
 		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
-		tp_release(&tp);
+		tp_put(tp);
 	}
 }
 
@@ -4575,7 +4589,7 @@ tp_unbind(struct tp *tp)
 		tp_unbind_prot(tp->protoids[0], tp->info.SERV_type);
 		tp->bport = tp->sport = 0;
 		tp->bnum = tp->snum = tp->pnum = 0;
-		tp_release(&tp);
+		tp_put(tp);
 		write_unlock_bh(&hp->lock);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
 		synchronize_net();	/* might sleep */
@@ -4891,7 +4905,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		tp->chash = NULL;
 		tp->dport = tp->sport = 0;
 		tp->dnum = tp->snum = 0;
-		tp_release(&tp);
+		tp_put(tp);
 		write_unlock_bh(&hp->lock);
 	}
 	return (QR_ABSORBED);
@@ -7879,7 +7893,7 @@ tp_free(char *data)
 			spin_unlock_bh(&tp->qlock);
 			/* put this back to null before freeing it */
 			*(struct tp **) skb->cb = NULL;
-			tp_release(&tp);
+			tp_put(tp);
 		}
 		kfree_skb(skb);
 	}
@@ -7959,13 +7973,13 @@ tp_v4_rcv(struct sk_buff *skb)
 		put(tp->oq, mp);
 //              UDP_INC_STATS_BH(UdpInDatagrams);
 		/* release reference from lookup */
-		tp_release(&tp);
+		tp_put(tp);
 		return (0);
 	}
       no_buffers:
       flow_controlled:
       linear_fail:
-	tp_release(&tp);
+	tp_put(tp);
 	kfree_skb(skb);
 	return (0);
       no_stream:
@@ -8043,7 +8057,7 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 	}
       discard_put:
 	/* release reference from lookup */
-	tp_release(&tp);
+	tp_put(tp);
 	tp_v4_err_next(skb, info);	/* anyway */
 	return;
       no_buffers:
