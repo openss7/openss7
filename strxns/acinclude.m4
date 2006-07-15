@@ -342,7 +342,7 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #include <net/tcp.h>
     ])
     _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
-			ip_route_output_key __in_dev_get_rcu], [], [], [
+			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -415,11 +415,13 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #endif
     ])
     _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
+			  struct inet_protocol.next,
 			  struct inet_protocol.copy,
 			  struct inet_protocol.no_policy,
+			  struct net_protocol.proto,
+			  struct net_protocol.next,
 			  struct net_protocol.no_policy,
 			  struct dst_entry.path,
-			  struct net_protocol.proto,
 			  struct dst_entry.path], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>

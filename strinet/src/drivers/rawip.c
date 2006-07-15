@@ -529,22 +529,25 @@ raw_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 	return ((raw_chash_size - 1) & (proto + sport + dport));
 }
 
-#ifdef LINUX
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
-struct inet_protocol {
-	struct net_protocol proto;
-	struct net_protocol *next;
+#define mynet_protocol net_protocol
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
+#define mynet_protocol inet_protocol
+#endif				/* defined HAVE_KTYPE_STRUCT_INET_PROTOCOL */
+
+struct ipnet_protocol {
+	struct mynet_protocol proto;
+	struct mynet_protocol *next;
 	struct module *kmod;
 };
-#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
-#endif				/* LINUX */
 
 struct tp_prot_bucket {
 	unsigned char proto;		/* protocol number */
 	int refs;			/* reference count */
 	int corefs;			/* T_COTS(_ORD) references */
 	int clrefs;			/* T_CLTS references */
-	struct inet_protocol prot;	/* Linux registration structure */
+	struct ipnet_protocol prot;	/* Linux registration structure */
 };
 STATIC rwlock_t raw_prot_lock = RW_LOCK_UNLOCKED;
 STATIC struct tp_prot_bucket *raw_prots[256];
@@ -3423,47 +3426,21 @@ STATIC void tp_v4_err(struct sk_buff *skb, u32 info);
  */
 #ifdef LINUX
 /**
- * tp_v4_steal - steal a socket buffer
- * @skb: socket buffer to steal
- *
- * In the 2.4 packet handler, if the packet is for us, steal the packet by overwritting the protocol
- * and returning.  This is only done for normal packets and not error packets (that do not need to
- * be stolen).  In the 2.4 handler loop, iph->protocol is examined on each iteration, permitting us
- * to steal the packet by overwritting the protocol number.
- *
- * In the 2.6 packet handler, if the packet is not for us, steal the packet by simply not passing it
- * to the next handler.
- */
-STATIC INLINE streams_fastcall __hot_in void
-tp_v4_steal(struct sk_buff *skb)
-{
-#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
-	skb->nh.iph->protocol = 255;
-	skb->protocol = 255;
-#endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
-}
-
-/**
  * tp_v4_rcv_next - pass a socket buffer to the next handler
  * @skb: socket buffer to pass
  *
- * In the 2.6 packet handler, if the packet is not for us, pass it to the next handler.  If there is
- * no next handler, free the packet and return.  Note that we do not have to lock the hash because
- * we own it and are also holding a reference to any module owning the next handler.
- *
- * In the 2.4 packet handler, if the packet is not for us, pass it to the next handler by simply
- * freeing the cloned copy and returning.
- *
- * This function returns zero (0) if the packet has not or will not be seen by another packet
- * handler, and one (1) if the packet has or will be seen by another packet handler.  This return
- * value is used to determine whether to generate ICMP errors or not.
+ * In the Linux packet handler, if the packet is not for us, pass it to the next handler.  If there
+ * is no next handler, free the packet and return.  Note that we do not have to lock the hash
+ * because we own it and are also holding a reference to any module owning the next handler.  This
+ * function returns zero (0) if the packet has not or will not be seen by another packet handler,
+ * and one (1) if the packet has or will be seen by another packet handler.  This return value is
+ * used to determine whether to generate ICMP errors or not.
  */
 STATIC INLINE streams_fastcall __hot_in int
 tp_v4_rcv_next(struct sk_buff *skb)
 {
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 	struct tp_prot_bucket *pb;
-	struct net_protocol *pp;
+	struct mynet_protocol *pp;
 	unsigned char proto;
 
 	proto = skb->nh.iph->protocol;
@@ -3473,52 +3450,40 @@ tp_v4_rcv_next(struct sk_buff *skb)
 	}
 	kfree_skb(skb);
 	return (0);
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
-#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
-	struct tp_prot_bucket *pb;
-	unsigned char proto;
-
-	proto = skb->nh.iph->protocol;
-	kfree_skb(skb);
-	pb = raw_prots[proto];
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
-	if (pb)
-		return (pb->prot.copy != 0);
-#endif
-	return (0);
-#endif
 }
 
 /**
  * tp_v4_err_next - pass a socket buffer to the next error handler
  * @skb: socket buffer to pass
  *
- * In the 2.6 packet error handler, if the packet is not for us, pass it to the next error handler.
- * If there is no next error handler, simply return.
- *
- * In the 2.4 packet error handler, if the packet is not for us, pass it to the next error handler
- * by simply returning.  Error packets are not cloned, so don't free it.
+ * In the Linux packet error handler, if the packet is not for us, pass it to the next error
+ * handler.  If there is no next error handler, simply return.
  */
 STATIC INLINE streams_fastcall __hot_in void
 tp_v4_err_next(struct sk_buff *skb, __u32 info)
 {
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 	struct tp_prot_bucket *pb;
-	struct net_protocol *pp;
+	struct mynet_protocol *pp;
 	unsigned char proto;
 
 	proto = ((struct iphdr *) skb->data)->protocol;
-	if ((pb = raw_prots[proto])
-	    && (pp = pb->prot.next))
+	if ((pb = raw_prots[proto]) && (pp = pb->prot.next))
 		pp->err_handler(skb, info);
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 	return;
 }
 
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#ifdef HAVE_INET_PROTO_LOCK_ADDR
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
-STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+
+#define net_protocol_lock() spin_lock_bh(inet_proto_lockp)
+#define net_protocol_unlock() spin_unlock_bh(inet_proto_lockp)
+#else
+#define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
+#define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
+#endif
+#ifdef HAVE_INET_PROTOS_ADDR
+STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
+#endif
 
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 #define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
@@ -3530,24 +3495,20 @@ STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PRO
  *
  * This is the network protocol override function.
  *
- * Under 2.4, simply add the protocol to the network using an inet_protocol structure and the
- * inet_add_protocol() function.  Each added function will be delivered a clone of the packet in an
- * sk_buff, which is fine.
- *
- * Under 2.6, things are more complicated.  2.6 will refuse to register a network protocol if one
- * already exists, so we hack the 2.6 tables.  If no other protocol was previously registered, this
- * reduces to the 2.6 version of inet_add_protocol().  If there is a protocol previously registered,
- * we take a reference on the kernel module owning the entry, if possible, and replace the entry
- * with our own, saving a pointer to the previous entry for passing sk_bufs along that we are not
- * interested in.  Taking a module reference is particularly for things like SCTP, where unloading
- * the module after protocol override would break things horribly.  Taking the reference keeps the
- * module from unloading (this works for OpenSS7 SCTP as well as lksctp).
+ * This is complicated because we hack the inet protocol tables.  If no other protocol was
+ * previously registered, this reduces to inet_add_protocol().  If there is a protocol previously
+ * registered, we take a reference on the kernel module owning the entry, if possible, and replace
+ * the entry with our own, saving a pointer to the previous entry for passing sk_bufs along that we
+ * are not interested in.  Taking a module reference is particularly for things like SCTP, where
+ * unloading the module after protocol override would break things horribly.  Taking the reference
+ * keeps the module from unloading (this works for OpenSS7 SCTP as well as lksctp).
  */
 STATIC INLINE streams_fastcall __unlikely struct tp_prot_bucket *
 tp_init_nproto(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
-	struct inet_protocol *pp;
+	struct ipnet_protocol *pp;
+	struct mynet_protocol **ppp;
 	int hash = proto & (MAX_INET_PROTOS - 1);
 
 	write_lock_bh(&raw_prot_lock);
@@ -3563,63 +3524,69 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 			break;
 		}
 	} else if ((pb = kmem_cache_alloc(raw_prot_cachep, SLAB_ATOMIC))) {
+		bzero(pb, sizeof(*pb));
 		pb->refs = 1;
 		switch (type) {
 		case T_COTS:
 		case T_COTS_ORD:
 			pb->corefs = 1;
-			pb->clrefs = 0;
 			break;
 		case T_CLTS:
-			pb->corefs = 0;
 			pb->clrefs = 1;
 			break;
 		}
 		pp = &pb->prot;
-#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
-		(void) hash;
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
-		pp->protocol = proto;
-		pp->name = "streams-ip";
+		pp->proto.protocol = proto;
+		pp->proto.name = "streams-rawip";
 #endif
-		pp->handler = &tp_v4_rcv;
-		pp->err_handler = &tp_v4_err;
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
-		pp->copy = 0;
-		pp->next = NULL;
-#endif
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
-		pp->no_policy = 1;
-#endif
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
-		inet_add_protocol(pp);
-#else
-		inet_add_protocol(pp, proto);
-#endif
-#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO
 		pp->proto.proto = proto;
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO */
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
+		pp->proto.no_policy = 1;
+#endif
 		pp->proto.handler = &tp_v4_rcv;
 		pp->proto.err_handler = &tp_v4_err;
-		pp->proto.no_policy = 1;
-		pp->next = NULL;
-		pp->kmod = NULL;
-		spin_lock_bh(inet_proto_lockp);
-		if ((pp->next = inet_protosp[hash]) != NULL) {
-			if ((pp->kmod = module_text_address((ulong) pp->next))
-			    && pp->kmod != THIS_MODULE) {
-				if (!try_module_get(pp->kmod)) {
-					spin_unlock_bh(inet_proto_lockp);
+		ppp = &inet_protosp[hash];
+
+		{
+			net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+			while (*ppp && (*ppp)->protocol != proto)
+				ppp = &(*ppp)->next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+			if (*ppp != NULL) {
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
+				/* can only override last entry */
+				if ((*ppp)->copy != 0) {
+					__ptrace(("Cannot override copy entry\n"));
+					net_protocol_unlock();
+					write_unlock_bh(&raw_prot_lock);
 					kmem_cache_free(raw_prot_cachep, pb);
 					return (NULL);
 				}
+#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+				if ((pp->kmod = module_text_address((ulong) *ppp))
+				    && pp->kmod != THIS_MODULE) {
+					if (!try_module_get(pp->kmod)) {
+						__ptrace(("Cannot acquire module\n"));
+						net_protocol_unlock();
+						write_unlock_bh(&raw_prot_lock);
+						kmem_cache_free(raw_prot_cachep, pb);
+						return (NULL);
+					}
+				}
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NEXT || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NEXT
+				pp->proto.next = (*ppp)->next;
+#endif
 			}
+			pp->next = (*ppp);
+			*ppp = &pp->proto;
+			net_protocol_unlock();
 		}
-		inet_protosp[hash] = &pp->proto;
-		spin_unlock_bh(inet_proto_lockp);
-		// synchronize_net(); /* might sleep */
-#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 		/* link into hash slot */
 		raw_prots[proto] = pb;
 	}
@@ -3633,14 +3600,11 @@ tp_init_nproto(unsigned char proto, unsigned int type)
  *
  * This is the network protocol restoration function.
  *
- * Under 2.4, simply remove the protocol from the network using the inet_protocol structure and the
- * inet_del_protocol() function, and we stop receiving packets.
- * 
- * Under 2.6, things are more complicated.
- * The module stuff here is just for ourselves (other kernel modules pulling the same trick) as
- * Linux IP protocols are normally kernel resident.  If a protocol was previously registered,
- * restore the protocol's entry and drop the reference to its owning kernel module.  If there was no
- * protocol previously registered, this reduces to the 2.6 version of inet_del_protocol().
+ * This is complicated and brittle.  The module stuff here is just for ourselves (other kernel
+ * modules pulling the same trick) as Linux IP protocols are normally kernel resident.  If a
+ * protocol was previously registered, restore the protocol's entry and drop the reference to its
+ * owning kernel module.  If there was no protocol previously registered, this reduces to
+ * inet_del_protocol().
  */
 STATIC INLINE streams_fastcall __unlikely void
 tp_term_nproto(unsigned char proto, unsigned int type)
@@ -3659,28 +3623,29 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 			break;
 		}
 		if (--pb->refs == 0) {
-			struct inet_protocol *pp = &pb->prot;
+			struct ipnet_protocol *pp = &pb->prot;
+			struct mynet_protocol **ppp;
+			int hash = proto & (MAX_INET_PROTOS - 1);
 
-#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
-			inet_del_protocol(pp);
-#else
-			inet_del_protocol(pp, proto);
-#endif
-			/* unlink from hash slot */
-			raw_prots[proto] = NULL;
-#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
-			spin_lock_bh(inet_proto_lockp);
-			inet_protosp[proto] = pp->next;
-			spin_unlock_bh(inet_proto_lockp);
+			ppp = &inet_protosp[hash];
+			{
+				net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+				while (*ppp && *ppp != &pp->proto)
+					ppp = &(*ppp)->next;
+				pp->next->next = pp->proto.next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+				__assert(*ppp == &pp->proto);
+				*ppp = pp->next;
+				net_protocol_unlock();
+			}
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 			/* unlink from hash slot */
 			raw_prots[proto] = NULL;
-			// synchronize_net(); /* might sleep */
-#else
-#error
-#endif
+
 			kmem_cache_free(raw_prot_cachep, pb);
 		}
 	}
@@ -3803,9 +3768,9 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 	for (i = 0; i < anum; i++)
 		tp->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
 	write_unlock_bh(&hp->lock);
-#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#if defined HAVE_KFUNC_SYNCHRONIZE_NET
 	synchronize_net();	/* might sleep */
-#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+#endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
 	return (0);
 }
 
@@ -3854,8 +3819,13 @@ tp_ip_queue_xmit(struct sk_buff *skb)
  * When tp->sndmem is greater than tp->options.xti.sndbuf we place STREAMS buffers back on the send
  * queue and stall the queue.  When the send memory falls below tp->options.xti.sndlowat (or to
  * zero) and there are message on the send queue, we enable the queue.
+ *
+ * NOTE: There was not enough hysteresis in this function!  It was qenabling too fast.  We need a
+ * flag in the private structure that indicates that the queue is stalled awaiting subsiding below
+ * the send low water mark (or to zero) that is set when we stall the queue and reset when we fall
+ * beneath the low water mark.
  */
-STATIC void __hot
+STATIC __hot_out void
 tp_skb_destructor(struct sk_buff *skb)
 {
 	struct tp *tp;
@@ -3932,7 +3902,7 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 }
 
 /**
- * tp_alloc_skb - allocate a socket buffer from a message block
+ * tp_alloc_skb_old - allocate a socket buffer from a message block
  * @tp: private pointer
  * @mp: the message block
  * @headroom: header room for resulting sk_buff
@@ -3983,11 +3953,15 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
  * through the data to generate the checksum.
  */
 #if defined LFS
-STATIC INLINE streams_fastcall __hot_out struct sk_buff *
-tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+STATIC noinline streams_fastcall __unlikely struct sk_buff *
+tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
-	struct sk_buff *skb, *skb_head = NULL, *skb_tail = NULL;
+	struct sk_buff *skb;
 	unsigned char *beg, *end;
+
+#if 0
+	struct sk_buff *skb_head = NULL, *skb_tail = NULL;
+#endif
 
 	/* must not be a fastbuf */
 	if (unlikely(mp->b_datap->db_size <= FASTBUF))
@@ -4002,17 +3976,22 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	beg = mp->b_rptr - headroom;
 	/* First, check if there is enough head room in the data block. */
 	if (unlikely(beg < mp->b_datap->db_base)) {
+#if 0
 		/* No, there is not enough headroom, allocate an sk_buff for the header. */
 		skb_head = alloc_skb(headroom, gfp);
 		if (unlikely(skb_head == NULL))
 			goto no_head;
 		skb_reserve(skb_head, headroom);
 		beg = mp->b_rptr;
+#else
+		goto go_frag;
+#endif
 	}
 	/* Next, check if there is enough tail room in the data block. */
 	end = (unsigned char *) (((unsigned long) mp->b_wptr + (SMP_CACHE_BYTES - 1)) &
 				 ~(SMP_CACHE_BYTES - 1));
 	if (unlikely(end + sizeof(struct skb_shared_info) > mp->b_datap->db_lim)) {
+#if 0
 		/* No, there is not enough tailroom, allocate an sk_buff for the tail. */
 		skb_tail = alloc_skb(SMP_CACHE_BYTES + sizeof(struct skb_shared_info), gfp);
 		if (unlikely(skb_tail == NULL))
@@ -4027,6 +4006,9 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 			bcopy(end, skb_put(skb_tail, len), len);
 			mp->b_wptr = end;
 		}
+#else
+		goto go_frag;
+#endif
 	}
 
 	/* Last, allocate a socket buffer header and point it to the payload data. */
@@ -4067,6 +4049,7 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	tp->sndmem += skb->truesize;
 	spin_unlock_bh(&tp->qlock);
 
+#if 0
 	if (likely(skb_head == NULL)) {
 		if (unlikely(skb_tail != NULL)) {
 			/* Chain skb_tail onto skb. */
@@ -4089,6 +4072,11 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		skb_head->len += skb_head->data_len;
 	}
 	return (skb_head);
+#else
+      no_skb:
+	return (skb);
+#endif
+#if 0
       no_skb:
 	if (skb_tail != NULL)
 		kfree_skb(skb_tail);
@@ -4096,17 +4084,49 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	if (skb_head != NULL)
 		kfree_skb(skb_head);
       no_head:
+#endif
 	return (NULL);
+      go_frag:			/* for now */
       go_slow:
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
-#else
+
+STATIC INLINE streams_fastcall __hot_out struct sk_buff *
+tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
+{
+	struct sk_buff *skb;
+
+	if (unlikely((mp->b_datap->db_flag & (DB_SKBUFF)) == 0))
+		goto old_way;
+	if (unlikely((mp->b_rptr < mp->b_datap->db_base + headroom)))
+		goto go_slow;
+	if (unlikely((skb = (typeof(skb)) mp->b_datap->db_frtnp->free_arg) == NULL))
+		goto go_slow;
+	skb_get(skb);
+	skb_reserve(skb, mp->b_rptr - skb->data);
+	skb_put(skb, mp->b_wptr - mp->b_rptr);
+	/* we never have any page fragments, so we can steal a pointer from the page fragement
+	   list. */
+	assert(skb_shinfo(skb)->nr_frags == 0);
+	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+	skb->destructor = tp_skb_destructor;
+	spin_lock_bh(&tp->qlock);
+	tp->sndmem += skb->truesize;
+	spin_unlock_bh(&tp->qlock);
+	freemsg(mp);
+	return (skb);
+      old_way:
+	return tp_alloc_skb_old(tp, mp, headroom, gfp);
+      go_slow:
+	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
+}
+#else				/* !defined LFS */
 STATIC INLINE streams_fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
-#endif
+#endif				/* !defined LFS */
 
 /**
  * tp_senddata - process a unit data request
@@ -4557,9 +4577,9 @@ tp_unbind(struct tp *tp)
 		tp->bnum = tp->snum = tp->pnum = 0;
 		tp_release(&tp);
 		write_unlock_bh(&hp->lock);
-#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#if defined HAVE_KFUNC_SYNCHRONIZE_NET
 		synchronize_net();	/* might sleep */
-#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+#endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
 		return (0);
 	}
 	return (-EALREADY);
@@ -4594,7 +4614,6 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 
 	if (ACCEPTOR_id != tp) {
 		err = TBADF;
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 		/* Accepting Stream must be bound to the same protocol as connection indication. */
 		for (j = 0; j < ACCEPTOR_id->pnum; j++)
 			if (ACCEPTOR_id->protoids[j] == iph->protocol)
@@ -4602,23 +4621,6 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 		if (j >= ACCEPTOR_id->pnum)
 			/* Must be bound to the same protocol. */
 			goto error;
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
-#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
-		/* Problem for 2.4: we overwrote iph->protocol with 255 to steal the packet, so we
-		   can't check it now.  Check that the accepting stream is bound to the same
-		   protocol id as the listening stream. */
-		/* Another approach for 2.4 would be to copy the sk_buff before stealing it. */
-		for (j = 0, i = 0; j < ACCEPTOR_id->pnum; j++) {
-			for (i = 0; i < tp->pnum; i++)
-				if (ACCEPTOR_id->protoids[j] == tp->protoids[i])
-					break;
-			if (ACCEPTOR_id->protoids[j] == tp->protoids[i])
-				break;
-		}
-		if (j >= ACCEPTOR_id->pnum || i >= tp->pnum)
-			/* Must be bound to the same protocol. */
-			goto error;
-#endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
 		/* Accepting Stream must be bound to the same address (or wildcard) including
 		   destination address in connection indication. */
 		for (i = 0; i < ACCEPTOR_id->bnum; i++)
@@ -7921,16 +7923,6 @@ tp_v4_rcv(struct sk_buff *skb)
 	/* we do the lookup before the checksum */
 	if (unlikely((tp = tp_lookup(iph, uh)) == NULL))
 		goto no_stream;
-
-	/* TODO: for 2.4 we overwrite iph->protocol to steal the packet.  This means that we loose
-	   the protocol information.  This is important if we ever allow binding to more than one
-	   protocol id (which we don't currently do).  At that point we would have to copy the
-	   sk_buff before stealing the original and free the original.  See the NBADTOKEN check in
-	   tp_passive(). */
-	/* FIXME: Another trick for 2.4 would be to copy the IP header and UDP header, but esballoc 
-	   the payload.  That might be the best way to do things.  The problem is that we indicate
-	   iph->protocol on connection indications, and it will be the wrong protocol on 2.4. */
-	tp_v4_steal(skb);	/* its ours */
 #if 0
 	/* For now... We should actually place non-linear fragments into separate mblks and pass
 	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
@@ -8351,9 +8343,8 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 #if defined LFS
 	/* want to set a write offet of MAX_HEADER bytes */
 	so = (typeof(so)) mp->b_wptr;
-	so->so_flags = SO_WROFF | SO_WRPAD;
+	so->so_flags = SO_WROFF | SO_SKBUFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
-	so->so_wrpad = SMP_CACHE_BYTES + sizeof(struct skb_shared_info);	/* this is too big */
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);

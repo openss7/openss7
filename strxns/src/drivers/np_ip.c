@@ -409,22 +409,25 @@ np_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 	return ((np_chash_size - 1) & (proto + sport + dport));
 }
 
-#ifdef LINUX
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
-struct inet_protocol {
-	struct net_protocol proto;
-	struct net_protocol *next;
+#define mynet_protocol net_protocol
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
+#define mynet_protocol inet_protocol
+#endif				/* defined HAVE_KTYPE_STRUCT_INET_PROTOCOL */
+
+struct ipnet_protocol {
+	struct mynet_protocol proto;
+	struct mynet_protocol *next;
 	struct module *kmod;
 };
-#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
-#endif				/* LINUX */
 
 struct np_prot_bucket {
 	unsigned char proto;		/* protocol number */
 	int refs;			/* reference count */
 	int corefs;			/* N_CONS references */
 	int clrefs;			/* N_CLNS references */
-	struct inet_protocol prot;	/* Linux registration structure */
+	struct ipnet_protocol prot;	/* Linux registration structure */
 };
 STATIC rwlock_t np_prot_lock = RW_LOCK_UNLOCKED;
 STATIC struct np_prot_bucket *np_prots[256];
@@ -619,47 +622,21 @@ STATIC void np_v4_err(struct sk_buff *skb, u32 info);
  */
 #ifdef LINUX
 /**
- * np_v4_steal - steal a socket buffer
- * @skb: socket buffer to steal
- *
- * In the 2.4 packet handler, if the packet is for us, steal the packet by overwritting the protocol
- * and returning.  This is only done for normal packets and not error packets (that do not need to
- * be stolen).  In the 2.4 handler loop, iph->protocol is examined on each iteration, permitting us
- * to steal the packet by overwritting the protocol number.
- *
- * In the 2.6 packet handler, if the packet is not for us, steal the packet by simply not passing it
- * to the next handler.
- */
-STATIC INLINE streams_fastcall __hot_in void
-np_v4_steal(struct sk_buff *skb)
-{
-#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
-	skb->nh.iph->protocol = 255;
-	skb->protocol = 255;
-#endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
-}
-
-/**
  * np_v4_rcv_next - pass a socket buffer to the next handler
  * @skb: socket buffer to pass
  *
- * In the 2.6 packet handler, if the packet is not for us, pass it to the next handler.  If there is
- * no next handler, free the packet and return.  Note that we do not have to lock the hash because
- * we own it and are also holding a reference to any module owning the next handler.
- *
- * In the 2.4 packet handler, if the packet is not for us, pass it to the next handler by simply
- * freeing the cloned copy and returning.
- *
- * This function returns zero (0) if the packet has not or will not be seen by another packet
- * handler, and one (1) if the packet has or will be seen by another packet handler.  This return
- * value is used to determine whether to generate ICMP errors or not.
+ * In the Linux packet handler, if the packet is not for us, pass it to the next handler.  If there
+ * is no next handler, free the packet and return.  Note that we do not have to lock the hash
+ * because we own it and are also holding a reference to any module owning the next handler.  This
+ * function returns zero (0) if the packet has not or will not be seen by another packet handler,
+ * and one (1) if the packet has or will be seen by another packet handler.  This return value is
+ * used to determine whether to generate ICMP errors or not.
  */
 STATIC INLINE streams_fastcall __hot_in int
 np_v4_rcv_next(struct sk_buff *skb)
 {
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 	struct np_prot_bucket *pb;
-	struct net_protocol *pp;
+	struct mynet_protocol *pp;
 	unsigned char proto;
 
 	proto = skb->nh.iph->protocol;
@@ -669,52 +646,40 @@ np_v4_rcv_next(struct sk_buff *skb)
 	}
 	kfree_skb(skb);
 	return (0);
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
-#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
-	struct np_prot_bucket *pb;
-	unsigned char proto;
-
-	proto = skb->nh.iph->protocol;
-	kfree_skb(skb);
-	pb = np_prots[proto];
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
-	if (pb)
-		return (pb->prot.copy != 0);
-#endif
-	return (0);
-#endif
 }
 
 /**
  * np_v4_err_next - pass a socket buffer to the next error handler
  * @skb: socket buffer to pass
  *
- * In the 2.6 packet error handler, if the packet is not for us, pass it to the next error handler.
- * If there is no next error handler, simply return.
- *
- * In the 2.4 packet error handler, if the packet is not for us, pass it to the next error handler
- * by simply returning.  Error packets are not cloned, so don't free it.
+ * In the Linux packet error handler, if the packet is not for us, pass it to the next error
+ * handler.  If there is no next error handler, simply return.
  */
 STATIC INLINE streams_fastcall __hot_in void
 np_v4_err_next(struct sk_buff *skb, __u32 info)
 {
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 	struct np_prot_bucket *pb;
-	struct net_protocol *pp;
+	struct mynet_protocol *pp;
 	unsigned char proto;
 
 	proto = ((struct iphdr *) skb->data)->protocol;
-	if ((pb = np_prots[proto])
-	    && (pp = pb->prot.next))
+	if ((pb = np_prots[proto]) && (pp = pb->prot.next))
 		pp->err_handler(skb, info);
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 	return;
 }
 
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#ifdef HAVE_INET_PROTO_LOCK_ADDR
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
-STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+
+#define net_protocol_lock() spin_lock_bh(inet_proto_lockp)
+#define net_protocol_unlock() spin_unlock_bh(inet_proto_lockp)
+#else
+#define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
+#define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
+#endif
+#ifdef HAVE_INET_PROTOS_ADDR
+STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
+#endif
 
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 #define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
@@ -726,24 +691,20 @@ STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PRO
  *
  * This is the network protocol override function.
  *
- * Under 2.4, simply add the protocol to the network using an inet_protocol structure and the
- * inet_add_protocol() function.  Each added function will be delivered a clone of the packet in an
- * sk_buff, which is fine.
- *
- * Under 2.6, things are more complicated.  2.6 will refuse to register a network protocol if one
- * already exists, so we hack the 2.6 tables.  If no other protocol was previously registered, this
- * reduces to the 2.6 version of inet_add_protocol().  If there is a protocol previously registered,
- * we take a reference on the kernel module owning the entry, if possible, and replace the entry
- * with our own, saving a pointer to the previous entry for passing sk_bufs along that we are not
- * interested in.  Taking a module reference is particularly for things like SCTP, where unloading
- * the module after protocol override would break things horribly.  Taking the reference keeps the
- * module from unloading (this works for OpenSS7 SCTP as well as lksctp).
+ * This is complicated because we hack the inet protocol tables.  If no other protocol was
+ * previously registered, this reduces to inet_add_protocol().  If there is a protocol previously
+ * registered, we take a reference on the kernel module owning the entry, if possible, and replace
+ * the entry with our own, saving a pointer to the previous entry for passing sk_bufs along that we
+ * are not interested in.  Taking a module reference is particularly for things like SCTP, where
+ * unloading the module after protocol override would break things horribly.  Taking the reference
+ * keeps the module from unloading (this works for OpenSS7 SCTP as well as lksctp).
  */
 STATIC INLINE streams_fastcall struct np_prot_bucket *
 np_init_nproto(unsigned char proto, unsigned int type)
 {
 	struct np_prot_bucket *pb;
-	struct inet_protocol *pp;
+	struct ipnet_protocol *pp;
+	struct mynet_protocol **ppp;
 	int hash = proto & (MAX_INET_PROTOS - 1);
 
 	write_lock_bh(&np_prot_lock);
@@ -754,54 +715,62 @@ np_init_nproto(unsigned char proto, unsigned int type)
 		if (type & N_CLNS)
 			++pb->clrefs;
 	} else if ((pb = kmem_cache_alloc(np_prot_cachep, SLAB_ATOMIC))) {
+		bzero(pb, sizeof(*pb));
 		pb->refs = 1;
 		pb->corefs = (type & N_CONS) ? 1 : 0;
 		pb->clrefs = (type & N_CLNS) ? 1 : 0;
 		pp = &pb->prot;
-#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
-		(void) hash;
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
-		pp->protocol = proto;
-		pp->name = "streams-ip";
+		pp->proto.protocol = proto;
+		pp->proto.name = "streams-udp";
 #endif
-		pp->handler = &np_v4_rcv;
-		pp->err_handler = &np_v4_err;
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
-		pp->copy = 0;
-		pp->next = NULL;
-#endif
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
-		pp->no_policy = 1;
-#endif
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
-		inet_add_protocol(pp);
-#else
-		inet_add_protocol(pp, proto);
-#endif
-#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO
 		pp->proto.proto = proto;
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO */
-		pp->proto.handler = &np_v4_rcv;
-		pp->proto.err_handler = &np_v4_err;
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
 		pp->proto.no_policy = 1;
-		pp->next = NULL;
-		pp->kmod = NULL;
-		spin_lock_bh(inet_proto_lockp);
-		if ((pp->next = inet_protosp[hash]) != NULL) {
-			if ((pp->kmod = module_text_address((ulong) pp->next))
-			    && pp->kmod != THIS_MODULE) {
-				if (!try_module_get(pp->kmod)) {
-					spin_unlock_bh(inet_proto_lockp);
+#endif
+		pp->proto.handler = &tp_v4_rcv;
+		pp->proto.err_handler = &tp_v4_err;
+		ppp = &inet_protosp[hash];
+
+		{
+			net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+			while (*ppp && (*ppp)->protocol != proto)
+				ppp = &(*ppp)->next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+			if (*ppp != NULL) {
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
+				/* can only override last entry */
+				if ((*ppp)->copy != 0) {
+					__ptrace(("Cannot override copy entry\n"));
+					net_protocol_unlock();
+					write_unlock_bh(&np_prot_lock);
 					kmem_cache_free(np_prot_cachep, pb);
 					return (NULL);
 				}
+#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+				if ((pp->kmod = module_text_address((ulong) *ppp))
+				    && pp->kmod != THIS_MODULE) {
+					if (!try_module_get(pp->kmod)) {
+						__ptrace(("Cannot acquire module\n"));
+						net_protocol_unlock();
+						write_unlock_bh(&np_prot_lock);
+						kmem_cache_free(np_prot_cachep, pb);
+						return (NULL);
+					}
+				}
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NEXT || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NEXT
+				pp->proto.next = (*ppp)->next;
+#endif
 			}
+			pp->next = (*ppp);
+			*ppp = &pp->proto;
+			net_protocol_unlock();
 		}
-		inet_protosp[hash] = &pp->proto;
-		spin_unlock_bh(inet_proto_lockp);
-		// synchronize_net(); /* might sleep */
-#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 		/* link into hash slot */
 		np_prots[proto] = pb;
 	}
@@ -815,14 +784,11 @@ np_init_nproto(unsigned char proto, unsigned int type)
  *
  * This is the network protocol restoration function.
  *
- * Under 2.4, simply remove the protocol from the network using the inet_protocol structure and the
- * inet_del_protocol() function, and we stop receiving packets.
- * 
- * Under 2.6, things are more complicated.
- * The module stuff here is just for ourselves (other kernel modules pulling the same trick) as
- * Linux IP protocols are normally kernel resident.  If a protocol was previously registered,
- * restore the protocol's entry and drop the reference to its owning kernel module.  If there was no
- * protocol previously registered, this reduces to the 2.6 version of inet_del_protocol().
+ * This is complicated and brittle.  The module stuff here is just for ourselves (other kernel
+ * modules pulling the same trick) as Linux IP protocols are normally kernel resident.  If a
+ * protocol was previously registered, restore the protocol's entry and drop the reference to its
+ * owning kernel module.  If there was no protocol previously registered, this reduces to
+ * inet_del_protocol().
  */
 STATIC INLINE streams_fastcall void
 np_term_nproto(unsigned char proto, unsigned int type)
@@ -836,28 +802,29 @@ np_term_nproto(unsigned char proto, unsigned int type)
 		if (type & N_CLNS)
 			--pb->clrefs;
 		if (--pb->refs == 0) {
-			struct inet_protocol *pp = &pb->prot;
+			struct ipnet_protocol *pp = &pb->prot;
+			struct mynet_protocol **ppp;
+			int hash = proto & (MAX_INET_PROTOS - 1);
 
-#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
-			inet_del_protocol(pp);
-#else
-			inet_del_protocol(pp, proto);
-#endif
-			/* unlink from hash slot */
-			np_prots[proto] = NULL;
-#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
-			spin_lock_bh(inet_proto_lockp);
-			inet_protosp[proto] = pp->next;
-			spin_unlock_bh(inet_proto_lockp);
+			ppp = &inet_protosp[hash];
+			{
+				net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+				while (*ppp && *ppp != &pp->proto)
+					ppp = &(*ppp)->next;
+				pp->next->next = pp->proto.next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+				__assert(*ppp == &pp->proto);
+				*ppp = pp->next;
+				net_protocol_unlock();
+			}
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 			/* unlink from hash slot */
 			np_prots[proto] = NULL;
-			// synchronize_net(); /* might sleep */
-#else
-#error
-#endif
+
 			kmem_cache_free(np_prot_cachep, pb);
 		}
 	}
@@ -1005,9 +972,9 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	for (i = 0; i < anum; i++)
 		np->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
 	write_unlock_bh(&hp->lock);
-#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#if defined HAVE_KFUNC_SYNCHRONIZE_NET
 	synchronize_net();	/* might sleep */
-#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+#endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
 	return (0);
 }
 
@@ -1719,9 +1686,9 @@ np_unbind(struct np *np)
 		np->bnum = np->snum = np->pnum = 0;
 		np_release(&np);
 		write_unlock_bh(&hp->lock);
-#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#if defined HAVE_KFUNC_SYNCHRONIZE_NET
 		synchronize_net();	/* might sleep */
-#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+#endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
 		return (0);
 	}
 	return (-EALREADY);
@@ -1756,7 +1723,6 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 
 	if (TOKEN_value != np) {
 		err = NBADTOKEN;
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 		/* Accepting Stream must be bound to the same protocol as connection indication. */
 		for (j = 0; j < TOKEN_value->pnum; j++)
 			if (TOKEN_value->protoids[j] == iph->protocol)
@@ -1764,23 +1730,6 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 		if (j >= TOKEN_value->pnum)
 			/* Must be bound to the same protocol. */
 			goto error;
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
-#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
-		/* Problem for 2.4: we overwrote iph->protocol with 255 to steal the packet, so we
-		   can't check it now.  Check that the accepting stream is bound to the same
-		   protocol id as the listening stream. */
-		/* Another approach for 2.4 would be to copy the sk_buff before stealing it. */
-		for (j = 0, i = 0; j < TOKEN_value->pnum; j++) {
-			for (i = 0; i < np->pnum; i++)
-				if (TOKEN_value->protoids[j] == np->protoids[i])
-					break;
-			if (TOKEN_value->protoids[j] == np->protoids[i])
-				break;
-		}
-		if (j >= TOKEN_value->pnum || i >= np->pnum)
-			/* Must be bound to the same protocol. */
-			goto error;
-#endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
 		/* Accepting Stream must be bound to the same address (or wildcard) including
 		   destination address in connection indication. */
 		for (i = 0; i < TOKEN_value->bnum; i++)
@@ -5277,16 +5226,6 @@ np_v4_rcv(struct sk_buff *skb)
 	/* we do the lookup before the checksum */
 	if ((np = np_lookup(iph, uh)) == NULL)
 		goto no_stream;
-
-	/* TODO: for 2.4 we overwrite iph->protocol to steal the packet.  This means that we loose
-	   the protocol information.  This is important if we ever allow binding to more than one
-	   protocol id (which we don't currently do).  At that point we would have to copy the
-	   sk_buff before stealing the original and free the original.  See the NBADTOKEN check in
-	   np_passive(). */
-	/* FIXME: Another trick for 2.4 would be to copy the IP header and UDP header, but esballoc 
-	   the payload.  That might be the best way to do things.  The problem is that we indicate
-	   iph->protocol on connection indications, and it will be the wrong protocol on 2.4. */
-	np_v4_steal(skb);	/* its ours */
 	if (unlikely(skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0))
 		goto linear_fail;
 	{

@@ -424,10 +424,10 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 			  struct inet_protocol.next,
 			  struct inet_protocol.copy,
 			  struct inet_protocol.no_policy,
-			  struct dst_entry.path,
 			  struct net_protocol.proto,
 			  struct net_protocol.next,
 			  struct net_protocol.no_policy,
+			  struct dst_entry.path,
 			  struct dst_entry.path], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
