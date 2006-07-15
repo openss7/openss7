@@ -4371,7 +4371,7 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > np->info.NSDU_size))
 			goto go_slow;
 	}
-	daddr = dst_buf.sin - addr.s_addr;
+	daddr = dst_buf.sin_addr.s_addr;
 	if (unlikely((err = np_senddata(np, np->qos.protocol, daddr, dp)) != QR_ABSORBED))
 		goto error;
 	return (QR_TRIMMED);
@@ -5407,7 +5407,7 @@ np_w_prim_error(queue_t *q, const int rtn)
 	case -ENOMEM:		/* could not allocate memory */
 	case -ENOBUFS:		/* could not allocate an mblk */
 	case -EOPNOTSUPP:	/* primitive not supported */
-		return ne_error_ack(q, T_UNITDATA_REQ, rtn);
+		return ne_error_ack(q, N_UNITDATA_REQ, rtn);
 	case -EPROTO:
 		return ne_error_reply(q, -EPROTO);
 	default:
@@ -5624,7 +5624,7 @@ np_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	return (result);
 }
 
-STATIC noinline streams_fastcall __unlikely struct tp *
+STATIC noinline streams_fastcall __unlikely struct np *
 np_lookup_common_slow(struct np_prot_bucket *pp, uint8_t proto, uint32_t daddr, uint16_t dport,
 		      uint32_t saddr, uint16_t sport)
 {
