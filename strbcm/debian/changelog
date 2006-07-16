@@ -1,3 +1,9 @@
+strbcm (0.9.2.1.rc3-0) experimental; urgency=low
+
+  * Third release candidate.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Sun, 16 Jul 2006 02:35:55 -0600
+
 strbcm (0.9.2.1.rc2-0) experimental; urgency=low
 
   * Second release candidate.

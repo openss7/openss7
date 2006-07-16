@@ -1,3 +1,9 @@
+2006-07-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: bumped release number for release candidate 3
+	* debian/changelog: bumped release number for release candidate 3
+	* NEWS: bumped release number for release candidate 3
+
 2006-07-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/strutil.c: take care with free_func's

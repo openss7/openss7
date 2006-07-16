@@ -12,6 +12,9 @@
 	* tests/testsuite-inet_tcp.at: full test suite
 	* tests/testsuite-inet_udp.at: full test suite
 	* tests/testsuite-inet_udp2.at: full test suite
+	* .pkgrelease: bumped release number for release candidate 3
+	* debian/changelog: bumped release number for release candidate 3
+	* NEWS: bumped release number for release candidate 3
 
 2006-07-15  Brian Bidulock  <bidulock@openss7.org>
 
