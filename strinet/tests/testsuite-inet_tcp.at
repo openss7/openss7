@@ -2663,7 +2663,6 @@ AT_CLEANUP
 
 AT_SETUP([tcp test 13.2.6.2])
 AT_KEYWORDS([errors T_BIND_REQ TOUTSTATE TS_WCON_CREQ])
-AT_XFAIL_IF([true])
 AT_CHECK([test_inet_tcp 13.2.6.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2825,7 +2824,6 @@ AT_CLEANUP
 
 AT_SETUP([tcp test 13.5.9.3])
 AT_KEYWORDS([errors T_CONN_RES TOUTSTATE TS_WCON_CREQ])
-AT_XFAIL_IF([true])
 AT_CHECK([test_inet_tcp 13.5.9.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -3044,7 +3042,6 @@ AT_CLEANUP
 
 AT_SETUP([tcp test 13.12.1.3])
 AT_KEYWORDS([errors T_ORDREL_REQ EPROTO TS_WCON_CREQ])
-AT_XFAIL_IF([true])
 AT_CHECK([test_inet_tcp 13.12.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -3121,7 +3118,6 @@ AT_CLEANUP
 
 AT_SETUP([tcp test 14.1.3])
 AT_KEYWORDS([allowedstates T_ADDR_REQ TS_WCON_CREQ])
-AT_XFAIL_IF([true])
 AT_CHECK([test_inet_tcp 14.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -3162,7 +3158,6 @@ AT_CLEANUP
 
 AT_SETUP([tcp test 14.3.3])
 AT_KEYWORDS([allowedstates T_CAPABILITY_REQ TS_WCON_CREQ])
-AT_XFAIL_IF([true])
 AT_CHECK([test_inet_tcp 14.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -3302,7 +3297,6 @@ AT_CLEANUP
 
 AT_SETUP([tcp test 14.11.3])
 AT_KEYWORDS([allowedstates T_OPTMGMT_REQ TS_WCON_CREQ])
-AT_XFAIL_IF([true])
 AT_CHECK([test_inet_tcp 14.11.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
