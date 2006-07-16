@@ -848,7 +848,8 @@ np_term_nproto(unsigned char proto, unsigned int type)
 #ifdef HAVE_OLD_STYLE_INET_PROTOCOL
 				while (*ppp && *ppp != &pp->proto)
 					ppp = &(*ppp)->next;
-				pp->next->next = pp->proto.next;
+				if (pp->next)
+					pp->next->next = pp->proto.next;
 #endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
 				__assert(*ppp == &pp->proto);
 				*ppp = pp->next;
