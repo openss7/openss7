@@ -18122,13 +18122,19 @@ sctp_v4_rcv(struct sk_buff *skb)
 	struct sctphdr *sh;
 	struct sctpchdr *ch;
 	frtn_t fr = { &sctp_free, (char *) skb };
+
 	if (skb->pkt_type != PACKET_HOST)
 		goto bad_pkt_type;
 	SCTP_INC_STATS_BH(SctpInSCTPPacks);
 	/* For now...  We should actually place non-linear fragments into seperate mblks and pass
 	   them up as a chain. */
+#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
 		goto linear_fail;
+#else				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
+	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
+		goto linear_fail;
+#endif				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 	/* pull up the ip header */
 	__skb_pull(skb, skb->h.raw - skb->data);
 	sh = (struct sctphdr *) skb->h.raw;

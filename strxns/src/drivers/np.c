@@ -2655,8 +2655,13 @@ np_ip_v4_rcv(struct sk_buff *skb)
 	np_ip_v4_steal(skb);	/* its ours now */
 	if (unlikely(np->rq == NULL || !canput(np->rq)))
 		goto flow_controlled;
+#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
+	if (skb_is_nonlinear(skb) && unlikely(skb_linearize(skb) != 0))
+		goto linear_fail;
+#else				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 	if (skb_is_nonlinear(skb) && unlikely(skb_linearize(skb, GFP_ATOMIC) != 0))
 		goto linear_fail;
+#endif				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 	{
 		mblk_t *mp, *dp;
 		size_t mlen = skb->len + (skb->data - skb->nh.raw);
@@ -2699,7 +2704,8 @@ np_ip_v4_rcv(struct sk_buff *skb)
 			sin->sin_port = uh->source;
 			sin->sin_addr.s_addr = iph->saddr;
 			mp->b_wptr += sizeof(*sin);
-			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_UNITDATA_IND"); */
+			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<-
+			   N_UNITDATA_IND"); */
 		} else {
 			N_data_ind_t *p;
 
@@ -2719,7 +2725,8 @@ np_ip_v4_rcv(struct sk_buff *skb)
 			p->PRIM_type = N_DATA_IND;
 			p->DATA_xfer_flags = 0;
 			mp->b_wptr += sizeof(*p);
-			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_DATA_IND"); */
+			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<-
+			   N_DATA_IND"); */
 		}
 		mp->b_cont = dp;
 		put(np->rq, mp);

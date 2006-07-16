@@ -337,8 +337,12 @@ sctp_rcv(struct sk_buff *skb)
 		/* 
 		   For now...  We should actually place non-linear fragments into seperate mblks
 		   and pass them up as a chain. */
-		if (!skb_is_nonlinear(skb)
-		    || skb_linearize(skb, GFP_ATOMIC) == 0) {
+#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
+		if (!skb_is_nonlinear(skb) || skb_linearize(skb) == 0)
+#else			/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
+		if (!skb_is_nonlinear(skb) || skb_linearize(skb, GFP_ATOMIC) == 0)
+#endif			/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
+		{
 			/* 
 			   pull up the ip header */
 			__skb_pull(skb, skb->h.raw - skb->data);
