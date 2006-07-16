@@ -204,6 +204,11 @@ XNS
 .]
 as described in
 .BR xti_ip (3).
+.PP
+.B RAWIP2
+provides one connectionless or pseudo-connection-oriented TPI Stream type.  To select the Stream,
+.I raw_device
+can be one of the following:
 .TP
 .IR /dev/rawip2 ", " /dev/streams/rawip .
 The same as above, but accesses the second generation

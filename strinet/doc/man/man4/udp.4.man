@@ -190,6 +190,12 @@ XNS
 .]
 as described in
 .BR xti_udp (3).
+.PP
+.B UDP2
+provides one connectionless or pseudo-connection-oriented TPI Stream type.  To
+select the Stream,
+.I udp_device
+can be one of the following:
 .TP
 .IR /dev/udp2 ", " /dev/streams/udp .
 The same as above, but accesses the second generation
