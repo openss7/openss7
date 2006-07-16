@@ -38695,27 +38695,27 @@ struct test_case {
 		numb_case_3_6, tgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, {
 	&test_3_6_conn, &test_3_6_resp, &test_3_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_1_1, tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, sref_case_4_1_1, {
-	&test_4_1_1_conn, &test_4_1_1_resp, &test_4_1_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_1_1_conn, &test_4_1_1_resp, &test_4_1_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_1_2, tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, sref_case_4_1_2, {
-	&test_4_1_2_conn, &test_4_1_2_resp, &test_4_1_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_1_2_conn, &test_4_1_2_resp, &test_4_1_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_1_3, tgrp_case_4_1_3, name_case_4_1_3, desc_case_4_1_3, sref_case_4_1_3, {
-	&test_4_1_3_conn, &test_4_1_3_resp, &test_4_1_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_1_3_conn, &test_4_1_3_resp, &test_4_1_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_1_4, tgrp_case_4_1_4, name_case_4_1_4, desc_case_4_1_4, sref_case_4_1_4, {
-	&test_4_1_4_conn, &test_4_1_4_resp, &test_4_1_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_1_4_conn, &test_4_1_4_resp, &test_4_1_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_1_5, tgrp_case_4_1_5, name_case_4_1_5, desc_case_4_1_5, sref_case_4_1_5, {
-	&test_4_1_5_conn, &test_4_1_5_resp, &test_4_1_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_1_5_conn, &test_4_1_5_resp, &test_4_1_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_1_6, tgrp_case_4_1_6, name_case_4_1_6, desc_case_4_1_6, sref_case_4_1_6, {
-	&test_4_1_6_conn, &test_4_1_6_resp, &test_4_1_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_1_6_conn, &test_4_1_6_resp, &test_4_1_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_1_7, tgrp_case_4_1_7, name_case_4_1_7, desc_case_4_1_7, sref_case_4_1_7, {
-	&test_4_1_7_conn, &test_4_1_7_resp, &test_4_1_7_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_1_7_conn, &test_4_1_7_resp, &test_4_1_7_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_1_8, tgrp_case_4_1_8, name_case_4_1_8, desc_case_4_1_8, sref_case_4_1_8, {
-	&test_4_1_8_conn, &test_4_1_8_resp, &test_4_1_8_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_1_8_conn, &test_4_1_8_resp, &test_4_1_8_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_1_9, tgrp_case_4_1_9, name_case_4_1_9, desc_case_4_1_9, sref_case_4_1_9, {
-	&test_4_1_9_conn, &test_4_1_9_resp, &test_4_1_9_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_1_9_conn, &test_4_1_9_resp, &test_4_1_9_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_2_1, tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, sref_case_4_2_1, {
-	&test_4_2_1_conn, &test_4_2_1_resp, &test_4_2_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_2_1_conn, &test_4_2_1_resp, &test_4_2_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_2_2, tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, sref_case_4_2_2, {
-	&test_4_2_2_conn, &test_4_2_2_resp, &test_4_2_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOAPPL}, {
+	&test_4_2_2_conn, &test_4_2_2_resp, &test_4_2_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_3_1_1, tgrp_case_4_3_1_1, name_case_4_3_1_1, desc_case_4_3_1_1, sref_case_4_3_1_1, {
 	&test_4_3_1_1_conn, &test_4_3_1_1_resp, &test_4_3_1_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_4_3_1_2, tgrp_case_4_3_1_2, name_case_4_3_1_2, desc_case_4_3_1_2, sref_case_4_3_1_2, {
