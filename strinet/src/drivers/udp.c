@@ -3888,15 +3888,21 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 			break;
 	}
 	if (tp2 != NULL) {
-		write_unlock_bh(&hp->lock);
-		if (num == 0)
+		if (num == 0) {
 			/* specific port number requested */
-			return (TADDRBUSY);
-		if (++num > tp_last_port)
-			num = tp_frst_port;
-		if (num != tp_prev_port)
-			goto try_again;
-		return (TNOADDR);
+			if (tp2->options.ip.reuseaddr != T_YES || tp->options.ip.reuseaddr != T_YES) {
+				write_unlock_bh(&hp->lock);
+				return (TADDRBUSY);
+			}
+			/* fall through and bind */
+		} else {
+			write_unlock_bh(&hp->lock);
+			if (++num > tp_last_port)
+				num = tp_frst_port;
+			if (num != tp_prev_port)
+				goto try_again;
+			return (TNOADDR);
+		}
 	}
 	if ((err = tp_bind_prot(proto, tp->info.SERV_type))) {
 		write_unlock_bh(&hp->lock);
@@ -6626,15 +6632,21 @@ te_bind_req(queue_t *q, mblk_t *mp)
 	}
 	for (i = 0; i < anum; i++) {
 		err = TBADADDR;
-		/* wildcard addresses cannot be mixed with other addresses */
-		if (ADDR_buffer[i].sin_addr.s_addr == INADDR_ANY && anum > 1)
-			goto error;
-		type = inet_addr_type(ADDR_buffer[i].sin_addr.s_addr);
-		err = TNOADDR;
-		if (sysctl_ip_nonlocal_bind == 0
-		    && ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY
-		    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
-			goto error;
+		if (ADDR_buffer[i].sin_addr.s_addr == INADDR_ANY) {
+			/* wildcard addresses cannot be mixed with other addresses */
+			if (anum > 1)
+				goto error;
+		} else {
+			type = inet_addr_type(ADDR_buffer[i].sin_addr.s_addr);
+			err = TNOADDR;
+			if (sysctl_ip_nonlocal_bind == 0
+			    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
+				goto error;
+			err = TACCES;
+			if ((type == RTN_BROADCAST || type == RTN_MULTICAST)
+			    && tp->options.ip.broadcast != T_YES)
+				goto error;
+		}
 	}
 	tp->bport = ntohs(ADDR_buffer[0].sin_port);
 	/* check for bind to privileged port */

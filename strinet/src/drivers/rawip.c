@@ -3829,8 +3829,11 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 			break;
 	}
 	if (tp2 != NULL) {
-		write_unlock_bh(&hp->lock);
-		return (TADDRBUSY);
+		if (tp2->options.ip.reuseaddr != T_YES || tp->options.ip.reuseaddr != T_YES) {
+			write_unlock_bh(&hp->lock);
+			return (TADDRBUSY);
+		}
+		/* fall through and bind */
 	}
 	if ((err = tp_bind_prot(proto, tp->info.SERV_type))) {
 		write_unlock_bh(&hp->lock);
@@ -6533,17 +6536,25 @@ te_bind_req(queue_t *q, mblk_t *mp)
 	}
 	for (i = 0; i < anum; i++) {
 		err = TBADADDR;
-		/* wildcard addresses not allowed for RAWIP driver */
-		if (ADDR_buffer[i].sin_addr.s_addr == INADDR_ANY)
-			goto error;
-		type = inet_addr_type(ADDR_buffer[i].sin_addr.s_addr);
-		err = TNOADDR;
-		if (sysctl_ip_nonlocal_bind == 0
-		    && ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY
-		    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
-			goto error;
+		if (ADDR_buffer[i].sin_addr.s_addr == INADDR_ANY) {
+			/* wildcard addresses cannot be mixed with other addresses */
+			if (anum > 1)
+				goto error;
+		} else {
+			type = inet_addr_type(ADDR_buffer[i].sin_addr.s_addr);
+			err = TNOADDR;
+			if (sysctl_ip_nonlocal_bind == 0
+			    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
+				goto error;
+			err = TACCES;
+			if ((type == RTN_BROADCAST || type == RTN_MULTICAST)
+			    && tp->options.ip.broadcast != T_YES)
+				goto error;
+		}
 	}
-	tp->options.ip.protocol = ntohs(ADDR_buffer[0].sin_port);
+	err = TNOADDR;
+	if ((tp->options.ip.protocol = ntohs(ADDR_buffer[0].sin_port)) == 0)
+		goto error;
 	/* check for bind to privileged protocol */
 	err = TACCES;
 	if (tp->options.ip.protocol && tp->options.ip.protocol < 255
