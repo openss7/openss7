@@ -624,6 +624,21 @@ dnl *** Configure cannot determine whether your __ip_select_ident function takes
 dnl *** 2 arguments or whether it takes 3 arguments.
 dnl *** ])
 dnl 	fi
+	AC_CACHE_CHECK([for kernel skb_linearize with 1 argument], [linux_cv_have_skb_linearize_1_arg], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/skbuff.h>]],
+		[[int (*my_autoconf_function_pointer)(struct sk_buff *) = &skb_linearize;]]) ],
+		[linux_cv_have_skb_linearize_1_arg='yes'],
+		[linux_cv_have_skb_linearize_1_arg='no'])
+	])
+	if test :$linux_cv_have_skb_linearize_1_arg = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_SKB_LINEARIZE_1_ARG], [1], [Define if
+		       function skb_linearize takes 1 argument.])
+	fi
     ])
     _LINUX_KERNEL_SYMBOLS([inet_proto_lock, inet_protos])
     if test :"${with_sctp:-no}" = :yes -o :"${with_sctp2:-no}" = :yes ; then
