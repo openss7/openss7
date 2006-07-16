@@ -4479,13 +4479,12 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 
 	hp = hp1;
 	do {
-		struct tp *tp2;
-		t_uscalar_t state;
+		register struct tp *tp2;
 
 		for (tp2 = hp->list; tp2; tp2 = tp2->cnext) {
 			int i, j;
 
-			if ((state = tp_get_state(tp2)) != TS_DATA_XFER && state != TS_WIND_ORDREL)
+			if (tp_not_state(tp2, (TSF_DATA_XFER | TSF_WIND_ORDREL)))
 				continue;
 			if (tp2->sport != sport)
 				continue;
@@ -6592,7 +6591,7 @@ te_bind_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	t_uscalar_t ADDR_length;
-	int type;
+	int type, i;
 	const struct T_bind_req *p;
 	struct sockaddr_in ADDR_buffer[8] = { {AF_INET,}, };
 	size_t anum = 0;
@@ -6624,16 +6623,22 @@ te_bind_req(queue_t *q, mblk_t *mp)
 			     && ADDR_buffer[0].sin_family != 0))
 			goto error;
 	}
-	type = inet_addr_type(ADDR_buffer[0].sin_addr.s_addr);
-	err = TNOADDR;
-	if (sysctl_ip_nonlocal_bind == 0 && ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY
-	    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
-		goto error;
+	for (i = 0; i < anum; i++) {
+		err = TBADADDR;
+		/* wildcard addresses cannot be mixed with other addresses */
+		if (ADDR_buffer[i].sin_addr.s_addr == INADDR_ANY && anum > 1)
+			goto error;
+		type = inet_addr_type(ADDR_buffer[i].sin_addr.s_addr);
+		err = TNOADDR;
+		if (sysctl_ip_nonlocal_bind == 0
+		    && ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY
+		    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
+			goto error;
+	}
 	tp->bport = ntohs(ADDR_buffer[0].sin_port);
 	/* check for bind to privileged port */
 	err = TACCES;
-	if (tp->bport && tp->bport < PROT_SOCK
-	    && !capable(CAP_NET_BIND_SERVICE))
+	if (tp->bport && tp->bport < PROT_SOCK && !capable(CAP_NET_BIND_SERVICE))
 		goto error;
 	if (unlikely((err = te_bind_ack(q, ADDR_buffer, ADDR_length, p->CONIND_number)) != 0))
 		goto error;

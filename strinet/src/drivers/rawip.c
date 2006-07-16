@@ -307,8 +307,8 @@ STATIC struct module_info raw_minfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 15),		/* Hi water mark */
-	.mi_lowat = (1 << 10),		/* Lo water mark */
+	.mi_hiwat = (1 << 18),		/* Hi water mark */
+	.mi_lowat = (1 << 17),		/* Lo water mark */
 };
 
 STATIC struct module_stat raw_mstat = {
@@ -6498,7 +6498,7 @@ te_bind_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	t_uscalar_t ADDR_length;
-	int type;
+	int type, i;
 	const struct T_bind_req *p;
 	struct sockaddr_in ADDR_buffer[8] = { {AF_INET,}, };
 	size_t anum = 0;
@@ -6516,8 +6516,8 @@ te_bind_req(queue_t *q, mblk_t *mp)
 	err = TBADADDR;
 	if (unlikely(mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length))
 		goto error;
-	err = TNOADDR;
-	if (unlikely((ADDR_length = p->ADDR_length) == 0)) {
+	if ((ADDR_length = p->ADDR_length) == 0) {
+		err = TNOADDR;
 		goto error;
 	} else {
 		err = TBADADDR;
@@ -6530,11 +6530,18 @@ te_bind_req(queue_t *q, mblk_t *mp)
 			     && ADDR_buffer[0].sin_family != 0))
 			goto error;
 	}
-	type = inet_addr_type(ADDR_buffer[0].sin_addr.s_addr);
-	err = TNOADDR;
-	if (sysctl_ip_nonlocal_bind == 0 && ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY
-	    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
-		goto error;
+	for (i = 0; i < anum; i++) {
+		err = TBADADDR;
+		/* wildcard addresses not allowed for RAWIP driver */
+		if (ADDR_buffer[i].sin_addr.s_addr == INADDR_ANY)
+			goto error;
+		type = inet_addr_type(ADDR_buffer[i].sin_addr.s_addr);
+		err = TNOADDR;
+		if (sysctl_ip_nonlocal_bind == 0
+		    && ADDR_buffer[0].sin_addr.s_addr != INADDR_ANY
+		    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
+			goto error;
+	}
 	tp->options.ip.protocol = ntohs(ADDR_buffer[0].sin_port);
 	/* check for bind to privileged protocol */
 	err = TACCES;
@@ -7123,7 +7130,7 @@ te_write_req(queue_t *q, mblk_t *mp)
  * multihomed hosts.  We use T_OPTMGMT_REQ to change the primary destination address, source address
  * and options.
  */
-STATIC noinline streams_fastcall __hot_put int
+STATIC noinline streams_fastcall int
 te_data_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
