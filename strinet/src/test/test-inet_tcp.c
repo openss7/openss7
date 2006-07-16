@@ -1307,6 +1307,175 @@ terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 	}
 }
 
+#define ICMP_ECHOREPLY		0	/* Echo Reply			*/
+#define ICMP_DEST_UNREACH	3	/* Destination Unreachable	*/
+#define ICMP_SOURCE_QUENCH	4	/* Source Quench		*/
+#define ICMP_REDIRECT		5	/* Redirect (change route)	*/
+#define ICMP_ECHO		8	/* Echo Request			*/
+#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded		*/
+#define ICMP_PARAMETERPROB	12	/* Parameter Problem		*/
+#define ICMP_TIMESTAMP		13	/* Timestamp Request		*/
+#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply		*/
+#define ICMP_INFO_REQUEST	15	/* Information Request		*/
+#define ICMP_INFO_REPLY		16	/* Information Reply		*/
+#define ICMP_ADDRESS		17	/* Address Mask Request		*/
+#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply		*/
+#define NR_ICMP_TYPES		18
+
+/* Codes for UNREACH. */
+#define ICMP_NET_UNREACH	0	/* Network Unreachable		*/
+#define ICMP_HOST_UNREACH	1	/* Host Unreachable		*/
+#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable		*/
+#define ICMP_PORT_UNREACH	3	/* Port Unreachable		*/
+#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set	*/
+#define ICMP_SR_FAILED		5	/* Source Route failed		*/
+#define ICMP_NET_UNKNOWN	6
+#define ICMP_HOST_UNKNOWN	7
+#define ICMP_HOST_ISOLATED	8
+#define ICMP_NET_ANO		9
+#define ICMP_HOST_ANO		10
+#define ICMP_NET_UNR_TOS	11
+#define ICMP_HOST_UNR_TOS	12
+#define ICMP_PKT_FILTERED	13	/* Packet filtered */
+#define ICMP_PREC_VIOLATION	14	/* Precedence violation */
+#define ICMP_PREC_CUTOFF	15	/* Precedence cut off */
+#define NR_ICMP_UNREACH		15	/* instead of hardcoding immediate value */
+
+/* Codes for REDIRECT. */
+#define ICMP_REDIR_NET		0	/* Redirect Net			*/
+#define ICMP_REDIR_HOST		1	/* Redirect Host		*/
+#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS		*/
+#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS	*/
+
+/* Codes for TIME_EXCEEDED. */
+#define ICMP_EXC_TTL		0	/* TTL count exceeded		*/
+#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded	*/
+
+char *
+etype_string(t_uscalar_t etype)
+{
+	switch (etype) {
+	case TBADADDR:
+		return ("[TBADADDR]");
+	case TBADOPT:
+		return ("[TBADOPT]");
+	case TACCES:
+		return ("[TACCES]");
+	case TBADF:
+		return ("[TBADF]");
+	case TNOADDR:
+		return ("[TNOADDR]");
+	case TOUTSTATE:
+		return ("[TOUTSTATE]");
+	case TBADSEQ:
+		return ("[TBADSEQ]");
+	case TSYSERR:
+		return ("[TSYSERR]");
+	case TLOOK:
+		return ("[TLOOK]");
+	case TBADDATA:
+		return ("[TBADDATA]");
+	case TBUFOVFLW:
+		return ("[TBUFOVFLW]");
+	case TFLOW:
+		return ("[TFLOW]");
+	case TNODATA:
+		return ("[TNODATA]");
+	case TNODIS:
+		return ("[TNODIS]");
+	case TNOUDERR:
+		return ("[TNOUDERR]");
+	case TBADFLAG:
+		return ("[TBADFLAG]");
+	case TNOREL:
+		return ("[TNOREL]");
+	case TNOTSUPPORT:
+		return ("[TNOTSUPPORT]");
+	case TSTATECHNG:
+		return ("[TSTATECHNG]");
+	case TNOSTRUCTYPE:
+		return ("[TNOSTRUCTYPE]");
+	case TBADNAME:
+		return ("[TBADNAME]");
+	case TBADQLEN:
+		return ("[TBADQLEN]");
+	case TADDRBUSY:
+		return ("[TADDRBUSY]");
+	case TINDOUT:
+		return ("[TINDOUT]");
+	case TPROVMISMATCH:
+		return ("[TPROVMISMATCH]");
+	case TRESQLEN:
+		return ("[TRESQLEN]");
+	case TRESADDR:
+		return ("[TRESADDR]");
+	case TQFULL:
+		return ("[TQFULL]");
+	case TPROTO:
+		return ("[TPROTO]");
+	default:
+	{
+		unsigned char code = ((etype >> 0) & 0x00ff);
+		unsigned char type = ((etype >> 8) & 0x00ff);
+
+		switch (type) {
+		case ICMP_DEST_UNREACH:
+			switch (code) {
+			case ICMP_NET_UNREACH:
+				return ("<ICMP_NET_UNREACH>");
+			case ICMP_HOST_UNREACH:
+				return ("<ICMP_HOST_UNREACH>");
+			case ICMP_PROT_UNREACH:
+				return ("<ICMP_PROT_UNREACH>");
+			case ICMP_PORT_UNREACH:
+				return ("<ICMP_PORT_UNREACH>");
+			case ICMP_FRAG_NEEDED:
+				return ("<ICMP_FRAG_NEEDED>");
+			case ICMP_NET_UNKNOWN:
+				return ("<ICMP_NET_UNKNOWN>");
+			case ICMP_HOST_UNKNOWN:
+				return ("<ICMP_HOST_UNKNOWN>");
+			case ICMP_HOST_ISOLATED:
+				return ("<ICMP_HOST_ISOLATED>");
+			case ICMP_NET_ANO:
+				return ("<ICMP_NET_ANO>");
+			case ICMP_HOST_ANO:
+				return ("<ICMP_HOST_ANO>");
+			case ICMP_PKT_FILTERED:
+				return ("<ICMP_PKT_FILTERED>");
+			case ICMP_PREC_VIOLATION:
+				return ("<ICMP_PREC_VIOLATION>");
+			case ICMP_PREC_CUTOFF:
+				return ("<ICMP_PREC_CUTOFF>");
+			case ICMP_SR_FAILED:
+				return ("<ICMP_SR_FAILED>");
+			case ICMP_NET_UNR_TOS:
+				return ("<ICMP_NET_UNR_TOS>");
+			case ICMP_HOST_UNR_TOS:
+				return ("<ICMP_HOST_UNR_TOS>");
+			default:
+				return ("<ICMP_DEST_UNREACH?>");
+			}
+		case ICMP_SOURCE_QUENCH:
+			return ("<ICMP_SOURCE_QUENCH>");
+		case ICMP_TIME_EXCEEDED:
+			switch (code) {
+			case ICMP_EXC_TTL:
+				return ("<ICMP_EXC_TTL>");
+			case ICMP_EXC_FRAGTIME:
+				return ("<ICMP_EXC_FRAGTIME>");
+			default:
+				return ("<ICMP_TIME_EXCEEDED?>");
+			}
+		case ICMP_PARAMETERPROB:
+			return ("<ICMP_PARAMETERPROB>");
+		default:
+			return ("<ICMP_???? >");
+		}
+	}
+	}
+}
+
 const char *
 event_string(int event)
 {
@@ -3636,7 +3805,10 @@ do_signal(int child, int action)
 		p->conn_ind.OPT_length = 0;
 		p->conn_ind.OPT_offset = 0;
 		p->conn_ind.SEQ_number = last_sequence;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Connection indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3671,7 +3843,10 @@ do_signal(int child, int action)
 		p->conn_con.RES_offset = 0;
 		p->conn_con.OPT_length = 0;
 		p->conn_con.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Connection confirmation test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3694,7 +3869,10 @@ do_signal(int child, int action)
 		p->discon_ind.PRIM_type = T_DISCON_IND;
 		p->discon_ind.DISCON_reason = 0;
 		p->discon_ind.SEQ_number = last_sequence;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Disconnection indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3715,7 +3893,10 @@ do_signal(int child, int action)
 		ctrl->len = sizeof(p->data_ind);
 		p->data_ind.PRIM_type = T_DATA_IND;
 		p->data_ind.MORE_flag = MORE_flag;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Normal test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3736,7 +3917,10 @@ do_signal(int child, int action)
 		ctrl->len = sizeof(p->exdata_ind);
 		p->data_ind.PRIM_type = T_EXDATA_IND;
 		p->data_ind.MORE_flag = MORE_flag;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Expedited test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		print_tx_prim(child, prim_string(p->type));
@@ -3853,7 +4037,10 @@ do_signal(int child, int action)
 		p->unitdata_ind.SRC_offset = 0;
 		p->unitdata_ind.OPT_length = 0;
 		p->unitdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Unit test data indication.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3913,7 +4100,10 @@ do_signal(int child, int action)
 	case __TEST_ORDREL_IND:
 		ctrl->len = sizeof(p->ordrel_ind);
 		p->ordrel_ind.PRIM_type = T_ORDREL_IND;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Orderly release indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3952,7 +4142,10 @@ do_signal(int child, int action)
 		p->optdata_ind.DATA_flag = 0;
 		p->optdata_ind.OPT_length = 0;
 		p->optdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Option data indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
@@ -3967,7 +4160,10 @@ do_signal(int child, int action)
 		p->optdata_ind.DATA_flag = T_ODF_EX;
 		p->optdata_ind.OPT_length = 0;
 		p->optdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Option data indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
@@ -4420,6 +4616,9 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 		case T_UDERROR_IND:
 			event = __TEST_UDERROR_IND;
 			print_rx_prim(child, prim_string(p->type));
+			print_string(child, addr_string(cbuf + p->uderror_ind.DEST_offset, p->uderror_ind.DEST_length));
+			print_options(child, cbuf, p->uderror_ind.OPT_offset, p->uderror_ind.OPT_length);
+			print_string(child, etype_string(p->uderror_ind.ERROR_type));
 			break;
 		case T_OPTMGMT_ACK:
 			event = __TEST_OPTMGMT_ACK;
