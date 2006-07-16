@@ -15,6 +15,10 @@
 	* .pkgrelease: bumped release number for release candidate 3
 	* debian/changelog: bumped release number for release candidate 3
 	* NEWS: bumped release number for release candidate 3
+	* acinclude.m4: handle skb_linearize with one arg on recent kernels
+	* src/drivers/ldl.c: handle skb_linearize with one arg on recent kernels
+	* src/drivers/np.c: handle skb_linearize with one arg on recent kernels
+	* src/drivers/np_ip.c: handle skb_linearize with one arg on recent kernels
 
 2006-07-15  Brian Bidulock  <bidulock@openss7.org>
 

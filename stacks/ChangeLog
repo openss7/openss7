@@ -3,6 +3,8 @@
 	* .pkgrelease: bumped release number for release candidate 3
 	* debian/changelog: bumped release number for release candidate 3
 	* NEWS: bumped release number for release candidate 3
+	* src/modules/sctp/sctp2.c: handle skb_linearize with one arg on recent kernels
+	* src/modules/sctp/sctp_input.c: handle skb_linearize with one arg on recent kernels
 
 2006-07-15  Brian Bidulock  <bidulock@openss7.org>
 

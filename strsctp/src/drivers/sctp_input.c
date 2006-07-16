@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/15 13:06:25 $
+ @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/16 12:46:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/15 13:06:25 $ by $Author: brian $
+ Last Modified $Date: 2006/07/16 12:46:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/15 13:06:25 $"
+#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/16 12:46:49 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/15 13:06:25 $";
+    "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/16 12:46:49 $";
 
 #define __NO_VERSION__
 

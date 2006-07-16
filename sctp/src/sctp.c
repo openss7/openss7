@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/29 11:27:52 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/07/16 12:46:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/29 11:27:52 $ by $Author: brian $
+ Last Modified $Date: 2006/07/16 12:46:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/29 11:27:52 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/07/16 12:46:24 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/29 11:27:52 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/07/16 12:46:24 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -158,9 +158,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.33 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.34 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/29 11:27:52 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/07/16 12:46:24 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

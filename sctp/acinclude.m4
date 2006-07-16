@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/05/08 03:12:25 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/07/16 12:46:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:12:25 $ by $Author: brian $
+# Last Modified $Date: 2006/07/16 12:46:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -319,6 +319,21 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 	if test :$linux_cv_have_sk_filter_3_args = :yes ; then
 	    AC_DEFINE([HAVE_SK_FILTER_3_ARGS], [1], [Define if function sk_filter takes 3
 	    arguments.])
+	fi
+	AC_CACHE_CHECK([for kernel skb_linearize with 1 argument], [linux_cv_have_skb_linearize_1_arg], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/skbuff.h>]],
+		[[int (*my_autoconf_function_pointer)(struct sk_buff *) = &skb_linearize;]]) ],
+		[linux_cv_have_skb_linearize_1_arg='yes'],
+		[linux_cv_have_skb_linearize_1_arg='no'])
+	])
+	if test :$linux_cv_have_skb_linearize_1_arg = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_SKB_LINEARIZE_1_ARG], [1], [Define if
+		       function skb_linearize takes 1 argument.])
 	fi
     ])
     _LINUX_CHECK_HEADERS([net/xfrm.h net/dst.h], [], [], [

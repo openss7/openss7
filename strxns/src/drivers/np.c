@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/15 13:06:29 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/16 12:46:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/15 13:06:29 $ by $Author: brian $
+ Last Modified $Date: 2006/07/16 12:46:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 0.9.2.8  2006/07/16 12:46:52  brian
+ - handle skb_linearize with 1 arg on recent kernels
+
  Revision 0.9.2.7  2006/07/15 13:06:29  brian
  - rationalized np_ip.c and rawip.c to upd.c drivers
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/15 13:06:29 $"
+#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/16 12:46:52 $"
 
 static char const ident[] =
-    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/15 13:06:29 $";
+    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/16 12:46:52 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -115,7 +118,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2006/07/15 13:06:29 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2006/07/16 12:46:52 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
