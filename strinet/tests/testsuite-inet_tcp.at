@@ -3234,11 +3234,13 @@ AT_CLEANUP
 
 AT_SETUP([tcp test 14.8.1])
 AT_KEYWORDS([allowedstates T_EXDATA_REQ TS_DATA_XFER])
+AT_XFAIL_IF([true])
 AT_CHECK([test_inet_tcp 14.8.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([tcp test 14.8.2])
 AT_KEYWORDS([allowedstates T_EXDATA_REQ TS_WREQ_ORDREL])
+AT_XFAIL_IF([true])
 AT_CHECK([test_inet_tcp 14.8.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
