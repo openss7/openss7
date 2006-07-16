@@ -450,7 +450,7 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 #define ip_default_options		{ 0, }
 #define ip_default_tos			0
 #define ip_default_ttl			64
-#define ip_default_reuseaddr		T_NO
+#define ip_default_reuseaddr		T_YES
 #define ip_default_dontroute		T_NO
 #define ip_default_broadcast		T_NO
 #define ip_default_addr			INADDR_ANY
