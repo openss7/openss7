@@ -1,3 +1,18 @@
+2006-07-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/rawip.4.man: minor documentation updates
+	* doc/man/man4/udp.4.man: minor documentation updates
+	* src/drivers/rawip.c: fixed noxious 2.4 bug, test suite corrections
+	* src/drivers/udp.c: fixed noxious 2.4 bug, test suite corrections
+	* src/test/test-inet_raw.c: all test cases
+	* src/test/test-inet_tcp.c: all test cases
+	* src/test/test-inet_udp.c: all test cases
+	* tests/testsuite-inet_raw.at: full test suite
+	* tests/testsuite-inet_raw2.at: full test suite
+	* tests/testsuite-inet_tcp.at: full test suite
+	* tests/testsuite-inet_udp.at: full test suite
+	* tests/testsuite-inet_udp2.at: full test suite
+
 2006-07-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: added symbols for new inet protocol hooks

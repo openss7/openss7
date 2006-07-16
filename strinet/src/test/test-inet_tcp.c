@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/07/08 07:26:06 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/16 08:19:07 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/08 07:26:06 $ by $Author: brian $
+ Last Modified $Date: 2006/07/16 08:19:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.44  2006/07/16 08:19:07  brian
+ - noxious 2.4 bug fixed, test suite corrections
+
  Revision 0.9.2.43  2006/07/08 07:26:06  brian
  - removed trigraphs
 
@@ -226,9 +229,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/07/08 07:26:06 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/16 08:19:07 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/07/08 07:26:06 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/16 08:19:07 $";
 
 /*
  *  Simple test program for INET streams.

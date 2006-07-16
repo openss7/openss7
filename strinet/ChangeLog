@@ -1,3 +1,7 @@
+2006-07-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: fixed noxious 2.4 bug, test suite corrections
+
 2006-07-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: added symbols for new inet protocol hooks

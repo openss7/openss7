@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/15 13:06:10 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/16 08:18:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/15 13:06:10 $ by $Author: brian $
+ Last Modified $Date: 2006/07/16 08:18:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.45  2006/07/16 08:18:56  brian
+ - noxious 2.4 bug fixed, test suite corrections
+
  Revision 0.9.2.44  2006/07/15 13:06:10  brian
  - rationalized np_ip.c and rawip.c to upd.c drivers
 
@@ -185,10 +188,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/15 13:06:10 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/16 08:18:56 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/15 13:06:10 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/16 08:18:56 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -267,7 +270,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/15 13:06:10 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/16 08:18:56 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"

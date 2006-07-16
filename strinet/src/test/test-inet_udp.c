@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/07/13 08:08:08 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/16 08:19:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/13 08:08:08 $ by $Author: brian $
+ Last Modified $Date: 2006/07/16 08:19:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.44  2006/07/16 08:19:16  brian
+ - noxious 2.4 bug fixed, test suite corrections
+
  Revision 0.9.2.43  2006/07/13 08:08:08  brian
  - added sk_buff data buffer allocation mechanism for stream head
 
@@ -227,9 +230,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/07/13 08:08:08 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/16 08:19:16 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/07/13 08:08:08 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/16 08:19:16 $";
 
 /*
  *  Simple test program for INET streams.
