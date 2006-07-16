@@ -2629,10 +2629,17 @@ rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 		kfree_skb(skb);
 		if (b == NULL)
 			return 0;
+#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
+		if (skb_linearize(b)) {
+			kfree_skb(b);
+			return 0;
+		}
+#else				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 		if (skb_linearize(b, GFP_ATOMIC)) {
 			kfree_skb(b);
 			return 0;
 		}
+#endif				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 		skb = b;
 	}
 #if 1

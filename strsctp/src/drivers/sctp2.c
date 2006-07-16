@@ -27290,8 +27290,13 @@ sctp_v4_rcv(struct sk_buff *skb)
 	/* For now...  We should actually place non-linear fragments into seperate mblks and pass
 	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
 	   netfilter hooks linearize anyway. */
+#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
+	if (skb_is_nonlinear(skb) && skb_linearize(skb) != 0)
+		goto linear_fail;
+#else				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
 		goto linear_fail;
+#endif				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 	/* pull up the ip header */
 	sh = SCTP_SKB_SH(skb);
 	/* sanity check length and first chunk header */

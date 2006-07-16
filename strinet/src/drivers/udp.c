@@ -8335,8 +8335,13 @@ tp_v4_rcv(struct sk_buff *skb)
 	/* For now... We should actually place non-linear fragments into separate mblks and pass
 	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
 	   netfilter hooks linearize anyway. */
+#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
+	if (unlikely(skb_is_nonlinear(skb) && skb_linearize(skb) != 0))
+		goto linear_fail;
+#else				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 	if (unlikely(skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0))
 		goto linear_fail;
+#endif				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 #else
 	if (unlikely(skb_is_nonlinear(skb))) {
 		_ptrace(("Non-linear sk_buff encountered!\n"));
