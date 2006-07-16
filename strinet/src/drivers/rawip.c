@@ -3794,7 +3794,7 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 {
 	struct tp_bhash_bucket *hp;
 	unsigned short bport = 0;
-	unsigned char proto = ADDR_buffer[0].sin_port;
+	unsigned char proto = ntohs(ADDR_buffer[0].sin_port);
 	size_t anum = ADDR_length / sizeof(*ADDR_buffer);
 	struct tp *tp2;
 	int i, j, err;
