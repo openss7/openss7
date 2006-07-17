@@ -4253,8 +4253,8 @@ runqueues(void)
 #endif
 	leave_streams();	/* go back to user context */
 #if defined HAVE_KINC_LINUX_KTHREAD_H
-	preempt_enable();
-	cond_resched();
+	/* going to sleep or exit system call anyway */
+	preempt_enable_no_resched();
 #endif
 }
 

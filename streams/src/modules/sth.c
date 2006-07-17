@@ -512,18 +512,15 @@ strsyscall(void)
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule(void)
 {
-	/* NOTE:- Let the scheduler do its job.  On SVR4.2 queues are run before a sleep to avoid
-	   the context switch.  This might actually freak the Linux scheduler into thinking that
-	   the user process has a better priority than it should because it is running unblockable
-	   STREAMS scheduler threads.  Strapping out the above on Linux 2.6.17 bought a several
-	   percent performance gain: trying this one now. */
-#if 0
+	/* NOTE:- This does more than just saves a context switch: the STREAMS scheduler is running
+	   nice 19 and if we don't execute runqueues when possible it is unlikely that the STREAMS
+	   scheduler will even get a chance to run under heavy load.  With this strapped out, for
+	   example, the write side heavily overloads the read side on loopback tests. */
 	/* before every sleep -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	set_current_state(TASK_RUNNING);
 	runqueues();
-#endif
 }
 
 STATIC streams_inline streams_fastcall __hot_out void
