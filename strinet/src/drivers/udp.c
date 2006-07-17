@@ -359,18 +359,24 @@ STATIC struct module_stat udp_mstat = {
 STATIC streamscall int udp_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int udp_qclose(queue_t *, int, cred_t *);
 
+streamscall int tp_oput(queue_t *, mblk_t *);
+streamscall int tp_osrv(queue_t *);
+
 STATIC struct qinit udp_rinit = {
-	.qi_putp = ss7_oput,		/* Read put procedure (message from below) */
-	.qi_srvp = ss7_osrv,		/* Read service procedure */
+	.qi_putp = tp_oput,		/* Read put procedure (message from below) */
+	.qi_srvp = tp_osrv,		/* Read service procedure */
 	.qi_qopen = udp_qopen,		/* Each open */
 	.qi_qclose = udp_qclose,	/* Last close */
 	.qi_minfo = &udp_minfo,		/* Module information */
 	.qi_mstat = &udp_mstat,		/* Module statistics */
 };
 
+streamscall int tp_iput(queue_t *, mblk_t *);
+streamscall int tp_isrv(queue_t *);
+
 STATIC struct qinit udp_winit = {
-	.qi_putp = ss7_iput,		/* Write put procedure (message from above) */
-	.qi_srvp = ss7_isrv,		/* Write service procedure */
+	.qi_putp = tp_iput,		/* Write put procedure (message from above) */
+	.qi_srvp = tp_isrv,		/* Write service procedure */
 	.qi_minfo = &udp_minfo,		/* Module information */
 	.qi_mstat = &udp_mstat,		/* Module statistics */
 };
@@ -643,6 +649,161 @@ tp_alloc(void)
 		// tp->flags = 0;
 	}
 	return (tp);
+}
+
+/*
+ *  Queue Locking
+ */
+
+streams_inline streamscall __hot int
+tp_trylockq(queue_t *q)
+{
+	int res;
+	str_t *s = STR_PRIV(q);
+	unsigned long flags;
+
+	spin_lock_irqsave(&s->qlock, flags);
+	if (!(res = !s->users++)) {
+		if (q == s->iq)
+			s->iwait = q;
+		if (q == s->oq)
+			s->owait = q;
+		--s->users;
+	}
+	spin_unlock_irqrestore(&s->qlock, flags);
+	return (res);
+}
+
+streams_inline streamscall __hot void
+tp_unlockq(queue_t *q)
+{
+	str_t *s = STR_PRIV(q);
+	queue_t *wait;
+	unsigned long flags;
+
+	int streamscall (*isrv) (queue_t *) = NULL;
+	int streamscall (*osrv) (queue_t *) = NULL;
+
+	spin_lock_irqsave(&s->qlock, flags);
+	if ((wait = XCHG(&s->iwait, NULL)) && !enableq(wait)) {
+		if (wait->q_qinfo && wait->q_qinfo->qi_srvp)
+			qenable(wait);
+		else
+			isrv = &tp_isrv;
+	}
+	if ((wait = XCHG(&s->owait, NULL)) && !enableq(wait)) {
+		if (wait->q_qinfo && wait->q_qinfo->qi_srvp)
+			qenable(wait);
+		else
+			osrv = &tp_osrv;
+	}
+	s->users = 0;
+	spin_unlock_irqrestore(&s->qlock, flags);
+
+	if (isrv)
+		isrv(s->iq);
+	if (osrv)
+		osrv(s->iq);
+}
+
+/*
+ *  Buffer allocation
+ */
+
+streams_inline streamscall __unlikely void
+tp_bufsrv(long data)
+{
+	str_t *s;
+	queue_t *q;
+
+	q = (queue_t *) data;
+	ensure(q, return);
+	s = STR_PRIV(q);
+	ensure(s, return);
+
+	if (q == s->iq) {
+		if (xchg(&s->ibid, 0) != 0)
+			atomic_dec(&s->refcnt);
+		if (q->q_qinfo && q->q_qinfo->qi_srvp)
+			qenable(q);
+		else
+			tp_isrv(q);
+		return;
+	}
+	if (q == s->oq) {
+		if (xchg(&s->obid, 0) != 0)
+			atomic_dec(&s->refcnt);
+		if (q->q_qinfo && q->q_qinfo->qi_srvp)
+			qenable(q);
+		else
+			tp_osrv(q);
+		return;
+	}
+	return;
+}
+
+streams_inline streamscall __unlikely void
+tp_unbufcall(str_t * s)
+{
+	bufcall_id_t bid;
+
+	if ((bid = xchg(&s->ibid, 0))) {
+		unbufcall(bid);
+		atomic_dec(&s->refcnt);
+	}
+	if ((bid = xchg(&s->obid, 0))) {
+		unbufcall(bid);
+		atomic_dec(&s->refcnt);
+	}
+}
+
+streams_inline streamscall __unlikely void
+tp_bufcall(queue_t *q, size_t size, int prior)
+{
+	if (q) {
+		str_t *s = STR_PRIV(q);
+		bufcall_id_t bid, *bidp = NULL;
+
+		if (q == s->iq)
+			bidp = &s->ibid;
+		if (q == s->oq)
+			bidp = &s->obid;
+
+		if (bidp) {
+			atomic_inc(&s->refcnt);
+			if ((bid = xchg(bidp, bufcall(size, prior, &tp_bufsrv, (long) q)))) {
+				unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
+				atomic_dec(&s->refcnt);
+			}
+			return;
+		}
+	}
+	swerr();
+	return;
+}
+
+streams_inline streamscall __unlikely mblk_t *
+tp_allocb(queue_t *q, size_t size, int prior)
+{
+	mblk_t *mp;
+
+	if (likely((mp = allocb(size, prior)) != NULL))
+		return (mp);
+	rare();
+	tp_bufcall(q, size, prior);
+	return (mp);
+}
+
+streams_inline streamscall __unlikely mblk_t *
+tp_dupmsg(queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+
+	if (likely((mp = dupmsg(bp)) != NULL))
+		return (mp);
+	rare();
+	tp_bufcall(q, msgsize(bp), BPRI_MED);
+	return (mp);
 }
 
 /*
@@ -5207,7 +5368,7 @@ m_flush(queue_t *q, const int how, const int band)
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
 
-	if (unlikely((mp = ss7_allocb(q, 2, BPRI_HI)) == NULL))
+	if (unlikely((mp = tp_allocb(q, 2, BPRI_HI)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_FLUSH;
 	*mp->b_wptr++ = how;
@@ -5229,7 +5390,7 @@ m_error(queue_t *q, const int error)
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
 
-	if (likely((mp = ss7_allocb(q, 2, BPRI_HI)) != NULL)) {
+	if (likely((mp = tp_allocb(q, 2, BPRI_HI)) != NULL)) {
 		mp->b_datap->db_type = M_ERROR;
 		mp->b_wptr[0] = mp->b_wptr[1] = error;
 		mp->b_wptr += 2;
@@ -5260,7 +5421,7 @@ m_hangup(queue_t *q)
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
 
-	if (likely((mp = ss7_allocb(q, 0, BPRI_HI)) != NULL)) {
+	if (likely((mp = tp_allocb(q, 0, BPRI_HI)) != NULL)) {
 		mp->b_datap->db_type = M_HANGUP;
 		/* make sure the stream is disconnected */
 		if (tp->chash != NULL) {
@@ -5322,7 +5483,7 @@ te_info_ack(queue_t *q)
 	int err;
 
 	err = -ENOBUFS;
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto error;
 
 	mp->b_datap->db_type = M_PCPROTO;
@@ -5371,7 +5532,7 @@ te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_le
 		goto error;
 
 	err = -ENOBUFS;
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto error;
 
 	err = tp_bind(tp, ADDR_buffer, ADDR_length, CONIND_number);
@@ -5458,7 +5619,7 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
 		break;
 	}
 	err = -ENOBUFS;
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL)
+	if ((mp = tp_allocb(q, sizeof(*p), BPRI_MED)) == NULL)
 		goto error;
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -5496,7 +5657,7 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 	const size_t size = sizeof(*p);
 	int err = QR_DONE;
 
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PCPROTO;
@@ -5628,7 +5789,7 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 
 	tp_set_state(tp, TS_WCON_CREQ);
 
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 
 	err = tp_connect(tp, RES_buffer, RES_length, OPT_buffer, CONN_flags);
@@ -5689,7 +5850,7 @@ ne_reset_con(queue_t *q, const np_ulong RESET_orig, const np_ulong RESET_reason,
 	size_t size = sizeof(*p);
 	int err;
 
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	if (unlikely((err = np_reset_loc(np, RESET_orig, RESET_reason, dp)) != 0))
 		goto free_error;
@@ -5767,14 +5928,14 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 
 	tp_set_state(tp, TS_WRES_CIND);
 
-	if (unlikely((cp = ss7_dupmsg(q, SEQ_number)) == NULL))
+	if (unlikely((cp = tp_dupmsg(q, SEQ_number)) == NULL))
 		goto enobufs;
 
 	SRC_length = sizeof(struct sockaddr_in);
 	OPT_length = t_opts_size(tp, SEQ_number);
 	size = sizeof(*p) + SRC_length + OPT_length;
 
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto free_enobufs;
 
 	if (unlikely(!canputnext(q)))
@@ -5848,7 +6009,7 @@ te_discon_ind(queue_t *q, const struct sockaddr_in *RES_buffer, const socklen_t 
 	    (tp_not_state(tp, (TSF_WRES_CIND | TSF_DATA_XFER | TSF_WREQ_ORDREL | TSF_WIND_ORDREL))))
 		goto discard;
 
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PROTO;
@@ -5951,7 +6112,7 @@ te_data_ind(queue_t *q, mblk_t *dp)
 	struct T_data_ind *p;
 	const size_t size = sizeof(*p);
 
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 
 	if (unlikely(!canputnext(q)))
@@ -5989,7 +6150,7 @@ te_exdata_ind(queue_t *q, mblk_t *dp)
 	mblk_t *mp;
 	struct T_exdata_ind *p;
 
-	if (unlikely((mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, sizeof(*p), BPRI_MED)) == NULL))
 		goto enobufs;
 	if (unlikely(!bcanputnext(q, 1)))
 		goto ebusy;
@@ -6038,7 +6199,7 @@ te_unitdata_ind(queue_t *q, mblk_t *dp)
 
 	if (unlikely(tp_get_state(tp) != TS_IDLE))
 		goto discard;
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	if (unlikely(!canputnext(q)))
 		goto ebusy;
@@ -6103,7 +6264,7 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
 
 	if (unlikely(tp_get_statef(tp) & ~(TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto discard;
-	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + OPT_length, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, sizeof(*p) + OPT_length, BPRI_MED)) == NULL))
 		goto enobufs;
 	if (unlikely(!canputnext(q)))
 		goto ebusy;
@@ -6154,7 +6315,7 @@ te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned
 
 	if (unlikely(tp_get_state(tp) != TS_IDLE))
 		goto discard;
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	if (unlikely(!canputnext(tp->oq)))
 		goto ebusy;
@@ -6313,9 +6474,9 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 			goto discard;
 	}
 
-	if (unlikely((bp = ss7_dupmsg(q, dp)) == NULL))
+	if (unlikely((bp = tp_dupmsg(q, dp)) == NULL))
 		goto enobufs;
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PROTO;
@@ -6431,7 +6592,7 @@ t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size
 	mblk_t *mp;
 	struct T_optmgmt_ack *p;
 
-	if (unlikely((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, sizeof(*p) + opt_len, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -6478,7 +6639,7 @@ t_addr_ack(queue_t *q, const struct sockaddr_in *LOCADDR_buffer, const t_uscalar
 	struct T_addr_ack *p;
 	size_t size = sizeof(*p) + LOCADDR_length + REMADDR_length;
 
-	if (unlikely((mp = ss7_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -6519,7 +6680,7 @@ t_capability_ack(queue_t *q, const t_uscalar_t caps, const int type)
 	mblk_t *mp;
 	struct T_capability_ack *p;
 
-	if (unlikely((mp = ss7_allocb(q, sizeof(*p), BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, sizeof(*p), BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = type;
 	p = (typeof(p)) mp->b_wptr;
@@ -7773,6 +7934,35 @@ tp_w_ioctl(queue_t *q, mblk_t *mp)
 	return (QR_ABSORBED);
 }
 
+STATIC streamscall int
+tp_flushq(queue_t *q, mblk_t *mp, const unsigned char flag)
+{
+	if (mp->b_rptr[0] & flag) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHALL);
+		else
+			flushq(q, FLUSHALL);
+	}
+	if ((mp->b_rptr[0] & (FLUSHR | FLUSHW))) {
+		if (q->q_next) {
+			putnext(q, mp);
+			return (QR_ABSORBED);
+		}
+		mp->b_rptr[0] &= ~flag;
+	}
+	return (QR_DONE);
+}
+
+noinline streamscall int
+tp_w_flush(queue_t *q, mblk_t *mp)
+{
+	int rtn;
+
+	if ((rtn = tp_flushq(q, mp, FLUSHW)) == QR_DONE)
+		rtn = tp_flushq(RD(q), mp, FLUSHR);
+	return (rtn);
+}
+
 /**
  * tp_r_other - process other message
  * @q: active queue in pair (read queue)
@@ -7903,6 +8093,16 @@ tp_r_error(queue_t *q, mblk_t *mp)
 	return (rtn);
 }
 
+noinline streamscall int
+tp_r_flush(queue_t *q, mblk_t *mp)
+{
+	int rtn;
+
+	if ((rtn = tp_flushq(q, mp, FLUSHR)) == QR_DONE)
+		rtn = tp_flushq(WR(q), mp, FLUSHW);
+	return (rtn);
+}
+
 STATIC noinline streams_fastcall __unlikely int
 tp_r_prim_slow(queue_t *q, mblk_t *mp)
 {
@@ -7912,7 +8112,7 @@ tp_r_prim_slow(queue_t *q, mblk_t *mp)
 	case M_ERROR:
 		return tp_r_error(q, mp);
 	case M_FLUSH:
-		return ss7_r_flush(q, mp);
+		return tp_r_flush(q, mp);
 	default:
 		return tp_r_other(q, mp);
 	}
@@ -7943,7 +8143,7 @@ tp_w_prim_slow(queue_t *q, mblk_t *mp)
 	case M_PCPROTO:
 		return tp_w_proto(q, mp);
 	case M_FLUSH:
-		return ss7_w_flush(q, mp);
+		return tp_w_flush(q, mp);
 	case M_IOCTL:
 		return tp_w_ioctl(q, mp);
 	default:
@@ -7989,6 +8189,350 @@ tp_w_prim(queue_t *q, mblk_t *mp)
 		}
 	}
 	return tp_w_prim_slow(q, mp);
+}
+
+static noinline streams_fastcall void
+udp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
+{
+	switch (rtn) {
+	case QR_DONE:
+		freemsg(mp);
+	case QR_ABSORBED:
+		break;
+	case QR_STRIP:
+		if (mp->b_cont)
+			if (unlikely(putq(q, mp->b_cont) == 0))
+				freemsg(mp->b_cont);
+	case QR_TRIMMED:
+		freeb(mp);
+		break;
+	case QR_LOOP:
+		if (!q->q_next) {
+			qreply(q, mp);
+			break;
+		}
+	case QR_PASSALONG:
+		if (q->q_next) {
+			putnext(q, mp);
+			break;
+		}
+		rtn = -EOPNOTSUPP;
+	default:
+		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+			q->q_ptr, rtn));
+		freemsg(mp);
+		break;
+	case QR_DISABLE:
+		if (unlikely(putq(q, mp) == 0))
+			freemsg(mp);
+		break;
+	case QR_PASSFLOW:
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+			putnext(q, mp);
+			break;
+		}
+	case -ENOBUFS:
+	case -EBUSY:
+	case -ENOMEM:
+	case -EAGAIN:
+	case QR_RETRY:
+		if (unlikely(putq(q, mp) == 0))
+			freemsg(mp);
+		break;
+	}
+	return;
+}
+
+streamscall __hot int
+udp_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *))
+{
+	int locked = 0;
+
+	ensure(q, return (-EFAULT));
+	ensure(mp, return (-EFAULT));
+
+	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
+		if (unlikely(putq(q, mp) == 0))
+			freemsg(mp);
+		return (0);
+	}
+	if (likely((locked = tp_trylockq(q))) || unlikely(mp->b_datap->db_type == M_FLUSH)) {
+		int rtn;
+
+		rtn = proc(q, mp);
+		/* Fast Paths */
+		if (likely(rtn == QR_TRIMMED)) {
+			freeb(mp);
+		      unlock_exit:
+			if (locked)
+				tp_unlockq(q);
+			return (0);
+		}
+		if (likely(rtn == QR_DONE)) {
+			freemsg(mp);
+			goto unlock_exit;
+		}
+		udp_putq_slow(q, mp, rtn);
+		goto unlock_exit;
+	} else {
+		seldom();
+		if (unlikely(putq(q, mp) == 0))
+			freemsg(mp);
+	}
+	return (0);
+}
+
+static noinline streams_fastcall int
+udp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
+{
+	switch (rtn) {
+	case QR_DONE:
+		freemsg(mp);
+	case QR_ABSORBED:
+		return (1);
+	case QR_STRIP:
+		if (mp->b_cont)
+			if (!putbq(q, mp->b_cont))
+				freemsg(mp->b_cont);
+	case QR_TRIMMED:
+		freeb(mp);
+		return (1);
+	case QR_LOOP:
+		if (!q->q_next) {
+			qreply(q, mp);
+			return (1);
+		}
+	case QR_PASSALONG:
+		if (q->q_next) {
+			putnext(q, mp);
+			return (1);
+		}
+		rtn = -EOPNOTSUPP;
+	default:
+		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+			q->q_ptr, rtn));
+		freemsg(mp);
+		return (1);
+	case QR_DISABLE:
+		printd(("%s: %p: ERROR: (q disabling) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+			q->q_ptr, rtn));
+		noenable(q);
+		if (!putbq(q, mp))
+			freemsg(mp);
+		rtn = 0;
+		return (0);
+	case QR_PASSFLOW:
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+			putnext(q, mp);
+			return (1);
+		}
+	case -ENOBUFS:		/* proc must have scheduled bufcall */
+	case -EBUSY:		/* proc must have failed canput */
+	case -ENOMEM:		/* proc must have scheduled bufcall */
+	case -EAGAIN:		/* proc must re-enable on some event */
+		if (mp->b_datap->db_type < QPCTL) {
+			printd(("%s: %p: ERROR: (q stalled) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+				q->q_ptr, rtn));
+			if (!putbq(q, mp))
+				freemsg(mp);
+			return (0);
+		}
+		/* 
+		 *  Be careful not to put a priority message back on the queue.
+		 */
+		switch (mp->b_datap->db_type) {
+		case M_PCPROTO:
+			mp->b_datap->db_type = M_PROTO;
+			break;
+		case M_PCRSE:
+			mp->b_datap->db_type = M_RSE;
+			break;
+		case M_PCCTL:
+			mp->b_datap->db_type = M_CTL;
+			break;
+		default:
+			printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+				q->q_ptr, rtn));
+			freemsg(mp);
+			return (1);
+		}
+		mp->b_band = 255;
+		if (unlikely(putq(q, mp) == 0))
+			freemsg(mp);
+		return (0);
+	case QR_RETRY:
+		if (!putbq(q, mp))
+			freemsg(mp);
+		return (1);
+	}
+}
+
+streamscall __hot int
+udp_srvq(queue_t *q, int streamscall (*proc) (queue_t *, mblk_t *),
+	 void streamscall (*procwake) (queue_t *))
+{
+	int rtn = 0;
+
+	ensure(q, return (-EFAULT));
+	if (likely(tp_trylockq(q))) {
+		mblk_t *mp;
+
+		while (likely((mp = getq(q)) != NULL)) {
+
+			prefetch(mp);
+#if 0
+			prefetch(mp->b_datap);
+			prefetch(mp->b_rptr);
+			prefetch(mp->b_cont);
+#endif
+
+			rtn = proc(q, mp);
+			/* Fast Path */
+			if (likely(rtn == QR_TRIMMED)) {
+				freeb(mp);
+				continue;
+			}
+			if (likely(rtn == QR_DONE)) {
+				freemsg(mp);
+				continue;
+			}
+			if (likely(udp_srvq_slow(q, mp, rtn)))
+				continue;
+			break;
+		}
+		/* perform wakeups */
+		if (procwake)
+			procwake(q);
+		tp_unlockq(q);
+		return (0);
+	} else {
+		rare();
+		return (0);
+	}
+}
+
+static noinline streams_fastcall int
+tp_oput_slow(str_t * s, mblk_t *mp)
+{
+	if (likely(s->oq != NULL)) {
+		swerr();
+		if (s->oq->q_qinfo->qi_srvp && likely(putq(s->oq, mp) != 0))
+			return (0);	/* recovered */
+	}
+	swerr();
+	freemsg(mp);
+	return (-EFAULT);
+}
+
+streamscall __hot_out int
+tp_oput(queue_t *q, mblk_t *mp)
+{
+	str_t *s = STR_PRIV(q);
+
+	prefetch(mp);
+#if 0
+	prefetch(mp->b_datap);
+	prefetch(mp->b_rptr);
+	prefetch(mp->b_cont);
+#endif
+
+	if (likely(s->oq != NULL)) {
+		if (likely(s->o_prim != NULL)) {
+			udp_putq(s->oq, mp, s->o_prim);
+			return (0);
+		}
+	}
+	return tp_oput_slow(s, mp);
+}
+
+static noinline streams_fastcall int
+tp_osrv_slow(str_t * s, queue_t *q)
+{
+	if (likely(s->oq != NULL)) {
+		if (s->o_wakeup) {
+			s->o_wakeup(s->oq);
+			return (0);
+		}
+	}
+	swerr();
+	noenable(q);
+	return (-EFAULT);
+}
+
+streamscall __hot_out int
+tp_osrv(queue_t *q)
+{
+	str_t *s = STR_PRIV(q);
+
+	if (likely(s->oq != NULL)) {
+		if (likely(s->o_prim != NULL)) {
+			udp_srvq(s->oq, s->o_prim, s->o_wakeup);
+			return (0);
+		}
+	}
+	return tp_osrv_slow(s, q);
+}
+
+static noinline streams_fastcall int
+tp_iput_slow(str_t * s, mblk_t *mp)
+{
+	if (likely(s->iq != NULL)) {
+		swerr();
+		if (s->iq->q_qinfo->qi_srvp && likely(putq(s->iq, mp) != 0))
+			return (0);	/* recovered */
+	}
+	swerr();
+	freemsg(mp);
+	return (-EFAULT);
+}
+
+streamscall __hot_in int
+tp_iput(queue_t *q, mblk_t *mp)
+{
+	str_t *s = STR_PRIV(q);
+
+	prefetch(mp);
+#if 0
+	prefetch(mp->b_datap);
+	prefetch(mp->b_rptr);
+	prefetch(mp->b_cont);
+#endif
+
+	if (likely(s->iq != NULL)) {
+		if (likely(s->i_prim != NULL)) {
+			udp_putq(s->iq, mp, s->i_prim);
+			return (0);
+		}
+	}
+	return tp_iput_slow(s, mp);
+}
+
+static noinline streams_fastcall int
+tp_isrv_slow(str_t * s, queue_t *q)
+{
+	if (likely(s->iq != NULL)) {
+		if (s->i_wakeup) {
+			s->i_wakeup(s->iq);
+			return (0);
+		}
+	}
+	swerr();
+	noenable(q);
+	return (-EFAULT);
+}
+
+streamscall __hot_in int
+tp_isrv(queue_t *q)
+{
+	str_t *s = STR_PRIV(q);
+
+	if (likely(s->iq != NULL)) {
+		if (likely(s->i_prim != NULL)) {
+			udp_srvq(s->iq, s->i_prim, s->i_wakeup);
+			return (0);
+		}
+	}
+	return tp_isrv_slow(s, q);
 }
 
 /*
@@ -8642,7 +9186,7 @@ tp_free_priv(queue_t *q)
 #else
 	bufq_purge(&tp->conq);
 #endif
-	ss7_unbufcall((str_t *) tp);
+	tp_unbufcall((str_t *) tp);
 #if 0
 	strlog(DRV_ID, tp->u.dev.cminor, 0, SL_TRACE, "removed bufcalls: reference count = %d",
 	       atomic_read(&tp->refcnt));
