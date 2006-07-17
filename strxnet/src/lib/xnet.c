@@ -5172,8 +5172,11 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 
 	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
+#if 0
+	/* don't do this unless there is a problem, and then after the call */
 	if ((__xnet_t_peek(fd) & ~T_DATA) > 0)
 		goto tlook;
+#endif
 #ifdef DEBUG
 	if (!unitdata)
 		goto einval;
