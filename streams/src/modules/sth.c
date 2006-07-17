@@ -501,6 +501,32 @@ strsyscall(void)
 	   user context.  This call would make the top module or driver service procedure also run
 	   in user context, but that is unnecessary.  Some performance gains yielded by not
 	   freaking the Linux scheduler. */
+#if 0
+	/* before every system call return -- saves a context switch */
+	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		return;
+	runqueues();
+#endif
+}
+
+STATIC streams_inline streams_fastcall __hot void
+strsyscall_write(void)
+{
+#if 0
+	/* before every system call return -- saves a context switch */
+	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		return;
+	runqueues();
+#endif
+}
+
+STATIC streams_inline streams_fastcall __hot void
+strsyscall_read(void)
+{
+	/* Strapping out syscall STREAMS runs for the write side and non-read/write system calls is
+	   fine; however, the read side does not back-enable in a timely fashion unless the syscall
+	   invokes the STREAMS scheduler when it can run as a result of the read.  Therefore, split
+	   this specific read syscall function out. */
 	/* before every system call return -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
@@ -4737,7 +4763,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 	goto exit;
       exit:
 	/* We want to give the driver queues an opportunity to run. */
-	strsyscall();		/* save context switch */
+	strsyscall_read();	/* save context switch */
 	return (err);
 }
 
@@ -5017,7 +5043,7 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 	goto exit;
       exit:
 	/* We want to give the driver queues an opportunity to run. */
-	strsyscall();		/* save context switch */
+	strsyscall_write();	/* save context switch */
 	return (err);
 }
 
@@ -5182,7 +5208,7 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
 		_ctrace(sd_put(&sd));
 	}
 	/* We want to give the driver queues an opportunity to run. */
-	strsyscall();		/* save context switch */
+	strsyscall_write();	/* save context switch */
 	return (err);
 }
 
@@ -5356,7 +5382,7 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 	} else
 		err = -EBADF;
 	/* We want to give the driver queues an opportunity to run. */
-	strsyscall();		/* save context switch */
+	strsyscall_write();	/* save context switch */
 	return (err);
 }
 
@@ -5738,7 +5764,7 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 				sd_put(&sd);
 			      done:
 				/* We want to give the driver queues an opportunity to run. */
-				strsyscall();	/* save context switch */
+				strsyscall_read();	/* save context switch */
 				return (err);
 			}
 			err = sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp);
