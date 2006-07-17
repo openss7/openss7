@@ -496,20 +496,34 @@ strdetached(struct stdata *sd)
 STATIC streams_inline streams_fastcall __hot void
 strsyscall(void)
 {
-	/* before every system call return or sleep -- saves a context switch */
+	/* NOTE:- Try strapping this out.  Because, unlike LiS, there is no service procedure on
+	   the Stream head write queue, the top module or driver put procedure is always invoked in 
+	   user context.  This call would make the top module or driver service procedure also run
+	   in user context, but that is unnecessary.  Some performance gains yielded by not
+	   freaking the Linux scheduler. */
+#if 0
+	/* before every system call return -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
+#endif
 }
 
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule(void)
 {
-	/* before every system call return or sleep -- saves a context switch */
+	/* NOTE:- Let the scheduler do its job.  On SVR4.2 queues are run before a sleep to avoid
+	   the context switch.  This might actually freak the Linux scheduler into thinking that
+	   the user process has a better priority than it should because it is running unblockable
+	   STREAMS scheduler threads.  Strapping out the above on Linux 2.6.17 bought a several
+	   percent performance gain: trying this one now. */
+#if 0
+	/* before every sleep -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	set_current_state(TASK_RUNNING);
 	runqueues();
+#endif
 }
 
 STATIC streams_inline streams_fastcall __hot_out void

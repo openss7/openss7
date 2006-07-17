@@ -343,12 +343,12 @@ MODULE_ALIAS("/dev/udp2");
 #endif				/* MODULE */
 
 STATIC struct module_info udp_minfo = {
-	.mi_idnum = DRV_ID,		/* Module ID number */
-	.mi_idname = DRV_NAME,		/* Module name */
-	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 18),		/* Hi water mark */
-	.mi_lowat = (1 << 17),		/* Lo water mark */
+	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idname = DRV_NAME,	/* Module name */
+	.mi_minpsz = 0,		/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
+	.mi_hiwat = (1 << 18),	/* Hi water mark */
+	.mi_lowat = (1 << 17),	/* Lo water mark */
 };
 
 STATIC struct module_stat udp_mstat = {
@@ -359,26 +359,26 @@ STATIC struct module_stat udp_mstat = {
 STATIC streamscall int udp_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int udp_qclose(queue_t *, int, cred_t *);
 
-streamscall int tp_oput(queue_t *, mblk_t *);
-streamscall int tp_osrv(queue_t *);
+streamscall int tp_rput(queue_t *, mblk_t *);
+streamscall int tp_rsrv(queue_t *);
 
 STATIC struct qinit udp_rinit = {
-	.qi_putp = tp_oput,		/* Read put procedure (message from below) */
-	.qi_srvp = tp_osrv,		/* Read service procedure */
-	.qi_qopen = udp_qopen,		/* Each open */
+	.qi_putp = tp_rput,	/* Read put procedure (message from below) */
+	.qi_srvp = tp_rsrv,	/* Read service procedure */
+	.qi_qopen = udp_qopen,	/* Each open */
 	.qi_qclose = udp_qclose,	/* Last close */
-	.qi_minfo = &udp_minfo,		/* Module information */
-	.qi_mstat = &udp_mstat,		/* Module statistics */
+	.qi_minfo = &udp_minfo,	/* Module information */
+	.qi_mstat = &udp_mstat,	/* Module statistics */
 };
 
-streamscall int tp_iput(queue_t *, mblk_t *);
-streamscall int tp_isrv(queue_t *);
+streamscall int tp_wput(queue_t *, mblk_t *);
+streamscall int tp_wsrv(queue_t *);
 
 STATIC struct qinit udp_winit = {
-	.qi_putp = tp_iput,		/* Write put procedure (message from above) */
-	.qi_srvp = tp_isrv,		/* Write service procedure */
-	.qi_minfo = &udp_minfo,		/* Module information */
-	.qi_mstat = &udp_mstat,		/* Module statistics */
+	.qi_putp = tp_wput,	/* Write put procedure (message from above) */
+	.qi_srvp = tp_wsrv,	/* Write service procedure */
+	.qi_minfo = &udp_minfo,	/* Module information */
+	.qi_mstat = &udp_mstat,	/* Module statistics */
 };
 
 MODULE_STATIC struct streamtab udp_info = {
@@ -652,61 +652,6 @@ tp_alloc(void)
 }
 
 /*
- *  Queue Locking
- */
-
-streams_inline streamscall __hot int
-tp_trylockq(queue_t *q)
-{
-	int res;
-	str_t *s = STR_PRIV(q);
-	unsigned long flags;
-
-	spin_lock_irqsave(&s->qlock, flags);
-	if (!(res = !s->users++)) {
-		if (q == s->iq)
-			s->iwait = q;
-		if (q == s->oq)
-			s->owait = q;
-		--s->users;
-	}
-	spin_unlock_irqrestore(&s->qlock, flags);
-	return (res);
-}
-
-streams_inline streamscall __hot void
-tp_unlockq(queue_t *q)
-{
-	str_t *s = STR_PRIV(q);
-	queue_t *wait;
-	unsigned long flags;
-
-	int streamscall (*isrv) (queue_t *) = NULL;
-	int streamscall (*osrv) (queue_t *) = NULL;
-
-	spin_lock_irqsave(&s->qlock, flags);
-	if ((wait = XCHG(&s->iwait, NULL)) && !enableq(wait)) {
-		if (wait->q_qinfo && wait->q_qinfo->qi_srvp)
-			qenable(wait);
-		else
-			isrv = &tp_isrv;
-	}
-	if ((wait = XCHG(&s->owait, NULL)) && !enableq(wait)) {
-		if (wait->q_qinfo && wait->q_qinfo->qi_srvp)
-			qenable(wait);
-		else
-			osrv = &tp_osrv;
-	}
-	s->users = 0;
-	spin_unlock_irqrestore(&s->qlock, flags);
-
-	if (isrv)
-		isrv(s->iq);
-	if (osrv)
-		osrv(s->iq);
-}
-
-/*
  *  Buffer allocation
  */
 
@@ -724,19 +669,13 @@ tp_bufsrv(long data)
 	if (q == s->iq) {
 		if (xchg(&s->ibid, 0) != 0)
 			atomic_dec(&s->refcnt);
-		if (q->q_qinfo && q->q_qinfo->qi_srvp)
-			qenable(q);
-		else
-			tp_isrv(q);
+		qenable(q);
 		return;
 	}
 	if (q == s->oq) {
 		if (xchg(&s->obid, 0) != 0)
 			atomic_dec(&s->refcnt);
-		if (q->q_qinfo && q->q_qinfo->qi_srvp)
-			qenable(q);
-		else
-			tp_osrv(q);
+		qenable(q);
 		return;
 	}
 	return;
@@ -4681,19 +4620,24 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 		}
 	} while (conflict == NULL && hp != hp2 && (hp = hp2));
 	if (conflict != NULL) {
-		int i;
-
 		if (hp1 != hp2)
 			write_unlock(&hp2->lock);
 		write_unlock_bh(&hp1->lock);
-		/* free dst caches */
-		for (i = 0; i < tp->dnum; i++)
-			dst_release(XCHG(&tp->daddrs[i].dst, NULL));
-		tp->dnum = 0;
-		tp->dport = 0;
-		/* blank source addresses */
-		tp->snum = 0;
-		tp->sport = 0;
+#if 0
+		/* needs to be done by caller */
+		{
+			int i;
+
+			/* free dst caches */
+			for (i = 0; i < tp->dnum; i++)
+				dst_release(XCHG(&tp->daddrs[i].dst, NULL));
+			tp->dnum = 0;
+			tp->dport = 0;
+			/* blank source addresses */
+			tp->snum = 0;
+			tp->sport = 0;
+		}
+#endif
 		/* how do we say already connected? (-EISCONN) */
 		return (TADDRBUSY);
 	}
@@ -4840,7 +4784,7 @@ tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t
 					break;
 			}
 			if (i >= tp->snum)
-				goto error;
+				goto recover;
 		}
 	} else {
 		OPT_buffer->ip.saddr = tp->options.ip.saddr;
@@ -4851,7 +4795,7 @@ tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t
 			if (DEST_buffer[i].sin_addr.s_addr == OPT_buffer->ip.daddr)
 				break;
 		if (i >= dnum)
-			goto error;
+			goto recover;
 	} else {
 		/* The default destination address is the first address in the list. */
 		OPT_buffer->ip.daddr = DEST_buffer[0].sin_addr.s_addr;
@@ -4869,20 +4813,17 @@ tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t
 
 	err = TBADADDR;
 	if (tp->dport == 0 && (tp->bport != 0 || tp->sport != 0))
-		goto error;
+		goto recover;
 	if (tp->dport != 0 && tp->sport == 0)
 		/* TODO: really need to autobind the stream to a dynamically allocated source port
 		   number. */
-		goto error;
+		goto recover;
 
 	for (i = 0; i < dnum; i++) {
 		struct rtable *rt = NULL;
 
-		if ((err = ip_route_output(&rt, DEST_buffer[i].sin_addr.s_addr, 0, 0, 0))) {
-			while (--i >= 0)
-				dst_release(XCHG(&tp->daddrs[i].dst, NULL));
-			goto error;
-		}
+		if ((err = ip_route_output(&rt, DEST_buffer[i].sin_addr.s_addr, 0, 0, 0)))
+			goto recover;
 		tp->daddrs[i].dst = &rt->u.dst;
 
 		/* Note that we do not have to use the destination reference cached above.  It is
@@ -4899,10 +4840,6 @@ tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t
 	}
 	tp->dnum = dnum;
 
-	/* try to place in connection hashes with conflict checks */
-	if ((err = tp_conn_check(tp, OPT_buffer->ip.protocol)) != 0)
-		goto error;
-
 	/* store negotiated values */
 	tp->options.xti.priority = OPT_buffer->xti.priority;
 	tp->options.ip.protocol = OPT_buffer->ip.protocol;
@@ -4912,8 +4849,34 @@ tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t
 	tp->options.ip.saddr = OPT_buffer->ip.saddr;
 	tp->options.ip.daddr = OPT_buffer->ip.daddr;
 	tp->options.udp.checksum = OPT_buffer->udp.checksum;
+	/* note that on failure we are allowed to have partially negotiated some values */
+
+	/* note that all these state changes are not seen by the read side until we are placed into
+	   the hashes under hash lock. */
+
+	/* try to place in connection hashes with conflict checks */
+	if ((err = tp_conn_check(tp, OPT_buffer->ip.protocol)) != 0)
+		goto recover;
 
 	return (0);
+      recover:
+	/* clear out source addresses */
+	tp->sport = 0;
+	for (i = 0; i < tp->snum; i++) {
+		tp->saddrs[i].addr = INADDR_ANY;
+	}
+	tp->snum = 0;
+	/* clear out destination addresses */
+	tp->dport = 0;
+	for (i = 0; i < tp->dnum; i++) {
+		if (tp->daddrs[i].dst)
+			dst_release(XCHG(&tp->daddrs[i].dst, NULL));
+		tp->daddrs[i].addr = INADDR_ANY;
+		tp->daddrs[i].ttl = 0;
+		tp->daddrs[i].tos = 0;
+		tp->daddrs[i].mtu = 0;
+	}
+	tp->dnum = 0;
       error:
 	return (err);
 }
@@ -4989,6 +4952,7 @@ tp_unbind(struct tp *tp)
 		tp_unbind_prot(tp->protoids[0], tp->info.SERV_type);
 		tp->bport = tp->sport = 0;
 		tp->bnum = tp->snum = tp->pnum = 0;
+		tp_set_state(tp, TS_UNBND);
 		tp_put(tp);
 		write_unlock_bh(&hp->lock);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
@@ -5160,7 +5124,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 					break;
 			}
 			if (i >= ACCEPTOR_id->snum)
-				goto error;
+				goto recover;
 		}
 	} else {
 		OPT_buffer->ip.saddr = ACCEPTOR_id->options.ip.saddr;
@@ -5176,12 +5140,12 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 				if (RES_buffer[i].sin_addr.s_addr == OPT_buffer->ip.daddr)
 					break;
 			if (i >= rnum)
-				goto error;
+				goto recover;
 		} else {
 			/* If no responding address list is provided (rnum == 0), the destination
 			   address must be the source address of the connection indication. */
 			if (OPT_buffer->ip.daddr != iph->saddr)
-				goto error;
+				goto recover;
 		}
 	} else {
 		OPT_buffer->ip.daddr = rnum ? RES_buffer[0].sin_addr.s_addr : iph->saddr;
@@ -5191,21 +5155,18 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 
 	err = TBADADDR;
 	if (ACCEPTOR_id->dport == 0 && (ACCEPTOR_id->bport != 0 || ACCEPTOR_id->sport != 0))
-		goto error;
+		goto recover;
 	if (ACCEPTOR_id->dport != 0 && ACCEPTOR_id->sport == 0)
 		/* TODO: really need to autobind the stream to a dynamically allocated source port
 		   number. */
-		goto error;
+		goto recover;
 
 	if (rnum > 0) {
 		for (i = 0; i < rnum; i++) {
 			struct rtable *rt = NULL;
 
-			if ((err = ip_route_output(&rt, RES_buffer[i].sin_addr.s_addr, 0, 0, 0))) {
-				while (--i >= 0)
-					dst_release(XCHG(&ACCEPTOR_id->daddrs[i].dst, NULL));
-				goto error;
-			}
+			if ((err = ip_route_output(&rt, RES_buffer[i].sin_addr.s_addr, 0, 0, 0)))
+				goto recover;
 			ACCEPTOR_id->daddrs[i].dst = &rt->u.dst;
 
 			/* Note that we do not have to use the destination reference cached above.
@@ -5225,7 +5186,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 		struct rtable *rt = NULL;
 
 		if ((err = ip_route_output(&rt, iph->saddr, 0, 0, 0)))
-			goto error;
+			goto recover;
 		ACCEPTOR_id->daddrs[0].dst = &rt->u.dst;
 
 		/* Note that we do not have to use the destination reference cached above.  It is
@@ -5243,21 +5204,6 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 		ACCEPTOR_id->dnum = 1;
 	}
 
-	/* try to place in connection hashes with conflict checks */
-	if ((err = tp_conn_check(ACCEPTOR_id, iph->protocol)) != 0)
-		goto error;
-
-	if (dp != NULL)
-		if (unlikely((err = tp_senddata(tp, tp->dport, OPT_buffer, dp)) != QR_ABSORBED))
-			goto error;
-	if (SEQ_number != NULL) {
-		bufq_unlink(&tp->conq, SEQ_number);
-		freeb(XCHG(&SEQ_number, SEQ_number->b_cont));
-		/* queue any pending data */
-		while (SEQ_number)
-			put(ACCEPTOR_id->oq, XCHG(&SEQ_number, SEQ_number->b_cont));
-	}
-
 	/* store negotiated qos values */
 	ACCEPTOR_id->options.xti.priority = OPT_buffer->xti.priority;
 	ACCEPTOR_id->options.ip.protocol = OPT_buffer->ip.protocol;
@@ -5266,8 +5212,43 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 	ACCEPTOR_id->options.ip.mtu = OPT_buffer->ip.mtu;
 	ACCEPTOR_id->options.ip.saddr = OPT_buffer->ip.saddr;
 	ACCEPTOR_id->options.ip.daddr = OPT_buffer->ip.daddr;
+	/* note: on failure allowed to have partially negotiated options */
+
+	/* try to place in connection hashes with conflict checks */
+	if ((err = tp_conn_check(ACCEPTOR_id, iph->protocol)) != 0)
+		goto recover;
+
+	if (dp != NULL)
+		if (unlikely((err = tp_senddata(tp, tp->dport, OPT_buffer, dp)) != QR_ABSORBED))
+			goto recover;
+	if (SEQ_number != NULL) {
+		bufq_unlink(&tp->conq, SEQ_number);
+		freeb(XCHG(&SEQ_number, SEQ_number->b_cont));
+		/* queue any pending data */
+		while (SEQ_number)
+			put(ACCEPTOR_id->oq, XCHG(&SEQ_number, SEQ_number->b_cont));
+	}
+
 	return (QR_ABSORBED);
 
+      recover:
+	/* clear out source addresses */
+	ACCEPTOR_id->sport = 0;
+	for (i = 0; i < ACCEPTOR_id->snum; i++) {
+		ACCEPTOR_id->saddrs[i].addr = INADDR_ANY;
+	}
+	ACCEPTOR_id->snum = 0;
+	/* clear out destination addresses */
+	ACCEPTOR_id->dport = 0;
+	for (i = 0; i < ACCEPTOR_id->dnum; i++) {
+		if (ACCEPTOR_id->daddrs[i].dst)
+			dst_release(XCHG(&ACCEPTOR_id->daddrs[i].dst, NULL));
+		ACCEPTOR_id->daddrs[i].addr = INADDR_ANY;
+		ACCEPTOR_id->daddrs[i].ttl = 0;
+		ACCEPTOR_id->daddrs[i].tos = 0;
+		ACCEPTOR_id->daddrs[i].mtu = 0;
+	}
+	ACCEPTOR_id->dnum = 0;
       error:
 	return (err);
 }
@@ -5305,6 +5286,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		tp->chash = NULL;
 		tp->dport = tp->sport = 0;
 		tp->dnum = tp->snum = 0;
+		tp_set_state(tp, TS_IDLE);
 		tp_put(tp);
 		write_unlock_bh(&hp->lock);
 	}
@@ -5395,15 +5377,9 @@ m_error(queue_t *q, const int error)
 		mp->b_wptr[0] = mp->b_wptr[1] = error;
 		mp->b_wptr += 2;
 		/* make sure the stream is disconnected */
-		if (tp->chash != NULL) {
-			tp_disconnect(tp, NULL, NULL, N_REASON_UNDEFINED, NULL);
-			tp_set_state(tp, TS_IDLE);
-		}
+		tp_disconnect(tp, NULL, NULL, N_REASON_UNDEFINED, NULL);
 		/* make sure the stream is unbound */
-		if (tp->bhash != NULL) {
-			tp_unbind(tp);
-			tp_set_state(tp, TS_UNBND);
-		}
+		tp_unbind(tp);
 		_printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, tp, error));
 		qreply(q, mp);
 		return (QR_DONE);
@@ -5424,15 +5400,9 @@ m_hangup(queue_t *q)
 	if (likely((mp = tp_allocb(q, 0, BPRI_HI)) != NULL)) {
 		mp->b_datap->db_type = M_HANGUP;
 		/* make sure the stream is disconnected */
-		if (tp->chash != NULL) {
-			tp_disconnect(tp, NULL, NULL, N_REASON_UNDEFINED, NULL);
-			tp_set_state(tp, TS_IDLE);
-		}
+		tp_disconnect(tp, NULL, NULL, N_REASON_UNDEFINED, NULL);
 		/* make sure the stream is unbound */
-		if (tp->bhash != NULL) {
-			tp_unbind(tp);
-			tp_set_state(tp, TS_UNBND);
-		}
+		tp_unbind(tp);
 		_printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, tp));
 		qreply(q, mp);
 		return (QR_DONE);
@@ -5695,6 +5665,7 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		break;
 #endif
 	case TS_WACK_CRES:
+		/* FIXME: needs to hold reference to and lock the accepting stream */
 		if (tp != ACCEPTOR_id)
 			ACCEPTOR_id->i_oldstate = tp_get_state(ACCEPTOR_id);
 		tp_set_state(ACCEPTOR_id, TS_DATA_XFER);
@@ -5704,8 +5675,11 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 			tp_set_state(ACCEPTOR_id, ACCEPTOR_id->i_oldstate);
 			goto error;
 		}
-		if (tp != ACCEPTOR_id)
+		if (tp != ACCEPTOR_id) {
+			bufq_lock(&tp->conq);
 			tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
+			bufq_unlock(&tp->conq);
+		}
 		break;
 #if 0
 	case NS_WACK_RRES:
@@ -5723,7 +5697,9 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		err = tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, dp);
 		if (unlikely(err != QR_ABSORBED))
 			goto error;
+		bufq_lock(&tp->conq);
 		tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
+		bufq_unlock(&tp->conq);
 		break;
 	default:
 		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
@@ -7211,6 +7187,7 @@ te_conn_res(queue_t *q, mblk_t *mp)
 	if (unlikely((SEQ_number = t_seq_check(tp, p->SEQ_number)) == NULL))
 		goto error;
 	if (p->ACCEPTOR_id != 0) {
+		/* FIXME: really need to acquire and lock the accepting stream! */
 		err = TBADF;
 		if (unlikely((ACCEPTOR_id = t_tok_check(p->ACCEPTOR_id)) == NULL))
 			goto error;
@@ -7308,6 +7285,7 @@ te_discon_req(queue_t *q, mblk_t *mp)
 	if ((dp = mp->b_cont) != NULL)
 		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
 			goto error;
+	/* FIXME: hold conq bufq_lock to keep connection indication state from changing */
 	state = tp_get_state(tp);
 	err = TBADSEQ;
 	if (p->SEQ_number != 0) {
@@ -7934,33 +7912,25 @@ tp_w_ioctl(queue_t *q, mblk_t *mp)
 	return (QR_ABSORBED);
 }
 
-STATIC streamscall int
-tp_flushq(queue_t *q, mblk_t *mp, const unsigned char flag)
+STATIC noinline streamscall int
+tp_w_flush(queue_t *q, mblk_t *mp)
 {
-	if (mp->b_rptr[0] & flag) {
+	if (mp->b_rptr[0] & FLUSHW) {
 		if (mp->b_rptr[0] & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHALL);
 		else
 			flushq(q, FLUSHALL);
+		mp->b_rptr[0] &= ~FLUSHW;
 	}
-	if ((mp->b_rptr[0] & (FLUSHR | FLUSHW))) {
-		if (q->q_next) {
-			putnext(q, mp);
-			return (QR_ABSORBED);
-		}
-		mp->b_rptr[0] &= ~flag;
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+		else
+			flushq(RD(q), FLUSHALL);
+		qreply(q, mp);
+		return (QR_ABSORBED);
 	}
 	return (QR_DONE);
-}
-
-noinline streamscall int
-tp_w_flush(queue_t *q, mblk_t *mp)
-{
-	int rtn;
-
-	if ((rtn = tp_flushq(q, mp, FLUSHW)) == QR_DONE)
-		rtn = tp_flushq(RD(q), mp, FLUSHR);
-	return (rtn);
 }
 
 /**
@@ -8001,7 +7971,14 @@ tp_r_data(queue_t *q, mblk_t *mp)
 
 	switch (tp->info.SERV_type) {
 	case T_CLTS:
-		rtn = te_unitdata_ind(q, mp);
+		switch (tp_get_state(tp)) {
+		case TS_IDLE:
+			rtn = te_unitdata_ind(q, mp);
+			break;
+		default:
+			rtn = QR_DONE;
+			break;
+		}
 		break;
 	case T_COTS:
 	case T_COTS_ORD:
@@ -8059,7 +8036,14 @@ tp_r_error(queue_t *q, mblk_t *mp)
 
 	switch (tp->info.SERV_type) {
 	case T_CLTS:
-		rtn = te_uderror_ind_icmp(q, mp);
+		switch (tp_get_state(tp)) {
+		case TS_IDLE:
+			rtn = te_uderror_ind_icmp(q, mp);
+			break;
+		default:
+			rtn = QR_DONE;
+			break;
+		}
 		break;
 	case T_COTS:
 	case T_COTS_ORD:
@@ -8093,14 +8077,22 @@ tp_r_error(queue_t *q, mblk_t *mp)
 	return (rtn);
 }
 
-noinline streamscall int
+STATIC noinline streamscall int
 tp_r_flush(queue_t *q, mblk_t *mp)
 {
-	int rtn;
-
-	if ((rtn = tp_flushq(q, mp, FLUSHR)) == QR_DONE)
-		rtn = tp_flushq(WR(q), mp, FLUSHW);
-	return (rtn);
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHALL);
+		else
+			flushq(q, FLUSHALL);
+		putnext(q, mp);
+		return (QR_ABSORBED);
+	}
+	if (mp->b_rptr[0] & FLUSHW) {
+		putnext(q, mp);
+		return (QR_ABSORBED);
+	}
+	return (QR_DONE);
 }
 
 STATIC noinline streams_fastcall __unlikely int
@@ -8191,8 +8183,8 @@ tp_w_prim(queue_t *q, mblk_t *mp)
 	return tp_w_prim_slow(q, mp);
 }
 
-static noinline streams_fastcall void
-udp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
+STATIC noinline streams_fastcall void
+tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 {
 	switch (rtn) {
 	case QR_DONE:
@@ -8243,47 +8235,8 @@ udp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	return;
 }
 
-streamscall __hot int
-udp_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *))
-{
-	int locked = 0;
-
-	ensure(q, return (-EFAULT));
-	ensure(mp, return (-EFAULT));
-
-	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
-		return (0);
-	}
-	if (likely((locked = tp_trylockq(q))) || unlikely(mp->b_datap->db_type == M_FLUSH)) {
-		int rtn;
-
-		rtn = proc(q, mp);
-		/* Fast Paths */
-		if (likely(rtn == QR_TRIMMED)) {
-			freeb(mp);
-		      unlock_exit:
-			if (locked)
-				tp_unlockq(q);
-			return (0);
-		}
-		if (likely(rtn == QR_DONE)) {
-			freemsg(mp);
-			goto unlock_exit;
-		}
-		udp_putq_slow(q, mp, rtn);
-		goto unlock_exit;
-	} else {
-		seldom();
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
-	}
-	return (0);
-}
-
 static noinline streams_fastcall int
-udp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
+tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 {
 	switch (rtn) {
 	case QR_DONE:
@@ -8367,172 +8320,98 @@ udp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 	}
 }
 
-streamscall __hot int
-udp_srvq(queue_t *q, int streamscall (*proc) (queue_t *, mblk_t *),
-	 void streamscall (*procwake) (queue_t *))
+streamscall __hot_out int
+tp_rput(queue_t *q, mblk_t *mp)
 {
-	int rtn = 0;
-
-	ensure(q, return (-EFAULT));
-	if (likely(tp_trylockq(q))) {
-		mblk_t *mp;
-
-		while (likely((mp = getq(q)) != NULL)) {
-
-			prefetch(mp);
+	/* It appears that once the locking is removed, running procedures directly from the put
+	   procedure is causing soft lockups (interactions between the put procedure running at
+	   bottom half and the service procedure running under STREAMS scheduler context.  This is
+	   just inviting put procedures to run during service procedures.  Testing the QSVCBUSY
+	   flag does not seem to be enough.  Might be a STREAMS bug, but trying scheduling everying 
+	   from the service procedure under STREAMS context instead.  Then we are pretty much
+	   guaranteed that the read side is single threaded. */
 #if 0
-			prefetch(mp->b_datap);
-			prefetch(mp->b_rptr);
-			prefetch(mp->b_cont);
-#endif
-
-			rtn = proc(q, mp);
-			/* Fast Path */
-			if (likely(rtn == QR_TRIMMED)) {
-				freeb(mp);
-				continue;
-			}
-			if (likely(rtn == QR_DONE)) {
-				freemsg(mp);
-				continue;
-			}
-			if (likely(udp_srvq_slow(q, mp, rtn)))
-				continue;
-			break;
-		}
-		/* perform wakeups */
-		if (procwake)
-			procwake(q);
-		tp_unlockq(q);
-		return (0);
+	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
+		if (unlikely(putq(q, mp) == 0))
+			freemsg(mp);
 	} else {
-		rare();
-		return (0);
-	}
-}
+		int rtn;
 
-static noinline streams_fastcall int
-tp_oput_slow(str_t * s, mblk_t *mp)
-{
-	if (likely(s->oq != NULL)) {
-		swerr();
-		if (s->oq->q_qinfo->qi_srvp && likely(putq(s->oq, mp) != 0))
-			return (0);	/* recovered */
+		rtn = tp_r_prim(q, mp);
+		/* Fast Paths */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (likely(rtn == QR_DONE))
+			freemsg(mp);
+		else
+			tp_putq_slow(q, mp, rtn);
 	}
-	swerr();
-	freemsg(mp);
-	return (-EFAULT);
+#else
+	if (unlikely(putq(q, mp) == 0))
+		freemsg(mp);
+#endif
+	return (0);
 }
 
 streamscall __hot_out int
-tp_oput(queue_t *q, mblk_t *mp)
+tp_rsrv(queue_t *q)
 {
-	str_t *s = STR_PRIV(q);
+	mblk_t *mp;
 
-	prefetch(mp);
-#if 0
-	prefetch(mp->b_datap);
-	prefetch(mp->b_rptr);
-	prefetch(mp->b_cont);
-#endif
+	while (likely((mp = getq(q)) != NULL)) {
+		int rtn;
 
-	if (likely(s->oq != NULL)) {
-		if (likely(s->o_prim != NULL)) {
-			udp_putq(s->oq, mp, s->o_prim);
-			return (0);
-		}
+		rtn = tp_r_prim(q, mp);
+		/* Fast Path */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (likely(rtn == QR_DONE))
+			freemsg(mp);
+		else if (unlikely(tp_srvq_slow(q, mp, rtn) != 0))
+			break;
 	}
-	return tp_oput_slow(s, mp);
-}
-
-static noinline streams_fastcall int
-tp_osrv_slow(str_t * s, queue_t *q)
-{
-	if (likely(s->oq != NULL)) {
-		if (s->o_wakeup) {
-			s->o_wakeup(s->oq);
-			return (0);
-		}
-	}
-	swerr();
-	noenable(q);
-	return (-EFAULT);
-}
-
-streamscall __hot_out int
-tp_osrv(queue_t *q)
-{
-	str_t *s = STR_PRIV(q);
-
-	if (likely(s->oq != NULL)) {
-		if (likely(s->o_prim != NULL)) {
-			udp_srvq(s->oq, s->o_prim, s->o_wakeup);
-			return (0);
-		}
-	}
-	return tp_osrv_slow(s, q);
-}
-
-static noinline streams_fastcall int
-tp_iput_slow(str_t * s, mblk_t *mp)
-{
-	if (likely(s->iq != NULL)) {
-		swerr();
-		if (s->iq->q_qinfo->qi_srvp && likely(putq(s->iq, mp) != 0))
-			return (0);	/* recovered */
-	}
-	swerr();
-	freemsg(mp);
-	return (-EFAULT);
+	return (0);
 }
 
 streamscall __hot_in int
-tp_iput(queue_t *q, mblk_t *mp)
+tp_wput(queue_t *q, mblk_t *mp)
 {
-	str_t *s = STR_PRIV(q);
+	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
+		if (unlikely(putq(q, mp) == 0))
+			freemsg(mp);
+	} else {
+		int rtn;
 
-	prefetch(mp);
-#if 0
-	prefetch(mp->b_datap);
-	prefetch(mp->b_rptr);
-	prefetch(mp->b_cont);
-#endif
-
-	if (likely(s->iq != NULL)) {
-		if (likely(s->i_prim != NULL)) {
-			udp_putq(s->iq, mp, s->i_prim);
-			return (0);
-		}
+		rtn = tp_w_prim(q, mp);
+		/* Fast Paths */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (likely(rtn == QR_DONE))
+			freemsg(mp);
+		else
+			tp_putq_slow(q, mp, rtn);
 	}
-	return tp_iput_slow(s, mp);
-}
-
-static noinline streams_fastcall int
-tp_isrv_slow(str_t * s, queue_t *q)
-{
-	if (likely(s->iq != NULL)) {
-		if (s->i_wakeup) {
-			s->i_wakeup(s->iq);
-			return (0);
-		}
-	}
-	swerr();
-	noenable(q);
-	return (-EFAULT);
+	return (0);
 }
 
 streamscall __hot_in int
-tp_isrv(queue_t *q)
+tp_wsrv(queue_t *q)
 {
-	str_t *s = STR_PRIV(q);
+	mblk_t *mp;
 
-	if (likely(s->iq != NULL)) {
-		if (likely(s->i_prim != NULL)) {
-			udp_srvq(s->iq, s->i_prim, s->i_wakeup);
-			return (0);
-		}
+	while (likely((mp = getq(q)) != NULL)) {
+		int rtn;
+
+		rtn = tp_w_prim(q, mp);
+		/* Fast Path */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (likely(rtn == QR_DONE))
+			freemsg(mp);
+		else if (unlikely(tp_srvq_slow(q, mp, rtn) != 0))
+			break;
 	}
-	return tp_isrv_slow(s, q);
+	return (0);
 }
 
 /*
@@ -8678,7 +8557,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 				if (tp->CONIND_number == 0 && tp->info.SERV_type != T_CLTS)
 					continue;
 				/* only Streams in close to the correct state */
-				if (tp_not_state(tp, (TSF_IDLE | TSF_WACK_CREQ)))
+				if (tp_not_state(tp, TSF_IDLE))
 					continue;
 				for (i = 0; i < tp->pnum; i++) {
 					if (tp->protoids[i] != proto)
@@ -9067,8 +8946,8 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		tp->cred = *crp;
 		(tp->oq = q)->q_ptr = tp_get(tp);
 		(tp->iq = WR(q))->q_ptr = tp_get(tp);
-		tp->i_prim = &tp_w_prim;
-		tp->o_prim = &tp_r_prim;
+		// tp->i_prim = &tp_w_prim;
+		// tp->o_prim = &tp_r_prim;
 		// tp->i_wakeup = NULL;
 		// tp->o_wakeup = NULL;
 		spin_lock_init(&tp->qlock);	/* "tp-queue-lock" */
@@ -9148,15 +9027,9 @@ tp_free_priv(queue_t *q)
 		atomic_read(&tp->refcnt)));
 #endif
 	/* make sure the stream is disconnected */
-	if (tp->chash != NULL) {
-		tp_disconnect(tp, NULL, NULL, 0, NULL);
-		tp_set_state(tp, TS_IDLE);
-	}
+	tp_disconnect(tp, NULL, NULL, 0, NULL);
 	/* make sure the stream is unbound */
-	if (tp->bhash != NULL) {
-		tp_unbind(tp);
-		tp_set_state(tp, TS_UNBND);
-	}
+	tp_unbind(tp);
 	if (tp->daddrs[0].dst != NULL) {
 		dst_release(tp->daddrs[0].dst);
 		tp->daddrs[0].dst = NULL;
