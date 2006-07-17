@@ -955,7 +955,9 @@ mdbblock_alloc(uint priority, void *func)
 			local_irq_restore(flags);
 			mp->b_next = NULL;
 			{
+#if !defined CONFIG_STREAMS_OPTIMIZE_SPEED || !defined CONFIG_STREAMS_NONE
 				struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
+#endif
 
 #if defined CONFIG_STREAMS_DEBUG
 				struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
