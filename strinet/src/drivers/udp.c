@@ -6293,10 +6293,10 @@ te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned
 		goto discard;
 	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
-	if (unlikely(!canputnext(tp->oq)))
+	if (unlikely(!bcanputnext(tp->oq, 1)))
 		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
-	mp->b_band = 2;		/* XXX move ahead of data indications */
+	mp->b_band = 1;		/* XXX move ahead of data indications */
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_UDERROR_IND;
 	p->DEST_length = DEST_length;
@@ -6456,7 +6456,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PROTO;
-	mp->b_band = 2;
+	mp->b_band = 1;
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_IND;
 	p->RESET_orig = N_PROVIDER;
@@ -8020,16 +8020,16 @@ tp_r_data(queue_t *q, mblk_t *mp)
 }
 
 /**
- * tp_r_error - process M_ERROR message
+ * tp_r_ctl - process M_CTL message
  * @q: active queue in queue pair (read queue)
- * @mp: the M_ERROR message
+ * @mp: the M_CTL message
  *
- * M_ERROR messages are placed to the read queue by the Linux IP tp_v4_err() callback.  The message
+ * M_CTL messages are placed to the read queue by the Linux IP tp_v4_err() callback.  The message
  * contains a complete ICMP datagram starting with the IP header.  What needs to be done is to
  * convert this to an upper layer indication and deliver it upstream.
  */
 STATIC noinline streams_fastcall __unlikely int
-tp_r_error(queue_t *q, mblk_t *mp)
+tp_r_ctl(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	int rtn;
@@ -8101,8 +8101,8 @@ tp_r_prim_slow(queue_t *q, mblk_t *mp)
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		return tp_r_data(q, mp);
-	case M_ERROR:
-		return tp_r_error(q, mp);
+	case M_CTL:
+		return tp_r_ctl(q, mp);
 	case M_FLUSH:
 		return tp_r_flush(q, mp);
 	default:
@@ -8323,14 +8323,6 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-	/* It appears that once the locking is removed, running procedures directly from the put
-	   procedure is causing soft lockups (interactions between the put procedure running at
-	   bottom half and the service procedure running under STREAMS scheduler context.  This is
-	   just inviting put procedures to run during service procedures.  Testing the QSVCBUSY
-	   flag does not seem to be enough.  Might be a STREAMS bug, but trying scheduling everying 
-	   from the service procedure under STREAMS context instead.  Then we are pretty much
-	   guaranteed that the read side is single threaded. */
-#if 0
 	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
@@ -8346,10 +8338,6 @@ tp_rput(queue_t *q, mblk_t *mp)
 		else
 			tp_putq_slow(q, mp, rtn);
 	}
-#else
-	if (unlikely(putq(q, mp) == 0))
-		freemsg(mp);
-#endif
 	return (0);
 }
 
@@ -8367,7 +8355,7 @@ tp_rsrv(queue_t *q)
 			freeb(mp);
 		else if (likely(rtn == QR_DONE))
 			freemsg(mp);
-		else if (unlikely(tp_srvq_slow(q, mp, rtn) != 0))
+		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
 	return (0);
@@ -8408,7 +8396,7 @@ tp_wsrv(queue_t *q)
 			freeb(mp);
 		else if (likely(rtn == QR_DONE))
 			freemsg(mp);
-		else if (unlikely(tp_srvq_slow(q, mp, rtn) != 0))
+		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
 	return (0);
@@ -8841,7 +8829,7 @@ tp_v4_rcv(struct sk_buff *skb)
  * @info: additional information (unused)
  *
  * This function is a network protocol callback that is invoked when transport specific ICMP errors
- * are received.  The function looks up the Stream and, if found, wraps the packet in an M_ERROR
+ * are received.  The function looks up the Stream and, if found, wraps the packet in an M_CTL
  * message and passes it to the read queue of the Stream.
  *
  * ICMP packet consists of ICMP IP header, ICMP header, IP header of returned packet, and IP payload
@@ -8875,15 +8863,16 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 		mblk_t *mp;
 		size_t plen = skb->len + (skb->data - skb->nh.raw);
 
-		/* Create a queue a specialized M_ERROR message to the Stream's read queue for
+		/* Create a queue a specialized M_CTL message to the Stream's read queue for
 		   further processing.  The Stream will convert this message into a T_UDERROR_IND
 		   or T_DISCON_IND message and pass it along. */
 		if ((mp = allocb(plen, BPRI_MED)) == NULL)
 			goto no_buffers;
 		/* check flow control only after we have a buffer */
-		if (tp->oq == NULL || !canput(tp->oq))
+		if (tp->oq == NULL || !bcanput(tp->oq, 1))
 			goto flow_controlled;
-		mp->b_datap->db_type = M_ERROR;
+		mp->b_datap->db_type = M_CTL;
+		mp->b_band = 1;
 		bcopy(skb->nh.raw, mp->b_wptr, plen);
 		mp->b_wptr += plen;
 		put(tp->oq, mp);
