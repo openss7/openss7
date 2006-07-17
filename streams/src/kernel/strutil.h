@@ -69,7 +69,8 @@ extern struct syncq *global_syncq;
 #if 0
 extern bool __rmvq(queue_t *q, mblk_t *mp);
 #endif
-extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[]);
+extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t ***mppp,
+						 char bands[]);
 
 /*
  *  Simple locks, no nesting (not required).  Write locks suppress interrupts; read locks only
@@ -148,19 +149,19 @@ extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t **
 #define not_frozen_by_caller(__q)	(bool)({ ((qstream((__q)))->sd_freezer != current); })
 
 /* no IRQ suppression (but BH) for profiling */
-#ifdef CONFIG_STREAMS_TEST
+#if defined CONFIG_STREAMS_TEST || defined CONFIG_STREAMS_NOIRQ
 #define zlockinit(__sd)			do { rwlock_init(&(__sd)->sd_freeze); } while (0)
 #define zwlock(__sd)			(unsigned long)({ write_lock_bh(&(__sd)->sd_freeze); (__sd)->sd_freezer = current; 0; })
 #define zwunlock(__sd,__pl)		do { (__sd)->sd_freezer = NULL; write_unlock_bh(&(__sd)->sd_freeze); (void)(__pl); } while (0)
 #define zrlock(__sd)			(unsigned long)({ local_bh_disable(); if ((__sd)->sd_freezer != current) read_lock(&(__sd)->sd_freeze); 0; })
 #define zrunlock(__sd,__pl)		do { if ((__sd)->sd_freezer != current) read_unlock(&(__sd)->sd_freeze); local_bh_enable(); (void)(__pl); } while (0)
-#else
+#else				/* defined CONFIG_STREAMS_TEST || defined CONFIG_STREAMS_NOIRQ */
 #define zlockinit(__sd)			do { rwlock_init(&(__sd)->sd_freeze); } while (0)
 #define zwlock(__sd)			(unsigned long)({ unsigned long __pl; write_lock_irqsave(&(__sd)->sd_freeze, __pl); (__sd)->sd_freezer = current; __pl; })
 #define zwunlock(__sd,__pl)		do { (__sd)->sd_freezer = NULL; write_unlock_irqrestore(&(__sd)->sd_freeze, (__pl)); } while (0)
 #define zrlock(__sd)			(unsigned long)({ unsigned long __pl; local_irq_save(__pl); if ((__sd)->sd_freezer != current) read_lock(&(__sd)->sd_freeze); __pl; })
 #define zrunlock(__sd,__pl)		do { if ((__sd)->sd_freezer != current) read_unlock(&(__sd)->sd_freeze); local_irq_restore((__pl)); } while (0)
-#endif
+#endif				/* defined CONFIG_STREAMS_TEST || defined CONFIG_STREAMS_NOIRQ */
 
 #define stream_barrier(__sd)		do { unsigned long __pl; __pl = zrlock((__sd)); zrunlock((__sd),__pl); } while (0)
 #define freeze_barrier(__q)		do { struct stdata *__sd = qstream((__q)); stream_barrier(__sd); } while (0)
@@ -210,12 +211,12 @@ extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t **
 #define qwunlock(__q,__pl)		do { struct stdata *__sd = qstream((__q)); write_unlock(&(__q)->q_lock); zrunlock((__sd),(__pl)); }  while (0)
 
 /* no IRQ suppression (but BH) for profiling */
-#ifdef CONFIG_STREAMS_TEST
+#if defined CONFIG_STREAMS_TEST || defined CONFIG_STREAMS_NOIRQ
 #define qrlock(__q)			(unsigned long)({ read_lock_bh(&(__q)->q_lock); 0; })
 #define qrunlock(__q,__pl)		do { read_unlock_bh(&(__q)->q_lock); (void)(__pl); }  while (0)
-#else
+#else				/* defined CONFIG_STREAMS_TEST || defined CONFIG_STREAMS_NOIRQ */
 #define qrlock(__q)			(unsigned long)({ unsigned long __pl; read_lock_irqsave(&(__q)->q_lock, __pl);  __pl;  })
 #define qrunlock(__q,__pl)		do { read_unlock_irqrestore(&(__q)->q_lock,(__pl)); }  while (0)
-#endif
+#endif				/* defined CONFIG_STREAMS_TEST || defined CONFIG_STREAMS_NOIRQ */
 
 #endif				/* __LOCAL_STRUTIL_H__ */

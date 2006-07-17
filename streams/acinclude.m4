@@ -228,6 +228,31 @@ AC_DEFUN([_LFS_SETUP_DEBUG], [dnl
 # =============================================================================
 
 # =============================================================================
+# _LFS_SETUP_IRQ
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_IRQ], [dnl
+    AC_ARG_ENABLE([streams-irq],
+	AS_HELP_STRING([--enable-streams-irq],
+	    [enable STREAMS irq suppression.
+	     @<:@default=disabled@:>@])
+	    [enable_streams_irq="$enableval"],
+	    [enable_streams_irq='no'])
+    AC_CACHE_CHECK([for STREAMS irq suppression], [lfs_streams_irq], [dnl
+	lfs_streams_irq="${enable_streams_irq:-no}"])
+    case ${lfs_streams_irq:-no} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NOIRQ], [1], [When defined]
+	    AC_PACKAGE_TITLE [will not suppress interrupts for stream or queue
+	    lock protection.  When defined a driver's put() procedure must not
+	    be called from an ISR and must only be called from bottom half or
+	    tasklets.])
+	    ;;
+    esac
+    AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :${lfs_streams_irq:-no} = :no])
+])# _LFS_SETUP_IRQ
+# =============================================================================
+
+# =============================================================================
 # _LFS_SETUP_SYNCQS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_SYNCQS], [dnl
@@ -872,6 +897,7 @@ AC_DEFUN([_LFS_SETUP], [dnl
     _LFS_SETUP_DEBUG
     _LFS_SETUP_COMPAT
     _LFS_SETUP_MODULE
+    _LFS_SETUP_IRQ
     _LFS_SETUP_SYNCQS
     _LFS_SETUP_KTHREADS
     _LFS_SETUP_UTILS
