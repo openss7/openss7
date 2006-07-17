@@ -501,12 +501,10 @@ strsyscall(void)
 	   user context.  This call would make the top module or driver service procedure also run
 	   in user context, but that is unnecessary.  Some performance gains yielded by not
 	   freaking the Linux scheduler. */
-#if 0
 	/* before every system call return -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
-#endif
 }
 
 STATIC streams_inline streams_fastcall __hot_in void
