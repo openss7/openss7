@@ -347,7 +347,7 @@ STATIC struct module_info udp_minfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 19),		/* Hi water mark */
+	.mi_hiwat = (1 << 18),		/* Hi water mark */
 	.mi_lowat = (1 << 17),		/* Lo water mark */
 };
 
@@ -8327,7 +8327,16 @@ tp_rsrv(queue_t *q)
 			freeb(mp);
 		else if (likely(rtn == QR_DONE))
 			freemsg(mp);
-		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+		else if (likely(rtn == -EBUSY)) {
+			if (unlikely(!putbq(q, mp)))
+				freemsg(mp);
+#if !defined CONFIG_STREAMS_NOIRQ && !defined CONFIG_SMP
+			/* try running softirqd */
+			local_bh_disable();
+			local_bh_enable();
+#endif
+			break;
+		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
 	return (0);
@@ -8377,7 +8386,16 @@ tp_wsrv(queue_t *q)
 			freeb(mp);
 		else if (likely(rtn == QR_DONE))
 			freemsg(mp);
-		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+		else if (likely(rtn == -EBUSY)) {
+			if (unlikely(!putbq(q, mp)))
+				freemsg(mp);
+#if !defined CONFIG_STREAMS_NOIRQ && !defined CONFIG_SMP
+			/* try running softirqd */
+			local_bh_disable();
+			local_bh_enable();
+#endif
+			break;
+		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
 	return (0);
