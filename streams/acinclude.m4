@@ -240,7 +240,7 @@ AC_DEFUN([_LFS_SETUP_IRQ], [dnl
     AC_CACHE_CHECK([for STREAMS irq suppression], [lfs_streams_irq], [dnl
 	lfs_streams_irq="${enable_streams_irq:-no}"])
     case ${lfs_streams_irq:-no} in
-	(yes)
+	(no)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NOIRQ], [1], [When defined]
 	    AC_PACKAGE_TITLE [will not suppress interrupts for stream or queue
 	    lock protection.  When defined a driver's put() procedure must not
