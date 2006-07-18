@@ -343,12 +343,12 @@ MODULE_ALIAS("/dev/udp2");
 #endif				/* MODULE */
 
 STATIC struct module_info udp_minfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
-	.mi_idname = DRV_NAME,	/* Module name */
-	.mi_minpsz = 0,		/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
-	.mi_hiwat = (1 << 19),	/* Hi water mark */
-	.mi_lowat = (1 << 17),	/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = (1 << 19),		/* Hi water mark */
+	.mi_lowat = (1 << 17),		/* Lo water mark */
 };
 
 STATIC struct module_stat udp_mstat = {
@@ -363,22 +363,22 @@ streamscall int tp_rput(queue_t *, mblk_t *);
 streamscall int tp_rsrv(queue_t *);
 
 STATIC struct qinit udp_rinit = {
-	.qi_putp = tp_rput,	/* Read put procedure (message from below) */
-	.qi_srvp = tp_rsrv,	/* Read service procedure */
-	.qi_qopen = udp_qopen,	/* Each open */
+	.qi_putp = tp_rput,		/* Read put procedure (message from below) */
+	.qi_srvp = tp_rsrv,		/* Read service procedure */
+	.qi_qopen = udp_qopen,		/* Each open */
 	.qi_qclose = udp_qclose,	/* Last close */
-	.qi_minfo = &udp_minfo,	/* Module information */
-	.qi_mstat = &udp_mstat,	/* Module statistics */
+	.qi_minfo = &udp_minfo,		/* Module information */
+	.qi_mstat = &udp_mstat,		/* Module statistics */
 };
 
 streamscall int tp_wput(queue_t *, mblk_t *);
 streamscall int tp_wsrv(queue_t *);
 
 STATIC struct qinit udp_winit = {
-	.qi_putp = tp_wput,	/* Write put procedure (message from above) */
-	.qi_srvp = tp_wsrv,	/* Write service procedure */
-	.qi_minfo = &udp_minfo,	/* Module information */
-	.qi_mstat = &udp_mstat,	/* Module statistics */
+	.qi_putp = tp_wput,		/* Write put procedure (message from above) */
+	.qi_srvp = tp_wsrv,		/* Write service procedure */
+	.qi_minfo = &udp_minfo,		/* Module information */
+	.qi_mstat = &udp_mstat,		/* Module statistics */
 };
 
 MODULE_STATIC struct streamtab udp_info = {
@@ -458,7 +458,7 @@ typedef struct tp {
 	unsigned int BIND_flags;	/* bind flags */
 	unsigned int CONN_flags;	/* connect flags */
 	unsigned int CONIND_number;	/* maximum number of outstanding connection indications */
-	bufq_t conq;			/* queue outstanding connection indications */
+	bufq_t conq;			/* connection indication queue */
 	unsigned short pnum;		/* number of bound protocol ids */
 	uint8_t protoids[16];		/* bound protocol ids */
 	unsigned short bnum;		/* number of bound addresses */
@@ -486,10 +486,10 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 
 #define xti_default_debug		{ 0, }
 #define xti_default_linger		(struct t_linger){T_YES, 120}
-#define xti_default_rcvbuf		sysctl_rmem_default
+#define xti_default_rcvbuf		(sysctl_rmem_default << 1)
 #define xti_default_rcvlowat		1
-#define xti_default_sndbuf		sysctl_wmem_default
-#define xti_default_sndlowat		(sysctl_wmem_default >> 1)
+#define xti_default_sndbuf		(sysctl_wmem_default << 1)
+#define xti_default_sndlowat		sysctl_wmem_default
 #define xti_default_priority		0
 
 #define ip_default_protocol		17
@@ -655,7 +655,7 @@ tp_alloc(void)
  *  Buffer allocation
  */
 
-streams_inline streamscall __unlikely void
+STATIC streamscall __unlikely void
 tp_bufsrv(long data)
 {
 	str_t *s;
@@ -681,7 +681,7 @@ tp_bufsrv(long data)
 	return;
 }
 
-streams_inline streamscall __unlikely void
+STATIC noinline fastcall __unlikely void
 tp_unbufcall(str_t * s)
 {
 	bufcall_id_t bid;
@@ -696,7 +696,7 @@ tp_unbufcall(str_t * s)
 	}
 }
 
-streams_inline streamscall __unlikely void
+STATIC noinline fastcall __unlikely void
 tp_bufcall(queue_t *q, size_t size, int prior)
 {
 	if (q) {
@@ -721,7 +721,7 @@ tp_bufcall(queue_t *q, size_t size, int prior)
 	return;
 }
 
-streams_inline streamscall __unlikely mblk_t *
+STATIC INLINE fastcall __unlikely mblk_t *
 tp_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
@@ -733,7 +733,7 @@ tp_allocb(queue_t *q, size_t size, int prior)
 	return (mp);
 }
 
-streams_inline streamscall __unlikely mblk_t *
+STATIC INLINE fastcall __unlikely mblk_t *
 tp_dupmsg(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
@@ -4623,21 +4623,6 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 		if (hp1 != hp2)
 			write_unlock(&hp2->lock);
 		write_unlock_bh(&hp1->lock);
-#if 0
-		/* needs to be done by caller */
-		{
-			int i;
-
-			/* free dst caches */
-			for (i = 0; i < tp->dnum; i++)
-				dst_release(XCHG(&tp->daddrs[i].dst, NULL));
-			tp->dnum = 0;
-			tp->dport = 0;
-			/* blank source addresses */
-			tp->snum = 0;
-			tp->sport = 0;
-		}
-#endif
 		/* how do we say already connected? (-EISCONN) */
 		return (TADDRBUSY);
 	}
@@ -4914,17 +4899,13 @@ np_reset_loc(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *
 STATIC int
 np_reset_rem(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason)
 {
-	mblk_t *resp, **respp;
+	mblk_t *rp;
 
-	/* find last one on list */
-	for (respp = &np->resq; (*respp) && (*respp)->b_next; respp = &(*respp)->b_next) ;
-	if (*respp == NULL)
-		return (-EFAULT);
-	resp = *respp;
-	*respp = resp->b_next;
-	resp->b_next = NULL;
-	freemsg(resp);
-	np->resinds--;
+	/* free last one on list */
+	if ((rp = bufq_tail(&np->resq)) != NULL) {
+		bufq_unlink(&np->resq, rp);
+		freemsg(rp);
+	}
 	return (0);
 }
 #endif
@@ -5073,8 +5054,10 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 	if (t_tst_bit(_T_BIT_IP_TTL, OPT_buffer->flags)) {
 		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl < 1)
 			goto error;
-		// if ((t_scalar_t) (signed char)OPT_buffer->ip.ttl > 127)
-		// goto error;
+#if 0
+		if ((t_scalar_t) (signed char)OPT_buffer->ip.ttl > 127)
+			goto error;
+#endif
 	} else {
 		OPT_buffer->ip.ttl = ACCEPTOR_id->options.ip.ttl;
 	}
@@ -5255,7 +5238,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 
 /**
  * tp_disconnect - disconnect from the connection hashes
- * @q: active queue (write queue)
+ * @tp: private structure
  * @RES_buffer: responding address (unused)
  * @SEQ_number: connection indication being refused
  * @DISCON_reason: disconnect reason (unused)
@@ -5450,11 +5433,9 @@ te_info_ack(queue_t *q)
 	mblk_t *mp;
 	struct T_info_ack *p;
 	size_t size = sizeof(*p);
-	int err;
 
-	err = -ENOBUFS;
 	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
-		goto error;
+		goto enobufs;
 
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -5474,8 +5455,8 @@ te_info_ack(queue_t *q)
 	qreply(q, mp);
 	return (QR_DONE);
 
-      error:
-	return (err);
+      enobufs:
+	return (-ENOBUFS);
 }
 
 /**
@@ -5611,6 +5592,7 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
  * @CORRECT_prim: correct primitive
  * @ADDR_buffer: destination or responding address
  * @ADDR_length: length of destination or responding addresses
+ * @OPT_buffer: option parameters
  * @SEQ_number: sequence number (i.e. connection/reset indication sequence number)
  * @ACCEPTOR_id: token (i.e. connection response token)
  * @flags: mangement flags, connection flags, disconnect reason, etc.
@@ -5638,6 +5620,12 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 	switch (tp_get_state(tp)) {
 #if 0
 	case TS_WACK_OPTREQ:
+		err = tp_optmgmt(tp, OPT_buffer, flags);
+		if (unlikely(err != 0))
+			goto free_error;
+		bufq_lock(&tp->conq);
+		tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
+		bufq_unlock(&tp->conq);
 		break;
 #endif
 	case TS_WACK_UREQ:
@@ -5686,7 +5674,9 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		err = np_reset_rem(np, N_USER, N_REASON_UNDEFINED);
 		if (unlikely(err != 0))
 			goto free_error;
-		np_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
+		bufq_lock(&np->resq);
+		np_set_state(np, bufq_length(&np->resq) > 0 ? NS_WRES_RIND : NS_DATA_XFER);
+		bufq_unlock(&np->resq);
 		break;
 #endif
 	case TS_WACK_DREQ6:
@@ -5818,7 +5808,7 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
  * An N_RESET_CON message is sent only when the reset completes successfully.
  */
 STATIC streams_fastcall int
-ne_reset_con(queue_t *q, const np_ulong RESET_orig, const np_ulong RESET_reason, mblk_t *dp)
+ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 {
 	struct np *np = NP_PRIV(q);
 	mblk_t *mp = NULL;
@@ -5835,7 +5825,9 @@ ne_reset_con(queue_t *q, const np_ulong RESET_orig, const np_ulong RESET_reason,
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_CON;
 	mp->b_wptr += sizeof(*p);
-	np_set_state(np, np->resinds > 0 ? NS_WRES_RIND : NS_DATA_XFER);
+	bufq_lock(&np->resq);
+	np_set_state(np, bufq_length(&np->resq) > 0 ? NS_WRES_RIND : NS_DATA_XFER);
+	bufq_unlock(&np->resq);
 	_printd(("%s: <- N_RESET_CON\n", DRV_NAME));
 	qreply(q, mp);
 	return (QR_DONE);
@@ -7221,14 +7213,6 @@ te_conn_res(queue_t *q, mblk_t *mp)
 		if (bufq_length(&tp->conq) > 1)
 			goto error;
 	}
-#if 0
-	/* Do this in ok ack */
-	{
-		struct T_conn_ind *c = (typeof(c)) SEQ_number->b_rptr;
-
-		bcopy(SEQ_number->b_rptr + c->SRC_offset, &ACCEPTOR_id->DEST_buffer, c->SRC_length);
-	}
-#endif
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	tp_set_state(tp, TS_WACK_CRES);
 	err = te_ok_ack(q, T_CONN_RES, NULL, 0, OPT_buffer, SEQ_number, ACCEPTOR_id, 0, dp);
@@ -8323,9 +8307,7 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-	/* It seems to run faster if the messages are simply queued.  This is just for testing, one 
-	   should never queue M_FLUSH messages. */
-	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
+	if (likely(mp->b_datap->db_type < QPCTL)) {
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
@@ -8366,14 +8348,7 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
-	/* It seems to run faster if the messages are simply queued.  This is just for testing, one 
-	   should never queue M_FLUSH messages. */
-#if 0
-	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY))
-#else
-	if (likely(mp->b_datap->db_type < QPCTL))
-#endif
-	{
+	if (likely(mp->b_datap->db_type < QPCTL)) {
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
