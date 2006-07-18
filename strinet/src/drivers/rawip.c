@@ -7936,7 +7936,12 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-	if (likely(mp->b_datap->db_type < QPCTL) && (q->q_first == NULL || (q->q_flag & QSVCBUSY))) {
+#ifdef CONFIG_SMP
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
+#else
+	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
+#endif
+	{
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
@@ -7977,7 +7982,12 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
-	if (likely(mp->b_datap->db_type < QPCTL) && (q->q_first == NULL || (q->q_flag & QSVCBUSY))) {
+#ifdef CONFIG_SMP
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
+#else
+	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
+#endif
+	{
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
