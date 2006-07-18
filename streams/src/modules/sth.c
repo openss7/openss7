@@ -535,7 +535,7 @@ strsyscall_read(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#if 1
+#if 0
 	struct strthread *t = this_thread;
 
 	/* before every system call return -- saves a context switch */
