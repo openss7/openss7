@@ -553,9 +553,6 @@ strsyscall_read(void)
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule(void)
 {
-	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
-	   STREAMS scheduler in process context here. I don't know why... */
-#ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* before every sleep -- saves a context switch */
@@ -565,7 +562,6 @@ strschedule(void)
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	set_current_state(TASK_RUNNING);
 	runqueues();
-#endif
 }
 
 STATIC streams_inline streams_fastcall __hot_out void
