@@ -2859,6 +2859,10 @@ __rmvq(queue_t *q, mblk_t *mp)
 	if (likely(mp->b_band == 0)) {
 		q->q_count -= msgsize(mp);
 		assert(q->q_count >= 0);
+#if 0
+		/* This turns out to be a really bad policy: empty queues are backenabling way too
+		   fast, running the upstream service procedure which causes it to backenable
+		   further.  This is a waste.  Remember to change the documentation too! */
 		if (q->q_count == 0) {
 			clear_bit(QFULL_BIT, &q->q_flag);
 			clear_bit(QWANTW_BIT, &q->q_flag);
@@ -2868,6 +2872,13 @@ __rmvq(queue_t *q, mblk_t *mp)
 			if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
 				backenable = true;
 		}
+#else
+		if (q->q_count == 0 || q->q_count < q->q_lowat) {
+			clear_bit(QFULL_BIT, &q->q_flag);
+			if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
+				backenable = true;
+		}
+#endif
 		/* no longer want to read band zero */
 		clear_bit(QWANTR_BIT, &q->q_flag);
 	} else {
@@ -3253,6 +3264,11 @@ __getq(queue_t *q, bool *be)
 		if (likely(mp->b_band == 0)) {
 			q->q_count -= msgsize(mp);
 			assert(q->q_count >= 0);
+#if 0
+			/* This turns out to be a really bad policy: empty queues are backenabling
+			   way too fast, running the upstream service procedure which causes it to
+			   backenable further.  This is a waste.  Remember to change the
+			   documentation too! */
 			if (q->q_count == 0) {
 				clear_bit(QFULL_BIT, &q->q_flag);
 				clear_bit(QWANTW_BIT, &q->q_flag);
@@ -3262,6 +3278,13 @@ __getq(queue_t *q, bool *be)
 				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
 					*be = true;
 			}
+#else
+			if (q->q_count == 0 || q->q_count < q->q_lowat) {
+				clear_bit(QFULL_BIT, &q->q_flag);
+				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
+					backenable = true;
+			}
+#endif
 			/* no longer want to read band zero */
 			clear_bit(QWANTR_BIT, &q->q_flag);
 		} else {
