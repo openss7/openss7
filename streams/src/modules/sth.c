@@ -500,7 +500,6 @@ strsyscall(void)
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
 #if 0
-#ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* before every system call return -- saves a context switch */
@@ -509,7 +508,6 @@ strsyscall(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	runqueues();
-#endif
 #endif
 }
 
@@ -519,8 +517,7 @@ strsyscall_write(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#if 0
-#ifndef CONFIG_SMP
+#if 1
 	struct strthread *t = this_thread;
 
 	/* before every system call return -- saves a context switch */
@@ -529,7 +526,6 @@ strsyscall_write(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	runqueues();
-#endif
 #endif
 }
 
@@ -540,7 +536,6 @@ strsyscall_read(void)
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
 #if 0
-#ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* before every system call return -- saves a context switch */
@@ -549,7 +544,6 @@ strsyscall_read(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	runqueues();
-#endif
 #endif
 }
 
