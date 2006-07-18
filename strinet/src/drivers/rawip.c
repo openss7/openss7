@@ -883,9 +883,6 @@ STATIC struct tp_options tp_defaults = {
 	       .daddr = ip_default_daddr,
 	       .mtu = ip_default_mtu,
 	       },
-	.udp = {
-		.checksum = udp_default_checksum,
-		}
 };
 
 #define t_defaults tp_defaults
@@ -4480,7 +4477,6 @@ tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t
 	tp->options.ip.mtu = OPT_buffer->ip.mtu;
 	tp->options.ip.saddr = OPT_buffer->ip.saddr;
 	tp->options.ip.daddr = OPT_buffer->ip.daddr;
-	tp->options.udp.checksum = OPT_buffer->udp.checksum;
 	/* note that on failure we are allowed to have partially negotiated some values */
 
 	/* note that all these state changes are not seen by the read side until we are placed into
@@ -8612,7 +8608,6 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		tp->options.ip.saddr = ip_default_saddr;
 		tp->options.ip.daddr = ip_default_daddr;
 		tp->options.ip.mtu = ip_default_mtu;
-		tp->options.udp.checksum = udp_default_checksum;
 		/* link into master list */
 		tp_get(tp);
 		if ((tp->next = *tpp))
