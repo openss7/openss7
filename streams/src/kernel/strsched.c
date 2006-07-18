@@ -4200,7 +4200,6 @@ __runqueues(struct softirq_action *unused)
 #endif
 {				/* PROFILED */
 	struct strthread *t;
-	int oldflags;
 	int runs = 0;
 
 	_trace();
