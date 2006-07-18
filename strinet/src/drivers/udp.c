@@ -8315,12 +8315,14 @@ streamscall __hot_out int
 tp_rsrv(queue_t *q)
 {
 	mblk_t *mp;
+	int blockcnt = 0;
 
 	udp_mstat.ms_scnt++;
 	if (likely((mp = getq(q)) != NULL)) {
 		do {
 			int rtn;
 
+			++blockcnt;
 			rtn = tp_r_prim(q, mp);
 			/* Fast Path */
 			if (likely(rtn == QR_TRIMMED))
@@ -8340,7 +8342,12 @@ tp_rsrv(queue_t *q)
 #endif
 	return (0);
       busy:
-	__ptrace(("%s: %p: flow controlled\n", __FUNCTION__, q));
+	_ptrace(("%s: %p: flow controlled\n", __FUNCTION__, q));
+	udp_mstat.ms_ccnt++;
+	if (blockcnt <= 1) {
+		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
+		udp_mstat.ms_acnt++;
+	}
 	return (0);
 }
 
@@ -8379,12 +8386,14 @@ streamscall __hot_in int
 tp_wsrv(queue_t *q)
 {
 	mblk_t *mp;
+	int blockcnt = 0;
 
 	udp_mstat.ms_scnt++;
 	if (likely((mp = getq(q)) != NULL)) {
 		do {
 			register int rtn;
 
+			++blockcnt;
 			rtn = tp_w_prim(q, mp);
 			/* Fast Path */
 			if (likely(rtn == QR_TRIMMED))
@@ -8399,7 +8408,12 @@ tp_wsrv(queue_t *q)
 	}
 	return (0);
       busy:
-	__ptrace(("%s: %p: flow controlled\n", __FUNCTION__, q));
+	_ptrace(("%s: %p: flow controlled\n", __FUNCTION__, q));
+	udp_mstat.ms_ccnt++;
+	if (blockcnt <= 1) {
+		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
+		udp_mstat.ms_acnt++;
+	}
 #if 1
 	/* try running softirqd */
 	local_bh_disable();
