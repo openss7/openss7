@@ -232,23 +232,24 @@ AC_DEFUN([_LFS_SETUP_DEBUG], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_IRQ], [dnl
     AC_ARG_ENABLE([streams-irq],
-	AS_HELP_STRING([--enable-streams-irq],
-	    [enable STREAMS irq suppression.
+	AS_HELP_STRING([--disable-streams-irq],
+	    [distable STREAMS irq suppression.
 	     @<:@default=disabled@:>@])
 	    [enable_streams_irq="$enableval"],
-	    [enable_streams_irq='no'])
+	    [enable_streams_irq='yes'])
     AC_CACHE_CHECK([for STREAMS irq suppression], [lfs_streams_irq], [dnl
-	lfs_streams_irq="${enable_streams_irq:-no}"])
-    case ${lfs_streams_irq:-no} in
+	lfs_streams_irq="${enable_streams_irq:-yes}"])
+    case ${lfs_streams_irq:-yes} in
 	(no)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NOIRQ], [1], [When defined]
 	    AC_PACKAGE_TITLE [will not suppress interrupts for stream or queue
 	    lock protection.  When defined a driver's put() procedure must not
 	    be called from an ISR and must only be called from bottom half or
-	    tasklets.])
+	    tasklets.  Bottom half locking is more expensive: don't enable
+	    this.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :${lfs_streams_irq:-no} = :no])
+    AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :${lfs_streams_irq:-yes} = :no])
 ])# _LFS_SETUP_IRQ
 # =============================================================================
 

@@ -3434,8 +3434,9 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 	struct ipnet_protocol *pp;
 	struct mynet_protocol **ppp;
 	int hash = proto & (MAX_INET_PROTOS - 1);
+	unsigned long flags;
 
-	write_lock_bh(&tp_prot_lock);
+	write_lock_irqsave(&tp_prot_lock, flags);
 	if ((pb = tp_prots[proto]) != NULL) {
 		pb->refs++;
 		switch (type) {
@@ -3492,7 +3493,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 				if ((*ppp)->copy != 0) {
 					__ptrace(("Cannot override copy entry\n"));
 					net_protocol_unlock();
-					write_unlock_bh(&tp_prot_lock);
+					write_unlock_irqrestore(&tp_prot_lock, flags);
 					kmem_cache_free(raw_prot_cachep, pb);
 					return (NULL);
 				}
@@ -3503,7 +3504,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 					if (!try_module_get(pp->kmod)) {
 						__ptrace(("Cannot acquire module\n"));
 						net_protocol_unlock();
-						write_unlock_bh(&tp_prot_lock);
+						write_unlock_irqrestore(&tp_prot_lock, flags);
 						kmem_cache_free(raw_prot_cachep, pb);
 						return (NULL);
 					}
@@ -3520,7 +3521,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 		/* link into hash slot */
 		tp_prots[proto] = pb;
 	}
-	write_unlock_bh(&tp_prot_lock);
+	write_unlock_irqrestore(&tp_prot_lock, flags);
 	return (pb);
 }
 
@@ -3540,8 +3541,9 @@ STATIC INLINE streams_fastcall __unlikely void
 tp_term_nproto(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
+	unsigned long flags;
 
-	write_lock_bh(&tp_prot_lock);
+	write_lock_irqsave(&tp_prot_lock, flags);
 	if ((pb = tp_prots[proto]) != NULL) {
 		switch (type) {
 		case T_COTS:
@@ -3585,7 +3587,7 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 			kmem_cache_free(raw_prot_cachep, pb);
 		}
 	}
-	write_unlock_bh(&tp_prot_lock);
+	write_unlock_irqrestore(&tp_prot_lock, flags);
 }
 #endif				/* LINUX */
 
@@ -3649,9 +3651,10 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 	size_t anum = ADDR_length / sizeof(*ADDR_buffer);
 	struct tp *tp2;
 	int i, j, err;
+	unsigned long flags;
 
 	hp = &tp_bhash[tp_bhashfn(proto, bport)];
-	write_lock_bh(&hp->lock);
+	write_lock_irqsave(&hp->lock, flags);
 	for (tp2 = hp->list; tp2; tp2 = tp2->bnext) {
 		if (proto != tp2->protoids[0])
 			continue;
@@ -3680,13 +3683,13 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 	}
 	if (tp2 != NULL) {
 		if (tp2->options.ip.reuseaddr != T_YES || tp->options.ip.reuseaddr != T_YES) {
-			write_unlock_bh(&hp->lock);
+			write_unlock_irqrestore(&hp->lock, flags);
 			return (TADDRBUSY);
 		}
 		/* fall through and bind */
 	}
 	if ((err = tp_bind_prot(proto, tp->info.SERV_type))) {
-		write_unlock_bh(&hp->lock);
+		write_unlock_irqrestore(&hp->lock, flags);
 		return (err);
 	}
 	tp->options.ip.protocol = proto;
@@ -3706,7 +3709,7 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 		 (int) proto, (int) ntohs(bport)));
 	for (i = 0; i < anum; i++)
 		tp->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
-	write_unlock_bh(&hp->lock);
+	write_unlock_irqrestore(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
 	synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
@@ -3754,16 +3757,18 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 STATIC noinline streams_fastcall void
 tp_skb_destructor_slow(struct tp *tp, struct sk_buff *skb)
 {
-	spin_lock_bh(&tp->qlock);
+	unsigned long flags;
+
+	spin_lock_irqsave(&tp->qlock, flags);
 	// ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 	tp->sndmem -= skb->truesize;
 	if (unlikely((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0))) {
 		tp->sndblk = 0;	/* no longer blocked */
-		spin_unlock_bh(&tp->qlock);
+		spin_unlock_irqrestore(&tp->qlock, flags);
 		if (tp->iq != NULL && tp->iq->q_first != NULL)
 			qenable(tp->iq);
 	} else {
-		spin_unlock_bh(&tp->qlock);
+		spin_unlock_irqrestore(&tp->qlock, flags);
 	}
 #if 0				/* destructor is nulled by skb_orphan */
 	skb_shinfo(skb)->frags[0].page = NULL;
@@ -3791,15 +3796,16 @@ STATIC __hot_out void
 tp_skb_destructor(struct sk_buff *skb)
 {
 	struct tp *tp;
+	unsigned long flags;
 
 	tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page;
 	dassert(tp != NULL);
 	if (likely(tp->sndblk == 0)) {
 		/* technically we could have multiple processors freeing sk_buffs at the same time */
-		spin_lock_bh(&tp->qlock);
+		spin_lock_irqsave(&tp->qlock, flags);
 		// ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 		tp->sndmem -= skb->truesize;
-		spin_unlock_bh(&tp->qlock);
+		spin_unlock_irqrestore(&tp->qlock, flags);
 #if 0				/* destructor is nulled by skb_orphan */
 		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
@@ -3833,6 +3839,7 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
 	unsigned int dlen = msgsize(mp);
+	unsigned long flags;
 
 	if (likely((skb = alloc_skb(headroom + dlen, GFP_ATOMIC)) != NULL)) {
 		skb_reserve(skb, headroom);
@@ -3858,9 +3865,9 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		assert(skb_shinfo(skb)->nr_frags == 0);
 		skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
 		skb->destructor = tp_skb_destructor;
-		spin_lock_bh(&tp->qlock);
+		spin_lock_irqsave(&tp->qlock, flags);
 		tp->sndmem += skb->truesize;
-		spin_unlock_bh(&tp->qlock);
+		spin_unlock_irqrestore(&tp->qlock, flags);
 #endif
 	}
 	return (skb);
@@ -3923,6 +3930,7 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
 	unsigned char *beg, *end;
+	unsigned long flags;
 
 #if 0
 	struct sk_buff *skb_head = NULL, *skb_tail = NULL;
@@ -4011,9 +4019,9 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	assert(skb_shinfo(skb)->nr_frags == 0);
 	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
 	skb->destructor = tp_skb_destructor;
-	spin_lock_bh(&tp->qlock);
+	spin_lock_irqsave(&tp->qlock, flags);
 	tp->sndmem += skb->truesize;
-	spin_unlock_bh(&tp->qlock);
+	spin_unlock_irqrestore(&tp->qlock, flags);
 #endif
 
 #if 0
@@ -4062,6 +4070,7 @@ STATIC INLINE streams_fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
+	unsigned long flags;
 
 	if (unlikely((mp->b_datap->db_flag & (DB_SKBUFF)) == 0))
 		goto old_way;
@@ -4078,9 +4087,9 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	assert(skb_shinfo(skb)->nr_frags == 0);
 	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
 	skb->destructor = tp_skb_destructor;
-	spin_lock_bh(&tp->qlock);
+	spin_lock_irqsave(&tp->qlock, flags);
 	tp->sndmem += skb->truesize;
-	spin_unlock_bh(&tp->qlock);
+	spin_unlock_irqrestore(&tp->qlock, flags);
 #endif
 	freemsg(mp);
 	return (skb);
@@ -4236,11 +4245,12 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 	unsigned short dport = tp->dport;
 	struct tp *conflict = NULL;
 	struct tp_chash_bucket *hp, *hp1, *hp2;
+	unsigned long flags;
 
 	hp1 = &tp_chash[tp_chashfn(proto, dport, sport)];
 	hp2 = &tp_chash[tp_chashfn(proto, 0, 0)];
 
-	write_lock_bh(&hp1->lock);
+	write_lock_irqsave(&hp1->lock, flags);
 	if (hp1 != hp2)
 		write_lock(&hp2->lock);
 
@@ -4276,7 +4286,7 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 	if (conflict != NULL) {
 		if (hp1 != hp2)
 			write_unlock(&hp2->lock);
-		write_unlock_bh(&hp1->lock);
+		write_unlock_irqrestore(&hp1->lock, flags);
 		/* how do we say already connected? (-EISCONN) */
 		return (TADDRBUSY);
 	}
@@ -4288,7 +4298,7 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 	tp->chash = hp1;
 	if (hp1 != hp2)
 		write_unlock(&hp2->lock);
-	write_unlock_bh(&hp1->lock);
+	write_unlock_irqrestore(&hp1->lock, flags);
 	return (0);
 }
 
@@ -4565,9 +4575,10 @@ STATIC int
 tp_unbind(struct tp *tp)
 {
 	struct tp_bhash_bucket *hp;
+	unsigned long flags;
 
 	if ((hp = tp->bhash)) {
-		write_lock_bh(&hp->lock);
+		write_lock_irqsave(&hp->lock, flags);
 		if ((*tp->bprev = tp->bnext))
 			tp->bnext->bprev = tp->bprev;
 		tp->bnext = NULL;
@@ -4578,7 +4589,7 @@ tp_unbind(struct tp *tp)
 		tp->bnum = tp->snum = tp->pnum = 0;
 		tp_set_state(tp, TS_UNBND);
 		tp_put(tp);
-		write_unlock_bh(&hp->lock);
+		write_unlock_irqrestore(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
 		synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
@@ -4893,6 +4904,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 {
 	struct tp_chash_bucket *hp;
 	int err;
+	unsigned long flags;
 
 	if (dp != NULL) {
 		err = tp_senddata(tp, &tp->options, dp);
@@ -4904,7 +4916,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		freemsg(SEQ_number);
 	}
 	if ((hp = tp->chash) != NULL) {
-		write_lock_bh(&hp->lock);
+		write_lock_irqsave(&hp->lock, flags);
 		if ((*tp->cprev = tp->cnext))
 			tp->cnext->cprev = tp->cprev;
 		tp->cnext = NULL;
@@ -4914,7 +4926,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		tp->dnum = tp->snum = 0;
 		tp_set_state(tp, TS_IDLE);
 		tp_put(tp);
-		write_unlock_bh(&hp->lock);
+		write_unlock_irqrestore(&hp->lock, flags);
 	}
 	return (QR_ABSORBED);
       error:
@@ -5505,12 +5517,13 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	t_scalar_t SRC_length, OPT_length;
 	size_t size;
 	struct iphdr *iph = (struct iphdr *) SEQ_number->b_rptr;
+	unsigned long flags;
 
 	if (unlikely(tp_not_state(tp, (TSF_IDLE | TSF_WRES_CIND | TSF_WACK_CRES))))
 		goto discard;
 
 	/* Make sure we don't already have a connection indication */
-	spin_lock_bh(&tp->conq.q_lock);
+	spin_lock_irqsave(&tp->conq.q_lock, flags);
 	for (cp = bufq_head(&tp->conq); cp; cp = cp->b_next) {
 		struct iphdr *iph2 = (struct iphdr *) cp->b_rptr;
 
@@ -5518,11 +5531,11 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		    && iph->saddr == iph2->saddr && iph->daddr == iph2->daddr) {
 			/* already have a connection indication, link the data */
 			linkb(cp, SEQ_number);
-			spin_unlock_bh(&tp->conq.q_lock);
+			spin_unlock_irqrestore(&tp->conq.q_lock, flags);
 			goto absorbed;
 		}
 	}
-	spin_unlock_bh(&tp->conq.q_lock);
+	spin_unlock_irqrestore(&tp->conq.q_lock, flags);
 
 	if (unlikely(bufq_length(&tp->conq) >= tp->CONIND_number))
 		/* If there are already too many connection indications outstanding, discard
@@ -6720,11 +6733,12 @@ STATIC INLINE streams_fastcall mblk_t *
 t_seq_check(struct tp *tp, const t_uscalar_t SEQ_number)
 {
 	mblk_t *cp;
+	unsigned long flags;
 
-	spin_lock_bh(&tp->conq.q_lock);
+	spin_lock_irqsave(&tp->conq.q_lock, flags);
 	for (cp = bufq_head(&tp->conq); cp && (t_uscalar_t) (long) cp != SEQ_number;
 	     cp = cp->b_next) ;
-	spin_unlock_bh(&tp->conq.q_lock);
+	spin_unlock_irqrestore(&tp->conq.q_lock, flags);
 	usual(cp);
 	return (cp);
 }
@@ -6732,10 +6746,11 @@ STATIC INLINE streams_fastcall struct tp *
 t_tok_check(const t_uscalar_t ACCEPTOR_id)
 {
 	struct tp *ap;
+	unsigned long flags;
 
-	read_lock_bh(&master.lock);
+	read_lock_irqsave(&master.lock, flags);
 	for (ap = master.tp.list; ap && (t_uscalar_t) (long) ap->oq != ACCEPTOR_id; ap = ap->next) ;
-	read_unlock_bh(&master.lock);
+	read_unlock_irqrestore(&master.lock, flags);
 	usual(ap);
 	return (ap);
 }
@@ -8052,13 +8067,14 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 	struct tp *result = NULL;
 	int hiscore = -1;
 	struct tp_chash_bucket *hp, *hp1, *hp2;
+	unsigned long flags;
 
 	hp1 = &tp_chash[tp_chashfn(proto, sport, dport)];
 	hp2 = &tp_chash[tp_chashfn(proto, 0, 0)];
 
 	hp = hp1;
 	do {
-		read_lock_bh(&hp->lock);
+		read_lock_irqsave(&hp->lock, flags);
 		{
 			register struct tp *tp;
 
@@ -8118,7 +8134,7 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 					break;
 			}
 		}
-		read_unlock_bh(&hp->lock);
+		read_unlock_irqrestore(&hp->lock, flags);
 	} while (hiscore < 4 && hp != hp2 && (hp = hp2));
 	usual(result);
 	return (result);
@@ -8148,6 +8164,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	struct tp *result = NULL;
 	int hiscore = -1;
 	struct tp_bhash_bucket *hp, *hp1, *hp2;
+	unsigned long flags;
 
 	hp1 = &tp_bhash[tp_bhashfn(proto, dport)];
 	hp2 = &tp_bhash[tp_bhashfn(proto, 0)];
@@ -8156,7 +8173,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	_ptrace(("%s: %s: proto = %d, dport = %d\n", DRV_NAME, __FUNCTION__, (int) proto,
 		 (int) ntohs(dport)));
 	do {
-		read_lock_bh(&hp->lock);
+		read_lock_irqsave(&hp->lock, flags);
 		{
 			register struct tp *tp;
 
@@ -8204,7 +8221,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 					break;
 			}
 		}
-		read_unlock_bh(&hp->lock);
+		read_unlock_irqrestore(&hp->lock, flags);
 	} while (hiscore < 2 && hp != hp2 && (hp = hp2));
 	usual(result);
 	return (result);
@@ -8230,16 +8247,17 @@ tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
 {
 	struct tp_prot_bucket *pp, **ppp;
 	register struct tp *result;
+	unsigned long flags;
 
 	ppp = &tp_prots[proto];
 
-	read_lock_bh(&tp_prot_lock);
+	read_lock_irqsave(&tp_prot_lock, flags);
 	if (likely((pp = *ppp) != NULL)) {
 		if (likely(pp->corefs == 0)) {
 			if (likely(pp->clrefs > 0)) {
 				result = tp_lookup_bind(proto, daddr, dport);
 			      done:
-				read_unlock_bh(&tp_prot_lock);
+				read_unlock_irqrestore(&tp_prot_lock, flags);
 				return (result);
 			}
 		}
@@ -8298,13 +8316,14 @@ tp_free(caddr_t data)
 #if 0
 	struct sk_buff *skb = (typeof(skb)) data;
 	struct tp *tp;
+	unsigned long flags;
 
 	dassert(skb != NULL);
 	if (likely((tp = *(struct tp **) skb->cb) != NULL)) {
-		spin_lock_bh(&tp->qlock);
+		spin_lock_irqsave(&tp->qlock, flags);
 		// ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
 		tp->rcvmem -= skb->truesize;
-		spin_unlock_bh(&tp->qlock);
+		spin_unlock_irqrestore(&tp->qlock, flags);
 #if 0
 		/* put this back to null before freeing it */
 		*(struct tp **) skb->cb = NULL;
@@ -8710,6 +8729,7 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	struct tp *tp, **tpp = &master.tp.list;
+	unsigned long flags;
 
 #if defined LFS
 	mblk_t *mp;
@@ -8748,7 +8768,7 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
 #endif
-	write_lock_bh(&master.lock);
+	write_lock_irqsave(&master.lock, flags);
 	for (; *tpp; tpp = &(*tpp)->next) {
 		if (cmajor != (*tpp)->u.dev.cmajor)
 			break;
@@ -8767,7 +8787,7 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
-		write_unlock_bh(&master.lock);
+		write_unlock_irqrestore(&master.lock, flags);
 #if defined LFS
 		freeb(mp);
 #endif
@@ -8777,13 +8797,13 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(tp = tp_alloc_priv(q, tpp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
-		write_unlock_bh(&master.lock);
+		write_unlock_irqrestore(&master.lock, flags);
 #if defined LFS
 		freeb(mp);
 #endif
 		return (ENOMEM);
 	}
-	write_unlock_bh(&master.lock);
+	write_unlock_irqrestore(&master.lock, flags);
 #if defined LFS
 	/* want to set a write offet of MAX_HEADER bytes */
 	so = (typeof(so)) mp->b_wptr;

@@ -98,7 +98,7 @@ extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t **
 #define streams_local_restore(__flags) \
 	do { (void)__flags; } while (0)
 
-#elif defined CONFIG_STREAMS_NOIRQ
+#elif defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 
 #define streams_spin_lock(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

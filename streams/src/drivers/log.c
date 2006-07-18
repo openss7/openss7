@@ -487,6 +487,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct log *p, **pp = &log_list;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
+	unsigned long flags;
 
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
@@ -506,7 +507,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 		if (cminor < 1)
 			return (ENXIO);
-		spin_lock_bh(&log_lock);
+		spin_lock_irqsave(&log_lock, flags);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
 		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
@@ -517,14 +518,14 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				if (sflag == CLONEOPEN)
 					cminor++;
 				else {
-					spin_unlock_bh(&log_lock);
+					spin_unlock_irqrestore(&log_lock, flags);
 					kmem_free(p, sizeof(*p));
 					return (EIO);	/* bad error */
 				}
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
-			spin_unlock_bh(&log_lock);
+			spin_unlock_irqrestore(&log_lock, flags);
 			kmem_free(p, sizeof(*p));
 			return (EBUSY);	/* no minors left */
 		}
@@ -534,7 +535,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		p->prev = pp;
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
-		spin_unlock_bh(&log_lock);
+		spin_unlock_irqrestore(&log_lock, flags);
 		qprocson(q);
 		return (0);
 	}
@@ -546,17 +547,18 @@ static streamscall int
 log_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct log *p;
+	unsigned long flags;
 
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	qprocsoff(q);
-	spin_lock_bh(&log_lock);
+	spin_lock_irqsave(&log_lock, flags);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
 	p->next = NULL;
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
-	spin_unlock_bh(&log_lock);
+	spin_unlock_irqrestore(&log_lock, flags);
 	return (0);
 }
 
