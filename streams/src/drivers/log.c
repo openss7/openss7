@@ -89,6 +89,9 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "log.h"
+#if !defined HAVE_KFUNC_ATOMIC_ADD_RETURN
+#include "src/kernel/strutil.h"
+#endif
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
