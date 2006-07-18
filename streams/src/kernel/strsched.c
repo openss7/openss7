@@ -4582,6 +4582,8 @@ str_init_caches(void)
 STATIC int
 kstreamd(void *__bind_cpu)
 {
+	struct strthread *t = this_thread;
+
 	set_user_nice(current, 19);
 #ifdef PF_NOFREEZE
 	current->flags |= PF_NOFREEZE;
@@ -4589,23 +4591,31 @@ kstreamd(void *__bind_cpu)
 	set_current_state(TASK_INTERRUPTIBLE);
 	while (!kthread_should_stop()) {
 		preempt_disable();
-		if (!(this_thread->flags & (QRUNFLAGS))) {
-			preempt_enable_no_resched();
-			schedule();
-			preempt_disable();
+		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets worken up and then
+		   the process runs queues in process context. */
+		if (likely((t->flags & (QRUNFLAGS)) == 0)) {
+			do {
+				preempt_enable_no_resched();
+				schedule();
+				preempt_disable();
+			}
+			while (unlikely((t->flags & (QRUNFLAGS)) == 0));
 		}
 		__set_current_state(TASK_RUNNING);
 
-		while (this_thread->flags & (QRUNFLAGS)) {
-			if (cpu_is_offline((long) __bind_cpu))
-				goto wait_to_die;
-			__runqueues();
+		if (likely((t->flags & (QRUNFLAGS)) != 0)) {
+			do {
+				if (cpu_is_offline((long) __bind_cpu))
+					goto wait_to_die;
+				__runqueues();
 #if 0
-			/* don't take a breath here */
-			preempt_enable_no_resched();
-			cond_resched();
-			preempt_disable();
+				/* don't take a breath here */
+				preempt_enable_no_resched();
+				cond_resched();
+				preempt_disable();
 #endif
+			}
+			while (unlikely((t->flags & (QRUNFLAGS)) != 0));
 		}
 		preempt_enable();
 		set_current_state(TASK_INTERRUPTIBLE);
@@ -4799,24 +4809,34 @@ kstreamd(void *__bind_cpu)
 	for (;;) {
 		if (signal_pending(current))
 			do_exit(0);
-		if (!(t->flags & (QRUNFLAGS))) {
-			schedule();
-			prefetchw(t);
-			if (signal_pending(current)
-			    && sigismember(&current->pending.signal, SIGKILL))
-				break;
+		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets worken up and then
+		   the process runs queues in process context. */
+		if (likely((t->flags & (QRUNFLAGS)) == 0)) {
+			do {
+				schedule();
+				prefetchw(t);
+				if (signal_pending(current)
+				    && sigismember(&current->pending.signal, SIGKILL))
+					break;
+			}
+			while (unlikely((t->flags & (QRUNFLAGS)) == 0));
 		}
 		__set_current_state(TASK_RUNNING);
-		__runqueues();
+		if (likely((t->flags & (QRUNFLAGS)) != 0)) {
+			do {
+				__runqueues();
 #if 0
-		/* don't take a breath here */
-		if (current->need_resched)
-			schedule();
+				/* don't take a breath here */
+				if (current->need_resched)
+					schedule();
 #endif
-		prefetchw(t);
-		if (signal_pending(current)
-		    && sigismember(&current->pending.signal, SIGKILL))
-			break;
+				prefetchw(t);
+				if (signal_pending(current)
+				    && sigismember(&current->pending.signal, SIGKILL))
+					break;
+			}
+			while (unlikely((t->flags & (QRUNFLAGS)) != 0));
+		}
 		__set_current_state(TASK_INTERRUPTIBLE);
 	}
 	t->proc = NULL;
