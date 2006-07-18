@@ -8323,20 +8323,15 @@ tp_rsrv(queue_t *q)
 		/* Fast Path */
 		if (likely(rtn == QR_TRIMMED))
 			freeb(mp);
-		else if (likely(rtn == QR_DONE))
-			freemsg(mp);
-		else if (likely(rtn == -EBUSY)) {
-			if (unlikely(!putbq(q, mp)))
-				freemsg(mp);
-#if !defined CONFIG_STREAMS_NOIRQ && !defined CONFIG_SMP
-			/* try running softirqd */
-			local_bh_disable();
-			local_bh_enable();
-#endif
-			break;
-		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
-			break;
+		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+			goto done;
 	}
+#ifndef CONFIG_SMP
+	/* try waking softirqd when service queue empty */
+	local_bh_disable();
+	locak_bh_enable();
+#endif
+      done:
 	return (0);
 }
 
@@ -8382,19 +8377,14 @@ tp_wsrv(queue_t *q)
 		/* Fast Path */
 		if (likely(rtn == QR_TRIMMED))
 			freeb(mp);
-		else if (likely(rtn == QR_DONE))
-			freemsg(mp);
-		else if (likely(rtn == -EBUSY)) {
-			if (unlikely(!putbq(q, mp)))
-				freemsg(mp);
-#if !defined CONFIG_STREAMS_NOIRQ && !defined CONFIG_SMP
+		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0)) {
+#ifndef CONFIG_SMP
 			/* try running softirqd */
 			local_bh_disable();
 			local_bh_enable();
 #endif
 			break;
-		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
-			break;
+		}
 	}
 	return (0);
 }
