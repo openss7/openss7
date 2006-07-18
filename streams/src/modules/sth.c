@@ -498,6 +498,7 @@ strsyscall(void)
 {
 	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
 	   STREAMS scheduler in process context here. I don't know why... */
+#if 0
 #ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
@@ -507,6 +508,7 @@ strsyscall(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	runqueues();
+#endif
 #endif
 }
 
@@ -515,6 +517,7 @@ strsyscall_write(void)
 {
 	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
 	   STREAMS scheduler in process context here. I don't know why... */
+#if 0
 #ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
@@ -525,6 +528,7 @@ strsyscall_write(void)
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	runqueues();
 #endif
+#endif
 }
 
 STATIC streams_inline streams_fastcall __hot void
@@ -532,6 +536,7 @@ strsyscall_read(void)
 {
 	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
 	   STREAMS scheduler in process context here. I don't know why... */
+#if 0
 #ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
@@ -541,6 +546,7 @@ strsyscall_read(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	runqueues();
+#endif
 #endif
 }
 
