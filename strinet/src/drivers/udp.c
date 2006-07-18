@@ -347,8 +347,8 @@ STATIC struct module_info udp_minfo = {
 	.mi_idname = DRV_NAME,	/* Module name */
 	.mi_minpsz = 0,		/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
-	.mi_hiwat = (1 << 17),	/* Hi water mark */
-	.mi_lowat = 0,		/* Lo water mark */
+	.mi_hiwat = (1 << 19),	/* Hi water mark */
+	.mi_lowat = (1 << 17),	/* Lo water mark */
 };
 
 STATIC struct module_stat udp_mstat = {
@@ -486,10 +486,10 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 
 #define xti_default_debug		{ 0, }
 #define xti_default_linger		(struct t_linger){T_YES, 120}
-#define xti_default_rcvbuf		(SK_RMEM_MAX << 1)	/* needs to be sysctl_rmem_default */
+#define xti_default_rcvbuf		sysctl_rmem_default
 #define xti_default_rcvlowat		1
-#define xti_default_sndbuf		(SK_WMEM_MAX << 1)	/* needs to be sysctl_wmem_default */
-#define xti_default_sndlowat		0			/* needs to be sysctl_wmem_default >> 1 */
+#define xti_default_sndbuf		sysctl_wmem_default
+#define xti_default_sndlowat		(sysctl_wmem_default >> 1)
 #define xti_default_priority		0
 
 #define ip_default_protocol		17
