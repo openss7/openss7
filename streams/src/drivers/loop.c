@@ -170,13 +170,13 @@ STATIC streamscall int
 loop_wput(queue_t *q, mblk_t *mp)
 {
 	struct loop *p = q->q_ptr, *o;
+	unsigned long flags;
 	int err;
 
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
 	{
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
-		unsigned long flags;
 
 		switch (ioc->iocblk.ioc_cmd) {
 		case LOOP_SET:

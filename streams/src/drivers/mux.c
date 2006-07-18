@@ -234,6 +234,7 @@ STATIC streamscall int
 mux_uwput(queue_t *q, mblk_t *mp)
 {
 	struct mux *mux = q->q_ptr, *bot;
+	unsigned long flags;
 	int err;
 
 	_trace();
@@ -241,7 +242,6 @@ mux_uwput(queue_t *q, mblk_t *mp)
 	case M_IOCTL:
 	{
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
-		unsigned long flags;
 
 		_trace();
 		switch (ioc->iocblk.ioc_cmd) {
@@ -443,7 +443,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 
 		read_lock_irqsave(&mux_lock, flags);
 		if (mux->other)
-			, flagswq = mux->other->wq;
+			wq = mux->other->wq;
 		read_unlock_irqrestore(&mux_lock, flags);
 
 		/* if not linked behave like echo driver */
