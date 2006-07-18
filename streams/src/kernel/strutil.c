@@ -3282,7 +3282,7 @@ __getq(queue_t *q, bool *be)
 			if (q->q_count == 0 || q->q_count < q->q_lowat) {
 				clear_bit(QFULL_BIT, &q->q_flag);
 				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
-					backenable = true;
+					*be = true;
 			}
 #endif
 			/* no longer want to read band zero */
