@@ -8183,6 +8183,7 @@ tp_w_prim(queue_t *q, mblk_t *mp)
 	return tp_w_prim_slow(q, mp);
 }
 
+#if 0
 STATIC noinline streams_fastcall void
 tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 {
@@ -8234,6 +8235,7 @@ tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	}
 	return;
 }
+#endif
 
 static noinline streams_fastcall int
 tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
