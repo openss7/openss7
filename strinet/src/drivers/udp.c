@@ -351,7 +351,7 @@ STATIC struct module_info udp_minfo = {
 	.mi_lowat = (1 << 17),		/* Lo water mark */
 };
 
-STATIC struct module_stat udp_mstat = { NULL, 0, 0, };
+STATIC struct module_stat udp_mstat;
 
 /* Upper multiplex is a T provider following the TPI. */
 
