@@ -2974,7 +2974,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		if (unlikely(err != QR_ABSORBED))
 			goto free_error;
 		bufq_lock(&np->conq);
-		np_set_state(np, bufq_length(np->conq) > 0 ? NS_WRES_CIND : NS_IDLE);
+		np_set_state(np, bufq_length(&np->conq) > 0 ? NS_WRES_CIND : NS_IDLE);
 		bufq_unlock(&np->conq);
 		break;
 	default:
@@ -3154,7 +3154,7 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	assure(SEQ_number->b_wptr >= SEQ_number->b_rptr + sizeof(*iph));
 	assure(SEQ_number->b_wptr >= SEQ_number->b_rptr + (iph->ihl << 2));
 
-	if (unlikely(np_not_state(np, (NSF_IDLE | NSF_WRES_CIND | TSF_WACK_CRES))))
+	if (unlikely(np_not_state(np, (NSF_IDLE | NSF_WRES_CIND | NSF_WACK_CRES))))
 		goto discard;
 
 	/* Make sure we don't already have a connection indication */
@@ -3331,8 +3331,8 @@ ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	struct sockaddr_in res_buf, *RES_buffer = &res_buf;
 	np_ulong DISCON_reason;
 	np_ulong RESERVED_field, DISCON_orig;
-	mblk_t **respp;
-	mblk_t **conpp, *SEQ_number;
+	mblk_t *rp;
+	mblk_t *cp, *SEQ_number;
 	ptrdiff_t hidden;
 	int err;
 
@@ -3427,8 +3427,8 @@ ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	}
 
 	/* check for outstanding reset indications for responding address */
-	for (respp = &np->resq; (*respp); respp = &(*respp)->b_next) {
-		struct iphdr *iph2 = (struct iphdr *) (*respp)->b_rptr;
+	for (rp = bufq_head(&np->resq); rp; rp = rp->b_next) {
+		struct iphdr *iph2 = (struct iphdr *) rp->b_rptr;
 
 		if (iph->protocol == iph2->protocol && iph->saddr == iph2->saddr
 		    && iph->daddr == iph2->daddr)
@@ -3436,14 +3436,14 @@ ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	}
 
 	/* check for outstanding connection indications for responding address */
-	for (conpp = &np->conq; (*conpp); conpp = &(*conpp)->b_next) {
-		struct iphdr *iph2 = (struct iphdr *) (*conpp)->b_rptr;
+	for (cp = bufq_head(&np->conq); cp; cp = cp->b_next) {
+		struct iphdr *iph2 = (struct iphdr *) cp->b_rptr;
 
 		if (iph->protocol == iph2->protocol && iph->saddr == iph2->saddr
 		    && iph->daddr == iph2->daddr)
 			break;
 	}
-	SEQ_number = (*conpp);
+	SEQ_number = cp;
 
 	/* hide ICMP header */
 	hidden = (unsigned char *) iph - mp->b_rptr;
@@ -3451,21 +3451,14 @@ ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	if ((err = ne_discon_ind(q, RES_buffer, sizeof(*RES_buffer), RESERVED_field, DISCON_orig,
 				 DISCON_reason, SEQ_number, mp)) < 0)
 		mp->b_rptr -= hidden;
-	else if ((*conpp) != NULL) {
-		mblk_t *b, *b_prev;
-
-		/* Remove connection indication from queue */
-		b = (*conpp);
-		(*conpp) = b->b_next;
-		b->b_next = NULL;
-
-		/* Free any attached pending data */
-		b_prev = b;
-		while ((b = b_prev)) {
-			b_prev = b->b_prev;
-			b->b_prev = NULL;
-			b->b_next = NULL;
-			freemsg(b);
+	else {
+		if (cp != NULL) {
+			bufq_unlink(&np->conq, cp);
+			freemsg(cp);
+		}
+		if (rp != NULL) {
+			bufq_unlink(&np->conq, rp);
+			freemsg(rp);
 		}
 	}
 	return (err);
@@ -3605,6 +3598,8 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
 		DEST_buffer->sin_addr.s_addr = iph->daddr;
 		mp->b_wptr += DEST_length;
 	}
+	/* pull IP header */
+	dp->b_rptr = (unsigned char *) uh;
 	mp->b_cont = dp;
 	dp->b_datap->db_type = M_DATA;	/* just in case */
 	_printd(("%s: %p: <- N_UNITDATA_IND\n", DRV_NAME, np));
@@ -3633,14 +3628,14 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
 STATIC noinline streams_fastcall __hot_get int
 te_optdata_ind(queue_t *q, mblk_t *dp)
 {
-	struct np *np = TP_PRIV(q);
+	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
 	struct T_optdata_ind *p;
-	t_scalar_t OPT_length = t_opts_size(np, dp);
+	t_scalar_t OPT_length = t_opts_size_ud(tp, dp);
 
-	if (unlikely(np_get_statef(np) & ~(TSF_DATA_XFER | TSF_WIND_ORDREL)))
+	if (unlikely(tp_get_statef(tp) & ~(TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto discard;
-	if (unlikely((mp = np_allocb(q, sizeof(*p) + OPT_length, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, sizeof(*p) + OPT_length, BPRI_MED)) == NULL))
 		goto enobufs;
 	if (unlikely(!canputnext(q)))
 		goto ebusy;
@@ -3651,13 +3646,13 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
 	p->DATA_flag = 0;
 	p->OPT_length = OPT_length;
 	p->OPT_offset = OPT_length ? sizeof(*p) : 0;
-	if (OPT_length) {
-		t_opts_build(np, dp, mp->b_wptr, OPT_length);
+	if (unlikely(OPT_length != 0)) {
+		t_opts_build_ud(tp, dp, mp->b_wptr, OPT_length);
 		mp->b_wptr += OPT_length;
 	}
 	dp->b_datap->db_type = M_DATA;
 	mp->b_cont = dp;
-	_printd(("%s: %p: <= T_OPTDATA_IND\n", DRV_NAME, np));
+	_printd(("%s: %p: <= T_OPTDATA_IND\n", DRV_NAME, tp));
 	putnext(q, mp);
 	return (QR_ABSORBED);
       ebusy:
@@ -3866,11 +3861,13 @@ ne_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_
 	case -EOPNOTSUPP:
 		ERROR_type = NNOTSUPPORT;
 		break;
+	case NBADOPT:
 	case NBADADDR:
-	case NBADDATA:
+	case NBADQOSTYPE:
 		break;
 	default:
 	case NOUTSTATE:
+	case NBADDATA:
 	case -EINVAL:
 	case -EFAULT:
 	case -EMSGSIZE:
@@ -3906,7 +3903,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	assure(dp->b_wptr >= dp->b_rptr + (iph->ihl << 2));
 
 	/* Make sure we don't already have a reset indication */
-	for (bp = np->resq; bp; bp = bp->b_next) {
+	for (bp = bufq_head(&np->resq); bp; bp = bp->b_next) {
 		struct iphdr *iph2 = (struct iphdr *) bp->b_rptr;
 		struct icmphdr *icmp2 = (struct icmphdr *) (bp->b_rptr + (iph2->ihl << 2));
 
@@ -4000,8 +3997,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 		break;
 	}
 	/* save original in reset indication list */
-	dp->b_next = np->resq;
-	np->resq = dp;
+	bufq_queue(&np->resq, dp);
 	_printd(("%s: <- N_RESET_IND\n", DRV_NAME));
 	putnext(q, mp);
       discard:
@@ -4026,18 +4022,19 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
  * adjusted when the option buffer is built.
  */
 STATIC noinline int
-t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, size_t opt_len)
+t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size_t req_len,
+	      size_t opt_len)
 {
-	struct np *np = TP_PRIV(q);
+	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
 	struct T_optmgmt_ack *p;
 
-	if (unlikely((mp = np_allocb(q, sizeof(*p) + opt_len, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, sizeof(*p) + opt_len, BPRI_MED)) == NULL))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr;
 	mp->b_wptr += sizeof(*p);
-	if ((flags = t_build_options(np, req, req_len, mp->b_wptr, &opt_len, flags)) < 0) {
+	if ((flags = t_build_options(tp, req, req_len, mp->b_wptr, &opt_len, flags)) < 0) {
 		freemsg(mp);
 		return (flags);
 	}
@@ -4049,11 +4046,11 @@ t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, 
 		mp->b_wptr += opt_len;
 	}
 #ifdef TS_WACK_OPTREQ
-	if (np_get_state(np) == TS_WACK_OPTREQ)
-		np_set_state(np, TS_IDLE);
+	if (tp_get_state(tp) == TS_WACK_OPTREQ)
+		tp_set_state(tp, TS_IDLE);
 #endif
-	_printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, np));
-	putnext(np->oq, mp);
+	_printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, tp));
+	putnext(tp->oq, mp);
 	return (0);
       enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
@@ -4625,7 +4622,7 @@ n_seq_check(struct np *np, np_ulong SEQ_number)
 {
 	mblk_t *cp;
 
-	for (cp = np->conq; cp && (np_ulong) (long) cp != SEQ_number; cp = cp->b_next) ;
+	for (cp = bufq_head(&np->conq); cp && (np_ulong) (long) cp != SEQ_number; cp = cp->b_next) ;
 	usual(cp);
 	return (cp);
 }
@@ -6176,7 +6173,7 @@ np_v4_rcv(struct sk_buff *skb)
 	// goto pass_it;
       too_small:
 	// goto pass_it;
-      pass_it:
+      // pass_it:
 	if (np_v4_rcv_next(skb)) {
 		/* TODO: want to generate an ICMP error here */
 	}
@@ -6399,31 +6396,8 @@ np_free_priv(queue_t *q)
 		dst_release(np->daddrs[0].dst);
 		np->daddrs[0].dst = NULL;
 	}
-#if 1
-	{
-		mblk_t *b, *b_prev, *b_next;
-
-		/* purge connection indication queue, conq */
-		b_next = XCHG(&np->conq, NULL);
-		while ((b = b_next)) {
-			b_next = XCHG(&b->b_next, NULL);
-			/* might be data hanging off of b_prev pointer */
-			b_prev = b;
-			while ((b = b_prev)) {
-				b_prev = XCHG(&b->b_prev, NULL);
-				freemsg(b);
-			}
-		}
-		/* purge reset indication queue, resq */
-		b_next = XCHG(&np->resq, NULL);
-		while ((b = b_next)) {
-			b_next = XCHG(&b->b_next, NULL);
-			freemsg(b);
-		}
-	}
-#else
 	bufq_purge(&np->conq);
-#endif
+	bufq_purge(&np->resq);
 	np_unbufcall((str_t *) np);
 #if 0
 	strlog(DRV_ID, np->u.dev.cminor, 0, SL_TRACE, "removed bufcalls: reference count = %d",

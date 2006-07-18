@@ -1076,7 +1076,6 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
-#if 1
 	uh = (struct udphdr *) (mp->b_datap->db_base + (iph->ihl << 2));
 	{
 		if (oh == NULL)
@@ -1089,7 +1088,6 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((t_uscalar_t *) T_OPT_DATA(oh)) = (uh->check == 0) ? T_NO : T_YES;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
-#endif
 	assure(oh == NULL);
 	return (olen);
       efault:
@@ -1192,7 +1190,6 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
-#if 1
 	uh = (struct udphdr *) (mp->b_rptr + (iph->ihl << 2));
 	{
 		if (oh == NULL)
@@ -1205,7 +1202,6 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((t_uscalar_t *) T_OPT_DATA(oh)) = (uh->check == 0) ? T_NO : T_YES;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
-#endif
 	assure(oh == NULL);
 	return (olen);
       efault:
@@ -1392,7 +1388,6 @@ t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *o
 				continue;
 			}
 			}
-#if 1
 		case T_INET_UDP:
 			switch (ih->name) {
 			default:
@@ -1410,7 +1405,6 @@ t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *o
 				continue;
 			}
 			}
-#endif
 		}
 	}
 	return (0);
@@ -1591,7 +1585,6 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 				continue;
 			}
 			}
-#if 1
 		case T_INET_UDP:
 			switch (ih->name) {
 			default:
@@ -1609,7 +1602,6 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 				continue;
 			}
 			}
-#endif
 		}
 	}
 	return (0);
@@ -1725,7 +1717,6 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 1
 		case T_INET_UDP:
 			switch (ih->name) {
 			default:
@@ -1739,7 +1730,6 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#endif
 		}
 	}
 	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
@@ -1854,7 +1844,6 @@ t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 1
 		case T_INET_UDP:
 			switch (ih->name) {
 			default:
@@ -1868,7 +1857,6 @@ t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#endif
 		}
 	}
 	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
@@ -2011,7 +1999,6 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 1
 		case T_INET_UDP:
 			switch (ih->name) {
 			default:
@@ -2027,7 +2014,6 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#endif
 		}
 	}
 	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
@@ -2175,7 +2161,6 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 1
 		case T_INET_UDP:
 			switch (ih->name) {
 			default:
@@ -2192,7 +2177,6 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#endif
 		}
 	}
 	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
@@ -2437,7 +2421,6 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 1
 			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 				goto efault;
 		case T_INET_UDP:
@@ -2460,7 +2443,6 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#endif
 		}
 	}
 	if (ih && !oh)
@@ -2684,7 +2666,6 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 1
 			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 				goto efault;
 		case T_INET_UDP:
@@ -2708,7 +2689,6 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#endif
 		}
 	}
 	if (ih && !oh)
@@ -3088,7 +3068,6 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 1
 			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 				goto efault;
 		case T_INET_UDP:
@@ -3121,7 +3100,6 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#endif
 		}
 	}
 	if (ih && !oh)
@@ -3550,7 +3528,6 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 1
 			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 				goto efault;
 		case T_INET_UDP:
@@ -3586,7 +3563,6 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#endif
 		}
 	}
 	if (ih && !oh)
@@ -5985,6 +5961,7 @@ te_discon_ind(queue_t *q, const struct sockaddr_in *RES_buffer, const socklen_t 
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PROTO;
+	mp->b_band = 2;		/* expedite */
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_DISCON_IND;
 	p->DISCON_reason = DISCON_reason;
@@ -6015,7 +5992,7 @@ te_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	struct udphdr *uh;
 	struct sockaddr_in res_buf, *RES_buffer = &res_buf;
 	t_uscalar_t DISCON_reason;
-	mblk_t **conpp, *SEQ_number;
+	mblk_t *cp, *SEQ_number;
 	ptrdiff_t hidden;
 	int err;
 
@@ -6033,14 +6010,14 @@ te_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	DISCON_reason = ((t_uscalar_t) icmp->type << 8) | ((t_uscalar_t) icmp->code);
 
 	/* check for outstanding connection indications for responding address */
-	for (conpp = &tp->conq.q_head; (*conpp); conpp = &(*conpp)->b_next) {
-		struct iphdr *iph2 = (struct iphdr *) (*conpp)->b_rptr;
+	for (cp = bufq_head(&tp->conq); cp; cp = cp->b_next) {
+		struct iphdr *iph2 = (struct iphdr *) cp->b_rptr;
 
 		if (iph->protocol == iph2->protocol && iph->saddr == iph2->saddr
 		    && iph->daddr == iph2->daddr)
 			break;
 	}
-	SEQ_number = (*conpp);
+	SEQ_number = cp;
 
 	/* hide ICMP header */
 	hidden = (unsigned char *) iph - mp->b_rptr;
@@ -6048,21 +6025,10 @@ te_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	if ((err = te_discon_ind(q, RES_buffer, sizeof(*RES_buffer),
 				 DISCON_reason, SEQ_number, mp)) < 0)
 		mp->b_rptr -= hidden;
-	else if ((*conpp) != NULL) {
-		mblk_t *b, *b_prev;
-
-		/* Remove connection indication from queue */
-		b = (*conpp);
-		(*conpp) = b->b_next;
-		b->b_next = NULL;
-
-		/* Free any attached pending data */
-		b_prev = b;
-		while ((b = b_prev)) {
-			b_prev = b->b_prev;
-			b->b_prev = NULL;
-			b->b_next = NULL;
-			freemsg(b);
+	else {
+		if (cp != NULL) {
+			bufq_unlink(&tp->conq, cp);
+			freemsg(cp);
 		}
 	}
 	return (err);
@@ -6425,7 +6391,7 @@ te_uderror_reply(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsign
 STATIC int
 ne_reset_ind(queue_t *q, mblk_t *dp)
 {
-	struct np *np = TP_PRIV(q);
+	struct np *np = NP_PRIV(q);
 	mblk_t *mp, *bp;
 	N_reset_ind_t *p;
 	const size_t size = sizeof(*p);
@@ -6436,7 +6402,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	assure(dp->b_wptr >= dp->b_rptr + (iph->ihl << 2));
 
 	/* Make sure we don't already have a reset indication */
-	for (bp = np->resq; bp; bp = bp->b_next) {
+	for (bp = bufq_head(&np->resq); bp; bp = bp->b_next) {
 		struct iphdr *iph2 = (struct iphdr *) bp->b_rptr;
 		struct icmphdr *icmp2 = (struct icmphdr *) (bp->b_rptr + (iph2->ihl << 2));
 
@@ -6446,13 +6412,13 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 			goto discard;
 	}
 
-	if (unlikely((bp = tp_dupmsg(q, dp)) == NULL))
+	if (unlikely((bp = np_dupmsg(q, dp)) == NULL))
 		goto enobufs;
-	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = np_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PROTO;
-	mp->b_band = 1;
+	mp->b_band = 2;
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_IND;
 	p->RESET_orig = N_PROVIDER;
@@ -6530,9 +6496,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 		break;
 	}
 	/* save original in reset indication list */
-	dp->b_next = np->resq;
-	np->resq = dp;
-	np->resinds++;
+	bufq_queue(&np->resq, dp);
 	_printd(("%s: <- N_RESET_IND\n", DRV_NAME));
 	putnext(q, mp);
       discard:
@@ -8842,12 +8806,8 @@ tp_v4_rcv(struct sk_buff *skb)
 	    && (unsigned short) csum_fold(skb_checksum(skb, 0, skb->len, skb->csum)))
 		goto bad_checksum;
 //      UDP_INC_STATS_BH(UdpNoPorts);   /* should wait... */
-	// goto pass_it;
       bad_pkt_type:
-	// goto pass_it;
       too_small:
-	// goto pass_it;
-	// pass_it:
 	if (tp_v4_rcv_next(skb)) {
 		/* TODO: want to generate an ICMP port unreachable error here */
 	}
@@ -9060,31 +9020,7 @@ tp_free_priv(queue_t *q)
 		dst_release(tp->daddrs[0].dst);
 		tp->daddrs[0].dst = NULL;
 	}
-#if 0
-	{
-		mblk_t *b, *b_prev, *b_next;
-
-		/* purge connection indication queue, conq */
-		b_next = XCHG(&tp->conq, NULL);
-		while ((b = b_next)) {
-			b_next = XCHG(&b->b_next, NULL);
-			/* might be data hanging off of b_prev pointer */
-			b_prev = b;
-			while ((b = b_prev)) {
-				b_prev = XCHG(&b->b_prev, NULL);
-				freemsg(b);
-			}
-		}
-		/* purge reset indication queue, resq */
-		b_next = XCHG(&tp->resq, NULL);
-		while ((b = b_next)) {
-			b_next = XCHG(&b->b_next, NULL);
-			freemsg(b);
-		}
-	}
-#else
 	bufq_purge(&tp->conq);
-#endif
 	tp_unbufcall((str_t *) tp);
 #if 0
 	strlog(DRV_ID, tp->u.dev.cminor, 0, SL_TRACE, "removed bufcalls: reference count = %d",

@@ -403,9 +403,6 @@ typedef struct tp_options {
 		uint32_t daddr;		/* T_IP_DADDR */
 		uint32_t mtu;		/* T_IP_MTU */
 	} ip;
-	struct {
-		t_uscalar_t checksum;	/* T_UDP_CHECKSUM */
-	} udp;
 } tp_options_t;
 
 /* Private structure */
@@ -492,7 +489,6 @@ enum {
 	_T_BIT_IP_SADDR,
 	_T_BIT_IP_DADDR,
 	_T_BIT_IP_MTU,
-	_T_BIT_UDP_CHECKSUM,
 };
 
 #define t_tst_bit(nr,addr) tp_tst_bit(nr,addr)
@@ -975,7 +971,6 @@ t_opts_size(const struct tp *t, const mblk_t *mp)
 	size += _T_SPACE_SIZEOF(t_defaults.ip.ttl);	/* T_IP_TTL */
 	size += _T_SPACE_SIZEOF(t_defaults.ip.tos);	/* T_IP_TOS */
 	size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
-	// size += _T_SPACE_SIZEOF(t_defaults.udp.checksum); /* T_UDP_CHECKSUM */
 	return (size);
 }
 
@@ -1041,20 +1036,6 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
-#if 0
-	uh = (struct udphdr *) (mp->b_datap->db_base + (iph->ihl << 2));
-	{
-		if (oh == NULL)
-			goto efault;
-		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
-
-		oh->level = T_INET_UDP;
-		oh->name = T_UDP_CHECKSUM;
-		oh->status = T_SUCCESS;
-		*((t_uscalar_t *) T_OPT_DATA(oh)) = (uh->check == 0) ? T_NO : T_YES;
-		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
-	}
-#endif
 	assure(oh == NULL);
 	return (olen);
       efault:
@@ -1086,7 +1067,6 @@ t_errs_size(const struct tp *t, const mblk_t *mp)
 		size += _T_SPACE_SIZEOF(t_defaults.ip.ttl);	/* T_IP_TTL */
 		size += _T_SPACE_SIZEOF(t_defaults.ip.tos);	/* T_IP_TOS */
 		size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
-		// size += _T_SPACE_SIZEOF(t_defaults.udp.checksum); /* T_UDP_CHECKSUM */
 	}
 	return (size);
 }
@@ -1156,20 +1136,6 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
 		*((uint32_t *) T_OPT_DATA(oh)) = iph->daddr;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
-#if 0
-	uh = (struct udphdr *) (mp->b_rptr + (iph->ihl << 2));
-	{
-		if (oh == NULL)
-			goto efault;
-		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
-
-		oh->level = T_INET_UDP;
-		oh->name = T_UDP_CHECKSUM;
-		oh->status = T_SUCCESS;
-		*((t_uscalar_t *) T_OPT_DATA(oh)) = (uh->check == 0) ? T_NO : T_YES;
-		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
-	}
-#endif
 	assure(oh == NULL);
 	return (olen);
       efault:
@@ -1356,25 +1322,6 @@ t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *o
 				continue;
 			}
 			}
-#if 0
-		case T_INET_UDP:
-			switch (ih->name) {
-			default:
-				continue;
-			case T_UDP_CHECKSUM:
-			{
-				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
-
-				if (unlikely(optlen != sizeof(*valp)))
-					goto error;
-				if (unlikely(*valp != T_NO && *valp != T_YES))
-					goto error;
-				op->udp.checksum = *valp;
-				t_set_bit(_T_BIT_UDP_CHECKSUM, op->flags);
-				continue;
-			}
-			}
-#endif
 		}
 	}
 	return (0);
@@ -1555,25 +1502,6 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 				continue;
 			}
 			}
-#if 0
-		case T_INET_UDP:
-			switch (ih->name) {
-			default:
-				goto error;
-			case T_UDP_CHECKSUM:
-			{
-				const t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
-
-				if (unlikely(optlen != sizeof(*valp)))
-					goto error;
-				if (unlikely(*valp != T_NO && *valp != T_YES))
-					goto error;
-				op->udp.checksum = *valp;
-				t_set_bit(_T_BIT_UDP_CHECKSUM, op->flags);
-				continue;
-			}
-			}
-#endif
 		}
 	}
 	return (0);
@@ -1689,21 +1617,6 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 0
-		case T_INET_UDP:
-			switch (ih->name) {
-			default:
-				olen += T_SPACE(0);
-				continue;
-			case T_ALLOPT:
-			case T_UDP_CHECKSUM:
-				olen += _T_SPACE_SIZEOF(t_defaults.udp.checksum);
-				if (ih->name != T_ALLOPT)
-					continue;
-			}
-			if (ih->level != T_ALLLEVELS)
-				continue;
-#endif
 		}
 	}
 	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
@@ -1818,21 +1731,6 @@ t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 0
-		case T_INET_UDP:
-			switch (ih->name) {
-			default:
-				olen += T_SPACE(0);
-				continue;
-			case T_ALLOPT:
-			case T_UDP_CHECKSUM:
-				olen += _T_SPACE_SIZEOF(t->options.udp.checksum);
-				if (ih->name != T_ALLOPT)
-					continue;
-			}
-			if (ih->level != T_ALLLEVELS)
-				continue;
-#endif
 		}
 	}
 	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
@@ -1975,23 +1873,6 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 0
-		case T_INET_UDP:
-			switch (ih->name) {
-			default:
-				olen += T_SPACE(optlen);
-				continue;
-			case T_ALLOPT:
-			case T_UDP_CHECKSUM:
-				if (optlen && optlen != sizeof(t->options.udp.checksum))
-					goto einval;
-				olen += T_SPACE(optlen);
-				if (ih->name != T_ALLOPT)
-					continue;
-			}
-			if (ih->level != T_ALLLEVELS)
-				continue;
-#endif
 		}
 	}
 	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
@@ -2139,24 +2020,6 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 0
-		case T_INET_UDP:
-			switch (ih->name) {
-			default:
-				olen += T_SPACE(optlen);
-				continue;
-			case T_ALLOPT:
-			case T_UDP_CHECKSUM:
-				if (ih->name != T_ALLOPT
-				    && optlen != sizeof(t->options.udp.checksum))
-					goto einval;
-				olen += _T_SPACE_SIZEOF(t->options.udp.checksum);
-				if (ih->name != T_ALLOPT)
-					continue;
-			}
-			if (ih->level != T_ALLLEVELS)
-				continue;
-#endif
 		}
 	}
 	_ptrace(("%p: Calculated option output size = %u\n", t, olen));
@@ -2401,30 +2264,6 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 0
-			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-				goto efault;
-		case T_INET_UDP:
-			switch (ih->name) {
-			default:
-				oh->len = sizeof(*oh);
-				oh->level = ih->level;
-				oh->name = ih->name;
-				oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-				continue;
-			case T_ALLOPT:
-			case T_UDP_CHECKSUM:
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.udp.checksum);
-				oh->level = T_INET_UDP;
-				oh->name = T_UDP_CHECKSUM;
-				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.udp.checksum;
-				if (ih->name != T_ALLOPT)
-					continue;
-			}
-			if (ih->level != T_ALLLEVELS)
-				continue;
-#endif
 		}
 	}
 	if (ih && !oh)
@@ -2648,31 +2487,6 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 0
-			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-				goto efault;
-		case T_INET_UDP:
-			switch (ih->name) {
-			default:
-				oh->len = sizeof(*oh);
-				oh->level = ih->level;
-				oh->name = ih->name;
-				oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-				continue;
-			case T_ALLOPT:
-			case T_UDP_CHECKSUM:
-				oh->len = _T_LENGTH_SIZEOF(t->options.udp.checksum);
-				oh->level = T_INET_UDP;
-				oh->name = T_UDP_CHECKSUM;
-				oh->status = T_SUCCESS;
-				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.udp.checksum;
-				if (ih->name != T_ALLOPT)
-					continue;
-			}
-			if (ih->level != T_ALLLEVELS)
-				continue;
-#endif
 		}
 	}
 	if (ih && !oh)
@@ -3052,40 +2866,6 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 0
-			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-				goto efault;
-		case T_INET_UDP:
-			switch (ih->name) {
-			default:
-				oh->len = ih->len;
-				oh->level = ih->level;
-				oh->name = ih->name;
-				oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-				if (optlen)
-					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
-				continue;
-			case T_ALLOPT:
-			case T_UDP_CHECKSUM:
-				oh->len = ih->len;
-				oh->level = T_INET_UDP;
-				oh->name = T_UDP_CHECKSUM;
-				oh->status = T_SUCCESS;
-				if (optlen) {
-					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-
-					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
-					if (optlen != sizeof(*valp))
-						goto einval;
-					if (*valp != T_YES && *valp != T_NO)
-						goto einval;
-				}
-				if (ih->name != T_ALLOPT)
-					continue;
-			}
-			if (ih->level != T_ALLLEVELS)
-				continue;
-#endif
 		}
 	}
 	if (ih && !oh)
@@ -3514,43 +3294,6 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-#if 0
-			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-				goto efault;
-		case T_INET_UDP:
-			switch (ih->name) {
-			default:
-				oh->len = ih->len;
-				oh->level = ih->level;
-				oh->name = ih->name;
-				oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
-				continue;
-			case T_ALLOPT:
-			case T_UDP_CHECKSUM:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-
-				oh->len = _T_LENGTH_SIZEOF(*valp);
-				oh->level = T_INET_UDP;
-				oh->name = T_UDP_CHECKSUM;
-				oh->status = T_SUCCESS;
-				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
-				if (ih->name == T_ALLOPT) {
-					*valp = t_defaults.udp.checksum;
-				} else {
-					*valp = *((typeof(valp)) T_OPT_DATA(ih));
-					if (*valp != T_YES && *valp != T_NO)
-						goto einval;
-				}
-				t->options.udp.checksum = *valp;
-				if (ih->name != T_ALLOPT)
-					continue;
-			}
-			}
-			if (ih->level != T_ALLLEVELS)
-				continue;
-#endif
 		}
 	}
 	if (ih && !oh)
@@ -4649,13 +4392,6 @@ tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t
 			goto error;
 	} else {
 		OPT_buffer->ip.mtu = tp->options.ip.mtu;
-	}
-	if (t_tst_bit(_T_BIT_UDP_CHECKSUM, OPT_buffer->flags)) {
-		if ((t_scalar_t) OPT_buffer->udp.checksum != T_YES
-		    && (t_scalar_t) OPT_buffer->udp.checksum != T_NO)
-			goto error;
-	} else {
-		OPT_buffer->udp.checksum = tp->options.udp.checksum;
 	}
 
 	/* Need to determine source addressess from bound addresses before we can test the source
@@ -5774,8 +5510,6 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	size_t size;
 	struct iphdr *iph = (struct iphdr *) SEQ_number->b_rptr;
 
-	// struct udphdr *uh = (struct udphdr *) (SEQ_number->b_rptr + (iph->ihl << 2));
-
 	if (unlikely(tp_not_state(tp, (TSF_IDLE | TSF_WRES_CIND | TSF_WACK_CRES))))
 		goto discard;
 
@@ -5892,6 +5626,7 @@ te_discon_ind(queue_t *q, const struct sockaddr_in *RES_buffer, const socklen_t 
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PROTO;
+	mp->b_band = 2;		/* expedite */
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_DISCON_IND;
 	p->DISCON_reason = DISCON_reason;
@@ -5922,7 +5657,7 @@ te_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	struct udphdr *uh;
 	struct sockaddr_in res_buf, *RES_buffer = &res_buf;
 	t_uscalar_t DISCON_reason;
-	mblk_t **conpp, *SEQ_number;
+	mblk_t *cp, *SEQ_number;
 	ptrdiff_t hidden;
 	int err;
 
@@ -5940,14 +5675,14 @@ te_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	DISCON_reason = ((t_uscalar_t) icmp->type << 8) | ((t_uscalar_t) icmp->code);
 
 	/* check for outstanding connection indications for responding address */
-	for (conpp = &tp->conq.q_head; (*conpp); conpp = &(*conpp)->b_next) {
-		struct iphdr *iph2 = (struct iphdr *) (*conpp)->b_rptr;
+	for (cp = bufq_head(&tp->conq); cp; cp = cp->b_next) {
+		struct iphdr *iph2 = (struct iphdr *) cp->b_rptr;
 
 		if (iph->protocol == iph2->protocol && iph->saddr == iph2->saddr
 		    && iph->daddr == iph2->daddr)
 			break;
 	}
-	SEQ_number = (*conpp);
+	SEQ_number = cp;
 
 	/* hide ICMP header */
 	hidden = (unsigned char *) iph - mp->b_rptr;
@@ -5955,21 +5690,10 @@ te_discon_ind_icmp(queue_t *q, mblk_t *mp)
 	if ((err = te_discon_ind(q, RES_buffer, sizeof(*RES_buffer),
 				 DISCON_reason, SEQ_number, mp)) < 0)
 		mp->b_rptr -= hidden;
-	else if ((*conpp) != NULL) {
-		mblk_t *b, *b_prev;
-
-		/* Remove connection indication from queue */
-		b = (*conpp);
-		(*conpp) = b->b_next;
-		b->b_next = NULL;
-
-		/* Free any attached pending data */
-		b_prev = b;
-		while ((b = b_prev)) {
-			b_prev = b->b_prev;
-			b->b_prev = NULL;
-			b->b_next = NULL;
-			freemsg(b);
+	else {
+		if (cp != NULL) {
+			bufq_unlink(&tp->conq, cp);
+			freemsg(cp);
 		}
 	}
 	return (err);
@@ -6332,7 +6056,7 @@ te_uderror_reply(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsign
 STATIC int
 ne_reset_ind(queue_t *q, mblk_t *dp)
 {
-	struct np *np = TP_PRIV(q);
+	struct np *np = NP_PRIV(q);
 	mblk_t *mp, *bp;
 	N_reset_ind_t *p;
 	const size_t size = sizeof(*p);
@@ -6343,7 +6067,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	assure(dp->b_wptr >= dp->b_rptr + (iph->ihl << 2));
 
 	/* Make sure we don't already have a reset indication */
-	for (bp = np->resq; bp; bp = bp->b_next) {
+	for (bp = bufq_head(&np->resq); bp; bp = bp->b_next) {
 		struct iphdr *iph2 = (struct iphdr *) bp->b_rptr;
 		struct icmphdr *icmp2 = (struct icmphdr *) (bp->b_rptr + (iph2->ihl << 2));
 
@@ -6353,13 +6077,13 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 			goto discard;
 	}
 
-	if (unlikely((bp = tp_dupmsg(q, dp)) == NULL))
+	if (unlikely((bp = np_dupmsg(q, dp)) == NULL))
 		goto enobufs;
-	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = np_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 
 	mp->b_datap->db_type = M_PROTO;
-	mp->b_band = 1;
+	mp->b_band = 2;
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_IND;
 	p->RESET_orig = N_PROVIDER;
@@ -6437,9 +6161,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 		break;
 	}
 	/* save original in reset indication list */
-	dp->b_next = np->resq;
-	np->resq = dp;
-	np->resinds++;
+	bufq_queue(&np->resq, dp);
 	_printd(("%s: <- N_RESET_IND\n", DRV_NAME));
 	putnext(q, mp);
       discard:
@@ -8440,7 +8162,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 				if (tp->CONIND_number == 0 && tp->info.SERV_type != T_CLTS)
 					continue;
 				/* only Streams in close to the correct state */
-				if (tp_not_state(tp, (TSF_IDLE | TSF_WACK_CREQ)))
+				if (tp_not_state(tp, TSF_IDLE))
 					continue;
 				for (i = 0; i < tp->pnum; i++) {
 					if (tp->protoids[i] != proto)
@@ -8629,7 +8351,6 @@ tp_v4_rcv(struct sk_buff *skb)
 		/* need to do something about broadcast and multicast */ ;
 
 	_printd(("%s: %s: packet received %p\n", DRV_NAME, __FUNCTION__, skb));
-//      UDP_INC_STATS_BH(UdpInDatagrams);
 	/* we do the lookup before the checksum */
 	if (unlikely((tp = tp_lookup(iph, uh)) == NULL))
 		goto no_stream;
@@ -8675,7 +8396,6 @@ tp_v4_rcv(struct sk_buff *skb)
 		// mp->b_datap->db_type = M_DATA;
 		mp->b_wptr += plen;
 		put(tp->oq, mp);
-//              UDP_INC_STATS_BH(UdpInDatagrams);
 		/* release reference from lookup */
 		tp_put(tp);
 		return (0);
@@ -8700,7 +8420,6 @@ tp_v4_rcv(struct sk_buff *skb)
 		/* always schedule out of service procedure */
 		if (unlikely(putq(tp->oq, mp) == 0))
 			goto dropped;
-//              UDP_INC_STATS_BH(UdpInDatagrams);
 		/* release reference from lookup */
 		tp_put(tp);
 		return (0);
@@ -8723,13 +8442,8 @@ tp_v4_rcv(struct sk_buff *skb)
 	return (0);
       no_stream:
 	ptrace(("ERROR: No stream\n"));
-//      UDP_INC_STATS_BH(UdpNoPorts);   /* should wait... */
-	// goto pass_it;
       bad_pkt_type:
-	// goto pass_it;
       too_small:
-	// goto pass_it;
-	// pass_it:
 	if (tp_v4_rcv_next(skb)) {
 		/* TODO: want to generate an ICMP port unreachable error here */
 	}
@@ -8942,31 +8656,7 @@ tp_free_priv(queue_t *q)
 		dst_release(tp->daddrs[0].dst);
 		tp->daddrs[0].dst = NULL;
 	}
-#if 0
-	{
-		mblk_t *b, *b_prev, *b_next;
-
-		/* purge connection indication queue, conq */
-		b_next = XCHG(&tp->conq, NULL);
-		while ((b = b_next)) {
-			b_next = XCHG(&b->b_next, NULL);
-			/* might be data hanging off of b_prev pointer */
-			b_prev = b;
-			while ((b = b_prev)) {
-				b_prev = XCHG(&b->b_prev, NULL);
-				freemsg(b);
-			}
-		}
-		/* purge reset indication queue, resq */
-		b_next = XCHG(&tp->resq, NULL);
-		while ((b = b_next)) {
-			b_next = XCHG(&b->b_next, NULL);
-			freemsg(b);
-		}
-	}
-#else
 	bufq_purge(&tp->conq);
-#endif
 	tp_unbufcall((str_t *) tp);
 #if 0
 	strlog(DRV_ID, tp->u.dev.cminor, 0, SL_TRACE, "removed bufcalls: reference count = %d",
