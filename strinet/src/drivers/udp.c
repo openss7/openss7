@@ -8391,7 +8391,7 @@ tp_wsrv(queue_t *q)
 				freeb(mp);
 			else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 				goto busy;
-		} while (likely((mp = get(q)) != NULL));
+		} while (likely((mp = getq(q)) != NULL));
 	} else {
 		__pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
 		return (0);
