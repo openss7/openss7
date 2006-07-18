@@ -8368,7 +8368,12 @@ tp_wput(queue_t *q, mblk_t *mp)
 {
 	/* It seems to run faster if the messages are simply queued.  This is just for testing, one 
 	   should never queue M_FLUSH messages. */
-	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
+#if 0
+	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY))
+#else
+	if (likely(mp->b_datap->db_type < QPCTL))
+#endif
+	{
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
