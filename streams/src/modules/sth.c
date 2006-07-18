@@ -496,8 +496,9 @@ strdetached(struct stdata *sd)
 STATIC streams_inline streams_fastcall __hot void
 strsyscall(void)
 {
-	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
-	   STREAMS scheduler in process context here. I don't know why... */
+	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
+	   the way out of a system call.  This allows queues to fill, flow control to function, and
+	   service procedures to run more efficiently. */
 #if 0
 #ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
@@ -515,8 +516,9 @@ strsyscall(void)
 STATIC streams_inline streams_fastcall __hot void
 strsyscall_write(void)
 {
-	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
-	   STREAMS scheduler in process context here. I don't know why... */
+	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
+	   the way out of a system call.  This allows queues to fill, flow control to function, and
+	   service procedures to run more efficiently. */
 #if 0
 #ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
@@ -534,8 +536,9 @@ strsyscall_write(void)
 STATIC streams_inline streams_fastcall __hot void
 strsyscall_read(void)
 {
-	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
-	   STREAMS scheduler in process context here. I don't know why... */
+	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
+	   the way out of a system call.  This allows queues to fill, flow control to function, and
+	   service procedures to run more efficiently. */
 #if 0
 #ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
@@ -555,6 +558,14 @@ strschedule(void)
 {
 	struct strthread *t = this_thread;
 
+	/* NOTE:- Better performance is acheived on (true) SMP machines by no attempting to run the
+	   STREAMS scheduler in process context here.  The reason is that if we avoid scheduling,
+	   the current process is blocked off other processors while it is running the STREAMS
+	   scheduler.  If we do the task switch, the process can run concurrently on another
+	   processor.  This does have a negative impact; however, on SMP kernels running on UP
+	   machines, so it would be better if we could quickly check the number of processors
+	   running.  We just decide by static kernel configuration for the moment. */
+#ifndef CONFIG_SMP
 	/* before every sleep -- saves a context switch */
 	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
@@ -562,6 +573,7 @@ strschedule(void)
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	set_current_state(TASK_RUNNING);
 	runqueues();
+#endif
 }
 
 STATIC streams_inline streams_fastcall __hot_out void
