@@ -496,12 +496,9 @@ strdetached(struct stdata *sd)
 STATIC streams_inline streams_fastcall __hot void
 strsyscall(void)
 {
-	/* NOTE:- Try strapping this out.  Because, unlike LiS, there is no service procedure on
-	   the Stream head write queue, the top module or driver put procedure is always invoked in 
-	   user context.  This call would make the top module or driver service procedure also run
-	   in user context, but that is unnecessary.  Some performance gains yielded by not
-	   freaking the Linux scheduler. */
-#if 0
+	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
+	   STREAMS scheduler in process context here. I don't know why... */
+#ifndef CONFIG_SMP
 	/* before every system call return -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
@@ -512,11 +509,10 @@ strsyscall(void)
 STATIC streams_inline streams_fastcall __hot void
 strsyscall_write(void)
 {
-	/* Looks like it might be better to push on the write side and let the read side and back
-	   enabling run whenever. */
+	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
+	   STREAMS scheduler in process context here. I don't know why... */
+#ifndef CONFIG_SMP
 	/* before every system call return -- saves a context switch */
-	/* no way to cancel a wakeup - will not save task switch */
-#if 0
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
@@ -526,8 +522,9 @@ strsyscall_write(void)
 STATIC streams_inline streams_fastcall __hot void
 strsyscall_read(void)
 {
-	/* no way to cancel a wakeup - will not save task switch */
-#if 0
+	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
+	   STREAMS scheduler in process context here. I don't know why... */
+#ifndef CONFIG_SMP
 	/* before every system call return -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
@@ -538,12 +535,9 @@ strsyscall_read(void)
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule(void)
 {
-	/* NOTE:- This does more than just saves a context switch: the STREAMS scheduler is running
-	   nice 19 and if we don't execute runqueues when possible it is unlikely that the STREAMS
-	   scheduler will even get a chance to run under heavy load.  With this strapped out, for
-	   example, the write side heavily overloads the read side on loopback tests. */
-	/* no way to cancel a wakeup - will not save task switch */
-#if 0
+	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
+	   STREAMS scheduler in process context here. I don't know why... */
+#ifndef CONFIG_SMP
 	/* before every sleep -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
