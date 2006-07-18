@@ -4600,9 +4600,12 @@ kstreamd(void *__bind_cpu)
 			if (cpu_is_offline((long) __bind_cpu))
 				goto wait_to_die;
 			__runqueues();
+#if 0
+			/* don't take a breath here */
 			preempt_enable_no_resched();
 			cond_resched();
 			preempt_disable();
+#endif
 		}
 		preempt_enable();
 		set_current_state(TASK_INTERRUPTIBLE);
@@ -4805,8 +4808,11 @@ kstreamd(void *__bind_cpu)
 		}
 		__set_current_state(TASK_RUNNING);
 		__runqueues();
+#if 0
+		/* don't take a breath here */
 		if (current->need_resched)
 			schedule();
+#endif
 		prefetchw(t);
 		if (signal_pending(current)
 		    && sigismember(&current->pending.signal, SIGKILL))
