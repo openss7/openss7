@@ -515,6 +515,7 @@ strsyscall_write(void)
 	/* Looks like it might be better to push on the write side and let the read side and back
 	   enabling run whenever. */
 	/* before every system call return -- saves a context switch */
+	/* no way to cancel a wakeup - will not save task switch */
 #if 0
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
@@ -525,6 +526,7 @@ strsyscall_write(void)
 STATIC streams_inline streams_fastcall __hot void
 strsyscall_read(void)
 {
+	/* no way to cancel a wakeup - will not save task switch */
 #if 0
 	/* before every system call return -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
@@ -540,11 +542,14 @@ strschedule(void)
 	   nice 19 and if we don't execute runqueues when possible it is unlikely that the STREAMS
 	   scheduler will even get a chance to run under heavy load.  With this strapped out, for
 	   example, the write side heavily overloads the read side on loopback tests. */
+	/* no way to cancel a wakeup - will not save task switch */
+#if 0
 	/* before every sleep -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	set_current_state(TASK_RUNNING);
 	runqueues();
+#endif
 }
 
 STATIC streams_inline streams_fastcall __hot_out void

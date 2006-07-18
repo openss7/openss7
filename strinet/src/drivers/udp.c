@@ -8183,7 +8183,6 @@ tp_w_prim(queue_t *q, mblk_t *mp)
 	return tp_w_prim_slow(q, mp);
 }
 
-#if 0
 STATIC noinline streams_fastcall void
 tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 {
@@ -8235,7 +8234,6 @@ tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	}
 	return;
 }
-#endif
 
 static noinline streams_fastcall int
 tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
@@ -8327,12 +8325,9 @@ tp_rput(queue_t *q, mblk_t *mp)
 {
 	/* It seems to run faster if the messages are simply queued.  This is just for testing, one 
 	   should never queue M_FLUSH messages. */
-#if 0
 	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
-#endif
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
-#if 0
 	} else {
 		int rtn;
 
@@ -8345,7 +8340,6 @@ tp_rput(queue_t *q, mblk_t *mp)
 		else
 			tp_putq_slow(q, mp, rtn);
 	}
-#endif
 	return (0);
 }
 
