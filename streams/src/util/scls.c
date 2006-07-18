@@ -223,6 +223,7 @@ printit(struct sc_mlist *l, int cmd)
 		fprintf(stdout, "\t%ld", (long) l->ms.ms_pcnt);
 		fprintf(stdout, "\t%ld", (long) l->ms.ms_scnt);
 		fprintf(stdout, "\t%ld", (long) l->ms.ms_ocnt);
+		fprintf(stdout, "\t%ld", (long) l->ms.ms_ccnt);
 		fprintf(stdout, "\t%ld", (long) l->ms.ms_acnt);
 		fprintf(stdout, "\t%x", l->ms.ms_flags);
 	}
