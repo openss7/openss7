@@ -4229,7 +4229,7 @@ __runqueues(struct softirq_action *unused)
 	} while (unlikely((t->flags & (QRUNFLAGS)) != 0 && runs < 10));
 
 	if (runs >= 10)
-		__pswerr(("CPU#%d: kstreamd looping: flags = 0x%08lx\n", smp_processor_id(), t->flags));
+		__pswerr(("CPU#%d: STREAMS scheduler looping: flags = 0x%08lx\n", smp_processor_id(), t->flags));
 
 	atomic_dec(&t->lock);
 
@@ -4602,12 +4602,18 @@ kstreamd(void *__bind_cpu)
 		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets woken up and then
 		   the process runs queues in process context. */
 		if (likely((t->flags & (QRUNFLAGS)) == 0)) {
-			do {
-				preempt_enable_no_resched();
-				schedule();
-				preempt_disable();
+		      reschedule:
+			preempt_enable_no_resched();
+			schedule();
+			prefetchw(t);
+			if (unlikely(kthread_should_stop()))
+				break;
+			preempt_disable();
+			if (unlikely((t->flags & (QRUNFLAGS)) == 0)) {
+				__pswerr(("CPU#%d: kstreamd: false wakeup\n",
+					  (int) (long) __bind_cpu));
+				goto reschedule;
 			}
-			while (unlikely((t->flags & (QRUNFLAGS)) == 0));
 		}
 		__set_current_state(TASK_RUNNING);
 
@@ -4805,31 +4811,32 @@ kstreamd(void *__bind_cpu)
 	__set_current_state(TASK_INTERRUPTIBLE);
 	mb();
 	t->proc = current;
-	for (;;) {
+	while (likely(!(signal_pending(current) && sigismember(&current->pending.signal, SIGKILL)))) {
 		if (signal_pending(current))
 			do_exit(0);
 		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets woken up and then
 		   the process runs queues in process context. */
 		if (likely((t->flags & (QRUNFLAGS)) == 0)) {
-			do {
-				schedule();
-				prefetchw(t);
-				if (signal_pending(current)
-				    && sigismember(&current->pending.signal, SIGKILL))
-					break;
+		      reschedule:
+			schedule();
+			prefetchw(t);
+			if (unlikely(signal_pending(current)
+				     && sigismember(&current->pending.signal, SIGKILL)))
+				goto break;
+			if (unlikely((t->flags & (QRUNFLAGS)) == 0)) {
+				__pswerr(("CPU#%d: kstreamd: false wakeup\n",
+					  (int) (long) __bind_cpu));
+				goto reschedule;
 			}
-			while (unlikely((t->flags & (QRUNFLAGS)) == 0));
 		}
 		__set_current_state(TASK_RUNNING);
 		__runqueues();
 		if (current->need_resched)
 			schedule();
 		prefetchw(t);
-		if (signal_pending(current)
-		    && sigismember(&current->pending.signal, SIGKILL))
-			break;
 		__set_current_state(TASK_INTERRUPTIBLE);
 	}
+	__set_current_state(TASK_RUNNING);
 	t->proc = NULL;
 	/* FIXME: might need to migrate */
 	return (0);
