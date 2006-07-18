@@ -4610,8 +4610,8 @@ kstreamd(void *__bind_cpu)
 				break;
 			preempt_disable();
 			if (unlikely((t->flags & (QRUNFLAGS)) == 0)) {
-				__pswerr(("CPU#%d: kstreamd: false wakeup\n",
-					  (int) (long) __bind_cpu));
+				pswerr(("CPU#%d: kstreamd: false wakeup\n",
+					(int) (long) __bind_cpu));
 				set_current_state(TASK_INTERRUPTIBLE);
 				goto reschedule;
 			}
@@ -4825,8 +4825,8 @@ kstreamd(void *__bind_cpu)
 				     && sigismember(&current->pending.signal, SIGKILL)))
 				break;
 			if (unlikely((t->flags & (QRUNFLAGS)) == 0)) {
-				__pswerr(("CPU#%d: kstreamd: false wakeup\n",
-					  (int) (long) __bind_cpu));
+				pswerr(("CPU#%d: kstreamd: false wakeup\n",
+					(int) (long) __bind_cpu));
 				set_current_state(TASK_INTERRUPTIBLE);
 				goto reschedule;
 			}
