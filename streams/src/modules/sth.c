@@ -515,9 +515,11 @@ strsyscall_write(void)
 	/* Looks like it might be better to push on the write side and let the read side and back
 	   enabling run whenever. */
 	/* before every system call return -- saves a context switch */
+#if 0
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
+#endif
 }
 
 STATIC streams_inline streams_fastcall __hot void
