@@ -4230,7 +4230,7 @@ __runqueues(struct softirq_action *unused)
 	} while (unlikely((t->flags & (QRUNFLAGS)) != 0 && runs < 10));
 
 	if (runs >= 10)
-		__pswerr(("CPU#%d: kstreamd looping: flags = 0x%08x\n", smp_processor_id(), t->flags));
+		__pswerr(("CPU#%d: kstreamd looping: flags = 0x%08lx\n", smp_processor_id(), t->flags));
 
 	atomic_dec(&t->lock);
 
