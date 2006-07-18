@@ -4612,10 +4612,11 @@ kstreamd(void *__bind_cpu)
 			if (unlikely((t->flags & (QRUNFLAGS)) == 0)) {
 				__pswerr(("CPU#%d: kstreamd: false wakeup\n",
 					  (int) (long) __bind_cpu));
+				set_current_state(TASK_INTERRUPTIBLE);
 				goto reschedule;
 			}
 		}
-		__set_current_state(TASK_RUNNING);
+		set_current_state(TASK_RUNNING);
 
 		if (cpu_is_offline((long) __bind_cpu))
 			goto wait_to_die;
@@ -4623,9 +4624,10 @@ kstreamd(void *__bind_cpu)
 
 		preempt_enable_no_resched();
 		cond_resched();
+		prefetchw(t);
 		set_current_state(TASK_INTERRUPTIBLE);
 	}
-	__set_current_state(TASK_RUNNING);
+	set_current_state(TASK_RUNNING);
 	return (0);
       wait_to_die:
 	preempt_enable();
@@ -4634,7 +4636,7 @@ kstreamd(void *__bind_cpu)
 		schedule();
 		set_current_state(TASK_INTERRUPTIBLE);
 	}
-	__set_current_state(TASK_RUNNING);
+	set_current_state(TASK_RUNNING);
 	return (0);
 }
 
@@ -4808,8 +4810,7 @@ kstreamd(void *__bind_cpu)
 	if (cpu() != cpu)
 		swerr();
 	sprintf(current->comm, "kstreamd_CPU%d", bind_cpu);
-	__set_current_state(TASK_INTERRUPTIBLE);
-	mb();
+	set_current_state(TASK_INTERRUPTIBLE);
 	t->proc = current;
 	while (likely(!(signal_pending(current) && sigismember(&current->pending.signal, SIGKILL)))) {
 		if (signal_pending(current))
@@ -4826,17 +4827,19 @@ kstreamd(void *__bind_cpu)
 			if (unlikely((t->flags & (QRUNFLAGS)) == 0)) {
 				__pswerr(("CPU#%d: kstreamd: false wakeup\n",
 					  (int) (long) __bind_cpu));
+				set_current_state(TASK_INTERRUPTIBLE);
 				goto reschedule;
 			}
 		}
-		__set_current_state(TASK_RUNNING);
+		set_current_state(TASK_RUNNING);
 		__runqueues();
-		if (current->need_resched)
+		if (current->need_resched) {
 			schedule();
-		prefetchw(t);
-		__set_current_state(TASK_INTERRUPTIBLE);
+			prefetchw(t);
+		}
+		set_current_state(TASK_INTERRUPTIBLE);
 	}
-	__set_current_state(TASK_RUNNING);
+	set_current_state(TASK_RUNNING);
 	t->proc = NULL;
 	/* FIXME: might need to migrate */
 	return (0);
