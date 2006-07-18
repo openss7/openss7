@@ -347,7 +347,7 @@ STATIC struct module_info udp_minfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 18),		/* Hi water mark */
+	.mi_hiwat = (1 << 19),		/* Hi water mark */
 	.mi_lowat = (1 << 17),		/* Lo water mark */
 };
 
@@ -8288,6 +8288,7 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
+	++udp_mstat.ms_pcnt;
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
 #else
@@ -8316,28 +8317,37 @@ tp_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 
-	while (likely((mp = getq(q)) != NULL)) {
-		int rtn;
+	++udp_mstat.ms_scnt;
+	if (likely((mp = getq(q)) != NULL)) {
+		do {
+			int rtn;
 
-		rtn = tp_r_prim(q, mp);
-		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED))
-			freeb(mp);
-		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
-			goto done;
+			rtn = tp_r_prim(q, mp);
+			/* Fast Path */
+			if (likely(rtn == QR_TRIMMED))
+				freeb(mp);
+			else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+				goto busy;
+		} while (likely((mp = getq(q)) != NULL));
+	} else {
+		__pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
+		return (0);
 	}
-#ifndef CONFIG_SMP
+#if 1
 	/* try waking softirqd when service queue empty */
 	local_bh_disable();
 	local_bh_enable();
 #endif
-      done:
+	return (0);
+      busy:
+	__ptrace(("%s: %p: flow controlled\n", __FUNCTION__, q));
 	return (0);
 }
 
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
+	++udp_mstat.ms_pcnt;
 #if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
@@ -8370,22 +8380,30 @@ tp_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 
-	while (likely((mp = getq(q)) != NULL)) {
-		int rtn;
+	++udp_mstat.ms_scnt;
+	if (likely((mp = getq(q)) != NULL)) {
+		do {
+			register int rtn;
 
-		rtn = tp_w_prim(q, mp);
-		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED))
-			freeb(mp);
-		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0)) {
-#ifndef CONFIG_SMP
-			/* try running softirqd */
-			local_bh_disable();
-			local_bh_enable();
-#endif
-			break;
-		}
+			rtn = tp_w_prim(q, mp);
+			/* Fast Path */
+			if (likely(rtn == QR_TRIMMED))
+				freeb(mp);
+			else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+				goto busy;
+		} while (likely((mp = get(q)) != NULL));
+	} else {
+		__pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
+		return (0);
 	}
+	return (0);
+      busy:
+	__ptrace(("%s: %p: flow controlled\n", __FUNCTION__, q));
+#if 1
+	/* try running softirqd */
+	local_bh_disable();
+	local_bh_enable();
+#endif
 	return (0);
 }
 
@@ -9123,6 +9141,7 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct stroptions *so;
 #endif
 
+	++udp_mstat.ms_ocnt;
 	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
 	}
@@ -9215,6 +9234,7 @@ udp_qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	struct tp *tp = TP_PRIV(q);
 
+	++udp_mstat.ms_ccnt;
 	(void) oflag;
 	(void) crp;
 	(void) tp;
