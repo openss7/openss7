@@ -351,8 +351,7 @@ STATIC struct module_info udp_minfo = {
 	.mi_lowat = (1 << 17),		/* Lo water mark */
 };
 
-STATIC struct module_stat udp_mstat = {
-};
+STATIC struct module_stat udp_mstat = { NULL, 0, 0, };
 
 /* Upper multiplex is a T provider following the TPI. */
 
@@ -8288,7 +8287,7 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-	++udp_mstat.ms_pcnt;
+	udp_mstat.ms_pcnt++;
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
 #else
@@ -8317,7 +8316,7 @@ tp_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 
-	++udp_mstat.ms_scnt;
+	udp_mstat.ms_scnt++;
 	if (likely((mp = getq(q)) != NULL)) {
 		do {
 			int rtn;
@@ -8330,7 +8329,8 @@ tp_rsrv(queue_t *q)
 				goto busy;
 		} while (likely((mp = getq(q)) != NULL));
 	} else {
-		__pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
+		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
+		udp_mstat.ms_acnt++;
 		return (0);
 	}
 #if 1
@@ -8347,7 +8347,7 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
-	++udp_mstat.ms_pcnt;
+	udp_mstat.ms_pcnt++;
 #if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
@@ -8380,7 +8380,7 @@ tp_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 
-	++udp_mstat.ms_scnt;
+	udp_mstat.ms_scnt++;
 	if (likely((mp = getq(q)) != NULL)) {
 		do {
 			register int rtn;
@@ -8393,7 +8393,8 @@ tp_wsrv(queue_t *q)
 				goto busy;
 		} while (likely((mp = getq(q)) != NULL));
 	} else {
-		__pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
+		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
+		udp_mstat.ms_acnt++;
 		return (0);
 	}
 	return (0);
@@ -9141,7 +9142,7 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct stroptions *so;
 #endif
 
-	++udp_mstat.ms_ocnt;
+	udp_mstat.ms_ocnt++;
 	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
 	}
@@ -9234,7 +9235,7 @@ udp_qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	struct tp *tp = TP_PRIV(q);
 
-	++udp_mstat.ms_ccnt;
+	udp_mstat.ms_ccnt++;
 	(void) oflag;
 	(void) crp;
 	(void) tp;
