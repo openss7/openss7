@@ -8275,7 +8275,7 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-	if (likely(mp->b_datap->db_type < QPCTL)) {
+	if (likely(mp->b_datap->db_type < QPCTL) && (q->q_first == NULL || (q->q_flag & QSVCBUSY))) {
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
@@ -8316,7 +8316,7 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
-	if (likely(mp->b_datap->db_type < QPCTL)) {
+	if (likely(mp->b_datap->db_type < QPCTL) && (q->q_first == NULL || (q->q_flag & QSVCBUSY))) {
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
@@ -8769,14 +8769,11 @@ tp_v4_rcv(struct sk_buff *skb)
 			goto flow_controlled;
 		// mp->b_datap->db_type = M_DATA;
 		mp->b_wptr += plen;
-		/* always schedule out of service procedure */
-		if (unlikely(putq(tp->oq, mp) == 0))
-			goto dropped;
+		put(tp->oq, mp);
 //              UDP_INC_STATS_BH(UdpInDatagrams);
 		/* release reference from lookup */
 		tp_put(tp);
 		return (0);
-	      dropped:
 	      flow_controlled:
 		freeb(mp);	/* will take sk_buff with it */
 		tp_put(tp);
@@ -8866,13 +8863,7 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 		mp->b_band = 1;
 		bcopy(skb->nh.raw, mp->b_wptr, plen);
 		mp->b_wptr += plen;
-		/* always schedule out of service procedure */
-		if (unlikely(putq(tp->oq, mp) == 0))
-			goto dropped;
-		goto discard_put;
-	      dropped:
-		ptrace(("ERROR: stream is dropping\n"));
-		freeb(mp);
+		put(tp->oq, mp);
 		goto discard_put;
 	      flow_controlled:
 		ptrace(("ERROR: stream is flow controlled\n"));
