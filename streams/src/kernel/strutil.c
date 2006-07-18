@@ -136,9 +136,9 @@ db_inc_slow(register dblk_t *db)
 {
 	unsigned long flags;
 
-	spin_lock_irqsave(&db_ref_lock, flags);
+	streams_spin_lock(&db_ref_lock, flags);
 	++db->db_ref;
-	spin_unlock_irqrestore(&db_ref_lock, flags);
+	streams_spin_unlock(&db_ref_lock, flags);
 }
 
 STATIC streams_inline streams_fastcall __hot_get void
@@ -157,9 +157,9 @@ db_dec_and_test_slow(register dblk_t *db)
 	unsigned long flags;
 	register bool ret;
 
-	spin_lock_irqsave(&db_ref_lock, flags);
+	streams_spin_lock(&db_ref_lock, flags);
 	ret = (--db->db_ref == 0);
-	spin_unlock_irqrestore(&db_ref_lock, flags);
+	streams_spin_unlock(&db_ref_lock, flags);
 	return ret;
 }
 
@@ -1064,7 +1064,7 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 			unsigned long pl;
 			struct qband *qb;
 
-			pl = qwlock(q);
+			qwlock(q, pl);
 			if (likely(bands == NULL)) {
 				if (band == 0)
 					set_bit(QBACK_BIT, &q->q_flag);
@@ -1111,7 +1111,7 @@ bcangetany(queue_t *q)
 
 	dassert(q);
 
-	pl = qrlock(q);
+	qrlock(q, pl);
 	b = q->q_first;
 	/* find normal messages */
 	for (; b && b->b_datap->db_type >= QPCTL; b = b->b_next) ;
@@ -1149,7 +1149,7 @@ bcanget(queue_t *q, unsigned char band)
 
 	dassert(q);
 
-	pl = qrlock(q);
+	qrlock(q, pl);
 	{
 		mblk_t *b;
 
@@ -1177,7 +1177,7 @@ __bcanputany(queue_t *q)
 	/* find first queue with service procedure or no q_next pointer */
 	for (; !q->q_qinfo->qi_srvp && q->q_next; q = q->q_next) ;
 
-	pl = qrlock(q);
+	qrlock(q, pl);
 	result = (q->q_blocked < q->q_nband);
 	_ptrace(("queue bands blocked %d, available %d\n", q->q_blocked, q->q_nband));
 	qrunlock(q, pl);
@@ -1307,7 +1307,7 @@ __bcanput_slow(queue_t *q, unsigned char band)
 {
 	unsigned long pl;
 
-	pl = qrlock(q);
+	qrlock(q, pl);
 	if (likely(band <= q->q_nband && q->q_blocked > 0)) {
 		struct qband *qb;
 
@@ -1357,7 +1357,7 @@ __bcanput(queue_t *q, unsigned char band)
 	for (q_next = q; !q->q_qinfo->qi_srvp && (q_next = q->q_next); q = q_next) ;
 
 	if (likely(band == 0)) {
-		pl = qrlock(q);
+		qrlock(q, pl);
 		if (likely(test_bit(QFULL_BIT, &q->q_flag) == 0)) {
 			qrunlock(q, pl);
 			return (1);
@@ -1551,12 +1551,14 @@ streams_fastcall __unlikely unsigned long
 freezestr(queue_t *q)
 {
 	struct stdata *sd;
+	unsigned long pl = 0;
 
 	assert(q);
 	sd = qstream(q);
 	assert(sd);
 
-	return zwlock(sd);
+	zwlock(sd, pl);
+	return (pl);
 }
 
 EXPORT_SYMBOL_NOVERS(freezestr);
@@ -1682,9 +1684,9 @@ qschedule(queue_t *q)
 		{
 			unsigned long flags;
 
-			local_irq_save(flags);
+			streams_local_save(flags);
 			*XCHG(&t->qtail, &q->q_link) = qget(q);
-			local_irq_restore(flags);
+			streams_local_restore(flags);
 		}
 		setqsched();
 	}
@@ -1747,7 +1749,7 @@ enableok(queue_t *q)
 	assert(sd);
 
 	/* block on frozen stream unless stream frozen by caller */
-	pl = zrlock(sd);
+	zrlock(sd, pl);
 	clear_bit(QNOENB_BIT, &q->q_flag);
 	zrunlock(sd, pl);
 }
@@ -1774,7 +1776,7 @@ noenable(queue_t *q)
 	assert(sd);
 
 	/* block on frozen stream unless stream frozen by caller */
-	pl = zrlock(sd);
+	zrlock(sd, pl);
 	set_bit(QNOENB_BIT, &q->q_flag);
 	zrunlock(sd, pl);
 }
@@ -1893,7 +1895,7 @@ putbq(register queue_t *q, register mblk_t *mp)
 
 	assure(not_frozen_by_caller(q));
 
-	pl = qwlock(q);
+	qwlock(q, pl);
 	result = __putbq(q, mp);
 	qwunlock(q, pl);
 	if (likely(result == 1))
@@ -2180,7 +2182,7 @@ putq(register queue_t *q, register mblk_t *mp)
 
 	assure(not_frozen_by_caller(q));
 
-	pl = qwlock(q);
+	qwlock(q, pl);
 	result = __putq(q, mp);
 	qwunlock(q, pl);
 	if (likely(result == 1))
@@ -2313,7 +2315,7 @@ insq(register queue_t *q, register mblk_t *emp, register mblk_t *nmp)
 
 	assure(frozen_by_caller(q));
 
-	pl = qwlock(q);
+	qwlock(q, pl);
 	result = __insq(q, emp, nmp);
 	qwunlock(q, pl);
 	if (likely(result == 1))
@@ -2347,7 +2349,7 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 
 	assure(frozen_by_caller(q));
 
-	pl = qwlock(q);
+	qwlock(q, pl);
 	result = __insq(q, emp ? emp->b_next : emp, nmp);
 	qwunlock(q, pl);
 	/* do enabling outside the locks */
@@ -2499,7 +2501,7 @@ qdelete(queue_t *q)
 
 	_ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
 
-	pl = pwlock(sd);
+	pwlock(sd, pl);
 
 	(q + 0)->q_next = NULL;
 	(q + 1)->q_next = NULL;
@@ -2643,7 +2645,7 @@ qprocsoff(queue_t *q)
 		assert(sd);
 
 		/* spin here waiting for queue procedures to exit */
-		pl = pwlock(sd);
+		pwlock(sd, pl);
 
 		set_bit(QPROCS_BIT, &rq->q_flag);
 		set_bit(QPROCS_BIT, &wq->q_flag);
@@ -2731,7 +2733,7 @@ qprocson(queue_t *q)
 		unsigned long pl;
 
 		/* spin here waiting for queue procedures to exit */
-		pl = pwlock(sd);
+		pwlock(sd, pl);
 
 		clear_bit(QPROCS_BIT, &rq->q_flag);
 		clear_bit(QPROCS_BIT, &wq->q_flag);
@@ -2929,7 +2931,7 @@ rmvq(register queue_t *q, register mblk_t *mp)
 
 	assure(frozen_by_caller(q));
 
-	pl = qwlock(q);
+	qwlock(q, pl);
 	backenable = __rmvq(q, mp);
 	qwunlock(q, pl);
 
@@ -3082,7 +3084,7 @@ flushband(register queue_t *q, int band, int flag)
 
 	assure(not_frozen_by_caller(q));
 
-	pl = qwlock(q);
+	qwlock(q, pl);
 	backenable = __flushband(q, flag, band, &mpp);
 	qwunlock(q, pl);
 
@@ -3204,7 +3206,7 @@ flushq(register queue_t *q, int flag)
 
 	assure(not_frozen_by_caller(q));
 
-	pl = qwlock(q);
+	qwlock(q, pl);
 	q_nband = q->q_nband;
 	backenable = __flushq(q, flag, &mpp, back);
 	qwunlock(q, pl);
@@ -3316,7 +3318,7 @@ getq(register queue_t *q)
 
 	assure(not_frozen_by_caller(q));
 
-	pl = qwlock(q);
+	qwlock(q, pl);
 	mp = __getq(q, &backenable);
 	qwunlock(q, pl);
 	if (likely(backenable == 0))
@@ -3391,7 +3393,7 @@ setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 
 	assert(sd);
 
-	pl = zwlock(sd);
+	zwlock(sd, pl);
 	__setq(q, rinit, winit);
 	/* unlock in reverse order */
 	zwunlock(sd, pl);
@@ -3564,7 +3566,7 @@ setsq(queue_t *q, struct fmodsw *fmod)
 
 	assert(sd);
 
-	pl = zwlock(sd);
+	zwlock(sd, pl);
 	result = __setsq(q, fmod);
 	zwunlock(sd, pl);
 	return (result);
@@ -3587,7 +3589,7 @@ strqget(register queue_t *q, qfields_t what, register unsigned char band, long *
 
 	assure(frozen_by_caller(q));
 
-	pl = qrlock(q);
+	qrlock(q, pl);
 	if (!band) {
 		switch (what) {
 		case QHIWAT:
@@ -3684,7 +3686,7 @@ strqset(register queue_t *q, qfields_t what, register unsigned char band, long v
 
 	assure(frozen_by_caller(q));
 
-	pl = qwlock(q);
+	qwlock(q, pl);
 	if (!band) {
 		switch (what) {
 		case QMAXPSZ:
@@ -3771,7 +3773,7 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 		short lev = (short) level;
 
 		/* XXX: are these strict locks necessary? */
-		spin_lock_irqsave(&str_err_lock, flags);
+		streams_spin_lock(&str_err_lock, flags);
 		vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
 #define STRLOG_PFX "strlog(%hd)[%hd,%hd]: %s\n"
 		if (flag & SL_FATAL)
@@ -3787,7 +3789,7 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 		else
 			printk(KERN_INFO STRLOG_PFX, lev, mid, sid, str_err_buf);
 #undef STRLOG_PFX
-		spin_unlock_irqrestore(&str_err_lock, flags);
+		streams_spin_unlock(&str_err_lock, flags);
 	}
 	if (flag & SL_ERROR)
 		rval = 0;	/* no error logger */
@@ -3818,10 +3820,10 @@ register_strlog(vstrlog_t newlog)
 	unsigned long flags;
 	vstrlog_t oldlog;
 
-	write_lock_irqsave(&strlog_reg_lock, flags);
+	streams_write_lock(&strlog_reg_lock, flags);
 	oldlog = vstrlog_hook;
 	vstrlog_hook = newlog;
-	write_unlock_irqrestore(&strlog_reg_lock, flags);
+	streams_write_unlock(&strlog_reg_lock, flags);
 	return (oldlog);
 }
 
@@ -3923,7 +3925,7 @@ vcmn_err(int err_lvl, const char *fmt, va_list args)
 	char *cmn_err_ptr = str_err_buf;
 
 	/* XXX: are these strict locks necessary? */
-	spin_lock_irqsave(&str_err_lock, flags);
+	streams_spin_lock(&str_err_lock, flags);
 	vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
 	if (str_err_buf[0] == '^' || str_err_buf[0] == '!')
 		cmn_err_ptr++;
@@ -3940,7 +3942,7 @@ vcmn_err(int err_lvl, const char *fmt, va_list args)
 		printk(KERN_WARNING "%s\n", cmn_err_ptr);
 		break;
 	case CE_PANIC:
-		spin_unlock_irqrestore(&str_err_lock, flags);
+		streams_spin_unlock(&str_err_lock, flags);
 		panic("%s\n", cmn_err_ptr);
 		return;
 	case CE_DEBUG:		/* IRIX 6.5 */
@@ -3950,7 +3952,7 @@ vcmn_err(int err_lvl, const char *fmt, va_list args)
 		printk(KERN_ALERT "%s \n", cmn_err_ptr);
 		break;
 	}
-	spin_unlock_irqrestore(&str_err_lock, flags);
+	streams_spin_unlock(&str_err_lock, flags);
 	return;
 }
 

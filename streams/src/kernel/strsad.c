@@ -159,10 +159,10 @@ autopush_find(dev_t dev)
 		goto notfound;
 	_printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 	/* XXX: do these locks have to be so severe? */
-	spin_lock_irqsave(&apush_lock, flags);
+	streams_spin_lock(&apush_lock, flags);
 	if ((api = __autopush_find(cdev, getminor(dev))) != NULL)
 		ap_get(api);
-	spin_unlock_irqrestore(&apush_lock, flags);
+	streams_spin_unlock(&apush_lock, flags);
 	_printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 	_ctrace(sdev_put(cdev));
       notfound:
@@ -191,10 +191,10 @@ autopush_search(const char *name, minor_t minor)
 		goto notfound;
 	_printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 	/* XXX: do these locks have to be so severe? */
-	spin_lock_irqsave(&apush_lock, flags);
+	streams_spin_lock(&apush_lock, flags);
 	if ((api = __autopush_find(cdev, minor)) != NULL)
 		ap_get(api);
-	spin_unlock_irqrestore(&apush_lock, flags);
+	streams_spin_unlock(&apush_lock, flags);
 	_printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 	_ctrace(sdev_put(cdev));
       notfound:
@@ -268,9 +268,9 @@ autopush_add(struct strapush *sap)
 	}
 	_printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	/* XXX: do these logs have to be so severe? */
-	spin_lock_irqsave(&apush_lock, flags);
+	streams_spin_lock(&apush_lock, flags);
 	err = __autopush_add(cdev, sap);
-	spin_unlock_irqrestore(&apush_lock, flags);
+	streams_spin_unlock(&apush_lock, flags);
 	_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	_ctrace(sdev_put(cdev));
       error:
@@ -310,9 +310,9 @@ autopush_del(struct strapush *sap)
 	}
 	_printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	/* XXX: do these logs have to be so severe? */
-	spin_lock_irqsave(&apush_lock, flags);
+	streams_spin_lock(&apush_lock, flags);
 	err = __autopush_del(cdev, sap);
-	spin_unlock_irqrestore(&apush_lock, flags);
+	streams_spin_unlock(&apush_lock, flags);
 	_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	_ctrace(sdev_put(cdev));
       error:
@@ -399,10 +399,10 @@ apush_get(struct strapush *sap)
 			goto enostr;
 		}
 		_printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
-		spin_lock_irqsave(&apush_lock, flags);
+		streams_spin_lock(&apush_lock, flags);
 		if ((ap = (struct strapush *) __autopush_find(cdev, sap->sap_minor)))
 			ap_get((struct apinfo *) ap);
-		spin_unlock_irqrestore(&apush_lock, flags);
+		streams_spin_unlock(&apush_lock, flags);
 		if (ap) {
 			*sap = *ap;
 			ap_put((struct apinfo *) ap);

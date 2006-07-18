@@ -1480,7 +1480,7 @@ strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band, uns
 			zwunlock(sd, pl);
 			if (unlikely((err = strsignal_locked(sd, b, FREAD))))
 				return (ERR_PTR(err));
-			pl = zwlock(sd);
+			zwlock(sd, pl);
 			continue;
 		default:
 		case M_PASSFP:
@@ -1536,7 +1536,7 @@ strgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 	mblk_t *b = NULL;
 	unsigned long pl;
 
-	pl = zwlock(sd);
+	zwlock(sd, pl);
 	/* fast path for data */
 	if (unlikely((b = q->q_first) == NULL))
 		goto unlock_return;
@@ -1559,7 +1559,7 @@ strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 {				/* IRQ SUPPRESSED */
 	unsigned long pl;
 
-	pl = zwlock(sd);
+	zwlock(sd, pl);
 	/* Like putbq() but handles STRPRI bit and under queue locks */
 	if (unlikely(mp->b_datap->db_type >= QPCTL))
 		set_bit(STRPRI_BIT, &sd->sd_flag);
@@ -1789,7 +1789,7 @@ strgetfp(struct stdata *sd, queue_t *q)
 	unsigned long pl;
 	int err;
 
-	pl = zwlock(sd);
+	zwlock(sd, pl);
 	/* like a mini service procedure */
 	while (likely((b = q->q_first) != NULL)) {
 		int type = b->b_datap->db_type;
@@ -1811,7 +1811,7 @@ strgetfp(struct stdata *sd, queue_t *q)
 			zwunlock(sd, pl);
 			if (unlikely((err = strsignal_locked(sd, b, FREAD))))
 				return (ERR_PTR(err));
-			pl = zwlock(sd);
+			zwlock(sd, pl);
 			continue;
 		default:
 		case M_PCPROTO:
@@ -6172,7 +6172,7 @@ str_i_atmark(const struct file *file, struct stdata *sd, unsigned long arg)
 			mblk_t *b;
 
 			dassert(sd->sd_rq != NULL);
-			pl = qrlock(q);
+			qrlock(q, pl);
 			if (flags == LASTMARK) {
 				if ((b = q->q_first) && b->b_flag & MSGMARK) {
 					if ((b = b->b_next) && b->b_flag & MSGMARK)
@@ -6595,7 +6595,7 @@ str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 		unsigned long pl;
 
 		dassert(sd->sd_rq != NULL);
-		pl = qrlock(q);
+		qrlock(q, pl);
 		if (q->q_first) {
 			band = q->q_first->b_band;
 			qrunlock(q, pl);
@@ -7506,7 +7506,7 @@ str_i_nread(const struct file *file, struct stdata *sd, unsigned long arg)
 		unsigned long pl;
 
 		dassert(sd->sd_rq != NULL);
-		pl = qrlock(q);
+		qrlock(q, pl);
 		if ((msgs = qsize(q)))
 			bytes = msgdsize(q->q_first);
 		else
@@ -7555,7 +7555,7 @@ __str_i_peek(const struct file *file, struct stdata *sd, struct strpeek *sp)
 		mblk_t *b, *dp = NULL;
 
 		dassert(sd->sd_rq != NULL);
-		pl = qrlock(q);
+		qrlock(q, pl);
 
 		if ((b = q->q_first)) {
 			if (sp->flags == 0 || b->b_datap->db_type >= QPCTL)
@@ -8535,8 +8535,8 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 						    && sd2->sd_wq->q_next == sd2->sd_rq) {
 							unsigned long pl, pl2;
 
-							pl = pwlock(sd);
-							pl2 = pwlock(sd2);
+							pwlock(sd, pl);
+							pwlock(sd2, pl2);
 
 							/* weld 'em together */
 							sd->sd_other = sd_get(sd2);
@@ -10091,7 +10091,7 @@ strwsrv(queue_t *q)
 
 	assert(sd);
 
-	pl = qrlock(q);
+	qrlock(q, pl);
 	if (test_and_clear_bit(QBACK_BIT, &q->q_flag))
 		be[0] = 1;
 	for (qb = q->q_bandp, band = q->q_nband; qb; qb = qb->qb_next, band--)
@@ -10142,7 +10142,7 @@ str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 	unsigned long pl;
 	int enable;
 
-	pl = qwlock(q);
+	qwlock(q, pl);
 	enable = __putq(q, mp);
 	qwunlock(q, pl);
 	if (likely(enable > 1)) {	/* PROFILED */
@@ -10202,7 +10202,7 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 				mblk_t *b;
 				unsigned long pl;
 
-				pl = zwlock(sd);
+				zwlock(sd, pl);
 				b = q->q_first;
 				if (!b || b->b_datap->db_type != M_PCPROTO)
 					clear_bit(STRPRI_BIT, &sd->sd_flag);
@@ -10342,7 +10342,7 @@ str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   the signal is SIGPOLL, it will be sent only to the processes that requested it with the
 	   I_SETSIG ioctl.  Other signals are sent to a process only if the stream is associated
 	   with the control terminal (see 7.11.2)." */
-	pl = zwlock(sd);
+	zwlock(sd, pl);
 	putq(q, mp);		/* ok when frozen - faster than insq */
 	if (q->q_first->b_datap->db_type == M_SIG)
 		set_bit(STRMSIG_BIT, &sd->sd_flag);

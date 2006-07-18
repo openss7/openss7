@@ -767,11 +767,11 @@ extern struct file_operations strm_f_ops;
 ((typeof(__b))({ \
 	unsigned long __flags; \
 	typeof(__b) __result; \
-	local_irq_save(__flags); \
+	streams_local_save(__flags); \
 	__result = *(__a); \
 	prefetchw(__result); \
 	*(__a) = (__b); \
-	local_irq_restore(__flags); \
+	streams_local_restore(__flags); \
 	__result; \
 }))
 #endif

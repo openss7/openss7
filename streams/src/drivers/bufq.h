@@ -74,12 +74,12 @@ bufq_init(bufq_t * q)
 static inline void
 bufq_lock(bufq_t * q, unsigned long *flags)
 {
-	spin_lock_irqsave(&q->q_lock, *flags);
+	streams_spin_lock(&q->q_lock, *flags);
 }
 static inline void
 bufq_unlock(bufq_t * q, unsigned long *flags)
 {
-	spin_unlock_irqrestore(&q->q_lock, *flags);
+	streams_spin_unlock(&q->q_lock, *flags);
 }
 
 static inline size_t
