@@ -4822,7 +4822,7 @@ kstreamd(void *__bind_cpu)
 			prefetchw(t);
 			if (unlikely(signal_pending(current)
 				     && sigismember(&current->pending.signal, SIGKILL)))
-				goto break;
+				break;
 			if (unlikely((t->flags & (QRUNFLAGS)) == 0)) {
 				__pswerr(("CPU#%d: kstreamd: false wakeup\n",
 					  (int) (long) __bind_cpu));
