@@ -347,8 +347,8 @@ STATIC struct module_info udp_minfo = {
 	.mi_idname = DRV_NAME,	/* Module name */
 	.mi_minpsz = 0,		/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
-	.mi_hiwat = (1 << 18),	/* Hi water mark */
-	.mi_lowat = (1 << 17),	/* Lo water mark */
+	.mi_hiwat = (1 << 17),	/* Hi water mark */
+	.mi_lowat = 0,		/* Lo water mark */
 };
 
 STATIC struct module_stat udp_mstat = {
@@ -489,7 +489,7 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 #define xti_default_rcvbuf		(SK_RMEM_MAX << 1)	/* needs to be sysctl_rmem_default */
 #define xti_default_rcvlowat		1
 #define xti_default_sndbuf		(SK_WMEM_MAX << 1)	/* needs to be sysctl_wmem_default */
-#define xti_default_sndlowat		SK_WMEM_MAX	/* needs to be sysctl_wmem_default >> 1 */
+#define xti_default_sndlowat		0			/* needs to be sysctl_wmem_default >> 1 */
 #define xti_default_priority		0
 
 #define ip_default_protocol		17
@@ -8368,12 +8368,9 @@ tp_wput(queue_t *q, mblk_t *mp)
 {
 	/* It seems to run faster if the messages are simply queued.  This is just for testing, one 
 	   should never queue M_FLUSH messages. */
-#if 0
 	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
-#endif
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
-#if 0
 	} else {
 		int rtn;
 
@@ -8386,7 +8383,6 @@ tp_wput(queue_t *q, mblk_t *mp)
 		else
 			tp_putq_slow(q, mp, rtn);
 	}
-#endif
 	return (0);
 }
 
