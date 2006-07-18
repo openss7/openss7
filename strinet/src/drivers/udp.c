@@ -8321,10 +8321,14 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
+#if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
 #else
 	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
+#endif
+#else
+	if (likely(mp->b_datap->db_type < QPCTL))
 #endif
 	{
 		if (unlikely(putq(q, mp) == 0))
@@ -8779,7 +8783,7 @@ tp_v4_rcv(struct sk_buff *skb)
 			goto flow_controlled;
 		// mp->b_datap->db_type = M_DATA;
 		mp->b_wptr += plen;
-#if 1
+#if 0
 		put(tp->oq, mp);
 #else
 		if (!putq(tp->oq, mp))
@@ -8789,7 +8793,7 @@ tp_v4_rcv(struct sk_buff *skb)
 		/* release reference from lookup */
 		tp_put(tp);
 		return (0);
-#if 0
+#if 1
 	      dropped:
 #endif
 	      flow_controlled:
