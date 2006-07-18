@@ -512,25 +512,23 @@ strsyscall(void)
 STATIC streams_inline streams_fastcall __hot void
 strsyscall_write(void)
 {
+	/* Looks like it might be better to push on the write side and let the read side and back
+	   enabling run whenever. */
+	/* before every system call return -- saves a context switch */
+	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		return;
+	runqueues();
+}
+
+STATIC streams_inline streams_fastcall __hot void
+strsyscall_read(void)
+{
 #if 0
 	/* before every system call return -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
 #endif
-}
-
-STATIC streams_inline streams_fastcall __hot void
-strsyscall_read(void)
-{
-	/* Strapping out syscall STREAMS runs for the write side and non-read/write system calls is
-	   fine; however, the read side does not back-enable in a timely fashion unless the syscall
-	   invokes the STREAMS scheduler when it can run as a result of the read.  Therefore, split
-	   this specific read syscall function out. */
-	/* before every system call return -- saves a context switch */
-	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
-		return;
-	runqueues();
 }
 
 STATIC streams_inline streams_fastcall __hot_in void
