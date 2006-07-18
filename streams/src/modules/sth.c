@@ -498,11 +498,13 @@ strsyscall(void)
 {
 	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
 	   STREAMS scheduler in process context here. I don't know why... */
+#if 0
 #ifndef CONFIG_SMP
 	/* before every system call return -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
+#endif
 #endif
 }
 
@@ -511,11 +513,13 @@ strsyscall_write(void)
 {
 	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
 	   STREAMS scheduler in process context here. I don't know why... */
+#if 0
 #ifndef CONFIG_SMP
 	/* before every system call return -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
+#endif
 #endif
 }
 
@@ -524,11 +528,13 @@ strsyscall_read(void)
 {
 	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
 	   STREAMS scheduler in process context here. I don't know why... */
+#if 0
 #ifndef CONFIG_SMP
 	/* before every system call return -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
+#endif
 #endif
 }
 
@@ -537,12 +543,14 @@ strschedule(void)
 {
 	/* NOTE:- Better performance on true SMP machines is acheived by not attempting to run the
 	   STREAMS scheduler in process context here. I don't know why... */
+#if 0
 #ifndef CONFIG_SMP
 	/* before every sleep -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	set_current_state(TASK_RUNNING);
 	runqueues();
+#endif
 #endif
 }
 
