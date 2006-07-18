@@ -556,8 +556,6 @@ strsyscall_read(void)
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule(void)
 {
-	struct strthread *t = this_thread;
-
 	/* NOTE:- Better performance is acheived on (true) SMP machines by no attempting to run the
 	   STREAMS scheduler in process context here.  The reason is that if we avoid scheduling,
 	   the current process is blocked off other processors while it is running the STREAMS
@@ -567,6 +565,8 @@ strschedule(void)
 	   running.  We just decide by static kernel configuration for the moment. */
 #ifndef CONFIG_SMP
 	/* before every sleep -- saves a context switch */
+	struct strthread *t = this_thread;
+
 	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	/* try to avoid context switch */
