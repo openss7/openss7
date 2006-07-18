@@ -8680,6 +8680,7 @@ tp_lookup_icmp(struct iphdr *iph, unsigned int len)
 STATIC streamscall __hot_get void
 tp_free(caddr_t data)
 {
+#if 0
 	struct sk_buff *skb = (typeof(skb)) data;
 	struct tp *tp;
 
@@ -8699,6 +8700,13 @@ tp_free(caddr_t data)
 		return;
 	}
 	goto done;
+#else
+	struct sk_buff *skb = (typeof(skb)) data;
+
+	dassert(skb != NULL);
+	kfree_skb(skb);
+	return;
+#endif
 }
 
 /**
@@ -8770,6 +8778,7 @@ tp_v4_rcv(struct sk_buff *skb)
 		goto linear_fail;
 	}
 #endif
+#if 0
 	/* Before passing the message up, check that there is room in the receive buffer.  Allows
 	   slop over by 1 buffer per processor. */
 	if (unlikely(tp->rcvmem > tp->options.xti.rcvbuf))
@@ -8799,13 +8808,44 @@ tp_v4_rcv(struct sk_buff *skb)
 		tp_put(tp);
 		return (0);
 	}
+#else
+	{
+		mblk_t *mp;
+		frtn_t fr = { &np_free, (caddr_t) skb };
+		size_t plen = skb->len + (skb->data - skb->nh.raw);
+
+		/* now allocate an mblk */
+		if (unlikely((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr)) == NULL))
+			goto no_buffers;
+		/* tell others it is a socket buffer */
+		mp->b_datap->db_flag |= DB_SKBUFF;
+		_ptrace(("Allocated external buffer message block %p\n", mp));
+		/* check flow control only after we have a buffer */
+		if (tp->oq == NULL || !canput(tp->oq))
+			goto flow_controlled;
+		// mp->b_datap->db_type = M_DATA;
+		mp->b_wptr += plen;
+		put(tp->oq, mp);
+//              UDP_INC_STATS_BH(UdpInDatagrams);
+		/* release reference from lookup */
+		tp_put(tp);
+		return (0);
+	      flow_controlled:
+		tp_put(tp);
+		freeb(mp);	/* will take sk_buff with it */
+		return (0);
+
+	}
+#endif
       bad_checksum:
 //      UDP_INC_STATS_BH(UdpInErrors);
 //      IP_INC_STATS_BH(IpInDiscards);
 	/* decrement IpInDelivers ??? */
 	// goto linear_fail;
       no_buffers:
+#if 0
       flow_controlled:
+#endif
       linear_fail:
 	if (tp)
 		tp_put(tp);
