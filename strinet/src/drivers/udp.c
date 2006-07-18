@@ -8329,7 +8329,7 @@ tp_rsrv(queue_t *q)
 #ifndef CONFIG_SMP
 	/* try waking softirqd when service queue empty */
 	local_bh_disable();
-	locak_bh_enable();
+	local_bh_enable();
 #endif
       done:
 	return (0);
