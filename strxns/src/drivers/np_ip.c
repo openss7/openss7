@@ -494,7 +494,105 @@ np_alloc(void)
 }
 
 /*
- *  State changes.
+ *  Buffer allocation
+ */
+
+STATIC streamscall __unlikely void
+np_bufsrv(long data)
+{
+	str_t *s;
+	queue_t *q;
+
+	q = (queue_t *) data;
+	ensure(q, return);
+	s = STR_PRIV(q);
+	ensure(s, return);
+
+	if (q == s->iq) {
+		if (xchg(&s->ibid, 0) != 0)
+			atomic_dec(&s->refcnt);
+		qenable(q);
+		return;
+	}
+	if (q == s->oq) {
+		if (xchg(&s->obid, 0) != 0)
+			atomic_dec(&s->refcnt);
+		qenable(q);
+		return;
+	}
+	return;
+}
+
+STATIC noinline fastcall __unlikely void
+np_unbufcall(str_t * s)
+{
+	bufcall_id_t bid;
+
+	if ((bid = xchg(&s->ibid, 0))) {
+		unbufcall(bid);
+		atomic_dec(&s->refcnt);
+	}
+	if ((bid = xchg(&s->obid, 0))) {
+		unbufcall(bid);
+		atomic_dec(&s->refcnt);
+	}
+}
+
+STATIC noinline fastcall __unlikely void
+np_bufcall(queue_t *q, size_t size, int prior)
+{
+	if (q) {
+		str_t *s = STR_PRIV(q);
+		bufcall_id_t bid, *bidp = NULL;
+
+		if (q == s->iq)
+			bidp = &s->ibid;
+		if (q == s->oq)
+			bidp = &s->obid;
+
+		if (bidp) {
+			atomic_inc(&s->refcnt);
+			if ((bid = xchg(bidp, bufcall(size, prior, &np_bufsrv, (long) q)))) {
+				unbufcall(bid);	/* Unsafe on LiS without atomic exchange above. */
+				atomic_dec(&s->refcnt);
+			}
+			return;
+		}
+	}
+	swerr();
+	return;
+}
+
+STATIC INLINE fastcall __unlikely mblk_t *
+np_allocb(queue_t *q, size_t size, int prior)
+{
+	mblk_t *mp;
+
+	if (likely((mp = allocb(size, prior)) != NULL))
+		return (mp);
+	rare();
+	np_bufcall(q, size, prior);
+	return (mp);
+}
+
+STATIC INLINE fastcall __unlikely mblk_t *
+np_dupmsg(queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+
+	if (likely((mp = dupmsg(bp)) != NULL))
+		return (mp);
+	rare();
+	np_bufcall(q, msgsize(bp), BPRI_MED);
+	return (mp);
+}
+
+/*
+ *  =========================================================================
+ *
+ *  State Changes
+ *
+ *  =========================================================================
  */
 
 /* State flags */
