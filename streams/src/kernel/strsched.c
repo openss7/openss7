@@ -4200,12 +4200,17 @@ __runqueues(struct softirq_action *unused)
 #endif
 {				/* PROFILED */
 	struct strthread *t;
+	int oldflags;
+	int runs = 0;
 
 	_trace();
 	t = this_thread;
 
+#if 0
+	/* checked before this function is called */
 	if (unlikely(!(t->flags & (QRUNFLAGS))))	/* PROFILED */
 		goto done;
+#endif
 
 	if (unlikely(atomic_read(&t->lock) != 0))	/* PROFILED */
 		goto want_run;
@@ -4213,6 +4218,7 @@ __runqueues(struct softirq_action *unused)
 	atomic_inc(&t->lock);
 
 	do {
+		++runs;
 		/* run queue service procedures if necessary */
 		if (likely(test_bit(qrunflag, &t->flags) != 0))	/* PROFILED */
 			_ctrace(queuerun(t));
@@ -4221,7 +4227,10 @@ __runqueues(struct softirq_action *unused)
 					  STRBCWAIT)) != 0))
 			__runqueues_slow(t);
 		clear_bit(qwantrun, &t->flags);
-	} while (unlikely(t->flags & (QRUNFLAGS)));
+	} while (unlikely((t->flags & (QRUNFLAGS)) != 0 && runs < 10));
+
+	if (runs >= 10)
+		__pswerr(("CPU#%d: kstreamd looping: flags = 0x%08x\n", t->flags));
 
 	atomic_dec(&t->lock);
 
@@ -4591,7 +4600,7 @@ kstreamd(void *__bind_cpu)
 	set_current_state(TASK_INTERRUPTIBLE);
 	while (!kthread_should_stop()) {
 		preempt_disable();
-		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets worken up and then
+		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets woken up and then
 		   the process runs queues in process context. */
 		if (likely((t->flags & (QRUNFLAGS)) == 0)) {
 			do {
@@ -4603,21 +4612,12 @@ kstreamd(void *__bind_cpu)
 		}
 		__set_current_state(TASK_RUNNING);
 
-		if (likely((t->flags & (QRUNFLAGS)) != 0)) {
-			do {
-				if (cpu_is_offline((long) __bind_cpu))
-					goto wait_to_die;
-				__runqueues();
-#if 0
-				/* don't take a breath here */
-				preempt_enable_no_resched();
-				cond_resched();
-				preempt_disable();
-#endif
-			}
-			while (unlikely((t->flags & (QRUNFLAGS)) != 0));
-		}
-		preempt_enable();
+		if (cpu_is_offline((long) __bind_cpu))
+			goto wait_to_die;
+		__runqueues();
+
+		preempt_enable_no_resched();
+		cond_resched();
 		set_current_state(TASK_INTERRUPTIBLE);
 	}
 	__set_current_state(TASK_RUNNING);
@@ -4809,7 +4809,7 @@ kstreamd(void *__bind_cpu)
 	for (;;) {
 		if (signal_pending(current))
 			do_exit(0);
-		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets worken up and then
+		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets woken up and then
 		   the process runs queues in process context. */
 		if (likely((t->flags & (QRUNFLAGS)) == 0)) {
 			do {
@@ -4822,21 +4822,13 @@ kstreamd(void *__bind_cpu)
 			while (unlikely((t->flags & (QRUNFLAGS)) == 0));
 		}
 		__set_current_state(TASK_RUNNING);
-		if (likely((t->flags & (QRUNFLAGS)) != 0)) {
-			do {
-				__runqueues();
-#if 0
-				/* don't take a breath here */
-				if (current->need_resched)
-					schedule();
-#endif
-				prefetchw(t);
-				if (signal_pending(current)
-				    && sigismember(&current->pending.signal, SIGKILL))
-					break;
-			}
-			while (unlikely((t->flags & (QRUNFLAGS)) != 0));
-		}
+		__runqueues();
+		if (current->need_resched)
+			schedule();
+		prefetchw(t);
+		if (signal_pending(current)
+		    && sigismember(&current->pending.signal, SIGKILL))
+			break;
 		__set_current_state(TASK_INTERRUPTIBLE);
 	}
 	t->proc = NULL;
