@@ -1534,7 +1534,7 @@ STATIC streams_inline streams_fastcall __hot_get mblk_t *
 strgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 {				/* IRQ SUPPRESSED */
 	mblk_t *b = NULL;
-	unsigned long pl;
+	unsigned long pl = 0;
 
 	zwlock(sd, pl);
 	/* fast path for data */

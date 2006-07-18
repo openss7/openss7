@@ -3680,7 +3680,7 @@ timeouts(struct strthread *t)
 		unsigned long flags;
 
 		prefetchw(t);
-		strams_local_save(flags);
+		streams_local_save(flags);
 		__test_and_clear_bit(strtimout, &t->flags);
 		if (likely((se_next = XCHG(&t->strtimout_head, NULL)) != NULL))
 			t->strtimout_tail = &t->strtimout_head;
