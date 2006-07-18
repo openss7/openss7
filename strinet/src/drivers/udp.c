@@ -3706,9 +3706,8 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 	struct ipnet_protocol *pp;
 	struct mynet_protocol **ppp;
 	int hash = proto & (MAX_INET_PROTOS - 1);
-	unsigned long flags;
 
-	write_lock_irqsave(&tp_prot_lock, flags);
+	write_lock_bh(&tp_prot_lock);
 	if ((pb = tp_prots[proto]) != NULL) {
 		pb->refs++;
 		switch (type) {
@@ -3765,7 +3764,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 				if ((*ppp)->copy != 0) {
 					__ptrace(("Cannot override copy entry\n"));
 					net_protocol_unlock();
-					write_unlock_irqrestore(&tp_prot_lock, flags);
+					write_unlock_bh(&tp_prot_lock);
 					kmem_cache_free(udp_prot_cachep, pb);
 					return (NULL);
 				}
@@ -3776,7 +3775,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 					if (!try_module_get(pp->kmod)) {
 						__ptrace(("Cannot acquire module\n"));
 						net_protocol_unlock();
-						write_unlock_irqrestore(&tp_prot_lock, flags);
+						write_unlock_bh(&tp_prot_lock);
 						kmem_cache_free(udp_prot_cachep, pb);
 						return (NULL);
 					}
@@ -3793,7 +3792,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 		/* link into hash slot */
 		tp_prots[proto] = pb;
 	}
-	write_unlock_irqrestore(&tp_prot_lock, flags);
+	write_unlock_bh(&tp_prot_lock);
 	return (pb);
 }
 
@@ -3813,9 +3812,8 @@ STATIC INLINE streams_fastcall __unlikely void
 tp_term_nproto(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
-	unsigned long flags;
 
-	write_lock_irqsave(&tp_prot_lock, flags);
+	write_lock_bh(&tp_prot_lock);
 	if ((pb = tp_prots[proto]) != NULL) {
 		switch (type) {
 		case T_COTS:
@@ -3859,7 +3857,7 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 			kmem_cache_free(udp_prot_cachep, pb);
 		}
 	}
-	write_unlock_irqrestore(&tp_prot_lock, flags);
+	write_unlock_bh(&tp_prot_lock);
 }
 #endif				/* LINUX */
 
