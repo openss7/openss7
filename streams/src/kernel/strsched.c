@@ -3029,8 +3029,9 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 #endif
 		err = q_open(q, devp, oflag, sflag, crp);
 		leave_syncq(sc);
-	} else {
+	} else
 #endif
+	{
 #ifdef CONFIG_STREAMS_DO_STATS
 		if (unlikely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_ocnt++;
@@ -3080,8 +3081,9 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 #endif
 		err = q_close(q, oflag, crp);
 		leave_syncq(sc);
-	} else {
+	} else
 #endif
+	{
 #ifdef CONFIG_STREAMS_DO_STATS
 		if (unlikely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_ccnt++;

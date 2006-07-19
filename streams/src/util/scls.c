@@ -207,12 +207,12 @@ printit(struct sc_mlist *l, int cmd)
 	if (output <= 0 || l->major == -1)
 		return;
 	for (i = 0; i < 4; i++) {
-		if (l->mi[i].mi_idnum == -1)
+		if (l->mi[i].mi_idnum == (unsigned short)-1)
 			continue;
-		if (i > 0 && cmd != CMD_LONG && cmd != CMD_COUNT)
+		if (i > 0 && cmd != CMN_LONG && cmd != CMN_COUNT)
 			continue;
 		fprintf(stdout, "%s", l->name);
-		if (cmd == CMD_LONG || cmd == CMD_COUNT) {
+		if (cmd == CMN_LONG || cmd == CMN_COUNT) {
 			switch (i) {
 			case 0:
 				fprintf(stdout, "\trd");
