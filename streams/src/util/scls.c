@@ -207,7 +207,7 @@ printit(struct sc_mlist *l, int cmd)
 	if (output <= 0 || l->major == -1)
 		return;
 	for (i = 0; i < 4; i++) {
-		if (l->mi[i].mi_idnum == (unsigned short)-1)
+		if (l->mi[i].mi_idnum == 0)
 			continue;
 		if (i > 0 && cmd != CMN_LONG && cmd != CMN_COUNT)
 			continue;

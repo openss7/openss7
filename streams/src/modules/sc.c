@@ -179,8 +179,7 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const uint flag)
 					mlist->ms[0].ms_flags = st->st_rdinit->qi_mstat->ms_flags;
 					mlist->ms[0].ms_xsize = st->st_rdinit->qi_mstat->ms_xsize;
 				}
-			} else
-				mlist->mi[0].mi_idnum = -1;
+			}
 			if (st->st_wrinit) {
 				mlist->mi[1].mi_idnum = st->st_wrinit->qi_minfo->mi_idnum;
 				strncpy(mlist->mi[1].mi_idname, st->st_wrinit->qi_minfo->mi_idname, FMNAMESZ + 1);
@@ -197,8 +196,7 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const uint flag)
 					mlist->ms[1].ms_flags = st->st_wrinit->qi_mstat->ms_flags;
 					mlist->ms[1].ms_xsize = st->st_wrinit->qi_mstat->ms_xsize;
 				}
-			} else
-				mlist->mi[1].mi_idnum = -1;
+			}
 			if (st->st_muxrinit) {
 				mlist->mi[2].mi_idnum = st->st_muxrinit->qi_minfo->mi_idnum;
 				strncpy(mlist->mi[2].mi_idname, st->st_muxrinit->qi_minfo->mi_idname, FMNAMESZ + 1);
@@ -215,8 +213,7 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const uint flag)
 					mlist->ms[2].ms_flags = st->st_muxrinit->qi_mstat->ms_flags;
 					mlist->ms[2].ms_xsize = st->st_muxrinit->qi_mstat->ms_xsize;
 				}
-			} else
-				mlist->mi[2].mi_idnum = -1;
+			}
 			if (st->st_muxwinit) {
 				mlist->mi[3].mi_idnum = st->st_muxwinit->qi_minfo->mi_idnum;
 				strncpy(mlist->mi[3].mi_idname, st->st_muxwinit->qi_minfo->mi_idname, FMNAMESZ + 1);
@@ -233,8 +230,7 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const uint flag)
 					mlist->ms[3].ms_flags = st->st_muxwinit->qi_mstat->ms_flags;
 					mlist->ms[3].ms_xsize = st->st_muxwinit->qi_mstat->ms_xsize;
 				}
-			} else
-				mlist->mi[3].mi_idnum = -1;
+			}
 		}
 		return sizeof(struct sc_mlist32);
 	} else
@@ -260,8 +256,7 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const uint flag)
 					mlist->ms[0].ms_flags = st->st_rdinit->qi_mstat->ms_flags;
 					mlist->ms[0].ms_xsize = st->st_rdinit->qi_mstat->ms_xsize;
 				}
-			} else
-				mlist->mi[0].mi_idnum = -1;
+			}
 			if (st->st_wrinit) {
 				mlist->mi[1].mi_idnum = st->st_wrinit->qi_minfo->mi_idnum;
 				strncpy(mlist->mi[1].mi_idname, st->st_wrinit->qi_minfo->mi_idname, FMNAMESZ + 1);
@@ -278,8 +273,7 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const uint flag)
 					mlist->ms[1].ms_flags = st->st_wrinit->qi_mstat->ms_flags;
 					mlist->ms[1].ms_xsize = st->st_wrinit->qi_mstat->ms_xsize;
 				}
-			} else
-				mlist->mi[1].mi_idnum = -1;
+			}
 			if (st->st_muxrinit) {
 				mlist->mi[2].mi_idnum = st->st_muxrinit->qi_minfo->mi_idnum;
 				strncpy(mlist->mi[2].mi_idname, st->st_muxrinit->qi_minfo->mi_idname, FMNAMESZ + 1);
@@ -296,8 +290,7 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const uint flag)
 					mlist->ms[2].ms_flags = st->st_muxrinit->qi_mstat->ms_flags;
 					mlist->ms[2].ms_xsize = st->st_muxrinit->qi_mstat->ms_xsize;
 				}
-			} else
-				mlist->mi[2].mi_idnum = -1;
+			}
 			if (st->st_muxwinit) {
 				mlist->mi[3].mi_idnum = st->st_muxwinit->qi_minfo->mi_idnum;
 				strncpy(mlist->mi[3].mi_idname, st->st_muxwinit->qi_minfo->mi_idname, FMNAMESZ + 1);
@@ -314,8 +307,7 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const uint flag)
 					mlist->ms[3].ms_flags = st->st_muxwinit->qi_mstat->ms_flags;
 					mlist->ms[3].ms_xsize = st->st_muxwinit->qi_mstat->ms_xsize;
 				}
-			} else
-				mlist->mi[3].mi_idnum = -1;
+			}
 		}
 		return sizeof(struct sc_mlist);
 	}
