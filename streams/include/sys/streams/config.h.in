@@ -73,6 +73,10 @@
 
 #undef CONFIG_STREAMS_TEST
 
+#undef CONFIG_STREAMS_NOIRQ
+
+#undef CONFIG_STREAMS_DO_STATS
+
 #undef _DEBUG
 
 #undef _NONE

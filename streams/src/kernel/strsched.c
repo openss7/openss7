@@ -2162,6 +2162,10 @@ putp_fast(queue_t *q, mblk_t *mp)
 #endif
 		dassert(q->q_qinfo != NULL);
 		dassert(q->q_qinfo->qi_putp != NULL);
+#if CONFIG_STREAMS_DO_STATS
+		if (unlikely(q->q_qinfo->qi_mstat != NULL))
+			q->q_qinfo->qi_mstat->ms_pcnt++;
+#endif
 		/* some weirdness in older compilers */
 		(*q->q_qinfo->qi_putp) (q, mp);
 		qwakeup(q);
@@ -2235,12 +2239,20 @@ srvp_fast(queue_t *q)
 			/* prefetch private structure */
 			prefetch(q->q_ptr);
 
+#ifdef CONFIG_SMP
 			set_bit(QSVCBUSY_BIT, &q->q_flag);
+#endif
 			dassert(q->q_qinfo);
 			dassert(q->q_qinfo->qi_srvp);
+#if CONFIG_STREAMS_DO_STATS
+			if (unlikely(q->q_qinfo->qi_mstat != NULL))
+				q->q_qinfo->qi_mstat->ms_scnt++;
+#endif
 			/* some weirdness in older compilers */
 			(*q->q_qinfo->qi_srvp) (q);
+#ifdef CONFIG_SMP
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
+#endif
 		}
 #ifdef CONFIG_SMP
 		prunlock(sd);
@@ -3011,11 +3023,20 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 		if (unlikely((err = enter_inner_syncq_asopen(sc)) <= 0))
 			return (err);
-		err = q_open(q, devp, oflag, sflag, crp);
-		leave_syncq(sc);
-	} else
+#ifdef CONFIG_STREAMS_DO_STATS
+		if (unlikely(q->q_qinfo->qi_mstat != NULL))
+			q->q_qinfo->qi_mstat->ms_ocnt++;
 #endif
 		err = q_open(q, devp, oflag, sflag, crp);
+		leave_syncq(sc);
+	} else {
+#endif
+#ifdef CONFIG_STREAMS_DO_STATS
+		if (unlikely(q->q_qinfo->qi_mstat != NULL))
+			q->q_qinfo->qi_mstat->ms_ocnt++;
+#endif
+		err = q_open(q, devp, oflag, sflag, crp);
+	}
 	/* SVR 3.2 compatibility of return codes and handle broken LiS modules */
 	err = (err == OPENFAIL) ? -ENXIO : (err > 0 ? -err : err);
 	return (err);
@@ -3053,11 +3074,20 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 
 		if (unlikely((err = enter_inner_syncq_asopen(sc)) <= 0))
 			return (err);
-		err = q_close(q, oflag, crp);
-		leave_syncq(sc);
-	} else
+#ifdef CONFIG_STREAMS_DO_STATS
+		if (unlikely(q->q_qinfo->qi_mstat != NULL))
+			q->q_qinfo->qi_mstat->ms_ccnt++;
 #endif
 		err = q_close(q, oflag, crp);
+		leave_syncq(sc);
+	} else {
+#endif
+#ifdef CONFIG_STREAMS_DO_STATS
+		if (unlikely(q->q_qinfo->qi_mstat != NULL))
+			q->q_qinfo->qi_mstat->ms_ccnt++;
+#endif
+		err = q_close(q, oflag, crp);
+	}
 	/* handle broken LiS modujles */
 	err = err > 0 ? -err : err;
 	return (err);

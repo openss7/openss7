@@ -233,8 +233,8 @@ AC_DEFUN([_LFS_SETUP_DEBUG], [dnl
 AC_DEFUN([_LFS_SETUP_IRQ], [dnl
     AC_ARG_ENABLE([streams-irq],
 	AS_HELP_STRING([--disable-streams-irq],
-	    [distable STREAMS irq suppression.
-	     @<:@default=disabled@:>@])
+	    [disable STREAMS irq suppression.
+	     @<:@default=enabled@:>@])
 	    [enable_streams_irq="$enableval"],
 	    [enable_streams_irq='yes'])
     AC_CACHE_CHECK([for STREAMS irq suppression], [lfs_streams_irq], [dnl
@@ -251,6 +251,30 @@ AC_DEFUN([_LFS_SETUP_IRQ], [dnl
     esac
     AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :${lfs_streams_irq:-yes} = :no])
 ])# _LFS_SETUP_IRQ
+# =============================================================================
+
+# =============================================================================
+# _LFS_SETUP_STATS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_STATS], [dnl
+    AC_ARG_ENABLE([streams-stats],
+	AS_HELP_STRING([--disable-streams-stats],
+	    [disable STREAMS stats counting.
+	     @<:@default=disabled@:>@])
+	    [enable_streams_stats="$enableval"],
+	    [enable_streams_stats='yes'])
+    AC_CACHE_CHECK([for STREAMS stats counting], [lfs_streams_stats], [dnl
+	lfs_streams_stats="${enable_streams_stats:-yes}"])
+    case ${lfs_streams_stats:=yes} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DO_STATS], [1], [When defined]
+	    AC_PACKAGE_TITLE [will perform STREAMS entry point counting in the
+	    module_stat structure if a pointer is provided by the module or
+	    driver.  This is a low cost item and is enabled by default.])
+	    ;;
+    esac
+    AM_CONDITIONAL([CONFIG_STREAMS_DO_STATS], [test :${lfs_streams_stats:-yes} = :yes])
+])# _LFS_SETUP_STATS
 # =============================================================================
 
 # =============================================================================
