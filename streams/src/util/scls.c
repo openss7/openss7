@@ -202,32 +202,56 @@ enum { CMN_NONE, CMN_NAMES, CMN_LONG, CMN_COUNT, } command = CMN_NONE;
 void
 printit(struct sc_mlist *l, int cmd)
 {
+	int i;
+
 	if (output <= 0 || l->major == -1)
 		return;
-	fprintf(stdout, "%s", l->name);
-	switch (cmd) {
-	case CMN_LONG:
-		if (l->major != 0) {
-			fprintf(stdout, "\tdevice");
-			fprintf(stdout, "\t%ld", (long) l->major);
-		} else {
-			fprintf(stdout, "\tmodule");
-			fprintf(stdout, "\t-");
+	for (i = 0; i < 4; i++) {
+		if (l->mi[i].mi_idnum == -1)
+			continue;
+		if (i > 0 && cmd != CMD_LONG && cmd != CMD_COUNT)
+			continue;
+		fprintf(stdout, "%s", l->name);
+		if (cmd == CMD_LONG || cmd == CMD_COUNT) {
+			switch (i) {
+			case 0:
+				fprintf(stdout, "\trd");
+				break;
+			case 1:
+				fprintf(stdout, "\twr");
+				break;
+			case 2:
+				fprintf(stdout, "\tmuxr");
+				break;
+			case 3:
+				fprintf(stdout, "\tmuxw");
+				break;
+			}
 		}
-		fprintf(stdout, "\t%u", l->mi.mi_idnum);
-		fprintf(stdout, "\t%ld", (long) l->mi.mi_minpsz);
-		fprintf(stdout, "\t%ld", (long) l->mi.mi_maxpsz);
-		fprintf(stdout, "\t%ld", (long) l->mi.mi_hiwat);
-		fprintf(stdout, "\t%ld", (long) l->mi.mi_lowat);
-	case CMN_COUNT:
-		fprintf(stdout, "\t%ld", (long) l->ms.ms_pcnt);
-		fprintf(stdout, "\t%ld", (long) l->ms.ms_scnt);
-		fprintf(stdout, "\t%ld", (long) l->ms.ms_ocnt);
-		fprintf(stdout, "\t%ld", (long) l->ms.ms_ccnt);
-		fprintf(stdout, "\t%ld", (long) l->ms.ms_acnt);
-		fprintf(stdout, "\t%x", l->ms.ms_flags);
+		switch (cmd) {
+		case CMN_LONG:
+			if (l->major != 0) {
+				fprintf(stdout, "\tdevice");
+				fprintf(stdout, "\t%ld", (long) l->major);
+			} else {
+				fprintf(stdout, "\tmodule");
+				fprintf(stdout, "\t-");
+			}
+			fprintf(stdout, "\t%u", l->mi[i].mi_idnum);
+			fprintf(stdout, "\t%ld", (long) l->mi[i].mi_minpsz);
+			fprintf(stdout, "\t%ld", (long) l->mi[i].mi_maxpsz);
+			fprintf(stdout, "\t%ld", (long) l->mi[i].mi_hiwat);
+			fprintf(stdout, "\t%ld", (long) l->mi[i].mi_lowat);
+		case CMN_COUNT:
+			fprintf(stdout, "\t%ld", (long) l->ms[i].ms_pcnt);
+			fprintf(stdout, "\t%ld", (long) l->ms[i].ms_scnt);
+			fprintf(stdout, "\t%ld", (long) l->ms[i].ms_ocnt);
+			fprintf(stdout, "\t%ld", (long) l->ms[i].ms_ccnt);
+			fprintf(stdout, "\t%ld", (long) l->ms[i].ms_acnt);
+			fprintf(stdout, "\t%x", l->ms[i].ms_flags);
+		}
+		fprintf(stdout, "\n");
 	}
-	fprintf(stdout, "\n");
 };
 
 int
