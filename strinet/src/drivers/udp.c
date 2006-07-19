@@ -9137,11 +9137,8 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	struct tp *tp, **tpp = &master.tp.list;
 	unsigned long flags;
-
-#if defined LFS
 	mblk_t *mp;
 	struct stroptions *so;
-#endif
 
 	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
@@ -9171,10 +9168,8 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = FREE_CMINOR;
-#if defined LFS
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
-#endif
 	write_lock_irqsave(&master.lock, flags);
 	for (; *tpp; tpp = &(*tpp)->next) {
 		if (cmajor != (*tpp)->u.dev.cmajor)
@@ -9195,9 +9190,7 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		write_unlock_irqrestore(&master.lock, flags);
-#if defined LFS
 		freeb(mp);
-#endif
 		return (ENXIO);
 	}
 	_printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
@@ -9205,21 +9198,29 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (!(tp = tp_alloc_priv(q, tpp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		write_unlock_irqrestore(&master.lock, flags);
-#if defined LFS
 		freeb(mp);
-#endif
 		return (ENOMEM);
 	}
 	write_unlock_irqrestore(&master.lock, flags);
-#if defined LFS
-	/* want to set a write offet of MAX_HEADER bytes */
 	so = (typeof(so)) mp->b_wptr;
-	so->so_flags = SO_WROFF | SO_SKBUFF;
+	bzero(so, sizeof(*so));
+#if defined LFS
+	so->so_flags |= SO_SKBUFF;
+#endif
+	/* want to set a write offet of MAX_HEADER bytes */
+	so->so_flags |= SO_WROFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
+	so->so_flags |= SO_MINPSZ;
+	so->so_minpsz = udp_minfo.mi_minpsz;
+	so->so_flags |= SO_MAXPSZ;
+	so->so_maxpsz = udp_minfo.mi_maxpsz;
+	so->so_flags |= SO_HIWAT;
+	so->so_hiwat = udp_minfo.mi_hiwat;
+	so->so_flags |= SO_LOWAT;
+	so->so_lowat = udp_minfo.mi_lowat;
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
-#endif
 	qprocson(q);
 	return (0);
 }
