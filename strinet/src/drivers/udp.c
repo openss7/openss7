@@ -8841,19 +8841,11 @@ tp_v4_rcv(struct sk_buff *skb)
 			goto flow_controlled;
 		// mp->b_datap->db_type = M_DATA;
 		mp->b_wptr += plen;
-#if 0
 		put(tp->oq, mp);
-#else
-		if (!putq(tp->oq, mp))
-			goto dropped;
-#endif
 //              UDP_INC_STATS_BH(UdpInDatagrams);
 		/* release reference from lookup */
 		tp_put(tp);
 		return (0);
-#if 1
-	      dropped:
-#endif
 	      flow_controlled:
 		freeb(mp);	/* will take sk_buff with it */
 		tp_put(tp);
