@@ -211,7 +211,7 @@ printit(struct sc_mlist *l, int cmd)
 			continue;
 		if (i > 0 && cmd != CMN_LONG && cmd != CMN_COUNT)
 			continue;
-		fprintf(stdout, "%-8s", l->name);
+		fprintf(stdout, "%-9s", l->name);
 		if (cmd == CMN_LONG || cmd == CMN_COUNT) {
 			switch (i) {
 			case 0:
