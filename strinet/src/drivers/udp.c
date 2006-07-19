@@ -8288,14 +8288,17 @@ streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
 	udp_mstat.ms_pcnt++;
+#if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
 #else
 	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
 #endif
 	{
+#endif
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
+#if 0
 	} else {
 		int rtn;
 
@@ -8308,6 +8311,7 @@ tp_rput(queue_t *q, mblk_t *mp)
 		else
 			tp_putq_slow(q, mp, rtn);
 	}
+#endif
 	return (0);
 }
 
@@ -8355,13 +8359,12 @@ streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
 	udp_mstat.ms_pcnt++;
-#if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
 #else
 	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
 #endif
-#else
+#if 0
 	if (likely(mp->b_datap->db_type < QPCTL))
 #endif
 	{
@@ -8850,7 +8853,6 @@ tp_v4_rcv(struct sk_buff *skb)
 		freeb(mp);	/* will take sk_buff with it */
 		tp_put(tp);
 		return (0);
-
 	}
 #endif
       bad_checksum:
