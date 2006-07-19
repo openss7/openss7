@@ -103,8 +103,8 @@ typedef struct sc_module_stat {
 struct sc_mlist {
 	long major;
 	char name[FMNAMESZ + 1];
-	struct sc_module_info mi;
-	struct sc_module_stat ms;
+	struct sc_module_info mi[4];
+	struct sc_module_stat ms[4];
 };
 
 struct sc_list {
@@ -136,8 +136,8 @@ struct sc_module_stat32 {
 struct sc_mlist32 {
 	int32_t major;
 	char name[FMNAMESZ + 1];
-	struct sc_module_info32 mi;
-	struct sc_module_stat32 ms;
+	struct sc_module_info32 mi[4];
+	struct sc_module_stat32 ms[4];
 };
 
 struct sc_list32 {
