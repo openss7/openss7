@@ -232,14 +232,14 @@ AC_DEFUN([_LFS_SETUP_DEBUG], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_IRQ], [dnl
     AC_ARG_ENABLE([streams-irq],
-	AS_HELP_STRING([--disable-streams-irq],
-	    [disable STREAMS irq suppression.
-	     @<:@default=enabled@:>@])
+	AS_HELP_STRING([--enable-streams-irq],
+	    [enable STREAMS irq suppression.
+	     @<:@default=disabled@:>@])
 	    [enable_streams_irq="$enableval"],
-	    [enable_streams_irq='yes'])
+	    [enable_streams_irq='no'])
     AC_CACHE_CHECK([for STREAMS irq suppression], [lfs_streams_irq], [dnl
-	lfs_streams_irq="${enable_streams_irq:-yes}"])
-    case ${lfs_streams_irq:-yes} in
+	lfs_streams_irq="${enable_streams_irq:-no}"])
+    case ${lfs_streams_irq:-no} in
 	(no)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NOIRQ], [1], [When defined]
 	    AC_PACKAGE_TITLE [will not suppress interrupts for stream or queue
@@ -249,7 +249,7 @@ AC_DEFUN([_LFS_SETUP_IRQ], [dnl
 	    this.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :${lfs_streams_irq:-yes} = :no])
+    AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :${lfs_streams_irq:-no} = :no])
 ])# _LFS_SETUP_IRQ
 # =============================================================================
 
