@@ -211,44 +211,44 @@ printit(struct sc_mlist *l, int cmd)
 			continue;
 		if (i > 0 && cmd != CMN_LONG && cmd != CMN_COUNT)
 			continue;
-		fprintf(stdout, "%s", l->name);
+		fprintf(stdout, "%-10s", l->name);
 		if (cmd == CMN_LONG || cmd == CMN_COUNT) {
 			switch (i) {
 			case 0:
-				fprintf(stdout, "\trd");
+				fprintf(stdout, "   rd:");
 				break;
 			case 1:
-				fprintf(stdout, "\twr");
+				fprintf(stdout, "   wr:");
 				break;
 			case 2:
-				fprintf(stdout, "\tmuxr");
+				fprintf(stdout, " muxr:");
 				break;
 			case 3:
-				fprintf(stdout, "\tmuxw");
+				fprintf(stdout, " muxw:");
 				break;
 			}
 		}
 		switch (cmd) {
 		case CMN_LONG:
 			if (l->major != 0) {
-				fprintf(stdout, "\tdevice");
-				fprintf(stdout, "\t%ld", (long) l->major);
+				fprintf(stdout, "  device");
+				fprintf(stdout, " %-3ld", (long) l->major);
 			} else {
-				fprintf(stdout, "\tmodule");
-				fprintf(stdout, "\t-");
+				fprintf(stdout, "  module");
+				fprintf(stdout, "   -");
 			}
-			fprintf(stdout, "\t%u", l->mi[i].mi_idnum);
-			fprintf(stdout, "\t%ld", (long) l->mi[i].mi_minpsz);
-			fprintf(stdout, "\t%ld", (long) l->mi[i].mi_maxpsz);
-			fprintf(stdout, "\t%ld", (long) l->mi[i].mi_hiwat);
-			fprintf(stdout, "\t%ld", (long) l->mi[i].mi_lowat);
+			fprintf(stdout, "  %-5u", l->mi[i].mi_idnum);
+			fprintf(stdout, "  %-6ld", (long) l->mi[i].mi_minpsz);
+			fprintf(stdout, "  %-6ld", (long) l->mi[i].mi_maxpsz);
+			fprintf(stdout, "  %-6ld", (long) l->mi[i].mi_hiwat);
+			fprintf(stdout, "  %-6ld", (long) l->mi[i].mi_lowat);
 		case CMN_COUNT:
-			fprintf(stdout, "\t%ld", (long) l->ms[i].ms_pcnt);
-			fprintf(stdout, "\t%ld", (long) l->ms[i].ms_scnt);
-			fprintf(stdout, "\t%ld", (long) l->ms[i].ms_ocnt);
-			fprintf(stdout, "\t%ld", (long) l->ms[i].ms_ccnt);
-			fprintf(stdout, "\t%ld", (long) l->ms[i].ms_acnt);
-			fprintf(stdout, "\t%x", l->ms[i].ms_flags);
+			fprintf(stdout, "  %-8ld", (long) l->ms[i].ms_pcnt);
+			fprintf(stdout, "  %-8ld", (long) l->ms[i].ms_scnt);
+			fprintf(stdout, "  %-8ld", (long) l->ms[i].ms_ocnt);
+			fprintf(stdout, "  %-8ld", (long) l->ms[i].ms_ccnt);
+			fprintf(stdout, "  %-8ld", (long) l->ms[i].ms_acnt);
+			fprintf(stdout, "  %08x", l->ms[i].ms_flags);
 		}
 		fprintf(stdout, "\n");
 	}
