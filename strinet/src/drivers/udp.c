@@ -351,7 +351,8 @@ STATIC struct module_info udp_minfo = {
 	.mi_lowat = (1 << 17),		/* Lo water mark */
 };
 
-STATIC struct module_stat udp_mstat;
+STATIC struct module_stat udp_rstat __smp_cacheline_aligned;
+STATIC struct module_stat udp_wstat __smp_cacheline_aligned;
 
 /* Upper multiplex is a T provider following the TPI. */
 
@@ -367,7 +368,7 @@ STATIC struct qinit udp_rinit = {
 	.qi_qopen = udp_qopen,		/* Each open */
 	.qi_qclose = udp_qclose,	/* Last close */
 	.qi_minfo = &udp_minfo,		/* Module information */
-	.qi_mstat = &udp_mstat,		/* Module statistics */
+	.qi_mstat = &udp_rstat,		/* Module statistics */
 };
 
 streamscall int tp_wput(queue_t *, mblk_t *);
@@ -377,7 +378,7 @@ STATIC struct qinit udp_winit = {
 	.qi_putp = tp_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = tp_wsrv,		/* Write service procedure */
 	.qi_minfo = &udp_minfo,		/* Module information */
-	.qi_mstat = &udp_mstat,		/* Module statistics */
+	.qi_mstat = &udp_wstat,		/* Module statistics */
 };
 
 MODULE_STATIC struct streamtab udp_info = {
@@ -8287,7 +8288,6 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-	udp_mstat.ms_pcnt++;
 #if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
@@ -8321,7 +8321,6 @@ tp_rsrv(queue_t *q)
 	mblk_t *mp;
 	int blockcnt = 0;
 
-	udp_mstat.ms_scnt++;
 	if (likely((mp = getq(q)) != NULL)) {
 		do {
 			int rtn;
@@ -8336,7 +8335,7 @@ tp_rsrv(queue_t *q)
 		} while (likely((mp = getq(q)) != NULL));
 	} else {
 		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
-		udp_mstat.ms_acnt++;
+		udp_rstat.ms_acnt++;
 		return (0);
 	}
 #if 1
@@ -8347,10 +8346,10 @@ tp_rsrv(queue_t *q)
 	return (0);
       busy:
 	_ptrace(("%s: %p: flow controlled\n", __FUNCTION__, q));
-	udp_mstat.ms_ccnt++;
+	udp_rstat.ms_ccnt++;
 	if (blockcnt <= 1) {
 		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
-		udp_mstat.ms_acnt++;
+		udp_rstat.ms_acnt++;
 	}
 	return (0);
 }
@@ -8358,13 +8357,13 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
-	udp_mstat.ms_pcnt++;
+#if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
 #else
 	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
 #endif
-#if 0
+#else
 	if (likely(mp->b_datap->db_type < QPCTL))
 #endif
 	{
@@ -8391,7 +8390,6 @@ tp_wsrv(queue_t *q)
 	mblk_t *mp;
 	int blockcnt = 0;
 
-	udp_mstat.ms_scnt++;
 	if (likely((mp = getq(q)) != NULL)) {
 		do {
 			register int rtn;
@@ -8406,16 +8404,16 @@ tp_wsrv(queue_t *q)
 		} while (likely((mp = getq(q)) != NULL));
 	} else {
 		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
-		udp_mstat.ms_acnt++;
+		udp_wstat.ms_acnt++;
 		return (0);
 	}
 	return (0);
       busy:
 	_ptrace(("%s: %p: flow controlled\n", __FUNCTION__, q));
-	udp_mstat.ms_ccnt++;
+	udp_wstat.ms_ccnt++;
 	if (blockcnt <= 1) {
 		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
-		udp_mstat.ms_acnt++;
+		udp_wstat.ms_acnt++;
 	}
 #if 1
 	/* try running softirqd */
@@ -9150,7 +9148,6 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct stroptions *so;
 #endif
 
-	udp_mstat.ms_ocnt++;
 	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
 	}
@@ -9243,7 +9240,6 @@ udp_qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	struct tp *tp = TP_PRIV(q);
 
-	udp_mstat.ms_ccnt++;
 	(void) oflag;
 	(void) crp;
 	(void) tp;
