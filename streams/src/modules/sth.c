@@ -270,6 +270,9 @@ struct module_info str_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat str_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat str_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 int streamscall str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
 int streamscall str_close(queue_t *q, int oflag, cred_t *crp);
 
@@ -280,6 +283,7 @@ static struct qinit str_rinit = {
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
 	.qi_minfo = &str_minfo,
+	.qi_mstat = &str_rstat,
 };
 
 int streamscall strwput(queue_t *q, mblk_t *mp);
@@ -289,6 +293,7 @@ static struct qinit str_winit = {
 	.qi_putp = strwput,
 	.qi_srvp = strwsrv,
 	.qi_minfo = &str_minfo,
+	.qi_mstat = &str_wstat,
 };
 
 struct streamtab str_info = {

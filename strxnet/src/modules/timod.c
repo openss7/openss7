@@ -154,6 +154,9 @@ static struct module_info timod_minfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
+static struct module_stat timod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat timod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 static streamscall int timod_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int timod_close(queue_t *, int, cred_t *);
 
@@ -165,11 +168,13 @@ static struct qinit timod_rinit = {
 	.qi_qopen = timod_open,		/* Each open */
 	.qi_qclose = timod_close,	/* Last close */
 	.qi_minfo = &timod_minfo,	/* Information */
+	.qi_mstat = &timod_rstat,	/* Statistics */
 };
 
 static struct qinit timod_winit = {
 	.qi_putp = timod_wput,		/* Write put (message from above) */
 	.qi_minfo = &timod_minfo,	/* Information */
+	.qi_mstat = &timod_wstat,	/* Statistics */
 };
 
 MODULE_STATIC struct streamtab timodinfo = {
