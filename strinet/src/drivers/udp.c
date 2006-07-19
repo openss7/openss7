@@ -8288,14 +8288,17 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
+#if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
 #else
 	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
 #endif
 	{
+#endif
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
+#if 0
 	} else {
 		int rtn;
 
@@ -8308,6 +8311,7 @@ tp_rput(queue_t *q, mblk_t *mp)
 		else
 			tp_putq_slow(q, mp, rtn);
 	}
+#endif
 	return (0);
 }
 
@@ -8315,50 +8319,34 @@ streamscall __hot_out int
 tp_rsrv(queue_t *q)
 {
 	mblk_t *mp;
-	int blockcnt = 0;
 
-	if (likely((mp = getq(q)) != NULL)) {
-		do {
-			int rtn;
-
-			++blockcnt;
-			rtn = tp_r_prim(q, mp);
-			/* Fast Path */
-			if (likely(rtn == QR_TRIMMED))
-				freeb(mp);
-			else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
-				goto busy;
-		} while (likely((mp = getq(q)) != NULL));
-	} else {
-		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
-		udp_rstat.ms_acnt++;
-		return (0);
-	}
-#if 1
-	/* try waking softirqd when service queue empty */
+	/* try bottom half locking across loop to allow softirqd to burst. */
 	local_bh_disable();
-	local_bh_enable();
-#endif
-	return (0);
-      busy:
-	_ptrace(("%s: %p: flow controlled\n", __FUNCTION__, q));
-	udp_rstat.ms_ccnt++;
-	if (blockcnt <= 1) {
-		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
-		udp_rstat.ms_acnt++;
+	while (likely((mp = getq(q)) != NULL)) {
+		int rtn;
+
+		rtn = tp_r_prim(q, mp);
+		/* Fast Path */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+			break;
 	}
+	/* this should run the burst from softirqd. */
+	local_bh_enable();
 	return (0);
 }
 
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
+#if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
 #else
 	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
 #endif
-#if 0
+#else
 	if (likely(mp->b_datap->db_type < QPCTL))
 #endif
 	{
@@ -8383,38 +8371,21 @@ streamscall __hot_in int
 tp_wsrv(queue_t *q)
 {
 	mblk_t *mp;
-	int blockcnt = 0;
 
-	if (likely((mp = getq(q)) != NULL)) {
-		do {
-			register int rtn;
-
-			++blockcnt;
-			rtn = tp_w_prim(q, mp);
-			/* Fast Path */
-			if (likely(rtn == QR_TRIMMED))
-				freeb(mp);
-			else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
-				goto busy;
-		} while (likely((mp = getq(q)) != NULL));
-	} else {
-		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
-		udp_wstat.ms_acnt++;
-		return (0);
-	}
-	return (0);
-      busy:
-	_ptrace(("%s: %p: flow controlled\n", __FUNCTION__, q));
-	udp_wstat.ms_ccnt++;
-	if (blockcnt <= 1) {
-		_pswerr(("%s: %p: woken up for nothing\n", __FUNCTION__, q));
-		udp_wstat.ms_acnt++;
-	}
-#if 1
-	/* try running softirqd */
+	/* try bottom half locking across loop to bundle burst for softirqd. */
 	local_bh_disable();
+	while (likely((mp = getq(q)) != NULL)) {
+		register int rtn;
+
+		rtn = tp_w_prim(q, mp);
+		/* Fast Path */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+			break;
+	}
+	/* this should run the burst to softirqd. */
 	local_bh_enable();
-#endif
 	return (0);
 }
 
