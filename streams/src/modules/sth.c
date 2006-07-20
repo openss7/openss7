@@ -504,7 +504,7 @@ strsyscall(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#if 0
+#if 1
 	struct strthread *t = this_thread;
 
 	/* before every system call return -- saves a context switch */
@@ -522,7 +522,7 @@ strsyscall_write(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#if 0
+#if 1
 	struct strthread *t = this_thread;
 
 	/* before every system call return -- saves a context switch */
@@ -562,7 +562,6 @@ strschedule(void)
 	   processor.  This does have a negative impact; however, on SMP kernels running on UP
 	   machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-#if 0
 #ifndef CONFIG_SMP
 	/* before every sleep -- saves a context switch */
 	struct strthread *t = this_thread;
@@ -573,7 +572,6 @@ strschedule(void)
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	set_current_state(TASK_RUNNING);
 	runqueues();
-#endif
 #endif
 }
 
