@@ -767,7 +767,7 @@ function netperf_calibrate()
 
 function scls_show()
 {
-    if test ${verbose:-1} -le 0 ; then
+    if test ${verbose:-1} -lt 2 ; then
 	return
     fi
     if test :${xti:-no} = :no ; then
