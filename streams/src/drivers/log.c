@@ -174,6 +174,9 @@ static struct module_info log_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat log_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat log_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 queue_t *log_conq = NULL;
 queue_t *log_errq = NULL;
 queue_t *log_trcq = NULL;
@@ -568,11 +571,13 @@ static struct qinit log_rqinit = {
 	.qi_qopen = log_open,
 	.qi_qclose = log_close,
 	.qi_minfo = &log_minfo,
+	.qi_mstat = &log_rstat,
 };
 
 static struct qinit log_wqinit = {
 	.qi_putp = log_wput,
 	.qi_minfo = &log_minfo,
+	.qi_mstat = &log_wstat,
 };
 
 static struct streamtab log_info = {

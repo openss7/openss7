@@ -154,6 +154,9 @@ STATIC struct module_info loop_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat loop_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat loop_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 typedef struct loop {
 	struct loop *next;		/* list linkage */
 	struct loop **prev;		/* list linkage */
@@ -473,12 +476,14 @@ STATIC struct qinit loop_rqinit = {
 	.qi_qopen = loop_open,
 	.qi_qclose = loop_close,
 	.qi_minfo = &loop_minfo,
+	.qi_mstat = &loop_rstat,
 };
 
 STATIC struct qinit loop_wqinit = {
 	.qi_putp = loop_wput,
 	.qi_srvp = loop_wsrv,
 	.qi_minfo = &loop_minfo,
+	.qi_mstat = &loop_wstat,
 };
 
 STATIC struct streamtab loop_info = {

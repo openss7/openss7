@@ -317,8 +317,8 @@ STATIC struct module_info raw_minfo = {
 	.mi_lowat = (1 << 17),		/* Lo water mark */
 };
 
-STATIC struct module_stat raw_mstat = {
-};
+STATIC struct module_stat raw_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat raw_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
 /* Upper multiplex is a T provider following the TPI. */
 
@@ -334,7 +334,7 @@ STATIC struct qinit raw_rinit = {
 	.qi_qopen = raw_qopen,		/* Each open */
 	.qi_qclose = raw_qclose,	/* Last close */
 	.qi_minfo = &raw_minfo,		/* Module information */
-	.qi_mstat = &raw_mstat,		/* Module statistics */
+	.qi_mstat = &raw_rstat,		/* Module statistics */
 };
 
 streamscall int tp_wput(queue_t *, mblk_t *);
@@ -344,7 +344,7 @@ STATIC struct qinit raw_winit = {
 	.qi_putp = tp_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = tp_wsrv,		/* Write service procedure */
 	.qi_minfo = &raw_minfo,		/* Module information */
-	.qi_mstat = &raw_mstat,		/* Module statistics */
+	.qi_mstat = &raw_wstat,		/* Module statistics */
 };
 
 MODULE_STATIC struct streamtab raw_info = {

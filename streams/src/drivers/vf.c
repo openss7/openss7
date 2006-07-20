@@ -169,6 +169,11 @@ STATIC struct module_info vf_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat vf_urstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat vf_uwstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat vf_lrstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat vf_lwstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 /* private structure */
 struct vf {
 	struct vf *next;		/* list linkage */
@@ -814,23 +819,27 @@ STATIC struct qinit vf_urqinit = {
 	.qi_qopen = vf_open,
 	.qi_qclose = vf_close,
 	.qi_minfo = &vf_minfo,
+	.qi_mstat = &vf_urstat,
 };
 
 STATIC struct qinit vf_uwqinit = {
 	.qi_putp = vf_uwput,
 	.qi_srvp = vf_uwsrv,
 	.qi_minfo = &vf_minfo,
+	.qi_mstat = &vf_uwstat,
 };
 
 STATIC struct qinit vf_lrqinit = {
 	.qi_putp = vf_lrput,
 	.qi_srvp = vf_lrsrv,
 	.qi_minfo = &vf_minfo,
+	.qi_mstat = &vf_lrstat,
 };
 
 STATIC struct qinit vf_lwqinit = {
 	.qi_srvp = vf_lwsrv,
 	.qi_minfo = &vf_minfo,
+	.qi_mstat = &vf_lwstat,
 };
 
 STATIC struct streamtab vf_info = {

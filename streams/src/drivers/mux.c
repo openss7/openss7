@@ -183,6 +183,11 @@ STATIC struct module_info mux_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat mux_urstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat mux_uwstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat mux_lrstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat mux_lwstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 #ifdef LIS
 #define _trace() while (0) { }
 #define _ptrace(__x) while (0) { }
@@ -754,23 +759,27 @@ STATIC struct qinit mux_urqinit = {
 	.qi_qopen = mux_open,
 	.qi_qclose = mux_close,
 	.qi_minfo = &mux_minfo,
+	.qi_mstat = &mux_urstat,
 };
 
 STATIC struct qinit mux_uwqinit = {
 	.qi_putp = mux_uwput,
 	.qi_srvp = mux_uwsrv,
 	.qi_minfo = &mux_minfo,
+	.qi_mstat = &mux_uwstat,
 };
 
 STATIC struct qinit mux_lrqinit = {
 	.qi_putp = mux_lrput,
 	.qi_srvp = mux_lrsrv,
 	.qi_minfo = &mux_minfo,
+	.qi_mstat = &mux_lrstat,
 };
 
 STATIC struct qinit mux_lwqinit = {
 	.qi_srvp = mux_lwsrv,
 	.qi_minfo = &mux_minfo,
+	.qi_mstat = &mux_lwstat,
 };
 
 STATIC struct streamtab mux_info = {
