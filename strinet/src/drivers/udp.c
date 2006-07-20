@@ -4218,9 +4218,11 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		spin_lock_str(&tp->qlock, flags);
 		tp->sndmem += skb->truesize;
 		spin_unlock_str(&tp->qlock, flags);
+#if 0
 		/* keep track of high water mark */
 		if (udp_wstat.ms_acnt < tp->sndmem)
 			udp_wstat.ms_acnt = tp->sndmem;
+#endif
 #endif
 	}
 	return (skb);
