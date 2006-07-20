@@ -8320,8 +8320,10 @@ tp_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 
+#if 0
 	/* try bottom half locking across loop to allow softirqd to burst. */
 	local_bh_disable();
+#endif
 	while (likely((mp = getq(q)) != NULL)) {
 		int rtn;
 
@@ -8332,8 +8334,10 @@ tp_rsrv(queue_t *q)
 		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
+#if 0
 	/* this should run the burst from softirqd. */
 	local_bh_enable();
+#endif
 	return (0);
 }
 
@@ -8371,8 +8375,10 @@ tp_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 
+#if 0
 	/* try bottom half locking across loop to bundle burst for softirqd. */
 	local_bh_disable();
+#endif
 	while (likely((mp = getq(q)) != NULL)) {
 		register int rtn;
 
@@ -8383,8 +8389,10 @@ tp_wsrv(queue_t *q)
 		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
+#if 0
 	/* this should run the burst to softirqd. */
 	local_bh_enable();
+#endif
 	return (0);
 }
 
