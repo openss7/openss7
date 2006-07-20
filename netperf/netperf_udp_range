@@ -782,9 +782,14 @@ function scls_show()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "$scls -c $scls_modules"
-    fi
-    if test :${run:-yes} != :no ; then
-	$scls $scls_modules
+	if test ${verbose:-1} -gt 2 ; then
+	    $scls_modules="-l $scls_modules"
+	else
+	    $scls_modules="-c $scls_modules"
+	fi
+	if test :${run:-yes} != :no ; then
+	    $scls $scls_modules
+	fi
     fi
 }
 
