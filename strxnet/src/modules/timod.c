@@ -310,7 +310,7 @@ split_buffer(mblk_t *mp, int offset)
  *  
  *  -------------------------------------------------------------------------
  */
-static noinline streams_fastcall __hot_get int
+static noinline streams_fastcall __unlikely int
 timod_rput_slow(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
@@ -559,10 +559,14 @@ timod_rput_slow(queue_t *q, mblk_t *mp)
 static streamscall __hot_in int
 timod_rput(queue_t *q, mblk_t *mp)
 {
+#if 0
 	struct timod *priv = q->q_ptr;
+#endif
 	union T_primitives *p;
 
+#if 0
 	prefetchw(priv);
+#endif
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
@@ -573,19 +577,23 @@ timod_rput(queue_t *q, mblk_t *mp)
 #endif				/* defined LIS */
 	/* fast path for data */
 	if (likely(mp->b_datap->db_type == M_PROTO)) {
-		if (likely(priv->iocblk == NULL)) {
+		if (likely(mp->b_wptr >= mp->b_rptr + sizeof(p->type))) {
 			p = (typeof(p)) mp->b_rptr;
 			switch (p->type) {
 			case T_UNITDATA_IND:
 			case T_UDERROR_IND:
+#if 0
 				priv->oldstate = priv->state;
 				priv->state = TS_IDLE;
+#endif
 				putnext(q, mp);
 				return (0);
 			case T_EXDATA_IND:
 			case T_DATA_IND:
+#if 0
 				priv->oldstate = priv->state;
 				priv->state = TS_DATA_XFER;
+#endif
 				putnext(q, mp);
 				return (0);
 			}
@@ -594,7 +602,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 	return timod_rput_slow(q, mp);
 }
 
-static noinline streams_fastcall __hot_put int
+static noinline streams_fastcall __unlikely int
 timod_wput_slow(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
@@ -937,10 +945,14 @@ timod_wput_slow(queue_t *q, mblk_t *mp)
 static streamscall __hot_out int
 timod_wput(queue_t *q, mblk_t *mp)
 {
+#if 0
 	struct timod *priv = q->q_ptr;
+#endif
 	union T_primitives *p;
 
+#if 0
 	prefetchw(priv);
+#endif
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
@@ -955,14 +967,18 @@ timod_wput(queue_t *q, mblk_t *mp)
 			p = (typeof(p)) mp->b_rptr;
 			switch (p->type) {
 			case T_UNITDATA_REQ:
+#if 0
 				priv->oldstate = priv->state;
 				priv->state = TS_IDLE;
+#endif
 				putnext(q, mp);
 				return (0);
 			case T_EXDATA_REQ:
 			case T_DATA_REQ:
+#if 0
 				priv->oldstate = priv->state;
 				priv->state = TS_DATA_XFER;
+#endif
 				putnext(q, mp);
 				return (0);
 			}
