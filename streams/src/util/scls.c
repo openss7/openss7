@@ -197,7 +197,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-enum { CMN_NONE, CMN_NAMES, CMN_LONG, CMN_COUNT, } command = CMN_NONE;
+enum { CMN_NONE, CMN_NAMES, CMN_LONG, CMN_COUNT, CMN_BOTH, } command = CMN_NONE;
 
 void
 printit(struct sc_mlist *l, int cmd)
@@ -209,49 +209,70 @@ printit(struct sc_mlist *l, int cmd)
 	for (i = 0; i < 4; i++) {
 		if (l->mi[i].mi_idnum == 0)
 			continue;
-		if (i > 0 && cmd != CMN_LONG && cmd != CMN_COUNT)
+		if (i > 0 && cmd != CMN_LONG && cmd != CMN_BOTH && cmd != CMN_COUNT)
 			continue;
-		fprintf(stdout, "%-9s", l->name);
-		if (cmd == CMN_LONG || cmd == CMN_COUNT) {
-			switch (i) {
-			case 0:
-				fprintf(stdout, "   rd:");
-				break;
-			case 1:
-				fprintf(stdout, "   wr:");
-				break;
-			case 2:
-				fprintf(stdout, " muxr:");
-				break;
-			case 3:
-				fprintf(stdout, " muxw:");
-				break;
-			}
-		}
+//		if (i == 0)
+			fprintf(stdout, "%-9s", l->name);
+//		else
+//			fprintf(stdout, "         ");
 		switch (cmd) {
 		case CMN_LONG:
-			if (l->major != 0) {
-				fprintf(stdout, " device");
-				fprintf(stdout, " %3ld", (long) l->major);
-			} else {
-				fprintf(stdout, " module");
-				fprintf(stdout, "   -");
+		case CMN_BOTH:
+//			if (i == 0) {
+				if (l->major != 0) {
+					fprintf(stdout, " driver");
+					fprintf(stdout, " %3ld", (long) l->major);
+				} else {
+					fprintf(stdout, " module");
+					fprintf(stdout, "    ");
+				}
+//			} else {
+//				fprintf(stdout, "           ");
+//			}
+			if (l->mi[i].index != 0) {
+				fprintf(stdout, " %5u", l->mi[i].mi_idnum);
+				fprintf(stdout, " %6ld", (long) l->mi[i].mi_minpsz);
+				fprintf(stdout, " %6ld", (long) l->mi[i].mi_maxpsz);
+				fprintf(stdout, " %6ld", (long) l->mi[i].mi_hiwat);
+				fprintf(stdout, " %6ld", (long) l->mi[i].mi_lowat);
+				fprintf(stdout, " #");
+				if (l->mi[i].index & 0x8)
+					fprintf(stdout, " wr");
+				if (l->mi[i].index & 0x4)
+					fprintf(stdout, " rd");
+				if (l->mi[i].index & 0x2)
+					fprintf(stdout, " muxw");
+				if (l->mi[i].index & 0x1)
+					fprintf(stdout, " muxr");
 			}
-			fprintf(stdout, " %5u", l->mi[i].mi_idnum);
-			fprintf(stdout, " %6ld", (long) l->mi[i].mi_minpsz);
-			fprintf(stdout, " %6ld", (long) l->mi[i].mi_maxpsz);
-			fprintf(stdout, " %6ld", (long) l->mi[i].mi_hiwat);
-			fprintf(stdout, " %6ld", (long) l->mi[i].mi_lowat);
+			if (cmd == CMN_BOTH)
+				goto show_counts;
+			break;
 		case CMN_COUNT:
-			fprintf(stdout, " %8ld", (long) l->ms[i].ms_pcnt);
-			fprintf(stdout, " %8ld", (long) l->ms[i].ms_scnt);
-			fprintf(stdout, " %8ld", (long) l->ms[i].ms_ocnt);
-			fprintf(stdout, " %8ld", (long) l->ms[i].ms_ccnt);
-			fprintf(stdout, " %8ld", (long) l->ms[i].ms_acnt);
-			fprintf(stdout, " %08x", l->ms[i].ms_flags);
+		      show_counts:
+			if (l->ms[i].index != 0) {
+				fprintf(stdout, " %8ld", (long) l->ms[i].ms_pcnt);
+				fprintf(stdout, " %8ld", (long) l->ms[i].ms_scnt);
+				fprintf(stdout, " %8ld", (long) l->ms[i].ms_ocnt);
+				fprintf(stdout, " %8ld", (long) l->ms[i].ms_ccnt);
+				fprintf(stdout, " %8ld", (long) l->ms[i].ms_acnt);
+				fprintf(stdout, " %8x", l->ms[i].ms_flags);
+				fprintf(stdout, " #");
+				if (l->ms[i].index & 0x8)
+					fprintf(stdout, " wr");
+				if (l->ms[i].index & 0x4)
+					fprintf(stdout, " rd");
+				if (l->ms[i].index & 0x2)
+					fprintf(stdout, " muxw");
+				if (l->ms[i].index & 0x1)
+					fprintf(stdout, " muxr");
+			}
+			break;
 		}
 		fprintf(stdout, "\n");
 	}
+//	if (cmd == CMN_LONG || cmd == CMN_BOTH || cmd == CMN_COUNT)
+//		fprintf(stdout, "\n");
 };
 
 int
@@ -300,11 +321,14 @@ main(int argc, char *argv[])
 			command = CMN_LONG;
 			break;
 		case 'c':
-			if (command != CMN_NONE)
+			if (command != CMN_NONE && command != CMN_LONG)
 				goto bad_option;
 			if (debug)
 				fprintf(stderr, "%s: setting count command\n", argv[0]);
-			command = CMN_COUNT;
+			if (command == CMN_LONG)
+				command = CMN_BOTH;
+			else
+				command = CMN_COUNT;
 			break;
 		case 'D':	/* -D, --debug */
 			if (debug)

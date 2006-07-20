@@ -199,46 +199,56 @@ where
 .RS
 .TP 12
 .RB < name >
-is the name of the driver or module.
+is the name of the driver or module
+.RI ( %9s ).
 .RE
 .PP
 The format of the output with the
 .B -l
 option is
 .sp
-.RB < type "> <" major "> <" mi_idnum "> <" mi_idname "> <" mi_minpsz "> <" mi_maxpsz "> <" mi_hiwat "> <" mi_lowat >,
+.\".RB < name "> <" type "> <" major "> <" mi_idnum "> <" mi_idname "> <" mi_minpsz "> <" mi_maxpsz "> <" mi_hiwat "> <" mi_lowat >,
+.RB < name "> <" type "> <" major "> <" mi_idnum "> <" mi_minpsz "> <" mi_maxpsz "> <" mi_hiwat "> <" mi_lowat >,
 where
 .RS
 .TP 12
+.RB < name >
+is the name of the driver or module
+.RI ( %9s ).
+.PD 0
+.TP
 .RB < type >
 The module type.  This is either: \(lqmodule\(rq or \(lqdriver\(rq.
-.PD 0
 .TP
 .RB < major >
 The major device number
-.RI ( %d )
+.RI ( %5d )
 when
 .I type
 is \(lqDriver\(rq, and a space otherwise.
 .TP
 .RB < mi_idnum >
 The module ID number for the module
-.RI ( %d ).
-.TP
-.RB < mi_idname >
-The module name.
+.RI ( %5d ).
+.\".TP
+.\".RB < mi_idname >
+.\"The module name.
 .TP
 .RB < mi_minpsz >
-The minimum packet size accepted.
+The minimum packet size accepted
+.RI ( %6ld ).
 .TP
 .RB < mi_maxpsz >
-The maximum packet size accepted.
+The maximum packet size accepted
+.RI ( %6ld ).
 .TP
 .RB < mi_hiwat >
-The (initial) high water mark for the queue pair.
+The (initial) high water mark for the queue pair
+.RI ( %6ld ).
 .TP
 .RB < mi_lowat >
-The (initial) low water mark for the queue pair.
+The (initial) low water mark for the queue pair
+.RI ( %6ld ).
 .PD
 .RE
 .PP
@@ -246,34 +256,42 @@ The format of the output with the
 .B -c
 option is
 .sp
-.RB < ms_pcnt "> <" ms_scnt "> <" ms_ocnt "> <" ms_acnt "> <" ms_flags >,
+.RB < name "> <" ms_pcnt "> <" ms_scnt "> <" ms_ocnt "> <" ms_acnt "> <" ms_flags >,
 where
 .RS
 .TP 12
+.RB < name >
+is the name of the driver or module
+.RI ( %9s ).
+.PD 0
+.TP
 .RB < ms_pcnt >
 The number of calls to the module's
 .BR putp (9)
-procedure, as a decimal number
-.RI ( %lu ).
-.PD 0
+procedure
+.RI ( %8ld ).
 .TP
 .RB < ms_scnt >
 The number of calls to the module's
 .BR srvp (9)
-procedure, as a decimal number
+procedure
+.RI ( %8ld ).
 .TP
 .RB < ms_ocnt >
 The number of calls to the module's
 .BR qopen (9)
-procedure.
+procedure
+.RI ( %8ld ).
 .TP
 .RB < ms_acnt >
 The number of calls to the module's
 .BR qadmin (9)
-procedure.
+procedure
+.RI ( %8ld ).
 .TP
 .RB < ms_flags >
-Boolean statistics flags.
+Boolean statistics flags
+.RI ( %8x ).
 .PD
 .RE
 .\"
@@ -309,18 +327,18 @@ driver.
 If either one is not available, the
 .B scls
 command will not be successful.
-.PP
-Note that only the module information and module statistics associated with the write side of the
-upper multiplexer will be displayed for a module or driver.  A module or driver that has more than
-one
-.BR module_info (9)
-or
-.BR module_stat (9)
-structure in its definition, will only display the information associated with the
-.I st_wrinit
-member of the
-.BR streamtab (9)
-structure.
+.\".PP
+.\"Note that only the module information and module statistics associated with the write side of the
+.\"upper multiplexer will be displayed for a module or driver.  A module or driver that has more than
+.\"one
+.\".BR module_info (9)
+.\"or
+.\".BR module_stat (9)
+.\"structure in its definition, will only display the information associated with the
+.\".I st_wrinit
+.\"member of the
+.\".BR streamtab (9)
+.\"structure.
 See
 .BR sc (4),
 .BR module_info (9),
@@ -338,35 +356,34 @@ command without options:
 .nf
 \fC\s-1
 #> scls
-clone
-dlb
-kinfo
-log
-nuls
-echo
-sad
-pipe
-xtisoUDP
-xtisoTCP
-ptm
-pts
-bba
-lat
-pppif
-pppasync
-pppcomp
-bufcall
-null
-pass
-errm
-ptem
-spass
-rspass
-pipemod
-timod
-tirdwr
-ldtty
-ifnet
+spx      
+sfx      
+sad      
+pipe     
+nuls     
+nsdev    
+mux      
+loop     
+log      
+fifo     
+echo     
+clone    
+inet     
+rawip2   
+udp2     
+ip_to_dlp
+link-driv
+np_ip    
+sc       
+tirdwr   
+timod    
+testmod  
+pipemod  
+nullmod  
+connld   
+bufmod   
+ip_strms 
+sth      
 \s+1\fP
 .fi
 .RE
@@ -379,36 +396,15 @@ option:
 .RS
 .nf
 \fC\s-1
-#> scls -l
-clone           driver     32       0 xxxx xxxxx xxxxx xxxxx
-dlb             driver     52    5010 xxxx xxxxx xxxxx xxxxx
-kinfo           driver     53    5020 xxxx xxxxx xxxxx xxxxx
-log             driver     54      44 xxxx xxxxx xxxxx xxxxx
-nuls            driver     55    5001 xxxx xxxxx xxxxx xxxxx
-echo            driver     56    5000 xxxx xxxxx xxxxx xxxxx
-sad             driver     57      45 xxxx xxxxx xxxxx xxxxx
-pipe            driver     58    5304 xxxx xxxxx xxxxx xxxxx
-xtisoUDP        driver     59    5010 xxxx xxxxx xxxxx xxxxx
-xtisoTCP        driver     60    5010 xxxx xxxxx xxxxx xxxxx
-ptm             driver     63    7609 xxxx xxxxx xxxxx xxxxx
-pts             driver      6    7608 xxxx xxxxx xxxxx xxxxx
-bba             driver     64   24880 xxxx xxxxx xxxxx xxxxx
-lat             driver      5       5 xxxx xxxxx xxxxx xxxxx
-pppif           module           6002 xxxx xxxxx xxxxx xxxxx
-pppasync        module           6000 xxxx xxxxx xxxxx xxxxx
-pppcomp         module           6001 xxxx xxxxx xxxxx xxxxx
-bufcall         module              0 xxxx xxxxx xxxxx xxxxx
-null            module           5002 xxxx xxxxx xxxxx xxxxx
-pass            module           5003 xxxx xxxxx xxxxx xxxxx
-errm            module           5003 xxxx xxxxx xxxxx xxxxx
-ptem            module           5003 xxxx xxxxx xxxxx xxxxx
-spass           module           5007 xxxx xxxxx xxxxx xxxxx
-rpass           module           5008 xxxx xxxxx xxxxx xxxxx
-pipemod         module           5303 xxxx xxxxx xxxxx xxxxx
-timod           module           5006 xxxx xxxxx xxxxx xxxxx
-tirdwr          module              0 xxxx xxxxx xxxxx xxxxx
-ldtty           module           7701 xxxx xxxxx xxxxx xxxxx
-ifnet           module           5501 xxxx xxxxx xxxxx xxxxx
+#> scls -l sth sc mux
+sth       module         1      0   4096   5120   1024 wr
+sth       module         1      0   4096   5120   1024 rd
+sc        module         6      0   4096   5120   1024 wr
+sc        module         6      0   4096   5120   1024 rd
+mux       driver 236   236      0   4096   5120   1024 wr
+mux       driver 236   236      0   4096   5120   1024 rd
+mux       driver 236   236      0   4096   5120   1024 muxw
+mux       driver 236   236      0   4096   5120   1024 muxr
 \s+1\fP
 .fi
 .RE
@@ -421,36 +417,17 @@ option:
 .RS
 .nf
 \fC\s-1
-#> scls -c
-clone           %lu     %lu     %lu     %lu     %lx
-dlb             %lu     %lu     %lu     %lu     %lx
-kinfo           %lu     %lu     %lu     %lu     %lx
-log             %lu     %lu     %lu     %lu     %lx
-nuls            %lu     %lu     %lu     %lu     %lx
-echo            %lu     %lu     %lu     %lu     %lx
-sad             %lu     %lu     %lu     %lu     %lx
-pipe            %lu     %lu     %lu     %lu     %lx
-xtisoUDP        %lu     %lu     %lu     %lu     %lx
-xtisoTCP        %lu     %lu     %lu     %lu     %lx
-ptm             %lu     %lu     %lu     %lu     %lx
-pts             %lu     %lu     %lu     %lu     %lx
-bba             %lu     %lu     %lu     %lu     %lx
-lat             %lu     %lu     %lu     %lu     %lx
-pppif           %lu     %lu     %lu     %lu     %lx
-pppasync        %lu     %lu     %lu     %lu     %lx
-pppcomp         %lu     %lu     %lu     %lu     %lx
-bufcall         %lu     %lu     %lu     %lu     %lx
-null            %lu     %lu     %lu     %lu     %lx
-pass            %lu     %lu     %lu     %lu     %lx
-errm            %lu     %lu     %lu     %lu     %lx
-ptem            %lu     %lu     %lu     %lu     %lx
-spass           %lu     %lu     %lu     %lu     %lx
-rpass           %lu     %lu     %lu     %lu     %lx
-pipemod         %lu     %lu     %lu     %lu     %lx
-timod           %lu     %lu     %lu     %lu     %lx
-tirdwr          %lu     %lu     %lu     %lu     %lx
-ldtty           %lu     %lu     %lu     %lu     %lx
-ifnet           %lu     %lu     %lu     %lu     %lx
+#> scls -c sc timod tirdwr mux
+sc               0        0       33       32        0        0 wr
+sc             131        0        0        0        0        0 rd
+timod            0        0        0        0        0        0 wr
+timod            0        0        0        0        0        0 rd
+tirdwr           0        0        0        0        0        0 wr
+tirdwr           0        0        0        0        0        0 rd
+mux              0        0        0        0        0        0 wr
+mux              0        0        0        0        0        0 rd
+mux              0        0        0        0        0        0 muxw
+mux              0        0        0        0        0        0 muxr
 \s+1\fP
 .fi
 .RE

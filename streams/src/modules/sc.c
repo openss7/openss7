@@ -165,73 +165,123 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const uint flag)
 		struct sc_mlist32 *mlist = (typeof(mlist)) _mlist;
 
 		if ((mlist->major = major) != -1) {
-			if (st->st_rdinit) {
-				strncpy(mlist->name, st->st_rdinit->qi_minfo->mi_idname, FMNAMESZ + 1);
-				mlist->mi[0].mi_idnum = st->st_rdinit->qi_minfo->mi_idnum;
-				strncpy(mlist->mi[0].mi_idname, st->st_rdinit->qi_minfo->mi_idname, FMNAMESZ + 1);
-				mlist->mi[0].mi_minpsz = st->st_rdinit->qi_minfo->mi_minpsz;
-				mlist->mi[0].mi_maxpsz = st->st_rdinit->qi_minfo->mi_maxpsz;
-				mlist->mi[0].mi_hiwat = st->st_rdinit->qi_minfo->mi_hiwat;
-				mlist->mi[0].mi_lowat = st->st_rdinit->qi_minfo->mi_lowat;
-				if (st->st_rdinit->qi_mstat) {
-					mlist->ms[0].ms_pcnt = st->st_rdinit->qi_mstat->ms_pcnt;
-					mlist->ms[0].ms_scnt = st->st_rdinit->qi_mstat->ms_scnt;
-					mlist->ms[0].ms_ocnt = st->st_rdinit->qi_mstat->ms_ocnt;
-					mlist->ms[0].ms_ccnt = st->st_rdinit->qi_mstat->ms_ccnt;
-					mlist->ms[0].ms_acnt = st->st_rdinit->qi_mstat->ms_acnt;
-					mlist->ms[0].ms_flags = st->st_rdinit->qi_mstat->ms_flags;
-					mlist->ms[0].ms_xsize = st->st_rdinit->qi_mstat->ms_xsize;
-				}
-			}
 			if (st->st_wrinit) {
-				mlist->mi[1].mi_idnum = st->st_wrinit->qi_minfo->mi_idnum;
-				strncpy(mlist->mi[1].mi_idname, st->st_wrinit->qi_minfo->mi_idname, FMNAMESZ + 1);
-				mlist->mi[1].mi_minpsz = st->st_wrinit->qi_minfo->mi_minpsz;
-				mlist->mi[1].mi_maxpsz = st->st_wrinit->qi_minfo->mi_maxpsz;
-				mlist->mi[1].mi_hiwat = st->st_wrinit->qi_minfo->mi_hiwat;
-				mlist->mi[1].mi_lowat = st->st_wrinit->qi_minfo->mi_lowat;
+				strncpy(mlist->name, st->st_wrinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+				mlist->mi[0].index = 0x8;
+				mlist->mi[0].mi_idnum = st->st_wrinit->qi_minfo->mi_idnum;
+				strncpy(mlist->mi[0].mi_idname, st->st_wrinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+				mlist->mi[0].mi_minpsz = st->st_wrinit->qi_minfo->mi_minpsz;
+				mlist->mi[0].mi_maxpsz = st->st_wrinit->qi_minfo->mi_maxpsz;
+				mlist->mi[0].mi_hiwat = st->st_wrinit->qi_minfo->mi_hiwat;
+				mlist->mi[0].mi_lowat = st->st_wrinit->qi_minfo->mi_lowat;
 				if (st->st_wrinit->qi_mstat) {
-					mlist->ms[1].ms_pcnt = st->st_wrinit->qi_mstat->ms_pcnt;
-					mlist->ms[1].ms_scnt = st->st_wrinit->qi_mstat->ms_scnt;
-					mlist->ms[1].ms_ocnt = st->st_wrinit->qi_mstat->ms_ocnt;
-					mlist->ms[1].ms_ccnt = st->st_wrinit->qi_mstat->ms_ccnt;
-					mlist->ms[1].ms_acnt = st->st_wrinit->qi_mstat->ms_acnt;
-					mlist->ms[1].ms_flags = st->st_wrinit->qi_mstat->ms_flags;
-					mlist->ms[1].ms_xsize = st->st_wrinit->qi_mstat->ms_xsize;
+					mlist->ms[0].index = 0x8;
+					mlist->ms[0].ms_pcnt = st->st_wrinit->qi_mstat->ms_pcnt;
+					mlist->ms[0].ms_scnt = st->st_wrinit->qi_mstat->ms_scnt;
+					mlist->ms[0].ms_ocnt = st->st_wrinit->qi_mstat->ms_ocnt;
+					mlist->ms[0].ms_ccnt = st->st_wrinit->qi_mstat->ms_ccnt;
+					mlist->ms[0].ms_acnt = st->st_wrinit->qi_mstat->ms_acnt;
+					mlist->ms[0].ms_flags = st->st_wrinit->qi_mstat->ms_flags;
+					mlist->ms[0].ms_xsize = st->st_wrinit->qi_mstat->ms_xsize;
 				}
 			}
-			if (st->st_muxrinit) {
-				mlist->mi[2].mi_idnum = st->st_muxrinit->qi_minfo->mi_idnum;
-				strncpy(mlist->mi[2].mi_idname, st->st_muxrinit->qi_minfo->mi_idname, FMNAMESZ + 1);
-				mlist->mi[2].mi_minpsz = st->st_muxrinit->qi_minfo->mi_minpsz;
-				mlist->mi[2].mi_maxpsz = st->st_muxrinit->qi_minfo->mi_maxpsz;
-				mlist->mi[2].mi_hiwat = st->st_muxrinit->qi_minfo->mi_hiwat;
-				mlist->mi[2].mi_lowat = st->st_muxrinit->qi_minfo->mi_lowat;
-				if (st->st_muxrinit->qi_mstat) {
-					mlist->ms[2].ms_pcnt = st->st_muxrinit->qi_mstat->ms_pcnt;
-					mlist->ms[2].ms_scnt = st->st_muxrinit->qi_mstat->ms_scnt;
-					mlist->ms[2].ms_ocnt = st->st_muxrinit->qi_mstat->ms_ocnt;
-					mlist->ms[2].ms_ccnt = st->st_muxrinit->qi_mstat->ms_ccnt;
-					mlist->ms[2].ms_acnt = st->st_muxrinit->qi_mstat->ms_acnt;
-					mlist->ms[2].ms_flags = st->st_muxrinit->qi_mstat->ms_flags;
-					mlist->ms[2].ms_xsize = st->st_muxrinit->qi_mstat->ms_xsize;
+			if (st->st_rdinit) {
+				if (st->st_rdinit->qi_minfo == st->st_wrinit->qi_minfo)
+					mlist->mi[0].index |= 0x4;
+				else {
+					mlist->mi[1].index = 0x4;
+					mlist->mi[1].mi_idnum = st->st_rdinit->qi_minfo->mi_idnum;
+					strncpy(mlist->mi[1].mi_idname, st->st_rdinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+					mlist->mi[1].mi_minpsz = st->st_rdinit->qi_minfo->mi_minpsz;
+					mlist->mi[1].mi_maxpsz = st->st_rdinit->qi_minfo->mi_maxpsz;
+					mlist->mi[1].mi_hiwat = st->st_rdinit->qi_minfo->mi_hiwat;
+					mlist->mi[1].mi_lowat = st->st_rdinit->qi_minfo->mi_lowat;
+				}
+				if (st->st_rdinit->qi_mstat) {
+					if (st->st_rdinit->qi_mstat == st->st_wrinit->qi_mstat)
+						mlist->ms[0].index |= 0x4;
+					else {
+						mlist->ms[1].index = 0x4;
+						mlist->ms[1].ms_pcnt = st->st_rdinit->qi_mstat->ms_pcnt;
+						mlist->ms[1].ms_scnt = st->st_rdinit->qi_mstat->ms_scnt;
+						mlist->ms[1].ms_ocnt = st->st_rdinit->qi_mstat->ms_ocnt;
+						mlist->ms[1].ms_ccnt = st->st_rdinit->qi_mstat->ms_ccnt;
+						mlist->ms[1].ms_acnt = st->st_rdinit->qi_mstat->ms_acnt;
+						mlist->ms[1].ms_flags = st->st_rdinit->qi_mstat->ms_flags;
+						mlist->ms[1].ms_xsize = st->st_rdinit->qi_mstat->ms_xsize;
+					}
 				}
 			}
 			if (st->st_muxwinit) {
-				mlist->mi[3].mi_idnum = st->st_muxwinit->qi_minfo->mi_idnum;
-				strncpy(mlist->mi[3].mi_idname, st->st_muxwinit->qi_minfo->mi_idname, FMNAMESZ + 1);
-				mlist->mi[3].mi_minpsz = st->st_muxwinit->qi_minfo->mi_minpsz;
-				mlist->mi[3].mi_maxpsz = st->st_muxwinit->qi_minfo->mi_maxpsz;
-				mlist->mi[3].mi_hiwat = st->st_muxwinit->qi_minfo->mi_hiwat;
-				mlist->mi[3].mi_lowat = st->st_muxwinit->qi_minfo->mi_lowat;
+				if (st->st_muxwinit->qi_minfo == st->st_wrinit->qi_minfo)
+					mlist->mi[0].index |= 0x2;
+				else
+				if (st->st_muxwinit->qi_minfo == st->st_rdinit->qi_minfo)
+					mlist->mi[1].index |= 0x2;
+				else {
+					mlist->mi[2].index = 0x2;
+					mlist->mi[2].mi_idnum = st->st_muxwinit->qi_minfo->mi_idnum;
+					strncpy(mlist->mi[2].mi_idname, st->st_muxwinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+					mlist->mi[2].mi_minpsz = st->st_muxwinit->qi_minfo->mi_minpsz;
+					mlist->mi[2].mi_maxpsz = st->st_muxwinit->qi_minfo->mi_maxpsz;
+					mlist->mi[2].mi_hiwat = st->st_muxwinit->qi_minfo->mi_hiwat;
+					mlist->mi[2].mi_lowat = st->st_muxwinit->qi_minfo->mi_lowat;
+				}
 				if (st->st_muxwinit->qi_mstat) {
-					mlist->ms[3].ms_pcnt = st->st_muxwinit->qi_mstat->ms_pcnt;
-					mlist->ms[3].ms_scnt = st->st_muxwinit->qi_mstat->ms_scnt;
-					mlist->ms[3].ms_ocnt = st->st_muxwinit->qi_mstat->ms_ocnt;
-					mlist->ms[3].ms_ccnt = st->st_muxwinit->qi_mstat->ms_ccnt;
-					mlist->ms[3].ms_acnt = st->st_muxwinit->qi_mstat->ms_acnt;
-					mlist->ms[3].ms_flags = st->st_muxwinit->qi_mstat->ms_flags;
-					mlist->ms[3].ms_xsize = st->st_muxwinit->qi_mstat->ms_xsize;
+					if (st->st_muxwinit->qi_mstat == st->st_wrinit->qi_mstat)
+						mlist->ms[0].index |= 0x2;
+					else
+					if (st->st_muxwinit->qi_mstat == st->st_rdinit->qi_mstat)
+						mlist->ms[1].index |= 0x2;
+					else {
+						mlist->ms[2].index = 0x2;
+						mlist->ms[2].ms_pcnt = st->st_muxwinit->qi_mstat->ms_pcnt;
+						mlist->ms[2].ms_scnt = st->st_muxwinit->qi_mstat->ms_scnt;
+						mlist->ms[2].ms_ocnt = st->st_muxwinit->qi_mstat->ms_ocnt;
+						mlist->ms[2].ms_ccnt = st->st_muxwinit->qi_mstat->ms_ccnt;
+						mlist->ms[2].ms_acnt = st->st_muxwinit->qi_mstat->ms_acnt;
+						mlist->ms[2].ms_flags = st->st_muxwinit->qi_mstat->ms_flags;
+						mlist->ms[2].ms_xsize = st->st_muxwinit->qi_mstat->ms_xsize;
+					}
+				}
+			}
+			if (st->st_muxrinit) {
+				if (st->st_muxrinit->qi_minfo == st->st_wrinit->qi_minfo)
+					mlist->mi[0].index |= 0x1;
+				else
+				if (st->st_muxrinit->qi_minfo == st->st_rdinit->qi_minfo)
+					mlist->mi[1].index |= 0x1;
+				else
+				if (st->st_muxrinit->qi_minfo == st->st_muxwinit->qi_minfo)
+					mlist->mi[2].index |= 0x1;
+				else {
+					mlist->mi[3].index = 0x1;
+					mlist->mi[3].mi_idnum = st->st_muxrinit->qi_minfo->mi_idnum;
+					strncpy(mlist->mi[3].mi_idname, st->st_muxrinit->qi_minfo->mi_idname, FMNAMESZ + 1);
+					mlist->mi[3].mi_minpsz = st->st_muxrinit->qi_minfo->mi_minpsz;
+					mlist->mi[3].mi_maxpsz = st->st_muxrinit->qi_minfo->mi_maxpsz;
+					mlist->mi[3].mi_hiwat = st->st_muxrinit->qi_minfo->mi_hiwat;
+					mlist->mi[3].mi_lowat = st->st_muxrinit->qi_minfo->mi_lowat;
+				}
+				if (st->st_muxrinit->qi_mstat) {
+					if (st->st_muxrinit->qi_mstat == st->st_wrinit->qi_mstat)
+						mlist->ms[0].index |= 0x1;
+					else
+					if (st->st_muxrinit->qi_mstat == st->st_rdinit->qi_mstat)
+						mlist->ms[1].index |= 0x1;
+					else
+					if (st->st_muxrinit->qi_mstat == st->st_muxwinit->qi_mstat)
+						mlist->ms[2].index |= 0x1;
+					else {
+						mlist->ms[3].index = 0x1;
+						mlist->ms[3].ms_pcnt = st->st_muxrinit->qi_mstat->ms_pcnt;
+						mlist->ms[3].ms_scnt = st->st_muxrinit->qi_mstat->ms_scnt;
+						mlist->ms[3].ms_ocnt = st->st_muxrinit->qi_mstat->ms_ocnt;
+						mlist->ms[3].ms_ccnt = st->st_muxrinit->qi_mstat->ms_ccnt;
+						mlist->ms[3].ms_acnt = st->st_muxrinit->qi_mstat->ms_acnt;
+						mlist->ms[3].ms_flags = st->st_muxrinit->qi_mstat->ms_flags;
+						mlist->ms[3].ms_xsize = st->st_muxrinit->qi_mstat->ms_xsize;
+					}
 				}
 			}
 		}

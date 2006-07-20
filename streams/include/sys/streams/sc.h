@@ -81,6 +81,7 @@ struct bar {
 };
 
 struct sc_module_info {
+	int index;			/* same as index */
 	ushort mi_idnum;		/* module id number */
 	char mi_idname[FMNAMESZ + 1];	/* module name */
 	ssize_t mi_minpsz;		/* min packet size accepted */
@@ -90,6 +91,7 @@ struct sc_module_info {
 };
 
 typedef struct sc_module_stat {
+	int index;			/* same as index */
 	long ms_pcnt;			/* calls to qi_putp() */
 	long ms_scnt;			/* calls to qi_srvp() */
 	long ms_ocnt;			/* calls to qi_qopen() */
@@ -114,6 +116,7 @@ struct sc_list {
 
 #ifdef __LP64__
 struct sc_module_info32 {
+	int32_t index;			/* same as index */
 	u_int16_t mi_idnum;		/* module id number */
 	char mi_idname[FMNAMESZ + 1];	/* module name */
 	int32_t mi_minpsz;		/* min packet size accepted */
@@ -123,6 +126,7 @@ struct sc_module_info32 {
 };
 
 struct sc_module_stat32 {
+	int32_t index;			/* same as index */
 	int32_t ms_pcnt;		/* calls to qi_putp() */
 	int32_t ms_scnt;		/* calls to qi_srvp() */
 	int32_t ms_ocnt;		/* calls to qi_qopen() */

@@ -205,8 +205,8 @@ structure contains the following members:
 \fC\s-1\
 struct sc_mlist {
     int major;
-    struct module_info mi;
-    struct module_stat ms;
+    struct module_info mi[4];
+    struct module_stat ms[4];
 };
 \s+1\fP
 .fi
@@ -219,17 +219,29 @@ device number for the driver whose information is contained in this entry.
 .I mi
 Contains the
 .B module_info
-structure associated with the driver with the
+structures associated with the driver with the
 .I major
-device number specified.
-Note that if the driver definition contains more than one
-.BR module_info (9)
-structure in the definition, only that associated with the write side of the upper multiplexer
-(i.e.,
-.I st_wrinit
-in
-.BR streamtab (9))
-will be retrieved.
+device number specified; or with the module if the
+.I major
+device number is zero.
+The four
+.I mi
+structures correspond to those associated with the
+.I qi_minfo
+field of the
+.IR st_rdinit ", " st_wrinit ", " st_muxrinit " and " st_muxwinit
+.BR qinit (9)
+structures referenced by the driver or module's
+.BR streamtab (9)
+structure.
+.\"Note that if the driver definition contains more than one
+.\".BR module_info (9)
+.\"structure in the definition, only that associated with the write side of the upper multiplexer
+.\"(i.e.,
+.\".I st_wrinit
+.\"in
+.\".BR streamtab (9))
+.\"will be retrieved.
 For details of the
 .B module_info
 structure, see
@@ -238,17 +250,29 @@ structure, see
 .I ms
 Contains the
 .B module_stats
-structure associated with the driver with the
+structures associated with the driver with the
 .I major
-device number specified.
-Note that if the driver definition contains more than one
-.BR module_stat (9)
-structure in the definition, only that associated with the write side of the upper multiplexer
-(i.e.,
-.I st_wrinit
-in
-.BR streamtab (9))
-will be retrieved.
+device number specified; or with the module if the
+.I major
+device number is zero.
+The four
+.I ms
+structures correspond to those associated with the
+.I qi_mstat
+field of the
+.IR st_rdinit ", " st_wrinit ", " st_muxrinit " and " st_muxwinit
+.BR qinit (9)
+structures referenced by the driver or module's
+.BR streamtab (9)
+structure.
+.\"Note that if the driver definition contains more than one
+.\".BR module_stat (9)
+.\"structure in the definition, only that associated with the write side of the upper multiplexer
+.\"(i.e.,
+.\".I st_wrinit
+.\"in
+.\".BR streamtab (9))
+.\"will be retrieved.
 For details of the
 .B module_stat
 structure, see
