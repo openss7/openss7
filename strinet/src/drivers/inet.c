@@ -13831,6 +13831,7 @@ ss_sock_recvmsg(queue_t *q)
 				   procedure runs (possibly again), ss_r_data() will do a putbq()
 				   on a subsequent failure and suspend the service procedure from
 				   there. */
+#if 0
 				if (!putq(q, mp)) {
 					swerr();
 					/* Will only happen if there is not enough memory to
@@ -13841,6 +13842,9 @@ ss_sock_recvmsg(queue_t *q)
 					   ss_open()) so that this call cannot fail. */
 					freemsg(mp);
 				}
+#else
+				put(q, mp);
+#endif
 				return (err);
 			}
 		}
@@ -13874,8 +13878,12 @@ ss_putctl(ss_t *ss, queue_t *q, int type, void streamscall (*func) (long), struc
 		p->sk = sk;
 		p->state = sk->sk_state;	/* capture current state */
 		mp->b_wptr += sizeof(*p);
+#if 0
 		if (!putq(q, mp))
 			freemsg(mp);	/* FIXME */
+#else
+		put(q, mp);
+#endif
 		return (void) (0);
 	}
 	/* set up bufcall so we don't lose events */
