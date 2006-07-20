@@ -140,6 +140,8 @@ Options:\n\
         print module_info and module_stat only\n\
     -a, --all\n\
         print info or stats for all queues\n\
+    -r, --reset\n\
+        reset all statistics upon collection\n\
     -q, --quiet\n\
         suppress output\n\
     -d, --debug [LEVEL]\n\
@@ -203,6 +205,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 
 enum { CMN_NONE, CMN_NAMES, CMN_LONG, CMN_COUNT, CMN_BOTH, } command = CMN_NONE;
 int option_all = 0;
+int option_reset = 0;
 
 void
 printit(struct sc_mlist *l, int cmd, int all)
@@ -369,6 +372,7 @@ main(int argc, char *argv[])
 			{"count",	no_argument,		NULL, 'c'},
 			{"both",	no_argument,		NULL, 'b'},
 			{"all",		no_argument,		NULL, 'a'},
+			{"reset"	no_argument,		NULL, 'r'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
@@ -380,9 +384,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "lcbaqD::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "lcbarqD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "lcbaqDvhVC?");
+		c = getopt(argc, argv, "lcbarqDvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -396,6 +400,11 @@ main(int argc, char *argv[])
 			if (debug)
 				fprintf(stderr, "%s: setting option all\n", argv[0]);
 			option_all = 1;
+			break;
+		case 'r':
+			if (debug)
+				fprintf(stderr, "%s: setting option reset\n", argv[0]);
+			option_reset = 1;
 			break;
 		case 'b':
 			if (command != CMN_NONE && command != CMN_LONG && command != CMN_COUNT)
@@ -525,11 +534,20 @@ main(int argc, char *argv[])
 	}
 	list->sc_nmods = count;
 	list->sc_mlist = (struct sc_mlist *) (list + 1);
-	if (ioctl(fd, SC_IOC_LIST, list) < 0) {
-		if (debug)
-			fprintf(stderr, "%s: could not perform second SC_IOC_LIST command\n", argv[0]);
-		perror(argv[0]);
-		exit(1);
+	if (option_reset) {
+		if (ioctl(fd, SC_IOC_RESET, list) < 0) {
+			if (debug)
+				fprintf(stderr, "%s: could not perform second SC_IOC_RESET command\n", argv[0]);
+			perror(argv[0]);
+			exit(1);
+		}
+	} else {
+		if (ioctl(fd, SC_IOC_LIST, list) < 0) {
+			if (debug)
+				fprintf(stderr, "%s: could not perform second SC_IOC_LIST command\n", argv[0]);
+			perror(argv[0]);
+			exit(1);
+		}
 	}
 	if (optind < argc) {
 		int ret = 0;

@@ -158,6 +158,11 @@ The
 .B -a
 option causes it to display information for all queues.
 .TP
+\fB-r\fR, \fB--reset\fR
+All statistics are reset after collection.  This is statistics for all STREAMS
+modules and drivers, not just those listed as
+.IR module .
+.TP
 \fB-q\fR, \fB--quiet\fR
 Suppresses normal output.
 .TP
@@ -523,7 +528,7 @@ does not document long options.
 .IP \(em
 .IR AIX \(rg
 does not document the
-.BR -b ", " -a ", " -q ", " -v ", " -h ", " -V " or " -C
+.BR -b ", " -a ", " -r ", " -q ", " -v ", " -h ", " -V " or " -C
 options.
 .IP \(em
 Options

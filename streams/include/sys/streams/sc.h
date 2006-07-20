@@ -67,7 +67,8 @@
 #endif
 
 #define SC_IOC_MAGIC 'C'
-#define SC_IOC_LIST ((SC_IOC_MAGIC << 8) | 0x01)
+#define SC_IOC_LIST	((SC_IOC_MAGIC << 8) | 0x01)
+#define SC_IOC_RESET	((SC_IOC_MAGIC << 8) | 0x02)
 
 #define SCI_FOO 1
 #define SCI_BAR 2
