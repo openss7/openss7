@@ -15659,7 +15659,7 @@ ss_putq(queue_t *q, mblk_t *mp, streams_fastcall int (*proc) (queue_t *, mblk_t 
 {
 	int rtn = 0, locked;
 
-	if (mp->b_datap->db_type < QPCTL && (q->q_first || q->q_flag & QSVCBUSY)) {
+	if (mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY))) {
 		if (!putq(q, mp))
 			freemsg(mp);	/* FIXME */
 		return (0);
