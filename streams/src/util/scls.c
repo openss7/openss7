@@ -372,7 +372,7 @@ main(int argc, char *argv[])
 			{"count",	no_argument,		NULL, 'c'},
 			{"both",	no_argument,		NULL, 'b'},
 			{"all",		no_argument,		NULL, 'a'},
-			{"reset"	no_argument,		NULL, 'r'},
+			{"reset",	no_argument,		NULL, 'r'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},

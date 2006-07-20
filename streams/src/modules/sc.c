@@ -480,7 +480,7 @@ static streamscall int
 sc_wput(queue_t *q, mblk_t *mp)
 {
 	union ioctypes *ioc;
-	int err = 0, rval = 0;
+	int err = 0, rval = 0, reset = 0;
 	mblk_t *dp = mp->b_cont;
 
 	switch (mp->b_datap->db_type) {
@@ -508,7 +508,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 	{
 		caddr_t uaddr;
 		size_t usize;
-		int reset = 0;
 
 		_trace();
 		ioc = (typeof(ioc)) mp->b_rptr;
