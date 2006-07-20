@@ -130,6 +130,8 @@ static struct module_info connld_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat connld_mstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -166,6 +168,7 @@ static struct qinit connld_qinit = {
 	.qi_qopen = connld_open,
 	.qi_qclose = connld_close,
 	.qi_minfo = &connld_minfo,
+	.qi_mstat = &connld_mstat,
 };
 
 static struct streamtab connld_info = {

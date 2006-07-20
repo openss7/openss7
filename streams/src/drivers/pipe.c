@@ -151,17 +151,22 @@ static struct module_info pipe_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat pipe_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat pipe_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 static struct qinit pipe_rinit = {
 	.qi_putp = strrput,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
 	.qi_minfo = &pipe_minfo,
+	.qi_mstat = &pipe_rstat,
 };
 
 static struct qinit pipe_winit = {
 	.qi_putp = strwput,
 	.qi_srvp = strwsrv,
 	.qi_minfo = &pipe_minfo,
+	.qi_mstat = &pipe_wstat,
 };
 
 static struct streamtab pipe_info = {

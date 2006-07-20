@@ -143,6 +143,9 @@ static struct module_info tcpns_minfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
+static struct module_stat tcpns_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat tcpns_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 static streamscall int tcpns_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int tcpns_close(queue_t *, int, cred_t *);
 
@@ -154,11 +157,13 @@ static struct qinit tcpns_rinit = {
 	.qi_qopen = tcpns_open,		/* Each open */
 	.qi_qclose = tcpns_close,	/* Last close */
 	.qi_minfo = &tcpns_minfo,	/* Information */
+	.qi_mstat = &tcpns_rstat,	/* Statistics */
 };
 
 static struct qinit tcpns_winit = {
 	.qi_putp = tcpns_wput,		/* Write put (message from above) */
 	.qi_minfo = &tcpns_minfo,	/* Information */
+	.qi_mstat = &tcpns_wstat,	/* Statistics */
 };
 
 MODULE_STATIC struct streamtab tcpnsinfo = {

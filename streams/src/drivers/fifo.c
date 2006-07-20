@@ -155,17 +155,22 @@ static struct module_info fifo_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat fifo_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat fifo_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 static struct qinit fifo_rinit = {
 	.qi_putp = strrput,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
 	.qi_minfo = &fifo_minfo,
+	.qi_mstat = &fifo_rstat,
 };
 
 static struct qinit fifo_winit = {
 	.qi_putp = strwput,
 	.qi_srvp = strwsrv,
 	.qi_minfo = &fifo_minfo,
+	.qi_mstat = &fifo_wstat,
 };
 
 static struct streamtab fifo_info = {

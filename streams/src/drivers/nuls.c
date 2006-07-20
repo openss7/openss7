@@ -174,6 +174,9 @@ static struct module_info nuls_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat nuls_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat nuls_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 #ifdef LIS
 #define _trace() while (0) { }
 #define _ptrace(__x) while (0) { }
@@ -366,12 +369,14 @@ static struct qinit nuls_rqinit = {
 	.qi_qopen = nuls_open,
 	.qi_qclose = nuls_close,
 	.qi_minfo = &nuls_minfo,
+	.qi_mstat = &nuls_rstat,
 };
 
 static struct qinit nuls_wqinit = {
 	.qi_putp = nuls_put,
 	.qi_srvp = NULL,
 	.qi_minfo = &nuls_minfo,
+	.qi_mstat = &nuls_wstat,
 };
 
 static struct streamtab nuls_info = {

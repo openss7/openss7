@@ -159,6 +159,9 @@ STATIC struct module_info bufmod_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+STATIC struct module_stat bufmod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat bufmod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -283,12 +286,14 @@ STATIC struct qinit bufmod_rinit = {
 	.qi_qopen = bufmod_open,
 	.qi_qclose = bufmod_close,
 	.qi_minfo = &bufmod_minfo,
+	.qi_mstat = &bufmod_rstat,
 };
 
 STATIC struct qinit bufmod_winit = {
 	.qi_putp = bufmod_wput,
 	.qi_srvp = bufmod_srv,
 	.qi_minfo = &bufmod_minfo,
+	.qi_mstat = &bufmod_wstat,
 };
 
 STATIC struct streamtab bufmod_info = {

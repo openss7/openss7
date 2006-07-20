@@ -175,6 +175,8 @@ static struct module_info sad_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat sad_mstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 #ifdef __LP64__
 #  undef WITH_32BIT_CONVERSION
 #  define WITH_32BIT_CONVERSION 1
@@ -538,6 +540,7 @@ static struct qinit sad_qinit = {
 	.qi_qopen = sad_open,
 	.qi_qclose = sad_close,
 	.qi_minfo = &sad_minfo,
+	.qi_minfo = &sad_mstat,
 };
 
 static struct streamtab sad_info = {

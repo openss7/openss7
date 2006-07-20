@@ -734,6 +734,9 @@ STATIC struct module_info ss_minfo = {
 	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
+STATIC struct module_stat ss_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat ss_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 STATIC streamscall int ss_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int ss_close(queue_t *, int, cred_t *);
 
@@ -746,6 +749,7 @@ STATIC struct qinit ss_rinit = {
 	.qi_qopen = ss_open,		/* Each open */
 	.qi_qclose = ss_close,		/* Last close */
 	.qi_minfo = &ss_minfo,		/* Information */
+	.qi_mstat = &ss_rstat,		/* Statistics */
 };
 
 STATIC streamscall int ss_wput(queue_t *, mblk_t *);
@@ -755,6 +759,7 @@ STATIC struct qinit ss_winit = {
 	.qi_putp = ss_wput,		/* Write put (msg from above) */
 	.qi_srvp = ss_wsrv,		/* Write queue service */
 	.qi_minfo = &ss_minfo,		/* Information */
+	.qi_mstat = &ss_wstat,		/* Statistics */
 };
 
 MODULE_STATIC struct streamtab ss_info = {

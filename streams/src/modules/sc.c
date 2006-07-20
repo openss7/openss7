@@ -149,6 +149,9 @@ static struct module_info sc_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat sc_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat sc_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 #if defined __LP64__ && defined LFS
 #  undef WITH_32BIT_CONVERSION
 #  define WITH_32BIT_CONVERSION 1
@@ -618,11 +621,13 @@ static struct qinit sc_rqinit = {
 	.qi_qopen = sc_open,
 	.qi_qclose = sc_close,
 	.qi_minfo = &sc_minfo,
+	.qi_mstat = &sc_rstat,
 };
 
 static struct qinit sc_wqinit = {
 	.qi_putp = sc_wput,
 	.qi_minfo = &sc_minfo,
+	.qi_mstat = &sc_wstat,
 };
 
 static struct streamtab sc_info = {

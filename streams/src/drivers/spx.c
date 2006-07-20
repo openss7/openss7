@@ -145,6 +145,9 @@ static struct module_info spx_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat spx_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat spx_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 typedef struct spx {
 	struct spx *next;
 	struct spx **prev;
@@ -352,12 +355,14 @@ static struct qinit spx_rqinit = {
 	.qi_qopen = spx_open,
 	.qi_qclose = spx_close,
 	.qi_minfo = &spx_minfo,
+	.qi_mstat = &spx_rstat,
 };
 
 static struct qinit spx_wqinit = {
 	.qi_putp = spx_wput,
 	.qi_srvp = NULL,
 	.qi_minfo = &spx_minfo,
+	.qi_mstat = &spx_wstat,
 };
 
 static struct streamtab spx_info = {

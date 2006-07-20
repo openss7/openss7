@@ -174,6 +174,9 @@ static struct module_info echo_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat echo_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat echo_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 #ifdef LIS
 #define _trace() while (0) { }
 #define _ptrace(__x) while (0) { }
@@ -418,12 +421,14 @@ static struct qinit echo_rqinit = {
 	.qi_qopen = echo_open,
 	.qi_qclose = echo_close,
 	.qi_minfo = &echo_minfo,
+	.qi_mstat = &echo_rstat,
 };
 
 static struct qinit echo_wqinit = {
 	.qi_putp = echo_wput,
 	.qi_srvp = echo_wsrv,
 	.qi_minfo = &echo_minfo,
+	.qi_mstat = &echo_wstat,
 };
 
 static struct streamtab echo_info = {

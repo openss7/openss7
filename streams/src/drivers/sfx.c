@@ -149,17 +149,22 @@ static struct module_info sfx_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat sfx_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat sfx_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 static struct qinit sfx_rqinit = {
 	.qi_putp = strrput,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
 	.qi_minfo = &sfx_minfo,
+	.qi_mstat = &sfx_rstat,
 };
 
 static struct qinit sfx_wqinit = {
 	.qi_putp = strwput,
 	.qi_srvp = strwsrv,
 	.qi_minfo = &sfx_minfo,
+	.qi_mstat = &sfx_wstat,
 };
 
 static struct streamtab sfx_info = {

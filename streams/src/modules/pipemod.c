@@ -134,6 +134,8 @@ static struct module_info pipemod_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat pipemod_mstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -211,6 +213,7 @@ static struct qinit pipemod_qinit = {
 	.qi_qopen = pipemod_open,
 	.qi_qclose = pipemod_close,
 	.qi_minfo = &pipemod_minfo,
+	.qi_mstat = &pipemod_mstat,
 };
 
 static struct streamtab pipemod_info = {

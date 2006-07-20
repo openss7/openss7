@@ -189,6 +189,9 @@ STATIC struct module_info nullmod_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+STATIC struct module_stat nullmod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat nullmod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -430,11 +433,13 @@ STATIC struct qinit nullmod_rinit = {
 	.qi_qopen = nullmod_open,
 	.qi_qclose = nullmod_close,
 	.qi_minfo = &nullmod_minfo,
+	.qi_mstat = &nullmod_rstat,
 };
 
 STATIC struct qinit nullmod_winit = {
 	.qi_putp = nullmod_wput,
 	.qi_minfo = &nullmod_minfo,
+	.qi_mstat = &nullmod_wstat,
 };
 
 STATIC struct streamtab nullmod_info = {

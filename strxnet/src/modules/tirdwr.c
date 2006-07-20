@@ -128,6 +128,9 @@ static struct module_info tirdwr_minfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
+static struct module_stat tirdwr_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat tirdwr_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 static streamscall int tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int tirdwr_close(queue_t *, int, cred_t *);
 
@@ -139,11 +142,13 @@ static struct qinit tirdwr_rinit = {
 	.qi_qopen = tirdwr_open,	/* Each open */
 	.qi_qclose = tirdwr_close,	/* Last close */
 	.qi_minfo = &tirdwr_minfo,	/* Information */
+	.qi_mstat = &tirdwr_rstat,	/* Statistics */
 };
 
 static struct qinit tirdwr_winit = {
 	.qi_putp = tirdwr_wput,		/* Write put (message from above) */
 	.qi_minfo = &tirdwr_minfo,	/* Information */
+	.qi_mstat = &tirdwr_wstat,	/* Statistics */
 };
 
 static struct streamtab tirdwrinfo = {

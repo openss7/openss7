@@ -151,14 +151,18 @@ static struct module_info nsdev_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat nsdev_mstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 static struct qinit nsdev_rinit = {
 	// qi_putp:putq,
 	qi_minfo:&nsdev_minfo,
+	qi_mstat:&nsdev_mstat,
 };
 
 static struct qinit nsdev_winit = {
 	// qi_putp:putq,
 	qi_minfo:&nsdev_minfo,
+	qi_mstat:&nsdev_mstat,
 };
 
 static struct streamtab nsdev_info = {

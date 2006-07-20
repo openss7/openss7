@@ -256,6 +256,9 @@ STATIC struct module_info tpi_minfo = {
 	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
+STATIC struct module_stat tpi_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat tpi_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 STATIC streamscall int tpi_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int tpi_qclose(queue_t *, int, cred_t *);
 
@@ -265,12 +268,14 @@ STATIC struct qinit tpi_rinit = {
 	.qi_qopen = tpi_qopen,		/* Each open */
 	.qi_qclose = tpi_qclose,	/* Last close */
 	.qi_minfo = &tpi_minfo,		/* Information */
+	.qi_mstat = &tpi_rstat,		/* Statistics */
 };
 
 STATIC struct qinit tpi_winit = {
 	.qi_putp = &ss7_iput,		/* Write put (msg from above) */
 	.qi_srvp = &ss7_isrv,		/* Write queue service */
 	.qi_minfo = &tpi_minfo,		/* Information */
+	.qi_mstat = &tpi_wstat,		/* Statistics */
 };
 
 MODULE_STATIC struct streamtab tpi_info = {

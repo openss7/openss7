@@ -194,6 +194,9 @@ static struct module_info testmod_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat testmod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat testmod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -595,11 +598,13 @@ static struct qinit testmod_rinit = {
 	.qi_qopen = testmod_open,
 	.qi_qclose = testmod_close,
 	.qi_minfo = &testmod_minfo,
+	.qi_mstat = &testmod_rstat,
 };
 
 static struct qinit testmod_winit = {
 	.qi_putp = testmod_wput,
 	.qi_minfo = &testmod_minfo,
+	.qi_mstat = &testmod_wstat,
 };
 
 static struct streamtab testmod_info = {
