@@ -650,6 +650,32 @@ function netperf_options()
     fi
 }
 
+function scls_find()
+{
+    scls=`which scls 2>/dev/null`
+    pname=`$ECHO "$scls" | $SED -e 's%^.*/%%'`
+    if test ":$pname" = ":scls" ; then
+	return
+    fi
+    if test -x "$scls" ; then
+	return
+    fi
+    # scls is not in our path, check elsewhere
+    scls=`whereis scls 2>/dev/null`
+    scls=`$ECHO "$scls" | $SED -e 's%^scls:[[:space:]]*%%;s%[[:space:]].*%%'`
+    pname=`$ECHO "$scls" | $SED -e 's%^.*/%%'`
+    if test ":$pname" = ":scls" ; then
+	return
+    fi
+    if test -x "$scls" ; then
+	return
+    fi
+    if test ${verbose:-1} -gt 0 ; then
+	$ECHO "$program: warning -- cannot find scls executable" >&2
+    fi
+    scls=scls
+}
+
 function netperf_find()
 {
     netperf=`which netperf 2>/dev/null`
@@ -739,6 +765,29 @@ function netperf_calibrate()
     fi
 }
 
+function scls_show()
+{
+    if test :${xti:-no} = :no ; then
+	return
+    fi
+    scls_modules="sth timod"
+    if test :${device:-/dev/udp} = :/dev/udp ; then
+	scls_modules="$scls_modules inet"
+    fi
+    if test :${device:-/dev/udp} = :/dev/udp2 ; then
+	scls_modules="$scls_modules udp2"
+    fi
+    if test ${verbose:-1} -gt 1 ; then
+	$ECHO "STREAMS statistics"
+	$ECHO
+	$ECHO "------------------------------------"
+	$ECHO "$scls -c $scls_modules"
+    fi
+    if test :${run:-yes} != :no ; then
+	$scls $scls_modules
+    fi
+}
+
 function netperf_udp_test()
 {
     if test :${xti:-no} = :no ; then
@@ -763,6 +812,7 @@ function netperf_udp_test()
 	    if test ${verbose:-1} -gt 0 ; then
 		$ECHO
 	    fi
+	    scls_show
 	    if test "$sndadd" -le 0 -a "$sndmult" -le 0 ; then
 		break
 	    fi
@@ -779,6 +829,7 @@ function netperf_test()
 	$ECHO
     fi
     netperf_calibrate
+    scls_show
     netperf_udp_test
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO "Tests completed at `date`"
@@ -802,6 +853,7 @@ function run_command()
     netperf_copying
     netperf_options
     netperf_find
+    scls_find
     if test "${verbose:-1}" -gt 1 ; then
 	((verb=$verbose-1))
 	verb="-v $verb"
