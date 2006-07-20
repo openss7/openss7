@@ -8336,14 +8336,17 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
+#if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
 #else
 	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
 #endif
 	{
+#endif
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
+#if 0
 	} else {
 		int rtn;
 
@@ -8356,6 +8359,7 @@ tp_rput(queue_t *q, mblk_t *mp)
 		else
 			tp_putq_slow(q, mp, rtn);
 	}
+#endif
 	return (0);
 }
 
