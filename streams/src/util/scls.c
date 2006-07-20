@@ -123,7 +123,7 @@ help(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] [{-c|--count}|{-l|--long}] [MODULE ...]\n\
+    %1$s [options] [{-l|--long}] [{-c|--count}] [{-b|--both}] [MODULE ...]\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -132,10 +132,14 @@ Arguments:\n\
 	specific drivers and modules to list instead of all drivers and\n\
 	modules\n\
 Options:\n\
-    -c, --count\n\
-        print module_stats only\n\
     -l, --long\n\
-        print module_info and module_stats\n\
+        print module_info only\n\
+    -c, --count\n\
+        print module_stat only\n\
+    -b, --both\n\
+        print module_info and module_stat only\n\
+    -a, --all\n\
+        print info or stats for all queues\n\
     -q, --quiet\n\
         suppress output\n\
     -d, --debug [LEVEL]\n\
@@ -198,27 +202,35 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 enum { CMN_NONE, CMN_NAMES, CMN_LONG, CMN_COUNT, CMN_BOTH, } command = CMN_NONE;
+int option_all = 0;
 
 void
-printit(struct sc_mlist *l, int cmd)
+printit(struct sc_mlist *l, int cmd, int all)
 {
 	int i;
 
 	if (output <= 0 || l->major == -1)
 		return;
 	for (i = 0; i < 4; i++) {
-		if (l->mi[i].mi_idnum == 0)
-			continue;
-		if (i > 0 && cmd != CMN_LONG && cmd != CMN_BOTH && cmd != CMN_COUNT)
-			continue;
-//		if (i == 0)
+		if (i > 0) {
+			if (all == 0)
+				continue;
+			if (l->mi[i].index == 0 && l->ms[i].index == 0)
+				continue;
+			if (l->mi[i].index == 0 && cmd == CMN_LONG)
+				continue;
+			if (l->ms[i].index == 0 && cmd == CMN_COUNT)
+				continue;
+			if (cmd != CMN_LONG && cmd != CMN_BOTH && cmd != CMN_COUNT)
+				continue;
+		}
+		if (i == 0)
 			fprintf(stdout, "%-9s", l->name);
-//		else
-//			fprintf(stdout, "         ");
+		else
+			fprintf(stdout, "         ");
 		switch (cmd) {
 		case CMN_LONG:
-		case CMN_BOTH:
-//			if (i == 0) {
+			if (i == 0) {
 				if (l->major != 0) {
 					fprintf(stdout, " driver");
 					fprintf(stdout, " %3ld", (long) l->major);
@@ -226,30 +238,85 @@ printit(struct sc_mlist *l, int cmd)
 					fprintf(stdout, " module");
 					fprintf(stdout, "    ");
 				}
-//			} else {
-//				fprintf(stdout, "           ");
-//			}
+			} else {
+				fprintf(stdout, "           ");
+			}
 			if (l->mi[i].index != 0) {
 				fprintf(stdout, " %5u", l->mi[i].mi_idnum);
 				fprintf(stdout, " %6ld", (long) l->mi[i].mi_minpsz);
 				fprintf(stdout, " %6ld", (long) l->mi[i].mi_maxpsz);
 				fprintf(stdout, " %6ld", (long) l->mi[i].mi_hiwat);
 				fprintf(stdout, " %6ld", (long) l->mi[i].mi_lowat);
-				fprintf(stdout, " #");
-				if (l->mi[i].index & 0x8)
-					fprintf(stdout, " wr");
-				if (l->mi[i].index & 0x4)
-					fprintf(stdout, " rd");
-				if (l->mi[i].index & 0x2)
-					fprintf(stdout, " muxw");
-				if (l->mi[i].index & 0x1)
-					fprintf(stdout, " muxr");
+				if (all) {
+					fprintf(stdout, " :");
+					if (l->mi[i].index & 0x8)
+						fprintf(stdout, " wr");
+					if (l->mi[i].index & 0x4)
+						fprintf(stdout, " rd");
+					if (l->mi[i].index & 0x2)
+						fprintf(stdout, " muxw");
+					if (l->mi[i].index & 0x1)
+						fprintf(stdout, " muxr");
+				}
 			}
-			if (cmd == CMN_BOTH)
-				goto show_counts;
 			break;
 		case CMN_COUNT:
-		      show_counts:
+			if (i == 0 || l->ms[i].index != 0) {
+				if (l->ms[i].index != 0) {
+					fprintf(stdout, " %8ld", (long) l->ms[i].ms_pcnt);
+					fprintf(stdout, " %8ld", (long) l->ms[i].ms_scnt);
+					fprintf(stdout, " %8ld", (long) l->ms[i].ms_ocnt);
+					fprintf(stdout, " %8ld", (long) l->ms[i].ms_ccnt);
+					fprintf(stdout, " %8ld", (long) l->ms[i].ms_acnt);
+					fprintf(stdout, " %8x", l->ms[i].ms_flags);
+				} else {
+					fprintf(stdout, "         ");
+					fprintf(stdout, "         ");
+					fprintf(stdout, "         ");
+					fprintf(stdout, "         ");
+					fprintf(stdout, "         ");
+					fprintf(stdout, "         ");
+					l->ms[i].index = 0xf;
+				}
+				if (all) {
+					fprintf(stdout, " :");
+					if (l->ms[i].index & 0x8)
+						fprintf(stdout, " wr");
+					if (l->ms[i].index & 0x4)
+						fprintf(stdout, " rd");
+					if (l->ms[i].index & 0x2)
+						fprintf(stdout, " muxw");
+					if (l->ms[i].index & 0x1)
+						fprintf(stdout, " muxr");
+				}
+			}
+			break;
+		case CMN_BOTH:
+			if (i == 0) {
+				if (l->major != 0) {
+					fprintf(stdout, " driver");
+					fprintf(stdout, " %3ld", (long) l->major);
+				} else {
+					fprintf(stdout, " module");
+					fprintf(stdout, "    ");
+				}
+			} else {
+				fprintf(stdout, "           ");
+			}
+			if (l->mi[i].index != 0) {
+				fprintf(stdout, " %5u", l->mi[i].mi_idnum);
+				fprintf(stdout, " %6ld", (long) l->mi[i].mi_minpsz);
+				fprintf(stdout, " %6ld", (long) l->mi[i].mi_maxpsz);
+				fprintf(stdout, " %6ld", (long) l->mi[i].mi_hiwat);
+				fprintf(stdout, " %6ld", (long) l->mi[i].mi_lowat);
+			} else {
+				fprintf(stdout, "      ");
+				fprintf(stdout, "       ");
+				fprintf(stdout, "       ");
+				fprintf(stdout, "       ");
+				fprintf(stdout, "       ");
+				l->mi[i].index = 0xf;
+			}
 			if (l->ms[i].index != 0) {
 				fprintf(stdout, " %8ld", (long) l->ms[i].ms_pcnt);
 				fprintf(stdout, " %8ld", (long) l->ms[i].ms_scnt);
@@ -257,22 +324,32 @@ printit(struct sc_mlist *l, int cmd)
 				fprintf(stdout, " %8ld", (long) l->ms[i].ms_ccnt);
 				fprintf(stdout, " %8ld", (long) l->ms[i].ms_acnt);
 				fprintf(stdout, " %8x", l->ms[i].ms_flags);
-				fprintf(stdout, " #");
-				if (l->ms[i].index & 0x8)
+			} else {
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				l->ms[i].index = 0xf;
+			}
+			if (all) {
+				fprintf(stdout, " :");
+				if (l->mi[i].index & l->ms[i].index & 0x8)
 					fprintf(stdout, " wr");
-				if (l->ms[i].index & 0x4)
+				if (l->mi[i].index & l->ms[i].index & 0x4)
 					fprintf(stdout, " rd");
-				if (l->ms[i].index & 0x2)
+				if (l->mi[i].index & l->ms[i].index & 0x2)
 					fprintf(stdout, " muxw");
-				if (l->ms[i].index & 0x1)
+				if (l->mi[i].index & l->ms[i].index & 0x1)
 					fprintf(stdout, " muxr");
 			}
 			break;
 		}
 		fprintf(stdout, "\n");
 	}
-//	if (cmd == CMN_LONG || cmd == CMN_BOTH || cmd == CMN_COUNT)
-//		fprintf(stdout, "\n");
+//      if (cmd == CMN_LONG || cmd == CMN_BOTH || cmd == CMN_COUNT)
+//              fprintf(stdout, "\n");
 };
 
 int
@@ -290,6 +367,8 @@ main(int argc, char *argv[])
 		static struct option long_options[] = {
 			{"long",	no_argument,		NULL, 'l'},
 			{"count",	no_argument,		NULL, 'c'},
+			{"both",	no_argument,		NULL, 'b'},
+			{"all",		no_argument,		NULL, 'a'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
@@ -301,9 +380,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "lcqD::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "lcbaqD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "lcqDvhVC?");
+		c = getopt(argc, argv, "lcbaqDvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -313,6 +392,18 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
+		case 'a':
+			if (debug)
+				fprintf(stderr, "%s: setting option all\n", argv[0]);
+			option_all = 1;
+			break;
+		case 'b':
+			if (command != CMN_NONE && command != CMN_LONG && command != CMN_COUNT)
+				goto bad_option;
+			if (debug)
+				fprintf(stderr, "%s: setting both command\n", argv[0]);
+			command = CMN_BOTH;
+			break;
 		case 'l':
 			if (command != CMN_NONE)
 				goto bad_option;
@@ -450,7 +541,7 @@ main(int argc, char *argv[])
 				    == 0)
 					break;
 			if (i < count)
-				printit(&list->sc_mlist[i], command);
+				printit(&list->sc_mlist[i], command, option_all);
 			else {
 				fprintf(stderr, "%s: %s: %s\n", argv[0], argv[optind],
 					strerror(ENXIO));
@@ -462,7 +553,7 @@ main(int argc, char *argv[])
 	} else {
 		/* have no module name arguments - operate on all */
 		for (i = 0; i < count; i++)
-			printit(&list->sc_mlist[i], command);
+			printit(&list->sc_mlist[i], command, option_all);
 	}
 	if (ioctl(fd, I_POP, NULL) < 0) {
 		perror(argv[0]);
