@@ -240,7 +240,7 @@ function help()
     cat <<EOF
 Arguments:
     HOSTNAME
-        name of remote host [Default: $default_hostname]
+	name of remote host [Default: $default_hostname]
     CPU
 	calibrate CPU [Default: $default_calibrate]
 Options:
@@ -251,7 +251,7 @@ Options:
     -H, --hostname=HOSTNAME[:PORT]
 	add a name or address to the netserver host list
     -l, --hostnames='HOSTNAME[:PORT][ HOSTNAME[:PORT]]*'
-        names or addresses of netserver hosts [Default: $default_hostnames]
+	names or addresses of netserver hosts [Default: $default_hostnames]
     -n, --numproc=NUMPROC
 	add a processor number to the list
     -N, --numprocs='NUMPROC[ NUMPROC]*'
@@ -624,8 +624,8 @@ esac
 
 args=($nonopt${nonopt:+ }${1+$@})
 
-if test "$verbose" -gt 2 ; then
-$ECHO "Nonoption arguments: ${args[@]}"
+if test "$verbose" -gt 3 ; then
+    $ECHO "Nonoption arguments: ${args[@]}"
 fi
 
 while test "${#args[@]}" -gt 0
@@ -684,12 +684,39 @@ done
 
 function netperf_options()
 {
-    if test ${verbose:-1} -gt 2 ; then
+    if test ${verbose:-1} -gt 3 ; then
 	for arg in $defaults ; do
 	    val=`eval 'echo $'"$arg"`
 	    $ECHO "Option $arg is \`$val'"
 	done
+	$ECHO
     fi
+}
+
+function scls_find()
+{
+    scls=`which scls 2>/dev/null`
+    pname=`$ECHO "$scls" | $SED -e 's%^.*/%%'`
+    if test ":$pname" = ":scls" ; then
+	return
+    fi
+    if test -x "$scls" ; then
+	return
+    fi
+    # scls is not in our path, check elsewhere
+    scls=`whereis scls 2>/dev/null`
+    scls=`$ECHO "$scls" | $SED -e 's%^scls:[[:space:]]*%%;s%[[:space:]].*%%'`
+    pname=`$ECHO "$scls" | $SED -e 's%^.*/%%'`
+    if test ":$pname" = ":scls" ; then
+	return
+    fi
+    if test -x "$scls" ; then
+	return
+    fi
+    if test ${verbose:-1} -gt 0 ; then
+	$ECHO "$program: warning -- cannot find scls executable" >&2
+    fi
+    scls=scls
 }
 
 function netperf_find()
@@ -781,6 +808,52 @@ function netperf_calibrate()
     fi
 }
 
+function scls_show()
+{
+    if test ${verbose:-1} -le 1 ; then
+	return
+    fi
+    if test :${xti:-no} = :no ; then
+	return
+    fi
+    scls_modules="sth timod"
+    if test :${device:-/dev/udp} = :/dev/udp ; then
+	scls_modules="$scls_modules inet"
+    fi
+    if test :${device:-/dev/udp} = :/dev/udp2 ; then
+	scls_modules="$scls_modules udp2"
+    fi
+    if test :${device:-/dev/tcp} = :/dev/tcp ; then
+	scls_modules="$scls_modules inet"
+    fi
+    if test :${device:-/dev/tcp} = :/dev/tcp2 ; then
+	scls_modules="$scls_modules tcp2"
+    fi
+    if test :${device:-/dev/sctp} = :/dev/sctp ; then
+	scls_modules="$scls_modules sctp"
+    fi
+    if test :${device:-/dev/sctp} = :/dev/sctp2 ; then
+	scls_modules="$scls_modules sctp2"
+    fi
+    if test ${verbose:-1} -gt 2 ; then
+	scls_options="-b -a"
+    else
+	scls_options="-c -a"
+    fi
+    if test ${verbose:-1} -gt 2 ; then
+	$ECHO "STREAMS statistics"
+	$ECHO
+	$ECHO "------------------------------------"
+    fi
+    if test ${verbose:-1} -gt 1 ; then
+	$ECHO "$scls $scls_options $scls_modules"
+    fi
+    if test :${run:-yes} != :no ; then
+	$scls $scls_options $scls_modules
+    fi
+    $ECHO
+}
+
 procsarray=($numprocs)
 
 function netperf_rr_tests()
@@ -814,6 +887,7 @@ function netperf_rr_tests()
 		if test :${run:-yes} != :no ; then
 		    $netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $host $calibration -- -r $rrsize $device &
 		fi
+		scls_show
 		if test ${verbose:-1} -gt 0 ; then
 		    $ECHO
 		    $ECHO
@@ -860,10 +934,11 @@ function netperf_lla_tests()
 function netperf_test()
 {
     if test ${verbose:-1} -gt 0 ; then
-	$ECHO "Netperf arr script started at `date`"
+	$ECHO "Netperf $program script started at `date`"
 	$ECHO
     fi
     netperf_calibrate
+    scls_show
     netperf_sctp_tests
     netperf_tcp_tests
     netperf_udp_tests
@@ -889,6 +964,7 @@ function run_command()
     netperf_copying
     netperf_options
     netperf_find
+    scls_find
     if test "${verbose:-1}" -gt 1 ; then
 	((verb=$verbose-1))
 	verb="-v $verb"

@@ -181,6 +181,7 @@ default_verbose=1
 default_run=yes
 
 default_netperf=${NETPERF_CMD:=netperf}
+default_calibrate=no
 default_testtime=${NETPERF_TIME:=60}
 default_port=${NETPERF_PORT:=}
 default_stats=${NETPERF_STATS:='-i 10,3 -I 99,5'}
@@ -197,7 +198,7 @@ default_xti=no
 default_headers='-P 0'
 default_calibrate=no
 
-defaults='command debug verbose run netperf testtime port warmtime hostname bufsize sctp tcp udp sctpdev tcpdev udpdev xti stats headers calibrate'
+defaults='command debug verbose run netperf calibrate testtime port warmtime hostname bufsize sctp tcp udp sctpdev tcpdev udpdev xti stats headers calibrate'
 
 function version()
 {
@@ -238,16 +239,16 @@ function help()
     cat <<EOF
 Arguments:
     HOSTNAME
-        name of remote host [Default: $default_hostname]
+	name of remote host [Default: $default_hostname]
     CPU
 	calibrate CPU [Default: $default_calibrate]
 Options:
     -c, --calibrate
 	calibrate CPU [Default: $default_calibrate]
     -H, --hostname=HOSTNAME
-        name or address of netserver host [Default: $default_hostname]
+	name or address of netserver host [Default: $default_hostname]
     -p, --port=PORTNUM
-        netserver port number [Default: ${default_port:-12865}]
+	netserver port number [Default: ${default_port:-12865}]
     -t, --testtime=SECONDS
 	duration of each test in seconds [Default: $default_testtime]
     -w, --warmtime=SECONDS
@@ -407,12 +408,12 @@ do
     if test x"$more_options" = xno ; then nonopt="$arg" ; break ; fi
     # check for attached option argument
     case $arg in
-	--port=* | --por=* | --po=* | --p=* | \
-	--hostname=* | --hostnam=* | --hostna=* | --hostn=* | --host=* | --hos=* | --ho=* | --h=* | \
 	--debug=* | --debu=* | --deb=* | --de=* | --d=* | \
 	--verbose=* | --verbos=* | --verbo=* | --verb=* | \
-	--warmtime=* | --warmtim=* | --warmti=* | --warmt=* | --warm=* | --war=* | --wa=* | --w=* | \
+	--port=* | --por=* | --po=* | --p=* | \
+	--hostname=* | --hostnam=* | --hostna=* | --hostn=* | --host=* | --hos=* | --ho=* | --h=* | \
 	--testtime=* | --testime=* | --testtim=* | --testim=* | --time=* | --t=* | \
+	--warmtime=* | --warmtim=* | --warmti=* | --warmt=* | --warm=* | --war=* | --wa=* | --w=* | \
 	--bufsize=* | --bufsiz=* | --bufsi=* | --bufs=* | --buf=* | --bu=* | --b=* | \
 	--sctp=* | --sct=* | --sc=* | --s=* | --tcp=* | --tc=* | --udp=* | --ud=*)
 	    optarg=`$ECHO "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
@@ -460,137 +461,75 @@ do
     # Have we seen a non-optional argument yet?
     case $arg in
 	--help | --h | --\? | -h | -\?)
-	    show_help=yes
-	    if test ":$command" = ":" ; then command=none ; fi
-	    ;;
+	    show_help=yes ; if test ":$command" = ":" ; then command=none ; fi ;;
 	--version | --versio | --versi | --vers | -V)
-	    show_version=yes
-	    if test ":$command" = ":" ; then command=none ; fi
-	    ;;
+	    show_version=yes ; if test ":$command" = ":" ; then command=none ; fi ;;
 	--copying | --copyin | --copyi | --copy | --cop | --co | --c | -C)
-	    show_copying=yes
-	    if test ":$command" = ":" ; then command=none ; fi
-	    ;;
+	    show_copying=yes ; if test ":$command" = ":" ; then command=none ; fi ;;
 	--verbose | --verbos | --verbo | --verb)
-	    prevopt="$arg"
-	    prev=verbose
-	    ;;
+	    prevopt="$arg" ; prev=verbose ;;
 	-v)
-	    ((verbose++))
-	    ;;
+	    ((verbose++)) ;;
 	--verbose=* | --verbos=* | --verbo=* | --verb=*)
-	    verbose="$optarg"
-	    ;;
+	    verbose="$optarg" ;;
 	--debug | --debu | --deb)
-	    prevopt="$arg"
-	    prev=debug
-	    ;;
+	    prevopt="$arg" ; prev=debug ;;
 	-D)
-	    $ECHO "$program: enabling shell trace mode" 1>&2
-	    set -x
-	    ;;
+	    $ECHO "$program: enabling shell trace mode" 1>&2 ; set -x ;;
 	--debug=* | --debu=* | --deb=*)
-	    debug="$optarg"
-	    ;;
+	    debug="$optarg" ;;
 	--dry-run | --dryrun | --n | -n)
-	    run=no
-	    ;;
+	    run=no ;;
 	--quiet | --silent | -q)
-	    show=no
-	    verbose=0
-	    debug=0
-	    ;;
+	    show=no ; verbose=0 ; debug=0 ;;
 	--port | --por | --po | --p | -p)
-	    prevopt=$arg
-	    prev=port
-	    ;;
+	    prevopt=$arg ; prev=port ;;
 	--port=* | --por=* | --po=* | --p=* | -p*)
-	    port="$optarg"
-	    ;;
+	    port="$optarg" ;;
 	--warmtime | --warmtim | --warmti | --warmt | --warm | --war | --wa | --w | -w)
-	    prevopt="$arg"
-	    prev=warmtime
-	    ;;
+	    prevopt="$arg" ; prev=warmtime ;;
 	--warmtime=* | --warmtim=* | --warmti=* | --warmt=* | --warm=* | --war=* | --wa=* | --w=* | -w*)
-	    warmtime="$optarg"
-	    ;;
+	    warmtime="$optarg" ;;
 	--testtime | --testime | --testtim | --testim | --time | --t | -t)
-	    prevopt="$arg"
-	    prev=testtime
-	    ;;
+	    prevopt="$arg" ; prev=testtime ;;
 	--testtime=* | --testime=* | --testtim=* | --testim=* | --time=* | --t=* | -t*)
-	    testtime="$optarg"
-	    ;;
+	    testtime="$optarg" ;;
 	--hostname | --hostnam | --hostna | --hostn | --host | --hos | --ho | --h | -H)
-	    prevopt="$arg"
-	    prev=hostname
-	    ;;
+	    prevopt="$arg" ; prev=hostname ;;
 	--hostname=* | --hostnam=* | --hostna=* | --hostn=* | --host=* | --hos=* | --ho=* | --h=* | -H*)
-	    hostname="$optarg"
-	    ;;
+	    hostname="$optarg" ;;
 	--bufsize | --bufsiz | --bufsi | --bufs | --buf | --bu | --b | -b)
-	    prevopt="$arg"
-	    prev=bufsizes
-	    ;;
+	    prevopt="$arg" ; prev=bufsizes ;;
 	--bufsize=* | --bufsiz=* | --bufsi=* | --bufs=* | --buf=* | --bu=* | --b=* | -b*)
-	    bufsize="$optarg"
-	    ;;
+	    bufsizes="$optarg" ;;
 	--calibrate | --calibrat | --calibra | --calibr | --calib | --cali | --cal | --ca | --c | -c)
-	    calibrate=yes
-	    ;;
+	    calibrate=yes ;;
 	--sctp | --sct | --sc | --s | \+S)
-	    sctp=yes
-	    prevopt="$arg"
-	    prev=sctpdev
-	    ;;
+	    sctp=yes ; prevopt="$arg" ; prev=sctpdev ;;
 	--sctp=* | --sct=* | --sc=* | --s=* | \+S*)
-	    sctp=yes
-	    sctpdev="$optarg"
-	    ;;
+	    sctp=yes ; sctpdev="$optarg" ;;
 	--tcp | --tc | \+T)
-	    tcp=yes
-	    prevopt="$arg"
-	    prev=tcpdev
-	    ;;
+	    tcp=yes ; prevopt="$arg" ; prev=tcpdev ;;
 	--tcp=* | --tc=* | \+T*)
-	    tcp=yes
-	    tcpdev="$optarg"
-	    ;;
+	    tcp=yes ; tcpdev="$optarg" ;;
 	--udp | --ud | \+U)
-	    udp=yes
-	    prevopt="$arg"
-	    prev=udpdev
-	    ;;
+	    udp=yes ; prevopt="$arg" ; prev=udpdev ;;
 	--udp=* | --ud=* | \+U*)
-	    udp=yes
-	    udpdev="$optarg"
-	    ;;
+	    udp=yes ; udpdev="$optarg" ;;
 	--nosctp | --nosct | --nosc | --nos | -S)
-	    sctp=no
-	    sctpdev=
-	    ;;
+	    sctp=no ; sctpdev= ;;
 	--notcp | --notc | -T)
-	    tcp=no
-	    tcpdev=
-	    ;;
+	    tcp=no ; tcpdev= ;;
 	--noudp | --noud | -U)
-	    udp=no
-	    udpdev=
-	    ;;
+	    udp=no ; udpdev= ;;
 	--xti | --xt | --x | -x)
-	    xti=yes
-	    ;;
-	--)
-	    # end of options
-	    more_options=no
-	    ;;
+	    xti=yes ;;
+	--) # end of options
+	    more_options=no ;;
 	-* | \+*)
-	    option_unrec $arg
-	    ;;
-	*)
-	    # permute all non-options to the end
-	    nonopt="${nonopt}${nonopt:+ }$arg"
-	    ;;
+	    option_unrec $arg ;;
+	*)  # permute all non-options to the end
+	    nonopt="${nonopt}${nonopt:+ }$arg" ;;
     esac
 done
 
@@ -606,7 +545,7 @@ esac
 
 args=($nonopt${nonopt:+ }${1+$@})
 
-if test "$verbose" -gt 2 ; then
+if test "$verbose" -gt 3 ; then
     $ECHO "Nonoption arguments: ${args[@]}"
 fi
 
@@ -636,12 +575,39 @@ fi
 
 function netperf_options()
 {
-    if test ${verbose:-1} -gt 2 ; then
+    if test ${verbose:-1} -gt 3 ; then
 	for arg in $defaults ; do
 	    val=`eval 'echo $'"$arg"`
 	    $ECHO "Option $arg is \`$val'"
 	done
+	$ECHO
     fi
+}
+
+function scls_find()
+{
+    scls=`which scls 2>/dev/null`
+    pname=`$ECHO "$scls" | $SED -e 's%^.*/%%'`
+    if test ":$pname" = ":scls" ; then
+	return
+    fi
+    if test -x "$scls" ; then
+	return
+    fi
+    # scls is not in our path, check elsewhere
+    scls=`whereis scls 2>/dev/null`
+    scls=`$ECHO "$scls" | $SED -e 's%^scls:[[:space:]]*%%;s%[[:space:]].*%%'`
+    pname=`$ECHO "$scls" | $SED -e 's%^.*/%%'`
+    if test ":$pname" = ":scls" ; then
+	return
+    fi
+    if test -x "$scls" ; then
+	return
+    fi
+    if test ${verbose:-1} -gt 0 ; then
+	$ECHO "$program: warning -- cannot find scls executable" >&2
+    fi
+    scls=scls
 }
 
 function netperf_find()
@@ -733,6 +699,52 @@ function netperf_calibrate()
     fi
 }
 
+function scls_show()
+{
+    if test ${verbose:-1} -le 1 ; then
+	return
+    fi
+    if test :${xti:-no} = :no ; then
+	return
+    fi
+    scls_modules="sth timod"
+    if test :${device:-/dev/udp} = :/dev/udp ; then
+	scls_modules="$scls_modules inet"
+    fi
+    if test :${device:-/dev/udp} = :/dev/udp2 ; then
+	scls_modules="$scls_modules udp2"
+    fi
+    if test :${device:-/dev/tcp} = :/dev/tcp ; then
+	scls_modules="$scls_modules inet"
+    fi
+    if test :${device:-/dev/tcp} = :/dev/tcp2 ; then
+	scls_modules="$scls_modules tcp2"
+    fi
+    if test :${device:-/dev/sctp} = :/dev/sctp ; then
+	scls_modules="$scls_modules sctp"
+    fi
+    if test :${device:-/dev/sctp} = :/dev/sctp2 ; then
+	scls_modules="$scls_modules sctp2"
+    fi
+    if test ${verbose:-1} -gt 2 ; then
+	scls_options="-b -a"
+    else
+	scls_options="-c -a"
+    fi
+    if test ${verbose:-1} -gt 2 ; then
+	$ECHO "STREAMS statistics"
+	$ECHO
+	$ECHO "------------------------------------"
+    fi
+    if test ${verbose:-1} -gt 1 ; then
+	$ECHO "$scls $scls_options $scls_modules"
+    fi
+    if test :${run:-yes} != :no ; then
+	$scls $scls_options $scls_modules
+    fi
+    $ECHO
+}
+
 function netperf_sctp_warmup()
 {
 	return
@@ -754,6 +766,7 @@ function netperf_tcp_warmup()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device 2>&1 >/dev/null
     fi
+    scls_show
     if test ${verbose:-1} -gt 1 ; then
 	$ECHO
 	$ECHO
@@ -768,6 +781,7 @@ function netperf_tcp_warmup()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m   96 $device 2>&1 >/dev/null
     fi
+    scls_show
     if test ${verbose:-1} -gt 1 ; then
 	$ECHO
 	$ECHO
@@ -783,6 +797,7 @@ function netperf_tcp_warmup()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase -H $hostname $calibration -- -r 1,1                    $device 2>&1 >/dev/null
     fi
+    scls_show
     if test ${verbose:-1} -gt 1 ; then
 	$ECHO
 	$ECHO
@@ -812,6 +827,7 @@ function netperf_sctp_tests()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 57344 -S 57344 -m 4096 $device
     fi
+    scls_show
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
 	$ECHO
@@ -827,6 +843,7 @@ function netperf_sctp_tests()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device
     fi
+    scls_show
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
 	$ECHO
@@ -843,6 +860,7 @@ function netperf_sctp_tests()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 1,1 $device
     fi
+    scls_show
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
 	$ECHO
@@ -867,6 +885,7 @@ function netperf_tcp_tests()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 57344 -S 57344 -m 4096 $device
     fi
+    scls_show
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
 	$ECHO
@@ -882,6 +901,7 @@ function netperf_tcp_tests()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device
     fi
+    scls_show
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
 	$ECHO
@@ -898,6 +918,7 @@ function netperf_tcp_tests()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 1,1 $device
     fi
+    scls_show
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
 	$ECHO
@@ -922,6 +943,7 @@ function netperf_udp_tests()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 1,1 $device
     fi
+    scls_show
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
 	$ECHO
@@ -937,6 +959,7 @@ function netperf_udp_tests()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 516,4 $device
     fi
+    scls_show
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
 	$ECHO
@@ -953,6 +976,7 @@ function netperf_udp_tests()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device
     fi
+    scls_show
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
 	$ECHO
@@ -968,6 +992,7 @@ function netperf_udp_tests()
     if test :${run:-yes} != :no ; then
 	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 1024 $device
     fi
+    scls_show
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
 	$ECHO
@@ -981,6 +1006,7 @@ function netperf_test()
 	$ECHO
     fi
     netperf_calibrate
+    scls_show
     netperf_sctp_tests
     netperf_tcp_tests
     netperf_udp_tests
@@ -1006,6 +1032,7 @@ function run_command()
     netperf_copying
     netperf_options
     netperf_find
+    scls_find
     if test "${verbose:-1}" -gt 1 ; then
 	((verb=$verbose-1))
 	verb="-v $verb"
