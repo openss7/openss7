@@ -88,7 +88,7 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBscls\fR [\fIoptions\fR] [{\fB-c\fR|\fB--count\fR}|{\fB-l\fR|\fB--long\fR}] [\fImodule\fR ...]
+\fBscls\fR [\fIoptions\fR] [{\fB-c\fR|\fB--count\fR}|{\fB-l\fR|\fB--long\fR}|{\fB-b\fR|\fB--both\fR}] [\fImodule\fR ...]
 .PD 0
 .HP 12
 \fBscls\fR {{\fB-h\fR|\fB--help\fR}|{\fB-V\fR|\fB--version\fR}|{\fB-C\fR|\fB--copying\fR}}
@@ -113,7 +113,7 @@ system.
 \fB-l\fR, \fB--long\fR [\fImodule\fR ...]
 Produces a listing that shows the extension type, major number, and
 information pertaining to the
-.B module_info
+.BR module_info (9)
 structure, for each
 .I module
 name listed, or, if no
@@ -130,6 +130,33 @@ name is specified, all modules on the system.  Information is obtained from
 the
 .BR module_stat (9)
 structure if one is specified for the module.
+.TP
+\fB-b\fR, \fB--both\fR
+Produces a listing showing both the information from the \fB--long\fR format
+and the \fB--count\fR format for each
+.I module
+name listed, or, if no
+.I module
+name is psecified, all modules on the system.  Information is obtained 
+from the
+.BR module_info (9)
+and
+.BR module_stat (0)
+structure (if one is specified) for the module.
+.TP
+\fB-a\fR, \fB--all\fR
+Used in conjunction with
+\fB-c\fR, \fB-l\fR or \fB-b\fR.
+Normally
+.B scls
+only prints information only for the upper multiplex write queue (that is, the
+.I st_wrinit
+member of the
+.BR streamtab (9)
+structure).
+The
+.B -a
+option causes it to display information for all queues.
 .TP
 \fB-q\fR, \fB--quiet\fR
 Suppresses normal output.
@@ -397,14 +424,9 @@ option:
 .nf
 \fC\s-1
 #> scls -l sth sc mux
-sth       module         1      0   4096   5120   1024 wr
-sth       module         1      0   4096   5120   1024 rd
-sc        module         6      0   4096   5120   1024 wr
-sc        module         6      0   4096   5120   1024 rd
-mux       driver 236   236      0   4096   5120   1024 wr
-mux       driver 236   236      0   4096   5120   1024 rd
-mux       driver 236   236      0   4096   5120   1024 muxw
-mux       driver 236   236      0   4096   5120   1024 muxr
+sth       module         1      0   4096   5120   1024
+sc        module         6      0   4096   5120   1024
+mux       driver 236   236      0   4096   5120   1024
 \s+1\fP
 .fi
 .RE
@@ -418,16 +440,29 @@ option:
 .nf
 \fC\s-1
 #> scls -c sc timod tirdwr mux
-sc               0        0       33       32        0        0 wr
-sc             131        0        0        0        0        0 rd
-timod            0        0        0        0        0        0 wr
-timod            0        0        0        0        0        0 rd
-tirdwr           0        0        0        0        0        0 wr
-tirdwr           0        0        0        0        0        0 rd
-mux              0        0        0        0        0        0 wr
-mux              0        0        0        0        0        0 rd
-mux              0        0        0        0        0        0 muxw
-mux              0        0        0        0        0        0 muxr
+sc              19        0        0        0        0        0
+timod            0        0        0        0        0        0
+tirdwr           0        0        0        0        0        0
+mux              0        0        0        0        0        0
+\s+1\fP
+.fi
+.RE
+.PP
+Following is an example of the output of the
+.B scls
+command with the
+.B -a
+option:
+.RS
+.nf
+\fC\s-1
+#> scls -c -a sth timod sc
+sth              0        0        0        0        0        0 : wr
+                46        0       12       11        0        0 : rd
+timod            0        0        0        0        0        0 : wr
+                 0        0        0        0        0        0 : rd
+sc              47        0        0        0        0        0 : wr
+                 0        0       12       11        0        0 : rd
 \s+1\fP
 .fi
 .RE
@@ -488,7 +523,7 @@ does not document long options.
 .IP \(em
 .IR AIX \(rg
 does not document the
-.BR -q ", " -v ", " -h ", " -V " or " -C
+.BR -b ", " -a ", " -q ", " -v ", " -h ", " -V " or " -C
 options.
 .IP \(em
 Options
