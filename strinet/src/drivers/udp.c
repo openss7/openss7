@@ -347,7 +347,7 @@ STATIC struct module_info udp_minfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 17),		/* Hi water mark */
+	.mi_hiwat = (1 << 19),		/* Hi water mark */
 	.mi_lowat = (1 << 15),		/* Lo water mark */
 };
 
@@ -8336,30 +8336,26 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-#if 0
 #ifdef CONFIG_SMP
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
 #else
 	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
 #endif
 	{
-#endif
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
-#if 0
 	} else {
 		int rtn;
 
 		rtn = tp_r_prim(q, mp);
 		/* Fast Paths */
-		if (likely(rtn == QR_TRIMMED))
-			freeb(mp);
-		else if (likely(rtn == QR_DONE))
+		if (likely(rtn == QR_ABSORBED)) {
+			return (0);
+		} else if (likely(rtn == QR_DONE))
 			freemsg(mp);
 		else
 			tp_putq_slow(q, mp, rtn);
 	}
-#endif
 	return (0);
 }
 
@@ -8377,9 +8373,9 @@ tp_rsrv(queue_t *q)
 
 		rtn = tp_r_prim(q, mp);
 		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED))
-			freeb(mp);
-		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+		if (likely(rtn == QR_ABSORBED)) {
+			continue;
+		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
 #if 0
@@ -8405,9 +8401,10 @@ tp_wput(queue_t *q, mblk_t *mp)
 
 		rtn = tp_w_prim(q, mp);
 		/* Fast Paths */
-		if (likely(rtn == QR_TRIMMED))
+		if (likely(rtn == QR_TRIMMED)) {
 			freeb(mp);
-		else if (likely(rtn == QR_DONE))
+			return (0);
+		} else if (likely(rtn == QR_DONE))
 			freemsg(mp);
 		else
 			tp_putq_slow(q, mp, rtn);
@@ -8429,9 +8426,10 @@ tp_wsrv(queue_t *q)
 
 		rtn = tp_w_prim(q, mp);
 		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED))
+		if (likely(rtn == QR_TRIMMED)) {
 			freeb(mp);
-		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+			continue;
+		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
 #if 0
