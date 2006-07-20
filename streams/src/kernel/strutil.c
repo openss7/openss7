@@ -2859,7 +2859,7 @@ __rmvq(queue_t *q, mblk_t *mp)
 	if (likely(mp->b_band == 0)) {
 		q->q_count -= msgsize(mp);
 		assert(q->q_count >= 0);
-#if 1
+#if 0
 		/* This turns out to be a really bad policy: empty queues are backenabling way too
 		   fast, running the upstream service procedure which causes it to backenable
 		   further.  This is a waste.  Remember to change the documentation too! My case
@@ -3265,7 +3265,7 @@ __getq(queue_t *q, bool *be)
 		if (likely(mp->b_band == 0)) {
 			q->q_count -= msgsize(mp);
 			assert(q->q_count >= 0);
-#if 1
+#if 0
 			/* This turns out to be a really bad policy: empty queues are backenabling
 			   way too fast, running the upstream service procedure which causes it to
 			   backenable further.  This is a waste.  Remember to change the
