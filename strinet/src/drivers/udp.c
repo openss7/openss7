@@ -8857,17 +8857,11 @@ tp_v4_rcv(struct sk_buff *skb)
 			goto flow_controlled;
 		// mp->b_datap->db_type = M_DATA;
 		mp->b_wptr += plen;
-#if 0
 		put(q, mp);
-#else
-		if (unlikely(!putq(q, mp)))
-			goto dropped;
-#endif
 //              UDP_INC_STATS_BH(UdpInDatagrams);
 		/* release reference from lookup */
 		tp_put(tp);
 		return (0);
-	      dropped:
 	      flow_controlled:
 		freeb(mp);	/* will take sk_buff with it */
 		tp_put(tp);
@@ -8957,16 +8951,10 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 		mp->b_band = 1;
 		bcopy(skb->nh.raw, mp->b_wptr, plen);
 		mp->b_wptr += plen;
-#if 0
 		put(q, mp);
-#else
-		if (unlikely(!putq(q,mp)))
-			goto dropped;
-#endif
 		goto discard_put;
 	      flow_controlled:
 		ptrace(("ERROR: stream is flow controlled\n"));
-	      dropped:
 		freeb(mp);
 		goto discard_put;
 	}
