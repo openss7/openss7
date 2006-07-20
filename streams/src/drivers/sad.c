@@ -540,7 +540,7 @@ static struct qinit sad_qinit = {
 	.qi_qopen = sad_open,
 	.qi_qclose = sad_close,
 	.qi_minfo = &sad_minfo,
-	.qi_minfo = &sad_mstat,
+	.qi_mstat = &sad_mstat,
 };
 
 static struct streamtab sad_info = {
