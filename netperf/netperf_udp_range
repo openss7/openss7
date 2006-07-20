@@ -767,6 +767,9 @@ function netperf_calibrate()
 
 function scls_show()
 {
+    if test ${verbose:-1} -le 0 ; then
+	return
+    fi
     if test :${xti:-no} = :no ; then
 	return
     fi
@@ -777,20 +780,21 @@ function scls_show()
     if test :${device:-/dev/udp} = :/dev/udp2 ; then
 	scls_modules="$scls_modules udp2"
     fi
+    if test ${verbose:-1} -gt 2 ; then
+	scls_options="-l"
+    else
+	scls_options="-c"
+    fi
     if test ${verbose:-1} -gt 1 ; then
 	$ECHO "STREAMS statistics"
 	$ECHO
 	$ECHO "------------------------------------"
-	$ECHO "$scls -c $scls_modules"
-	if test ${verbose:-1} -gt 2 ; then
-	    $scls_modules="-l $scls_modules"
-	else
-	    $scls_modules="-c $scls_modules"
-	fi
-	if test :${run:-yes} != :no ; then
-	    $scls $scls_modules
-	fi
+	$ECHO "$scls $scls_options $scls_modules"
     fi
+    if test :${run:-yes} != :no ; then
+	$scls $scls_options $scls_modules
+    fi
+    $ECHO
 }
 
 function netperf_udp_test()
