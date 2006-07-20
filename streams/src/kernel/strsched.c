@@ -166,6 +166,8 @@ static char const ident[] =
 #include "src/kernel/strutil.h"	/* for q locking and puts and gets */
 #include "src/kernel/strsched.h"	/* verification of externs */
 
+#undef CONFIG_STREAMS_NORECYCLE
+
 BIG_STATIC_STH struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 BIG_STATIC struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
 
@@ -855,7 +857,7 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
  *  we also return an allocation failure if the number of message blocks exceeds a tunable
  *  threshold.
  */
-#if defined SLAB_DESTROY_BY_RCU
+#if defined CONFIG_STREAMS_NORECYCLE
 STATIC streams_inline streams_fastcall __hot mblk_t *
 #else
 STATIC streams_noinline streams_fastcall __hot_out mblk_t *
@@ -931,7 +933,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 STATIC streams_fastcall __hot mblk_t *
 mdbblock_alloc(uint priority, void *func)
 {
-#if !defined SLAB_DESTROY_BY_RCU
+#if !defined CONFIG_STREAMS_NORECYCLE
 	struct strthread *t = this_thread;
 	mblk_t *mp;
 
@@ -979,11 +981,11 @@ mdbblock_alloc(uint priority, void *func)
 		}
 		streams_local_restore(flags);
 	}
-#endif				/* !defined SLAB_DESTROY_BY_RCU */
+#endif				/* !defined CONFIG_STREAMS_NORECYCLE */
 	return mdbblock_alloc_slow(priority, func);
 }
 
-#if !defined SLAB_DESTROY_BY_RCU
+#if !defined CONFIG_STREAMS_NORECYCLE
 /*
  *  raise_local_bufcalls: - raise buffer callbacks on the local STREAMS scheduler thread.
  */
@@ -996,7 +998,7 @@ raise_local_bufcalls(void)
 		if (!test_and_set_bit(strbcflag, &t->flags))
 			__raise_streams();
 }
-#endif				/* !defined SLAB_DESTROY_BY_RCU */
+#endif				/* !defined CONFIG_STREAMS_NORECYCLE */
 
 /*
  *  raise_bufcalls: - raise buffer callbacks on all STREAMS scheduler threads
@@ -1062,7 +1064,7 @@ raise_bufcalls(void)
 BIG_STATIC_INLINE streams_fastcall __hot_in void
 mdbblock_free(mblk_t *mp)
 {
-#if !defined SLAB_DESTROY_BY_RCU
+#if !defined CONFIG_STREAMS_NORECYCLE
 	struct strthread *t = this_thread;
 
 	_printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
@@ -1089,7 +1091,7 @@ mdbblock_free(mblk_t *mp)
 		t->freemblks++;
 		streams_local_restore(flags);
 	}
-#endif				/* !defined SLAB_DESTROY_BY_RCU */
+#endif				/* !defined CONFIG_STREAMS_NORECYCLE */
 	{
 		struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 
@@ -1103,11 +1105,11 @@ mdbblock_free(mblk_t *mp)
 #else
 		(void) sdi;
 #endif				/* !defined CONFIG_STREAMS_OPTIMIZE_SPEED */
-#if defined SLAB_DESTROY_BY_RCU
+#if defined CONFIG_STREAMS_NORECYCLE
 		kmem_cache_free(sdi->si_cache, mp);
 #endif
 	}
-#if !defined SLAB_DESTROY_BY_RCU
+#if !defined CONFIG_STREAMS_NORECYCLE
 	/* Decide when to invoke freeblocks.  Current policy is to free blocks when then number of
 	   blocks on the free list exceeds some (per-cpu) threshold.  Currently I set this to just
 	   1/16th of the maximum.  That should be ok for now.  I will create a sysctl for it
@@ -1117,13 +1119,13 @@ mdbblock_free(mblk_t *mp)
 		__raise_streams();
 	raise_local_bufcalls();
 	/* other processors will just have to fight over the remaining memory */
-#else				/* !defined SLAB_DESTROY_BY_RCU */
+#else				/* !defined CONFIG_STREAMS_NORECYCLE */
 	/* raise global bufcalls if we free anything to the cache */
 	raise_bufcalls();
-#endif				/* !defined SLAB_DESTROY_BY_RCU */
+#endif				/* !defined CONFIG_STREAMS_NORECYCLE */
 }
 
-#if !defined SLAB_DESTROY_BY_RCU
+#if !defined CONFIG_STREAMS_NORECYCLE
 /* 
  *  freeblocks: - free message blocks
  *  @t:	    the STREAMS executive thread
@@ -1197,7 +1199,7 @@ term_freemblks(void)
 		freeblocks(t);
 	}
 }
-#endif				/* !defined SLAB_DESTROY_BY_RCU */
+#endif				/* !defined CONFIG_STREAMS_NORECYCLE */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -4190,7 +4192,7 @@ __runqueues_slow(struct strthread *t)
 	/* free flush chains if necessary */
 	if (unlikely(test_bit(flushwork, &t->flags) != 0))
 		_ctrace(freechains(t));
-#if !defined SLAB_DESTROY_BY_RCU
+#if !defined CONFIG_STREAMS_NORECYCLE
 	/* free mdbblocks to cache, if memory needed */
 	if (unlikely(test_bit(freeblks, &t->flags) != 0))
 		_ctrace(freeblocks(t));
@@ -4716,7 +4718,7 @@ takeover_strsched(unsigned int cpu)
 		o->freemsg_head = NULL;
 		o->freemsg_tail = &o->freemsg_head;
 	}
-#if !defined SLAB_DESTROY_BY_RCU
+#if !defined CONFIG_STREAMS_NORECYCLE
 	if (o->freemblk_head) {
 		*XCHG(&t->freemblk_tail, o->freemblk_tail) = o->freemblk_head;
 		o->freemblk_head = NULL;
@@ -4724,7 +4726,7 @@ takeover_strsched(unsigned int cpu)
 		t->freemblks += o->freemblks;
 		o->freemblks = 0;
 	}
-#endif				/* !defined SLAB_DESTROY_BY_RCU */
+#endif				/* !defined CONFIG_STREAMS_NORECYCLE */
 	if (o->freeevnt_head) {
 		*XCHG(&t->freeevnt_tail, o->freeevnt_tail) = o->freeevnt_head;
 		o->freeevnt_head = NULL;
@@ -5004,9 +5006,9 @@ strsched_init(void)
 		t->strevents_tail = &t->strevents_head;
 		t->scanqtail = &t->scanqhead;
 		t->freemsg_tail = &t->freemsg_head;
-#if !defined SLAB_DESTROY_BY_RCU
+#if !defined CONFIG_STREAMS_NORECYCLE
 		t->freemblk_tail = &t->freemblk_head;
-#endif				/* !defined SLAB_DESTROY_BY_RCU */
+#endif				/* !defined CONFIG_STREAMS_NORECYCLE */
 		t->freeevnt_tail = &t->freeevnt_head;
 	}
 	init_timer(&scan_timer);
@@ -5027,7 +5029,7 @@ strsched_exit(void)
 {
 	del_timer(&scan_timer);
 	term_strsched();
-#if !defined SLAB_DESTROY_BY_RCU
+#if !defined CONFIG_STREAMS_NORECYCLE
 	term_freemblks();
 #endif
 #if defined CONFIG_STREAMS_SYNCQS
