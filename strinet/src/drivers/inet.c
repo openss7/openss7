@@ -15835,7 +15835,13 @@ ss_srvq(queue_t *q, streams_fastcall int (*proc) (queue_t *, mblk_t *),
 STATIC streamscall __hot_in int
 ss_rput(queue_t *q, mblk_t *mp)
 {
+#if 0
 	return ss_putq(q, mp, &ss_r_prim);
+#else
+	if (unlikely(!putq(q, mp)))
+		freemsg(mp);
+	return(0);
+#endif
 }
 
 STATIC streamscall __hot_in int
