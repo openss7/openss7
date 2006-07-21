@@ -363,7 +363,7 @@ EXPORT_SYMBOL_NOVERS(skballoc);
  *  @priority:	priority of message block header allocation
  *  @freeinfo:	free routine callback
  */
-streams_fastcall __hot_in mblk_t *
+streams_fastcall __hot_write mblk_t *
 esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 {
 	mblk_t *mp;
@@ -403,7 +403,7 @@ EXPORT_SYMBOL_NOVERS(esballoc);
  *  @size:	size of message block in bytes
  *  @priority:	priority of the allocation
  */
-STATIC streams_fastcall __hot_out mblk_t *
+STATIC streams_fastcall __hot_write mblk_t *
 allocb_skb(const size_t size, uint priority)
 {
 	mblk_t *mp;
@@ -423,7 +423,7 @@ allocb_skb(const size_t size, uint priority)
  *  @size:	size of message block in bytes (unused)
  *  @priority:	priority of the allocation
  */
-STATIC streams_fastcall __hot_out mblk_t *
+STATIC streams_fastcall __hot_write mblk_t *
 allocb_fast(const size_t size, uint priority)
 {
 	mblk_t *mp;
@@ -456,7 +456,7 @@ allocb_fast(const size_t size, uint priority)
 	return (NULL);
 }
 
-STATIC streams_fastcall __hot_out mblk_t *
+STATIC streams_fastcall __hot_write mblk_t *
 allocb_kmem(const size_t size, uint priority)
 {
 	mblk_t *mp;
@@ -496,7 +496,7 @@ allocb_kmem(const size_t size, uint priority)
  *  @size:	size of message block in bytes
  *  @priority:	priority of the allocation
  */
-streams_fastcall __hot_out mblk_t *
+streams_fastcall __hot_write mblk_t *
 allocb(size_t size, uint priority)
 {
 	streams_fastcall mblk_t *(*alloc_func) (const size_t, uint);
@@ -1343,7 +1343,7 @@ __bcanput_slow(queue_t *q, unsigned char band)
  *  will enable the queue if necessary.  If it back-enables before we call putbq(9) then the service
  *  procedure will go for another run anyway.
  */
-STATIC streams_inline streams_fastcall __hot int
+STATIC streams_inline streams_fastcall __hot_write int
 __bcanput(queue_t *q, unsigned char band)
 {
 	unsigned long pl;
@@ -1463,7 +1463,7 @@ EXPORT_SYMBOL_NOVERS(bcanput);
  *  compatibility there is little choice but to make bcanputnext() safe from an asynchronous
  *  context by taking a plumb read lock.
  */
-streams_fastcall __hot int
+streams_fastcall __hot_write int
 bcanputnext(register queue_t *q, unsigned char band)
 {
 	register int result;
@@ -2071,7 +2071,7 @@ EXPORT_SYMBOL_NOVERS(putnextctl2);
  *  1) When a banded message arrives at an empty queue band, should the queue be enabled?
  *
  */
-STATIC streams_inline streams_fastcall __hot int
+STATIC streams_inline streams_fastcall __hot_out int
 __putq(queue_t *q, mblk_t *mp)
 {
 	int enable;
@@ -2082,20 +2082,22 @@ __putq(queue_t *q, mblk_t *mp)
 		b_prev = q->q_last;
 		b_next = NULL;
 		/* enable if will be first message in queue, or requested by getq() */
-		enable = ((q->q_first == b_next)
-			  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
+		if (likely(q->q_first == NULL))
+			enable = 1;
+		else 
+			enable = (test_bit(QWANTR_BIT, &q->q_flag) != 0);
 	      hipri:
 		if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
 			set_bit(QFULL_BIT, &q->q_flag);
 	      banded:
 		if (likely(q->q_last == b_prev))
 			q->q_last = mp;
-		if (unlikely(q->q_first == b_next))
+		if (likely(q->q_first == b_next))
 			q->q_first = mp;
 		q->q_msgs++;
 		if (unlikely((mp->b_next = b_next) != NULL))
 			b_next->b_prev = mp;
-		if (likely((mp->b_prev = b_prev) != NULL))
+		if (unlikely((mp->b_prev = b_prev) != NULL))
 			b_prev->b_next = mp;
 		return (1 + enable);	/* success */
 	}
@@ -2821,70 +2823,35 @@ __STRUTIL_EXTERN_INLINE queue_t *RD(queue_t *q);
 EXPORT_SYMBOL_NOVERS(RD);
 
 /*
- *  __rmvq:	- remove a message from a queue
+ *  __rmvq_band	- remove a banded message from a queue
  *  @q:		the queue from which to remove the message
  *  @mp:	the message to removed
  *
- *  __rmvq() is a version of rmvq(9) that takes no locks.
- *
- *  CONTEXT: This function takes no locks and must be called with the queue write locked, either
- *  explicitly or by calling freezestr().
- *
- *  RETURN VALUE: Returns an integer indicating whether back enabling should be performed.  A return
- *  value of zero (0) indicates that back enabling is not necessary.  A return value of one (1)
- *  indicates that back enabling of queues is required.
+ *  __rmvq_band() handles the less common case of removing a banded message from the queue.
+ *  Still optimized for the only message on the queue.
  */
-STATIC streams_noinline streams_fastcall __hot_read bool
-__rmvq(queue_t *q, mblk_t *mp)
+streams_noinline streams_fastcall bool
+__rmvq_band(queue_t *q, mblk_t *mp)
 {
-	bool backenable = false;
-	mblk_t *b_next, *b_prev;
+	struct qband *qb;
 
-	assert(q);
-	assert(mp);
+	{
+		register mblk_t *b_next, *b_prev;
 
-	b_prev = mp->b_prev;	/* NULL for getq */
-	b_next = mp->b_next;
-	if (b_prev)
-		b_prev->b_next = b_next;
-	if (b_next)
-		b_next->b_prev = b_prev;
-	mp->b_next = mp->b_prev = NULL;
-	if (q->q_first == mp)
-		q->q_first = b_next;
-	if (q->q_last == mp)
-		q->q_last = b_prev;
-	q->q_msgs--;
-	assert(q->q_msgs >= 0);
-	if (likely(mp->b_band == 0)) {
-		q->q_count -= msgsize(mp);
-		assert(q->q_count >= 0);
-#if 0
-		/* This turns out to be a really bad policy: empty queues are backenabling way too
-		   fast, running the upstream service procedure which causes it to backenable
-		   further.  This is a waste.  Remember to change the documentation too! My case
-		   was the case of a receive buffer too small, putting this back. */
-		if (q->q_count == 0) {
-			clear_bit(QFULL_BIT, &q->q_flag);
-			clear_bit(QWANTW_BIT, &q->q_flag);
-			backenable = true;
-		} else if (q->q_count < q->q_lowat) {
-			clear_bit(QFULL_BIT, &q->q_flag);
-			if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
-				backenable = true;
+		if (unlikely((b_prev = mp->b_prev) != NULL)) {	/* NULL for getq */
+			b_prev->b_next = b_next;
+			mp->b_prev = NULL;
 		}
-#else
-		if (q->q_count == 0 || q->q_count < q->q_lowat) {
-			clear_bit(QFULL_BIT, &q->q_flag);
-			if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
-				backenable = true;
+		if (unlikely((b_next = mp->b_next) != NULL)) {	/* NULL for only message on queue */
+			b_next->b_prev = b_prev;
+			mp->b_next = NULL;
 		}
-#endif
-		/* no longer want to read band zero */
-		clear_bit(QWANTR_BIT, &q->q_flag);
-	} else {
-		struct qband *qb;
-
+		if (likely(q->q_first == mp))
+			q->q_first = b_next;
+		if (likely(q->q_last == mp))
+			q->q_last = b_prev;
+		q->q_msgs--;
+		assert(q->q_msgs >= 0);
 		{
 			unsigned char q_nband, band;
 
@@ -2900,20 +2867,95 @@ __rmvq(queue_t *q, mblk_t *mp)
 			if (qb->qb_last == mp)
 				qb->qb_last = b_prev;
 		}
-		qb->qb_msgs--;
-		assert(qb->qb_msgs >= 0);
-		qb->qb_count -= msgsize(mp);
-		assert(qb->qb_count >= 0);
+	}
+	qb->qb_msgs--;
+	assert(qb->qb_msgs >= 0);
+	qb->qb_count -= msgsize(mp);
+	assert(qb->qb_count >= 0);
+	{
+		bool backenable;
+
 		if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
 			if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
 				q->q_blocked--;
 			if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
 				backenable = true;
-		}
+			else
+				backenable = false;
+		} else
+			backenable = false;
 		/* no longer want to read */
 		clear_bit(QWANTR_BIT, &q->q_flag);
+		return (backenable);
 	}
-	return (backenable);
+}
+
+/*
+ *  __rmvq:	- remove a message from a queue
+ *  @q:		the queue from which to remove the message
+ *  @mp:	the message to removed
+ *
+ *  __rmvq() is a version of rmvq(9) that takes no locks.
+ *
+ *  CONTEXT: This function takes no locks and must be called with the queue write locked, either
+ *  explicitly or by calling freezestr().
+ *
+ *  RETURN VALUE: Returns an integer indicating whether back enabling should be performed.  A return
+ *  value of zero (0) indicates that back enabling is not necessary.  A return value of one (1)
+ *  indicates that back enabling of queues is required.
+ *
+ *  OPTIMIZATION: Optimized for messages being removed from a queue where the message is the only
+ *  message on the queue.  The Stream head uses rmvq() alot.  The Stream head uses this function to
+ *  lock a queue, look at the first message, and then decide whether to remove it from the queue
+ *  with this function.  The Stream head does this instead of getq()/putbq() operations which are
+ *  not atomic.
+ */
+STATIC streams_inline streams_fastcall __hot_read bool
+__rmvq(queue_t *q, mblk_t *mp)
+{
+	assert(q);
+	assert(mp);
+
+	if (likely(mp->b_band == 0)) {
+		{
+			register mblk_t *b_next, *b_prev;
+
+			/* NULL for getq */
+			if (unlikely((b_prev = mp->b_prev) != NULL)) {
+				b_prev->b_next = b_next;
+				mp->b_prev = NULL;
+			}
+			/* NULL for only message on queue */
+			if (unlikely((b_next = mp->b_next) != NULL)) {
+				b_next->b_prev = b_prev;
+				mp->b_next = NULL;
+			}
+			if (likely(q->q_first == mp))
+				q->q_first = b_next;
+			if (likely(q->q_last == mp))
+				q->q_last = b_prev;
+		}
+		q->q_msgs--;
+		assert(q->q_msgs >= 0);
+		q->q_count -= msgsize(mp);
+		assert(q->q_count >= 0);
+		{
+			bool backenable;
+
+			if (q->q_count == 0 || q->q_count < q->q_lowat) {
+				clear_bit(QFULL_BIT, &q->q_flag);
+				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
+					backenable = true;
+				else
+					backenable = false;
+			} else
+				backenable = false;
+			/* no longer want to read band zero */
+			clear_bit(QWANTR_BIT, &q->q_flag);
+			return (backenable);
+		}
+	}
+	return __rmvq_band(q, mp);
 }
 
 /**
@@ -2932,7 +2974,7 @@ __rmvq(queue_t *q, mblk_t *mp)
  *  NOTICES: rmvq() panics when passed null pointers.  rmvq() panics if a write lock has not been
  *  taken on the queue.  rmvq() panics if the message is not a queue, or not on the specified queue.
  */
-streams_fastcall __hot_in void
+streams_fastcall __hot_read void
 rmvq(register queue_t *q, register mblk_t *mp)
 { /* IRQ DISABLED */
 	bool backenable;
@@ -2969,7 +3011,7 @@ EXPORT_SYMBOL_NOVERS(rmvq);
  *  freechains() task under the STREAMS scheduler.  Flushing of long chains is more efficient for
  *  %FLUSHALL than for %FLUSHDATA.
  */
-STATIC __unlikely bool
+streams_noinline streams_fastcall __unlikely bool
 __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 {
 	bool backenable = false;
@@ -3136,7 +3178,7 @@ EXPORT_SYMBOL_NOVERS(flushband);
  *
  *  Note that the putq() deferral chain is flushed as well.
  */
-streams_fastcall __unlikely bool
+streams_noinline streams_fastcall __unlikely bool
 __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 {
 	bool backenable = false;
