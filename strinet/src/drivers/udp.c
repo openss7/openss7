@@ -347,7 +347,7 @@ STATIC struct module_info udp_minfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 26),		/* Hi water mark */
+	.mi_hiwat = (1 << 18),		/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
@@ -5898,6 +5898,7 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	if (unlikely(tp_get_statef(tp) & ~(TSF_IDLE | TSF_WRES_CIND | TSF_WACK_CRES)))
 		goto discard;
 
+	/* Make sure we don't already have a connection indication */
 	spin_lock_str(&tp->conq.q_lock, flags);
 	for (cp = bufq_head(&tp->conq); cp; cp = cp->b_next) {
 		struct iphdr *iph2 = (struct iphdr *) cp->b_rptr;
