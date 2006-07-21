@@ -1037,7 +1037,7 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 STATIC streams_inline streams_fastcall __hot_write mblk_t *
 allocb_buf(const struct stdata *sd, size_t size, uint priority)
 {
-	if ((sd->sd_flag & (STRSKBUFF)) == 0)
+	if ((sd->sd_flag & (STRSKBUFF)) != 0)
 		priority |= BPRI_SKBUFF;
 	return (allocb(size, priority));
 }
@@ -1626,7 +1626,7 @@ strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band, uns
  *  PROFILING NOTES: This function didn't event take a hit, but it is done under locks and we only
  *  used timer interrupts.  The rest are guesses.
  */
-STATIC streams_inline streams_fastcall __hot_get mblk_t *
+STATIC streams_inline streams_fastcall __hot_read mblk_t *
 strgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 {				/* IRQ SUPPRESSED */
 	mblk_t *b = NULL;
