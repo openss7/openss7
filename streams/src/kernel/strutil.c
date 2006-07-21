@@ -2838,11 +2838,13 @@ __rmvq_band(queue_t *q, mblk_t *mp)
 	{
 		register mblk_t *b_next, *b_prev;
 
-		if (unlikely((b_prev = mp->b_prev) != NULL)) {	/* NULL for getq */
+		b_prev = mp->b_prev;
+		b_next = mp->b_next;
+		if (unlikely(b_prev != NULL)) {	/* NULL for getq */
 			b_prev->b_next = b_next;
 			mp->b_prev = NULL;
 		}
-		if (unlikely((b_next = mp->b_next) != NULL)) {	/* NULL for only message on queue */
+		if (unlikely(b_next != NULL)) {	/* NULL for only message on queue */
 			b_next->b_prev = b_prev;
 			mp->b_next = NULL;
 		}
@@ -2920,13 +2922,13 @@ __rmvq(queue_t *q, mblk_t *mp)
 		{
 			register mblk_t *b_next, *b_prev;
 
-			/* NULL for getq */
-			if (unlikely((b_prev = mp->b_prev) != NULL)) {
+			b_prev = mp->b_prev;
+			b_next = mp->b_next;
+			if (unlikely(b_prev != NULL)) {	/* NULL for getq */
 				b_prev->b_next = b_next;
 				mp->b_prev = NULL;
 			}
-			/* NULL for only message on queue */
-			if (unlikely((b_next = mp->b_next) != NULL)) {
+			if (unlikely(b_next != NULL)) {	/* NULL for only message on queue */
 				b_next->b_prev = b_prev;
 				mp->b_next = NULL;
 			}
