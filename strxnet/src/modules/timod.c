@@ -579,6 +579,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 	if (likely(mp->b_datap->db_type == M_PROTO)) {
 		if (likely(mp->b_wptr >= mp->b_rptr + sizeof(p->type))) {
 			p = (typeof(p)) mp->b_rptr;
+#if 0
 			switch (p->type) {
 			case T_UNITDATA_IND:
 			case T_UDERROR_IND:
@@ -597,6 +598,15 @@ timod_rput(queue_t *q, mblk_t *mp)
 				putnext(q, mp);
 				return (0);
 			}
+#else
+			/* conveniently none of these are > 31 */
+			if (likely((1 << p->type)
+				   & ((1 << T_UNITDATA_IND) | (1 << T_UDERROR_IND) |
+				      (1 << T_EXDATA_IND) | (1 << T_DATA_IND)))) {
+				putnext(q, mp);
+				return (0);
+			}
+#endif
 		}
 	}
 	return timod_rput_slow(q, mp);
@@ -965,6 +975,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 	if (likely(mp->b_datap->db_type == M_PROTO)) {
 		if (likely(mp->b_wptr >= mp->b_rptr + sizeof(p->type))) {
 			p = (typeof(p)) mp->b_rptr;
+#if 0
 			switch (p->type) {
 			case T_UNITDATA_REQ:
 #if 0
@@ -982,6 +993,15 @@ timod_wput(queue_t *q, mblk_t *mp)
 				putnext(q, mp);
 				return (0);
 			}
+#else
+			/* conveniently none of these are > 31 */
+			if (likely((1 << p->type)
+				   & ((1 << T_UNITDATA_REQ) |
+				      (1 << T_EXDATA_REQ) | (1 << T_DATA_REQ)))) {
+				putnext(q, mp);
+				return (0);
+			}
+#endif
 		}
 	}
 	return timod_wput_slow(q, mp);
