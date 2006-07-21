@@ -973,19 +973,6 @@ STATIC struct tp_options tp_defaults = {
 
 #define t_defaults tp_defaults
 
-STATIC noinline streams_fastcall __unlikely int
-t_opts_size_ud_slow(const struct tp *tp, const mblk_t *mp)
-{
-	int size = 0;
-	struct iphdr *iph;
-
-	/* only need to deliver up destination address info if the stream is multihomed (i.e.
-	   wildcard bound) */
-	iph = (struct iphdr *) mp->b_datap->db_base;
-	size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
-	return (size);
-}
-
 /**
  * t_opts_size_ud - size options from received message for unitdata
  * @t: private structure
@@ -997,7 +984,9 @@ t_opts_size_ud(const struct tp *t, const mblk_t *mp)
 	if (likely(t->bnum == 1))
 		if (likely(t->baddrs[0].addr != INADDR_ANY))
 			return (0);
-	return t_opts_size_ud_slow(t, mp);
+	/* only need to deliver up destination address info if the stream is multihomed (i.e.
+	   wildcard bound) */
+	return (_T_SPACE_SIZEOF(t_defaults.ip.addr));	/* T_IP_ADDR */
 }
 
 /**
@@ -4142,7 +4131,7 @@ tp_skb_destructor_slow(struct tp *tp, struct sk_buff *skb)
  * the send low water mark (or to zero) that is set when we stall the queue and reset when we fall
  * beneath the low water mark.
  */
-STATIC __hot_out void
+STATIC __hot void
 tp_skb_destructor(struct sk_buff *skb)
 {
 	struct tp *tp;
