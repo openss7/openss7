@@ -166,7 +166,11 @@ static char const ident[] =
 #include "src/kernel/strutil.h"	/* for q locking and puts and gets */
 #include "src/kernel/strsched.h"	/* verification of externs */
 
+#ifdef SLAB_DESTROY_BY_RCU
+#define CONFIG_STREAMS_NORECYCLE 1
+#else
 #undef CONFIG_STREAMS_NORECYCLE
+#endif
 
 BIG_STATIC_STH struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 BIG_STATIC struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
