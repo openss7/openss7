@@ -930,7 +930,8 @@ mdbblock_alloc_slow(uint priority, void *func)
 		return (mp);
 	}
 }
-STATIC streams_fastcall __hot mblk_t *
+/* The put and write side of the Stream head lives in this function */
+STATIC streams_fastcall __hot_write mblk_t *
 mdbblock_alloc(uint priority, void *func)
 {
 #if !defined CONFIG_STREAMS_NORECYCLE
@@ -951,11 +952,13 @@ mdbblock_alloc(uint priority, void *func)
 		mp = t->freemblk_head;
 		prefetchw(mp);
 		if (likely(mp != NULL)) {
-			if ((t->freemblk_head = mp->b_next) == NULL)
+			/* free block list normally has more than one block on it */
+			if (likely((t->freemblk_head = mp->b_next) != NULL))
+				mp->b_next = NULL;
+			else
 				t->freemblk_tail = &t->freemblk_head;
 			t->freemblks--;
 			streams_local_restore(flags);
-			mp->b_next = NULL;
 			{
 #if !defined CONFIG_STREAMS_OPTIMIZE_SPEED || !defined CONFIG_STREAMS_NONE
 				struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
@@ -989,7 +992,7 @@ mdbblock_alloc(uint priority, void *func)
 /*
  *  raise_local_bufcalls: - raise buffer callbacks on the local STREAMS scheduler thread.
  */
-STATIC streams_fastcall void
+STATIC streams_inline streams_fastcall void
 raise_local_bufcalls(void)
 {
 	struct strthread *t = this_thread;
@@ -2165,7 +2168,8 @@ putp_fast(queue_t *q, mblk_t *mp)
 		dassert(q->q_qinfo != NULL);
 		dassert(q->q_qinfo->qi_putp != NULL);
 #if CONFIG_STREAMS_DO_STATS
-		if (unlikely(q->q_qinfo->qi_mstat != NULL))
+		/* if we enabled this capability, it is likely it will be used */
+		if (likely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_pcnt++;
 #endif
 		/* some weirdness in older compilers */
@@ -3564,25 +3568,40 @@ do_unweldq_event(struct strevent *se)
 	sefree(se);
 }
 
-/**
- *  kmem_alloc:	- allocate memory
- *  @size:	amount of memory to allocate in bytes
- *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
- */
-streams_fastcall __hot void *
-kmem_alloc(size_t size, int flags)
+streams_noinline streams_fastcall void *
+kmem_alloc_slow(size_t size, int flags)
 {
 	if (size == 0 || size > 131072)
 		return NULL;
 #if ((L1_CACHE_BYTES > 32) && (PAGE_SIZE == 4096)) || ((L1_CACHE_BYTES > 64) && (PAGE_SIZE != 4096))
 	/* all we have to do is pad to a cacheline to get cacheline aligment, as long as a
 	   cacheline is a power of 2 */
-	if (flags & KM_CACHEALIGN && size <= (L1_CACHE_BYTES >> 1))
+	if (unlikely(flags & KM_CACHEALIGN) && unlikely(size <= (L1_CACHE_BYTES >> 1)))
 		size = L1_CACHE_BYTES;
 #endif
 	/* KM_PHYSCONTIG is ignored because kmalloc'ed memory is always physically contiguous. */
 	return kmalloc(size, ((flags & KM_NOSLEEP) ? GFP_ATOMIC : GFP_KERNEL)
 		       | ((flags & KM_DMA) ? GFP_DMA : 0));
+}
+
+/**
+ *  kmem_alloc:	- allocate memory
+ *  @size:	amount of memory to allocate in bytes
+ *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
+ */
+streams_fastcall __hot_write void *
+kmem_alloc(size_t size, int flags)
+{
+	if (unlikely(size == 0))
+		goto go_slow;
+	if (unlikely(size > 131072))
+		goto go_slow;
+	if (unlikely(flags & (KM_CACHEALIGN | KM_DMA)))
+		goto go_slow;
+	/* KM_PHYSCONTIG is ignored because kmalloc'ed memory is always physically contiguous. */
+	return kmalloc(size, ((flags & KM_NOSLEEP) ? GFP_ATOMIC : GFP_KERNEL));
+      go_slow:
+	return kmem_alloc_slow(size, flags);
 }
 
 EXPORT_SYMBOL_NOVERS(kmem_alloc);	/* include/sys/streams/kmem.h */
