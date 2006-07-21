@@ -563,7 +563,6 @@ strschedule(void)
 	   machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 #if 0
-#ifndef CONFIG_SMP
 	/* before every sleep -- saves a context switch */
 	struct strthread *t = this_thread;
 
@@ -573,7 +572,6 @@ strschedule(void)
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	set_current_state(TASK_RUNNING);
 	runqueues();
-#endif
 #endif
 }
 
@@ -588,7 +586,6 @@ strschedule_ioctl(void)
 	   machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 #if 0
-#ifndef CONFIG_SMP
 	/* before every sleep -- saves a context switch */
 	struct strthread *t = this_thread;
 
@@ -598,7 +595,6 @@ strschedule_ioctl(void)
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	set_current_state(TASK_RUNNING);
 	runqueues();
-#endif
 #endif
 }
 
@@ -613,8 +609,7 @@ strschedule_write(void)
 	   processor.  This does have a negative impact; however, on SMP kernels running on UP
 	   machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-#if 0
-#ifndef CONFIG_SMP
+#if 1
 	/* before every sleep -- saves a context switch */
 	{
 		struct strthread *t = this_thread;
@@ -626,7 +621,6 @@ strschedule_write(void)
 		set_current_state(TASK_RUNNING);
 		runqueues();
 	}
-#endif
 #endif
 }
 
@@ -641,7 +635,7 @@ strschedule_read(void)
 	   processor.  This does have a negative impact; however, on SMP kernels running on UP
 	   machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-#ifndef CONFIG_SMP
+#if 0
 	/* before every sleep -- saves a context switch */
 	{
 		struct strthread *t = this_thread;

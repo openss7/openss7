@@ -348,7 +348,7 @@ STATIC struct module_info udp_minfo = {
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
 	.mi_hiwat = (1 << 17),		/* Hi water mark */
-	.mi_lowat = (1 << 16),		/* Lo water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 STATIC struct module_stat udp_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
