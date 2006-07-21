@@ -270,8 +270,8 @@ struct module_info str_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat str_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat str_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat str_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat str_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 int streamscall str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
 int streamscall str_close(queue_t *q, int oflag, cred_t *crp);
@@ -522,7 +522,7 @@ strsyscall_write(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#if 0
+#if 1
 	struct strthread *t = this_thread;
 
 	/* before every system call return -- saves a context switch */
@@ -574,6 +574,85 @@ strschedule(void)
 	set_current_state(TASK_RUNNING);
 	runqueues();
 #endif
+#endif
+}
+
+STATIC streams_inline streams_fastcall __hot_in void
+strschedule_ioctl(void)
+{
+	/* NOTE:- Better performance is acheived on (true) SMP machines by no attempting to run the
+	   STREAMS scheduler in process context here.  The reason is that if we avoid scheduling,
+	   the current process is blocked off other processors while it is running the STREAMS
+	   scheduler.  If we do the task switch, the process can run concurrently on another
+	   processor.  This does have a negative impact; however, on SMP kernels running on UP
+	   machines, so it would be better if we could quickly check the number of processors
+	   running.  We just decide by static kernel configuration for the moment. */
+#if 0
+#ifndef CONFIG_SMP
+	/* before every sleep -- saves a context switch */
+	struct strthread *t = this_thread;
+
+	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		return;
+	/* try to avoid context switch */
+	set_task_state(t->proc, TASK_INTERRUPTIBLE);
+	set_current_state(TASK_RUNNING);
+	runqueues();
+#endif
+#endif
+}
+
+STATIC streams_inline streams_fastcall __hot_in void
+strschedule_write(void)
+{
+	str_wstat.ms_acnt++;
+	/* NOTE:- Better performance is acheived on (true) SMP machines by no attempting to run the
+	   STREAMS scheduler in process context here.  The reason is that if we avoid scheduling,
+	   the current process is blocked off other processors while it is running the STREAMS
+	   scheduler.  If we do the task switch, the process can run concurrently on another
+	   processor.  This does have a negative impact; however, on SMP kernels running on UP
+	   machines, so it would be better if we could quickly check the number of processors
+	   running.  We just decide by static kernel configuration for the moment. */
+#if 0
+#ifndef CONFIG_SMP
+	/* before every sleep -- saves a context switch */
+	{
+		struct strthread *t = this_thread;
+
+		if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+			return;
+		/* try to avoid context switch */
+		set_task_state(t->proc, TASK_INTERRUPTIBLE);
+		set_current_state(TASK_RUNNING);
+		runqueues();
+	}
+#endif
+#endif
+}
+
+STATIC streams_inline streams_fastcall __hot_in void
+strschedule_read(void)
+{
+	str_rstat.ms_acnt++;
+	/* NOTE:- Better performance is acheived on (true) SMP machines by no attempting to run the
+	   STREAMS scheduler in process context here.  The reason is that if we avoid scheduling,
+	   the current process is blocked off other processors while it is running the STREAMS
+	   scheduler.  If we do the task switch, the process can run concurrently on another
+	   processor.  This does have a negative impact; however, on SMP kernels running on UP
+	   machines, so it would be better if we could quickly check the number of processors
+	   running.  We just decide by static kernel configuration for the moment. */
+#ifndef CONFIG_SMP
+	/* before every sleep -- saves a context switch */
+	{
+		struct strthread *t = this_thread;
+
+		if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+			return;
+		/* try to avoid context switch */
+		set_task_state(t->proc, TASK_INTERRUPTIBLE);
+		set_current_state(TASK_RUNNING);
+		runqueues();
+	}
 #endif
 }
 
@@ -1612,7 +1691,7 @@ strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
  *  what we need to do here, so we have to expose the internals of the wait queue implementation
  *  here.
  */
-STATIC streams_noinline streams_fastcall __hot_get mblk_t *
+STATIC streams_inline streams_fastcall __hot_read mblk_t *
 strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
@@ -1624,11 +1703,11 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 	int err;
 
 	srunlock(sd);
+	strschedule_read();	/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&sd->sd_rwaitq, &wait);
 #endif
 	for (;;) {
-		strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(&sd->sd_rwaitq, &wait, TASK_INTERRUPTIBLE);
 #else
@@ -1738,7 +1817,7 @@ strsendmread(struct stdata *sd, const unsigned long len)
  *  on or free the M_READ message.  Modules that do not recognize this message must pass it on.  All
  *  other drivers may or may not take action and then free the message."
  */
-STATIC streams_inline streams_fastcall __hot_in mblk_t *
+STATIC streams_inline streams_fastcall __hot_read mblk_t *
 strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, const int band,
 	    const unsigned long len)
 {
@@ -1747,8 +1826,10 @@ strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 
 	/* maybe we'll get lucky... */
 	/* also we need to trigger QWANTR bit and empty queue backenabling */
-	if ((mp = strgetq(sd, q, flags, band)))
-		return (mp);
+	/* in reality we almost always go to block as processors are quite fast enough to keep read 
+	   queues empty */
+	if (unlikely((mp = strgetq(sd, q, flags, band)) != NULL))
+		goto done;
 
 	/* only here it there's nothing left on the queue */
 
@@ -1770,7 +1851,10 @@ strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 			return ERR_PTR(err);
 	}
 
-	return strwaitgetq(sd, q, flags, band);
+	/* this is actually the fast path, so we inline strwaitgetq here */
+	mp = strwaitgetq(sd, q, flags, band);
+      done:
+	return (mp);
 
       eagain:
 	err = -EAGAIN;
@@ -1889,11 +1973,11 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 	int err;
 
 	srunlock(sd);
+	strschedule_read();	/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&sd->sd_rwaitq, &wait);
 #endif
 	for (;;) {
-		strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(&sd->sd_rwaitq, &wait, TASK_INTERRUPTIBLE);
 #else
@@ -1973,11 +2057,11 @@ __strwaitband(struct stdata *sd, int band)
 	int err = 0;
 
 	srunlock(sd);
+	strschedule_write();	/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&sd->sd_wwaitq, &wait);	/* exclusive? */
 #endif
 	for (;;) {
-		strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(&sd->sd_wwaitq, &wait, TASK_INTERRUPTIBLE);	/* exclusive? */
 #else
@@ -2071,6 +2155,7 @@ __strwaitopen(struct stdata *sd, const int access)
 	int err;
 
 	swunlock(sd);
+	strschedule();		/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
 	add_wait_queue_exclusive(&sd->sd_owaitq, &wait);
 #endif
@@ -2078,7 +2163,6 @@ __strwaitopen(struct stdata *sd, const int access)
 	/* Wait for the STWOPEN bit.  Only one open can be performed on a stream at a time. See
 	   Magic Garden. */
 	for (;;) {
-		strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
 		prepare_to_wait_exclusive(&sd->sd_owaitq, &wait, TASK_INTERRUPTIBLE);
 #else
@@ -2236,11 +2320,11 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 
 	waitq = (oflag & FREAD) ? &sd->sd_rwaitq : &sd->sd_wwaitq;
 
+	strschedule();		/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(waitq, &wait);
 #endif
 	for (;;) {
-		strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(waitq, &wait, TASK_INTERRUPTIBLE);
 #else
@@ -2301,11 +2385,11 @@ strwaitqueue(struct stdata *sd, queue_t *q)
 	struct queinfo *qu = ((struct queinfo *) _RD(q));
 
 	set_bit(QWCLOSE_BIT, &q->q_flag);
+	strschedule();		/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&qu->qu_qwait, &wait);
 #endif
 	for (;;) {
-		strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(&qu->qu_qwait, &wait, TASK_INTERRUPTIBLE);
 #else
@@ -2394,6 +2478,7 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 	int err = 0;
 
 	srunlock(sd);
+	strschedule_ioctl();	/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&sd->sd_iwaitq, &wait);
 #endif
@@ -2402,7 +2487,6 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 	   input output control. */
 	if (timeo) {
 		for (;;) {
-			strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 			prepare_to_wait(&sd->sd_iwaitq, &wait, TASK_INTERRUPTIBLE);
 #else
@@ -2419,7 +2503,6 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 		}
 	} else {
 		for (;;) {
-			strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 			prepare_to_wait(&sd->sd_iwaitq, &wait, TASK_UNINTERRUPTIBLE);
 #else
@@ -2489,6 +2572,7 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 	int err;
 
 	srunlock(sd);
+	strschedule_ioctl();	/* save context switch */
 	/* We are waiting for a response to our downwards ioctl message.  Wait until the message
 	   arrives or the io check fails. */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
@@ -2496,7 +2580,6 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 #endif
 	if (timeo) {
 		do {
-			strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
 			prepare_to_wait_exclusive(&sd->sd_iwaitq, &wait, TASK_INTERRUPTIBLE);
 #else
@@ -2522,7 +2605,6 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 	} else {
 		/* timeo is NULL for no timeout no signals */
 		do {
-			strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
 			prepare_to_wait_exclusive(&sd->sd_iwaitq, &wait, TASK_UNINTERRUPTIBLE);
 #else
@@ -5130,11 +5212,11 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 #endif
 
 			srunlock(sd);
+			strschedule_write();	/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 			add_wait_queue(&sd->sd_wwaitq, &wait);	/* exclusive? */
 #endif
 			for (;;) {
-				strschedule();	/* save context switch */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 				prepare_to_wait(&sd->sd_wwaitq, &wait, TASK_INTERRUPTIBLE);	/* exclusive? 
 												 */
