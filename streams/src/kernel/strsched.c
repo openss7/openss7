@@ -2249,9 +2249,7 @@ srvp_fast(queue_t *q)
 			/* prefetch private structure */
 			prefetch(q->q_ptr);
 
-#ifdef CONFIG_SMP
 			set_bit(QSVCBUSY_BIT, &q->q_flag);
-#endif
 			dassert(q->q_qinfo);
 			dassert(q->q_qinfo->qi_srvp);
 #if CONFIG_STREAMS_DO_STATS
@@ -2260,9 +2258,7 @@ srvp_fast(queue_t *q)
 #endif
 			/* some weirdness in older compilers */
 			(*q->q_qinfo->qi_srvp) (q);
-#ifdef CONFIG_SMP
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
-#endif
 		}
 #ifdef CONFIG_SMP
 		prunlock(sd);
