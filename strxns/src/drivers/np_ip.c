@@ -276,8 +276,8 @@ STATIC struct module_info np_minfo = {
 	.mi_lowat = (1 << 17),		/* Lo water mark */
 };
 
-STATIC struct module_stat np_mstat = {
-};
+STATIC struct module_stat np_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat np_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
 /* Upper multiplex is a N provider following the NPI. */
 
@@ -293,7 +293,7 @@ STATIC struct qinit np_rinit = {
 	.qi_qopen = np_qopen,		/* Each open */
 	.qi_qclose = np_qclose,		/* Last close */
 	.qi_minfo = &np_minfo,		/* Module information */
-	.qi_mstat = &np_mstat,		/* Module statistics */
+	.qi_mstat = &np_rstat,		/* Module statistics */
 };
 
 streamscall int np_wput(queue_t *, mblk_t *);
@@ -303,7 +303,7 @@ STATIC struct qinit np_winit = {
 	.qi_putp = np_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = np_wsrv,		/* Write service procedure */
 	.qi_minfo = &np_minfo,		/* Module information */
-	.qi_mstat = &np_mstat,		/* Module statistics */
+	.qi_mstat = &np_wstat,		/* Module statistics */
 };
 
 MODULE_STATIC struct streamtab np_info = {
@@ -1281,6 +1281,11 @@ np_alloc_skb_slow(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 		spin_lock_irqsave(&np->qlock, flags);
 		np->sndmem += skb->truesize;
 		spin_unlock_irqrestore(&np->qlock, flags);
+#if 0
+		/* keep track of high water mark */
+		if (tp_wstat.ms_acnt < tp->sndmem)
+			tp_wstat.ms_acnt = tp->sndmem;
+#endif
 #endif
 	}
 	return (skb);
@@ -1343,9 +1348,7 @@ np_alloc_skb_old(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
 	unsigned char *beg, *end;
-#if 0
 	unsigned long flags;
-#endif
 
 #if 0
 	struct sk_buff *skb_head = NULL, *skb_tail = NULL;
@@ -5746,6 +5749,7 @@ np_rput(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
 #endif
 	{
+		np_rstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
@@ -5768,18 +5772,24 @@ np_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 
+#if 1
+	/* try bottom half locking across loop to allow softirqd to burst. */
+	local_bh_disable();
+#endif
 	while (likely((mp = getq(q)) != NULL)) {
 		int rtn;
 
 		rtn = np_r_prim(q, mp);
 		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED))
-			freeb(mp);
-		else if (likely(rtn == QR_DONE))
-			freemsg(mp);
-		else if (unlikely(np_srvq_slow(q, mp, rtn) == 0))
+		if (likely(rtn == QR_ABSORBED)) {
+			continue;
+		} else if (unlikely(np_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
+#if 1
+	/* this should run the burst from softirqd. */
+	local_bh_enable();
+#endif
 	return (0);
 }
 
@@ -5792,6 +5802,7 @@ np_wput(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
 #endif
 	{
+		np_wstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
@@ -5799,9 +5810,10 @@ np_wput(queue_t *q, mblk_t *mp)
 
 		rtn = np_w_prim(q, mp);
 		/* Fast Paths */
-		if (likely(rtn == QR_TRIMMED))
+		if (likely(rtn == QR_TRIMMED)) {
 			freeb(mp);
-		else if (likely(rtn == QR_DONE))
+			return (0);
+		} else if (likely(rtn == QR_DONE))
 			freemsg(mp);
 		else
 			np_putq_slow(q, mp, rtn);
@@ -5814,18 +5826,25 @@ np_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 
+#if 0
+	/* try bottom half locking across loop to bundle burst for softirqd. */
+	local_bh_disable();
+#endif
 	while (likely((mp = getq(q)) != NULL)) {
-		int rtn;
+		register int rtn;
 
 		rtn = np_w_prim(q, mp);
 		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED))
+		if (likely(rtn == QR_TRIMMED)) {
 			freeb(mp);
-		else if (likely(rtn == QR_DONE))
-			freemsg(mp);
-		else if (unlikely(np_srvq_slow(q, mp, rtn) == 0))
+			continue;
+		} else if (unlikely(np_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
+#if 0
+	/* this should run the burst to softirqd. */
+	local_bh_enable();
+#endif
 	return (0);
 }
 
@@ -6184,6 +6203,7 @@ np_v4_rcv(struct sk_buff *skb)
 		np_put(np);
 		return (0);
 	      flow_controlled:
+		np_rstat.ms_ccnt++;
 		freeb(mp);	/* will take sk_buff with it */
 		np_put(np);
 		return (0);
@@ -6242,6 +6262,7 @@ np_v4_err(struct sk_buff *skb, u32 info)
 		goto closed;
 	{
 		mblk_t *mp;
+		queue_t *q;
 		size_t plen = skb->len + (skb->data - skb->nh.raw);
 
 		/* Create a queue a specialized M_CTL message to the Stream's read queue for
@@ -6250,15 +6271,16 @@ np_v4_err(struct sk_buff *skb, u32 info)
 		if ((mp = allocb(plen, BPRI_MED)) == NULL)
 			goto no_buffers;
 		/* check flow control only after we have a buffer */
-		if (np->oq == NULL || !bcanput(np->oq, 1))
+		if ((q = np->oq) == NULL || !bcanput(q, 1))
 			goto flow_controlled;
 		mp->b_datap->db_type = M_CTL;
 		mp->b_band = 1;
 		bcopy(skb->nh.raw, mp->b_wptr, plen);
 		mp->b_wptr += plen;
-		put(np->oq, mp);
+		put(q, mp);
 		goto discard_put;
 	      flow_controlled:
+		np_rstat.ms_ccnt++;
 		ptrace(("ERROR: stream is flow controlled\n"));
 		freeb(mp);
 		goto discard_put;
@@ -6473,11 +6495,8 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	struct np *np, **npp = &master.np.list;
 	unsigned long flags;
-
-#if defined LFS
 	mblk_t *mp;
 	struct stroptions *so;
-#endif
 
 	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
@@ -6507,11 +6526,9 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = FREE_CMINOR;
-#if defined LFS
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
-#endif
-	write_lock_irqsave(&master.lock, flags);
+	write_lock_str(&master.lock, flags);
 	for (; *npp; npp = &(*npp)->next) {
 		if (cmajor != (*npp)->u.dev.cmajor)
 			break;
@@ -6530,32 +6547,38 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
-		write_unlock_irqrestore(&master.lock, flags);
-#if defined LFS
+		write_unlock_str(&master.lock, flags);
 		freeb(mp);
-#endif
 		return (ENXIO);
 	}
 	_printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(np = np_alloc_priv(q, npp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
-		write_unlock_irqrestore(&master.lock, flags);
-#if defined LFS
+		write_unlock_str(&master.lock, flags);
 		freeb(mp);
-#endif
 		return (ENOMEM);
 	}
-	write_unlock_irqrestore(&master.lock, flags);
-#if defined LFS
-	/* want to set a write offet of MAX_HEADER bytes */
+	write_unlock_str(&master.lock, flags);
 	so = (typeof(so)) mp->b_wptr;
-	so->so_flags = SO_WROFF | SO_SKBUFF;
+	bzero(so, sizeof(*so));
+#if defined LFS
+	so->so_flags |= SO_SKBUFF;
+#endif
+	/* want to set a write offet of MAX_HEADER bytes */
+	so->so_flags |= SO_WROFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
+	so->so_flags |= SO_MINPSZ;
+	so->so_minpsz = udp_minfo.mi_minpsz;
+	so->so_flags |= SO_MAXPSZ;
+	so->so_maxpsz = udp_minfo.mi_maxpsz;
+	so->so_flags |= SO_HIWAT;
+	so->so_hiwat = udp_minfo.mi_hiwat;
+	so->so_flags |= SO_LOWAT;
+	so->so_lowat = udp_minfo.mi_lowat;
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
-#endif
 	qprocson(q);
 	return (0);
 }
