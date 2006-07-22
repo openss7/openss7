@@ -8157,6 +8157,7 @@ tp_w_prim_error(queue_t *q, const int rtn)
 	case -EAGAIN:		/* try again */
 	case -ENOMEM:		/* could not allocate memory */
 	case -ENOBUFS:		/* could not allocate an mblk */
+		return (rtn);
 	case -EOPNOTSUPP:	/* primitive not supported */
 		return te_error_ack(q, T_UNITDATA_REQ, rtn);
 	case -EPROTO:
@@ -8329,12 +8330,7 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-#ifdef CONFIG_SMP
-	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
-#else
-	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
-#endif
-	{
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		udp_rstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
@@ -8358,10 +8354,6 @@ tp_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 
-#if 1
-	/* try bottom half locking across loop to allow softirqd to burst. */
-	local_bh_disable();
-#endif
 	while (likely((mp = getq(q)) != NULL)) {
 		int rtn;
 
@@ -8372,22 +8364,13 @@ tp_rsrv(queue_t *q)
 		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
-#if 1
-	/* this should run the burst from softirqd. */
-	local_bh_enable();
-#endif
 	return (0);
 }
 
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
-#ifdef CONFIG_SMP
-	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first != NULL || (q->q_flag & QSVCBUSY))))
-#else
-	if (unlikely(mp->b_datap->db_type < QPCTL && q->q_first != NULL))
-#endif
-	{
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		udp_wstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
@@ -8412,10 +8395,6 @@ tp_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 
-#if 0
-	/* try bottom half locking across loop to bundle burst for softirqd. */
-	local_bh_disable();
-#endif
 	while (likely((mp = getq(q)) != NULL)) {
 		register int rtn;
 
@@ -8427,10 +8406,6 @@ tp_wsrv(queue_t *q)
 		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
-#if 0
-	/* this should run the burst to softirqd. */
-	local_bh_enable();
-#endif
 	return (0);
 }
 
