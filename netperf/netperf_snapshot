@@ -701,7 +701,7 @@ function netperf_calibrate()
 
 function scls_show()
 {
-    if test ${verbose:-1} -lt 1 ; then
+    if test ${verbose:-1} -lt 2 ; then
 	return
     fi
     if test :${xti:-no} = :no ; then
@@ -726,7 +726,7 @@ function scls_show()
     if test :${device:-/dev/sctp} = :/dev/sctp2 ; then
 	scls_modules="$scls_modules sctp2"
     fi
-    if test ${verbose:-1} -gt 1 ; then
+    if test ${verbose:-1} -gt 2 ; then
 	scls_options="-b -a -r"
     else
 	scls_options="-c -a -r"
