@@ -133,6 +133,7 @@ static char const ident[] =
 int verbose = 1;
 int msgsize = 64;
 int report = 1;
+int iterations = -1;
 
 #ifdef NATIVE_PIPES
 int native = 1;
@@ -196,6 +197,7 @@ test_sync(int fds[])
 {
 	int tbytcnt = 0, tavg_msgs = 0, tavg_tput = 0;
 	int rbytcnt = 0, ravg_msgs = 0, ravg_tput = 0;
+	int report_count = 0;
 
 	if (verbose > 1)
 		fprintf(stderr, "Starting timer\n");
@@ -232,6 +234,12 @@ test_sync(int fds[])
 			}
 			tbytcnt -= rbytcnt;
 			rbytcnt = 0;
+			report_count++;
+			if (iterations > 0 && report_count >= iterations) {
+				close(fds[0]);
+				close(fds[1]);
+				return (0);
+			}
 			if (start_timer()) {
 				if (verbose)
 					perror("start_timer()");
@@ -324,6 +332,7 @@ read_child(int fd)
 {
 	int bytcnt = 0, avg_msgs = 0, avg_tput = 0;
 	struct pollfd pfd = { fd, POLLIN | POLLERR | POLLHUP, 0 };
+	int report_count = 0;
 
 	if (verbose > 1)
 		fprintf(stderr, "Starting timer\n");
@@ -345,6 +354,11 @@ read_child(int fd)
 				(long) msgcnt, (long) avg_msgs, (long) thrput, (long) avg_tput);
 			fflush(stdout);
 			bytcnt = 0;
+			report_count++;
+			if (iterations > 0 && report_count >= iterations) {
+				close(fd);
+				return (0);
+			}
 			if (start_timer()) {
 				if (verbose)
 					perror("start_timer()");
@@ -416,6 +430,7 @@ write_child(int fd)
 {
 	int bytcnt = 0, avg_msgs = 0, avg_tput = 0;
 	struct pollfd pfd = { fd, POLLOUT | POLLERR | POLLHUP, 0 };
+	int report_count = 0;
 
 	if (verbose > 1)
 		fprintf(stderr, "Starting timer\n");
@@ -437,6 +452,11 @@ write_child(int fd)
 				(long) msgcnt, (long) avg_msgs, (long) thrput, (long) avg_tput);
 			fflush(stdout);
 			bytcnt = 0;
+			report_count++;
+			if (iterations > 0 && report_count >= iterations) {
+				close(fd);
+				return (0);
+			}
 			if (start_timer()) {
 				if (verbose)
 					perror("start_timer()");
@@ -807,6 +827,8 @@ Options:\n\
         Use read/write instead of putmsg/getmsg\n\
     -t, --time=[REPORT]\n\
         Report time in seconds [default: %3$d]\n\
+    -i, --iterations=ITERATIONS\n\
+        Stop after INTERATIONS number of reports [default: none]\n\
     -q, --quiet\n\
         Suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose=[LEVEL]\n\
@@ -839,6 +861,7 @@ main(int argc, char *argv[])
 			{"size",	required_argument,	NULL, 's'},
 			{"readwrite",	no_argument,		NULL, 'r'},
 			{"time",	required_argument,	NULL, 't'},
+			{"iterations",	required_argument,	NULL, 'i'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
@@ -849,9 +872,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "m:afp:bs:rt:qvhV?W:", long_options, &option_index);
+		c = getopt_long(argc, argv, "m:afp:bs:rt:i:qvhV?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "m:afp:bs:rt:qvhV?");
+		c = getopt(argc, argv, "m:afp:bs:rt:i:qvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -895,6 +918,11 @@ main(int argc, char *argv[])
 		case 't':
 			report = strtol(optarg, NULL, 0);
 			if (1 > report)
+				goto bad_option;
+			break;
+		case 'i':
+			iterations = strtol(optarg, NULL, 0);
+			if (1 > iterations)
 				goto bad_option;
 			break;
 		case 'q':
