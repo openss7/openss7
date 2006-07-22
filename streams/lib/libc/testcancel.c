@@ -57,30 +57,24 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define _REENTRANT
 #define _THREAD_SAFE
 
+#include <errno.h>
 #include <sys/types.h>
-#include <stropts.h>
 #include <unistd.h>
+#include <stropts.h>
 
-/**
- * @ingroup libLiS
- * @brief get a message from a STREAM.
- * @param fd a file descriptor for the stream.
- * @param ctlptr a pointer to a struct strbuf structure that returns the
- * control part of the retrieved message.
- * @param datptr a pointer to a struct strbuf structuer that returns the data
- * part of the retrieved message.
- * @param flagsp a pointer to an integer flags word that returns the priority
- * of the retrieved message.
- *
- * getmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).
- * Because getmsg consists of a single call to getpmsg() which has the same
- * characteristics, no protection against asynchronous thread cancellation is
- * required.
- */
-int
-getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+#include <pthread.h>
+#include <errno.h>
+
+extern void __pthread_testcancel(void);
+
+#pragma weak __pthread_testcancel
+#pragma weak pthread_testcancel
+
+void
+pthread_testcancel(void)
 {
-	int band = -1;
-
-	return getpmsg(fd, ctlptr, datptr, &band, flagsp);
+	if (__pthread_testcancel)
+		__pthread_testcancel();
+	return;
 }
+

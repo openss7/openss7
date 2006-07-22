@@ -520,13 +520,12 @@ if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
 libstreams_la_SOURCES		= \
+				lib/libc/testcancel.c \
 				lib/libc/fattach.c \
 				lib/libc/fdetach.c \
-				lib/libc/getmsg.c \
 				lib/libc/getpmsg.c \
 				lib/libc/isastream.c \
 				lib/libc/pipe.c \
-				lib/libc/putmsg.c \
 				lib/libc/putpmsg.c
 libstreams_la_LDFLAGS		= -no-undefined
 libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)

@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/14 16:30:05 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ This library is free software; you can redistribute it and/or modify it under
+ the terms of the GNU Lesser General Public License as published by the Free
+ Software Foundation; version 2.1 of the License.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
+ This library is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Lesser Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Lesser General Public License
+ along with this library; if not, write to the Free Software Foundation, Inc.,
+ 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/14 16:30:05 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/14 16:30:05 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
-static char const ident[] =
-    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/14 16:30:05 $";
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -66,17 +64,24 @@ static char const ident[] =
 #include <pthread.h>
 #include <errno.h>
 
-extern void __pthread_testcancel(void);
+#define inline __attribute__((always_inline))
+#define noinline __attribute__((noinline))
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
 
-#pragma weak __pthread_testcancel
-#pragma weak pthread_testcancel
+extern void pthread_testcancel(void);
 
-void
-pthread_testcancel(void)
+static noinline void
+__putpmsg_error(void)
 {
-	if (__pthread_testcancel)
-		__pthread_testcancel();
-	return;
+	int __olderrno;
+
+	/* If we get an EINVAL error back it is likely due to a bad ioctl, in which case this is
+	   not a Stream, so we need to check if it is a Stream and fix up the error code.  We get
+	   EINTR for a controlling terminal. */
+	if ((__olderrno = errno) == EINVAL || __olderrno == EINTR || __olderrno == ENOTTY)
+		errno = (ioctl(fd, I_ISASTREAM) == -1) ? ENOSTR : __olderrno;
+	pthread_testcancel();
 }
 
 /**
@@ -96,7 +101,7 @@ pthread_testcancel(void)
  * function consists of a single system call, asynchronous thread cancellation
  * protection is not required.
  */
-static int
+static inline int
 __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
 	int err;
@@ -108,30 +113,36 @@ __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int 
 					   -1, -1, NULL});
 	args.band = band;
 	args.flags = flags;
+
+	pthread_testcancel();
 #if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
-	if ((err = ioctl(fd, I_PUTPMSG, &args)) == -1)
+	if (likely((err = ioctl(fd, I_PUTPMSG, &args)) >= 0))
 #else
-	if ((err = write(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) == -1)
+	if (likely((err = write(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0))
 #endif
-	{
-		int __olderrno;
-		/* If we get an EINVAL error back it is likely due to a bad ioctl, in which case
-		   this is not a Stream, so we need to check if it is a Stream and fix up the error
-		   code.  We get EINTR for a controlling terminal. */
-		if ((__olderrno = errno) == EINVAL || __olderrno == EINTR || __olderrno == ENOTTY)
-			errno = (ioctl(fd, I_ISASTREAM) == -1) ? ENOSTR : __olderrno;
-	}
+		return (err);
+	__putpmsg_error();
 	return (err);
 }
 
 int
 putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
-	int ret;
+	return __putpmsg(fd, ctlptr, datptr, band, flags);
+}
 
-	pthread_testcancel();
-	ret = __putpmsg(fd, ctlptr, datptr, band, flags);
-	if (ret == -1)
-		pthread_testcancel();
-	return (ret);
+/**
+ * @ingroup libLiS
+ * @brief put a message to a stream band.
+ * @param fd a file descriptor representing the stream.
+ * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+ * @param datptr a pointer to a strbuf structure describing the data part of the message.
+ * @param flags the priority of the message.
+ *
+ * This function is a thread cancellation point.
+ */
+int
+putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+{
+	return __putpmsg(fd, ctlptr, datptr, -1, flags);
 }

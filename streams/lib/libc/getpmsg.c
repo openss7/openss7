@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/14 16:30:05 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ This library is free software; you can redistribute it and/or modify it under
+ the terms of the GNU Lesser General Public License as published by the Free
+ Software Foundation; version 2.1 of the License.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
+ This library is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Lesser Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Lesser General Public License
+ along with this library; if not, write to the Free Software Foundation, Inc.,
+ 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/14 16:30:05 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/14 16:30:05 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
-static char const ident[] =
-    "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/14 16:30:05 $";
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -67,17 +65,24 @@ static char const ident[] =
 #include <pthread.h>
 #include <errno.h>
 
-extern void __pthread_testcancel(void);
+#define inline __attribute__((always_inline))
+#define noinline __attribute__((noinline))
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
 
-#pragma weak __pthread_testcancel
-#pragma weak pthread_testcancel
+extern void pthread_testcancel(void);
 
-void
-pthread_testcancel(void)
+static noinline void
+__getpmsg_error(void)
 {
-	if (__pthread_testcancel)
-		__pthread_testcancel();
-	return;
+	int __olderrno;
+
+	/* If we get an EINVAL error back it is likely due to a bad ioctl, in which case this is
+	   not a Stream, so we need to check if it is a Stream and fix up the error code.  We get
+	   EINTR for a controlling terminal. */
+	if ((__olderrno = errno) == EINVAL || __olderrno == EINTR || __olderrno == ENOTTY)
+		errno = (ioctl(fd, I_ISASTREAM) == -1) ? ENOSTR : __olderrno;
+	pthread_testcancel();
 }
 
 /**
@@ -97,7 +102,7 @@ pthread_testcancel(void)
  * function consists of a single system call, asynchronous thread cancellation
  * protection is not required.
  */
-static int
+static inline int
 __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
 	int err;
@@ -109,10 +114,12 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 					   -1, -1, NULL});
 	args.band = bandp ? *bandp : 0;
 	args.flags = flagsp ? *flagsp : 0;
+
+	pthread_testcancel();
 #if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
-	if ((err = ioctl(fd, I_GETPMSG, &args)) >= 0)
+	if (likely((err = ioctl(fd, I_GETPMSG, &args)) >= 0))
 #else
-	if ((err = read(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0)
+	if (likely((err = read(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0))
 #endif
 	{
 		if (ctlptr)
@@ -123,25 +130,38 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 			*bandp = args.band;
 		if (flagsp)
 			*flagsp = args.flags;
-	} else {
-		int __olderrno;
-		/* If we get an EINVAL error back it is likely due to a bad ioctl, in which case
-		   this is not a Stream, so we need to check if it is a Stream and fix up the error
-		   code.  We get EINTR for a controlling terminal. */
-		if ((__olderrno = errno) == EINVAL || __olderrno == EINTR || __olderrno == ENOTTY)
-			errno = (ioctl(fd, I_ISASTREAM) == -1) ? ENOSTR : __olderrno;
+		return (err);
 	}
+	__getpmsg_error();
 	return (err);
 }
 
 int
 getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
-	int ret;
+	return __getpmsg(fd, ctlptr, datptr, bandp, flagsp);
+}
 
-	pthread_testcancel();
-	ret = __getpmsg(fd, ctlptr, datptr, bandp, flagsp);
-	if (ret == -1)
-		pthread_testcancel();
-	return (ret);
+/**
+ * @ingroup libLiS
+ * @brief get a message from a STREAM.
+ * @param fd a file descriptor for the stream.
+ * @param ctlptr a pointer to a struct strbuf structure that returns the
+ * control part of the retrieved message.
+ * @param datptr a pointer to a struct strbuf structuer that returns the data
+ * part of the retrieved message.
+ * @param flagsp a pointer to an integer flags word that returns the priority
+ * of the retrieved message.
+ *
+ * getmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).
+ * Because getmsg consists of a single call to getpmsg() which has the same
+ * characteristics, no protection against asynchronous thread cancellation is
+ * required.
+ */
+int
+getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+{
+	int band = -1;
+
+	return __getpmsg(fd, ctlptr, datptr, &band, flagsp);
 }
