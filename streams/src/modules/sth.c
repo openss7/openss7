@@ -1627,7 +1627,22 @@ strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band, uns
  *  used timer interrupts.  The rest are guesses.
  */
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
-strgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
+strgetq_test(struct stdata *sd, queue_t *q, const int flags, const int band)
+{				/* IRQ SUPPRESSED */
+	mblk_t *b = NULL;
+	unsigned long pl = 0;
+
+	zwlock(sd, pl);
+	/* fast path for data */
+	if (likely((b = q->q_first) == NULL)) {
+		zwunlock(sd, pl);
+		return (b);
+	}
+	return strgetq_slow(sd, q, flags, band, pl);
+}
+
+STATIC streams_inline streams_fastcall __hot_read mblk_t *
+strgetq_wakeup(struct stdata *sd, queue_t *q, const int flags, const int band)
 {				/* IRQ SUPPRESSED */
 	mblk_t *b = NULL;
 	unsigned long pl = 0;
@@ -1716,7 +1731,7 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 			mp = ERR_PTR(-EINTR);
 			break;
 		}
-		if (likely((mp = strgetq(sd, q, flags, band)) != NULL))
+		if (likely((mp = strgetq_wakeup(sd, q, flags, band)) != NULL))
 			break;
 		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
@@ -1822,7 +1837,7 @@ strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 	/* also we need to trigger QWANTR bit and empty queue backenabling */
 	/* in reality we almost always go to block as processors are quite fast enough to keep read 
 	   queues empty */
-	if (unlikely((mp = strgetq(sd, q, flags, band)) != NULL))
+	if (unlikely((mp = strgetq_test(sd, q, flags, band)) != NULL))
 		goto done;
 
 	/* only here it there's nothing left on the queue */
