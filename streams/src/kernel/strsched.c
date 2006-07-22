@@ -2171,7 +2171,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 #endif
 		dassert(q->q_qinfo != NULL);
 		dassert(q->q_qinfo->qi_putp != NULL);
-#if CONFIG_STREAMS_DO_STATS
+#ifdef CONFIG_STREAMS_DO_STATS
 		/* if we enabled this capability, it is likely it will be used */
 		if (likely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_pcnt++;
@@ -2252,7 +2252,7 @@ srvp_fast(queue_t *q)
 			set_bit(QSVCBUSY_BIT, &q->q_flag);
 			dassert(q->q_qinfo);
 			dassert(q->q_qinfo->qi_srvp);
-#if CONFIG_STREAMS_DO_STATS
+#ifdef CONFIG_STREAMS_DO_STATS
 			if (unlikely(q->q_qinfo->qi_mstat != NULL))
 				q->q_qinfo->qi_mstat->ms_scnt++;
 #endif

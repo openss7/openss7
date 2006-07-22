@@ -313,8 +313,8 @@ STATIC struct module_info raw_minfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 19),		/* Hi water mark */
-	.mi_lowat = (1 << 17),		/* Lo water mark */
+	.mi_hiwat = (1 << 26),		/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 STATIC struct module_stat raw_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
@@ -932,19 +932,6 @@ STATIC struct tp_options tp_defaults = {
 
 #define t_defaults tp_defaults
 
-STATIC noinline streams_fastcall __unlikely int
-t_opts_size_ud_slow(const struct tp *tp, const mblk_t *mp)
-{
-	int size = 0;
-	struct iphdr *iph;
-
-	/* only need to deliver up destination address info if the stream is multihomed (i.e.
-	   wildcard bound) */
-	iph = (struct iphdr *) mp->b_datap->db_base;
-	size += _T_SPACE_SIZEOF(t_defaults.ip.addr);	/* T_IP_ADDR */
-	return (size);
-}
-
 /**
  * t_opts_size_ud - size options from received message for unitdata
  * @t: private structure
@@ -956,7 +943,9 @@ t_opts_size_ud(const struct tp *t, const mblk_t *mp)
 	if (likely(t->bnum == 1))
 		if (likely(t->baddrs[0].addr != INADDR_ANY))
 			return (0);
-	return t_opts_size_ud_slow(t, mp);
+	/* only need to deliver up destination address info if the stream is multihomed (i.e.
+	   wildcard bound) */
+	return (_T_SPACE_SIZEOF(t_defaults.ip.addr));	/* T_IP_ADDR */
 }
 
 /**
@@ -3479,9 +3468,8 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 	struct ipnet_protocol *pp;
 	struct mynet_protocol **ppp;
 	int hash = proto & (MAX_INET_PROTOS - 1);
-	unsigned long flags;
 
-	write_lock_str(&tp_prot_lock, flags);
+	write_lock_bh(&tp_prot_lock);
 	if ((pb = tp_prots[proto]) != NULL) {
 		pb->refs++;
 		switch (type) {
@@ -3538,7 +3526,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 				if ((*ppp)->copy != 0) {
 					__ptrace(("Cannot override copy entry\n"));
 					net_protocol_unlock();
-					write_unlock_str(&tp_prot_lock, flags);
+					write_unlock_bh(&tp_prot_lock);
 					kmem_cache_free(raw_prot_cachep, pb);
 					return (NULL);
 				}
@@ -3549,7 +3537,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 					if (!try_module_get(pp->kmod)) {
 						__ptrace(("Cannot acquire module\n"));
 						net_protocol_unlock();
-						write_unlock_str(&tp_prot_lock, flags);
+						write_unlock_bh(&tp_prot_lock);
 						kmem_cache_free(raw_prot_cachep, pb);
 						return (NULL);
 					}
@@ -3566,7 +3554,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 		/* link into hash slot */
 		tp_prots[proto] = pb;
 	}
-	write_unlock_str(&tp_prot_lock, flags);
+	write_unlock_bh(&tp_prot_lock);
 	return (pb);
 }
 
@@ -3586,9 +3574,8 @@ STATIC INLINE streams_fastcall __unlikely void
 tp_term_nproto(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
-	unsigned long flags;
 
-	write_lock_str(&tp_prot_lock, flags);
+	write_lock_bh(&tp_prot_lock);
 	if ((pb = tp_prots[proto]) != NULL) {
 		switch (type) {
 		case T_COTS:
@@ -3632,7 +3619,7 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 			kmem_cache_free(raw_prot_cachep, pb);
 		}
 	}
-	write_unlock_str(&tp_prot_lock, flags);
+	write_unlock_bh(&tp_prot_lock);
 }
 #endif				/* LINUX */
 
@@ -3913,6 +3900,11 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		spin_lock_str(&tp->qlock, flags);
 		tp->sndmem += skb->truesize;
 		spin_unlock_str(&tp->qlock, flags);
+#if 0
+		/* keep track of high water mark */
+		if (raw_wstat.ms_acnt < tp->sndmem)
+			raw_wstat.ms_acnt = tp->sndmem;
+#endif
 #endif
 	}
 	return (skb);
@@ -4264,6 +4256,7 @@ tp_senddata(struct tp *tp, const struct tp_options *opt, mblk_t *mp)
 	_rare();
 	return (err);
       blocked:
+	raw_wstat.ms_ccnt++;
 	tp->sndblk = 1;
       ebusy:
 	return (-EBUSY);
@@ -7998,6 +7991,7 @@ tp_rput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY))))
 	{
+		raw_rstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
@@ -8005,9 +7999,9 @@ tp_rput(queue_t *q, mblk_t *mp)
 
 		rtn = tp_r_prim(q, mp);
 		/* Fast Paths */
-		if (likely(rtn == QR_TRIMMED))
-			freeb(mp);
-		else if (likely(rtn == QR_DONE))
+		if (likely(rtn == QR_ABSORBED)) {
+			return (0);
+		} else if (likely(rtn == QR_DONE))
 			freemsg(mp);
 		else
 			tp_putq_slow(q, mp, rtn);
@@ -8020,18 +8014,24 @@ tp_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 
+#if 1
+	/* try bottom half locking across loop to allow softirqd to burst. */
+	local_bh_disable();
+#endif
 	while (likely((mp = getq(q)) != NULL)) {
 		int rtn;
 
 		rtn = tp_r_prim(q, mp);
 		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED))
-			freeb(mp);
-		else if (likely(rtn == QR_DONE))
-			freemsg(mp);
-		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+		if (likely(rtn == QR_ABSORBED)) {
+			continue;
+		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
+#if 1
+	/* this should run the burst from softirqd. */
+	local_bh_enable();
+#endif
 	return (0);
 }
 
@@ -8040,6 +8040,7 @@ tp_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY))))
 	{
+		raw_wstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
@@ -8047,9 +8048,10 @@ tp_wput(queue_t *q, mblk_t *mp)
 
 		rtn = tp_w_prim(q, mp);
 		/* Fast Paths */
-		if (likely(rtn == QR_TRIMMED))
+		if (likely(rtn == QR_TRIMMED)) {
 			freeb(mp);
-		else if (likely(rtn == QR_DONE))
+			return (0);
+		} else if (likely(rtn == QR_DONE))
 			freemsg(mp);
 		else
 			tp_putq_slow(q, mp, rtn);
@@ -8062,18 +8064,25 @@ tp_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 
+#if 0
+	/* try bottom half locking across loop to bundle burst for softirqd. */
+	local_bh_disable();
+#endif
 	while (likely((mp = getq(q)) != NULL)) {
-		int rtn;
+		register int rtn;
 
 		rtn = tp_w_prim(q, mp);
 		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED))
+		if (likely(rtn == QR_TRIMMED)) {
 			freeb(mp);
-		else if (likely(rtn == QR_DONE))
-			freemsg(mp);
-		else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
+			continue;
+		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
 			break;
 	}
+#if 0
+	/* this should run the burst to softirqd. */
+	local_bh_enable();
+#endif
 	return (0);
 }
 
@@ -8465,6 +8474,7 @@ tp_v4_rcv(struct sk_buff *skb)
 #else
 	{
 		mblk_t *mp;
+		queue_t *q;
 		frtn_t fr = { &tp_free, (caddr_t) skb };
 		size_t plen = skb->len + (skb->data - skb->nh.raw);
 
@@ -8475,19 +8485,19 @@ tp_v4_rcv(struct sk_buff *skb)
 		mp->b_datap->db_flag |= DB_SKBUFF;
 		_ptrace(("Allocated external buffer message block %p\n", mp));
 		/* check flow control only after we have a buffer */
-		if (tp->oq == NULL || !canput(tp->oq))
+		if (unlikely((q = tp->oq) == NULL || !canput(q)))
 			goto flow_controlled;
 		// mp->b_datap->db_type = M_DATA;
 		mp->b_wptr += plen;
-		put(tp->oq, mp);
+		put(q, mp);
 		/* release reference from lookup */
 		tp_put(tp);
 		return (0);
 	      flow_controlled:
+		raw_rstat.ms_ccnt++;
 		freeb(mp);	/* will take sk_buff with it */
 		tp_put(tp);
 		return (0);
-
 	}
 #endif
       no_buffers:
@@ -8547,6 +8557,7 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 		goto closed;
 	{
 		mblk_t *mp;
+		queue_t *q;
 		size_t plen = skb->len + (skb->data - skb->nh.raw);
 
 		/* Create a queue a specialized M_CTL message to the Stream's read queue for
@@ -8555,15 +8566,16 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 		if ((mp = allocb(plen, BPRI_MED)) == NULL)
 			goto no_buffers;
 		/* check flow control only after we have a buffer */
-		if (tp->oq == NULL || !bcanput(tp->oq, 1))
+		if ((q = tp->oq) == NULL || !bcanput(q, 1))
 			goto flow_controlled;
 		mp->b_datap->db_type = M_CTL;
 		mp->b_band = 1;
 		bcopy(skb->nh.raw, mp->b_wptr, plen);
 		mp->b_wptr += plen;
-		put(tp->oq, mp);
+		put(q, mp);
 		goto discard_put;
 	      flow_controlled:
+		raw_rstat.ms_ccnt++;
 		ptrace(("ERROR: stream is flow controlled\n"));
 		freeb(mp);
 		goto discard_put;
@@ -8767,11 +8779,8 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	struct tp *tp, **tpp = &master.tp.list;
 	unsigned long flags;
-
-#if defined LFS
 	mblk_t *mp;
 	struct stroptions *so;
-#endif
 
 	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
@@ -8801,10 +8810,8 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = FREE_CMINOR;
-#if defined LFS
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
-#endif
 	write_lock_str(&master.lock, flags);
 	for (; *tpp; tpp = &(*tpp)->next) {
 		if (cmajor != (*tpp)->u.dev.cmajor)
@@ -8825,9 +8832,7 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		write_unlock_str(&master.lock, flags);
-#if defined LFS
 		freeb(mp);
-#endif
 		return (ENXIO);
 	}
 	_printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
@@ -8835,21 +8840,29 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (!(tp = tp_alloc_priv(q, tpp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		write_unlock_str(&master.lock, flags);
-#if defined LFS
 		freeb(mp);
-#endif
 		return (ENOMEM);
 	}
 	write_unlock_str(&master.lock, flags);
-#if defined LFS
-	/* want to set a write offet of MAX_HEADER bytes */
 	so = (typeof(so)) mp->b_wptr;
-	so->so_flags = SO_WROFF | SO_SKBUFF;
+	bzero(so, sizeof(*so));
+#if defined LFS
+	so->so_flags |= SO_SKBUFF;
+#endif
+	/* want to set a write offet of MAX_HEADER bytes */
+	so->so_flags |= SO_WROFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
+	so->so_flags |= SO_MINPSZ;
+	so->so_minpsz = raw_minfo.mi_minpsz;
+	so->so_flags |= SO_MAXPSZ;
+	so->so_maxpsz = raw_minfo.mi_maxpsz;
+	so->so_flags |= SO_HIWAT;
+	so->so_hiwat = raw_minfo.mi_hiwat;
+	so->so_flags |= SO_LOWAT;
+	so->so_lowat = raw_minfo.mi_lowat;
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
-#endif
 	qprocson(q);
 	return (0);
 }
