@@ -4256,7 +4256,7 @@ tp_senddata(struct tp *tp, const struct tp_options *opt, mblk_t *mp)
 	_rare();
 	return (err);
       blocked:
-	raw_wstats.ms_ccnt++;
+	raw_wstat.ms_ccnt++;
 	tp->sndblk = 1;
       ebusy:
 	return (-EBUSY);
@@ -8861,13 +8861,13 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	so->so_flags |= SO_WROFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
 	so->so_flags |= SO_MINPSZ;
-	so->so_minpsz = udp_minfo.mi_minpsz;
+	so->so_minpsz = raw_minfo.mi_minpsz;
 	so->so_flags |= SO_MAXPSZ;
-	so->so_maxpsz = udp_minfo.mi_maxpsz;
+	so->so_maxpsz = raw_minfo.mi_maxpsz;
 	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = udp_minfo.mi_hiwat;
+	so->so_hiwat = raw_minfo.mi_hiwat;
 	so->so_flags |= SO_LOWAT;
-	so->so_lowat = udp_minfo.mi_lowat;
+	so->so_lowat = raw_minfo.mi_lowat;
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);

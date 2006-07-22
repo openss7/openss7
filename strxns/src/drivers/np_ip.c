@@ -1393,7 +1393,9 @@ np_alloc_skb_old(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
 	unsigned char *beg, *end;
+#if 0
 	unsigned long flags;
+#endif
 
 #if 0
 	struct sk_buff *skb_head = NULL, *skb_tail = NULL;
@@ -6614,13 +6616,13 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	so->so_flags |= SO_WROFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
 	so->so_flags |= SO_MINPSZ;
-	so->so_minpsz = udp_minfo.mi_minpsz;
+	so->so_minpsz = np_minfo.mi_minpsz;
 	so->so_flags |= SO_MAXPSZ;
-	so->so_maxpsz = udp_minfo.mi_maxpsz;
+	so->so_maxpsz = np_minfo.mi_maxpsz;
 	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = udp_minfo.mi_hiwat;
+	so->so_hiwat = np_minfo.mi_hiwat;
 	so->so_flags |= SO_LOWAT;
-	so->so_lowat = udp_minfo.mi_lowat;
+	so->so_lowat = np_minfo.mi_lowat;
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
