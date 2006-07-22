@@ -234,7 +234,7 @@ AC_DEFUN([_LFS_SETUP_IRQ], [dnl
     AC_ARG_ENABLE([streams-irq],
 	AS_HELP_STRING([--disable-streams-irq],
 	    [disable STREAMS irq suppression.
-	     @<:@default=enabled@:>@])
+	     @<:@default=enabled@:>@]),
 	    [enable_streams_irq="$enableval"],
 	    [enable_streams_irq='yes'])
     AC_CACHE_CHECK([for STREAMS irq suppression], [lfs_streams_irq], [dnl
@@ -260,7 +260,7 @@ AC_DEFUN([_LFS_SETUP_STATS], [dnl
     AC_ARG_ENABLE([streams-stats],
 	AS_HELP_STRING([--enable-streams-stats],
 	    [enable STREAMS stats counting.
-	     @<:@default=disabled@:>@])
+	     @<:@default=disabled@:>@]),
 	    [enable_streams_stats="$enableval"],
 	    [enable_streams_stats='no'])
     AC_CACHE_CHECK([for STREAMS stats counting], [lfs_streams_stats], [dnl
