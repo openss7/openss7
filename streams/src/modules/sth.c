@@ -2046,7 +2046,9 @@ strwaitgetfp(struct stdata *sd, queue_t *q, const int f_flags)
 /**
  *  __strwaitband: - timed wait to perform write on a flow controlled band
  *  @sd: stream head
+ *  @f_flags: file flags
  *  @band: band number
+ *  @flags: message flags
  *
  *  DESCRIPTION: Wait for the specified band to pass flow control restrictions.  Test for flow
  *  control before calling this function.  Call it with the STREAM head at least read locked and
@@ -2055,7 +2057,7 @@ strwaitgetfp(struct stdata *sd, queue_t *q, const int f_flags)
  *  LOCKING: Must be called with a single read lock held on the STREAM head.
  */
 STATIC streams_noinline streams_fastcall int
-__strwaitband(struct stdata *sd, int band)
+__strwaitband(struct stdata *sd, const int f_flags, int band, const int flags)
 {
 	/* wait for band to become available */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
@@ -2064,6 +2066,15 @@ __strwaitband(struct stdata *sd, int band)
 	DECLARE_WAITQUEUE(wait, current);
 #endif
 	int err = 0;
+
+	if (unlikely(flags == MSG_HIPRI))	/* PROFILED */
+		return (0);
+
+	if (unlikely((f_flags & FNDELAY) && test_bit(STRNDEL_BIT, &sd->sd_flag) == 0))
+		return (-EAGAIN);
+
+	if (likely(signal_pending(current)))	/* PROFILED */
+		return (-ERESTARTSYS);
 
 	srunlock(sd);
 	strschedule_write();	/* save context switch */
@@ -2130,20 +2141,12 @@ __strwaitband(struct stdata *sd, int band)
 STATIC streams_fastcall __hot_out int
 strwaitband(struct stdata *sd, const int f_flags, const int band, const int flags)
 {
-	if (unlikely(flags == MSG_HIPRI))	/* PROFILED */
-		return (0);
-
 	/* have read lock and access was ok */
-	if (likely(bcanputnext(sd->sd_wq, band) != 0))	/* PROFILED */
-		return (0);
+	if (likely(flags != MSG_HIPRI))	/* PROFILED */
+		if (likely(bcanputnext(sd->sd_wq, band) != 0))	/* PROFILED */
+			return (0);
 
-	if (unlikely((f_flags & FNDELAY) && test_bit(STRNDEL_BIT, &sd->sd_flag) == 0))
-		return (-EAGAIN);
-
-	if (likely(signal_pending(current)))	/* PROFILED */
-		return (-ERESTARTSYS);
-
-	return __strwaitband(sd, band);
+	return __strwaitband(sd, f_flags, band, flags);
 }
 
 /*
