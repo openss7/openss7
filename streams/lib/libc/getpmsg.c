@@ -73,7 +73,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 extern void pthread_testcancel(void);
 
 static noinline void
-__getpmsg_error(void)
+__getpmsg_error(int fd)
 {
 	int __olderrno;
 
@@ -132,7 +132,7 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 			*flagsp = args.flags;
 		return (err);
 	}
-	__getpmsg_error();
+	__getpmsg_error(fd);
 	return (err);
 }
 

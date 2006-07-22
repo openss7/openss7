@@ -72,7 +72,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 extern void pthread_testcancel(void);
 
 static noinline void
-__putpmsg_error(void)
+__putpmsg_error(int fd)
 {
 	int __olderrno;
 
@@ -121,7 +121,7 @@ __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int 
 	if (likely((err = write(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0))
 #endif
 		return (err);
-	__putpmsg_error();
+	__putpmsg_error(fd);
 	return (err);
 }
 
