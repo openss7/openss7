@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/07/03 04:09:54 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/07/23 04:04:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/03 04:09:54 $ by $Author: brian $
+# Last Modified $Date: 2006/07/23 04:04:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1626,7 +1626,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 		[specify optimization, normal, size, speed or quick.
 		@<:@default=normal@:>@]),
 	    [with_k_optimize="$withval"],
-	    [with_k_optimize=''])
+	    [with_k_optimize="$with_optimize"])
 	case "${with_k_optimize:-normal}" in
 	    (size)
 		linux_cflags="$linux_cflags${linux_cflags:+ }-Os"

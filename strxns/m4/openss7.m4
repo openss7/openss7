@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/07/14 00:12:25 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/07/23 04:04:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/14 00:12:25 $ by $Author: brian $
+# Last Modified $Date: 2006/07/23 04:04:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.34  2006/07/23 04:04:10  brian
+# - more control for user optimizations
+#
 # Revision 0.9.2.33  2006/07/14 00:12:25  brian
 # - substitute config cache and site filenames
 #
@@ -96,7 +99,7 @@ AC_DEFUN([_OPENSS7_PACKAGE], [dnl
     AC_SUBST([PKGINCL])dnl
     _OPENSS7_OPTIONS
     _OPENSS7_CACHE
-    _OPENSS7_DEBUG
+    _OPENSS7_OPTIONS_CFLAGS
     AC_SUBST([cross_compiling])dnl
 # =============================================================================
 # 
@@ -210,11 +213,10 @@ AC_DEFUN([_OPENSS7_CACHE], [dnl
 AC_DEFUN([_OPENSS7_DEBUG], [dnl
     if test :"${USE_MAINTAINER_MODE:-no}" != :no
     then
-	CFLAGS=`echo "$CFLAGS" | sed -e 's|-Wall||;s|  | |g'`
-	CFLAGS=`echo "$CFLAGS" | sed -e 's|-Werror||;s|  | |g'`
-	CFLAGS=`echo "$CFLAGS" | sed -e 's|-Wundef||;s|  | |g'`
-	CFLAGS=`echo "$CFLAGS" | sed -e 's|-Wp,-D_FORTIFY_SOURCE=[0-9]*||;s|  | |g'`
-	CFLAGS=`echo "$CFLAGS" | sed -e 's|^  *||;s|  *$||;s|    | |g;s|   | |g;s|  | |g'`
+	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wall,,g'`
+	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Werror,,g'`
+	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wundef,,g'`
+	CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[0-9]*%%g'`
 	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Wp,-D_FORTIFY_SOURCE=2 -Werror"
     fi
 ])# _OPENSS7_DEBUG
@@ -418,6 +420,94 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_INDEP], [dnl
     AC_MSG_RESULT([${enable_indep:-yes}])
     AM_CONDITIONAL([PKG_BUILD_INDEP], [test :"${enable_indep:-yes}" = :yes])dnl
 ])# _OPENSS7_OPTIONS_PKG_INDEP
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_CFLAGS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
+    AC_MSG_CHECKING([for user CFLAGS])
+    AC_MSG_RESULT([${CFLAGS}])
+    AC_MSG_CHECKING([for user CFLAGS])
+    AC_ARG_WITH([optimize],
+	AC_HELP_STRING([--with-optimize=HOW],
+	    [specify optimization, normale, size, speed or quick,
+	     @<:@default=normal@:>@]),
+	[with_optimize="$withval"],
+	[with_optimize=''])
+    case "${with_optimize:-normal}" in
+	(size)
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    CFLAGS="-Os -g${CFLAGS:+ $CFLAGS}"
+	    ;;
+	(speed)
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -finline-functions,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-inline-functions,,g;s, , ,g'`
+	    CFLAGS="-O3 -g -fno-inline-functions${CFLAGS:+ $CFLAGS}"
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-reorder-blocks,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-reorder-functions,,g;s, , ,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-unit-at-a-time,,g'`
+	    ;;
+	(normal)
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    CFLAGS="-O2 -g${CFLAGS:+ $CFLAGS}"
+	    ;;
+	(quick)
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fkeep-inline-functions,,g;s, , ,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-keep-inline-functions,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fkeep-static-consts,,g;s, , ,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-keep-static-consts,,g;s, , ,g'`
+	    CFLAGS="-O0 -g -finline -fno-keep-inline-functions -fno-keep-static-consts${CFLAGS:+ $CFLAGS}"
+	    ;;
+    esac
+    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wtrigraphs,,g'`
+    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wno-trigraphs,,g'`
+    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-trigraphs"
+    if test :"${USE_MAINTAINER_MODE:-no}" != :no
+    then
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-system-headers"
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wundef,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wno-undef,,g'`
+	    CFLAGS="${CFLAGS:+$CFLAGS }-Wundef"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-endif-labels"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wbad-function-cast"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wcast-qual"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wcast-align"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wwrite-strings"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wconversion"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wsign-compare"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Waggregate-return"
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wstrict-prototypes,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wno-strict-prototypes,,g;s, , ,g'`
+	    CFLAGS="${CFLAGS:+$CFLAGS }-Wstrict-prototypes"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-prototypes"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-declarations"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-noreturn"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-format-attribute"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wpacked"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wpadded"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wredundant-decls"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wnested-externs"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wunreachable-code"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Winline"
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wall,,g'`
+	    CFLAGS="${CFLAGS:+$CFLAGS }-Wall"
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[0-9]*%%g'`
+	    CFLAGS="${CFLAGS:+$CFLAGS }-Wp,-D_FORTIFY_SOURCE=2"
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Werror,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wno-error,,g'`
+	    CFLAGS="${CFLAGS:+$CFLAGS }-Werror"
+    fi
+    CFLAGS=`echo "$CFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
+    AC_MSG_RESULT([${CFLAGS}])
+])# _OPENSS7_OPTIONS_CFLAGS
 # =============================================================================
 
 # =============================================================================
