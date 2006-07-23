@@ -8338,12 +8338,10 @@ tp_rput(queue_t *q, mblk_t *mp)
 		int rtn;
 
 		rtn = tp_r_prim(q, mp);
-		/* Fast Paths */
+		/* Fast Path */
 		if (likely(rtn == QR_ABSORBED)) {
 			return (0);
-		} else if (likely(rtn == QR_DONE))
-			freemsg(mp);
-		else
+		} else
 			tp_putq_slow(q, mp, rtn);
 	}
 	return (0);
@@ -8378,13 +8376,11 @@ tp_wput(queue_t *q, mblk_t *mp)
 		int rtn;
 
 		rtn = tp_w_prim(q, mp);
-		/* Fast Paths */
+		/* Fast Path */
 		if (likely(rtn == QR_TRIMMED)) {
 			freeb(mp);
 			return (0);
-		} else if (likely(rtn == QR_DONE))
-			freemsg(mp);
-		else
+		} else
 			tp_putq_slow(q, mp, rtn);
 	}
 	return (0);
@@ -8675,6 +8671,7 @@ tp_lookup_icmp(struct iphdr *iph, unsigned int len)
 	return tp_lookup_common(iph->protocol, iph->saddr, uh->source, iph->daddr, uh->dest);
 }
 
+#if 1
 /**
  * tp_free - message block free function for mblks esballoc'ed from sk_buffs
  * @data: client data (sk_buff pointer in this case)
@@ -8711,6 +8708,7 @@ tp_free(caddr_t data)
 	return;
 #endif
 }
+#endif
 
 /**
  * tp_v4_rcv - receive IPv4 protocol packets
@@ -8739,8 +8737,11 @@ tp_v4_rcv(struct sk_buff *skb)
 
 	if (unlikely(!pskb_may_pull(skb, sizeof(struct udphdr))))
 		goto too_small;
+#if 0
+	/* I don't think that ip_rcv will ever give us a packet that tis not PACKET_HOST. */
 	if (unlikely(skb->pkt_type != PACKET_HOST))
 		goto bad_pkt_type;
+#endif
 	rt = (struct rtable *) skb->dst;
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
 		/* need to do something about broadcast and multicast */ ;
@@ -8758,12 +8759,15 @@ tp_v4_rcv(struct sk_buff *skb)
 	if (unlikely((tp = tp_lookup(iph, uh)) == NULL))
 		goto no_stream;
 	/* checksum initialization */
-	if (uh->check == 0)
+	if (likely(uh->check == 0))
 		skb->ip_summed = CHECKSUM_UNNECESSARY;
-	else if (skb->ip_summed == CHECKSUM_HW)
-		skb->ip_summed = CHECKSUM_UNNECESSARY;
-	else if (skb->ip_summed != CHECKSUM_UNNECESSARY)
-		skb->csum = csum_tcpudp_nofold(iph->saddr, iph->daddr, ulen, IPPROTO_UDP, 0);
+	else {
+		if (skb->ip_summed == CHECKSUM_HW)
+			skb->ip_summed = CHECKSUM_UNNECESSARY;
+		else if (skb->ip_summed != CHECKSUM_UNNECESSARY)
+			skb->csum =
+			    csum_tcpudp_nofold(iph->saddr, iph->daddr, ulen, IPPROTO_UDP, 0);
+	}
 #if 0
 	/* For now... We should actually place non-linear fragments into separate mblks and pass
 	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
@@ -8814,7 +8818,7 @@ tp_v4_rcv(struct sk_buff *skb)
 #else
 	{
 		mblk_t *mp;
-		queue_t *q;
+#if 1
 		frtn_t fr = { &tp_free, (caddr_t) skb };
 		size_t plen = skb->len + (skb->data - skb->nh.raw);
 
@@ -8823,13 +8827,21 @@ tp_v4_rcv(struct sk_buff *skb)
 			goto no_buffers;
 		/* tell others it is a socket buffer */
 		mp->b_datap->db_flag |= DB_SKBUFF;
+#else
+		if (unlikely((mp = skballoc(skb, BPRI_MED)) == NULL))
+			goto no_buffers;
+#endif
 		_ptrace(("Allocated external buffer message block %p\n", mp));
 		/* check flow control only after we have a buffer */
-		if (unlikely((q = tp->oq) == NULL || !canput(q)))
+		if (unlikely(!canput(tp->oq)))
 			goto flow_controlled;
 		// mp->b_datap->db_type = M_DATA;
+#if 1
 		mp->b_wptr += plen;
-		put(q, mp);
+#else
+		mp->b_wptr += skb->len;
+#endif
+		put(tp->oq, mp);
 //              UDP_INC_STATS_BH(UdpInDatagrams);
 		/* release reference from lookup */
 		tp_put(tp);
@@ -8863,7 +8875,9 @@ tp_v4_rcv(struct sk_buff *skb)
 	    && (unsigned short) csum_fold(skb_checksum(skb, 0, skb->len, skb->csum)))
 		goto bad_checksum;
 //      UDP_INC_STATS_BH(UdpNoPorts);   /* should wait... */
+#if 0
       bad_pkt_type:
+#endif
       too_small:
 	if (tp_v4_rcv_next(skb)) {
 		/* TODO: want to generate an ICMP port unreachable error here */
