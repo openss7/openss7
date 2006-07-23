@@ -131,6 +131,11 @@ typedef unsigned long __streams_dev_t;
 #endif
 #include <asm/fcntl.h>		/* for O_NONBLOCK, etc */
 #include <linux/poll.h>		/* for poll_table_struct */
+#if 0
+#include <linux/skbuff.h>	/* for struct sk_buff */
+#else
+struct sk_buff;			/* good enough to declare it */
+#endif
 
 #include "sys/streams/config.h"	/* build specific configuration file */
 
@@ -1010,6 +1015,7 @@ __STREAMS_EXTERN int ctlmsg(unsigned char type);
 __STREAMS_EXTERN int datamsg(unsigned char type);
 __STREAMS_EXTERN mblk_t *dupb(mblk_t *mp);
 __STRUTIL_EXTERN_INLINE mblk_t *dupmsg(mblk_t *mp);
+__STREAMS_EXTERN mblk_t *skballoc(struct sk_buff *skb, uint priority);
 __STREAMS_EXTERN mblk_t *esballoc(unsigned char *base, size_t size, uint priority,
 				  frtn_t *freeinfo);
 __STRUTIL_EXTERN_INLINE int isdatablk(dblk_t * db);
