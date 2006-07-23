@@ -62,8 +62,13 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <errno.h>
 #include <stropts.h>
 
+#if __GNUC__ < 3
+#define inline inline
+#define noinline extern
+#else
 #define inline __attribute__((always_inline))
-#define noinline __attribute__((noinline))
+#define noinline static __attribute__((noinline))
+#endif
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
 #define __hot __attribute__((section(".text.hot")))
