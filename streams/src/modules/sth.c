@@ -517,12 +517,30 @@ strsyscall(void)
 }
 
 STATIC streams_inline streams_fastcall __hot void
+strsyscall_ioctl(void)
+{
+	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
+	   the way out of a system call.  This allows queues to fill, flow control to function, and
+	   service procedures to run more efficiently. */
+#if 1
+	struct strthread *t = this_thread;
+
+	/* before every system call return -- saves a context switch */
+	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		return;
+	/* try to avoid context switch */
+	set_task_state(t->proc, TASK_INTERRUPTIBLE);
+	runqueues();
+#endif
+}
+
+STATIC streams_inline streams_fastcall __hot void
 strsyscall_write(void)
 {
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#ifndef CONFIG_SMP
+#if 1
 	struct strthread *t = this_thread;
 
 	/* before every system call return -- saves a context switch */
@@ -540,7 +558,7 @@ strsyscall_read(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#if 0
+#if 1
 	struct strthread *t = this_thread;
 
 	/* before every system call return -- saves a context switch */
@@ -585,7 +603,7 @@ strschedule_ioctl(void)
 	   processor.  This does have a negative impact; however, on SMP kernels running on UP
 	   machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-#if 0
+#if 1
 	/* before every sleep -- saves a context switch */
 	struct strthread *t = this_thread;
 
@@ -609,7 +627,7 @@ strschedule_write(void)
 	   processor.  This does have a negative impact; however, on SMP kernels running on UP
 	   machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-#if 0
+#if 1
 	/* before every sleep -- saves a context switch */
 	{
 		struct strthread *t = this_thread;
@@ -635,7 +653,7 @@ strschedule_read(void)
 	   processor.  This does have a negative impact; however, on SMP kernels running on UP
 	   machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-#ifndef CONFIG_SMP
+#if 1
 	/* before every sleep -- saves a context switch */
 	{
 		struct strthread *t = this_thread;
@@ -3947,24 +3965,22 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 	/* VFS doesn't check this */
 	if (likely((file->f_mode & (FREAD | FWRITE))) && likely((sd = stri_acquire(file)) != NULL)) {
 		if (likely(straccess_rlock(sd, (FCREAT | FAPPEND)) == 0)) {
-			if (likely(!sd->sd_directio || !sd->sd_directio->poll)) {
+			if (likely(!sd->sd_directio) || likely(!sd->sd_directio->poll)) {
 				mask = strpoll_fast(file, poll);
-			      unlock_done:
 				srunlock(sd);
-			      put_done:
 				sd_put(&sd);
-			      done:
 				strsyscall();	/* save context switch */
 				return (mask);
 			}
 			mask = sd->sd_directio->poll(file, poll);
-			goto unlock_done;
-		}
+			srunlock(sd);
+		} else
+			mask = POLLNVAL;
+		sd_put(&sd);
+	} else
 		mask = POLLNVAL;
-		goto put_done;
-	}
-	mask = POLLNVAL;
-	goto done;
+	strsyscall();		/* save context switch */
+	return (mask);
 }
 
 /**
@@ -4877,11 +4893,16 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 	else
 #endif
 	if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
-		if (likely(!sd->sd_directio || !sd->sd_directio->read))	/* PROFILED */
+		if (likely(!sd->sd_directio) || likely(!sd->sd_directio->read)) {
+			/* PROFILED */
 			err = strread_fast(file, buf, len, ppos);
-		else
-			err = sd->sd_directio->read(file, buf, len, ppos);
-		_ctrace(sd_put(&sd));
+			sd_put(&sd);
+			/* We want to give the driver queues an opportunity to run. */
+			strsyscall_read();	/* save context switch */
+			return (err);
+		}
+		err = sd->sd_directio->read(file, buf, len, ppos);
+		sd_put(&sd);
 	} else
 		err = -ENOSTR;
 	goto exit;
@@ -5157,11 +5178,16 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 	else
 #endif
 	if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
-		if (likely(!sd->sd_directio || !sd->sd_directio->write))	/* PROFILED */
+		if (likely(!sd->sd_directio) || likely(!sd->sd_directio->write)) {
+			/* PROFILED */
 			err = strwrite_fast(file, buf, len, ppos);
-		else
-			err = sd->sd_directio->write(file, buf, len, ppos);
-		_ctrace(sd_put(&sd));
+			sd_put(&sd);
+			/* We want to give the driver queues an opportunity to run. */
+			strsyscall_write();	/* save context switch */
+			return (err);
+		}
+		err = sd->sd_directio->write(file, buf, len, ppos);
+		sd_put(&sd);
 	} else
 		err = -ENOSTR;
 	goto exit;
@@ -5322,15 +5348,20 @@ STATIC __unlikely ssize_t
 _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_t *ppos, int more)
 {
 	struct stdata *sd;
-	int err = -ENOSTR;
+	int err;
 
 	if (likely((sd = stri_acquire(file)) != NULL)) {
-		if (likely(!sd->sd_directio || !sd->sd_directio->sendpage))
+		if (likely(!sd->sd_directio) || likely(!sd->sd_directio->sendpage)) {
 			err = strsendpage(file, page, offset, size, ppos, more);
-		else
-			err = sd->sd_directio->sendpage(file, page, offset, size, ppos, more);
-		_ctrace(sd_put(&sd));
-	}
+			sd_put(&sd);
+			/* We want to give the driver queues an opportunity to run. */
+			strsyscall_write();	/* save context switch */
+			return (err);
+		}
+		err = sd->sd_directio->sendpage(file, page, offset, size, ppos, more);
+		sd_put(&sd);
+	} else
+		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
 	strsyscall_write();	/* save context switch */
 	return (err);
@@ -5495,12 +5526,16 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 	/* not checked when coming though ioctl */
 	if (likely(file->f_mode & FWRITE)) {	/* PROFILED */
 		if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
-			if (likely(!sd->sd_directio || !sd->sd_directio->putpmsg))	/* PROFILED 
-											 */
+			if (likely(!sd->sd_directio) || likely(!sd->sd_directio->putpmsg)) {
+				/* PROFILED */
 				err = strputpmsg_fast(file, ctlp, datp, band, flags);
-			else
-				err = sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
-			_ctrace(sd_put(&sd));
+				sd_put(&sd);
+				/* We want to give the driver queues an opportunity to run. */
+				strsyscall_write();	/* save context switch */
+				return (err);
+			}
+			err = sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
+			sd_put(&sd);
 		} else
 			err = -ENOSTR;
 	} else
@@ -5882,23 +5917,22 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 	/* not checked when we come in through ioctl */
 	if (likely(file->f_mode & FREAD)) {
 		if (likely((sd = stri_acquire(file)) != NULL)) {
-			if (likely(!sd->sd_directio || !sd->sd_directio->getpmsg)) {
+			if (likely(!sd->sd_directio) || likely(!sd->sd_directio->getpmsg)) {
 				err = strgetpmsg_fast(file, ctlp, datp, bandp, flagsp);
-			      put_done:
 				sd_put(&sd);
-			      done:
 				/* We want to give the driver queues an opportunity to run. */
 				strsyscall_read();	/* save context switch */
 				return (err);
 			}
 			err = sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp);
-			goto put_done;
-		}
-		err = -ENOSTR;
-		goto done;
-	}
-	err = -EBADF;
-	goto done;
+			sd_put(&sd);
+		} else
+			err = -ENOSTR;
+	} else
+		err = -EBADF;
+	/* We want to give the driver queues an opportunity to run. */
+	strsyscall_read();	/* save context switch */
+	return (err);
 }
 
 /**
@@ -9665,7 +9699,13 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 		return str_i_getpmsg(file, sd, arg);
 	}
       go_slow:
-	return strioctl_slow(file, cmd, arg);
+	{
+		int err;
+
+		err = strioctl_slow(file, cmd, arg);
+		strsyscall_ioctl();
+		return (err);
+	}
 }
 
 streams_fastcall int
@@ -9683,19 +9723,17 @@ _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	int err;
 
 	if (likely((sd = stri_acquire(file)) != NULL)) {
-		if (likely(!sd->sd_directio || !sd->sd_directio->ioctl)) {
+		if (likely(!sd->sd_directio) || likely(!sd->sd_directio->ioctl)) {
 			err = strioctl_fast(file, cmd, arg);
-		      put_done:
 			sd_put(&sd);
-		      done:
-			strsyscall();	/* save context switch */
 			return (err);
 		}
 		err = sd->sd_directio->ioctl(file, cmd, arg);
-		goto put_done;
-	}
-	err = -ENOSTR;
-	goto done;
+		sd_put(&sd);
+	} else 
+		err = -ENOSTR;
+	strsyscall_ioctl();	/* save context switch */
+	return (err);
 }
 
 STATIC __hot int
@@ -10266,12 +10304,13 @@ str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 		int band, flags;
 
 		strwakeread(sd);
-		if (likely((band = mp->b_band) == 0))
+		if (likely((band = mp->b_band) == 0)) {
 			flags = (S_INPUT | S_RDNORM);
-		else
-			flags = (S_INPUT | S_RDBAND);
+			strevent(sd, flags, band);
+			return (0);
+		}
+		flags = (S_INPUT | S_RDBAND);
 		strevent(sd, flags, band);
-		return (0);
 	}
 	return (0);
 }
@@ -10284,12 +10323,13 @@ str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 		int band, flags;
 
 		strwakeread(sd);
-		if (likely((band = mp->b_band) == 0))
+		if (likely((band = mp->b_band) == 0)) {
 			flags = (S_INPUT | S_RDNORM);
-		else
-			flags = (S_INPUT | S_RDBAND);
+			strevent(sd, flags, band);
+			return (0);
+		}
+		flags = (S_INPUT | S_RDBAND);
 		strevent(sd, flags, band);
-		return (0);
 	}
 	return (0);
 }
