@@ -69,10 +69,12 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define noinline __attribute__((noinline))
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
+#define __hot __attribute__((section(".text.hot")))
+#define __unlikely __attribute__((section(".text.unlikely")))
 
 extern void pthread_testcancel(void);
 
-static noinline void
+static noinline __unlikely void
 __getpmsg_error(int fd)
 {
 	int __olderrno;
@@ -102,7 +104,7 @@ __getpmsg_error(int fd)
  * function consists of a single system call, asynchronous thread cancellation
  * protection is not required.
  */
-static inline int
+static inline __hot int
 __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
 	int err;
@@ -136,7 +138,7 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 	return (err);
 }
 
-int
+__hot int
 getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
 	return __getpmsg(fd, ctlptr, datptr, bandp, flagsp);
@@ -158,7 +160,7 @@ getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *f
  * characteristics, no protection against asynchronous thread cancellation is
  * required.
  */
-int
+__hot int
 getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
 	int band = -1;

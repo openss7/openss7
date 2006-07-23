@@ -62,6 +62,13 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <errno.h>
 #include <stropts.h>
 
+#define inline __attribute__((always_inline))
+#define noinline __attribute__((noinline))
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+#define __hot __attribute__((section(".text.hot")))
+#define __unlikely __attribute__((section(".text.unlikely")))
+
 /**
  * @ingroup libLiS
  * @brief test a stream.
@@ -71,7 +78,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * Because isastream() consists of a single system call, asynchronous thread
  * cancellation protection is not required.
  */
-int
+__unlikely int
 isastream(int fd)
 {
 	if (ioctl(fd, I_ISASTREAM) == -1) {

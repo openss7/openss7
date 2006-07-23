@@ -57,6 +57,13 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <stropts.h>
 #include <sys/ioctl.h>
 
+#define inline __attribute__((always_inline))
+#define noinline __attribute__((noinline))
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+#define __hot __attribute__((section(".text.hot")))
+#define __unlikely __attribute__((section(".text.unlikely")))
+
 /**
  * @ingroup libLiS
  * @brief attach a stream to a path in a filesystem.
@@ -67,7 +74,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * function contains a single system call, it is asyncrhonous thread
  * cancellation safe.
  */
-int
+int __unlikely
 fattach(int fd, const char *path)
 {
 	return (ioctl(fd, I_FATTACH, path));

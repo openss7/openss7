@@ -68,10 +68,12 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define noinline __attribute__((noinline))
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
+#define __hot __attribute__((section(".text.hot")))
+#define __unlikely __attribute__((section(".text.unlikely")))
 
 extern void pthread_testcancel(void);
 
-static noinline void
+static noinline __unlikely void
 __putpmsg_error(int fd)
 {
 	int __olderrno;
@@ -101,7 +103,7 @@ __putpmsg_error(int fd)
  * function consists of a single system call, asynchronous thread cancellation
  * protection is not required.
  */
-static inline int
+static inline __hot int
 __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
 	int err;
@@ -125,7 +127,7 @@ __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int 
 	return (err);
 }
 
-int
+__hot int
 putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
 	return __putpmsg(fd, ctlptr, datptr, band, flags);
@@ -141,7 +143,7 @@ putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int ba
  *
  * This function is a thread cancellation point.
  */
-int
+__hot int
 putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
 	return __putpmsg(fd, ctlptr, datptr, -1, flags);

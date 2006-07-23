@@ -521,15 +521,15 @@ if PKG_BUILD_ARCH
 
 libstreams_la_SOURCES		= \
 				lib/libc/testcancel.c \
-				lib/libc/fattach.c \
-				lib/libc/fdetach.c \
+				lib/libc/putpmsg.c \
 				lib/libc/getpmsg.c \
 				lib/libc/isastream.c \
 				lib/libc/pipe.c \
-				lib/libc/putpmsg.c
+				lib/libc/fattach.c \
+				lib/libc/fdetach.c
 libstreams_la_LDFLAGS		= -no-undefined
 libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-libstreams_la_CFLAGS		= $(USER_CFLAGS)
+libstreams_la_CFLAGS		= $(USER_CFLAGS) -freorder-blocks -freorder-functions
 
 if USING_IOCTL_GETPMSG_PUTPMSG
 libstreams_la_LDFLAGS		+= -version-info 0:1:0

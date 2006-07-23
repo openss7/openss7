@@ -67,20 +67,14 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include <pthread.h>
 
-extern int __pthread_setcanceltype(int type, int *oldtype);
+#define inline __attribute__((always_inline))
+#define noinline __attribute__((noinline))
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+#define __hot __attribute__((section(".text.hot")))
+#define __unlikely __attribute__((section(".text.unlikely")))
 
-#pragma weak __pthread_setcanceltype
-#pragma weak pthread_setcanceltype
-
-int
-pthread_setcanceltype(int type, int *oldtype)
-{
-	if (__pthread_setcanceltype)
-		return __pthread_setcanceltype(type, oldtype);
-	if (oldtype)
-		*oldtype = type;
-	return (0);
-}
+extern int pthread_setcanceltype(int type, int *oldtype);
 
 #if 0
 #define DUMMY_STREAM "/dev/nuls"	/* FIXME: /dev/stream,... */
