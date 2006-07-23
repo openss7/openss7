@@ -1,3 +1,8 @@
+2006-07-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: added module_stat structure,
+	  results of optimization
+
 2006-07-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/rawip.4.man: minor documentation updates

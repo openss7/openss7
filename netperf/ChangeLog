@@ -1,3 +1,18 @@
+2006-07-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* netperf_arr: rationalized and added scls_show
+	* netperf_packet_byte: rationalized and added scls_show
+	* netperf_sctp_range: rationalized and added scls_show
+	* netperf_sctp_rr: rationalized and added scls_show
+	* netperf_sctp_stream: rationalized and added scls_show
+	* netperf_snapshot: rationalized and added scls_show
+	* netperf_tcp_range: rationalized and added scls_show
+	* netperf_tcp_rr: rationalized and added scls_show
+	* netperf_tcp_stream: rationalized and added scls_show
+	* netperf_udp_range: rationalized and added scls_show
+	* netperf_udp_rr: rationalized and added scls_show
+	* netperf_udp_stream: rationalized and added scls_show
+
 2006-07-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release number for release candidate 3

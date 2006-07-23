@@ -1,3 +1,48 @@
+2006-07-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* acincline.m4 (_LFS_SETUP_IRQ): added new option to use bh locking
+	  instead of irq locking
+	* acinclude.m4 (_LFS_SETUP_STATS): added new option to automagically
+	  collect STREAMS statistics in module_stat structure when provided
+	* doc/man/man4/sc.4.man: updated documentation for new sc functionality
+	* doc/man/man8/scls.8.man: updated documentation for new scls
+	  functionality
+	* include/sys/streams/config.h.in (CONFIG_STREAMS_NOIRQ)
+	  (CONFI_STREAMS_DO_STATS): added two new config flags
+	* include/sys/streams/sc.h (SC_IOC_RESET): added io control and expanded
+	  structures to include additional information
+	* include/sys/streams/strsubr.h: converted for NOIRQ operation
+	* src/drivers/bufq.h: converted for NOIRQ operation
+	* src/drivers/clone.c: added module_stat structure
+	* src/drivers/echo.c: added module_stat structure
+	* src/drivers/fifo.c: added module_stat structure
+	* src/drivers/log.c: added module_stat structure
+	* src/drivers/loop.c: added module_stat structure
+	* src/drivers/mux.c: added module_stat structure
+	* src/drivers/nsdev.c: added module_stat structure
+	* src/drivers/nuls.c: added module_stat structure
+	* src/drivers/pipe.c: added module_stat structure
+	* src/drivers/sad.c: added module_stat structure
+	* src/drivers/sfx.c: added module_stat structure
+	* src/drivers/spx.c: added module_stat structure
+	* src/drivers/vf.c: added module_stat structure
+	* src/kernel/strsad.c: converted for NOIRQ operation
+	* src/kernel/strsched.c: converted for NOIRQ and DO_STATS operation
+	* src/kernel/strutil.c: converted for NOIRQ operation
+	  (__rmvq): split __rmvq() into __rmvq() and __rmvq_band()
+	  (getq) (rmvq): removed empty queue backenable policy from getq and rmvq.
+	* src/kernel/strutil.h: converted for NOIRQ operation
+	* src/modules/bufmod.c: added module_stat structure
+	* src/modules/connld.c: added module_stat structure
+	* src/modules/nullmod.c: added module_stat structure
+	* src/modules/pipemod.c: added module_stat structure
+	* src/modules/sc.c: added module_stat structure
+	  (SC_IOC_RESET): added new io controls and modified to pass more information
+	* src/modules/sth.c: added module_stat structure, converted for NOIRQ
+	  operation, tweaks on when STREAMS is invoked from process context
+	* src/modules/testmod.c: added module_stat structure
+	* src/util/scls.c: modified to reset counts and pass more information
+
 2006-07-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release number for release candidate 3

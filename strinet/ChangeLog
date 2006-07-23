@@ -1,3 +1,15 @@
+2006-07-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/inet.c: added module_stat structure, and invoke put()
+	  instead of putq() to collect statistics
+	* src/drivers/rawip.c: added module_stat structure,
+	  results of optimization
+	* src/drivers/tcp.c: added module_stat structure,
+	  results of optimization
+	* src/drivers/udp.c: added module_stat structure,
+	  results of optimization
+	* src/modules/tcpns.c: added module_stat structure
+
 2006-07-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/np_ip.c: fixed noxious 2.4 bug, test suite corrections
