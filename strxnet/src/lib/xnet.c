@@ -137,6 +137,26 @@ static char const ident[] =
 #include <tihdr.h>
 #include <timod.h>
 
+#if defined __i386__ || defined __x86_64__ || defined __k8__
+#define fastcall __attribute__((__regparm__(3)))
+#else
+#define fastcall
+#endif
+
+#define __hot __attribute__((section(".text.hot")))
+#define __unlikely __attribute__((section(".text.unlikely")))
+
+#if __GNUC__ < 3
+#define inline static inline fastcall __hot
+#define noinline extern fastcall __unlikely
+#else
+#define inline static inline __attribute__((always_inline)) fastcall __hot
+#define noinline static __attribute__((noinline)) fastcall __unlikely
+#endif
+
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+
 #undef min
 #define min(a, b) (a < b ? a : b)
 
@@ -463,7 +483,7 @@ static struct _t_user *_t_fds[OPEN_MAX] = { NULL, };
  * accepting a constant so that the compiler can inline just the appropriate
  * case value.
  */
-static inline void
+inline void
 __xnet_u_setstate_const(struct _t_user *user, const int state)
 {
 	user->statef = (1 << state);
@@ -563,7 +583,7 @@ __xnet_u_setstate(struct _t_user *user, int state)
  * Sets the current event in the transport endpoint user structure according
  * to the current primitive.
  */
-static inline int
+inline int
 __xnet_u_setevent(struct _t_user *user, int prim, int flags)
 {
 	switch ((user->prim = prim)) {
@@ -635,48 +655,47 @@ __xnet_u_reset_event(struct _t_user *user)
 	}
 }
 
-static int
+inline int
 __xnet_u_max_addr(struct _t_user *user)
 {
-	return (user->info.addr ==
-		T_INFINITE ? MAXINT : (user->info.addr >= 0 ? user->info.addr : 0));
+	return (user->info.addr == T_INFINITE
+		? MAXINT : (user->info.addr >= 0 ? user->info.addr : 0));
 }
-static int
+inline int
 __xnet_u_max_options(struct _t_user *user)
 {
-	return (user->info.options ==
-		T_INFINITE ? MAXINT : (user->info.options >= 0 ? user->info.options : 0));
+	return (user->info.options == T_INFINITE
+		? MAXINT : (user->info.options >= 0 ? user->info.options : 0));
 }
-static int
+inline int
 __xnet_u_max_tsdu(struct _t_user *user)
 {
-	return ((user->info.tsdu == T_INFINITE
-		 || user->info.tsdu == 0) ? MAXINT : (user->info.tsdu >= 0 ? user->info.tsdu : 0));
+	return ((user->info.tsdu == T_INFINITE || user->info.tsdu == 0)
+		? MAXINT : (user->info.tsdu >= 0 ? user->info.tsdu : 0));
 }
-static int
+inline int
 __xnet_u_max_etsdu(struct _t_user *user)
 {
-	return ((user->info.etsdu == T_INFINITE
-		 || user->info.etsdu == 0) ? MAXINT : (user->info.etsdu >=
-						       0 ? user->info.etsdu : 0));
+	return ((user->info.etsdu == T_INFINITE || user->info.etsdu == 0)
+		? MAXINT : (user->info.etsdu >= 0 ? user->info.etsdu : 0));
 }
-static int
+inline int
 __xnet_u_max_connect(struct _t_user *user)
 {
-	return (user->info.connect ==
-		T_INFINITE ? MAXINT : (user->info.connect >= 0 ? user->info.connect : 0));
+	return (user->info.connect == T_INFINITE
+		? MAXINT : (user->info.connect >= 0 ? user->info.connect : 0));
 }
-static int
+inline int
 __xnet_u_max_discon(struct _t_user *user)
 {
-	return (user->info.discon ==
-		T_INFINITE ? MAXINT : (user->info.discon >= 0 ? user->info.discon : 0));
+	return (user->info.discon == T_INFINITE
+		? MAXINT : (user->info.discon >= 0 ? user->info.discon : 0));
 }
-static int
+inline int
 __xnet_u_max_tidu(struct _t_user *user)
 {
-	return (user->info.tidu ==
-		T_INFINITE ? MAXINT : (user->info.tidu >= 0 ? user->info.tidu : 0));
+	return (user->info.tidu == T_INFINITE
+		? MAXINT : (user->info.tidu >= 0 ? user->info.tidu : 0));
 }
 
 /*
@@ -811,7 +830,7 @@ __xnet_t_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flagsp)
  * This is the same as putmsg(2) with the exception that XTI errors are
  * returned.
  */
-static int
+static __hot int
 __xnet_t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags)
 {
 	int ret;
@@ -885,26 +904,23 @@ __xnet_t_putpmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int band, int
 	return (-1);
 }
 
-static int
+static __hot int
 __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 {
 	struct _t_user *user = _t_fds[fd];
 	int ret, flag = 0;
 	union T_primitives *p = (typeof(p)) user->ctlbuf;
 
-	switch (user->event) {
-	case T_DATA:
-	case T_EXDATA:
-		if (!(user->event & expect))
-			break;
-		if (user->data.len < 1)
+	if (likely(user->event == T_DATA) || likely(user->event == T_EXDATA)) {
+		if (unlikely(!(user->event & expect)))
+			goto done;
+		if (unlikely(user->data.len < 1))
 			goto getmoredata;
 		udata->len = min(udata->maxlen, user->data.len);
 		memcpy(udata->buf, user->data.buf, udata->len);
 		user->data.buf += udata->len;
 		user->data.len -= udata->len;
-		break;
-	case 0:
+	} else if (user->event == 0) {
 		__xnet_u_reset_event(user);
 	      getmoredata:
 		user->data.maxlen = min(udata->maxlen, user->datmax);
@@ -975,10 +991,9 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 				udata->len = 0;
 			}
 		}
-		break;
-	default:
+	} else 
 		goto tlook;
-	}
+      done:
 	return (user->event);
       cleanup:
 	while (ret != -1 && (ret & (MORECTL | MOREDATA)))
@@ -1086,23 +1101,23 @@ __xnet_t_getevent(int fd)
 
 static pthread_rwlock_t __xnet_fd_lock = PTHREAD_RWLOCK_INITIALIZER;
 
-static int
+inline int
 __xnet_lock_rdlock(pthread_rwlock_t * rwlock)
 {
 	return pthread_rwlock_rdlock(rwlock);
 }
-static int
+inline int
 __xnet_lock_wrlock(pthread_rwlock_t * rwlock)
 {
 	return pthread_rwlock_wrlock(rwlock);
 }
-static void
+inline void
 __xnet_lock_unlock(void *rwlock)
 {
 	pthread_rwlock_unlock(rwlock);
 }
 
-static int
+inline int
 __xnet_list_rdlock(void)
 {
 	return __xnet_lock_rdlock(&__xnet_fd_lock);
@@ -1125,12 +1140,12 @@ __xnet_user_rdlock(struct _t_user *user)
 	return __xnet_lock_rdlock(&user->lock);
 }
 #endif
-static int
+inline int
 __xnet_user_wrlock(struct _t_user *user)
 {
 	return __xnet_lock_wrlock(&user->lock);
 }
-static void
+inline void
 __xnet_user_unlock(struct _t_user *user)
 {
 	return __xnet_lock_unlock(&user->lock);
@@ -1156,17 +1171,19 @@ __xnet_t_putuser(void *arg)
  * associated with the specified file descriptor.  In addition, this function
  * takes the necessary locks for thread-safe operation.
  */
-static struct _t_user *
+static __hot struct _t_user *
 __xnet_t_getuser(int fd)
 {
 	struct _t_user *user;
 	int err;
 
-	if ((err = __xnet_list_rdlock()))
+	if (unlikely((err = __xnet_list_rdlock())))
 		goto list_lock_error;
-	if (0 > fd || fd >= OPEN_MAX || !(user = _t_fds[fd]))
+	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
 		goto tbadf;
-	if ((err = __xnet_user_wrlock(user)))
+	if (unlikely(!(user = _t_fds[fd])))
+		goto tbadf;
+	if (unlikely((err = __xnet_user_wrlock(user))))
 		goto user_lock_error;
 	return (user);
       user_lock_error:
@@ -1211,20 +1228,22 @@ __xnet_t_getuser(int fd)
  * in the mask, then the call will fail (return NULL) and set t_errno to
  * @c TOUTSTATE.  To accept any state, set states to -1.
  */
-static struct _t_user *
+static __hot struct _t_user *
 __xnet_t_tstuser(int fd, const int expect, const int servtype, const int states)
 {
 	struct _t_user *user;
 
-	if (0 > fd || fd >= OPEN_MAX || !(user = _t_fds[fd]))
+	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
 		goto tbadf;
-	if (user->flags & TUF_SYNC_REQUIRED)
+	if (unlikely(!(user = _t_fds[fd])))
+		goto tbadf;
+	if (unlikely(user->flags & TUF_SYNC_REQUIRED))
 		goto tproto;
-	if (user->event && user->event != expect && expect != -1)
+	if (unlikely(user->event && user->event != expect && expect != -1))
 		goto tlook;
-	if (!((1 << user->info.servtype) & servtype))
+	if (unlikely(!((1 << user->info.servtype) & servtype)))
 		goto tnotsupport;
-	if (!(user->statef & states))
+	if (unlikely(!(user->statef & states)))
 		goto toutstate;
 	return (user);
       toutstate:
@@ -1337,10 +1356,8 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 		if (user->ocnt < 1)
 			goto tproto;
 	} else
-	    if (!
-		(resuser =
-		 __xnet_t_tstuser(resfd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
-				  TSF_UNBND | TSF_IDLE)))
+	    if (!(resuser = __xnet_t_tstuser(resfd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+					     TSF_UNBND | TSF_IDLE)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
 		goto tlook;
@@ -2944,7 +2961,7 @@ int t_look(int fd)
 /*
    look for an event, but do not block 
  */
-int
+__hot int
 __xnet_t_peek(int fd)
 {
 	struct _t_user *user;
@@ -3661,9 +3678,8 @@ __xnet_t_rcvrel(int fd)
 {
 	struct _t_user *user;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+	if (!(user = __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 	switch (__xnet_t_getevent(fd)) {
 	case T_ORDREL:
@@ -3724,9 +3740,8 @@ __xnet_t_rcvreldata(int fd, struct t_discon *discon)
 {
 	struct _t_user *user;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+	if (!(user = __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (discon
@@ -3822,10 +3837,8 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 	struct _t_user *user;
 	int copied = 0;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
-			      TSF_DATA_XFER | TSF_WIND_ORDREL)))
+	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!optdata)
@@ -3968,13 +3981,13 @@ int t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
  * but into the user-supplied data area.  Only if the wrong event occurs,
  * should the data be moved to the look data area. 
  */
-int
+__hot int
 __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 {
 	struct _t_user *user;
 	int copied = 0, flag = 0, result;
 
-	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
+	if (unlikely(!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE))))
 		goto error;
 #ifdef DEBUG
 	if (!unitdata)
@@ -3982,57 +3995,53 @@ __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 	if (!flags)
 		goto einval;
 #endif
-	if (!unitdata)
-		return (0);
+	if (unlikely(!unitdata))
+		goto done;
 	{
 		struct strbuf data;
 
-		data.maxlen = unitdata->udata.maxlen > 0 ? unitdata->udata.maxlen : 0;
+		data.maxlen = likely(unitdata->udata.maxlen > 0)
+		    ? unitdata->udata.maxlen : 0;
 		data.len = 0;
 		data.buf = unitdata->udata.buf;
-		if ((result = __xnet_t_getdata(fd, &data, T_DATA)) == T_DATA) {
+		if (likely((result = __xnet_t_getdata(fd, &data, T_DATA)) == T_DATA)) {
 			union T_primitives *p = (typeof(p)) user->ctrl.buf;
 
-			switch (user->prim) {
-			case T_UNITDATA_IND:
-				if (unitdata->addr.maxlen
-				    && unitdata->addr.maxlen < p->unitdata_ind.SRC_length)
+			if (likely(user->prim == T_UNITDATA_IND)) {
+				if (unlikely(unitdata->addr.maxlen)
+				    && unlikely(unitdata->addr.maxlen < p->unitdata_ind.SRC_length))
 					goto tbufovflw;
-				if (unitdata->opt.maxlen
-				    && unitdata->opt.maxlen < p->unitdata_ind.OPT_length)
+				if (unlikely(unitdata->opt.maxlen)
+				    && unlikely(unitdata->opt.maxlen < p->unitdata_ind.OPT_length))
 					goto tbufovflw;
-				if (unitdata->addr.maxlen
+				if (unlikely(unitdata->addr.maxlen)
 				    && (unitdata->addr.len = p->unitdata_ind.SRC_length))
 					memcpy(unitdata->addr.buf,
 					       (char *) p + p->unitdata_ind.SRC_offset,
 					       unitdata->addr.len);
-				if (unitdata->opt.maxlen
+				if (unlikely(unitdata->opt.maxlen)
 				    && (unitdata->opt.len = p->unitdata_ind.OPT_length))
 					memcpy(unitdata->opt.buf,
 					       (char *) p + p->unitdata_ind.OPT_offset,
 					       unitdata->opt.len);
-				break;
-			default:
+			} else {
 				unitdata->addr.len = 0;
 				unitdata->opt.len = 0;
-				break;
 			}
 		}
 		for (;;) {
-			switch (result) {
-			case T_DATA:
+			if (likely(result == T_DATA))
 				flag = (user->moresdu || user->moredat) ? T_MORE : 0;
-				break;
-			case 0:
+			else if (result == 0)
 				goto tnodata;
-			case -1:
+			else if (result == -1)
 				goto error;
-			default:
+			else
 				goto tlook;
-			}
-			if ((copied += data.len) >= unitdata->udata.maxlen)
+
+			if (likely((copied += data.len) >= unitdata->udata.maxlen))
 				break;
-			if (!(flag & T_MORE)) {
+			if (likely(!(flag & T_MORE))) {
 				__xnet_u_reset_event(user);
 				break;
 			}
@@ -4045,6 +4054,7 @@ __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 	if (flags)
 		*flags = flag;
 	unitdata->udata.len = copied;
+      done:
 	return (0);
 #ifdef DEBUG
       einval:
@@ -4071,7 +4081,7 @@ __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 	return (-1);
 }
 
-int
+__hot int
 __xnet_t_rcvudata_r(int fd, struct t_unitdata *unitdata, int *flags)
 {
 	int ret = -1;
@@ -4196,10 +4206,8 @@ __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 	struct _t_user *user;
 	int copied = 0, nbytes, n = 0, event = 0, flag = 0, result;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
-			      TSF_DATA_XFER | TSF_WIND_ORDREL)))
+	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!flags)
@@ -4586,10 +4594,8 @@ __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags)
 	struct _t_user *user;
 	int written = 0;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
-			      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
 		goto tlook;
@@ -4950,10 +4956,8 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 	struct _t_user *user;
 	int written = 0;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
-			      TSF_DATA_XFER | TSF_WIND_ORDREL)))
+	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!optdata)
@@ -5060,10 +5064,8 @@ __xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec 
 	struct _t_user *user;
 	int written = 0, nbytes, i;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
-			      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!iov)
@@ -5165,7 +5167,7 @@ int t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *io
  * @c T_OPTDATA_REQ).  There is no other way in XTI of generating option data
  * with a transmission.
  */
-int
+__hot int
 __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 {
 	struct _t_user *user;
@@ -5173,34 +5175,39 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
 #if 0
-	/* don't do this unless there is a problem, and then after the call */
 	if ((__xnet_t_peek(fd) & ~T_DATA) > 0)
 		goto tlook;
 #endif
 #ifdef DEBUG
-	if (!unitdata)
+	if (unlikely(!unitdata))
 		goto einval;
-	if (unitdata && (unitdata->addr.len < 0 || (unitdata->addr.len > 0 && !unitdata->addr.buf)))
+	if (unlikely(unitdata->addr.len < 0 || (unitdata->addr.len > 0 && !unitdata->addr.buf)))
 		goto einval;
-	if (unitdata && (unitdata->opt.len < 0 || (unitdata->opt.len > 0 && !unitdata->opt.buf)))
+	if (unlikely(unitdata->opt.len < 0 || (unitdata->opt.len > 0 && !unitdata->opt.buf)))
 		goto einval;
-	if (unitdata
-	    && (unitdata->udata.len < 0 || (unitdata->udata.len > 0 && !unitdata->udata.buf)))
+	if (unlikely(unitdata->udata.len < 0 || (unitdata->udata.len > 0 && !unitdata->udata.buf)))
 		goto einval;
 #endif
-	if (unitdata && unitdata->addr.len > __xnet_u_max_addr(user))
-		goto tbadaddr;
-	if (unitdata && unitdata->opt.len > __xnet_u_max_options(user))
-		goto tbadopt;
-	if (unitdata && unitdata->udata.len > __xnet_u_max_tsdu(user))
-		goto tbaddata;
-	if (unitdata && unitdata->udata.len > __xnet_u_max_tidu(user))
-		goto tbaddata;
-	if ((!unitdata || unitdata->udata.len == 0) && !(user->info.flags & T_SNDZERO))
-		goto tbaddata;
+	if (likely(unitdata)) {
+		if (unlikely(unitdata->addr.len > __xnet_u_max_addr(user)))
+			goto tbadaddr;
+		if (unlikely(unitdata->opt.len > __xnet_u_max_options(user)))
+			goto tbadopt;
+		if (unlikely(unitdata->udata.len > __xnet_u_max_tsdu(user)))
+			goto tbaddata;
+		if (unlikely(unitdata->udata.len > __xnet_u_max_tidu(user)))
+			goto tbaddata;
+		if (unlikely(unitdata->udata.len == 0 && !(user->info.flags & T_SNDZERO)))
+			goto tbaddata;
+	} else {
+		if (unlikely(!(user->info.flags & T_SNDZERO)))
+			goto tbaddata;
+	}
 	{
-		size_t add_len = (unitdata && unitdata->addr.len > 0) ? unitdata->addr.len : 0;
-		size_t opt_len = (unitdata && unitdata->opt.len > 0) ? unitdata->opt.len : 0;
+		size_t add_len = (likely(unitdata)
+				  && likely(unitdata->addr.len > 0)) ? unitdata->addr.len : 0;
+		size_t opt_len = (likely(unitdata)
+				  && unlikely(unitdata->opt.len > 0)) ? unitdata->opt.len : 0;
 		struct {
 			struct T_unitdata_req prim;
 			unsigned char addr[add_len];
@@ -5211,19 +5218,25 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 		ctrl.maxlen = sizeof(req);
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
-		data.maxlen = unitdata ? unitdata->udata.maxlen : 0;
-		data.len = unitdata ? unitdata->udata.len : 0;
-		data.buf = unitdata ? unitdata->udata.buf : NULL;
+		if (likely(unitdata)) {
+			data.maxlen = unitdata->udata.maxlen;
+			data.len = unitdata->udata.len;
+			data.buf = unitdata->udata.buf;
+		} else {
+			data.maxlen = 0;
+			data.len = 0;
+			data.buf = NULL;
+		}
 		req.prim.PRIM_type = T_UNITDATA_REQ;
 		req.prim.DEST_length = add_len;
-		req.prim.DEST_offset = add_len ? sizeof(req.prim) : 0;
+		req.prim.DEST_offset = likely(add_len) ? sizeof(req.prim) : 0;
 		req.prim.OPT_length = opt_len;
-		req.prim.OPT_offset = opt_len ? sizeof(req.prim) + add_len : 0;
-		if (add_len)
+		req.prim.OPT_offset = unlikely(opt_len) ? sizeof(req.prim) + add_len : 0;
+		if (likely(add_len))
 			memcpy(req.addr, unitdata->addr.buf, add_len);
-		if (opt_len)
+		if (unlikely(opt_len))
 			memcpy(req.addr + add_len, unitdata->opt.buf, opt_len);
-		if (__xnet_t_putmsg(fd, &ctrl, &data, 0))
+		if (unlikely(__xnet_t_putmsg(fd, &ctrl, &data, 0)))
 			goto error;
 		return (0);
 	}
@@ -5253,7 +5266,7 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 	return (-1);
 }
 
-int
+__hot int
 __xnet_t_sndudata_r(int fd, const struct t_unitdata *unitdata)
 {
 	int ret = -1;
@@ -5293,10 +5306,8 @@ __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flag
 	struct _t_user *user;
 	int written = 0, nbytes, i;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
-			      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
 		goto tlook;
@@ -5403,10 +5414,8 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
 	struct _t_user *user;
 	int written = 0, nbytes, i;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
-			      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!iov)
