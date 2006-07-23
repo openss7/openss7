@@ -3930,13 +3930,13 @@ ne_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_
 	case -EOPNOTSUPP:
 		ERROR_type = NNOTSUPPORT;
 		break;
-	case NBADOPT:
 	case NBADADDR:
+	case NBADDATA:
+	case NBADOPT:
 	case NBADQOSTYPE:
 		break;
 	default:
 	case NOUTSTATE:
-	case NBADDATA:
 	case -EINVAL:
 	case -EFAULT:
 	case -EMSGSIZE:
