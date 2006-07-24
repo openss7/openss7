@@ -185,7 +185,7 @@ dnl
     AC_MSG_RESULT([${STRCONF_PACKAGE}])
     AC_MSG_CHECKING([for strconf minor bits])
     STRCONF_MINORSZ="${strconf_cv_minorbits:-8}"
-    AC_MSG_RESULT([${STRCONF_MINORBITS}])
+    AC_MSG_RESULT([${STRCONF_MINORSZ}])
 dnl
 dnl Allow the user to specify a package directory that is completely outside
 dnl of the source or build tree: that way, one can configure with a simple
@@ -471,6 +471,7 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 	AC_SUBST([STRCONF_STRLOAD])dnl
 	AC_SUBST([STRCONF_BPKGDIR])dnl
 	AC_SUBST([STRCONF_PACKAGE])dnl
+	AC_SUBST([STRCONF_MINORSZ])dnl
 	AC_SUBST([STRMAKENODES])dnl
 	_STRCONF_OUTPUT_CONFIG
 ])# _STRCONF_OUTPUT

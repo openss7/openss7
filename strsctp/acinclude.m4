@@ -1,5 +1,5 @@
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
 # @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/07/16 12:46:36 $
@@ -390,7 +390,7 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 #include <net/tcp.h>
     ])
     _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
-			ip_route_output_key __in_dev_get_rcu], [], [], [
+			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -463,11 +463,13 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 #endif
     ])
     _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
+			  struct inet_protocol.next,
 			  struct inet_protocol.copy,
 			  struct inet_protocol.no_policy,
+			  struct net_protocol.proto,
+			  struct net_protocol.next,
 			  struct net_protocol.no_policy,
 			  struct dst_entry.path,
-			  struct net_protocol.proto,
 			  struct dst_entry.path], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
@@ -867,7 +869,6 @@ AC_DEFUN([_SCTP_OUTPUT], [dnl
 # =============================================================================
 # _SCTP_CONFIG
 # -----------------------------------------------------------------------------
-# -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP_CONFIG], [dnl
 # SCTP_CONFIG_SLOW_VERIFICATION
     AC_MSG_CHECKING([for sctp slow verification])
@@ -1138,6 +1139,12 @@ AC_DEFUN([_SCTP_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=242
+dnl
+dnl Tired of device conflicts on 2.6 kernels.
+dnl
+    if test ${linux_cv_minorbits:-8} -gt 8 ; then
+	((strconf_cv_majbase+=2000))
+    fi
     strconf_cv_midbase=70
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'
@@ -1167,5 +1174,5 @@ AC_DEFUN([_SCTP_], [dnl
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================

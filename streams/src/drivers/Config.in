@@ -16,7 +16,7 @@
 # not all drivers do.  It is only known to work for 'fifo' at this time.
 #
 #	name		prefix	major	n-minors  n-majors
-@CONFIG_STREAMS_CLONE_TRUE@	driver	clone		clone	*
+@CONFIG_STREAMS_CLONE_TRUE@	driver	clone		clone	230
 @CONFIG_STREAMS_ECHO_TRUE@	driver	echo		echo	*
 @CONFIG_STREAMS_FIFO_TRUE@	driver	fifo		fifo	*
 @CONFIG_STREAMS_LOG_TRUE@	driver	log		log	*
@@ -36,7 +36,7 @@
 #
 #@CONFIG_STREAMS_INET_TRUE@	driver	inet		inet	30
 
-@CONFIG_STREAMS_CLONE_MODULE_TRUE@	driver	clone		clone	*
+@CONFIG_STREAMS_CLONE_MODULE_TRUE@	driver	clone		clone	230
 @CONFIG_STREAMS_ECHO_MODULE_TRUE@	driver	echo		echo	*
 @CONFIG_STREAMS_FIFO_MODULE_TRUE@	driver	fifo		fifo	*
 @CONFIG_STREAMS_LOG_MODULE_TRUE@	driver	log		log	*

@@ -68,7 +68,7 @@
 # not all drivers do.  It is only known to work for 'fifo' at this time.
 #
 #	name		prefix	major	n-minors  n-majors
-driver	clone-drvr	clone_	*
+driver	clone-drvr	clone_	230
 driver	fifo		fifo_	*	512
 driver	loop-around	sloop_	*
 driver	mini-mux	mmux_	*

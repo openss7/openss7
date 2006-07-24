@@ -221,7 +221,7 @@ AC_DEFUN([_LIS_SETUP], [dnl
 # Null out all the definitions that we don't need when not building for linux
 AC_DEFUN([_LIS_NO_LINUX], [dnl
 dnl LIS_KERN_TARGET=
-    STRCONF_MAJBASE=230
+    STRCONF_MAJBASE=231
     STRCONF_CONFIG='include/sys/LiS/config.h'
     STRCONF_MODCONF='head/modconf.inc'
     STRCONF_DRVCONF='drvrconf.mk'
@@ -327,7 +327,7 @@ AC_DEFUN([_LIS_LINUX_SETUP], [dnl
     AC_MSG_NOTICE([-----------------------------------])
     AC_MSG_NOTICE([complete linux kernel configuration])
     AC_MSG_NOTICE([-----------------------------------])
-    STRCONF_MAJBASE=230
+    STRCONF_MAJBASE=231
     STRCONF_CONFIG='include/sys/LiS/config.h'
     STRCONF_MODCONF='head/modconf.inc'
     STRCONF_DRVCONF='drvrconf.mk'
@@ -1573,6 +1573,12 @@ AC_DEFUN([_LIS_STRCONF], [dnl
     esac
     strconf_cv_input='Config.master'
     strconf_cv_majbase=230
+dnl
+dnl Tired of device conflicts on 2.6 kernels.
+dnl
+    if test ${linux_cv_minorbits:-8} -gt 8 ; then
+	((strconf_cv_majbase+=2000))
+    fi
     strconf_cv_midbase=1
     strconf_cv_config='include/sys/LiS/config.h'
     strconf_cv_modconf='head/modconf.inc'

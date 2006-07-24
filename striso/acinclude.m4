@@ -318,7 +318,13 @@ AC_DEFUN([_ISO_OUTPUT], [dnl
 AC_DEFUN([_ISO_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=180
+    strconf_cv_majbase=250
+dnl
+dnl Tired of device conflicts on 2.6 kernels.
+dnl
+    if test ${linux_cv_minorbits:-8} -gt 8 ; then
+	((strconf_cv_majbase+=2000))
+    fi
     strconf_cv_midbase=80
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'

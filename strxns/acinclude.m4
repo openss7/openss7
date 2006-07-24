@@ -151,7 +151,31 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
 # _XNS_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_OPTIONS], [dnl
+    _XNS_CHECK_XNS
 ])# _XNS_OPTIONS
+# =============================================================================
+
+# =============================================================================
+# _XNS_CHECK_XNS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNS_CHECK_XNS], [dnl
+    AC_ARG_WITH([ip],
+	AS_HELP_STRING([--with-ip],
+	    [include np-ip version 2 driver in build.  @<:@default=yes@:>@]),
+	[with_ip="$withval"],
+	[with_ip='no'])
+    AC_MSG_CHECKING([for NP-IP driver])
+    if test :"$with_ip" = :yes ; then
+	inet_cv_ip_v2='yes'
+	AC_DEFINE([IP_VERSION_2], [1], [
+	    Define for NP-IP driver.  This define is needed by test programs and other programs
+	    that need to determine if the NP-IP driver is included in the build or not.])
+    else
+	inet_cv_ip_v2='yes'
+    fi
+    AC_MSG_RESULT([$inet_cv_ip_v2])
+    AM_CONDITIONAL([WITH_IP], [test :"$inet_cv_ip_v2" = :yes])dnl
+])# _XNS_CHECK_XNS
 # =============================================================================
 
 # =============================================================================
@@ -846,8 +870,16 @@ dnl
 # _XNS_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_OUTPUT], [dnl
+    _XNS_CONFIG
     _XNS_STRCONF dnl
 ])# _XNS_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _XNS_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNS_CONFIG], [dnl
+])# _XNS_CONFIG
 # =============================================================================
 
 # =============================================================================
@@ -856,7 +888,13 @@ AC_DEFUN([_XNS_OUTPUT], [dnl
 AC_DEFUN([_XNS_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
+dnl
+dnl Tired of device conflicts on 2.6 kernels.
+dnl
     strconf_cv_majbase=244
+    if test ${linux_cv_minorbits:-8} -gt 8 ; then
+	((strconf_cv_majbase+=2000))
+    fi
     strconf_cv_midbase=40
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'

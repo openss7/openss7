@@ -155,7 +155,63 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
 # _INET_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_OPTIONS], [dnl
+    _INET_CHECK_INET
 ])# _INET_OPTIONS
+# =============================================================================
+
+# =============================================================================
+# _INET_CHECK_INET
+# -----------------------------------------------------------------------------
+AC_DEFUN([_INET_CHECK_INET], [dnl
+    AC_ARG_WITH([udp],
+	AS_HELP_STRING([--with-udp],
+	    [include udp version 2 driver in build.  @<:@default=yes@:>@]),
+	[with_udp="$withval"],
+	[with_udp='no'])
+    AC_MSG_CHECKING([for UDP Version 2 driver])
+    if test :"$with_udp" = :yes ; then
+	inet_cv_udp_v2='yes'
+	AC_DEFINE([UDP_VERSION_2], [1], [
+	    Define for UDP Version 2.  This define is needed by test programs and other programs
+	    that need to determine if the UDP Version 2 driver is included in the build or not.])
+    else
+	inet_cv_udp_v2='yes'
+    fi
+    AC_MSG_RESULT([$inet_cv_udp_v2])
+    AM_CONDITIONAL([WITH_UDP], [test :"$inet_cv_udp_v2" = :yes])dnl
+    AC_ARG_WITH([raw],
+	AS_HELP_STRING([--with-raw],
+	    [include raw version 2 driver in build.  @<:@default=yes@:>@]),
+	[with_raw="$withval"],
+	[with_raw='no'])
+    AC_MSG_CHECKING([for RAW Version 2 driver])
+    if test :"$with_raw" = :yes ; then
+	inet_cv_raw_v2='yes'
+	AC_DEFINE([RAW_VERSION_2], [1], [
+	    Define for RAW Version 2.  This define is needed by test programs and other programs
+	    that need to determine if the RAW Version 2 driver is included in the build or not.])
+    else
+	inet_cv_raw_v2='yes'
+    fi
+    AC_MSG_RESULT([$inet_cv_raw_v2])
+    AM_CONDITIONAL([WITH_RAW], [test :"$inet_cv_raw_v2" = :yes])dnl
+    AC_ARG_WITH([tcp],
+	AS_HELP_STRING([--with-tcp],
+	    [include tcp version 2 driver in build.  @<:@default=no@:>@]),
+	[with_tcp="$withval"],
+	[with_tcp='no'])
+    AC_MSG_CHECKING([for TCP Version 2 driver])
+    if test :"$with_tcp" = :yes ; then
+	inet_cv_tcp_v2='yes'
+	AC_DEFINE([TCP_VERSION_2], [1], [
+	    Define for TCP Version 2.  This define is needed by test programs and other programs
+	    that need to determine if the TCP Version 2 driver is included in the build or not.])
+    else
+	inet_cv_tcp_v2='yes'
+    fi
+    AC_MSG_RESULT([$inet_cv_tcp_v2])
+    AM_CONDITIONAL([WITH_TCP], [test :"$inet_cv_tcp_v2" = :yes])dnl
+])# _INET_CHECK_INET
 # =============================================================================
 
 # =============================================================================
@@ -664,6 +720,8 @@ dnl 	fi
 	esac
     else
 	with_udp='no'
+	with_raw='no'
+	with_tcp='no'
     fi
     if test :"${linux_cv_dst_entry_path:-no}" = :yes ; then
 	AC_DEFINE([HAVE_STRUCT_DST_ENTRY_PATH], [1], [Newer RHEL3
@@ -920,8 +978,16 @@ dnl
 # _INET_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_OUTPUT], [dnl
+    _INET_CONFIG
     _INET_STRCONF dnl
 ])# _INET_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _INET_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_INET_CONFIG], [dnl
+])# _INET_CONFIG
 # =============================================================================
 
 # =============================================================================
@@ -930,7 +996,13 @@ AC_DEFUN([_INET_OUTPUT], [dnl
 AC_DEFUN([_INET_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=247
+    strconf_cv_majbase=246
+dnl
+dnl Tired of device conflicts on 2.6 kernels.
+dnl
+    if test ${linux_cv_minorbits:-8} -gt 8 ; then
+	((strconf_cv_majbase+=2000))
+    fi
     strconf_cv_midbase=60
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'
