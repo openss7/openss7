@@ -288,11 +288,14 @@ install-modconf:
 # into the /etc/modules file and the initscripts would load them with /etc/rc.d/rc.modules.  Now, at
 # least on Mandrakelinux we need to place them in /etc/modprobe.preload for the same effect.
 ##
-if WITH_KO_MODULES
+if !MAINTAINER_MODE
 PRE_INSTALL_AM		+= pre-modules
+endif
+if WITH_KO_MODULES
+PRE_INSTALL_AM		+= 
 INSTALL_EXEC_LOCAL	+= install-modules
 else
-PRE_INSTALL_AM		+= pre-modules pre-modconf
+PRE_INSTALL_AM		+= pre-modconf
 INSTALL_EXEC_LOCAL	+= install-modules install-preloads install-modconf
 endif
 
@@ -320,7 +323,7 @@ pre-modules:
 	xtrace=`shopt -p -o | grep xtrace` ; set +x ; \
 	for m in `find $(DESTDIR)$(kmoduledir) \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do \
 		$(ECHO) "Checking module $$m" ; \
-		b=`echo $$m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)? | |'` ; \
+		b=`echo $$m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?$$||'` ; \
 		case " $$list " in (*" $$b "*) ;; (*) continue ;; esac ; \
 		modl_mods="$${modl_mods:+$$modl_mods }$$m" ; \
 	done ; \
