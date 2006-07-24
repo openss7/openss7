@@ -704,7 +704,7 @@ allocq(void)
 
 EXPORT_SYMBOL_NOVERS(allocq);	/* include/sys/streams/stream.h */
 
-STATIC streams_noinline streams_fastcall void sd_put_slow(struct stdata **sdp);
+streams_noinline streams_fastcall void sd_put_slow(struct stdata **sdp);
 
 /*
  *  __freeq:	- free a queue pair
@@ -867,7 +867,7 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #if defined CONFIG_STREAMS_NORECYCLE
 STATIC streams_inline streams_fastcall __hot mblk_t *
 #else
-STATIC streams_noinline streams_fastcall __hot_out mblk_t *
+streams_noinline streams_fastcall __hot_out mblk_t *
 #endif
 mdbblock_alloc_slow(uint priority, void *func)
 {
@@ -1145,7 +1145,7 @@ mdbblock_free(mblk_t *mp)
  *  then work on them one by one.  After we free something, we want to raise pending buffer
  *  callbacks on all STREAMS scheduler threads in an attempt to let them use the freed blocks.
  */
-STATIC streams_noinline streams_fastcall __unlikely void
+streams_noinline streams_fastcall __unlikely void
 freeblocks(struct strthread *t)
 {
 	mblk_t *mp, *mp_next;
@@ -2751,13 +2751,13 @@ qputp(queue_t *q, mblk_t *mp)
 	_trace();
 }
 
-STATIC streams_noinline streams_fastcall void
+streams_noinline streams_fastcall void
 qputp_slow(queue_t *q, mblk_t *mp)
 {
 	qputp(q, mp);
 }
 
-static streams_noinline streams_fastcall __unlikely int
+streams_noinline streams_fastcall __unlikely int
 put_filter(queue_t **qp, mblk_t *mp)
 {
 	queue_t *q = *qp;
@@ -3696,7 +3696,7 @@ EXPORT_SYMBOL_NOVERS(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
  *
  *  Process all message functions deferred from hardirq in the order in which they were received.
  */
-STATIC streams_noinline streams_fastcall __unlikely void
+streams_noinline streams_fastcall __unlikely void
 domfuncs(struct strthread *t)
 {
 	do {
@@ -3728,7 +3728,7 @@ domfuncs(struct strthread *t)
  *  
  *  Process all oustanding timeouts in the order in which they were received.
  */
-STATIC streams_noinline streams_fastcall __unlikely void
+streams_noinline streams_fastcall __unlikely void
 timeouts(struct strthread *t)
 {
 	do {
@@ -3796,7 +3796,7 @@ EXPORT_SYMBOL_NOVERS(qscan);	/* for stream head in include/sys/streams/strsubr.h
  *
  *  Note that the only queues on this list are stream head write queues.
  */
-STATIC streams_noinline streams_fastcall __unlikely void
+streams_noinline streams_fastcall __unlikely void
 scanqueues(struct strthread *t)
 {
 	do {
@@ -3844,7 +3844,7 @@ scanqueues(struct strthread *t)
  *  doevents:	- process STREAMS events
  *  @t:		STREAMS execution thread
  */
-STATIC streams_noinline streams_fastcall __unlikely void
+streams_noinline streams_fastcall __unlikely void
 doevents(struct strthread *t)
 {
 	struct strevent *se, *se_next;
@@ -4023,7 +4023,7 @@ runsyncq(struct syncq *sq)
  *  access was requested.  This is acceptable and reduces the burder of tracking two perimeters with
  *  shared or exclusive access.
  */
-STATIC streams_noinline streams_fastcall __unlikely void
+streams_noinline streams_fastcall __unlikely void
 backlog(struct strthread *t)
 {
 	syncq_t *sq, *sq_link;
@@ -4060,7 +4060,7 @@ backlog(struct strthread *t)
  *  subsystem will hang until an external event kicks it.  Therefore, we kick the chain every time
  *  an allocation is successful.
  */
-STATIC streams_noinline streams_fastcall __unlikely void
+streams_noinline streams_fastcall __unlikely void
 bufcalls(struct strthread *t)
 {
 	struct strevent *se, *se_next;
@@ -4159,7 +4159,7 @@ sqsched(syncq_t *sq)
  *  Free chains of message blocks outstanding from flush operations that were left over at the end
  *  of the CPU run.
  */
-STATIC streams_noinline streams_fastcall __unlikely void
+streams_noinline streams_fastcall __unlikely void
 freechains(struct strthread *t)
 {
 	mblk_t *mp, *mp_next;
@@ -4208,7 +4208,7 @@ freechain(mblk_t *mp, mblk_t **mpp)
 	}
 }
 
-STATIC streams_noinline streams_fastcall __unlikely void
+streams_noinline streams_fastcall __unlikely void
 __runqueues_slow(struct strthread *t)
 {
 	/* free flush chains if necessary */
@@ -4494,7 +4494,7 @@ sd_put(struct stdata **sdp)
 EXPORT_SYMBOL_NOVERS(sd_put);	/* include/sys/streams/strsubr.h */
 #endif
 
-STATIC streams_noinline streams_fastcall void
+streams_noinline streams_fastcall void
 sd_put_slow(struct stdata **sdp)
 {
 	sd_put(sdp);

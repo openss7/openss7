@@ -134,7 +134,7 @@ static char const ident[] =
 
 STATIC spinlock_t db_ref_lock = SPIN_LOCK_UNLOCKED;
 
-STATIC streams_noinline streams_fastcall __unlikely void
+streams_noinline streams_fastcall __unlikely void
 db_inc_slow(register dblk_t *db)
 {
 	unsigned long flags;
@@ -154,7 +154,7 @@ db_inc(register dblk_t *db)
 	return db_inc_slow(db);
 }
 
-STATIC streams_noinline streams_fastcall __unlikely int
+streams_noinline streams_fastcall __unlikely int
 db_dec_and_test_slow(register dblk_t *db)
 {
 	unsigned long flags;
@@ -1305,7 +1305,7 @@ __get_qband(queue_t *q, unsigned char band)
 	return (qb);
 }
 
-STATIC streams_noinline streams_fastcall __unlikely int
+streams_noinline streams_fastcall __unlikely int
 __bcanput_slow(queue_t *q, unsigned char band)
 {
 	unsigned long pl;
@@ -1854,7 +1854,7 @@ __putbq(queue_t *q, mblk_t *mp)
 	}
 }
 
-STATIC streams_noinline streams_fastcall int
+streams_noinline streams_fastcall int
 putbq_result(queue_t *q, const int result)
 {
 	switch (result) {
@@ -2199,7 +2199,7 @@ __putq(queue_t *q, mblk_t *mp)
 	return __putq_pri(q, mp);
 }
 
-STATIC streams_noinline streams_fastcall int
+streams_noinline streams_fastcall int
 putq_result(queue_t *q, mblk_t *mp, const int result)
 {
 	switch (result) {
@@ -2334,7 +2334,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	}
 }
 
-STATIC streams_noinline streams_fastcall int
+streams_noinline streams_fastcall int
 insq_result(queue_t *q, const int result)
 {
 	switch (result) {
