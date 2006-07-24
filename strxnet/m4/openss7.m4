@@ -456,7 +456,6 @@ AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-blocks"
-	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-functions"
 	    ;;
 	(normal)
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
@@ -468,7 +467,6 @@ AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-blocks"
-	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-functions"
 	    ;;
 	(quick)
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
