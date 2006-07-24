@@ -6412,6 +6412,9 @@ np_alloc_priv(queue_t *q, struct np **npp, int type, dev_t *devp, cred_t *crp)
 		np->info.PROTOID_length = 0;
 		np->info.PROTOID_offset = 0;
 		np->info.NPI_version = N_CURRENT_VERSION;
+		bufq_init(&np->conq);
+		bufq_init(&np->datq);
+		bufq_init(&np->resq);
 		/* qos defaults */
 		np->qos.n_qos_type = N_QOS_SEL_INFO_IP;
 		np->qos.protocol = QOS_UNKNOWN;
@@ -6475,6 +6478,7 @@ np_free_priv(queue_t *q)
 		np->daddrs[0].dst = NULL;
 	}
 	bufq_purge(&np->conq);
+	bufq_purge(&np->datq);
 	bufq_purge(&np->resq);
 	np_unbufcall((str_t *) np);
 #if 0
