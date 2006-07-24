@@ -896,6 +896,12 @@ dnl
 	((strconf_cv_majbase+=2000))
     fi
     strconf_cv_midbase=40
+dnl
+dnl Get these away from device numbers.
+dnl
+    if test ${streams_cv_package:-LfS} = LfS ; then
+	((strconf_cv_midbase+=5000))
+    fi
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'
     strconf_cv_drvconf='drvconf.mk'

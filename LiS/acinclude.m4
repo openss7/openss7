@@ -1572,7 +1572,7 @@ AC_DEFUN([_LIS_STRCONF], [dnl
 	    ;;
     esac
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=230
+    strconf_cv_majbase=231
 dnl
 dnl Tired of device conflicts on 2.6 kernels.
 dnl

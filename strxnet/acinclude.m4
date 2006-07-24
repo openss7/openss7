@@ -185,7 +185,7 @@ AC_DEFUN([_XNET_OUTPUT], [dnl
 AC_DEFUN([_XNET_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=246
+    strconf_cv_majbase=245
 dnl
 dnl Tired of device conflicts on 2.6 kernels.
 dnl
@@ -193,6 +193,12 @@ dnl
 	((strconf_cv_majbase+=2000))
     fi
     strconf_cv_midbase=50
+dnl
+dnl Get these away from device numbers.
+dnl
+    if test ${streams_cv_package:-LfS} = LfS ; then
+	((strconf_cv_midbase+=5000))
+    fi
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'
     strconf_cv_drvconf='drvconf.mk'

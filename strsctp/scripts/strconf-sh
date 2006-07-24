@@ -510,6 +510,7 @@ do
             filename="${tokens[1]}"
             ;;
         (:driver)
+            assigned=no
             token=`$echo -n ${tokens[1]} | $strconf_tokenize`
             eval "otherno=\"\$strconf_driver_lineno_$token\""
             if test -n "$otherno" ; then
@@ -520,6 +521,7 @@ do
             case "x$major" in
                 x | x#* | x[-*]*)
                     major="$imajor"
+                    assigned=yes
                     ;;
                 x[0-9]*)
                     if test $major -ge $basemajor -a $major -le $imajor; then
@@ -566,14 +568,16 @@ do
             eval "strconf_nmajors_$token=$nmajors"
             case $package in
             LfS)
-                eval "strconf_id_$token=$imajor"
+                eval "strconf_id_$token=$major"
                 ;;
             LiS | *)
                 eval "strconf_id_$token=$idnumber"
                 ((idnumber++))
                 ;;
             esac
-            ((imajor+=nmajors))
+            if test :${assigned} = :yes ; then
+                ((imajor+=nmajors))
+            fi
             ;;
         (:module)
             token=`$echo -n ${tokens[1]} | $strconf_tokenize`
