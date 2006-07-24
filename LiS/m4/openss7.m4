@@ -431,49 +431,64 @@ AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
     AC_MSG_CHECKING([for user CFLAGS])
     AC_ARG_WITH([optimize],
 	AC_HELP_STRING([--with-optimize=HOW],
-	    [specify optimization, normale, size, speed or quick,
-	     @<:@default=normal@:>@]),
+	    [specify optimization, normal, size, speed or quick,
+	     @<:@default=auto@:>@]),
 	[with_optimize="$withval"],
 	[with_optimize=''])
-    case "${with_optimize:-normal}" in
+    case "${with_optimize:-auto}" in
 	(size)
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
 	    CFLAGS="-Os -g${CFLAGS:+ $CFLAGS}"
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
 	    ;;
 	(speed)
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -finline-functions,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-inline-functions,,g;s, , ,g'`
-	    CFLAGS="-O3 -g -fno-inline-functions${CFLAGS:+ $CFLAGS}"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-reorder-blocks,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-reorder-functions,,g;s, , ,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-unit-at-a-time,,g'`
+	    CFLAGS="-O3 -g${CFLAGS:+ $CFLAGS}"
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-blocks"
+	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-functions"
 	    ;;
 	(normal)
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
 	    CFLAGS="-O2 -g${CFLAGS:+ $CFLAGS}"
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-blocks"
+	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-functions"
 	    ;;
 	(quick)
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fkeep-inline-functions,,g;s, , ,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-keep-inline-functions,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fkeep-static-consts,,g;s, , ,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -fno-keep-static-consts,,g;s, , ,g'`
-	    CFLAGS="-O0 -g -finline -fno-keep-inline-functions -fno-keep-static-consts${CFLAGS:+ $CFLAGS}"
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?keep-inline-functions,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?keep-static-consts,,g'`
+	    CFLAGS="-O0 -g${CFLAGS:+ $CFLAGS}"
+	    CFLAGS="${CFLAGS:+$CFLAGS }-finline"
+	    CFLAGS="${CFLAGS:+$CFLAGS }-fno-keep-inline-functions"
+	    CFLAGS="${CFLAGS:+$CFLAGS }-fno-keep-static-consts"
+	(auto)
+	    : # don't do anything
 	    ;;
     esac
-    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wtrigraphs,,g'`
-    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wno-trigraphs,,g'`
+    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
     CFLAGS="${CFLAGS:+$CFLAGS }-Wno-trigraphs"
     if test :"${USE_MAINTAINER_MODE:-no}" != :no
     then
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-system-headers"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wundef,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wno-undef,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Wundef"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-endif-labels"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wbad-function-cast"
@@ -483,8 +498,7 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wwrite-strings"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wconversion"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wsign-compare"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Waggregate-return"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wstrict-prototypes,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wno-strict-prototypes,,g;s, , ,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Wstrict-prototypes"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-prototypes"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-declarations"
@@ -501,8 +515,7 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Wall"
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[0-9]*%%g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Wp,-D_FORTIFY_SOURCE=2"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Werror,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wno-error,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Werror"
     fi
     CFLAGS=`echo "$CFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`

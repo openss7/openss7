@@ -1625,7 +1625,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	AC_ARG_WITH([k-optimize],
 	    AS_HELP_STRING([--with-k-optimize=HOW],
 		[specify optimization, normal, size, speed or quick.
-		@<:@default=normal@:>@]),
+		@<:@default=auto@:>@]),
 	    [with_k_optimize="$withval"],
 	    [with_k_optimize="$with_optimize"])
 
@@ -1633,13 +1633,12 @@ dnl
 dnl	Recent x86_64 makefiles add -fno-reorder-blocks which impedes __builtin_expect() which is
 dnl	not good.  Strip it off here.
 dnl
-	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -freorder-blocks||"`
-	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-reorder-blocks||"`
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -r -e "s| -f(no-)?reorder-blocks||g"`
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -r -e "s| -f(no-)?reorder-functions||g"`
 dnl
-dnl	Recent x86_64 makefiles add -freorder-functions which is just insane.  Strip it off here.
+dnl	Recent x86_64 makefiles add -ffunction-sections which is just insane.  Strip it off here.
 dnl
-	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -freorder-functions||"`
-	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-reorder-functions||"`
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -r -e "s| -f(no-)?function-sections||g"`
 dnl
 dnl	Recent kernels add -fno-unit-at-a-time, probably because of a whole bunch of top-level asm
 dnl	problems.  Because it impedes optimization independent of positioning of functions in a
@@ -1647,9 +1646,9 @@ dnl	file, we want to kick it out.
 dnl
 dnl	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-unit-at-a-time||"`
 
-	case "${with_k_optimize:-normal}" in
+	case "${with_k_optimize:-auto}" in
 	    (size)
-		linux_cflags="$linux_cflags${linux_cflags:+ }-Os"
+		linux_cflags="$linux_cflags${linux_cflags:+ }-Os -g"
 		linux_cv_debug="_NONE"
 		linux_cv_optimize='size'
 		;;
@@ -1679,6 +1678,15 @@ dnl
 		linux_cflags="$linux_cflags${linux_cflags:+ }-finline"
 		linux_cflags="$linux_cflags${linux_cflags:+ }-fno-keep-inline-functions"
 		linux_cflags="$linux_cflags${linux_cflags:+ }-fno-keep-static-consts"
+		;;
+	    (auto)
+dnl
+dnl		Try to pass through whatever optmization options are present.
+dnl
+		linux_cflags="$linux_cflags${linux_cflags:+ }"`echo " $linux_cv_k_cflags " | sed -e 's|^.* -O|-O|;s| .*$||'`
+		linux_cflags="$linux_cflags${linux_cflags:+ }"`echo " $linux_cv_k_cflags " | sed -e 's|^.* -g|-g|;s| .*$||'`
+		linux_cv_debug="_SAFE"
+		linux_cv_optimize='normal'
 		;;
 	esac
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
