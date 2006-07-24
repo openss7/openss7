@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2006/07/03 02:59:21 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2006/07/24 09:01:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/03 02:59:21 $ by $Author: brian $
+# Last Modified $Date: 2006/07/24 09:01:09 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.119  2006/07/24 09:01:09  brian
+# - results of udp2 optimizations
+#
 # Revision 0.9.2.118  2006/07/03 02:59:21  brian
 # - updated documentation for release
 #

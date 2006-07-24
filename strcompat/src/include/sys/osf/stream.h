@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.6 2006/06/22 13:11:27 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.7 2006/07/24 09:00:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:27 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:00:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.7  2006/07/24 09:00:59  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.6  2006/06/22 13:11:27  brian
  - more optmization tweaks and fixes
 
@@ -73,7 +76,7 @@
 #ifndef __SYS_OSF_STREAM_H__
 #define __SYS_OSF_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/osf/stream.h directly, include sys/stream.h instead."

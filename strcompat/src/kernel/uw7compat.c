@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/07 20:49:55 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/24 09:01:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/07 20:49:55 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/07 20:49:55 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/24 09:01:07 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/07 20:49:55 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/24 09:01:07 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/07 20:49:55 $"
+#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/24 09:01:07 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"

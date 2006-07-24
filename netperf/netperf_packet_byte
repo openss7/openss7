@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2006/05/23 22:43:29 $
+# @(#) $RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2006/07/24 09:00:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/23 22:43:29 $ by $Author: brian $
+# Last Modified $Date: 2006/07/24 09:00:44 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: netperf_packet_byte,v $
+# Revision 1.1.2.8  2006/07/24 09:00:44  brian
+# - results of udp2 optimizations
+#
 # Revision 1.1.2.7  2006/05/23 22:43:29  brian
 # - updated copyright headers
 #
@@ -126,7 +129,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.7 $)'
+ident='$RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.8 $)'
 
 HELP="Try \`$program --help' for more information."
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/07 20:49:55 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/24 09:01:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/07 20:49:55 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/07 20:49:55 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/24 09:01:05 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/07 20:49:55 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/24 09:01:05 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/07 20:49:55 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/24 09:01:05 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"

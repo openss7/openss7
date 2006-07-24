@@ -1,3 +1,9 @@
+2006-07-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/lib/xnet.c: optimizations
+	* src/modules/timod.c: optimizations
+	* src/modules/tirdwr.c: optimizations
+
 2006-07-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release number for release candidate 3

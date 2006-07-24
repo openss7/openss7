@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timer.h,v 0.9.2.9 2006/05/23 10:44:05 brian Exp $
+ @(#) $Id: timer.h,v 0.9.2.10 2006/07/24 09:00:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 10:44:05 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:00:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_TIMER_H__
 #define __OS7_TIMER_H__
 
-#ident "@(#) $RCSfile: timer.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: timer.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define SS7_DECLARE_TIMER(__n,__o,__t,__c) \
 STATIC int __o ## _ ## __t ## _timeout(struct __o *); \

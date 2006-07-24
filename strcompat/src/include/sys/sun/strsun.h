@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.8 2006/06/22 13:11:28 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.9 2006/07/24 09:01:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:28 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:00 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/06/22 13:11:28 $"
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/24 09:01:00 $"
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."

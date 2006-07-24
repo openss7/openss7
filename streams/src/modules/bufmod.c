@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.7  2006/07/24 09:01:20  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.6  2005/12/28 09:48:02  brian
  - remove warnings on FC4 compile
 
@@ -72,10 +75,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:20 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:20 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -103,7 +106,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:20 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.17 2006/06/22 13:11:22 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.18 2006/07/24 09:00:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:22 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:00:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LFS_STRCONF_H__
 #define __SYS_LFS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/06/22 13:11:22 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/07/24 09:00:48 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."

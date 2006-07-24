@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/28 09:48:02 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 0.9.2.5  2006/07/24 09:01:15  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.4  2005/12/28 09:48:02  brian
  - remove warnings on FC4 compile
 
@@ -65,9 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/28 09:48:02 $"
+#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:15 $"
 
-static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/28 09:48:02 $";
+static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:15 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -95,7 +98,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.4 $) 
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2005/12/28 09:48:02 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:15 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"

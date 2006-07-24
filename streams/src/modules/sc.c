@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:27 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:27 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.47  2006/07/24 09:01:20  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.46  2006/06/14 10:37:27  brian
  - defeat a lot of debug traces in debug mode for testing
  - changes to allow strinet to compile under LiS (why???)
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:27 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:20 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:27 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:20 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -95,7 +98,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/06/14 10:37:27 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:20 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"

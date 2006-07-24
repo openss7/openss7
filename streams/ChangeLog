@@ -1,3 +1,22 @@
+2006-07-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: libstreams optimizations
+	* include/sys/streams/ddi.h: fix up inlines recent compilers
+	* include/sys/streams/sc.h: fix up inlines recent compilers
+	* include/sys/streams/strdebug.h: fix up inlines recent compilers
+	* include/sys/streams/stream.h: fix up inlines recent compilers
+	* include/sys/streams/strsubr.h: fix up inlines recent compilers
+	* lib/libc/fattach.c: libstreams optimizations
+	* lib/libc/fdetach.c: libstreams optimizations
+	* lib/libc/getmsg.c: libstreams optimizations
+	* lib/libc/getpmsg.c: libstreams optimizations
+	* lib/libc/isastream.c: libstreams optimizations
+	* lib/libc/pipe.c: libstreams optimizations
+	* lib/libc/putmsg.c: libstreams optimizations
+	* lib/libc/putpmsg.c: libstreams optimizations
+	* lib/libc/testcancel.c: libstreams optimizations
+	* src/test/perftest.c: added maximum iteration option
+
 2006-07-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* acincline.m4 (_LFS_SETUP_IRQ): added new option to use bh locking

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.20 2006/06/22 13:11:28 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.21 2006/07/24 09:01:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:28 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:00 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_DDI_H__
 #define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/06/22 13:11:28 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/07/24 09:01:00 $"
 
 #ifndef __SYS_SUNDDI_H__
 #warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."

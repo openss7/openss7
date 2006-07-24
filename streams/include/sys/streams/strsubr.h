@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.72 2006/07/13 08:07:50 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.73 2006/07/24 09:01:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/13 08:07:50 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.73  2006/07/24 09:01:13  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.72  2006/07/13 08:07:50  brian
  - added sk_buff data buffer allocation mechanism for stream head
 
@@ -76,7 +79,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.72 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.73 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."

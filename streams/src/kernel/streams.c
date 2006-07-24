@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/06/22 13:11:39 $
+ @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/24 09:01:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:39 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: streams.c,v $
+ Revision 0.9.2.9  2006/07/24 09:01:17  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.8  2006/06/22 13:11:39  brian
  - more optmization tweaks and fixes
 
@@ -80,9 +83,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/06/22 13:11:39 $"
+#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/24 09:01:17 $"
 
-static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/06/22 13:11:39 $";
+static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/24 09:01:17 $";
 
 /* can we just include these into one big compilation unit? */
 

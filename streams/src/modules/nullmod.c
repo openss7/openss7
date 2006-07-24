@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 10:57:11 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/24 09:01:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.10  2006/07/24 09:01:20  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.9  2006/03/03 10:57:11  brian
  - 32-bit compatibility support, updates for release
 
@@ -81,10 +84,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 10:57:11 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/24 09:01:20 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 10:57:11 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/24 09:01:20 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -116,7 +119,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/03 10:57:11 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/24 09:01:20 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"

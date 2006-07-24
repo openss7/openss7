@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/07/15 13:06:06 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/07/24 09:01:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/15 13:06:06 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.131  2006/07/24 09:01:18  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.130  2006/07/15 13:06:06  brian
  - rationalized np_ip.c and rawip.c to upd.c drivers
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/07/15 13:06:06 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/07/24 09:01:18 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/07/15 13:06:06 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/07/24 09:01:18 $";
 
 #include <linux/config.h>
 #include <linux/module.h>

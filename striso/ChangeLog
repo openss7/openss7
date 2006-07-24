@@ -1,3 +1,7 @@
+2006-07-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/clns.c: fix up inlines for recent compilers
+
 2006-07-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release number for release candidate 3

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/06/14 10:37:31 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/24 09:01:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:31 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.13  2006/07/24 09:01:22  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.12  2006/06/14 10:37:31  brian
  - defeat a lot of debug traces in debug mode for testing
  - changes to allow strinet to compile under LiS (why???)
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/06/14 10:37:31 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/24 09:01:22 $"
 
 static char const ident[] =
-    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/06/14 10:37:31 $";
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/24 09:01:22 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -121,7 +124,7 @@ static char const ident[] =
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/06/14 10:37:31 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/24 09:01:22 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"

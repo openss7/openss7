@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.36 2006/05/23 10:39:40 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.37 2006/07/24 09:01:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 10:39:40 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.37  2006/07/24 09:01:12  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.36  2006/05/23 10:39:40  brian
  - marked normally inline functions for unlikely text section
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.36 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.37 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_DDI_H__
 #warning "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."

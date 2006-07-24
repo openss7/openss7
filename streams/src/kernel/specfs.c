@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/02/20 10:59:21 $
+ @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:21 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: specfs.c,v $
+ Revision 0.9.2.7  2006/07/24 09:01:17  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.6  2006/02/20 10:59:21  brian
  - updated copyright headers on changed files
 
@@ -74,9 +77,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/02/20 10:59:21 $"
+#ident "@(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:17 $"
 
-static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/02/20 10:59:21 $";
+static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:17 $";
 
 /* can we just include these into one big compilation unit? */
 

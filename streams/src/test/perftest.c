@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/25 01:30:46 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/24 09:01:23 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/25 01:30:46 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.10  2006/07/24 09:01:23  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.9  2006/02/25 01:30:46  brian
  - more roughing in of 32bit compatibilty support
  - updated perftest program to be able to use FIFOs as well as pipes
@@ -97,10 +100,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/25 01:30:46 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/24 09:01:23 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/25 01:30:46 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/24 09:01:23 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS

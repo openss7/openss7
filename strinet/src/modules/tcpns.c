@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/11 18:30:11 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/07/24 09:01:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/11 18:30:11 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.2  2006/07/24 09:01:36  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.1  2006/04/11 18:30:11  brian
  - added new ISO over TCP modules
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/11 18:30:11 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/07/24 09:01:36 $"
 
-static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/11 18:30:11 $";
+static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/07/24 09:01:36 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -86,7 +89,7 @@ static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.1 
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2996 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.1 $) $Date: 2006/04/11 18:30:11 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2006/07/24 09:01:36 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"

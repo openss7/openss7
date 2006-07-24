@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/07/24 09:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $";
 
 #define _XOPEN_SOURCE 600
 #define _GNU_SOURCE 1

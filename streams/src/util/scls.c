@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 10:57:17 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/07/24 09:01:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 10:57:17 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: scls.c,v $
+ Revision 0.9.2.21  2006/07/24 09:01:24  brian
+ - results of udp2 optimizations
+
  Revision 0.9.2.20  2006/03/03 10:57:17  brian
  - 32-bit compatibility support, updates for release
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 10:57:17 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/07/24 09:01:24 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/03 10:57:17 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/07/24 09:01:24 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.

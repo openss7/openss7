@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/07 20:49:55 $
+ @(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/24 09:01:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/07 20:49:55 $ by $Author: brian $
+ Last Modified $Date: 2006/07/24 09:01:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/07 20:49:55 $"
+#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/24 09:01:06 $"
 
 static char const ident[] =
-    "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/07 20:49:55 $";
+    "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/24 09:01:06 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SVR3COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR3COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/07 20:49:55 $"
+#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/24 09:01:06 $"
 #define SVR3COMP_DEVICE		"UNIX(R) SVR 3.2 Compatibility"
 #define SVR3COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR3COMP_LICENSE	"GPL"

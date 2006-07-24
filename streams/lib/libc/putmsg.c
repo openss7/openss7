@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/07/24 09:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $";
 
 #include <sys/types.h>
 #include <stropts.h>

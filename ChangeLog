@@ -1,3 +1,8 @@
+2006-07-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: optimization flags for recent kernels/compilers
+	* am/kernel.am: do not search modules in maintainer mode
+
 2006-07-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/openss7.m4: more control for user optimizations

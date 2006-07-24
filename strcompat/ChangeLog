@@ -1,3 +1,41 @@
+2006-07-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/aix/stream.h: fix up inlines recent compilers
+	* src/include/sys/irix/ddi.h: fix up inlines recent compilers
+	* src/include/sys/lfs/ddi.h: fix up inlines recent compilers
+	* src/include/sys/lfs/strconf.h: fix up inlines recent compilers
+	* src/include/sys/lfs/stream.h: fix up inlines recent compilers
+	* src/include/sys/lis/ddi.h: fix up inlines recent compilers
+	* src/include/sys/lis/stream.h: fix up inlines recent compilers
+	* src/include/sys/mps/ddi.h: fix up inlines recent compilers
+	* src/include/sys/mps/stream.h: fix up inlines recent compilers
+	* src/include/sys/os7/allocb.h: fix up inlines recent compilers
+	* src/include/sys/os7/bufpool.h: fix up inlines recent compilers
+	* src/include/sys/os7/bufq.h: fix up inlines recent compilers
+	* src/include/sys/os7/timer.h: fix up inlines recent compilers
+	* src/include/sys/osf/ddi.h: fix up inlines recent compilers
+	* src/include/sys/osf/stream.h: fix up inlines recent compilers
+	* src/include/sys/sun/ddi.h: fix up inlines recent compilers
+	* src/include/sys/sun/strconf.h: fix up inlines recent compilers
+	* src/include/sys/sun/stream.h: fix up inlines recent compilers
+	* src/include/sys/sun/strsun.h: fix up inlines recent compilers
+	* src/include/sys/svr3/ddi.h: fix up inlines recent compilers
+	* src/include/sys/svr4/ddi.h: fix up inlines recent compilers
+	* src/include/sys/uw7/ddi.h: fix up inlines recent compilers
+	* src/kernel/aixcompat.c: fix up inlines recent compilers
+	* src/kernel/hpuxcompat.c: fix up inlines recent compilers
+	* src/kernel/irixcompat.c: fix up inlines recent compilers
+	* src/kernel/lfscompat.c: fix up inlines recent compilers
+	* src/kernel/liscompat.c: fix up inlines recent compilers
+	* src/kernel/maccompat.c: fix up inlines recent compilers
+	* src/kernel/mpscompat.c: fix up inlines recent compilers
+	* src/kernel/os7compat.c: fix up inlines recent compilers
+	* src/kernel/osfcompat.c: fix up inlines recent compilers
+	* src/kernel/suncompat.c: fix up inlines recent compilers
+	* src/kernel/svr3compat.c: fix up inlines recent compilers
+	* src/kernel/svr4compat.c: fix up inlines recent compilers
+	* src/kernel/uw7compat.c: fix up inlines recent compilers
+
 2006-07-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release number for release candidate 3
