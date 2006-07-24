@@ -872,9 +872,8 @@ np_init_nproto(unsigned char proto, unsigned int type)
 	struct ipnet_protocol *pp;
 	struct mynet_protocol **ppp;
 	int hash = proto & (MAX_INET_PROTOS - 1);
-	unsigned long flags;
 
-	write_lock_irqsave(&np_prot_lock, flags);
+	write_lock_bh(&np_prot_lock);
 	if ((pb = np_prots[proto]) != NULL) {
 		pb->refs++;
 		switch (type) {
@@ -929,7 +928,7 @@ np_init_nproto(unsigned char proto, unsigned int type)
 				if ((*ppp)->copy != 0) {
 					__ptrace(("Cannot override copy entry\n"));
 					net_protocol_unlock();
-					write_unlock_irqrestore(&np_prot_lock, flags);
+					write_unlock_bh(&np_prot_lock);
 					kmem_cache_free(np_ip_prot_cachep, pb);
 					return (NULL);
 				}
@@ -940,7 +939,7 @@ np_init_nproto(unsigned char proto, unsigned int type)
 					if (!try_module_get(pp->kmod)) {
 						__ptrace(("Cannot acquire module\n"));
 						net_protocol_unlock();
-						write_unlock_irqrestore(&np_prot_lock, flags);
+						write_unlock_bh(&np_prot_lock);
 						kmem_cache_free(np_ip_prot_cachep, pb);
 						return (NULL);
 					}
@@ -957,7 +956,7 @@ np_init_nproto(unsigned char proto, unsigned int type)
 		/* link into hash slot */
 		np_prots[proto] = pb;
 	}
-	write_unlock_irqrestore(&np_prot_lock, flags);
+	write_unlock_bh(&np_prot_lock);
 	return (pb);
 }
 
@@ -977,9 +976,8 @@ STATIC INLINE streams_fastcall __unlikely void
 np_term_nproto(unsigned char proto, unsigned int type)
 {
 	struct np_prot_bucket *pb;
-	unsigned long flags;
 
-	write_lock_irqsave(&np_prot_lock, flags);
+	write_lock_bh(&np_prot_lock);
 	if ((pb = np_prots[proto]) != NULL) {
 		switch (type) {
 		case N_CONS:
@@ -1022,7 +1020,7 @@ np_term_nproto(unsigned char proto, unsigned int type)
 			kmem_cache_free(np_ip_prot_cachep, pb);
 		}
 	}
-	write_unlock_irqrestore(&np_prot_lock, flags);
+	write_unlock_bh(&np_prot_lock);
 }
 #endif				/* LINUX */
 
@@ -1094,7 +1092,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 
 	PROTOID_length = 1;
 	hp = &np_bhash[np_bhashfn(proto, bport)];
-	write_lock_irqsave(&hp->lock, flags);
+	write_lock_str(&hp->lock, flags);
 	for (np2 = hp->list; np2; np2 = np2->bnext) {
 		if (proto != np2->protoids[0])
 			continue;
@@ -1122,7 +1120,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 			break;
 	}
 	if (np2 != NULL) {
-		write_unlock_irqrestore(&hp->lock, flags);
+		write_unlock_str(&hp->lock, flags);
 		/* There is a question as to which error should be returned when a protocol address 
 		   is already bound.
 
@@ -1146,7 +1144,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 		return (NBOUND);
 	}
 	if ((err = np_bind_prot(proto, np->info.SERV_type))) {
-		write_unlock_irqrestore(&hp->lock, flags);
+		write_unlock_str(&hp->lock, flags);
 		return (err);
 	}
 	if ((np_long) np->qos.protocol == QOS_UNKNOWN)
@@ -1168,7 +1166,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 		(int) proto, (int) ntohs(bport)));
 	for (i = 0; i < anum; i++)
 		np->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
-	write_unlock_irqrestore(&hp->lock, flags);
+	write_unlock_str(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
 	synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
@@ -1218,16 +1216,16 @@ np_skb_destructor_slow(struct np *np, struct sk_buff *skb)
 {
 	unsigned long flags;
 
-	spin_lock_irqsave(&np->qlock, flags);
+	spin_lock_str(&np->qlock, flags);
 	// ensure(np->sndmem >= skb->truesize, np->sndmem = skb->truesize);
 	np->sndmem -= skb->truesize;
 	if (unlikely((np->sndmem < np->options.xti.sndlowat || np->sndmem == 0))) {
 		np->sndblk = 0;	/* no longer blocked */
-		spin_unlock_irqrestore(&np->qlock, flags);
+		spin_unlock_str(&np->qlock, flags);
 		if (np->iq != NULL && np->iq->q_first != NULL)
 			qenable(np->iq);
 	} else {
-		spin_unlock_irqrestore(&np->qlock, flags);
+		spin_unlock_str(&np->qlock, flags);
 	}
 #if 0				/* destructor is nulled by skb_orphan */
 	skb_shinfo(skb)->frags[0].page = NULL;
@@ -1261,10 +1259,10 @@ np_skb_destructor(struct sk_buff *skb)
 	dassert(np != NULL);
 	if (likely(np->sndblk == 0)) {
 		/* technically we could have multiple processors freeing sk_buffs at the same time */
-		spin_lock_irqsave(&np->qlock, flags);
+		spin_lock_str(&np->qlock, flags);
 		// ensure(np->sndmem >= skb->truesize, np->sndmem = skb->truesize);
 		np->sndmem -= skb->truesize;
-		spin_unlock_irqrestore(&np->qlock, flags);
+		spin_unlock_str(&np->qlock, flags);
 #if 0				/* destructor is nulled by skb_orphan */
 		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
@@ -1326,9 +1324,9 @@ np_alloc_skb_slow(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 		assert(skb_shinfo(skb)->nr_frags == 0);
 		skb_shinfo(skb)->frags[0].page = (struct page *) np_get(np);
 		skb->destructor = np_skb_destructor;
-		spin_lock_irqsave(&np->qlock, flags);
+		spin_lock_str(&np->qlock, flags);
 		np->sndmem += skb->truesize;
-		spin_unlock_irqrestore(&np->qlock, flags);
+		spin_unlock_str(&np->qlock, flags);
 #if 0
 		/* keep track of high water mark */
 		if (tp_wstat.ms_acnt < tp->sndmem)
@@ -1487,9 +1485,9 @@ np_alloc_skb_old(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 	assert(skb_shinfo(skb)->nr_frags == 0);
 	skb_shinfo(skb)->frags[0].page = (struct page *) np_get(np);
 	skb->destructor = np_skb_destructor;
-	spin_lock_irqsave(&np->qlock, flags);
+	spin_lock_str(&np->qlock, flags);
 	np->sndmem += skb->truesize;
-	spin_unlock_irqrestore(&np->qlock, flags);
+	spin_unlock_str(&np->qlock, flags);
 #endif
 
 #if 0
@@ -1557,9 +1555,9 @@ np_alloc_skb(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 	assert(skb_shinfo(skb)->nr_frags == 0);
 	skb_shinfo(skb)->frags[0].page = (struct page *) np_get(np);
 	skb->destructor = np_skb_destructor;
-	spin_lock_irqsave(&np->qlock, flags);
+	spin_lock_str(&np->qlock, flags);
 	np->sndmem += skb->truesize;
-	spin_unlock_irqrestore(&np->qlock, flags);
+	spin_unlock_str(&np->qlock, flags);
 #endif
 	freemsg(mp);
 	return (skb);
@@ -1709,7 +1707,7 @@ np_conn_check(struct np *np, unsigned char proto)
 	hp1 = &np_chash[np_chashfn(proto, dport, sport)];
 	hp2 = &np_chash[np_chashfn(proto, 0, 0)];
 
-	write_lock_irqsave(&hp1->lock, flags);
+	write_lock_str(&hp1->lock, flags);
 	if (hp1 != hp2)
 		write_lock(&hp2->lock);
 
@@ -1745,7 +1743,7 @@ np_conn_check(struct np *np, unsigned char proto)
 	if (conflict != NULL) {
 		if (hp1 != hp2)
 			write_unlock(&hp2->lock);
-		write_unlock_irqrestore(&hp1->lock, flags);
+		write_unlock_str(&hp1->lock, flags);
 		/* how do we say already connected? (-EISCONN) */
 		return (NBADADDR);
 	}
@@ -1757,7 +1755,7 @@ np_conn_check(struct np *np, unsigned char proto)
 	np->chash = hp1;
 	if (hp1 != hp2)
 		write_unlock(&hp2->lock);
-	write_unlock_irqrestore(&hp1->lock, flags);
+	write_unlock_str(&hp1->lock, flags);
 	return (0);
 }
 
@@ -2266,7 +2264,7 @@ np_unbind(struct np *np)
 	unsigned long flags;
 
 	if ((hp = np->bhash)) {
-		write_lock_irqsave(&hp->lock, flags);
+		write_lock_str(&hp->lock, flags);
 		if ((*np->bprev = np->bnext))
 			np->bnext->bprev = np->bprev;
 		np->bnext = NULL;
@@ -2277,7 +2275,7 @@ np_unbind(struct np *np)
 		np->bnum = np->snum = np->pnum = 0;
 		np_set_state(np, NS_UNBND);
 		np_put(np);
-		write_unlock_irqrestore(&hp->lock, flags);
+		write_unlock_str(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
 		synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
@@ -2568,7 +2566,7 @@ np_disconnect(struct np *np, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
 		freemsg(SEQ_number);
 	}
 	if ((hp = np->chash) != NULL) {
-		write_lock_irqsave(&hp->lock, flags);
+		write_lock_str(&hp->lock, flags);
 		if ((*np->cprev = np->cnext))
 			np->cnext->cprev = np->cprev;
 		np->cnext = NULL;
@@ -2578,7 +2576,7 @@ np_disconnect(struct np *np, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
 		np->dnum = np->snum = 0;
 		np_set_state(np, NS_IDLE);
 		np_put(np);
-		write_unlock_irqrestore(&hp->lock, flags);
+		write_unlock_str(&hp->lock, flags);
 	}
 	return (QR_ABSORBED);
       error:
@@ -3230,7 +3228,7 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		goto discard;
 
 	/* Make sure we don't already have a connection indication */
-	spin_lock_irqsave(&np->conq.q_lock, flags);
+	spin_lock_str(&np->conq.q_lock, flags);
 	for (cp = bufq_head(&np->conq); cp; cp = cp->b_next) {
 		struct iphdr *iph2 = (struct iphdr *) cp->b_rptr;
 
@@ -3238,11 +3236,11 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		    && iph->saddr == iph2->saddr && iph->daddr == iph2->daddr) {
 			/* already have a connection indication, link the data */
 			linkb(cp, SEQ_number);
-			spin_unlock_irqrestore(&np->conq.q_lock, flags);
+			spin_unlock_str(&np->conq.q_lock, flags);
 			goto absorbed;
 		}
 	}
-	spin_unlock_irqrestore(&np->conq.q_lock, flags);
+	spin_unlock_str(&np->conq.q_lock, flags);
 
 	if (unlikely(bufq_length(&np->conq) >= np->CONIND_number))
 		/* If there are already too many connection indications outstanding, discard
@@ -4704,9 +4702,9 @@ n_tok_check(np_ulong TOKEN_value)
 	struct np *ap;
 	unsigned long flags;
 
-	read_lock_irqsave(&master.lock, flags);
+	read_lock_str(&master.lock, flags);
 	for (ap = master.np.list; ap && (np_ulong) (long) ap->oq != TOKEN_value; ap = ap->next) ;
-	read_unlock_irqrestore(&master.lock, flags);
+	read_unlock_str(&master.lock, flags);
 	usual(ap);
 	return (ap);
 }
@@ -5922,7 +5920,7 @@ np_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 
 	hp = hp1;
 	do {
-		read_lock_irqsave(&hp->lock, flags);
+		read_lock_str(&hp->lock, flags);
 		{
 			register struct np *np;
 
@@ -5982,7 +5980,7 @@ np_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 					break;
 			}
 		}
-		read_unlock_irqrestore(&hp->lock, flags);
+		read_unlock_str(&hp->lock, flags);
 	} while (hiscore < 4 && hp != hp2 && (hp = hp2));
 	usual(result);
 	return (result);
@@ -6021,7 +6019,7 @@ np_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	_ptrace(("%s: %s: proto = %d, dport = %d\n", DRV_NAME, __FUNCTION__, (int) proto,
 		 (int) ntohs(dport)));
 	do {
-		read_lock_irqsave(&hp->lock, flags);
+		read_lock_str(&hp->lock, flags);
 		{
 			register struct np *np;
 
@@ -6070,7 +6068,7 @@ np_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 					break;
 			}
 		}
-		read_unlock_irqrestore(&hp->lock, flags);
+		read_unlock_str(&hp->lock, flags);
 	} while (hiscore < 2 && hp != hp2 && (hp = hp2));
 	usual(result);
 	return (result);
@@ -6100,13 +6098,13 @@ np_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
 
 	ppp = &np_prots[proto];
 
-	read_lock_irqsave(&np_prot_lock, flags);
+	read_lock_str(&np_prot_lock, flags);
 	if (likely((pp = *ppp) != NULL)) {
 		if (likely(pp->corefs == 0)) {
 			if (likely(pp->clrefs > 0)) {
 				result = np_lookup_bind(proto, daddr, dport);
 			      done:
-				read_unlock_irqrestore(&np_prot_lock, flags);
+				read_unlock_str(&np_prot_lock, flags);
 				return (result);
 			}
 		}
