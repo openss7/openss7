@@ -66,7 +66,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __IRIX_EXTERN_INLINE __inline__ streamscall
+#define __IRIX_EXTERN_INLINE __inline__ streamscall __unlikely
 
 #define _IRIX_SOURCE
 

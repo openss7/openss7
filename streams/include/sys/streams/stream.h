@@ -1109,7 +1109,7 @@ bcmp(const void *s1, const void *s2, size_t len)
 
 /* Message functions. */
 
-__STRUTIL_EXTERN_INLINE __unlikely void
+__STRUTIL_EXTERN_INLINE void
 freemsg(mblk_t *mp)
 {
 	register mblk_t *b, *bp;
@@ -1117,7 +1117,7 @@ freemsg(mblk_t *mp)
 	for (b = mp; (bp = b); b = b->b_cont, freeb(bp)) ;
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely mblk_t *
+__STRUTIL_EXTERN_INLINE mblk_t *
 copymsg(register mblk_t *mp)
 {
 	mblk_t *msg = NULL;
@@ -1132,7 +1132,7 @@ copymsg(register mblk_t *mp)
 	return (NULL);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely mblk_t *
+__STRUTIL_EXTERN_INLINE mblk_t *
 dupmsg(mblk_t *mp)
 {
 	mblk_t *msg = NULL;
@@ -1147,19 +1147,19 @@ dupmsg(mblk_t *mp)
 	return (NULL);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely int
+__STRUTIL_EXTERN_INLINE int
 isdatablk(dblk_t * db)
 {
 	return datamsg(db->db_type);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely int
+__STRUTIL_EXTERN_INLINE int
 isdatamsg(mblk_t *mp)
 {
 	return isdatablk(mp->b_datap);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely void
+__STRUTIL_EXTERN_INLINE void
 linkb(register mblk_t *mp1, register mblk_t *mp2)
 {
 	register mblk_t **bp;
@@ -1169,7 +1169,7 @@ linkb(register mblk_t *mp1, register mblk_t *mp2)
 	*bp = mp2;
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely mblk_t *
+__STRUTIL_EXTERN_INLINE mblk_t *
 linkmsg(mblk_t *mp1, mblk_t *mp2)
 {
 	if (mp1) {
@@ -1179,7 +1179,7 @@ linkmsg(mblk_t *mp1, mblk_t *mp2)
 	return (mp2);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely size_t
+__STRUTIL_EXTERN_INLINE size_t
 msgdsize(register mblk_t *mp)
 {
 	register mblk_t *b;
@@ -1192,7 +1192,7 @@ msgdsize(register mblk_t *mp)
 	return (size);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely size_t
+__STRUTIL_EXTERN_INLINE size_t
 msgsize(mblk_t *mp)
 {
 	prefetch(mp);
@@ -1211,13 +1211,13 @@ msgsize(mblk_t *mp)
 	}
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely int
+__STRUTIL_EXTERN_INLINE int
 pcmsg(unsigned char type)
 {
 	return ((type & QPCTL) != 0);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely mblk_t *
+__STRUTIL_EXTERN_INLINE mblk_t *
 rmvb(register mblk_t *mp, register mblk_t *bp)
 {
 	mblk_t **mpp;
@@ -1234,7 +1234,7 @@ rmvb(register mblk_t *mp, register mblk_t *bp)
 	return ((mblk_t *) (-1));
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely mblk_t *
+__STRUTIL_EXTERN_INLINE mblk_t *
 unlinkb(register mblk_t *mp)
 {
 	mblk_t *b;
@@ -1246,7 +1246,7 @@ unlinkb(register mblk_t *mp)
 	return (b);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely mblk_t *
+__STRUTIL_EXTERN_INLINE mblk_t *
 unlinkmsg(register mblk_t *mp, register mblk_t *bp)
 {
 	if ((mp == bp))
@@ -1258,34 +1258,34 @@ unlinkmsg(register mblk_t *mp, register mblk_t *bp)
 
 /* Queue functions. */
 
-__STRUTIL_EXTERN_INLINE __unlikely int
+__STRUTIL_EXTERN_INLINE int
 canget(queue_t *q)
 {
 	dassert(q);
 	return bcanget(q, 0);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely int
+__STRUTIL_EXTERN_INLINE int
 canput(queue_t *q)
 {
 	dassert(q);
 	return bcanput(q, 0);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely int
+__STRUTIL_EXTERN_INLINE int
 canputnext(register queue_t *q)
 {
 	dassert(q);
 	return bcanputnext(q, 0);
 }
 
-__STRSCHD_EXTERN_INLINE __unlikely bcid_t
+__STRSCHD_EXTERN_INLINE bcid_t
 esbbcall(int priority, void streamscall (*function) (long), long arg)
 {
 	return bufcall(0, priority, function, arg);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely int
+__STRUTIL_EXTERN_INLINE int
 SAMESTR(queue_t *q)
 {
 	dassert(q);
@@ -1296,7 +1296,7 @@ SAMESTR(queue_t *q)
 #define SAMESTR(__q) SAMESTR(__q)
 #endif
 
-__STRUTIL_EXTERN_INLINE __unlikely int
+__STRUTIL_EXTERN_INLINE int
 canenable(queue_t *q)
 {
 	dassert(q);
@@ -1313,7 +1313,7 @@ __STREAMS_EXTERN int putnextctl(queue_t *q, int type);
 __STREAMS_EXTERN int putnextctl1(queue_t *q, int type, int param);
 __STREAMS_EXTERN int putnextctl2(queue_t *q, int type, int param1, int param2);
 
-__STRUTIL_EXTERN_INLINE __unlikely queue_t *
+__STRUTIL_EXTERN_INLINE queue_t *
 OTHERQ(queue_t *q)
 {
 	dassert(q);
@@ -1324,7 +1324,7 @@ OTHERQ(queue_t *q)
 #define OTHERQ(__q) OTHERQ(__q)
 #endif
 
-__STRUTIL_EXTERN_INLINE __unlikely queue_t *
+__STRUTIL_EXTERN_INLINE queue_t *
 RD(register queue_t *q)
 {
 	dassert(q);
@@ -1335,7 +1335,7 @@ RD(register queue_t *q)
 #define RD(__q) RD(__q)
 #endif
 
-__STRUTIL_EXTERN_INLINE __unlikely queue_t *
+__STRUTIL_EXTERN_INLINE queue_t *
 WR(register queue_t *q)
 {
 	dassert(q);
@@ -1346,7 +1346,7 @@ WR(register queue_t *q)
 #define WR(__q) WR(__q)
 #endif
 
-__STRUTIL_EXTERN_INLINE __unlikely queue_t *
+__STRUTIL_EXTERN_INLINE queue_t *
 backq(register queue_t *q)
 {
 	queue_t *bq;
@@ -1355,7 +1355,7 @@ backq(register queue_t *q)
 	return ((bq = OTHERQ(q)->q_next) ? OTHERQ(bq) : NULL);
 }
 
-__STRUTIL_EXTERN_INLINE __unlikely ssize_t
+__STRUTIL_EXTERN_INLINE ssize_t
 qsize(register queue_t *q)
 {
 	dassert(q);
@@ -1365,7 +1365,7 @@ qsize(register queue_t *q)
 __STREAMS_EXTERN void enableok(queue_t *q);
 __STREAMS_EXTERN void noenable(queue_t *q);
 
-__STRUTIL_EXTERN_INLINE __unlikely void
+__STRUTIL_EXTERN_INLINE void
 qreply(register queue_t *q, mblk_t *mp)
 {
 	queue_t *oq;

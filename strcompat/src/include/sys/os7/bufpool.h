@@ -80,7 +80,7 @@ typedef struct ss7_bufpool {
 /*
    assumes bufpool is locked 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 __ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -102,7 +102,7 @@ __ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 /*
    for use in the bottom half or tasklet 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -127,7 +127,7 @@ ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 /*
    for use outside the bottom half 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -160,7 +160,7 @@ ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size, int prior)
 /*
    assumes bufpool is locked 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -177,7 +177,7 @@ __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use inside the bottom half 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -196,7 +196,7 @@ ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use outside the bottom half 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -223,7 +223,7 @@ ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    assumes bufpool is locked 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
@@ -237,7 +237,7 @@ __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use inside the bottom half 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
@@ -251,7 +251,7 @@ ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use outside the bottom half 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
@@ -273,7 +273,7 @@ ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp)
  *  -----------------------------------
  *  Initialized the buffer pool for operation.
  */
-__OS7_EXTERN_INLINE __unlikely void
+__OS7_EXTERN_INLINE void
 ss7_bufpool_init(struct ss7_bufpool *pool)
 {
 	if (!pool->initialized) {
@@ -292,7 +292,7 @@ ss7_bufpool_init(struct ss7_bufpool *pool)
  *  Reserves n more FASTBUF sized blocks in the buffer pool and precharges
  *  those n blocks into the buffer pool.
  */
-__OS7_EXTERN_INLINE __unlikely void
+__OS7_EXTERN_INLINE void
 ss7_bufpool_reserve(struct ss7_bufpool *pool, int n)
 {
 	mblk_t *mp;
@@ -313,7 +313,7 @@ ss7_bufpool_reserve(struct ss7_bufpool *pool, int n)
  *  Releases reservation of n FASTBUF sized blocks.  We do not release them
  *  here, we wait for them to be used normally, or freed on termination.
  */
-__OS7_EXTERN_INLINE __unlikely void
+__OS7_EXTERN_INLINE void
 ss7_bufpool_release(struct ss7_bufpool *pool, int n)
 {
 	atomic_sub(n, &pool->reserve);
@@ -324,7 +324,7 @@ ss7_bufpool_release(struct ss7_bufpool *pool, int n)
  *  -----------------------------------
  *  Terminate the buffer pool and free any blocks in the pool.
  */
-__OS7_EXTERN_INLINE __unlikely void
+__OS7_EXTERN_INLINE void
 ss7_bufpool_term(struct ss7_bufpool *pool)
 {
 	unsigned long flags;

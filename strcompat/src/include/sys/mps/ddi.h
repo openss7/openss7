@@ -119,7 +119,7 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_MPS) || defined(CONFIG_STREAMS_COMPAT_MPS_MODULE)
 
-__MPS_EXTERN_INLINE __unlikely int
+__MPS_EXTERN_INLINE int
 mi_bcmp(const void *s1, const void *s2, size_t len)
 {
 	return bcmp(s1, s2, len);
@@ -128,7 +128,7 @@ mi_bcmp(const void *s1, const void *s2, size_t len)
 /*
  *  Memory allocation functions.
  */
-__MPS_EXTERN_INLINE __unlikely void *
+__MPS_EXTERN_INLINE void *
 mi_alloc(size_t size, unsigned int pri)
 {
 	size_t *sp;
@@ -138,7 +138,7 @@ mi_alloc(size_t size, unsigned int pri)
 	return (sp);
 }
 
-__MPS_EXTERN_INLINE __unlikely void *
+__MPS_EXTERN_INLINE void *
 mi_alloc_sleep(size_t size, unsigned int pri)
 {
 	size_t *sp;
@@ -147,7 +147,7 @@ mi_alloc_sleep(size_t size, unsigned int pri)
 		*sp++ = size;
 	return (sp);
 }
-__MPS_EXTERN_INLINE __unlikely caddr_t
+__MPS_EXTERN_INLINE caddr_t
 mi_zalloc(size_t size)
 {
 	caddr_t memp;
@@ -156,7 +156,7 @@ mi_zalloc(size_t size)
 		bzero(memp, size);
 	return (memp);
 }
-__MPS_EXTERN_INLINE __unlikely caddr_t
+__MPS_EXTERN_INLINE caddr_t
 mi_zalloc_sleep(size_t size)
 {
 	caddr_t memp;
@@ -165,7 +165,7 @@ mi_zalloc_sleep(size_t size)
 		bzero(memp, size);
 	return (memp);
 }
-__MPS_EXTERN_INLINE __unlikely void
+__MPS_EXTERN_INLINE void
 mi_free(void *ptr)
 {
 	size_t *sp;

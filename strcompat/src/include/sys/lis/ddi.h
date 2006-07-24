@@ -459,12 +459,12 @@ extern int _RP lis_pcibios_write_config_word(unsigned char bus, unsigned char de
 					     unsigned char where, unsigned short val);
 #endif
 
-__LIS_EXTERN_INLINE _RP __unlikely int
+__LIS_EXTERN_INLINE _RP int
 lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len)
 {
 	return copyin(ubuf, kbuf, len);
 }
-__LIS_EXTERN_INLINE _RP __unlikely int
+__LIS_EXTERN_INLINE _RP int
 lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len)
 {
 	return copyout(kbuf, ubuf, len);

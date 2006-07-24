@@ -107,7 +107,7 @@ extern int streams_close_comm(queue_t *, int, cred_t *);
 extern int streams_open_comm(unsigned int, queue_t *, dev_t *, int, int, cred_t *);
 extern int streams_open_ocomm(dev_t, unsigned int, queue_t *, dev_t *, int, int, cred_t *);
 
-__OSF_EXTERN_INLINE __unlikely void
+__OSF_EXTERN_INLINE void
 puthere(queue_t *q, mblk_t *mp)
 {
 	put(q, mp);

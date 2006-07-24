@@ -105,7 +105,7 @@
 
 #if defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
 
-__SUN_EXTERN_INLINE __unlikely void
+__SUN_EXTERN_INLINE void
 freezestr_SUN(queue_t *q)
 {
 	freezestr(q);
@@ -114,7 +114,7 @@ freezestr_SUN(queue_t *q)
 #undef freezestr
 #define freezestr freezestr_SUN
 
-__SUN_EXTERN_INLINE __unlikely void
+__SUN_EXTERN_INLINE void
 unfreezestr_SUN(queue_t *q)
 {
 #ifdef LFS
@@ -144,7 +144,7 @@ extern clock_t quntimeout(queue_t *q, timeout_id_t toid);
 
 #ifdef LFS
 /* LiS already defines this */
-__SUN_EXTERN_INLINE __unlikely unsigned char
+__SUN_EXTERN_INLINE unsigned char
 queclass(mblk_t *mp)
 {
 	return (mp->b_datap->db_type < QPCTL ? QNORM : QPCTL);
@@ -157,7 +157,7 @@ __SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*fun
 
 #define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))
 
-__SUN_EXTERN_INLINE __unlikely mblk_t *
+__SUN_EXTERN_INLINE mblk_t *
 mkiocb(unsigned int command)
 {
 	mblk_t *mp;

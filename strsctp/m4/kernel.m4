@@ -1619,6 +1619,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	fi
 	cp -f "$kconfig" .config
 	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cflag-check`"
+	linux_cv_k_cflags_orig="$linux_cv_k_cflags"
 	rm -f .config
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
@@ -1627,6 +1628,25 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 		@<:@default=normal@:>@]),
 	    [with_k_optimize="$withval"],
 	    [with_k_optimize="$with_optimize"])
+
+dnl
+dnl	Recent x86_64 makefiles add -fno-reorder-blocks which impedes __builtin_expect() which is
+dnl	not good.  Strip it off here.
+dnl
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -freorder-blocks||"`
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-reorder-blocks||"`
+dnl
+dnl	Recent x86_64 makefiles add -freorder-functions which is just insane.  Strip it off here.
+dnl
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -freorder-functions||"`
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-reorder-functions||"`
+dnl
+dnl	Recent kernels add -fno-unit-at-a-time, probably because of a whole bunch of top-level asm
+dnl	problems.  Because it impedes optimization independent of positioning of functions in a
+dnl	file, we want to kick it out.
+dnl
+dnl	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-unit-at-a-time||"`
+
 	case "${with_k_optimize:-normal}" in
 	    (size)
 		linux_cflags="$linux_cflags${linux_cflags:+ }-Os"
@@ -1634,24 +1654,14 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 		linux_cv_optimize='size'
 		;;
 	    (speed)
-dnl
-dnl		Please don't inline everything at -O3.
-dnl
-		linux_cflags="$linux_cflags${linux_cflags:+ }-O3 -g -fno-inline-functions"
+		linux_cflags="$linux_cflags${linux_cflags:+ }-O3 -g"
 		linux_cv_debug="_NONE"
 		linux_cv_optimize='speed'
 dnl
-dnl		Recent x86_64 makefiles add -fno-reorder-blocks which impedes __builtin_expect()
-dnl		which is not good.  Strip it off here.
+dnl		Please don't inline everything at -O3.
 dnl
-		linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-reorder-blocks||"`
-		linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-reorder-functions||"`
-dnl
-dnl		Recent kernels add -fno-unit-at-a-time, probably because of a whole bunch of
-dnl		top-level asm problems.  Because it impedes optimization independent of positioning
-dnl		of functions in a file, we want to kick it out.
-dnl
-		linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-unit-at-a-time||"`
+dnl		linux_cflags="$linux_cflags${linux_cflags:+ }-fno-inline-functions"
+dnl		linux_cflags="$linux_cflags${linux_cflags:+ }-fno-inline-functions-called-once"
 		;;
 	    (normal)
 		linux_cflags="$linux_cflags${linux_cflags:+ }-O2 -g"
@@ -1659,13 +1669,16 @@ dnl
 		linux_cv_optimize='normal'
 		;;
 	    (quick)
+		linux_cflags="$linux_cflags${linux_cflags:+ }-O0 -g"
+		linux_cv_debug="_TEST"
+		linux_cv_optimize='quick'
 dnl
 dnl		Linux kernel header files have some functions that are expected to "disappear" just
 dnl		because they are static inline and never referenced.
 dnl
-		linux_cflags="$linux_cflags${linux_cflags:+ }-O0 -g -finline -fno-keep-inline-functions -fno-keep-static-consts"
-		linux_cv_debug="_TEST"
-		linux_cv_optimize='quick'
+		linux_cflags="$linux_cflags${linux_cflags:+ }-finline"
+		linux_cflags="$linux_cflags${linux_cflags:+ }-fno-keep-inline-functions"
+		linux_cflags="$linux_cflags${linux_cflags:+ }-fno-keep-static-consts"
 		;;
 	esac
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
@@ -1759,6 +1772,7 @@ dnl
     AC_CACHE_CHECK([for kernel CPPFLAGS], [linux_cv_k_cppflags], [dnl
 	cp -f "$kconfig" .config
 	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cppflag-check`"
+	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"
 	rm -f .config
 	if test :"${cross_compiling:-no}" = :no
 	then
@@ -1808,6 +1822,7 @@ dnl
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
 	cp -f "$kconfig" .config
 	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} modflag-check`"
+	linux_cv_k_modflags_orig="$linux_cv_k_modflags"
 	rm -f .config
 dnl
 dnl	Unfortunately we need to rip the module flags from the kernel source
@@ -1829,6 +1844,7 @@ dnl
     AC_CACHE_CHECK([for kernel KBUILD_STR], [linux_cv_k_bldflags], [dnl
 	cp -f "$kconfig" .config
 	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} bldflag-check`"
+	linux_cv_k_bldflags_orig="$linux_cv_k_bldflags"
 	rm -f .config
 dnl
 dnl	As of 2.6.16+ the KBUILD_BASENAME is stringified on the command line

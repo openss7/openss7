@@ -117,7 +117,7 @@ extern void mi_bufcall(queue_t *q, int size, int priority);
 #ifdef LFS
 extern int wantio(queue_t *q, struct wantio *w);
 
-__AIX_EXTERN_INLINE __unlikely int
+__AIX_EXTERN_INLINE int
 wantmsg(queue_t *q, int streamscall (*func) (mblk_t *))
 {
 	if (!q->q_qinfo->qi_srvp) {

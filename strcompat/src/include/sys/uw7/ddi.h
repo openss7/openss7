@@ -81,12 +81,12 @@ int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 
 typedef atomic_t atomic_int_t;
 
-__UW7_EXTERN_INLINE __unlikely void
+__UW7_EXTERN_INLINE void
 ATOMIC_INT_ADD(atomic_int_t * counter, int value)
 {
 	atomic_add(value, counter);
 }
-__UW7_EXTERN_INLINE __unlikely atomic_int_t *
+__UW7_EXTERN_INLINE atomic_int_t *
 ATOMIC_INT_ALLOC(int flag)
 {
 	atomic_int_t *counter;
@@ -95,37 +95,37 @@ ATOMIC_INT_ALLOC(int flag)
 		*counter = (atomic_int_t) ATOMIC_INIT(0);
 	return (counter);
 }
-__UW7_EXTERN_INLINE __unlikely void
+__UW7_EXTERN_INLINE void
 ATOMIC_INT_DEALLOC(atomic_int_t * counter)
 {
 	kmem_free(counter, sizeof(*counter));
 }
-__UW7_EXTERN_INLINE __unlikely int
+__UW7_EXTERN_INLINE int
 ATOMIC_INT_DECR(atomic_int_t * counter)
 {
 	return atomic_dec_and_test(counter);
 }
-__UW7_EXTERN_INLINE __unlikely void
+__UW7_EXTERN_INLINE void
 ATOMIC_INT_INCR(atomic_int_t * counter)
 {
 	atomic_inc(counter);
 }
-__UW7_EXTERN_INLINE __unlikely void
+__UW7_EXTERN_INLINE void
 ATOMIC_INT_INIT(atomic_int_t * counter, int value)
 {
 	atomic_set(counter, value);
 }
-__UW7_EXTERN_INLINE __unlikely int
+__UW7_EXTERN_INLINE int
 ATOMIC_INT_READ(atomic_int_t * counter)
 {
 	return atomic_read(counter);
 }
-__UW7_EXTERN_INLINE __unlikely void
+__UW7_EXTERN_INLINE void
 ATOMIC_INT_SUB(atomic_int_t * counter, int value)
 {
 	atomic_sub(value, counter);
 }
-__UW7_EXTERN_INLINE __unlikely void
+__UW7_EXTERN_INLINE void
 ATOMIC_INT_WRITE(atomic_int_t * counter, int value)
 {
 	atomic_set(counter, value);

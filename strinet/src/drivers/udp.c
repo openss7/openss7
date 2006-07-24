@@ -608,7 +608,7 @@ STATIC struct tp_prot_bucket *tp_prots[256];
 STATIC kmem_cache_t *udp_prot_cachep;
 STATIC kmem_cache_t *udp_priv_cachep;
 
-static INLINE __unlikely struct tp *
+static INLINE struct tp *
 tp_get(struct tp *tp)
 {
 	dassert(tp != NULL);
@@ -632,7 +632,7 @@ tp_release(struct tp **tpp)
 	if (likely((tp = XCHG(tpp, NULL)) != NULL))
 		tp_put(tp);
 }
-static INLINE __unlikely struct tp *
+static INLINE struct tp *
 tp_alloc(void)
 {
 	struct tp *tp;

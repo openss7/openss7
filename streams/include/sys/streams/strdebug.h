@@ -182,7 +182,7 @@
 #define streams_inline
 
 #ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE
+#define __EXTERN_INLINE extern
 #endif
 
 #else
@@ -246,7 +246,7 @@
 #define streams_inline inline
 
 #ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE inline
+#define __EXTERN_INLINE static inline
 #endif
 
 #else /* defined(CONFIG_STREAMS_OPTIMIZE_NORMAL) */

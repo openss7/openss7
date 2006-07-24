@@ -80,24 +80,24 @@
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 
 #ifdef LFS
-__SUN_EXTERN_INLINE __unlikely cred_t *
+__SUN_EXTERN_INLINE cred_t *
 ddi_get_cred(void)
 {
 	return (current_creds);
 }
 #endif
-__SUN_EXTERN_INLINE __unlikely clock_t
+__SUN_EXTERN_INLINE clock_t
 ddi_get_lbolt(void)
 {
 	return (jiffies);
 }
-__SUN_EXTERN_INLINE __unlikely pid_t
+__SUN_EXTERN_INLINE pid_t
 ddi_get_pid(void)
 {
 	return (current->pid);
 }
 
-__SUN_EXTERN_INLINE __unlikely time_t
+__SUN_EXTERN_INLINE time_t
 ddi_get_time(void)
 {
 	struct timeval tv;
@@ -105,7 +105,7 @@ ddi_get_time(void)
 	do_gettimeofday(&tv);
 	return (tv.tv_sec);
 }
-__SUN_EXTERN_INLINE __unlikely unsigned short
+__SUN_EXTERN_INLINE unsigned short
 ddi_getiminor(dev_t dev)
 {
 #ifdef HAVE_KFUNC_TO_KDEV_T
@@ -131,7 +131,7 @@ typedef struct ddi_umem_cookie {
 	void *umem;
 } ddi_umem_cookie_t;
 
-__SUN_EXTERN_INLINE __unlikely void *
+__SUN_EXTERN_INLINE void *
 ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep)
 {
 	void *umem;
@@ -149,7 +149,7 @@ ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep)
 	}
 	return (umem);
 }
-__SUN_EXTERN_INLINE __unlikely void *
+__SUN_EXTERN_INLINE void *
 ddi_umem_free(ddi_umem_cookie_t * cookiep)
 {
 	if (cookiep)

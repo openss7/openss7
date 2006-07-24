@@ -70,7 +70,7 @@ STATIC void __o ## _start_timer_ ## __t (struct __o * __o) \
 	ss7_start_timer((struct head *)__o, # __t, __n, &__o->timers.__t, &__o ## _ ## __t ## _expiry, __o->__c.__t); \
 } \
 
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 ss7_do_timeout(caddr_t data, const char *timer, const char *mod, ulong *timeo,
 	       int (*to_fnc) (struct head *), void streamscall (*exp_func) (caddr_t))
 {
@@ -101,7 +101,7 @@ ss7_do_timeout(caddr_t data, const char *timer, const char *mod, ulong *timeo,
 		*timeo = timeout(exp_func, data, 2);
 	}
 }
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 ss7_stop_timer(struct head *h, const char *timer, const char *mod, ulong *timeo)
 {
 	ulong to;
@@ -116,7 +116,7 @@ ss7_stop_timer(struct head *h, const char *timer, const char *mod, ulong *timeo)
 	}
 	return;
 }
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 ss7_start_timer(struct head *h, const char *timer, const char *mod, ulong *timeo,
 		void streamscall (*exp_func) (caddr_t), ulong val)
 {

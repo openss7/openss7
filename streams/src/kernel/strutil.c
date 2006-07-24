@@ -104,7 +104,7 @@ static char const ident[] =
 #include <stdbool.h>		/* for bool, true and false */
 
 #ifndef __STRUTIL_EXTERN_INLINE
-#define __STRUTIL_EXTERN_INLINE inline streams_fastcall
+#define __STRUTIL_EXTERN_INLINE inline streams_fastcall __unlikely
 #endif
 
 #include "sys/strdebug.h"

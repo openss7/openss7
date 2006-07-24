@@ -126,7 +126,7 @@ extern int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, in
 			cred_t *credp);
 extern void mi_close_free(caddr_t ptr);
 
-__MPS_EXTERN_INLINE __unlikely caddr_t
+__MPS_EXTERN_INLINE caddr_t
 mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp)
 {
 	caddr_t ptr;
@@ -140,13 +140,13 @@ mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp)
 	return (NULL);
 }
 
-__MPS_EXTERN_INLINE __unlikely void
+__MPS_EXTERN_INLINE void
 mi_attach(queue_t *q, caddr_t ptr)
 {
 	q->q_ptr = WR(q)->q_ptr = ptr;
 }
 
-__MPS_EXTERN_INLINE __unlikely int
+__MPS_EXTERN_INLINE int
 mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag, int sflag,
 	     cred_t *credp)
 {
@@ -174,20 +174,20 @@ mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag, i
 
 extern void mi_close_unlink(caddr_t *mi_head, caddr_t ptr);
 
-__MPS_EXTERN_INLINE __unlikely void
+__MPS_EXTERN_INLINE void
 mi_detach(queue_t *q, caddr_t ptr)
 {
 	mi_close_unlink(NULL, ptr);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 }
 
-__MPS_EXTERN_INLINE __unlikely void
+__MPS_EXTERN_INLINE void
 mi_close_detached(caddr_t *mi_head, caddr_t ptr)
 {
 	mi_close_free(ptr);
 }
 
-__MPS_EXTERN_INLINE __unlikely int
+__MPS_EXTERN_INLINE int
 mi_close_comm(caddr_t *mi_head, queue_t *q)
 {
 	caddr_t ptr = q->q_ptr;
@@ -220,7 +220,7 @@ extern void mi_timer_free(mblk_t *mp);
 /*
  *  Buffer call helper function.
  */
-__MPS_EXTERN_INLINE __unlikely void
+__MPS_EXTERN_INLINE void
 mi_bufcall(queue_t *q, int size, int priority)
 {
 #ifdef LFS

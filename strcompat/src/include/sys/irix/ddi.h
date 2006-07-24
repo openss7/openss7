@@ -77,7 +77,7 @@
 #endif
 #include <sys/svr4/ddi.h>	/* for lock_t */
 
-__IRIX_EXTERN_INLINE __unlikely void
+__IRIX_EXTERN_INLINE void
 icmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	return vcmn_err(err_lvl, fmt, args);

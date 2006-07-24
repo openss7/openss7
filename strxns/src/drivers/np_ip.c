@@ -450,7 +450,7 @@ STATIC struct np_prot_bucket *np_prots[256];
 STATIC kmem_cache_t *np_ip_prot_cachep;
 STATIC kmem_cache_t *np_ip_priv_cachep;
 
-static INLINE __unlikely struct np *
+static INLINE struct np *
 np_get(struct np *np)
 {
 	dassert(np != NULL);
@@ -474,7 +474,7 @@ np_release(struct np **npp)
 	if (likely((np = XCHG(npp, NULL)) != NULL))
 		np_put(np);
 }
-static INLINE __unlikely struct np *
+static INLINE struct np *
 np_alloc(void)
 {
 	struct np *np;

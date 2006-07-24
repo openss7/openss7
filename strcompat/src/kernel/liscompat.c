@@ -66,7 +66,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __LIS_EXTERN_INLINE __inline__ streamscall
+#define __LIS_EXTERN_INLINE __inline__ streamscall __unlikely
 #define __LIS_NO_MACROS
 #define __depr
 

@@ -66,7 +66,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __SVR4_EXTERN_INLINE __inline__ streamscall
+#define __SVR4_EXTERN_INLINE __inline__ streamscall __unlikely
 
 #define _SVR4_SOURCE
 

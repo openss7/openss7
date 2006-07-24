@@ -72,13 +72,13 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
 
-__OSF_EXTERN_INLINE __unlikely time_t
+__OSF_EXTERN_INLINE time_t
 lbolt(void)
 {
 	return jiffies;
 }
 
-__OSF_EXTERN_INLINE __unlikely time_t
+__OSF_EXTERN_INLINE time_t
 time(void)
 {
 	struct timeval tv;

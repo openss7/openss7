@@ -66,7 +66,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __HPUX_EXTERN_INLINE __inline__ streamscall
+#define __HPUX_EXTERN_INLINE __inline__ streamscall __unlikely
 
 #define _HPUX_SOURCE
 

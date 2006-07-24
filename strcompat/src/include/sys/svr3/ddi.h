@@ -76,7 +76,7 @@
 #define dev_t __streams_dev_t
 #endif
 
-__SVR3_EXTERN_INLINE __unlikely mblk_t *
+__SVR3_EXTERN_INLINE mblk_t *
 alloc_proto(size_t psize, size_t dsize, int type, uint bpri)
 {
 	mblk_t *mp = NULL, *dp = NULL;
@@ -106,12 +106,12 @@ alloc_proto(size_t psize, size_t dsize, int type, uint bpri)
 }
 
 /* these two are included here because we need the STREAMS version of dev_t */
-__SVR3_EXTERN_INLINE __unlikely major_t
+__SVR3_EXTERN_INLINE major_t
 emajor(dev_t dev)
 {
 	return (getmajor(dev) + MAJOR(getminor(dev)));
 }
-__SVR3_EXTERN_INLINE __unlikely minor_t
+__SVR3_EXTERN_INLINE minor_t
 eminor(dev_t dev)
 {
 	return (MINOR(getminor(dev)));

@@ -9599,6 +9599,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, -ECONNRESET);
 		err = -EPROTO;
 	}
+	err = QR_DONE;
 	goto done;
 }
 

@@ -97,8 +97,8 @@ static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.6
 #endif
 
 #define __EXTERN_INLINE
-#define __STRSCHD_EXTERN_INLINE extern inline streams_fastcall
-#define __STRUTIL_EXTERN_INLINE extern inline streams_fastcall
+#define __STRSCHD_EXTERN_INLINE static inline streams_fastcall
+#define __STRUTIL_EXTERN_INLINE static inline streams_fastcall
 
 /* initialization for specfs */
 BIG_STATIC int strlookup_init(void);

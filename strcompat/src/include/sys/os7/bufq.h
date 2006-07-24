@@ -69,7 +69,7 @@ typedef struct bufq {
 	size_t q_count;
 } bufq_t;
 
-__OS7_EXTERN_INLINE __unlikely void
+__OS7_EXTERN_INLINE void
 bufq_init(bufq_t * q)
 {
 	spin_lock_init(&q->q_lock);
@@ -78,42 +78,42 @@ bufq_init(bufq_t * q)
 	q->q_msgs = 0;
 	q->q_count = 0;
 }
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_lock(bufq_t * q)
 {
 	spin_lock_bh(&q->q_lock);
 }
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_unlock(bufq_t * q)
 {
 	spin_unlock_bh(&q->q_lock);
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely size_t
+__OS7_EXTERN_INLINE streamscall size_t
 bufq_length(bufq_t * q)
 {
 	return q->q_msgs;
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely size_t
+__OS7_EXTERN_INLINE streamscall size_t
 bufq_size(bufq_t * q)
 {
 	return q->q_count;
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 bufq_head(bufq_t * q)
 {
 	return q->q_head;
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 bufq_tail(bufq_t * q)
 {
 	return q->q_tail;
 }
 
-__OS7_EXTERN_INLINE __unlikely void
+__OS7_EXTERN_INLINE void
 __bufq_add(bufq_t * q, mblk_t *mp)
 {
 	mblk_t *md = mp;
@@ -130,7 +130,7 @@ __bufq_add(bufq_t * q, mblk_t *mp)
 	assure(q->q_msgs != 1 || !q->q_tail->b_prev);
 }
 
-__OS7_EXTERN_INLINE __unlikely void
+__OS7_EXTERN_INLINE void
 __bufq_sub(bufq_t * q, mblk_t *mp)
 {
 	mblk_t *md = mp;
@@ -150,7 +150,7 @@ __bufq_sub(bufq_t * q, mblk_t *mp)
 	assure(q->q_msgs || !q->q_tail);
 }
 
-__OS7_EXTERN_INLINE __unlikely void
+__OS7_EXTERN_INLINE void
 __bufq_queue(bufq_t * q, mblk_t *mp)
 {
 	if ((mp->b_prev = q->q_tail))
@@ -162,7 +162,7 @@ __bufq_queue(bufq_t * q, mblk_t *mp)
 	__bufq_add(q, mp);
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_queue(bufq_t * q, mblk_t *mp)
 {
 	ensure(q && mp, return);
@@ -171,7 +171,7 @@ bufq_queue(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_queue_head(bufq_t * q, mblk_t *mp)
 {
 	ensure(q && mp, return);
@@ -186,7 +186,7 @@ bufq_queue_head(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	bufq_lock(q);
@@ -201,7 +201,7 @@ bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	ensure(q && mp && np, return);
@@ -216,7 +216,7 @@ bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE __unlikely mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 __bufq_dequeue(bufq_t * q)
 {
 	mblk_t *mp;
@@ -233,7 +233,7 @@ __bufq_dequeue(bufq_t * q)
 	return mp;
 }
 
-__OS7_EXTERN_INLINE __unlikely mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 bufq_dequeue(bufq_t * q)
 {
 	mblk_t *mp;
@@ -245,7 +245,7 @@ bufq_dequeue(bufq_t * q)
 	return mp;
 }
 
-__OS7_EXTERN_INLINE __unlikely mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 __bufq_dequeue_tail(bufq_t * q)
 {
 	mblk_t *mp;
@@ -262,7 +262,7 @@ __bufq_dequeue_tail(bufq_t * q)
 	return (mp);
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 bufq_dequeue_tail(bufq_t * q)
 {
 	mblk_t *mp;
@@ -274,7 +274,7 @@ bufq_dequeue_tail(bufq_t * q)
 	return mp;
 }
 
-__OS7_EXTERN_INLINE __unlikely mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 __bufq_unlink(bufq_t * q, mblk_t *mp)
 {
 	ensure(q && mp, return (NULL));
@@ -292,7 +292,7 @@ __bufq_unlink(bufq_t * q, mblk_t *mp)
 	return mp;
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 bufq_unlink(bufq_t * q, mblk_t *mp)
 {
 	ensure(q && mp, return (NULL));
@@ -305,7 +305,7 @@ bufq_unlink(bufq_t * q, mblk_t *mp)
 /*
    splice bufq2 onto the head of bufq1 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_splice_head(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
@@ -319,7 +319,7 @@ bufq_splice_head(bufq_t * q1, bufq_t * q2)
 /*
    splice bufq2 onto the tail of bufq1 
  */
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
@@ -329,7 +329,7 @@ bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 		bufq_queue(q1, mp);
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_freehead(bufq_t * q)
 {
 	bufq_lock(q);
@@ -338,7 +338,7 @@ bufq_freehead(bufq_t * q)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_purge(bufq_t * q)
 {
 	bufq_lock(q);
@@ -347,7 +347,7 @@ bufq_purge(bufq_t * q)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE __unlikely void
+__OS7_EXTERN_INLINE void
 __bufq_supply(bufq_t * q, mblk_t *mp)
 {
 	mblk_t *md = mp;
@@ -360,7 +360,7 @@ __bufq_supply(bufq_t * q, mblk_t *mp)
 	}
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 bufq_supply(bufq_t * q, mblk_t *mp)
 {
 	bufq_lock(q);
@@ -368,7 +368,7 @@ bufq_supply(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q);
 }
 
-__OS7_EXTERN_INLINE streamscall __unlikely mblk_t *
+__OS7_EXTERN_INLINE streamscall mblk_t *
 bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount)
 {
 	bufq_lock(q);
@@ -382,7 +382,7 @@ bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount)
 }
 
 #ifndef SCTP_VERSION_2
-__OS7_EXTERN_INLINE streamscall __unlikely void
+__OS7_EXTERN_INLINE streamscall void
 freechunks(mblk_t *mp)
 {
 	mblk_t *dp, *dp_next;

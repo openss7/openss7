@@ -148,7 +148,7 @@ static char const ident[] =
 // #include <asm/atomic.h>
 
 #ifndef __STRSCHD_EXTERN_INLINE
-#define __STRSCHD_EXTERN_INLINE inline streams_fastcall
+#define __STRSCHD_EXTERN_INLINE inline streams_fastcall __unlikely
 #endif
 
 #include "sys/strdebug.h"

@@ -102,8 +102,8 @@ static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.
 #define BIG_STATIC_INLINE_CLONE STATIC streams_inline
 #endif
 
-#define __STRSCHD_EXTERN_INLINE	streams_inline streams_fastcall
-#define __STRUTIL_EXTERN_INLINE streams_inline streams_fastcall
+#define __STRSCHD_EXTERN_INLINE	streams_inline streams_fastcall __unlikely
+#define __STRUTIL_EXTERN_INLINE streams_inline streams_fastcall __unlikely
 
 #undef ident
 #define ident ident_strreg

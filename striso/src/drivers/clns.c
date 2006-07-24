@@ -312,14 +312,14 @@ typedef struct np {
 
 STATIC kmem_cache_t *np_priv_cachep;
 
-static INLINE __unlikely struct np *
+static INLINE struct np *
 np_get(struct np *np)
 {
 	if (np)
 		atomic_inc(&np->refcnt);
 	return (np);
 }
-static INLINE __unlikely void
+static INLINE void
 np_put(struct np *np)
 {
 	if (np)
@@ -327,13 +327,13 @@ np_put(struct np *np)
 			kmem_cache_free(np_priv_cachep, np);
 		}
 }
-static INLINE __unlikely void
+static INLINE void
 np_release(struct np **npp)
 {
 	if (npp != NULL)
 		np_put(XCHG(npp, NULL));
 }
-static INLINE __unlikely struct np *
+static INLINE struct np *
 np_alloc(void)
 {
 	struct np *np;
@@ -362,14 +362,14 @@ typedef struct dl {
 
 STATIC kmem_cache_t *dl_priv_cachep;
 
-static INLINE __unlikely struct dl *
+static INLINE struct dl *
 dl_get(struct dl *dl)
 {
 	if (dl)
 		atomic_inc(&dl->refcnt);
 	return (dl);
 }
-static INLINE __unlikely void
+static INLINE void
 dl_put(struct dl *dl)
 {
 	if (dl)
@@ -377,13 +377,13 @@ dl_put(struct dl *dl)
 			kmem_cache_free(dl_priv_cachep, dl);
 		}
 }
-static INLINE __unlikely void
+static INLINE void
 dl_release(struct dl **dlp)
 {
 	if (dlp != NULL)
 		dl_put(XCHG(dlp, NULL));
 }
-static INLINE __unlikely struct dl *
+static INLINE struct dl *
 dl_alloc(void)
 {
 	struct dl *dl;

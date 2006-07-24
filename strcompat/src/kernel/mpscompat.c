@@ -145,7 +145,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __MPS_EXTERN_INLINE __inline__ streamscall
+#define __MPS_EXTERN_INLINE __inline__ streamscall __unlikely
 
 #ifdef LIS
 #define _LFS_SOURCE

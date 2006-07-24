@@ -66,7 +66,7 @@
 #endif
 
 #ifndef __SCHED_EXTERN_INLINE
-#define __SCHED_EXTERN_INLINE __EXTERN_INLINE streams_fastcall
+#define __SCHED_EXTERN_INLINE __EXTERN_INLINE streams_fastcall __unlikely
 #endif
 
 #ifndef BIG_STATIC

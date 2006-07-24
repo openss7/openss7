@@ -178,22 +178,22 @@ struct dev_ops {
 	int (*devo_power) (dev_info_t * dip, int component, int level);
 };
 
-__SUN_EXTERN_INLINE __unlikely int
+__SUN_EXTERN_INLINE int
 nodev(void)
 {
 	return (ENXIO);
 }
-__SUN_EXTERN_INLINE __unlikely int
+__SUN_EXTERN_INLINE int
 nulldev(void)
 {
 	return (0);
 }
-__SUN_EXTERN_INLINE __unlikely int
+__SUN_EXTERN_INLINE int
 nochpoll(void)
 {
 	return (ENXIO);
 }
-__SUN_EXTERN_INLINE __unlikely int
+__SUN_EXTERN_INLINE int
 ddi_prop_op(void)
 {
 	return (0);

@@ -116,7 +116,7 @@
 #endif
 
 /* Strangely, LiS 2.18.0 defined lis_appq, but no longer appq */
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	return lis_appq(q, emp, nmp);
@@ -127,7 +127,7 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 extern int bcanget(queue_t *q, int band);
 extern int canget(queue_t *q);
 
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 enableq(queue_t *q)
 {
 	lis_flags_t flags;
@@ -148,7 +148,7 @@ typedef int streamscall (*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
 typedef int streamscall (*qi_qclose_t) (queue_t *, int, cred_t *);
 typedef int streamscall (*qi_qadmin_t) (void);
 
-__LFS_EXTERN_INLINE __unlikely qi_qadmin_t
+__LFS_EXTERN_INLINE qi_qadmin_t
 getadmin(modID_t modid)
 {
 	struct streamtab *st;
@@ -159,12 +159,12 @@ getadmin(modID_t modid)
 			return (qi->qi_qadmin);
 	return (NULL);
 }
-__LFS_EXTERN_INLINE __unlikely modID_t
+__LFS_EXTERN_INLINE modID_t
 getmid(const char *name)
 {
 	return lis_findmod(name);
 }
-__LFS_EXTERN_INLINE __unlikely mblk_t *
+__LFS_EXTERN_INLINE mblk_t *
 linkmsg(mblk_t *mp1, mblk_t *mp2)
 {
 	if (mp1) {
@@ -173,14 +173,14 @@ linkmsg(mblk_t *mp1, mblk_t *mp2)
 	}
 	return (mp2);
 }
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 pcmsg(unsigned char type)
 {
 	return ((type & QPCTL) != 0);
 }
 
 #undef datamsg
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 datamsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
@@ -193,7 +193,7 @@ datamsg(unsigned char type)
 
 #define datamsg(_type) datamsg(_type)
 #undef ctlmsg
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 ctlmsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
@@ -204,7 +204,7 @@ ctlmsg(unsigned char type)
 
 #define ctlmsg(_type) ctlmsg(_type)
 #undef isdatablk
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 isdatablk(dblk_t * db)
 {
 	return datamsg(db->db_type);
@@ -212,7 +212,7 @@ isdatablk(dblk_t * db)
 
 #define isdatablk(_db) isdatablk(_db)
 #undef isdatamsg
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 isdatamsg(mblk_t *mp)
 {
 	return isdatablk(mp->b_datap);
@@ -220,7 +220,7 @@ isdatamsg(mblk_t *mp)
 
 #define isdatamsg(_mp) isdatamsg(_mp)
 #undef putctl
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 putctl(queue_t *q, int type)
 {
 	mblk_t *mp;
@@ -235,7 +235,7 @@ putctl(queue_t *q, int type)
 
 #define putctl(_q,_type) putctl(_q,_type)
 #undef putctl1
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 putctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
@@ -251,7 +251,7 @@ putctl1(queue_t *q, int type, int param)
 
 #define putctl1(_q,_type,_param) putctl1(_q,_type,_param)
 #undef putctl2
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 putctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
@@ -268,7 +268,7 @@ putctl2(queue_t *q, int type, int param1, int param2)
 
 #define putctl2(_q,_type,_param1,_param2) putctl2(_q,_type,_param1,_param2)
 #undef putnextctl
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 putnextctl(queue_t *q, int type)
 {
 	mblk_t *mp;
@@ -283,7 +283,7 @@ putnextctl(queue_t *q, int type)
 
 #define putnextctl(_q,_type) putnextctl(_q,_type)
 #undef putnextctl1
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 putnextctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
@@ -299,7 +299,7 @@ putnextctl1(queue_t *q, int type, int param)
 
 #define putnextctl1(_q,_type,_param) putnextctl1(_q,_type,_param)
 #undef putnextctl2
-__LFS_EXTERN_INLINE __unlikely int
+__LFS_EXTERN_INLINE int
 putnextctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
@@ -316,7 +316,7 @@ putnextctl2(queue_t *q, int type, int param1, int param2)
 
 #define putnextctl2(_q,_type,_param1,_param2) putnextctl2(_q,_type,_param1,_param2)
 
-__LFS_EXTERN_INLINE __unlikely void
+__LFS_EXTERN_INLINE void
 setq(queue_t *q, struct qinit *rinit, struct qinit *wrinit)
 {
 	return lis_setq(q, rinit, wrinit);
