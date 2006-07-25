@@ -512,7 +512,6 @@ register_cdev(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 	if (err < 0)
 		return (err);
 	cdev_init(cdev->d_cdev, fops);
-	cdev->d_cdev->owner = cdev->d_kmod;
 	err = cdev_add(cdev->d_cdev, dev, 1 << 16);
 	if (err) {
 		unregister_chrdev_region(dev, 1 << 16);
