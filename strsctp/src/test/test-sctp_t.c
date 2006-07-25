@@ -2909,6 +2909,11 @@ print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
 
 	if (verbose < 4)
 		return;
+	if (opt_len == 0) {
+		snprintf(buf, sizeof(buf), "(no options)");
+		print_string(child, buf);
+		return;
+	}
 	snprintf(buf, sizeof(buf), "opt len = %lu", (ulong) opt_len);
 	print_string(child, buf);
 	snprintf(buf, sizeof(buf), "opt ofs = %lu", (ulong) opt_ofs);
@@ -3023,11 +3028,21 @@ int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
 	if (flags & MSG_BAND || band) {
-		if (verbose > 3) {
+		if (verbose > 4) {
+			int i;
+
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			dummy = lockf(fileno(stdout), F_ULOCK, 0);
+			fprintf(stdout, "[");
+			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+				fprintf(stdout, "%02X", ctrl->buf[i]);
+			fprintf(stdout, "]\n");
+			fprintf(stdout, "[");
+			for (i = 0; i < (data ? data->len : 0); i++)
+				fprintf(stdout, "%02X", data->buf[i]);
+			fprintf(stdout, "]\n");
 			fflush(stdout);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (ctrl == NULL || data != NULL)
 			print_datcall(child, "putpmsg(2)----", data ? data->len : 0);
@@ -4584,8 +4599,18 @@ wait_event(int child, int wait)
 					if (verbose > 4)
 						print_success(child);
 					if (verbose > 4) {
+						int i;
+
 						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "gotmsg from %d [%d,%d]:\n", child, ctrl.len, data.len);
+						fprintf(stdout, "[");
+						for (i = 0; i < ctrl.len; i++)
+							fprintf(stdout, "%02X", ctrl.buf[i]);
+						fprintf(stdout, "]\n");
+						fprintf(stdout, "[");
+						for (i = 0; i < data.len; i++)
+							fprintf(stdout, "%02X", data.buf[i]);
+						fprintf(stdout, "]\n");
 						fflush(stdout);
 						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
@@ -16917,7 +16942,7 @@ struct test_stream test_1_10_1_list = { &preamble_1_10_1_list, &test_case_1_10_1
 #define desc_case_1_10_2 "\
 Check that an attempt to bind three streams to the same address\n\
 will result in one success and two failures.  Rawip streams do\n\
-not care about reuse, so all streams will successd for rawip."
+not care about reuse, so all streams will succeed for rawip."
 
 int
 test_case_1_10_2_conn(int child)
@@ -17598,9 +17623,9 @@ int
 postamble_2_2(int child)
 {
 	if (last_info.SERV_type == T_CLTS)
-		return postamble_0(child);
-	else
 		return postamble_1(child);
+	else
+		return postamble_0(child);
 }
 
 #define preamble_2_2_conn	preamble_1s
@@ -21830,7 +21855,7 @@ test_case_3_1_conn(int child)
 		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 			goto failure;
 		state++;
-		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		if (expect(child, LONGER_WAIT << 2, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 			goto failure;
 		break;
 	default:
@@ -21869,11 +21894,11 @@ test_case_3_1_list(int child)
 }
 
 #define preamble_3_1_conn	preamble_1s
-#define preamble_3_1_resp	preamble_1s
+#define preamble_3_1_resp	preamble_0
 #define preamble_3_1_list	preamble_0
 
 #define postamble_3_1_conn	postamble_1
-#define postamble_3_1_resp	postamble_1
+#define postamble_3_1_resp	postamble_0
 #define postamble_3_1_list	postamble_0
 
 struct test_stream test_3_1_conn = { &preamble_3_1_conn, &test_case_3_1_conn, &postamble_3_1_conn };
@@ -22919,18 +22944,11 @@ test_case_4_1_3_list(int child)
 	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
-	expect(child, LONG_WAIT, __EVENT_NO_MSG);
-	switch (last_event) {
-	case __EVENT_NO_MSG:
-		state++;
-		if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-			goto failure;
-		break;
-	case __TEST_DISCON_IND:
-		break;
-	default:
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
-	}
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	expect(child, LONG_WAIT, __EVENT_NO_MSG);
 	switch (last_event) {
@@ -23529,7 +23547,7 @@ test_case_4_1_7_conn_part(int child)
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT << 1, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, LONG_WAIT);
@@ -23544,7 +23562,7 @@ test_case_4_1_7_resp_part(int child)
 {
 	test_msleep(child, LONG_WAIT);
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT << 3, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, SHORT_WAIT);
@@ -34458,7 +34476,7 @@ int
 test_case_13_5_4_list(int child)
 {
 	/* LiS has a bug where it passes a zero length data message. */
-	test_data = "data";
+	test_data = "";
 	test_opts = NULL;
 	test_olen = 0;
 	test_resfd = test_fd[1];
