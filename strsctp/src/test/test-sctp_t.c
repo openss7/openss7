@@ -6058,12 +6058,23 @@ test_case_1_4_2(int child)
 	if (p->addr_ack.PRIM_type != T_ADDR_ACK)
 		goto failure;
 	state++;
-	/* returns multiple addresses */
 	if (p->addr_ack.LOCADDR_length == 0)
 		goto failure;
 	state++;
-	if ((p->addr_ack.LOCADDR_length % sizeof(struct sockaddr_in)) != 0)
-		goto failure;
+	switch (test_level) {
+	case T_INET_SCTP:
+		/* SCTP returns multiple addresses */
+		if ((p->addr_ack.LOCADDR_length % sizeof(struct sockaddr_in)) != 0)
+			goto failure;
+		break;
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+		/* others return single address */
+		if (p->addr_ack.LOCADDR_length != sizeof(struct sockaddr_in))
+			goto failure;
+		break;
+	}
 	state++;
 	if (p->addr_ack.REMADDR_length != 0)
 		goto failure;
