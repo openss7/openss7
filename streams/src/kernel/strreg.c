@@ -476,6 +476,60 @@ unregister_strdrv(struct cdevsw *cdev)
 
 EXPORT_SYMBOL_NOVERS(unregister_strdrv);
 
+#if !defined HAVE_KINC_LINUX_CDEV_H
+STATIC int
+register_cdev(struct cdevsw *cdev, major_t major, struct file_operations *fops)
+{
+	return register_chrdev(major, cdev->d_name, fops);
+}
+STATIC void
+unregister_cdev(struct cdevsw *cdev, major_t major)
+{
+	return unregister_chrdev(major, cdev->d_name);
+}
+#else				/* defined HAVE_KINC_LINUX_CDEV_H */
+STATIC int
+register_cdev(struct cdevsw *cdev, major_t major, struct file_operations *fops)
+{
+	int err;
+	dev_t dev = 0;
+
+	if ((cdev->d_cdev = kmalloc(sizeof(struct cdev), GFP_KERNEL)) == NULL)
+		return (-ENOMEM);
+
+	if (major == 0) {
+		err = alloc_chrdev_region(&dev, 0, 1 << 16, (char *) cdev->d_name);
+		if (err == 0)
+			major = MAJOR(dev);
+	} else {
+		dev = MKDEV(major, 0);
+		err = register_chrdev_region(dev, 1 << 16, (char *) cdev->d_name);
+	}
+	if (err < 0)
+		return (err);
+	cdev_init(cdev->d_cdev, fops);
+	cdev->d_cdev->owner = cdev->d_kmod;
+	err = cdev_add(cdev->d_cdev, dev, 1 << 16);
+	if (err) {
+		unregister_chrdev_region(dev, 1 << 16);
+		cdev_del(cdev->d_cdev);
+		kfree(XCHG(&cdev->d_cdev, NULL));
+		return (err);
+	}
+	return (major);
+}
+STATIC void
+unregister_cdev(struct cdevsw *cdev, major_t major)
+{
+	dev_t dev = MKDEV(major, 0);
+
+	unregister_chrdev_region(dev, 1 << 16);
+	cdev_del(cdev->d_cdev);
+	kfree(XCHG(&cdev->d_cdev, NULL));
+	return;
+}
+#endif				/* defined HAVE_KINC_LINUX_CDEV_H */
+
 /*
  *  register_xinode:	- register a character device inode
  *  @cdev:	character device switch structure pointer
@@ -486,7 +540,7 @@ EXPORT_SYMBOL_NOVERS(unregister_strdrv);
  *  subsystem.  @fops is the file operations that will be used to open the character device.
  *
  *  The major device number can be specified as zero (0), in which case the major device number will
- *  be assigned to a free major device number by register_chrdev() and returned as a positive return
+ *  be assigned to a free major device number by register_cdev() and returned as a positive return
  *  value.  Any valid external major device number can be used for @major.
  *
  *  register_xinode() can be called multiple times for the same registered cdevsw entries to
@@ -536,7 +590,7 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
 #endif
 		/* register the character device */
-		if ((err = register_chrdev(major, cdev->d_name, fops)) < 0) {
+		if ((err = register_cdev(cdev, major, fops)) < 0) {
 			_ptrace(("Error path taken!\n"));
 			break;
 		}
@@ -600,7 +654,7 @@ unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
 			err = -EPERM;
 			if (d != cmaj)
 				break;
-			if ((err = unregister_chrdev(major, cdev->d_name)) < 0)
+			if ((err = unregister_cdev(cdev, major)) < 0)
 				break;
 			cmaj_del(cmaj, cdev);
 		} else {
@@ -612,7 +666,7 @@ unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
 			list_for_each(pos, &cdev->d_majors) {
 				cmaj = list_entry(pos, struct devnode, n_list);
 
-				unregister_chrdev(cmaj->n_major, cdev->d_name);
+				unregister_cdev(cdev, cmaj->n_major);
 				cmaj_del(cmaj, cdev);
 			}
 		}
@@ -635,7 +689,7 @@ unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
  *  character special major device within the specfs filesystem.
  *
  *  @major, the major device number, can be specified as zero (0), in which case the major device
- *  number will be assigned to a free major device number by the Linux register_chrdev() function
+ *  number will be assigned to a free major device number by the Linux register_cdev() function
  *  and returned as a positive return value.  Any valid external major device number can be used for
  *  @major.
  *

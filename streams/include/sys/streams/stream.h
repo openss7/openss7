@@ -700,6 +700,8 @@ struct fmodsw {
 	struct module *f_kmod;		/* kernel module */
 };
 
+struct cdev; /* just in case */
+
 struct cdevsw {
 	struct list_head d_list;	/* list of all structures */
 	struct list_head d_hash;	/* list of module hashes in slot */
@@ -722,6 +724,7 @@ struct cdevsw {
 	struct list_head d_apush;	/* autopush list */
 	struct stdata *d_plinks;	/* permanent links for this device */
 	struct list_head d_stlist;	/* stream head list for this device */
+	struct cdev *d_cdev;		/* character device structure */
 };
 
 struct devnode {

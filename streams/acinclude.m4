@@ -1022,7 +1022,7 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
 			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
-			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h], [:], [:], [
+			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h linux/cdev.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
