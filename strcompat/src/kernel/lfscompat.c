@@ -414,6 +414,30 @@ __LFS_EXTERN_INLINE void setq(queue_t *q, struct qinit *rinit, struct qinit *wri
 
 EXPORT_SYMBOL_NOVERS(setq);
 
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+#define write_lock_str(__lkp, __flags) \
+	do { (void)__flags; write_lock_bh(__lkp); } while (0)
+#define write_unlock_str(__lkp, __flags) \
+	do { (void)__flags; write_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+#define write_lock_str(__lkp, __flags) \
+	write_lock_irqsave(__lkp, __flags)
+#define write_unlock_str(__lkp, __flags) \
+	write_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
 static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
 static char str_err_buf[LOGMSGSZ];
 
@@ -435,7 +459,7 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 		short lev = (short) level;
 
 		/* XXX: are these strict locks necessary? */
-		spin_lock_irqsave(&str_err_lock, flags);
+		spin_lock_str(&str_err_lock, flags);
 		vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
 #define STRLOG_PFX "strlog(%hd)[%hd,%hd]: %s\n"
 		if (flag & SL_FATAL)
@@ -451,7 +475,7 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 		else
 			printk(KERN_INFO STRLOG_PFX, lev, mid, sid, str_err_buf);
 #undef STRLOG_PFX
-		spin_unlock_irqrestore(&str_err_lock, flags);
+		spin_unlock_str(&str_err_lock, flags);
 	}
 	if (flag & SL_ERROR)
 		rval = 0;	/* no error logger */
@@ -482,9 +506,9 @@ register_strlog(vstrlog_t newlog)
 	unsigned long flags;
 	vstrlog_t oldlog;
 
-	write_lock_irqsave(&strlog_reg_lock, flags);
+	write_lock_str(&strlog_reg_lock, flags);
 	oldlog = xchg(&vstrlog_hook, newlog);
-	write_unlock_irqrestore(&strlog_reg_lock, flags);
+	write_unlock_str(&strlog_reg_lock, flags);
 	return (oldlog);
 }
 

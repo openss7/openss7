@@ -193,6 +193,25 @@ STATIC spinlock_t vf_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct vf *vf_opens = NULL;
 STATIC struct vf *vf_links = NULL;
 
+/*
+ *  Locking
+ */
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
 #define MUX_UP 1
 #define MUX_DOWN 2
 
@@ -220,7 +239,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 				goto enomem;
 			l = (typeof(l)) mp->b_cont->b_rptr;
 
-			spin_lock_irqsave(&vf_lock, flags);
+			spin_lock_str(&vf_lock, flags);
 			bot->next = vf_links;
 			bot->prev = &vf_links;
 			vf_links = bot;
@@ -231,7 +250,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 			bot->lower = NULL;
 			noenable(bot->rq);
 			l->l_qtop->q_ptr = RD(l->l_qtop)->q_ptr = bot;
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 
 			goto ack;
 		}
@@ -244,7 +263,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 				goto einval;
 			l = (typeof(l)) mp->b_cont->b_rptr;
 
-			spin_lock_irqsave(&vf_lock, flags);
+			spin_lock_str(&vf_lock, flags);
 			for (bot = vf_links, bot; bot = bot->next)
 				if (bot->index = l->l_index)
 					break;
@@ -269,7 +288,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 					if (top->lower == bot)
 						top->lower == NULL;
 			}
-			spin_unlock_irqrestpre(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			if (!bot)
 				goto einval;
 			goto ack;
@@ -285,7 +304,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 			if (!mp->b_cont)
 				goto einval;
 			l_index = *((typeof(l_index)) *) mp->b_cont->b_rptr;
-			spin_lock_irqsave(&vf_lock, flags);
+			spin_lock_str(&vf_lock, flags);
 			for (bot = vf_links; bot; bot = bot->next)
 				if (bot->index == l_index)
 					break;
@@ -301,7 +320,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 				} else
 					bot = NULL;
 			}
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			if (!bot)
 				goto einval;
 			goto ack;
@@ -317,7 +336,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 			if (!mp->b_cont)
 				goto einval;
 			l_index = *((typeof(l_index)) *) mp->b_cont->b_rptr;
-			spin_lock_irqsave(&vf_lock, flags);
+			spin_lock_str(&vf_lock, flags);
 			for (bot = vf_links; bot; bot = bot->next)
 				if (bot->index == l_index)
 					break;
@@ -329,7 +348,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 				} else
 					bot = NULL;
 			}
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			if (!bot)
 				goto einval;
 			goto ack;
@@ -345,7 +364,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 			if (!mp->b_cont)
 				goto einval;
 			l_index = *((typeof(l_index)) *) mp->b_cont->b_rptr;
-			spin_lock_irqsave(&vf_lock, flags);
+			spin_lock_str(&vf_lock, flags);
 			for (bot = vf_links; bot; bot = bot->next)
 				if (bot->index == l_index)
 					break;
@@ -357,7 +376,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 				} else
 					bot = NULL;
 			}
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			if (!bot)
 				goto einval;
 			goto ack;
@@ -373,7 +392,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 			if (!mp->b_cont)
 				goto einval;
 			dev = *((typeof(dev)) *) mp->b_cont->b_rptr;
-			spin_lock_irqsave(&vf_lock, flags);
+			spin_lock_str(&vf_lock, flags);
 			for (top = vf_opens; top; top = top->next)
 				if (top->dev == dev)
 					break;
@@ -389,7 +408,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 				} else
 					top = NULL;
 			}
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			if (!top)
 				goto einval;
 			goto ack;
@@ -405,7 +424,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 			if (!mp->b_cont)
 				goto einval;
 			dev = *((typeof(dev)) *) mp->b_cont->b_rptr;
-			spin_lock_irqsave(&vf_lock, flags);
+			spin_lock_str(&vf_lock, flags);
 			for (top = vf_opens; top; top = top->next)
 				if (top->dev == dev)
 					break;
@@ -417,7 +436,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 				} else
 					top = NULL;
 			}
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			if (!top)
 				goto einval;
 			goto ack;
@@ -433,7 +452,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 			if (!mp->b_cont)
 				goto einval;
 			dev = *((typeof(dev)) *) mp->b_cont->b_rptr;
-			spin_lock_irqsave(&vf_lock, flags);
+			spin_lock_str(&vf_lock, flags);
 			for (top = vf_opens; top; top = top->next)
 				if (top->dev == dev)
 					break;
@@ -445,7 +464,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 				} else
 					top = NULL;
 			}
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			if (!top)
 				goto einval;
 			goto ack;
@@ -483,18 +502,18 @@ vf_uwput(queue_t *q, mblk_t *mp)
 			else
 				flushq(q, FLUSHALL);
 		}
-		spin_lock_irqsave(&vf_lock, flags);
+		spin_lock_str(&vf_lock, flags);
 		if (vf->lower) {
 			queue_t *wq;
 
 			wq = vf->lower->wq;
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			putnext(wq, mp);
 		} else if (vf->upper) {
 			queue_t *rq;
 
 			rq = vf->upper->rq;
-			spin_unlock_irqsave(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			/* switch sense of flush flags */
 			switch (mp->b_rptr[0] & (FLUSHW | FLUSHR | FLUSHRW)) {
 			case FLUSHR:
@@ -506,7 +525,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 			}
 			putnext(rq, mp);
 		} else {
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			if (mp->b_rptr[0] & FLUSHR) {
 				if (mp->b_rptr[0] & FLUSHBAND)
 					flushband(RD(q), mp->b_rptr[1], FLUSHALL);
@@ -521,7 +540,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 		break;
 	default:
 	      passmsg:
-		spin_lock_irqsave(&vf_lock, flags);
+		spin_lock_str(&vf_lock, flags);
 		if (vf->upper || vf->lower) {
 			if (!q->q_first) {
 				queue_t *oq = NULL;
@@ -530,7 +549,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
 					oq = vf->upper->rq;
 				if (vf->lower)
 					oq = vf->lower->wq;
-				spin_unlock_irqrestore(&vf_lock, flags);
+				spin_unlock_str(&vf_lock, flags);
 				if (oq) {
 					if (mp->b_datap->db_type >= QPCTL
 					    || bcanputnext(oq, mp->b_band)) {
@@ -539,10 +558,10 @@ vf_uwput(queue_t *q, mblk_t *mp)
 					}
 				}
 			} else
-				spin_unlock_irqrestore(&vf_lock, flags);
+				spin_unlock_str(&vf_lock, flags);
 			putq(q, mp);
 		} else {
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			freemsg(mp);
 			putnextctl2(OTHERQ(q), M_ERROR, ENXIO, ENXIO);
 		}
@@ -572,12 +591,12 @@ vf_uwsrv(queue_t *q)
 	queue_t oq = NULL;
 	mblk_t *mp;
 
-	spin_lock_irqsave(&vf_lock, flags);
+	spin_lock_str(&vf_lock, flags);
 	if (vf->upper)
 		oq = vf->upper->rq;
 	if (vf->lower)
 		oq = vf->lower->wq;
-	spin_unlock_irqrestore(&vf_lock, flags);
+	spin_unlock_str(&vf_lock, flags);
 	if (oq) {
 		while ((mp = getq(q))) {
 			if (mp->b_datap->db_type >= QPCTL || bcanputnext(oq, mp->b_band)) {
@@ -599,14 +618,14 @@ vf_ursrv(queue_t *q)
 	unsigned long flags;
 
 	/* Find the other queues feeding this one and enable them. */
-	spin_lock_irqsave(&vf_lock, flags);
+	spin_lock_str(&vf_lock, flags);
 	for (top = vf_opens; top; top = top->next)
 		if (top->upper == vf)
 			qenable(top->wq);
 	for (bot = vf_links; bot; bot = bot->next)
 		if (bot->upper == vf)
 			qenable(bot->rq);
-	spin_unlock_irqrestore(&vf_lock, flags);
+	spin_unlock_str(&vf_lock, flags);
 	return (0);
 }
 
@@ -624,18 +643,18 @@ vf_lrput(queue_t *q, mblk_t *mp)
 			else
 				flushq(q, FLUSHALL);
 		}
-		spin_lock_irqsave(&vf_lock, flags);
+		spin_lock_str(&vf_lock, flags);
 		if (vf->upper) {
 			queue_t *rq;
 
 			rq = vf->upper->rq;
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			putnext(rq, mp);
 		} else if (vf->lower) {
 			queue_t *wq;
 
 			wq = vf->lower->wq;
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			/* switch sense of flush flags */
 			switch (mp->b_rptr[0] & (FLUSHW | FLUSHR | FLUSHRW)) {
 			case FLUSHR:
@@ -647,7 +666,7 @@ vf_lrput(queue_t *q, mblk_t *mp)
 			}
 			putnext(wq, mp);
 		} else {
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			if (!(mp->b_flags & MSGNOLOOP)) {
 				if (mp->b_rptr[0] & FLUSHW) {
 					if (mp->b_rptr[0] & FLUSHBAND)
@@ -668,12 +687,12 @@ vf_lrput(queue_t *q, mblk_t *mp)
 		if (!q->q_first) {
 			queue_t *oq = NULL;
 
-			spin_lock_irqsave(&vf_lock, flags);
+			spin_lock_str(&vf_lock, flags);
 			if (vf->upper)
 				oq = vf->upper - rq;
 			if (vf->lower)
 				oq = vf->lower->wq;
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			if (oq) {
 				if (mp->b_datap->db_type >= QPCTL || bcanputnext(oq, mp->b_band)) {
 					putnext(oq, mp);
@@ -695,12 +714,12 @@ vf_lrsrv(queue_t *q)
 	queue_t oq = NULL;
 	mblk_t *mp;
 
-	spin_lock_irqsave(&vf_lock, flags);
+	spin_lock_str(&vf_lock, flags);
 	if (vf->upper)
 		oq = vf->upper->rq;
 	if (vf->lower)
 		oq = vf->lower->wq;
-	spin_unlock_irqrestore(&vf_lock, flags);
+	spin_unlock_str(&vf_lock, flags);
 	if (oq) {
 		while ((mp = getq(q))) {
 			if (mp->b_datap->db_type >= QPCTL || bcanputnext(oq, mp->b_band)) {
@@ -722,14 +741,14 @@ vf_lwsrv(queue_t *q)
 	unsigned long flags;
 
 	/* Find the other queues feeding this one and enable them. */
-	spin_lock_irqsave(&vf_lock, flags);
+	spin_lock_str(&vf_lock, flags);
 	for (top = vf_opens; top; top = top->next)
 		if (top->upper == vf)
 			qenable(top->wq);
 	for (bot = vf_links; bot; bot = bot->next)
 		if (bot->upper == vf)
 			qenable(bot->rq);
-	spin_unlock_irqrestore(&vf_lock, flags);
+	spin_unlock_str(&vf_lock, flags);
 	return (0);
 }
 
@@ -759,7 +778,7 @@ vf_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 		if (cminor < 1)
 			return (ENXIO);
-		spin_lock_irqsave(&vf_lock, flags);
+		spin_lock_str(&vf_lock, flags);
 		for (; *vfp && (dmajor = getmajor((*vfp)->dev)) < cmajor; vfp = &(*vfp)->next) ;
 		for (; *vfp && dmajor == getmajor((*vfp)->dev)
 		     && getminor(makedevice(cmajor, cminor)) != 0; vfp = &(*vfp)->next) {
@@ -770,14 +789,14 @@ vf_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				if (sflag == CLONEOPEN)
 					cminor++;
 				else {
-					spin_unlock_irqrestore(&vf_lock, flags);
+					spin_unlock_str(&vf_lock, flags);
 					kmem_free(vf, sizeof(*vf));
 					return (EIO);	/* bad error */
 				}
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
-			spin_unlock_irqrestore(&vf_lock, flags);
+			spin_unlock_str(&vf_lock, flags);
 			kmem_free(vf, sizeof(*vf));
 			return (EBUSY);	/* no minors left */
 		}
@@ -790,7 +809,7 @@ vf_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		vf->wq = WR(q);
 		noenable(vf->wq);
 		vf->rq->q_ptr = vf->wq->q_ptr = vf;
-		spin_unlock_irqrestore(&vf_lock, flags);
+		spin_unlock_str(&vf_lock, flags);
 		qprocson(q);
 		return (0);
 	}
@@ -807,13 +826,13 @@ vf_close(queue_t *q, int oflag, cred_t *crp)
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	qprocsoff(q);
-	spin_lock_irqsave(&vf_lock, flags);
+	spin_lock_str(&vf_lock, flags);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
 	p->next = NULL;
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
-	spin_unlock_irqrestore(&vf_lock, flags);
+	spin_unlock_str(&vf_lock, flags);
 	return (0);
 }
 

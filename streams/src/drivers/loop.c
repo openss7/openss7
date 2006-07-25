@@ -169,6 +169,25 @@ typedef struct loop {
 STATIC struct loop *loop_opens = NULL;
 STATIC spinlock_t loop_lock = SPIN_LOCK_UNLOCKED;
 
+/*
+ *  Locking
+ */
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
 STATIC streamscall int
 loop_wput(queue_t *q, mblk_t *mp)
 {
@@ -195,17 +214,17 @@ loop_wput(queue_t *q, mblk_t *mp)
 				break;
 			}
 			dev = *(dev_t *) mp->b_cont->b_rptr;
-			spin_lock_irqsave(&loop_lock, flags);
+			spin_lock_str(&loop_lock, flags);
 			for (o = loop_opens; o; o = o->next)
 				if (o->dev == dev)
 					break;
 			if (o == NULL) {
-				spin_unlock_irqrestore(&loop_lock, flags);
+				spin_unlock_str(&loop_lock, flags);
 				err = -ENXIO;
 				break;
 			}
 			if (p->other || o->other) {
-				spin_unlock_irqrestore(&loop_lock, flags);
+				spin_unlock_str(&loop_lock, flags);
 				err = -EBUSY;
 				break;
 			}
@@ -215,7 +234,7 @@ loop_wput(queue_t *q, mblk_t *mp)
 			enableok(p->wq);
 			qenable(o->wq);
 			qenable(p->wq);
-			spin_unlock_irqrestore(&loop_lock, flags);
+			spin_unlock_str(&loop_lock, flags);
 			err = 0;
 			break;
 		}
@@ -244,12 +263,12 @@ loop_wput(queue_t *q, mblk_t *mp)
 			else
 				flushq(q, FLUSHALL);
 		}
-		spin_lock_irqsave(&loop_lock, flags);
+		spin_lock_str(&loop_lock, flags);
 		if (p->other) {
 			queue_t *rq;
 
 			rq = p->other->rq;
-			spin_unlock_irqrestore(&loop_lock, flags);
+			spin_unlock_str(&loop_lock, flags);
 			/* switch sense of flush flags */
 			switch (mp->b_rptr[0] & (FLUSHW | FLUSHR | FLUSHRW)) {
 			case FLUSHR:
@@ -261,7 +280,7 @@ loop_wput(queue_t *q, mblk_t *mp)
 			}
 			putnext(rq, mp);
 		} else {
-			spin_unlock_irqrestore(&loop_lock, flags);
+			spin_unlock_str(&loop_lock, flags);
 			if (mp->b_rptr[0] & FLUSHR) {
 				if (mp->b_rptr[0] & FLUSHBAND)
 					flushband(RD(q), mp->b_rptr[1], FLUSHALL);
@@ -275,13 +294,13 @@ loop_wput(queue_t *q, mblk_t *mp)
 		}
 		break;
 	default:
-		spin_lock_irqsave(&loop_lock, flags);
+		spin_lock_str(&loop_lock, flags);
 		if (p->other) {
 			if (!q->q_first) {
 				queue_t *rq;
 
 				rq = p->other->rq;
-				spin_unlock_irqrestore(&loop_lock, flags);
+				spin_unlock_str(&loop_lock, flags);
 				if (rq) {
 					if (mp->b_datap->db_type >= QPCTL
 					    || bcanputnext(rq, mp->b_band)) {
@@ -290,10 +309,10 @@ loop_wput(queue_t *q, mblk_t *mp)
 					}
 				}
 			} else
-				spin_unlock_irqrestore(&loop_lock, flags);
+				spin_unlock_str(&loop_lock, flags);
 			putq(q, mp);
 		} else {
-			spin_unlock_irqrestore(&loop_lock, flags);
+			spin_unlock_str(&loop_lock, flags);
 			freemsg(mp);
 			putnextctl2(OTHERQ(q), M_ERROR, ENXIO, ENXIO);
 		}
@@ -315,10 +334,10 @@ loop_wsrv(queue_t *q)
 	queue_t *rq = NULL;
 	mblk_t *mp;
 
-	spin_lock_irqsave(&loop_lock, flags);
+	spin_lock_str(&loop_lock, flags);
 	if (p->other)
 		rq = p->other->rq;
-	spin_unlock_irqrestore(&loop_lock, flags);
+	spin_unlock_str(&loop_lock, flags);
 
 	if (rq) {
 		while ((mp = getq(q))) {
@@ -347,10 +366,10 @@ loop_rsrv(queue_t *q)
 	struct loop *p = q->q_ptr;
 	unsigned long flags;
 
-	spin_lock_irqsave(&loop_lock, flags);
+	spin_lock_str(&loop_lock, flags);
 	if (p->other && p->other->wq)
 		qenable(p->other->wq);
-	spin_unlock_irqrestore(&loop_lock, flags);
+	spin_unlock_str(&loop_lock, flags);
 	return (0);
 }
 
@@ -398,7 +417,7 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			_printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
 			return (ENXIO);
 		}
-		spin_lock_irqsave(&loop_lock, flags);
+		spin_lock_str(&loop_lock, flags);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
 		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
@@ -410,7 +429,7 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				if (sflag == CLONEOPEN)
 					cminor++;
 				else {
-					spin_unlock_irqrestore(&loop_lock, flags);
+					spin_unlock_str(&loop_lock, flags);
 					kmem_free(p, sizeof(*p));
 					pswerr(("%s: stream already open!\n", __FUNCTION__));
 					return (EIO);	/* bad error */
@@ -418,7 +437,7 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
-			spin_unlock_irqrestore(&loop_lock, flags);
+			spin_unlock_str(&loop_lock, flags);
 			kmem_free(p, sizeof(*p));
 			_printd(("%s: no minor devices left\n", __FUNCTION__));
 			return (EBUSY);	/* no minors left */
@@ -432,7 +451,7 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		p->prev = pp;
 		*pp = p;
 		q->q_ptr = WR(q)->q_ptr = p;
-		spin_unlock_irqrestore(&loop_lock, flags);
+		spin_unlock_str(&loop_lock, flags);
 		qprocson(q);
 		_printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
@@ -454,7 +473,7 @@ loop_close(queue_t *q, int oflag, cred_t *crp)
 		return (0);	/* already closed */
 	}
 	qprocsoff(q);
-	spin_lock_irqsave(&loop_lock, flags);
+	spin_lock_str(&loop_lock, flags);
 	if (p->other && p->other->rq)
 		putnextctl(p->other->rq, M_HANGUP);
 	if ((*(p->prev) = p->next))
@@ -466,7 +485,7 @@ loop_close(queue_t *q, int oflag, cred_t *crp)
 	p->rq = NULL;
 	p->wq = NULL;
 	q->q_ptr = WR(q)->q_ptr = NULL;
-	spin_unlock_irqrestore(&loop_lock, flags);
+	spin_unlock_str(&loop_lock, flags);
 	_printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
 	return (0);
 }

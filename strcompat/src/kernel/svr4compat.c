@@ -96,6 +96,47 @@ MODULE_ALIAS("streams-svr4compat");
 #endif
 #endif
 
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+#define write_lock_str(__lkp, __flags) \
+	do { (void)__flags; write_lock_bh(__lkp); } while (0)
+#define write_unlock_str(__lkp, __flags) \
+	do { (void)__flags; write_unlock_bh(__lkp); } while (0)
+#define read_lock_str(__lkp, __flags) \
+	do { (void)__flags; read_lock_bh(__lkp); } while (0)
+#define read_unlock_str(__lkp, __flags) \
+	do { (void)__flags; read_unlock_bh(__lkp); } while (0)
+#define local_save_str(__flags) \
+	do { (void)__flags; local_bh_disable(); } while (0)
+#define local_restore_str(__flags) \
+	do { (void)__flags; local_bh_enable(); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+#define write_lock_str(__lkp, __flags) \
+	write_lock_irqsave(__lkp, __flags)
+#define write_unlock_str(__lkp, __flags) \
+	write_unlock_irqrestore(__lkp, __flags)
+#define read_lock_str(__lkp, __flags) \
+	read_lock_irqsave(__lkp, __flags)
+#define read_unlock_str(__lkp, __flags) \
+	read_unlock_irqrestore(__lkp, __flags)
+#define local_save_str(__flags) \
+	local_irq_save(__flags)
+#define local_restore_str(__flags) \
+	local_irq_restore(__flags)
+
+#endif
+
+
 #undef MPSTR_QLOCK
 long
 MPSTR_QLOCK(queue_t *q)
@@ -113,7 +154,7 @@ MPSTR_QLOCK(queue_t *q)
 	else {
 		unsigned long flags;
 
-		local_irq_save(flags);
+		local_save_str(flags);
 		write_lock(&q->q_klock.kl_lock);
 		q->q_klock.kl_isrflags = flags;
 		q->q_klock.kl_owner = current;
@@ -123,7 +164,7 @@ MPSTR_QLOCK(queue_t *q)
 #else
 	unsigned long flags;
 
-	write_lock_irqsave(&q->q_lock, flags);
+	write_lock_str(&q->q_lock, flags);
 	return (flags);
 #endif
 #endif
@@ -153,13 +194,13 @@ MPSTR_QRELE(queue_t *q, long s)
 		if (waitqueue_active(&q->q_klock.kl_waitq))
 			wake_up(&q->q_klock.kl_waitq);
 		write_unlock(&q->q_klock.kl_lock);
-		local_irq_restore(flags);
+		local_restore_str(flags);
 	}
 	return;
 #else
 	unsigned long flags = s;
 
-	write_unlock_irqrestore(&q->q_lock, flags);
+	write_unlock_str(&q->q_lock, flags);
 #endif
 #endif
 }
@@ -183,7 +224,7 @@ MPSTR_STPLOCK(struct stdata *sd)
 	else {
 		unsigned long flags;
 
-		local_irq_save(flags);
+		local_save_str(flags);
 		write_lock(&sd->sd_klock.kl_lock);
 		sd->sd_klock.kl_isrflags = flags;
 		sd->sd_klock.kl_owner = current;
@@ -192,7 +233,7 @@ MPSTR_STPLOCK(struct stdata *sd)
 	return (sd->sd_klock.kl_isrflags);
 #else
 	unsigned long flags;
-	write_lock_irqsave(&sd->sd_lock, flags);
+	write_lock_str(&sd->sd_lock, flags);
 	return (flags);
 #endif
 #endif
@@ -222,11 +263,11 @@ MPSTR_STPRELE(struct stdata *sd, long s)
 		if (waitqueue_active(&sd->sd_klock.kl_waitq))
 			wake_up(&sd->sd_klock.kl_waitq);
 		write_unlock(&sd->sd_klock.kl_lock);
-		local_irq_restore(flags);
+		local_restore_str(flags);
 	}
 #else
 	unsigned long flags = s;
-	write_unlock_irqrestore(&sd->sd_lock, flags);
+	write_unlock_str(&sd->sd_lock, flags);
 #endif
 #endif
 }

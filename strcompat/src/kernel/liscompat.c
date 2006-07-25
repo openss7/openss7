@@ -615,6 +615,39 @@ lis_own_spl(void)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_own_spl);
+
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+#define write_lock_str(__lkp, __flags) \
+	do { (void)__flags; write_lock_bh(__lkp); } while (0)
+#define write_unlock_str(__lkp, __flags) \
+	do { (void)__flags; write_unlock_bh(__lkp); } while (0)
+#define read_lock_str(__lkp, __flags) \
+	do { (void)__flags; read_lock_bh(__lkp); } while (0)
+#define read_unlock_str(__lkp, __flags) \
+	do { (void)__flags; read_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+#define write_lock_str(__lkp, __flags) \
+	write_lock_irqsave(__lkp, __flags)
+#define write_unlock_str(__lkp, __flags) \
+	write_unlock_irqrestore(__lkp, __flags)
+#define read_lock_str(__lkp, __flags) \
+	read_lock_irqsave(__lkp, __flags)
+#define read_unlock_str(__lkp, __flags) \
+	read_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
 _RP int
 lis_printk(const char *fmt, ...)
 {
@@ -624,12 +657,12 @@ lis_printk(const char *fmt, ...)
 	va_list args;
 	int ret;
 
-	spin_lock_irqsave(&printk_lock, flags);
+	spin_lock_str(&printk_lock, flags);
 	va_start(args, fmt);
 	vsnprintf(printk_buf, sizeof(printk_buf), fmt, args);
 	va_end(args);
 	ret = WARN(printk("%s", printk_buf));
-	spin_unlock_irqrestore(&printk_lock, flags);
+	spin_unlock_str(&printk_lock, flags);
 	return ret;
 }
 
@@ -2162,7 +2195,7 @@ lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flagp, char *file, int lin
 {
 	unsigned long flags;
 
-	WARNF(spin_lock_irqsave((spinlock_t *) lock->spin_lock_mem, flags), file, line);
+	WARNF(spin_lock_str((spinlock_t *) lock->spin_lock_mem, flags), file, line);
 	*flagp = flags;
 }
 
@@ -2186,7 +2219,7 @@ lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, int *flagp, char *file, in
 {
 	unsigned long flags = *flagp;
 
-	WARNF(spin_unlock_irqrestore((spinlock_t *) lock->spin_lock_mem, flags), file, line);
+	WARNF(spin_unlock_str((spinlock_t *) lock->spin_lock_mem, flags), file, line);
 }
 
 EXPORT_SYMBOL_NOVERS(lis_spin_unlock_irqrestore_fcn);
@@ -2244,7 +2277,7 @@ lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int li
 {
 	unsigned long flags;
 
-	WARNF(read_lock_irqsave((rwlock_t *) lock->rw_lock_mem, flags), file, line);
+	WARNF(read_lock_str((rwlock_t *) lock->rw_lock_mem, flags), file, line);
 	*flagp = flags;
 }
 
@@ -2268,7 +2301,7 @@ lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flagp, char *file, i
 {
 	unsigned long flags = *flagp;
 
-	WARNF(read_unlock_irqrestore((rwlock_t *) lock->rw_lock_mem, flags), file, line);
+	WARNF(read_unlock_str((rwlock_t *) lock->rw_lock_mem, flags), file, line);
 }
 
 EXPORT_SYMBOL_NOVERS(lis_rw_read_unlock_irqrestore_fcn);
@@ -2291,7 +2324,7 @@ lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int l
 {
 	unsigned long flags;
 
-	WARNF(write_lock_irqsave((rwlock_t *) lock->rw_lock_mem, flags), file, line);
+	WARNF(write_lock_str((rwlock_t *) lock->rw_lock_mem, flags), file, line);
 	*flagp = flags;
 }
 
@@ -2315,7 +2348,7 @@ lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flagp, char *file, 
 {
 	unsigned long flags = *flagp;
 
-	WARNF(write_unlock_irqrestore((rwlock_t *) lock->rw_lock_mem, flags), file, line);
+	WARNF(write_unlock_str((rwlock_t *) lock->rw_lock_mem, flags), file, line);
 }
 
 EXPORT_SYMBOL_NOVERS(lis_rw_write_unlock_irqrestore_fcn);

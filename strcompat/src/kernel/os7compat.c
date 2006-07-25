@@ -325,6 +325,23 @@ __OS7_EXTERN_INLINE streamscall mblk_t *bufq_resupply(bufq_t * q, mblk_t *mp, in
 
 EXPORT_SYMBOL_NOVERS(bufq_resupply);
 
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
+
 /**
  * ss7_trylockq: - try to lock a queue pair for exclusive operation
  * @q: queue in queue pair
@@ -343,7 +360,7 @@ ss7_trylockq(queue_t *q)
 	str_t *s = STR_PRIV(q);
 	unsigned long flags;
 
-	spin_lock_irqsave(&s->qlock, flags);
+	spin_lock_str(&s->qlock, flags);
 	if (!(res = !s->users++)) {
 		if (q == s->iq)
 			s->iwait = q;
@@ -351,7 +368,7 @@ ss7_trylockq(queue_t *q)
 			s->owait = q;
 		--s->users;
 	}
-	spin_unlock_irqrestore(&s->qlock, flags);
+	spin_unlock_str(&s->qlock, flags);
 	return (res);
 }
 
@@ -381,7 +398,7 @@ ss7_unlockq(queue_t *q)
 	int streamscall (*isrv) (queue_t *) = NULL;
 	int streamscall (*osrv) (queue_t *) = NULL;
 
-	spin_lock_irqsave(&s->qlock, flags);
+	spin_lock_str(&s->qlock, flags);
 	if ((wait = XCHG(&s->iwait, NULL)) && !enableq(wait)) {
 		if (wait->q_qinfo && wait->q_qinfo->qi_srvp)
 			qenable(wait);
@@ -395,7 +412,7 @@ ss7_unlockq(queue_t *q)
 			osrv = &ss7_osrv;
 	}
 	s->users = 0;
-	spin_unlock_irqrestore(&s->qlock, flags);
+	spin_unlock_str(&s->qlock, flags);
 
 	if (isrv)
 		isrv(s->iq);

@@ -228,6 +228,41 @@ STATIC rwlock_t mux_lock = RW_LOCK_UNLOCKED;
 STATIC struct mux *mux_opens = NULL;
 STATIC struct mux *mux_links = NULL;
 
+/*
+ *  Locking
+ */
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+#define write_lock_str(__lkp, __flags) \
+	do { (void)__flags; write_lock_bh(__lkp); } while (0)
+#define write_unlock_str(__lkp, __flags) \
+	do { (void)__flags; write_unlock_bh(__lkp); } while (0)
+#define read_lock_str(__lkp, __flags) \
+	do { (void)__flags; read_lock_bh(__lkp); } while (0)
+#define read_unlock_str(__lkp, __flags) \
+	do { (void)__flags; read_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+#define write_lock_str(__lkp, __flags) \
+	write_lock_irqsave(__lkp, __flags)
+#define write_unlock_str(__lkp, __flags) \
+	write_unlock_irqrestore(__lkp, __flags)
+#define read_lock_str(__lkp, __flags) \
+	read_lock_irqsave(__lkp, __flags)
+#define read_unlock_str(__lkp, __flags) \
+	read_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
 #define MUX_UP 1
 #define MUX_DOWN 2
 
@@ -266,7 +301,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
 
-			write_lock_irqsave(&mux_lock, flags);
+			write_lock_str(&mux_lock, flags);
 			bot->next = mux_links;
 			bot->prev = &mux_links;
 			mux_links = bot;
@@ -276,7 +311,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			bot->other = NULL;
 			noenable(bot->rq);
 			l->l_qtop->q_ptr = RD(l->l_qtop)->q_ptr = bot;
-			write_unlock_irqrestore(&mux_lock, flags);
+			write_unlock_str(&mux_lock, flags);
 
 			goto ack;
 		}
@@ -292,7 +327,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
 
-			write_lock_irqsave(&mux_lock, flags);
+			write_lock_str(&mux_lock, flags);
 			for (bot = mux_links; bot; bot = bot->next)
 				if (bot->dev == l->l_index)
 					break;
@@ -322,7 +357,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 					}
 				}
 			}
-			write_unlock_irqrestore(&mux_lock, flags);
+			write_unlock_str(&mux_lock, flags);
 			if (!bot)
 				goto einval;
 			goto ack;
@@ -337,7 +372,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			if (!mp->b_cont)
 				goto einval;
 			l_index = *(int *) mp->b_cont->b_rptr;
-			write_lock_irqsave(&mux_lock, flags);
+			write_lock_str(&mux_lock, flags);
 			for (bot = mux_links; bot; bot = bot->next)
 				if (bot->dev == l_index)
 					break;
@@ -349,7 +384,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 				} else
 					bot = NULL;
 			}
-			write_unlock_irqrestore(&mux_lock, flags);
+			write_unlock_str(&mux_lock, flags);
 			if (!bot)
 				goto einval;
 			goto ack;
@@ -364,7 +399,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			if (!mp->b_cont)
 				goto einval;
 			l_index = *(int *) mp->b_cont->b_rptr;
-			write_lock_irqsave(&mux_lock, flags);
+			write_lock_str(&mux_lock, flags);
 			for (bot = mux_links; bot; bot = bot->next)
 				if (bot->dev == l_index)
 					break;
@@ -376,7 +411,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 				} else
 					bot = NULL;
 			}
-			write_unlock_irqrestore(&mux_lock, flags);
+			write_unlock_str(&mux_lock, flags);
 			if (!bot)
 				goto einval;
 			goto ack;
@@ -417,17 +452,17 @@ mux_uwput(queue_t *q, mblk_t *mp)
 				flushq(q, FLUSHALL);
 		}
 
-		read_lock_irqsave(&mux_lock, flags);
+		read_lock_str(&mux_lock, flags);
 		if (mux->other) {
 			queue_t *wq;
 
 			if ((wq = mux->other->wq)) {
 				putnext(wq, mp);
-				read_unlock_irqrestore(&mux_lock, flags);
+				read_unlock_str(&mux_lock, flags);
 				return (0);
 			}
 		}
-		read_unlock_irqrestore(&mux_lock, flags);
+		read_unlock_str(&mux_lock, flags);
 
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
@@ -446,10 +481,10 @@ mux_uwput(queue_t *q, mblk_t *mp)
 	{
 		queue_t *wq = NULL;
 
-		read_lock_irqsave(&mux_lock, flags);
+		read_lock_str(&mux_lock, flags);
 		if (mux->other)
 			wq = mux->other->wq;
-		read_unlock_irqrestore(&mux_lock, flags);
+		read_unlock_str(&mux_lock, flags);
 
 		/* if not linked behave like echo driver */
 		if (!wq)
@@ -484,17 +519,17 @@ mux_lrput(queue_t *q, mblk_t *mp)
 				flushq(q, FLUSHALL);
 		}
 
-		read_lock_irqsave(&mux_lock, flags);
+		read_lock_str(&mux_lock, flags);
 		if (mux->other) {
 			queue_t *rq;
 
 			if ((rq = mux->other->rq)) {
 				putnext(rq, mp);
-				read_unlock_irqrestore(&mux_lock, flags);
+				read_unlock_str(&mux_lock, flags);
 				return (0);
 			}
 		}
-		read_unlock_irqrestore(&mux_lock, flags);
+		read_unlock_str(&mux_lock, flags);
 
 		if (!(mp->b_flag & MSGNOLOOP)) {
 			if (mp->b_rptr[0] & FLUSHW) {
@@ -516,7 +551,7 @@ mux_lrput(queue_t *q, mblk_t *mp)
 		/* check the QSVCBUSY flag in MP drivers to avoid missequencing of messages when
 		   service procedure is running concurrent with put procedure */
 		if (!q->q_first && !(q->q_flag & QSVCBUSY)) {
-			read_lock_irqsave(&mux_lock, flags);
+			read_lock_str(&mux_lock, flags);
 			if (mux->other) {
 				queue_t *rq;
 
@@ -524,11 +559,11 @@ mux_lrput(queue_t *q, mblk_t *mp)
 				    && (mp->b_datap->db_type >= QPCTL
 					|| bcanputnext(rq, mp->b_band))) {
 					putnext(rq, mp);
-					read_unlock_irqrestore(&mux_lock, flags);
+					read_unlock_str(&mux_lock, flags);
 					return (0);
 				}
 			}
-			read_unlock_irqrestore(&mux_lock, flags);
+			read_unlock_str(&mux_lock, flags);
 		}
 		putq(q, mp);
 		break;
@@ -554,11 +589,11 @@ mux_lwsrv(queue_t *q)
 	struct mux *top;
 
 	/* Find the upper queues feeding this one and enable them. */
-	read_lock_irqsave(&mux_lock, flags);
+	read_lock_str(&mux_lock, flags);
 	for (top = mux_opens; top; top = top->next)
 		if (top->other == mux)
 			qenable(top->wq);
-	read_unlock_irqrestore(&mux_lock, flags);
+	read_unlock_str(&mux_lock, flags);
 	return (0);
 }
 
@@ -582,10 +617,10 @@ mux_uwsrv(queue_t *q)
 	queue_t *wq = NULL;
 	mblk_t *mp;
 
-	read_lock_irqsave(&mux_lock, flags);
+	read_lock_str(&mux_lock, flags);
 	if (mux->other)
 		wq = mux->other->wq;
-	read_unlock_irqrestore(&mux_lock, flags);
+	read_unlock_str(&mux_lock, flags);
 
 	if (!wq)
 		wq = RD(q);
@@ -619,13 +654,13 @@ mux_ursrv(queue_t *q)
 	bool found = false;
 
 	/* Find the lower queues feeding this one and enable them. */
-	read_lock_irqsave(&mux_lock, flags);
+	read_lock_str(&mux_lock, flags);
 	for (bot = mux_links; bot; bot = bot->next)
 		if (bot->other == mux) {
 			qenable(bot->rq);
 			found = true;
 		}
-	read_unlock_irqrestore(&mux_lock, flags);
+	read_unlock_str(&mux_lock, flags);
 
 	/* echo behaviour otherwise */
 	if (!found)
@@ -652,7 +687,7 @@ mux_lrsrv(queue_t *q)
 	queue_t *rq = NULL;
 	mblk_t *mp;
 
-	read_lock_irqsave(&mux_lock, flags);
+	read_lock_str(&mux_lock, flags);
 	if (mux->other)
 		rq = mux->other->rq;
 	if (rq) {
@@ -666,7 +701,7 @@ mux_lrsrv(queue_t *q)
 		}
 	} else
 		noenable(q);
-	read_unlock_irqrestore(&mux_lock, flags);
+	read_unlock_str(&mux_lock, flags);
 	return (0);
 }
 
@@ -696,7 +731,7 @@ mux_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 		if (cminor < 1)
 			return (ENXIO);
-		write_lock_irqsave(&mux_lock, flags);
+		write_lock_str(&mux_lock, flags);
 		for (; *muxp && (dmajor = getmajor((*muxp)->dev)) < cmajor; muxp = &(*muxp)->next) ;
 		for (; *muxp && dmajor == getmajor((*muxp)->dev) &&
 		     getminor(makedevice(cmajor, cminor)) != 0; muxp = &(*muxp)->next) {
@@ -707,14 +742,14 @@ mux_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				if (sflag == CLONEOPEN)
 					cminor++;
 				else {
-					write_unlock_irqrestore(&mux_lock, flags);
+					write_unlock_str(&mux_lock, flags);
 					kmem_free(mux, sizeof(*mux));
 					return (EIO);	/* bad error */
 				}
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
-			write_unlock_irqrestore(&mux_lock, flags);
+			write_unlock_str(&mux_lock, flags);
 			kmem_free(mux, sizeof(*mux));
 			return (EBUSY);	/* no minors left */
 		}
@@ -727,7 +762,7 @@ mux_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		mux->wq = WR(q);
 		noenable(mux->wq);
 		mux->rq->q_ptr = mux->wq->q_ptr = mux;
-		write_unlock_irqrestore(&mux_lock, flags);
+		write_unlock_str(&mux_lock, flags);
 		qprocson(q);
 		return (0);
 	}
@@ -744,13 +779,13 @@ mux_close(queue_t *q, int oflag, cred_t *crp)
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	qprocsoff(q);
-	write_lock_irqsave(&mux_lock, flags);
+	write_lock_str(&mux_lock, flags);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
 	p->next = NULL;
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
-	write_unlock_irqrestore(&mux_lock, flags);
+	write_unlock_str(&mux_lock, flags);
 	return (0);
 }
 

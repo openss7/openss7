@@ -183,10 +183,10 @@ my_atomic_add_return(int val, atomic_t *atomic)
 	unsigned long flags;
 
 	/* XXX: do these locks have to be so severe? */
-	spin_lock_irqsave(&my_atomic_lock, flags);
+	spin_lock_str(&my_atomic_lock, flags);
 	atomic_add(val, atomic);
 	ret = atomic_read(atomic);
-	spin_unlock_irqrestore(&my_atomic_lock, flags);
+	spin_unlock_str(&my_atomic_lock, flags);
 	return (ret);
 }
 

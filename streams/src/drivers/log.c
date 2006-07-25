@@ -177,6 +177,25 @@ static struct module_info log_minfo = {
 static struct module_stat log_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat log_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
+/*
+ *  Locking
+ */
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
 queue_t *log_conq = NULL;
 queue_t *log_errq = NULL;
 queue_t *log_trcq = NULL;
@@ -510,7 +529,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 		if (cminor < 1)
 			return (ENXIO);
-		spin_lock_irqsave(&log_lock, flags);
+		spin_lock_str(&log_lock, flags);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
 		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
@@ -521,14 +540,14 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				if (sflag == CLONEOPEN)
 					cminor++;
 				else {
-					spin_unlock_irqrestore(&log_lock, flags);
+					spin_unlock_str(&log_lock, flags);
 					kmem_free(p, sizeof(*p));
 					return (EIO);	/* bad error */
 				}
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
-			spin_unlock_irqrestore(&log_lock, flags);
+			spin_unlock_str(&log_lock, flags);
 			kmem_free(p, sizeof(*p));
 			return (EBUSY);	/* no minors left */
 		}
@@ -538,7 +557,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		p->prev = pp;
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
-		spin_unlock_irqrestore(&log_lock, flags);
+		spin_unlock_str(&log_lock, flags);
 		qprocson(q);
 		return (0);
 	}
@@ -555,13 +574,13 @@ log_close(queue_t *q, int oflag, cred_t *crp)
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	qprocsoff(q);
-	spin_lock_irqsave(&log_lock, flags);
+	spin_lock_str(&log_lock, flags);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
 	p->next = NULL;
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
-	spin_unlock_irqrestore(&log_lock, flags);
+	spin_unlock_str(&log_lock, flags);
 	return (0);
 }
 

@@ -791,6 +791,23 @@ np_alloc(void)
 	return (np);
 }
 
+//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+#if 1
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
 /*
  *  State Changes
  *  =============
@@ -4415,10 +4432,10 @@ tp_r_wakeup(queue_t *q)
 		/* When this upper multiplex Stream is linked to lower multiplex Streams, it is
 		   necessary to manually enable the feeding queues accross the multiplex. */
 
-		spin_lock_irqsave(&tp->lock, flags);
+		spin_lock_str(&tp->lock, flags);
 		for (np = tp->np.np; np; np = np->tp.next)
 			qenable(np->iq);
-		spin_unlock_irqrestore(&tp->lock, flags);
+		spin_unlock_str(&tp->lock, flags);
 	}
 }
 STATIC int
@@ -4517,10 +4534,10 @@ np_w_wakeup(queue_t *q)
 		/* When this lower multiplex Stream is linked to upper multiplex Streams, it is
 		   necessary to manually enable the feeding queues across the multiplex. */
 
-		spin_lock_irqsave(&np->lock, flags);
+		spin_lock_str(&np->lock, flags);
 		for (tp = np->tp.tp; tp; tp = tp->np.next)
 			qenable(tp->iq);
-		spin_unlock_irqrestore(&np->lock, flags);
+		spin_unlock_str(&np->lock, flags);
 	}
 }
 

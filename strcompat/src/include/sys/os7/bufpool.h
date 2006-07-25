@@ -319,6 +319,22 @@ ss7_bufpool_release(struct ss7_bufpool *pool, int n)
 	atomic_sub(n, &pool->reserve);
 }
 
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
 /*
  *  BUFPOOL TERM
  *  -----------------------------------
@@ -329,7 +345,7 @@ ss7_bufpool_term(struct ss7_bufpool *pool)
 {
 	unsigned long flags;
 
-	spin_lock_irqsave(&pool->lock, flags);
+	spin_lock_str(&pool->lock, flags);
 	if (pool->initialized) {
 		mblk_t *bp;
 
@@ -341,7 +357,7 @@ ss7_bufpool_term(struct ss7_bufpool *pool)
 		atomic_set(&pool->reserve, 0);
 		pool->initialized = 0;
 	}
-	spin_unlock_irqrestore(&pool->lock, flags);
+	spin_unlock_str(&pool->lock, flags);
 }
 
 #endif				/* __OS7_BUFPOOL_H__ */
