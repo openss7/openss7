@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/07/24 09:01:17 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/07/25 06:39:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:17 $ by $Author: brian $
+ Last Modified $Date: 2006/07/25 06:39:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.143  2006/07/25 06:39:09  brian
+ - expanded minor device numbers and optimization and locking corrections
+
  Revision 0.9.2.142  2006/07/24 09:01:17  brian
  - results of udp2 optimizations
 
@@ -110,10 +113,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/07/24 09:01:17 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/07/25 06:39:09 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/07/24 09:01:17 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/07/25 06:39:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

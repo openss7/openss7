@@ -1,3 +1,12 @@
+2006-07-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: expand majors, minors and module ids
+	* src/include/sys/os7/bufpool.h: correct locking
+	* src/kernel/lfscompat.c: correct locking
+	* src/kernel/liscompat.c: correct locking
+	* src/kernel/os7compat.c: correct locking
+	* src/kernel/svr4compat.c: correct locking
+
 2006-07-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/aix/stream.h: fix up inlines recent compilers

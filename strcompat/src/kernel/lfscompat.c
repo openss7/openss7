@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/24 09:01:05 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/25 06:39:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:05 $ by $Author: brian $
+ Last Modified $Date: 2006/07/25 06:39:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.24  2006/07/25 06:39:02  brian
+ - expanded minor device numbers and optimization and locking corrections
+
  Revision 0.9.2.23  2006/07/24 09:01:05  brian
  - results of udp2 optimizations
 
@@ -122,10 +125,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/24 09:01:05 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/25 06:39:02 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/24 09:01:05 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/25 06:39:02 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -148,7 +151,7 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/07/24 09:01:05 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/25 06:39:02 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"

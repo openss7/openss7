@@ -1,3 +1,11 @@
+2006-07-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/strconf.am: add minor bits to strconf config command
+	* m4/kernel.m4: correction of some optimiztion flags
+	* m4/openss7.m4: correction of some optimiztion flags
+	* m4/strconf.m4: substitute minor bits size
+	* scripts/strconf-sh: make LfS module id match selected major
+
 2006-07-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: optimization flags for recent kernels/compilers

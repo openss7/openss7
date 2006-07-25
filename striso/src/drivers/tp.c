@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/11 12:32:04 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/25 06:39:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/11 12:32:04 $ by $Author: brian $
+ Last Modified $Date: 2006/07/25 06:39:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.9  2006/07/25 06:39:18  brian
+ - expanded minor device numbers and optimization and locking corrections
+
  Revision 0.9.2.8  2006/07/11 12:32:04  brian
  - added ISO and other implementations to distribution
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/11 12:32:04 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/25 06:39:18 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/11 12:32:04 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/25 06:39:18 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
@@ -131,7 +134,7 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2006/07/11 12:32:04 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2006/07/25 06:39:18 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL"

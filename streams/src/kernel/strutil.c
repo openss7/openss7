@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/07/24 09:01:18 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/07/25 06:39:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:18 $ by $Author: brian $
+ Last Modified $Date: 2006/07/25 06:39:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.132  2006/07/25 06:39:09  brian
+ - expanded minor device numbers and optimization and locking corrections
+
  Revision 0.9.2.131  2006/07/24 09:01:18  brian
  - results of udp2 optimizations
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/07/24 09:01:18 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/07/25 06:39:09 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2006/07/24 09:01:18 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/07/25 06:39:09 $";
 
 #include <linux/config.h>
 #include <linux/module.h>

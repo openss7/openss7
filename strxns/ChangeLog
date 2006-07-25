@@ -1,3 +1,8 @@
+2006-07-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: expand majors, minors and module ids
+	* src/drivers/np_ip.c: locking corrrections
+
 2006-07-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/np_ip.c: added module_stat structure,

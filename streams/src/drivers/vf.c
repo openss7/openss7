@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:15 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/07/25 06:39:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:15 $ by $Author: brian $
+ Last Modified $Date: 2006/07/25 06:39:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 0.9.2.6  2006/07/25 06:39:07  brian
+ - expanded minor device numbers and optimization and locking corrections
+
  Revision 0.9.2.5  2006/07/24 09:01:15  brian
  - results of udp2 optimizations
 
@@ -68,9 +71,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:15 $"
+#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/07/25 06:39:07 $"
 
-static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:15 $";
+static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/07/25 06:39:07 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -98,7 +101,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.5 $) 
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:15 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2006/07/25 06:39:07 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"

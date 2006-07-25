@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/07/24 09:01:06 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/25 06:39:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:06 $ by $Author: brian $
+ Last Modified $Date: 2006/07/25 06:39:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.22  2006/07/25 06:39:02  brian
+ - expanded minor device numbers and optimization and locking corrections
+
  Revision 0.9.2.21  2006/07/24 09:01:06  brian
  - results of udp2 optimizations
 
@@ -119,10 +122,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/07/24 09:01:06 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/25 06:39:02 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/07/24 09:01:06 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/25 06:39:02 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -143,7 +146,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/07/24 09:01:06 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/25 06:39:02 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"

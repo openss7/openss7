@@ -1,3 +1,19 @@
+2006-07-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: expand majors, minors and module ids
+	* include/sys/streams/stream.h: add d_cdev member for expanded minors
+	* src/drivers/Config.in: explicitly set clone driver to 230
+	* src/drivers/log.c: correct locking
+	* src/drivers/loop.c: correct locking
+	* src/drivers/mux.c: correct locking
+	* src/drivers/vf.c: correct locking
+	* src/kernel/strreg.c: register for expanded minor device numbers when
+	  possible
+	* src/kernel/strsched.c: remove static noinline combination
+	* src/kernel/strutil.c: remove static noinline combination
+	* src/modules/sth.c: remove static noinline combination
+	* src/util/scls.c: expand fields for expanded majors and module ids
+
 2006-07-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: libstreams optimizations
