@@ -132,3086 +132,3157 @@ m4_divert_pop([DEFAULTS])
 AT_TESTED([test-sctp_t])
 AT_BANNER([STREAMS SCTP TPI module tests])
 
-dnl AT_XFAIL_IF([test `id -u` -ne 0])
-
 AT_SETUP([sctp test 1.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([open close])
 AT_CHECK([test_sctp_t 1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_INFO_REQ])
 AT_CHECK([test_sctp_t 1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.3.1])
-AT_KEYWORDS([tpi sctp T_CAPABILITY_REQ])
+AT_KEYWORDS([T_CAPABILITY_REQ])
 AT_CHECK([test_sctp_t 1.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.3.2])
-AT_KEYWORDS([tpi sctp T_CAPABILITY_REQ])
+AT_KEYWORDS([T_CAPABILITY_REQ])
 AT_CHECK([test_sctp_t 1.3.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.3.3])
-AT_KEYWORDS([tpi sctp T_CAPABILITY_REQ])
+AT_KEYWORDS([T_CAPABILITY_REQ])
 AT_CHECK([test_sctp_t 1.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.3.4])
-AT_KEYWORDS([tpi sctp T_CAPABILITY_REQ])
+AT_KEYWORDS([T_CAPABILITY_REQ])
 AT_CHECK([test_sctp_t 1.3.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.4.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_ADDR_REQ])
 AT_CHECK([test_sctp_t 1.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.4.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_ADDR_REQ])
 AT_CHECK([test_sctp_t 1.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.4.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_ADDR_REQ])
 AT_CHECK([test_sctp_t 1.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.1.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_ALL])
 AT_CHECK([test_sctp_t 1.5.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.1.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT XTI_DEBUG])
 AT_CHECK([test_sctp_t 1.5.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.1.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT XTI_LINGER])
 AT_CHECK([test_sctp_t 1.5.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.1.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT XTI_RCVBUF])
 AT_CHECK([test_sctp_t 1.5.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.1.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT XTI_RCVLOWAT])
 AT_CHECK([test_sctp_t 1.5.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.1.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT XTI_SNDBUF])
 AT_CHECK([test_sctp_t 1.5.1.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.1.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT XTI_SNDLOWAT])
 AT_CHECK([test_sctp_t 1.5.1.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.2.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_IP_TOS])
 AT_CHECK([test_sctp_t 1.5.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.2.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_IP_TTL])
 AT_CHECK([test_sctp_t 1.5.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.2.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_IP_DONTROUTE])
 AT_CHECK([test_sctp_t 1.5.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.2.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_IP_BROADCAST])
 AT_CHECK([test_sctp_t 1.5.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.2.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_IP_REUSEADDR])
 AT_CHECK([test_sctp_t 1.5.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.3.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_UDP_CHECKSUM])
 AT_CHECK([test_sctp_t 1.5.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_NODELAY])
 AT_CHECK([test_sctp_t 1.5.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_MAXSEG])
 AT_CHECK([test_sctp_t 1.5.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_KEEPALIVE])
 AT_CHECK([test_sctp_t 1.5.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_CORK])
 AT_CHECK([test_sctp_t 1.5.4.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_KEEPIDLE])
 AT_CHECK([test_sctp_t 1.5.4.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_KEEPINTVL])
 AT_CHECK([test_sctp_t 1.5.4.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_KEEPCNT])
 AT_CHECK([test_sctp_t 1.5.4.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_SYNCNT])
 AT_CHECK([test_sctp_t 1.5.4.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_LINGER2])
 AT_CHECK([test_sctp_t 1.5.4.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_DEFER_ACCEPT])
 AT_CHECK([test_sctp_t 1.5.4.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_WINDOW_CLAMP])
 AT_CHECK([test_sctp_t 1.5.4.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_INFO])
 AT_CHECK([test_sctp_t 1.5.4.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.4.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_TCP_QUICKACK])
 AT_CHECK([test_sctp_t 1.5.4.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_NODELAY])
 AT_CHECK([test_sctp_t 1.5.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_CORK])
 AT_CHECK([test_sctp_t 1.5.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_PPI])
 AT_CHECK([test_sctp_t 1.5.5.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_SID])
 AT_CHECK([test_sctp_t 1.5.5.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_SSN])
 AT_CHECK([test_sctp_t 1.5.5.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_TSN])
 AT_CHECK([test_sctp_t 1.5.5.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_RECVOPT])
 AT_CHECK([test_sctp_t 1.5.5.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_COOKIE_LIFE])
 AT_CHECK([test_sctp_t 1.5.5.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_SACK_DELAY])
 AT_CHECK([test_sctp_t 1.5.5.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_PATH_MAX_RETRANS])
 AT_CHECK([test_sctp_t 1.5.5.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_ASSOC_MAX_RETRANS])
 AT_CHECK([test_sctp_t 1.5.5.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_MAX_INIT_RETRIES])
 AT_CHECK([test_sctp_t 1.5.5.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_HEARTBEAT_ITVL])
 AT_CHECK([test_sctp_t 1.5.5.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.14])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_RTO_INITIAL])
 AT_CHECK([test_sctp_t 1.5.5.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.15])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_RTO_MIN])
 AT_CHECK([test_sctp_t 1.5.5.15], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.16])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_RTO_MAX])
 AT_CHECK([test_sctp_t 1.5.5.16], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.17])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_OSTREAMS])
 AT_CHECK([test_sctp_t 1.5.5.17], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.18])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_ISTREAMS])
 AT_CHECK([test_sctp_t 1.5.5.18], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.19])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_COOKIE_INC])
 AT_CHECK([test_sctp_t 1.5.5.19], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.20])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_THROTTLE_ITVL])
 AT_CHECK([test_sctp_t 1.5.5.20], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.21])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_MAC_TYPE])
 AT_CHECK([test_sctp_t 1.5.5.21], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.22])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_CKSUM_TYPE])
 AT_CHECK([test_sctp_t 1.5.5.22], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.23])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_ECN])
 AT_CHECK([test_sctp_t 1.5.5.23], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.24])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_ALI])
 AT_CHECK([test_sctp_t 1.5.5.24], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.25])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_ADD])
 AT_CHECK([test_sctp_t 1.5.5.25], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.26])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_SET])
 AT_CHECK([test_sctp_t 1.5.5.26], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.27])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_ADD_IP])
 AT_CHECK([test_sctp_t 1.5.5.27], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.28])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_DEL_IP])
 AT_CHECK([test_sctp_t 1.5.5.28], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.29])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_SET_IP])
 AT_CHECK([test_sctp_t 1.5.5.29], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.30])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_PR])
 AT_CHECK([test_sctp_t 1.5.5.30], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.31])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_LIFETIME])
 AT_CHECK([test_sctp_t 1.5.5.31], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.32])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_DISPOSITION])
 AT_CHECK([test_sctp_t 1.5.5.32], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.33])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_MAX_BURST])
 AT_CHECK([test_sctp_t 1.5.5.33], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.34])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_HB])
 AT_CHECK([test_sctp_t 1.5.5.34], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.35])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_RTO])
 AT_CHECK([test_sctp_t 1.5.5.35], [], [ignore], [], [], [])
 AT_CLEANUP
 
+AT_SETUP([sctp test 1.5.5.36])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_MAXSEG])
+AT_CHECK([test_sctp_t 1.5.5.36], [], [ignore], [], [], [])
+AT_CLEANUP
+
 AT_SETUP([sctp test 1.5.5.37])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_STATUS])
 AT_CHECK([test_sctp_t 1.5.5.37], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.5.5.38])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_SCTP_DEBUG])
 AT_CHECK([test_sctp_t 1.5.5.38], [], [ignore], [], [], [])
 AT_CLEANUP
 
-
 AT_SETUP([sctp test 1.6.1.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_ALL])
 AT_CHECK([test_sctp_t 1.6.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.1.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT XTI_DEBUG])
 AT_CHECK([test_sctp_t 1.6.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.1.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT XTI_LINGER])
 AT_CHECK([test_sctp_t 1.6.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.1.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT XTI_RCVBUF])
 AT_CHECK([test_sctp_t 1.6.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.1.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT XTI_RCVLOWAT])
 AT_CHECK([test_sctp_t 1.6.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.1.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT XTI_SNDBUF])
 AT_CHECK([test_sctp_t 1.6.1.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.1.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT XTI_SNDLOWAT])
 AT_CHECK([test_sctp_t 1.6.1.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.2.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_IP_TOS])
 AT_CHECK([test_sctp_t 1.6.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.2.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_IP_TTL])
 AT_CHECK([test_sctp_t 1.6.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.2.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_IP_DONTROUTE])
 AT_CHECK([test_sctp_t 1.6.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.2.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_IP_BROADCAST])
 AT_CHECK([test_sctp_t 1.6.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.2.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_IP_REUSEADDR])
 AT_CHECK([test_sctp_t 1.6.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.3.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_UDP_CHECKSUM])
 AT_CHECK([test_sctp_t 1.6.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_NODELAY])
 AT_CHECK([test_sctp_t 1.6.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_MAXSEG])
 AT_CHECK([test_sctp_t 1.6.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_KEEPALIVE])
 AT_CHECK([test_sctp_t 1.6.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_CORK])
 AT_CHECK([test_sctp_t 1.6.4.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_KEEPIDLE])
 AT_CHECK([test_sctp_t 1.6.4.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_KEEPINTVL])
 AT_CHECK([test_sctp_t 1.6.4.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_KEEPCNT])
 AT_CHECK([test_sctp_t 1.6.4.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_SYNCNT])
 AT_CHECK([test_sctp_t 1.6.4.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_LINGER2])
 AT_CHECK([test_sctp_t 1.6.4.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_DEFER_ACCEPT])
 AT_CHECK([test_sctp_t 1.6.4.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_WINDOW_CLAMP])
 AT_CHECK([test_sctp_t 1.6.4.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_INFO])
 AT_CHECK([test_sctp_t 1.6.4.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.4.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_TCP_QUICKACK])
 AT_CHECK([test_sctp_t 1.6.4.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_NODELAY])
 AT_CHECK([test_sctp_t 1.6.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_CORK])
 AT_CHECK([test_sctp_t 1.6.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_PPI])
 AT_CHECK([test_sctp_t 1.6.5.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_SID])
 AT_CHECK([test_sctp_t 1.6.5.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_SSN])
 AT_CHECK([test_sctp_t 1.6.5.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_TSN])
 AT_CHECK([test_sctp_t 1.6.5.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_RECVOPT])
 AT_CHECK([test_sctp_t 1.6.5.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_COOKIE_LIFE])
 AT_CHECK([test_sctp_t 1.6.5.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_SACK_DELAY])
 AT_CHECK([test_sctp_t 1.6.5.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_PATH_MAX_RETRANS])
 AT_CHECK([test_sctp_t 1.6.5.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_ASSOC_MAX_RETRANS])
 AT_CHECK([test_sctp_t 1.6.5.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_MAX_INIT_RETRIES])
 AT_CHECK([test_sctp_t 1.6.5.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_HEARTBEAT_ITVL])
 AT_CHECK([test_sctp_t 1.6.5.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.14])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_RTO_INITIAL])
 AT_CHECK([test_sctp_t 1.6.5.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.15])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_RTO_MIN])
 AT_CHECK([test_sctp_t 1.6.5.15], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.16])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_RTO_MAX])
 AT_CHECK([test_sctp_t 1.6.5.16], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.17])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_OSTREAMS])
 AT_CHECK([test_sctp_t 1.6.5.17], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.18])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_ISTREAMS])
 AT_CHECK([test_sctp_t 1.6.5.18], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.19])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_COOKIE_INC])
 AT_CHECK([test_sctp_t 1.6.5.19], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.20])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_THROTTLE_ITVL])
 AT_CHECK([test_sctp_t 1.6.5.20], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.21])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_MAC_TYPE])
 AT_CHECK([test_sctp_t 1.6.5.21], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.22])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_CKSUM_TYPE])
 AT_CHECK([test_sctp_t 1.6.5.22], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.23])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_ECN])
 AT_CHECK([test_sctp_t 1.6.5.23], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.24])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_ALI])
 AT_CHECK([test_sctp_t 1.6.5.24], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.25])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_ADD])
 AT_CHECK([test_sctp_t 1.6.5.25], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.26])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_SET])
 AT_CHECK([test_sctp_t 1.6.5.26], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.27])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_ADD_IP])
 AT_CHECK([test_sctp_t 1.6.5.27], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.28])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_DEL_IP])
 AT_CHECK([test_sctp_t 1.6.5.28], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.29])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_SET_IP])
 AT_CHECK([test_sctp_t 1.6.5.29], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.30])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_PR])
 AT_CHECK([test_sctp_t 1.6.5.30], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.31])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_LIFETIME])
 AT_CHECK([test_sctp_t 1.6.5.31], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.32])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_DISPOSITION])
 AT_CHECK([test_sctp_t 1.6.5.32], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.33])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_MAX_BURST])
 AT_CHECK([test_sctp_t 1.6.5.33], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.34])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_HB])
 AT_CHECK([test_sctp_t 1.6.5.34], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.35])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_RTO])
 AT_CHECK([test_sctp_t 1.6.5.35], [], [ignore], [], [], [])
 AT_CLEANUP
 
+AT_SETUP([sctp test 1.6.5.36])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_MAXSEG])
+AT_CHECK([test_sctp_t 1.6.5.36], [], [ignore], [], [], [])
+AT_CLEANUP
+
 AT_SETUP([sctp test 1.6.5.37])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_STATUS])
 AT_CHECK([test_sctp_t 1.6.5.37], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.6.5.38])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_SCTP_DEBUG])
 AT_CHECK([test_sctp_t 1.6.5.38], [], [ignore], [], [], [])
 AT_CLEANUP
 
-
 AT_SETUP([sctp test 1.7.1.1])
-AT_KEYWORDS([tpi sctp])
-AT_XFAIL_IF([test `id -u` -ne 0])
-AT_CHECK([if test `id -u` -ne 0 ; then exit 77 ; fi
-    test_sctp_t 1.7.1.1], [], [ignore], [], [], [])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_ALL])
+AT_CHECK([test_sctp_t_root 1.7.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.1.2])
-AT_KEYWORDS([tpi sctp])
-AT_XFAIL_IF([test `id -u` -ne 0])
-AT_CHECK([if test `id -u` -ne 0 ; then exit 77 ; fi
-    test_sctp_t 1.7.1.2], [], [ignore], [], [], [])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK XTI_DEBUG])
+AT_CHECK([test_sctp_t_root 1.7.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.1.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK XTI_LINGER])
 AT_CHECK([test_sctp_t 1.7.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.1.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK XTI_RCVBUF])
 AT_CHECK([test_sctp_t 1.7.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.1.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK XTI_RCVLOWAT])
 AT_CHECK([test_sctp_t 1.7.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.1.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK XTI_SNDBUF])
 AT_CHECK([test_sctp_t 1.7.1.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.1.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK XTI_SNDLOWAT])
 AT_CHECK([test_sctp_t 1.7.1.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.2.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_IP_TOS])
 AT_CHECK([test_sctp_t 1.7.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.2.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_IP_TTL])
 AT_CHECK([test_sctp_t 1.7.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.2.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_IP_DONTROUTE])
 AT_CHECK([test_sctp_t 1.7.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.2.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_IP_BROADCAST])
 AT_CHECK([test_sctp_t 1.7.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.2.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_IP_REUSEADDR])
 AT_CHECK([test_sctp_t 1.7.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.3.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_UDP_CHECKSUM])
 AT_CHECK([test_sctp_t 1.7.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_NODELAY])
 AT_CHECK([test_sctp_t 1.7.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_MAXSEG])
 AT_CHECK([test_sctp_t 1.7.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_KEEPALIVE])
 AT_CHECK([test_sctp_t 1.7.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_CORK])
 AT_CHECK([test_sctp_t 1.7.4.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_KEEPIDLE])
 AT_CHECK([test_sctp_t 1.7.4.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_KEEPINTVL])
 AT_CHECK([test_sctp_t 1.7.4.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_KEEPCNT])
 AT_CHECK([test_sctp_t 1.7.4.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_SYNCNT])
 AT_CHECK([test_sctp_t 1.7.4.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_LINGER2])
 AT_CHECK([test_sctp_t 1.7.4.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_DEFER_ACCEPT])
 AT_CHECK([test_sctp_t 1.7.4.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_WINDOW_CLAMP])
 AT_CHECK([test_sctp_t 1.7.4.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_INFO])
 AT_CHECK([test_sctp_t 1.7.4.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.4.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_TCP_QUICKACK])
 AT_CHECK([test_sctp_t 1.7.4.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_NODELAY])
 AT_CHECK([test_sctp_t 1.7.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_CORK])
 AT_CHECK([test_sctp_t 1.7.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_PPI])
 AT_CHECK([test_sctp_t 1.7.5.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_SID])
 AT_CHECK([test_sctp_t 1.7.5.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_SSN])
 AT_CHECK([test_sctp_t 1.7.5.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_TSN])
 AT_CHECK([test_sctp_t 1.7.5.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_RECVOPT])
 AT_CHECK([test_sctp_t 1.7.5.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_COOKIE_LIFE])
 AT_CHECK([test_sctp_t 1.7.5.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_SACK_DELAY])
 AT_CHECK([test_sctp_t 1.7.5.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_PATH_MAX_RETRANS])
 AT_CHECK([test_sctp_t 1.7.5.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_ASSOC_MAX_RETRANS])
 AT_CHECK([test_sctp_t 1.7.5.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_MAX_INIT_RETRIES])
 AT_CHECK([test_sctp_t 1.7.5.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_HEARTBEAT_ITVL])
 AT_CHECK([test_sctp_t 1.7.5.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.14])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_RTO_INITIAL])
 AT_CHECK([test_sctp_t 1.7.5.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.15])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_RTO_MIN])
 AT_CHECK([test_sctp_t 1.7.5.15], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.16])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_RTO_MAX])
 AT_CHECK([test_sctp_t 1.7.5.16], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.17])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_OSTREAMS])
 AT_CHECK([test_sctp_t 1.7.5.17], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.18])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_ISTREAMS])
 AT_CHECK([test_sctp_t 1.7.5.18], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.19])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_COOKIE_INC])
 AT_CHECK([test_sctp_t 1.7.5.19], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.20])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_THROTTLE_ITVL])
 AT_CHECK([test_sctp_t 1.7.5.20], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.21])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_MAC_TYPE])
 AT_CHECK([test_sctp_t 1.7.5.21], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.22])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_CKSUM_TYPE])
 AT_CHECK([test_sctp_t 1.7.5.22], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.23])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_ECN])
 AT_CHECK([test_sctp_t 1.7.5.23], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.24])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_ALI])
 AT_CHECK([test_sctp_t 1.7.5.24], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.25])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_ADD])
 AT_CHECK([test_sctp_t 1.7.5.25], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.26])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_SET])
 AT_CHECK([test_sctp_t 1.7.5.26], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.27])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_ADD_IP])
 AT_CHECK([test_sctp_t 1.7.5.27], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.28])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_DEL_IP])
 AT_CHECK([test_sctp_t 1.7.5.28], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.29])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_SET_IP])
 AT_CHECK([test_sctp_t 1.7.5.29], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.30])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_PR])
 AT_CHECK([test_sctp_t 1.7.5.30], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.31])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_LIFETIME])
 AT_CHECK([test_sctp_t 1.7.5.31], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.32])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_DISPOSITION])
 AT_CHECK([test_sctp_t 1.7.5.32], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.33])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_MAX_BURST])
 AT_CHECK([test_sctp_t 1.7.5.33], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.34])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_HB])
 AT_CHECK([test_sctp_t 1.7.5.34], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.35])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_RTO])
 AT_CHECK([test_sctp_t 1.7.5.35], [], [ignore], [], [], [])
 AT_CLEANUP
 
+AT_SETUP([sctp test 1.7.5.36])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_MAXSEG])
+AT_CHECK([test_sctp_t 1.7.5.36], [], [ignore], [], [], [])
+AT_CLEANUP
+
 AT_SETUP([sctp test 1.7.5.37])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_STATUS])
 AT_CHECK([test_sctp_t 1.7.5.37], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.7.5.38])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_SCTP_DEBUG])
 AT_CHECK([test_sctp_t 1.7.5.38], [], [ignore], [], [], [])
 AT_CLEANUP
 
-
 AT_SETUP([sctp test 1.8.1.1])
-AT_KEYWORDS([tpi sctp])
-AT_XFAIL_IF([test `id -u` -ne 0])
-AT_CHECK([if test `id -u` -ne 0 ; then exit 77 ; fi
-    test_sctp_t 1.8.1.1], [], [ignore], [], [], [])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_ALL])
+AT_CHECK([test_sctp_t_root 1.8.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.1.2])
-AT_KEYWORDS([tpi sctp])
-AT_XFAIL_IF([test `id -u` -ne 0])
-AT_CHECK([if test `id -u` -ne 0 ; then exit 77 ; fi
-    test_sctp_t 1.8.1.2], [], [ignore], [], [], [])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_DEBUG])
+AT_CHECK([test_sctp_t_root 1.8.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.1.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_LINGER])
 AT_CHECK([test_sctp_t 1.8.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.1.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_RCVBUF])
 AT_CHECK([test_sctp_t 1.8.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.1.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_RCVLOWAT])
 AT_CHECK([test_sctp_t 1.8.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.1.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_SNDBUF])
 AT_CHECK([test_sctp_t 1.8.1.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.1.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_SNDLOWAT])
 AT_CHECK([test_sctp_t 1.8.1.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.2.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_IP_TOS])
 AT_CHECK([test_sctp_t 1.8.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.2.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_IP_TTL])
 AT_CHECK([test_sctp_t 1.8.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.2.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_IP_DONTROUTE])
 AT_CHECK([test_sctp_t 1.8.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.2.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_IP_BROADCAST])
 AT_CHECK([test_sctp_t 1.8.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.2.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_IP_REUSEADDR])
 AT_CHECK([test_sctp_t 1.8.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.3.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_UDP_CHECKSUM])
 AT_CHECK([test_sctp_t 1.8.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_NODELAY])
 AT_CHECK([test_sctp_t 1.8.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_MAXSEG])
 AT_CHECK([test_sctp_t 1.8.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_KEEPALIVE])
 AT_CHECK([test_sctp_t 1.8.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_CORK])
 AT_CHECK([test_sctp_t 1.8.4.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_KEEPIDLE])
 AT_CHECK([test_sctp_t 1.8.4.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_KEEPINTVL])
 AT_CHECK([test_sctp_t 1.8.4.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_KEEPCNT])
 AT_CHECK([test_sctp_t 1.8.4.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_SYNCNT])
 AT_CHECK([test_sctp_t 1.8.4.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_LINGER2])
 AT_CHECK([test_sctp_t 1.8.4.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_DEFER_ACCEPT])
 AT_CHECK([test_sctp_t 1.8.4.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_WINDOW_CLAMP])
 AT_CHECK([test_sctp_t 1.8.4.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_INFO])
 AT_CHECK([test_sctp_t 1.8.4.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.4.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_QUICKACK])
 AT_CHECK([test_sctp_t 1.8.4.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_NODELAY])
 AT_CHECK([test_sctp_t 1.8.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_CORK])
 AT_CHECK([test_sctp_t 1.8.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_PPI])
 AT_CHECK([test_sctp_t 1.8.5.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_SID])
 AT_CHECK([test_sctp_t 1.8.5.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_SSN])
 AT_CHECK([test_sctp_t 1.8.5.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_TSN])
 AT_CHECK([test_sctp_t 1.8.5.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_RECVOPT])
 AT_CHECK([test_sctp_t 1.8.5.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_COOKIE_LIFE])
 AT_CHECK([test_sctp_t 1.8.5.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_SACK_DELAY])
 AT_CHECK([test_sctp_t 1.8.5.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_PATH_MAX_RETRANS])
 AT_CHECK([test_sctp_t 1.8.5.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ASSOC_MAX_RETRANS])
 AT_CHECK([test_sctp_t 1.8.5.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_MAX_INIT_RETRIES])
 AT_CHECK([test_sctp_t 1.8.5.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_HEARTBEAT_ITVL])
 AT_CHECK([test_sctp_t 1.8.5.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.14])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_RTO_INITIAL])
 AT_CHECK([test_sctp_t 1.8.5.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.15])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_RTO_MIN])
 AT_CHECK([test_sctp_t 1.8.5.15], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.16])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_RTO_MAX])
 AT_CHECK([test_sctp_t 1.8.5.16], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.17])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_OSTREAMS])
 AT_CHECK([test_sctp_t 1.8.5.17], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.18])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ISTREAMS])
 AT_CHECK([test_sctp_t 1.8.5.18], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.19])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_COOKIE_INC])
 AT_CHECK([test_sctp_t 1.8.5.19], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.20])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_THROTTLE_ITVL])
 AT_CHECK([test_sctp_t 1.8.5.20], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.21])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_MAC_TYPE])
 AT_CHECK([test_sctp_t 1.8.5.21], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.22])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_CKSUM_TYPE])
 AT_CHECK([test_sctp_t 1.8.5.22], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.23])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ECN])
 AT_CHECK([test_sctp_t 1.8.5.23], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.24])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ALI])
 AT_CHECK([test_sctp_t 1.8.5.24], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.25])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ADD])
 AT_CHECK([test_sctp_t 1.8.5.25], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.26])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_SET])
 AT_CHECK([test_sctp_t 1.8.5.26], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.27])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ADD_IP])
 AT_CHECK([test_sctp_t 1.8.5.27], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.28])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_DEL_IP])
 AT_CHECK([test_sctp_t 1.8.5.28], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.29])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_SET_IP])
 AT_CHECK([test_sctp_t 1.8.5.29], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.30])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_PR])
 AT_CHECK([test_sctp_t 1.8.5.30], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.31])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_LIFETIME])
 AT_CHECK([test_sctp_t 1.8.5.31], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.32])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_DISPOSITION])
 AT_CHECK([test_sctp_t 1.8.5.32], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.33])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_MAX_BURST])
 AT_CHECK([test_sctp_t 1.8.5.33], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.34])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_HB])
 AT_CHECK([test_sctp_t 1.8.5.34], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.35])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_RTO])
 AT_CHECK([test_sctp_t 1.8.5.35], [], [ignore], [], [], [])
 AT_CLEANUP
 
+AT_SETUP([sctp test 1.8.5.36])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_MAXSEG])
+AT_CHECK([test_sctp_t 1.8.5.36], [], [ignore], [], [], [])
+AT_CLEANUP
+
 AT_SETUP([sctp test 1.8.5.37])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_STATUS])
 AT_CHECK([test_sctp_t 1.8.5.37], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.8.5.38])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_DEBUG])
 AT_CHECK([test_sctp_t 1.8.5.38], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.1.1])
-AT_KEYWORDS([tpi sctp allopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT (none)])
 AT_CHECK([test_sctp_t 1.9.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.1.2])
-AT_KEYWORDS([tpi sctp allopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT (none)])
 AT_CHECK([test_sctp_t 1.9.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.1.3])
-AT_KEYWORDS([tpi sctp allopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK (none)])
 AT_CHECK([test_sctp_t 1.9.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.1.4])
-AT_KEYWORDS([tpi sctp allopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE (none)])
 AT_CHECK([test_sctp_t 1.9.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.2.1])
-AT_KEYWORDS([tpi sctp allopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT T_ALLOPT])
 AT_CHECK([test_sctp_t 1.9.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.2.2])
-AT_KEYWORDS([tpi sctp allopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT T_ALLOPT])
 AT_CHECK([test_sctp_t 1.9.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.2.3])
-AT_KEYWORDS([tpi sctp allopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK T_ALLOPT])
 AT_CHECK([test_sctp_t 1.9.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.2.4])
-AT_KEYWORDS([tpi sctp allopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_ALLOPT])
 AT_CHECK([test_sctp_t 1.9.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.3.1])
-AT_KEYWORDS([tpi sctp illegalopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_DEFAULT (illegal)])
 AT_CHECK([test_sctp_t 1.9.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.3.2])
-AT_KEYWORDS([tpi sctp illegalopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CURRENT (illegal)])
 AT_CHECK([test_sctp_t 1.9.3.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.3.3])
-AT_KEYWORDS([tpi sctp illegalopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_CHECK (illegal)])
 AT_CHECK([test_sctp_t 1.9.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.9.3.4])
-AT_KEYWORDS([tpi sctp illegalopt])
+AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE (illegal)])
 AT_CHECK([test_sctp_t 1.9.3.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_BIND_REQ T_UNBIND_REQ])
 AT_CHECK([test_sctp_t 1.10.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_BIND_REQ TADDRBUSY])
 AT_CHECK([test_sctp_t 1.10.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_BIND_REQ])
 AT_CHECK([test_sctp_t 1.10.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_BIND_REQ TOUTSTATE])
 AT_CHECK([test_sctp_t 1.10.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_BIND_REQ T_UNBIND_REQ TOUTSTATE])
 AT_CHECK([test_sctp_t 1.10.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNBIND_REQ TOUTSTATE])
 AT_CHECK([test_sctp_t 1.10.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_BIND_REQ T_UNBIND_REQ])
 AT_CHECK([test_sctp_t 1.10.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_BIND_REQ TBADADDR])
 AT_CHECK([test_sctp_t 1.10.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_BIND_REQ TBADADDR])
 AT_CHECK([test_sctp_t 1.10.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_BIND_REQ TNOADDR])
 AT_CHECK([test_sctp_t 1.10.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 1.10.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_BIND_REQ CONIND_number])
 AT_CHECK([test_sctp_t 1.10.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.1.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ XTI_DEBUG])
 AT_CHECK([test_sctp_t 2.2.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.1.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ XTI_LINGER])
 AT_CHECK([test_sctp_t 2.2.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.1.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ XTI_RCVBUF])
 AT_CHECK([test_sctp_t 2.2.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.1.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ XTI_RCVLOWAT])
 AT_CHECK([test_sctp_t 2.2.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.1.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ XTI_SNDBUF])
 AT_CHECK([test_sctp_t 2.2.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.1.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ XTI_SNDLOWAT])
 AT_CHECK([test_sctp_t 2.2.1.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.2.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_IP_TOS])
 AT_CHECK([test_sctp_t 2.2.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.2.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_IP_TTL])
 AT_CHECK([test_sctp_t 2.2.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.2.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_IP_DONTROUTE])
 AT_CHECK([test_sctp_t 2.2.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.2.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_IP_BROADCAST])
 AT_CHECK([test_sctp_t 2.2.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.2.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_IP_REUSEADDR])
 AT_CHECK([test_sctp_t 2.2.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.3.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_UDP_CHECKSUM])
 AT_CHECK([test_sctp_t 2.2.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_NODELAY])
 AT_CHECK([test_sctp_t 2.2.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_MAXSEG])
 AT_CHECK([test_sctp_t 2.2.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_KEEPALIVE])
 AT_CHECK([test_sctp_t 2.2.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_CORK])
 AT_CHECK([test_sctp_t 2.2.4.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_KEEPIDLE])
 AT_CHECK([test_sctp_t 2.2.4.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_KEEPINTVL])
 AT_CHECK([test_sctp_t 2.2.4.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_KEEPCNT])
 AT_CHECK([test_sctp_t 2.2.4.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_SYNCNT])
 AT_CHECK([test_sctp_t 2.2.4.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_LINGER2])
 AT_CHECK([test_sctp_t 2.2.4.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_DEFER_ACCEPT])
 AT_CHECK([test_sctp_t 2.2.4.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_WINDOW_CLAMP])
 AT_CHECK([test_sctp_t 2.2.4.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_INFO])
 AT_CHECK([test_sctp_t 2.2.4.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.4.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_TCP_QUICKACK])
 AT_CHECK([test_sctp_t 2.2.4.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_NODELAY])
 AT_CHECK([test_sctp_t 2.2.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_CORK])
 AT_CHECK([test_sctp_t 2.2.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_PPI])
 AT_CHECK([test_sctp_t 2.2.5.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_SID])
 AT_CHECK([test_sctp_t 2.2.5.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_SSN])
 AT_CHECK([test_sctp_t 2.2.5.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_TSN])
 AT_CHECK([test_sctp_t 2.2.5.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_RECVOPT])
 AT_CHECK([test_sctp_t 2.2.5.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_COOKIE_LIFE])
 AT_CHECK([test_sctp_t 2.2.5.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_SACK_DELAY])
 AT_CHECK([test_sctp_t 2.2.5.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_PATH_MAX_RETRANS])
 AT_CHECK([test_sctp_t 2.2.5.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_ASSOC_MAX_RETRANS])
 AT_CHECK([test_sctp_t 2.2.5.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_MAX_INIT_RETRIES])
 AT_CHECK([test_sctp_t 2.2.5.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_HEARTBEAT_ITVL])
 AT_CHECK([test_sctp_t 2.2.5.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.14])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_RTO_INITIAL])
 AT_CHECK([test_sctp_t 2.2.5.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.15])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_RTO_MIN])
 AT_CHECK([test_sctp_t 2.2.5.15], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.16])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_RTO_MAX])
 AT_CHECK([test_sctp_t 2.2.5.16], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.17])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_OSTREAMS])
 AT_CHECK([test_sctp_t 2.2.5.17], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.18])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_ISTREAMS])
 AT_CHECK([test_sctp_t 2.2.5.18], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.19])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_COOKIE_INC])
 AT_CHECK([test_sctp_t 2.2.5.19], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.20])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_THROTTLE_ITVL])
 AT_CHECK([test_sctp_t 2.2.5.20], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.21])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_MAC_TYPE])
 AT_CHECK([test_sctp_t 2.2.5.21], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.22])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_CKSUM_TYPE])
 AT_CHECK([test_sctp_t 2.2.5.22], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.23])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_ECN])
 AT_CHECK([test_sctp_t 2.2.5.23], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.24])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_ALI])
 AT_CHECK([test_sctp_t 2.2.5.24], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.25])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_ADD])
 AT_CHECK([test_sctp_t 2.2.5.25], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.26])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_SET])
 AT_CHECK([test_sctp_t 2.2.5.26], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.27])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_ADD_IP])
 AT_CHECK([test_sctp_t 2.2.5.27], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.28])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_DEL_IP])
 AT_CHECK([test_sctp_t 2.2.5.28], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.29])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_SET_IP])
 AT_CHECK([test_sctp_t 2.2.5.29], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.30])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_PR])
 AT_CHECK([test_sctp_t 2.2.5.30], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.31])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_LIFETIME])
 AT_CHECK([test_sctp_t 2.2.5.31], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.32])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_DISPOSITION])
 AT_CHECK([test_sctp_t 2.2.5.32], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.33])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_MAX_BURST])
 AT_CHECK([test_sctp_t 2.2.5.33], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.34])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_HB])
 AT_CHECK([test_sctp_t 2.2.5.34], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.35])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_RTO])
 AT_CHECK([test_sctp_t 2.2.5.35], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.36])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_MAXSEG])
 AT_CHECK([test_sctp_t 2.2.5.36], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.37])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_STATUS])
 AT_CHECK([test_sctp_t 2.2.5.37], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.5.38])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ T_SCTP_DEBUG])
 AT_CHECK([test_sctp_t 2.2.5.38], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 2.2.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_UNITDATA_REQ TBADOPT])
 AT_CHECK([test_sctp_t 2.2.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 3.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ])
 AT_CHECK([test_sctp_t 3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 3.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_DISCON_REQ])
 AT_CHECK([test_sctp_t 3.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 3.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_DISCON_REQ])
 AT_CHECK([test_sctp_t 3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 3.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_DISCON_REQ])
 AT_CHECK([test_sctp_t 3.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 3.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_CONN_REQ])
 AT_CHECK([test_sctp_t 3.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 3.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ TOUTSTATE])
 AT_CHECK([test_sctp_t 3.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([sctp test 4.1])
-AT_KEYWORDS([tpi sctp])
-AT_CHECK([test_sctp_t 4.1], [], [ignore], [], [], [])
+AT_SETUP([sctp test 4.1.1])
+AT_KEYWORDS([T_CONN_REQ T_CONN_RES])
+AT_CHECK([test_sctp_t 4.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([sctp test 4.2])
-AT_KEYWORDS([tpi sctp])
-AT_CHECK([test_sctp_t 4.2], [], [ignore], [], [], [])
+AT_SETUP([sctp test 4.1.2])
+AT_KEYWORDS([T_CONN_REQ T_CONN_RES])
+AT_CHECK([test_sctp_t 4.1.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 4.1.3])
+AT_KEYWORDS([T_CONN_REQ T_CONN_RES])
+AT_CHECK([test_sctp_t 4.1.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 4.1.4])
+AT_KEYWORDS([T_CONN_REQ T_CONN_RES])
+AT_CHECK([test_sctp_t 4.1.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 4.1.5])
+AT_KEYWORDS([T_CONN_REQ T_CONN_RES])
+AT_CHECK([test_sctp_t 4.1.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 4.1.6])
+AT_KEYWORDS([T_CONN_REQ])
+AT_CHECK([test_sctp_t 4.1.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 4.1.7])
+AT_KEYWORDS([T_CONN_REQ])
+AT_CHECK([test_sctp_t 4.1.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 4.1.8])
+AT_KEYWORDS([T_CONN_RES T_CONN_RES])
+AT_CHECK([test_sctp_t 4.1.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 4.1.9])
+AT_KEYWORDS([T_CONN_RES T_CONN_RES])
+AT_CHECK([test_sctp_t 4.1.9], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 4.2.1])
+AT_KEYWORDS([T_CONN_REQ M_DATA])
+AT_CHECK([test_sctp_t 4.2.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 4.2.2])
+AT_KEYWORDS([T_CONN_REQ M_DATA])
+AT_CHECK([test_sctp_t 4.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.1.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ XTI_DEBUG])
 AT_CHECK([test_sctp_t 4.3.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.1.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ XTI_LINGER])
 AT_CHECK([test_sctp_t 4.3.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.1.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ XTI_RCVBUF])
 AT_CHECK([test_sctp_t 4.3.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.1.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ XTI_RCVLOWAT])
 AT_CHECK([test_sctp_t 4.3.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.1.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ XTI_SNDBUF])
 AT_CHECK([test_sctp_t 4.3.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.1.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ XTI_SNDLOWAT])
 AT_CHECK([test_sctp_t 4.3.1.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.2.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_IP_TOS])
 AT_CHECK([test_sctp_t 4.3.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.2.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_IP_TTL])
 AT_CHECK([test_sctp_t 4.3.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.2.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_IP_REUSEADDR])
 AT_CHECK([test_sctp_t 4.3.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.2.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_IP_DONTROUTE])
 AT_CHECK([test_sctp_t 4.3.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.2.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_IP_BROADCAST])
 AT_CHECK([test_sctp_t 4.3.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.3.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_UDP_CHECKSUM])
 AT_CHECK([test_sctp_t 4.3.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_NODELAY])
 AT_CHECK([test_sctp_t 4.3.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_MAXSEG])
 AT_CHECK([test_sctp_t 4.3.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_KEEPALIVE])
 AT_CHECK([test_sctp_t 4.3.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_CORK])
 AT_CHECK([test_sctp_t 4.3.4.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_KEEPIDLE])
 AT_CHECK([test_sctp_t 4.3.4.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_KEEPINTVL])
 AT_CHECK([test_sctp_t 4.3.4.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_KEEPCNT])
 AT_CHECK([test_sctp_t 4.3.4.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_SYNCNT])
 AT_CHECK([test_sctp_t 4.3.4.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_LINGER2])
 AT_CHECK([test_sctp_t 4.3.4.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_DEFER_ACCEPT])
 AT_CHECK([test_sctp_t 4.3.4.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_WINDOW_CLAMP])
 AT_CHECK([test_sctp_t 4.3.4.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_INFO])
 AT_CHECK([test_sctp_t 4.3.4.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.4.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_TCP_QUICKACK])
 AT_CHECK([test_sctp_t 4.3.4.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.1])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_NODELAY])
 AT_CHECK([test_sctp_t 4.3.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.2])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_CORK])
 AT_CHECK([test_sctp_t 4.3.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.3])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_PPI])
 AT_CHECK([test_sctp_t 4.3.5.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.4])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_SID])
 AT_CHECK([test_sctp_t 4.3.5.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.5])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_SSN])
 AT_CHECK([test_sctp_t 4.3.5.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.6])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_TSN])
 AT_CHECK([test_sctp_t 4.3.5.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.7])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_RECVOPT])
 AT_CHECK([test_sctp_t 4.3.5.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.8])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_COOKIE_LIFE])
 AT_CHECK([test_sctp_t 4.3.5.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.9])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_SACK_DELAY])
 AT_CHECK([test_sctp_t 4.3.5.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.10])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_PATH_MAX_RETRANS])
 AT_CHECK([test_sctp_t 4.3.5.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.11])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_ASSOC_MAX_RETRANS])
 AT_CHECK([test_sctp_t 4.3.5.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.12])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_MAX_INIT_RETRIES])
 AT_CHECK([test_sctp_t 4.3.5.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.13])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_HEARTBEAT_ITVL])
 AT_CHECK([test_sctp_t 4.3.5.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.14])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_RTO_INITIAL])
 AT_CHECK([test_sctp_t 4.3.5.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.15])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_RTO_MIN])
 AT_CHECK([test_sctp_t 4.3.5.15], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.16])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_RTO_MAX])
 AT_CHECK([test_sctp_t 4.3.5.16], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.17])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_OSTREAMS])
 AT_CHECK([test_sctp_t 4.3.5.17], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.18])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_ISTREAMS])
 AT_CHECK([test_sctp_t 4.3.5.18], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.19])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_COOKIE_INC])
 AT_CHECK([test_sctp_t 4.3.5.19], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.20])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_THROTTLE_ITVL])
 AT_CHECK([test_sctp_t 4.3.5.20], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.21])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_MAC_TYPE])
 AT_CHECK([test_sctp_t 4.3.5.21], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.22])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_CKSUM_TYPE])
 AT_CHECK([test_sctp_t 4.3.5.22], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.23])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_ECN])
 AT_CHECK([test_sctp_t 4.3.5.23], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.24])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_ALI])
 AT_CHECK([test_sctp_t 4.3.5.24], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.25])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_ADD])
 AT_CHECK([test_sctp_t 4.3.5.25], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.26])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_SET])
 AT_CHECK([test_sctp_t 4.3.5.26], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.27])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_ADD_IP])
 AT_CHECK([test_sctp_t 4.3.5.27], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.28])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_DEL_IP])
 AT_CHECK([test_sctp_t 4.3.5.28], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.29])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_SET_IP])
 AT_CHECK([test_sctp_t 4.3.5.29], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.30])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_PR])
 AT_CHECK([test_sctp_t 4.3.5.30], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.31])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_LIFETIME])
 AT_CHECK([test_sctp_t 4.3.5.31], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.32])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_DISPOSITION])
 AT_CHECK([test_sctp_t 4.3.5.32], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.33])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_MAX_BURST])
 AT_CHECK([test_sctp_t 4.3.5.33], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.34])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_HB])
 AT_CHECK([test_sctp_t 4.3.5.34], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.35])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_RTO])
 AT_CHECK([test_sctp_t 4.3.5.35], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.36])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_MAXSEG])
 AT_CHECK([test_sctp_t 4.3.5.36], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.37])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_STATUS])
 AT_CHECK([test_sctp_t 4.3.5.37], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 4.3.5.38])
-AT_KEYWORDS([tpi sctp])
+AT_KEYWORDS([T_CONN_REQ T_SCTP_DEBUG])
 AT_CHECK([test_sctp_t 4.3.5.38], [], [ignore], [], [], [])
 AT_CLEANUP
 
+AT_SETUP([sctp test 5.1])
+AT_KEYWORDS([T_ORDREL_REQ])
+AT_CHECK([test_sctp_t 5.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 5.2])
+AT_KEYWORDS([T_ORDREL_REQ])
+AT_CHECK([test_sctp_t 5.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 5.3])
+AT_KEYWORDS([T_ORDREL_REQ])
+AT_CHECK([test_sctp_t 5.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 5.4])
+AT_KEYWORDS([T_DISCON_REQ])
+AT_CHECK([test_sctp_t 5.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
 AT_SETUP([sctp test 11.1.1])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_ADDR_REQ])
 AT_CHECK([test_sctp_t 11.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.2])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_BIND_REQ])
 AT_CHECK([test_sctp_t 11.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.3])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_CAPABILITY_REQ])
 AT_CHECK([test_sctp_t 11.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.4])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_CONN_REQ])
 AT_CHECK([test_sctp_t 11.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.5])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_CONN_RES])
 AT_CHECK([test_sctp_t 11.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.6])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_DATA_REQ])
 AT_CHECK([test_sctp_t 11.1.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.7])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_DISCON_REQ])
 AT_CHECK([test_sctp_t 11.1.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.8])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_EXDATA_REQ])
 AT_CHECK([test_sctp_t 11.1.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.9])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_INFO_REQ])
 AT_CHECK([test_sctp_t 11.1.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.10])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_OPTDATA_REQ])
 AT_CHECK([test_sctp_t 11.1.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.11])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_ORDREL_REQ])
 AT_CHECK([test_sctp_t 11.1.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.12])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_UNBIND_REQ])
 AT_CHECK([test_sctp_t 11.1.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.13])
-AT_KEYWORDS([tpi sctp tooshort])
+AT_KEYWORDS([tooshort T_UNITDATA_REQ])
 AT_CHECK([test_sctp_t 11.1.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.1])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_ADDR_ACK])
 AT_CHECK([test_sctp_t 11.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.2])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_BIND_ACK])
 AT_CHECK([test_sctp_t 11.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.3])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_CAPABILITY_ACK])
 AT_CHECK([test_sctp_t 11.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.4])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_CONN_CON])
 AT_CHECK([test_sctp_t 11.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.5])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_CONN_IND])
 AT_CHECK([test_sctp_t 11.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.6])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_DATA_IND])
 AT_CHECK([test_sctp_t 11.2.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.7])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_DISCON_IND])
 AT_CHECK([test_sctp_t 11.2.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.8])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_ERROR_ACK])
 AT_CHECK([test_sctp_t 11.2.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.9])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_EXDATA_IND])
 AT_CHECK([test_sctp_t 11.2.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.10])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_INFO_ACK])
 AT_CHECK([test_sctp_t 11.2.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.11])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_OK_ACK])
 AT_CHECK([test_sctp_t 11.2.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.12])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_OPTDATA_IND])
 AT_CHECK([test_sctp_t 11.2.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.13])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_OPTMGMT_ACK])
 AT_CHECK([test_sctp_t 11.2.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.14])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_ORDREL_IND])
 AT_CHECK([test_sctp_t 11.2.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.15])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_UDERROR_IND])
 AT_CHECK([test_sctp_t 11.2.15], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.16])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim T_UNITDATA_IND])
 AT_CHECK([test_sctp_t 11.2.16], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.17])
-AT_KEYWORDS([tpi sctp badprim])
+AT_KEYWORDS([badprim UNKNOWN])
 AT_CHECK([test_sctp_t 11.2.17], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.1])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_ADDR_REQ])
 AT_CHECK([test_sctp_t 11.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.2])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_BIND_REQ])
 AT_CHECK([test_sctp_t 11.3.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.3])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_CAPABILITY_REQ])
 AT_CHECK([test_sctp_t 11.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.4])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_CONN_REQ])
 AT_CHECK([test_sctp_t 11.3.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.5])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_CONN_RES])
 AT_CHECK([test_sctp_t 11.3.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.6])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_DATA_REQ])
 AT_CHECK([test_sctp_t 11.3.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.7])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_DISCON_REQ])
 AT_CHECK([test_sctp_t 11.3.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.8])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_EXDATA_REQ])
 AT_CHECK([test_sctp_t 11.3.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.9])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_INFO_REQ])
 AT_CHECK([test_sctp_t 11.3.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.10])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_OPTDATA_REQ])
 AT_CHECK([test_sctp_t 11.3.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.11])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_ORDREL_REQ])
 AT_CHECK([test_sctp_t 11.3.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.12])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_UNBIND_REQ])
 AT_CHECK([test_sctp_t 11.3.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.13])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim T_UNITDATA_REQ])
 AT_CHECK([test_sctp_t 11.3.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.14])
-AT_KEYWORDS([tpi sctp unsupprim])
+AT_KEYWORDS([unsupprim UNKNOWN])
 AT_CHECK([test_sctp_t 11.3.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 12.1])
-AT_KEYWORDS([tpi sctp flush])
+AT_KEYWORDS([flush T_UNBIND_REQ])
 AT_CHECK([test_sctp_t 12.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 12.2.1])
-AT_KEYWORDS([tpi sctp flush])
+AT_KEYWORDS([flush T_DISCON_IND TS_DATA_XFER])
 AT_CHECK([test_sctp_t 12.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 12.2.2])
-AT_KEYWORDS([tpi sctp flush])
+AT_KEYWORDS([flush T_DISCON_IND TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 12.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 12.2.3])
-AT_KEYWORDS([tpi sctp flush])
+AT_KEYWORDS([flush T_DISCON_IND TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 12.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 12.3.1])
-AT_KEYWORDS([tpi sctp flush])
+AT_KEYWORDS([flush T_DISCON_REQ TS_DATA_XFER])
 AT_CHECK([test_sctp_t 12.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 12.3.2])
-AT_KEYWORDS([tpi sctp flush])
+AT_KEYWORDS([flush T_DISCON_REQ TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 12.3.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 12.3.3])
-AT_KEYWORDS([tpi sctp flush])
+AT_KEYWORDS([flush T_DISCON_REQ TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 12.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.1.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_ADDR_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.1.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_ADDR_REQ TSYSERR])
 AT_CHECK([test_sctp_t 13.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TACCES])
 AT_CHECK([test_sctp_t 13.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TADDRBUSY])
 AT_CHECK([test_sctp_t 13.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TBADADDR])
 AT_CHECK([test_sctp_t 13.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TNOADDR])
 AT_CHECK([test_sctp_t 13.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.6.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TOUTSTATE TS_IDLE])
 AT_CHECK([test_sctp_t 13.2.6.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.6.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TOUTSTATE TS_WCON_CREQ])
 AT_CHECK([test_sctp_t 13.2.6.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.6.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TOUTSTATE TS_WRES_CIND])
 AT_CHECK([test_sctp_t 13.2.6.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.6.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TOUTSTATE TS_DATA_XFER])
 AT_CHECK([test_sctp_t 13.2.6.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.6.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TOUTSTATE TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 13.2.6.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.6.6])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TOUTSTATE TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 13.2.6.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.2.7])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_BIND_REQ TSYSERR])
 AT_CHECK([test_sctp_t 13.2.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.3.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CAPABILITY_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.3.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CAPABILITY_REQ TSYSERR])
 AT_CHECK([test_sctp_t 13.3.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TACCES])
 AT_CHECK([test_sctp_t 13.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TADDRBUSY])
 AT_CHECK([test_sctp_t 13.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TBADADDR])
 AT_CHECK([test_sctp_t 13.4.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TBADDATA])
 AT_CHECK([test_sctp_t 13.4.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.6])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TBADOPT])
 AT_CHECK([test_sctp_t 13.4.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.7])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TNOTSUPPORT])
 AT_CHECK([test_sctp_t 13.4.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.8.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TOUTSTATE TS_UNBND])
 AT_CHECK([test_sctp_t 13.4.8.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.8.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TOUTSTATE TS_WCON_CREQ])
 AT_XFAIL_IF([true])
 AT_CHECK([test_sctp_t 13.4.8.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.8.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TOUTSTATE TS_WRES_CIND])
 AT_CHECK([test_sctp_t 13.4.8.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.8.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TOUTSTATE TS_DATA_XFER])
 AT_CHECK([test_sctp_t 13.4.8.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.8.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TOUTSTATE TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 13.4.8.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.8.6])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TOUTSTATE TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 13.4.8.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.4.9])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_REQ TSYSERR])
 AT_CHECK([test_sctp_t 13.4.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES EPROTO])
 AT_CHECK([test_sctp_t 13.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TACCES])
 AT_CHECK([test_sctp_t 13.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TBADADDR])
 AT_CHECK([test_sctp_t 13.5.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TBADDATA])
 AT_CHECK([test_sctp_t 13.5.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TBADF])
 AT_CHECK([test_sctp_t 13.5.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.6])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TBADOPT])
 AT_CHECK([test_sctp_t 13.5.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.7])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TBADSEQ])
 AT_CHECK([test_sctp_t 13.5.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.8])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TNOTSUPPORT])
 AT_CHECK([test_sctp_t 13.5.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.9.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TOUTSTATE TS_UNBND])
 AT_CHECK([test_sctp_t 13.5.9.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.9.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TOUTSTATE TS_IDLE])
 AT_CHECK([test_sctp_t 13.5.9.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.9.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TOUTSTATE TS_WCON_CREQ])
 AT_CHECK([test_sctp_t 13.5.9.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.9.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TOUTSTATE TS_DATA_XFER])
 AT_CHECK([test_sctp_t 13.5.9.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.9.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TOUTSTATE TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 13.5.9.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.9.6])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TOUTSTATE TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 13.5.9.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.10])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TPROVMISMATCH])
 AT_CHECK([test_sctp_t 13.5.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.11])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TRESADDR])
 AT_CHECK([test_sctp_t 13.5.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.12])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TRESQLEN])
 AT_CHECK([test_sctp_t 13.5.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.5.13])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_CONN_RES TSYSERR])
 AT_CHECK([test_sctp_t 13.5.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.6.1.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DATA_REQ EPROTO TS_UNBND])
 AT_CHECK([test_sctp_t 13.6.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.6.1.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DATA_REQ EPROTO TS_IDLE])
 AT_CHECK([test_sctp_t 13.6.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.6.1.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DATA_REQ EPROTO TS_WCON_CREQ])
 AT_XFAIL_IF([true])
 AT_CHECK([test_sctp_t 13.6.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.6.1.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DATA_REQ EPROTO TS_WRES_CIND])
 AT_CHECK([test_sctp_t 13.6.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.6.1.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DATA_REQ EPROTO TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 13.6.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.6.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DATA_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.6.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.7.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DISCON_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.7.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.7.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DISCON_REQ TBADDATA])
 AT_CHECK([test_sctp_t 13.7.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.7.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DISCON_REQ TBADSEQ])
 AT_CHECK([test_sctp_t 13.7.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.7.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DISCON_REQ TNOTSUPPORT])
 AT_CHECK([test_sctp_t 13.7.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.7.5.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DISCON_REQ TOUTSTATE TS_UNBND])
 AT_CHECK([test_sctp_t 13.7.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.7.5.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DISCON_REQ TOUTSTATE TS_IDLE])
 AT_CHECK([test_sctp_t 13.7.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.7.6])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_DISCON_REQ TSYSERR])
 AT_CHECK([test_sctp_t 13.7.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.8.1.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_EXDATA_REQ EPROTO TS_UNBND])
 AT_CHECK([test_sctp_t 13.8.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.8.1.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_EXDATA_REQ EPROTO TS_IDLE])
 AT_CHECK([test_sctp_t 13.8.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.8.1.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_EXDATA_REQ EPROTO TS_WCON_CREQ])
 AT_XFAIL_IF([true])
 AT_CHECK([test_sctp_t 13.8.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.8.1.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_EXDATA_REQ EPROTO TS_WRES_CIND])
 AT_CHECK([test_sctp_t 13.8.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.8.1.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_EXDATA_REQ EPROTO TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 13.8.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.8.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_EXDATA_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.8.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.9.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_INFO_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.9.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.9.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_INFO_REQ TSYSERR])
 AT_CHECK([test_sctp_t 13.9.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.10.1.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTDATA_REQ EPROTO TS_UNBND])
 AT_CHECK([test_sctp_t 13.10.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.10.1.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTDATA_REQ EPROTO TS_IDLE])
 AT_CHECK([test_sctp_t 13.10.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.10.1.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTDATA_REQ EPROTO TS_WCON_CREQ])
 AT_XFAIL_IF([true])
 AT_CHECK([test_sctp_t 13.10.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.10.1.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTDATA_REQ EPROTO TS_WRES_CIND])
 AT_CHECK([test_sctp_t 13.10.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.10.1.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTDATA_REQ EPROTO TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 13.10.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.11.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTMGMT_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.11.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.11.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTMGMT_REQ TACCES])
 AT_CHECK([test_sctp_t 13.11.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.11.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTMGMT_REQ TBADFLAG])
 AT_CHECK([test_sctp_t 13.11.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.11.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTMGMT_REQ TBADOPT])
 AT_CHECK([test_sctp_t 13.11.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.11.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTMGMT_REQ TOUTSTATE])
 AT_CHECK([test_sctp_t 13.11.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.11.6])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTMGMT_REQ TNOTSUPPORT])
 AT_CHECK([test_sctp_t 13.11.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.11.7])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_OPTMGMT_REQ TSYSERR])
 AT_CHECK([test_sctp_t 13.11.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.12.1.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_ORDREL_REQ EPROTO TS_UNBND])
 AT_CHECK([test_sctp_t 13.12.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.12.1.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_ORDREL_REQ EPROTO TS_IDLE])
 AT_CHECK([test_sctp_t 13.12.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.12.1.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_ORDREL_REQ EPROTO TS_WCON_CREQ])
 AT_CHECK([test_sctp_t 13.12.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.12.1.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_ORDREL_REQ EPROTO TS_WRES_CIND])
 AT_CHECK([test_sctp_t 13.12.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.12.1.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_ORDREL_REQ EPROTO TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 13.12.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.13.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors TS_UNBIND_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.13.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.13.2.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors TS_UNBIND_REQ TOUTSTATE TS_UNBND])
 AT_CHECK([test_sctp_t 13.13.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.13.2.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors TS_UNBIND_REQ TOUTSTATE TS_WCON_CREQ])
 AT_XFAIL_IF([true])
 AT_CHECK([test_sctp_t 13.13.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.13.2.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors TS_UNBIND_REQ TOUTSTATE TS_WRES_CIND])
 AT_CHECK([test_sctp_t 13.13.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.13.2.4])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors TS_UNBIND_REQ TOUTSTATE TS_DATA_XFER])
 AT_CHECK([test_sctp_t 13.13.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.13.2.5])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors TS_UNBIND_REQ TOUTSTATE TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 13.13.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.13.2.6])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors TS_UNBIND_REQ TOUTSTATE TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 13.13.2.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.13.3])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_UNBIND_REQ TSYSERR])
 AT_CHECK([test_sctp_t 13.13.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.14.1.1])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_UNITDATA_REQ EPROTO TS_UNBND])
 AT_CHECK([test_sctp_t 13.14.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 13.14.2])
-AT_KEYWORDS([tpi sctp errors])
+AT_KEYWORDS([errors T_UNITDATA_REQ EPROTO])
 AT_CHECK([test_sctp_t 13.14.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.1.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_ADDR_REQ TS_UNBND])
 AT_CHECK([test_sctp_t 14.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.1.2])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_ADDR_REQ TS_IDLE])
 AT_CHECK([test_sctp_t 14.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.1.3])
-AT_KEYWORDS([tpi sctp allowedstates])
-AT_XFAIL_IF([true])
+AT_KEYWORDS([allowedstates T_ADDR_REQ TS_WCON_CREQ])
 AT_CHECK([test_sctp_t 14.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.1.4])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_ADDR_REQ TS_WRES_CIND])
 AT_CHECK([test_sctp_t 14.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.1.5])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_ADDR_REQ TS_DATA_XFER])
 AT_CHECK([test_sctp_t 14.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.1.6])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_ADDR_REQ TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 14.1.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.1.7])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_ADDR_REQ TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 14.1.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.2.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_BIND_REQ TS_UNBND])
 AT_CHECK([test_sctp_t 14.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.3.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_CAPABILITY_REQ TS_UNBND])
 AT_CHECK([test_sctp_t 14.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.3.2])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_CAPABILITY_REQ TS_IDLE])
 AT_CHECK([test_sctp_t 14.3.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.3.3])
-AT_KEYWORDS([tpi sctp allowedstates])
-AT_XFAIL_IF([true])
+AT_KEYWORDS([allowedstates T_CAPABILITY_REQ TS_WCON_CREQ])
 AT_CHECK([test_sctp_t 14.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.3.4])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_CAPABILITY_REQ TS_WRES_CIND])
 AT_CHECK([test_sctp_t 14.3.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.3.5])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_CAPABILITY_REQ TS_DATA_XFER])
 AT_CHECK([test_sctp_t 14.3.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.3.6])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_CAPABILITY_REQ TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 14.3.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.3.7])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_CAPABILITY_REQ TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 14.3.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.4.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_CONN_REQ TS_IDLE])
 AT_CHECK([test_sctp_t 14.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.5.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_CONN_RES TS_WRES_CIND])
 AT_CHECK([test_sctp_t 14.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.6.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_DATA_REQ TS_DATA_XFER])
 AT_CHECK([test_sctp_t 14.6.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.6.2])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_DATA_REQ TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 14.6.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.7.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_DISCON_REQ TS_WCON_CREQ])
 AT_XFAIL_IF([true])
 AT_CHECK([test_sctp_t 14.7.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.7.2])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_DISCON_REQ TS_WRES_CIND])
 AT_CHECK([test_sctp_t 14.7.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.7.3])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_DISCON_REQ TS_DATA_XFER])
 AT_CHECK([test_sctp_t 14.7.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.7.4])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_DISCON_REQ TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 14.7.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.7.5])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_DISCON_REQ TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 14.7.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.8.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_EXDATA_REQ TS_DATA_XFER])
+AT_XFAIL_IF([true])
 AT_CHECK([test_sctp_t 14.8.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.8.2])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_EXDATA_REQ TS_WREQ_ORDREL])
+AT_XFAIL_IF([true])
 AT_CHECK([test_sctp_t 14.8.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.9.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_INFO_REQ TS_UNBND])
 AT_CHECK([test_sctp_t 14.9.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.9.2])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_INFO_REQ TS_IDLE])
 AT_CHECK([test_sctp_t 14.9.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.9.3])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_INFO_REQ TS_WCON_CREQ])
 AT_XFAIL_IF([true])
 AT_CHECK([test_sctp_t 14.9.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.9.4])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_INFO_REQ TS_WRES_CIND])
 AT_CHECK([test_sctp_t 14.9.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.9.5])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_INFO_REQ TS_DATA_XFER])
 AT_CHECK([test_sctp_t 14.9.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.9.6])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_INFO_REQ TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 14.9.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.9.7])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_INFO_REQ TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 14.9.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.10.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_OPTDATA_REQ TS_DATA_XFER])
 AT_CHECK([test_sctp_t 14.10.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.10.2])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_OPTDATA_REQ TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 14.10.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.11.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_OPTMGMT_REQ TS_UNBND])
 AT_CHECK([test_sctp_t 14.11.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.11.2])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_OPTMGMT_REQ TS_IDLE])
 AT_CHECK([test_sctp_t 14.11.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.11.3])
-AT_KEYWORDS([tpi sctp allowedstates])
-AT_XFAIL_IF([true])
+AT_KEYWORDS([allowedstates T_OPTMGMT_REQ TS_WCON_CREQ])
 AT_CHECK([test_sctp_t 14.11.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.11.4])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_OPTMGMT_REQ TS_WRES_CIND])
 AT_CHECK([test_sctp_t 14.11.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.11.5])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_OPTMGMT_REQ TS_DATA_XFER])
 AT_CHECK([test_sctp_t 14.11.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.11.6])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_OPTMGMT_REQ TS_WIND_ORDREL])
 AT_CHECK([test_sctp_t 14.11.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.11.7])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_OPTMGMT_REQ TS_WRES_ORDREL])
 AT_CHECK([test_sctp_t 14.11.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.12.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_ORDREL_REQ TS_DATA_XFER])
 AT_CHECK([test_sctp_t 14.12.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.12.2])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_ORDREL_REQ TS_WREQ_ORDREL])
 AT_CHECK([test_sctp_t 14.12.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.13.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_UNBIND_REQ TS_IDLE])
 AT_CHECK([test_sctp_t 14.13.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sctp test 14.14.1])
-AT_KEYWORDS([tpi sctp allowedstates])
+AT_KEYWORDS([allowedstates T_UNITDATA_REQ TS_IDLE])
 AT_CHECK([test_sctp_t 14.14.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
