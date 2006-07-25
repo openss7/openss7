@@ -245,14 +245,14 @@ printit(struct sc_mlist *l, int cmd, int all)
 					fprintf(stdout, "     ");
 				}
 			} else {
-				fprintf(stdout, "           ");
+				fprintf(stdout, "            ");
 			}
 			if (l->mi[i].index != 0) {
 				fprintf(stdout, " %5u", l->mi[i].mi_idnum);
-				fprintf(stdout, " %6ld", (long) l->mi[i].mi_minpsz);
-				fprintf(stdout, " %6ld", (long) l->mi[i].mi_maxpsz);
-				fprintf(stdout, " %6ld", (long) l->mi[i].mi_hiwat);
-				fprintf(stdout, " %6ld", (long) l->mi[i].mi_lowat);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_minpsz);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_maxpsz);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_hiwat);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_lowat);
 				if (all) {
 					fprintf(stdout, " :");
 					if (l->mi[i].index & 0x8)
@@ -301,26 +301,26 @@ printit(struct sc_mlist *l, int cmd, int all)
 			if (i == 0) {
 				if (l->major != 0) {
 					fprintf(stdout, " driver");
-					fprintf(stdout, " %3ld", (long) l->major);
+					fprintf(stdout, " %4ld", (long) l->major);
 				} else {
 					fprintf(stdout, " module");
-					fprintf(stdout, "    ");
+					fprintf(stdout, "     ");
 				}
 			} else {
-				fprintf(stdout, "           ");
+				fprintf(stdout, "            ");
 			}
 			if (l->mi[i].index != 0) {
 				fprintf(stdout, " %5u", l->mi[i].mi_idnum);
-				fprintf(stdout, " %6ld", (long) l->mi[i].mi_minpsz);
-				fprintf(stdout, " %6ld", (long) l->mi[i].mi_maxpsz);
-				fprintf(stdout, " %6ld", (long) l->mi[i].mi_hiwat);
-				fprintf(stdout, " %6ld", (long) l->mi[i].mi_lowat);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_minpsz);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_maxpsz);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_hiwat);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_lowat);
 			} else {
 				fprintf(stdout, "      ");
-				fprintf(stdout, "       ");
-				fprintf(stdout, "       ");
-				fprintf(stdout, "       ");
-				fprintf(stdout, "       ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
 				l->mi[i].index = 0xf;
 			}
 			if (l->ms[i].index != 0) {
