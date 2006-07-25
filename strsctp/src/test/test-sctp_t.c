@@ -6033,7 +6033,11 @@ test_case_1_4_2(int child)
 	if (p->addr_ack.PRIM_type != T_ADDR_ACK)
 		goto failure;
 	state++;
-	if (p->addr_ack.LOCADDR_length != sizeof(struct sockaddr_in))
+	/* returns multiple addresses */
+	if (p->addr_ack.LOCADDR_length == 0)
+		goto failure;
+	state++;
+	if ((p->addr_ack.LOCADDR_length % sizeof(struct sockaddr_in)) != 0)
 		goto failure;
 	state++;
 	if (p->addr_ack.REMADDR_length != 0)
