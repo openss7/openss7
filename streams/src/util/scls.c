@@ -239,10 +239,10 @@ printit(struct sc_mlist *l, int cmd, int all)
 			if (i == 0) {
 				if (l->major != 0) {
 					fprintf(stdout, " driver");
-					fprintf(stdout, " %3ld", (long) l->major);
+					fprintf(stdout, " %4ld", (long) l->major);
 				} else {
 					fprintf(stdout, " module");
-					fprintf(stdout, "    ");
+					fprintf(stdout, "     ");
 				}
 			} else {
 				fprintf(stdout, "           ");
