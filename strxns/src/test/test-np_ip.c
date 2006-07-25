@@ -1882,6 +1882,84 @@ print_proto(char *pro_ptr, size_t pro_len)
 }
 
 void
+print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
+{
+	unsigned char *qos_ptr = (unsigned char *) (cmd_buf + qos_ofs);
+	union N_qos_ip_types *qos = (union N_qos_ip_types *) qos_ptr;
+	char buf[64];
+
+	if (qos_len) {
+		switch (qos->n_qos_type) {
+		case N_QOS_SEL_CONN_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_CONN_IP:");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_conn.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_conn.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_conn.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_conn.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " mtu = %ld,", (long) qos->n_qos_sel_conn.mtu);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_conn.saddr));
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " daddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_conn.daddr));
+			print_string(child, buf);
+			break;
+
+		case N_QOS_SEL_UD_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_UD_IP: ");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_ud.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_ud.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_ud.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_ud.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_ud.saddr));
+			print_string(child, buf);
+			break;
+
+		case N_QOS_SEL_INFO_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_INFO_IP: ");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_info.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_info.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_info.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_info.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " mtu = %ld,", (long) qos->n_qos_sel_info.mtu);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_info.saddr));
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " daddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_info.daddr));
+			print_string(child, buf);
+			break;
+
+		case N_QOS_RANGE_INFO_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_RANGE_INFO_IP: ");
+			print_string(child, buf);
+			break;
+
+		default:
+			snprintf(buf, sizeof(buf), "(unknown qos structure %lu)\n", (ulong) qos->n_qos_type);
+			print_string(child, buf);
+			break;
+		}
+	} else {
+		snprintf(buf, sizeof(buf), "(no qos)");
+		print_string(child, buf);
+	}
+}
+
+void
 print_size(ulong size)
 {
 	switch (size) {
@@ -2633,6 +2711,7 @@ print_opt_value(int child, struct t_opthdr *oh)
 }
 #endif
 
+#if 0
 void
 print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 {
@@ -2710,6 +2789,7 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 		print_string(child, buf);
 	}
 }
+#endif
 
 void
 print_info(int child, N_info_ack_t *info)
@@ -4211,6 +4291,7 @@ test_msleep(int child, unsigned long m)
  *
  *  -------------------------------------------------------------------------
  */
+
 static int
 preamble_0(int child)
 {
