@@ -2193,7 +2193,7 @@ EXPORT_SYMBOL_NOVERS(lis_spin_lock_irq_fcn);
 _RP void
 lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flagp, char *file, int line)
 {
-	unsigned long flags;
+	unsigned long flags = 0;
 
 	WARNF(spin_lock_str((spinlock_t *) lock->spin_lock_mem, flags), file, line);
 	*flagp = flags;
@@ -2275,7 +2275,7 @@ EXPORT_SYMBOL_NOVERS(lis_rw_read_lock_irq_fcn);
 _RP void
 lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line)
 {
-	unsigned long flags;
+	unsigned long flags = 0;
 
 	WARNF(read_lock_str((rwlock_t *) lock->rw_lock_mem, flags), file, line);
 	*flagp = flags;
@@ -2322,7 +2322,7 @@ EXPORT_SYMBOL_NOVERS(lis_rw_write_lock_irq_fcn);
 _RP void
 lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line)
 {
-	unsigned long flags;
+	unsigned long flags = 0;
 
 	WARNF(write_lock_str((rwlock_t *) lock->rw_lock_mem, flags), file, line);
 	*flagp = flags;

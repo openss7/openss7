@@ -162,7 +162,7 @@ MPSTR_QLOCK(queue_t *q)
 	}
 	return (q->q_klock.kl_isrflags);
 #else
-	unsigned long flags;
+	unsigned long flags = 0;
 
 	write_lock_str(&q->q_lock, flags);
 	return (flags);
@@ -232,7 +232,7 @@ MPSTR_STPLOCK(struct stdata *sd)
 	}
 	return (sd->sd_klock.kl_isrflags);
 #else
-	unsigned long flags;
+	unsigned long flags = 0;
 	write_lock_str(&sd->sd_lock, flags);
 	return (flags);
 #endif
