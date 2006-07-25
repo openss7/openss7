@@ -364,17 +364,17 @@ AC_DEFUN([_SS7_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=180
+    strconf_cv_midbase=90
+    if test ${streams_cv_package:-LfS} = LfS ; then
+	if test ${linux_cv_minorbits:-8} -gt 8 ; then
 dnl
 dnl Tired of device conflicts on 2.6 kernels.
 dnl
-    if test ${linux_cv_minorbits:-8} -gt 8 ; then
-	((strconf_cv_majbase+=2000))
-    fi
-    strconf_cv_midbase=90
+	    ((strconf_cv_majbase+=2000))
+	fi
 dnl
 dnl Get these away from device numbers.
 dnl
-    if test ${streams_cv_package:-LfS} = LfS ; then
 	((strconf_cv_midbase+=5000))
     fi
     strconf_cv_config='strconf.h'

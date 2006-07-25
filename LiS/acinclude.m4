@@ -1573,12 +1573,6 @@ AC_DEFUN([_LIS_STRCONF], [dnl
     esac
     strconf_cv_input='Config.master'
     strconf_cv_majbase=231
-dnl
-dnl Tired of device conflicts on 2.6 kernels.
-dnl
-    if test ${linux_cv_minorbits:-8} -gt 8 ; then
-	((strconf_cv_majbase+=2000))
-    fi
     strconf_cv_midbase=1
     strconf_cv_config='include/sys/LiS/config.h'
     strconf_cv_modconf='head/modconf.inc'

@@ -1454,13 +1454,17 @@ AC_DEFUN([_LFS_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=231
+    strconf_cv_midbase=1
+    if test ${linux_cv_minorbits:-8} -gt 8 ; then
 dnl
 dnl Tired of device conflicts on 2.6 kernels.
 dnl
-    if test ${linux_cv_minorbits:-8} -gt 8 ; then
 	((strconf_cv_majbase+=2000))
     fi
-    strconf_cv_midbase=5001
+dnl
+dnl Get these away from device numbers.
+dnl
+    ((strconf_cv_midbase+=5000))
     strconf_cv_config='include/sys/config.h'
     strconf_cv_modconf='modconf.h'
     strconf_cv_drvconf='drvconf.mk'
