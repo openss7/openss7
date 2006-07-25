@@ -822,8 +822,13 @@ struct {
  * management options
  */
 struct {
+#if 0
+	struct t_opthdr xdb_hdr;
+	t_uscalar_t xdb_val;
+#else
 	struct t_opthdr dbg_hdr;
 	t_uscalar_t dbg_val;
+#endif
 	struct t_opthdr lin_hdr;
 	struct t_linger lin_val;
 	struct t_opthdr rbf_hdr;
