@@ -55,7 +55,11 @@
 static char const ident[] =
     "$RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $";
 
-#include "sctp_compat.h"
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/compiler.h>
+#include <linux/types.h>
+
 #include "sctp_sha1.h"
 
 /* 

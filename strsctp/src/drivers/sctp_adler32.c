@@ -58,7 +58,11 @@ static char const ident[] =
 #undef _DEBUG
 #undef SCTP_CONFIG_DEBUG
 
-#include "sctp_compat.h"
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/compiler.h>
+#include <linux/types.h>
+
 #include "sctp_adler32.h"
 
 /*
