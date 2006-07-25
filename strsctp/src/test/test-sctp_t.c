@@ -147,6 +147,7 @@ static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.
 #include <xti_inet.h>
 #include <sys/xti_sctp.h>
 
+#if 1
 #define SCTP_VERSION_2 1
 
 #ifndef SCTP_VERSION_2
@@ -159,6 +160,7 @@ typedef struct sctp_addr {
 #	define sctp_addr_t sctp_addr_t
 #   endif			/* sctp_addr_t */
 #endif				/* SCTP_VERSION_2 */
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -257,12 +259,14 @@ int flags = 0;
 
 int dummy = 0;
 
+#if 1
 #ifndef SCTP_VERSION_2
 typedef struct addr {
 	uint16_t port __attribute__ ((packed));
 	struct in_addr addr[3] __attribute__ ((packed));
 } addr_t;
 #endif				/* SCTP_VERSION_2 */
+#endif
 
 struct timeval when;
 
@@ -543,11 +547,15 @@ stop_tt(void)
 /*
  *  Addresses
  */
+#if 1
 #ifndef SCTP_VERSION_2
 addr_t addrs[4];
 #else				/* SCTP_VERSION_2 */
 struct sockaddr_in addrs[4][3];
 #endif				/* SCTP_VERSION_2 */
+#else
+struct sockaddr_in addrs[4];
+#endif
 unsigned short ports[4] = { 10000, 10001, 10002, 10003 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
@@ -559,6 +567,7 @@ const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.
  * data options
  */
 struct {
+#if 1
 	struct t_opthdr tos_hdr;
 	union {
 		unsigned char opt_val;
@@ -569,35 +578,43 @@ struct {
 		unsigned char opt_val;
 		t_scalar_t opt_fil;
 	} ttl_val;
+#endif
 	struct t_opthdr drt_hdr;
 	t_scalar_t drt_val;
 #if 0
 	struct t_opthdr csm_hdr;
 	t_scalar_t csm_val;
 #endif
+#if 1
 	struct t_opthdr ppi_hdr;
 	t_uscalar_t ppi_val;
 	struct t_opthdr sid_hdr;
 	t_scalar_t sid_val;
+#endif
 } opt_data = {
+#if 1
 	{
 	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, {
 	.opt_val = 0x0}
 	, {
 	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, {
-	.opt_val = 64}
-	, {
+	.opt_val = 64},
+#endif
+	{
 	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 #if 0
 	    , {
 	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}
 	, T_NO
 #endif
+#if 1
 	    , {
 	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}
 	, 10, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}
-, 0};
+	, 0
+#endif
+};
 
 /*
  * connect options
@@ -631,10 +648,12 @@ struct {
 	t_scalar_t bca_val;
 	struct t_opthdr reu_hdr;
 	t_scalar_t reu_val;
+#if 1
 	struct t_opthdr ist_hdr;
 	t_scalar_t ist_val;
 	struct t_opthdr ost_hdr;
 	t_scalar_t ost_val;
+#endif
 } opt_conn = {
 	{
 	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}
@@ -659,18 +678,22 @@ struct {
 	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO, {
 	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO, {
 	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}
-	, T_NO, {
+	, T_NO
+#if 1
+	    , {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}
 	, 1, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}
-, 1};
+	, 1
+#endif
+};
 
 /*
  * management options
  */
 struct {
-	struct t_opthdr xdb_hdr;
-	t_uscalar_t xdb_val;
+	struct t_opthdr dbg_hdr;
+	t_uscalar_t dbg_val;
 	struct t_opthdr lin_hdr;
 	struct t_linger lin_val;
 	struct t_opthdr rbf_hdr;
@@ -700,13 +723,18 @@ struct {
 #if 0
 	struct t_opthdr csm_hdr;
 	t_scalar_t csm_val;
+#endif
+#if 0
 	struct t_opthdr ndl_hdr;
 	t_scalar_t ndl_val;
 	struct t_opthdr mxs_hdr;
 	t_scalar_t mxs_val;
+#endif
+#if 0
 	struct t_opthdr kpa_hdr;
 	struct t_kpalive kpa_val;
 #endif
+#if 1
 	struct t_opthdr nod_hdr;
 	t_scalar_t nod_val;
 	struct t_opthdr crk_hdr;
@@ -747,6 +775,7 @@ struct {
 	t_scalar_t mac_val;
 	struct t_opthdr dbg_hdr;
 	t_scalar_t dbg_val;
+#endif
 } opt_optm = {
 	{
 	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}
@@ -781,10 +810,14 @@ struct {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}
 	, T_NO, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}
-	, 576, {
+	, 576
+#endif
+#if 0
+	    , {
 	sizeof(struct t_opthdr) + sizeof(struct t_kpalive), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, {
 	T_NO, 0}
 #endif
+#if 1
 	, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}
 	, T_YES, {
@@ -825,7 +858,9 @@ struct {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE, T_SUCCESS}
 	, T_SCTP_HMAC_NONE, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}
-, 0};
+	, 0
+#endif
+};
 
 struct t_opthdr *
 find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
@@ -1185,6 +1220,175 @@ terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 
 		snprintf(buf, sizeof(buf), "[%lu]", (ulong) terr);
 		return buf;
+	}
+	}
+}
+
+#define ICMP_ECHOREPLY		0	/* Echo Reply			*/
+#define ICMP_DEST_UNREACH	3	/* Destination Unreachable	*/
+#define ICMP_SOURCE_QUENCH	4	/* Source Quench		*/
+#define ICMP_REDIRECT		5	/* Redirect (change route)	*/
+#define ICMP_ECHO		8	/* Echo Request			*/
+#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded		*/
+#define ICMP_PARAMETERPROB	12	/* Parameter Problem		*/
+#define ICMP_TIMESTAMP		13	/* Timestamp Request		*/
+#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply		*/
+#define ICMP_INFO_REQUEST	15	/* Information Request		*/
+#define ICMP_INFO_REPLY		16	/* Information Reply		*/
+#define ICMP_ADDRESS		17	/* Address Mask Request		*/
+#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply		*/
+#define NR_ICMP_TYPES		18
+
+/* Codes for UNREACH. */
+#define ICMP_NET_UNREACH	0	/* Network Unreachable		*/
+#define ICMP_HOST_UNREACH	1	/* Host Unreachable		*/
+#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable		*/
+#define ICMP_PORT_UNREACH	3	/* Port Unreachable		*/
+#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set	*/
+#define ICMP_SR_FAILED		5	/* Source Route failed		*/
+#define ICMP_NET_UNKNOWN	6
+#define ICMP_HOST_UNKNOWN	7
+#define ICMP_HOST_ISOLATED	8
+#define ICMP_NET_ANO		9
+#define ICMP_HOST_ANO		10
+#define ICMP_NET_UNR_TOS	11
+#define ICMP_HOST_UNR_TOS	12
+#define ICMP_PKT_FILTERED	13	/* Packet filtered */
+#define ICMP_PREC_VIOLATION	14	/* Precedence violation */
+#define ICMP_PREC_CUTOFF	15	/* Precedence cut off */
+#define NR_ICMP_UNREACH		15	/* instead of hardcoding immediate value */
+
+/* Codes for REDIRECT. */
+#define ICMP_REDIR_NET		0	/* Redirect Net			*/
+#define ICMP_REDIR_HOST		1	/* Redirect Host		*/
+#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS		*/
+#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS	*/
+
+/* Codes for TIME_EXCEEDED. */
+#define ICMP_EXC_TTL		0	/* TTL count exceeded		*/
+#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded	*/
+
+char *
+etype_string(t_uscalar_t etype)
+{
+	switch (etype) {
+	case TBADADDR:
+		return ("[TBADADDR]");
+	case TBADOPT:
+		return ("[TBADOPT]");
+	case TACCES:
+		return ("[TACCES]");
+	case TBADF:
+		return ("[TBADF]");
+	case TNOADDR:
+		return ("[TNOADDR]");
+	case TOUTSTATE:
+		return ("[TOUTSTATE]");
+	case TBADSEQ:
+		return ("[TBADSEQ]");
+	case TSYSERR:
+		return ("[TSYSERR]");
+	case TLOOK:
+		return ("[TLOOK]");
+	case TBADDATA:
+		return ("[TBADDATA]");
+	case TBUFOVFLW:
+		return ("[TBUFOVFLW]");
+	case TFLOW:
+		return ("[TFLOW]");
+	case TNODATA:
+		return ("[TNODATA]");
+	case TNODIS:
+		return ("[TNODIS]");
+	case TNOUDERR:
+		return ("[TNOUDERR]");
+	case TBADFLAG:
+		return ("[TBADFLAG]");
+	case TNOREL:
+		return ("[TNOREL]");
+	case TNOTSUPPORT:
+		return ("[TNOTSUPPORT]");
+	case TSTATECHNG:
+		return ("[TSTATECHNG]");
+	case TNOSTRUCTYPE:
+		return ("[TNOSTRUCTYPE]");
+	case TBADNAME:
+		return ("[TBADNAME]");
+	case TBADQLEN:
+		return ("[TBADQLEN]");
+	case TADDRBUSY:
+		return ("[TADDRBUSY]");
+	case TINDOUT:
+		return ("[TINDOUT]");
+	case TPROVMISMATCH:
+		return ("[TPROVMISMATCH]");
+	case TRESQLEN:
+		return ("[TRESQLEN]");
+	case TRESADDR:
+		return ("[TRESADDR]");
+	case TQFULL:
+		return ("[TQFULL]");
+	case TPROTO:
+		return ("[TPROTO]");
+	default:
+	{
+		unsigned char code = ((etype >> 0) & 0x00ff);
+		unsigned char type = ((etype >> 8) & 0x00ff);
+
+		switch (type) {
+		case ICMP_DEST_UNREACH:
+			switch (code) {
+			case ICMP_NET_UNREACH:
+				return ("<ICMP_NET_UNREACH>");
+			case ICMP_HOST_UNREACH:
+				return ("<ICMP_HOST_UNREACH>");
+			case ICMP_PROT_UNREACH:
+				return ("<ICMP_PROT_UNREACH>");
+			case ICMP_PORT_UNREACH:
+				return ("<ICMP_PORT_UNREACH>");
+			case ICMP_FRAG_NEEDED:
+				return ("<ICMP_FRAG_NEEDED>");
+			case ICMP_NET_UNKNOWN:
+				return ("<ICMP_NET_UNKNOWN>");
+			case ICMP_HOST_UNKNOWN:
+				return ("<ICMP_HOST_UNKNOWN>");
+			case ICMP_HOST_ISOLATED:
+				return ("<ICMP_HOST_ISOLATED>");
+			case ICMP_NET_ANO:
+				return ("<ICMP_NET_ANO>");
+			case ICMP_HOST_ANO:
+				return ("<ICMP_HOST_ANO>");
+			case ICMP_PKT_FILTERED:
+				return ("<ICMP_PKT_FILTERED>");
+			case ICMP_PREC_VIOLATION:
+				return ("<ICMP_PREC_VIOLATION>");
+			case ICMP_PREC_CUTOFF:
+				return ("<ICMP_PREC_CUTOFF>");
+			case ICMP_SR_FAILED:
+				return ("<ICMP_SR_FAILED>");
+			case ICMP_NET_UNR_TOS:
+				return ("<ICMP_NET_UNR_TOS>");
+			case ICMP_HOST_UNR_TOS:
+				return ("<ICMP_HOST_UNR_TOS>");
+			default:
+				return ("<ICMP_DEST_UNREACH?>");
+			}
+		case ICMP_SOURCE_QUENCH:
+			return ("<ICMP_SOURCE_QUENCH>");
+		case ICMP_TIME_EXCEEDED:
+			switch (code) {
+			case ICMP_EXC_TTL:
+				return ("<ICMP_EXC_TTL>");
+			case ICMP_EXC_FRAGTIME:
+				return ("<ICMP_EXC_FRAGTIME>");
+			default:
+				return ("<ICMP_TIME_EXCEEDED?>");
+			}
+		case ICMP_PARAMETERPROB:
+			return ("<ICMP_PARAMETERPROB>");
+		default:
+			return ("<ICMP_???? >");
+		}
 	}
 	}
 }
@@ -1959,7 +2163,9 @@ value_string(int child, struct t_opthdr *oh)
 		case T_SCTP_PPI:
 			return number_string(oh);;
 		case T_SCTP_SID:
+#if 1
 			sid[child] = *((t_uscalar_t *) T_OPT_DATA(oh));
+#endif
 			return number_string(oh);;
 		case T_SCTP_SSN:
 		case T_SCTP_TSN:
@@ -2017,6 +2223,7 @@ value_string(int child, struct t_opthdr *oh)
 	return ("(unknown value)");
 }
 
+#if 1
 void
 parse_options(int fd, char *opt_ptr, size_t opt_len)
 {
@@ -2044,6 +2251,7 @@ parse_options(int fd, char *opt_ptr, size_t opt_len)
 		}
 	}
 }
+#endif
 
 char *
 mgmtflag_string(t_uscalar_t flag)
@@ -3551,7 +3759,10 @@ do_signal(int child, int action)
 		p->conn_ind.OPT_length = 0;
 		p->conn_ind.OPT_offset = 0;
 		p->conn_ind.SEQ_number = last_sequence;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Connection indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3586,7 +3797,10 @@ do_signal(int child, int action)
 		p->conn_con.RES_offset = 0;
 		p->conn_con.OPT_length = 0;
 		p->conn_con.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Connection confirmation test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3609,7 +3823,10 @@ do_signal(int child, int action)
 		p->discon_ind.PRIM_type = T_DISCON_IND;
 		p->discon_ind.DISCON_reason = 0;
 		p->discon_ind.SEQ_number = last_sequence;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Disconnection indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3630,7 +3847,10 @@ do_signal(int child, int action)
 		ctrl->len = sizeof(p->data_ind);
 		p->data_ind.PRIM_type = T_DATA_IND;
 		p->data_ind.MORE_flag = MORE_flag;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Normal test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3651,7 +3871,10 @@ do_signal(int child, int action)
 		ctrl->len = sizeof(p->exdata_ind);
 		p->data_ind.PRIM_type = T_EXDATA_IND;
 		p->data_ind.MORE_flag = MORE_flag;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Expedited test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		print_tx_prim(child, prim_string(p->type));
@@ -3780,7 +4003,10 @@ do_signal(int child, int action)
 		p->unitdata_ind.SRC_offset = 0;
 		p->unitdata_ind.OPT_length = 0;
 		p->unitdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Unit test data indication.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3844,7 +4070,10 @@ do_signal(int child, int action)
 	case __TEST_ORDREL_IND:
 		ctrl->len = sizeof(p->ordrel_ind);
 		p->ordrel_ind.PRIM_type = T_ORDREL_IND;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Orderly release indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3883,7 +4112,10 @@ do_signal(int child, int action)
 		p->optdata_ind.DATA_flag = 0;
 		p->optdata_ind.OPT_length = 0;
 		p->optdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Option data indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
@@ -3898,7 +4130,10 @@ do_signal(int child, int action)
 		p->optdata_ind.DATA_flag = T_ODF_EX;
 		p->optdata_ind.OPT_length = 0;
 		p->optdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Option data indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
@@ -4372,6 +4607,13 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 		case T_UDERROR_IND:
 			event = __TEST_UDERROR_IND;
 			print_rx_prim(child, prim_string(p->type));
+#ifndef SCTP_VERSION_2
+			print_string(child, addr_string(cbuf + p->uderror_ind.DEST_offset, p->uderror_ind.DEST_length));
+#else
+			print_addrs(child, cbuf + p->uderror_ind.DEST_offset, p->uderror_ind.DEST_length);
+#endif
+			print_options(child, cbuf, p->uderror_ind.OPT_offset, p->uderror_ind.OPT_length);
+			print_string(child, etype_string(p->uderror_ind.ERROR_type));
 			break;
 		case T_OPTMGMT_ACK:
 			event = __TEST_OPTMGMT_ACK;
@@ -5080,6 +5322,7 @@ postamble_2_list(int child)
 	return (__RESULT_FAILURE);
 }
 
+#if 1
 static int
 preamble_2b_conn(int child)
 {
@@ -5406,6 +5649,7 @@ preamble_8_resp(int child)
 	opt_optm.mac_val = T_SCTP_HMAC_MD5;
 	return preamble_1(child);
 }
+#endif
 
 /*
  *  =========================================================================
@@ -5504,25 +5748,25 @@ test_case_1_2(int child)
 	state++;
 	switch (test_level) {
 	case T_INET_IP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -5535,25 +5779,25 @@ test_case_1_2(int child)
 			goto failure;
 		break;
 	case T_INET_UDP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -5609,7 +5853,7 @@ test_case_1_2(int child)
 		if (last_info.DDATA_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != T_INFINITE && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
 		if (last_info.OPT_size != T_INFINITE)
@@ -5691,25 +5935,25 @@ test_case_1_3_1(int child)
 	state++;
 	switch (test_level) {
 	case T_INET_IP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65515)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65515)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -5722,25 +5966,25 @@ test_case_1_3_1(int child)
 			goto failure;
 		break;
 	case T_INET_UDP:
-		if (last_info.TSDU_size != 65535)
+		if (last_info.TSDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.ETSDU_size != T_INVALID)
 			goto failure;
 		state++;
-		if (last_info.CDATA_size != T_INVALID)
+		if (last_info.CDATA_size != T_INVALID && last_info.CDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.DDATA_size != T_INVALID)
+		if (last_info.DDATA_size != T_INVALID && last_info.DDATA_size != 65507)
 			goto failure;
 		state++;
-		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in) && last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
 			goto failure;
 		state++;
-		if (last_info.OPT_size != T_INFINITE)
+		if (last_info.OPT_size != T_INFINITE && last_info.OPT_size != 65535)
 			goto failure;
 		state++;
-		if (last_info.TIDU_size != 65535)
+		if (last_info.TIDU_size != 65507)
 			goto failure;
 		state++;
 		if (last_info.SERV_type != T_CLTS)
@@ -6058,12 +6302,12 @@ test_case_1_4_2(int child)
 	if (p->addr_ack.PRIM_type != T_ADDR_ACK)
 		goto failure;
 	state++;
-	if (p->addr_ack.LOCADDR_length == 0)
-		goto failure;
-	state++;
 	switch (test_level) {
 	case T_INET_SCTP:
 		/* SCTP returns multiple addresses */
+		if (p->addr_ack.LOCADDR_length == 0)
+			goto failure;
+		state++;
 		if ((p->addr_ack.LOCADDR_length % sizeof(struct sockaddr_in)) != 0)
 			goto failure;
 		break;
@@ -16085,7 +16329,9 @@ test_case_1_9_2(int child)
 #if 0
 		struct t_opthdr opt_hdr3;
 #endif
+#if 1
 		struct t_opthdr opt_hdr4;
+#endif
 #if 0
 		struct t_opthdr opt_hdr5;
 #endif
@@ -16097,11 +16343,15 @@ test_case_1_9_2(int child)
 #if 0
 		, {
 		sizeof(struct t_opthdr), T_INET_UDP, T_ALLOPT, T_SUCCESS}
+#endif
+#if 0
 		, {
 		sizeof(struct t_opthdr), T_INET_TCP, T_ALLOPT, T_SUCCESS}
 #endif
+#if 1
 		, {
 		sizeof(struct t_opthdr), T_INET_SCTP, T_ALLOPT, T_SUCCESS}
+#endif
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -17634,9 +17884,9 @@ int
 postamble_2_2(int child)
 {
 	if (last_info.SERV_type == T_CLTS)
-		return postamble_1(child);
-	else
 		return postamble_0(child);
+	else
+		return postamble_1(child);
 }
 
 #define preamble_2_2_conn	preamble_1s
@@ -21866,7 +22116,7 @@ test_case_3_1_conn(int child)
 		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 			goto failure;
 		state++;
-		if (expect(child, LONGER_WAIT << 2, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 			goto failure;
 		break;
 	default:
@@ -21905,11 +22155,11 @@ test_case_3_1_list(int child)
 }
 
 #define preamble_3_1_conn	preamble_1s
-#define preamble_3_1_resp	preamble_0
+#define preamble_3_1_resp	preamble_1s
 #define preamble_3_1_list	preamble_0
 
 #define postamble_3_1_conn	postamble_1
-#define postamble_3_1_resp	postamble_0
+#define postamble_3_1_resp	postamble_1
 #define postamble_3_1_list	postamble_0
 
 struct test_stream test_3_1_conn = { &preamble_3_1_conn, &test_case_3_1_conn, &postamble_3_1_conn };
@@ -22955,11 +23205,18 @@ test_case_4_1_3_list(int child)
 	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	expect(child, LONG_WAIT, __EVENT_NO_MSG);
+	switch (last_event) {
+	case __EVENT_NO_MSG:
+		state++;
+		if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case __TEST_DISCON_IND:
+		break;
+	default:
 		goto failure;
-	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		goto failure;
+	}
 	state++;
 	expect(child, LONG_WAIT, __EVENT_NO_MSG);
 	switch (last_event) {
@@ -23558,7 +23815,7 @@ test_case_4_1_7_conn_part(int child)
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT << 1, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, LONG_WAIT);
@@ -23573,7 +23830,7 @@ test_case_4_1_7_resp_part(int child)
 {
 	test_msleep(child, LONG_WAIT);
 	state++;
-	if (expect(child, LONGER_WAIT << 3, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, SHORT_WAIT);
@@ -28051,6 +28308,7 @@ struct test_stream test_5_4_conn = { &preamble_5_4_conn, &test_case_5_4_conn, &p
 struct test_stream test_5_4_resp = { &preamble_5_4_resp, &test_case_5_4_resp, &postamble_5_4_resp };
 struct test_stream test_5_4_list = { &preamble_5_4_list, &test_case_5_4_list, &postamble_5_4_list };
 
+#if 1
 /*
  *  Accept a connection.
  */
@@ -28315,7 +28573,9 @@ test_case_5_5_3_list(int child)
 struct test_stream test_5_5_3_conn = { &preamble_5_5_3_conn, &test_case_5_5_3_conn, &postamble_5_5_3_conn };
 struct test_stream test_5_5_3_resp = { &preamble_5_5_3_resp, &test_case_5_5_3_resp, &postamble_5_5_3_resp };
 struct test_stream test_5_5_3_list = { &preamble_5_5_3_list, &test_case_5_5_3_list, &postamble_5_5_3_list };
+#endif
 
+#if 1
 /*
  *  Connect with data.
  */
@@ -28669,7 +28929,9 @@ test_case_6_3_list(int child)
 struct test_stream test_6_3_conn = { &preamble_6_3_conn, &test_case_6_3_conn, &postamble_6_3_conn };
 struct test_stream test_6_3_resp = { &preamble_6_3_resp, &test_case_6_3_resp, &postamble_6_3_resp };
 struct test_stream test_6_3_list = { &preamble_6_3_list, &test_case_6_3_list, &postamble_6_3_list };
+#endif
 
+#if 1
 /*
  *  Test fragmentation by sending very large packets.
  */
@@ -28889,7 +29151,9 @@ test_case_7_2_list(int child)
 struct test_stream test_7_2_conn = { &preamble_7_2_conn, &test_case_7_2_conn, &postamble_7_2_conn };
 struct test_stream test_7_2_resp = { &preamble_7_2_resp, &test_case_7_2_resp, &postamble_7_2_resp };
 struct test_stream test_7_2_list = { &preamble_7_2_list, &test_case_7_2_list, &postamble_7_2_list };
+#endif
 
+#if 1
 /*
  *  Connect with transfer data and orderly release.
  */
@@ -29355,7 +29619,9 @@ test_case_8_4_list(int child)
 struct test_stream test_8_4_conn = { &preamble_8_4_conn, &test_case_8_4_conn, &postamble_8_4_conn };
 struct test_stream test_8_4_resp = { &preamble_8_4_resp, &test_case_8_4_resp, &postamble_8_4_resp };
 struct test_stream test_8_4_list = { &preamble_8_4_list, &test_case_8_4_list, &postamble_8_4_list };
+#endif
 
+#if 1
 /*
  *  Delivering ordered data under noise.
  */
@@ -29926,7 +30192,9 @@ test_case_9_4_list(int child)
 struct test_stream test_9_4_conn = { &preamble_9_4_conn, &test_case_9_4_conn, &postamble_9_4_conn };
 struct test_stream test_9_4_resp = { &preamble_9_4_resp, &test_case_9_4_resp, &postamble_9_4_resp };
 struct test_stream test_9_4_list = { &preamble_9_4_list, &test_case_9_4_list, &postamble_9_4_list };
+#endif
 
+#if 1
 /*
  *  Data for destination failure testing.
  */
@@ -30141,6 +30409,7 @@ test_case_10_2_list(int child)
 struct test_stream test_10_2_conn = { &preamble_10_2_conn, &test_case_10_2_conn, &postamble_10_2_conn };
 struct test_stream test_10_2_resp = { &preamble_10_2_resp, &test_case_10_2_resp, &postamble_10_2_resp };
 struct test_stream test_10_2_list = { &preamble_10_2_list, &test_case_10_2_list, &postamble_10_2_list };
+#endif
 
 #define test_group_11_1 "Primitives in error -- too short"
 
@@ -34487,7 +34756,7 @@ int
 test_case_13_5_4_list(int child)
 {
 	/* LiS has a bug where it passes a zero length data message. */
-	test_data = "";
+	test_data = "data";
 	test_opts = NULL;
 	test_olen = 0;
 	test_resfd = test_fd[1];
@@ -40748,22 +41017,29 @@ struct test_case {
 	&test_5_3_conn, &test_5_3_resp, &test_5_3_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_4, tgrp_case_5_4, name_case_5_4, desc_case_5_4, sref_case_5_4, {
 	&test_5_4_conn, &test_5_4_resp, &test_5_4_list}, &begin_tests, &end_tests, 0, 0}, {
+#if 1
 		numb_case_5_5_1, tgrp_case_5_5_1, name_case_5_5_1, desc_case_5_5_1, sref_case_5_5_1, {
 	&test_5_5_1_conn, &test_5_5_1_resp, &test_5_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_5_2, tgrp_case_5_5_2, name_case_5_5_2, desc_case_5_5_2, sref_case_5_5_2, {
 	&test_5_5_2_conn, &test_5_5_2_resp, &test_5_5_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_5_3, tgrp_case_5_5_3, name_case_5_5_3, desc_case_5_5_3, sref_case_5_5_3, {
 	&test_5_5_3_conn, &test_5_5_3_resp, &test_5_5_3_list}, &begin_tests, &end_tests, 0, 0}, {
+#endif
+#if 1
 		numb_case_6_1, tgrp_case_6_1, name_case_6_1, desc_case_6_1, sref_case_6_1, {
 	&test_6_1_conn, &test_6_1_resp, &test_6_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_6_2, tgrp_case_6_2, name_case_6_2, desc_case_6_2, sref_case_6_2, {
 	&test_6_2_conn, &test_6_2_resp, &test_6_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_6_3, tgrp_case_6_3, name_case_6_3, desc_case_6_3, sref_case_6_3, {
 	&test_6_3_conn, &test_6_3_resp, &test_6_3_list}, &begin_tests, &end_tests, 0, 0}, {
+#endif
+#if 1
 		numb_case_7_1, tgrp_case_7_1, name_case_7_1, desc_case_7_1, sref_case_7_1, {
 	&test_7_1_conn, &test_7_1_resp, &test_7_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_7_2, tgrp_case_7_2, name_case_7_2, desc_case_7_2, sref_case_7_2, {
 	&test_7_2_conn, &test_7_2_resp, &test_7_2_list}, &begin_tests, &end_tests, 0, 0}, {
+#endif
+#if 1
 		numb_case_8_1, tgrp_case_8_1, name_case_8_1, desc_case_8_1, sref_case_8_1, {
 	&test_8_1_conn, &test_8_1_resp, &test_8_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_2, tgrp_case_8_2, name_case_8_2, desc_case_8_2, sref_case_8_2, {
@@ -40772,6 +41048,8 @@ struct test_case {
 	&test_8_3_conn, &test_8_3_resp, &test_8_3_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_4, tgrp_case_8_4, name_case_8_4, desc_case_8_4, sref_case_8_4, {
 	&test_8_4_conn, &test_8_4_resp, &test_8_4_list}, &begin_tests, &end_tests, 0, 0}, {
+#endif
+#if 1
 		numb_case_9_1, tgrp_case_9_1, name_case_9_1, desc_case_9_1, sref_case_9_1, {
 	&test_9_1_conn, &test_9_1_resp, &test_9_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_9_2, tgrp_case_9_2, name_case_9_2, desc_case_9_2, sref_case_9_2, {
@@ -40780,10 +41058,13 @@ struct test_case {
 	&test_9_3_conn, &test_9_3_resp, &test_9_3_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_9_4, tgrp_case_9_4, name_case_9_4, desc_case_9_4, sref_case_9_4, {
 	&test_9_4_conn, &test_9_4_resp, &test_9_4_list}, &begin_tests, &end_tests, 0, 0}, {
+#endif
+#if 1
 		numb_case_10_1, tgrp_case_10_1, name_case_10_1, desc_case_10_1, sref_case_10_1, {
 	&test_10_1_conn, &test_10_1_resp, &test_10_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_10_2, tgrp_case_10_2, name_case_10_2, desc_case_10_2, sref_case_10_2, {
 	&test_10_2_conn, &test_10_2_resp, &test_10_2_list}, &begin_tests, &end_tests, 0, 0}, {
+#endif
 		numb_case_11_1_1, tgrp_case_11_1_1, name_case_11_1_1, desc_case_11_1_1, sref_case_11_1_1, {
 	&test_11_1_1_conn, &test_11_1_1_resp, &test_11_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_11_1_2, tgrp_case_11_1_2, name_case_11_1_2, desc_case_11_1_2, sref_case_11_1_2, {
