@@ -72,6 +72,10 @@ static char const ident[] =
 #include <linux/mount.h>	/* for vfsmount and friends */
 #include <asm/hardirq.h>
 
+#ifdef HAVE_KINC_LINUX_CDEV_H
+#include <linux/cdev.h>
+#endif
+
 #include "sys/strdebug.h"
 
 #include <sys/kmem.h>		/* for kmem_ */
@@ -482,7 +486,7 @@ register_cdev(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 {
 	return register_chrdev(major, cdev->d_name, fops);
 }
-STATIC void
+STATIC int
 unregister_cdev(struct cdevsw *cdev, major_t major)
 {
 	return unregister_chrdev(major, cdev->d_name);
@@ -492,7 +496,7 @@ STATIC int
 register_cdev(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 {
 	int err;
-	dev_t dev = 0;
+	__kernel_dev_t dev = 0;
 
 	if ((cdev->d_cdev = kmalloc(sizeof(struct cdev), GFP_KERNEL)) == NULL)
 		return (-ENOMEM);
@@ -518,7 +522,7 @@ register_cdev(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 	}
 	return (major);
 }
-STATIC void
+STATIC int
 unregister_cdev(struct cdevsw *cdev, major_t major)
 {
 	dev_t dev = MKDEV(major, 0);
@@ -526,7 +530,7 @@ unregister_cdev(struct cdevsw *cdev, major_t major)
 	unregister_chrdev_region(dev, 1 << 16);
 	cdev_del(cdev->d_cdev);
 	kfree(XCHG(&cdev->d_cdev, NULL));
-	return;
+	return (0);
 }
 #endif				/* defined HAVE_KINC_LINUX_CDEV_H */
 
