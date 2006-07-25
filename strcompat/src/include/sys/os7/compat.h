@@ -53,6 +53,8 @@
 
 #ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.32 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+#define __OPTIMIZE__ 1
+
 /*
  *  Unfortunately this is necessary for older non-rpm LIS releases.
  */
@@ -86,6 +88,8 @@ typedef void irqreturn_t;
 #undef IRQ_RETVAL
 #define IRQ_RETVAL(x)	((x) != 0)
 #endif				/* LINUX */
+
+#include <asm/byteorder.h>
 
 #ifndef __MOD_INC_USE_COUNT
 #undef MOD_INC_USE_COUNT
@@ -160,5 +164,15 @@ typedef void irqreturn_t;
 #else				/* LINUX */
 #define MODULE_STATIC STATIC
 #endif				/* LINUX */
+
+#undef htonl
+#undef htons
+#undef ntohl
+#undef ntohs
+
+#define htonl(x) ___htonl(x)
+#define htons(x) ___htons(x)
+#define ntohl(x) ___ntohl(x)
+#define ntohs(x) ___ntohs(x)
 
 #endif				/* __LOCAL_COMPAT_H__ */
