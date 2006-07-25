@@ -8092,10 +8092,11 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SSN:
+					/* read only */
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.ssn);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
-					oh->status = T_SUCCESS;
+					oh->status = t_overall_result(&overall, T_READONLY);
 					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.sctp.ssn;
 					if (ih->name != T_ALLOPT)
@@ -8103,10 +8104,11 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_TSN:
+					/* read only */
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.tsn);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
-					oh->status = T_SUCCESS;
+					oh->status = t_overall_result(&overall, T_READONLY);
 					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.sctp.tsn;
 					if (ih->name != T_ALLOPT)
@@ -8329,10 +8331,11 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_STATUS:
+					/* read-only */
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.status);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_STATUS;
-					oh->status = T_SUCCESS;
+					oh->status = t_overall_result(&overall, T_READONLY);
 					/* refresh current value */
 					bcopy(&t->options.sctp.status, T_OPT_DATA(oh),
 					      sizeof(struct t_sctp_status) +
