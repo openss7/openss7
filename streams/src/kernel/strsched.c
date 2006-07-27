@@ -1477,7 +1477,8 @@ event_free(struct strevent *se)
 #if defined CONFIG_STREAMS_DEBUG
 	struct seinfo *s = (struct seinfo *) se;
 
-	_ctrace(qput(&s->s_queue));
+	if (s->s_queue)
+		_ctrace(qput(&s->s_queue));
 	write_lock(&si->si_rwlock);
 	list_del_init(&s->s_list);
 	write_unlock(&si->si_rwlock);
@@ -1661,7 +1662,7 @@ timeout_function(unsigned long arg)
 {
 	struct strevent *se = (struct strevent *) arg;
 
-#if defined CONFIG_STREAMS_KTHREADS || defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
+#if !defined CONFIG_STREAMS_KTHREADS || defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 	struct strthread *t = &strthreads[se->x.t.cpu];
 #else
 	struct strthread *t = this_thread;
@@ -1671,14 +1672,17 @@ timeout_function(unsigned long arg)
 
 	se->se_next = NULL;
 	{
+		static spinlock_t timeout_list_lock = SPIN_LOCK_UNLOCKED;
 		unsigned long flags;
 
-		streams_local_save(flags);
-		*XCHG(&t->strtimout_tail, &se->se_next) = se;
-		streams_local_restore(flags);
+		/* Spin lock here to keep multiple processors from appending to the list at the
+		   same time.  Stealing the list for processing is MP safe. */
+		streams_spin_lock(&timeout_list_lock, flags);
+		*xchg(&t->strtimout_tail, &se->se_next) = se;
+		streams_spin_unlock(&timeout_list_lock, flags);
 	}
 	if (!test_and_set_bit(strtimout, &t->flags))
-#if defined CONFIG_STREAMS_KTHREADS || defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
+#if !defined CONFIG_STREAMS_KTHREADS || defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 		/* bind timeout back to the CPU that called for it */
 		cpu_raise_streams(se->x.t.cpu);
 #else
@@ -1725,7 +1729,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*
 	struct strevent *se;
 
 	if ((se = _ctrace(event_alloc(SE_BUFCALL, q)))) {
-		_ctrace(se->x.b.queue = qget(q));
+		se->x.b.queue = q ? qget(q) : NULL;
 		se->x.b.func = func;
 		se->x.b.arg = arg;
 		se->x.b.size = size;
@@ -1741,11 +1745,12 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	struct strevent *se;
 
 	if ((se = _ctrace(event_alloc(SE_TIMEOUT, q)))) {
-		_ctrace(se->x.t.queue = qget(q));
+		se->x.t.queue = q ? qget(q) : NULL;
 		se->x.t.func = func;
 		se->x.t.arg = arg;
 		se->x.t.pl = pl;
 		se->x.t.cpu = cpu;
+		init_timer(&se->x.t.timer);
 		se->x.t.timer.expires = jiffies + ticks;
 		id = strsched_timeout(se);
 	}
@@ -1759,7 +1764,7 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	struct strevent *se;
 
 	if ((se = _ctrace(event_alloc(SE_WELDQ, q)))) {
-		_ctrace(se->x.w.queue = qget(q));
+		se->x.w.queue = q ? qget(q) : NULL;
 		se->x.w.func = func;
 		se->x.w.arg = arg;
 		_ctrace(se->x.w.q1 = qget(q1));
@@ -1778,7 +1783,7 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
 	struct strevent *se;
 
 	if ((se = _ctrace(event_alloc(SE_UNWELDQ, q)))) {
-		_ctrace(se->x.w.queue = qget(q));
+		se->x.w.queue = q ? qget(q) : NULL;
 		se->x.w.func = func;
 		se->x.w.arg = arg;
 		_ctrace(se->x.w.q1 = qget(q1));
@@ -1901,7 +1906,8 @@ untimeout(toid_t toid)
 
 	if ((se = find_event(toid))) {
 		se->x.t.func = NULL;
-		_ctrace(qput(&se->x.t.queue));
+		if (se->x.t.queue)
+			_ctrace(qput(&se->x.t.queue));
 		rem = se->x.t.timer.expires - jiffies;
 		if (rem < 0)
 			rem = 0;
@@ -2271,7 +2277,8 @@ srvp_fast(queue_t *q)
 #endif
 		qwakeup(q);
 	}
-	_ctrace(qput(&q));	/* cancel qget from qschedule */
+	if (q)
+		_ctrace(qput(&q));	/* cancel qget from qschedule */
 }
 
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -3249,29 +3256,22 @@ do_bufcall_synced(struct strevent *se)
 		unsigned long flags = 0;
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
 
-#ifdef CONFIG_SMP
-		struct stdata *sd;
-
-		dassert(q);
-		sd = qstream(q);
-		dassert(sd);
-#endif
-
 		if (unlikely(safe))
 			streams_local_save(flags);
 #ifdef CONFIG_SMP
 		if (likely(q != NULL))
-			prlock(sd);
+			prlock(qstream(q));
 #endif
 		func(se->x.b.arg);
 #ifdef CONFIG_SMP
 		if (likely(q != NULL))
-			prunlock(sd);
+			prunlock(qstream(q));
 #endif
 		if (unlikely(safe))
 			streams_local_restore(flags);
 	}
-	_ctrace(qput(&q));
+	if (q)
+		_ctrace(qput(&q));
 }
 
 /**
@@ -3308,29 +3308,22 @@ do_timeout_synced(struct strevent *se)
 		unsigned long flags = 0;
 		int safe = (se->x.t.pl != 0 || (q && test_bit(QSAFE_BIT, &q->q_flag)));
 
-#ifdef CONFIG_SMP
-		struct stdata *sd;
-
-		dassert(q);
-		sd = qstream(q);
-		dassert(sd);
-#endif
-
 		if (unlikely(safe))
 			streams_local_save(flags);
 #ifdef CONFIG_SMP
 		if (likely(q != NULL))
-			prlock(sd);
+			prlock(qstream(q));
 #endif
 		func(se->x.t.arg);
 #ifdef CONFIG_SMP
 		if (likely(q != NULL))
-			prunlock(sd);
+			prunlock(qstream(q));
 #endif
 		if (unlikely(safe))
 			streams_local_restore(flags);
 	}
-	_ctrace(qput(&q));
+	if (q)
+		_ctrace(qput(&q));
 }
 
 /**
@@ -3412,7 +3405,8 @@ do_weldq_synced(struct strevent *se)
 			zwunlock(sd, flags);
 		}
 	}
-	_ctrace(qput(&q));
+	if (q)
+		_ctrace(qput(&q));
 }
 
 STATIC void
@@ -3470,7 +3464,8 @@ do_mblk_func(mblk_t *b)
 	else
 		/* deferred function is a qstrfunc function */
 		(void) qstrfunc(m_func, m_queue, b, m_private);
-	_ctrace(qput(&m_queue));
+	if (m_queue)
+		_ctrace(qput(&m_queue));
 }
 
 STATIC void
@@ -3736,14 +3731,11 @@ timeouts(struct strthread *t)
 {
 	do {
 		struct strevent *se, *se_next;
-		unsigned long flags;
 
 		prefetchw(t);
-		streams_local_save(flags);
-		__test_and_clear_bit(strtimout, &t->flags);
-		if (likely((se_next = XCHG(&t->strtimout_head, NULL)) != NULL))
+		clear_bit(strtimout, &t->flags);
+		if (likely((se_next = xchg(&t->strtimout_head, NULL)) != NULL))
 			t->strtimout_tail = &t->strtimout_head;
-		streams_local_restore(flags);
 		if (likely(se_next != NULL)) {
 			se = se_next;
 			do {
@@ -4724,7 +4716,7 @@ takeover_strsched(unsigned int cpu)
 		o->strbcalls_tail = &o->strbcalls_head;
 	}
 	if (o->strtimout_head) {
-		*XCHG(&t->strtimout_tail, o->strtimout_tail) = o->strtimout_head;
+		*xchg(&t->strtimout_tail, o->strtimout_tail) = o->strtimout_head;
 		o->strtimout_head = NULL;
 		o->strtimout_tail = &o->strtimout_head;
 	}
