@@ -4083,6 +4083,7 @@ t_parse_conn_opts(ss_t *ss, const unsigned char *ip, size_t ilen, int request)
 					if (!request)
 						continue;
 					sp->cksum = *valp;
+					continue;
 				}
 				case T_SCTP_HB:
 				{
