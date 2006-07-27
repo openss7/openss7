@@ -262,7 +262,7 @@ STATIC int min_sctp_max_burst = 1;
 #define sctp_default_mac_type		T_SCTP_HMAC_NONE
 #endif
 #endif
-#if defined SCTP_CONFIG_CRC32C
+#if defined SCTP_CONFIG_CRC_32C
 #define sctp_default_cksum_type		T_SCTP_CSUM_CRC32C
 #else
 #define sctp_default_cksum_type		T_SCTP_CSUM_ADLER32
@@ -617,19 +617,19 @@ STATIC struct sctp_options sctp_defaults = {
 	 sctp_default_ssn,
 	 sctp_default_tsn,
 	 sctp_default_recvopt,
-	 sctp_default_cookie_life,
-	 sctp_default_sack_delay,
+	 (sctp_default_cookie_life * HZ),		/* XXX */
+	 (sctp_default_sack_delay * HZ / 1000),		/* XXX */
 	 sctp_default_path_max_retrans,
 	 sctp_default_assoc_max_retrans,
 	 sctp_default_max_init_retries,
-	 sctp_default_heartbeat_itvl,
-	 sctp_default_rto_initial,
-	 sctp_default_rto_min,
-	 sctp_default_rto_max,
+	 (sctp_default_heartbeat_itvl * HZ),		/* XXX */
+	 (sctp_default_rto_initial * HZ / 1000),	/* XXX */
+	 (sctp_default_rto_min * HZ / 1000),		/* XXX */
+	 (sctp_default_rto_max * HZ / 1000),		/* XXX */
 	 sctp_default_ostreams,
 	 sctp_default_istreams,
-	 sctp_default_cookie_inc,
-	 sctp_default_throttle_itvl,
+	 (sctp_default_cookie_inc * HZ / 1000),		/* XXX */
+	 (sctp_default_throttle_itvl * HZ / 1000),	/* XXX */
 	 sctp_default_mac_type,
 	 sctp_default_cksum_type,
 	 sctp_default_hb,
@@ -5473,6 +5473,7 @@ sctp_bundle_sack(struct sctp *sp,	/* association */
 	struct sctp_ecne *e;
 	size_t elen;
 #endif				/* SCTP_CONFIG_ECN */
+
 	assert(sp);
 #ifdef SCTP_CONFIG_ECN
 	elen = ((sp->sackf & SCTP_SACKF_ECN) ? sizeof(*e) : 0);
@@ -6470,7 +6471,7 @@ ___sctp_transmit_wakeup(struct sctp *sp)
 	struct sctp_daddr *sd;
 	int loop_max = 1000;
 
-	_printd(("INFO: Performing transmitter wakeup\n"));
+	printd(("INFO: Performing transmitter wakeup\n"));
 	ensure(sp, return);
 	if ((1 << sp->state) & ~(SCTPF_SENDING | SCTPF_RECEIVING))
 		goto skip;
@@ -6518,6 +6519,7 @@ ___sctp_transmit_wakeup(struct sctp *sp)
       done:
 	assure(i > 0 || !(sp->sackf & SCTP_SACKF_NOW) || sp->rq->q_count);
       skip:
+	printd(("WARNING: skipping wakeup in incorrect state\n"));
 	return;
 }
 
@@ -7587,8 +7589,10 @@ sctp_send_data(struct sctp *sp, struct sctp_strm *st, t_uscalar_t flags, mblk_t 
 		struct sctp_daddr *sd;
 		size_t awnd, plen, amps, used, swnd;
 
-		if (!(sd = sctp_route_normal(sp)))
+		if (!(sd = sctp_route_normal(sp))) {
+			ptrace(("ERROR: Error path taken!\n"));
 			return (-EHOSTUNREACH);
+		}
 		/* If there is not enough room in the current send window to handle all or at least 
 		   1/2 MTU of the data and the current send backlog then return (-EBUSY) and put
 		   the message back on the queue so that backpressure will result.  We only do this 
@@ -7692,8 +7696,10 @@ sctp_send_data(struct sctp *sp, struct sctp_strm *st, t_uscalar_t flags, mblk_t 
 	}
 	return (0);
       enobufs:
+	ptrace(("ERROR: No buffers\n"));
 	return (-ENOBUFS);
       ebusy:
+	ptrace(("ERROR: flow controlled\n"));
 	return (-EBUSY);
 }
 
@@ -8678,6 +8684,8 @@ sctp_send_abort_ootb(uint32_t daddr, uint32_t saddr, struct sctphdr *sh)
 	sctp_xmit_ootb(daddr, saddr, mp);
 	return;
       noroute:
+	swerr();
+	return;
       enobufs:
 	rare();
 	return;
@@ -8722,7 +8730,10 @@ sctp_send_abort_error_ootb(uint32_t daddr,	/* dest address */
 	return;
       noerror:
 	sctp_send_abort_ootb(daddr, saddr, sh);
+	return;
       noroute:
+	swerr();
+	return;
       enobufs:
 	rare();
 	return;
@@ -9340,16 +9351,45 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 	assert(mp);
 	if ((1 << sp->state) & ~(SCTPF_RECEIVING))
 		goto outstate;
-	for (newd = 0, data = 0, plen = 0, err = 0; err == 0;) {
+	for (newd = 0, data = 0, plen = 0, err = 0; err == 0; mp->b_rptr += plen) {
 		mblk_t *dp, *db;
 		struct sctp_strm *st;
 		sctp_tcb_t **gap;
 		uint32_t tsn, ppi;
 		uint16_t sid, ssn;
-		size_t clen, blen, dlen;
+		size_t clen;
 		uint flags;
-		int ord, more;
+		int ord;
+#if 0
+		int more;
+#endif
+		if (mp->b_rptr == mp->b_wptr)
+			break; /* we're done */
+		if (mp->b_rptr > mp->b_wptr) {
+			pswerr(("Should have been caught on last iteration!\n"));
+			goto emsgsize;
+		}
+		if (mp->b_rptr + sizeof(struct sctpchdr) > mp->b_wptr)
+			goto emsgsize;
+		m = (typeof(m)) mp->b_rptr;
+		clen = ntohs(m->ch.len);
+		if (clen < sizeof(struct sctpchdr))
+			goto emsgsize;
+		if (mp->b_rptr + clen > mp->b_wptr)
+			goto emsgsize;
+		plen = PADC(clen);
+		if (mp->b_rptr + plen > mp->b_wptr)
+			goto emsgsize;
+		if (m->ch.type != SCTP_CTYPE_DATA) {
+			todo(("Need to ignore padding chunk here...\n"));
+			goto eproto;
+		}
+		if (clen < sizeof(*m))
+			goto emsgsize;
+		if (clen == sizeof(m))
+			goto baddata; /* zero length data */
 
+#if 0
 		if ((!(m = (typeof(m)) mp->b_rptr))
 		    || ((mp->b_rptr += plen) > mp->b_wptr)
 		    || ((blen = mp->b_wptr - mp->b_rptr) < sizeof(struct sctpchdr))
@@ -9359,18 +9399,16 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 				goto emsgsize;
 			break;
 		}
+#endif
 		flags = (m->ch.flags);
 		ord = !(flags & SCTPCB_FLAG_URG);
+#if 0
 		more = !(flags & SCTPCB_FLAG_LAST_FRAG) ? SCTP_STRMF_MORE : 0;
+#endif
 		tsn = ntohl(m->tsn);
 		sid = ntohs(m->sid);
 		ssn = ntohs(m->ssn);
 		ppi = ntohl(m->ppi);
-		dlen = clen - sizeof(*m);
-		if (m->ch.type != SCTP_CTYPE_DATA)
-			goto eproto;
-		if (dlen == 0)
-			goto baddata;
 		if (sid >= sp->n_istr)
 			goto badstream;
 		if (sp->a_rwnd <=
@@ -9382,10 +9420,10 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		if (!(dp = sctp_dupb(sp, mp)))
 			goto enobufs;
 		data++;
+		/* trim copy to data only */
+		dp->b_wptr = dp->b_rptr + clen;
 		/* pull copy to data only */
 		dp->b_rptr += sizeof(*m);
-		/* trim copy to data only */
-		dp->b_wptr = dp->b_rptr + dlen;
 #if 0
 		/* fast path, next expected, nothing backed up, nothing out of order */
 		if (tsn == sp->r_ack + 1 && !bufq_head(&sp->rcvq) && !bufq_head(&sp->expq)
@@ -9422,7 +9460,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 			continue;
 		}
 #endif
-		if (!(db = sctp_alloc_ctl(sp, 0, dlen)))
+		if (!(db = sctp_alloc_ctl(sp, 0, clen - sizeof(*m))))
 			goto free_nobufs;
 		cb = SCTP_TCB(db);
 		cb->when = jiffies;
@@ -9439,20 +9477,27 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		/* fast path, next expected, nothing out of order */
 		if (tsn == sp->r_ack + 1 && !bufq_head(&sp->oooq)) {
 			/* we have next expected TSN, just process it */
+			printd(("INFO: Fast-tracking received DATA tsn = %u\n", tsn));
 			cb->flags |= SCTPCB_FLAG_DELIV;
 			if (ord) {
+#if 0
 				if (!more) {
 					st->n.more &= ~SCTP_STRMF_MORE;
 					st->ssn = cb->ssn;
 				} else
 					st->n.more |= SCTP_STRMF_MORE;
 				SCTP_INC_STATS(SctpInOrderChunks);
+#endif
+				bufq_queue(&sp->rcvq, db);
 			} else {
+#if 0
 				if (!more)
 					st->x.more &= ~SCTP_STRMF_MORE;
 				else
 					st->x.more |= SCTP_STRMF_MORE;
 				SCTP_INC_STATS(SctpInUnorderChunks);
+#endif
+				bufq_queue(&sp->expq, db);
 			}
 			sp->r_ack++;
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
@@ -9944,8 +9989,8 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 	sctp_dest_calc(sp);
 	/* After receiving a cummulative ack, I want to check if the sndq, urgq and rtxq is empty
 	   and a SHUTDOWN or SHUTDOWN-ACK is pending.  If so, I want to issue these primitives. */
-	if (((1 << sp->
-	      state) & (SCTPF_SHUTDOWN_PENDING | SCTPF_SHUTDOWN_RECEIVED | SCTPF_SHUTDOWN_RECVWAIT))
+	if (((1 << sp->state) & (SCTPF_SHUTDOWN_PENDING | SCTPF_SHUTDOWN_RECEIVED
+				 | SCTPF_SHUTDOWN_RECVWAIT))
 	    && !bufq_head(&sp->sndq)
 	    && !bufq_head(&sp->urgq)
 	    && !bufq_head(&sp->rtxq)) {
@@ -10893,6 +10938,7 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 	/* RFC 2960 5.2.4 ...silently discarded */
 	return (0);
       recv_cookie_echo_action_a:
+	printd(("INFO: Performing cookie echo action (A)\n"));
 	rare();
 	/* 
 	 *  RFC 2960 5.2.4 Action (A)
@@ -10964,6 +11010,7 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 	}
 	never();
       recv_cookie_echo_action_b:
+	printd(("INFO: Performing cookie echo action (B)\n"));
 	rare();
 	/* 
 	 *  RFC 2960 5.2.4 Action (B)
@@ -11006,6 +11053,7 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 	sctp_send_sack(sp);
 	goto recv_cookie_echo_action_d;
       recv_cookie_echo_action_c:
+	printd(("INFO: Performing cookie echo action (C)\n"));
 	rare();
 	/* 
 	 *  RFC 2960 5.2.4 Action (C)
@@ -11021,6 +11069,7 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 		goto stale_cookie;
 	return (0);
       recv_cookie_echo_action_d:
+	printd(("INFO: Performing cookie echo action (D)\n"));
 	/* 
 	 *  RFC 2960 5.2.4 Action (D)
 	 *
@@ -11054,6 +11103,7 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 	}
 	never();
       recv_cookie_echo_listen:
+	printd(("INFO: Performing cookie echo (LISTEN)\n"));
 	if (sp->conind) {
 		mblk_t *cp;
 
@@ -11080,6 +11130,7 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 	}
 	return (0);
       recv_cookie_echo_action_p:
+	printd(("INFO: Performing cookie echo action (P)\n"));
 	/* 
 	 *  SCTP IG 2.6 replacement:
 	 *
@@ -11104,6 +11155,7 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 		goto recv_cookie_echo_action_b;
 	}
 	rare();
+	goto no_resource;
 	return (0);
       error_abort:
 	{
@@ -12055,68 +12107,87 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 		    || PADC(clen) + mp->b_rptr > mp->b_wptr)
 			goto emsgsize;
 		if ((type = ch->type) == SCTP_CTYPE_DATA) {
+			printd(("INFO: receiving DATA chunk\n"));
 			err = sctp_recv_data(sp, mp);
 		} else {
 			SCTP_INC_STATS(SctpInCtrlChunks);
 			switch (type) {
 			case SCTP_CTYPE_INIT:
+				printd(("INFO: receiving INIT chunk\n"));
 				err = sctp_recv_init(sp, mp);
 				break;
 			case SCTP_CTYPE_INIT_ACK:
+				printd(("INFO: receiving INIT-ACK chunk\n"));
 				err = sctp_recv_init_ack(sp, mp);
 				break;
 			case SCTP_CTYPE_SACK:
+				printd(("INFO: receiving SACK chunk\n"));
 				err = sctp_recv_sack(sp, mp);
 				break;
 			case SCTP_CTYPE_HEARTBEAT:
+				printd(("INFO: receiving HEARTBEAT chunk\n"));
 				err = sctp_recv_heartbeat(sp, mp);
 				break;
 			case SCTP_CTYPE_HEARTBEAT_ACK:
+				printd(("INFO: receiving HEARTBEAT-ACK chunk\n"));
 				err = sctp_recv_heartbeat_ack(sp, mp);
 				break;
 			case SCTP_CTYPE_ABORT:
+				printd(("INFO: receiving ABORT chunk\n"));
 				err = sctp_recv_abort(sp, mp);
 				break;
 			case SCTP_CTYPE_SHUTDOWN:
+				printd(("INFO: receiving SHUTDOWN chunk\n"));
 				err = sctp_recv_shutdown(sp, mp);
 				break;
 			case SCTP_CTYPE_SHUTDOWN_ACK:
+				printd(("INFO: receiving SHUTDOWN-ACK chunk\n"));
 				err = sctp_recv_shutdown_ack(sp, mp);
 				break;
 			case SCTP_CTYPE_ERROR:
+				printd(("INFO: receiving ERROR chunk\n"));
 				err = sctp_recv_error(sp, mp);
 				break;
 			case SCTP_CTYPE_COOKIE_ECHO:
+				printd(("INFO: receiving COOKIE-ECHO chunk\n"));
 				err = sctp_recv_cookie_echo(sp, mp);
 				break;
 			case SCTP_CTYPE_COOKIE_ACK:
+				printd(("INFO: receiving COOKIE-ACK chunk\n"));
 				err = sctp_recv_cookie_ack(sp, mp);
 				break;
 #ifdef SCTP_CONFIG_ECN
 			case SCTP_CTYPE_ECNE:
+				printd(("INFO: receiving ECNE chunk\n"));
 				err = sctp_recv_ecne(sp, mp);
 				break;
 			case SCTP_CTYPE_CWR:
+				printd(("INFO: receiving CWR chunk\n"));
 				err = sctp_recv_cwr(sp, mp);
 				break;
 #endif				/* SCTP_CONFIG_ECN */
 			case SCTP_CTYPE_SHUTDOWN_COMPLETE:
+				printd(("INFO: receiving SHUTDOWN-COMPLETE chunk\n"));
 				err = sctp_recv_shutdown_complete(sp, mp);
 				break;
 #ifdef SCTP_CONFIG_ADD_IP
 			case SCTP_CTYPE_ASCONF:
+				printd(("INFO: receiving ASCONF chunk\n"));
 				err = sctp_recv_asconf(sp, mp);
 				break;
 			case SCTP_CTYPE_ASCONF_ACK:
+				printd(("INFO: receiving ASCONF-ACK chunk\n"));
 				err = sctp_recv_asconf_ack(sp, mp);
 				break;
 #endif				/* SCTP_CONFIG_ADD_IP */
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 			case SCTP_CTYPE_FORWARD_TSN:
+				printd(("INFO: receiving FORWARD-TSN chunk\n"));
 				err = sctp_recv_forward_tsn(sp, mp);
 				break;
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 			default:
+				printd(("INFO: receiving Urecognized chunk\n"));
 				err = sctp_recv_unrec_ctype(sp, mp);
 				break;
 			}
@@ -12158,6 +12229,7 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 	case -ENOMEM:
 	case -ENOBUFS:
 	case -EBUSY:
+		ptrace(("ERROR: resource problem\n"));
 		/* These are resource problems */
 		if ((1 << sp->state) & (SCTPF_NEEDABORT))
 			sctp_send_abort_error(sp, SCTP_CAUSE_RES_SHORTAGE, NULL, 0);
@@ -12165,6 +12237,7 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, -ECONNABORTED);
 		break;
 	case -EPROTO:
+		ptrace(("ERROR: protocol violation\n"));
 		/* This is a protocol violation */
 		if ((1 << sp->state) & (SCTPF_NEEDABORT))
 			sctp_send_abort_error(sp, SCTP_CAUSE_PROTO_VIOLATION, NULL, 0);
@@ -12172,6 +12245,7 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, err);
 		break;
 	case -EINVAL:
+		ptrace(("ERROR: invalid parameter\n"));
 		/* This is an invalid parameter */
 		if ((1 << sp->state) & (SCTPF_NEEDABORT))
 			sctp_send_abort_error(sp, SCTP_CAUSE_INVALID_PARM, NULL, 0);
@@ -12179,6 +12253,7 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, err);
 		break;
 	case -EMSGSIZE:
+		ptrace(("ERROR: invalid message size\n"));
 		/* This is a message formatting error */
 		if ((1 << sp->state) & (SCTPF_NEEDABORT))
 			sctp_send_abort(sp);
@@ -12186,6 +12261,7 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, err);
 		break;
 	default:
+		__rare();
 		/* ignore others handled specially inside receive functions */
 		goto done;
 	}
@@ -12300,17 +12376,22 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 	/* Try to be a little bit smarter about ICMP errors received while trying to form a
 	   connection.  This can speed things up or make them more reliable. */
 	if (abt && ((1 << sp->state) & (SCTPF_OPENING))) {
-		sd = sp->taddr;
 		switch (sp->state) {
 		case SCTP_COOKIE_WAIT:
 			/* advance timeout */
+			printd(("INFO: truncating init timeout\n"));
 			if (sp_del_timeout(sp, &sp->timer_init))
 				sp_set_timeout(sp, &sp->timer_init, 1);
+			else
+				ptrace(("WARNING: truncating init timeout failed\n"));
 			break;
 		case SCTP_COOKIE_ECHOED:
 			/* advance timeout */
+			printd(("INFO: truncating cookie timeout\n"));
 			if (sp_del_timeout(sp, &sp->timer_cookie))
 				sp_set_timeout(sp, &sp->timer_cookie, 1);
+			else
+				ptrace(("WARNING: truncating cookie timeout failed\n"));
 			break;
 		}
 	}
@@ -12798,6 +12879,7 @@ sctp_unbind(struct sctp *sp)
 #endif				/* STREAMS */
 	sctp_reset(sp);
 	sctp_clear(sp);
+	/* XXX: should really send an abort to each connection indication */
 	unusual(sp->conq.q_msgs);
 	bufq_purge(&sp->conq);
 }
@@ -13019,10 +13101,13 @@ sctp_ordrel_req(struct sctp *sp)
 		/* check for empty send queues */
 		if (!bufq_head(&sp->sndq)
 		    && !bufq_head(&sp->urgq)
-		    && !bufq_head(&sp->rtxq))
+		    && !bufq_head(&sp->rtxq)) {
+			ptrace(("Sending SHUTDOWN\n"));
 			sctp_send_shutdown(sp);
-		else
+		} else {
+			ptrace(("Changing state to SHUTDOWN-PENDING\n"));
 			sctp_change_state(sp, SCTP_SHUTDOWN_PENDING);
+		}
 		return (0);
 	}
 	case SCTP_SHUTDOWN_RECEIVED:
@@ -13030,10 +13115,13 @@ sctp_ordrel_req(struct sctp *sp)
 		/* check for empty send queues */
 		if (!bufq_head(&sp->sndq)
 		    && !bufq_head(&sp->urgq)
-		    && !bufq_head(&sp->rtxq))
+		    && !bufq_head(&sp->rtxq)) {
+			ptrace(("Sending SHUTDOWN-ACK\n"));
 			sctp_send_shutdown_ack(sp);
-		else
+		} else {
+			ptrace(("Changing state to SHUTDOWN-RECVWAIT\n"));
 			sctp_change_state(sp, SCTP_SHUTDOWN_RECVWAIT);
+		}
 		return (0);
 	}
 	}
@@ -13061,8 +13149,10 @@ sctp_data_req(struct sctp *sp, uint32_t ppi, uint16_t sid, uint ord, uint more, 
 		freemsg(mp);
 		return (0);
 	}
-	if (!(st = sctp_ostrm_find(sp, sid, &err)))
+	if (!(st = sctp_ostrm_find(sp, sid, &err))) {
+		ptrace(("ERROR: Error path taken!\n"));
 		return (err);
+	}
 	/* we probably want to data ack out of order as well */
 #if 0
 	if (rcpt || (ord && (sp->flags & SCTP_FLAG_DEFAULT_RC_SEL)))
@@ -13663,7 +13753,7 @@ sctp_cleanup_read(struct sctp *sp)
 				need_sack = 0;
 				continue;
 			}
-			break;	/* error on delivery (ENOBUFS, EBUSY) */
+			break;	/* error on delivery (ENOBUFS, EBUSY, EPROTO) */
 		}
 		bufq_unlock(&sp->rcvq);
 		bufq_unlock(&sp->expq);
@@ -13819,7 +13909,8 @@ sctp_r_prim(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *))
+sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *),
+	  streamscall void (*procwake) (queue_t *q))
 {
 	int rtn = 0, locked;
 
@@ -13886,6 +13977,9 @@ sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *))
 				break;
 			}
 		} while (0);
+		/* perform wakeups */
+		if (procwake)
+			procwake(q);
 		if (locked)
 			sctp_unlockq(q);
 	} else {
@@ -13993,7 +14087,7 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 STATIC streamscall int
 sctp_rput(queue_t *q, mblk_t *mp)
 {
-	return (int) sctp_putq(q, mp, &sctp_r_prim);
+	return (int) sctp_putq(q, mp, &sctp_r_prim, &_sctp_cleanup_read);
 }
 STATIC streamscall int
 sctp_rsrv(queue_t *q)
@@ -14052,6 +14146,87 @@ static struct qinit sctp_m_winit = {
 };
 
 #endif				/* defined WITH_NPI_IP_MUX */
+
+
+STATIC int
+m_flush(struct sctp *sp, int how, int band)
+{
+	mblk_t *mp;
+
+	if ((mp = sctp_allocb(sp, 2, BPRI_HI))) {
+		mp->b_datap->db_type = M_FLUSH;
+		*mp->b_wptr++ = how;
+		*mp->b_wptr++ = band;
+		putnext(sp->rq, mp);
+		return (QR_DONE);
+	}
+	return (-ENOBUFS);
+}
+
+STATIC int
+m_error(struct sctp *sp, int error)
+{
+	mblk_t *mp;
+
+	if ((mp = sctp_allocb(sp, 2, BPRI_HI))) {
+		mp->b_datap->db_type = M_ERROR;
+		*mp->b_wptr++ = error;
+		*mp->b_wptr++ = error;
+		putnext(sp->rq, mp);
+		if ((1 << sp->state) & SCTPF_NEEDABORT)	/* SCTP IG 2.21 */
+			sctp_send_abort_error(sp, SCTP_CAUSE_USER_INITIATED, NULL, 0);
+		sctp_unbind(sp);
+		return (-error);
+	}
+	return (-ENOBUFS);
+}
+
+STATIC int
+m_hangup(struct sctp *sp)
+{
+	mblk_t *mp;
+
+	if ((mp = sctp_allocb(sp, 0, BPRI_HI))) {
+		mp->b_datap->db_type = M_HANGUP;
+		putnext(sp->rq, mp);
+		if ((1 << sp->state) & SCTPF_NEEDABORT)	/* SCTP IG 2.21 */
+			sctp_send_abort_error(sp, SCTP_CAUSE_USER_INITIATED, NULL, 0);
+		sctp_unbind(sp);
+		return (-EPIPE);
+	}
+	return (-ENOBUFS);
+}
+
+STATIC int
+m_error_reply(struct sctp *sp, int err)
+{
+	int hangup = 0;
+	int error = err;
+
+	switch (error) {
+	case -EBUSY:
+	case -ENOBUFS:
+	case -EAGAIN:
+	case -ENOMEM:
+		return (error);
+	case 0:
+	case 1:
+	case 2:
+		return (error);
+	case -EPIPE:
+	case -ENETDOWN:
+	case -EHOSTUNREACH:
+		hangup = 1;
+		error = EPIPE;
+		break;
+	default:
+		error = (err < 0) ? -err : err;
+		break;
+	}
+	if (hangup)
+		return m_hangup(sp);
+	return m_error(sp, error);
+}
 
 /*
  *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -14224,7 +14399,7 @@ n_conn_ind(struct sctp *sp, mblk_t *cp)
 	return (-ERESTART);
       outstate:
 	swerr();
-	return (0);
+	return (-ECONNREFUSED);
 }
 
 /*
@@ -14296,14 +14471,19 @@ n_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
 	mblk_t *mp;
 	N_discon_ind_t *p;
 
-	if ((1 << sp->
-	     i_state) & ~(NSF_WCON_CREQ | NSF_WRES_CIND | NSF_DATA_XFER | NSF_WCON_RREQ |
-			  NSF_WRES_RIND))
+	if ((1 << sp->i_state) & ~(NSF_WCON_CREQ | NSF_WRES_CIND | NSF_DATA_XFER
+				   | NSF_WCON_RREQ | NSF_WRES_RIND))
 		goto outstate;
-	if (!canputnext(sp->rq))
-		goto ebusy;
+	/* TPI spec says that if the interface is in the TS_DATA_XFER, TS_WIND_ORDREL or
+	   TS_WACK_ORDREL [sic] state, the stream must be flushed before sending up the
+	   T_DISCON_IND primitive. */
+	if ((1 << sp->i_state) & (NSF_DATA_XFER | NSF_WCON_RREQ | NSF_WRES_RIND))
+		if (m_flush(sp, FLUSHRW, 0))
+			goto enobufs;
 	if (!(mp = sctp_allocb(sp, sizeof(*p), BPRI_MED)))
 		goto enobufs;
+	if (!canputnext(sp->rq))
+		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
 	p = (N_discon_ind_t *) mp->b_wptr;
 	p->PRIM_type = N_DISCON_IND;
@@ -14326,6 +14506,7 @@ n_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
       enobufs:
 	return (-ENOBUFS);
       ebusy:
+	freemsg(mp);
 	return (-EBUSY);
       outstate:
 	swerr();
@@ -14376,6 +14557,7 @@ n_data_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t t
 	return (-EBUSY);
       outstate:
 	swerr();
+	freemsg(dp);
 	return (0);
 }
 
@@ -14420,6 +14602,7 @@ n_exdata_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t
 	return (-EBUSY);
       outstate:
 	swerr();
+	freemsg(dp);
 	return (0);
 }
 
@@ -14656,17 +14839,18 @@ n_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 	p->PRIM_type = N_OK_ACK;
 	p->CORRECT_prim = prim;
 	mp->b_wptr += sizeof(*p);
-	switch (sp->i_state) {
-	case NS_WACK_OPTREQ:
+	/* switch by prim and not by state */
+	switch (prim) {
+	case N_OPTMGMT_REQ:
 		sp->i_state = NS_IDLE;
 		break;
-	case NS_WACK_RRES:
+	case N_RESET_RES:
 		sp->i_state = NS_DATA_XFER;
 		break;
-	case NS_WACK_UREQ:
+	case N_UNBIND_REQ:
 		sp->i_state = NS_UNBND;
 		break;
-	case NS_WACK_CRES:
+	case N_CONN_RES:
 		if (ap != NULL)
 			ap->i_state = NS_DATA_XFER;
 		if (cp != NULL)
@@ -14678,22 +14862,35 @@ n_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 				sp->i_state = NS_IDLE;
 		}
 		break;
-	case NS_WACK_DREQ7:
-		if (cp != NULL)
-			freemsg(__bufq_unlink(&sp->conq, cp));
-	case NS_WACK_DREQ6:
-	case NS_WACK_DREQ9:
-	case NS_WACK_DREQ10:
-	case NS_WACK_DREQ11:
-		if (bufq_length(&sp->conq))
-			sp->i_state = NS_WRES_CIND;
-		else
-			sp->i_state = NS_IDLE;
+	case N_DISCON_REQ:
+		switch (sp->i_state) {
+		case NS_WACK_DREQ7:
+			if (cp != NULL)
+				freemsg(__bufq_unlink(&sp->conq, cp));
+		case NS_WACK_DREQ6:
+			if (bufq_length(&sp->conq))
+				sp->i_state = NS_WRES_CIND;
+			else
+				sp->i_state = NS_IDLE;
+			break;
+		case NS_WACK_DREQ9:
+		case NS_WACK_DREQ10:
+		case NS_WACK_DREQ11:
+			/* TPI spec says that if the interface is in the TS_DATA_XFER,
+			   TS_WIND_ORDREL or TS_WACK_ORDREL [sic] state, the stream must be flushed 
+			   before responding with the T_OK_ACK primitive. */
+			if (m_flush(sp, FLUSHRW, 0))
+				goto enobufs;
+			if (bufq_length(&sp->conq))
+				sp->i_state = NS_WRES_CIND;
+			else
+				sp->i_state = NS_IDLE;
+			break;
+		}
 		break;
-		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
-		   normally when we are responding to an N_OPTMGMT_REQ in other than the NS_IDLE
-		   state. */
 	}
+	/* Note: if we are not in a WACK state we simply do not change state.  This occurs
+	   normally when we are responding to an N_OPTMGMT_REQ in other than the NS_IDLE state. */
 	if (cp != NULL)
 		bufq_unlock(&sp->conq);
 	putnext(sp->rq, mp);
@@ -15290,31 +15487,6 @@ n_discon_req(struct sctp *sp, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-n_error_reply(struct sctp *sp, int err)
-{
-	mblk_t *mp;
-
-	switch (err) {
-	case -EBUSY:
-	case -EAGAIN:
-	case -ENOMEM:
-	case -ENOBUFS:
-		return (err);
-	case 0:
-	case 1:
-	case 2:
-		return (err);
-	}
-	if ((mp = sctp_allocb(sp, 2, BPRI_HI))) {
-		mp->b_datap->db_type = M_ERROR;
-		*(mp->b_wptr)++ = (err < 0) ? -err : err;
-		*(mp->b_wptr)++ = (err < 0) ? -err : err;
-		putnext(sp->rq, mp);
-		return (0);
-	}
-	return (-ENOBUFS);
-}
-STATIC int
 n_write(struct sctp *sp, mblk_t *mp)
 {
 	int err;
@@ -15344,7 +15516,7 @@ n_write(struct sctp *sp, mblk_t *mp)
 	goto error;		/* ignore in idle state */
       error:
 	seldom();
-	return n_error_reply(sp, err);
+	return m_error_reply(sp, err);
 }
 STATIC int
 n_data_req(struct sctp *sp, mblk_t *mp)
@@ -15388,7 +15560,7 @@ n_data_req(struct sctp *sp, mblk_t *mp)
 	return (0);		/* ignore in idle state */
       error:
 	seldom();
-	return n_error_reply(sp, err);
+	return m_error_reply(sp, err);
 }
 
 /*
@@ -15437,7 +15609,7 @@ n_exdata_req(struct sctp *sp, mblk_t *mp)
 	return (0);		/* ignore in idle state */
       error:
 	seldom();
-	return n_error_reply(sp, err);
+	return m_error_reply(sp, err);
 }
 
 /*
@@ -15846,7 +16018,7 @@ sctp_n_w_prim(queue_t *q, mblk_t *mp)
 STATIC streamscall int
 sctp_n_wput(queue_t *q, mblk_t *mp)
 {
-	return (int) sctp_putq(q, mp, &sctp_n_w_prim);
+	return (int) sctp_putq(q, mp, &sctp_n_w_prim, &_sctp_transmit_wakeup);
 }
 STATIC streamscall int
 sctp_n_wsrv(queue_t *q)
@@ -17086,6 +17258,7 @@ t_parse_conn_opts(struct sctp *sp, const unsigned char *ip, size_t ilen, int req
 				if (!request)
 					continue;
 				sp->cksum = *valp;
+				continue;
 			}
 			case T_SCTP_HB:
 			{
@@ -17157,7 +17330,7 @@ t_parse_conn_opts(struct sctp *sp, const unsigned char *ip, size_t ilen, int req
 			case T_SCTP_STATUS:
 			{
 				/* this is a read-only option */
-				goto eacces;
+				goto einval;
 			}
 			case T_SCTP_DEBUG:
 			{
@@ -24790,7 +24963,7 @@ t_conn_ind(struct sctp *sp, mblk_t *cp)
 	return (-ERESTART);
       outstate:
 	swerr();
-	return (0);
+	return (-ECONNREFUSED);
 }
 
 /*
@@ -24876,10 +25049,16 @@ t_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
 	(void) orig;
 	if ((1 << sp->i_state) & ~TSM_CONNECTED)
 		goto outstate;
-	if (!canputnext(sp->rq))
-		goto ebusy;
+	/* TPI spec says that if the interface is in the TS_DATA_XFER, TS_WIND_ORDREL or
+	   TS_WACK_ORDREL [sic] state, the stream must be flushed before sending up the
+	   T_DISCON_IND primitive. */
+	if ((1 << sp->i_state) & (TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL))
+		if (m_flush(sp, FLUSHRW, 0))
+			goto enobufs;
 	if (!(mp = sctp_allocb(sp, sizeof(*p), BPRI_MED)))
 		goto enobufs;
+	if (!canputnext(sp->rq))
+		goto ebusy;
 	mp->b_datap->db_type = M_PROTO;
 	p = (struct T_discon_ind *) mp->b_wptr;
 	p->PRIM_type = T_DISCON_IND;
@@ -24899,6 +25078,7 @@ t_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
       enobufs:
 	return (-ENOBUFS);
       ebusy:
+	freemsg(mp);
 	return (-EBUSY);
       outstate:
 	pswerr(("t_discon_ind() requested in TPI state %d\n", (int) sp->i_state));
@@ -24938,6 +25118,7 @@ t_data_ind(struct sctp *sp, t_uscalar_t more, mblk_t *dp)
 	return (-EBUSY);
       outstate:
 	swerr();
+	freemsg(dp);
 	return (0);
 }
 
@@ -24975,6 +25156,7 @@ t_exdata_ind(struct sctp *sp, t_uscalar_t more, mblk_t *dp)
 	return (-EBUSY);
       outstate:
 	swerr();
+	freemsg(dp);
 	return (0);
 }
 
@@ -25155,14 +25337,15 @@ t_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 	p->PRIM_type = T_OK_ACK;
 	p->CORRECT_prim = prim;
 	mp->b_wptr += sizeof(*p);
-	switch (sp->i_state) {
-	case TS_WACK_CREQ:
+	/* switch by prim not by state */
+	switch (prim) {
+	case T_CONN_REQ:
 		sp->i_state = TS_WCON_CREQ;
 		break;
-	case TS_WACK_UREQ:
+	case T_UNBIND_REQ:
 		sp->i_state = TS_UNBND;
 		break;
-	case TS_WACK_CRES:
+	case T_CONN_RES:
 		if (ap != NULL)
 			ap->i_state = TS_DATA_XFER;
 		if (cp != NULL)
@@ -25174,22 +25357,35 @@ t_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 				sp->i_state = TS_IDLE;
 		}
 		break;
-	case TS_WACK_DREQ7:
-		if (cp != NULL)
-			freemsg(__bufq_unlink(&sp->conq, cp));
-	case TS_WACK_DREQ6:
-	case TS_WACK_DREQ9:
-	case TS_WACK_DREQ10:
-	case TS_WACK_DREQ11:
-		if (bufq_length(&sp->conq))
-			sp->i_state = TS_WRES_CIND;
-		else
-			sp->i_state = TS_IDLE;
+	case T_DISCON_REQ:
+		switch (sp->i_state) {
+		case TS_WACK_DREQ7:
+			if (cp != NULL)
+				freemsg(__bufq_unlink(&sp->conq, cp));
+		case TS_WACK_DREQ6:
+			if (bufq_length(&sp->conq))
+				sp->i_state = TS_WRES_CIND;
+			else
+				sp->i_state = TS_IDLE;
+			break;
+		case TS_WACK_DREQ9:
+		case TS_WACK_DREQ10:
+		case TS_WACK_DREQ11:
+			/* TPI spec says that if the interface is in the TS_DATA_XFER,
+			   TS_WIND_ORDREL or TS_WACK_ORDREL [sic] state, the stream must be flushed 
+			   before responding with the T_OK_ACK primitive. */
+			if (m_flush(sp, FLUSHRW, 0))
+				goto enobufs;
+			if (bufq_length(&sp->conq))
+				sp->i_state = TS_WRES_CIND;
+			else
+				sp->i_state = TS_IDLE;
+			break;
+		}
 		break;
-		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
-		   normally when we are responding to a T_OPTMGMT_REQ in other than the TS_IDLE
-		   state. */
 	}
+	/* Note: if we are not in a WACK state we simply do not change state.  This occurs normally 
+	   when we are responding to a T_OPTMGMT_REQ in other than the TS_IDLE state. */
 	if (cp != NULL)
 		bufq_unlock(&sp->conq);
 	putnext(sp->rq, mp);
@@ -25351,6 +25547,7 @@ t_optdata_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_
 	return (-EBUSY);
       outstate:
 	swerr();
+	freemsg(dp);
 	return (0);
 }
 
@@ -25736,8 +25933,14 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	if (sp->i_state != TS_WRES_CIND)
 		goto outstate;
 	sp->i_state = TS_WACK_CRES;
-	if (mp->b_cont && !msgdsize(mp->b_cont))
-		goto baddata;
+	if (mp->b_cont) {
+		long mlen, mmax;
+
+		mlen = msgdsize(mp->b_cont);
+		if (((mmax = sp->pmtu - 16) > 0 && mlen > mmax) || mmax == T_INVALID
+		    || ((mmax = 65535) > 0 && mlen > mmax) || mmax == T_INVALID)
+			goto baddata;
+	}
 	if (p->OPT_length && mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 		goto badopt;
 	if (!(cp = t_seq_check(sp, p->SEQ_number)))
@@ -25980,36 +26183,6 @@ t_discon_req(struct sctp *sp, mblk_t *mp)
  *  -----------------------------------------------------------------
  */
 STATIC int
-t_error_reply(struct sctp *sp, int err)
-{
-	mblk_t *mp;
-
-	switch (err) {
-	case -EBUSY:
-	case -EAGAIN:
-	case -ENOMEM:
-	case -ENOBUFS:
-		return (err);
-	case 0:
-	case 1:
-	case 2:
-		return (err);
-	}
-	if ((mp = sctp_allocb(sp, 2, BPRI_HI))) {
-		mp->b_datap->db_type = M_ERROR;
-		*(mp->b_wptr)++ = (err < 0) ? -err : err;
-		*(mp->b_wptr)++ = (err < 0) ? -err : err;
-		putnext(sp->rq, mp);
-		local_bh_disable();
-		bh_lock_sctp(sp);
-		sctp_unbind(sp);
-		bh_unlock_sctp(sp);
-		local_bh_enable();
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-STATIC int
 t_write(struct sctp *sp, mblk_t *mp)
 {
 	int err;
@@ -26041,7 +26214,7 @@ t_write(struct sctp *sp, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, sp));
 	return (QR_DONE);
       error:
-	return t_error_reply(sp, err);
+	return m_error_reply(sp, err);
 }
 STATIC int
 t_data_req(struct sctp *sp, mblk_t *mp)
@@ -26088,7 +26261,7 @@ t_data_req(struct sctp *sp, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, sp));
 	return (QR_DONE);
       error:
-	return t_error_reply(sp, err);
+	return m_error_reply(sp, err);
 }
 
 /*
@@ -26140,7 +26313,7 @@ t_exdata_req(struct sctp *sp, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, sp));
 	return (QR_DONE);
       error:
-	return t_error_reply(sp, err);
+	return m_error_reply(sp, err);
 }
 
 /*
@@ -26261,7 +26434,7 @@ t_unbind_req(struct sctp *sp, mblk_t *mp)
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state %d\n", DRV_NAME, sp, (int)sp->i_state));
 	goto error;
       error:
 	return t_error_ack(sp, T_UNBIND_REQ, err);
@@ -26473,7 +26646,7 @@ t_ordrel_req(struct sctp *sp, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sp));
 	goto error;
       error:
-	return t_error_reply(sp, err);
+	return m_error_reply(sp, err);
 }
 
 /*
@@ -26558,7 +26731,7 @@ t_optdata_req(struct sctp *sp, mblk_t *mp)
 	goto error;
 #endif
       error:
-	return t_error_reply(sp, err);
+	return m_error_reply(sp, err);
 }
 
 #ifdef T_ADDR_REQ
@@ -26720,8 +26893,9 @@ sctp_t_w_proto(queue_t *q, mblk_t *mp)
 #ifdef T_CAPABILITY_ACK
 	case T_CAPABILITY_ACK:
 #endif
+	case T_UNITDATA_REQ:
 	      eproto:
-		rtn = t_error_reply(sp, -EPROTO);
+		rtn = m_error_reply(sp, -EPROTO);
 		break;
 	default:
 		rtn = t_other_req(sp, mp);
@@ -26808,7 +26982,7 @@ sctp_t_w_prim(queue_t *q, mblk_t *mp)
 STATIC streamscall int
 sctp_t_wput(queue_t *q, mblk_t *mp)
 {
-	return (int) sctp_putq(q, mp, &sctp_t_w_prim);
+	return (int) sctp_putq(q, mp, &sctp_t_w_prim, &_sctp_transmit_wakeup);
 }
 STATIC streamscall int
 sctp_t_wsrv(queue_t *q)
@@ -27391,7 +27565,6 @@ sctp_rcv_ootb(mblk_t *mp)
 	case SCTP_CTYPE_SHUTDOWN_COMPLETE:	/* RFC 2960 8.4(6). */
 	case SCTP_CTYPE_INIT:	/* RFC 2960 8.4(3) and (8). */
 	case SCTP_CTYPE_INIT_ACK:	/* RFC 2960 8.4(8). */
-	case SCTP_CTYPE_COOKIE_ECHO:	/* RFC 2960 8.4(4) and (8). */
 	default:
 		switch (ch->type) {
 		case SCTP_CTYPE_COOKIE_ACK:
@@ -27417,6 +27590,7 @@ sctp_rcv_ootb(mblk_t *mp)
 			break;
 		}
 		break;;
+	case SCTP_CTYPE_COOKIE_ECHO:	/* RFC 2960 8.4(4) and (8). */
 	case SCTP_CTYPE_SHUTDOWN:	/* RFC 2960 8.4(8). */
 	case SCTP_CTYPE_SACK:	/* RFC 2960 8.4(8). */
 	case SCTP_CTYPE_HEARTBEAT:	/* RFC 2960 8.4(8). */
@@ -27437,6 +27611,9 @@ sctp_rcv_ootb(mblk_t *mp)
 			break;
 		case SCTP_CTYPE_DATA:
 			printd(("Received OOTB DATA\n"));
+			break;
+		case SCTP_CTYPE_COOKIE_ECHO:
+			printd(("Received OOTB COOKIE-ECHO\n"));
 			break;
 		}
 		if (!(sp = sctp_lookup_tcb(sh->dest, sh->srce, iph->daddr, iph->saddr))) {
