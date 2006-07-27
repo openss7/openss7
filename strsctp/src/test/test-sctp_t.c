@@ -215,6 +215,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
+#define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
 #define INFINITE_WAIT	-1
 
@@ -353,7 +354,8 @@ enum {
 
 long test_start = 0;
 
-static int state;
+static int state = 0;
+static const char *failure_string = NULL;
 
 #if 1
 #undef lockf
@@ -2579,6 +2581,22 @@ print_preamble(int child)
 		print_simple(child, msgs);
 }
 
+void print_string_state(int child, const char *msgs[], const char *string);
+
+void
+print_failure(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"....................|%-32s|..|                    [%d:%03d]\n",
+		"                    |%-32s|  |................... [%d:%03d]\n",
+		"                    |%-32s|...................... [%d:%03d]\n",
+		"....................|%-32s|..|................... [%d:%03d]\n",
+	};
+
+	if (string && strnlen(string, 32) > 0 && verbose > 0)
+		print_string_state(child, msgs, string);
+}
+
 void
 print_notapplicable(int child)
 {
@@ -2591,6 +2609,7 @@ print_notapplicable(int child)
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2605,6 +2624,7 @@ print_skipped(int child)
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2619,6 +2639,7 @@ print_inconclusive(int child)
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2647,6 +2668,7 @@ print_failed(int child)
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2661,6 +2683,7 @@ print_script_error(int child)
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2675,6 +2698,7 @@ print_passed(int child)
 
 	if (verbose > 2)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -6371,18 +6395,62 @@ test_case_1_4_3(int child)
 	if (p->addr_ack.PRIM_type != T_ADDR_ACK)
 		goto failure;
 	state++;
-	if (p->addr_ack.LOCADDR_length != sizeof(struct sockaddr_in))
-		goto failure;
+	switch (test_level) {
+	case T_INET_SCTP:
+		/* SCTP returns multiple addresses */
+		if (p->addr_ack.LOCADDR_length == 0) {
+			failure_string = "LOCADDR_length == 0";
+			goto failure;
+		}
+		state++;
+		if ((p->addr_ack.LOCADDR_length % sizeof(struct sockaddr_in)) != 0) {
+			failure_string = "LOCADDR_length % sockaddr_in";
+			goto failure;
+		}
+		break;
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+		/* others return single address */
+		if (p->addr_ack.LOCADDR_length != sizeof(struct sockaddr_in)) {
+			failure_string = "LOCADDR_length != sockaddr_in";
+			goto failure;
+		}
+		break;
+	}
 	state++;
 	switch (last_info.SERV_type) {
 	case T_CLTS:
-		if (p->addr_ack.REMADDR_length != 0)
+		if (p->addr_ack.REMADDR_length != 0) {
+			failure_string = "REMADDR_length != 0";
 			goto failure;
+		}
 		break;
 	case T_COTS:
 	case T_COTS_ORD:
-		if (p->addr_ack.REMADDR_length != sizeof(struct sockaddr_in))
-			goto failure;
+		switch (test_level) {
+		case T_INET_SCTP:
+			/* SCTP returns multiple addresses */
+			if (p->addr_ack.REMADDR_length == 0) {
+				failure_string = "REMADDR_length == 0";
+				goto failure;
+			}
+			state++;
+			if ((p->addr_ack.REMADDR_length % sizeof(struct sockaddr_in)) != 0) {
+				failure_string = "REMADDR_length % sockaddr_in";
+				goto failure;
+			}
+			break;
+		case T_INET_IP:
+		case T_INET_UDP:
+		case T_INET_TCP:
+			/* others return single address */
+			if (p->addr_ack.REMADDR_length != sizeof(struct sockaddr_in)) {
+				failure_string = "REMADDR_length != sockaddr_in";
+				goto failure;
+			}
+			break;
+		}
 		break;
 	default:
 		goto failure;
@@ -6443,14 +6511,39 @@ test_case_1_4_3_list(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_ADDR_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (p->addr_ack.PRIM_type != T_ADDR_ACK)
+	if (p->addr_ack.PRIM_type != T_ADDR_ACK) {
+		failure_string = "PRIM_type != T_ADDR_ACK";
 		goto failure;
+	}
 	state++;
-	if (p->addr_ack.LOCADDR_length != sizeof(struct sockaddr_in))
-		goto failure;
+	switch (test_level) {
+	case T_INET_SCTP:
+		/* SCTP returns multiple addresses */
+		if (p->addr_ack.LOCADDR_length == 0) {
+			failure_string = "LOCADDR_length == 0";
+			goto failure;
+		}
+		state++;
+		if ((p->addr_ack.LOCADDR_length % sizeof(struct sockaddr_in)) != 0) {
+			failure_string = "LOCADDR_length % sockaddr_in";
+			goto failure;
+		}
+		break;
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+		/* others return single address */
+		if (p->addr_ack.LOCADDR_length != sizeof(struct sockaddr_in)) {
+			failure_string = "LOCADDR_length != sockaddr_in";
+			goto failure;
+		}
+		break;
+	}
 	state++;
-	if (p->addr_ack.REMADDR_length != 0)
+	if (p->addr_ack.REMADDR_length != 0) {
+		failure_string = "REMADDR_length != 0";
 		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -22121,7 +22214,7 @@ test_case_3_1_conn(int child)
 		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 			goto failure;
 		state++;
-		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		if (expect(child, INFINITE_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 			goto failure;
 		break;
 	default:
@@ -39875,6 +39968,7 @@ run_stream(int child, struct test_stream *stream)
 
 	print_preamble(child);
 	state = 100;
+	failure_string = NULL;
 	if (stream->preamble && (pre_result = stream->preamble(child)) != __RESULT_SUCCESS) {
 		switch (pre_result) {
 		case __RESULT_NOTAPPL:
@@ -39893,6 +39987,7 @@ run_stream(int child, struct test_stream *stream)
 	} else {
 		print_test(child);
 		state = 200;
+		failure_string = NULL;
 		switch (stream->testcase(child)) {
 		default:
 		case __RESULT_INCONCLUSIVE:
@@ -39922,6 +40017,7 @@ run_stream(int child, struct test_stream *stream)
 		}
 		print_postamble(child);
 		state = 300;
+		failure_string = NULL;
 		if (stream->postamble && (post_result = stream->postamble(child)) != __RESULT_SUCCESS) {
 			switch (post_result) {
 			case __RESULT_NOTAPPL:
