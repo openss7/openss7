@@ -345,6 +345,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
+#define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
 #define INFINITE_WAIT	-1
 
@@ -3369,6 +3370,22 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
+	if (verbose > 4) {
+		int i;
+
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "fdinsert to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+		fprintf(stdout, "[");
+		for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+			fprintf(stdout, "%02X", ctrl->buf[i]);
+		fprintf(stdout, "]\n");
+		fprintf(stdout, "[");
+		for (i = 0; i < (data ? data->len : 0); i++)
+			fprintf(stdout, "%02X", data->buf[i]);
+		fprintf(stdout, "]\n");
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
 	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
@@ -5182,6 +5199,7 @@ static int
 postamble_1(int child)
 {
 	int failed = -1;
+	const char *fail_string = NULL;
 
 	while (1) {
 		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
@@ -5191,20 +5209,26 @@ postamble_1(int child)
 			break;
 		case __RESULT_FAILURE:
 			failed = (failed == -1) ? state : failed;
+			fail_string = (fail_string == NULL) ? "Cannot get message" : fail_string;
 			break;
 		default:
 			failed = (failed == -1) ? state : failed;
+			fail_string = (fail_string == NULL) ? "Unexpected event" : fail_string;
 			state++;
 			continue;
 		}
 		break;
 	}
 	state++;
-	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS) {
 		failed = (failed == -1) ? state : failed;
+		fail_string = (fail_string == NULL) ? "Cannot unbind." : fail_string;
+	}
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS) {
 		failed = (failed == -1) ? state : failed;
+		fail_string = (fail_string == NULL) ? "No T_OK_ACK." : fail_string;
+	}
 	state++;
 	if (stop_tt() != __RESULT_SUCCESS)
 		goto failure;
@@ -5214,6 +5238,7 @@ postamble_1(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	state = failed;
+	failure_string = (failure_string == NULL) ? fail_string : failure_string;
 	return (__RESULT_FAILURE);
 }
 
@@ -5373,6 +5398,7 @@ static int
 postamble_2_resp(int child)
 {
 	int failed = -1;
+	const char *fail_string = NULL;
 
 	while (1) {
 		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
@@ -5382,23 +5408,29 @@ postamble_2_resp(int child)
 			break;
 		case __RESULT_FAILURE:
 			failed = (failed == -1) ? state : failed;
+			fail_string = (fail_string == NULL) ? "Cannot get message" : fail_string;
 			break;
 		case __TEST_DISCON_IND:
 			goto got_disconnect;
 		default:
 			failed = (failed == -1) ? state : failed;
+			fail_string = (fail_string == NULL) ? "Unexpected event" : fail_string;
 			state++;
 			continue;
 		}
 		break;
 	}
 	state++;
-	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
 		failed = (failed == -1) ? state : failed;
+		fail_string = (fail_string == NULL) ? "No T_DISCON_IND." : fail_string;
+	}
       got_disconnect:
 	state++;
-	if (postamble_1(child) != __RESULT_SUCCESS)
+	if (postamble_1(child) != __RESULT_SUCCESS) {
 		failed = (failed == -1) ? state : failed;
+		fail_string = (fail_string == NULL) ? "Postamble 1 failed." : fail_string;
+	}
 	state++;
 	if (stop_tt() != __RESULT_SUCCESS)
 		goto failure;
@@ -5408,6 +5440,7 @@ postamble_2_resp(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	state = failed;
+	failure_string = (failure_string == NULL) ? fail_string : failure_string;
 	return (__RESULT_FAILURE);
 }
 
@@ -22294,7 +22327,7 @@ test_case_3_1_conn(int child)
 		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 			goto failure;
 		state++;
-		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		if (expect(child, INFINITE_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 			goto failure;
 		break;
 	default:
@@ -23282,7 +23315,7 @@ struct test_stream test_4_1_2_list = { &preamble_4_1_2_list, &test_case_4_1_2_li
 Attempt and accept a connection on the same (listening) stream.  Generate\n\
 another connection attempt to the listening stream to ensure that a second\n\
 connection indication is not generated while the stream is connected.  Upon\n\
-release, the connection indication may be delivered if it contintues to exit."
+release, the connection indication may be delivered if it continues to exist."
 
 int
 test_case_4_1_3_conn(int child)
@@ -23345,6 +23378,7 @@ test_case_4_1_3_resp(int child)
 	expect(child, LONG_WAIT << 2, __TEST_DISCON_IND);
 	switch (last_event) {
 	case __TEST_CONN_CON:
+	case __EVENT_NO_MSG:
 		state++;
 		test_msleep(child, NORMAL_WAIT);
 		state++;
@@ -23510,14 +23544,22 @@ test_case_4_1_4_resp(int child)
 		goto failure;
 	state++;
 	sin = (typeof(sin)) (cbuf + p->addr_ack.LOCADDR_offset);
-	if (sin->sin_family != addrs[2].sin_family)
+	if (sin->sin_family != addrs[2].sin_family) {
+		failure_string = "LOCADDR sin_family unexpected";
 		goto failure;
+	}
 	state++;
-	if (sin->sin_port != addrs[2].sin_port)
+	if (sin->sin_port != addrs[2].sin_port) {
+		failure_string = "LOCADDR sin_port unexpected";
 		goto failure;
+	}
+#if 1
 	state++;
-	if (sin->sin_addr.s_addr != addrs[2].sin_addr.s_addr)
+	if (sin->sin_addr.s_addr != addrs[2].sin_addr.s_addr) {
+		failure_string = "LOCADDR sin_addr.s_addr unexpected";
 		goto failure;
+	}
+#endif
 	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
@@ -23750,8 +23792,7 @@ test_case_4_1_6_conn(int child)
 int
 test_case_4_1_6_resp(int child)
 {
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (expect(child, LONG_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
@@ -23768,8 +23809,7 @@ test_case_4_1_6_resp(int child)
 		goto failure;
 	state++;
 	/* ---- */
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (expect(child, LONG_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
@@ -23905,8 +23945,6 @@ midamble_4_1_7_conn(int child)
 	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_msleep(child, SHORT_WAIT);
-	state++;
 	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -23931,10 +23969,6 @@ midamble_4_1_7_resp(int child)
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONG_WAIT);
-	state++;
-	test_msleep(child, SHORT_WAIT);
 	state++;
 	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -24382,12 +24416,43 @@ test_case_4_2_1_conn(int child)
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TBADDATA)
-		goto failure;
-	state++;
+	switch (test_level) {
+	case T_INET_TCP:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS
+		    || last_t_errno != TBADDATA)
+			goto failure;
+		state++;
+		break;
+	case T_INET_UDP:
+	case T_INET_IP:
+		goto script_error;
+	case T_INET_SCTP:
+		if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS) {
+			failure_string = "Did not get T_OK_ACK.";
+			goto failure;
+		}
+		state++;
+		test_sleep(child, 2);
+		state++;
+		if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS) {
+			failure_string = "Did not get T_CONN_CON.";
+			goto failure;
+		}
+		state++;
+		if (expect(child, SHORT_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
+			failure_string = "Did not get T_EXDATA_IND.";
+			goto failure;
+		}
+		state++;
+		test_msleep(child, LONG_WAIT);
+		state++;
+		break;
+	}
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+      script_error:
+	return (__RESULT_SCRIPT_ERROR);
 }
 
 int
@@ -24395,30 +24460,85 @@ test_case_4_2_1_resp(int child)
 {
 	test_msleep(child, LONG_WAIT);
 	state++;
-	if (wait_event(child, SHORT_WAIT) != __EVENT_NO_MSG)
-		return (__RESULT_FAILURE);
-	state++;
+	switch (test_level) {
+	case T_INET_TCP:
+		if (wait_event(child, SHORT_WAIT) != __EVENT_NO_MSG)
+			goto failure;
+		state++;
+		break;
+	case T_INET_SCTP:
+		test_sleep(child, 2);
+		state++;
+		if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
+			failure_string = "Did not get T_EXDATA_IND.";
+			goto failure;
+		}
+		state++;
+		test_msleep(child, LONG_WAIT);
+		state++;
+		break;
+	}
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
 test_case_4_2_1_list(int child)
 {
 	test_msleep(child, LONG_WAIT);
+	expect(child, LONGER_WAIT, __TEST_CONN_IND);
 	state++;
-	if (wait_event(child, SHORT_WAIT) != __EVENT_NO_MSG)
-		return (__RESULT_FAILURE);
-	state++;
+	switch (test_level) {
+	case T_INET_TCP:
+		if (last_event != __EVENT_NO_MSG)
+			goto failure;
+		state++;
+		break;
+	case T_INET_SCTP:
+		if (last_event != __TEST_CONN_IND) {
+			failure_string = "Did not get T_CONN_IND.";
+			goto failure;
+		}
+		state++;
+		test_sleep(child, 2);
+		state++;
+		test_resfd = test_fd[1];
+		test_data = "Connection Response Data!\n";
+		test_opts = &opt_conn;
+		test_olen = sizeof(opt_conn);
+		if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS) {
+			failure_string = "Could not send T_CONN_RES.";
+			goto failure;
+		}
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS) {
+			failure_string = "Did not get T_OK_ACK.";
+			goto failure;
+		}
+		state++;
+		test_msleep(child, LONG_WAIT);
+		state++;
+		break;
+	}
 	return (__RESULT_SUCCESS);
+failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_2_1_conn	preamble_1s
 #define preamble_4_2_1_resp	preamble_1s
 #define preamble_4_2_1_list	preamble_1s
 
+#if 1
 #define postamble_4_2_1_conn	postamble_1
 #define postamble_4_2_1_resp	postamble_1
 #define postamble_4_2_1_list	postamble_1
+#else
+#define postamble_4_2_1_conn	postamble_2_conn
+#define postamble_4_2_1_resp	postamble_2_resp
+#define postamble_4_2_1_list	postamble_2_list
+#endif
 
 struct test_stream test_4_2_1_conn = { &preamble_4_2_1_conn, &test_case_4_2_1_conn, &postamble_4_2_1_conn };
 struct test_stream test_4_2_1_resp = { &preamble_4_2_1_resp, &test_case_4_2_1_resp, &postamble_4_2_1_resp };
@@ -24451,6 +24571,8 @@ test_case_4_2_2_conn(int child)
 	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_sleep(child, 5);
+	state++;
 	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -24458,8 +24580,6 @@ test_case_4_2_2_conn(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_sleep(child, 5);
 	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
@@ -24652,6 +24772,61 @@ test_case_4_3_list(int child)
 	return (__RESULT_FAILURE);
 }
 
+int
+test_case_4_3_conn_readonly(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_t_errno != TBADOPT)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+
+int
+test_case_4_3_resp_readonly(int child)
+{
+	return test_case_4_3_resp(child);
+}
+
+int
+test_case_4_3_list_readonly(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONGER_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
 #define preamble_4_3_conn	preamble_1s
 #define preamble_4_3_resp	preamble_1s
 #define preamble_4_3_list	preamble_1s
@@ -24679,6 +24854,16 @@ postamble_4_3_list(int child)
 		return postamble_1(child);
 	return postamble_2_list(child);
 }
+
+#if 1
+#define postamble_4_3_conn_readonly postamble_4_3_conn
+#define postamble_4_3_resp_readonly postamble_4_3_resp
+#define postamble_4_3_list_readonly postamble_4_3_list
+#else
+#define postamble_4_3_conn_readonly postamble_1
+#define postamble_4_3_resp_readonly postamble_1
+#define postamble_4_3_list_readonly postamble_1
+#endif
 
 struct test_stream test_4_3_conn = { &preamble_4_3_conn, &test_case_4_3_conn, &postamble_4_3_conn };
 struct test_stream test_4_3_resp = { &preamble_4_3_resp, &test_case_4_3_resp, &postamble_4_3_resp };
@@ -26216,13 +26401,25 @@ test_case_4_3_5_5_conn(int child)
 	, T_NO};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_4_3_conn(child);
+	switch (test_level) {
+	case T_INET_TCP:
+	default:
+		return test_case_4_3_conn(child);
+	case T_INET_SCTP:
+		return test_case_4_3_conn_readonly(child);
+	}
 }
 
 int
 test_case_4_3_5_5_resp(int child)
 {
-	return test_case_4_3_resp(child);
+	switch (test_level) {
+	case T_INET_TCP:
+	default:
+		return test_case_4_3_resp(child);
+	case T_INET_SCTP:
+		return test_case_4_3_resp_readonly(child);
+	}
 }
 
 int
@@ -26237,12 +26434,18 @@ test_case_4_3_5_5_list(int child)
 	, T_NO};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_4_3_list(child);
+	switch (test_level) {
+	case T_INET_TCP:
+	default:
+		return test_case_4_3_list(child);
+	case T_INET_SCTP:
+		return test_case_4_3_list_readonly(child);
+	}
 }
 
-struct test_stream test_4_3_5_5_conn = { &preamble_4_3_conn, &test_case_4_3_5_5_conn, &postamble_4_3_conn };
-struct test_stream test_4_3_5_5_resp = { &preamble_4_3_resp, &test_case_4_3_5_5_resp, &postamble_4_3_resp };
-struct test_stream test_4_3_5_5_list = { &preamble_4_3_list, &test_case_4_3_5_5_list, &postamble_4_3_list };
+struct test_stream test_4_3_5_5_conn = { &preamble_4_3_conn, &test_case_4_3_5_5_conn, &postamble_4_3_conn_readonly };
+struct test_stream test_4_3_5_5_resp = { &preamble_4_3_resp, &test_case_4_3_5_5_resp, &postamble_4_3_resp_readonly };
+struct test_stream test_4_3_5_5_list = { &preamble_4_3_list, &test_case_4_3_5_5_list, &postamble_4_3_list_readonly };
 
 /*
  *  Connect with options - T_SCTP_TSN
@@ -26268,13 +26471,25 @@ test_case_4_3_5_6_conn(int child)
 	, T_NO};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_4_3_conn(child);
+	switch (test_level) {
+	case T_INET_TCP:
+	default:
+		return test_case_4_3_conn(child);
+	case T_INET_SCTP:
+		return test_case_4_3_conn_readonly(child);
+	}
 }
 
 int
 test_case_4_3_5_6_resp(int child)
 {
-	return test_case_4_3_resp(child);
+	switch (test_level) {
+	case T_INET_TCP:
+	default:
+		return test_case_4_3_resp(child);
+	case T_INET_SCTP:
+		return test_case_4_3_resp_readonly(child);
+	}
 }
 
 int
@@ -26289,12 +26504,18 @@ test_case_4_3_5_6_list(int child)
 	, T_NO};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_4_3_list(child);
+	switch (test_level) {
+	case T_INET_TCP:
+	default:
+		return test_case_4_3_list(child);
+	case T_INET_SCTP:
+		return test_case_4_3_list_readonly(child);
+	}
 }
 
-struct test_stream test_4_3_5_6_conn = { &preamble_4_3_conn, &test_case_4_3_5_6_conn, &postamble_4_3_conn };
-struct test_stream test_4_3_5_6_resp = { &preamble_4_3_resp, &test_case_4_3_5_6_resp, &postamble_4_3_resp };
-struct test_stream test_4_3_5_6_list = { &preamble_4_3_list, &test_case_4_3_5_6_list, &postamble_4_3_list };
+struct test_stream test_4_3_5_6_conn = { &preamble_4_3_conn, &test_case_4_3_5_6_conn, &postamble_4_3_conn_readonly };
+struct test_stream test_4_3_5_6_resp = { &preamble_4_3_resp, &test_case_4_3_5_6_resp, &postamble_4_3_resp_readonly };
+struct test_stream test_4_3_5_6_list = { &preamble_4_3_list, &test_case_4_3_5_6_list, &postamble_4_3_list_readonly };
 
 /*
  *  Connect with options - T_SCTP_RECVOPT
@@ -26837,7 +27058,7 @@ test_case_4_3_5_17_conn(int child)
 	} options = {
 		{
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}
-	, T_NO};
+	, 16};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_conn(child);
@@ -26858,7 +27079,7 @@ test_case_4_3_5_17_list(int child)
 	} options = {
 		{
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}
-	, T_NO};
+	, 16};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_list(child);
@@ -26889,7 +27110,7 @@ test_case_4_3_5_18_conn(int child)
 	} options = {
 		{
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}
-	, T_NO};
+	, 256};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_conn(child);
@@ -26910,7 +27131,7 @@ test_case_4_3_5_18_list(int child)
 	} options = {
 		{
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}
-	, T_NO};
+	, 256};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_list(child);
@@ -27669,7 +27890,7 @@ test_case_4_3_5_33_conn(int child)
 	} options = {
 		{
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_BURST, T_SUCCESS}
-	, T_NO};
+	, 3};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_conn(child);
@@ -27690,7 +27911,7 @@ test_case_4_3_5_33_list(int child)
 	} options = {
 		{
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_BURST, T_SUCCESS}
-	, T_NO};
+	, 3};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_list(child);
@@ -27880,13 +28101,25 @@ test_case_4_3_5_37_conn(int child)
 	, T_NO};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_4_3_conn(child);
+	switch (test_level) {
+	case T_INET_TCP:
+	default:
+		return test_case_4_3_conn(child);
+	case T_INET_SCTP:
+		return test_case_4_3_conn_readonly(child);
+	}
 }
 
 int
 test_case_4_3_5_37_resp(int child)
 {
-	return test_case_4_3_resp(child);
+	switch (test_level) {
+	case T_INET_TCP:
+	default:
+		return test_case_4_3_resp(child);
+	case T_INET_SCTP:
+		return test_case_4_3_resp_readonly(child);
+	}
 }
 
 int
@@ -27901,12 +28134,18 @@ test_case_4_3_5_37_list(int child)
 	, T_NO};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_4_3_list(child);
+	switch (test_level) {
+	case T_INET_TCP:
+	default:
+		return test_case_4_3_list(child);
+	case T_INET_SCTP:
+		return test_case_4_3_list_readonly(child);
+	}
 }
 
-struct test_stream test_4_3_5_37_conn = { &preamble_4_3_conn, &test_case_4_3_5_37_conn, &postamble_4_3_conn };
-struct test_stream test_4_3_5_37_resp = { &preamble_4_3_resp, &test_case_4_3_5_37_resp, &postamble_4_3_resp };
-struct test_stream test_4_3_5_37_list = { &preamble_4_3_list, &test_case_4_3_5_37_list, &postamble_4_3_list };
+struct test_stream test_4_3_5_37_conn = { &preamble_4_3_conn, &test_case_4_3_5_37_conn, &postamble_4_3_conn_readonly };
+struct test_stream test_4_3_5_37_resp = { &preamble_4_3_resp, &test_case_4_3_5_37_resp, &postamble_4_3_resp_readonly };
+struct test_stream test_4_3_5_37_list = { &preamble_4_3_list, &test_case_4_3_5_37_list, &postamble_4_3_list_readonly };
 
 /*
  *  Connect with options - T_SCTP_DEBUG
@@ -28190,6 +28429,8 @@ test_case_5_2_resp(int child)
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -30755,7 +30996,7 @@ test_case_11_1(int child, int prim)
 #define desc_case_11_1_1 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_ADDR_REQ primitive that is too short."
@@ -30785,7 +31026,7 @@ struct test_stream test_11_1_1_list = { &preamble_11_1_1_list, &test_case_11_1_1
 #define desc_case_11_1_2 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_BIND_REQ primitive that is too short."
@@ -30815,7 +31056,7 @@ struct test_stream test_11_1_2_list = { &preamble_11_1_2_list, &test_case_11_1_2
 #define desc_case_11_1_3 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_CAPABILITY_REQ primitive that is too short."
@@ -30845,7 +31086,7 @@ struct test_stream test_11_1_3_list = { &preamble_11_1_3_list, &test_case_11_1_3
 #define desc_case_11_1_4 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_CONN_REQ primitive that is too short."
@@ -30875,7 +31116,7 @@ struct test_stream test_11_1_4_list = { &preamble_11_1_4_list, &test_case_11_1_4
 #define desc_case_11_1_5 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_CONN_RES primitive that is too short."
@@ -30905,7 +31146,7 @@ struct test_stream test_11_1_5_list = { &preamble_11_1_5_list, &test_case_11_1_5
 #define desc_case_11_1_6 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_DATA_REQ primitive that is too short."
@@ -30935,7 +31176,7 @@ struct test_stream test_11_1_6_list = { &preamble_11_1_6_list, &test_case_11_1_6
 #define desc_case_11_1_7 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_DISCON_REQ primitive that is too short."
@@ -30965,7 +31206,7 @@ struct test_stream test_11_1_7_list = { &preamble_11_1_7_list, &test_case_11_1_7
 #define desc_case_11_1_8 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_EXDATA_REQ primitive that is too short."
@@ -30995,7 +31236,7 @@ struct test_stream test_11_1_8_list = { &preamble_11_1_8_list, &test_case_11_1_8
 #define desc_case_11_1_9 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_INFO_REQ primitive that is too short."
@@ -31025,7 +31266,7 @@ struct test_stream test_11_1_9_list = { &preamble_11_1_9_list, &test_case_11_1_9
 #define desc_case_11_1_10 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_OPTDATA_REQ primitive that is too short."
@@ -31055,7 +31296,7 @@ struct test_stream test_11_1_10_list = { &preamble_11_1_10_list, &test_case_11_1
 #define desc_case_11_1_11 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_ORDREL_REQ primitive that is too short."
@@ -31085,7 +31326,7 @@ struct test_stream test_11_1_11_list = { &preamble_11_1_11_list, &test_case_11_1
 #define desc_case_11_1_12 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_UNBIND_REQ primitive that is too short."
@@ -31115,7 +31356,7 @@ struct test_stream test_11_1_12_list = { &preamble_11_1_12_list, &test_case_11_1
 #define desc_case_11_1_13 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is to short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgeement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_UNITDATA_REQ primitive that is too short."
@@ -33091,7 +33332,49 @@ postamble_ts_wcon_creq_conn(int child)
 #define postamble_ts_wcon_creq_resp	postamble_0
 #define postamble_ts_wcon_creq_list	postamble_0
 
-#define preamble_ts_wres_cind_conn	preamble_13_connection
+int
+preamble_ts_wres_cind_conn(int child)
+{
+	switch(test_level) {
+	case T_INET_TCP:
+	default:
+		return preamble_13_connection(child);
+	case T_INET_SCTP:
+		break;
+	}
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_info.SERV_type == T_CLTS)
+		goto notapplicable;
+	state++;
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+      notapplicable:
+	return (__RESULT_NOTAPPL);
+}
+
 #define preamble_ts_wres_cind_resp	preamble_0
 
 int
@@ -33134,6 +33417,8 @@ preamble_ts_data_xfer_conn(int child)
 	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -33156,6 +33441,8 @@ preamble_ts_data_xfer_resp(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -33258,9 +33545,12 @@ postamble_ts_wind_ordrel_resp(int child)
 	int failed = -1;
 	int result = __RESULT_SCRIPT_ERROR;
 
-	test_data = NULL;
-	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
-		failed = state;
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
+		state++;
+		test_data = NULL;
+		if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+			failed = state;
+	}
 	state++;
 	if ((result = postamble_1(child)) != __RESULT_SUCCESS)
 		goto abort;
@@ -34929,20 +35219,28 @@ test_case_13_5_4_resp(int child)
 int
 test_case_13_5_4_list(int child)
 {
-	/* LiS has a bug where it passes a zero length data message. */
-	test_data = "data";
-	test_opts = NULL;
-	test_olen = 0;
-	test_resfd = test_fd[1];
-	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (last_t_errno != TBADDATA)
-		goto failure;
-	state++;
+	switch (test_level) {
+	case T_INET_TCP:
+		/* LiS has a bug where it passes a zero length data message. */
+		test_data = "data";
+		test_opts = NULL;
+		test_olen = 0;
+		test_resfd = test_fd[1];
+		if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (last_t_errno != TBADDATA)
+			goto failure;
+		state++;
+		break;
+	case T_INET_SCTP:
+		return (__RESULT_SKIPPED);
+	default:
+		return (__RESULT_SCRIPT_ERROR);
+	}
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -35789,8 +36087,20 @@ for the T_DATA_REQ primitive."
 int
 test_case_13_6_1_4_conn(int child)
 {
-	expect(child, LONG_WAIT, __TEST_DISCON_IND);
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
+		state++;
+		test_data = NULL;
+		last_sequence = 0;
+		if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+	}
+	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
@@ -35883,7 +36193,7 @@ test_case_13_6_2_conn(int child)
 	case __RESULT_FAILURE:
 		break;
 	case __TEST_DISCON_IND:
-		goto again;
+		goto success;
 	case __TEST_ORDREL_IND:
 		goto again;
 	default:
@@ -35892,6 +36202,7 @@ test_case_13_6_2_conn(int child)
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
+      success:
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -35912,7 +36223,7 @@ test_case_13_6_2_resp(int child)
 	case __RESULT_FAILURE:
 		break;
 	case __TEST_DISCON_IND:
-		goto again;
+		goto success;
 	case __TEST_ORDREL_IND:
 		goto again;
 	default:
@@ -35921,6 +36232,7 @@ test_case_13_6_2_resp(int child)
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
+      success:
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -36454,8 +36766,19 @@ for the T_EXDATA_REQ primitive."
 int
 test_case_13_8_1_4_conn(int child)
 {
-	expect(child, LONG_WAIT, __TEST_DISCON_IND);
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
+		state++;
+		test_data = NULL;
+		last_sequence = 0;
+		if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+	}
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
@@ -36548,7 +36871,7 @@ test_case_13_8_2_conn(int child)
 	case __RESULT_FAILURE:
 		break;
 	case __TEST_DISCON_IND:
-		goto again;
+		goto success;
 	case __TEST_ORDREL_IND:
 		goto again;
 	default:
@@ -36557,6 +36880,7 @@ test_case_13_8_2_conn(int child)
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
+      success:
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -36577,7 +36901,7 @@ test_case_13_8_2_resp(int child)
 	case __RESULT_FAILURE:
 		break;
 	case __TEST_DISCON_IND:
-		goto again;
+		goto success;
 	case __TEST_ORDREL_IND:
 		goto again;
 	default:
@@ -36586,6 +36910,7 @@ test_case_13_8_2_resp(int child)
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
+      success:
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -36862,8 +37187,19 @@ for the T_OPTDATA_REQ primitive."
 int
 test_case_13_10_1_4_conn(int child)
 {
-	expect(child, LONG_WAIT, __TEST_DISCON_IND);
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
+		state++;
+		test_data = NULL;
+		last_sequence = 0;
+		if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+	}
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
@@ -37440,8 +37776,19 @@ for the T_ORDREL_REQ primitive."
 int
 test_case_13_12_1_4_conn(int child)
 {
-	expect(child, LONG_WAIT, __TEST_DISCON_IND);
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
+		state++;
+		test_data = NULL;
+		last_sequence = 0;
+		if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+	}
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
@@ -37660,6 +38007,8 @@ for the T_UNBIND_REQ primitive."
 int
 test_case_13_13_2_3_conn(int child)
 {
+	test_msleep(child, LONG_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38780,8 +39129,8 @@ test_case_14_7_1_list(int child)
 #define preamble_14_7_1_list	preamble_ts_wcon_creq_list
 
 #define postamble_14_7_1_conn	postamble_ts_idle_conn
-#define postamble_14_7_1_resp	postamble_ts_idle_resp
-#define postamble_14_7_1_list	postamble_ts_idle_list
+#define postamble_14_7_1_resp	postamble_ts_wcon_creq_resp
+#define postamble_14_7_1_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_14_7_1_conn = { &preamble_14_7_1_conn, &test_case_14_7_1_conn, &postamble_14_7_1_conn };
 struct test_stream test_14_7_1_resp = { &preamble_14_7_1_resp, &test_case_14_7_1_resp, &postamble_14_7_1_resp };
@@ -39260,6 +39609,8 @@ can be issued.  This test case tests the T_INFO_REQ primitive in the TS_WRES_CIN
 int
 test_case_14_9_4_conn(int child)
 {
+	test_msleep(child, LONG_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40044,6 +40395,7 @@ run_stream(int child, struct test_stream *stream)
 
 	print_preamble(child);
 	state = 100;
+	failure_string = NULL;
 	if (stream->preamble && (pre_result = stream->preamble(child)) != __RESULT_SUCCESS) {
 		switch (pre_result) {
 		case __RESULT_NOTAPPL:
@@ -40062,6 +40414,7 @@ run_stream(int child, struct test_stream *stream)
 	} else {
 		print_test(child);
 		state = 200;
+		failure_string = NULL;
 		switch (stream->testcase(child)) {
 		default:
 		case __RESULT_INCONCLUSIVE:
@@ -40091,6 +40444,7 @@ run_stream(int child, struct test_stream *stream)
 		}
 		print_postamble(child);
 		state = 300;
+		failure_string = NULL;
 		if (stream->postamble && (post_result = stream->postamble(child)) != __RESULT_SUCCESS) {
 			switch (post_result) {
 			case __RESULT_NOTAPPL:
