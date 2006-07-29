@@ -99,6 +99,7 @@ if RPM_BUILD_USER
 EXTRA_PROGRAMS			+= \
 				  test-sctp \
 				  test-sctp_n \
+				  test-sctp_n2 \
 				  test-sctp_nc \
 				  test-sctp_ns \
 				  test-sctp_t \
@@ -108,6 +109,7 @@ EXTRA_PROGRAMS			+= \
 pkglibexec_PROGRAMS		= \
 				  test-sctp \
 				  test-sctp_n \
+				  test-sctp_n2 \
 				  test-sctp_nc \
 				  test-sctp_ns \
 				  test-sctp_t \
@@ -134,6 +136,12 @@ test_sctp_n_LDADD		= $(STREAMS_LDADD)
 test_sctp_n_LDFLAGS		= -static
 test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n_CFLAGS		= $(USER_CFLAGS)
+
+test_sctp_n2_SOURCES		= src/test/test-sctp_n2.c
+test_sctp_n2_LDADD		= $(STREAMS_LDADD)
+test_sctp_n2_LDFLAGS		= -static
+test_sctp_n2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_n2_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
 test_sctp_nc_LDADD		= $(STREAMS_LDADD)
@@ -288,6 +296,7 @@ if RPM_BUILD_USER
 EXTRA_PROGRAMS			+= \
 				  test-sctp \
 				  test-sctp_n \
+				  test-sctp_n2 \
 				  test-sctp_nc \
 				  test-sctp_ns \
 				  test-sctp_t \
@@ -297,6 +306,7 @@ EXTRA_PROGRAMS			+= \
 pkglibexec_PROGRAMS		= \
 				  test-sctp \
 				  test-sctp_n \
+				  test-sctp_n2 \
 				  test-sctp_nc \
 				  test-sctp_ns \
 				  test-sctp_t \
@@ -323,6 +333,12 @@ test_sctp_n_LDADD		= $(STREAMS_LDADD)
 test_sctp_n_LDFLAGS		= -static
 test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n_CFLAGS		= $(USER_CFLAGS)
+
+test_sctp_n2_SOURCES		= src/test/test-sctp_n2.c
+test_sctp_n2_LDADD		= $(STREAMS_LDADD)
+test_sctp_n2_LDFLAGS		= -static
+test_sctp_n2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_n2_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
 test_sctp_nc_LDADD		= $(STREAMS_LDADD)

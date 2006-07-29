@@ -116,9 +116,123 @@ AT_BANNER([STREAMS SCTP NPI module tests])
 
 dnl AT_XFAIL_IF([test `id -u` -ne 0])
 
-dnl AT_SETUP([sctp test 1.1])
-dnl AT_KEYWORDS([npi sctp])
-dnl AT_CHECK([test_sctp_n 1.1], [], [ignore], [], [], [])
-dnl AT_CLEANUP
+AT_SETUP([sctp-npi test 1.1])
+AT_KEYWORDS([N_OPTMGMT_REQ])
+AT_CHECK([test_sctp_n 1.1], [], [ignore], [], [], [])
+AT_CLEANUP
 
+AT_SETUP([sctp-npi test 1.2])
+AT_KEYWORDS([N_BIND_REQ])
+AT_CHECK([test_sctp_n 1.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 2.1])
+AT_KEYWORDS([N_CONN_REQ])
+AT_CHECK([test_sctp_n 2.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 2.2])
+AT_KEYWORDS([N_CONN_REQ])
+AT_CHECK([test_sctp_n 2.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 3.1])
+AT_KEYWORDS([N_CONN_REQ])
+AT_CHECK([test_sctp_n 3.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 3.2])
+AT_KEYWORDS([N_CONN_REQ])
+AT_CHECK([test_sctp_n 3.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 4.1])
+AT_KEYWORDS([N_CONN_REQ])
+AT_CHECK([test_sctp_n 4.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 4.2])
+AT_KEYWORDS([N_CONN_RES])
+AT_CHECK([test_sctp_n 4.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 5.1])
+AT_KEYWORDS([N_CONN_RES])
+AT_CHECK([test_sctp_n 5.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 5.2])
+AT_KEYWORDS([N_CONN_RES])
+AT_CHECK([test_sctp_n 5.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 5.3])
+AT_KEYWORDS([N_CONN_RES])
+AT_CHECK([test_sctp_n 5.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 6.1])
+AT_KEYWORDS([N_CONN_REQ M_DATA])
+AT_CHECK([test_sctp_n 6.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 6.2])
+AT_KEYWORDS([N_DATA_REQ])
+AT_CHECK([test_sctp_n 6.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 6.3])
+AT_KEYWORDS([N_DATA_REQ])
+AT_CHECK([test_sctp_n 6.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 7.1])
+AT_KEYWORDS([N_DATA_REQ])
+AT_CHECK([test_sctp_n 7.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 7.2])
+AT_KEYWORDS([N_DATA_REQ])
+AT_CHECK([test_sctp_n 7.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 8.1])
+AT_KEYWORDS([N_CONN_REQ M_DATA])
+AT_CHECK([test_sctp_n 8.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 8.2])
+AT_KEYWORDS([N_DATACK_REQ])
+AT_CHECK([test_sctp_n 8.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 9.1])
+AT_KEYWORDS([N_DATA_REQ])
+AT_CHECK([test_sctp_n 9.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 9.2])
+AT_KEYWORDS([N_EXDATA_REQ])
+AT_CHECK([test_sctp_n 9.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 9.3])
+AT_KEYWORDS([N_DATA_REQ])
+AT_CHECK([test_sctp_n 9.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 9.4])
+AT_KEYWORDS([N_EXDATA_REQ])
+AT_CHECK([test_sctp_n 9.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 10.1])
+AT_KEYWORDS([N_DATA_REQ])
+AT_CHECK([test_sctp_n 10.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp-npi test 10.2])
+AT_KEYWORDS([N_DATA_REQ])
+AT_CHECK([test_sctp_n 10.2], [], [ignore], [], [], [])
+AT_CLEANUP
 

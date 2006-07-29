@@ -92,6 +92,7 @@ TESTSUITE_DEPS		+= \
 			$(TESTSUITE)-sctp.at \
 			$(TESTSUITE)-sctp_t.at \
 			$(TESTSUITE)-sctp_n.at \
+			$(TESTSUITE)-sctp_n2.at \
 			$(TESTSUITE).at
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

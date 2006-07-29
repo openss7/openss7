@@ -84,6 +84,7 @@ m4_include([kernel.at])
 
 m4_include([testsuite-sctp_t.at])
 m4_include([testsuite-sctp_n.at])
+m4_include([testsuite-sctp_n2.at])
 
 #m4_include([dummy1.m4])
 #m4_include([dummy2.m4])

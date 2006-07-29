@@ -1808,6 +1808,31 @@ struct sctp_tcb {
 #define TF_SCTP_DEBUG			(1<<32)
 #define TF_SCTP_ALLOPS			0xffffffff
 
+#define NSM_ALLSTATES	(NSF_NOSTATES - 1)
+#define NSM_WACK_DREQ	(NSF_WACK_DREQ6 \
+			|NSF_WACK_DREQ7 \
+			|NSF_WACK_DREQ9 \
+			|NSF_WACK_DREQ10 \
+			|NSF_WACK_DREQ11)
+#define NSM_LISTEN	(NSF_IDLE \
+			|NSF_WRES_CIND)
+#define NSM_CONNECTED	(NSF_WCON_CREQ\
+			|NSF_WRES_CIND\
+			|NSF_DATA_XFER\
+			|NSF_WCON_RREQ\
+			|NSF_WRES_RIND)
+#define NSM_DISCONN	(NSF_IDLE\
+			|NSF_UNBND)
+#define NSM_INDATA	(NSF_DATA_XFER\
+			|NSF_WCON_RREQ)
+#define NSM_OUTDATA	(NSF_DATA_XFER\
+			|NSF_WRES_RIND)
+
+#ifndef N_PROVIDER
+#define N_PROVIDER  0
+#define N_USER	    1
+#endif
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -3625,15 +3650,15 @@ __sctp_lhash_unhash(sctp_t * sp)
 	struct sctp_hash_bucket *hp = &sctp_lhash[sctp_sp_lhashfn(sp)];
 
 	_printd(("INFO: Removing stream %p from Listen hashes\n", sp));
+	write_lock(&hp->lock);
 	if (sp->lprev) {
-		write_lock(&hp->lock);
 		if ((*(sp->lprev) = sp->lnext))
 			sp->lnext->lprev = sp->lprev;
 		sp->lnext = NULL;
 		sp->lprev = NULL;
-		write_unlock(&hp->lock);
 	} else
 		swerr();
+	write_unlock(&hp->lock);
 }
 STATIC void
 __sctp_phash_unhash(sctp_t * sp)
@@ -3641,15 +3666,15 @@ __sctp_phash_unhash(sctp_t * sp)
 	struct sctp_hash_bucket *hp = &sctp_phash[sctp_sp_phashfn(sp)];
 
 	_printd(("INFO: Removing stream %p from Peer Tag hashes\n", sp));
+	write_lock(&hp->lock);
 	if (sp->pprev) {
-		write_lock(&hp->lock);
 		if ((*(sp->pprev) = sp->pnext))
 			sp->pnext->pprev = sp->pprev;
 		sp->pnext = NULL;
 		sp->pprev = NULL;
-		write_unlock(&hp->lock);
 	} else
 		swerr();
+	write_unlock(&hp->lock);
 }
 STATIC void
 __sctp_vhash_unhash(sctp_t * sp)
@@ -3657,8 +3682,8 @@ __sctp_vhash_unhash(sctp_t * sp)
 	struct sctp_hash_bucket *hp = &sctp_vhash[sctp_sp_vhashfn(sp)];
 
 	_printd(("INFO: Removing stream %p from Verification Tag hashes\n", sp));
+	write_lock(&hp->lock);
 	if (sp->vprev) {
-		write_lock(&hp->lock);
 		if ((*(sp->vprev) = sp->vnext))
 			sp->vnext->vprev = sp->vprev;
 		sp->vnext = NULL;
@@ -3666,9 +3691,9 @@ __sctp_vhash_unhash(sctp_t * sp)
 		if (sctp_cache[sp->hashent].list == sp)
 			sctp_cache[sp->hashent].list = NULL;
 		sp->hashent = 0;
-		write_unlock(&hp->lock);
 	} else
 		swerr();
+	write_unlock(&hp->lock);
 }
 STATIC void
 __sctp_thash_unhash(sctp_t * sp)
@@ -3676,15 +3701,15 @@ __sctp_thash_unhash(sctp_t * sp)
 	struct sctp_hash_bucket *hp = &sctp_thash[sctp_sp_thashfn(sp)];
 
 	_printd(("INFO: Removing stream %p from TCB hashes\n", sp));
+	write_lock(&hp->lock);
 	if (sp->tprev) {
-		write_lock(&hp->lock);
 		if ((*(sp->tprev) = sp->tnext))
 			sp->tnext->tprev = sp->tprev;
 		sp->tnext = NULL;
 		sp->tprev = NULL;
-		write_unlock(&hp->lock);
 	} else
 		swerr();
+	write_unlock(&hp->lock);
 }
 STATIC void
 __sctp_bindb_get(unsigned short snum)
@@ -6631,7 +6656,7 @@ sctp_data_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_
  *
  *  -------------------------------------------------------------------------
  */
-#if 0
+#if 1
 STATIC INLINE int
 sctp_datack_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t tsn)
 {
@@ -9128,7 +9153,7 @@ sctp_cumm_ack(struct sctp *sp, uint32_t ack)
 			sp->nsack--;
 		}
 		__bufq_unlink(&sp->rtxq, mp);
-#if 0
+#if 1
 		if (cb->flags & SCTPCB_FLAG_CONF && cb->flags & SCTPCB_FLAG_LAST_FRAG
 		    && sp->ops->datack_ind)
 			bufq_queue(&sp->ackq, mp);
@@ -13696,7 +13721,7 @@ sctp_cleanup_read(struct sctp *sp)
 	mblk_t *mp;
 
 	assert(sp);
-#if 0
+#if 1
 	bufq_lock(&sp->ackq);
 	while ((mp = bufq_head(&sp->ackq))) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
@@ -14707,12 +14732,11 @@ n_bind_ack(struct sctp *sp)
 	N_bind_ack_t *p;
 	struct sctp_saddr *ss = sp->saddr;
 	struct sockaddr_in *add;
-	size_t add_len = sp->sanum * sizeof(*add);
-	size_t pro_len = sizeof(sp->ppi);
+	size_t add_len = sp->sanum ? sp->sanum * sizeof(*add) : sizeof(*add);
 
 	if (sp->i_state != NS_WACK_BREQ)
 		goto outstate;
-	if (!(mp = sctp_allocb(sp, sizeof(*p) + add_len + pro_len, BPRI_MED)))
+	if (!(mp = sctp_allocb(sp, sizeof(*p) + add_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (N_bind_ack_t *) mp->b_wptr;
@@ -14721,19 +14745,23 @@ n_bind_ack(struct sctp *sp)
 	p->ADDR_offset = add_len ? sizeof(*p) : 0;
 	p->CONIND_number = sp->conind;
 	p->TOKEN_value = (t_uscalar_t) (long) sp->rq;
-	p->PROTOID_length = pro_len;
-	p->PROTOID_offset = pro_len ? sizeof(*p) + add_len : 0;
+	p->PROTOID_length = 0;
+	p->PROTOID_offset = 0;
 	mp->b_wptr += sizeof(*p);
-	for (; ss; ss = ss->next) {
+	if (sp->sanum) {
+		for (; ss; ss = ss->next) {
+			add = (typeof(add)) mp->b_wptr;
+			add->sin_family = AF_INET;
+			add->sin_port = sp->sport;
+			add->sin_addr.s_addr = ss->saddr;
+			mp->b_wptr += sizeof(*add);
+		}
+	} else {
 		add = (typeof(add)) mp->b_wptr;
 		add->sin_family = AF_INET;
 		add->sin_port = sp->sport;
-		add->sin_addr.s_addr = ss->saddr;
+		add->sin_addr.s_addr = INADDR_ANY;
 		mp->b_wptr += sizeof(*add);
-	}
-	{
-		*(uint32_t *) mp->b_wptr = sp->ppi;
-		mp->b_wptr += sizeof(uint32_t);
 	}
 	sp->i_state = NS_IDLE;
 	putnext(sp->rq, mp);
@@ -14771,6 +14799,9 @@ n_error_ack(struct sctp *sp, int prim, int err)
 		break;
 	case -EACCES:
 		err = NACCESS;
+		break;
+	case -EDESTADDRREQ:
+		err = NBADADDR;
 		break;
 	}
 	if (!(mp = sctp_allocb(sp, sizeof(*p), BPRI_MED)))
@@ -14842,7 +14873,8 @@ n_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 	/* switch by prim and not by state */
 	switch (prim) {
 	case N_OPTMGMT_REQ:
-		sp->i_state = NS_IDLE;
+		if (sp->i_state == NS_WACK_OPTREQ)
+			sp->i_state = NS_IDLE;
 		break;
 	case N_RESET_RES:
 		sp->i_state = NS_DATA_XFER;
@@ -15195,11 +15227,16 @@ n_conn_req(struct sctp *sp, mblk_t *mp)
 	struct sockaddr_in *dsin = (struct sockaddr_in *) &sa;
 	size_t dnum = 0, dlen, qlen;
 
-	if (sp->i_state != NS_IDLE)
+	if (sp->i_state != NS_IDLE) {
+		if (sp->conind > 0)
+			goto access;
 		goto outstate;
+	}
 	sp->i_state = NS_WCON_CREQ;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
+	if (p->CONN_flags & ~(REC_CONF_OPT|EX_DATA_OPT))
+		goto badflag;
 	if ((dlen = p->DEST_length)) {
 		unsigned char *dptr = mp->b_rptr + p->DEST_offset;
 
@@ -15217,9 +15254,14 @@ n_conn_req(struct sctp *sp, mblk_t *mp)
 		if (dsin->sin_family != AF_INET)
 			goto badaddr;
 		dport = dsin->sin_port;
-	}
+	} else
+		goto noaddr;
 	if (!dport)
 		goto badaddr;
+	if (mp->b_cont && (!msgdsize(mp->b_cont) || msgdsize(mp->b_cont) > sp->pmtu - 16))
+		goto baddata;
+	if (sp->conind > 0)
+		goto access;
 	if ((qlen = p->QOS_length)) {
 		if (mp->b_wptr < mp->b_rptr + p->QOS_offset + qlen)
 			goto badopt1;
@@ -15250,13 +15292,21 @@ n_conn_req(struct sctp *sp, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: no permission for requested address\n", DRV_NAME, sp));
 	goto error;
 #endif
+      baddata:
+	err = NBADDATA;
+	ptrace(("%s: %p: ERROR: amount of data is invalid\n", DRV_NAME, sp));
+	goto error;
+      noaddr:
+	err = NNOADDR;
+	ptrace(("%s: %p: ERROR: destination address required\n", DRV_NAME, sp));
+	goto error;
       badaddr:
 	err = NBADADDR;
 	ptrace(("%s: %p: ERROR: address is unusable\n", DRV_NAME, sp));
 	goto error;
       badopt2:
 	ptrace(("%s: %p: ERROR: options are unusable\n", DRV_NAME, sp));
-	err = NBADOPT;
+	err = NBADQOSPARAM;
 	goto error;
       badqostype:
 	err = NBADQOSTYPE;
@@ -15266,9 +15316,17 @@ n_conn_req(struct sctp *sp, mblk_t *mp)
 	err = NBADOPT;
 	ptrace(("%s: %p: ERROR: options are unusable\n", DRV_NAME, sp));
 	goto error;
+      badflag:
+	err = NBADFLAG;
+	ptrace(("%s: %p: ERROR: bad connection flags\n", DRV_NAME, sp));
+	goto error;
       einval:
 	err = -EINVAL;
 	ptrace(("%s: %p: ERROR: invalid message format\n", DRV_NAME, sp));
+	goto error;
+      access:
+	err = NACCESS;
+	ptrace(("%s: %p: ERROR: cannot connect on listening stream\n", DRV_NAME, sp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
@@ -15423,10 +15481,8 @@ n_discon_req(struct sctp *sp, mblk_t *mp)
 	mblk_t *cp = NULL;
 	N_discon_req_t *p = (N_discon_req_t *) mp->b_rptr;
 
-	if (!
-	    ((1 << sp->
-	      i_state) & (NSF_WCON_CREQ | NSF_WRES_CIND | NSF_DATA_XFER | NSF_WCON_RREQ |
-			  NSF_WRES_RIND)))
+	if (!((1 << sp->i_state) & (NSF_WCON_CREQ | NSF_WRES_CIND | NSF_DATA_XFER
+				    | NSF_WCON_RREQ | NSF_WRES_RIND)))
 		goto outstate;
 	switch (sp->i_state) {
 	case NS_WCON_CREQ:
@@ -15452,6 +15508,8 @@ n_discon_req(struct sctp *sp, mblk_t *mp)
 	if (p->RES_length)
 		goto badaddr;
 	if (sp->i_state == NS_WACK_DREQ7 && !(cp = n_seq_check(sp, p->SEQ_number)))
+		goto badseq;
+	if (sp->i_state != NS_WACK_DREQ7 && (p->SEQ_number != 0))
 		goto badseq;
 	/* XXX: What do we do with the disconnect reason? Nothing? */
 	if ((err = sctp_discon_req(sp, cp)))
@@ -15499,8 +15557,8 @@ n_write(struct sctp *sp, mblk_t *mp)
 		t_uscalar_t ppi = sp->ppi;
 		t_uscalar_t sid = sp->sid;
 		t_uscalar_t ord = 1;
-		t_uscalar_t more = 0;
-		t_uscalar_t rcpt = 0;
+		t_uscalar_t more = (mp->b_flag & MSGDELIM) ? 0 : N_MORE_DATA_FLAG;
+		t_uscalar_t rcpt = (sp->flags & SCTP_FLAG_DEFAULT_RC_SEL) ? N_RC_FLAG : 0;
 
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp)))
 			goto error;
@@ -15536,6 +15594,8 @@ n_data_req(struct sctp *sp, mblk_t *mp)
 	}
 	if (!((1 << sp->i_state) & (NSF_DATA_XFER | NSF_WRES_RIND)))
 		goto eproto;
+	if (mp->b_cont == NULL || msgdsize(mp->b_cont) == 0)
+		goto baddata;
 	{
 		t_uscalar_t ppi = q ? q->ppi : sp->ppi;
 		t_uscalar_t sid = q ? q->sid : sp->sid;
@@ -15547,6 +15607,10 @@ n_data_req(struct sctp *sp, mblk_t *mp)
 			goto error;
 		return (QR_TRIMMED);
 	}
+      baddata:
+	seldom();
+	err = -EPROTO;
+	goto error;
       eproto:
 	seldom();
 	err = -EPROTO;
@@ -15585,6 +15649,8 @@ n_exdata_req(struct sctp *sp, mblk_t *mp)
 	}
 	if (!((1 << sp->i_state) & (NSF_DATA_XFER | NSF_WRES_RIND)))
 		goto eproto;
+	if (mp->b_cont == NULL || msgdsize(mp->b_cont) == 0)
+		goto baddata;
 	{
 		t_uscalar_t ppi = q ? q->ppi : sp->ppi;
 		t_uscalar_t sid = q ? q->sid : sp->sid;
@@ -15596,6 +15662,10 @@ n_exdata_req(struct sctp *sp, mblk_t *mp)
 			goto error;
 		return (QR_TRIMMED);
 	}
+      baddata:
+	seldom();
+	err = -EPROTO;
+	goto error;
       eproto:
 	seldom();
 	err = -EPROTO;
@@ -15638,6 +15708,10 @@ n_bind_req(struct sctp *sp, mblk_t *mp)
 	sp->i_state = NS_WACK_BREQ;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
+	if ((p->BIND_flags & ~(TOKEN_REQUEST|DEFAULT_DEST|DEFAULT_LISTENER)))
+		goto badflag;
+	if ((p->BIND_flags & (DEFAULT_DEST|DEFAULT_LISTENER)))
+		goto notsupport;
 	if (p->ADDR_length && (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length))
 		goto badaddr;
 	{
@@ -15661,7 +15735,10 @@ n_bind_req(struct sctp *sp, mblk_t *mp)
 				goto badaddr;
 			sport = add_in->sin_port;
 		} else {
-			anum = 0;
+			add_in->sin_family = AF_INET;
+			add_in->sin_port = 0;
+			add_in->sin_addr.s_addr = INADDR_ANY;
+			anum = 1;
 			sport = 0;
 		}
 		if ((err = sctp_bind_req(sp, sport, add_in, anum, p->CONIND_number)))
@@ -15685,6 +15762,12 @@ n_bind_req(struct sctp *sp, mblk_t *mp)
 	seldom();
 	err = NBADADDR;
 	goto error;		/* address is invalid */
+      notsupport:
+	err = NNOTSUPPORT;
+	goto error;
+      badflag:
+	err = NBADFLAG;
+	goto error;
       einval:
 	seldom();
 	err = -EINVAL;
@@ -15748,46 +15831,135 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 			goto badopt2;
 	}
 	if (p->QOS_length) {
-		if (q->i_streams != -1)
+		if (q->i_streams != -1) {
+			if (q->i_streams < 1)
+				goto badqosparam;
+			if (q->i_streams > 0x00010000)
+				goto badqosparam;
 			sp->max_istr = q->i_streams ? q->i_streams : 1;
-		if (q->o_streams != -1)
+		}
+		if (q->o_streams != -1) {
+			if (q->o_streams < 1)
+				goto badqosparam;
+			if (q->o_streams > 0x00010000)
+				goto badqosparam;
 			sp->req_ostr = q->o_streams ? q->o_streams : 1;
-		if (q->ppi != -1)
+		}
+		if (q->ppi != -1) {
 			sp->ppi = q->ppi;
-		if (q->sid != -1)
+		}
+		if (q->sid != -1) {
+			if (q->sid > 0x0000ffff)
+				goto badqosparam;
 			sp->sid = q->sid;
-		if (q->max_inits != -1)
+		}
+		if (q->max_inits != -1) {
 			sp->max_inits = q->max_inits;
-		if (q->max_retrans != -1)
+		}
+		if (q->max_retrans != -1) {
 			sp->max_retrans = q->max_retrans;
-		if (q->ck_life != -1)
-			sp->ck_life = q->ck_life;
-		if (q->ck_inc != -1)
-			sp->ck_inc = q->ck_inc;
-		if (q->hmac != -1)
+		}
+		if (q->ck_life != -1) {
+			if (q->ck_life < 1)
+				goto badqosparam;
+			if (q->ck_life * HZ > MAX_SCHEDULE_TIMEOUT)
+				goto badqosparam;
+			sp->ck_life = q->ck_life * HZ;
+		}
+		if (q->ck_inc != -1) {
+			if (q->ck_inc * HZ > MAX_SCHEDULE_TIMEOUT)
+				goto badqosparam;
+			sp->ck_inc = q->ck_inc * HZ;
+		}
+		if (q->hmac != -1) {
+			if (q->hmac != T_SCTP_HMAC_NONE
+#if defined SCTP_CONFIG_HMAC_SHA1
+			    && q->hmac != T_SCTP_HMAC_SHA1
+#endif
+#if defined SCTP_CONFIG_HMAC_MD5
+			    && q->hmac != T_SCTP_HMAC_MD5
+#endif
+			    )
+				goto badqosparam;
 			sp->hmac = q->hmac;
-		if (q->throttle != -1)
-			sp->throttle = q->throttle;
-		if (q->max_sack != -1)
-			sp->max_sack = q->max_sack;
-		if (q->rto_ini != -1)
-			sp->rto_ini = q->rto_ini;
-		if (q->rto_min != -1)
-			sp->rto_min = q->rto_min;
-		if (q->rto_max != -1)
-			sp->rto_max = q->rto_max;
-		if (q->rtx_path != -1)
+		}
+		if (q->throttle != -1) {
+			if (q->throttle < 1000 / HZ)
+				goto badqosparam;
+			if (q->throttle < 1)
+				goto badqosparam;
+			if (q->throttle / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
+				goto badqosparam;
+			sp->throttle = q->throttle * HZ / 1000;
+		}
+		if (q->max_sack != -1) {
+			if (q->max_sack) {
+				if (q->max_sack < 1000 / HZ)
+					goto badqosparam;
+				if (q->max_sack < 1)
+					goto badqosparam;
+				if (q->max_sack > 500)
+					goto badqosparam;
+			}
+			sp->max_sack = q->max_sack * HZ / 1000;
+		}
+		if (q->rto_ini != -1) {
+			if (q->rto_ini) {
+				if (q->rto_ini < 1000 / HZ)
+					goto badqosparam;
+				if (q->rto_ini < 1)
+					goto badqosparam;
+				if (q->rto_ini / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
+					goto badqosparam;
+			}
+			sp->rto_ini = q->rto_ini * HZ / 1000;
+		}
+		if (q->rto_min != -1) {
+			if (q->rto_min) {
+				if (q->rto_min < 1000 / HZ)
+					goto badqosparam;
+				if (q->rto_min < 1)
+					goto badqosparam;
+				if (q->rto_min / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
+					goto badqosparam;
+			}
+			sp->rto_min = q->rto_min * HZ / 1000;
+		}
+		if (q->rto_max != -1) {
+			if (q->rto_max) {
+				if (q->rto_max < 1000 / HZ)
+					goto badqosparam;
+				if (q->rto_max < 1)
+					goto badqosparam;
+				if (q->rto_max / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
+					goto badqosparam;
+			}
+			sp->rto_max = q->rto_max * HZ / 1000;
+		}
+		if (q->rtx_path != -1) {
+			if (q->rtx_path < 0)
+				goto badqosparam;
 			sp->rtx_path = q->rtx_path;
-		if (q->hb_itvl != -1)
-			sp->hb_itvl = q->hb_itvl;
-		if (q->options != -1)
+		}
+		if (q->hb_itvl != -1) {
+			if (q->hb_itvl < 1)
+				goto badqosparam;
+			if (q->hb_itvl * HZ > MAX_SCHEDULE_TIMEOUT)
+				goto badqosparam;
+			sp->hb_itvl = q->hb_itvl * HZ;
+		}
+		if (q->options != -1) {
 			sp->debug = q->options;
+		}
 	}
 	if (p->OPTMGMT_flags & DEFAULT_RC_SEL)
 		sp->flags |= SCTP_FLAG_DEFAULT_RC_SEL;
 	else
 		sp->flags &= ~SCTP_FLAG_DEFAULT_RC_SEL;
 	return n_ok_ack(sp, N_OPTMGMT_REQ, NULL, NULL);
+      badqosparam:
+	err = NBADQOSPARAM;
+	goto error;		/* QOS parameter value was incorrect */
       badopt2:
 	seldom();
 	err = NBADOPT;
@@ -15881,6 +16053,50 @@ n_reset_res(struct sctp *sp, mblk_t *mp)
 	return n_error_ack(sp, N_RESET_RES, err);
 }
 
+STATIC int
+n_datack_req(struct sctp *sp, mblk_t *mp)
+{
+	int err;
+	N_datack_req_t *p;
+
+	err = -EINVAL;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto error;
+	p = (typeof(p)) mp->b_rptr;
+	dassert(p->PRIM_type == N_DATACK_REQ);
+#if 0
+	err = NNOTSUPPORT;
+	if (unlikely(sp->info.SERV_type == N_CLNS))
+		goto error;
+	err = NOUTSTATE;
+	if (unlikely(sp->info.SERV_type != N_CONS))
+		goto error;
+#endif
+	/* Note: If the interface is in the NS_IDLE state when the provider receives the
+	   N_DATACK_REQ primitive, then the NS provider should discard the request without
+	   generating a fatal error. */
+	if (sp->i_state == NS_IDLE)
+		goto discard;
+	if (unlikely(!((1 << sp->i_state) & (NSM_CONNECTED))))
+		goto error;
+	/* Note: If the NS provider had no knowledge of a previous N_DATA_IND with the receipt
+	   confirmation flag set, then the NS provider should just ignore the request without
+	   generating a fatal error. */
+	if (unlikely(bufq_length(&sp->ackq) <= 0))
+		goto error;
+#if 0
+	if (unlikely((err = np_datack(q)) < 0))
+		goto error;
+#else
+	err = -EOPNOTSUPP;
+	goto error;
+#endif
+      discard:
+	return (QR_DONE);
+      error:
+	return m_error_reply(sp, -EPROTO);
+}
+
 /*
  *  =========================================================================
  *
@@ -15933,6 +16149,12 @@ sctp_n_w_proto(queue_t *q, mblk_t *mp)
 		break;
 	case N_RESET_RES:
 		rtn = n_reset_res(sp, mp);
+		break;
+	case N_DATACK_REQ:
+		rtn = n_datack_req(sp, mp);
+		break;
+	case N_UNITDATA_REQ:
+		rtn = m_error_reply(sp, -EPROTO);
 		break;
 	default:
 		rtn = -EOPNOTSUPP;

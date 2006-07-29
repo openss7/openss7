@@ -1510,6 +1510,7 @@ ioctl_string(int cmd, intptr_t arg)
 			struct strioctl *icp = (struct strioctl *) arg;
 
 			switch (icp->ic_cmd) {
+#if 0
 			case _O_TI_BIND:
 				return ("_O_TI_BIND");
 			case O_TI_BIND:
@@ -1562,6 +1563,7 @@ ioctl_string(int cmd, intptr_t arg)
 				return ("TI_SYNC");
 			case TI_UNBIND:
 				return ("TI_UNBIND");
+#endif
 			}
 		}
 		return ("I_STR");
@@ -1779,7 +1781,7 @@ print_addr(char *add_ptr, size_t add_len)
 		for (i = 0; i < anum; i++) {
 			uint32_t addr = a[i].sin_addr.s_addr;
 
-			fprintf(stdout, "%s%d.%d.%d.%d.", i ? "," : "", (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
+			fprintf(stdout, "%s%d.%d.%d.%d", i ? "," : "", (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
 		}
 	} else
 		fprintf(stdout, "(no address)");
@@ -1805,7 +1807,7 @@ addr_string(char *add_ptr, size_t add_len)
 		for (i = 0; i < anum; i++) {
 			uint32_t addr = a[i].sin_addr.s_addr;
 
-			snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d.", i ? "," : "", (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
+			len += snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d", i ? "," : "", (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
 		}
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
@@ -1829,6 +1831,7 @@ print_addrs(int child, char *add_ptr, size_t add_len)
 }
 #endif				/* SCTP_VERSION_2 */
 
+#if 1
 char *
 status_string(struct t_opthdr *oh)
 {
@@ -2229,6 +2232,7 @@ value_string(int child, struct t_opthdr *oh)
 	}
 	return ("(unknown value)");
 }
+#endif
 
 #if 1
 void
@@ -2286,6 +2290,7 @@ mgmtflag_string(t_uscalar_t flag)
 	return "(unknown flag)";
 }
 
+#if 1
 char *
 size_string(t_uscalar_t size)
 {
@@ -2302,6 +2307,7 @@ size_string(t_uscalar_t size)
 	snprintf(buf, sizeof(buf), "%lu", (ulong) size);
 	return buf;
 }
+#endif
 
 const char *
 prim_string(t_uscalar_t prim)
@@ -2989,6 +2995,7 @@ print_libcall(int child, const char *command)
 		print_string_state(child, msgs, command);
 }
 
+#if 1
 void
 print_terror(int child, long error, long terror)
 {
@@ -3002,6 +3009,7 @@ print_terror(int child, long error, long terror)
 	if (verbose > 0)
 		print_string_state(child, msgs, t_errno_string(terror, error));
 }
+#endif
 
 void
 print_expect(int child, int want)
@@ -3089,6 +3097,7 @@ print_mgmtflag(int child, t_uscalar_t flag)
 	print_string(child, mgmtflag_string(flag));
 }
 
+#if 1
 void
 print_opt_level(int child, struct t_opthdr *oh)
 {
@@ -3136,6 +3145,7 @@ print_opt_value(int child, struct t_opthdr *oh)
 	if (value)
 		print_string(child, value);
 }
+#endif
 
 void
 print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
@@ -4726,105 +4736,6 @@ do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 	}
 	return ((last_event = __EVENT_NO_MSG));
 }
-
-#if 0
-#define IUT 0x00000001
-#define PT  0x00000002
-#define ANY 0x00000003
-
-int
-any_wait_event(int source, int wait)
-{
-	while (1) {
-		struct pollfd pfd[] = {
-			{test_fd[0], POLLIN | POLLPRI, 0},
-			{test_fd[1], POLLIN | POLLPRI, 0}
-		};
-
-		if (timer_timeout) {
-			timer_timeout = 0;
-			print_timeout(3);
-			last_event = __EVENT_TIMEOUT;
-			return time_event(__EVENT_TIMEOUT);
-		}
-		if (verbose > 3) {
-			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "polling:\n");
-			fflush(stdout);
-			dummy = lockf(fileno(stdout), F_ULOCK, 0);
-		}
-		pfd[0].fd = test_fd[0];
-		pfd[0].events = (source & IUT) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP) : 0;
-		pfd[0].revents = 0;
-		pfd[1].fd = test_fd[1];
-		pfd[1].events = (source & PT) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP) : 0;
-		pfd[1].revents = 0;
-		switch (poll(pfd, 2, wait)) {
-		case -1:
-			if ((errno == EAGAIN || errno == EINTR))
-				break;
-			print_errno(3, (last_errno = errno));
-			break;
-		case 0:
-			print_nothing(3);
-			last_event = __EVENT_NO_MSG;
-			return time_event(__EVENT_NO_MSG);
-		case 1:
-		case 2:
-			if (pfd[0].revents) {
-				int flags = 0;
-				char cbuf[BUFSIZE];
-				char dbuf[BUFSIZE];
-				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
-				struct strbuf data = { BUFSIZE, 0, dbuf };
-
-				if (verbose > 3) {
-					dummy = lockf(fileno(stdout), F_LOCK, 0);
-					fprintf(stdout, "getmsg from top:\n");
-					fflush(stdout);
-					dummy = lockf(fileno(stdout), F_ULOCK, 0);
-				}
-				if (getmsg(test_fd[0], &ctrl, &data, &flags) == 0) {
-					if (verbose > 3) {
-						dummy = lockf(fileno(stdout), F_LOCK, 0);
-						fprintf(stdout, "gotmsg from top [%d,%d]:\n", ctrl.len, data.len);
-						fflush(stdout);
-						dummy = lockf(fileno(stdout), F_ULOCK, 0);
-					}
-					if ((last_event = do_decode_msg(0, &ctrl, &data)) != __EVENT_NO_MSG)
-						return time_event(last_event);
-				}
-			}
-			if (pfd[1].revents) {
-				int flags = 0;
-				char cbuf[BUFSIZE];
-				char dbuf[BUFSIZE];
-				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
-				struct strbuf data = { BUFSIZE, 0, dbuf };
-
-				if (verbose > 3) {
-					dummy = lockf(fileno(stdout), F_LOCK, 0);
-					fprintf(stdout, "getmsg from bot:\n");
-					fflush(stdout);
-					dummy = lockf(fileno(stdout), F_ULOCK, 0);
-				}
-				if (getmsg(test_fd[1], &ctrl, &data, &flags) == 0) {
-					if (verbose > 3) {
-						dummy = lockf(fileno(stdout), F_LOCK, 0);
-						fprintf(stdout, "gotmsg from bot [%d,%d,%d]:\n", ctrl.len, data.len, flags);
-						fflush(stdout);
-						dummy = lockf(fileno(stdout), F_ULOCK, 0);
-					}
-					if ((last_event = do_decode_msg(1, &ctrl, &data)) != __EVENT_NO_MSG)
-						return time_event(last_event);
-				}
-			}
-		default:
-			break;
-		}
-	}
-}
-#endif
 
 int
 wait_event(int child, int wait)
