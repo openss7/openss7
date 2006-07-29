@@ -4661,8 +4661,8 @@ kstreamd(void *__bind_cpu)
 				break;
 			preempt_disable();
 			if (unlikely((t->flags & (QRUNFLAGS)) == 0)) {
-				pswerr(("CPU#%d: kstreamd: false wakeup\n",
-					(int) (long) __bind_cpu));
+				pswerr(("CPU#%d: kstreamd: false wakeup, flags = 0x%08x\n",
+					(int) (long) __bind_cpu, (int) t->flags));
 				set_current_state(TASK_INTERRUPTIBLE);
 				goto reschedule;
 			}
