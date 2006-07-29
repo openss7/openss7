@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/08 07:25:56 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/07/29 07:43:28 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/08 07:25:56 $ by $Author: brian $
+ Last Modified $Date: 2006/07/29 07:43:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.25  2006/07/29 07:43:28  brian
+ - CVS checkin of changes before leaving for SCTP interop
+
  Revision 0.9.2.24  2006/07/08 07:25:56  brian
  - removed trigraphs
 
@@ -199,9 +202,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/08 07:25:56 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/07/29 07:43:28 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/08 07:25:56 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/07/29 07:43:28 $";
 
 /*
  *  Simple test program for INET streams.

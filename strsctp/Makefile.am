@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/07/01 11:59:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/29 07:44:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/01 11:59:44 $ by $Author: brian $
+# Last Modified $Date: 2006/07/29 07:44:03 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.47  2006/07/29 07:44:03  brian
+# - CVS checkin of changes before leaving for SCTP interop
+#
 # Revision 0.9.2.46  2006/07/01 11:59:44  brian
 # - added new KERNEL_BLDFLAGS to makefiles
 #

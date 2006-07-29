@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/16 08:19:07 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/29 07:43:39 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/16 08:19:07 $ by $Author: brian $
+ Last Modified $Date: 2006/07/29 07:43:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.45  2006/07/29 07:43:39  brian
+ - CVS checkin of changes before leaving for SCTP interop
+
  Revision 0.9.2.44  2006/07/16 08:19:07  brian
  - noxious 2.4 bug fixed, test suite corrections
 
@@ -229,9 +232,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/16 08:19:07 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/29 07:43:39 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/07/16 08:19:07 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/29 07:43:39 $";
 
 /*
  *  Simple test program for INET streams.

@@ -1,3 +1,11 @@
+2006-07-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/inet.c: option handling corrections for SCTP from strsctp
+	* src/test/test-inet_raw.c: rationalized to latest SCTP test programs
+	* src/test/test-inet_sctp.c: rationalized to latest SCTP test programs
+	* src/test/test-inet_tcp.c: rationalized to latest SCTP test programs
+	* src/test/test-inet_udp.c: rationalized to latest SCTP test programs
+
 2006-07-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: expand majors, minors and module ids

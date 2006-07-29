@@ -1,3 +1,22 @@
+2006-07-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added sctp_n2 test program
+	* src/drivers/sctp2.c: corrections made to sctp before interop
+	* src/drivers/sctp_adler32.c: compile non-optimized
+	* src/drivers/sctp_crc32c.c: compile non-optimized
+	* src/drivers/sctp_hmac_md5.c: compile non-optimized
+	* src/drivers/sctp_hmac_sha1.c: compile non-optimized
+	* src/drivers/sctp_md5.c: compile non-optimized
+	* src/drivers/sctp_sha1.c: compile non-optimized
+	* src/test/test-sctp_n.c: corrections to test programs
+	* src/test/test-sctp_t.c: corrections to test programs
+	* src/test/test-sctp_n2.c: additional test program
+	* tests/Makefile.am: added sctp_n2 testsuite
+	* tests/testsuite-sctp_n.at: completed sctp_n testsuite
+	* tests/testsuite-sctp_t.at: completed sctp_t testsuite
+	* tests/testsuite.at: added sctp_n2 testsuite
+	* tests/testsuite-sctp_n2.at: added sctp_n2 testsuite
+
 2006-07-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: expand majors, minors and module ids, rationalize to

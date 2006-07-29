@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.32 2006/07/07 20:59:10 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.33 2006/07/29 07:43:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/07 20:59:10 $ by $Author: brian $
+ Last Modified $Date: 2006/07/29 07:43:00 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_COMPAT_H__
 #define __LOCAL_COMPAT_H__
 
-#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.32 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.33 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define __OPTIMIZE__ 1
 

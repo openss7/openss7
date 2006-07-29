@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/06 10:36:10 $
+ @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/29 07:44:38 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/06 10:36:10 $ by $Author: brian $
+ Last Modified $Date: 2006/07/29 07:44:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: test-sctp_n.c,v $
+ $Log: test-sctp_n2.c,v $
+ Revision 0.9.2.1  2006/07/29 07:44:38  brian
+ - CVS checkin of changes before leaving for SCTP interop
+
  Revision 0.9.2.14  2006/05/06 10:36:10  brian
  - minor changes
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/06 10:36:10 $"
+#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/29 07:44:38 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/06 10:36:10 $";
+static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/29 07:44:38 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the

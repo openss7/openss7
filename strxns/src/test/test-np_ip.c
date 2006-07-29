@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/08 07:26:47 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/07/29 07:44:43 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/08 07:26:47 $ by $Author: brian $
+ Last Modified $Date: 2006/07/29 07:44:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.15  2006/07/29 07:44:43  brian
+ - CVS checkin of changes before leaving for SCTP interop
+
  Revision 0.9.2.14  2006/07/08 07:26:47  brian
  - removed trigraphs
 
@@ -114,9 +117,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/08 07:26:47 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/07/29 07:44:43 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/08 07:26:47 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/07/29 07:44:43 $";
 
 /*
  *  Simple test program for NPI-IP streams.

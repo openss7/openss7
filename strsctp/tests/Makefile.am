@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/01 12:09:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/07/29 07:44:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/01 12:09:20 $ by $Author: brian $
+# Last Modified $Date: 2006/07/29 07:44:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.15  2006/07/29 07:44:40  brian
+# - CVS checkin of changes before leaving for SCTP interop
+#
 # Revision 0.9.2.14  2006/07/01 12:09:20  brian
 # - missing dependencies for testsuite
 #

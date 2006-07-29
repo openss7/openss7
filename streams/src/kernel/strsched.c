@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/07/25 06:39:09 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/07/29 07:43:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:09 $ by $Author: brian $
+ Last Modified $Date: 2006/07/29 07:43:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.144  2006/07/29 07:43:03  brian
+ - CVS checkin of changes before leaving for SCTP interop
+
  Revision 0.9.2.143  2006/07/25 06:39:09  brian
  - expanded minor device numbers and optimization and locking corrections
 
@@ -113,10 +116,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/07/25 06:39:09 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/07/29 07:43:03 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2006/07/25 06:39:09 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/07/29 07:43:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

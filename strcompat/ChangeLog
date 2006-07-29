@@ -1,3 +1,7 @@
+2006-07-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/os7/compat.h: corrections for non-optimized compile
+
 2006-07-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: expand majors, minors and module ids

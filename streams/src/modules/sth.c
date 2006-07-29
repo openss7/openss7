@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2006/07/25 06:39:11 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2006/07/29 07:43:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:11 $ by $Author: brian $
+ Last Modified $Date: 2006/07/29 07:43:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.162  2006/07/29 07:43:07  brian
+ - CVS checkin of changes before leaving for SCTP interop
+
  Revision 0.9.2.161  2006/07/25 06:39:11  brian
  - expanded minor device numbers and optimization and locking corrections
 
@@ -119,10 +122,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2006/07/25 06:39:11 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2006/07/29 07:43:07 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2006/07/25 06:39:11 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2006/07/29 07:43:07 $";
 
 //#define __NO_VERSION__
 
@@ -220,7 +223,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2006/07/25 06:39:11 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2006/07/29 07:43:07 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
