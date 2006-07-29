@@ -1,0 +1,713 @@
+dnl vim: ft=config sw=4
+dnl ==========================================================================
+dnl 
+dnl @(#) $RCSfile: testsuite-sctp_n.at,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/14 06:51:41 $
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl
+dnl All Rights Reserved.
+dnl
+dnl Unauthorized distribution or duplication is prohibited.
+dnl
+dnl This software and related documentation is protected by copyright and
+dnl distributed under licenses restricting its use, copying, distribution
+dnl and decompilation.  No part of this software or related documentation
+dnl may be reproduced in any form by any means without the prior written
+dnl authorization of the copyright holder, and licensors, if any.
+dnl
+dnl The recipient of this document, by its retention and use, warrants that
+dnl the recipient will protect this information and keep it confidential,
+dnl and will not disclose the information contained in this document
+dnl without the written permission of its owner.
+dnl
+dnl The author reserves the right to revise this software and documentation
+dnl for any reason, including but not limited to, conformity with standards
+dnl promulgated by various agencies, utilization of advances in the state
+dnl of the technical arts, or the reflection of changes in the design of any
+dnl techniques, or procedures embodied, described, or referred to herein.
+dnl The author is under no obligation to provide any feature listed herein.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl As an exception to the above, this software may be distributed under the
+dnl GNU General Public License (GPL) Version 2, so long as the software is
+dnl distributed with, and only used for the testing of, OpenSS7 modules,
+dnl drivers, and libraries.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+dnl behalf of the U.S. Government ("Government"), the following provisions
+dnl apply to you.  If the Software is supplied by the Department of Defense
+dnl ("DoD"), it is classified as "Commercial Computer Software" under
+dnl paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+dnl Regulations ("DFARS") (or any successor regulations) and the Government is
+dnl acquiring only the license rights granted herein (the license rights
+dnl customarily provided to non-Government users).  If the Software is
+dnl supplied to any unit or agency of the Government other than DoD, it is
+dnl classified as "Restricted Computer Software" and the Government's rights
+dnl in the Software are defined in paragraph 52.227-19 of the Federal
+dnl Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+dnl (or any successor regulations).
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Commercial licensing and support of this software is available from OpenSS7
+dnl Corporation at a fee.  See http://www.openss7.com/
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Last Modified $Date: 2006/05/14 06:51:41 $ by $Author: brian $
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl $Log: testsuite-sctp_n.at,v $
+dnl Revision 0.9.2.4  2006/05/14 06:51:41  brian
+dnl - added buffer leak checks to testsuites
+dnl
+dnl Revision 0.9.2.3  2006/03/03 11:47:06  brian
+dnl - 32/64-bit compatibility
+dnl
+dnl Revision 0.9.2.2  2005/06/24 16:59:00  brian
+dnl - testsuite as always verbose internally
+dnl
+dnl Revision 0.9.2.1  2005/06/16 04:34:05  brian
+dnl - modifications to test-sctp_t
+dnl
+dnl ==========================================================================
+
+m4_divert_push([DEFAULTS])
+function test_sctp_n2() {
+    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--verbose=3' ; fi
+    if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    if test-sctp_n2 $options -e -o $1
+    then
+	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
+	then
+	    # check for leaks
+	    if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
+	    then
+		return 1
+	    else
+		return 0
+	    fi
+	else
+	    return 0
+	fi
+    else
+	return $?
+    fi
+}
+function test_sctp_n2_root() {
+    if test `id -u` -ne 0 ; then return 77 ; fi
+    test_sctp_n2 $1
+    return $?
+}
+m4_divert_pop([DEFAULTS])
+
+AT_TESTED([test-sctp_n2])
+AT_BANNER([STREAMS SCTP NPI module tests])
+
+dnl AT_XFAIL_IF([test `id -u` -ne 0])
+
+dnl Test Case XNS/NPI-SCTP/0.1: Check test case guard timer.
+AT_SETUP([sctp-npi-2 test 0.1])
+AT_CHECK([test_sctp_n2 0.1], [], [ignore], [], [], [])
+AT_KEYWORDS([testtimer])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.1: Open and close 3 streams
+AT_SETUP([sctp-npi-2 test 1.1])
+AT_CHECK([test_sctp_n2 1.1], [], [ignore], [], [], [])
+AT_KEYWORDS([open close])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.2: Request information.
+AT_SETUP([sctp-npi-2 test 1.2])
+AT_CHECK([test_sctp_n2 1.2], [], [ignore], [], [], [])
+AT_KEYWORDS([N_INFO_REQ])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.3.1: NOUTSTATE for N_CONN_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.3.1])
+AT_CHECK([test_sctp_n2 1.3.1], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_CONN_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.3.2: NOUTSTATE for N_CONN_RES in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.3.2])
+AT_CHECK([test_sctp_n2 1.3.2], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_CONN_RES NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.3.3: NOUTSTATE for N_DISCON_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.3.3])
+AT_CHECK([test_sctp_n2 1.3.3], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE NS_DISCON_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.3.4: NOUTSTATE for N_UNBIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.3.4])
+AT_CHECK([test_sctp_n2 1.3.4], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_UNBIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.3.5: NOUTSTATE for N_RESET_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.3.5])
+AT_CHECK([test_sctp_n2 1.3.5], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_RESET_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.3.6: NOUTSTATE for N_RESET_RES in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.3.6])
+AT_CHECK([test_sctp_n2 1.3.6], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_RESET_RES NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.4.1: EPROTO for N_DATACK_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.4.1])
+AT_CHECK([test_sctp_n2 1.4.1], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_DATACK_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.4.2: EPROTO for N_DATA_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.4.2])
+AT_CHECK([test_sctp_n2 1.4.2], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_DATA_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.4.3: EPROTO for N_EXDATA_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.4.3])
+AT_CHECK([test_sctp_n2 1.4.3], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_EXDATA_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.4.4: EPROTO for M_DATA in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.4.4])
+AT_CHECK([test_sctp_n2 1.4.4], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO M_DATA NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.5.1.1: NBADQOSTYPE for N_OPTMGMT_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.5.1.1])
+AT_CHECK([test_sctp_n2 1.5.1.1], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADQOSTYPE N_OPTMGMT_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.5.1.2: NBADQOSPARAM for N_OPTMGMT_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.5.1.2])
+AT_CHECK([test_sctp_n2 1.5.1.2], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADQOSPARAM N_OPTMGMT_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.5.1.3: EINVAL for N_OPTMGMT_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.5.1.3])
+AT_CHECK([test_sctp_n2 1.5.1.3], [], [ignore], [], [], [])
+AT_KEYWORDS([EINVAL N_OPTMGMT_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.5.2.1: N_QOS_SEL_INFO_IP for N_OPTMGMT_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.5.2.1])
+AT_CHECK([test_sctp_n2 1.5.2.1], [], [ignore], [], [], [])
+AT_KEYWORDS([N_QOS_SEL_INFO_IP N_OPTMGMT_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.5.2.2: N_QOS_SEL_UD_IP for N_OPTMGMT_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.5.2.2])
+AT_CHECK([test_sctp_n2 1.5.2.2], [], [ignore], [], [], [])
+AT_KEYWORDS([N_QOS_SEL_UD_IP N_OPTMGMT_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.5.2.3: N_QOS_SEL_CONN_IP for N_OPTMGMT_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.5.2.3])
+AT_CHECK([test_sctp_n2 1.5.2.3], [], [ignore], [], [], [])
+AT_KEYWORDS([N_QOS_SEL_CONN_IP N_OPTMGMT_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.1.1: EINVAL for N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.1.1])
+AT_CHECK([test_sctp_n2 1.6.1.1], [], [ignore], [], [], [])
+AT_KEYWORDS([EINVAL N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.1.2: NBADADDR for N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.1.2])
+AT_CHECK([test_sctp_n2 1.6.1.2], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADADDR N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.1.3: NBOUND for N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.1.3])
+AT_CHECK([test_sctp_n2 1.6.1.3], [], [ignore], [], [], [])
+AT_KEYWORDS([NBOUND N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.1.4: NNOADDR for N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.1.4])
+AT_CHECK([test_sctp_n2 1.6.1.4], [], [ignore], [], [], [])
+AT_KEYWORDS([NNOADDR N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.1.5: NACCESS for N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.1.5])
+AT_CHECK([test_sctp_n2 1.6.1.5], [], [ignore], [], [], [])
+AT_KEYWORDS([NACCESS N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.1.6: NNOPROTOID for N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.1.6])
+AT_CHECK([test_sctp_n2 1.6.1.6], [], [ignore], [], [], [])
+AT_KEYWORDS([NNOPROTOID N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.1.7: NBADFLAG for N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.1.7])
+AT_CHECK([test_sctp_n2 1.6.1.7], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADFLAG N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.1.8: NBADADDR for N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.1.8])
+AT_CHECK([test_sctp_n2 1.6.1.8], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADADDR N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.1.9: NBADADDR for N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.1.9])
+AT_CHECK([test_sctp_n2 1.6.1.9], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADADDR N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.2.1: Missing address N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.2.1])
+AT_CHECK([test_sctp_n2 1.6.2.1], [], [ignore], [], [], [])
+AT_KEYWORDS([missing N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.2.2: Wildcard N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.2.2])
+AT_CHECK([test_sctp_n2 1.6.2.2], [], [ignore], [], [], [])
+AT_KEYWORDS([wildcard N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.2.3: Wildcard N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.2.3])
+AT_CHECK([test_sctp_n2 1.6.2.3], [], [ignore], [], [], [])
+AT_KEYWORDS([wildcard N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.2.4: DEFAULT_DEST N_BIND_REQ in NS_UNBND state.
+AT_SETUP([sctp-npi-2 test 1.6.2.4])
+AT_CHECK([test_sctp_n2 1.6.2.4], [], [ignore], [], [], [])
+AT_KEYWORDS([DEFAULT_DEST N_BIND_REQ NS_UNBND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.2.5: Wildcard N_BIND_REQ in NS_UNBND state with TOKEN_REQUEST.
+AT_SETUP([sctp-npi-2 test 1.6.2.5])
+AT_CHECK([test_sctp_n2 1.6.2.5], [], [ignore], [], [], [])
+AT_KEYWORDS([wildcard N_BIND_REQ NS_UNBND TOKEN_REQUEST])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/1.6.3.1: NOUTSTATE in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 1.6.3.1])
+AT_CHECK([test_sctp_n2 1.6.3.1], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.1.1: NOUTSTATE for N_BIND_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.1.1])
+AT_CHECK([test_sctp_n2 2.1.1], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_BIND_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.1.2: NNOTSUPPORT for N_CONN_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.1.2])
+AT_CHECK([test_sctp_n2 2.1.2], [], [ignore], [], [], [])
+AT_KEYWORDS([NNOTSUPPORT N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.1.3: NNOTSUPPORT for N_CONN_RES in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.1.3])
+AT_CHECK([test_sctp_n2 2.1.3], [], [ignore], [], [], [])
+AT_KEYWORDS([NNOTSUPORT N_CONN_RES NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.1.4: NNOTSUPPORT for N_RESET_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.1.4])
+AT_CHECK([test_sctp_n2 2.1.4], [], [ignore], [], [], [])
+AT_KEYWORDS([NNOTSUPPORT N_RESET_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.1.5: NNOTSUPPORT for N_RESET_RES in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.1.5])
+AT_CHECK([test_sctp_n2 2.1.5], [], [ignore], [], [], [])
+AT_KEYWORDS([NNOTSUPPORT N_RESET_RES NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.1.6: NNOTSUPPORT for N_DISCON_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.1.6])
+AT_CHECK([test_sctp_n2 2.1.6], [], [ignore], [], [], [])
+AT_KEYWORDS([NNOTSUPPORT N_DISCON_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.2.1: EPROTO for N_DATACK_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.2.1])
+AT_CHECK([test_sctp_n2 2.2.1], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_DATACK_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.2.2: EPROTO for N_DATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.2.2])
+AT_CHECK([test_sctp_n2 2.2.2], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_DATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.2.3: EPROTO for N_EXDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.2.3])
+AT_CHECK([test_sctp_n2 2.2.3], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_EXDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.3.1: EPROTO for N_UNITDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.3.1])
+AT_CHECK([test_sctp_n2 2.3.1], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_UNITDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.3.2: EPROTO for N_UNITDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.3.2])
+AT_CHECK([test_sctp_n2 2.3.2], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_UNITDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.4.1: NBADDATA for N_UNITDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.4.1])
+AT_CHECK([test_sctp_n2 2.4.1], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADDATA N_UNITDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.4.2: NBADDATA for N_UNITDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.4.2])
+AT_CHECK([test_sctp_n2 2.4.2], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADDATA N_UNITDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.4.3: NBADDATA for N_UNITDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.4.3])
+AT_CHECK([test_sctp_n2 2.4.3], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADDATA N_UNITDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.4.4: NBADADDR for N_UNITDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.4.4])
+AT_CHECK([test_sctp_n2 2.4.4], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADADDR N_UNITDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.4.5: NBADADDR for N_UNITDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.4.5])
+AT_CHECK([test_sctp_n2 2.4.5], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADADDR N_UNITDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.5.1: Successful N_UNITDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.5.1])
+AT_CHECK([test_sctp_n2 2.5.1], [], [ignore], [], [], [])
+AT_KEYWORDS([N_UNITDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/2.5.2: Successful N_UNITDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 2.5.2])
+AT_CHECK([test_sctp_n2 2.5.2], [], [ignore], [], [], [])
+AT_KEYWORDS([N_UNITDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.1.1: NOUTSTATE for N_BIND_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 3.1.1])
+AT_CHECK([test_sctp_n2 3.1.1], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_BIND_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.1.2: NOUTSTATE for N_CONN_RES in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 3.1.2])
+AT_CHECK([test_sctp_n2 3.1.2], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_CONN_RES NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.1.3: NOUTSTATE for N_RESET_RES in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 3.1.3])
+AT_CHECK([test_sctp_n2 3.1.3], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_RESET_RES NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.1.4: NOUTSTATE for N_DISCON_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 3.1.4])
+AT_CHECK([test_sctp_n2 3.1.4], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_DISCON_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.2.1: EPROTO for N_UNITDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 3.2.1])
+AT_CHECK([test_sctp_n2 3.2.1], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_UNITDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.3.1: Ignored N_DATACK_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 3.3.1])
+AT_CHECK([test_sctp_n2 3.3.1], [], [ignore], [], [], [])
+AT_KEYWORDS([ignored N_DATACK_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.3.2: Ignored N_DATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 3.3.2])
+AT_CHECK([test_sctp_n2 3.3.2], [], [ignore], [], [], [])
+AT_KEYWORDS([ignored N_DATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.3.3: Ignored N_EXDATA_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 3.3.3])
+AT_CHECK([test_sctp_n2 3.3.3], [], [ignore], [], [], [])
+AT_KEYWORDS([ignored N_EXDATA_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.3.4: Ignored N_RESET_REQ in NS_IDLE state.
+AT_SETUP([sctp-npi-2 test 3.3.4])
+AT_CHECK([test_sctp_n2 3.3.4], [], [ignore], [], [], [])
+AT_KEYWORDS([ignored N_RESET_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.1: EINVAL for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.1])
+AT_CHECK([test_sctp_n2 3.4.1], [], [ignore], [], [], [])
+AT_KEYWORDS([EINVAL N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.2: NACCESS for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.2])
+AT_CHECK([test_sctp_n2 3.4.2], [], [ignore], [], [], [])
+AT_KEYWORDS([NACCESS N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.3: NBADFLAG for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.3])
+AT_CHECK([test_sctp_n2 3.4.3], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADFLAG N_CONN_RES NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.4: NNOADDR for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.4])
+AT_CHECK([test_sctp_n2 3.4.4], [], [ignore], [], [], [])
+AT_KEYWORDS([NNOADDR N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.5: NBADADDR for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.5])
+AT_CHECK([test_sctp_n2 3.4.5], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADADDR N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.6: NBADADDR for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.6])
+AT_CHECK([test_sctp_n2 3.4.6], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADADDR N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.7: NBADADDR for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.7])
+AT_CHECK([test_sctp_n2 3.4.7], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADADDR N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.8: NBADQOSTYPE for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.8])
+AT_CHECK([test_sctp_n2 3.4.8], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADQOSTYPE N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.9: NBADQOSTYPE for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.9])
+AT_CHECK([test_sctp_n2 3.4.9], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADQOSTYPE N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.10: NBADQOSPARAM for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.10])
+AT_CHECK([test_sctp_n2 3.4.10], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADQOSPARAM N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.11: NBADDATA for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.11])
+AT_CHECK([test_sctp_n2 3.4.11], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADDATA N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.4.12: NBADDATA for N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.4.12])
+AT_CHECK([test_sctp_n2 3.4.12], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADDATA N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.5.1: Successful N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.5.1])
+AT_CHECK([test_sctp_n2 3.5.1], [], [ignore], [], [], [])
+AT_KEYWORDS([N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.5.2: Successful N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.5.2])
+AT_CHECK([test_sctp_n2 3.5.2], [], [ignore], [], [], [])
+AT_KEYWORDS([N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.5.3: Successful N_CONN_REQ in the NS_IDLE state
+AT_SETUP([sctp-npi-2 test 3.5.3])
+AT_CHECK([test_sctp_n2 3.5.3], [], [ignore], [], [], [])
+AT_KEYWORDS([N_CONN_REQ NS_IDLE])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.6.1: NOUTSTATE for N_BIND_REQ in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.6.1])
+AT_CHECK([test_sctp_n2 3.6.1], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_BIND_REQ NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.6.2: NOUTSTATE for N_UNBIND_REQ in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.6.2])
+AT_CHECK([test_sctp_n2 3.6.2], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_UNBIND_REQ NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.6.3: NACCESS for N_CONN_REQ in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.6.3])
+AT_CHECK([test_sctp_n2 3.6.3], [], [ignore], [], [], [])
+AT_KEYWORDS([NACESS N_CONN_REQ NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.6.4: NOUTSTATE for N_RESET_REQ in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.6.4])
+AT_CHECK([test_sctp_n2 3.6.4], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_RESET_REQ NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.6.5: NOUTSTATE for N_RESET_RES in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.6.5])
+AT_CHECK([test_sctp_n2 3.6.5], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_RESET_RES NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.6.6: NBADSEQ for N_DISCON_REQ in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.6.6])
+AT_CHECK([test_sctp_n2 3.6.6], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADSEQ N_DISCON_REQ NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.7.1: EPROTO for N_DATA_REQ in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.7.1])
+AT_CHECK([test_sctp_n2 3.7.1], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_DATA_REQ NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.7.2: EPROTO for N_EXDATA_REQ in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.7.2])
+AT_CHECK([test_sctp_n2 3.7.2], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_EXDATA_REQ NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.7.3: EPROTO for N_DATACK_REQ in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.7.3])
+AT_CHECK([test_sctp_n2 3.7.3], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_DATACK_REQ NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.7.4: EPROTO for N_UNITDATA_REQ in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.7.4])
+AT_CHECK([test_sctp_n2 3.7.4], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_UNITDATA_REQ NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.8.1: Successful N_DISCON_REQ in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.8.1])
+AT_CHECK([test_sctp_n2 3.8.1], [], [ignore], [], [], [])
+AT_KEYWORDS([N_DISCON_RES NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.8.2: Successful N_CONN_RES in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.8.2])
+AT_CHECK([test_sctp_n2 3.8.2], [], [ignore], [], [], [])
+AT_KEYWORDS([N_CONN_RES NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.8.3: Successful N_CONN_RES in the NS_WRES_CIND state
+AT_SETUP([sctp-npi-2 test 3.8.3])
+AT_CHECK([test_sctp_n2 3.8.3], [], [ignore], [], [], [])
+AT_KEYWORDS([N_CONN_RES NS_WRES_CIND])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.9.1: NOUTSTATE for N_BIND_REQ in the NS_DATA_XFER state
+AT_SETUP([sctp-npi-2 test 3.9.1])
+AT_CHECK([test_sctp_n2 3.9.1], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_BIND_REQ NS_DATA_XFER])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.9.2: NOUTSTATE for N_UNBIND_REQ in the NS_DATA_XFER state
+AT_SETUP([sctp-npi-2 test 3.9.2])
+AT_CHECK([test_sctp_n2 3.9.2], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_UNBIND_REQ NS_DATA_XFER])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.9.3: NOUTSTATE/NACCESS for N_CONN_REQ in the NS_DATA_XFER state
+AT_SETUP([sctp-npi-2 test 3.9.3])
+AT_CHECK([test_sctp_n2 3.9.3], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE NACCESS N_CONN_REQ NS_DATA_XFER])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.9.4: NOUTSTATE for N_RESET_RES in the NS_DATA_XFER state
+AT_SETUP([sctp-npi-2 test 3.9.4])
+AT_CHECK([test_sctp_n2 3.9.4], [], [ignore], [], [], [])
+AT_KEYWORDS([NOUTSTATE N_RESET_RES NS_DATA_XFER])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.9.5: NBADSEQ for N_DISCON_REQ in the NS_DATA_XFER state
+AT_SETUP([sctp-npi-2 test 3.9.5])
+AT_CHECK([test_sctp_n2 3.9.5], [], [ignore], [], [], [])
+AT_KEYWORDS([NBADSEQ N_DISCON_REQ NS_DATA_XFER])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.10.1: EPROTO for N_DATA_REQ in the NS_DATA_XFER state
+AT_SETUP([sctp-npi-2 test 3.10.1])
+AT_CHECK([test_sctp_n2 3.10.1], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_DATA_REQ NS_DATA_XFER])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.10.2: EPROTO for N_EXDATA_REQ in the NS_DATA_XFER state
+AT_SETUP([sctp-npi-2 test 3.10.2])
+AT_CHECK([test_sctp_n2 3.10.2], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_EXDATA_REQ NS_DATA_XFER])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.10.3: EPROTO for N_DATACK_REQ in the NS_DATA_XFER state
+AT_SETUP([sctp-npi-2 test 3.10.3])
+AT_CHECK([test_sctp_n2 3.10.3], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_DATACK_REQ NS_DATA_XFER])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.10.4: EPROTO for N_UNITDATA_REQ in the NS_DATA_XFER state
+AT_SETUP([sctp-npi-2 test 3.10.4])
+AT_CHECK([test_sctp_n2 3.10.4], [], [ignore], [], [], [])
+AT_KEYWORDS([EPROTO N_UNITDATA_REQ NS_DATA_XFER])
+AT_CLEANUP
+
+dnl Test Case XNS/NPI-SCTP/3.11.1: N_DATA_REQ in the NS_DATA_XFER state
+AT_SETUP([sctp-npi-2 test 3.11.1])
+AT_CHECK([test_sctp_n2 3.11.1], [], [ignore], [], [], [])
+AT_KEYWORDS([N_DATA_REQ NS_DATA_XFER])
+AT_CLEANUP
+
+
