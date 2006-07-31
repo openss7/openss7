@@ -1841,6 +1841,8 @@ print_addrs(int child, char *add_ptr, size_t add_len)
 
 	if (verbose < 3)
 		return;
+	if (add_len == 0)
+		print_string(child, "(no address)");
 	for (sin = (typeof(sin)) add_ptr; add_len >= sizeof(*sin); sin++, add_len -= sizeof(*sin)) {
 		char buf[128];
 
@@ -4697,6 +4699,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case T_OPTMGMT_ACK:
 			event = __TEST_OPTMGMT_ACK;
+			test_mgmtflags = p->optmgmt_ack.MGMT_flags;
 			print_ack_prim(child, prim_string(p->type));
 			print_mgmtflag(child, p->optmgmt_ack.MGMT_flags);
 			print_options(child, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length);
@@ -4984,9 +4987,35 @@ postamble_0(int child)
 static int
 preamble_1(int child)
 {
-#if 0
-	union T_primitives *p = (typeof(p)) cbuf;
-
+#if 1
+	struct {
+		struct t_opthdr prt_hdr;
+		t_scalar_t prt_val;
+		struct t_opthdr art_hdr;
+		t_scalar_t art_val;
+		struct t_opthdr irt_hdr;
+		t_scalar_t irt_val;
+		struct t_opthdr rin_hdr;
+		t_scalar_t rin_val;
+		struct t_opthdr rmn_hdr;
+		t_scalar_t rmn_val;
+		struct t_opthdr rmx_hdr;
+		t_scalar_t rmx_val;
+	} opt_optm = {
+		{
+		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS, T_SUCCESS}
+		, 5, {
+		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS, T_SUCCESS}
+		, 12, {
+		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES, T_SUCCESS}
+		, 12, {
+		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_INITIAL, T_SUCCESS}
+		, 200, {
+		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MIN, T_SUCCESS}
+		, 10, {
+		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MAX, T_SUCCESS}
+		, 2000
+	};
 	test_mgmtflags = T_NEGOTIATE;
 	test_opts = &opt_optm;
 	test_olen = sizeof(opt_optm);
@@ -4996,12 +5025,12 @@ preamble_1(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (p->optmgmt_ack.MGMT_flags != T_SUCCESS)
+	if (test_mgmtflags != T_SUCCESS)
 		goto failure;
 	state++;
 #endif
 	test_addr = addrs[child];
-	test_alen = sizeof(addrs[child]);
+	test_alen = anums[child]*sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -5071,7 +5100,7 @@ preamble_2_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = sizeof(addrs[2]);
+	test_alen = anums[2]*sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -5081,7 +5110,7 @@ preamble_2_conn(int child)
 	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, LONG_WAIT);
@@ -5097,7 +5126,7 @@ preamble_2_resp(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_msleep(child, LONG_WAIT);
+	test_msleep(child, SHORT_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5110,7 +5139,7 @@ preamble_2_list(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_resfd = test_fd[1];
@@ -5270,7 +5299,7 @@ preamble_2b_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[1];
-	test_alen = sizeof(addrs[1]);
+	test_alen = anums[1]*sizeof(addrs[1][0]);
 	test_data = "Hello World";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -5641,11 +5670,11 @@ Attempt and accept a connection.  This should be successful."
 int
 test_case_4_1_1_conn(int child)
 {
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = sizeof(addrs[2]);
+	test_alen = anums[2]*sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -5655,7 +5684,7 @@ test_case_4_1_1_conn(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
@@ -5671,7 +5700,7 @@ test_case_4_1_1_conn(int child)
 int
 test_case_4_1_1_resp(int child)
 {
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
@@ -5687,7 +5716,7 @@ test_case_4_1_1_resp(int child)
 int
 test_case_4_1_1_list(int child)
 {
-	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_resfd = test_fd[1];
@@ -5738,7 +5767,7 @@ test_case_4_1_2_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = sizeof(addrs[2]);
+	test_alen = anums[2]*sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -5827,7 +5856,7 @@ int
 test_case_5_1_conn(int child)
 {
 	static char dat[] = "Orderly release data connecting.";
-	int data_seen = 0, data_sent;
+	int data_seen = 0, data_sent, ordrel_seen = 0;
 
 	for (data_sent = 0; data_sent < 4; data_sent++) {
 		test_data = dat;
@@ -5839,24 +5868,17 @@ test_case_5_1_conn(int child)
 		case __EVENT_NO_MSG:
 			break;
 		case __TEST_DATA_IND:
+#if 0
 			if (data_seen >= 4)
 				goto failure;
+#endif
 			data_seen++;
-			break;
-		default:
-			goto failure;
-		}
-		state++;
-	}
-	while (data_seen < 4) {
-		switch (wait_event(child, NORMAL_WAIT)) {
-		case __EVENT_NO_MSG:
-			break;
-		case __TEST_DATA_IND:
-			if (data_seen >= 4)
+			continue;
+		case __TEST_ORDREL_IND:
+			if (ordrel_seen >= 1)
 				goto failure;
-			data_seen++;
-			break;
+			ordrel_seen++;
+			continue;
 		default:
 			goto failure;
 		}
@@ -5866,9 +5888,23 @@ test_case_5_1_conn(int child)
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
+	while (data_seen < 1 || ordrel_seen < 1) {
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __EVENT_NO_MSG:
+			continue;
+		case __TEST_DATA_IND:
+			data_seen++;
+			continue;
+		case __TEST_ORDREL_IND:
+			if (ordrel_seen >= 1)
+				goto failure;
+			ordrel_seen++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+	}
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -5880,7 +5916,7 @@ test_case_5_1_resp(int child)
 	static char dat[] = "Orderly release data responding.";
 	int data_seen = 0, data_sent, ordrel_seen = 0;
 
-	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	data_seen++;
 	state++;
@@ -5894,27 +5930,6 @@ test_case_5_1_resp(int child)
 		case __EVENT_NO_MSG:
 			break;
 		case __TEST_DATA_IND:
-			if (data_seen >= 4)
-				goto failure;
-			data_seen++;
-			break;
-		case __TEST_ORDREL_IND:
-			if (ordrel_seen >= 1)
-				goto failure;
-			ordrel_seen++;
-			break;
-		default:
-			goto failure;
-		}
-		state++;
-	}
-	while (data_seen < 4 || ordrel_seen < 1) {
-		switch (wait_event(child, NORMAL_WAIT)) {
-		case __EVENT_NO_MSG:
-			break;
-		case __TEST_DATA_IND:
-			if (data_seen >= 4)
-				goto failure;
 			data_seen++;
 			break;
 		case __TEST_ORDREL_IND:
@@ -5931,6 +5946,23 @@ test_case_5_1_resp(int child)
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	while (data_seen < 1 || ordrel_seen < 1) {
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __EVENT_NO_MSG:
+			continue;
+		case __TEST_DATA_IND:
+			data_seen++;
+			continue;
+		case __TEST_ORDREL_IND:
+			if (ordrel_seen >= 1)
+				goto failure;
+			ordrel_seen++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+	}
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -5975,7 +6007,7 @@ test_case_5_2_conn(int child)
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	data_seen++;
 	state++;
@@ -5984,10 +6016,8 @@ test_case_5_2_conn(int child)
 		goto failure;
 	state++;
       more:
-	switch (wait_event(child, LONG_WAIT)) {
+	switch (wait_event(child, INFINITE_WAIT)) {
 	case __TEST_DATA_IND:
-		if (data_seen >= 5)
-			goto failure;
 		data_seen++;
 		state++;
 		goto more;
@@ -6007,7 +6037,7 @@ test_case_5_2_resp(int child)
 {
 	int data_seen = 0;
 
-	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	data_seen++;
 	state++;
@@ -6016,7 +6046,7 @@ test_case_5_2_resp(int child)
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_data = "Orderly release data responding.";
@@ -6090,7 +6120,7 @@ test_case_5_3_conn(int child)
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	data_seen++;
 	state++;
@@ -6108,14 +6138,12 @@ test_case_5_3_conn(int child)
 		goto failure;
 	state++;
 	for (;;) {
-		switch (wait_event(child, LONGER_WAIT)) {
+		switch (wait_event(child, INFINITE_WAIT)) {
 		case __EVENT_NO_MSG:
-			break;
+			continue;
 		case __TEST_ORDREL_IND:
 			break;
 		case __TEST_DATA_IND:
-			if (data_seen >= 4)
-				goto failure;
 			data_seen++;
 			state++;
 			continue;
@@ -6135,7 +6163,7 @@ test_case_5_3_resp(int child)
 {
 	int data_seen = 0;
 
-	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	data_seen++;
 	state++;
@@ -6158,14 +6186,12 @@ test_case_5_3_resp(int child)
 		goto failure;
 	state++;
 	for (;;) {
-		switch (wait_event(child, LONGER_WAIT)) {
+		switch (wait_event(child, INFINITE_WAIT)) {
 		case __EVENT_NO_MSG:
-			break;
+			continue;
 		case __TEST_ORDREL_IND:
 			break;
 		case __TEST_DATA_IND:
-			if (data_seen >= 4)
-				goto failure;
 			data_seen++;
 			state++;
 			continue;
@@ -6356,7 +6382,7 @@ test_case_5_5_1_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[1];
-	test_alen = sizeof(addrs[1]);
+	test_alen = anums[1]*sizeof(addrs[1][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -6444,7 +6470,7 @@ test_case_5_5_2_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[1];
-	test_alen = sizeof(addrs[1]);
+	test_alen = anums[1]*sizeof(addrs[1][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -6532,7 +6558,7 @@ test_case_5_5_3_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[1];
-	test_alen = sizeof(addrs[1]);
+	test_alen = anums[1]*sizeof(addrs[1][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -9492,6 +9518,7 @@ main(int argc, char *argv[])
 		int count = 0;
 		char *token = hostc, *next_token, *delim = NULL;
 
+		fprintf(stdout, "Specified client address => %s\n", token);
 		do {
 			if ((delim = index(token, ','))) {
 				delim[0] = '\0';
@@ -9514,11 +9541,13 @@ main(int argc, char *argv[])
 		} while ((token = next_token) && count < 4);
 		anums[0] = count;
 		anums[3] = count;
+		fprintf(stdout, "%d client addresses assigned\n", count);
 	}
 	if (server_host_specified) {
 		int count = 0;
 		char *token = hosts, *next_token, *delim = NULL;
 
+		fprintf(stdout, "Specified server address => %s\n", token);
 		do {
 			if ((delim = index(token, ','))) {
 				delim[0] = '\0';
@@ -9541,10 +9570,12 @@ main(int argc, char *argv[])
 			addrs[1][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
 			addrs[2][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
 			addrs[3][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			count++;
 		} while ((token = next_token) && count < 4);
 		anums[1] = count;
 		anums[2] = count;
 		anums[3] = count;
+		fprintf(stdout, "%d server addresses assigned\n", count);
 	}
 	exit(do_tests(tests_to_run));
 }
