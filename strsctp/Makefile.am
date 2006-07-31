@@ -107,7 +107,8 @@ EXTRA_PROGRAMS			+= \
 				  test-sctp_ns \
 				  test-sctp_t \
 				  test-etsi_n \
-				  test-etsi_t
+				  test-etsi_t \
+				  test-interop
 
 pkglibexec_PROGRAMS		= \
 				  test-sctp \
@@ -117,7 +118,8 @@ pkglibexec_PROGRAMS		= \
 				  test-sctp_ns \
 				  test-sctp_t \
 				  test-etsi_n \
-				  test-etsi_t
+				  test-etsi_t \
+				  test-interop
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
@@ -175,6 +177,12 @@ test_etsi_t_LDADD		= $(STREAMS_LDADD)
 test_etsi_t_LDFLAGS		= -static
 test_etsi_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_etsi_t_CFLAGS		= $(USER_CFLAGS)
+
+test_interop_SOURCES		= src/test/test-interop.c
+test_interop_LDADD		= $(STREAMS_LDADD)
+test_interop_LDFLAGS		= -static
+test_interop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_interop_CFLAGS		= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif
@@ -304,7 +312,8 @@ EXTRA_PROGRAMS			+= \
 				  test-sctp_ns \
 				  test-sctp_t \
 				  test-etsi_n \
-				  test-etsi_t
+				  test-etsi_t \
+				  test-interop
 
 pkglibexec_PROGRAMS		= \
 				  test-sctp \
@@ -314,7 +323,8 @@ pkglibexec_PROGRAMS		= \
 				  test-sctp_ns \
 				  test-sctp_t \
 				  test-etsi_n \
-				  test-etsi_t
+				  test-etsi_t \
+				  test-interop
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
@@ -372,6 +382,12 @@ test_etsi_t_LDADD		= $(STREAMS_LDADD)
 test_etsi_t_LDFLAGS		= -static
 test_etsi_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_etsi_t_CFLAGS		= $(USER_CFLAGS)
+
+test_interop_SOURCES		= src/test/test-interop.c
+test_interop_LDADD		= $(STREAMS_LDADD)
+test_interop_LDFLAGS		= -static
+test_interop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_interop_CFLAGS		= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif
