@@ -698,7 +698,7 @@ struct sctp {
 	queue_t *wwait;			/* WR queue waiting on lock */
 	int users;			/* lock holders */
 	int bcid;			/* bufcall id */
-	t_uscalar_t i_flags;		/* Interface flags */
+//	t_uscalar_t i_flags;		/* Interface flags */
 	t_uscalar_t i_state;		/* Interface state */
 	t_uscalar_t state;		/* SCTP state */
 	sctp_t *bnext;			/* linkage for bind hash */
@@ -25716,7 +25716,7 @@ t_optdata_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_
 		goto outstate;
 	if (!bcanputnext(sp->rq, ord ? 0 : 1))
 		goto ebusy;
-	if (sp->i_flags & TF_SCTP_RECVOPT)
+	if (sp->options.sctp.recvopt)
 		opt_len = 4 * str_len;
 	if (!(mp = sctp_allocb(sp, sizeof(*p) + opt_len, BPRI_MED)))
 		goto enobufs;
@@ -25729,7 +25729,7 @@ t_optdata_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
 	mp->b_wptr += sizeof(*p);
 	/* indicate options */
-	if (sp->i_flags & TF_SCTP_RECVOPT) {
+	if (sp->options.sctp.recvopt) {
 		oh = (struct t_opthdr *) mp->b_wptr;
 		oh->len = str_len;
 		oh->level = T_INET_SCTP;
@@ -25886,7 +25886,7 @@ STATIC int
 sctp_t_data_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t tsn, uint ord,
 		uint more, mblk_t *dp)
 {
-	if (sp->i_flags & TF_SCTP_RECVOPT) {
+	if (sp->options.sctp.recvopt) {
 		printd(("=========================================\n"));
 		printd(("T_OPTDATA_IND ->\n"));
 		return t_optdata_ind(sp, ppi, sid, ssn, tsn, ord, more, dp);
