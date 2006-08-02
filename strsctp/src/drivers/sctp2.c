@@ -10414,6 +10414,7 @@ sctp_recv_init(struct sctp *sp, mblk_t *mp)
 			goto init_bad_parm;
 		switch (type) {
 		case SCTP_PTYPE_IPV6_ADDR:
+			break;
 		case SCTP_PTYPE_HOST_NAME:
 			goto bad_address;
 		case SCTP_PTYPE_COOKIE_PSRV:
@@ -26904,11 +26905,13 @@ t_optdata_req(struct sctp *sp, mblk_t *mp)
 
 		if (p->OPT_length) {
 			unsigned char *op = mp->b_rptr + p->OPT_offset;
-			unsigned char *oe = op + p->OPT_length;
-			struct t_opthdr *oh = (struct t_opthdr *) op;
+			int olen = p->OPT_length;
+			struct t_opthdr *oh;
 
-			for (; op + sizeof(*oh) <= oe && oh->len >= sizeof(*oh)
-			     && op + oh->len <= oe; op += oh->len, oh = (struct t_opthdr *) op) {
+			for (oh = _T_OPT_FIRSTHDR_OFS(op, olen, 0);
+					oh; oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0)) {
+				if (oh->len < sizeof(*oh))
+					break;
 				if (oh->level == T_INET_SCTP)
 					switch (oh->name) {
 					case T_SCTP_SID:
