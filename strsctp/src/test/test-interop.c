@@ -3645,6 +3645,22 @@ test_close(int child)
 	}
 }
 
+int
+test_push(int child)
+{
+	if (test_ioctl(child, I_PUSH, (intptr_t) "tpiperf") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
+int
+test_pop(int child)
+{
+	if (test_ioctl(child, I_POP, (intptr_t) 0) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -3752,6 +3768,46 @@ end_tests(int index)
 		goto failure;
 	state++;
 	if (stream_stop(0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+begin_tests_p(int index)
+{
+	if (begin_tests(index) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_push(0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_push(1) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_push(2) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+end_tests_p(int index)
+{
+	if (test_pop(2) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_pop(1) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_pop(0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (end_tests(index) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -3934,8 +3990,12 @@ do_signal(int child, int action)
 		p->data_req.MORE_flag = MORE_flag;
 		if (test_data)
 			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
-		else
-			data = NULL;
+		else {
+			if (test_dlen)
+				data->len = test_dlen;
+			else
+				data = NULL;
+		}
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		if ((verbose && show) || verbose > 4) {
@@ -5976,6 +6036,581 @@ test_case_1_3_list(int child)
 struct test_stream test_1_3_conn = { &preamble_1_3_conn, &test_case_1_3_conn, &postamble_1_3_conn };
 struct test_stream test_1_3_resp = { &preamble_1_3_resp, &test_case_1_3_resp, &postamble_1_3_resp };
 struct test_stream test_1_3_list = { &preamble_1_3_list, &test_case_1_3_list, &postamble_1_3_list };
+
+/*
+ * -----------------------------------------------------
+ */
+
+#define test_group_2 "Performance"
+
+#define tgrp_case_2_0 test_group_2
+#define numb_case_2_0 "2.0"
+#define name_case_2_0 "Connect and send and receive data."
+#define sref_case_2_0 "(none)"
+#define desc_case_2_0 "\
+Connect and send and receive data on one stream."
+
+int
+test_case_2_0_conn(int child)
+{
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_2_0_resp(int child)
+{
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	test_msleep(child, LONGER_WAIT);
+	state++;
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_2_0_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_2_0_conn	preamble_3b_conn
+#define preamble_2_0_resp	preamble_3b_resp
+#define preamble_2_0_list	preamble_3b_list
+
+#define postamble_2_0_conn	postamble_3_conn
+#define postamble_2_0_resp	postamble_3_resp
+#define postamble_2_0_list	postamble_3_list
+
+struct test_stream test_2_0_conn = { &preamble_2_0_conn, &test_case_2_0_conn, &postamble_2_0_conn };
+struct test_stream test_2_0_resp = { &preamble_2_0_resp, &test_case_2_0_resp, &postamble_2_0_resp };
+struct test_stream test_2_0_list = { &preamble_2_0_list, &test_case_2_0_list, &postamble_2_0_list };
+
+#define tgrp_case_2_1 test_group_2
+#define numb_case_2_1 "2.1"
+#define name_case_2_1 "Connect and send and receive data."
+#define sref_case_2_1 "(none)"
+#define desc_case_2_1 "\
+Connect and send and receive data on one stream."
+
+int
+test_case_2_1_conn(int child)
+{
+	int i;
+
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+
+	/* set for discard */
+	if (test_ioctl(child, 1, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+
+	test_msleep(child, LONG_WAIT);
+	state++;
+
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	print_less(child);
+	test_block(child);
+	for (i = 0; i < 1000; i++) {
+		if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	test_nonblock(child);
+	print_more();
+
+	switch (wait_event(child, LONG_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		goto failure;
+	default:
+		break;
+	}
+	state++;
+
+	/* set for normal */
+	if (test_ioctl(child, 0, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	test_nonblock(child);
+	print_more();
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_2_1_resp(int child)
+{
+	int i;
+
+	test_msleep(child, LONGER_WAIT);
+	state++;
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+
+	/* set for discard */
+	if (test_ioctl(child, 1, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+
+	test_msleep(child, LONG_WAIT);
+	state++;
+
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	print_less(child);
+	for (i = 0; i < 10; i++) {
+		if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	print_more();
+
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		goto failure;
+	default:
+		break;
+	}
+	state++;
+
+	if (test_ioctl(child, 0, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	print_more();
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_2_1_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_2_1_conn	preamble_3b_conn
+#define preamble_2_1_resp	preamble_3b_resp
+#define preamble_2_1_list	preamble_3b_list
+
+#define postamble_2_1_conn	postamble_2_conn
+#define postamble_2_1_resp	postamble_2_resp
+#define postamble_2_1_list	postamble_3_list
+
+struct test_stream test_2_1_conn = { &preamble_2_1_conn, &test_case_2_1_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_resp = { &preamble_2_1_resp, &test_case_2_1_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_list = { &preamble_2_1_list, &test_case_2_1_list, &postamble_2_1_list };
+
+#define tgrp_case_2_2 test_group_2
+#define numb_case_2_2 "2.2"
+#define name_case_2_2 "Connect and send and receive data."
+#define sref_case_2_2 "(none)"
+#define desc_case_2_2 "\
+Connect and send and receive data on one stream."
+
+int
+test_case_2_2_conn(int child)
+{
+	int i;
+
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+
+	/* set for discard */
+	if (test_ioctl(child, 1, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+
+	test_msleep(child, LONG_WAIT);
+	state++;
+
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	print_less(child);
+	test_block(child);
+	for (i = 0; i < 1000; i++) {
+		if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	test_nonblock(child);
+	print_more();
+
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		goto failure;
+	default:
+		break;
+	}
+	state++;
+
+	/* set for normal */
+	if (test_ioctl(child, 0, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	test_nonblock(child);
+	print_more();
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_2_2_resp(int child)
+{
+	test_msleep(child, LONGER_WAIT);
+	state++;
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+
+	/* set for echo */
+	if (test_ioctl(child, 2, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+
+	test_msleep(child, LONG_WAIT);
+	state++;
+
+	switch (wait_event(child, TEST_DURATION)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		goto failure;
+	default:
+		break;
+	}
+	state++;
+
+	if (test_ioctl(child, 0, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	test_ioctl(child, 0, (intptr_t) 0);
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_2_2_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_2_2_conn	preamble_3b_conn
+#define preamble_2_2_resp	preamble_3b_resp
+#define preamble_2_2_list	preamble_3b_list
+
+#define postamble_2_2_conn	postamble_2_conn
+#define postamble_2_2_resp	postamble_2_resp
+#define postamble_2_2_list	postamble_3_list
+
+struct test_stream test_2_2_conn = { &preamble_2_2_conn, &test_case_2_2_conn, &postamble_2_2_conn };
+struct test_stream test_2_2_resp = { &preamble_2_2_resp, &test_case_2_2_resp, &postamble_2_2_resp };
+struct test_stream test_2_2_list = { &preamble_2_2_list, &test_case_2_2_list, &postamble_2_2_list };
+
+#define tgrp_case_2_3 test_group_2
+#define numb_case_2_3 "2.3"
+#define name_case_2_3 "Connect and send and receive data."
+#define sref_case_2_3 "(none)"
+#define desc_case_2_3 "\
+Connect and send and receive data on one stream."
+
+#if 0
+int
+test_case_2_3_conn(int child)
+{
+	int i;
+
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+
+	/* set for discard */
+	if (test_ioctl(child, 1, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+
+	test_msleep(child, LONG_WAIT);
+	state++;
+
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	test_opts = &opt_data;
+	test_olen = sizeof(opt_data);
+
+	print_less(child);
+	test_block(child);
+	for (i = 0; i < 1000; i++) {
+		if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	test_nonblock(child);
+	print_more();
+
+	switch (wait_event(child, LONG_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		goto failure;
+	default:
+		break;
+	}
+	state++;
+
+	/* set for normal */
+	if (test_ioctl(child, 0, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	test_nonblock(child);
+	print_more();
+	return (__RESULT_FAILURE);
+}
+#else
+#if 1
+int
+test_case_2_3_conn(int child)
+{
+	uint32_t args[3] = { 100000, 100000, 1 };
+	struct strioctl sio = {
+		.ic_cmd = 3,
+		.ic_timout = -1,
+		.ic_len = sizeof(args),
+		.ic_dp = (char *)args,
+	};
+
+	if (test_ioctl(child, I_STR, (intptr_t) &sio) != __RESULT_SUCCESS)
+		goto failure;
+
+	test_data = NULL;
+	test_dlen = 8952;
+	DATA_flag = 0;
+	test_opts = NULL;
+	test_olen = 0;
+
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+
+	test_sleep(child, 60);
+	state++;
+
+	test_ioctl(child, 0, (intptr_t) 0);
+	state++;
+
+	return __RESULT_SUCCESS;
+      failure:
+	return (__RESULT_FAILURE);
+}
+#else
+int
+test_case_2_3_conn(int child)
+{
+	int i;
+
+	test_data = NULL;
+	test_dlen = 8952;
+	DATA_flag = 0;
+	test_opts = NULL;
+	test_olen = 0;
+
+	print_less(child);
+	test_block(child);
+	for (i = 0; i < 100000; i++) {
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	test_nonblock(child);
+	print_more();
+
+	return __RESULT_SUCCESS;
+      failure:
+	print_more();
+	return (__RESULT_FAILURE);
+}
+#endif
+#endif
+
+int
+test_case_2_3_resp(int child)
+{
+	/* set for discard */
+	if (test_ioctl(child, 1, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_EXP_OPTDATA_IND:
+	case __TEST_NRM_OPTDATA_IND:
+		goto failure;
+	case __TEST_ORDREL_IND:
+		test_data = NULL;
+		do_signal(child, __TEST_ORDREL_REQ);
+		break;
+	default:
+		break;
+	}
+	state++;
+
+	if (test_ioctl(child, 0, (intptr_t) 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	print_more();
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_2_3_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_2_3_conn	preamble_3b_conn
+#define preamble_2_3_resp	preamble_3b_resp
+#define preamble_2_3_list	preamble_3b_list
+
+#define postamble_2_3_conn	postamble_2_conn
+#define postamble_2_3_resp	postamble_2_resp
+#define postamble_2_3_list	postamble_3_list
+
+struct test_stream test_2_3_conn = { &preamble_2_3_conn, &test_case_2_3_conn, &postamble_2_3_conn };
+struct test_stream test_2_3_resp = { &preamble_2_3_resp, &test_case_2_3_resp, &postamble_2_3_resp };
+struct test_stream test_2_3_list = { &preamble_2_3_list, &test_case_2_3_list, &postamble_2_3_list };
+
+/*
+ * -----------------------------------------------------
+ */
 
 #define test_group_4 "Connection and disconnection -- successful"
 #define sref_case_4_1 "TPI Version 2 Draft 2 -- Appendix A -- Connection Acceptance"
@@ -9168,6 +9803,18 @@ struct test_case {
 	&test_1_2_conn, &test_1_2_resp, &test_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_3, tgrp_case_1_3, name_case_1_3, desc_case_1_3, sref_case_1_3, {
 	&test_1_3_conn, &test_1_3_resp, &test_1_3_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_0, tgrp_case_2_0, name_case_2_0, desc_case_2_0, sref_case_2_0, {
+	&test_2_0_conn, &test_2_0_resp, &test_2_0_list}, &begin_tests_p, &end_tests_p, 0, 0}, {
+		numb_case_2_1, tgrp_case_2_1, name_case_2_1, desc_case_2_1, sref_case_2_1, {
+	&test_2_1_conn, &test_2_1_resp, &test_2_1_list}, &begin_tests_p, &end_tests_p, 0, 0}, {
+		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, {
+	&test_2_2_conn, &test_2_2_resp, &test_2_2_list}, &begin_tests_p, &end_tests_p, 0, 0}, {
+		numb_case_2_3, tgrp_case_2_3, name_case_2_3, desc_case_2_3, sref_case_2_3, {
+	&test_2_3_conn, &test_2_3_resp, &test_2_3_list}, &begin_tests_p, &end_tests_p, 0, 0}, {
+#if 0
+		numb_case_2_4, tgrp_case_2_4, name_case_2_4, desc_case_2_4, sref_case_2_4, {
+	&test_2_4_conn, &test_2_4_resp, &test_2_4_list}, &begin_tests_p, &end_tests_p, 0, 0}, {
+#endif
 		numb_case_4_1_1, tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, sref_case_4_1_1, {
 	&test_4_1_1_conn, &test_4_1_1_resp, &test_4_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1_2, tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, sref_case_4_1_2, {
