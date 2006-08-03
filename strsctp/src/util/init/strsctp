@@ -99,7 +99,7 @@ done
 
 # Specify defaults
 
-STRSCTP_MODULES="streams-sctp"
+STRSCTP_MODULES="streams-sctp streams-tpiperf"
 STRSCTP_MAKEDEVICES="yes"
 STRSCTP_REMOVEDEVICES="yes"
 

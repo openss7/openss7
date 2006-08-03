@@ -190,16 +190,28 @@ endif
 if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
 
-ADDON_LIBS			= libSCTPsctp.a
+ADDON_LIBS			= libSCTPsctp.a libSCTPtest.a
 if WITH_KO_MODULES
 ADDON_MODS			= streams_sctp.o
 else
 ADDON_MODS			= streams-sctp.o
 endif
-ADDON_OBJS			= $(libSCTPsctp_a_OBJECTS)
+ADDON_OBJS			= $(libSCTPsctp_a_OBJECTS) $(libSCTPtest_a_OBJECTS)
 
 noinst_LIBRARIES		= $(ADDON_LIBS)
-EXTRA_LIBRARIES			+= libSCTPsctp.a
+EXTRA_LIBRARIES			+= libSCTPsctp.a libSCTPtest.a
+
+nodist_EXTRA_libSCTPtest_a_SOURCES = \
+				  src/modules/tpiperf.c
+
+test_source_FILES		= $(nodist_EXTRA_libSCTPtest_a_SOURCES)
+
+nodist_libSCTPtest_a_SOURCES	= \
+			          $(test_source_FILES)
+
+libSCTPtest_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSCTPtest_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libSCTPtest_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 sctp_source_FILES		= \
 				  src/drivers/sctp.c \
@@ -395,16 +407,28 @@ endif
 if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
 
-ADDON_LIBS			= libSCTPsctp.a
+ADDON_LIBS			= libSCTPsctp.a libSCTPtest.a
 if WITH_KO_MODULES
-ADDON_MODS			= streams_sctp.o
+ADDON_MODS			= streams_sctp.o 
 else
 ADDON_MODS			= streams-sctp.o
 endif
-ADDON_OBJS			= $(libSCTPsctp_a_OBJECTS)
+ADDON_OBJS			= $(libSCTPsctp_a_OBJECTS) $(libSCTPtest_a_OBJECTS)
 
 noinst_LIBRARIES		= $(ADDON_LIBS)
-EXTRA_LIBRARIES			+= libSCTPsctp.a
+EXTRA_LIBRARIES			+= libSCTPsctp.a libSCTPtest.a
+
+nodist_EXTRA_libSCTPtest_a_SOURCES = \
+				  src/modules/tpiperf.c
+
+test_source_FILES		= $(nodist_EXTRA_libSCTPtest_a_SOURCES)
+
+nodist_libSCTPtest_a_SOURCES	= \
+			          $(test_source_FILES)
+
+libSCTPtest_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSCTPtest_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libSCTPtest_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 sctp_source_FILES		= \
 				  src/drivers/sctp.c \
@@ -508,7 +532,7 @@ endif
 ## PKG_BUILD_ARCH
 endif
 
-EXTRA_DIST			+= $(sctp_source_FILES) $(sctp2_source_FILES)
+EXTRA_DIST			+= $(sctp_source_FILES) $(sctp2_source_FILES) $(test_source_FILES)
 
 EXTRA_TEX			+= \
 				scripts/texinfo.cnf \
@@ -526,7 +550,7 @@ EXTRA_SCRIPTS			+= configure.nexusware
 ## Rules for building kernel objects
 ##
 KERNEL_OBJECTS			= $(ADDON_OBJS)
-KERNEL_MODULES			= $(ADDON_MODS)
+KERNEL_MODULES			= $(libSCTPtest_a_OBJECTS) $(ADDON_MODS)
 KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)

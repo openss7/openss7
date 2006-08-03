@@ -41,7 +41,7 @@ done
 
 # Specify defaults
 
-STRSCTP_MODULES="streams-sctp"
+STRSCTP_MODULES="streams-sctp streams-tpiperf"
 STRSCTP_MAKEDEVICES="no"
 STRSCTP_REMOVEDEVICES="no"
 
