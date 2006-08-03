@@ -13802,7 +13802,8 @@ _sctp_cleanup_read(queue_t *q)
 {
 	struct sctp *sp = SCTP_PRIV(q);
 
-	return sctp_cleanup_read(sp);
+	sctp_cleanup_read(sp);
+	___sctp_transmit_wakeup(sp);
 }
 
 STATIC INLINE int
