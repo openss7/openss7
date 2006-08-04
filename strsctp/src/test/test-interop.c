@@ -6520,7 +6520,15 @@ test_case_2_3_conn(int child)
 		goto failure;
 	state++;
 
-	test_sleep(child, 60);
+	switch(wait_event(child, LONGEST_WAIT)) {
+		case __TEST_DISCON_IND:
+			break;
+		case __TEST_ORDREL_IND:
+			do_signal(child, __TEST_ORDREL_REQ);
+			break;
+		default:
+			goto failure;
+	}
 	state++;
 
 	test_ioctl(child, 0, (intptr_t) 0);
@@ -6531,6 +6539,7 @@ test_case_2_3_conn(int child)
 	return (__RESULT_FAILURE);
 }
 #else
+#if 0
 int
 test_case_2_3_conn(int child)
 {
@@ -6557,6 +6566,7 @@ test_case_2_3_conn(int child)
 	print_more();
 	return (__RESULT_FAILURE);
 }
+#endif
 #endif
 #endif
 

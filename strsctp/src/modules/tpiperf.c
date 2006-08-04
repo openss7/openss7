@@ -305,9 +305,16 @@ tpiperf_wput(queue_t *q, mblk_t *mp)
 
 		switch ((cmd = ioc->iocblk.ioc_cmd)) {
 		case 0:	/* none */
+			priv->mode = cmd;
+			__printd(("%s: set mode to NONE\n", MOD_NAME));
+			goto ack;
 		case 1:	/* discard */
+			priv->mode = cmd;
+			__printd(("%s: set mode to DISCARD\n", MOD_NAME));
+			goto ack;
 		case 2:	/* echo */
 			priv->mode = cmd;
+			__printd(("%s: set mode to ECHO\n", MOD_NAME));
 			goto ack;
 		case 3:	/* generator 1 stream */
 			if (count == TRANSPARENT)
@@ -315,12 +322,13 @@ tpiperf_wput(queue_t *q, mblk_t *mp)
 			if (args == NULL || count < 2 * sizeof(uint32_t))
 				goto nak;
 			priv->mode = cmd;
-			priv->number = 100000;
-			priv->burst = 100000;
+			priv->number = args[0];
+			priv->burst = args[1];
 			priv->streams = 1;
+			__printd(("%s: set mode to GENERATE, number = %u, burst = %u, streams = %u\n", MOD_NAME, priv->number, priv->burst, priv->streams));
 			count = 0;
 			goto ack;
-		case 4: /* generator N streams */
+		case 4:	/* generator N streams */
 			if (count == TRANSPARENT)
 				goto nak;
 			if (args == NULL || count < 3 * sizeof(uint32_t))
@@ -329,9 +337,10 @@ tpiperf_wput(queue_t *q, mblk_t *mp)
 			priv->number = args[0];
 			priv->burst = args[1];
 			priv->streams = args[2];
+			__printd(("%s: set mode to GENERATE, number = %u, burst = %u, streams = %u\n", MOD_NAME, priv->number, priv->burst, priv->streams));
 			count = 0;
 			goto ack;
-		case 5: /* collect stats with reset */
+		case 5:	/* collect stats with reset */
 			if (count == TRANSPARENT)
 				goto nak;
 			if (args == NULL) {
@@ -367,101 +376,18 @@ tpiperf_wput(queue_t *q, mblk_t *mp)
 		case 2:
 			break;
 		case 3:	/* generator 1 stream */
-			if (likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t))) {
-				switch (*((t_scalar_t *) mp->b_rptr)) {
-				case T_OPTDATA_IND:
-				case T_DATA_IND:
-				case T_EXDATA_IND:
-				{
-					/* save message for later */
-					if (priv->mp != NULL)
-						freemsg(xchg(&priv->mp, mp));
-					qenable(q);
-#if 0
-					/* start generating immediately */
-					for (;;) {
-						if (likely((dp = dupmsg(mp)) != NULL)) {
-							if (likely(mp->b_cont != NULL))
-								priv->bytes += msgsize(mp->b_cont);
-							priv->count++;
-							burst++;
-							if (likely(bcanput(priv->wq, dp->b_band))) {
-								put(priv->wq, dp);
-								if ((priv->count > priv->number) || (burst > priv->burst)) {
-									qenable(priv->wq);
-									break;
-								}
-								continue;
-							}
-						} else {
-							/* need bufcall */
-							if (priv->bcid)
-								unbufcall(xchg(&priv->bcid, NULL));
-							priv->bcid = bufcall(msgsize(mp->b_cont), BPRI_MED, &tpiperf_bufcall, (long) q);
-						}
-						if (unlikely(!putq(q, dp))) {
-							swerr();
-							freemsg(dp);
-						}
-						break;
-					}
-#endif
-					return (0);
-				}
-				}
-			}
-			break;
-
 		case 4:	/* generator multiple streams */
 			if (likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t))) {
 				switch (*((t_scalar_t *) mp->b_rptr)) {
-				case T_OPTDATA_IND:
-				case T_DATA_IND:
-				case T_EXDATA_IND:
+				case T_OPTDATA_REQ:
+				case T_DATA_REQ:
+				case T_EXDATA_REQ:
 				{
-					mblk_t *bp, *dp;
-					int burst = 0;
-
 					/* save message for later */
 					if (priv->mp != NULL)
 						freemsg(xchg(&priv->mp, mp));
-					/* start generating immediately */
-					for (;;) {
-						if (likely((bp = copyb(mp)) != NULL)) {
-							if (likely((dp = mp->b_cont) == NULL || (dp = dupmsg(dp)) != NULL)) {
-								if (likely((bp->b_cont = dp) != NULL))
-									priv->bytes += msgsize(dp);
-								priv->count++;
-								burst++;
-								if (likely(bcanput(priv->wq, bp->b_band))) {
-									put(priv->wq, bp);
-									if ((priv->count > priv->number) || (burst > priv->burst)) {
-										qenable(priv->wq);
-										break;
-									}
-									continue;
-								}
-							} else {
-								freeb(bp);
-								if (mp->b_cont) {
-									/* need bufcall */
-									if (priv->bcid)
-										unbufcall(xchg(&priv->bcid, NULL));
-									priv->bcid = bufcall(msgsize(mp->b_cont), BPRI_MED, &tpiperf_bufcall, (long) q);
-								}
-							}
-						} else {
-							/* need bufcall */
-							if (priv->bcid)
-								unbufcall(xchg(&priv->bcid, NULL));
-							priv->bcid = bufcall(mp->b_wptr - mp->b_rptr, BPRI_MED, &tpiperf_bufcall, (long) q);
-						}
-						if (unlikely(!putq(q, bp))) {
-							swerr();
-							freemsg(bp);
-						}
-						break;
-					}
+					priv->mp = mp;
+					qenable(q);
 					return (0);
 				}
 				}
@@ -494,7 +420,7 @@ tpiperf_wsrv(queue_t *q)
 			swerr();
 			freemsg(mp);
 		}
-		return (0);
+		break;
 	}
 	{
 		struct tpiperf *priv = (typeof(priv)) q->q_ptr;
@@ -516,10 +442,28 @@ tpiperf_wsrv(queue_t *q)
 							priv->bytes += msgsize(mp->b_cont);
 						priv->count++;
 						burst++;
-						if (likely(bcanput(priv->wq, dp->b_band))) {
-							put(priv->wq, dp);
+						if (likely(bcanputnext(q, dp->b_band))) {
+							putnext(q, dp);
 							if (priv->count > priv->number) {
 								priv->mode = 0;
+								if ((dp = allocb(2 * sizeof(t_scalar_t), BPRI_MED))) {
+									dp->b_datap->db_type = M_PROTO;
+									*((t_scalar_t *)dp->b_wptr) = T_DISCON_REQ;
+									dp->b_wptr += sizeof(t_scalar_t);
+									*((t_scalar_t *)dp->b_wptr) = 0;
+									dp->b_wptr += sizeof(t_scalar_t);
+									putnext(q, dp);
+								}
+								if ((dp = allocb(3 * sizeof(t_scalar_t), BPRI_MED))) {
+									dp->b_datap->db_type = M_PROTO;
+									*((t_scalar_t *)dp->b_wptr) = T_DISCON_IND;
+									dp->b_wptr += sizeof(t_scalar_t);
+									*((t_scalar_t *)dp->b_wptr) = 0;
+									dp->b_wptr += sizeof(t_scalar_t);
+									*((t_scalar_t *)dp->b_wptr) = 0;
+									dp->b_wptr += sizeof(t_scalar_t);
+									put(priv->rq, dp);
+								}
 								break;
 							} else if (burst > priv->burst) {
 								qenable(q);
@@ -556,8 +500,8 @@ tpiperf_wsrv(queue_t *q)
 								if (likely((bp->b_cont = dp) != NULL))
 									priv->bytes += msgsize(dp);
 								priv->count++;
-								if (likely(bcanput(priv->wq, bp->b_band))) {
-									put(priv->wq, bp);
+								if (likely(bcanput(q, bp->b_band))) {
+									put(q, bp);
 									continue;
 								}
 							} else {
