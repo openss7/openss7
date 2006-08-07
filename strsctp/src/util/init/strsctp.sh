@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/07/15 13:06:26 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/08/07 22:17:17 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -183,7 +183,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/07/15 13:06:26 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/08/07 22:17:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -228,7 +228,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/15 13:06:26 $ by $Author: brian $
+# Last Modified $Date: 2006/08/07 22:17:17 $ by $Author: brian $
 #
 # =============================================================================
 

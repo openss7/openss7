@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/07/29 07:44:25 $
+ @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/07 22:17:15 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:44:25 $ by $Author: brian $
+ Last Modified $Date: 2006/08/07 22:17:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: test-sctp_t.c,v $
+ $Log: test-interop.c,v $
+ Revision 0.9.2.1  2006/08/07 22:17:15  brian
+ - changes from SCTP Interop
+
  Revision 0.9.2.17  2006/07/29 07:44:25  brian
  - CVS checkin of changes before leaving for SCTP interop
 
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/07/29 07:44:25 $"
+#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/07 22:17:15 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/07/29 07:44:25 $";
+static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/07 22:17:15 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the

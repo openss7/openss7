@@ -1,3 +1,15 @@
+2006-08-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added test-interop program and performance test module
+	* src/drivers/sctp2.c:
+	  - ignore IPv6 addresses
+	  - perform transmitter wakeup on read side
+	  - correct T_OPTDATA_REQ options handling
+	* src/modules/tpiperf.c: added performance test module for SCTP
+	* src/test/test-interop.c: added SCTP Interop test program
+	* src/util/init/strsctp: add and remove performance test module
+	* src/util/init/strsctp.sh: add and remove performance test module
+
 2006-07-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added sctp_n2 test program
