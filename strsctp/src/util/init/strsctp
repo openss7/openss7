@@ -166,7 +166,7 @@ stop() {
 	    $STRSCTP_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]sctp' /proc/modules 2>/dev/null | remove_modules
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_](sctp|tpiperf)' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?

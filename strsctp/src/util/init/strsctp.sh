@@ -141,7 +141,7 @@ stop() {
 	$STRSCTP_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]sctp' /proc/modules 2>/dev/null | remove_modules
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_](sctp|tpiperf)' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
