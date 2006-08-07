@@ -6520,7 +6520,7 @@ test_case_2_3_conn(int child)
 		goto failure;
 	state++;
 
-	switch(wait_event(child, LONGEST_WAIT)) {
+	switch(wait_event(child, INFINITE_WAIT)) {
 		case __TEST_DISCON_IND:
 			break;
 		case __TEST_ORDREL_IND:
