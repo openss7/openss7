@@ -109,6 +109,10 @@ static char const ident[] =
 
 #include <stdbool.h>		/* for bool, true and false */
 
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
+
 #ifndef __STRUTIL_EXTERN_INLINE
 #define __STRUTIL_EXTERN_INLINE inline streams_fastcall __unlikely
 #endif

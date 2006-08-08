@@ -1,3 +1,7 @@
+2006-08-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: locking defines must match
+
 2006-07-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-np_ip.c: rationalized to new SCTP test programs

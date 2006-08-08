@@ -79,6 +79,9 @@ static char const ident[] =
 #ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
 #endif
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #include "sys/strdebug.h"
 

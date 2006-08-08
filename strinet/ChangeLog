@@ -1,3 +1,12 @@
+2006-08-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/rawip.c: locking defines must match
+	* src/drivers/tcp.c: avoid unused variable warning
+	* src/drivers/udp.c: locking defines must match
+	* src/test/test-inet_raw.c: address pointer error
+	* src/test/test-inet_tcp.c: address pointer error
+	* src/test/test-inet_udp.c: address pointer error
+
 2006-07-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: option handling corrections for SCTP from strsctp

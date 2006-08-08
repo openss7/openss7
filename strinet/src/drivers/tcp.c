@@ -6867,6 +6867,7 @@ tpi_init_protos(void)
 		struct inet_protocol *ip;
 		unsigned char proto = slot + BASE_INET_PROTOCOL;
 
+		(void) proto;
 		ip = &tpi_proto[slot];
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
@@ -6886,8 +6887,6 @@ tpi_init_protos(void)
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 #if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
 		ip->proto.proto = proto;
-#else
-		(void) proto;
 #endif				/* defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO */
 		ip->proto.handler = &tpi_v4_rcv;
 		ip->proto.err_handler = &tpi_v4_err;

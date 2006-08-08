@@ -155,6 +155,9 @@ static char const ident[] =
 #endif
 #include <linux/major.h>
 // #include <asm/atomic.h>
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #ifndef __STRSCHD_EXTERN_INLINE
 #define __STRSCHD_EXTERN_INLINE inline streams_fastcall __unlikely
@@ -4789,6 +4792,11 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 STATIC struct notifier_block __devinitdata str_cpu_nfb = {
 	.notifier_call = str_cpu_callback,
 };
+
+/* some older kernels (SLES) do not define cpu_present */
+#ifndef cpu_present
+#define cpu_present(__cpu) 1
+#endif
 
 /* This was OK for boot, but not for starting threads after all the processors have come online.  So
  * we check which processors are online and start their threads.  Note that this will also still

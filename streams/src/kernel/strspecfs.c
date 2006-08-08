@@ -90,6 +90,9 @@ static char const ident[] =
 #if defined HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #include "sys/strdebug.h"
 

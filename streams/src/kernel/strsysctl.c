@@ -69,6 +69,9 @@ static char const ident[] =
 #include <linux/proc_fs.h>
 #endif
 #include <linux/sysctl.h>
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #include "sys/strdebug.h"
 

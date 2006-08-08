@@ -88,6 +88,9 @@ MODULE_LICENSE(STREAMS_LICENSE);
 MODULE_ALIAS("streams");
 #endif
 #endif
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #include "sys/strdebug.h"
 

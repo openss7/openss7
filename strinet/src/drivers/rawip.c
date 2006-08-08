@@ -620,8 +620,7 @@ tp_alloc(void)
  *  Locking
  */
 
-//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
-#if 1
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 
 #define spin_lock_str(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

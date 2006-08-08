@@ -1,3 +1,43 @@
+2006-08-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/strattach.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	* src/kernel/strlookup.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	* src/kernel/strmain.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	* src/kernel/strpipe.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	* src/kernel/strprocfs.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	* src/kernel/strreg.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	* src/kernel/strsad.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	* src/kernel/strsched.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	  - SLES 9 does not define cpu_present()
+	* src/kernel/strspecfs.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	* src/kernel/strsyms.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	* src/kernel/strsysctl.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+	* src/kernel/strutil.c:
+	  - include linux/security.h before sys/strdebug.h to avoid ptrace
+	    conflict on SLES 9
+
 2006-07-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/strsched.c: correct timer lock handling

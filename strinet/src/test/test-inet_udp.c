@@ -24795,7 +24795,7 @@ test_case_4_3_conn_readonly(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = addrs[2];
+	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -33365,7 +33365,7 @@ preamble_ts_wres_cind_conn(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = addrs[2];
+	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;

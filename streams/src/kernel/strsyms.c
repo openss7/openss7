@@ -62,6 +62,9 @@ static char const ident[] =
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or

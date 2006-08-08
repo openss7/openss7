@@ -73,6 +73,9 @@ static char const ident[] =
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
 #include <asm/hardirq.h>
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #include "sys/strdebug.h"
 
