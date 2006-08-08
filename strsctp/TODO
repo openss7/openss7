@@ -1,4 +1,4 @@
-OpenSS7 STREAMS SCTP -- things to do.  2006-03-01
+OpenSS7 STREAMS SCTP -- things to do.  2006-08-07
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -8,6 +8,17 @@ Things to do:
 * The strsctp package is quite stable and mature as of strsctp-0.9.2.2
   and most of the things that remain to be done are rigorous conformance
   and performance testing.
+
+- SCTP Interoperability testing.  Take the STREAMS package to the SCTP
+  Interop tests at UBC and perform interoperability testing.
+
+  *Complete*
+  
+  Tested perfect against all functional implementations present.  Passed
+  720 Mbps compiled with no optimizations and debugging assertions
+  turned on.  Still have to go through the logs and collect warnings and
+  investigate them.  Still have to complete optimized performance
+  testing.
 
 - Work recent SCTP I-G changes into the code.
 
