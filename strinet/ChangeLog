@@ -1,11 +1,26 @@
+2006-08-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: SLES doesn't include -ffreestanding
+	* tests/testsuite-inet_raw.at: wait momentarily on buffer leak check
+	* tests/testsuite-inet_raw2.at: wait momentarily on buffer leak check
+	* tests/testsuite-inet_sctp.at: wait momentarily on buffer leak check
+	* tests/testsuite-inet_tcp.at: wait momentarily on buffer leak check
+	* tests/testsuite-inet_udp.at: wait momentarily on buffer leak check
+	* tests/testsuite-inet_udp2.at: wait momentarily on buffer leak check
+	* src/drivers/rawip.c: make locking defines unique
+	* src/drivers/udp.c: make locking defines unique
+
 2006-08-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/rawip.c: locking defines must match
-	* src/drivers/tcp.c: avoid unused variable warning
 	* src/drivers/udp.c: locking defines must match
+	* src/drivers/tcp.c: avoid unused variable warning
 	* src/test/test-inet_raw.c: address pointer error
 	* src/test/test-inet_tcp.c: address pointer error
 	* src/test/test-inet_udp.c: address pointer error
+	* doc/manual/releases.texi: added SLES 9 to supported distros
+	* doc/manual/texi/install.texi: debs apply to Debian not RedHat
+	* scripts/texi/install.texi: debs apply to Debian not RedHat
 
 2006-07-29  Brian Bidulock  <bidulock@openss7.org>
 

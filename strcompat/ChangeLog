@@ -1,3 +1,13 @@
+2006-08-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: SLES doesn't include -ffreestanding
+
+2006-08-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/releases.texi: added SLES 9 to supported distros
+	* doc/manual/texi/install.texi: debs apply to Debian not RedHat
+	* scripts/texi/install.texi: debs apply to Debian not RedHat
+
 2006-07-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/os7/compat.h: corrections for non-optimized compile

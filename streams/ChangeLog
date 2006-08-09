@@ -1,3 +1,23 @@
+2006-08-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: SLES doesn't include -ffreestanding
+	* tests/testsuite-clone.at: wait momentarily on buffer leak check
+	* tests/testsuite-connld.at: wait momentarily on buffer leak check
+	* tests/testsuite-echo.at: wait momentarily on buffer leak check
+	* tests/testsuite-fifo.at: wait momentarily on buffer leak check
+	* tests/testsuite-log.at: wait momentarily on buffer leak check
+	* tests/testsuite-loop.at: wait momentarily on buffer leak check
+	* tests/testsuite-mux.at: wait momentarily on buffer leak check
+	* tests/testsuite-nsdev.at: wait momentarily on buffer leak check
+	* tests/testsuite-nuls.at: wait momentarily on buffer leak check
+	* tests/testsuite-pipe.at: wait momentarily on buffer leak check
+	* tests/testsuite-pipemod.at: wait momentarily on buffer leak check
+	* tests/testsuite-sad.at: wait momentarily on buffer leak check
+	* tests/testsuite-sc.at: wait momentarily on buffer leak check
+	* tests/testsuite-streams.at: wait momentarily on buffer leak check
+	* src/kernel/strreg.c: correct register_cdev and unregister_cdev
+	* src/modules/sth.c: need to push if SMP kernel run on UP machine
+
 2006-08-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/strattach.c:
@@ -37,6 +57,10 @@
 	* src/kernel/strutil.c:
 	  - include linux/security.h before sys/strdebug.h to avoid ptrace
 	    conflict on SLES 9
+	* doc/manual/install.texi: debs apply to Debian not RedHat
+	* doc/manual/releases.texi: added SLES 9 to supported distros
+	* doc/manual/texi/install.texi: debs apply to Debian not RedHat
+	* scripts/texi/install.texi: debs apply to Debian not RedHat
 
 2006-07-29  Brian Bidulock  <bidulock@openss7.org>
 

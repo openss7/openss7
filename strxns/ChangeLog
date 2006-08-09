@@ -1,6 +1,15 @@
+2006-08-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: SLES doesn't include -ffreestanding
+	* tests/testsuite-np_ip.at: wait momentarily on buffer leak check
+	* src/drivers/np_ip.c: make locking defines unique
+
 2006-08-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/np_ip.c: locking defines must match
+	* doc/manual/releases.texi: added SLES 9 to supported distros
+	* doc/manual/texi/install.texi: debs apply to Debian not RedHat
+	* scripts/texi/install.texi: debs apply to Debian not RedHat
 
 2006-07-29  Brian Bidulock  <bidulock@openss7.org>
 

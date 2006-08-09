@@ -1,3 +1,18 @@
+2006-08-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: SLES doesn't include -ffreestanding
+	* tests/testsuite-fifo.at: wait momentarily on buffer leak check
+	* tests/testsuite-pipe.at: wait momentarily on buffer leak check
+	* tests/testsuite-sad.at: wait momentarily on buffer leak check
+	* tests/testsuite-streams.at: wait momentarily on buffer leak check
+
+2006-08-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* manual/install.texi: debs apply to Debian not RedHat
+	* manual/releases.texi: added SLES 9 to supported distros
+	* manual/texi/install.texi: debs apply to Debian not RedHat
+	* scripts/texi/install.texi: debs apply to Debian not RedHat
+
 2006-07-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: start assigning majors at 231 instead of 230

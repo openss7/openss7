@@ -1,3 +1,14 @@
+2006-08-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: SLES doesn't include -ffreestanding
+
+2006-08-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* manual/install.texi: debs apply to Debian not RedHat
+	* manual/releases.texi: added SLES 9 to supported distros
+	* manual/texi/install.texi: debs apply to Debian not RedHat
+	* scripts/texi/install.texi: debs apply to Debian not RedHat
+
 2006-07-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* netperf_arr: rationalized and added scls_show
