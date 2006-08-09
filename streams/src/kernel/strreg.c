@@ -501,9 +501,6 @@ register_cdev(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 	int err;
 	__kernel_dev_t dev = 0;
 
-	if ((cdev->d_cdev = kmalloc(sizeof(struct cdev), GFP_KERNEL)) == NULL)
-		return (-ENOMEM);
-
 	if (major == 0) {
 		err = alloc_chrdev_region(&dev, 0, 1 << 16, (char *) cdev->d_name);
 		if (err == 0)
@@ -514,24 +511,33 @@ register_cdev(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 	}
 	if (err < 0)
 		return (err);
+
+	err = -ENOMEM;
+	if ((cdev->d_cdev = cdev_alloc()) == NULL)
+		goto unregister_out;
+
 	cdev_init(cdev->d_cdev, fops);
-	err = cdev_add(cdev->d_cdev, dev, 1 << 16);
-	if (err) {
-		unregister_chrdev_region(dev, 1 << 16);
-		cdev_del(cdev->d_cdev);
-		kfree(XCHG(&cdev->d_cdev, NULL));
-		return (err);
-	}
+	if ((err = cdev_add(cdev->d_cdev, dev, 1 << 16)))
+		goto delete_out;
+
 	return (major);
+
+      delete_out:
+	cdev_del(XCHG(&cdev->d_cdev, NULL));
+
+      unregister_out:
+	unregister_chrdev_region(dev, 1 << 16);
+
+	return (err);
+
 }
 STATIC int
 unregister_cdev(struct cdevsw *cdev, major_t major)
 {
 	dev_t dev = MKDEV(major, 0);
 
+	cdev_del(XCHG(&cdev->d_cdev, NULL));
 	unregister_chrdev_region(dev, 1 << 16);
-	cdev_del(cdev->d_cdev);
-	kfree(XCHG(&cdev->d_cdev, NULL));
 	return (0);
 }
 #endif				/* defined HAVE_KINC_LINUX_CDEV_H */
