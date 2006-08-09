@@ -1646,6 +1646,12 @@ dnl	file, we want to kick it out.
 dnl
 dnl	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -fno-unit-at-a-time||"`
 
+dnl	Some older 2.6 kernels do not set -ffreestanding when required: kick it out and then add it
+dnl	back in here.
+dnl
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -ffreestanding||"`
+	linux_cv_k_cflags="$linux_cv_k_cflags -ffreestanding"
+
 	case "${with_k_optimize:-auto}" in
 	    (size)
 		linux_cflags="$linux_cflags${linux_cflags:+ }-Os -g"
