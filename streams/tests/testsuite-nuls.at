@@ -117,9 +117,15 @@ function test_nuls() {
     if test-nuls $options -e -o $1
     then
         # check for leaks
-	if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
+	if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
 	then
-	    return 1
+	    sleep 1
+	    if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
+	    then
+		return 1
+	    else
+		return 0
+	    fi
 	else
 	    return 0
 	fi
