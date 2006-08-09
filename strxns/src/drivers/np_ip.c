@@ -503,42 +503,46 @@ np_alloc(void)
  *  Locking
  */
 
-#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+/* Must always be bottom-half versions to avoid lock badness.  But give these
+ * different names to avoid conflict with generic definitions.  */
 
-#define spin_lock_str(__lkp, __flags) \
+//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+#if 1
+
+#define spin_lock_str2(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
-#define spin_unlock_str(__lkp, __flags) \
+#define spin_unlock_str2(__lkp, __flags) \
 	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
-#define write_lock_str(__lkp, __flags) \
+#define write_lock_str2(__lkp, __flags) \
 	do { (void)__flags; write_lock_bh(__lkp); } while (0)
-#define write_unlock_str(__lkp, __flags) \
+#define write_unlock_str2(__lkp, __flags) \
 	do { (void)__flags; write_unlock_bh(__lkp); } while (0)
-#define read_lock_str(__lkp, __flags) \
+#define read_lock_str2(__lkp, __flags) \
 	do { (void)__flags; read_lock_bh(__lkp); } while (0)
-#define read_unlock_str(__lkp, __flags) \
+#define read_unlock_str2(__lkp, __flags) \
 	do { (void)__flags; read_unlock_bh(__lkp); } while (0)
-#define local_save_str(__flags) \
+#define local_save_str2(__flags) \
 	do { (void)__flags; local_bh_disable(); } while (0)
-#define local_restore_str(__flags) \
+#define local_restore_str2(__flags) \
 	do { (void)__flags; local_bh_enable(); } while (0)
 
 #else
 
-#define spin_lock_str(__lkp, __flags) \
+#define spin_lock_str2(__lkp, __flags) \
 	spin_lock_irqsave(__lkp, __flags)
-#define spin_unlock_str(__lkp, __flags) \
+#define spin_unlock_str2(__lkp, __flags) \
 	spin_unlock_irqrestore(__lkp, __flags)
-#define write_lock_str(__lkp, __flags) \
+#define write_lock_str2(__lkp, __flags) \
 	write_lock_irqsave(__lkp, __flags)
-#define write_unlock_str(__lkp, __flags) \
+#define write_unlock_str2(__lkp, __flags) \
 	write_unlock_irqrestore(__lkp, __flags)
-#define read_lock_str(__lkp, __flags) \
+#define read_lock_str2(__lkp, __flags) \
 	read_lock_irqsave(__lkp, __flags)
-#define read_unlock_str(__lkp, __flags) \
+#define read_unlock_str2(__lkp, __flags) \
 	read_unlock_irqrestore(__lkp, __flags)
-#define local_save_str(__flags) \
+#define local_save_str2(__flags) \
 	local_irq_save(__flags)
-#define local_restore_str(__flags) \
+#define local_restore_str2(__flags) \
 	local_irq_restore(__flags)
 
 #endif
@@ -1094,7 +1098,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 
 	PROTOID_length = 1;
 	hp = &np_bhash[np_bhashfn(proto, bport)];
-	write_lock_str(&hp->lock, flags);
+	write_lock_str2(&hp->lock, flags);
 	for (np2 = hp->list; np2; np2 = np2->bnext) {
 		if (proto != np2->protoids[0])
 			continue;
@@ -1122,7 +1126,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 			break;
 	}
 	if (np2 != NULL) {
-		write_unlock_str(&hp->lock, flags);
+		write_unlock_str2(&hp->lock, flags);
 		/* There is a question as to which error should be returned when a protocol address 
 		   is already bound.
 
@@ -1146,7 +1150,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 		return (NBOUND);
 	}
 	if ((err = np_bind_prot(proto, np->info.SERV_type))) {
-		write_unlock_str(&hp->lock, flags);
+		write_unlock_str2(&hp->lock, flags);
 		return (err);
 	}
 	if ((np_long) np->qos.protocol == QOS_UNKNOWN)
@@ -1168,7 +1172,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 		(int) proto, (int) ntohs(bport)));
 	for (i = 0; i < anum; i++)
 		np->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
-	write_unlock_str(&hp->lock, flags);
+	write_unlock_str2(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
 	synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
@@ -1218,16 +1222,16 @@ np_skb_destructor_slow(struct np *np, struct sk_buff *skb)
 {
 	unsigned long flags;
 
-	spin_lock_str(&np->qlock, flags);
+	spin_lock_str2(&np->qlock, flags);
 	// ensure(np->sndmem >= skb->truesize, np->sndmem = skb->truesize);
 	np->sndmem -= skb->truesize;
 	if (unlikely((np->sndmem < np->options.xti.sndlowat || np->sndmem == 0))) {
 		np->sndblk = 0;	/* no longer blocked */
-		spin_unlock_str(&np->qlock, flags);
+		spin_unlock_str2(&np->qlock, flags);
 		if (np->iq != NULL && np->iq->q_first != NULL)
 			qenable(np->iq);
 	} else {
-		spin_unlock_str(&np->qlock, flags);
+		spin_unlock_str2(&np->qlock, flags);
 	}
 #if 0				/* destructor is nulled by skb_orphan */
 	skb_shinfo(skb)->frags[0].page = NULL;
@@ -1261,10 +1265,10 @@ np_skb_destructor(struct sk_buff *skb)
 	dassert(np != NULL);
 	if (likely(np->sndblk == 0)) {
 		/* technically we could have multiple processors freeing sk_buffs at the same time */
-		spin_lock_str(&np->qlock, flags);
+		spin_lock_str2(&np->qlock, flags);
 		// ensure(np->sndmem >= skb->truesize, np->sndmem = skb->truesize);
 		np->sndmem -= skb->truesize;
-		spin_unlock_str(&np->qlock, flags);
+		spin_unlock_str2(&np->qlock, flags);
 #if 0				/* destructor is nulled by skb_orphan */
 		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
@@ -1326,9 +1330,9 @@ np_alloc_skb_slow(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 		assert(skb_shinfo(skb)->nr_frags == 0);
 		skb_shinfo(skb)->frags[0].page = (struct page *) np_get(np);
 		skb->destructor = np_skb_destructor;
-		spin_lock_str(&np->qlock, flags);
+		spin_lock_str2(&np->qlock, flags);
 		np->sndmem += skb->truesize;
-		spin_unlock_str(&np->qlock, flags);
+		spin_unlock_str2(&np->qlock, flags);
 #if 0
 		/* keep track of high water mark */
 		if (tp_wstat.ms_acnt < tp->sndmem)
@@ -1487,9 +1491,9 @@ np_alloc_skb_old(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 	assert(skb_shinfo(skb)->nr_frags == 0);
 	skb_shinfo(skb)->frags[0].page = (struct page *) np_get(np);
 	skb->destructor = np_skb_destructor;
-	spin_lock_str(&np->qlock, flags);
+	spin_lock_str2(&np->qlock, flags);
 	np->sndmem += skb->truesize;
-	spin_unlock_str(&np->qlock, flags);
+	spin_unlock_str2(&np->qlock, flags);
 #endif
 
 #if 0
@@ -1557,9 +1561,9 @@ np_alloc_skb(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 	assert(skb_shinfo(skb)->nr_frags == 0);
 	skb_shinfo(skb)->frags[0].page = (struct page *) np_get(np);
 	skb->destructor = np_skb_destructor;
-	spin_lock_str(&np->qlock, flags);
+	spin_lock_str2(&np->qlock, flags);
 	np->sndmem += skb->truesize;
-	spin_unlock_str(&np->qlock, flags);
+	spin_unlock_str2(&np->qlock, flags);
 #endif
 	freemsg(mp);
 	return (skb);
@@ -1709,7 +1713,7 @@ np_conn_check(struct np *np, unsigned char proto)
 	hp1 = &np_chash[np_chashfn(proto, dport, sport)];
 	hp2 = &np_chash[np_chashfn(proto, 0, 0)];
 
-	write_lock_str(&hp1->lock, flags);
+	write_lock_str2(&hp1->lock, flags);
 	if (hp1 != hp2)
 		write_lock(&hp2->lock);
 
@@ -1745,7 +1749,7 @@ np_conn_check(struct np *np, unsigned char proto)
 	if (conflict != NULL) {
 		if (hp1 != hp2)
 			write_unlock(&hp2->lock);
-		write_unlock_str(&hp1->lock, flags);
+		write_unlock_str2(&hp1->lock, flags);
 		/* how do we say already connected? (-EISCONN) */
 		return (NBADADDR);
 	}
@@ -1757,7 +1761,7 @@ np_conn_check(struct np *np, unsigned char proto)
 	np->chash = hp1;
 	if (hp1 != hp2)
 		write_unlock(&hp2->lock);
-	write_unlock_str(&hp1->lock, flags);
+	write_unlock_str2(&hp1->lock, flags);
 	return (0);
 }
 
@@ -2266,7 +2270,7 @@ np_unbind(struct np *np)
 	unsigned long flags;
 
 	if ((hp = np->bhash)) {
-		write_lock_str(&hp->lock, flags);
+		write_lock_str2(&hp->lock, flags);
 		if ((*np->bprev = np->bnext))
 			np->bnext->bprev = np->bprev;
 		np->bnext = NULL;
@@ -2277,7 +2281,7 @@ np_unbind(struct np *np)
 		np->bnum = np->snum = np->pnum = 0;
 		np_set_state(np, NS_UNBND);
 		np_put(np);
-		write_unlock_str(&hp->lock, flags);
+		write_unlock_str2(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
 		synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
@@ -2568,7 +2572,7 @@ np_disconnect(struct np *np, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
 		freemsg(SEQ_number);
 	}
 	if ((hp = np->chash) != NULL) {
-		write_lock_str(&hp->lock, flags);
+		write_lock_str2(&hp->lock, flags);
 		if ((*np->cprev = np->cnext))
 			np->cnext->cprev = np->cprev;
 		np->cnext = NULL;
@@ -2578,7 +2582,7 @@ np_disconnect(struct np *np, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
 		np->dnum = np->snum = 0;
 		np_set_state(np, NS_IDLE);
 		np_put(np);
-		write_unlock_str(&hp->lock, flags);
+		write_unlock_str2(&hp->lock, flags);
 	}
 	return (QR_ABSORBED);
       error:
@@ -3230,7 +3234,7 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		goto discard;
 
 	/* Make sure we don't already have a connection indication */
-	spin_lock_str(&np->conq.q_lock, flags);
+	spin_lock_str2(&np->conq.q_lock, flags);
 	for (cp = bufq_head(&np->conq); cp; cp = cp->b_next) {
 		struct iphdr *iph2 = (struct iphdr *) cp->b_rptr;
 
@@ -3238,11 +3242,11 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		    && iph->saddr == iph2->saddr && iph->daddr == iph2->daddr) {
 			/* already have a connection indication, link the data */
 			linkb(cp, SEQ_number);
-			spin_unlock_str(&np->conq.q_lock, flags);
+			spin_unlock_str2(&np->conq.q_lock, flags);
 			goto absorbed;
 		}
 	}
-	spin_unlock_str(&np->conq.q_lock, flags);
+	spin_unlock_str2(&np->conq.q_lock, flags);
 
 	if (unlikely(bufq_length(&np->conq) >= np->CONIND_number))
 		/* If there are already too many connection indications outstanding, discard
@@ -4704,9 +4708,9 @@ n_tok_check(np_ulong TOKEN_value)
 	struct np *ap;
 	unsigned long flags;
 
-	read_lock_str(&master.lock, flags);
+	read_lock_str2(&master.lock, flags);
 	for (ap = master.np.list; ap && (np_ulong) (long) ap->oq != TOKEN_value; ap = ap->next) ;
-	read_unlock_str(&master.lock, flags);
+	read_unlock_str2(&master.lock, flags);
 	usual(ap);
 	return (ap);
 }
@@ -5922,7 +5926,7 @@ np_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 
 	hp = hp1;
 	do {
-		read_lock_str(&hp->lock, flags);
+		read_lock_str2(&hp->lock, flags);
 		{
 			register struct np *np;
 
@@ -5982,7 +5986,7 @@ np_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 					break;
 			}
 		}
-		read_unlock_str(&hp->lock, flags);
+		read_unlock_str2(&hp->lock, flags);
 	} while (hiscore < 4 && hp != hp2 && (hp = hp2));
 	usual(result);
 	return (result);
@@ -6021,7 +6025,7 @@ np_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	_ptrace(("%s: %s: proto = %d, dport = %d\n", DRV_NAME, __FUNCTION__, (int) proto,
 		 (int) ntohs(dport)));
 	do {
-		read_lock_str(&hp->lock, flags);
+		read_lock_str2(&hp->lock, flags);
 		{
 			register struct np *np;
 
@@ -6070,7 +6074,7 @@ np_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 					break;
 			}
 		}
-		read_unlock_str(&hp->lock, flags);
+		read_unlock_str2(&hp->lock, flags);
 	} while (hiscore < 2 && hp != hp2 && (hp = hp2));
 	usual(result);
 	return (result);
@@ -6100,13 +6104,13 @@ np_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
 
 	ppp = &np_prots[proto];
 
-	read_lock_str(&np_prot_lock, flags);
+	read_lock_str2(&np_prot_lock, flags);
 	if (likely((pp = *ppp) != NULL)) {
 		if (likely(pp->corefs == 0)) {
 			if (likely(pp->clrefs > 0)) {
 				result = np_lookup_bind(proto, daddr, dport);
 			      done:
-				read_unlock_str(&np_prot_lock, flags);
+				read_unlock_str2(&np_prot_lock, flags);
 				return (result);
 			}
 		}
@@ -6230,8 +6234,10 @@ np_v4_rcv(struct sk_buff *skb)
 		/* now allocate an mblk */
 		if (unlikely((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr)) == NULL))
 			goto no_buffers;
+#ifndef LIS
 		/* tell others it is a socket buffer */
 		mp->b_datap->db_flag |= DB_SKBUFF;
+#endif
 		_ptrace(("Allocated external buffer message block %p\n", mp));
 		/* check flow control only after we have a buffer */
 		if (np->oq == NULL || !canput(np->oq))
@@ -6572,7 +6578,7 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		cminor = FREE_CMINOR;
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
-	write_lock_str(&master.lock, flags);
+	write_lock_str2(&master.lock, flags);
 	for (; *npp; npp = &(*npp)->next) {
 		if (cmajor != (*npp)->u.dev.cmajor)
 			break;
@@ -6591,7 +6597,7 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
-		write_unlock_str(&master.lock, flags);
+		write_unlock_str2(&master.lock, flags);
 		freeb(mp);
 		return (ENXIO);
 	}
@@ -6599,11 +6605,11 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(np = np_alloc_priv(q, npp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
-		write_unlock_str(&master.lock, flags);
+		write_unlock_str2(&master.lock, flags);
 		freeb(mp);
 		return (ENOMEM);
 	}
-	write_unlock_str(&master.lock, flags);
+	write_unlock_str2(&master.lock, flags);
 	so = (typeof(so)) mp->b_wptr;
 	bzero(so, sizeof(*so));
 #if defined LFS
