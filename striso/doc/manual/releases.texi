@@ -145,36 +145,44 @@ is, in a future release, the distributions marked @samp{TBD} will not longer be 
 release.}
 
 @itemize @bullet
-@item RedHat Linux 7.2 (RH7)
-@item RedHat Linux 7.3 (RH7)
-@item Performance Technlogies @dfn{NexusWare24} -- TBD
-@item RedHat Linux 8.0 (RH8) -- TBD
-@item RedHat Linux 9 (RH9) -- TBD
-@item SuSE 8.0 Professional -- TBD
-@item Fedora Core 1 (FC1) -- TBD
-@item Debian 3.0r2 Woody
-@item Mandrakelinux 9.2 (MDK92) -- TBD
-@item RedHat Enterprise Linux 3.0 (EL3)
-@item WhiteBox Enterprise Linux 3.0 (WBEL3)
 @item CentOS Enterprise Linux 3.4 (centos34)
-@item Fedora Core 2 (FC2) -- TBD
-@item SuSE 9.1 Personal -- TBD
-@item Mandrakelinux 10.0 (MDK100) -- TBD
-@item SuSE 9.2 Professional (SuSE9.2) -- TBD
-@item Mandrakelinux 10.1 (MDK101) -- TBD
-@item Fedora Core 3 (FC3) -- TBD
-@item RedHat Enterprise Linux 4 (EL4)
 @item CentOS Enterprise Linux 4.0 (centos4)
-@item WhiteBox Enterprise Linux 4 (WBEL4)
+@item Debian 3.0r2 Woody (deb3.0) -- TBD
+@item Debian 3.1r0a Sarge (deb3.1)
+@item Fedora Core 1 (FC1) -- TBD
+@item Fedora Core 2 (FC2) -- TBD
+@item Fedora Core 3 (FC3) -- TBD
 @item Fedora Core 4 (FC4)
+@item Fedora Core 5 (FC5)
+@item Gentoo 2006.1 (untested)
 @item Lineox 4.026 (LEL4) -- TBD
 @item Lineox 4.053 (LEL4)
+@item Mandrakelinux 9.2 (MDK92) -- TBD
+@item Mandrakelinux 10.0 (MDK100) -- TBD
+@item Mandrakelinux 10.1 (MDK101) -- TBD
 @item Mandriva Linux LE2005 (MDK102) -- TBD
+@item Mandriva Linux LE2006 (MDK103)
+@item Mandriva One (untested)
+@item Performance Technlogies @dfn{NexusWare24} -- TBD
 @item Performance Technologies NexusWare 8.0
-@item Debian 3.1r0a Sarge (untested)
-@item SuSE 10.0 (untested)
-@item OpenSuSE (untested)
-@item Mandriva Linux LE2006 (MDK103) (untested)
+@item RedHat Linux 7.2 (RH7)
+@item RedHat Linux 7.3 (RH7)
+@item RedHat Linux 8.0 (RH8) -- TBD
+@item RedHat Linux 9 (RH9) -- TBD
+@item RedHat Enterprise Linux 3.0 (EL3)
+@item RedHat Enterprise Linux 4 (EL4)
+@item SuSE 8.0 Professional (SuSE8.0) -- TBD
+@item SuSE 9.1 Personal (SuSE9.1) -- TBD
+@item SuSE 9.2 Professional (SuSE9.2) -- TBD
+@item SuSE OpenSuSE (SuSEOSS)
+@item SuSE 10.0 (SuSE10.0)
+@item SuSE 10.1 (SuSE10.1) (untested)
+@item SLES 9 SP2
+@item SLES 9 SP3
+@item Ubuntu 5.10 (ubu5.10)
+@item Ubuntu 6.06 LTS (ubu6.06)
+@item WhiteBox Enterprise Linux 3.0 (WBEL3)
+@item WhiteBox Enterprise Linux 4 (WBEL4)
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
