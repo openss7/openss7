@@ -881,6 +881,7 @@ EXPORT_SYMBOL_NOVERS(sdev_get);
 streams_fastcall void
 sdev_put(struct cdevsw *cdev)
 {
+#ifdef CONFIG_KMOD
 	if (cdev && cdev->d_kmod) {
 		_printd(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
 		__assert(module_refcount(cdev->d_kmod) > 0);
@@ -888,6 +889,7 @@ sdev_put(struct cdevsw *cdev)
 		_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__, cdev->d_name,
 			 cdev->d_kmod->name, module_refcount(cdev->d_kmod)));
 	}
+#endif
 }
 
 EXPORT_SYMBOL_NOVERS(sdev_put);
@@ -939,6 +941,7 @@ EXPORT_SYMBOL_NOVERS(fmod_get);
 streams_fastcall void
 fmod_put(struct fmodsw *fmod)
 {
+#ifdef CONFIG_KMOD
 	if (fmod && fmod->f_kmod) {
 		_ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
 		__assert(module_refcount(fmod->f_kmod) > 0);
@@ -946,6 +949,7 @@ fmod_put(struct fmodsw *fmod)
 		_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__, fmod->f_name,
 			 fmod->f_kmod->name, module_refcount(fmod->f_kmod)));
 	}
+#endif
 }
 
 EXPORT_SYMBOL_NOVERS(fmod_put);

@@ -8,6 +8,8 @@
 	  - added kernel symbol lookup for kthread_* functions for SLES 9
 	* src/modules/sth.c:
 	  - added linux/smp_lock.h header file for SLES 9
+	* src/kernel/strlookup.c:
+	  - don't do module_put for no CONFIG_KMOD for NexusWare
 
 2006-08-09  Brian Bidulock  <bidulock@openss7.org>
 
