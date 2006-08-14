@@ -4648,6 +4648,13 @@ STATIC int
 kstreamd(void *__bind_cpu)
 {
 	struct strthread *t = this_thread;
+#ifndef HAVE_KTHREAD_SHOULD_STOP_EXPORT
+#ifdef HAVE_KTHREAD_SHOULD_STOP_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_should_stop) kthread_should_stop_funcp = (void *) HAVE_KTHREAD_SHOULD_STOP_ADDR;
+#define kthread_should_stop (*kthread_should_stop_funcp)
+#endif
+#endif
 
 	set_user_nice(current, 19);
 #ifdef PF_NOFREEZE
@@ -4764,6 +4771,29 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 	int cpu = (long) hcpu;
 	struct strthread *t = &strthreads[cpu];
 	struct task_struct *p = t->proc;
+#ifndef HAVE_KTHREAD_CREATE_EXPORT
+#ifdef HAVE_KTHREAD_CREATE_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_create) kthread_create_funcp = (void *) HAVE_KTHREAD_CREATE_ADDR;
+#define kthread_create(w, x, y, z) (*kthread_create_funcp)(w, x, y, z)
+#endif
+#endif
+#ifndef HAVE_KTHREAD_BIND_EXPORT
+#ifdef HAVE_KTHREAD_BIND_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
+#define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
+#endif
+#endif
+#if defined CONFIG_HOTPLUG_CPU
+#ifndef HAVE_KTHREAD_STOP_EXPORT
+#ifdef HAVE_KTHREAD_STOP_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_stop) kthread_stop_funcp = (void *) HAVE_KTHREAD_STOP_ADDR;
+#define kthread_stop(x) (*kthread_stop_funcp)(x)
+#endif
+#endif
+#endif
 
 	switch (action) {
 	case CPU_UP_PREPARE:
@@ -4823,6 +4853,20 @@ STATIC __unlikely void
 kill_kstreamd(void)
 {
 	int cpu;
+#ifndef HAVE_KTHREAD_BIND_EXPORT
+#ifdef HAVE_KTHREAD_BIND_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
+#define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
+#endif
+#endif
+#ifndef HAVE_KTHREAD_STOP_EXPORT
+#ifdef HAVE_KTHREAD_STOP_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_stop) kthread_stop_funcp = (void *) HAVE_KTHREAD_STOP_ADDR;
+#define kthread_stop(x) (*kthread_stop_funcp)(x)
+#endif
+#endif
 
 	for (cpu = 0; cpu < NR_CPUS; cpu++) {
 		struct strthread *t = &strthreads[cpu];

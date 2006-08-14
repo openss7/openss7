@@ -166,6 +166,9 @@ static char const ident[] =
 #endif
 
 #ifdef WITH_32BIT_CONVERSION
+#  ifdef HAVE_KINC_LINUX_SMP_LOCK_H
+#    include <linux/smp_lock.h>
+#  endif
 #  ifdef HAVE_KINC_LINUX_COMPAT_H
 #    include <linux/compat.h>
 #  endif

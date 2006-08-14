@@ -1025,7 +1025,7 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
 			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
-			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h], [:], [:], [
+			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h linux/smp_lock.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1041,6 +1041,11 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/sched.h>
 ])
     AC_SUBST([EXPOSED_SYMBOLS])dnl
+dnl
+dnl  Well, not exporting kthread_ functions is just about the stupidest thing
+dnl  I've seen from a distro yet.  SLES takes the prize for this stupidity.
+dnl
+    _LINUX_KERNEL_SYMBOLS([kthread_create, kthread_should_stop, kthread_stop, kthread_bind])
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
