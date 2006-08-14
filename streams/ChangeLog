@@ -1,3 +1,7 @@
+2006-08-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* streams.spec.in: get kernel_source right for SUSE smp kernel
+
 2006-08-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: SLES doesn't include -ffreestanding

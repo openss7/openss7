@@ -79,7 +79,7 @@
 %{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
 
 %global kernel_version %{_kversion}
-%global kernel_source %(echo %{_kversion} | sed -e 's|BOOT$||;s|smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default||')
+%global kernel_source %(echo %{_kversion} | sed -r -e 's|BOOT$||;s|-?smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default$||')
 %global kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %global kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
 %global kernel_fedora %(echo %{_kversion} | sed -e 's|.*FC4.*$|1|;s|[^1].*$|0|')
@@ -1754,15 +1754,18 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
-# Revision 0.9.2.102  2006/07/07 21:08:39  brian
-# - place all header files in development subpackage
-#
-# Revision 0.9.2.101  2006/05/08 03:33:32  brian
-# - updated headers, corrected init scrip removal
-#
-# Revision 0.9.2.100  2006/03/24 10:02:54  brian
-# - added send-pr to %package test description
-#
+
+* Fri Jul  7 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.102  2006/07/07 21:08:39  brian
+- place all header files in development subpackage
+
+* Mon May  8 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.101  2006/05/08 03:33:32  brian
+- updated headers, corrected init scrip removal
+
+* Fri Mar 24 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.100  2006/03/24 10:02:54  brian
+- added send-pr to %package test description
 
 * Fri Mar 24 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.99  2006/03/24 00:03:28  brian
