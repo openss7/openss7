@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:33 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:33 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.48  2006/08/16 07:47:38  brian
+ - removed locking macro pollution
+
  Revision 0.9.2.47  2006/07/24 09:01:33  brian
  - results of udp2 optimizations
 
@@ -194,10 +197,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:33 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:38 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:33 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:38 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -276,7 +279,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:33 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:38 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -658,43 +661,46 @@ tp_alloc(void)
  *  Locking
  */
 
+/* Must always be bottom-half versions to avoid lock badness.  But give these
+ * different names to avoid conflict with generic definitions.  */
+
 //#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 #if 1
 
-#define spin_lock_str(__lkp, __flags) \
+#define spin_lock_str2(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
-#define spin_unlock_str(__lkp, __flags) \
+#define spin_unlock_str2(__lkp, __flags) \
 	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
-#define write_lock_str(__lkp, __flags) \
+#define write_lock_str2(__lkp, __flags) \
 	do { (void)__flags; write_lock_bh(__lkp); } while (0)
-#define write_unlock_str(__lkp, __flags) \
+#define write_unlock_str2(__lkp, __flags) \
 	do { (void)__flags; write_unlock_bh(__lkp); } while (0)
-#define read_lock_str(__lkp, __flags) \
+#define read_lock_str2(__lkp, __flags) \
 	do { (void)__flags; read_lock_bh(__lkp); } while (0)
-#define read_unlock_str(__lkp, __flags) \
+#define read_unlock_str2(__lkp, __flags) \
 	do { (void)__flags; read_unlock_bh(__lkp); } while (0)
-#define local_save_str(__flags) \
+#define local_save_str2(__flags) \
 	do { (void)__flags; local_bh_disable(); } while (0)
-#define local_restore_str(__flags) \
+#define local_restore_str2(__flags) \
 	do { (void)__flags; local_bh_enable(); } while (0)
 
 #else
 
-#define spin_lock_str(__lkp, __flags) \
+#define spin_lock_str2(__lkp, __flags) \
 	spin_lock_irqsave(__lkp, __flags)
-#define spin_unlock_str(__lkp, __flags) \
+#define spin_unlock_str2(__lkp, __flags) \
 	spin_unlock_irqrestore(__lkp, __flags)
-#define write_lock_str(__lkp, __flags) \
+#define write_lock_str2(__lkp, __flags) \
 	write_lock_irqsave(__lkp, __flags)
-#define write_unlock_str(__lkp, __flags) \
+#define write_unlock_str2(__lkp, __flags) \
 	write_unlock_irqrestore(__lkp, __flags)
-#define read_lock_str(__lkp, __flags) \
+#define read_lock_str2(__lkp, __flags) \
 	read_lock_irqsave(__lkp, __flags)
-#define read_unlock_str(__lkp, __flags) \
+#define read_unlock_str2(__lkp, __flags) \
 	read_unlock_irqrestore(__lkp, __flags)
-#define local_save_str(__flags) \
+#define local_save_str2(__flags) \
 	local_irq_save(__flags)
-#define local_restore_str(__flags) \
+#define local_restore_str2(__flags) \
 	local_irq_restore(__flags)
 
 #endif
@@ -3984,7 +3990,7 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 		bport = htons(num);
 	}
 	hp = &tp_bhash[tp_bhashfn(proto, bport)];
-	write_lock_str(&hp->lock, flags);
+	write_lock_str2(&hp->lock, flags);
 	for (tp2 = hp->list; tp2; tp2 = tp2->bnext) {
 		if (proto != tp2->protoids[0])
 			continue;
@@ -4015,12 +4021,12 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 		if (num == 0) {
 			/* specific port number requested */
 			if (tp2->options.ip.reuseaddr != T_YES || tp->options.ip.reuseaddr != T_YES) {
-				write_unlock_str(&hp->lock, flags);
+				write_unlock_str2(&hp->lock, flags);
 				return (TADDRBUSY);
 			}
 			/* fall through and bind */
 		} else {
-			write_unlock_str(&hp->lock, flags);
+			write_unlock_str2(&hp->lock, flags);
 			if (++num > tp_last_port)
 				num = tp_frst_port;
 			if (num != tp_prev_port)
@@ -4029,7 +4035,7 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 		}
 	}
 	if ((err = tp_bind_prot(proto, tp->info.SERV_type))) {
-		write_unlock_str(&hp->lock, flags);
+		write_unlock_str2(&hp->lock, flags);
 		return (err);
 	}
 	if (num != 0)
@@ -4051,7 +4057,7 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 		 (int) proto, (int) ntohs(bport)));
 	for (i = 0; i < anum; i++)
 		tp->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
-	write_unlock_str(&hp->lock, flags);
+	write_unlock_str2(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
 	synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
@@ -4101,16 +4107,16 @@ tp_skb_destructor_slow(struct tp *tp, struct sk_buff *skb)
 {
 	unsigned long flags;
 
-	spin_lock_str(&tp->qlock, flags);
+	spin_lock_str2(&tp->qlock, flags);
 	// ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 	tp->sndmem -= skb->truesize;
 	if (unlikely((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0))) {
 		tp->sndblk = 0;	/* no longer blocked */
-		spin_unlock_str(&tp->qlock, flags);
+		spin_unlock_str2(&tp->qlock, flags);
 		if (tp->iq != NULL && tp->iq->q_first != NULL)
 			qenable(tp->iq);
 	} else {
-		spin_unlock_str(&tp->qlock, flags);
+		spin_unlock_str2(&tp->qlock, flags);
 	}
 #if 0				/* destructor is nulled by skb_orphan */
 	skb_shinfo(skb)->frags[0].page = NULL;
@@ -4144,10 +4150,10 @@ tp_skb_destructor(struct sk_buff *skb)
 	dassert(tp != NULL);
 	if (likely(tp->sndblk == 0)) {
 		/* technically we could have multiple processors freeing sk_buffs at the same time */
-		spin_lock_str(&tp->qlock, flags);
+		spin_lock_str2(&tp->qlock, flags);
 		// ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 		tp->sndmem -= skb->truesize;
-		spin_unlock_str(&tp->qlock, flags);
+		spin_unlock_str2(&tp->qlock, flags);
 #if 0				/* destructor is nulled by skb_orphan */
 		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
@@ -4207,9 +4213,9 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		assert(skb_shinfo(skb)->nr_frags == 0);
 		skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
 		skb->destructor = tp_skb_destructor;
-		spin_lock_str(&tp->qlock, flags);
+		spin_lock_str2(&tp->qlock, flags);
 		tp->sndmem += skb->truesize;
-		spin_unlock_str(&tp->qlock, flags);
+		spin_unlock_str2(&tp->qlock, flags);
 #if 0
 		/* keep track of high water mark */
 		if (udp_wstat.ms_acnt < tp->sndmem)
@@ -4366,9 +4372,9 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	assert(skb_shinfo(skb)->nr_frags == 0);
 	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
 	skb->destructor = tp_skb_destructor;
-	spin_lock_str(&tp->qlock, flags);
+	spin_lock_str2(&tp->qlock, flags);
 	tp->sndmem += skb->truesize;
-	spin_unlock_str(&tp->qlock, flags);
+	spin_unlock_str2(&tp->qlock, flags);
 #endif
 
 #if 0
@@ -4434,9 +4440,9 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	assert(skb_shinfo(skb)->nr_frags == 0);
 	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
 	skb->destructor = tp_skb_destructor;
-	spin_lock_str(&tp->qlock, flags);
+	spin_lock_str2(&tp->qlock, flags);
 	tp->sndmem += skb->truesize;
-	spin_unlock_str(&tp->qlock, flags);
+	spin_unlock_str2(&tp->qlock, flags);
 #endif
 	freemsg(mp);
 	return (skb);
@@ -4617,7 +4623,7 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 	hp1 = &tp_chash[tp_chashfn(proto, dport, sport)];
 	hp2 = &tp_chash[tp_chashfn(proto, 0, 0)];
 
-	write_lock_str(&hp1->lock, flags);
+	write_lock_str2(&hp1->lock, flags);
 	if (hp1 != hp2)
 		write_lock(&hp2->lock);
 
@@ -4653,7 +4659,7 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 	if (conflict != NULL) {
 		if (hp1 != hp2)
 			write_unlock(&hp2->lock);
-		write_unlock_str(&hp1->lock, flags);
+		write_unlock_str2(&hp1->lock, flags);
 		/* how do we say already connected? (-EISCONN) */
 		return (TADDRBUSY);
 	}
@@ -4665,7 +4671,7 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 	tp->chash = hp1;
 	if (hp1 != hp2)
 		write_unlock(&hp2->lock);
-	write_unlock_str(&hp1->lock, flags);
+	write_unlock_str2(&hp1->lock, flags);
 	return (0);
 }
 
@@ -4956,7 +4962,7 @@ tp_unbind(struct tp *tp)
 	unsigned long flags;
 
 	if ((hp = tp->bhash)) {
-		write_lock_str(&hp->lock, flags);
+		write_lock_str2(&hp->lock, flags);
 		if ((*tp->bprev = tp->bnext))
 			tp->bnext->bprev = tp->bprev;
 		tp->bnext = NULL;
@@ -4967,7 +4973,7 @@ tp_unbind(struct tp *tp)
 		tp->bnum = tp->snum = tp->pnum = 0;
 		tp_set_state(tp, TS_UNBND);
 		tp_put(tp);
-		write_unlock_str(&hp->lock, flags);
+		write_unlock_str2(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
 		synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
@@ -5294,7 +5300,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		freemsg(SEQ_number);
 	}
 	if ((hp = tp->chash) != NULL) {
-		write_lock_str(&hp->lock, flags);
+		write_lock_str2(&hp->lock, flags);
 		if ((*tp->cprev = tp->cnext))
 			tp->cnext->cprev = tp->cprev;
 		tp->cnext = NULL;
@@ -5304,7 +5310,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		tp->dnum = tp->snum = 0;
 		tp_set_state(tp, TS_IDLE);
 		tp_put(tp);
-		write_unlock_str(&hp->lock, flags);
+		write_unlock_str2(&hp->lock, flags);
 	}
 	return (QR_ABSORBED);
       error:
@@ -5902,7 +5908,7 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		goto discard;
 
 	/* Make sure we don't already have a connection indication */
-	spin_lock_str(&tp->conq.q_lock, flags);
+	spin_lock_str2(&tp->conq.q_lock, flags);
 	for (cp = bufq_head(&tp->conq); cp; cp = cp->b_next) {
 		struct iphdr *iph2 = (struct iphdr *) cp->b_rptr;
 		struct udphdr *uh2 = (struct udphdr *) (cp->b_rptr + (iph->ihl << 2));
@@ -5912,11 +5918,11 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		    && uh->source == uh2->source && uh->dest == uh2->dest) {
 			/* already have a connection indication, link the data */
 			linkb(cp, SEQ_number);
-			spin_unlock_str(&tp->conq.q_lock, flags);
+			spin_unlock_str2(&tp->conq.q_lock, flags);
 			goto absorbed;
 		}
 	}
-	spin_unlock_str(&tp->conq.q_lock, flags);
+	spin_unlock_str2(&tp->conq.q_lock, flags);
 
 	if (unlikely(bufq_length(&tp->conq) >= tp->CONIND_number))
 		/* If there are already too many connection indications outstanding, discard
@@ -7116,10 +7122,10 @@ t_seq_check(struct tp *tp, const t_uscalar_t SEQ_number)
 	mblk_t *cp;
 	unsigned long flags;
 
-	spin_lock_str(&tp->conq.q_lock, flags);
+	spin_lock_str2(&tp->conq.q_lock, flags);
 	for (cp = bufq_head(&tp->conq); cp && (t_uscalar_t) (long) cp != SEQ_number;
 	     cp = cp->b_next) ;
-	spin_unlock_str(&tp->conq.q_lock, flags);
+	spin_unlock_str2(&tp->conq.q_lock, flags);
 	usual(cp);
 	return (cp);
 }
@@ -7129,9 +7135,9 @@ t_tok_check(const t_uscalar_t ACCEPTOR_id)
 	struct tp *ap;
 	unsigned long flags;
 
-	read_lock_str(&master.lock, flags);
+	read_lock_str2(&master.lock, flags);
 	for (ap = master.tp.list; ap && (t_uscalar_t) (long) ap->oq != ACCEPTOR_id; ap = ap->next) ;
-	read_unlock_str(&master.lock, flags);
+	read_unlock_str2(&master.lock, flags);
 	usual(ap);
 	return (ap);
 }
@@ -8442,7 +8448,7 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 
 	hp = hp1;
 	do {
-		read_lock_str(&hp->lock, flags);
+		read_lock_str2(&hp->lock, flags);
 		{
 			register struct tp *tp;
 
@@ -8502,7 +8508,7 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 					break;
 			}
 		}
-		read_unlock_str(&hp->lock, flags);
+		read_unlock_str2(&hp->lock, flags);
 	} while (hiscore < 4 && hp != hp2 && (hp = hp2));
 	usual(result);
 	return (result);
@@ -8541,7 +8547,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	_ptrace(("%s: %s: proto = %d, dport = %d\n", DRV_NAME, __FUNCTION__, (int) proto,
 		 (int) ntohs(dport)));
 	do {
-		read_lock_str(&hp->lock, flags);
+		read_lock_str2(&hp->lock, flags);
 		{
 			register struct tp *tp;
 
@@ -8589,7 +8595,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 					break;
 			}
 		}
-		read_unlock_str(&hp->lock, flags);
+		read_unlock_str2(&hp->lock, flags);
 	} while (hiscore < 2 && hp != hp2 && (hp = hp2));
 	usual(result);
 	return (result);
@@ -8619,13 +8625,13 @@ tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
 
 	ppp = &tp_prots[proto];
 
-	read_lock_str(&tp_prot_lock, flags);
+	read_lock_str2(&tp_prot_lock, flags);
 	if (likely((pp = *ppp) != NULL)) {
 		if (likely(pp->corefs == 0)) {
 			if (likely(pp->clrefs > 0)) {
 				result = tp_lookup_bind(proto, daddr, dport);
 			      done:
-				read_unlock_str(&tp_prot_lock, flags);
+				read_unlock_str2(&tp_prot_lock, flags);
 				return (result);
 			}
 		}
@@ -8689,10 +8695,10 @@ tp_free(caddr_t data)
 
 	dassert(skb != NULL);
 	if (likely((tp = *(struct tp **) skb->cb) != NULL)) {
-		spin_lock_str(&tp->qlock, flags);
+		spin_lock_str2(&tp->qlock, flags);
 		// ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
 		tp->rcvmem -= skb->truesize;
-		spin_unlock_str(&tp->qlock, flags);
+		spin_unlock_str2(&tp->qlock, flags);
 #if 0
 		/* put this back to null before freeing it */
 		*(struct tp **) skb->cb = NULL;
@@ -8828,8 +8834,10 @@ tp_v4_rcv(struct sk_buff *skb)
 		/* now allocate an mblk */
 		if (unlikely((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr)) == NULL))
 			goto no_buffers;
+#ifndef LIS
 		/* tell others it is a socket buffer */
 		mp->b_datap->db_flag |= DB_SKBUFF;
+#endif
 #else
 		if (unlikely((mp = skballoc(skb, BPRI_MED)) == NULL))
 			goto no_buffers;
@@ -9182,7 +9190,7 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		cminor = FREE_CMINOR;
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
-	write_lock_str(&master.lock, flags);
+	write_lock_str2(&master.lock, flags);
 	for (; *tpp; tpp = &(*tpp)->next) {
 		if (cmajor != (*tpp)->u.dev.cmajor)
 			break;
@@ -9201,7 +9209,7 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
-		write_unlock_str(&master.lock, flags);
+		write_unlock_str2(&master.lock, flags);
 		freeb(mp);
 		return (ENXIO);
 	}
@@ -9209,11 +9217,11 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(tp = tp_alloc_priv(q, tpp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
-		write_unlock_str(&master.lock, flags);
+		write_unlock_str2(&master.lock, flags);
 		freeb(mp);
 		return (ENOMEM);
 	}
-	write_unlock_str(&master.lock, flags);
+	write_unlock_str2(&master.lock, flags);
 	so = (typeof(so)) mp->b_wptr;
 	bzero(so, sizeof(*so));
 #if defined LFS

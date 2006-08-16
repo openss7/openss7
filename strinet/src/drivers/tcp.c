@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/24 09:01:33 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/08/16 07:47:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:33 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.14  2006/08/16 07:47:37  brian
+ - removed locking macro pollution
+
  Revision 0.9.2.13  2006/07/24 09:01:33  brian
  - results of udp2 optimizations
 
@@ -92,9 +95,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/24 09:01:33 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/08/16 07:47:37 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/24 09:01:33 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/08/16 07:47:37 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -173,7 +176,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.13 $
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/07/24 09:01:33 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/08/16 07:47:37 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -6867,6 +6870,7 @@ tpi_init_protos(void)
 		struct inet_protocol *ip;
 		unsigned char proto = slot + BASE_INET_PROTOCOL;
 
+		(void) proto;
 		ip = &tpi_proto[slot];
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
@@ -6886,8 +6890,6 @@ tpi_init_protos(void)
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 #if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
 		ip->proto.proto = proto;
-#else
-		(void) proto;
 #endif				/* defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO */
 		ip->proto.handler = &tpi_v4_rcv;
 		ip->proto.err_handler = &tpi_v4_err;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/07/29 07:43:03 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/08/16 07:47:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:43:03 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.145  2006/08/16 07:47:28  brian
+ - add security.h header file to avoid ptrace conflict, SLES changes
+
  Revision 0.9.2.144  2006/07/29 07:43:03  brian
  - CVS checkin of changes before leaving for SCTP interop
 
@@ -116,10 +119,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/07/29 07:43:03 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/08/16 07:47:28 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/07/29 07:43:03 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/08/16 07:47:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -155,6 +158,9 @@ static char const ident[] =
 #endif
 #include <linux/major.h>
 // #include <asm/atomic.h>
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #ifndef __STRSCHD_EXTERN_INLINE
 #define __STRSCHD_EXTERN_INLINE inline streams_fastcall __unlikely
@@ -4645,6 +4651,13 @@ STATIC int
 kstreamd(void *__bind_cpu)
 {
 	struct strthread *t = this_thread;
+#ifndef HAVE_KTHREAD_SHOULD_STOP_EXPORT
+#ifdef HAVE_KTHREAD_SHOULD_STOP_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_should_stop) kthread_should_stop_funcp = (void *) HAVE_KTHREAD_SHOULD_STOP_ADDR;
+#define kthread_should_stop (*kthread_should_stop_funcp)
+#endif
+#endif
 
 	set_user_nice(current, 19);
 #ifdef PF_NOFREEZE
@@ -4761,6 +4774,29 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 	int cpu = (long) hcpu;
 	struct strthread *t = &strthreads[cpu];
 	struct task_struct *p = t->proc;
+#ifndef HAVE_KTHREAD_CREATE_EXPORT
+#ifdef HAVE_KTHREAD_CREATE_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_create) kthread_create_funcp = (void *) HAVE_KTHREAD_CREATE_ADDR;
+#define kthread_create(w, x, y, z) (*kthread_create_funcp)(w, x, y, z)
+#endif
+#endif
+#ifndef HAVE_KTHREAD_BIND_EXPORT
+#ifdef HAVE_KTHREAD_BIND_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
+#define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
+#endif
+#endif
+#if defined CONFIG_HOTPLUG_CPU
+#ifndef HAVE_KTHREAD_STOP_EXPORT
+#ifdef HAVE_KTHREAD_STOP_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_stop) kthread_stop_funcp = (void *) HAVE_KTHREAD_STOP_ADDR;
+#define kthread_stop(x) (*kthread_stop_funcp)(x)
+#endif
+#endif
+#endif
 
 	switch (action) {
 	case CPU_UP_PREPARE:
@@ -4790,6 +4826,11 @@ STATIC struct notifier_block __devinitdata str_cpu_nfb = {
 	.notifier_call = str_cpu_callback,
 };
 
+/* some older kernels (SLES) do not define cpu_present */
+#ifndef cpu_present
+#define cpu_present(__cpu) 1
+#endif
+
 /* This was OK for boot, but not for starting threads after all the processors have come online.  So
  * we check which processors are online and start their threads.  Note that this will also still
  * work for boot. */
@@ -4815,6 +4856,20 @@ STATIC __unlikely void
 kill_kstreamd(void)
 {
 	int cpu;
+#ifndef HAVE_KTHREAD_BIND_EXPORT
+#ifdef HAVE_KTHREAD_BIND_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
+#define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
+#endif
+#endif
+#ifndef HAVE_KTHREAD_STOP_EXPORT
+#ifdef HAVE_KTHREAD_STOP_ADDR
+	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
+	static const typeof(&kthread_stop) kthread_stop_funcp = (void *) HAVE_KTHREAD_STOP_ADDR;
+#define kthread_stop(x) (*kthread_stop_funcp)(x)
+#endif
+#endif
 
 	for (cpu = 0; cpu < NR_CPUS; cpu++) {
 		struct strthread *t = &strthreads[cpu];

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/06/29 23:38:09 $
+# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:30:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/29 23:38:09 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:30:47 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: pr.m4,v $
+# Revision 0.9.2.4  2006/08/16 07:30:47  brian
+# - changes for SLES 10
+#
 # Revision 0.9.2.3  2006/06/29 23:38:09  brian
 # - more variations for Ubuntu, which in most ways is much like Debian.
 #
@@ -92,9 +95,16 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 		    (3|3.0)	ap_cv_distribution="RHEL3" ;;
 		    (4|4.0)	ap_cv_distribution="RHEL4" ;;
 		    (5|5.0)	ap_cv_distribution="RHEL5" ;;
+		    (*)		ap_cv_distribution="RH$dist_cv_host_release" ;;
 		esac ;;
 	    (mandrake)	ap_cv_distribution="MDK$dist_cv_host_release"	;;
-	    (suse)	ap_cv_distribution="SuSE$dist_cv_host_release"	;;
+	    (suse)
+	        case $dist_cv_host_release in
+		    (6.2|7.[[0-3]]|8.[[0-3]]|9.[[0-3]])
+		    		ap_cv_distribution="SuSE$dist_cv_host_release"	;;
+		    (8|9|10)	ap_cv_distribution="SLES$dist_cv_host_release"	;;
+		    (*)		ap_cv_distribution="SuSE$dist_cv_host_release"	;;
+		esac ;;
 	    (debian)	ap_cv_distribution="Debian$dist_cv_host_release" ;;
 	    (ubuntu)	ap_cv_distribution="Ubuntu$dist_cv_host_release" ;;
 	    (montavista) ap_cv_distribtuion="MontaVista"		;;

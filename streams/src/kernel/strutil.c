@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/07/25 06:39:09 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/08/16 07:47:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:09 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.133  2006/08/16 07:47:29  brian
+ - add security.h header file to avoid ptrace conflict, SLES changes
+
  Revision 0.9.2.132  2006/07/25 06:39:09  brian
  - expanded minor device numbers and optimization and locking corrections
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/07/25 06:39:09 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/08/16 07:47:29 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2006/07/25 06:39:09 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/08/16 07:47:29 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -108,6 +111,10 @@ static char const ident[] =
 #include <asm/cache.h>		/* for L1_CACHE_BYTES */
 
 #include <stdbool.h>		/* for bool, true and false */
+
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #ifndef __STRUTIL_EXTERN_INLINE
 #define __STRUTIL_EXTERN_INLINE inline streams_fastcall __unlikely

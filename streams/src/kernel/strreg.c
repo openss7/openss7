@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/07/25 06:39:09 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/08/16 07:47:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:09 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/07/25 06:39:09 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/08/16 07:47:28 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/07/25 06:39:09 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/08/16 07:47:28 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -74,6 +74,9 @@ static char const ident[] =
 
 #ifdef HAVE_KINC_LINUX_CDEV_H
 #include <linux/cdev.h>
+#endif
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
 #endif
 
 #include "sys/strdebug.h"
@@ -498,9 +501,6 @@ register_cdev(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 	int err;
 	__kernel_dev_t dev = 0;
 
-	if ((cdev->d_cdev = kmalloc(sizeof(struct cdev), GFP_KERNEL)) == NULL)
-		return (-ENOMEM);
-
 	if (major == 0) {
 		err = alloc_chrdev_region(&dev, 0, 1 << 16, (char *) cdev->d_name);
 		if (err == 0)
@@ -511,24 +511,33 @@ register_cdev(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 	}
 	if (err < 0)
 		return (err);
+
+	err = -ENOMEM;
+	if ((cdev->d_cdev = cdev_alloc()) == NULL)
+		goto unregister_out;
+
 	cdev_init(cdev->d_cdev, fops);
-	err = cdev_add(cdev->d_cdev, dev, 1 << 16);
-	if (err) {
-		unregister_chrdev_region(dev, 1 << 16);
-		cdev_del(cdev->d_cdev);
-		kfree(XCHG(&cdev->d_cdev, NULL));
-		return (err);
-	}
+	if ((err = cdev_add(cdev->d_cdev, dev, 1 << 16)))
+		goto delete_out;
+
 	return (major);
+
+      delete_out:
+	cdev_del(XCHG(&cdev->d_cdev, NULL));
+
+      unregister_out:
+	unregister_chrdev_region(dev, 1 << 16);
+
+	return (err);
+
 }
 STATIC int
 unregister_cdev(struct cdevsw *cdev, major_t major)
 {
 	dev_t dev = MKDEV(major, 0);
 
+	cdev_del(XCHG(&cdev->d_cdev, NULL));
 	unregister_chrdev_region(dev, 1 << 16);
-	cdev_del(cdev->d_cdev);
-	kfree(XCHG(&cdev->d_cdev, NULL));
 	return (0);
 }
 #endif				/* defined HAVE_KINC_LINUX_CDEV_H */

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/06/30 19:36:08 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/08/16 07:30:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/30 19:36:08 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:30:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -202,7 +202,12 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			rpm_cv_dist_extra=".${rpm_tmp}mdk"
 			;;
 		    (suse)
-			rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}"
+			case $dist_cv_host_release in
+			    (6.2|7.[[0-3]]|8.[[0-3]]|9.[[0-3]])
+					rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}" ;;
+			    (8|9|10)	rpm_cv_dist_extra=".${dist_cv_host_release:-SLES}" ;;
+			    (*)		rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}" ;;
+			esac
 			;;
 		    (debian)
 			rpm_cv_dist_extra=".deb${dist_cv_host_release}"
@@ -229,6 +234,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
 			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
+			    (*)		rpm_cv_dist_extra2=".COS${dist_cvs_host_release}" ;;
 			esac
 			;;
 		    (lineox)
@@ -236,6 +242,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
 			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
+			    (*)		rpm_cv_dist_extra2=".LEL${dist_cvs_host_release}" ;;
 			esac
 			;;
 		    (whitebox)
@@ -243,6 +250,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.0)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
 			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
+			    (*)		rpm_cv_dist_extra2=".WB${dist_cvs_host_release}" ;;
 			esac
 			;;
 		    (fedora)
@@ -253,6 +261,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (4)		rpm_cv_dist_extra2=".FC4"	;;
 			    (5)		rpm_cv_dist_extra2=".FC5"	;;
 			    (6)		rpm_cv_dist_extra2=".FC6"	;;
+			    (*)		rpm_cv_dist_extra2=".FC${dist_cvs_host_release}" ;;
 			esac
 			;;
 		    (redhat)
@@ -264,6 +273,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.0)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
 			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
+			    (*)		rpm_cv_dist_extra2=".RH${dist_cvs_host_release}" ;;
 			esac
 			;;
 		    (mandrake)
@@ -271,7 +281,12 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			rpm_cv_dist_extra2=".${rpm_tmp}mdk"
 			;;
 		    (suse)
-			rpm_cv_dist_extra2=".${dist_cv_host_release:-SuSE}"
+			case $dist_cv_host_release in
+			    (6.2|7.[[0-3]]|8.[[0-3]]|9.[[0-3]])
+					rpm_cv_dist_extra2=".${dist_cv_host_release:-SuSE}" ;;
+			    (8|9|10)	rpm_cv_dist_extra2=".${dist_cv_host_release:-SLES}" ;;
+			    (*)		rpm_cv_dist_extra2=".${dist_cv_host_release:-SuSE}" ;;
+			esac
 			;;
 		    (debian)
 			rpm_cv_dist_extra2=".deb${dist_cv_host_release}"

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/07/15 13:06:31 $
+# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:41:00 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -70,8 +70,14 @@ build_options() {
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
+    RETVAL=0
+    modules=
     for module in $STRXNS_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules $redir ; then
 	    echo -n "$module "
 	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
@@ -81,74 +87,76 @@ start() {
 
     echo -n "Starting $desc: $name "
     build_options
-    RETVAL=$?
-    if [ $RETVAL -eq 0 ] ; then
+    if [ $? -eq 0 ] ; then
 	echo "."
     else
 	echo "(failed.)"
+	RETVAL=1
     fi
+
     if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf $redir ; then
 	echo -n "Reconfiguring kernel parameters: "
 	sysctl -p /etc/sysctl.conf $redir
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
 	fi
     fi
+
     if [ -f /etc/${name}.conf ] ; then
-	echo -n "Configuring STREAMS XNS parameters: "
+	echo -n "Configuring STREAMS parameters: "
 	sysctl -p /etc/${name}.conf $redir
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
+	    RETVAL=1
 	fi
     fi
+
     if [ -n "$STRXNS_MKNOD" -a ":$STRXNS_MAKEDEVICES" = ":yes" ] ; then
 	echo -n "Making STREAMS XNS devices: "
 	$STRXNS_MKNOD
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
+	    RETVAL=1
 	fi
-    fi
-    return $RETVAL
-}
-
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	echo -n "Removing STREAMS XNS modules: "
-	rmmod $modules
-	RETVAL=$?
     fi
     return $RETVAL
 }
 
 stop() {
-    echo -n "Stopping $desc: $name "
-    RETVAL=$?
+    echo "Stopping $desc: $name "
+    RETVAL=0
     if [ -n "$STRXNS_MKNOD" -a ":$STRXNS_REMOVEDEVICES" = ":yes" ] ; then
 	echo -n "Removing STREAMS XNS devices: "
 	$STRXNS_MKNOD --remove
-	RETVAL=$?
+	if [ $? -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	    RETVAL=1
+	fi
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]ip_strm_mod' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]ip_to_dlpi' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]ldl' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]np_ip' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
+    echo -n "Unloading STREAMS kernel modules: "
+    modules=
+    for module in $STRXNS_MODULES ; do
+	modules="$module${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules $redir ; then
+	    echo -n "$module "
+	    modprobe -r -q -- $module $redir
+	    if [ $? -ne 0 ] ; then
+		echo -n "(failed) "
+		RETVAL=1
+	    fi
+	fi
+    done
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
     else
@@ -189,7 +197,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/07/15 13:06:31 $
+# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:41:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -234,9 +242,8 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/15 13:06:31 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:41:00 $ by $Author: brian $
 #
 # =============================================================================
 
 # vim: ft=sh sw=4 tw=80
-

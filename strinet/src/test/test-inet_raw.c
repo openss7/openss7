@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/29 07:43:19 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:43:19 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.48  2006/08/16 07:47:51  brian
+ - correct addresses
+
  Revision 0.9.2.47  2006/07/29 07:43:19  brian
  - CVS checkin of changes before leaving for SCTP interop
 
@@ -227,9 +230,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/29 07:43:19 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:51 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/29 07:43:19 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:51 $";
 
 /*
  *  Simple test program for INET streams.
@@ -24787,7 +24790,7 @@ test_case_4_3_conn_readonly(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = addrs[2];
+	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -33357,7 +33360,7 @@ preamble_ts_wres_cind_conn(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = addrs[2];
+	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;

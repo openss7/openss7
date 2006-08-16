@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2006/05/08 03:34:52 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2006/08/16 07:40:45 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -20,9 +20,7 @@
 # description:	This STREAMS init script is part of Linux Fast-STREAMS.  \
 #		It is responsible for ensuring that the necessary STREAMS \
 #		character devices are present in the /dev directory and \
-#		that the STREAMS subsystem is configured and loaded.  It \
-#		is also responsible for starting the STREAMS log and trace \
-#		facilities.
+#		that the STREAMS subsystem is configured and loaded.
 #
 # LSB init script conventions
 #
@@ -55,7 +53,7 @@ case "$init_mode" in
 	action() {
 	    echo -en "$1"
 	    shift 1
-	    ${1+"$@"}
+	    ${1+"$@"} >/dev/null
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
 	    rc_status -v
@@ -66,7 +64,7 @@ case "$init_mode" in
 	action() {
 	    echo -en "$1"
 	    shift 1
-	    ${1+"$@"}
+	    ${1+"$@"} >/dev/null
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
 	    return $?
@@ -76,7 +74,7 @@ case "$init_mode" in
 	action() {
 	    echo -en "$1"
 	    shift 1
-	    ${1+"$@"}
+	    ${1+"$@"} >/dev/null
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
 	    return $?
@@ -121,8 +119,13 @@ RETVAL=0
 umask 077
 
 start() {
+    modules=
     for module in $STREAMS_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
 	    action $"Loading kernel module $module: " \
 		modprobe -k -q -- $module
 	    RETVAL=$?
@@ -147,28 +150,25 @@ start() {
     return $RETVAL
 }
 
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	action $"Removing STREAMS modules: " \
-		rmmod $modules
-	RETVAL=$?
-    fi
-    RETVAL=0
-    return $RETVAL
-}
-
 stop() {
     if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_REMOVEDEVICES" = ":yes" ] ; then
 	action $"Removing STREAMS devices: " \
 	    $STREAMS_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]?' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
+    modules=
+    for module in $STREAMS_MODULES ; do
+	modules="${module}${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
+	    action $"Unloading kernel module $module: " \
+		modprobe -r -q -- $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?
     return $RETVAL
@@ -268,7 +268,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2006/05/08 03:34:52 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2006/08/16 07:40:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -313,7 +313,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:34:52 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:40:45 $ by $Author: brian $
 #
 # =============================================================================
 

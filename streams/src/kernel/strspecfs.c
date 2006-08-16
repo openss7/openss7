@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/07/13 08:07:51 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2006/08/16 07:47:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/13 08:07:51 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/07/13 08:07:51 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2006/08/16 07:47:29 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/07/13 08:07:51 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2006/08/16 07:47:29 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -90,6 +90,9 @@ static char const ident[] =
 #if defined HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #include "sys/strdebug.h"
 
@@ -101,7 +104,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/07/13 08:07:51 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2006/08/16 07:47:29 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"

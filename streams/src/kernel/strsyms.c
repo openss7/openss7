@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/22 10:28:44 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/08/16 07:47:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:44 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/22 10:28:44 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/08/16 07:47:29 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/22 10:28:44 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/08/16 07:47:29 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -62,6 +62,9 @@ static char const ident[] =
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or

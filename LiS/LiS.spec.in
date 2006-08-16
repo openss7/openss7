@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.59 $) $Date: 2006/07/07 21:08:35 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.60 $) $Date: 2006/08/16 07:37:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/07 21:08:35 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:37:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,7 +73,7 @@
 %{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
 
 %global kernel_version %{_kversion}
-%global kernel_source %(echo %{_kversion} | sed -e 's|BOOT$||;s|smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default||')
+%global kernel_source %(echo %{_kversion} | sed -r -e 's|BOOT$||;s|-?smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default$||')
 %global kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %global kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
 %global kernel_fedora %(echo %{_kversion} | sed -e 's|.*FC4.*$|1|;s|[^1].*$|0|')
@@ -1745,12 +1745,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.59  2006/07/07 21:08:35  brian
-# - place all header files in development subpackage
+# Revision 1.1.6.60  2006/08/16 07:37:53  brian
+# - get kernel_source right for SuSE -smp kernel
 #
-# Revision 1.1.6.58  2006/05/08 03:33:25  brian
-# - updated headers, corrected init scrip removal
-#
+
+* Fri Jul  7 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.59  2006/07/07 21:08:35  brian
+- place all header files in development subpackage
+
+* Mon May  8 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.58  2006/05/08 03:33:25  brian
+- updated headers, corrected init scrip removal
 
 * Fri Mar 24 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.57  2006/03/24 10:02:37  brian

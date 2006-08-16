@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2006/05/08 03:34:52 $
+# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2006/08/16 07:40:45 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -56,6 +56,12 @@ done
 RETVAL=0
 
 umask 077
+
+if [ "${VERBOSE:-0}" -ne 0 ] ; then
+    redir='>/dev/null 2>&1'
+else
+    redir=
+fi
 
 build_options() {
     # Build up the options string
@@ -148,7 +154,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2006/05/08 03:34:52 $
+# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2006/08/16 07:40:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -193,7 +199,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:34:52 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:40:45 $ by $Author: brian $
 #
 # =============================================================================
 

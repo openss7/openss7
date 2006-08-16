@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/15 23:11:18 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/08/16 07:40:48 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -48,7 +48,9 @@ done
 
 RETVAL=0
 
-if [ "$VERBOSE" -ne 0 ] ; then
+umask 077
+
+if [ "${VERBOSE:-0}" -ne 0 ] ; then
     redir='>/dev/null 2>&1'
 else
     redir=
@@ -168,7 +170,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/15 23:11:18 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/08/16 07:40:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -214,7 +216,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/15 23:11:18 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:40:48 $ by $Author: brian $
 #
 # =============================================================================
 

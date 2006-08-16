@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/02/20 10:59:22 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/08/16 07:47:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:22 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsysctl.c,v $
+ Revision 0.9.2.38  2006/08/16 07:47:29  brian
+ - add security.h header file to avoid ptrace conflict, SLES changes
+
  Revision 0.9.2.37  2006/02/20 10:59:22  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/02/20 10:59:22 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/08/16 07:47:29 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/02/20 10:59:22 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/08/16 07:47:29 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -69,6 +72,9 @@ static char const ident[] =
 #include <linux/proc_fs.h>
 #endif
 #include <linux/sysctl.h>
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #include "sys/strdebug.h"
 

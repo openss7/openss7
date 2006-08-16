@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 03:34:58 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:40:47 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -112,9 +112,15 @@ build_options() {
 }
 
 start() {
-    echo -n "Loading STREAMS Compatibility kernel modules: "
+    echo -n "Loading STREAMS kernel modules: "
+    RETVAL=0
+    modules=
     for module in $STRCOMPAT_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules $redir ; then
 	    modprobe_name $module
 	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
@@ -124,35 +130,76 @@ start() {
 
     echo -n "Starting $desc: $name "
     build_options
-    RETVAL=$?
-    if [ $RETVAL -eq 0 ] ; then
+    if [ $? -eq 0 ] ; then
 	echo "."
     else
 	echo "(failed.)"
+	RETVAL=1
     fi
-    if [ -n "$STRCOMPAT_MKNOD" -a ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
-	echo -n "Making STREAMS Compatibility devices: "
-	$STRCOMPAT_MKNOD
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+
+    if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf $redir ; then
+	echo -n "Reconfiguring kernel parameters: "
+	sysctl -p /etc/sysctl.conf $redir
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
+	fi
+    fi
+
+    if [ -f /etc/${name}.conf ] ; then
+	echo -n "Configuring STREAMS parameters: "
+	sysctl -p /etc/${name}.conf $redir
+	if [ $? -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	    RETVAL=1
+	fi
+    fi
+
+    if [ -n "$STRCOMPAT_MKNOD" -a ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
+	echo -n "Making STREAMS devices: "
+	$STRCOMPAT_MKNOD
+	if [ $? -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	    RETVAL=1
 	fi
     fi
     return $RETVAL
 }
 
 stop() {
-    echo -n "Stopping $desc: $name "
-    RETVAL=$?
+    echo "Stopping $desc: $name "
+    RETVAL=0
     if [ -n "$STRCOMPAT_MKNOD" -a ":$STREAMS_REMOVEDEVICES" = ":yes" ] ; then
 	echo -n "Removing STREAMS devices: "
 	$STRCOMPAT_MKNOD --remove
-	RETVAL=$?
+	if [ $? -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	    RETVAL=1
+	fi
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]?' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
+    echo -n "Unloading STREAMS kernel modules: "
+    modules=
+    for module in $STRCOMPAT_MODULES ; do
+	modules="$module${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules $redir ; then
+	    modprobe_name $module
+	    modprobe -r -q -- $module $redir
+	    if [ $? -ne 0 ] ; then
+		echo -n "(failed) "
+		RETVAL=1
+	    fi
+	fi
+    done
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
     else
@@ -193,7 +240,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 03:34:58 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:40:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -238,7 +285,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:34:58 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:40:47 $ by $Author: brian $
 #
 # =============================================================================
 

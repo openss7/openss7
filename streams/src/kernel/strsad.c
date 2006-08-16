@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:17 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:17 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:17 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:28 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:17 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #include "sys/strdebug.h"
 

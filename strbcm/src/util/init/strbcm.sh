@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:18:05 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/08/16 07:40:46 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -70,8 +70,14 @@ build_options() {
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
+    RETVAL=0
+    modules=
     for module in $STRBCM_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules $redir ; then
 	    echo -n "$module "
 	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
@@ -81,73 +87,76 @@ start() {
 
     echo -n "Starting $desc: $name "
     build_options
-    RETVAL=$?
-    if [ $RETVAL -eq 0 ] ; then
+    if [ $? -eq 0 ] ; then
 	echo "."
     else
 	echo "(failed.)"
+	RETVAL=1
     fi
+
     if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf $redir ; then
 	echo -n "Reconfiguring kernel parameters: "
 	sysctl -p /etc/sysctl.conf $redir
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
 	fi
     fi
+
     if [ -f /etc/${name}.conf ] ; then
-	echo -n "Configuring STREAMS BCM parameters: "
+	echo -n "Configuring STREAMS parameters: "
 	sysctl -p /etc/${name}.conf $redir
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
+	    RETVAL=1
 	fi
     fi
-    if [ -n "$STRBCM_MKNOD"-a :"$STRBCM_MAKEDEVICES" = ":yes" ] ; then
+
+    if [ -n "$STRBCM_MKNOD" -a :"$STRBCM_MAKEDEVICES" = ":yes" ] ; then
 	echo -n "Making STREAMS BCM devices: "
 	$STRBCM_MKNOD
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
+	    RETVAL=1
 	fi
-    fi
-    return $RETVAL
-}
-
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	echo -n "Removing STREAMS BCM modules: "
-	rmmod $modules
-	RETVAL=$?
     fi
     return $RETVAL
 }
 
 stop() {
-    echo -n "Stopping $desc: $name "
-    RETVAL=$?
+    echo "Stopping $desc: $name "
+    RETVAL=0
     if [ -n "$STRBCM_MKNOD" -a ":$STRBCM_REMOVEDEVICES" = ":yes" ] ; then
-	echo -n "Removing STREAMS BCM devices: "
+	echo -n "Removing STREAMS devices: "
 	$STRBCM_MKNOD --remove
-	RETVAL=$?
+	if [ $? -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	    RETVAL=1
+	fi
     fi
-    [ $RETVAL -eq 0 ] && {
-	for m in $STRBCM_MODULES ; do
-	    m=`echo $m | sed -e 's|[-_]|.|g;s|^|^|'`
-	    egrep $m /proc/modules 2>/dev/null
-	done | remove_modules
-    }
-    RETVAL=$?
+    echo -n "Unloading STREAMS kernel modules: "
+    modules=
+    for module in $STRBCM_MODULES ; do
+	modules="$module${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules $redir ; then
+	    echo -n "$module "
+	    modprobe -r -q -- $module $redir
+	    if [ $? -ne 0 ] ; then
+		echo -n "(failed) "
+		RETVAL=1
+	    fi
+	fi
+    done
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
     else
@@ -188,7 +197,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:18:05 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/08/16 07:40:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -233,11 +242,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/08 11:18:05 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:40:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strbcm.sh,v $
+# Revision 0.9.2.2  2006/08/16 07:40:46  brian
+# - rework addition and removal of kernel modules
+#
 # Revision 0.9.2.1  2006/03/08 11:18:05  brian
 # - completing package
 #

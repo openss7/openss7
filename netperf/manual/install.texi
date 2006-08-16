@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.9 2006/07/03 06:07:38 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.10 2006/08/16 07:34:26 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/07/03 06:07:38 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/16 07:34:26 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -494,8 +494,8 @@ STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
 @ignore
 @subsubheading Kernel-Dependent DEB
 Kernel-Dependent DEB are dependent on specific Linux Kernel Binary DEB releases.
-Packages are provided for popular released @cite{RedHat} kernels.  Packages
-dependent upon @cite{RedHat} or other kernel DEB will have the @samp{_kversion}
+Packages are provided for popular released @cite{Debian} kernels.  Packages
+dependent upon @cite{Debian} or other kernel DEB will have the @samp{_kversion}
 kernel package version in the package name.
 
 One of the following Kernel-Dependent packages is required for your architecture

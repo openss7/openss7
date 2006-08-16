@@ -1,3 +1,28 @@
+2006-08-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/releases.texi: added supported SuSE distirbutions
+	* m4/kernel.m4: adjusted autoconf.h path for SLES 10
+	* m4/pr.m4: more info for SLES distribution
+	* m4/rpm.m4: more info for SLES distribution
+
+2006-08-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* strxnet.spec.in: get kernel_source right for SUSE smp kernel
+
+2006-08-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: SLES doesn't include -ffreestanding
+	* tests/testsuite-timod.at: wait momentarily on buffer leak check
+	* tests/testsuite-tirdwr.at: wait momentarily on buffer leak check
+	* tests/testsuite-xnet.at: wait momentarily on buffer leak check
+	* tests/testsuite-xnet_thr.at: wait momentarily on buffer leak check
+
+2006-08-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/releases.texi: added SLES 9 to supported distros
+	* doc/manual/texi/install.texi: debs apply to Debian not RedHat
+	* scripts/texi/install.texi: debs apply to Debian not RedHat
+
 2006-07-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: expand majors, minors and module ids

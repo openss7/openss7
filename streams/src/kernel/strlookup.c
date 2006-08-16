@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/10 12:22:41 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/08/16 07:47:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/10 12:22:41 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/10 12:22:41 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/08/16 07:47:28 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/10 12:22:41 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/08/16 07:47:28 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -73,6 +73,9 @@ static char const ident[] =
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
 #include <asm/hardirq.h>
+#if defined HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>	/* avoid ptrace conflict */
+#endif
 
 #include "sys/strdebug.h"
 
@@ -878,6 +881,7 @@ EXPORT_SYMBOL_NOVERS(sdev_get);
 streams_fastcall void
 sdev_put(struct cdevsw *cdev)
 {
+#ifdef CONFIG_KMOD
 	if (cdev && cdev->d_kmod) {
 		_printd(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
 		__assert(module_refcount(cdev->d_kmod) > 0);
@@ -885,6 +889,7 @@ sdev_put(struct cdevsw *cdev)
 		_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__, cdev->d_name,
 			 cdev->d_kmod->name, module_refcount(cdev->d_kmod)));
 	}
+#endif
 }
 
 EXPORT_SYMBOL_NOVERS(sdev_put);
@@ -936,6 +941,7 @@ EXPORT_SYMBOL_NOVERS(fmod_get);
 streams_fastcall void
 fmod_put(struct fmodsw *fmod)
 {
+#ifdef CONFIG_KMOD
 	if (fmod && fmod->f_kmod) {
 		_ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
 		__assert(module_refcount(fmod->f_kmod) > 0);
@@ -943,6 +949,7 @@ fmod_put(struct fmodsw *fmod)
 		_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__, fmod->f_name,
 			 fmod->f_kmod->name, module_refcount(fmod->f_kmod)));
 	}
+#endif
 }
 
 EXPORT_SYMBOL_NOVERS(fmod_put);

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.11 2006/07/03 02:59:20 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.12 2006/08/16 07:36:23 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/07/03 02:59:20 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/16 07:36:23 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -155,9 +155,9 @@ release.}
 @item Gentoo 2006.1 (untested)
 @item Lineox 4.026 (LEL4) -- TBD
 @item Lineox 4.053 (LEL4)
+@item Mandrakelinux 9.2 (MDK92) -- TBD
 @item Mandrakelinux 10.0 (MDK100) -- TBD
 @item Mandrakelinux 10.1 (MDK101) -- TBD
-@item Mandrakelinux 9.2 (MDK92) -- TBD
 @item Mandriva Linux LE2005 (MDK102) -- TBD
 @item Mandriva Linux LE2006 (MDK103)
 @item Mandriva One (untested)
@@ -174,7 +174,11 @@ release.}
 @item SuSE 9.2 Professional (SuSE9.2) -- TBD
 @item SuSE OpenSuSE (SuSEOSS)
 @item SuSE 10.0 (SuSE10.0)
-@item SuSE 10.1 (SuSE10.1) (untested)
+@item SuSE 10.1 (SuSE10.1)
+@item SLES 9 (SLES9)
+@item SLES 9 SP2 (SLES9)
+@item SLES 9 SP3 (SLES9)
+@item SLES 10 (SLES10)
 @item Ubuntu 5.10 (ubu5.10)
 @item Ubuntu 6.06 LTS (ubu6.06)
 @item WhiteBox Enterprise Linux 3.0 (WBEL3)
