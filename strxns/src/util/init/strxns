@@ -116,8 +116,13 @@ RETVAL=0
 umask 077
 
 start() {
+    modules=
     for module in $STRXNS_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
 	    action $"Loading kernel module $module: " \
 		modprobe -k -q -- $module
 	    RETVAL=$?
@@ -129,51 +134,38 @@ start() {
 	    sysctl -e -p /etc/sysctl.conf || :
     fi
     if [ -f /etc/${name}.conf ] ; then
-	action $"Configuring STREAMS XNS parameters: " \
+	action $"Configuring STREAMS parameters: " \
 	    sysctl -e -p /etc/${name}.conf || :
     fi
-    if [ -n "$STRXNS_MKNOD" -o -n "$XNS_MKDEV" ] ; then
-	if [ ":$STRXNS_MAKEDEVICES" = ":yes" ] ; then
-	    if [ -n "$STRXNS_MKNOD" ] ; then
-		action $"Making STREAMS XNS devices: " \
-		    $STRXNS_MKNOD
-		RETVAL=$?
-	    fi
-	fi
+    if [ -n "$STRXNS_MKNOD" -a ":$STRXNS_MAKEDEVICES" = ":yes" ] ; then
+	action $"Making STREAMS devices: " \
+	    $STRXNS_MKNOD
+	RETVAL=$?
     fi
     [ $RETVAL -eq 0 ] && touch $lockfile
     RETVAL=$?
     return $RETVAL
 }
 
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	action $"Removing STREAMS XNS modules: " \
-		rmmod $modules
-	RETVAL=$?
-    fi
-    RETVAL=0
-    return $RETVAL
-}
-
 stop() {
     if [ -n "$STRXNS_MKNOD" -a ":$STRXNS_REMOVEDEVICES" = ":yes" ] ; then
-	action $"Removing STREAMS XNS devices: " \
+	action $"Removing STREAMS devices: " \
 	    $STRXNS_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]ip_strm_mod' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]ip_to_dlpi'	 /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]ldl'	 /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]np_ip'	 /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
+    modules=
+    for module in $STRXNS_MODULES ; do
+	modules="${module}${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
+	    action $"Unloading kernel module $module: " \
+		modprobe -r -q -- $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?
     return $RETVAL

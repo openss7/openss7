@@ -86,8 +86,14 @@ build_options() {
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
+    RETVAL=0
+    modules=
     for module in $STRINET_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules $redir ; then
 	    echo -n "$module "
 	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
@@ -97,52 +103,54 @@ start() {
 
     echo -n "Starting $desc: $name "
     build_options
-    RETVAL=$?
-    if [ $RETVAL -eq 0 ] ; then
+    if [ $? -eq 0 ] ; then
 	echo "."
     else
 	echo "(failed.)"
+	RETVAL=1
     fi
+
     if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf $redir ; then
 	echo -n "Reconfiguring kernel parameters: "
 	sysctl -p /etc/sysctl.conf $redir
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
 	fi
     fi
+
     if [ -f /etc/${name}.conf ] ; then
-	echo -n "Configuring STREAMS INET parameters: "
+	echo -n "Configuring STREAMS parameters: "
 	sysctl -p /etc/${name}.conf $redir
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
+	    RETVAL=1
 	fi
     fi
+
     if [ -n "$STRINET_MKNOD" -o -n "$INET_MKDEV" ] ; then
 	if [ :"$STRINET_MAKEDEVICES" = ":yes" ] ; then
 	    if [ -n "$INET_MKDEV" ] ; then
 		echo -n "Making STREAMS iBCS devices: "
 		$INET_MKDEV
-		RETVAL=$?
-		if [ $RETVAL -eq 0 ] ; then
+		if [ $? -eq 0 ] ; then
 		    echo "."
 		else
 		    echo "(failed.)"
+		    RETVAL=1
 		fi
 	    fi
 	    if [ -n "$STRINET_MKNOD" ] ; then
 		echo -n "Making STREAMS INET devices: "
 		$STRINET_MKNOD
-		RETVAL=$?
-		if [ $RETVAL -eq 0 ] ; then
+		if [ $? -eq 0 ] ; then
 		    echo "."
 		else
 		    echo "(failed.)"
+		    RETVAL=1
 		fi
 	    fi
 	fi
@@ -150,33 +158,35 @@ start() {
     return $RETVAL
 }
 
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	echo -n "Removing STREAMS INET modules: "
-	rmmod $modules
-	RETVAL=$?
-    fi
-    return $RETVAL
-}
-
 stop() {
-    echo -n "Stopping $desc: $name "
-    RETVAL=$?
+    echo "Stopping $desc: $name "
+    RETVAL=0
     if [ -n "$STRINET_MKNOD" -a ":$STRINET_REMOVEDEVICES" = ":yes" ] ; then
-	echo -n "Removing STREAMS INET devices: "
+	echo -n "Removing STREAMS devices: "
 	$STRINET_MKNOD --remove
-	RETVAL=$?
+	if [ $? -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	    RETVAL=1
+	fi
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]udp' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]rawip' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]inet' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
+    echo -n "Unloading STREAMS kernel modules: "
+    modules=
+    for module in $STRINET_MODULES ; do
+	modules="$module${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules $redir ; then
+	    echo -n "$module "
+	    modprobe -r -q -- $module $redir
+	    if [ $? -ne 0 ] ; then
+		echo -n "(failed) "
+		RETVAL=1
+	    fi
+	fi
+    done
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
     else

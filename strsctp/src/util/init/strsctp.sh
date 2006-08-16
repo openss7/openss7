@@ -70,8 +70,14 @@ build_options() {
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
+    RETVAL=0
+    modules=
     for module in $STRSCTP_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules $redir ; then
 	    echo -n "$module "
 	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
@@ -81,68 +87,76 @@ start() {
 
     echo -n "Starting $desc: $name "
     build_options
-    RETVAL=$?
-    if [ $RETVAL -eq 0 ] ; then
+    if [ $? -eq 0 ] ; then
 	echo "."
     else
 	echo "(failed.)"
+	RETVAL=1
     fi
+
     if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf $redir ; then
 	echo -n "Reconfiguring kernel parameters: "
 	sysctl -p /etc/sysctl.conf $redir
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
 	fi
     fi
+
     if [ -f /etc/${name}.conf ] ; then
-	echo -n "Configuring STREAMS SCTP parameters: "
+	echo -n "Configuring STREAMS parameters: "
 	sysctl -p /etc/${name}.conf $redir
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
+	    RETVAL=1
 	fi
     fi
+
     if [ -n "$STRSCTP_MKNOD" -a ":$STRSCTP_MAKEDEVICES" = ":yes" ] ; then
 	echo -n "Making STREAMS SCTP devices: "
 	$STRSCTP_MKNOD
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
+	    RETVAL=1
 	fi
-    fi
-    return $RETVAL
-}
-
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	echo -n "Removing STREAMS SCTP modules: "
-	rmmod $modules
-	RETVAL=$?
     fi
     return $RETVAL
 }
 
 stop() {
-    echo -n "Stopping $desc: $name "
-    RETVAL=$?
+    echo "Stopping $desc: $name "
+    RETVAL=0
     if [ -n "$STRSCTP_MKNOD" -a ":$STRSCTP_REMOVEDEVICES" = ":yes" ] ; then
-	echo -n "Removing STREAMS SCTP devices: "
+	echo -n "Removing STREAMS devices: "
 	$STRSCTP_MKNOD --remove
-	RETVAL=$?
+	if [ $? -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	    RETVAL=1
+	fi
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_](sctp|tpiperf)' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
+    echo -n "Unloading STREAMS kernel modules: "
+    modules=
+    for module in $STRSCTP_MODULES ; do
+	modules="$module${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules $redir ; then
+	    echo -n "$module "
+	    modprobe -r -q -- $module $redir
+	    if [ $? -ne 0 ] ; then
+		echo -n "(failed) "
+		RETVAL=1
+	    fi
+	fi
+    done
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
     else

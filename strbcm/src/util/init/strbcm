@@ -116,8 +116,13 @@ RETVAL=0
 umask 077
 
 start() {
+    modules=
     for module in $STRBCM_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
 	    action $"Loading kernel module $module: " \
 		modprobe -k -q -- $module
 	    RETVAL=$?
@@ -129,11 +134,11 @@ start() {
 	    sysctl -e -p /etc/sysctl.conf || :
     fi
     if [ -f /etc/${name}.conf ] ; then
-	action $"Configuring STREAMS BCM parameters: " \
+	action $"Configuring STREAMS parameters: " \
 	    sysctl -e -p /etc/${name}.conf || :
     fi
     if [ -n "$STRBCM_MKNOD" -a ":$STRBCM_MAKEDEVICES" = ":yes" ] ; then
-	action $"Making STREAMS BCM devices: " \
+	action $"Making STREAMS devices: " \
 	    $STRBCM_MKNOD
 	RETVAL=$?
     fi
@@ -142,33 +147,25 @@ start() {
     return $RETVAL
 }
 
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	action $"Removing STREAMS BCM modules: " \
-		rmmod $modules
-	RETVAL=$?
-    fi
-    RETVAL=0
-    return $RETVAL
-}
-
 stop() {
     if [ -n "$STRBCM_MKNOD" -a ":$STRBCM_REMOVEDEVICES" = ":yes" ] ; then
-	action $"Removing STREAMS BCM devices: " \
+	action $"Removing STREAMS devices: " \
 	    $STRBCM_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && {
-	for m in $STRBCM_MODULES ; do
-	    m=`echo $m | sed -e 's|[-_]|.|g;s|^|^|'`
-	    egrep $m /proc/modules 2>/dev/null
-	done | remove_modules
-    }
-    RETVAL=$?
+    modules=
+    for module in $STRBCM_MODULES ; do
+	modules="${module}${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
+	    action $"Unloading kernel module $module: " \
+		modprobe -r -q -- $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?
     return $RETVAL

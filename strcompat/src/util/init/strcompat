@@ -156,14 +156,20 @@ function modprobe_action() {
 	    modname=$"UnixWare(R) 7.1.3"
 	    ;;
 	esac
-	action $"Loading STREAMS Compatibility module $modname:" \
+	action $"Loading kernel module $modname:" \
 	    modprobe -k -q -- $module
 }
 
 start() {
+    modules=
     for module in $STRCOMPAT_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
-	    modprobe_action $module
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
+	    modprobe_action \
+		$module
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] || return $RETVAL
 	fi
@@ -186,28 +192,25 @@ start() {
     return $RETVAL
 }
 
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	action $"Removing STREAMS Compatibility modules: " \
-		rmmod $modules
-	RETVAL=$?
-    fi
-    RETVAL=0
-    return $RETVAL
-}
-
 stop() {
     if [ -n "$STRCOMPAT_MKNOD" -a ":$STRCOMPAT_REMOVEDEVICES" = ":yes" ] ; then
 	action $"Removing STREAMS devices: " \
 	    $STRCOMPAT_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]?' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
+    modules=
+    for module in $STRCOMPAT_MODULES ; do
+	modules="${module}${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
+	    action $"Unloading kernel module $module: " \
+		modprobe -r -q -- $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?
     return $RETVAL

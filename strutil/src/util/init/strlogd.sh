@@ -57,6 +57,12 @@ RETVAL=0
 
 umask 077
 
+if [ "${VERBOSE:-0}" -ne 0 ] ; then
+    redir='>/dev/null 2>&1'
+else
+    redir=
+fi
+
 build_options() {
     # Build up the options string
     STRLOGD_OPTIONS=

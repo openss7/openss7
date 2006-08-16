@@ -132,8 +132,13 @@ RETVAL=0
 umask 077
 
 start() {
+    modules=
     for module in $STRINET_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
 	    action $"Loading kernel module $module: " \
 		modprobe -k -q -- $module
 	    RETVAL=$?
@@ -145,7 +150,7 @@ start() {
 	    sysctl -e -p /etc/sysctl.conf || :
     fi
     if [ -f /etc/${name}.conf ] ; then
-	action $"Configuring STREAMS INET parameters: " \
+	action $"Configuring STREAMS parameters: " \
 	    sysctl -e -p /etc/${name}.conf || :
     fi
     if [ -n "$STRINET_MKNOD" -o -n "$INET_MKDEV" ] ; then
@@ -167,20 +172,6 @@ start() {
     return $RETVAL
 }
 
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	action $"Removing STREAMS INET modules: " \
-		rmmod $modules
-	RETVAL=$?
-    fi
-    RETVAL=0
-    return $RETVAL
-}
-
 stop() {
     if [ -n "$STRINET_MKNOD" -o -n "$INET_RMDEV" ] ; then
 	if [ ":$STRINET_REMOVEDEVICES" = ":yes" ] ; then
@@ -188,20 +179,29 @@ stop() {
 		action $"Removing STREAMS INET devices: " \
 		    $STRINET_MKNOD --remove
 		RETVAL=$?
+		[ $RETVAL -eq 0 ] || return $RETVAL
 	    fi
 	    if [ -n "$INET_RMDEV" ] ; then
 		action $"Removing STREAMS iBCS devices: " \
 		    $INET_RMDEV
 		RETVAL=$?
+		[ $RETVAL -eq 0 ] || return $RETVAL
 	    fi
 	fi
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]udp' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]rawip' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && egrep '^streams[-_]inet' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
+    modules=
+    for module in $STRINET_MODULES ; do
+	modules="${module}${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
+	    action $"Unloading kernel module $module: " \
+		modprobe -r -q -- $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?
     return $RETVAL
