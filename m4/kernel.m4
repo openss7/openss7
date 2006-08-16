@@ -1818,9 +1818,11 @@ dnl
 dnl
 dnl	Recent 2.6.15+ kernels include autoconf.h from the build directory instead of the source
 dnl	directory.  I suppose the idea is to allow you to configure in a separate directory as
-dnl	well as build.  Given 100 years, kbuild might catch up to autoconf.
+dnl	well as build.  Given 100 years, kbuild might catch up to autoconf.  SLES 10 for some silly
+dnl	reason expands the current working directory in the autoconf.h include, so watch out for
+dnl	leading junk in the autoconf.h argument.
 dnl
-	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -include include/linux/autoconf.h| -include ${kbuilddir}/include/linux/autoconf.h|"`
+	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -r -e "s| -include (\.*/.*/)?include/linux/autoconf.h| -include ${kbuilddir}/include/linux/autoconf.h|"`
 dnl
 dnl	Non-kbuild (2.4 kernel) always needs include directories to be in the
 dnl	build directory.
