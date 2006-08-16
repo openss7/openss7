@@ -10468,20 +10468,26 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 		sd->sd_rdopt = so->so_readopt & (RMODEMASK | RPROTMASK);
 	if (so->so_flags & SO_WROFF)
 		sd->sd_wroff = so->so_wroff;
-	if (so->so_flags & SO_MINPSZ)
-		strqset(q, QMINPSZ, 0, so->so_minpsz);
-	if (so->so_flags & SO_MAXPSZ)
-		strqset(q, QMAXPSZ, 0, so->so_maxpsz);
-	if (so->so_flags & SO_BAND) {
-		if (so->so_flags & SO_HIWAT)
-			strqset(q, QHIWAT, so->so_band, so->so_hiwat);
-		if (so->so_flags & SO_LOWAT)
-			strqset(q, QLOWAT, so->so_band, so->so_lowat);
-	} else {
-		if (so->so_flags & SO_HIWAT)
-			strqset(q, QHIWAT, 0, so->so_hiwat);
-		if (so->so_flags & SO_LOWAT)
-			strqset(q, QLOWAT, 0, so->so_lowat);
+	if (so->so_flags & (SO_MINPSZ | SO_MAXPSZ | SO_LOWAT | SO_HIWAT)) {
+		unsigned long flags = freezestr(q);
+
+		/* Must freeze stream before calling strqset(). */
+		if (so->so_flags & SO_MINPSZ)
+			strqset(q, QMINPSZ, 0, so->so_minpsz);
+		if (so->so_flags & SO_MAXPSZ)
+			strqset(q, QMAXPSZ, 0, so->so_maxpsz);
+		if (so->so_flags & SO_BAND) {
+			if (so->so_flags & SO_HIWAT)
+				strqset(q, QHIWAT, so->so_band, so->so_hiwat);
+			if (so->so_flags & SO_LOWAT)
+				strqset(q, QLOWAT, so->so_band, so->so_lowat);
+		} else {
+			if (so->so_flags & SO_HIWAT)
+				strqset(q, QHIWAT, 0, so->so_hiwat);
+			if (so->so_flags & SO_LOWAT)
+				strqset(q, QLOWAT, 0, so->so_lowat);
+		}
+		unfreezestr(q, flags);
 	}
 	if (so->so_flags & SO_ERROPT)
 		sd->sd_eropt = so->so_erropt & (RERRMASK | WERRMASK);
