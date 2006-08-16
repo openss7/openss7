@@ -1,3 +1,9 @@
+2006-08-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: adjusted autoconf.h path for SLES 10
+	* m4/pr.m4: more info for SLES distribution
+	* m4/rpm.m4: more info for SLES distribution
+
 2006-08-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: SLES doesn't include -ffreestanding

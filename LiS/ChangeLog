@@ -1,3 +1,14 @@
+2006-08-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: adjusted autoconf.h path for SLES 10
+	* m4/pr.m4: more info for SLES distribution
+	* m4/rpm.m4: more info for SLES distribution
+	* manual/releases.texi: added supported SuSE distirbutions
+	* util/init/strace.sh: added redirection
+	* util/init/streams: reworked addition and removal of modules
+	* util/init/streams.sh: reworked addition and removal of modules
+	* util/init/strerr.sh: added redirection
+
 2006-08-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* LiS.spec.in: get kernel_source right for SUSE smp kernel
