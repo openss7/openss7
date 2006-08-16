@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/29 07:43:39 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/08/16 07:47:59 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:43:39 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.46  2006/08/16 07:47:59  brian
+ - correct addresses
+
  Revision 0.9.2.45  2006/07/29 07:43:39  brian
  - CVS checkin of changes before leaving for SCTP interop
 
@@ -232,9 +235,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/29 07:43:39 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/08/16 07:47:59 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/07/29 07:43:39 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/08/16 07:47:59 $";
 
 /*
  *  Simple test program for INET streams.

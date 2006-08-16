@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/06/29 23:38:09 $
+# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:30:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/29 23:38:09 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:30:47 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: pr.m4,v $
+# Revision 0.9.2.4  2006/08/16 07:30:47  brian
+# - changes for SLES 10
+#
 # Revision 0.9.2.3  2006/06/29 23:38:09  brian
 # - more variations for Ubuntu, which in most ways is much like Debian.
 #

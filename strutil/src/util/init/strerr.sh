@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/08 03:35:10 $
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/08/16 07:40:51 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -154,7 +154,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/05/08 03:35:10 $
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/08/16 07:40:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -199,7 +199,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:35:10 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:40:51 $ by $Author: brian $
 #
 # =============================================================================
 

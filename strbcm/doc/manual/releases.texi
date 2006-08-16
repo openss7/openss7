@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.6 2006/07/03 02:59:10 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.7 2006/08/16 07:36:31 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,11 +54,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/07/03 02:59:10 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/16 07:36:31 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: releases.texi,v $
+@c Revision 0.9.2.7  2006/08/16 07:36:31  brian
+@c - add freshly supported SuSE distributions
+@c
 @c Revision 0.9.2.6  2006/07/03 02:59:10  brian
 @c - updated documentation for release
 @c

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 03:34:58 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:40:47 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -240,7 +240,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 03:34:58 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:40:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -285,7 +285,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:34:58 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:40:47 $ by $Author: brian $
 #
 # =============================================================================
 

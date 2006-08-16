@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-sad.at,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2006/03/05 04:03:08 $
+dnl @(#) $RCSfile: testsuite-sad.at,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2006/08/16 07:39:33 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/03/05 04:03:08 $ by $Author: brian $
+dnl Last Modified $Date: 2006/08/16 07:39:33 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-sad.at,v $
+dnl Revision 1.1.2.5  2006/08/16 07:39:33  brian
+dnl - add brief sleep to buffer leak check
+dnl
 dnl Revision 1.1.2.4  2006/03/05 04:03:08  brian
 dnl - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
 dnl - updates for new release

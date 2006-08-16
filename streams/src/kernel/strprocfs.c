@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/06/14 10:37:23 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/08/16 07:47:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/14 10:37:23 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strprocfs.c,v $
+ Revision 0.9.2.53  2006/08/16 07:47:28  brian
+ - add security.h header file to avoid ptrace conflict, SLES changes
+
  Revision 0.9.2.52  2006/06/14 10:37:23  brian
  - defeat a lot of debug traces in debug mode for testing
  - changes to allow strinet to compile under LiS (why???)
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/06/14 10:37:23 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/08/16 07:47:28 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/06/14 10:37:23 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/08/16 07:47:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

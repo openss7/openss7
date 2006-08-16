@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/07/29 07:43:03 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/08/16 07:47:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:43:03 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.145  2006/08/16 07:47:28  brian
+ - add security.h header file to avoid ptrace conflict, SLES changes
+
  Revision 0.9.2.144  2006/07/29 07:43:03  brian
  - CVS checkin of changes before leaving for SCTP interop
 
@@ -116,10 +119,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/07/29 07:43:03 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/08/16 07:47:28 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2006/07/29 07:43:03 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/08/16 07:47:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

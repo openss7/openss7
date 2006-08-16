@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2006/07/07 21:08:39 $
+# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2006/08/16 07:38:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/07 21:08:39 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:38:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1754,6 +1754,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
+# Revision 0.9.2.103  2006/08/16 07:38:00  brian
+# - get kernel_source right for SuSE -smp kernel
+#
 
 * Fri Jul  7 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.102  2006/07/07 21:08:39  brian

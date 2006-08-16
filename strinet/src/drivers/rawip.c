@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/07/24 09:01:31 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/08/16 07:47:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:31 $ by $Author: brian $
+ Last Modified $Date: 2006/08/16 07:47:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.37  2006/08/16 07:47:36  brian
+ - removed locking macro pollution
+
  Revision 0.9.2.36  2006/07/24 09:01:31  brian
  - results of udp2 optimizations
 
@@ -161,10 +164,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/07/24 09:01:31 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/08/16 07:47:36 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/07/24 09:01:31 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/08/16 07:47:36 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -242,7 +245,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/07/24 09:01:31 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/08/16 07:47:36 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"

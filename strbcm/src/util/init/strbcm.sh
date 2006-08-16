@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:18:05 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/08/16 07:40:46 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -197,7 +197,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:18:05 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/08/16 07:40:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -242,11 +242,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/08 11:18:05 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:40:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strbcm.sh,v $
+# Revision 0.9.2.2  2006/08/16 07:40:46  brian
+# - rework addition and removal of kernel modules
+#
 # Revision 0.9.2.1  2006/03/08 11:18:05  brian
 # - completing package
 #

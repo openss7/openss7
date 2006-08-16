@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/08 03:35:01 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/08/16 07:40:48 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -200,7 +200,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/05/08 03:35:01 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/08/16 07:40:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -245,7 +245,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:35:01 $ by $Author: brian $
+# Last Modified $Date: 2006/08/16 07:40:48 $ by $Author: brian $
 #
 # =============================================================================
 
