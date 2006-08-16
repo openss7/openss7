@@ -92,9 +92,16 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 		    (3|3.0)	ap_cv_distribution="RHEL3" ;;
 		    (4|4.0)	ap_cv_distribution="RHEL4" ;;
 		    (5|5.0)	ap_cv_distribution="RHEL5" ;;
+		    (*)		ap_cv_distribution="RH$dist_cv_host_release" ;;
 		esac ;;
 	    (mandrake)	ap_cv_distribution="MDK$dist_cv_host_release"	;;
-	    (suse)	ap_cv_distribution="SuSE$dist_cv_host_release"	;;
+	    (suse)
+	        case $dist_cv_host_release in
+		    (6.2|7.[[0-3]]|8.[[0-3]]|9.[[0-3]])
+		    		ap_cv_distribution="SuSE$dist_cv_host_release"	;;
+		    (8|9|10)	ap_cv_distribution="SLES$dist_cv_host_release"	;;
+		    (*)		ap_cv_distribution="SuSE$dist_cv_host_release"	;;
+		esac ;;
 	    (debian)	ap_cv_distribution="Debian$dist_cv_host_release" ;;
 	    (ubuntu)	ap_cv_distribution="Ubuntu$dist_cv_host_release" ;;
 	    (montavista) ap_cv_distribtuion="MontaVista"		;;
