@@ -5391,7 +5391,7 @@ sctp_bundle_sack(struct sock *sk,	/* association */
 		}
 		for (; dup && ndups; dup = dup->next, ndups--) {
 			*(uint32_t *) b_wptr = htonl(dup->tsn);
-			mp->b_wptr += sizeof(uint32_t);
+			b_wptr += sizeof(uint32_t);
 		}
 		__skb_queue_purge(&sp->dupq);
 		sp->ndups = 0;
@@ -12111,8 +12111,8 @@ sctp_recv_err(struct sock *sk, struct sk_buff *skb)
 		goto listening;
 	/* Try to be a little bit smarter about ICMP errors received while trying to form a
 	   connection.  This can speed things up or make them more reliable. */
-	if (abt && ((1 << sp->state) & (SCTPF_OPENING))) {
-		switch (sp->state) {
+	if (abt && ((1 << sk->state) & (SCTPF_OPENING))) {
+		switch (sk->state) {
 		case SCTP_COOKIE_WAIT:
 			/* advance timeout */
 			printd(("INFO: truncating init timeout\n"));
@@ -12513,7 +12513,7 @@ sctp_reset(struct sock *sk)
  *  bottom-half locks).
  */
 STATIC void sctp_destroy_orphan(struct sock *sk);
-STATIC INLINE int
+STATIC int
 sctp_abort(struct sock *sk, ulong origin, long reason)
 {
 	sctp_t *sp = SCTP_PROT(sk);
