@@ -17816,6 +17816,7 @@ sctp_term_proto(void)
 STATIC struct inet_protocol sctp_protocol = {
 	.handler = sctp_v4_rcv,		/* SCTP data handler */
 	.err_handler = sctp_v4_err,	/* SCTP error control */
+	.no_policy = 1,
 };
 STATIC void
 sctp_init_proto(void)
@@ -17828,6 +17829,24 @@ sctp_term_proto(void)
 	inet_del_protocol(&sctp_protocol, IPPROTO_SCTP);
 }
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
+
+#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
+STATIC struct net_protocol sctp_protocol = {
+	.handler = sctp_v4_rcv,		/* SCTP data handler */
+	.err_handler = sctp_v4_err,	/* SCTP error control */
+	.no_policy = 1,
+};
+STATIC void
+sctp_init_proto(void)
+{
+	inet_add_protocol(&sctp_protocol, IPPROTO_SCTP);
+}
+STATIC void
+sctp_term_proto(void)
+{
+	inet_del_protocol(&sctp_protocol, IPPROTO_SCTP);
+}
+#endif				/* HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY */
 /* *INDENT-ON* */
 
 #if SOCKETS
