@@ -10010,6 +10010,7 @@ sctp_recv_init(struct sock *sk, struct sk_buff *skb)
 			goto init_bad_parm;
 		switch (type) {
 		case SCTP_PTYPE_IPV6_ADDR:
+			break;
 		case SCTP_PTYPE_HOST_NAME:
 			goto bad_address;
 		case SCTP_PTYPE_COOKIE_PSRV:
