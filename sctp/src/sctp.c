@@ -9019,16 +9019,46 @@ sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 	assert(skb);
 	if ((1 << sk->state) & ~(SCTPF_RECEIVING) || sk->dead || sk->shutdown & RCV_SHUTDOWN)
 		goto outstate;
-	for (newd = 0, data = 0, plen = 0, err = 0; err == 0;) {
+	for (newd = 0, data = 0, plen = 0, err = 0; err == 0; skb_pull(skb, plen)) {
 		struct sk_buff *skd;
 		struct sctp_strm *st;
 		sctp_tcb_t **gap;
 		uint32_t tsn, ppi;
 		uint16_t sid, ssn;
-		size_t clen, blen, dlen;
+		size_t clen, dlen;
 		uint flags;
-		int ord, more;
+		int ord;
+#if 1
+		int more;
+#endif
+		if (skb->len == 0)
+			break; /* we're done */
+		if (skb->len < 0) {
+			pswerr(("Should have been caught on last iteration!\n"));
+			goto emsgsize;
+		}
+		if (skb->len < sizeof(struct sctphdr))
+			goto emsgsize;
+		m = (typeof(m)) skb->data;
+		clen = ntohs(m->ch.len);
+		if (clen < sizeof(struct sctpchdr))
+			goto emsgsize;
+		if (skb->len < clen)
+			goto emsgsize;
+		plen = PADC(clen);
+		if (skb->len < plen)
+			goto emsgsize;
+		if (m->ch.type != SCTP_CTYPE_DATA) {
+			todo(("Need to ignore padding chunk here...\n"));
+			goto eproto;
+		}
+		if (clen < sizeof(*m))
+			goto emsgsize;
+		dlen = clen - sizeof(*m);
+		if (dlen == 0)
+			goto baddata; /* zero length data */
 
+#if 0
 		if ((!(m = (typeof(m)) skb_pull(skb, plen)))
 		    || (skb->len <= 0)
 		    || ((blen = skb->len) < sizeof(struct sctpchdr))
@@ -9038,6 +9068,7 @@ sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 				goto emsgsize;
 			break;
 		}
+#endif
 		flags = (m->ch.flags);
 		ord = !(flags & SCTPCB_FLAG_URG);
 #if 1
@@ -9047,11 +9078,6 @@ sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 		sid = ntohs(m->sid);
 		ssn = ntohs(m->ssn);
 		ppi = ntohl(m->ppi);
-		dlen = clen - sizeof(*m);
-		if (m->ch.type != SCTP_CTYPE_DATA)
-			goto eproto;
-		if (dlen == 0)
-			goto baddata;
 		if (sid >= sp->n_istr)
 			goto badstream;
 		sctp_put_owner_r(skb);
