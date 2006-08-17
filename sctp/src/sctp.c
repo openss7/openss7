@@ -4662,6 +4662,26 @@ sctp_update_routes(struct sock *sk, int force_reselect)
  *  -------------------------------------------------------------------------
  *  We need this broken out so that we can use the netfilter hooks.
  */
+#ifdef HAVE_KFUNC_DST_OUTPUT
+STATIC INLINE int
+sctp_queue_xmit(struct sk_buff *skb)
+{
+	struct rtable *rt = (struct rtable *) skb->dst;
+	struct iphdr *iph = skb->nh.iph;
+
+#ifdef NETIF_F_TSO
+	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
+#else
+	ip_select_ident(iph, &rt->u.dst, NULL);
+#endif
+	ip_send_check(iph);
+#ifdef HAVE_KFUNC_IP_DST_OUTPUT
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
+#else
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
+#endif
+}
+#else
 STATIC INLINE int
 sctp_queue_xmit(struct sk_buff *skb)
 {
@@ -4677,6 +4697,7 @@ sctp_queue_xmit(struct sk_buff *skb)
 		return skb->dst->output(skb);
 	}
 }
+#endif
 
 /*
  *  XMIT OOTB (Disconnect Send with no Listening Socket or STREAM).
@@ -4727,7 +4748,17 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, struct sk_buff *skb)
 			iph->protocol = 132;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
+#ifndef HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
+#else
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+			__ip_select_ident(iph, &rt->u.dst, 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
+#endif
+#endif
 #if STREAMS
 			/* For sockets the passed in sk_buff represents a single packet.  For
 			   STREAMS, the passed in mblk_t pointer is possibly a message buffer chain
@@ -4748,7 +4779,11 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, struct sk_buff *skb)
 			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 				sh->check = htonl(cksum_generate(sh, plen));
 			SCTP_INC_STATS(SctpOutSCTPPacks);
+#ifdef HAVE_KFUNC_DST_OUTPUT
+			sctp_queue_xmit(skb);
+#else
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
+#endif
 			return;
 		} else
 			rare();
@@ -4822,17 +4857,42 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, struct sk_buff *skb, struct sock *
 			iph->protocol = sk->protocol;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
+#ifndef HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
+#else
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+			__ip_select_ident(iph, &rt->u.dst, 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
+#endif
+#endif
+#if STREAMS
 			/* For sockets the passed in sk_buff represents a single packet.  For
 			   STREAMS, the passed in mblk_t pointer is possibly a message buffer chain
 			   and we must iterate along the b_cont pointer. */
+			for (bp = mp; bp; bp = bp->b_cont) {
+				int blen = bp->b_wptr - bp->b_rptr;
+
+				if (blen > 0) {
+					bcopy(bp->b_rptr, data, blen);
+					data += blen;
+				} else
+					rare();
+			}
+#endif
 			/* TODO:- For STREAMS it would be better to combine copying the buffer
 			   segments above with performing the checking below.  */
 			sh->check = 0;
 			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 				sh->check = htonl(cksum(sk, sh, plen));
 			SCTP_INC_STATS(SctpOutSCTPPacks);
+#ifdef HAVE_KFUNC_DST_OUTPUT
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
+#else
+			sctp_queue_xmit(skb);
+#endif
 			return;
 		} else
 			rare();
@@ -4949,7 +5009,17 @@ sctp_send_msg(struct sock *sk, struct sctp_daddr *sd, struct sk_buff *skc)
 		iph->protocol = sk->protocol;
 		iph->tot_len = htons(tlen);
 		skb->nh.iph = iph;
+#ifndef HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 		__ip_select_ident(iph, sd->dst_cache);
+#else
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+		__ip_select_ident(iph, sd->dst_cache, 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
+#endif
+#endif
 		/* For sockets, socket buffers representing chunks are chained together by control
 		   block pointers, however, each socket buffer in the chain is a complete chunk.
 		   For message blocks, blocks representing chunks are chained together with the
@@ -4996,7 +5066,11 @@ sctp_send_msg(struct sock *sk, struct sctp_daddr *sd, struct sk_buff *skc)
 		if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 			sh->check = htonl(cksum(sk, sh, plen));
 		SCTP_INC_STATS(SctpOutSCTPPacks);
+#ifdef HAVE_KFUNC_DST_OUTPUT
 		NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
+#else
+		sctp_queue_xmit(skb);
+#endif
 		/* Whenever we transmit something, we expect a reply to our v_tag, so we put
 		   ourselves in the 1st level vtag caches expecting a quick reply. */
 		if (!((1 << sk->state) & (SCTPF_DISCONNECTED)))
@@ -8950,7 +9024,9 @@ sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 		}
 		flags = (m->ch.flags);
 		ord = !(flags & SCTPCB_FLAG_URG);
+#if 1
 		more = !(flags & SCTPCB_FLAG_LAST_FRAG) ? SCTP_STRMF_MORE : 0;
+#endif
 		tsn = ntohl(m->tsn);
 		sid = ntohs(m->sid);
 		ssn = ntohs(m->ssn);
