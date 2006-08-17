@@ -13336,28 +13336,22 @@ sctp_ordrel_req(struct sctp *sp)
 	printd(("%p: X_ORDREL_REQ <- \n", sp));
 	switch (sp->state) {
 	case SCTP_ESTABLISHED:
+		sctp_change_state(sp, SCTP_SHUTDOWN_PENDING);
+	case SCTP_SHUTDOWN_PENDING:
 		/* check for empty send queues */
 		if (!bufq_head(&sp->sndq)
 		    && !bufq_head(&sp->urgq)
-		    && !bufq_head(&sp->rtxq)) {
-			ptrace(("Sending SHUTDOWN\n"));
+		    && !bufq_head(&sp->rtxq))
 			sctp_send_shutdown(sp);
-		} else {
-			ptrace(("Changing state to SHUTDOWN-PENDING\n"));
-			sctp_change_state(sp, SCTP_SHUTDOWN_PENDING);
-		}
 		break;
 	case SCTP_SHUTDOWN_RECEIVED:
+		sctp_change_state(sp, SCTP_SHUTDOWN_RECVWAIT);
+	case SCTP_SHUTDOWN_RECVWAIT:
 		/* check for empty send queues */
 		if (!bufq_head(&sp->sndq)
 		    && !bufq_head(&sp->urgq)
-		    && !bufq_head(&sp->rtxq)) {
-			ptrace(("Sending SHUTDOWN-ACK\n"));
+		    && !bufq_head(&sp->rtxq))
 			sctp_send_shutdown_ack(sp);
-		} else {
-			ptrace(("Changing state to SHUTDOWN-RECVWAIT\n"));
-			sctp_change_state(sp, SCTP_SHUTDOWN_RECVWAIT);
-		}
 		break;
 	default:
 		rare();
