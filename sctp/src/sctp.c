@@ -16875,7 +16875,6 @@ sctp_rcv_ootb(struct sk_buff *skb)
 	case SCTP_CTYPE_SHUTDOWN_COMPLETE:	/* RFC 2960 8.4(6). */
 	case SCTP_CTYPE_INIT:	/* RFC 2960 8.4(3) and (8). */
 	case SCTP_CTYPE_INIT_ACK:	/* RFC 2960 8.4(8). */
-	case SCTP_CTYPE_COOKIE_ECHO:	/* RFC 2960 8.4(4) and (8). */
 	default:
 		switch (ch->type) {
 		case SCTP_CTYPE_COOKIE_ACK:
@@ -16901,6 +16900,7 @@ sctp_rcv_ootb(struct sk_buff *skb)
 			break;
 		}
 		break;;
+	case SCTP_CTYPE_COOKIE_ECHO:	/* RFC 2960 8.4(4) and (8). */
 	case SCTP_CTYPE_SHUTDOWN:	/* RFC 2960 8.4(8). */
 	case SCTP_CTYPE_SACK:	/* RFC 2960 8.4(8). */
 	case SCTP_CTYPE_HEARTBEAT:	/* RFC 2960 8.4(8). */
@@ -16921,6 +16921,9 @@ sctp_rcv_ootb(struct sk_buff *skb)
 			break;
 		case SCTP_CTYPE_DATA:
 			printd(("Received OOTB DATA\n"));
+			break;
+		case SCTP_CTYPE_COOKIE_ECHO:
+			printd(("Received OOTB COOKIE-ECHO\n"));
 			break;
 		}
 		if (!(sk = sctp_lookup_tcb(sh->dest, sh->srce, iph->daddr, iph->saddr))) {
