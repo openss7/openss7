@@ -4732,10 +4732,13 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, struct sk_buff *skb)
 		if (skb) {
 			struct iphdr *iph;
 			struct sctphdr *sh;
+			unsigned char *data;
 
+			skb_reserve(skb, hlen);
 			/* find headers */
-			iph = (typeof(iph)) skb_push(skb, sizeof(*iph));
-			sh = (typeof(sh)) skb->data;
+			iph = (typeof(iph)) __skb_put(skb, tlen);
+			sh = (typeof(sh)) (iph + 1);
+			data = (unsigned char *) (sh);
 			skb->dst = &rt->u.dst;
 			skb->priority = 0;
 			iph->version = 4;
@@ -4832,13 +4835,18 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, struct sk_buff *skb, struct sock *
 		if (head > skb_headroom(skb2))
 			skb = skb_realloc_headroom(skb2, head);
 		if (skb) {
-			struct sctphdr *sh = (typeof(sh)) skb->data;
-			struct iphdr *iph = (typeof(iph)) skb_push(skb, sizeof(*iph));
+			struct iphdr *iph;
+			struct sctphdr *sh;
+			unsigned char *data;
 
 			_printd(("INFO: Sending messsage %d.%d.%d.%d -> %d.%d.%d.%d\n",
 				 (saddr >> 0) & 0xff, (saddr >> 8) & 0xff, (saddr >> 16) & 0xff,
 				 (saddr >> 24) & 0xff, (daddr >> 0) & 0xff, (daddr >> 8) & 0xff,
 				 (daddr >> 16) & 0xff, (daddr >> 24) & 0xff));
+			skb_reserve(skb, hlen);
+			iph = (typeof(iph)) skb_push(skb, sizeof(*iph));
+			sh = (typeof(sh)) skb->data;
+			data = (unsigned char *) (sh);
 			skb->dst = &rt->u.dst;
 			skb->priority = sk->priority;
 			iph->version = 4;
