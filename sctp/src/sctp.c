@@ -11831,7 +11831,7 @@ sctp_recv_err(struct sock *sk, struct sk_buff *skb)
 	struct icmphdr *icmph = skb->h.icmph;
 	int type = icmph->type;
 	int code = icmph->code;
-	int err = 0;
+	int err = 0, abt = 0;
 
 	if (sk->state == SCTP_CLOSED)
 		goto closed;
@@ -11877,12 +11877,15 @@ sctp_recv_err(struct sock *sk, struct sk_buff *skb)
 			}
 		}
 		err = icmp_err_convert[code].errno;
+		abt = icmp_err_convert[code].fatal;
 		break;
 	case ICMP_PARAMETERPROB:
 		err = EPROTO;
+		abt = 1;	/* fatal */
 		break;
 	case ICMP_TIME_EXCEEDED:
 		err = EHOSTUNREACH;
+		abt = 0;	/* transient */
 		break;
 	default:
 		goto done;
@@ -11894,6 +11897,28 @@ sctp_recv_err(struct sock *sk, struct sk_buff *skb)
 		   an INIT-ACK that can't get to its destination, so we don't care, just ignore it. 
 		 */
 		goto listening;
+	/* Try to be a little bit smarter about ICMP errors received while trying to form a
+	   connection.  This can speed things up or make them more reliable. */
+	if (abt && ((1 << sp->state) & (SCTPF_OPENING))) {
+		switch (sp->state) {
+		case SCTP_COOKIE_WAIT:
+			/* advance timeout */
+			printd(("INFO: truncating init timeout\n"));
+			if (sp_del_timeout(sp, &sp->timer_init))
+				sp_set_timeout(sp, &sp->timer_init, 1);
+			else
+				ptrace(("WARNING: truncating init timeout failed\n"));
+			break;
+		case SCTP_COOKIE_ECHOED:
+			/* advance timeout */
+			printd(("INFO: truncating cookie timeout\n"));
+			if (sp_del_timeout(sp, &sp->timer_cookie))
+				sp_set_timeout(sp, &sp->timer_cookie, 1);
+			else
+				ptrace(("WARNING: truncating cookie timeout failed\n"));
+			break;
+		}
+	}
 	sctp_error_report(sk, err);
 	if (sd && sd->dst_cache)
 		dst_negative_advice(&sd->dst_cache);
@@ -17035,6 +17060,7 @@ sctp_v4_rcv(struct sk_buff *skb)
 #endif				/* HAVE___XFRM_POLICY_CHECK_SYMBOL */
 #endif				/* SOCKETS */
 #ifndef SCTP_CONFIG_DISCARD_OOTB
+	icmp_send(skb, ICMP_DEST_UNREACH, ICMP_PORT_UNREACH, 0);
 	/* RFC 2960 Section 8.4 */
 	return sctp_rcv_ootb(skb);
 #endif				/* SCTP_CONFIG_DISCARD_OOTB */
