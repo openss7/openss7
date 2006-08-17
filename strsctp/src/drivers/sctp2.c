@@ -3069,7 +3069,7 @@ sctp_del_daddr(struct sctp_daddr *sd)
 				cb->daddr = NULL;
 		}
 		bufq_unlock(&sp->dupq);
-#if 0
+#if 1
 		bufq_lock(&sp->ackq);
 		for (mp = bufq_head(&sp->ackq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
