@@ -1,5 +1,5 @@
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
 # @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/07/16 12:46:22 $
@@ -284,6 +284,280 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 	    AC_DEFINE([HAVE_IP_ROUTE_OUTPUT_EXPLICIT], [1], [Define if you have the explicit
 		version of ip_route_output.])
 	fi
+    ])
+    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
+			  linux/locks.h asm/softirq.h linux/brlock.h \
+			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h \
+			  net/request_sock.h], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#if HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+#include <linux/sched.h>
+    ])
+    _LINUX_CHECK_TYPES([struct sockaddr_storage], [], [], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+    ])
+    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
+			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#if HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+#include <linux/inetdevice.h>
+    ])
+    _LINUX_CHECK_TYPES([irqreturn_t,
+			struct inet_protocol,
+			struct net_protocol], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#include <linux/time.h>		/* for struct timespec */
+#include <net/sock.h>
+#include <net/protocol.h>
+    ])
+    _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#if HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+    ])
+    _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
+			  struct inet_protocol.next,
+			  struct inet_protocol.copy,
+			  struct inet_protocol.no_policy,
+			  struct net_protocol.proto,
+			  struct net_protocol.next,
+			  struct net_protocol.no_policy,
+			  struct dst_entry.path,
+			  struct dst_entry.path], [], [], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#ifdef HAVE_NET_DST_H
+#include <net/dst.h>
+#endif
+    ])
+    _LINUX_KERNEL_SYMBOLS([module_text_address,
+			   skbuff_head_cache,
+			   icmp_err_convert,
+			   icmp_statistics,
+			   inet_bind,
+			   inet_getname,
+			   inet_ioctl,
+			   inet_multi_getname,
+			   ip_cmsg_send,
+			   ip_getsockopt,
+			   ip_route_output_flow,
+			   __ip_route_output_key,
+			   ip_rt_min_pmtu,
+			   ip_rt_mtu_expires,
+			   ip_rt_update_pmtu,
+			   ipsec_sk_policy,
+			   ip_setsockopt,
+			   snmp_get_info,
+			   socket_get_info,
+			   sysctl_ip_dynaddr,
+			   sysctl_ip_nonlocal_bind,
+			   sysctl_local_port_range,
+			   ip_frag_nqueues,
+			   ip_frag_mem,
+			   __xfrm_policy_check,
+			   xfrm_policy_delete,
+			   __xfrm_sk_clone_policy])
+    if test :"${linux_cv_have_ip_route_output:-no}" = :yes ; then
+	AC_DEFINE([HAVE_IP_ROUTE_OUTPUT], [1], [Most 2.4 kernels have
+	the function ip_route_output() defined.  Newer RH kernels (EL3) use
+	the 2.6 functions and do not provide ip_route_output().  Define this
+	macro if your kernel provides ip_route_output().])
+dnl     else
+dnl 	_LINUX_KERNEL_SYMBOL_EXPORT([ip_route_output_flow], [dnl
+dnl 	    AC_MSG_ERROR([
+dnl **** 
+dnl **** To use the package on newer kernels requires the availability of the
+dnl **** function ip_route_output_flow() to permit calling ip_route_connect()
+dnl **** which is an inline in net/route.h.  I cannot find this symbol on your
+dnl **** system and the resulting kernel module will therefore not load.
+dnl ****
+dnl 		    ])
+dnl 	])
+dnl 	_LINUX_KERNEL_SYMBOL_EXPORT([__ip_route_output_key], [dnl
+dnl 	    AC_MSG_ERROR([
+dnl **** 
+dnl **** To use the package on newer kernels requires the availability of the
+dnl **** function __ip_route_output_key() to permit calling ip_route_connect()
+dnl **** which is an inline in net/route.h.  I cannot find this symbol on your
+dnl **** system and the resulting kernel module will therefore not load.
+dnl ****
+dnl 		    ])
+dnl 	])
+    fi
+    _LINUX_KERNEL_ENV([dnl
+	if test :$linux_cv_xfrm_policy_delete_symbol = :yes ; then
+	    AC_CACHE_CHECK([for kernel xfrm_policy_delete_symbol returns int],
+			   [linux_cv_xfrm_policy_delete_returns_int], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif]],
+		    [[int retval = xfrm_policy_delete(NULL, 0);]]) ],
+		    [linux_cv_xfrm_policy_delete_returns_int='yes'],
+		    [linux_cv_xfrm_policy_delete_returns_int='no'])
+	    ])
+	    if test :$linux_cv_xfrm_policy_delete_returns_int = :yes ; then
+		AC_DEFINE([HAVE_XFRM_POLICY_DELETE_RETURNS_INT], [1], [Define if function
+			   xfrm_policy_delete returns int.])
+	    fi
+	fi
+	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments], [linux_cv_have___ip_select_ident_2_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+		[[void (*my_autoconf_function_pointer)(struct iphdr *, struct dst_entry *) = &__ip_select_ident;]]) ],
+		[linux_cv_have___ip_select_ident_2_args='yes'],
+		[linux_cv_have___ip_select_ident_2_args='no'])
+	])
+	if test :$linux_cv_have___ip_select_ident_2_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS], [1], [Define if function __ip_select_ident
+		       takes 2 arguments.])
+	fi
+	AC_CACHE_CHECK([for kernel __ip_select_ident with 3 arguments], [linux_cv_have___ip_select_ident_3_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>]],
+		[[void (*my_autoconf_function_pointer)(struct iphdr *, struct dst_entry *, int) = &__ip_select_ident;]]) ],
+		[linux_cv_have___ip_select_ident_3_args='yes'],
+		[linux_cv_have___ip_select_ident_3_args='no'])
+	])
+	if test :$linux_cv_have___ip_select_ident_3_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS], [1], [Define if function __ip_select_ident
+		       takes 3 arguments.])
+	fi
+dnl 	if test :"${linux_cv_have___ip_select_ident_2_args:-no}" = :no \
+dnl 	     -a :"${linux_cv_have___ip_select_ident_3_args:-no}" = :no
+dnl 	then
+dnl 	    AC_MSG_ERROR([
+dnl ***
+dnl *** Configure cannot determine whether your __ip_select_ident function takes
+dnl *** 2 arguments or whether it takes 3 arguments.
+dnl *** ])
+dnl 	fi
 	AC_CACHE_CHECK([for kernel sk_filter with 2 arguments], [linux_cv_have_sk_filter_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -336,6 +610,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 		       function skb_linearize takes 1 argument.])
 	fi
     ])
+    _LINUX_KERNEL_SYMBOLS([inet_proto_lock, inet_protos])
     _LINUX_CHECK_HEADERS([net/xfrm.h net/dst.h], [], [], [
 #include <linux/config.h>
 #include <linux/sysctl.h>
@@ -401,6 +676,12 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/dst.h>
 #endif
     ])
+    _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_nonlocal_bind])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_default_ttl])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
     _LINUX_KERNEL_SYMBOLS([afinet_get_info,
 			   icmp_err_convert,
 			   icmp_statistics,
@@ -989,5 +1270,5 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
