@@ -10630,6 +10630,7 @@ sctp_recv_init(struct sctp *sp, mblk_t *mp)
 				bcopy(pptr, unrec->b_wptr, PADC(plen));
 				unrec->b_wptr += PADC(plen);
 			}
+			continue;
 		}
 	}
 	/* put together cookie */
