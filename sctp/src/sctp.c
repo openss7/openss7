@@ -3321,15 +3321,15 @@ __sctp_lhash_unhash(sctp_t * sp)
 	struct sctp_hash_bucket *hp = &sctp_lhash[sctp_sp_lhashfn(sp)];
 
 	_printd(("INFO: Removing socket %p from Listen hashes\n", SCTP_SOCK(sp)));
+	write_lock(&hp->lock);
 	if (sp->lprev) {
-		write_lock(&hp->lock);
 		if ((*(sp->lprev) = sp->lnext))
 			sp->lnext->lprev = sp->lprev;
 		sp->lnext = NULL;
 		sp->lprev = NULL;
-		write_unlock(&hp->lock);
 	} else
 		swerr();
+	write_unlock(&hp->lock);
 }
 STATIC void
 __sctp_phash_unhash(sctp_t * sp)
@@ -3337,15 +3337,15 @@ __sctp_phash_unhash(sctp_t * sp)
 	struct sctp_hash_bucket *hp = &sctp_phash[sctp_sp_phashfn(sp)];
 
 	_printd(("INFO: Removing socket %p from Peer Tag hashes\n", SCTP_SOCK(sp)));
+	write_lock(&hp->lock);
 	if (sp->pprev) {
-		write_lock(&hp->lock);
 		if ((*(sp->pprev) = sp->pnext))
 			sp->pnext->pprev = sp->pprev;
 		sp->pnext = NULL;
 		sp->pprev = NULL;
-		write_unlock(&hp->lock);
 	} else
 		swerr();
+	write_unlock(&hp->lock);
 }
 STATIC void
 __sctp_vhash_unhash(sctp_t * sp)
@@ -3353,8 +3353,8 @@ __sctp_vhash_unhash(sctp_t * sp)
 	struct sctp_hash_bucket *hp = &sctp_vhash[sctp_sp_vhashfn(sp)];
 
 	_printd(("INFO: Removing socket %p from Verification Tag hashes\n", SCTP_SOCK(sp)));
+	write_lock(&hp->lock);
 	if (sp->vprev) {
-		write_lock(&hp->lock);
 		if ((*(sp->vprev) = sp->vnext))
 			sp->vnext->vprev = sp->vprev;
 		sp->vnext = NULL;
@@ -3362,9 +3362,9 @@ __sctp_vhash_unhash(sctp_t * sp)
 		if (sctp_cache[sp->hashent].list == sp)
 			sctp_cache[sp->hashent].list = NULL;
 		sp->hashent = 0;
-		write_unlock(&hp->lock);
 	} else
 		swerr();
+	write_unlock(&hp->lock);
 }
 STATIC void
 __sctp_thash_unhash(sctp_t * sp)
@@ -3372,15 +3372,15 @@ __sctp_thash_unhash(sctp_t * sp)
 	struct sctp_hash_bucket *hp = &sctp_thash[sctp_sp_thashfn(sp)];
 
 	_printd(("INFO: Removing socket %p from TCB hashes\n", SCTP_SOCK(sp)));
+	write_lock(&hp->lock);
 	if (sp->tprev) {
-		write_lock(&hp->lock);
 		if ((*(sp->tprev) = sp->tnext))
 			sp->tnext->tprev = sp->tprev;
 		sp->tnext = NULL;
 		sp->tprev = NULL;
-		write_unlock(&hp->lock);
 	} else
 		swerr();
+	write_unlock(&hp->lock);
 }
 STATIC void
 __sctp_bindb_get(unsigned short snum)
@@ -3751,12 +3751,12 @@ sctp_lookup_listen(uint16_t dport, uint32_t daddr)
 			result = sp;
 		}
 	}
+	if (result)
+		sctp_hold(result);
 	read_unlock(&hp->lock);
 	usual(result);
-	if (result) {
-		sctp_hold(result);
+	if (result)
 		return SCTP_SOCK(result);
-	}
 	return NULL;
 }
 
@@ -3821,12 +3821,12 @@ sctp_lookup_bind(uint16_t dport, uint32_t daddr)
 			}
 		}
 	}
+	if (result)
+		sctp_hold(result);
 	read_unlock(&hp->lock);
 	usual(result);
-	if (result) {
-		sctp_hold(result);
+	if (result)
 		return SCTP_SOCK(result);
-	}
 	return NULL;
 }
 
@@ -3859,11 +3859,11 @@ sctp_lookup_tcb(uint16_t sport, uint16_t dport, uint32_t saddr, uint32_t daddr)
 	for (sp = hp->list; sp; sp = sp->tnext)
 		if (sctp_match_tcb(SCTP_SOCK(sp), saddr, daddr, sport, dport))
 			break;
-	read_unlock(&hp->lock);
-	if (sp) {
+	if (sp)
 		sctp_hold(sp);
+	read_unlock(&hp->lock);
+	if (sp)
 		return SCTP_SOCK(sp);
-	}
 	return NULL;
 }
 
@@ -3912,11 +3912,11 @@ sctp_lookup_ptag(uint32_t p_tag, uint16_t sport, uint16_t dport, uint32_t saddr,
 	for (sp = hp->list; sp; sp = sp->pnext)
 		if (sctp_match_ptag(SCTP_SOCK(sp), saddr, daddr, p_tag, sport, dport))
 			break;
-	read_unlock(&hp->lock);
-	if (sp) {
+	if (sp)
 		sctp_hold(sp);
+	read_unlock(&hp->lock);
+	if (sp)
 		return SCTP_SOCK(sp);
-	}
 	return NULL;
 }
 
@@ -3969,11 +3969,11 @@ sctp_lookup_vtag(uint32_t v_tag, uint16_t sport, uint16_t dport, uint32_t saddr,
 				break;
 			}
 	}
-	read_unlock(&hp->lock);
-	if (sp) {
+	if (sp)
 		sctp_hold(sp);
+	read_unlock(&hp->lock);
+	if (sp)
 		return SCTP_SOCK(sp);
-	}
 	return NULL;
 }
 
@@ -6615,10 +6615,10 @@ sctp_init_timeout(unsigned long data)
 	sp_set_timeout(sp, &sp->timer_init, sd->rto);
 	normal(sp->retry);
 	sctp_send_msg(sk, sd, sp->retry);
+	goto done;
       done:
-	sock_put(sk);
-      unlock:
 	bh_unlock_sock(sk);
+	sock_put(sk);
 	return;
       timedout:
 	ptrace(("WARNING: association timed out\n"));
@@ -6629,7 +6629,8 @@ sctp_init_timeout(unsigned long data)
 	goto done;
       cancelled:
 	ptrace(("WARNING: timer cancelled\n"));
-	goto unlock;
+	bh_unlock_sock(sk);
+	return;
       outstate:
 	ptrace(("WARNING: timeout in incorrect state\n"));
 	goto done;
@@ -6681,9 +6682,8 @@ sctp_cookie_timeout(unsigned long data)
 	normal(sp->retry);
 	sctp_send_msg(sk, sd, sp->retry);
       done:
-	sock_put(sk);
-      unlock:
 	bh_unlock_sock(sk);
+	sock_put(sk);
 	return;
       timedout:
 	ptrace(("WARNING: association timed out\n"));
@@ -6694,7 +6694,8 @@ sctp_cookie_timeout(unsigned long data)
 	goto done;
       cancelled:
 	ptrace(("WARNING: timer cancelled\n"));
-	goto unlock;
+	bh_unlock_sock(sk);
+	return;
       outstate:
 	ptrace(("WARNING: timeout in incorrect state\n"));
 	goto done;
@@ -6772,9 +6773,8 @@ sctp_retrans_timeout(unsigned long data)
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 	sctp_transmit_wakeup(sk);
       done:
-	sctp_dput((struct sctp_daddr *) data);
-      unlock:
 	bh_unlock_sock(sk);
+	sctp_dput((struct sctp_daddr *) data);
 	return;
       timedout:
 	ptrace(("WARNING: association timed out\n"));
@@ -6785,7 +6785,8 @@ sctp_retrans_timeout(unsigned long data)
 	goto done;
       cancelled:
 	ptrace(("WARNING: timer cancelled\n"));
-	goto unlock;
+	bh_unlock_sock(sk);
+	return;
       outstate:
 	ptrace(("WARNING: timeout in incorrect state\n"));
 	goto done;
@@ -6815,9 +6816,8 @@ sctp_sack_timeout(unsigned long data)
 	sp->sackf |= SCTP_SACKF_TIM;	/* RFC 2960 6.2 */
 	sctp_transmit_wakeup(sk);
       done:
-	sock_put(sk);
-      unlock:
 	bh_unlock_sock(sk);
+	sock_put(sk);
 	return;
       locked:
 	ptrace(("WARNING: hit locks\n"));
@@ -6825,7 +6825,8 @@ sctp_sack_timeout(unsigned long data)
 	goto done;
       cancelled:
 	ptrace(("WARNING: timer cancelled\n"));
-	goto unlock;
+	bh_unlock_sock(sk);
+	return;
       outstate:
 	ptrace(("WARNING: timeout in incorrect state\n"));
 	goto done;
@@ -6861,9 +6862,8 @@ sctp_idle_timeout(unsigned long data)
 		goto outstate;
 	sctp_send_heartbeat(sk, sd);
       done:
-	sctp_dput((struct sctp_daddr *) data);
-      unlock:
 	bh_unlock_sock(sk);
+	sctp_dput((struct sctp_daddr *) data);
 	return;
       locked:
 	ptrace(("WARNING: hit locks\n"));
@@ -6871,7 +6871,8 @@ sctp_idle_timeout(unsigned long data)
 	goto done;
       cancelled:
 	ptrace(("WARNING: timer cancelled\n"));
-	goto unlock;
+	bh_unlock_sock(sk);
+	return;
       outstate:
 	ptrace(("WARNING: timeout in incorrect state\n"));
 	goto done;
@@ -6913,9 +6914,8 @@ sctp_heartbeat_timeout(unsigned long data)
 	sctp_send_heartbeat(sk, sd);
 #endif
       done:
-	sctp_dput((struct sctp_daddr *) data);
-      unlock:
 	bh_unlock_sock(sk);
+	sctp_dput((struct sctp_daddr *) data);
 	return;
       timedout:
 	ptrace(("WARNING: association timed out\n"));
@@ -6926,7 +6926,8 @@ sctp_heartbeat_timeout(unsigned long data)
 	goto done;
       cancelled:
 	ptrace(("WARNING: timer cancelled\n"));
-	goto unlock;
+	bh_unlock_sock(sk);
+	return;
       outstate:
 	ptrace(("WARNING: timeout in incorrect state\n"));
 	goto done;
@@ -6963,9 +6964,8 @@ sctp_shutdown_timeout(unsigned long data)
 	normal(sp->retry);
 	sctp_send_msg(sk, sd, sp->retry);
       done:
-	sock_put(sk);
-      unlock:
 	bh_unlock_sock(sk);
+	sock_put(sk);
 	return;
       timedout:
 	ptrace(("WARNING: association timed out\n"));
@@ -6976,7 +6976,8 @@ sctp_shutdown_timeout(unsigned long data)
 	goto done;
       cancelled:
 	ptrace(("WARNING: timer cancelled\n"));
-	goto unlock;
+	bh_unlock_sock(sk);
+	return;
       outstate:
 	ptrace(("WARNING: timeout in incorrect state\n"));
 	goto done;
@@ -7011,9 +7012,8 @@ sctp_guard_timeout(unsigned long data)
 		sctp_abort(sk, SCTP_ORIG_PROVIDER, err);
 	}
       done:
-	sock_put(sk);
-      unlock:
 	bh_unlock_sock(sk);
+	sock_put(sk);
 	return;
       locked:
 	ptrace(("WARNING: hit locks\n"));
@@ -7021,7 +7021,8 @@ sctp_guard_timeout(unsigned long data)
 	goto done;
       cancelled:
 	ptrace(("WARNING: timer cancelled\n"));
-	goto unlock;
+	bh_unlock_sock(sk);
+	return;
       outstate:
 	ptrace(("WARNING: timeout in incorrect state\n"));
 	goto done;
@@ -7061,9 +7062,8 @@ sctp_asconf_timeout(unsigned long data)
 	normal(sp->retry);
 	sctp_send_msg(sk, sd, sp->retry);
       done:
-	sock_put(sk);
-      unlock:
 	bh_unlock_sock(sk);
+	sock_put(sk);
 	return;
       noroute:
 	ptrace(("WARNING: no route\n"));
@@ -7077,7 +7077,8 @@ sctp_asconf_timeout(unsigned long data)
 	goto done;
       cancelled:
 	ptrace(("WARNING: timer cancelled\n"));
-	goto unlock;
+	bh_unlock_sock(sk);
+	return;
       outstate:
 	ptrace(("WARNING: timeout in incorrect state\n"));
 	goto done;
@@ -7213,9 +7214,8 @@ sctp_life_timeout(unsigned long data)
 	}
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
       done:
-	sock_put(sk);
-      unlock:
 	bh_unlock_sock(sk);
+	sock_put(sk);
 	return;
       nocaps:
 	ptrace(("WARNING: no capabilities\n"));
@@ -7226,7 +7226,8 @@ sctp_life_timeout(unsigned long data)
 	goto done;
       cancelled:
 	ptrace(("WARNING: timer cancelled\n"));
-	goto unlock;
+	bh_unlock_sock(sk);
+	return;
       outstate:
 	ptrace(("WARNING: timeout in incorrect state\n"));
 	goto done;
