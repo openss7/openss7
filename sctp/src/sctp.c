@@ -4420,7 +4420,7 @@ sctp_choose_best(sctp_t * sp)
 #endif				/* defined(SCTP_CONFIG_DEBUG) &&
 				   defined(SCTP_CONFIG_ERROR_GENERATOR) */
 STATIC INLINE int
-dst_check(struct dst_entry **dstp)
+my_dst_check(struct dst_entry **dstp)
 {
 	struct dst_entry *dst;
 
@@ -4467,22 +4467,17 @@ sctp_update_routes(struct sock *sk, int force_reselect)
 		printd(("INFO: Checking socket %p route for %d.%d.%d.%d\n", sk,
 			(sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
 			(sd->daddr >> 24) & 0xff));
-		if (!sd->dst_cache || (sd->dst_cache->obsolete && !dst_check(&sd->dst_cache))) {
+		if (!sd->dst_cache || (sd->dst_cache->obsolete && !my_dst_check(&sd->dst_cache))) {
 			rt = NULL;
 			sd->saddr = 0;
 			route_changed = 1;
 			/* try wildcard saddr and dif routing */
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
+#if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sk), 0);
 #else
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
-			err =
-			    ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sk), 0, IPPROTO_SCTP,
-					     sk->sport, sk->dport, NULL);
-#else				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
-#error One of HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL or HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY must be defined.
+			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sk), 0,
+					       IPPROTO_SCTP, sk->sport, sk->dport, NULL);
 #endif
-#endif				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 			if (err < 0 || !rt || rt->u.dst.obsolete) {
 				rare();
 				if (rt)
@@ -4545,17 +4540,12 @@ sctp_update_routes(struct sock *sk, int force_reselect)
 			/* see if route changed on primary as result of INIT that was discarded */
 			struct rtable *rt2 = NULL;
 
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
+#if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sk), sd->dif))
 #else
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
-			if (!ip_route_connect
-			    (&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sk), sd->dif, IPPROTO_SCTP,
-			     sk->sport, sk->dport, NULL))
-#else				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
-#error One of HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL or HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY must be defined.
+			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sk), sd->dif,
+					      IPPROTO_SCTP, sk->sport, sk->dport, NULL))
 #endif
-#endif				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 			{
 				if (rt2->rt_src != rt->rt_src) {
 					rare();
@@ -4801,7 +4791,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, struct sk_buff *skb, struct sock *
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 			iph->ttl = ip->uc_ttl;
 #endif
-#endif				/* defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 			iph->daddr = rt->rt_dst;
 			iph->saddr = saddr;
 			iph->protocol = sk->protocol;
@@ -12872,7 +12862,7 @@ sctp_data_req(struct sock *sk, uint32_t ppi, uint16_t sid, uint ord, uint more, 
 STATIC int sctp_port_rover = 0;
 
 /* FIXME: the following should be done in the hooks file. */
-#ifdef sysctl_local_port_range
+#ifdef HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
 extern int sysctl_local_port_range[2];
 #else				/* sysctl_local_port_range */
 STATIC int sysctl_local_port_range[2] = { 1024, 4999 };
@@ -17005,16 +16995,14 @@ sctp_v4_rcv(struct sk_buff *skb)
 #if SOCKETS
 	/* TODO: We have no easy way of performing IPSEC security under STREAMS, so we leave this
 	   out for the moment.  Below is the sockets version. */
-#if defined HAVE_IPSEC_SK_POLICY_EXPORT || defined HAVE_IPSEC_SK_POLICY_ADDR
+#ifdef HAVE_IPSEC_SK_POLICY_SYMBOL
 	if (!ipsec_sk_policy(sk, skb))
 		goto failed_security;
-#endif				/* defined HAVE_IPSEC_SK_POLICY_EXPORT || defined
-				   HAVE_IPSEC_SK_POLICY_ADDR */
-#if defined HAVE___XFRM_POLICY_CHECK_EXPORT || defined HAVE___XFRM_POLICY_CHECK_ADDR
+#endif				/* HAVE_IPSEC_SK_POLICY_SYMBOL */
+#ifdef HAVE___XFRM_POLICY_CHECK_SYMBOL
 	if (!xfrm4_policy_check(sk, XFRM_POLICY_IN, skb))
 		goto failed_security;
-#endif				/* defined HAVE___XFRM_POLICY_CHECK_EXPORT || defined
-				   HAVE___XFRM_POLICY_CHECK_ADDR */
+#endif				/* HAVE___XFRM_POLICY_CHECK_SYMBOL */
 #endif				/* SOCKETS */
 	skb->dev = NULL;
 	if (sock_locked(sk))
@@ -17046,11 +17034,10 @@ sctp_v4_rcv(struct sk_buff *skb)
 	SCTP_INC_STATS_BH(SctpOutOfBlues);
 #if SOCKETS
 	/* Another IPSEC policy check that we cannot perform on STREAMS yet. */
-#if defined HAVE___XFRM_POLICY_CHECK_EXPORT || defined HAVE___XFRM_POLICY_CHECK_ADDR
+#ifdef HAVE___XFRM_POLICY_CHECK_SYMBOL
 	if (!xfrm4_policy_check(NULL, XFRM_POLICY_IN, skb))
 		goto discard_it;
-#endif				/* defined HAVE___XFRM_POLICY_CHECK_EXPORT || defined
-				   HAVE___XFRM_POLICY_CHECK_ADDR */
+#endif				/* HAVE___XFRM_POLICY_CHECK_SYMBOL */
 #endif				/* SOCKETS */
 #ifndef SCTP_CONFIG_DISCARD_OOTB
 	/* RFC 2960 Section 8.4 */
@@ -17672,10 +17659,10 @@ struct proto_ops inet_sctp_ops = {
 	.connect = &inet_stream_connect,
 	.socketpair = &sock_no_socketpair,
 	.accept = &inet_accept,
-#if defined(HAVE_INET_MULTI_GETNAME_EXPORT) || defined (HAVE_INET_MULTI_GETNAME_ADDR)
+#ifdef HAVE_INET_MULTI_GETNAME_SYMBOL
 	.getname = &inet_multi_getname,
 #endif
-#if defined(HAVE_INET_GETNAME_EXPORT) || defined (HAVE_INET_GETNAME_ADDR)
+#ifdef HAVE_INET_GETNAME_SYMBOL
 	.getname = &inet_getname,
 #endif
 	.poll = &sctp_poll,
