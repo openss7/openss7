@@ -9867,7 +9867,10 @@ sctp_recv_abort_listening(struct sock *sk, struct sk_buff *skb)
 		struct sctp_cookie *ck = (typeof(ck)) ce->cookie;
 
 		if (ck->v_tag == sh->v_tag && ck->sport == sh->dest && ck->dport == sh->srce
-		    && ck->saddr == iph->daddr && ck->daddr == iph->saddr) {
+#if 0
+		    && ck->saddr == iph->daddr && ck->daddr == iph->saddr
+#endif
+		    ) {
 			int err;
 
 			/* FIXME: the reasons -ECONNRESET is only if there is no cause value in the 
