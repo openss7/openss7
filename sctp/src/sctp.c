@@ -8610,12 +8610,12 @@ sctp_rtt_calc(struct sctp_daddr *sd, unsigned long time)
 			sd->srtt += (rtt - sd->srtt) >> 3;
 		} else {
 			rttvar = sd->srtt - rtt;
-			sd->srtt -= (sd->srtt - rtt) >> 3;
+			sd->srtt += (sd->srtt - rtt) >> 3;
 		}
 		if (rttvar > sd->rttvar)
 			sd->rttvar += (rttvar - sd->rttvar) >> 2;
 		else
-			sd->rttvar -= (sd->rttvar - rttvar) >> 2;
+			sd->rttvar += (sd->rttvar - rttvar) >> 2;
 		sd->rto = sd->srtt + (sd->rttvar << 2);
 	} else {
 		/* RFC 2960 6.3.1 (C2) */
