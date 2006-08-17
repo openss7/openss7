@@ -12155,6 +12155,8 @@ sctp_reset(struct sock *sk)
 	sp->retransmits = 0;
 	sp->n_istr = 0;
 	sp->n_ostr = 0;
+	sp->p_caps = 0;
+	sp->p_ali = 0;
 	sp->v_tag = 0;
 	sp->p_tag = 0;
 	sp->p_rwnd = 0;
