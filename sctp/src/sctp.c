@@ -4713,9 +4713,20 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, struct sk_buff *skb)
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
 			__ip_select_ident(iph, &rt->u.dst);
+#if STREAMS
 			/* For sockets the passed in sk_buff represents a single packet.  For
 			   STREAMS, the passed in mblk_t pointer is possibly a message buffer chain
 			   and we must iterate along the b_cont pointer. */
+			for (bp = mp; bp; bp = bp->b_cont) {
+				int blen = bp->b_wptr - bp->b_rptr;
+
+				if (blen > 0) {
+					bcopy(bp->b_rptr, data, blen);
+					data += blen;
+				} else
+					rare();
+			}
+#endif
 			/* TODO:- For STREAMS it would be better to combine copying the buffer
 			   segments above with performing the checking below.  */
 			sh->check = 0;
@@ -4917,7 +4928,7 @@ sctp_send_msg(struct sock *sk, struct sctp_daddr *sd, struct sk_buff *skc)
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 		iph->ttl = ip->uc_ttl;
 #endif
-#endif				/* defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 		iph->daddr = sd->daddr;	/* XXX */
 		iph->saddr = sd->saddr;
 		iph->protocol = sk->protocol;
@@ -5210,10 +5221,12 @@ sctp_bundle_sack(struct sock *sk,	/* association */
 
 #ifdef SCTP_CONFIG_ECN
 	struct sctp_ecne *e;
-	size_t elen = ((sp->sackf & SCTP_SACKF_ECN) ? sizeof(*e) : 0);
+	size_t elen;
 #endif				/* SCTP_CONFIG_ECN */
+
 	assert(sk);
 #ifdef SCTP_CONFIG_ECN
+	elen = ((sp->sackf & SCTP_SACKF_ECN) ? sizeof(*e) : 0);
 	plen += PADC(elen);
 #endif				/* SCTP_CONFIG_ECN */
 	if ((1 << sk->state) & ~(SCTPF_RECEIVING))
@@ -5239,11 +5252,11 @@ sctp_bundle_sack(struct sock *sk,	/* association */
 	if (!(skb = sctp_alloc_chk(sk, clen, plen)))
 		goto enobufs;
 	{
+		size_t arwnd = sp->a_rwnd;
 		sctp_tcb_t *gap = sp->gaps;
 		sctp_tcb_t *dup = sp->dups;
 		sctp_tcb_t *tcb = SCTP_SKB_CB(skb);
 		unsigned char *b_wptr = skb_put(skb, plen);
-		size_t arwnd = sp->a_rwnd;
 
 		/* For sockets, socket buffer management maintaines the sp->a_rwnd value at the
 		   current available receive window. For STREAMS, sp->a_rwnd is the maximum
@@ -5279,7 +5292,7 @@ sctp_bundle_sack(struct sock *sk,	/* association */
 			e->ch.len = __constant_htons(sizeof(*e));
 			e->l_tsn = htonl(sp->l_lsn);
 			SCTP_INC_STATS(SctpOutCtrlChunks);
-			printd(("INFO: Bundled ECNE chunk.\n"));
+			_printd(("INFO: Bundled ECNE chunk.\n"));
 		}
 #endif				/* SCTP_CONFIG_ECN */
 		sp->sackf &= ~SCTP_SACKF_ANY;
@@ -5290,7 +5303,7 @@ sctp_bundle_sack(struct sock *sk,	/* association */
 		ckp->dpp = &(tcb->next);
 		tcb->next = NULL;
 		SCTP_INC_STATS(SctpOutCtrlChunks);
-		printd(("INFO: Bundled SACK chunk.\n"));
+		_printd(("INFO: Bundled SACK chunk.\n"));
 		return (0);
 	}
       enobufs:
@@ -5386,7 +5399,7 @@ sctp_bundle_fsn(struct sock *sk,	/* association */
 		ckp->dpp = &tcb->next;
 		tcb->next = NULL;
 		SCTP_INC_STATS(SctpOutCtrlChunks);
-		printd(("INFO: Bundled FORWARD-TSN chunk.\n"));
+		_printd(("INFO: Bundled FORWARD-TSN chunk.\n"));
 		return (0);
 	}
       enobufs:
@@ -5440,7 +5453,7 @@ sctp_bundle_cwr(struct sock *sk,	/* association */
 		ckp->dpp = &tcb->next;
 		tcb->next = NULL;
 		SCTP_INC_STATS(SctpOutCtrlChunks);
-		printd(("INFO: Bundled CWR chunk.\n"));
+		_printd(("INFO: Bundled CWR chunk.\n"));
 		return (0);
 	}
       enobufs:
@@ -6492,7 +6505,7 @@ sctp_retr_ind(struct sock *sk, struct sk_buff *dp)
 STATIC INLINE int
 sctp_retr_con(struct sock *sk)
 {
-	printd(("%p: X_RETRV_CON -> \n", sk));
+	_printd(("%p: X_RETRV_CON -> \n", sk));
 	assert(sk);
 	if (!sk->dead || sk->socket) {
 		sctp_t *sp = SCTP_PROT(sk);
@@ -6613,7 +6626,7 @@ sctp_init_timeout(unsigned long data)
 	sd = sp->taddr;		/* might have new primary */
 	ensure(sd, goto done);
 	sp_set_timeout(sp, &sp->timer_init, sd->rto);
-	normal(sp->retry);
+	usual(sp->retry);
 	sctp_send_msg(sk, sd, sp->retry);
 	goto done;
       done:
@@ -6739,8 +6752,8 @@ sctp_retrans_timeout(unsigned long data)
 		size_t dlen = cb->dlen;
 
 		if (cb->daddr == sd && (cb->flags & SCTPCB_FLAG_SENT)
-		    && !(cb->
-			 flags & (SCTPCB_FLAG_RETRANS | SCTPCB_FLAG_SACKED | SCTPCB_FLAG_DROPPED)))
+		    && !(cb->flags & (SCTPCB_FLAG_RETRANS
+				      | SCTPCB_FLAG_SACKED | SCTPCB_FLAG_DROPPED)))
 		{
 			cb->flags |= SCTPCB_FLAG_RETRANS;
 			sp->nrtxs++;
@@ -7624,14 +7637,17 @@ sctp_send_cookie_ack(struct sock *sk, struct sk_buff *cp)
 	m->ch.len = __constant_htons(clen);
 	SCTP_INC_STATS(SctpOutCtrlChunks);
 	printd(("Sending COOKIE-ACK from socket %p\n", sk));
+#if SOCKETS
 	/* process data bundled with cookie echo on new socket */
 	if (sctp_return_more(cp) > 0) {
 		sctp_recv_msg(sk, skb_get(cp));
 		if (sk->state != SCTP_ESTABLISHED)
 			goto done;
 	}
+#endif
 	sctp_bundle_more(sk, sd, skb, 1);	/* don't nagle */
 	sctp_send_msg(sk, sd, skb);
+	goto done;
       done:
 	freechunks(skb);
       enobufs:
@@ -8060,7 +8076,7 @@ sctp_send_asconf(struct sock *sk)
 	size_t clen = sizeof(*m);
 	struct sctp_saddr *ss;
 	int requested = 0;
-	unsigned char *ptr;
+	unsigned char *b_wptr;
 
 	if (sk->state != SCTP_ESTABLISHED)
 		goto skip;
@@ -8101,15 +8117,15 @@ sctp_send_asconf(struct sock *sk)
 	m->ch.len = htons(clen);
 	/* ADD-IP 4.1 (A2) */
 	m->asn = htonl(++sp->l_asn);
-	ptr = (unsigned char *) (m + 1);
+	b_wptr = (unsigned char *) (m + 1);
 	for (ss = sp->saddr; ss; ss = ss->next) {
 		if (sp->p_caps & SCTP_CAPS_ADD_IP) {
 			if (ss->flags & SCTP_SRCEF_ADD_REQUEST) {
-				a = ((typeof(a)) ptr)++;
+				a = ((typeof(a)) b_wptr)++;
 				a->ph.type = SCTP_PTYPE_ADD_IP;
 				a->ph.len = __constant_htons(sizeof(*a) + sizeof(*p));
 				a->id = htonl((uint32_t) ss);
-				p = ((typeof(p)) ptr)++;
+				p = ((typeof(p)) b_wptr)++;
 				p->ph.type = SCTP_PTYPE_IPV4_ADDR;
 				p->ph.len = __constant_htons(sizeof(*p));
 				p->addr = htonl(ss->saddr);
@@ -8117,11 +8133,11 @@ sctp_send_asconf(struct sock *sk)
 				ss->flags |= SCTP_SRCEF_ADD_PENDING;
 			}
 			if (ss->flags & SCTP_SRCEF_DEL_REQUEST) {
-				d = ((typeof(d)) ptr)++;
+				d = ((typeof(d)) b_wptr)++;
 				d->ph.type = SCTP_PTYPE_DEL_IP;
 				d->ph.len = __constant_htons(sizeof(*d) + sizeof(*p));
 				d->id = htonl((uint32_t) ss);
-				p = ((typeof(p)) ptr)++;
+				p = ((typeof(p)) b_wptr)++;
 				p->ph.type = SCTP_PTYPE_IPV4_ADDR;
 				p->ph.len = __constant_htons(sizeof(*p));
 				p->addr = htonl(ss->saddr);
@@ -8131,11 +8147,11 @@ sctp_send_asconf(struct sock *sk)
 		}
 		if (sp->p_caps & SCTP_CAPS_SET_IP) {
 			if (ss->flags & SCTP_SRCEF_SET_REQUEST) {
-				s = ((typeof(s)) ptr)++;
+				s = ((typeof(s)) b_wptr)++;
 				s->ph.type = SCTP_PTYPE_SET_IP;
 				s->ph.len = __constant_htons(sizeof(*s) + sizeof(*p));
 				s->id = htonl((uint32_t) ss);
-				p = ((typeof(p)) ptr)++;
+				p = ((typeof(p)) b_wptr)++;
 				p->ph.type = SCTP_PTYPE_IPV4_ADDR;
 				p->ph.len = __constant_htons(sizeof(*p));
 				p->addr = htonl(ss->saddr);
@@ -12321,8 +12337,7 @@ sctp_abort(struct sock *sk, ulong origin, long reason)
  */
 STATIC int sctp_get_port(struct sock *sk, unsigned short port);
 STATIC int
-sctp_conn_req(struct sock *sk, uint16_t dport, struct sockaddr_in *dsin, size_t dnum,
-	      struct sk_buff *dp)
+sctp_conn_req(struct sock *sk, uint16_t dport, struct sockaddr_in *dsin, size_t dnum, struct sk_buff *dp)
 {
 	sctp_t *sp = SCTP_PROT(sk);
 	int err;
@@ -16911,7 +16926,7 @@ sctp_free(caddr_t data)
 }
 #endif				/* STREAMS */
 
-__SCTP_STATIC int
+STATIC int
 sctp_v4_rcv(struct sk_buff *skb)
 {
 	int ret = 0;
@@ -17007,7 +17022,7 @@ sctp_v4_rcv(struct sk_buff *skb)
 	else
 		ret = sctp_backlog_rcv(sk, skb);
 	/* all done */
-	_printd(("%s: skb %p put to socket %p\n", __FUNCTION__, skb, sk));
+	printd(("%s: skb %p put to socket %p\n", __FUNCTION__, skb, sk));
 	bh_unlock_sock(sk);
 	sock_put(sk);
 	return (ret);
