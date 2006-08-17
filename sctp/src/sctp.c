@@ -3280,7 +3280,7 @@ __sctp_vhash_insert(sctp_t * sp)
 
 	_printd(("INFO: Adding socket %p to Verification Tag hashes\n", SCTP_SOCK(sp)));
 	write_lock(&hp->lock);
-	if (!sp->pprev) {
+	if (!sp->vprev) {
 		if ((sp->vnext = hp->list))
 			sp->vnext->vprev = &sp->vnext;
 		sp->vprev = &hp->list;
