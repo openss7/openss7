@@ -2191,7 +2191,6 @@ sctp_get(void)
 	sctp_t *sp;
 
 	if ((sp = kmem_cache_alloc(sctp_sctp_cachep, SLAB_ATOMIC))) {
-		MOD_INC_USE_COUNT;
 		bzero(sp, sizeof(*sp));
 		atomic_set(&sp->refcnt, 1);
 	}
@@ -2217,7 +2216,6 @@ sctp_dget(void)
 	struct sctp_daddr *sd;
 
 	if ((sd = kmem_cache_alloc(sctp_dest_cachep, SLAB_ATOMIC))) {
-		MOD_INC_USE_COUNT;
 		bzero(sd, sizeof(*sd));
 		atomic_set(&sd->refcnt, 1);
 	}
@@ -2240,7 +2238,6 @@ sctp_dput(struct sctp_daddr *sd)
 				 (sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff,
 				 (sd->daddr >> 16) & 0xff, (sd->daddr >> 24) & 0xff, sp));
 			kmem_cache_free(sctp_dest_cachep, sd);
-			MOD_DEC_USE_COUNT;
 			sctp_put(sp);
 		}
 }
