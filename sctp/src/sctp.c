@@ -6784,10 +6784,10 @@ sctp_send_forward_tsn(struct sock *sk)
 STATIC void
 sctp_retrans_timeout(unsigned long data)
 {
-	struct sctp_daddr *sd = (struct sctp_daddr *) data;
-	sctp_t *sp;
 	struct sock *sk;
 	struct sk_buff *skb;
+	sctp_t *sp;
+	struct sctp_daddr *sd = (typeof(sd)) data;
 	int retransmits = 0;
 
 	ensure(sd, return);
@@ -6799,7 +6799,7 @@ sctp_retrans_timeout(unsigned long data)
 		goto cancelled;
 	if (sock_locked(sk))
 		goto locked;
-	if (!((1 << sk->state) & (SCTPF_CONNECTED)))
+	if ((1 << sk->state) & ~(SCTPF_CONNECTED))
 		goto outstate;
 	if (sctp_assoc_timedout(sk, sd, sp->max_retrans ? sp->max_retrans : 1, sp->p_rwnd))
 		goto timedout;
@@ -8147,7 +8147,7 @@ sctp_send_asconf(struct sock *sk)
 				a = (typeof(a)) b_wptr;
 				a->ph.type = SCTP_PTYPE_ADD_IP;
 				a->ph.len = __constant_htons(sizeof(*a) + sizeof(*p));
-				a->id = htonl((uint32_t) ss);
+				a->id = htonl((uint32_t) (long) ss);
 				b_wptr += sizeof(*a);
 				p = (typeof(p)) b_wptr;
 				p->ph.type = SCTP_PTYPE_IPV4_ADDR;
@@ -8161,7 +8161,7 @@ sctp_send_asconf(struct sock *sk)
 				d = (typeof(d)) b_wptr;
 				d->ph.type = SCTP_PTYPE_DEL_IP;
 				d->ph.len = __constant_htons(sizeof(*d) + sizeof(*p));
-				d->id = htonl((uint32_t) ss);
+				d->id = htonl((uint32_t) (long) ss);
 				b_wptr += sizeof(*d);
 				p = (typeof(p)) b_wptr;
 				p->ph.type = SCTP_PTYPE_IPV4_ADDR;
@@ -8177,7 +8177,7 @@ sctp_send_asconf(struct sock *sk)
 				s = (typeof(s)) b_wptr;
 				s->ph.type = SCTP_PTYPE_SET_IP;
 				s->ph.len = __constant_htons(sizeof(*s) + sizeof(*p));
-				s->id = htonl((uint32_t) ss);
+				s->id = htonl((uint32_t) (long) ss);
 				b_wptr += sizeof(*s);
 				p = (typeof(p)) b_wptr;
 				p->ph.type = SCTP_PTYPE_IPV4_ADDR;
@@ -11456,7 +11456,8 @@ sctp_recv_asconf_ack(struct sock *sk, struct sk_buff *skb)
 		unsigned char *pptr = (unsigned char *) (m + 1);
 		unsigned char *pend = pptr + ntohs(m->ch.len) - sizeof(*m);
 		size_t plen;
-		struct sctp_saddr *ss, *s2;
+		struct sctp_saddr *ss;
+		uint32_t s2;
 
 		/* process the ASCONF chunk */
 		for (ph = (union sctp_parm *) pptr;
@@ -11471,7 +11472,8 @@ sctp_recv_asconf_ack(struct sock *sk, struct sk_buff *skb)
 				if (plen != sizeof(ph->error_cause))
 					goto bad_parm;
 				s2 = (typeof(s2)) ntohl(ph->error_cause.cid);
-				for (ss = sp->saddr; ss && ss != s2; ss = ss->next) ;
+				for (ss = sp->saddr; ss && (uint32_t) (long) ss != s2;
+				     ss = ss->next) ;
 				if (!ss)
 					goto bad_parm;
 				if (ss->flags & SCTP_SRCEF_ADD_PENDING) {
@@ -11491,7 +11493,8 @@ sctp_recv_asconf_ack(struct sock *sk, struct sk_buff *skb)
 				if (plen != sizeof(ph->success_report))
 					goto bad_parm;
 				s2 = (typeof(s2)) ntohl(ph->success_report.cid);
-				for (ss = sp->saddr; ss && ss != s2; ss = ss->next) ;
+				for (ss = sp->saddr; ss && (uint32_t) (long) ss != s2;
+				     ss = ss->next) ;
 				if (!ss)
 					goto bad_parm;
 				if (ss->flags & SCTP_SRCEF_ADD_PENDING) {
