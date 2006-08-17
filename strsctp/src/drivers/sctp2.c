@@ -5684,9 +5684,9 @@ sctp_bundle_sack(struct sctp *sp,	/* association */
 	if (!(mp = sctp_alloc_chk(sp, clen, plen)))
 		goto enobufs;
 	{
+		size_t arwnd = sp->a_rwnd;
 		sctp_tcb_t *gap = sp->gaps;
 		sctp_tcb_t *dup = sp->dups;
-		size_t arwnd = sp->a_rwnd;
 
 		/* For sockets, socket buffer management maintaines the sp->a_rwnd value at the
 		   current available receive window. For STREAMS, sp->a_rwnd is the maximum
@@ -9142,7 +9142,7 @@ sctp_rtt_calc(struct sctp_daddr *sd, unsigned long time)
 			sd->rttvar += (rttvar - sd->rttvar) >> 2;
 		else
 			sd->rttvar += (sd->rttvar - rttvar) >> 2;
-		sd->rto = rtt + (sd->rttvar << 2);
+		sd->rto = sd->srtt + (sd->rttvar << 2);
 	} else {
 		/* RFC 2960 6.3.1 (C2) */
 		sd->rttvar = rtt >> 1;
