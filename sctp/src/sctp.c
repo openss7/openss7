@@ -5255,7 +5255,7 @@ sctp_bundle_sack(struct sock *sk,	/* association */
 		/* TODO: double check the a_rwnd calculation for STREAMS as it does not seem to
 		   take into account SWS. */
 		/* fill out sack message information */
-		m = ((typeof(m)) b_wptr)++;
+		m = (typeof(m)) b_wptr;
 		m->ch.type = SCTP_CTYPE_SACK;
 		m->ch.flags = 0;
 		m->ch.len = htons(clen);
@@ -5263,23 +5263,29 @@ sctp_bundle_sack(struct sock *sk,	/* association */
 		m->a_rwnd = htonl(arwnd);
 		m->ngaps = htons(ngaps);
 		m->ndups = htons(ndups);
+		b_wptr += sizeof(*m);
 		for (; gap && ngaps; gap = gap->next, ngaps--) {
-			*((uint16_t *) b_wptr)++ = htons(gap->tsn - sp->r_ack);
+			*(uint16_t *) b_wptr = htons(gap->tsn - sp->r_ack);
+			b_wptr += sizeof(uint16_t);
 			gap = gap->tail;
-			*((uint16_t *) b_wptr)++ = htons(gap->tsn - sp->r_ack);
+			*(uint16_t *) b_wptr = htons(gap->tsn - sp->r_ack);
+			b_wptr += sizeof(uint16_t);
 		}
-		for (; dup && ndups; dup = dup->next, ndups--)
-			*((uint32_t *) b_wptr)++ = htonl(dup->tsn);
+		for (; dup && ndups; dup = dup->next, ndups--) {
+			*(uint32_t *) b_wptr = htonl(dup->tsn);
+			mp->b_wptr += sizeof(uint32_t);
+		}
 		__skb_queue_purge(&sp->dupq);
 		sp->ndups = 0;
 		sp->dups = NULL;
 #ifdef SCTP_CONFIG_ECN
 		if (sp->sackf & SCTP_SACKF_ECN) {
-			e = ((typeof(e)) b_wptr)++;
+			e = (typeof(e)) b_wptr;
 			e->ch.type = SCTP_CTYPE_ECNE;
 			e->ch.flags = 0;
 			e->ch.len = __constant_htons(sizeof(*e));
 			e->l_tsn = htonl(sp->l_lsn);
+			b_wptr += sizeof(*e);
 			SCTP_INC_STATS(SctpOutCtrlChunks);
 			_printd(("INFO: Bundled ECNE chunk.\n"));
 		}
@@ -5355,11 +5361,12 @@ sctp_bundle_fsn(struct sock *sk,	/* association */
 		unsigned char *b_wptr = skb_put(skb, plen);
 
 		/* fill out fsn message headers */
-		m = ((typeof(m)) b_wptr)++;
+		m = (typeof(m)) b_wptr;
 		m->ch.type = SCTP_CTYPE_FORWARD_TSN;
 		m->ch.flags = 0;
 		m->ch.len = htons(clen);
 		m->f_tsn = htonl(l_fsn);
+		b_wptr += sizeof(*m);
 		/* run backwards to build stream number list */
 		for (skb = skb_peek_tail(&sp->rtxq); skb; skb = skb_prev(skb)) {
 			sctp_tcb_t *cb = SCTP_SKB_CB(skb);
@@ -5370,8 +5377,10 @@ sctp_bundle_fsn(struct sock *sk,	/* association */
 				break;
 			if (cb->st && !(cb->flags & SCTPCB_FLAG_URG)
 			    && (cb->st->n.more & SCTP_STRMF_DROP)) {
-				*((uint16_t *) b_wptr)++ = cb->st->sid;
-				*((uint16_t *) b_wptr)++ = cb->ssn;
+				*(uint16_t *) b_wptr = cb->st->sid;
+				b_wptr += sizeof(uint16_t);
+				*(uint16_t *) b_wptr = cb->ssn;
+				b_wptr += sizeof(uint16_t);
 				cb->st->n.more &= ~SCTP_STRMF_DROP;
 				assure(nstrs);
 				nstrs--;
@@ -8131,40 +8140,46 @@ sctp_send_asconf(struct sock *sk)
 	for (ss = sp->saddr; ss; ss = ss->next) {
 		if (sp->p_caps & SCTP_CAPS_ADD_IP) {
 			if (ss->flags & SCTP_SRCEF_ADD_REQUEST) {
-				a = ((typeof(a)) b_wptr)++;
+				a = (typeof(a)) b_wptr;
 				a->ph.type = SCTP_PTYPE_ADD_IP;
 				a->ph.len = __constant_htons(sizeof(*a) + sizeof(*p));
 				a->id = htonl((uint32_t) ss);
-				p = ((typeof(p)) b_wptr)++;
+				b_wptr += sizeof(*a);
+				p = (typeof(p)) b_wptr;
 				p->ph.type = SCTP_PTYPE_IPV4_ADDR;
 				p->ph.len = __constant_htons(sizeof(*p));
 				p->addr = htonl(ss->saddr);
+				b_wptr += sizeof(*p);
 				ss->flags &= ~SCTP_SRCEF_ADD_REQUEST;
 				ss->flags |= SCTP_SRCEF_ADD_PENDING;
 			}
 			if (ss->flags & SCTP_SRCEF_DEL_REQUEST) {
-				d = ((typeof(d)) b_wptr)++;
+				d = (typeof(d)) b_wptr;
 				d->ph.type = SCTP_PTYPE_DEL_IP;
 				d->ph.len = __constant_htons(sizeof(*d) + sizeof(*p));
 				d->id = htonl((uint32_t) ss);
-				p = ((typeof(p)) b_wptr)++;
+				b_wptr += sizeof(*d);
+				p = (typeof(p)) b_wptr;
 				p->ph.type = SCTP_PTYPE_IPV4_ADDR;
 				p->ph.len = __constant_htons(sizeof(*p));
 				p->addr = htonl(ss->saddr);
+				b_wptr += sizeof(*p);
 				ss->flags &= ~SCTP_SRCEF_DEL_REQUEST;
 				ss->flags |= SCTP_SRCEF_DEL_PENDING;
 			}
 		}
 		if (sp->p_caps & SCTP_CAPS_SET_IP) {
 			if (ss->flags & SCTP_SRCEF_SET_REQUEST) {
-				s = ((typeof(s)) b_wptr)++;
+				s = (typeof(s)) b_wptr;
 				s->ph.type = SCTP_PTYPE_SET_IP;
 				s->ph.len = __constant_htons(sizeof(*s) + sizeof(*p));
 				s->id = htonl((uint32_t) ss);
-				p = ((typeof(p)) b_wptr)++;
+				b_wptr += sizeof(*s);
+				p = (typeof(p)) b_wptr;
 				p->ph.type = SCTP_PTYPE_IPV4_ADDR;
 				p->ph.len = __constant_htons(sizeof(*p));
 				p->addr = htonl(ss->saddr);
+				b_wptr += sizeof(*p);
 				ss->flags &= ~SCTP_SRCEF_SET_REQUEST;
 				ss->flags |= SCTP_SRCEF_SET_PENDING;
 			}
@@ -11282,20 +11297,23 @@ sctp_recv_asconf(struct sock *sk, struct sk_buff *skb)
 				if (a->ph.type != SCTP_PTYPE_IPV4_ADDR)
 					continue;
 				if ((sd = sctp_find_daddr(sp, ntohl(a->addr)))) {
-					sr = ((typeof(sr)) bptr)++;
+					sr = (typeof(sr)) bptr;
 					sr->ph.type = SCTP_PTYPE_SUCCESS_REPORT;
 					sr->ph.len = __constant_htons(sizeof(*sr));
 					sr->cid = ph->add_ip.id;
+					bptr += sizeof(*sr);
 					rlen += sizeof(*sr);
 					continue;
 				} else {
-					er = ((typeof(er)) bptr)++;
+					er = (typeof(er)) bptr;
 					er->ph.type = SCTP_PTYPE_ERROR_CAUSE;
 					er->ph.len = htons(sizeof(*er) + sizeof(*eh) + plen);
 					er->cid = ph->del_ip.id;
-					eh = ((typeof(eh)) bptr)++;
+					bptr += sizeof(*er);
+					eh = (typeof(eh)) bptr;
 					eh->code = __constant_htons(SCTP_CAUSE_RES_SHORTAGE);
 					eh->len = htons(sizeof(*eh) + plen);
+					bptr += sizeof(*eh);
 					bcopy(pptr, bptr, plen);
 					bptr += plen;
 					rlen += sizeof(*er) + sizeof(*eh) + plen;
@@ -11311,22 +11329,25 @@ sctp_recv_asconf(struct sock *sk, struct sk_buff *skb)
 				if (a->ph.type != SCTP_PTYPE_IPV4_ADDR)
 					continue;
 				if (!(sd = sctp_find_daddr(sp, ntohl(a->addr)))) {
-					sr = ((typeof(sr)) bptr)++;
+					sr = (typeof(sr)) bptr;
 					sr->ph.type = SCTP_PTYPE_SUCCESS_REPORT;
 					sr->ph.len = __constant_htons(sizeof(*sr));
 					sr->cid = ph->add_ip.id;
+					bptr += sizeof(*sr);
 					rlen += sizeof(*sr);
 					continue;
 				}
 				if (a->addr == SCTP_IPH(skb)->saddr) {
 					/* request to delete source address */
-					er = ((typeof(er)) bptr)++;
+					er = (typeof(er)) bptr;
 					er->ph.type = SCTP_PTYPE_ERROR_CAUSE;
 					er->ph.len = htons(sizeof(*er) + sizeof(*eh) + plen);
 					er->cid = ph->del_ip.id;
-					eh = ((typeof(eh)) bptr)++;
+					bptr += sizeof(*er);
+					eh = (typeof(eh)) bptr;
 					eh->code = __constant_htons(SCTP_CAUSE_SOURCE_ADDR);
 					eh->len = htons(sizeof(*eh) + plen);
+					bptr += sizeof(*eh);
 					bcopy(pptr, bptr, plen);
 					bptr += plen;
 					rlen += sizeof(*er) + sizeof(*eh) + plen;
@@ -11334,14 +11355,16 @@ sctp_recv_asconf(struct sock *sk, struct sk_buff *skb)
 				}
 				if (sp->danum == 1) {
 					/* last address need to send error */
-					er = ((typeof(er)) bptr)++;
+					er = (typeof(er)) bptr;
 					er->ph.type = SCTP_PTYPE_ERROR_CAUSE;
 					er->ph.len = htons(sizeof(*er) + sizeof(*eh)
 							   + plen);
 					er->cid = ph->del_ip.id;
-					eh = ((typeof(eh)) bptr)++;
+					bptr += sizeof(*er);
+					eh = (typeof(eh)) bptr;
 					eh->code = __constant_htons(SCTP_CAUSE_LAST_ADDR);
 					eh->len = htons(sizeof(*eh) + plen);
+					bptr += sizeof(*eh);
 					bcopy(pptr, bptr, plen);
 					bptr += plen;
 					rlen += sizeof(*er) + sizeof(*eh) + plen;
@@ -11359,10 +11382,11 @@ sctp_recv_asconf(struct sock *sk, struct sk_buff *skb)
 				if (!(sd = sctp_find_daddr(sp, ntohl(a->addr))))
 					continue;
 				/* fake success */
-				sr = ((typeof(sr)) bptr)++;
+				sr = (typeof(sr)) bptr;
 				sr->ph.type = SCTP_PTYPE_SUCCESS_REPORT;
 				sr->ph.len = __constant_htons(sizeof(*sr));
 				sr->cid = ph->add_ip.id;
+				bptr += sizeof(*sr);
 				rlen += sizeof(*sr);
 				continue;
 			}
