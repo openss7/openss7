@@ -4237,6 +4237,31 @@ sctp_verify_cookie(sctp_t * sp, struct sctp_cookie *ck)
 }
 
 /*
+ *  CONGESTION/RECEIVE WINDOW AVAILABILITY
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *
+ *  Calculate of the remaining space in the current packet, how much is available for use by data
+ *  according to the current peer receive window, the current destination congestion window, and the
+ *  current outstanding data bytes in flight.
+ *
+ *  This is called iteratively as each data chunk is tested for bundling into the current message.
+ *  The usable length returned does not include the data chunk header.
+ */
+STATIC INLINE size_t
+sctp_avail(sctp_t * sp, struct sctp_daddr *sd)
+{
+	size_t cwnd, rwnd, swnd, awnd;
+
+	cwnd = sd->cwnd + sd->mtu + 1;
+	cwnd = (cwnd > sd->in_flight) ? cwnd - sd->in_flight : 0;
+	rwnd = sp->p_rwnd;
+	rwnd = (rwnd > sp->in_flight) ? rwnd - sp->in_flight : 0;
+	swnd = (cwnd < rwnd) ? cwnd : rwnd;
+	awnd = (sp->in_flight) ? swnd : cwnd;
+	return awnd;
+}
+
+/*
  *  =========================================================================
  *
  *  IP OUTPUT: ROUTING FUNCTIONS
@@ -4252,7 +4277,6 @@ sctp_verify_cookie(sctp_t * sp, struct sctp_cookie *ck)
  *  -------------------------------------------------------------------------
  *  Break a tie between two equally rated routes.
  */
-STATIC INLINE size_t sctp_avail(sctp_t * sp, struct sctp_daddr *sd);
 STATIC INLINE struct sctp_daddr *
 sctp_break_tie(sctp_t * sp, struct sctp_daddr *sd1, struct sctp_daddr *sd2)
 {
@@ -5159,31 +5183,6 @@ struct sctp_bundle_cookie {
 	size_t swnd;			/* remaining send window */
 	size_t pbuf;			/* peer buffer */
 };
-
-/*
- *  CONGESTION/RECEIVE WINDOW AVAILABILITY
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *
- *  Calculate of the remaining space in the current packet, how much is available for use by data
- *  according to the current peer receive window, the current destination congestion window, and the
- *  current outstanding data bytes in flight.
- *
- *  This is called iteratively as each data chunk is tested for bundling into the current message.
- *  The usable length returned does not include the data chunk header.
- */
-STATIC INLINE size_t
-sctp_avail(sctp_t * sp, struct sctp_daddr *sd)
-{
-	size_t cwnd, rwnd, swnd, awnd;
-
-	cwnd = sd->cwnd + sd->mtu + 1;
-	cwnd = (cwnd > sd->in_flight) ? cwnd - sd->in_flight : 0;
-	rwnd = sp->p_rwnd;
-	rwnd = (rwnd > sp->in_flight) ? rwnd - sp->in_flight : 0;
-	swnd = (cwnd < rwnd) ? cwnd : rwnd;
-	awnd = (sp->in_flight) ? swnd : cwnd;
-	return awnd;
-}
 
 STATIC struct sk_buff *sctp_alloc_chk(struct sock *sk, size_t clen, size_t dlen);
 
@@ -6507,6 +6506,40 @@ sctp_retr_con(struct sock *sk)
 	return (-EFAULT);
 }
 
+#ifdef SCTP_CONFIG_ECN
+/*
+ *  SEND ECNE (Explicit Congestion Notification Echo)
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *  Just mark an ECNE chunk to be sent with the next SACK (and don't delay SACKs).
+ */
+STATIC INLINE void
+sctp_send_ecne(struct sock *sk)
+{
+	sctp_t *sp = SCTP_PROT(sk);
+
+	if (sp->l_caps & sp->p_caps & SCTP_CAPS_ECN) {
+		_printd(("Marking ECNE from socket %p\n", sk));
+		sp->sackf |= SCTP_SACKF_ECN;
+	}
+}
+
+/*
+ *  SEND CWR (Congestion Window Reduction)
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *  Just mark a CWR chunk to be bundled with the next DATA.
+ */
+STATIC INLINE void
+sctp_send_cwr(struct sock *sk)
+{
+	sctp_t *sp = SCTP_PROT(sk);
+
+	if (sp->l_caps & sp->p_caps & SCTP_CAPS_ECN) {
+		_printd(("Marking CWR from socket %p\n", sk));
+		sp->sackf |= SCTP_SACKF_CWR;
+	}
+}
+#endif				/* SCTP_CONFIG_ECN */
+
 /*
  *  =========================================================================
  *
@@ -6514,9 +6547,6 @@ sctp_retr_con(struct sock *sk)
  *
  *  =========================================================================
  */
-#ifdef SCTP_CONFIG_ECN
-STATIC INLINE void sctp_send_cwr(struct sock *sk);
-#endif				/* SCTP_CONFIG_ECN */
 STATIC void sctp_send_heartbeat(struct sock *sk, struct sctp_daddr *sd);
 
 /*
@@ -6704,6 +6734,29 @@ sctp_cookie_timeout(unsigned long data)
 	goto done;
 }
 
+#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
+/*
+ *  SEND FORWARD TSN
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+STATIC INLINE void
+sctp_send_forward_tsn(struct sock *sk)
+{
+	sctp_t *sp = SCTP_PROT(sk);
+	struct sctp_daddr *sd;
+
+	/* PR-SCTP 3.5 (F2) */
+	sp->sackf |= SCTP_SACKF_FSN;
+	for (sd = sp->daddr; sd; sd = sd->next) {
+		if (sd->flags & SCTP_DESTF_FORWDTSN) {
+			if (!sd->in_flight && sctp_timeout_pending(&sd->timer_retrans))
+				sd_del_timeout(sd, &sd->timer_retrans);
+			sd->flags &= ~SCTP_DESTF_FORWDTSN;
+		}
+	}
+}
+#endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
+
 /*
  *  RETRANS TIMEOUT (T3-rtx)
  *  -------------------------------------------------------------------------
@@ -6711,9 +6764,6 @@ sctp_cookie_timeout(unsigned long data)
  *  that we should mark all outstanding DATA chunks for retransmission and start a retransmission
  *  cycle.
  */
-#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
-STATIC INLINE void sctp_send_forward_tsn(struct sock *sk);
-#endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 STATIC void
 sctp_retrans_timeout(unsigned long data)
 {
@@ -7979,40 +8029,6 @@ sctp_send_shutdown_complete(struct sock *sk)
 	return;
 }
 
-#ifdef SCTP_CONFIG_ECN
-/*
- *  SEND ECNE (Explicit Congestion Notification Echo)
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Just mark an ECNE chunk to be sent with the next SACK (and don't delay SACKs).
- */
-STATIC INLINE void
-sctp_send_ecne(struct sock *sk)
-{
-	sctp_t *sp = SCTP_PROT(sk);
-
-	if (sp->l_caps & sp->p_caps & SCTP_CAPS_ECN) {
-		printd(("Marking ECNE from socket %p\n", sk));
-		sp->sackf |= SCTP_SACKF_ECN;
-	}
-}
-
-/*
- *  SEND CWR (Congestion Window Reduction)
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Just mark a CWR chunk to be bundled with the next DATA.
- */
-STATIC INLINE void
-sctp_send_cwr(struct sock *sk)
-{
-	sctp_t *sp = SCTP_PROT(sk);
-
-	if (sp->l_caps & sp->p_caps & SCTP_CAPS_ECN) {
-		printd(("Marking CWR from socket %p\n", sk));
-		sp->sackf |= SCTP_SACKF_CWR;
-	}
-}
-#endif				/* SCTP_CONFIG_ECN */
-
 #ifdef SCTP_CONFIG_ADD_IP
 /*
  *  ABORT ASCONF
@@ -8205,29 +8221,6 @@ sctp_send_asconf_ack(struct sock *sk, caddr_t rptr, size_t rlen)
 	return;
 }
 #endif				/* SCTP_CONFIG_ADD_IP */
-
-#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
-/*
- *  SEND FORWARD TSN
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-STATIC INLINE void
-sctp_send_forward_tsn(struct sock *sk)
-{
-	sctp_t *sp = SCTP_PROT(sk);
-	struct sctp_daddr *sd;
-
-	/* PR-SCTP 3.5 (F2) */
-	sp->sackf |= SCTP_SACKF_FSN;
-	for (sd = sp->daddr; sd; sd = sd->next) {
-		if (sd->flags & SCTP_DESTF_FORWDTSN) {
-			if (!sd->in_flight && sctp_timeout_pending(&sd->timer_retrans))
-				sd_del_timeout(sd, &sd->timer_retrans);
-			sd->flags &= ~SCTP_DESTF_FORWDTSN;
-		}
-	}
-}
-#endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 
 /*
  *  SENDING WITHOUT TCB  (Responding to OOTB packets)
