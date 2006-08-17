@@ -9281,7 +9281,7 @@ sctp_cumm_ack(struct sctp *sp, uint32_t ack)
 			struct sctp_daddr *sd = cb->daddr;
 
 			/* RFC 2960 6.3.1 (C5) */
-			if (cb->trans < 2) {
+			if (sd && cb->trans < 2) {
 				/* remember latest transmitted packet acked for rtt calc */
 				sd->when = (sd->when > cb->when) ? sd->when : cb->when;
 			}
@@ -9540,7 +9540,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		sctp_tcb_t **gap;
 		uint32_t tsn, ppi;
 		uint16_t sid, ssn;
-		size_t clen;
+		size_t clen, dlen;
 		uint flags;
 		int ord;
 #if 0
@@ -9569,7 +9569,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		}
 		if (clen < sizeof(*m))
 			goto emsgsize;
-		if (clen == sizeof(m))
+		if ((dlen = clen - sizeof(*m)) == 0)
 			goto baddata; /* zero length data */
 
 #if 0
@@ -9603,10 +9603,10 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		if (!(dp = sctp_dupb(sp, mp)))
 			goto enobufs;
 		data++;
-		/* trim copy to data only */
-		dp->b_wptr = dp->b_rptr + clen;
 		/* pull copy to data only */
 		dp->b_rptr += sizeof(*m);
+		/* trim copy to data only */
+		dp->b_wptr = dp->b_rptr + dlen;
 #if 0
 		/* fast path, next expected, nothing backed up, nothing out of order */
 		if (tsn == sp->r_ack + 1 && !bufq_head(&sp->rcvq) && !bufq_head(&sp->expq)
@@ -13335,7 +13335,6 @@ sctp_ordrel_req(struct sctp *sp)
 	printd(("%p: X_ORDREL_REQ <- \n", sp));
 	switch (sp->state) {
 	case SCTP_ESTABLISHED:
-	{
 		/* check for empty send queues */
 		if (!bufq_head(&sp->sndq)
 		    && !bufq_head(&sp->urgq)
@@ -13346,10 +13345,8 @@ sctp_ordrel_req(struct sctp *sp)
 			ptrace(("Changing state to SHUTDOWN-PENDING\n"));
 			sctp_change_state(sp, SCTP_SHUTDOWN_PENDING);
 		}
-		return (0);
-	}
+		break;
 	case SCTP_SHUTDOWN_RECEIVED:
-	{
 		/* check for empty send queues */
 		if (!bufq_head(&sp->sndq)
 		    && !bufq_head(&sp->urgq)
@@ -13360,12 +13357,13 @@ sctp_ordrel_req(struct sctp *sp)
 			ptrace(("Changing state to SHUTDOWN-RECVWAIT\n"));
 			sctp_change_state(sp, SCTP_SHUTDOWN_RECVWAIT);
 		}
-		return (0);
+		break;
+	default:
+		rare();
+		ptrace(("sp->state = %u\n", (uint) sp->state));
+		return (-EPROTO);
 	}
-	}
-	rare();
-	ptrace(("sp->state = %u\n", (uint) sp->state));
-	return (-EPROTO);
+	return (0);
 }
 
 /*
