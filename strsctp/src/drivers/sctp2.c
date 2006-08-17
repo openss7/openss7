@@ -4248,11 +4248,11 @@ sctp_lookup_ptag(uint32_t p_tag, uint16_t sport, uint16_t dport, uint32_t saddr,
 	for (sp = hp->list; sp; sp = sp->pnext)
 		if (sctp_match_ptag(sp, saddr, daddr, p_tag, sport, dport))
 			break;
-	read_unlock(&hp->lock);
-	if (sp) {
+	if (sp)
 		sctp_hold(sp);
+	read_unlock(&hp->lock);
+	if (sp)
 		return (sp);
-	}
 	return NULL;
 }
 
@@ -4305,11 +4305,11 @@ sctp_lookup_vtag(uint32_t v_tag, uint16_t sport, uint16_t dport, uint32_t saddr,
 				break;
 			}
 	}
-	read_unlock(&hp->lock);
-	if (sp) {
+	if (sp)
 		sctp_hold(sp);
+	read_unlock(&hp->lock);
+	if (sp)
 		return (sp);
-	}
 	return NULL;
 }
 
