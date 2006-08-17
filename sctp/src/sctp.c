@@ -6469,6 +6469,7 @@ sctp_reset_con(struct sock *sk)
  *
  *  -------------------------------------------------------------------------
  */
+#if 0
 STATIC INLINE int
 sctp_retr_ind(struct sock *sk, struct sk_buff *dp)
 {
@@ -6483,6 +6484,7 @@ sctp_retr_ind(struct sock *sk, struct sk_buff *dp)
 	swerr();
 	return (-EFAULT);
 }
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -6491,6 +6493,7 @@ sctp_retr_ind(struct sock *sk, struct sk_buff *dp)
  *
  *  -------------------------------------------------------------------------
  */
+#if 0
 STATIC INLINE int
 sctp_retr_con(struct sock *sk)
 {
@@ -6505,6 +6508,7 @@ sctp_retr_con(struct sock *sk)
 	swerr();
 	return (-EFAULT);
 }
+#endif
 
 #ifdef SCTP_CONFIG_ECN
 /*
