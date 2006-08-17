@@ -1949,11 +1949,11 @@ cksum(struct sock *sk, void *buf, size_t len)
 	default:
 #ifdef SCTP_CONFIG_CRC_32C
 	case SCTP_CSUM_CRC32C:
-		return crc32c(~0UL, buf, len);
+		return crc32c(~0, buf, len);
 #endif				/* SCTP_CONFIG_CRC_32C */
 #if defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C)
 	case SCTP_CSUM_ADLER32:
-		return adler32(1UL, buf, len);
+		return adler32(1, buf, len);
 #endif				/* defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C) */
 	}
 }
@@ -2017,10 +2017,10 @@ STATIC INLINE int
 cksum_verify(uint32_t csum, void *buf, size_t len)
 {
 #if defined(SCTP_CONFIG_CRC_32C)||!defined(SCTP_CONFIG_ADLER_32)
-	if (csum != crc32c(~0UL, buf, len))
+	if (csum != crc32c(~0, buf, len))
 #endif				/* defined(SCTP_CONFIG_CRC_32C)||!defined(SCTP_CONFIG_ADLER_32) */
 #ifdef SCTP_CONFIG_ADLER_32
-		if (csum != adler32(1UL, buf, len))
+		if (csum != adler32(1, buf, len))
 #endif				/* SCTP_CONFIG_ADLER_32 */
 			return (0);
 	return (1);
@@ -2034,13 +2034,13 @@ cksum_sk_verify(struct sock *sk, uint32_t csum, void *buf, size_t len)
 	default:
 #ifdef SCTP_CONFIG_CRC_32C
 	case SCTP_CSUM_CRC32C:
-		if (csum != crc32c(~0UL, buf, len))
+		if (csum != crc32c(~0, buf, len))
 			return (0);
 		return (1);
 #endif				/* SCTP_CONFIG_CRC_32C */
 #if defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C)
 	case SCTP_CSUM_ADLER32:
-		if (csum != adler32(1UL, buf, len))
+		if (csum != adler32(1, buf, len))
 			return (0);
 		return (1);
 #endif				/* defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C) */
@@ -2052,10 +2052,10 @@ cksum_generate(void *buf, size_t len)
 	uint32_t csum = 0;
 
 #if defined(SCTP_CONFIG_CRC_32C)||!defined(SCTP_CONFIG_ADLER_32)
-	csum = crc32c(~0UL, buf, len);
+	csum = crc32c(~0, buf, len);
 #else
 #ifdef SCTP_CONFIG_ADLER_32
-	csum = adler32(1UL, buf, len);
+	csum = adler32(1, buf, len);
 #endif
 #endif				/* defined(SCTP_CONFIG_ADLER_32) */
 	return (csum);
@@ -2101,12 +2101,12 @@ skb_init_cksum(struct sk_buff *skb)
 	default:
 #ifdef SCTP_CONFIG_CRC_32C
 	case SCTP_CSUM_CRC32C:
-		skb->csum = 1UL;
+		skb->csum = 1;
 		return;
 #endif				/* SCTP_CONFIG_CRC_32C */
 #if defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C)
 	case SCTP_CSUM_ADLER32:
-		skb->csum = ~0UL;
+		skb->csum = ~0;
 		return;
 #endif				/* defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C) */
 	}
@@ -3111,23 +3111,23 @@ sctp_init_hashes(void)
 
 	/* size and allocate vtag hash table */
 	goal = num_physpages >> (20 - PAGE_SHIFT);
-	for (order = 0; (1UL << order) < goal; order++) ;
+	for (order = 0; (1 << order) < goal; order++) ;
 	do {
 		sctp_vhash_order = order;
-		sctp_vhash_size = (1UL << order) * PAGE_SIZE / sizeof(struct sctp_hash_bucket);
+		sctp_vhash_size = (1 << order) * PAGE_SIZE / sizeof(struct sctp_hash_bucket);
 		sctp_vhash = (struct sctp_hash_bucket *) __get_free_pages(GFP_ATOMIC, order);
 	} while (sctp_vhash == NULL && --order >= 0);
 	if (!sctp_vhash)
 		panic("%s: Failed to allocate SCTP established hash table\n", __FUNCTION__);
 	/* size and allocate bind hash table */
-	goal = (((1UL << order) * PAGE_SIZE) / sizeof(struct sctp_bhash_bucket));
+	goal = (((1 << order) * PAGE_SIZE) / sizeof(struct sctp_bhash_bucket));
 	if (goal > (64 * 1024)) {
 		goal = (((64 * 1024) * sizeof(struct sctp_bhash_bucket)) / PAGE_SIZE);
-		for (order = 0; (1UL << order) < goal; order++) ;
+		for (order = 0; (1 << order) < goal; order++) ;
 	}
 	do {
 		sctp_bhash_order = order;
-		sctp_bhash_size = (1UL << order) * PAGE_SIZE / sizeof(struct sctp_bhash_bucket);
+		sctp_bhash_size = (1 << order) * PAGE_SIZE / sizeof(struct sctp_bhash_bucket);
 		sctp_bhash = (struct sctp_bhash_bucket *) __get_free_pages(GFP_ATOMIC, order);
 	} while (sctp_bhash == NULL && --order >= 0);
 	if (!sctp_bhash)
@@ -4412,7 +4412,7 @@ sctp_choose_best(sctp_t * sp)
  *  addresses and IP routing and establish new routes as required and set the (primary) and
  *  (secondary) destination addresses.
  */
-#if (defined(SCTP_CONFIG_DEBUG)||defined(SCTP_CONFIG_TEST)) && defined(SCTP_CONFIG_ERROR_GENERATOR)
+#if (defined(SCTP_CONFIG_DEBUG) || defined(SCTP_CONFIG_TEST)) && defined(SCTP_CONFIG_ERROR_GENERATOR)
 #define SCTP_CONFIG_ERROR_GENERATOR_LEVEL  8
 #define SCTP_CONFIG_ERROR_GENERATOR_LIMIT 13
 #define SCTP_CONFIG_BREAK_GENERATOR_LEVEL 50
@@ -7098,7 +7098,7 @@ sctp_life_timeout(unsigned long data)
 	struct sock *sk = (struct sock *) data;
 	sctp_t *sp = SCTP_PROT(sk);
 	struct sk_buff *skb, *skb_next;
-	unsigned long expires = -1UL;
+	unsigned long expires = -1;
 
 	ensure(sk, return);
 	bh_lock_sock(sk);
@@ -7199,7 +7199,7 @@ sctp_life_timeout(unsigned long data)
 			sp->l_fsn++;
 		}
 	}
-	if (expires != -1UL)
+	if (expires != -1)
 		sp_set_timeout(sp, &sp->timer_life, expires - jiffies);
 	if (after(sp->l_fsn, sp->t_ack)) {
 		sctp_send_forward_tsn(sk);
