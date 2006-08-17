@@ -17298,6 +17298,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 			bh_unlock_sock(sk);
 		}
 		spin_unlock(&sctp_protolock);
+		break;
 	}
 	case NETDEV_DOWN:
 	case NETDEV_GOING_DOWN:
@@ -17342,6 +17343,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 			bh_unlock_sock(sk);
 		}
 		spin_unlock(&sctp_protolock);
+		break;
 	}
 	case NETDEV_CHANGEADDR:
 		/* we should probably do something for this, but I don't know wheterh it is
