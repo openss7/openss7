@@ -1035,7 +1035,7 @@ sctp_change_state(struct sock *sk, int newstate)
 			newname = "(Invalid)";
 			break;
 		}
-		printd(("INFO: STATE CHANGE: sk %p, %s to %s\n", sk, oldname, newname));
+		_printd(("INFO: STATE CHANGE: sk %p, %s to %s\n", sk, oldname, newname));
 	}
 	return (oldstate);
 }
@@ -1752,7 +1752,7 @@ STATIC int sctp_recv_err(struct sock *sk, struct sk_buff *skb);
 STATIC INLINE uint32_t
 nocsum_and_copy_from_user(const char *src, char *dst, int len, int sum, int *errp)
 {
-	if (verify_area(VERIFY_READ, src, len)) {
+	if (access_ok(VERIFY_READ, src, len)) {
 		bcopy(src, dst, len);
 		return (sum);
 	}
@@ -1835,7 +1835,7 @@ __adler32_partial_copy_from_user(register const unsigned char *src, register uns
 STATIC INLINE uint32_t
 adler32_and_copy_from_user(const char *src, char *dst, int len, int sum, int *errp)
 {
-	if (!verify_area(VERIFY_READ, src, len))
+	if (access_ok(VERIFY_READ, src, len))
 		return __adler32_partial_copy_from_user(src, dst, len, sum, errp);
 	if (len)
 		*errp = -EFAULT;
@@ -1925,7 +1925,7 @@ __crc32c_partial_copy_from_user(register const unsigned char *src, register unsi
 STATIC INLINE uint32_t
 crc32c_and_copy_from_user(const char *src, char *dst, int len, int sum, int *errp)
 {
-	if (!verify_area(VERIFY_READ, src, len))
+	if (access_ok(VERIFY_READ, src, len))
 		return __crc32c_partial_copy_from_user(src, dst, len, sum, errp);
 	if (len)
 		*errp = -EFAULT;
