@@ -2381,19 +2381,23 @@ sd_init_timeout(struct sctp_daddr *sd, sctp_timer_t * tidp, timo_fcn_t *fnc)
 	tidp->function = fnc;
 }
 
-STATIC INLINE void
+STATIC INLINE int
 sp_del_timeout(sctp_t * sp, sctp_timer_t * tidp)
 {
 	if (del_timer(tidp)) {
 		sctp_put(sp);
+		return (1);
 	}
+	return (0);
 }
-STATIC INLINE void
+STATIC INLINE int
 sd_del_timeout(struct sctp_daddr *sd, sctp_timer_t * tidp)
 {
 	if (del_timer(tidp)) {
 		sctp_dput(sd);
+		return (1);
 	}
+	return (0);
 }
 STATIC INLINE void
 sp_set_timeout(sctp_t * sp, sctp_timer_t * tidp, unsigned long ticks)
