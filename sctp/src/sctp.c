@@ -10783,6 +10783,7 @@ sctp_recv_cookie_echo(struct sock *sk, struct sk_buff *skb)
 		goto recv_cookie_echo_action_b;
 	}
 	rare();
+	goto no_resource;
 	return (0);
       error_abort:
 	{
