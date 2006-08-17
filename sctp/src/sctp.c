@@ -4845,6 +4845,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, struct sk_buff *skb, struct sock *
 			iph->ihl = 5;
 			iph->tos = ip->tos;
 			iph->frag_off = 0;
+#if 1
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			iph->ttl = ip->ttl;
 #else
@@ -4852,6 +4853,9 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, struct sk_buff *skb, struct sock *
 			iph->ttl = ip->uc_ttl;
 #endif
 #endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#else
+			iph->ttl = ip->uc_ttl;
+#endif
 			iph->daddr = rt->rt_dst;
 			iph->saddr = saddr;
 			iph->protocol = sk->protocol;
@@ -4997,6 +5001,7 @@ sctp_send_msg(struct sock *sk, struct sctp_daddr *sd, struct sk_buff *skc)
 		iph->ihl = 5;
 		iph->tos = ip->tos;
 		iph->frag_off = 0;
+#if 1
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 		iph->ttl = ip->ttl;
 #else
@@ -5004,6 +5009,9 @@ sctp_send_msg(struct sock *sk, struct sctp_daddr *sd, struct sk_buff *skc)
 		iph->ttl = ip->uc_ttl;
 #endif
 #endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#else
+		iph->ttl = ip->uc_ttl;
+#endif
 		iph->daddr = sd->daddr;	/* XXX */
 		iph->saddr = sd->saddr;
 		iph->protocol = sk->protocol;
