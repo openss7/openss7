@@ -1,0 +1,1 @@
+.so man8/specfs.8.man

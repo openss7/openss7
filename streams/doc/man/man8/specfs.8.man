@@ -1,0 +1,548 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: specfs.8.man,v 1.1.2.1 2006/08/22 12:36:44 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/08/22 12:36:44 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: specfs.8.man,v $
+.\" Revision 1.1.2.1  2006/08/22 12:36:44  brian
+.\" - udpates to documentation, tweaks to Stream head
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so streams.macros
+.\"
+.\"
+.TH SPECFS 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B specfs, specfs.sh
+\- System V Init Script for the \fISTREAMS\fR Shadow Special Filesystem.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBservice\fR \fRspecfs\fR
+[\fIcommand\fR]
+# RedHat/Mandriva distribution
+.PD 0
+.HP 12
+\fBrc\fRspecfs\fR
+[\fIcommand\fR]
+# SuSE distribution
+.HP 12
+\fB/etc/init.d/\fRspecfs\fR
+[\fIcommand\fR]
+# Ubuntu distribution
+.HP 12
+\fB/etc/init.d/\fRspecfs.sh\fR
+[\fIcommand\fR]
+# Debian distribution
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B specfs
+System V Init Script starts, stop, restarts and displays the status of the
+.IR STREAMS (9)
+Special Shadow Filesystem.
+.\"
+.\"
+.SH OPTIONS
+.PP
+None.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The
+.I command
+argument can be one of the following:
+.TP
+(none)
+When executed without arguments, the
+.B specfs
+init script will display a short usage summary and exit.
+.TP
+.B start
+Start the
+.IR STREAMS (9)
+Special Shadow Filesystem.
+The filesystem is mounted if
+.B SPECFS_MOUNT
+is set to
+.IR yes .
+All
+.I STREAMS Special Shadow Filesystem
+kernel modules in the base package are loaded with
+.BR "modprobe" ,
+and a lock file is created to indicate that the filesystem has been started.
+.TP
+.B stop
+Stop the
+.IR STREAMS (9)
+Special Shadow Filesystem.
+The filesystem is unmount if
+.B SPECFS_MOUNT
+is set to
+.IR yes .
+Any
+.I STREAMS Special Shadow Filesystem
+kernel modules that are loaded (that is the
+.BR specfs (5)
+kernel module), will be removed with
+.BR "modprobe -r" .
+If devices do not exist and there are no
+.I STREAM Special Shadow Filesystem
+kernel modules loaded,
+.B stop
+performs effectively no action.
+.TP
+.B force-reload
+Perform a forced reload of configuration information for the
+.IR STREAMS (9)
+Special Shadow Filesystem.
+This has the same effect as a
+.B reload
+except that the lock file is forcibly removed.
+.PP
+The Debian-style
+.B specfs.sh
+script also recognizes the following commands:
+.TP
+.B show
+Report on the status of the
+.IR STREAMS (9)
+Special Shadow Filesystem.
+.PP
+The RedHat-style
+.B specfs
+script also recognizes the following commands:
+.TP
+.B status
+Report on the status of the
+.IR STREAMS (9)
+Special Shadow Filesystem.
+.TP
+.B restart
+Restart the
+.IR STREAMS (9)
+Special Shadow Filesystem.
+.TP
+.B try-restart
+Try to restart the
+.IR STREAMS (9)
+Special Shadow Filesystem.
+This has the same effect as a
+.B reload
+except that the lock file is forcibly removed.
+.TP
+.B condrestart
+Perform a conditional restart of
+.IR STREAMS (9)
+Special Shadow Filesystem.
+This is the same as a start if the filesystem is not already running.
+This also has the same effect as a
+.B reload
+except that the lock file is forcibly removed.
+.TP
+.B reload
+Perform a reload of configuration information for the
+.IR STREAMS (9)
+Special Shadow Filesystem.  This has the same effect as a
+.BR restart .
+.TP
+.B probe
+Probe the
+.IR STREAMS (9)
+Special Shadow Filesystem.  Probing consists of determining the status of the lock file and
+configuration files and performing the actions necessary to move the
+.IR STREAMS (9)
+filesystem to an operational state.  This could be effectively the same as a
+.BR start ", " reload " or " restart
+depending on the current status of the lock files, configuration files, and
+filesystem.
+.\"
+.\"
+.SH USAGE
+.PP
+Normally the
+.B specfs
+or
+.B specfs
+init script is invoked by the
+.BR init (8)
+process.
+Nevertheless, the script can be invoked by the adminstrator in the usual ways:
+.\"
+.SS RedHat-Style Systems
+.PP
+When the init script is installed, it is made known to the
+.BR service (8)
+command.  The
+.BR service (8)
+command can be used to invoke the script by name with the same command
+arguments as the script itself, at the shell command prompt, as follows:
+.PP
+.RS
+.nf
+\fC\s-1\
+$> service specfs [command]
+\s+1\fP
+.fi
+.RE
+.\"
+.SS SuSE Systems
+.PP
+When the init script is installed,
+.BR inserv (8)
+will also create the rc script named
+.B rcspecfs
+in the
+.B /usr/sbin
+directory.  This script can be invoked by the adminstrator with the same
+command arguments as the
+.B specfs
+script itself, at the shell command prompt, as follows:
+.PP
+.RS
+.nf
+\fC\s-1\
+$> rcspecfs [command]
+\s+1\fP
+.fi
+.RE
+.\"
+.SS Debian-Style Systems
+.PP
+When the init script is installed, it is made available in the
+.B /etc/init.d
+directory and can be invoked directly with the same command arguments, at the
+shell command prompt, as follows:
+.PP
+.RS
+.nf
+\fC\s-1\
+$> /etc/init.d/specfs.sh [command]
+\s+1\fP
+.fi
+.RE
+.\"
+.SS Other Systems
+.PP
+On other System V Init Script compatible systems, the init script is installed
+in the
+.B /etc/init.d
+directory and can be invoked directly, with the same command arguments, at the
+shell command prompt, as follows:
+.PP
+.RS
+.nf
+\fC\s-1\
+$> /etc/init.d/specfs [command]
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH ENVIRONMENT VARIABLES
+.PP
+The following shell variables can be overridden in a configuration file or via
+the environment:
+.TP
+.B SPECFS_MOUNTPOINT
+When set to a directory path, the init script will mount the
+.BR specfs (5)
+filesystem on the specified mount point.  If the mount point does not exist,
+but can be created as a directory, the mount point will be created before
+mounting the filesystem.
+.IP ""
+When not set, the
+.BR specfs (5)
+filesystem will not be mounted.
+.TP
+.B SPECFS_UID
+Specifies the user id to use for mounting the
+.BR specfs (5)
+filesystem.  If not specified, the user id will default to the user id of the
+process running the script and performing the
+.BR mount (8).
+.TP
+.B SPECFS_GID
+Specifies the group id to use for mounting the
+.BR specfs (5)
+filesystem.  If not specified, the group id will default to the group id of
+the process running the script and performing the
+.BR mount (8).
+.TP
+.B SPECFS_MODE
+Specifies the mode of the mounted
+.BR specfs (5)
+filesystem.  If not specified, the mode will default to the umask of the
+process running the script and performing the
+.BR mount (8).
+.TP
+.B SPECFS_OPTIONS
+Specifies additional options to the mount.  See
+.BR mount (8)
+and
+.BR specfs (5)
+for more information.
+.PP
+The Debian-style
+.B streams.sh
+script also recognizes the following additional evironment variables:
+.TP
+.B VERBOSE
+When set to other than zero (0), diagnostic messages printed by commands executed
+by the script will be printed to standard output.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+The
+.B specfs
+and
+.B specfs.sh
+scripts display success or failure on standard output in the normal manner of
+System V Init Scripts for the distribution upon which they are loaded.
+Diagnostic messages associated with the failure of the script or any command
+in the script are printed on standard error (however, standard error may be
+redirected by the invoking script).
+.\"
+.\"
+.SH NOTICES
+.PP
+None.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+To probe the filesystem and move the
+.I STREAMS (9)
+Special Shadow Filesystem smoothly to an operational state, execute the following (as root) at
+the shell command prompt:
+.PP
+.RS
+.nf
+\fC\s-1\
+$> service specfs probe
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DEVICES
+.PP
+When mounted, typically on the
+.B /dev/streams
+mount point, device nodes corresponding to
+.IR STREAMS (9)
+drivers will appear in the Special Shadow Filesystem beneath the
+.B /dev/streams
+directory.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/rc.d/init.d/specfs
+Installed location of the init script on RedHat-style systems.
+.TP
+.B /etc/init.d/specfs.sh
+Installed location of the init script on Debian-style systems and accessible
+location of the init script on all systems.
+.TP
+.B /etc/sysconfig/specfs
+The configuration file for the
+.B specfs
+startup script is located in the
+.B /etc/sysconfig/specfs
+file (for RedHat-style System V Init Script configurations).
+.TP
+.B /etc/default/specfs
+The configuration file for the
+.B specfs.sh
+startup script is located in the
+.B /etc/default/specfs
+file (for Debian-style System V Init Script configurations).
+.TP
+.B /etc/sysctl.conf
+Contains general system wide system controls.
+This file has the format described in
+.BR sysctl.conf (5).
+.I STREAMS
+Special Shadow Filesystem system controls can either be placed in this global file or in the
+specific file below.
+.TP
+.B /etc/specfs.conf
+Contains
+.I STREAMS
+Special Shadow Filesystem specific system controls.
+This file has the format described in
+.BR sysctl.conf (5).
+.I STREAMS
+Special Shadow Filesystem system controls can either be placed in this specific file or in the
+global file above.
+.TP
+.B /var/lock/subsys/specfs
+The subsystem lock file for the
+.I STREAMS
+subsystem on RedHat-style systems.  This file normally exists when the
+Special Shadow Filesystem is initialized and locked.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR specfs (5),
+.BR sysctl (8),
+.BR service (8),
+.BR rc (8),
+.BR insmod (8),
+.BR rmmod (8),
+.BR modprobe (8),
+.BR inserv (8),
+.BR ckconfig (8),
+.BR install_initd (8),
+.BR remove_initd (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B specfs
+and
+.BR specfs.sh
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B specfs
+and
+.B specfs.sh
+init scripts are compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Although the file layout is similar,
+.B Linux
+init scripts are not necessarily compatible with
+.I "SVR 4.2"
+.[
+svr42
+.]
+init scripts.
+.IP \(em
+On
+.I SVR 4.2
+the
+.IR STREAMS (9)
+Special Shadow Filesystem is an integral part of the kernel and does not need to be installed or
+mounted.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Initializing the
+.I STREAMS
+Special Shadow Filesystem is implementation specific and not subject to standardization.
+.PP
+The
+.B specfs
+init script conforms to
+.I LSB
+specification for init scripts and is compatible with a wide range of
+RedHat-style and LSB compatibile systems.
+.PP
+The
+.B specfs.sh
+init script conforms to
+.I Debian
+policy.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B specfs
+and
+.B specfs.sh
+init scripts are new to
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
