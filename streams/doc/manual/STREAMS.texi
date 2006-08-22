@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.25 2006/03/22 10:02:04 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.26 2006/08/22 12:36:49 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/03/22 10:02:04 $ by $Author: brian $
+% Last Modified $Date: 2006/08/22 12:36:49 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -172,6 +172,11 @@ another language, under the same conditions as for modified versions.
 @c Define an index of makefile targets
 @defcodeindex mk
 
+@c An index of manual pages
+@defcodeindex mp
+
+@include texi/macros.texi
+
 @ifnottex
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
@@ -183,6 +188,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
 @menu
 * Acknowledgements::		Sponsors and Contributors
+* Preface::			Preface to this document
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
@@ -204,6 +210,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @c * Sponsors::			Sponsors of the package
 @c * Contributors::		People who contributed to the development of
 @c 				the package.
+@c Preface
 @c Introduction
 @c 
 @c * Notice::			Notice
@@ -261,12 +268,215 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
 @include texi/funding.texi
 
+@c --------------------------------------------------------------------------
+
+@node Preface
+@unnumbered Preface
+
+@section Document Information
+@cindex document information
+
+@subsection Notice
+@cindex document notice
+@cindex licensing
+
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
+General Public License}).  Please note, however, that there are different licensing terms for the
+manual pages and some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX
+International.} publications and other sources).  Consult the permission notices contained in the
+documentation for more information.
+
+This document, is released under the @cite{GNU Free Documentation License} (@pxref{GNU Free
+Documentation License}) with all sections invariant.
+
+@subsection Abstract
+@cindex document abstract
+
+This document provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
+
+@subsection Objective
+@cindex document objective
+
+The objective of this document is to provide a guide for the @dfn{STREAMS} programmer when
+developing @dfn{STREAMS} modules, drivers and application programs for @cite{@value{PACKAGE_TITLE}}.
+
+This guide provides information to developers on the use of the @dfn{STREAMS} mechanism at user and
+kernel levels.
+
+@dfn{STREAMS} was incorporated in UNIX System V Release 3 to augment the character input/output
+(I/O) mechanism and to support development of communication services.
+
+@dfn{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
+that expedite software design and implementation.
+
+@subsection Intent
+@cindex document intent
+
+The intent of this document is to act as an introductory guide to the @dfn{STREAMS} programmer.  It
+is intended to be read alone and is not intended to replace or supplement the
+@cite{@value{PACKAGE_TITLE}} manual pages.  For a reference for writing code, the manual pages
+(see @manref{STREAMS(9)}) provide a better reference to the programmer.
+Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package,
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
+system or feature listed herein.
+
+@subsection Audience
+@cindex document audience
+
+This document is intended for a highly technical audience.  The reader should already be familiar
+with @cite{Linux} kernel programming, the @cite{Linux} file system, character devices, driver input
+and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
+locks, etc.
+
+The guide is intended for network and systems programmers, who use the @dfn{STREAMS} mechanism at
+user and kernel levels for @cite{Linux} and @cite{UNIX} system communication services.
+
+Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
+system, programming, networking, and data communication.
+
+@subsection Revisions
+@cindex document revisions
+
+Take care that you are working with a current version of this document: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+A current version of this document is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package.
+
+@subsubsection Version Control
+
+@smallexample
+
+$Log: STREAMS.texi,v $
+Revision 0.9.2.26  2006/08/22 12:36:49  brian
+- udpates to documentation, tweaks to Stream head
+
+Revision 0.9.2.25  2006/03/22 10:02:04  brian
+- added makefile target index
+
+Revision 0.9.2.24  2006/03/03 10:57:11  brian
+- 32-bit compatibility support, updates for release
+
+Revision 0.9.2.23  2005/09/15 13:03:08  brian
+- added new graphics and updates
+
+Revision 0.9.2.22  2005/07/08 13:16:11  brian
+- updates to documentation
+
+Revision 0.9.2.21  2005/06/24 13:38:59  brian
+- added troubleshooting section to manuals
+
+Revision 0.9.2.20  2005/05/14 08:34:34  brian
+- copyright header correction
+
+Revision 0.9.2.19  2005/04/15 00:58:31  brian
+- working up documentation
+
+Revision 0.9.2.18  2005/04/14 08:06:09  brian
+- added figures
+
+Revision 0.9.2.17  2005/04/12 09:28:59  brian
+- corrections
+
+Revision 0.9.2.16  2005/04/11 20:48:41  brian
+- documentation updates and corrections
+
+Revision 0.9.2.15  2005/03/15 12:06:58  brian
+- Updated texinfo documentation.
+
+Revision 0.9.2.14  2005/03/15 00:56:42  brian
+- Updated version numbering in texinfo files.
+
+Revision 0.9.2.13  2005/03/15 00:51:34  brian
+- Updated version numbering in texinfo files.
+
+Revision 0.9.2.12  2005/02/17 22:57:34  brian
+- Some cross-reference corrections.
+
+Revision 0.9.2.11  2005/02/17 11:34:53  brian
+- Corrected some more texi problems.
+
+Revision 0.9.2.10  2005/01/24 11:57:57  brian
+- Updated texinfo headers.
+
+Revision 0.9.2.9  2004/12/19 15:15:02  brian
+- Corrected include position.
+
+Revision 0.9.2.8  2004/12/17 04:02:46  brian
+- Improving spec files.
+
+Revision 0.9.2.7  2004/11/06 10:24:35  brian
+- Updated documentation.
+
+Revision 0.9.2.6  2004/08/22 07:28:53  brian
+- Converted to shared common files.
+
+Revision 0.9.2.5  2004/08/22 06:17:50  brian
+- Checkin on new working branch.
+
+Revision 0.9.2.4  2004/08/15 19:59:29  brian
+- Build system updates.
+
+Revision 0.9.2.3  2004/05/29 08:28:01  brian
+- Working up stable release.
+
+Revision 0.9.2.2  2004/03/15 07:59:39  brian
+- Working up manual pages.
+
+Revision 0.9.2.1  2004/03/13 05:46:34  brian
+- Working up more documentation.
+
+@end smallexample
+
+@subsubsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed,
+postscript or portable document format) version of this document is an @strong{UNCONTROLLED
+VERSION}.
+
+@subsection Disclaimer
+@cindex document disclaimer
+
+@noindent
+@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect, special or
+consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether
+in an action of contract, negligence or other tortious action, arising out of or in connection with
+any use of this document or the performance or implementation of the contents thereof.
+
+@noindent
+@cite{OpenSS7 Corporation} reserves the right to revise this software and documentation for any
+reason, including but not limited to, conformity with standards promulgated by various agencies,
+utilization of advances in the state of the technical arts, or the reflection of changes in the
+design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
+Corporation} is under no obligation to provide any feature listed herein.
+
+@subsubsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Acquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to
+the FAR (or any successor regulations).
+
+@c --------------------------------------------------------------------------
+
 @node Introduction
 @chapter Introduction
 @cindex introduction
 
 This manual documents the design, implementation, installation, operation and future development
-schedule of the @value{PACKAGE_TITLE} package.
+schedule of the @cite{@value{PACKAGE_TITLE}} package.
 
 @c ----------------------------------------------------------------------------
 
@@ -295,7 +505,7 @@ License}) with all sections invariant.
 @cindex overview
 
 This manual documents the design, implementation, installation, operation and future development of
-the @value{PACKAGE_TITLE} package.
+the @cite{@value{PACKAGE_TITLE}} package.
 
 @node Organization
 @section Organization of this Guide
@@ -371,7 +581,7 @@ This manual uses @cite{texinfo} typographic conventions.
 
 @sp 1
 @multitable @columnfractions .5 .5
-@item @b{Linux Fast-STREAMS}
+@item @cite{@value{PACKAGE_TITLE}}
 @tab @b{LiS}
 @item @  @tab @ 
 @item Provided and optimized for Linux.
@@ -393,7 +603,7 @@ all major SVR 4.2 variants.
 @item Supports full SVR 4.2 ES/MP synchronization models.
 @tab Supports only single, Linux derived sychronization models.
 @item @  @tab @ 
-@item Runs at SoftIRQ.  By running at SoftIRQ, Linux Fast-STREAMS ensures that its place within the
+@item Runs at SoftIRQ.  By running at SoftIRQ, @cite{@value{PACKAGE_TITLE}} ensures that its place within the
 scheduling network-based events is appropriate for the Linux kernel.
 @tab Separate kernel threads.
 @item @  @tab @ 
@@ -430,28 +640,155 @@ filesystem for support and debugging.
 @section Files
 @cindex headers
 
-@include tree.texi
+The following kernel modules are installed by @cite{@value{PACKAGE_TITLE}} in the
+@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/}directory, with either a @samp{.o} or @samp{.ko} extension.
+@footnote{The kernel version, @value{_kversion} is just an example.  When installed with a
+@samp{.ko} extension, dashes (@samp{-}) are also changed to underscores (@samp{_}).}
 
-@table @file
-@item specfs.o
-@pgindex specfs.o
-@item streams.o
-@pgindex streams.o
-@item streams-aixcompat.o
-@pgindex streams-aixcompat.o
-@item streams-hpuxcompat.o
-@pgindex streams-hpuxcompat.o
-@item streams-liscompat.o
-@pgindex streams-liscompat.o
-@item streams-osfcompat.o
-@pgindex streams-osfcompat.o
-@item streams-suncompat.o
-@pgindex streams-suncompat.o
-@item streams-svr4compat.o
-@pgindex streams-svr4compat.o
-@item streams-uw7compat.o
-@pgindex streams-uw7compat.o
+@c @include tree.texi
+
+@table @asis
+
+@item @file{specfs}
+@pgindex specfs
+
+This kernel module contains the @dfn{STREAMS} Special Shadow Filesystem.
+See @manref{specfs(5)} for more information.
+
+@item @file{streams}
+@pgindex streams
+
+This kernel module contians the @dfn{STREAMS} scheduler, utility functions, and @dfn{STREAMS} Device
+Driver Interface/Driver Kernel Interface (DDI/DKI).
+See @manref{STREAMS(9)} for more information.
+
+@item @file{streams-fifo}
+@pgindex streams-fifo
+
+This kernel module contains the @file{fifo} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver, but is also used by the conformance and validation test suite.
+See @manref{fifo(4)} for more information.
+
+@item @file{streams-sad}
+@pgindex streams-sad
+
+This kernel module contains the @file{sad} @dfn{STREAMS} driver.
+This is the standard @dfn{STREAMS} Administrative Driver.
+See @manref{sad(4)} for more information.
+
+@item @file{streams-nsdev}
+@pgindex streams-nsdev
+
+This kernel module contains the @file{nsdev} @dfn{STREAMS} driver.
+This is a @cite{@value{PACKAGE_TITLE}} specific driver.
+See @manref{nsdev(4)} for more information.
+
+@item @file{streams-echo}
+@pgindex streams-echo
+
+This kernel module contains the @file{echo} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver, but is also used by the conformance and validation test suite.
+See @manref{echo(4)} for more information.
+
+@item @file{streams-mux}
+@pgindex streams-mux
+
+This kernel module contains the @file{mux} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver< but is also used by the conformance and validation test suite.
+See @manref{mux(4)} for more information.
+
+@item @file{streams-nuls}
+@pgindex streams-nuls
+
+This kernel module contains the @file{nuls} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} module.
+See @manref{nuls(4)} for more information.
+
+@item @file{streams-pipe}
+@pgindex streams-pipe
+
+This kernel module contains the @file{pipe} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver.
+See @manref{pipe(4)} for more information.
+
+@item @file{streams-log}
+@pgindex streams-log
+
+This kernel module contains the @file{log} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver.
+See @manref{log(4)} for more information.
+
+@item @file{streams-loop}
+@pgindex streams-loop
+
+This kernel module contains the @file{loop} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver, but is also used by the conformance and validation test suite.
+See @manref{loop(4)} for more information.
+
+@item @file{streams-sfx}
+@pgindex streams-sfx
+
+This kernel module contains the @dfn{sfx} @dfn{STREAMS} driver.
+This is a common character device driver for implementing @dfn{STREAMS} FIFOs.
+See @manref{sfx(4)} for more information.
+
+@item @file{streams-spx}
+@pgindex streams-spx
+
+This kernel module contains the @dfn{spx} @dfn{STREAMS} driver.
+This is a common character device driver for implementing @dfn{STREAMS} pipes.
+See @manref{spx(4)} for more information.
+
+@item @file{streams-bufmod}
+@pgindex streams-bufmod
+
+This kernel module contains the @file{bufmod} @dfn{STREAMS} module.  The @file{bufmod} @dfn{STREAMS}
+module is a simple buffer module (a module that always defers to its service procedure and then
+passes any message along).  This module is used for performance testing of the @dfn{STREAMS}
+package.
+See @manref{bufmod(4)} for more information.
+
+@item @file{streams-nullmod}
+@pgindex streams-nullmod
+
+This kernel module contains the @file{nullmod} @dfn{STREAMS} module.  The @file{nullmod}
+@dfn{STREAMS} module is a simple null module (a module that always passes messages to the next
+module in along the Stream).  This module is used for performance testing of the @dfn{STREAMS}
+package and is also used by the conformance and validation test suite.
+See @manref{nullmod(4)} for more information.
+
+@item @file{streams-pipemod}
+@pgindex streams-pipemod
+
+This kernel module contains the @file{pipemod} @dfn{STREAMS} module.
+This is a standard @dfn{STREAMS} module used with pipes.
+See @manref{pipemod(4)} for more information.
+
+@item @file{streams-connld}
+@pgindex streams-connld
+
+This kernel module contains the @file{connld} @dfn{STREAMS} module.
+This is a standard @dfn{STREAMS} module.
+See @manref{connld(4)} for more information.
+
+@item @file{streams-sc}
+@pgindex streams-sc
+
+This kernel module contains the @dfn{sc} @dfn{STREAMS} module.
+This is a common @dfn{STREAMS} Configuration module.
+See @manref{sc(4)} for more information.
+
+@item @file{streams-testmod}
+@pgindex streams-testmod
+
+This kernel module contains the @file{testmod} @dfn{STREAMS} module.
+This is a @cite{@value{PACKAGE_TITLE}} specific test module that is used for conformance and validation
+testing of @dfn{STREAMS}.
+See @manref{testmod(4)} for more information.
+
 @end table
+
+Additional kernel modules are provided by add-on packages.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -460,67 +797,264 @@ filesystem for support and debugging.
 @section Drivers
 @cindex drivers
 
-The configuration of @cite{STREAMS} drivers and modules is performed when
-compiling the @b{Linux Fast-STREAMS} subsystem.  The @cite{STREAMS} subsystem,
-core drivers and modules are part of every @b{Linux Fast-STREAMS} system.
+The configuration of @dfn{STREAMS} drivers and modules is performed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{STREAMS} subsystem, core drivers and modules are
+part of every @cite{@value{PACKAGE_TITLE}} system.
 
-The following sections list the core drivers and modules, @cite{STREAMS} kernel
-tunable parameters, and @cite{STREAMS} configuration information.
+The following lists the core drivers and modules, @dfn{STREAMS} kernel tunable parameters, and
+@dfn{STREAMS} configuration information:@footnote{Note that documentation for @dfn{STREAMS} drivers
+is in the form of manual pages in Section 4 of the manual pages with the same name as the driver.}
 
-@table @file
-@item streams-clone.o ("clone")
-@pgindex streams-clone.o
+@table @asis
+
+@item @manpage{clone(4)} (@file{streams})
+@pgindex streams
+@pgindex clone
+
 Clone device driver.
-@item streams-echo.o ("echo")
-@pgindex streams-echo.o
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+The @manpage{clone(4)} driver is a integral part of @dfn{STREAMS} and is used to create clone
+instances of a @dfn{STREAMS} driver.
+
+See @manref{clone(4)} for more information.
+
+@item @manpage{echo(4)} (@file{streams-echo})
+@pgindex streams-echo
+@pgindex echo
+
 Echo (loopback) device driver.
-@item streams-fifo.o ("fifo")
-@pgindex streams-fifo.o
-FIFO (Named Pipe) driver.
-@item streams-log.o ("strlog")
-@pgindex streams-log.o
-STREAMS log driver.
-@item streams-nsdev.o ("nsdev")
-@pgindex streams-nsdev.o
-Named STREAMS device driver.
-@item streams-nuls.o ("nuls")
-@pgindex streams-nuls.o
-Null stream driver.
-@item streams-pipe.o ("pipe")
-@pgindex streams-pipe.o
-Pipe driver.
-@item streams-sad.o ("sad")
-@pgindex streams-sad.o
-STREAMS Administrative Driver.
+This is a commonly implemented @dfn{STREAMS} driver.  It is implemented by @cite{HP-UX(R)} and
+@cite{OSF/1(R)}.  The @manpage{echo(4)} driver provides a simple FIFO-like device without full
+@cite{POSIX} FIFO semantics.  Its primary purpose is for the @dfn{STREAMS} Verficiation function,
+@manref{strvf(8)}, and the @manref{test-streams(8)} validation test suite.
+
+See @manref{echo(4)} for more information.
+
+@item @manpage{fifo(4)} (@file{streams-fifo})
+@pgindex streams-fifo
+@pgindex fifo
+
+FIFO (Named Pipe) device driver.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+The @manpage{fifo(4)} driver provides @cite{POSIX}-compliant @dfn{STREAMS}-based @dfn{FIFO} device.
+Not all implementations of @dfn{STREAMS} provide @dfn{STREAMS}-based @dfn{FIFO}s: some
+implementations use the older @cite{SVR 3}-style @dfn{FIFO}s that are not @dfn{STREAMS}-based.
+@cite{@value{PACKAGE_TITLE}} provides @dfn{STREAMS}-based @dfn{FIFO}s with the @manpage{fifo(4)}
+driver.
+
+See @manref{fifo(4)} for more information.
+
+@item @manpage{log(4)} (@file{streams-log})
+@pgindex streams-log
+@pgindex log
+
+@dfn{STREAMS} log driver.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+The @manpage{log(4)} driver provides a @dfn{STREAMS} capable logger in addition to the @cite{BSD}
+logger present in @cite{Linux}.  The @manpage{log(4)} driver provides additional support for
+@dfn{STREAMS} modules and drivers using the @manref{strlog(9)} kernel level utility.
+@cite{@value{PACKAGE_TITLE}} also provides the @manpage{strace(8)}, @manpage{strerr(8)} and
+@manpage{strclean(8)} administrative utility  functions and startup scripts for controlling the
+@manpage{log(4)} driver.
+
+See @manref{log(4)} for more information.
+
+@item @manpage{loop(4)} (@file{streams-loop})
+@pgindex streams-loop
+@pgindex loop
+
+Loop device driver.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+The @command{loop} driver is detailed in the @cite{UNIX System V Release 4 Programmer's Manual -- STREAMS}.
+The @manpage{loop(4)} driver provides capabilities used primarly for validation test programs (see
+@manref{test-streams(8)}) as well as serving as an example driver.
+
+See @manref{loop(4)} for more information.
+
+@item @manpage{mux(4)} (@file{streams-mux})
+@pgindex streams-mux
+@pgindex mux
+
+Multiplexing driver.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+The @command{mux} driver is detailed in the @cite{UNIX System V Release 4 Programmer's Manual -- STREAMS}.
+The @manpage{mux(4)} driver provides capabilities used primarily for validation test programs (see
+@manref{test-streams(8)} as well as serving as an example multiplexing driver.  This
+@manpage{mux(4)} driver also provides the @command{minimux} capabilities formerly present in @cite{LiS}.
+
+See @manref{mux(4)} for more information.
+
+@item @manpage{nsdev(4)} (@file{streams-nsdev})
+@pgindex streams-nsdev
+@pgindex nsdev
+
+Named @dfn{STREAMS} device driver.
+This is a @cite{@value{PACKAGE_TITLE}} specific driver.
+The @manpage{nsdev(4)} driver is a @manpage{clone(4)}-like driver that permits the specification of
+major and minor device numbers using the device node name.  It provides one of three mechanisms
+under @cite{@value{PACKAGE_TITLE}} that remove @dfn{STREAMS} driver dependency on statically
+allocated device numbers.
+
+See @manref{nsdev(4)} for more information.
+
+@item @manpage{nuls(4)} (@file{streams-nuls})
+@pgindex streams-nuls
+@pgindex nuls
+
+Null @dfn{Stream} driver.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+The @manpage{nuls(4)} driver is usually called @samp{null}.  @cite{Linux} has its own
+@cite{SVR3}-style @file{/dev/null} driver, so it was renamed to @samp{nuls}.
+
+See @manref{nuls(4)} for more information.
+
+@item @manpage{pipe(4)} (@file{streams-pipe})
+@pgindex streams-pipe
+@pgindex pipe
+
+@dfn{STREAMS}-based pipe driver.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+However, @manpage{pipe(4)} is not normally implemented as a @dfn{STREAMS} driver, but is implemented
+as a system call.  @cite{@value{PACKAGE_TITLE}} provides @manpage{pipe(2s)} system call emulation
+which invokes this driver internal to the kernel.
+
+See @manref{pipe(4)} for more information.
+
+@item @manpage{sad(4)} (@file{streams-sad})
+@pgindex streams-sad
+@pgindex sad
+
+@dfn{STREAMS} Administrative Driver.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+The @manpage{sad(4)} driver is used by the @manref{autopush(8)} utility to examine and specify the
+autopush lists for @dfn{STREAMS} drivers.  Also, it is used to examine and verify the present of
+@dfn{STREAMS} modules or drivers in the system.
+
+See @manref{sad(4)} for more information.
+
+@item @manpage{sfx(4)} (@file{streams-sfx})
+@pgindex streams-sfx
+@pgindex sfx
+
+@dfn{STREAMS} FIFO device driver.
+This is commonly implemented @dfn{STREAMS} driver that is used to implement @dfn{STREAMS} FIFOs
+(Named Pipes) using a regular character device.
+The @manpage{sfx(4)} driver provides a character based device approach to creating FIFOs.
+
+See @manref{sfx(4)} for more information.
+
+@item @manpage{spx(4)} (@file{streams-spx})
+@pgindex streams-spx
+@pgindex spx
+
+@dfn{STREAMS} pipe device driver.
+This is commonly implemented @dfn{STREAMS} driver that is used to implement @dfn{STREAMS} pipes
+using a regular character device.
+The @manpage{spx(4)} driver provides a character based device approach to creating FIFOs and pipes.
+Only @cite{UnixWare(R)} and @cite{AIX(4)} document this device.
+
+See @manref{spx(4)} for more information.
+
 @end table
 
+Additional drivers are provided by add-on packages.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
+@page
 @node Modules
 @section Modules
 @cindex modules
 
-The configuration of @cite{STREAMS} drivers and modules is performed when
-compiling the @b{Linux Fast-STREAMS} subsystem.  The @cite{STREAMS} subsystem,
-core drivers and modules are part of every @b{Linux Fast-STREAMS} system.
+The configuration of @dfn{STREAMS} drivers and modules is performed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{STREAMS} subsystem, core drivers and modules are
+part of every @cite{@value{PACKAGE_TITLE}} system.
 
-The following sections list the core drivers and modules, @cite{STREAMS} kernel
-tunable parameters, and @cite{STREAMS} configuration information.
+The following lists the core drivers and modules, @dfn{STREAMS} kernel tunable parameters, and
+@dfn{STREAMS} configuration information:@footnote{Note that documentation for @dfn{STREAMS} modules
+is in the form of a manual page in Section 4 of the manual pages with the same name as the module.}
 
-@table @file
-@item streams-connld.o ("connld")
-@pgindex streams-connld.o
-Connld module.
-@item streams-pipemod.o ("pipemod")
-@pgindex streams-pipemod.o
+@table @asis
+
+@item @manpage{pipemod(4)} (@file{streams-pipemod})
+@pgindex streams-pipemod
+
 Pipe module.
-@item streams-sc.o ("sc")
-@pgindex streams-sc.o
-STREAMS configuration module.
-@item streams-sth.o ("sth")
-@pgindex streams-sth.o
-Stream Head module.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} module.
+The @manpage{pipemod(4)} module can be pushed over a pipe end or FIFO before other modules are
+pushed (on either end) to reverse the sense of the @manpage{M_FLUSH(9)} message that traverse the
+pipe.
+
+See @manref{pipemod(4)} for more information.
+
+@item @manpage{connld(4)} (@file{streams-connld})
+@pgindex streams-connld
+
+Connection Line Discipline module.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} module.
+The @manpage{connld(4)} module can be pushed over a pipe end that has been attached to a filesystem
+file using @manref{fattach(3)} and will then create a new pipe instance on each @manpage{open(2s)}
+of the attached file and pass the new remove file pointer to the remove end using
+@manpage{M_PASSFP(9)} to be received with @manpage{I_RECVFD(7)}.  This allows servers to be created
+that use @manpage{pipe(4)}s for communication.
+
+See @manref{connld(4)} for more information.
+
+@item @manpage{sc(4)} (@file{streams-sc})
+@pgindex streams-sc
+
+@dfn{STREAMS} Configuration module.
+This is a commonly implemented @dfn{STREAMS} module.
+It is implemented by @cite{HP-UX} and @cite{AIX}, and perhaps other @cite{Mentat}-derived
+@dfn{STREAMS} implementations.
+The @manpage{sc(4)} modules provides the ability to access @dfn{STREAMS} driver information by name
+rather than major device number.  It also provides access to the @mantype{module_info(9)} and
+@mantype{module_stat(9)} structure information for the named @dfn{STREAMS} module or driver, not
+accessible using the @manpage{sad(4)} driver.  The @manpage{sc(4)} module is used by the
+@manref{scls(8)} utility.
+
+See @manref{sc(4)} for more information.
+
+@item @manpage{bufmod(4)} (@file{streams-bufmod})
+@pgindex streams-bufmod
+
+Buffer module.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} module described in the @cite{UNIX System V Release 4
+Programmer's Manual -- STREAMS}.
+The @manpage{bufmod(4)} module also has @cite{@value{PACKAGE_TITLE}} specific extensions.
+The @manpage{bufmod(4)} module is used by the @manref{perftest(8)} performance test program to test
+the effect of additional levels of service procedure pushed over a @dfn{Stream}.
+The module also serves as an example of a @dfn{STREAMS} module using service procedures.
+
+See @manref{bufmod(4)} for more information.
+
+@item @manpage{nullmod(4)} (@file{streams-nullmod})
+@pgindex streams-nullmod
+
+Null module.
+This is a standard @cite{SVR 4.2 @dfn{STREAMS}} module described in the @cite{UNIX System V Release 4
+Programmer's Manual -- STREAMS}.
+The @manpage{nullmod(4)} module also has @cite{@value{PACKAGE_TITLE}} specific extensions.
+The @manpage{nullmod(4)} module is used by the @manref{perftest(8)} performance test program to test
+the effect of additional levels of put procedure pushed over a @dfn{Stream}.
+The module also serves as an example of a @dfn{STREAMS} module not using service procedures.
+
+See @manref{nullmod(4)} for more information.
+
+@item @manpage{testmod(4)} (@file{streams-testmod})
+@pgindex streams-testmod
+
+Test module.
+This is a @cite{@value{PACKAGE_TITLE}} specific @dfn{STREAMS} module.
+The primary purpose of the @manpage{testmod(4)} modules is to provide the @manref{test-streams(8)}
+validation test program with the capability to pass specific @manpage{M_ERROR(9)} and
+@manpage{M_HANGUP(9)} messages to the @dfn{Stream head} for @cite{POSIX} validation testing.
+It also serves as an example of how a @dfn{STREAMS} module can properly process @manpage{M_IOCTL(9)}
+and related messages.
+
+See @manref{testmod(4)} for more information.
+
 @end table
 
 Additional modules are provided by add-on packages.
@@ -528,26 +1062,785 @@ Additional modules are provided by add-on packages.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
+@page
 @node Libraries
 @section Libraries
 @cindex libraries
 
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
+@page
 @node Utilities
 @section Utilities
 @cindex utilities
 
+@menu
+* Init Scripts::
+* User Utilities::
+* Administrative Utilities::
+* Performance Test Programs::
+* Conformance Test Programs::
+@end menu
+
+@node Init Scripts
+@subsection Init Scripts
+@cindex init scripts
+
+Following are System V Init Scripts that are installed by the package:
+
+@table @asis
+
+@item @manpage{specfs(8)} (@file{/etc/init.d/specfs})
+@pgindex specfs
+@pgindex /etc/init.d/specfs
+@itemx @manpage{specfs.sh(8)} (@file{/etc/init.d/specfs.sh})
+@pgindex specfs.sh
+@pgindex /etc/init.d/specfs.sh
+
+System V Init Script for the @dfn{STREAMS} Special Shadow Filesystem.
+The @manpage{specfs(8)} init script provides the ability to initialize, configure and mount the
+@dfn{STREAMS} Special Shadow Filesystem, @manpage{specfs(5)}.
+The @manpage{specfs(8)} script provides the RedHat-style init script, whereas the
+@manpage{specfs.sh(8)} script provides the Debian-style init script.
+
+See @manref{specfs(8)} for more information.
+
+@item @manpage{@value{PACKAGE}(8)} (@file{/etc/init.d/@value{PACKAGE}})
+@pgindex @value{PACKAGE}
+@pgindex /etc/init.d/@value{PACKAGE}
+@itemx @manpage{@value{PACKAGE}.sh(8)} (@file{/etc/init.d/@value{PACKAGE}.sh})
+@pgindex @value{PACKAGE}.sh
+@pgindex /etc/init.d/@value{PACKAGE}.sh
+
+System V Init Script for the @dfn{STREAMS} Subsystem.
+The @manpage{streams(8)} init script provides the ability to initialize, configure and mount the
+@dfn{STREAMS} subsystem, @manpage{STREAMS(9)}.
+The @manpage{streams(8)} script provides the RedHat-style init script, whereas the
+@manpage{streams.sh(8)} script provides the Debian-style init script.
+
+See @manref{streams(8)} for more information.
+
+@end table
+
+@node User Utilities
+@subsection User Utilities
+@cindex user utilities
+
+Following are user utilities for manipulating @dfn{Streams}:
+
+@table @asis
+
+@item @manpage{strchg(1)} (@file{/usr/bin/strchg})
+@pgindex strchg
+@pgindex /usr/bin/strchg
+
+Change @dfn{Stream} configuration.
+@manpage{strchg(1)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} user utility.
+
+@manpage{strchg(1)} is a C-language user program that can be used to alter the configuration of the
+@dfn{Stream} associated with the caller's standard input.  The @manpage{strchg(1)} command pushes
+modules on the @dfn{Stream}, pops modules off of the @dfn{Stream}, or both.  Only the superuser or
+owner of the @dfn{STREAMS} device can alter the configruation of that @dfn{Stream}.  If another user
+attempts to alter the configuration, the @manpage{strconf(1)} command will fail.
+
+@manpage{strchg(1)} is useful from the shell and, when standard input is redirected from an open
+file descriptor to the command, can be used to push and pop modules from arbitrary @dfn{Streams},
+not just those associated with @dfn{STREAMS}-based terminal devices.
+
+See @manref{strchg(1)} for more information.
+
+@item @manpage{strconf(1)} (@file{/usr/bin/strconf})
+@pgindex strconf
+@pgindex /usr/bin/strconf
+
+Query @dfn{Stream} configuration.
+@manpage{strconf(1)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} user utility.
+
+@manpage{strconf(1)} is a C-language user program that can be used to query the configuration of a
+@dfn{Stream}.  When use without any options, it prints a list of the modules in the @dfn{Stream}
+associated with the standard input, as well as the topmost driver.  The list is printed with one
+name per line, where the first name printed is the topmost module on the @dfn{Stream} and the last
+item printed is the name of the topmost driver associated with the @dfn{Stream}.
+
+@manpage{strconf(1)} is useful from the shell and, when standard input is redirected from an open
+file descriptor to the command, can be used to query arbitrary @dfn{Streams}, not just the
+associated with @dfn{STREAMS}-based terminal devices.
+
+See @manref{strconf(1)} for more information.
+
+@item @manpage{strreset(1)} (@file{/usr/bin/strreset})
+@pgindex strreset
+@pgindex /usr/bin/strreset
+
+Reset a @dfn{Stream}.
+@manpage{strreset(1)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} user utility.
+
+@manpage{strreset(1)}is a C-language user progrm that resets an open @dfn{Stream} by generating an
+@manpage{M_FLUSH(9)} message to the @dfn{Stream head}.  It is used mainly to reset blocked
+@dfn{Streams}.  Wehn it is impossible to reopen the @dfn{Stream}, issue an @manref{I_FLUSH} or
+equivalent command.  This situtation may happen with a process sleeping in a module's close routine,
+when signals can not be sent to the process (a zombie process exiting, for example).
+
+See @manref{strreset(1)} for more information.
+
+@end table
+
+@node Administrative Utilities
+@subsection Administrative Utilities
+@cindex administrative utilities
+
+Following are adminstrative utilities for manipulating and examining the @dfn{STREAMS} subsystem:
+
+@table @asis
+
+@item @manpage{autopush(8)} (@file{/usr/sbin/autopush})
+@pgindex autopush
+@pgindex /usr/sbin/autopush
+
+Control the @dfn{autopush} module list for a @dfn{STREAMS} device.
+@manpage{autopush(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} adminstrative utility.
+
+@manpage{autopush(8)} is a C-language program that can be used to manipulate and examine which
+@dfn{STREAMS} modules are automatically pushed over a device when it is opened.  It is also possible
+to restrict the ability to push further modules on the @dfn{Stream} without proper privilege.
+The @manpage{autopush(8)} utility provides a user program interface to the @dfn{STREAMS}
+Administrative Driver (@manpage{sad(4)}).
+
+See @manref{autopush(8)} for more information.
+
+@item @manpage{fattach(8)} (@file{/usr/sbin/fattach})
+@pgindex fattach
+@pgindex /usr/sbin/fattach
+
+Name a @dfn{STREAMS} file.
+@manpage{fattach(8)} is an @cite{LiS} utility.  Although @cite{OSF/1} documentation mentions an
+@command{fattach} manpage in section 8, one does not exist.
+
+@manpage{fattach(8)} opens a @manpage{pipe(4)} and attaches one end of the pipe to a file using
+@manpage{fattach(3)}, and optionally pushes the @manpage{connld(4)} module on the side of the pipe
+being attached to the file.  The other end of the pipe remains available for use by the shell
+program invoking this command.
+
+@manpage{fattach(8)} provides a easy way for shell programs to use @dfn{STREAMS}-based pipes and to
+use the facilities of the @manpage{connld(4)} module.
+
+See @manref{fattach(8)} for more information.
+
+@item @manpage{fdetach(8)} (@file{/usr/sbin/fdetach})
+@pgindex fdetach
+@pgindex /usr/sbin/fdetach
+
+Unlink a named @dfn{STREAMS} file.
+
+@manpage{fdetach(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
+
+@manpage{fdetach(8)} is a C-language program that detaches or disassociates a file descriptor for an
+oepn @dfn{STREAMS} device or pipe from its filename in the file system.
+
+See @manref{fdetach(8)} for more information.
+
+@item @manpage{insf(8)} (@file{/usr/sbin/insf})
+@pgindex insf
+@pgindex /usr/sbin/insf
+
+Install special files.
+@manpage{insf(8)} is the @cite{HP-UX} way to install special (device) files.  This program is not
+even partially implemented in @cite{@value{PACKAGE_TITLE}}.  Use @manref{streams_mknod(8)} and
+friends instead.
+
+See @manref{insf(8)} for more information.
+
+@item @manpage{scls(8)} (@file{/usr/sbin/scls})
+@pgindex scls
+@pgindex /usr/sbin/scls
+
+List @dfn{STREAMS} configuration.
+@manpage{scls(8)} is a rather useful @cite{AIX} administrative utility that is also implemented by
+@cite{@value{PACKAGE_TITLE}}.
+
+@manpage{scls(8)} is a C-language program that can be used to list module and driver names as well
+as information and statistics associated with those modules or drivers.
+The @manpage{scls(8)} utility provides a user program interface to the @dfn{STREAMS} Configuration
+module (@manpage{sc(4)}).
+
+See @manref{scls(8)} for more information.
+
+@item @manpage{strace(8)} (@file{/usr/sbin/strace})
+@pgindex strace
+@pgindex /usr/sbin/strace
+
+Write @dfn{STREAMS} event trace messages to the standard output.
+@manpage{strace(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} adminstrative utility.
+
+The @manpage{strace(8)} C-language program receies trace event messages from the @dfn{STREAMS} log
+driver (@manpage{log(4)}) and writes these messages to the standard output.  When run as a daemon,
+@manpage{strace(8)} appens these messages to a log file.
+
+Messages that appear in the trace log are intended to report debugging information that assists with
+troubleshooting a running @dfn{STREAMS} module or driver.
+
+See @manref{strace(8)} for more information.
+
+@item @manpage{strclean(8)} (@file{/usr/sbin/strclean})
+@pgindex strclean
+@pgindex /usr/sbin/strclean
+
+Clean up after the @dfn{STREAMS} error logger.
+@manpage{strclean(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} adminstrative utility.
+
+The @manpage{strclean(8)} utility is a bash script that can be used to delete aged log files
+generated by the @dfn{STREAMS} error logger, @manpage{strerr(8)}.
+
+See @manref{strclean(8)} for more information.
+
+@item @manpage{streams_mknod(8)} (@file{/usr/sbin/streams_mknod})
+@pgindex streams_mknod
+@pgindex /usr/sbin/streams_mknod
+
+Make special device nodes for @dfn{STREAMS}.
+@manpage{streams_mknod(8)} is a @cite{@value{PACKAGE_TITLE}} specific adminstrative utility.
+
+The @manpage{streams_mknod(8)} C-language program can be used to make (or remove) the special
+device nodes under the @file{/dev} directory required by @command{@value{PACKAGE}-@value{VERSION}}
+package modules and drivers.  @manpage{streams_mknod(8)} in invoked by the System V startup script,
+@file{/etc/init.d/@value{PACKAGE}}.
+
+See @manref{streams_mknod(8)} for more information.
+
+@item @manpage{strerr(8)} (@file{/usr/sbin/strerr})
+@pgindex strerr
+@pgindex /usr/sbin/strerr
+
+Receive error log messages from the @dfn{STREAMS} @manpage{log(4)} driver.
+@manpage{strerr(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} adminstrative utility.
+
+The @manpage{strerr(8)} utility is a C-language program, run as a daemon, that receives error log
+messages from the @dfn{STREAMS} log driver (@manpage{log(4)}) and writes these messsage to a log
+file.  By default, @manpage{strerr(8)} logs all @dfn{STREAM} error messages from all drivers and
+modules.
+
+Messages that appear in the error log are intended to report exceptional conditions that require the
+attention of the person who administers your system.
+
+See @manref{strerr(8)} for more information.
+
+@item @manpage{strinfo(8)} (@file{/usr/sbin/strinfo})
+@pgindex strinfo
+@pgindex /usr/sbin/strinfo
+
+List @dfn{Stream} information.
+@manpage{strinfo(8)} is a rather useful @cite{AIX} adminstrative utility that is also implemented by
+@cite{@value{PACKAGE_TITLE}}.
+
+The @manpage{strinfo(8)} C-language program can be used to list @dfn{Stream} instance information as
+well as information and statistics on a module or driver basis.
+The @manpage{scls(8)} utility provides a user program interface to the @dfn{STREAMS} Configuration
+module (@manpage{sc(4)}).
+
+This program is not even partially implemented in @cite{@value{PACKAGE_TITLE}} yet.  User
+@manref{proc(5)} file system and the @file{/proc/streams} directory instead.  Also, see
+@manref{scls(8)} for driver and module specific information.
+
+See @manref{strinfo(8)} for more information.
+
+@item @manpage{strload(8)} (@file{/usr/sbin/strload})
+@pgindex strload
+@pgindex /usr/sbin/strload
+
+Loads the @dfn{STREAMS} subsystem.
+@manpage{strload(8)} is a useful @cite{AIX} administrative utility that is also implemented by
+@cite{@value{PACKAGE_TITLE}}.
+
+The @manpage{strload(8)} bash script can be used to load @dfn{STREAMS} modules and drivers
+individually or from a configuration file.
+
+See @manref{strload(8)} for more information.
+
+@item @manpage{strsetup(8)} (@file{/usr/sbin/strsetup})
+@pgindex strsetup
+@pgindex /usr/sbin/strsetup
+
+Bash script.
+
+See @manref{strsetup(8)} for more information.
+
+@item @manpage{strvf(8)} (@file{/usr/sbin/strvf})
+@pgindex strvf
+@pgindex /usr/sbin/strvf
+
+C-language program.
+
+See @manref{strvf(8)} for more information.
+
+@end table
+
+@node Performance Test Programs
+@subsection Performance Test Programs
+@cindex performance test programs
+
+Following are performance test programs:
+
+@table @asis
+
+@item @manpage{perftest(8)} (@file{/usr/sbin/perftest})
+@pgindex perftest
+@pgindex /usr/sbin/perftest
+
+C-language program.
+
+See @manref{perftest(8)} for more information.
+
+@item @manpage{perftestn(8)} (@file{/usr/sbin/perftestn})
+@pgindex perftestn
+@pgindex /usr/sbin/perftestn
+
+C-language program.
+
+See @manref{perftestn(8)} for more information.
+
+@end table
+
+@node Conformance Test Programs
+@subsection Conformance Test Programs
+@cindex conformance test programs
+
+Following and conformance and validation testing programs:
+
+@table @asis
+
+@item @manpage{test-clone(8)} (@file{/usr/libexec/@value{PACKAGE}/test-clone})
+@pgindex test-clone
+@pgindex /usr/libexec/@value{PACKAGE}/test-clone
+
+The @manpage{test-clone(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{clone(4)} @dfn{STREAMS} driver.
+
+See @manref{test-clone(8)} for more information.
+
+@item @manpage{test-connld(8)} (@file{/usr/libexec/@value{PACKAGE}/test-connld})
+@pgindex test-connld
+@pgindex /usr/libexec/@value{PACKAGE}/test-connld
+
+The @manpage{test-connld(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{connld(4)} @dfn{STREAMS} driver.
+
+See @manref{test-connld(8)} for more information.
+
+@item @manpage{test-echo(8)} (@file{/usr/libexec/@value{PACKAGE}/test-echo})
+@pgindex test-echo
+@pgindex /usr/libexec/@value{PACKAGE}/test-echo
+
+The @manpage{test-echo(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{echo(4)} @dfn{STREAMS} driver.
+
+See @manref{test-echo(8)} for more information.
+
+@item @manpage{test-fifo(8)} (@file{/usr/libexec/@value{PACKAGE}/test-fifo})
+@pgindex test-fifo
+@pgindex /usr/libexec/@value{PACKAGE}/test-fifo
+
+The @manpage{test-fifo(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{fifo(4)} @dfn{STREAMS} driver.
+
+See @manref{test-fifo(8)} for more information.
+
+@item @manpage{test-log(8)} (@file{/usr/libexec/@value{PACKAGE}/test-log})
+@pgindex test-log
+@pgindex /usr/libexec/@value{PACKAGE}/test-log
+
+The @manpage{test-log(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{log(4)} @dfn{STREAMS} driver.
+
+See @manref{test-log(8)} for more information.
+
+@item @manpage{test-loop(8)} (@file{/usr/libexec/@value{PACKAGE}/test-loop})
+@pgindex test-loop
+@pgindex /usr/libexec/@value{PACKAGE}/test-loop
+
+The @manpage{test-loop(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{loop(4)} @dfn{STREAMS} driver.
+
+See @manref{test-loop(8)} for more information.
+
+@item @manpage{test-mux(8)} (@file{/usr/libexec/@value{PACKAGE}/test-mux})
+@pgindex test-mux
+@pgindex /usr/libexec/@value{PACKAGE}/test-mux
+
+The @manpage{test-mux(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{mux(4)} @dfn{STREAMS} driver.
+
+See @manref{test-mux(8)} for more information.
+
+@item @manpage{test-nsdev(8)} (@file{/usr/libexec/@value{PACKAGE}/test-nsdev})
+@pgindex test-nsdev
+@pgindex /usr/libexec/@value{PACKAGE}/test-nsdev
+
+The @manpage{test-nsdev(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{nsdev(4)} @dfn{STREAMS} driver.
+
+See @manref{test-nsdev(8)} for more information.
+
+@item @manpage{test-nuls(8)} (@file{/usr/libexec/@value{PACKAGE}/test-nuls})
+@pgindex test-nuls
+@pgindex /usr/libexec/@value{PACKAGE}/test-nuls
+
+The @manpage{test-nuls(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{nuls(4)} @dfn{STREAMS} driver.
+
+See @manref{test-nuls(8)} for more information.
+
+@item @manpage{test-pipe(8)} (@file{/usr/libexec/@value{PACKAGE}/test-pipe})
+@pgindex test-pipe
+@pgindex /usr/libexec/@value{PACKAGE}/test-pipe
+
+The @manpage{test-pipe(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{pipe(4)} @dfn{STREAMS} driver.
+
+See @manref{test-pipe(8)} for more information.
+
+@item @manpage{test-pipemod(8)} (@file{/usr/libexec/@value{PACKAGE}/test-pipemod})
+@pgindex test-pipemod
+@pgindex /usr/libexec/@value{PACKAGE}/test-pipemod
+
+The @manpage{test-pipemod(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{pipemod(4)} @dfn{STREAMS} driver.
+
+See @manref{test-pipemod(8)} for more information.
+
+@item @manpage{test-sad(8)} (@file{/usr/libexec/@value{PACKAGE}/test-sad})
+@pgindex test-sad
+@pgindex /usr/libexec/@value{PACKAGE}/test-sad
+
+The @manpage{test-sad(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{sad(4)} @dfn{STREAMS} driver.
+
+See @manref{test-sad(8)} for more information.
+
+@item @manpage{test-sc(8)} (@file{/usr/libexec/@value{PACKAGE}/test-sc})
+@pgindex test-sc
+@pgindex /usr/libexec/@value{PACKAGE}/test-sc
+
+The @manpage{test-sc(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{sc(4)} @dfn{STREAMS} driver.
+
+See @manref{test-sc(8)} for more information.
+
+@item @manpage{test-streams(8)} (@file{/usr/libexec/@value{PACKAGE}/test-streams})
+@pgindex test-streams
+@pgindex /usr/libexec/@value{PACKAGE}/test-streams
+
+The @manpage{test-streams(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{STREAMS(9)} subsystem and primarly the @manpage{sth(4)} @dfn{Stream head}.
+
+See @manref{test-streams(8)} for more information.
+
+@end table
+
+For the proper way to execute these validation test programs in a conformance and validation test
+suite, see @ref{Running Test Suites}.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
+@page
 @node Development
 @section Development
 @cindex developing
 
 For development using the @cite{@value{PACKAGE_NAME}} package, @xref{Top, About This Manual, About
 This Manual, SPG, STREAMS Programmer's Guide}.
+
+@menu
+* Development Header Files::
+* Static and Shared Libraries::
+* Kernel Module Development::
+* Manual Pages::
+@end menu
+
+@node Development Header Files
+@subsection Header Files
+
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}} subdirectory.  To
+use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the
+@command{gcc} command line as a compile option.  This is true regardless of whether user space or
+kernel space programs are being compiled.
+
+In general, @samp{-I} include directives on the @command{gcc} command line should be ordered in the
+reverse order of the dependencies between packages.  So, for example, if the include files from all
+add-on packages are required, the order of these directives would be: @samp{-I/usr/include/strss7
+-I/usr/include/strsctp -I/usr/include/strinet -I/usr/include/strxnet -I/usr/include/strxns
+-I/usr/include/strcompat -I/usr/include/streams}.
+
+Following are the user visible header files provided by the
+@command{@value{PACKAGE}-@value{VERSION}} package in directory @file{/usr/include/streams}:
+
+@table @asis
+
+@item @file{strlog.h}
+@pgindex strlog.h
+@pgindex /usr/include/streams/strlog.h
+
+This is the primary header file for the @manref{strlog(4)} driver.
+It is normally only included by user space programs when interacting with the @manpage{log(4)} driver.
+See @manref{log(4)} for more information.
+
+@item @file{stropts.h}
+@pgindex stropts.h
+@pgindex /usr/include/streams/stropts.h
+
+This is the primary user header file for the @dfn{Stream head}.
+It is normally only included by user space programs when interacting with the @dfn{Stream head}.
+See @manref{sth(4)} for more information.
+
+@item @file{log.h}
+@pgindex log.h
+@pgindex /usr/include/streams/log.h
+
+This is the primary header file for the @manref{log(4)} driver.
+It is normally only included by user space programs when interacting with the @manpage{log(4)} driver.
+See @manref{log(4)} for more information.
+
+@item @file{loop.h}
+@pgindex loop.h
+@pgindex /usr/include/streams/loop.h
+
+This is the primary header file for the @manref{loop(4)} driver.
+It is normally only included by user space programs when interacting with the @manpage{loop(4)} driver.
+See @manref{loop(4)} for more information.
+
+@item @file{sad.h}
+@pgindex sad.h
+@pgindex /usr/include/streams/sad.h
+
+This is the primary header file for the @manref{sad(4)} driver.
+It is normally only included by user space programs when interacting with the @manpage{sad(4)} driver.
+See @manref{sad(4)} for more information.
+
+@item @file{sys/cmn_err.h}
+@pgindex sys/cmn_err.h
+@pgindex /usr/include/streams/sys/cmn_err.h
+
+This is the system specific kernel header file for the @manref{cmn_err(9)} utility.
+
+@item @file{sys/ddi.h}
+@pgindex sys/ddi.h
+@pgindex /usr/include/streams/sys/ddi.h
+
+This is the system specific kernel header file for various @dfn{STREAMS} @manref{DDI(9)} utilities.
+It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+See @manref{DDI(9)} for more information.
+
+@item @file{sys/debug.h}
+@pgindex sys/debug.h
+@pgindex /usr/include/streams/sys/debug.h
+
+This is the system specific kernel header file for kernel debuggin macros.
+It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+
+@item @file{sys/dki.h}
+@pgindex sys/dki.h
+@pgindex /usr/include/streams/sys/dki.h
+
+This is the system specific kernel header file for various @dfn{STREAMS} @manref{DKI(9)} utilities.
+It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+See @manref{DKI(9)} for more information.
+
+@item @file{sys/kmem.h}
+@pgindex sys/kmem.h
+@pgindex /usr/include/streams/sys/kmem.h
+
+This is the system specific kernel header file for @manref{kmem_alloc(9)} and related utilities.
+It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+See @manref{kmem_alloc(9)} for more information.
+
+@item @file{sys/strconf.h}
+@pgindex sys/strconf.h
+@pgindex /usr/include/streams/sys/strconf.h
+
+This is the system specific kernel header file for @dfn{STREAMS} driver and module configuration.
+It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+
+@item @file{sys/strdebug.h}
+@pgindex sys/strdebug.h
+@pgindex /usr/include/streams/sys/strdebug.h
+
+This is the system specific kernel header file for @dfn{STREAMS} driver and module debugging macros.
+It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+
+@item @file{sys/stream.h}
+@pgindex sys/stream.h
+@pgindex /usr/include/streams/sys/stream.h
+
+This is the system specific kernel header file for @dfn{STREAMS} drivers and modules.
+It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+See @manref{STREAMS(9)} for more information.
+
+@item @file{sys/strlog.h}
+@pgindex sys/strlog.h
+@pgindex /usr/include/streams/sys/strlog.h
+
+This is the system specific header file for the @manref{strlog(4)} and @manref{strlog(9)} facilities.
+It is normally only included by kernel space programs when interacting with the @manpage{log(4)} driver.
+See @manref{log(4)} for more information.
+
+@item @file{sys/stropts.h}
+@pgindex sys/stropts.h
+@pgindex /usr/include/streams/sys/stropts.h
+
+This is the system specific user header file for the @dfn{Stream head}.
+It is normally only included by user space programs when interacting with the @dfn{Stream head}.
+See @manref{sth(4)} for more information.
+
+@item @file{sys/stropts32.h}
+@pgindex sys/stropts32.h
+@pgindex /usr/include/streams/sys/stropts32.h
+
+This is the system specific user 32/64-bit header file for the @dfn{Stream head}.
+It is normally only included by user space programs when interacting with the @dfn{Stream head}.
+See @manref{sth(4)} for more information.
+
+@item @file{sys/strsubr.h}
+@pgindex sys/strsubr.h
+@pgindex /usr/include/streams/sys/strsubr.h
+
+This is the system specific kernel header file for @dfn{STREAMS} private definitions.
+It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+See @manref{STREAMS(9)} for more information.
+
+@item @file{sys/log.h}
+@pgindex sys/log.h
+@pgindex /usr/include/streams/sys/log.h
+
+This is the system specific header file for the @manref{log(4)} driver.
+It is normally only included by kernel space programs when interacting with the @manpage{log(4)} driver.
+See @manref{log(4)} for more information.
+
+@item @file{sys/loop.h}
+@pgindex sys/loop.h
+@pgindex /usr/include/streams/sys/loop.h
+
+This is the system specific header file for the @manref{loop(4)} driver.
+It is normally only included by kernel space programs when interacting with the @manpage{loop(4)} driver.
+See @manref{loop(4)} for more information.
+
+@item @file{sys/sad.h}
+@pgindex sys/sad.h
+@pgindex /usr/include/streams/sys/sad.h
+
+This is the system specific header file for the @manref{sad(4)} driver.
+It is normally only included by kernel space programs when interacting with the @manpage{sad(4)} driver.
+See @manref{sad(4)} for more information.
+
+@item @file{sys/sc.h}
+@pgindex sys/sc.h
+@pgindex /usr/include/streams/sys/sc.h
+
+This is the system specific header file for the @manref{sc(4)} module.
+It is normally only included by user or kernel space programs when interacting with the @manpage{sc(4)} driver.
+See @manref{sc(4)} for more information.
+
+@item @file{sys/testmod.h}
+@pgindex sys/testmod.h
+@pgindex /usr/include/streams/sys/testmod.h
+
+This is the system specific header file for the @manref{testmod(4)} module.
+It is normally only included by user or kernel space programs when interacting with the @manpage{testmod(4)} driver.
+See @manref{testmod(4)} for more information.
+
+@end table
+
+@subsubsection User Space Programs
+
+Typical include files for interacting with @dfn{STREAMS} from user space include the
+@file{stropts.h} header file.  Additional header files for interacting with specific drivers or
+modules may also be required.
+
+@subsubsection Kernel Space Drivers and Modules
+
+Typical include files for writing @dfn{STREAMS} modules and drivers for kernel space include the
+@file{sys/cmn_err.h}, @file{sys/kmem.h}, @file{sys/dki.h}, @file{sys/stream.h}, @file{sys/ddi.h},
+and @file{sys/strconf.h} header files.  Additional header files for interacting with specific
+drivers or modules may also be required.
+
+@node Static and Shared Libraries
+@subsection Libraries
+
+Shared or static versions of the @file{libstreams} library must be linked when using the
+@command{@value{PACKAGE}-@value{VERSION}} package.  This library must either be specified on the
+@command{gcc} command line as a shared library (e.g. @samp{-lstreams}) or as a static library (e.g.
+@samp{/usr/lib/libstreams.a}).
+
+If the shared library is linked, include the following options on the @command{gcc} command line:
+
+@table @asis
+
+@item @samp{-lstreams}
+Link to the @file{/usr/lib/libstreams.so} shared library.
+
+@end table
+
+If the static library is linked, include the following options on the @command{gcc} command line:
+
+@table @asis
+
+@item @samp{/usr/lib/libstreams.a}
+Link to the @file{/usr/lib/libstreams.a} static library.
+
+@end table
+
+@node Kernel Module Development
+@subsection Kernel Modules
+
+Developing @dfn{STREAMS} kernel modules is similar to user space programs with regard to header
+files.  @file{/usr/include/@value{PACKAGE}} should be placed as an include directory to search in
+the @command{gcc} command line.  The rules for compiling @cite{Linux} kernel modules should be
+followed.  In particular, several important intricacies should be considered:
+
+@itemize @bullet
+
+@item
+The @command{gcc} compiler user to compile the kernel modules must be the same version of compiler
+that was used to compile the kernel.
+
+@item
+The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel.
+
+@item
+The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.
+
+@item
+The @command{gcc} command line must include several important include files directly on the command
+line such as @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
+maybe even @samp{--include
+/@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The kernel version
+@samp{@value{_kversion}} is just an example.  For the running kernel, use the output of @samp{uname
+-r}.}
+
+@end itemize
+
+@node Manual Pages
+@subsection Manual Pages
+
+The @command{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages.  The number
+of manual pages installed totals several hundred manual pages.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -763,11 +2056,11 @@ For additional details,
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
 * Makefile Target Index::	Index of Makefile Targets
+* Manual Page Index::		Index of Manual Pages Referenced
 @end menu
 
 @c ----------------------------------------------------------------------------
 
-@page
 @node Concept Index
 @unnumberedsec Index of Concepts
 @printindex cp
@@ -789,7 +2082,7 @@ For additional details,
 
 @page
 @node File Index
-@unnumberedsec Index of Files and Prorams
+@unnumberedsec Index of Files and Programs
 @printindex pg
 
 @page
@@ -801,6 +2094,11 @@ For additional details,
 @node Makefile Target Index
 @unnumberedsec Index of Makefile Targets
 @printindex mk
+
+@page
+@node Manual Page Index
+@unnumberedsec Index of Manual Pages Referenced
+@printindex mp
 
 @c ----------------------------------------------------------------------------
 

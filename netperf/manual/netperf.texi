@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: netperf.texi,v 1.1.2.6 2006/03/22 10:01:58 brian Exp $
+% @(#) $Id: netperf.texi,v 1.1.2.7 2006/08/22 12:41:33 brian Exp $
 %
 % =========================================================================
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/03/22 10:01:58 $ by $Author: brian $
+% Last Modified $Date: 2006/08/22 12:41:33 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -246,6 +246,9 @@ OR DOCUMENTATION.}
 
 @c Define an index of tests
 @defcodeindex te
+
+@defcodeindex mp
+@include texi/macros.texi
 
 @ifnottex
 @node Top

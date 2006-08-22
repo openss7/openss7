@@ -1,0 +1,2900 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: drivers.texi,v 1.1.2.1 2006/08/22 12:36:50 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/22 12:36:50 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@menu
+* clone Driver::
+* echo Driver::
+* fifo Driver::
+* log Driver::
+* loop Driver::
+* mux Driver::
+* nsdev Driver::
+* nuls Driver::
+* pipe Driver::
+* sad Driver::
+* sfx Driver::
+* spx Driver::
+@end menu
+
+@c ============================================================================
+
+@node clone Driver
+@subsection clone
+
+@subheading Name
+       clone - the STREAMS clone driver
+
+@subheading Synopsis
+@example
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/stream.h>
+#include <fcntl.h>
+
+int fd = open(/dev/xxx_clone, oflags);
+@end example
+
+@subheading Description
+
+The @command{clone} pseudo-device driver is the traditional @dfn{STREAMS} mechanism for dynamic
+assignment of minor device numbers to @dfn{STREAMS} drivers.
+
+@subsubheading Traditional Cloning
+
+When a device node with the @command{clone} major device number is opened, the @command{clone}
+pseudo-device driver opens the @dfn{STREAMS} device associated with the device number formed by
+using the @command{clone} device minor number as the major device number, and zero (0) as the minor
+device number.  Where @var{dev} is the device number associated with the @command{clone} device
+node, the @dfn{STREAMS} device opened have the device number @samp{makedevice(getminor(@var{dev}),
+0)}.
+
+Upon locating the @dfn{STREAMS} device associated with this redirected device number, the
+@command{clone} pseudo-device driver calls the @manref{qopen(9)} routine of the redirected device
+with the @var{sflag} argument to the open set to @var{CLONEOPEN}.  This value of @var{sflag} tells
+the redirected device driver that it should assign a new, unique, minor device number to the
+@dfn{Stream}
+and return it in the @var{devp} argument to the
+@manpage{qopen(9)} call.  Upon successful return
+from the
+@manpage{qopen(9)} call on the redirected device, the @command{clone} driver takes all the
+necessary step to ensure that subsequent file operations on the resulting file descriptor act on the
+redirected device rather than the @command{clone} pseudo-device.
+
+@subsubheading New Cloning
+
+@cite{@value{PACKAGE_TITLE}} also supports the new cloning method in addition to the traditional
+cloning method.  Under the new cloning method, even when the @var{sflag} argument to
+@manpage{qopen(9)} is set to @var{DRVOPEN}, the @dfn{STREAMS} driver is permitted to return a minor
+device number different from the minor device number passed to the driver's
+@manpage{qopen(9)}
+procedure in the @var{devp} argument.  For this to function properly, two conditions must occur:
+
+@enumerate
+
+@item There must be no @dfn{Stream head} already assigned to the minor device number passed in the
+@var{devp} argument to
+@manpage{qopen(9)}.  The
+@manpage{qopen(9)} procedure should check to ensure
+that there is no @code{q->q_ptr} assignment already made to the passed in read queue before
+attempting to assign a minor device number.
+
+This condition can be relaxed if the minor device node is marked as @command{clone} device (either
+with the @var{DF_CLONE} flag on minor node registration or creation, or with the @var{SAP_CLONE}
+flag to the @cite{@dfn{STREAMS} Administrative Driver},
+@manpage{sad(4)}).  In that case,
+@dfn{STREAMS} will always allocate and assign a new @dfn{Stream head} before calling
+@manpage{qopen(9)},
+and will always set the @var{CLONEOPEN} flag in the @var{sflag} argument.
+
+@item The resulting device number returned to the @var{devp} argument must not yet have a
+@dfn{Stream head} allocated.  If this condition is not met, multiple @dfn{Stream heads} will be
+allocated to the same minor device number.  See "NOTICES", below.
+
+Therefore, it is not necessary to use @command{clone} devices at all.  Under
+@cite{@value{PACKAGE_TITLE}} any @dfn{STREAMS} device can return a different minor device number
+when opened with a new @dfn{Stream}, regardless of the setting of the @var{sflag} to
+@manpage{qopen(9)}.
+This means that a @dfn{STREAMS} driver can always treat minor device number zero (0) as a
+@command{clone} minor device and assign a new, unique, non-zero minor device number.  This removes
+the need to create special @command{clone} device nodes in the file system using
+@manpage{mknod(1)}
+as described below under "USAGE".  Rather, a minor device node with minor device number zero can be
+used to represent the @command{clone} device instead.
+
+@end enumerate
+
+@subsubheading Super Cloning
+
+In an attempt to remove @cite{@value{PACKAGE_TITLE}} dependence on statically assigned major device
+numbers, yet permit demand kernel module loading, the @command{clone} pseudo-device driver also
+supports super cloning.  Super cloning is a @cite{@value{PACKAGE_TITLE}} facility.  Under super
+cloning if the @command{clone} device is opened with a minor device number equal to the Named
+@dfn{STREAMS} Device,
+@manpage{nsdev(4)}, the creation of the the resulting device number is the
+same as under traditional cloning (i.e.  the device number is formed with the major device number of
+the
+@manpage{nsdev(4)} and the minor number zero (0)); however, when the open is chained to the
+@manpage{nsdev(4)}, with the @var{CLONEOPEN} @var{sflag} set, the
+@manpage{nsdev(4)} will
+redetermine the major device number according to the name of the original @command{clone} device
+that was opened.
+
+This approach permits static allocation of a single major device number for the Named @dfn{STREAMS}
+Device,
+@manpage{nsdev(4)}, and obviating the need for any further static major device number
+assignments.  The Named @dfn{STREAMS} Device is a unique feature of @cite{@value{PACKAGE_TITLE}}
+
+For details on this somewhat different and unique approach to @command{clone} devices that also
+accommodates the dynamic assignment of major device numbers, see
+@manpage{nsdev(4)}.
+
+@subsubheading Minor Device Assignment
+
+Although traditionally it was expected of drivers opened with @var{CLONEOPEN} that a new, unique,
+minor device number be assigned to the @dfn{Stream}, this can be problematic, particularly where the
+number of minor device numbers available per major device number is limited.  (On @cite{Linux} 2.4
+kernels, this is @var{MAX_CHRDEV} or @samp{256} minor device numbers.) @cite{@value{PACKAGE_TITLE}}
+provides several solutions device number limitations including extended minor device numbers,
+internal minor device numbers, a mountable shadow special file system, and overlapping minor device
+ranges.  See the "Device Numbering" section of the @manref{dev_t(9)}, for additional information on
+device numbering schemes supported by @cite{@value{PACKAGE_TITLE}}
+
+For maximum compatibility with other implementations, @cite{@value{PACKAGE_TITLE}} take the approach
+of allowing a device driver to assign multiple streams to the same minor device number when
+necessary.  This relaxes the requirement that the minor device number returned to a @var{CLONEOPEN}
+be new or unique.  In fact, an existing minor device number can be returned.  This has two
+ramification on the explicit opening of minor devices:
+
+@enumerate
+
+@item
+If a minor device number is explicitly opened and the device number is marked with device flags
+@var{DF_CLONE}, or the device has been marked as a @command{clone} minor with the @var{SAP_CLONE}
+flag to the @cite{@dfn{STREAMS} Administrative Driver}
+@manpage{sad(4)}, then a new @dfn{Stream} will
+always be created before calling
+@manpage{qopen(9)} and @var{sflag} will always be set to
+@var{CLONEOPEN}.
+
+@item
+If a minor device number is explicitly opened and the device number is not marked as a
+@command{clone} minor (i.e.  @var{DF_CLONE} is not used and @var{SAP_CLONE} has not been performed
+on the minor device), then if one or more streams are already associated with the minor device
+number, the most recently created @dfn{Stream} is accessed and the
+@manpage{qopen(9)} procedure is called
+with an @var{sflag} of @var{DRVOPEN}.
+
+@end enumerate
+
+This is also true of minor device nodes opened using the @command{clone} driver.
+
+@subheading Usage
+
+@command{clone} is typically used to provide dynamic minor device number assignment.  To accomplish
+this, the driver installation performs the following steps:
+
+@enumerate
+
+@item
+Write the @dfn{STREAMS} device driver to accept @command{clone} opens with @var{CLONEOPEN} set in
+@var{sflag} to the
+@manpage{qopen(9)} procedure.  The driver assigns a new, unique minor device
+number when opened in this fashion.
+
+@item
+Create a device node in the file system using
+@manpage{mknod(1)} that has the major device number of
+the @command{clone} pseudo-device driver and a minor device number that corresponds to the major
+device number of the driver.
+
+@item
+Programs performing
+@manpage{open(2s)} with the path of the @command{clone} device node created in
+this fashion will perform a @var{CLONEOPEN} on the device.  In this fashion, upon each open of the
+@command{clone} device, a new @var{CLONEOPEN} will be performed on the real device and a new, unique
+minor device number will be associated with the resulting file descriptor.
+
+@end enumerate
+
+This process is often useful for pseudo-device drivers where all minor device nodes are effectively
+the same.  To obtain a new minor device node, the @command{clone} device is opened.  To open an
+existing device node, the information returned from
+@manpage{fstat(2)} on the resulting file
+descriptor can be used to identify the minor node for an explicit open of the minor device node.
+
+@subheading Notices
+
+If there is not a @dfn{STREAMS} device associated with the resulting device number, attempting to
+open the resulting character special device will result in the @cite{Linux} kernel attempting to
+load the kernel module with the name (or alias) @samp{char-major-@var{nnn}}, where @var{nnn} is the
+ASCII representation of the major device number sought.  This can be an undesirable side effect of
+the major device number is not associated with a @dfn{STREAMS} device.  To avoid undesirable side
+effects, care should be taken to not create @command{clone} device nodes in the file system with
+minor device numbers that do not correspond to major device numbers of @dfn{STREAMS} devices.
+
+Super cloning (see
+@manpage{nsdev(4)}) and use of the @file{specfs} filesystem (see
+@manref{specfs(5)}) are other possible solutions to avoid undesirable side effects.
+
+Because a minor device number is assigned to the Shadow Special Filesystem inode (see
+@manref{specfs(5)}) and is assigned to the file system resident @command{clone} device node, the
+results of
+@manpage{stat(2)} on the @command{clone} device will yield a different device number than
+the results of
+@manpage{fstat(2)} on the file descriptor resulting from an open of the
+@command{clone} device. 
+@manpage{stat(2)} takes the device number from the device node in the file
+system, whereas,
+@manpage{fstat(2)} takes the device number from the Shadow Special inode
+corresponding to the @dfn{STREAMS} special file.  This is normal @cite{UNIX} behaviour.
+
+@subheading Implementation
+
+@command{clone} is not implemented as a normal @dfn{STREAMS} driver: it is implemented as a shadow
+special device node under @cite{@value{PACKAGE_TITLE}}.@footnote{@cite{streams-0.7a,
+@cite{@value{PACKAGE_TITLE}} (LfS) 0.7a.6 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+<http://www.openss7.org/>}} @cite{@value{PACKAGE_TITLE}} shadow special device nodes call
+@code{clone_open()} from @code{cdev_open()} instead of @code{spec_open()} permitting the
+@command{clone} device to intercept and redirect the open call to the appropriate device.  This is
+consistent with the descriptions of the internal @code{clone_open()} under @cite{SVR 4}.
+@footnote{@cite{Magic Garden, The Magic Garden Explained: The Internals of @cite{UNIX} System V
+Release 4 / An Open Systems Design, 1994, (Australia), B.  Goodheart, J.  Cox, Prentice Hall.  [ISBN
+0-13-098138-9]}}
+
+@subheading Examples
+
+If the following is performed to create the device (assuming that major device number 74 is the
+major device number of the Clone Device):
+
+@cartouche
+@float Example,clone:ex0
+@caption{@emph{Clone Device Example}}
+@example
+$> mknod -m 0666 /dev/streams c 74 56
+@end example
+@end float
+@end cartouche
+
+then opening @file{/dev/streams} will result in opening minor device number 0 of the @file{streams}
+device (character major 56) with the @var{sflag} argument to
+@manpage{qopen(9)} begin set to
+@var{CLONEOPEN}.
+
+@subheading Devices
+
+@command{clone} provides for the creation of @command{clone} devices with the @command{clone} major
+device number using various names in the file system.
+
+@subheading See Also
+
+@manref{mknod(1)}, @manref{qopen(9)}, @manref{open(2s)}, @manref{stat(2)}, @manref{fstat(2)},
+@manref{sad(4)}, @manref{nsdev(4)}.
+
+@subheading Bugs
+
+@command{clone} has no known bugs.
+
+@subheading Compatibility
+
+@command{clone} is compatible with SVR 4.2, and implementations based on @cite{SVR 4.2},
+@footnote{@cite{SVR 4.2, @cite{UNIX} System V Release 4.2 Programmer's Manual, 1992, (Englewood
+Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} including @cite{AIX},
+@cite{HP-UX}, @cite{LiS}, @cite{OSF/1}, @cite{Solaris}, @cite{SUPER-UX}, @cite{UnixWare}, @cite{UXP/V},
+with the following portability considerations:
+
+@itemize
+
+@item
+@cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
+OpenSS7 Corporation.  <http://www.openss7.org/>}} (and to my knowledge @cite{Solaris}) does not
+support the concept of @command{clone} minors.
+
+@item
+@cite{AIX} supports the STR_NEWCLONING flag in the strconf_t structure passed to str_install() to
+indicate that a driver is capable of the new cloning method.  See str_install_AIX(9) for more
+information.
+
+@item
+@cite{UnixWare} supports both the concept of @command{clone} minors as well as providing for
+@command{clone} channels which is more in line with the behaviour of @cite{@value{PACKAGE_TITLE}}
+This should not, however, cause incompatibility problems with @cite{LiS} or @cite{Solaris} because
+correctly written drivers for these systems have the requirement that they assign a new and unique
+minor device number when drivers are opened with @var{CLONEOPEN}.
+
+@item
+The ability for a normal minor device node to perform a @command{clone} open when explicitly opened
+with @var{sflag} DRVOPEN is a characteristic of @cite{@value{PACKAGE_TITLE}} that is also supported
+by @cite{LiS}.  I do not know whether @cite{Solaris} or @cite{UnixWare} supports this feature in the same
+fashion.  This should not affect user programs, because user programs open these devices with
+pathnames in the file system and should have no knowledge of the major device numbers assigned to
+@command{clone} and other devices.
+
+@end itemize
+
+The @command{clone} device provided with @cite{@value{PACKAGE_TITLE}} release must be used.  Other
+@command{clone} device drivers (e.g.  from @cite{LiS}) are incompatible with the
+@cite{@value{PACKAGE_TITLE}} executive.
+
+@subheading Conformance
+
+@cite{SVR 4.2}.@footnote{@cite{SVR 4.2, @cite{UNIX} System V Release 4.2 Programmer's Manual, 1992,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} Conformance is
+verified using the @manref{test-clone(8)} verification test suite.
+
+@subheading History
+
+@command{clone} appeared in @cite{SVR 4}.@footnote{@cite{SVR 4, @cite{UNIX} System V Release 4
+Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
+Prentice Hall.}}
+
+@c ============================================================================
+
+@page
+@node echo Driver
+@subsection echo
+
+@subheading Name
+echo - echo STREAMS device
+
+@subheading Synopsis
+@example
+#include <unistd.h>
+#include <stropts.h>
+
+int fd = open(/dev/echo, oflag);
+@end example
+
+@subheading Description
+@var{fd} is a file descriptor for an @command{echo} @dfn{Stream} opened using the
+@manpage{open(2s)}
+system call on one of the following devices:
+
+@ftable @file
+@item /dev/echo
+@itemx /dev/streams/clone/echo
+This device is accessible to all users.
+@end ftable
+
+The @command{echo} device is characterized by the following behaviour:
+
+@itemize
+@item
+Most @dfn{STREAMS} messages written to the driver's write queue are echoed back to the @dfn{Stream
+head} read queue.  These messages include: @var{M_DATA}, @var{M_PROTO}, and @var{M_PCPROTO}.
+@end itemize
+
+@subheading Ioctls
+@command{echo} does not support any I/O controls of its own and all I/O controls delivered will
+return an
+@manpage{errno(3)} of @errno{EOPNOTSUPP}.
+
+@subheading Usage
+The @command{echo} device can be opened when no other suitable device exists and modules may be
+pushed on the @command{echo} device.
+
+The primary use of the @command{echo} device is the @dfn{STREAMS} verification utility
+@manpage{strvf(8)}.
+
+@subheading Notices
+The @command{echo} device is used on @cite{HP-UX} systems in support of the
+@manpage{strvf(8)}
+utility.  @cite{@value{PACKAGE_TITLE}} provides this device in support of
+@manpage{strvf(8)} and for
+compatibility with @cite{HP-UX} and @cite{OSF/1}.
+
+@subheading Implementation
+@command{echo} is implemented as a regular @dfn{STREAMS} pseudo-device driver.
+
+@subheading Devices
+@file{/dev/echo},
+@file{/dev/streams/clone/echo}
+
+@subheading See Also
+@manref{open(2s)}, @manref{errno(3)}, @manref{nuls(4)}, @manref{spx(4)}, @manref{strvf(8)}.
+
+@subheading Bugs
+@command{echo} has no known bugs.
+
+@subheading Compatibility
+@cite{HP-UX(R)}.  This is an @cite{HP-UX}
+@footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo Alto, California),
+Hewlett-Packard Company, HP.  <@url{http://docs.hp.com/}>}}
+and @cite{OSF/1}
+@footnote{@cite{Digital(R) UNIX (OSF/1.2), Digital UNIX: Network Programmers Guide, 1996, (Palo Alto,
+California), Digital Equipment Corporation, Hewlett-Packard Company.}
+<@url{http://www.true64unix.compaq.com/docs/}>}
+specific device.
+
+@command{echo} is provided in @cite{@value{PACKAGE_TITLE}} for compatibility with @cite{HP-UX} and
+@cite{OSF/1} with the following portability considerations:
+
+@itemize
+@item
+@cite{HP-UX} and @cite{OSF/1} do not document all behaviour.
+
+@item
+Use for purposes other than
+@manpage{strvf(8)} are not necessarily compatible.
+
+@item
+For an @cite{AIX} and @cite{UnixWare} equivalent, see
+@manpage{spx(4)}.
+
+@end itemize
+
+@subheading Conformance
+@cite{HP-UX}
+@footnote{@cite{HP-UX(R) 11i v2, HP-UX 11i v2 Documentation, 2001, (Palo Alto, California), Hewlett-Packard
+Company, HP.  <@url{http://docs.hp.com/}>}}
+and @cite{OSF/1}
+@footnote{@cite{Digital(R) UNIX (OSF/1.2), Digital UNIX Documentation Library, 2003, (Palo Alto, California),
+Digital Equipment Corporation, Hewlett-Packard Company.
+<@url{http://www.true64unix.compaq.com/docs/}>}}
+documentation.
+
+@subheading History
+@command{echo} first appeared in @cite{HP-UX} and @cite{OSF/1}.
+
+@c ============================================================================
+
+@page
+@node fifo Driver
+@subsection fifo
+
+@subheading Name
+@command{fifo} - @dfn{STREAMS}-based @dfn{FIFO} Device
+
+@subheading Synopsis
+@example
+#include <sys/types.h>  #include <sys/stropts.h>
+
+int open("/dev/fifo", int flags);
+@end example
+
+@subheading Description
+The named pipe obtained by opening a special device node created with the
+@manpage{mkfifo(1)}
+command are not necessarily @dfn{STREAMS} devices.  The @command{fifo} @dfn{STREAMS} pseudo-device
+driver provides a mechanism for assigning @dfn{STREAMS}-based fifos within the file system.
+
+The @command{fifo} pseudo-device driver is a regular STREAMS character special device driver with
+the following exceptions:
+
+@enumerate
+
+@item
+@command{fifo} character special device files cannot be clone opened.  Attempts to clone open a
+@command{fifo} character special device file with the
+@manpage{open(2s)} system call, will fail and
+return @errno{ENXIO} in
+@manpage{errno(3)}.
+
+@item
+@command{fifo} character special device files and @dfn{FIFO} special files cannnot be mounted with
+@manpage{fattach(2)}.  This is because a @dfn{FIFO} as already mounted at the point that the
+character or @dfn{FIFO} special file appears within a filesystem.
+
+@item
+@command{fifo} character special device files, once opened, are indistiguishable from system-based
+@dfn{FIFO}s:
+@manpage{fstat(2)} will report the file as a @dfn{FIFO} special device.
+
+@end enumerate
+
+@dfn{STREAMS}-based @dfn{FIFO}s differ from @cite{SVR 3.2}-style @dfn{FIFO}s in the following ways:
+
+@enumerate
+
+@item
+@dfn{STREAMS}-based @dfn{FIFO}s support the
+@manpage{getmsg(2)},
+@manpage{getpmsg(2s)},
+@manpage{putmsg(2)},
+@manpage{putpmsg(2s)}, system calls, and
+@manpage{streamio(7)} @dfn{STREAMS}
+input-output controls (in particular the
+@manpage{I_SENDFD(9)} and
+@manpage{I_RECVFD(9)}
+@manpage{ioctl(2s)}s).  @cite{SVR 3.2}-style @dfn{FIFO}s do not.
+
+@item
+@dfn{STREAMS}-based @dfn{FIFO}s support @cite{UNIX Eigth Edition} @var{O_NDELAY} behaviour, the
+@cite{SVR 4.2} delimited message features, and
+@manpage{M_READ(9)} generation.  @cite{SVR 3.2}-style
+@dfn{FIFO}s do not.
+
+@item
+@dfn{STREAMS}-based @dfn{FIFO}s can have @dfn{STREAMS} modules pushed onto the @dfn{FIFO} (see
+@manpage{I_LINK(7)} and
+@manpage{I_PLINK(7)} under
+@manpage{streamio(7)}).  @cite{SVR 3.2}-style
+@dfn{FIFO}s cannot.
+
+@end enumerate
+
+As a result of these additional features, @dfn{STREAMS}-based @dfn{FIFO}s are less
+efficient@footnote{But, in fact, performance tests on @cite{@value{PACKAGE_TITLE}} show that they
+are not less efficient, but comparable in efficiency and speed.} in pure
+@manpage{read(2s)}/@manpage{write(2s)} performance when compared to @cite{Linux} native @cite{SVR
+3.2}-style @dfn{FIFO}s.
+
+Following are some characteristics of @dfn{FIFO}s (both character special and system based) that
+cause their behaviour to differ from that of regular @dfn{STREAMS} character special device files:
+(this behaviour is consistent with @cite{POSIX}@footnote{@cite{SUS Version 3, Single UNIX
+Specification, Open Group, Open Group Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}}
+specifications.)
+
+@itemize
+
+@item
+@dfn{FIFO}s must be opened for read, write or both.  A @dfn{FIFO} cannot be opened otherwise.  (But
+see "NOTICES", below.)
+
+@item
+@dfn{FIFO}s opened with the @var{O_NONBLOCK} flag set, will not block on the open, regardless of
+whether they are opened @var{O_RDONLY} and there are no writers, or opened @var{O_WRONLY} and there
+are no readers.
+
+@item
+@dfn{FIFO}s opened with the @var{O_NONBLOCK} flag set, for write-only, @var{O_WRONLY}, operation,
+when no process has the @dfn{FIFO} open for reading will fail an return @errno{ENXIO}, to the call
+to
+@manpage{open(2s)}.
+
+@item
+@dfn{FIFO}s opened with the @var{O_NONBLOCK} flag set, for read-only, @var{O_RDONLY}, operation,
+when no process has the @dfn{FIFO} open for writing will not block, will succeed and return zero to
+the call to
+@manpage{open(2s)}.
+
+@item
+@dfn{FIFO}s opened without the @var{O_NONBLOCK} flag set, will block on the open if opened
+@var{O_RDONLY} and there are no writers, or opened @var{O_WRONLY} and there are no readers.
+
+@item
+@dfn{FIFO}s opened without the @var{O_NONBLOCK} flag set, will not block on the open if opened
+@var{O_RDWR}.
+
+@item
+When a @dfn{FIFO} is hung up, write and write-like operations return @errno{ENXIO} as is the case
+for regular @dfn{STREAMS} devices.  This is true for
+@manpage{write(2s)},
+@manpage{writev(2s)},
+@manpage{putmsg(2)},
+@manpage{putpmsg(2s)}, and
+@manpage{streamio(7)} input-output controls that
+write messages to the @dfn{Stream}, such as
+@manpage{I_FDINSERT(7)}.
+
+@item
+If there are no writers at the time that a read or read-like operation is performed, and the
+@dfn{Stream} is set for blocking operation, the read operation will block awaiting writers to the
+@dfn{Stream}.
+
+@item
+If there are no readers at the time that a write or write-like operation is performed, and the the
+write or write-like operations fail, generate a @signal{SIGPIPE} signal to the callers, and return
+@errno{EPIPE}, regardless of whether the file descriptor is set for blocking or non-blocking
+operation.
+
+@item
+By default, when an asynchronous write error occurs, and a write or write-like operation is
+performed, @dfn{FIFO}s will generate @signal{SIGPIPE} to the caller in addition to returning the
+error from the asynchronous write error message.  This behavior can be suppressed by clearing the
+@var{SNDPIPE} write option flag using the
+@manpage{I_SWROPT(7)} input-output control.  This is the
+reverse of the default behavior for regular @dfn{STREAMS} character special files.
+
+@item
+By default, attempting to write a zero-length data message to a @dfn{FIFO} with
+@manpage{write(2s)},
+@manpage{writev(2s)},
+@manpage{putmsg(2)}, or
+@manpage{putpmsg(2s)}, will succeed, return zero, but
+no message will be generated.  Generation of the message can be enabled by setting the @var{SNDZERO}
+write option flag using the
+@manpage{I_SWROPT(7)} input-output control.  This is the reverse of the
+default behaviour for regular @dfn{STREAMS} character special files.
+
+@item
+@dfn{FIFO}s break large writes down into independent data messages of @var{PIPE_BUF} bytes or less.
+Writes of less than or equal to @var{PIPE_BUF} bytes are guaranteed atomic (i.e.  they will not be
+interleaved with data from writes by other processes).  Writes of greater than @var{PIPE_BUF} bytes
+are not guaranteed atomic (i.e.  may be interleaved with data from writes by other processes).  This
+is default behaviour of all @dfn{STREAMS} character special files, unless altered by the driver.
+
+@item
+@dfn{FIFO}s that have no modules pushed, even when full and blocked on write, will not block on
+close as described under
+@manpage{I_SETCLTIME(7)}, because there is no driver write queue.
+
+@item
+@manpage{I_LIST(7)} will not report a count for a driver (@dfn{FIFO}s have no driver).
+
+@item
+@manpage{I_LINK(7)},
+@manpage{I_PLINK(7)},
+@manpage{I_UNLINK(7)}, and
+@manpage{I_PUNLINK(7)}, will
+always fail with error @errno{EINVAL} when issued to a file descriptor associated with a @dfn{FIFO}.
+
+@item
+@manpage{I_SENDFD(7)} and
+@manpage{I_RECVFD(7)} can succeed on a @dfn{FIFO} (whereas they always
+fail on a regular @dfn{STREAMS} character special file).
+
+@end itemize
+
+@subheading Notices
+Normally a @dfn{STREAMS} special file is associated with a device number.  For @command{fifo}, the
+@dfn{STREAMS} special file is associated with the @dfn{inode} in the file system in which the
+character special node was created.  This acts identically to a @dfn{FIFO} created with
+@manpage{mkfifo(1)}, with the exception that a
+@manpage{stat(2)} on the device node will report that
+it is an @var{S_IFCHR} device node.  An
+@manpage{fstat(2)} on a file descriptor opening this device
+node in the file system will report that the file descriptor is of type @var{S_IFIFO}.
+
+Under @cite{@value{PACKAGE_TITLE}} is it possible to make all @cite{Linux} system @dfn{FIFO}s
+@dfn{STREAMS}-based.  This is accomplished during configuration of the package and when the package
+kernel modules are loaded.
+
+@subheading Devices
+
+@ftable @file
+@item /dev/fifo
+An instance of an external filesystem @dfn{STREAMS} @dfn{FIFO} character device.  This @dfn{FIFO}
+device instance is provided for testing, primarily by the
+@manpage{test-fifo(8)} conformance
+verification test suite.
+
+@item /dev/streams/fifo
+The
+@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @dfn{FIFO} device.
+
+@item /dev/streams/fifo/nnn
+Instances of
+@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @dfn{FIFO} devices.
+
+@end ftable
+
+@subheading See Also
+@manref{mkfifo(1)}, @manref{stat(2)}, @manref{fstat(2)}, @manref{pipe(2s)}, @manref{pipe(4)},
+@manref{spx(4)}.
+
+@subheading Bugs
+@command{fifo} has no known bugs.
+
+@subheading Compatibility
+The @cite{@value{PACKAGE_TITLE}} implementation of @dfn{FIFO}s is compatible with @cite{SVR
+4.2}@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992, (Englewood
+Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} and implementations based
+on @cite{SVR 4.2}, with the following portability considerations:
+
+@itemize
+
+@item
+@cite{@value{PACKAGE_TITLE}} provides character device special file @dfn{FIFO}s as well as providing
+an option to make all @cite{Linux} system @dfn{FIFO}s @dfn{STREAMS}-based, or to leave system
+@dfn{FIFO}s using the @cite{Linux} @cite{SVR 3.2}-sytle@footnote{@cite{SVR 3, UNIX(R) System V
+Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
+Prentice Hall.}} implementation.  A number of implementations do not normally support
+@dfn{STREAMS}-based @dfn{FIFO}s, but, instead, opt for @cite{SVR 3.2}-sytle@footnote{@cite{SVR 3,
+UNIX(R) System V Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System
+Laboratories, Inc., Prentice Hall.}} @dfn{FIFO}s that are not @dfn{STREAMS}-based.  Some
+implementations support making all @dfn{FIFO}s @dfn{STREAMS}-based as a system configuration option.
+Some implementations support character device special file implementations of @dfn{FIFO}s.  (See
+also
+@manpage{sfx(4)}.) Some implementations support only character device special file
+implementations of @dfn{FIFO}s (as @cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4
+Source Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} does) and
+do not support @dfn{STREAMS}-based system @dfn{FIFO}s.
+
+Portable @dfn{STREAMS} applications will use
+@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6 Source
+Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} instead of
+@cite{LiS}.@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
+OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}}
+
+@item
+Under Linux a @dfn{FIFO} cannot be opened without read or write.  This is because @cite{Linux}
+defines the @var{O_RDONLY} flag to
+@manpage{open(2s)} to be zero, despite
+@cite{POSIX}@footnote{@cite{SUS Version 3, Single UNIX Specification, Open Group, Open Group
+Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}} recommendations to the contrary.
+
+@item
+@var{PIPE_BUF} under @cite{@value{PACKAGE_TITLE}} is set to the historical default of @samp{4096}
+bytes.  This is consistent with the current settings for @cite{Linux} @cite{SVR 3.2}-style
+@dfn{FIFO}s and is properly reported using @cite{POSIX}@footnote{@cite{SUS Version 3, Single UNIX
+Specification, Open Group, Open Group Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}}
+features interrogation methods.
+
+@item
+@var{PIPE_BUF} characteristics are accomplished by setting the @dfn{STREAMS} minimum packet size to
+zero @samp{0}, the maximum packet size to @samp{4096}, the high water mark to @samp{5120}, and the
+low water mark to @samp{1024}.  These are the defaults for all @dfn{Stream heads} and can only be
+altered by a driver or module.
+
+@item
+It may be necessary to push the
+@manpage{pipemod(4)} module on one end of the @dfn{FIFO} to maintain
+the sense of
+@manpage{M_FLUSH(9)}.
+
+@item
+Some @dfn{STREAMS} implementations do not permit @dfn{STREAMS}-based pipes or @dfn{FIFO}s to be
+linked beneath a multiplexing driver.  This may be due to an inability to represent a @dfn{FIFO} as
+a regular Stream within the traditional VFS filesystem.  @cite{@value{PACKAGE_TITLE}} permits
+@dfn{STREAMS}-based pipes and @dfn{FIFO}s to be linked beneath a multiplexing driver for testing and
+other special purposes.  The @cite{@value{PACKAGE_TITLE}} implementation of @dfn{FIFO}s permit them
+to be treated as any other @dfn{Stream} with regards to linking.
+
+@end itemize
+
+See @dfn{STREAMS}(9) for additional compatibility information.
+
+@subheading Conformance
+SVID,@footnote{@cite{SVID, System V, Interface Definition, No. Fourth Edition.}}
+XID,@footnote{@cite{XBD Issue 5, X/Open System Interface Definitions, Open Group, Open Group
+Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}} SUSv2,@footnote{@cite{SUS Version 2,
+Single UNIX Specification, Open Group, Open Group Publication.
+<@url{http://www.opengroup.org/onlinepubs/}>}} SUSv3.@footnote{@cite{SUS Version 3, Single UNIX
+Specification, Open Group, Open Group Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}}
+Conformance is verified using the
+@manpage{test-fifo(8)} verification test suite.
+
+@subheading History
+fifos first appeared in SVR 3,@footnote{@cite{SVR 3, UNIX(R) System V Release 3 Programmer's Manual,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} but were not
+implemented using @dfn{STREAMS}.
+
+@c ============================================================================
+
+@page
+@node log Driver
+@subsection log
+
+@subheading Name
+@command{strlog}, @command{log} -- @dfn{STREAMS} log device
+
+@subheading Synopsis
+@example
+#include <unistd.h>
+#include <stropts.h>
+#include <strlog.h>
+#include <syslog.h>
+
+int fd = open(/dev/strlog, oflag);
+int fd = open(/dev/conslog, oflag);
+@end example
+
+@subheading Description
+@var{fd} is a file descriptor for an @command{strlog} @dfn{Stream} opened using the open(2s) system call on one of
+the following devices:
+
+@ftable @file
+@item /dev/strlog
+@itemx /dev/streams/log/strlog
+This clone device is accessible to all users.  This device can either be used by a console, error
+or trace logger, or can be used to generate log messages with
+@manpage{putmsg(2)}.
+
+@item /dev/conslog
+@itemx /dev/streams/log/conslog
+This non-clone device is accessble to all users.  This device can be used to generate log
+messages to the console with
+@manpage{putmsg(2)} or
+@manpage{write(2s)}.
+@end ftable
+
+The @command{strlog} device is characterized by the following behaviour:
+
+The @command{strlog} driver is a @dfn{STREAMS} software device driver that provides an interface for
+the @dfn{STREAMS} console logging (@manpage{strlogd(8)}), error logging (@manpage{strerr(8)}) and
+event tracing (@manpage{strace(8)}) processes.  The @command{strlog} driver presents two separate
+interfaces:
+
+@itemize
+@item
+A function call interface in the kernel (@manpage{strlog(9)}) through which @dfn{STREAMS} driver and
+modules submit log messages.
+
+@item
+A subset of ioctl (@manpage{streamio(7)}) operations and @dfn{STREAMS} messages for interaction with
+a user-level console logger (@manpage{strlogd(8)}), error logger (@manpage{strerr(8)}), trace logger
+(@manpage{strace(8)}), or processes that need to submit their own log messages (@manpage{strlog(1)}).
+@end itemize
+
+@subsubheading Kernel Interface
+The log messages are generated within the kernel by calls to the
+@manpage{strlog(9)} utility.
+
+@subsubheading User Interface
+The @command{strlog} driver is opened using the clone interface, @file{/dev/strlog}, or the
+non-clone interface @file{/dev/conslog}.
+
+When the
+@manpage{specfs(5)} file system is mounted on @file{/dev/streams}, the clone interface
+@file{/dev/streams/clone/log}, or @file{/dev/streams/log/strlog}, may also be used, or the
+non-cloning device @file{/dev/streams/log/conslog}.
+
+Each open of the @file{/dev/strlog} device obtains a separate @dfn{Stream} to @command{strlog}.  To
+receive log messages, a process first notifies the @command{strlog} driver whether it is a console
+logger, an error logger or a trace logger by using the
+@manpage{I_STR(7)} (@manpage{streamio(7)})
+operation.
+
+For the console logger, the
+@manpage{I_STR(7)} operation has a @var{ic_cmd} parameter value of
+@var{I_CONSLOG} with no accompanying data.
+
+For the error logger, the
+@manpage{I_STR(7)} operation has a @var{ic_cmd} parameter value of
+@var{I_ERRLOG} with no accompanying data.
+
+For the trace logger, the
+@manpage{I_STR(7)} operation has an @var{ic_cmd} parameter value of
+@var{I_TRCLOG}, and must be accomplished by a data buffer containing an array of one or more
+@var{trace_ids} structures.  Each @var{trace_ids} structure specifies a @var{mid}, @var{sid} and
+@var{level} field from which messages are to be accepted.  The
+@manpage{strlog(9)} subroutine
+accepts messages whose values in the @var{mid} and @var{sid} fields exactly match those in the
+@var{trace_ids} structure, and whose @var{level} is less than or equal to the @var{level} given in
+the @var{trace_ids} structure.  A value of @samp{-1} in any of the fields of the @var{trace_ids}
+structure indicates that any value is accepted for that field.
+
+Following is the format of the @var{trace_ids} structure:
+
+@example
+struct trace_ids @{
+   short   ti_mid;
+   short   ti_sid;
+   char    ti_level;
+   short   ti_flags;
+@};
+@end example
+
+@vtable @var
+
+@item ti_mid
+specifies the @dfn{STREAMS} module ID number for this trace id entry.  A value of minus one
+(@samp{-1}) indicates that this trace id entry applies to any module ID.
+
+@item ti_sid
+specifies the sub-ID number of a minor device (unit) associated with the @dfn{STREAMS} module
+or driver specified by @var{t_mid}.  A value of minus one (@samp{-1}) indicates that this trace id
+entry applies to any sub-ID.
+
+@item ti_level
+specifies that maximum @command{strlog} log @var{level} that will be accepted by this trace id
+entry.  A value of minus one (@samp{-1}) indicates that this trace id entry applies to any log
+@var{level}.
+
+@item ti_flags
+this member is only present for @cite{AIX}, @cite{HP-UX} and @cite{OSF/1} (Mentat) implementations
+and serves no purpose for the user.  It is not used to filter trace messages.
+
+@end vtable
+
+If any of the fields of the @var{trace_ids} structure contain a value of -1, @command{strlog} will
+accept whatever value it receives in that field.  Otherwise, @command{strlog} only accepts messages
+if the values of @var{mid} and @var{sid} are the same as their counter-parts in the @var{trace_ids}
+structure, and if the message's @var{level} is equal to or less than the @var{level} value in the
+@var{trace_ids} structure.
+
+At most, one console logger, one error logger and one trace logger can be active at a time.  After
+the logger process has identified itself by using the @code{ioctl} (@manpage{streamio(7)})
+operation, the @command{strlog} driver will begin sending messages, subject to the restrictions
+previously noted.  These messages are obtained by using the
+@manpage{getmsg(2)} system call.  The
+control part of the message contains a @var{log_ctl} structure, which specifies the @var{mid},
+@var{sid}, @var{level} and flags fields, as well as the time in ticks since boot that the message
+was submitted, the corresponding time in seconds since @samp{Jan. 1, 1970}, and a sequence number.
+The time in seconds since @samp{1970} is provided so that the date and time of the message can be
+easily computed; the time in ticks since boot is provided so that the relative timing of log
+messages can be determined.
+
+
+@example
+struct log_ctl @{
+   short   mid;
+   short   sid;
+   char    level;
+   short   flags;
+   long    ltime;
+   long    ttime;
+   int     seq_no;
+   int     pri;
+@};
+@end example
+
+
+@vtable @var
+@item mid
+specifies the @dfn{STREAMS} module ID number for the driver or module submitting the log message.
+
+@item sid
+specifies the sub-ID number of a minor device (unit) associated with the @dfn{STREAMS} module or
+driver identified by @var{mid}.
+
+@item level
+specifies the @var{level} for screening lower-level event messages from a tracer.
+
+@item flags
+contains several flags that can be set in various combinations.  The flags are as follows:
+
+@multitable @columnfractions .25 .75
+@item @var{SL_CONSOLE}
+@tab message is for the console logger.
+@item @var{SL_ERROR}
+@tab message is for the error logger.
+@item @var{SL_TRACE}
+@tab message is for the trace logger.
+@item @var{SL_FATAL}
+@tab notification of a fatal error.
+@item @var{SL_WARN}
+@tab message is a warning.
+@item @var{SL_NOTE}
+@tab message is a note.
+@item @var{SL_NOTIFY}
+@tab requests to mail a copy of a message to the system administrator.
+@end multitable
+
+@item ltime
+time in seconds since @samp{January 1, 1970}.
+
+@item ttime
+time in ticks since boot time.
+
+@item seq_no
+a sequence number for the log message.
+
+@item pri
+specifies the @dfn{priority code} and @dfn{facility code}, found in @file{<sys/syslog.h>}.  If
+@var{SL_CONSOLE} is set in flags, the @dfn{priority code} is set as follows: If @var{SL_WARN} is
+set, the @dfn{priority code} is set to @var{LOG_WARNING}; if @var{SL_FATAL} is set, the
+@dfn{priority code} is @var{LOG_ERR}; @var{SL_NOTE}, the @dfn{priority code} is @var{LOG_NOTICES};
+@var{SL_TRACE}, @var{LOG_DEBUG}; otherwise, @var{LOG_INFO}.  Messages originating from the kernel
+have @dfn{facility code} set to @var{LOG_KERN}.  Most message originating from user processes will
+have the @dfn{facility code} set to @var{LOG_USER}.
+
+@end vtable
+
+Different sequence number are maintained for the error logging and trace logging streams so
+that gaps in the sequence of messages can be determined.  (During times of high message traffic,
+some message may not be delivered by the logger to avoid tying up system resources).
+
+The data part of the message contains the unexpanded text of the format string
+(null-terminated), followed by the arguments to the format string (up to the number specified by
+the @var{NLOGARGS} value), aligned on the first word (int) boundary following the format string.  The
+format string can be a maximum of @var{LOGMSGSZ} in length.  Longer format messages will be
+truncated.
+
+A process may also send a message of the same structure to the log driver, even if it is not a
+console, error or trace logger.  The only fields of the log_ctl structure in the control part of the
+message that are accepted are the @var{level} and flags fields.  All other fields are filled in by
+the log driver before being forwarded to the appropriate logger.  The data portion must contain a
+null-terminated format string, of maximum length @var{LOGMSGSZ}, and any arguments (up to
+@var{NLOGARGS}) must be packed in an integral number of words (@samp{int}) each, on the next word
+(@samp{int}) boundary following the end of the format string.
+
+In addition, a process may also send a message of the same structure to the console logger using the
+@var{log_ctl} structure and the
+@manpage{putmsg(2)} system call, or can simply write the data
+portion of the message using the
+@manpage{write(2s)} system call.
+
+The
+@manpage{strlog(1)} facility is provided for issuing console, error and trace log messages from
+shell scripts.  This is similar to the @cite{POSIX}
+@manpage{logger(1)} command.
+
+Attempting to issue an @var{I_TRCLOG}, @var{I_ERRLOG} or @var{I_CONSLOG} operation when a logging
+process of the given type already exists result in the @errno{ENXIO} error being returned.
+Similarly, @errno{ENXIO} is returned for @var{I_TRCLOG} operations without any @var{trace_ids}
+structures, or for any unrecognized
+@manpage{I_STR(7)} operations.  Incorrectly formatted log
+messages sent to the driver by a user process are silently ignored (no error results).
+
+@subheading Usage
+The @command{strlog} device can be opened when no other suitable device exists and modules may
+be pushed on the @command{strlog} device.
+
+@subheading Ioctls
+The @command{strlog} driver only supports
+@manpage{streamio(7)}
+@manpage{I_STR(7)} input output
+controls.  @var{TRANSPARENT} input output controls are not supported and will result in a return
+value of @errno{ENXIO}.  The @command{strlog} drivers supports the following streamio(7)
+@manpage{I_STR(7)} input ouput controls:
+
+@subsubheading I_TRCLOG
+Indicates a trace logger.  A data buffer consisting of an array of one or more @var{trace_ids}
+structures must be included.
+
+@subsubheading I_ERRLOG
+Indicates an error logger.  No @var{trace_ids} is required.
+
+@subsubheading I_CONSLOG
+Indicates a console logger.  No @var{trace_ids} is required.
+
+@subheading Notices
+This device is provided as @file{/dev/strlog} instead of @file{/dev/log} as is the case for
+@cite{SVR 4.2}@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+systems, because @cite{Linux} already has a non-@dfn{STREAMS} driver called @file{/dev/log}.
+
+@subheading Examples
+@enumerate
+@item The following is an example of @var{I_ERRLOG} notification:
+@cartouche
+@float Example,strlog:ex0
+@caption{@emph{@var{I_ERRLOG} Example}}
+@example
+struct strioctl ioc;
+ioc.ic_cmd = I_ERRLOG;
+ioc.ic_timout = 0; /* default timeout (15 secs.) */
+ioc.ic_len = 0;
+ioc.ic_dp = NULL;
+ioctl(log, I_STR, &ioc);
+@end example
+@end float
+@end cartouche
+
+@item The following is an example of @var{I_TRCLOG} notification:
+@cartouche
+@float Example,strlog:ex1
+@caption{@emph{@var{I_TRCLOG} Example}}
+@example
+struct trace_ids tid[2];
+tid[0].ti_mid = 2;
+tid[0].ti_sid = 0;
+tid[0].ti_level = 1;
+tid[1].ti_mid = 1002;
+tid[1].ti_sid = -1; /* any sub-id will be allowed */
+tid[1].ti_level = -1; /* any level will be allowed */
+ioc.ic_cmd = I_TRCLOG;
+ioc.ic_timout = 0;
+ioc.ic_len = sizeof(tid);
+ioc.ic_dp = (char *) tid;
+ioctl(log, I_STR, &ioc);
+@end example
+@end float
+@end cartouche
+
+@item following is an example of submitting a log message (no arguments):
+@cartouche
+@float Example,strlog:ex2
+@caption{@emph{Log Message Example}}
+@example
+struct strbuf ctl, dat;
+struct log_ctl lc;
+char *message = "Honey, I'm home.";
+ctl.len = ctl.maxlen = sizeof(lc);
+ctl.buf = (char *) &lc;
+dat.len = dat.maxlen = strlen(message);
+dat.buf = message;
+lc.level = 0;
+lc.flags = SL_ERROR;
+putmsg(log, &ctl, &dat, 0);
+@end example
+@end float
+@end cartouche
+@end enumerate
+
+
+@subheading Devices
+
+@ftable @file
+
+@item /dev/strlog
+The external file system @dfn{STREAMS} log device.
+
+@item /dev/conslog
+The external file system console log device.
+
+@item /dev/streams/log/strlog
+@itemx /dev/streams/clone/log
+@itemx /devices/strlog
+The
+@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} log device.
+
+@item /dev/streams/log/conslog
+@itemx /devices/conslog
+The
+@manpage{specfs(5)} shadow special filesystem console log device.
+
+@end ftable
+
+@subheading See Also
+@manref{open(2s)}, @manref{strerr(8)}, @manref{strace(8)}, @manref{strlogd(8)}, @manref{strlog(9)},
+@manref{streamio(7)}, @manref{strlog(1)}, @manref{getmsg(2)}, @manref{putmsg(2)},
+@manref{write(2s)}.
+
+@subheading Bugs
+@command{strlog} has no known bugs.
+
+@subheading Compatibility
+The operation of the @dfn{STREAMS} error logger and trace logger are described in the @cite{SVR 4.2
+SPG}.@footnote{@cite{SVR 4.2, STREAMS Programmer's Guide, 1992, (Engle- wood Cliffs, New Jersey),
+AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+@command{strlog} is compatible with systems based on @cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX(R)
+System V Release 4.2 Programmer's Manual, 1992, (Englewood Cliffs, New Jersey), AT&T UNIX System
+Laboratories, Inc., Prentice Hall.}}
+including @cite{AIX},
+@cite{HP-UX}, @cite{OSF/1}, @cite{Solaris}, @cite{SUPER-UX} and @cite{UnixWare}, with the following
+portability considerations:
+
+@itemize --
+
+@item
+@cite{AIX} does not document the @var{trace_ids} and @var{log_ctl} structures.
+
+@item
+@cite{HP-UX} does not have a @var{pri} field in the @var{log_ctl} structure.
+
+@item
+@cite{HP-UX} does not support @dfn{priority} or @dfn{facility} codes.
+
+@item
+@cite{HP-UX} does not support the @var{I_CONSLOG} input output control.
+
+@item
+@cite{OSF/1} calls this device @var{/dev/streams/log}.
+
+@item
+@cite{Solaris}, @cite{SUPER-UX} and @cite{UnixWare} do not provide the @var{ti_flags} field of the
+@var{trace_ids} structure; @cite{AIX}, @cite{HP-UX} and @cite{OSF/1} do.
+
+@item
+@cite{Solaris} declares @var{ltime} to be @code{clock32_t} or @code{clock_t}, and @var{ttime} to be
+@code{time32_t} or @code{time_t}, depending on a 64 or 32-bit architecture.
+
+@item
+On most systems, the @dfn{STREAMS} log device is called @file{/dev/log}; however, @cite{Linux} has a
+@cite{BSD}-based log device by that name, so the device @file{/dev/strlog} is used instead.
+
+@end itemize
+
+@subheading Conformance
+@cite{SVR 4.2},@footnote{@cite{SVR 4.2 CR, UNIX(R) System V Release 4.2 Command Reference Manual,
+1992, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+@cite{AIX},@footnote{@cite{AIX(R) 5L Version 5.1, AIX 5L Version 5.1 Documenta- tion, 2001,
+(Boulder, Colorado), Internatonal Business Machines Corp., IBM.
+<@url{http://publibn.boulder.ibm.com/}>}} @cite{HP-UX},@footnote{@cite{HP-UX(R) 11i v2, HP-UX 11i v2
+Documentation, 2001, (Palo Alto, California), Hewlett-Packard Company, HP.
+<@url{http://docs.hp.com/}>}} @cite{OSF/1},@footnote{@cite{Digital(R) UNIX (OSF/1.2), Digital UNIX
+Documentation Library, 2003, (Palo Alto, California), Digital Equipment Corporation, Hewlett-Packard
+Company.  <@url{http://www.true64unix.compaq.com/docs/}>}} @cite{Solaris},@footnote{@cite{Solaris(R)
+8, Solaris 8 Docmentation, 2001, (Santa Clara, California), Sun Microsystems, Inc., Sun.
+<@url{http://docs.sun.com/}>}} @cite{SUPER-UX}@footnote{@cite{SUPER-UX(R) Release 9.2, SUPER-UX
+Release 9.2 Documentation, 1999, NEC Corporation, NEC.}} and
+@cite{UnixWare}@footnote{@cite{UnixWare(R) 7.1.3, UnixWare 7.1.3 (OpenUnix 8) Documentation, 2002,
+(Lindon, Utah), Caldera International, Inc., Caldera.  <@url{http://uw713doc.sco.com/}>}}
+documentation.
+
+@subheading History
+@command{strlog} first appeared in @cite{SVR 4}.
+@footnote{@cite{SVR 4, UNIX(R) System V Release 4 Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T
+UNIX System Laboratories, Inc., Prentice Hall.}}
+
+@c ============================================================================
+
+@page
+@node loop Driver
+@subsection loop
+
+@subheading Name
+@command{loop} -- @dfn{STREAMS} loop-around pseudo-device driver
+
+@subheading Description
+The @command{loop} psuedo-device multiplexing driver is an implementation of the loop-around driver
+described in the @cite{UNIX(R) System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
+4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
+UNIX System Laboratories, Inc., Prentice Hall.}} with a number of exceptions and enhancments.  The
+primary purposes of the @command{loop} pseudo-device driver are: to provide a capability to the
+@manpage{test-streams(8)} conformance and verification test program, for testing passing of
+@dfn{STREAMS} file descriptors across a pipe-like driver; and to provide an example of a pipe-like
+driver for the @dfn{STREAMS} programmer.  To avoid complications for testing, and to serve as a basic
+example, the driver is as simplistic as possible.
+
+The @command{loop} pseudo-device driver has the following behaviour:
+
+@table @asis
+
+@item
+@manpage{open(2s)}
+When a @command{loop} @dfn{Stream} is opened using
+@manpage{open(2s)} a new @command{loop}
+@dfn{Stream} is created.  The newly created @dfn{Stream} is not associated with any other
+@dfn{Stream}.  Issuing the @var{LOOP_SET} input-output control is necessary, to associate the
+@command{loop} @dfn{Stream} with another one, before data can be written to or read from the
+@dfn{Stream}.  Any attempt to send data on the @dfn{Stream} before it is associated with another will
+result in an
+@manpage{M_ERROR(9)} message being sent upstream causing all further read, write or
+control operations on the @dfn{Stream} to fail with error @errno{ENXIO}.
+
+@item @var{LOOP_SET}
+The @var{LOOP_SET} input-output control described under "IOCTLS," below, is used to connect the
+upstream and downstream flow between the requesting @dfn{Stream} and a specified @dfn{Stream}.  Once
+connected in this fashion, data can be passed in either direction.
+
+@item
+@manpage{putpmsg(2s)},
+@manpage{getpmsg(2s)}
+Data is passed in either direction using the
+@manpage{putpmsg(2s)} or
+@manpage{getpmsg(2s)} calls as
+normal.  The @command{loop} driver coordinates @dfn{STREAMS} flow control across the driver by
+explicitly enabling service procedures of the feeding side when the accepting side is back-enabled.
+
+@item
+@manpage{close(2s)}
+When an @dfn{Stream} is closed using the
+@manpage{close(2s)} system call, the @dfn{Stream} is
+dismantled.  If the upper @dfn{Stream} remains connected to another @dfn{Stream} (due to a previous
+call to @var{LOOP_SET}), the connection will be broken and a
+@manpage{M_HANGUP(9)} message will be
+sent to the other @dfn{Stream}.
+
+@end table
+
+@subheading Usage
+The @command{loop} pseudo-device loop-around driver is an implementation of the loop-around driver
+described in the @cite{UNIX(R) System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
+4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
+UNIX System Laboratories, Inc., Prentice Hall.}} with a number of considerations as follows:
+
+@itemize @bullet
+
+@item The @cite{SVR4} driver does not implement input-output controls other than @var{LOOP_SET}.  In
+contrast, @command{loop} implements a set of input-output controls compatible with the
+@cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
+OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} loop-around driver for use in testing.
+
+@end itemize
+
+@subheading Ioctls
+@subsubheading LOOP_SET
+
+@subheading Notices
+The @command{loop} driver is used by the
+@manpage{test-streams(8)} conformance and verification test
+program to test passing of file descriptors across a pipe-like driver.  Much of its behaviour is
+specific to testing and cannot be altered without impacting the ability of the
+@manpage{test-streams(8)} conformance and verification test program results.
+
+@subheading Implementation
+@command{loop} is implemented as described in the @cite{SVR4 SPG}.@footnote{@cite{SVR 4, UNIX(R)
+System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX
+System Laboratories, Inc., Prentice Hall.}}
+
+@subheading Devices
+
+@ftable @file
+
+@item /dev/sloop
+The external filesystem @dfn{STREAMS} @command{loop} device.
+
+@item /dev/streams/loop, /devices/loop
+The
+@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @command{loop} device.
+
+@end ftable
+
+@subheading See Also
+@manref{mux(4)}, @manref{nullmod(4)}, @manref{test-streams(8)}.
+
+@subheading Bugs
+@command{loop} has no known bugs.
+
+@subheading Compatibility
+@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6 Source
+Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} provides the
+@command{loop} pseudo-device driver for testing and compatibility with
+@cite{LiS},@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
+OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} with the following portability
+considerations:
+
+@itemize --
+@item Although this driver is described in the @cite{SVR4 SPG}@footnote{@cite{SVR 4, UNIX(R) System
+V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System
+Laboratories, Inc., Prentice Hall.}} as a driver example, most @dfn{STREAMS} implementations do not
+actually provide such a driver.
+
+@item @command{loop} is provided primarily for use by the
+@manpage{test-streams(8)} conformance and
+verification test program, and as an example of a pipe-like driver with flow control supported
+across the driver.  It should not be used by portable @dfn{STREAMS} modules, driver or
+applications programs.
+
+@end itemize
+
+See
+@manpage{STREAMS(9)} for additional compatibility information.
+
+@subheading Conformance
+@cite{SVR4}@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} and
+@cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
+OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} documentation.  Conformance is verified using
+the
+@manpage{test-loop(8)} verification test suite.
+
+@subheading History
+@command{loop} is described as an example loop-around driver in the @cite{SVR4
+SPG}@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood
+Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+
+@c ============================================================================
+
+@page
+@node mux Driver
+@subsection mux
+
+@subheading Name
+@command{mux} -- @dfn{STREAMS} multiplexing pseudo-device driver
+
+@subheading Description
+The @command{mux} psuedo-device multiplexing driver is an implementation of the multplexing driver
+described in the @cite{UNIX(R) System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
+4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
+UNIX System Laboratories, Inc., Prentice Hall.}} with a number of exceptions and enhancments.  The
+primary purposes of the @command{mux} pseudo-device driver are: to provide a capability to the
+@manpage{test-streams(8)} conformance and verification test program, for testing linking and
+unlinking of @dfn{STREAMS} across a multiplexing driver; and to provide an example of a multiplexing
+driver for the @dfn{STREAMS} programmer.  To avoid complications for testing, and to serve as a
+basic example, the driver is as simplistic as possible.
+
+The @command{mux} pseudo-device driver has the following behaviour:
+
+@table @asis
+
+@item @manpage{open(2s)}
+When a @command{mux} @dfn{Stream} is opened using
+@manpage{open(2s)} a new @command{mux}
+@dfn{Stream} is created.  The newly created @dfn{Stream} is not associated with any lower multiplex
+@dfn{Stream}.  Issuing the @var{MUX_UP} and @var{MUX_DOWN} input-output controls are necessary, to
+associate the upper multiplex @dfn{Stream} with a lower one, before data can be written to or read
+from the @dfn{Stream}.  Any attempt to send data on the @dfn{Stream} before it is associated with a
+lower @dfn{Stream} will result in an
+@manpage{M_ERROR(9)} message being sent upstream causing all
+further read, write or control operations on the @dfn{Stream} to fail with error @errno{ENXIO}.
+
+@item @ioctlref{I_LINK}, @ioctlref{I_PLINK}
+ When a @dfn{Stream} is linked under the @command{mux} driver, a new lower multiplex @dfn{Stream} is
+instantiated.  This newly instantiated lower @dfn{Stream} is not associated with an upper multiplex
+@dfn{Stream}.  Issuing the @var{MUX_UP} and @var{MUX_DOWN} input-output controls are necessary, to
+associate an upper multiplex @dfn{Stream} with the lower one.  If data is received on the linked
+@dfn{Stream}, it will be accumulated in the read-side queue pending a @var{MUX_UP} or
+@ioctlref{I_UNLINK}, or @ioctlref{I_PUNLINK} operation.
+
+@item @var{MUX_UP}, @var{MUX_DOWN}
+The @var{MUX_UP} and @var{MUX_DOWN} input-output controls described under "IOCTLS," below, are used
+to connect the upstream or downstream flow (respectively) between the requesting upper multiplex
+@dfn{Stream} and a specified (by @dfn{link id}) lower multiplex @dfn{Stream}.  Once connected in this
+fashion, data can be passed in either direction.
+
+Each upstream or downstream multiplex connection is independent of all others.  @var{MUX_DOWN}
+establishes fan-in in the downstream direction.  Multiple upper multiplex @dfn{STREAMS} can be
+connected to the same lower multiplex @dfn{Stream} using separate calls to @dfn{MUX_DOWN}.
+@dfn{MUX_UP} establishes fan-in in the upstream direction.  Multiple lower multiplex @dfn{Stream} can
+be connected to the same upper multiplex @dfn{Stream} using separate calls to @dfn{MUX_UP}.
+
+@item @manpage{putpmsg(2s)}, @manpage{getpmsg(2s)}
+Data is passed in either direction using the
+@manpage{putpmsg(2s)} or
+@manpage{getpmsg(2s)} calls as
+normal.  The @command{mux} driver coordinates @dfn{STREAMS} flow control across the multiplexing
+driver by explicitly enabling service procedures of the feeding side when the accepting side is
+back-enabled.
+
+@item @ioctlref{I_UNLINK}, @ioctlref{I_PUNLINK}
+When a lower multiplex @dfn{Stream} is removed using @ioctlref{I_UNLINK} or @ioctlref{I_PUNLINK},
+the lower multiplex @dfn{Stream} is no longer availble for data transfer and returns to its original
+@dfn{Stream head}.  If the unlinked @dfn{Stream} is connected to an upper multiplex @dfn{Stream}
+(with @var{MUX_DOWN}), the connection is broken and an
+@manpage{M_HANGUP(9)} message is sent to the
+upper @dfn{Stream}.
+
+@item @manpage{close(2s)}
+When an upper multiplex @dfn{Stream} is closed using the
+@manpage{close(2s)} system call, the
+@dfn{Stream} is dismantled.  An lower multiplex @dfn{STREAMS} that were previously linked under
+the closing @dfn{Stream} with @ioctlref{I_LINK} will be unlinked automatically by the @dfn{Stream
+head} before the upper multiplex @dfn{Stream} is closed.  If the upper @dfn{Stream} remains connected
+to a lower multiplex @dfn{Stream} (due to a previous call to @var{MUX_UP}), the connection will be
+broken and the lower multiplex @dfn{Stream} will begin queuing read data pending a subsequent
+connection or unlink operation.
+
+@end table
+
+@subheading Usage
+The @command{mux} pseudo-device multiplexing driver is an implementation of the multplexing
+driver described in the @cite{UNIX(R) System V Release 4 -- STREAMS Programmer's
+Guide},@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} with a number
+of considerations as follows:
+
+@itemize @bullet
+
+@item The @cite{SVR4} driver is only a fan-in driver; that is, it only supports multiple upper
+@dfn{Streams} fanning into a single @ioctlref{I_LINK}'ed lower @dfn{Stream}.  In contrast,
+@command{mux} supports fan-in and fan-out arrangements, as well as multiple linked lower
+@dfn{Streams}.
+
+@item The @cite{SVR4} driver does not support @ioctlref{I_PLINK}.  In contrast, @command{mux}
+supports both @ioctlref{I_LINK} and @ioctlref{I_PLINK}.
+
+@end itemize
+
+@subheading Ioctls
+@subsubheading I_LINK
+The @command{mux} driver responds to the @ioctlref{I_LINK} @dfn{STREAMS} input-output control.  The
+lower multiplex @dfn{Stream} is instantiated and made available as a target of the @var{MUX_UP} or
+@var{MUX_DOWN} input-output controls.  The link will be removed once the upper control @dfn{Stream}
+(the one that performed the @ioctlref{I_LINK} operation) is closed.
+
+@var{arg} is a pointer to a @mantype{linkblk(9)} structure describing the lower multiplexed
+@dfn{Stream} to be linked.
+
+@subsubheading I_PLINK
+The @command{mux} driver responds to the @ioctlref{I_PLINK} @dfn{STREAMS} input-output control.  The
+lower multiplex @dfn{Stream} is instantiated and made available as a target of the @var{MUX_UP} or
+@var{MUX_DOWN} input-output controls.  The link will persist, even if all @dfn{Streams} are closed.
+An explicit @ioctlref{I_PUNLINK} operation is necessary to unlink the @dfn{Stream}.
+
+@var{arg} is a pointer to a @mantype{linkblk(9)} structure describing the lower multiplexed
+@dfn{Stream} to be linked.
+
+@subsubheading I_UNLINK
+The @command{mux} driver responds to the @ioctlref{I_UNLINK} @dfn{STREAMS} input-output control.  The
+specified linked @dfn{Stream} is disconnected from all feeding upper multiplex @dfn{Streams},
+and an
+@manpage{M_HANGUP(9)} message is sent to each.  The linked @dfn{Stream} is then removed from
+the lower side of the driver.
+
+@var{arg} is a pointer to a @mantype{linkblk(9)} structure describing the lower multiplexed
+@dfn{Stream} to be unlinked.
+
+@subsubheading I_PUNLINK
+The @command{mux} driver responds to the @ioctlref{I_PUNLINK} @dfn{STREAMS} input-output control.
+The specified linked @dfn{Stream} is disconnected from all feeding upper multiplex
+@dfn{Streams}, and an
+@manpage{M_HANGUP(9)} message is sent to each.  The linked @dfn{Stream} is then
+removed from the lower side of the driver.
+
+@var{arg} is a pointer to a @mantype{linkblk(9)} structure describing the lower multiplexed
+@dfn{Stream} to be unlinked.
+
+@subsubheading MUX_UP
+Requests that the driver connect the requesting @dfn{Stream} upstream from the specified linked
+@dfn{Stream}.  This only connects the read-side direction of flow.  See "@var{MUX_DOWN}," below, for
+the write-side connection.
+
+@var{arg} is an integer value specifying the lower multiplexed @dfn{Stream} to be used for the
+connection.
+
+@subsubheading MUX_DOWN
+Requests that the driver connect the specified linked @dfn{Stream} downstream from the requesting
+@dfn{Stream}.  This only connects the write-side direction of flow.  See "@var{MUX_UP}," above, for
+the read-side connection.
+
+@var{arg} is an integer value specifying the lower multiplexed @dfn{Stream} to be used for the
+connection.
+
+@subsubheading MINIMUX_UP
+Requests that the driver connect the requesting @dfn{Stream} upstream from the specified linked
+@dfn{Stream}.  This only connects the read-side direction of flow.  See "@var{MINIMUX_DOWN}," below,
+for the write-side connection.
+
+@var{arg} is a pointer to an integer value specifying the lower multiplexed @dfn{Stream} to be use
+for the connection.
+
+This input-output control is provided for compatibility with the @cite{LiS}@footnote{@cite{LIS 2.18,
+Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+<@url{http://www.openss7.org/}>}} @file{minimux} driver.
+
+@subsubheading MINIMUX_DOWN
+Requests that the driver connect the specified linked @dfn{Stream} downstream from the requesting
+@dfn{Stream}.  This only connects the write-side direction of flow.  See "@var{MINIMUX_UP}," above,
+for the read-side connection.
+
+@var{arg} is a pointer to an integer value specifying the lower multiplexed @dfn{Stream} to be use
+for the connection.
+
+This input-output control is provided for compatibility with the @var{LiS}@footnote{@cite{LIS 2.18,
+Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+<@url{http://www.openss7.org/}>}} @file{minimux} driver.
+
+@subheading Notices
+The @command{mux} driver is used by the
+@manpage{test-streams(8)} conformance and verification test
+program to test linking and unlinking of @dfn{Streams} across a multiplexing driver.  Much of its
+behaviour is specific to testing and cannot be altered without impacting the ability of the
+@manpage{test-streams(8)} conformance and verification test program results.
+
+@subheading Implementation
+@command{mux} is implemented as described in the @cite{SVR4 SPG}.@footnote{@cite{SVR 4, UNIX(R)
+System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX
+System Laboratories, Inc., Prentice Hall.}}
+
+@subheading Devices
+
+@ftable @file
+
+@item /dev/mux
+The external filesystem @dfn{STREAMS} @command{mux} device.
+
+@item /dev/streams/mux, /devices/mux
+The
+@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @command{mux} device.
+
+@end ftable
+
+@subheading See Also
+@manref{loop(4)}, @manref{nullmod(4)}, @manref{test-streams(8)}.
+
+@subheading Bugs
+@command{mux} has no known bugs.
+
+@subheading Compatibility
+@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6 Source
+Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} provides the
+@command{mux} pseudo-device driver for testing and compatibility with @cite{LiS},@footnote{@cite{LIS
+2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+<@url{http://www.openss7.org/}>}} with the following portability considerations:
+
+@itemize --
+
+@item
+Although this driver is described in the @cite{SVR4 SPG}@footnote{@cite{SVR 4, UNIX(R) System V
+Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System
+Laboratories, Inc., Prentice Hall.}} as a driver example, most @dfn{STREAMS} implementations do not
+actually provide such a driver.
+
+@item
+@command{mux} is provided primarily for use by the
+@manpage{test-streams(8)} conformance and
+verification test program, and as an example of a multiplexing driver with flow control supported
+across the driver.  It should not be used by portable @dfn{STREAMS} modules, driver or applications
+programs.
+
+@end itemize
+
+See
+@manpage{STREAMS(9)} for additional compatibility information.
+
+@subheading Conformance
+@cite{SVR4}@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} and
+@cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
+OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} documentation.  Conformance is verified using
+the
+@manpage{test-mux(8)} verification test suite.
+
+@subheading History
+@command{mux} is described as an example multiplexing driver in the @cite{SVR4
+SPG}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood
+Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+
+@c ============================================================================
+
+@page
+@node nsdev Driver
+@subsection nsdev
+
+@subheading Name
+@command{nsdev} -- named @dfn{STREAMS} device
+
+@subheading Synopsis
+@example
+#include <sys/stropts.h>
+
+int fd = open("/dev/xxx.yyy", oflags);
+@end example
+
+@subheading Description
+@command{nsdev} is a @dfn{Named STREAMS Device} pseudo-device driver similar in some respects to
+@manpage{clone(4)}.  @command{nsdev} is perhaps the only assigned major device number that is ever
+needed by a @dfn{STREAMS} device driver.
+
+Whereas the
+@manpage{clone(4)} pseudo-device driver transforms the device number @var{dev} into
+@samp{makedevice(getminor(@var{dev}), 0)}, the @command{nsdev} pseudo-device driver transforms the
+device number @var{dev} into @samp{makedevice(major, getminor(@var{dev}))}, where @var{major} is
+determined from the name of the device rather than the device number.
+
+To determine the major component of the device number, @command{nsdev} looks for a registered
+@dfn{STREAMS} device with the same initial substring (before a dot) as the name of the device opened
+(@var{xxx} in the "SYNOPSIS" above).
+
+If no registered @dfn{STREAMS} device can be found that match the initial substring, @var{xxx}, of
+the device name, the @command{nsdev} requests that the kernel load the module named
+@file{streams-@var{xxx}}, where @var{xxx} is the longest initial substring of the device name that
+does not contain a period (".") character.  This makes it possible to create Named @dfn{STREAMS}
+Devices knowing only the character major device number associated with the @command{nsdev} driver
+and demand load other @dfn{STREAMS} modules and drivers that may then dynamically allocate their
+major device numbers (or not allocate any major device numbers at all).
+
+For additional information on device numbers, see the "Device Numbering" section of the
+@manref{dev_t(9)}.
+
+@subsubheading Super Cloning
+The @command{nsdev} supports the concept of super cloning when used in conjunction with the
+traditional
+@manpage{clone(4)} device.  A super clone device has the clone device major device number
+as a major number and the @command{nsdev} major device number as a minor number.  This is a
+traditional clone device application to the @command{nsdev} pseudo-device driver.  This arrangement
+has the characteristic that when such a
+@manpage{clone(4)} device is opened, it chains the open call
+to the @command{nsdev} with the @var{CLONEOPEN} flag set in sflag.  The @dfn{Named STREAMS Device}
+then chains the open to the device number derived from the device name and the minor device number
+(in this case zero (0)) as normal.
+
+@subsubheading Named Clone Devices
+The @command{nsdev} can be used to create named clone devices.  A named clone device can be created
+by assigning the @command{nsdev} major device number to devices with the name @file{clone.@var{yyy}}
+and assigning the traditional clone device minor number (see
+@manpage{clone(4)}).  In this way, it is
+not even necessary to know the device major number of the
+@manpage{clone(4)} device.
+
+@subheading Notices
+Performing an
+@manpage{open(2s)} of the @command{nsdev} can result in the loading of (or an attempt
+to load) the kernel module named @file{streams-@var{xxx}}.
+
+If the device opened is a symbolic link, the name of the actual file is the name used for
+determining the major device number of the cloned device.  If the device opened is a hard link,
+the name of the opened file is the name used for determining the major device number of the
+cloned device.
+
+@command{nsdev} is used by the @cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux
+Fast-STREAMS (LfS) 0.7a.6 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+<@url{http://www.openss7.org/}>}} system provided drivers to limit the use of major device numbers
+to a single major device number for the @dfn{STREAMS} system installed device drivers.  Clonable
+minor devices are allocated against a single @dfn{STREAMS} system major device number rather than
+allocating new major device numbers for each facility.
+
+When @command{nsdev} loads, it assigns a major device number either statically or dynamically.  In
+either event, the major device number associated with the @command{nsdev} can be found by search the
+@file{/proc/devices} file for the major device number assigned to "@command{nsdev}".
+
+@subheading Implementation
+@command{nsdev} is not implemented as a normal @dfn{STREAMS} driver: it is implemented as a shadow
+special device node under @cite{@value{PACKAGE_TITLE}}.@footnote{@cite{streams-0.7a, Linux
+Fast-STREAMS (LfS) 0.7a.6 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+<@url{http://www.openss7.org/}>}} @cite{@value{PACKAGE_TITLE}} shadow special device nodes call
+@code{nsdev_open()} from @code{cdev_open()} instead of @code{spec_open()} permitting the
+@command{nsdev} device to intercept and redirect the open call to the appropriate device.  This is
+consitent with the descriptions for the internal @code{clone_open()} under @cite{SVR
+4}.@footnote{@cite{Magic Garden, The Magic Garden Explained: The Internals of UNIX(R) System V
+Release 4 / An Open Systems Design, 1994, (Australia), B. Goodheart, J. Cox, Prentice Hall.  [ISBN
+0-13-098138-9]}}
+
+@subheading Examples
+Following are some examples of how to use the @dfn{Named STREAMS Device}:
+
+@subsubheading Named STREAMS Device Example
+
+If the following is performed to create the device (assuming that major device number @samp{56} is
+the major device number of the @dfn{Named STREAMS Device}):
+
+@cartouche
+@float Example,nsdev:ex0
+@caption{@emph{Named STREAMS Device Example}}
+@example
+$> mknod -m 0666 /dev/mystream.04 c 56 3
+$> ln -s /dev/mystream.04 /dev/ticlts
+@end example
+@end float
+@end cartouche
+
+then opening @file{/dev/ticlts} will result in opening minor device number @samp{3} of the
+@samp{mystream} device.  The device will be opened with the @var{sflag} argument to
+@manpage{qopen(9)} set to @var{DRVOPEN} unless the device has had cloning set using @var{D_CLONE}
+during registration of the major or minor device nodes (see @manref{register_strdev(9)}), or unless
+@var{SAP_CLONE} was set using the @dfn{STREAMS Administrative Driver}
+@manpage{sad(4)} for the
+ultimate device node.  In either of these later cases, the device will be opened with a @var{sflag}
+argument of @var{CLONEOPEN}.
+
+@subsubheading Super Clone Example
+
+If the following is performed to create a
+@manpage{clone(4)} device in addition to the above example
+(assuming that the
+@manpage{clone(4)} major device number is @samp{74}):
+
+@cartouche
+@float Example,nsdev:ex1
+@caption{@emph{Super Clone Example}}
+@example
+$> mknod -m 0666 /dev/mystream.00 c 56 0
+$> mknod -m 0666 /dev/mystream c 74 56
+$> ln -s /dev/mystream my_super_clone_device
+$> mknod -m 0666 /dev/mystream.00 c 56 0
+@end example
+@end float
+@end cartouche
+
+then opening either @file{my_super_clone_device} or @file{/dev/mystream} will result in opening
+minor device number @samp{0} of the @file{mystream} device with the @var{sflag} argument to
+@manpage{qopen(9)} being set to @var{CLONEOPEN}.  For additional information on the super cloning
+technique using the @dfn{Named STREAMS Device}, see
+@manpage{clone(4)}.
+
+@subheading Devices
+@ftable @file
+
+@item /dev/nsdev
+The external filesystem @dfn{Named STREAMS Device}.
+
+@item /dev/streams/nsdev, /devices/nsdev
+The
+@manpage{specfs(5)} shadow special filesystem @dfn{Named STREAMS Device}.
+
+@end ftable
+
+@subheading See Also
+@manref{specfs(5)}, @manref{open(2s)}, @manref{qopen(9)}, @manref{register_strdev(9)},
+@manref{clone(4)}, @manref{sad(4)}, @manref{dev_t(9)}, @manref{STREAMS(9)}.
+
+@subheading Bugs
+@command{nsdev} has no known bugs.
+
+@subheading Compatiblity
+@command{nsdev} is compatible with @cite{SVR 4.2}@footnote{@cite{SVR 4.2, UNIX(R) System V Release
+4.2 Programmer's Manual, 1992, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
+Prentice Hall.}} and implementations based on @cite{SVR 4.2}, including @cite{AIX(R)},
+@cite{HP-UX(R)}, @cite{LiS}, @cite{OSF/1(R)}, @cite{Solaris(R)}, @cite{SUPER-UX(R)},
+@cite{UXP/V(R)}, with the following compatibility considerations:
+
+@itemize --
+
+@item
+@command{nsdev} is a @cite{@value{PACKAGE_TITLE}} specific device.
+
+@item
+Although @command{nsdev} is @cite{@value{PACKAGE_TITLE}} specific, the operation of this device is a
+file system artifice and is transparent to both the @dfn{STREAMS} device user and the @dfn{STREAMS}
+device driver itself.
+
+@item
+When the @command{nsdev} is opened directly, the driver has no indication that it has been opened
+via the @dfn{Named STREAMS Device} and, for all intents and purposes, appears to the driver as
+having been opened as a direct minor node of the driver.
+
+@end itemize
+
+See STREAMS(9) for additional compatibility information.
+
+@subheading Conformance
+@command{nsdev} is a @cite{@value{PACKAGE_TITLE}} specific mechanism.  Conformance is verified using
+the
+@manpage{test-nsdev(4)} verification test suite.
+
+@subheading History
+@command{nsdev} first appeared in @cite{@value{PACKAGE_TITLE}}.
+
+@c ============================================================================
+
+@page
+@node nuls Driver
+@subsection nuls
+
+@subheading Name
+@command{nuls} -- null @dfn{STREAMS} device
+
+@subheading Synopsis
+@example
+#include <unistd.h>
+#include <stropts.h>
+
+int fd = open(/dev/nuls, oflag);
+@end example
+
+@subheading Description
+@var{fd} is a file descriptor for a null @dfn{Stream} opened using the
+@manpage{open(2s)} system call on
+one of the following devices:
+
+@ftable @file
+
+@item /dev/nuls
+This device is accessible to all users.
+
+@end ftable
+
+The @command{nuls} device is characterized by the following behaviour:
+
+@itemize --
+
+@item
+All data written to the @command{nuls} device with
+@manpage{write(2s)},
+@manpage{writev(2s)},
+@manpage{putmsg(2)} and
+@manpage{putpmsg(2s)} is discarded.
+
+@item
+All attempts to read the @command{nuls} device with
+@manpage{read(2s)},
+@manpage{readv(2s)},
+@manpage{getmsg(2)} or
+@manpage{getpmsg(2s)} will return zero length data.
+
+@end itemize
+
+In contrast to the @cite{Linux} @file{/dev/null} and @file{/dev/zero} (see
+@manpage{null(4)},
+@manpage{zero(4)}), @command{nuls} is a @dfn{STREAMS} null device with the following additional
+characteristics:
+
+@itemize --
+
+@item
+@dfn{STREAMS} modules can be pushed and popped from the device.
+
+@item
+The device response to all @dfn{STREAMS} I/O controls described in
+@manpage{streamio(7)}.
+
+@item
+The device can be linked under a multiplexing driver.
+
+@end itemize
+
+@subheading Ioctls
+@command{nuls} does not support any I/O controls of its own and all I/O controls delivered to
+the driver will return an
+@manpage{errno(3)} of @errno{EOPNOTSUPP}.
+
+@subheading Usage
+The @command{nuls} device can be opened when no other suitable device exists and modules may
+be pushed on the @command{nuls} device.
+
+Pushing a @dfn{STREAMS} module that responds to administrative I/O controls on the @command{nuls}
+device is a method of providing administrative drivers without consuming major device numbers.
+
+@subheading Notices
+The @command{nuls} device is used on systems that provide the older @cite{SVR 3}@footnote{@cite{SVR
+3, UNIX(R) System V Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System
+Laboratories, Inc., Prentice Hall.}} style @file{/dev/null} or @file{/dev/zero}.  On those systems,
+the @file{/dev/null} and @file{/dev/zero} devices are not @dfn{STREAMS} based and will not respond
+to @dfn{STREAMS} I/O controls.
+
+The @command{nuls} device is used with the
+@manpage{sc(4)} module as on @cite{AIX(R)},
+@cite{HP-UX(R)}, and @cite{OSF/1(R)} systems in support of the
+@manpage{autopush(8)},
+@manpage{scls(8)},
+@manpage{strinfo(8)},
+@manpage{strload(8)}, and
+@manpage{strsetup(8)} commands.
+
+Under @cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6
+Source Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} the
+@command{nuls} device is also used with the
+@manpage{sockmod(4)} module in support of
+@file{libsocket}, and by @file{libstreams}, as an anonymous @dfn{Stream} for non-file-descriptor
+related system call emulation for
+@manpage{fdetach(3)}.
+
+@subheading Implementation
+@command{nuls} is implemented as a regular @dfn{STREAMS} pseudo-device driver.
+
+@subheading Devices
+@ftable @file
+
+@item /dev/nuls
+The external filesystem null @dfn{STREAMS} device.
+
+@item /dev/streams/nuls
+@itemx /devices/nuls
+The
+@manpage{specfs(5)} shadow special filesystem null @dfn{STREAMS} device.
+
+@end ftable
+
+@subheading See Also
+@manref{null(4)}, @manref{zero(4)}, @manref{echo(4)}.
+
+@subheading Bugs
+@command{nuls} has no known bugs.
+
+@subheading Compatibility
+The @command{nuls} device is compatible with @cite{SVR 4.2}, @cite{AIX(R)}, @cite{HP-UX(R)}, and
+@cite{OSF/1(R)} with the following portability considerations:
+
+@itemize --
+
+@item
+@file{/dev/nuls} can be used instead of @file{/dev/null} or @file{/dev/zero} for any purpose for
+which those devices are used.
+
+@end itemize
+
+@subheading Conformance
+@cite{SVR 4.2},@footnote{@cite{SVR 4.2 CR, UNIX(R) System V Release 4.2 Command Reference Manual,
+1992, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} and
+@cite{AIX(R)},@footnote{@cite{AIX(R) 5L Version 5.1, AIX 5L Version 5.1 Documentation, 2001,
+(Boulder, Colorado), Internatonal Business Machines Corp., IBM.
+<@url{http://publibn.boulder.ibm.com/}>}} @cite{HP-UX(R)},@footnote{@cite{HP-UX(R) 11i v2, HP-UX 11i
+v2 Documentation, 2001, (Palo Alto, California), Hewlett-Packard Company, HP.
+<@url{http://docs.hp.com/}>}} and @cite{OSF/1(R)}@footnote{@cite{Digital(R) UNIX (OSF/1.2), Digital
+UNIX Documentation Library, 2003, (Palo Alto, California), Digital Equipment Corporation,
+Hewlett-Packard Company.  <@url{http://www.true64unix.compaq.com/docs/}>}} documentation.
+Conformance is verified using the
+@manpage{test-nuls(8)} verification test suite.
+
+@subheading History
+The @command{nuls} device first appeared in @cite{SVR 4.2}@footnote{@cite{Digital(R) UNIX (OSF/1.2),
+Digital UNIX Documentation Library, 2003, (Palo Alto, California), Digital Equipment Corporation,
+Hewlett-Packard Company.  <@url{http://www.true64unix.compaq.com/docs/}>}} implementations for
+@cite{AIX(R)}, @cite{HP-UX(R)}, and @cite{OSF/1(R)}.
+
+@c ============================================================================
+
+@page
+@node pipe Driver
+@subsection pipe
+
+@xref{spx Driver}.
+
+
+@c ============================================================================
+
+@page
+@node sad Driver
+@subsection sad
+
+@subheading Name
+@command{sad} -- @dfn{STREAMS} Administrative Driver
+
+@subheading Synopsis
+@example
+#include <sys/types.h>
+#include <sys/stropts.h>
+#include <sys/sad.h>
+
+int ioctl(int fd, int cmd, intarg);
+@end example
+
+@subheading Description
+@var{fd} is a file descriptor returned from an
+@manpage{open(2s)} system call on one of the
+following devices:
+
+@ftable @file
+
+@item /dev/sad/admin
+This device is only accessible by privileged users.
+
+@item /dev/sad/user
+This device is accessible by all users.
+
+@end ftable
+
+@subheading Ioctls
+The @command{sad} driver implements the IO controls that can be performed on an open device using
+the
+@manpage{ioctl(2s)} system call as follows:
+@example
+int ioctl(int fd, int cmd, intarg);
+@end example
+@table @var
+@item fd
+is an open file descriptor for the @file{/dev/sad/admin} or @file{/dev/sad/user} device.
+
+@item cmd
+is the
+@manpage{ioctl(2s)} command and can be one of the following:
+
+@multitable @columnfractions .15 .60
+@item SAD_GAP
+@tab get autopush list.
+@item SAD_SAP
+@tab set autopush list or clone minor.
+@item SAD_VML
+@tab verify module list.
+@end multitable
+
+@item arg
+is a pointer to a @mantype{strapush} or @mantype{str_list} structure, depending on @var{cmd}.
+@end table
+
+Each @var{cmd} is described in the subsections which follow:
+
+@subsubheading SAD_SAP
+Set the @manref{autopush} list for a
+@manpage{STREAMS(9)} driver.
+
+@var{arg} points to a @mantype{strapush} structure formatted as follows:
+@example
+struct strapush @{
+  unsigned int sap_cmd;
+  long sap_major;
+  long sap_minor;
+  long sap_lastminor;
+  long sap_npush;
+  char sap_list[MAXAPUSH][FMNAMSZ + 1];
+  int sap_anchor;
+  char sap_module[FMNAMSZ + 1];
+@};
+@end example
+
+@table @var
+@item sap_cmd
+Specifies the command to execute when setting the autopush list for a
+@manpage{STREAMS(9)} driver.
+@var{sap_cmd} can be one of the following values:
+
+@table @var
+@item SAP_CLEAR
+Requests that the
+@manpage{autopush(9)} list for the @dfn{STREAMS} driver specified by the
+@var{sap_major} major device number be cleared.
+@item SAP_ONE
+Requests that the
+@manpage{autopush(9)} list for the @dfn{STREAMS} driver specified by the
+@var{sap_major} and @var{sap_minor} device number be set to the modules named in the @var{sap_npush}
+and @var{sap_list} members.
+@item SAP_RANGE
+Requests that the
+@manpage{autopush(9)} list for the @dfn{STREAMS} driver specified by the
+@var{sap_major} and range of minor devices from @var{sap_minor} to @var{sap_lastminor} (inclusive)
+be set to the modules named in the @var{sap_npush} and @var{sap_list} members.
+@item SAP_ALL
+Requests that the
+@manpage{autopush(9)} list for all minor devices of the @dfn{STREAMS} driver
+specified by the @var{sap_major} major device number be set to the modules named in the
+@var{sap_npush} and @var{sap_list} members.
+@item SAP_CLONE
+Requests that the minor device of the @dfn{STREAMS} driver specified by the @var{sap_major} and
+@var{sap_minor} device number to set to be a clone minor device.
+@end table
+
+@item sap_major
+Specifies the major device number of the @dfn{STREAMS} driver upon which to perform the command
+specified in @var{sap_cmd}.  @var{sap_major} is significant for all
+@manpage{autopush(9)} commands.
+
+@item sap_minor
+Specifies the minor device number, or initial minor device number in a range, of the @dfn{STREAMS}
+driver for which to execute the
+@manpage{autopush(9)} command.  @var{sap_minor} is only significant
+for
+@manpage{autopush(9)} commands @var{SAP_CLEAR}, @var{SAP_ONE} and @var{SAP_RANGE}, and is
+ignored otherwise.
+
+@item sap_lastminor
+Specifies the minor device number of the last minor device in a range for the @dfn{STREAMS} driver
+for which to execute the
+@manpage{autopush(9)} command.  @var{sap_lastminor} is only significant for
+@manpage{autopush(9)} commands @var{SAP_RANGE}, and is ignored otherwise.
+
+@item sap_npush
+Specifies the number of module names in the @var{sap_list} member array.  @var{sap_npush} is only
+significant for
+@manpage{autopush(9)} commands @var{SAP_ONE}, @var{SAP_RANGE} and @var{SAP_ALL}, and
+is ignored otherwise.
+
+@item sap_list
+Specifies an array containing @var{sap_npush} names of modules.
+
+@end table
+
+When calling @var{SAD_SAP}, the user must provide sufficient room for the entire @mantype{strapush}
+structure, regardless of the number of module names in the @var{sap_list} member.
+
+Upon success, @var{SAD_SAP} returns zero (0) and sets or clears the
+@manpage{autopush(9)} list for
+the specified @dfn{STREAMS} device.  Upon failure, @var{SAD_SAP} returns @samp{-1}, does not alter
+@manpage{autopush(9)} list for any @dfn{STREAMS} device, and sets
+@manpage{errno(3)} to an
+appropriate error number as follows:
+
+@table @errno
+@item EFAULT
+@var{arg} is @samp{NULL} or points outside the caller's valid address space.
+@item EINVAL
+@var{sap_major}, @var{sap_minor} or @var{sap_lastminor} was invalid.
+@item EINVAL
+@var{sap_nlist} is less than one or greater than @var{MAXAPUSH}.
+@item EINVAL
+@var{sap_list} contained invalid information (e.g. the names are not null terminated).
+@item ENOSTR
+@var{sap_major}, @var{sap_minor} and @var{sap_lastminor} specify a character device that is not
+a @dfn{STREAMS} device.
+@item EEXIST
+@var{sap_major}, @var{sap_minor} and @var{sap_lastminor} specify a @dfn{STREAMS} device that is
+already configured for
+@manpage{autopush(9)} and the @var{sap_cmd} was @var{SAP_ONE},
+@var{SAP_RANGE} or @var{SAP_ALL}.
+@item ERANGE
+@var{sap_minor} was not the first minor an a range previously set with @var{SAP_RANGE} and the
+@var{sap_cmd} was @var{SAP_CLEAR}.
+@item ERANGE
+@var{sap_lastminor} is less than or equal to @var{sap_minor} and the @var{sap_cmd} was @var{SAP_RANGE}.
+@item ENODEV
+the device specified by @var{sap_major} and @var{sap_minor} is not configured with an
+@manpage{autopush(9)} list and the @var{sap_cmd} was @var{SAP_CLEAR}.
+@item ENOSR
+@dfn{STREAMS} resources could not be allocated to complete the command.
+@end table
+
+In addition, any of the errors returned by the
+@manpage{ioctl(2s)} command may be returned.
+
+@subsubheading SAD_GAP
+Get the
+@manpage{autopush(9)} list for a @dfn{STREAMS} driver.
+
+@var{arg} points to a @mantype{strapush} structure formatted as follows:
+@example
+struct strapush @{
+  unsigned int sap_cmd;
+  major_t sap_major;
+  minor_t sap_minor;
+  minor_t sap_lastminor;
+  unsigned int sap_npush;
+  char sap_list[MAXAPUSH][FMNAMSZ + 1];
+  int sap_anchor;
+  char sap_module[FMNAMESZ + 1];
+@};
+@end example
+
+
+@table @var
+
+@item sap_cmd
+This member is ignored on call an is unchanged on return.
+
+@item sap_major
+This member specifies the major device number of the @dfn{STREAMS} driver for which to retrieve the
+current
+@manpage{autopush(9)} list.
+
+@item sap_minor
+This member specifies the minor device number of the @dfn{STREAMS} driver for which to retrieve the
+current
+@manpage{autopush(9)} list.
+
+@item sap_lastminor
+This member is ignored on call an is unchanged on return.
+
+@item sap_npush
+Indicates on successful return the number of modules in the
+@manpage{autopush(9)} list for the
+@dfn{STREAMS} device specified in the @var{sap_major} and @var{sap_minor} members.  Upon failure,
+this member remains unchanged.
+
+@item sap_list
+Indicates on successful return the null terminated names of the @var{sap_npush} modules in the
+@manpage{autopush(9)} list for the @dfn{STREAMS} device specified in @var{sap_major} and
+@var{sap_minor}.  Unused elements in the list are filled with character nulls.  Upon failure, this
+member remains unchanged.
+
+@end table
+
+For @var{SAD_GAP} to be successful, @var{sap_major} and @var{sap_minor} must specify a @dfn{STREAMS}
+device that was previously configured for
+@manpage{autopush(9)} with @var{SAP_SAP}, above, or using
+@manref{register_strdev(9)}.
+
+Upon success, @var{SAD_GAP} returns zero (0) and sets the @var{sap_nlist} and @var{sap_list} members
+to indicate the current
+@manpage{autopush(9)} settings for the @dfn{STREAMS} device specified in
+@var{sap_major} and @var{sap_minor}.  Upon failure, @var{SAD_GAP} returns @samp{-1}, does not alter
+any members, and sets
+@manpage{errno(3)} to an appropriate error number as follows:
+
+@table @errno
+@item EFAULT
+@var{arg} is @samp{NULL} or points outside the caller's valid address space.
+@item EINVAL
+The device specified by @var{sap_major} and @var{sap_minor} is invalid.
+@item ENOSTR
+The device specified by @var{sap_major} and @var{sap_minor} is not a @dfn{STREAMS} device.
+@item ENODEV
+The device specified by @var{sap_major} and @var{sap_minor} is not configured for
+@manpage{autopush(9)}.
+@end table
+
+In addition, any of the errors returned by the @manref{ioctl(2s)} command may be returned.
+
+@subsubheading SAD_VML
+Verify that a module list is valid.
+
+@var{arg} points to a @mantype{str_list} structure formatted as follows:
+@example
+struct str_list @{
+  int sl_nmods;
+  struct str_mlist *sl_modlist;
+@};
+@end example
+
+@table @var
+
+@item sl_nmods
+
+@item sl_modlist
+@example
+struct str_mlist @{
+  char l_name[FMNAMESZ + 1];
+@};
+@end example
+
+@end table
+
+@var{SAD_VML} has the side-effect that if a @dfn{STREAMS} module corresponds to a kernel-module, the
+call will load the kernel module: meaning, this control has the side-effect as calling
+@manpage{request_module(9)} for some of the module names in the module list, whether the control is
+successful or not.
+
+Only @dfn{STREAMS} module names are considered valid: @dfn{STREAMS} driver names are considered
+invalid and will not be loaded as a side-effect.  The
+@manpage{sc(4)} module or
+@manpage{scls(8)}
+utility can be used query whether a driver is loaded on the system.  Opening a character device
+special file associated with driver will also effect driver kernel-module demand loading.
+
+Upon success, @var{SAD_VML} return zero (@samp{0}) to indicate that all of the modules in the
+specified module list are loaded on the system.  Upon failure, @var{SAD_VML} returns one (@samp{1})
+if an invalid module name is present in the list, or returns minus one (@samp{-1}) and sets
+@manpage{errno(3)} to an appropriate error number as follows:
+
+@table @errno
+@item EFAULT
+@var{arg} is @samp{NULL} or points outside the caller's valid address space.
+@item EFAULT
+@var{sl_modlist} is @samp{NULL} or points outside the caller's valid address space.
+@item EINVAL
+@var{sl_nmods} is less than one (1).
+@end table
+
+In addition, any of the errors returned by the @manref{ioctl(2s)} command may be returned.
+
+@subheading Return
+Upon success, @command{sad} IO controls return zero (@samp{0}) and perform the requested control.
+
+@subheading Errors
+Upon failure, @command{sad} IO controls return minus one (@samp{-1}) and set
+@manpage{errno(3)} to
+an appropriate error code as describe for the specific IO control above.
+
+In addition,
+@manpage{errno(3)} may be set to any of the errors returned by the @manref{ioctl(2s)}
+system call.
+
+@subheading Notices
+Historically, the @command{sad} driver has not used user credentials on a IO control by IO control
+basis, but permits access to the privileged @var{SAD_SAP} command on the basis of file access
+controls.  This means that a user program can open the @file{/dev/sad/admin} device while suid root
+and then downgrade its credentials for security, but still have the ability to modify the
+@manpage{autopush(9)} list for @dfn{STREAMS} devices.
+
+@subheading Devices
+@ftable @file
+@item /dev/sad
+Systems other than @cite{Solaris(R)} use this external filesystem device.  This may be a symbolic
+link to the
+@manpage{specfs(5)} device.
+
+@item /dev/sad/admin
+@itemx /dev/sad/user
+@cite{Solaris(R)} uses these two external filesystem devices.  This (or @file{/dev/sad}) may be a
+symbolic link to a
+@manpage{specfs(5)} device.
+
+@item /dev/streams/sad
+@itemx /dev/streams/sad/admin
+@itemx /dev/streams/sad/user
+@itemx /devices/sad
+@itemx /devices/sad/admin
+@itemx /devices/sad/user
+These are the
+@manpage{specfs(5)} special shadow filesystem nodes for the @dfn{STREAMS}
+administrative device.
+
+@end ftable
+
+@subheading See Also
+@manref{STREAMS(9)}, @manref{errno(3)}, @manref{ioctl(2s)}, @manref{register_strdev(9)}.
+
+@subheading Bugs
+@command{sad} has no know bugs.
+
+@subheading Compatibility
+@cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+@cite{Solaris(R)},
+@cite{UnixWare(R)}
+and @cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
+OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}}
+with the following considerations:
+
+@itemize --
+@item
+@command{sad} implements the @cite{UnixWare(R)} @var{SAP_CLONE} command for specifying clone minor
+devices.  This command is not implemented by @cite{SVR 4.2}, @cite{Solaris(R)} or @cite{LiS}.
+@end itemize
+
+@subheading Conformance
+@cite{SVID},@footnote{@cite{SVID, System V, Interface Definition, No. Fourth Edition.}}
+@cite{XID},@footnote{@cite{XBD Issue 5, X/Open System Interface Definitions, Open Group, Open Group
+Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv2},@footnote{@cite{SUS
+Version 2, Single UNIX Specification, Open Group, Open Group Publication.
+<@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv3}.@footnote{@cite{SUS Version 3, Single
+UNIX Specification, Open Group, Open Group Publication.
+<@url{http://www.opengroup.org/onlinepubs/}>}} Conformance is verified using the
+@manpage{test-sad(8)} verification test suite.
+
+@subheading History
+@command{sad} first appeared in @cite{SVR 4}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4
+Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
+Prentice Hall.}}
+
+@c ============================================================================
+
+@page
+@node sfx Driver
+@subsection sfx
+
+@subheading Name
+@command{sfx}, @command{fifo} -- @dfn{STREAMS} @dfn{FIFO} Device
+
+@subheading Synopsis
+none
+
+@subheading Description
+The named pipe obtained by opening a special device node created with the
+@manpage{mkfifo(1)}
+command are not necessarily @dfn{STREAMS} devices.  The @command{sfx} @dfn{STREAMS} pseudo-device
+driver provides a mechanism for assigning @dfn{STREAMS}-based fifos within the file system.
+
+The @command{sfx} pseudo-device driver is a regular @dfn{STREAMS} character special device driver
+with the following exceptions:
+
+@subsubheading Characteristics
+Following are some characteristics of @dfn{FIFO}s that cause their behaviour to differ from that of
+regular @dfn{STREAMS} character special device files:
+
+@itemize @bullet
+
+@item
+@dfn{FIFO}s cannot be clone opened.
+
+@item
+@dfn{FIFO}s must be opened for read, write or both.  A @dfn{FIFO} cannot be opened otherwise.  (But
+see "NOTICES", below.)
+
+@item
+@dfn{FIFO}s opened with the @var{O_NONBLOCK} flag set, will not block on the open, regardless of
+whether they are opened @var{O_RDONLY} and there are no writers, or opened @var{O_WRONLY} and there
+are no readers.
+
+@item
+@dfn{FIFO}s opened with the @var{O_NONBLOCK} flag set, for write-only, @var{O_WRONLY}, operation,
+when no process has the @dfn{FIFO} open for reading will fail an return @errno{ENXIO}, to the call
+to
+@manpage{open(2s)}.
+
+@item
+@dfn{FIFO}s opened with the @var{O_NONBLOCK} flag set, for read-only, @var{O_RDONLY}, operation,
+when no process has the @dfn{FIFO} open for writing will not block, will succeed and return zero to
+the call to
+@manpage{open(2s)}.
+
+@item
+@dfn{FIFO}s opened without the @var{O_NONBLOCK} flag set, will block on the open if opened
+@var{O_RDONLY} and there are no writers, or opened @var{O_WRONLY} and there are no readers.
+
+@item
+@dfn{FIFO}s opened without the @var{O_NONBLOCK} flag set, will not block on the open if opened
+@var{O_RDWR}.
+
+@item
+When a @dfn{FIFO} is hung up, write and write-like operations return @errno{ENXIO} as is the case
+for regular @dfn{STREAMS} devices.  This is true for
+@manpage{write(2s)},
+@manpage{writev(2s)},
+@manpage{putmsg(2)},
+@manpage{putpmsg(2s)}, and
+@manpage{streamio(7)} input-output controls that
+write messages to the @dfn{Stream}, such as @ioctlref{I_FDINSERT}.
+
+@item
+If there are no writers at the time that a read or read-like operation is performed, and the
+@dfn{Stream} is set for blocking operation, the read operation will block awaiting writers to the
+@dfn{Stream}.
+
+@item
+If there are no readers at the time that a write or write-like operation is performed, and the the
+write or write-like operations fail, generate a @signal{SIGPIPE} signal to the callers, and return
+@errno{EPIPE}, regardless of whether the file descriptor is set for blocking or non-blocking operation.
+
+@item
+By default, when an asynchronous write error occurs, and a write or write-like operation is
+performed, @dfn{FIFO}s will generate @signal{SIGPIPE} to the caller in addition to returning the
+error from the asynchronous write error message.  This behavior can be suppressed by clearing the
+@var{SNDPIPE} write option flag using the @ioctlref{I_SWROPT} input-output control.  This is the
+reverse of the default behavior for regular @dfn{STREAMS} character special files.
+
+@item
+By default, attempting to write a zero-length data message to a @dfn{FIFO} with
+@manpage{write(2s)},
+@manpage{writev(2s)},
+@manpage{putmsg(2)}, or
+@manpage{putpmsg(2s)}, will succeed, return zero, but
+no message will be generated.  Generation of the message can be enabled by setting the @var{SNDZERO}
+write option flag using the @ioctlref{I_SWROPT} input-output control.  This is the reverse of the
+default behaviour for regular @dfn{STREAMS} character special files.
+
+@item
+@dfn{FIFO}s break large writes down into independent data messages of @var{PIPE_BUF} bytes or less.
+Writes of less than or equal to @var{PIPE_BUF} bytes are guaranteed atomic (i.e.  they will not be
+interleaved with data from writes by other processes).  Writes of greater than @var{PIPE_BUF} bytes
+are not guaranteed atomic (i.e. may be interleaved with data from writes by other processes).  This
+is default behaviour of all @dfn{STREAMS} character special files, unless altered by the driver.
+
+@item
+@dfn{FIFO}s that have no modules pushed, even when full and blocked on write, will not block on
+close as described under @ioctlref{I_SETCLTIME}, because there is no driver write queue.
+
+@item
+@ioctlref{I_LIST} will not report a count for a driver (@dfn{FIFO}s have no driver).
+
+@item
+@ioctlref{I_LINK}, @ioctlref{I_PLINK}, @ioctlref{I_UNLINK}, and @ioctlref{I_PUNLINK}, will always
+fail with error @errno{EINVAL} when issued to a file descriptor associated with a @dfn{FIFO}.
+
+@item
+@ioctlref{I_SENDFD} and @ioctlref{I_RECVFD} can succeed on a @dfn{FIFO} (whereas they always fail on
+a regular @dfn{STREAMS} character special file).
+
+@end itemize
+
+@subheading Notices
+Normally a @dfn{STREAMS} special file is associated with a device number.  For @command{sfx}, the
+@dfn{STREAMS} special file is associated with the inode in the file system in which the character
+special node was created.  This acts identically to a @dfn{FIFO} created with
+@manpage{mkfifo(1)},
+with the exception that a
+@manpage{stat(2)} on the device node will say that it is an @var{S_IFCHR}
+device node.  A
+@manpage{fstat(2)} on a file descriptor opening this device node in the file system
+will say that the file descriptor is of type @var{S_IFIFO}.
+
+It may be necessary to push the
+@manpage{pipemod(4)} module on one end of the @dfn{FIFO} to maintain
+the sense of
+@manpage{M_FLUSH(9)}.
+
+Under @cite{@value{PACKAGE_TITLE}} is it possible to make all @cite{Linux} system @dfn{FIFO}s
+@dfn{STREAMS}-based.  This is accomplished during configuration of the package and when the package
+kernel modules are loaded.
+
+Under @cite{Linux} a @dfn{FIFO} cannot be opened without read or write.  This is because
+@cite{Linux} defines the @var{O_RDONLY} flag to
+@manpage{open(2s)} to be zero, despite
+@cite{POSIX}@footnote{@cite{SUS Version 3, Single UNIX Specification, Open Group, Open Group
+Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}} recommendations to the contrary.
+
+@var{PIPE_BUF} under @cite{@value{PACKAGE_TITLE}} is set to the historical default of @samp{4096}
+bytes.
+
+@var{PIPE_BUF} characteristics are accomplished by setting the @dfn{STREAMS} minimum packet size to
+zero (@samp{0}), the maximum packet size to (@samp{4096}), the high water mark to (@samp{5120}), and
+the low water mark to (@samp{1024}).  These are the defaults for all @dfn{Stream heads} and can only
+be altered by a driver or module.
+
+Some @dfn{STREAMS} implementations do not permit @dfn{STREAMS}-based pipes or @dfn{FIFO}s to be
+linked beneath a multiplexing driver.  @cite{@value{PACKAGE_TITLE}} permits @dfn{STREAMS}-based
+pipes and @dfn{FIFO}s to be linked beneath a multiplexing driver.
+
+@subheading Devices
+@ftable @file
+
+@item /dev/fifo
+@itemx /dev/sfx
+The external filesystem @dfn{STREAMS} @dfn{FIFO} devices.
+
+@item /dev/fifo
+An instance of an external filesystem @dfn{STREAMS} @dfn{FIFO} character device.  This @dfn{FIFO}
+device instance is provided for testing, primarily by the
+@manpage{test-fifo(8)} conformance
+verification suite.
+
+@item /dev/streams/sfx
+@itemx /devices/sfx
+The
+@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @command{fifo} device.
+
+@item /dev/streams/fifo/nnn
+Instances of
+@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @dfn{FIFO} devices.
+
+@end ftable
+
+@subheading See Also
+@manref{mkfifo(1)}, @manref{stat(2)}, @manref{fstat(2)}, @manref{pipe(2s)}, @manref{pipe(4)},
+@manref{spx(4)}.
+
+@subheading Bugs
+@command{sfx} and @command{fifo} have no known bugs.
+
+@subheading Compatibility
+@command{sfx} is a character special node based replacement for @command{fifo}s.  See
+@manpage{mkfifo(1)}.
+
+@subheading Conformance
+@cite{SVID},@footnote{@cite{SVID, System V, Interface Definition, No. Fourth Edition.}}
+@cite{XID},@footnote{@cite{XBD Issue 5, X/Open System Interface Definitions, Open Group, Open Group
+Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv2},@footnote{@cite{SUS
+Version 2, Single UNIX Specification, Open Group, Open Group Publication.
+<@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv3}.@footnote{@cite{SUS Version 3, Single
+UNIX Specification, Open Group, Open Group Publication.
+<@url{http://www.opengroup.org/onlinepubs/}>}} Conformance is verified using the
+@manpage{test-fifo(8)} verification test suite.
+
+@subheading History
+@command{fifo}s first appeared in @cite{SVR 3},@footnote{@cite{SVR 3, UNIX(R) System V Release 3
+Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice
+Hall.}} but were not implemented using @dfn{STREAMS}.
+
+@c ============================================================================
+
+@page
+@node spx Driver
+@subsection spx
+
+@subheading Name
+@command{spx}, @command{pipe} -- @dfn{STREAMS} bi-directional pipe device
+
+@subheading Description
+The software pipes obtained by the system call
+@manpage{pipe(2s)} are not necessarily
+bidirectional.@footnote{@cite{XBD Issue 5, X/Open System Interface Definitions, Open Group, Open
+Group Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}
+
+@cite{SUS Version 2, Single UNIX Specification, Open Group, Open Group Publication.
+<@url{http://www.opengroup.org/onlinepubs/}>}
+
+@cite{SUS Version 3, Single UNIX Specification, Open Group, Open Group Publication.
+<@url{http://www.opengroup.org/onlinepubs/}>}} The @command{spx} @dfn{STREAMS} pseudo-device driver
+provide a mechanism for obtaining @dfn{STREAMS}-based pipes that are bidirectional in nature.
+
+The @command{spx} pseudo-device driver is a regular @dfn{STREAMS} device driver.
+
+Because the
+@manpage{open(2s)} system call only returns one file descriptor, the following procedure
+is used to create two file descriptors with a connected @dfn{STREAMS}-based pipe between them:
+
+@enumerate
+
+@item
+Open @file{/dev/spx} and obtain a first file descriptor.  At this point there is only half of the
+pipe available.  This step obtains @code{fd[0]}.
+
+@item
+Open @file{/dev/spx} again to obtain a second file descriptor.  At this point there are two
+unconnected stream heads.  This step obtains @code{fd[2]}.
+
+@item
+Call
+@manpage{ioctl(2s)} with the @ioctlref{I_FDINSERT} command (see
+@manpage{streamio(7)}) to
+associate @code{fd[0]} with @code{fd[1]}.  This can either be accomplished by performing an
+@ioctlref{I_FDINSERT} with @code{fd[1]} on the stream returned as @code{fd[0]}; or, with
+@code{fd[0]} on @code{fd[1]}.  The data part of the @ioctlref{I_FDINSERT} command is ignored, and
+the control part of the @code{I_FDINSERT} command contains only the file descriptor translated to a
+queue pointer.  This step connects @code{fd[0]} to @code{fd[1]} for a fully connected,
+@dfn{STREAMS}-based, bidirectional pipe.
+
+@end enumerate
+
+@subsubheading Characteristics
+Following are some characteristics of @dfn{STREAMS}-based pips that cause their behaviour to differ
+from that of regular @dfn{STREAMS} character special device files:
+
+@itemize @bullet
+
+@item
+@dfn{STREAMS}-based pipes cannot be clone opened.  But see @manref{connld(4)}.
+
+@item
+@dfn{STREAMS}-based pipes have both ends open for both read and write.
+
+@item
+When a @dfn{STREAMS}-based pipe is hung up, or the other end of the @dfn{STREAMS}-based pipe is
+closed, write and write-like operations return @errno{EPIPE} and generate a @signal{SIGPIPE} signal
+to the caller, instead of simply returning @errno{ENXIO} as is the case for regular @dfn{STREAMS}
+devices.  This is true for
+@manpage{write(2s)},
+@manpage{writev(2s)},
+@manpage{putmsg(2)},
+@manpage{putpmsg(2s)}, and
+@manpage{streamio(7)} input-output controls that write messages to the
+Stream, such as @ioctlref{I_FDINSERT}.
+
+@item
+By default, when an asynchronous write error occurs, and a write or write-like operation is
+performed, @dfn{STREAMS}-based pipes will generate @signal{SIGPIPE} to the caller in addition to
+returning the error from the asynchronous write error message.  This behavior can be suppressed by
+clearing the @var{SNDPIPE} option using the @ioctlref{I_SWROPT} input-output control.  This is the
+reverse of the default behavior for regular @dfn{STREAMS} character special files.
+
+@item
+By default, attempting to write a zero-length data message to a @dfn{STREAMS}-based pipe with
+@manpage{write(2s)},
+@manpage{writev(2s)},
+@manpage{putmsg(2)}, or
+@manpage{putpmsg(2s)}, will
+succeed, return zero, but no message will be generated.  Generation of the message can be enabled by
+setting the @var{SNDZERO} option using the @ioctlref{I_SWROPT} input-output control.  This is the
+reverse of the default behaviour for regular @dfn{STREAMS} character special files.
+
+@item
+@dfn{STREAMS}-based pipes break large writes down into independent data messages of @samp{4096}
+bytes or less.  Writes of less than or equal to @samp{4096} bytes are guaranteed atomic.  Writes of
+greater than @samp{4096} bytes are not guaranteed atomic.  This is default behaviour of all
+@dfn{STREAMS} character special files, unless altered by the driver.
+
+@item
+An end of a @dfn{STREAMS}-based pipes that has no modules pushed, even when full and blocked on
+write, will not block on close as described under @ioctlref{I_SETCLTIME}, because there is no driver
+write queue.
+
+@item
+@ioctlref{I_LIST} will not report a count for a driver on either end of a @dfn{STREAMS}-based pipe
+(@dfn{STREAMS}-based pipes have no driver).
+
+@item
+@ioctlref{I_LINK}, @ioctlref{I_PLINK}, @ioctlref{I_UNLINK}, and @ioctlref{I_PUNLINK}, will always
+fail with error @errno{EINVAL} on a @dfn{STREAMS}-based pipe.
+
+@item
+@ioctlref{I_SENDFD} and @ioctlref{I_RECVFD} will operate on a @dfn{STREAMS}-based pipe (whereas they
+fail on a regular @dfn{STREAMS} character special file).
+
+@end itemize
+
+@subheading Usage
+The characteristics of bi-directional @dfn{STREAMS}-based pipes, by comparison to @cite{SVR
+3}@footnote{@cite{SVR 3, UNIX(R) System V Release 3 Programmer's Manual, (Englewood Cliffs, New
+Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} style pipes is as follows:
+
+@itemize @bullet
+
+@item
+@dfn{STREAMS}-based pipes are bi-directional.  Both sides are opened for both read and write.  Data
+written to one end of the pipe can be read by the other.  Both ends of the pipe can have data
+written and read.
+
+@item
+@dfn{STREAMS}-based pipes can have modules pushed and popped from either side of the pipe.  However,
+before pushing a @dfn{STREAMS} module on either side of the @dfn{STREAMS}-based pipe, the
+@manpage{pipemod(4)} module should be pushed on one end of the @dfn{STREAMS}-based pipe to reverse
+the sense of
+@manpage{M_FLUSH(9)} bits for proper flushing of the pipe.
+
+@item
+@dfn{STREAMS}-based pipes can have the
+@manpage{connld(4)} module can be pushed onto one end of the
+pipe.
+
+@item
+@dfn{STREAMS}-based pipes have controllable flow control and minimum and maximum packet size
+characteristics.
+
+@item
+@dfn{STREAMS}-based pipes permit the use of the
+@manpage{getmsg(2)},
+@manpage{getpmsg(2s)},
+@manpage{putmsg(2)} and
+@manpage{putpmsg(2s)} system calls on the pipe ends.
+
+@item
+@dfn{STREAMS}-based pipes permit the use of @dfn{STREAMS} IO controls on either pipe end.  See
+@manpage{streamio(7)}.
+
+@end itemize
+
+@subheading Notices
+Although an
+@manpage{stat(2)} on the @file{/dev/spx} device node will show the node as being a
+character special device with a device number corresponding to the @command{spx} driver, an
+@manpage{fstat(2)} on the file descriptor resulting from an
+@manpage{open(2s)} call on
+@file{/dev/spx} will indicate that the file is a fifo.  This is rather normal @cite{UNIX(R)}
+behaviour.
+
+Depending on @cite{Linux(R)} kernel configuration parameters, it might not be necessary to go to
+this extent to create a @dfn{STREAMS}-based bi-directional pipe.  When kernel configuration
+parameter @var{CONFIG_STREAMS_PIPES_REPLACE} is set, then the @cite{SVR 3}@footnote{@cite{SVR 3,
+UNIX(R) System V Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System
+Laboratories, Inc., Prentice Hall.}} pipe approach used by @cite{Linux(R)} will be replaced with a
+bi-directional @dfn{STREAMS}-based pipe.  Then, a simple call to
+@manpage{pipe(2s)} will return a
+bi-directional pipe and it is not necessary to open the @command{spx} driver to obtain one.
+
+When first opened, a @command{spx} device behaves similar to an @dfn{Echo Device}, @manref{echo(4)}.
+
+Under @cite{@value{PACKAGE_TITLE}} it is possible to make all @cite{Linux} system pipes
+@dfn{STREAMS}-based.  This must be done when the package is configured and will be effected when the
+@dfn{STREAMS} pipe kernel module is loaded.  Once the kernel module is loaded all pipes subsequently
+opened with the
+@manpage{pipe(2s)} system call will be @dfn{STREAMS}-based.
+
+@subheading Implementation
+@command{spx} is not implemented as a normal @dfn{STREAMS} driver: it is implemented as a shadow
+special device node under @cite{@value{PACKAGE_TITLE}}.@footnote{@cite{streams-0.7a, Linux
+Fast-STREAMS (LfS) 0.7a.6 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+<@url{http://www.openss7.org/}>}} @cite{@value{PACKAGE_TITLE}} shadow special devices nodes call
+@code{pipe_open()} from @code{cdev_open()} instead of @code{spec_open()} permitting the pipe device
+to intercept and redirect the open call to the appropriate device.  This is consistent with the
+descriptions for the internal @code{pipe_open()} under @cite{SVR 4}.@footnote{@cite{Magic Garden,
+The Magic Garden Explained: The Internals of UNIX(R) System V Release 4 / An Open Systems Design,
+1994, (Australia), B. Goodheart, J. Cox, Prentice Hall.  [ISBN 0-13-098138-9]}}
+
+@subheading Examples
+Following is an example of how to open a @dfn{STREAMS}-based pipe:
+
+@cartouche
+@float Example,spx:ex0
+@caption{@emph{Opening a STREAMS-based Pipe}}
+@example
+int
+spipe(int *fd)
+@{
+   int fds[2];
+   long ptr;
+   struct strfdinsert fdi;
+   if ((fds[0] = open("/dev/spx", O_RDWR)) < 0)
+       return (-1);
+   if ((fds[1] = open("/dev/spx", O_RDWR)) < 0) @{
+       close(fds[0]);
+       return (-1);
+   @}
+   fdi.ctlbuf.maxlen = fdi.ctlbuf.len = sizeof(ptr);
+   fdi.ctlbuf.buf = (caddr_t) &ptr;
+   fdi.databuf.maxlen = fdi.databuf.len = -1;
+   fdi.databuf.buf = NULL;
+   fdi.filedes = fds[0];
+   fdi.offset = 0;
+   fdi.flags = RS_NORM;
+   if (ioctl(fds[0], I_FDINSERT, &fdi) < 0) @{
+       close(fds[0]);
+       close(fds[1]);
+       return (-1);
+   @}
+   fd[0] = fds[0];
+   fd[1] = fds[1];
+   return (0);
+@}
+@end example
+@end float
+@end cartouche
+
+
+@subheading Devices
+@ftable @file
+
+@item /dev/spx
+The external filesystem @dfn{STREAMS} @command{pipe} device.
+
+@item /dev/streams/spx
+@itemx /devices/spx
+The
+@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @command{pipe} deivce.
+
+@end ftable
+
+@subheading See Also
+@manref{pipe(2s)}, @manref{open(2s)}, @manref{ioctl(2s)}, @manref{streamio(7)}, @manref{pipemod(4)},
+@manref{connld(4)}, @manref{echo(4)}, @manref{getmsg(2)}, @manref{getpmsg(2s)}, @manref{putmsg(2)},
+@manref{putpmsg(2s)}, @manref{stat(2)}, @manref{fstat(2)}.
+
+@subheading Bugs
+@command{spx} has no known bugs.
+
+@subheading Compatibility
+@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6 Source
+Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} provides the
+@command{spx} device for compatibility with @cite{UnixWare(R)} and @cite{AIX(R)}.  @cite{Solaris(R)}
+and @cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
+OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} do not provide an @command{spx} driver.
+
+@itemize --
+
+@item
+@cite{AIX(R)} provides a @command{spx} driver.  The use of the @command{spx} driver under
+@cite{AIX(R)} is not well documented.
+
+@item
+@cite{UnixWare(R)} provides a @command{spx} driver.  The use of the @command{spx} driver under
+@cite{UnixWare(R)} is not well documented.
+
+@item
+@cite{LiS} does not provide a @command{spx} driver.
+
+@item
+@cite{UnixWare(R)} documentation@footnote{@cite{UnixWare(R) 7.1.3, UnixWare 7.1.3 (OpenUnix 8)
+Documentation, 2002, (Lindon, Utah), Caldera International, Inc., Caldera.
+<@url{http://uw713doc.sco.com/}>}} describes naming an unnamed pipe by making a device node with the
+device number returned by a call to
+@manpage{stat(2)} on one end of the pipe.  Although this
+technique also works with @cite{@value{PACKAGE_TITLE}}, we recommend using
+@manpage{fattach(2)}
+instead.
+
+@end itemize
+
+@subheading Conformance
+@cite{AIX(R)} and @cite{UnixWare(R)} documentation.  Conformance is verified using the
+@manpage{test-pipe(8)} verification test suite.
+
+@subheading History
+@command{spx} appears in @cite{AIX(R)} and @cite{UnixWare(R)}.
+
+

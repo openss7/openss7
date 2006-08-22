@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: lab.texi,v 0.9.2.5 2006/05/01 14:35:57 brian Exp $
+% @(#) $Id: lab.texi,v 0.9.2.6 2006/08/22 12:44:10 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/05/01 14:35:57 $ by $Author: brian $
+% Last Modified $Date: 2006/08/22 12:44:10 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: lab.texi,v $
+% Revision 0.9.2.6  2006/08/22 12:44:10  brian
+% - documentation updates
+%
 % Revision 0.9.2.5  2006/05/01 14:35:57  brian
 % - spelling corrections
 %
@@ -225,49 +228,12 @@ no obligation to provide any feature listed herein.
 @end iftex
 @page
 
+@include texi/macros.texi
+
 @ifnottex
 @node Top
 @top SS7/SIGTRAN/VoIP Security Network
 @end ifnottex
-
-@macro tabfig {image, number, caption}
-
-@float Table,Table \number\
-@image{\image\}
-@caption{\caption\}
-@end float
-
-@end macro
-
-@macro tabref {number}
-@emph{@ref{Table \number\}}
-@end macro
-
-@macro figure {image, number, caption}
-
-@cartouche
-@float Figure,Figure \number\
-@image{\image\}
-@caption{\caption\}
-@end float
-@end cartouche
-
-@end macro
-
-@macro figuresized {image, number, caption, size}
-
-@cartouche
-@float Figure,Figure \number\
-@image{\image\,\size\}
-@caption{\caption\}
-@end float
-@end cartouche
-
-@end macro
-
-@macro figref {number}
-@emph{@ref{Figure \number\}}
-@end macro
 
 @menu
 * Executive Overview::
@@ -407,6 +373,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: lab.texi,v $
+Revision 0.9.2.6  2006/08/22 12:44:10  brian
+- documentation updates
+
 Revision 0.9.2.5  2006/05/01 14:35:57  brian
 - spelling corrections
 

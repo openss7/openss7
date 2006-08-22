@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2006/03/06 11:38:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2006/08/22 12:36:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:35 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 12:36:43 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.77  2006/08/22 12:36:43  brian
+# - udpates to documentation, tweaks to Stream head
+#
 # Revision 0.9.2.76  2006/03/06 11:38:35  brian
 # - updated headers
 #
@@ -1017,6 +1020,10 @@ man_MANS = \
 	man7/I_SWROPT.7 \
 	man7/I_UNLINK.7 \
 	man7/streamio.7 \
+	man8/specfs.8 \
+	man8/specfs.sh.8 \
+	man8/streams.8 \
+	man8/streams.sh.8 \
 	man8/streams_mknod.8 \
 	man8/test-streams.8 \
 	man8/perftest.8 \
@@ -2119,6 +2126,10 @@ dist_noinst_MANS = \
 	man7/I_SWROPT.7.man \
 	man7/I_UNLINK.7.man \
 	man7/streamio.7.man \
+	man8/specfs.8.man \
+	man8/specfs.sh.8.man \
+	man8/streams.8.man \
+	man8/streams.sh.8.man \
 	man8/streams_mknod.8.man \
 	man8/test-streams.8.man \
 	man8/perftest.8.man \

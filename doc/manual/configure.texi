@@ -1,0 +1,262 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: configure.texi,v 1.1.2.1 2006/08/22 12:40:13 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/22 12:40:13 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@c This file is include from install.texi and contains the descriptions for
+@c package-specific enable/disable and with/without options
+
+Options specific to the @value{PACKAGE_TITLE} control primarily whether add-on packages are included
+or excluded from the build, install or RPM or DEB packaging.  The following @command{configure}
+options, specific to the @value{PACKAGE_TITLE}, are available:
+
+@table @command
+
+@item --without-SCTP
+@opindex SCTP
+
+When disabled, excludes the @command{sctp-@value{VERSION_SCTP}} add-on package from the build.
+This function is useful only for disabling build of the @command{sctp} add-on package on a 2.4
+series @cite{Linux} kernel.
+This option defaults differently depending upon for which kernel the add-on package is being built.
+For 2.4 kernels, this option defaults to include the @command{sctp} add-on package; 2.6 kernels,
+defaults to exclude the @command{sctp} add-on package.
+
+@item --without-IPERF
+@opindex IPERF
+
+When disabled, excludes the @command{iperf-@value{VERSION_IPERF}} add-on package from the build.
+This function is useful only for disabling build of the @command{sctp} add-on package on a 2.4
+series @cite{Linux} kernel.
+This option defaults differently depending upon for which kernel the add-on package is being built.
+For 2.4 kernels, this option defaults to include the @command{sctp} add-on package; 2.6 kernels,
+defaults to exclude the @command{sctp} add-on package.
+
+@item --without-STREAMS
+@opindex STREAMS
+
+When disabled, excludes the @command{streams-@value{VERSION_STREAMS}} add-on package from the build.
+When the @command{streams} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{streams} package was otherwise installed on the build system.
+The default is to include the
+@cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}})
+add-on package in the build.
+
+@item --without-STRCOMPAT
+@opindex STRCOMPAT
+
+When disabled, excludes the @command{strcompat-@value{VERSION_STRCOMPAT}} add-on package from the
+build.
+When the @command{strcompat} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{strcompat} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}})
+add-on package in the build.
+
+@item --with-STRUTIL
+@opindex STRUTIL
+
+When enabled, includes the @command{strutil-@value{VERSION_STRUTIL}} add-on package in the build.
+Because the @command{strutil} add-on package is not distributed by default, this option only has a
+use on development copies and CVS checkouts.
+The default is to exclude the
+@cite{STREAMS Utilities} (@command{strutil-@value{VERSION_STRUTIL}})
+add-on package from the build.
+
+@item --with-STRTTY
+@opindex STRTTY
+
+When enabled, includes the @command{strtty-@value{VERSION_STRTTY}} add-on package in the build.
+Because the @command{strtty} add-on package is not distributed by default, this option only has a
+use on development copies and CVS checkouts.
+The default is to exclude the
+@cite{STREAMS Terminals} (@command{strtty-@value{VERSION_STRTTY}})
+add-on package from the build.
+
+@item --without-STRXNS
+@opindex STRXNS
+
+When disabled, excludes the @command{strxns-@value{VERSION_STRXNS}} add-on package from the build.
+When the @command{strxns} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{strxns} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS X/Open Networking Services (XNS)} (@command{strxns-@value{VERSION_STRXNS}})
+add-on package in the build.
+
+@item --without-STRXNET
+@opindex STRXNET
+
+When disabled, excludes the @command{strxnet-@value{VERSION_STRXNET}} add-on package from the build.
+When the @command{strxnet} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{strxnet} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS X/Open Transport Interface (XTI)} (@command{strxnet-@value{VERSION_STRXNET}})
+add-on package in the build.
+
+@item --with-STRSOCK
+@opindex STRSOCK
+
+When enabled, includes the @command{strsock-@value{VERSION_STRSOCK}} add-on package in the build.
+Because the @command{strsock} add-on package is not distributed by default, this option only has a
+use on development copies and CVS checkouts.
+The default is to exclude the
+@cite{STREAMS Sockets} (@command{strsock-@value{VERSION_STRSOCK}})
+add-on package from the build.
+
+@item --without-STRINET
+@opindex STRINET
+
+When disabled, excludes the @command{strinet-@value{VERSION_STRINET}} add-on package from the build.
+When the @command{strinet} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{strinet} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS Internet Protocol (INET)} (@command{strinet-@value{VERSION_STRINET}})
+add-on package in the build.
+
+@item --without-STRSCTP
+@opindex STRSCTP
+
+When disabled, excludes the @command{strsctp-@value{VERSION_STRSCTP}} add-on package from the build.
+When the @command{strsctp} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{strsctp} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS Stream Control Transmission Protocol (SCTP)} (@command{strsctp-@value{VERSION_STRSCTP}})
+add-on package in the build.
+
+@item --with-STRISO
+@opindex STRISO
+
+When enabled, includes the @command{striso-@value{VERSION_STRISO}} add-on package in the build.
+Because the @command{striso} add-on package is not distributed by default, this option only has a
+use on development copies and CVS checkouts.
+The default is to exclude the
+@cite{STREAMS Open Standards Interconnect (ISO/OSI)} (@command{striso-@value{VERSION_STRISO}})
+add-on package from the build.
+
+@item --without-NETPERF
+@opindex NETPERF
+
+When disabled, excludes the @command{netperf-@value{VERSION_NETPERF}} add-on package from the build.
+The default is to include the
+@cite{Netperf} (@command{netperf-@value{VERSION_NETPERF}})
+add-on package in the build.
+
+@item --without-STACKS
+@opindex STACKS
+
+When disabled, excludes the @command{strss7-@value{VERSION_STRSS7}} add-on package from the build.
+When the @command{strss7} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{strss7} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS SS7/VoIP/ISDN/SIGTRAN Stacks} (@command{strss7-@value{VERSION_STRSS7}})
+add-on package in the build.
+
+@item --with-LIS
+@opindex LIS
+
+When enabled, includes the @command{LiS-@value{VERSION_LIS}} add-on package in the build.
+Because the @command{LiS} add-on package is no longer distributed by default, this option only has a
+use on development copies and CVS checkouts.
+The default is to exclude the
+@cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}})
+add-on package from the build.
+
+@item --with-lis[=LIS-DIR]
+@itemx --without-lis
+@opindex lis
+
+Specify the @samp{LIS-DIR} directory in which to find @cite{LiS} headers.  Also specifies that the
+build is to be made against @cite{Linux STREAMS}.  The default is the include directory of the
+add-on @cite{LiS} package, or the directory @file{/usr/@-include/@-LiS} if it exists, @samp{no}
+otherwise.  This directory is normally located by the @command{configure} script and need only be
+provided for special cross-build environments or when requested by a @command{configure} script
+error message.  This option has no effect on add-on packages that do not use the @dfn{STREAMS}
+subsystem.
+
+When enabled, @dfn{STREAMS} add-on packages will also have RedHat RPMs or Debian DEBs built for the
+@cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}) @dfn{STREAMS} package.  @samp{--with-LIS}
+must also be specified.  The default is to not build RPMs nor DEBs for @cite{LiS} version of the
+add-on @dfn{STREAMS} packages.  As @cite{LiS} is deprecated and no longer included in the
+distribution, this option is only useful for CVS downloads.
+
+@item --without-lfs
+@itemx --with-lfs[=LFS-DIR]
+@opindex lfs
+
+Specify the @samp{LFS-DIR} directory in which to find @cite{LfS} headers.  Also specifies that the
+build is to be made against @cite{Linux Fast-STREAMS}.  The default is the include directory of the
+add-on @cite{LfS} package, or the directory @file{/usr/@-include/@-streams} if it exists, @samp{no}
+otherwise.  This directory is normally located by the @command{configure} script and need only be
+provided for special cross-build environments or when requested by a @command{configure} script
+error message.  This option has no effect on add-on packages that do not use the @dfn{STREAMS}
+subsystem.
+
+When disabled, @dfn{STREAMS} add-on packages will not have RedHat RPMS nor Debian DEBs built for the
+@cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) package.
+@samp{--without-STREAMS} may also be specified.  The default is to build RPMs nor DEBs for
+@cite{Linux Fast-STREAMS} version of the add-on @dfn{STREAMS} packages.  As @cite{LiS} is deprecated
+and no longer included in the distribution, and this option is only useful for suppressing
+@cite{Linux Fast-STREAMS} builds in favor of @cite{LiS}, this option is only useful for CVS
+downloads or where the @command{streams} package has otherwise already been installed on the target
+system.
+
+@end table
+
+Additional options specified to an add-on package may also be specified on the @command{configure}
+command line and they will be passed to all sub-packages.  Therefore, any of the add-on package
+specific options described by the @cite{Installation and Reference Manual} for the add-on package
+may also be specified on the command line.

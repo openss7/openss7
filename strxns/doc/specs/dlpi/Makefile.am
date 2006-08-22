@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/20 13:50:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/08/22 12:44:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 13:50:39 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 12:44:14 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2006/08/22 12:44:14  brian
+# - documentation updates
+#
 # Revision 0.9.2.7  2006/03/20 13:50:39  brian
 # - get automake to run clean
 #
@@ -78,6 +81,7 @@ info_TEXINFOS		+= dlpi.texi
 
 EXTRA_info_TEXINFOS	= \
 			texi/args.texi \
+			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/fdl.texi
 
 if PKG_BUILD_INDEP

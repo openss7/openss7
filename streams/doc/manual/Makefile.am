@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/03/20 13:50:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/08/22 12:36:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 13:50:32 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 12:36:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.43  2006/08/22 12:36:45  brian
+# - udpates to documentation, tweaks to Stream head
+#
 # Revision 0.9.2.42  2006/03/20 13:50:32  brian
 # - get automake to run clean
 #
@@ -77,13 +80,18 @@ EXTRA_info_TEXINFOS	= \
 			  rpm.texi \
 			  testsuite.texi \
 			  tree.texi \
+			  drivers.texi \
+			  modules.texi \
+			  utilities.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
 			  texi/install.texi \
 			  texi/lesser.texi \
 			  texi/testsuite.texi \
-			  $(top_builddir)/scripts/texi/funding.texi
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/compat.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

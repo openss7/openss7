@@ -1,0 +1,2374 @@
+% -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
+% =========================================================================
+%
+% @(#) $Id: openss7.texi,v 1.1.2.1 2006/08/22 12:40:13 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2006/08/22 12:40:13 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename openss7.info
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+@settitle @value{MANUAL_TITLE}
+
+@dircategory STREAMS
+@direntry
+* openss7: (openss7).		OpenSS7 Master Package Manual
+@end direntry
+
+@defindex op
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{VERSION}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
+All Rights Reserved. @*
+
+@noindent
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
+documentation, and is consistent with @value{PACKAGE_NAME} @value{PACKAGE_VERSION}.
+This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
+Project} and was funded in part by
+@uref{http://www.openss7.com/, OpenSS7 Corporation}.
+
+@noindent
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@noindent
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+@noindent
+Permission is granted to copy and distribute translations of this manual into
+another language, under the same conditions as for modified versions.
+
+@vskip 0pt
+@end titlepage
+@page
+
+@c Define an index of authors.
+@defindex au
+
+@c Define an index of makefile targets
+@defcodeindex mk
+
+@c An index of manual pages
+@defcodeindex mp
+
+@include texi/macros.texi
+
+@c
+@c Handle these version numbers right here so that when they are changed here they are changed
+@c everywhere.
+@c
+@set VERSION_EXTRA	.rc3
+@set VERSION_SCTP	0.2.24@value{VERSION_EXTRA}
+@set VERSION_IPERF	2.0.5@value{VERSION_EXTRA}
+@set VERSION_STREAMS	0.7a.6@value{VERSION_EXTRA}
+@set VERSION_STRCOMPAT	0.9.2.4@value{VERSION_EXTRA}
+@set VERSION_STRUTIL	0.9.2.4@value{VERSION_EXTRA}
+@set VERSION_STRBCM	0.9.2.2@value{VERSION_EXTRA}
+@set VERSION_STRXNS	0.9.2.4@value{VERSION_EXTRA}
+@set VERSION_STRXNET	0.9.2.9@value{VERSION_EXTRA}
+@set VERSION_STRSOCK	0.9.2.1@value{VERSION_EXTRA}
+@set VERSION_STRINET	0.9.2.4@value{VERSION_EXTRA}
+@set VERSION_STRSCTP	0.9.2.6@value{VERSION_EXTRA}
+@set VERSION_STRISO	0.9.2.1@value{VERSION_EXTRA}
+@set VERSION_STRTTY	0.9.2.1@value{VERSION_EXTRA}
+@set VERSION_NETPERF	2.3.4@value{VERSION_EXTRA}
+@set VERSION_STRSS7	0.9a.5@value{VERSION_EXTRA}
+@set VERSION_LIS	2.18.4@value{VERSION_EXTRA}
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of @cite{The
+@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Acknowledgements::		Sponsors and Contributors
+* Preface::			Preface to this document
+* Introduction::		Introduction to the package
+* Objective::			Objective of the package
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
+* Copying::			Copying information for this Software
+* Documentation License::	Copying information for this Manual
+* Indices::			Indices
+@end menu
+@ignore
+@c @menu
+@c
+@c  ----- detailed node listing -----
+@c 
+@c Acknowledgements
+@c 
+@c * Sponsors::			Sponsors of the package
+@c * Contributors::		People who contributed to the development of
+@c 				the package.
+@c Preface
+@c Introduction
+@c 
+@c * Notice::			Notice
+@c * Overview::			Overview
+@c * Organization::		Organization
+@c * Conventions::			Conventions
+@c 
+@c Objective
+@c 
+@c Reference
+@c 
+@c * Files::			Files included in the package
+@c * Drivers::			Drivers included in the package
+@c * Modules::			Modules included in the package
+@c * Libraries::			Libraries includedi in the package
+@c * Utilities::			Utilities includedi in the package
+@c * Development::			Development against the package
+@c 
+@c Conformance
+@c 
+@c Releases
+@c 
+@c * Prerequisites::		Prerequisite packages
+@c * Compatibility::		Compatibility Issues
+@c * Release Notes::		Release Notes
+@c * Bugs::			Package Defects
+@c * Schedule::			Development and Bug Fix Schedule
+@c 
+@c Installation
+@c 
+@c * Downloading::			Downloading the package
+@c * Configuration::		Configuration of the package
+@c * Building::			Building the package
+@c * Installing::			Installing the package
+@c * Removal::			Removal of the package
+@c * Loading::			Loading the package
+@c 
+@c Indices
+@c 
+@c * Concept Index::		Index of Concepts
+@c * Type Index::			Index of Data Types
+@c * Function Index::		Index of Functions and Macros
+@c * Variable Index::		Index of Variables and Constants
+@c * File Index::			Index of Files and Programs
+@c * Option Index::		Index of Configuration Options
+@c * Makefile Target Index::	Index of Makefile Targets
+@c @end menu
+@end ignore
+
+@c --------------------------------------------------------------------------
+
+@node Acknowledgements
+@unnumbered Acknowledgements
+@cindex credits
+
+@include texi/funding.texi
+
+@c --------------------------------------------------------------------------
+
+@node Preface
+@unnumbered Preface
+
+@section Document Information
+@cindex document information
+
+@subsection Notice
+@cindex document notice
+@cindex licensing
+
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
+General Public License}).  Please note, however, that there are different licensing terms for the
+manual pages and some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX
+International.} publications and other sources).  Consult the permission notices contained in the
+documentation for more information.
+
+This document, is released under the @cite{GNU Free Documentation License} (@pxref{GNU Free
+Documentation License}) with all sections invariant.
+
+@subsection Abstract
+@cindex document abstract
+
+This document provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
+
+@subsection Objective
+@cindex document objective
+
+The objective of this document is to provide a guide for the @cite{@value{PACKAGE_TITLE}} developer
+when downloading, building, installing and using the @cite{@value{PACKAGE_TITLE}} package.
+
+This guide provides information to developers on the downloading, building, installation and use of
+the @cite{@value{PACKAGE_TITLE}} package.
+
+@subsection Intent
+@cindex document intent
+
+The intent of this document is to act as an installation guide and reference manual to the
+@cite{@value{PACKAGE_TITLE}} developer.  It is intended to be read alone and is not intended to
+replace or supplement the @cite{@value{PACKAGE_TITLE}} manual pages.  For a reference for writing
+code, the manual pages (see @manref{STREAMS(9)}) provide a better reference to the programmer.
+
+Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package,
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
+system or feature listed herein.
+
+@subsection Audience
+@cindex document audience
+
+This document is intended for a highly technical audience.  The reader should already be familiar
+with @cite{Linux} kernel programming, the @cite{Linux} file system, character devices, driver input
+and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
+locks, adminstration, kernel dumps, crashes, oops logs, package managers, the autoconf packaging
+system, etc.
+
+The guide is intended for installers and maintainers of @cite{@value{PACKAGE_TITLE}} software.
+
+Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
+system, programming, networking, and data communication.
+
+@subsection Revisions
+@cindex document revisions
+
+Take care that you are working with a current version of this document: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+A current version of this document is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
+@subsubsection Version Control
+
+@smallexample
+
+$Log: openss7.texi,v $
+Revision 1.1.2.1  2006/08/22 12:40:13  brian
+- added doc tree for master package
+
+
+@end smallexample
+
+@subsubsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed,
+postscript or portable document format) version of this document is an @strong{UNCONTROLLED
+VERSION}.
+
+@subsection Disclaimer
+@cindex document disclaimer
+
+@noindent
+@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect, special or
+consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether
+in an action of contract, negligence or other tortious action, arising out of or in connection with
+any use of this document or the performance or implementation of the contents thereof.
+
+@noindent
+@cite{OpenSS7 Corporation} reserves the right to revise this software and documentation for any
+reason, including but not limited to, conformity with standards promulgated by various agencies,
+utilization of advances in the state of the technical arts, or the reflection of changes in the
+design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
+Corporation} is under no obligation to provide any feature listed herein.
+
+@subsubsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Acquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to
+the FAR (or any successor regulations).
+
+@c --------------------------------------------------------------------------
+
+@node Introduction
+@chapter Introduction
+@cindex introduction
+
+This manual documents the design, implementation, installation, operation and future development
+schedule of the @cite{@value{PACKAGE_TITLE}} package.
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Notice::			Notice
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
+@end menu
+
+@node Notice
+@section Notice
+@cindex notice
+@cindex licensing
+
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
+General Public License}).  Please note, however, that there are different licensing terms for the
+manual pages and some of the documentation (derived from X/Open publications and other sources).
+Consult the permission notices contained in the documentation for more information.
+
+This guide, is released under the @cite{GNU Free Documentation License} (@pxref{Documentation
+License}) with all sections invariant.
+
+@node Overview
+@section Overview
+@cindex overview
+
+This manual documents the design, implementation, installation, operation and future development of
+the @cite{@value{PACKAGE_TITLE}} package.
+
+@node Organization
+@section Organization of this Guide
+@cindex organization
+
+This guide is organized (loosely) into several sections as follows:
+
+@ifnottex
+@menu
+  Introduction::		This introduction
+* Objective::			Objective of the package
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
+@end menu
+@end ifnottex
+@iftex
+@multitable @columnfractions .50 .50
+@item @ref{Introduction}.
+@tab This introduction
+@item @ref{Objective}.
+@tab Objective of the package
+@item @ref{Reference}.
+@tab Contents of the package
+@item @ref{Conformance}.
+@tab Conformance of the package
+@item @ref{Releases}.
+@tab Releases of the package
+@item @ref{Installation}.
+@tab Installation of the package
+@item @ref{Troubleshooting}.
+@tab Troubleshooting of the package
+@end multitable
+@end iftex
+@ifinfo
+@multitable @columnfractions .50 .50
+@item @ref{Introduction}.
+@tab This introduction
+@item @ref{Objective}.
+@tab Objective of the package
+@item @ref{Reference}.
+@tab Contents of the package
+@item @ref{Conformance}.
+@tab Conformance of the package
+@item @ref{Releases}.
+@tab Releases of the package
+@item @ref{Installation}.
+@tab Installation of the package
+@item @ref{Troubleshooting}.
+@tab Troubleshooting of the package
+@end multitable
+@end ifinfo
+
+@node Conventions
+@section Conventions and Definitions
+@cindex conventions
+@cindex definitions
+
+This manual uses @cite{texinfo} typographic conventions.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Objective
+@chapter Objective
+@cindex objective
+
+@menu
+* STREAMS Packages::		STREAMS packages in the master package
+* Other Packages::		Other packages in the master package
+@end menu
+
+The @dfn{@value{PACKAGE_TITLE}} package is intended as a common build and installation package for
+all other packages available from @uref{http://www.openss7.org/, The OpenSS7 Project}.  The master
+package began as a slim framework for development of the other packages and blossomed into a
+combined build and development environment for all OpenSS7 packages.  The master package is
+currently very mature and provides a simple way for users of the OpenSS7 packages to download, build
+and install all available OpenSS7 Project packages without concern or consideration for intricate
+dependencies between packages.
+
+@node STREAMS Packages
+@section STREAMS Packages
+@cindex STREAMS packages
+
+Because OpenSS7 packages first built with @dfn{Linux STREAMS (LiS)} but now build with the superior
+@dfn{Linux Fast-STREAMS (LfS)}, the master package had the objective from the onset of being able to
+build all OpenSS7 packages against either @dfn{LiS} or @dfn{LfS} or both.  This was the case from
+@dfn{LiS} version @emph{2.18.1} through @emph{2.18.3} and @dfn{streams} version @emph{0.7a.3}
+through @emph{0.7a.5}, or master package releases @emph{0.9.2.A} through @emph{0.9.2.C}.  With the
+release of master package @emph{0.9.2.D} containing @dfn{streams} @emph{0.7a.6}, @dfn{LiS} is no
+longer supported in the master package.  The contained @dfn{LiS} @emph{2.18.4} is the final release
+of @dfn{LiS} from the OpenSS7 Project.
+
+@node Other Packages
+@section Other Packages
+@cindex other packages
+
+The other packages in the @value{PACKAGE_TITLE} normally depend upon one of the @dfn{STREAMS}
+packages and zero or more of the other sub-packages in the master package.  The
+@value{PACKAGE_TITLE}, by default, builds @cite{Linux Fast-STREAMS}
+(@command{streams-@value{VERSION_STREAMS}}) and all other packages against @cite{Linux
+Fast-STREAMS}.  It is possible; however, to direct the package to build against @cite{Linux STREAMS}
+(@command{LiS-@value{VERSION_LIS}}), or both @cite{LiS} and @cite{LfS} (such as is done to release
+the master package).
+
+@c ----------------------------------------------------------------------------
+
+@node Reference
+@chapter Reference
+@cindex reference
+
+@menu
+* Packages::			Packages included in the master package
+* Files::			Files included in the master package
+* Drivers::			Drivers included in the master package
+* Modules::			Modules included in the master package
+* Libraries::			Libraries included in the master package
+* Utilities::			Utilities included in the master package
+* Development::			Development against the master package
+@end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Packages
+@section Packages
+@cindex packages
+
+Following is a list of the sub-packages contained in the @dfn{@value{PACKAGE_TITLE}} package:
+
+@menu
+* sctp::		Linux Native Sockets SCTP
+* iperf::		Iperf
+* streams::		Linux Fast-STREAMS
+* strcompat::		STREAMS Compatibility Modules
+* strutil::		STREAMS Utilities
+* strbcm::		STREAMS Binary Compatibility Module
+* strtty::		STREAMS Terminals
+* strxns::		STREAMS X/Open Networking Services (XNS)
+* strxnet::		STREAMS XTI/TLI Library
+* strsock::		STREAMS Sockets Library
+* strinet::		STREAMS INET
+* strsctp::		STREAMS SCTP
+* striso::		STREAMS ISO
+* netperf::		Netperf
+* strss7::		STREAMS SS7/VoIP/ISDN/SIGTRAN Stacks
+* LiS::			Linux STREAMS
+@end menu
+
+@ifnotinfo
+@multitable @columnfractions .48 .52
+@item Linux Native Sockets SCTP
+@tab @ref{sctp}.
+@item Iperf
+@tab @ref{iperf}.
+@item Linux Fast-STREAMS
+@tab @ref{streams}.
+@item STREAMS Compatibility Modules
+@tab @ref{strcompat}.
+@item STREAMS Utilities
+@tab @ref{strutil}.
+@item STREAMS Binary Compatibility Module
+@tab @ref{strbcm}.
+@item STREAMS Terminals
+@tab @ref{strtty}.
+@item STREAMS X/Open Networking Services
+@tab @ref{strxns}.
+@item STREAMS XTI/TLI Library
+@tab @ref{strxnet}.
+@item STREAMS Sockets Library
+@tab @ref{strsock}.
+@item STREAMS INET
+@tab @ref{strinet}.
+@item STREAMS SCTP
+@tab @ref{strsctp}.
+@item STREAMS ISO
+@tab @ref{striso}.
+@item Netperf
+@tab @ref{netperf}.
+@item STREAMS SS7/@-ISDN/@-VoIP Stacks
+@tab @ref{strss7}.
+@item Linux STREAMS
+@tab @ref{LiS}.
+@end multitable
+@end ifnotinfo
+@ifplaintext
+@multitable @columnfractions .48 .52
+@item Linux Native Sockets SCTP
+@tab @ref{sctp}.
+@item Iperf
+@tab @ref{iperf}.
+@item Linux Fast-STREAMS
+@tab @ref{streams}.
+@item STREAMS Compatibility Modules
+@tab @ref{strcompat}.
+@item STREAMS Utilities
+@tab @ref{strutil}.
+@item STREAMS Binary Compatibility Module
+@tab @ref{strbcm}.
+@item STREAMS Terminals
+@tab @ref{strtty}.
+@item STREAMS X/Open Networking Services
+@tab @ref{strxns}.
+@item STREAMS XTI/TLI Library
+@tab @ref{strxnet}.
+@item STREAMS Sockets Library
+@tab @ref{strsock}.
+@item STREAMS INET
+@tab @ref{strinet}.
+@item STREAMS SCTP
+@tab @ref{strsctp}.
+@item STREAMS ISO
+@tab @ref{striso}.
+@item Netperf
+@tab @ref{netperf}.
+@item STREAMS SS7/@-ISDN/@-VoIP Stacks
+@tab @ref{strss7}.
+@item Linux STREAMS
+@tab @ref{LiS}.
+@end multitable
+@end ifplaintext
+
+These sub-packages are described in sections following.
+
+@node sctp
+@subsection sctp-@value{VERSION_SCTP}
+
+@dfn{sctp-@value{VERSION_SCTP}} is the @cite{Linux} native (Sockets) version of OpenSS7 Stream
+Control Transmission Prtocol (SCTP).  This is an implementation of SCTP built on the same protocol
+engine core as the @dfn{STREAMS} implementation: @command{strsctp-@value{VERSION_STRSCTP}}.  This
+sub-package currently only builds for @cite{Linux} kernels in the 2.4 series; however, the
+@dfn{STREAMS} implementation (@command{strsctp-@value{VERSION_STRSCTP}}) runs on both 2.4 and 2.6
+kernel series.
+
+This package does not rely upon any other package, but will only form part of the build for a 2.4
+series @cite{Linux} kernel.
+
+This package is contained in the @file{sctp} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{sctp/doc} directory for more information on
+this sub-package.
+
+@node iperf
+@subsection iperf-@value{VERSION_IPERF}
+
+@dfn{iperf-@value{VERSION_IPERF}} is an OpenSS7 Project modified version of the University of
+Illinois IPERF package.  The packages is modified to work with the OpenSS7 Linux Native Sockets
+version of SCTP (@command{sctp-@value{VERSION_SCTP}}) and is used for performance testing of that
+package.
+
+This package relies upon the @command{sctp-@value{VERSION_SCTP}} package only.
+
+This package is contained in the @file{iperf} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{iperf/doc} directory for more information on
+this sub-package.
+
+@node streams
+@subsection streams-@value{VERSION_STREAMS}
+
+The @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) package is
+@cite{POSIX/SuSv3} conforming, high-performance, SVR 4.2 @dfn{STREAMS} compatible, production
+replacement for the buggy, non-conforming, SVR 4 @dfn{STREAMS} @cite{LiS} package.
+
+This package relies upon no other package and is compatible with a wide range of @cite{Linux}
+kernels in both the 2.4 and 2.6 kernels.
+
+This package is contained in the @file{streams} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{streams/doc} directory for more information on
+this sub-package.
+
+@node strcompat
+@subsection strcompat-@value{VERSION_STRCOMPAT}
+
+The @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}) package is
+an SVR 4.2 @dfn{STREAMS} compatibility package that provides @dfn{STREAMS} compatibilty for the
+following mainstream @dfn{STREAMS} implementations:
+
+@itemize @bullet
+@item UNIX System V Release 3.2
+@item UNIX System V Release 4 MP
+@item UNIX System V Release 4.0 MP
+@item UNIX System V Release 4.2 MP
+@item Mentat Portable STREAMS (MPS)
+@item Linux STREAMS LiS 2.16
+@item Linux STREAMS LiS 2.18
+@item Linux Fast-STREAMS 0.7a
+@item AIX 5L Version 5.2 Portable STREAMS Environment (PSE)
+@item HP-UX 11.0i v2 STREAMS/UX
+@item OSF/1.2 - Digital UNIX STREAMS
+@item UnixWare 7.1.3 (OpenUnix 8) STREAMS
+@item Solaris 8/SunOS 5.9 (OpenSolaris) STREAMS
+@item Mac OS 9 OpenTransport 1.5r2
+@item IRIX 6.5.17 STREAMS
+@item SUPER-UX Release 9.2
+@item UXP/V V10L10 STREAMS V10
+@end itemize
+
+This package was originally part of the @cite{Linux Fast-STREAMS} release, but was split off to
+temporarily provide compatibility for both @cite{Linux Fast-STREAMS} and @cite{Linux STREAMS}, and,
+thus, provide a transition path for @dfn{STREAMS} drivers and modules using other major @cite{UNIX}
+implementations, and even @cite{LiS}, to @cite{Linux Fast-STREAMS}.
+
+This package relies upon the present of the following packages also included in the
+@value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) or
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}).
+@end enumerate
+
+This package is contained in the @file{strcompat} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{strcompat/doc} directory for more information on
+this sub-package.
+
+@node strutil
+@subsection strutil-@value{VERSION_STRUTIL}
+
+The @cite{STREAMS Utilities} package (@command{strutil-@value{VERSION_STRUTIL}}) provides a set of
+utility programs normally only contained in the @cite{Linux Fast-STREAMS} release, such as the
+@command{scls} program.  It was the intention of this package to split of some of the more useful
+utilities to allow them to work with @cite{LiS} as well as @cite{Linux Fast-STREAMS}.  Currently,
+these utilities are present in the @command{streams-@value{VERSION_STREAMS}} package, and, as
+@cite{LiS} is now completely deprecated, there is no longer a use for this package.  It is currently
+not part of the build or the distribution of the @value{PACKAGE_TITLE}.
+
+This package relies upon the present of the following packages also included in the
+@value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}})
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}})
+@end enumerate
+
+This package is contained in the @file{strutil} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{strutil/doc} directory for more information on
+this sub-package.
+
+@node strbcm
+@subsection strbcm-@value{VERSION_STRBCM}
+
+The @cite{STREAMS Binary Compatibility Module} (@command{strbcm-@value{VERSION_STRBCM}}) package
+was intended to provide the ability to take a precompiled binary object, pre-compiled either for
+@cite{Linux STREAMS} or @cite{Linux Fast-STREAMS} and install it onto a system running @cite{Linux
+Fast-STREAMS}.  This package would provide the ability to run older, deprecated, @cite{Lis}
+pre-compiled binaries and run them under a new production @cite{Linux Fast-STREAMS} installation.
+
+This package is currently incomplete and neither forms part of the build, nor part of the
+distribution.  This package relies upon the present of the following packages also included in the
+@value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}})
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}})
+@end enumerate
+
+This package is contained in the @file{strbcm} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{strbcm/doc} directory for more information on
+this sub-package.
+
+@node strtty
+@subsection strtty-@value{VERSION_STRTTY}
+
+The @cite{STREAMS Terminal} (@command{strtty-@value{VERSION_STRTTY}}) package
+
+It was the intention of this package to provide Terminal interface capability for @cite{Linux
+STREAMS}.  Unfortunately, @cite{Linux STREAMS} does not support the necessary capability for
+supporting Terminal input/output controls directly from the @dfn{Stream head} as is necessary for
+proper implementation of this package.
+
+Currently, @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) contains direct
+support for Sockets and Terminals from the @dfn{Stream head}.  Master terminals are formed by
+sending a @var{M_SETOPTS} message to the @dfn{Stream head} at open in the normal fashion  for
+@dfn{STREAMS}-based terminals.  However, this capability is to some degree incomplete and only
+partially tested.
+
+Nevertheless, @cite{LiS} is now completely deprecated, and this package can contain only the
+necessary modules (@file{streams-ldterm}) and drivers (@file{streams-ptem}) and depend upon
+@cite{Linux Fast-STREAMS}.
+
+This package is incomplete and untested and neither forms part of the build, nor part of the
+distribution.  This package relies upon the present of the following packages also included in the
+@value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}), and
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}).
+@end enumerate
+
+This package is contained in the @file{strtty} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{strtty/doc} directory for more information on
+this sub-package.
+
+@node strxns
+@subsection strxns-@value{VERSION_STRXNS}
+
+The @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}) package provides Communications
+Data Link Interface (CDI), Data Link Provider Interface (DLPI) and Network Provider Interface (NPI)
+drivers, modules, header files, documentation and specification reprints.
+
+This package contains drivers, modules and header files that were split off from the @cite{Linux
+STREAMS} release so that they could be corrected and used with @cite{Linux Fast-STREAMS}.  In
+particular, the standard headers files (@file{sys/cdi.h}, @file{sys/dlpi.h} and @file{sys/npi.h})
+that formed part of the original @cite{LiS} releases from @uref{http://www.gcom.com/, GCOM} releases
+of @cite{LiS} contained errors.
+
+This package also provides additional DLPI and NPI drivers that were not present in any @cite{LiS}
+release.
+
+This package is complete but not completely tested.  This package relies upon the present of the
+following packages also included in the @value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) or
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}})
+@end enumerate
+
+This package is contained in the @file{strxns} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{strxns/doc} directory for more information on
+this sub-package.
+
+@node strxnet
+@subsection strxnet-@value{VERSION_STRXNET}
+
+The @cite{STREAMS XTI/TLI Library} (@command{strxnet-@value{VERSION_STRXNET}}) package
+
+This package contains drivers, modules and header files that were split off frm the @cite{Linux
+STREAMS} release so that they could be corrrected and used wtih @cite{Linux Fast-STREAMS}.  In
+particular, the standard header files (@file{sys/tihdr.h} and @file{sys/tiuser.h}) that formed part
+of the original @cite{LiS} releases from @uref{http://www.gcom.com/, GCOM} release of @cite{LiS}
+contained errors.
+
+This package provides the X/Open Transport Inteface/Transport Layer Interface (XTI/TLI) library
+described in the X/Open Networking Services (XNS) 5.2 specification available from the
+@uref{http://www.opengroup.org/, OpenGroup}.  This library and cooperating @dfn{STREAMS} modules
+(@file{streams-timod}) provide XTI/TLI library functionality to any driver providing the Transport
+Provider Interface (TPI) Revision 2.0.0 interface.  It also provides header files conforming to the
+TPI specification.
+
+This package is complete and completely tested.  This package relies upon the present of the
+following packages also included in the @value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) or
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}), and
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}})
+@end enumerate
+
+
+This package is contained in the @file{strxnet} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{strxnet/doc} directory for more information on
+this sub-package.
+
+@node strsock
+@subsection strsock-@value{VERSION_STRSOCK}
+
+The @cite{STREAMS Socket Library} (@command{strsock-@value{VERSION_STRSOCK}}) package provides a
+library (@file{libsocket}) and cooperating @dfn{STREAMS} module (@file{streams-sockmod}) that
+provides X/Open Network Services (XNS) 5.2 Sockets interface to any driver or module supporting a
+Transport Provider Interface (TPI) Revision 2.0.0 service interface at its upper boundary in a
+similar fashion to the XTI/TLI library package above.
+
+It was the intention of this package to provide Sockets interface capability for @cite{Linux
+STREAMS}.  Unfortunately, @cite{Linux STREAMS} does not provide the necessary capabilities for
+supporting Socket and Terminal input/output controls direclty from the @dfn{Stream head} as is
+necessary for proper implementation of this package.
+
+Currently, @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) contains direct
+support for Sockets and Terminals in the @dfn{Stream head}.  Sockets are formed by declaring the
+@dfn{Stream} to be of type @var{IFSOCK}; however, this capability is incomplete and untested.
+
+Nevertheless, as @cite{LiS} is now completely deprecated, and there is no longer a use for this
+package.  It is currently not part of the build no the distribution of @value{PACKAGE_TITLE}.
+
+This package is incomplete and untested and neither forms part of the build, nor part of the
+distribution.  This package relies upon the present of the following packages also included in the
+@value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}),
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}), and
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}).
+@end enumerate
+
+This package is contained in the @file{strsock} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{strsock/doc} directory for more information on
+this sub-package.
+
+@node strinet
+@subsection strinet-@value{VERSION_STRINET}
+
+The @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}) package provides a pseudo-device
+driver sporting a Transport Provider Interface (TPI) Revision 2.0.0 service interface providing to
+@dfn{SCTP}, @dfn{TCP}, @dfn{UDP}, @dfn{RAWIP}, and @dfn{UNIX} sockets within the @cite{Linux}
+kernel.  Also provided are second generation implementations of @dfn{UDP} and @dfn{RAWIP} that are
+completely implemented using @dfn{STREAMS}.
+
+This package is complete and tested.  This package relies upon the present of the following packages
+also included in the @value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}),
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}), and
+@item optional @cite{Sockets SCTP} (@command{sctp-@value{VERSION_SCTP}}).
+@end enumerate
+
+This package is contained in the @file{strinet} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{strinet/doc} directory for more information on
+this sub-package.
+
+@node strsctp
+@subsection strsctp-@value{VERSION_STRSCTP}
+
+The @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}) package provides a pseudo-device
+driver sporting a Network Provider Interface (NPI) Revision 2.0.0 and Transport Provider Interface
+(TPI) Revision 2.0.0 service interfaces to an full @dfn{STREAMS} implementation of SCTP
+(@cite{Stream Control Transmission Protocol}).
+
+This package is complete and tested.  This package relies upon the present of the following packages
+also included in the @value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}), or
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}), and
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}).
+@end enumerate
+
+This package is contained in the @file{strsctp} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{strsctp/doc} directory for more information on
+this sub-package.
+
+@node striso
+@subsection striso-@value{VERSION_STRISO}
+
+The @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}) package provides pseudo-device
+drivers providing the Communications Datalink Interface (CDI) for X.21 PAD, Data Link Provider
+Interface (DLPI) for X.25 LP, Network Provider Interface (NPI) for X.25 PLP CONS and ISO CLNS, and
+Transport Provider Interace (TPI) for ISO TP0, TP1, TP2, TP3, TP4.  It also supports Ethernet LAP
+over LLC2.  It is intended that this package support ISOT, CMOT, CMISE/CMIP for TMN management.
+
+This package is incomplete and untested and neither forms part of the build, nor part of the
+distribution.  This package relies upon the present of the following packages also included in the
+@value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}), or
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}), and
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}).
+@end enumerate
+
+This package is contained in the @file{striso} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+
+@node netperf
+@subsection netperf-@value{VERSION_NETPERF}
+
+The @cite{Netperf} (@command{netperf-@value{VERSION_NETPERF}}) package is a OpenSS7 modified version
+of the Hewlett-Packard network performance testing tool, @cite{Netperf}, modified for use with
+@cite{Linux Fast-STREAMS} XTI/TLI, INET and SCTP stack components.  It is used for performance
+testing and measurement on these packages by the OpenSS7 Project.
+
+This package is complete and tested.   This package relies upon the present of the following
+packages also included in the @value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}), or
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
+@item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}), and
+@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}).
+@end enumerate
+
+This package is contained in the @file{netperf} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+
+@node strss7
+@subsection strss7-@value{VERSION_STRSS7}
+
+The @cite{STREAMS SS7/VoIP/ISDN/SIGTRAN} (@command{strss7-@value{VERSION_STRSS7}}) package contains
+a wide array of signalling and call control packages for use in development of switching platforms
+for legacy and VoIP networks.
+
+This package is a work in progress and partially tested.   This package relies upon the present of
+the following packages also included in the @value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) or
+@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
+@item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}), and
+@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}).
+@end enumerate
+
+This package is contained in the @file{stacks} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+
+@node LiS
+@subsection LiS-@value{VERSION_LIS}
+
+The @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}) package is the deprecated @cite{Linux
+STREAMS} package first available from @uref{http://www.gcom.com/, GCOM} and later supported by
+@uref{http://www.openss7.org/, The OpenSS7 Project} for a number of years.  @emph{Do not use this
+package.} @footnote{@dfn{LiS} is only included in this release for those that are so impossibly
+behind on the development evolutionary scale that they simply do not have the genetic material to
+evolve to the superior @cite{Linux Fast-STREAMS}.  We pity you (as we pity pond scum).} @dfn{LiS}
+has always been buggy and impossible to fix.  Use @cite{Linux Fast-STREAMS}
+(@command{streams-@value{VERSION_STREAMS}}) instead.  By default, this master package will build
+@cite{Linux Fast-STREAMS} and will build all other sub-packages for @cite{Linux Fast-STREAMS}.
+
+This package is contained in the @file{LiS} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+
+@node Files
+@section Files
+@cindex files
+
+The @value{PACKAGE_TITLE} does not install and files of it own and is simply a master package for
+the coordinated build and installation of the contained sub-packages.
+
+@include tree.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Drivers
+@section Drivers
+@cindex drivers
+
+The @value{PACKAGE_TITLE} does not install any drivers of its own and is simply a master package for
+the coordinated build and installation of the contained sub-packages.
+
+@dfn{STREAMS} drivers contained in sub-packages consist of the following:
+
+@table @file
+
+@item clone
+
+See @manref{clone(4)} for more information.
+
+@item echo
+
+See @manref{echo(4)} for more information.
+
+@item fifo
+
+See @manref{fifo(4)} for more information.
+
+@item log
+
+See @manref{log(4)} for more information.
+
+@item loop
+
+See @manref{loop(4)} for more information.
+
+@item mux
+
+See @manref{mux(4)} for more information.
+
+@item nsdev
+
+See @manref{nsdev(4)} for more information.
+
+@item nuls
+
+See @manref{nuls(4)} for more information.
+
+@item pipe
+
+See @manref{pipe(4)} for more information.
+
+@item sad
+
+See @manref{sad(4)} for more information.
+
+@item sfx
+
+See @manref{sfx(4)} for more information.
+
+@item spx
+
+See @manref{spx(4)} for more information.
+
+
+@item ip_to_dlpi
+
+See @manref{ip_to_dlpi(4)} for more information.
+
+@item ldl
+
+See @manref{ldl(4)} for more information.
+
+@item np_ip
+
+See @manref{np_ip(4)} for more information.
+
+
+@item inet
+
+See @manref{inet(4)} for more information.
+
+@item rawip
+
+See @manref{rawip(4)} for more information.
+
+@item tcp
+
+See @manref{tcp(4)} for more information.
+
+@item udp
+
+See @manref{udp(4)} for more information.
+
+
+@item sctp
+
+See @manref{sctp(4)} for more information.
+
+
+@item sdlm
+
+See @manref{sdlm(4)} for more information.
+
+@item sl_mux
+
+See @manref{sl_mux(4)} for more information.
+
+@item x100p-ss7
+
+See @manref{x100p-ss7(4)} for more information.
+
+@item x400p-ss7
+
+See @manref{x400p-ss7(4)} for more information.
+
+
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Modules
+@section Modules
+@cindex modules
+
+The @value{PACKAGE_TITLE} does not install any drivers of its own and is simply a master package for
+the coordinated build and installation of the contained sub-packages.
+
+@dfn{STREAMS} modules contained in sub-packages consist of the following:
+
+@table @file
+
+@item sth
+
+See @manref{sth(4)} for more information.
+
+@item bufmod
+
+See @manref{bufmod(4)} for more information.
+
+@item connld
+
+See @manref{connld(4)} for more information.
+
+@item nullmod
+
+See @manref{nullmod(4)} for more information.
+
+@item pipemod
+
+See @manref{pipemod(4)} for more information.
+
+@item sc
+
+See @manref{sc(4)} for more information.
+
+@item testmod
+
+See @manref{testmod(4)} for more information.
+
+
+@item ip_strm_mod
+
+See @manref{ip_strm_mod(4)} for more information.
+
+
+@item timod
+
+See @manref{timod(4)} for more information.
+
+@item tirdwr
+
+See @manref{tirdwr(4)} for more information.
+
+
+@item tpiperf
+
+See @manref{tpiperf(4)} for more information.
+
+
+@item m2pa_sl
+
+See @manref{m2pa_sl(4)} for more information.
+
+@item sdl
+
+See @manref{sdl(4)} for more information.
+
+@item sdl_sctp
+
+See @manref{sdl_sctp(4)} for more information.
+
+@item sdt
+
+See @manref{sdt(4)} for more information.
+
+@item sdt_sctp
+
+See @manref{sdt_sctp(4)} for more information.
+
+@item sl
+
+See @manref{sl(4)} for more information.
+
+@item sl_tpi
+
+See @manref{sl_tpi(4)} for more information.
+
+@item sm_mod
+
+See @manref{sm_mod(4)} for more information.
+
+@item spm
+
+See @manref{spm(4)} for more information.
+
+
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Libraries
+@section Libraries
+@cindex libraries
+
+The @value{PACKAGE_TITLE} does not install any drivers of its own and is simply a master package for
+the coordinated build and installation of the contained sub-packages.
+
+Libraries contained in sub-packages consist of the following:
+
+@table @file
+
+@item libstreams.so
+
+This is a @dfn{STREAMS} library installed by the @command{streams-@value{VERSION_STREAMS}} package
+providing usable @manref{getmsg(2)}, @manref{getpmsg(2)}, @manref{putmsg(2)}, @manref{putpmsg(2)}
+and @manref{isastream(2)} system call emulation.
+
+@item libxnet.so
+
+This is an @dfn{XTI/TLI} library installed by the @command{strxnet-@value{VERSION_STRXNET}} package
+providing a set of XTI/TLI functions described in Section 3 of the manual pages, starting with
+@manref{xti(3)}.
+
+@item libsocket.so
+
+This ia a @dfn{Sockets} library installed by the @command{strsock-@value{VERSION_STRSOCK}} package
+providing a set of Socket functions described in Section 3 of the manual pages, starting with
+@manref{libsocket(3)}.
+
+@item libLiS.so
+@itemx libpLiS.so
+
+These are @dfn{STREAMS} libraries installed be the @command{LiS-@value{VERSION_LIS}} package
+providing usable @manref{getmsg(2)}, @manref{getpmsg(2)}, @manref{putmsg(2)}, @manref{putpmsg(2)}
+and @manref{isastream(2)} system call emulation.
+
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Utilities
+@section Utilities
+@cindex utilities
+
+The @value{PACKAGE_TITLE} does not install any drivers of its own and is simply a master package for
+the coordinated build and installation of the contained sub-packages.
+
+Utilities contained in sub-packages consist of the following:
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Development
+@section Development
+@cindex developing
+
+The @value{PACKAGE_TITLE} sub-packages install info manuals, manual pages, header files, static and
+shared libraries, and kernel modules in a structured manner.
+
+@menu
+* User Visible Header Files::
+* Shared and Static Libraries::
+* Kernel Module Development::
+* Manual Pages::
+@end menu
+
+@node User Visible Header Files
+@subsection Header Files
+
+Header files are installed, typically, in the @file{/@-usr/@-include/@-@var{name}/} subdirectory,
+where @var{name} is the name of the package.@footnote{That is, where @emph{name} is one of
+@file{sctp}, @file{iperf}, @file{streams}, @file{strcompat}, @file{strutil}, @file{strxns},
+@file{strxnet}, @file{strinet}, @file{strtty}, @file{striso}, @file{strsctp}, @file{netperf}, or
+@file{LiS}.} To use the header files from one of the packages,
+@samp{-I/@-usr/@-include/@-@var{name}/} must be included as a @command{gcc} compile option.  This is
+true regardless of whether user space or kernel programs are being compiled.
+
+In general, @samp{-I} include directives on the @command{gcc} command line should be ordered in the
+reverse order of the dependencies between packages.  So, for example, if include files for all
+add-on packages are required, the order of these directives should be:
+
+@enumerate
+@item @samp{-I/usr/include/strss7}
+@item @samp{-I/usr/include/strsctp}
+@item @samp{-I/usr/include/strinet}
+@item @samp{-I/usr/include/strxnet}
+@item @samp{-I/usr/include/strxns}
+@item @samp{-I/usr/include/strcompat}
+@item @samp{-I/usr/include/streams}
+@end enumerate
+
+See the sections that follow for a list of the user-visible header files provided by each of the
+add-on packages:
+
+@menu
+* streams Header Files::
+* strcompat Header Files::
+* strxns Header Files::
+* strxnet Header Files::
+* strinet Header Files::
+* strsctp Header Files::
+* strss7 Header Files::
+@end menu
+
+@node streams Header Files
+@subsubsection streams
+
+The @command{streams-@value{VERSION_STREAMS}} add-on package provides the following user-visible
+header files in @file{/usr/include/streams}:
+
+@multitable @columnfractions .25 .75
+@item @file{strlog.h}
+@tab primary header file for the @manref{strlog(4)} driver.
+@item @file{stropts.h}
+@tab primary user header file for the @dfn{Stream head}.
+@item @file{log.h}
+@tab primary header file for the @manref{log(4)} driver.
+@item @file{loop.h}
+@tab primary header file for the @manref{loop(4)} driver.
+@item @file{sad.h}
+@tab primary header file for the @manref{sad(4)} driver.
+@item @file{sys/sad.h}
+@tab system specific header file for the @manref{sad(4)} driver.
+@item @file{sys/cmn_err.h}
+@tab system specific kernel header file for the @manref{cmn_err(9)} utility.
+@item @file{sys/ddi.h}
+@tab system specific kernel header file for various @dfn{STREAMS} @manref{DDI(9)} utilities.
+@item @file{sys/debug.h}
+@item @file{sys/dki.h}
+@tab system specific kernel header file for various @dfn{STREAMS} @manref{DKI(9)} utilities.
+@item @file{sys/kmem.h}
+@tab system specific kernel header file for @manref{kmem_alloc(9)} and related utilities.
+@item @file{sys/strconf.h}
+@tab system specific kernel header file for @dfn{STREAMS} driver and module configuration.
+@item @file{sys/strdebug.h}
+@tab system specific kernel header file for @dfn{STREAMS} driver and module debugging macros.
+@item @file{sys/stream.h}
+@tab system specific kernel header file for @dfn{STREAMS} drivers and modules.
+@item @file{sys/strlog.h}
+@tab system specific header file for the @manref{strlog(4)} and @manref{strlog(9)} facilities.
+@item @file{sys/stropts.h}
+@tab system specific user header file for the @dfn{Stream head}.
+@item @file{sys/stropts32.h}
+@tab system specific user 32/64-bit header file for the @dfn{Stream head}.
+@item @file{sys/strsubr.h}
+@tab system specific kernel header file for @dfn{STREAMS} private definitions.
+@item @file{sys/log.h}
+@tab system specific header file for the @manref{log(4)} driver.
+@item @file{sys/loop.h}
+@tab system specific header file for the @manref{loop(4)} driver.
+@item @file{sys/sad.h}
+@tab system specific header file for the @manref{sad(4)} driver.
+@item @file{sys/sc.h}
+@tab system specific header file for the @manref{sc(4)} module.
+@item @file{sys/testmod.h}
+@tab system specific header file for the @manref{testmod(4)} module.
+@end multitable
+
+@node strcompat Header Files
+@subsubsection strcompat
+
+The @command{strcompat-@value{VERSION_STRCOMPAT}} add-on package provides the following user-visible
+header files in @file{/usr/include/strcompat}:
+
+@multitable @columnfractions .25 .75
+@item @file{sys/ddi.h}
+@tab system specific kernel header file for various @dfn{STREAMS} @manref{DDI(9)} utilities.
+@item @file{sys/strconf.h}
+@tab system specific kernel header file for @dfn{STREAMS} driver and module configuration.
+@item @file{sys/stream.h}
+@tab system specific kernel header file for @dfn{STREAMS} drivers and modules.
+@item @file{sys/strsun.h}
+@tab @cite{Solaris/SunOS} system specific kernel header file.
+@item @file{sys/sunddi.h}
+@tab @cite{Solaris/SunOS} system specific kernel header file.
+@item @file{sys/os7/compat.h}
+@tab @cite{OpenSS7} system specific kernel header file.
+@end multitable
+
+The @file{sys/ddi.h}, @file{ssy/strconf.h} and @file{sys/stream.h} header files installed by this
+package are intended to override those from the @command{streams-@value{VERSION_STREAMS}} add-on
+package.  To accomplish this, @samp{-I/usr/include/strcompat} must appear on the @command{gcc}
+command line ahead of @samp{-I/usr/include/streams}.
+
+@node strxns Header Files
+@subsubsection strxns
+
+The @command{strxns-@value{VERSION_STRXNS}} add-on package provides the following user-visible
+header files in @file{/usr/include/strxns}:
+
+@multitable @columnfractions .25 .75
+@item @file{sys/cdi.h}
+@tab system specific @cite{Communications Device Interface (CDI)} header file.
+@item @file{sys/dlpi.h}
+@tab system specific @cite{Data Link Provider Interface (DLPI)} header file.
+@item @file{sys/ldl.h}
+@tab system specific header file for the @manref{ldl(4)} driver.
+@item @file{sys/npi.h}
+@tab system specific @cite{Network Provider Interface (NPI)} header file.
+@item @file{sys/npi_ip.h}
+@tab system specific @cite{NPI for Internet Protocol (IP)} header file.
+@end multitable
+
+@node strxnet Header Files
+@subsubsection strxnet
+
+The @command{strxnet-@value{VERSION_STRXNET}} add-on package provides the following user-visible
+header files in @file{/usr/include/strxnet}:
+
+@multitable @columnfractions .25 .75
+@item @file{ticlts.h}
+@tab header file for the @manref{ticlts(4)} device.
+@item @file{ticots.h}
+@tab header file for the @manref{ticots(4)} device.
+@item @file{ticotsord.h}
+@tab header file for the @manref{ticotsord(4)} device.
+@item @file{tihdr.h}
+@tab kernel header file for the @cite{Transport Provider Interface (TPI)}.
+@item @file{tiuser.h}
+@tab user header file for the @cite{Transport Provider Interface (TPI)}.
+@item @file{timod.h}
+@tab header file for the @manref{timod(4)} module.
+@item @file{tirdwr.h}
+@tab header file for the @manref{tirdwr(4)} module.
+@item @file{xti.h}
+@tab header file for the @cite{X/Open Transport Interface (XTI)}.
+@item @file{xti_inet.h}
+@tab header file for the @cite{X/Open Transport Interface (XTI)}, Internet Protocol specific declarations.
+@item @file{sys/ticlts.h}
+@tab system specific header file for the @manref{ticlts(4)} device.
+@item @file{sys/ticots.h}
+@tab system specific header file for the @manref{ticots(4)} device.
+@item @file{sys/ticotsord.h}
+@tab system specific header file for the @manref{ticotsord(4)} device.
+@item @file{sys/tihdr.h}
+@tab system specific kernel header file for the @cite{Transport Provider Interface (TPI)}.
+@item @file{sys/tiuser.h}
+@tab system specific user header file for the @cite{Transport Provider Interface (TPI)}.
+@item @file{sys/timod.h}
+@tab system specific header file for the @manref{timod(4)} module.
+@item @file{sys/tirdwr.h}
+@tab system specific header file for the @manref{tirdwr(4)} module.
+@item @file{sys/tli.h}
+@tab system specific header file for the @cite{Transport Layer Interface (TLI)}.
+@item @file{sys/tpi.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)}.
+@item @file{sys/xti.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}.
+@item @file{sys/xti_atm.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, ATM specific declarations.
+@item @file{sys/xti_inet.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, Internet Protocol specific declarations.
+@item @file{sys/xti_ip.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, Internet Protocol specific declarations.
+@item @file{sys/xti_local.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, local declarations.
+@item @file{sys/xti_mosi.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, Minimal OSI specific declarations.
+@item @file{sys/xti_osi.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, OSI specific declarations.
+@item @file{sys/xti_sctp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, SCTP specific declarations.
+@item @file{sys/xti_tcp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, TCP specific declarations.
+@item @file{sys/xti_udp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, UDP specific declarations.
+@item @file{sys/xti_xti.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, XTI generic declarations.
+@end multitable
+
+@node strinet Header Files
+@subsubsection strinet
+
+The @command{strinet-@value{VERSION_STRINET}} add-on package provides the following user-visible
+header files in @file{/usr/include/strinet}:
+@footnote{Note that some of these header files are repeats of those found in the
+@command{strxnet-@value{VERSION_STRXNET}} package: the reason for this is that the @command{strinet}
+add-on package was also meant to be used in a stand-alone fashion with non-@cite{OpenSS7}
+@cite{LiS}, even though this use is deprecated.}
+
+@multitable @columnfractions .25 .75
+@item @file{ticlts.h}
+@tab header file for the @manref{ticlts(4)} device.
+@item @file{ticots.h}
+@tab header file for the @manref{ticots(4)} device.
+@item @file{ticotsord.h}
+@tab header file for the @manref{ticotsord(4)} device.
+@item @file{sys/ticlts.h}
+@tab system specific header file for the @manref{ticlts(4)} device.
+@item @file{sys/ticots.h}
+@tab system specific header file for the @manref{ticots(4)} device.
+@item @file{sys/ticotsord.h}
+@tab system specific header file for the @manref{ticots(4)} device.
+@item @file{sys/ticotsord.h}
+@tab system specific header file for the @manref{ticotsord(4)} device.
+@end multitable
+
+@multitable @columnfractions .25 .75
+@item @file{xti.h}
+@tab header file for the @cite{X/Open Transport Interface (XTI)}.
+@item @file{xti_inet.h}
+@tab header file for the @cite{X/Open Transport Interface (XTI)}, Internet Protocol specific declarations.
+@item @file{sys/xti_inet.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, Internet Protocol specific declarations.
+@item @file{sys/xti_ip.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, Internet Protocol specific declarations.
+@item @file{sys/xti_udp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, UDP specific declarations.
+@item @file{sys/xti_tcp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, XTI generic declarations.
+@end multitable
+
+@node strsctp Header Files
+@subsubsection strsctp
+
+The @command{strsctp-@value{VERSION_STRSCTP}} add-on package provides the following user-visible
+header files in @file{/usr/include/strsctp}:
+
+@multitable @columnfractions .25 .75
+@item @file{sys/npi_sctp.h}
+@tab system specific header file for the @cite{Network Provider Interface (NPI)},
+@cite{Stream Control Transmission Protocol (SCTP)} specifics.
+@item @file{sys/tpi_sctp.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Stream Control Transmission Protocol (SCTP)} specifics.
+@item @file{sys/xti_sctp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Stream Control Transmission Protocol (SCTP)} specifics.
+@end multitable
+
+@node strss7 Header Files
+@subsubsection strss7
+
+The @command{strss7-@value{VERSION_STRSS7}} add-on package provides the following user-visible
+header files in @file{/usr/include/strss7}:
+
+@multitable @columnfractions .25 .75
+@item @file{sys/cdi.h}
+@tab system specific header file for the @cite{Communications Device Interface (CDI)}.
+@item @file{sys/cdi_daed.h}
+@tab system specific header file for the @cite{Communications Device Interface (CDI)},
+@cite{Delimination, Alignment and Error Detection} specifics.
+@item @file{sys/cdi_hdlc.h}
+@tab system specific header file for the @cite{Communications Device Interface (CDI)},
+@cite{High-Level Data link Control} specifics.
+@end multitable
+
+@multitable @columnfractions .25 .75
+@item @file{sys/dlpi.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)}.
+@item @file{sys/dlpi_dua.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{DASS/DPNSS User Adaptation Layer} specifics.
+@item @file{sys/dlpi_gr303.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{GR-303} specifics.
+@item @file{sys/dlpi_gr303ua.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{GR-303 User Adaptation Layer} specifics.
+@item @file{sys/dlpi_gsma.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{GSM-A Inteface} specifics.
+@item @file{sys/dlpi_h225.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{H.225} specifics.
+@item @file{sys/dlpi_isdn.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{ISDN} specifics.
+@item @file{sys/dlpi_iua.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{ISDN User Adaptation Layer} specifics.
+@item @file{sys/dlpi_lapb.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{Link Access Protocol (Balanced)} specifics.
+@item @file{sys/dlpi_lapd.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{Link Access Protocol (D-Channel)} specifics.
+@item @file{sys/dlpi_lapf.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{Link Access Protocol (Frame Relay)} specifics.
+@item @file{sys/dlpi_m2ua.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{MTP2 User Adaptation Layer} specifics.
+@item @file{sys/dlpi_mtp2.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{Message Transfer Part (MTP) Level 2} specifics.
+@item @file{sys/dlpi_v52.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{V5.2} specifics.
+@item @file{sys/dlpi_v5ua.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{V5.2 User Adaptation Layer} specifics.
+@end multitable
+
+@multitable @columnfractions .25 .75
+@item @file{sys/npi.h}
+@tab system specific header file for the @cite{Network Provider Interface (NPI)}.
+@item @file{sys/npi_ip.h}
+@tab system specific header file for the @cite{Network Provider Interface (NPI)},
+@cite{Internet Protocol} specifics.
+@item @file{sys/npi_mtp.h}
+@tab system specific header file for the @cite{Network Provider Interface (NPI)},
+@item @file{sys/npi_sccp.h}
+@tab system specific header file for the @cite{Network Provider Interface (NPI)},
+@cite{Signalling Connection Control Part (SCCP)} specifics.
+@item @file{sys/npi_sctp.h}
+@tab system specific header file for the @cite{Network Provider Interface (NPI)},
+@cite{Stream Control Transmission Protocol (SCTP)} specifics.
+@item @file{sys/npi_ss7.h}
+@tab system specific header file for the @cite{Network Provider Interface (NPI)},
+@cite{Signalling System Number 7 (SS7)} specifics.
+@item @file{sys/npi_sscop.h}
+@tab system specific header file for the @cite{Network Provider Interface (NPI)},
+@cite{Service-Specific Connection Oriented Protocol (SSCOP)} specifics.
+@item @file{sys/npi_tcp.h}
+@tab system specific header file for the @cite{Network Provider Interface (NPI)},
+@cite{Transmission Control Protocol (TCP)} specifics.
+@item @file{sys/npi_udp.h}
+@tab system specific header file for the @cite{Network Provider Interface (NPI)},
+@cite{User Datagram Protocol (UDP)} specifics.
+@end multitable
+
+@multitable @columnfractions .25 .75
+@item @file{sys/tpi.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)}.
+@item @file{sys/tpi_inet.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Internet Protocol} suite specifics.
+@item @file{sys/tpi_ip.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Internet Protocol} specifics.
+@item @file{sys/tpi_mtp.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Message Transfer Part (MTP)} specifics.
+@item @file{sys/tpi_sccp.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Signalling Connection Control Part (SCCP)} specifics.
+@item @file{sys/tpi_sctp.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Stream Control Transmission Protocol (SCTP)} specifics.
+@item @file{sys/tpi_sl.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Signalling Link (SL)} specifics.
+@item @file{sys/tpi_ss7.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Signalling System Number 7 (SS7)} specifics.
+@item @file{sys/tpi_sscop.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Service-Specific Connection Oriented Protocol (SSCOP)} specifics.
+@item @file{sys/tpi_tcap.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Transaction Capabilities Application Part (TCAP)} specifics.
+@item @file{sys/tpi_tcp.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{Transmission Control Protocol (TCP)} specifics.
+@item @file{sys/tpi_udp.h}
+@tab system specific header file for the @cite{Transport Provider Interface (TPI)},
+@cite{User Datagram Protocol (UDP)} specifics.
+@end multitable
+
+@multitable @columnfractions .25 .75
+@item @file{ticlts.h}
+@tab header file for the @manref{ticlts(4)} device.
+@item @file{ticots.h}
+@tab header file for the @manref{ticots(4)} device.
+@item @file{ticotsord.h}
+@tab header file for the @manref{ticotsord(4)} device.
+@item @file{tihdr.h}
+@tab kernel header file for the @cite{Transport Provider Interface (TPI)}.
+@item @file{tiuser.h}
+@tab user header file for the @cite{Transport Provider Interface (TPI)}.
+@item @file{timod.h}
+@tab header file for the @manref{timod(4)} module.
+@item @file{tirdwr.h}
+@tab header file for the @manref{tirdwr(4)} module.
+@item @file{sys/ticlts.h}
+@tab system specific header file for the @manref{ticlts(4)} device.
+@item @file{sys/ticots.h}
+@tab system specific header file for the @manref{ticots(4)} device.
+@item @file{sys/ticotsord.h}
+@tab system specific header file for the @manref{ticotsord(4)} device.
+@item @file{sys/tihdr.h}
+@tab system specific kernel header file for the @cite{Transport Provider Interface (TPI)}.
+@item @file{sys/tiuser.h}
+@tab system specific user header file for the @cite{Transport Provider Interface (TPI)}.
+@item @file{sys/timod.h}
+@tab system specific header file for the @manref{timod(4)} module.
+@item @file{sys/tirdwr.h}
+@tab system specific header file for the @manref{tirdwr(4)} module.
+@item @file{sys/tli.h}
+@tab system specific header file for the @cite{Transport Layer Interface (TLI)}.
+@end multitable
+
+@multitable @columnfractions .25 .75
+@item @file{xti.h}
+@tab header file for the @cite{X/Open Transport Interface (XTI)}.
+@item @file{xti_inet.h}
+@tab header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Internet Protocol Suite (INET)} specifics.
+@item @file{sys/xti.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)}.
+@item @file{sys/xti_atm.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Asynchronous Transfer Mode (ATM)} specifics.
+@item @file{sys/xti_inet.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Internet Protocol Suite (INET)} specifics.
+@item @file{sys/xti_ip.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Internet Protocol (IP)} specifics.
+@item @file{sys/xti_local.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{XTI Generic} specifics.
+@item @file{sys/xti_mosi.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Minimal OSI (mOSI)} specifics.
+@item @file{sys/xti_mtp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Message Transfer Part (MTP)} specifics.
+@item @file{sys/xti_osi.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Open Systems Interconnect (OSI)} specifics.
+@item @file{sys/xti_sccp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Signalling Connection Control Part (SCCP)} specifics.
+@item @file{sys/xti_sctp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Stream Control Transmission Protocol (SCTP)} specifics.
+@item @file{sys/xti_sl.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Signalling Link (SL)} specifics.
+@item @file{sys/xti_ss7.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Signalling System Number 7 (SS7)} specifics.
+@item @file{sys/xti_sscop.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Service-Specific Connection Oriented Protocol (SSCOP)} specifics.
+@item @file{sys/xti_tcap.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Transaction Capabilities Application Part (TCAP)} specifics.
+@item @file{sys/xti_tcp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Transmission Control Protocol (TCP)} specifics.
+@item @file{sys/xti_udp.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{User Datagram Protocol (UDP)} specifics.
+@item @file{sys/xti_xti.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{XTI Generic} specifics.
+@end multitable
+
+@multitable @columnfractions .25 .75
+@item @file{sys/sockmod.h}
+@tab
+@end multitable
+
+@multitable @columnfractions .25 .75
+@item @file{ss7/capi.h}
+@tab header file for @cite{ISDN Common API (CAPI)}.
+@item @file{ss7/capi_ioctl.h}
+@tab header file for @cite{ISDN Common API (CAPI)} input-output controls.
+@item @file{ss7/cci.h}
+@tab header file for @cite{Call Control Interface (CCI)}.
+@item @file{ss7/cdi.h}
+@tab header file for @cite{Communications Device Interface (CDI)}.
+@item @file{ss7/chi.h}
+@tab header file for @cite{Channel Inteface (CHI)}.
+@item @file{ss7/chi_ioctl.h}
+@tab header file for @cite{Channel Inteface (CHI)} input-output controls.
+@item @file{ss7/devi.h}
+@tab header file for @cite{Device Inteface (DEVI)}.
+@item @file{ss7/devi_ioctl.h}
+@tab header file for @cite{Device Inteface (DEVI)} input-output controls.
+@item @file{ss7/dl.h}
+@tab header file for the @manref{dl(4)} driver.
+@item @file{ss7/dl_ioctl.h}
+@tab header file for the @manref{dl(4)} driver, input-output controls.
+@item @file{ss7/dlpi_ioctl.h}
+@tab header file for the @cite{Data Link Provider Interface (DLPI)}, input-output controls.
+@item @file{ss7/dua_ioctl.h}
+@tab header file for the @manref{dua(4)} driver, input-output controls.
+@item @file{ss7/gr303_ioctl.h}
+@tab header file for the @manref{gr303(4)} driver, input-output controls.
+@item @file{ss7/gr303ua_ioctl.h}
+@tab header file for the @manref{gr303ua(4)} driver, input-output controls.
+@item @file{ss7/gsma_ioctl.h}
+@tab header file for the @manref{gsma(4)} driver, input-output controls.
+@item @file{ss7/h225_ioctl.h}
+@tab header file for the @manref{h225(4)} driver, input-output controls.
+@item @file{ss7/hdlc_ioctl.h}
+@tab header file for the @manref{hdlc(4)} driver, input-output controls.
+@item @file{ss7/isdni.h}
+@tab header file for @cite{Integrated Services Digital Network Interface (ISDNI)}.
+@item @file{ss7/isdni_ioctl.h}
+@tab header file for @cite{Integrated Services Digital Network Interface (ISDNI)}, input-output controls.
+@item @file{ss7/isupi.h}
+@tab header file for @cite{ISDN User Part Interface (ISUPI)}.
+@item @file{ss7/isupi_ioctl.h}
+@tab header file for @cite{ISDN User Part Interface (ISUPI)}, input-output controls.
+@item @file{ss7/iua_ioctl.h}
+@tab header file for the @manref{iua(4)} driver, input-output controls.
+@item @file{ss7/lapb_ioctl.h}
+@tab header file for the @manref{labp(4)} driver, input-output controls.
+@item @file{ss7/lapd_ioctl.h}
+@tab header file for the @manref{labd(4)} driver, input-output controls.
+@item @file{ss7/lapf_ioctl.h}
+@tab header file for the @manref{labf(4)} driver, input-output controls.
+@item @file{ss7/lki.h}
+@tab header file for @cite{Link Interface (LKI)}.
+@item @file{ss7/lki_ioctl.h}
+@tab header file for @cite{Link Interface (LKI)}, input-output controls.
+@item @file{ss7/lmi.h}
+@tab header file for @cite{Local Management Interface (LMI)}.
+@item @file{ss7/lmi_ioctl.h}
+@tab header file for @cite{Local Management Interface (LMI)}, input-output controls.
+@item @file{ss7/m2pa_ioctl.h}
+@tab header file for the @manref{m2pa(4)} driver, input-output controls.
+@item @file{ss7/m2ua_ioctl.h}
+@tab header file for the @manref{m2ua(4)} driver, input-output controls.
+@item @file{ss7/m3ua.h}
+@tab header file for the @manref{m3ua(4)} driver.
+@item @file{ss7/m3ua_ioctl.h}
+@tab header file for the @manref{m3ua(4)} driver, input-output controls.
+@item @file{ss7/mgcp.h}
+@tab header file for the @manref{mgcp(4)} driver.
+@item @file{ss7/mgi.h}
+@tab header file for @cite{Media Gateway Interface (MGI)}.
+@item @file{ss7/mgi_ioctl.h}
+@tab header file for @cite{Media Gateway Interface (MGI)}, input-output controls.
+@item @file{ss7/mtp2_ioctl.h}
+@tab header file for the @manref{mtp2(4)} driver, input-output controls.
+@item @file{ss7/mtp3b.h}
+@tab header file for the @manref{mtp3b(4)} driver.
+@item @file{ss7/mtp.h}
+@tab header file for the @manref{mtp(4)} driver.
+@item @file{ss7/mtpi.h}
+@tab header file for @cite{Message Transfer Part Interface (MTPI)}.
+@item @file{ss7/mtpi_ioctl.h}
+@tab header file for @cite{Message Transfer Part Interface (MTPI)}, input-output controls.
+@item @file{ss7/mtp_ioctl.h}
+@tab header file for the @manref{mtp(4)} driver, input-output controls.
+@item @file{ss7/mxi.h}
+@tab header file for @cite{Multiplex Interface (MXI)}.
+@item @file{ss7/mxi_ioctl.h}
+@tab header file for @cite{Multiplex Interface (MXI)}, input-output controls.
+@item @file{ss7/ph.h}
+@tab header file for @cite{Physical Interface (PH)}.
+@item @file{ss7/q920.h}
+@tab header file for the @manref{q920(4)} driver.
+@item @file{ss7/sccp.h}
+@tab header file for the @manref{sccp(4)} driver.
+@item @file{ss7/sccpi.h}
+@tab header file for @cite{Signalling Connection Control Part Interface (SCCPI)}.
+@item @file{ss7/sccpi_ioctl.h}
+@tab header file for @cite{Signalling Connection Control Part Interface (SCCPI)}, input-output controls.
+@item @file{ss7/sccp_ioctl.h}
+@tab header file for the @manref{sccp(4)} driver, input-output controls.
+@item @file{ss7/sctp.h}
+@tab header file for the @manref{sctp(4)} driver.
+@item @file{ss7/sctpi.h}
+@tab header file for @cite{Stream Control Transmission Protocol Inteface (SCTPI)}.
+@item @file{ss7/sctpi_ioctl.h}
+@tab header file for @cite{Stream Control Transmission Protocol Inteface (SCTPI)}, input-output controls.
+@item @file{ss7/sdli.h}
+@tab header file for @cite{Signalling Data Link Interface (SDLI)}.
+@item @file{ss7/sdli_ioctl.h}
+@tab header file for @cite{Signalling Data Link Interface (SDLI)}, input-output controls.
+@item @file{ss7/sdti.h}
+@tab header file for @cite{Signalling Data Terminal Interface (SDTI)}.
+@item @file{ss7/sdti_ioctl.h}
+@tab header file for @cite{Signalling Data Terminal Interface (SDTI)}, input-output controls.
+@item @file{ss7/sl.h}
+@tab header file fro the @manref{sl(4)} module.
+@item @file{ss7/sli.h}
+@tab header file for @cite{Signalling Link Interface (SLI)}.
+@item @file{ss7/sli_ioctl.h}
+@tab header file for @cite{Signalling Link Interface (SLI)}, input-output controls.
+@item @file{ss7/slmi.h}
+@item @file{ss7/slsi.h}
+@tab header file for @cite{Signalling Link Set Inteface (SLSI)}.
+@item @file{ss7/slsi_ioctl.h}
+@tab header file for @cite{Signalling Link Set Inteface (SLSI)}, input-output controls.
+@item @file{ss7/smi.h}
+@tab header file for @cite{Signalling Management Interface (SMI)}.
+@item @file{ss7/smi_ioctl.h}
+@tab header file for @cite{Signalling Management Interface (SMI)}, input-output controls.
+@item @file{ss7/tcap.h}
+@tab header file for the @manref{tcap(4)} driver.
+@item @file{ss7/tcapi.h}
+@tab header file for @cite{Transaction Capabilities Application Part Interface (TCAPI)}.
+@item @file{ss7/tcap_ioctl.h}
+@tab header file for @cite{Transaction Capabilities Application Part Interface (TCAPI)}, input-output controls.
+@item @file{ss7/tc.h}
+@tab header file for the @manref{tc(4)} driver.
+@item @file{ss7/tr.h}
+@tab header file for the @manref{tr(4)} driver.
+@item @file{ss7/ua_lm.h}
+@tab header file for @cite{User Adaptation Layer Management (UA-LM)}.
+@item @file{ss7/ua_lm_ioctl.h}
+@tab header file for @cite{User Adaptation Layer Management (UA-LM)}, input-output controls.
+@item @file{ss7/v52_ioctl.h}
+@tab header file for the @manref{v52(4)} driver, input-output controls.
+@item @file{ss7/v5ua_ioctl.h}
+@tab header file for the @manref{v5ua(4)} driver, input-output controls.
+@end multitable
+
+@node Shared and Static Libraries
+@subsection Libraries
+
+Shared or static libraries must be linked when using the @command{streams-@value{VERSION_STREAMS}}
+(@file{libstreams}), @command{strxnet-@value{VERSION_STRXNET}} (@file{libxnet}),
+@command{strsock-@value{VERSION_STRSOCK}} (@file{libsocket}) or @command{LiS-@value{VERSION_LIS}}
+packages (@file{libLiS} or @file{libpLiS}).  These libraries must either be specified on the
+@command{gcc} command line as shared libraries (e.g. @samp{-lstreams -lxnet -lsocket}) or as static
+libraries (e.g. @samp{/@-usr/@-lib/@-libstreams.a /@-usr/@-lib/@-libxnet.a
+/@-usr/@-lib/@-libsocket.a}).
+
+If all shared libraries are linked, include the following options on the @command{gcc} command line:
+
+@multitable @columnfractions .30 .70
+@item @samp{-lstreams}
+@tab Link to the @file{/usr/lib/libstreams.so} shared library.
+@item @samp{-lxnet}
+@tab Link to the @file{/usr/lib/libxnet.so} shared library.
+@item @samp{-lsocket}
+@tab Link to the @file{/usr/lib/libsocket.so} shared library.
+@item @samp{-lLiS}
+@tab Link to the @file{/usr/lib/libLiS.so} shared library.
+@item @samp{-lpLiS}
+@tab Link to the @file{/usr/lib/libpLiS} shared library.
+@end multitable
+
+If all static libraries are linked, include the following options on the @command{gcc} command line:
+
+@multitable @columnfractions .30 .70
+@item @file{/usr/lib/libstreams.a}
+@tab Link with the @file{/usr/lib/libstreams.a} static library.
+@item @file{/usr/lib/libxnet.a}
+@tab Link with the @file{/usr/lib/libxnet.a} static library.
+@item @file{/usr/lib/libsocket.a}
+@tab Link with the @file{/usr/lib/libsocket.a} static library.
+@item @file{/usr/lib/libLiS.a}
+@tab Link with the @file{/usr/lib/libLiS.a} static library.
+@item @file{/usr/lib/libpLiS.a}
+@tab Link with the @file{/usr/lib/libpLiS.a} static library.
+@end multitable
+
+@node Kernel Module Development
+@subsection Kernel Modules
+
+Developing @dfn{STREAMS} kernel modules is similar to user space programs with regard to header
+files.  @samp{/usr/include/@var{name}} should be placed in the @command{gcc} command line.  The
+rules for compiling @cite{Linux} kernel modules should be followed.  In particular, several
+important intricacies should be considered:
+
+@itemize
+
+@item The @command{gcc} compiler used to compile the kernel modules must be the same version of
+compiler that was used to compile the kernel.
+
+@item The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel.
+
+@item The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.
+
+@item The @command{gcc} command line must include several important include files directly on the
+command line such as @samp{--include /@-lib/@-modules/@-`uname
+-r`/@-build/@-include/@-linux/@-autoconf.h} and maybe even @samp{--include /@-lib/@-modules/@-`uname
+-r`/@-build/@-include/@-linux/@-modversions.h}.
+
+@end itemize
+
+@node Manual Pages
+@subsection Manual Pages
+
+Sub-packages install a number of manual pages.  All sub-packages combined install over 1000 manual
+packages for use by developers and administrators.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Conformance
+@chapter Conformance
+@cindex conformance
+
+Each add-on package to the @value{PACKAGE_TITLE} has its own set of conformances to @emph{ipso
+facto} or @emph{standards} specifications.  In general, however, most of the add-on packages can
+only to either @emph{ipso facto} nor @emph{standards} specifications when used with @cite{Linux
+Fast-STREAMS}.
+
+@cite{LiS}, on the other hand, is so buggy and non-conformant to @cite{POSIX/SuSv3} specifications,
+that it is impossible to expect add-on packages built against @cite{LiS} to conform in many
+respects.  Do not use @cite{LiS}, use the superior @cite{Linux Fast-STREAMS} instead.
+
+@menu
+* STREAMS Compatibility::
+* Porting::
+@end menu
+
+@node STREAMS Compatibility
+@section STREAMS Compatibility
+@cindex compatibility
+
+@cite{@value{PACKAGE_TITLE}} provides some degree of compatibility with other @dfn{STREAMS}
+implementation as follows:
+
+@table @cite
+@item --- SVR 4.2 ES/MP
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{SVR 4.2 ES/MP}
+to ease portability and common comprehension,
+@pxref{SVR 4.2 Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- AIX 5L Version 5.1
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{AIX 5L Version 5.1}
+to ease portability and common comprehension,
+@pxref{AIX Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- HP-UX 11.0i v2
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{HP-UX 11.0i v2}
+to ease portability and common comprehension,
+@pxref{HP-UX Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- OSF/1 1.2/Digital UNIX/True 64
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{OSF/1 1.2/Digital UNIX}
+to ease portability and common comprehension,
+@pxref{OSF/1 Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- UnixWare 7.1.3 (OpenUnix 8)
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{UnixWare 7.1.3 (OpenUnix 8)}
+to ease portability and common comprehension,
+@pxref{UnixWare Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- Solaris 9/SunOS 5.9
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{Solaris 9/SunOS 5.9}
+to ease portability and common comprehension,
+@pxref{Solaris Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- SUPER-UX
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{SUPER-UX}
+to ease portability and common comprehension,
+@pxref{SUX Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- UXP/V
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{UXP/V}
+to ease portability and common comprehension,
+@pxref{UXP Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- LiS-2.16.18
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{LiS 2.16}
+to ease portability and common comprehension,
+@pxref{LiS Compatibility, , , SPG, STREAMS Programmer's Guide}.
+@end table
+
+For additional details,
+@pxref{Top, , About This Manual, SPG, STREAMS Programmer's Guide}.
+
+@node Porting
+@section Porting
+@cindex porting
+
+@table @cite
+@item --- SVR 4.2 ES/MP
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{SVR 4.2 ES/MP}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from SVR 4.2 MP, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- AIX 5L Version 5.1
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{AIX 5L Version 5.1}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from AIX 5L Version 5.1, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- HP-UX 11.0i v2
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{HP-UX 11.0i v2}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from HP-UX 11.0i v2, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- OSF/1 1.2/Digital UNIX/True 64
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{OSF/1 1.2/Digital UNIX/True 64}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from OSF/1 1.2/Digital UNIX, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- UnixWare 7.1.3 (OpenUnix 8)
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{UnixWare 7.1.3 (OpenUnix 8)}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from UnixWare 7.1.3 (OpenUnix 8), , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- Solaris 9/SunOS 5.9
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{Solaris 9/SunOS 5.9}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from Solaris 9/SunOS 5.9, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- SUPER-UX
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{SUPER-UX}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from SUPER-UX, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- UXP/V
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{UXP/V}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from UXP/V, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- LiS-2.16.18
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{LiS-2.16.18}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from Linux STREAMS (LiS) 2.16.18, , , porting, Linux Fast-STREAMS Porting Guide}.
+@end table
+
+For additional details,
+@pxref{Top, , About This Manual, porting, Linux Fast-STREAMS Porting Guide}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Releases
+@chapter Releases
+@cindex releases
+
+@include releases.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Installation
+@chapter Installation
+@cindex installation
+
+@include install.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Troubleshooting
+@chapter Troubleshooting
+@cindex troubleshooting
+
+@include texi/testsuite.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Copying
+@appendix Copying
+
+@menu
+* GNU General Public License::
+@end menu
+
+@include texi/gpl.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Documentation License
+@appendix Documentation License
+
+@menu
+* GNU Free Documentation License::
+@end menu
+
+@include texi/fdl.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Indices
+@unnumbered Indices
+@menu
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+* Makefile Target Index::	Index of Makefile Targets
+* Manual Pages Index::		Index of Manual Pages
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Concept Index
+@unnumberedsec Index of Concepts
+@printindex cp
+
+@page
+@node Type Index
+@unnumberedsec Index of Data Types
+@printindex tp
+
+@page
+@node Function Index
+@unnumberedsec Index of Functions and Macros
+@printindex fn
+
+@page
+@node Variable Index
+@unnumberedsec Index of Variables and Constants
+@printindex vr
+
+@page
+@node File Index
+@unnumberedsec Index of Files and Programs
+@printindex pg
+
+@page
+@node Option Index
+@unnumberedsec Index of Configuration Options
+@printindex op
+
+@page
+@node Makefile Target Index
+@unnumberedsec Index of Makefile Targets
+@printindex mk
+
+@page
+@node Manual Pages Index
+@unnumberedsec Index of Manual Pages
+@printindex mp
+
+@c ----------------------------------------------------------------------------
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+

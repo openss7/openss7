@@ -1,0 +1,434 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: utilities.texi,v 1.1.2.1 2006/08/22 12:36:52 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/22 12:36:52 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@menu
+* strchg Utility::
+* strconf Utility::
+* strreset Utility::
+
+* autopush Utility::
+* fattach Utility::
+* fdetach Utility::
+* insf Utility::
+* scls Utility::
+* strace Utility::
+* strclean Utility::
+* streams_mknod Utility::
+* strerr Utility::
+* strinfo Utility::
+* strload Utility::
+* strsetup Utility::
+* strvf Utility::
+
+* perftest Utility::
+* perftestn Utility::
+
+* test-clone Utility::
+* test-connld Utility::
+* test-echo Utility::
+* test-fifo Utility::
+* test-log Utility::
+* test-loop Utility::
+* test-mux Utility::
+* test-nsdev Utility::
+* test-nuls Utility::
+* test-pipe Utility::
+* test-pipemod Utility::
+* test-sad Utility::
+* test-sc Utility::
+* test-streams Utility::
+@end menu
+
+@c ============================================================================
+
+@page
+@node strchg Utility
+@subsection strchg
+
+@subheading NAME
+@command{strchg} - changes @dfn{Stream} configuration
+
+@subheading SYNOPSIS
+@command{strchg} [@var{options}] @{@option{-h}|@option{--push}@} @var{module}[,@var{module} ...] @*
+@command{strchg} [@var{options}] @{@option{-p}|@option{--pop}@} [@{@option{-a}|@option{--all}@} | @{@option{-u}|@option{--upto}@} @var{module}] @*
+@command{strchg} [@var{options}] @{@option{-f}|@option{--file}@} @var{filename} @*
+@command{strchg} @{@option{-H}|@option{--help}@} @*
+@command{strchg} @{@option{-V}|@option{--version}@} @*
+@command{strchg} @{@option{-C}|@option{--copying}@} @*
+
+@subheading DESCRIPTION
+The @command{strchg} command is used to alter the configuration of the @dfn{Stream} associated with
+the caller's standard input.  The @command{strchg} command pushes modules on the @dfn{Stream}, pops
+modules off of the @dfn{Stream}, or both.  Only the root user or owner of the @dfn{STREAMS} device
+can alter the configuration of that @dfn{Stream}.  If another user attempts to alter the
+configuration, the @command{strchg} command will fail.
+
+@subheading OPTIONS
+@table @asis
+
+@item @option{-h}, @option{--push} @var{module}[,@var{module} ...]
+
+@item @option{-p}, @option{--pop}
+Pops a @var{module} off of a @dfn{Stream}.  Used along, the @option{-p} option pops the topmost
+@var{module} from the @dfn{Stream}.  May also be combined with the @option{-u} or @option{-a}
+options below.
+
+@table @asis
+@item @option{-a}, @option{--all}
+Pops all modules above the topmost driver off of a @dfn{Stream}.  The @option{-p} option must be
+used in front of the @option{-a} flag.
+
+@item @option{-u}, @option{--upto} @var{module}
+Pops all modules above the specified @var{module} off of a @dfn{Stream}.  The @option{-p} option
+must be used in front of the @option{-u} flag.
+
+@end table
+
+@item @option{-f}, @option{--file} @var{filename}
+Pushes and pops the necessary modules to conform the @dfn{Stream} to the configuration given in the
+file corresponding to the specified @var{filename}.
+
+@end table
+
+Only one of @option{-h}, @option{-p} or @option{-f} options may be specified.
+
+The following options are non-portable:
+
+@table @asis
+
+@item @option{-d}, @option{--debug} [@var{level}]
+Increases or sets to @var{level} the debug verbosity, typically for debugging purposes.
+
+@item @option{-v}, @option{--verbose} [@var{level}]
+Increases or sets to @var{level} the output verbosity, typically for diagnostic purposes.
+
+@item @option{-q}, @option{--quiet}
+Suppresses normal output.
+
+@item @option{-H}, @option{--help}
+When this option is encountered, @command{strchg} displays usage information on stdout and exits.
+
+@item @option{-V}, @option{--version}
+When this option is encountered, @command{strchg} displays version information on stdout and exits.
+
+@item @option{-C}, @option{--copying}
+When this option is encountered, @command{strchg} displays copyright and copying information on stdout
+and exits.
+
+@end table
+
+@subheading FILE FORMAT
+The @command{strchg} configuration file contains a list of modules representing the desired
+configuration of the @dfn{Stream}.  Each module must appear on a separate line, where the first name
+represents the topmost module and the last name represents the module that is closest to the driver.
+
+@subheading DIAGNOSTICS
+On successful completion, the @command{strchg} command returns a value of zero (0).  Otherwise, it
+returns a nonzero value and prints an error message indicating usage error, a bad module name, too
+many modules to push, failure of a @manpage{streamio(7)} operation on the @dfn{Stream}, or failure
+to open the file specified by the @var{filename} argument.
+
+@command{strchg} returns zero on success.  It prints an error mes­ sage and returns non-zero status for
+various error conditions, including usage error, bad module name, too many modules to push, failure
+of an @manpage{ioctl(2s)} on the @dfn{Stream}, or failure to open file from the @option{-f} option.
+
+@subheading NOTICES
+If modules are pushed in the wrong order, the @dfn{Stream} might not function as expected.
+
+If the caller is neither the owner of the @dfn{Stream} nor the superuser, the @command{strchg}
+command will fail.
+
+If modules are pushed in the wrong order, one could end up with a @dfn{Stream} that does not
+function as expected.  For @dfn{ttys}, if the line discipline modules is not pushed in the correct
+place, one could have a terminal that does not respond to any commands.
+
+@subheading FILES
+@table @file
+@item /usr/bin/strchg
+contains the @command{strchg} command.
+@end table
+
+@subheading SEE ALSO
+@manref{strconf(1)}, @manref{strreset(1)}.
+
+@subheading BUGS
+@command{strchg} has no known bugs.
+
+@subheading COMPATIBILITY
+SVR 4.2, AIX®, HP-UX®, OSF/1®, Solaris®, SUPER-UX®, UnixWare® and UXP/VP®, with the following
+portability considerations:
+
+@itemize --
+@item
+SVR 4.2 does not document long options.  The use of long options should be avoided by portable
+programs.
+
+@item
+Options --help and --version are provided for com­ patibility with GNU coding standards;
+--copying, --debug, --verbose and --quiet, OpenSS7 coding standards.
+@end itemize
+
+@subheading CONFORMANCE
+SVR 4.2;[1] AIX®, HP-UX®, OSF/1®, Solaris®, SUPER-UX®, UnixWare®, and UXP/VP®, documentation.
+
+@subheading HISTORY
+@command{strchg} first appeared in SVR 4[2].
+
+@subheading REFERENCES
+[1]
+SVR 4.2 CR, UNIX® System V Release 4.2 Command Reference Manual, 1992, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.
+
+[2]
+SVR 4, UNIX® System V Release 4 Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.
+
+Trademarks mentioned are the property of their owners.
+
+@c ============================================================================
+
+@page
+@node strconf Utility
+@subsection strconf
+
+@c ============================================================================
+
+@page
+@node strreset Utility
+@subsection strreset
+
+
+@c ============================================================================
+@c ============================================================================
+
+@page
+@node autopush Utility
+@subsection autopush
+
+@c ============================================================================
+
+@page
+@node fattach Utility
+@subsection fattach
+
+@c ============================================================================
+
+@page
+@node fdetach Utility
+@subsection fdetach
+
+@c ============================================================================
+
+@page
+@node insf Utility
+@subsection insf
+
+@c ============================================================================
+
+@page
+@node scls Utility
+@subsection scls
+
+@c ============================================================================
+
+@page
+@node strace Utility
+@subsection strace
+
+@c ============================================================================
+
+@page
+@node strclean Utility
+@subsection strclean
+
+@c ============================================================================
+
+@page
+@node streams_mknod Utility
+@subsection streams_mknod
+
+@c ============================================================================
+
+@page
+@node strerr Utility
+@subsection strerr
+
+@c ============================================================================
+
+@page
+@node strinfo Utility
+@subsection strinfo
+
+@c ============================================================================
+
+@page
+@node strload Utility
+@subsection strload
+
+@c ============================================================================
+
+@page
+@node strsetup Utility
+@subsection strsetup
+
+@c ============================================================================
+
+@page
+@node strvf Utility
+@subsection strvf
+
+
+@c ============================================================================
+@c ============================================================================
+
+@page
+@node perftest Utility
+@subsection perftest
+
+@c ============================================================================
+
+@page
+@node perftestn Utility
+@subsection perftestn
+
+
+@c ============================================================================
+@c ============================================================================
+
+@page
+@node test-clone Utility
+@subsection test-clone
+
+@c ============================================================================
+
+@page
+@node test-connld Utility
+@subsection test-connld
+
+@c ============================================================================
+
+@page
+@node test-echo Utility
+@subsection test-echo
+
+@c ============================================================================
+
+@page
+@node test-fifo Utility
+@subsection test-fifo
+
+@c ============================================================================
+
+@page
+@node test-log Utility
+@subsection test-log
+
+@c ============================================================================
+
+@page
+@node test-loop Utility
+@subsection test-loop
+
+@c ============================================================================
+
+@page
+@node test-mux Utility
+@subsection test-mux
+
+@c ============================================================================
+
+@page
+@node test-nsdev Utility
+@subsection test-nsdev
+
+@c ============================================================================
+
+@page
+@node test-nuls Utility
+@subsection test-nuls
+
+@c ============================================================================
+
+@page
+@node test-pipe Utility
+@subsection test-pipe
+
+@c ============================================================================
+
+@page
+@node test-pipemod Utility
+@subsection test-pipemod
+
+@c ============================================================================
+
+@page
+@node test-sad Utility
+@subsection test-sad
+
+@c ============================================================================
+
+@page
+@node test-sc Utility
+@subsection test-sc
+
+@c ============================================================================
+
+@page
+@node test-streams Utility
+@subsection test-streams
+
+@c ============================================================================

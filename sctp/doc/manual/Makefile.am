@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/29 11:27:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/08/22 12:31:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/29 11:27:45 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 12:31:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.12  2006/08/22 12:31:41  brian
+# - changes to documentation, rationalised sctp to strsctp driver
+#
 # Revision 0.9.2.11  2006/03/29 11:27:45  brian
 # - corrections for rerelease, see ChangeLog
 #
@@ -85,7 +88,9 @@ EXTRA_info_TEXINFOS	= \
 			  texi/install.texi \
 			  texi/lesser.texi \
 			  texi/testsuite.texi \
-			  $(top_builddir)/scripts/texi/funding.texi
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/compat.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
 
 ## DEVELOPMENT
 endif

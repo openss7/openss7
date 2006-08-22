@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strsctp.texi,v 0.9.2.15 2006/03/22 10:02:06 brian Exp $
+% @(#) $Id: strsctp.texi,v 0.9.2.16 2006/08/22 12:57:30 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/03/22 10:02:06 $ by $Author: brian $
+% Last Modified $Date: 2006/08/22 12:57:30 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -197,6 +197,11 @@ another language, under the same conditions as for modified versions.
 @c @syncodeindex op cp
 @c @syncodeindex tr cp
 @c @syncodeindex cm cp
+
+@c Manpage index
+@defcodeindex mp
+
+@include texi/macros.texi
 
 @ifnottex
 @node Top
@@ -357,9 +362,9 @@ future development schedule of the @value{PACKAGE_TITLE} package.
 Note that previous releases of the @samp{@value{PACKAGE_TARNAME}} package were intended to provide
 additional support to GCOM release of LiS and were released primarily in Tar Ball format.  As of
 @value{PACKAGE_TARNAME}-0.9.2-1 this is no longer the case.  @value{PACKAGE_TARNAME}-0.9.2-1 and
-subsequent releases are intended to be loaded on top of an OpenSS7 release of LiS or Linux
-Fast-STREAMS.  If you wish to use these packages over a GCOM release of LiS, you will now need to
-also download and install the @samp{strxns} package from Tar Ball.
+subsequent releases are intended to be loaded on top of an OpenSS7 release of Linux Fast-STREAMS.
+If you wish to use these packages over a GCOM release of LiS, you will now need to also download and
+install the @file{strcompat}, @file{strxns} and @file{strxnet} package from Tar Ball.
 
 This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
 General Public License}).
@@ -453,12 +458,35 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Drivers
 @cindex drivers
 
+The @samp{@value{PACKAGE_TARNAME}} package
+builds and installs the following @cite{STREAMS} drivers:
+
+@table @file
+@item streams-sctp
+@pgindex streams-sctp
+This is the primary @cite{STREAMS} psuedo-device driver that implements the Stream Control
+Tramission Protocol (SCTP) described in RFC 2960 and RFC 4460.
+@end table
+
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Modules
 @section Modules
 @cindex modules
+
+The @samp{@value{PACKAGE_TARNAME}} package
+builds and installs the following @cite{STREAMS} modules:
+
+@table @file
+@item streams-tpiperf
+@pgindex streams-tpiperf
+This @cite{STREAMS} module is primarily for performance testing of the TPI interface of the
+@file{streams-sctp} driver.@footnote{Because this modules does not depend upon SCTP and can be used
+for performance testing of any TPI driver, this module will later be moved into the @samp{strxnet}
+package and may no longer be present in the current version of @samp{@value{PACKAGE_TARNAME}}.}
+@end table
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -467,6 +495,82 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Utilities
 @cindex utilities
 
+The @samp{@value{PACKAGE_TARNAME}} package
+builds and installs the following utilities:
+
+@table @command
+@item @value{PACKAGE_TARNAME}_mknod
+This is a C-language program that can be used by startup scripts to create device nodes for the
+@samp{@value{PACKAGE_TARNAME}} package.  This utility is normally installed in the @file{/usr/sbin}
+directory.
+See @manref{@value{PACKAGE_TARNAME}_mknod(8)} for more information.
+@item @value{PACKAGE_TARNAME}
+This is a @cite{RedHat}-style System V init script that is installed and used to start and stop the
+@samp{@value{PACKAGE_TARNAME}} package.  Starting consists of creating SCTP device nodes using
+@command{@value{PACKAGE_TARNAME}_mknod} and installing the @file{streams-sctp} and
+@file{streams-tpiperf} modules in the running kernel.  This init script is normally installed in the
+@file{/etc/init.d} directory.
+@item @value{PACKAGE_TARNAME}.sh
+This is a @cite{Debian}-style System V init script that is installed and used to start and stop the
+@samp{@value{PACKAGE_TARNAME}} package in a similar fashion to the @command{@value{PACKAGE_TARNAME}}
+script, but in the @cite{Debian} style.  This init script is normally installed in the
+@file{/etc/rc.d/init.d} directory.
+@end table
+
+The @samp{@value{PACKAGE_TARNAME}} package
+builds and installs the following test programs:
+
+@table @command
+@item test-etsi_n
+@pgindex test-etsi_n
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+For more information on the @command{test-etsi_n} test program, see @manref{test-etsi_n(8)}.
+@item test-etsi_t
+@pgindex test-etsi_t
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+For more information on the @command{test-etsi_t} test program, see @manref{test-etsi_t(8)}.
+@item test-sctp
+@pgindex test-sctp
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+For more information on the @command{test-sctp} test program, see @manref{test-sctp(8)}.
+@item test-sctp_n
+@pgindex test-sctp_n
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+For more information on the @command{test-sctp_n} test program, see @manref{test-sctp_n(8)}.
+@item test-sctp_n2
+@pgindex test-sctp_n2
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+For more information on the @command{test-sctp_n2} test program, see @manref{test-sctp_n2(8)}.
+@item test-sctp_t
+@pgindex test-sctp_t
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+For more information on the @command{test-sctp_t} test program, see @manref{test-sctp_t(8)}.
+@item test-interop
+@pgindex test-interop
+@file{test-interop} is similar to @file{test-sctp_t}; however, the program has been modified to
+permit just the initiating or responding side of the test case to be executed so that it can be run
+against other implementations.  This test program was used in the 2006 SCTP Interop at the
+University of British Columbia in July/August 2006.  This program is provided for historical
+purposes.
+
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+For more information on the @command{test-interop} test program, see @manref{test-interop(8)}.
+@item testsuite
+@pgindex testsuite
+When executed, this @command{bash} script executes test cases from the above test programs to form a
+complete testsuite of the SCTP implementation.
+
+This test script normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+@item test-sctp_nc
+@pgindex test-sctp_nc
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+For more information on the @command{test-sctp_nc} test program, see @manref{test-sctp_nc(8)}.
+@item test-sctp_ns
+@pgindex test-sctp_ns
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+For more information on the @command{test-sctp_ns} test program, see @manref{test-sctp_ns(8)}.
+@end table
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -474,12 +578,161 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Development
 @cindex developing
 
+To assist in the development of user programs and @cite{STREAMS} driver or modules using the Stream
+Control Tramsmission Control (SCTP) protocol module, the following manual pages are provided:
+
+@table @manref
+@item npi_sctp(7)
+The @manref{npi_sctp(7)} manual page describes the differences between the generic Network
+Provider Interface (NPI) specification and the options and primitive formats specific to the Stream
+Control Transmission Protocol (SCTP).
+@item tpi_sctp(7)
+The @manref{tpi_sctp(7)} manual page describes the differences between the generic Transport
+Provider Interface (TPI) specification and the options and primitive formats specific to the Stream
+Control Transmission Protocol (SCTP).
+@item xti_sctp(3)
+The @manref{xti_sctp(3)} manual page describes the differences between the generic X/Open Transport
+Interface/Transport Layer Interface (XTI/TLI) interface and the options and formats specific to the
+Stream Control Transmission Protocol (SCTP).
+@item sctp(4)
+Provides an overview of the Streams Control Transmission Protocol (SCTP) driver.
+@item sctp_n(4)
+Provides an overview description of the Network Provider Interface (NPI) service interface to the
+Stream Control Transmission Protocol (SCTP) driver.
+@item sctp_t(4)
+Provides an overview description of the Transport Provider Interface (TPI) service interface to the
+Stream Control Transmission Protocol (SCTP) driver.
+@item strsctp_mknod(8)
+Provides a description of the @manref{strsctp_mknod(8)} command.
+@item test-sctp(8)
+Provides a description of the @manref{test-sctp(8)} test program.
+This manual pages documents all of the options a operation of the @command{test-sctp} program but
+does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
+the @samp{--list} option to @command{test-sctp}.  See the program source for detailed information on
+specific test cases.
+@item test-sctp_n(8)
+Provides a description of the @manref{test-sctp_n(8)} test program.
+This manual pages documents all of the options a operation of the @command{test-sctp_n} program but
+does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
+the @samp{--list} option to @command{test-sctp_n}.  See the program source for detailed information on
+specific test cases.
+@item test-sctp_nc(8)
+Provides a description of the @manref{test-sctp_nc(8)} test program.
+This manual pages documents all of the options a operation of the @command{test-sctp_nc} program but
+does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
+the @samp{--list} option to @command{test-sctp_nc}.  See the program source for detailed information on
+specific test cases.
+@item test-sctp_ns(8)
+Provides a description of the @manref{test-sctp_ns(8)} test program.
+This manual pages documents all of the options a operation of the @command{test-sctp_ns} program but
+does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
+the @samp{--list} option to @command{test-sctp_ns}.  See the program source for detailed information on
+specific test cases.
+@item test-sctp_t(8)
+Provides a description of the @manref{test-sctp_t(8)} test program.
+This manual pages documents all of the options a operation of the @command{test-sctp_t} program but
+does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
+the @samp{--list} option to @command{test-sctp_t}.  See the program source for detailed information on
+specific test cases.
+@item test-etsi_n(8)
+Provides a description of the @manref{test-etsi_n(8)} test program.
+This manual pages documents all of the options a operation of the @command{test-etsi_n} program but
+does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
+the @samp{--list} option to @command{test-etsi_n}.  See the program source for detailed information on
+specific test cases.
+@item test-etsi_t(8)
+Provides a description of the @manref{test-etsi_t(8)} test program.
+This manual pages documents all of the options a operation of the @command{test-etsi_t} program but
+does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
+the @samp{--list} option to @command{test-etsi_t}.  See the program source for detailed information on
+specific test cases.
+@end table
+
+To assist in the development of user programs and @cite{STREAMS} driver or modules using the Stream
+Control Tramsmission Control (SCTP) protocol module, the following header files are provided:
+
+@table @header
+@item sys/npi_sctp.h
+The @header{sys/npi_sctp.h} header file provides the Network Provider Interface (NPI) definitions for
+Stream Control Transmission Protocol (SCTP) that are common to the kernel and user space programs.
+Include this file in kernel or user space programs immediatetly after including @header{sys/npi.h}.
+
+This header file is normally installed in the @file{/usr/include/strsctp} directory, so remember to
+add @samp{-I/usr/include/strsctp} to your compile line.
+@item sys/tpi_sctp.h
+The @header{sys/npi_sctp.h} header file provides the Transport Provider Interface (TPI) definitions for
+Stream Control Transmission Protocol (SCTP) that are common to the kernel and user space programs.
+Include this file in kernel space programs immediately after including @header{sys/tihdr.h}, or user
+space programs immediatetly after including @header{sys/tiuser.h}.
+
+This header file is normally installed in the @file{/usr/include/strsctp} directory, so remember to
+add @samp{-I/usr/include/strsctp} to your compile line.
+@item sys/xti_sctp.h
+The @header{sys/xti_sctp.h} header file provides the X/Open Transport Interface/Transport Layer
+Interface (XTI/TLI) definitions for Stream Control Transmission Protocol (SCTP) that are common to
+the kernel and user space programs.  Include this file in kernel or user space programs immediately
+after including @header{xti.h} or @header{sys/xti.h}.
+
+This header file is normally installed in the @file{/usr/include/strsctp} directory, so remember to
+add @samp{-I/usr/include/strsctp} to your compile line.
+@end table
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Conformance
 @chapter Conformance
 @cindex conformance
+
+Although @cite{OpenSS7 Project} software is of high quality, and untested behaviour is often correct
+behaviour, the principle of the @cite{OpenSS7 Project} is to test all functional requirements
+against the behaviour of the package in a repeatable validation test suite that can be used to
+perform regression, target architecture validation and trouble shooting, (@pxref{Maturity}, and
+@pxref{Test Suites}).
+
+@menu
+* NPI Interface Conformance::	    Conformance to the NPI.
+* TPI Interface Conformance::	    Conformance to the TPI.
+@end menu
+
+@node NPI Interface Conformance
+@section NPI Interface Conformance
+@cindex NPI interface conformance
+
+The Stream Control Transmission Protocol (SCTP) driver conforms to the @cite{Network Provider
+Interface (NPI) Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original
+document is available from @uref{http://www.openss7.org/docs/npi.pdf, The OpenSS7
+Project Website}.
+A reprint of the document specifying this version of the protocol is available as part of the
+@samp{strxns} package available online in @uref{http://www.openss7.org/specs/npi.pdf,
+PDF format}, or also in simple @uref{http://www.openss7.org/specs/npi.html, HTML
+format}.
+
+@node TPI Interface Conformance
+@section TPI Interface Conformance
+@cindex TPI interface conformance
+
+The Stream Control Transmission Protocol (SCTP) driver conforms to the @cite{Transport Provider
+Interface (TPI) Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original
+document is available from @uref{http://www.openss7.org/docs/tpi.pdf, The OpenSS7
+Project Website}.
+A reprint of the document specifying this version of the protocol is available as part of the
+@samp{strxnet} package available online in @uref{http://www.openss7.org/specs/tpi.pdf,
+PDF format}, or also in simple @uref{http://www.openss7.org/specs/tpi.html, HTML
+format}.
+
+@node XTI Interface Conformance
+@section XTI Interface Conformance
+@cindex XTI interface conformance
+
+The Stream Control Transmission Protocol (SCTP) driver conforms to the @cite{X/Open Transport
+Interface/Transport Layer Interface (XTI/TLI) X/Open Networking Services (XNS) Revision 5.2} as
+released by @cite{The OpenGroup}.  A copy of the original document is available from
+@uref{http://www.opengroup.org/, The OpenGroup website}.
+Reprints of the document are not available from The OpenSS7 Project website due to copyright
+restrictions.  Similar information is available in the manual pages that accompany the
+@samp{strxnet} package.  These can be viewed online starting at
+@uref{http://www.openss7.org/man2html?3+xti, XTI/TLI manpage}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

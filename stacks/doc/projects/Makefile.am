@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/01 14:19:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/08/22 12:44:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/01 14:19:22 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 12:44:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.14  2006/08/22 12:44:10  brian
+# - documentation updates
+#
 # Revision 0.9.2.13  2006/05/01 14:19:22  brian
 # - updating LAB document
 #
@@ -81,6 +84,7 @@ info_TEXINFOS		+= lab.texi hlr.texi voip.texi
 
 EXTRA_info_TEXINFOS	= \
 			texi/args.texi \
+			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/fdl.texi
 
 if PKG_BUILD_INDEP

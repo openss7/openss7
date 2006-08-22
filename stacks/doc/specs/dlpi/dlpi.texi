@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: dlpi.texi,v 0.9.2.6 2006/01/11 22:03:15 brian Exp $
+% @(#) $Id: dlpi.texi,v 0.9.2.7 2006/08/22 12:44:14 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/01/11 22:03:15 $ by $Author: brian $
+% Last Modified $Date: 2006/08/22 12:44:14 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -361,85 +361,7 @@ obligation to provide any feature listed herein.
 @c syncodeindex tp cp
 @c syncodeindex vr cp
 
-@macro tabfig {image, number, caption}
-@iftex
-@cartouche
-@float Table,Table \number\
-@image{\image\}
-@caption{\caption\}
-@end float
-@end cartouche
-@end iftex
-@ifnottex
-@image{\image\} @anchor{Table \number\}@center @emph{Table \number\.@:  \caption\}
-@end ifnottex
-
-@end macro
-
-@macro tabfigsized {image, number, caption, size}
-@iftex
-@cartouche
-@float Table,Table \number\
-@image{\image\,\size\}
-@caption{\caption\}
-@end float
-@end cartouche
-@end iftex
-@ifnottex
-@image{\image\,\size\} @anchor{Table \number\}@center @emph{Table \number\.@:  \caption\}
-@end ifnottex
-
-@end macro
-
-@macro tabref {number}
-@iftex
-@emph{@ref{Table \number\}}
-@end iftex
-@ifnottex
-@emph{@ref{Table \number\}}
-@end ifnottex
-@end macro
-
-@macro figure {image, number, caption}
-@iftex
-@cartouche
-@float Figure,Figure \number\
-@image{\image\}
-@caption{\caption\}
-@end float
-@end cartouche
-@end iftex
-@ifnottex
-@image{\image\} @anchor{Figure \number\}@center @emph{Figure \number\.@:  \caption\}
-@set fignum \number\
-@end ifnottex
-
-@end macro
-
-@macro figuresized {image, number, caption, size}
-@iftex
-@cartouche
-@float Figure,Figure \number\
-@image{\image\,\size\}
-@caption{\caption\}
-@end float
-@end cartouche
-@end iftex
-@ifnottex
-@image{\image\,\size\} @anchor{Figure \number\}@center @emph{Figure \number\.@:  \caption\}
-@set fignum \number\
-@end ifnottex
-
-@end macro
-
-@macro figref {number}
-@iftex
-@emph{@ref{Figure \number\}}
-@end iftex
-@ifnottex
-@emph{@ref{Figure \number\}}
-@end ifnottex
-@end macro
+@include texi/macros.texi
 
 @ifnottex
 @node Top

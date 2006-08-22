@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS_FAQ.texi,v 0.9.2.2 2005/11/20 22:20:19 brian Exp $
+% @(#) $Id: STREAMS_FAQ.texi,v 0.9.2.3 2006/08/22 12:36:50 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/11/20 22:20:19 $ by $Author: brian $
+% Last Modified $Date: 2006/08/22 12:36:50 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -186,6 +186,8 @@ another language, under the same conditions as for modified versions.
 @syncodeindex tp cp
 @synindex mp cp
 
+@include texi/macros.texi
+
 @ifnottex
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
@@ -194,195 +196,6 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of @
 @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @end ifnottex
-
-@iftex
-
-@macro tabfig {image, number, caption}
-@cartouche
-@float Table,Table \number\
-@center @image{\image\}
-@caption{@emph{\caption\}}
-@end float
-@end cartouche
-@end macro
-
-@macro tabfigsized {image, number, caption, size}
-@cartouche
-@float Table,Table \number\
-@center @image{\image\,\size\}
-@caption{@emph{\caption\}}
-@end float
-@end cartouche
-@end macro
-
-@macro figure {image, number, caption}
-@cartouche
-@float Figure,Figure \number\
-@center @image{\image\}
-@caption{@emph{\caption\}}
-@end float
-@end cartouche
-@end macro
-
-@macro figuresized {image, number, caption, size}
-@cartouche
-@float Figure,Figure \number\
-@center @image{\image\,\size\}
-@caption{@emph{\caption\}}
-@end float
-@end cartouche
-@end macro
-
-@macro manref {name}
-@mpindex \name\
-@command{\name\}
-@end macro
-
-@macro mantype {name}
-@tindex \name\
-@code{\name\}
-@end macro
-
-@macro ioctlref {name}
-@findex \name\
-@code{\name\}
-@end macro
-
-@end iftex
-
-@ifnottex
-
-@macro tabfig {image, number, caption}
-@center @image{\image\}
-@anchor{Table \number\}
-@center @emph{Table \number\.@:  \caption\}
-@end macro
-
-@macro tabfigsized {image, number, caption, size}
-@center @image{\image\,\size\}
-@anchor{Table \number\}
-@center @emph{Table \number\.@:  \caption\}
-@end macro
-
-@macro figure {image, number, caption}
-@center @image{\image\}
-@anchor{Figure \number\}
-@center @emph{Figure \number\.@:  \caption\}
-@set fignum \number\
-@end macro
-
-@macro figuresized {image, number, caption, size}
-@center @image{\image\,\size\}
-@anchor{Figure \number\}
-@center @emph{Figure \number\.@:  \caption\}
-@set fignum \number\
-@end macro
-
-@ifhtml
-
-@macro manref {name}
-@mpindex \name\
-@code{@uref{/man2html?\name\,\name\}}
-@end macro
-
-@macro mantype {name}
-@tindex \name\
-@code{@uref{/man2html?\name\,\name\}}
-@end macro
-
-@macro ioctlref {name}
-@code{@uref{/man2html?2+\name\,\name\(2)} (see @uref{/man2html?7+streamio,streamio(7)})}
-@end macro
-
-@end ifhtml
-
-@ifnothtml
-
-@macro manref {name}
-@mpindex \name\
-@command{\name\} (@inforef{\name\, , *manpages*})
-@end macro
-
-@macro mantype {name}
-@tindex \name\
-@code{\name\} (@inforef{\name\, , *manpages*})
-@end macro
-
-@macro ioctlref {name}
-@code{\name\} (@inforef{\name\(2), , *manpages*}; @inforef{streamio(7), , *manpages*})
-@end macro
-
-@end ifnothtml
-
-@end ifnottex
-
-@macro tabref {number}
-@ref{Table \number\}
-@end macro
-
-@macro figref {number}
-@ref{Figure \number\}
-@end macro
-
-@macro manpage {name}
-@mpindex \name\
-@command{\name\}
-@end macro
-
-@macro type {name}
-@tindex \name\
-@code{\name\}
-@end macro
-
-@macro member {name}
-@vindex \name\
-@var{\name\}
-@end macro
-
-@macro constant {name}
-@vindex \name\
-@code{\name\}
-@end macro
-
-@macro signal {name}
-@vindex \name\
-@{@b{@code{\name\}}@}
-@end macro
-
-@macro errno {name}
-@vindex \name\
-(@b{@code{\name\}})
-@end macro
-
-@macro stropt {name}
-@vindex \name\
-@code{\name\}
-@end macro
-
-@macro streamio {name}
-@findex \name\
-@code{\name\}
-@end macro
-
-@macro termio {name}
-@findex \name\
-@code{\name\}
-@end macro
-
-@macro sockio {name}
-@findex \name\
-@code{\name\}
-@end macro
-
-@macro msg {name}
-@vindex \name\
-@code{\name\}
-@end macro
-
-@macro header {name}
-@pindex \name\
-@file{\name\}
-@end macro
 
 @menu
 * Acknowledgements::
@@ -513,6 +326,9 @@ package.
 @smallexample
 
 $Log: STREAMS_FAQ.texi,v $
+Revision 0.9.2.3  2006/08/22 12:36:50  brian
+- udpates to documentation, tweaks to Stream head
+
 Revision 0.9.2.2  2005/11/20 22:20:19  brian
 - still working up documentation
 
@@ -674,7 +490,7 @@ bugs and races that make its production use questionable.@footnote{One of the ma
 is rather obfuscated and difficult to maintain or repair.}
 
 Versions of @cite{LiS} are available that supports 2.2, 2.4 and 2.6 @b{Linux} kernels, however,
-recevent releases only support 2.4 and 2.6 kernels.
+recent releases only support 2.4 and 2.6 kernels.
 
 @subsection Linux Fast-STREAMS (LfS)
 @cindex Linux Fast-STREAMS (LfS)

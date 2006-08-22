@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: tpi.texi,v 0.9.2.10 2006/01/02 11:59:40 brian Exp $
+% @(#) $Id: tpi.texi,v 0.9.2.11 2006/08/22 12:44:21 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/01/02 11:59:40 $ by $Author: brian $
+% Last Modified $Date: 2006/08/22 12:44:21 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -227,6 +227,9 @@ countries.
 @syncodeindex pv cp
 @syncodeindex tp cp
 @syncodeindex vr cp
+
+@defcodeindex mp
+@include texi/macros.texi
 
 @ifnottex
 @node Top

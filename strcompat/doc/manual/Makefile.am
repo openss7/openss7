@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/20 13:50:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/08/22 12:57:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 13:50:32 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 12:57:09 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2006/08/22 12:57:09  brian
+# - updated documentation
+#
 # Revision 0.9.2.7  2006/03/20 13:50:32  brian
 # - get automake to run clean
 #
@@ -81,7 +84,9 @@ EXTRA_info_TEXINFOS	= \
 			  texi/install.texi \
 			  texi/lesser.texi \
 			  texi/testsuite.texi \
-			  $(top_builddir)/scripts/texi/funding.texi
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/compat.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
 
 ## DEVELOPMENT
 endif

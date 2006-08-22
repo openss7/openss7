@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/04/08 03:39:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/08/22 12:57:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/04/08 03:39:15 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 12:57:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,7 +70,9 @@ EXTRA_info_TEXINFOS	= \
 			  texi/install.texi \
 			  texi/testsuite.texi \
 			  texi/lesser.texi \
-			  $(top_builddir)/scripts/texi/funding.texi
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/compat.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
 
 ## DEVELOPMENT
 endif
@@ -80,6 +82,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/08/22 12:57:27  brian
+# - updated documentation
+#
 # Revision 0.9.2.2  2006/04/08 03:39:15  brian
 # - working up striso package
 #

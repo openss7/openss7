@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/07/11 01:57:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/08/22 13:02:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/11 01:57:54 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 13:02:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.22  2006/08/22 13:02:54  brian
+# - doc directory addition
+#
 # Revision 0.9.2.21  2006/07/11 01:57:54  brian
 # - nexusware build fixes
 #
@@ -87,6 +90,10 @@ all-distcheck: ALL_EXPORT_OPTS=\
 	master_builddir="$(master_builddir)"
 
 SUBDIRS	= @subdirs@
+
+if DEVELOPMENT
+SUBDIRS += doc
+endif
 
 dist_noinst_SCRIPTS		+= scripts/cflagcheck $(top_srcdir)/scripts/modpost.sh
 EXTRA_SCRIPTS			+= scripts/cflagcheck

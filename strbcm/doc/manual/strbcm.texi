@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strbcm.texi,v 0.9.2.3 2006/03/22 10:02:01 brian Exp $
+% @(#) $Id: strbcm.texi,v 0.9.2.4 2006/08/22 12:57:06 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/03/22 10:02:01 $ by $Author: brian $
+% Last Modified $Date: 2006/08/22 12:57:06 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -195,6 +195,9 @@ another language, under the same conditions as for modified versions.
 @c @syncodeindex op cp
 @c @syncodeindex tr cp
 @c @syncodeindex cm cp
+
+@defcodeindex mp
+@include texi/macros.texi
 
 @ifnottex
 @node Top

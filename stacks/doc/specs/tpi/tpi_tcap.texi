@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tpi_tcap.texi,v 0.9.2.6 2005/05/14 08:26:10 brian Exp $
+% @(#) $Id: tpi_tcap.texi,v 0.9.2.7 2006/08/22 12:44:21 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/05/14 08:26:10 $ by $Author: brian $
+% Last Modified $Date: 2006/08/22 12:44:21 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -183,6 +183,9 @@ or the performance or implementation of the contents thereof.}
 @syncodeindex pv cp
 @syncodeindex tp cp
 @syncodeindex vr cp
+
+@defcodeindex mp
+@include texi/macros.texi
 
 @ifnottex
 @node Top

@@ -1,0 +1,861 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: modules.texi,v 1.1.2.1 2006/08/22 12:36:52 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/22 12:36:52 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@menu
+* pipemod Module::
+* connld Module::
+* sc Module::
+* bufmod Module::
+* nullmod Module::
+* testmod Module::
+@end menu
+
+@c ============================================================================
+
+@node pipemod Module
+@subsection pipemod
+
+@subheading Name
+@command{pipemod} -- @dfn{STREAMS}-based pipe module
+
+@subheading Synopsis
+@example
+int pfds[2];
+
+int pipe(pfds);
+
+int ioctl(pfds[0], I_PUSH, "pipemod");
+@end example
+
+@subheading Description
+@command{pipemod} is a @dfn{STREAMS} module that is pushed over one end of a @dfn{STREAMS}-based
+bidirectional
+@manpage{pipe(4)} to reverse the sense of the
+@manpage{M_FLUSH(9)} command.  (See the
+@ioctlref{I_FLUSH} command to
+@manpage{ioctl(2s)} as described in
+@manpage{streamio(7)}).
+
+@dfn{STREAMS}-based pipes have a twist in the @dfn{Stream} at their midpoints.  At their midpoints,
+the read-side @dfn{Stream} becomes the write-side @dfn{Stream} and visa versa.  As an M_FLUSH(9)
+message traverses the twist, the sense of read-side and write-side must be reversed within the
+message (as indicated by the @var{FLUSHW} and @var{FLUSHR} flags).
+
+The reversal of flush flag sense across the twist is not so problematic for the pipe ends
+(@dfn{Stream heads}), as described under "USAGE," below; however, when modules are pushed on either
+pipe end, all
+@manpage{M_FLUSH(9)} messages received on the module read-queue will have a flag
+reversal, causing the module to flush the wrong side of the @dfn{Stream} if only @var{FLUSHR} or
+only @var{FLUSHW} are specified.
+
+@command{pipemod} corrects this problem for pushed modules by swapping the read and write side flush
+flags across the module.  @command{pipemod} should be pushed over one end of the pipe before any
+other modules are pushed so that the reversal is performed accross the twist at the midpoint in a
+@dfn{STREAMS}-based
+@manpage{pipe(4)}.
+
+@subheading Usage
+@command{pipemod} should be pushed over one end of a newly created @dfn{STREAMS}-based
+@manpage{pipe(4)}, before any other modules are pushed on either end of the pipe.  This ensures that
+@command{pipemod} sits at the midpoint of the pipe, the necessary position for reversing the sense
+of the
+@manpage{M_FLUSH(9)} message flags.
+
+On a bare @dfn{STREAMS}-based
+@manpage{pipe(4)}, with no modules pushed, issuing the
+@ioctlref{I_FLUSH} command to
+@manpage{ioctl(2s)} with the @var{FLUSHR} flag will flush the
+read-side queues at both @dfn{Stream heads} (pipe ends); @var{FLUSHW}, the write-side queues.
+Because the @dfn{Stream head} does not queue on the write-side queue, @var{FLUSHR} has the same
+effect as @var{FLUSHRW}, and @var{FLUSHW} has no effect.  When @command{pipemod} is pushed on a bare
+pipe, @var{FLUSHR} flushes only the near read-side queue and @var{FLUSHW} flushes only the far
+read-side queue.  Due to this difference in the @dfn{Stream head} flushing behaviour when
+@command{pipemod} is pushed or not, it is good practice to always flush pipes with @var{FLUSHRW}.
+
+@subheading Notices
+It is not necessary to use @command{pipemod} if all flushes flush both read and write queues at the
+same time, or if the @ioctlref{I_FLUSH} command is never issued on the pipe for one side of the
+@dfn{Stream}, or the
+@manpage{M_FLUSH(9)} command is never send by a pushed module for one side of
+the @dfn{Stream}.
+
+Note that the @dfn{Stream head} normally flushes the @dfn{Stream} on final close of the
+@dfn{Stream}.  This flush is performed on both the read and write side of the @dfn{Stream} at the
+same time, so the @dfn{Stream head} does not require @command{pipemod}.
+
+Note that proper canonical
+@manpage{M_FLUSH(9)} processing must be performed by all modules and
+drivers.  See @manref{M_FLUSH(9)} for details.
+
+@subheading Examples
+Following is an example of the @code{s_pipe()} function which generates a @dfn{STREAMS}-based
+software pipe and pushes the @command{pipemod} module on one end:
+@cartouche
+@float Example,pipemod:ex0
+@caption{@emph{Pushing @command{pipemod}}}
+@example
+int s_pipe(int fds[2])
+@{
+    int err;
+
+    if ((err = pipe(fds)) != 0)
+        return (err);
+    if ((err = ioctl(fds[0], I_PUSH, "pipemod")) < 0) @{
+        close(fds[0]);
+        close(fds[1]);
+        return (err);
+        @}
+    return (0);
+@}
+@end example
+@end float
+@end cartouche
+
+@subheading Modules
+@command{pipemod} is a @dfn{STREAMS} module named "pipemod".
+
+@subheading See Also
+@manref{pipe(2s)}, @manref{spx(4)}, @manref{pipe(4)}, @manref{I_FLUSH(7)}, @manref{M_FLUSH(9)},
+@manref{ioctl(2s)}, @manref{streamio(7)}.
+
+@subheading Bugs
+@command{pipemod} has no known bugs.
+
+@subheading Compatibility
+@command{pipemod} is compatible with @cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX(R) System V
+Release 4.2 Programmer's Manual, 1992, (Englewood Cliffs, New Jersey), AT&T UNIX System
+Laboratories, Inc., Prentice Hall.}} and implementations based on @cite{SVR 4.2}, including
+@cite{AIX(R)}, @cite{HP-UX(R)}, @cite{IRIX(R)}, @cite{LiS}, @cite{MacOT(R)}, @cite{OSF/1(R)},
+@cite{Solaris(R)}, @cite{SUPER-UX(R)}, @cite{UnixWare(R)}, @cite{UXP/V(R)}, with the following
+compatibility considerations:
+
+@itemize --
+@item
+Not all implementations of @cite{SVR 4.2} @dfn{STREAMS} support @dfn{STREAMS}-based pipes.  Those
+that do, provide the @command{pipemod} module.
+@end itemize
+
+See
+@manpage{STREAMS(9)} for additional compatibility information.
+
+@subheading Conformance
+@cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+@cite{SVID},@footnote{@cite{SVID, System V, Interface Definition, No. Fourth Edition.}}
+@cite{XID},@footnote{@cite{XBD Issue 5, X/Open System Interface Definitions, Open Group, Open Group
+Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv2},@footnote{@cite{SUS
+Version 2, Single UNIX Specification, Open Group, Open Group Publication.
+<@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv3}.@footnote{@cite{SUS Version 3, Single
+UNIX Specification, Open Group, Open Group Publication.
+<@url{http://www.opengroup.org/onlinepubs/}>}} Conformance is verified using the
+@manpage{test-pipemod(8)} verification test suite.
+
+@subheading History
+@command{pipemod} first appeared in @cite{SVR 4}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4
+Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
+Prentice Hall.}}
+
+@c ============================================================================
+
+@page
+@node connld Module
+@subsection connld
+
+@subheading Name
+@command{connld} -- incomplete man page
+
+@subheading Synopsis
+@example
+int pfds[2];
+
+int s_pipe(pfds);
+
+int ioctl(pfds[0], I_PUSH, "connld");
+
+int fattach(pfds[0], "/tmp/server");
+
+int ioctl(pfds[1], I_RECVFD, struct strfdinsert *fdi);
+@end example
+
+@subheading Description
+@command{connld} is a @dfn{STREAMS} module that can be pushed over a @dfn{STREAMS}-based
+bi-drectional software pipe (see
+@manpage{spx(4)}) to provide automatic generation of new
+@dfn{STREAMS}-based bi-drectional software pipes between a client and server process.
+
+When
+@manpage{open(2s)} is called on the end of a pipe upon which @command{connld} has been pushed
+(see
+@manpage{streamio(7)}) a new software pipe is created. The file descriptor for the far end of
+the newly created pipe is sent to the other end of the existing pipe in the same fashion as an
+@ioctlref{I_SENDFD} IO control (see
+@manpage{streamio(7)}) and can be received at the other end of
+the existing pipe with @ioctlref{I_RECVFD}.  The file descriptor returned by the
+@manpage{open(2s)}
+call will be the near end of the newly created pipe.
+
+@subheading Usage
+The normal usage of @command{connld} is as follows:
+
+@enumerate
+
+@item
+A server process creates a software pipe using
+@manpage{pipe(2s)} or
+@manpage{spx(4)}.
+
+@item
+The server process pushes the @command{connld} module on the client end of the pipe using the
+@ioctlref{I_PUSH} command of
+@manpage{streamio(7)}.
+@item
+The server process names the client end of the pipe using
+@manpage{fattach(3)}.
+
+@item
+The server process uses
+@manpage{poll(2s)} to listen for received file descriptors on the server end
+of the pipe.
+
+@item
+When a client process performs an
+@manpage{open(2s)} on the file to which the client end of the pipe
+has been named with
+@manpage{fattach(3)}, @command{connld} creates a new pipe, sends the server side
+file descriptor to the server with the @ioctlref{I_SENDFD} command of
+@manpage{streamio(7)} and
+returns the file descriptor of the client end of the new pipe in return to the
+@manpage{open(2s)}
+call.
+
+@item
+The server receives the file descriptor with the @ioctlref{I_RECVFD} command of
+@manpage{streamio(7)} resulting in a unique per-client bi-directional @dfn{STREAMS}-based pipe for
+each connecting client.
+
+@end enumerate
+
+@subheading Examples
+A description and a client-server example for the @command{connld} module appears in @cite{Advanced
+Programming in the UNIX(R) Environment}.@footnote{@cite{Advanced Programming in the UNIX(R)
+Environment, No. 15th edition, December 1997, (Reading, Massachusetts), W. R. Stevens, Addison
+Wesley. [ISBN 0-201-56317-7] 498.}}
+
+@subheading modules
+@command{connld} is a @dfn{STREAMS} module named "connld".
+
+@subheading See Also
+@manref{spx(4))}, @manref{open(2s)}, @manref{streamio(7)}, @manref{fattach(3)}, @manref{poll(2s)}.
+
+@subheading Bugs
+@command{connld} has no known bugs.
+
+@subheading Compatibility
+@command{connld} is compatible with @cite{Solaris(R)}, @cite{UnixWare(R)}
+@cite{SVR4.2}@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} and
+@cite{LiS}.@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
+OpenSS7 Corporation. <@url{http://www.openss7.org/}>}}
+
+@subheading Conformance
+@cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+@cite{SVID},@footnote{@cite{SVID, System V, Interface Definition, No. Fourth Edition.}}
+@cite{XID},@footnote{@cite{XBD Issue 5, X/Open System Interface Definitions, Open Group, Open Group
+Publication. <@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv2},@footnote{@cite{SUS Version
+2, Single UNIX Specification, Open Group, Open Group Publication.
+<@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv3}.@footnote{@cite{SVR 4, UNIX(R) System V
+Release 4 Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories,
+Inc., Prentice Hall.}} Conformance is verified using the test-connld(8) verification test suite.
+
+@subheading History
+@command{connld} first appeared in @cite{SVR 4}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4
+Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
+Prentice Hall.}}
+
+@c ============================================================================
+
+@page
+@node sc Module
+@subsection sc
+
+@subheading Name
+@command{sc} -- @dfn{STREAMS} configuration module
+
+@subheading Synopsis
+@example
+#include <sys/stropts.h>
+#include <sys/sc.h>
+
+t = open(/dev/nuls, 0);
+
+ioctl(t, I_PUSH, "sc");
+@end example
+
+@subheading Description
+@command{sc} is a @dfn{STREAMS} configuration module for @cite{@value{PACKAGE_TITLE}}. It interprets
+a set of @command{sc}
+@manpage{ioctl(2s)} commands and provides information about the @dfn{STREAMS}
+configuration. @command{sc} does not interpret any
+@manpage{M_DATA(9)},
+@manpage{M_PROTO(9)} or
+@manpage{M_PCPROTO(9)} messages either from above or below the module. @command{sc} can be pushed on
+the the null @dfn{Stream}
+@manpage{nuls(4)} or any other suitable @dfn{Stream} available to the
+caller (e.g.
+@manpage{sad(4)}).
+
+@subheading Usage
+The @command{sc} module is not intended to be used directly by application program developers.  It
+is used by the
+@manpage{scls(8)} utility an other utilities needing to enquire about the
+configuration of @cite{@value{PACKAGE_TITLE}}.
+
+@subheading Ioctls
+This subsection details the
+@manpage{ioctl(2s)} commands that are made available by pushing the
+@command{sc} module. For general information on input-output controls for @dfn{STREAMS} drivers,
+see
+@manpage{streamio(7)}.
+
+@subsubheading SC_IOC_LIST
+@var{arg} is a pointer to a @var{sc_list} structure in the user's address space.
+
+The sc_list structure contains the following members:
+
+@example
+struct sc_list @{
+  int sc_nmods;
+  struct sc_mlist *sc_mlist;
+@};
+@end example
+
+@vtable @var
+@item sc_nmods
+On call specifies the number of @var{sc_mlist} structures that a provided in the caller's buffer
+pointed to by @var{sc_mlist}. On return, specifies the number of @var{sc_mlist} structures that are
+available to be written to the caller's buffer pointed to by @var{sc_mlist}, regardless of the space
+provided by the caller.
+
+@item @var{sc_mlist}
+Provides a pointer to a user buffer that contains at least @var{sc_nmods} number of @var{sc_mlist}
+structures in an array. The module will returns nor more than the number of modules available, or
+the number of modules requested, whichever is less. However, @var{sc_nmods} will always return the
+number of modules available.
+
+By calling with a @var{sc_nmods} of zero and a @var{sc_mlist} of @samp{NULL}, the caller can
+determine the number of modules that are available to be returned in @var{sc_mlist} so that the
+buffer may be appropriately sized for a subsequent call.
+
+The @var{sc_mlist} structure contains the following members:
+@example
+struct sc_mlist @{
+  int major;
+  struct module_info mi[4];
+  struct module_stat ms[4];
+@};
+@end example
+
+@vtable @var
+@item major
+Specifies the major device number for the driver whose information is contained in this entry.
+
+@item mi
+Contains the @mantype{module_info(9)} structures associated with the driver with the major device
+number specified; or with the module if the major device number is zero. The four @var{mi}
+structures correspond to those associated with the @member{qi_minfo} field of the
+@member{st_rdinit}, @member{st_wrinit}, @member{st_muxrinit} and @member{st_muxwinit}
+@mantype{qinit(9)} structures referenced by the driver or module's @mantype{streamtab(9)} structure.
+For details of the @mantype{module_info(9)} structure, see
+@manpage{module_info(9)}.
+
+@item ms
+Contains the
+@manpage{module_stats(9)} structures associated with the driver with the major device
+number specified; or with the module if the major device number is zero. The four @var{ms}
+structures correspond to those associated with the @member{qi_mstat} field of the
+@member{st_rdinit}, @member{st_wrinit}, @member{st_muxrinit} and @member{st_muxwinit}
+@mantype{qinit(9)} structures referenced by the driver or module's @mantype{streamtab(9)} structure.
+For details of the
+@manpage{module_stat} structure, see
+@manpage{module_stat(9)}.
+
+@end vtable
+
+@end vtable
+
+@subheading Notices
+Note that the @command{sc} module is not yet capable of copying and providing access to the private
+statistics area indicated by the ms_xprt and ms_xsize members of the
+@manpage{module_stat(9)}
+structure. This is an unnecessary limitation. At some point it would make sense to add a
+@var{SC_IOC_STATS} command that would retrieve both the
+@manpage{module_stat(9)} structure and the
+private statistics for a single module or driver.
+
+@subheading Examples
+See the source code for
+@manpage{scls(8)}.
+
+@subheading Modules
+@command{sc} is a @dfn{STREAMS} module named "sc".
+
+@subheading See Also
+@manref{ioctl(2s)}, @manref{nuls(4)}, @manref{sad(4))}, @manref{scls(8)}, @manref{streamio(7)},
+@manref{autopush(8)}, @manref{scls(8)}, @manref{streamtab(9)}, @manref{module_info(9)},
+@manref{module_stat(9)}.
+
+@subheading Bugs
+The @command{sc} module has no known bugs.
+
+@subheading Compatibility
+Many implementations of @dfn{STREAMS} have some mechanism for augmenting the functionality of the
+@manpage{sad(4)} driver. Some implementations, such as @cite{AIX(R)},@footnote{@cite{AIX(R) 5L
+Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder, Colorado), Internatonal Business
+Machines Corp., IBM. <@url{http://publibn.boulder.ibm.com/}>}}
+@cite{HP-UX(R)},@footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo
+Alto, California), Hewlett-Packard Company, HP. <@url{http://docs.hp.com/}>}} provide an
+@command{sc} module for this purpose.
+
+@itemize --
+@item
+@cite{AIX(R)}@footnote{@cite{AIX(R) 5L Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder,
+Colorado), Internatonal Business Machines Corp., IBM. <@url{http://publibn.boulder.ibm.com/}>}}
+provides an @command{sc} module for the purpose of allowing autopush(8) to use device names instead
+of major device numbers, and to support the scls(8) utility.
+
+@item
+@cite{AIX(R)}@footnote{@cite{AIX(R) 5L Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder,
+Colorado), Internatonal Business Machines Corp., IBM. <@url{http://publibn.boulder.ibm.com/}>}}
+requires the use of the @command{sc} modules with the nuls(4) driver.
+
+@item
+@cite{HP-UX(R)}@footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo
+Alto, California), Hewlett-Packard Company, HP. <@url{http://docs.hp.com/}>}} describes the
+@command{sc} module as a core @dfn{STREAMS} module used by
+@manpage{autopush(8)} and provides
+support for device names instead of device numbers, and providing supplemental functions for the
+@manpage{sad(4)} driver.
+
+@item
+@command{sc} can be pushed over any @dfn{Stream}, unlike the @cite{AIX(R)} or @cite{HP-UX(R)}
+documentation. The user must have sufficient privilege to push the @command{sc} module.
+
+@item
+Internals of the @command{sc} module is implementation dependent, not subject to standardization,
+and not documented. This manual page documents the @cite{@value{PACKAGE_TITLE}} implementation of
+the @command{sc} module. Compatibility with other implementations is not guaranteed.
+
+@end itemize
+
+@subheading Conformance
+None. (This manual page.) Conformance is verified using the
+@manpage{test-sc(8)} verification test
+suite.
+
+@subheading History
+An @command{sc} module for extending the capabilities of the
+@manpage{sad(4)} driver appear in
+@cite{AIX(R)}@footnote{@cite{AIX(R) 5L Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder,
+Colorado), Internatonal Business Machines Corp., IBM. <@url{http://publibn.boulder.ibm.com/}>}} and
+@cite{HP-UX(R)}@footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo
+Alto, California), Hewlett-Packard Company, HP. <@url{http://docs.hp.com/}>}} documentation.
+
+@c ============================================================================
+
+@page
+@node bufmod Module
+@subsection bufmod
+
+
+@subheading Name
+@command{bufmod} -- @dfn{STREAMS} null module
+
+@subheading Synopsis
+@example
+int fd;
+
+int open("/dev/nuls", 0);
+
+int ioctl(fd, I_PUSH, "bufmod");
+@end example
+
+@subheading Description
+@command{bufmod} is a @dfn{STREAMS} module that is pushed over any @dfn{Stream}, @dfn{STREAMS}-based
+pipe(4) or @dfn{STREAMS}-based fifo(4).
+
+Aside from being a @dfn{STREAMS} module, @command{bufmod} performs no actions other than to perform
+flow control and queueing of messages.  All messages passed from the @dfn{Stream head} toward the
+@command{bufmod} module are passed on downstream from the @command{bufmod} write-side put procedure
+(with
+@manpage{putnext(9)}) when flow control conditions are not in effect.  When flow controlled,
+messages are placed on the write-side queue to be scheduled from the module's service procedure.
+All messages received from the driver, are passed on upstream from the read-side put procedure, or
+scheduled for the read-side service procedure under flow control.
+
+@subheading Usage
+The primary purpose of @command{bufmod} is as a test module for use with the
+@manpage{test-streams(8)} conformance test program, and the
+@manpage{perftest(8)} performance
+benchmarking program.  The other purpose of @command{bufmod} is as an example skeleton for a
+@dfn{STREAMS} pushable module.
+
+@subheading Notices
+@command{bufmod} is implementation-specific to the @cite{@value{PACKAGE_TITLE}} package.
+
+@subheading Examples
+The source code for @command{bufmod} serves as an example skeleton for a @dfn{STREAMS} pushable
+module.
+
+@subheading Modules
+@command{bufmod} is a @dfn{STREAMS} module named "bufmod".
+
+@subheading See Also
+@manref{open(2s)}, @manref{ioctl(2s)}, @manref{streamio(7)}, @manref{putnext(9)}.
+
+@subheading Bugs
+@command{bufmod} has no known bugs.
+
+@subheading Compatibility
+@command{bufmod} is compatible with the null module described in the @cite{SVR 4.0}, @cite{STREAMS
+Programmer's Guide},@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide,
+1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section
+6.1.1.1, "Null Module Example".}} with the following portability considerations:
+
+@itemize --
+@item
+The null module example of @cite{SVR 4.0} does not queue messages and has no service procedure.  See
+also
+@manpage{nullmod(4)}.
+
+@item
+@command{bufmod} is specific to @cite{@value{PACKAGE_TITLE}}, and will not be used by portable
+@dfn{STREAMS} modules, drivers and applications programs.
+
+@item
+The @cite{SVR 4.0 SPG}@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide,
+1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section
+6.1.1.1, "Null Module Example".}} does not name this module.  The name @command{bufmod} was chosen
+for @cite{@value{PACKAGE_TITLE}}.
+
+@item
+@command{bufmod} is used as an example skeleton module and for use by the
+@manpage{test-streams(8)}
+conformance test program, and the
+@manpage{perftest(8)} performance benchmarking program.  It will
+not be used by portable @dfn{STREAMS} modules, drivers or applications.
+
+@end itemize
+
+See
+@manpage{STREAMS(9)} for additional compatibility information.
+
+@subheading Conformance
+@cite{SVR 4.0}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section
+6.1.1.1, "Null Module Example".}} Conformance is not verified.
+
+@subheading History
+@command{bufmod} first appeared in SVR 4.0.
+
+@ignore
+@subheading References
+@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood
+Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section 6.1.1.1, "Null
+Module Example".}}
+@end ignore
+
+
+@c ============================================================================
+
+@page
+@node nullmod Module
+@subsection nullmod
+
+@subheading Name
+@command{nullmod} -- @dfn{STREAMS} null module
+
+@subheading Synopsis
+@example
+int fd;
+
+int open("/dev/nuls", 0);
+
+int ioctl(fd, I_PUSH, "nullmod");
+@end example
+
+@subheading Description
+@command{nullmod} is a @dfn{STREAMS} module that is pushed over any @dfn{Stream},
+@dfn{STREAMS}-based
+@manpage{pipe(4)} or @dfn{STREAMS}-based
+@manpage{fifo(4)}.
+
+Aside from being a @dfn{STREAMS} module, @command{nullmod} performs no actions.  All messages passed
+from the @dfn{Stream head} toward the @command{nullmod} module are passed on downstream from the
+@command{nullmod} write-side put procedure (with
+@manpage{putnext(9)}); all messages received from
+the driver, are passed on upstream from the read-side put procedure.  The @command{nullmod} module
+has no write- or read-side service procedure.
+
+@subheading Usage
+The primary purpose of @command{nullmod} is as a test module for use with the
+@manpage{test-streams(8)} conformance test program.  The other purpose of @command{nullmod} is as an
+example skeleton for a @dfn{STREAMS} pushable module.
+
+@subheading Notices
+@command{nullmod} is implementation-specific to the @cite{@value{PACKAGE_TITLE}} package.
+
+@subheading Examples
+The source code for @command{nullmod} serves as an example skeleton for a @dfn{STREAMS} pushable
+module.
+
+@subheading Modules
+@command{nullmod} is a STREAMS module named "nullmod".
+
+@subheading See Also
+@manref{open(2s)}, @manref{ioctl(2s)}, @manref{streamio(7)}, @manref{putnext(9)}.
+
+@subheading Bugs
+@command{nullmod} has no known bugs.
+
+@subheading Compatibility
+@command{nullmod} is compatible with the null module described in the @cite{SVR 4.0, "STREAMS Programmer's
+Guide},@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section
+6.1.1.1, "Null Module Example".}} with the following portability considerations:
+
+@itemize --
+
+@item
+@command{nullmod} is specific to @cite{@value{PACKAGE_TITLE}}, and will not be used by portable
+@dfn{STREAMS} modules, drivers and applications programs.
+
+@item
+The @cite{SVR 4.0 SPG} does not name this module.  The name @command{nullmod} was chosen for
+@cite{@value{PACKAGE_TITLE}}.
+
+@item
+@command{nullmod} is used as an example skeleton module and for use by the
+@manpage{test-streams(8)}
+conformance test program.  It will not be used by portable @dfn{STREAMS} modules, drivers or
+applications.
+
+@end itemize
+
+See
+@manpage{STREAMS(9)} for additional compatibility information.
+
+@subheading Conformance
+SVR 4.0.@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section 6.1.1.1,
+"Null Module Example".}} Conformance is verified using the test-nullmod(8) verification test suite.
+
+@subheading History
+@command{nullmod} first appeared in SVR 4.0.
+
+@ignore
+@subheading References
+[1]
+@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section 6.1.1.1, "Null Module Example".}}
+@end ignore
+
+
+@c ============================================================================
+
+@page
+@node testmod Module
+@subsection testmod
+
+@subheading Name
+ @command{testmod} -- @dfn{STREAMS} test module
+
+@subheading Synopsis
+@example
+int fd;
+
+int open("/dev/nuls", 0);
+
+int ioctl(fd, I_PUSH, "testmod");
+@end example
+
+@subheading Description
+@command{testmod} is a @dfn{STREAMS} module that is pushed over any @dfn{Stream}, @dfn{STREAMS}-based
+@manpage{pipe(4)} or @dfn{STREAMS}-based
+@manpage{fifo(4)}.
+
+Aside from being a @dfn{STREAMS} module, @command{testmod} performs no actions on the data path.  All
+messages passed from the @dfn{Stream head} toward the @command{testmod} module are passed on downstream
+from the @command{testmod} write-side put procedure (with
+@manpage{putnext(9)}); all messaes received
+from the driver, are passed on upstream from the read-side put procedure.  The @command{testmod}
+module has no write- or read-side service procedure.
+
+@command{testmod} does, however, respond to a number of specialized input-output controls that are
+dedicated to performing functions in the kernel necessary for the execution of test cases on a
+@dfn{Stream}.  These input-output controls are described below:
+
+@subsubheading IOCTLS
+The following input-output control command can be executed on the file descriptor @var{fd} after the
+@command{testmod} module has been pushed:
+
+@vtable @var
+@item TM_IOC_HANGUP
+Send a
+@manpage{M_HANGUP(9)} message to the @dfn{Stream head}.
+
+This input-output control command takes no argument.  It is used primarily by
+@manpage{test-streams(8)} to test the reaction to system calls executed on a @dfn{Stream} that is
+hung up.
+
+@item TM_IOC_RDERR
+Send a two-byte
+@manpage{M_ERROR(9)} message to the @dfn{Stream head} with the read error set to
+@var{arg} and the write error set to @var{NOERROR}.
+
+This input-output control command takes a single argument that contains the error number to be
+placed in the read error byte of the
+@manpage{M_ERROR(9)} message.  It is used primarily by
+@manpage{test-streams(8)} to test the reaction to system calls executed on a @dfn{Stream} that has a
+read error.
+
+@item TM_IOC_WRERR
+Send a two-byte
+@manpage{M_ERROR(9)} message to the @dfn{Stream head} with the read error set to
+@var{NOERROR} and the write error set to @var{arg}.
+
+This input-output control command takes a single argument that contains the error number to
+be placed in the write error byte of the
+@manpage{M_ERROR(9)} message.  It is used primarily by
+@manpage{test-streams(8)} to test the reaction to system calls executed on a @dfn{Stream} that has a
+write error.
+
+@item TM_IOC_RWERR
+Send a one-byte
+@manpage{M_ERROR(9)} message to the @dfn{Stream head} with the error set to
+@var{arg}.
+
+This input-output control command takes a single argument that contains the error number to be
+placed in the
+@manpage{M_ERROR(9)} message.  It is used primarily by
+@manpage{test-streams(8)} to test
+the reaction to system calls executed on a @dfn{Stream} that has an error.
+
+@end vtable
+
+@subheading Usage
+The primary purpose of @command{testmod} is as a test module for use with the
+@manpage{test-streams(8)} conformance test program.  The other purpose of @command{testmod} is as an
+example of a @dfn{STREAMS} pushable module.
+
+@subheading Notices
+@command{testmod} is implementation-specific to the @cite{@value{PACKAGE_TITLE}} package.
+
+@subheading Examples
+The source code for @command{testmod} serves as an example for a @dfn{STREAMS} pushable module.
+
+@subheading Modules
+@command{testmod} is a @dfn{STREAMS} module named "testmod".
+
+@subheading See Also
+@dfn{open(2s)}, @dfn{ioctl(2s)}, @dfn{streamio(7)}, @dfn{putnext(9)}, @dfn{nullmod(4)}.
+
+@subheading Bugs
+@command{testmod} has no known bugs.
+
+@subheading Compatibility
+@command{testmod} is compatible with the null module described in the @cite{SVR 4.0, "STREAMS Programmer's
+Guide"},@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} with the
+following portability considerations:
+
+@itemize --
+@item
+@command{testmod} is specific to @cite{@value{PACKAGE_TITLE}}, and will not be used by portable
+@dfn{STREAMS} modules, drivers and applications programs.
+
+@item
+The @cite{SVR 4.0 SPG} does not name this module.  The name @command{testmod} was chosen for
+@cite{@value{PACKAGE_TITLE}}.  See also
+@manpage{nullmod(4)}.
+
+@item
+@command{testmod} is used as an example skeleton module and for use by the
+@manpage{test-streams(8)}
+conformance test program.  It will not be used by portable @dfn{STREAMS} module, drivers or
+applications.
+
+@end itemize
+
+See
+@manpage{STREAMS(9)} for additional compatiblity information.
+
+@subheading Conformance
+@cite{SVR 4.0}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+(Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+
+@subheading History
+@command{testmod} first appeared in SVR 4.0.
+
+@ignore
+@subheading References
+ [1]
+@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+@end ignore
+
+

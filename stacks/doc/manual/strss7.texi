@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strss7.texi,v 0.9.2.11 2006/03/22 10:02:00 brian Exp $
+% @(#) $Id: strss7.texi,v 0.9.2.12 2006/08/22 12:44:09 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/03/22 10:02:00 $ by $Author: brian $
+% Last Modified $Date: 2006/08/22 12:44:09 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -177,6 +177,9 @@ another language, under the same conditions as for modified versions.
 @everyheading @thistitle @| @| @thischaptername
 @everyfooting Version @value{PACKAGE_VERSION} @| @emph{Released under the GFDL} @| @thispage
 @end iftex
+
+@defcodeindex mp
+@include texi/macros.texi
 
 @ifnottex
 @node Top

@@ -1,12 +1,12 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.2 2006/08/16 07:36:30 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.3 2006/08/22 12:57:27 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
-@c Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
 @c
@@ -17,7 +17,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/16 07:36:30 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/22 12:57:27 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -106,11 +106,11 @@ Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
 (@samp{groff_ext}), as it contains the @command{refer} or @command{grefer} commands necessary for
 including references in the manual pages.}
 @item OpenSS7 Linux Fast-STREAMS
-(@url{http://www.openss7.org/tarballs/streams-0.7a.5.tar.bz2, streams-0.7a.5} or better)
+(@href{http://@-www.@-openss7.@-org/@-tarballs/@-streams-0.7a.5.@-tar.@-bz2, streams-0.7a.5} or better)
 @footnote{Although this an other OpenSS7 STREAMS packages will build and install with Linux STREAMS
 (LiS), @b{Linux STREAMS (LiS) is deprecated and cannot be supported because it is full of bugs!}}
 @item OpenSS7 STREAMS Compatibility Modules
-(@url{http://www.openss7.org/tarballs/strcompat-0.9.2.3.tar.bz2, strcompat-0.9.2.3} or better)
+(@href{http://@-www.@-openss7.@-org/@-tarballs/@-strcompat-0.9.2.3.@-tar.@-bz2, strcompat-0.9.2.3} or better)
 @end itemize
 
 If you need to rebuild the package from sources with modifications, you will need a larger GNU
@@ -135,103 +135,7 @@ This section discusses compatibility with major prerequisites.
 
 @c ----------------------------------------------------------------------------
 
-@node GNU/Linux Distributions
-@subsection GNU/Linux Distributions
-@cindex GNU/Linux Distributions
-
-@dfn{@value{PACKAGE_TITLE}} is compatible with the following @dfn{Linux}
-distributions:@footnote{Items marked as @samp{TBD} are scheduled to have support deprecated.  That
-is, in a future release, the distributions marked @samp{TBD} will not longer be validated before
-release.}
-
-@itemize @bullet
-@item CentOS Enterprise Linux 3.4 (centos34)
-@item CentOS Enterprise Linux 4.0 (centos4)
-@item Debian 3.0r2 Woody (deb3.0) -- TBD
-@item Debian 3.1r0a Sarge (deb3.1)
-@item Fedora Core 1 (FC1) -- TBD
-@item Fedora Core 2 (FC2) -- TBD
-@item Fedora Core 3 (FC3) -- TBD
-@item Fedora Core 4 (FC4)
-@item Fedora Core 5 (FC5)
-@item Gentoo 2006.1 (untested)
-@item Lineox 4.026 (LEL4) -- TBD
-@item Lineox 4.053 (LEL4)
-@item Mandrakelinux 9.2 (MDK92) -- TBD
-@item Mandrakelinux 10.0 (MDK100) -- TBD
-@item Mandrakelinux 10.1 (MDK101) -- TBD
-@item Mandriva Linux LE2005 (MDK102) -- TBD
-@item Mandriva Linux LE2006 (MDK103)
-@item Mandriva One (untested)
-@item Performance Technlogies @dfn{NexusWare24} -- TBD
-@item Performance Technologies NexusWare 8.0
-@item RedHat Linux 7.2 (RH7)
-@item RedHat Linux 7.3 (RH7)
-@item RedHat Linux 8.0 (RH8) -- TBD
-@item RedHat Linux 9 (RH9) -- TBD
-@item RedHat Enterprise Linux 3.0 (EL3)
-@item RedHat Enterprise Linux 4 (EL4)
-@item SuSE 8.0 Professional (SuSE8.0) -- TBD
-@item SuSE 9.1 Personal (SuSE9.1) -- TBD
-@item SuSE 9.2 Professional (SuSE9.2) -- TBD
-@item SuSE OpenSuSE (SuSEOSS)
-@item SuSE 10.0 (SuSE10.0)
-@item SuSE 10.1 (SuSE10.1)
-@item SLES 9 (SLES9)
-@item SLES 9 SP2 (SLES9)
-@item SLES 9 SP3 (SLES9)
-@item SLES 10 (SLES10)
-@item Ubuntu 5.10 (ubu5.10)
-@item Ubuntu 6.06 LTS (ubu6.06)
-@item WhiteBox Enterprise Linux 3.0 (WBEL3)
-@item WhiteBox Enterprise Linux 4 (WBEL4)
-@end itemize
-
-When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
-compatible with a  much broader array of distributions than those listed above.  These are the
-distributions against which the current maintainer creates and tests builds.
-
-@node Linux Kernel
-@subsection Kernel
-@cindex Kernel
-
-The @cite{@value{PACKAGE_TITLE}} package compiles as a @dfn{Linux} kernel module.  It is not
-necessary to patch the @dfn{Linux} kernel to build or use the package.@footnote{At a later date, it
-is possible to move this package into the kernel, however, with continued resistance to STREAMS from
-within the @dfn{Linux} developer community, this is currently unlikely.} Nor do you have to
-recompile your kernel to build or use the package.  OpenSS7 packages use @command{autoconf} scripts
-to adapt the package source to your existing kernel.  The package builds and runs nicely against
-production kernels from the distributions listed above.  Rather than relying on kernel versions, the
-@command{autoconf} scripts interrogate the kernel for specific features and variants to better adapt
-to distribution production kernels that have had patches applied over the official
-@url{http://www.kernel.org/, kernel.org} sources.
-
-The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10 and has
-been tested up to and including 2.4.27.  It has been tested from 2.6.3 up to and including 2.6.15.
-
-UP validation testing for kernels is performed on all supported architectures.  SMP validation
-testing is performed on UP machines, as well as on an Intel 3.0GHz Pentium IV 630 with
-HyperThreading enabled.  Because HyperThreading is not as independent as multiple CPUs, SMP
-validation testing is limited.
-
-@node Linux Architectures
-@subsection Architectures
-@cindex Architectures
-
-The @cite{@value{PACKAGE_TITLE}} package compiles and installs on a wide range of architectures.
-Although it is believed that the package will work on all architectures supported by the Linux
-kernel being used, validation testing has only been performed with the following architectures:
-
-@itemize
-@item ix86
-@item x86_64
-@item ppc (MPC 860)
-@item ppc64
-@end itemize
-
-32-bit compatibility validation testing is performed on all 64-bit architectures supporting 32-bit
-compatibility.  If you would like to validate an OpenSS7 package on a specific machine architecture,
-you are welcome to sponsor the project with a test machine.
+@include texi/compat.texi
 
 @node Linux STREAMS
 @subsection Linux STREAMS
@@ -253,7 +157,7 @@ instead.
 
 The @cite{@value{PACKAGE_TITLE}} package is currently compatible with @cite{Linux Fast-STREAMS
 (LfS)}.
-The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{streams-0.7a.4} release
+The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{streams-0.7a.6} release
 that is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
 Page}.
 
@@ -500,12 +404,18 @@ With the exception of packages not originaly created by the @cite{OpenSS7 Projec
 @section Schedule
 @cindex schedule
 
+For the lastest developments with regard to schedule, please see the @file{TODO} file in the release
+package.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node History
 @section History
 @cindex history
+
+For the latest developments with regard to history of changes, please see the @file{ChangeLog} file
+in the release package.
 
 @c ----------------------------------------------------------------------------
 

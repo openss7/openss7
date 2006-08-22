@@ -1,0 +1,553 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: tree.texi,v 1.1.2.1 2006/08/22 12:40:13 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/22 12:40:13 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@menu
+* Kernel Modules::
+@end menu
+
+@node Kernel Modules
+@subsection Kernel Modules
+
+The @value{PACKAGE_TITLE} package does directly build or install any of its own kernel modules.  The
+kernel modules built and installed belong to subtending add-on packages.  The following sections
+describe some of the kernel modules installed by add-on packages in the @value{PACKAGE_TITLE}.
+
+@menu
+* sctp Kernel Modules::
+* streams Kernel Modules::
+* strcompat Kernel Modules::
+* strxns Kernel Modules::
+* strxnet Kernel Modules::
+* strinet Kernel Modules::
+* strsctp Kernel Modules::
+* strss7 Kernel Modules::
+* LiS Kernel Modules::
+@end menu
+
+@node sctp Kernel Modules
+@subsubsection sctp
+
+The @command{sctp-@value{VERSION_SCTP}} add-on package is a Linux Native Sockets implementation of
+Stream Control Transmission Protocol (SCTP), and does not use @dfn{STREAMS}.  This package installs
+one module that implements the SCTP socket functionality:
+
+@table @file
+
+@item sctp
+
+This kernel module provides the Stream Control Transmission Protocol (SCTP) sockets and the
+@cite{OpenSS7} implementation of SCTP for sockets.
+See @manref{sctp(7)} for more information.
+
+@end table
+
+@node streams Kernel Modules
+@subsubsection streams
+
+The @command{streams-@value{VERSION_STREAMS}} add-on package provides a number of kernel modules
+used to implement the @dfn{STREAMS} Shadow Special Filesystem, the @dfn{STREAMS} executive, and
+various base and standard @dfn{STREAMS} drivers and modules.
+
+Kernel modules installed by @command{streams-@value{VERSION_STREAMS}} are as follows:
+
+@table @file
+
+@item specfs
+
+This kernel module contains the @dfn{STREAMS} Special Shadow Filesystem.
+See @manref{specfs(5)} for more information.
+
+@item streams
+
+This kernel module contians the @dfn{STREAMS} scheduler, utility functions, and @dfn{STREAMS} Device
+Driver Interface/Driver Kernel Interface (DDI/DKI).
+See @manref{STREAMS(9)} for more information.
+
+@item streams-bufmod
+
+This kernel module contains the @file{bufmod} @dfn{STREAMS} module.  The @file{bufmod} @dfn{STREAMS}
+module is a simple buffer module (a module that always defers to its service procedure and then
+passes any message along).  This module is used for performance testing of the @dfn{STREAMS}
+package.
+See @manref{bufmod(4)} for more information.
+
+@item streams-connld
+
+This kernel module contains the @file{connld} @dfn{STREAMS} module.
+This is a standard @dfn{STREAMS} module.
+See @manref{connld(4)} for more information.
+
+@item streams-echo
+
+This kernel module contains the @file{echo} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver, but is also used by the conformance and validation test suite.
+See @manref{echo(4)} for more information.
+
+@item streams-fifo
+
+This kernel module contains the @file{fifo} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver, but is also used by the conformance and validation test suite.
+See @manref{fifo(4)} for more information.
+
+@item streams-log
+
+This kernel module contains the @file{log} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver.
+See @manref{log(4)} for more information.
+
+@item streams-loop
+
+This kernel module contains the @file{loop} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver, but is also used by the conformance and validation test suite.
+See @manref{loop(4)} for more information.
+
+@item streams-mux
+
+This kernel module contains the @file{mux} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver< but is also used by the conformance and validation test suite.
+See @manref{mux(4)} for more information.
+
+@item streams-nsdev
+
+This kernel module contains the @file{nsdev} @dfn{STREAMS} driver.
+This is a @cite{Linux Fast-STREAMS} specific driver.
+See @manref{nsdev(4)} for more information.
+
+@item streams-nullmod
+
+This kernel module contains the @file{nullmod} @dfn{STREAMS} module.  The @file{nullmod}
+@dfn{STREAMS} module is a simple null module (a module that always passes messages to the next
+module in along the Stream).  This module is used for performance testing of the @dfn{STREAMS}
+package and is also used by the conformance and validation test suite.
+See @manref{nullmod(4)} for more information.
+
+@item streams-nuls
+
+This kernel module contains the @file{nuls} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} module.
+See @manref{nuls(4)} for more information.
+
+@item streams-pipemod
+
+This kernel module contains the @file{pipemod} @dfn{STREAMS} module.
+This is a standard @dfn{STREAMS} module used with pipes.
+See @manref{pipemod(4)} for more information.
+
+@item streams-pipe
+
+This kernel module contains the @file{pipe} @dfn{STREAMS} driver.
+This is a standard @dfn{STREAMS} driver.
+See @manref{pipe(4)} for more information.
+
+@item streams-sad
+
+This kernel module contains the @file{sad} @dfn{STREAMS} driver.
+This is the standard @dfn{STREAMS} Administrative Driver.
+See @manref{sad(4)} for more information.
+
+@item streams-sc
+
+This kernel module contains the @dfn{sc} @dfn{STREAMS} module.
+This is a common @dfn{STREAMS} Configuration module.
+See @manref{sc(4)} for more information.
+
+@item streams-sfx
+
+This kernel module contains the @dfn{sfx} @dfn{STREAMS} driver.
+This is a common character device driver for implementing @dfn{STREAMS} FIFOs.
+See @manref{sfx(4)} for more information.
+
+@item streams-spx
+
+This kernel module contains the @dfn{spx} @dfn{STREAMS} driver.
+This is a common character device driver for implementing @dfn{STREAMS} pipes.
+See @manref{spx(4)} for more information.
+
+@item streams-testmod
+
+This kernel module contains the @file{testmod} @dfn{STREAMS} module.
+This is a @value{PACKAGE_TITLE} specific test module that is used for conformance and validation
+testing of @dfn{STREAMS}.
+See @manref{testmod(4)} for more information.
+
+@end table
+
+@node strcompat Kernel Modules
+@subsubsection strcompat
+
+The @command{strcompat-@value{VERSION_STRCOMPAT}} add-on package provides a number of kernel modules
+that implement enhanced @dfn{STREAMS} and @dfn{DDI/DKI} functions in support of compatibility for
+@dfn{STREAMS} driver and modules written for other implementations of @dfn{STREAMS}.
+
+Kernel modules installed by @command{strcompat-@value{VERSION_STRCOMPAT}} are as follows:
+
+@table @file
+
+@item streams-aixcompat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{AIX 5L Version 5.1}.
+See @manref{aixcompat(9)} for more information.
+
+@item streams-hpuxcompat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{HP-UX 11.0i v2}.
+See @manref{hpuxcomat(9)} for more information.
+
+@item streams-irixcompat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{IRIX 6.5.17}.
+See @manref{irixcompat(9)} for more information.
+
+@item streams-liscompat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{LiS-@value{VERSION_LIS}}.
+See @manref{liscompat(9)} for more information.
+
+@item streams-maccompat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{MacOT 1.5r2}.
+See @manref{maccompat(9)} for more information.
+
+@item streams-mpscompat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{Mentat Portable STREAMS}.
+See @manref{mpscompat(9)} for more information.
+
+@item streams-os7compat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{OpenSS7}.
+See @manref{os7compat(9)} for more information.
+
+@item streams-osfcompat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{OSF1 1.2--Digital UNIX}.
+See @manref{osfcompat(9)} for more information.
+
+@item streams-suncompat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{Solaris 9/SunOS 5.9}.
+See @manref{suncompat(9)} for more information.
+
+@item streams-svr3compat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{UNIX System V Release 3.2}.
+See @manref{svr3compat(9)} for more information.
+
+@item streams-svr4compat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{UNIX System V Release 4.2 MP}.
+See @manref{svr4compat(9)} for more information.
+
+@item streams-uw7compat
+
+This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
+@cite{UnixWare 7.1.3 (OpenUnix 8)}.
+See @manref{uw7compat(9)} for more information.
+
+@end table
+
+@node strxns Kernel Modules
+@subsubsection strxns
+
+The @command{strxns-@value{VERSION_STRXNS}} add-on packages provides kernel modules for sundry
+@dfn{STREAMS} drivers and modules written to the specifications for @cite{X/Open Networking
+Services} and the @dfn{CDI}, @dfn{DLPI} and @dfn{NPI} levels.  Many of these modules come from the
+deprecated @cite{LiS} package and were ported to @cite{Linux Fast-STREAMS} to aid migration.
+
+Kernel modules installed by @command{strxns-@value{VERSION_STRXNS}} are as follows:
+
+@table @file
+
+@item streams-ip_strm_mod
+
+This @dfn{STREAMS} module was originally part of the @cite{LiS} distribution.
+
+@item streams-ip_to_dlpi
+
+This @dfn{STREAMS} driver was originally part of the @cite{LiS} distribution.
+
+@item streams-ldl
+
+This @dfn{STREAMS} driver was originally part of the @cite{LiS} distribution.
+
+@item streams-np_ip
+
+This @dfn{STREAMS} driver was originally part of the @cite{Linux Fast-STREAMS} distribution.
+
+@end table
+
+@node strxnet Kernel Modules
+@subsubsection strxnet
+
+The @command{strxnet-@value{VERSION_STRXNET}} add-on package provides several @dfn{STREAMS} modules
+that provide capabilities first found in @cite{UNIX System V Release 4} that form part of the
+@dfn{Transport Provider Interface (TPI)} networking capabilities.  These @dfn{STREAMS} modules are
+provided as kernel modules in the add-on package.
+
+Kernel modules installed by @command{strxnet-@value{VERSION_STRXNET}} are as follows:
+
+@table @file
+
+@item streams-timod
+
+This kernel module provides the @file{timod} @dfn{STREAMS} module.
+This is a standard @dfn{STREAMS} module that is part of the @cite{X/Open Transport Interface (XTI)}
+library capability.
+When pushed on a @dfn{Stream} it provides a set of input-output controls that are used by the
+@cite{X/Open Transport Interface (XTI)} library (@file{libxnet}) to provide its functions.
+See @manref{timod(4)} for more information.
+
+@item streams-tirdwr
+
+This kernel module provides the @file{tirdwr} @dfn{STREAMS} module.
+This is a standard @dfn{STREAMS} module that is part of the @cite{X/Open Transport Interface (XTI)}
+library capability.
+When pushed on a @dfn{Stream} it provides the ability to @manpage{read(2)} from and @manpage{write(2)} to a
+@dfn{Stream} supporting the @dfn{Transport Provider Interface (TPI)}.
+See @manref{tirdwr(4)} for more information.
+
+@end table
+
+@node strinet Kernel Modules
+@subsubsection strinet
+
+The @command{strinet-@value{VERSION_STRINET}} add-on package provides a number of @dfn{STREAMS}
+drivers in kernel modules.  The original package provided only the @dfn{XTIOS (XTI over Sockets)}
+approach @file{inet} driver, however, the current package also provides implementations of these
+drivers written directly in @dfn{STREAMS}.
+
+Kernel modules installed by @command{strinet-@value{VERSION_STRINET}} are as follows:
+
+@table @file
+
+@item streams-inet
+
+This kernel module provides the first-generation @file{inet} @dfn{STREAMS} driver.
+This driver provides @dfn{STREAMS} access to @dfn{TCP/IP} and @dfn{UNIX} domain sockets based on the
+@cite{Transport Provider Interface (TPI)} and supporting the @cite{X/Open Transport
+Interface/Transport Layer Interface (XTI/TLI)} library.
+See @manref{inet(4)} for more information.
+
+@item streams-rawip
+
+This kernel module provides the second-generation @file{rawip} @dfn{STREAMS} driver.
+This driver provides a second-generation @file{rawip} driver.  This difference between this
+@file{rawip} driver and that provided by the @file{inet} module is that this driver does not open a
+socket internal to the kernel and implements the driver as a full @dfn{STREAMS} driver.
+See @manref{rawip(4)} for more information.
+
+@item streams-tcp
+
+This kernel module provides the second-generation @file{tcp} @dfn{STREAMS} driver.
+This driver provides a second-generation @file{tcp} driver.  This difference between this
+@file{tcp} driver and that provided by the @file{inet} module is that this driver does not open a
+socket internal to the kernel and implements the driver as a full @dfn{STREAMS} driver.
+See @manref{tcp(4)} for more information.
+
+@item streams-udp
+
+This kernel module provides the second-generation @file{udp} @dfn{STREAMS} driver.
+This driver provides a second-generation @file{udp} driver.  This difference between this
+@file{udp} driver and that provided by the @file{inet} module is that this driver does not open a
+socket internal to the kernel and implements the driver as a full @dfn{STREAMS} driver.
+See @manref{udp(4)} for more information.
+
+@end table
+
+@node strsctp Kernel Modules
+@subsubsection strsctp
+
+The @command{strsctp-@value{VERSION_STRSCTP}} add-on package provides a number of @dfn{STREAMS}
+drivers in kernel modules.  This is the @dfn{STREAMS} implementation of Stream Control Transmission
+Protocol (SCTP).
+
+Kernel modules installed by @command{strsctp-@value{VERSION_STRSCTP}} are as follows:
+
+@table @file
+
+@item streams-sctp
+
+This kernel module provides the @dfn{STREAMS} implementation of Stream Control Transmission Protocol
+(SCTP).
+See @manref{sctp(4)} for more information.
+
+@item streams-tpiperf
+
+This kernel module provides a capability to perform in-kernel performance testing of drivers based
+on the @cite{Transport Provider Interface (TPI)}.  It will eventually be moved to the
+@command{strxnet-@value{VERSION_STRXNET}} add-on package.
+See @manref{tpiperf(4)} for more information.
+
+@end table
+
+@node strss7 Kernel Modules
+@subsubsection strss7
+
+The @command{strss7-@value{VERSION_STRSS7}} add-on package provides a wide range of @dfn{STREAMS}
+drivers and modules as kernel modules.  The package comes in public and subscriber versions.  The
+public version has far fewer modules than the subscriber version.  Listed below are only the current
+public modules.
+
+Kernel modules installed by @command{strss7-@value{VERSION_STRSS7}} are as follows:
+
+@table @file
+
+@item streams-m2pa_sl
+
+This kernel module provides the @dfn{STREAMS} @file{m2pa_sl} module.  This module provide an
+implementation of @cite{MTP2 Peer-to-Peer Adaptation Layer}.
+See @manref{m2pa_sl(4)} for more information.
+
+@item streams-sdlm
+
+This kernel modules provides the @dfn{STREAMS} @file{sdlm} multiplexing driver.  This driver provide
+a multiplexer for @cite{Signalling Data Links}.
+See @manref{sdlm(4)} for more information.
+
+@item streams-sdl
+
+This kernel module provides the @dfn{STREAMS} @file{sdl} module.  This module provides a
+@cite{Signalling Data Link} interface to any modules providing a @cite{Multiplex Interface (MX)}.
+See @manref{sdl(4)} for more information.
+
+@item streams-sdl_sctp
+
+This kernel module provides the @dfn{STREAMS} @file{sdl_sctp} module.  This module provides
+@cite{SS7 over IP} by directly passing @cite{Signalling Data Link} messages on the @cite{Stream
+Control Transmission Protocol (SCTP)}.
+See @manref{sdl_sctp(4)} for more information.
+
+@item streams-sdt
+
+This kernel module provides the @dfn{STREAMS} @file{sdt} module.  This module provide a
+@cite{Signalling Data Terminal} interface to any modules providing the @cite{Signalling Data Link}
+inteface.
+See @manref{sdt(4)} for more information.
+
+@item streams-sdt_sctp
+
+This kernel module provides the @dfn{STREAMS} @file{sdt_sctp} module.  This module provies @cite{SS7
+over IP} by directly passing @cite{Signalling Data Terminal} message on the @cite{Stream Control
+Transmission Protocol (SCTP)}.
+See @manref{sdt_sctp(4)} for more information.
+
+@item streams-sl_mux
+
+This kernel modules provides the @dfn{STREAMS} @file{sl_mux} multiplexing driver.  This module
+provides a multiplexer for @dfn{Streams} supporting the @dfn{Signalling Data Link}, @dfn{Signalling
+Data Terminal} or @dfn{Signalling Link} interfaces.
+See @manref{sl_mux(4)} for more information.
+
+@item streams-sl
+
+This kernel module provides the @dfn{STREAMS} @file{sl} module.  This module provides a
+@cite{Signalling Link} interface to any modules providing a @cite{Signalling Data Terminal}
+interace.  This module implements a @cite{Signalling System No. 7 (SS7) Message Transfer Part (MTP)
+Level 2} state machine.
+See @manref{sl(4)} for more information.
+
+@item streams-sl_tpi
+
+This kernel module provides the @dfn{STREAMS} @file{sl_tpi} module.  This module provides @cite{SS7
+over IP} by directly passing @cite{Signalling Link} messages on any @dfn{Stream} supporting the
+@cite{Transport Provider Interface} (such as @cite{UDP} or @cite{SCTP}).
+See @manref{sl_tpi(4)} for more information.
+
+@item streams-sm_mod
+
+This kernel module provides the @dfn{STREAMS} @file{sm_mod} module.  This module provides a
+simplistic @cite{SS7 MTP Level 3} capability using the @cite{Message Transfer Part Inteface (MTPI)}
+service interface.
+See @manref{sm_mod(4)} for more information.
+
+@item streams-spm
+
+This kernel module proides the @dfn{STREAMS} @file{spm} module.
+See @manref{spm(4)} for more information.
+
+@item streams-x100p-ss7
+
+This kernel module provides the @dfn{STREAMS} @file{x100p-ss7} driver.
+This driver provides SS7 signalling link support for the @cite{T100P} and @cite{E100P} cards.
+See @manref{x100p-ss7(4)} for more information.
+
+@item streams-x400p-ss7
+
+This kernel module provides the @dfn{STREAMS} @file{x400p-ss7} driver.
+This driver provides SS7 signalling link support for the @cite{E400P}, @cite{T400P}, @cite{V400P}
+and @cite{V401P} cards.
+See @manref{x400p-ss7(4)} for more information.
+
+@end table
+
+@node LiS Kernel Modules
+@subsubsection LiS
+
+The @command{LiS-@value{VERSION_LIS}} package is deprecated and this section is deleted.
