@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/08/16 07:40:48 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/22 12:36:57 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -35,11 +35,11 @@ desc="the STREAMS special shadow filesystem"
 
 # Specify defaults
 
-SPECFS_MOUNTPOINT="/dev/streams"
-SPECFS_UID=
-SPECFS_GID=
-SPECFS_MODE=
-SPECFS_OPTIONS=
+[ -n "$SPECFS_MOUNTPOINT" ] || SPECFS_MOUNTPOINT="/dev/streams"
+[ -n "$SPECFS_UID"        ] || SPECFS_UID=
+[ -n "$SPECFS_GID"        ] || SPECFS_GID=
+[ -n "$SPECFS_MODE"       ] || SPECFS_MODE=
+[ -n "$SPECFS_OPTIONS"    ] || SPECFS_OPTIONS=
 
 # Source config file
 for file in $config ; do
@@ -170,7 +170,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/08/16 07:40:48 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/22 12:36:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -216,7 +216,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:40:48 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 12:36:57 $ by $Author: brian $
 #
 # =============================================================================
 

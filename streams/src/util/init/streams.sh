@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/08/16 07:40:48 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/08/22 12:36:57 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -31,30 +31,31 @@ desc="the STREAMS subsystem"
 
 [ -e /proc/modules ] || exit 0
 
-for STREAMS_MKNOD in /sbin/streams_mknod /usr/sbin/streams_mknod /bin/streams_mknod /usr/bin/streams_mknod ; do
-    if [ -x $STREAMS_MKNOD ] ; then
-	break
-    else
-	STREAMS_MKNOD=
-    fi
-done
+if test -z "$STREAMS_MKNOD" ; then
+    for STREAMS_MKNOD in /sbin/streams_mknod /usr/sbin/streams_mknod /bin/streams_mknod /usr/bin/streams_mknod ; do
+	if [ -x $STREAMS_MKNOD ] ; then
+	    break
+	else
+	    STREAMS_MKNOD=
+	fi
+    done
+fi
 
 # Specify defaults
 
-#STREAMS_MODULES="streams streams-clone streams-sth"
-STREAMS_MODULES="streams"
-STREAMS_MAKEDEVICES="no"
-STREAMS_REMOVEDEVICES="no"
-STREAMS_MOUNTSPECFS="yes"
-STREAMS_MOUNTPOINT="/dev/streams"
+[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES="streams"
+[ -n "$STREAMS_MAKEDEVICES"   ] || STREAMS_MAKEDEVICES="yes"
+[ -n "$STREAMS_REMOVEDEVICES" ] || STREAMS_REMOVEDEVICES="yes"
+[ -n "$STREAMS_MOUNTSPECFS"   ] || STREAMS_MOUNTSPECFS="yes"
+[ -n "$STREAMS_MOUNTPOINT"    ] || STREAMS_MOUNTPOINT="/dev/streams"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
-[ -z "$STREAMS_MKNOD" ] && STREAMS_MAKEDEVICES='no'
-[ -z "$STREAMS_MKNOD" ] && STREAMS_REMOVEDEVICES='no'
+[ -z "$STREAMS_MKNOD" ] && STREAMS_MAKEDEVICES="no"
+[ -z "$STREAMS_MKNOD" ] && STREAMS_REMOVEDEVICES="no"
 
 RETVAL=0
 
@@ -200,7 +201,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/08/16 07:40:48 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/08/22 12:36:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -245,7 +246,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:40:48 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 12:36:57 $ by $Author: brian $
 #
 # =============================================================================
 
