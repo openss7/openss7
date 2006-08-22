@@ -1,9 +1,13 @@
-OpenSS7 STREAMS Compatibility Modules -- things to do.  2006-03-01
+OpenSS7 STREAMS Compatibility Modules -- things to do.  2006-08-18
+$Id: TODO,v 0.9.2.2 2006/08/22 12:57:08 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 Things to do:
+
+- Work in streams_interrupt() and STREAMS_TIMEOUT() from IRIX into
+  irixcompat.c.
 
 - Hey, here's an idea for testing Solaris compatibility: take an
   OpenSolaris source file for a STREAMS driver and compile and test it
