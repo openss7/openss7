@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strreset.1.man,v 0.9.2.11 2006/04/05 09:43:40 brian Exp $
+.\" @(#) $Id: strreset.1.man,v 0.9.2.12 2006/08/22 12:36:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:40 $ by $Author: brian $
+.\" Last Modified $Date: 2006/08/22 12:36:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strreset.1.man,v $
+.\" Revision 0.9.2.12  2006/08/22 12:36:44  brian
+.\" - udpates to documentation, tweaks to Stream head
+.\"
 .\" Revision 0.9.2.11  2006/04/05 09:43:40  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B strreset
-\- resets a stream
+\- resets a Stream
 .\"
 .\"
 .SH SYNOPSIS
@@ -103,10 +106,10 @@ sort-adjacent-labels
 .PP
 The
 .B strreset
-command resets an open stream by generating a
+command resets an open Stream by generating a
 .BR M_FLUSH (9)
-message to the stream head.  You use it mainly to reset blocked streams.  When
-it is impossible to reopen the stream, issue an
+message to the Stream head.  You use it mainly to reset blocked streams.  When
+it is impossible to reopen the Stream, issue an
 .B I_FLUSH
 .BR streamio (7)
 .BR ioctl (2s),
@@ -120,11 +123,11 @@ process exiting, for example).
 .TP
 \fR[\fB-M\fR, \fB--major\fR \fImajor\fR]
 Specifies the major device number for the special file associated with the
-stream to be reset.
+Stream to be reset.
 .TP
 \fR[\fB-m\fR, \fB--minor\fR \fIminor\fR]
 Specifies the minor device number for the special file associated with the
-stream to be reset.
+Stream to be reset.
 .PP
 The following options are non-portable:
 .TP

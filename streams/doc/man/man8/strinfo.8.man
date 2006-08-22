@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strinfo.8.man,v 0.9.2.15 2006/04/05 09:43:51 brian Exp $
+.\" @(#) $Id: strinfo.8.man,v 0.9.2.16 2006/08/22 12:36:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:51 $ by $Author: brian $
+.\" Last Modified $Date: 2006/08/22 12:36:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strinfo.8.man,v $
+.\" Revision 0.9.2.16  2006/08/22 12:36:44  brian
+.\" - udpates to documentation, tweaks to Stream head
+.\"
 .\" Revision 0.9.2.15  2006/04/05 09:43:51  brian
 .\" - moved .so line and updated headers
 .\"
@@ -105,7 +108,7 @@ The
 .B strinfo
 command displays information for debugging purposes about
 .I STREAMS
-drivers and modules, or stream heads and the
+drivers and modules, or Stream heads and the
 .I STREAMS
 run queue.
 .\"
@@ -121,7 +124,7 @@ drivers and modules loaded on the system.
 .BR -q ", " --queues
 Print information about the
 .I STREAMS
-active stream heads and on the run queues upon which 
+active Stream heads and on the run queues upon which 
 drivers and modules are
 scheduled.
 .TP
@@ -171,6 +174,7 @@ fails, it returns a non-zero exit status and displays a diagnostic on
 .\"
 .SH NOTICES
 .PP
+None.
 .\"
 .\"
 .SH EXAMPLES
@@ -207,6 +211,7 @@ Queue 0x5ad7000 Flags 0x10
 .\"
 .SH DEVICES
 .PP
+None.
 .\"
 .\"
 .SH FILES
@@ -220,10 +225,22 @@ command.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR scls (8),
+.BR proc (5).
 .\"
 .\"
 .SH BUGS
 .PP
+.B strinfo
+is not fully implemented (it is hardly partially implemented).  It just recognizes standard
+.B OpenSS7 Project
+options and does nothing.
+.PP
+For a functional equivalent, see the
+.B /proc/streams
+directory and the
+.BR scls (8)
+utility.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -241,7 +258,7 @@ provides
 .B strinfo
 for compatibility with
 .IR AIX \(rg.
-.IP \(bu
+.IP \(em
 .IR AIX \(rg
 does not document long options.
 .IP \(em

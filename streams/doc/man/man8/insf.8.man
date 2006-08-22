@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: insf.8.man,v 0.9.2.12 2006/04/05 09:43:50 brian Exp $
+.\" @(#) $Id: insf.8.man,v 0.9.2.13 2006/08/22 12:36:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:50 $ by $Author: brian $
+.\" Last Modified $Date: 2006/08/22 12:36:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: insf.8.man,v $
+.\" Revision 0.9.2.13  2006/08/22 12:36:44  brian
+.\" - udpates to documentation, tweaks to Stream head
+.\"
 .\" Revision 0.9.2.12  2006/04/05 09:43:50  brian
 .\" - moved .so line and updated headers
 .\"
@@ -104,27 +107,1367 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B insf
+command installs special files in the devices directory, normall
+.BR /dev .
+If required,
+.B insf
+creates any subdirectories that are defined for the resulting special file.
+.PP
+If no options are specified, special files are created for all new devices in the system.  New
+devices are those devices for which no special files have been previously created.  A subset of the
+new devices can be selected with
+.BR -C ,
+.BR -d ,
+and
+.B -H
+options.
+.PP
+With the
+.B -e
+option,
+.B insf
+reinstalls the sepcial files for pseudo-drivers and existing devices.  This is useful for restoring
+special files when one or more have been removed.
+.PP
+Normally,
+.B insf
+displays a message as the special files are installed for each driver.  The
+.B -q
+(quiet)
+option suppresses the installation message.  The
+.B -v
+(verbose)
+option displays the installation message and the name of each special file as it is created.
 .\"
 .\"
 .SH OPTIONS
 .PP
+.B insf
+recognizes the following options:
 .TP
+.BI -C " class
+Match devices that belong to a given device class,
+.IR class .
+Device classes can be listed with the
+.BR lsdev (1)
+command.
+They are defined in the files in the directory
+.BR /usr/conf/master.d .
+The special class
+.I pseudo
+includes all pseduo-drivers.  This option cannot be used with
+.BR -d .
+.TP
+.BI -d " driver
+Match devices that are controlled by the specified device driver,
+.IR driver .
+Device drivers can be listed with the
+.BR lsdev (1)
+comand.
+They are defined in the files in the directory
+.BR /usr/conf/master.d .
+This option cannot be used with
+.BR -C .
+.TP
+.BI -D " directory
+Override the default device installation directory
+.B /dev
+and install the special files in
+.I directory
+instead.
+.I directory
+must exist; otherwise,
+.B insf
+displays an error message and exits.  See
+.RI \(lq WARNINGS \(rq.
+.TP
+.B -e
+Reinstall the special files for pseudo-drivers and existing devices.  This is useful for restoring
+special files if one or more have been removed.
+.TP
+.BI -H " hw-path
+Match devices at a given hardware path,
+.IR hw-path .
+Hardware paths can be listed with the
+.BR ioscan (1)
+command.  A hardware path specifies the addresses of the hardware components leading to a device.
+It consists of a stream of numbers separated by periods (.), such as
+.B 52
+(a card),
+.BR 52 . 3
+(a taret address),
+and
+.BR 52 . 3 . 0
+(a device).  If a hardware component is a bus converter, the following period, if any, is replaced
+by a slash (/) as in
+.BR 2 ,
+.BR 2 / 3 ,
+and
+.BR 2 / 3 . 0 .
+If the specified path contains fewer numbers than are necessary to reach a device, special files are
+made for all devices at addresses that extend the given path.  If the specified path is
+.BR 56 ,
+then special files are made for the devices at addresses
+.BR 56 . 0 ,
+.BR 56 . 1 ,
+.BR 56 . 2 ,
+etc.
+.TP
+.BI -I " instance
+Match a device with the specified instance number.  Instances can be listed with the
+.B -f
+option of the
+.BR ioscan (1)
+comand.
+This option is effective only if the
+.B -e
+option is specified or if an appropriate device class or driver is specified with a
+.B -C
+or
+.B -d
+option.
+.TP
+.BI -n " npty
+Install
+.I npty
+special files for each specified
+.B ptym
+and
+.B ptys
+driver.  The
+.I pty
+driver specifies both the
+.B ptym
+and
+.B ptys
+drivers.
+.B npty
+is a decimal number.
+This option is only effective if the
+.B -e
+option is specified or if an appropriate device class or driver is specified with a
+.B -C
+or
+.B -d
+option.  If this option is omitted,
+.I npty
+defaults to
+.B 60
+for the
+.B ptym
+and
+.B ptys
+drivers.
+.TP
+.BI -p " first-optical-disk:last-optical-disk
+Install the special files for those optical disks in slots in the range
+.IR first-optical-disk " to " last-optical-disk .
+The two variables can have values from the set
+.BR 1a ", " 1b ", " ... ", " 32a ", " 32b .
+This option only applies to the
+.B autox0
+and
+.B schgr
+drivers.  If it is omitted, the 64 special files for both sides of 32 optical disks (1a through 32b)
+will be installed.
+.TP
+.B -q
+Quiet option.  Normally,
+.B insf
+displays a message as each driver is processed.  This option suppresses the driver message, but not
+error messages.  See the
+.B -v
+option.
+.TP
+.BI -s " nstrpty
+Install
+.I nstrpty
+slave-side stream special files for the
+.B pts
+driver.
+.I nstrpty
+is a decimal number.  This option only applies to the
+.I pts
+special file installation.
+This option is effective only if the
+.B -e
+option is specified or if an appropriate device class or driver is specified with a
+.B -C
+or
+.B -d
+option.
+If this option is omitted,
+.I nstrpty
+defaults to 60.
+.TP
+.B -v
+Verbose option.  In addition to the normal processing message, display the name of each special file
+as it is created.  See
+.B -q
+option.
+.\"
+.\"
+.SS Naming Conventions
+.PP
+Many special files are named using the
+.I ccardtargetdevice
+naming convention.  These variables have the following meaning whenever they are used:
+.TP
+.I card
+The unique interface card identifier number from
+.BR ioscan (1).
+It is represented as a decimal number with a typical range of
+.BR 0 " to " 255 .
+.TP
+.I target
+The device target number, for example the address on a HP-FL or SCSI bus.  It is represented as a
+decimal number with a typical range of
+.BR 0 " to " 15 .
+.TP
+.I device
+An address unit within a deice, for example, the unit in a HP-FL device or the LUN in a SCSI device.
+It is represented as a decimal number with a typical range of
+.BR 0 " to " 15 .
+.\"
+.\"
+.SS Special Files
+.PP
+This subsection shows which special files are created and the permissions for each device driver.
+.PP
+The special file names are relative to the installation directory, normall
+.BR /dev .
+This directory may be overridden with the
+.B -D
+option.
+.PP
+.B insf
+sets the file permissions and the owner and group IDs.  They are shown here in a format similar to
+that of the
+.BR ll (1)
+command:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+special-file:permissions:owner:group
+.TE
+
+For example:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+tty:rw-rw-rw-:bin:bin
+.TE
+.\"
+.\"
+.PP
+.B Device Driver Special Files and Description
+.TP
+arp
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+arp:rw-rw-rw-:root:sys
+.TE
+.TP
+asio0
+For the built-in serial port, the following special files are installed for each card instance:
+ttycardp0:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+Direct connect
+T}
+.TP
+asio0
+For  the  SAS console ports, the following special files are installed for each card instance:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardp0:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+local console port (direct connect)
+T}
+ttycardp1:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+remote session port (direct connect)
+T}
+sassy:rw-------:root:sys:T{
+.ad l
+.hy 0
+internal console port (direct connect)
+}T
+ttycard+1p0:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+UPS port (direct connect)
+T}
+ttycard+1p1:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+local session port (direct connect)
+T}
+.TE
+.TP
+asyncdsk
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+asyncdsk:rw-rw-rw-:bin:bin
+.TE
+.TP
+audio
+The following special files are installed. Note the underscore (_) before card in each special file
+name.  For  card 0, the device files are linked to files without the trailing _0 in their names.
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+audio_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Default audio device
+T}
+audioCtl_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Audio control device
+T}
+audioBA_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+All outputs, A-law format
+T}
+audioBL_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+All outputs, 16-bit linear format
+T}
+audioBU_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+All outputs, Mu-law format
+T}
+audioEA_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+External output, A-law format
+T}
+audioEL_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+External output, 16-bit linear format
+T}
+audioEU_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+External output, Mu-law format
+T}
+audioIA_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Internal speaker output, A-law format
+T}
+audioIL_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Internal speaker output, 16-bit linear format
+T}
+audioIU_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Internal speaker output, Mu-law format
+T}
+audioLA_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Line output, A-law format
+T}
+audioLL_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Line output, 16 bit linear format
+T}
+audioLU_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Line output, Mu-law format
+T}
+audioNA_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+No output, A-law format
+T}
+audioNL_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+No output, 16 bit linear format
+T}
+audioNU_card:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+No output, Mu-law format
+T}
+.TE
+.TP
+autox0 schgr
+Special file names for autox0 and schgr use the format: ccardttargetd device_surface
+surface:  1a  through  32b, unless modified by the -p option. Note the
+underscore (_) between device and surface.
+
+For   each   autochanger  device,  the  following  special  files  are
+installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ac/ccardttargetddevice_surface:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Block entry
+T}
+rac/ccardttargetddevice_surface:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Character entry
+T}
+rac/ccardttargetddevice:rw-------:bin:sys:T{
+.ad l
+.hy 0
+Character entry
+T}
+.TE
+.TP
+beep
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+beep:rw-rw-rw-:bin:bin
+.TE
+.TP
+CentIf
+For  each  card  instance,  the  following  special file is installed.
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ccardttargetddevice_lp:rw-rw-rw-:lp:bin:T{
+.ad l
+.hy 0
+Handshake mode 2, character entry
+T}
+.TE
+.TP
+consp1
+For  each  card  instance,  the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardp0:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+Direct connect
+T}
+.TE
+.TP
+cn
+The following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+syscon:rw--w--w-:bin:bin
+systty:rw--w--w-:bin:bin
+console:rw--w--w-:root:sys
+ttyconf:rw-------:root:sys
+.TE
+.TP
+devconfig
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+config:rw-r-----:root:sys
+.TE
+.TP
+diag0
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+diag/diag0:rw-------:bin:bin
+.TE
+.TP
+diag1
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+diag/diag1:rw-------:bin:bin
+.TE
+.TP
+diag2
+The following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+diag2:rw-------:bin:bin
+diag/diag2:rw-------:bin:bin
+.TE
+.TP
+disc3  sdisk
+For each disk device, the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+dsk/ccardttargetddevice:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Block entry
+T}
+rdsk/ccardttargetddevice:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Character entry
+T}
+.TE
+
+For  disc3  instances,  the  following  additional  special  files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+floppy/ccardttargetddevice:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Block entry
+T}
+rfloppy/ccardttargetddevice:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Character entry
+T}
+.TE
+
+For  disk  instances  that  are  partitioned, the following additional special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+dsk/ccardttargetddevicespartition:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Block entry
+T}
+rdsk/ccardttargetddevicespartition:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Character entry
+T}
+.TE
+.TP
+dlpi
+The following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+dlpi:rw-rw-rw-:root:sys
+dlpi0:rw-rw-rw-:root:sys
+dlpi1:rw-rw-rw-:root:sys
+dlpi2:rw-rw-rw-:root:sys
+dlpi3:rw-rw-rw-:root:sys
+dlpi4:rw-rw-rw-:root:sys
+.TE
+.TP
+dmem
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+dmem:rw-------:bin:bin
+.TE
+.TP
+echo
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+echo:rw-rw-rw-:root:sys
+.TE
+.TP
+eisa_mux0 pci_mux0
+For  each  instance  of  an EISA mux or PCI mux card, the following "Direct  Connect"  special
+files  are  created. The term "card" below refers to the instance number of the mux card.
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardport_moduleport:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+letter: a to p, port module name port: 1 to 16, direct connect
+T}
+muxcard:rw-------:bin:bin
+diag/muxcard:rw-------:bin:bin
+diag/muxcard_1:rw-------:bin:bin
+diag/muxcard_2:rw-------:bin:bin
+.TE
+.TP
+fddi
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+lancard:rw-rw-rw-:bin:bin
+.TE
+.TP
+framebuf
+For each graphics device, the following special files are installed.
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+crtdevice_number:rw-rw-rw-:bin:bin
+ocrtdevice_number:rw-rw-rw-:bin:bin
+.TE
+
+.I device_number
+is  0 indexed and is assigned in the order in which the devices appear in [26]ioscan(1M) output.
+
+If the console device is a graphics device, the files crt and ocrt are created  as  the  console
+device.  If  the  console is not a graphics device, crt and ocrt are identical to crt0 and ocrt0.
+.TP
+hil
+For each device, the following special files are installed. Note the underscore (_) before card in
+each special file name.  For card 0, the device files are linked to files named hiladdr for the link
+addresses 1 to 7; hilkbd for the cooked keyboard device; and rhil for the hil controller device.
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+hil_card.addr:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+addr: link addresses 1 to 7
+T}
+hilkbd_card:rw-rw-rw-:bin:bin
+rhil_card:rw-rw-rw-:bin:bin
+.TE
+.TP
+inet_clts
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+inet_clts:rw-rw-rw-:root:sys
+.TE
+.TP
+inet_cots
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+inet_cots:rw-rw-rw-:root:sys
+.TE
+.TP
+ip
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ip:rw-rw-rw-:root:sys
+.TE
+.TP
+kepd
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+kepd:rw-r--r--:root:other
+.TE
+.TP
+klog
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+klog:rw-------:bin:bin
+.TE
+.TP
+lan0 lan1 lan2 lan3
+For each card instance, the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+lancard:rw-rw-rw-:bin:bin
+ethercard:rw-rw-rw-:bin:bin
+diag/lancard:rw-------:bin:bin
+.TE
+.TP
+lantty0
+For  each  card  instance, the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+lanttycard:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Normal access
+T}
+diag/lanttycard:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Exclusive access
+T}
+.TE
+.TP
+lpr2  lpr3
+For each card instance, the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ccardttargetddevice_lp:rw-------:lp:bin
+diag/ccardttargetddevice_lp:rw-------:bin:bin
+.TE
+.TP
+mm
+The following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+mem:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Minor 0
+T}
+kmem:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Minor 1
+T}
+null:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Minor 2
+T}
+.TE
+.TP
+mux0
+For  each instance of a 6-channel card, the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardpport:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+port: 0 to 5, direct connect
+T}
+muxcard:rw-------:bin:bin
+diag/muxcard:rw-------:bin:bin
+.TE
+
+For  each  instance  of a 16-channel card, the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardpport:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+port: 0 to 15, direct connect
+T}
+muxcard:rw-------:bin:bin
+diag/muxcard:rw-------:bin:bin
+.TE
+.TP
+mux2
+For each instance of an 16-channel card, the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardpport:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+port: 0 to 15, direct connect
+T}
+muxcard:rw-------:bin:bin
+diag/muxcard:rw-------:bin:bin
+.TE
+
+For  each  card  instance  of an 8-channel card, the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardpport:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+port: 0 to 7, direct connect
+T}
+muxcard:rw-------:bin:bin
+diag/muxcard:rw-------:bin:bin
+.TE
+
+For  each  card  instance  of an 3-channel card, the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardpport:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+port: 0, 1, and 7, direct connect
+T}
+muxcard:rw-------:bin:bin
+diag/muxcard:rw-------:bin:bin
+.TE
+.TP
+mux4
+For  each  card  instance,  the  following  special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardpport:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+port: 0 and 1, direct connect
+T}
+.TE
+.TP
+netqa
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+netqa:rw-rw-rw-:root:sys
+.TE
+
+.TP
+nuls
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+nuls:rw-rw-rw-:root:sys
+.TE
+.TP
+pci_mux0
+The following "Direct Connect" special files are created.  The term "card" below refers to the
+instance number of the mux card.
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardport_moduleport:rw--w--w-:bin:bin:T{
+.ad l
+.hy 0
+port_module: a to p, port module name port: 1 to 16, port number
+T}
+muxcard:rw-------:bin:bin
+diag/muxcard:rw-------:bin:bin
+diag/muxcard_1:rw-------:bin:bin
+diag/muxcard_2:rw-------:bin:bin
+.TE
+.TP
+pflop sflop
+For each card instance, the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+floppy/ccardttargetddevice:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Block entry
+T}
+rfloppy/ccardttargetddevice:rw-r-----:bin:sys:T{
+.ad l
+.hy 0
+Character entry
+T}
+.TE
+.TP
+ps2
+The following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ps2kbd:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Autosearch for first ps2 keyboard
+T}
+ps2mouse:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Autosearch for first ps2 mouse
+T}
+ps2_0:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+ps2 port 0
+T}
+ps2_1:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+ps2 port 1
+T}
+.TE
+.TP
+ptm
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ptmx:rw-rw-rw-:root:sys
+.TE
+.TP
+pts
+The following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+pts/number:rw-rw-rw-:root:sys:T{
+.ad l
+.hy 0
+number: 0 to 59
+T}
+.TE
+.TP
+pty
+Specifying this driver tells insf to install the special files for  both the master and slave pty
+drivers, ptym and ptys. The command insf -d pty is equivalent to the two commands insf -d ptym and
+insf -d ptys.
+.TP
+ptym
+The following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ptym/clone:rw-r--r--:root:other
+ptym/ptyindexnumber:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+index: p to z, a to c, e to o; number: 0 to f (hexadecimal)
+T}
+.TE
+
+The first 48 special files ptym/pty* are linked to pty*.
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ptym/ptyindexnumber:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+index: p to z, a to c, e to o; number: 00 to 99
+T}
+ptym/ptyindexnumber:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+index: p to z, a to c, e to o; number: 000 to 999
+T}
+.TE
+
+.TP
+ptys
+The following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+pty/ttyindexnumber:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+index: p to z, a to c, e to o; number: 0 to f (hexadecimal)
+T}
+.TE
+
+The first 48 special files pty/tty* are linked to tty*.
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+pty/ttyindexnumber:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+index: p to z, a to c, e to o; number: 00 to 99
+T}
+pty/ttyindexnumber:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+index: p to z, a to c, e to o; number: 000 to 999
+T}
+.TE
+
+.TP
+rawip
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+rawip:rw-rw-rw-:root:sys
+.TE
+.TP
+root
+The following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+root:rw-r-----:bin:sys
+rroot:rw-r-----:bin:sys
+.TE
+.TP
+sad
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+sad:rw-rw-rw-:root:sys
+.TE
+.TP
+sastty
+For  each  card  instance,  the following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+ttycardpport:rw--w--w-:bin:bin
+.TE
+port: 0 to 1, direct connect
+.TP
+schgr
+See autox0.
+.TP
+sdisk
+See disc3.
+.TP
+sflop
+See pflop.
+.TP
+stape tape2
+For each driver instance, different special files are installed  depending on the number of
+characters allowed in the target directory.  There  are  two  lists  below,  one  for  long  file
+name directories  and  one  for  short file name directories (14 characters maximum). Short file
+names are used for files installed on an NFS file system.
+
+Note  that  the  first four special files in each list for tape driver instances  0-9  are  also
+linked  to  rmt/instancem,  rmt/instancemb, rmt/instancemn, and rmt/instancemnb, respectively.
+
+For installation in a long file name directory:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+rmt/ccardttargetddeviceBEST:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+AT&T-style, best available density, character entry
+T}
+rmt/ccardttargetddeviceBESTb:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Berkeley-style, best available density, character entry
+T}
+rmt/ccardttargetddeviceBESTn:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+AT&T-style, no rewind, best available density, character entry
+T}
+rmt/ccardttargetddeviceBESTnb:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Berkeley-style, no rewind, best available density, character entry
+T}
+.TE
+
+For installation in a short file name directory:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+rmt/ccardttargetddevicef0:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+AT&T-style, best available density, character entry
+T}
+rmt/ccardttargetddevicef0b:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Berkeley-style, best available density, character entry
+T}
+rmt/ccardttargetddevicef0n:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+AT&T-style, no rewind, best available density, character entry
+T}
+rmt/ccardttargetddevicef0nb:rw-rw-rw-:bin:bin:T{
+.ad l
+.hy 0
+Berkeley-style, no rewind, best available density, character entry
+T}
+.TE
+
+For   both  long  and  short  file  name  directories,  the  following additional files are created.
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+rmt/driver_name_config:rw-r--r--:bin:bin:T{
+.ad l
+.hy 0
+Tape configuration, character entry
+T}
+diag/rmt/ccardttargetddevice:rw-------:bin:bin:T{
+.ad l
+.hy 0
+For tape2 only, diagnostic access, character entry
+T}
+.TE
+
+.TP
+stcpmap
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+stcpmap:rw-rw-rw-:root:sys
+.TE
+.TP
+strlog
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+strlog:rw-rw-rw-:root:sys
+.TE
+.TP
+sy
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+tty:rw-rw-rw-:bin:bin
+.TE
+.TP
+tape2
+See stape.
+.TP
+tcp
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+tcp:rw-rw-rw-:root:sys
+.TE
+.TP
+telm
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+telnetm:rw-rw-rw-:root:sys
+.TE
+.TP
+tels
+The following special files are installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+pts/tnumber:rw-rw-rw-:root:sys:T{
+.ad l
+.hy 0
+number: 0 to 59
+T}
+.TE
+.TP
+tlclts
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+tlclts:rw-rw-rw-:root:sys
+.TE
+.TP
+tlcots
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+tlcots:rw-rw-rw-:root:sys
+.TE
+.TP
+tlcotsod
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+tlcotsod:rw-rw-rw-:root:sys
+.TE
+.TP
+token2
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+lancard:rw-rw-rw-:bin:bin
+.TE
+.TP
+udp
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+udp:rw-rw-rw-:root:sys
+.TE
+.TP
+unix_clts
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+unix_clts:rw-rw-rw-:root:sys
+.TE
+.TP
+unix_cots
+The following special file is installed:
+
+.TS
+tab(:);
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+unix_cots:rw-rw-rw-:root:sys
+.TE
+.\"
+.\"
+.SH EXIT STATUS
+.PP
+.B insf
+exits with one of the following values:
+.TP
+.B 0
+Successful completion, including warning diagnostics.
+.TP
+.B 1
+Failure.
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
+Most diagnostic messages from
+.B insf
+are self-explanatory.  Listed below are some messages deserving further clarification.
+.\"
+.SS Warnings 
+.TP
+Device driver name is not in the kernel
+.TP
+Device class name is not in the kernel
+The indicated device driver or device class is not present in the kernel. A device driver and/or
+device class can be added to the kernel using
+.BR config (8).
+.TP 
+No instance number available for device class name list item
+All of the instance numbers available for the device class are already assigned. Use the rmsf
+command to remove any unneeded devices from the system (see
+.BR rmsf(8)).
+.TP
+Don't know how to handle driver name - no special files created for path list item
+.B insf
+does not know how to create special files for the specified device driver. Use mknod to create
+special files for the device (see
+.BR mknod (1)).
 .\"
 .\"
 .SH NOTICES
 .PP
+.B insf
+should only be run in single-user mode.  It can change the mode, owner, or group of an existing
+special file, or unlink and recreate one; special files that are currently open may be left in an
+indeterminate state.
+
+Many commands and subsystems assume their device files are in
+.BR /dev ,
+therefore the use of the
+.B -D
+option is discouraged.
 .\"
 .\"
 .SH EXAMPLES
 .PP
-.\"
-.\"
-.SH DEVICES
+Install special files for all new devices
+belonging to the tty device class:
+.sp
+.nf
+\fC\s-1\
+insf -C tty
+\s+1\fP
+.fi
 .PP
+Install special files to the new device added at hardware path 2/4.0.0:
+.sp
+.nf
+\fC\s-1\
+insf -H 2/4.0.0
+\s+1\fP
+.fi
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH FILES
@@ -134,14 +1477,29 @@ sort-adjacent-labels
 contains the
 .B insf
 command.
+.TP
+.B /dev/config
+I/O system special file
+.TP
+.B /etc/ioconfig
+I/O system configuration database
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR config (1M),
+.BR ioscan (1M),
+.BR lsdev (1M),
+.BR lssf (1M),
+.BR mknod (1M),
+.BR mksf (1M),
+.BR rmsf (1M).
 .\"
 .\"
 .SH BUGS
 .PP
+.B insf
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -166,6 +1524,8 @@ documentation.
 .\"
 .SH HISTORY
 .PP
+.B insf
+was developed by HP.
 .\"
 .\"
 .[
