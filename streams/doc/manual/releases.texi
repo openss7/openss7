@@ -136,13 +136,15 @@ STREAMS (LiS) 2.18.0} package formerly maintained by Dave Goethe of @uref{http:/
 @section Release Notes
 @cindex release notes
 
-The sections that follow provide information on OpenSS7 releases of the @*
-@value{PACKAGE_TITLE} package.
+The sections that follow provide information on OpenSS7 releases of the
+@cite{@value{PACKAGE_TITLE}} package.
 
 @ifnotplaintext
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE_TARNAME}-0.7a.6.rc2::		Release 6 Candidate 2
+* Release @value{PACKAGE_TARNAME}-0.7a.6rc1::		Release 6 Candidate 1
 * Release @value{PACKAGE_TARNAME}-0.7a.5::		Release 5
 * Release @value{PACKAGE_TARNAME}-0.7a.4::		Release 4
 * Release @value{PACKAGE_TARNAME}-0.7a.3::		Release 3
@@ -159,8 +161,41 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
+Third release candidate.
+
+This release candidate provides support for additional @cite{SuSE} distributions on @code{ix86} as
+well as @code{x86_64}.  Added distribution support includes @cite{SLES 9}, @cite{SLES 9 SP2},
+@cite{SLES 9 SP3}, @cite{SLES 10}, @cite{SuSE 10.1}.
+
+This release candidate includes the changes made to the strsctp drivers at the @cite{2006 SCTP
+Interop} at the @cite{University of British Columbia}.  This version was interoperability tested
+with all implementations present.
+
+This release is an internal release candidate and was not publicly released.
+
+@node Release @value{PACKAGE_TARNAME}-0.7a.6.rc2
+@subsection Release @value{PACKAGE_TARNAME}-0.7a.6.rc2
+@cindex release @value{PACKAGE_TARNAME}-0.7a.6.rc2
+
+Second release candidate.
+
+This release candidate also contains the results of performance testing of the new second generation
+@dfn{UDP} driver (implemented completely in @dfn{STREAMS} instead of using an internal socket).
+
+This release candidate also contains support for @cite{SuSE 10.1}.
+
+This release is an internal release candidate and was not publicly released.
+
+@node Release @value{PACKAGE_TARNAME}-0.7a.6rc1
+@subsection Release @value{PACKAGE_TARNAME}-0.7a.6rc1
+@cindex release @value{PACKAGE_TARNAME}-0.7a.6rc1
+
+Release candidate for Mark Fugate.
+
 Added @samp{--enable-devel} @command{configure} option for embedded targets.
 Added @command{send-pr} script for automatic problem report generation.
+
+This release is an internal release candidate and was not publicly released.
 
 @node Release @value{PACKAGE_TARNAME}-0.7a.5
 @subsection Release @value{PACKAGE_TARNAME}-0.7a.5

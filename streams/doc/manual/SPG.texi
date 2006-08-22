@@ -4245,7 +4245,7 @@ interrupt routines).  Put routines are generally called at @var{str} priority.
 @subsection Scheduling
 
 Flow control and scheduling mechanisms are closely related.  They are also influenced by other parts
-fo the kernel such as the memory management routines and the system call mechanism.  The following
+of the kernel such as the memory management routines and the system call mechanism.  The following
 subsections describ how the variables and data structures for flow control and scheduling are used,
 and how the individual procedures work together.
 

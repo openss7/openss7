@@ -2008,7 +2008,7 @@ The sequence of primitives are shown in @figref{53}.
 @chapter CCI Primitives
 
 This section describes the format and parameters of the CCI primitives (@ref{Mapping of CCI Primitives to Q.931} and
-@ref{Mapping of CCI Primitives to Q.764}.  shows the mapping of CCI primitives fo the primitives defined in Q.931 and
+@ref{Mapping of CCI Primitives to Q.764}.  shows the mapping of CCI primitives of the primitives defined in Q.931 and
 Q.764).  In addition, it discusses the states the primitive is valid in, the resulting state, and the acknowledgement
 that the primitive expects.  (The state/event tables for these primitives are shown in @ref{State/Event Tables}.  The
 precedence tables for the CCI primitives are shown in @ref{Primitive Precedence Tables}.)  Rules for ITU-T conformance

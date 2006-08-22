@@ -59,7 +59,7 @@
 @c =========================================================================
 
 As with most open source projects, this project would not have been possible without the valiant
-efforts and productive software fo the @cite{Free Software Foundation} and the @cite{Linux Kernel
+efforts and productive software of the @cite{Free Software Foundation} and the @cite{Linux Kernel
 Community}.
 
 @menu

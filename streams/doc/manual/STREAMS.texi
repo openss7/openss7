@@ -70,8 +70,6 @@
 * STREAMS: (STREAMS).		STREAMS Manual
 @end direntry
 
-@defindex op
-
 @include texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE Installation and Reference Manual
@@ -172,6 +170,32 @@ another language, under the same conditions as for modified versions.
 @c Define an index of makefile targets
 @defcodeindex mk
 
+@c Define an index of configure output variables.
+@c @defcodeindex ov
+
+@c Define an index of configure variables.
+@c @defcodeindex cv
+
+@c Define an index of options.
+@defcodeindex op
+
+@c Define an index of targets.
+@c @defcodeindex tr
+
+@c Define an index of commands.
+@c @defcodeindex cm
+
+@c Put the macros and variables into their own index.
+@c @syncodeindex fn cp
+@c @syncodeindex ov vr
+@c @syncodeindex cv vr
+@c @syncodeindex fn vr
+
+@c Put everything else into one index (arbitrarily chosen to be the concept index).
+@c @syncodeindex op cp
+@c @syncodeindex tr cp
+@c @syncodeindex cm cp
+
 @c An index of manual pages
 @defcodeindex mp
 
@@ -196,9 +220,13 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Releases::			Releases of the package
 * Installation::		Installation of the package
 * Troubleshooting::		Troubleshooting of the package
-* Copying::			Copying information for this Software
-* Documentation License::	Copying information for this Manual
-* Indices::			Indices
+
+* GPL::				GNU General Public License
+* LGPL::			GNU Lesser General Public License
+* FDL::				GNU Free Documentation License
+
+* Indices::			Index of Indices
+
 @end menu
 @ignore
 @c @menu
@@ -280,14 +308,14 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @cindex document notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
-General Public License}).  Please note, however, that there are different licensing terms for the
-manual pages and some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX
-International.} publications and other sources).  Consult the permission notices contained in the
-documentation for more information.
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+Please note, however, that there are different licensing terms for the manual pages and some of the
+documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.} publications
+and other sources).  Consult the permission notices contained in the documentation for more
+information.
 
-This document, is released under the @cite{GNU Free Documentation License} (@pxref{GNU Free
-Documentation License}) with all sections invariant.
+This document, is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+sections invariant.
 
 @subsection Abstract
 @cindex document abstract
@@ -492,13 +520,13 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @cindex notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
-General Public License}).  Please note, however, that there are different licensing terms for the
-manual pages and some of the documentation (derived from X/Open publications and other sources).
-Consult the permission notices contained in the documentation for more information.
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+Please note, however, that there are different licensing terms for the manual pages and some of the
+documentation (derived from X/Open publications and other sources).  Consult the permission notices
+contained in the documentation for more information.
 
-This guide, is released under the @cite{GNU Free Documentation License} (@pxref{Documentation
-License}) with all sections invariant.
+This manual is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+sections invariant.
 
 @node Overview
 @section Overview
@@ -508,10 +536,10 @@ This manual documents the design, implementation, installation, operation and fu
 the @cite{@value{PACKAGE_TITLE}} package.
 
 @node Organization
-@section Organization of this Guide
+@section Organization of this Manual
 @cindex organization
 
-This guide is organized (loosely) into several sections as follows:
+This manual is organized (loosely) into several sections as follows:
 
 @ifnottex
 @menu
@@ -2022,25 +2050,28 @@ For additional details,
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Copying
-@appendix Copying
+@node GPL
+@appendix GPL
+@cindex license GPL
 
-@menu
-* GNU General Public License::
-@end menu
-
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
 @include texi/gpl.texi
 
+@node LGPL
+@appendix LGPL
+@cindex license LGPL
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
+@include texi/lesser.texi
 
-@node Documentation License
-@appendix Documentation License
+@node FDL
+@appendix FDL
+@cindex license FDL
 
-@menu
-* GNU Free Documentation License::
-@end menu
-
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
 @include texi/fdl.texi
 
 @c ----------------------------------------------------------------------------
@@ -2048,6 +2079,10 @@ For additional details,
 
 @node Indices
 @unnumbered Indices
+@cindex indices
+
+@c ----------------------------------------------------------------------------
+
 @menu
 * Concept Index::		Index of Concepts
 * Type Index::			Index of Data Types
@@ -2055,6 +2090,7 @@ For additional details,
 * Variable Index::		Index of Variables and Constants
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
+* Author Index::		Index of Authors
 * Makefile Target Index::	Index of Makefile Targets
 * Manual Page Index::		Index of Manual Pages Referenced
 @end menu
@@ -2096,6 +2132,11 @@ For additional details,
 @printindex mk
 
 @page
+@node Author Index
+@unnumberedsec Index of Authors
+@printindex au
+
+@page
 @node Manual Page Index
 @unnumberedsec Index of Manual Pages Referenced
 @printindex mp
@@ -2108,3 +2149,4 @@ For additional details,
 @contents
 @bye
 
+@c ============================================================================

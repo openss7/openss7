@@ -17,6 +17,9 @@ See the end for copying conditions.
   Columbia.  This version was interoperability tested with all
   implementations present.
 
+  This release is an internal release candidate and was not publicly
+  released.
+
 * Major changes for streams-0.7a.6.rc2
 
   Second release candidate.
@@ -27,14 +30,18 @@ See the end for copying conditions.
 
   This release candidate also contains support for SuSE 10.1.
 
+  This release is an internal release candidate and was not publicly
+  released.
+
 * Major changes for streams-0.7a.6rc1
 
   Release candidate for Mark Fugate.
 
-* Major changes for streams-0.7a.6
-
   Added --enable-devel configure option for embedded targets.
   Added send-pr script for automatic problem report generation.
+
+  This release is an internal release candidate and was not publicly
+  released.
 
 * Major changes for streams-0.7a.5
 

@@ -1346,7 +1346,7 @@ the following OpenSS7 stack components:
 
 @c @figure{voip_proto,6,Protocol Architecture}
 
-The following Protocol Stacks are provided as part fo the OpenSS7 SS7 and VoIP stacks:
+The following Protocol Stacks are provided as part of the OpenSS7 SS7 and VoIP stacks:
 
 @menu
 * Applications::
