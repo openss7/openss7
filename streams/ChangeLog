@@ -1,3 +1,35 @@
+2006-08-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/texi/compat.texi: created common compatibility text
+	* scripts/texi/macros.texi: created common macros file
+	* NEWS: updated for release
+	* doc/man/Makefile.am: macros and compat dependecies
+	* doc/man/man1/strreset.1.man: corrections
+	* doc/man/man8/insf.8.man: corrections
+	* doc/man/man8/specfs.8.man: added init script manpage
+	* doc/man/man8/specfs.sh.8.man:added init script manpage
+	* doc/man/man8/streams.8.man:added init script manpage
+	* doc/man/man8/streams.sh.8.man:added init script manpage
+	* doc/man/man8/strinfo.8.man: corrections
+	* doc/man/man8/strload.8.man: corrections
+	* doc/manual/Makefile.am: macros and compat dependencies
+	* doc/manual/SPG.texi: corrections
+	* doc/manual/SPG2.texi: corrections
+	* doc/manual/STREAMS.texi: corrections
+	* doc/manual/STREAMS_FAQ.texi: corrections
+	* doc/manual/drivers.texi: new file for drivers
+	* doc/manual/install.texi: corrections
+	* doc/manual/modules.texi: new file for modules
+	* doc/manual/porting.texi: corrections
+	* doc/manual/releases.texi: corrections
+	* doc/manual/utilities.texi: corrections
+	* src/modules/sth.c: corrections
+	* src/util/strload: corrections
+	* src/util/init/specfs: corrections
+	* src/util/init/specfs.sh: corrections
+	* src/util/init/streams: corrections
+	* src/util/init/streams.sh: corrections
+
 2006-08-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/releases.texi: added supported SuSE distirbutions

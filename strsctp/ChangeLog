@@ -1,3 +1,15 @@
+2006-08-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/texi/compat.texi: created common compatibility text
+	* scripts/texi/macros.texi: created common macros file
+	* NEWS: updates for release
+	* TODO: updates for release
+	* doc/manual/Makefile.am: updated documentation
+	* doc/manual/releases.texi: updated documentation
+	* doc/manual/strsctp.texi: updated documentation
+	* doc/manual/tree.texi: updated documentation
+	* acinclude.m4: get rid of AC_DEFINE_UNQUOTED
+
 2006-08-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/releases.texi: added supported SuSE distirbutions

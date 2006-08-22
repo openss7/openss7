@@ -1,3 +1,22 @@
+2006-08-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/texi/compat.texi: created common compatibility text
+	* scripts/texi/macros.texi: created common macros file
+	* doc/.cvsignore: added doc tree for master package
+	* doc/Makefile.am: added doc tree for master package
+	* doc/manual/.cvsignore: added doc tree for master package
+	* doc/manual/Makefile.am: added doc tree for master package
+	* doc/manual/configure.texi: added doc tree for master package
+	* doc/manual/install.texi: added doc tree for master package
+	* doc/manual/openss7.texi: added doc tree for master package
+	* doc/manual/releases.texi: added doc tree for master package
+	* doc/manual/rpm.texi: added doc tree for master package
+	* doc/manual/testsuite.texi: added doc tree for master package
+	* doc/manual/tree.texi: added doc tree for master package
+	* NEWS: updates for release
+	* Makefile.am: add documenation directory
+	* configure.ac: add documentation directory
+
 2006-08-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: adjusted autoconf.h path for SLES 10

@@ -1,3 +1,12 @@
+2006-08-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/texi/compat.texi: created common compatibility text
+	* scripts/texi/macros.texi: created common macros file
+	* NEWS: updates for release
+	* doc/manual/Makefile.am: updated documentation
+	* doc/manual/releases.texi: updated documentation
+	* doc/manual/strxns.texi: updated documentation
+
 2006-08-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/releases.texi: added supported SuSE distirbutions

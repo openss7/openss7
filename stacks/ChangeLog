@@ -1,3 +1,32 @@
+2006-08-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/texi/compat.texi: created common compatibility text
+	* scripts/texi/macros.texi: created common macros file
+	* NEWS: updated for release
+	* doc/manual/Makefile.am: updated documentation
+	* doc/manual/libxnet.texi: updated documentation
+	* doc/manual/releases.texi: updated documentation
+	* doc/manual/strss7.texi: updated documentation
+	* doc/projects/Makefile.am: updated documentation
+	* doc/projects/hlr.texi: updated documentation
+	* doc/projects/lab.texi: updated documentation
+	* doc/projects/voip.texi: updated documentation
+	* doc/specs/cci/Makefile.am: updated documentation
+	* doc/specs/cci/cci.texi: updated documentation
+	* doc/specs/dlpi/Makefile.am: updated documentation
+	* doc/specs/dlpi/dlpi.texi: updated documentation
+	* doc/specs/mapi/Makefile.am: updated documentation
+	* doc/specs/mapi/mapi.texi: updated documentation
+	* doc/specs/npi/Makefile.am: updated documentation
+	* doc/specs/npi/npi.texi: updated documentation
+	* doc/specs/tci/Makefile.am: updated documentation
+	* doc/specs/tci/tci.texi: updated documentation
+	* doc/specs/tpi/Makefile.am: updated documentation
+	* doc/specs/tpi/tpi.texi: updated documentation
+	* doc/specs/tpi/tpi_tcap.texi: updated documentation
+	* doc/specs/tri/Makefile.am: updated documentation
+	* doc/specs/tri/tri.texi: updated documentation
+
 2006-08-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/releases.texi: added supported SuSE distirbutions

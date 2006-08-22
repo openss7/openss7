@@ -1,3 +1,14 @@
+2006-08-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/texi/compat.texi: created common compatibility text
+	* scripts/texi/macros.texi: created common macros file
+	* NEWS: updated for release
+	* acinclude.m4: add checks from strsctp package in preparation for 2.6
+	* doc/manual/Makefile.am: added macros.texi and compat.texi dependencies
+	* doc/manual/releases.texi: removed compat information
+	* doc/manual/sctp.texi: remove macros
+	* src/sctp.c: rationalized to strsctp
+
 2006-08-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/releases.texi: added supported SuSE distirbutions
