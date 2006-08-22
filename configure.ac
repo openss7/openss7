@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/20 13:29:55 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/08/22 13:02:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,14 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 13:29:55 $ by $Author: brian $
+# Last Modified $Date: 2006/08/22 13:02:54 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.21 2006/03/20 13:29:55 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.22 2006/08/22 13:02:54 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([OpenSS7],[0.9.2],[bugs@openss7.org],[openss7])
 
@@ -165,7 +165,11 @@ AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm atexit bzero get
 
 AC_OS7
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile
+		 scripts/texi/args.texi
+		 doc/Makefile
+		 doc/manual/Makefile
+		 doc/manual/texi/args.texi])
 
 AC_OUTPUT
 
