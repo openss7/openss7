@@ -1,0 +1,2573 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: strconf-sh,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/07/25 06:38:54 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/07/25 06:38:54 $ by $Author: brian $
+#
+# =============================================================================
+
+# Streams configuration ala bash
+
+echo='echo'
+SHELL='/bin/sh'
+SED='sed'
+
+# Check that we have a working $echo.
+if test "X$1" = X--no-reexec; then
+    # Discard the --no-reexec flag, and continue
+    shift
+elif test "X`($echo '\t') 2>/dev/null`" = 'X\t'; then
+    :
+else
+    exec $SHELL "$0" --no-reexec ${1+"$@"}
+fi
+
+if test "X$1" = X--fallback-echo ; then
+    shift
+    cat <<EOF
+$*
+EOF
+    exit 0
+fi
+
+edirname=`$echo "$0" | ${SED} -e 's|[^/]*$||;s|^$|.|'`
+progname=`$echo "$0" | ${SED} -e 's%^.*/%%'`
+modename="$progname"
+reexec="$SHELL $0"
+
+help="Try \`$progname --help' for more information."
+mkdir="mkdir"
+mv="mv -f"
+rm="rm -f"
+
+# Sed substitution that helps us do robust quoting.  It backslashifies
+# metacharacters that are still active within double-quoted strings.
+Xsed="${SED}"' -e 1s/^X//'
+sed_quote_subst='s/\([\\`\\"$\\\\]\)/\\\1/g'
+# test EBCDIC or ASCII
+case `$echo A|od -x` in
+ *[Cc]1*) # EBCDIC based system
+  SP2NL="tr '\100' '\n'"
+  NL2SP="tr '\r\n' '\100\100'"
+  ;;
+ *) # Assume ASCII based system
+  SP2NL="tr '\040' '\012'"
+  NL2SP="tr '\015\012' '\040\040'"
+  ;;
+esac
+
+# NLS nuisances.
+# Only set LANG and LC_ALL to C if already set.
+# These must not be set unconditionally because not all systems understand
+# e.g. LANG=C (notably SCO).
+# We save the old values to restore during execute mode.
+if test "${LC_ALL+set}" = set; then
+  save_LC_ALL="$LC_ALL"; LC_ALL=C; export LC_ALL
+fi
+if test "${LANG+set}" = set; then
+  save_LANG="$LANG"; LANG=C; export LANG
+fi
+
+# Make sure IFS has a sensible default
+: ${IFS=" 	"}
+
+#
+# Now we need to find the source and build directories.  Of course, the build
+# directory is the current directory, however, the source directory is
+# whatever directory we were invoked in minus the 'scripts' component.  If it
+# was specified relative, it will be relative.
+#
+srcdir=`$echo $0 | sed -e 's|/scripts/[^/]*$||'`
+builddir='.'
+
+strconf_letters='abcdefghijklmnopqrstuvwxyz'
+strconf_LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+strconf_Letters=$strconf_letters$strconf_LETTERS
+strconf_numbers='0123456789'
+strconf_alphano=$strconf_Letters$strconf_numbers
+strconf_uppercase="$SED y%*$strconf_letters%P$strconf_LETTERS%;s%[^_$strconf_alphano]%_%g"
+
+strconf_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
+
+# Defaults
+
+default_package=${PACKAGE:-LiS}
+default_basemajor=230
+default_basemodid=1
+default_minorbits=8
+default_permission=0666
+default_functionname='main'
+default_pkgobject=
+
+package=
+basemajor=
+basemodid=
+minorbits=
+permission=
+functionname=
+pkgobject=
+
+defaults='package basemajor basemodid minorbits permission functionname pkgobject'
+
+default_hconfig='config.h'
+default_modconf='modconf.inc'
+default_makenodes='makenodes.c'
+default_driverconf='drvrconf.mk'
+default_confmodules='conf.modules'
+default_strmknods='makedev.lst'
+default_strsetup='strsetup.conf'
+default_strload='strload.conf'
+default_minorbits='8'
+
+hconfig=
+modconf=
+makenodes=
+driverconf=
+confmodules=
+strmknods=
+strsetup=
+strload=
+packagedir=
+
+# Parse our command line options once, thoroughly.
+while test "$#" -gt 0 -o ":$more" != ":"
+do
+    if test ":$more" != ":" ; then arg="-$more" ; more= ; else arg="$1" ; shift ; fi
+    if test x"$more_options" = xno ; then nonopt="$arg" ; break; fi
+    # check for attached option argument
+    case $arg in
+        --basemajor=* | --basemajo=* | --basemaj=* | --basema=* | \
+        --basemodid=* | --basemodi=* | --basemod=* | --basemo=* | \
+        --minorbits=* | --minorbit=* | --minorbi=* | --minorb=* | --minor=* | --mino=* | --min=* | --mi=* | --bits=* | \
+        --hconfig=* | --hconfi=* | --hconf=* | --hcon=* | --hco=* | --hc=* | --h=* | \
+        --modconf=* | --modcon=* | --modco=* | --modc=* | --mod=* | --mo=* | --m=* | --o=* | \
+        --makenodes=* | --makenode=* | --makenod=* | --makeno=* | --maken=* | --make=* | --mak=* | --ma=* | --mknod=* | \
+        --strsetup=* | --strsetu=* | --strset=* | --strse=* | --strs=* | --setup=* | \
+        --strload=* | --strloa=* | --strlo=* | --strl=* | --load=* | \
+        --strmknods=* | --strmknod=* | --strmkno=* | --strmkn=* | --strmk=* | --strm=* | --str=* | --st=* | --smknod=* | \
+        --permission=* | --permissio=* | --permissi=* | --permiss=* | --permis=* | --permi=* | --perm=* | --per=* | --pe=* | --umask=* | --p=* | \
+        --driverconf=* | --drvrconf=* | --drvconf=* | --drconf=* | --dconf=* | --l* | \
+        --confmodules=* | --confmodule=* | --confmodul=* | --confmodu=* | --confmod=* | --confmo=* | --conf=* | --con=* | --co=* | --c=* | --L=* | \
+        --functionname=* | --funcname=* | --funcnam=* | --function=* | --func=* | --fncname=* | --fncnam=* | --fnc=* | --f=* | --r=* | \
+        --package=* | --packag=* | --packa=* | --pack=* | --pac=* | --pa=* | --k=* | \
+        --pkgobject=* | --pkgobjec=* | --pkgobje=* | --pkgobj=* | --pkgob=* | --pkgo=* | --pkg=* | --pk=* | --g=* | \
+        --packagedir=* | --packagedi=* | --packaged=* | --d=* \
+        )
+            optarg=`$echo "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
+        --*=*)
+            opt=`$echo -n "X$1" | $Xsed -e 's|=.*||'`
+            $echo "$program: syntax error -- \`$opt' does not accept an argument" >&2
+            $echo "$help" >&2
+            exit 2 ;;
+        -[biBhomHprlLsSOkg])
+            optarg= ;;
+        -[biBhomHprlLsSOkg]*)
+            optarg=`$echo "X$arg" | $Xsed -e 's/-[biBhomHprlLsSOkg]//'` ;;
+        *)
+            optarg= ;;
+    esac
+
+    # check for optional or required option argument
+    if test -n "$prev"; then
+        case $arg in
+            -*) # optional arguments not forthcoming
+                case $prev in
+                    # these have optional arguments
+                    basemajor | basemodid | minorbits | permission | functionname | hconfig | modconf | makenodes | driverconf | confmodules | strmknods | strsetup | strload | package)
+                        eval "$prev=\"\$default_$prev\""
+                        reexec="$reexec $prevopt"
+                        prev= ; prevopt=
+                        ;;
+                    # the rest have required arguments
+                    *)
+                        $echo "$progname: syntax error -- \`$prevopt' requires an argument" >&2
+                        $echo "$help" >&2
+                        exit 2
+                        ;;
+                esac
+                ;;
+            *) # If the previous option needs an argument, assign it.
+                eval "$prev=\"\$arg\""
+                reexec="$reexec $prevopt=\"$arg\""
+                prev= ; prevopt=
+                continue
+                ;;
+        esac
+    fi
+
+    # Have we seen a non-optional argument yet?
+    case $arg in
+        --help | --Help | --H | -H)
+            show_help=yes
+            reexec="$reexec --help"
+            ;;
+        --version | --versio | --versi | --vers | --ver | --ve | --v | -V)
+            show_version=yes
+            reexec="$reexec --version"
+            ;;
+        --debug | -d)
+            $echo "$progname: enabling shell trace mode"
+            reexec="$reexec --debug"
+            set -x
+            ;;
+        --dry-run | --dryrun | --n | -n)
+            reexec="$reexec --dryrun"
+            run=:
+            ;;
+        --quiet | --silent | -q)
+            reexec="$reexec --quiet"
+            show=:
+            ;;
+        --basemajor | --basemajo | --basemaj | --basema | -b)
+            prevopt="$arg" ; prev=basemajor ;;
+        --basemajor=* | --basemajo=* | --basemaj=* | --basema=* | -b*)
+            basemajor="$optarg" ; reexec="$reexec --basemajor=\"$optarg\"" ;;
+        --basemodid | --basemodi | --basemod | --basemo | -b)
+            prevopt="$arg" ; prev=basemodid ;;
+        --basemodid=* | --basemodi=* | --basemod=* | --basemo=* | -i*)
+            basemodid="$optarg" ; reexec="$reexec --basemodid=\"$optarg\"" ;;
+        --minorbits | --minorbit | --minorbi | --minorb | --minor | --mino | --min | --mi | --bits | -B)
+            prevopt="$arg" ; prev=minorbits ;;
+        --minorbits=* | --minorbit=* | --minorbi=* | --minorb=* | --minor=* | --mino=* | --min=* | --mi=* | --bits=* | -B*)
+            minorbits="$optarg" ; reexec="$reexec --minorbits=\"$optarg\"" ;;
+        --hconfig | --hconfi | --hconf | --hcon | --hco | --hc | --h | -h)
+            prevopt="$arg" ; prev=hconfig ;;
+        --hconfig=* | --hconfi=* | --hconf=* | --hcon=* | --hco=* | --hc=* | --h=* | -h*)
+            hconfig="$optarg" ; reexec="$reexec --hconfig=\"$optarg\"" ;;
+        --modconf | --modcon | --modco | --modc | --mod | --mo | --m | --o | -o)
+            prevopt="$arg" ; prev=modconf ;;
+        --modconf=* | --modcon=* | --modco=* | --modc=* | --mod=* | --mo=* | --m=* | --o=* | -o*)
+            modconf="$optarg" ; reexec="$reexec --modconf=\"$optarg\"" ;;
+        --makenodes | --makenode | --makenod | --makeno | --maken | --make | --mak | --ma | --mknod | -m)
+            prevopt="$arg" ; prev=makenodes ;;
+        --makenodes=* | --makenode=* | --makenod=* | --makeno=* | --maken=* | --make=* | --mak=* | --ma=* | --mknod=* | -m*)
+            makenodes="$optarg" ; reexec="$reexec --makenodes=\"$optarg\"" ;;
+        --strsetup | --strsetu | --strset | --strse | --strs | --setup | -S)
+            prevopt="$arg" ; prev=strsetup ;;
+        --strsetup=* | --strsetu=* | --strset=* | --strse=* | --strs=* | --setup=* | -S*)
+            strsetup="$optarg" ; reexec="$reexec --strsetup=\"$optarg\"" ;;
+        --strload | --strloa | --strlo | --strl | --load | -O)
+            prevopt="$arg" ; prev=strload ;;
+        --strload=* | --strloa=* | --strlo=* | --strl=* | --load=* | -O*)
+            strload="$optarg" ; reexec="$reexec --strload=\"$optarg\"" ;;
+        --strmknods | --strmknod | --strmkno | --strmkn | --strmk | --strm | --str | --st | --smknod | -s)
+            prevopt="$arg" ; prev=strmknods ;;
+        --strmknods=* | --strmknod=* | --strmkno=* | --strmkn=* | --strmk=* | --strm=* | --str=* | --st=* | --smknod=* | -s*)
+            strmknods="$optarg" ; reexec="$reexec --strmknods=\"$optarg\"" ;;
+        --permission | --permissio | --permissi | --permiss | --permis | --permi | --perm | --per | --pe | --umask | --p | -p)
+            prevopt="$arg" ; prev=permission ;;
+        --permission=* | --permissio=* | --permissi=* | --permiss=* | --permis=* | --permi=* | --perm=* | --per=* | --pe=* | --umask=* | --p=* | -p*)
+            permission="$optarg" ; reexec="$reexec --permission=\"$optarg\"" ;;
+        --driverconf | --drvrconf | --drvconf | --drconf | --dconf | --l | -l)
+            prevopt="$arg" ; prev=driverconf ;;
+        --driverconf=* | --drvrconf=* | --drvconf=* | --drconf=* | --dconf=* | --l* | -l*)
+            driverconf="$optarg" ; reexec="$reexec --driverconf=\"$optarg\"" ;;
+        --confmodules | --confmodule | --confmodul | --confmodu | --confmod | --confmo | --conf | --con | --co | --c | --L | -L)
+            prevopt="$arg" ; prev=confmodules ;;
+        --confmodules=* | --confmodule=* | --confmodul=* | --confmodu=* | --confmod=* | --confmo=* | --conf=* | --con=* | --co=* | --c=* | --L=* | -L*)
+            confmodules="$optarg"; reexec="$reexec --confmodules=\"$optarg\"" ;;
+        --functionname | --funcname | --funcnam | --function | --func | --fncname | --fncnam | --fnc | --f | --r | -r)
+            prevopt="$arg" ; prev=functionname ;;
+        --functionname=* | --funcname=* | --funcnam=* | --function=* | --func=* | --fncname=* | --fncnam=* | --fnc=* | --f=* | --r=* | -r*)
+            functionname="$optarg" ; reexec="$reexec --functionname=\"$optarg\"" ;;
+        --package | --packag | --packa | --pack | --pac | --pa | --k | -k)
+            prevopt="$arg" ; prev=package ;;
+        --package=* | --packag=* | --packa=* | --pack=* | --pac=* | --pa=* | --k=* | -k*)
+            package="$optarg" ; reexec="$reexec --package=\"$optarg\"" ;;
+        --pkgobject | --pkgobjec | --pkgobje | --pkgobj | --pkgob | --pkgo | --pkg | --pk | --g | -g)
+            prevopt="$arg" ; prev=pkgobject ;;
+        --pkgobject=* | --pkgobjec=* | --pkgobje=* | --pkgobj=* | --pkgob=* | --pkgo=* | --pkg=* | --pk=* | --g=* | -g*)
+            pkgobject="$optarg" ; reexec="$reexec --pkgobject=\"$optarg\"" ;;
+        --packagedir | --packagedi | --packaged | --d | -d)
+            prevopt="$arg" ; prev=packagedir ;;
+        --packagedir=* | --packagedi=* | --packaged=* | --d=* | -d*)
+            packagedir="$optarg" ; reexec="$reexec --packagedir=\"$optarg\"" ;;
+        --) # end of options
+            more_options=no
+            ;;
+        -*)
+            $echo "$progname: syntax error -- unrecognized option \`$arg'" >&2
+            $echo "$help" >&2
+            exit 2
+            ;;
+        *) # permute all non-options to the end
+            nonopt="${nonopt}${nonopt:+ }$arg" ;;
+    esac
+done
+
+# hit the end of the list wanting an argument
+if test -n "$prev" ; then
+    case $prev in
+        # these have optional arguments
+        basemajor | minorbits | permission | functionname | hconfig | modconf | makenodes | driverconf | confmodules | strmknods | strsetup | package)
+            eval "$prev=\"\$default_$prev\""
+            reexec="$reexec $prevopt"
+            ;;
+        # the rest have required arguments
+        *)
+            $echo "$progname: stynax error -- option \`$prevopt' requires an argument" >&2
+            $echo "$help" >&2
+            exit 1
+            ;;
+    esac
+fi
+
+if test X"$show_version" = Xyes ; then
+    $echo "$progname:"' Version $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/07/25 06:38:54 $'
+fi
+
+if test X"$show_help" = Xyes ; then
+    cat <<EOF
+$progname:
+Usage:
+    $progname [options] CONFIGFILE
+        where the configuration file will be read
+
+Options:
+    -b, --basemajor=MAJOR
+        major number to act as base for STREAMS drivers and devices
+        [default: $default_basemajor]
+    -i, --basemodid=MODID
+        module id number to act as base for STREAMS modules
+        [default: $default_basemajor]
+    -B, --minorbits=MINORBITS
+        number of bits in a minor devices number
+        [default: $default_minorbits]
+    -h, --hconfig=[HCONFIG]
+        full path and filename of the STREAMS configuration header file
+        [default: $default_hconfig]
+    -o, --modconf=[MODCONFINC]
+        full path and filename of the module configuration include file
+        [default: $default_modconf]
+    -m, --makenodes=[MAKENODES]
+        full path and filename of the makenodes file
+        [default: $default_makenodes]
+    -p, --permission=PERM
+        permissions to assign to created files
+        [default: $default_permission]
+    -l, --driverconf=[DRIVERCONF]
+        full path and filename of the driver configuration makefile
+        [default: $default_driverconf]
+    -L, --confmodules=[CONFMODULES]
+        full path and filename of the modules configuration file
+        [default: $default_confmodules]
+    -r, --functionanme=FUNCNAME
+        function name of the function in makenodes
+        [default: $default_functionname]
+    -s, --strmknods=[MAKEDEVICES]
+        full path and filename of the makedevices script
+        [default: $default_strmknods]
+    -S, --strsetup=[STRSETUP]
+        full path and filename of the strsetup configuration file
+        [default: $default_strsetup]
+    -O, --strload=[STRLOAD]
+        full path and filename of the strload configuration file
+        [default: $default_strload]
+    -k, --package=[PACKAGE]
+        name of STREAMS package: LiS or LfS
+        [default: $default_package]
+    -g, --pkgobject=[PKGOBJECT]
+        full path and filename of object file to package
+        [default: $default_pkgobject]
+    -d, --packagedir=[PACKAGEDIR]
+        full path or vpath to binary package directory
+        [default: $default_packagedir]
+EOF
+    exit 0
+fi
+
+if test "x$nonopt" != "x"; then
+    infile="$nonopt${1+ $@}"
+    reexec="$reexec $infile"
+else
+    # reading standard input
+    infile=
+fi
+
+# assign defaults to all unassigned variables
+for def in $defaults ; do
+    val=`eval 'echo $'"$def"`
+    if test :${val:+set} != :set ; then
+        eval "$def=\$default_$def"
+    else
+        eval "$def=\"\$val\""
+    fi
+done
+
+case $package in
+LfS)
+    ucpackage='LFS'
+    lcpackage='lfs'
+    package='LfS'
+    ;;
+LiS | *)
+    ucpackage='LIS'
+    lcpackage='lis'
+    package='LiS'
+    ;;
+esac
+
+# create all our directories
+
+for file in $hconfig $modconf $makenodes $strmknods $strsetup $strload $driverconf $confmodules $functionname
+do
+    # strip filename
+    comps=`$echo ":$file" | $SED -ne 's/^:\//#/;s/^://;s/\// /g;s/^#/\//;p'`
+    eval "components=($comps)"
+    count=0
+    pathcomp=
+    numb=${#components[*]}
+    ((numb--))
+    while test $count -lt $numb
+    do
+        eval "pathcomp=\"$pathcomp\${components[$count]}\""
+        ((count++))
+        case $pathcomp in
+            -*) pathcomp=./$pathcomp ;;
+        esac
+        if test ! -d "$pathcomp"; then
+            mkdir "$pathcomp" || lasterr=$?
+            if test ! -d "$pathcomp"; then
+                errstatus=$lasterr
+            else
+                if test ! -z "$permission"; then
+                    lasterr=""
+                    chmod 0777 "$pathcomp" || lasterr=$?
+                    if test ! -z "$lasterr"; then
+                        errstatus=$lasterr
+                    fi
+                fi
+            fi
+        fi
+        pathcomp="$pathcomp/"
+    done
+done
+
+if test ! -z "$errstatus"; then
+    exit $errstatus
+fi
+
+imajor="$basemajor"
+idnumber="$basemodid"
+lineno=0
+set noglob
+qlock_encountered=no
+if test -n "$infile" ; then exec 0<$infile ; fi
+filename="$infile"
+while read -a tokens
+do
+    ((lineno++))
+    if test "x${tokens[*]}" = x ; then
+        continue
+    fi
+    case ":${tokens[0]}" in
+        (:file)
+            # new keyword indicating the file that the configuration came from
+            filename="${tokens[1]}"
+            ;;
+        (:driver)
+            assigned=no
+            token=`$echo -n ${tokens[1]} | $strconf_tokenize`
+            eval "otherno=\"\$strconf_driver_lineno_$token\""
+            if test -n "$otherno" ; then
+                $echo "$progname: error: ${infile:-(stdin)} +$lineno : driver \`${tokens[1]}' already defined at line $otherno" >&2
+                continue
+            fi
+            major=${tokens[3]}
+            case "x$major" in
+                x | x#* | x[-*]*)
+                    major="$imajor"
+                    assigned=yes
+                    ;;
+                x[0-9]*)
+                    if test $major -ge $basemajor -a $major -le $imajor; then
+                        $echo "$progname: error: ${infile:-(stdin)} +$lineno : major number conflict \`$major'" >&2
+                        continue
+                    fi
+                    ;;
+                *)  $echo "$progname: syntax error: ${infile:-(stdin)} +$lineno : bad major field \`$major'" >&2
+                    continue
+                    ;;
+            esac
+            inmajors=1
+            nminors=${tokens[4]}
+            case "x$nminors" in
+                x | x#* | x[-*]*)
+                    nminors=1
+                    ;;
+                x[0-9]*)
+                    ((inmajors=(nminors+(1<<minorbits)-1)/(1<<minorbits)))
+                    ;;
+                *)  $echo "$progname: syntax error: ${infile:-(stdin)} +$lineno : bad nminors field \`$nminors'" >&2
+                    continue
+                    ;;
+            esac
+            nmajors=${tokens[5]}
+            case "x$nmajors" in
+                x | x#* | x[-*]*)
+                    nmajors="$inmajors"
+                    ;;
+                x[0-9]*)
+                    ;;
+                *)  $echo "$progname: syntax error: ${infile:-(stdin)} +$lineno : bad nmajors field \`$nmajors'" >&2
+                    continue
+                    ;;
+            esac
+            eval "strconf_driver_lineno_$token=\"\$lineno\""
+            eval "strconf_driver_$token='${tokens[*]}'"
+            strconf_driver_names="$strconf_driver_names $token"
+            eval "strconf_filename_$token='$filename'"
+            eval "strconf_realname_$token='${tokens[1]}'"
+            eval "strconf_prefix_$token='${tokens[2]}'"
+            eval "strconf_major_$token=$major"
+            eval "strconf_nminors_$token=$nminors"
+            eval "strconf_nmajors_$token=$nmajors"
+            case $package in
+            LfS)
+                eval "strconf_id_$token=$major"
+                ;;
+            LiS | *)
+                eval "strconf_id_$token=$idnumber"
+                ((idnumber++))
+                ;;
+            esac
+            if test :${assigned} = :yes ; then
+                ((imajor+=nmajors))
+            fi
+            ;;
+        (:module)
+            token=`$echo -n ${tokens[1]} | $strconf_tokenize`
+            eval "otherno=\"\$strconf_module_lineno_$token\""
+            if test -n "$otherno" ; then
+                $echo "$progname: error: ${infile:-(stdin)} +$lineno : module \`${tokens[1]}' already defined at line $otherno" >&2
+                continue
+            fi
+            eval "strconf_module_lineno_$token=\"\$lineno\""
+            eval "strconf_module_$token='${tokens[*]}'"
+            strconf_module_names="$strconf_module_names $token"
+            eval "strconf_filename_$token='$filename'"
+            eval "strconf_realname_$token='${tokens[1]}'"
+            eval "strconf_prefix_$token='${tokens[2]}'"
+            eval "strconf_id_$token=$idnumber"
+            ((idnumber++))
+            ;;
+        (:objname)
+            case ":${tokens[1]}" in
+                :driver)
+                    token=`$echo -n ${tokens[2]} | $strconf_tokenize`
+                    eval "otherno=\"\$strconf_objname_driver_lineno_$token\""
+                    if test -n "$otherno" ; then
+                        $echo "$progname: error: ${infile:-(stdin)} +$lineno : driver object name \`${tokens[2]}' already defined at line $otherno" >&2
+                        continue
+                    fi
+                    object=`$echo -n ${tokens[3]} | $strconf_tokenize`
+                    eval "strconf_objname_driver_lineno_$token=\"\$lineno\""
+                    eval "strconf_objname_driver_$token='${tokens[*]}'"
+                    eval "strconf_objname_$token=\"$object\""
+                    eval "strconf_name_$object=\"$token\""
+                    eval "strconf_object_driver_$token=\"${tokens[3]}\""
+                    strconf_drv_objnames="$strconf_drv_objnames ${tokens[3]}"
+                    ;;
+                :module)
+                    token=`$echo -n ${tokens[2]} | $strconf_tokenize`
+                    eval "otherno=\"\$strconf_objname_module_lineno_$token\""
+                    if test -n "$otherno" ; then
+                        $echo "$progname: error: ${infile:-(stdin)} +$lineno : module object name \`${tokens[2]}' already defined at line $otherno" >&2
+                        continue
+                    fi
+                    object=`$echo -n ${tokens[3]} | $strconf_tokenize`
+                    eval "strconf_objname_module_lineno_$token=\"\$lineno\""
+                    eval "strconf_objname_module_$token='${tokens[*]}'"
+                    eval "strconf_objname_$token=\"$object\""
+                    eval "strconf_name_$object=\"$token\""
+                    eval "strconf_object_module_$token=\"${tokens[3]}\""
+                    strconf_mod_objnames="$strconf_mod_objnames ${tokens[3]}"
+                    ;;
+                :*)
+                    $echo "$progname: syntax error: ${infile:-(stdin)} +$lineno : unknown object name \`${tokens[1]}'" >&2
+                    continue
+                    ;;
+            esac
+            ;;
+        (:autopush)
+            token=`$echo -n ${tokens[1]} | $strconf_tokenize`
+#            eval "otherno=\"\$strconf_autopush_lineno_$token\""
+#            if test -n "$otherno" ; then
+#                $echo "$progname: error: ${infile:-(stdin)} +$lineno : autopush \`${tokens[1]}' already defined at line $otherno" >&2
+#                continue
+#            fi
+            eval "strconf_autopush_lineno_$token=\"\$lineno\""
+            eval "strconf_autopush_$token='${tokens[*]}'"
+            eval "strconf_minor_$token='${tokens[2]}'"
+            eval "strconf_lastminor_$token='${tokens[3]}'"
+            eval "strconf_modules_$token='\
+${tokens[4]} ${tokens[5]} ${tokens[6]} ${tokens[7]} ${tokens[8]} \
+${tokens[9]} ${tokens[10]} ${tokens[11]} ${tokens[12]} ${tokens[13]} \
+${tokens[14]} ${tokens[15]} ${tokens[16]} ${tokens[17]} ${tokens[18]} \
+${tokens[19]}'"
+            ;;
+        (:loadable)
+            token=`$echo -n ${tokens[1]} | $strconf_tokenize`
+            eval "otherno=\"\$strconf_loadable_lineno_$token\""
+            if test -n "$otherno" ; then
+                $echo "$progname: error: ${infile:-(stdin)} +$lineno : loadable \`${tokens[1]}' already defined at line $otherno" >&2
+                continue
+            fi
+            eval "strconf_loadable_lineno_$token=\"\$lineno\""
+            eval "strconf_loadable_$token='yes'"
+            ;;
+        (:initialize)
+            token=`$echo -n ${tokens[1]} | $strconf_tokenize`
+            eval "otherno=\"\$strconf_initialize_lineno_$token\""
+            if test -n "$otherno" ; then
+                $echo "$progname: error: ${infile:-(stdin)} +$lineno : initialize \`${tokens[1]}' already defined at line $otherno" >&2
+                continue
+            fi
+            eval "strconf_initialize_lineno_$token=\"\$lineno\""
+            eval "strconf_initialize_$token='yes'"
+            ;;
+        (:terminate)
+            token=`$echo -n ${tokens[1]} | $strconf_tokenize`
+            eval "otherno=\"\$strconf_terminate_lineno_$token\""
+            if test -n "$otherno" ; then
+                $echo "$progname: error: ${infile:-(stdin)} +$lineno : terminate \`${tokens[1]}' already defined at line $otherno" >&2
+                continue
+            fi
+            eval "strconf_terminate_lineno_$token=\"\$lineno\""
+            eval "strconf_terminate_$token='yes'"
+            ;;
+        (:node)
+            token=`$echo -n ${tokens[1]} | $strconf_tokenize`
+            eval "otherno=\"\$strconf_node_lineno_$token\""
+            if test -n "$otherno" ; then
+                $echo "$progname: error: ${infile:-(stdin)} +$lineno : node \`${tokens[1]}' already defined at line $otherno" >&2
+                continue
+            fi
+            eval "strconf_node_lineno_$token=\"\$lineno\""
+            eval "strconf_node_$token='${tokens[*]}'"
+            eval "strconf_devname_$token='${tokens[1]}'"
+            eval "strconf_devtype_$token='${tokens[2]}'"
+            devperm="${tokens[3]}"
+            if test "x$devperm" = "x*"; then
+                devperm='0666'
+            fi
+            eval "strconf_devperm_$token='${devperm}'"
+            majorname=`$echo ${tokens[4]} | $strconf_tokenize`
+            eval "strconf_majname_$token='${majorname}'"
+            minorname=`$echo ${tokens[5]} | $strconf_tokenize`
+            eval "strconf_minname_$token='${minorname}'"
+            strconf_node_names="$strconf_node_names $token"
+            ;;
+        (:device)
+            token=`$echo -n ${tokens[1]} | $strconf_tokenize`
+            eval "otherno=\"\$strconf_device_lineno_$token\""
+            if test -n "$otherno" ; then
+                $echo "$progname: error: ${infile:-(stdin)} +$lineno : device \`${tokens[1]}' already defined at line $otherno" >&2
+                continue
+            fi
+            eval "strconf_device_lineno_$token=\"\$lineno\""
+            eval "strconf_device_$token='${tokens[*]}'"
+            ;;
+        (:qlock)
+            case ":${tokens[1]}" in
+                (:driver|:module) ;;
+                (:*) $echo "$progname: syntax error ${infile:-(stdin)} +$lineno : unknown object type \`${tokens[1]}'" >&2
+                    continue ;;
+            esac
+            token=`echo -n ${tokens[2]} | $strconf_tokenize`
+            qlock=`echo -n ${tokens[3]} | $strconf_uppercase`
+            case ":$qlock" in
+                (:0|:NONE)   qlock=0 ;;
+                (:1|:QUEUE)  qlock=1 ;;
+                (:2|:QPAIR)  qlock=2 ;;
+                (:3|:GLOBAL) qlock=3 ;;
+                (:*)
+                    $echo "$progname: syntax error ${infile:-(stdin)} +$lineno : unknown qlock type \`${tokens[3]}'" >&2
+                    continue
+                    ;;
+            esac
+            case ":${tokens[1]}" in
+                :driver)
+                    eval "otherno=\"\$strconf_qlock_driver_lineno_$token\""
+                    if test -n "$otherno" ; then
+                        $echo "$progname: error: ${infile:-(stdin)} +$lineno : qlock for driver \`${tokens[2]}' already defined at line $otherno" >&2
+                        continue
+                    fi
+                    eval "strconf_qlock_driver_lineno_$token=\"\$lineno\""
+                    eval "strconf_qlock_driver_$token='${tokens[*]}'"
+                    eval "strconf_qlock_$token=\"$qlock\""
+                    qlock_encountered=yes
+                    ;;
+                :module)
+                    eval "otherno=\"\$strconf_qlock_module_lineno_$token\""
+                    if test -n "$otherno" ; then
+                        $echo "$progname: error: ${infile:-(stdin)} +$lineno : qlock for module \`${tokens[2]}' already defined at line $otherno" >&2
+                        continue
+                    fi
+                    eval "strconf_qlock_module_lineno_$token=\"\$lineno\""
+                    eval "strconf_qlock_module_$token='${tokens[*]}'"
+                    eval "strconf_qlock_$token=\"$qlock\""
+                    qlock_encountered=yes
+                    ;;
+                :*)
+                    $echo "$progname: syntax error ${infile:-(stdin)} +$lineno : unknown object type \`${tokens[1]}'" >&2
+                    continue
+            esac
+            ;;
+        :#*)
+            continue
+            ;;
+        :*)
+            $echo "$progname: syntax error: ${infile:-(stdin)} +$lineno : unknown command name \`${tokens[0]}'" >&2
+            continue
+            ;;
+    esac
+done
+set glob
+
+#
+#   Generate drvrconf.mk
+#
+if test x"$driverconf" != x
+then
+cat >$driverconf <<EOF
+# vim: ft=make
+# =============================================================================
+# 
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# =============================================================================
+
+#
+# Generated by $progname (`date`) from ${infile:-(stdin)}
+# Edits to this file will be lost: edit $progname instead.
+#
+
+# --------------------------------
+EOF
+major=$basemajor
+space_loads=
+space_links=
+for object in $strconf_drv_objnames
+do
+    objname=`$echo -n $object | $strconf_tokenize`
+    eval "loadable=\"\$strconf_loadable_$objname\""
+    eval "name=\"\$strconf_name_$objname\""
+    if test ":$loadable" = ":yes" ; then
+#        $echo "alias char-major-$major  streams-$object		# driver $name" >>$confmodules
+        modconf_drv_loads="$modconf_drv_loads$space_loads$object"
+        space_loads=' '
+    else
+#        $echo "alias char-major-$major  streams			# driver $name" >>$confmodules
+        modconf_drv_links="$modconf_drv_links$space_links$object"
+        space_links=' '
+    fi
+    ((major++))
+done
+space_loads=
+space_links=
+for object in $strconf_mod_objnames
+do
+    objname=`$echo -n $object | $strconf_tokenize`
+    eval "loadable=\"\$strconf_loadable_$objname\""
+    if test ":$loadable" = ":yes" ; then
+        modconf_mod_loads="$modconf_mod_loads$space_loads$object"
+        space_loads=' '
+    else
+        modconf_mod_links="$modconf_mod_links$space_links$object"
+        space_links=' '
+    fi
+done
+modconf_links="$modconf_mod_links $modconf_drv_links"
+modconf_loads="$modconf_mod_loads $modconf_drv_loads"
+cat >>$driverconf <<EOF
+
+MODCONF_LINKS = $modconf_links
+MODCONF_LOADS = $modconf_loads
+
+# --------------------------------
+# vim: ft=make
+EOF
+fi
+
+#
+#   Generate config.h (although I don't know why)
+#
+if test x"$hconfig" != x
+then
+cat >$hconfig <<EOF
+/******************************************************************* vim: ft=c
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ *****************************************************************************/
+
+#ifndef __SYS_${ucpackage}_CONFIG_H__
+#define __SYS_${ucpackage}_CONFIG_H__
+
+/*
+ * GENERATED BY $progname (`date`) FROM ${infile:-(stdin)}
+ * EDITS TO THIS FILE WILL BE LOST: EDIT $progname INSTEAD.
+ */
+
+/* -------------------------------------------------- */
+
+EOF
+for name in $strconf_driver_names
+do
+    Name=`$echo $name | $strconf_uppercase`
+    eval "prefix=\"\$strconf_prefix_$name\""
+    Prefix=`$echo $prefix | $strconf_uppercase`
+    eval "realname=\"\$strconf_realname_$name\""
+    eval "Idnum=\"\$strconf_id_$name\""
+    eval "major=\"\$strconf_major_$name\""
+    eval "nmajors=\"\$strconf_nmajors_$name\""
+    eval "nminors=\"\$strconf_nminors_$name\""
+    case $package in
+    LfS)
+        $echo "#define CONFIG_STREAMS_${Prefix}_NAME     \"$realname\"" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_MODID    $Idnum" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_NMINORS  $nminors" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_NMAJORS  $nmajors" >>$hconfig
+        ;;
+    LiS | *)
+#       $echo "#define ${Prefix}            1" >>$hconfig
+        $echo "#define ${Prefix}_ID         $Idnum" >>$hconfig
+        $echo "#define ${Prefix}_DRV_NAME   \"$realname\"" >>$hconfig
+        $echo "#define ${Prefix}_DRV        1" >>$hconfig
+        $echo "#define ${Prefix}_DRV_ID     $Idnum" >>$hconfig
+        $echo "#define ${Prefix}_CNTLS      0" >>$hconfig
+        $echo "#define ${Prefix}_UNITS      $nminors" >>$hconfig
+        $echo "#define ${Prefix}_CMAJORS    $nmajors" >>$hconfig
+        ;;
+    esac
+    count=0
+    case $package in
+    LfS)
+        while test $count -lt $nmajors
+        do
+            if test ${count} -eq 0 ; then
+                $echo "#define CONFIG_STREAMS_${Prefix}_MAJOR    $((major+count++))" >>$hconfig
+            else
+                $echo "#define CONFIG_STREAMS_${Prefix}_MAJOR_${count}  $((major+count++))" >>$hconfig
+            fi
+        done
+        eval "objname=\"\$strconf_objname_$name\""
+        eval "loadable=\"\$strconf_loadable_$objname\""
+        if test x"$loadable" = xyes; then
+            $echo "#define CONFIG_STREAMS_${Prefix}_MODULE   1" >>$hconfig
+        fi
+        ;;
+    LiS | *)
+        while test $count -lt $nmajors
+        do
+            $echo "#define ${Prefix}_CMAJOR_${count}   $((major+count++))" >>$hconfig
+        done
+        $echo "#define ${Prefix}_TYPE       -1" >>$hconfig
+        ;;
+    esac
+    $echo "" >>$hconfig
+done
+for name in $strconf_module_names
+do
+    Name=`$echo $name | $strconf_uppercase`
+    eval "prefix=\"\$strconf_prefix_$name\""
+    Prefix=`$echo $prefix | $strconf_uppercase`
+    eval "realname=\"\$strconf_realname_$name\""
+    eval "Idnum=\"\$strconf_id_$name\""
+    case $package in
+    LfS)
+        $echo "#define CONFIG_STREAMS_${Prefix}_NAME     \"$realname\"" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_MODID    $Idnum" >>$hconfig
+        eval "objname=\"\$strconf_objname_$name\""
+            eval "loadable=\"\$strconf_loadable_$objname\""
+        if test x"$loadable" = xyes; then
+            $echo "#define CONFIG_STREAMS_${Prefix}_MODULE   1" >>$hconfig
+        fi
+        ;;
+    LiS | *)
+#       $echo "#define ${Prefix}            1" >>$hconfig
+        $echo "#define ${Prefix}_ID         $Idnum" >>$hconfig
+        $echo "#define ${Prefix}_MOD_NAME   \"$realname\"" >>$hconfig
+        $echo "#define ${Prefix}_MOD        1" >>$hconfig
+        $echo "#define ${Prefix}_MOD_ID     $Idnum" >>$hconfig
+        $echo "#define ${Prefix}_UNITS      0" >>$hconfig
+        $echo "#define ${Prefix}_TYPE       -1" >>$hconfig
+        ;;
+    esac
+    $echo "" >>$hconfig
+done
+cat >>$hconfig <<EOF
+/* -------------------------------------------------- */
+
+#endif  /* __SYS_${ucpackage}_CONFIG_H__ */
+
+/*
+ * vim: ft=c
+ */
+EOF
+fi
+
+#
+#   General modconf.inc
+#
+if test x"$modconf" != x
+then
+cat >$modconf <<EOF
+/******************************************************************* vim: ft=c
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ *****************************************************************************/
+
+#ifndef __SYS_${ucpackage}_MODCONF_INC__
+#define __SYS_${ucpackage}_MODCONF_INC__
+
+/*
+ * GENERATED BY $progname (`date`) FROM ${infile:-(stdin)}
+ * EDITS TO THIS FILE WILL BE LOST: EDIT $progname INSTEAD.
+ */
+
+/* -------------------------------------------------- */
+
+EOF
+for name in $strconf_driver_names
+do
+    eval "objname=\"\$strconf_objname_$name\""
+    eval "loadable=\"\$strconf_loadable_$objname\""
+    if test x"$loadable" != xyes; then
+        eval "prefix=\"\$strconf_prefix_$name\""
+        eval "init=\"\$strconf_initialize_$name\""
+        eval "term=\"\$strconf_terminate_$name\""
+        $echo "extern struct streamtab ${prefix}info;" >>$modconf
+        if test x"$init" = "xyes"; then
+            $echo "extern void _RP ${prefix}init(void);" >>$modconf
+        fi
+        if test x"$term" = "xyes"; then
+            $echo "extern void _RP ${prefix}term(void);" >>$modconf
+        fi
+    fi
+done
+$echo "" >>$modconf
+for name in $strconf_driver_names
+do
+#    eval "objname=\"\$strconf_objname_$name\""
+#    eval "loadable=\"\$strconf_loadable_$objname\""
+#    if test x"$loadable" != xyes; then
+        eval "prefix=\"\$strconf_prefix_$name\""
+        eval "major=\"\$strconf_major_$name\""
+        eval "nmajors=\"\$strconf_nmajors_$name\""
+        $echo -n "int ${prefix}_0_majors[] = {" >>$modconf
+        count=0
+        while test $count -lt $nmajors
+        do
+            $echo -n "$((major+count++))" >>$modconf
+            if test $count -lt $nmajors; then
+                $echo -n ", " >>$modconf
+            fi
+        done
+        $echo "};" >>$modconf
+#    fi
+done
+$echo "" >>$modconf
+mysep="
+"
+$echo "driver_config_t ${lcpackage}_driver_config[] =" >>$modconf
+$echo -n "{" >>$modconf
+for name in $strconf_driver_names
+do
+    eval "objname=\"\$strconf_objname_$name\""
+    eval "loadable=\"\$strconf_loadable_$objname\""
+    if test x"$loadable" != xyes; then
+        eval "prefix=\"\$strconf_prefix_$name\""
+        eval "nmajors=\"\$strconf_nmajors_$name\""
+        eval "nminors=\"\$strconf_nminors_$name\""
+        eval "realname=\"\$strconf_realname_$name\""
+        eval "init=\"\$strconf_initialize_$name\""
+        eval "term=\"\$strconf_terminate_$name\""
+        eval "qlock=\"\$strconf_qlock_$name\""
+        if test x"$init" = "xyes"; then
+            init="${prefix}init"
+        else
+            init='NULL'
+        fi
+        if test x"$term" = "xyes"; then
+            term="${prefix}term"
+        else
+            term='NULL'
+        fi
+        if test :"$qlock_encountered" = :yes
+        then
+            $echo -n "$mysep	{\"${realname}\", &${prefix}info, ${prefix}_0_majors, ${nmajors}, ${nminors}, ${init}, ${term}, ${qlock:--1}}" >>$modconf
+        else
+            $echo -n "$mysep	{\"${realname}\", &${prefix}info, ${prefix}_0_majors, ${nmajors}, ${nminors}, ${init}, ${term}, ${qlock}}" >>$modconf
+        fi
+        mysep=",
+"
+    fi
+done
+mysep="
+"
+$echo "$mysep};" >>$modconf
+$echo "" >>$modconf
+$echo "device_config_t ${lcpackage}_device_config[] =" >>$modconf
+$echo "{" >>$modconf
+$echo "};" >>$modconf
+$echo "" >>$modconf
+for name in $strconf_module_names
+do
+    eval "objname=\"\$strconf_objname_$name\""
+    eval "loadable=\"\$strconf_loadable_$objname\""
+    if test x"$loadable" != xyes; then
+        eval "prefix=\"\$strconf_prefix_$name\""
+        $echo "extern struct streamtab ${prefix}info;" >>$modconf
+    fi
+done
+$echo "" >>$modconf
+$echo "module_config_t ${lcpackage}_module_config[] =" >>$modconf
+$echo "{" >>$modconf
+$echo -n "	{\"\", NULL, \"\"},	/* empty 0th entry */" >>$modconf
+for name in $strconf_module_names
+do
+    eval "objname=\"\$strconf_objname_$name\""
+    eval "loadable=\"\$strconf_loadable_$objname\""
+    eval "realname=\"\$strconf_realname_$name\""
+    eval "qlock=\"\$strconf_qlock_$name\""
+    if test x"$loadable" != xyes; then
+        eval "prefix=\"\$strconf_prefix_$name\""
+        if test :"$qlock_encountered" = :yes
+        then
+            $echo -n "$mysep	{\"${realname}\", &${prefix}info, \"\", ${qlock:--1}}" >>$modconf
+        else
+            $echo -n "$mysep	{\"${realname}\", &${prefix}info, \"\", ${qlock}}" >>$modconf
+        fi
+        mysep=",
+"
+#    else
+#        if test :"$qlock_encountered" = :yes
+#        then
+#            $echo -n "$mysep	{\"${realname}\", NULL, \"${objname}\", ${qlock:--1}}" >>$modconf
+#        else
+#            $echo -n "$mysep	{\"${realname}\", NULL, \"${objname}\", ${qlock}}" >>$modconf
+#        fi
+#        mysep=",
+#"
+    fi
+done
+mysep="
+"
+$echo "$mysep};" >>$modconf
+$echo "" >>$modconf
+$echo "#ifdef ${ucpackage}_LOADABLE_SUPPORT" >>$modconf
+$echo "" >>$modconf
+$echo "driver_obj_name_t ${lcpackage}_drv_objnames[] =" >>$modconf
+$echo -n "{" >>$modconf
+for name in $strconf_driver_names
+do
+    eval "objname=\"\$strconf_objname_$name\""
+    eval "loadable=\"\$strconf_loadable_$objname\""
+    if test x"$loadable" = xyes; then
+        eval "prefix=\"\$strconf_prefix_$name\""
+        eval "nmajors=\"\$strconf_nmajors_$name\""
+        eval "init=\"\$strconf_initialize_$name\""
+        if test x"$init" = "xyes"; then
+            init="\"${prefix}init\""
+        else
+            init='NULL'
+        fi
+        $echo -n "$mysep	{${prefix}_0_majors, ${nmajors}, ${init}, \"${objname}\"}" >>$modconf
+        mysep=",
+"
+    fi
+done
+mysep="
+"
+$echo "$mysep};" >>$modconf
+$echo "" >>$modconf
+$echo "#endif			/* ${ucpackage}_LOADABLE_SUPPORT */" >>$modconf
+$echo "" >>$modconf
+$echo "autopush_init_t ${lcpackage}_apush_init[] =" >>$modconf
+$echo -n "{" >>$modconf
+for name in $strconf_driver_names
+do
+    eval "autopush=\"\$strconf_autopush_$name\""
+    if test x"$autopush" != "x"; then
+        eval "major=\"\$strconf_major_$name\""
+        eval "minor=\"\$strconf_minor_$name\""
+        eval "lastminor=\"\$strconf_lastminor_$name\""
+        eval "modules=\"\$strconf_modules_$name\""
+        modules=`$echo $modules | sed -e 's%#.*%%g'`
+        unset mods
+        eval "mods=($modules)"
+        if test ${#mods} -eq 0; then
+            continue
+        fi
+        modules="${mods[*]}"
+        modules=`$echo $modules | sed -e 's%^%"%;s%$%",%;s% %", "%g'`
+        $echo -n "$mysep	{${major:-0}, ${minor:-0}, ${lastminor:-0}, ${#mods[*]}, {${modules}}}" >>$modconf
+        mysep=",
+"
+    fi
+done
+mysep="
+"
+$echo "$mysep};" >>$modconf
+cat >>$modconf <<EOF
+
+/* -------------------------------------------------- */
+
+#endif  /* __SYS_${ucpackage}_MODCONF_INC__ */
+
+/*
+ * vim: ft=c
+ */
+EOF
+fi
+
+#
+#   Generate makenodes.c
+#
+if test x"$makenodes" != x
+then
+cat >$makenodes <<EOF
+/******************************************************************* vim: ft=c
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ *****************************************************************************/
+
+/*
+ * GENERATED BY $progname (`date`) FROM ${infile:-(stdin)}
+ * EDITS TO THIS FILE WILL BE LOST: EDIT $progname INSTEAD.
+ */
+
+static char const ident[] = "\$RCSfile\$ \$Name\$(\$Revision\$) \$Date\$";
+
+#if defined(LINUX)
+#	include <sys/types.h>
+#	include <sys/stat.h>
+#	include <sys/sysmacros.h>
+#	define makedevice(maj,min) makedev(maj,min)
+#elif defined(QNX)
+#	include <sys/types.h>
+#	include <sys/stat.h>
+#	define makedevice(maj,min) makedev(1,maj,min)
+#elif defined(USER)
+#	include <sys/stropts.h>
+#	include <sys/LiS/usrio.h>
+#else
+#	include <sys/types.h>
+#	include <sys/stat.h>
+#	define makedevice(maj,min) makedev(maj,min)
+#endif
+#ifdef _GNU_SOURCE
+#       include <getopt.h>
+#endif
+
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+#if !defined(LINUX)
+#	include <fcntl.h>
+#endif
+
+#if !defined(USER)
+void copying(int argc, char *argv[])
+{
+	fprintf(stdout, "\
+\\n\\
+%1\$s %2\$s:\\n\\
+\\n\\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\\n\\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\\n\\
+Copyright (c) 1997       David Grothe, Gcom, Inc <dave@gcom.com>\\n\\
+\\n\\
+All Rights Reserved.\\n\\
+\\n\\
+This program is free software;  you can  redistribute  it and/or modify it under\\n\\
+the terms of the GNU General  Public License as  published by the  Free Software\\n\\
+Foundation; version 2 of  the  License.\\n\\
+\\n\\
+This program is distributed in the hope that it will be  useful, but WITHOUT ANY\\n\\
+WARRANTY;  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\\n\\
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.\\n\\
+\\n\\
+You should  have received  a copy of the GNU  General  Public License along with\\n\\
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\\n\\
+Cambridge, MA 02139, USA.\\n\\
+\\n\\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\\n\\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\\n\\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\\n\\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\\n\\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\\n\\
+regulations) and the  Government  is acquiring  only the license rights  granted\\n\\
+herein (the license  rights customarily  provided to non-Government  users).  If\\n\\
+the Software is supplied to any unit or agency of the Government other than DoD,\\n\\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\\n\\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\\n\\
+Regulations  (\"FAR\") (or any successor  regulations) or, in the  cases of NASA, in\\n\\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\\n\\
+regulations).\\n\\
+\\n\\
+", argv[0], ident);
+}
+
+void version(int argc, char *argv[])
+{
+	fprintf(stdout, "\\
+\\n\\
+%1\$s %2\$s:\\n\\
+    Copyright (c) 2003-2006  OpenSS7 Corporation.  All Rights Reserved.\\n\\
+    Copyright (c) 1997       David Grothe, Gcom, Inc <dave@gcom.com>\\n\\
+\\n\\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\\n\\
+    included here by reference.\\n\\
+\\n\\
+    See \`%1\$s --copying' for copying permissions.\\n\\
+\\n\\
+", argv[0], ident);
+}
+
+void usage(int argc, char *argv[])
+{
+	fprintf(stderr, "\\
+Usage:\\n\\
+    %1\$s [options]\\n\\
+    %1\$s {-h,--help}\\n\\
+    %1\$s {-V,--version}\\n\\
+    %1\$s {-C,--copying}\\n\\
+", argv[0]);
+}
+
+void help(int argc, char *argv[])
+{
+	fprintf(stdout, "\\
+\\n\\
+Usage:\\n\\
+    %1\$s [options]\\n\\
+    %1\$s {-h,--help}\\n\\
+    %1\$s {-V,--version}\\n\\
+    %1\$s {-C,--copying}\\n\\
+Options:\\n\\
+    -r, --remove\\n\\
+        remove devices before making them\\n\\
+    -h, --help, -?\\n\\
+        print this usage information and exit\\n\\
+    -V, --version\\n\\
+        print version and exit\\n\\
+    -C, --copying\\n\\
+        print copying permission and exit\\n\\
+\\n\\
+", argv[0]);
+}
+#endif				/* !defined(USER) */
+
+int main(int argc, char *argv[])
+{
+	int rslt;
+	int rmopt = 0;
+	char *strerror(int);
+
+        (void) rslt;
+#if !defined(USER)
+	(void) umask(0);
+	if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'r')
+		rmopt = 1;
+
+	while (1) {
+		int c;
+#ifdef _GNU_SOURCE
+		int option_index = 0;
+		/* *INDENT-OFF* */
+		static struct option long_options[] = {
+			{ "help",    no_argument, NULL, 'h'},
+			{ "version", no_argument, NULL, 'V'},
+			{ "copying", no_argument, NULL, 'C'},
+			{ "remove",  no_argument, NULL, 'r'},
+			{ "?",       no_argument, NULL, 'h'},
+			{ 0, }
+		};
+		/* *INDENT-ON* */
+		c = getopt_long_only(argc, argv, "rhVC?", long_options, &option_index);
+#else				/* _GNU_SOURCE */
+		c = getopt(argc, argv, "rhVC?");
+#endif				/* _GNU_SOURCE */
+		if (c == -1)
+			break;
+		switch (c) {
+		case 'r':	/* -r, --remove */
+			rmopt = 1;
+                        break;
+		case 'h':	/* -h, --help */
+			help(argc, argv);
+			exit(0);
+		case 'V':	/* -V, --version */
+			version(argc, argv);
+			exit(0);
+		case 'C':	/* -C, --copying */
+			copying(argc, argv);
+			exit(0);
+		case '?':
+			optind--;
+		      bad_nonoption:
+			if (optind < argc) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				for (; optind < argc; optind++)
+					fprintf(stderr, "%s ", argv[optind]);
+				fprintf(stderr, "\\n");
+			}
+			usage(argc, argv);
+			exit(2);
+		}
+	}
+	if (optind < argc)
+		goto bad_nonoption;
+
+#endif
+	(void) ident;
+
+/* -------------------------------------------------- */
+
+EOF
+for node in $strconf_node_names
+do
+    eval "devname=\"\$strconf_devname_$node\""
+    eval "devtype=\"\$strconf_devtype_$node\""
+    eval "devperm=\"\$strconf_devperm_$node\""
+    eval "majname=\"\$strconf_majname_$node\""
+    case "$majname" in
+        [_a-zA-Z]*) eval "majnumb=\"\$strconf_major_$majname\"" ;;
+        [0-9]*) majnumb="$majname" ;;
+        *) continue ;;
+    esac
+    if test x"$majnumb" = x; then
+        continue
+    fi
+    eval "minname=\"\$strconf_minname_$node\""
+    case "$minname" in
+        [_a-zA-Z]*) eval "minnumb=\"\$strconf_major_$minname\"" ;;
+        [0-9]*) minnumb="$minname" ;;
+        *) continue ;;
+    esac
+    if test x"$minnumb" = x; then
+        continue
+    fi
+    $echo "#if !defined(USER)" >>$makenodes
+    $echo "	(void)unlink(\"${devname}\");" >>$makenodes
+    $echo "#endif" >>$makenodes
+    $echo "	if (!rmopt) {" >>$makenodes
+    $echo "		rslt = mknod(\"${devname}\", 02${devperm}, makedevice(${majnumb},${minnumb}));" >>$makenodes
+    $echo "		if (rslt < 0)" >>$makenodes
+    $echo "			printf(\"${devname}: %s\\n\", strerror(-rslt));" >>$makenodes
+    $echo "	}" >>$makenodes
+done
+cat >>$makenodes <<EOF
+
+/* -------------------------------------------------- */
+
+#if !defined(USER)
+	exit(0);
+#else
+	return (0);
+#endif
+}
+
+/* 
+ * vim: ft=c
+ */
+EOF
+fi
+
+#
+#   Make device list for rpm.
+#
+if test x"$strmknods" != x
+then
+echo '%defattr(-,root,root)' > $strmknods
+for node in $strconf_node_names
+do
+    eval "devname=\"\$strconf_devname_$node\""
+    eval "devtype=\"\$strconf_devtype_$node\""
+    eval "devperm=\"\$strconf_devperm_$node\""
+    eval "majname=\"\$strconf_majname_$node\""
+    case "$majname" in
+        [_a-zA-Z]*) eval "majnumb=\"\$strconf_major_$majname\"" ;;
+        [0-9]*) majnumb="$majname" ;;
+        *) continue ;;
+    esac
+    if test x"$majnumb" = x; then
+        continue
+    fi
+    eval "minname=\"\$strconf_minname_$node\""
+    case "$minname" in
+        [_a-zA-Z]*) eval "minnumb=\"\$strconf_major_$minname\"" ;;
+        [0-9]*) minnumb="$minname" ;;
+        *) continue ;;
+    esac
+    if test x"$minnumb" = x; then
+        continue
+    fi
+    echo "%attr(${devperm}, root, root) %dev(c, ${majnumb}, ${minnumb}) ${devname}" >> $strmknods
+done
+fi
+
+#
+#   Make strsetup configuration file
+#
+if test x"$strsetup" != x
+then
+cat >$strsetup <<EOF
+# vim: ft=conf
+# =============================================================================
+# 
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# =============================================================================
+
+#
+# Generated by $progname (`date`) from ${infile:-(stdin)}
+# Edits to this file will be lost: edit $progname instead.
+#
+# --------------------------------
+
+#
+#   strsetup configuration file
+#
+
+EOF
+for node in $strconf_node_names
+do
+    eval "devname=\"\$strconf_devname_$node\""
+    eval "devtype=\"\$strconf_devtype_$node\""
+    eval "devperm=\"\$strconf_devperm_$node\""
+    eval "majname=\"\$strconf_majname_$node\""
+    case "$majname" in
+        [_a-zA-Z]*) eval "majnumb=\"\$strconf_major_$majname\"" ;;
+        [0-9]*) majnumb="$majname" ;;
+        *) continue ;;
+    esac
+    if test x"$majnumb" = x; then
+        continue
+    fi
+    eval "minname=\"\$strconf_minname_$node\""
+    case "$minname" in
+        [_a-zA-Z]*) eval "minnumb=\"\$strconf_major_$minname\"" ;;
+        [0-9]*) minnumb="$minname" ;;
+        *) continue ;;
+    esac
+    if test x"$minnumb" = x; then
+        continue
+    fi
+    minor="$minnumb"
+    if test ":$majname" = ":clone" -a ":$minnumb" != ":0" ; then
+        majname="$minname"
+        minor="clone"
+    fi
+    echo -e "$majname\t$devname\t$devperm\t$minor\t# major $majnumb\tminor $minnumb" >> $strsetup
+done
+cat >>$strsetup <<EOF
+
+# --------------------------------
+# vim: ft=conf
+EOF
+fi
+
+#
+#   Make strload configuration file
+#
+if test x"$strload" != x
+then
+cat >$strload <<EOF
+# vim: ft=conf
+# =============================================================================
+# 
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# =============================================================================
+
+#
+# Generated by $progname (`date`) from ${infile:-(stdin)}
+# Edits to this file will be lost: edit $progname instead.
+#
+# --------------------------------
+
+#
+#   strload configuration file
+#
+
+# Attr	Filename	Argument	Node		Minors
+
+EOF
+seen_these_drivers=
+for node in $strconf_node_names
+do
+    eval "devname=\"\$strconf_devname_$node\""
+    eval "devtype=\"\$strconf_devtype_$node\""
+    eval "devperm=\"\$strconf_devperm_$node\""
+    eval "majname=\"\$strconf_majname_$node\""
+    case "$majname" in
+        [_a-zA-Z]*) eval "majnumb=\"\$strconf_major_$majname\"" ;;
+        [0-9]*) majnumb="$majname" ;;
+        *) continue ;;
+    esac
+    if test x"$majnumb" = x; then
+        continue
+    fi
+    eval "minname=\"\$strconf_minname_$node\""
+    case "$minname" in
+        [_a-zA-Z]*) eval "minnumb=\"\$strconf_major_$minname\"" ;;
+        [0-9]*) minnumb="$minname" ;;
+        *) continue ;;
+    esac
+    if test x"$minnumb" = x; then
+        continue
+    fi
+    cloneflag=s
+    minor="$minnumb"
+    if test ":$majname" = ":clone" -a ":$minnumb" != ":0" ; then
+        majname="$minname"
+        minor=""
+        cloneflag=
+    fi
+    if test :"$devname" = :"/dev/$majname" ; then
+        devname="-"
+    fi
+    echo -e "d$cloneflag\t$majname\t\t-\t\t$devname\t$minor" >> $strload
+    seen_these_drivers="$seen_these_drivers${seen_these_drivers:+ }$majname"
+done
+for name in $strconf_driver_names
+do
+    eval "realname=\"\$strconf_realname_$name\""
+    case " $seen_these_drivers " in
+        *" $realname "*) continue ;;
+    esac
+    echo -e "d\t$realname" >> $strload
+done
+for name in $strconf_module_names
+do
+    eval "realname=\"\$strconf_realname_$name\""
+    echo -e "m\t$realname" >> $strload
+done
+cat >>$strload <<EOF
+
+# --------------------------------
+# vim: ft=conf
+EOF
+fi
+
+#
+#   Generate conf.modules
+#
+if test x"$confmodules" != x
+then
+cat >$confmodules <<EOF
+# vim: ft=conf
+# =============================================================================
+# 
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# =============================================================================
+
+#
+# Generated by $progname (`date`) from ${infile:-(stdin)}
+# Edits to this file will be lost: edit $progname instead.
+#
+# --------------------------------
+
+EOF
+$echo -e "\n# older style character device demand loading entries" >>$confmodules
+for name in $strconf_driver_names
+do
+    eval "objname=\"\$strconf_objname_$name\""
+    eval "loadable=\"\$strconf_loadable_$objname\""
+    eval "major=\"\$strconf_major_$name\""
+    eval "nmajors=\"\$strconf_nmajors_$name\""
+    eval "realname=\"\$strconf_realname_$name\""
+    count=0
+    while test $count -lt $nmajors
+    do
+        if test "x$loadable" = "xyes"
+        then
+            eval "object=\"\$strconf_object_driver_$name\""
+            $echo -e "alias\tchar-major-$((major+count++))\t\tstreams-${object}\t# driver ${realname}" >>$confmodules
+        else
+            $echo -e "alias\tchar-major-$((major+count++))\t\tstreams\t\t# driver ${realname}" >>$confmodules
+        fi
+    done
+done
+$echo -e "\n# newer style devfs character device demand loading entries" >>$confmodules
+for node in $strconf_node_names
+do
+    eval "devname=\"\$strconf_devname_$node\""
+    eval "devtype=\"\$strconf_devtype_$node\""
+    eval "devperm=\"\$strconf_devperm_$node\""
+    eval "majname=\"\$strconf_majname_$node\""
+    case "$majname" in
+        [_a-zA-Z]*) eval "majnumb=\"\$strconf_major_$majname\"" ;;
+        [0-9]*) majnumb="$majname" ; majname= ;;
+        *) continue ;;
+    esac
+    if test x"$majnumb" = x; then
+        continue
+    fi
+    eval "minname=\"\$strconf_minname_$node\""
+    case "$minname" in
+        [_a-zA-Z]*) eval "minnumb=\"\$strconf_major_$minname\"" ;;
+        [0-9]*) minnumb="$minname" ; minname= ;;
+        *) continue ;;
+    esac
+    if test x"$minnumb" = x; then
+        continue
+    fi
+    modname="${minname:-${majname}}"
+    if test x"$modname" = x; then
+        continue
+    fi
+    eval "objname=\"\$strconf_objname_$modname\""
+    eval "loadable=\"\$strconf_loadable_$objname\""
+    eval "realname=\"\$strconf_realname_$modname\""
+    if test "x$loadable" = "xyes"
+    then
+        eval "object=\"\$strconf_object_driver_$modname\""
+        $echo -e "alias\tchar-major-${majnumb}-${minnumb:-*}\tstreams-${object}\t# driver ${realname}" >>$confmodules
+    else
+        $echo -e "alias\tchar-major-${majnumb}-${minnumb:-*}\tstreams\t\t# driver ${realname}" >>$confmodules
+    fi
+done
+$echo -e "\n# newer style devfsd device demand loading entries" >>$confmodules
+for node in $strconf_node_names
+do
+    eval "devname=\"\$strconf_devname_$node\""
+    eval "devtype=\"\$strconf_devtype_$node\""
+    eval "devperm=\"\$strconf_devperm_$node\""
+    eval "majname=\"\$strconf_majname_$node\""
+    case "$majname" in
+        [_a-zA-Z]*) eval "majnumb=\"\$strconf_major_$majname\"" ;;
+        [0-9]*) majnumb="$majname" ; majname= ;;
+        *) continue ;;
+    esac
+    if test x"$majnumb" = x; then
+        continue
+    fi
+    eval "minname=\"\$strconf_minname_$node\""
+    case "$minname" in
+        [_a-zA-Z]*) eval "minnumb=\"\$strconf_major_$minname\"" ;;
+        [0-9]*) minnumb="$minname" ; minname= ;;
+        *) continue ;;
+    esac
+    if test x"$minnumb" = x; then
+        continue
+    fi
+    modname="${minname:-${majname}}"
+    if test x"$modname" = x; then
+        continue
+    fi
+    eval "objname=\"\$strconf_objname_$modname\""
+    eval "loadable=\"\$strconf_loadable_$objname\""
+    eval "realname=\"\$strconf_realname_$modname\""
+    if test "x$loadable" = "xyes"
+    then
+        eval "object=\"\$strconf_object_driver_$modname\""
+        $echo -e "alias\t${devname}\t\tstreams-${object}\t# driver ${realname}" >>$confmodules
+    else
+        $echo -e "alias\t${devname}\t\tstreams\t\t# driver ${realname}" >>$confmodules
+    fi
+done
+cat >>$confmodules <<EOF
+
+# --------------------------------
+# vim: ft=conf
+EOF
+fi
+
+#
+#   Generate pkgobject wrapper
+#
+if test x"$pkgobject" != x
+then
+pkgdir=`dirname $pkgobject`
+object=`basename $pkgobject .o`
+pkgwrapper="${pkgdir}/${object}_wrapper.c"
+modtype=''
+if test -z "$modtype" ; then
+    for obj in $strconf_drv_objnames ; do
+        if test "$obj" = "$object" ; then
+            modtype='driver'
+            break
+        fi
+    done
+fi
+if test -z "$modtype" ; then
+    for obj in $strconf_mod_objnames ; do
+        if test "$obj" = "$object" ; then
+            modtype='module'
+            break
+        fi
+    done
+fi
+if test -z "$modtype" ; then
+    $echo "$progname: error: cannot find object $object"
+    exit 1
+fi
+objname=`$echo -n $object | $strconf_tokenize`
+eval "name=\"\$strconf_name_$objname\""
+eval "realname=\"\$strconf_realname_$name\""
+eval "prefix=\"\$strconf_prefix_$name\""
+Prefix=`$echo $prefix | $strconf_uppercase`
+eval "major=\"\$strconf_major_$name\""
+eval "nmajors=\"\$strconf_nmajors_$name\""
+eval "nminors=\"\$strconf_nminors_$name\""
+eval "init=\"\$strconf_initialize_$name\""
+eval "term=\"\$strconf_terminate_$name\""
+eval "qlock=\"\$strconf_qlock_$name\""
+cat >$pkgwrapper <<EOF
+/******************************************************************* vim: ft=c
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ *****************************************************************************/
+
+/*
+ * GENERATED BY $progname (`date`) FROM ${infile:-(stdin)}
+ * EDITS TO THIS FILE WILL BE LOST: EDIT $progname INSTEAD.
+ */
+
+#ident "@(#) \$RCSfile\$ \$Name\$(\$Revision\$) \$Date\$"
+
+static char const ident[] = "\$RCSfile\$ \$Name\$(\$Revision\$) \$Date\$";
+
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+
+#include <sys/kmem.h>
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/ddi.h>
+
+#define _XX_DESCRIP	"UNIX/SYSTEM V RELEASE 4 STREAMS FOR LINUX"
+#define _XX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define _XX_DEVICE	"LiS Binary Compatibility Wrapper for ${pkgobject}"
+#define _XX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define _XX_LICENSE	"Proprietary"
+#define _XX_BANNER	_XX_DESCRIP	"\n" \\
+			_XX_COPYRIGHT	"\n" \\
+			_XX_DEVICE	"\n" \\
+			_XX_CONTACT
+
+MODULE_AUTHOR(_XX_CONTACT);
+MODULE_DESCRIPTION(_XX_DESCRIP);
+MODULE_SUPPORTED_DEVICE(_XX_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(_XX_LICENSE);
+#endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-${object}");
+EOF
+if test :"$modtype" = :driver ; then
+    count=0
+    while test $count -lt $nmajors
+    do
+        $echo "MODULE_ALIAS(\"char-major-$((major+count++))\");" >>$pkgwrapper
+    done
+fi
+cat >>$pkgwrapper <<EOF
+#endif
+
+extern struct module_info ${prefix}info;
+EOF
+if test :"$init" = :yes ; then
+    $echo "extern void _RP ${prefix}init(void);" >>$pkgwrapper
+fi
+if test :"$term" = :yes ; then
+    $echo "extern void _RP ${prefix}term(void);" >>$pkgwrapper
+fi
+case $modtype in
+    driver)
+        $echo "static int _xx_majors[${nmajors}] = {" >>$pkgwrapper
+        count=0
+        while test $count -lt $nmajors
+        do
+            $echo "	$((major+count++))," >>$pkgwrapper
+        done
+        $echo "};" >>$pkgwrapper
+        cat >>$pkgwrapper <<EOF
+
+static void
+_xx_del(void)
+{
+	int err, mindex;
+
+	for (mindex = ${nmajors} - 1; mindex >= 0; mindex--) {
+		if (_xx_majors[mindex]) {
+			if ((err = lis_unregister_strdev(_xx_majors[mindex])))
+				cmn_err(CE_PANIC, "${realname}: cannot unregister major %d", _xx_majors[mindex]);
+			_xx_majors[mindex] = 0;
+		}
+	}
+}
+
+static int
+_xx_add(void)
+{
+	int err, mindex = 0, major;
+
+	cmn_err(CE_NOTE, _XX_BANNER);	/* console splash */
+	for (mindex = 0; mindex < ${nmajors}; mindex++) {
+		if ((err = lis_register_strdev(_xx_majors[mindex], &${prefix}info, ${nminors}, "${realname}")) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "${realname}: could not register major %d", _xx_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "${realname}: could not register driver, err = %d", err);
+				return (err);
+			}
+		}
+		if (_xx_majors[mindex] == 0)
+			_xx_majors[mindex] = err;
+		if ((err = lis_register_qlock_option(_xx_majors[mindex], ${qlock:--1})) < 0)
+			cmn_err(CE_WARN, "${realname}: could not register qlock option, err = %d", err);
+	}
+	return (0);
+}
+EOF
+        ;;
+    module)
+        cat >>$pkgwrapper <<EOF
+
+static void
+_xx_del(void)
+{
+	int err;
+
+	if ((err = lis_unregister_strmod(&${prefix}info)) < 0) {
+		cmn_err(CE_PANIC, "${realname}: cannot unregister module, err = %d", err);
+		return (err);
+	}
+	return (0);
+}
+
+static int
+__xx_add(void)
+{
+	int err, modid;
+
+	cmn_err(CE_NOTE, _XX_BANNER);	/* console splash */
+	if ((modid = lis_register_strmod(&${prefix}info, "${realname}")) == LIS_NULL_MID) {
+		cmn_err(CE_WARN, "${realname}: could not register module");
+		return (-ENXIO);
+	}
+	if ((err = lis_register_qlock_option(modid, ${qlock:--1})) < 0)
+		cmn_err(CE_WARN, "${realname}: could not register qlock option, err = %d", err);
+	return (0);
+}
+EOF
+        ;;
+esac
+cat >>$pkgwrapper <<EOF
+
+static void __exit
+_xx_exit(void)
+{
+EOF
+if test :"$term" = :yes ; then
+        $echo "	${prefix}term(); /* only if we have a terminate function */" >>$pkgwrapper
+fi
+cat >>$pkgwrapper <<EOF
+	_xx_del();
+}
+
+static int __init
+_xx_init(void)
+{
+	int err;
+
+	if ((err = _xx_add())) {
+		_xx_del();
+		return (err);
+	}
+EOF
+if test :"$init" = :yes ; then
+        $echo "	${prefix}init(); /* only if we have an initialize function */" >>$pkgwrapper
+fi
+cat >>$pkgwrapper <<EOF
+	return (0);
+}
+
+module_init(_xx_init);
+module_exit(_xx_exit);
+EOF
+fi
+
+#
+#   Generate package object wrappers and make rules as required
+#
+if test -n "$packagedir"
+then
+    if test ! -d $packagedir ; then
+        $echo "$progname: error: directory \"$packagedir\" does not exit" >&2
+        exit 1
+    fi
+    case $packagedir in
+        (.*|/*) # non-vpath
+        pkgdirs=("$packagedir");
+        ;;
+        (*)
+        pkgdirs=("$builddir/$packagedir" "$srcdir/$packagedir");
+        ;;
+    esac
+    for object in $strconf_drv_objnames ; do
+        objname=`$echo -n $object | $strconf_tokenize`
+        eval "file=\"\$strconf_filename_$objname\""
+        skip='yes'
+        for dir in ${pkgdirs[*]} ; do
+            if test -n "$file" ; then
+                case $file in
+                    ("$dir"*)
+                    skip='no'
+                    break
+                    ;;
+                esac
+            fi
+        done
+        # skip objects not configured in a package directory or subdirectory
+        test ":$skip" = ":yes" && continue
+        found='no'
+        for dir in ${pkgdirs[*]} ; do
+            if test -f "$dir/$object.o" ; then
+                bcm_drv_objects="${bcm_drv_objects:+$bcm_drv_objects }$object" ; found='yes'
+            elif test -f "$dir/$object.c" ; then
+                bcm_drv_sources="${bcm_drv_sources:+$bcm_drv_sources }$object" ; found='yes'
+            fi
+        done
+        if test ":$found" = :no ; then
+            $echo "$progname: error: no source or object in ${pkgdirs[*]} for driver $object" >&2
+            continue
+        fi
+    done
+    for object in $strconf_mod_objnames ; do
+        objname=`$echo -n $object | $strconf_tokenize`
+        eval "file=\"\$strconf_filename_$objname\""
+        skip='yes'
+        for dir in ${pkgdirs[*]} ; do
+            if test -n "$file" ; then
+                case $file in
+                    ("$dir"*)
+                    skip='no'
+                    break
+                    ;;
+                esac
+            fi
+        done
+        # skip objects not configured in a package directory or subdirectory
+        test ":$skip" = ":yes" && continue
+        found='no'
+        for dir in ${pkgdirs[*]} ; do
+            if test -f "$dir/$object.o" ; then
+                bcm_mod_objects="${bcm_mod_objects:+$bcm_mod_objects }$object" ; found='yes'
+            elif test -f "$dir/$object.c" ; then
+                bcm_mod_sources="${bcm_mod_sources:+$bcm_drv_sources }$object" ; found='yes'
+            fi
+        done
+        if test ":$found" = :no ; then
+            $echo "$progname: error: no source or object in ${pkgdirs[*]} for module $object" >&2
+            continue
+        fi
+    done
+    # anything not marked loadable needs a wrapper
+    # the wrapper *really* needs to go in the build directory unless we were
+    # passed an absolute directory
+    for object in $bcm_drv_objects $bcm_drv_sources $bcm_mod_objects $bcm_mod_sources
+    do
+        case " $bcm_drv_objects $bcm_drv_sources " in
+            (*" $object "*)
+            modtype='driver'
+            moddef=0
+            drvdef=1
+            ;;
+        esac
+        case " $bcm_mod_objects $bcm_mod_sources " in
+            (*" $object "*)
+            modtype='module'
+            moddef=1
+            drvdef=0
+            ;;
+        esac
+        pkgwrapper="${pkgdirs[0]}/${object}_wrapper.c"
+        $echo "$progname: generating $pkgwrapper from ${infile:-(stdin)}" >&1
+        objname=`$echo -n $object | $strconf_tokenize`
+        eval "loadable=\"\$strconf_loadable_$objname\""
+        if test :"$loadable" = :yes ; then linkdef=0 ; else linkdef=1 ; fi
+        eval "name=\"\$strconf_name_$objname\""
+        eval "realname=\"\$strconf_realname_$name\""
+        eval "prefix=\"\$strconf_prefix_$name\""
+        Prefix=`$echo $prefix | $strconf_uppercase`
+        eval "major=\"\$strconf_major_$name\""
+        eval "nmajors=\"\$strconf_nmajors_$name\""
+        eval "nminors=\"\$strconf_nminors_$name\""
+        eval "init=\"\$strconf_initialize_$name\""
+        if test :"$init" = :yes ; then initdef=1 ; else initdef=0 ; fi
+        eval "term=\"\$strconf_terminate_$name\""
+        if test :"$term" = :yes ; then termdef=1 ; else termdef=0 ; fi
+        eval "qlock=\"\$strconf_qlock_$name\""
+        cat /dev/null >$pkgwrapper
+        cat>>$pkgwrapper<<EOF
+/*****************************************************************************
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ *****************************************************************************/
+
+/*
+ * GENERATED BY $progname (`date`) FROM ${infile:-(stdin)}
+ * EDITS TO THIS FILE WILL BE LOST: EDIT $progname INSTEAD.
+ */
+
+#ident "@(#) \$RCSfile\$ \$Name\$(\$Revision\$) \$Date\$"
+
+static char const ident[] = "\$RCSfile\$ \$Name\$(\$Revision\$) \$Date\$";
+
+#if ${linkdef}
+#include <sys/os7/compat.h>
+
+#define _XX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define _XX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define _XX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define _XX_REVISION	"OpenSS7 \$RCSfile\$ \$Name\$(\$Revision\$) \$Date\$"
+#define _XX_DEVICE	"Linux Fast-STREAMS Binary Compatibility Wrapper for ${object}"
+#define _XX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define _XX_LICENSE	"Proprietary"
+#define _XX_BANNER	_XX_DESCRIP	"\n" \\
+			_XX_EXTRA	"\n" \\
+			_XX_REVISION	"\n" \\
+			_XX_COPYRIGHT	"\n" \\
+			_XX_DEVICE	"\n" \\
+			_XX_CONTACT
+#ifdef LINUX
+MODULE_AUTHOR(_XX_CONTACT);
+MODULE_DESCRIPTION(_XX_DESCRIP);
+MODULE_SUPPORTED_DEVICE(_XX_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(_XX_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-${object}");
+#if ${drvdef}
+EOF
+        count=0
+        while test $count -lt $nmajors
+        do
+            numb=$((major+count++))
+            cat>>$pkgwrapper<<EOF
+MODULE_ALIAS("char-major-${numb}");
+EOF
+        done
+        cat>>$pkgwrapper<<EOF
+#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* LINUX */
+
+extern struct module_info ${prefix}info;
+
+#if ${initdef}
+extern void streamscall ${prefix}init(void);
+#endif
+
+#if ${termdef}
+extern void streamscall ${prefix}term(void);
+#endif
+
+#if ${drvdef}
+static int _xx_majors[${nmajors}] = {
+EOF
+        count=0
+        while test $count -lt $nmajors
+        do
+            numb=$((major+count++))
+            cat>>$pkgwrapper<<EOF
+	${numb},
+EOF
+        done
+        cat>>$pkgwrapper<<EOF
+};
+
+static void
+__xx_del(void)
+{
+	int err, mindex;
+
+	for (mindex = ${nmajors} - 1; mindex >= 0; mindex--) {
+		if (_xx_majors[mindex]) {
+			if ((err = lis_unregister_strdev(_xx_majors[mindex])))
+				cmn_err(CE_PANIC, "${realname}: cannot unregister major %d", _xx_majors[mindex]);
+			_xx_majors[mindex] = 0;
+		}
+	}
+}
+
+static int
+_xx_add(void)
+{
+	int err, mindex = 0, major;
+
+	cmn_err(CE_NOTE, _XX_BANNER);	/* console splash */
+	for (mindex = 0; mindex < ${nmajors}; mindex++) {
+		if ((err = lis_register_strdev(_xx_majors[mindex], &${prefix}info, ${nminors}, "${realname}")) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "${realname}: could not register major %d", _xx_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "${realname}: could not register driver, err = %d", err);
+				return (err);
+			}
+		}
+		if (_xx_majors[mindex] == 0)
+			_xx_majors[mindex] = err;
+		if ((err = lis_register_qlock_option(_xx_majors[mindex], ${qlock:--1})) < 0)
+			cmn_err(CE_WARN, "${realname}: could not register qlock option, err = %d", err);
+	}
+	return (0);
+}
+#endif
+
+#if ${moddef}
+static void
+_xx_del(void)
+{
+	int err;
+
+	if ((err = lis_unregister_strmod(&${prefix}info)) < 0) {
+		cmn_err(CE_PANIC, "${realname}: cannot unregister module, err = %d", err);
+		return (err);
+	}
+	return (0);
+}
+
+static int
+__xx_add(void)
+{
+	int err, modid;
+
+	cmn_err(CE_NOTE, _XX_BANNER);	/* console splash */
+	if ((modid = lis_register_strmod(&${prefix}info, "${realname}")) == LIS_NULL_MID) {
+		cmn_err(CE_WARN, "${realname}: could not register module");
+		return (-ENXIO);
+	}
+	if ((err = lis_register_qlock_option(modid, ${qlock:--1})) < 0)
+		cmn_err(CE_WARN, "${realname}: could not register qlock option, err = %d", err);
+	return (0);
+}
+#endif
+
+static void __exit
+_xx_exit(void)
+{
+#if ${termdef}
+	${prefix}term();	/* only if we have a terminate function */
+#endif
+	_xx_del();
+}
+
+static int __init
+_xx_init(void)
+{
+	int err;
+
+	if ((err = _xx_add())) {
+		_xx_del();
+		return (err);
+	}
+#if ${initdef}
+	${prefix}init();	/* only if we have an initialize function */
+#endif
+	return (0);
+}
+
+module_init(_xx_init);
+module_exit(_xx_exit);
+#endif
+EOF
+    done
+fi
+
+# vim: ft=sh sw=4 et nocin nosi

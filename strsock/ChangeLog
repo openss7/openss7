@@ -1,0 +1,137 @@
+2006-08-23  Brian Bidulock  <bidulcok@openss7.org>
+
+	- started off this new STREAMS Terminals package
+	* .cvsignore: added
+	* .debepoch: added
+	* .debrelease: added
+	* .pkgepoch: added
+	* .pkgrelease: added
+	* .rpmepoch: added
+	* .rpmrelease: added
+	* AUTHORS: added
+	* ChangeLog: added
+	* Makefile.am: added
+	* NEWS: added
+	* README: added
+	* README-cvs: added
+	* README-nexusware: added
+	* THANKS: added
+	* TODO: added
+	* acinclude.m4: added
+	* configure.ac: added
+	* configure.nexusware: added
+	* strsock.gif: added
+	* strsock.lsm.in: added
+	* strsock.spec.in: added
+	* strsock.tif: added
+	* strsock.xcf: added
+	* strsock.xpm: added
+	* debian/README.Debian: added
+	* debian/TODO.Debian: added
+	* debian/changelog: added
+	* debian/control.in: added
+	* debian/copyright: added
+	* debian/mscript_header.in: added
+	* debian/mscript_postinst.in: added
+	* debian/mscript_postrm.in: added
+	* debian/mscript_preinst.in: added
+	* debian/mscript_prerm.in: added
+	* debian/rules.in: added
+	* debian/strsock-core.postinst.in: added
+	* debian/strsock-core.postrm.in: added
+	* debian/strsock-core.preinst.in: added
+	* debian/strsock-core.prerm.in: added
+	* debian/strsock-dev.postinst.in: added
+	* debian/strsock-dev.preinst.in: added
+	* debian/strsock-dev.prerm.in: added
+	* debian/strsock-devel.preinst.in: added
+	* debian/strsock-doc.postinst.in: added
+	* debian/strsock-doc.preinst.in: added
+	* debian/strsock-doc.prerm.in: added
+	* debian/strsock-init.postinst.in: added
+	* debian/strsock-init.postrm.in: added
+	* debian/strsock-init.preinst.in: added
+	* debian/strsock-init.prerm.in: added
+	* debian/strsock-lib.preinst.in: added
+	* debian/strsock-source.preinst.in: added
+	* debian/strsock-util.preinst.in: added
+	* doc/.cvsignore: added
+	* doc/Makefile.am: added
+	* doc/man/.cvsignore: added
+	* doc/man/Makefile.am: added
+	* doc/man/strsock.macros: added
+	* doc/man/strsock.refs: added
+	* doc/manual/.cvsignore: added
+	* doc/manual/Makefile.am: added
+	* doc/manual/configure.texi: added
+	* doc/manual/releases.texi: added
+	* doc/manual/rpm.texi: added
+	* doc/manual/strsock.texi: added
+	* doc/manual/tree.texi: added
+	* src/.cvsignore: added
+	* src/Makefile.am: added
+	* src/drivers/Config.in: added
+	* src/include/.cvsignore: added
+	* src/include/Makefile.am: added
+	* src/include/sys/strsock/config.h.in: added
+	* src/include/sys/strsock/version.h.in: added
+	* src/modules/Config.in: added
+	* src/test/test-sock.c: added
+	* src/util/init/README: added
+	* src/util/init/strsock: added
+	* src/util/init/strsock.sh: added
+	* src/util/modutils/strsock.in: added
+	* src/util/sysconfig/README: added
+	* src/util/sysconfig/strsock.conf: added
+	* src/util/sysconfig/strsock.in: added
+	* tests/.cvsignore: added
+	* tests/Makefile.am: added
+	* tests/atlocal.in: added
+	* tests/dummy1.m4: added
+	* tests/dummy2.m4: added
+	* tests/dummy3.m4: added
+	* tests/dummy4.m4: added
+	* tests/kernel.at: added
+	* tests/local.at: added
+	* tests/testsuite.at: added
+
+-----
+
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+Ave, Cambridge, MA 02139, USA.
+
+
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+behalf of the U.S. Government ("Government"), the following provisions apply
+to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+is classified as "Commercial Computer Software" under paragraph 252.227-7014
+of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+successor regulations) and the Government is acquiring only the license rights
+granted herein (the license rights customarily provided to non-Government
+users).  If the Software is supplied to any unit or agency of the Government
+other than DoD, it is classified as "Restricted Computer Software" and the
+Government's rights in the Software are defined in paragraph 52.227-19 of the
+Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+(or any successor regulations).
+
+
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+
+vim: ft=changelog tw=80 com=fb\:*,fb\:- fo+=tcqlorn nocin nosi

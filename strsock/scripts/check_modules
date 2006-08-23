@@ -1,0 +1,439 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: check_modules,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/05/23 22:43:38 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/05/23 22:43:38 $ by $Author: brian $
+#
+# =============================================================================
+
+me=`basename $0`
+errors=0
+warnings=0
+
+exec 5>>$top_builddir/$me.log
+
+export -p >&5
+
+function echo_v()
+{
+	echo "$me:  : $1"
+}
+function echo_t()
+{
+	echo "$me: T: $1"
+}
+function echo_s()
+{
+	case :"${MAINTAINER_MODE:-no}" in
+	(:verbose|:continue) echo "$me: S: $1" ;;
+	esac
+	echo "$me:$2: S: $1" >&5
+}
+function echo_d()
+{
+	echo "$me:$2: D: $1" >&5
+}
+function echo_e()
+{
+	echo "$me: E: --- $1" >&2
+	echo "$me:$2: E: $1" >&5
+	((errors++))
+}
+function echo_w()
+{
+#	if test :"${MAINTAINER_MODE:-no}" != :no ; then
+		echo "$me: W: --- $1" >&2
+#	fi
+	echo "$me:$2: W: $1" >&5
+	((warnings++))
+}
+function echo_fls()
+{
+	echo_s "$3" "$4"
+}
+function echo_flw()
+{
+	echo "$1:$2: warning: $3" >&2
+	echo "$me:$4: W: $3" >&5
+	((warnings++))
+}
+function echo_fle()
+{
+	echo "$1:$2: error: $3" >&2
+	echo "$me:$4: E: $3" >&5
+	((errors++))
+}
+
+export -p | while read line
+do
+	echo_d "$line" $LINENO
+done
+
+KERNEL_SYSMAP="$DESTDIR$ksysmap"
+KERNEL_MODMAP="Modules.map"
+
+echo_v "testing for undefined symbols in kernel modules"
+if test -z "$KERNEL_SYSMAP"
+then
+	echo_w "KERNEL_SYSMAP is empty, skipping test" $LINENO
+	exit 77
+fi
+if test -z "$KERNEL_MODULES" -o ! -f $KERNEL_MODMAP
+then
+	echo_w "KERNEL_MODULES is empty, skipping test" $LINENO
+	exit 77
+fi
+echo_d "using system map $KERNEL_SYSMAP" $LINENO
+echo_d "using module map $KERNEL_MODMAP" $LINENO
+rm -f Modules.def
+for modmap in $KERNEL_MODMAP $KERNEL_MODMAPS
+do
+	echo_v "creating defined symbol map for $modmap"
+	echo_d "cat $modmap | egrep -- '\<B\>|\<D\>|\<T\>' >> Modules.def" $LINENO
+	cat $modmap | egrep -- '\<B\>|\<D\>|\<T\>' | tee -a Modules.def \
+		| while read line ; do echo_d "$line" $LINENO ; done
+done
+for module in $KERNEL_MODULES
+do
+	thismodule=
+	if test -f ./$module
+	then
+		echo_v "testing symbols in kernel module $module"
+#		symbollist=`objdump -t $module | egrep -- '\*UND\*' | sed -e 's|^.* ||'`
+#		for symbol in $symbollist
+		echo_d "nm -s $module | egrep -- '\<U\>' | sed -e 's|^.* ||' > Modules.und" $LINENO
+		nm -s $module | egrep -- '\<U\>' | sed -e 's|^.* ||' | tee Modules.und \
+			| while read line ; do echo_d "$line" $LINENO; done
+		while read symbol
+		do
+			if test "$symbol" = "__this_module"
+			then
+				thismodule=found
+				continue
+			fi
+			uv_symbol=`echo $symbol | sed -r -e 's|_R(smp_)?[[:xdigit:]]{8}$||'`
+			echo_t "testing symbol $symbol"
+			found='no'
+			conflict='no'
+			: #echo_t "testing Modules.def for $symbol"
+			echo_d "egrep -- \"\<$symbol\>\" Modules.def 2>&1 >/dev/null" $LINENO
+			if ( egrep -- "\<$symbol\>" Modules.def 2>&1 >/dev/null)
+			then
+				echo_s "symbol $symbol found (Modules.def)" $LINENO
+				conflict=$found
+				found='yes'
+			fi
+			: #echo_t "testing System.map for $symbol"
+			echo_d "egrep -- \"\<$symbol\>\" $KERNEL_SYSMAP 2>&1 >/dev/null" $LINENO
+			if ( egrep -- "\<$symbol\>" $KERNEL_SYSMAP 2>&1 >/dev/null)
+			then
+				echo_s "symbol $symbol found (System.map)" $LINENO
+				conflict=$found
+				found='yes'
+			else
+				: #echo_t "testing System.map for $uv_symbol"
+				echo_d "egrep -- \"\<$uv_symbol\>\" $KERNEL_SYSMAP 2>&1 >/dev/null" $LINENO
+				if ( egrep -- "\<$uv_symbol\>" $KERNEL_SYSMAP 2>&1 >/dev/null)
+				then
+					echo_s "symbol $symbol found (System.map)[unversioned]" $LINENO
+					conflict=$found
+					found='yes'
+				fi
+			fi
+			if test :$found = :no
+			then
+				echo_w "cannot find symbol $uv_symbol" $LINENO
+				symbols="${symbols}${symbols:+ }${module}:${symbol}"
+			elif test :$conflict = :yes
+			then
+				echo_w "conflicting symbol $uv_symbol" $LINENO
+				conflicts="${conflicts}${conflicts:+ }${module}:${symbol}"
+			fi
+		done <Modules.und
+		rm -f Modules.und
+	else
+		echo_e "kernel module $module does not exist" >&2 $LINENO
+		modules="${modules}${modules:+ }$module"
+	fi
+done
+rm -f Modules.def
+
+if test -z "$modules"
+then
+	echo_s "all modules found" $LINENO
+else
+	echo_e "the following modules were not found:" $LINENO
+	for module in $modules
+	do
+		echo_e "$module" $LINENO
+	done
+fi
+if test -z "$symbols"
+then
+	echo_s "all symbols in all modules found" $LINENO
+else
+	echo_e "the following symbols were not found:" $LINENO
+	for symbol in $symbols
+	do
+		echo_e "$symbol" $LINENO
+	done
+fi
+if test -z "$conflicts"
+then
+	echo_s "no conflicts in module symbols found" $LINENO
+else
+	echo_e "the following symbols had conflicts:" $LINENO
+	for symbol in $conflicts
+	do
+		echo_e "$symbol" $LINENO
+	done
+fi
+
+if test :"${MAINTAINER_MODE:-no}" != :no ; then
+	if test -n "$PKG_MANPATH" ; then
+		manpath="$PKG_MANPATH"
+	else
+		manpath="${top_builddir}/doc/man:${top_builddir}/man:${top_builddir}:./doc/man:./man:.${mandir:+:${mandir}}"
+	fi
+	srcpath="${top_srcdir}/doc/man:${top_srcdir}/man:${top_srcdir}:${srcdir}/doc/man:${srcdir}/man:${srcdir}${mandir:+:$mandir}"
+	searchpath=`echo "$manpath" | sed -e 's|:| |g'`
+	sourcepath=`echo "$srcpath" | sed -e 's|:| |g'`
+	#
+	# Check for manual pages corresponding to the kernel module names so that we are sure that
+	# each module or driver has some high level documentation.
+	#
+	echo_v "testing for manual pages for modules"
+	for module in $KERNEL_MODULES
+	do
+		myname=`echo $module | sed -e 's|^lib[^[:space:]]*_a-|streams-|'`
+		mcname=`echo $myname | sed -e 's|^streams[-_]||;s|\.gz$||;s|\.ko$||;s|\.o$||;s|[^_[:alnum:]]|_|g'`
+		ucname=`echo $mcname | sed -e 'y|abcdefghijklmnopqrstuvwxyz|ABCDEFGHIJKLMNOPQRSTUVWXYZ|'`
+		sections="4 5 7 9"
+		string="$mcname or $ucname in sections $sections"
+		echo_t "testing for $string"
+		# look for it in section 4, 5, 7 or 9
+		found=no
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/$mcname.${n} man${n}/$ucname.${n}" ; done
+		for page in $list; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				files=`ls $dir/$page* 2>/dev/null`
+				for file in $files ; do
+					if test -f $file ; then
+						echo_s "manual page $file exists" $LINENO
+						dirmask=`echo $dir | sed -e's|.|.|g'`
+						page=`echo $file | sed -e 's|^'$dirmask'/||'`
+						echo "$page" >> ${top_builddir}/check_used.log
+						found=yes
+					fi
+				done
+			done
+		done
+		if test :$found = :yes ; then
+			echo_s "found $string" $LINENO
+		else
+			for page in $list; do
+				for dir in $sourcepath ; do
+					test -d $dir || continue
+					files=`ls $dir/$page*.man 2>/dev/null`
+					for file in $files ; do
+						if test -f $file ; then
+							echo_w "manual source page for $mcname or $ucname, $file exists" $LINENO
+						fi
+					done
+				done
+			done
+			echo_e "cannot find $string" $LINENO
+		fi
+	done
+	rm -f Modules.exp
+	for module in $KERNEL_MODULES
+	do
+		echo_v "creating exported symbol map for $module"
+		echo_d "nm -s $module | egrep -- '. __ksymtab_' | sed -e 's|^.*. __ksymtab_||' >> Modules.exp" $LINENO
+		nm -s $module | egrep -- '. __ksymtab_' | sed -e 's|^.*. __ksymtab_||' | tee -a Modules.exp \
+			| while read line ; do echo_d "$line" $LINENO ; done
+	done
+	if test -f ${top_builddir}/check_ctags.log
+	then
+		#
+		# Generate lists of functions, prototypes and external variables
+		#
+		echo_v "generating lists of functions, prototypes and external variables"
+		declarations=
+		while read -a tokens
+		do
+			case ${tokens[1]} in
+			(function|prototype|externvar)
+				declarations="${declarations:+$declarations }${tokens[0]}"
+				;;
+			(*)	continue
+				;;
+			esac
+		done < ${top_builddir}/check_ctags.log
+		echo_d "declarations: $declarations"
+		#
+		# Check that each exported symbol has a prototype or externvar
+		#
+		echo_t "testing exported symbols for declarations"
+		while read symbol
+		do
+			symbol=`echo $symbol | sed -r -e 's|_R(smp_)?[[:xdigit:]]{8}$||'`
+			echo_t "testing $symbol for declaration"
+			case $symbol in
+			(_*)	on_error='echo_w' ;;
+			(*)	on_error='echo_e' ;;
+			esac
+			echo_t "testing $symbol for declaration"
+			case " $declarations " in
+			(*" $symbol "*)
+				echo_s "symbol $symbol has declaration" $LINENO
+				echo "$symbol" >> ${top_builddir}/check_symbols.log
+				;;
+			(*)
+				eval "$on_error \"symbol \$symbol has no declaration\" \$LINENO" ;;
+			esac
+		done <Modules.exp
+	fi
+	#
+	# Check for manual pages for exported symbols.  In maintainer mode we get pedantic and
+	# generate an error if there are any exported symbols from our modules that are not
+	# documented with a manual page in section 9.  This ensures that the documentation is
+	# complete.  You need to run make check in maintainer mode to perform this check.
+	#
+	echo_v "testing for manual pages for exported symbols"
+	while read symbol
+	do
+		symbol=`echo $symbol | sed -r -e 's|_R(smp_)?[[:xdigit:]]{8}$||'`
+		sections="9"
+		string="$symbol in section $sections"
+		echo_t "testing for $string"
+		# just find it
+		case $symbol in
+			(_*)	on_error='echo_w' ;;
+			(*)	on_error='echo_e' ;;
+		esac
+		found=no
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/$symbol.${n}" ; done
+		for page in $list; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				files=`ls $dir/$page* 2>/dev/null`
+				for file in $files ; do
+					if test -f $file ; then
+						echo_s "manual page $file exists" $LINENO
+						dirmask=`echo $dir | sed -e's|.|.|g'`
+						page=`echo $file | sed -e 's|^'$dirmask'/||'`
+						echo "$page" >> ${top_builddir}/check_used.log
+						found=yes
+					fi
+				done
+			done
+		done
+		if test :$found = :yes ; then
+			echo_s "found $string" $LINENO
+		else
+			#
+			# one additional check here: we check if there is a source manual page in
+			# the source directories that matches the object, if so, we warn as well
+			# because there is no reason why the manual page should not be included
+			#
+			for page in $list; do
+				for dir in $sourcepath ; do
+					test -d $dir || continue
+					files=`ls $dir/$page*.man 2>/dev/null`
+					for file in $files ; do
+						if test -f $file ; then
+							echo_w "manual source page for $symbol, $file exists" $LINENO
+						fi
+					done
+				done
+			done
+			eval "$on_error \"cannot find \$string\" \$LINENO"
+		fi
+#		echo_d "man -aw -M $manpath 9 $symbol 2>&1" $LINENO
+#		if result=`man -aw -M $manpath 9 $symbol 2>&1`
+#		then
+#			echo "$result" | while read line
+#			do
+#				echo_s "$line" $LINENO
+#			done
+#		else
+#			echo_e "$result" $LINENO
+#		fi
+	done <Modules.exp
+	rm -f Modules.exp
+fi
+
+retval=0
+if test $warnings -gt 0
+then
+	echo_v "--------------"
+	echo_v "Warning summary:"
+	echo_v "--------------"
+	egrep -- '\<W:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	retval=77
+fi
+if test $errors -gt 0
+then
+	echo_v "--------------"
+	echo_v "Error summary:"
+	echo_v "--------------"
+	egrep -- '\<E:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	if test :"${MAINTAINER_MODE:-no}" = :continue
+	then
+		retval=77
+	else
+		retval=1
+	fi
+fi
+
+exit $retval

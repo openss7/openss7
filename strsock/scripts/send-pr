@@ -1,0 +1,1618 @@
+#!/bin/bash
+# vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
+# =============================================================================
+# 
+# @(#) $RCSfile: send-pr,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/14 00:10:02 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/07/14 00:10:02 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: send-pr,v $
+# Revision 0.9.2.7  2006/07/14 00:10:02  brian
+# - added more files to output
+#
+# Revision 0.9.2.6  2006/07/06 13:36:04  brian
+# - better handling of testsuite logs
+#
+# Revision 0.9.2.5  2006/05/19 22:05:32  brian
+# - added /proc/streams files to problem reports
+#
+# Revision 0.9.2.4  2006/04/03 23:01:02  brian
+# - preserve leading space
+#
+# Revision 0.9.2.3  2006/03/29 11:27:50  brian
+# - corrections for rerelease, see ChangeLog
+#
+# Revision 0.9.2.2  2006/03/23 11:19:17  brian
+# - working up send-pr
+#
+# Revision 0.9.2.1  2006/03/23 05:41:19  brian
+# - renamed auto-pr to send-pr
+#
+# =============================================================================
+
+#
+# This is a verision of gnats(1) send-pr(1) for use with openss7 packages.  This
+# is simply a Bourne shell script and does not rely upon any other installed
+# binaries.  It is a workalike for gnats(1) send-pr(1).
+#
+
+ECHO='echo'
+SHELL='/bin/bash'
+SED='sed'
+
+# Check that we have a woring $ECHO.
+if test "X$1" = X--no-reexec ; then
+    # Discard the --no-reexec flag, and continue
+    shift
+elif test "X`(echo '\t') 2>/dev/null`" = 'X\t' ; then
+    :
+else
+    exec $SHELL "$0" --no-reexec ${1+"$@"}
+fi
+
+if test "X$1" = X--fallback-echo ; then
+    shift
+    cat <<EOF
+$*
+EOF
+    exit 0
+fi
+
+me=`basename $0 .sh`
+dir=`dirname $0`
+path=`(cd $dir ; pwd)`
+errors=0
+warnings=0
+revision='$Revision: 0.9.2.7 $'
+
+exec 5>${top_builddir}${top_builddir+/}$me.log
+
+program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
+modename="$program"
+
+ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.7 $) $Date: 2006/07/14 00:10:02 $'
+
+# Sed substitution that helps us do robust quoting.  It backslashifies
+# metacharacters that are still active within double-quoted strings.
+Xsed="$SED"' -e 1s/^X//'
+sed_quote_subst='s/\([\\`\\"$\\\\]\)/\\\1/g'
+# test EBCDIC or ASCII
+case `$ECHO A | od -x` in
+    *[Cc]1*) # EBCDIC based system
+	SP2NL="tr '\100' '\n'"
+	NL2SP="tr '\r\n' '\100\100'"
+	;;
+    *) # Assume ASCII based system
+	SP2NL="tr '\040' '\012'"
+	NL2SP="tr '\015\012' '\040\040'"
+	;;
+esac
+
+# NLS nuisances.
+# Only set LANG and LC_ALL to C if already set.
+# These must not be set unconditionally because not all systems understand
+# e.g. LANG=C (notably SCO).
+# We save the old values to restore during execute mode.
+if test "${LC_ALL+set}" = set ; then
+    save_LC_ALL="$LC_ALL"; LC_ALL=C; export LC_ALL
+fi
+if test "${LANG+set}" = set ; then
+    save_LANG="$LANG"; LANG=C; export LANG
+fi
+
+# Make sure IFS has a sensible default
+: ${IFS=" 	"}
+
+sendpr_letters='abcdefghijklmnopqrstuvwxyz'
+sendpr_LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+sendpr_Letters=$sendpr_letters$sendpr_LETTERS
+sendpr_numbers='0123456789'
+sendpr_alphano=$sendpr_Letters$sendpr_numbers
+sendpr_uppercase="$SED y%*$sendpr_letters%P$sendpr_LETTERS%;s%[^_$sendpr_alphano]%_%g"
+sendpr_capitals="$SED y%*$sendpr_letters%P$sendpr_LETTERS%"
+sendpr_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
+
+ucme=`echo "$me" | $sendpr_capitals`
+leader="$ucme:"
+
+# Defaults
+
+default_search="/etc:$path:./scripts:~:."
+#default_config="/etc/$me.config:$path/$me.config:~/$me.config:./$me.config"
+default_file="problem.pr"
+default_sendmail="/usr/sbin/sendmail -oi -t"
+default_severity="software"
+default_to="bugs@openss7.org"
+#default_cc=""
+default_batch=no
+default_nomail=no
+default_debug=0
+default_verbose=1
+
+defaults="search config file sendmail severity to cc batch nomail debug verbose"
+
+unset command
+unset search
+unset config
+unset file
+unset sendmail
+unset severity
+unset to
+unset cc
+unset batch
+unset nomail
+unset debug
+unset verbose
+
+targets=( \
+    "configure.log" \
+    "compile.log" \
+    "check.log" \
+    "install.log" \
+    "installcheck.log" \
+    "dist.log" \
+    "distcheck.log" \
+    "rpms.log" \
+    "sign.log" \
+    "rebuild.log" \
+    "resign.log" \
+    "uninstall.log" \
+    "release.log" \
+    "release-sign.log" \
+    "srpm.log" \
+    "remove.log" \
+    )
+
+function known()
+{
+    if test ${show:-yes} = no ; then
+	return
+    fi
+    cat <<EOF
+Known targets are:
+    ${target[@]}
+EOF
+}
+
+function version()
+{
+    if test ${show:-yes} = no ; then
+	return
+    fi
+    cat <<EOF
+$ident
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.
+Distributed under GPL Version 2, included here by reference.
+See \`$program --copying' for copying permissions.
+EOF
+}
+
+function usage()
+{
+    if test ${show:-yes} = no ; then
+	return
+    fi
+    cat <<EOF
+Usage:
+    $program [SITE] [options]
+    $program [SITE] [options] {-p|-P|--print}
+    $program [SITE] [options] {-r|--requestid}
+    $program [SITE] [options] {-L|--list}
+    $program [SITE] [options] {-f|--file}
+    $program [SITE] [options] {-t|--target} [TARGET[ TARGET]*]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+EOF
+}
+
+function help()
+{
+    if test ${show:-yes} = no ; then
+	return
+    fi
+    usage
+    cat <<EOF
+Arguments:
+    [SITE]
+        site to which to send problem report ${default_site+[default: '$default_site']}
+
+Command options:
+    {}
+        create problem report from template
+    -p, --print, -P
+        print PR_FORM or standard blank PR template and exit
+    -r, --request-id
+        requests an id from SITE
+    -L, --list
+        list available categories
+    -f, --file FILE
+        read the PR template from FILE ${default_file+[default: '$default_file']} ('-' for stdin)
+    -T, --target TARGET[ TARGET]*
+        create problem report for failed makefile target ${default_target+[default: '$default_target']} (implies batch mode)
+    -h, --help
+        print this usage information and exit
+    -V, --version
+        print the version and exit
+    -C, --copying
+        print copying permissions and exit
+
+Options:
+    -b, --batch
+        use from shell script (non-interactive) ${default_batch+[default: '$default_batch']}
+    -n, --nomail
+        perform all actions except mailing ${default_nomail:+[default: '$default_nomail']}
+    -c, --cc LINE
+        place LINE in the Cc: header ${default_cc+[default: '$default_cc']}
+    -d, --database DATABASE
+        submit problem report to database DATABASE
+    -s, --severity SEVERITY
+        assign a severity to the problem report ${default_severity+[default: '$default_severity']}
+    -t, --to BUGREPORTS
+        use BUGREPORTS as the mail address for the support site ${default_to+[default: '$default_to']}
+    -g, --config CONFIG[:CONFIG]*
+        $me configuration file ${default_config+[default: '$default_config}']}
+    -S, --sendmail COMMAND
+        mail command to use when sending mail ${default_sendmail+[default: '$default_sendmail']}
+    -q, --quiet
+        suppress normal output
+    -D, --debug [LEVEL]
+        increase or set debugging verbosity ${default_debug+[default: '$default_debug']}
+    -v, --verbose [LEVEL]
+        increase or set output verbosity ${default_verbose+[default: '$default_verbose']}
+
+Environment:
+    PR_FORM
+        problem report form to use [default: Initial-Entry]
+    GNATS_DATABASE
+        gnats(1) database to use [default: default]
+        other possibilities are 'sponsors'
+    EMAIL_ADDRESS
+        first place to check for email address of submitter
+    DEBFULLNAME
+        second place to check for full name of submitter
+    DEBEMAIL
+        second place to check for email address of submitter
+    EMAIL
+        third place to check for email address of submitter
+EOF
+}
+
+function copying()
+{
+    if test ${show:-yes} = no ; then
+	return
+    fi
+    cat <<EOF
+--------------------------------------------------------------------------------
+$ident
+--------------------------------------------------------------------------------
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+--------------------------------------------------------------------------------
+This program is free software; you can  redistribute  it and/or modify  it under
+the terms  of the GNU General Public License  as  published by the Free Software
+Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should  have received a copy of the GNU  General  Public License  along with
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,
+Cambridge, MA 02139, USA.
+--------------------------------------------------------------------------------
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
+of the U.S. Government ("Government"), the following provisions apply to you. If
+the Software is supplied by the  Department of Defense ("DoD"), it is classified
+as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
+Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
+regulations) and the  Government  is acquiring  only the  license rights granted
+herein (the license rights customarily provided to non-Government users). If the
+Software is supplied to any unit or agency of the Government  other than DoD, it
+is  classified as  "Restricted Computer Software" and the Government's rights in
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
+Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
+regulations).
+--------------------------------------------------------------------------------
+Commercial  licensing  and  support of this  software is  available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+--------------------------------------------------------------------------------
+EOF
+}
+
+# functions for displaying and logging
+function echo_v()
+{
+    $ECHO "$me:  : $1"
+}
+function echo_t()
+{
+    $ECHO "$me: T: $1"
+}
+function echo_s()
+{
+    case :"${MAINTAINER_MODE:-no}" in
+	(:verbose|:continue) $ECHO "$me: S: $1" ;;
+    esac
+    $ECHO "$me: S: $1" >&5
+}
+function echo_d()
+{
+    if test ${debug-0} -gt 0 ; then
+	$ECHO "$me: D: $1"
+    fi
+    $ECHO "$me: D: $1" >&5
+}
+function echo_e()
+{
+    $ECHO "$me: E: --- $1" >&2
+    $ECHO "$me: E: $1" >&5
+    ((errors++))
+}
+function echo_w()
+{
+    $ECHO "$me: W: --- $1" >&2
+    $ECHO "$me: W: $1" >&5
+    ((errors++))
+}
+function echo_fls()
+{
+    echo_s "$2"
+}
+function echo_flw()
+{
+    $ECHO "$1: warning: $2" >&2
+    $ECHO "$me: W: $2" >&5
+    ((warnings++))
+}
+function echo_fle()
+{
+    $ECHO "$1: error: $2" >&2
+    $ECHO "$me: E: $2" >&5
+    ((errors++))
+}
+function echo_i()
+{
+    echo -e "$1" >&6
+    echo_d "$1"
+}
+function echo_c()
+{
+    if test "$target" != none ; then
+	return
+    fi
+    echo_i "$1"
+}
+
+# functions for option processing errors
+function syntax_error()
+{
+    if test ${verbose:-1} -gt 0 ; then
+	echo_e "$1" "option syntax"
+	( usage ) >&2
+    fi
+    exit 2
+}
+function option_unrec()
+{
+    opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
+    syntax_error "\`$opt' unrecognized"
+}
+function option_noarg()
+{
+    opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
+    syntax_error "\`$opt' does not accept an argument"
+}
+function option_needarg()
+{
+    syntax_error "\`$1' requires an argument"
+}
+function option_after()
+{
+    syntax_error "\`$1' cannot occur after \`$2'"
+}
+function option_with()
+{
+    syntax_error "\`$1' cannot occur with \`$2'"
+}
+
+echo_d "Processing options:"
+# Parse our command line options once, thoroughly.
+while test "$#" -gt 0 -o ":$more" != ":"
+do
+    if test ":$more" != ":" ; then arg="-$more" ; more= ; else arg="$1" ; shift ; fi
+    # check for attached option argument
+    case $arg in
+	# these long options accept an argument
+	( --file=*|--fil=*|--fi=*|--f=*|\
+	  --severity=*|--severit=*|--severi=*|--sever=*|--seve=*|--sev=*|--se=*|--s=*|\
+	  --to=*|--t=*|\
+	  --cc=*|--c=*|\
+	  --config=*|--confi=*|--conf=*|--con=*|--co=*|--c=*|\
+	  --sendmail=*|--sendmai=*|--sendma=*|--sendm=*|--send=*|--sen=*|--se=*|--s=*|\
+	  --target=*|--targe=*|--targ=*|--tar=*|--ta=*|--t=*|\
+	  --debug=*|--debu=*|--deb=*|--de=*|--d=*|\
+	  --verbose=*|--verbos=*|--verbo=*|--verb=*|--ver=*|--ve=*|--v=*\
+	)
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
+	# other long options do not accept an argument
+	( --*=* )
+	    option_noarg $arg ;;
+	# these short options do not accept an argument and can be followed by
+	# another short option letter
+	( -[PLbqDvhVC] )
+	    optarg= ;;
+	( -[PLbqDvhVC]* )
+	    more=`$ECHO "X$arg" | $Xsed -e 's|-[PLbqDvhVC]||'`
+	    eval "arg=\`$ECHO \"X$arg\" | $Xsed -e 's|$more||'\`"
+	    ;;
+	# these options require an argument and cannot be followed by another
+	# short option character
+	( -[fstcgST] )
+	    optarg= ;;
+	( -[fstcgST]* )
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's|-[fstcgST]||'` ;;
+	( * )
+	    optarg= ;;
+    esac
+    # check for optional or required option argument or permute nonoption argument
+    if test -n "$prev" ; then
+	# we are expecting an option argument
+	case $arg in
+	    ( -* ) # optional arguments not forthcoming
+		case $prev in
+		    # debug and verbose are special with no option arguments
+		    ( debug|verbose )
+			eval "(($prev++))" ;;
+		    # these have optional arguments
+		    # ( target ) ;;
+		    # these have required arguments
+		    ( target|file|severity|to|cc|config|sendmail )
+			option_needarg $prevopt ;;
+		esac
+		prev= ; prevopt=
+		;;
+	    ( * ) # if the previous option accepts an argument, assign it.
+		case $prev in
+		    # these accept array arguments
+		    ( file|target )
+			eval "$prev=(\"\${${prev}[@]}\" $arg)"
+                        echo_d "echo_d \"$prev is now \\\"\${${prev}[@]}\\\"\""
+                        eval "echo_d \"$prev is now \\\"\${${prev}[@]}\\\"\""
+                        ;;
+		    # the rest are simple arguments
+		    ( * )
+			eval "$prev=\"\$arg\"" ;;
+		esac
+		prev= ; prevopt=
+		continue
+		;;
+	esac
+    fi
+    # Have we seen a non-optional argument yet?
+    case $arg in
+	( --help|--hel|--he|--h|-h|--Help|--Hel|--He|--H|-H|--\?|-\? )
+            if test -n "${command:+set}" ; then option_with "$arg" "$commandopt" ; fi
+            commandopt="$arg"
+            command='help'
+	    ;;
+	( --version|--versio|--versi|--vers|-V )
+            if test -n "${command:+set}" ; then option_with "$arg" "$commandopt" ; fi
+            commandopt="$arg"
+            command='version'
+	    ;;
+	( --copying|--copyin|--copyi|--copy|--cop|--co|--c|-C )
+            if test -n "${command:+set}" ; then option_with "$arg" "$commandopt" ; fi
+            commandopt="$arg"
+            command='copying'
+	    ;;
+	( --verbose|--verbos|--verbo|--verb )
+	    prevopt="$arg"
+	    prev=verbose
+	    ;;
+	( -v )
+	    ((verbose++))
+	    ;;
+	( --verbose=*|--verbos=*|--verbo=*|--verb=* )
+	    verbose="$optarg"
+	    ;;
+	( --debug|--debu|--deb|--de|--d )
+	    prevopt="$arg"
+	    prev=debug
+	    ;;
+	( --debug=*|--debu=*|--deb=*|--de=*|--d=* )
+	    debug="$optarg"
+	    ;;
+	( -D )
+	    $ECHO "$program: enabling shell trace mode" 1>&2
+	    set -x
+	    ;;
+	( --dry-run|--dryrun|--n|-n )
+	    run=no
+	    ;;
+	( --quiet|--silent|-q )
+	    show=no
+	    verbose=0
+	    debug=0
+	    ;;
+	( --file|--fil|--fi|--f|-f )
+	    if test -n "${command:+set}" -a "$command" != file ; then option_with "$arg" "$commandopt" ; fi
+	    commandopt="$arg"
+	    command='file'
+	    prevopt="$arg"
+	    prev=file
+	    ;;
+	( --file=*|--fil=*|--fi=*|--f=*|-f* )
+	    if test -n "${command:+set}" -a "$command" != file ; then option_with "$arg" "$commandopt" ; fi
+	    commandopt="$arg"
+	    command='file'
+	    file=("${file[@]}" $optarg)
+	    echo_d "file is now \"${file[@]}\""
+	    ;;
+	( --severity|--severit|--severi|--sever|--seve|--sev|--se|--s|-s )
+	    prevopt="$arg"
+	    prev=severity
+	    ;;
+	( --severity=*|--severit=*|--severi=*|--sever=*|--seve=*|--sev=*|--se=*|--s=*|-s* )
+	    severity="$optarg"
+	    ;;
+	( --to|--t|-t )
+	    prevopt="$arg"
+	    prev=to
+	    ;;
+	( --to=*|--t=*|-t* )
+	    to="$optarg"
+	    ;;
+	( --cc|--c|-c )
+	    prevopt="$arg"
+	    prev=cc
+	    ;;
+	( --cc=*|--c=*|-c* )
+	    cc="$optarg"
+	    ;;
+	( --printform|--printfor|--printfo|--printf|--print|--prin|--pri|--pr|--p|-P )
+            if test -n "${command:+set}" ; then option_with "$arg" "$commandopt" ; fi
+            commandopt="$arg"
+            command='print'
+	    ;;
+	( --listcategories|--listcategorie|--listcategori|--listcategor|--listcatego|--listcateg|--listcate|--listcat|--listca|--listc|--list|--lis|--li|--l|-L )
+            if test -n "${command:+set}" ; then option_with "$arg" "$commandopt" ; fi
+            commandopt="$arg"
+            command='list'
+	    ;;
+	( --request-id|--request-i|--request-|--requestid|--requesti|--request|--reques|--reque|--requ|--req|--re|--r|-r )
+            if test -n "${command:+set}" ; then option_with "$arg" "$commandopt" ; fi
+            commandopt="$arg"
+            command='requestid'
+	    ;;
+	( --configfile|--configfil|--configfi|--configf|--config|--confi|--conf|--con|--co|--c|-g )
+	    prevopt="$arg"
+	    prev=config
+	    ;;
+	( --configfile=*|--configfil=*|--configfi=*|--configf=*|--config=*|--confi=*|--conf=*|--con=*|--co=*|--c=*|-g* )
+	    config=${config}${config:+:}"$optarg"
+	    ;;
+	( --sendmail|--sendmai|--sendma|--sendm|--send|--sen|--se|--s|-S )
+	    prevopt="$arg"
+	    prev=sendmail
+	    ;;
+	( --sendmail=*|--sendmai=*|--sendma=*|--sendm=*|--send=*|--sen=*|--se=*|--s=*|-S* )
+	    sendmail="$optarg"
+	    ;;
+	( --batchmode|--batchmod|--batchmo|--batchm|--batch|--batc|--bat|--ba|--b|-b )
+	    batch='yes'
+	    ;;
+	( --nomail|--nomai|--noma|--nom|--no|--n|-n )
+	    nomail='yes'
+	    ;;
+	( --targets|--target|--targe|--targ|--tar|--ta|--t|-T )
+            if test -n "${command:+set}" -a "$command" != target ; then option_with "$arg" "$commandopt" ; fi
+            commandopt="$arg"
+            command='target'
+	    prevopt="$arg"
+	    prev=target
+	    ;;
+	( --targets=*|--target=*|--targe=*|--targ=*|--tar=*|--ta=*|--t=*|-T* )
+            if test -n "${command:+set}" -a "$command" != target ; then option_with "$arg" "$commandopt" ; fi
+            commandopt="$arg"
+            command='target'
+	    target=("${target[@]}" $optarg)
+            echo_d "target is now \"${target[@]}\""
+	    ;;
+	( -- )
+	    # end of options
+	    break
+	    ;;
+	( -* )
+	    option_unrec $arg
+	    ;;
+	( * )
+	    nonopt=("${nonopt[@]}" "$arg")
+	    ;;
+    esac
+done
+
+# hit end of list wanting arguments
+case $prev in
+    # these have optional arguments
+    ( debug|verbose )
+	eval "(($prev++))" ;;
+    # these have optional arguments
+    # ( target ) ;;
+    # these have required arguments
+    ( file|severity|to|cc|config|sendmail|target )
+	option_needarg $prevopt ;;
+esac
+
+nonopt=("${nonopt[@]}" ${1+"$@"})
+if test "x${nonopt[*]}" != "x" ; then
+    site="${nonopt[0]}"
+fi
+
+# assign defaults
+for parm in $defaults ; do
+    eval "val=\"\$$parm\""
+    if test -z "$val" ; then
+	eval "def=\"\$default_$parm\""
+	echo_d "Assigning default parm $parm=\"$def\""
+	eval "$parm=\"$def\""
+    fi
+done
+
+found=no
+configs=`echo "$config" | sed -e 's|:| |g'`
+if test -n "$configs" ; then
+    for conf in $configs ; do
+	if test -r $conf ; then
+	    echo_d "Reading config file '$conf'."
+	    . $conf
+	    found=yes
+	else
+	    : # echo_w "Cannot read config file '$conf'."
+	fi
+    done
+    if test :$found = :no ; then
+	echo_w "Could not read any of '$config' config files."
+    fi
+else
+    sdirs=`echo "$search" | sed -e 's|:| |g'`
+    if test -n "$sdirs" ; then
+	for dir in $sdirs ; do
+	    if test -d $dir ; then
+		conf="$dir/$me.config"
+		if test -r $conf ; then
+		    echo_d "Reading config file '$conf'."
+		    . $conf
+		    found=yes
+		else
+		    : # echo_w "Cannot read config file '$conf'."
+		fi
+	    else
+		: # echo_w "Directory '$dir' does not exit."
+	    fi
+	done
+    fi
+    if test :$found = :no ; then
+	echo_w "Could not find config file in '$search' path."
+    fi
+fi
+
+severities=( \
+	"--unspecified--" \
+	"system-lockup" \
+	"system-crash" \
+	"kernel-oops" \
+	"segfault" \
+	"syscall-error" \
+	"critical" \
+	"serious" \
+	"annoyance" \
+	"other" \
+    )
+
+priorities=( \
+	"--unspecified--" \
+	"revenue-affecting" \
+	"service-affecting" \
+	"maintenance-affecting" \
+	"installation-affecting" \
+	"schedule-affecting" \
+	"feature-affecting" \
+	"other" \
+    )
+
+categories=( \
+	"pending" \
+	"linux-sctp" \
+	"sigtran" \
+	"strsctp" \
+	"strinet" \
+	"strss7" \
+	"x400p-ss7" \
+	"codecs" \
+	"web" \
+	"openss7" \
+	"other" \
+    )
+
+classes=( \
+	"software" \
+	"install" \
+	"compatibility" \
+	"documentation" \
+	"support" \
+	"change" \
+	"mistaken" \
+	"duplicate" \
+    )
+
+disributions=( \
+	"--unspecified--" \
+	"RH6.2" \
+	"RH7.0" \
+	"RH7.1" \
+	"RH7.2" \
+	"RH7.3" \
+	"RHEL3" \
+	"RHEL4" \
+	"RHAS3" \
+	"RHAS4" \
+	"MDK9.2" \
+	"MDK10.0" \
+	"MDK10.1" \
+	"LE2005" \
+	"SuSE8.0" \
+	"SuSE9.1" \
+	"SuSE9.2" \
+	"SuSE10.0" \
+	"SLES8" \
+	"SLES9" \
+	"FC1" \
+	"FC2" \
+	"FC3" \
+	"FC4" \
+	"Debian3.0r1" \
+	"Debian3.0r2" \
+	"Debian3.1" \
+	"COS3.0" \
+	"COS3.1" \
+	"COS3.2" \
+	"COS3.3" \
+	"COS3.4" \
+	"COS4.0" \
+	"COS4.1" \
+	"WBEL3" \
+	"WBEL3.1" \
+	"WBEL4" \
+	"MontaVista" \
+	"BlueCat" \
+	"Solaris-2.5" \
+	"Solaris-2.7" \
+	"Solaris-8" \
+	"Solaris-9" \
+	"Solaris-10" \
+	"OpenSolaris" \
+	"FreeBSD-4.5" \
+	"LynxOS" \
+	"pSOS" \
+	"VxWorks" \
+	"other" \
+    )
+
+packages=( \
+	"--unspecified--" \
+	"openss7-0.7.2" \
+	"linux-sctp-0.1" \
+	"linux-sctp-0.2" \
+	"linux-sctp" \
+	"ss7codecs-0.1.0" \
+	"ss7codecs-0.1.0b" \
+	"ss7codecs" \
+	"strsctp-0.7.6" \
+	"strsctp-0.7.8" \
+	"strsctp-0.8.2" \
+	"strsctp" \
+	"strss7-0.7.2" \
+	"strss7-0.7.4" \
+	"strss7-0.7.8" \
+	"strss7-0.8.2" \
+	"linux-sctp-0.2.14" \
+	"linux-sctp-0.2.15" \
+	"linux-sctp-0.2.16" \
+	"linux-sctp-0.2.18" \
+	"linux-sctp-0.2.19" \
+	"sctp-0.2.21" \
+	"iperf-2.0.2" \
+	"LiS-2.16.18-19" \
+	"LiS-2.16.18-20" \
+	"LiS-2.16.18-21" \
+	"LiS-2.16.18-22" \
+	"LiS-2.18.1" \
+	"strxns-0.9.2.1" \
+	"strxnet-0.9.2-1" \
+	"strxnet-0.9.2-2" \
+	"strxnet-0.9.2-3" \
+	"strxnet-0.9.2-4" \
+	"strxnet-0.9.2.5" \
+	"strxnet-0.9.2.6" \
+	"strinet-0.9.2.1" \
+	"strsctp-0.9.2.3" \
+	"strss7-0.9a.3" \
+	"streams-0.7a.3" \
+	"netperf-2.3.1" \
+	"netperf-2.3.2" \
+	"netperf" \
+	"iperf-2.0.2" \
+	"iperf-2.0.3" \
+	"iperf" \
+	"streams-0.7a.4" \
+	"sctp-0.2.22" \
+	"sctp" \
+	"LiS-2.18.2" \
+	"LiS" \
+	"strcompat-0.9.2.1" \
+	"strcompat-0.9.2.2" \
+	"strcompat" \
+	"strxns-0.9.2.2" \
+	"strxns" \
+	"strxnet-0.9.2.7" \
+	"strxnet" \
+	"strinet-0.9.2.2" \
+	"strinet" \
+	"strsctp-0.9.2.4" \
+	"strss7-0.9a.4" \
+	"strss7" \
+	"linux-sctp-0.2.20" \
+	"other" \
+    )
+
+distributions=( \
+	"--unspecified--" \
+	"RH6.2" \
+	"RH7.0" \
+	"RH7.1" \
+	"RH7.2" \
+	"RH7.3" \
+	"RHEL3" \
+	"RHEL4" \
+	"RHAS3" \
+	"RHAS4" \
+	"MDK9.2" \
+	"MDK10.0" \
+	"MDK10.1" \
+	"LE2005" \
+	"SuSE8.0" \
+	"SuSE9.1" \
+	"SuSE9.2" \
+	"SuSE10.0" \
+	"SLES8" \
+	"SLES9" \
+	"FC1" \
+	"FC2" \
+	"FC3" \
+	"FC4" \
+	"Debian3.0r1" \
+	"Debian3.0r2" \
+	"Debian3.1" \
+	"COS3.0" \
+	"COS3.1" \
+	"COS3.2" \
+	"COS3.3" \
+	"COS3.4" \
+	"COS4.0" \
+	"COS4.1" \
+	"WBEL3" \
+	"WBEL3.1" \
+	"WBEL4" \
+	"MontaVista" \
+	"BlueCat" \
+	"Solaris-2.5" \
+	"Solaris-2.7" \
+	"Solaris-8" \
+	"Solaris-9" \
+	"Solaris-10" \
+	"OpenSolaris" \
+	"FreeBSD-4.5" \
+	"LynxOS" \
+	"pSOS" \
+	"VxWorks" \
+	"other" \
+    )
+
+kerneltypes=( \
+	"--unspecified--" \
+	"UP" \
+	"Preemptive" \
+	"SMP" \
+	"other" \
+    )
+
+function gnats_comment() {
+    if test "$target" != none ; then
+	return
+    fi
+    fields=
+    for field in $* ; do
+	fields=${fields:+$fields | }$field
+    done
+    echo "<[ $fields ] (one line)>"
+}
+
+function gnats_info() {
+    if test "$target" != none ; then
+	return
+    fi
+    echo -n "$1"
+}
+
+function pr_cases()
+{
+    # determine which test cases have failed, find the most recent testsuite.log
+    testfile=
+    for f in `find . -type f -name 'testsuite.log' -not \( -regex '.*/testsuite.dir/' -prune \) | xargs -r ls -t` ; do
+	if test -r $f ; then
+	    testfile="$f"
+	    break
+	fi
+    done
+    failed=
+    if test -n "$testfile" ; then
+	failed=`sed -e '\|Summary of the failures|,\|Detailed failed tests|!d;\|Failed tests:|,\|Skipped tests:|!d;\|Failed tests:|,\|Unexpected passes:|!d;\|^[[:space:]]*[0-9][0-9]*:|!d;s|^[[:space:]]*||;s|:.*||' $f`
+	unexpp=`sed -e '\|Summary of the failures|,\|Detailed failed tests|!d;\|Unexpected passes:|,$!d;\|^[[:space:]]*[0-9][0-9]*:|!d;s|^[[:space:]]*||;s|:.*||' $f`
+    fi
+    cases=()
+    fails=()
+    xpass=()
+    if test -n "$failed" ; then
+	for c in $failed ; do
+	    cases=("${cases[@]}" $c)
+	    fails=("${fails[@]}" $c)
+	done
+    fi
+    if test -n "$unexpp" ; then
+	for c in $unexpp ; do
+	    cases=("${cases[@]}" $c)
+	    xpass=("${xpass[@]}" $c)
+	done
+    fi
+}
+
+function pr_procs()
+{
+    # determine number of processors
+    cpus=(`grep '^processor[[:space:]]*:[[:space:]]*[0-9][0-9]*' /proc/cpuinfo 2>/dev/null | sed -e 's|.*|cpu|'`)
+    procs=${#cpus[*]}
+    if test $procs -eq 0 ; then
+	procs='--unknown--'
+    fi
+    if ( egrep -q '<SMP>' /proc/version >/dev/null 2>&1 ) ; then
+	ktype=SMP
+    else
+	ktype=UP
+    fi
+    # cpu=`uname -p`
+    # uname -p doesn't work so well on some older and newer systems
+    #test -n "$cpu" -a "$cpu" != unknown || \
+	cpu=`grep '^model name[[:space:]]*:[[:space:]]*' /proc/cpuinfo 2>/dev/null | head -1 | sed -e 's|^model name[[:space:]]*:[[:space:]]*||'`
+    test -n "$cpu" || \
+	cpu='unknown'
+    proc=`uname -m`
+    proc="${proc:+$proc }${cpu:+<$cpu>}"
+}
+
+function pr_streams()
+{
+    # try to determine the streams package and version
+    case :$ap_STRCONF_PACKAGE: in
+    :LiS:)
+	streams=LiS
+	;;
+    :LfS:)
+	streams=streams
+	;;
+    :*:)
+	streams='unknown'
+	return
+	;;
+    esac
+    streams="$streams${ap_STREAMS_VERSION:+ $ap_STREAMS_VERSION}"
+}
+
+function pr_synopsis()
+{
+    # determine a synopsis line
+    case "$stage" in
+	(configure|compile|check|install|uninstall|remove|maintenance)
+	    synopsis="Failure during $stage for $target."
+	    ;;
+	(installcheck|external)
+	    if test ${#cases[*]} -gt 0 ; then
+		synopsis="[${ap_PACKAGE:-unknown} ${ap_VERSION:-?.?.?}] testsuite:${fails[*]:+ }${fails[*]}${fails[*]:+ failed}${xpass[*]+, }${xpass[*]}${xpass[*]:+ passed unexpectedly}"
+	    else
+		if test "$stage" = installcheck ; then
+		    synopsis="Failure during $stage for $target."
+		else
+		    synopsis=''
+		fi
+	    fi
+	    ;;
+    esac
+}
+
+function proutput()
+{
+    user=`whoami`
+    host=`hostname -f`
+    email=
+    if test -n "$DEBFULLNAME" ; then email="\"$DEBFULLNAME\" " ; fi
+    if test -n "$DEBEMAIL" ; then email="$email<$DEBEMAIL>" ; fi
+    if test -z "$email" ; then email="$EMAIL_ADDRESS" ; fi
+    if test -z "$email" ; then email="$EMAIL" ; fi
+    test -n "$email" || {
+	name=`finger -mpl $user | grep Name: | sed -e 's|.*Name:[[:space:]]*||'`
+	if test -n "$name" ; then email="\"$name\" " ; fi
+	email="$email$user@$host"
+    }
+    name=`echo $email | sed -e 's|[^"]*"||;s|".*||'`
+    mail=`echo $email | sed -e 's|[^<]*<||;s|>.*||'`
+    if test -n "$name" ; then email="\"$name\" " ; fi
+    email="$email${mail:+<$mail>}"
+    echo_d "Email is $email"
+    cat>&6<<-EOF
+	$leader vim: ft=mail comments=b\:$ucme\:,b\:# fo+=tcqlorn
+	$leader
+	$leader Lines starting with '$ucme' will be removed automatically, as
+	$leader will all comments (text enclosed in '<' and '>').
+	$leader
+	$leader Please consult the send-pr man page 'send-pr(1)' or the Texinfo
+	$leader manual if you are not sure how to fill out a problem report.
+	$leader Note that the Synopsis field is mandatory.  The Subject (for the
+	$leader mail) will be made the same as Synopsis unless explicity
+	$leader changed.
+	$leader
+	$leader Please do not send confidential information in the mail.
+	$leader Setting 'Confidential' to yes simply makes the information less
+	$leader accessible to other users, but does not ensure confidentiality
+	$leader of information.  In particular, please inspect the included
+	$leader Environment Variables and remove any sensitive values.  Note
+	$leader also that log files included may contain IP addresses,
+	$leader hostnames, email addresses, and other information of a
+	$leader confidential or sensitive nature.  Please delete all such
+	$leader information before sending.
+	$leader
+EOF
+    cat>&6<<-EOF
+	From $mail `date`
+	From: $email
+	To: ${ap_PACKAGE_BUGREPORT:-bugs@openss7.org}
+	Subject: $synopsis
+	Date: `date -R`
+	Reply-To: $email
+	X-$me-version: $revision
+
+
+EOF
+    echo_i ">Submitter-Id:    ${SUBMITTER:-<SUBMITTER>}"
+    echo_i ">Originator:      ${DEFAULT_ORIGINATOR:-${name:-<DEFAULT_ORIGINATOR>}}"
+    echo_i ">Organization:    "
+    echo_i "\t${ORGANIZATION:-<ORGANIZATION>}"
+    if test -n "$org" ; then
+	echo "$org" | while read ; do
+	    echo_i "\t$REPLY"
+	done
+    fi
+    cat>&6<<-EOF
+	>Synopsis:        $synopsis `gnats_info '<One-line summary of the Problem. (one line)>'`
+	>Confidential:    no `gnats_comment yes no`
+	>Severity:        $severity `gnats_comment ${severities[*]}`
+	>Priority:        $priority `gnats_comment ${priorities[*]}`
+	>Category:        ${ap_PACKAGE:-openss7} `gnats_comment ${categories[*]}`
+	>Class:           $class `gnats_comment ${classes[*]}`
+	>Quarter:         $me
+	>Package:         ${ap_PACKAGE:-unknown} `gnats_comment ${packages[*]}`
+	>Release:         ${ap_VERSION:-unknown}
+	>URL:             $url
+	>Browser:         $browser
+	>OS-Distribution: ${ap_DISTRIBUTION:-unknown}${ap_PACKAGE_RPMDIST:+ <$ap_PACKAGE_RPMDIST>} `gnats_comment ${distributions[*]}`
+	>STREAMS-Release: $streams
+	>Kernel-Version:  ${ap_PACKAGE_KVERSION:-`uname -r`}
+	>Kernel-Type:     $ktype `gnats_comment ${kerneltypes[*]}`
+	>Processor-Type:  $proc `gnats_info '<Processor machine architecture type. (one line)>'`
+	>Processors:      $procs `gnats_info '<Number of processors on the target system. (one line)>'`
+	>Environment:     
+EOF
+    echo_i "\t`uname -a`"
+    if test -r /proc/version ; then
+	cat /proc/version | while read ; do
+	    echo_i "\t$REPLY"
+	done
+    fi
+    echo_i "\t"
+#   env | uuencode -m env.log | while read ; do
+    echo_i "\tEnvironment Variables:"
+    declare -x | while read ; do
+	echo_i "\t| $REPLY"
+    done
+    for f in $envfiles ; do
+	if test -r $f ; then
+	    echo_i "\t"
+	    echo_i "\tContents of $f:"
+	    cat $f | while read ; do
+		echo_i "\t| $REPLY"
+	    done
+	fi
+    done
+    if test -x "`which rpm`" ; then
+	    echo_i "\t"
+	    echo_i "\tRPM specifications:"
+	    rpm --showrc | while read ; do
+		echo_i "\t| $REPLY"
+	    done
+    fi
+    echo_i "\t"
+    cat>&6<<-EOF
+	>Cases:           ${cases[*]} `gnats_info '<Test cases that failed. (one line)>'`
+	>Description:     
+EOF
+    echo_c "\t<Precise description of the problem. (multiple lines)>"
+    echo_i "\t"
+    cat>&6<<EOF
+	This problem report was automatically generated by $me
+	on `date -u -I` because:
+
+	${synopsis:-(Unknown reason.)}
+
+	The pertinent log files have been included below as follows:
+EOF
+    echo_i "\t"
+    for f in $files ; do
+	if test -r $f ; then
+	    echo_i "\t\t$f"
+	fi
+    done
+    echo_i "\t"
+    for f in $files ; do
+	if test -r $f ; then
+	    echo_i "\tContents of file '$f':"
+#	    uuencode -m $f `basename $f` | while read ; do
+	    cat $f | while read ; do
+		echo_i "\t| $REPLY"
+	    done
+	    echo_i ""
+	fi
+    done
+    cat>&6<<-EOF
+	>How-To-Repeat:   
+EOF
+    echo_c "\t<Code/input/activities to reproduce the problem. (multiple lines)>"
+    cat>&6<<EOF
+	wget http://www.openss7.org/tarballs/${ap_PACKAGE}-${ap_VERSION}.tar.bz2
+	tar -xjvf ${ap_PACKAGE}-${ap_VERSION}.tar.bz2
+	cd ${ap_PACKAGE}-${ap_VERSION}
+	./configure
+EOF
+    case "$stage" in
+    (configure)
+	cat>&6<<EOF
+	make configure.log
+EOF
+	;;
+    (compile)
+	cat>&6<<EOF
+	make compile.log
+EOF
+	;;
+    (check)
+	cat>&6<<EOF
+	make compile.log
+	make check-clean
+	make check.log
+EOF
+	;;
+    (install)
+	cat>&6<<EOF
+	make compile.log
+	make check-clean
+	make check.log
+	sudo make install.log
+EOF
+	;;
+    (installcheck)
+	cat>&6<<EOF
+	make compile.log
+	make check-clean
+	make check.log
+	sudo make install.log
+	sudo make installcheck.log
+EOF
+	;;
+    (uninstall)
+	cat>&6<<EOF
+	make compile.log
+	make check-clean
+	make check.log
+	sudo make install.log
+	sudo make installcheck.log
+	sudo make uninstall.log
+EOF
+	;;
+    (remove)
+	cat>&6<<EOF
+	make compile.log
+	make check-clean
+	make check.log
+	sudo make install.log
+	sudo make installcheck.log
+	sudo make remove.log
+EOF
+	;;
+    (maintenance)
+	cat>&6<<EOF
+	make dist.log
+	make distcheck.log
+	make rpms.log
+	make sign.log
+	make rebuild.log
+	make resign.log
+	make release.log
+	make release-sign.log
+	make srpm.log
+EOF
+	;;
+    (external)
+	cat>&6<<EOF
+	<Provide specific build or test instructions.>
+EOF
+	;;
+    esac
+    cat>&6<<-EOF
+	>Fix:              
+EOF
+    echo_c "\t<How to correct or work around the problem, if known. (multiple lines)>"
+    if test -n "$fix" ; then
+	echo "$fix" | while read ; do
+	    echo_i "\t$REPLY"
+	done
+    fi
+}
+
+function targetpr()
+{
+    target=$1
+    case $1 in
+    (configure.log)
+#	filename=configure.pr
+	stage=configure
+	class=install
+	severity=serious
+	files="configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
+	envfiles="/proc/cpuinfo /proc/streams/strinfo $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
+	;;
+    (compile.log)
+#	filename=compile.pr
+	stage=compile
+	class=software
+	severity=serious
+	files="compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
+	envfiles="/proc/cpuinfo /proc/streams/strinfo $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	;;
+    (check.log)
+#	filename=check.pr
+	stage=check
+	class=install
+	severity=annoyance
+	files="check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
+	envfiles="/proc/cpuinfo /proc/streams/strinfo $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	;;
+    (install.log)
+#	filename=install.pr
+	stage=install
+	class=install
+	severity=serious
+	files="install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	;;
+    (installcheck.log)
+#	filename=installcheck.pr
+	stage=installcheck
+	class=software
+	severity=critical
+	files="*/tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	;;
+    (uninstall.log)
+#	filename=uninstall.pr
+	stage=uninstall
+	class=install
+	severity=annoyance
+	files="uninstall.log */tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	;;
+    (remove.log)
+#	filename=remove.pr
+	stage=remove
+	class=install
+	severity=annoyance
+	files="remove.log */tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	;;
+    (dist.log|distcheck.log|rpms.log|sign.log|rebuild.log|resign.log|release.log|release-sign.log|srpm.log)
+#	filename=`echo "$target" | sed -e 's|\.log$|.pr|'`
+	stage=maintenance
+	class=install
+	severity=annoyance
+	files="$1 remove.log uninstall.log */tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	;;
+    (none|*)
+#	filename=problem.pr
+	stage=external
+	class=software
+	severity=serious
+	files="config.log */config.log */tests/testsuite.log tests/testsuite.log ${targets[*]} $ap_cache_file $ap_CONFIG_SITE"
+	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	;;
+    esac
+    filename='problem.pr'
+    echo_d "stage  : $stage"
+    echo_d "target : $target"
+    if test ${stage:-maintenance} != maintenance
+    then
+	echo_d "Generating Problem Report."
+    else
+	echo_w "Problem reports not generated for maintenance stage targets."
+    fi
+    echo_d "Opening $filename"
+    exec 6>$filename
+    url="http://www.openss7.org/support.html"
+    browser=`mozilla --version 2>/dev/null | sed -e 's|,.*||'`
+    test -n "$browser" || browser=`netscape --version 2>/dev/null | sed -e 's|,.*||'`
+    priority="installation-affecting"
+    pr_procs
+    pr_streams
+    pr_cases
+    pr_synopsis
+    proutput
+    exec 6>&-
+    if test "${batch:-no}" = no ; then
+	answer=
+	while test :$answer != :y -a :$answer != :n ; do
+	    echo -n "Do you wish to edit the report (y/n)? "
+	    read -n 1 answer
+	    echo ""
+	done
+	if test :$answer = :y ; then
+	    ${EDITOR:-vi} $filename
+	fi
+	answer=
+	while test :$answer != :y -a :$answer != :n ; do
+	    echo -n "Do you wish to finalize the report (y/n)? "
+	    read -n 1 answer
+	    echo ""
+	done
+	if test :$answer = :y ; then
+	    filepr $filename
+	    return
+	fi
+    fi
+    if test "$stage" != external ; then
+	cat<<-EOF
+		$leader
+		$leader $me:  Make target $target failed in the $stage stage.  An
+		$leader automated problem report has been created in the file named
+		$leader '$filename' in the current directory.  This problem report can
+		$leader be sent to ${ap_PACKAGE_BUGREPORT} by calling 'make send-pr'.
+		$leader
+		$leader It is possible to edit some of the fields before sending on the
+		$leader problem report.  Please remember that there is NO WARRANTY.  See
+		$leader the file 'COPYING' in the top level directory.
+		$leader
+		$leader Please do not send confidential information to the bug report
+		$leader address.  Inspect the file '$filename' for confidential
+		$leader information before mailing.
+		$leader
+EOF
+    else
+	cat<<-EOF
+		$leader
+		$leader $me:  $me was invoked to generate an external report.  An
+		$leader automated problem report has been created in the file named
+		$leader '$filename' in the current directory.  This problem report can
+		$leader be sent to ${ap_PACKAGE_BUGREPORT} by calling this script as
+		$leader '$path/$me --file $filename'.
+		$leader
+		$leader It is possible to edit some of the fields before sending on the
+		$leader problem report.  Please remember that there is NO WARRANTY.  See
+		$leader the file 'COPYING' in the top level directory.
+		$leader
+		$leader Please do not send confidential information to the bug report
+		$leader address.  Inspect the file '$filename' for confidential
+		$leader information before mailing.
+		$leader
+EOF
+    fi
+}
+
+function target {
+    if test -n "${target[*]}" ; then
+	for t in "${target[@]}" ; do
+	    echo_d "Creating problem report for target '$t'."
+	    found=
+	    for x in "${targets[@]}" ; do
+		if test $t = $x ; then
+		    found=yes
+		    break
+		fi
+	    done
+	    if test ${found:-no} = no ; then
+		echo_e "Unknown target $t."
+		usage
+		known
+		exit 1
+	    fi
+	done
+	for t in "${target[@]}" ; do
+	    targetpr "$t"
+	done
+    else
+	targetpr none
+    fi
+}
+
+function sendpr {
+    targetpr none
+}
+
+function mailpr {
+    cat "$1" | $sendmail
+    cat<<-EOF
+	$leader
+	$leader The problem report '$1' has been mailed.
+	$leader
+EOF
+}
+
+function filepr {
+    echo_d "Filing problem report '$1'."
+
+    if test "${nomail:-no}" = no ; then
+	if grep -q '^Status: RO' $1 >/dev/null 2>&1 ; then
+	    echo_w "Problem report '$1' already filed."
+	    echo_w "Edit and remove 'Status: RO' line from headers in '$1' to refile."
+	    return
+	fi
+    fi
+
+    cat "$1" | sed -e '/^'$leader'/d;/^[[:space:]]<[^>]*>/d;/^>[a-zA-Z-]*:[^<]*<[^>]*>/s/<[^>]*>//g' > /tmp/$$.pr
+    found=
+    save_IFS=$IFS
+    IFS=''
+    cat /tmp/$$.pr | while read ; do
+	IFS=$save_IFS
+	if test :$nomail != :yes -a :$found != :yes -a -z "$REPLY" ; then
+	    echo "Status: RO"
+	    found=yes
+	fi
+	echo "$REPLY"
+	save_IFS=$IFS
+	IFS=''
+    done > "$1"
+    IFS=$save_IFS
+    rm -f -- /tmp/$$.pr
+
+    if test "${batch:-no}" = no ; then
+	echo "Problem report '$1' has been finalized."
+	answer=
+	while test :$answer != :y -a :$answer != :n ; do
+	    echo -n "Do you wish to edit the finalized report (y/n)? "
+	    read -n 1 answer
+	    echo ""
+	done
+	if test :$answer = :y ; then
+	    ${EDITOR:-vi} $1
+	fi
+	answer=
+	while test :$answer != :y -a :$answer != :n ; do
+	    echo -n "Do you wish to mail the report (y/n)? "
+	    read -n 1 answer
+	    echo ""
+	done
+	if test :$answer = :y ; then
+	    mailpr "$1"
+	    return
+	fi
+	nomail=yes
+    else
+	if test "${nomail:-no}" = no ; then
+	    mailpr "$1"
+	    return
+	fi
+    fi
+
+    cat<<-EOF
+	$leader
+	$leader Problem report '$1' has been finalized.  It is possible
+	$leader to send this email simply by piping it to a mailer or by using the
+	$leader 'make send-pr' makefile target within the build directory.  If
+	$leader this machine does not support outgoing email, copy the file
+	$leader '$1' to a machine that does and mail it.
+	$leader
+EOF
+}
+
+function file {
+    if test -n "${file[*]}" ; then
+	for f in "${file[@]}" ; do
+	    if test ! -r $f ; then
+		echo_e "Cannot find problem report file '$f'."
+		usage
+		exit 1
+	    fi
+	done
+	for f in "${file[@]}" ; do
+	    filepr "$f"
+	done
+    else
+	filepr problem.pr
+    fi
+}
+
+
+echo_d "processing command=\"$command\""
+case "${command:-sendpr}" in
+    (version|help|copying|usage|target|file|sendpr) ${command:-sendpr} ;;
+    (*) ( usage ) >&2 ; exit 1 ;;
+esac
+
+exit 0
+
+# vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

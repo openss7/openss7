@@ -1,0 +1,151 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: init.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/03/06 11:35:14 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; version 2 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2006/03/06 11:35:14 $ by $Author: brian $
+##
+## -----------------------------------------------------------------------------
+##
+## $Log: init.am,v $
+## Revision 0.9.2.23  2006/03/06 11:35:14  brian
+## - updated headers
+##
+## =============================================================================
+
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(dist_initrd_SCRIPTS)
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+if RPM_BUILD_USER
+## RPM_BUILD_USER
+
+install-initscripts: $(dist_initrd_SCRIPTS)
+	@$(ECHO) "Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
+		f=`$(ECHO) $$p | sed -e 's|^.*/||'` ; \
+		$(ECHO) "$(SHELL) $(top_srcdir)/scripts/install_initd -v $(DESTDIR)$(initrddir)/$$f" ; \
+		$(SHELL) $(top_srcdir)/scripts/install_initd -v $(DESTDIR)$(initrddir)/$$f || :; \
+	done
+
+post-initscripts:
+	@$(ECHO) "Making $@ in `pwd`"
+	@if test -z '$(DESTDIR)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
+		if runlevel >/dev/null 2>&1 ; then \
+			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
+				f=`$(ECHO) $$p | sed -e 's|^.*/||'` ; \
+				flist="$$flist $$f" ; \
+				rlist="$$f $$rlist" ; \
+			done ; \
+			r=`runlevel | sed -e 's|.*[[:space:]]||'` ; \
+			for d in $$r S ; do \
+				for i in $$rlist ; do \
+					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i \
+					        -o -L $(initrddir)/rc$${d}.d/S[0-9][0-9]$$i ; then \
+						$(ECHO) "$(SHELL) $(initrddir)/$$i stop" ; \
+						$(SHELL) $(initrddir)/$$i stop || : ; \
+					fi ; \
+				done ; \
+			done ; \
+			for d in S $$r ; do \
+				for i in $$flist ; do \
+					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i \
+					        -o -L $(initrddir)/rc$${d}.d/S[0-9][0-9]$$i ; then \
+						$(ECHO) "$(SHELL) $(initrddir)/$$i start" ; \
+						$(SHELL) $(initrddir)/$$i start || : ; \
+					fi ; \
+				done ; \
+			done ; \
+		fi ; \
+	fi
+
+preun-initscripts:
+	@$(ECHO) "Making $@ in `pwd`"
+	@if test -z '$(DESTDIR)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
+		if runlevel >/dev/null 2>&1 ; then \
+			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
+				rlist="$$p $$rlist" ; \
+			done ; \
+			r=`runlevel | sed -e 's|.*[[:space:]]||'` ; \
+			for d in $$r S ; do \
+				for p in $$rlist ; do \
+					f=`$(ECHO) $$p | sed -e 's|^.*/||'` ; \
+					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$f \
+					        -o -L $(initrddir)/rc$${d}.d/S[0-9][0-9]$$f ; then \
+						$(ECHO) "$(SHELL) $(srcdir)/$$p stop" ; \
+						$(SHELL) $(srcdir)/$$p stop || : ; \
+					fi ; \
+				done ; \
+			done ; \
+		fi ; \
+	fi
+
+uninstall-initscripts:
+	@$(ECHO) "Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
+		f=`$(ECHO) $$p | sed -e 's|^.*/||'` ; \
+		$(ECHO) "$(SHELL) $(top_srcdir)/scripts/remove_initd -v $(DESTDIR)$(initrddir)/$$f" ; \
+		$(SHELL) $(top_srcdir)/scripts/remove_initd -v $(DESTDIR)$(initrddir)/$$f || :; \
+	done
+
+dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/install_initd $(top_srcdir)/scripts/remove_initd
+
+INSTALL_DATA_HOOK	+= install-initscripts
+
+POST_INSTALL_AM		+= post-initscripts
+
+UNINSTALL_LOCAL		+= uninstall-initscripts
+
+PRE_UNINSTALL_AM	+= preun-initscripts
+
+## RPM_BUILD_USER
+endif
+## PKG_BUILD_INDEP
+endif
+
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
