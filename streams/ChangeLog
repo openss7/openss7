@@ -1,3 +1,12 @@
+2006-08-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* NEWS: updated
+	* doc/manual/SPG.texi: correction
+	* doc/manual/STREAMS.texi: added preface
+	* doc/manual/releases.texi: updated for release
+	* scripts/texi/funding.texi: correction
+	* src/modules/sc.c: rationalized to strutil module
+
 2006-08-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/compat.texi: created common compatibility text

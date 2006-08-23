@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:20 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:09:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:20 $ by $Author: brian $
+ Last Modified $Date: 2006/08/23 11:09:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.48  2006/08/23 11:09:13  brian
+ - rationalized to strutil
+
  Revision 0.9.2.47  2006/07/24 09:01:20  brian
  - results of udp2 optimizations
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:20 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:09:13 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:20 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:09:13 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -98,7 +101,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:20 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:09:13 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -469,6 +472,17 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const int reset,
 static size_t
 str_mlist_count(void)
 {
+#ifdef LIS
+	int i, cdev_count = 0, fmod_count = 0;
+
+	for (i = 0; i < MAX_STRDEV; i++)
+		if (lis_fstr_sw[i].f_str && lis_fstr_sw[i].f_count)
+			cdev_count++;
+	for (i = 1; i < MAX_STRMOD; i++)
+		if ((lis_fmod_sw[i].f_state & LIS_MODSTATE_INITED)
+		    && lis_fmod_sw[i].f_count)
+			fmod_count++;
+#endif
 	return (cdev_count + fmod_count);
 }
 
@@ -570,8 +584,16 @@ sc_wput(queue_t *q, mblk_t *mp)
 		case SC_IOC_LIST:
 			_trace();
 			if (ioc->copyresp.cp_rval != 0) {
+#ifdef LFS
 				_ptrace(("Aborting ioctl!\n"));
 				goto abort;
+#endif
+#ifdef LIS
+				/* LiS has a bug here... */
+				_ptrace(("Nacking failed ioctl!\n"));
+				err = -(long) ioc->copyresp.cp_rval;
+				goto nak;
+#endif
 			}
 			_trace();
 			if (ioc->copyresp.cp_private == (mblk_t *) 0) {
@@ -635,6 +657,54 @@ sc_wput(queue_t *q, mblk_t *mp)
 				bzero(dp->b_rptr, usize);
 				freemsg(mp->b_cont);
 				mp->b_cont = dp;
+#ifdef LIS
+				{
+					int i;
+					uint flag = 0;
+					caddr_t mlist = (typeof(mlist)) dp->b_rptr;
+
+					_trace();
+					if (n < count) {
+						_trace();
+						/* list all devices */
+						for (i = 0; i < MAX_STRDEV; i++) {
+							struct cdevsw *cdev;
+							struct streamtab *st;
+
+							cdev = &lis_fstr_sw[i];
+							if (!cdev->f_str || !cdev->f_count)
+								continue;
+							if (n >= count)
+								break;
+							st = cdev->f_str;
+							mlist +=
+							    sc_mlist_copy(i, st, mlist, reset,
+									  flag);
+							n++;
+						}
+					}
+					_trace();
+					if (n < count) {
+						/* list all modules */
+						for (i = 1; i < MAX_STRMOD; i++) {
+							struct fmodsw *fmod;
+							struct streamtab *st;
+
+							fmod = &lis_fmod_sw[i];
+							if (!fmod->f_str || !fmod->f_count)
+								continue;
+							if (n >= count)
+								break;
+							st = fmod->f_str;
+							mlist +=
+							    sc_mlist_copy(0, st, mlist, reset,
+									  flag);
+							n++;
+						}
+					}
+				}
+#endif
+#ifdef LFS
 				{
 					struct list_head *pos;
 					uint flag = ioc->copyresp.cp_flag;
@@ -689,6 +759,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 						    sc_mlist_copy(-1, NULL, mlist, reset, flag);
 					}
 				}
+#endif
 				_trace();
 				mp->b_datap->db_type = M_COPYOUT;
 				ioc->copyreq.cq_addr = uaddr;
@@ -718,9 +789,11 @@ sc_wput(queue_t *q, mblk_t *mp)
 		ioc->iocblk.ioc_error = 0;
 		qreply(q, mp);
 		return (0);
+#ifdef LFS
 	      abort:
 		_ctrace(freemsg(mp));
 		return (0);
+#endif
 	}
 	putnext(q, mp);
 	return (0);
@@ -791,6 +864,9 @@ static struct streamtab sc_info = {
 	.st_wrinit = &sc_wqinit,
 };
 
+#ifdef LIS
+#define fmodsw _fmodsw
+#endif
 static struct fmodsw sc_fmod = {
 	.f_name = CONFIG_STREAMS_SC_NAME,
 	.f_str = &sc_info,
