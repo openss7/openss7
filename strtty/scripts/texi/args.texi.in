@@ -1,0 +1,123 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: args.texi.in,v 0.9.2.8 2006/05/23 22:43:39 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/05/23 22:43:39 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@set PACKAGE @PACKAGE@
+@set VERSION @VERSION@
+@c @set PACKAGE_BUGREPORT @PACKAGE_BUGREPORT@
+@set PACKAGE_DATE @PACKAGE_DATE@
+@set PACKAGE_DEBEPOCH @PACKAGE_DEBEPOCH@
+@set PACKAGE_DEBOPTIONS @PACKAGE_DEBOPTIONS@
+@set PACKAGE_DEBRELEASE @PACKAGE_DEBRELEASE@
+@set PACKAGE_DEBTOPDIR @PACKAGE_DEBTOPDIR@
+@set PACKAGE_DISTDIR @PACKAGE_DISTDIR@
+@set PACKAGE_EPOCH @PACKAGE_EPOCH@
+@set PACKAGE_KNUMBER @PACKAGE_KNUMBER@
+@set PACKAGE_KVERSION @PACKAGE_KVERSION@
+@set PACKAGE_LCNAME @PACKAGE_LCNAME@
+@set PACKAGE_NAME @PACKAGE_NAME@
+@set PACKAGE_RELEASE @PACKAGE_RELEASE@
+@set PACKAGE_RPMDIST @PACKAGE_RPMDIST@
+@set PACKAGE_RPMEPOCH @PACKAGE_RPMEPOCH@
+@set PACKAGE_RPMEXTRA @PACKAGE_RPMEXTRA@
+@set PACKAGE_RPMOPTIONS @PACKAGE_RPMOPTIONS@
+@set PACKAGE_RPMRELEASE @PACKAGE_RPMRELEASE@
+@set PACKAGE_SHORTTITLE @PACKAGE_SHORTTITLE@
+@set PACKAGE_STRING @PACKAGE_STRING@
+@set PACKAGE_TARNAME @PACKAGE_TARNAME@
+@set PACKAGE_TITLE @PACKAGE_TITLE@
+@set PACKAGE_UCNAME @PACKAGE_UCNAME@
+@set PACKAGE_VERSION @PACKAGE_VERSION@
+
+@set _bindir @prefix@/bin
+@set _datadir @prefix@/share
+@set _exec_prefix @prefix@
+@set _includedir @prefix@/include
+@set _infodir @prefix@/share/info
+@set _kmoduledir @kmoduledir@
+@set _rootdir @rootdir@
+@set _ksysmap @ksysmap@
+@set _kversion @kversion@
+@set _libdir @prefix@/lib
+@set _libexecdir @prefix@/libexec
+@set _localstatedir @localstatedir@
+@set _mandir @prefix@/share/man
+@set _oldincludedir @oldincludedir@
+@set _prefix @prefix@
+@set _sbindir @prefix@/sbin
+@set _sharedstatedir @prefix@/com
+@set _sysconfdir /etc
+
+@set _build @build@
+@set _build_alias @build_alias@
+@set _build_cpu @build_cpu@
+@set _build_os @build_os@
+@set _build_vendor @build_vendor@
+
+@set _host @host@
+@set _host_alias @host_alias@
+@set _host_cpu @host_cpu@
+@set _host_os @host_os@
+@set _host_vendor @host_vendor@
+
+@set _target @target@
+@set _target_alias @target_alias@
+@set _target_cpu @target_cpu@
+@set _target_os @target_os@
+@set _target_vendor @target_vendor@

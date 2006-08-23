@@ -1,0 +1,4820 @@
+%L XNS
+%A Open\ Group
+%R XNS Issue 5.2 Draft 2.0
+%T Technical Standard: Network Services (XNS)
+%D 1999
+%I Open Group Publication
+%G ISBN 1-85912-241-8
+%U http://www.opengroup.org/onlinepubs/
+
+%L XTI
+%A XPG
+%Q X\ Programmer's\ Group
+%D n.d.
+%R XTI/TLI Revision 1.0
+%T XOpen Transport Interface
+%I X Programmer's Group
+%U http://www.opengroup.org/onlinepubs/
+
+%L TCI
+%A The\ OpenSS7\ Project
+%Q The\ OpenSS7\ Project
+%R TCI Revision 0.9.2
+%N Draft 1
+%T Transaction Component Interface (TCI) Specification
+%D October 2004
+%C Edmonton, Alberta
+%I OpenSS7\ Corporation
+%U http://www.openss7.org/docs/tci.pdf
+
+%L TRI
+%A The\ OpenSS7\ Project
+%Q The\ OpenSS7\ Project
+%R TRI Revision 0.9.2
+%N Draft 1
+%T Transaction Interface (TRI) Specification
+%D October 2004
+%C Edmonton, Alberta
+%I OpenSS7\ Corporation
+%U http://www.openss7.org/docs/tri.pdf
+
+%L TPI
+%A Open\ Group
+%Q Open\ Group
+%R TPI Revision 2.0.0
+%N Draft 2
+%T Transport Provider Interface (TPI) Specification
+%D 1999
+%C Parsippany, New Jersey
+%I Open Group Publication
+%U http://www.opengroup.org/onlinepubs/
+
+%L NPI
+%A UNIX\ International,\ Inc.
+%Q UNIX\ International,\ Inc.
+%R NPI Revision 2.0.0
+%N Draft 2
+%T Network Provider Interface (NPI) Specification
+%D August 17, 1992
+%C Parsippany, New Jersey
+%I UNIX International Press
+%U http://www.openss7.org/doc/npi.pdf
+
+%L DLPI
+%A UNIX International,\ Inc.
+%Q UNIX International,\ Inc.
+%R DLPI Revision 2.0.0
+%N Draft 2
+%T Data Link Provider Interface (DLPI) Specification
+%D August 20, 1991
+%C Parsippany, New Jersey
+%I UNIX International Press
+%U http://www.openss7.org/doc/dlpi.pdf
+
+%L TLI
+%A UNIX\ International,\ Inc.
+%Q UNIX\ International,\ Inc.
+%R TLI Revision 1.5
+%N Draft 2
+%T Transport Provider Interface Specification
+%D December 10, 1992
+%C Parsippany, New Jersey
+%I Unix International Press
+%U http://www.openss7.org/doc/tpi.pdf
+
+%L CDI
+%A Geoffrey Gerrien
+%T CDI \(em Application Program Interface Guide
+%I Gcom, Inc.
+%D March 1999
+
+%K xxx
+%A X Programmer's Group
+%L XXX
+%D unknown
+%T XOpen Transport Interface
+%R Revision 1.0
+%K kewords
+%A author
+%A another author
+%Q author (not a person)
+%C city of publication
+%D date of publication
+%E editor name, (ed) (use %A if no author)
+%G ISBN number
+%I publisher
+%L label
+%O other information (immediately following citation)
+%P 1-10 (pages)
+%R technical report number
+%S series name
+%T title
+%B book, if article part of book
+%J journal, if article part of journal
+%V journal voume number
+%N journal issue number
+%X annotation (separate paragraph after citation)
+
+%L SIPT
+%R draft-ietf-sipping-sipt-04.txt
+%A Aparna Vemuri
+%A Jon Peterson
+%E Aparna Vemuri
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SIP for Telephones (SIP-T): Context and Architectures
+%D June 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sipping-sipt-04.txt
+
+%L SIP-ISUP
+%R draft-ietf-sipping-isup-06.txt
+%A Gonzalo Camarillo
+%A Adam Roach
+%A Jon Peterson
+%A Lyndon Ong
+%E Gonzalo Camarillo
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T ISUP to SIP Mapping
+%D August 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sipping-isup-06.txt
+
+%K bob
+%L SMull
+%A Sape Mullender
+%D 1993
+%T Distributed Systems, 2nd Edition
+%I Addison-Wesley
+%G ISBN 0-201-62427-3
+
+%K v51
+%L V5.1
+%A ETSI
+%R ETSI EN 300 324-1 (1999)
+%T V Interfaces at the Digital Local Exchange (LE) \(em V5.1 Interface fo the Support of Access Network (AN) \(em Part 1 \(em V5.1 Interface Specification
+%D 1999
+%C Valbonne
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%K v52
+%L V5.2
+%A ETSI
+%R ETSI EN 300 347-1 (1999)
+%T V Interfaces at the Digital Local Exchange (LE) \(em V5.2 Interface fo the Support of Access Network (AN) \(em Part 1 \(em V5.2 Interface Specification
+%D 1999
+%C Valbonne
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%K gsm0407
+%L GSM 04.07
+%A ETSI
+%R ETSI TS 100 939-V7.3.0 (1999-12)
+%T Digial cellular telecommunications system (Phase 2+) \(em Mobile radio interface signalling layer 3 \(em General aspects
+%D December 1999
+%N GSM 04.07 Version 7.3.0 Release 1998
+%C Valbonne
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%K gsm0408
+%L GSM 04.08
+%A ETSI
+%R ETSI ETS 300 557-1999
+%T Digial cellular telecommunications system (Phase 2) \(em Mobile radio interface \(em Layer 3 specification
+%D December 1999
+%N GSM 04.08 Version 4.23.1 Release 1999
+%C Valbonne
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%K 3gppts0408
+%L 3GPP TS 04.08
+%A ETSI
+%R ETSI TS 100 940-V7.10.0 (2000-12)
+%T Digial cellular telecommunications system (Phase 2+) \(em Mobile radio interface layer 3 specification
+%D December 2000
+%N 3GPP TS 04.08 Version 7.10.0 Release 1998
+%C Valbonne
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%K 3gppts0408
+%L 3GPP TS 04.08
+%A ETSI
+%R ETSI TS 100 940-V7.8.0 (2000-10)
+%T Digial cellular telecommunications system (Phase 2+) \(em Mobile radio interface layer 3 specification
+%D October 2000
+%N 3GPP TS 04.08 Version 7.8.0 Release 1998
+%C Valbonne
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%K gsm0802
+%L GSM 08.02
+%A ETSI
+%R ETSI TS 101 642-V8.0.0 (2000-06)
+%T Digial cellular telecommunications system (Phase 2+) \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface \(em Interface principles
+%D June 2000
+%N GSM 08.02 Version 8.0.0 Release 1999
+%C Valbonne
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%K gsm0806
+%L GSM 08.06
+%A ETSI
+%R ETSI TS 100 589-V8.0.0 (2000-06)
+%T Digial cellular telecommunications system (Phase 2+) \(em Signalling transport mechanism specification for the \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface
+%D June 2000
+%N GSM 08.06 Version 8.0.0 Release 1999
+%C Valbonne
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%K 3gppts0806
+%L 3GPP TS 08.06
+%A ETSI
+%R ETSI TS 100 589-V8.0.1 (2002-05)
+%T Digial cellular telecommunications system (Phase 2+) \(em Signalling transport mechanism specification for the \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface
+%D May 2000
+%N 3GPP TS 08.06 Version 8.0.1 Release 1999
+%C Cedex
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%K gsm0808
+%L GSM 08.08
+%A ETSI
+%R ETSI ETS 300 590-1998
+%T Digial cellular telecommunications system (Phase 2) \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface \(em Layer 3 specification
+%D 1998
+%N GSM 08.08 Version 4.12.1
+%C Valbonne
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%K gsm0808
+%L GSM 08.08
+%A ETSI
+%R ETSI TS 100 590-V8.5.0 (2000-08)
+%T Digial cellular telecommunications system (Phase 2) \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface \(em Layer 3 specification
+%D August 2000
+%N GSM 08.08 Version 8.5.0 Release 1999
+%C Valbonne
+%I European Telecommunications Standards Institute
+%Q ETSI Secretariat
+%U http://www.etsi.org/
+
+%L ETS 300 336
+%A ETSI
+%R ETSI ETS 300 336
+%D September 1996
+%T Integrated Services Digital Network (ISDN); Signalling System No. 7; Message Transfer Part (MTP); Test Specification
+%O (ITU-T Recommendations Q.781 and Q.782 (1993), modified)
+%C Valbonne
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K mtpv1
+%L EN 300 008-1
+%A ETSI
+%R ETSI EN 300 008-1 V1.3.1
+%D September 2000
+%T Integrated Services Digital Network (ISDN); Signalling System No. 7; Protocol Specification
+%O (ITU-T Recommendations Q.701, Q.702, Q.703, Q.704, Q.705, Q.706, Q.707 and Q.708, modified)
+%C Cedex
+%G REN/SPAN-01074-1
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K sccpv4
+%L EN 300 009-1
+%A ETSI
+%R ETSI EN 300 009-1 V1.4.3
+%D February 2001
+%T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection;
+Part 1: Protocol Specification
+%O (ITU-T Recommendations Q.711 to Q.716 (1996) modified)
+%C Cedex
+%G REN/SPAN-01063-1
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K sccpv3
+%L ETS 300 009-1
+%A ETSI
+%R ETSI ETS 300 009-1
+%N Third Edition
+%D September 1996
+%T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection; Part 1: Protocol Specification
+%O (ITU-T Recommendations Q.711 to Q.714 and Q.716 (1993) modified)
+%C Cedex
+%G RE/SPS-02018-1
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K sccpv2
+%L ETS 300 009
+%A ETSI
+%R ETSI ETS 300 009
+%N Second Edition
+%D January 1995
+%T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection
+%C Cedex
+%G RE/SPS-02003
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K isupv4-1
+%L ISUPv4-1
+%A ETSI
+%R ETSI EN 300 356-1-V4.2.1 (2001-07)
+%T Integrated Serivces Digital Network (ISDN); Signalling System No. 7 (SS7); ISDN User Part (ISUP) Version 4 for the International Interface; Part 1: Basic Services
+%D July 2001
+%N ISUP Version 4
+%C Cedex
+%I European Telecommunications Standards Institute
+%O (ITU-T Rcommendations Q.761 to Q.764 (1999) modified)
+%U http://www.etsi.org/
+
+%K tcapv2
+%L ETS 300 287
+%A ETSI
+%R ETSI ETS 300 287
+%T Integrated Services Digital Network (ISDN); Signalling System No. 7 (SS7); Transaction Capabilities Application Part (TCAP)
+%D 1993
+%N TCAP Version 2
+%C Cedex
+%G RE/SPS-02003
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+%O (ITU-T Rcommendations Q.771 to Q.774 (1993) modified)
+
+%L M2UA
+%A Ken Morneault
+%A Ram Dantu
+%A Greg Sidebottom
+%A Tom George
+%A Brian Bidulock
+%A Jacob Heitz
+%E Ken Morneault
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Adaptation Layer (M2UA)
+%R draft-ietf-sigtran-m2ua-09.txt
+%D July 2001
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-09.txt
+
+%L M2UA
+%A Ken Morneault
+%A Ram Dantu
+%A Greg Sidebottom
+%A Tom George
+%A Brian Bidulock
+%A Jacob Heitz
+%E Ken Morneault
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Adaptation Layer (M2UA)
+%R draft-ietf-sigtran-m2ua-11.txt
+%D November 2001
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-11.txt
+
+%L M2UA
+%A Ken Morneault
+%A Ram Dantu
+%A Greg Sidebottom
+%A Tom George
+%A Brian Bidulock
+%A Jacob Heitz
+%E Ken Morneault
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Adaptation Layer (M2UA)
+%R draft-ietf-sigtran-m2ua-12.txt
+%D December 2001
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-12.txt
+
+%L M2UA
+%A Ken Morneault
+%A Ram Dantu
+%A Greg Sidebottom
+%A Tom George
+%A Brian Bidulock
+%A Jacob Heitz
+%E Ken Morneault
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Adaptation Layer (M2UA)
+%R draft-ietf-sigtran-m2ua-15.txt
+%D February 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-15.txt
+
+%K M3UA-IG-04
+%L M3UA-IG
+%A Javier Pastor
+%A Ken Morneault
+%E Javier Pastor
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T M3UA Implementor's Guide
+%R draft-ietf-sigtran-m3ua-implementors-guide-04.txt
+%D March 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-04.txt
+
+%K M3UA-IG-03
+%L M3UA-IG
+%A Javier Pastor
+%A Ken Morneault
+%E Javier Pastor
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T M3UA Implementor's Guide
+%R draft-ietf-sigtran-m3ua-implementors-guide-03.txt
+%D March 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-03.txt
+
+%K M3UA-IG-02
+%L M3UA-IG
+%A Javier Pastor
+%A Ken Morneault
+%E Javier Pastor
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T M3UA Implementor's Guide
+%R draft-ietf-sigtran-m3ua-implementors-guide-02.txt
+%D March 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-02.txt
+
+%K M3UA-IG-01
+%L M3UA-IG
+%A Javier Pastor
+%A Ken Morneault
+%E Javier Pastor
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T M3UA Implementor's Guide
+%R draft-ietf-sigtran-m3ua-implementors-guide-01.txt
+%D March 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-01.txt
+
+%K M3UA-IG-00
+%L M3UA-IG
+%A Javier Pastor
+%A Ken Morneault
+%E Javier Pastor
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T M3UA Implementor's Guide
+%R draft-ietf-sigtran-m3ua-implementors-guide-00.txt
+%D March 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-00.txt
+
+%L M3UA
+%A Greg Sidebottom
+%A Guy Mousseau
+%A Lyndon Ong
+%A Ian Rytina
+%A Hannz Juergen Schwarzbauer
+%A Klaus Gradischnig
+%A Ken Morneault
+%A Mallesh Kalla
+%A Normand Glaude
+%E Greg Sidebottom
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP3-User Adaptation Layer (M3UA)
+%R draft-ietf-sigtran-m3ua-07.txt
+%D July 2001
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m3ua-07.txt
+
+%L M3UA
+%A Greg Sidebottom
+%A Javier Pastor-Balbas
+%A Ian Rytina
+%A Guy Mousseau
+%A Lyndon Ong
+%A Hannz Juergen Schwarzbauer
+%A Klaus Gradischnig
+%A Ken Morneault
+%A Mallesh Kalla
+%A Normand Glaude
+%A Brian Bidulock
+%A John Loughney
+%E Greg Sidebottom
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP3-User Adaptation Layer (M3UA)
+%R draft-ietf-sigtran-m3ua-10.txt
+%D November 2001
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m3ua-10.txt
+
+%L M3UA
+%A Greg Sidebottom
+%A Javier Pastor-Balbas
+%A Ian Rytina
+%A Guy Mousseau
+%A Lyndon Ong
+%A Hannz Juergen Schwarzbauer
+%A Klaus Gradischnig
+%A Ken Morneault
+%A Mallesh Kalla
+%A Normand Glaude
+%A Brian Bidulock
+%A John Loughney
+%E Greg Sidebottom
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP3-User Adaptation Layer (M3UA)
+%R draft-ietf-sigtran-m3ua-11.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m3ua-11.txt
+
+%L M3UA
+%A Greg Sidebottom
+%A Javier Pastor-Balbas
+%A Ian Rytina
+%A Guy Mousseau
+%A Lyndon Ong
+%A Hannz Juergen Schwarzbauer
+%A Klaus Gradischnig
+%A Ken Morneault
+%A Mallesh Kalla
+%A Normand Glaude
+%A Brian Bidulock
+%A John Loughney
+%E Greg Sidebottom
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP3-User Adaptation Layer (M3UA)
+%R draft-ietf-sigtran-m3ua-12.txt
+%D February 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m3ua-12.txt
+
+%K SUA15
+%L SUA15
+%A John Loughney
+%A Greg Sidebottom
+%A Lode Coene
+%A Gery Verwimp
+%A Joe Keller
+%A Brian Bidulock
+%E John Loughney
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 SCCP-User Adaptation Layer (SUA)
+%R draft-ietf-sigtran-sua-15.txt
+%D June 30, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sua-15.txt
+
+%L SUA
+%A John Loughney
+%A Greg Sidebottom
+%A Lode Coene
+%A Gery Verwimp
+%A Joe Keller
+%A Brian Bidulock
+%E John Loughney
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 SCCP-User Adaptation Layer (SUA)
+%R draft-ietf-sigtran-sua-14.txt
+%D June 30, 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sua-14.txt
+
+%L SUA
+%A John Loughney
+%A Greg Sidebottom
+%A Guy Mousseau
+%A Stephen Lorusso
+%A Lode Coene
+%A Gery Verwimp
+%A Joe Keller
+%A Florencio Escobar Gonzalez
+%A William Sully
+%A Steven Furniss
+%A Brian Bidulock
+%E John Loughney
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 SCCP-User Adaptation Layer (SUA)
+%R draft-ietf-sigtran-sua-12.txt
+%D February 11, 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sua-12.txt
+
+%L SUA
+%A John Loughney
+%A Greg Sidebottom
+%A Guy Mousseau
+%A Stephen Lorusso
+%A Lode Coene
+%A Gery Verwimp
+%A Joe Keller
+%A Florencio Escobar Gonzalez
+%A William Sully
+%A Steven Furniss
+%A Brian Bidulock
+%E John Loughney
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 SCCP-User Adaptation Layer (SUA)
+%R draft-ietf-sigtran-sua-10.txt
+%D December 27, 2001
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sua-10.txt
+
+%L SUA
+%A John Loughney
+%A Greg Sidebottom
+%A Guy Mousseau
+%A Stephen Lorusso
+%A Lode Coene
+%A Gery Verwimp
+%A Joe Keller
+%A Florencio Escobar Gonzalez
+%A William Sully
+%A Steven Furniss
+%A Brian Bidulock
+%E John Loughney
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 SCCP-User Adaptation Layer (SUA)
+%R draft-ietf-sigtran-sua-09.txt
+%D June 15, 2001
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sua-09.txt
+
+%L SUA
+%A John Loughney
+%A Greg Sidebottom
+%A Guy Mousseau
+%A Stephen Lorusso
+%A Lode Coene
+%A Gery Verwimp
+%A Joe Keller
+%A Florencio Escobar Gonzalez
+%A Steven Furniss
+%A William Sully
+%E John Loughney
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 SCCP-User Adaptation Layer (SUA)
+%R draft-ietf-sigtran-sua-06.txt
+%D June 15, 2001
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sua-06.txt
+
+%K isua-01
+%L ISUA
+%A Brian Bidulock
+%E Brian Bidulock, (ed)
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 ISUP-User Adaptation Layer (ISUA)
+%R draft-bidulock-sigtran-isua-01.txt
+%D July 26, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-isua-01.txt
+
+%K isua-00
+%L ISUA
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 ISUP-User Adaptation Layer (ISUA)
+%R draft-bidulock-sigtran-isua-00.txt
+%D January 5, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-isua-00.txt
+
+%K tua-02
+%L TUA
+%A Brian Bidulock
+%E Brian Bidulock, (ed)
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 TCAP-User Adaptation Layer (TUA)
+%R draft-bidulock-sigtran-tua-02.txt
+%D July 26, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-tua-02.txt
+
+%K tua-01
+%L TUA01
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 TCAP-User Adaptation Layer (TUA)
+%R draft-bidulock-sigtran-tua-01.txt
+%D January 2, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-tua-01.txt
+
+%K tua-00
+%L TUA00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 TCAP-User Adaptation Layer (TUA)
+%R draft-bidulock-sigtran-tua-00.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-tua-00.txt
+
+%L TUA
+%A Jianxing Hou
+%A Ming Lin
+%E Jianxing Hou
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 TCAP-User Adaptation Layer (TUA)
+%R draft-hou-sigtran-tua-00.txt
+%D June 15, 2001
+%O Work In Progress. [Expired]
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-hou-sigtran-tua-00.txt
+
+%L BUA
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 BICC-User Adaptation Layer (BUA)
+%R draft-bidulock-sigtran-bua-00.txt
+%D (TBD)
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-bua-00.txt
+
+%L IUA-BIS
+%K IUAbis
+%A Ken Morneault
+%A Selvam Rengasami
+%A Melleswar Kalla
+%A Greg Sidebottom
+%E Ken Morneault
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T ISDN Q.921-User Adaptation Layer
+%R draft-ietf-sigtran-rfc3057bis-00.txt
+%D May 2003
+%I The Internet Society
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-rfc3057bis-00.txt
+
+%K rfc4129
+%K DUArfc
+%L RFC 4129
+%R RFC 4129
+%A Ranjith Mukundan
+%A Ken Morneault
+%A Narsimullo Mangalpally
+%E Ranjith Mukundan
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Digital Private Network Signaling System (DPNSS)/Digital Access Signaling System 2 (DASS 2) Extensions to the IUA Protocol
+%D August 2005
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4129.txt
+
+%K dua-05
+%L DUA
+%A Ranjith Mukundan
+%A Narsimullo Mangalpally
+%A Ken Morneault
+%A Anil Vydyam
+%E Ranjith Mukundan
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T DPNSS/DASS 2 Extensions to the IUA Protocol
+%R draft-ietf-sigtran-dua-05.txt
+%D January 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-dua-05.txt
+
+%K dua-04
+%L DUA
+%A Ranjith Mukundan
+%A Narsimullo Mangalpally
+%A Ken Morneault
+%A Anil Vydyam
+%E Ranjith Mukundan
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T DPNSS/DASS 2 Extensions to the IUA Protocol
+%R draft-ietf-sigtran-dua-04.txt
+%D October 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-dua-04.txt
+
+%K dua-00
+%L DUA
+%A Anil Vydyam
+%A Ranjith Mukundan
+%A Narsimullo Mangalpally
+%A Ken Morneault
+%E Ranjith Mukundan
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T DPNSS/DASS 2 Extensions to the IUA Protocol
+%R draft-ietf-sigtran-dua-00.txt
+%D July 2001
+%O Work In Progress. [Expired]
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-dua-00.txt
+
+%K v5ua-03
+%L V5UA03
+%A Eva Weilandt
+%A Neeraj Khanchandani
+%A Sanjay Rao
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T V5.2-User Adaption Layer (V5UA)
+%R draft-ietf-sigtran-v5ua-03.txt
+%D June 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-v5ua-03.txt
+
+%K v5ua-01
+%L V5UA01
+%A Eva Weilandt
+%A Neeraj Khanchandani
+%A Fahir Ergincan
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T V5.2-User Adaption Layer (V5UA)
+%R draft-ietf-sigtran-v5ua-01.txt
+%D July 2001
+%O Work In Progress. [Expired]
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-v5ua-01.txt
+
+%K GR303UA-00
+%L GR303UA00
+%A Ranjith Mukundan
+%A Ken Morneault
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T GR-303 extensions to the IUA Protocol
+%R draft-ietf-sigtran-gr303ua-00.txt
+%D December 2002
+%O Work In Progress
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-gr303ua-00.txt
+
+%L GR303UA
+%A Ranjith Mukundan
+%A Ken Morneault
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T GR-303 extensions to the IUA Protocol
+%R draft-ranjith-sigtran-gr303ua-00.txt
+%D October 2002
+%O Work In Progress
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ranjith-sigtran-gr303ua-00.txt
+
+%L GR-303
+%R GR-303-CORE
+%T IDLC Generic Requirements, Objectives and Interface
+%D December 2000
+%C Pasqataway, New Jersey
+%Q Telcordia
+%I Telcordia Technologies, Inc
+%U http://www.telcordia.com/
+
+%K sginfo-02
+%L SGINFO
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Signalling Gateway (SG) Information Support
+%R draft-bidulock-sigtran-sginfo-02.txt
+%D July 26, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sginfo-01.txt
+
+%K sginfo-01
+%L SGINFO
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Signalling Gateway (SG) Information Support
+%R draft-bidulock-sigtran-sginfo-01.txt
+%D January 2, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sginfo-01.txt
+
+%K sginfo-00
+%L SGINFO
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Signalling Gateway (SG) Information Support
+%R draft-bidulock-sigtran-sginfo-00.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sginfo-00.txt
+
+%L ASPEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Application Server Process (ASP) Extension Framework
+%R draft-bidulock-sigtran-aspext-01.txt
+%D January 2, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-aspext-01.txt
+
+%L ASPEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Application Server Process (ASP) Extension Framework
+%R draft-bidulock-sigtran-aspext-00.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-aspext-00.txt
+
+%K corid-02
+%L CORID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
+%R draft-bidulock-sigtran-corid-02.txt
+%D July 26, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-corid-02.txt
+
+%K corid-01
+%L CORID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
+%R draft-bidulock-sigtran-corid-01.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-corid-01.txt
+
+%K corid-00
+%L CORID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
+%R draft-bidulock-sigtran-corid-00.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-corid-00.txt
+
+%K sessid-02
+%L SESSID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Session Identification for SS7 Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-sessid-02.txt
+%D July 26, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sessid-02.txt
+
+%K sessid-01
+%L SESSID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Session Identification for SS7 Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-sessid-01.txt
+%D January 2, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sessid-01.txt
+
+%K sessid-00
+%L SESSID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Session Identification for SS7 Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-sessid-00.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sessid-00.txt
+
+%K regext-02
+%L REGEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Registration Extensions for SS7 Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-regext-02.txt
+%D July 26 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-regext-02.txt
+
+%K regext-01
+%L REGEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Registration Extensions for SS7 Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-regext-01.txt
+%D January 2, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-regext-01.txt
+
+%K regext-00
+%L REGEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Registration Extensions for SS7 Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-regext-00.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-regext-00.txt
+
+%K loadsel-02
+%L LOADSEL
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
+%R draft-bidulock-sigtran-loadsel-02.txt
+%D July 26, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadsel-02.txt
+
+%K loadsel-01
+%L LOADSEL
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
+%R draft-bidulock-sigtran-loadsel-01.txt
+%D January 2, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadsel-01.txt
+
+%K loadsel-00
+%L LOADSEL
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
+%R draft-bidulock-sigtran-loadsel-00.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadsel-00.txt
+
+%K loadgrp-02
+%L LOADGRP
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Load Grouping Extension for Signalling User Adaptation Layers (LOADGRP)
+%R draft-bidulock-sigtran-loadgrp-02.txt
+%D July 26, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadgrp-02.txt
+
+%K loadgrp-01
+%L LOADGRP
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Load Grouping Extension for Signalling User Adaptation Layers (LOADGRP)
+%R draft-bidulock-sigtran-loadgrp-01.txt
+%D January 2, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadgrp-01.txt
+
+%K loadgrp-00
+%L LOADGRP
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Load Grouping Extension for Signalling User Adaptation Layers (LOADGRP)
+%R draft-bidulock-sigtran-loadgrp-00.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadgrp-00.txt
+
+%K ss7perf
+%K q706
+%L Q.706
+%A ITU
+%R ITU Recommendation Q.706
+%T Signalling System No. 7 \(em Message Transfer Part Signalling Performance
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K rfc4165
+%K M2PArfc
+%L RFC 4165
+%R RFC 4165
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George
+%T Signaling System 7 (SS7) Message Transfer Part 2 (MTP2) - User Peer-to-Peer Adaptation Layer (M2PA)
+%D September 2005
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4165.txt
+
+%K m2pa-09
+%L M2PA09
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Malleswar Kalla
+%A Hanns Juergen Schwarzbauer
+%A Greg Sidebottom
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-09.txt
+%D June 29, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-09.txt
+
+%K m2pa-08
+%L M2PA08
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Malleswar Kalla
+%A Hanns Juergen Schwarzbauer
+%A Greg Sidebottom
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-08.txt
+%D April 22, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-08.txt
+
+%K m2pa-07
+%L M2PA07
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Malleswar Kalla
+%A Hanns Juergen Schwarzbauer
+%A Greg Sidebottom
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-07.txt
+%D January 17, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-07.txt
+
+%K m2pa-06
+%L M2PA06
+%A Tom George
+%A Ram Dantu
+%A Malleswar Kalla
+%A Hanns Juergen Schwarzbauer
+%A Greg Sidebottom
+%A Ken Morneault
+%A Brian Bidulock
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-06.txt
+%D August 28, 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-06.txt
+
+%K m2pa-05
+%L M2PA05
+%A Tom George
+%A Ram Dantu
+%A Malleswar Kalla
+%A Hanns Juergen Schwarzbauer
+%A Greg Sidebottom
+%A Ken Morneault
+%A Brian Bidulock
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-05.txt
+%D May 3, 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-05.txt
+
+%K m2pa-04
+%L M2PA04
+%A Tom George
+%A Ram Dantu
+%A Malleswar Kalla
+%A Hanns Juergen Schwarzbauer
+%A Greg Sidebottom
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-04.txt
+%D February 28, 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-04.txt
+
+%K m2pa-03
+%L M2PA03
+%A Tom George
+%A Ram Dantu
+%A Malleswar Kalla
+%A Hanns Juergen Schwarzbauer
+%A Greg Sidebottom
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-03.txt
+%D July 20, 2001
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-03.txt
+
+%K m2pa-02
+%L M2PA02
+%A Tom George
+%A Ram Dantu
+%A Malleswar Kalla
+%A Hanns Juergen Schwarzbauer
+%A Greg Sidebottom
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-02.txt
+%D March 2, 2001
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-02.txt
+
+%K q700
+%L Q.700
+%A ITU
+%R ITU-T Recommendation Q.700
+%T Introduction to CCITT Signalling System No. 7
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q701
+%L Q.701
+%A ITU
+%R ITU-T Recommendation Q.701
+%T Functional Description of the Message Transfer Part (MTP) of Signalling System No. 7
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q702
+%L Q.702
+%A ITU
+%R ITU-T Recommendation Q.702
+%T Signalling System No. 7 \(em Signalling Data Link
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q703
+%L Q.703
+%A ITU
+%R ITU-T Recommendation Q.703
+%T Signalling System No. 7 \(em Signalling Link
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q704
+%L Q.704
+%A ITU
+%R ITU-T Recommendation Q.704
+%T Message Transfer Part \(em Signalling Network Functions and Messages
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q705
+%L Q.705
+%A ITU
+%R ITU-T Recommendation Q.705
+%T Signalling System No. 7 \(em Signalling Network Structure
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q711
+%L Q.711
+%A ITU
+%R ITU-T Recommendation Q.711
+%T Functional Description of Signalling Connection Control Part
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q712
+%L Q.712
+%A ITU
+%R ITU-T Recommendation Q.712
+%T Definition and Function of Signalling Connection Control Part Messages
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q713
+%L Q.713
+%A ITU
+%R ITU-T Recommendation Q.713
+%T Signalling Connection Control Part Formats and Codes
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q714
+%L Q.714
+%A ITU
+%R ITU-T Recommendation Q.714
+%T Signalling Connection Control Part Procedures
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q715
+%L Q.715
+%A ITU
+%R ITU-T Recommendation Q.715
+%T Signalling Connection Control Part User Guide
+%D July 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q716
+%L Q.716
+%A ITU
+%R ITU-T Recommendation Q.716
+%T Signalling Connection Control Part (SCCP) Performance
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q721
+%L Q.721
+%A ITU
+%R ITU-T Recommendation Q.721
+%T Signalling System No. 7 \(em Function Description of the Telephone User Part (TUP)
+%D November 1988
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q722
+%L Q.722
+%A ITU
+%R ITU-T Recommendation Q.722
+%T Signalling System No. 7 \(em General Function of Telephone User Part (TUP) Messages and Signals
+%D November 1988
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q723
+%L Q.723
+%A ITU
+%R ITU-T Recommendation Q.723
+%T Signalling System No. 7 \(em Telephone User Part \(em Formats and codes
+%D November 1988
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q724
+%L Q.724
+%A ITU
+%R ITU-T Recommendation Q.724
+%T Signalling System No. 7 \(em Telephone User Part \(em Signalling Procedures
+%D November 1988
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q751.1
+%L Q.751.1
+%R ITU-T Recommendation Q.751.1
+%Q ITU
+%T Specification of Signalling System No. 7 \(em Network Element Management Information Model for the Message Transfer Part (MTP)
+%D October 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q751.2
+%L Q.751.2
+%R ITU-T Recommendation Q.751.2
+%Q ITU
+%T Specification of Signalling System No. 7 \(em Network Element Management Information Model for the Signalling Connection Control Part (SCCP)
+%D June 1997
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q752
+%L Q.752
+%R ITU-T Recommendation Q.752
+%Q ITU
+%T Specification of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Monitoring and Measurements for Signalling System No.  7 Networks
+%D June 1997
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q761
+%L Q.761
+%A ITU
+%R ITU-T Recommendation Q.761
+%T Signalling System No. 7 \(em Functional Description of the ISDN User Part
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q762
+%L Q.762
+%A ITU
+%R ITU-T Recommendation Q.762
+%T Signalling System No. 7 \(em General Function of Messages and Signals of the ISDN User Part
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q763
+%L Q.763
+%A ITU
+%R ITU-T Recommendation Q.763
+%T Signalling System No. 7 \(em Formats and Codes of the ISDN User Part
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q764
+%L Q.764
+%A ITU
+%R ITU-T Recommendation Q.764
+%T Signalling System No. 7 \(em ISDN User Part Signalling Procedures
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q766
+%L Q.766
+%A ITU
+%R ITU-T Recommendation Q.766
+%T Signalling System No. 7 \(em ISDN User Part \(em Performance Objectives in the Integrated Services Digital Network Application
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q767
+%L Q.767
+%A ITU
+%R ITU-T Recommendation Q.767
+%T Signalling System No. 7 \(em Application of the ISDN User Part of CCITT Signalling System No. 7 for International ISDN Interconnections
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q771
+%L Q.771
+%A ITU
+%R ITU-T Recommendation Q.771
+%T Signalling System No. 7 \(em Functional Description of Transaction Capabilities
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q772
+%L Q.772
+%A ITU
+%R ITU-T Recommendation Q.772
+%T Signalling System No. 7 \(em Transaction Capabilities Information Element Definitions
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q773
+%L Q.773
+%A ITU
+%R ITU-T Recommendation Q.773
+%T Signalling System No. 7 \(em Transaction Capabilities Formats and Encoding
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q774
+%L Q.774
+%A ITU
+%R ITU-T Recommendation Q.774
+%T Signalling System No. 7 \(em Transaction Capabilities Procedures
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q775
+%L Q.775
+%A ITU
+%R ITU-T Recommendation Q.775
+%T Signalling System No. 7 \(em Guidelines for Using Transaction Capabilities
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q781
+%L Q.781
+%A ITU
+%R ITU-T Recommendation Q.781
+%T Signalling System No. 7 \(em MTP Level 2 Test Specification
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q920
+%L Q.920
+%A ITU
+%R ITU-T Recommendation Q.920
+%T Digital Subscriber Signalling System No. 1 (DSS1) \(em ISDN User-Network Interface Data Link Layer \(em General Aspects
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q921
+%L Q.921
+%A ITU
+%R ITU-T Recommendation Q.921
+%T Digital Subscriber Signalling System No. 1 \(em ISDN User-Network Interface \(em Data Link Layer Specification
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q921bis
+%L Q.921 bis
+%A ITU
+%R ITU-T Recommendation Q.921 bis
+%T Digital Subscriber Signalling System No. 1 \(em Abstract Test Suite for LAPD Conformance Testing
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q922
+%L Q.922
+%A ITU
+%R ITU-T Recommendation Q.922
+%T Digital Subscriber Signalling System No. 1 \(em Data Link Layer \(em ISDN Data Link Layer Specification for Frame Mode Bearer Services
+%D February 1992
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q930
+%L Q.930
+%A ITU
+%R ITU-T Recommendation Q.930
+%T Digital Subscriber Signalling System No. 1 (DSS1) \(em ISDN User-Network Interface Layer 3 \(em General Aspects
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q931
+%L Q.931
+%A ITU
+%R ITU-T Recommendation Q.931
+%T Digital Subscriber Signalling System No. 1 \(em ISDN User-Network Interface Layer 3 Specification for Basic Call Control
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q932
+%L Q.932
+%A ITU
+%R ITU-T Recommendation Q.932
+%T Digital Subscriber Signalling System No. 1 \(em Generic Procedures for the Control of ISDN Supplementary Services
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q1902
+%L Q.1902
+%A ITU
+%R ITU-T Recommendation Q.1902.1 to Q.1902.4
+%T Specifications of the Bearer Independent Call Control (BICC)
+%D 2001
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+
+%K t1bicc
+%K bicc
+%L ANSI T1.BICC
+%A ANSI
+%R ANSI T1.BICC.1-2000 to T1.BICC.7-2000
+%Q American National Standards Institute
+%T Specifications of the Bearer Independent Call Control (BICC)
+%D 2000
+%I American National Standards Institute
+
+
+%K bicc1
+%L ANSI T1.BICC.1
+%A ANSI
+%R ANSI T1.BICC.1-2000
+%Q American National Standards Institute
+%T Specifications of the Bearer Independent Call Control (BICC) \(em Functional Description of the Bearer Independen Call Control (BICC) Protocol
+%D 2000
+%I American National Standards Institute
+
+%K bicc2
+%L ANSI T1.BICC.2
+%A ANSI
+%R ANSI T1.BICC.2-2000
+%Q American National Standards Institute
+%T Specifications of the Bearer Independent Call Control (BICC) \(em General Function of Messages and Signals
+%D 2000
+%I American National Standards Institute
+
+%K bicc3
+%L ANSI T1.BICC.3
+%A ANSI
+%R ANSI T1.BICC.3-2000
+%Q American National Standards Institute
+%T Specifications of the Bearer Independent Call Control (BICC) \(em Formats and Codes
+%D 2000
+%I American National Standards Institute
+
+%K bicc4
+%L ANSI T1.BICC.4
+%A ANSI
+%R ANSI T1.BICC.4-2000
+%Q American National Standards Institute
+%T Specifications of the Bearer Independent Call Control (BICC) \(em Signalling Procedures for Bearer Independent Call Controll (BICC)
+%D 2000
+%I American National Standards Institute
+
+%K bicc5
+%L ANSI T1.BICC.5
+%A ANSI
+%R ANSI T1.BICC.5-2000
+%Q American National Standards Institute
+%T Specifications of the Bearer Independent Call Control (BICC) \(em Performance Objectives in the BICC Application
+%D 2000
+%I American National Standards Institute
+
+%K bicc6
+%L ANSI T1.BICC.6
+%A ANSI
+%R ANSI T1.BICC.6-2000
+%Q American National Standards Institute
+%T Specifications of the Bearer Independent Call Control (BICC) \(em State Transition Diagrams
+%D 2000
+%I American National Standards Institute
+
+%K bicc7
+%L ANSI T1.BICC.7
+%A ANSI
+%R ANSI T1.BICC.7-2000
+%Q American National Standards Institute
+%T Specifications of the Bearer Independent Call Control (BICC) \(em Application Transport Mechanism
+%D 2000
+%I American National Standards Institute
+
+%K q2110
+%L Q.2110
+%A ITU
+%R ITU-T Recommendation Q.2110
+%T Service Specific Connection-Oriented Protocol (SSCOP)
+%D 
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q2111
+%L Q.2111
+%A ITU
+%R ITU-T Recommendation Q.2111
+%T Service Specific Connection-Oriented Protocol in a Multi-link and Connectionless Environment (SSCOPMCE)
+%D 
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q2210
+%L Q.2210
+%A ITU
+%R ITU-T Recommendation Q.2210
+%T Message Transfer Part Level 3 Functions and Messages Using the Services of ITU-T Recommendation Q.2140
+%D July 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K q2140
+%L Q.2140
+%A ITU
+%R ITU-T Recommendation Q.2140
+%T B-ISDN ATM Adaptation Layer \(em Service Specific Coordination Function for Signalling at the Network Node Interface (SSCF at NNI)
+%D February 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K 802.1X
+%L 802.1X
+%A IEEE
+%R IEEE Std. 802.1X-2004
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Port-Based Network Access Control
+%D December 13, 2004
+%C New York
+%G ISBN 0-7381-4529-7 SS95298
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+%O (Revision of IEEE Std. 802.1X-2001)
+
+%K 802.1AB
+%L 802.1AB
+%A IEEE
+%R IEEE Std. 802.1AB-2005
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Station and Media Access Control Connectivity Discovery
+%D May 6, 2005
+%C New York
+%G ISBN 0-7381-4688-9 SS95332
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802.1D
+%L 802.1D
+%A IEEE
+%R IEEE Std. 802.1D-2004
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Media Access Control (MAC) Bridges
+%D June 9, 2004
+%C New York
+%G ISBN 0-7381-3982-3 SS95213
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+%O (Revision of IEEE Std. 802.1D-1998)
+
+%K 802.1Q
+%L 802.1Q
+%A IEEE
+%R IEEE Std. 802.1Q-2003
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Virtual Bridged Local Area Networks
+%D May 7, 2003
+%C New York
+%G ISBN 0-7381-3663-8 SS95124
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802.1F
+%L 802.1F
+%A IEEE
+%R IEEE Std. 802.1F-1993(R2004)
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Common Definitions and Procedures for IEEE 802 Management Information
+%D March 25, 2004
+%C New York
+%G ISBN 1-55937-340-7
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802
+%L 802
+%A IEEE
+%R IEEE Std. 802-2001
+%T IEEE Standard for Local and Metropolitan Area Networks \(em Overview and Architecture
+%D March 8, 2002
+%C New York
+%G ISBN 0-7381-2941-0 SS94947
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802.1G
+%L 802.1G
+%A ANSI/IEEE
+%R ANSI/IEEE Std. 802.1G-1998 [ISO/IEC 15802-5 : 1998(E)]
+%T IEEE Standard for Information Technology \(em Telecommunications and Information Exchange Between Systems \(em Local and Metropolitan Area Networks \(em Common Specifications \(em Part 5: Remove media Access Control (MAC) Bridging
+%D March 13, 1998
+%C New York
+%G ISBN 1-55937-899-6
+%Q American National Standards Institute, Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802.1H
+%L 802.1H
+%A IEEE
+%R IEEE Std. 802.1H-1997 [ISO/IEC 11802-5 : 1997(E)]
+%T IEEE Standard for Information Technology \(em Telecommunications and Information Exchange Between Systems \(em Local and Metropolitan Area Networks \(em Common Specifications \(em Part 5: Remove media Access Control (MAC) Bridging of Ethernet V2.0 in Local Area Networks
+%D May 2, 2002
+%C New York
+%G ISBN 1-55937-931-6
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K 802.2
+%L 802.2
+%A ANSI/IEEE
+%R ANSI/IEEE Std. 802.2-1998 [ISO/IEC 8802-2 : 1998]
+%T IEEE Standard for Information Technology \(em Telecommunications and Information Exchange Between Systems \(em Local and Metropolitan Area Networks \(em Specific Requirements \(em Part 2: Logical Link Control
+%D May 7, 1998
+%C New York
+%G ISBN 1-55937-959-6
+%Q Institute of Electrical and Electronics Engineers
+%I IEEE Computer Society
+
+%K x25
+%L X.25
+%A ITU
+%R ITU-T Recommendation X.25
+%T Interface between Data Terminal Equipment (DTE) and Data Circuit-terminating Equipment (DCE) for terminals operating in the packet mode and connected to the public data networks by dedicated circuit
+%D October 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K x75
+%L X.75
+%A ITU
+%R ITU-T Recommendation X.75
+%T Packet-switched Signalling System between Public Networks Providing Data Transmission Services
+%D October 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K x680
+%L X.680
+%A ITU
+%R ITU-T Recommendation X.680 [ISO/IEC 8824-1 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Specification of Basic Notation
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x681
+%L X.681
+%A ITU
+%R ITU-T Recommendation X.681 [ISO/IEC 8824-2 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Information Object Specification
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x682
+%L X.682
+%A ITU
+%R ITU-T Recommendation X.682 [ISO/IEC 8824-3 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Constraint Specification
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x683
+%L X.683
+%A ITU
+%R ITU-T Recommendation X.683 [ISO/IEC 8824-4 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Parameterization of ASN.1 Specifications
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x690
+%L X.690
+%A ITU
+%R ITU-T Recommendation X.690 [ISO/IEC 8825-1 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): ASN.1 Encoding Rules: Specification of Basic Encoding Rules (BER), Canonical Encoding Rules (CER) and Distinguished Encoding Rules (DER)
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x691
+%L X.691
+%A ITU
+%R ITU-T Recommendation X.691 [ISO/IEC 8825-2 : 1994]
+%T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): ASN.1 Encoding Rules: Specification of Packet Encoding Rules (PER)
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x200
+%L X.200
+%A ITU
+%R ITU-T Recommendation X.200 [ISO/IEC 7498-1 : 1994]
+%T Information Technology \(em Open Systems Interconnection
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x208
+%L X.208
+%A ITU
+%R ITU-T Recommendation X.208
+%T Specification of Abstract Syntax Notation One
+%D 1988
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x210
+%L X.210
+%A ITU
+%R ITU-T Recommendation X.210 [ISO/IEC 10731 : 1994]
+%T Information Technology \(em Open Systems Interconnection \(em Basic reference model: Conventions for the definition of OSI services
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x213
+%L X.213
+%A ITU
+%R ITU-T Recommendation X.213 [ISO/IEC 8348]
+%T OSI \(em Network Service Definition
+%D November 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x214
+%L X.214
+%A ITU
+%R ITU-T Recommendation X.214 [ISO/IEC 8072 : 1996]
+%T Information Technology \(em Open Systems Interconnection \(em Transport service definition
+%D November 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x215
+%L X.215
+%A ITU
+%R ITU-T Recommendation X.215 [ISO/IEC 8326 : 1996]
+%C Geneva
+%D 1995
+%T Information Technology \(em Open Systems Interconnection \(em Session service definition
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x216
+%L X.216
+%A ITU
+%R ITU-T Recommendation X.216 [ISO/IEC 8822 : 1994]
+%T Information Technology \(em Open Systems Interconnection \(em Presentation service definition
+%D 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x217
+%L X.217
+%A ITU
+%R ITU-T Recommendation X.217 [ISO/IEC 8649 : 1996]
+%T Information Technology \(em Open Systems Interconnection \(em Service definition for the Association Control Service Element
+%D 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x219
+%L X.219
+%A ITU
+%R ITU-T Recommendation X.219 (ISO/IEC 9072-1)
+%T Information processing systems \(em Text Communication, Remote Operations: Model, Notation and Service Definition
+%D n.d.
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%O (Previously "CCITT Recommendation")
+
+%K x223
+%L X.223
+%A ITU
+%R ITU-T Recommendation X.223 (ISO/IEC 8878)
+%T Use of X.25 to Provide the OSI Connection-mode Network Service for ITU-T Applications
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K x224
+%L X.224
+%A ITU
+%R ITU-T Recommendation X.224 (ISO/IEC 8073)
+%T Transport Protocol Speciication for Open System Interconnection (OSI) for ITU-T Applications
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K x225
+%L X.225
+%R ITU-T Recommendation X.225 [ISO/IEC 8327-1 : 1996]
+%A ITU
+%T Information Technology \(em Open Systems Interconnection \(em Connection-oriented session protocol: Protocol specification
+%D 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x226
+%L X.226
+%A ITU
+%R ITU-T Recommendation X.226 [ISO/IEC 8823-1 : 1994]
+%T Information Technology \(em Open Systems Interconnection \(em Connection-oriented presentation protocol: Protocol specification
+%D 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x227
+%L X.227
+%A ITU
+%R ITU-T Recommendation X.227 [ISO/IEC 8650-1]
+%T Information Technology \(em Open Systems Interconnection \(em Connection-oriented protocol for the Association Control Service Element: Protocol Specification
+%D 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x229
+%L X.229
+%A ITU
+%R ITU-T Recommendation X.229 (ISO/IEC 9072-2)
+%T Information processing systems \(em Text Communication, Remote Operations: Protocol Specification
+%D March 1988
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x233
+%L X.233
+%A ITU
+%R ITU-T Recommendation X.233 [ISO/IEC 8473-1 : 1993]
+%T Data Communication Networks \(em Information Technology \(em Protocol for Providing the Connectionless-mode Network Service: Protocol Specification
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x234
+%L X.234
+%A ITU
+%R ITU-T Recommendation X.234 [ISO/IEC 8602 : 1994]
+%T Data Communication Networks \(em Information Technology \(em Protocol for Providing the Connectionless-mode Network Service: Protocol Specification
+%D July 1994
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x235
+%L X.235
+%A ITU
+%R ITU-T Recommendation X.235 [ISO/IEC 9548-1 : 1995]
+%T Information Technology \(em Open Systems Interconnection \(em Connectionless session protocol: Protocol specification
+%D 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x236
+%L X.236
+%A ITU
+%R ITU-T Recommendation X.236 [ISO/IEC 9576-1 : 1995]
+%T Information Technology \(em Open Systems Interconnection \(em Connectionless presentation protocol: Protocol specification
+%D 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x237
+%L X.237
+%A ITU
+%R ITU-T Recommendation X.237 [ISO/IEC 10035-1 : 1995]
+%C Geneva 
+%D 1995
+%T Information Technology \(em Open Systems Interconnection \(em Connectionless protocol for the Association Control Service Element: Protocol Specification
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x622
+%L X.622
+%A ITU
+%R ITU-T Recommendation X.622 [ISO/IEC 8473-3 : 1995]
+%C Geneva
+%D July 1994
+%T Information Technology \(em Open Systems Interconnection \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the Underlying Service by an X.25 Subnetwork
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x623
+%L X.623
+%A ITU
+%R ITU-T Recommendation X.622 [ISO/IEC 8473-4 : 1995]
+%C Geneva
+%D July 1994
+%T Information Technology \(em Open Systems Interconnection \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the Underlying Service by a Subnetwork that Provides the OSI Data Link Service
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x625
+%L X.625
+%A ITU
+%R ITU-T Recommendation X.625
+%C Geneva
+%D October 1996
+%T Information Technology \(em Open Systems Interconnection \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the Underlying Service by ISDN Circuit-Switched B-Channels
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x637
+%L X.637
+%A ITU
+%R ITU-T Recommendation X.637
+%C Geneva
+%D October 1996
+%T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Basic Connection-Oriented Common Upper Layer Requirements
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x638
+%L X.638
+%A ITU
+%R ITU-T Recommendation X.638
+%C Geneva
+%D October 1996
+%T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Minimal OSI Facilities to Support Basic Communications Applications
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K x639
+%L X.639
+%A ITU
+%R ITU-T Recommendation X.639
+%C Geneva
+%D October 1996
+%T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Basic Connection-Oriented Requirements for ROSE-based Profiles
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%O (Previously "CCITT Recommendation")
+
+%K h225.0
+%L H.225.0
+%A ITU
+%Q International Telecommunication Union
+%R ITU-T Recommendation H.225.0
+%T Media Stream Packetization and Synchronization on Non-Guaranteed Quality of Service LANs
+%D November 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K h245
+%L H.245
+%A ITU
+%Q International Telecommunication Union
+%R ITU-T Recommendation H.245
+%T Control Protocol for Multimedia Communication
+%D March 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K h248.1
+%L H.248.1
+%A ITU
+%Q International Telecommunication Union
+%R ITU Recommendation H.248.1
+%T Gateway Control Protocol Version 1
+%D March 2002
+%I ITU-T Telecommunication Standardization Sector of ITU
+
+%k h323
+%L H.323
+%A ITU
+%Q International Telecommunication Union
+%R ITU-T Recommendation H.323
+%T Packet-Based Multimedia Communications Systems
+%D February 1998
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%O (Previously "CCITT Recommendation")
+
+%K t1.111
+%L T1.111
+%A ANSI
+%R ANSI T1.111
+%T Signalling System No. 7 \(em Message Transfer Part
+%D 1992
+%I American National Standards Institute
+
+%K t1.112
+%L T1.112
+%A ANSI
+%R ANSI T1.112
+%T Signalling System No. 7 \(em Signalling Connection Control Part
+%D 1992
+%I American National Standards Institute
+
+%K t1.113
+%L T1.113
+%A ANSI
+%R ANSI T1.113
+%T Signalling System No. 7 \(em ISDN User Part
+%D 1992
+%I American National Standards Institute
+
+%K t1.114
+%L T1.114
+%A ANSI
+%R ANSI T1.114
+%T Signalling System No. 7 \(em Transaction Capabilities Application Part
+%D 1992
+%I American National Standards Institute
+
+%K t1.116.1
+%L T1.116.1
+%R ANSI T1.116.1/2000
+%Q ANSI
+%T Network Element Management Information Models
+%D 2000
+%I American National Standards Institute
+
+%K t1.116.2
+%L T1.116.2
+%R ANSI T1.116.2/2000
+%Q ANSI
+%T Monitoring and Measurements for Signalling System No. 7 Networks
+%D 2000
+%I American National Standards Institute
+
+%K t1.637
+%L T1.637
+%R ANSI T1.637/2000
+%Q ANSI
+%T Service Specific Connection-Oriented Protocol (SSCOP)
+%D 2000
+%I American National Standards Institute
+
+%L ISO 3309
+%R ISO/IEC 3309:1988
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Data Communication \(em High-Level Data Link Control Procedures \(em Frame Structure
+%D 1988
+%I International Organization for Standardization
+
+%L ISO 4335
+%R ISO/IEC 4335:1988
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Data Communication \(em High-Level Data Link Control Procedures \(em Consolidation of Elements of Procedures
+%D 1988
+%I International Organization for Standardization
+
+%L ISO 8649
+%R ISO/IEC 8649:1988
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Information Processing Systems \(em Open Systems Interconnection \(em Service Definition for the Association Control Service Element
+%D 1988
+%I International Organization for Standardization
+
+%L ISO 8650
+%R ISO/IEC 8650:1988
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Information Processing Systems \(em Open Systems Interconnection \(em Protocol Specification for the Association Control Service Element
+%D 1988
+%I International Organization for Standardization
+
+%L ISO 8881
+%R ISO/IEC 8881:1989
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Information Processing Systems \(em Data Communications \(em Use of the X.25 Packet Level Protocol in Local Area Networks
+%D 1989
+%I International Organization for Standardization
+
+%K jtq704
+%L JT-Q\)704
+%A TTC
+%R TTC Standard JT-Q\)704
+%T Message Transfer Part \(em Signalling Network Functions and Messages
+%D April 28, 1992
+%C Japan
+%I Telecommunication Technology Committee (TTC)
+
+%K jtq711
+%L JT-Q\)711
+%A TTC
+%R TTC Standard JT-Q\)711
+%T Functional Description of the Signalling Connection Control Part (SCCP)
+%N Version 2
+%D April 23, 1997
+%C Japan
+%I Telecommunication Technology Comittee (TTC)
+
+%K jtq712
+%L JT-Q\)712
+%A TTC
+%R TTC Standard JT-Q\)712
+%T Definition and Functions of SCCP Messages
+%N Version 3
+%D April 23, 1997
+%C Japan
+%I Telecommunication Technology Comittee (TTC)
+
+%K jtq713
+%L JT-Q\)713
+%A TTC
+%R TTC Standard JT-Q\)713
+%T SCCP Formats and Codes
+%N Version 8
+%D April 20, 2000
+%C Japan
+%I Telecommunication Technology Comittee (TTC)
+
+%K jtq714
+%L JT-Q\)714
+%A TTC
+%R TTC Standard JT-Q\)714
+%T Signalling Connection Control Part Procedures
+%N Version 3
+%D April 23, 1997
+%C Japan
+%I Telecommunication Technology Comittee (TTC)
+
+%L MINSHALL
+%A Greg Minshall
+%Q Internet Engineering Task Force \(em Transport Area Working Group
+%T A Proposed Modification to Nagle's Algorithm
+%R draft-minshall-nagle-01.txt
+%D June 17, 1999
+%O Work In Progress
+%I Internet Engineering Task Force \(em Transport Area Working Group
+%U http://www.ietf.org/internet-drafts/draft-minshall-nagle-01.txt
+
+%L SVID
+%R SVID
+%K svid
+%T System V, Interface Definition
+%N Fourth Edition
+
+%L XBD5
+%K xbd5
+%R XBD Issue 5
+%A Open\ Group
+%T X/Open System Interface Definitions
+%I Open Group Publication
+%U http://www.opengroup.org/onlinepubs/
+
+%L SUSv2
+%K susv2
+%R SUS Version 2
+%A Open\ Group
+%T Single UNIX Specification
+%I Open Group Publication
+%U http://www.opengroup.org/onlinepubs/
+
+%L SUSv3
+%K susv3
+%R SUS Version 3
+%A Open\ Group
+%T Single UNIX Specification
+%I Open Group Publication
+%U http://www.opengroup.org/onlinepubs/
+
+%L Magic Garden
+%K magic
+%R Magic Garden
+%A Berny Goodheart
+%A James Cox
+%T The Magic Garden Explained: The Internals of UNIX\(rg System V Release 4 / An Open Systems Design
+%D 1994
+%I Prentice Hall
+%C Australia
+%G ISBN 0-13-098138-9
+
+%K advprog
+%L AdvProg
+%A W. Richard Stevens
+%T Advanced Programming in the UNIX\(rg\ Environment
+%N 15th edition
+%D December 1997
+%C Reading, Massachusetts
+%I Addison Wesley
+%G ISBN 0-201-56317-7
+
+%L SVR42CR
+%K svr42cr
+%R SVR 4.2 CR
+%T UNIX\(rg System V Release 4.2 Command Reference Manual
+%D 1992
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L SVR42
+%K svr42
+%R SVR 4.2
+%T UNIX\(rg System V Release 4.2 Programmer's Manual
+%D 1992
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L SVR4
+%R SVR 4
+%K svr4
+%T UNIX\(rg System V Release 4 Programmer's Manual
+%D 1990
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L SVR3
+%R SVR 3
+%K svr3
+%T UNIX\(rg System V Release 3 Programmer's Manual
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L SVR2
+%R SVR 2
+%K svr2
+%T UNIX\(rg System V Release 2 Programmer's Manual
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L USLDK
+%R USL DDI/DKI
+%K usldk
+%T Device Driver Interface/Driver-Kernel Interface (DDI/DKI) Reference Manual for Intel Processors
+%D 1992
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L SVR4DK
+%R SVR 4 DDI/DKI
+%K svr4dk
+%T UNIX\(rg System V Release 4 Device Driver Interface/Driver-Kernel Interface (DDI/DKI) Reference Manual
+%D 1990
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L SVR42SPG
+%K uslspg
+%R SVR 4.2
+%T STREAMS Programmer's Guide
+%D 1992
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L SVR4SPG
+%R SVR 4
+%K svr4spg
+%T UNIX\(rg System V Release 4 STREAMS Programmer's Guide
+%D 1990
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L SVR3SPG
+%R SVR 3
+%k svr3spg
+%T UNIX\(rg System V Release 3 STREAMS Programmer's Guide
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L svr3sp
+%R SVR 3
+%k svr3sp
+%T UNIX\(rg System V Release 3 STREAMS Primer
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
+%L AIXSPG
+%R AIX\(rg 5L Version 5.1
+%K aixspg
+%T AIX STREAMS Programmers Guide
+%D 2001
+%Q Internatonal Business Machines Corp.
+%I IBM
+%C Boulder, Colorado
+%U http://publibn.boulder.ibm.com/
+
+%L AIXCPC
+%R AIX\(rg 5L Version 5.1
+%K aixcpc
+%T AIX Communications Programming Concepts
+%D 2001
+%Q Internatonal Business Machines Corp.
+%I IBM
+%C Boulder, Colorado
+%U http://publibn.boulder.ibm.com/
+
+%L IRIXSPG
+%R IRIX\(rg 6.5.17
+%K irixspg
+%T IRIX\(rg Device Driver Programmer's Guide
+%D 2001
+%Q Silicon Graphics, Inc.
+%I SGI Technical Publications
+%C Mountainview, California
+%U http://techpubs.sgi.com/
+
+%L HPUXSPG
+%R STREAMS/UX
+%K hpuxspg
+%T STREAMS/UX for the HP 9000 Reference Manual
+%D 1995
+%Q Hewlett-Packard Company
+%I HP
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L MACOTR
+%R Mac OS 9
+%K macotr
+%K macdoc
+%T Open Transport Reference
+%D 2003
+%Q Apple Computer, Inc.
+%I Apple
+%C Cupertino, California
+%U http://developer.apple.com/macros/opentransport/
+
+%L MACOTDN
+%R Revision 1.5d2
+%K macmdn
+%K macspg
+%T Open Transport Module Developer Note
+%D June 18, 1996
+%Q Apple Computer, Inc.
+%I Apple
+%C Cupertino, California
+%U http://developer.apple.com/macos/opentransport/
+
+%L OSFSPG
+%R Digital\(rg UNIX (OSF/1.2)
+%K osfspg
+%T Digital UNIX: Network Programmers Guide
+%D 1996
+%Q Digital Equipment Corporation
+%I Hewlett-Packard Company
+%C Palo Alto, California
+%U http://www.true64unix.compaq.com/docs/
+
+%L SOLSPG
+%R Solaris\(rg 8
+%K solspg
+%T STREAMS Programming Guide
+%G Part No: 805-7478-05
+%D August 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SUXSPG
+%R SUPER-UX\(rg Release 9.2
+%K suxspg
+%T SUPER-UX STREAMS Programmers Guide
+%D 1999
+%Q NEC Corporation
+%I NEC
+
+%L UW7SPG
+%R UnixWare\(rg 7.1.3
+%K uw7spg
+%T UnixWare\(rg 7 STREAMS Programmer's Guide
+%D 2002
+%Q Caldera International, Inc.
+%I Caldera
+%C Lindon, Utah
+%U http://uw713doc.sco.com/
+
+%L UXPSPG
+%R UXP/V\(rg V10L10
+%K uxpspg
+%T UXP/V Programmer's Guide: STREAMS V10
+%D 1997
+%Q Fujitsu Limited
+%I Fujitsu
+
+%L XSTRAPG
+%R xSTRa
+%K xstrapg
+%T xSTRa Programmer's and Configuration Guide
+%G Document No. 106P08861
+%D 1998
+%Q Performance Technologies Inc.
+%I PT
+%C Rochester, New York
+
+%L AIXDOC
+%R AIX\(rg 5L Version 5.1
+%K aixdoc
+%T AIX 5L Version 5.1 Documentation
+%D 2001
+%Q Internatonal Business Machines Corp.
+%I IBM
+%C Boulder, Colorado
+%U http://publibn.boulder.ibm.com/
+
+%L HPUXDOC
+%R HP-UX\(rg 11i v2
+%K hpuxdoc
+%T HP-UX 11i v2 Documentation
+%D 2001
+%Q Hewlett-Packard Company
+%I HP
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L IRIXDOC
+%R IRIX\(rg 6.5.17
+%K irixdoc
+%T IRIX 6.5 Manual Pages
+%D 2003
+%Q Silicon Graphics, Inc.
+%I SGI Technical Publications
+%C Mountainview, California
+%U http://techpubs.sgi.com/
+
+%L OSFDOC
+%R Digital\(rg UNIX (OSF/1.2)
+%K osfdoc
+%T Digital UNIX Documentation Library
+%D 2003
+%Q Digital Equipment Corporation
+%I Hewlett-Packard Company
+%C Palo Alto, California
+%U http://www.true64unix.compaq.com/docs/
+
+%L SOLDOC
+%R Solaris\(rg 8
+%K soldoc
+%T Solaris 8 Docmentation
+%D 2001
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Santa Clara, California
+%U http://docs.sun.com/
+
+%L SUXDOC
+%R SUPER-UX\(rg Release 9.2
+%K suxdoc
+%T SUPER-UX Release 9.2 Documentation
+%D 1999
+%Q NEC Corporation
+%I NEC
+
+%L UW7DOC
+%R UnixWare\(rg 7.1.3
+%K uw7doc
+%T UnixWare 7.1.3 (OpenUnix 8) Documentation
+%D 2002
+%Q Caldera International, Inc.
+%I Caldera
+%C Lindon, Utah
+%U http://uw713doc.sco.com/
+
+%L UXPDOC
+%R UXP/V\(rg V10L10
+%K UXPDOC
+%T UXP/V V10L10 Documentation
+%D 1997
+%Q Fujitsu Limited
+%I Fujitsu
+
+%K sctp-mib-10
+%L SCTPMIB10
+%A Javier Pastor-Balbas
+%A Maria-Carmen Belinchon
+%E Javier Pastor-Balbas
+%Q Internet Engineering Task Force \(em Transport Area Working Group
+%T Stream Control Transmission Protocol Management Information Base
+%R draft-ietf-sigtran-sctp-mib-10.txt
+%D June 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sctp-mib-10.txt
+
+%K prsctp-00
+%L PRSCTP00
+%A Randall R. Stewart
+%A Michael A. Ramalho
+%A Qiaobing Xie
+%A Michael Tuexen
+%A Phillip T. Conrad
+%E Randall R. Stewart
+%Q Internet Engineering Task Force \(em Transport Area Working Group
+%T SCTP Partial Reliability Extension
+%R draft-ietf-tsvwg-prsctp-00.txt
+%D June 18, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-prsctp-00.txt
+
+%K addip-07
+%L ADDIP07
+%A Randall R. Stewart
+%A Michael A. Ramalho
+%A Qiaobing Xie
+%A Ian Rytina
+%A Maria-Carmen Belinchon
+%A Phillip T. Conrad
+%E Randall R. Stewart
+%Q Internet Engineering Task Force \(em Transport Area Working Group
+%T Stream Control Transmission Protocol (SCTP) Dynamic Address Reconfiguration
+%R draft-ietf-tsvwg-addip-sctp-07.txt
+%D February 26, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-addip-sctp-07.txt
+
+%K addip-08
+%L ADDIP08
+%A Randall R. Stewart
+%A Michael A. Ramalho
+%A Qiaobing Xie
+%A Ian Rytina
+%A Maria-Carmen Belinchon
+%A Phillip T. Conrad
+%E Randall R. Stewart
+%Q Internet Engineering Task Force - Transport Area Working Group
+%T Stream Control Transmission Protocol (SCTP) Dynamic Address Reconfiguration
+%R draft-ietf-tsvwg-addip-sctp-08.txt
+%D September 24, 2003
+%I Internet Engineering Task Force - Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-addip-sctp-08.txt
+
+%K sctpig-08
+%L SCTPIG08
+%A Randall R. Stewart
+%A Lyndon Ong
+%A Ivan Arias-Rodriguez
+%A Kacheong Poon
+%A Phillip T. Conrad
+%A Armando L. Caro Jr.
+%A Michael Tuexen
+%E Randall R. Stewart
+%Q Internet Engineering Task Force \(em Transport Area Working Group
+%T Stream Control Transmission Protocol (SCTP) Implementor's Guide
+%R draft-ietf-tsvwg-sctpimpguide-08.txt
+%D February 26, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-08.txt
+
+%K sctpig-10
+%L SCTPIG10
+%A Randall R. Stewart
+%A Ivan Arias-Rodriguez
+%A Kacheong Poon
+%A Armando L. Caro Jr.
+%A Michael Tuexen
+%E Randall R. Stewart
+%Q Internet Engineering Task Force - Transport Area Working Group
+%T Stream Control Transmission Protocol (SCTP) Implementor's Guide
+%R draft-ietf-tsvwg-sctpimpguide-10.txt
+%D November 13, 2003
+%I Internet Engineering Task Force - Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt
+
+%K sctpsock-07
+%L SCTPSOCK07
+%A Randall R. Stewart
+%A Qiaobing Xie
+%A La Monte H.P. Yarroll
+%A Johnathan Wood
+%A Kacheong Poon
+%A Ken Fujita
+%A Michael Tuexen
+%E Randall R. Stewart
+%Q Internet Engineering Task Force - Transport Area Working Group
+%T Sockets API Extensions for Stream Control Transmission Protocol (SCTP)
+%R draft-ietf-tsvwg-sctpsocket-07.txt
+%D August 22, 2003
+%I Internet Engineering Task Force - Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpsocket-07.txt
+
+%K capi20
+%L CAPI 2.0
+%A CAPI Association e.V.
+%Q CAPI Association e.V.
+%T Common-ISDN-API, Version 2.0
+%E AVM GmbH
+%I CAPI Association e.V.
+%U http://www.capi.org/
+%D June 2001
+%O 4th Edition
+
+%K capi2p1
+%L CAPI 2.0 I
+%A CAPI Association e.V.
+%Q CAPI Association e.V.
+%T Common-ISDN-API, Part I, Version 2.0
+%E AVM GmbH
+%I CAPI Association e.V.
+%U http://www.capi.org/
+%D June 2001
+%O 4th Edition
+
+%K capi2p2
+%L CAPI 2.0 II
+%A CAPI Association e.V.
+%Q CAPI Association e.V.
+%T Common-ISDN-API, Part II, Version 2.0
+%E AVM GmbH
+%I CAPI Association e.V.
+%U http://www.capi.org/
+%D June 2001
+%O 4th Edition
+
+%K capi2p3
+%L CAPI 2.0 III
+%A CAPI Association e.V.
+%Q CAPI Association e.V.
+%T Common-ISDN-API, Part III, Version 2.0
+%E AVM GmbH
+%I CAPI Association e.V.
+%U http://www.capi.org/
+%D June 2001
+%O 4th Edition
+
+%K capi2p4
+%L CAPI 2.0 IV
+%A CAPI Association e.V.
+%Q CAPI Association e.V.
+%T Common-ISDN-API, Part IV, Version 2.0
+%E AVM GmbH
+%I CAPI Association e.V.
+%U http://www.capi.org/
+%D June 2001
+%O 4th Edition
+
+%K lis
+%L LIS 2.18
+%R LIS 2.18
+%A OpenSS7
+%Q OpenSS7
+%T Linux STREAMS (LiS) 2.18.4 Source Code
+%E Brian Bidulock
+%I OpenSS7 Corporation
+%U http://www.openss7.org/
+
+%K lfs
+%L streams-0.7a
+%R streams-0.7a
+%A OpenSS7
+%Q OpenSS7
+%T Linux Fast-STREAMS (LfS) 0.7a.6 Source Code
+%E Brian Bidulock
+%I OpenSS7 Corporation
+%U http://www.openss7.org/
+
+%K dpnss1
+%L DPNSS1
+%A British Telecom
+%Q British Telecom
+%T Digital Private Network Signalling System No. 1
+%R BTNR 186, Issue 6
+%C London
+%I British Telecom
+%U http://www.bt.com/
+
+%K dass2
+%L DASS2
+%A British Telecom
+%Q British Telecom
+%T Digital Access Signalling System No. 2
+%R BTNR 190, Issue 2
+%C London
+%I British Telecom
+%U http://www.bt.com/
+
+%K cci
+%L CCI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%T Call Control Interface (CCI) Specification
+%R CCI Revision 1.0.0
+%N Draft 1
+%C Edmonton
+%D April 2003
+%I OpenSS7 Corporation
+%U http://www.openss7.org/docs/cci.pdf
+
+%K chi
+%L CHI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%T Channel Interface (CHI) Specification
+%R CHI Revision 1.0.0
+%N Draft 1
+%C Edmonton
+%D May 2003
+%I OpenSS7 Corporation
+%U http://www.openss7.org/docs/chi.pdf
+
+%K mgi
+%L MGI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%T Media Gateway Interface (MGI) Specification
+%R MGI Revision 1.0.0
+%N Draft 1
+%C Edmonton
+%D May 2003
+%I OpenSS7 Corporation
+%U http://www.openss7.org/docs/mgi.pdf
+
+%K mtpi
+%L MTPI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%T Messages Transfer Part Interface (MTPI) Specification
+%R MTPI Revision 1.0.0
+%N Draft 1
+%C Edmonton
+%D January 2003
+%I OpenSS7 Corporation
+%U http://www.openss7.org/docs/mtpi.pdf
+
+%K mxi
+%L MXI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%T Multiplex Interface (MXI) Specification
+%R MXI Revision 1.0.0
+%N Draft 1
+%C Edmonton
+%D May 2003
+%I OpenSS7 Corporation
+%U http://www.openss7.org/docs/mxi.pdf
+
+%K rfc768
+%L RFC 768
+%R RFC 768/STD 6
+%T User Datagram Protocol
+%A J. Postel
+%E J. Postel
+%D August 28, 1980
+%O (Also STD0006) (Status: STANDARD)
+%Q Information Sciences Institute, University of Southern California
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0768.txt
+
+%K rfc3828
+%L RFC 3828
+%R RFC 3828
+%A L-A. Larzon
+%T The Lightweight User Datagram Protocol (UDP-Lite)
+%A M. Degermark
+%A S. Pink
+%E L-E. Jonsson
+%E G. Fairhurst
+%D July 2004
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3828.txt
+
+%K rfc791
+%L RFC 791
+%R RFC 791/STD 5
+%T Internet Protocol \(em DARPA Internet Program \(em Protocol Specification
+%A J. Postel
+%E J. Postel
+%D September 1981
+%O (Also ST0005) (Status: STANDARD) (Updated by RFC 1349)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0791.txt
+
+%K rfc793
+%L RFC 793
+%R RFC 793/STD 7
+%T Transmission Control Protocol, DARPA Internet Program, Protocol Specification
+%A J. Postel
+%E J. Postel
+%D September 1981
+%O (Also STD0007) (Updated by RFC 3168) (Status: STANDARD)
+%Q Information Sciences Institute, University of Southern California
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0793.txt
+
+%K rfc813
+%L RFC 813
+%A D. Clark
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Window and Acknowledgment Strategy in TCP
+%R RFC 813
+%D July 1982
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0813.txt
+
+%K rfc892
+%L RFC 892
+%A International Organization for Standardization
+%Q Internet Engineering Task Force \(em Network Working Group
+%T ISO Transport Protocol Specification
+%R RFC 892
+%D December 1983
+%I The Internet Society
+%O (Obsoleted by RFC 905)
+%U http://www.ietf.org/rfc/rfc0892.txt
+
+%K rfc905
+%L RFC 905
+%A International Organization for Standardization
+%Q Internet Engineering Task Force \(em Network Working Group
+%T ISO Transport Protocol Specification ISO DP 8073
+%R RFC 905
+%D April 1, 1984
+%I The Internet Society
+%O (Obsoletes RFC 892)
+%U http://www.ietf.org/rfc/rfc0905.txt
+
+%K rfc896
+%L RFC 896
+%R RFC 896
+%A John Nagle
+%T Congestion control in IP/TCP Internetworks
+%D January 6, 1984
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0896.txt
+
+%K rfc926
+%L RFC 926
+%R RFC 926
+%A International Organization for Standardization
+%T Protocol for providing the Connectionless Mode Network Services.
+%D December 1984
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0926.txt
+%O (Obsoleted by RFC 994)
+
+%K rfc958
+%L RFC 958
+%R RFC 958
+%A D. L. Mills
+%T Network Time Protocol (NTP)
+%D September 1985
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc958.txt
+
+%K rfc982
+%L RFC 892
+%A H. W. Braun
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Guidelines for the Specification of the Structure of the Domain Specific Part (DSP) of the ISO Standard NSAP Address
+%R RFC 982
+%D April 1, 1986
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0982.txt
+
+%K rfc983
+%L RFC 983
+%A Dwight E. Cass
+%A Marshal T. Rose
+%T ISO Transport Arrives on Top of the TCP
+%D April 1, 1986
+%R RFC 983
+%O (Obsoleted by RFC 1006)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0983.txt
+
+%K rfc986
+%L RFC 986
+%R RFC 986
+%A R.W. Callon
+%A H.W. Braun
+%T Guidelines for the use of Internet-IP addesses in the ISO Connectionless-Mode Network Protocol
+%D June 1986
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0986.txt
+%O (Obsoleted by RFC 1069)
+
+%K rfc994
+%L RFC 994
+%R RFC 994
+%A International Organization for Standardization
+%T Final text of DIS 8473, Protocol for Providing the Connectionless-mode Network Service
+%D March 1986
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0994.txt
+%O (Obsoletes RFC 926)
+
+%K rfc995
+%L RFC 995
+%A International Organization for Standardization
+%T End System to Intermediate System Routing Exchange Protocol for Standardization with ISO 8473
+%D April 1, 1986
+%R RFC 995
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0995.txt
+
+%K rfc1006
+%L RFC 1006
+%E Marshall T. Rose
+%A Dwight D. Cass
+%T ISO Transport Service on top of the TCP \(em Version 3
+%D May 1987
+%R STD 35/RFC 1006
+%O (Obsoletes RFC 983) (Updated by RFC 2126)  (Also STD 35)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1006.txt
+
+%K rfc1007
+%L RFC 1007
+%A W. McCoy
+%T Military Supplement to the ISO Transport Protocol
+%D June 1987
+%R RFC 1007
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1007.txt
+
+%K rfc1008
+%L RFC 1008
+%A W. McCoy
+%T Implementation Guide for the ISO Transport Protocol
+%D June 1987
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1008.txt
+
+%K rfc1162
+%L RFC 1162
+%R RFC 1162
+%A G. Satz
+%T Connectionless Network Protocol (ISO 8473) and End System to Intermediate System (ISO 9542) Management Information Base
+%D June 1990
+%O (Obsoleted by RFC 1238) (Status: EXPERIMENTAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1162.txt
+
+%K rfc1238
+%L RFC 1238
+%R RFC 1238
+%T CLNS MIB for use with Connectionless Network Protocol (ISO 8473) and End System to Intermediate System (ISO 9542)
+%A G. Satz
+%D June 1991
+%O (Obsoletes RFC 1162) (Status: EXPERIMENTAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1162.txt
+
+%K rfc3277
+%L RFC 3277
+%R RFC 3277
+%T Intermediate System to Intermediate System (IS-IS) Transient Blackhole Avoidance
+%A D. McPherson
+%D April 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3277.txt
+
+%K rfc3358
+%L RFC 3358
+%R RFC 3358
+%T Optional Checksums in Intermediate System to Intermediate System (ISIS)
+%A R. Koodli
+%A R. Ravikanth
+%D August 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3358.txt
+
+%K rfc3359
+%L RFC 3359
+%R RFC 3359
+%T Reserved Type, Length and Value (TLV) Codepoints in Intermediate System to Intermediate System
+%A T. Przygienda
+%D August 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3359.txt
+
+%K rfc3373
+%L RFC 3373
+%R RFC 3373
+%T Three-Way Handshake for Intermediate System to Intermediate System (IS-IS) Point-to-Point Adjacencies
+%A D. Katz
+%A R. Saluja
+%D September 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3373.txt
+
+%K rfc3567
+%L RFC 3567
+%R RFC 3567
+%T Intermediate System to Intermediate System (IS-IS) Cryptographic Authentication
+%A T. Li
+%A R. Atkinson
+%D July 2003
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3567.txt
+
+%K rfc3719
+%L RFC 3719
+%R RFC 3719
+%T Recommendations for Interoperable Networks using Intermediate System to Intermediate System (IS-IS)
+%E J. Parker
+%D February 2004
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3719.txt
+
+%K rfc3784
+%L RFC 3784
+%R RFC 3784
+%T Intermediate System to Intermediate System (IS-IS) Extensions for Traffic Engineering (TE)
+%A H. Smit
+%A T. Li
+%D June 2004
+%O (Updated by RFC 4205) (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3784.txt
+
+%K rfc3785
+%L RFC 3785
+%R BCP 87/RFC 3785
+%T Use of Interior Gateway Protocol (IGP) Metric as a second MPLS Traffic Engineering (TE) Metric
+%A F. Le Faucheur
+%A R. Uppili
+%A A.  Vedrenne
+%A P. Merckx
+%A T. Telkamp
+%D May 2004
+%O (Also BCP0087) (Status: BEST CURRENT PRACTICE)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3785.txt http://www.ietf.org/rfc/bcp/bcp0087.txt
+
+%K rfc3786
+%L RFC 3786
+%R RFC 3786
+%T Extending the Number of Intermediate System to Intermediate System (IS-IS) Link State PDU (LSP) Fragments Beyond the 256 Limit
+%A A. Hermelin
+%A S. Previdi
+%A M. Shand
+%D May 2004
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3786.txt
+
+%K rfc3787
+%L RFC 3787
+%R RFC 3787
+%T Recommendations for Interoperable IP Networks using Intermediate System to Intermediate System (IS-IS)
+%E J. Parker
+%D May 2004
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3787.txt
+
+%K rfc3847
+%L RFC 3847
+%R RFC 3847
+%T Restart Signaling for Intermediate System to Intermediate System (IS-IS)
+%A M. Shand
+%A L. Ginsberg
+%D July 2004
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3847.txt
+
+%K rfc3906
+%L RFC 3906
+%R RFC 3906
+%T Calculating Interior Gateway Protocol (IGP) Routes Over Traffic Engineering Tunnels
+%A N. Shen
+%A H. Smit
+%D October 2004
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3906.txt
+
+%K rfc4205
+%L RFC 4205
+%R RFC 4205
+%T Intermediate System to Intermediate System (IS-IS) Extensions in Support of Generalized Multi-Protocol Label Switching (GMPLS)
+%E K.  Kompella
+%E Y. Rekhter
+%D October 2005
+%O (Updates RFC 3784) (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4205.txt
+
+%K rfc1613
+%L RFC 1613
+%R RFC 1613
+%T Cisco Systems X.25 over TCP (XOT)
+%E J. Forster
+%E G. Satz
+%E G. Glick
+%E R. Day
+%D May 1994
+%O (Status: INFORMATIONAL) (Defines TCP port number 1998.)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1613.txt
+
+%K rfc1371
+%L RFC 1371
+%R RFC 1371
+%T Choosing a Common IGP for the IP Internet
+%A P. Gross
+%D October 1992
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1371.txt
+
+%K rfc1069
+%L RFC 1069
+%R RFC 1069
+%A R.W. Callon
+%A H.W. Braun
+%T Guidelines for the Use of Internet-IP Addresses in the ISO Connectionless-Mode Network Protocol
+%D February 1989
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1069.txt
+%O (Obsoletes RFC 986) (Status: UNKNOWN)
+
+%K rfc1356
+%L RFC 1356
+%R RFC 1356
+%E A. Malis
+%A A. Malis
+%A D. Robinson
+%A R. Ullmann
+%T Multiprotocol Interconnection on X.25 and ISDN in the Packet Mode.
+%D August 1992
+%O Draft Standard
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1356.txt
+
+%K rfc1381
+%L RFC 1381
+%R RFC 1381
+%E D. Throop
+%A D. Throop
+%A F. Baker
+%T SNMP MIB Extension for X.25 LAPB
+%D November 1992
+%O Proposed Standard
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1381.txt
+
+%K rfc1382
+%L RFC 1382
+%R RFC 1382
+%E D. Throop
+%A D. Throop
+%T SNMP MIB Extension for the X.25 Packet Layer
+%D November 1992
+%O Proposed Standard
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1382.txt
+
+%K rfc1461
+%L RFC 1461
+%R RFC 1461
+%E D. Throop
+%A D. Throop
+%T SNMP MIB Extension for Multiprotocol Interconnect over X.25
+%D May 1993
+%O Historic
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1461.txt
+
+%K rfc1598
+%L RFC 1598
+%R RFC 1598
+%E W. Simpson
+%A W. Simpson
+%T PPP in X.25
+%D March 1994
+%O Proposed Standard
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1598.txt
+
+%K rfc1277
+%L RFC 1277
+%A Steve E. Hardcastle-Kille
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Encoding Network Addresses to Support Operation over Non-OSI Lower Layers
+%R RFC 1277
+%D November 1991
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1277.txt
+
+%K rfc1278
+%L RFC 1278
+%A Steve E. Hardcastle-Kille
+%Q Internet Engineering Task Force \(em Network Working Group
+%T A String Encoding of Presentation Address
+%R RFC 1278
+%D November 1991
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1278.txt
+
+%K rfc1859
+%L RFC 1859
+%A Yanick Pouffary
+%T ISO Transport Class 2 Non-use of Explicit Flow Control over TCP RFC 1006 Extension
+%R RFC 1859
+%D October 1995
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1859.txt
+
+%K rfc1070
+%L RFC 1070
+%R RFC 1070
+%A R.A. Hagens
+%A N.E. Hall
+%A Marshall T. Rose
+%T Use of the Internet as a Subnetwork for Experimentation with the OSI Network Layer
+%D February 1989
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1070.txt
+%O (This RFC allocates IP protocol number 80 and UDP port number 147.) (Status: UNKNOWN)
+
+%K rfc1085
+%L RFC 1085
+%R RFC 1085
+%A Marshall T. Rose
+%T ISO Presentation Services on top of TCP/IP-based Internets
+%D December 1988
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1085.txt
+
+%K rfc1086
+%L RFC 1086
+%R RFC 1086
+%A J.P. Onions
+%A Marshall T. Rose
+%T ISO-TP0 Bridge Between TCP and X.25.
+%D December 1988
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1086.txt
+
+%K rfc1139
+%L RFC 1139
+%R RFC 1139
+%A R.A. Hagens
+%T Echo Function for ISO 8473
+%D January 1990
+%O (Obsoleted by RFC 1574, RFC 1575)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1139.txt
+
+%K rfc1138
+%L RFC 1138
+%R RFC 1138
+%A Steve. E. Hardcastle-Kille
+%T Mapping between X.400(1988) / ISO 10021 and RFC 822
+%D December 1989
+%O (Updates RFC 1026, RFC 987, RFC 822) (Updated by RFC 1148)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1138.txt
+
+%K rfc1148
+%L RFC 1148
+%R RFC 1148
+%A Steve. E. Hardcastle-Kille
+%T Mapping between X.400(1988) / ISO 10021 and RFC 822
+%D March 1990
+%O (Updates RFC 1026, RFC 987, RFC 1138, RFC 822) (Obsoleted by RFC 2156, RFC 1327)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1148.txt
+
+%K rfc1162
+%L RFC 1162
+%R RFC 1162
+%A G. Satz
+%T Connectionless Network Protocol (ISO 8473) and End System to Intermediate System (ISO 9542) Management Information Base
+%D June 1990
+%O (Obsoleted by RFC 1238)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1162.txt
+
+%K rfc1238
+%L RFC 1238
+%R RFC 1238
+%A G. Satz
+%T CLNS MIB for use with Connectionless Network Protocol (ISO 8473) and End System to Intermediate System (ISO 9542)
+%D June 1991
+%O (Obsoletes RFC 1162)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1238.txt
+
+%K rfc1561
+%L RFC 1561
+%R RFC 1561
+%A D. Piscitello
+%T Use of ISO CLNP in TUBA Environments
+%D December 1993
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1561.txt
+
+%K rfc1575
+%L RFC 1575
+%R RFC 1575
+%A S. Hares
+%A C. Wittbrodt
+%T An Echo Function for CLNP (ISO 8473)
+%D February 1994
+%O (Obsoletes RFC 1139)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1575.txt
+
+%K rfc1095
+%L rfc 1095
+%A Unnikrishnan S. Warrier
+%A Larry Besaw
+%Q Internet Engineering Task Force \(em Network Working Group
+%T The Common Management Information Services and Protocol over TCP/IP (CMOT)
+%R RFC 1095
+%D April 1988
+%I The Internet Society
+%O (Obsoleted by RFC 1189)
+%U http://www.ietf.org/rfc/rfc1095.txt
+
+%K rfc1122
+%L RFC 1122
+%E Robert Braden
+%T Requirements for Internet Hosts -- Communication Layers
+%Q The Internet Society
+%R RFC 1122
+%D October 1989
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1122.txt
+
+%K rfc1155
+%L RFC 1155
+%E Marshall T. Rose
+%A K. McCloghrie
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Structure and Identification of Management Information for TCP/IP-based Internets
+%R RFC 1155
+%D May 1990
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1155.txt
+
+%K rfc1157
+%L RFC 1157
+%E J. Case
+%A M. Fedor
+%A M. Schoffstall
+%A J. Davin
+%Q Internet Engineering Task Force \(em Network Working Group
+%T A Simple Network Management Protocol (SNMP)
+%R RFC 1157
+%D May 1990
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1157.txt
+
+%K rfc1189
+%L RFC 1189
+%A Unnikrishnan S. Warrier
+%A Larry Besaw
+%A Lee LaBarre
+%A Biran D. Handspicker
+%Q Internet Engineering Task Force \(em Network Working Group
+%T The Common Management Information Services and Protocols for the Internet (CMOT and CMIP)
+%R RFC 1189
+%D October 1990
+%I The Internet Society
+%O (Obsoletes RFC 1095)
+%U http://www.ietf.org/rfc/rfc1189.txt
+
+%K rfc1212
+%L RFC 1212
+%E Marshall T. Rose
+%A K. McCloghrie
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Concise MIB Definitions
+%R RFC 1212
+%D March 1991
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1212.txt
+
+%K rfc1224
+%L RFC 1224
+%A Lou Steinberg
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Techniques for Managing Asyncrhonously Generated Alerts
+%R RFC 1224
+%D May 1991
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1224.txt
+
+%K rfc1213
+%L RFC 1213
+%E K. McCloghrie
+%A Marshall T. Rose
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Management Information Base for Network Management of TCP/IP-based Internets: MIB-II
+%R RFC 1213
+%D March 1991
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1213.txt
+
+%K rfc1321
+%L RFC 1321
+%A Ronald L. Rivest
+%E Ronald L. Rivest
+%Q Internet Engineering Task Force
+%T The MD5 Message-Digest Algorithm
+%R RFC 1321
+%D April 1992
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1321.txt
+
+%K rfc1349
+%L RFC 1349
+%R RFC 1349
+%T Type of Service in the Internet Protocol Suite
+%A Philip Almquist
+%E Philip Almquist
+%D July 1992
+%O (Obsoleted by RFC 2474) (Updates RFC 1248, RFC 1247, RFC 1195, RFC 1123, RFC 1122, RFC 1060, RFC 0791) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1349.txt
+
+%K rfc2474
+%L RFC 2474
+%R RFC 2474
+%T Definition of the Differentiated Services Field (DS Field) in the IPv4 and IPv6 Headers
+%A K. Nichols
+%A S. Blake
+%A F. Baker
+%A D. Black
+%D December 1998
+%O (Obsoletes RFC 1455, RFC 1349) (Updated by RFC 3168, RFC 3260) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2474.txt
+
+%K rfc1889
+%L RFC 1889
+%R RFC 1889
+%A Henry Shulzrinne
+%A Stephen L. Casner
+%A Ron Frederick
+%A Van Jacobson
+%E Henry Shulzrinne
+%Q Internet Engineering Task Force
+%T RTP: A Transport Protocol for Real-Time Application
+%D January 1996
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1889.txt
+
+%K rfc2001
+%L RFC 2001
+%A W. Richard Stevens
+%E W. Richard Stevens
+%T TCP Slow Start, Congestion Avoidance, Fast Retransmit, and Fast Recovery Algorithms
+%Q Internet Engineering Task Force
+%R RFC 2001
+%D January 1997
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2001.txt
+
+%K rfc2119
+%L RFC 2119
+%A Scott Bradner
+%E Scott Bradner
+%Q Internet Engineering Task Force
+%T Key words for use in RFCs to Indicate Requirement Levels
+%R BCP 14/RFC 2119
+%D March 1997
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2119.txt
+
+%K rfc2126
+%L RFC 2126
+%R RFC 2126
+%A Y. Pouffray
+%A A. Young
+%E Y. Pouffray
+%T ISO Transport Service on top of TCP (ITOT)
+%D March 1997
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2126.txt
+
+%K rfc2196
+%L RFC 2196
+%A Barbara Y. Frazer
+%E Barbara Y. Frazer
+%Q Internet Engineering Task Force
+%T Site Security Handbook
+%R RFC 2196
+%D September 1997
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2196.txt
+
+%K rfc2246
+%L RFC 2246
+%A Time Dierke
+%A Christopher Allen
+%E Time Dierke
+%Q Internet Engineering Task Force
+%T The TLS Protocol \(em Version 1.0
+%R RFC 2246
+%D January 1999
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2246.txt
+
+%K rfc2279
+%L RFC 2279
+%A Francois Yergenau
+%Q Internet Engineering Task Force
+%T UTF-8, a transformation format of ISO 10646
+%R RFC 2279
+%D January 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2279.txt
+
+%L RFC 2401
+%K ipsec
+%A Stephen Kent
+%A Randall Atkinson
+%E Stephen Kent
+%Q Internet Engineering Task Force
+%T Security Architecture for the Internet Protocol
+%R RFC 2401
+%D November 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2401.txt
+
+%L RFC 2406
+%K ipsecesp
+%A Stephen Kent
+%A Randall Atkinson
+%E Stephen Kent
+%Q Internet Engineering Task Force
+%T IP Encapsulating Security Payload (ESP)
+%R RFC 2406
+%D November 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2406.txt
+
+%L RFC 2407
+%K ipsecdoi
+%A Derrell Piper
+%Q Internet Engineering Task Force
+%T The Internet IP Security Domain of Interpretation for ISAKMP
+%R RFC 2407
+%D November 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2407.txt
+
+%L RFC 2409
+%K ike
+%A Dan Harkins
+%A Dave Carrel
+%E Dan Harkins
+%Q Internet Engineering Task Force
+%T The Internet Key Exchange (IKE)
+%R RFC 2409
+%D November 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2409.txt
+
+%L RFC 2434
+%A Thomas Narten
+%A Herald Tveit Alvestrand
+%E Thomas Narten
+%Q Internet Engineering Task Force
+%T Guidelines for Writing an IANA Considerations Section in RFCs
+%R RFC 2434
+%D October 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2434.txt
+
+%K rfc2705
+%L RFC 2705
+%R RFC 2705
+%A Mauricio Arango
+%A Andrew Dugan
+%A Isaac Elliott
+%A Christian Huitema
+%A Scott Pickett
+%E Mauricio Arango
+%Q Internet Engineering Task Force
+%T Media Gateway Control Protocol (MGCP) Version 1.0
+%D October 1999
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2705.txt
+
+%K rfc2719
+%L RFC 2719
+%A Lyndon Ong
+%A Ian Rytina
+%A Matt Holdrege
+%A Lode Coene
+%A Miguel-Angel Garcia
+%A Chip Sharp
+%A Imre Juhasz
+%A Huai-an Paul Lin
+%A HannsJuergen Schwarzbauer
+%E Lyndon Ong
+%Q Internet Engineering Task Force
+%T Framework Architecture for Signaling Transport
+%R RFC 2719
+%D October 1999
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2719.txt
+
+%K rfc2805
+%L RFC 2805
+%R RFC 2805
+%A Nancy Greene, et al
+%E Nancy Greene
+%Q Internet Engineering Task Force
+%T Media Gateway Control Protocol Architecture and Requirements
+%D April 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2805.txt
+
+%K rfc2885
+%L RFC 2885
+%R RFC 2885
+%A F. Cuervo, et al
+%E F. Cuervo
+%Q Internet Engineering Task Force
+%T Megaco Protocol Version 0.8
+%D August 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2885.txt
+
+%K rfc2886
+%L RFC 2886
+%R RFC 2886
+%A Tom Taylor
+%E Tom Taylor
+%Q Internet Engineering Task Force
+%T Megaco Errata
+%D August 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2886.txt
+
+%K rfc2897
+%L RFC 2897
+%R RFC 2897
+%A Nancy Greene, et al
+%E Nancy Greene
+%Q Internet Engineering Task Force
+%T Proposal for an MGCP Advanced Audio Package
+%D August 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2897.txt
+
+%L RFC 2916
+%A Patrik Falstrom
+%Q Internet Engineering Task Force
+%T E.164 number and DNS (ENUM)
+%R RFC 2916
+%D September 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2916.txt
+
+%K rfc2959
+%L RFC 2959
+%R RFC 2959
+%A Mark Baugher
+%A Bill Strahm
+%A Irina Suconick
+%E Mark Baugher
+%Q Internet Engineering Task Force
+%T Real-Time Transport Protocol Management Information Base
+%D October 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2959.txt
+
+%K rfc2960
+%L RFC 2960
+%R RFC 2960
+%T Stream Control Transmission Protocol (SCTP)
+%A Randall R. Stewart
+%A Qiaobing Xie
+%A Ken Morneault
+%A Chip Sharp
+%A Hanns Juergen Schwarzbauer
+%A Tom Taylor
+%A Ian Rytina
+%A Hallewar Kalla
+%A Lixia Zhang
+%A Vern Paxson
+%E Randall R. Stewart
+%D October 2000
+%O (Updated by RFC 3309) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2960.txt
+
+%K rfc2976
+%L RFC 2976
+%R RFC 2976
+%A Steve Donovan
+%E Steve Donovan
+%Q Internet Engineering Task Force
+%T The SIP INFO Method
+%D October 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2976.txt
+
+%K preSPIRITS
+%K rfc2995
+%L RFC 2995
+%R RFC 2995
+%A Hui-Lan Lu
+%A Igor Faynberg
+%A John Voelker
+%A Mark Weissman
+%A Weizhong Zhang
+%A Sung-Yurn Rhim
+%A Jinkyung Hwang
+%A Shinji Ago
+%A S. Moeenuddin
+%A S. Hadvani
+%A Soren Nyckelgard
+%A John Yoakum
+%A Lewis Robart
+%E Hui-Lan Lu
+%Q Internet Engineering Task Force
+%T Pre-SPIRITS Implementations of PSTN-initiated Services
+%D November 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2995.txt
+
+%K rfc3015
+%L RFC 3015
+%R RFC 3015
+%A F. Cuervo, et al
+%E F. Cuervo
+%Q Internet Engineering Task Force
+%T Megaco Protocol Version 1.0
+%D November 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3015.txt
+
+%K rfc3054
+%L RFC 3054
+%R RFC 3054
+%A Peter Blatherwick, et al
+%E Peter Blatherwick
+%Q Internet Engineering Task Force
+%T Megaco IP Phone Media Gateway Application Profile
+%D January 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3054.txt
+
+%K rfc4233
+%K IUArfc
+%L RFC 4233
+%R RFC 4233
+%A Ken Morneault
+%A Selvam Rengasami
+%A Melleswar Kalla
+%A Greg Sidebottom
+%E Ken Morneault
+%T Integrated Services Digital Network (ISDN) Q.921-User Adaptation Layer
+%D January 2006
+%I The Internet Society
+%O (Obsoletes RFC 3057)
+%U http://www.ietf.org/rfc/rfc4233.txt
+
+%K rfc3057
+%L RFC 3057
+%R RFC 3057
+%A Ken Morneault
+%A Selvam Rengasami
+%A Melleswar Kalla
+%A Greg Sidebottom
+%E Ken Morneault
+%Q Internet Engineering Task Force
+%T ISDN Q.921-User Adaptation Layer
+%R RFC 3057
+%D November 2000
+%I The Internet Society
+%O (Obsoleted by RFC 4233)
+%U http://www.ietf.org/rfc/rfc3057.txt
+
+%K rfc3064
+%L RFC 3064
+%R RFC 3064
+%A B. Foster, et al
+%E B. Foster
+%Q Internet Engineering Task Force
+%T MCGP CAS Package
+%D February 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3064.txt
+
+%K tali
+%K rfc3094
+%L RFC 3094
+%R RFC 3094
+%A David Sprague
+%A Dan Brendes
+%A Robby Benedyk
+%A Joe Keller
+%E David Sprague
+%Q Internet Engineering Task Force
+%T Tekelec's Transport Adapter Layer Interface
+%D April 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3094.txt
+
+%K rfc3136
+%L RFC 3136
+%R RFC 3136
+%A Lev Slutsman
+%A Igor Faynberg
+%A Mark Weissman
+%E Lev Slutsman
+%Q Internet Engineering Task Force
+%T The SPIRITS Architecture
+%D June 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3136.txt
+
+%K rfc3149
+%L RFC 3149
+%R RFC 3149
+%A A. Srinath, et al
+%E A. Srinath
+%Q Internet Engineering Task Force
+%T MGCP Business Phone Package
+%D September 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3149.txt
+
+%K rfc3158
+%L RFC 3158
+%R RFC 3158
+%A Colin Perkins
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%E Colin Perkins
+%Q Internet Engineering Task Force
+%T RTP Testing Strategies
+%D August 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3158.txt
+
+%K rfc3168
+%L RFC 3168
+%R RFC 3168
+%T The Addition of Explicit Congestion Notification (ECN) to IP
+%A K. K. Ramakrishnan
+%A Sally Floyd
+%A David L. Black
+%E K. K. Ramakrishnan
+%D September 2001
+%O (Obsoletes RFC 2481) (Updates RFC 2474, RFC 2401, RFC 793) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3168.txt
+
+%K rfc3199
+%L RFC 3199
+%R RFC 3199
+%E Igor Faynberg
+%A Igor Faynberg
+%A Jorge Gato
+%A Hui-Lan Lu
+%A Lev Slutsman
+%Q Internet Engineering Task Force
+%T Service in the Public Switched Telephone Newtork/Intelligent Network (PSTN/IN) Requesting %InTernet Service (SPIRITS) Protocol Requirements
+%D August 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3199.txt
+
+%K rfc3204
+%L RFC 3204
+%R RFC 3204
+%A Eric Zimmerer
+%A Aparna Vemuri
+%A Jon Peterson
+%A Lyndon Ong
+%A Francois Audet
+%A Ho Zonoun
+%A M. Watson
+%E Eric Zimmerer
+%T MIME Media Types for ISUP and QSIG Objects
+%D December 2001
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3204.txt
+
+%K rfc3257
+%L RFC 3257
+%R RFC 3257
+%T Stream Control Transmission Protocol Applicability Statement
+%A L. Coene
+%D April 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3257.txt
+
+%K rfc3260
+%L RFC 3260
+%R RFC 3260
+%T New Terminology and Clarifications for Diffserv
+%E D. Grossman
+%D April 2002
+%O (Updates RFC 2474, RFC 2475, RFC 2597) (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3260.txt
+
+%K rfc3261
+%K siprfc
+%L RFC 3261
+%R RFC 3261
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%A Gonzalo Camarillo
+%A Alan Johnston
+%A Jon Peterson
+%A Robert Sparks
+%A Mark Handley
+%A Eve Schooler
+%E Jonathan Rosenberg
+%Q Internet Engineering Task Force
+%T SIP: Session Initiation Protocol
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3261.txt
+
+%K rfc3262
+%L RFC 3262
+%R RFC 3262
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%E Jonathan Rosenberg
+%Q Internet Engineering Task Force
+%T Reliability of Provisional Responses in the Session Initiation Protocol (SIP)
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3262.txt
+
+%K rfc3263
+%L RFC 3263
+%R RFC 3263
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%E Jonathan Rosenberg
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol (SIP): Locating SIP Servers
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3263.txt
+
+%K rfc3265
+%L RFC 3265
+%R RFC 3265
+%A Adam Roach
+%E Adam Roach
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol (SIP)-Specific Event Notification
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3265.txt
+
+%K rfc3267
+%L RFC 3267
+%R RFC 3267
+%A Johan Sjoberg
+%A Magnus Westerlund
+%A Ari Lakaniemi
+%A Qiaobing Xie
+%E Johan Sjoberg
+%Q Internet Engineering Task Force
+%T Real-Time Transport Protocol (RTP) Payload Format and File Storage Format for the Adaptive Multi-Rate (AMR) and Adaptive Multi-Rate Wideband (AMR-WB) Audio Codecs
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3267.txt
+
+%K rfc3286
+%L RFC 3286
+%R RFC 3286
+%T An Introduction to the Stream Control Transmission Protocol (SCTP)
+%A L. Ong
+%A J. Yoakum
+%D May 2002
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3286.txt
+
+%k rfc3309
+%L RFC 3309
+%R RFC 3309
+%T Stream Control Transmission Protocol (SCTP) Checksum Change
+%A Jonathan Stone
+%A Randall R. Stewart
+%A Douglas Otis
+%E Jonathan Stone
+%D September 2002
+%O (Updates RFC 2960) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3309.txt
+
+%K rfc3310
+%L RFC 3310
+%R RFC 3310
+%A Aki Niemi
+%A Jari Arkko
+%A Vesa Torvinen
+%E Aki Niemi
+%Q Internet Engineering Task Force
+%T Hypertext Transfer Protocol (HTTP) Digest Authentication Using Authentication and Key Agreement (AKA)
+%D September 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3310.txt
+
+%K rfc3311
+%L RFC 3311
+%R RFC 3311
+%A Jonathan Rosenberg
+%E Jonathan Rosenberg
+%Q Internet Engineering Task Force
+%T The Session Initiation Protocol UPDATE Method
+%D September 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3311.txt
+
+%K rfc3312
+%L RFC 3312
+%R RFC 3312
+%A Gonzalo Camarillo
+%A Bill Marshall
+%A Jonathan Rosenberg
+%E Gonzalo Camarillo
+%Q Internet Engineering Task Force
+%T Integration of Resource Management and Session Initiation Protocol (SIP)
+%D October 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3312.txt
+
+%K rfc3313
+%L RFC 3313
+%R RFC 3313
+%A Bill Marshall
+%E Bill Marshall
+%Q Internet Engineering Task Force
+%T Privacy Session Initiation Protocol (SIP) Extensions for Media Authorization
+%D January 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3313.txt
+
+%K rfc3323
+%L RFC 3323
+%R RFC 3323
+%A Jon Peterson
+%E Jon Peterson
+%Q Internet Engineering Task Force
+%T A Privacy Mechanism for the Session Initiation Protocol (SIP)
+%D November 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3323.txt
+
+%K rfc3325
+%L RFC 3325
+%R RFC 3325
+%A Cullen Jennings
+%A Jon Peterson
+%A Mark Watson
+%E Cullen Jennings
+%Q Internet Engineering Task Force
+%T Privacy Extensions to the Session Initiation Protocol (SIP) for Asserted Identity with Trusted Networks
+%D November 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3325.txt
+
+%K rfc3326
+%L RFC 3326
+%R RFC 3326
+%A Henning Schulzrinne
+%A David R. Oran
+%A Gonzalo Camarillo
+%E Henning Schulzrinne
+%Q Internet Engineering Task Force
+%T The Reason Header Field for the Session Initiation Protocol (SIP)
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3326.txt
+
+%K rfc3327
+%L RFC 3327
+%R RFC 3327
+%A Dean Willis
+%A Bernie Hoeneisen
+%E Dean Willis
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol (SIP) Extension Header Field for Registering Non-Adjacent Contacts
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3327.txt
+
+%K rfc3329
+%L RFC 3329
+%R RFC 3329
+%A Jari Arkko
+%A Vesa Torvinen
+%A Gonzalo Camarillo
+%A Aki Niemi
+%A Tao Haukka
+%E Jari Arkko
+%Q Internet Engineering Task Force
+%T Security Mechansim Agreement for the Session Initiation Protocol (SIP)
+%D January 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3329.txt
+
+%K M2UA-RFC
+%L M2UA
+%A Ken Morneault
+%A Ram Dantu
+%A Greg Sidebottom
+%A Brian Bidulock
+%A Jacob Heitz
+%E Ken Morneault
+%Q Internet Engineering Task Force
+%T Signaling System 7 (SS7) Message Transfer Part 2 (MTP2) \(em User Adaptation Layer
+%R RFC 3331
+%D September 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3331.txt
+
+%K M3UA-RFC
+%L M3UA
+%A Greg Sidebottom
+%A Ken Morneault
+%A Javier Pastor-Balbas, (eds)
+%Q Internet Engineering Task Force
+%T Signaling System 7 (SS7) Message Transfer Part 3 (MTP3) \(em User Adaptation Layer (M3UA)
+%R RFC 3332
+%D September 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3332.txt
+
+%K rfc3361
+%L RFC 3361
+%R RFC 3361
+%A Henning Schulzrinne
+%E Henning Schulzrinne
+%Q Internet Engineering Task Force
+%T Dynamic Host Configuration Protocol (DHCP-for-IPv4) Option for Session Initiation Protocol (SIP) Servers
+%D August 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3361.txt
+
+%K SIPT-RFC
+%K rfc3372
+%K bcp63
+%L BCP 63
+%R BCP 63/RFC 3372
+%A Aparna Vemuri
+%A Jon Peterson
+%E Aparna Vemuri
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol for Telephones (SIP-T): Context and Architectures
+%D September 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/bcp/bcp63.txt
+
+%K rfc3398
+%L RFC 3398
+%R RFC 3398
+%A Gonzalo Camarillo
+%A Adam Roach
+%A Jon Peterson
+%A Lyndon Ong
+%E Gonzalo Camarillo
+%Q Internet Engineering Task Force
+%T Integrated Services Digital Network (ISDN) User Part (ISUP) to Session Initiation Protocol (SIP) Mapping
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3398.txt
+
+%K rfc3420
+%L RFC 3420
+%R RFC 3420
+%A Robert J. Sparks
+%E Robert J. Sparks
+%Q Internet Engineering Task Force
+%T Internet Media Type message/sipfrag
+%D November 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3420.txt
+
+%K rfc3428
+%L RFC 3428
+%R RFC 3428
+%A Ben Campbell
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%A Christian Huitema
+%A David Gurle
+%E Ben Campbell
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol (SIP) Extension for Instant Messaging
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3428.txt
+
+%K rfc3435
+%L RFC 3435
+%R RFC 3435
+%A F. Andreasen
+%A B. Foster
+%E F. Andreasen
+%Q Internet Engineering Task Force
+%T Media Gateway Control Protocol (MGCP) Version 1.0
+%D January 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3435.txt
+
+%K rfc3436
+%L RFC 3436
+%R RFC 3436
+%T Transport Layer Security over Stream Control Transmission Protocol
+%A Adreas Jungmaier
+%A Eric Rescorla
+%A Michael Tuexen
+%E Adreas Jungmaier
+%D December 2002
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3436.txt
+
+%K rfc3441
+%L RFC 3441
+%R RFC 3441
+%A R. Kumar
+%E R. Kumar
+%Q Internet Engineering Task Force
+%T Asynchronous Transfer Mode (ATM) Package for the Media Gateway Control Protocol (MGCP)
+%D January 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3441.txt
+
+%K rfc3515
+%L RFC 3515
+%R RFC 3515
+%A Robert J. Sparks
+%E Robert J. Sparks
+%Q Internet Engineering Task Force
+%T The Session Initiation Protocol (SIP) Refer Method
+%D April 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3515.txt
+
+%K rfc3525
+%L RFC 3525
+%R RFC 3525
+%A Terry L. Anderson
+%A Christian Groves
+%A Marcello Pantaleo
+%A Tom Taylor
+%E Tom Taylor
+%T Gateway Control Protocol Version 1
+%D June 2003
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3525.txt
+
+%K rfc3554
+%L RFC 3554
+%R RFC 3554
+%T On the Use of Stream Control Transmission Protocol (SCTP) wih IPsec
+%A S. Bellovin
+%A J. Ioannidis
+%A A. Keromytis
+%A R. Stewart
+%E S. Bellovin
+%D July 2003
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3554.txt
+
+%K rfc3666
+%K bcp76
+%L BCP 76
+%R BCP 76/RFC 3666
+%A Alan Johnston
+%A Steve Donovan
+%A Robert Sparks
+%A Chris Cunningham
+%A Kevin Summers
+%E Alan Johnston
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol (SIP) Public Switched Telephone Network (PSTN) Call Flows
+%D December 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/bcp/bcp76.txt
+
+%K rfc3708
+%L RFC 3708
+%R RFC 3708
+%T Using TCP Duplicate Selective Acknowledgement (DSACKs) and Stream Control Transmission Protocol (SCTP) Duplicat Transmission Sequence Numbers (TSNs) to Detect Spurious Retransmissions
+%A E. Blanton
+%A M. Allman
+%D February 2004
+%O (Status: EXPERIMENTAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3708.txt
+
+%K rfc3758
+%L RFC 3758
+%R RFC 3758
+%T Stream Control Transmission Protocol (SCTP) Partial Reliability Extension
+%A Randall R. Stewart
+%A Michael A. Ramalho
+%A Qiaobing Xie
+%A Michael Tuexen
+%A Phillip T. Conrad
+%E Randall R. Stewart
+%D May 2004
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3758.txt
+
+%K V5UA-RFC
+%K rfc3807
+%L V5UA
+%A Eva Weilandt
+%A Neeraj Khanchandani
+%A Sanjay Rao
+%Q Internet Engineering Task Force
+%T V5.2-User Adaption Layer (V5UA)
+%R RFC 3807
+%D June 2004
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3807.txt
+%O (Updates RFC 3057)
+
+%K SUA-RFC
+%K rfc3868
+%L SUA
+%A John Loughney
+%A Greg Sidebottom
+%A Lode Coene
+%A Gery Verwimp
+%A Joe Keller
+%A Brian Bidulock
+%E John Loughney
+%Q Internet Engineering Task Force
+%T Signalling Connection Control Part User Adaptation Layer (SUA)
+%R RFC 3868
+%D  October 2004
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3868.txt
+
+%K SCTP-MIB
+%K rfc3873
+%L RFC 3873
+%R RFC 3873
+%T Stream Control Transmission Protocol (SCTP) Mangement Information Base (MIB)
+%A J. Pastor
+%A M. Belinchon
+%D September 2004
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3873.txt
+
+%K rfc3910
+%L RFC 3910
+%R RFC 3910
+%E Vijay K. Gurbani
+%A Vijay K. Gurbani
+%A Alec Brusilovsky
+%A Igor Faynberg
+%A Jorge Gato
+%A Hui-Lan Lu
+%A Musa Unmehopa
+%Q Internet Engineering Task Force
+%T The SPIRITS (Services in PSTN requesting Internet Services) Protocol
+%D October 2004
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3910.txt
+
+%K rfc4138
+%L RFC 4138
+%R RFC 4138
+%T Forward RTO-Recovery (F-RTO); An Algorithm for Detecting Spurious Retransmission Timeouts with TCP and the Stream Control Transmission Protocol (SCTP)
+%A P. Sarolahti
+%A M. Kojo
+%D August 2005
+%O (Status: EXPERIMENTAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4138.txt
+
+%K rfc4166
+%L RFC 4166
+%R RFC 4166
+%T Telephony Signalling Transport over Stream Control Transmission Protoocl (SCTP) Applicability Statement
+%A L. Coene
+%A J. Pastor-Balbas
+%D February 2006
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4166.txt
+
+%K rfc4168
+%L RFC 4168
+%R RFC 4168
+%T The Stream Control Transmission Protocol (SCTP) as a Transport for the Session Initiation Protocol (SIP)
+%A J. Rosenberg
+%A H. Schulzrinne
+%A G. Camarillo
+%D October 2005
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4168.txt
+
+%K rfc4460
+%L RFC 4460
+%R RFC 4460
+%T Stream Control Transmission Protocol (SCTP) Specification Errata and Issues
+%A R. Stewart
+%A I. Aria-Rodriguez
+%A K. Poon
+%A A. Caro
+%A M. Tuexen
+%D April 2006
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4460.txt
+
+%K streamio
+%Q AT&T Bell Laboratories
+%A Dennis M. Ritchie
+%J AT&T Bell Laboratories Technical Journal
+%T A Stream Input-Output System
+%V 63
+%N 8
+%P pp. 1879-1910
+%D October 1984
+%I AT&T
+%C New Jersey
+

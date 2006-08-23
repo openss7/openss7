@@ -1,0 +1,362 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: check_libs,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/05/23 22:43:38 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/05/23 22:43:38 $ by $Author: brian $
+#
+# =============================================================================
+
+me=`basename $0`
+errors=0
+warnings=0
+
+exec 5>>$top_builddir/$me.log
+
+export -p >&5
+
+function echo_v()
+{
+	echo "$me:  : $1"
+}
+function echo_t()
+{
+	echo "$me: T: $1"
+}
+function echo_s()
+{
+	case :"${MAINTAINER_MODE:-no}" in
+	(:verbose|:continue) echo "$me: S: $1" ;;
+	esac
+	echo "$me:$2: S: $1" >&5
+}
+function echo_d()
+{
+	echo "$me:$2: D: $1" >&5
+}
+function echo_e()
+{
+	echo "$me: E: --- $1" >&2
+	echo "$me:$2: E: $1" >&5
+	((errors++))
+}
+function echo_w()
+{
+#	if test :"${MAINTAINER_MODE:-no}" != :no ; then
+		echo "$me: W: --- $1" >&2
+#	fi
+	echo "$me:$2: W: $1" >&5
+	((warnings++))
+}
+function echo_fls()
+{
+	echo_s "$3" "$4"
+}
+function echo_flw()
+{
+	echo "$1:$2: warning: $3" >&2
+	echo "$me:$4: W: $3" >&5
+	((warnings++))
+}
+function echo_fle()
+{
+	echo "$1:$2: error: $3" >&2
+	echo "$me:$4: E: $3" >&5
+	((errors++))
+}
+
+export -p | while read line
+do
+	echo_d "$line" $LINENO
+done
+
+if test :"${MAINTAINER_MODE:-no}" != :no
+then
+	if test -n "$PKG_MANPATH" ; then
+		manpath="$PKG_MANPATH"
+	else
+		manpath="${top_builddir}/doc/man:${top_builddir}/man:${top_builddir}:./doc/man:./man:.${mandir:+:${mandir}}"
+	fi
+	srcpath="${top_srcdir}/doc/man:${top_srcdir}/man:${top_srcdir}:${srcdir}/doc/man:${srcdir}/man:${srcdir}${mandir:+:$mandir}"
+	searchpath=`echo "$manpath" | sed -e 's|:| |g'`
+	sourcepath=`echo "$srcpath" | sed -e 's|:| |g'`
+	#
+	# Check for manual pages corresponding to the library names so that we are sure that each
+	# module or drier has some high level documentation.
+	#
+	echo_v "testing for manual pages for libraries"
+	for lib in $lib_LTLIBRARIES
+	do
+		myname=`echo $lib | sed -e 's|\.la$||;s|\.a$||;s|\.so$||'`
+		mcname=`echo $myname | sed -e 's|[^_[:alnum:]]|_|g'`
+		nlname=`echo $mcname | sed -e 's|^lib||'`
+		ucname=`echo $mcname | sed -e 'y|abcdefghijklmnopqrstuvwxyz|ABCDEFGHIJKLMNOPQRSTUVWXYZ|'`
+		ulname=`echo $nlname | sed -e 'y|abcdefghijklmnopqrstuvwxyz|ABCDEFGHIJKLMNOPQRSTUVWXYZ|'`
+		sections="3"
+		string="$mcname, $ucname, $nlname or $ulname in section $sections"
+		echo_t "testing for $string"
+		# look for it in section 3
+		found=no
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/$mcname.${n} man${n}/$ucname.${n} man${n}/$nlname.${n} man${n}/$ulname.${n}" ; done
+		for page in $list ; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				files=`ls $dir/$page* 2>/dev/null`
+				for file in $files ; do
+					if test -f $file ; then
+						echo_s "manual page $file exists" $LINENO
+						dirmask=`echo $dir | sed -e's|.|.|g'`
+						page=`echo $file | sed -e 's|^'$dirmask'/||'`
+						echo "$page" >> ${top_builddir}/check_used.log
+						found=yes
+					fi
+				done
+			done
+		done
+		if test :$found = :yes ; then
+			echo_s "found $string" $LINENO
+		else
+			for page in $list; do
+				for dir in $sourcepath ; do
+					test -d $dir || continue
+					files=`ls $dir/$page*.man` 2>/dev/null
+					for file in $files ; do
+						if test -f $file ; then
+							echo_w "manual source page for $mcname, $file exists" $LINENO
+						fi
+					done
+				done
+			done
+			echo_e "cannot find $string" $LINENO
+		fi
+	done
+	#
+	# Generating symbols
+	#
+	echo_v "generating exported symbols"
+	rm -f Libraries.map
+	libs=
+	for lib in $lib_LTLIBRARIES
+	do
+		echo_t "generating exported symbols for library $lib"
+		l=`basename $lib`
+		l=.libs/`echo $l | sed -e 's|\.la$|.a|'`
+		if test -e $l
+		then :
+		else
+			echo_e "cannot find library $l" $LINENO
+			continue
+		fi
+		echo_v "creating symbol map for $l"
+		echo_d "nm -s $l | egrep -- '\<B\>|\<D\>|\<T\>|\<W\>' >> Libraries.map" $LINENO
+		nm -s $l | egrep -- '\<B\>|\<D\>|\<T\>|\<W\>' | tee -a Libraries.map \
+			| while read line ; do echo_d "$line" $LINENO ; done
+	done
+	if test -f ${top_builddir}/check_ctags.log
+	then
+		#
+		# Generate lists of prototypes and external variables
+		#
+		echo_v "generating lists of prototypes and external variables"
+		functions=
+		prototypes=
+		externvars=
+		while read -a tokens
+		do
+			case ${tokens[1]} in
+			(function)  functions="${functions:+$functions }${tokens[0]}" ;;
+			(prototype) prototypes="${prototypes:+$prototypes }${tokens[0]}" ;;
+			(externvar) externvars="${externvars:+$externvars }${tokens[0]}" ;;
+			(*)	    continue ;;
+			esac
+		done < ${top_builddir}/check_ctags.log
+		echo_d "functions: $functions"
+		echo_d "prototypes: $prototypes"
+		echo_d "externvars: $externvars"
+		#
+		# Check that each exported symbol has a function, prototype or externvar
+		#
+		echo_t "testing exported symbols for declarations"
+		while read -a tokens
+		do
+			case ${tokens[2]} in
+			(_*)	on_error='echo_w' ;;
+			(*)	case ${tokens[1]} in
+				(B|D|T)	on_error='echo_e' ;;
+				(W)	on_error='echo_w' ;;
+				(*)	continue ;;
+				esac
+			esac
+			echo_t "testing ${tokens[1]} symbol ${tokens[2]} for declaration"
+			case ${tokens[1]} in
+			(B|D)	case " $externvars " in
+				(*" ${tokens[2]} "*)
+					echo_s "symbol ${tokens[1]} ${tokens[2]} has externvar" $LINENO
+					echo "${tokens[2]}" >> ${top_builddir}/check_symbols.log
+					;;
+				(*)
+					eval "$on_error \"symbol \${tokens[1]} \${tokens[2]} has no externvar\" \$LINENO" ;;
+				esac
+				;;
+			(T)	case " $functions $prototypes " in
+				(*" ${tokens[2]} "*)
+					echo_s "symbol ${tokens[1]} ${tokens[2]} has function or prototype" $LINENO
+					echo "${tokens[2]}" >> ${top_builddir}/check_symbols.log
+					;;
+				(*)
+					eval "$on_error \"symbol \${tokens[1]} \${tokens[2]} has no function or prototype\" \$LINENO" ;;
+				esac
+				;;
+			(W)	case " $externvars $functions $prototypes " in
+				(*" ${tokens[2]} "*)
+					echo_s "symbol ${tokens[1]} ${tokens[2]} has declaration" $LINENO
+					echo "${tokens[2]}" >> ${top_builddir}/check_symbols.log
+					;;
+				(*)
+					eval "$on_error \"symbol \${tokens[1]} \${tokens[2]} has no declaration\" \$LINENO" ;;
+				esac
+				;;
+			(*)	continue ;;
+			esac
+		done <Libraries.map
+	fi
+	#
+	# Check for manual pages for exported symbols.
+	#
+	echo_v "testing for manual pages for exported symbols"
+	while read -a tokens
+	do
+		symbol="${tokens[2]}"
+		sections="2 3"
+		string="$symbol in sections $sections"
+		echo_t "testing for $string"
+		case $symbol in
+		(_*)	on_error='echo_w' ;;
+		(*)	case ${tokens[1]} in
+			(B|D|T)	on_error='echo_e' ;;
+			(W)	on_error='echo_w' ;;
+			(*)	continue ;;
+			esac
+		esac
+		# just find it
+		found=no
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/$symbol.${n}" ; done
+		for page in $list ; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				files=`ls $dir/$page* 2>/dev/null`
+				for file in $files ; do
+					if test -f $file ; then
+						echo_s "manual page $file exists" $LINENO
+						dirmask=`echo $dir | sed -e's|.|.|g'`
+						page=`echo $file | sed -e 's|^'$dirmask'/||'`
+						echo "$page" >> ${top_builddir}/check_used.log
+						found=yes
+					fi
+				done
+			done
+		done
+		if test :$found = :yes ; then
+			echo_s "found $string" $LINENO
+		else
+			for page in $list; do
+				for dir in $sourcepath ; do
+					test -d $dir || continue
+					files=`ls $dir/$page*.man 2>/dev/null`
+					for file in $files ; do
+						if test -f $file ; then
+							echo_w "manual source page for $symbol, $file exists" $LINENO
+						fi
+					done
+				done
+			done
+			eval "$on_error \"cannot find \$string\" \$LINENO"
+		fi
+#		echo_d "man -aw -M $manpath -S 2:3 $symbol 2>&1" $LINENO
+#		if result=`man -aw -M $manpath -S 2:3 $symbol 2>&1`
+#		then
+#			echo "$result" | while read line
+#			do
+#				echo_s "$line" $LINENO
+#			done
+#		else
+#			echo_e "$result" $LINENO
+#		fi
+	done <Libraries.map
+	rm -f Libraries.map
+else
+	echo_d "skipping test" $LINENO
+	exit 77
+fi
+
+retval=0
+if test $warnings -gt 0
+then
+	echo_v "--------------"
+	echo_v "Warning summary:"
+	echo_v "--------------"
+	egrep -- '\<W:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	retval=77
+fi
+if test $errors -gt 0
+then
+	echo_v "--------------"
+	echo_v "Error summary:"
+	echo_v "--------------"
+	egrep -- '\<E:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	if test :"${MAINTAINER_MODE:-no}" = :continue
+	then
+		retval=77
+	else
+		retval=1
+	fi
+fi
+
+exit $retval
