@@ -70,8 +70,6 @@
 * OpenSS7 SCTP: (@value{PACKAGE_TARNAME}).	An Open Linux SCTP Package.
 @end direntry
 
-@defindex op
-
 @include texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE Installation and Reference Manual
@@ -80,7 +78,7 @@
 @ifinfo
 This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
 
-This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of the
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of the
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
@@ -123,7 +121,7 @@ another language, under the above conditions for modified versions.
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
-@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@subtitle Package @value{PACKAGE}-@value{VERSION}
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
@@ -142,7 +140,7 @@ Canada @*
 
 @noindent
 This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
-documentation, and is consistent with @value{PACKAGE_TARNAME} @value{PACKAGE_VERSION}.
+documentation, and is consistent with @value{PACKAGE_NAME} @value{PACKAGE_VERSION}.
 This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
 Project} and was funded in part by
 @uref{http://www.openss7.com/, OpenSS7 Corporation}.
@@ -172,9 +170,6 @@ another language, under the same conditions as for modified versions.
 @c Define an index of makefile targets
 @defcodeindex mk
 
-@c Define an index of manual pages
-@defindex mp
-
 @c Define an index of configure output variables.
 @c @defcodeindex ov
 
@@ -182,7 +177,7 @@ another language, under the same conditions as for modified versions.
 @c @defcodeindex cv
 
 @c Define an index of options.
-@c @defcodeindex op
+@defcodeindex op
 
 @c Define an index of targets.
 @c @defcodeindex tr
@@ -201,21 +196,25 @@ another language, under the same conditions as for modified versions.
 @c @syncodeindex tr cp
 @c @syncodeindex cm cp
 
+@c An index of manual pages
+@defcodeindex mp
+
 @include texi/macros.texi
 
 @ifnottex
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @unnumbered About This Manual
-This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of @cite{The
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of @cite{The
 @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @end ifnottex
 
 @menu
-* Acknowledgments::		Sponsors and Contributors
-
+* Acknowledgements::		Sponsors and Contributors
+* Preface::			Preface to this document
 * Introduction::		Introduction to the package
+* Objective::			Objective of the package
 * Reference::			Contents of the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
@@ -230,7 +229,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
  ----- detailed node listing -----
 
-Acknowledgments
+Acknowledgements
 
 * Sponsors::			Sponsors of the package
 * Contributors::		People who contributed to the development of
@@ -260,6 +259,7 @@ Releases
 * Maturity::			Package Maturity
 * Bugs::			Package Defects
 * Schedule::			Development and Bug Fix Schedule
+* History::			Project History
 
 Installation
 
@@ -285,69 +285,194 @@ Indices
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
 * Makefile Target Index::	Index of Makefile Targets
-* Manual Page Index::		Index of Manual Pages
 * Author Index::		Index of Authors
+* Manual Page Index::		Index of Manual Pages
 @end menu
 
 @c --------------------------------------------------------------------------
 
-@node Acknowledgments
-@unnumbered Acknowledgments
+@node Acknowledgements
+@unnumbered Acknowledgements
 @cindex credits
 
 @include texi/funding.texi
 
-@ignore
-As with most open source projects, this project would not have been possible
-without the valiant efforts and productive software of the @cite{Free Software
-Foundation} and the @cite{Linux Kernel Community}.
+@c --------------------------------------------------------------------------
 
-@menu
-* Sponsors::			Sponsors
-* Contributors::		Contributors
-@end menu
+@node Preface
+@unnumbered Preface
 
-@node Sponsors
-@unnumberedsec Sponsors
-@cindex sponsors
+@section Document Information
+@cindex document information
 
-Funding for completion of the @value{PACKAGE_TITLE} package was provided in
-part by:
+@subsection Notice
+@cindex document notice
+@cindex licensing
 
-@itemize
-@item Lockheed Martin
-@item Performance Technologies
-@item Motorola
-@item HOB International
-@item Comverse
-@item Sonus Networks
-@end itemize
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+Please note, however, that there are different licensing terms for the manual pages and some of the
+documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.} publications
+and other sources).  Consult the permission notices contained in the documentation for more
+information.
 
-@node Contributors
-@unnumberedsec Contributors
-@cindex contributors
+This document, is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+sections invariant.
 
-The primary contributor to the @value{PACKAGE_TITLE} package is
-@email{bidulock@@openss7.org, Brian F. G. Bidulock}.  The following is a list
-of significant contributors to the project:
+@subsection Abstract
+@cindex document abstract
 
-@itemize
-@item Per Berquist
-@item John Boyd
-@item Chuck Winters
-@item Peter Courtney
-@item Tom Chandler
-@item Gurol Akman
-@item Others
-@end itemize
-@end ignore
+This document provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
+
+@subsection Objective
+@cindex document objective
+
+The objective of this document is to provide a guide for the @dfn{STREAMS} programmer when
+developing @dfn{STREAMS} modules, drivers and application programs for @cite{@value{PACKAGE_TITLE}}.
+
+This guide provides information to developers on the use of the @dfn{STREAMS} mechanism at user and
+kernel levels.
+
+@dfn{STREAMS} was incorporated in UNIX System V Release 3 to augment the character input/output
+(I/O) mechanism and to support development of communication services.
+
+@dfn{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
+that expedite software design and implementation.
+
+@subsection Intent
+@cindex document intent
+
+The intent of this document is to act as an introductory guide to the @dfn{STREAMS} programmer.  It
+is intended to be read alone and is not intended to replace or supplement the
+@cite{@value{PACKAGE_TITLE}} manual pages.  For a reference for writing code, the manual pages
+(see @manref{STREAMS(9)}) provide a better reference to the programmer.
+Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package,
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
+system or feature listed herein.
+
+@subsection Audience
+@cindex document audience
+
+This document is intended for a highly technical audience.  The reader should already be familiar
+with @cite{Linux} kernel programming, the @cite{Linux} file system, character devices, driver input
+and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
+locks, etc.
+
+The guide is intended for network and systems programmers, who use the @dfn{STREAMS} mechanism at
+user and kernel levels for @cite{Linux} and @cite{UNIX} system communication services.
+
+Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
+system, programming, networking, and data communication.
+
+@subsection Revisions
+@cindex document revisions
+
+Take care that you are working with a current version of this document: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+A current version of this document is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package.
+
+@subsubsection Version Control
+
+@smallexample
+
+$Log: sctp.texi,v $
+Revision 0.9.2.14  2006-03-29 04:27:45 -0700  brian
+- corrections for rerelease, see ChangeLog
+
+Revision 0.9.2.13  2006-03-22 03:01:59 -0700  brian
+- added makefile target index
+
+Revision 0.9.2.12  2006-03-04 22:51:50 -0700  brian
+- minor updates of some release info for next release
+
+Revision 0.9.2.11  2005-07-08 07:15:51 -0600  brian
+- updates to documentation
+
+Revision 0.9.2.10  2005-06-24 07:38:58 -0600  brian
+- added troubleshooting section to manuals
+
+Revision 0.9.2.9  2005-05-14 02:29:32 -0600  brian
+- copyright header correction
+
+Revision 0.9.2.8  2005-04-12 17:01:41 -0600  brian
+- correct docs
+
+Revision 0.9.2.7  2005-04-12 03:28:55 -0600  brian
+- corrections
+
+Revision 0.9.2.6  2005-03-14 17:56:58 -0700  brian
+- Updated version numbering in texinfo files.
+
+Revision 0.9.2.5  2005-03-14 17:51:55 -0700  brian
+- Updated version numbering in texinfo files.
+
+Revision 0.9.2.4  2005-02-17 13:00:07 -0700  brian
+- Fixes for texi documentation.
+
+Revision 0.9.2.3  2005-01-24 04:57:59 -0700  brian
+- Updated texinfo headers.
+
+Revision 0.9.2.2  2004-12-21 15:20:24 -0700  brian
+- Some corrections.
+
+Revision 0.9.2.1  2004-12-20 03:18:19 -0700  brian
+- Big start on autoconf release of Linux Native SCTP.
+
+Revision 0.9  1996-12-31 17:00:00 -0700  brian
+*** empty log message ***
+
+@end smallexample
+
+@subsubsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed,
+postscript or portable document format) version of this document is an @strong{UNCONTROLLED
+VERSION}.
+
+@subsection Disclaimer
+@cindex document disclaimer
+
+@noindent
+@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect, special or
+consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether
+in an action of contract, negligence or other tortious action, arising out of or in connection with
+any use of this document or the performance or implementation of the contents thereof.
+
+@noindent
+@cite{OpenSS7 Corporation} reserves the right to revise this software and documentation for any
+reason, including but not limited to, conformity with standards promulgated by various agencies,
+utilization of advances in the state of the technical arts, or the reflection of changes in the
+design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
+Corporation} is under no obligation to provide any feature listed herein.
+
+@subsubsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Acquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to
+the FAR (or any successor regulations).
+
+@c --------------------------------------------------------------------------
 
 @node Introduction
 @chapter Introduction
 @cindex introduction
 
-This manual documents the design, implementation, installation, operation and
-future development schedule of the @value{PACKAGE_TITLE} package.
+This manual documents the design, implementation, installation, operation and future development
+schedule of the @cite{@value{PACKAGE_TITLE}} package.
 
 @c ----------------------------------------------------------------------------
 
@@ -361,19 +486,22 @@ future development schedule of the @value{PACKAGE_TITLE} package.
 @node Notice
 @section Notice
 @cindex notice
-
 @cindex licensing
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
-General Public License}).  Consult the permission notices contained in the code and documentation
-for more information.  This document, is released under the @cite{GNU Free Documentation License}
-(@pxref{FDL}) with all sections invariant.
+
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+Please note, however, that there are different licensing terms for the manual pages and some of the
+documentation (derived from X/Open publications and other sources).  Consult the permission notices
+contained in the documentation for more information.
+
+This manual is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+sections invariant.
 
 @node Overview
 @section Overview
 @cindex overview
 
 This manual documents the design, implementation, installation, operation and future development of
-the @value{PACKAGE_TITLE} package.
+the @cite{@value{PACKAGE_TITLE}} package.
 
 The @value{PACKAGE_TITLE} package is an Open Linux SCTP package for Linux.  It includes development
 tools, header files and manual pages for SCTP.
@@ -383,10 +511,10 @@ modules and drivers and provides a fundamental set of header files and manual pa
 development.
 
 @node Organization
-@section Organization of this Document
+@section Organization of this Manual
 @cindex organization
 
-This document is organized (loosely) into several sections as follows:
+This manual is organized (loosely) into several sections as follows:
 
 @ifnottex
 @menu
@@ -402,6 +530,8 @@ This document is organized (loosely) into several sections as follows:
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
+@item @ref{Objective}.
+@tab Objective of the package
 @item @ref{Reference}.
 @tab Contents of the package
 @item @ref{Conformance}.
@@ -414,6 +544,24 @@ This document is organized (loosely) into several sections as follows:
 @tab Troubleshooting of the package
 @end multitable
 @end iftex
+@ifinfo
+@multitable @columnfractions .50 .50
+@item @ref{Introduction}.
+@tab This introduction
+@item @ref{Objective}.
+@tab Objective of the package
+@item @ref{Reference}.
+@tab Contents of the package
+@item @ref{Conformance}.
+@tab Conformance of the package
+@item @ref{Releases}.
+@tab Releases of the package
+@item @ref{Installation}.
+@tab Installation of the package
+@item @ref{Troubleshooting}.
+@tab Troubleshooting of the package
+@end multitable
+@end ifinfo
 
 @node Conventions
 @section Conventions and Definitions
@@ -422,6 +570,14 @@ This document is organized (loosely) into several sections as follows:
 
 This manual uses @cite{texinfo} typographic conventions.
 
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Objective
+@chapter Objective
+@cindex objective
+
+@c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Reference
@@ -632,8 +788,11 @@ programs that use the @file{sctp} kernel module.
 @c ----------------------------------------------------------------------------
 @include texi/fdl.texi
 
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
 @node Indices
-@appendix Indices
+@unnumbered Indices
 @cindex indices
 
 @c ----------------------------------------------------------------------------
@@ -645,33 +804,40 @@ programs that use the @file{sctp} kernel module.
 * Variable Index::		Index of Variables and Constants
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
-* Makefile Target Index::	Index of Makefile Targets
-* Manual Page Index::		Index of Manual Pages
 * Author Index::		Index of Authors
+* Makefile Target Index::	Index of Makefile Targets
+* Manual Page Index::		Index of Manual Pages Referenced
 @end menu
 
+@c ----------------------------------------------------------------------------
+
 @node Concept Index
-@appendixsec Index of Concepts
+@unnumberedsec Index of Concepts
 @printindex cp
 
+@page
 @node Type Index
-@appendixsec Index of Data Types
+@unnumberedsec Index of Data Types
 @printindex tp
 
+@page
 @node Function Index
-@appendixsec Index of Functions and Macros
+@unnumberedsec Index of Functions and Macros
 @printindex fn
 
+@page
 @node Variable Index
-@appendixsec Index of Variables and Constants
+@unnumberedsec Index of Variables and Constants
 @printindex vr
 
+@page
 @node File Index
-@appendixsec Index of Files and Programs
+@unnumberedsec Index of Files and Programs
 @printindex pg
 
+@page
 @node Option Index
-@appendixsec Index of Configuration Options
+@unnumberedsec Index of Configuration Options
 @printindex op
 
 @page
@@ -680,13 +846,14 @@ programs that use the @file{sctp} kernel module.
 @printindex mk
 
 @page
-@node Manual Page Index
-@unnumberedsec Index of Manual Pages
-@printindex mp
-
 @node Author Index
-@appendixsec Index of Authors
+@unnumberedsec Index of Authors
 @printindex au
+
+@page
+@node Manual Page Index
+@unnumberedsec Index of Manual Pages Referenced
+@printindex mp
 
 @c ----------------------------------------------------------------------------
 

@@ -17,7 +17,7 @@
 % Permission is granted to copy and distribute modified versions of this
 % manual under the conditions for verbatim copying, provided that the
 % entire resulting derived work is distributed under the terms of a
-% permission notice identical to this one
+% permission notice identical to this one.
 % 
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -285,6 +285,8 @@ Indices
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
 * Makefile Target Index::	Index of Makefile Targets
+* Author Index::		Index of Authors
+* Manual Page Index::		Index of Manual Pages
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -526,12 +528,13 @@ This manual documents the design, implementation, installation, operation and fu
 the @cite{@value{PACKAGE_TITLE}} package.
 
 The @value{PACKAGE_TITLE} package is
-an implemenetation of the Stream Transmission Control Protocol (SCTP) for Linux as described in RFC 2960 and subsequent RFCs,
+an implementation of the Stream Transmission Control Protocol (SCTP) for Linux as described in RFC 2960 and subsequent RFCs,
 that can be used with
 @cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
 or
 @cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
 It includes development tools, header files and manual pages for
+@value{PACKAGE_TITLE}.
 
 @node Organization
 @section Organization of this Manual
@@ -542,6 +545,7 @@ This manual is organized (loosely) into several sections as follows:
 @ifnottex
 @menu
   Introduction::		This introduction
+* Objective::			Objective of the package
 * Reference::			Contents of the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
@@ -611,7 +615,8 @@ This manual uses @cite{texinfo} typographic conventions.
 * Files::			Files included in the package
 * Drivers::			Drivers included in the package
 * Modules::			Modules included in the package
-* Utilities::			Utilities
+* Libraries::			Libraries included in the package
+* Utilities::			Utilities included in the package
 * Development::			Development against the package
 @end menu
 
