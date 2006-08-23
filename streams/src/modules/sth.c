@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2006/08/16 07:47:32 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2006/08/22 12:36:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:32 $ by $Author: brian $
+ Last Modified $Date: 2006/08/22 12:36:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.164  2006/08/22 12:36:53  brian
+ - udpates to documentation, tweaks to Stream head
+
  Revision 0.9.2.163  2006/08/16 07:47:32  brian
  - added smp_lock.h for SLES
 
@@ -125,10 +128,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2006/08/16 07:47:32 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2006/08/22 12:36:53 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2006/08/16 07:47:32 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2006/08/22 12:36:53 $";
 
 //#define __NO_VERSION__
 
@@ -229,7 +232,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2006/08/16 07:47:32 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2006/08/22 12:36:53 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
