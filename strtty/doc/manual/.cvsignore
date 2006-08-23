@@ -1,9 +1,3 @@
+.*
 Makefile.in
-strtty.info
-strtty.info-1
-strtty.info-2
-strtty.info-3
-strtty.info-4
-strtty.info-5
-strtty.info-6
-strtty.info-7
+*.info*

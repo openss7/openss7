@@ -24,3 +24,5 @@ INSTALL.*
 netperf-2.1.pdf
 netperf-2.1.ps
 *.pr
+*.patch
+*.patch.gz

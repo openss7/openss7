@@ -1,9 +1,3 @@
+.*
 Makefile.in
-strcompat.info
-strcompat.info-1
-strcompat.info-2
-strcompat.info-3
-strcompat.info-4
-strcompat.info-5
-strcompat.info-6
-strcompat.info-7
+*.info*

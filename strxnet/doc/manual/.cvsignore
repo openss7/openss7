@@ -1,12 +1,3 @@
+.*
 Makefile.in
-libxnet.info
-libxnet.info-1
-libxnet.info-2
-libxnet.info-3
-strxnet.info
-strxnet.info-1
-strxnet.info-2
-strxnet.info-3
-strxnet.info-4
-strxnet.info-5
-strxnet.info-6
+*.info*

@@ -22,3 +22,5 @@ config.site
 config.cache
 INSTALL.*
 *.pr
+*.patch
+*.patch.gz

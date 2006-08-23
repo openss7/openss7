@@ -1,9 +1,3 @@
+.*
 Makefile.in
-strutil.info
-strutil.info-1
-strutil.info-2
-strutil.info-3
-strutil.info-4
-strutil.info-5
-strutil.info-6
-strutil.info-7
+*.info*
