@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 1.1.2.1 2006/08/22 12:40:13 brian Exp $
+% @(#) $Id: openss7.texi,v 1.1.2.2 2006/08/23 11:00:17 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/22 12:40:13 $ by $Author: brian $
+% Last Modified $Date: 2006/08/23 11:00:17 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -367,6 +367,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 1.1.2.2  2006/08/23 11:00:17  brian
+- added preface, corrections and updates for release
+
 Revision 1.1.2.1  2006/08/22 12:40:13  brian
 - added doc tree for master package
 
@@ -1320,6 +1323,17 @@ See @manref{spm(4)} for more information.
 @section Libraries
 @cindex libraries
 
+@menu
+* iperf Libraries::
+* streams Libraries::
+* strtty Libraries::
+* strxnet Libraries::
+* strsock Libraries::
+* striso Libraries::
+* netperf Libraries::
+* LiS Libraries::
+@end menu
+
 The @value{PACKAGE_TITLE} does not install any drivers of its own and is simply a master package for
 the coordinated build and installation of the contained sub-packages.
 
@@ -1353,6 +1367,43 @@ providing usable @manref{getmsg(2)}, @manref{getpmsg(2)}, @manref{putmsg(2)}, @m
 and @manref{isastream(2)} system call emulation.
 
 @end table
+
+@node iperf Libraries
+@subsection iperf
+
+@node streams Libraries
+@subsection streams
+
+@subsubsection libstreams
+
+@node strtty Libraries
+@subsection strtty
+
+@subsubsection libtty
+
+@node strxnet Libraries
+@subsection strxnet
+
+@subsubsection libxnet
+
+@node strsock Libraries
+@subsection strsock
+
+@subsubsection libsocket
+
+@node striso Libraries
+@subsection striso
+
+@subsubsection libiso
+
+@node netperf Libraries
+@subsection netperf
+
+@node LiS Libraries
+@subsection LiS
+
+@subsubsection libLiS
+@subsubsection libpLiS
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -1412,14 +1463,29 @@ See the sections that follow for a list of the user-visible header files provide
 add-on packages:
 
 @menu
+* sctp Header Files::
+* iperf Header Files
 * streams Header Files::
 * strcompat Header Files::
+* strutil Header Files::
+* strbcm Header Files::
+* strtty Header Files::
 * strxns Header Files::
 * strxnet Header Files::
+* strsock Header Files::
 * strinet Header Files::
 * strsctp Header Files::
+* striso Header Files::
+* netperf Header Files::
 * strss7 Header Files::
+* LiS Header Files::
 @end menu
+
+@node sctp Header Files
+@subsubsection sctp
+
+@node iperf Header Files
+@subsubsection iperf
 
 @node streams Header Files
 @subsubsection streams
@@ -1500,6 +1566,15 @@ The @file{sys/ddi.h}, @file{ssy/strconf.h} and @file{sys/stream.h} header files 
 package are intended to override those from the @command{streams-@value{VERSION_STREAMS}} add-on
 package.  To accomplish this, @samp{-I/usr/include/strcompat} must appear on the @command{gcc}
 command line ahead of @samp{-I/usr/include/streams}.
+
+@node strutil Header Files
+@subsubsection strutil
+
+@node strbcm Header Files
+@subsubsection strbcm
+
+@node strtty Header Files
+@subsubsection strtty
 
 @node strxns Header Files
 @subsubsection strxns
@@ -1587,6 +1662,9 @@ header files in @file{/usr/include/strxnet}:
 @tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, XTI generic declarations.
 @end multitable
 
+@node strsock Header Files
+@subsubsection strsock
+
 @node strinet Header Files
 @subsubsection strinet
 
@@ -1646,6 +1724,12 @@ header files in @file{/usr/include/strsctp}:
 @tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
 @cite{Stream Control Transmission Protocol (SCTP)} specifics.
 @end multitable
+
+@node striso Header Files
+@subsubsection striso
+
+@node netperf Header Files
+@subsubsection netperf
 
 @node strss7 Header Files
 @subsubsection strss7
@@ -2022,6 +2106,9 @@ header files in @file{/usr/include/strss7}:
 @item @file{ss7/v5ua_ioctl.h}
 @tab header file for the @manref{v5ua(4)} driver, input-output controls.
 @end multitable
+
+@node LiS Header Files
+@subsubsection LiS
 
 @node Shared and Static Libraries
 @subsection Libraries

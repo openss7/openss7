@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 1.1.2.1 2006/08/22 12:40:13 brian Exp $
+@c @(#) $Id: tree.texi,v 1.1.2.2 2006/08/23 11:00:18 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/22 12:40:13 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/23 11:00:18 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -72,10 +72,15 @@ describe some of the kernel modules installed by add-on packages in the @value{P
 * sctp Kernel Modules::
 * streams Kernel Modules::
 * strcompat Kernel Modules::
+* strutil Kernel Modules::
+* strbcm Kernel Modules::
+* strtty Kernel Modules::
 * strxns Kernel Modules::
 * strxnet Kernel Modules::
+* strsock Kernel Modules::
 * strinet Kernel Modules::
 * strsctp Kernel Modules::
+* striso Kernel Modules::
 * strss7 Kernel Modules::
 * LiS Kernel Modules::
 @end menu
@@ -313,6 +318,15 @@ See @manref{uw7compat(9)} for more information.
 
 @end table
 
+@node strutil Kernel Modules
+@subsubsection strutil
+
+@node strbcm Kernel Modules
+@subsubsection strbcm
+
+@node strtty Kernel Modules
+@subsubsection strtty
+
 @node strxns Kernel Modules
 @subsubsection strxns
 
@@ -374,6 +388,9 @@ When pushed on a @dfn{Stream} it provides the ability to @manpage{read(2)} from 
 See @manref{tirdwr(4)} for more information.
 
 @end table
+
+@node strsock Kernel Modules
+@subsubsection strsock
 
 @node strinet Kernel Modules
 @subsubsection strinet
@@ -446,6 +463,9 @@ on the @cite{Transport Provider Interface (TPI)}.  It will eventually be moved t
 See @manref{tpiperf(4)} for more information.
 
 @end table
+
+@node striso Kernel Modules
+@subsubsection striso
 
 @node strss7 Kernel Modules
 @subsubsection strss7

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.15 2006/08/22 12:21:06 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.16 2006/08/23 11:00:19 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/22 12:21:06 $ by $Author: brian $
+% Last Modified $Date: 2006/08/23 11:00:19 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -380,6 +380,9 @@ package.
 @smallexample
 
 $Log: LiS.texi,v $
+Revision 1.1.6.16  2006/08/23 11:00:19  brian
+- added preface, corrections and updates for release
+
 Revision 1.1.6.14  2006-07-02 06:13:45 -0600  brian
 - release documentation updates
 
