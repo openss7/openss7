@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/10 07:24:20 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/08/23 11:06:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:20 $ by $Author: brian $
+ Last Modified $Date: 2006/08/23 11:06:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/10 07:24:20 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/08/23 11:06:44 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/10 07:24:20 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/08/23 11:06:44 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -114,7 +114,7 @@ help(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] [{-c|--count}|{-l|--long}] [MODULE ...]\n\
+    %1$s [options] [{-l|--long}] [{-c|--count}] [{-b|--both}] [MODULE ...]\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -123,10 +123,16 @@ Arguments:\n\
 	specific drivers and modules to list instead of all drivers and\n\
 	modules\n\
 Options:\n\
-    -c, --count\n\
-        print module_stats only\n\
     -l, --long\n\
-        print module_info and module_stats\n\
+        print module_info only\n\
+    -c, --count\n\
+        print module_stat only\n\
+    -b, --both\n\
+        print module_info and module_stat only\n\
+    -a, --all\n\
+        print info or stats for all queues\n\
+    -r, --reset\n\
+        reset all statistics upon collection\n\
     -q, --quiet\n\
         suppress output\n\
     -d, --debug [LEVEL]\n\
@@ -188,36 +194,156 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-enum { CMN_NONE, CMN_NAMES, CMN_LONG, CMN_COUNT, } command = CMN_NONE;
+enum { CMN_NONE, CMN_NAMES, CMN_LONG, CMN_COUNT, CMN_BOTH, } command = CMN_NONE;
+int option_all = 0;
+int option_reset = 0;
 
 void
-printit(struct sc_mlist *l, int cmd)
+printit(struct sc_mlist *l, int cmd, int all)
 {
+	int i;
+
 	if (output <= 0 || l->major == -1)
 		return;
-	fprintf(stdout, "%s", l->name);
-	switch (cmd) {
-	case CMN_LONG:
-		if (l->major != 0) {
-			fprintf(stdout, "\tdevice");
-			fprintf(stdout, "\t%ld", (long) l->major);
-		} else {
-			fprintf(stdout, "\tmodule");
-			fprintf(stdout, "\t-");
+	for (i = 0; i < 4; i++) {
+		if (i > 0) {
+			if (all == 0)
+				continue;
+			if (l->mi[i].index == 0 && l->ms[i].index == 0)
+				continue;
+			if (l->mi[i].index == 0 && cmd == CMN_LONG)
+				continue;
+			if (l->ms[i].index == 0 && cmd == CMN_COUNT)
+				continue;
+			if (cmd != CMN_LONG && cmd != CMN_BOTH && cmd != CMN_COUNT)
+				continue;
 		}
-		fprintf(stdout, "\t%u", l->mi.mi_idnum);
-		fprintf(stdout, "\t%ld", (long) l->mi.mi_minpsz);
-		fprintf(stdout, "\t%ld", (long) l->mi.mi_maxpsz);
-		fprintf(stdout, "\t%ld", (long) l->mi.mi_hiwat);
-		fprintf(stdout, "\t%ld", (long) l->mi.mi_lowat);
-	case CMN_COUNT:
-		fprintf(stdout, "\t%ld", (long) l->ms.ms_pcnt);
-		fprintf(stdout, "\t%ld", (long) l->ms.ms_scnt);
-		fprintf(stdout, "\t%ld", (long) l->ms.ms_ocnt);
-		fprintf(stdout, "\t%ld", (long) l->ms.ms_acnt);
-		fprintf(stdout, "\t%x", l->ms.ms_flags);
+		if (i == 0)
+			fprintf(stdout, "%-9s", l->name);
+		else
+			fprintf(stdout, "         ");
+		switch (cmd) {
+		case CMN_LONG:
+			if (i == 0) {
+				if (l->major != 0) {
+					fprintf(stdout, " driver");
+					fprintf(stdout, " %4ld", (long) l->major);
+				} else {
+					fprintf(stdout, " module");
+					fprintf(stdout, "     ");
+				}
+			} else {
+				fprintf(stdout, "            ");
+			}
+			if (l->mi[i].index != 0) {
+				fprintf(stdout, " %5u", l->mi[i].mi_idnum);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_minpsz);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_maxpsz);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_hiwat);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_lowat);
+				if (all) {
+					fprintf(stdout, " :");
+					if (l->mi[i].index & 0x8)
+						fprintf(stdout, " wr");
+					if (l->mi[i].index & 0x4)
+						fprintf(stdout, " rd");
+					if (l->mi[i].index & 0x2)
+						fprintf(stdout, " muxw");
+					if (l->mi[i].index & 0x1)
+						fprintf(stdout, " muxr");
+				}
+			}
+			break;
+		case CMN_COUNT:
+			if (i == 0 || l->ms[i].index != 0) {
+				if (l->ms[i].index != 0) {
+					fprintf(stdout, " %8ld", (long) l->ms[i].ms_pcnt);
+					fprintf(stdout, " %8ld", (long) l->ms[i].ms_scnt);
+					fprintf(stdout, " %8ld", (long) l->ms[i].ms_ocnt);
+					fprintf(stdout, " %8ld", (long) l->ms[i].ms_ccnt);
+					fprintf(stdout, " %8ld", (long) l->ms[i].ms_acnt);
+					fprintf(stdout, " %8x", l->ms[i].ms_flags);
+				} else {
+					fprintf(stdout, "         ");
+					fprintf(stdout, "         ");
+					fprintf(stdout, "         ");
+					fprintf(stdout, "         ");
+					fprintf(stdout, "         ");
+					fprintf(stdout, "         ");
+					l->ms[i].index = 0xf;
+				}
+				if (all) {
+					fprintf(stdout, " :");
+					if (l->ms[i].index & 0x8)
+						fprintf(stdout, " wr");
+					if (l->ms[i].index & 0x4)
+						fprintf(stdout, " rd");
+					if (l->ms[i].index & 0x2)
+						fprintf(stdout, " muxw");
+					if (l->ms[i].index & 0x1)
+						fprintf(stdout, " muxr");
+				}
+			}
+			break;
+		case CMN_BOTH:
+			if (i == 0) {
+				if (l->major != 0) {
+					fprintf(stdout, " driver");
+					fprintf(stdout, " %4ld", (long) l->major);
+				} else {
+					fprintf(stdout, " module");
+					fprintf(stdout, "     ");
+				}
+			} else {
+				fprintf(stdout, "            ");
+			}
+			if (l->mi[i].index != 0) {
+				fprintf(stdout, " %5u", l->mi[i].mi_idnum);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_minpsz);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_maxpsz);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_hiwat);
+				fprintf(stdout, " %8ld", (long) l->mi[i].mi_lowat);
+			} else {
+				fprintf(stdout, "      ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				l->mi[i].index = 0xf;
+			}
+			if (l->ms[i].index != 0) {
+				fprintf(stdout, " %8ld", (long) l->ms[i].ms_pcnt);
+				fprintf(stdout, " %8ld", (long) l->ms[i].ms_scnt);
+				fprintf(stdout, " %8ld", (long) l->ms[i].ms_ocnt);
+				fprintf(stdout, " %8ld", (long) l->ms[i].ms_ccnt);
+				fprintf(stdout, " %8ld", (long) l->ms[i].ms_acnt);
+				fprintf(stdout, " %8x", l->ms[i].ms_flags);
+			} else {
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				fprintf(stdout, "         ");
+				l->ms[i].index = 0xf;
+			}
+			if (all) {
+				fprintf(stdout, " :");
+				if (l->mi[i].index & l->ms[i].index & 0x8)
+					fprintf(stdout, " wr");
+				if (l->mi[i].index & l->ms[i].index & 0x4)
+					fprintf(stdout, " rd");
+				if (l->mi[i].index & l->ms[i].index & 0x2)
+					fprintf(stdout, " muxw");
+				if (l->mi[i].index & l->ms[i].index & 0x1)
+					fprintf(stdout, " muxr");
+			}
+			break;
+		}
+		fprintf(stdout, "\n");
 	}
-	fprintf(stdout, "\n");
+//      if (cmd == CMN_LONG || cmd == CMN_BOTH || cmd == CMN_COUNT)
+//              fprintf(stdout, "\n");
 };
 
 int
@@ -235,6 +361,9 @@ main(int argc, char *argv[])
 		static struct option long_options[] = {
 			{"long",	no_argument,		NULL, 'l'},
 			{"count",	no_argument,		NULL, 'c'},
+			{"both",	no_argument,		NULL, 'b'},
+			{"all",		no_argument,		NULL, 'a'},
+			{"reset",	no_argument,		NULL, 'r'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
@@ -246,9 +375,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "lcqD::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "lcbarqD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "lcqDvhVC?");
+		c = getopt(argc, argv, "lcbarqDvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -258,6 +387,23 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
+		case 'a':
+			if (debug)
+				fprintf(stderr, "%s: setting option all\n", argv[0]);
+			option_all = 1;
+			break;
+		case 'r':
+			if (debug)
+				fprintf(stderr, "%s: setting option reset\n", argv[0]);
+			option_reset = 1;
+			break;
+		case 'b':
+			if (command != CMN_NONE && command != CMN_LONG && command != CMN_COUNT)
+				goto bad_option;
+			if (debug)
+				fprintf(stderr, "%s: setting both command\n", argv[0]);
+			command = CMN_BOTH;
+			break;
 		case 'l':
 			if (command != CMN_NONE)
 				goto bad_option;
@@ -266,11 +412,14 @@ main(int argc, char *argv[])
 			command = CMN_LONG;
 			break;
 		case 'c':
-			if (command != CMN_NONE)
+			if (command != CMN_NONE && command != CMN_LONG)
 				goto bad_option;
 			if (debug)
 				fprintf(stderr, "%s: setting count command\n", argv[0]);
-			command = CMN_COUNT;
+			if (command == CMN_LONG)
+				command = CMN_BOTH;
+			else
+				command = CMN_COUNT;
 			break;
 		case 'D':	/* -D, --debug */
 			if (debug)
@@ -376,11 +525,20 @@ main(int argc, char *argv[])
 	}
 	list->sc_nmods = count;
 	list->sc_mlist = (struct sc_mlist *) (list + 1);
-	if (ioctl(fd, SC_IOC_LIST, list) < 0) {
-		if (debug)
-			fprintf(stderr, "%s: could not perform second SC_IOC_LIST command\n", argv[0]);
-		perror(argv[0]);
-		exit(1);
+	if (option_reset) {
+		if (ioctl(fd, SC_IOC_RESET, list) < 0) {
+			if (debug)
+				fprintf(stderr, "%s: could not perform second SC_IOC_RESET command\n", argv[0]);
+			perror(argv[0]);
+			exit(1);
+		}
+	} else {
+		if (ioctl(fd, SC_IOC_LIST, list) < 0) {
+			if (debug)
+				fprintf(stderr, "%s: could not perform second SC_IOC_LIST command\n", argv[0]);
+			perror(argv[0]);
+			exit(1);
+		}
 	}
 	if (optind < argc) {
 		int ret = 0;
@@ -392,7 +550,7 @@ main(int argc, char *argv[])
 				    == 0)
 					break;
 			if (i < count)
-				printit(&list->sc_mlist[i], command);
+				printit(&list->sc_mlist[i], command, option_all);
 			else {
 				fprintf(stderr, "%s: %s: %s\n", argv[0], argv[optind],
 					strerror(ENXIO));
@@ -404,7 +562,7 @@ main(int argc, char *argv[])
 	} else {
 		/* have no module name arguments - operate on all */
 		for (i = 0; i < count; i++)
-			printit(&list->sc_mlist[i], command);
+			printit(&list->sc_mlist[i], command, option_all);
 	}
 	if (ioctl(fd, I_POP, NULL) < 0) {
 		perror(argv[0]);

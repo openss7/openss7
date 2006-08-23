@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 07:24:14 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/08/23 11:06:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:14 $ by $Author: brian $
+ Last Modified $Date: 2006/08/23 11:06:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.32  2006/08/23 11:06:42  brian
+ - corrections for compile
+
  Revision 0.9.2.31  2006/03/10 07:24:14  brian
  - rationalized streams and strutil package sources
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 07:24:14 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/08/23 11:06:42 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 07:24:14 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/08/23 11:06:42 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -79,7 +82,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 07:24:14 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/08/23 11:06:42 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -133,35 +136,165 @@ static struct module_info sc_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat sc_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat sc_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+
 #if defined __LP64__ && defined LFS
 #  undef WITH_32BIT_CONVERSION
 #  define WITH_32BIT_CONVERSION 1
 #endif
 
 static size_t
-sc_mlist_copy(long major, struct qinit *qinit, caddr_t _mlist, const uint flag)
+sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const int reset, const uint flag)
 {
+	struct module_info *info;
+	struct module_stat *stat;
+
 #ifdef WITH_32BIT_CONVERSION
 	if (flag == IOC_ILP32) {
 		struct sc_mlist32 *mlist = (typeof(mlist)) _mlist;
 
 		if ((mlist->major = major) != -1) {
-			strncpy(mlist->name, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
-			// mlist->mi = *qinit->qi_minfo;
-			mlist->mi.mi_idnum = qinit->qi_minfo->mi_idnum;
-			strncpy(mlist->mi.mi_idname, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
-			mlist->mi.mi_minpsz = qinit->qi_minfo->mi_minpsz;
-			mlist->mi.mi_maxpsz = qinit->qi_minfo->mi_maxpsz;
-			mlist->mi.mi_hiwat = qinit->qi_minfo->mi_hiwat;
-			mlist->mi.mi_lowat = qinit->qi_minfo->mi_lowat;
-			if (qinit->qi_mstat) {
-				mlist->ms.ms_pcnt = qinit->qi_mstat->ms_pcnt;
-				mlist->ms.ms_scnt = qinit->qi_mstat->ms_scnt;
-				mlist->ms.ms_ocnt = qinit->qi_mstat->ms_ocnt;
-				mlist->ms.ms_ccnt = qinit->qi_mstat->ms_ccnt;
-				mlist->ms.ms_acnt = qinit->qi_mstat->ms_acnt;
-				mlist->ms.ms_flags = qinit->qi_mstat->ms_flags;
-				mlist->ms.ms_xsize = qinit->qi_mstat->ms_xsize;
+			if (st->st_wrinit && (info = st->st_wrinit->qi_minfo)) {
+				strncpy(mlist->name, info->mi_idname, FMNAMESZ + 1);
+				mlist->mi[0].index = 0x8;
+				mlist->mi[0].mi_idnum = info->mi_idnum;
+				strncpy(mlist->mi[0].mi_idname, info->mi_idname, FMNAMESZ + 1);
+				mlist->mi[0].mi_minpsz = info->mi_minpsz;
+				mlist->mi[0].mi_maxpsz = info->mi_maxpsz;
+				mlist->mi[0].mi_hiwat = info->mi_hiwat;
+				mlist->mi[0].mi_lowat = info->mi_lowat;
+				if ((stat = st->st_wrinit->qi_mstat)) {
+					mlist->ms[0].index = 0x8;
+					mlist->ms[0].ms_pcnt = stat->ms_pcnt;
+					mlist->ms[0].ms_scnt = stat->ms_scnt;
+					mlist->ms[0].ms_ocnt = stat->ms_ocnt;
+					mlist->ms[0].ms_ccnt = stat->ms_ccnt;
+					mlist->ms[0].ms_acnt = stat->ms_acnt;
+					mlist->ms[0].ms_flags = stat->ms_flags;
+					mlist->ms[0].ms_xsize = stat->ms_xsize;
+				}
+			}
+			if (st->st_rdinit && (info = st->st_rdinit->qi_minfo)) {
+				if (info == st->st_wrinit->qi_minfo)
+					mlist->mi[0].index |= 0x4;
+				else
+					mlist->mi[1].index = 0x4;
+				mlist->mi[1].mi_idnum = info->mi_idnum;
+				strncpy(mlist->mi[1].mi_idname, info->mi_idname, FMNAMESZ + 1);
+				mlist->mi[1].mi_minpsz = info->mi_minpsz;
+				mlist->mi[1].mi_maxpsz = info->mi_maxpsz;
+				mlist->mi[1].mi_hiwat = info->mi_hiwat;
+				mlist->mi[1].mi_lowat = info->mi_lowat;
+				if ((stat = st->st_rdinit->qi_mstat)) {
+					if (stat == st->st_wrinit->qi_mstat)
+						mlist->ms[0].index |= 0x4;
+					else
+						mlist->ms[1].index = 0x4;
+					mlist->ms[1].ms_pcnt = stat->ms_pcnt;
+					mlist->ms[1].ms_scnt = stat->ms_scnt;
+					mlist->ms[1].ms_ocnt = stat->ms_ocnt;
+					mlist->ms[1].ms_ccnt = stat->ms_ccnt;
+					mlist->ms[1].ms_acnt = stat->ms_acnt;
+					mlist->ms[1].ms_flags = stat->ms_flags;
+					mlist->ms[1].ms_xsize = stat->ms_xsize;
+				}
+			}
+			if (st->st_muxwinit && (info = st->st_muxwinit->qi_minfo)) {
+				if (info == st->st_wrinit->qi_minfo)
+					mlist->mi[0].index |= 0x2;
+				else if (info == st->st_rdinit->qi_minfo)
+					mlist->mi[1].index |= 0x2;
+				else
+					mlist->mi[2].index = 0x2;
+				mlist->mi[2].mi_idnum = info->mi_idnum;
+				strncpy(mlist->mi[2].mi_idname, info->mi_idname, FMNAMESZ + 1);
+				mlist->mi[2].mi_minpsz = info->mi_minpsz;
+				mlist->mi[2].mi_maxpsz = info->mi_maxpsz;
+				mlist->mi[2].mi_hiwat = info->mi_hiwat;
+				mlist->mi[2].mi_lowat = info->mi_lowat;
+				if ((stat = st->st_muxwinit->qi_mstat)) {
+					if (stat == st->st_wrinit->qi_mstat)
+						mlist->ms[0].index |= 0x2;
+					else if (stat == st->st_rdinit->qi_mstat)
+						mlist->ms[1].index |= 0x2;
+					else
+						mlist->ms[2].index = 0x2;
+					mlist->ms[2].ms_pcnt = stat->ms_pcnt;
+					mlist->ms[2].ms_scnt = stat->ms_scnt;
+					mlist->ms[2].ms_ocnt = stat->ms_ocnt;
+					mlist->ms[2].ms_ccnt = stat->ms_ccnt;
+					mlist->ms[2].ms_acnt = stat->ms_acnt;
+					mlist->ms[2].ms_flags = stat->ms_flags;
+					mlist->ms[2].ms_xsize = stat->ms_xsize;
+				}
+			}
+			if (st->st_muxrinit && (info = st->st_muxrinit->qi_minfo)) {
+				if (info == st->st_wrinit->qi_minfo)
+					mlist->mi[0].index |= 0x1;
+				else if (info == st->st_rdinit->qi_minfo)
+					mlist->mi[1].index |= 0x1;
+				else if (info == st->st_muxwinit->qi_minfo)
+					mlist->mi[2].index |= 0x1;
+				else
+					mlist->mi[3].index = 0x1;
+				mlist->mi[3].mi_idnum = info->mi_idnum;
+				strncpy(mlist->mi[3].mi_idname, info->mi_idname, FMNAMESZ + 1);
+				mlist->mi[3].mi_minpsz = info->mi_minpsz;
+				mlist->mi[3].mi_maxpsz = info->mi_maxpsz;
+				mlist->mi[3].mi_hiwat = info->mi_hiwat;
+				mlist->mi[3].mi_lowat = info->mi_lowat;
+				if ((stat = st->st_muxrinit->qi_mstat)) {
+					if (stat == st->st_wrinit->qi_mstat)
+						mlist->ms[0].index |= 0x1;
+					else if (stat == st->st_rdinit->qi_mstat)
+						mlist->ms[1].index |= 0x1;
+					else if (stat == st->st_muxwinit->qi_mstat)
+						mlist->ms[2].index |= 0x1;
+					else
+						mlist->ms[3].index = 0x1;
+					mlist->ms[3].ms_pcnt = stat->ms_pcnt;
+					mlist->ms[3].ms_scnt = stat->ms_scnt;
+					mlist->ms[3].ms_ocnt = stat->ms_ocnt;
+					mlist->ms[3].ms_ccnt = stat->ms_ccnt;
+					mlist->ms[3].ms_acnt = stat->ms_acnt;
+					mlist->ms[3].ms_flags = stat->ms_flags;
+					mlist->ms[3].ms_xsize = stat->ms_xsize;
+				}
+			}
+			if (reset) {
+				if (st->st_wrinit && (stat = st->st_wrinit->qi_mstat)) {
+					stat->ms_pcnt = 0;
+					stat->ms_scnt = 0;
+					stat->ms_ocnt = 0;
+					stat->ms_ccnt = 0;
+					stat->ms_acnt = 0;
+					stat->ms_flags = 0;
+				}
+				if (st->st_rdinit && (stat = st->st_rdinit->qi_mstat)) {
+					stat->ms_pcnt = 0;
+					stat->ms_scnt = 0;
+					stat->ms_ocnt = 0;
+					stat->ms_ccnt = 0;
+					stat->ms_acnt = 0;
+					stat->ms_flags = 0;
+				}
+				if (st->st_muxwinit && (stat = st->st_muxwinit->qi_mstat)) {
+					stat->ms_pcnt = 0;
+					stat->ms_scnt = 0;
+					stat->ms_ocnt = 0;
+					stat->ms_ccnt = 0;
+					stat->ms_acnt = 0;
+					stat->ms_flags = 0;
+				}
+				if (st->st_muxrinit && (stat = st->st_muxrinit->qi_mstat)) {
+					stat->ms_pcnt = 0;
+					stat->ms_scnt = 0;
+					stat->ms_ocnt = 0;
+					stat->ms_ccnt = 0;
+					stat->ms_acnt = 0;
+					stat->ms_flags = 0;
+				}
 			}
 		}
 		return sizeof(struct sc_mlist32);
@@ -171,22 +304,146 @@ sc_mlist_copy(long major, struct qinit *qinit, caddr_t _mlist, const uint flag)
 		struct sc_mlist *mlist = (typeof(mlist)) _mlist;
 
 		if ((mlist->major = major) != -1) {
-			strncpy(mlist->name, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
-			// mlist->mi = *qinit->qi_minfo;
-			mlist->mi.mi_idnum = qinit->qi_minfo->mi_idnum;
-			strncpy(mlist->mi.mi_idname, qinit->qi_minfo->mi_idname, FMNAMESZ + 1);
-			mlist->mi.mi_minpsz = qinit->qi_minfo->mi_minpsz;
-			mlist->mi.mi_maxpsz = qinit->qi_minfo->mi_maxpsz;
-			mlist->mi.mi_hiwat = qinit->qi_minfo->mi_hiwat;
-			mlist->mi.mi_lowat = qinit->qi_minfo->mi_lowat;
-			if (qinit->qi_mstat) {
-				mlist->ms.ms_pcnt = qinit->qi_mstat->ms_pcnt;
-				mlist->ms.ms_scnt = qinit->qi_mstat->ms_scnt;
-				mlist->ms.ms_ocnt = qinit->qi_mstat->ms_ocnt;
-				mlist->ms.ms_ccnt = qinit->qi_mstat->ms_ccnt;
-				mlist->ms.ms_acnt = qinit->qi_mstat->ms_acnt;
-				mlist->ms.ms_flags = qinit->qi_mstat->ms_flags;
-				mlist->ms.ms_xsize = qinit->qi_mstat->ms_xsize;
+			if (st->st_wrinit && (info = st->st_wrinit->qi_minfo)) {
+				strncpy(mlist->name, info->mi_idname, FMNAMESZ + 1);
+				mlist->mi[0].index = 0x8;
+				mlist->mi[0].mi_idnum = info->mi_idnum;
+				strncpy(mlist->mi[0].mi_idname, info->mi_idname, FMNAMESZ + 1);
+				mlist->mi[0].mi_minpsz = info->mi_minpsz;
+				mlist->mi[0].mi_maxpsz = info->mi_maxpsz;
+				mlist->mi[0].mi_hiwat = info->mi_hiwat;
+				mlist->mi[0].mi_lowat = info->mi_lowat;
+				if ((stat = st->st_wrinit->qi_mstat)) {
+					mlist->ms[0].index = 0x8;
+					mlist->ms[0].ms_pcnt = stat->ms_pcnt;
+					mlist->ms[0].ms_scnt = stat->ms_scnt;
+					mlist->ms[0].ms_ocnt = stat->ms_ocnt;
+					mlist->ms[0].ms_ccnt = stat->ms_ccnt;
+					mlist->ms[0].ms_acnt = stat->ms_acnt;
+					mlist->ms[0].ms_flags = stat->ms_flags;
+					mlist->ms[0].ms_xsize = stat->ms_xsize;
+				}
+			}
+			if (st->st_rdinit && (info = st->st_rdinit->qi_minfo)) {
+				if (info == st->st_wrinit->qi_minfo)
+					mlist->mi[0].index |= 0x4;
+				else
+					mlist->mi[1].index = 0x4;
+				mlist->mi[1].mi_idnum = info->mi_idnum;
+				strncpy(mlist->mi[1].mi_idname, info->mi_idname, FMNAMESZ + 1);
+				mlist->mi[1].mi_minpsz = info->mi_minpsz;
+				mlist->mi[1].mi_maxpsz = info->mi_maxpsz;
+				mlist->mi[1].mi_hiwat = info->mi_hiwat;
+				mlist->mi[1].mi_lowat = info->mi_lowat;
+				if ((stat = st->st_rdinit->qi_mstat)) {
+					if (stat == st->st_wrinit->qi_mstat)
+						mlist->ms[0].index |= 0x4;
+					else
+						mlist->ms[1].index = 0x4;
+					mlist->ms[1].ms_pcnt = stat->ms_pcnt;
+					mlist->ms[1].ms_scnt = stat->ms_scnt;
+					mlist->ms[1].ms_ocnt = stat->ms_ocnt;
+					mlist->ms[1].ms_ccnt = stat->ms_ccnt;
+					mlist->ms[1].ms_acnt = stat->ms_acnt;
+					mlist->ms[1].ms_flags = stat->ms_flags;
+					mlist->ms[1].ms_xsize = stat->ms_xsize;
+				}
+			}
+			if (st->st_muxwinit && (info = st->st_muxwinit->qi_minfo)) {
+				if (info == st->st_wrinit->qi_minfo)
+					mlist->mi[0].index |= 0x2;
+				else if (info == st->st_rdinit->qi_minfo)
+					mlist->mi[1].index |= 0x2;
+				else
+					mlist->mi[2].index = 0x2;
+				mlist->mi[2].mi_idnum = info->mi_idnum;
+				strncpy(mlist->mi[2].mi_idname, info->mi_idname, FMNAMESZ + 1);
+				mlist->mi[2].mi_minpsz = info->mi_minpsz;
+				mlist->mi[2].mi_maxpsz = info->mi_maxpsz;
+				mlist->mi[2].mi_hiwat = info->mi_hiwat;
+				mlist->mi[2].mi_lowat = info->mi_lowat;
+				if ((stat = st->st_muxwinit->qi_mstat)) {
+					if (stat == st->st_wrinit->qi_mstat)
+						mlist->ms[0].index |= 0x2;
+					else if (stat == st->st_rdinit->qi_mstat)
+						mlist->ms[1].index |= 0x2;
+					else
+						mlist->ms[2].index = 0x2;
+					mlist->ms[2].ms_pcnt = stat->ms_pcnt;
+					mlist->ms[2].ms_scnt = stat->ms_scnt;
+					mlist->ms[2].ms_ocnt = stat->ms_ocnt;
+					mlist->ms[2].ms_ccnt = stat->ms_ccnt;
+					mlist->ms[2].ms_acnt = stat->ms_acnt;
+					mlist->ms[2].ms_flags = stat->ms_flags;
+					mlist->ms[2].ms_xsize = stat->ms_xsize;
+				}
+			}
+			if (st->st_muxrinit && (info = st->st_muxrinit->qi_minfo)) {
+				if (info == st->st_wrinit->qi_minfo)
+					mlist->mi[0].index |= 0x1;
+				else if (info == st->st_rdinit->qi_minfo)
+					mlist->mi[1].index |= 0x1;
+				else if (info == st->st_muxwinit->qi_minfo)
+					mlist->mi[2].index |= 0x1;
+				else
+					mlist->mi[3].index = 0x1;
+				mlist->mi[3].mi_idnum = info->mi_idnum;
+				strncpy(mlist->mi[3].mi_idname, info->mi_idname, FMNAMESZ + 1);
+				mlist->mi[3].mi_minpsz = info->mi_minpsz;
+				mlist->mi[3].mi_maxpsz = info->mi_maxpsz;
+				mlist->mi[3].mi_hiwat = info->mi_hiwat;
+				mlist->mi[3].mi_lowat = info->mi_lowat;
+				if ((stat = st->st_muxrinit->qi_mstat)) {
+					if (stat == st->st_wrinit->qi_mstat)
+						mlist->ms[0].index |= 0x1;
+					else if (stat == st->st_rdinit->qi_mstat)
+						mlist->ms[1].index |= 0x1;
+					else if (stat == st->st_muxwinit->qi_mstat)
+						mlist->ms[2].index |= 0x1;
+					else
+						mlist->ms[3].index = 0x1;
+					mlist->ms[3].ms_pcnt = stat->ms_pcnt;
+					mlist->ms[3].ms_scnt = stat->ms_scnt;
+					mlist->ms[3].ms_ocnt = stat->ms_ocnt;
+					mlist->ms[3].ms_ccnt = stat->ms_ccnt;
+					mlist->ms[3].ms_acnt = stat->ms_acnt;
+					mlist->ms[3].ms_flags = stat->ms_flags;
+					mlist->ms[3].ms_xsize = stat->ms_xsize;
+				}
+			}
+			if (reset) {
+				if (st->st_wrinit && (stat = st->st_wrinit->qi_mstat)) {
+					stat->ms_pcnt = 0;
+					stat->ms_scnt = 0;
+					stat->ms_ocnt = 0;
+					stat->ms_ccnt = 0;
+					stat->ms_acnt = 0;
+					stat->ms_flags = 0;
+				}
+				if (st->st_rdinit && (stat = st->st_rdinit->qi_mstat)) {
+					stat->ms_pcnt = 0;
+					stat->ms_scnt = 0;
+					stat->ms_ocnt = 0;
+					stat->ms_ccnt = 0;
+					stat->ms_acnt = 0;
+					stat->ms_flags = 0;
+				}
+				if (st->st_muxwinit && (stat = st->st_muxwinit->qi_mstat)) {
+					stat->ms_pcnt = 0;
+					stat->ms_scnt = 0;
+					stat->ms_ocnt = 0;
+					stat->ms_ccnt = 0;
+					stat->ms_acnt = 0;
+					stat->ms_flags = 0;
+				}
+				if (st->st_muxrinit && (stat = st->st_muxrinit->qi_mstat)) {
+					stat->ms_pcnt = 0;
+					stat->ms_scnt = 0;
+					stat->ms_ocnt = 0;
+					stat->ms_ccnt = 0;
+					stat->ms_acnt = 0;
+					stat->ms_flags = 0;
+				}
 			}
 		}
 		return sizeof(struct sc_mlist);
@@ -221,7 +478,7 @@ static streamscall int
 sc_wput(queue_t *q, mblk_t *mp)
 {
 	union ioctypes *ioc;
-	int err = 0, rval = 0;
+	int err = 0, rval = 0, reset = 0;
 	mblk_t *dp = mp->b_cont;
 
 	switch (mp->b_datap->db_type) {
@@ -250,7 +507,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 		caddr_t uaddr;
 		size_t usize;
 
-		trace();
+		_trace();
 		ioc = (typeof(ioc)) mp->b_rptr;
 
 #ifdef WITH_32BIT_CONVERSION
@@ -264,20 +521,22 @@ sc_wput(queue_t *q, mblk_t *mp)
 			usize = sizeof(struct sc_list);
 		}
 		switch (ioc->iocblk.ioc_cmd) {
+		case SC_IOC_RESET:
+			reset = 1;
 		case SC_IOC_LIST:
 			/* there is really no reason why a regular user cannot list modules and
 			   related information. */
 #if 0
-			trace();
+			_trace();
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto nak;
 			}
 #endif
-			trace();
+			_trace();
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
-				trace();
+				_trace();
 				if (uaddr == NULL) {
 					rval = str_mlist_count();
 					goto ack;
@@ -290,7 +549,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 				qreply(q, mp);
 				return (0);
 			}
-			trace();
+			_trace();
 			/* doesn't support I_STR yet, just TRANSPARENT */
 			err = -EINVAL;
 			goto nak;
@@ -301,21 +560,23 @@ sc_wput(queue_t *q, mblk_t *mp)
 		ioc = (typeof(ioc)) mp->b_rptr;
 
 		switch (ioc->copyresp.cp_cmd) {
+		case SC_IOC_RESET:
+			reset = 1;
 		case SC_IOC_LIST:
-			trace();
+			_trace();
 			if (ioc->copyresp.cp_rval != 0) {
 #ifdef LFS
-				ptrace(("Aborting ioctl!\n"));
+				_ptrace(("Aborting ioctl!\n"));
 				goto abort;
 #endif
 #ifdef LIS
 				/* LiS has a bug here... */
-				ptrace(("Nacking failed ioctl!\n"));
+				_ptrace(("Nacking failed ioctl!\n"));
 				err = -(long) ioc->copyresp.cp_rval;
 				goto nak;
 #endif
 			}
-			trace();
+			_trace();
 			if (ioc->copyresp.cp_private == (mblk_t *) 0) {
 				int n, count;
 				caddr_t uaddr;
@@ -329,7 +590,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 #ifdef WITH_32BIT_CONVERSION
 				if (ioc->copyresp.cp_flag == IOC_ILP32) {
 					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_list32)) {
-						ptrace(("Error path taken!\n"));
+						_ptrace(("Error path taken!\n"));
 						err = -EFAULT;
 						goto nak;
 					} else {
@@ -343,7 +604,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 #endif
 				{
 					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_list)) {
-						ptrace(("Error path taken!\n"));
+						_ptrace(("Error path taken!\n"));
 						err = -EFAULT;
 						goto nak;
 					} else {
@@ -355,12 +616,12 @@ sc_wput(queue_t *q, mblk_t *mp)
 					}
 				}
 				if (count < 0) {
-					ptrace(("Error path taken!\n"));
+					_ptrace(("Error path taken!\n"));
 					err = -EINVAL;
 					goto nak;
 				}
 				if (count > 100) {
-					ptrace(("Error path taken!\n"));
+					_ptrace(("Error path taken!\n"));
 					err = -ERANGE;
 					goto nak;
 				}
@@ -369,7 +630,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 					goto ack;
 				}
 				if (!(dp = allocb(usize, BPRI_MED))) {
-					ptrace(("Error path taken!\n"));
+					_ptrace(("Error path taken!\n"));
 					err = -ENOSR;
 					goto nak;
 				}
@@ -383,40 +644,42 @@ sc_wput(queue_t *q, mblk_t *mp)
 					uint flag = 0;
 					caddr_t mlist = (typeof(mlist)) dp->b_rptr;
 
-					trace();
+					_trace();
 					if (n < count) {
-						trace();
+						_trace();
 						/* list all devices */
 						for (i = 0; i < MAX_STRDEV; i++) {
 							struct cdevsw *cdev;
-							struct qinit *qinit;
+							struct streamtab *st;
 
 							cdev = &lis_fstr_sw[i];
 							if (!cdev->f_str || !cdev->f_count)
 								continue;
 							if (n >= count)
 								break;
-							qinit = cdev->f_str->st_wrinit;
+							st = cdev->f_str;
 							mlist +=
-							    sc_mlist_copy(i, qinit, mlist, flag);
+							    sc_mlist_copy(i, st, mlist, reset,
+									  flag);
 							n++;
 						}
 					}
-					trace();
+					_trace();
 					if (n < count) {
 						/* list all modules */
 						for (i = 1; i < MAX_STRMOD; i++) {
 							struct fmodsw *fmod;
-							struct qinit *qinit;
+							struct streamtab *st;
 
 							fmod = &lis_fmod_sw[i];
 							if (!fmod->f_str || !fmod->f_count)
 								continue;
 							if (n >= count)
 								break;
-							qinit = fmod->f_str->st_wrinit;
+							st = fmod->f_str;
 							mlist +=
-							    sc_mlist_copy(0, qinit, mlist, flag);
+							    sc_mlist_copy(0, st, mlist, reset,
+									  flag);
 							n++;
 						}
 					}
@@ -428,55 +691,56 @@ sc_wput(queue_t *q, mblk_t *mp)
 					uint flag = ioc->copyresp.cp_flag;
 					caddr_t mlist = (typeof(mlist)) dp->b_rptr;
 
-					trace();
+					_trace();
 					if (n < count) {
-						trace();
+						_trace();
 						/* output all devices */
 						read_lock(&cdevsw_lock);
 						list_for_each(pos, &cdevsw_list) {
 							struct cdevsw *cdev;
-							struct qinit *qinit;
+							struct streamtab *st;
 
 							if (n >= count)
 								break;
 							cdev =
 							    list_entry(pos, struct cdevsw, d_list);
-							qinit = cdev->d_str->st_wrinit;
+							st = cdev->d_str;
 							mlist +=
-							    sc_mlist_copy(cdev->d_major, qinit,
-									  mlist, flag);
+							    sc_mlist_copy(cdev->d_major, st,
+									  mlist, reset, flag);
 							n++;
 						}
 						read_unlock(&cdevsw_lock);
 					}
-					trace();
+					_trace();
 					if (n < count) {
-						trace();
+						_trace();
 						/* output all modules */
 						read_lock(&fmodsw_lock);
 						list_for_each(pos, &fmodsw_list) {
 							struct fmodsw *fmod;
-							struct qinit *qinit;
+							struct streamtab *st;
 
 							if (n >= count)
 								break;
 							fmod =
 							    list_entry(pos, struct fmodsw, f_list);
-							qinit = fmod->f_str->st_wrinit;
+							st = fmod->f_str;
 							mlist +=
-							    sc_mlist_copy(0, qinit, mlist, flag);
+							    sc_mlist_copy(0, st, mlist, reset,
+									  flag);
 							n++;
 						}
 						read_unlock(&fmodsw_lock);
 					}
-#endif
-					trace();
+					_trace();
 					/* zero all excess elements */
 					for (; n < count; n++) {
-						mlist += sc_mlist_copy(-1, NULL, mlist, flag);
+						mlist +=
+						    sc_mlist_copy(-1, NULL, mlist, reset, flag);
 					}
 				}
-				trace();
+				_trace();
 				mp->b_datap->db_type = M_COPYOUT;
 				ioc->copyreq.cq_addr = uaddr;
 				ioc->copyreq.cq_size = usize;
@@ -485,11 +749,12 @@ sc_wput(queue_t *q, mblk_t *mp)
 				qreply(q, mp);
 				return (0);
 			} else {
-				trace();
+				_trace();
 				/* done */
 				rval = (int) (long) ioc->copyresp.cp_private;
 				goto ack;
 			}
+#endif
 		}
 	      nak:
 		mp->b_datap->db_type = M_IOCNAK;
@@ -507,7 +772,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 		return (0);
 #ifdef LFS
 	      abort:
-		ctrace(freemsg(mp));
+		_ctrace(freemsg(mp));
 		return (0);
 #endif
 	}
@@ -566,11 +831,13 @@ static struct qinit sc_rqinit = {
 	.qi_qopen = sc_open,
 	.qi_qclose = sc_close,
 	.qi_minfo = &sc_minfo,
+	.qi_mstat = &sc_rstat,
 };
 
 static struct qinit sc_wqinit = {
 	.qi_putp = sc_wput,
 	.qi_minfo = &sc_minfo,
+	.qi_mstat = &sc_wstat,
 };
 
 static struct streamtab sc_info = {

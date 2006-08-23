@@ -1,3 +1,13 @@
+2006-08-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* ANNOUNCE: added missing file
+	* README-alpha: added missing file
+	* doc/man/man8/scls.8.man: corrected to streams version
+	* doc/manual/strutil.texi: added preface
+	* scripts/texi/funding.texi: correction
+	* src/modules/sc.c: corrected to streams version
+	* src/util/scls.c: corrected to streams version
+
 2006-08-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/compat.texi: created common compatibility text
