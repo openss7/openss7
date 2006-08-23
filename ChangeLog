@@ -1,3 +1,10 @@
+2006-08-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: added new packages to build
+	* doc/manual/openss7.texi: updates
+	* doc/manual/tree.texi: updates
+	* scripts/texi/funding.texi: correction
+
 2006-08-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/compat.texi: created common compatibility text

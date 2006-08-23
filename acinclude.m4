@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/07/11 09:17:38 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/08/23 11:05:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/11 09:17:38 $ by $Author: brian $
+# Last Modified $Date: 2006/08/23 11:05:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -206,7 +206,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRUTIL],
 			       [include STRUTIL in master pack @<:@detected@:>@]),
 		[with_STRUTIL="$withval"],
-		[with_STRUTIL='no'])
+		[with_STRUTIL="$with_ALL"])
     if test ! -d "$srcdir/strutil" ; then
 	with_STRUTIL='no'
     fi
@@ -225,6 +225,14 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		[with_STRXNET='yes'])
     if test ! -d "$srcdir/strxnet" ; then
 	with_STRXNET='no'
+    fi
+    AC_ARG_WITH([STRSOCK],
+		AS_HELP_STRING([--without-STRSOCK],
+			       [do not include STRSOCK in master pack @<:@included@:>@]),
+		[with_STRSOCK="$withval"],
+		[with_STRSOCK="$with_ALL"])
+    if test ! -d "$srcdir/strsock" ; then
+	with_STRSOCK='no'
     fi
     AC_ARG_WITH([STRINET],
 		AS_HELP_STRING([--without-STRINET],
@@ -265,6 +273,14 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		[with_STRBCM="$with_ALL"])
     if test ! -d "$srcdir/strbcm" ; then
 	with_STRBCM='no'
+    fi
+    AC_ARG_WITH([STRTTY],
+		AS_HELP_STRING([--with-STRTTY],
+			       [include STRTTY in master pack @<:@detected@:>@]),
+		[with_STRTTY="$withval"],
+		[with_STRTTY="$with_ALL"])
+    if test ! -d "$srcdir/strtty" ; then
+	with_STRTTY='no'
     fi
     AC_ARG_WITH([STRISO],
 		AS_HELP_STRING([--with-STRISO],
@@ -348,6 +364,13 @@ dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-xti'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-xti"
     fi
+    if test :"${with_STRSOCK:-yes}" != :no ; then
+	:
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_sock --without-sock\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-sock'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-sock"
+    fi
     if test :"${with_STRINET:-yes}" != :no ; then
 	_INET
     else
@@ -375,6 +398,13 @@ dnl
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_bcm --without-bcm\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-bcm'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-bcm"
+    fi
+    if test :"${with_STRTTY:-yes}" != :no ; then
+	:
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_tty --without-tty\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-tty'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-tty"
     fi
     if test :"${with_STRISO:-yes}" != :no ; then
 	:
@@ -420,6 +450,9 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_STRBCM:-auto} = :auto ; then
 	with_STRBCM='no'
     fi
+    if test :${with_STRTTY:-auto} = :auto ; then
+	with_STRTTY='no'
+    fi
     if test :${with_STRISO:-auto} = :auto ; then
 	with_STRISO='no'
     fi
@@ -447,6 +480,9 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_STRXNET:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strxnet])
     fi
+    if test :${with_STRSOCK:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strsock])
+    fi
     if test :${with_STRINET:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strinet])
     fi
@@ -461,6 +497,9 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     fi
     if test :${with_STRBCM:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strbcm])
+    fi
+    if test :${with_STRTTY:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strtty])
     fi
     if test :${with_STRISO:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([striso])
