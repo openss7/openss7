@@ -1,3 +1,10 @@
+2006-08-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* ANNOUNCE: correction
+	* doc/manual/striso.texi: added preface
+	* scripts/texi/funding.texi: correction
+	* src/drivers/clns.c: correction for compile
+
 2006-08-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/compat.texi: created common compatibility text

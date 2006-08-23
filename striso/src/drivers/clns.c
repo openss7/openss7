@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:38 $
+ @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/08/23 11:08:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:38 $ by $Author: brian $
+ Last Modified $Date: 2006/08/23 11:08:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns.c,v $
+ Revision 0.9.2.6  2006/08/23 11:08:11  brian
+ - changes for compile
+
  Revision 0.9.2.5  2006/07/24 09:01:38  brian
  - results of udp2 optimizations
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:38 $"
+#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/08/23 11:08:11 $"
 
 static char const ident[] =
-    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:38 $";
+    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/08/23 11:08:11 $";
 
 /*
  *  This is an X.233 CLNS driver.  This is an NPI driver that can be pushed over or link a DLPI
@@ -123,7 +126,7 @@ static char const ident[] =
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2006/07/24 09:01:38 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2006/08/23 11:08:11 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLNS_LICENSE	"GPL"
@@ -204,7 +207,7 @@ STATIC struct module_info np_minfo = {
 	.mi_minpsz = 0,		/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,	/* Max packet size acceptd */
 	.mi_hiwat = 1 << 15,	/* Hi water mark */
-	.mi_hiwat = 1 << 10,	/* Lo water mark */
+	.mi_lowat = 1 << 10,	/* Lo water mark */
 };
 
 STATIC struct module_stat np_mstat = {
@@ -237,7 +240,7 @@ STATIC struct module_info dl_minfo = {
 	.mi_minpsz = 0,		/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,	/* Max packet size acceptd */
 	.mi_hiwat = 1 << 15,	/* Hi water mark */
-	.mi_hiwat = 1 << 10,	/* Lo water mark */
+	.mi_lowat = 1 << 10,	/* Lo water mark */
 };
 
 STATIC struct module_stat dl_mstat = {
