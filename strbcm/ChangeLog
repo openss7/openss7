@@ -1,3 +1,10 @@
+2006-08-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/strbcm.texi: added preface
+	* scripts/texi/funding.texi: correction
+	* ANNOUNCE: added missing file
+	* README-alpha: added missing file
+
 2006-08-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/compat.texi: created common compatibility text

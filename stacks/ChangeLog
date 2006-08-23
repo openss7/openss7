@@ -1,3 +1,10 @@
+2006-08-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/strss7.texi: added Preface
+	* doc/projects/voip.texi: correction
+	* doc/specs/cci/cci.texi: correction
+	* scripts/texi/funding.texi: correction
+
 2006-08-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/compat.texi: created common compatibility text

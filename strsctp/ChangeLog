@@ -1,3 +1,9 @@
+2006-08-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/strsctp.texi: added preface
+	* scripts/texi/funding.texi: correction
+	* src/drivers/sctp2.c: rationalization to sctp.c driver
+
 2006-08-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/compat.texi: created common compatibility text
