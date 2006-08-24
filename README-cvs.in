@@ -1,5 +1,5 @@
 @PACKAGE_TITLE@ -- CVS procedures.  @PACKAGE_DATE@
-$Id: README-cvs.in,v 1.1.2.1 2006/08/24 17:00:22 brian Exp $
+$Id: README-cvs.in,v 1.1.2.1 2006/08/24 17:00:20 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -14,7 +14,7 @@ If you are a subscriber or sponsor of The OpenSS7 Project
 can download release, mid-release or release candidate versions of the
 `@PACKAGE_SHORTTITLE@' package from the project CVS archive.
 
-The @PACKAGE_TITLE@ package is located in the `@PACKAGE@' module
+The @PACKAGE_TITLE@ package is located in the `os7' module
 of `/var/cvs'.  For release tag information, see *Note Releases::.
 
 To access the archive from the project CVS pserver, use the following
@@ -23,7 +23,7 @@ commands to check out a version from the archive:
      % export CVSROOT='-d:pserver:USERNAME@cvs.openss7.com:2401/var/cvs'
      % cvs login
      Password: *********
-     % cvs co -r @PACKAGE@_@VERSION@ @PACKAGE@
+     % cvs co -r @PACKAGE@_@VERSION@ os7
      % cvs logout
 
 It is, of course, possible to check out by date or by other criteria.
@@ -98,9 +98,9 @@ To generate a configuration script and the necessary scriptlets
 required by the GNU `autoconf(1)' system, execute the following
 commands on the working directory:
 
-     % autoreconf -fiv @PACKAGE@
+     % autoreconf -fiv os7
 
-where, `@PACKAGE@' is the name of the directory to where the working copy
+where, `os7' is the name of the directory to where the working copy
 was checked out under the previous step.  This command generates the
 `configure' script and other missing pieces that are normally
 distributed with the release Tar Balls, SRPMs and DSCs.
@@ -109,7 +109,7 @@ Make sure that `autoreconf --version' returns `2.59'.  Otherwise, you
 may need to perform something like the following:
 
      % PATH="/usr/local/bin:$PATH"
-     % autoreconf -fiv @PACKAGE@
+     % autoreconf -fiv os7
 
 After reconfiguring the directory, the package can then be configured
 and built using the same instructions as are used for the Tar Ball, see

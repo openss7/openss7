@@ -1,0 +1,128 @@
+OpenSS7 STREAMS ISO -- readme LiS file.  2006-04-07
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions.
+
+Linux STREAMS (LiS) Binary Compatibility Issues
+-----------------------------------------------
+
+The modules and drivers from this packages are binary compatible
+with the equivalent modules and drivers from LiS-2.18.0.
+
+The modules and drivers from this package have been converted to support
+32-bit ioctl compatibility under Linux Fast-STREAMS.  LiS-2.18.0 is
+incapable of 32-bit ioctl compatibility, so that should not be an issue.
+
+NPI Header Files
+----------------
+
+The NPI header file (sys/npi.h) for LiS-2.18.0 is broken for 64-bit
+architectures.  The NPI 2.0.0 specification uses `ulong' and `long'
+throughout.  LiS-2.18.0 changes a bunch of the `ulong's to np_ulong's
+(which are really unsigned int) and defines a 16bit np_ushort (even
+though a ushort is always 16 bits) and then never uses the type.
+Compatibility of 32-bit over 64-bit is impossible with this approach,
+and LiS-2.18.0 applications, modules and drivers will be incompatible
+with those compiled against standard NPI headers.
+
+OpenSS7 XNS npi.h header file defines np_long and np_ulong.  These types
+are 32-bits long on both 32-bit and 64-bit architectures.  This
+definition, (in the fashion of t_uscalar_t for TPI header files), makes
+32-bit over 64-bit compatiblity possible as well as making messages
+passed between architectures (with the same endianess) binary
+compatible.
+
+The ramifications of using standard header files over broken LiS header
+files is that 32-bit applications, modules and drivers compiled for LiS
+are binary compatible with applications, modules and drivers compiled
+for this package, whereas applications, modules and drivers compiled
+with the broken LiS-2.18.0 headers will be compatible with nothing but
+itself.
+
+DLPI Header Files
+-----------------
+
+The DLPI header file (sys/dlpi.h) for LiS-2.18.0 is broken for 64-bit
+architectures, and is broken in several data types (e.g.
+dl_qos_co_sel1_t) for all architectures.  The DLPI 2.0.0 specification
+uses `ulong' and `long' throught.  A corrigendum recommends using
+t_uscalar_t and t_scalar_t instead.  LiS-2.18.0 changes a bunch of the
+`ulong's' to dl_ulong's (which are really unsigned int) and defines a
+16bit dl_ushort (used in two places).  In most places where a `long'
+needs to be changed to `dl_long' or `t_scalar_t', LiS-2.18.0 change them
+to `dl_ulong' or in several instances, doesn't change them at all!  (The
+affected structures are dl_qos_cl_sel1_t and (worse) dl_info_ack_t.)
+
+OpenSS7 XNS dlpi header file defined dl_long, dl_ulong and dl_ushort.
+These types are 32-bits (and 16-bits) long on both 32-bit and 64-bit
+architectures.  This definition, (in the fashion of t_uscalar_t for TPI
+header files), makes 32-bit over 64-bit compatibility possible as well
+as making messages passed between architectures (with the same
+endianess) binary compatible.
+
+The ramifications of using standard header files over broken LiS header
+files is that 32-bit applications, modules and drivers compiled for LiS
+are binary compatible with applications, modules and drivers compiled
+for this package (except with regard to dl_qos_co_sel1_t which is just
+too broken), whereas applications, modules and drivers compiled with the
+broken LiS-2.18.0 headers will be compatible with nothing but itself.
+
+CDI Header Files
+----------------
+
+Both OpenSS7 XNS and LiS 2.18.0 provide CDI header files (sys/cdi.h)
+that are binary compatible as well as providing 32-bit over 64-bit
+compatibility.
+
+
+=========================================================================
+
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by
+ the source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and the
+ Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn

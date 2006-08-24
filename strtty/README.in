@@ -96,7 +96,7 @@ validate, uninstall and remove the package:
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
 be generated that can be mailed to The OpenSS7 Project
-(mailto:bugs@openss7.org).  Installation steps using the logging
+(mailto:@PACKAGE_BUGREPORT@).  Installation steps using the logging
 targets proceed as follows:
 
      $> wget http://www.openss7.org/tarballs/@PACKAGE@-@VERSION@.tar.bz2

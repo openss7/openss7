@@ -1,5 +1,5 @@
 @PACKAGE_TITLE@ -- CVS procedures.  @PACKAGE_DATE@
-$Id: README-cvs.in,v 1.1.2.1 2006/08/24 17:00:22 brian Exp $
+$Id: README-cvs.in,v 1.1.2.1 2006/08/24 17:00:21 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -14,8 +14,9 @@ If you are a subscriber or sponsor of The OpenSS7 Project
 can download release, mid-release or release candidate versions of the
 `@PACKAGE_SHORTTITLE@' package from the project CVS archive.
 
-The @PACKAGE_TITLE@ package is located in the `@PACKAGE@' module
-of `/var/cvs'.  For release tag information, see *Note Releases::.
+The @PACKAGE_TITLE@ package is located in
+the `@PACKAGE@' module of `/var/cvs'.  For release tag information, see
+*Note Releases::.
 
 To access the archive from the project CVS pserver, use the following
 commands to check out a version from the archive:

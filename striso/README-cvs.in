@@ -1,4 +1,4 @@
-@PACKAGE_TITLE@ -- CVS procedures.  @PACKAGE_DATE@
+@PACKAGE_TITLE@ -- CVS procedures.  2006-07-11
 $Id: README-cvs.in,v 1.1.2.1 2006/08/24 17:00:22 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
