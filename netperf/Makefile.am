@@ -296,6 +296,17 @@ MANUAL: manual/$(PACKAGE).txt
 
 ALL_LOCAL			+= MANUAL
 
+##
+## Rules for making release files
+##
+RELEASE_FILES			= \
+				  README \
+				  README-alpha \
+				  README-cvs \
+				  README-nexusware
+
+include am/release.am
+
 EXTRA_DIST			+= \
 				  TODO \
 				  MANUAL \

@@ -953,6 +953,18 @@ MANUAL: doc/manual/$(PACKAGE_UCNAME).txt
 
 ALL_LOCAL			+= MANUAL
 
+##
+## Rules for making release files
+##
+RELEASE_FILES			= \
+				  README \
+				  README-alpha \
+				  README-cvs \
+				  README-LiS \
+				  README-nexusware
+
+include am/release.am
+
 EXTRA_DIST			+= \
 				  TODO \
 				  MANUAL \
