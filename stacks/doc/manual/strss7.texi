@@ -67,7 +67,7 @@
 
 @dircategory STREAMS
 @direntry
-* OpenSS7 SS7: (strss7).	An open SS7, SIGTRAN, ISDN, VoIP package.
+* OpenSS7 SS7: (@value{PACKAGE_TARNAME}).	An Open SS7, SIGTRAN, ISDN, VoIP Package.
 @end direntry
 
 @include texi/args.texi
@@ -561,7 +561,7 @@ This manual is organized (loosely) into several sections as follows:
 * Troubleshooting::		Troubleshooting of the package
 @end menu
 @end ifnottex
-@iftex
+@ifnotinfo
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
@@ -578,8 +578,8 @@ This manual is organized (loosely) into several sections as follows:
 @item @ref{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
-@end iftex
-@ifinfo
+@end ifnotinfo
+@ifplaintext
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
@@ -596,7 +596,7 @@ This manual is organized (loosely) into several sections as follows:
 @item @ref{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
-@end ifinfo
+@end ifplaintext
 
 @node Conventions
 @section Conventions and Definitions

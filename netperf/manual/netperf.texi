@@ -68,7 +68,7 @@
 
 @dircategory Network testing
 @direntry
-* Netperf: (netperf).           OpenSS7 implementation of HP Netperf.
+* Netperf: (@value{PACKAGE_TARNAME}).           OpenSS7 implementation of HP Netperf.
 @end direntry
 
 @include texi/args.texi
@@ -576,7 +576,7 @@ This manual is organized (loosely) into several sections as follows:
 * Troubleshooting::		Troubleshooting of the package
 @end menu
 @end ifnottex
-@iftex
+@ifnotinfo
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
@@ -593,8 +593,8 @@ This manual is organized (loosely) into several sections as follows:
 @item @ref{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
-@end iftex
-@ifinfo
+@end ifnotinfo
+@ifplaintext
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
@@ -611,7 +611,7 @@ This manual is organized (loosely) into several sections as follows:
 @item @ref{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
-@end ifinfo
+@end ifplaintext
 
 We thank you in advance for your comments, and hope that you find this tool
 useful.

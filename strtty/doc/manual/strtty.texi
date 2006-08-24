@@ -67,7 +67,7 @@
 
 @dircategory STREAMS
 @direntry
-* OpenSS7 UTIL: (@value{PACKAGE_TARNAME}).	An Open STREAMS Utilities Package.
+* OpenSS7 TTY: (@value{PACKAGE_TARNAME}).	An Open STREAMS Terminals Package.
 @end direntry
 
 @include texi/args.texi
@@ -485,7 +485,7 @@ This manual is organized (loosely) into several sections as follows:
 * Troubleshooting::		Troubleshooting of the package
 @end menu
 @end ifnottex
-@iftex
+@ifnotinfo
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
@@ -502,8 +502,8 @@ This manual is organized (loosely) into several sections as follows:
 @item @ref{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
-@end iftex
-@ifinfo
+@end ifnotinfo
+@ifplaintext
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
@@ -520,7 +520,7 @@ This manual is organized (loosely) into several sections as follows:
 @item @ref{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
-@end ifinfo
+@end ifplaintext
 
 @node Conventions
 @section Conventions and Definitions
@@ -622,6 +622,15 @@ This manual uses @cite{texinfo} typographic conventions.
 @cindex troubleshooting
 
 @include texi/testsuite.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Quick Start
+@appendix Quick Start Guide
+@cindex quick start guide
+
+@include quick.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

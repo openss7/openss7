@@ -65,9 +65,9 @@
 @set MANUAL_TYPE Installation and Reference Manual
 @settitle @value{MANUAL_TITLE}
 
-@dircategory STREAMS
+@dircategory OpenSS7
 @direntry
-* openss7: (openss7).		OpenSS7 Master Package Manual
+* openss7: (@value{PACKAGE_TARNAME}).		OpenSS7 Master Package.
 @end direntry
 
 @defindex op
@@ -454,10 +454,10 @@ This manual documents the design, implementation, installation, operation and fu
 the @cite{@value{PACKAGE_TITLE}} package.
 
 @node Organization
-@section Organization of this Guide
+@section Organization of this Manual
 @cindex organization
 
-This guide is organized (loosely) into several sections as follows:
+This manual is organized (loosely) into several sections as follows:
 
 @ifnottex
 @menu
@@ -470,7 +470,7 @@ This guide is organized (loosely) into several sections as follows:
 * Troubleshooting::		Troubleshooting of the package
 @end menu
 @end ifnottex
-@iftex
+@ifnotinfo
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
@@ -487,8 +487,8 @@ This guide is organized (loosely) into several sections as follows:
 @item @ref{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
-@end iftex
-@ifinfo
+@end ifnotinfo
+@ifplaintext
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
@@ -505,7 +505,7 @@ This guide is organized (loosely) into several sections as follows:
 @item @ref{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
-@end ifinfo
+@end ifplaintext
 
 @node Conventions
 @section Conventions and Definitions
