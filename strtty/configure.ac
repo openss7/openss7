@@ -149,6 +149,10 @@ AC_CHECK_FUNCS([alarm gettimeofday inet_ntoa memset strtol strtoul])
 AC_TTY
 
 AC_CONFIG_FILES([Makefile
+		 README
+		 README-cvs
+		 README-alpha
+		 README-nexusware
 		 scripts/texi/args.texi
 		 src/include/Makefile
 		 src/Makefile

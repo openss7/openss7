@@ -302,8 +302,12 @@ include am/rpm.am
 ##
 include am/deb.am
 
+MANUAL: doc/manual/strtty.txt
+	cp -f $< $@
+
 EXTRA_DIST			+= \
 				  TODO \
+				  MANUAL \
 				  README-cvs \
 				  README-nexusware \
 				  debian/README.Debian \
