@@ -1,10 +1,15 @@
-OpenSS7 STREAMS Sockets -- alpha release introduction.  2006-07-03
-$Id: README-alpha,v 0.9.2.1 2006/08/23 10:03:51 brian Exp $
+@PACKAGE_TITLE@ -- alpha release introduction.  @PACKAGE_DATE@
+$Id$
 Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-This is an alpha release of the OpenSS7 STREAMS Sockets package.  The
+@PACKAGE_TITLE@
+=======================
+
+Package @PACKAGE@-@VERSION@ Released @PACKAGE_DATE@.
+
+This is an alpha release of the @PACKAGE_TITLE@ package.  The
 purpose of this release is to provide the community with a starting
 point for the development of baseline tests for the modules and drivers
 contained in this package.
@@ -34,7 +39,7 @@ executed.
 4.5.1 Defect Notices
 --------------------
 
-"OpenSS7 Sockets" has unknown defects.  This is a "alpha" release.  Some
+"@PACKAGE_TITLE@" has unknown defects.  This is a "alpha" release.  Some
 defects could be harmful.  No validation testing whatsoever has been performed
 by the `OpenSS7 Project' on this software.  The software might fail to
 configure or compile on some systems.  The `OpenSS7 Project' recommends that
@@ -63,7 +68,7 @@ run this software.  YOU HAVE BEEN WARNED.
 
 With the exception of packages not originaly created by the `OpenSS7 Project',
 the `OpenSS7 Project' software does not ship with known bugs in any release
-stage except "pre-alpha".  "OpenSS7 Sockets" had no known bugs at the
+stage except "pre-alpha".  "@PACKAGE_TITLE@" had no known bugs at the
 time of release.
 
 
