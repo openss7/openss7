@@ -288,6 +288,9 @@ include am/deb.am
 ##
 ## Put the text manual where we can find it in the distribution
 ##
+manual/$(PACKAGE).txt:
+	make -C manual $(PACKAGE).txt
+
 MANUAL: manual/$(PACKAGE).txt
 	cp -f $< $@
 
