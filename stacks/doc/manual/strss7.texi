@@ -200,6 +200,7 @@ another language, under the same conditions as for modified versions.
 @defcodeindex mp
 
 @include texi/macros.texi
+@include texi/versions.texi
 
 @iftex
 @headings off
@@ -219,6 +220,10 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @menu
 * Acknowledgements::		Sponsors and Contributors
 * Preface::			Preface to this document
+
+* Quick Start Guide::		Quick Installation Instructions
+
+Full Manual:
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
@@ -468,6 +473,14 @@ than DoD, it is classified as "Restricted Computer Software" and the Government'
 Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
 successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to
 the FAR (or any successor regulations).
+
+@c ----------------------------------------------------------------------------
+
+@node Quick Start Guide
+@unnumbered Quick Start Guide
+@cindex quick start guide
+
+@include texi/quick.texi
 
 @c --------------------------------------------------------------------------
 

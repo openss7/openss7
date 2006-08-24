@@ -236,6 +236,7 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @c @syncodeindex vr cp
 
 @include texi/macros.texi
+@include texi/versions.texi
 
 @ifnottex
 @node Top

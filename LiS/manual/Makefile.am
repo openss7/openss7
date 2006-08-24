@@ -80,16 +80,19 @@ EXTRA_info_TEXINFOS	= \
 			  configure.texi \
 			  install.texi \
 			  releases.texi \
+			  prerequisites.texi \
 			  rpm.texi \
 			  testsuite.texi \
 			  tree.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
+			  texi/quick.texi \
 			  texi/install.texi \
 			  texi/lesser.texi \
 			  texi/testsuite.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/compat.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 

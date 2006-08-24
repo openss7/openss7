@@ -84,20 +84,7 @@ drivers, as well as Linux kernel compatibility.
 @section Prerequisites
 @cindex prerequisites
 
-Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
-
-@itemize @bullet
-@item A fairly LSB compliant GNU/Linux distribution.
-@footnote{@xref{GNU/Linux Distributions}, for more information.}
-@item Linux 2.4 kernel (2.4.10 - 2.4.27)
-@footnote{This @dfn{@value{PACKAGE_TITLE}} package does not yet build and install on any 2.6 kernel.}
-@item glibc2 or better.
-@item GNU info (for info files).
-@item GNU groff (for man pages).
-@footnote{If you are using a Debian release, please make sure to install the groff extension package
-(@samp{groff_ext}), as it contains the @command{refer} or @command{grefer} commands necessary for
-including references in the manual pages.}
-@end itemize
+@include prerequisites.texi
 
 If you need to rebuild the package from sources with modifications, you will need a larger GNU
 toolchain as described in @xref{Downloading from CVS}.

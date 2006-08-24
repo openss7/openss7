@@ -200,6 +200,7 @@ another language, under the same conditions as for modified versions.
 @defcodeindex mp
 
 @include texi/macros.texi
+@include texi/versions.texi
 
 @ifnottex
 @node Top
@@ -213,6 +214,10 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @menu
 * Acknowledgements::		Sponsors and Contributors
 * Preface::			Preface to this document
+
+* Quick Start Guide::		Quick Installation Instructions
+
+Full Manual:
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
@@ -424,6 +429,14 @@ Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulatio
 successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to
 the FAR (or any successor regulations).
 
+@c ----------------------------------------------------------------------------
+
+@node Quick Start Guide
+@unnumbered Quick Start Guide
+@cindex quick start guide
+
+@include texi/quick.texi
+
 @c --------------------------------------------------------------------------
 
 @node Introduction
@@ -622,15 +635,6 @@ This manual uses @cite{texinfo} typographic conventions.
 @cindex troubleshooting
 
 @include texi/testsuite.texi
-
-@c ----------------------------------------------------------------------------
-@c ----------------------------------------------------------------------------
-
-@node Quick Start
-@appendix Quick Start Guide
-@cindex quick start guide
-
-@include quick.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

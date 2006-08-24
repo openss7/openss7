@@ -83,9 +83,10 @@ if DEVELOPMENT
 info_TEXINFOS		+= lab.texi hlr.texi voip.texi
 
 EXTRA_info_TEXINFOS	= \
-			texi/args.texi \
-			$(top_srcdir)/scripts/texi/macros.texi \
-			$(top_srcdir)/scripts/texi/fdl.texi
+			  texi/args.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/fdl.texi
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

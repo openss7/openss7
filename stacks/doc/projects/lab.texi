@@ -229,6 +229,7 @@ no obligation to provide any feature listed herein.
 @page
 
 @include texi/macros.texi
+@include texi/versions.texi
 
 @ifnottex
 @node Top

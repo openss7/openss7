@@ -200,6 +200,7 @@ another language, under the same conditions as for modified versions.
 @defcodeindex mp
 
 @include texi/macros.texi
+@include texi/versions.texi
 
 @ifnottex
 @node Top

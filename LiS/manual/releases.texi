@@ -84,19 +84,7 @@ drivers, as well as Linux kernel compatibility.
 @section Prerequisites
 @cindex prerequisites
 
-Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
-
-@itemize @bullet
-@item A fairly LSB compliant GNU/Linux distribution.
-@footnote{@xref{GNU/Linux Distributions}, for more information.}
-@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.17)
-@item glibc2 or better.
-@item GNU info (for info files).
-@item GNU groff (for man pages).
-@footnote{If you are using a Debian release, please make sure to install the groff extension package
-(@samp{groff_ext}), as it contains the @command{refer} or @command{grefer} commands necessary for
-including references in the manual pages.}
-@end itemize
+@include prerequisites.texi
 
 If you need to rebuild the package from sources with modifications, you will need a larger GNU
 toolchain as described in @xref{Downloading from CVS}.
@@ -434,9 +422,9 @@ The sections that follow provide information on OpenSS7 releases of the @*
 Added @samp{--enable-devel} @command{configure} option for embedded targets.
 Added @command{send-pr} script for automatic problem report generation.
 
-@node Release LiS-2.18.2
-@subsection Release LiS-2.18.2
-@cindex release LiS-2.18.2
+@node Release LiS-2.18.3
+@subsection Release LiS-2.18.3
+@cindex release LiS-2.18.3
 
 Corrections for and testing of 64-bit clean compile and test runs on x86_64 architecture.  Some bug
 corrections resulting from gcc 4.0.2 compiler warnings.

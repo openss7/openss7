@@ -574,8 +574,17 @@ include am/rpm.am
 ##
 include am/deb.am
 
+##
+## Put the text manual where we can find it in the distribution
+##
+MANUAL: manual/$(PACKAGE).txt
+	cp -f $< $@
+
+ALL_LOCAL			+= MANUAL
+
 EXTRA_DIST			+= \
 				  TODO \
+				  MANUAL \
 				  README-cvs \
 				  README-alpha \
 				  README-nexusware \

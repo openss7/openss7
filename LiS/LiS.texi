@@ -167,6 +167,7 @@ Free Software Foundation.
 
 @defcodeindex mp
 @include texi/macros.texi
+@include texi/versions.texi
 
 @node Top, Copying, (dir), (dir)
 @top Linux STREAMS (LiS)

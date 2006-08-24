@@ -302,8 +302,13 @@ include am/rpm.am
 ##
 include am/deb.am
 
-MANUAL: doc/manual/strtty.txt
+##
+## Put the text manual where we can find it in the distribution
+##
+MANUAL: doc/manual/$(PACKAGE).txt
 	cp -f $< $@
+
+ALL_LOCAL			+= MANUAL
 
 EXTRA_DIST			+= \
 				  TODO \

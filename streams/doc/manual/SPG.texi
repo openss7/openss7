@@ -185,6 +185,7 @@ another language, under the same conditions as for modified versions.
 @synindex mp cp
 
 @include texi/macros.texi
+@include texi/versions.texi
 
 @ifnottex
 @node Top
@@ -194,8 +195,6 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of @
 @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @end ifnottex
-
-@include texi/macros.texi
 
 @menu
 * Acknowledgements::

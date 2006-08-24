@@ -93,25 +93,7 @@ drivers, as well as Linux kernel compatibility.
 @section Prerequisites
 @cindex prerequisites
 
-Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
-
-@itemize @bullet
-@item A fairly LSB compliant GNU/Linux distribution.
-@footnote{@xref{GNU/Linux Distributions}, for more information.}
-@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.17)
-@item glibc2 or better.
-@item GNU info (for info files).
-@item GNU groff (for man pages).
-@footnote{If you are using a Debian release, please make sure to install the groff extension package
-(@samp{groff_ext}), as it contains the @command{refer} or @command{grefer} commands necessary for
-including references in the manual pages.}
-@item OpenSS7 Linux Fast-STREAMS
-(@href{http://@-www.@-openss7.@-org/@-tarballs/@-streams-0.7a.6.@-tar.@-bz2, streams-0.7a.6} or better)
-@footnote{Although this an other OpenSS7 STREAMS packages will build and install with Linux STREAMS
-(LiS), @b{Linux STREAMS (LiS) is deprecated and cannot be supported because it is full of bugs!}}
-@item OpenSS7 STREAMS Compatibility Modules
-(@href{http://@-www.@-openss7.@-org/@-tarballs/@-strcompat-0.9.2.4.@-tar.@-bz2, strcompat-0.9.2.4} or better)
-@end itemize
+@include prerequisites.texi
 
 If you need to rebuild the package from sources with modifications, you will need a larger GNU
 toolchain as described in @xref{Downloading from CVS}.

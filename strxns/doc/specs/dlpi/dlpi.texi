@@ -362,6 +362,7 @@ obligation to provide any feature listed herein.
 @c syncodeindex vr cp
 
 @include texi/macros.texi
+@include texi/versions.texi
 
 @ifnottex
 @node Top

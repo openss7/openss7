@@ -200,6 +200,7 @@ another language, under the same conditions as for modified versions.
 @defcodeindex mp
 
 @include texi/macros.texi
+@include texi/versions.texi
 
 @ifnottex
 @node Top
@@ -213,6 +214,10 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @menu
 * Acknowledgements::		Sponsors and Contributors
 * Preface::			Preface to this document
+
+* Quick Start Guide::		Quick Installation Instructions
+
+Full Manual:
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
@@ -605,6 +610,16 @@ You can mail to the group by addressing email to
 You can view the archives at
 @uref{http://gsyc.escet.urjc.es/mailarchive/linux-streams}.
 @end ignore
+
+@c ----------------------------------------------------------------------------
+
+@node Quick Start Guide
+@unnumbered Quick Start Guide
+@cindex quick start guide
+
+@include texi/quick.texi
+
+@c ----------------------------------------------------------------------------
 
 @node Introduction
 @chapter Introduction

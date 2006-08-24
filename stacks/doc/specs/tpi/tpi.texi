@@ -230,6 +230,7 @@ countries.
 
 @defcodeindex mp
 @include texi/macros.texi
+@include texi/versions.texi
 
 @ifnottex
 @node Top

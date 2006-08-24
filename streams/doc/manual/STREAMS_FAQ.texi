@@ -187,6 +187,7 @@ another language, under the same conditions as for modified versions.
 @synindex mp cp
 
 @include texi/macros.texi
+@include texi/versions.texi
 
 @ifnottex
 @node Top

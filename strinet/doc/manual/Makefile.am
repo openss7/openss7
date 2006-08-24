@@ -76,15 +76,18 @@ info_TEXINFOS		+= strinet.texi
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
 			  releases.texi \
+			  prerequisites.texi \
 			  rpm.texi \
 			  tree.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
+			  texi/quick.texi \
 			  texi/install.texi \
 			  texi/testsuite.texi \
 			  texi/lesser.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/compat.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
