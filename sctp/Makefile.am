@@ -90,9 +90,7 @@ if PKG_BUILD_ARCH
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-EXTRA_PROGRAMS			+= 
-
-pkglibexec_PROGRAMS		= \
+sctp_programs			= \
 				  test-tcps \
 				  test-tcpc \
 				  test-udps \
@@ -109,6 +107,14 @@ pkglibexec_PROGRAMS		= \
 				  test-sctp-tc \
 				  test-sctp-ss \
 				  test-sctp-sc
+
+if WITH_KO_MODULES
+pkglibexec_PROGRAMS		= 
+else
+pkglibexec_PROGRAMS		= $(sctp_programs)
+endif
+
+EXTRA_PROGRAMS			+= $(sctp_programs)
 
 test_tcps_SOURCES		= test/test-tcps.c
 test_tcps_DEPENDENCIES		= $(CONFIG_HEADER)
@@ -206,9 +212,15 @@ endif
 if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
 
+if WITH_KO_MODULES
+ADDON_LIBS			= 
+ADDON_MODS			= 
+ADDON_OBJS			= 
+else
 ADDON_LIBS			= libSCTPmodl.a
 ADDON_MODS			= sctp.o
 ADDON_OBJS			= $(libSCTPmodl_a_OBJECTS)
+endif
 
 noinst_LIBRARIES		= $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= libSCTPmodl.a
@@ -230,7 +242,11 @@ nodist_EXTRA_libSCTPmodl_a_SOURCES = \
 				  src/sctp_namespace.h \
 				  src/sctp.c
 
+if WITH_KO_MODULES
+sctp_source_FILES		= 
+else
 sctp_source_FILES		= $(nodist_EXTRA_libSCTPmodl_a_SOURCES)
+endif
 
 nodist_libSCTPmodl_a_SOURCES	= $(sctp_source_FILES)
 
