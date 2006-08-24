@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Terminals -- alpha release introduction.  2006-07-03
+OpenSS7 STREAMS Terminals -- alpha release introduction.  2006-08-24
 $Id: README-alpha,v 0.9.2.1 2006/08/23 09:53:07 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
@@ -34,7 +34,7 @@ executed.
 4.5.1 Defect Notices
 --------------------
 
-"OpenSS7 Terminals" has unknown defects.  This is a "alpha" release.  Some
+"OpenSS7 STREAMS Terminals" has unknown defects.  This is a "alpha" release.  Some
 defects could be harmful.  No validation testing whatsoever has been performed
 by the `OpenSS7 Project' on this software.  The software might fail to
 configure or compile on some systems.  The `OpenSS7 Project' recommends that
@@ -63,7 +63,7 @@ run this software.  YOU HAVE BEEN WARNED.
 
 With the exception of packages not originaly created by the `OpenSS7 Project',
 the `OpenSS7 Project' software does not ship with known bugs in any release
-stage except "pre-alpha".  "OpenSS7 Terminals" had no known bugs at the
+stage except "pre-alpha".  "OpenSS7 STREAMS Terminals" had no known bugs at the
 time of release.
 
 

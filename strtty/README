@@ -1,11 +1,11 @@
-OpenSS7 STREAMS Terminals -- readme first file.  2006-08-23
-$Id: README,v 0.9.2.1 2006/08/23 09:53:07 brian Exp $
+OpenSS7 STREAMS Terminals -- readme first file.  2006-08-24
+$Id$
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 OpenSS7 STREAMS Terminals
-*************************************
+=======================
 
 This is the `strtty-0.9.2.1.rc3' package.  It, and the current version,
 can be obtained from the download aread of The OpenSS7 Project
@@ -36,7 +36,7 @@ See `README-alpha' (if it exists) for alpha release information.
 Prerequisites
 -------------
 
-The following are prequisites for building the package:
+The following are prerequisites for building the package:
 
   1. `Linux' distribution with a 2.4 or 2.6 kernel with the appropriate
      tool chain.  For supported and tested distributions, see the

@@ -1,11 +1,11 @@
-OpenSS7 Master Package -- alpha release introduction.  2006-07-03
-$Id: README-alpha,v 0.9.2.2 2006/07/03 02:53:24 brian Exp $
+OpenSS7 Master Package -- alpha release introduction.  2006-08-23
+$Id$
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-This is an alpha release of the OpenSS7 Master Package.  The purpose of
-this alpha release is to provide the techical community with detailed
+This is an alpha release of the OpenSS7 Master Package.  The purpose
+of this alpha release is to provide the techical community with detailed
 information on the status and development directions for the package.
 
 THIS CODE HAS NOT BEEN VALIDATED.  LOADING OR EXECUTING CODE IN THIS
@@ -17,10 +17,10 @@ The following is an extract from the Installation and Reference Manual:
 4.4 Bugs
 ========
 
-"OpenSS7 Master" may have unknown bugs.  These are alpha releases.
-Although there are no bugs known to be harmful, the OpenSS7 Project does
-not fully validate alpha releases.  Use at your own risk.  Remember that
-there is NO WARRANTY.(1)
+"OpenSS7 Master Package" may have unknown bugs.  These are alpha
+releases.  Although there are no bugs known to be harmful, the OpenSS7
+Project does not fully validate alpha releases.  Use at your own risk.
+Remember that there is NO WARRANTY.(1)
 
 This software is alpha software.  As such, it might crash your kernel.
 Installation of the software might irreparably mangle your header files
