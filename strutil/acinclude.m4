@@ -157,24 +157,24 @@ AC_DEFUN([_UTIL_OPTIONS], [dnl
 AC_DEFUN([_UTIL_SETUP_DEBUG], [dnl
     case "$linux_cv_debug" in
 	_DEBUG)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [], [Define to perform
+	    AC_DEFINE([CONFIG_STREAMS_DEBUG], [1], [Define to perform
 		    internal structure tracking within the STREAMS executive
 		    as well as to provide additional /proc filesystem files
 		    for examining internal structures.])
 	    ;;
 	_TEST)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TEST], [], [Define to perform
+	    AC_DEFINE([CONFIG_STREAMS_TEST], [1], [Define to perform
 		    performance testing with debugging.  This mode does not
 		    dump massive amounts of information into system logs, but
 		    peforms all assertion checks.])
 	    ;;
 	_SAFE)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAFE], [], [Define to perform
+	    AC_DEFINE([CONFIG_STREAMS_SAFE], [1], [Define to perform
 		    fundamental assertion checks.  This is a safer mode of
 		    operation.])
 	    ;;
 	_NONE | *)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NONE], [], [Define to perform
+	    AC_DEFINE([CONFIG_STREAMS_NONE], [1], [Define to perform
 		    no assertion checks but report software errors.  This is
 		    the smallest footprint, highest performance mode of
 		    operation.])
@@ -223,12 +223,12 @@ AC_DEFUN([_UTIL_SETUP_MODULES], [dnl
 dnl --------------------------------------
     case ${util_module_pipemod:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPEMOD], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_PIPEMOD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the pipemod module for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the pipemod module for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPEMOD_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_PIPEMOD_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the pipemod module as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the pipemod module as a loadable kernel
 	    module.])
@@ -236,12 +236,12 @@ dnl --------------------------------------
     esac
     case ${util_module_connld:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CONNLD], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_CONNLD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the connld module for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the connld module for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CONNLD_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_CONNLD_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the connld module as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the connld module as a loadable kernel
 	    module.])
@@ -249,12 +249,12 @@ dnl --------------------------------------
     esac
     case ${util_module_sc:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SC], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_SC], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sc module for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the sc module for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SC_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_SC_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the sc module as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the sc module as a loadable kernel
 	    module.])
@@ -398,12 +398,12 @@ AC_DEFUN([_UTIL_SETUP_DRIVERS], [dnl
 dnl ------------------------------------
     case ${util_driver_clone:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CLONE], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_CLONE], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the clone driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the clone driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CLONE_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_CLONE_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the clone driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the clone driver as a loadable kernel
 	    module.])
@@ -411,12 +411,12 @@ dnl ------------------------------------
     esac
     case ${util_driver_echo:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_ECHO], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_ECHO], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the echo driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the echo driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_ECHO_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_ECHO_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the echo driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the echo driver as a loadable kernel
 	    module.])
@@ -424,12 +424,12 @@ dnl ------------------------------------
     esac
     case ${util_driver_fifo:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the fifo driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the fifo driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO_MODULE], [], [When defined,]
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the fifo driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the fifo driver as a loadable kernel
 	    module.])
@@ -437,12 +437,12 @@ dnl ------------------------------------
     esac
     case ${util_driver_log:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the log driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the log driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG_MODULE], [], [When defined,]
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the log driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the log driver as a loadable kernel
 	    module.])
@@ -450,12 +450,12 @@ dnl ------------------------------------
     esac
     case ${util_driver_loop:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOOP], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_LOOP], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the loop driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the loop driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOOP_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_LOOP_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the loop driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the loop driver as a loadable kernel
 	    module.])
@@ -463,12 +463,12 @@ dnl ------------------------------------
     esac
     case ${util_driver_nsdev:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NSDEV], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_NSDEV], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the nsdev driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the nsdev driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NSDEV_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_NSDEV_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the nsdev driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the nsdev driver as a loadable kernel
 	    module.])
@@ -476,12 +476,12 @@ dnl ------------------------------------
     esac
     case ${util_driver_nuls:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULS], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_NULS], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the nuls driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the nuls driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULS_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_NULS_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the nuls driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the nuls driver as a loadable kernel
 	    module.])
@@ -489,12 +489,12 @@ dnl ------------------------------------
     esac
     case ${util_driver_pipe:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPE], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_PIPE], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the pipe driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the pipe driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPE_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_PIPE_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the pipe driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the pipe driver as a loadable kernel
 	    module.])
@@ -502,12 +502,12 @@ dnl ------------------------------------
     esac
     case ${util_driver_sad:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAD], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_SAD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sad driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the sad driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAD_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_SAD_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the sad driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the sad driver as a loadable kernel
 	    module.])
@@ -515,12 +515,12 @@ dnl ------------------------------------
     esac
     case ${util_driver_sfx:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SFX], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_SFX], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sfx driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the sfx driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SFX_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_SFX_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the sfx driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the sfx driver as a loadable kernel
 	    module.])
@@ -528,12 +528,12 @@ dnl ------------------------------------
     esac
     case ${util_driver_spx:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SPX], [], [When defined,] AC_PACKAGE_TITLE [
+	    AC_DEFINE([CONFIG_STREAMS_SPX], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the spx driver for linkage with the kernel.  When undefined,]
 	    AC_PACKAGE_TITLE [will not include the spx driver for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SPX_MODULE], [], [When defined,]
+	    AC_DEFINE([CONFIG_STREAMS_SPX_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include the spx driver as a loadable kernel module.  When
 	    undefined,] AC_PACKAGE_TITLE [will not include the spx driver as a loadable kernel
 	    module.])
@@ -576,7 +576,7 @@ AC_DEFUN([_UTIL_SETUP_FIFOS], [dnl
 	[enable_streams_fifos="$enableval"],
 	[enable_streams_fifos='no'])
     if test :"$enable_streams_fifos" = :yes ; then
-	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_OVERRIDE_FIFOS], [], [When defined,]
+	AC_DEFINE([CONFIG_STREAMS_OVERRIDE_FIFOS], [1], [When defined,]
 		AC_PACKAGE_TITLE [will override the Linux system defined
 		FIFOs at startup.  This should be used with care for a while,
 		until streams FIFOs are proven.])
