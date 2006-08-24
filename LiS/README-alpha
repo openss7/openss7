@@ -1,5 +1,5 @@
-OpenSS7 Linux STREAMS (LiS) -- alpha release introduction.  2006-07-03
-$Id: README-alpha,v 1.1.2.4 2006/07/11 01:55:54 brian Exp $
+Linux STREAMS (LiS) -- alpha release introduction.  2006-08-23
+$Id$
 Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,9 @@ See the end for copying conditions (for this file).
 Linux STREAMS (LiS)
 ===================
 
-This is an incremental release of OpenSS7 Linux STREAMS.  The purpose of
+Package LiS-2.18.4.rc3 Released 2006-08-23.
+
+This is an incremental release of Linux STREAMS (LiS).  The purpose of
 this release is to provide the technical community with a detailed
 comparison point for the OpenSS7 Linux Fast-STREAMS releases, which are
 superior and that deprecates this package.
@@ -39,7 +41,7 @@ which it is executed.
 5.5.1 Defect Notices
 --------------------
 
-"Linux STREAMS (LiS)", both releases from `OpenSS7' and `GCOM', contain
+"Linux STREAMS (LiS)", both releases from `OpenSS7' and `GCOM', contany
 many known bugs. These are unstable releases.  Although there are no
 bugs known to be harmful, the `OpenSS7 Project' has tested the release
 and found defects that cause the kernel to lock or crash. Use at your
