@@ -1264,7 +1264,7 @@ dl_r_error(queue_t *q, mblk_t *mp)
  * @q: upper multiplex write queue
  * @mp: message to process
  */
-STATIC int
+STATIC streamscall int
 np_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -1304,7 +1304,7 @@ np_w_prim(queue_t *q, mblk_t *mp)
  * function.  This function is only used for the read queue of an upper multiplex.
  *
  */
-STATIC int
+STATIC streamscall int
 np_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -1318,7 +1318,7 @@ np_r_prim(queue_t *q, mblk_t *mp)
 	return (QR_PASSFLOW);
 }
 
-STATIC void
+STATIC streamscall void
 np_r_wakeup(queue_t *q)
 {
 	qenable(q);
@@ -1369,7 +1369,7 @@ dl_w_prim(queue_t *q, mblk_t *mp)
  * (q->q_next); when a multiplexing driver, some algorithm that considers all upper multiplex
  * streams.
  */
-STATIC int
+STATIC streamscall int
 dl_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
