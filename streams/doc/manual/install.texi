@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.29 2006/08/22 12:36:51 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.30 2006/08/24 16:15:44 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,9 +54,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/22 12:36:51 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/24 16:15:44 $ by $Author: brian $
 @c
 @c =========================================================================
+
+@set pkgtype release
+@set PACKAGE_CVSMODULE @value{PACKAGE}
+@set package @value{PACKAGE_LCNAME}
+@set pkgexample @value{PACKAGE_LCNAME}
 
 @menu
 * Downloading::			Downloading the package
@@ -75,21 +80,29 @@
 @section Downloading
 @cindex downloading
 
-The @value{PACKAGE_TITLE} package releases can be downloaded from the downloads
-page of @uref{http://www.openss7.org/download.html, The OpenSS7 Project}.  The
-package is available as a binary RPM (for popular architectures) a source RPM,
-Debian binary DEB and source DSC, or as a tar ball.  If you are using a
-browsable viewer, you can obtain the OpenSS7 release of
+The @value{PACKAGE_TITLE} package releases can be downloaded from the downloads page of
+@uref{http://www.openss7.org/download.html, The OpenSS7 Project}.
+@ignore
+The master package is currently only available as a tar ball.@footnote{At a later date this
+@value{PACKAGE_TITLE} might be enhanced to build separate master package RPMs and DEBs, but as the
+objective of the @value{PACKAGE_TITLE} was for development purposes, this is on the back-burner.}
+@end ignore
+The package is available as a binary RPM (for popular architectures) a source RPM, Debian binary DEB
+and source DSC, or as a tar ball.
+If you are using a browsable viewer, you can obtain the OpenSS7 release of
 @command{@value{PACKAGE_NAME}} from the links in the sections that follow.
 
-By far the easiest form for installing and using
-@command{@value{PACKAGE}-@value{VERSION}} is to download and install binary RPM.
-If a binary RPM is not available for your distribution,  but your distribution
-supports RPM, the next best method for installing and using
-@command{@value{PACKAGE}-@value{VERSION}} is to download and rebuild the source
-RPM.  If your architecture does not support RPM at all, or you have special
-needs (such as cross-compiling for embedded targets), the final resort method is
-to download, configure, build and install from the source tarball.
+By far the easiest (most repeatable and manageable) form for installing and using @cite{OpenSS7}
+packages is to download and install individual packages from binary RPM or DEB.  If binary RPMs or
+DEBs are not available for your distribution, but your distribution supports @manref{rpm(1)} or
+@manref{dpkg(1)}, the next best method for installing and using @cite{OpenSS7} packages is to
+download and rebuild the source RPMs or DSCs.
+
+If your architecture does not support @manpage{rpm(1)} or @manpage{dpkg(1)} at all, or you have
+special needs (such as cross-compiling for embedded targets), the final resort method is to
+download, configure, build and install from tarball.  In this later case, the easiest way to build
+and install @cite{OpenSS7} packages from tarball is to use the tarball for the
+@cite{OpenSS7 Master Package}, @command{openss7-@value{VERSION_OPENSS7}}.
 
 @menu
 * Downloading the Binary RPM::		the easiest approach
@@ -107,10 +120,10 @@ to download, configure, build and install from the source tarball.
 @cindex downloading, binary rpms
 @cindex binary rpms
 
-To install from binary RPM, you will need several of the RPM for a complete
-installation.  Binary RPM fall into several categories.  To download and install a
-complete package requires the appropriate RPM from each of the several categories
-below.
+To install from binary RPM, you will need several of the RPM for a complete installation.  Binary
+RPM fall into several categories.  To download and install a complete package requires the
+appropriate RPM from each of the several categories below, as applicable.  Some release packages do
+not provide RPMs in each of the several categories.
 
 To install from Binary RPM, you will need all of the following kernel
 indepdendent packages for your architecture, and one of the kernel-depdendent
@@ -138,10 +151,10 @@ RPM}).
 The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary
 to run applications programs developed for @value{PACKAGE_TITLE}.@footnote{Not
 all distributions support the @samp{%dev} RPM macro: a case in point is the SuSE
-8.0 distribution which uses an older version of @command{rpm}.  Distributions
+8.0 distribution which uses an older version of @manpage{rpm(1)}.  Distributions
 that do not support the @samp{%dev} macro will build devices as a @samp{%post}
 operation.  Note also that not all release packages contain devices.  Only
-packages that provide STREAMS character device drivers need devices, and then
+packages that provide @dfn{STREAMS} character device drivers need devices, and then
 only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
 @item @href{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
@@ -149,7 +162,7 @@ The @file{@value{PACKAGE}@--doc} package contains this manual in plaintext,
 postscript, PDF and HTML forms, along with the meta-information from the
 @file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
 necessary for developing @value{PACKAGE_TITLE} applications and
-@value{PACKAGE_TITLE} STREAMS modules or drivers.
+@value{PACKAGE_TITLE} @dfn{STREAMS} modules or drivers.
 
 @item @href{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}@--init@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}@--init} package contains the init scripts and provides
@@ -158,7 +171,7 @@ definitions for all kernel module @samp{core} subpackages.
 
 @item @href{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}@--source} package contains the source code necessary for
-building the @value{PACKAGE_TITLE} release.  It includes the @command{autoconf}
+building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
 configuration utilities necessary to create and distribute tarballs, rpms and
 deb/dscs.
 @ignore
@@ -192,15 +205,15 @@ configuration test utilities and commands associated with the
 
 @ignore
 @subsubheading STREAMS-Dependent RPM
-STREAMS-Dependent RPM are dependent upon the specific STREAMS package being
+@dfn{STREAMS}-Dependent RPM are dependent upon the specific @dfn{STREAMS} package being
 used, either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.  Packages
 dependent upon @cite{Linux STREAMS} will have @file{LiS} in the package name.
 Packages dependent upon @cite{Linux Fast-STREAMS} will have @file{streams} in
-the package name.  Note that some STREAMS-Dependent RPM are also
+the package name.  Note that some @dfn{STREAMS}-Dependent RPM are also
 Kernel-Dependent RPM as described below.
 
 @noindent
-One of the following STREAMS-Dependent packages is required for your
+One of the following @dfn{STREAMS}-Dependent packages is required for your
 architecture.  If your architecture is not on the list, you can build binary RPM
 from the source RPM (see @pxref{Building from the Source RPM}).
 
@@ -209,14 +222,14 @@ from the source RPM (see @pxref{Building from the Source RPM}).
 The @file{@value{PACKAGE}@--LiS@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
-STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
+@dfn{STREAMS}-specific library, it is a @dfn{STREAMS}-Dependent package.  Use the
 @file{@value{PACKAGE}@--LiS@--util} package if you have LiS installed.
 
 @item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--streams@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--streams@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
-STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
+@dfn{STREAMS}-specific library, it is a @dfn{STREAMS}-Dependent package.  Use the
 @file{@value{PACKAGE}@--streams@--util} package if you have streams installed.
 @end table
 @end ignore
@@ -233,7 +246,7 @@ you can build binary RPM from the source RPM (see @pxref{Building from the
 Source RPM}).@footnote{Note that on @cite{Mandrakelinux}, unlike other RPM
 kernel distributions, kernel packages for the ix86 architectures are always
 placed in i586 architecture packages regardless of the true processor
-architecture of the kernel package.  @command{configure} detects this and builds
+architecture of the kernel package.  @file{configure} detects this and builds
 the appropriate packages.}
 
 @table @asis
@@ -261,16 +274,16 @@ compiled.  This particular package applies to kernel version
 @ignore
 @item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--LiS@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--LiS@--core} package contains the kernel modules that
-provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
-heavily tied to the STREAMS package and kernel for which it was compiled.  This
+provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
+heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
 particular package applies to @file{LiS} (@cite{Linux STREAMS}) on kernel
 version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
 @item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--streams@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--streams@--core} package contains the kernel modules that
-provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
-heavily tied to the STREAMS package and kernel for which it was compiled.  This
+provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
+heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
 particular package applies to @file{streams} (@cite{Linux Fast@--STREAMS}) on
 kernel version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion}
 of @samp{@value{_kversion}} is only an example.}
@@ -282,7 +295,7 @@ contain a @file{LiS@--info} subpackage.} contains the module symbol version
 information for the @file{LiS@--core} subpackage, above.  It is possible to load
 this subpackage and compile modules that use the exported symbols without loaded
 the actual kernel modules (from the @file{LiS@--core} subpackage above).  This
-package is heavily tied to the STREAMS package and kernel for which it was
+package is heavily tied to the @dfn{STREAMS} package and kernel for which it was
 compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
 on kernel version @samp{@value{_kversion}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
@@ -294,7 +307,7 @@ contain a @file{streams@--info} subpackage.} contains the module symbol version
 information for the @file{streams@--core} subpackage, above.  It is possible to
 load this subpackage and compile modules that use the exported symbols without
 loaded the actual kernel modules (from the @file{streams@--core} subpackage
-above).  This package is heavily tied to the STREAMS package and kernel for
+above).  This package is heavily tied to the @dfn{STREAMS} package and kernel for
 which it was compiled.  This particular package applies to @file{streams}
 (@cite{Linux Fast@--STREAMS}) on kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
@@ -313,52 +326,47 @@ RPM}.
 @cindex downloading, debian debs
 @cindex binary debs
 
-To install from binary DEB, you will need several of the DEB for a complete
-installation.  Binary DEB fall into several categories.  To download and install a
-complete package requires the appropriate DEB from each of the several categories
-below.
+To install from binary DEB, you will need several of the DEB for a complete installation.  Binary
+DEB fall into several categories.  To download and install a complete package requires the
+appropriate DEB from each of the several categories below.
 
-To install from Binary DEB, you will need all of the following kernel
-indepdendent packages for your architecture, and one of the kernel-depdendent
-packages from the next section.
+To install from Binary DEB, you will need all of the following kernel indepdendent packages for your
+architecture, and one of the kernel-depdendent packages from the next section.
 
 @subsubheading Independent DEB
-Independent DEB are not dependent on the Linux kernel version.
-For example, the source package
-@samp{@value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb},
-is not dependent on kernel.
+Independent DEB are not dependent on the Linux kernel version.  For
+example, the source package
+@samp{@value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}, is not
+dependent on kernel.
 
 @noindent
-All of the following kernel independent DEB are required for your
-architecture.  Binary DEBs listed here are for example only: additional binary
-DEBs are available from the downloads site.  If your architecture is not
-available, you can build binary DEB from the Debian DSC (see @pxref{Building
-from the Debian DSC}).
+All of the following kernel independent DEB are required for your architecture.
+Binary DEBs listed here are for example only: additional binary DEBs are available from the
+downloads site.  If your architecture is not available, you can build binary DEB from the Debian DSC
+(see @pxref{Building from the Debian DSC}).
 
 @subsubheading Architecture Independent
 @table @asis
 @item @href{http://www.openss7.org/debian/@value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}@--dev_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
-The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary
-to run applications programs developed for @value{PACKAGE_TITLE}.
-@footnote{Note that not all release packages contain devices.  Only packages
-that provide STREAMS character device drivers need devices, and then only when
-the @samp{specfs} or @samp{devfsd} is not being used.}
+The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary to run
+applications programs developed for @value{PACKAGE_TITLE}.  @footnote{Note that not all release
+packages contain devices.  Only packages that provide @dfn{STREAMS} character device drivers need
+devices, and then only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
 @item @href{http://www.openss7.org/debian/@value{PACKAGE}-doc_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}@--doc_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
-The @file{@value{PACKAGE}@--doc} package contains this manual in plaintext,
-postscript, PDF and HTML forms, along with the meta-information from the
-@file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
-necessary for developing @value{PACKAGE_TITLE} applications and
-@value{PACKAGE_TITLE} STREAMS modules or drivers.
+The @file{@value{PACKAGE}@--doc} package contains this manual in plaintext, postscript, PDF and HTML
+forms, along with the meta-information from the @file{@value{PACKAGE_NAME}} package.  It also
+contains all of the manual pages necessary for developing @value{PACKAGE_TITLE} applications and
+@value{PACKAGE_TITLE} @dfn{STREAMS} modules or drivers.
 
 @item @href{http://www.openss7.org/debian/@value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}@--init_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
-The @file{@value{PACKAGE}@--init} package contains the init scripts and provides
-the postinst scripts necessary to create kernel module preloads and modules
-definitions for all kernel module @samp{core} subpackages.
+The @file{@value{PACKAGE}@--init} package contains the init scripts and provides the postinst
+scripts necessary to create kernel module preloads and modules definitions for all kernel module
+@samp{core} subpackages.
 
 @item @href{http://www.openss7.org/debian/@value{PACKAGE}-source_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}@--source} package contains the source code necessary for
-building the @value{PACKAGE_TITLE} release.  It includes the @command{autoconf}
+building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
 configuration utilities necessary to create and distribute tarballs, rpms and
 deb/dscs.
 !ignore
@@ -394,15 +402,15 @@ configuration test utilities and commands associated with the
 
 @ignore
 @subsubheading STREAMS-Dependent DEB
-STREAMS-Dependent DEB are dependent upon the specific STREAMS package being
+@dfn{STREAMS}-Dependent DEB are dependent upon the specific @dfn{STREAMS} package being
 used, either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.  Packages
 dependent upon @cite{Linux STREAMS} will have @file{LiS} in the package name.
 Packages dependent upon @cite{Linux Fast-STREAMS} will have @file{streams} in
-the package name.  Note that some STREAMS-Dependent DEB are also
+the package name.  Note that some @dfn{STREAMS}-Dependent DEB are also
 Kernel-Dependent DEB as described below.
 
 @noindent
-One of the following STREAMS-Dependent packages is required for your
+One of the following @dfn{STREAMS}-Dependent packages is required for your
 architecture.  If your architecture is not on the list, you can build binary DEB
 from the Debian DSC (see @pxref{Building from the Debian DSC}).
 
@@ -411,14 +419,14 @@ from the Debian DSC (see @pxref{Building from the Debian DSC}).
 The @file{@value{PACKAGE}@--LiS@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
-STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
+@dfn{STREAMS}-specific library, it is a @dfn{STREAMS}-Dependent package.  Use the
 @file{@value{PACKAGE}@--LiS@--util} package if you have LiS installed.
 
 @item @href{http://www.openss7.org/debian/@value{PACKAGE}-streams-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--streams@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--streams@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
-STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
+@dfn{STREAMS}-specific library, it is a @dfn{STREAMS}-Dependent package.  Use the
 @file{@value{PACKAGE}@--streams@--util} package if you have streams installed.
 @end table
 @end ignore
@@ -435,7 +443,7 @@ you can build binary DEB from the source DEB (see @pxref{Building from the
 Debian DSC}).@footnote{Note that on @cite{Mandrakelinux}, unlike other DEB
 kernel distributions, kernel packages for the ix86 architectures are always
 placed in i586 architecture packages regardless of the true processor
-architecture of the kernel package.  @command{configure} detects this and builds
+architecture of the kernel package.  @file{configure} detects this and builds
 the appropriate packages.}
 
 @table @asis
@@ -463,16 +471,16 @@ compiled.  This particular package applies to kernel version
 @ignore
 @item @href{http://www.openss7.org/debian/@value{PACKAGE}-LiS-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--LiS@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--LiS@--core} package contains the kernel modules that
-provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
-heavily tied to the STREAMS package and kernel for which it was compiled.  This
+provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
+heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
 particular package applies to @file{LiS} (@cite{Linux STREAMS}) on kernel
 version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
 @item @href{http://www.openss7.org/debian/@value{PACKAGE}-streams-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--streams@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--streams@--core} package contains the kernel modules that
-provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
-heavily tied to the STREAMS package and kernel for which it was compiled.  This
+provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
+heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
 particular package applies to @file{streams} (@cite{Linux Fast@--STREAMS}) on
 kernel version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion}
 of @samp{@value{_kversion}} is only an example.}
@@ -484,7 +492,7 @@ contain a @file{LiS@--info} subpackage.} contains the module symbol version
 information for the @file{LiS@--core} subpackage, above.  It is possible to load
 this subpackage and compile modules that use the exported symbols without loaded
 the actual kernel modules (from the @file{LiS@--core} subpackage above).  This
-package is heavily tied to the STREAMS package and kernel for which it was
+package is heavily tied to the @dfn{STREAMS} package and kernel for which it was
 compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
 on kernel version @samp{@value{_kversion}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
@@ -496,7 +504,7 @@ contain a @file{streams@--info} subpackage.} contains the module symbol version
 information for the @file{streams@--core} subpackage, above.  It is possible to
 load this subpackage and compile modules that use the exported symbols without
 loaded the actual kernel modules (from the @file{streams@--core} subpackage
-above).  This package is heavily tied to the STREAMS package and kernel for
+above).  This package is heavily tied to the @dfn{STREAMS} package and kernel for
 which it was compiled.  This particular package applies to @file{streams}
 (@cite{Linux Fast@--STREAMS}) on kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
@@ -515,13 +523,13 @@ DEB}.
 @cindex downloading, source srpm
 @cindex source rpms
 
-If you cannot obtain a binary RPM for your architecture, or would like to roll
-you own binary RPM, download the following source RPM.
+If you cannot obtain a binary RPM for your architecture, or would like to roll you own binary RPM,
+download the following source RPM.
 
 @table @asis
 @item @href{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm, @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
-This is the source RPM for the package.  From this source RPM it is possible to
-build binary RPM for any supported architecture and for any 2.4 or 2.6 kernel.
+This is the source RPM for the package.  From this source RPM it is possible to build binary RPM for
+any supported architecture and for any 2.4 or 2.6 kernel.
 @end table
 
 @subsubheading Configuration
@@ -534,14 +542,14 @@ To configure the source RPM, @xref{Configuring the Source RPM}.
 @cindex downloading, debian dscs
 @cindex source dscs
 
-If you cannot obtain a binary DEB for your architecture, or would like to roll
-your own DEB, download the following Debian DSC.
+If you cannot obtain a binary DEB for your architecture, or would like to roll your own DEB,
+download the following Debian DSC.
 
 @table @asis
 @item @href{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc}
 @itemx @href{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz}
-This is the Debian DSC for the package.  From this Debian DSC it is possible to
-build binary DEB for any supported architecture and for any 2.4 or 2.6 kernel.
+This is the Debian DSC for the package.  From this Debian DSC it is possible to build binary DEB for
+any supported architecture and for any 2.4 or 2.6 kernel.
 @end table
 
 @subsubheading Configuration
@@ -554,20 +562,19 @@ To configure the source RPM, @xref{Configuring the Debian DSC}.
 @cindex downloading, tar ball
 @cindex tar ball
 
-For non-RPM architectures, such as @cite{Nex@-us@-Ware} embedded target, download
-the tarball as follows:
+For non-@manpage{rpm(1)} architectures, such as @cite{Nex@-us@-Ware} embedded target, download the
+tarball as follows:
 
 @table @asis
 @item @href{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz, @value{PACKAGE}@--@value{VERSION}@-.tar@-.gz}
 @itemx @href{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2, @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2}
-These are the @command{tar} balls for the release.  These @command{tar} balls
-contain the @command{autoconf} distribution which includes all the source
-necessary for building and installing the package.  These tarballs will even
-build Source RPM and Binary RPM on RPM architectures and Debian DSC and DEB on
-DPKG architectures.
+These are the @manpage{tar(1)} balls for the release.  These @manpage{tar(1)} balls contain the
+@manpage{autoconf(1)} distribution which includes all the source necessary for building and
+installing the package.  These tarballs will even build Source RPM and Binary RPM on
+@manpage{rpm(1)} architectures and Debian DSC and DEB on @manpage{dpkg(1)} architectures.
 @end table
 
-The tar ball may be downloaded easily with @command{wget} as follows:
+The tar ball may be downloaded easily with @manpage{wget(1)} as follows:
 
 @cartouche
 @example
@@ -583,6 +590,9 @@ or
 % wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
 @end example
 @end cartouche
+
+Note that you will need an @cite{OpenSS7 Project} username and password to download release
+candidates (which are only available to subscribers and sponsors of the @cite{OpenSS7 Project}).
 
 @subsubheading  Unpacking the Archive
 
@@ -623,36 +633,34 @@ To configure and install the tar ball, @xref{Configuring the Tar Ball}.
 @cindex checkout, cvs
 @cindex cvs
 
-If you are a subscriber or sponsor of @uref{http://www.openss7.org/, The OpenSS7
-Project} with CVS archive access privileges then you can download release or
-mid-release versions of the @file{@value{PACKAGE_NAME}} package from the project
-CVS archive.
+If you are a subscriber or sponsor of @uref{http://www.openss7.org/, The OpenSS7 Project} with CVS
+archive access privileges then you can download release, mid-release or release candidate versions
+of the @file{@value{PACKAGE_NAME}} package from the project CVS archive.
 
-The @value{PACKAGE_TITLE} package is located in the @file{@value{PACKAGE}}
-subdirectory of @file{/var/cvs}.  For release tag information, see
-@ref{Releases}.
+The @value{PACKAGE_TITLE} package is located in the @file{@value{PACKAGE_CVSMODULE}} module of
+@file{/var/cvs}.  For release tag information, see @ref{Releases}.
 
-To access the archive from the project CVS pserver, use the following commands
-to check out a version from the archive:
+To access the archive from the project CVS pserver, use the following commands to check out a
+version from the archive:
 
 @cartouche
 @example
 % export CVSROOT='-d:pserver:@var{username}@@cvs.openss7.com:2401/var/cvs'
 % cvs login
 Password: *********
-% cvs co -r @value{PACKAGE}_@value{VERSION} @value{PACKAGE}
+% cvs co -r @value{PACKAGE}_@value{VERSION} @value{PACKAGE_CVSMODULE}
 % cvs logout
 @end example
 @end cartouche
 
-It is, of course, possible to check out by date or by other criteria.  For more
-information, see @ref{cvs(1), cvs(1), cvs(1), *manpages*, The Manual Pages}.
+It is, of course, possible to check out by date or by other criteria.  For more information, see
+@manref{cvs(1)}.
 
 @subsubheading Preparing the CVS Working Directory
 
-Although public releases of the @file{@value{PACKAGE_NAME}} package do not
-require reconfiguration, creating a configurable directory from the CVS archive
-requires tools not normally distributed with the other releases.
+Although public releases of the @file{@value{PACKAGE_NAME}} package do not require reconfiguration,
+creating a configurable directory from the CVS archive requires tools not normally distributed with
+the other releases.
 
 The build host requires the following GNU tools:
 
@@ -663,16 +671,14 @@ The build host requires the following GNU tools:
 @item @command{gettext 0.14.5}
 @end itemize
 
-It should be stressed that, in particular, the @command{autoconf} and
-@command{automake} must be at version releases @command{2.59} and @command{1.9}.
-@emph{The versions normally distributed in mainstream GNU/Linux distributions
-are, in fact, much older than these versions.}@footnote{A notable exception is
-Debian.}  GNU version of these packages configured and installed to default
-directories will install in @file{/usr/local/} allowing them to coexist with
+It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
+must be at version releases @command{2.59} and @command{1.9}.  @emph{The versions normally
+distributed in mainstream GNU/Linux distributions are, in fact, much older than these
+versions.}@footnote{A notable exception is Debian.}  GNU version of these packages configured and
+installed to default directories will install in @file{/usr/local/} allowing them to coexist with
 distribution installed versions.
 
-For building documentation, the build host also requires the following
-documentation tools:
+For building documentation, the build host also requires the following documentation tools:
 
 @itemize
 @item @command{gs 8.15}
@@ -683,14 +689,12 @@ documentation tools:
 @item @command{groff 1.17.2}
 @end itemize
 
-Most desktop GNU/Linux distributions will have these tools; however, some
-server-style installations (e.g. @cite{Ubuntu}-server) will not and they must
-be installed separately.
+Most desktop GNU/Linux distributions will have these tools; however, some server-style installations
+(e.g. @cite{Ubuntu}-server or @cite{SLES 9}) will not and they must be installed separately.
 
-For uncooked manual pages, the entire @command{groff} package is required on
-@cite{Debian} and @cite{Ubuntu} systems (the base package does not include
-grefer which is used extensively by uncooked manual pages).  The following will
-get what you need:
+For uncooked manual pages, the entire @manpage{groff(1)} package is required on @cite{Debian} and
+@cite{Ubuntu} systems (the base package does not include grefer which is used extensively by
+uncooked manual pages).  The following will get what you need:
 
 @cartouche
 @example
@@ -699,14 +703,14 @@ Ubuntu: % apt-get install groff
 @end example
 @end cartouche
 
-In addition, the build host requires a complete tool chain for compiling for the
-target host, including kernel tools such as @command{genksyms} and others.
+In addition, the build host requires a complete tool chain for compiling for the target host,
+including kernel tools such as @manref{genksyms(8)} and others.
 
-If you wish to package rpms on an @command{rpm} system, or debs on a
-@command{dpkg} system, you will need the appropriate tool chain.  Systems based
-on @command{rpm} typically have the necessary toolchain available, however,
-@command{dpkg} systems do not.  The following on a @cite{Debian} or
-@cite{Ubuntu} system will get what you need:
+If you wish to package @file{rpms} on an @manpage{rpm(1)} system, or @file{debs} on a
+@manpage{dpkg(1)} system, you will need the appropriate tool chain.  Systems based on
+@manpage{rpm(1)}
+typically have the necessary toolchain available, however, @manpage{dpkg(1)} systems do not.  The
+following on a @cite{Debian} or @cite{Ubuntu} system will get what you need:
 
 @cartouche
 @example
@@ -715,49 +719,49 @@ on @command{rpm} typically have the necessary toolchain available, however,
 @end example
 @end cartouche
 
-To generate a configuration script and the necessary scriptlets required by the
-GNU @command{autoconf} system, execute the following commands on the working
-directory:
+To generate a configuration script and the necessary scriptlets required by the GNU
+@manpage{autoconf(1)} system, execute the following commands on the working directory:
 
 @cartouche
 @example
-% autoreconf -fiv @value{PACKAGE}
+% autoreconf -fiv @value{PACKAGE_CVSMODULE}
 @end example
 @end cartouche
 
 @noindent
-where, @file{@value{PACKAGE}} is the name of the directory to where the working
-copy was checked out under the previous step.  This command generates the
-@command{configure} script and other missing pieces that are normally
-distributed with the release Tar Balls, SRPMs and DSCs.
+where, @file{@value{PACKAGE_CVSMODULE}} is the name of the directory to where the working copy was
+checked out under the previous step.  This command generates the @file{configure} script and
+other missing pieces that are normally distributed with the release Tar Balls, SRPMs and DSCs.
 
-Make sure that @samp{autoreconf --version} returns @samp{2.59}.  Otherwise, you
-may need to perform something like the following:
+Make sure that @samp{autoreconf --version} returns @samp{2.59}.  Otherwise, you may need to perform
+something like the following:
 
 @cartouche
 @example
 % PATH="/usr/local/bin:$PATH"
-% autoreconf -fiv @value{PACKAGE}
+% autoreconf -fiv @value{PACKAGE_CVSMODULE}
 @end example
 @end cartouche
 
 @noindent
-After reconfiguring the directory, the package can then be configured and built
-using the same instructions as are used for the Tar Ball, see @ref{Configuring
-the Tar Ball}, and @ref{Building from the Tar Ball}.
+After reconfiguring the directory, the package can then be configured and built using the same
+instructions as are used for the Tar Ball, see @ref{Configuring the Tar Ball}, and @ref{Building
+from the Tar Ball}.
 
-Do note, however, that @command{make} will rebuild the documentation that is
-normally released with the package.  Additional tools may be necessary for
-building the documentation.
+Do note, however, that @manpage{make(1)} will rebuild the documentation that is normally released
+with the package.  Additional tools may be necessary for building the documentation.  To avoid
+building and installing the documentation, use the @option{--disable-devel} option to configure
+described in @ref{Configuring the Tar Ball}.
 
-When configuring the package in a working directory and while working a
-change-compile-test cycle that involves configuration macros or documentation, I
-find it of great advantage to invoke the GNU @command{configure} options
-@command{--enable-maintainer-mode} and @command{--enable-dependency-tracking}.
-The first of these two options will add maintainer-specific targets to any
-generated @file{Makefile}, and the later will invoke automatic dependency
-tracking within the @file{Makefile} so rebuilds after changes to macro, source
-or documentation files will be automatically rebuilt.
+When configuring the package in a working directory and while working a change-compile-test cycle
+that involves configuration macros or documentation, I find it of great advantage to invoke the GNU
+@file{configure} options @option{--enable-maintainer-mode}, @option{--enable-dependency-tracking}
+and @option{--disable-devel}.  The first of these three options will add maintainer-specific targets
+to any generated @file{Makefile}, the second option will invoke automatic dependency tracking within
+the @file{Makefile} so rebuilds after changes to macro, source or documentation files will be
+automatically rebuilt; and the last option will suppress rebuilding and reinstalling documentation
+manual pages and header files.  Header files will still be available under the @file{/usr/src}
+directory.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -781,10 +785,9 @@ or documentation files will be automatically rebuilt.
 @cindex configuring, binary rpms
 @cindex binary rpms
 
-In general the binary RPM do not require any configuration, however, during
-installation it is possible to relocate some of the installation directories.
-This allows some degree of customization.  Relocations that are available on the
-binary RPM are as follows:
+In general the binary RPM do not require any configuration, however, during installation it is
+possible to relocate some of the installation directories.  This allows some degree of
+customization.  Relocations that are available on the binary RPM are as follows:
 
 @table @file
 @item @value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
@@ -889,12 +892,11 @@ To install the Debian DEB, @xref{Installing the Debian DEB}.
 @cindex configuring, source srpm
 @cindex source rpms
 
-When building from the source RPM (@pxref{Building from the Source RPM}), the
-rebuild process uses a number of macros from the user's @file{.rpmmacros} file
-as described in @ref{rpm(8), rpm(8), rpm(8), *manpages*, The Manual Pages}.
+When building from the source RPM (@pxref{Building from the Source RPM}), the rebuild process uses a
+number of macros from the user's @file{.rpmmacros} file as described in @ref{rpm(8), rpm(8), rpm(8),
+*manpages*, The Manual Pages}.
 
-Following is an example of the @file{~/.rpmmacros} file that I use for
-rebuilding RPMS:
+Following is an example of the @file{~/.rpmmacros} file that I use for rebuilding RPMS:
 
 @cartouche
 @smallexample
@@ -947,15 +949,13 @@ package or when debugging this package.\
 @end cartouche
 
 
-When building from the source RPM (@pxref{Building from the Source RPM}), it is
-possible to pass a number of additional configuration options to the
-@command{rpmbuild} process.
+When building from the source RPM (@pxref{Building from the Source RPM}), it is possible to pass a
+number of additional configuration options to the @manpage{rpmbuild(1)} process.
 
 The additional configuration options are described below.
 
-Note that distributions that use older versions of rpm do not have the
-@samp{--with} or @samp{--without} options defined.  To acheive the same effect
-as:
+Note that distributions that use older versions of rpm do not have the @option{--with} or
+@option{--without} options defined.  To acheive the same effect as:
 @example
 --with someparm=somearg
 @end example
@@ -965,35 +965,33 @@ do:
 @end example
 
 @ignore
-This is a generic description of common @command{rpmbuild} options.  Not all
-@command{rpmbuild} options are applicable to all SRPMs.  Options that are kernel
-module specific are only applicable to SRPMs that build kernel modules.  STREAMS
-options are only applicable to SRPMs that provide or require STREAMS.
+This is a generic description of common @manpage{rpmbuild(1)} options.  Not all @manpage{rpmbuild(1)}
+options are applicable to all SRPMs.  Options that are kernel module specific are only applicable to
+SRPMs that build kernel modules.  @dfn{STREAMS} options are only applicable to SRPMs that provide or
+require @dfn{STREAMS}.
 @end ignore
 
 @table @code
 @item --define "_kversion $PACKAGE_KVERSION"
 @vindex PACKAGE_KVERSION
 @opindex k-release
-Specifies the kernel version other than the running kernel for which to build.
-If @command{_kversion} is not defined when rebuilding, the environment variable
-@var{PACKAGE_KVERSION} is used.  If the environment variable
-@var{PACKAGE_KVERSION} is not defined, then the version of the running kernel
-(i.e. discovered with @samp{uname -r}) is used as the target version for
-kernel-dependent packages.  This option can also be defined in an
-@file{.rpmspec} file using the macro name @samp{_kversion}.
+Specifies the kernel version other than the running kernel for which to build.  If
+@command{_kversion} is not defined when rebuilding, the environment variable @var{PACKAGE_KVERSION}
+is used.  If the environment variable @var{PACKAGE_KVERSION} is not defined, then the version of the
+running kernel (i.e. discovered with @samp{uname -r}) is used as the target version for
+kernel-dependent packages.  This option can also be defined in an @file{.rpmspec} file using the
+macro name @samp{_kversion}.
 
 @item --with checks
 @itemx --without checks
 @opindex checks
-Enable or disable preinstall checks.  Each packages supports a number of
-preinstall checks that can be performed by invoking the @samp{check} target with
-@command{make}.  These currently consist of checking each kernel module for
-unresolved kernel symbols, checking for documentation for exported kernel module
-symbols, checking for documentation for exported library symbols, checking for
-standard options for build and installable programs, checking for documentation
-for built and installable programs.  Normally these checks are only run in
-maintainer mode, but can be enabled and disabled with this option.
+Enable or disable preinstall checks.  Each packages supports a number of preinstall checks that can
+be performed by invoking the @samp{check} target with @manpage{automake(1)}.  These currently consist of
+checking each kernel module for unresolved kernel symbols, checking for documentation for exported
+kernel module symbols, checking for documentation for exported library symbols, checking for
+standard options for build and installable programs, checking for documentation for built and
+installable programs.  Normally these checks are only run in maintainer mode, but can be enabled and
+disabled with this option.
 
 @ignore
 @item --with autotest
@@ -1004,22 +1002,20 @@ maintainer mode, but can be enabled and disabled with this option.
 @item --with k-optimize=HOW
 @itemx --without k-optimize
 @opindex k-optimize
-Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or
-@var{quick}.  @var{size} compiles kernel modules @code{-Os}, @var{speed}
-compiles kernel modules @code{-O3}, and @var{quick} compiles kernel modules
-@code{-O0}.  The default is @var{normal}.  Use with care.
+Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or @var{quick}.  @var{size}
+compiles kernel modules @code{-Os}, @var{speed} compiles kernel modules @code{-O3}, and @var{quick}
+compiles kernel modules @code{-O0}.  The default is @var{normal}.  Use with care.
 
 @item --with cooked-manpages
 @itemx --without cooked-manpages
 @opindex cooked-manpages
-Some systems do not like @command{grefer} references in manpages.@footnote{In
-particular, some @cite{Debian} systems do not load the @command{groff}
-extensions package and do not have @command{grefer} installed.  Although this is
-an oversight on the configuration of the particular @cite{Debian} system, we
-accomodate such misconfiguration with this feature.}  This option will cook
-@command{soelim}, @command{refer}, @command{tbl} and @command{pic} commands from
-the manpages and also strip @command{groff} comments.  The default is to leave
-manpages uncooked: they are actually smaller that way.
+Some systems do not like @manpage{grefer(1)} references in manpages.@footnote{In particular, some
+@cite{Debian} systems do not load the @manpage{groff(1)} extensions package and do not have
+@manpage{grefer(1)} installed.  Although this is an oversight on the configuration of the particular
+@cite{Debian} system, we accomodate such misconfiguration with this feature.}  This option will cook
+@manpage{soelim(1)}, @manpage{refer(1)}, @manpage{tbl(1)} and @manpage{pic(1)} commands from the manpages and
+also strip @manpage{groff(1)} comments.  The default is to leave manpages uncooked: they are actually
+smaller that way.
 
 @item --with public
 @itemx --without public
@@ -1030,101 +1026,94 @@ Release public packages or private packages.  This option has no effect on the
 @item --with k-debug
 @itemx --without k-debug
 @opindex k-debug
-Specifies whether kernel debugging is to be performed on the build kernel
-modules.  Mutually exclusive with @code{test} and @code{safe} below.  This has
-the effect of removing static and inline attributes from functions and invoking
-all debugging macros in the code.  The default is to not perform kernel
-debugging.
+Specifies whether kernel debugging is to be performed on the build kernel modules.  Mutually
+exclusive with @code{test} and @code{safe} below.  This has the effect of removing static and inline
+attributes from functions and invoking all debugging macros in the code.  The default is to not
+perform kernel debugging.
 
 @item --with k-test
 @itemx --without k-test
 @opindex k-test
-Specifies whether kernel testing is to be performed.  Mutually exclusive with
-@code{debug} above and @code{safe} below.  This has the effect of removing
-static and inline attributes from functions and invoking most debugging macros
-in the code.  The default is to not perform kernel testing.
+Specifies whether kernel testing is to be performed.  Mutually exclusive with @code{debug} above and
+@code{safe} below.  This has the effect of removing static and inline attributes from functions and
+invoking most debugging macros in the code.  The default is to not perform kernel testing.
 
 @item --with k-safe
 @itemx --without k-safe
 @opindex k-safe
-Specifies whether kernel saftey is to be performed.  Mutually exclusive with
-@code{debug} and @code{test} above.  This has the effect of invoking some more
-pedantic assertion macros in the code.  The default is not to apply kernel
-safety.
+Specifies whether kernel saftey is to be performed.  Mutually exclusive with @code{debug} and
+@code{test} above.  This has the effect of invoking some more pedantic assertion macros in the code.
+The default is not to apply kernel safety.
 
 @item --with k-inline
 @itemx --without k-inline
 @opindex k-inline
-Specifies whether kernel @code{inline} functions are to be place inline.  This
-has the effect of adding the @command{-finline-functions} flag to @var{CFLAGS}
-for compiling kernel modules.  Linux 2.4 kernels are normally compiled
-@command{-O2} which does not respect the @code{inline} directive.  This compiles
-kernel modules with @command{-finline-functions} to get closer to @command{-O3}
-optimization.  For better optimization controls, @xref{Configuring the Tar
-Ball}.
+Specifies whether kernel @code{inline} functions are to be place inline.  This has the effect of
+adding the @option{-finline-functions} flag to @var{CFLAGS} for compiling kernel modules.  Linux 2.4
+kernels are normally compiled @option{-O2} which does not respect the @code{inline} directive.  This
+compiles kernel modules with @option{-finline-functions} to get closer to @option{-O3} optimization.
+For better optimization controls, @xref{Configuring the Tar Ball}.
 
 @item --with k-modversions
 @itemx --without k-modversions
 @opindex k-modversions
-Specifies whether kernel symbol versioning is to be applied to symbols exported
-by package kernel modules.  The default is to version exported module symbols.
-This package does not export symbols so this option has no effect.
+Specifies whether kernel symbol versioning is to be applied to symbols exported by package kernel
+modules.  The default is to version exported module symbols.  This package does not export symbols
+so this option has no effect.
 
 @item --with devfs
 @itemx --without devfs
-Specifies whether the build is for a device filesystem daemon enabled system
-with autoloading, or not.  The default is to build for devfsd autoloading when
-CONFIG_DEVFS_FS is defined in the target kernel.  The @command{reuild} target
-uses this option to signal to the RPM spec file that the @samp{dev} subpackage
-need not be built.  This option does not appear when the package has no devices.
+Specifies whether the build is for a device filesystem daemon enabled system with autoloading, or
+not.  The default is to build for devfsd autoloading when @var{CONFIG_DEVFS_FS} is defined in the
+target kernel.  The @samp{rebuild} target uses this option to signal to the RPM spec file that the
+@samp{dev} subpackage need not be built.  This option does not appear when the package has no
+devices.
 
 @item --with devel
 @itemx --without devel
 @opindex devel
-Specifies whether to build development environment packages such as those that
-include header files, static libraries, manual pages and texinfo
-documentation.  The default is to build development environment packages.
-This option can be useful when building for an embedded target where only the
+Specifies whether to build development environment packages such as those that include header files,
+static libraries, manual pages and texinfo documentation.  The default is to build development
+environment packages.  This option can be useful when building for an embedded target where only the
 runtime components are desired.
 
 @item --with tools
 @itemx --without tools
 @opindex tools
-Specifies whether user space packages are to be built.  The default is to build
-user space packages.  This option can be useful when rebuilding for multiple
-architectures and target kernels.  The @command{rebuild} automake target uses
-this feature when rebuilding for all available architectures and kernels, to
-rebuild user packages once per architecture instead of once per kernel.
+Specifies whether user space packages are to be built.  The default is to build user space packages.
+This option can be useful when rebuilding for multiple architectures and target kernels.  The
+@samp{rebuild} @manpage{automake(1)} target uses this feature when rebuilding for all available architectures
+and kernels, to rebuild user packages once per architecture instead of once per kernel.
 
 @item --with modules
 @itemx --without modules
 @opindex modules
-Specifies whether kernel modules packages are to be built.  The default is to
-build kernel module packages.  This option can be useful when rebuilding for
-multiple architectures and target kernels.  The @command{rebuild} automake
-target uses this feature to rebuild for all available architectures and kernels.
+Specifies whether kernel modules packages are to be built.  The default is to build kernel module
+packages.  This option can be useful when rebuilding for multiple architectures and target kernels.
+The @samp{rebuild} @manpage{automake(1)} target uses this feature to rebuild for all available architectures
+and kernels.
 
 @ignore
 @item --with lis
 @itemx --without lis
 @opindex lis
-Specifies that the package is to be rebuilt against @cite{Linux STREAMS}.  The
-default is to automatically identify whether @file{LiS} or @file{streams} is
-loaded on the build system and build accordingly.
+Specifies that the package is to be rebuilt against @cite{Linux STREAMS}.  The default is to
+automatically identify whether @file{LiS} or @file{streams} is loaded on the build system and build
+accordingly.
 
 @item --with lfs
 @itemx --without lfs
 @opindex lfs
-Specifies that the package is to be rebuilt against @cite{Linux Fast-STREAMS}.
-The default is to automatically identify whether @file{LiS} or @file{streams} is
-loaded on the build system and build accordingly.
+Specifies that the package is to be rebuilt against @cite{Linux Fast-STREAMS}.  The default is to
+automatically identify whether @file{LiS} or @file{streams} is loaded on the build system and build
+accordingly.
 @end ignore
 @end table
 
 @include rpm.texi
 
-In general, the default values of these options are sufficient for most purposes
-and no options need be provided when rebuilding the Source RPMs.
+In general, the default values of these options are sufficient for most purposes and no options need
+be provided when rebuilding the Source RPMs.
 
 @subsubheading Build
 To build from the source RPM, @xref{Building from the Source RPM}.
@@ -1137,9 +1126,9 @@ To build from the source RPM, @xref{Building from the Source RPM}.
 @cindex source dscs
 
 The Debian DSC can be configured by passing options in the environment variable
-@var{BUILD_DEBOPTIONS}.  The options placed in this variable take the same form
-as those passed to the @command{configure} script, @xref{Configuring the Tar
-Ball}.  For an example, @xref{Building from the Debian DSC}.
+@var{BUILD_DEBOPTIONS}.  The options placed in this variable take the same form as those passed to
+the @file{configure} script, @xref{Configuring the Tar Ball}.  For an example, @xref{Building
+from the Debian DSC}.
 
 @subsubheading Build
 To build from the Debian DSC, @xref{Building from the Debian DSC}.
@@ -1151,13 +1140,13 @@ To build from the Debian DSC, @xref{Building from the Debian DSC}.
 @cindex configuring, tar ball
 @cindex tar ball
 
-All of the normal GNU @command{autoconf} configuration options and environment
-variables apply.  Additional options and environment variables are provided to
-tailor or customize the build and are described below.
+All of the normal GNU @manpage{autoconf(1)} configuration options and environment variables apply.
+Additional options and environment variables are provided to tailor or customize the build and are
+described below.
 
 @menu
-* Configure Options::		Options to @command{configure}
-* Environment Variables::	Environment variables to @command{configure}
+* Configure Options::		Options to @file{configure}
+* Environment Variables::	Environment variables to @file{configure}
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -1167,27 +1156,28 @@ tailor or customize the build and are described below.
 @cindex configure options
 
 @ignore
-This is a generic description of common @command{configure} options.  Not all
-@command{configure} options are applicable to all release packages.  Options
-that are kernel module specific are only applicable to release packages that
-build kernel modules.  STREAMS options are only applicable to release packages
-that provide or require STREAMS.
+This is a generic description of common @file{configure} options that are in addition to those
+provided by @manpage{autoconf(1)}, @manpage{automake(1)}, @manpage{libtool(1)} and @manpage{gettext(1)}.
+
+Not all @file{configure} options are applicable to all @value{pkgtype} packages.  Options that
+are kernel module specific are only applicable to @value{pkgtype} packages that build kernel
+modules.  @dfn{STREAMS} options are only applicable to @value{pkgtype} packages that provide or
+require @dfn{STREAMS}.
 @end ignore
 
-Following are the additional @command{configure} options, their meaning and use:
+Following are the additional @file{configure} options, their meaning and use:
 
 @table @command
 @item --enable-checks
 @itemx --disable-checks
 @opindex checks
-Enable or disable preinstall checks.  Each packages supports a number of
-preinstall checks that can be performed by invoking the @samp{check} target with
-@command{make}.  These currently consist of checking each kernel module for
-unresolved kernel symbols, checking for documentation for exported kernel module
-symbols, checking for documentation for exported library symbols, checking for
-standard options for build and installable programs, checking for documentation
-for built and installable programs.  Normally these checks are only run in
-maintainer mode, but can be enabled and disabled with this option.
+Enable or disable preinstall checks.  Each @value{pkgtype} package supports a number of preinstall
+checks that can be performed by invoking the @samp{check} target with @manpage{make(1)}.  These
+currently consist of checking each kernel module for unresolved kernel symbols, checking for
+documentation for exported kernel module symbols, checking for documentation for exported library
+symbols, checking for standard options for build and installable programs, checking for
+documentation for built and installable programs.  Normally these checks are only run in maintainer
+mode, but can be enabled and disabled with this option.
 
 @ignore
 @item --enable-autotest
@@ -1197,16 +1187,18 @@ maintainer mode, but can be enabled and disabled with this option.
 
 @item --disable-compress-manpages
 @opindex compress-manpages
-Compress manpages with @samp{gzip -9} or @samp{bzip2 -9} or leave them
-uncompressed.  The default is to compress manpages with @samp{gzip -9}
-or @samp{bzip2 -9} if a single compressed manpage exists in the target
-installation directory (@command{--mandir}).  This disables automatic
-compression.
+Compress manpages with @samp{gzip -9} or @samp{bzip2 -9} or leave them uncompressed.  The default is
+to compress manpages with @samp{gzip -9} or @samp{bzip2 -9} if a single compressed manpage exists in
+the target installation directory (@option{--mandir}).  This disables automatic compression.
 
 @item --disable-public
 @opindex public
-Disable public release.  Has no effect on the @file{@value{PACKAGE_NAME}} release.
-No private components exist in @file{@value{PACKAGE_NAME}} releases.
+Disable public release.  This option is not usable on public releases and only has a usable effect
+on @value{PACKAGE_TITLE} when the package is acquired from CVS.  In particular, the @cite{STREAMS
+SS7/VoIP/ISDN/SIGTRAN Stacks} (@command{strss7-@value{VERSION_STRSS7}}) @value{pkgtype} package has a large
+number of non-public components.  Specifying this option will cause the package to build and install
+all private release components in addition to the public release components.  This option affects
+all @value{pkgtype} packages.  Most @value{pkgtype} packages do not have private release components.
 
 @item --disable-initscripts
 @opindex initscripts
@@ -1214,375 +1206,357 @@ Disables the installation of init scripts.
 The default is to configure and install init scripts and their associated
 configuration files.
 
+Although the default is to install init scripts, installation attempts to detect a System V init
+script configuration, and if one is not found, the init scripts are installed into the appropriate
+directories, but the symbolic links to the run level script directories are not generated and the
+script is not invoked.  Therefore, it is safe to leave this option unchanged, even on distributions
+that do not support System V init script layout (such as @cite{NexusWare}).
+
 @item --disable-devel
 @opindex devel
-Disables the installation of development environment components such as
-header files, static libraries, manual pages and texinfo documentation.  The
-default is to install development environment components.  This option can be
-useful when configuring for an embedded target where only the runtime
-components are desired.
+Disables the installation of development environment components such as header files, static
+libraries, manual pages and texinfo documentation.  The default is to install development
+environment components.  This option can be useful when configuring for an embedded target where
+only the runtime components are desired, or when performing a edit-compile-test cycle.
 
 @item --enable-tools
 @opindex tools
-Specifies whether user space programs and libraries are to be built and
-installed.  The default is to build and install user space programs and
-libraries.  This option can be useful when rebuilding for multiple architectures
-and target kernels, particularly under rpm.  The @command{rebuild} target uses
-this feature when rebuilding RPMs for all available architectures and kernels,
-to rebuild user packages once per architecture instead of once per kernel.
+Specifies whether user space programs and libraries are to be built and installed.  The default is
+to build and install user space programs and libraries.  This option can be useful when rebuilding
+for multiple architectures and target kernels, particularly under @manpage{rpm(1)} or
+@manpage{dpkg(1)}.  The @samp{rebuild} @manpage{automake(1)} target uses this feature when rebuilding
+RPMs for all available architectures and kernels, to rebuild user packages once per architecture
+instead of once per kernel.
 
 @item --enable-modules
 @opindex modules
-Specifies whether kernel modules are to be built and installed.  The default is
-to build and install kernel modules.  This option can be useful when rebuilding
-for multiple architectures and target kernels, particularly under rpm.  The
-@command{rebuild} automake target uses this feature to rebuild for all available
-architectures and kernels.
+Specifies whether kernel modules are to be built and installed.  The default is to build and install
+kernel modules.  This option can be useful when rebuilding for multiple architectures and target
+kernels, particularly under @manpage{rpm(1)} or @manpage{dpkg(1)}.  The @samp{rebuild}
+@manpage{automake(1)} target uses this feature to rebuild for all available architectures and
+kernels.
 @ignore
-This option has no effect if there are no kernel modules in the package.
+This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
 @end ignore
 
 @item --enable-arch
 @opindex arch
-Specifies whether architectural dependent package components are to be built and
-installed.  This option can be useful when rebuilding for multiple architectures
-and target kernels, particularly under dpkg.  The default is to configure, build
-and install architecture dependent package components.
+Specifies whether architectural dependent package components are to be built and installed.  This
+option can be useful when rebuilding for multiple architectures and target kernels, particularly
+under @manpage{dpkg(1)}.  The default is to configure, build and install architecture dependent
+package components.
 @ignore
-This option has no effect if there are no architecture dependent components in
-the package.
+This option has no effect for @value{pkgtype} packages that do not provide architecture dependent
+components.
 @end ignore
 
 @item --enable-indep
 @opindex indep
-Specifies whether architecture independent package components are to be built
-and installed.  This option can be useful when rebuilding for multiple
-architectures and target kernels, particularly under dpkg.  The default is to
-configure, build and install architecture independent package components.
+Specifies whether architecture independent package components are to be built and installed.  This
+option can be useful when rebuilding for multiple architectures and target kernels, particularly
+under @manpage{dpkg(1)}.  The default is to configure, build and install architecture independent
+package components.
 @ignore
-This options has no effect if there are no architecture independent components
-in the package.
+This options has no effect for @value{pkgtype} packages that do not provide architecture independent
+components.
 @end ignore
 
 @item --enable-k-inline
 @opindex k-inline
-Enable kernel inline functions.  Most Linux kernels build without
-@command{-finline-functions}.  This option adds the @command{-finline-functions}
-and @command{-Winline} flags to the compilation of kernel modules.  Use with
-care.
+Enable kernel inline functions.  Most Linux kernels build without @option{-finline-functions}.  This
+option adds the @option{-finline-functions} and @option{-Winline} flags to the compilation of kernel
+modules.  Use with care.
 @ignore
-This option has no effect if there are no kernel modules in the package.
+This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
 @end ignore
 
 @item --enable-k-safe
 @opindex k-safe
-Enable kernel module run-time safety checks.  Specifies whether kernel safety is
-to be performed.  This option is mutually exclusive with
-@command{--enable-k-test} and @command{--enable-k-debug} below.  This has the
-effect of invoking some more pedantic assertion macros in the code.  The default
-is not to apply kernel safety.
+Enable kernel module run-time safety checks.  Specifies whether kernel safety is to be performed.
+This option is mutually exclusive with @option{--enable-k-test} and @option{--enable-k-debug} below.
+This has the effect of invoking some more pedantic assertion macros in the code.  The default is not
+to apply kernel safety.
 @ignore
-This option has no effect if there are no kernel modules in the package.
+This option has no effect for @value{pkgtype} packages that have are no kernel modules.
 @end ignore
 
 @item --enable-k-test
 @opindex k-test
-Enable kernel module run-teim testing.  Specifies whether kernel testing is to
-be performed.  This option is mutually exclusive with @command{--enable-k-safe}
-above and @command{--enable-k-debug} below.  This has the effect of remove
-@code{static} and @code{inline} attributes from functions and invoking most
-non-performance affecting debugging macros in the code.  The default is not to
-perform kernel testing.
+Enable kernel module run-time testing.  Specifies whether kernel testing is to be performed.  This
+option is mutually exclusive with @option{--enable-k-safe} above and @option{--enable-k-debug}
+below.  This has the effect of remove @code{static} and @code{inline} attributes from functions and
+invoking most non-performance affecting debugging macros in the code.  The default is not to perform
+kernel testing.
 @ignore
-This option has no effect if there are no kernel modules in the package.
+This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
 @end ignore
 
 @item --enable-k-debug
 @opindex k-debug
-Enable kernel module run-time debugging.  Specifies whether kernel debugging is
-to be performed.  This option is mutuallly exclusive with
-@command{--enable-k-safe} and @command{--enable-k-test} above.  This has the
-effect of removing @code{static} and @code{inline} attributes from functions and
-invoking all debuggin macros in the code (including performance-affecting debug
-macros).  The default is to not perform kernel debugging.
+Enable kernel module run-time debugging.  Specifies whether kernel debugging is to be performed.
+This option is mutuallly exclusive with @option{--enable-k-safe} and @option{--enable-k-test} above.
+This has the effect of removing @code{static} and @code{inline} attributes from functions and
+invoking all debuggin macros in the code (including performance-affecting debug macros).  The
+default is to not perform kernel debugging.
 @ignore
-This option has no effect if there are no kernel modules in the package.
+This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
 @end ignore
 
 @ignore
 @itemx --disable-k-modversions
 @opindex k-modversions
-Disable module versions on @command{@value{PACKAGE_NAME}} symbols.  Specifies
-whether kernel symbol versioning is to be used on symbols exported from built
-@command{@value{PACKAGE_NAME}} modules.  The default is to provide kernel symbol
-versioning on all exported symbols.
-This option has no effect if there are no kernel modules in the package.
+Disable module versions on @command{@value{PACKAGE_NAME}} symbols.  Specifies whether kernel symbol
+versioning is to be used on symbols exported from built @command{@value{PACKAGE_NAME}} modules.  The
+default is to provide kernel symbol versioning on all exported symbols.
+This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
 @end ignore
 
 @item --enable-devfs
 @itemx --disable-devfs
 @opindex devfs
-Specifies whether the build is for a device filesystem daemon enabled system
-with autoloading, or not.  The default is to build for devfsd autoloading when
-CONFIG_DEVFS_FS is defined in the target kernel.  The @command{reuild} target
-uses this option to signal to the RPM spec file that the @samp{dev} subpackage
-need not be built.  This option does not appear when the package has no devices.
+Specifies whether the build is for a device filesystem daemon enabled system with autoloading, or
+not.  The default is to build for @manpage{devfsd(8)} autoloading when @var{CONFIG_DEVFS_FS} is
+defined in the target kernel.  The @samp{reuild} @manpage{automake(1)} target uses this option to
+signal to the RPM spec file that the @samp{dev} subpackage need not be built.  This option has no
+effect for @value{pkgtype} packages that do not provide devices.
 
 @item --with-gpg-user=GNUPGUSER
 @opindex gpg-user
-Specify the @command{gpg} @samp{GNUPGUSER} for signing RPMs and tarballs.  The
-default is the content of the environment variable @var{GNUPGUSER}.  If
-unspecified, the @command{gpg} program will normally use the user name of the
-account invoking the @command{gpg} program.  For building source RPMs, the RPM
-macro @samp{_gpg_name} will override this setting.
+Specify the @manref{gpg(1)} @samp{GNUPGUSER} for signing RPMs and tarballs.  The default is the
+content of the environment variable @var{GNUPGUSER}.  If unspecified, the @manpage{gpg(1)} program
+will normally use the user name of the account invoking the @manpage{gpg(1)} program.  For building
+source RPMs, the RPM macro @samp{_gpg_name} will override this setting.
 
 @item --with-gpg-home=GNUPGHOME
 @opindex gpg-home
-Specify the @samp{GNUPGHOME} directory for signing RPMs and tarballs.  The
-default is the user's @file{~/.gpg} directory.  For building source RPMs, the
-RPM macro @samp{_gpg_path} will override this setting.
+Specify the @samp{GNUPGHOME} directory for signing RPMs and tarballs.  The default is the user's
+@file{~/.gpg} directory.  For building source RPMs, the RPM macro @samp{_gpg_path} will override
+this setting.
 
 @item --with-pkg-epoch=EPOCH
 @opindex pkg-epoch
-Specifies the epoch for the package.  This is neither used for RPM nor Debian
-packages, it applies to the tarball release as a whole.  The default is the
-contents of the @file{.pkgepoch} file in the source directory or, if that file
-does not exist, zero (0).
+Specifies the epoch for the package.  This is neither used for @manpage{rpm(1)} nor
+@manpage{dpkg(1)} packages, it applies to the tarball release as a whole.  The default is the
+contents of the @file{.pkgepoch} file in the @value{pkgtype} package source directory or, if that
+file does not exist, zero (0).
 
 @item --with-pkg-release=RELEASE
 @opindex pkg-release
-Specifies the release for the package.  This is neither used for RPM nor Debian
-packages, it applies to the tarball release as a whole.  The default is the
-contents of the @file{.pkgrelease} file in the source directory or, if that file
-does not exist, one (1).  This is the number after the last point in ther
-package version number.
+Specifies the release for the package.  This is neither used for @manpage{rpm(1)} nor
+@manpage{dpkg(1)} packages, it applies to the tarball release as a whole.  The default is the
+contents of the @file{.pkgrelease} file in the @value{pkgtype} package source directory or, if that
+file does not exist, one (1).  This is the number after the last point in the package version
+number.
 
 @item --with-pkg-distdir=DIR
 @opindex pkg-distdir
-Specifies the distribution directory for the package.  This is used by the
-maintainer for building distributions of tarballs.  This is the directory into
-which archives are copied for distribution.  The default is the top build
-directory.
+Specifies the distribution directory for the package.  This is used by the maintainer for building
+distributions of tarballs.  This is the directory into which archives are copied for distribution.
+The default is the top build directory.
 
 @item --with-cooked-manpages
 @opindex cooked-manpages
-Convert manual pages to remove macro dependencies and @command{grefer}
-references.  Some systems do not like @command{grefer} references in
-manpages.@footnote{In particular, some @cite{Debian} systems do not load the
-@command{groff} extensions package and do not have @command{grefer} installed.
-Although this is an oversight on the configuration of the particular
-@cite{Debian} system, we accomodate such misconfiguration with this feature.}
-This option will cook @command{soelim}, @command{refer}, @command{tbl} and
-@command{pic} commands from the manpages and also strip @command{groff}
-comments.  The default is to leave manpages uncooked (they are actually smaller
-that way).
+Convert manual pages to remove macro dependencies and @manpage{grefer(1)} references.  Some systems
+do not like @manpage{grefer(1)} references in manpages.@footnote{In particular, some @cite{Debian}
+or @cite{Ubuntu} systems do not load the @manpage{groff(1)} extensions package and do not have
+@manpage{grefer(1)} installed.  Although this is an oversight on the configuration of the particular
+@cite{Debian} or @cite{Ubuntu} system, we accomodate such misconfiguration with this feature.} This
+option will cook @manpage{soelim(1)}, @manpage{refer(1)}, @manpage{tbl(1)} and @manpage{pic(1)}
+commands from the manpages and also strip @manpage{groff(1)} comments.  The default is to leave
+manpages uncooked (they are actually smaller that way).
 
 @item --with-rpm-epoch=PACKAGE_EPOCH
 @opindex rpm-epoch
-Specify the @samp{PACKAGE_EPOCH} for the RPM spec file.  The default is to use
-the RPM epoch conatined in the file @file{.rpmepoch}.
+Specify the @samp{PACKAGE_EPOCH} for the RPM spec file.  The default is to use the RPM epoch
+contained in the @value{pkgtype} package file @file{.rpmepoch}.
 
 @item --with-rpm-release=PACKAGE_RPMRELEASE
 @opindex rpm-release
-Specify the @samp{PACKAGE_RPMRELEASE} for the RPM rspec file.  The default is to
-use the RPM release contained in the file @file{.rpmrelease}.
+Specify the @samp{PACKAGE_RPMRELEASE} for the RPM rspec file.  The default is to use the RPM release
+contained in the @value{pkgtype} package file @file{.rpmrelease}.
 
 @item --with-rpm-extra=PACKAGE_RPMEXTRA
 @opindex rpm-extra
-Specify the @samp{PACKAGE_RPMEXTRA} extra release information for the RPM spec
-file.  The default is to use the RPM extra release information contained in the
-file @file{.rpmextra}.  Otherwise, this value will be determined from automatic
-detection of the RPM distribution.
+Specify the @samp{PACKAGE_RPMEXTRA} extra release information for the RPM spec file.  The default is
+to use the RPM extra release information contained in the @value{pkgtype} package file
+@file{.rpmextra}.  Otherwise, this value will be determined from automatic detection of the RPM
+distribution.
 
 @item --with-rpm-topdir=PACKAGE_RPMTOPDIR
 @opindex rpm-topdir
-Specify the @samp{PACKAGE_RPMTOPDIR} top directory for RPMs.  If specified
-with a null @samp{PACKAGE_RPMTOPDIR}, the default directory for the RPM
-distribution will be used.  If this option is not provided on the command line,
-the top build directory will be used as the RPM top directory as well.
+Specify the @samp{PACKAGE_RPMTOPDIR} top directory for RPMs.  If specified with a null
+@samp{PACKAGE_RPMTOPDIR}, the default directory for the RPM distribution will be used.  If this
+option is not provided on the command line, the top build directory will be used as the RPM top
+directory as well.
 
 @item --with-deb-epoch=EPOCH
 @opindex deb-epoch
-Specify the @samp{PACKAGE_DEBEPOCH} for the DEB control file.  The default is to
-use the DEB epoch contained int he file @file{.debepoch}.
+Specify the @samp{PACKAGE_DEBEPOCH} for the DEB control file.  The default is to use the DEB epoch
+contained in the @value{pkgtype} package file @file{.debepoch}.
 
 @item --with-deb-release=RELEASE
 @opindex deb-release
-Specify the @samp{PACKAGE_DEBRELEASE} for the DEB control file.  The default is to
-use the DEB release contained in the file @file{.debrelease}.
+Specify the @samp{PACKAGE_DEBRELEASE} for the DEB control file.  The default is to use the DEB
+release contained in the @value{pkgtype} package file @file{.debrelease}.
 
 @item --with-deb-topdir=DIR
 @opindex deb-topdir
-Specify the @samp{PACKAGE_DEBTOPDIR} top directory for DEBs.  If specified
-with a null @samp{PACKAGE_DEBTOPDIR}, the default directory for the DEB
-distribution will be used.  If this option is not provided on the command line,
-the top build directory will be used as the DEB top directory as well.
+Specify the @samp{PACKAGE_DEBTOPDIR} top directory for DEBs.  If specified with a null
+@samp{PACKAGE_DEBTOPDIR}, the default directory for the DEB distribution will be used.  If this
+option is not provided on the command line, the top build directory will be used as the DEB top
+directory as well.
 
 @item --with-k-release=PACKAGE_KRELEASE
 @opindex k-release
-Specify the @samp{PACKAGE_KRELEASE} release of the Linux kernel for which the
-build is targeted.  When not cross compiling, if this option is not set, the
-build will be targeted at the kernel running in the build environment (e.g.,
-@samp{uname -r}).  When cross-compiling this option must be specified or the
-configure script will generate an error and terminate.
+Specify the @samp{PACKAGE_KRELEASE} release of the Linux kernel for which the build is targeted.
+When not cross compiling, if this option is not set, the build will be targeted at the kernel
+running in the build environment (e.g., @samp{uname -r}).  When cross-compiling this option must be
+specified or the configure script will generate an error and terminate.
 
 @ignore
 @item --with-k-prefix=K-PREFIX-DIR
 @opindex k-prefix
-Specify the @samp{K-PREFIX-DIR} kernel directory prefix for install.  The
-default is the root directory (@file{/}) of the build machine.  This directory
-is normally located by the @command{configure} script and need only be provided
-for special cross-build environments or when requested by a @command{configure}
-script error message.
+Specify the @samp{K-PREFIX-DIR} kernel directory prefix for install.  The default is the root
+directory (@file{/}) of the build machine.  This directory is normally located by the
+@file{configure} script and need only be provided for special cross-build environments or when
+requested by a @file{configure} script error message.
 
 @item --with-k-rootdir=K-ROOTDIR
 @opindex k-rootdir
-Specify the @samp{K-ROOTDIR} root directory for configure.  The default is the
-setting of environment variable @var{DESTDIR}, and if @var{DESTDIR} is not set,
-the root directory (@file{/}) of the build machine.  This directory is normally
-located by the @command{configure} script and need only be provided for special
-cross-build environments or when requested by a @command{configure} script error
-message.
+Specify the @samp{K-ROOTDIR} root directory for configure.  The default is the setting of
+environment variable @var{DESTDIR}, and if @var{DESTDIR} is not set, the root directory (@file{/})
+of the build machine.  This directory is normally located by the @file{configure} script and need
+only be provided for special cross-build environments or when requested by a @file{configure}
+script error message.
 @end ignore
 
 @item --with-k-linkage=PACKAGE_KLINKAGE
 @opindex k-linkage
-Specify the @samp{PACKAGE_KLINKAGE} for kernel module linkage.  This can be one
-of the following:
+Specify the @samp{PACKAGE_KLINKAGE} for kernel module linkage.  This can be one of the following:
 @itemize
-@item @samp{loadable}
--- loadable kernel modules
-@item @samp{linkable}
--- linkable kernel objects
+@item @samp{loadable} -- loadable kernel modules
+@item @samp{linkable} -- linkable kernel objects
 @end itemize
 The default is to build loadable kernel modules.
 
 @item --with-k-modules=K-MODULES-DIR
 @opindex k-modules
-Specify the @samp{K-MODULES-DIR} directory to which kernel modules will be
-installed.  The default is based on the option @command{--with-k-release},
-@command{--with-k-prefix} and @command{--with-k-rootdir}.  The default is
-@file{DESTDIR}/@-@file{K@--MODULES@--DIR} which is typically
-@file{@var{DESTDIR}/@-lib/@-modules/@-@var{PACKAGE_KRELEASE}/@-}.  This directory is
-normally located by the @command{configure} script and need only be provided for
-special cross-build environments or when requested by a @command{configure}
-script error message.
+Specify the @samp{K-MODULES-DIR} directory to which kernel modules will be installed.  The default
+is based on the option @option{--with-k-release}, @option{--with-k-prefix} and
+@option{--with-k-rootdir}.  The default is @file{DESTDIR}/@-@file{K@--MODULES@--DIR} which is
+typically @file{@var{DESTDIR}/@-lib/@-modules/@-@var{PACKAGE_KRELEASE}/@-}.  This directory is
+normally located by the @file{configure} script and need only be provided for special cross-build
+environments or when requested by a @file{configure} script error message.
 
 @item --with-k-build=K-BUILD-DIR
 @opindex k-build
-Specify the @samp{K-BUILD-DIR} base kernel build directory in which configured
-kernel source resides.  The default is
-@file{@var{DESTDIR}/@-@var{K@--MODULES@--DIR}/@-build}.  This directory is normally
-located by the @command{configure} script and need only be provided for special
-cross-build environments or when requested by a @command{configure} script error
-message.
+Specify the @samp{K-BUILD-DIR} base kernel build directory in which configured kernel source
+resides.  The default is @file{@var{DESTDIR}/@-@var{K@--MODULES@--DIR}/@-build}.  This directory is
+normally located by the @file{configure} script and need only be provided for special cross-build
+environments or when requested by a @file{configure} script error message.
 
 @item --with-k-source=K-SOURCE-DIR
 @opindex k-build
-Specify the @samp{K-SOURCE-DIR} base kernel build directory in which configured
-kernel source resides.  The default is
-@file{@var{DESTDIR}/@-@var{K@--MODULES@--DIR}/@-source}.  This directory is normally
-located by the @command{configure} script and need only be provided for special
-cross-build environments or when requested by a @command{configure} script error
-message.
+Specify the @samp{K-SOURCE-DIR} base kernel build directory in which configured kernel source
+resides.  The default is @file{@var{DESTDIR}/@-@var{K@--MODULES@--DIR}/@-source}.  This directory is
+normally located by the @file{configure} script and need only be provided for special cross-build
+environments or when requested by a @file{configure} script error message.
 
 @item --with-k-modver=K-MODVER-FILE
 @opindex k-sysmap
 Specify the @samp{K-MODVER-FILE} kernel module versions file.  The default is
 @file{@var{K@--BUILD@--DIR}/@-Module.symvers}.  This file is normally located by the
-@command{configure} script and need only be provided for special cross-build
-environments or when requested by a @command{configure} script error message.
+@file{configure} script and need only be provided for special cross-build environments or when
+requested by a @file{configure} script error message.
 
 @item --with-k-sysmap=K-SYSMAP-FILE
 @opindex k-sysmap
 Specify the @samp{K-SYSMAP-FILE} kernel system map file.  The default is
-@file{@var{K@--BUILD@--DIR}/@-System.map}.  This file is normally located by the
-@command{configure} script and need only be provided for special cross-build
-environments or when requested by a @command{configure} script error message.
+@file{@var{K@--BUILD@--DIR}/@-System.map}.  This file is normally located by the @file{configure}
+script and need only be provided for special cross-build environments or when requested by a
+@file{configure} script error message.
 
 @ignore
 @item --with-k-includes=K-INCLUDES-DIR
 @opindex k-includes
-Specify the @samp{K-INCLUDES-DIR} include directory of the kernel for which the
-build is targeted.  The default is
-@file{@var{DESTDIR}/@-@var{K@--BUILD@--DIR}/@-include}.  This directory is normally
-located by the @command{configure} script and need only be provided for special
-cross-build environments or when requested by a @command{configure} script error
-message.
+Specify the @samp{K-INCLUDES-DIR} include directory of the kernel for which the build is targeted.
+The default is @file{@var{DESTDIR}/@-@var{K@--BUILD@--DIR}/@-include}.  This directory is normally
+located by the @file{configure} script and need only be provided for special cross-build
+environments or when requested by a @file{configure} script error message.
 @end ignore
 
 @item --with-k-archdir=K-ARCHDIR
 @opindex k-archdir
-Specify the @samp{K-ARCHDIR} kernel source architecture specific directory.  The
-default is @file{@var{DESTDIR}/@-@var{K@--SOURCE@--DIR}/@-arch}.  This directory is
-normally located by the @command{configure} script and need only be provided for
-special cross-build environments or when requested by a @command{configure}
-script error message.
+Specify the @samp{K-ARCHDIR} kernel source architecture specific directory.  The default is
+@file{@var{DESTDIR}/@-@var{K@--SOURCE@--DIR}/@-arch}.  This directory is normally located by the
+@file{configure} script and need only be provided for special cross-build environments or when
+requested by a @file{configure} script error message.
 
 @item --with-k-machdir=K-MACHDIR
 @opindex k-machdir
-Specify the @samp{K-MACHDIR} kernel source machine specific directory.  The
-default is @file{@var{DESTDIR}/@-@var{K@--SOURCE@--DIR}/@-@var{target_cpu}}.  This
-directory is normally located by the @command{configure} script and need only be
-provided for special cross-build environments or when requested by a
-@command{configure} script error message.
+Specify the @samp{K-MACHDIR} kernel source machine specific directory.  The default is
+@file{@var{DESTDIR}/@-@var{K@--SOURCE@--DIR}/@-@var{target_cpu}}.  This directory is normally
+located by the @file{configure} script and need only be provided for special cross-build
+environments or when requested by a @file{configure} script error message.
 
 @item --with-k-config=K-CONFIG
 @opindex k-config
 Specify the @samp{K-CONFIG} kernel configuration file.  The default is
-@file{@var{BOOT}/@-config@--@var{K@--RELEASE}}.  This configuration file is normally
-located by the @command{configure} script and need only be provided forspecial
-cross-build environments or when requested by a @command{configure} script error
-message.
+@file{@var{BOOT}/@-config@--@var{K@--RELEASE}}.  This configuration file is normally located by the
+@file{configure} script and need only be provided forspecial cross-build environments or when
+requested by a @file{configure} script error message.
 
 @item --with-k-optimize=HOW
 @itemx --without-k-optimize
 @opindex k-optimize
-Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or
-@var{quick}.  @var{size} compiles kernel modules @code{-Os}, @var{speed}
-compiles kernel modules @code{-O3}, and @var{quick} compiles kernel modules
-@code{-O0}.  The default is @var{normal}.  Use with care.
+Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or @var{quick}.  @var{size}
+compiles kernel modules @code{-Os}, @var{speed} compiles kernel modules @code{-O3}, and @var{quick}
+compiles kernel modules @code{-O0}.  The default is @var{normal}.  Use with care.  The most common
+use of this option is to specify @option{--with-k-optimize=speed --disable-k-safe} to compile for
+maximum performance.  Nevertheless, even these setting are @dfn{ricing} and the resulting kernel
+modules will only be about 5% faster.
 
 @ignore
 @item --with-lis[=LIS-DIR]
 @itemx --without-lis
 @opindex lis
-Specify the @samp{LIS-DIR} directory in which to find LiS headers.  Also
-specifies that the build is to be made against Linux STREAMS.  The default is
-@file{/usr/@-include/@-LiS} if it exists, @samp{no} otherwise.  This directory is
-normally located by the @command{configure} script and need only be provided for
-special cross-build environments or when requested by a @command{configure}
-script error message.
-This option has no effect on packages that do not use the STREAMS subsystem.
+Specify the @samp{LIS-DIR} directory in which to find LiS headers.  Also specifies that the build is
+to be made against Linux STREAMS.  The default is @file{/usr/@-include/@-LiS} if it exists,
+@samp{no} otherwise.  This directory is normally located by the @file{configure} script and need
+only be provided for special cross-build environments or when requested by a @file{configure}
+script error message.  This option has no effect on @value{pkgtype} packages that do not use the
+@dfn{STREAMS} subsystem.
 
 @item --with-lfs[=LFS-DIR]
 @itemx --without-lfs
 @opindex lfs
-Specify the @samp{LFS-DIR} directory in which to find LfS headers.  Also
-specifies that the build is to be made against Linux Fast-STREAMS.  The default
-is @file{/usr/@-include/@-streams} if it exists, @samp{no} otherwise.  This
-directory is normally located by the @command{configure} script and need only be
-provided for special cross-build environments or when requested by a
-@command{configure} script error message.
-This option has no effect on packages that do not use the STREAMS subsystem.
+Specify the @samp{LFS-DIR} directory in which to find LfS headers.  Also specifies that the build is
+to be made against Linux Fast-STREAMS.  The default is @file{/usr/@-include/@-streams} if it exists,
+@samp{no} otherwise.  This directory is normally located by the @file{configure} script and need
+only be provided for special cross-build environments or when requested by a @file{configure}
+script error message.  This option has no effect on @value{pkgtype} packages that do not use the
+@dfn{STREAMS} subsystem.
 @end ignore
 
 @item --with-strconf-master=STRCONF_CONFIG
 @opindex strconf-master
-Specify the @samp{STRCONF_CONFIG} file name to which the configuration master
-file is written.  The default is @file{Config.master}.
+Specify the @samp{STRCONF_CONFIG} file name to which the configuration master file is written.  The
+default is @file{Config.master}.
 @ignore
-This option has no effect on packages that do not use the STREAMS subsystem and
-the strconf scripts.
+This option has no effect on @value{pkgtype} packages that do not use the @dfn{STREAMS} subsystem
+and the strconf scripts.
+This option should not be specified when configuring the master package as the setting for all
+add-on packages will conflict.
 @end ignore
 
 @item --with-base-major=STRCONF_MAJBASE
 @opindex base-major
-Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is
-@samp{230}.
+Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is @samp{230}.
 @ignore
-This option has no effect on packages that do not use the STREAMS subsystem and
-the strconf scripts.
+This option has no effect on @value{pkgtype} packages that do not use the @dfn{STREAMS} subsystem
+and the strconf scripts.
+This option should not be specified when configuring the master package as the setting for all
+add-on packages will conflict.
 @end ignore
 
 @end table
@@ -1595,13 +1569,12 @@ the strconf scripts.
 @subsubsection Environment Variables
 @cindex configure environment variables
 
-Following are additional environment variables to @command{configure}, their
-meaning and use:
+Following are additional environment variables to @file{configure}, their meaning and use:
 
 @vtable @var
 @item GPG
-GPG signature command.  This is used for signing distributions by the
-maintainer.  By default, @command{configure} will search for this tool.
+GPG signature command.  This is used for signing distributions by the maintainer.  By default,
+@file{configure} will search for this tool.
 
 @item GNUPGUSER
 GPG user name.  This is used for signing distributions by the maintainer.
@@ -1610,85 +1583,77 @@ GPG user name.  This is used for signing distributions by the maintainer.
 GPG home directory.  This is used for signing distributions by the maintainer.
 
 @item GPGPASSWD
-GPG password for signing.  This is used for signing distributions by the
-maintainer.  This environment variable is not maintained by the
-@command{configure} script and should only be used on an isolated system.
+GPG password for signing.  This is used for signing distributions by the maintainer.  This
+environment variable is not maintained by the @file{configure} script and should only be used on
+an isolated system.
 
 @item SOELIM
-Roff source elimination command.  This is only necessary when the option
-@command{--with-cooked-manpages} has been specified and @command{configure}
-cannot find the proper @command{soelim} command.  By default,
-@command{configure} will search for this tool.
+Roff source elimination command, @manref{soelim(1)}.  This is only necessary when the option
+@option{--with-cooked-manpages} has been specified and @file{configure} cannot find the proper
+@manpage{soelim(1)} command.  By default, @file{configure} will search for this tool.
 
 @item REFER
-Roff references command.  This is only necessary when the option
-@command{--with-cooked-manpages} has been specified and @command{configure}
-cannot find the proper @command{refer} command.  By default, @command{configure}
-will search for this tool.
+Roff references command, @manref{refer(1)}.  This is only necessary when the option
+@option{--with-cooked-manpages} has been specified and @file{configure} cannot find the proper
+@manpage{refer(1)} command.  By default, @file{configure} will search for this tool.
 
 @item TBL
-Roff table command.  This is only necessary when the option
-@command{--with-cooked-manpages} has been specified and @command{configure}
-cannot find the proper @command{tbl} command.  By default, @command{configure}
-will search for this tool.
+Roff table command, @manref{tbl(1)}.  This is only necessary when the option
+@option{--with-cooked-manpages} has been specified and @file{configure} cannot find the proper
+@manpage{tbl(1)} command.  By default, @file{configure} will search for this tool.
 
 @item PIC
-Roff picture command.  This is only necessary when the option
-@command{--with-cooked-manpages} has been specified and @command{configure}
-cannot find the proper @command{pic} command.  By default, @command{configure}
-will search for this tool.
+Roff picture command, @manref{pic(1)}.  This is only necessary when the option
+@option{--with-cooked-manpages} has been specified and @file{configure} cannot find the proper
+@manpage{pic(1)} command.  By default, @file{configure} will search for this tool.
 
 @item GZIP
 Default compression options provided to @command{GZIP_CMD}.
 
 @item GZIP_CMD
-Manpages (and kernel modules) compression commands.  This is only necessary when
-the option @command{--without-compressed-manpages} has @emph{not} been specified
-and @command{configure} cannot find the proper @command{gzip} command.  By
-default, @command{configure} will search for this tool.
+Manpages (and kernel modules) compression commands, @manref{gzip(1)}.  This is only necessary when
+the option @option{--without-compressed-manpages} has @emph{not} been specified and
+@file{configure} cannot find the proper @manpage{gzip(1)} command.  By default,
+@file{configure} will search for this tool.
 
 @item BZIP2
 Default compression options provided to @command{BZIP2_CMD}
 
 @item BZIP2_CMD
-Manpages compression commands.  This is only necessary when the option
-@command{--without-compressed-manpages} has @emph{not} been specified and
-@command{configure} cannot find the proper @command{bzip2} command.  By default,
-@command{configure} will search for this tool.
-
-@item MAKEWHATIS
-Manpages apropros database rebuild command.  By default, @command{configure}
-will search for this tool.  By default, @command{configure} will search for this
+Manpages compression commands, @manref{bzip2(1)}.  This is only necessary when the option
+@option{--without-compressed-manpages} has @emph{not} been specified and @file{configure} cannot
+find the proper @manpage{bzip2(1)} command.  By default, @file{configure} will search for this
 tool.
 
+@item MAKEWHATIS
+Manpages apropros database rebuild command, @manref{makewhatis(8)}.  By default, @file{configure}
+will search for this tool.  By default, @file{configure} will search for this tool.
+
 @item CHKCONFIG
-Chkconfig command.  This was used for installation of init scripts.  All
-pacakges now come with @command{init_install} and @command{init_remove} scripts
-used to install and remove init scripts on both RPM and debian systems.
+Chkconfig command, @manref{chkconfig(8)}.  This was used for installation of init scripts.  All
+packages now come with @manpage{init_install(8)} and @manpage{init_remove(8)} scripts used to install and
+remove init scripts on both RPM and debian systems.
 
 @item RPM
-Rpm command.  This is only necessary for RPM builds.  By default,
-@command{configure} will search for this tool.
+Rpm command, @manref{rpm(1)}.  This is only necessary for RPM builds.  By default,
+@file{configure} will search for this tool.
 
 @item RPMBUILD
-Build RPM command.  This is only necessary for RPM builds.  By default,
-@command{configure} will search for this tool.  @command{rpm} will be used
-instead of @command{rpmbuild} only if @command{rpmbuild} cannot be found.
+Build RPM command, @manref{rpmbuild(1)}.  This is only necessary for RPM builds.  By default,
+@file{configure} will search for this tool.  @manpage{rpm(1)} will be used instead of
+@manpage{rpmbuild(1)} only if @manpage{rpmbuild(1)} cannot be found.
 
 @item DPKG
-Dpkg comand.
-This command is used for building debian packages.
-By default, @command{configure} will search for this tool.
+Dpkg comand, @manref{dpkg(1)}.  This command is used for building Debian packages.  By default,
+@file{configure} will search for this tool.
 
 @item DPKG_SOURCE
-Dpkg-source command.
-This command is used for building debian dsc packages.
-By default, @command{configure} will search for this tool.
+Dpkg-source command, @manref{dpkg-source(1)}.  This command is used for building debian dsc
+packages.  By default, @file{configure} will search for this tool.
 
 @item DPKG_BUILDPACKAGE
-Dpkg-buildpackage command.
-This command is used for building debian deb packages.
-By default, @command{configure} will search for this tool.
+Dpkg-buildpackage command, @manref{dpkg-buildpackage(1)}.  This command is used for building debian
+deb packages.  By default, @file{configure} will search for this tool.
 
 @item DEB_BUILD_ARCH
 Debian build architecture.
@@ -1731,70 +1696,64 @@ This variable is used for building debian packages.
 The default is the autoconf host alias.
 
 @item LDCONFIG
-Configure loader command.  Command used to configure the loader when libraries
-are installed.  By default, @command{configure} will search for this tool.
+Configure loader command, @manref{ldconfig(8)}.  Command used to configure the loader when libraries
+are installed.  By default, @file{configure} will search for this tool.
 
 @item DESTDIR
-Cross build root directory.  Specifies the root directory for build and
-installation.  For example, for @cite{Nex@-us@-Ware} cross-builds, this is set to
-environment variable @var{NEX@-US@-WARE@-_@-PRE@-FIX} on configuration to point to the
-root of the cross-build tree for both configuration and installation.
+Cross build root directory.  Specifies the root directory for build and installation.  For example,
+for @cite{Nex@-us@-Ware} cross-builds, this is set to environment variable
+@var{NEX@-US@-WARE@-_@-PRE@-FIX} on configuration to point to the root of the cross-build tree for
+both configuration and installation.
 
 @item DEPMOD
-Build kernel module dependencies command.  This is used during installation of
-kernel modules to a running kernel to rebuild the modules dependency database.
-By default, @command{configure} will search for this tool.
+Build kernel module dependencies command, @manref{depmod(8)}.  This is used during installation of
+kernel modules to a running kernel to rebuild the modules dependency database.  By default,
+@file{configure} will search for this tool.
 
 @item MODPROBE
-Probe kernel module dependencies command.  This is used during installation of
-kernel modules to a running kernel to remove old modules.  By default,
-@command{configure} will search for this tool.
-
-@item LSMOD
-List kernel modules command.  This is used during installation of kernel modules
-to a running kernel to detect old modules for removal.  By default,
-@command{configure} will search for this tool.
-
-@item LSOF
-List open files command.  This is used during installation of kernel modules to
-a running kernel to detect old modules for removal.  Processes owning the old
-kernel modules will be killed and the module removed.  If the process restarts,
-the new module will be demand loaded.  By default, @command{configure} will
+Probe kernel module dependencies command, @manref{modprobe(8)}.  This is used during installation of
+kernel modules to a running kernel to remove old modules.  By default, @file{configure} will
 search for this tool.
 
+@item LSMOD
+List kernel modules command, @manref{lsmod(8)}.  This is used during installation of kernel modules
+to a running kernel to detect old modules for removal.  By default, @file{configure} will search
+for this tool.
+
+@item LSOF
+List open files command, @manref{lsof(1)}.  This is used during installation of kernel modules to a
+running kernel to detect old modules for removal.  Processes owning the old kernel modules will be
+killed and the module removed.  If the process restarts, the new module will be demand loaded.  By
+default, @file{configure} will search for this tool.
+
 @item GENKSYMS
-Generate kernel symbols command.  This is used for generating module symbol
-versions during build.  By default, @command{configure} will search for this
-tool.
+Generate kernel symbols command, @manref{genksyms(8)}.  This is used for generating module symbol
+versions during build.  By default, @file{configure} will search for this tool.
 
 @item KGENKSYMS
-Linux 2.6 generate kernel symbols command.  This is used for generating module
-symbol version during build.  By default, @command{configure} will search for
-this tool.
+Linux 2.6 generate kernel symbols command, @manref{genksyms(8)}.  This is used for generating module
+symbol version during build.  By default, @file{configure} will search for this tool.
 
 @item OBJDUMP
-Object dumping command.  This is used for listing information about object
-files.  By default, @command{configure} will search for this tool.
+Object dumping command, @manref{objdump(1)}.  This is used for listing information about object
+files.  By default, @file{configure} will search for this tool.
 
 @item NM
-Object symbol listing command.  This is used for listing information about
-object files.
-By default, @command{configure} will search for this tool.
+Object symbol listing command, @manref{nm(1)}.  This is used for listing information about object
+files.  By default, @file{configure} will search for this tool.
 
 @item MODPOST_CACHE
-Cache file for modpost.  The version of the @command{modpost.sh} script that
-ships with each package can cache information to a cache file to speed multiple
-builds.  This environment variable is used to specify a cache file.
+Cache file for modpost.  The version of the @command{modpost.sh} script that ships with each package
+can cache information to a cache file to speed multiple builds.  This environment variable is used
+to specify a cache file.
 
 @item AUTOM4TE
-Autom4te command.
-This is the executable used by autotest for pre- and post-installation checks.
-By default, @command{configure} will search for this tool.
+Autom4te command, @manref{autom4te(1)}.  This is the executable used by autotest for pre- and
+post-installation checks.  By default, @file{configure} will search for this tool.
 
 @item AUTOTEST
-Autotest macro build command.
-This is the executable used by autotest for pre- and post-installation checks.
-By default, @command{configure} will search for this tool.
+Autotest macro build command, @manpage{autom4te(1)}.  This is the executable used by autotest for
+pre- and post-installation checks.  By default, @file{configure} will search for this tool.
 @end vtable
 
 @subsubsection Build
@@ -1820,10 +1779,9 @@ To build from the tar ball, @xref{Building from the Tar Ball}.
 @cindex building, source srpm
 @cindex source rpms
 
-If you have downloaded the necessary source RPM (@pxref{Downloading the Source
-RPM}), then the following instructions will rebuild the binary RPMs on your
-system.  Once the binary RPMs are rebuilt, you may install them as described
-above (@pxref{Installing the Binary RPM}).
+If you have downloaded the necessary source RPM (@pxref{Downloading the Source RPM}), then the
+following instructions will rebuild the binary RPMs on your system.  Once the binary RPMs are
+rebuilt, you may install them as described above (@pxref{Installing the Binary RPM}).
 
 @noindent
 The source RPM is rebuilt to binary RPMs as follows:
@@ -1836,9 +1794,9 @@ The source RPM is rebuilt to binary RPMs as follows:
 @end cartouche
 
 @noindent
-The rebuild process can also recognize a number of options that can be used to
-tweak the resulting binaries, @xref{Configuring the Source RPM}.  These options
-are provided on the @command{rpm} command line.  For example:
+The rebuild process can also recognize a number of options that can be used to tweak the resulting
+binaries, @xref{Configuring the Source RPM}.  These options are provided on the @manpage{rpm(1)}
+command line.  For example:
 
 @cartouche
 @example
@@ -1849,8 +1807,9 @@ are provided on the @command{rpm} command line.  For example:
 @end cartouche
 
 @noindent
-will rebuild binary RPM for the @samp{@value{_kversion}} kernel for the
-@samp{athlon} architecture.
+will rebuild binary RPM
+for the @samp{@value{_kversion}} kernel
+for the @samp{athlon} architecture against the @cite{LiS} @dfn{STREAMS} package.
 @footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
 @subsubheading Installation
@@ -1864,10 +1823,9 @@ To install the resulting binary RPM, @xref{Installing the Binary RPM}.
 @cindex building, source dscs
 @cindex source dscs
 
-If you have downloaded the necessary Debian DSC (@pxref{Downloading the Debian
-DSC}), then the following instructions will rebuild the binary DEBs on your
-system.  Once the binary DEBs are rebuilt, you may install them as described
-above (@pxref{Installing the Debian DEB}).
+If you have downloaded the necessary Debian DSC (@pxref{Downloading the Debian DSC}), then the
+following instructions will rebuild the binary DEBs on your system.  Once the binary DEBs are
+rebuilt, you may install them as described above (@pxref{Installing the Debian DEB}).
 
 @noindent
 The Debian DSC is rebuilt to binary DEBs as follows:
@@ -1881,11 +1839,10 @@ The Debian DSC is rebuilt to binary DEBs as follows:
 @end cartouche
 
 @noindent
-The rebuild process can also recognize a number of options that can be used to
-tweak the resulting binaries, @xref{Configuring the Debian DSC}.  These options
-are provided in the environment variable @var{BUILD_DPKGOPTIONS} and have the
-same form as the options to @command{configure}, @xref{Configuring the Tar Ball}.
-For example:
+The rebuild process can also recognize a number of options that can be used to tweak the resulting
+binaries, @xref{Configuring the Debian DSC}.  These options are provided in the environment variable
+@var{BUILD_DPKGOPTIONS} and have the same form as the options to @file{configure},
+@xref{Configuring the Tar Ball}.  For example:
 
 @cartouche
 @example
@@ -1898,8 +1855,9 @@ For example:
 @end cartouche
 
 @noindent
-will rebuild binary DEB for the @samp{@value{_kversion}} kernel for the
-@samp{athlon} architecture.
+will rebuild binary DEB
+for the @samp{@value{_kversion}} kernel
+for the @samp{athlon} architecture against the @cite{LiS} @dfn{STREAMS} package.
 @footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
 @subsubheading Installation
@@ -1913,9 +1871,9 @@ To install the resulting binary DEB, @xref{Installing the Debian DEB}.
 @cindex building, tar ball
 @cindex tar ball
 
-If you have downloaded the tar ball (@pxref{Downloading the Tar Ball}), then the
-following instructions will rebuild the package on your system.  (Note that the
-build process does not required @command{root} privilege.)
+If you have downloaded the tar ball (@pxref{Downloading the Tar Ball}), then the following
+instructions will rebuild the package on your system.  (Note that the build process does not
+required @command{root} privilege.)
 
 @subsubsection Native Build
 
@@ -1934,17 +1892,15 @@ Folowing is an example of a native build against the running kernel:
 
 @subsubsection Cross-Build
 
-Following is an example for a cross-build.  The kernel release version must
-always be specified for a cross-build.@footnote{Because it @emph{is} a
-cross-build, the kernel version on the build machine is unlikely to be the
-kernel version of the target machine, except by coincidence.}  If you are
-cross-building, specify the root for the build with environment variable
-@var{DESTDIR}.  The cross-compile host must also be specified if different from
-the build host.  Either the compiler and other tools must be in the usual places
-where GNU @command{autoconf} can find them, or they must be specified with
-declarations such as @samp{CC=/u5/@-Nex@-us@-Ware@-24/@-ppc@--linux/@-gcc} on the
-@command{configure} command line.  Look in the file @file{configure.nexusware}
-in the release package for an example.
+Following is an example for a cross-build.  The kernel release version must always be specified for
+a cross-build.@footnote{Because it @emph{is} a cross-build, the kernel version on the build machine
+is unlikely to be the kernel version of the target machine, except by coincidence.}  If you are
+cross-building, specify the root for the build with environment variable @var{DESTDIR}.  The
+cross-compile host must also be specified if different from the build host.  Either the compiler and
+other tools must be in the usual places where GNU @manpage{autoconf(1)} can find them, or they must
+be specified with declarations such as @samp{CC=/u5/@-Nex@-us@-Ware@-24/@-ppc@--linux/@-gcc} on the
+@file{configure} command line.  Look in the file @file{configure.nexusware} in the release
+package for an example.
 
 @cartouche
 @example
@@ -1960,11 +1916,10 @@ in the release package for an example.
 
 @subsubsection NexusWare Build
 
-Additional support is provided for cross-building for the @cite{Performance
-Technologies Inc.} @cite{Nex@-us@-Ware} embedded target for the CPC-384, CPC-388 and
-CPC-396 cards.  A configuration script wrapper (@file{configure.nexusware}) is
-provided to simplify the cross-build operation for these targets.  The following
-steps describe the process:
+Additional support is provided for cross-building for the @cite{Performance Technologies Inc.}
+@cite{Nex@-us@-Ware} embedded target for the CPC-384, CPC-388 and CPC-396 cards.  A configuration
+script wrapper (@file{configure.nexusware}) is provided to simplify the cross-build operation for
+these targets.  The following steps describe the process:
 
 @enumerate
 @item Follow the normal @cite{Nex@-us@-Ware} instructions for rebuilding a
@@ -1994,37 +1949,32 @@ kernel is a little different as follows:
 @end example
 @end cartouche
 
-@item Next download, unpack
-(@pxref{Downloading the Tar Ball}) and configure (@pxref{Configuring the Tar
-Ball}) using the provided @file{configure.nexusware} wrapper for
-@command{configure}.  This wrapper simply tells the @command{configure} script
-where to find the @cite{Nex@-us@-Ware} sources and which @cite{Nex@-us@-Ware}
-cross-building tools to use for a cross-compile.@footnote{Although I have not
-tried it, because we use GNU @command{autoconf} for configuration, these
-instructions should work equally well for the Solaris @cite{Nex@-us@-Ware}
-cross-building environment as it does for the Linux @cite{Nex@-us@-Ware}
-cross-building environment.}
+@item Next download, unpack (@pxref{Downloading the Tar Ball}) and configure (@pxref{Configuring the
+Tar Ball}) using the provided @file{configure.nexusware} wrapper for @file{configure}.  This
+wrapper simply tells the @file{configure} script where to find the @cite{Nex@-us@-Ware} sources
+and which @cite{Nex@-us@-Ware} cross-building tools to use for a cross-compile.@footnote{Although I
+have not tried it, because we use GNU @manpage{autoconf(1)} for configuration, these instructions
+should work equally well for the Solaris @cite{Nex@-us@-Ware} cross-building environment as it does
+for the Linux @cite{Nex@-us@-Ware} cross-building environment.}
 
-Any of the normal @command{configure} script options (@pxref{Configuring the Tar
-Ball}) can be used on the same line as @samp{./configure.nexusware}.  One of
-particular interest to embedded targets is @samp{--with-k-optimize=size} to
-attempt to reduce the size of the kernel modules.
+Any of the normal @file{configure} script options (@pxref{Configuring the Tar Ball}) can be used
+on the same line as @samp{./configure.nexusware}.  One of particular interest to embedded targets is
+@option{--with-k-optimize=size} to attempt to reduce the size of the kernel modules.
 
-You must specify the kernel version of the kernel for which you are configuring.
-Add the --with-k-release=2.4.18 option for older @cite{Nex@-us@-Ware} releases,
---with-k-release=2.4.25 or --with-k-release=2.6.12 for more current
+You must specify the kernel version of the kernel for which you are configuring.  Add the
+@option{--with-k-release=2.4.18} option for older @cite{Nex@-us@-Ware} releases,
+@option{--with-k-release=2.4.25} or @option{--with-k-release=2.6.12} for more current
 @cite{Nex@-us@-Ware} releases.
 
-@item Install as normal (@pxref{Installing the Tar Ball}), however, for embedded
-targets the @command{install-strip} target should be used instead of the
-@command{install} target.  The @command{install-strip} target will strip
-unnecessary symbols from kernel modules and further reduce the size in the root
-file system flash image.
+@item Install as normal (@pxref{Installing the Tar Ball}), however, for embedded targets the
+@samp{install-strip} @manpage{automake(1)} target should be used instead of the @samp{install}
+@manpage{automake(1)} target.  The @samp{install-strip} target will strip unnecessary symbols from
+kernel modules and further reduce the size in the root file system flash image.
 
 @end enumerate
 
-Following is what I use for configuration and installation: (My @cite{Nex@-us@-Ware}
-tree is rooted at @file{/u5/@-Nex@-us@-Ware}.)
+Following is what I use for configuration and installation: (My @cite{Nex@-us@-Ware} tree is rooted
+at @file{/u5/@-Nex@-us@-Ware}.)
 
 @cartouche
 @example
@@ -2044,46 +1994,42 @@ tree is rooted at @file{/u5/@-Nex@-us@-Ware}.)
 @end example
 @end cartouche
 
-Once built and installed in the @cite{Nex@-us@-Ware} directory, you will have to
-(currently) hand edit a @file{.spec} file to include the components you want in
-the @cite{Nex@-us@-Ware} root file system.  If you are cross-building for
-@cite{Nex@-us@-Ware} you should already know what that means.  Objects that you
-might be interested in copying to the root file system are kernel modules that
-were installed in
+Once built and installed in the @cite{Nex@-us@-Ware} directory, you will have to (currently) hand
+edit a @file{.spec} file to include the components you want in the @cite{Nex@-us@-Ware} root file
+system.  If you are cross-building for @cite{Nex@-us@-Ware} you should already know what that means.
+Objects that you might be interested in copying to the root file system are kernel modules that were
+installed in
 @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-lib/@-modules/@-2.4.18/@-@value{PACKAGE_LCNAME}},
-libraries installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-lib} and utility
-functions installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-bin} and
+libraries installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-lib} and utility functions
+installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-bin} and
 @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-sbin} and test programs in
-@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-libexec}.  If you would prefer that these
-programs be installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-lib},
+@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-libexec}.  If you would prefer that these programs
+be installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-lib},
 @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-bin}, @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-sbin} and
-@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-libexec}, (say because you want to remote mount
-the @file{/usr} directory after boot), then specify the @samp{--exec-prefix=/}
-option to @samp{./configure.nexusware}.
+@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-libexec}, (say because you want to remote mount the
+@file{/usr} directory after boot), then specify the @option{--exec-prefix=/} option to
+@samp{./configure.nexusware}.
 
-In addition, because @cite{Nex@-us@-Ware} does not include an
-@file{/etc/@-modules.conf} file by default, it will be necessary to add one or
-edit your @file{rc.4} file to @command{insmod} the necessary
+Because @cite{Nex@-us@-Ware} does not include an @file{/etc/@-modules.conf} file by default, it will
+be necessary to add one or edit your @file{rc.4} file to @manpage{insmod(8)} the necessary
 @file{@value{PACKAGE_NAME}} modules at boot time.
 
-Also, @cite{Nex@-us@-Ware} does not configure its kernels for @var{CONFIG_KMOD},
-so any kernel modules must be loaded by the @file{rc.4} init script at boot.
-On more recent @cite{Nex@-us@-Ware} releases, the init scripts will be installed
-in @file{@var{$NEX@-US@-WARE@-_PRE@-FIX}/etc/rc.d/init.d/} but you must manually
-edit your @file{rc.4} script to invoke these scripts.
+@cite{Nex@-us@-Ware} does not configure its kernels for @var{CONFIG_KMOD}, so any kernel modules
+must be loaded by the @file{rc.4} init script at boot.  On more recent @cite{Nex@-us@-Ware}
+releases, the init scripts will be installed in
+@file{@var{$NEX@-US@-WARE@-_PRE@-FIX}/etc/rc.d/init.d/} but you must manually edit your @file{rc.4}
+script to invoke these scripts.
 
-Once you have completed the necessary @file{.spec} and @file{rc.4} file entries,
-you need to rebuild the @samp{generic} kernel flash image once more for these
-objects to be included in the flash file system.  It is important that this
-second build of the kernel image be the same as the first.
+Once you have completed the necessary @file{.spec} and @file{rc.4} file entries, you need to rebuild
+the @samp{generic} kernel flash image once more for these objects to be included in the flash file
+system.  It is important that this second build of the kernel image be the same as the first.
 
-When modifying and rebuilding a @cite{Nex@-us@-Ware} kernel, it will be necessary to
-rebuild and install @file{@value{PACKAGE_NAME}}.  Simply perform the last @samp{make
-install-strip} stage or start again with @samp{./configure.nexusware}.  You can
-place the unpacked tarball in
-@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/usr/src/@value{PACKAGE}}, and add the following to
-the top-level @cite{Nex@-us@-Ware} @file{Makefile} to make the build process a
-single step process instead of dual pass:
+When modifying and rebuilding a @cite{Nex@-us@-Ware} kernel, it will be necessary to rebuild and
+install @file{@value{PACKAGE_NAME}}.  Simply perform the last @samp{make install-strip} stage or
+start again with @samp{./configure.nexusware}.  You can place the unpacked tarball in
+@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/usr/src/@value{PACKAGE}}, and add the following to the
+top-level @cite{Nex@-us@-Ware} @file{Makefile} to make the build process a single step process
+instead of dual pass:
 
 @cartouche
 @smallexample
@@ -2096,6 +2042,12 @@ all:
         (cd usr/src/pti; $(MAKE))
         (cd drivers; $(MAKE))
         (cd utility; $(MAKE))
+@ignore
+#       uncomment for LiS build
+#       (cd usr/src/LiS; ./configure.nexusware; $(MAKE) install-strip)
+#       uncomment for LfS build
+        (cd usr/src/streams; ./configure.nexusware; $(MAKE) install-strip)
+@end ignore
 #       uncomment for @value{PACKAGE} build
 #       (cd usr/src/@value{PACKAGE}; ./configure.nexusware; $(MAKE) install-strip)
         (cd build/generic; $(MAKE))
@@ -2103,10 +2055,9 @@ all:
 @end smallexample
 @end cartouche
 
-Another, perhaps simpler approach, is to make the necessary edits to the
-@cite{Nex@-us@-Ware} top-level @file{Makefile} and @file{.spec} and @file{rc.4}
-files, download and unpack the tar ball into the @cite{Nex@-us@-Ware} directory, and
-build the @cite{Nex@-us@-Ware} flash image as normal:
+Another, perhaps simpler approach, is to make the necessary edits to the @cite{Nex@-us@-Ware}
+top-level @file{Makefile} and @file{.spec} and @file{rc.4} files, download and unpack the tar ball
+into the @cite{Nex@-us@-Ware} directory, and build the @cite{Nex@-us@-Ware} flash image as normal:
 
 @cartouche
 @example
@@ -2144,11 +2095,10 @@ The situation is a little more complex for recent @cite{Nex@-us@-Ware} releases.
 @cindex installing, binary rpms
 @cindex binary rpms
 
-If you have downloaded the necessary binary RPMs (@pxref{Downloading the Binary
-RPM}), or have rebuilt binary RPMs using the source RPM (@pxref{Building from
-the Source RPM}), then the following instructions will install the RPMs on your
-system. For additional information on @command{rpm}, see @ref{rpm(8), rpm(8),
-rpm(8), *manpages*, The Manual Pages}.
+If you have downloaded the necessary binary RPMs (@pxref{Downloading the Binary RPM}), or have
+rebuilt binary RPMs using the source RPM (@pxref{Building from the Source RPM}), then the following
+instructions will install the RPMs on your system. For additional information on @manpage{rpm(1)}, see
+@ref{rpm(8), rpm(8), rpm(8), *manpages*, The Manual Pages}.
 
 @cartouche
 @example
@@ -2158,13 +2108,11 @@ rpm(8), *manpages*, The Manual Pages}.
 @end cartouche
 
 @noindent
-You must have the correct binary RPMs downloaded or built for this to be
-successful.
+You must have the correct binary RPMs downloaded or built for this to be successful.
 
-Some of the packages are relocatable and can have final installation directories
-altered with the @samp{--relocate} option to @command{rpm}, see @ref{rpm, rpm(8),
-rpm(8), rpm(8), *manpages*, The Manual Pages}.  For example, the following
-will relocate the documentation and info directories:
+Some of the packages are relocatable and can have final installation directories altered with the
+@option{--relocate} option to @manpage{rpm(1)}, see @ref{rpm, rpm(8), rpm(8), rpm(8), *manpages*, The
+Manual Pages}.  For example, the following will relocate the documentation and info directories:
 
 @cartouche
 @example
@@ -2177,9 +2125,8 @@ will relocate the documentation and info directories:
 @end cartouche
 
 @noindent
-The previous example will install the @file{@value{PACKAGE}-doc} package by will
-relocate the documentation an info directory contents to the @file{/usr/local}
-version.
+The previous example will install the @file{@value{PACKAGE}-doc} package by will relocate the
+documentation an info directory contents to the @file{/usr/local} version.
 
 @c ----------------------------------------------------------------------------
 
@@ -2188,11 +2135,10 @@ version.
 @cindex installing, binary debs
 @cindex binary debs
 
-If you have downloaded the necessary Debian DEBs (@pxref{Downloading the Debian
-DEB}), or have rebuild binary DEBs using the Debian DSC (@pxref{Building from
-the Debian DSC}), then the following instructions will install the DEBs on your
-system.  For additional information on @command{dpkg}, see @ref{dpkg(8),
-dpkg(8), dpkg(8), *manpages*, The Manual Pages}.
+If you have downloaded the necessary Debian DEBs (@pxref{Downloading the Debian DEB}), or have
+rebuild binary DEBs using the Debian DSC (@pxref{Building from the Debian DSC}), then the following
+instructions will install the DEBs on your system.  For additional information on @manpage{dpkg(8)},
+see @ref{dpkg(8), dpkg(8), dpkg(8), *manpages*, The Manual Pages}.
 
 @cartouche
 @example
@@ -2202,8 +2148,7 @@ dpkg(8), dpkg(8), *manpages*, The Manual Pages}.
 @end cartouche
 
 @noindent
-You must have the correct @file{.deb} files downloaded or build for this to be
-successful.
+You must have the correct @file{.deb} files downloaded or build for this to be successful.
 
 @c ----------------------------------------------------------------------------
 
@@ -2212,19 +2157,18 @@ successful.
 @cindex installing, tar ball
 @cindex tar ball
 
-After the build process (@pxref{Building from the Tar Ball}), installation only
-requires execution of one of two @command{make} targets:
+After the build process (@pxref{Building from the Tar Ball}), installation only requires execution
+of one of two @manpage{automake(1)} targets:
 
 @table @asis
 @item @samp{make install}
-The @samp{install} @command{make} target will install all the components of the
-package.  Root privilege is required to successfully invoke this target.
+The @samp{install} @manpage{automake(1)} target will install all the components of the package.
+Root privilege is required to successfully invoke this target.
 
 @item @samp{make install-strip}
-The @samp{install-strip} @command{make} target will install all the components
-of the package, but will strip unnecessary information out of the objects and
-compress manual pages.  Root privilege is required to successfully invoke this
-target.
+The @samp{install-strip} @manpage{automake(1)} target will install all the components of the
+package, but will strip unnecessary information out of the objects and compress manual pages.  Root
+privilege is required to successfully invoke this target.
 @end table
 
 @c ----------------------------------------------------------------------------
@@ -2249,9 +2193,8 @@ target.
 @cindex removing, binary rpms
 @cindex binary rpms
 
-To remove an installed version of the binary RPMs (whether obtained from the
-OpenSS7 binary RPM releases, or whether created by the source RPM), execute the
-following command:
+To remove an installed version of the binary RPMs (whether obtained from the OpenSS7 binary RPM
+releases, or whether created by the source RPM), execute the following command:
 
 @cartouche
 @example
@@ -2259,7 +2202,7 @@ following command:
 @end example
 @end cartouche
 
-For more information on @command{rpm}, see @ref{rpm(8), rpm(8), rpm(8),
+For more information on @manpage{rpm(1)}, see @ref{rpm(8), rpm(8), rpm(8),
 *manpages*, The Manual Pages}.
 
 @c ----------------------------------------------------------------------------
@@ -2269,9 +2212,8 @@ For more information on @command{rpm}, see @ref{rpm(8), rpm(8), rpm(8),
 @cindex removing, binary debs
 @cindex binary debs
 
-To remove and installed version of the debian DEB (whether obtained from the
-OpenSS7 binary DEB releases, or whether created by the Debian DSC), execute the
-following command:
+To remove and installed version of the debian DEB (whether obtained from the OpenSS7 binary DEB
+releases, or whether created by the Debian DSC), execute the following command:
 
 @cartouche
 @example
@@ -2279,8 +2221,8 @@ following command:
 @end example
 @end cartouche
 
-For more information on @command{dpkg}, see @ref{dpkg(8), dpkg(8), dpkg(8),
-*manpages*, The Manual Pages}.
+For more information on @manpage{dpkg(8)}, see @ref{dpkg(8), dpkg(8), dpkg(8), *manpages*, The Manual
+Pages}.
 
 @c ----------------------------------------------------------------------------
 
@@ -2289,9 +2231,8 @@ For more information on @command{dpkg}, see @ref{dpkg(8), dpkg(8), dpkg(8),
 @cindex removing, source srpm
 @cindex source rpms
 
-To remove all the installed binary RPM build from the source RPM, see
-@ref{Removing the Binary RPM}.  Then simply remove the binary RPM package
-files and source RPM file.  A command such as:
+To remove all the installed binary RPM build from the source RPM, see @ref{Removing the Binary RPM}.
+Then simply remove the binary RPM package files and source RPM file.  A command such as:
 
 @cartouche
 @example
@@ -2309,9 +2250,8 @@ should remove all @file{@value{PACKAGE_NAME}} RPMs from your system.
 @cindex removing, source dscs
 @cindex source dscs
 
-To remove all the installed binary DEB build from the Debian DSC, see
-@ref{Removing the Debian DEB}.  Then simply remove the binary DEB package
-files and Debian DSC file.  A command such as:
+To remove all the installed binary DEB build from the Debian DSC, see @ref{Removing the Debian DEB}.
+Then simply remove the binary DEB package files and Debian DSC file.  A command such as:
 
 @cartouche
 @example
@@ -2323,8 +2263,7 @@ files and Debian DSC file.  A command such as:
 @end cartouche
 
 @noindent
-should remove all @file{@value{PACKAGE_NAME}} DEBs, DSCs and TARs from your
-system.
+should remove all @file{@value{PACKAGE_NAME}} DEBs, DSCs and TARs from your system.
 
 @c ----------------------------------------------------------------------------
 
@@ -2333,9 +2272,8 @@ system.
 @cindex removing, tar ball
 @cindex tar ball
 
-To remove a version installed from tar ball, change to the build directory where
-the package was built and use the @samp{uninstall} @command{make} target as
-follows:
+To remove a version installed from tar ball, change to the build directory where the package was
+built and use the @samp{uninstall} @manpage{automake(1)} target as follows:
 
 @cartouche
 @example
@@ -2348,10 +2286,10 @@ follows:
 @end example
 @end cartouche
 
-If you have inadvertently removed the build directory and, therefore, no longer
-have a configured directory from which to execute @samp{make uninstall}, then
-perform all of the steps for configuration and installation (@pxref{Installing
-the Tar Ball}) except the final installation and then perform the steps above.
+If you have inadvertently removed the build directory and, therefore, no longer have a configured
+directory from which to execute @samp{make uninstall}, then perform all of the steps for
+configuration and installation (@pxref{Installing the Tar Ball}) except the final installation and
+then perform the steps above.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -2362,26 +2300,26 @@ the Tar Ball}) except the final installation and then perform the steps above.
 
 @subsection Normal Module Loading
 
-When @file{@value{PACKAGE_NAME}} installs, modules and drivers are normally
-configured for demand loading.  The @samp{install} and @samp{install-strip}
-@command{make}
+When @value{PACKAGE_TITLE} installs, modules and drivers belonging to @value{pkgtype} packages are
+normally configured for demand loading.  The @samp{install} and @samp{install-strip}
+@manpage{automake(1)}
 @mkindex all
 @mkindex install
 @mkindex install-strip
-targets will make the necessary changes to the @file{/etc/@-modules@-.conf} file and
-place the modules in an appropriate place in
-@file{@value{_rootdir}/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE_LCNAME}}.
-The @samp{make install} process should have copied the kernel module files
-@file{streams-*.o} to the directory
-@file{@value{_rootdir}/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE_LCNAME}}.
-This means that to load any of these modules, you can simply execute, for
-example, @samp{modprobe stream-@var{somedriver}}.@footnote{Note that the
-@samp{_kversion} of @samp{@value{_kversion}} is only an example.}
+targets will make the necessary changes to the @file{/etc/@-modules@-.conf} file and place the
+modules in an appropriate place in
+@file{@value{_rootdir}/@-lib/@-modules/@-@value{_kversion}/@-@value{package}}.
+The @samp{make install} process should have copied the kernel module files @file{streams-*.o} to the
+directory
+@file{@value{_rootdir}/@-lib/@-modules/@-@value{_kversion}/@-@value{package}}.
+This means that to load any of these modules, you can simply execute, for example, @samp{modprobe
+stream-@var{somedriver}}.@footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is
+only an example.}
 
-@subsubsection Linux STREAMS Module Loading
+@subsubsection Linux Fast-STREAMS Module Loading
 
-The @file{@value{PACKAGE}} demand load system supports both the old kerneld and
-the new kmod mechanisms for demand loading kernel modules.
+The @file{@value{PACKAGE}} demand load system supports both the old @command{kerneld} and the new
+@command{kmod} mechanisms for demand loading kernel modules.
 
 The convention for @file{@value{PACKAGE}} kernel loadable object files is:
 @itemize @bullet
@@ -2390,27 +2328,25 @@ The convention for @file{@value{PACKAGE}} kernel loadable object files is:
 @pgindex /lib/@-modules/@-@value{_kversion}/@-streams/@-
 @end itemize
 
-If your kernel has been built using the @file{kerneld} daemon, then
-@file{@value{PACKAGE_NAME}} kernel modules will automatically load as soon as
-the STREAMS module is pushed or the driver is opened.  The @samp{make install}
-process makes the necessary changes to the
-@file{@value{_rootdir}/@-etc/@-modules.conf} file.  After the install, you will see
-lines like the following added to your @file{@value{_rootdir}/@-etc/@-modules.conf}
-file:
+If your kernel has been built using the @file{kerneld} daemon, then @file{@value{PACKAGE_NAME}}
+kernel modules will automatically load as soon as the @dfn{STREAMS} module is pushed or the driver
+is opened.  The @samp{make install} process makes the necessary changes to the
+@file{@value{_rootdir}/@-etc/@-modules.conf} file.  After the install, you will see lines like the
+following added to your @file{@value{_rootdir}/@-etc/@-modules.conf} file:
 
 @cartouche
 @example
-prune modules.@value{PACKAGE_LCNAME}
-if -f /lib/modules/`uname -r`/modules.@value{PACKAGE_LCNAME}
-include /lib/modules/`uname -r`/modules.@value{PACKAGE_LCNAME}
+prune modules.@value{pkgexample}
+if -f /lib/modules/`uname -r`/modules.@value{pkgexample}
+include /lib/modules/`uname -r`/modules.@value{pkgexample}
 endif
 @end example
 @end cartouche
 
 @noindent
-which will provide for demand loading of the modules if they have been built and
-installed for the running kernel.  The @file{/lib/@-modules/@-@command{`uname
--r`}/@-modules.@value{PACKAGE_LCNAME}} file looks like this:
+which will provide for demand loading of the modules if they have been built and installed for the
+running kernel.  The @file{/lib/@-modules/@-@command{`uname -r`}/@-modules.@value{pkgexample}} file
+looks like this:
 
 @cartouche
 @smallexample
@@ -2419,26 +2355,25 @@ alias char-major-246  streams-@var{other_driver}
 @end smallexample
 @end cartouche
 
-Note that STREAMS modules are not listed in this file, but will be loaded by
-name using @file{kerneld} if available.
+Note that @dfn{STREAMS} modules are not listed in this file, but will be loaded by name using
+@file{kerneld} if available.
 
-@subsubsection Linux Fast-STREAMS Module Loading
-
-@cite{Linux Fast-STREAMS} has a wider range of kernel module loading mechanisms
-than is provided by @cite{LiS}.  For mechanisms used for kernel module loading
-under @cite{Linux Fast-STREAMS}, @xref{Top, About This Manual, , STREAMS, Linux
-Fast-STREAMS Reference Manual}.
-
+@cite{Linux Fast-STREAMS} has a wider range of kernel module loading mechanisms than is provided by
+the deprecated @cite{LiS}.  For mechanisms used for kernel module loading under @cite{Linux
+Fast-STREAMS}, @xref{Top, About This Manual, , STREAMS, Linux Fast-STREAMS Reference Manual}.
 
 @subsection NexusWare Module Loading
 @cindex NexusWare
 @cindex loading kernel modules
 
-Under exceptional circumstances, such as a @cite{Nex@-us@-Ware} build, it is
-necessary to hand-edit a @file{.spec} and @file{rc.4} file to load the modules
-at boot time.@footnote{At some time I expect to create an
-@samp{install-nexusware} target that will make the necessary modifications to
-the @file{.spec} and @file{rc.4} files automatically.}
+Under exceptional circumstances, such as a @cite{Nex@-us@-Ware} build, it is necessary to hand-edit
+a @file{.spec} and @file{rc.4} file to load the modules at boot time.@footnote{At some time I expect
+to create an @samp{install-nexusware} target that will make the necessary modifications to the
+@file{.spec} and @file{rc.4} files automatically.}
+
+@subsubsection Linux STREAMS Module Loading
+
+@cite{LiS} is deprecated and this section has been deleted.
 
 @node Maintenance
 @section Maintenance
@@ -2450,10 +2385,10 @@ the @file{.spec} and @file{rc.4} files automatically.}
 @node Makefile Targets
 @subsection Makefile Targets
 
-Automake has many targets, not all of which are obvious to the casual user.  In addition,
-@cite{OpenSS7} automake files have additional rules added to make maintaining and releasing a
-package somewhat easier.  This list of targets provides some help with what targets can be invoked,
-what they do, and what they hope to acheive.  The available targets are as follows:
+@manpage{automake(1)} has many targets, not all of which are obvious to the casual user.  In
+addition, @cite{OpenSS7} @manpage{automake(1)} files have additional rules added to make maintaining
+and releasing a package somewhat easier.  This list of targets provides some help with what targets
+can be invoked, what they do, and what they hope to acheive.  The available targets are as follows:
 
 @menu
 * User Targets::
@@ -2477,80 +2412,81 @@ uninstalling the package.
 @table @samp
 @item [all]
 @mkindex all
-This is also the default target.  It compiles the package.  This is performed after configuring the
-source with @samp{configure}.  A makefile stub is provided so that if the package has not had
-autoreconf run (such as when checked out from CVS, the package will attempt to run @samp{autoreconf
--fiv}.
+This is also the default target.  It compiles the package and all @value{pkgtype} packages selected
+by @file{configure}.  This is performed after configuring the source with @samp{configure}.  A
+@file{Makefile} stub is provided so that if the package has not had @manpage{autoreconf(1)} run
+(such as when checked out from CVS, the package will attempt to run @samp{autoreconf -fiv}.
 
 All @cite{OpenSS7 Project} packages are configured without maintainer mode and without dependency
-tracking by default.  This speed compilation of the package for one-time builds.  This also means
-that if you are developing using the source package (edit-compile-test-cycle), changes made to
+tracking by default.  This speeds compilation of the package for one-time builds.  This also means
+that if you are developing using the source package (edit-compile-test cycle), changes made to
 source files will not cause the automatic rebuilding due to dependencies.  There are two ways to
-enable dependency tracking: specify @samp{--enable-maintainer-mode} to @command{configure}; or,
-specify @samp{--enable-dependency-tracking} to @command{configure}.  I use the former during my
+enable dependency tracking: specify @option{--enable-maintainer-mode} to @file{configure}; or,
+specify @option{--enable-dependency-tracking} to @file{configure}.  I use the former during my
 edit-compile-test cycle.
 
-This is a standard @cite{GNU} @command{automake} makefile target.
-This target does not require root privilege.
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target does not require
+root privilege.
 
 @item check
 @mkindex check
-All @cite{OpenSS7 Project} packages provide check scripts for the check target.  This step is
-performed after compiling the package and will run all of the check programs against the compiled
-binaries.  Which checks are performed depends on whether @samp{--enable-maintainer-mode} was
-specified to configure.  If in maintainer mode, checks that assist with the release of the package
-will be run (such as checking that all manual pages load properly and that they have required
-sections.)  We recommend running the check stage before installing, because it catches problems that
-might keep the installed package from functioning properly.
+All @cite{OpenSS7 Project} @value{pkgtype} packages provide check scripts for the check target.
+This step is performed after compiling the package and will run all of the @samp{check} programs
+against the compiled binaries.  Which checks are performed depends on whether
+@option{--enable-maintainer-mode} was specified to @file{configure}.  If in maintainer mode,
+checks that assist with the release of the package will be run (such as checking that all manual
+pages load properly and that they have required sections.)  We recommend running the check stage
+before installing, because it catches problems that might keep the installed package from
+functioning properly.
 
 Another way to enable the greater set of checks, without invoking maintainer mode, is to specify
-@samp{--enable-checks} to @command{configure}.
+@option{--enable-checks} to @file{configure}.  For more information, see @ref{Pre-installation
+Checks}.
 
-This is a standard @cite{GNU} @command{automake} makefile target, although the functions performed
-are customized for the @cite{OpenSS7 Project}.
-This target does not require root privilege.
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target, although the functions
+performed are customized for the @cite{OpenSS7 Project}.  This target does not require root
+privilege.
 
 @item install
 @itemx install-strip
 @mkindex install
 @mkindex install-strip
-The @samp{install} target installs the package.  This target also performs some actions similar to
-the pre- and post-install scripts used by packaging tools such as @command{rpm} or @command{dpkg}.
-The @samp{install-strip} target strips unnecessary symbols from executables and kernel modules
-before installing.
+The @samp{install} target installs the package by installing each @value{pkgtype} package.  This
+target also performs some actions similar to the pre- and post-install scripts used by packaging
+tools such as @manpage{rpm(1)} or @manpage{dpkg(1)}.  The @samp{install-strip} target strips
+unnecessary symbols from executables and kernel modules before installing.
 
-This is a standard @cite{GNU} @command{automake} makefile target.
-This target requires root privilege.
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target requires root
+privilege.
 
 @item installcheck
 @mkindex installcheck
 All @cite{OpenSS7 Project} packages provide test scripts for the @samp{installcheck} target.  Test
-scripts are created and run using autotest (part of the autoconf package).  Which test suites are
-run and how extensive they are depends on whether @samp{--enable-maintainer-mode} was specified to
-@command{configure}.  When in maintainer mode, all test suites will be run.  When not in maintainer
-mode, only a few post-install checks will be performed, but the test suites themselves will be
-installed in
-@file{@value{_libexecdir}/@value{PACKAGE}}@footnote{@file{@value{_libexecdir}/@value{PACKAGE}} is
-just an example, the actual location is @file{$@{libexecdir@}/$@{PACKAGE@}}, which varies from
+scripts are created and run using @command{autotest} (part of the @manpage{autoconf(1)} package).
+Which test suites are run and how extensive they are depends on whether
+@option{--enable-maintainer-mode} was specified to @file{configure}.  When in maintainer mode,
+all test suites will be run.  When not in maintainer mode, only a few post-install checks will be
+performed, but the test suites themselves will be installed in
+@file{@value{_libexecdir}/@value{package}}@footnote{@file{@value{_libexecdir}/@value{package}}
+is just an example, the actual location is @file{$@{libexecdir@}/$@{PACKAGE@}}, which varies from
 distribution to distribution (as some distributions such as Mandriva do not have a libexec
 directory).} for later use.
 
-This is a standard @cite{GNU} @command{automake} makefile target.
-This target might require root privilege.  Tests requiring root privilege will be skipped when run
-as a regular user.  Tests requiring regular account privileges will be skipped when run as root.
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target might require root
+privilege.  Tests requiring root privilege will be skipped when run as a regular user.  Tests
+requiring regular account privileges will be skipped when run as root.
 
 @item retest
 @mkindex retest
 To complement the @samp{installcheck} target above, all @cite{OpenSS7 Project} packages provide the
-@samp{retest} target as a means to rerun failed conformance testsuite test cases.  The retest target
-is provided because some test cases in the testsuites have delicate timing considerations that allow
-them to fail sporadically.  Invoking this target will retest the failed cases until no cases that
-are not expected failures remain.
+@samp{retest} target as a means to rerun failed conformance testsuite test cases.  The @samp{retest}
+target is provided because some test cases in the testsuites have delicate timing considerations
+that allow them to fail sporadically.  Invoking this target will retest the failed cases until no
+cases that are not expected failures remain.
 
-This is an @cite{OpenSS7 Project} specific makefile target.
-As with @samp{installcheck}, this target might require root privilege.  Tests requiring root
-privilege will be skpped when run as a regular user.  Tests requiring regular account privileges
-will be skipped when run as root.
+This is an @cite{OpenSS7 Project} specific makefile target.  As with @samp{installcheck}, this
+target might require root privilege.  Tests requiring root privilege will be skpped when run as a
+regular user.  Tests requiring regular account privileges will be skipped when run as root.
 
 @item uninstall
 @mkindex uninstall
@@ -2561,15 +2497,20 @@ compiled any of the files in that build directory.@footnote{Therefore, it is pos
 the package, configure it, and then uninstall it.  This is handy if you do not have the sources used
 to build and install the package immediately available.}
 
-This is a standard @cite{GNU} @command{automake} makefile target.
-This target requires root privilege.
+The @samp{uninstall} target unfortunately uninstalls add-on packages in the same order in which they
+were installed.  This is not good for the @cite{OpenSS7 Master Package}, where the @samp{remove}
+taret should be used instead.
+
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target requires root
+privilege.
 
 @item remove
 @mkindex remove
-This target is like @samp{uninstall} with the exception that it uninstalls in the reverse order that
-installation was performed.@footnote{This is useful from the @cite{OpenSS7 Master Package}.}
+This target is like @samp{uninstall} with the exception that it uninstalls add-on packages in the
+reverse order that installation was performed.@footnote{This is useful from the @cite{OpenSS7 Master
+Package}.}
 
-This is an @cite{OpenSS7 Project} specific makefile target.
+This is an @cite{OpenSS7 Project} specific makefile target.  This target requires root privilege.
 @end table
 
 @node Maintainer Targets
@@ -2577,8 +2518,8 @@ This is an @cite{OpenSS7 Project} specific makefile target.
 
 The following targets are targets intended for use by maintainers of the package, or those
 responsible for rerelease and packaging of a derivative work of the package.  Some of these targets
-are only effective when maintainer mode has been invoked (@samp{--enable-maintainer-mode} specified
-to @command{configure}.)
+are only effective when maintainer mode has been invoked (@option{--enable-maintainer-mode} specified
+to @file{configure}.)
 
 @table @samp
 @item dist
@@ -2588,20 +2529,20 @@ packages distribute two archives: a @samp{gzip tar} archive and a @samp{bzip tar
 archives will have the name @file{@value{PACKAGE}-@value{VERSION}.tar.gz} and
 @file{@value{PACKAGE}-@value{VERSION}.tar.bz2}.
 
-This is a standard @cite{GNU} @command{automake} makefile target.
-This target does not require root privilege.
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target does not require
+root privilege.
 
 @item distcheck
 @mkindex distcheck
-This target is intended for use when releasing the package.  It creates the @command{tar} archives
+This target is intended for use when releasing the package.  It creates the @manpage{tar(1)} archives
 above and then unpacks the tarball in a source directory, configures in a separate build directory,
 compiles the package, installs the package in a separate install directory, tests the install
 package to ensure that some components work, and, finally, uses the unpacked source tree to build
 another tarball.  If you have added or removed files from the package, this is a good way to ensure
 that everything is still stable for release.
 
-This is a standard @cite{GNU} @command{automake} makefile target.
-This target does not require root privilege.
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target does not require
+root privilege.
 @end table
 
 @node Clean Targets
@@ -2613,40 +2554,43 @@ This target does not require root privilege.
 Cleans out most of the files from the compile stage.  This target is helpful if you have not enabled
 dependency tracking and need to recompile with changes.
 
-This is a standard @cite{GNU} @command{automake} makefile target.
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target.
 This target does not require root privilege.
 
 @item clean
 @mkindex clean
 Cleans all the files from the build directory generated during the @samp{make [all]} phase.  It does
-not, however, remove files from the directory left there from the @command{configure} run.  Use the
+not, however, remove files from the directory left there from the @file{configure} run.  Use the
 @samp{distclean} target to remove those too.
 
-This is a standard @cite{GNU} @command{automake} makefile target.
-This target might require root privilege if the @samp{installcheck} target or the
-@command{testsuite} was invoked with root privilege (leaving files belonging to root).
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target might require root
+privilege if the @samp{installcheck} target or the @command{testsuite} was invoked with root
+privilege (leaving files belonging to root).
 
 @item distclean
 @mkindex distclean
 This target cleans out the directories left behind by @samp{distcheck} and removes all the
-@command{configure} and generated files from the build directory.  This will effectively remove all
+@file{configure} and generated files from the build directory.  This will effectively remove all
 the files in the build directory, with the except of files that belong to you or some other process.
 
-This is a standard @cite{GNU} @command{automake} makefile target.
-This target might require root privilege if the @samp{installcheck} target or the
-@command{testsuite} was invoked with root privilege (leaving files belonging to root).
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target might require root
+privilege if the @samp{installcheck} target or the @command{testsuite} was invoked with root
+privilege (leaving files belonging to root).
 
 @item maintainer-clean
 @mkindex maintainer-clean
 This target not only removes files from the build directory, it removes generated files from the
 source directory as well.  Care should be taken when invoking this target, because it removes files
 generated by the maintainer and distributed with the archive that might require special tools to
-regenerate.  These special tools might only be available to the maintainer (but they aren't).  It
-also means that you probably need a full blown Linux system to rebuild the package.
+regenerate.  These special tools might only be available to the maintainer.@footnote{Theoretically
+this is true, however, the @cite{OpenSS7 Project} does not use any maintainer programs that are not
+generally available (i.e. open source).}
+It also means that you probably need a full blown Linux system to rebuild the package. For more
+information, see @ref{Downloading from CVS}.
 
-This is a standard @cite{GNU} @command{automake} makefile target.
-This target might require root privilege if the @samp{installcheck} target or the
-@command{testsuite} was invoked with root privilege (leaving files belonging to root).
+This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target might require root
+privilege if the @samp{installcheck} target or the @command{testsuite} was invoked with root
+privilege (leaving files belonging to root).
 
 @item check-clean
 @mkindex check-clean
@@ -2668,10 +2612,10 @@ building from atop multiple packages, these targets also recurse down through ea
 @table @samp
 @item release
 @mkindex release
-Build all of the things necessary to generate a release.  On an @command{rpm} system this is the
+Build all of the things necessary to generate a release.  On an @manpage{rpm(1)} system this is the
 distribution archives, the source rpm, and the architecture dependent and architecture independent
 binary rpms.  All items are placed in the package distribution directory that can be specified with
-the @samp{--with-pkg-distdir=DIR} option to @command{configure}.
+the @option{--with-pkg-distdir=DIR} option to @file{configure}.
 
 This is an @cite{OpenSS7 Project} specific makefile target.
 This target does not require root privilege.
@@ -2717,46 +2661,46 @@ For convenience, to log the output of a number of targets to a file, log targets
 log file itself is used as the target to make, but make invokes the target minus a @file{.log}
 suffix.  So, for example, to log the results of target @samp{foo}, invoke the target @samp{foo.log}.
 The only target that this does not apply to is @samp{compile.log}.  When you invoke the target
-@samp{compile.log} a simple @command{make} is invoked and logged to the file @file{compile.log}.
+@samp{compile.log} a simple @manpage{automake(1)} is invoked and logged to the file @file{compile.log}.
 The @samp{foo.log} rule applies to all other targets.  This does not work for all targets, just a
-selected few.@footnote{Note that because logging targets invoke a pipe, @command{make} does not
-return the correct return status (always returns success if the @command{tee} operation is
+selected few.@footnote{Note that because logging targets invoke a pipe, @manpage{automake(1)} does not
+return the correct return status (always returns success if the @manpage{tee(1)} operation is
 successful).  Therefore, these targets should not be invoked by scripts that need to use the return
-value from @command{make}.} Following are the logging targets:
+value from @manpage{automake(1)}.} Following are the logging targets:
 
 @subsubheading Common Logging Targets
 
-Common logging targets correspond to normal user @command{automake} makefile targets as follows:
+Common logging targets correspond to normal user @manpage{automake(1)} makefile targets as follows:
 
 @table @samp
 @item compile.log
 @mkindex compile.log
 This is an @cite{OpenSS7 Project} specific makefile target,
-but it invokes the standard @cite{GNU} @command{automake} makefile target
+but it invokes the standard @cite{GNU} @manpage{automake(1)} makefile target
 @samp{[all]}.
 
 @item check.log
 @mkindex check.log
 This is an @cite{OpenSS7 Project} specific makefile target,
-but it invokes the standard @cite{GNU} @command{automake} makefile target
+but it invokes the standard @cite{GNU} @manpage{automake(1)} makefile target
 @samp{check}.
 
 @item install.log
 @mkindex install.log
 This is an @cite{OpenSS7 Project} specific makefile target,
-but it invokes the standard @cite{GNU} @command{automake} makefile target
+but it invokes the standard @cite{GNU} @manpage{automake(1)} makefile target
 @samp{install}.
 
 @item installcheck.log
 @mkindex installcheck.log
 This is an @cite{OpenSS7 Project} specific makefile target,
-but it invokes the standard @cite{GNU} @command{automake} makefile target
+but it invokes the standard @cite{GNU} @manpage{automake(1)} makefile target
 @samp{installcheck}.
 
 @item uninstall.log
 @mkindex uninstall.log
 This is an @cite{OpenSS7 Project} specific makefile target,
-but it invokes the standard @cite{GNU} @command{automake} makefile target
+but it invokes the standard @cite{GNU} @manpage{automake(1)} makefile target
 @samp{uninstall}.
 
 @item remove.log
@@ -2769,20 +2713,20 @@ target.
 
 @subsubheading Maintainer Logging Targets
 
-Maintainer logging targets correspond to maintainer mode @command{automake} makefile targets as
+Maintainer logging targets correspond to maintainer mode @manpage{automake(1)} makefile targets as
 follows:
 
 @table @samp
 @item dist.log
 @mkindex dist.log
 This is an @cite{OpenSS7 Project} specific makefile target,
-but it invokes the standard @cite{GNU} @command{automake} makefile target
+but it invokes the standard @cite{GNU} @manpage{automake(1)} makefile target
 @samp{dist}.
 
 @item distcheck.log
 @mkindex distcheck.log
 This is an @cite{OpenSS7 Project} specific makefile target,
-but it invokes the standard @cite{GNU} @command{automake} makefile target
+but it invokes the standard @cite{GNU} @manpage{automake(1)} makefile target
 @samp{distcheck}.
 
 @item srpm.log
@@ -2862,10 +2806,10 @@ This target does not require root privilege (unless the problem report file was 
 The following targets are used to generate and clean distribution archive and signature files.
 Whereas the @samp{dist} target affects archives in the top build directory, the
 @samp{release-archive} targets affects archives in the package distribution directory (either the
-top build directory or that specified with @samp{--with-pkg-distdir=DIR} to @command{configure}).
+top build directory or that specified with @option{--with-pkg-distdir=DIR} to @file{configure}).
 
 You can change the directory to which packages are distributed by using the
-@samp{--with-pkg-distdir=DIR} option to @command{configure}.  The default directory is the top build
+@option{--with-pkg-distdir=DIR} option to @file{configure}.  The default directory is the top build
 directory.
 
 @table @samp
@@ -2881,8 +2825,8 @@ The files generated are named:
 and
 @file{@value{PACKAGE}-@value{VERSION}.tar.bz2}
 
-You can change this distribution directory with the @samp{--with-pkg-distdir} option to
-@command{configure}.  See @samp{./configure --help} for more details on options.
+You can change this distribution directory with the @option{--with-pkg-distdir} option to
+@file{configure}.  See @samp{./configure --help} for more details on options.
 
 This is an @cite{OpenSS7 Project} specific makefile target.
 This target does not require root privilege.
@@ -2919,10 +2863,10 @@ This target does not require root privilege.
 @node RPM Build Targets
 @subsubsection RPM Build Targets
 
-On @command{rpm} systems, or systems sporting rpm packaging tools, the following targets are used to
-generate @command{rpm} release packages.  The epoch and release number can be controlled by the
+On @manpage{rpm(1)} systems, or systems sporting rpm packaging tools, the following targets are used to
+generate @manpage{rpm(1)} release packages.  The epoch and release number can be controlled by the
 contents of the @file{.rpmepoch} and @file{.rpmrelease} files, or with the
-@samp{--with-rpm-epoch=EPOCH} and @samp{--with-rpm-release=RELEASE} options to @command{configure}.
+@option{--with-rpm-epoch=EPOCH} and @option{--with-rpm-release=RELEASE} options to @file{configure}.
 See @samp{configure --help} for more information on options.  We always use release number @samp{1}.
 You can use release numbers above @samp{1}.
 
@@ -2944,8 +2888,8 @@ binary rpms will be named:
 
 where the stars indicate the subpackage and the architecture.  Both the architecture specific
 subpackages (binary objects) and the architecture independent (@file{.noarch}) subpackages will be
-built unless the the former was disabled with the option @samp{--disable-arch}, or the later with
-the option @samp{--disable-indep}, passed to @command{configure}.
+built unless the the former was disabled with the option @option{--disable-arch}, or the later with
+the option @option{--disable-indep}, passed to @file{configure}.
 
 This is an @cite{OpenSS7 Project} specific makefile target.
 This target does not require root privilege.
@@ -2990,8 +2934,8 @@ This target does not require root privilege.
 
 On debian systems, or systems sporting debian packaging tools, the following targets are used to
 generate debian release packages.  The release number can be controlled by the contents of the
-@file{.debrelease} file, or with the @samp{--with-debrelease=RELEASENUMBER} option to
-@command{configure}.  See @samp{configure --help} for more information on options.
+@file{.debrelease} file, or with the @option{--with-debrelease=RELEASENUMBER} option to
+@file{configure}.  See @samp{configure --help} for more information on options.
 
 @table @samp
 @item dsc
