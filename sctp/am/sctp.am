@@ -75,7 +75,12 @@ if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
 
 Modules.map: $(KERNEL_MODULES)
-	$(NM) -s $(KERNEL_MODULES) > $@
+	cat /dev/null > $@
+	@modules="$(KERNEL_MODULES)" ; for module in $$modules ; do \
+		$(ECHO) "$(NM) -s $$module >> $@" ; \
+		$(NM) -s $$module >> $@ ; \
+	done
+
 
 CLEANFILES		+= Modules.map
 
