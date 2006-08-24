@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: quick.texi,v 0.9.2.2 2006/08/24 05:47:52 brian Exp $
+@c @(#) $Id: quick.texi,v 0.9.2.3 2006/08/24 07:09:36 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/24 05:47:52 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/24 07:09:36 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -90,8 +90,6 @@ interested in different licensing terms, please contact the copyright holder,
 See @file{README-alpha} (if it exists) for alpha release information.
 
 @unnumberedsec Prerequisites
-
-The following are prerequisites for building the package:
 
 @include prerequisites.texi
 

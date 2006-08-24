@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: versions.texi,v 0.9.2.1 2006/08/24 05:58:09 brian Exp $
+@c @(#) $Id: versions.texi,v 0.9.2.2 2006/08/24 07:08:49 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/24 05:58:09 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/24 07:08:49 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -62,6 +62,7 @@
 @c everywhere.
 @c
 @set VERSION_EXTRA	.rc3
+@set VERSION_OPENSS7	0.9.2.D@value{VERSION_EXTRA}
 @set VERSION_SCTP	0.2.24@value{VERSION_EXTRA}
 @set VERSION_IPERF	2.0.5@value{VERSION_EXTRA}
 @set VERSION_STREAMS	0.7a.6@value{VERSION_EXTRA}
