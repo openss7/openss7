@@ -1,0 +1,115 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id$
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date$ by $Author$
+@c
+@c =========================================================================
+
+@unnumberedsec Description
+
+The @cite{OpenSS7} @value{PACKAGE_TITLE} package is a @dfn{STREAMS} framework for @cite{Linux} that
+is compatible with @cite{SVR 4.2 MP} @dfn{STREAMS}.
+
+@cite{@value{PACKAGE_TITLE}} is intendeed as a high-performance, production replacement for the
+buggy and deprecated @cite{Linux STREAMS (LiS)}.  In contrast, @cite{@value{PACKAGE_TITLE}} has the
+following features in contrast to @cite{Linux STREAMS}:
+
+@multitable @columnfractions .50 .05
+@item @b{@value{PACKAGE_TITLE}}
+@tab @b{Linux STREAMS (LiS)}
+@item
+Provided and optimized for Linux.  Ports to other OSs (BSD?) possible.
+@tab
+Maintain portability across Linux, User Space, QNX, DOS and other ports.
+@item
+Promotes mainstream kernel adoption.
+@tab
+Places portability concerns before mainstream kernel adoption.
+@item
+Lindented and follows normal kernel formatting and coding practices.
+@tab
+Non-lindented, does not follow normal kernel formatting and coding practice.
+@item
+Provides compatibility modes for AIX, HPUX, OSF, Solaris, UnixWare, SVR 4.2 and LiS.  Supports all
+majjor SVR 4.2 variants.
+@tab
+Provides some compatibility interfaces but also many Linux-derived inetrfaces specific to LiS.
+@item
+Licensed under GPL with commercial licensing avaliable.
+@tab
+Dubiously licensed under LGPL.
+@item
+Supports full SVR4.2 MP sychronization models.
+@tab
+Supports only a single, Linux derived synchronization model.
+@item
+Runs at SoftIRQ.
+@tab
+Separate kernel threads.
+@item
+Provides common SVR4.2 system tunable parameters as sysctls as well as /proc filesystem support for
+debugging.
+@tab
+Provides only log based debugging.
+@item
+Provides support for SVR4.2 STREAMS and other utilities.
+@tab
+Provides a limited set of LiS only Linux-derived utlities.
+@item
+Provides full named-streams device and device filesystem support.
+@tab
+Provides only character-based node support.
+@end multitable
+

@@ -1,0 +1,122 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id$
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date$ by $Author$
+@c
+@c =========================================================================
+
+@unnumberedsec Description
+
+The @cite{@value{PACKAGE_TITLE}} package contains header files and a number of modules and drivers
+and the associated documentation not contained in the @cite{OpenSS7 Linux STREAMS (LiS)} releases.
+
+The package uses the following standard @cite{Open Systems Interconnect (OSI)} conforming header
+files from the @file{strxns} package:
+
+@itemize -
+@item @file{<sys/cdi.h>} @cite{Communications Device Interface}
+@item @file{<sys/dlpi.h>} @cite{Data Link Provider Interface Version 2.0.0}
+@item @file{<sys/npi.h>} @cite{Network Provider Interface Version 2.0.0}
+@end itemize
+
+The package uses the following standard @cite{Open Systems Interconnect (OSI)} conforming header
+files from the @file{strxnet} package:
+
+@itemize -
+@item @file{<sys/tihdr.h>} @cite{Transport Provider Interface Version 2.0.0}
+@end itemize
+
+The package currently includes the following @dfn{STREAMS} kernel modules and drivers:
+
+@multitable @columnfractions .05 .30 .65
+@item - @tab @file{streams_x223.ko} @tab @file{/dev/cons}
+@item - @tab @file{streams_x233.ko} @tab @file{/dev/clns}
+@item - @tab @file{streams_x224.ko} @tab @file{/dev/tp0} @file{/dev/tp4}
+@item - @tab @file{streams_X234.ko} @tab @file{/dev/clts}
+@item - @tab @file{streams_isot.ko} @tab @file{module} @file{/dev/isot}
+@item - @tab @file{streams_lpp.ko} @tab @file{module} @file{/dev/lpp}
+@item - @tab @file{streams_cmot.ko} @tab @file{module} @file{/dev/cmot}
+@item - @tab @file{streams_itot.ko} @tab @file{module}
+@item - @tab @file{streams_itos.ko} @tab @file{module}
+@end multitable
+
+The @manref{x223(4)} driver provides @dfn{CONS} and @dfn{CLNS} services in accordance with the
+@cite{ISO/OSI Network Protocol X.223}.
+
+The @manref{x224(4)} driver provides @dfn{OSI Transport Protocol} services in accordance with the
+@cite{ISO/OSI Transport Protocol X.224}.
+
+The @manref{isot(4)} driver and module provides @dfn{ISO Transport over TCP/IP} as specified in
+@cite{RFC 1006/STD 35}.
+
+The @manref{lpp(4)} driver and module provides @dfn{ISO Transport over TCP/IP} as specified in
+@cite{RFC 1085.}
+
+The @manref{cmot(4)} driver and modules provides @dfn{ISO Common Management Information Protocol
+(CMIP) over TCP/IP} as specified in @cite{RFC 1095}.
+
+The @manref{itot(4)} module provides @dfn{ISO Transport over TCP} as specified in @cite{RFC 2126}.
+
+The @manref{itos(4)} module provides @dfn{ISO Transport over SCTP}.
+
+The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
+drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of @cite{X/Open Network Services (ISO)} protocol stack components and
+applications for the @cite{SVR 4.2} @dfn{STREAMS} environment.
+
+This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targetted
+at @samp{ix86}, @samp{x86_64}, @samp{ppc} and @samp{ppc64} architectures, but should build and
+install for other architectures as well.
+

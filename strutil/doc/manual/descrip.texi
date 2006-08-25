@@ -1,0 +1,82 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id$
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date$ by $Author$
+@c
+@c =========================================================================
+
+@unnumberedsec Description
+
+The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and drivers, programs and
+daemons for adminstration and handling of the @dfn{STREAMS} subsystem.
+
+@quotation
+The @command{@value{PACKAGE}} package is currently incomplete.  The purpose of the package was to
+move @dfn{STREAMS} utility programs and modules outside of the @dfn{STREAMS} release package so as
+to allow them to be used with both @cite{LiS} and @cite{Linux Fast-STREAMS}.  As @cite{Linux
+Fast-STREAMS} has already shown superior to @cite{LiS} in terms of both performance and conformance,
+it is no longer necessary to keep these packages separate and they can be combined once again with
+@cite{Linux Fast-STREAMS}.
+@end quotation
+
+The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
+drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of @dfn{STREAMS} modules and drivers.  This package contains primarily
+user-space utilities and test programs.
+
+This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targetted
+at @samp{ix86}, @samp{x86_64}, @samp{ppc} and @samp{ppc64} architectures, but should build and
+install for other architectures as well.
+

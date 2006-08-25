@@ -167,6 +167,8 @@ Manual} as listed below.  If you encounter troubles, see the trouble shooting
 section of the @cite{Installation and Reference Manual} before issuing a bug
 report.
 
+@include descrip.texi
+
 @unnumberedsec Brief Installation Instructions
 
 The @value{PACKAGE_TITLE} package is available from the
