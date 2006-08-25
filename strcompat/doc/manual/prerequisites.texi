@@ -57,8 +57,13 @@
 @c
 @c =========================================================================
 
+The quickest and easiest way to ensure that all prerequisites are met is to download and install
+this package from within the @cite{OpenSS7 Master Package},
+@command{openss7-@value{VERSION_OPENSS7}}, instead of separately.
+
 Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
 
+@ignore
 @itemize @bullet
 @item A fairly LSB compliant GNU/Linux distribution.
 @footnote{@xref{GNU/Linux Distributions}, for more information.}
@@ -74,4 +79,45 @@ including references in the manual pages.}
 @footnote{Although this an other OpenSS7 STREAMS packages will build and install with Linux STREAMS
 (LiS), @b{Linux STREAMS (LiS) is deprecated and cannot be supported because it is full of bugs!}}
 @end itemize
+@end ignore
 
+@enumerate
+@item @cite{Linux} distribution, somewhat @cite{Linux Standards Base} compliant, with a 2.4 or 2.6
+kernel and the appropriate tool chain for compiling out-of-tree kenrel modules.  Most recent
+@cite{Linux} distributions are okay out of the box, but some development packages must be installed.
+For more information, see @xref{Compatibility}, in the manual.
+
+@item @cite{OpenSS7 Linux Fast-STREAMS} or @cite{OpenSS7 Modified Linux
+STREAMS} installed, such as @*
+@url{http://www.openss7.org/tarballs/streams-@value{VERSION_STREAMS}.tar.bz2} or @*
+@url{http://www.openss7.org/tarballs/LiS-@value{VERSION_LIS}}.
+
+(Note that the @file{LiS} package is deprecated and unsupported.  We recommend using the lastest
+ version of the @file{streams} package instead.)
+
+@ignore
+@item
+Most @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS Compatibility Modules} package be
+installed, such as @* @url{http://www.openss7.org/tarballs/strcompat-@value{VERSION_STRCOMPAT}.tar.bz2}.
+
+@item
+Most @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS Utilities} package be installed,
+such as @* @url{http://www.openss7.org/tarballs/strutil-@value{VERSION_STRUTIL}.tar.bz2}.
+
+@item
+Some @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS XNS} package be installed, such
+as @* @url{http://www.openss7.org/tarballs/strxns-@value{VERSION_STRXNS}.tar.bz2}.
+
+@item
+Some @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS XTI/TLI} package be installed,
+     such as @* @url{http://www.openss7.org/tarballs/strxnet-@value{VERSION_STRXNET}.tar.bz2}.
+
+@item
+Some @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS INET} package be installed, such
+as @* @url{http://www.openss7.org/tarballs/strinet-@value{VERSION_STRINET}.tar.bz2}.
+
+@item
+Some @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS SCTP} package be installed, such
+as @* @url{http://www.openss7.org/tarballs/strsctp-@value{VERSION_STRSCTP}.tar.bz2}.
+@end ignore
+@end enumerate
