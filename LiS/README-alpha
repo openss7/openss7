@@ -1,4 +1,4 @@
-Linux STREAMS (LiS) -- unstable release introduction.  2006-08-23
+Linux STREAMS (LiS) -- unstable release introduction.  2006-08-26
 $Id: README-alpha,v 0.9.2.6 2006/08/26 14:46:25 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
 Linux STREAMS (LiS)
 ===================
 
-Package LiS-2.18.4.rc3 Released 2006-08-23.
+Package LiS-2.18.4.rc3 Released 2006-08-26.
 
 This is unstable release software.
 
@@ -121,11 +121,6 @@ problems and issues be closely examined before this software is used
 even in a non-production evironment.  Each failing test scenario should
 be completely avoided by the application.  `OpenSS7' beta software is
 more stable that software in this category.
-
-------
-
-Although the original package is distributed under LGPL, this package is
-distributed by OpenSS7 Corporation under the GNU Public License.
 
 -----
 

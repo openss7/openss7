@@ -1,46 +1,26 @@
-OpenSS7 STREAMS XNS -- authors and acknowledgements.  2006-03-03
+OpenSS7 XNS Networking -- authors.  2006-08-26
 $Id: AUTHORS,v 0.9.2.6 2006/03/03 11:27:47 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-ip_to_dlpi.c was originally written and distributed under LGPL by:
+ Authors
+========
 
-  The Software Group Limited.
+The authors of the `OpenSS7 OpenSS7 XNS Networking' package include:
 
-ldl.c, ldltest.c, ldlconfig.c, were originally written and distributed
-under GPL by:
+     - Brian Bidulock <bidulock@openss7.org>
 
-  Ole Husgaard			sparre@login.dknet.dk
-  Dave Grothe			dave@gcom.com
+ Maintainer
+===========
 
-ip_strm_mod.c was originally written and distributed under LGPL by:
+The maintainer of the `OpenSS7 OpenSS7 XNS Networking' package is:
 
-  Mikel Matthews		mikel@gcom.com
-  Dave Grothe			dave@gcom.com
+     - Brian Bidulock <bidulock@openss7.org>
 
-Autoconf/RPM packaging was performed by:
-
-  Brian Bidulock		bidulock@openss7.org
-
-The current maintainer of the package is:
-
-  Brian Bidulock		bidulock@openss7.org
-
-Packaging would not be what it is today without the invaluable help of
-these people:
-
-  Christian Hildner		christian.hildner@hob.de
-  Gurol Akman			gurol.akman@ss8.com
-  John A. Boyd Jr.		jaboydjr@netwalk.com
-  William Waites		openss7@lists.styx.org
-
-See the file entitled "THANKS" for acknowledgements.
-
-------
-
-Although the original package is distributed under LGPL, this package is
-distributed by OpenSS7 Corporation under the GNU Public License.
+Please send bug reports to <bugs@openss7.org> using the `send-pr' script
+included in the package, only after reading the `BUGS' file in the
+release, or *Note Problem Reports::, in the manual.
 
 -----
 

@@ -1,4 +1,4 @@
-OpenSS7 XNS Networking -- alpha release introduction.  2006-08-23
+OpenSS7 XNS Networking -- alpha release introduction.  2006-08-26
 $Id: README-alpha,v 0.9.2.4 2006/08/26 14:46:50 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
 OpenSS7 XNS Networking
 ======================
 
-Package strxns-0.9.2.4.rc3 Released 2006-08-23.
+Package strxns-0.9.2.4.rc3 Released 2006-08-26.
 
 This is alpha release software.
 
@@ -64,11 +64,6 @@ themselves and contribute back to the project.
 "Alpha" release packages ship containing warnings that executing the
 code can crash machines and might possibly do damage to systems upon
 which it is executed.
-
-------
-
-Although the original package is distributed under LGPL, this package is
-distributed by OpenSS7 Corporation under the GNU Public License.
 
 -----
 

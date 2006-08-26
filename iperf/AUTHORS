@@ -1,31 +1,26 @@
-Iperf -- authors and acknowledgements.  2006-03-03
+OpenSS7 IPERF Utility -- authors.  2006-08-26
 $Id: AUTHORS,v 0.9.2.4 2006/03/05 05:52:08 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-Iperf was originally written by:
+ Authors
+========
 
-  Mark Gates
-  Ajay Tirumala
-  Jim Ferguson
-  Jon Dugan
-  Feng Qin
-  Kevin Gibbs
+The authors of the `OpenSS7 OpenSS7 IPERF Utility' package include:
 
-Autoconf/RPM packaging was performed as part of the OpenSS7 Project
-(http://www.openss7.org/) by:
+     - Brian Bidulock <bidulock@openss7.org>
 
-  Brian Bidulock		bidulock@openss7.org
+ Maintainer
+===========
 
-Packaging would not be what it is today without the invaluable help of
-these people:
+The maintainer of the `OpenSS7 OpenSS7 IPERF Utility' package is:
 
-Additional people not named here that I missed putting on the list.  We
-thank them too!
+     - Brian Bidulock <bidulock@openss7.org>
 
-
-See the file entitled "THANKS" for acknowledgements.
+Please send bug reports to <{No value for `PACKAGE_BUGREPORT'}> using
+the `send-pr' script included in the package, only after reading the
+`BUGS' file in the release, or *Note Problem Reports::, in the manual.
 
 -----
 

@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Terminals -- pre-alpha release introduction.  2006-08-24
+OpenSS7 STREAMS Terminals -- pre-alpha release introduction.  2006-08-26
 $Id: README-alpha,v 0.9.2.3 2006/08/26 14:46:45 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
 OpenSS7 STREAMS Terminals
 =========================
 
-Package strtty-0.9.2.1.rc3 Released 2006-08-24.
+Package strtty-0.9.2.1.rc3 Released 2006-08-26.
 
 This is pre-alpha release software.
 

@@ -1,19 +1,26 @@
-OpenSS7 SS7/VOIP/ISDN -- authors and acknowledgements.  2006-03-03
+OpenSS7 SS7 Stack -- authors.  2006-08-26
 $Id: AUTHORS,v 0.9.2.3 2006/03/03 12:06:06 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-strss7, the OpenSS7 STREAMS SS7/VOIP/ISDN stack was written as part of
-the OpenSS7 Project (http://www.openss7.org/) by:
+ Authors
+========
 
-  Brian Bidulock		bidulock@openss7.org
+The authors of the `OpenSS7 OpenSS7 SS7 Stack' package include:
 
-The current maintainer of the package is:
+     - Brian Bidulock <bidulock@openss7.org>
 
-  Brian Bidulock		bidulock@openss7.org
+ Maintainer
+===========
 
-See the file entitled "THANKS" for acknowledgements.
+The maintainer of the `OpenSS7 OpenSS7 SS7 Stack' package is:
+
+     - Brian Bidulock <bidulock@openss7.org>
+
+Please send bug reports to <bugs@openss7.org> using the `send-pr' script
+included in the package, only after reading the `BUGS' file in the
+release, or *Note Problem Reports::, in the manual.
 
 -----
 

@@ -1,4 +1,4 @@
-Linux STREAMS (LiS) -- history of user visible changes.  2006-08-23
+Linux STREAMS (LiS) -- history of user visible changes.  2006-08-26
 $Id: NEWS,v 1.1.6.21 2006/08/26 09:16:00 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -463,11 +463,6 @@ The next release may include some "strss7" software.
 (1) The `tirdwr' module included with the Gcom LiS-2.16.18 (and even
 more current) releases is almost completely disfunctional and has been
 replaced in entirety.
-
-------
-
-Although the original package is distributed under LGPL, this package is
-distributed by OpenSS7 Corporation under the GNU Public License.
 
 -----
 

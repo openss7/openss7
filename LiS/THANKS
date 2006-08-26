@@ -1,4 +1,4 @@
-Linux STREAMS (LiS) -- acknowledgements.  2006-08-23
+Linux STREAMS (LiS) -- acknowledgements.  2006-08-26
 $Id: THANKS,v 1.1.6.4 2006/08/26 18:31:29 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -89,11 +89,6 @@ Project (http://www.openss7.org/):
 
 Additional people not named here that I missed putting on the list.  We
 thank them too!
-
-------
-
-Although the original package is distributed under LGPL, this package is
-distributed by OpenSS7 Corporation under the GNU Public License.
 
 -----
 

@@ -1,24 +1,26 @@
-Netperf -- authors and acknowledgements.  2006-03-03
+OpenSS7 NETPERF Utility -- authors.  2006-08-26
 $Id: AUTHORS,v 0.9.2.3 2006/03/03 11:56:41 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-Netperf was originally written by:
+ Authors
+========
 
-Autoconf/RPM packaging was performed as part of the OpenSS7 Project
-(http://www.openss7.org/) by:
+The authors of the `OpenSS7 OpenSS7 NETPERF Utility' package include:
 
-  Brian Bidulock		bidulock@openss7.org
+     - Brian Bidulock <bidulock@openss7.org>
 
-Packaging would not be what it is today without the invaluable help of
-these people:
+ Maintainer
+===========
 
-Additional people not named here that I missed putting on the list.  We
-thank them too!
+The maintainer of the `OpenSS7 OpenSS7 NETPERF Utility' package is:
 
+     - Brian Bidulock <bidulock@openss7.org>
 
-See the file entitled "THANKS" for acknowledgements.
+Please send bug reports to <{No value for `PACKAGE_BUGREPORT'}> using
+the `send-pr' script included in the package, only after reading the
+`BUGS' file in the release, or *Note Problem Reports::, in the manual.
 
 -----
 

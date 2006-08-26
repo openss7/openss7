@@ -1,54 +1,62 @@
-LiS, Linux STREAMS -- authors and acknowledgements.  2006-03-03
+Linux STREAMS (LiS) -- authors.  2006-08-26
 $Id: AUTHORS,v 1.1.6.3 2006/03/05 04:02:52 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-LiS was originally written by:
+ Authors
+========
 
-  Christian Herkt		macbett@cs.tu-berlin.de
-  David Grothe			dave@gcom.com
-  Denis Froschauer		100741.1151@compuserve.com
-  Dennis Henriksen		duke@diku.dk
-  Ed Pendzik			edp@eznet.net
-  Francisco J. Ballesteros	nemo@gsyc.escet.urjc.es
-  Gautham Ghantasala		unknown@jove.acs.unt.edu
-  Graham Wheeler		gram@aztec.co.za
-  ISOLA Jean-Marc		root@devnet.fr
-  John A. Boyd Jr.		jaboydjr@netwalk.com
-  Lars Dahl-Hansen		ldh@imada.ou.dk
-  Ole Husgaard			sparre@login.dknet.dk
-  Rodney Thayer			rodney@sabletech.com
-  Roland Dunkerley		rolandd@swn.com
-  Shyan Katru			shyam@jove.acs.unt.edu
-  Tim G. Boerresen		tgrube@diku.dk
+Linux STREAMS, termed LiS, is an SVR4 compatible STREAMS executive
+which runs in the Linux Kernel as a loadable module.  It is the product
+of a joint effort among the following authors:
 
-Autoconf/RPM packaging was performed as part of the OpenSS7 Project
-(http://www.openss7.org/) by:
+     - Francisco J. Ballesteros <nemo@gsyc.escet.urjc.es>
+     - John Boyd <jaboydjr@netwalk.com>
+     - Denis Froschauer <Denis.Froschauer@hol.fr>
+     - David Grothe <dave@gcom.com>
+     - Ole Husgaard <sparre@login.dknet.dk>
+     - Jürgen Magin <juergen.magin@octogon.de>
+     - Graham Wheeler <gram@cdsec.com>
+     - G Yeganjaiah <yegag@hclt.com>
+     - Brian Bidulock <bidulock@openss7.org>
 
-  Brian Bidulock		bidulock@openss7.org
+The authors of the `OpenSS7 Linux STREAMS (LiS)' package include:
 
-The current maintainer of the package is:
+     - Brian Bidulock <bidulock@openss7.org>
 
-  Brian Bidulock		bidulock@openss7.org
+See *Note Author Index::, for a complete listing and cross-index of
+authors to sections of this document.  
 
-Packaging would not be what it is today without the invaluable help of
-these people:
+ Maintainer
+===========
 
-  Christian Hildner		christian.hildner@hob.de
-  Gurol Akman			gurol.akman@ss8.com
-  John A. Boyd Jr.		jaboydjr@netwalk.com
-  William Waites		openss7@lists.styx.org
+Brian Bidulock <bidulock@openss7.org> is the principal active
+maintainer of LiS, so please direct questions to him rather than the
+others.(1) Ole Husgaard has contributed to the kerneld support and
+installation procedures.  Jürgen Magin contributed patches for Linux
+SPARC.  G Yeganjaiah added interrupt routine support.  John Boyd implemented
+fattach and STREAMS pipes and FIFOs.  Brian Bidulock developed a
+complete set of manual pages for LiS, converted the build process to
+autoconf, wrapped the source RPMS, updated this manual for texinfo and
+currently maintains the package.
 
-Additional people not named here that I missed putting on the list.  We
-thank them too!
+The maintainer of the `OpenSS7 Linux STREAMS (LiS)' package is:
 
-See the file entitled "THANKS" for acknowledgements.
+     - Brian Bidulock <bidulock@openss7.org>
 
-------
+Please send bug reports to <bugs@openss7.org> using the `send-pr' script
+included in the package, only after reading the `BUGS' file in the
+release, or *Note Problem Reports::, in the manual.
 
-Although the original package is distributed under LGPL, this package is
-distributed by OpenSS7 Corporation under the GNU Public License.
+ Mailing List
+=============
+
+---------- Footnotes ----------
+
+(1) David Grothe was the previous maintainer of the LiS-2.18 releases;
+however, David is no longer maintaining any version of LiS.  Please do
+not direct maintenance requests at David.
 
 -----
 

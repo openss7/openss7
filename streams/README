@@ -1,4 +1,4 @@
-Linux Fast-STREAMS -- read me first file.  2006-08-23
+Linux Fast-STREAMS -- read me first file.  2006-08-26
 $Id: README,v 0.9.2.12 2006/08/26 09:18:32 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -15,83 +15,32 @@ replacement for the buggy and deprecated `Linux STREAMS (LiS)'.  In
 contrast, `Linux Fast-STREAMS' has the following features in contrast
 to `Linux STREAMS':
 
-Linux Fast-STREAMS                   Linux
-                                     STREAMS
-                                     (LiS)
-Provided and optimized for Linux.    Maintain
-Ports to other OSs (BSD?) possible.  portability
-                                     across
-                                     Linux,
-                                     User
-                                     Space,
-                                     QNX,
-                                     DOS
-                                     and
-                                     other
+Linux Fast-STREAMS                   Linux STREAMS (LiS)
+Provided and optimized for Linux.    Maintain portability across Linux,
+Ports to other OSs (BSD?) possible.  User Space, QNX, DOS and other
                                      ports.
-Promotes mainstream kernel adoption. Places
-                                     portability
-                                     concerns
-                                     before
-                                     mainstream
-                                     kernel
-                                     adoption.
-Lindented and follows normal kernel  Non-lindented,
-formatting and coding practices.     does
-                                     not
-                                     follow
-                                     normal
-                                     kernel
-                                     formatting
-                                     and
-                                     coding
+Promotes mainstream kernel adoption. Places portability concerns before
+                                     mainstream kernel adoption.
+Lindented and follows normal kernel  Non-lindented, does not follow
+formatting and coding practices.     normal kernel formatting and coding
                                      practice.
-Provides compatibility modes for     Provides
-AIX, HPUX, OSF, Solaris, UnixWare,   some
-SVR 4.2 and LiS.  Supports all       compatibility
-majjor SVR 4.2 variants.             interfaces
-                                     but
-                                     also
-                                     many
-                                     Linux-derived
-                                     inetrfaces
-                                     specific
-                                     to
-                                     LiS.
-Licensed under GPL with commercial   Dubiously
-licensing avaliable.                 licensed
-                                     under
-                                     LGPL.
-Supports full SVR4.2 MP              Supports
-sychronization models.               only
-                                     a
-                                     single,
-                                     Linux
-                                     derived
-                                     synchronization
-                                     model.
-Runs at SoftIRQ.                     Separate
-                                     kernel
-                                     threads.
-Provides common SVR4.2 system        Provides
-tunable parameters as sysctls as     only
-well as /proc filesystem support for log
-debugging.                           based
-                                     debugging.
-Provides support for SVR4.2 STREAMS  Provides
-and other utilities.                 a
-                                     limited
-                                     set
-                                     of
-                                     LiS
-                                     only
-                                     Linux-derived
-                                     utlities.
-Provides full named-streams device   Provides
-and device filesystem support.       only
-                                     character-based
-                                     node
-                                     support.
+Provides compatibility modes for     Provides some compatibility
+AIX, HPUX, OSF, Solaris, UnixWare,   interfaces but also many
+SVR 4.2 and LiS.  Supports all       Linux-derived inetrfaces specific
+majjor SVR 4.2 variants.             to LiS.
+Licensed under GPL with commercial   Dubiously licensed under LGPL.
+licensing avaliable.                 
+Supports full SVR4.2 MP              Supports only a single, Linux
+sychronization models.               derived synchronization model.
+Runs at SoftIRQ.                     Separate kernel threads.
+Provides common SVR4.2 system        Provides only log based debugging.
+tunable parameters as sysctls as     
+well as /proc filesystem support for 
+debugging.                           
+Provides support for SVR4.2 STREAMS  Provides a limited set of LiS only
+and other utilities.                 Linux-derived utlities.
+Provides full named-streams device   Provides only character-based node
+and device filesystem support.       support.
 
  Downloading
 ------------
