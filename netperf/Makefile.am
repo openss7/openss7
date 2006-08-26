@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.43 $) $Date: 2006/08/26 09:16:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/08/26 09:16:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -50,19 +50,19 @@
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
-# Revision 1.1.2.43  2006/08/26 09:16:13  brian
+# Revision 0.9.2.43  2006/08/26 09:16:13  brian
 # - better release file generation
 #
-# Revision 1.1.2.42  2006/03/21 13:24:35  brian
+# Revision 0.9.2.42  2006/03/21 13:24:35  brian
 # - included pr.am
 #
-# Revision 1.1.2.41  2006/03/20 11:53:56  brian
+# Revision 0.9.2.41  2006/03/20 11:53:56  brian
 # - added checks for DEVELOPMENT
 #
-# Revision 1.1.2.40  2006/03/07 12:34:18  brian
+# Revision 0.9.2.40  2006/03/07 12:34:18  brian
 # - tools must be built static for distcheck
 #
-# Revision 1.1.2.39  2006/03/06 11:37:56  brian
+# Revision 0.9.2.39  2006/03/06 11:37:56  brian
 # - updated headers
 #
 # =============================================================================

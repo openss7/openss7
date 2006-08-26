@@ -1,5 +1,5 @@
 OpenSS7 IPERF Utility -- read me first file.  2006-08-26
-$Id: README,v 1.1.1.2.2.6 2006/08/26 14:44:50 brian Exp $
+$Id: README,v 1.1.1.2.2.7 2006/08/26 18:31:33 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -89,8 +89,7 @@ Prerequisites for the OpenSS7 IPERF Utility package are as follows:
 
         - GNU groff (for man pages).  (2)
 
-  2. The `OpenSS7 Linux Native SCTP' (sctp-0.2.24.rc3.tar.bz2
-      <http://www.openss7.org/tarballs/sctp-0.2.24.rc3.tar.bz2> or
+  2. The `OpenSS7 Linux Native SCTP' (sctp-0.2.24.rc3.tar.bz2 or
      better).
 
 When configuring and building multiple `OpenSS7 Project' release

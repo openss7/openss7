@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.56 $) $Date: 2006/07/07 20:56:36 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/07/07 20:56:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -731,331 +731,331 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.56  2006/07/07 20:56:36  brian
+# Revision 0.9.2.56  2006/07/07 20:56:36  brian
 # - release send-pr scripts in test package
 #
-# Revision 1.1.2.55  2006/03/24 10:02:39  brian
+# Revision 0.9.2.55  2006/03/24 10:02:39  brian
 # - added send-pr to %package test description
 #
 
 * Fri Mar 24 2006 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.54  2006/03/24 00:03:27  brian
+- Revision 0.9.2.54  2006/03/24 00:03:27  brian
 - added send-pr files to distribution
 
 * Mon Mar 20 2006 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.53  2006/03/20 11:54:41  brian
+- Revision 0.9.2.53  2006/03/20 11:54:41  brian
 - tied in --disable-devel flag
 
 * Tue Mar 14 2006 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.52  2006/03/14 21:09:51  brian
+- Revision 0.9.2.52  2006/03/14 21:09:51  brian
 - two levels of distro specific rpm extra tags
 
 * Fri Mar 10 2006 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.51  2006/03/10 12:03:16  brian
+- Revision 0.9.2.51  2006/03/10 12:03:16  brian
 - updated descriptions and headers
 
 * Thu Mar  9 2006 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.50  2006/03/09 14:02:53  brian
+- Revision 0.9.2.50  2006/03/09 14:02:53  brian
 - updating descriptions
 
 * Mon Feb 20 2006 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.49  2006/02/20 10:07:00  brian
+- Revision 0.9.2.49  2006/02/20 10:07:00  brian
 - changes for 64 bit distributions
 
 * Fri Dec 30 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.48  2005/12/30 12:21:28  brian
+- Revision 0.9.2.48  2005/12/30 12:21:28  brian
 - updating release notes
 
 * Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.47  2005/12/23 05:23:28  brian
+- Revision 0.9.2.47  2005/12/23 05:23:28  brian
 - corrections
 
 * Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.46  2005/12/22 15:16:17  brian
+- Revision 0.9.2.46  2005/12/22 15:16:17  brian
 - different approach to compressed marco files
 
 * Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.45  2005/12/22 07:26:43  brian
+- Revision 0.9.2.45  2005/12/22 07:26:43  brian
 - make command location a little more portable
 
 * Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.44  2005/12/21 08:48:56  brian
+- Revision 0.9.2.44  2005/12/21 08:48:56  brian
 - add extraversion to dependencies
 
 * Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.43  2005/12/21 06:07:12  brian
+- Revision 0.9.2.43  2005/12/21 06:07:12  brian
 - cleaned up versioning for RPM builds
 
 * Mon Dec 19 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.42  2005/12/19 12:43:14  brian
+- Revision 0.9.2.42  2005/12/19 12:43:14  brian
 - locking down for release
 
 * Fri Dec 16 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.41  2005/12/16 12:13:50  brian
+- Revision 0.9.2.41  2005/12/16 12:13:50  brian
 - build does not require texinfo
 
 * Fri Dec 16 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.40  2005/12/16 09:24:00  brian
+- Revision 0.9.2.40  2005/12/16 09:24:00  brian
 - updated to support SuSE/UL and LSB init scripts
 
 * Wed Dec 14 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.39  2005/12/14 11:40:50  brian
+- Revision 0.9.2.39  2005/12/14 11:40:50  brian
 - quiet rpm -ihv output
 
 * Sun Nov  6 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.38  2005/11/06 10:59:08  brian
+- Revision 0.9.2.38  2005/11/06 10:59:08  brian
 - updates
 
 * Wed Sep 14 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.37  2005/09/14 23:41:00  brian
+- Revision 0.9.2.37  2005/09/14 23:41:00  brian
 - bumped release numbers and change logs
 
 * Thu Jul  7 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.36  2005/07/07 20:28:43  brian
+- Revision 0.9.2.36  2005/07/07 20:28:43  brian
 - changes for release
 
 * Sat Jun 25 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.35  2005/06/25 07:01:48  brian
+- Revision 0.9.2.35  2005/06/25 07:01:48  brian
 - more efficient dependency checking
 
 * Fri Jun 24 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.34  2005/06/24 13:40:40  brian
+- Revision 0.9.2.34  2005/06/24 13:40:40  brian
 - some install/erase script corrections
 
 * Tue May 31 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.33  2005/05/31 05:10:40  brian
+- Revision 0.9.2.33  2005/05/31 05:10:40  brian
 - correct case on modutildir filename
 
 * Mon May 30 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.32  2005/05/30 14:25:50  brian
+- Revision 0.9.2.32  2005/05/30 14:25:50  brian
 - packaged standalong test suites
 
 * Mon May 30 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.31  2005/05/30 08:44:00  brian
+- Revision 0.9.2.31  2005/05/30 08:44:00  brian
 - moved documentation for RHEL4 build
 
 * Mon May 30 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.30  2005/05/30 00:14:06  brian
+- Revision 0.9.2.30  2005/05/30 00:14:06  brian
 - address included info file issues
 
 * Sun May 29 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.29  2005/05/29 11:28:36  brian
+- Revision 0.9.2.29  2005/05/29 11:28:36  brian
 - better approach to mostlyclean
 
 * Sun May 29 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.28  2005/05/29 07:49:30  brian
+- Revision 0.9.2.28  2005/05/29 07:49:30  brian
 - updates and corrections for SuSE 9.2 build
 
 * Thu May 26 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.27  2005/05/26 09:59:33  brian
+- Revision 0.9.2.27  2005/05/26 09:59:33  brian
 - a few changes for WBEL3 release build
 
 * Thu May 19 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.26  2005/05/19 20:48:13  brian
+- Revision 0.9.2.26  2005/05/19 20:48:13  brian
 - suppress shell trace in loops
 
 * Sat May 14 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.25  2005/05/14 08:30:02  brian
+- Revision 0.9.2.25  2005/05/14 08:30:02  brian
 - copyright header correction
 
 * Fri Apr 22 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.24  2005/04/22 22:50:42  brian
+- Revision 0.9.2.24  2005/04/22 22:50:42  brian
 - remove noarch
 
 * Sat Apr  9 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.23  2005/04/09 09:34:58  brian
+- Revision 0.9.2.23  2005/04/09 09:34:58  brian
 - update spec files
 
 * Tue Apr  5 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.22  2005/04/05 01:57:05  brian
+- Revision 0.9.2.22  2005/04/05 01:57:05  brian
 - more robust sed
 
 * Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.21  2005/04/02 16:25:29  brian
+- Revision 0.9.2.21  2005/04/02 16:25:29  brian
 - more adjustments to arch indep build
 
 * Tue Mar 29 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.20  2005/03/29 17:16:32  brian
+- Revision 0.9.2.20  2005/03/29 17:16:32  brian
 - Updated lsms and added LSM to distribution.
 
 * Mon Mar 28 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.19  2005/03/28 07:42:29  brian
+- Revision 0.9.2.19  2005/03/28 07:42:29  brian
 - better debian build
 
 * Tue Mar 22 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.18  2005/03/22 19:44:13  brian
+- Revision 0.9.2.18  2005/03/22 19:44:13  brian
 - do not need symbolic link in prep anymore
 
 * Thu Mar 17 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.17  2005/03/17 11:22:33  brian
+- Revision 0.9.2.17  2005/03/17 11:22:33  brian
 - Updated change logs.
 
 * Wed Mar 16 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.16  2005/03/16 11:58:27  brian
+- Revision 0.9.2.16  2005/03/16 11:58:27  brian
 - enhance devfs support
 
 * Wed Mar 16 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.15  2005/03/16 10:48:39  brian
+- Revision 0.9.2.15  2005/03/16 10:48:39  brian
 - straighten out devfs and get source urls correct
 
 * Tue Mar 15 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.14  2005/03/15 10:41:49  brian
+- Revision 0.9.2.14  2005/03/15 10:41:49  brian
 - Updated changelog and a few inconsistencies.
 
 * Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.13  2005/03/09 08:00:23  brian
+- Revision 0.9.2.13  2005/03/09 08:00:23  brian
 - Updated revision numbering.
 
 * Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.12  2005/03/09 03:40:47  brian
+- Revision 0.9.2.12  2005/03/09 03:40:47  brian
 - Major revision number changes.
 
 * Fri Feb 25 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.11  2005/02/25 10:56:40  brian
+- Revision 0.9.2.11  2005/02/25 10:56:40  brian
 - Don't specify build architecture.
 
 * Tue Feb 22 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.10  2005/02/22 08:32:03  brian
+- Revision 0.9.2.10  2005/02/22 08:32:03  brian
 - spec changes for updated makefile fragments
 
 * Sat Feb 19 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.9  2005/02/19 12:06:51  brian
+- Revision 0.9.2.9  2005/02/19 12:06:51  brian
 - rpm-epoch to pkg-epoch, rpm-release to pkg-release
 - proper quotation of configure options
 
 * Tue Feb 15 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.8  2005/02/15 14:15:21  brian
+- Revision 0.9.2.8  2005/02/15 14:15:21  brian
 - Remove link before linking.
 
 * Mon Feb  7 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.7  2005/02/07 22:23:08  brian
+- Revision 0.9.2.7  2005/02/07 22:23:08  brian
 - Updated changelog.
 
 * Thu Feb  3 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.6  2005/02/03 12:34:53  brian
+- Revision 0.9.2.6  2005/02/03 12:34:53  brian
 - Spec file grand rework.
 
 * Wed Feb  2 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.5  2005/02/02 10:43:01  brian
+- Revision 0.9.2.5  2005/02/02 10:43:01  brian
 - Build in builddir again.
 
 * Tue Feb  1 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.4  2005/02/01 19:01:24  brian
+- Revision 0.9.2.4  2005/02/01 19:01:24  brian
 - Working up master build.
 
 * Sat Jan 29 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.3  2005/01/29 11:22:39  brian
+- Revision 0.9.2.3  2005/01/29 11:22:39  brian
 - Have master build working well.
 
 * Thu Jan 27 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.2  2005/01/27 08:30:29  brian
+- Revision 0.9.2.2  2005/01/27 08:30:29  brian
 - Get tarball and srpm names right.
 
 * Tue Jan 25 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.1  2005/01/25 03:41:15  brian
+- Revision 0.9.2.1  2005/01/25 03:41:15  brian
 - Get manpages to pass check_mans.
 
 * Fri Jan 21 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.26  2005/01/21 08:39:40  brian
+- Revision 0.9.2.26  2005/01/21 08:39:40  brian
 - Work around mandrake spec-helper for uncooked manpages.
 
 * Thu Jan 20 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.25  2005/01/20 00:51:59  brian
+- Revision 0.9.2.25  2005/01/20 00:51:59  brian
 - Go back to quick no dependencies compile.
 
 * Wed Jan 19 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.24  2005/01/19 07:38:25  brian
+- Revision 0.9.2.24  2005/01/19 07:38:25  brian
 - Added checks and autotest options to configure.
 
 * Tue Jan 18 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.23  2005/01/18 13:31:18  brian
+- Revision 0.9.2.23  2005/01/18 13:31:18  brian
 - Support multiple builds on same NFS mount.
 
 * Tue Jan 18 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.22  2005/01/18 10:42:34  brian
+- Revision 0.9.2.22  2005/01/18 10:42:34  brian
 - Rationalize to new separated build approach.
 
 * Thu Jan 13 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.21  2005/01/13 12:18:12  brian
+- Revision 0.9.2.21  2005/01/13 12:18:12  brian
 - *** empty log message ***
 
 * Mon Jan 10 2005 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.20  2005/01/10 18:59:13  brian
+- Revision 0.9.2.20  2005/01/10 18:59:13  brian
 - mandrake places libexec files in /usr/lib, correct globbing
 - updated change logs
 
 * Wed Dec 29 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.19  2004/12/29 21:32:32  brian
+- Revision 0.9.2.19  2004/12/29 21:32:32  brian
 - Straighten out cache and site files.
 
 * Wed Dec 29 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.18  2004/12/29 06:37:09  brian
+- Revision 0.9.2.18  2004/12/29 06:37:09  brian
 - Add site file definition to spec file.
 
 * Tue Dec 21 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.17  2004/12/21 22:22:14  brian
+- Revision 0.9.2.17  2004/12/21 22:22:14  brian
 - Added automatic site configuration to rpm build.
 
 * Sun Dec 19 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.16  2004/12/19 15:11:45  brian
+- Revision 0.9.2.16  2004/12/19 15:11:45  brian
 - Working up better spec files.
 
 * Fri Dec 17 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.15  2004/12/17 04:02:37  brian
+- Revision 0.9.2.15  2004/12/17 04:02:37  brian
 - Improving spec files.
 
 * Wed Dec 15 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.14  2004/12/15 15:25:33  brian
+- Revision 0.9.2.14  2004/12/15 15:25:33  brian
 - avoid undefined debug macro
 
 * Wed Dec 15 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.13  2004/12/15 14:59:06  brian
+- Revision 0.9.2.13  2004/12/15 14:59:06  brian
 - Update RPM build to build multiple distribution binary RPMs from a single SRPM.
 
 * Mon Dec 13 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.12  2004/12/13 10:52:09  brian
+- Revision 0.9.2.12  2004/12/13 10:52:09  brian
 - Removed vendor specific headers. (Define these in your .rpmmacros file.)
 - Added both .xpm and .gif icons into binary packages.
 - Fixed extrainfo empty macro body warning once and for all.
 
 * Wed Nov 24 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.11  2004/11/24 14:30:45  brian
+- Revision 0.9.2.11  2004/11/24 14:30:45  brian
 - Changes for multiple rpm distro builds.
 
 * Wed Nov 24 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.10  2004/11/24 11:27:50  brian
+- Revision 0.9.2.10  2004/11/24 11:27:50  brian
 - Changes to accomodate %_vendor macro for multiple distribution rpm builds.
 
 * Wed Oct 13 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.9  2004/10/13 01:49:05  brian
+- Revision 0.9.2.9  2004/10/13 01:49:05  brian
 - Updates spec changelogs.
 
 * Tue Aug 31 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.8  2004/08/31 04:49:03  brian
+- Revision 0.9.2.8  2004/08/31 04:49:03  brian
 - Avoid empty macro body error on extrainfo.
 
 * Tue Aug 17 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.7  2004/08/17 11:45:29  brian
+- Revision 0.9.2.7  2004/08/17 11:45:29  brian
 - Upgraded spec files.
 
 * Sat Aug  7 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.6  2004/08/07 11:00:46  brian
+- Revision 0.9.2.6  2004/08/07 11:00:46  brian
 - More rational provides structure.
 
 * Fri Aug  6 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.5  2004/08/06 20:59:02  brian
+- Revision 0.9.2.5  2004/08/06 20:59:02  brian
 - More final tweaks.
 
 * Fri Aug  6 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.4  2004/08/06 19:37:35  brian
+- Revision 0.9.2.4  2004/08/06 19:37:35  brian
 - Tweaking build and spec file.
 
 * Fri Aug  6 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.3  2004/08/06 14:35:38  brian
+- Revision 0.9.2.3  2004/08/06 14:35:38  brian
 - Getting spec file working.
 
 * Fri Aug  6 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.2  2004/08/06 03:47:22  brian
+- Revision 0.9.2.2  2004/08/06 03:47:22  brian
 - First stab at SCTP being included.
 
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi

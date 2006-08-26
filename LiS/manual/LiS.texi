@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.17 2006/08/26 09:15:54 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.18 2006/08/26 18:31:29 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 09:15:54 $ by $Author: brian $
+% Last Modified $Date: 2006/08/26 18:31:29 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -301,7 +301,109 @@ Indices
 @unnumbered Acknowledgements
 @cindex credits
 
-@include texi/funding.texi
+@c @include texi/funding.texi
+
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @cite{@uref{http://www.fsf.org/,, Free
+Software Foundation}} and the @cite{@uref{http://www.kernel.org/,, Linux Kernel Community}}.
+
+@menu
+* Sponsors::			Sponsors
+* Contributors::		Contributors
+@end menu
+
+@node Sponsors
+@unnumberedsec Sponsors
+@cindex sponsors
+
+Funding for completion of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package was
+provided in part by:
+
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.openss7.org/,, OpenSS7 Corporation}
+@end multitable
+
+@noindent
+Additional funding for @uref{http://www.openss7.org/,, The OpenSS7 Project} was provided by:
+
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.openss7.com/,, OpenSS7 Corporation}
+@item @tab @bullet{} @uref{http://www.lmco.com/,, Lockheed Martin Co.}
+@item @tab @bullet{} @uref{http://www.pti.com/,, Performance Technologies Inc.}
+@item @tab @bullet{} @uref{http://www.motorola.com/,, Motorola}
+@item @tab @bullet{} @uref{http://www.hob.de/,, HOB International}
+@item @tab @bullet{} @uref{http://www.comverse.com/,, Comverse Ltd.}
+@item @tab @bullet{} @uref{http://www.sonus.com/,, Sonus Networks Inc.}
+@item @tab @bullet{} @uref{http://www.francetelecom.fr/,, France Telecom}
+@item @tab @bullet{} @uref{http://www.ss8.com/,, SS8 Networks Inc}
+@item @tab @bullet{} @uref{http://www.nortel.com/,, Nortel Networks}
+@item @tab @bullet{} @uref{http://www.verisign.com/,, Verisign}
+@end multitable
+
+@node Contributors
+@unnumberedsec Contributors
+@cindex contributors
+
+The current maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is
+@email{bidulock@@openss7.org, Brian F. G. Bidulock}.
+
+@cite{@value{PACKAGE_TITLE}} was originally written by:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{macbett@@cs.tu-berlin.de, Christian Herkt}
+@item @tab @minus{} @email{dave@@gcom.com, David Grothe}
+@item @tab @minus{} @email{100741.1151@@compuserve.com, Denis Froschauer}
+@item @tab @minus{} @email{duke@@diku.dk, Dennis Henriksen}
+@item @tab @minus{} @email{edp@@eznet.net, Ed Pendzik}
+@item @tab @minus{} @email{nemo@@gsyc.escet.urjc.es, Francisco J. Ballesteros}
+@item @tab @minus{} @email{unknown@@jove.acs.unt.edu, Gautham Ghantasala}
+@item @tab @minus{} @email{gram@@aztec.co.za, Graham Wheeler}
+@item @tab @minus{} @email{root@@devnet.fr, ISOLA Jean-Marc}
+@item @tab @minus{} @email{jaboydjr@@netwalk.com, John A. Boyd Jr.}
+@item @tab @minus{} @email{ldh@@imada.ou.dk, Lars Dahl-Hansen}
+@item @tab @minus{} @email{sparre@@login.dknet.dk, Ole Husgaard}
+@item @tab @minus{} @email{rodney@@sabletech.com, Rodney Thayer}
+@item @tab @minus{} @email{rolandd@@swn.com, Roland Dunkerley}
+@item @tab @minus{} @email{shyam@@jove.acs.unt.edu, Shyan Katru}
+@item @tab @minus{} @email{tgrube@@diku.dk, Tim G. Boerresen}
+@end multitable
+
+Packaging was performed by:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@end multitable
+
+Packaging would not be what it is today without the invaluable help of these
+people:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{christian.hildner@@hob.de, Christian Hildner}
+@item @tab @minus{} @email{gurol.akman@@ss8.com, Gurol Akman}
+@item @tab @minus{} @email{jaboydjr@@netwalk.com, John A. Boyd Jr.}
+@item @tab @minus{} @email{openss7@@lists.styx.org, William Waites}
+@end multitable
+
+The primary contributor to @uref{http://www.openss7.org/, The OpenSS7 Project} is
+@email{bidulock@@openss7.org, Brian F. G. Bidulock}.
+
+The following is a list of significant contributors to
+@uref{http://www.openss7.org/, The OpenSS7 Project}:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} Per Berquist
+@item @tab @minus{} John Boyd
+@item @tab @minus{} Chuck Winters
+@item @tab @minus{} Peter Courtney
+@item @tab @minus{} Tom Chandler
+@item @tab @minus{} Gurol Ackman
+@item @tab @minus{} Kutluk Testicioglu
+@item @tab @minus{} John Wenker
+@item @tab @minus{} Others
+@end multitable
+
+Additional people not named here that I missed putting on the list.  We thank
+them too!
 
 @c --------------------------------------------------------------------------
 
@@ -385,6 +487,9 @@ package.
 @smallexample
 
 $Log: LiS.texi,v $
+Revision 1.1.6.18  2006/08/26 18:31:29  brian
+- handle long urls
+
 Revision 1.1.6.17  2006/08/26 09:15:54  brian
 - better release file generation
 

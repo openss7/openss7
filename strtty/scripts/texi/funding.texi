@@ -1,7 +1,7 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: funding.texi,v 0.9.2.5 2006/08/23 10:57:22 brian Exp $
+@c @(#) $Id: funding.texi,v 0.9.2.7 2006/08/26 16:21:29 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,13 +54,13 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/23 10:57:22 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/26 16:21:29 $ by $Author: brian $
 @c
 @c =========================================================================
 
 As with most open source projects, this project would not have been possible without the valiant
-efforts and productive software of the @cite{Free Software Foundation} and the @cite{Linux Kernel
-Community}.
+efforts and productive software of the @cite{@uref{http://www.fsf.org/,, Free Software Foundation}}
+and the @cite{@uref{http://www.kernel.org/,, Linux Kernel Community}}.
 
 @menu
 * Sponsors::			Sponsors
@@ -71,45 +71,46 @@ Community}.
 @unnumberedsec Sponsors
 @cindex sponsors
 
-Funding for completion of the @value{PACKAGE_TITLE} package was provided in part by:
+Funding for completion of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package was
+provided in part by:
 
-@itemize
-@item OpenSS7 Corporation
-@end itemize
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.openss7.com/,, OpenSS7 Corporation}
+@end multitable
 
 @noindent
-Additional funding for @uref{http://www.openss7.org/, The OpenSS7 Project} was provided by:
+Additional funding for @uref{http://www.openss7.org/,, The OpenSS7 Project} was provided by:
 
-@itemize
-@item OpenSS7 Corporation
-@item Lockheed Martin
-@item Performance Technologies
-@item Motorola
-@item HOB International
-@item Comverse
-@item Sonus Networks
-@item France Telecom
-@item SS8 Networks
-@item Nortel Networks
-@item Verisign
-@end itemize
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.openss7.com/,, OpenSS7 Corporation}
+@item @tab @bullet{} @uref{http://www.lmco.com/,, Lockheed Martin Co.}
+@item @tab @bullet{} @uref{http://www.pti.com/,, Performance Technologies Inc.}
+@item @tab @bullet{} @uref{http://www.motorola.com/,, Motorola}
+@item @tab @bullet{} @uref{http://www.hob.de/,, HOB International}
+@item @tab @bullet{} @uref{http://www.comverse.com/,, Comverse Ltd.}
+@item @tab @bullet{} @uref{http://www.sonus.com/,, Sonus Networks Inc.}
+@item @tab @bullet{} @uref{http://www.francetelecom.fr/,, France Telecom}
+@item @tab @bullet{} @uref{http://www.ss8.com/,, SS8 Networks Inc}
+@item @tab @bullet{} @uref{http://www.nortel.com/,, Nortel Networks}
+@item @tab @bullet{} @uref{http://www.verisign.com/,, Verisign}
+@end multitable
 
 @node Contributors
 @unnumberedsec Contributors
 @cindex contributors
 
-The primary contributor to the OpenSS7 @value{PACKAGE_TITLE} package is
+The primary contributor to the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is
 @email{bidulock@@openss7.org, Brian F. G. Bidulock}.  The following is a list of significant
-contributors to @uref{http://www.openss7.org/, The OpenSS7 Project}:
+contributors to @uref{http://www.openss7.org/,, The OpenSS7 Project}:
 
-@itemize
-@item Per Berquist
-@item John Boyd
-@item Chuck Winters
-@item Peter Courtney
-@item Tom Chandler
-@item Gurol Ackman
-@item Kutluk Testicioglu
-@item John Wenker
-@item Others
-@end itemize
+@multitable @columnfractions .05 .95
+@item @tab @minus{} Per Berquist
+@item @tab @minus{} John Boyd
+@item @tab @minus{} Chuck Winters
+@item @tab @minus{} Peter Courtney
+@item @tab @minus{} Tom Chandler
+@item @tab @minus{} Gurol Ackman
+@item @tab @minus{} Kutluk Testicioglu
+@item @tab @minus{} John Wenker
+@item @tab @minus{} Others
+@end multitable

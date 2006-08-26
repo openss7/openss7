@@ -94,7 +94,7 @@
 2006-07-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/releases.texi: documentation updates for release
-	* netlib.c: changes for gcc 4.1.1 compile
+	* netlib.c: changes for gcc 4.0.9 compile
 
 2006-07-01  Brian Bidulock  <bidulock@openss7.org>
 

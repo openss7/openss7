@@ -1,60 +1,101 @@
-LiS, Linux STREAMS -- acknowledgements.  2006-03-02
-$Id: THANKS,v 1.1.6.3 2006/03/05 04:02:56 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Linux STREAMS (LiS) -- acknowledgements.  2006-08-23
+$Id: THANKS,v 1.1.6.4 2006/08/26 18:31:29 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-Acknowledgements
-****************
+ Acknowledgements
+*****************
 
-Sponsors
-========
+As with most open source projects, this project would not have been
+possible without the valiant efforts and productive software of the
+`Free Software Foundation' and the `Linux Kernel Community'.
 
-Funding for maintenance of the Linux STREAMS (LiS) package was provided
-in part by:
+ Sponsors
+=========
 
-   * OpenSS7 Corporation
+Funding for completion of the `OpenSS7 Linux STREAMS (LiS)' package was
+provided in part by:
 
-Contributors
-============
+     * OpenSS7 Corporation
 
-The current maintainer of the Linux STREAMS (LiS) package is Brian F. G.
-Bidulock <bidulock@openss7.org>.
+Additional funding for The OpenSS7 Project was provided by:
 
-LiS was originally written by:
+     * OpenSS7 Corporation
+     * Lockheed Martin Co.
+     * Performance Technologies Inc.
+     * Motorola
+     * HOB International
+     * Comverse Ltd.
+     * Sonus Networks Inc.
+     * France Telecom
+     * SS8 Networks Inc
+     * Nortel Networks
+     * Verisign
 
-Christian Herkt			macbett@cs.tu-berlin.de
-David Grothe			dave@gcom.com
-Denis Froschauer		100741.1151@compuserve.com
-Dennis Henriksen		duke@diku.dk
-Ed Pendzik			edp@eznet.net
-Francisco J. Ballesteros	nemo@gsyc.escet.urjc.es
-Gautham Ghantasala		unknown@jove.acs.unt.edu
-Graham Wheeler			gram@aztec.co.za
-ISOLA Jean-Marc			root@devnet.fr
-John A. Boyd Jr.		jaboydjr@netwalk.com
-Lars Dahl-Hansen		ldh@imada.ou.dk
-Ole Husgaard			sparre@login.dknet.dk
-Rodney Thayer			rodney@sabletech.com
-Roland Dunkerley		rolandd@swn.com
-Shyan Katru			shyam@jove.acs.unt.edu
-Tim G. Boerresen		tgrube@diku.dk
+ Contributors
+=============
+
+The current maintainer of the `OpenSS7 Linux STREAMS (LiS)' package is
+Brian F. G. Bidulock <bidulock@openss7.org>.
+
+`Linux STREAMS (LiS)' was originally written by:
+
+     - Christian Herkt <macbett@cs.tu-berlin.de>
+     - David Grothe <dave@gcom.com>
+     - Denis Froschauer <100741.1151@compuserve.com>
+     - Dennis Henriksen <duke@diku.dk>
+     - Ed Pendzik <edp@eznet.net>
+     - Francisco J. Ballesteros <nemo@gsyc.escet.urjc.es>
+     - Gautham Ghantasala <unknown@jove.acs.unt.edu>
+     - Graham Wheeler <gram@aztec.co.za>
+     - ISOLA Jean-Marc <root@devnet.fr>
+     - John A. Boyd Jr. <jaboydjr@netwalk.com>
+     - Lars Dahl-Hansen <ldh@imada.ou.dk>
+     - Ole Husgaard <sparre@login.dknet.dk>
+     - Rodney Thayer <rodney@sabletech.com>
+     - Roland Dunkerley <rolandd@swn.com>
+     - Shyan Katru <shyam@jove.acs.unt.edu>
+     - Tim G. Boerresen <tgrube@diku.dk>
 
 Packaging was performed by:
 
-Brian Bidulock			bidulock@openss7.org
+     - Brian Bidulock <bidulock@openss7.org>
 
-Packaging would not be what it is today without the invaluable help of these
-people:
+Packaging would not be what it is today without the invaluable help of
+these people:
 
-Christian Hildner		christian.hildner@hob.de
-Gurol Akman			gurol.akman@ss8.com
-John A. Boyd Jr.		jaboydjr@netwalk.com
-William Waites			openss7@lists.styx.org
+     - Christian Hildner <christian.hildner@hob.de>
+     - Gurol Akman <gurol.akman@ss8.com>
+     - John A. Boyd Jr. <jaboydjr@netwalk.com>
+     - William Waites <openss7@lists.styx.org>
 
-Additional people not named here that I missed putting on the list.  We thank
-them too!
+The primary contributor to The OpenSS7 Project
+(http://www.openss7.org/) is Brian F. G. Bidulock
+<bidulock@openss7.org>.
 
+The following is a list of significant contributors to The OpenSS7
+Project (http://www.openss7.org/):
+
+     - Per Berquist
+     - John Boyd
+     - Chuck Winters
+     - Peter Courtney
+     - Tom Chandler
+     - Gurol Ackman
+     - Kutluk Testicioglu
+     - John Wenker
+     - Others
+
+Additional people not named here that I missed putting on the list.  We
+thank them too!
+
+------
+
+Although the original package is distributed under LGPL, this package is
+distributed by OpenSS7 Corporation under the GNU Public License.
+
+-----
 
 =========================================================================
 

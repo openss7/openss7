@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.14 2006/08/26 14:46:29 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.15 2006/08/26 18:31:36 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:46:29 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/26 18:31:36 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -150,7 +150,7 @@ RPM}).
 
 @subsubheading Architecture Independent
 @table @asis
-@item @href{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary
 to run applications programs developed for @value{PACKAGE_TITLE}.@footnote{Not
 all distributions support the @samp{%dev} RPM macro: a case in point is the SuSE
@@ -160,19 +160,19 @@ operation.  Note also that not all release packages contain devices.  Only
 packages that provide @dfn{STREAMS} character device drivers need devices, and then
 only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
-@item @href{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}@--doc} package contains this manual in plaintext,
 postscript, PDF and HTML forms, along with the meta-information from the
 @file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
 necessary for developing @value{PACKAGE_TITLE} applications and
 @value{PACKAGE_TITLE} @dfn{STREAMS} modules or drivers.
 
-@item @href{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}@--init@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--init@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}@--init} package contains the init scripts and provides
 the postinst scripts necessary to create kernel module preloads and modules
 definitions for all kernel module @samp{core} subpackages.
 
-@item @href{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}@--source} package contains the source code necessary for
 building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
 configuration utilities necessary to create and distribute tarballs, rpms and
@@ -189,18 +189,18 @@ from the Source RPM}).
 
 @table @asis
 @ignore
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-openss7-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--openss7@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-openss7-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--openss7@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 the @file{@value{PACKAGE}} package contains the @manpage{iperf(1)} program
 compiled to work with the OpenSS7 Linux Native Sockets version of SCTP.
 
 @end ignore
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--devel} package contains library archives for static
 compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
 This also includes the header files and static libraries required to compile
 @value{PACKAGE_TITLE} applications programs.
 
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--lib} package contains the run-time shared libraries
 necessary to run application programs and utilities developed for the
 @file{@value{PACKAGE_NAME}} package.
@@ -208,7 +208,7 @@ necessary to run application programs and utilities developed for the
 therefore, not all release packages contain this package.}
 
 @ignore
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.
@@ -229,24 +229,24 @@ architecture.  If your architecture is not on the list, you can build binary RPM
 from the source RPM (see @pxref{Building from the Source RPM}).
 
 @table @asis
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--LiS@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--LiS@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--LiS} package contains the @manpage{netserver(8)} and
 @manpage{netperf(1)} programs compiled to work with OpenSS7 Kernel and LiS
 @dfn{STREAMS} release of the INET driver and SCTP.
 
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-streams-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}-streams-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-streams} package contains the @manpage{netserver(8)} and
 @manpage{netperf(1)} programs compiled to work with OpenSS7 Kernel and Linux
 Fast-STREAMS release of the INET driver and SCTP.
 
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-LiS-util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
 @dfn{STREAMS}-specific library, it is a @dfn{STREAMS}-Dependent package.  Use the
 @file{@value{PACKAGE}@--LiS@--util} package if you have LiS installed.
 
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--streams@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--streams@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--streams@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
@@ -261,7 +261,7 @@ dependencies:
 
 @table @asis
 @ignore
-@item @href{http://www.openss7.org/rpms/RPMS/i686/sctp-@value{VERSION_SCTP}-1.i686.rpm, sctp-@value{VERSION_SCTP}-1.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/sctp-@value{VERSION_SCTP}-1.i686.rpm,, sctp-@value{VERSION_SCTP}-1.i686.rpm}
 This package provides the @cite{OpenSS7 Linux Native Sockets} version of
 @cite{SCTP}.  This package is required to support SCTP tests.
 This package is required by @cite{@value{PACKAGE}-openss7-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}.
@@ -269,7 +269,7 @@ Other subpackages created by @cite{sctp-@value{VERSION_SCTP}-1.src.rpm} may be n
 by able to recompile @cite{@value{PACKAGE}-@value{VERSION}}.
 
 @end ignore
-@item @href{http://www.openss7.org/rpms/RPMS/i686/LiS-core-2.18.1-1.i686.rpm, LiS-core-2.18.1-1.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/LiS-core-2.18.1-1.i686.rpm,, LiS-core-2.18.1-1.i686.rpm}
 This package provides one of the two SVR 4.2 @dfn{STREAMS} facilities for use by
 @cite{@value{PACKAGE}-@value{VERSION}}.  This (or the other) @dfn{STREAMS} package is required
 to support the DLPI and XTI tests.
@@ -281,7 +281,7 @@ This package is required by @cite{@value{PACKAGE}-LiS-@value{VERSION}-@value{PAC
 Other subpackages created by @cite{LiS-2.18.1-1.src.rpm} may be necessary to
 by able to recompile @cite{@value{PACKAGE}-@value{VERSION}}.
 
-@item @href{http://www.openss7.org/rh9/RPMS/i686/streams-core-0.7a-1.i686.rpm, streams-core-0.7a-1.i686.rpm}
+@item @uref{http://www.openss7.org/rh9/RPMS/i686/streams-core-0.7a-1.i686.rpm,, streams-core-0.7a-1.i686.rpm}
 This package provides the other of the two SVR 4.2 @dfn{STREAMS} facilities for use by
 @cite{netperf-openss7-2.3}.  This (or the other) @dfn{STREAMS} package is required
 to support the DLPI and XTI tests.
@@ -293,20 +293,20 @@ This package is required by @cite{netperf-openss7-streams-2.3-1.i686.rpm}.
 Other subpackages created by @cite{streams-0.7a-1.src.rpm} may be necessary to
 by able to recompile @cite{netperf-openss7-2.3}.
 
-@item @href{http://www.openss7.org/rh9/RPMS/i686/strxns-core-0.9.2-1.i686.rpm, strxns-core-0.9.2-1.i686.rpm}
+@item @uref{http://www.openss7.org/rh9/RPMS/i686/strxns-core-0.9.2-1.i686.rpm,, strxns-core-0.9.2-1.i686.rpm}
 This package provides the DLPI implementation for Linux Ethernet devices
 required by the @cite{netperf-openss7-2.3} DLPI tests.
 Other subpackages created by @cite{strxns-0.9.2-1.src.rpm} may be necessary to
 by able to recompile @cite{netperf-openss7-2.3}.
 
-@item @href{http://www.openss7.org/rh9/RPMS/i686/strxnet-core-0.9.2-1.i686.rpm, strxnet-core-0.9.2-1.i686.rpm}
+@item @uref{http://www.openss7.org/rh9/RPMS/i686/strxnet-core-0.9.2-1.i686.rpm,, strxnet-core-0.9.2-1.i686.rpm}
 This package provides the X/Open XNS 5.2 XTI/TLI library (@cite{libxnet})
 necessary to support the XTI tests.
 Other subpackages created by @cite{strxnet-0.9.2-1.src.rpm} may be necessary to
 by able to recompile @cite{netperf-openss7-2.3}.
 @ref{Top, Introduction, Introduction, libxnet, The OpenSS7 XNS/XTI Library Reference Manual}.
 
-@item @href{http://www.openss7.org/rh9/RPMS/i686/strinet-core-0.9.2-1.i686.rpm, strinet-core-0.9.2-1.i686.rpm}
+@item @uref{http://www.openss7.org/rh9/RPMS/i686/strinet-core-0.9.2-1.i686.rpm,, strinet-core-0.9.2-1.i686.rpm}
 This package provides the XTI interface to the Linux Socket SCTP, TCP and UDP
 implementations in support of XTI SCTP, XTI TCP and XTI UDP tests.  This
 package is only required if it is desired to run XTI SCTP, XTI TCP or XTI UDP
@@ -318,7 +318,7 @@ interface to the native Linux Kernel socket code.
 Other subpackages created by @cite{strinet-0.9.2-1.src.rpm} may be necessary to
 by able to recompile @cite{netperf-openss7-2.3}.
 
-@item @href{http://www.openss7.org/rh9/RPMS/i686/strsctp-core-0.9.2-1.i686.rpm, strsctp-core-0.9.2-1.i686.rpm}
+@item @uref{http://www.openss7.org/rh9/RPMS/i686/strsctp-core-0.9.2-1.i686.rpm,, strsctp-core-0.9.2-1.i686.rpm}
 This package provides the XTI interface to the Linux @dfn{STREAMS} implementation of
 SCTP in support of XTI SCTP tests.  This package is only required if it is
 desired to run XTI SCTP tests on Linux.  This is a native @dfn{STREAMS}
@@ -345,7 +345,7 @@ architecture of the kernel package.  @file{configure} detects this and builds
 the appropriate packages.}
 
 @table @asis
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--core} package contains the loadable kernel modules
 that depend only on the kernel.  This package is heavily tied to the kernel for
 which it was compiled.  This particular package applies to kernel version
@@ -353,7 +353,7 @@ which it was compiled.  This particular package applies to kernel version
 @samp{@value{_kversion}} is only an example.  Note also that only release
 packages that contain kernel modules will contain a @file{core} subpackage.}
 
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
@@ -366,7 +366,7 @@ compiled.  This particular package applies to kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--LiS@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--LiS@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--LiS@--core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
 heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
@@ -374,7 +374,7 @@ particular package applies to @file{LiS} (@cite{Linux STREAMS}) on kernel
 version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--streams@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--streams@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--streams@--core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
 heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
@@ -382,7 +382,7 @@ particular package applies to @file{streams} (@cite{Linux Fast@--STREAMS}) on
 kernel version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion}
 of @samp{@value{_kversion}} is only an example.}
 
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--LiS@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--LiS@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--LiS@--info} package@footnote{Note that only release
 packages that contain kernel modules and that export versioned symbols will
 contain a @file{LiS@--info} subpackage.} contains the module symbol version
@@ -394,7 +394,7 @@ compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
 on kernel version @samp{@value{_kversion}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
-@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--streams@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--streams@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--streams@--info} package@footnote{Note that only release
 packages that contain kernel modules and that export versioned symbols will
 contain a @file{streams@--info} subpackage.} contains the module symbol version
@@ -442,24 +442,24 @@ downloads site.  If your architecture is not available, you can build binary DEB
 
 @subsubheading Architecture Independent
 @table @asis
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}@--dev_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--dev_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary to run
 applications programs developed for @value{PACKAGE_TITLE}.  @footnote{Note that not all release
 packages contain devices.  Only packages that provide @dfn{STREAMS} character device drivers need
 devices, and then only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-doc_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}@--doc_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-doc_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--doc_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}@--doc} package contains this manual in plaintext, postscript, PDF and HTML
 forms, along with the meta-information from the @file{@value{PACKAGE_NAME}} package.  It also
 contains all of the manual pages necessary for developing @value{PACKAGE_TITLE} applications and
 @value{PACKAGE_TITLE} @dfn{STREAMS} modules or drivers.
 
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}@--init_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--init_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}@--init} package contains the init scripts and provides the postinst
 scripts necessary to create kernel module preloads and modules definitions for all kernel module
 @samp{core} subpackages.
 
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-source_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-source_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}@--source} package contains the source code necessary for
 building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
 configuration utilities necessary to create and distribute tarballs, rpms and
@@ -470,13 +470,13 @@ that do not contain kernel modules do not generate a source DEB package.}
 
 @subsubheading Architecture Dependent
 @table @asis
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-devel_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--devel_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-devel_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--devel_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--devel} package contains library archives for static
 compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
 This also includes the header files and static libraries required to compile
 @value{PACKAGE_TITLE} applications programs.
 
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-lib_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--lib_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-lib_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--lib_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--lib} package contains the run-time shared libraries
 necessary to run application programs and utilities developed for the
 @file{@value{PACKAGE_NAME}} package.
@@ -484,7 +484,7 @@ necessary to run application programs and utilities developed for the
 therefore, not all release packages contain this package.}
 
 @ignore
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.
@@ -505,14 +505,14 @@ architecture.  If your architecture is not on the list, you can build binary DEB
 from the Debian DSC (see @pxref{Building from the Debian DSC}).
 
 @table @asis
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-LiS-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--LiS@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-LiS-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--LiS@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--LiS@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
 @dfn{STREAMS}-specific library, it is a @dfn{STREAMS}-Dependent package.  Use the
 @file{@value{PACKAGE}@--LiS@--util} package if you have LiS installed.
 
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-streams-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--streams@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-streams-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--streams@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--streams@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
@@ -537,7 +537,7 @@ architecture of the kernel package.  @file{configure} detects this and builds
 the appropriate packages.}
 
 @table @asis
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--core} package contains the loadable kernel modules
 that depend only on the kernel.  This package is heavily tied to the kernel for
 which it was compiled.  This particular package applies to kernel version
@@ -545,7 +545,7 @@ which it was compiled.  This particular package applies to kernel version
 @samp{@value{_kversion}} is only an example.  Note also that only release
 packages that contain kernel modules will contain a @file{core} subpackage.}
 
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
@@ -558,7 +558,7 @@ compiled.  This particular package applies to kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-LiS-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--LiS@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-LiS-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--LiS@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--LiS@--core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
 heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
@@ -566,7 +566,7 @@ particular package applies to @file{LiS} (@cite{Linux STREAMS}) on kernel
 version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-streams-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--streams@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-streams-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--streams@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--streams@--core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
 heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
@@ -574,7 +574,7 @@ particular package applies to @file{streams} (@cite{Linux Fast@--STREAMS}) on
 kernel version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion}
 of @samp{@value{_kversion}} is only an example.}
 
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-LiS-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--LiS@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-LiS-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--LiS@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--LiS@--info} package@footnote{Note that only release
 packages that contain kernel modules and that export versioned symbols will
 contain a @file{LiS@--info} subpackage.} contains the module symbol version
@@ -586,7 +586,7 @@ compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
 on kernel version @samp{@value{_kversion}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}-streams-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}@--streams@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-streams-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--streams@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--streams@--info} package@footnote{Note that only release
 packages that contain kernel modules and that export versioned symbols will
 contain a @file{streams@--info} subpackage.} contains the module symbol version
@@ -616,7 +616,7 @@ If you cannot obtain a binary RPM for your architecture, or would like to roll y
 download the following source RPM.
 
 @table @asis
-@item @href{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm, @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
+@item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm,, @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
 This is the source RPM for the package.  From this source RPM it is possible to build binary RPM for
 any supported architecture and for any 2.4 or 2.6 kernel,
 for either @cite{Linux STREAMS} or @cite{Linux Fast@--STREAMS}.
@@ -636,8 +636,8 @@ If you cannot obtain a binary DEB for your architecture, or would like to roll y
 download the following Debian DSC.
 
 @table @asis
-@item @href{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc}
-@itemx @href{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc,, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc}
+@itemx @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz,, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz}
 This is the Debian DSC for the package.  From this Debian DSC it is possible to build binary DEB for
 any supported architecture and for any 2.4 or 2.6 kernel,
 for either @cite{Linux STREAMS} or @cite{Linux Fast@--STREAMS}.
@@ -657,8 +657,8 @@ For non-@manpage{rpm(1)} architectures, such as @cite{Nex@-us@-Ware} embedded ta
 tarball as follows:
 
 @table @asis
-@item @href{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz, @value{PACKAGE}@--@value{VERSION}@-.tar@-.gz}
-@itemx @href{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2, @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2}
+@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.gz}
+@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2}
 These are the @manpage{tar(1)} balls for the release.  These @manpage{tar(1)} balls contain the
 @manpage{autoconf(1)} distribution which includes all the source necessary for building and
 installing the package.  These tarballs will even build Source RPM and Binary RPM on

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2006/08/26 14:46:29 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/08/26 14:46:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -50,22 +50,22 @@
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
-# Revision 1.1.2.10  2006/08/26 14:46:29  brian
+# Revision 0.9.2.10  2006/08/26 14:46:29  brian
 # - update todo documentation
 #
-# Revision 1.1.2.9  2006/08/26 09:16:17  brian
+# Revision 0.9.2.9  2006/08/26 09:16:17  brian
 # - better release file generation
 #
-# Revision 1.1.2.8  2006/08/22 12:41:33  brian
+# Revision 0.9.2.8  2006/08/22 12:41:33  brian
 # - updated documentation
 #
-# Revision 1.1.2.7  2006/03/20 13:50:24  brian
+# Revision 0.9.2.7  2006/03/20 13:50:24  brian
 # - get automake to run clean
 #
-# Revision 1.1.2.6  2006/03/20 13:36:24  brian
+# Revision 0.9.2.6  2006/03/20 13:36:24  brian
 # - added checks for Development
 #
-# Revision 1.1.2.5  2006/03/06 11:37:55  brian
+# Revision 0.9.2.5  2006/03/06 11:37:55  brian
 # - updated headers
 #
 # =============================================================================
