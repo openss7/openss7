@@ -365,9 +365,12 @@ AM_CONDITIONAL(WITH_LFS, false)dnl
 AM_CONDITIONAL(WITH_LIS, false)dnl
 
 AC_CONFIG_FILES([Makefile
+		scripts/texi/args.texi
 		compat/Makefile
 		doc/Makefile
 		doc/man/Makefile
+		doc/manual/texi/args.texi
+		doc/manual/Makefile
 		include/Makefile
 		src/Makefile])
 AC_OUTPUT

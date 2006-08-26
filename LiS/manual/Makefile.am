@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.12 $) $Date: 2006/08/26 09:15:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.13 $) $Date: 2006/08/26 14:46:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/26 09:15:57 $ by $Author: brian $
+# Last Modified $Date: 2006/08/26 14:46:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.13  2006/08/26 14:46:26  brian
+# - update todo documentation
+#
 # Revision 1.1.6.12  2006/08/26 09:15:57  brian
 # - better release file generation
 #
@@ -88,6 +91,7 @@ EXTRA_info_TEXINFOS	= \
 			  releases.texi \
 			  rpm.texi \
 			  testsuite.texi \
+			  todo.texi \
 			  tree.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \

@@ -1,39 +1,41 @@
-OpenSS7 Netperf -- things to do.  2006-06-16
-Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
+OpenSS7 NETPERF Utility -- things to do.  2006-08-23
+$Id: TODO,v 1.1.2.3 2006/08/26 14:46:28 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 Things to do:
 
-- Merge in upstream changes into the OpenSS7 Modified version.
+   - Merge in upstream changes into the OpenSS7 Modified version.
 
-- Get the OpenSS7 Modified version working also with Linux Native
-  Sockets SCTP in addition to the current STREAMS SCTP XTI support.
-  This would not only allow Netperf to be used successfully with OpenSS7
-  Linux Native SCTP, but it would also comparison tests between STREAMS
-  an Sockets versions.  This is something that I would really like to
-  do.  Since Linux Fast-STREAMS STREAMS-based pipes beat FC4 Native
-  pipes on 2.6.14 in a performance test, it would be interesting to see
-  whether the STREAMS version can outpace the Sockets version.  This
-  would be an answer to the time old question as to whether Sockets or
-  STREAMS is faster.
+   - Get the OpenSS7 Modified version working also with Linux Native
+     Sockets SCTP in addition to the current STREAMS SCTP XTI support.
+     This would not only allow Netperf to be used successfully with
+     OpenSS7 Linux Native SCTP, but it would also comparison tests
+     between STREAMS an Sockets versions.  This is something that I
+     would really like to do.  Since Linux Fast-STREAMS STREAMS-based
+     pipes beat FC4 Native pipes on 2.6.14 in a performance test, it
+     would be interesting to see whether the STREAMS version can
+     outpace the Sockets version.  This would be an answer to the time
+     old question as to whether Sockets or STREAMS is faster.
 
-- Redo performance tests for strxnet/strinet package using recent
-  release of OpenSS7 Modified Netperf.
+   - Redo performance tests for strxnet/strinet package using recent
+     release of OpenSS7 Modified Netperf.
 
-  *done*
+     _*done*_
 
-- Perform x86_64 HT SMP testing.
+   - Perform x86_64 HT SMP testing.
 
-  *done*
+     _*done*_
 
+-----
 
 =========================================================================
 
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -52,8 +54,8 @@ All Rights Reserved.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -62,8 +64,8 @@ All Rights Reserved.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -78,4 +80,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: tw=72 nocindent
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

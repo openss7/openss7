@@ -1,5 +1,6 @@
-OpenSS7 Linux STREAMS -- things to do.  2006-03-01
-Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
+Linux STREAMS (LiS) -- things to do.  2006-08-23
+$Id: TODO,v 1.1.2.2 2006/08/26 14:46:25 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
@@ -19,16 +20,22 @@ package, unless at the bequest of a project sponsor.  As such, LiS is
 deprecated.  Use the latest streams package from the OpenSS7 download
 site at <http://www.openss7.org/download.html> instead.
 
-- Last remaining to do item is to release the LiS-2.18.3 release that
-  might very well be the last release.
+   - Last remaining to do item is to release the LiS-2.18.3 release
+     that might very well be the last release.
 
+------
+
+Although the original package is distributed under LGPL, this package is
+distributed by OpenSS7 Corporation under the GNU Public License.
+
+-----
 
 =========================================================================
 
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -47,8 +54,8 @@ All Rights Reserved.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -57,8 +64,8 @@ All Rights Reserved.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -73,4 +80,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: tw=72 nocindent
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

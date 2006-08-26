@@ -1,0 +1,84 @@
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c =========================================================================
+@c
+@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:37:57 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/26 14:37:57 $ by $Author: brian $
+@c
+@c =========================================================================
+
+Things to do (there is a great long list of these, but here is a crack
+at the first ones):
+
+@itemize @minus
+@item
+Compile entire (private) package against Linux Fast-STREAMS.
+
+@item
+Convert test programs into conformance test suites under GNU autotest.  This should be straight
+forward matter.
+
+@item
+Start retesting SIGTRAN components against SCTP and Linux Fast-STREAMS starting with M2PA.
+
+@item
+Start retesting SS7 Device Drivers under Linux Fast-STREAMS starting with X400P.
+
+@item
+Start retesting SS7 Stack compontents (MTP2, MTP3, SCCP, ISUP, TCAP) under Linux Fast-STREAMS.
+
+@item
+Package a public release.  It has been wayyy tooo looong since a public release of this package.
+The package has almost a million lines of code in it, most of which the public has never seen!
+@end itemize
+

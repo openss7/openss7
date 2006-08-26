@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/08 22:04:49 $
+ @(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/08 22:04:49 $
 
  -----------------------------------------------------------------------------
 
@@ -51,14 +51,14 @@
  -----------------------------------------------------------------------------
 
  $Log: drv_wrap.c,v $
- Revision 1.1.2.1  2006/07/08 22:04:49  brian
+ Revision 0.9.2.1  2006/07/08 22:04:49  brian
  - add wrapper files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/08 22:04:49 $"
+#ident "@(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/08 22:04:49 $"
 
-static char const ident[] = "$RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/08 22:04:49 $";
+static char const ident[] = "$RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/08 22:04:49 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

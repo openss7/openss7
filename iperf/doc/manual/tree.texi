@@ -1,0 +1,156 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: tree.texi,v 0.9.2.1 2006/08/26 14:41:37 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/26 14:41:37 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@ignore
+@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel
+modules directory @file{lib/modules/2.4.20-28.7/}:
+
+@table @file
+@item modules.strxns
+@end table
+@end ignore
+
+@ignore
+@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel
+modules directory @file{lib/modules/2.4.20-28.7/strxns/}:
+
+@table @file
+@item streams-ip_strm_mod.o
+This kernel module contains the IP to STREAMS module.
+@item streams-ip_to_dlpi.o
+This kernel module contains the IP to DLPI module.
+@item streams-ldl.o
+This kernel module contains the Linux DL module.
+@end table
+@end ignore
+
+@ignore
+@dfn{@value{PACKAGE_UCNAME}} places the following header files in the system include
+directory @file{/@-usr/@-include/@-strxns/@-}:
+
+@table @file
+@item sys/cdi.h
+This file contains the CDI header file.
+@item sys/dlpi.h
+This file contains the DLPI header file.
+@item sys/ldl.h
+This file contains the Linux DL header file.
+@item sys/npi.h
+This file contains the NPI header file.
+@end table
+@end ignore
+
+@ignore
+@dfn{@value{PACKAGE_UCNAME}} places the following test programs in the system lib@-exec
+directory @file{/@-usr/@-lib@-exec/@-}:
+
+@table @file
+@item ldltest
+This binary contins a test program for the Linux DL driver.
+@end table
+@end ignore
+
+@ignore
+@dfn{@value{PACKAGE_UCNAME}} places the following utility programs in the system
+binary directory @file{/@-usr/@-sbin/@-}:
+
+@table @file
+@item ldlconfig
+This binary contains a configuration utility for the Linux DL driver.
+@item strxns_mknod
+This binary conatins a script for making device nodes for the
+@dfn{@value{PACKAGE_UCNAME}} package.
+@end table
+@end ignore
+
+@dfn{@value{PACKAGE_UCNAME}} places the following info files in the system info
+directory @file{/@-usr/@-share/@-info/@-}:
+
+@table @file
+@item iperf.info
+@itemx iperf.info-1
+@itemx iperf.info-2
+@itemx iperf.info-3
+@itemx iperf.info-4
+These files contain this manual in info format.
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following manpage macro and reference
+database files in the system man directory @file{/@-usr/@-share/@-man/@-}:
+
+@table @file
+@item iperf.macros
+This file contain manual page macro definitions included by the manual pages
+included in the package.
+@item iperf.refs
+This file contains a reference database referenced by the manual pages
+included in the package.
+@end table
+
+@ignore
+@dfn{@value{PACKAGE_UCNAME}} places the following CDI manual pages in the system man
+directory @file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@dfn{@value{PACKAGE_UCNAME}} places the following DLPI manual pages in the system man
+directory @file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@dfn{@value{PACKAGE_UCNAME}} places the following NPI manual pages in the system man
+directory @file{/@-usr/@-share/@-man/@-man7/@-}:
+@end ignore
+

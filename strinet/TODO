@@ -1,51 +1,49 @@
-OpenSS7 STREAMS INET Driver -- things to do.  2006-06-16
-Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
+OpenSS7 INET Networking -- things to do.  2006-08-23
+$Id: TODO,v 0.9.2.4 2006/08/26 14:46:38 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 Things to do:
 
-- Convert inet driver to use os7 common functions.
+   - Convert inet driver to use os7 common functions.
 
-- Pure STREAMS RAW and UDP implementation.  A higher performance RAW and
-  UDP implementation supporting both TPI and NPI would be nice to have.
-  The OpenSS7 Project needs an NPI RAW implementation that can tap UDP
-  primarily for use with RTP.  Also, it will be interesting to test the
-  performance differences between STREAMS UDP and Sockets UDP.
+   - Pure STREAMS RAW and UDP implementation.  A higher performance RAW
+     and UDP implementation supporting both TPI and NPI would be nice
+     to have.  The OpenSS7 Project needs an NPI RAW implementation that
+     can tap UDP primarily for use with RTP.  Also, it will be
+     interesting to test the performance differences between STREAMS
+     UDP and Sockets UDP.
 
-  *done*
+    _*done*_
+          udp2 and rawip2 drivers implemented and tested.  strxns
+          package now has an np_ip driver for raw access to IP
+          (primarily for SCTP conformance testing).  RTP drivers should
+          be based on udp2 driver.
 
-    udp2 and rawip2 drivers implemented and tested.  strxns package now
-    has an np_ip driver for raw access to IP (primarily for SCTP
-    conformance testing).  RTP drivers should be based on udp2 driver.
+   - Connectionless testing using netperf competes well with
+     connection-oriented sockets.  Need to still modify netperf to use
+     (pseudo-)connection-oriented UDP for better comparison.
 
+   - 32bit compatibiltiy testing.
 
-- Connectionless testing using netperf competes well with
-  connection-oriented sockets.  Need to still modify netperf to use
-  (pseudo-)connection-oriented UDP for better comparison.
+    _*done*_
+          Ran ix86 test suite binaries on x86_64.
 
+   - SMP Testing.
 
-- 32bit compatibiltiy testing.
+    _*done*_
+          What I did was to perform SMP testing for Intel Pentium IV
+          630 HT at least.
 
-  *done*
-
-    Ran ix86 test suite binaries on x86_64.
-
-
-- SMP Testing.
-
-  *done*
-  
-    What I did was to perform SMP testing for Intel Pentium IV 630 HT at
-    least.
-
+-----
 
 =========================================================================
 
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -64,8 +62,8 @@ All Rights Reserved.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -74,8 +72,8 @@ All Rights Reserved.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -90,4 +88,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: tw=72 nocindent
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

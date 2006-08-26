@@ -1,5 +1,5 @@
 Linux STREAMS (LiS) -- unstable release introduction.  2006-08-23
-$Id: README-alpha,v 1.1.2.5 2006/08/26 09:16:07 brian Exp $
+$Id: README-alpha,v 1.1.2.6 2006/08/26 14:46:25 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -105,18 +105,6 @@ The work-around for these defects is to not use LiS at all: use the
 `OpenSS7 Linux Fast-STREAMS' release instead.  The `OpenSS7 Linux
 Fast-STREAMS', being a completely independent implemenation, does not
 suffer from this extensive set of LiS defects.
-
-5.6 Schedule
-============
-
-For the lastest developments with regard to schedule, please see the
-`TODO' file in the release package.
-
-5.7 History
-===========
-
-For the latest developments with regard to history of changes, please
-see the `ChangeLog' file in the release package.
 
 5.4.6 Unstable Releases
 -----------------------

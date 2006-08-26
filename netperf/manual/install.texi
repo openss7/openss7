@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.13 2006/08/26 09:16:15 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.14 2006/08/26 14:46:29 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 09:16:15 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/26 14:46:29 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -182,7 +182,18 @@ that do not contain kernel modules do not generate a source RPM package.}
 @end table
 
 @subsubheading Architecture Dependent
+@noindent
+The following Architecture Dependent packages are required for your architecture.  If your
+architecture is not on the list, you can build binary RPM from the source RPM (see @pxref{Building
+from the Source RPM}).
+
 @table @asis
+@ignore
+@item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-openss7-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--openss7@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+the @file{@value{PACKAGE}} package contains the @manpage{iperf(1)} program
+compiled to work with the OpenSS7 Linux Native Sockets version of SCTP.
+
+@end ignore
 @item @href{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--devel} package contains library archives for static
 compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
@@ -243,12 +254,22 @@ configuration test utilities and commands associated with the
 @file{@value{PACKAGE}@--streams@--util} package if you have streams installed.
 @end table
 
+@subsubheading Dependent RPM
 To be able to perform the SCTP and XTI tests supported by the release, it may
 be necessary to download and install some of the following packages to satisfy
 dependencies:
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/LiS-core-2.18.1-1.i686.rpm, LiS-core-2.18.1-1.i686.rpm}
+@ignore
+@item @href{http://www.openss7.org/rpms/RPMS/i686/sctp-@value{VERSION_SCTP}-1.i686.rpm, sctp-@value{VERSION_SCTP}-1.i686.rpm}
+This package provides the @cite{OpenSS7 Linux Native Sockets} version of
+@cite{SCTP}.  This package is required to support SCTP tests.
+This package is required by @cite{@value{PACKAGE}-openss7-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}.
+Other subpackages created by @cite{sctp-@value{VERSION_SCTP}-1.src.rpm} may be necessary to
+by able to recompile @cite{@value{PACKAGE}-@value{VERSION}}.
+
+@end ignore
+@item @href{http://www.openss7.org/rpms/RPMS/i686/LiS-core-2.18.1-1.i686.rpm, LiS-core-2.18.1-1.i686.rpm}
 This package provides one of the two SVR 4.2 @dfn{STREAMS} facilities for use by
 @cite{@value{PACKAGE}-@value{VERSION}}.  This (or the other) @dfn{STREAMS} package is required
 to support the DLPI and XTI tests.
@@ -260,7 +281,7 @@ This package is required by @cite{@value{PACKAGE}-LiS-@value{VERSION}-@value{PAC
 Other subpackages created by @cite{LiS-2.18.1-1.src.rpm} may be necessary to
 by able to recompile @cite{@value{PACKAGE}-@value{VERSION}}.
 
-@item @uref{http://www.openss7.org/rh9/RPMS/i686/streams-core-0.7a-1.i686.rpm, streams-core-0.7a-1.i686.rpm}
+@item @href{http://www.openss7.org/rh9/RPMS/i686/streams-core-0.7a-1.i686.rpm, streams-core-0.7a-1.i686.rpm}
 This package provides the other of the two SVR 4.2 @dfn{STREAMS} facilities for use by
 @cite{netperf-openss7-2.3}.  This (or the other) @dfn{STREAMS} package is required
 to support the DLPI and XTI tests.
@@ -272,20 +293,20 @@ This package is required by @cite{netperf-openss7-streams-2.3-1.i686.rpm}.
 Other subpackages created by @cite{streams-0.7a-1.src.rpm} may be necessary to
 by able to recompile @cite{netperf-openss7-2.3}.
 
-@item @uref{http://www.openss7.org/rh9/RPMS/i686/strxns-core-0.9.2-1.i686.rpm, strxns-core-0.9.2-1.i686.rpm}
+@item @href{http://www.openss7.org/rh9/RPMS/i686/strxns-core-0.9.2-1.i686.rpm, strxns-core-0.9.2-1.i686.rpm}
 This package provides the DLPI implementation for Linux Ethernet devices
 required by the @cite{netperf-openss7-2.3} DLPI tests.
 Other subpackages created by @cite{strxns-0.9.2-1.src.rpm} may be necessary to
 by able to recompile @cite{netperf-openss7-2.3}.
 
-@item @uref{http://www.openss7.org/rh9/RPMS/i686/strxnet-core-0.9.2-1.i686.rpm, strxnet-core-0.9.2-1.i686.rpm}
+@item @href{http://www.openss7.org/rh9/RPMS/i686/strxnet-core-0.9.2-1.i686.rpm, strxnet-core-0.9.2-1.i686.rpm}
 This package provides the X/Open XNS 5.2 XTI/TLI library (@cite{libxnet})
 necessary to support the XTI tests.
 Other subpackages created by @cite{strxnet-0.9.2-1.src.rpm} may be necessary to
 by able to recompile @cite{netperf-openss7-2.3}.
 @ref{Top, Introduction, Introduction, libxnet, The OpenSS7 XNS/XTI Library Reference Manual}.
 
-@item @uref{http://www.openss7.org/rh9/RPMS/i686/strinet-core-0.9.2-1.i686.rpm, strinet-core-0.9.2-1.i686.rpm}
+@item @href{http://www.openss7.org/rh9/RPMS/i686/strinet-core-0.9.2-1.i686.rpm, strinet-core-0.9.2-1.i686.rpm}
 This package provides the XTI interface to the Linux Socket SCTP, TCP and UDP
 implementations in support of XTI SCTP, XTI TCP and XTI UDP tests.  This
 package is only required if it is desired to run XTI SCTP, XTI TCP or XTI UDP
@@ -297,7 +318,7 @@ interface to the native Linux Kernel socket code.
 Other subpackages created by @cite{strinet-0.9.2-1.src.rpm} may be necessary to
 by able to recompile @cite{netperf-openss7-2.3}.
 
-@item @uref{http://www.openss7.org/rh9/RPMS/i686/strsctp-core-0.9.2-1.i686.rpm, strsctp-core-0.9.2-1.i686.rpm}
+@item @href{http://www.openss7.org/rh9/RPMS/i686/strsctp-core-0.9.2-1.i686.rpm, strsctp-core-0.9.2-1.i686.rpm}
 This package provides the XTI interface to the Linux @dfn{STREAMS} implementation of
 SCTP in support of XTI SCTP tests.  This package is only required if it is
 desired to run XTI SCTP tests on Linux.  This is a native @dfn{STREAMS}

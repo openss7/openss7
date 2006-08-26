@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.14 2006/08/26 09:17:53 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.15 2006/08/26 14:46:36 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 09:17:53 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/26 14:46:36 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -399,8 +399,7 @@ With the exception of packages not originaly created by the @cite{OpenSS7 Projec
 @section Schedule
 @cindex schedule
 
-For the lastest developments with regard to schedule, please see the @file{TODO} file in the release
-package.
+@include todo.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

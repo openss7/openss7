@@ -1,0 +1,289 @@
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c =========================================================================
+@c
+@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:37:56 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/26 14:37:56 $ by $Author: brian $
+@c
+@c =========================================================================
+
+Things to do:
+
+@itemize @minus
+@item
+Perform conformance and performance testing on the sctp-0.2.22 release.
+  
+For conformance testing, my intention was to use the same conformance test tool and available in the
+strsctp (OpenSS7 STREAMS SCTP) package.  This test tool uses the ability to directly send and
+intercept SCTP packets at the IP level.
+
+For performance testing, my intention was to use the iperf (OpenSS7 Modified Iperf) package.
+
+@item
+Perform x86_64 HT SMP testing on sctp-0.2.22.
+@end itemize
+
+Things to do to convert to autoconf: (2006-02-23)
+
+@itemize @minus
+@item
+Check for IPPROTO_SCTP = 132 in /usr/include/netinet/in.h it should be there on more recent
+releases.  It is there as a define as well as an enum.  Therefore it is enough to add #ifndef
+IPPROTO_SCTP to user files, but it is not as a define in linux/in.h so we will have to run a check
+against kernel headers.
+
+@quotation
+@emph{*done*}
+
+What I did was add the #ifndef the hooks.h file included after all other includes.  That way if the
+enum is there and not the define, the define gets done anyway.
+@end quotation
+
+@item
+We have our own linux/sctp.h  Our linux/sctp.h is not installed.  You will find the lksctp
+linux/sctp.h in the headers for some more recent c headers.  It is lucky it is really in the wrong
+place: it should be in netinet/sctp.h for user programs.  That is where we install the header file.
+
+@quotation
+@emph{*done*}
+
+Our header installs in netinet/sctp.h and has namespace polution protection.
+@end quotation
+
+@item
+We need to override the struct sk_buff definition from linux/skbuff.h to include the sctphdr in the
+h (transport header) union.  We are in real trouble if the size of sctphdr exceeds the existing
+union.
+
+@quotation
+@emph{*done*}
+
+What I did was change all references to h.sh to use the macro SCTP_SKB_SH that was already defined.
+The definition of SCTP_SKB_SH is based on the presence or absence of this field.  This field is,
+however, normally absent because lksctp failed to fill it in.
+
+We don't have to check the size of this because the transport header union is a union of pointers.
+What needs to be checked here is the size of the control block in the sk_buff (sizeof sk_buff.cb)
+against the size of our sctp_skb_cb structure that we cast the control block to.  This was done
+using a compiler trick to compare sizes of complex data structures.
+@end quotation
+
+@item
+We need to define SOL_SCTP that should be in linux/socket.h for the socket layer.  Some lksctp
+kernels already have it defined.  It needs to be the protoco number of 132 so there is no conflict
+there.
+
+@quotation
+@emph{*done*}
+
+Same treatment as IPPROTO_SCTP above.
+@end quotation
+
+@item
+We need to add sysctl definitions for /proc/sys/net/ipv4 to linux/sysctl.h Again, I added these to
+/proc/sys/net/ipv4 whereas lksctp adds to /proc/sys/net/sctp.  So there is no conflict.  I don't
+know whether we should jump the number high enough that it does not conflict with any latter
+additions to /proc/sys/net/ipv4 or whether to determine the last index at build time.  We should
+also override the /usr/include/linux/sysctl.h version with a patched version.  It may be necessary
+to patch out conflicting SCTP names.
+
+@item
+We need definitions for inet_sctp_ops (struct proto_ops) and need external definitions for
+inet_bind(), inet_multi_getname() and inet_ioctl() that are all missing from net/inet_common.h
+
+@quotation
+@emph{*done*}
+
+The necessary symbols have been ripped in acinclude.m4 and hooked in 
+@end quotation
+
+@item
+We have our own net/sctp.h  lksctp doesn't have one so we're ok there.
+
+@quotation
+@emph{*done*}
+
+Yes, we just include it.
+@end quotation
+
+@item
+net/snmp.h needs definitions for SCTP mibs.  lksctp has stolen ours here but have missed some
+definitions: SctpMaxAssoc and SctpDiscontinuityTime.  Fortunately we don't really use these two.
+Unfortunately, lksctp versions are not cacheline_aligned.  As it is only a structure definition, we
+don't need to override it, but could anyway.
+
+@quotation
+@emph{*done*}
+
+We override the mib definition with our own from net/net_snmp.h
+@end quotation
+
+@item
+We need to override struct sock in net/sock.h to include sctp_opt for af_sctp  On earlier kernels we
+can simply override the struct but must check that the tp_pinfo union has sufficient size for our
+definitions.  On latter kernels, lksctp includes there own definition here, but perhaps we can pull
+some "define" tricks when CONFIG_IP_SCTP_MODULE was set to override them.
+
+@quotation
+@emph{*done*}
+
+tp_pinfo is too small, so I defined our sctp_opt structure to span both tp_pinfo and protinfo
+private fields.  Configure checks that the spanning is correct and that there is sufficient room in
+the overlaid structure.
+@end quotation
+
+@item
+Unexported netsyms: we will have to rip the following symbols if not exported:
+
+@example
+EXPORT_SYMBOL(icmp_err_convert);
+EXPORT_SYMBOL(icmp_statistics);
+EXPORT_SYMBOL(inet_bind)
+EXPORT_SYMBOL(inet_ioctl)
+EXPORT_SYMBOL(inet_multi_getname)
+EXPORT_SYMBOL(ip_build_and_send_pkt);
+EXPORT_SYMBOL(ip_cmsg_send);
+EXPORT_SYMBOL(ip_getsockopt);
+EXPORT_SYMBOL(ip_options_echo);
+EXPORT_SYMBOL(ip_rt_min_pmtu);
+EXPORT_SYMBOL(ip_rt_mtu_expires);
+EXPORT_SYMBOL(ip_rt_update_pmtu);
+EXPORT_SYMBOL(ip_setsockopt);
+EXPORT_SYMBOL(sysctl_ip_dynaddr);
+EXPORT_SYMBOL(sysctl_ip_nonlocal_bind);
+EXPORT_SYMBOL(sysctl_rmem_default)
+EXPORT_SYMBOL(sysctl_wmem_default)
+@end example
+
+@quotation
+@emph{*done*}
+
+Actually, we rip a longer list as follows:
+
+@example
+EXPORT_SYMBOL(icmp_err_convert);
+EXPORT_SYMBOL(icmp_statistics);
+EXPORT_SYMBOL(inet_bind);
+EXPORT_SYMBOL(inet_getname);
+EXPORT_SYMBOL(inet_ioctl);
+EXPORT_SYMBOL(inet_multi_getname);
+EXPORT_SYMBOL(ip_cmsg_send);
+EXPORT_SYMBOL(ip_getsockopt);
+EXPORT_SYMBOL(ip_route_output_flow);
+EXPORT_SYMBOL(__ip_route_output_key);
+EXPORT_SYMBOL(ip_rt_min_pmtu);
+EXPORT_SYMBOL(ip_rt_mtu_expires);
+EXPORT_SYMBOL(ip_rt_update_pmtu);
+EXPORT_SYMBOL(ipsec_sk_policy);
+EXPORT_SYMBOL(ip_setsockopt);
+EXPORT_SYMBOL(sysctl_ip_dynaddr);
+EXPORT_SYMBOL(sysctl_ip_nonlocal_bind);
+EXPORT_SYMBOL(__xfrm_policy_check);
+EXPORT_SYMBOL(xfrm_policy_delete);
+EXPORT_SYMBOL(__xfrm_sk_clone_policy);
+@end example
+
+( even a longer list now... )
+@end quotation
+
+@item
+We need to figure out what to do net/ipv4/af_inet.c to get sctp to autoload correctly.  Also, we
+need to override any other loaded sctp.
+
+@quotation
+@emph{*done*}
+
+We override lksctp by moving it out of the way to sctp_deprecated.  As far as autoloading is
+concerned we will have to load it manually to begin with.
+@end quotation
+
+
+@item
+lksctp doesn't adjust the ext_header_len in net/ipv4/ip_sockglue when IP options are set on the
+socket.  We might have to find some way to intercept socket option IP_OPTIONS.
+
+@quotation
+@emph{*addressed*}
+
+IP layer will just have to pull up the sk_buff if there is not enough headroom.
+@end quotation
+
+@item
+Reporting snmp statistics.  lksctp doesn't do this right (i.e. netstat broken.)  Although we can
+generate our own sctp_get_info, we need to wrapper snmp_get_info and afinet_get_info.  We can do
+this by ripping these symbols, indexing into the proc directory structures and then stabbing them.
+Or we could destroy them and recreate them with the wrapper.  All we have to do is print our SCTP
+info first and then call the wrappered function for both snmp_get_info and afinet_get_info.
+
+@quotation
+@emph{*done*}
+
+I wrappered both snmp_get_info and afinet_get_info and reload the new version in the right place on
+module load and unload them afterward.  sctp_get_info is defined and loaded under /proc/net/sctp.
+@end quotation
+
+@item
+For sysctl we used to just add our entries to /proc/sys/net/ipv4 in the kernel  We might be able to
+just jam the ipv4_table pointer in net_table to point to a new table which includes the SCTP
+entries.
+
+@quotation
+@emph{*done*}
+
+Entries added as before.  Indexes start at 200 to avoid conflict with other entries at that level.
+@end quotation
+@end itemize
+
+... And that's it.  Just add compile our sctp.c file with our headers.  The loading step might be
+the toughest.
+

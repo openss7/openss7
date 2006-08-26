@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.2.16 2006/08/26 09:16:19 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.2.17 2006/08/26 14:46:29 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 09:16:19 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/26 14:46:29 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -455,8 +455,7 @@ this release package.
 @section Schedule
 @cindex schedule
 
-For the lastest developments with regard to schedule, please see the @file{TODO} file in the release
-package.
+@include todo.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

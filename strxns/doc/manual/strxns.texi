@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxns.texi,v 0.9.2.27 2006/08/26 09:20:17 brian Exp $
+% @(#) $Id: strxns.texi,v 0.9.2.28 2006/08/26 14:46:51 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 09:20:17 $ by $Author: brian $
+% Last Modified $Date: 2006/08/26 14:46:51 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -289,7 +289,9 @@ Indices
 * Variable Index::		Index of Variables and Constants
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
+* Author Index::		Index of Authors
 * Makefile Target Index::	Index of Makefile Targets
+* Manual Page Index::		Index of Manual Pages
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -382,6 +384,9 @@ package.
 @smallexample
 
 $Log: strxns.texi,v $
+Revision 0.9.2.28  2006/08/26 14:46:51  brian
+- update todo documentation
+
 Revision 0.9.2.27  2006/08/26 09:20:17  brian
 - better release file generation
 
@@ -536,6 +541,7 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @node Notice
 @section Notice
 @cindex notice
+@cindex licensing
 
 This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
 @uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and modules previously
@@ -543,7 +549,6 @@ part of @cite{Linux STREAMS}@footnote{@xref{Top, Top, About This Manual, LiS, Li
 Installation and Reference Manual}.}.  In stark contrast to many other software packages released by
 @uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
 other parties.
-@cindex licensing
 
 This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the

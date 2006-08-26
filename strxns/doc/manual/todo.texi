@@ -1,0 +1,131 @@
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c =========================================================================
+@c
+@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:38:05 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/26 14:38:05 $ by $Author: brian $
+@c
+@c =========================================================================
+
+Things to do:
+
+@itemize @minus
+@item
+I want to write a NetFilter pseudo-device driver that will install and control netfilter hooks for
+performance testing.  It will do things like packet drops, checksum errors, packet duplication,
+packet delay, and combinations, for a specified range of addresses and/or protocols.  Also a set of
+user-space utilities (C language programs) to permit the control of the filters.  The purpose is to
+be able to do a wide range of performance testing on simulated networks that are simply loopback
+devices.  This would permit performance test programs (such as netperf) to be used for testing
+special network conditions on SCTP (for example), and will also allow for comparison tests.
+@end itemize
+
+@itemize @bullet
+@item
+The strxns package contains several GPL'd modules and drivers originally included in the LiS
+releases that were removed to this package so that they could be used with both LiS and Linux
+Fast-STREAMS.
+@end itemize
+
+@itemize @minus
+@item
+Test.  Almost none of the modules or drivers in this package have been tested throuroughly against
+either LiS or Linux Fast-STREAMS.  One of the primary reasons for this is that The OpenSS7 Project
+does not really use any of these modules or drivers.
+
+@item
+Write an NPI interface driver to the Linux IP subsystem.  That is, the rough NPI equivalent of a raw
+IP TPI Stream.
+
+The purpose of this driver is twofold:
+
+@enumerate 1
+@item
+The OpenSS7 Project has need for a RTP (Real-Time Transport Protocol) and, because RTP runs over
+UDP, it is necessary to intercept packets ahead of UDP at the IP level to avoid opening Sockets from
+inside the kernel.  This NPI IP driver would accomplish that feat.  This would also permit 1 Stream
+to be opened but which communicates on many RTP channels.
+
+@item
+The OpenSS7 Project has a need for direct interface and interception (drop and insert) capabilities
+at the IP level for the purposes of testing both RTP and SCTP.  This later purpose is less critical
+because Ferry-Clip testing can be rigged to RTP and SCTP to acheive the same effect.
+
+@item
+Although the STREAMS SCTP driver directly interfaces with the IP subsystem at the driver-kernel
+interface, it might be of some advantage to make SCTP a pushable module that simply pushes over one
+of these NPI IP Streams.  The ability to bind to multiple addresses and multiple protocols would be
+of use to SCTP.
+
+@item
+If we can find some sort of standardized interface semantics (perhaps by examining OpenSolaris), it
+might be possible to make many of The OpenSS7 Project drivers, such as RTP and SCTP immediately
+portable to other operating systems with STREAMS such as Solaris, pSOS, VxWorks, LynxOS, etc.
+(Errr... no.  After examining OpenSolaris IP code, it is so messed up that there is no good way to
+interface to it except at the kernel level.  However, the approach might still be valid for
+portability because the Operating System dependent procedures could be encapsultated in the NPI IP
+driver and then only the NPI IP driver needs to be ported, and not the other upper-layer protocols.
+Yes, the approach still has some validity.)
+@end enumerate
+
+@emph{*done*}
+
+The np_ip driver performs many of these functions now.  Test suites for the driver are also
+provided.
+
+@item
+This might be a useful place to drop all of the DLPI drivers from the strss7 package, particularly
+those for X.25, Frame Relay, and ISDN LAPD and LAPB.
+@end itemize
+
+

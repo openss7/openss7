@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.24 2006/08/26 09:15:58 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.25 2006/08/26 14:46:26 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 09:15:58 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/26 14:46:26 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -670,8 +670,7 @@ independent implemenation, does not suffer from this extensive set of LiS defect
 @section Schedule
 @cindex schedule
 
-For the lastest developments with regard to schedule, please see the @file{TODO} file in the release
-package.
+@include todo.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

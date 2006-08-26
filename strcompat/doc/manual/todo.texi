@@ -1,0 +1,97 @@
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c =========================================================================
+@c
+@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:37:58 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/26 14:37:58 $ by $Author: brian $
+@c
+@c =========================================================================
+
+Things to do:
+
+@itemize @minus
+@item
+Work in streams_interrupt() and STREAMS_TIMEOUT() from IRIX into irixcompat.c.
+
+@item
+Hey, here's an idea for testing Solaris compatibility: take an OpenSolaris source file for a STREAMS
+driver and compile and test it under Linux with no (or minimal) source code modifications!
+
+@item
+Write test programs and test suites.  There are really not any test programs or test suites
+available for the OpenSS7 STREAMS Compatibility Modules package as of strcompat-0.9.2.2.
+
+@item
+Not all compatibility functionality is implemented.  There are a large number of Sun DDI functions
+applicable to STREAMS that have not been fully implemented.  Also, the Sun configuration management
+mechanism is not yet fully implemented and neither is that for AIX.  Also, there is a large group of
+SVR 4.2 compatible functions that are not directly STREAMS related but are part of the DDI/DKI and
+should be implemented to provide abstraction from Linux internals as well as the ability to link
+binary modules.
+
+@item
+Linking of binary modules is not yet supported.  This is the place (strcompat) where binary modules
+should be permitted to be loaded against either Linux STREAMS or Linux Fast-STREAMS, because the
+binary compatibility interface modules are defined here.  There is the begginnings of an strconf
+script output to generate a C-language wrapper file that will link with a binary object file to
+generate a loadable module that could load under Linux STREAMS or Linux Fast-STREAMS.  Note that
+there are a bunch of binary compatibility issues with Linux STREAMS in the first place (it cannot
+even be binary compatible with user programs written for 32bit architectures running on 64bit
+architectures).  For farily retricted use modules and drivers, a single binary object could run on
+both LiS and LfS.
+
+@item
+Documentation.  The documentation is trailing a bit.  I have thousands of manual pages written,
+however, some are sparse or incomplete.  Also, the manual and the STREAMS Porting Guide needs a
+bunch of work.
+@end itemize

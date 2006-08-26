@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.63 $) $Date: 2006/07/07 21:08:47 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.64 $) $Date: 2006/08/26 14:44:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/07 21:08:47 $ by $Author: brian $
+# Last Modified $Date: 2006/08/26 14:44:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -703,7 +703,7 @@ fi
 %doc LICENSE
 %doc LSM %{name}-%{version}.lsm
 %doc README-make
-#%{_infodir}/*
+%{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros*
 %{_mandir}/man*/*
@@ -716,7 +716,7 @@ fi
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
 %doc LICENSE
 %doc LSM %{name}-%{version}.lsm
-#%{_infodir}/*
+%{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros*
 %{_mandir}/man*/*
@@ -758,6 +758,9 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.64  2006/08/26 14:44:50  brian
+# - added manual
+#
 # Revision 1.1.2.63  2006/07/07 21:08:47  brian
 # - place all header files in development subpackage
 #

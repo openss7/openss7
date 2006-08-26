@@ -121,8 +121,20 @@ include am/rpm.am
 ##
 include am/deb.am
 
+##
+## Rules for making release files
+##
+MANUAL_FILE			= doc/manual/$(PACKAGE).txt
+RELEASE_FILES			= README \
+				  README-alpha \
+				  README-cvs \
+				  README-nexusware
+
+include am/release.am
+
 EXTRA_DIST			+= \
 				  TODO \
+				  MANUAL \
 				  README-cvs \
 				  README-nexusware \
 				  debian/README.Debian \

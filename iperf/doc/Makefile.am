@@ -59,7 +59,7 @@ EXTRA_DIST += index.html ui_license.html dast.gif
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-SUBDIRS = . man
+SUBDIRS = . man manual
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
