@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cmot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $
+ @(#) $RCSfile: cmot.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $
 
  -----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@
  -----------------------------------------------------------------------------
 
  $Log: cmot.c,v $
- Revision 1.1.2.1  2006/07/11 12:32:05  brian
+ Revision 0.9.2.1  2006/07/11 12:32:05  brian
  - added ISO and other implementations to distribution
 
  Revision 0.9.2.1  2006/04/11 18:30:09  brian
@@ -58,9 +58,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cmot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $"
+#ident "@(#) $RCSfile: cmot.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $"
 
-static char const ident[] = "$RCSfile: cmot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $";
+static char const ident[] = "$RCSfile: cmot.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $";
 
 /*
  *  CMISE over TCP (CMOT and CMIP).

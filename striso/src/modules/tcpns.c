@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $
 
  -----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
- Revision 1.1.2.1  2006/07/11 12:32:05  brian
+ Revision 0.9.2.1  2006/07/11 12:32:05  brian
  - added ISO and other implementations to distribution
 
  Revision 0.9.2.1  2006/04/11 18:30:11  brian
@@ -58,10 +58,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $"
 
 static char const ident[] =
-    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $";
+    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -94,7 +94,7 @@ static char const ident[] =
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2996 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"

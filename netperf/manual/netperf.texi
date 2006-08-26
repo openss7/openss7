@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: netperf.texi,v 1.1.2.8 2006/08/23 11:00:25 brian Exp $
+% @(#) $Id: netperf.texi,v 1.1.2.9 2006/08/26 09:16:18 brian Exp $
 %
 % =========================================================================
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/23 11:00:25 $ by $Author: brian $
+% Last Modified $Date: 2006/08/26 09:16:18 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -442,6 +442,9 @@ package.
 @smallexample
 
 $Log: netperf.texi,v $
+Revision 1.1.2.9  2006/08/26 09:16:18  brian
+- better release file generation
+
 Revision 1.1.2.8  2006/08/23 11:00:25  brian
 - added preface, corrections and updates for release
 

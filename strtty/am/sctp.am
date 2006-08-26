@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/06 11:35:14 $
+# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/08/26 08:51:49 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/06 11:35:14 $ by $Author: brian $
+## Last Modified $Date: 2006/08/26 08:51:49 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: sctp.am,v $
+## Revision 0.9.2.21  2006/08/26 08:51:49  brian
+## - handle null kernel module lists
+##
 ## Revision 0.9.2.20  2006/03/06 11:35:14  brian
 ## - updated headers
 ##
@@ -75,7 +78,12 @@ if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
 
 Modules.map: $(KERNEL_MODULES)
-	$(NM) -s $(KERNEL_MODULES) > $@
+	cat /dev/null > $@
+	@modules="$(KERNEL_MODULES)" ; for module in $$modules ; do \
+		$(ECHO) "$(NM) -s $$module >> $@" ; \
+		$(NM) -s $$module >> $@ ; \
+	done
+
 
 CLEANFILES		+= Modules.map
 

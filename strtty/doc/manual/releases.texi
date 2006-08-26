@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.1 2006/08/23 09:53:14 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.2 2006/08/26 09:19:33 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,11 +54,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/23 09:53:14 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/26 09:19:33 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: releases.texi,v $
+@c Revision 0.9.2.2  2006/08/26 09:19:33  brian
+@c - better release file generation
+@c
 @c Revision 0.9.2.1  2006/08/23 09:53:14  brian
 @c - started STREAMS Terminals package
 @c

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/08/22 12:31:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/08/26 09:16:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/22 12:31:41 $ by $Author: brian $
+# Last Modified $Date: 2006/08/26 09:16:35 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2006/08/26 09:16:35  brian
+# - better release file generation
+#
 # Revision 0.9.2.12  2006/08/22 12:31:41  brian
 # - changes to documentation, rationalised sctp to strsctp driver
 #

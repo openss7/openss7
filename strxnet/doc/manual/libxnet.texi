@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libxnet.texi,v 0.9.2.10 2006/08/22 12:57:36 brian Exp $
+% @(#) $Id: libxnet.texi,v 0.9.2.11 2006/08/26 09:20:01 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/22 12:57:36 $ by $Author: brian $
+% Last Modified $Date: 2006/08/26 09:20:01 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -579,7 +579,7 @@ XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
 Trademarks mentioned are the property of their owners.
 
 @subsubheading VERSIONS
-OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.10 $); $Date: 2006/08/22 12:57:36 $.
+OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.11 $); $Date: 2006/08/26 09:20:01 $.
 
 @subsubheading AUTHOR
 @format
@@ -743,7 +743,7 @@ Trademarks mentioned are the property of their owners.
 @subsubheading VERSIONS
 @format
 @flushleft
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.10 $); $Date: 2006/08/22 12:57:36 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.11 $); $Date: 2006/08/26 09:20:01 $.
 @end flushleft
 @end format
 

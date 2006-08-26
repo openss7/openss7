@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $
+ @(#) $RCSfile: lpp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $
 
  -----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@
  -----------------------------------------------------------------------------
 
  $Log: lpp.c,v $
- Revision 1.1.2.1  2006/07/11 12:32:05  brian
+ Revision 0.9.2.1  2006/07/11 12:32:05  brian
  - added ISO and other implementations to distribution
 
  Revision 0.9.2.1  2006/04/11 18:30:11  brian
@@ -58,9 +58,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $"
+#ident "@(#) $RCSfile: lpp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $"
 
-static char const ident[] = "$RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/07/11 12:32:05 $";
+static char const ident[] = "$RCSfile: lpp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $";
 
 /*
  *  Lightweight Presentation Protocol
