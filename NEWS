@@ -1,79 +1,101 @@
-OpenSS7 Master Package -- history of user-visible changes.  2006-08-16
+OpenSS7 Master Package -- history of user visible changes.  2006-08-23
 $Id: NEWS,v 0.9.2.17 2006/08/22 12:49:08 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
-See the end for copying conditions.
+See the end for copying conditions (for this file).
 
-* Major changes in openss7-0.9.2.D.rc3
+The sections that follow provide information on OpenSS7 releases of the
+OpenSS7 Master Package package.
 
-  Third release candidate.
+ Major changes for release openss7-0.9.2.D.rc3
+----------------------------------------------
 
-  This release candidate provides support for additional SuSE
-  distributions on ix86 as well as x86_64.  Added distribution support
-  includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
+Third release candidate.
 
-  This release candidate includes the changes made to the strsctp
-  drivers at the 2006 SCTP Interop at the University of British
-  Columbia.  This version was interoperability tested with all
-  implementations present.
+This release candidate provides support for additional SuSE
+distributions on ix86 as well as x86_64.  Added distribution support
+includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
 
-* Major changes in openss7-0.9.2.D.rc2
+This release candidate includes the changes made to the strsctp drivers
+at the 2006 SCTP Interop at the University of British Columbia.  This
+version was interoperability tested with all implementations present.
 
-  Second release candidate.
+This was an subscriber release.
 
-  This release candidate also contains the results of performance
-  testing of the new second generation UDP driver (implemented
-  completely in STREAMS instead of using an internal socket).
+ Major changes for release openss7-0.9.2.D.rc2
+----------------------------------------------
 
-  This release candidate also contains support for SuSE 10.1.
+Second release candidate.
 
-* Major changes in openss7-0.9.2.Drc1
+This release candidate also contains the results of performance testing
+of the new second generation UDP driver (implemented completely in
+STREAMS instead of using an internal socket).
 
-  Release candidate for Mark Fugate.
+This release candidate also contains support for SuSE 10.1.
 
-* Major changes in openss7-0.9.2.D
+This was an subscriber release.
 
-  Added --enable-devel configure option for embedded targets.
-  Added send-pr script for automatic problem report generation.
+ Major changes for release openss7-0.9.2.Drc1
+---------------------------------------------
 
-* Major changes in openss7-0.9.2.C
+First release candidate.
 
-  Distribution check for entire master package.  Trying to get master
-  package into form where it can be released as a complete package.
+   * Release candidate for Mark Fugate.
 
-* Major changes in openss7-0.9.2.B
+   * Added -enable-devel configure option for embedded targets.
 
-  Minor changes for wider release, better master packaging and bug
-  fixes.
+   * Added send-pr script for automatic problem report generation.
 
-* Initial release openss7-0.9.2.A
+This was an subscriber release.
 
-  With this release version numbers were changed to reflect an upstream
-  version only to be consistent with other OpenSS7 package releases.
-  All RPM release numbers will be -1$(PACKAGE_RPMEXTRA) and all Debian
-  release numbers will be _0.  If you wish to apply patches and
-  relelease the package, please bump up the release number and apply a
-  suitable release suffix for your organization.  We leave Debian
-  release number _1 reserved for your use, so you can still bundle the
-  source in the .dsc file.
+ Major changes for release openss7-0.9.2.C
+------------------------------------------
 
-  Major changes for this release include build against Linux 2.6 kernels
-  and popular distributions based on the 2.6 kernel as well as wider
-  distribution support.
+Distribution check for entire master package.  Trying to get master
+package into form where it can be released as a complete package.
 
-* Initial release openss7-0.9.2-1
+This was a public release.
 
-  Initial autoconf/RPM release of the OpenSS7 master package.
+ Major changes for release openss7-0.9.2.B
+------------------------------------------
 
-  This master package contains all other OpenSS7 releases.
+Minor changes for wider release, better master packaging and bug fixes.
 
+This was a public release.
+
+ Major changes for release openss7-0.9.2.A
+------------------------------------------
+
+With this release version numbers were changed to reflect an upstream
+version only to be consistent with other OpenSS7 package releases.  All
+RPM release numbers will be -1$(PACKAGE_RPMEXTRA) and all Debian
+release numbers will be _0.  If you wish to apply patches and relelease
+the package, please bump up the release number and apply a suitable
+release suffix for your organization.  We leave Debian release number
+_1 reserved for your use, so you can still bundle the source in the
+.dsc file.
+
+Major changes for this release include build against Linux 2.6 kernels
+and popular distributions based on the 2.6 kernel as well as wider
+distribution support.
+
+This was a public release.
+
+ Initial release openss7-0.9.2-1
+--------------------------------
+
+Initial autoconf/RPM release of the OpenSS7 master package.
+
+This master package contains all other OpenSS7 releases.
+
+-----
 
 =========================================================================
 
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -92,8 +114,8 @@ All Rights Reserved.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -102,8 +124,8 @@ All Rights Reserved.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -118,4 +140,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

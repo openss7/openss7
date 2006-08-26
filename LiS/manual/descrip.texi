@@ -57,8 +57,6 @@
 @c
 @c =========================================================================
 
-@unnumberedsec Description
-
 This is an @cite{OpenSS7} modified version of the sources available from
 @url{ftp://ftp.com.com/pub/linux/src/LiS-2.18.0.tgz}.
 

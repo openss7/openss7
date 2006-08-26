@@ -57,8 +57,6 @@
 @c
 @c =========================================================================
 
-@unnumberedsec Description
-
 The @value{PACKAGE_TITLE} package is the OpenSS7 Linux Native (Sockets) Kernel implementation of
 @cite{Stream Control Transmission Protocol (SCTP)}.
 

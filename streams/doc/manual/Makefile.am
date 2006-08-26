@@ -75,9 +75,11 @@ info_TEXINFOS		+= STREAMS.texi porting.texi STREAMS_FAQ.texi SPG2.texi # SPG.tex
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
+			  descrip.texi \
 			  install.texi \
-			  releases.texi \
+			  news.texi \
 			  prerequisites.texi \
+			  releases.texi \
 			  rpm.texi \
 			  testsuite.texi \
 			  tree.texi \

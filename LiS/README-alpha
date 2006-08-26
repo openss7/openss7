@@ -1,7 +1,7 @@
-Linux STREAMS (LiS) -- alpha release introduction.  2006-08-23
+Linux STREAMS (LiS) -- unstable release introduction.  2006-08-23
 $Id$
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 Linux STREAMS (LiS)
@@ -9,31 +9,9 @@ Linux STREAMS (LiS)
 
 Package LiS-2.18.4.rc3 Released 2006-08-23.
 
-This is an incremental release of Linux STREAMS (LiS).  The purpose of
-this release is to provide the technical community with a detailed
-comparison point for the OpenSS7 Linux Fast-STREAMS releases, which are
-superior and that deprecates this package.
-
-THIS CODE HAS TESTED UNSTABLE.  LOADING OR EXECUTING CODE IN THIS
-RELEASE WILL CRASH YOUR MACHINE AND COULD INADVETENTLY CAUSE DAMAGE.
-THERE IS NO WARRANTY.
+This is unstable release software.
 
 The following is an extract from the Installation and Reference Manual:
-
-5.4.2 Alpha Releases
---------------------
-
-"Alpha" release are releases that have received little to no testing,
-or that have been tested and contains known bugs or defects that make
-the package unsuitable even for testing.  The purpose for an "alpha"
-release are the same as for the pre-alpha release, with the additional
-purpose that it is an earily release of partially functional code that
-has problems that an external developer might be willing to fix
-themselves and contribute back to the project.
-
-"Alpha" release packages ship containing warnings that executing the
-code can crash machines and might possibly do damage to systems upon
-which it is executed.
 
 5.5 Bugs
 ========
@@ -41,27 +19,38 @@ which it is executed.
 5.5.1 Defect Notices
 --------------------
 
-"Linux STREAMS (LiS)", both releases from `OpenSS7' and `GCOM', contany
-many known bugs. These are unstable releases.  Although there are no
-bugs known to be harmful, the `OpenSS7 Project' has tested the release
-and found defects that cause the kernel to lock or crash. Use at your
-own risk.  Remember that there is NO WARRANTY(1) and that the package
-is no longer actively maintained.
+"Linux STREAMS (LiS)" has many and critical known defects.  This is an
+"unstable" release.  Some defects could be harmful.  Validation testing
+has been performed by the `OpenSS7 Project' on this software and it has
+revealed itself to be unstable and irreparable.  The software might not
+even configure or compile.  The `OpenSS7 Project' recommends that you
+do not use this software.  Use at your own risk.  Remember that there
+is NO WARRANTY.(1)
 
-This software has tested unstable.  As such, it can crash your kernel.
-Installation of the software could irreparably mangle your header files
-or Linux distribution in such a way as to make it unusable.  Crashes
-can lock your system and rebooting the system might not repair the
-problem.  You can loose all the data on your system.  Because this
-software locks or crashes under a large number of test cases in the
-test suite, simply running the test cases can cause locks or crashes.
-The resulting unstable system could destroy computer hardware or
-peripherals making them unusable.  You could void the warranty on any
-system on which you run this software. YOU HAVE BEEN WARNED.
+"Linux STREAMS (LiS)", both releases from `OpenSS7' and `GCOM', contain
+many known bugs. These are unstable releases.  Although there are no
+bugs known directly to be harmful, the `OpenSS7 Project' has tested the
+release and found defects that cause the kernel to lock or crash. Use
+at your own risk.  Remember that there is NO WARRANTY(2) and that the
+package is no longer actively maintained.
+
+This software is unstable software.  As such, it will lock or crash
+your kernel.  Installation of the software will irreparably mangle your
+header files or Linux distribution in such a way as to make it
+unusable.  Crashes will lock your system and rebooting the system will
+not repair the problem.  You will loose all the data on your system.
+Because this software has tested unstable in a number of test cases,
+simply running the validation test cases can cause locks or crashes.
+Because this software will lock or crash your kernel, the resulting
+unstable system can destroy computer hardware or You will void the
+warranty on any system on which you run this software.  YOU HAVE BEEN
+WARNED.
 
 ---------- Footnotes ----------
 
-(1) See section NO WARRANY under *Note GNU General Public License::.
+(1) See section NO WARRANTY under *Note GNU General Public License::.
+
+(2) See section NO WARRANTY under *Note GNU General Public License::.
 
 5.5.2 Known Defects
 -------------------
@@ -117,11 +106,45 @@ The work-around for these defects is to not use LiS at all: use the
 Fast-STREAMS', being a completely independent implemenation, does not
 suffer from this extensive set of LiS defects.
 
+5.6 Schedule
+============
+
+For the lastest developments with regard to schedule, please see the
+`TODO' file in the release package.
+
+5.7 History
+===========
+
+For the latest developments with regard to history of changes, please
+see the `ChangeLog' file in the release package.
+
+5.4.6 Unstable Releases
+-----------------------
+
+"Unstable" releases are releases that have received extensive testing
+within the project and validated on a a wide range of distributions and
+architectures; however, is has tested unstable and found to be
+suffering from critical problems and issues that cannot be resolved.
+Maintenance of the package has proven impossible.  "Unstable" release
+packages ship with known defects (and loud warnings).  Suitability of
+software in this category for production use is at the discretion of the
+user of the software.  "The OpenSS7 Project" recommends that the
+problems and issues be closely examined before this software is used
+even in a non-production evironment.  Each failing test scenario should
+be completely avoided by the application.  `OpenSS7' beta software is
+more stable that software in this category.
+
+------
+
+Although the original package is distributed under LGPL, this package is
+distributed by OpenSS7 Corporation under the GNU Public License.
+
+-----
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -142,8 +165,8 @@ suffer from this extensive set of LiS defects.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -152,8 +175,8 @@ suffer from this extensive set of LiS defects.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -168,4 +191,4 @@ suffer from this extensive set of LiS defects.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-# vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

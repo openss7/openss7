@@ -57,8 +57,6 @@
 @c
 @c =========================================================================
 
-@unnumberedsec Description
-
 The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} mopdules and drivers, libraries,
 programs, init scripts, and daemons.
 

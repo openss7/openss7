@@ -1,98 +1,84 @@
-OpenSS7 Linux Native SCTP -- history of user-visible changes.  2006-08-16
+OpenSS7 Linux Native SCTP -- history of user visible changes.  2006-08-23
 $Id: NEWS,v 0.9.2.17 2006/08/22 12:31:40 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
-See the end for copying conditions.
+See the end for copying conditions (for this file).
 
-* Major changes in sctp-0.2.24.rc3
+The sections that follow provide information on OpenSS7 releases of the
+OpenSS7 Linux Native SCTP package.
 
-  Third release candidate.
+ Major changes for release sctp-0.2.24.rc3
+------------------------------------------
 
-  This release candidate provides support for additional SuSE
-  distributions on ix86 as well as x86_64.  Added distribution support
-  includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
+This is primarily a maintenance release correcting reported bugs, but
+also includes the latest packaging improvements.
 
-  This release candidate includes the changes made to the strsctp
-  drivers at the 2006 SCTP Interop at the University of British
-  Columbia.  This version was interoperability tested with all
-  implementations present.
+   * Added `--enable-devel' `configure' option for embedded targets.
 
-* Major changes in sctp-0.2.24.rc2
+   * Added `send-pr' script for automatic problem report generation.
 
-  Second release candidate.
+   * Fixed problems with unresolved symbols on some systems.
 
-  This release candidate also contains the results of performance
-  testing of the new second generation UDP driver (implemented
-  completely in STREAMS instead of using an internal socket).
+   * Fixed glaring error in `sctp_init' preventing kernel module from
+     loading.
 
-  This release candidate also contains support for SuSE 10.1.
+   * Added init scripts and system control configuration data.
 
-* Major changes in sctp-0.2.24rc1
+   * Removed old preload approach to kernel module loading.
 
-  Release candidate for Mark Fugate.
+ Major changes for release sctp-0.2.23
+--------------------------------------
 
-* Major changes in sctp-0.2.24
+Corrections for and testing of 64-bit clean compile and test runs on
+x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
+compiler warnings.
 
-  This is primarily a maintenance release correcting reported bugs, but
-  also includes the latest packaging improvements.
+Corrected build flags for Gentoo and 2.6.15 kernels as reported on
+mailing list.
 
-  Added --enable-devel configure option for embedded targets.
-  Added send-pr script for automatic problem report generation.
+ Major changes for release sctp-0.2.22
+--------------------------------------
 
-  Fixed problems with unresolved symbols on some systems.  Fixed glaring
-  error in sctp_init preventing kernel module from loading.
+This is primarily a bug fixes release and corrections resulting from
+testing.  This is a major bug fix release.  The previous release was
+largely untested.
 
-  Added init scripts and system control configuration data.  Removed old
-  preload approach to kernel module loading.
+ Major changes for release sctp-0.2.21
+--------------------------------------
 
-* Major changes in sctp-0.2.23
+With this release version numbers were changed to reflect an upstream
+version only to be consistent with other OpenSS7 package releases.  All
+`RPM' release numbers will be `-1$(PACKAGE_RPMEXTRA)' and all `Debian'
+release numbers will be `_0'.  If you wish to apply patches and
+relelease the package, please bump up the release number and apply a
+suitable release suffix for your organization.  We leave `Debian'
+release number `_1' reserved for your use, so you can still bundle the
+source in the `.dsc' file.
 
-  Corrections for and testing of 64-bit clean compile and test runs on
-  x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
-  compiler warnings.
+Improved build process.
 
-  Corrected build flags for Gentoo and 2.6.15 kernels as reported on
-  mailing list.
+Not publicly released.
 
-* Major changes in sctp-0.2.22
+ Initial release sctp-0.2.20-1
+------------------------------
 
-  This is primarily a bug fixes release and corrections resulting from
-  testing.  This is a major bug fix release.  The previous release was
-  largely untested.
+Initial autoconf/RPM packaging of the `sctp' release.
 
-* Initial release sctp-0.2.21
+The `OpenSS7 Linux Native SCTP' existed before as a kernel patch for the
+Linux kernel.  This is an `autoconf/rpm' packaging release of `Linux
+Native SCTP' that builds and installs separate from the Linux kernel
+tree.
 
-  With this release version numbers were changed to reflect an upstream
-  version only to be consistent with other OpenSS7 package releases.
-  All `RPM' release numbers will be `-1$(PACKAGE_RPMEXTRA)' and all
-  `Debian' release numbers will be `_0'.  If you wish to apply patches
-  and relelease the package, please bump up the release number and apply
-  a suitable release suffix for your organization.  We leave `Debian'
-  release number `_1' reserved for your use, so you can still bundle the
-  source in the `.dsc' file.
+Not publicly released.
 
-  Improved build process.
-
-  Not publicly released.
-
-* Initial release sctp-0.2.20-1
-
-  Initial autoconf/RPM packaging of the `sctp' release.
-
-  The `OpenSS7 Linux Native SCTP' existed before as a kernel patch for
-  the Linux kernel.  This is an `autoconf/rpm' packaging release of
-  `Linux Native SCTP' that builds and installs separate from the Linux
-  kernel tree.
-
-  Not publicly released.
-
+-----
 
 =========================================================================
 
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
-All Rights Reserved.
+ All Rights Reserved.
 
  Permission is granted to make and distribute verbatim copies of this
  manual provided the copyright notice and this permission notice are
@@ -111,8 +97,8 @@ All Rights Reserved.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -121,8 +107,8 @@ All Rights Reserved.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -137,4 +123,4 @@ All Rights Reserved.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

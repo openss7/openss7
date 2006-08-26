@@ -75,8 +75,10 @@ info_TEXINFOS		+= strinet.texi
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
-			  releases.texi \
+			  descrip.texi \
+			  news.texi \
 			  prerequisites.texi \
+			  releases.texi \
 			  rpm.texi \
 			  tree.texi \
 			  texi/args.texi \

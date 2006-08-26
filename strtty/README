@@ -1,14 +1,30 @@
-OpenSS7 STREAMS Terminals -- readme first file.  2006-08-24
+OpenSS7 STREAMS Terminals -- read me first file.  2006-08-24
 $Id$
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-OpenSS7 STREAMS Terminals
-=======================
+ OpenSS7 STREAMS Terminals
+==========================
+
+The `OpenSS7 STREAMS Terminals' package provides "STREAMS" mopdules and
+drivers, libraries, programs, init scripts, and daemons.
+
+The `OpenSS7 STREAMS Terminals' package includes kernel modules, `SVR
+4.2' "STREAMS" drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of `OpenSS7 STREAMS Terminals' modules and drivers.
+
+This distribution is only currently applicable to `Linux' 2.4 and 2.6
+kernels and was targetted at `ix86', `x86_64', `ppc' and `ppc64'
+architectures, but should build and install for other architectures as
+well.
+
+ Downloading
+------------
 
 This is the `strtty-0.9.2.1.rc3' package.  It, and the current version,
-can be obtained from the download aread of The OpenSS7 Project
+can be obtained from the download area of The OpenSS7 Project
 (http://www.openss7.org/download.html) website using a command such as:
 
      $> wget http://www.openss7.org/tarballs/strtty-0.9.2.1.rc3.tar.bz2
@@ -33,25 +49,39 @@ Corporation (http://www.openss7.com/), or `mailto:bidulock@openss7.org'.
 
 See `README-alpha' (if it exists) for alpha release information.
 
-Prerequisites
--------------
+ Prerequisites
+--------------
 
-The following are prerequisites for building the package:
+The quickest and easiest way to ensure that all prerequisites are met
+is to download and install this package from within the `OpenSS7 Master
+Package', `openss7-0.9.2.D.rc3', instead of separately.
 
-  1. `Linux' distribution with a 2.4 or 2.6 kernel with the appropriate
-     tool chain.  For supported and tested distributions, see the
-     manual.
+Prerequisites for the OpenSS7 STREAMS Terminals package are as follows:
+
+  1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
+     with a 2.4 or 2.6 kernel and the appropriate tool chain for
+     compiling out-of-tree kenrel modules.  Most recent `Linux'
+     distributions are okay out of the box, but some development
+     packages must be installed.  For more information, see *Note
+     Compatibility::, in the manual.
 
   2. `OpenSS7 Linux Fast-STREAMS' or `OpenSS7 Modified Linux STREAMS'
      installed, such as
-     `http://www.openss7.org/tarballs/streams-0.7a.6.tar.bz2' or
-     `http://www.openss7.org/tarballs/LiS-2.18.4'.
+     `http://www.openss7.org/tarballs/streams-0.7a.6.rc3.tar.bz2' or
+     `http://www.openss7.org/tarballs/LiS-2.18.4.rc3'.
 
      (Note that the `LiS' package is deprecated and unsupported.  We
-     recommend using the `streams' package instead.)
+     recommend using the lastest  version of the `streams' package
+     instead.)
 
-  3. `OpenSS7 STREAMS Compatibility Modules' installed, such as
-     `http://www.openss7.org/tarballs/strcompat-0.9.2.4.tar.bz2'.
+  3. Most "STREAMS" packages require that the `OpenSS7 STREAMS
+     Compatibility Modules' package be installed, such as
+      `http://www.openss7.org/tarballs/strcompat-0.9.2.4.rc3.tar.bz2'.
+
+  4. Most "STREAMS" packages require that the `OpenSS7 STREAMS
+     Utilities' package be installed, such as
+      `http://www.openss7.org/tarballs/strutil-0.9.2.4.rc3.tar.bz2'.
+
 
 When configuring and building multiple `OpenSS7 Project' release
 packages, place all of the source packages (unpacked tarballs) at the
@@ -72,8 +102,8 @@ built.  If it is not the default, add `CC=kgcc' on the line after
 
      $> ../strtty-0.9.2.1.rc3/configure CC='gcc-3.4'
 
-Installation
-------------
+ Installation
+-------------
 
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
@@ -121,42 +151,8 @@ or the `Installation and Reference Manual' as listed below.  If you
 encounter troubles, see the trouble shooting section of the
 `Installation and Reference Manual' before issuing a bug report.
 
-Manual
-------
-
-More detailed installation instructions can be found in the
-`Installation and Reference Manual', contained in the distribution in
-`text', `info', `html' and `pdf' formats:
-
-     $> cd ../strtty-0.9.2.1.rc3
-     $> less doc/manual/strtty.txt
-     $> lynx doc/manual/strtty.html
-     $> info doc/manual/strtty.info
-     $> xpdf doc/manual/strtty.pdf
-
-The current manual is also always available online from `The OpenSS7
-Project' website at:
-
-     $> lynx http://www.openss7.org/strtty_manual.html
-
-Description
------------
-
-The OpenSS7 STREAMS Terminals package provides "STREAMS" mopdules and
-drivers, libraries, programs, init scripts, and daemons.
-
-The OpenSS7 STREAMS Terminals package includes kernel modules, SVR 4.2
-STREAMS drivers, modules, libraries, utilities, test programs, daemons,
-and development environment for the development and execution of
-OpenSS7 STREAMS Terminals modules and drivers.
-
-This distribution is only currently applicable to `Linux' 2.4 and 2.6
-kernels and was targetted at `ix86', `x86_64', `ppc' and `ppc64'
-architectures, but should build and install for other architectures as
-well.
-
-Brief Installation Instructions
--------------------------------
+ Brief Installation Instructions
+--------------------------------
 
 The OpenSS7 STREAMS Terminals package is available from the downloads
 area of The OpenSS7 Project website
@@ -232,11 +228,33 @@ Then the build directory and tarball can be simply removed:
      $> rm -rf strtty-0.9.2.1.rc3
      $> rm -f strtty-0.9.2.1.rc3.tar.bz2
 
+ Detailed Installation Instructions
+-----------------------------------
+
+More detailed installation instructions can be found in the
+`Installation and Reference Manual', contained in the distribution in
+`text', `info', `html' and `pdf' formats:
+
+     $> cd ../strtty-0.9.2.1.rc3
+     $> less doc/manual/strtty.txt
+     $> lynx doc/manual/strtty.html
+     $> info doc/manual/strtty.info
+     $> xpdf doc/manual/strtty.pdf
+
+The `text' version of the manual is always available in the `MANUAL'
+file in the release.
+
+The current manual is also always available online from `The OpenSS7
+Project' website at:
+
+     $> lynx http://www.openss7.org/strtty_manual.html
+
+-----
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -257,8 +275,8 @@ Then the build directory and tarball can be simply removed:
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -267,8 +285,8 @@ Then the build directory and tarball can be simply removed:
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the

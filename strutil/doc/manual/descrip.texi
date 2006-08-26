@@ -57,8 +57,6 @@
 @c
 @c =========================================================================
 
-@unnumberedsec Description
-
 The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and drivers, programs and
 daemons for adminstration and handling of the @dfn{STREAMS} subsystem.
 

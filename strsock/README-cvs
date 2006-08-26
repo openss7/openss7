@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Sockets -- CVS procedures.  2006-08-23
-$Id: README-cvs.in,v 1.1.2.1 2006/08/24 17:00:22 brian Exp $
+OpenSS7 STREAMS Sockets -- read me CVS file.  2006-08-23
+$Id$
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -12,7 +12,7 @@ The following is an extract from the manual to assist CVS developers:
 If you are a subscriber or sponsor of The OpenSS7 Project
 (http://www.openss7.org/) with CVS archive access privileges then you
 can download release, mid-release or release candidate versions of the
-`SOCK' package from the project CVS archive.
+`strsock' package from the project CVS archive.
 
 The OpenSS7 STREAMS Sockets package is located in the `strsock' module
 of `/var/cvs'.  For release tag information, see *Note Releases::.
@@ -32,7 +32,7 @@ For more information, see `cvs(1)'.
  Preparing the CVS Working Directory
 ....................................
 
-Although public releases of the `SOCK' package do not require
+Although public releases of the `strsock' package do not require
 reconfiguration, creating a configurable directory from the CVS archive
 requires tools not normally distributed with the other releases.
 
@@ -143,8 +143,8 @@ under the `/usr/src' directory.
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -165,8 +165,8 @@ under the `/usr/src' directory.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -175,8 +175,8 @@ under the `/usr/src' directory.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -191,4 +191,4 @@ under the `/usr/src' directory.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

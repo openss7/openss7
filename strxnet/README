@@ -1,247 +1,263 @@
-OpenSS7 STREAMS XTI/TLI Library -- readme first file.  2006-07-03
-$Id: README,v 0.9.2.7 2006/07/09 10:33:29 brian Exp $
+OpenSS7 XTI/TLI Networking -- read me first file.  2006-08-23
+$Id$
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-OpenSS7 STREAMS XTI/TLI Library (X/Open Transport Interface)
-================================
+ OpenSS7 XTI/TLI Networking
+===========================
 
-This is the strxnet-0.9.2.9 package.  It, and the current version, can
-be obtained from the download area of The OpenSS7 Project website at
-http://www.openss7.org/download.html as strxnet-0.9.2.9.tar.bz2 using a
-command such as
+The `OpenSS7 XTI/TLI Networking' package includes kernel modules, `SVR
+4.2' "STREAMS" drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of `X/Open Networking (XNET)' protocol stack components and
+applications for the `SVR 4.2' "STREAMS" environment.
 
-	wget http://www.openss7.org/tarballs/strxnet-0.9.2.9.tar.bz2
+This distribution is only currently applicable to `Linux' 2.4 and 2.6
+kernels and was targetted at `ix86', `x86_64', `ppc' and `ppc64'
+architectures, but should build and install for other architectures as
+well.
 
-Please see the NEWS file for release notes and history of user visible
-changes for the current version, and the ChangeLog file for a more
-detailed history of implementation changes.  The TODO file lists
-features not yet implemented or other outstanding items.
+ Downloading
+------------
 
-Please see the INSTALL, INSTALL-strxnet and README-make files (or the
-installation and reference manual) for installation instructions.  When
-working from CVS, please see the README-cvs file.  An abbreviated
-installation procedure that works for most applications appears below.
+This is the `strxnet-0.9.2.9.rc3' package.  It, and the current
+version, can be obtained from the download area of The OpenSS7 Project
+(http://www.openss7.org/download.html) website using a command such as:
+
+     $> wget http://www.openss7.org/tarballs/strxnet-0.9.2.9.rc3.tar.bz2
+
+Please see the `NEWS' file for release notes and history of user visible
+changes for the current version, and the `ChangeLog' file for a more
+detailed history of implementation changes.  The `TODO' file lists
+features not yet implemented and other outstanding items.
+
+Please see the `INSTALL', `INSTALL-strxnet' and `README-make' files (or
+the `Installation and Reference Manual') for installation instructions.
+When working from CVS or git, please see the `README-cvs' file.  An
+abbreviated installation procedure that works for most applications
+appears below.
 
 This release of the package is published strictly under Version 2 of the
-GNU Public License which can be found in the file COPYING.  Package
-specific licensing terms (if any) can be found in the file LICENSING.
+`GNU Public License' which can be found in the file `COPYING'.  Package
+specific licensing terms (if any) can be found in the file `LICENSING'.
 Please respect these licensing arrangements.  If you are interested in
 different licensing terms, please contact the copyright holder, OpenSS7
-Corporation, http://www.openss7.com/ or mailto:bidulock@openss7.org.
+Corporation (http://www.openss7.com/), or `mailto:bidulock@openss7.org'.
 
-See README-alpha (if it exists) for alpha release information.
+See `README-alpha' (if it exists) for alpha release information.
 
-Prerequisites
+ Prerequisites
+--------------
+
+Prerequisites for the OpenSS7 XTI/TLI Networking package are as follows:
+
+   * A fairly LSB compliant GNU/Linux distribution.  (1)
+
+   * Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.17)
+
+   * glibc2 or better.
+
+   * GNU info (for info files).
+
+   * GNU groff (for man pages).  (2)
+
+   * OpenSS7 Linux Fast-STREAMS (streams-0.7a.6
+      <http://www.openss7.org/tarballs/streams-0.7a.6.tar.bz2> or better)
+     (3)
+
+   * OpenSS7 STREAMS Compatibility Modules (strcompat-0.9.2.4
+      <http://www.openss7.org/tarballs/strcompat-0.9.2.4.tar.bz2> or
+     better)
+
+   * OpenSS7 STREAMS XNS (strxns-0.9.2.4
+      <http://www.openss7.org/tarballs/strxns-0.9.2.4.tar.bz2> or better)
+
+When configuring and building multiple `OpenSS7 Project' release
+packages, place all of the source packages (unpacked tarballs) at the
+same directory level and all build directories at the same directory
+level.
+
+When installing packages that install as kernel modules, it is
+necessary to have the correct kernel development package installed.
+For the following distributions, use the following commands:
+
+     Ubuntu:  $> apt-get install linux-headers
+     Debain:  $> apt-get install kernel-headers
+     Fedora:  $> yum install kernel-devel
+
+You also need the same version of gcc compiple with which the kernel was
+built.  If it is not the default, add `CC=kgcc' on the line after
+`./configure', for example:
+
+     $> ../strxnet-0.9.2.9.rc3/configure CC='gcc-3.4'
+
+ Installation
 -------------
-
-The following are prerequisites for building the package:
-
- 1. Linux distribution with a 2.4 or 2.6 kernel with the appropriate
-    tool chain.  For supported and tested distributions, see the manual.
-
- 2. OpenSS7 Linux Fast-STREAMS or OpenSS7 Modified Linux STREAMS
-    installed, such as
-    http://www.openss7.org/tarballs/streams-0.7a.6.tar.bz2 or
-    http://www.openss7.org/tarballs/LiS-2.18.4.tar.bz2
-
-    (Note that the `LiS' package is deprecated.  We recommend using the
-    `streams' package instead.)
-
- 3. OpenSS7 STREAMS Compatibility Modules installed, such as
-    http://www.openss7.org/tarballs/strcompat-0.9.2.4.tar.bz2
-
- 4. OpenSS7 STREAMS XNS installed, such as
-    http://www.openss7.org/tarballs/strxns-0.9.2.4.tar.bz2
-
-When configuring and building multiple OpenSS7 Project release packages,
-place all of the source packages (unpackaged tarballs) at the same
-directory level and all build directories at the same directory level.
-
-When installing packages that install as kernel modules, it is necessary
-to have the correct kernel development package installed.  For the
-following distributions, use the following commands:
-
-    Ubuntu:  apt-get install linux-headers
-    Debian:  apt-get install kernel-headers
-    Fedora:  yum install kernel-devel
-
-You also need the same version of gcc compiler with which the kernel
-was built.  If it is not the default, add CC=kgcc on the line after
-./configure, for example:
-
-	../strxnet-0.9.2.9/configure CC='gcc-3.4'
-
-Installation
-------------
 
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-	wget http://www.openss7.org/tarballs/strxnet-0.9.2.9.tar.bz2
-	tar -xjvf strxnet-0.9.2.9.tar.bz2
-	mkdir build
-	pushd build
-	../strxnet-0.9.2.9/configure --enable-autotest
-	make
-	make check
-	sudo make install
-	sudo make installcheck
-	sudo make uninstall
-	popd
-	sudo rm -rf build
-	rm -rf strxnet-0.9.2.9.
-	rm -f strxnet-0.9.2.9.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strxnet-0.9.2.9.rc3.tar.bz2
+     $> tar -xjvf strxnet-0.9.2.9.rc3.tar.bz2
+     $> mkdir build
+     $> pushd build
+     $> ../strxnet-0.9.2.9.rc3/configure --enable-autotest
+     $> make
+     $> make check
+     $> sudo make install
+     $> sudo make installcheck
+     $> sudo make uninstall
+     $> popd
+     $> sudo rm -rf build
+     $> rm -rf strxnet-0.9.2.9.rc3
+     $> rm -f strxnet-0.9.2.9.rc3.tar.bz2
 
-If you have problems, try building with the logging targets instead.  If
-the make of a logging target fails, an automatic problem report will be
-generated that can be mailed to The OpenSS7 Project.  Installation using
-the logging targets proceeds as follows:
+If you have problems, try building with the logging targets instead.
+If the make of a logging target fails, an automatic problem report will
+be generated that can be mailed to The OpenSS7 Project
+(mailto:bugs@openss7.org).  Installation steps using the logging
+targets proceed as follows:
 
-	wget http://www.openss7.org/tarballs/strxnet-0.9.2.9.tar.bz2
-	tar -xjvf strxnet-0.9.2.9.tar.bz2
-	mkdir build
-	pushd build
-	../strxnet-0.9.2.9/configure --enable-autotest
-	make compile.log
-	make check.log
-	sudo make install.log
-	sudo make installcheck.log
-	sudo make uninstall.log
-	popd
-	sudo rm -rf build
-	rm -rf strxnet-0.9.2.9.
-	rm -f strxnet-0.9.2.9.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strxnet-0.9.2.9.rc3.tar.bz2
+     $> tar -xjvf strxnet-0.9.2.9.rc3.tar.bz2
+     $> mkdir build
+     $> pushd build
+     $> ../strxnet-0.9.2.9.rc3/configure --enable-autotest
+     $> make compile.log
+     $> make check.log
+     $> sudo make install.log
+     $> sudo make installcheck.log
+     $> sudo make uninstall.log
+     $> popd
+     $> sudo rm -rf build
+     $> rm -rf strxnet-0.9.2.9.rc3
+     $> rm -f strxnet-0.9.2.9.rc3.tar.bz2
 
-See README-make for additional specialized make targets.
+See `README-make' for additional specialized make targets.
 
-For custom applications, see the INSTALL and INSTALL-strxnet files or
-the installation and reference manual as listed below.  If you encounter
-troubles, see the trouble shooting section of the installation and
-reference manual before issuing a bug report.
+For custom applications, see the `INSTALL' and `INSTALL-strxnet' files
+or the `Installation and Reference Manual' as listed below.  If you
+encounter troubles, see the trouble shooting section of the
+`Installation and Reference Manual' before issuing a bug report.
 
-Manual
-------
+ Brief Installation Instructions
+--------------------------------
 
-More detailed installation instructions can be found in the Installation
-and Reference Manual, contained in the distribution in `text', `info',
-`html', and `pdf' formats:
+The OpenSS7 XTI/TLI Networking package is available from the downloads
+area of The OpenSS7 Project website
+(http://www.openss7.org/download.html) using a command such as:
 
-	cd ../strxnet-0.9.2.9
-	less doc/manual/strxnet.txt
-	lynx doc/manual/strxnet.html
-	info -f doc/manual/strxnet.info
-	xpdf doc/manual/strxnet.pdf
-
-The current manual is also always available online from The OpenSS7
-Project website at:
-
-	lynx http://www.openss7.org/strxnet_manual.html
-
-Description
------------
-
-The OpenSS7 STREAMS XTI/TLI Library package includes kernel modules, SVR
-4.2 STREAMS drivers, modules, libraries, utilities, test programs,
-daemons, and development environment for the development and execution
-of X/Open Networking (XNET) protocol stack components and applications
-for the SVR 4.2 STREAMS environment.
-
-This distribution is only currently applicable to 2.4 kernels and was
-targetted at ix86, x86_64, ppc and ppc64 architectures, but should build
-and install for other architectures as well.
-
-The OpenSS7 STREAMS XTI/TLI Libarary package includes kernel modules,
-SVR 4.2 STREAMS drivers, modules, libraries, utilities, test programs,
-daemons, and development environment for the development and execution
-of X/Open Networking (XNET) protocol stack components and applications
-for the SVR 4.2 STREAMS environment.
-
-This distribution is only currently applicable to 2.4 and 2.6 kernels
-and was targetted at ix86, x86_64, ppc and ppc64 architectures, but
-should build and install for other architectures as well.
-
-Brief Installation Instructions
--------------------------------
-
-The OpenSS7 STREAMS XTI/TLI Library package is available from the
-downloads area of The OpenSS7 Project website:
-<http://www.openss7.org/download.html> using a command such as:
-
-	wget http://www.openss7.org/tarballs/strxnet-0.9.2.9.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strxnet-0.9.2.9.rc3.tar.bz2
 
 Unpack the tarball using a command such as:
 
-	tar -xjvf strxnet-0.9.2.9.tar.bz2
+     $> tar -xjvf strxnet-0.9.2.9.rc3.tar.bz2
 
 The tarball will unpack into the relative subdirectory named after the
-package name: strxnet-0.9.2.9  The package builds using the GNU autoconf
-utilities and the `configure' script.  To build the package, we
-recommend using a separate build directory as follows:
+package name: strxnet-0.9.2.9.rc3.
 
-	mkdir build
-	cd build
-	../strxnet-0.9.2.9/configure
+The package builds using the GNU `autoconf' utilities and the
+`configure' script.  To build the package, we recommend using a separate
+`build' directory as follows:
+
+     $> mkdir build
+     $> cd build
+     $> ../strxnet-0.9.2.9.rc3/configure
 
 In general, the package configures and builds without adding any special
-options to the configure script.  For general options to the configure
-script, see the GNU `INSTALL' file in the distribution:
+options to the `configure' script.  For general options to the
+`configure' script, see the GNU `INSTALL' file in the distribution:
 
-	less ../strxnet-0.9.2.9/INSTALL
+     $> less ../strxnet-0.9.2.9.rc3/INSTALL
 
-For specific options to the configure script, see the INSTALL-strxnet
-file in the distribution, or simply execute the configure script with
-the --help option like so:
+For specific options to the `configure' script, see the
+`INSTALL-strxnet' file in the distribution, or simply execute the
+configure script with the `--help' option like so:
 
-	../strxnet-0.9.2.9/configure --help
+     $> ../strxnet-0.9.2.9.rc3/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the `make' command:
 
-	make
+     $> make
 
-Some specialized makefile targets exist, see the README-make file in the
-distribution or simply invoke the `help' target like so:
+Some specialized makefile targets exists, see the `README-make' file in
+the distribution or simply invoke the `help' target like so:
 
-	make help
+     $> make help | less
 
 After successfully building the package, the package can be checked by
 invoking the `check' make target like so:
 
-	make check
+     $> make check
 
-After successfully checking the package, the package can be installed by
+After succesffully checking the package, the package can be installed by
 invoking the `install' make target (as root) like so:
 
-	sudo make install
+     $> sudo make install
 
 The testsuites that ship with the package can be invoked after the
 package has been installed by invoking the `installcheck' target.  This
 target can either be invoked as root, or as a normal user, like so:
 
-	make installcheck
+     $> make installcheck
 
-(Note: you must add the --enable-autotest flag to `configure', above for
- the testsuites to be invoked with `make installcheck'.)
+(Note: you must add the `--enable-autotest' flag to `configure', above
+for the testsuites to be invoked with `make installcheck'.)
 
 The package can be cleanly removed by invoking the `uninstall' target
 (as root):
 
-	sudo make uninstall
+     $> sudo make uninstall
 
 Then the build directory and tarball can be simply removed:
 
-	cd ..
-	rm -rf build
-	rm -rf strxnet-0.9.2.9
-	rm -f strxnet-0.9.2.9.tar.bz2
+     $> cd ..
+     $> rm -rf build
+     $> rm -rf strxnet-0.9.2.9.rc3
+     $> rm -f strxnet-0.9.2.9.rc3.tar.bz2
 
+ Detailed Installation Instructions
+-----------------------------------
+
+More detailed installation instructions can be found in the
+`Installation and Reference Manual', contained in the distribution in
+`text', `info', `html' and `pdf' formats:
+
+     $> cd ../strxnet-0.9.2.9.rc3
+     $> less doc/manual/strxnet.txt
+     $> lynx doc/manual/strxnet.html
+     $> info doc/manual/strxnet.info
+     $> xpdf doc/manual/strxnet.pdf
+
+The `text' version of the manual is always available in the `MANUAL'
+file in the release.
+
+The current manual is also always available online from `The OpenSS7
+Project' website at:
+
+     $> lynx http://www.openss7.org/strxnet_manual.html
+
+---------- Footnotes ----------
+
+(1) *Note GNU/Linux Distributions::, for more information.
+
+(2) If you are using a Debian release, please make sure to install the
+groff extension package (`groff_ext'), as it contains the `refer' or
+`grefer' commands necessary for including references in the manual
+pages.
+
+(3) Although this an other OpenSS7 STREAMS packages will build and
+install with Linux STREAMS (LiS), Linux STREAMS (LiS) is deprecated and
+cannot be supported because it is full of bugs!
+
+-----
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -262,8 +278,8 @@ Then the build directory and tarball can be simply removed:
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -272,8 +288,8 @@ Then the build directory and tarball can be simply removed:
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the

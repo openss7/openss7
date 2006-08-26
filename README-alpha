@@ -9,24 +9,9 @@ OpenSS7 Master Package
 
 Package openss7-0.9.2.D.rc3 Released 2006-08-23.
 
+This is beta release software.
+
 The following is an extract from the Installation and Reference Manual:
-
-5.4.3 Beta Releases
--------------------
-
-"Beta" releases are releases that have received some testing, but the
-testing to date is not exhaustive.  "Beta" release packages do not ship
-with known defects.  All known defects are respolved before
-distribution; however, as exhaustive testing has not been performed,
-unknown defects may exist.  The purpose for a "beta" release is to
-provide a baseline for other organizations to participate in the
-rigorous testing of the package.
-
-"Beta" release packages ship containing warnings that the package has
-not been exhaustively tested and that the package may cause systems to
-crash.  Suitability of software in this category for production use is
-not advised by the project; however, as always, is at the discretion of
-the user of the software.
 
 5.5 Bugs
 ========
@@ -49,7 +34,7 @@ distribution in such a way as to make it unusable.  Crashes could lock
 your system and rebooting the system might not repair the problem.  You
 can possibly loose all the data on your system.  Because this software
 might crash your kernel, the resulting unstable system could possibly
-destroy computer hardware or peripherals making them ususable.  You
+destroy computer hardware or peripherals making them unusable.  You
 might void the warranty on any system on which you run this software.
 YOU HAVE BEEN WARNED.
 
@@ -77,11 +62,29 @@ For the lastest developments with regard to schedule, please see the
 For the latest developments with regard to history of changes, please
 see the `ChangeLog' file in the release package.
 
+5.4.3 Beta Releases
+-------------------
+
+"Beta" releases are releases that have received some testing, but the
+testing to date is not exhaustive.  "Beta" release packages do not ship
+with known defects.  All known defects are resolved before
+distribution; however, as exhaustive testing has not been performed,
+unknown defects may exist.  The purpose for a "beta" release is to
+provide a baseline for other organizations to participate in the
+rigorous testing of the package.
+
+"Beta" release packages ship containing warnings that the package has
+not been exhaustively tested and that the package may cause systems to
+crash.  Suitability of software in this category for production use is
+not advised by the project; however, as always, is at the discretion of
+the user of the software.
+
+-----
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -102,8 +105,8 @@ see the `ChangeLog' file in the release package.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -112,8 +115,8 @@ see the `ChangeLog' file in the release package.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the

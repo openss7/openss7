@@ -1,19 +1,30 @@
-OpenSS7 STREAMS Sockets -- history of user-visible changes.  2006-08-23
+OpenSS7 STREAMS Sockets -- history of user visible changes.  2006-08-23
 $Id: NEWS,v 0.9.2.1 2006/08/23 10:03:51 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-* Initial release strsock-0.9.2.1
+The sections that follow provide information on OpenSS7 releases of the
+OpenSS7 STREAMS Sockets package.
 
-  Initial autoconf/RPM packaging of the `strsock' release.
+ Major changes for release strsock-0.9.2.1.rc3
+----------------------------------------------
 
-  This is the initial release of the OpenSS7 STREAMS Sockets package
-  for Linux Fast-STREAMS.  This is the first ever STREAMS Sockets
-  package for Linux.  It is initially included in a separate package
-  from STREAMS, but, after Linux Fast-STREAMS is production grade, this
-  terminals package will be rolled back into the streams package as LiS
-  is deprecated.
+Added `--enable-devel' `configure' option for embedded targets.  Added
+`send-pr' script for automatic problem report generation.
+
+ Initial release strsock-0.9.2.1
+--------------------------------
+
+Initial autoconf/RPM packaging of the `strsock' release.
+
+This is the initial release of the `OpenSS7 STREAMS Sockets' package
+for `Linux Fast-STREAMS'.  The ability to include precompiled STREAMS
+binaries was formerly part of the `Linux STREAMS' package, however, as
+the ability is also applicable to `Linux Fast-STREAMS', it was removed
+into a separate package.  Once `Linux Fast-STREAMS' is production
+grade, this binary compatibility suite will be rolled back into the
+streams package as `LiS' is deprecated.
 
 -----
 
@@ -67,4 +78,4 @@ See the end for copying conditions (for this file).
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

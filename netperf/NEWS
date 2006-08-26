@@ -1,88 +1,81 @@
-OpenSS7 Netperf -- history of user-visible changes.  2006-08-16
+OpenSS7 NETPERF Utility -- history of user visible changes.  2006-08-23
 $Id: NEWS,v 1.1.2.16 2006/08/22 12:41:32 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-* Major changes in netperf-2.3.4.rc3
+The sections that follow provide information on OpenSS7 releases of the
+OpenSS7 NETPERF Utility package as well as compatibility information of
+OpenSS7 releases to the original Hewlett-Packard Company releases.
 
-  Third release candidate.
+ Major changes for release netperf-2.3.4.rc3
+--------------------------------------------
 
-  This release candidate provides support for additional SuSE
-  distributions on ix86 as well as x86_64.  Added distribution support
-  includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
+Added `--enable-devel' `configure' option for embedded targets.  Added
+`send-pr' script for automatic problem report generation.
 
-  This release candidate includes the changes made to the strsctp
-  drivers at the 2006 SCTP Interop at the University of British
-  Columbia.  This version was interoperability tested with all
-  implementations present.
+ Major changes for release netperf-2.3.3
+----------------------------------------
 
-* Major changes in netperf-2.3.4.rc2
+This release is primarily to support additional compilers (gcc 4.0.2),
+architectures (x86_64, SMP, 32-bit compatibility), recent Linux
+distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
 
-  Second release candidate.
+Corrections for and testing of 64-bit clean compile and test runs on
+x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
+compiler warnings.
 
-  This release candidate also contains the results of performance
-  testing of the new second generation UDP driver (implemented
-  completely in STREAMS instead of using an internal socket).
+ Major changes for release netperf-2.3.2
+----------------------------------------
 
-  This release candidate also contains support for SuSE 10.1.
+Many corrections (but not enough) are included to use the package for
+XTI INET testing.  UDP works now, but TCP is not completely corrected
+yet (and, therefore, neither is SCTP).  These capabilities could not
+have possibly worked in the original `netperf-2.3' release.  The next
+release should have TCP and SCTP corrected for XTI.
 
-* Major changes in netperf-2.3.4rc1
+Corrections included to make the package cross-build for `NexusWare' as
+well as recent 2.6.14 (FC4) kernels.
 
-  Release candidate for Mark Fugate.
+What remains to be done is to merge in the latest upstream release of
+netperf into this package and contribute XTI corrections back upstream.
 
-* Major changes in netperf-2.3.4
+ Initial release netperf-2.3.1
+------------------------------
 
-  Added --enable-devel configure option for embedded targets.
-  Added send-pr script for automatic problem report generation.
+Initial autoconf/RPM packaging of the `netperf' release.  It is based
+on the Hewlett-Packard Company `netperf-2.3' release.
 
-* Major changes in netperf-2.3.3
+This release provides modifications to support the Stream Control
+Transmission Protocol (SCTP) and provides tests for the Sockets API for
+the OpenSS7 Linux Native Kernel version of SCTP as well as tests for
+the XTI API for the OpenSS7 STREAMS version of SCTP.  In addition, use
+of the XTI API for TCP and UDP tests is supported using the OpenSS7
+STREAMS INET package.
 
-  This release is primarily to support additional compilers (gcc 4.0.2),
-  architectures (x86_64, SMP, 32-bit compatibility), recent Linux
-  distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
+SCTP Sockets API tests depend upon the availability of an the OpenSS7
+Sockets implementation of SCTP in an OpenSS7 patched kernel.  Some
+binary kernels and prepatched kernel source for popular architectures
+are provided as RPMs from the OpenSS7 Project download page
+(http://www.openss7.org/download.html).
 
-  Corrections for and testing of 64-bit clean compile and test runs on
-  x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
-  compiler warnings.
+SCTP XTI API tests depend upon the availability of the OpenSS7 STREAMS
+implementation of SCTP.  Some binary and source packages for `LiS
+STREAMS', `Linux Fast-STREAMS', the `strxnet' XTI/TLI library and the
+`strsctp' package are available from the OpenSS7 Project download page
+(http://www.openss7.org/download.html).  *Note Introduction:
+(libxnet)Top.
 
-* Major changes in netperf-2.3.2
+Under Linux, the TCP and UDP XTI API tests depend upon the availability
+of the OpenSS7 INET driver.  Some binary and source packages for `LiS
+STREAMS', `Linux Fast-STREAMS', the `strxnet' XTI/TLI library and the
+`strinet' package (*note Introduction: (strinet)Top.) are available from
+the OpenSS7 Project download page
+(http://www.openss7.org/download.html).  *Note Introduction:
+(libxnet)Top.
 
-  Many corrections (but not enough) are included to use the package for
-  XTI INET testing.  UDP works now, but TCP is not completely corrected
-  yet (and, therefore, neither is SCTP).  These capabilities could not
-  have possibly worked in the original `netperf-2.3' release.  The next
-  release should have TCP and SCTP corrected for XTI.
-
-  Corrections included to make the package cross-build for `NexusWare'
-  as well as recent 2.6.14 (FC4) kernels.
-
-  What remains to be done is to merge in the latest upstream release of
-  netperf into this package and contribute XTI corrections back
-  upstream.
-
-* Initial release netperf-2.3.1
-
-  With this release version numbers were changed to reflect an upstream
-  version only to be consistent with other OpenSS7 package releases.
-  All RPM release numbers will be -1$(PACKAGE_RPMEXTRA) and all Debian
-  release numbers will be _0.  If you wish to apply patches and
-  relelease the package, please bump up the release number and apply a
-  suitable release suffix for your organization.  We leave Debian
-  release number _1 reserved for your use, so you can still bundle the
-  source in the .dsc file.
-
-* Initial release netperf-2.3-1
-
-  Initial autoconf/rpm packaging release of Netperf.
-
-  This is an autoconf/rpm release of Netperf suitable for use with
-  OpenSS7 STREAMS SCTP (Stream Control Transmission Protocol),
-  STREAMS/LiS INET and STREAMS/LiS DLPI.  It is usable for performance
-  testing STREAMS SCTP/INET/DLPI as well as sockets versions of OpenSS7
-  Linux Native SCTP as well as sockets versions of INET.
-
-  Not publicly released.
+This release also provides updates to the antiquated `netperf-2.1'
+release documentation distributed with `netperf-2.3'.
 
 -----
 
@@ -136,4 +129,4 @@ See the end for copying conditions (for this file).
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

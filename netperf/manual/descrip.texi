@@ -57,8 +57,6 @@
 @c
 @c =========================================================================
 
-@unnumberedsec Description
-
 @cite{@value{PACKAGE_TITLE}} is a general purpose tool for benchmarking bandwidth and performance of
 the @cite{Internet Protocol} suite.  The @cite{@value{PACKAGE_TITLE}} package is an @cite{OpenSS7}
 modified release of the @cite{Hewlett-Packard} @file{netperf} package configured to run with

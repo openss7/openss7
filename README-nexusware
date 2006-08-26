@@ -1,7 +1,7 @@
-OpenSS7 Master Package -- NexusWare procedures.  2006-08-23
+OpenSS7 Master Package -- read me CVS file.  2006-08-23
 $Id$
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The following is an extract from the manual to assist NexusWare developers:

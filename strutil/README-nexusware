@@ -1,7 +1,7 @@
-OpenSS7 STREAMS Utilities -- NexusWare procedures.  2006-08-24
+OpenSS7 STREAMS Utilities -- read me CVS file.  2006-08-24
 $Id$
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The following is an extract from the manual to assist NexusWare developers:
@@ -137,7 +137,7 @@ to `./configure.nexusware'.
 
 Because `NexusWare' does not include an `/etc/modules.conf' file by
 default, it will be necessary to add one or edit your `rc.4' file to `insmod(8)'
-the necessary `OpenSS7' modules at boot time.
+the necessary `strutil' modules at boot time.
 
 `NexusWare' does not configure its kernels for CONFIG_KMOD, so any
 kernel modules must be loaded by the `rc.4' init script at boot.  On
@@ -151,7 +151,7 @@ these objects to be included in the flash file system.  It is important
 that this second build of the kernel image be the same as the first.
 
 When modifying and rebuilding a `NexusWare' kernel, it will be
-necessary to rebuild and install `OpenSS7'.  Simply perform the last
+necessary to rebuild and install `strutil'.  Simply perform the last
 `make install-strip' stage or start again with `./configure.nexusware'.
 You can place the unpacked tarball in
 `$NEXUSWARE_PREFIX/usr/src/strutil', and add the following to the
@@ -167,6 +167,10 @@ step process instead of dual pass:
              (cd usr/src/pti; $(MAKE))
              (cd drivers; $(MAKE))
              (cd utility; $(MAKE))
+     #       uncomment for LiS build
+     #       (cd usr/src/LiS; ./configure.nexusware; $(MAKE) install-strip)
+     #       uncomment for LfS build
+             (cd usr/src/streams; ./configure.nexusware; $(MAKE) install-strip)
      #       uncomment for strutil build
      #       (cd usr/src/strutil; ./configure.nexusware; $(MAKE) install-strip)
              (cd build/generic; $(MAKE))

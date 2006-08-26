@@ -1,4 +1,4 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
 @c @(#) $Id$
@@ -57,5 +57,31 @@
 @c
 @c =========================================================================
 
-@unnumberedsec Description
+Package @command{@value{PACKAGE}-@value{VERSION}} Released @value{PACKAGE_DATE}.
 
+This is the @cite{@value{PACKAGE_TITLE}} package.  It consists of a master package that contains all
+other @uref{http://www.openss7.org/, OpenSS7 Project} package releases.  Use this package if you are
+interested in ease of installation of a wide range of @uref{http://www.openss7.org/, OpenSS7
+Project} packages.
+
+The @cite{@value{PACKAGE_TITLE}} package contains:
+
+@command{sctp-@value{VERSION_SCTP}} (@cite{Linux Native Sockets SCTP}), @*
+@command{iperf-@value{VERSION_IPERF}} (@cite{Internet Performance}), @*
+@command{streams-@value{VERSION_STREAMS}} (@cite{Linux Fast-STREAMS}), @*
+@command{strcompat-@value{VERSION_STRCOMPAT}} (@cite{STREAMS Compatibility Modules}), @*
+@command{strutil-@value{VERSION_STRUTIL}} (@cite{STREAMS Utilities}), @*
+@command{strbcm-@value{VERSION_STRBCM}} (@cite{STREAMS Binary Compatibility Module}), @*
+@command{strtty-@value{VERSION_STRTTY}} (@cite{STREAMS Terminals}), @*
+@command{strxns-@value{VERSION_STRXNS}} (@cite{STREAMS X/Open Networking Services}), @*
+@command{strxnet-@value{VERSION_STRXNET}} (@cite{STREAMS X/Open Networking}), @*
+@command{strsock-@value{VERSION_STRSOCK}} (@cite{STREAMS Sockets}), @*
+@command{strinet-@value{VERSION_STRINET}} (@cite{STREAMS Internet}), @*
+@command{strsctp-@value{VERSION_STRSCTP}} (@cite{STREAMS SCTP}), @*
+@command{striso-@value{VERSION_STRISO}} (@cite{STREAMS Open Systems Interconnect}), @*
+@command{netperf-@value{VERSION_NETPERF}} (@cite{Network Performance}), @*
+@command{strss7-@value{VERSION_STRSS7}} (@cite{STREAMS SS7/Voip/SIGTRAN/ISDN Stacks}) and @*
+@command{LiS-@value{VERSION_LIS}} (@cite{Linux STREAMS}).
+
+If you need to build an install a significant number of these packages, the
+@cite{@value{PACKAGE_TITLE}} package is the easiest way to do so.

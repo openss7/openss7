@@ -1,5 +1,5 @@
-OpenSS7 Master Package -- CVS procedures.  2006-08-23
-$Id: README-cvs.in,v 1.1.2.1 2006/08/24 17:00:20 brian Exp $
+OpenSS7 Master Package -- read me CVS file.  2006-08-23
+$Id$
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -14,8 +14,8 @@ If you are a subscriber or sponsor of The OpenSS7 Project
 can download release, mid-release or release candidate versions of the
 `OpenSS7' package from the project CVS archive.
 
-The OpenSS7 Master Package package is located in the `os7' module
-of `/var/cvs'.  For release tag information, see *Note Releases::.
+The OpenSS7 Master Package package is located in the `os7' module of
+`/var/cvs'.  For release tag information, see *Note Releases::.
 
 To access the archive from the project CVS pserver, use the following
 commands to check out a version from the archive:
@@ -100,8 +100,8 @@ commands on the working directory:
 
      % autoreconf -fiv os7
 
-where, `os7' is the name of the directory to where the working copy
-was checked out under the previous step.  This command generates the
+where, `os7' is the name of the directory to where the working copy was
+checked out under the previous step.  This command generates the
 `configure' script and other missing pieces that are normally
 distributed with the release Tar Balls, SRPMs and DSCs.
 
@@ -143,8 +143,8 @@ under the `/usr/src' directory.
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -165,8 +165,8 @@ under the `/usr/src' directory.
  which is licensed free of charge, as they might when working
  professionally.
 
- Formatted or processed versions of this manual, if unaccompanied by
- the source, must acknowledge the copyright and authors of this work.
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
 
 -------------------------------------------------------------------------
 
@@ -175,8 +175,8 @@ under the `/usr/src' directory.
  provisions apply to you.  If the Software is supplied by the Department
  of Defense ("DoD"), it is classified as "Commercial Computer Software"
  under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and the
- Government is acquiring only the license rights granted herein (the
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
  license rights customarily provided to non-Government users).  If the
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
@@ -191,4 +191,4 @@ under the `/usr/src' directory.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

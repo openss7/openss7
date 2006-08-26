@@ -150,79 +150,7 @@ Page}.
 @section Release Notes
 @cindex release notes
 
-The sections that follow provide information on OpenSS7 releases of the @*
-@value{PACKAGE_TITLE} package.
-
-@ifnotplaintext
-@ifnothtml
-@menu
-* Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
-* Release strcompat-0.9.2.3::		Release strcompat-0.9.2.3
-* Release strcompat-0.9.2.2::		Release strcompat-0.9.2.2
-* Release strcompat-0.9.2.1::		Release strcompat-0.9.2.1
-@end menu
-@end ifnothtml
-@end ifnotplaintext
-
-@c ----------------------------------------------------------------------------
-
-@node Release @value{PACKAGE}-@value{VERSION}
-@subsection Release @value{PACKAGE}-@value{VERSION}
-@cindex release @value{PACKAGE}-@value{VERSION}
-
-Added @samp{--enable-devel} @command{configure} option for embedded targets.
-Added @command{send-pr} script for automatic problem report generation.
-
-@c ----------------------------------------------------------------------------
-
-@node Release strcompat-0.9.2.3
-@subsection Release strcompat-0.9.2.3
-@cindex release strcompat-0.9.2.3
-
-This release is primarily to support additional compilers (gcc 4.0.2), architectures (x86_64, SMP,
-32-bit compatibility), recent Linux distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels
-(2.6.15).
-
-@itemize
-@item Corrections for and testing of 64-bit clean compile and test runs on x86_64 architecture.
-Some bug corrections resulting from gcc 4.0.2 compiler warnings.
-@item Changes to satisfy gcc 4.0.2 compiler.
-@item Corrected build flags for Gentoo and 2.6.15 kernels as reported on mailing list.
-@item Corrections for and testing of 64-bit clean compile and test runs on x86_64 architecture.
-Some bug corrections resulting from gcc 4.0.2 compiler warnings.
-@item Initial corrections for and testing of SMP operation on Intel 630 Hyper-Threaded SMP on
-x86_64.  This package should now run well on N-way Xeons even with Hyper-Threading enabled.
-@item Corrections and validation of 32-bit compatibilty over 64-bit on x86_64.  Should apply well to
-other 64-bit architectures as well.
-@end itemize
-
-This is a public beta test release of the package.
-
-@c ----------------------------------------------------------------------------
-
-@node Release strcompat-0.9.2.2
-@subsection Release strcompat-0.9.2.2
-@cindex release strcompat-0.9.2.2
-
-This is primarily a bug fixes release and corrections resulting from testing.  This is a major bug
-fix release.  The previous release was largely untested.  This release has been verified
-(conformance test suite passes) for operation with @cite{Linux Fast-STREAMS}
-(@file{streams-0.7a.4}).
-
-@c ----------------------------------------------------------------------------
-
-@node Release strcompat-0.9.2.1
-@subsection Release strcompat-0.9.2.1
-@cindex release strcompat-0.9.2.1
-
-Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
-
-This is the initial release of the @cite{OpenSS7 STREAMS Compatibility} package for @cite{Linux
-Fast-STREAMS} (and LiS).  These compatibility modules were formerly part of the @cite{Linux
-Fast-STREAMS} package (@file{streams-0.7a.3}), however, as they were also applicable to @cite{LiS},
-they have been removed into a separate package.  Once @cite{Linux Fast-STREAMS} is production grade,
-these compatibility modules will be rolled back into the streams package as @cite{LiS} becomes
-deprecated.
+@include news.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -239,6 +167,7 @@ The @cite{OpenSS7 Project} adheres to the following release philosophy:
 * Beta Releases::		Beta release description
 * Gamma Releases::		Gamma release description
 * Production Releases::		Production release description
+* Unstable Releases::		Unstable release description
 @end menu
 
 @itemize
@@ -247,6 +176,7 @@ The @cite{OpenSS7 Project} adheres to the following release philosophy:
 @item beta release
 @item gamma release
 @item production release
+@item unstable release
 @end itemize
 
 @node Pre-Alpha Releases
@@ -277,7 +207,7 @@ might possibly do damage to systems upon which it is executed.
 
 @dfn{Beta} releases are releases that have received some testing, but the testing to date is not
 exhaustive.  @dfn{Beta} release packages do not ship with known defects.  All known defects are
-respolved before distribution; however, as exhaustive testing has not been performed, unknown
+resolved before distribution; however, as exhaustive testing has not been performed, unknown
 defects may exist.  The purpose for a @dfn{beta} release is to provide a baseline for other
 organizations to participate in the rigorous testing of the package.
 
@@ -313,6 +243,19 @@ category for production use on the specified target distributions and architectu
 discretion of the user.  It should not be necessary to preform validation tests on the set of
 supported target systems before considering production use.
 
+@node Unstable Releases
+@subsection Unstable Releases
+
+@dfn{Unstable} releases are releases that have received extensive testing within the project and
+validated on a a wide range of distributions and architectures; however, is has tested unstable and
+found to be suffering from critical problems and issues that cannot be resolved.  Maintenance of the
+package has proven impossible.  @dfn{Unstable} release packages ship with known defects (and loud
+warnings).  Suitability of software in this category for production use is at the discretion of the
+user of the software.  @dfn{The OpenSS7 Project} recommends that the problems and issues be closely
+examined before this software is used even in a non-production evironment.  Each failing test
+scenario should be completely avoided by the application.  @cite{OpenSS7} beta software is more
+stable that software in this category.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -341,9 +284,8 @@ License}.}
 the software will irreparably mangle your header files or Linux distribution in such a way as to
 make it unusable.  Crashes will lock your system and rebooting the system will not repair the
 problem.  You will loose all the data on your system.  Because this software will crash your kernel,
-the resulting unstable system can destroy computer hardware or peripherals making them ususable.
-You will likely void the warranty on any system on which you run this software.  YOU HAVE BEEN
-WARNED.}
+the resulting unstable system can destroy computer hardware or peripherals making them unusable.
+You will void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 @end ignore
 
 @c This is the defect notice for alpha release software
@@ -358,7 +300,7 @@ WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public Li
 the software can irreparably mangle your header files or Linux distribution in such a way as to make
 it unusable.  Crashes could lock your system and rebooting the system might not repair the problem.
 You can possibly loose all the data on your system.  Because this software can crash your kernel,
-the resulting unstable system could destroy computer hardware or peripherals making them ususable.
+the resulting unstable system could destroy computer hardware or peripherals making them unusable.
 You could void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 
 @c This is the defect notice for beta release software
@@ -376,7 +318,7 @@ software might mangle your header files or Linux distribution in such a way as t
 Crashes could lock your system and rebooting the system might not repair the problem.  You can
 possibly loose all the data on your system.  Because this software might crash your kernel, the
 resulting unstable system could possibly destroy computer hardware or peripherals making them
-ususable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
+unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
 @end ignore
 
@@ -397,7 +339,7 @@ mangle your header files or Linux distribution in such a way as to make it unusa
 possibly lock your system and rebooting the system might not repair the problem.  You can possibly
 loose all the data on your system.  Because this software stands a chance of crashing your kernel,
 the resulting unstable system could possibly destroy computer hardware or peripherals making them
-ususable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
+unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
 @end ignore
 
@@ -418,7 +360,26 @@ distribution might mangle your header files or Linux distribution in such a way 
 unusable.  Crashes could possibly lock your system and rebooting the system might not repair the
 problem.  You can possibly loose all the data on your system.  Because this software stands a chance
 of crashing your kernel, the resulting unstable system could possibly destroy computer hardware or
-peripherals making them ususable.  You might void the warranty on any system on which you run this
+peripherals making them unusable.  You might void the warranty on any system on which you run this
+software.  YOU HAVE BEEN WARNED.}
+@end ignore
+
+@c This is the defect notice for unstable release software
+@ignore
+@dfn{@value{PACKAGE_TITLE}} has many and critical known defects.  This is an @dfn{unstable} release.
+Some defects could be harmful.  Validation testing has been performed by the @cite{OpenSS7 Project}
+on this software and it has revealed itself to be unstable and irreparable.  The software might not
+even configure or compile.  The @cite{OpenSS7 Project} recommends that you @b{do not use this
+software}.  Use at your own risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section
+@b{NO WARRANTY} under @ref{GNU General Public License}.}
+
+@b{This software is @i{unstable} software.  As such, it will lock or crash your kernel.
+Installation of the software will irreparably mangle your header files or Linux distribution in such
+a way as to make it unusable.  Crashes will lock your system and rebooting the system will not
+repair the problem.  You will loose all the data on your system.  Because this software has tested
+unstable in a number of test cases, simply running the validation test cases can cause locks or
+crashes.  Because this software will lock or crash your kernel, the resulting unstable system can
+destroy computer hardware or You will void the warranty on any system on which you run this
 software.  YOU HAVE BEEN WARNED.}
 @end ignore
 

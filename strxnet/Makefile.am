@@ -457,21 +457,10 @@ include am/rpm.am
 include am/deb.am
 
 ##
-## Put the text manual where we can find it in the distribution
-##
-doc/manual/$(PACKAGE).txt:
-	make -C doc/manual $(PACKAGE).txt
-
-MANUAL: doc/manual/$(PACKAGE).txt
-	cp -f $< $@
-
-ALL_LOCAL			+= MANUAL
-
-##
 ## Rules for making release files
 ##
-RELEASE_FILES			= \
-				  README \
+MANUAL_FILE			= doc/manual/$(PACKAGE).txt
+RELEASE_FILES			= README \
 				  README-alpha \
 				  README-cvs \
 				  README-nexusware

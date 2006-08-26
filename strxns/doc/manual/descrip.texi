@@ -57,8 +57,6 @@
 @c
 @c =========================================================================
 
-@unnumberedsec Description
-
 The @cite{@value{PACKAGE_TITLE}} package contains header files and a number of modules and drivers
 and the associated documentation that were formerly contained in the @cite{OpenSS7 Linux STREAMS
 (LiS)} releases.  When development started on @cite{Linux Fast-STREAMS} in 2003, these modules were

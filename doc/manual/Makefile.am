@@ -56,9 +56,11 @@ info_TEXINFOS		=
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
+			  descrip.texi \
 			  install.texi \
-			  releases.texi \
+			  news.texi \
 			  prerequisites.texi \
+			  releases.texi \
 			  rpm.texi \
 			  testsuite.texi \
 			  tree.texi \

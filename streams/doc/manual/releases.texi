@@ -124,159 +124,7 @@ STREAMS (LiS) 2.18.0} package formerly maintained by Dave Goethe of @uref{http:/
 @section Release Notes
 @cindex release notes
 
-The sections that follow provide information on OpenSS7 releases of the
-@cite{@value{PACKAGE_TITLE}} package.
-
-@ifnotplaintext
-@ifnothtml
-@menu
-* Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
-* Release @value{PACKAGE_TARNAME}-0.7a.6.rc2::		Release 6 Candidate 2
-* Release @value{PACKAGE_TARNAME}-0.7a.6rc1::		Release 6 Candidate 1
-* Release @value{PACKAGE_TARNAME}-0.7a.5::		Release 5
-* Release @value{PACKAGE_TARNAME}-0.7a.4::		Release 4
-* Release @value{PACKAGE_TARNAME}-0.7a.3::		Release 3
-* Release @value{PACKAGE_TARNAME}-0.7a-3::		Release 3
-* Release @value{PACKAGE_TARNAME}-0.7a-2::		Release 2
-* Release @value{PACKAGE_TARNAME}-0.7a-1::		Release 1
-@end menu
-@end ifnothtml
-@end ifnotplaintext
-
-@c ----------------------------------------------------------------------------
-
-@node Release @value{PACKAGE}-@value{VERSION}
-@subsection Release @value{PACKAGE}-@value{VERSION}
-@cindex release @value{PACKAGE}-@value{VERSION}
-
-Third release candidate.
-
-This release candidate provides support for additional @cite{SuSE} distributions on @code{ix86} as
-well as @code{x86_64}.  Added distribution support includes @cite{SLES 9}, @cite{SLES 9 SP2},
-@cite{SLES 9 SP3}, @cite{SLES 10}, @cite{SuSE 10.1}.
-
-This release candidate includes the changes made to the strsctp drivers at the @cite{2006 SCTP
-Interop} at the @cite{University of British Columbia}.  This version was interoperability tested
-with all implementations present.
-
-This release is an internal release candidate and was not publicly released.
-
-@node Release @value{PACKAGE_TARNAME}-0.7a.6.rc2
-@subsection Release @value{PACKAGE_TARNAME}-0.7a.6.rc2
-@cindex release @value{PACKAGE_TARNAME}-0.7a.6.rc2
-
-Second release candidate.
-
-This release candidate also contains the results of performance testing of the new second generation
-@dfn{UDP} driver (implemented completely in @dfn{STREAMS} instead of using an internal socket).
-
-This release candidate also contains support for @cite{SuSE 10.1}.
-
-This release is an internal release candidate and was not publicly released.
-
-@node Release @value{PACKAGE_TARNAME}-0.7a.6rc1
-@subsection Release @value{PACKAGE_TARNAME}-0.7a.6rc1
-@cindex release @value{PACKAGE_TARNAME}-0.7a.6rc1
-
-Release candidate for Mark Fugate.
-
-Added @samp{--enable-devel} @command{configure} option for embedded targets.
-Added @command{send-pr} script for automatic problem report generation.
-
-This release is an internal release candidate and was not publicly released.
-
-@node Release @value{PACKAGE_TARNAME}-0.7a.5
-@subsection Release @value{PACKAGE_TARNAME}-0.7a.5
-@cindex release @value{PACKAGE_TARNAME}-0.7a.5
-
-This release is primarily to support additional compilers (gcc 4.0.2), architectures (x86_64, SMP,
-32-bit compatibility), recent Linux distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels
-(2.6.15).
-
-@itemize @bullet
-@item Changes to wait queues.  Split single wait queue into four independent wait queues.  Reworked
-wait queues for both old style (2.4) and new style (2.6) semantics.
-@item Changes to satisfy gcc 4.0.2 compiler.
-@item Corrected build flags for Gentoo and 2.6.15 kernels as reported on mailing list.  Build and
-run tested on FC4 i686 and x86_64 kernels based on 2.6.15.
-@item Corrections for and testing of 64-bit clean compile and test runs on x86_64 architecture.
-Some bug corrections resulting from gcc 4.0.2 compiler warnings.
-@item Initial corrections for and testing of SMP operation on Intel 630 Hyper-Threaded SMP on
-x86_64.  This package should now run well on N-way Xeons even with Hyper-Threading enabled.
-@item Corrections and validation of 32-bit compatibilty over 64-bit on x86_64.  Should apply well to
-other 64-bit architectures as well.
-@end itemize
-
-This is a public beta test release of the package.
-
-@node Release @value{PACKAGE_TARNAME}-0.7a.4
-@subsection Release @value{PACKAGE_TARNAME}-0.7a.4
-@cindex release @value{PACKAGE_TARNAME}-0.7a.4
-
-This is primarily a bug fixes release and corrections resulting from testing.
-
-@node Release @value{PACKAGE_TARNAME}-0.7a.3
-@subsection Release @value{PACKAGE_TARNAME}-0.7a.3
-@cindex release @value{PACKAGE_TARNAME}-0.7a.3
-
-With this release version numbers were changed to reflect an upstream version only to be consistent
-with other OpenSS7 package releases.  All @cite{RPM} release numbers will be
-@samp{-1$(PACKAGE_RPMEXTRA)} and all @cite{Debian} release numbers will be @samp{_0}.  If you wish
-to apply patches and relelease the package, please bump up the release number and apply a suitable
-release suffix for your organization.  We leave @cite{Debian} release number @samp{_1} reserved for
-your use, so you can still bundle the source in the @file{.dsc} file.
-
-Major changes for this release include build against Linux 2.6 kernels and popular distributions
-based on the 2.6 kernel as well as wider distribution support.
-
-This was an internal beta test release and was not released publicly.
-
-@node Release @value{PACKAGE_TARNAME}-0.7a-3
-@subsection Release @value{PACKAGE_TARNAME}-0.7a-3
-@cindex release @value{PACKAGE_TARNAME}-0.7a-3
-
-Updates to common build process.  Documentation updates.
-
-This was an internal alpha test release and was not released publicly.
-
-@node Release @value{PACKAGE_TARNAME}-0.7a-2
-@subsection Release @value{PACKAGE_TARNAME}-0.7a-2
-@cindex release @value{PACKAGE_TARNAME}-0.7a-2
-
-Removed all XTI/TLI and Linux networking code, headers and documentation from streams distribution
-and set epoch at 0.  Linux networking code has been migrated to the strxnet, strinet and strsctp
-packages.  The purpose for doing this was to allow the Linux networking to build against
-@cite{@value{PACKAGE_TITLE}} as well as @cite{Linux STREAMS} and is a preparation for phasing out
-LiS and phasing in LfS.
-
-This was an internal alpha test release and was not released publicly.
-
-@c ----------------------------------------------------------------------------
-
-@node Release @value{PACKAGE_TARNAME}-0.7a-1
-@subsection Release @value{PACKAGE_TARNAME}-0.7a-1
-@cindex release @value{PACKAGE_TARNAME}-0.7a-1
-
-This is the initial release of the @value{PACKAGE_TITLE} package for Linux.  This is intended as a
-high-performance, production replacement for @cite{Linux STREAMS (LiS)}.  @value{PACKAGE_TITLE} has
-the following features:
-
-@itemize --
-@item optimized for Linux kernels.
-@item prepared for mainstream Linux kernel adoption.
-@item lindented and follows kernel coding practices.
-@item compatibility modes for AIX, HPUX, OSF, Solaris, UnixWare, SVR 4.2 and LiS.
-@item supports all major SVR4.2 variants.
-@item licensed under GPL with commercial licensing available.
-@item supports full SVR 4.2 MP synchronization models.
-@item runs at SoftIRQ.
-@item provides common SVR 4.2 system tunable parameters and sysctls.
-@item provides /proc filesystem access for debugging and performance tuning.
-@item provides a full set of common STREAMS modules and drivers.
-@item provides full name-streams device and shadow special filesystem support.
-@end itemize
-
-This was an internal alpha test release and was not released publicly.
+@include news.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -293,6 +141,7 @@ The @cite{OpenSS7 Project} adheres to the following release philosophy:
 * Beta Releases::		Beta release description
 * Gamma Releases::		Gamma release description
 * Production Releases::		Production release description
+* Unstable Releases::		Unstable release description
 @end menu
 
 @itemize
@@ -301,6 +150,7 @@ The @cite{OpenSS7 Project} adheres to the following release philosophy:
 @item beta release
 @item gamma release
 @item production release
+@item unstable release
 @end itemize
 
 @node Pre-Alpha Releases
@@ -331,7 +181,7 @@ might possibly do damage to systems upon which it is executed.
 
 @dfn{Beta} releases are releases that have received some testing, but the testing to date is not
 exhaustive.  @dfn{Beta} release packages do not ship with known defects.  All known defects are
-respolved before distribution; however, as exhaustive testing has not been performed, unknown
+resolved before distribution; however, as exhaustive testing has not been performed, unknown
 defects may exist.  The purpose for a @dfn{beta} release is to provide a baseline for other
 organizations to participate in the rigorous testing of the package.
 
@@ -367,6 +217,18 @@ category for production use on the specified target distributions and architectu
 discretion of the user.  It should not be necessary to preform validation tests on the set of
 supported target systems before considering production use.
 
+@node Unstable Releases
+@subsection Unstable Releases
+
+@dfn{Unstable} releases are releases that have received extensive testing within the project and
+validated on a a wide range of distributions and architectures; however, is has tested unstable and
+found to be suffering from critical problems and issues that cannot be resolved.  Maintenance of the
+package has proven impossible.  @dfn{Unstable} release packages ship with known defects (and loud
+warnings).  Suitability of software in this category for production use is at the discretion of the
+user of the software.  @dfn{The OpenSS7 Project} recommends that the problems and issues be closely
+examined before this software is used even in a non-production evironment.  Each failing test
+scenario should be completely avoided by the application.  @cite{OpenSS7} beta software is more
+stable that software in this category.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -396,9 +258,8 @@ License}.}
 the software will irreparably mangle your header files or Linux distribution in such a way as to
 make it unusable.  Crashes will lock your system and rebooting the system will not repair the
 problem.  You will loose all the data on your system.  Because this software will crash your kernel,
-the resulting unstable system can destroy computer hardware or peripherals making them ususable.
-You will likely void the warranty on any system on which you run this software.  YOU HAVE BEEN
-WARNED.}
+the resulting unstable system can destroy computer hardware or peripherals making them unusable.
+You will void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 @end ignore
 
 @c This is the defect notice for alpha release software
@@ -414,7 +275,7 @@ WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public Li
 the software can irreparably mangle your header files or Linux distribution in such a way as to make
 it unusable.  Crashes could lock your system and rebooting the system might not repair the problem.
 You can possibly loose all the data on your system.  Because this software can crash your kernel,
-the resulting unstable system could destroy computer hardware or peripherals making them ususable.
+the resulting unstable system could destroy computer hardware or peripherals making them unusable.
 You could void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 @end ignore
 
@@ -432,7 +293,7 @@ software might mangle your header files or Linux distribution in such a way as t
 Crashes could lock your system and rebooting the system might not repair the problem.  You can
 possibly loose all the data on your system.  Because this software might crash your kernel, the
 resulting unstable system could possibly destroy computer hardware or peripherals making them
-ususable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
+unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
 
 @c This is the defect notice for gammar release software
@@ -452,7 +313,7 @@ mangle your header files or Linux distribution in such a way as to make it unusa
 possibly lock your system and rebooting the system might not repair the problem.  You can possibly
 loose all the data on your system.  Because this software stands a chance of crashing your kernel,
 the resulting unstable system could possibly destroy computer hardware or peripherals making them
-ususable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
+unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
 @end ignore
 
@@ -473,7 +334,26 @@ distribution might mangle your header files or Linux distribution in such a way 
 unusable.  Crashes could possibly lock your system and rebooting the system might not repair the
 problem.  You can possibly loose all the data on your system.  Because this software stands a chance
 of crashing your kernel, the resulting unstable system could possibly destroy computer hardware or
-peripherals making them ususable.  You might void the warranty on any system on which you run this
+peripherals making them unusable.  You might void the warranty on any system on which you run this
+software.  YOU HAVE BEEN WARNED.}
+@end ignore
+
+@c This is the defect notice for unstable release software
+@ignore
+@dfn{@value{PACKAGE_TITLE}} has many and critical known defects.  This is an @dfn{unstable} release.
+Some defects could be harmful.  Validation testing has been performed by the @cite{OpenSS7 Project}
+on this software and it has revealed itself to be unstable and irreparable.  The software might not
+even configure or compile.  The @cite{OpenSS7 Project} recommends that you @b{do not use this
+software}.  Use at your own risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section
+@b{NO WARRANTY} under @ref{GNU General Public License}.}
+
+@b{This software is @i{unstable} software.  As such, it will lock or crash your kernel.
+Installation of the software will irreparably mangle your header files or Linux distribution in such
+a way as to make it unusable.  Crashes will lock your system and rebooting the system will not
+repair the problem.  You will loose all the data on your system.  Because this software has tested
+unstable in a number of test cases, simply running the validation test cases can cause locks or
+crashes.  Because this software will lock or crash your kernel, the resulting unstable system can
+destroy computer hardware or You will void the warranty on any system on which you run this
 software.  YOU HAVE BEEN WARNED.}
 @end ignore
 

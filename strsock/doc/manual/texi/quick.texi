@@ -59,6 +59,10 @@
 
 @unnumberedsec @value{PACKAGE_TITLE}
 
+@include descrip.texi
+
+@unnumberedsubsec Downloading
+
 This is the @command{@value{PACKAGE}-@value{VERSION}} package.  It, and the
 current version, can be obtained from the download area of
 @uref{http://www.openss7.org/download.html, The OpenSS7 Project} website using
@@ -89,7 +93,7 @@ interested in different licensing terms, please contact the copyright holder,
 
 See @file{README-alpha} (if it exists) for alpha release information.
 
-@unnumberedsec Prerequisites
+@unnumberedsubsec Prerequisites
 
 @include prerequisites.texi
 
@@ -115,7 +119,7 @@ built.  If it is not the default, add @samp{CC=kgcc} on the line after
 $> ../@value{PACKAGE}-@value{VERSION}/configure CC='gcc-3.4'
 @end example
 
-@unnumberedsec Installation
+@unnumberedsubsec Installation
 
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
@@ -167,9 +171,7 @@ Manual} as listed below.  If you encounter troubles, see the trouble shooting
 section of the @cite{Installation and Reference Manual} before issuing a bug
 report.
 
-@include descrip.texi
-
-@unnumberedsec Brief Installation Instructions
+@unnumberedsubsec Brief Installation Instructions
 
 The @value{PACKAGE_TITLE} package is available from the
 @uref{http://www.openss7.org/download.html, downloads area of The OpenSS7
@@ -269,7 +271,7 @@ $> rm -rf @value{PACKAGE}-@value{VERSION}
 $> rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
 @end example
 
-@unnumberedsec Detailed Installation Instructions
+@unnumberedsubsec Detailed Installation Instructions
 
 More detailed installation instructions can be found in the @cite{Installation
 and Reference Manual}, contained in the distribution in @samp{text},

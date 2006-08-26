@@ -943,19 +943,9 @@ include am/rpm.am
 include am/deb.am
 
 ##
-## Put the text manual where we can find it in the distribution
-##
-doc/manual/$(PACKAGE_UCNAME).txt:
-	make -C doc/manual $(PACKAGE_UCNAME).txt
-
-MANUAL: doc/manual/$(PACKAGE_UCNAME).txt
-	cp -f $< $@
-
-ALL_LOCAL			+= MANUAL
-
-##
 ## Rules for making release files
 ##
+MANUAL_FILE			= doc/manual/$(PACKAGE_UCNAME).txt
 RELEASE_FILES			= \
 				  README \
 				  README-alpha \

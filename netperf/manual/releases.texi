@@ -189,89 +189,7 @@ XTI interface rather than the non-standard socket API described in documents suc
 @section Release Notes
 @cindex release notes
 
-The sections that follow provide information on OpenSS7 releases of the @*
-@value{PACKAGE_TITLE} package
-as well as compatibility information of OpenSS7 releases to the original
-Hewlett-Packard Company releases.
-
-@ifnotplaintext
-@ifnothtml
-@menu
-* Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
-* Release netperf-2.3.3::		Release 3
-* Release netperf-2.3.2::		Release 2
-* Release netperf-2.3.1::		Release 1
-@end menu
-@end ifnothtml
-@end ifnotplaintext
-
-@c ----------------------------------------------------------------------------
-
-@node Release @value{PACKAGE}-@value{VERSION}
-@subsection Release @value{PACKAGE}-@value{VERSION}
-@cindex release @value{PACKAGE}-@value{VERSION}
-
-Added @samp{--enable-devel} @command{configure} option for embedded targets.
-Added @command{send-pr} script for automatic problem report generation.
-
-@node Release netperf-2.3.3
-@subsection Release netperf-2.3.3
-@cindex release netperf-2.3.3
-
-This release is primarily to support additional compilers (gcc 4.0.2), architectures (x86_64, SMP,
-32-bit compatibility), recent Linux distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels
-(2.6.15).
-
-Corrections for and testing of 64-bit clean compile and test runs on x86_64 architecture.  Some bug
-corrections resulting from gcc 4.0.2 compiler warnings.
-
-@node Release netperf-2.3.2
-@subsection Release netperf-2.3.2
-@cindex release netperf-2.3.2
-
-Many corrections (but not enough) are included to use the package for XTI INET testing.  UDP works
-now, but TCP is not completely corrected yet (and, therefore, neither is SCTP).  These capabilities
-could not have possibly worked in the original @cite{netperf-2.3} release.  The next release should
-have TCP and SCTP corrected for XTI.
-
-Corrections included to make the package cross-build for @cite{Nex@-us@-Ware} as well as recent
-2.6.14 (FC4) kernels.
-
-What remains to be done is to merge in the latest upstream release of netperf into this package and
-contribute XTI corrections back upstream.
-
-@node Release netperf-2.3.1
-@subsection Release netperf-2.3.1
-@cindex release netperf-2.3.1
-
-Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.  It is based on the
-Hewlett-Packard Company @cite{netperf-2.3} release.
-
-This release provides modifications to support the Stream Control Transmission Protocol (SCTP) and
-provides tests for the Sockets API for the OpenSS7 Linux Native Kernel version of SCTP as well as
-tests for the XTI API for the OpenSS7 STREAMS version of SCTP.  In addition, use of the XTI API for
-TCP and UDP tests is supported using the OpenSS7 STREAMS INET package.
-
-SCTP Sockets API tests depend upon the availability of an the OpenSS7 Sockets implementation of SCTP
-in an OpenSS7 patched kernel.  Some binary kernels and prepatched kernel source for popular
-architectures are provided as RPMs from @uref{http://www.openss7.org/download.html, the OpenSS7
-Project download page}.
-
-SCTP XTI API tests depend upon the availability of the OpenSS7 STREAMS implementation of SCTP.  Some
-binary and source packages for @cite{LiS STREAMS}, @cite{Linux Fast-STREAMS}, the @cite{strxnet}
-XTI/TLI library and the @cite{strsctp} package are available from
-@uref{http://www.openss7.org/download.html, the OpenSS7 Project download page}.  @ref{Top,
-Introduction, Introduction, libxnet, The OpenSS7 XNS/XTI Library Reference Manual}.
-
-Under Linux, the TCP and UDP XTI API tests depend upon the availability of the OpenSS7 INET driver.
-Some binary and source packages for @cite{LiS STREAMS}, @cite{Linux Fast-STREAMS}, the
-@cite{strxnet} XTI/TLI library and the @cite{strinet} package (@pxref{Top, Introduction,
-Introduction, strinet, OpenSS7 STREAMS INET Driver}) are available from
-@uref{http://www.openss7.org/download.html, the OpenSS7 Project download page}.  @ref{Top,
-Introduction, Introduction, libxnet, The OpenSS7 XNS/XTI Library Reference Manual}.
-
-This release also provides updates to the antiquated @cite{netperf-2.1} release documentation
-distributed with @cite{netperf-2.3}.
+@include news.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -288,6 +206,7 @@ The @cite{OpenSS7 Project} adheres to the following release philosophy:
 * Beta Releases::		Beta release description
 * Gamma Releases::		Gamma release description
 * Production Releases::		Production release description
+* Unstable Releases::		Unstable release description
 @end menu
 
 @itemize
@@ -296,6 +215,7 @@ The @cite{OpenSS7 Project} adheres to the following release philosophy:
 @item beta release
 @item gamma release
 @item production release
+@item unstable release
 @end itemize
 
 @node Pre-Alpha Releases
@@ -326,7 +246,7 @@ might possibly do damage to systems upon which it is executed.
 
 @dfn{Beta} releases are releases that have received some testing, but the testing to date is not
 exhaustive.  @dfn{Beta} release packages do not ship with known defects.  All known defects are
-respolved before distribution; however, as exhaustive testing has not been performed, unknown
+resolved before distribution; however, as exhaustive testing has not been performed, unknown
 defects may exist.  The purpose for a @dfn{beta} release is to provide a baseline for other
 organizations to participate in the rigorous testing of the package.
 
@@ -362,6 +282,18 @@ category for production use on the specified target distributions and architectu
 discretion of the user.  It should not be necessary to preform validation tests on the set of
 supported target systems before considering production use.
 
+@node Unstable Releases
+@subsection Unstable Releases
+
+@dfn{Unstable} releases are releases that have received extensive testing within the project and
+validated on a a wide range of distributions and architectures; however, is has tested unstable and
+found to be suffering from critical problems and issues that cannot be resolved.  Maintenance of the
+package has proven impossible.  @dfn{Unstable} release packages ship with known defects (and loud
+warnings).  Suitability of software in this category for production use is at the discretion of the
+user of the software.  @dfn{The OpenSS7 Project} recommends that the problems and issues be closely
+examined before this software is used even in a non-production evironment.  Each failing test
+scenario should be completely avoided by the application.  @cite{OpenSS7} beta software is more
+stable that software in this category.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -391,9 +323,8 @@ License}.}
 the software will irreparably mangle your header files or Linux distribution in such a way as to
 make it unusable.  Crashes will lock your system and rebooting the system will not repair the
 problem.  You will loose all the data on your system.  Because this software will crash your kernel,
-the resulting unstable system can destroy computer hardware or peripherals making them ususable.
-You will likely void the warranty on any system on which you run this software.  YOU HAVE BEEN
-WARNED.}
+the resulting unstable system can destroy computer hardware or peripherals making them unusable.
+You will void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 @end ignore
 
 @c This is the defect notice for alpha release software
@@ -409,7 +340,7 @@ WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public Li
 the software can irreparably mangle your header files or Linux distribution in such a way as to make
 it unusable.  Crashes could lock your system and rebooting the system might not repair the problem.
 You can possibly loose all the data on your system.  Because this software can crash your kernel,
-the resulting unstable system could destroy computer hardware or peripherals making them ususable.
+the resulting unstable system could destroy computer hardware or peripherals making them unusable.
 You could void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 @end ignore
 
@@ -427,7 +358,7 @@ software might mangle your header files or Linux distribution in such a way as t
 Crashes could lock your system and rebooting the system might not repair the problem.  You can
 possibly loose all the data on your system.  Because this software might crash your kernel, the
 resulting unstable system could possibly destroy computer hardware or peripherals making them
-ususable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
+unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
 
 @c This is the defect notice for gammar release software
@@ -447,7 +378,7 @@ mangle your header files or Linux distribution in such a way as to make it unusa
 possibly lock your system and rebooting the system might not repair the problem.  You can possibly
 loose all the data on your system.  Because this software stands a chance of crashing your kernel,
 the resulting unstable system could possibly destroy computer hardware or peripherals making them
-ususable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
+unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
 @end ignore
 
@@ -468,7 +399,26 @@ distribution might mangle your header files or Linux distribution in such a way 
 unusable.  Crashes could possibly lock your system and rebooting the system might not repair the
 problem.  You can possibly loose all the data on your system.  Because this software stands a chance
 of crashing your kernel, the resulting unstable system could possibly destroy computer hardware or
-peripherals making them ususable.  You might void the warranty on any system on which you run this
+peripherals making them unusable.  You might void the warranty on any system on which you run this
+software.  YOU HAVE BEEN WARNED.}
+@end ignore
+
+@c This is the defect notice for unstable release software
+@ignore
+@dfn{@value{PACKAGE_TITLE}} has many and critical known defects.  This is an @dfn{unstable} release.
+Some defects could be harmful.  Validation testing has been performed by the @cite{OpenSS7 Project}
+on this software and it has revealed itself to be unstable and irreparable.  The software might not
+even configure or compile.  The @cite{OpenSS7 Project} recommends that you @b{do not use this
+software}.  Use at your own risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section
+@b{NO WARRANTY} under @ref{GNU General Public License}.}
+
+@b{This software is @i{unstable} software.  As such, it will lock or crash your kernel.
+Installation of the software will irreparably mangle your header files or Linux distribution in such
+a way as to make it unusable.  Crashes will lock your system and rebooting the system will not
+repair the problem.  You will loose all the data on your system.  Because this software has tested
+unstable in a number of test cases, simply running the validation test cases can cause locks or
+crashes.  Because this software will lock or crash your kernel, the resulting unstable system can
+destroy computer hardware or You will void the warranty on any system on which you run this
 software.  YOU HAVE BEEN WARNED.}
 @end ignore
 

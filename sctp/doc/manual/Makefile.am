@@ -78,8 +78,10 @@ info_TEXINFOS		+= sctp.texi
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
-			  releases.texi \
+			  descrip.texi \
+			  news.texi \
 			  prerequisites.texi \
+			  releases.texi \
 			  rpm.texi \
 			  tree.texi \
 			  sctp.7.texi \

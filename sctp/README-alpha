@@ -1,0 +1,134 @@
+OpenSS7 Linux Native SCTP -- beta release introduction.  2006-08-23
+$Id$
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+OpenSS7 Linux Native SCTP
+=========================
+
+Package sctp-0.2.24.rc3 Released 2006-08-23.
+
+This is beta release software.
+
+The following is an extract from the Installation and Reference Manual:
+
+5.5 Bugs
+========
+
+5.5.1 Defect Notices
+--------------------
+
+"OpenSS7 Linux Native SCTP" could contain unknown defects.  This is a
+"beta" release.  Some defects could be harmful.  Validation testing has
+been performed by the `OpenSS7 Project' on this software for only a
+restricted set of systems.  The software might fail to configure or
+compile on other systems.  The `OpenSS7 Project' recommends that you do
+not use this software for purposes other than validation testing and
+evaluation, and then only with care. Use at your own risk.  Remember
+that there is NO WARRANTY.(1)
+
+This software is beta software.  As such, it might crash your kernel.
+Installation of the software might mangle your header files or Linux
+distribution in such a way as to make it unusable.  Crashes could lock
+your system and rebooting the system might not repair the problem.  You
+can possibly loose all the data on your system.  Because this software
+might crash your kernel, the resulting unstable system could possibly
+destroy computer hardware or peripherals making them unusable.  You
+might void the warranty on any system on which you run this software.
+YOU HAVE BEEN WARNED.
+
+---------- Footnotes ----------
+
+(1) See section NO WARRANTY under *Note GNU General Public License::.
+
+5.5.2 Known Defects
+-------------------
+
+With the exception of packages not originaly created by the `OpenSS7
+Project', the `OpenSS7 Project' software does not ship with known bugs
+in any release stage except "pre-alpha".  "OpenSS7 Linux Native SCTP"
+had no known bugs at the time of release.
+
+5.6 Schedule
+============
+
+For the lastest developments with regard to schedule, please see the
+`TODO' file in the release package.
+
+5.7 History
+===========
+
+For the latest developments with regard to history of changes, please
+see the `ChangeLog' file in the release package.
+
+5.4.3 Beta Releases
+-------------------
+
+"Beta" releases are releases that have received some testing, but the
+testing to date is not exhaustive.  "Beta" release packages do not ship
+with known defects.  All known defects are resolved before
+distribution; however, as exhaustive testing has not been performed,
+unknown defects may exist.  The purpose for a "beta" release is to
+provide a baseline for other organizations to participate in the
+rigorous testing of the package.
+
+"Beta" release packages ship containing warnings that the package has
+not been exhaustively tested and that the package may cause systems to
+crash.  Suitability of software in this category for production use is
+not advised by the project; however, as always, is at the discretion of
+the user of the software.
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

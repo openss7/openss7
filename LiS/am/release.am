@@ -68,45 +68,108 @@
 #   the confusing sources, so we will do manual an limited substitution here.
 ##
 
+##
+## Put the text manual where we can find it in the distribution
+##
+$(MANUAL_FILE):
+	make -C `dirname $(MANUAL_FILE)` `basename $(MANUAL_FILE)`
+
+MANUAL: $(MANUAL_FILE)
+	cp -f $< $@
+
+ALL_LOCAL			+= MANUAL
+
 if MAINTAINER_MODE
 ## MAINTAINER_MODE
 
-REL_SUBST_STRING = \
-	s|\@PACKAGE\@|$(PACKAGE)|g;\
-	s|\@PACKAGE_BUGREPORT\@|$(PACKAGE_BUGREPORT)|g;\
-	s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;\
-	s|\@PACKAGE_KNUMBER\@|$(PACKAGE_KNUMBER)|g;\
-	s|\@PACKAGE_KVERSION\@|$(PACKAGE_KVERSION)|g;\
-	s|\@PACKAGE_LCNAME\@|$(PACKAGE_LCNAME)|g;\
-	s|\@PACKAGE_NAME\@|$(PACKAGE_NAME)|g;\
-	s|\@PACKAGE_RELEASE\@|$(PACKAGE_RELEASE)|g;\
-	s|\@PACKAGE_SHORTTITLE\@|$(PACKAGE_SHORTTITLE)|g;\
-	s|\@PACKAGE_STRING\@|$(PACKAGE_STRING)|g;\
-	s|\@PACKAGE_TARNAME\@|$(PACKAGE_TARNAME)|g;\
-	s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g;\
-	s|\@PACKAGE_UCNAME\@|$(PACKAGE_UCNAME)|g;\
-	s|\@PACKAGE_VERSION\@|$(PACKAGE_VERSION)|g;\
-	s|\@VERSION\@|$(VERSION)|g
+$(srcdir)/NEWS: MANUAL $(srcdir)/AUTHORS
+	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	 idline='\$$Id\$$' ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 $(ECHO) "$(PACKAGE_TITLE) -- history of user visible changes.  $(PACKAGE_DATE)" > $@ ; \
+	 $(ECHO) "$$idline" >> $@ ; \
+	 $(ECHO) "Copyright (c) 2001-`date +%Y`  OpenSS7 Corporation. <http://www.openss7.com/>" >> $@ ; \
+	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
+	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
+	 $(ECHO) -e "\f" >> $@ ; \
+	 cat MANUAL | sed -e '\|[0-9].[0-9] Release Notes|,\|[0-9].[0-9] Maturity|!d;\|[0-9].[0-9] Maturity|,$$d' | sed -e '1,3d' >> $@ ;\
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
 
-RELEASE_FILES	+= \
-		  README \
-		  README-alpha \
-		  README-cvs \
-		  README-nexusware
+$(srcdir)/README: MANUAL $(srcdir)/AUTHORS
+	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	 idline='\$$Id\$$' ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 $(ECHO) "$(PACKAGE_TITLE) -- read me first file.  $(PACKAGE_DATE)" > $@ ; \
+	 $(ECHO) "$$idline" >> $@ ; \
+	 $(ECHO) "Copyright (c) 2001-`date +%Y`  OpenSS7 Corporation. <http://www.openss7.com/>" >> $@ ; \
+	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
+	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
+	 $(ECHO) -e "\f" >> $@ ; \
+	 cat MANUAL | sed -e '\|Quick Start Guide|,\|Introduction|!d;\|Introduction|,$$d' | sed -e '1,3d' >> $@ ;\
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
 
-release-files:
-	@files="$(RELEASE_FILES)"; for file in $$files ; do \
-		if test -e $(srcdir)/$$file.in ; then \
-			if test ! -e $(srcdir)/$$file -o $(srcdir)/$$file.in -nt $(srcdir)/$$file ; then \
-				$(ECHO) "converting release file $$file.in to $$file" ; \
-				cat $(srcdir)/$$file.in | sed -e '$(REL_SUBST_STRING)' > $(srcdir)/$$file ; \
-			fi ; \
-		fi ; \
-	done
+$(srcdir)/README-cvs: MANUAL $(srcdir)/AUTHORS
+	@$(ECHO) "Creating $@ from the MANUAL..." ;\
+	 idline='\$$Id\$$' ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 $(ECHO) "$(PACKAGE_TITLE) -- read me CVS file.  $(PACKAGE_DATE)" > $@ ;\
+	 $(ECHO) "$$idline" >> $@ ; \
+	 $(ECHO) "Copyright (c) 2001-`date +%Y`  OpenSS7 Corporation. <http://www.openss7.com/>" >> $@ ;\
+	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ;\
+	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ;\
+	 $(ECHO) -e "\f" >> $@ ;\
+	 $(ECHO) "The following is an extract from the manual to assist CVS developers:" >> $@ ;\
+	 $(ECHO) "" >> $@ ;\
+	 cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Downloading from CVS|,\|^[0-9].[0-9] Configuration|!d;\|^[0-9].[0-9] Configuration|,$$d' >> $@ ;\
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
 
-MY_PHONY	+= release-files
+$(srcdir)/README-nexusware: MANUAL $(srcdir)/AUTHORS
+	@$(ECHO) "Creating $@ from the MANUAL..." ;\
+	 idline='\$$Id\$$' ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 $(ECHO) "$(PACKAGE_TITLE) -- read me CVS file.  $(PACKAGE_DATE)" > $@ ;\
+	 $(ECHO) "$$idline" >> $@ ; \
+	 $(ECHO) "Copyright (c) 2001-`date +%Y`  OpenSS7 Corporation. <http://www.openss7.com/>" >> $@ ;\
+	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ;\
+	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ;\
+	 $(ECHO) -e "\f" >> $@ ;\
+	 $(ECHO) "The following is an extract from the manual to assist NexusWare developers:" >> $@ ;\
+	 $(ECHO) "" >> $@ ;\
+	 cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Building from the Tar Ball|,\|^[0-9].[0-9] Installing|!d;\|^[0-9].[0-9] Installing|,$$d' >> $@ ;\
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
 
-ALL_LOCAL	+= release-files
+$(srcdir)/README-alpha: MANUAL $(srcdir)/AUTHORS
+	@$(ECHO) "Creating $@ from the MANUAL..." ;\
+	 reltype=`grep '^This software is' MANUAL | cut -f4 '-d '` ; \
+	 idline='\$$Id\$$' ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 $(ECHO) "$(PACKAGE_TITLE) -- $$reltype release introduction.  $(PACKAGE_DATE)" > $@ ;\
+	 $(ECHO) "$$idline" >> $@ ; \
+	 $(ECHO) "Copyright (c) 2001-`date +%Y`  OpenSS7 Corporation. <http://www.openss7.com/>" >> $@ ;\
+	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ;\
+	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ;\
+	 $(ECHO) -e "\f" >> $@ ;\
+	 $(ECHO) "$(PACKAGE_TITLE)" >> $@ ;\
+	 $(ECHO) "$(PACKAGE_TITLE)" | sed -e 's,.,=,g' >> $@ ;\
+	 $(ECHO) "" >> $@ ;\
+	 $(ECHO) "Package $(PACKAGE)-$(VERSION) Released $(PACKAGE_DATE)." >> $@ ;\
+	 $(ECHO) "" >> $@ ;\
+	 $(ECHO) "This is $$reltype release software." >> $@ ;\
+	 $(ECHO) "" >> $@ ;\
+	 $(ECHO) "The following is an extract from the Installation and Reference Manual:" >> $@ ;\
+	 $(ECHO) "" >> $@ ;\
+	 cat MANUAL | sed -e '\|^[0-9].[0-9] Bugs|,\|^[0-9] Installation|!d;\|^[0-9] Installation|,$$d' >> $@ ;\
+	 case $$reltype in \
+		 (pre-alpha)  cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Pre-Alpha Releases|,\|^[0-9].[0-9].[0-9] Alpha Releases|!d;\|^[0-9].[0-9].[0-9] Alpha Releases|,$$d' >> $@ ;; \
+		 (alpha)      cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Alpha Releases|,\|^[0-9].[0-9].[0-9] Beta Releases|!d;\|^[0-9].[0-9].[0-9] Beta Releases|,$$d' >> $@ ;; \
+		 (beta)       cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Beta Releases|,\|^[0-9].[0-9].[0-9] Gamma Releases|!d;\|^[0-9].[0-9].[0-9] Gamma Releases|,$$d' >> $@ ;; \
+		 (gamma)      cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Gamma Releases|,\|^[0-9].[0-9].[0-9] Production Releases|!d;\|^[0-9].[0-9].[0-9] Production Releases|,$$d' >> $@ ;; \
+		 (production) cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Production Releases|,\|^[0-9].[0-9].[0-9] Unstable Releases|!d;\|^[0-9].[0-9].[0-9] Unstable Releases|,$$d' >> $@ ;; \
+		 (unstable)   cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Unstable Releases|,\|^[0-9].[0-9] Bugs|!d;\|^[0-9].[0-9] Bugs|,$$d' >> $@ ;; \
+		 (*)          cat MANUAL | sed -e '\|^[0-9].[0-9] Maturity|,\|^[0-9].[0-9] Bugs|!d;\|^[0-9].[0-9] Bugs|,$$d' >> $@ ;; \
+	 esac ; \
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
+
+ALL_LOCAL			+= $(srcdir)/NEWS \
+				   $(srcdir)/README \
+				   $(srcdir)/README-alpha \
+				   $(srcdir)/README-cvs \
+				   $(srcdir)/README-nexusware
 
 ## MAINTAINER_MODE
 endif

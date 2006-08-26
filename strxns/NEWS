@@ -1,101 +1,88 @@
-OpenSS7 STREAMS XNS -- history of user-visible changes.  2006-08-16
+OpenSS7 XNS Networking -- history of user visible changes.  2006-08-23
 $Id: NEWS,v 0.9.2.17 2006/08/22 12:49:20 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
-* Major changes in strxns-0.9.2.4.rc3
+The sections that follow provide information on OpenSS7 releases of the
+OpenSS7 XNS Networking package.
 
-  Third release candidate.
+ Major changes for release strxns-0.9.2.4.rc3
+---------------------------------------------
 
-  This release candidate provides support for additional SuSE
-  distributions on ix86 as well as x86_64.  Added distribution support
-  includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
+Added `--enable-devel' `configure' option for embedded targets.  Added
+`send-pr' script for automatic problem report generation.
 
-  This release candidate includes the changes made to the strsctp
-  drivers at the 2006 SCTP Interop at the University of British
-  Columbia.  This version was interoperability tested with all
-  implementations present.
+ Major changes for release strxns-0.9.2.3
+-----------------------------------------
 
-* Major changes in strxns-0.9.2.4.rc2
+This release is primarily to support additional compilers (gcc 4.0.2),
+architectures (x86_64, SMP, 32-bit compatibility), recent Linux
+distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
 
-  Second release candidate.
+   * Changes necessary for __LP64__ compatible builds.  Changes to
+     support 32-bit ioctl compatibility for __LP64__ architectures.
+     Binary compatibilty should not have been disrupted.  At the same
+     time as the ioctl32 changes, TRANSPARENT ioctl support for most of
+     the IO controls for the ldl(4) driver has been added.
 
-  This release candidate also contains the results of performance
-  testing of the new second generation UDP driver (implemented
-  completely in STREAMS instead of using an internal socket).
+   * Changes to satisfy gcc 4.0.2 compiler.
 
-  This release candidate also contains support for SuSE 10.1.
+   * Corrections for and testing of 64-bit clean compile and test runs
+     on x86_64 architecture.  Some bug corrections resulting from gcc
+     4.0.2 compiler warnings.
 
-* Major changes for strxns-0.9.2.4rc1
+   * Corrected build flags for Gentoo and 2.6.15 kernels as reported on
+     mailing list.
 
-  Release candidate for Mark Fugate.
+   * Initial corrections for and testing of SMP operation on Intel 630
+     Hyper-Threaded SMP on x86_64.  This package should now run well on
+     N-way Xeons even with Hyper-Threading enabled.
 
-* Major changes for strxns-0.9.2.4
+   * Corrections and validation of 32-bit compatibilty over 64-bit on
+     x86_64.  Should apply well to other 64-bit architectures as well.
 
-  Added --enable-devel configure option for embedded targets.
-  Added send-pr script for automatic problem report generation.
-  Added the NPI-IP driver for testing IP protocols.
+This is a public beta test release of the package.
 
-* Major changes for strxns-0.9.2.3
+ Major changes for release strxns-0.9.2.2
+-----------------------------------------
 
-  This release is primarily to support additional compilers (gcc 4.0.2),
-  architectures (x86_64, SMP, 32-bit compatibility), recent Linux
-  distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
+This is primarily a bug fixes release.  This release has been tested to
+build and install against both `LiS-2.18.2' and `streams-0.7a.4' on
+both 2.4 and 2.6 kernels as well as the `NexusWare' cross-build
+environment.
 
-  - Changes necessary for __LP64__ compatible builds.  Changes to
-    support 32-bit ioctl compatibility for __LP64__ architectures.
-    Binary compatibilty should not have been disrupted.  At the same
-    time as the ioctl32 changes, TRANSPARENT ioctl support for most of
-    the IO controls for the ldl(4) driver has been added.
+This package is still largely untested and does not yet have a
+testsuite.
 
-  - Changes to satisfy gcc 4.0.2 compiler.
+ Major changes for release strxns-0.9.2.1
+-----------------------------------------
 
-  - Corrections for and testing of 64-bit clean compile and test runs on
-    x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
-    compiler warnings.
+With this release version numbers were changed to reflect an upstream
+version only to be consistent with other `OpenSS7' package releases.
+All `RPM' release numbers will be `-1$(PACKAGE_RPMEXTRA)' and all
+`Debian' release numbers will be `_0'.  If you wish to apply patches
+and relelease the package, please bump up the release number and apply
+a suitable release suffix for your organization.  We leave `Debian'
+release number `_1' reserved for your use, so you can still bundle the
+source in the `.dsc' file.
 
-  - Corrected build flags for Gentoo and 2.6.15 kernels as reported on
-    mailing list.
+Major changes for this release include build against Linux 2.6 kernels
+and popular distributions based on the 2.6 kernel as well as wider
+distribution support.  The package also supports both `LiS-2.18.1' as
+well as `streams-0.7a' on both kernels.
 
-  - Initial corrections for and testing of SMP operation on Intel 630
-    Hyper-Threaded SMP on x86_64.  This package should now run well on
-    N-way Xeons even with Hyper-Threading enabled.
+ Initial release strxns-0.9.2-1
+-------------------------------
 
-  - Corrections and validation of 32-bit compatibilty over 64-bit on
-    x86_64.  Should apply well to other 64-bit architectures as well.
+Initial autoconf/RPM packaging of the `strxns' release.
 
-  This is a public beta test release of the package.
+This was an internal alpha test release and was not released publicly.
 
-* Major changes for strxns-0.9.2.2
+------
 
-  This is primarily a bug fixes release.  This release has been tested to
-  build and install against both `LiS-2.18.2' and `streams-0.7a.4' on both 2.4
-  and 2.6 kernels as well as the `NexusWare' cross-build environment.
-
-  This package is still largely untested and does not yet have a testsuite.
-
-* Major changes for strxns-0.9.2.1
-
-  With this release version numbers were changed to reflect an upstream
-  version only to be consistent with other `OpenSS7' package releases.  All
-  `RPM' release numbers will be `-1$(PACKAGE_RPMEXTRA)' and all `Debian'
-  release numbers will be `_0'.  If you wish to apply patches and relelease
-  the package, please bump up the release number and apply a suitable release
-  suffix for your organization.  We leave `Debian' release number `_1'
-  reserved for your use, so you can still bundle the source in the `.dsc'
-  file.
-
-  Major changes for this release include build against Linux 2.6 kernels and
-  popular distributions based on the 2.6 kernel as well as wider distribution
-  support.  The package also supports both `LiS-2.18.1' as well as
-  `streams-0.7a' on both kernels.
-
-* Initial release strxns-0.9.2-1
-
-  Initial autoconf/RPM packaging of the `strxns' release.
-
-  This was an internal alpha test release and was not released publicly.
+Although the original package is distributed under LGPL, this package is
+distributed by OpenSS7 Corporation under the GNU Public License.
 
 -----
 
@@ -149,4 +136,4 @@ See the end for copying conditions (for this file).
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
