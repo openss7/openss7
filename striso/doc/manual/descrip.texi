@@ -63,51 +63,60 @@ and the associated documentation not contained in the @cite{OpenSS7 Linux STREAM
 The package uses the following standard @cite{Open Systems Interconnect (OSI)} conforming header
 files from the @file{strxns} package:
 
-@itemize -
-@item @file{<sys/cdi.h>} @cite{Communications Device Interface}
-@item @file{<sys/dlpi.h>} @cite{Data Link Provider Interface Version 2.0.0}
-@item @file{<sys/npi.h>} @cite{Network Provider Interface Version 2.0.0}
-@end itemize
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @file{<sys/cdi.h>} @cite{Communications Device Interface}
+@item @tab @minus{} @file{<sys/dlpi.h>} @cite{Data Link Provider Interface Version 2.0.0}
+@item @tab @minus{} @file{<sys/npi.h>} @cite{Network Provider Interface Version 2.0.0}
+@end multitable
 
 The package uses the following standard @cite{Open Systems Interconnect (OSI)} conforming header
 files from the @file{strxnet} package:
 
-@itemize -
-@item @file{<sys/tihdr.h>} @cite{Transport Provider Interface Version 2.0.0}
-@end itemize
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @file{<sys/tihdr.h>} @cite{Transport Provider Interface Version 2.0.0}
+@end multitable
 
 The package currently includes the following @dfn{STREAMS} kernel modules and drivers:
 
 @multitable @columnfractions .05 .30 .65
-@item - @tab @file{streams_x223.ko} @tab @file{/dev/cons}
-@item - @tab @file{streams_x233.ko} @tab @file{/dev/clns}
-@item - @tab @file{streams_x224.ko} @tab @file{/dev/tp0} @file{/dev/tp4}
-@item - @tab @file{streams_X234.ko} @tab @file{/dev/clts}
-@item - @tab @file{streams_isot.ko} @tab @file{module} @file{/dev/isot}
-@item - @tab @file{streams_lpp.ko} @tab @file{module} @file{/dev/lpp}
-@item - @tab @file{streams_cmot.ko} @tab @file{module} @file{/dev/cmot}
-@item - @tab @file{streams_itot.ko} @tab @file{module}
-@item - @tab @file{streams_itos.ko} @tab @file{module}
+@item @tab @minus{} @file{streams_x223.ko} @tab @file{/dev/cons}
+@item @tab @minus{} @file{streams_x233.ko} @tab @file{/dev/clns}
+@item @tab @minus{} @file{streams_x224.ko} @tab @file{/dev/tp0} @file{/dev/tp4}
+@item @tab @minus{} @file{streams_X234.ko} @tab @file{/dev/clts}
+@item @tab @minus{} @file{streams_isot.ko} @tab @file{module} @file{/dev/isot}
+@item @tab @minus{} @file{streams_lpp.ko} @tab @file{module} @file{/dev/lpp}
+@item @tab @minus{} @file{streams_cmot.ko} @tab @file{module} @file{/dev/cmot}
+@item @tab @minus{} @file{streams_itot.ko} @tab @file{module}
+@item @tab @minus{} @file{streams_itos.ko} @tab @file{module}
 @end multitable
 
-The @manref{x223(4)} driver provides @dfn{CONS} and @dfn{CLNS} services in accordance with the
-@cite{ISO/OSI Network Protocol X.223}.
+@itemize @bullet
+@item
+@manref{x223(4)} driver provides @dfn{CONS} and @dfn{CLNS} services in accordance with the
+@cite{ISO/OSI Network Protocol X.223};
 
-The @manref{x224(4)} driver provides @dfn{OSI Transport Protocol} services in accordance with the
-@cite{ISO/OSI Transport Protocol X.224}.
+@item
+@manref{x224(4)} driver provides @dfn{OSI Transport Protocol} services in accordance with the
+@cite{ISO/OSI Transport Protocol X.224};
 
-The @manref{isot(4)} driver and module provides @dfn{ISO Transport over TCP/IP} as specified in
-@cite{RFC 1006/STD 35}.
+@item
+@manref{isot(4)} driver and module provides @dfn{ISO Transport over TCP/IP} as specified in
+@cite{RFC 1006/STD 35};
 
-The @manref{lpp(4)} driver and module provides @dfn{ISO Transport over TCP/IP} as specified in
-@cite{RFC 1085.}
+@item
+@manref{lpp(4)} driver and module provides @dfn{ISO Transport over TCP/IP} as specified in @cite{RFC
+1085};
 
-The @manref{cmot(4)} driver and modules provides @dfn{ISO Common Management Information Protocol
-(CMIP) over TCP/IP} as specified in @cite{RFC 1095}.
+@item
+@manref{cmot(4)} driver and modules provides @dfn{ISO Common Management Information Protocol
+(CMIP) over TCP/IP} as specified in @cite{RFC 1095};
 
-The @manref{itot(4)} module provides @dfn{ISO Transport over TCP} as specified in @cite{RFC 2126}.
+@item
+@manref{itot(4)} module provides @dfn{ISO Transport over TCP} as specified in @cite{RFC 2126}; and,
 
-The @manref{itos(4)} module provides @dfn{ISO Transport over SCTP}.
+@item
+@manref{itos(4)} module provides @dfn{ISO Transport over SCTP}.
+@end itemize
 
 The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
 drivers, modules, libraries, utilities, test programs, daemons, and development environment for the

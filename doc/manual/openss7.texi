@@ -271,7 +271,36 @@ Full Manual:
 @unnumbered Acknowledgements
 @cindex credits
 
+The @cite{OpenSS7 @value{PACKAGE_TITLE}} project was funded in part by:
+
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.openss7.com/, OpenSS7 Corporation}
+@end multitable
+
+Thanks to the subscribers to and sponsors of @url{http://www.openss7.org/,, The OpenSS7 Project}.
+Without their support, open software like this would not be possible.
+
 @include texi/funding.texi
+
+@unnumberedsec Authors
+
+The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@end multitable
+
+@unnumberedsec Maintainer
+
+The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@end multitable
+
+Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
+included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
+Reports}, in the manual.
 
 @c --------------------------------------------------------------------------
 

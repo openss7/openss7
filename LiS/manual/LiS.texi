@@ -405,6 +405,102 @@ The following is a list of significant contributors to
 Additional people not named here that I missed putting on the list.  We thank
 them too!
 
+@unnumberedsec Authors
+
+Linux STREAMS, termed LiS, is an SVR4 compatible STREAMS executive which runs in
+the Linux Kernel as a loadable module.  It is the product of a joint effort
+among the following authors:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{nemo@@gsyc.escet.urjc.es, Francisco J. Ballesteros}
+@auindex Ballesteros, Francisco J.
+@item @tab @minus{} @email{jaboydjr@@netwalk.com, John Boyd}
+@auindex Boyd, John
+@item @tab @minus{} @email{Denis.Froschauer@@hol.fr, Denis Froschauer}
+@auindex Froschauer, Denis
+@item @tab @minus{} @email{dave@@gcom.com, David Grothe}
+@auindex Grothe, David
+@item @tab @minus{} @email{sparre@@login.dknet.dk, Ole Husgaard}
+@auindex Husgaard, Ole
+@item @tab @minus{} @email{juergen.magin@@octogon.de, Jürgen Magin}
+@auindex Magin, Jürgen
+@item @tab @minus{} @email{gram@@cdsec.com, Graham Wheeler}
+@auindex Wheeler, Graham
+@item @tab @minus{} @email{yegag@@hclt.com, G Yeganjaiah}
+@auindex Yeganjaiah, G
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@auindex Bidulock, Brian F. G.
+@end multitable
+
+The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@end multitable
+
+See @ref{Author Index}, for a complete listing and cross-index of authors to
+sections of this document.
+@auindex Grothe, David
+@auindex Husgaard, Ole
+@auindex Boyd, John
+@auindex Ballesteros, Francisco J.
+@auindex Magin, Jürgen
+@auindex Yeganjaiah, G
+@auindex Bidulock, Brian F. G.
+
+@unnumberedsec Maintainer
+
+@email{bidulock@@openss7.org, Brian Bidulock} is the principal active maintainer of LiS, so please
+direct questions to him rather than the others.@footnote{David Grothe was the previous maintainer of
+the LiS-2.18 releases; however, David is no longer maintaining any version of LiS.  Please do not
+direct maintenance requests at David.}
+@ignore
+David Grothe is the principal active supporter of LiS, so please direct
+questions to him rather than to the others.
+@end ignore
+Ole Husgaard
+@auindex Husgaard, Ole
+@ignore
+is responsible for the ldl driver and
+@end ignore
+has contributed to the kerneld support and installation procedures.
+Jürgen Magin
+@auindex Magin, Jürgen
+contributed patches for Linux SPARC.
+G Yeganjaiah
+@auindex Yeganjaiah, G
+added interrupt routine support.
+John Boyd
+@auindex Boyd, John
+implemented fattach and STREAMS pipes and FIFOs.
+Brian Bidulock
+@auindex Bidulock, Brian
+developed a complete set of manual pages for LiS, converted the build process to autoconf, wrapped
+the source RPMS, updated this manual for texinfo and currently maintains the package.
+
+The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@end multitable
+
+Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
+included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
+Reports}, in the manual.
+
+@unnumberedsec Mailing List
+
+@ignore
+Francisco Ballesteros still maintains an LiS mailing list.  Click Here to
+Subscribe to the LiS mailing list
+
+You can mail to the group by addressing email to
+@email{linux-streams@@gsyc.escet.urjc.es}.
+
+You can view the archives at
+@uref{http://gsyc.escet.urjc.es/mailarchive/linux-streams}.
+@end ignore
+
 @c --------------------------------------------------------------------------
 
 @node Preface
@@ -651,75 +747,6 @@ successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of th
 the FAR (or any successor regulations).
 
 @c --------------------------------------------------------------------------
-
-@subsection Authors
-
-Linux STREAMS, termed LiS, is an SVR4 compatible STREAMS executive which runs in
-the Linux Kernel as a loadable module.  It is the product of a joint effort
-among the following authors.
-
-@itemize @asis
-@item Francisco J. Ballesteros @email{nemo@@gsyc.escet.urjc.es}
-@auindex Ballesteros, Francisco J.
-@item John Boyd @email{jaboydjr@@netwalk.com}
-@auindex Boyd, John
-@item Denis Froschauer @email{Denis.Froschauer@@hol.fr}
-@auindex Froschauer, Denis
-@item David Grothe @email{dave@@gcom.com}
-@auindex Grothe, David
-@item Ole Husgaard @email{sparre@@login.dknet.dk}
-@auindex Husgaard, Ole
-@item Jürgen Magin @email{juergen.magin@@octogon.de}
-@auindex Magin, Jürgen
-@item Graham Wheeler @email{gram@@cdsec.com}
-@auindex Wheeler, Graham
-@item G Yeganjaiah @email{yegag@@hclt.com}
-@auindex Yeganjaiah, G
-@item Brian Bidulock @email{bidulock@@openss7.org}
-@auindex Bidulock, Brian F. G.
-@end itemize
-
-Brian Bidulock is the principal active maintainer of LiS, so please direct
-questions to him rather than the others.@footnote{David Grothe was the previous
-maintainer of the LiS-2.18 releases; however, David is no longer maintaining any
-version of LiS.  Please do not direct maintenance requests at David.}
-@ignore
-David Grothe is the principal active supporter of LiS, so please direct
-questions to him rather than to the others.
-@end ignore
-Ole Husgaard
-@ignore
-is responsible for the ldl driver and
-@end ignore
-has contributed to the kerneld support and installation procedures.  Jürgen
-Magin contributed patches for Linux SPARC.  G Yeganjaiah added interrupt routine
-support.  John Boyd implemented fattach and STREAMS pipes and FIFOs.  Brian
-Bidulock developed a complete set of manual pages for LiS, converted the build
-process to autoconf, wrapped the source RPMS, updated this manual for texinfo
-and currently maintains and the package.
-
-See @ref{Author Index}, for a complete listing and cross-index of authors to
-sections of this document.
-@auindex Grothe, David
-@auindex Husgaard, Ole
-@auindex Boyd, John
-@auindex Ballesteros, Francisco J.
-@auindex Magin, Jürgen
-@auindex Yeganjaiah, G
-@auindex Bidulock, Brian F. G.
-
-@ignore
-Francisco Ballesteros still maintains an LiS mailing list.  Click Here to
-Subscribe to the LiS mailing list
-
-You can mail to the group by addressing email to
-@email{linux-streams@@gsyc.escet.urjc.es}.
-
-You can view the archives at
-@uref{http://gsyc.escet.urjc.es/mailarchive/linux-streams}.
-@end ignore
-
-@c ----------------------------------------------------------------------------
 
 @node Quick Start Guide
 @unnumbered Quick Start Guide

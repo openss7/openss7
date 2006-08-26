@@ -64,7 +64,7 @@ is compatible with @cite{SVR 4.2 MP} @dfn{STREAMS}.
 buggy and deprecated @cite{Linux STREAMS (LiS)}.  In contrast, @cite{@value{PACKAGE_TITLE}} has the
 following features in contrast to @cite{Linux STREAMS}:
 
-@multitable @columnfractions .50 .05
+@multitable @columnfractions .50 .50
 @item @b{@value{PACKAGE_TITLE}}
 @tab @b{Linux STREAMS (LiS)}
 @item

@@ -101,7 +101,7 @@
 
 @macro manref {name}
 @mpindex \name\
-@command{\name\}
+@code{@uref{http://www.openss7.org/man2html?\name\,,\name\}}
 @end macro
 
 @macro mantype {name}
@@ -174,7 +174,7 @@
 
 @macro manref {name}
 @mpindex \name\
-@command{\name\}
+@code{@uref{http://www.openss7.org/man2html?\name\,,\name\}}
 @end macro
 
 @macro mantype {name}
@@ -226,7 +226,7 @@
 
 @macro manpage {name}
 @mpindex \name\
-@command{\name\}
+@uref{http://www.openss7.org/man2html?\name\,, @command{\name\}}
 @end macro
 
 @macro type {name}

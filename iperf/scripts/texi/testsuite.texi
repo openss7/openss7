@@ -620,4 +620,6 @@ Unverified behaviour may contain unknown bugs.
 
 Please remember that there is @strong{NO WARRANTY}.
 
-See also @ref{Bugs}.
+@c See also @ref{Bugs}.
+
+@include bugs.texi

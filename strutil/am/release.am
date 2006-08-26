@@ -97,6 +97,30 @@ ALL_LOCAL			+= MANUAL
 if MAINTAINER_MODE
 ## MAINTAINER_MODE
 
+$(srcdir)/AUTHORS: MANUAL
+	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 $(ECHO) "$(PACKAGE_TITLE) -- authors.  $(PACKAGE_DATE)" > $@ ; \
+	 $(ECHO) "$$idline" >> $@ ; \
+	 $(ECHO) "Copyright (c) 2001-`date +%Y`  OpenSS7 Corporation. <http://www.openss7.com/>" >> $@ ; \
+	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
+	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
+	 $(ECHO) -e "\f" >> $@ ; \
+	 cat MANUAL | sed -e '\|^ Authors|,\|^ Preface|!d;\| Preface|,$$d' >> $@ ;\
+	 cat $(srcdir)/README | sed -e '\|^-----$$|,$$!d' >> $@
+
+$(srcdir)/BUGS: MANUAL $(srcdir)/AUTHORS
+	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 $(ECHO) "$(PACKAGE_TITLE) -- problem reports.  $(PACKAGE_DATE)" > $@ ; \
+	 $(ECHO) "$$idline" >> $@ ; \
+	 $(ECHO) "Copyright (c) 2001-`date +%Y`  OpenSS7 Corporation. <http://www.openss7.com/>" >> $@ ; \
+	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
+	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
+	 $(ECHO) -e "\f" >> $@ ; \
+	 cat MANUAL | sed -e '\|[0-9].[0-9] Problem Reports|,\|^Appendix|!d;\|^Appendix|,$$d' >> $@ ;\
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
+
 $(srcdir)/NEWS: MANUAL $(srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
@@ -107,7 +131,7 @@ $(srcdir)/NEWS: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
 	 cat MANUAL | sed -e '\|[0-9].[0-9] Release Notes|,\|[0-9].[0-9] Maturity|!d;\|[0-9].[0-9] Maturity|,$$d' | sed -e '1,3d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(srcdir)/THANKS: MANUAL $(srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
@@ -118,8 +142,8 @@ $(srcdir)/THANKS: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat MANUAL | sed -e '\|^ Acknowledgements|,\|^ Preface|!d;\| Preface|,$$d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
+	 cat MANUAL | sed -e '\|^ Acknowledgements|,\|^ Authors|!d;\| Authors|,$$d' >> $@ ;\
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(srcdir)/TODO: MANUAL $(srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
@@ -131,7 +155,7 @@ $(srcdir)/TODO: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
 	 cat MANUAL | sed -e '\|[0-9].[0-9] Schedule|,\|[0-9].[0-9] History|!d;\|[0-9].[0-9] History|,$$d' | sed -e '1,3d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(srcdir)/README: MANUAL $(srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
@@ -143,7 +167,7 @@ $(srcdir)/README: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
 	 cat MANUAL | sed -e '\|Quick Start Guide|,\|Introduction|!d;\|Introduction|,$$d' | sed -e '1,3d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(srcdir)/README-cvs: MANUAL $(srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ;\
@@ -157,7 +181,7 @@ $(srcdir)/README-cvs: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "The following is an extract from the manual to assist CVS developers:" >> $@ ;\
 	 $(ECHO) "" >> $@ ;\
 	 cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Downloading from CVS|,\|^[0-9].[0-9] Configuration|!d;\|^[0-9].[0-9] Configuration|,$$d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(srcdir)/README-nexusware: MANUAL $(srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ;\
@@ -171,7 +195,7 @@ $(srcdir)/README-nexusware: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "The following is an extract from the manual to assist NexusWare developers:" >> $@ ;\
 	 $(ECHO) "" >> $@ ;\
 	 cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Building from the Tar Ball|,\|^[0-9].[0-9] Installing|!d;\|^[0-9].[0-9] Installing|,$$d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(srcdir)/README-alpha: MANUAL $(srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ;\
@@ -202,9 +226,11 @@ $(srcdir)/README-alpha: MANUAL $(srcdir)/AUTHORS
 		 (unstable)   cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Unstable Releases|,\|^[0-9].[0-9] Bugs|!d;\|^[0-9].[0-9] Bugs|,$$d' >> $@ ;; \
 		 (*)          cat MANUAL | sed -e '\|^[0-9].[0-9] Maturity|,\|^[0-9].[0-9] Bugs|!d;\|^[0-9].[0-9] Bugs|,$$d' >> $@ ;; \
 	 esac ; \
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----|,$$!d' >> $@
+	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
-ALL_LOCAL			+= $(srcdir)/NEWS \
+ALL_LOCAL			+= $(srcdir)/AUTHORS \
+				   $(srcdir)/BUGS \
+				   $(srcdir)/NEWS \
 				   $(srcdir)/THANKS \
 				   $(srcdir)/TODO \
 				   $(srcdir)/README \
