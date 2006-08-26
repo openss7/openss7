@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2006/03/05 04:03:13 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/05 04:03:13 $
 
  -----------------------------------------------------------------------------
 
@@ -64,14 +64,14 @@
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
- Revision 1.1.2.3  2006/03/05 04:03:13  brian
+ Revision 0.9.2.3  2006/03/05 04:03:13  brian
  - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
  - updates for new release
 
- Revision 1.1.2.2  2005/12/28 09:53:35  brian
+ Revision 0.9.2.2  2005/12/28 09:53:35  brian
  - remove warnings on FC4 compile
 
- Revision 1.1.2.1  2005/11/07 10:54:59  brian
+ Revision 0.9.2.1  2005/11/07 10:54:59  brian
  - added SAD testing
 
  Revision 0.9.2.20  2005/10/15 10:19:52  brian
@@ -139,14 +139,14 @@
  Revision 1.2  2004/06/08 02:27:36  brian
  - Framework for testing streams.
 
- Revision 1.1  2004/06/07 22:35:57  brian
+ Revision 0.9  2004/06/07 22:35:57  brian
  - Starting test suites for everything.
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2006/03/05 04:03:13 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/05 04:03:13 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2006/03/05 04:03:13 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/03/05 04:03:13 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2173,7 +2173,7 @@ static const char sref_none[] = "(none)";
 static const char test_group_1[] = "Open and close Streams";
 
 #define tgrp_case_1_1 test_group_1
-#define numb_case_1_1 "1.1"
+#define numb_case_1_1 "0.9"
 #define name_case_1_1 "Open and close 1 user SAD Stream."
 #define sref_case_1_1 sref_none
 #define desc_case_1_1 "\
@@ -2248,7 +2248,7 @@ static const char test_group_2[] = "STREAMS Administrative Driver (SAD), ioctl(2
 static const char sref_group_2[] = "STREAMS Administrative Driver (SAD), sad(4) manual page.";
 
 #define tgrp_case_2_1_1 test_group_2
-#define numb_case_2_1_1 "2.1.1"
+#define numb_case_2_1_1 "2.0.9"
 #define name_case_2_1_1 "Perform SAD_VML - EINVAL."
 #define sref_case_2_1_1 sref_group_2
 #define desc_case_2_1_1 "\

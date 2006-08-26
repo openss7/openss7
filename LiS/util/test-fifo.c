@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/05 04:03:10 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/05 04:03:10 $
 
  -----------------------------------------------------------------------------
 
@@ -64,23 +64,23 @@
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
- Revision 1.1.2.6  2006/03/05 04:03:10  brian
+ Revision 0.9.2.6  2006/03/05 04:03:10  brian
  - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
  - updates for new release
 
- Revision 1.1.2.5  2006/02/20 11:05:58  brian
+ Revision 0.9.2.5  2006/02/20 11:05:58  brian
  - gcc 4.0.2 does not like (-1UL) on 64 bit
 
- Revision 1.1.2.4  2005/12/28 09:53:34  brian
+ Revision 0.9.2.4  2005/12/28 09:53:34  brian
  - remove warnings on FC4 compile
 
- Revision 1.1.2.3  2005/12/14 16:30:40  brian
+ Revision 0.9.2.3  2005/12/14 16:30:40  brian
  - added delay before close to one test case
 
- Revision 1.1.2.2  2005/11/01 11:20:34  brian
+ Revision 0.9.2.2  2005/11/01 11:20:34  brian
  - updates for testing and documentation
 
- Revision 1.1.2.1  2005/10/23 05:01:27  brian
+ Revision 0.9.2.1  2005/10/23 05:01:27  brian
  - test programs and modules for POSIX testing
 
  Revision 0.9.2.20  2005/10/13 10:58:48  brian
@@ -151,14 +151,14 @@
  Revision 1.2  2004/06/08 02:27:36  brian
  - Framework for testing streams.
 
- Revision 1.1  2004/06/07 22:35:57  brian
+ Revision 0.9  2004/06/07 22:35:57  brian
  - Starting test suites for everything.
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/05 04:03:10 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/05 04:03:10 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/05 04:03:10 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/05 04:03:10 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2277,7 +2277,7 @@ static const char test_group_1[] = "Open and close a FIFO.";
 static const char sref_group_1[] = "POSIX 1003.1 2004/SUSv3 open(2p) reference page, FIFOs.";
 
 #define tgrp_case_1_1 test_group_1
-#define numb_case_1_1 "1.1"
+#define numb_case_1_1 "0.9"
 #define name_case_1_1 "Open and close 1 FIFO."
 #define sref_case_1_1 sref_none
 #define desc_case_1_1 "\
@@ -2560,7 +2560,7 @@ static const char sref_group_2[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference 
 static const char sref_case_2_1[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_LOOK.";
 
 #define tgrp_case_2_1_1 test_group_2
-#define numb_case_2_1_1 "2.1.1"
+#define numb_case_2_1_1 "2.0.9"
 #define name_case_2_1_1 "I_LOOK ioctl() on a FIFO - EINVAL."
 #define sref_case_2_1_1 sref_case_2_1
 #define desc_case_2_1_1 "\
@@ -3179,7 +3179,7 @@ static const char sref_case_3_1[] = "POSIX 1003.1 2004/SUSv3 write(2p) reference
  * the O_NONBLOCK flag of the file status flags is set. */
 
 #define tgrp_case_3_1_1 test_group_3
-#define numb_case_3_1_1 "3.1.1"
+#define numb_case_3_1_1 "3.0.9"
 #define name_case_3_1_1 "write() to a FIFO."
 #define sref_case_3_1_1 sref_case_3_1
 #define desc_case_3_1_1 "\

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: testmod.h,v 1.1.2.1 2005/10/23 05:01:26 brian Exp $
+ @(#) $Id: testmod.h,v 0.9.2.1 2005/10/23 05:01:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@
  -----------------------------------------------------------------------------
 
  $Log: testmod.h,v $
- Revision 1.1.2.1  2005/10/23 05:01:26  brian
+ Revision 0.9.2.1  2005/10/23 05:01:26  brian
  - test programs and modules for POSIX testing
 
  Revision 0.9.2.1  2005/09/25 22:52:10  brian
@@ -61,7 +61,7 @@
 #ifndef __SYS_TESTMOD_H__
 #define __SYS_TESTMOD_H__
 
-#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

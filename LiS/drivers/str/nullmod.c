@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/20 15:11:41 $
 
  -----------------------------------------------------------------------------
 
@@ -50,10 +50,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/20 15:11:41 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/20 15:11:41 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/20 15:11:41 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"

@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-pipe.at,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2006/08/16 07:39:33 $
+dnl @(#) $RCSfile: testsuite-pipe.at,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/16 07:39:33 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -66,26 +66,26 @@ dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-pipe.at,v $
-dnl Revision 1.1.2.7  2006/08/16 07:39:33  brian
+dnl Revision 0.9.2.7  2006/08/16 07:39:33  brian
 dnl - add brief sleep to buffer leak check
 dnl
-dnl Revision 1.1.2.6  2006/03/05 04:03:08  brian
+dnl Revision 0.9.2.6  2006/03/05 04:03:08  brian
 dnl - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
 dnl - updates for new release
 dnl
-dnl Revision 1.1.2.5  2005/12/20 15:11:46  brian
+dnl Revision 0.9.2.5  2005/12/20 15:11:46  brian
 dnl - result of SMP kernel testing for LiS
 dnl
-dnl Revision 1.1.2.4  2005/12/19 12:42:54  brian
+dnl Revision 0.9.2.4  2005/12/19 12:42:54  brian
 dnl - locking down for release
 dnl
-dnl Revision 1.1.2.3  2005/11/07 03:01:56  brian
+dnl Revision 0.9.2.3  2005/11/07 03:01:56  brian
 dnl - marked expected failures
 dnl
-dnl Revision 1.1.2.2  2005/11/01 11:20:32  brian
+dnl Revision 0.9.2.2  2005/11/01 11:20:32  brian
 dnl - updates for testing and documentation
 dnl
-dnl Revision 1.1.2.1  2005/10/23 05:01:27  brian
+dnl Revision 0.9.2.1  2005/10/23 05:01:27  brian
 dnl - test programs and modules for POSIX testing
 dnl
 dnl Revision 0.9.2.2  2005/10/12 09:55:54  brian
@@ -265,14 +265,14 @@ AT_TESTED([test-pipe])
 
 AT_BANNER([PIPE Test])
 
-AT_SETUP([posix pipe test 1.1])
+AT_SETUP([posix pipe test 0.9])
 AT_KEYWORDS([pipe open])
-AT_CHECK([test_pipe 1.1], [], [ignore], [], [], [])
+AT_CHECK([test_pipe 0.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([posix pipe test 2.1.1])
+AT_SETUP([posix pipe test 2.0.9])
 AT_KEYWORDS([pipe ioctl I_LOOK])
-AT_CHECK([test_pipe 2.1.1], [], [ignore], [], [], [])
+AT_CHECK([test_pipe 2.0.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.2.1])
@@ -370,9 +370,9 @@ AT_KEYWORDS([pipe ioctl I_CANPUT ENXIO HUP])
 AT_CHECK([test_pipe 2.4.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([posix pipe test 3.1.1])
+AT_SETUP([posix pipe test 3.0.9])
 AT_KEYWORDS([pipe write PIPE_BUF])
-AT_CHECK([test_pipe 3.1.1], [], [ignore], [], [], [])
+AT_CHECK([test_pipe 3.0.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.2])

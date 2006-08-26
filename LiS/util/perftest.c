@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/11/01 11:20:34 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/11/01 11:20:34 $
 
  -----------------------------------------------------------------------------
 
@@ -64,13 +64,13 @@
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
- Revision 1.1.2.5  2005/11/01 11:20:34  brian
+ Revision 0.9.2.5  2005/11/01 11:20:34  brian
  - updates for testing and documentation
 
- Revision 1.1.2.4  2005/10/21 03:55:37  brian
+ Revision 0.9.2.4  2005/10/21 03:55:37  brian
  - changes for queueing performance testing
 
- Revision 1.1.2.3  2005/10/19 11:09:15  brian
+ Revision 0.9.2.3  2005/10/19 11:09:15  brian
  - updated perftest program
 
  Revision 0.9.2.3  2005/10/19 01:53:28  brian
@@ -87,10 +87,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/11/01 11:20:34 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/11/01 11:20:34 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/11/01 11:20:34 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/11/01 11:20:34 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS

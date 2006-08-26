@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 1.1.2.1 2005/07/13 01:37:14 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.1 2005/07/13 01:37:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@
  -----------------------------------------------------------------------------
 
  $Log: strconf.h,v $
- Revision 1.1.2.1  2005/07/13 01:37:14  brian
+ Revision 0.9.2.1  2005/07/13 01:37:14  brian
  - added __LIS_INTERNAL__ to hide internal symbol in header files
 
  *****************************************************************************/
@@ -58,7 +58,7 @@
 #ifndef __SYS_LIS_STRCONF_H__
 #define __SYS_LIS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 /* nothing here that is not in stream.h */
 

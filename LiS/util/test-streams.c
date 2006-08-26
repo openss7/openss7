@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/05 04:03:14 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/05 04:03:14 $
 
  -----------------------------------------------------------------------------
 
@@ -64,23 +64,23 @@
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
- Revision 1.1.2.6  2006/03/05 04:03:14  brian
+ Revision 0.9.2.6  2006/03/05 04:03:14  brian
  - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
  - updates for new release
 
- Revision 1.1.2.5  2006/02/20 11:05:59  brian
+ Revision 0.9.2.5  2006/02/20 11:05:59  brian
  - gcc 4.0.2 does not like (-1UL) on 64 bit
 
- Revision 1.1.2.4  2005/12/28 09:53:35  brian
+ Revision 0.9.2.4  2005/12/28 09:53:35  brian
  - remove warnings on FC4 compile
 
- Revision 1.1.2.3  2005/12/09 04:49:40  brian
+ Revision 0.9.2.3  2005/12/09 04:49:40  brian
  - new test cases
 
- Revision 1.1.2.2  2005/11/01 11:20:34  brian
+ Revision 0.9.2.2  2005/11/01 11:20:34  brian
  - updates for testing and documentation
 
- Revision 1.1.2.1  2005/10/23 05:01:27  brian
+ Revision 0.9.2.1  2005/10/23 05:01:27  brian
  - test programs and modules for POSIX testing
 
  Revision 0.9.2.54  2005/10/14 12:26:54  brian
@@ -250,14 +250,14 @@
  Revision 1.2  2004/06/08 02:27:36  brian
  - Framework for testing streams.
 
- Revision 1.1  2004/06/07 22:35:57  brian
+ Revision 0.9  2004/06/07 22:35:57  brian
  - Starting test suites for everything.
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/05 04:03:14 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/05 04:03:14 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2006/03/05 04:03:14 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/05 04:03:14 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2767,7 +2767,7 @@ static const char sref_none[] = "(none)";
 static const char test_group_1[] = "Open and close Streams";
 
 #define tgrp_case_1_1 test_group_1
-#define numb_case_1_1 "1.1"
+#define numb_case_1_1 "0.9"
 #define name_case_1_1 "Open and close 1 Stream."
 #define sref_case_1_1 sref_none
 #define desc_case_1_1 "\
@@ -2822,7 +2822,7 @@ static const char sref_case_2[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference p
 static const char sref_case_2_1[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_NREAD section.";
 
 #define tgrp_case_2_1_1 test_group_2
-#define numb_case_2_1_1 "2.1.1"
+#define numb_case_2_1_1 "2.0.9"
 #define name_case_2_1_1 "Perform streamio I_NREAD."
 #define sref_case_2_1_1 sref_case_2_1
 #define desc_case_2_1_1 "\
@@ -12750,7 +12750,7 @@ static const char test_group_3_1[] = "Perform READ on one Stream";
 static const char sref_case_3_1[] = "POSIX 1003.1 2003/SUSv3 read(2p) reference page.";
 
 #define tgrp_case_3_1_1 test_group_3_1
-#define numb_case_3_1_1 "3.1.1"
+#define numb_case_3_1_1 "3.0.9"
 #define name_case_3_1_1 "Perform read - EOF."
 #define sref_case_3_1_1 sref_case_3_1
 #define desc_case_3_1_1 "\

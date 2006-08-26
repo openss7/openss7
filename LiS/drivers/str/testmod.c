@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/20 15:11:41 $
 
  -----------------------------------------------------------------------------
 
@@ -51,19 +51,19 @@
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
- Revision 1.1.2.5  2005/12/20 15:11:41  brian
+ Revision 0.9.2.5  2005/12/20 15:11:41  brian
  - result of SMP kernel testing for LiS
 
- Revision 1.1.2.4  2005/12/19 03:22:18  brian
+ Revision 0.9.2.4  2005/12/19 03:22:18  brian
  - wend for simple _RP
 
- Revision 1.1.2.3  2005/12/18 06:37:53  brian
+ Revision 0.9.2.3  2005/12/18 06:37:53  brian
  - corrections for binary compatiblity
 
- Revision 1.1.2.2  2005/12/12 12:26:27  brian
+ Revision 0.9.2.2  2005/12/12 12:26:27  brian
  - changes for warningless compile on gcc 4.0.2.
 
- Revision 1.1.2.1  2005/10/23 05:01:26  brian
+ Revision 0.9.2.1  2005/10/23 05:01:26  brian
  - test programs and modules for POSIX testing
 
  Revision 0.9.2.6  2005/10/14 12:26:49  brian
@@ -86,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/20 15:11:41 $"
 
 static char const ident[] =
-    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $";
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/20 15:11:41 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -118,7 +118,7 @@ static char const ident[] =
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/20 15:11:41 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: version.h.in,v 1.1.2.2 2005/07/08 13:09:13 brian Exp $
+ @(#) $Id: version.h.in,v 0.9.2.2 2005/07/08 13:09:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -50,10 +50,10 @@
  -----------------------------------------------------------------------------
 
  $Log: version.h.in,v $
- Revision 1.1.2.2  2005/07/08 13:09:13  brian
+ Revision 0.9.2.2  2005/07/08 13:09:13  brian
  - use full version
 
- Revision 1.1.2.1  2005/07/08 12:16:30  brian
+ Revision 0.9.2.1  2005/07/08 12:16:30  brian
  - added version files
 
  *****************************************************************************/
@@ -61,7 +61,7 @@
 #ifndef __SYS_@PACKAGE_UCNAME@_VERSION_H__
 #define __SYS_@PACKAGE_UCNAME@_VERSION_H__
 
-#ident "@(#) $RCSfile: version.h.in,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: version.h.in,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #define @PACKAGE_UCNAME@_VERSION "@PACKAGE_RPMEPOCH@:@VERSION@-@PACKAGE_RPMRELEASE@"
 
