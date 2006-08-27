@@ -66,31 +66,34 @@ removed from the @cite{LiS} distribution and separated so that they could build 
 The package contains the following standard @cite{Open Systems Interconnect (OSI)} conforming header
 files:
 
-@itemize -
-@item @file{<sys/cdi.h>} @cite{Communications Device Interface}
-@item @file{<sys/dlpi.h>} @cite{Data Link Provider Interface Version 2.0.0}
-@item @file{<sys/npi.h>} @cite{Network Provider Interface Version 2.0.0}
-@end itemize
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @file{<sys/cdi.h>} @cite{Communications Device Interface}
+@item @tab @minus{} @file{<sys/dlpi.h>} @cite{Data Link Provider Interface Version 2.0.0}
+@item @tab @minus{} @file{<sys/npi.h>} @cite{Network Provider Interface Version 2.0.0}
+@end multitable
 
 Note that the @cite{Transport Provider Interface (TPI)} header files are contained in the
 @command{strxnet} package.
 
 The package currently includes the following @dfn{STREAMS} kernel modules and drivers:
 
-@itemize -
-@item @file{streams_link_driver.ko} @file{/dev/ldl}
-@item @file{streams_ip_to_dlpi.ko} @file{/dev/ip2xinet}
-@item @file{streams_ip_strms.ko} @file{module}
-@item @file{streams_np_ip.ko} @file{/dev/np_ip} @file{/dev/ipcl} @file{/dev/ipco}
-@end itemize
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @file{streams_link_driver.ko} @file{/dev/ldl}
+@item @tab @minus{} @file{streams_ip_to_dlpi.ko} @file{/dev/ip2xinet}
+@item @tab @minus{} @file{streams_ip_strms.ko} @file{module}
+@item @tab @minus{} @file{streams_np_ip.ko} @file{/dev/np_ip} @file{/dev/ipcl} @file{/dev/ipco}
+@end multitable
 
-The @manref{ldl(4)} driver attempts to provide a @cite{Data Link Provider (DLPI)} interface to an
+@table @manref
+@item ldl(4)
+The @manpage{ldl(4)} driver attempts to provide a @cite{Data Link Provider (DLPI)} interface to an
 existing Ethernet driver under Linux.  This driver was orignally written by Ole Husgaard and
 subsequently modified by Dave Grothe and later by Brian Bidulock of @uref{http://www.openss7.org/,
 The OpenSS7 Project}.  It is distributed under the terms of the @cite{GNU Public License (GPL)
 Version 2}.
 
-The @manref{ip2xnet(4)} driver attempts the reverse: to take a STREAMS Ethernet driver that supports
+@item ip2xnet(4)
+The @manpage{ip2xnet(4)} driver attempts the reverse: to take a STREAMS Ethernet driver that supports
 the @cite{Data Link Provider (DLPI)} interface and link it underneath the @manpage{ip2xnet(4)}
 multiplexing driver to make it available for use by the Linux IP subsystem.  The driver was
 originally written by @cite{The Software Group Ltd.} and subsequently modified by Brian Bidulock of
@@ -98,7 +101,8 @@ originally written by @cite{The Software Group Ltd.} and subsequently modified b
 of the @cite{LGPL}, but is distributed by @cite{The OpenSS7 Project} under the terms of the
 @cite{GNU Public License (GPL) Version 2}.
 
-The @manref{ip_strms(4)} module is similar to the @manpage{ip2xnet(4)} driver, however, this is a
+@item ip_strms(4)
+The @manpage{ip_strms(4)} module is similar to the @manpage{ip2xnet(4)} driver, however, this is a
 module that is pushed over the @cite{DLPI} Stream corresponding to the @cite{Data Link Provider
 (DLPI)} driver instead of linking the @cite{DLPI} Stream under a multiplexing driver as is done with
 the @manpage{ip2xnet(4)} driver.  Both have a similar effect.  The module was originally written by
@@ -107,10 +111,12 @@ Mikel Matthews and Dave Grothe and subsequently modified by Brian Bidulock of
 of the @cite{LGPL}, but is distributed by @cite{The OpenSS7 Project} under the terms of the
 @cite{GNU Public License (GPL) Version 2}.
 
-The @manref{np_ip(4)} driver provides a @dfn{Network Service Provider} using the @cite{Network
+@item np_ip(4)
+The @manpage{np_ip(4)} driver provides a @dfn{Network Service Provider} using the @cite{Network
 Provider Interface (NPI) Revision 2.0.0} service interface to the Linux IP subsystem.  The driver
 was originally written by Brian Bidulock for the OpenSS7 project for the purpose of testing
 @cite{Stream Control Transmission Protocol (SCTP)} and other direct IP based protocols.
+@end table
 
 The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
 drivers, modules, libraries, utilities, test programs, daemons, and development environment for the

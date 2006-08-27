@@ -21,27 +21,17 @@ well.
 The `OpenSS7 STREAMS Compatibility' package provides compatibility with
 the following "STREAMS" implementations:
 
-   * `UNIX(R) System V Release 3.2'
-
-   * `UNIX(R) System V Release 4.2'
-
-   * `MPS(R) Mentat Portable Streams'
-
-   * `Linux STREAMS 2.18.0'
-
-   * `AIX(R) 5L Version 5.1 Portable STREAMS Environment'
-
-   * `HP-UX(R) 11.0i v2 STREAMS/UX'
-
-   * `IRIX(R) 6.5.17'
-
-   * `Mac(R) OS 9 Open Transport'
-
-   * `Digital(R) UNIX (OSF/1.2)'
-
-   * `Solaris(R) 9/SunOS(R) 5.9'
-
-   * `UnixWare(R) 7.1.3'
+     * `UNIX(R) System V Release 3.2'
+     * `UNIX(R) System V Release 4.2'
+     * `MPS(R) Mentat Portable Streams'
+     * `Linux STREAMS 2.18.0'
+     * `AIX(R) 5L Version 5.1 Portable STREAMS Environment'
+     * `HP-UX(R) 11.0i v2 STREAMS/UX'
+     * `IRIX(R) 6.5.17'
+     * `Mac(R) OS 9 Open Transport'
+     * `Digital(R) UNIX (OSF/1.2)'
+     * `Solaris(R) 9/SunOS(R) 5.9'
+     * `UnixWare(R) 7.1.3'
 
 These compatiblity module compile as kernel modules and will be demand
 loaded into the kernel when used by a specific "STREAMS" module or
