@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: testsuite.texi,v 0.9.2.7 2006/07/03 05:49:20 brian Exp $
+@c @(#) $Id: testsuite.texi,v 0.9.2.8 2006/08/27 12:20:32 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/07/03 05:49:20 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/27 12:20:32 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -620,6 +620,4 @@ Unverified behaviour may contain unknown bugs.
 
 Please remember that there is @strong{NO WARRANTY}.
 
-@c See also @ref{Bugs}.
-
-@include bugs.texi
+See also @ref{Bugs}, in the manual, or file @file{BUGS} in the release directory.

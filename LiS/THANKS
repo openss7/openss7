@@ -1,18 +1,18 @@
 Linux STREAMS (LiS) -- acknowledgements.  2006-08-26
-$Id: THANKS,v 1.1.6.4 2006/08/26 18:31:29 brian Exp $
+$Id: THANKS,v 1.1.6.5 2006/08/27 12:26:25 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
  Acknowledgements
-*****************
+=================
 
 As with most open source projects, this project would not have been
 possible without the valiant efforts and productive software of the
 `Free Software Foundation' and the `Linux Kernel Community'.
 
  Sponsors
-=========
+---------
 
 Funding for completion of the `OpenSS7 Linux STREAMS (LiS)' package was
 provided in part by:
@@ -34,7 +34,7 @@ Additional funding for The OpenSS7 Project was provided by:
      * Verisign
 
  Contributors
-=============
+-------------
 
 The current maintainer of the `OpenSS7 Linux STREAMS (LiS)' package is
 Brian F. G. Bidulock <bidulock@openss7.org>.

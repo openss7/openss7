@@ -1,5 +1,5 @@
 OpenSS7 Master Package -- beta release introduction.  2006-08-26
-$Id: README-alpha,v 0.9.2.4 2006/08/26 14:46:24 brian Exp $
+$Id: README-alpha,v 0.9.2.5 2006/08/27 12:26:24 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -49,6 +49,25 @@ With the exception of packages not originaly created by the `OpenSS7
 Project', the `OpenSS7 Project' software does not ship with known bugs
 in any release stage except "pre-alpha".  "OpenSS7 Master Package" had
 no known bugs at the time of release.
+
+5.5.3 Defect History
+--------------------
+
+This section contains historical bugs that were encountered during
+development and their resolutions.  This list serves two purposes:
+
+  1. It captures bugs encountered between releases during development
+     that could possibly reoccur (and the Moon is made of blue cheese).
+     It therefore provides a place for users to look if they encounter
+     a problem.
+
+  2. It provides a low overhead bug list between releases for
+     developers to use as a `TODO' list.
+
+ Bugs
+.....
+
+`(no items)'
 
 5.4.3 Beta Releases
 -------------------

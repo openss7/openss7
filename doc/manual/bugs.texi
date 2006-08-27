@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id$
+@c @(#) $Id: bugs.texi,v 0.9.2.1 2006/08/27 12:02:50 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,30 +53,9 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date$ by $Author$
+@c Last Modified $Date: 2006/08/27 12:02:50 $ by $Author: brian $
 @c
 @c =========================================================================
-
-With the exception of packages not originaly created by the @uref{http://www.openss7.org/,, OpenSS7
-Project}, the @uref{http://www.openss7.org/,, OpenSS7 Project} released software does not ship with
-known bugs in any release stage except @dfn{pre-alpha}.  @cite{@value{PACKAGE_TITLE}} had no known
-bugs at the time of release.
-
-Nevertheless, this file contains bugs encountered during development and their resolutions.  The
-@uref{http://www.openss7.org/,, OpenSS7 Project} does not release software with known bugs, so this
-list serves two purposes:
-
-@enumerate 1
-@item
-It captures bugs encountered between releases during development that could possibly reoccur (and
-the Moon is made of blue cheese).  It therefore provides a place for users to look if they encounter
-a problem.
-
-@item
-It provides a low overhead bug list between releases for developers to use as a @file{TODO} list.
-@end enumerate
-
-@subsubheading Bugs
 
 @table @code
 @item (no items)

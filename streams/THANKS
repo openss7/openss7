@@ -1,19 +1,11 @@
 Linux Fast-STREAMS -- acknowledgements.  2006-08-26
-$Id: THANKS,v 0.9.2.7 2006/08/26 18:31:43 brian Exp $
+$Id: THANKS,v 0.9.2.8 2006/08/27 12:26:43 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
  Acknowledgements
-*****************
-
-The `OpenSS7 Linux Fast-STREAMS' project was funded in part by:
-
-     * OpenSS7 Corporation (http://www.openss7.com/)
-     * SS8 Networks Inc. (http://www.ss8.com/)
-
-Thanks to the subscribers to and sponsors of The OpenSS7 Project.
-Without their support, open software like this would not be possible.
+=================
 
 As with most open source projects, this project would not have been
 possible without the valiant efforts and productive software of the

@@ -1,7 +1,7 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: quick.texi,v 0.9.2.4 2006/08/26 08:54:16 brian Exp $
+@c @(#) $Id: quick.texi,v 0.9.2.5 2006/08/27 12:16:11 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 08:54:16 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/27 12:16:11 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -61,35 +61,31 @@
 
 @include descrip.texi
 
-@unnumberedsubsec Downloading
+@unnumberedsubsec Release
 
-This is the @command{@value{PACKAGE}-@value{VERSION}} package.  It, and the
-current version, can be obtained from the download area of
-@uref{http://www.openss7.org/download.html, The OpenSS7 Project} website using
-a command such as:
+This is the @command{@value{PACKAGE}-@value{VERSION}} package, released @value{PACKAGE_DATE}.  This
+@samp{@value{VERSION}} release, and the lastest version, can be obtained from the
+@uref{http://www.openss7.org/download.html, download area} of @uref{http://www.openss7.org/,, The
+OpenSS7 Project} website using a command such as:
 
 @example
 $> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2
 @end example
 
-Please see the @file{NEWS} file for release notes and history of user visible
-changes for the current version, and the @file{ChangeLog} file for a more
-detailed history of implementation changes.  The @file{TODO} file lists
-features not yet implemented and other outstanding items.
+Please see the @file{NEWS} file for release notes and history of user visible changes for the
+current version, and the @file{ChangeLog} file for a more detailed history of implementation
+changes.  The @file{TODO} file lists features not yet implemented and other outstanding items.
 
-Please see the @file{INSTALL}, @file{INSTALL-@value{PACKAGE}} and
-@file{README-make} files (or the @cite{Installation and Reference Manual}) for
-installation instructions.  When working from CVS or git, please see the
-@file{README-cvs} file.  An abbreviated installation procedure that works for
+Please see the @file{INSTALL}, @file{INSTALL-@value{PACKAGE}} and @file{README-make} files (or the
+@cite{Installation and Reference Manual}) for installation instructions.  When working from CVS or
+git, please see the @file{README-cvs} file.  An abbreviated installation procedure that works for
 most applications appears below.
 
-This release of the package is published strictly under Version 2 of the
-@cite{GNU Public License} which can be found in the file @file{COPYING}.
-Package specific licensing terms (if any) can be found in the file
-@file{LICENSING}.  Please respect these licensing arrangements.  If you are
+This release of the package is published strictly under Version 2 of the @cite{GNU Public License}
+which can be found in the file @file{COPYING}.  Package specific licensing terms (if any) can be
+found in the file @file{LICENSING}.  Please respect these licensing arrangements.  If you are
 interested in different licensing terms, please contact the copyright holder,
-@uref{http://www.openss7.com/, OpenSS7 Corporation}, or
-@url{mailto:bidulock@@openss7.org}.
+@uref{http://www.openss7.com/, OpenSS7 Corporation}, or @url{mailto:bidulock@@openss7.org}.
 
 See @file{README-alpha} (if it exists) for alpha release information.
 
@@ -97,13 +93,12 @@ See @file{README-alpha} (if it exists) for alpha release information.
 
 @include prerequisites.texi
 
-When configuring and building multiple @cite{OpenSS7 Project} release
-packages, place all of the source packages (unpacked tarballs) at the same
-directory level and all build directories at the same directory level.
+When configuring and building multiple @cite{OpenSS7 Project} release packages, place all of the
+source packages (unpacked tarballs) at the same directory level and all build directories at the
+same directory level.
 
-When installing packages that install as kernel modules, it is necessary to
-have the correct kernel development package installed.  For the following
-distributions, use the following commands:
+When installing packages that install as kernel modules, it is necessary to have the correct kernel
+development package installed.  For the following distributions, use the following commands:
 
 @example
 Ubuntu:  $> apt-get install linux-headers
@@ -111,9 +106,8 @@ Debain:  $> apt-get install kernel-headers
 Fedora:  $> yum install kernel-devel
 @end example
 
-You also need the same version of gcc compiple with which the kernel was
-built.  If it is not the default, add @samp{CC=kgcc} on the line after
-@samp{./configure}, for example:
+You also need the same version of gcc compiple with which the kernel was built.  If it is not the
+default, add @samp{CC=kgcc} on the line after @samp{./configure}, for example:
 
 @example
 $> ../@value{PACKAGE}-@value{VERSION}/configure CC='gcc-3.4'
@@ -121,8 +115,8 @@ $> ../@value{PACKAGE}-@value{VERSION}/configure CC='gcc-3.4'
 
 @unnumberedsubsec Installation
 
-The following commands will download, configure, build, check, install,
-validate, uninstall and remove the package:
+The following commands will download, configure, build, check, install, validate, uninstall and
+remove the package:
 
 @example
 $> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2
@@ -141,10 +135,11 @@ $> rm -rf @value{PACKAGE}-@value{VERSION}
 $> rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
 @end example
 
-If you have problems, try building with the logging targets instead.  If the
-make of a logging target fails, an automatic problem report will be generated
-that can be mailed to @uref{mailto:bugs@@openss7.org, The OpenSS7 Project}.
-Installation steps using the logging targets proceed as follows:
+If you have problems, try building with the logging targets instead.  If the make of a logging
+target fails, an automatic problem report will be generated that can be mailed to
+@email{bugs@@openss7.org, The OpenSS7 Project}.@footnote{Please see @xref{Problem Reports}, in the
+manual, or the file @file{PROBLEMS} in the release directory for more information on filing a proper
+@dfn{Problem Report}.} Installation steps using the logging targets proceed as follows:
 
 @example
 $> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2
@@ -165,17 +160,15 @@ $> rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
 
 See @file{README-make} for additional specialized make targets.
 
-For custom applications, see the @file{INSTALL} and
-@file{INSTALL-@value{PACKAGE}} files or the @cite{Installation and Reference
-Manual} as listed below.  If you encounter troubles, see the trouble shooting
-section of the @cite{Installation and Reference Manual} before issuing a bug
+For custom applications, see the @file{INSTALL} and @file{INSTALL-@value{PACKAGE}} files or the
+@cite{Installation and Reference Manual} as listed below.  If you encounter troubles, see the
+trouble shooting section of the @cite{Installation and Reference Manual} before issuing a bug
 report.
 
 @unnumberedsubsec Brief Installation Instructions
 
-The @value{PACKAGE_TITLE} package is available from the
-@uref{http://www.openss7.org/download.html, downloads area of The OpenSS7
-Project website} using a command such as:
+The @value{PACKAGE_TITLE} package is available from the @uref{http://www.openss7.org/download.html,
+downloads area of The OpenSS7 Project website} using a command such as:
 
 @example
 $> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2
@@ -187,12 +180,11 @@ Unpack the tarball using a command such as:
 $> tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 @end example
 
-The tarball will unpack into the relative subdirectory named after the package
-name: @value{PACKAGE}-@value{VERSION}.
+The tarball will unpack into the relative subdirectory named after the package name:
+@value{PACKAGE}-@value{VERSION}.
 
-The package builds using the GNU @command{autoconf} utilities and the
-@file{configure} script.  To build the package, we recommend using a separate
-@file{build} directory as follows:
+The package builds using the GNU @command{autoconf} utilities and the @file{configure} script.  To
+build the package, we recommend using a separate @file{build} directory as follows:
 
 @example
 $> mkdir build
@@ -200,63 +192,61 @@ $> cd build
 $> ../@value{PACKAGE}-@value{VERSION}/configure
 @end example
 
-In general, the package configures and builds without adding any special
-options to the @file{configure} script.  For general options to the
-@file{configure} script, see the GNU @file{INSTALL} file in the distribution:
+In general, the package configures and builds without adding any special options to the
+@file{configure} script.  For general options to the @file{configure} script, see the GNU
+@file{INSTALL} file in the distribution:
 
 @example
 $> less ../@value{PACKAGE}-@value{VERSION}/INSTALL
 @end example
 
-For specific options to the @file{configure} script, see the
-@file{INSTALL-@value{PACKAGE}} file in the distribution, or simply execute the
-configure script with the @option{--help} option like so:
+For specific options to the @file{configure} script, see the @file{INSTALL-@value{PACKAGE}} file in
+the distribution, or simply execute the configure script with the @option{--help} option like so:
 
 @example
 $> ../@value{PACKAGE}-@value{VERSION}/configure --help
 @end example
 
-After configuring the package, the package can be compiled simply by issuing
-the @samp{make} command:
+After configuring the package, the package can be compiled simply by issuing the @samp{make}
+command:
 
 @example
 $> make
 @end example
 
-Some specialized makefile targets exists, see the @file{README-make} file in
-the distribution or simply invoke the @samp{help} target like so:
+Some specialized makefile targets exists, see the @file{README-make} file in the distribution or
+simply invoke the @samp{help} target like so:
 
 @example
 $> make help | less
 @end example
 
-After successfully building the package, the package can be checked by
-invoking the @samp{check} make target like so:
+After successfully building the package, the package can be checked by invoking the @samp{check}
+make target like so:
 
 @example
 $> make check
 @end example
 
-After succesffully checking the package, the package can be installed by
-invoking the @samp{install} make target (as root) like so:
+After succesffully checking the package, the package can be installed by invoking the @samp{install}
+make target (as root) like so:
 
 @example
 $> sudo make install
 @end example
 
-The testsuites that ship with the package can be invoked after the package has
-been installed by invoking the @samp{installcheck} target.  This target can
-either be invoked as root, or as a normal user, like so:
+The testsuites that ship with the package can be invoked after the package has been installed by
+invoking the @samp{installcheck} target.  This target can either be invoked as root, or as a normal
+user, like so:
 
 @example
 $> make installcheck
 @end example
 
-(Note: you must add the @option{--enable-autotest} flag to @file{configure},
-above for the testsuites to be invoked with @samp{make installcheck}.)
+(Note: you must add the @option{--enable-autotest} flag to @file{configure}, above for the
+testsuites to be invoked with @samp{make installcheck}.)
 
-The package can be cleanly removed by invoking the @samp{uninstall} target (as
-root):
+The package can be cleanly removed by invoking the @samp{uninstall} target (as root):
 
 @example
 $> sudo make uninstall
@@ -273,9 +263,9 @@ $> rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
 
 @unnumberedsubsec Detailed Installation Instructions
 
-More detailed installation instructions can be found in the @cite{Installation
-and Reference Manual}, contained in the distribution in @samp{text},
-@samp{info}, @samp{html} and @samp{pdf} formats:
+More detailed installation instructions can be found in the @cite{Installation and Reference
+Manual}, contained in the distribution in @samp{text}, @samp{info}, @samp{html} and @samp{pdf}
+formats:
 
 @example
 $> cd ../@value{PACKAGE}-@value{VERSION}
@@ -285,11 +275,9 @@ $> info doc/manual/@value{PACKAGE}.info
 $> xpdf doc/manual/@value{PACKAGE}.pdf
 @end example
 
-The @samp{text} version of the manual is always available in the @file{MANUAL}
-file in the release.
+The @samp{text} version of the manual is always available in the @file{MANUAL} file in the release.
 
-The current manual is also always available online from @cite{The OpenSS7
-Project} website at:
+The current manual is also always available online from @cite{The OpenSS7 Project} website at:
 
 @example
 $> lynx http://www.openss7.org/@value{PACKAGE}_manual.html

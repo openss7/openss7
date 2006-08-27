@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 0.9.2.8 2006/08/26 09:18:15 brian Exp $
+% @(#) $Id: SPG2.texi,v 0.9.2.9 2006/08/27 12:26:58 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 09:18:15 $ by $Author: brian $
+% Last Modified $Date: 2006/08/27 12:26:58 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -538,6 +538,9 @@ package.
 @smallexample
 
 $Log: SPG2.texi,v $
+Revision 0.9.2.9  2006/08/27 12:26:58  brian
+- finalizing auto release files
+
 Revision 0.9.2.8  2006/08/26 09:18:15  brian
 - better release file generation
 

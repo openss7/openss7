@@ -1,12 +1,12 @@
 OpenSS7 NETPERF Utility -- read me CVS file.  2006-08-26
-$Id: README-nexusware,v 0.9.2.5 2006/08/26 09:16:25 brian Exp $
+$Id: README-nexusware,v 0.9.2.6 2006/08/27 12:26:31 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The following is an extract from the manual to assist NexusWare developers:
 
-6.3.3 Building from the Tar Ball
+7.3.3 Building from the Tar Ball
 --------------------------------
 
 If you have downloaded the tar ball (*note Downloading the Tar Ball::),
@@ -14,7 +14,7 @@ then the following instructions will rebuild the package on your
 system.  (Note that the build process does not required `root'
 privilege.)
 
-6.3.3.1 Native Build
+7.3.3.1 Native Build
 ....................
 
 Folowing is an example of a native build against the running kernel:
@@ -26,7 +26,7 @@ Folowing is an example of a native build against the running kernel:
      % make
      % popd
 
-6.3.3.2 Cross-Build
+7.3.3.2 Cross-Build
 ...................
 
 Following is an example for a cross-build.  The kernel release version
@@ -48,7 +48,7 @@ example.
      % make
      % popd
 
-6.3.3.3 NexusWare Build
+7.3.3.3 NexusWare Build
 .......................
 
 Additional support is provided for cross-building for the `Performance

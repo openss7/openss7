@@ -1,5 +1,5 @@
 Linux Fast-STREAMS -- read me first file.  2006-08-26
-$Id: README,v 0.9.2.12 2006/08/26 09:18:32 brian Exp $
+$Id: README,v 0.9.2.13 2006/08/27 12:26:43 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -42,18 +42,19 @@ and other utilities.                 Linux-derived utlities.
 Provides full named-streams device   Provides only character-based node
 and device filesystem support.       support.
 
- Downloading
-------------
+ Release
+--------
 
-This is the `streams-0.7a.6.rc3' package.  It, and the current version,
-can be obtained from the download area of The OpenSS7 Project
-(http://www.openss7.org/download.html) website using a command such as:
+This is the `streams-0.7a.6.rc3' package, released 2006-08-26.  This
+`0.7a.6.rc3' release, and the lastest version, can be obtained from the
+download area (http://www.openss7.org/download.html) of The OpenSS7
+Project website using a command such as:
 
      $> wget http://www.openss7.org/tarballs/streams-0.7a.6.rc3.tar.bz2
 
-Please see the `NEWS' file for release notes and history of user visible
-changes for the current version, and the `ChangeLog' file for a more
-detailed history of implementation changes.  The `TODO' file lists
+Please see the `NEWS' file for release notes and history of user
+visible changes for the current version, and the `ChangeLog' file for a
+more detailed history of implementation changes.  The `TODO' file lists
 features not yet implemented and other outstanding items.
 
 Please see the `INSTALL', `INSTALL-streams' and `README-make' files (or
@@ -62,12 +63,13 @@ When working from CVS or git, please see the `README-cvs' file.  An
 abbreviated installation procedure that works for most applications
 appears below.
 
-This release of the package is published strictly under Version 2 of the
-`GNU Public License' which can be found in the file `COPYING'.  Package
-specific licensing terms (if any) can be found in the file `LICENSING'.
-Please respect these licensing arrangements.  If you are interested in
-different licensing terms, please contact the copyright holder, OpenSS7
-Corporation (http://www.openss7.com/), or `mailto:bidulock@openss7.org'.
+This release of the package is published strictly under Version 2 of
+the `GNU Public License' which can be found in the file `COPYING'.
+Package specific licensing terms (if any) can be found in the file
+`LICENSING'.  Please respect these licensing arrangements.  If you are
+interested in different licensing terms, please contact the copyright
+holder, OpenSS7 Corporation (http://www.openss7.com/), or
+`mailto:bidulock@openss7.org'.
 
 See `README-alpha' (if it exists) for alpha release information.
 
@@ -99,8 +101,8 @@ For the following distributions, use the following commands:
      Debain:  $> apt-get install kernel-headers
      Fedora:  $> yum install kernel-devel
 
-You also need the same version of gcc compiple with which the kernel was
-built.  If it is not the default, add `CC=kgcc' on the line after
+You also need the same version of gcc compiple with which the kernel
+was built.  If it is not the default, add `CC=kgcc' on the line after
 `./configure', for example:
 
      $> ../streams-0.7a.6.rc3/configure CC='gcc-3.4'
@@ -129,8 +131,8 @@ validate, uninstall and remove the package:
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
 be generated that can be mailed to The OpenSS7 Project
-(mailto:bugs@openss7.org).  Installation steps using the logging
-targets proceed as follows:
+<bugs@openss7.org>.(3) Installation steps using the logging targets
+proceed as follows:
 
      $> wget http://www.openss7.org/tarballs/streams-0.7a.6.rc3.tar.bz2
      $> tar -xjvf streams-0.7a.6.rc3.tar.bz2
@@ -171,15 +173,15 @@ The tarball will unpack into the relative subdirectory named after the
 package name: streams-0.7a.6.rc3.
 
 The package builds using the GNU `autoconf' utilities and the
-`configure' script.  To build the package, we recommend using a separate
-`build' directory as follows:
+`configure' script.  To build the package, we recommend using a
+separate `build' directory as follows:
 
      $> mkdir build
      $> cd build
      $> ../streams-0.7a.6.rc3/configure
 
-In general, the package configures and builds without adding any special
-options to the `configure' script.  For general options to the
+In general, the package configures and builds without adding any
+special options to the `configure' script.  For general options to the
 `configure' script, see the GNU `INSTALL' file in the distribution:
 
      $> less ../streams-0.7a.6.rc3/INSTALL
@@ -205,8 +207,8 @@ invoking the `check' make target like so:
 
      $> make check
 
-After succesffully checking the package, the package can be installed by
-invoking the `install' make target (as root) like so:
+After succesffully checking the package, the package can be installed
+by invoking the `install' make target (as root) like so:
 
      $> sudo make install
 
@@ -260,6 +262,10 @@ Project' website at:
 groff extension package (`groff_ext'), as it contains the `refer' or
 `grefer' commands necessary for including references in the manual
 pages.
+
+(3) Please see *Note Problem Reports::, in the manual, or the file
+`PROBLEMS' in the release directory for more information on filing a
+proper "Problem Report".
 
 -----
 

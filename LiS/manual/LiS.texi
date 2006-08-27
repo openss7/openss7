@@ -1,7 +1,7 @@
-% -*- texinfo -*- vim: ft=texinfo
+% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.18 2006/08/26 18:31:29 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.19 2006/08/27 12:26:26 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 18:31:29 $ by $Author: brian $
+% Last Modified $Date: 2006/08/27 12:26:26 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -212,12 +212,10 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @end ifnottex
 
 @menu
-* Acknowledgements::		Sponsors and Contributors
 * Preface::			Preface to this document
 
 * Quick Start Guide::		Quick Installation Instructions
 
-Full Manual:
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
@@ -231,31 +229,41 @@ Full Manual:
 * FDL::				GNU Free Documentation License
 
 * Indices::			Index of Indices
-@end menu
-@ignore
+
  ----- detailed node listing -----
 
-Acknowledgements
+Preface
 
-* Sponsors::			Sponsors of the package
-* Contributors::		People who contributed to the development of
-				the package.
+* Notice::			Notices for this package
+* Abstract::			Abstract for this document
+* Revisions::			Revisions of this document
+* Disclaimer::			IPR Disclaimers for this package
+* Acknowledgements::		Sponsors of and Contributors to the package
+* Authors::			Authors of the package
+* Maintainer::			Maintainers of the package
+* Web Resources::		Web Resources for the package
+
 Introduction
 
-* Notice::			Notice
 * Overview::			Overview
 * Organization::		Organization
 * Conventions::			Conventions
+
+Objective
 
 Reference
 
 * Files::			Files included in the package
 * Drivers::			Drivers included in the package
 * Modules::			Modules included in the package
-* Utilities::			Utilities
+* Libraries::			Libraries included in the package
+* Utilities::			Utilities included in the package
 * Development::			Development against the package
 
 Conformance
+
+* STREAMS Compatibility::	Compatibility with other STREAMS packages
+* Porting::			Porting to this STREAMS package
 
 Releases
 
@@ -273,14 +281,21 @@ Installation
 * Configuration::		Configuration of the package
 * Building::			Building the package
 * Installing::			Installing the package
-* Removal::			Removal of the package
+* Removing::			Removing the package
 * Loading::			Loading the package
+* Maintenance::			Maintaining the package
 
 Troubleshooting
 
 * Test Suites::			Test Suites for the package
 * Problem Reports::		Problem Reports for the package
-* Known Bugs::			Known Bugs in the package
+* Known Problems::		Known Probelms with the package
+
+Appendices
+
+* GPL::				GNU General Public License
+* LGPL::			GNU Lesser General Public License
+* FDL::				GNU Free Documentation License
 
 Indices
 
@@ -292,224 +307,27 @@ Indices
 * Option Index::		Index of Configuration Options
 * Makefile Target Index::	Index of Makefile Targets
 * Author Index::		Index of Authors
-* Manual Page Index::		Index of Manual Pages
-@end ignore
-
-@c --------------------------------------------------------------------------
-
-@node Acknowledgements
-@unnumbered Acknowledgements
-@cindex credits
-
-@c @include texi/funding.texi
-
-As with most open source projects, this project would not have been possible without the valiant
-efforts and productive software of the @cite{@uref{http://www.fsf.org/,, Free
-Software Foundation}} and the @cite{@uref{http://www.kernel.org/,, Linux Kernel Community}}.
-
-@menu
-* Sponsors::			Sponsors
-* Contributors::		Contributors
+* Manual Page Index::		Index of Manual Pages Referenced
 @end menu
-
-@node Sponsors
-@unnumberedsec Sponsors
-@cindex sponsors
-
-Funding for completion of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package was
-provided in part by:
-
-@multitable @columnfractions .05 .95
-@item @tab @bullet{} @uref{http://www.openss7.org/,, OpenSS7 Corporation}
-@end multitable
-
-@noindent
-Additional funding for @uref{http://www.openss7.org/,, The OpenSS7 Project} was provided by:
-
-@multitable @columnfractions .05 .95
-@item @tab @bullet{} @uref{http://www.openss7.com/,, OpenSS7 Corporation}
-@item @tab @bullet{} @uref{http://www.lmco.com/,, Lockheed Martin Co.}
-@item @tab @bullet{} @uref{http://www.pti.com/,, Performance Technologies Inc.}
-@item @tab @bullet{} @uref{http://www.motorola.com/,, Motorola}
-@item @tab @bullet{} @uref{http://www.hob.de/,, HOB International}
-@item @tab @bullet{} @uref{http://www.comverse.com/,, Comverse Ltd.}
-@item @tab @bullet{} @uref{http://www.sonus.com/,, Sonus Networks Inc.}
-@item @tab @bullet{} @uref{http://www.francetelecom.fr/,, France Telecom}
-@item @tab @bullet{} @uref{http://www.ss8.com/,, SS8 Networks Inc}
-@item @tab @bullet{} @uref{http://www.nortel.com/,, Nortel Networks}
-@item @tab @bullet{} @uref{http://www.verisign.com/,, Verisign}
-@end multitable
-
-@node Contributors
-@unnumberedsec Contributors
-@cindex contributors
-
-The current maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is
-@email{bidulock@@openss7.org, Brian F. G. Bidulock}.
-
-@cite{@value{PACKAGE_TITLE}} was originally written by:
-
-@multitable @columnfractions .05 .95
-@item @tab @minus{} @email{macbett@@cs.tu-berlin.de, Christian Herkt}
-@item @tab @minus{} @email{dave@@gcom.com, David Grothe}
-@item @tab @minus{} @email{100741.1151@@compuserve.com, Denis Froschauer}
-@item @tab @minus{} @email{duke@@diku.dk, Dennis Henriksen}
-@item @tab @minus{} @email{edp@@eznet.net, Ed Pendzik}
-@item @tab @minus{} @email{nemo@@gsyc.escet.urjc.es, Francisco J. Ballesteros}
-@item @tab @minus{} @email{unknown@@jove.acs.unt.edu, Gautham Ghantasala}
-@item @tab @minus{} @email{gram@@aztec.co.za, Graham Wheeler}
-@item @tab @minus{} @email{root@@devnet.fr, ISOLA Jean-Marc}
-@item @tab @minus{} @email{jaboydjr@@netwalk.com, John A. Boyd Jr.}
-@item @tab @minus{} @email{ldh@@imada.ou.dk, Lars Dahl-Hansen}
-@item @tab @minus{} @email{sparre@@login.dknet.dk, Ole Husgaard}
-@item @tab @minus{} @email{rodney@@sabletech.com, Rodney Thayer}
-@item @tab @minus{} @email{rolandd@@swn.com, Roland Dunkerley}
-@item @tab @minus{} @email{shyam@@jove.acs.unt.edu, Shyan Katru}
-@item @tab @minus{} @email{tgrube@@diku.dk, Tim G. Boerresen}
-@end multitable
-
-Packaging was performed by:
-
-@multitable @columnfractions .05 .95
-@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
-@end multitable
-
-Packaging would not be what it is today without the invaluable help of these
-people:
-
-@multitable @columnfractions .05 .95
-@item @tab @minus{} @email{christian.hildner@@hob.de, Christian Hildner}
-@item @tab @minus{} @email{gurol.akman@@ss8.com, Gurol Akman}
-@item @tab @minus{} @email{jaboydjr@@netwalk.com, John A. Boyd Jr.}
-@item @tab @minus{} @email{openss7@@lists.styx.org, William Waites}
-@end multitable
-
-The primary contributor to @uref{http://www.openss7.org/, The OpenSS7 Project} is
-@email{bidulock@@openss7.org, Brian F. G. Bidulock}.
-
-The following is a list of significant contributors to
-@uref{http://www.openss7.org/, The OpenSS7 Project}:
-
-@multitable @columnfractions .05 .95
-@item @tab @minus{} Per Berquist
-@item @tab @minus{} John Boyd
-@item @tab @minus{} Chuck Winters
-@item @tab @minus{} Peter Courtney
-@item @tab @minus{} Tom Chandler
-@item @tab @minus{} Gurol Ackman
-@item @tab @minus{} Kutluk Testicioglu
-@item @tab @minus{} John Wenker
-@item @tab @minus{} Others
-@end multitable
-
-Additional people not named here that I missed putting on the list.  We thank
-them too!
-
-@unnumberedsec Authors
-
-Linux STREAMS, termed LiS, is an SVR4 compatible STREAMS executive which runs in
-the Linux Kernel as a loadable module.  It is the product of a joint effort
-among the following authors:
-
-@multitable @columnfractions .05 .95
-@item @tab @minus{} @email{nemo@@gsyc.escet.urjc.es, Francisco J. Ballesteros}
-@auindex Ballesteros, Francisco J.
-@item @tab @minus{} @email{jaboydjr@@netwalk.com, John Boyd}
-@auindex Boyd, John
-@item @tab @minus{} @email{Denis.Froschauer@@hol.fr, Denis Froschauer}
-@auindex Froschauer, Denis
-@item @tab @minus{} @email{dave@@gcom.com, David Grothe}
-@auindex Grothe, David
-@item @tab @minus{} @email{sparre@@login.dknet.dk, Ole Husgaard}
-@auindex Husgaard, Ole
-@item @tab @minus{} @email{juergen.magin@@octogon.de, Jürgen Magin}
-@auindex Magin, Jürgen
-@item @tab @minus{} @email{gram@@cdsec.com, Graham Wheeler}
-@auindex Wheeler, Graham
-@item @tab @minus{} @email{yegag@@hclt.com, G Yeganjaiah}
-@auindex Yeganjaiah, G
-@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
-@auindex Bidulock, Brian F. G.
-@end multitable
-
-The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
-
-@multitable @columnfractions .05 .95
-@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
-@end multitable
-
-See @ref{Author Index}, for a complete listing and cross-index of authors to
-sections of this document.
-@auindex Grothe, David
-@auindex Husgaard, Ole
-@auindex Boyd, John
-@auindex Ballesteros, Francisco J.
-@auindex Magin, Jürgen
-@auindex Yeganjaiah, G
-@auindex Bidulock, Brian F. G.
-
-@unnumberedsec Maintainer
-
-@email{bidulock@@openss7.org, Brian Bidulock} is the principal active maintainer of LiS, so please
-direct questions to him rather than the others.@footnote{David Grothe was the previous maintainer of
-the LiS-2.18 releases; however, David is no longer maintaining any version of LiS.  Please do not
-direct maintenance requests at David.}
-@ignore
-David Grothe is the principal active supporter of LiS, so please direct
-questions to him rather than to the others.
-@end ignore
-Ole Husgaard
-@auindex Husgaard, Ole
-@ignore
-is responsible for the ldl driver and
-@end ignore
-has contributed to the kerneld support and installation procedures.
-Jürgen Magin
-@auindex Magin, Jürgen
-contributed patches for Linux SPARC.
-G Yeganjaiah
-@auindex Yeganjaiah, G
-added interrupt routine support.
-John Boyd
-@auindex Boyd, John
-implemented fattach and STREAMS pipes and FIFOs.
-Brian Bidulock
-@auindex Bidulock, Brian
-developed a complete set of manual pages for LiS, converted the build process to autoconf, wrapped
-the source RPMS, updated this manual for texinfo and currently maintains the package.
-
-The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
-
-@multitable @columnfractions .05 .95
-@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
-@end multitable
-
-Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
-included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
-Reports}, in the manual.
-
-@unnumberedsec Mailing List
-
-@ignore
-Francisco Ballesteros still maintains an LiS mailing list.  Click Here to
-Subscribe to the LiS mailing list
-
-You can mail to the group by addressing email to
-@email{linux-streams@@gsyc.escet.urjc.es}.
-
-You can view the archives at
-@uref{http://gsyc.escet.urjc.es/mailarchive/linux-streams}.
-@end ignore
 
 @c --------------------------------------------------------------------------
 
 @node Preface
 @unnumbered Preface
 
-@section Document Information
-@cindex document information
+@menu
+* Notice::			Notices for this package
+* Abstract::			Abstract for this document
+* Revisions::			Revisions of this document
+* Disclaimer::			IPR Disclaimers for this package
+* Acknowledgements::		Sponsors of and Contributors to the package
+* Authors::			Authors of the package
+* Maintainer::			Maintainers of the package
+* Web Resources::		Web Resources for the package
+@end menu
 
-@subsection Notice
+@node Notice
+@unnumberedsec Notice
 @cindex document notice
 @cindex licensing
 
@@ -522,12 +340,13 @@ information.
 This document, is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
 sections invariant.
 
-@subsection Abstract
+@node Abstract
+@unnumberedsec Abstract
 @cindex document abstract
 
 This document provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
 
-@subsection Objective
+@unnumberedsubsec Objective
 @cindex document objective
 
 The objective of this document is to provide a guide for the @dfn{STREAMS} programmer when
@@ -542,7 +361,7 @@ kernel levels.
 @dfn{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
 that expedite software design and implementation.
 
-@subsection Intent
+@unnumberedsubsec Intent
 @cindex document intent
 
 The intent of this document is to act as an introductory guide to the @dfn{STREAMS} programmer.  It
@@ -553,7 +372,7 @@ Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package
 @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
 system or feature listed herein.
 
-@subsection Audience
+@unnumberedsubsec Audience
 @cindex document audience
 
 This document is intended for a highly technical audience.  The reader should already be familiar
@@ -567,7 +386,8 @@ user and kernel levels for @cite{Linux} and @cite{UNIX} system communication ser
 Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
 system, programming, networking, and data communication.
 
-@subsection Revisions
+@node Revisions
+@unnumberedsec Revisions
 @cindex document revisions
 
 Take care that you are working with a current version of this document: you will not be notified of
@@ -578,11 +398,14 @@ Project} website for a current version.
 A current version of this document is normally distributed with the @cite{@value{PACKAGE_TITLE}}
 package.
 
-@subsubsection Version Control
+@unnumberedsubsec Version Control
 
 @smallexample
 
 $Log: LiS.texi,v $
+Revision 1.1.6.19  2006/08/27 12:26:26  brian
+- finalizing auto release files
+
 Revision 1.1.6.18  2006/08/26 18:31:29  brian
 - handle long urls
 
@@ -707,13 +530,14 @@ file LiS.texi was initially added on branch LIS-2-16-16-autoconf.
 
 @end smallexample
 
-@subsubsection ISO 9000 Compliance
+@unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed,
 postscript or portable document format) version of this document is an @strong{UNCONTROLLED
 VERSION}.
 
-@subsection Disclaimer
+@node Disclaimer
+@unnumberedsec Disclaimer
 @cindex document disclaimer
 
 @noindent
@@ -733,7 +557,7 @@ utilization of advances in the state of the technical arts, or the reflection of
 design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
 Corporation} is under no obligation to provide any feature listed herein.
 
-@subsubsection U.S. Government Restricted Rights
+@unnumberedsubsec U.S. Government Restricted Rights
 
 If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
 provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
@@ -745,6 +569,207 @@ than DoD, it is classified as "Restricted Computer Software" and the Government'
 Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
 successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to
 the FAR (or any successor regulations).
+
+@c ----------------------------------------------------------------------------
+
+@node Acknowledgements
+@unnumberedsec Acknowledgements
+@cindex credits
+
+@c @include texi/funding.texi
+
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @cite{@uref{http://www.fsf.org/,, Free
+Software Foundation}} and the @cite{@uref{http://www.kernel.org/,, Linux Kernel Community}}.
+
+@unnumberedsubsec Sponsors
+@cindex sponsors
+
+Funding for completion of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package was
+provided in part by:
+
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.openss7.org/,, OpenSS7 Corporation}
+@end multitable
+
+@noindent
+Additional funding for @uref{http://www.openss7.org/,, The OpenSS7 Project} was provided by:
+
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.openss7.com/,, OpenSS7 Corporation}
+@item @tab @bullet{} @uref{http://www.lmco.com/,, Lockheed Martin Co.}
+@item @tab @bullet{} @uref{http://www.pti.com/,, Performance Technologies Inc.}
+@item @tab @bullet{} @uref{http://www.motorola.com/,, Motorola}
+@item @tab @bullet{} @uref{http://www.hob.de/,, HOB International}
+@item @tab @bullet{} @uref{http://www.comverse.com/,, Comverse Ltd.}
+@item @tab @bullet{} @uref{http://www.sonus.com/,, Sonus Networks Inc.}
+@item @tab @bullet{} @uref{http://www.francetelecom.fr/,, France Telecom}
+@item @tab @bullet{} @uref{http://www.ss8.com/,, SS8 Networks Inc}
+@item @tab @bullet{} @uref{http://www.nortel.com/,, Nortel Networks}
+@item @tab @bullet{} @uref{http://www.verisign.com/,, Verisign}
+@end multitable
+
+@unnumberedsubsec Contributors
+@cindex contributors
+
+The current maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is
+@email{bidulock@@openss7.org, Brian F. G. Bidulock}.
+
+@cite{@value{PACKAGE_TITLE}} was originally written by:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{macbett@@cs.tu-berlin.de, Christian Herkt}
+@item @tab @minus{} @email{dave@@gcom.com, David Grothe}
+@item @tab @minus{} @email{100741.1151@@compuserve.com, Denis Froschauer}
+@item @tab @minus{} @email{duke@@diku.dk, Dennis Henriksen}
+@item @tab @minus{} @email{edp@@eznet.net, Ed Pendzik}
+@item @tab @minus{} @email{nemo@@gsyc.escet.urjc.es, Francisco J. Ballesteros}
+@item @tab @minus{} @email{unknown@@jove.acs.unt.edu, Gautham Ghantasala}
+@item @tab @minus{} @email{gram@@aztec.co.za, Graham Wheeler}
+@item @tab @minus{} @email{root@@devnet.fr, ISOLA Jean-Marc}
+@item @tab @minus{} @email{jaboydjr@@netwalk.com, John A. Boyd Jr.}
+@item @tab @minus{} @email{ldh@@imada.ou.dk, Lars Dahl-Hansen}
+@item @tab @minus{} @email{sparre@@login.dknet.dk, Ole Husgaard}
+@item @tab @minus{} @email{rodney@@sabletech.com, Rodney Thayer}
+@item @tab @minus{} @email{rolandd@@swn.com, Roland Dunkerley}
+@item @tab @minus{} @email{shyam@@jove.acs.unt.edu, Shyan Katru}
+@item @tab @minus{} @email{tgrube@@diku.dk, Tim G. Boerresen}
+@end multitable
+
+Packaging was performed by:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@end multitable
+
+Packaging would not be what it is today without the invaluable help of these
+people:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{christian.hildner@@hob.de, Christian Hildner}
+@item @tab @minus{} @email{gurol.akman@@ss8.com, Gurol Akman}
+@item @tab @minus{} @email{jaboydjr@@netwalk.com, John A. Boyd Jr.}
+@item @tab @minus{} @email{openss7@@lists.styx.org, William Waites}
+@end multitable
+
+The primary contributor to @uref{http://www.openss7.org/, The OpenSS7 Project} is
+@email{bidulock@@openss7.org, Brian F. G. Bidulock}.
+
+The following is a list of significant contributors to
+@uref{http://www.openss7.org/, The OpenSS7 Project}:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} Per Berquist
+@item @tab @minus{} John Boyd
+@item @tab @minus{} Chuck Winters
+@item @tab @minus{} Peter Courtney
+@item @tab @minus{} Tom Chandler
+@item @tab @minus{} Gurol Ackman
+@item @tab @minus{} Kutluk Testicioglu
+@item @tab @minus{} John Wenker
+@item @tab @minus{} Others
+@end multitable
+
+Additional people not named here that I missed putting on the list.  We thank
+them too!
+
+@node Authors
+@unnumberedsec Authors
+@cindex authors
+
+Linux STREAMS, termed LiS, is an SVR4 compatible STREAMS executive which runs in
+the Linux Kernel as a loadable module.  It is the product of a joint effort
+among the following authors:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{nemo@@gsyc.escet.urjc.es, Francisco J. Ballesteros}
+@auindex Ballesteros, Francisco J.
+@item @tab @minus{} @email{jaboydjr@@netwalk.com, John Boyd}
+@auindex Boyd, John
+@item @tab @minus{} @email{Denis.Froschauer@@hol.fr, Denis Froschauer}
+@auindex Froschauer, Denis
+@item @tab @minus{} @email{dave@@gcom.com, David Grothe}
+@auindex Grothe, David
+@item @tab @minus{} @email{sparre@@login.dknet.dk, Ole Husgaard}
+@auindex Husgaard, Ole
+@item @tab @minus{} @email{juergen.magin@@octogon.de, Jürgen Magin}
+@auindex Magin, Jürgen
+@item @tab @minus{} @email{gram@@cdsec.com, Graham Wheeler}
+@auindex Wheeler, Graham
+@item @tab @minus{} @email{yegag@@hclt.com, G Yeganjaiah}
+@auindex Yeganjaiah, G
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@auindex Bidulock, Brian F. G.
+@end multitable
+
+The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@auindex Bidulock, Brian
+@end multitable
+
+See @ref{Author Index}, for a complete listing and cross-index of authors to
+sections of this document.
+
+@node Maintainer
+@unnumberedsec Maintainer
+@cindex maintainer
+
+@email{bidulock@@openss7.org, Brian Bidulock} is the principal active maintainer of LiS, so please
+direct questions to him rather than the others.@footnote{David Grothe was the previous maintainer of
+the LiS-2.18 releases; however, David is no longer maintaining any version of LiS.  Please do not
+direct maintenance requests at David.}
+@ignore
+David Grothe is the principal active supporter of LiS, so please direct
+questions to him rather than to the others.
+@end ignore
+Ole Husgaard
+@auindex Husgaard, Ole
+@ignore
+is responsible for the ldl driver and
+@end ignore
+has contributed to the kerneld support and installation procedures.
+Jürgen Magin
+@auindex Magin, Jürgen
+contributed patches for Linux SPARC.
+G Yeganjaiah
+@auindex Yeganjaiah, G
+added interrupt routine support.
+John Boyd
+@auindex Boyd, John
+implemented fattach and STREAMS pipes and FIFOs.
+Brian Bidulock
+@auindex Bidulock, Brian
+developed a complete set of manual pages for LiS, converted the build process to autoconf, wrapped
+the source RPMS, updated this manual for texinfo and currently maintains the package.
+
+The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@end multitable
+
+Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
+included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
+Reports}, in the manual.
+
+@node Web Resources
+@unnumberedsec Web Resources
+@cindex web resources
+
+@include texi/mail.texi
+
+@ignore
+Francisco Ballesteros still maintains an LiS mailing list.  Click Here to
+Subscribe to the LiS mailing list
+
+You can mail to the group by addressing email to
+@email{linux-streams@@gsyc.escet.urjc.es}.
+
+You can view the archives at
+@uref{http://gsyc.escet.urjc.es/mailarchive/linux-streams}.
+@end ignore
 
 @c --------------------------------------------------------------------------
 
@@ -766,12 +791,12 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @c ----------------------------------------------------------------------------
 
 @menu
-* Notice::			Notice
 * Overview::			Overview
 * Organization::		Organization
 * Conventions::			Conventions
 @end menu
 
+@ignore
 @node Notice
 @section Notice
 @cindex notice
@@ -784,6 +809,7 @@ contained in the documentation for more information.
 
 This manual is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
 sections invariant.
+@end ignore
 
 @node Overview
 @section Overview
@@ -5181,8 +5207,8 @@ int lis_umount(char *file, int flags);
 @cindex conformance
 
 @menu
-* STREAMS Compatibility::
-* Porting::
+* STREAMS Compatibility::	Compatibility with other STREAMS packages
+* Porting::			Porting to this STREAMS package
 @end menu
 
 @node STREAMS Compatibility
@@ -5393,8 +5419,8 @@ For additional details,
 * Variable Index::		Index of Variables and Constants
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
-* Author Index::		Index of Authors
 * Makefile Target Index::	Index of Makefile Targets
+* Author Index::		Index of Authors
 * Manual Page Index::		Index of Manual Pages Referenced
 @end menu
 

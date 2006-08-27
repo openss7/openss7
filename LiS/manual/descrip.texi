@@ -1,7 +1,7 @@
-@c -*- texinfo -*- vim: ft=texinfo nosi nocin
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nosi nocin
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.1 2006/08/26 09:14:19 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.2 2006/08/27 12:26:27 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,18 +53,40 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 09:14:19 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/27 12:26:27 $ by $Author: brian $
 @c
 @c =========================================================================
 
-This is an @cite{OpenSS7} modified version of the sources available from
-@url{ftp://ftp.com.com/pub/linux/src/LiS-2.18.0.tgz}.
+The @cite{OpenSS7 @value{PACKAGE_TITLE}} package is an @uref{http://www.openss7.org/,, OpenSS7}
+modified version of the @cite{LiS-2.18} package formerly from
+@cite{@uref{ftp://ftp.gcom.com/pub/linux/src/LiS-2.18.0.tgz,, GCOM}}, and formerly maintained by
+@email{dave@@gcom.com, David Grothe}.
 
+@emph{Note}: The original @value{PACKAGE} package from @cite{GCOM} is no longer actively maintained
+by either @cite{GCOM} or the @cite{OpenSS7 Project}: use the @cite{OpenSS7 Linux Fast-STREAMS}
+package <@uref{http://www.openss7.org/STREAMS.html}> instead.
+
+The following are claims made by its authors and original maintainer:
+
+@quotation
 The @cite{OpenSS7 Modified @value{PACKAGE_TITLE}} package is as @dfn{STREAMS} framework that is
 compatible with @dfn{SVR 4 STREAMS}.  It has lots of debugging features not found in other
 @dfn{STREAMS} packages.  Good to do networking and other things.  It allows for installation of
 binary drivers.
+@end quotation
 
-@emph{Note}: The original @value{PACKAGE} package from @cite{GCOM} is no longer actively maintained
-by either @cite{GCOM} or the @cite{OpenSS7 Project}: use the @cite{OpenSS7 Linux Fast-STREAMS}
-package <@url{http://www.openss7.org/STREAMS.html}> instead.
+@cite{@value{PACKAGE_TITLE}} aims to provide @cite{SVR 4} compatible @dfn{STREAMS} implementation
+for @cite{Linux} and claims to have special debugging facilities; however, the package suffers from
+the major failings that it is:
+
+@itemize @minus
+@item no longer maintained;
+@item full of bugs;
+@item incompatible with POSIX;
+@item implements SVR 4 STREAMS rather than the more popular SVR 4.2 MP/ES STREAMS;
+@item portions dubiously licensed under the LGPL;
+@item unsuitable for mainline adoption;
+@item adapts poorly to production kernels;
+@item many SMP races and lockups;
+@item no @manpage{strlog(9)} @dfn{STREAMS} logger;
+@end itemize

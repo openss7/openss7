@@ -1,5 +1,5 @@
 OpenSS7 NETPERF Utility -- beta release introduction.  2006-08-26
-$Id: README-alpha,v 0.9.2.2 2006/08/26 14:46:28 brian Exp $
+$Id: README-alpha,v 0.9.2.3 2006/08/27 12:26:31 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -13,10 +13,10 @@ This is beta release software.
 
 The following is an extract from the Installation and Reference Manual:
 
-5.5 Bugs
+6.5 Bugs
 ========
 
-5.5.1 Defect Notices
+6.5.1 Defect Notices
 --------------------
 
 "OpenSS7 NETPERF Utility" could contain unknown defects.  This is a
@@ -42,7 +42,7 @@ YOU HAVE BEEN WARNED.
 
 (1) See section NO WARRANTY under *Note GNU General Public License::.
 
-5.5.2 Known Defects
+6.5.2 Known Defects
 -------------------
 
 With the exception of packages not originaly created by the `OpenSS7
@@ -67,7 +67,26 @@ package that have not yet been discovered:
      on the regular Netperf release package probably still exist
      unfixed in this release package.
 
-5.4.3 Beta Releases
+6.5.3 Defect History
+--------------------
+
+This section contains historical bugs that were encountered during
+development and their resolutions.  This list serves two purposes:
+
+  1. It captures bugs encountered between releases during development
+     that could possibly reoccur (and the Moon is made of blue cheese).
+     It therefore provides a place for users to look if they encounter
+     a problem.
+
+  2. It provides a low overhead bug list between releases for
+     developers to use as a `TODO' list.
+
+ Bugs
+.....
+
+`(no items)'
+
+6.4.3 Beta Releases
 -------------------
 
 "Beta" releases are releases that have received some testing, but the

@@ -1,7 +1,7 @@
-% -*- texinfo -*- vim: ft=texinfo
+% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: sctp.texi,v 0.9.2.17 2006/08/26 09:16:38 brian Exp $
+% @(#) $Id: sctp.texi,v 0.9.2.18 2006/08/27 12:26:34 brian Exp $
 %
 % =========================================================================
 %
@@ -17,7 +17,7 @@
 % Permission is granted to copy and distribute modified versions of this
 % manual under the conditions for verbatim copying, provided that the
 % entire resulting derived work is distributed under the terms of a
-% permission notice identical to this one
+% permission notice identical to this one.
 % 
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 09:16:38 $ by $Author: brian $
+% Last Modified $Date: 2006/08/27 12:26:34 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -212,12 +212,10 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @end ifnottex
 
 @menu
-* Acknowledgements::		Sponsors and Contributors
 * Preface::			Preface to this document
 
 * Quick Start Guide::		Quick Installation Instructions
 
-Full Manual:
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
@@ -234,27 +232,38 @@ Full Manual:
 
  ----- detailed node listing -----
 
-Acknowledgements
+Preface
 
-* Sponsors::			Sponsors of the package
-* Contributors::		People who contributed to the development of
-				the package.
+* Notice::			Notices for this package
+* Abstract::			Abstract for this document
+* Revisions::			Revisions of this document
+* Disclaimer::			IPR Disclaimers for this package
+* Acknowledgements::		Sponsors of and Contributors to the package
+* Authors::			Authors of the package
+* Maintainer::			Maintainers of the package
+* Web Resources::		Web Resources for the package
+
 Introduction
 
-* Notice::			Notice
 * Overview::			Overview
 * Organization::		Organization
 * Conventions::			Conventions
+
+Objective
 
 Reference
 
 * Files::			Files included in the package
 * Kernel Modules::		Kernel Modules included in the package
-* Utilities::			Utilities
+* Libraries::			Libraries included in the package
+* Utilities::			Utilities included in the package
 * Development::			Development against the package
 * SCTP Reference Page::		SCTP Reference Page
 
 Conformance
+
+* STREAMS Compatibility::	Compatibility with other STREAMS packages
+* Porting::			Porting to this STREAMS package
 
 Releases
 
@@ -272,14 +281,21 @@ Installation
 * Configuration::		Configuration of the package
 * Building::			Building the package
 * Installing::			Installing the package
-* Removal::			Removal of the package
+* Removing::			Removing the package
 * Loading::			Loading the package
+* Maintenance::			Maintaining the package
 
 Troubleshooting
 
 * Test Suites::			Test Suites for the package
 * Problem Reports::		Problem Reports for the package
-* Known Bugs::			Known Bugs in the package
+* Known Problems::		Known Probelms with the package
+
+Appendices
+
+* GPL::				GNU General Public License
+* LGPL::			GNU Lesser General Public License
+* FDL::				GNU Free Documentation License
 
 Indices
 
@@ -291,46 +307,27 @@ Indices
 * Option Index::		Index of Configuration Options
 * Makefile Target Index::	Index of Makefile Targets
 * Author Index::		Index of Authors
-* Manual Page Index::		Index of Manual Pages
+* Manual Page Index::		Index of Manual Pages Referenced
 @end menu
-
-@c --------------------------------------------------------------------------
-
-@node Acknowledgements
-@unnumbered Acknowledgements
-@cindex credits
-
-@include texi/funding.texi
-
-@unnumberedsec Authors
-
-The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
-
-@multitable @columnfractions .05 .95
-@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
-@end multitable
-
-@unnumberedsec Maintainer
-
-The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
-
-@multitable @columnfractions .05 .95
-@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
-@end multitable
-
-Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
-included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
-Reports}, in the manual.
 
 @c --------------------------------------------------------------------------
 
 @node Preface
 @unnumbered Preface
 
-@section Document Information
-@cindex document information
+@menu
+* Notice::			Notices for this package
+* Abstract::			Abstract for this document
+* Revisions::			Revisions of this document
+* Disclaimer::			IPR Disclaimers for this package
+* Acknowledgements::		Sponsors of and Contributors to the package
+* Authors::			Authors of the package
+* Maintainer::			Maintainers of the package
+* Web Resources::		Web Resources for the package
+@end menu
 
-@subsection Notice
+@node Notice
+@unnumberedsec Notice
 @cindex document notice
 @cindex licensing
 
@@ -343,12 +340,13 @@ information.
 This document, is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
 sections invariant.
 
-@subsection Abstract
+@node Abstract
+@unnumberedsec Abstract
 @cindex document abstract
 
 This document provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
 
-@subsection Objective
+@unnumberedsubsec Objective
 @cindex document objective
 
 The objective of this document is to provide a guide for the @dfn{STREAMS} programmer when
@@ -363,7 +361,7 @@ kernel levels.
 @dfn{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
 that expedite software design and implementation.
 
-@subsection Intent
+@unnumberedsubsec Intent
 @cindex document intent
 
 The intent of this document is to act as an introductory guide to the @dfn{STREAMS} programmer.  It
@@ -374,7 +372,7 @@ Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package
 @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
 system or feature listed herein.
 
-@subsection Audience
+@unnumberedsubsec Audience
 @cindex document audience
 
 This document is intended for a highly technical audience.  The reader should already be familiar
@@ -388,7 +386,8 @@ user and kernel levels for @cite{Linux} and @cite{UNIX} system communication ser
 Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
 system, programming, networking, and data communication.
 
-@subsection Revisions
+@node Revisions
+@unnumberedsec Revisions
 @cindex document revisions
 
 Take care that you are working with a current version of this document: you will not be notified of
@@ -399,11 +398,14 @@ Project} website for a current version.
 A current version of this document is normally distributed with the @cite{@value{PACKAGE_TITLE}}
 package.
 
-@subsubsection Version Control
+@unnumberedsubsec Version Control
 
 @smallexample
 
 $Log: sctp.texi,v $
+Revision 0.9.2.18  2006/08/27 12:26:34  brian
+- finalizing auto release files
+
 Revision 0.9.2.17  2006/08/26 09:16:38  brian
 - better release file generation
 
@@ -457,13 +459,14 @@ Revision 0.9  1996-12-31 17:00:00 -0700  brian
 
 @end smallexample
 
-@subsubsection ISO 9000 Compliance
+@unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed,
 postscript or portable document format) version of this document is an @strong{UNCONTROLLED
 VERSION}.
 
-@subsection Disclaimer
+@node Disclaimer
+@unnumberedsec Disclaimer
 @cindex document disclaimer
 
 @noindent
@@ -483,7 +486,7 @@ utilization of advances in the state of the technical arts, or the reflection of
 design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
 Corporation} is under no obligation to provide any feature listed herein.
 
-@subsubsection U.S. Government Restricted Rights
+@unnumberedsubsec U.S. Government Restricted Rights
 
 If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
 provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
@@ -498,13 +501,55 @@ the FAR (or any successor regulations).
 
 @c ----------------------------------------------------------------------------
 
+@node Acknowledgements
+@unnumberedsec Acknowledgements
+@cindex credits
+
+@include texi/funding.texi
+
+@node Authors
+@unnumberedsec Authors
+@cindex authors
+
+The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@auindex Bidulock, Brian
+@end multitable
+
+See @ref{Author Index}, for a complete listing and cross-index of authors to
+sections of this document.
+
+@node Maintainer
+@unnumberedsec Maintainer
+@cindex maintainer
+
+The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@end multitable
+
+Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
+included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
+Reports}, in the manual.
+
+@node Web Resources
+@unnumberedsec Web Resources
+@cindex web resources
+
+@include texi/mail.texi
+
+@c ----------------------------------------------------------------------------
+
 @node Quick Start Guide
 @unnumbered Quick Start Guide
 @cindex quick start guide
 
 @include texi/quick.texi
 
-@c --------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
 
 @node Introduction
 @chapter Introduction
@@ -516,12 +561,12 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @c ----------------------------------------------------------------------------
 
 @menu
-* Notice::			Notice
 * Overview::			Overview
 * Organization::		Organization
 * Conventions::			Conventions
 @end menu
 
+@ignore
 @node Notice
 @section Notice
 @cindex notice
@@ -534,6 +579,7 @@ contained in the documentation for more information.
 
 This manual is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
 sections invariant.
+@end ignore
 
 @node Overview
 @section Overview
@@ -558,6 +604,7 @@ This manual is organized (loosely) into several sections as follows:
 @ifnottex
 @menu
   Introduction::		This introduction
+* Objective::			Objective of the package
 * Reference::			Contents of the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
@@ -626,7 +673,8 @@ This manual uses @cite{texinfo} typographic conventions.
 @menu
 * Files::			Files included in the package
 * Kernel Modules::		Kernel Modules included in the package
-* Utilities::			Utilities
+* Libraries::			Libraries included in the package
+* Utilities::			Utilities included in the package
 * Development::			Development against the package
 * SCTP Reference Page::		SCTP Reference Page
 @end menu
@@ -654,6 +702,14 @@ This manual uses @cite{texinfo} typographic conventions.
 The @file{sctp} module was originally written by Brian F. G. Bidulock and is
 licensed under the GNU General Public License Version 2 @xref{GNU General
 Public License}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Libraries
+@section Libraries
+@cindex libraries
+
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -843,8 +899,8 @@ programs that use the @file{sctp} kernel module.
 * Variable Index::		Index of Variables and Constants
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
-* Author Index::		Index of Authors
 * Makefile Target Index::	Index of Makefile Targets
+* Author Index::		Index of Authors
 * Manual Page Index::		Index of Manual Pages Referenced
 @end menu
 
