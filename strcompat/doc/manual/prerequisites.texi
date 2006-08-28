@@ -1,7 +1,7 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: prerequisites.texi,v 0.9.2.2 2006/08/26 18:31:42 brian Exp $
+@c @(#) $Id: prerequisites.texi,v 0.9.2.3 2006/08/28 02:52:13 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 18:31:42 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/28 02:52:13 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -75,49 +75,111 @@ Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
 (@samp{groff_ext}), as it contains the @command{refer} or @command{grefer} commands necessary for
 including references in the manual pages.}
 @item OpenSS7 Linux Fast-STREAMS
-(@uref{http://@-www.@-openss7.@-org/@-tarballs/@-streams-0.7a.6.@-tar.@-bz2,, streams-0.7a.6} or better)
+(@uref{http://www.openss7.org/tarballs/streams-@value{VERSION_STREAMS}.tar.bz2,, streams-@value{VERSION_STREAMS}} or better)
 @footnote{Although this an other OpenSS7 STREAMS packages will build and install with Linux STREAMS
 (LiS), @b{Linux STREAMS (LiS) is deprecated and cannot be supported because it is full of bugs!}}
+@item OpenSS7 STREAMS Compatibility Modules
+(@uref{http://www.openss7.org/tarballs/strcompat-@value{VERSION_STRCOMPAT}.tar.bz2,, strcompat-@value{VERSION_STRCOMPAT}} or better)
+@item OpenSS7 STREAMS XNS
+(@uref{http://www.openss7.org/tarballs/strxns-@value{VERSION_STRXNS}.tar.bz2,, strxns-@value{VERSION_STRXNS}} or better)
+@item OpenSS7 STREAMS XTI/TLI Library
+(@uref{http://www.openss7.org/tarballs/strxnet-@value{VERSION_STRXNET}.tar.bz2,, strxnet-@value{VERSION_STRXNET}} or better)
+@item OpenSS7 STREAMS INET
+(@uref{http://www.openss7.org/tarballs/strinet-@value{VERSION_STRINET}.tar.bz2,, strinet-@value{VERSION_STRINET}} or better)
+@item OpenSS7 STREAMS SCTP
+(@uref{http://www.openss7.org/tarballs/strsctp-@value{VERSION_STRSCTP}.tar.bz2,, strsctp-@value{VERSION_STRSCTP}} or better)
 @end itemize
 @end ignore
 
-@enumerate
+@enumerate 1
 @item @cite{Linux} distribution, somewhat @cite{Linux Standards Base} compliant, with a 2.4 or 2.6
 kernel and the appropriate tool chain for compiling out-of-tree kenrel modules.  Most recent
 @cite{Linux} distributions are okay out of the box, but some development packages must be installed.
 For more information, see @xref{Compatibility}, in the manual.
 
-@item @cite{OpenSS7 Linux Fast-STREAMS} or @cite{OpenSS7 Modified Linux
-STREAMS} installed, such as @*
-@url{http://www.openss7.org/tarballs/streams-@value{VERSION_STREAMS}.tar.bz2} or @*
-@url{http://www.openss7.org/tarballs/LiS-@value{VERSION_LIS}}.
+@multitable @columnfractions .05 .95
+@item @tab @minus{}
+A fairly LSB compliant GNU/Linux distribution.
+@footnote{@xref{GNU/Linux Distributions}, for more information.}
 
-(Note that the @file{LiS} package is deprecated and unsupported.  We recommend using the lastest
- version of the @file{streams} package instead.)
+@item @tab @minus{}
+Linux 2.4 kernel (2.4.10 - 2.4.27), or
+
+@item @tab @minus{}
+Linux 2.6 kernel (2.6.3 - 2.6.17);
+
+@item @tab @minus{}
+glibc2 or better.
+
+@item @tab @minus{}
+GNU info (for info files).
+
+@item @tab @minus{}
+GNU groff (for man pages).
+@footnote{If you are using a Debian release, please make sure to install the groff extension package
+(@samp{groff_ext}), as it contains the @command{refer} or @command{grefer} commands necessary for
+including references in the manual pages.}
+@end multitable
+@end enumerate
+
+(Note: If you acquired @command{@value{PACKAGE}} a part of the @cite{OpenSS7 Master Package}, then
+the dependencies listed below will already have been met by unpacking the master package.)
+
+@enumerate 2
+@item
+@cite{OpenSS7 Linux Fast-STREAMS},
+@uref{http://www.openss7.org/tarballs/streams-@value{VERSION_STREAMS}.tar.bz2, streams-@value{VERSION_STREAMS}}.
+@footnote{Although, at one time, this package supported @cite{LiS}, @cite{LiS} is now deprecated and
+unsupported.}
 
 @ignore
 @item
-Most @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS Compatibility Modules} package be
-installed, such as @* @url{http://www.openss7.org/tarballs/strcompat-@value{VERSION_STRCOMPAT}.tar.bz2}.
+@cite{OpenSS7 STREAMS Compatibility Modules},
+@uref{http://www.openss7.org/tarballs/strcompat-@value{VERSION_STRCOMPAT}.tar.bz2, strcompat-@value{VERSION_STRCOMPAT}}.
 
 @item
-Most @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS Utilities} package be installed,
-such as @* @url{http://www.openss7.org/tarballs/strutil-@value{VERSION_STRUTIL}.tar.bz2}.
+@cite{OpenSS7 STREAMS Utilities},
+@uref{http://www.openss7.org/tarballs/strutil-@value{VERSION_STRUTIL}.tar.bz2, strutil-@value{VERSION_STRUTIL}}.
+(Optional.)
 
 @item
-Some @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS XNS} package be installed, such
-as @* @url{http://www.openss7.org/tarballs/strxns-@value{VERSION_STRXNS}.tar.bz2}.
+@cite{OpenSS7 STREAMS Binary Compatibility},
+@uref{http://www.openss7.org/tarballs/stbcm-@value{VERSION_STRBCM}.tar.bz2, stbcm-@value{VERSION_STRBCM}}.
+(Optional.)
 
 @item
-Some @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS XTI/TLI} package be installed,
-     such as @* @url{http://www.openss7.org/tarballs/strxnet-@value{VERSION_STRXNET}.tar.bz2}.
+@cite{OpenSS7 STREAMS Terminals},
+@uref{http://www.openss7.org/tarballs/strtty-@value{VERSION_STRTTY}.tar.bz2, strtty-@value{VERSION_STRTTY}}.
+(Optional.)
 
 @item
-Some @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS INET} package be installed, such
-as @* @url{http://www.openss7.org/tarballs/strinet-@value{VERSION_STRINET}.tar.bz2}.
+@cite{OpenSS7 STREAMS XNS},
+@uref{http://www.openss7.org/tarballs/strxns-@value{VERSION_STRXNS}.tar.bz2, strxns-@value{VERSION_STRXNS}}.
 
 @item
-Some @dfn{STREAMS} packages require that the @cite{OpenSS7 STREAMS SCTP} package be installed, such
-as @* @url{http://www.openss7.org/tarballs/strsctp-@value{VERSION_STRSCTP}.tar.bz2}.
+@cite{OpenSS7 STREAMS XTI/TLI},
+@uref{http://www.openss7.org/tarballs/strxnet-@value{VERSION_STRXNET}.tar.bz2, strxnet-@value{VERSION_STRXNET}}.
+
+@item
+@cite{OpenSS7 STREAMS Sockets},
+@uref{http://www.openss7.org/tarballs/strsock-@value{VERSION_STRSOCK}.tar.bz2, strsock-@value{VERSION_STRSOCK}}.
+(Optional.)
+
+@item
+@cite{OpenSS7 STREAMS INET},
+@uref{http://www.openss7.org/tarballs/strinet-@value{VERSION_STRINET}.tar.bz2, strinet-@value{VERSION_STRINET}}.
+
+@item
+@cite{OpenSS7 STREAMS SCTP},
+@uref{http://www.openss7.org/tarballs/strsctp-@value{VERSION_STRSCTP}.tar.bz2, strsctp-@value{VERSION_STRSCTP}}.
+
+@item
+@cite{OpenSS7 STREAMS ISO},
+@uref{http://www.openss7.org/tarballs/striso-@value{VERSION_STRISO}.tar.bz2, striso-@value{VERSION_STRISO}}.
+
+@item
+@cite{OpenSS7 Sockets SCTP},
+@uref{http://www.openss7.org/tarballs/sctp-@value{VERSION_SCTP}.tar.bz2, sctp-@value{VERSION_SCTP}}.
+(Optional.)
 @end ignore
 @end enumerate

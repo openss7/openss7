@@ -21,9 +21,9 @@ The maintainer of the `OpenSS7 OpenSS7 NETPERF Utility' package is:
 
      - Brian Bidulock <bidulock@openss7.org>
 
-Please send bug reports to <{No value for `PACKAGE_BUGREPORT'}> using
-the `send-pr' script included in the package, only after reading the
-`BUGS' file in the release, or *Note Problem Reports::, in the manual.
+Please send bug reports to <bugs@openss7.org> using the `send-pr' script
+included in the package, only after reading the `BUGS' file in the
+release, or *Note Problem Reports::, in the manual.
 
  Web Resources
 ==============

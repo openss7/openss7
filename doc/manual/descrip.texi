@@ -60,8 +60,8 @@
 Package @command{@value{PACKAGE}-@value{VERSION}} Released @value{PACKAGE_DATE}.
 
 This is the @cite{@value{PACKAGE_TITLE}} package.  It consists of a master package that contains all
-other @uref{http://www.openss7.org/, OpenSS7 Project} package releases.  Use this package if you are
-interested in ease of installation of a wide range of @uref{http://www.openss7.org/, OpenSS7
+other @uref{http://www.openss7.org/,, OpenSS7 Project} package releases.  Use this package if you are
+interested in ease of installation of a wide range of @uref{http://www.openss7.org/,, OpenSS7
 Project} packages.
 
 The @cite{@value{PACKAGE_TITLE}} package contains:
@@ -80,7 +80,7 @@ The @cite{@value{PACKAGE_TITLE}} package contains:
 @command{strsctp-@value{VERSION_STRSCTP}} (@cite{STREAMS SCTP}), @*
 @command{striso-@value{VERSION_STRISO}} (@cite{STREAMS Open Systems Interconnect}), @*
 @command{netperf-@value{VERSION_NETPERF}} (@cite{Network Performance}), @*
-@command{strss7-@value{VERSION_STRSS7}} (@cite{STREAMS SS7/Voip/SIGTRAN/ISDN Stacks}) and @*
+@command{strss7-@value{VERSION_STRSS7}} (@cite{STREAMS SS7/VoIP/SIGTRAN/ISDN Stacks}) and @*
 @command{LiS-@value{VERSION_LIS}} (@cite{Linux STREAMS}).
 
 If you need to build an install a significant number of these packages, the
