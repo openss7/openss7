@@ -1,3 +1,61 @@
+2006-08-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: added manual pages
+	* doc/man/man3/accept.3.man: added manual pages
+	* doc/man/man3/bind.3.man: added manual pages
+	* doc/man/man3/connect.3.man: added manual pages
+	* doc/man/man3/getpeername.3.man: added manual pages
+	* doc/man/man3/getsockname.3.man: added manual pages
+	* doc/man/man3/getsockopt.3.man: added manual pages
+	* doc/man/man3/libsocket.3.man: added manual pages
+	* doc/man/man3/listen.3.man: added manual pages
+	* doc/man/man3/recv.3.man: added manual pages
+	* doc/man/man3/recvfrom.3.man: added manual pages
+	* doc/man/man3/recvmsg.3.man: added manual pages
+	* doc/man/man3/send.3.man: added manual pages
+	* doc/man/man3/sendmsg.3.man: added manual pages
+	* doc/man/man3/sendto.3.man: added manual pages
+	* doc/man/man3/setsockopt.3.man: added manual pages
+	* doc/man/man3/shutdown.3.man: added manual pages
+	* doc/man/man3/socket.3.man: added manual pages
+	* doc/man/man3/socketpair.3.man: added manual pages
+	* doc/man/man3/sockets.3.man: added manual pages
+	* doc/man/man3/xxx.3.man: added manual pages
+	* doc/man/man4/sockmod.4.man: added manual pages
+	* doc/man/man4/socksys.4.man: added manual pages
+	* doc/man/man4/xxx.4.man: added manual pages
+	* doc/man/man5/sock2path.5.man: added manual pages
+	* doc/man/man5/xxx.5.man: added manual pages
+	* doc/man/man8/soconfig.8.man: added manual pages
+	* doc/man/man8/xxx.8.man: added manual pages
+
+2006-08-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/todo.texi: added todo file
+	* doc/manual/bugs.texi: added bugs file
+
+2006-08-25  Brian Bidulock  <bidulock@openss7.org>
+
+        * am/release.am: added new release control file
+	* doc/manual/descrip.texi: added short description file
+
+2006-08-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/strsock.texi: some improvements to documentation
+	* src/include/sys/strsock/config.h.in: added missing file
+	* Makefile.am: automating release files
+	* README-alpha.in: automating release files
+	* README-cvs.in: automating release files
+	* README-nexusware.in: automating release files
+	* README.in: automating release files
+	* doc/manual/Makefile.am: automating release files
+	* doc/manual/prerequisites.texi: automating release files
+	* doc/manual/releases.texi: automating release files
+	* doc/manual/strsock.texi: automating release files
+	* doc/manual/texi/quick.texi: automating release files
+	* scripts/texi/macros.texi: automating release files
+	* scripts/texi/versions.texi: automating release files
+
 2006-08-23  Brian Bidulock  <bidulcok@openss7.org>
 
 	- started off this new STREAMS Terminals package
@@ -94,6 +152,10 @@
 	* tests/kernel.at: added
 	* tests/local.at: added
 	* tests/testsuite.at: added
+	* am/kernel.am: handle empty kernel module lists
+	* .cvsignore: better ignoring
+	* doc/manual/.cvsignore: better ignoring
+	* scripts/texi/funding.texi: correction
 
 -----
 

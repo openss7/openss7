@@ -1,6 +1,43 @@
+2006-08-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/.cvsignore: added manual
+	* doc/manual/Makefile.am: added manual
+	* doc/manual/compat.texi: added manual
+	* doc/manual/configure.texi: added manual
+	* doc/manual/descrip.texi: added manual
+	* doc/manual/install.texi: added manual
+	* doc/manual/iperf.info: added manual
+	* doc/manual/iperf.texi: added manual
+	* doc/manual/news.texi: added manual
+	* doc/manual/prerequisites.texi: added manual
+	* doc/manual/releases.texi: added manual
+	* doc/manual/rpm.texi: added manual
+	* doc/manual/testsuite.texi: added manual
+	* doc/manual/texi/.cvsignore: added manual
+	* doc/manual/texi/args.texi.in: added manual
+	* doc/manual/texi/fdl.texi: added manual
+	* doc/manual/texi/gpl.texi: added manual
+	* doc/manual/texi/install.texi: added manual
+	* doc/manual/texi/lesser.texi: added manual
+	* doc/manual/texi/quick.texi: added manual
+	* doc/manual/texi/testsuite.texi: added manual
+	* doc/manual/todo.texi: added manual
+	* doc/manual/tree.texi: added manual
+	* doc/manual/bugs.texi: added bugs file
+
+2006-08-25  Brian Bidulock  <bidulock@openss7.org>
+
+        * am/release.am: added new release control file
+	* doc/manual/descrip.texi: added short description file
+
 2006-08-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/funding.texi: correction
+	* am/kernel.am: handle empty kernel module lists
+	* .cvsignore: better ignoring
+	* scripts/texi/funding.texi: correction
+	* scripts/texi/macros.texi: automating release files
+	* scripts/texi/versions.texi: automating release files
 
 2006-08-22  Brian Bidulock  <bidulock@openss7.org>
 

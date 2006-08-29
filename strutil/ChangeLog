@@ -1,3 +1,26 @@
+2006-08-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/todo.texi: added todo file
+	* doc/manual/bugs.texi: added bugs file
+
+2006-08-25  Brian Bidulock  <bidulock@openss7.org>
+
+        * am/release.am: added new release control file
+	* doc/manual/descrip.texi: added short description file
+
+2006-08-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/strutil.texi: some improvements to documentation
+	* Makefile.am: automating release files
+	* doc/manual/Makefile.am: automating release files
+	* doc/manual/prerequisites.texi: automating release files
+	* doc/manual/releases.texi: automating release files
+	* doc/manual/strutil.texi: automating release files
+	* doc/manual/texi/quick.texi: automating release files
+	* scripts/texi/macros.texi: automating release files
+	* scripts/texi/versions.texi: automating release files
+	* acinclude.m4: make definitions 1 instead of null
+
 2006-08-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* ANNOUNCE: added missing file
@@ -7,6 +30,10 @@
 	* scripts/texi/funding.texi: correction
 	* src/modules/sc.c: corrected to streams version
 	* src/util/scls.c: corrected to streams version
+	* am/kernel.am: handle empty kernel module lists
+	* .cvsignore: better ignoring
+	* doc/manual/.cvsignore: better ignoring
+	* scripts/texi/funding.texi: correction
 
 2006-08-22  Brian Bidulock  <bidulock@openss7.org>
 
